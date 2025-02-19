@@ -35,7 +35,7 @@ public class MeteorSlamTowerAbility extends TowerAbility {
 			public @Nullable LivingEntity getTarget() {
 				List<LivingEntity> targets = mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs();
 				Collections.shuffle(targets);
-				if (targets.size() > 0) {
+				if (!targets.isEmpty()) {
 					return targets.get(0);
 				}
 				return null;

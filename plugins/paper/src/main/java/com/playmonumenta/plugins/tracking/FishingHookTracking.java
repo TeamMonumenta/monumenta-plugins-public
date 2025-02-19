@@ -9,7 +9,7 @@ import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 
 public class FishingHookTracking implements EntityTracking {
-	private HashMap<UUID, FishHook> mEntities = new HashMap<UUID, FishHook>();
+	private HashMap<UUID, FishHook> mEntities = new HashMap<>();
 
 	// Note this is not from the base class
 	public void addEntity(Player player, Entity entity) {

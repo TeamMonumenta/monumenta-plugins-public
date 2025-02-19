@@ -184,7 +184,7 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 			})
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 
 		events.put(50, mBoss -> {
 			changePhase(activeSpells2, passiveSpells2, null);

@@ -24,7 +24,7 @@ public class SummonOnExplosionBoss extends BossAbilityGroup {
 	public static class Parameters extends BossParameters {
 
 		@BossParam(help = "Pool of mobs to summon")
-		public LoSPool POOL = LoSPool.EMPTY;
+		public LoSPool POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "Particles summon when the mob spawm")
 		public ParticlesList PARTICLES = ParticlesList.fromString("[(SOUL_FIRE_FLAME,20,0.7,0.7,0.7,0.2)]");

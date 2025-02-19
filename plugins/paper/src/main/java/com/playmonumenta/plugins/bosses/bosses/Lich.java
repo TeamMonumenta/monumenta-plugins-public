@@ -120,7 +120,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 	private static final String mShieldCrystal = "DeathCrystal";
 	private static final String mCrystalShield = "CrystalShield";
 	private final String mFinalCrystal = "WarpedCrystal";
-	@SuppressWarnings("NullAway.Init")
+	@SuppressWarnings("NullAway")
 	private static LivingEntity mStart;
 	private final LivingEntity mKey;
 	private static final double mL = 26.5;

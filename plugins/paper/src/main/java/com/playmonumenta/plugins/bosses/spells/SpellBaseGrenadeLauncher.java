@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.utils.MMLog;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.List;
-import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -84,7 +83,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0, 0.0, null, null);
+			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.LibraryPool.EMPTY, 0.7f, 0.0, 0.0, null, null);
 	}
 
 	public SpellBaseGrenadeLauncher(
@@ -155,7 +154,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0f, 0.0f, additionalParameters, telegraphAesthetics);
+			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, LoSPool.LibraryPool.EMPTY, 0.7f, 0.0f, 0.0f, additionalParameters, telegraphAesthetics);
 	}
 
 	/*
@@ -303,8 +302,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 				new BukkitRunnable() {
 					int mLobsLaunched = 0;
 					final Location mBossLocation = bossLocation;
-					final WeakReference<Entity> mTarget = new WeakReference<Entity>(target);
-					final WeakReference<LivingEntity> mBossRef = new WeakReference<LivingEntity>(mBoss);
+					final WeakReference<Entity> mTarget = new WeakReference<>(target);
+					final WeakReference<LivingEntity> mBossRef = new WeakReference<>(mBoss);
 					@Override
 					public void run() {
 						Entity target = mTarget.get();
@@ -657,7 +656,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 
 		public double getRandomOffset() {
 			// Returns a value between -maxRandomness and +maxRandomness
-			return RandomUtils.nextDouble(0, 2 * mTargetMaxRandomness) - mTargetMaxRandomness;
+			return FastUtils.randomDoubleInRange(0, 2 * mTargetMaxRandomness) - mTargetMaxRandomness;
 		}
 
 		public int getStartDelay() {

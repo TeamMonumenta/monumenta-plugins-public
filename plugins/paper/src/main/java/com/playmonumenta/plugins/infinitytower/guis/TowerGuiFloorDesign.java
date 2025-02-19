@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.infinitytower.guis;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerFileUtils;
-import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.infinitytower.TowerTeam;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -257,7 +257,7 @@ public class TowerGuiFloorDesign extends CustomInventory {
 					int z = mod + mDz;
 					Vector vec = new Vector(x, 0, z);
 					player.closeInventory();
-					new TowerGuiFloorDesignMob(player, mTeam, mFloor, vec).openInventory(player, TowerManager.mPlugin);
+					new TowerGuiFloorDesignMob(player, mTeam, mFloor, vec).openInventory(player, Plugin.getInstance());
 					return;
 				}
 			}

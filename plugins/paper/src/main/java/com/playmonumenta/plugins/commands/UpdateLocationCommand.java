@@ -16,7 +16,6 @@ import org.jetbrains.annotations.Nullable;
 public class UpdateLocationCommand {
 	public static String COMMAND = "monumenta";
 
-	@SuppressWarnings("unchecked")
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.updatelocation");
 

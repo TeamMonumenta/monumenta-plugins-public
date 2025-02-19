@@ -45,7 +45,7 @@ public class RestartEmptyCommand {
 			TASK = new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (Bukkit.getOnlinePlayers().size() == 0) {
+					if (Bukkit.getOnlinePlayers().isEmpty()) {
 						this.cancel();
 						TASK = null;
 						plugin.getLogger().info("restart-empty: Restarting server now that it is empty");

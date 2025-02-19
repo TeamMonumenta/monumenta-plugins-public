@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -20,6 +19,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class ProwlersRoarCS extends MelancholicLamentCS {
 	private static final Particle.DustOptions OFF_WHITE = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.0f);

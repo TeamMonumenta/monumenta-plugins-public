@@ -182,7 +182,7 @@ public class AbilityHotbar {
 			.sorted(Comparator.comparing(AbilityHotbar::getAbilityName))
 			.toList();
 
-		if (abilityList.size() <= 0) {
+		if (abilityList.isEmpty()) {
 			player.hideBossBar(bossBar);
 			return;
 		}

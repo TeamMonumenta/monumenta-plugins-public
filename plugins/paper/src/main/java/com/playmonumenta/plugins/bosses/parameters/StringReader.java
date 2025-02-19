@@ -14,6 +14,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
@@ -250,7 +251,7 @@ public class StringReader {
 	public static final List<Particle> PARTICLES_SORTED = Arrays.asList(Particle.values());
 	public static final List<Material> MATERIALS_SORTED = Arrays.asList(Material.values());
 	public static final List<Sound> SOUNDS_SORTED = Arrays.asList(Sound.values());
-	public static final List<PotionEffectType> POTION_EFFECT_TYPES_SORTED = Arrays.asList(PotionEffectType.values());
+	public static final List<PotionEffectType> POTION_EFFECT_TYPES_SORTED = Registry.POTION_EFFECT_TYPE.stream().toList();
 
 	static {
 		//this is just because Color don't have the functions values() and getName()...

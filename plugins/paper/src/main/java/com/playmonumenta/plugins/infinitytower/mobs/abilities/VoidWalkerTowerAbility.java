@@ -43,7 +43,7 @@ public class VoidWalkerTowerAbility extends TowerAbility {
 			() -> {
 				List<LivingEntity> list = mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs();
 				Collections.shuffle(list);
-				if (list.size() > 0) {
+				if (!list.isEmpty()) {
 					return list.subList(0, 1);
 				} else {
 					return list;

@@ -237,7 +237,7 @@ public class CharmManager {
 
 	public CharmType mEnabledCharmType;
 
-	@SuppressWarnings("NullAway.Init") // fields are initialised by called methods
+	// fields are initialised by called methods
 	private CharmManager() {
 		mPlayerCharmEffectMap = new HashMap<>();
 		if (ServerProperties.getDepthsEnabled()) {
@@ -1336,7 +1336,6 @@ public class CharmManager {
 	 * @see CharmManager#getSummaryOfAllAttributesAsComponents(Player, CharmType)
 	 * @see com.playmonumenta.plugins.managers.DataCollectionManager.PlayerInformation#PlayerInformation(String, Player)
 	 */
-	@SuppressWarnings("JavadocReference")
 	@Contract(value = "_, _ -> !null", pure = true)
 	public @NonNull Map<String, Double> getSummaryOfAllAttributes(Player p, CharmType charmType) {
 		if (getCharms(p, charmType).isEmpty()) {

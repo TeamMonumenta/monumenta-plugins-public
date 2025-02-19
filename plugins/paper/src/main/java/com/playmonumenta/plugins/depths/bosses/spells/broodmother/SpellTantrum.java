@@ -110,7 +110,7 @@ public class SpellTantrum extends Spell {
 			public void run() {
 				List<Player> possibleTargets = PlayerUtils.playersInRange(mBoss.getLocation(), 100, false);
 
-				if (possibleTargets.size() != 0) {
+				if (!possibleTargets.isEmpty()) {
 					Collections.shuffle(possibleTargets);
 					// Alternate the starting location between the two frontal legs
 					boolean leftSide = mTimesRun % 2 == 0;
@@ -244,7 +244,7 @@ public class SpellTantrum extends Spell {
 
 			private void tryDamagePlayers(Location loc) {
 				List<Player> hitPlayers = PlayerUtils.playersInRange(loc, TRAVEL_QUAKE_RADIUS, true);
-				if (hitPlayers.size() > 0) {
+				if (!hitPlayers.isEmpty()) {
 					DisplayEntityUtils.groundBlockQuake(loc, HIT_QUAKE_RADIUS, GROUND_QUAKE_BLOCKS, new Display.Brightness(8, 8), 0.03);
 					hitPlayers.forEach(p -> {
 						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MELEE, DAMAGE, null, true, true, SPELL_NAME);

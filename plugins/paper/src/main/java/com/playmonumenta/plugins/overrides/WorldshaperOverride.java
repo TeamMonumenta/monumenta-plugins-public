@@ -435,6 +435,7 @@ public class WorldshaperOverride {
 			mPitch = pitch;
 		}
 
+		// Doesn't matter here.
 		@SuppressWarnings("EnumOrdinal")
 		Mode next(boolean reverse) {
 			return values()[Math.floorMod(ordinal() + (reverse ? -1 : 1), values().length)];

@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
@@ -18,7 +19,6 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -75,9 +75,9 @@ public class SpellVenomSpray extends SpellBaseGrenadeLauncher {
 			(LivingEntity bosss, Location loc) -> {
 				// Explosion Aesthetics
 				for (int i = 0; i < 50; i++) {
-					double offsetX = RandomUtils.nextDouble(0, BLAST_RADIUS * 2) - BLAST_RADIUS;
-					double offsetY = RandomUtils.nextDouble(0, BLAST_RADIUS / 2);
-					double offsetZ = RandomUtils.nextDouble(0, BLAST_RADIUS * 2) - BLAST_RADIUS;
+					double offsetX = FastUtils.randomDoubleInRange(0, BLAST_RADIUS * 2) - BLAST_RADIUS;
+					double offsetY = FastUtils.randomDoubleInRange(0, BLAST_RADIUS / 2);
+					double offsetZ = FastUtils.randomDoubleInRange(0, BLAST_RADIUS * 2) - BLAST_RADIUS;
 					Location spawnLoc = loc.clone().add(offsetX, offsetY, offsetZ);
 					new PartialParticle(Particle.SPELL_MOB, spawnLoc, 1).extra(1).directionalMode(true)
 						.delta(0, 1, 0).spawnAsEntityActive(bosss);

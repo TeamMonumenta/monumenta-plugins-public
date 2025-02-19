@@ -298,7 +298,8 @@ public class CosmeticSkills {
 		return cosmeticSkill == null ? null : cosmeticSkill.get();
 	}
 
-	@SuppressWarnings("unchecked") // the cast is actually checked with baseCosmetic.getClass().isAssignableFrom
+	// the cast is actually checked with baseCosmetic.getClass().isAssignableFrom
+	@SuppressWarnings("unchecked")
 	public static <T extends CosmeticSkill> T getPlayerCosmeticSkill(@Nullable Player player, T baseCosmetic) {
 		String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, baseCosmetic.getAbility());
 		CosmeticSkill cosmeticSkill = getCosmeticSkill(name);

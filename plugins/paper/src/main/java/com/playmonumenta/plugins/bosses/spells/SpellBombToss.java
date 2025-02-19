@@ -43,7 +43,7 @@ public class SpellBombToss extends Spell {
 	private final @Nullable ExplodeAction mExplodeAction;
 	private final int mCooldown;
 
-	private final List<TNTPrimed> mTNTList = new ArrayList<TNTPrimed>();
+	private final List<TNTPrimed> mTNTList = new ArrayList<>();
 
 	public SpellBombToss(Plugin plugin, LivingEntity boss, int range) {
 		this(plugin, boss, range, 4, 1, 50, false, true);

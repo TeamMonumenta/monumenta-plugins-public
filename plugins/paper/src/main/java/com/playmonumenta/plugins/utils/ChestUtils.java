@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.TreeSet;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -40,6 +39,7 @@ import org.bukkit.loot.Lootable;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Nullable;
 
 public class ChestUtils {
 	public static final NamespacedKey NON_LOOT_LIMITED
@@ -268,7 +268,7 @@ public class ChestUtils {
 		ArrayDeque<Integer> slotsWithMultipleItems = new ArrayDeque<>();
 		boolean skrScrolls = false;
 		for (ItemStack lootItem : lootList) {
-			if (freeSlots.size() == 0) {
+			if (freeSlots.isEmpty()) {
 				Plugin.getInstance().getLogger().severe("Tried to overfill container for player " + player.getName() + " at inventory " + inventory.getType() + " at location " + player.getLocation());
 				player.sendMessage("Tried to overfill this container! Please report this");
 				break;
@@ -290,7 +290,7 @@ public class ChestUtils {
 			}
 		}
 
-		while (randomlyDistribute && freeSlots.size() > 1 && slotsWithMultipleItems.size() > 0) {
+		while (randomlyDistribute && freeSlots.size() > 1 && !slotsWithMultipleItems.isEmpty()) {
 			int splitSlot = slotsWithMultipleItems.remove();
 			int slot = freeSlots.remove(0);
 

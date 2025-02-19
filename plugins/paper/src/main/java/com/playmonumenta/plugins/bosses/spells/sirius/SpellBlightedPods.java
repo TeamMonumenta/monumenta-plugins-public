@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,6 +32,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Transformation;
+import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 

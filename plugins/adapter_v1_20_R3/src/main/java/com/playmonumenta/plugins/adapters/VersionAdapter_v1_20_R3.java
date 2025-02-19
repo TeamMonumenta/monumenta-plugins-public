@@ -1,8 +1,7 @@
 package com.playmonumenta.plugins.adapters;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.adapters.v1_20_R3.CustomDamageSource;
-import com.playmonumenta.plugins.adapters.v1_20_R3.CustomMobAgroMeleeAttack;
+import com.playmonumenta.mixinapi.v1.CustomMeleeAttackGoal;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
@@ -23,6 +22,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -35,6 +35,9 @@ import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
@@ -95,9 +98,162 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class VersionAdapter_v1_20_R3 implements VersionAdapter {
+	public static class CustomDamageSource extends DamageSource {
+		private final boolean mBlockable;
+		@Nullable
+		private final String mKilledUsingMsg;
+		@Nullable
+		private final net.minecraft.world.entity.Entity mDamager;
+
+		public CustomDamageSource(Holder<DamageType> type, @Nullable net.minecraft.world.entity.Entity damager,
+								  boolean blockable, @Nullable String killedUsingMsg) {
+			super(type, damager, damager);
+			mDamager = damager;
+			mBlockable = blockable;
+			mKilledUsingMsg = killedUsingMsg;
+		}
+
+		@Override
+		public @Nullable Vec3 getSourcePosition() {
+			return mBlockable ? super.getSourcePosition() : null;
+		}
+
+		@Override
+		public Component getLocalizedDeathMessage(net.minecraft.world.entity.LivingEntity killed) {
+			if (this.mDamager == null) {
+				// death.attack.magic=%1$s was killed by magic
+				String s = "death.attack.magic";
+				return Component.translatable(s, killed.getDisplayName());
+			} else if (mKilledUsingMsg == null || mKilledUsingMsg.isEmpty()) {
+				// death.attack.mob=%1$s was killed by %2$s
+				String s = "death.attack.mob";
+				return Component.translatable(s, killed.getDisplayName(), this.mDamager.getDisplayName());
+			} else {
+				// death.attack.indirectMagic.item=%1$s was killed by %2$s using %3$s
+				String s = "death.attack.indirectMagic.item";
+				return Component.translatable(s, killed.getDisplayName(), this.mDamager.getDisplayName(), mKilledUsingMsg);
+			}
+		}
+	}
+
+	public static class CustomMobAgroMeleeAttack extends MeleeAttackGoal implements CustomMeleeAttackGoal {
+		@FunctionalInterface
+		public interface RangePredicate {
+			boolean test(PathfinderMob mob, net.minecraft.world.entity.LivingEntity target, double attackRangeSqr);
+		}
+
+		public static class Builder {
+			private final PathfinderMob mMob;
+			private DamageAction mAction = null;
+			private boolean mRequireSight = false;
+			private RangePredicate mRangeChecker = (mob, target, attackRangeSqr) -> {
+				double dx = mob.getX() - target.getX();
+				double dy = mob.getY() + mob.getBbHeight() / 2 - (target.getY() + target.getBbHeight() / 2);
+				double dz = mob.getZ() - target.getZ();
+
+				return dx * dx + dy * dy + dz * dz <= attackRangeSqr;
+			};
+			private double mAttackRange = 0;
+			private double mSpeed = 1;
+			private boolean mPauseWhenMobIdle = false;
+
+			public Builder(PathfinderMob entity) {
+				this.mMob = entity;
+			}
+
+			public Builder action(DamageAction action) {
+				this.mAction = action;
+				return this;
+			}
+
+			public Builder requireSight(boolean requireSight) {
+				this.mRequireSight = requireSight;
+				return this;
+			}
+
+			public Builder attackRange(double attackRange) {
+				this.mAttackRange = attackRange;
+				return this;
+			}
+
+			public Builder speed(double speed) {
+				this.mSpeed = speed;
+				return this;
+			}
+
+			public Builder pauseWhenMobIdle(boolean pauseWhenMobIdle) {
+				this.mPauseWhenMobIdle = pauseWhenMobIdle;
+				return this;
+			}
+
+			public Builder rangeChecker(RangePredicate rangeChecker) {
+				this.mRangeChecker = rangeChecker;
+				return this;
+			}
+
+			public CustomMobAgroMeleeAttack build() {
+				return new CustomMobAgroMeleeAttack(mMob, mAction, mRequireSight, mAttackRange, mSpeed,
+					mPauseWhenMobIdle,
+					mRangeChecker);
+			}
+		}
+
+		public static Builder builder(PathfinderMob mob) {
+			return new Builder(mob);
+		}
+
+		@Nullable
+		private final VersionAdapter.DamageAction mDamageAction;
+		private final boolean mRequireSight;
+		private final double mAttackRangeSquared;
+		private final RangePredicate mRangeChecker;
+
+		private CustomMobAgroMeleeAttack(
+			PathfinderMob entity,
+			@Nullable VersionAdapter.DamageAction action,
+			boolean requireSight,
+			double attackRange,
+			double speed,
+			boolean pauseWhenMobIdle,
+			RangePredicate rangeChecker
+		) {
+			super(entity, speed, pauseWhenMobIdle);
+			mDamageAction = action;
+			this.mRequireSight = requireSight;
+			mAttackRangeSquared = attackRange * attackRange;
+			this.mRangeChecker = rangeChecker;
+		}
+
+		@Override
+		protected void checkAndPerformAttack(@NotNull net.minecraft.world.entity.LivingEntity target) {
+			if (this.isTimeToAttack() && isWithinAttackRange(target.getBukkitLivingEntity()) && (!mRequireSight || this.mob.getSensing().hasLineOfSight(target))) {
+				this.resetAttackCooldown();
+				this.mob.swing(InteractionHand.MAIN_HAND);
+				if (mDamageAction == null) {
+					this.mob.doHurtTarget(target);
+				} else {
+					mDamageAction.damage(target.getBukkitLivingEntity());
+				}
+			}
+		}
+
+		// The naming scheme here is a bit terrible, sorry :(
+		@Override
+		public boolean isWithinAttackRange(LivingEntity e) {
+			final var target = ((CraftLivingEntity) e).getHandle();
+
+			if (mAttackRangeSquared == 0) {
+				return this.mob.isWithinMeleeAttackRange(target);
+			}
+
+			return mRangeChecker.test(mob, target, mAttackRangeSquared);
+		}
+	}
+
 	public VersionAdapter_v1_20_R3(@SuppressWarnings("PMD.UnusedFormalParameter") Logger logger) {
 	}
 
@@ -132,8 +288,9 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		((CraftLivingEntity) damagee).getHandle().hurt(reason, (float) amount);
 	}
 
-	@Override
+	// Can't get around this.
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T extends Entity> T duplicateEntity(T entity) {
 		final var newEntity = (T) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 

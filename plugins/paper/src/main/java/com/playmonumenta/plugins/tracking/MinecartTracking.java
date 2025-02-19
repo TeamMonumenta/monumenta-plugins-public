@@ -15,7 +15,7 @@ import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.inventory.ItemStack;
 
 public class MinecartTracking implements EntityTracking {
-	private Set<Minecart> mEntities = new HashSet<Minecart>();
+	private Set<Minecart> mEntities = new HashSet<>();
 	private int mTicks = 0;
 
 	@Override

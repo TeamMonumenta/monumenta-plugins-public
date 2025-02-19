@@ -40,10 +40,10 @@ public class SpellFinalParticle extends Spell {
 	private final int DEBUFF_DURATION = 20 * 15;
 	private int mCylRadius = 8;
 	private boolean mPTick = true;
-	private List<Player> mWarned = new ArrayList<Player>();
+	private List<Player> mWarned = new ArrayList<>();
 	private FallingBlock mBlock;
 	private boolean mTrigger = false;
-	private List<Player> mPlayers = new ArrayList<Player>();
+	private List<Player> mPlayers = new ArrayList<>();
 	private static final Particle.DustOptions BLACK = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.5f);
 	private PartialParticle mBlack;
 	private PPCircle mIndicator;

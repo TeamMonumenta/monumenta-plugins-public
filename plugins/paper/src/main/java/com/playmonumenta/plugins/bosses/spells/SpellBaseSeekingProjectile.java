@@ -228,7 +228,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 		if (mGetSpellTargets != null) {
 			List<? extends LivingEntity> entities = mGetSpellTargets.getTargets();
-			Map<LivingEntity, Location> locations = new HashMap<LivingEntity, Location>();
+			Map<LivingEntity, Location> locations = new HashMap<>();
 			if (!mLaunchTracking) {
 				for (LivingEntity target : entities) {
 					locations.put(target, target.getEyeLocation());
@@ -268,7 +268,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 		final List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
 
-		Map<Player, Location> locations = new HashMap<Player, Location>();
+		Map<Player, Location> locations = new HashMap<>();
 		if (!mLaunchTracking) {
 			for (Player player : players) {
 				locations.put(player, player.getEyeLocation());

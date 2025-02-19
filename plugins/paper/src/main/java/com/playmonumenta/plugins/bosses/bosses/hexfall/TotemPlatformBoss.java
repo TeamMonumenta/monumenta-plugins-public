@@ -13,11 +13,11 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.scriptedquests.growables.GrowableAPI;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class TotemPlatformBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_totemplatform";

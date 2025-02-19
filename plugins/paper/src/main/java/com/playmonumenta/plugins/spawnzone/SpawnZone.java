@@ -11,7 +11,7 @@ public class SpawnZone {
 	protected int mShardID;
 	protected Point mLowerCorner;
 	protected Point mUpperCorner;
-	protected List<SpawnEffect> mSEList = new ArrayList<SpawnEffect>();
+	protected List<SpawnEffect> mSEList = new ArrayList<>();
 
 	public SpawnZone(String zoneName, int shardID, Point lowerCorner, Point upperCorner, List<SpawnEffect> effectList) {
 		mZoneName = zoneName;

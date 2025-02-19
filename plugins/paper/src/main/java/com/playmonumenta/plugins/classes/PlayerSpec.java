@@ -6,8 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import java.util.ArrayList;
 import org.bukkit.Material;
 
-
-@SuppressWarnings("NullAway.Init") // fields are initialised in subclasses
+// fields are initialised in subclasses
+@SuppressWarnings("NullAway.Init")
 public class PlayerSpec {
 	public ArrayList<AbilityInfo<?>> mAbilities = new ArrayList<>();
 

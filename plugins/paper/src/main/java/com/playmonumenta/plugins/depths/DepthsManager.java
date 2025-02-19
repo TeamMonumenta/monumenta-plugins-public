@@ -173,6 +173,8 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -276,6 +278,7 @@ public class DepthsManager {
 	// Config path for saving and loading depths data from the file system
 	private @Nullable String mConfigPath;
 
+	@SuppressWarnings("NullAway.Init")
 	private DepthsManager() {
 		//Start the runnable for damaging players on bad glass
 		mDamageRunnable = new DepthsDamageRunnable();
@@ -287,6 +290,7 @@ public class DepthsManager {
 
 		//Try to load the manager from file, if it exists
 		mPlugin = p;
+		mRoomRepository = DepthsUtils.getDepthsContent().getRoomRepository();
 		if (!load(logger, configPath)) {
 			//Otherwise create a new instance
 			//Start the runnable for damaging players on bad glass
@@ -303,7 +307,6 @@ public class DepthsManager {
 			}.runTaskTimer(p, SAVE_INTERVAL, SAVE_INTERVAL);
 			mInstance = this;
 		}
-		mRoomRepository = DepthsUtils.getDepthsContent().getRoomRepository();
 	}
 
 	//Singleton pattern for manager
@@ -325,8 +328,8 @@ public class DepthsManager {
 		mConfigPath = configPath;
 		//Attempt to load save data from the file
 		try {
-			String playerContent = FileUtils.readFile(mConfigPath + "players.json");
-			String partyContent = FileUtils.readFile(mConfigPath + "parties.json");
+			String playerContent = Files.readString(Path.of(mConfigPath + "players.json"));
+			String partyContent = Files.readString(Path.of(mConfigPath + "parties.json"));
 			if (playerContent.isEmpty()) {
 				logger.warning("Depths" + mConfigPath + "' is empty - defaulting to new depths manager");
 			} else {
@@ -391,18 +394,21 @@ public class DepthsManager {
 		//Save two separate files, one for players and one for parties
 		String tempFilePath = ".tmp";
 
+		final var tempPlayers = Path.of(path + "players.json" + tempFilePath);
+		final var tempParties = Path.of(path + "parties.json" + tempFilePath);
+
 		try {
 			Gson gson = new Gson();
-			FileUtils.writeFile(path + "players.json" + tempFilePath, gson.toJson(mPlayers));
-			FileUtils.writeFile(path + "parties.json" + tempFilePath, gson.toJson(mParties));
+			FileUtils.writeFile(tempPlayers, gson.toJson(mPlayers));
+			FileUtils.writeFile(tempParties, gson.toJson(mParties));
 
 		} catch (Exception e) {
 			MMLog.severe("Caught exception saving file '" + tempFilePath + "': " + e);
 			e.printStackTrace();
 		}
 		try {
-			FileUtils.moveFile(path + "players.json" + tempFilePath, path + "players.json");
-			FileUtils.moveFile(path + "parties.json" + tempFilePath, path + "parties.json");
+			Files.move(tempPlayers, Path.of(path + "players.json"));
+			Files.move(tempParties, Path.of(path + "parties.json"));
 		} catch (Exception e) {
 			MMLog.severe("Caught exception renaming file '" + tempFilePath + "' to '" + path + "': " + e);
 			e.printStackTrace();

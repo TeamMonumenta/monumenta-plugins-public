@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.ArrayList;
 import java.util.Arrays;
-import javax.annotation.Nullable;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -30,6 +29,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class UmbralCannons extends Spell {
 	// the duration and windup duration of the attack, in ticks

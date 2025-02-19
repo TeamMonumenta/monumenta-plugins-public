@@ -64,7 +64,7 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 
 				if (mLastTarget == null) {
 					List<? extends LivingEntity> targets = TARGETS.getTargetsList(mob).stream().filter((player) -> !GalleryUtils.isPlayerDeath(player)).toList();
-					if (targets.size() > 0) {
+					if (!targets.isEmpty()) {
 						mob.setTarget(targets.get(0));
 						mLastTarget = targets.get(0);
 					} else {
@@ -100,7 +100,7 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 			@Override public void run() {
 				mTimer += 10;
 
-				if (mTimer >= DESPAWN_TIMER && TARGET_DESPAWN.getTargetsList(mBoss).size() <= 0) {
+				if (mTimer >= DESPAWN_TIMER && TARGET_DESPAWN.getTargetsList(mBoss).isEmpty()) {
 					GalleryUtils.despawnMob(mBoss);
 				}
 			}

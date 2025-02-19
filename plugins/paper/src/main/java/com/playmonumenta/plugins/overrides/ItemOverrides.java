@@ -3,8 +3,6 @@ package com.playmonumenta.plugins.overrides;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import de.tr7zw.nbtapi.NBTItem;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -310,25 +308,6 @@ public final class ItemOverrides {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		BaseOverride override = mItems.get(item.getType());
 		return override != null && override.swapHandsInteraction(plugin, player, item);
-	}
-
-	// Returns eventCancelled = true if disallowed, otherwise false
-	@SuppressWarnings({"unused"})
-	private boolean safezoneDisallowsBlockChange(Plugin plugin, Player player, Block block) {
-		boolean eventCancelled = false;
-
-		// Prevent players from breaking blocks in safezones from outside of them
-		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
-			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE) &&
-				!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
-				// Allow breaking if the player would be in survival mode at that spot
-				if (!ZoneUtils.isInPlot(block.getLocation())) {
-					eventCancelled = true;
-				}
-			}
-		}
-
-		return eventCancelled;
 	}
 
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item,

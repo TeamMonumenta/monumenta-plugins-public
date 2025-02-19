@@ -27,6 +27,7 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -174,7 +175,7 @@ public class PlotManager {
 				.withOptionalArguments(new IntegerArgument("instance", 1))
 				.executes((sender, args) -> {
 					Integer instance = args.getUnchecked("instance");
-					for (Player player : (List<Player>) args.get("players")) {
+					for (Player player : (Collection<Player>) args.get("players")) {
 						try {
 							if (instance != null) {
 								ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, instance);
@@ -192,7 +193,7 @@ public class PlotManager {
 				.withPermission(CommandPermission.fromString("monumenta.plot.gui"))
 				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
-					for (Player player : (List<Player>) args.get("players")) {
+					for (Player player : (Collection<Player>) args.getUnchecked("players")) {
 						String name = player.getName();
 						UUID uuid = resolveUUID(name);
 						getPlotInfo(player.getUniqueId()).thenCompose(PlotInfo::populateNamesAndHeads).whenComplete((info, ex) -> {
@@ -215,7 +216,7 @@ public class PlotManager {
 						!ServerProperties.getShardName().startsWith("dev")) {
 						throw CommandAPI.failWithString("This command is only available on the playerplots world. Current shard: " + ServerProperties.getShardName());
 					}
-					for (Player player : (List<Player>) args.get("players")) {
+					for (Player player : (Collection<Player>) args.getUnchecked("players")) {
 						int plot = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
 						int currentplot = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.CURRENT_PLOT).orElse(0);
 						if (plot != currentplot) {
@@ -235,7 +236,7 @@ public class PlotManager {
 				.withPermission(CommandPermission.fromString("monumenta.plot.new"))
 				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
-					for (Player player : (List<Player>) args.get("players")) {
+					for (Player player : (Collection<Player>) args.getUnchecked("players")) {
 						try {
 							int score = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
 							if (score > 0) {
@@ -266,7 +267,7 @@ public class PlotManager {
 				.withPermission(CommandPermission.fromString("monumenta.plot.reset"))
 				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
-					for (Player player : (List<Player>) args.get("players")) {
+					for (Player player : (Collection<Player>) args.getUnchecked("players")) {
 						int score = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
 						if (score == 0) {
 							sender.sendMessage(Component.text("Can't reset plot for player that has a Plot score of zero", NamedTextColor.RED));

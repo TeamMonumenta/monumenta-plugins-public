@@ -27,9 +27,11 @@ import java.util.concurrent.ConcurrentMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -261,8 +263,7 @@ public class BroadcastedEvents implements Listener {
 			if (knownEvent != KnownEvent.UNKNOWN) {
 				if (knownEvent.mPossibilities.length > 0) {
 					boolean canSee = false;
-					for (int i = 0; i < knownEvent.mPossibilities.length; i++) {
-						EventRequirement possibility = knownEvent.mPossibilities[i];
+					for (final var possibility : knownEvent.mPossibilities) {
 						OptionalInt score = ScoreboardUtils.getScoreboardValue(player, possibility.mScoreboard);
 						if (score.isPresent() && score.getAsInt() >= possibility.mStep) {
 							canSee = true;
@@ -439,24 +440,32 @@ public class BroadcastedEvents implements Listener {
 			mStatus = timeLeft > 0 ? EventStatus.STARTING : EventStatus.IN_PROGRESS;
 		}
 
-		@SuppressWarnings("deprecation")
 		public String getDisplay() {
 			KnownEvent known = getAsKnownEvent();
 
-			ChatColor eventColor = known == KnownEvent.UNKNOWN ? ChatColor.YELLOW : known.mColor;
-			String eventNamePart = "" + eventColor + ChatColor.BOLD + StringUtils.capitalize(mEventName.toLowerCase(Locale.getDefault()));
+			TextColor eventColor = known == KnownEvent.UNKNOWN ? NamedTextColor.YELLOW : known.mColor;
+			Component eventNamePart = Component.text(
+				StringUtils.capitalize(mEventName.toLowerCase(Locale.getDefault())),
+				eventColor,
+				TextDecoration.BOLD
+			);
 
-			String shardPart = ChatColor.GOLD + mShard;
-
-			String statusPart;
+			Component statusPart;
 			if (mTimeLeft > 0) {
-				statusPart = "" + ChatColor.GREEN + mTimeLeft + "s";
+				statusPart = Component.text(mTimeLeft + "s", NamedTextColor.GREEN);
 			} else {
-				ChatColor statusColor = (mStatus.mColor == null) ? ChatColor.RED : mStatus.mColor;
-				statusPart = "" + statusColor + ChatColor.BOLD + mStatus.mDisplayedAs;
+				TextColor statusColor = mStatus.mColor == null ? NamedTextColor.RED : mStatus.mColor;
+				statusPart = Component.text(mTimeLeft + "s", statusColor, TextDecoration.BOLD);
 			}
 
-			return eventNamePart + " " + shardPart + ": " + statusPart + ChatColor.RESET;
+			final var text = Component.empty()
+				.append(eventNamePart)
+				.append(Component.text(" "))
+				.append(Component.text(mShard, NamedTextColor.GOLD))
+				.append(Component.text(": "))
+				.append(statusPart);
+
+			return LegacyComponentSerializer.legacySection().serialize(text);
 		}
 
 		public KnownEvent getAsKnownEvent() {
@@ -475,21 +484,20 @@ public class BroadcastedEvents implements Listener {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	public enum KnownEvent {
-		KAUL(ChatColor.DARK_GREEN, new EventRequirement("Quest21", 20), new EventRequirement("Corrupted", 1)),
-		ELDRASK(ChatColor.AQUA, new EventRequirement("Quest101", 12), new EventRequirement("Teal", 1)),
-		HEKAWT(ChatColor.GOLD, new EventRequirement("Quest101", 12), new EventRequirement("Fred", 1)),
-		SIRIUS(ChatColor.GRAY, new EventRequirement("Quest220", 8), new EventRequirement("Zenith", 1)),
+		KAUL(NamedTextColor.DARK_GREEN, new EventRequirement("Quest21", 20), new EventRequirement("Corrupted", 1)),
+		ELDRASK(NamedTextColor.AQUA, new EventRequirement("Quest101", 12), new EventRequirement("Teal", 1)),
+		HEKAWT(NamedTextColor.GOLD, new EventRequirement("Quest101", 12), new EventRequirement("Fred", 1)),
+		SIRIUS(NamedTextColor.GRAY, new EventRequirement("Quest220", 8), new EventRequirement("Zenith", 1)),
 		UNKNOWN(null);
 
 		@Nullable
-		public final ChatColor mColor;
+		public final TextColor mColor;
 
 		//If none, will not require anything.
 		public final EventRequirement[] mPossibilities;
 
-		KnownEvent(@Nullable ChatColor color, EventRequirement... possibleRequirements) {
+		KnownEvent(@Nullable TextColor color, EventRequirement... possibleRequirements) {
 			this.mColor = color;
 			this.mPossibilities = possibleRequirements;
 		}
@@ -516,18 +524,17 @@ public class BroadcastedEvents implements Listener {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	public enum EventStatus {
-		STARTING("Starting", ChatColor.GREEN),
-		IN_PROGRESS("In-Progress", ChatColor.RED),
+		STARTING("Starting", NamedTextColor.GREEN),
+		IN_PROGRESS("In-Progress", NamedTextColor.RED),
 		UNKNOWN("Unknown", null);
 
 		public final String mDisplayedAs;
 
 		@Nullable
-		public final ChatColor mColor;
+		public final TextColor mColor;
 
-		EventStatus(String renderedAs, @Nullable ChatColor color) {
+		EventStatus(String renderedAs, @Nullable TextColor color) {
 			this.mDisplayedAs = renderedAs;
 			this.mColor = color;
 		}

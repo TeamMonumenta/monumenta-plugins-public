@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class MelancholicLament extends Ability {
 

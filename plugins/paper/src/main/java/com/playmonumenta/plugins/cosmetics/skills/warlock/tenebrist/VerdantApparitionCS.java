@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -20,6 +19,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class VerdantApparitionCS extends HauntingShadesCS {
 	private static final Particle.DustOptions GREEN_SMALL = new Particle.DustOptions(Color.fromRGB(120, 170, 0), 0.8f);

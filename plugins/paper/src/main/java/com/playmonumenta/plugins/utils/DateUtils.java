@@ -148,6 +148,7 @@ public class DateUtils {
 		return getMs(localDateTime());
 	}
 
+	// Errorprone warns on getNano() without getSecond(), but this is ok here since we only care about ms component.
 	@SuppressWarnings("JavaLocalDateTimeGetNano")
 	public static int getMs(LocalDateTime localDateTime) {
 		return localDateTime.getNano() / 1000000;

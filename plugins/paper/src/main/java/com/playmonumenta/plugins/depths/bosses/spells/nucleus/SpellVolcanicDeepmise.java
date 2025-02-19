@@ -63,7 +63,7 @@ public class SpellVolcanicDeepmise extends Spell {
 	}
 
 	private void rainMeteor(Location locInput, List<Player> players, double spawnY) {
-		if (players == null || players.size() == 0) {
+		if (players == null || players.isEmpty()) {
 			return;
 		}
 

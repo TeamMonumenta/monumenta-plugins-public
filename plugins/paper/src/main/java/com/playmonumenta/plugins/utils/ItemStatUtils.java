@@ -441,9 +441,9 @@ public class ItemStatUtils {
 		}
 		NBT.modify(item, nbt -> {
 			ReadWriteNBTList<String> lore = nbt.getOrCreateCompound(MONUMENTA_KEY).getStringList(CHARM_KEY);
-			if (lore.size() > 0 && index < lore.size()) {
+			if (!lore.isEmpty() && index < lore.size()) {
 				lore.remove(index);
-			} else if (lore.size() > 0) {
+			} else if (!lore.isEmpty()) {
 				lore.remove(lore.size() - 1);
 			}
 		});

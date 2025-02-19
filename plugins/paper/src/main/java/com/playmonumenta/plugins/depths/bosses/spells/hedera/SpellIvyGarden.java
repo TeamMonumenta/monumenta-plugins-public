@@ -46,7 +46,7 @@ public class SpellIvyGarden extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return mPlants.values().size() > 0;
+		return !mPlants.values().isEmpty();
 	}
 
 	@Override

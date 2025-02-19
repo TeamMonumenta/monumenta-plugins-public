@@ -33,6 +33,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
+// PlaceholderAPI really likes strings over components
+@SuppressWarnings("deprecation")
 public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 	public enum ShrineType {
 		SPEED("Speed", "D1Finished", NamedTextColor.AQUA),

@@ -103,6 +103,7 @@ public class SanctifiedArmor extends Ability {
 
 	private @Nullable UUID mLastAffectedMob = null;
 	private double mLastDamage;
+	@Nullable
 	public DamageType mLastDamageType;
 
 	private final SanctifiedArmorCS mCosmetic;

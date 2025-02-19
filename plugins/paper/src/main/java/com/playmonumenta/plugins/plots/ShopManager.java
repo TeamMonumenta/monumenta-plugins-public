@@ -381,7 +381,6 @@ public class ShopManager implements Listener {
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	public static void registerCommands() {
 		/* ******************** NEW ******************** */
 		new CommandAPICommand("monumentashop")

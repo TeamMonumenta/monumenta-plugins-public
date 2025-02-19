@@ -284,7 +284,7 @@ public class SpawnerCommand {
 	}
 
 	private static boolean isLosPoolValid(String losPool) {
-		return LibraryOfSoulsIntegration.getPool(losPool).keySet().size() > 0;
+		return !LibraryOfSoulsIntegration.getPool(losPool).keySet().isEmpty();
 	}
 
 	private static @Nullable ItemStack getHeldItemAndSendErrors(Player player) {
@@ -308,7 +308,7 @@ public class SpawnerCommand {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (SpawnerUtils.isSpawner(item)) {
 				List<String> breakActions = SpawnerUtils.getBreakActionIdentifiers(item);
-				return breakActions.size() > 0 ? breakActions.toArray(new String[0]) : new String[0];
+				return !breakActions.isEmpty() ? breakActions.toArray(new String[0]) : new String[0];
 			}
 		}
 		return new String[0];

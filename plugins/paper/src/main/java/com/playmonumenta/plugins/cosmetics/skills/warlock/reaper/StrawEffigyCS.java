@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -18,6 +17,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class StrawEffigyCS extends JudgementChainCS {
 	private static final Particle.DustOptions STRAW = new Particle.DustOptions(Color.fromRGB(250, 230, 80), 1f);

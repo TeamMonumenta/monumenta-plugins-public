@@ -1,0 +1,14 @@
+[
+  {
+    "user": {
+      "type": "other",
+      "name": "Standalone"
+    },
+    "time": 1738945384195,
+    "type": "Profiler (live)",
+    "data": {
+      "type": "url",
+      "value": "https://spark.lucko.me/7LIBEHaq8o"
+    }
+  }
+]

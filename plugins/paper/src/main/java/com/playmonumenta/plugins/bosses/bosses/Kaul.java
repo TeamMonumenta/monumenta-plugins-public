@@ -882,7 +882,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 								teleport(mSpawnLoc);
 								List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-								if (players.size() > 0) {
+								if (!players.isEmpty()) {
 									Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
 									((Mob) mBoss).setTarget(newTarget);
 								}

@@ -26,6 +26,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scoreboard.Objective;
 
+@SuppressWarnings("unchecked")
 public class CustomEffect {
 	private static final String COMMAND = "customeffect";
 	private static final String PERMISSION = "monumenta.commands.customeffect";
@@ -47,7 +48,6 @@ public class CustomEffect {
 	private static final Argument<String> scoreholderArg = new ScoreHolderArgument.Single("scoreholder").replaceSuggestions(ArgumentSuggestions.strings("scoreholder", "amount"));
 	private static final MultiLiteralArgument subcommandArg = new MultiLiteralArgument("subcommand", "haseffect", "clear");
 
-	@SuppressWarnings("unchecked")
 	public static void register() {
 		List<Argument<?>> optionalArguments = new ArrayList<>();
 		optionalArguments.add(amountArg);

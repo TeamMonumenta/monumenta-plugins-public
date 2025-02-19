@@ -11,7 +11,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,6 +18,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class CopyBlightArena extends BossAbilityGroup {
 	public static final String identityTag = "boss_copysiriusarena";

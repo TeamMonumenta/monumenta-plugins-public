@@ -44,7 +44,6 @@ public class CharmBagGui extends Gui {
 
 	@Override
 	// the loop is exited after the modification, so no CME can happen
-	@SuppressWarnings("ModifyCollectionInEnhancedForLoop")
 	protected void setup() {
 		List<CharmBag.CharmBagItem> charmBagItemsCopy = new ArrayList<>(
 			mCharmBag.mItems.stream()

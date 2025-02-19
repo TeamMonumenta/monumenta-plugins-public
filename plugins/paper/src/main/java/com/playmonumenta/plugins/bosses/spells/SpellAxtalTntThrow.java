@@ -72,7 +72,7 @@ public class SpellAxtalTntThrow extends Spell {
 			@Override
 			public void run() {
 				List<Player> plist = PlayerUtils.playersInRange(mLauncher.getLocation(), 100, true);
-				if (plist.size() >= 1) {
+				if (!plist.isEmpty()) {
 					Player target = plist.get(FastUtils.RANDOM.nextInt(plist.size()));
 					Location sLoc = mLauncher.getLocation().add(0, 1.7, 0);
 					final var tnt = sLoc.getWorld().spawn(sLoc, TNTPrimed.class, tntPrimed -> {

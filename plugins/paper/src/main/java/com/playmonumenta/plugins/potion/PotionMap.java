@@ -165,7 +165,7 @@ public class PotionMap {
 					}
 				}
 
-				if (potionInfo.size() == 0) {
+				if (potionInfo.isEmpty()) {
 					potionIter.remove();
 				}
 			}
@@ -243,7 +243,7 @@ public class PotionMap {
 				effectListArray.add(entry.getValue().getAsJsonObject());
 			}
 
-			if (effectListArray.size() > 0) {
+			if (!effectListArray.isEmpty()) {
 				if (potionMapObject == null) {
 					potionMapObject = new JsonObject();
 				}

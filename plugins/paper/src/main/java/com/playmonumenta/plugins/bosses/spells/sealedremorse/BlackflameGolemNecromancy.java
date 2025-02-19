@@ -29,7 +29,7 @@ public class BlackflameGolemNecromancy extends Spell {
 	private double mDetectRange;
 	private int mSummonTime;
 	private double mY;
-	private List<UUID> mSummoned = new ArrayList<UUID>();
+	private List<UUID> mSummoned = new ArrayList<>();
 
 	private Location mSpawnLoc;
 
@@ -129,7 +129,7 @@ public class BlackflameGolemNecromancy extends Spell {
 								if (ele == null || ele.isDead() || !ele.isValid()) {
 									this.cancel();
 									mSummoned.remove(ele.getUniqueId());
-									if (mSummoned.size() <= 0) {
+									if (mSummoned.isEmpty()) {
 										new BukkitRunnable() {
 
 											@Override

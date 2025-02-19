@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,6 +15,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class UntamedResilienceCS extends PhlegmaticResolveCS {
 	private static final Particle.DustOptions NEON_SMALL = new Particle.DustOptions(Color.fromRGB(215, 255, 0), 0.75f);

@@ -16,13 +16,13 @@ import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class CosmicMoonblade extends Ability {
 

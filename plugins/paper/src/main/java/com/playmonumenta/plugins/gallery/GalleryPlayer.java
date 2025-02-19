@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.gallery;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffect;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffectType;
@@ -168,7 +169,7 @@ public class GalleryPlayer {
 	public void onPlayerJoinEvent() {
 		if (isOnline()) {
 			if (mShouldTeleportToSpawn) {
-				Bukkit.getScheduler().runTaskLater(GalleryManager.mPlugin, () -> {
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 					GalleryGame game = getGame();
 					if (game == null) {
 						return;
@@ -179,7 +180,7 @@ public class GalleryPlayer {
 						if (player != null && player.isOnline() && !player.isDead()) {
 							player.teleport(loc);
 						} else {
-							GalleryUtils.printDebugMessage("Somehow teleporting a player== null? or an invalid player!");
+							GalleryUtils.printDebugMessage("Somehow teleporting a player == null? or an invalid player!");
 						}
 					} else {
 						GalleryUtils.printDebugMessage("LOCATION NULL when teleporting player back to game! how this happen?");

@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.gallery.effects;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.GalleryGame;
-import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -69,8 +69,8 @@ public class GalleryPhoenixEffect extends GalleryEffect {
 		}
 		player.playEffect(EntityEffect.TOTEM_RESURRECT);
 		event.setCancelled(true);
-		PlayerUtils.healPlayer(GalleryManager.mPlugin, player, EntityUtils.getMaxHealth(player));
-		GalleryManager.mPlugin.mTimers.updateCooldowns(player, 0);
+		PlayerUtils.healPlayer(Plugin.getInstance(), player, EntityUtils.getMaxHealth(player));
+		Plugin.getInstance().mTimers.updateCooldowns(player, 0);
 		clear(galleryPlayer);
 	}
 }
