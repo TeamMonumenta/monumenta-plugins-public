@@ -51,7 +51,15 @@ public class PointToLocCommand {
 				float radius = (float) args.getUnchecked("radius");
 				boolean skr = (boolean) args.getUnchecked("skrUsage");
 
-				Vector right = direction.clone().crossProduct(new Vector(0, 1, 0)).normalize();
+				Vector right;
+				Vector up;
+				if (direction.clone().normalize().equals(new Vector(0, 1, 0)) || direction.clone().normalize().equals(new Vector(0, -1, 0))) {
+					right = new Vector(1, 0, 0);
+					up = new Vector(0, 0, 1);
+				} else {
+					right = direction.clone().crossProduct(new Vector(0, 1, 0)).normalize();
+					up = direction.clone().crossProduct(right).normalize();
+				}
 				// Particle.DustTransition skrColours = new Particle.DustTransition(Color.fromRGB(255, 13, 247), Color.fromRGB(75, 35, 158), 1f);
 				final int[] mAngleOne = {0};
 				final int[] mAngleTwo = {180};
@@ -65,8 +73,8 @@ public class PointToLocCommand {
 						endNormalized.multiply(acceleration);
 						new PartialParticle(midParticleData.particle(), startpoint, 2, 0, 0, 0).spawnAsPlayerActive(player);
 						if (!skr) {
-							new PPCircle(helixParticleData.particle(), startpoint, radius).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).ringMode(true).arcDegree(mAngleOne[0], mAngleOne[0]).spawnAsEnemy();
-							new PPCircle(helixParticleData.particle(), startpoint, radius).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).ringMode(true).arcDegree(mAngleTwo[0], mAngleTwo[0]).spawnAsEnemy();
+							new PPCircle(helixParticleData.particle(), startpoint, radius).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleOne[0], mAngleOne[0]).spawnAsEnemy();
+							new PPCircle(helixParticleData.particle(), startpoint, radius).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleTwo[0], mAngleTwo[0]).spawnAsEnemy();
 						} else {
 							double length = startpoint.distanceSquared(endpoint);
 							Color helixColor;
@@ -80,8 +88,8 @@ public class PointToLocCommand {
 								helixColor = Color.RED;
 							}
 							Particle.DustTransition skrColours = new Particle.DustTransition(helixColor, helixColor, 1f);
-							new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).ringMode(true).arcDegree(mAngleOne[0], mAngleOne[0]).spawnAsEnemy();
-							new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(new Vector(0, 1, 0), right.clone()).ringMode(true).arcDegree(mAngleTwo[0], mAngleTwo[0]).spawnAsEnemy();
+							new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleOne[0], mAngleOne[0]).spawnAsEnemy();
+							new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleTwo[0], mAngleTwo[0]).spawnAsEnemy();
 						}
 						mAngleOne[0] = (mAngleOne[0] + 10) % 360;
 						mAngleTwo[0] = (mAngleTwo[0] + 10) % 360;
