@@ -39,7 +39,7 @@ public class SpellFluffPools extends Spell {
 			targets = players;
 		} else {
 			//Too lazy to do a random
-			targets = new ArrayList<>(3);
+			targets = new ArrayList<Player>(3);
 			targets.add(players.get(0));
 			targets.add(players.get(1));
 			targets.add(players.get(2));

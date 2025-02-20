@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -110,7 +111,7 @@ public final class ParticleManager {
 		public final boolean mForce;
 
 		public ParticlePacket(Particle particle, Player player, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, @Nullable Object data, boolean force) {
-			mPlayer = new WeakReference<>(player);
+			mPlayer = new WeakReference<Player>(player);
 			mPlayerUUID = player.getUniqueId();
 			mParticle = particle;
 			mX = x;

@@ -36,7 +36,6 @@ public class Eggify {
 			.register();
 	}
 
-	@SuppressWarnings("deprecation")
 	private static void eggify(Player player, Entity entity) {
 		if (!entity.isValid()) {
 			return;

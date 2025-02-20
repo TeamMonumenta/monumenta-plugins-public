@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -18,7 +19,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 public class ScorchingSigilCS extends CholericFlamesCS {
 	private static final Particle.DustOptions RED_1 = new Particle.DustOptions(Color.fromRGB(180, 70, 40), 1.1f);

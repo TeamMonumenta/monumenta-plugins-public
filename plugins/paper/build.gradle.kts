@@ -8,9 +8,17 @@ plugins {
 	id("com.playmonumenta.plugins.java-conventions")
 	id("com.playmonumenta.deployment") version "1.+"
 	id("net.minecrell.plugin-yml.bukkit") version "0.5.1" // Generates plugin.yml
+	id("net.minecrell.plugin-yml.bungee") version "0.5.1" // Generates bungee.yml
 	id("java")
 	id("net.ltgt.errorprone") version "3.1.0"
 	id("net.ltgt.nullaway") version "1.6.0"
+}
+
+repositories {
+	mavenCentral()
+	maven("https://libraries.minecraft.net/")
+	maven("https://repo.codemc.org/repository/maven-public/")
+	maven("https://maven.playmonumenta.com/releases")
 }
 
 dependencies {
@@ -20,9 +28,14 @@ dependencies {
 	implementation(project(":adapter_v1_20_R3", "reobf"))
 	implementation(project(":velocity"))
 
+	implementation("org.openjdk.jmh:jmh-core:1.19")
+	implementation("org.openjdk.jmh:jmh-generator-annprocess:1.19")
 	implementation("com.opencsv:opencsv:5.5") // generateitems
-	implementation("org.apache.commons:commons-lang3:3.17.0")
-	implementation("org.apache.commons:commons-math3:3.6.1")
+	implementation("net.kyori:adventure-text-serializer-bungeecord:4.3.2")
+
+	// Note this version should match what's in the Paper jar
+	compileOnly("net.kyori:adventure-api:4.11.0")
+	compileOnly("net.kyori:adventure-text-minimessage:4.11.0")
 
 	compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 	compileOnly("dev.jorel:commandapi-bukkit-core:9.4.1")
@@ -47,10 +60,13 @@ dependencies {
 	compileOnly("io.prometheus:simpleclient:0.11.0")
 	compileOnly("com.github.LeonMangler:PremiumVanishAPI:2.9.0-4")
 	compileOnly("me.neznamy:tab-api:4.0.2")
-	compileOnly("com.vexsoftware:nuvotifier-universal:3.0.0:all")
-
 	errorprone("com.google.errorprone:error_prone_core:2.29.1")
 	errorprone("com.uber.nullaway:nullaway:0.10.18")
+
+	// Bungeecord/Velocity deps
+	compileOnly("net.md-5:bungeecord-api:1.12-SNAPSHOT")
+	compileOnly("com.google.code.gson:gson:2.8.5")
+	compileOnly("com.vexsoftware:nuvotifier-universal:3.0.0:all")
 }
 
 group = "com.playmonumenta"
@@ -64,7 +80,7 @@ bukkit {
 	apiVersion = "1.19"
 	name = "Monumenta"
 	authors = listOf("The Monumenta Team")
-	depend = listOf("CommandAPI", "ScriptedQuests")
+	depend = listOf("CommandAPI", "ScriptedQuests",)
 	softDepend = listOf(
 		"NBTAPI",
 		"MonumentaRedisSync",
@@ -84,6 +100,14 @@ bukkit {
 		"MonumentaWorldManagement",
 		"TAB"
 	)
+}
+
+// Configure bungee.yml generation
+bungee {
+	name = "Monumenta-Bungee"
+	main = "com.playmonumenta.bungeecord.Main"
+	author = "The Monumenta Team"
+	softDepends = setOf("MonumentaNetworkRelay", "MonumentaRedisSync", "Votifier", "SuperVanish", "PremiumVanish", "BungeeTabListPlus", "LuckPerms")
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -114,6 +138,8 @@ tasks.withType<JavaCompile>().configureEach {
 tasks {
 	shadowJar {
 		relocate("com.opencsv", "com.playmonumenta.plugins.internal.com.opencsv") // /generateitems
+		relocate("org.openjdk.jmh", "com.playmonumenta.plugins.internal.org.openjdk.jmh") // Benchmarking Sin/Cos
+		relocate("joptsimple", "com.playmonumenta.plugins.internal.joptsimple") // Dependency of jmh
 		relocate(
 			"org.apache.commons.lang3",
 			"com.playmonumenta.plugins.internal.org.apache.commons.lang3"

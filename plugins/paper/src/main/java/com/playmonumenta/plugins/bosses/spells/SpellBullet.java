@@ -152,7 +152,7 @@ public class SpellBullet extends Spell {
 				if (mTicks < mDelay) {
 					mTickAction.run(mCaster, mTicks);
 				} else if (mTicks < mDuration + mDelay && mTicks % mEmissionSpeed == 0) {
-					if (!PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, false).isEmpty()) {
+					if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, false).size() > 0) {
 						List<Player> hittablePlayers = PlayerUtils.playersInRange(mCaster.getLocation(), 75, false);
 						if (mPattern == Pattern.BORDER || mPattern == Pattern.BORDER_2 || mPattern == Pattern.BORDER_1) {
 							launchAcceleratingBullet(hittablePlayers, new Vector(1, 0, 0).rotateAroundY(mRotation), 0, 0, 0);

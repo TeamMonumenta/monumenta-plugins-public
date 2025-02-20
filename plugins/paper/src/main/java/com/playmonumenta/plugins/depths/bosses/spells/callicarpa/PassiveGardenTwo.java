@@ -127,7 +127,7 @@ public class PassiveGardenTwo extends Spell {
 		for (int i = 0; i < count; i++) {
 			List<Location> temp = new ArrayList<>(mFlowerSpawns);
 			boolean spawned = false;
-			while (!spawned && !temp.isEmpty()) {
+			while (!spawned && temp.size() > 0) {
 				int random = FastUtils.randomIntInRange(0, temp.size() - 1);
 				Location randomLoc = temp.get(random);
 				if (isFlowerAtLocation(randomLoc) || aboutToSpawn.stream().anyMatch(loc -> loc.equals(randomLoc))) {
@@ -184,7 +184,7 @@ public class PassiveGardenTwo extends Spell {
 
 		for (int i = 0; i < count; i++) {
 			// If there are no more flowers available for evolving, break out of the loop.
-			if (evolutionCandidates.isEmpty()) {
+			if (evolutionCandidates.size() == 0) {
 				break;
 			}
 

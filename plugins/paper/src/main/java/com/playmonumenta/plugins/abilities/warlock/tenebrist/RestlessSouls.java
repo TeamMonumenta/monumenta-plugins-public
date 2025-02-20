@@ -167,7 +167,7 @@ public class RestlessSouls extends Ability {
 							nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 							nearbyMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC));
 							// check mob count again after removal of vexes
-							if (!nearbyMobs.isEmpty()) {
+							if (nearbyMobs.size() > 0) {
 								Collections.shuffle(nearbyMobs);
 								LivingEntity randomMob = nearbyMobs.get(0);
 								if (randomMob != null) {
@@ -228,7 +228,7 @@ public class RestlessSouls extends Ability {
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		if (mVexList != null) {
 			mVexList.removeIf(e -> !e.isValid() || e.isDead());
-			if (!mVexList.isEmpty()) {
+			if (mVexList.size() > 0) {
 				for (Vex v : mVexList) {
 					v.remove();
 				}

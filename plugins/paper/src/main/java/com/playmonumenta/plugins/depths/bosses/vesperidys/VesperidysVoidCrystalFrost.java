@@ -166,7 +166,7 @@ public class VesperidysVoidCrystalFrost extends BossAbilityGroup {
 							List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), Vesperidys.detectionRange, true);
 							Collections.shuffle(players);
 
-							if (!players.isEmpty()) {
+							if (players.size() > 0) {
 								Player selectedPlayer = players.get(0);
 
 								Runnable runnable = () -> mMissile.launch(selectedPlayer, selectedPlayer.getEyeLocation());

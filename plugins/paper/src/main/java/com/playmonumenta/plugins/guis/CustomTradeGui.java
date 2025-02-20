@@ -848,7 +848,7 @@ public class CustomTradeGui extends Gui {
 			// Priority for tab order is: WEAPON, ARMOR, OFFHAND, CHARM, MISC, according to the enum.
 			TradeType type = tradeTypes[i];
 			List<TradeWindowOpenEvent.Trade> tradeList = tradeTypeToMemberList(type);
-			if (!tradeList.isEmpty()) {
+			if (tradeList.size() > 0) {
 				mDisplayTradeTypes.add(type);
 			}
 		}

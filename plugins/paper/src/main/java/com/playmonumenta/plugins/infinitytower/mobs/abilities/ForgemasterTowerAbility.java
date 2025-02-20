@@ -43,7 +43,7 @@ public class ForgemasterTowerAbility extends TowerAbility {
 			() -> {
 				List<LivingEntity> list = (mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs());
 				Collections.shuffle(list);
-				if (!list.isEmpty()) {
+				if (list.size() > 0) {
 					return list.subList(0, 1);
 				}
 				return list;

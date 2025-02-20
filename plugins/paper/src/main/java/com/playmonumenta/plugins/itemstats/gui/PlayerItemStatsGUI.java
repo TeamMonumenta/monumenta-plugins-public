@@ -84,7 +84,6 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			mInfusionType = infusionType;
 		}
 
-		// Doesn't matter here.
 		@SuppressWarnings("EnumOrdinal")
 		InfusionSetting next(boolean reverse) {
 			return values()[Math.floorMod(ordinal() + (reverse ? -1 : 1), values().length)];

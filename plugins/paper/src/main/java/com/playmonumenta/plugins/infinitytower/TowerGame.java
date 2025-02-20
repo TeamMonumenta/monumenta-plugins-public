@@ -43,9 +43,9 @@ public class TowerGame {
 	public int mCurrentFloor;
 
 	public TowerPlayer mPlayer;
-	// constructor stops game if null
+	@SuppressWarnings("NullAway.Init") // constructor stops game if null
 	protected TowerTeam mFloorTeam;
-	// constructor stops game if null
+	@SuppressWarnings("NullAway.Init") // constructor stops game if null
 	protected TowerFloor mFloor;
 	//keep track of the starting point of the floor.
 
@@ -59,11 +59,12 @@ public class TowerGame {
 	private boolean mIsTurnEnded = false;
 	private boolean mPlayerLose = false;
 
-	protected final int mId;
+	protected final int ID;
+	private final TowerGame INSTANCE;
 
-	@SuppressWarnings("NullAway.Init")
 	public TowerGame(int idGame, Player player) {
-		mId = idGame;
+		ID = idGame;
+		INSTANCE = this;
 		mPlayer = new TowerPlayer(player);
 		mPlayerMobs = new ArrayList<>();
 		mFloorMobs = new ArrayList<>();
@@ -266,7 +267,7 @@ public class TowerGame {
 
 		};
 
-		mAesthetics.runTaskTimer(Plugin.getInstance(), 0, 1);
+		mAesthetics.runTaskTimer(TowerManager.mPlugin, 0, 1);
 
 	}
 
@@ -293,7 +294,7 @@ public class TowerGame {
 
 
 	public void buyMobs() {
-		new TowerGuiBuyMob(mPlayer.mPlayer, this).openInventory(mPlayer.mPlayer, Plugin.getInstance());
+		new TowerGuiBuyMob(mPlayer.mPlayer, this).openInventory(mPlayer.mPlayer, TowerManager.mPlugin);
 	}
 
 	public boolean canAddWeight(TowerMobInfo info) {
@@ -371,13 +372,13 @@ public class TowerGame {
 					if (mTimes >= 5) {
 						cancel();
 						if (TowerFileUtils.getFloorTeam(mCurrentFloor) == null) {
-							TowerFileUtils.convertPlayerTeamLocation(TowerGame.this);
+							TowerFileUtils.convertPlayerTeamLocation(INSTANCE);
 							TowerFileUtils.savePlayerTeam(mPlayer.mTeam, mCurrentFloor);
 						} else if (mCurrentFloor > TowerConstants.DESIGNED_FLOORS + 1) {
-							TowerFileUtils.convertPlayerTeamLocation(TowerGame.this);
+							TowerFileUtils.convertPlayerTeamLocation(INSTANCE);
 							TowerFileUtils.savePlayerTeam(mPlayer.mTeam, mCurrentFloor - 1);
 						}
-						TowerGameUtils.giveLoot(TowerGame.this);
+						TowerGameUtils.giveLoot(INSTANCE);
 						clearPlayer(mPlayer.mPlayer);
 						forceStopGame();
 					}
@@ -490,13 +491,13 @@ public class TowerGame {
 			public void run() {
 				if (mTimer == 0) {
 					for (TowerMob mob : mFloorTeam.mMobs) {
-						mob.spawnPuppet(TowerGame.this, mMobs);
+						mob.spawnPuppet(INSTANCE, mMobs);
 					}
 				}
 
 				if (mPlayer != null) {
 					for (TowerMob playerMob : mPlayer.mTeam.mMobs) {
-						new PartialParticle(Particle.REDSTONE, playerMob.getSpawnLocation(TowerGame.this), 80, 0, 0.5, 0, 1, new DustOptions(playerMob.mInfo.mMobRarity.getColor(), 0.5f))
+						new PartialParticle(Particle.REDSTONE, playerMob.getSpawnLocation(INSTANCE), 80, 0, 0.5, 0, 1, new DustOptions(playerMob.mInfo.mMobRarity.getColor(), 0.5f))
 							.spawnAsPlayerActive(mPlayer.mPlayer);
 					}
 				}
@@ -531,7 +532,7 @@ public class TowerGame {
 				mTimer = 0;
 			}
 		};
-		mCountDown.runTaskTimer(Plugin.getInstance(), 10, 10);
+		mCountDown.runTaskTimer(TowerManager.mPlugin, 10, 10);
 	}
 
 	public static void clearPlayer(Player player) {

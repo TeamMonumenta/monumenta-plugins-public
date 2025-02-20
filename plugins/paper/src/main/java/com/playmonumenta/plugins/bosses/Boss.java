@@ -198,7 +198,7 @@ public class Boss {
 	}
 
 	public List<BossAbilityGroup> getAbilities() {
-		return new ArrayList<>(mAbilities);
+		return new ArrayList<BossAbilityGroup>(mAbilities);
 	}
 
 	public void unload(boolean shuttingDown) {

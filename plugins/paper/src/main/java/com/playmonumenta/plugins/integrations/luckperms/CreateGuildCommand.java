@@ -24,6 +24,7 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -47,11 +48,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.Nullable;
 
 public class CreateGuildCommand {
 	private static final String[] SUGGESTIONS = {"@a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13,gamemode=!spectator]"};
 
+	@SuppressWarnings({"DataFlowIssue"})
 	public static void register(Plugin plugin) {
 		// guild mod create <guild name> <guild color> <guild tag> <founders>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.guild.mod.create");

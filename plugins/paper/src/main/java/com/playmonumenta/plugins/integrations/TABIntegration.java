@@ -297,7 +297,6 @@ public class TABIntegration implements Listener {
 		fakePlayers.clear();
 	}
 
-	@SuppressWarnings("PMD.EmptyCatchBlock")
 	public void refreshOnlinePlayer(UUID uuid, boolean latency) {
 		if (latency) {
 			Player bukkitPlayer = Bukkit.getPlayer(uuid);

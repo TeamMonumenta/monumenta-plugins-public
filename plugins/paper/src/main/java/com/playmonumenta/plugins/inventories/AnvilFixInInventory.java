@@ -24,7 +24,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 
 /**
  * Handles anvils and upgraded lime tesseract
@@ -37,6 +36,7 @@ public class AnvilFixInInventory implements Listener {
 		mPlugin = plugin;
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (!event.getClick().equals(ClickType.RIGHT)) {
@@ -92,14 +92,10 @@ public class AnvilFixInInventory implements Listener {
 			return;
 		}
 
-		boolean canRepair = item.getItemMeta() instanceof Damageable damageable &&
-			damageable.getDamage() > 0 &&
-			!item.getType().isBlock() &&
-			ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_IRREPARIBILITY) == 0;
-
-		if (unshattered || canRepair) {
-			if (!unshattered && item.getItemMeta() instanceof Damageable damageable) {
-				damageable.setDamage(0);
+		if (unshattered
+			    || (item.getDurability() > 0 && !item.getType().isBlock() && item.hasItemMeta() && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_IRREPARIBILITY) == 0)) {
+			if (!unshattered) {
+				item.setDurability((short) 0);
 			}
 			if (isUpgradedLimeTesseract) {
 				ItemStatUtils.setCharges(anvilOrTess, limeTesseractCharges - 1);

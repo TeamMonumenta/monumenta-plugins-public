@@ -75,7 +75,7 @@ public class Spectate implements Listener {
 				throw CommandAPI.failWithString("You can not use this command in spectator mode");
 			}
 			//Success condition- either in a safezone OR on a dungeon shard with no nearby mobs
-		} else if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SPECTATE_AVAILABLE) || (ServerProperties.getPreventDungeonItemTransfer() && EntityUtils.getNearbyMobs(player.getLocation(), MOB_CANCEL_RADIUS).isEmpty())) {
+		} else if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SPECTATE_AVAILABLE) || (ServerProperties.getPreventDungeonItemTransfer() && EntityUtils.getNearbyMobs(player.getLocation(), MOB_CANCEL_RADIUS).size() == 0)) {
 			// Move player to spectator, remember coordinates
 			new SpectateContext(plugin, player);
 			// Succeeded in making this player a spectator

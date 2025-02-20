@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,7 +24,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 public class BurstingRootsCS extends GraspingClawsCS {
 	private static final Particle.DustOptions BROWN = new Particle.DustOptions(Color.fromRGB(115, 65, 15), 1f);

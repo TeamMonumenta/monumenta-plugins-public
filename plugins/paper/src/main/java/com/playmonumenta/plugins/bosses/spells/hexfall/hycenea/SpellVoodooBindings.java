@@ -68,7 +68,7 @@ public class SpellVoodooBindings extends Spell {
 					for (Player player : HexfallUtils.getPlayersInHycenea(mSpawnLoc)) {
 
 						String effectTag = "";
-						if (!currentSet.isEmpty()) {
+						if (currentSet.size() > 0) {
 							effectTag = currentSet.get(0);
 							currentSet.remove(0);
 						}

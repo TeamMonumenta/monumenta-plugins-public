@@ -115,7 +115,7 @@ public class VoidCorruption extends Effect {
 				List<Player> players = PlayerUtils.playersInRange(entity.getLocation(), RANGE, true);
 				for (Player p2 : players) {
 					NavigableSet<VoidCorruption> corruptionSet = mPlugin.mEffectManager.getEffects(p2, VoidCorruption.class);
-					if (!corruptionSet.isEmpty()) {
+					if (corruptionSet.size() > 0) {
 						double pCorruption = corruptionSet.last().getCorruption();
 						if (pCorruption > mCorruption + 5) {
 							addCorruption(1);

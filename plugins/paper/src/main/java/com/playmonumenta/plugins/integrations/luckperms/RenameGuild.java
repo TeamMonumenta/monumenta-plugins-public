@@ -39,6 +39,7 @@ public class RenameGuild {
 
 	private static final CommandPermission PERMISSION = CommandPermission.fromString("monumenta.command.guild.mod.renameguild");
 
+	@SuppressWarnings("DataFlowIssue")
 	public static CommandAPICommand attach(Plugin plugin, CommandAPICommand rootCommand) {
 		CommandAPICommand tagSubCommand = new CommandAPICommand("tag")
 			.withArguments(List.of(

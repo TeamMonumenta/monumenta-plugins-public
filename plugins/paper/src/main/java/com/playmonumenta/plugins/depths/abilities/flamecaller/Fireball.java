@@ -155,7 +155,7 @@ public class Fireball extends DepthsAbility {
 
 	private boolean hasCollidedWithEnemy(Item physicsItem) {
 		Hitbox hitbox = new Hitbox.AABBHitbox(physicsItem.getWorld(), BoundingBox.of(physicsItem.getLocation(), 1.025, 1.025, 1.025));
-		return !hitbox.getHitMobs().isEmpty();
+		return hitbox.getHitMobs().size() > 0;
 	}
 
 	private void explode(Location loc) {

@@ -61,7 +61,7 @@ public class Diversity extends DepthsAbility {
 					.collect(Collectors.toSet());
 
 				mTreeCount = Math.min(uniqueTrees.size(), TREES_REQUIRED);
-				if (mTreeCount == TREES_REQUIRED) {
+				if (mTreeCount >= TREES_REQUIRED) {
 					//Give a random prismatic the first time this effect is reached
 					if (!depthsPlayer.mDiversityGift) {
 						depthsPlayer.sendMessage(Component.text("Due to achieving your Diversity goal, you've received a prismatic ability reward in your trinket!"));

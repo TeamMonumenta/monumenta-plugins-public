@@ -35,8 +35,6 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Handles communication with an (optional) client mod.
  */
-// SerDes
-@SuppressWarnings("UnusedVariable")
 public class ClientModHandler {
 
 	public static final String CHANNEL_ID = "monumenta:client_channel_v1";
@@ -138,7 +136,11 @@ public class ClientModHandler {
 		}
 		EffectInfo[] effectsList = INSTANCE.mPlugin.mEffectManager.getPriorityEffects(player).entrySet().stream()
 			.filter(effect -> effect != null && effect.getValue().doesDisplay() && effect.getValue().getDisplayedName() != null)
-			.map(effect -> mapEffectToEffectInfo(effect.getValue(), effect.getKey(), false))
+			.map(effect -> {
+				EffectInfo info = new EffectInfo();
+				mapEffectToEffectInfo(effect.getValue(), info, effect.getKey(), false);
+				return info;
+			})
 			.sorted((effect1, effect2) -> effect2.displayPriority - effect1.displayPriority)
 			.toArray(EffectInfo[]::new);
 
@@ -156,26 +158,25 @@ public class ClientModHandler {
 			|| effect.getDisplayedName() == null) {
 			return;
 		}
-
+		EffectInfo info = new EffectInfo();
+		mapEffectToEffectInfo(effect, info, source, remove);
 		EffectUpdatePacket packet = new EffectUpdatePacket();
-		packet.effect = mapEffectToEffectInfo(effect, source, remove);
+		packet.effect = info;
 		INSTANCE.sendPacket(player, packet);
 	}
 
-	public static EffectInfo mapEffectToEffectInfo(Effect effect, String source, boolean remove) {
-		final var uuid = UUID.nameUUIDFromBytes(source.getBytes(StandardCharsets.UTF_8)).toString();
-		final var duration = remove ? 0 : effect.getDuration();
-		final var name = effect.getDisplayedName() != null ? effect.getDisplayedName() : "";
-		final var percentage = effect.getDisplay() != null && MessagingUtils.plainText(effect.getDisplay()).contains("%");
-		final double power;
-		if (effect.getSpecificDisplay() != null && Objects.equals(MessagingUtils.plainText(effect.getSpecificDisplay()), name)) {
-			power = 0;
+	public static void mapEffectToEffectInfo(Effect effect, EffectInfo info, String source, boolean remove) {
+		info.UUID = UUID.nameUUIDFromBytes(source.getBytes(StandardCharsets.UTF_8)).toString();
+		info.duration = remove ? 0 : effect.getDuration();
+		info.name = effect.getDisplayedName() != null ? effect.getDisplayedName() : "";
+		info.percentage = effect.getDisplay() != null && MessagingUtils.plainText(effect.getDisplay()).contains("%");
+		if (effect.getSpecificDisplay() != null && Objects.equals(MessagingUtils.plainText(effect.getSpecificDisplay()), info.name)) {
+			info.power = 0;
 		} else {
-			power = (percentage ? effect.getMagnitude() * 100 : effect.getMagnitude());
+			info.power = (info.percentage ? effect.getMagnitude() * 100 : effect.getMagnitude());
 		}
-		final var positive = effect.isBuff() == effect.getMagnitude() >= 0;
-		final var displayPriority = effect.getDisplayPriority();
-		return new EffectInfo(uuid, displayPriority, name, duration, power, positive, percentage);
+		info.positive = effect.isBuff() == effect.getMagnitude() >= 0;
+		info.displayPriority = effect.getDisplayPriority();
 	}
 
 	public static void silenced(Player player, int duration) {
@@ -277,6 +278,7 @@ public class ClientModHandler {
 	/**
 	 * Sent whenever a player's class is updated.
 	 */
+	@SuppressWarnings("unused")
 	private static class ClassUpdatePacket implements Packet {
 
 		final String _type = "ClassUpdatePacket";
@@ -306,6 +308,7 @@ public class ClientModHandler {
 	/**
 	 * Sent whenever an ability is used or changed in any way
 	 */
+	@SuppressWarnings("unused")
 	private static class AbilityUpdatePacket implements Packet {
 
 		final String _type = "AbilityUpdatePacket";
@@ -328,6 +331,7 @@ public class ClientModHandler {
 	/**
 	 * Custom player status effects that effect skills
 	 */
+	@SuppressWarnings("unused")
 	private static class PlayerStatusPacket implements Packet {
 
 		final String _type = "PlayerStatusPacket";
@@ -340,6 +344,7 @@ public class ClientModHandler {
 	/**
 	 * Sent whenever the number of chests in a strike changes
 	 */
+	@SuppressWarnings("unused")
 	private static class StrikeChestUpdatePacket implements Packet {
 
 		final String _type = "StrikeChestUpdatePacket";
@@ -350,6 +355,7 @@ public class ClientModHandler {
 
 	}
 
+	@SuppressWarnings("unused")
 	public static class MassEffectUpdatePacket implements Packet {
 		String _type = "MassEffectUpdatePacket";
 
@@ -357,19 +363,31 @@ public class ClientModHandler {
 		public @Nullable EffectInfo[] effects;
 	}
 
+	@SuppressWarnings("unused")
 	public static class EffectUpdatePacket implements Packet {
 		String _type = "EffectUpdatePacket";
 
 		public @Nullable EffectInfo effect;
 	}
 
-	public record EffectInfo(String UUID, int displayPriority, String name, int duration, double power, boolean positive, boolean percentage) {
+	@SuppressWarnings("NullAway")
+	public static class EffectInfo {
+		public String UUID;
+		public int displayPriority;
+
+		public String name;
+		public Integer duration;
+		public double power;
+
+		public boolean positive;
+		public boolean percentage;
 	}
 
 
 	/**
 	 * Should be sent on login, shard change and after a player enters a new content (most likely will be tied to the instance bot)
 	 */
+	@SuppressWarnings("unused")
 	public static class LocationUpdatedPacket implements Packet {
 		String _type = "LocationUpdatedPacket";
 

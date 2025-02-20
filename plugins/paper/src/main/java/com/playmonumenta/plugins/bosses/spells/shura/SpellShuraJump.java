@@ -57,12 +57,12 @@ public class SpellShuraJump extends Spell {
 				while (players.size() > 4) {
 					players.remove(0);
 				}
-				if (mTrigger && !players.isEmpty()) {
+				if (mTrigger && players.size() > 0) {
 					mTrigger = false;
 					jump(players.get(0));
 					mTargeted.add(players.get(0));
 				}
-				if (players.isEmpty()) {
+				if (players.size() == 0) {
 					this.cancel();
 				}
 			}

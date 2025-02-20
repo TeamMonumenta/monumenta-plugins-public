@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.tracking;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -11,7 +12,9 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 
 public class CreeperTracking implements EntityTracking {
-	private Set<Creeper> mEntities = Collections.newSetFromMap(new WeakHashMap<>());
+	private Set<Creeper> mEntities = Collections.newSetFromMap(
+		new WeakHashMap<Creeper, Boolean>()
+);
 	private int mTicks = 0;
 
 	@Override

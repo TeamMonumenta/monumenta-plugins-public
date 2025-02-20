@@ -18,7 +18,6 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-@SuppressWarnings("deprecation")
 public class NetworkRelayIntegration {
 	public static final String VOTE_NOTIFY_CHANNEL = "Monumenta.Bungee.VoteNotify";
 

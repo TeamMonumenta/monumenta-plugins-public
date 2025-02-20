@@ -103,7 +103,7 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		public SoundsList SOUND_LINGERING = SoundsList.fromString("[(ENTITY_BLAZE_BURN,4,1.5)]");
 
 		@BossParam(help = "LibraryOfSouls name of the mob spawned when the grenade explodes")
-		public LoSPool SPAWNED_MOB_POOL = LoSPool.LibraryPool.EMPTY;
+		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
 
 		@BossParam(help = "y-velocity of the thrown grenade")
 		public float Y_VELOCITY = 0.7f;

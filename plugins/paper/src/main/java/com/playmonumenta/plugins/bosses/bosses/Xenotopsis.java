@@ -118,7 +118,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 		// load gallery game based on players nearby
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE, true);
-		if (players.isEmpty()) {
+		if (players.size() == 0) {
 			MMLog.severe("[Xenotopsis] Boss started with zero detected players nearby, proceeding without gallery game.");
 
 			mMaxHealthPart1 = BASE_HEALTH_PART1;
@@ -271,7 +271,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 				}
 
 				// check if every player has died and fight should cancel
-				if (PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE, true).isEmpty()) {
+				if (PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE, true).size() == 0) {
 					sendWorldDialogueMessage("DEATH'S HAND HAS ENSNARED YOU IN ITS GRASP. SINK BELOW THE WAVES, LIKE ALL THOSE WHO CAME BEFORE YOU THAT DARE ATTEMPT TO DEFY IT");
 					mBoss.remove();
 					this.cancel();

@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.gallery;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffect;
 import com.playmonumenta.plugins.gallery.interactables.BaseInteractable;
@@ -50,7 +49,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * This is the main class for each game of gallery, each map has a UNIQUE key as the UUID of the world is playing on.
  */
-// nit class needs some refactoring to solve all issues
+@SuppressWarnings("NullAway") // nit class needs some refactoring to solve all issues
 public class GalleryGame {
 
 	//statics constant that we may need to move inside GalleryGame if each map has his own constant
@@ -70,6 +69,9 @@ public class GalleryGame {
 
 	//UUID of the world and also this game key for the GalleryManager
 	protected final UUID mUUIDGame;
+
+	//instance of this game
+	private final GalleryGame GAME_INSTANCE;
 
 	//ENUM to know which map is loaded
 	private final GalleryMap mMap;
@@ -131,7 +133,6 @@ public class GalleryGame {
 	private boolean mShouldReload = false;
 
 	//used when the new round should start and
-	@Nullable
 	private BukkitRunnable mRoundStartRunnable = null;
 
 	/**
@@ -142,6 +143,7 @@ public class GalleryGame {
 	 * @param players  list of the players
 	 */
 	public GalleryGame(UUID gameUUID, GalleryMap map, List<Player> players) {
+		GAME_INSTANCE = this;
 		mUUIDGame = gameUUID;
 		mMap = map;
 		mLastMobKilledTick = GalleryManager.ticks;
@@ -153,25 +155,21 @@ public class GalleryGame {
 		Collection<ArmorStand> armorStands = players.get(0).getLocation().getNearbyEntitiesByType(ArmorStand.class, 500);
 
 		List<ArmorStand> utilsArmorStands = armorStands.stream().filter(armorStand -> armorStand.getScoreboardTags().contains(GalleryManager.TAG_UTIL_LOCATION)).toList();
-
-		mSpawningLoc = utilsArmorStands.stream()
-			.filter(e -> e.getScoreboardTags().contains(GalleryManager.TAG_SPAWNING_LOC))
-			.findFirst()
-			.orElseThrow()
-			.getLocation().toVector();
-
-		mDeathBoxLoc = utilsArmorStands.stream()
-			.filter(e -> e.getScoreboardTags().contains(GalleryManager.TAG_DEAD_BOX_LOC))
-			.findFirst()
-			.orElseThrow()
-			.getLocation().toVector();
+		for (LivingEntity livingEntity : utilsArmorStands) {
+			if (livingEntity.getScoreboardTags().contains(GalleryManager.TAG_SPAWNING_LOC)) {
+				mSpawningLoc = livingEntity.getLocation().toVector();
+			}
+			if (livingEntity.getScoreboardTags().contains(GalleryManager.TAG_DEAD_BOX_LOC)) {
+				mDeathBoxLoc = livingEntity.getLocation().toVector();
+			}
+		}
 
 		reloadAll();
 	}
 
 	//this constructor is only used for when creating a game from the Json file
-	@SuppressWarnings("NullAway.Init")
 	private GalleryGame(UUID gameUUID, GalleryMap map) {
+		GAME_INSTANCE = this;
 		mUUIDGame = gameUUID;
 		mMap = map;
 	}
@@ -397,12 +395,6 @@ public class GalleryGame {
 		for (LivingEntity entity : spawnersEntities) {
 			try {
 				GallerySpawner spawner = GallerySpawner.fromEntity(entity);
-				// lets not rely on catching NPEs, eh?
-				if (spawner == null) {
-					GalleryUtils.printDebugMessage("spawner was null");
-					continue;
-				}
-
 				GallerySpawner otherSpawner = mSpawnerMap.get(spawner.getName());
 				if (otherSpawner != null) {
 					//we have more than one interactable with the same name. this is a problem since only one will be saved
@@ -461,7 +453,7 @@ public class GalleryGame {
 				player.setAlive(true);
 				if (player.isOnline()) {
 					//player.getPlayer() will always not null at this point
-					Objects.requireNonNull(player.getPlayer()).teleport(new Location(player.getPlayer().getWorld(), mSpawningLoc.getX(), mSpawningLoc.getY(), mSpawningLoc.getZ()));
+					player.getPlayer().teleport(new Location(player.getPlayer().getWorld(), mSpawningLoc.getX(), mSpawningLoc.getY(), mSpawningLoc.getZ()));
 				} else {
 					//player is not online, add new tag to teleport him when reenter the world
 					player.setShouldTeleportWhenJoining(true);
@@ -469,7 +461,7 @@ public class GalleryGame {
 			}
 
 			if (player.isOnline()) {
-				SeasonalEventListener.playerGalleryWave(Objects.requireNonNull(player.getPlayer()));
+				SeasonalEventListener.playerGalleryWave(player.getPlayer());
 				player.onRoundStart(this);
 			}
 			player.sendMessage("Starting round: " + mCurrentRound);
@@ -489,7 +481,7 @@ public class GalleryGame {
 				mRoundStartRunnable = null;
 			}
 		};
-		mRoundStartRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
+		mRoundStartRunnable.runTaskTimer(GalleryManager.mPlugin, 0, 1);
 	}
 
 
@@ -584,9 +576,6 @@ public class GalleryGame {
 		if (entity.getScoreboardTags().contains(GallerySpawner.TAG_STRING)) {
 			try {
 				GallerySpawner spawner = GallerySpawner.fromEntity(entity);
-				if (spawner == null) {
-					throw new IllegalStateException("spawner == null?");
-				}
 				mSpawnerMap.put(spawner.getName(), spawner);
 				if (spawner.isActive()) {
 					mActivatedSpawnerSet.add(spawner);
@@ -626,7 +615,6 @@ public class GalleryGame {
 		mPlayersCoins += coins;
 	}
 
-	@Nullable
 	protected GalleryPlayer getGalleryPlayer(UUID player) {
 		return mPlayersMap.get(player);
 	}
@@ -639,7 +627,7 @@ public class GalleryGame {
 			}
 		}
 		if (mPlayersMap.isEmpty()) {
-			GalleryManager.removeGame(this);
+			GalleryManager.removeGame(GAME_INSTANCE);
 		}
 	}
 
@@ -704,7 +692,6 @@ public class GalleryGame {
 		return locations;
 	}
 
-	@Nullable
 	public Location getBoxLocation() {
 		for (BaseInteractable interactable : mInteractableMap.values()) {
 			if (interactable instanceof MysteryBoxInteractable box) {
@@ -716,14 +703,10 @@ public class GalleryGame {
 		return null;
 	}
 
-	@Nullable
 	public Location getSpawnLocation() {
 		for (GalleryPlayer player : mPlayersMap.values()) {
 			if (player.isOnline()) {
-				return new Location(
-					Objects.requireNonNull(player.getPlayer()).getWorld(),
-					mSpawningLoc.getX(), mSpawningLoc.getY(), mSpawningLoc.getZ()
-				);
+				return new Location(player.getPlayer().getWorld(), mSpawningLoc.getX(), mSpawningLoc.getY(), mSpawningLoc.getZ());
 			}
 		}
 		return null;
@@ -733,7 +716,6 @@ public class GalleryGame {
 		mSpawningLoc = newLocation.toVector();
 	}
 
-	@Nullable
 	public BaseInteractable getInteractable(String name) {
 		return mInteractableMap.get(name);
 	}
@@ -865,8 +847,8 @@ public class GalleryGame {
 			BaseInteractable lastInteract = null;
 			for (BaseInteractable interactable : mInteractableMap.values()) {
 				if (interactable.getLocation().distance(player.getLocation()) < 20) {
-					if (interactable.canInteractWithObject(this, gPlayer)) {
-						if (interactable.interactWithObject(this, gPlayer)) {
+					if (interactable.canInteractWithObject(GAME_INSTANCE, gPlayer)) {
+						if (interactable.interactWithObject(GAME_INSTANCE, gPlayer)) {
 							lastInteract = interactable;
 							break;
 						}
@@ -879,7 +861,7 @@ public class GalleryGame {
 				if (FastUtils.RANDOM.nextDouble() <= 0.1) {
 					//delayed so the animation ends
 					mysteryBoxInteractable.setValidBox(false);
-					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+					Bukkit.getScheduler().runTaskLater(GalleryManager.mPlugin, () -> {
 						List<BaseInteractable> list = new ArrayList<>(mInteractableMap.values().stream().filter(bInteract -> bInteract instanceof MysteryBoxInteractable mmBox && mmBox != mysteryBoxInteractable).toList());
 						if (!list.isEmpty()) {
 							mysteryBoxInteractable.runCommandRemove();

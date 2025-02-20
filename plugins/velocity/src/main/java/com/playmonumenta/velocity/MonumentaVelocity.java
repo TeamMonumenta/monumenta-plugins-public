@@ -86,7 +86,7 @@ public class MonumentaVelocity {
 		if (plugins.isLoaded("monumenta-redisapi")) {
 			mReconnectHandler = new MonumentaReconnectHandler(this);
 			mServer.getEventManager().register(this, mReconnectHandler);
-			mServer.getCommandManager().register(mServer.getCommandManager().getCommandMeta("rejoin"), new Rejoin(mReconnectHandler));
+			mServer.getCommandManager().register("rejoin", new Rejoin(mReconnectHandler));
 		}
 
 		if (plugins.isLoaded("monumenta-network-relay")) {
@@ -96,7 +96,7 @@ public class MonumentaVelocity {
 		if (plugins.isLoaded("nuvotifier")) {
 			try {
 				mVoteManager = new VoteManager(this, mConfig);
-				mServer.getCommandManager().register(mServer.getCommandManager().getCommandMeta("vote"), new Vote(mVoteManager));
+				mServer.getCommandManager().register("vote", new Vote(mVoteManager));
 				mServer.getEventManager().register(this, mVoteManager);
 			} catch (IllegalArgumentException ex) {
 				mLogger.warn("Failed to initialize voting system:", ex);
@@ -105,7 +105,7 @@ public class MonumentaVelocity {
 
 		mServer.getEventManager().register(this, new JoinLeaveHandler(this));
 
-		mServer.getEventManager().register(this, new VelocityClientModHandler(mConfig.mAllowPacketPublicizeContent));
+		mServer.getEventManager().register(this, new VelocityClientModHandler(this, mConfig.mAllowPacketPublicizeContent));
 		mServer.getChannelRegistrar().register(VelocityClientModHandler.CHANNEL_ID);
 	}
 
@@ -167,11 +167,11 @@ public class MonumentaVelocity {
 	@ConfigSerializable
 	public static class MonumentaVoting {
 		@Setting(value = "sites")
-		public List<String> mUrls = new ArrayList<>();
+		public List<String> mUrls = new ArrayList<String>();
 		@Setting(value = "alternate_names")
-		public List<String> mAlternateNames = new ArrayList<>();
+		public List<String> mAlternateNames = new ArrayList<String>();
 		@Setting(value = "cooldown_minutes")
-		public List<Integer> mCooldownMinutes = new ArrayList<>();
+		public List<Integer> mCooldownMinutes = new ArrayList<Integer>();
 	}
 
 }

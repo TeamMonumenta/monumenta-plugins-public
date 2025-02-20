@@ -160,7 +160,6 @@ enum PSGUIStat {
 	;
 
 	// Has to be an inner class as static fields cannot be declared before enum constants
-	@SuppressWarnings("UnnecessaryLambda")
 	private static final class Formatting {
 
 		private static final DecimalFormat NUMBER_FORMATTER = new DecimalFormat("0.##");
@@ -168,9 +167,12 @@ enum PSGUIStat {
 		private static final DecimalFormat PERCENT_CHANGE_FORMATTER = new DecimalFormat("+0.##%;-0.##%");
 
 		private static final DoubleFunction<String> PERCENT = PERCENT_FORMATTER::format;
+		@SuppressWarnings("UnnecessaryLambda")
 		private static final DoubleFunction<String> ONE_MINUS_PERCENT = d -> PERCENT_FORMATTER.format(1 - d);
+		@SuppressWarnings("UnnecessaryLambda")
 		private static final DoubleFunction<String> PERCENT_MODIFIER = d -> PERCENT_FORMATTER.format(d - 1);
 		private static final DoubleFunction<String> NUMBER = NUMBER_FORMATTER::format;
+		@SuppressWarnings("UnnecessaryLambda")
 		private static final DoubleFunction<String> DR_CHANGE_FORMAT = d -> PERCENT_CHANGE_FORMATTER.format(d) + " damage taken";
 
 	}

@@ -104,15 +104,15 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 				}
 
 				List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-				if (!players.isEmpty()) {
+				if (players.size() > 0) {
 					Collections.shuffle(players);
 					mDavey.setTarget(players.get(0));
 				}
-				if (!players.isEmpty() && !mVexes.isEmpty() && mVexes.get(0) != null) {
+				if (players.size() > 0 && mVexes.size() >= 1 && mVexes.get(0) != null) {
 					Collections.shuffle(players);
 					((Mob) mVexes.get(0)).setTarget(players.get(0));
 				}
-				if (!players.isEmpty() && mVexes.size() >= 2 && mVexes.get(1) != null) {
+				if (players.size() > 0 && mVexes.size() >= 2 && mVexes.get(1) != null) {
 					Collections.shuffle(players);
 					((Mob) mVexes.get(1)).setTarget(players.get(0));
 				}

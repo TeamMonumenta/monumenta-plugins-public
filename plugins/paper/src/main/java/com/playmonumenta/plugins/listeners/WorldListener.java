@@ -258,7 +258,7 @@ public class WorldListener implements Listener {
 			return;
 		}
 
-		if (!entityScores.isEmpty()) {
+		if (entityScores.size() > 0) {
 			entity.getPersistentDataContainer().set(ENTITY_SCORES_DATA_KEY, PersistentDataType.STRING, entityScores.toString());
 		} else {
 			entity.getPersistentDataContainer().remove(ENTITY_SCORES_DATA_KEY);

@@ -127,7 +127,7 @@ public class SpellBaseBolt extends Spell {
 
 	@Override
 	public void run() {
-		if (!PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, false).isEmpty()) {
+		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, false).size() > 0) {
 			new BukkitRunnable() {
 				int mTicks = 0;
 
@@ -232,7 +232,7 @@ public class SpellBaseBolt extends Spell {
 	/* If there are players in range of the attack, put it on cooldown. Otherwise, skip and move on*/
 	@Override
 	public int cooldownTicks() {
-		if (!PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, true).isEmpty()) {
+		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, true).size() > 0) {
 			return mDelay + (20 * 5);
 		} else {
 			return 1;

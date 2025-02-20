@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -17,7 +16,7 @@ public class FireworkOverride extends BaseOverride {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
 		if (item != null && block != null) {
-			if (!BlockUtils.INTERACTABLE.contains(block.getType())) {
+			if (!block.getType().isInteractable()) {
 				ItemMeta meta = item.getItemMeta();
 				if (meta != null) {
 					if (meta.hasDisplayName() && ItemUtils.getPlainName(item).contains("Signal Flare")) {

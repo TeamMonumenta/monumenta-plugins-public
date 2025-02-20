@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
-import com.playmonumenta.plugins.bosses.parameters.EffectsList;
-import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
-import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.parameters.*;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingAoE;
 import com.playmonumenta.plugins.events.DamageEvent;

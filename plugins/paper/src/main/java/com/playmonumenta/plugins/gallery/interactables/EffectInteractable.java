@@ -8,6 +8,7 @@ import java.util.HashSet;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.openjdk.jmh.runner.RunnerException;
 
 public class EffectInteractable extends BasePricedInteractable {
 	public static final String TAG_STRING = "GalleryEffectInteractable";
@@ -50,7 +51,7 @@ public class EffectInteractable extends BasePricedInteractable {
 					String name = split[1];
 					GalleryEffectType type = GalleryEffectType.fromName(readNullableString(split[2]));
 					if (type == null) {
-						throw new RuntimeException("effect TYPE == null ? for entity at: " + entity.getLocation().getBlockX() + " " + entity.getLocation().getBlockY() + " " + entity.getLocation().getBlockZ() + " \n tag: " + tag);
+						throw new RunnerException("effect TYPE == null ? for entity at: " + entity.getLocation().getBlockX() + " " + entity.getLocation().getBlockY() + " " + entity.getLocation().getBlockZ() + " \n tag: " + tag);
 					}
 					Integer price = readNullableInteger(split[3]);
 					String text = readNullableString(split[4]);

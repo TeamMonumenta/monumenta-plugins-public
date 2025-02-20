@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -43,7 +44,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 public class ThundercloudForm extends DepthsAbility implements AbilityWithDuration {
 

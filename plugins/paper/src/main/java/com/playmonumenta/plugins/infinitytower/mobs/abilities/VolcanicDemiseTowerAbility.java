@@ -85,7 +85,7 @@ public class VolcanicDemiseTowerAbility extends TowerAbility {
 										}
 
 										// Target one random player. Have a meteor rain nearby them.
-										if (!targets.isEmpty()) {
+										if (targets.size() >= 1) {
 											LivingEntity rPlayer = targets.get(FastUtils.RANDOM.nextInt(targets.size()));
 											Location loc = rPlayer.getLocation();
 											rainMeteor(loc.add(FastUtils.randomDoubleInRange(-8, 8), 0, FastUtils.randomDoubleInRange(-8, 8)), 15);

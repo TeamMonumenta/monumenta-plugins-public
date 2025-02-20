@@ -142,7 +142,7 @@ public class VesperidysBlockPlacerBoss extends BossAbilityGroup {
 	public void death(@Nullable EntityDeathEvent event) {
 		for (Player player : PlayerUtils.playersInRange(mVesperidys.mSpawnLoc, Vesperidys.detectionRange, true)) {
 			NavigableSet<VoidCorruption> corruptionSet = mMonuPlugin.mEffectManager.getEffects(player, VoidCorruption.class);
-			if (!corruptionSet.isEmpty()) {
+			if (corruptionSet.size() > 0) {
 				corruptionSet.last().addCorruption(-mCorruptionCleanse);
 			}
 		}

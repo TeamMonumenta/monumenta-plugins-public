@@ -103,7 +103,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 
 		//List is farthest players in the beginning, and nearest players at the end
 		List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), BeastOfTheBlackFlame.detectionRange);
-		if (!players.isEmpty()) {
+		if (players.size() > 0) {
 			Player playerOne = players.get(0);
 			super.launch(playerOne, playerOne.getEyeLocation());
 			if (players.size() > 5) {

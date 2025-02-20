@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.market.filters.MarketFilter;
 import com.playmonumenta.plugins.market.gui.MarketGui;
 import com.playmonumenta.plugins.market.gui.TabBazaarBrowserState;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -27,7 +28,6 @@ import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +63,7 @@ public class MarketManager {
 			MarketManager instance = getInstance();
 			String json = null;
 			try {
-				json = Files.readString(Plugin.getInstance().getDataFolder().toPath().resolve("market.json"));
+				json = FileUtils.readFile(Plugin.getInstance().getDataFolder().getPath() + "/market.json");
 			} catch (Exception e) {
 				MMLog.severe("Caught Market plugin exception while loading the config : ", e);
 			}

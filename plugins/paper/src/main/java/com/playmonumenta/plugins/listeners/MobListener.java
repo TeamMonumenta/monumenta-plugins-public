@@ -471,7 +471,7 @@ public class MobListener implements Listener {
 		// Drop armed armor stands from armed variants
 		if (livingEntity instanceof ArmorStand armorStand && armorStand.hasArms()) {
 			List<ItemStack> drops = event.getDrops();
-			if (!drops.isEmpty() && drops.get(0).equals(new ItemStack(Material.ARMOR_STAND, 1))) {
+			if (drops.size() > 0 && drops.get(0).equals(new ItemStack(Material.ARMOR_STAND, 1))) {
 				ItemStack armedArmorStand = InventoryUtils.getItemFromLootTable(event.getEntity(), ARMED_ARMOR_STAND_LOOT_TABLE);
 				if (armedArmorStand != null) {
 					drops.set(0, armedArmorStand);

@@ -88,7 +88,6 @@ public class QuiverListener implements Listener {
 			mItemStack = item;
 		}
 
-		// Using enum ordinal is the best way of handling this, and doesn't have any issues with persistence here.
 		@SuppressWarnings("EnumOrdinal")
 		ArrowTransformMode next(boolean reverse) {
 			return values()[Math.floorMod(ordinal() + (reverse ? -1 : 1), values().length)];

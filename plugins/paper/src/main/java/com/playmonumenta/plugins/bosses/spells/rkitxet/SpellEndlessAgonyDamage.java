@@ -34,7 +34,7 @@ public class SpellEndlessAgonyDamage extends Spell {
 		//This function runs every 5 ticks
 		mTicks += 5;
 
-		List<Player> hitPlayers = new ArrayList<>();
+		List<Player> hitPlayers = new ArrayList<Player>();
 		for (Location loc : mRKitxet.mAgonyLocations) {
 			if (mTicks % 10 == 0) {
 				for (Player p : PlayerUtils.playersInCylinder(loc, RADIUS, RADIUS)) {

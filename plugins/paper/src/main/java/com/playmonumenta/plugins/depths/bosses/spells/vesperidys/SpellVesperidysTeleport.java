@@ -96,7 +96,7 @@ public class SpellVesperidysTeleport extends Spell {
 		// Prioritizes platforms which doesn't have adds on it.
 		for (Vesperidys.Platform platform : platforms) {
 			selectedPlatform = platform;
-			if (platform.getMobsOnPlatform().isEmpty() && platform.getPlayersOnPlatform().isEmpty()) {
+			if (platform.getMobsOnPlatform().size() <= 0 && platform.getPlayersOnPlatform().size() <= 0) {
 				break;
 			}
 		}

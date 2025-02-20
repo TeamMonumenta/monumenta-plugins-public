@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 public class UpdateStrikeChests {
 	public static String COMMAND = "monumenta";
 
+	@SuppressWarnings("unchecked")
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.updatestrikechests");
 

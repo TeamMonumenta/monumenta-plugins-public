@@ -65,9 +65,8 @@ public class LoadoutManagerGui extends Gui {
 		mLoadoutData = Plugin.getInstance().mLoadoutManager.getData(target);
 	}
 
-	// Doesn't matter here.
-	@SuppressWarnings("EnumOrdinal")
 	@Override
+	@SuppressWarnings("EnumOrdinal")
 	protected void setup() {
 		LoadoutManager.Loadout selectedLoadout = mSelectedLoadout;
 		if (selectedLoadout == null) {

@@ -153,7 +153,7 @@ public class DepthsPlayer {
 	 * IF YOU ADD ANYTHING HERE THAT REFERENCES A COMPLEX OBJECT THE SERVER WILL CRASH WHILE SAVING
 	 * (especially Player or World)
 	 */
-	@SuppressWarnings("NullAway.Init")
+
 	public DepthsPlayer(Player p) {
 		mPlayerId = p.getUniqueId();
 		mPlayerName = p.getName();
@@ -192,13 +192,12 @@ public class DepthsPlayer {
 
 	public void initTreeSelection() {
 		// we have to initialize the random tree choice once, so that way you can't repeatedly reroll your choices by retriggering the GUI
-		final var player = getPlayer();
-		if (player == null) {
-			throw new IllegalStateException();
+		if (getPlayer() == null) {
+			return;
 		}
 
 		List<DepthsTree> choices = new ArrayList<>();
-		int talismanScore = DepthsUtils.getDepthsContent() == DepthsContent.DARKEST_DEPTHS ? ScoreboardUtils.getScoreboardValue(player, "DDTalisman").orElse(0) : ScoreboardUtils.getScoreboardValue(player, "CZTalisman").orElse(0);
+		int talismanScore = DepthsUtils.getDepthsContent() == DepthsContent.DARKEST_DEPTHS ? ScoreboardUtils.getScoreboardValue(getPlayer(), "DDTalisman").orElse(0) : ScoreboardUtils.getScoreboardValue(getPlayer(), "CZTalisman").orElse(0);
 		if (talismanScore > 0) {
 			DepthsTree talismanTree = DepthsTree.OWNABLE_TREES[talismanScore - 1];
 			choices.add(talismanTree);

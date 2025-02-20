@@ -46,8 +46,8 @@ public class AbilityTriggersGui extends Gui {
 		mGuiTextures = GUIUtils.getGuiTextureObjective(player);
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes", "EnumOrdinal", "ReturnValueIgnored"})
 	@Override
+	@SuppressWarnings({ "EnumOrdinal", "rawtypes", "unchecked" })
 	protected void setup() {
 		ItemStack tempItem;
 		String guiTag;

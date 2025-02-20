@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 
 public class BoatTracking implements EntityTracking {
-	private Set<Boat> mEntities = new HashSet<>();
+	private Set<Boat> mEntities = new HashSet<Boat>();
 	private int mTicks = 0;
 
 	@Override

@@ -16,14 +16,13 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-@SuppressWarnings("deprecation")
 public class JoinLeaveHandler {
 	final boolean mVanishEnabled;
 
 	final MonumentaVelocity mPlugin;
 
 	/* Keeps track of players that have had their join message sent */
-	private final Set<UUID> mOnlinePlayers = new ConcurrentSkipListSet<>();
+	private final Set<UUID> mOnlinePlayers = new ConcurrentSkipListSet<UUID>();
 
 	public JoinLeaveHandler(MonumentaVelocity main) {
 		mPlugin = main;

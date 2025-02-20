@@ -103,7 +103,7 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 				}
 
 				List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-				if (!players.isEmpty()) {
+				if (players.size() > 0) {
 					Collections.shuffle(players);
 					mWitch.setTarget(players.get(0));
 				}

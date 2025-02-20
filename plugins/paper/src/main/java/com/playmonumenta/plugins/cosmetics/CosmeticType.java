@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.cosmetics;
 
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
-import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
 import com.playmonumenta.plugins.cosmetics.punches.PlayerPunches;
+import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import java.util.Locale;
 import java.util.function.Function;
@@ -28,8 +28,7 @@ public enum CosmeticType {
 		this(displayName, displayNamePlural, material, null);
 	}
 
-	CosmeticType(String displayName, String displayNamePlural, Material material,
-				 @Nullable Function<String, Material> displayItemSupplier) {
+	CosmeticType(String displayName, String displayNamePlural, Material material, @Nullable Function<String, Material> displayItemSupplier) {
 		mDisplayName = displayName;
 		mDisplayNamePlural = displayNamePlural;
 		mDisplayItem = material;

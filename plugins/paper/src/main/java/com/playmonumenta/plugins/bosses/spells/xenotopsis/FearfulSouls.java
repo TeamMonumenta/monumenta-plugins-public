@@ -307,5 +307,6 @@ public class FearfulSouls extends Spell {
 	}
 
 	// record class usage without constructor creates unused variable warnings despite not having issues
+	@SuppressWarnings("UnusedVariable")
 	private record FearfulSoulData(ArmorStand skull, double speed, double height) {}
 }

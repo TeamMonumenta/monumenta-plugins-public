@@ -17,15 +17,15 @@ public class ParseResult<T> {
 	}
 
 	public static <T> ParseResult<T> of(T results) {
-		return new ParseResult<>(null, results);
+		return new ParseResult<T>(null, results);
 	}
 
 	public static <T> ParseResult<T> of(Tooltip<String>[] tooltip) {
-		return new ParseResult<>(List.of(tooltip), null);
+		return new ParseResult<T>(List.of(tooltip), null);
 	}
 
 	public static <T> ParseResult<T> of(List<Tooltip<String>> tooltip) {
-		return new ParseResult<>(tooltip, null);
+		return new ParseResult<T>(tooltip, null);
 	}
 
 	public @Nullable List<Tooltip<String>> getTooltip() {

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerFileUtils;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerGameUtils;
+import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import java.util.Objects;
@@ -56,13 +57,13 @@ public class SvalgotGhalkorTowerAbility extends TowerAbility {
 			}
 
 			if (mIsPlayerMob) {
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				Bukkit.getScheduler().runTaskLater(TowerManager.mPlugin, () -> {
 					mGame.mPlayerMobs.add(ghalkor);
 					mGame.mPlayerMobs.add(svalgot);
 					boss.remove();
 				}, 1);
 			} else {
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				Bukkit.getScheduler().runTaskLater(TowerManager.mPlugin, () -> {
 					mGame.mFloorMobs.add(ghalkor);
 					mGame.mFloorMobs.add(svalgot);
 					boss.remove();

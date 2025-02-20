@@ -54,7 +54,7 @@ public class GroundSeekerBoss extends BossAbilityGroup {
 		@BossParam(help = "effects applied on hit")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 		@BossParam(help = "LOS name of the mob when the seeker hits its target")
-		public LoSPool SPAWNED_MOB_POOL = LoSPool.LibraryPool.EMPTY;
+		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
 		@BossParam(help = "particles around the boss while it telegraphs")
 		public ParticlesList PARTICLE_CHARGE = ParticlesList.fromString("[(CRIT,8,1,0.1,1,0.25)]");
 		@BossParam(help = "particles created in the telegraphed line")

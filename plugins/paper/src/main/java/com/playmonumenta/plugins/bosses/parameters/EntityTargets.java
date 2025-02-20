@@ -325,7 +325,7 @@ public class EntityTargets implements Cloneable {
 				@Override
 				public int getNum(List<?> list) {
 					int num = list.size() / 2;
-					if (!list.isEmpty()) {
+					if (list.size() > 0) {
 						return num > 0 ? num : 1;
 					}
 					return 0;
@@ -335,7 +335,7 @@ public class EntityTargets implements Cloneable {
 				@Override
 				public int getNum(List<?> list) {
 					int num = list.size() / 4;
-					if (!list.isEmpty()) {
+					if (list.size() > 0) {
 						return num > 0 ? num : 1;
 					}
 					return 0;
@@ -345,7 +345,7 @@ public class EntityTargets implements Cloneable {
 				@Override
 				public int getNum(List<?> list) {
 					int num = list.size() / 8;
-					if (!list.isEmpty()) {
+					if (list.size() > 0) {
 						return num > 0 ? num : 1;
 					}
 					return 0;

@@ -129,7 +129,7 @@ public class Effect {
 				if (type == null) {
 					// Clear all effects
 					// Copy the list to prevent ConcurrentModificationException's
-					for (PotionEffect effect : new ArrayList<>(entity.getActivePotionEffects())) {
+					for (PotionEffect effect : new ArrayList<PotionEffect>(entity.getActivePotionEffects())) {
 						entity.removePotionEffect(effect.getType());
 					}
 				} else {

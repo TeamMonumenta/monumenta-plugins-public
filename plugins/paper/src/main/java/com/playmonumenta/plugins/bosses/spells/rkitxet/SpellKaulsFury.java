@@ -58,7 +58,7 @@ public class SpellKaulsFury extends Spell {
 		if (mTicks % mTriggerInterval == 0) {
 			mTicks = 0;
 			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), RKitxet.detectionRange, false);
-			if (players.isEmpty()) {
+			if (players.size() == 0) {
 				return;
 			}
 			if (players.size() > 1 && mRKitxet.getFuryTarget() != null) {

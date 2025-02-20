@@ -178,7 +178,7 @@ public class DelvesManager implements Listener {
 		}
 
 		JsonArray dungeonArr = obj.getAsJsonArray("dungeons");
-		if (dungeonArr == null || dungeonArr.isEmpty()) {
+		if (dungeonArr == null || dungeonArr.size() == 0) {
 			return;
 		}
 

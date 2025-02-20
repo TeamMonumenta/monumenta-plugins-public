@@ -18,7 +18,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("deprecation")
 public class MonumentaReconnectHandler {
 	private final MonumentaVelocity mPlugin;
 	private final @Nullable String mDefaultServer;

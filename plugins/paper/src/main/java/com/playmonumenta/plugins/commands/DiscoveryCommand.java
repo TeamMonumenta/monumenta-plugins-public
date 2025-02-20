@@ -494,7 +494,7 @@ public class DiscoveryCommand {
 					.executesPlayer((player, args) -> {
 						List<ItemDiscovery> discoveries = DiscoveryManager.getById(args.getUnchecked("id"));
 
-						if (discoveries.isEmpty()) {
+						if (discoveries.size() == 0) {
 							player.sendMessage(Component.text("Could not find any loaded discoveries", MESSAGE_COLOR));
 						}
 
@@ -526,7 +526,7 @@ public class DiscoveryCommand {
 
 		List<ItemDiscovery> toShow = allLoadedDiscoveries.subList(Math.max(0, (page - 1) * 10), Math.min(page * 10, allLoadedDiscoveries.size()));
 
-		if (toShow.isEmpty()) {
+		if (toShow.size() == 0) {
 			player.sendMessage(Component.text("There is nothing to show", MESSAGE_COLOR));
 			return;
 		}
@@ -555,7 +555,7 @@ public class DiscoveryCommand {
 
 			List<JsonObject> toShow = allDiscoveries.subList(Math.max(0, (page - 1) * 10), Math.min(page * 10, allDiscoveries.size()));
 
-			if (toShow.isEmpty()) {
+			if (toShow.size() == 0) {
 				player.sendMessage(Component.text("There is nothing to show", MESSAGE_COLOR));
 				return;
 			}

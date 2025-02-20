@@ -2,6 +2,7 @@ package com.playmonumenta.velocity.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.playmonumenta.velocity.MonumentaVelocity;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.PlayerChannelRegisterEvent;
@@ -14,7 +15,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-@SuppressWarnings("deprecation")
 public class VelocityClientModHandler {
 	public static final ChannelIdentifier CHANNEL_ID = MinecraftChannelIdentifier.create("monumenta", "client_channel_v1");
 
@@ -25,9 +25,9 @@ public class VelocityClientModHandler {
 	public static boolean mAllowPublicizeContent;
 
 	/* Keeps track of players that have registered the client packet channel (added in PlayerChannelRegisterEvent and removed following DisconnectEvent)*/
-	private static final Set<UUID> mOnlinePlayersWithClientChannel = new ConcurrentSkipListSet<>();
+	private static final Set<UUID> mOnlinePlayersWithClientChannel = new ConcurrentSkipListSet<UUID>();
 
-	public VelocityClientModHandler(boolean allowPublicizeContent) {
+	public VelocityClientModHandler(MonumentaVelocity plugin, boolean allowPublicizeContent) {
 		mAllowPublicizeContent = allowPublicizeContent;
 		mGson = new GsonBuilder().create();
 		INSTANCE = this;
@@ -64,6 +64,7 @@ public class VelocityClientModHandler {
 	/**
 	 * sent on login, gives information that the client should know first and foremost.
 	 */
+	@SuppressWarnings("unused")
 	public static class ServerInfoPacket implements Packet {
 		String _type = "ServerInfoPacket";
 

@@ -74,7 +74,7 @@ public class PotionUtils {
 	public static final ImmutableSet<PotionType> BASE_POTION_ITEM_TYPES = ImmutableSet.of(PotionType.AWKWARD, PotionType.THICK, PotionType.MUNDANE, PotionType.WATER);
 
 	// This map only notes any "useful" effect pairs, i.e. effects that would be non-annoying and balanced to invert
-	private static final Map<PotionEffectType, PotionEffectType> OPPOSITE_EFFECTS = new HashMap<>();
+	private static final Map<PotionEffectType, PotionEffectType> OPPOSITE_EFFECTS = new HashMap<PotionEffectType, PotionEffectType>();
 
 	static {
 		OPPOSITE_EFFECTS.put(PotionEffectType.SPEED, PotionEffectType.SLOW);
@@ -410,11 +410,14 @@ public class PotionUtils {
 		// add the player to the list of affected entities otherwise the player who splashed the potion won't get any effects
 		affectedEntites.put(player, 1.0d);
 
-		PotionSplashEvent potionEvent = new PotionSplashEvent(potion, null, null, null, affectedEntites);
+		PotionSplashEvent potionEvent = new PotionSplashEvent(potion, affectedEntites);
 		Bukkit.getPluginManager().callEvent(potionEvent);
 
 		// ignore if splash event if cancelled
-		return !potionEvent.isCancelled();
+		if (potionEvent.isCancelled()) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -464,7 +467,6 @@ public class PotionUtils {
 		}
 	}
 
-	// Need to handle legacy effects that we have stored.
 	@SuppressWarnings("deprecation")
 	public static @Nullable PotionEffectType getTypeByKey(String key) {
 		return PotionEffectType.getByName(key);

@@ -23,7 +23,7 @@ public class SpellFinalSwarm extends Spell {
 	private Location mCenter;
 	private double mRange;
 	private boolean mTrigger;
-	private List<Player> mPlayers = new ArrayList<>();
+	private List<Player> mPlayers = new ArrayList<Player>();
 
 	public SpellFinalSwarm(Plugin plugin, Location loc, double range) {
 		mPlugin = plugin;

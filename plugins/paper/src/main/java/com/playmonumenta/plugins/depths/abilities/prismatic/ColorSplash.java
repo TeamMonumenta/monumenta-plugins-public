@@ -294,7 +294,7 @@ public class ColorSplash extends DepthsAbility {
 					});
 
 					// Hit sounds for mobs (so that it only plays once)
-					if (!nearbyMobsOnIce.isEmpty()) {
+					if (nearbyMobsOnIce.size() > 0) {
 						mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 2, 1.3f);
 					}
 

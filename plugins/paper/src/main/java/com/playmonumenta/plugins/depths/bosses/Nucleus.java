@@ -291,7 +291,7 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 		Collections.shuffle(mEyeSpawns);
 		for (Location loc : mEyeSpawns) {
 			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(loc, 1.0);
-			if (mEyes.get(loc) == null && nearbyMobs.isEmpty()) {
+			if (mEyes.get(loc) == null && nearbyMobs.size() == 0) {
 				//Summon a new eye here
 				LivingEntity newEye = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, EYE_LOS));
 				mEyes.put(loc, newEye);

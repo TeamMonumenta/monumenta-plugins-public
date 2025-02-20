@@ -60,8 +60,6 @@ public class DamageListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	// Bukkit deprecates EntityDamageEvent.DamageModifier.
-	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
 		if (event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent) {

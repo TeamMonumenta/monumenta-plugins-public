@@ -204,7 +204,7 @@ public class SpawnerListener implements Listener {
 			List<MobInfo> spawnerInfo = mSpawnerInfos.computeIfAbsent(event.getSpawner().getLocation(), k -> new ArrayList<>());
 
 			// Generate list of player locations a single time
-			List<Location> playerLocations = new ArrayList<>();
+			List<Location> playerLocations = new ArrayList<Location>();
 			for (Player player : mob.getWorld().getPlayers()) {
 				playerLocations.add(player.getLocation());
 			}
@@ -212,7 +212,7 @@ public class SpawnerListener implements Listener {
 			// Check the list of mobs from the spawner to see if any should be disposed of
 			// or, if the spawner has a LoS Pool attached, replace it with a mob from the pool first
 			String poolName = SpawnerUtils.getLosPool(event.getSpawner().getBlock());
-			LoSPool losPool = LoSPool.LibraryPool.EMPTY;
+			LoSPool losPool = LoSPool.EMPTY;
 			boolean hasPool = false;
 			if (poolName != null) {
 				hasPool = true;

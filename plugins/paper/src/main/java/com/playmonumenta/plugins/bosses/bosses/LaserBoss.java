@@ -70,7 +70,7 @@ public class LaserBoss extends BossAbilityGroup {
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 
 		@BossParam(help = "LOS name of the mob at the location of the laser's end")
-		public LoSPool SPAWNED_MOB_POOL = LoSPool.LibraryPool.EMPTY;
+		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
 
 		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";

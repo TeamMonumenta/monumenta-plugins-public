@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -72,7 +73,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
-import org.jetbrains.annotations.Nullable;
 
 public class Vesperidys extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_vesperidys";
@@ -746,7 +746,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		mDefeated = true;
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		if (players.isEmpty()) {
+		if (players.size() == 0) {
 			return;
 		}
 
@@ -1384,7 +1384,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		}
 
 		public @Nullable List<Platform> getPlatformColumn(int y) {
-			if (!mPlatformHashMap.isEmpty()) {
+			if (mPlatformHashMap.size() > 0) {
 				List<Platform> platformList = new ArrayList<>();
 				for (HashMap<Integer, Platform> innerMap : mPlatformHashMap.values()) {
 					if (innerMap.containsKey(y)) {
@@ -1401,7 +1401,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		public @Nullable Platform getPlatformNearestToEntity(LivingEntity livingEntity) {
 			double minDistance = Double.POSITIVE_INFINITY;
 			Platform closestPlatform = null;
-			if (!mPlatformHashMap.isEmpty()) {
+			if (mPlatformHashMap.size() > 0) {
 				for (HashMap<Integer, Platform> innerMap : mPlatformHashMap.values()) {
 					for (Platform platform : innerMap.values()) {
 						if (platform.getCenter().distance(livingEntity.getLocation()) < minDistance && !platform.mBroken) {

@@ -8,7 +8,7 @@ public class SpellMulti extends Spell {
 	private List<Spell> mSpells;
 
 	public SpellMulti(Spell... spells) {
-		mSpells = new ArrayList<>(spells.length);
+		mSpells = new ArrayList<Spell>(spells.length);
 		for (Spell spell : spells) {
 			mSpells.add(spell);
 		}

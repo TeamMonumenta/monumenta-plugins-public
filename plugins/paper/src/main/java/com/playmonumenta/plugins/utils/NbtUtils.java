@@ -130,7 +130,7 @@ public class NbtUtils {
 			}
 			while (mIt.hasNext()) {
 				mNextLocalKey = mIt.next();
-				if (mHere.hasTag(mNextLocalKey)) {
+				if (mHere.hasKey(mNextLocalKey)) {
 					NBTCompound child = mHere.addCompound(mNextLocalKey);
 					mNextLocalIt = new NestedCompoundIterator(child, mSubPathIterables);
 					if (mNextLocalIt.hasNext()) {
@@ -157,7 +157,7 @@ public class NbtUtils {
 			return;
 		}
 		String key = path.get(0);
-		if (compound.hasTag(key)) {
+		if (compound.hasKey(key)) {
 			if (path.size() == 1) {
 				compound.removeKey(key);
 				return;

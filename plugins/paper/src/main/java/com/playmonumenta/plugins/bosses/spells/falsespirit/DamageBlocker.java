@@ -34,7 +34,7 @@ public class DamageBlocker extends Spell {
 
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
-	private List<Player> mWarned = new ArrayList<>();
+	private List<Player> mWarned = new ArrayList<Player>();
 	private GatesOfHell mHell;
 	private GatesOfHell mCeilingHell;
 

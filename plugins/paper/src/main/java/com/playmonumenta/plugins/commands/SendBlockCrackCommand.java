@@ -5,12 +5,13 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class SendBlockCrackCommand {
+
 
 	@SuppressWarnings("unchecked")
 	public static void register() {
@@ -27,7 +28,7 @@ public class SendBlockCrackCommand {
 
 				final Location where = Objects.requireNonNull(commandArguments.getByArgument(whereArgument));
 				final float amount = Objects.requireNonNull(commandArguments.getByArgument(damage)).floatValue() / 9;
-				for (final Player who : (Collection<Player>) commandArguments.get("audience")) {
+				for (final Player who : (List<Player>) Objects.requireNonNull(commandArguments.getUnchecked("audience"))) {
 					who.sendBlockDamage(where.toLocation(who.getWorld()), amount);
 				}
 			})

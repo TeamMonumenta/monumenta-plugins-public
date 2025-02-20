@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Set;
 import org.bukkit.Material;

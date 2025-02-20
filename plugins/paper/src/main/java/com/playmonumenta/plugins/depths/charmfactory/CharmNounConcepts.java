@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.depths.charmfactory;
 
 import com.playmonumenta.plugins.depths.DepthsTree;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public enum CharmNounConcepts {
 

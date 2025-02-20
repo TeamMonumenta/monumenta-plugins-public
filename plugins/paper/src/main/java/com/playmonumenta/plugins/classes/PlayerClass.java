@@ -10,8 +10,7 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
-// fields are initialised in subclasses
-@SuppressWarnings("NullAway.Init")
+@SuppressWarnings("NullAway.Init") // fields are initialised in subclasses
 public abstract class PlayerClass {
 
 	public List<AbilityInfo<?>> mAbilities = new ArrayList<>();

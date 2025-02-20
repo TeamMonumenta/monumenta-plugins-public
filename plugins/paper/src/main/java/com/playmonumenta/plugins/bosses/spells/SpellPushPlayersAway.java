@@ -28,10 +28,10 @@ public class SpellPushPlayersAway extends Spell {
 	private PPLine mInnerLine;
 
 	/* Tracks how long players have been too close */
-	Map<UUID, Integer> mPlayerNearTimes = new HashMap<>();
+	Map<UUID, Integer> mPlayerNearTimes = new HashMap<UUID, Integer>();
 
 	// Tracks if player has been a given hint about this spell
-	Map<UUID, Boolean> mPlayerHintsGiven = new HashMap<>();
+	Map<UUID, Boolean> mPlayerHintsGiven = new HashMap<UUID, Boolean>();
 
 	/* Push players away that have been too close for too long */
 	public SpellPushPlayersAway(Entity launcher, int radius, int maxNearTime, int horizontalOffset) {

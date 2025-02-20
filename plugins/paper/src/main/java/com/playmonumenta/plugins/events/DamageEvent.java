@@ -241,8 +241,6 @@ public class DamageEvent extends Event implements Cancellable {
 	 *                          useful to check if an attack would be lethal
 	 * @return The final damage that will be dealt
 	 */
-	// Bukkit deprecates EntityDamageEvent.DamageModifier
-	@SuppressWarnings("deprecation")
 	public double getFinalDamage(boolean includeAbsorption) {
 		if (includeAbsorption) {
 			return Math.max(0, mEvent.getFinalDamage());
@@ -428,8 +426,6 @@ public class DamageEvent extends Event implements Cancellable {
 	/**
 	 * Returns whether the damage is blocked by a shield
 	 */
-	// Bukkit deprecates EntityDamageEvent.DamageModifier
-	@SuppressWarnings("deprecation")
 	public boolean isBlockedByShield() {
 		return mEvent.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0;
 	}

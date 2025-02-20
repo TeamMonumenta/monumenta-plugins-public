@@ -55,7 +55,7 @@ public class TowerGuiMobInfo extends CustomInventory {
 		mInventory.setItem(CLASS_ITEM_SLOT, TowerMobInfo.buildClassItem(mInfo));
 		mInventory.setItem(HP_ITEM_SLOT, TowerMobInfo.buildHPItem(mInfo));
 		int i = 0;
-		if (!mInfo.mAbilities.isEmpty()) {
+		if (mInfo.mAbilities.size() > 0) {
 			for (int pos : SPELL_ITEMS_SLOT[mInfo.mAbilities.size() - 1]) {
 				mInventory.setItem(pos, TowerMobInfo.buildSpellItem(mInfo, i++));
 			}

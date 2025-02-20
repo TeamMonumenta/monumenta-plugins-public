@@ -10,7 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Silverfish;
 
 public class SilverfishTracking implements EntityTracking {
-	private Set<Silverfish> mEntities = new HashSet<>();
+	private Set<Silverfish> mEntities = new HashSet<Silverfish>();
 	private int mTicks = 0;
 
 	@Override

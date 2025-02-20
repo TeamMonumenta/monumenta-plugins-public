@@ -106,7 +106,7 @@ public class SpellPassiveGarden extends Spell {
 		Collections.shuffle(mPlantSpawns);
 		for (Location loc : mPlantSpawns) {
 			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(loc, 1.0);
-			if (mPlants.get(loc) == null && mPlantTypes.get(loc) == null && nearbyMobs.isEmpty()) {
+			if (mPlants.get(loc) == null && mPlantTypes.get(loc) == null && nearbyMobs.size() == 0) {
 				//Summon a new plant here
 				String plant = getValidPlant();
 				if (plant == null) {

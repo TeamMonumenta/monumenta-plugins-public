@@ -522,7 +522,7 @@ public final class Grave {
 			if (!mGraveMessageCooldown.contains(mUuid)) {
 				Component message = Component.text("Your grave at ", NamedTextColor.AQUA)
 					                    .append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ(), NamedTextColor.AQUA));
-				if (!mItems.isEmpty()) {
+				if (mItems.size() > 0) {
 					message = message.append(Component.text(" with ", NamedTextColor.AQUA))
 						          .append(Component.text(getItems().size() + " item" + (getItems().size() > 1 ? "s" : ""), NamedTextColor.AQUA)
 							                  .hoverEvent(HoverEvent.showText(getItemList(false))));

@@ -5,6 +5,7 @@ import com.comphenix.protocol.events.ListenerOptions;
 import com.comphenix.protocol.events.ListeningWhitelist;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
+import com.comphenix.protocol.injector.GamePhase;
 import com.comphenix.protocol.injector.netty.WirePacket;
 import com.playmonumenta.plugins.Plugin;
 import io.prometheus.client.Counter;
@@ -54,6 +55,7 @@ public class PacketMonitor implements PacketListener {
 	@Override
 	public ListeningWhitelist getSendingWhitelist() {
 		return ListeningWhitelist.newBuilder()
+			.gamePhase(GamePhase.PLAYING)
 			.types(PacketType.Play.Server.getInstance().values().stream()
 				.filter(type -> type.isSupported()
 					                && !type.isDeprecated()

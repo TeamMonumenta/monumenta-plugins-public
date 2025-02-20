@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.io.File;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -450,7 +449,7 @@ public class DepthsUtils {
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
-				FileUtils.writeFile(Path.of(fileName), json.toString());
+				FileUtils.writeFile(fileName, json.toString());
 			} catch (Exception e) {
 				MMLog.severe("Caught exception saving file '" + fileName + "': " + e);
 				e.printStackTrace();

@@ -167,10 +167,12 @@ public class DeclarationTp extends Spell {
 					createBeam(mSirius.mAuroraLocation.clone().add(0, 0.5, 0), mMidPoint.clone().add(0, 0.60, 0), mMaxDistance);
 				}
 				if (mTicks >= DURATION) {
+					int passers = 0;
 					//cleanse all people in radius
 					List<Player> pList = mSirius.getValidDeclarationPlayersInArena();
-					int passers = PlayerUtils.playersInRange(pList, mMidPoint, RADIUS, true, true).size();
-
+					for (Player p : PlayerUtils.playersInRange(pList, mMidPoint, RADIUS, true, true)) {
+						passers++;
+					}
 					//make sure everyone is tagged with participation if they tried also
 					for (Player p : PlayerUtils.playersInRange(mSirius.getPlayers(), mMidPoint, RADIUS + 3, true, true)) {
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, Sirius.PARTICIPATION_TAG, new CustomTimerEffect(DURATION, "Participated").displays(false));

@@ -193,6 +193,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			mInventory.setItem((row * 9), infuseItem);
 
 			//set the function when the item is clicked
+
 			mPanelList.forEach((inf, it) -> {
 				int loc = (row * 9) + 2 + inf.ordinal();
 				mInventory.setItem(loc, it);

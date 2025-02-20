@@ -55,7 +55,6 @@ public class AbilityTrigger {
 			mDisplay = display;
 		}
 
-		// Doesn't matter here.
 		@SuppressWarnings("EnumOrdinal")
 		public Key next() {
 			return values()[Math.floorMod(ordinal() + 1, values().length)];
@@ -129,6 +128,14 @@ public class AbilityTrigger {
 		private final Predicate<Player> mPredicate;
 		// tag used for rp support
 		private final String mGuiTag;
+
+		KeyOptions(String enabledDisplay, String disabledDisplay, Material material, Predicate<Player> predicate) {
+			mEnabledDisplay = enabledDisplay;
+			mDisabledDisplay = disabledDisplay;
+			mMaterial = material;
+			mPredicate = predicate;
+			mGuiTag = "unassigned";
+		}
 
 		KeyOptions(String enabledDisplay, String disabledDisplay, Material material, Predicate<Player> predicate, String guiTag) {
 			mEnabledDisplay = enabledDisplay;

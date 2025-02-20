@@ -15,6 +15,8 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.List;
+import java.util.function.Predicate;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -109,13 +111,13 @@ public class Encore extends DepthsAbility {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	private <T extends DepthsAbility> void abilityCastEventInner(DepthsAbility a, DepthsAbilityInfo<T> info, ClassAbility spell) {
 		Class<T> clazz = info.getAbilityClass();
 		if (a.getClass() != clazz) {
 			// Should never happen
 			return;
 		}
+		@SuppressWarnings("unchecked")
 		T ability = (T) a;
 
 		Runnable action;
@@ -132,7 +134,12 @@ public class Encore extends DepthsAbility {
 				mPlayer.setSneaking(sneak);
 			};
 		} else {
-			action = this::cast;
+			List<AbilityTriggerInfo<T>> triggers = info.getTriggers();
+			if (triggers.isEmpty()) {
+				return;
+			}
+			Predicate<T> method = triggers.get(0).getAction();
+			action = () -> method.test(ability);
 		}
 
 		// start the countdown!

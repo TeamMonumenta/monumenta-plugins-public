@@ -46,7 +46,7 @@ public class PinningShot extends Ability {
 
 	private final double mDamageMultiplier;
 	private final double mWeaken;
-	private final Map<LivingEntity, Boolean> mPinnedMobs = new HashMap<>();
+	private final Map<LivingEntity, Boolean> mPinnedMobs = new HashMap<LivingEntity, Boolean>();
 	private final PinningShotCS mCosmetic;
 
 	public PinningShot(Plugin plugin, Player player) {

@@ -66,7 +66,7 @@ public class PassiveLaserCores extends Spell {
 
 	@Override
 	public void run() {
-		if (mCores.isEmpty()) {
+		if (mCores.size() == 0) {
 			return;
 		}
 

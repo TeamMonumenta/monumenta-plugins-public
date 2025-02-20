@@ -48,7 +48,8 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 	private static final List<ItemStack> mInvalidItems;
 	private static final ItemStack mRefundItem;
-	// We'll want to turn this back on at some point later.
+	@SuppressWarnings("unused") // We'll want to turn this back on at some point later.
+	private static final ItemStack mFullRefundItem;
 	private static final ItemStack mMaxLevelReachedItem;
 	private static final ItemStack mMaxLevelReachedRevelationItem;
 
@@ -104,6 +105,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 		//Refund item
 		mRefundItem = GUIUtils.createBasicItem(Material.GRINDSTONE, "Click to refund this item's infusions.", NamedTextColor.DARK_GRAY, true, "You will receive " + (DelveInfusionUtils.FULL_REFUND ? "100" : (int) (DelveInfusionUtils.REFUND_PERCENT * 100)) + "% of the experience, but all of the materials back.", NamedTextColor.GRAY);
+
+		//Refund item
+		mFullRefundItem = GUIUtils.createBasicItem(Material.GRINDSTONE, "Click to refund this item's infusions.", NamedTextColor.DARK_GRAY, true, "You will receive 100% of the experience, and all of the materials back.", NamedTextColor.GRAY);
 
 		//Cake for max level reached
 		mMaxLevelReachedItem = GUIUtils.createBasicItem(Material.CAKE, "Congratulations!", NamedTextColor.DARK_AQUA, true, "You've reached the max Delve Infusion level on this item.", NamedTextColor.DARK_AQUA);

@@ -34,7 +34,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 	private Location mCenter;
 	private double mRange;
 	private int mTimer;
-	private Set<UUID> mSummoned = new HashSet<>();
+	private Set<UUID> mSummoned = new HashSet<UUID>();
 
 	public SpellPhantomOfTheOpera(Plugin plugin, LivingEntity entity, Location center, int range, int timer) {
 		mPlugin = plugin;
@@ -55,7 +55,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 
 			//set amount of phantoms spawn
 			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
-			if (players.isEmpty()) {
+			if (players.size() == 0) {
 				return;
 			}
 			if (players.size() <= 2) {
@@ -104,7 +104,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 							Phantom nightTerror = (Phantom) LibraryOfSoulsIntegration.summon(sLoc, "NightTerror");
 
 							List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
-							if (players.isEmpty()) {
+							if (players.size() == 0) {
 								return;
 							}
 
