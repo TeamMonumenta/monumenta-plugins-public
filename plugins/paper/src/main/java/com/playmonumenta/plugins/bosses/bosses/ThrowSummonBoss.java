@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellThrowSummon;
+import java.util.Arrays;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -18,9 +19,11 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 
 		@BossParam(help = "not written", deprecated = true)
 		public double RADIUS = 8;
-
 		@BossParam(help = "targets of the ability")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_ONE_PLAYER_CLOSER_TARGET.setOptional(false).setRange(8);
+
+		@BossParam(help = "toggle for requiring line of sight")
+		public boolean LINE_OF_SIGHT = false;
 
 		@BossParam(help = "not written")
 		public int DETECTION = 20;
@@ -79,8 +82,15 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		EntityTargets targets = p.TARGETS;
+
+		//Super hacky fix since trying to do it on the target part of the tag didn't work. no idea why
+		if (p.LINE_OF_SIGHT) {
+			targets = targets.setFilters(Arrays.asList(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+		}
+
+		//This used to overwrite any targeting info if the range wasn't 8. Wack
 		if (p.RADIUS != 8) {
-			targets = EntityTargets.GENERIC_ONE_PLAYER_CLOSER_TARGET.setOptional(false).setRange(p.RADIUS);
+			targets = targets.setOptional(false).setRange(p.RADIUS);
 		}
 
 		Spell spell = new SpellThrowSummon(plugin, boss, targets, p.LOBS, p.COOLDOWN, p.SPAWNEDMOB, p.POOL, p.LOB_DELAY,

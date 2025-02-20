@@ -3,7 +3,9 @@ package com.playmonumenta.plugins.bosses.spells;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -13,10 +15,14 @@ import org.bukkit.entity.LivingEntity;
 
 public class SpellSpawnMobs extends Spell {
 	public static final int DEFAULT_MOB_CAP_RADIUS = 10;
+	public static final boolean DEFAULT_LINE_OF_SIGHT = false;
+	public static final int DEFAULT_DETECTION_RANGE = 30;
 
 	private final double mSummonRange;
 	private final double mMinSummonRange;
 	private final int mCooldownTicks;
+	private final boolean mLineOfSight;
+	private final double mDetectionRange;
 	private final String mSummonName;
 	private final int mSpawns;
 	private final int mMobCap;
@@ -27,14 +33,16 @@ public class SpellSpawnMobs extends Spell {
 	private final LivingEntity mBoss;
 
 	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, double range, double minrange, int mobcap) {
-		this(boss, spawns, losname, cooldown, range, minrange, mobcap, DEFAULT_MOB_CAP_RADIUS, false, "");
+		this(boss, spawns, losname, cooldown, range, minrange, DEFAULT_LINE_OF_SIGHT, DEFAULT_DETECTION_RANGE, mobcap, DEFAULT_MOB_CAP_RADIUS, false, "");
 	}
 
-	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, double range, double minrange, int mobcap, double mobcaprange, boolean capmobsbyname, String mobcapname) {
+	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, double range, double minrange, boolean lineOfSight, int detectionRange, int mobcap, double mobcaprange, boolean capmobsbyname, String mobcapname) {
 		mBoss = boss;
 		mSummonRange = range;
 		mMinSummonRange = minrange;
 		mCooldownTicks = cooldown;
+		mLineOfSight = lineOfSight;
+		mDetectionRange = detectionRange;
 		mSummonName = losname;
 		mSpawns = spawns;
 		mMobCap = mobcap;
@@ -97,10 +105,14 @@ public class SpellSpawnMobs extends Spell {
 			}
 
 			return mobCount < mMobCap
-				&& !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS);
+				&& !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS)
+				&& (!mLineOfSight ||
+				PlayerUtils.playersInRange(mBoss.getLocation(), mDetectionRange, false).stream().anyMatch(p -> LocationUtils.hasLineOfSight(mBoss, p)));
 		} else {
 			return EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() <= mMobCap
-				&& !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS);
+				&& !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS)
+				&& (!mLineOfSight ||
+				PlayerUtils.playersInRange(mBoss.getLocation(), mDetectionRange, false).stream().anyMatch(p -> LocationUtils.hasLineOfSight(mBoss, p)));
 		}
 	}
 
