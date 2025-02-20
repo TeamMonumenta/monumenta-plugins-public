@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
+import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
@@ -40,8 +41,7 @@ public class Cleric extends PlayerClass {
 		mClassGlassFiller = Material.YELLOW_STAINED_GLASS_PANE;
 		mDisplayItem = Material.POPPY;
 		mClassDescription = "Clerics are mighty healers and specialize in fighting the undead.";
-		mClassPassiveDescription = "You and all allies in a 12 block radius heal 5% of max health every 5s while under 50% health.";
-		mClassPassiveName = "Rejuvenation";
+		mPassive = Rejuvenation.INFO;
 
 		mSpecOne.mAbilities.add(HolyJavelin.INFO);
 		mSpecOne.mAbilities.add(ChoirBells.INFO);

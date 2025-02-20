@@ -217,7 +217,7 @@ public class LightningBottle extends DepthsAbility implements AbilityWithCharges
 	}
 
 	private static Description<LightningBottle> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<LightningBottle>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("For every ")
 			.add(a -> a.mKillsPer, KILLS_PER, true)
 			.add(" mobs that die within ")

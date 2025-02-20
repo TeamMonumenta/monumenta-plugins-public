@@ -491,8 +491,7 @@ public class AbilityUtils {
 
 		String errorMessage = null;
 		if (chosenClass != null &&
-			    (chosenClass.mQuestReq != null && (ScoreboardUtils.getScoreboardValue(player, chosenClass.mQuestReq).orElse(0) < chosenClass.mQuestReqMin && !getEffectiveSpecs(player))) &&
-			    (chosenClass.mPermissionString != null && !player.hasPermission(chosenClass.mPermissionString))) {
+			    (chosenClass.mQuestReq != null && (ScoreboardUtils.getScoreboardValue(player, chosenClass.mQuestReq).orElse(0) < chosenClass.mQuestReqMin && !getEffectiveSpecs(player)))) {
 			errorMessage = "You have not unlocked this class yet.";
 		} else if (chosenClass != null && playerSpec == chosenClass.mSpecOne.mSpecialization && ScoreboardUtils.getScoreboardValue(player, Objects.requireNonNull(chosenClass.mSpecOne.mSpecQuestScoreboard)).orElse(0) < 100 && !getEffectiveSpecs(player)) {
 			errorMessage = "You have not unlocked this specialization yet.";

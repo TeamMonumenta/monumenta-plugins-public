@@ -52,7 +52,7 @@ public class CurseOfSobriety extends DepthsAbility {
 	}
 
 	public static Description<CurseOfSobriety> getDescription() {
-		return new DescriptionBuilder<CurseOfSobriety>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("All positive potion effects are nullified.");
 	}
 }

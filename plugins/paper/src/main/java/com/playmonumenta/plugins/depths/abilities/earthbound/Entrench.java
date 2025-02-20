@@ -78,7 +78,7 @@ public class Entrench extends DepthsAbility {
 	}
 
 	private static Description<Entrench> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Entrench>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Breaking a spawner roots mobs within ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks for ")

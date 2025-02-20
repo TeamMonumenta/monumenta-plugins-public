@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import java.util.ArrayList;
 import org.bukkit.Material;
+import org.jetbrains.annotations.Nullable;
 
 // fields are initialised in subclasses
 @SuppressWarnings("NullAway.Init")
@@ -17,8 +18,7 @@ public class PlayerSpec {
 	public int mSpecialization;
 	public Material mDisplayItem;
 	public String mDescription;
-	public String mPassiveName;
-	public String mPassiveDescription;
+	public @Nullable AbilityInfo<?> mPassive;
 
 	public JsonObject toJson() {
 		JsonArray abilities = new JsonArray();

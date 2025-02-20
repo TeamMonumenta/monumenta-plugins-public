@@ -151,7 +151,9 @@ public class MessagingUtils {
 	}
 
 	public static int plainLengthFromMini(String mini) {
-		String plain = plainText(fromMiniMessage(mini));
+		// Replace key components with a single character
+		String replacedKeys = mini.replaceAll("<key:key\\.[^\\s>]*>", "*");
+		String plain = plainText(fromMiniMessage(replacedKeys));
 		// Remove any format ends
 		plain = plain.replaceAll("<\\/[^\\s>]*>", "");
 		return plain.length();

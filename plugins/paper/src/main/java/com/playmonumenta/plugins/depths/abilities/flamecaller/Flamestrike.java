@@ -121,8 +121,9 @@ public class Flamestrike extends DepthsAbility {
 	}
 
 	private static Description<Flamestrike> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Flamestrike>(color)
-			.add("Right click while sneaking to create a torrent of flames, dealing ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to create a torrent of flames, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage to all enemies in front of you within ")
 			.add(a -> a.mRadius, RADIUS)

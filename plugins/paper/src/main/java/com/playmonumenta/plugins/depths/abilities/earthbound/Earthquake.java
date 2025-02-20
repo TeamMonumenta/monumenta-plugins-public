@@ -188,7 +188,7 @@ public class Earthquake extends DepthsAbility {
 	}
 
 	private static Description<Earthquake> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Earthquake>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Shooting a projectile while sneaking causes an earthquake ")
 			.addDuration(a -> EARTHQUAKE_TIME, EARTHQUAKE_TIME)
 			.add(" second after impact. The earthquake deals ")

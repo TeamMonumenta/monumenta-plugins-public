@@ -104,7 +104,7 @@ public class SoothingCombos extends DepthsCombosAbility {
 
 	private static Description<SoothingCombos> getDescription(int rarity, TextColor color) {
 		TextComponent haste = rarity == 6 ? Component.text("II", color) : Component.text("I");
-		return new DescriptionBuilder<SoothingCombos>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Every ")
 			.add(a -> a.mHitRequirement, HIT_REQ, true)
 			.add(" melee strikes, heal all players within ")

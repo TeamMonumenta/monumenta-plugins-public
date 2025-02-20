@@ -393,8 +393,9 @@ public class IgneousRune extends DepthsAbility {
 	}
 
 	private static Description<IgneousRune> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<IgneousRune>(color)
-			.add("Left click while sneaking to place a rune up to ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to place a rune up to ")
 			.add(a -> a.mCastRange, CAST_RANGE)
 			.add(" blocks away. The rune has a radius of ")
 			.add(a -> a.mRuneRadius, RUNE_RADIUS)

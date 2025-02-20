@@ -263,14 +263,16 @@ public class EscapeArtist extends DepthsAbility {
 	}
 
 	private static Description<EscapeArtist> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<EscapeArtist>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When your health drops below ")
 			.addPercent(TRIGGER_HEALTH)
 			.add(", ignore the hit and gain 50% resistance and stealth for ")
 			.addDuration(a -> a.mStealthDuration, STEALTH_DURATION[rarity - 1], false, true)
-			.add(" seconds. Hitting the drop key within the next ")
+			.add(" seconds. ")
+			.addTrigger()
+			.add(" within the next ")
 			.addDuration(a -> TP_WINDOW, TP_WINDOW)
-			.add(" seconds throws a projectile that travels up to ")
+			.add(" seconds to throw a projectile that travels up to ")
 			.add(a -> a.mMaxTPDistance, MAX_TP_DISTANCE)
 			.add(" blocks away. Upon hitting a mob, block, or reaching its max distance, you teleport to its location and leave behind a smoke bomb that stuns all mobs in a ")
 			.add(a -> a.mStunRadius, STUN_RADIUS)

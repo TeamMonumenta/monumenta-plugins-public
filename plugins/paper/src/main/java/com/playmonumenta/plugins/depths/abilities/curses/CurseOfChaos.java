@@ -24,7 +24,7 @@ public class CurseOfChaos extends DepthsAbility {
 	}
 
 	private static Description<CurseOfChaos> getDescription() {
-		return new DescriptionBuilder<CurseOfChaos>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("The chaos utility room's effect is applied to you every ")
 			.add(ROOMS)
 			.add(" rooms.");

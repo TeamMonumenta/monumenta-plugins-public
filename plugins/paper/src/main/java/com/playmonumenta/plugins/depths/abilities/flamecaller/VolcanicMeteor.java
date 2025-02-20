@@ -139,8 +139,9 @@ public class VolcanicMeteor extends DepthsAbility {
 	}
 
 	private static Description<VolcanicMeteor> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<VolcanicMeteor>(color)
-			.add("Swap hands to summon a falling meteor at the location where you are looking, up to ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to summon a falling meteor at the location where you are looking, up to ")
 			.add(DISTANCE)
 			.add(" blocks away. When the meteor lands, it deals ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)

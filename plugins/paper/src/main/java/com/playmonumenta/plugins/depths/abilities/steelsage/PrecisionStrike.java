@@ -116,7 +116,7 @@ public class PrecisionStrike extends DepthsAbility implements AbilityWithCharges
 	}
 
 	private static Description<PrecisionStrike> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<PrecisionStrike>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Breaking a spawner adds ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" projectile damage to your next attack against a mob that is more than ")

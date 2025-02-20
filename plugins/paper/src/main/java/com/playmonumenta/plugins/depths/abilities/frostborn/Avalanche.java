@@ -162,8 +162,9 @@ public class Avalanche extends DepthsAbility {
 	}
 
 	private static Description<Avalanche> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Avalanche>(color)
-			.add("Swap hands to begin shattering all ice blocks within a radius of ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to begin shattering all ice blocks within a radius of ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks, dealing a total of ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)

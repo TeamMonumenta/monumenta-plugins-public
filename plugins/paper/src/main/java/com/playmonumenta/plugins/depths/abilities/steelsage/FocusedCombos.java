@@ -62,7 +62,7 @@ public class FocusedCombos extends DepthsCombosAbility {
 	}
 
 	private static Description<FocusedCombos> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<FocusedCombos>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Every ")
 			.add(a -> a.mHitRequirement, HIT_REQUIREMENT, true)
 			.add(" critical projectile shots, deal ")

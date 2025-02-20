@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.EnergizingElixirCS;
@@ -62,22 +64,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 			.linkedSpell(ClassAbility.ENERGIZING_ELIXIR)
 			.scoreboardId("EnergizingElixir")
 			.shorthandName("EE")
-			.descriptions(
-				String.format("Left click while holding an Alchemist's Bag to consume a potion and gain %s Speed " +
-					"and Jump Boost %s for %ss. Cooldown: %ss.",
-					StringUtils.multiplierToPercentageWithSign(SPEED_AMPLIFIER_1),
-					JUMP_LEVEL + 1,
-					StringUtils.ticksToSeconds(DURATION),
-					StringUtils.ticksToSeconds(COOLDOWN)),
-				String.format("The Speed is increased to %s and gain %s Damage for %ss.",
-					StringUtils.multiplierToPercentage(SPEED_AMPLIFIER_2),
-					StringUtils.multiplierToPercentage(DAMAGE_AMPLIFIER_2),
-					StringUtils.ticksToSeconds(DURATION)),
-				String.format("Recasting this ability while the buff is active refreshes the duration and increases " +
-					"the Damage and Speed by %s, up to %s stacks. Stacks decay every %ss.",
-					StringUtils.multiplierToPercentageWithSign(ENHANCED_BONUS),
-					ENHANCED_MAX_STACK,
-					StringUtils.ticksToSeconds(DURATION)))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Consume potions to give yourself mobility and damage buffs.")
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast",
@@ -261,5 +248,40 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 	@Override
 	public @Nullable String getMode() {
 		return mPlayer.getScoreboardTags().contains(TOGGLE_TAG) ? "active" : null;
+	}
+
+	private static Description<EnergizingElixir> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger(0)
+			.add(" to consume a potion and gain ")
+			.addPercent(a -> a.mSpeedAmp, SPEED_AMPLIFIER_1, false, Ability::isLevelOne)
+			.add(" speed and Jump Boost ")
+			.addPotionAmplifier(a -> a.mJumpBoostAmplifier, JUMP_LEVEL)
+			.add(" for ")
+			.addDuration(a -> a.mDuration, DURATION)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<EnergizingElixir> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The speed is increased to ")
+			.addPercent(a -> a.mSpeedAmp, SPEED_AMPLIFIER_2, false, Ability::isLevelTwo)
+			.add(" and gain ")
+			.addPercent(a -> a.mDamageAmp, DAMAGE_AMPLIFIER_2, false, Ability::isLevelTwo)
+			.add(" damage for ")
+			.addDuration(a -> a.mDuration, DURATION)
+			.add(" seconds.");
+	}
+
+	private static Description<EnergizingElixir> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Recasting this ability while the buff is active refreshes the duration and increases the damage and speed by ")
+			.addPercent(a -> a.mEnhanceEffectBonus, ENHANCED_BONUS)
+			.add(", up to ")
+			.add(a -> a.mMaxStacks, ENHANCED_MAX_STACK)
+			.add(" stacks. Stacks decay every ")
+			.addDuration(a -> a.mDuration, DURATION)
+			.add(" seconds.");
 	}
 }

@@ -36,7 +36,7 @@ public class CurseOfDependency extends DepthsAbility {
 	}
 
 	private static Description<CurseOfDependency> getDescription() {
-		return new DescriptionBuilder<CurseOfDependency>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Self-healing is ")
 			.addPercent(SELF_HEALING_MULTIPLIER)
 			.add(" as effective. Healing from other players is unaffected.");

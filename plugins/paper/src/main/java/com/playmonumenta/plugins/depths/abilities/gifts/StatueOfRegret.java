@@ -36,6 +36,6 @@ public class StatueOfRegret extends DepthsAbility {
 	}
 
 	private static Description<StatueOfRegret> getDescription() {
-		return new DescriptionBuilder<StatueOfRegret>().add("Choose one of your current curses to replace with a selection of five other curses.");
+		return new DescriptionBuilder<>(() -> INFO).add("Choose one of your current curses to replace with a selection of five other curses.");
 	}
 }

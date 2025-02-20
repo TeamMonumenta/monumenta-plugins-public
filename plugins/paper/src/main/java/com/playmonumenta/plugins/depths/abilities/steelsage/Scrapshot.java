@@ -162,8 +162,9 @@ public class Scrapshot extends DepthsAbility {
 	}
 
 	private static Description<Scrapshot> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Scrapshot>(color)
-			.add("Left click while sneaking to fire a blunderbuss shot that goes up to ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to fire a blunderbuss shot that goes up to ")
 			.add(a -> a.mRange, RANGE)
 			.add(" blocks away, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)

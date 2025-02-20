@@ -62,7 +62,7 @@ public class OneWithTheWind extends DepthsAbility {
 	}
 
 	private static Description<OneWithTheWind> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<OneWithTheWind>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("If there are no other players in a ")
 			.add(a -> a.mRange, RANGE, true)
 			.add(" block radius, you gain ")

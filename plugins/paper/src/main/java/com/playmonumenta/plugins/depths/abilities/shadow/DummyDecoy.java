@@ -164,7 +164,7 @@ public class DummyDecoy extends DepthsAbility {
 	}
 
 	private static Description<DummyDecoy> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DummyDecoy>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Shooting a projectile while sneaking fires a cursed projectile. When the projectile lands, it spawns a dummy decoy at that location with ")
 			.addDepthsDamage(a -> a.mHealth, HEALTH[rarity - 1], true)
 			.add(" health that lasts for up to ")

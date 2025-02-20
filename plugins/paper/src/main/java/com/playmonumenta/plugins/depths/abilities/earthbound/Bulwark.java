@@ -62,7 +62,7 @@ public class Bulwark extends DepthsAbility {
 	}
 
 	private static Description<Bulwark> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Bulwark>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("You block the next melee attack that would have hit you, nullifying the damage.")
 			.addCooldown(COOLDOWN[rarity - 1], true);
 	}

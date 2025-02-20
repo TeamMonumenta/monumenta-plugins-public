@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PinningShotCS;
@@ -38,10 +40,7 @@ public class PinningShot extends Ability {
 			.linkedSpell(ClassAbility.PINNING_SHOT)
 			.scoreboardId("PinningShot")
 			.shorthandName("PSh")
-			.descriptions(
-				String.format("The first time you shoot a non-boss enemy, pin it for %ss. Pinned enemies are afflicted with %d%% Slowness and %d%% Weaken (Bosses receive %d%% Slowness and no Weaken). Shooting a pinned non-boss enemy deals %d%% of its max health on top of regular damage and removes the pin. A mob cannot be pinned more than once.",
-					PINNING_SHOT_DURATION / 20.0, (int) (PINNING_SLOW * 100), (int) (PINNING_WEAKEN_1 * 100), (int) (PINNING_SLOW_BOSS * 100), (int) (PINNING_SHOT_1_DAMAGE_MULTIPLIER * 100)),
-				String.format("Weaken increased to %d%% and bonus damage increased to %d%% max health.", (int) (PINNING_WEAKEN_2 * 100), (int) (PINNING_SHOT_2_DAMAGE_MULTIPLIER * 100)))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Shooting a mob for the first time roots and weakens it. Shooting it again damages it for a percentage of its maximum health.")
 			.displayItem(Material.CROSSBOW);
 
@@ -100,4 +99,27 @@ public class PinningShot extends Ability {
 		}
 	}
 
+	private static Description<PinningShot> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The first time you shoot a non-boss enemy, pin it for ")
+			.addDuration(PINNING_SHOT_DURATION)
+			.add(" seconds. Pinned enemies are afflicted with ")
+			.addPercent(PINNING_SLOW)
+			.add(" slowness and ")
+			.addPercent(a -> a.mWeaken, PINNING_WEAKEN_1, false, Ability::isLevelOne)
+			.add(" weaken (Bosses receive ")
+			.addPercent(PINNING_SLOW_BOSS)
+			.add(" slowness and no weaken). Shooting a pinned non-boss enemy deals ")
+			.addPercent(a -> a.mDamageMultiplier, PINNING_SHOT_1_DAMAGE_MULTIPLIER, false, Ability::isLevelOne)
+			.add(" of its max health on top of regular damage and removes the pin. A mob cannot be pinned more than once.");
+	}
+
+	private static Description<PinningShot> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Weaken increased to ")
+			.addPercent(a -> a.mWeaken, PINNING_WEAKEN_2, false, Ability::isLevelTwo)
+			.add(" and bonus damage increased to ")
+			.addPercent(a -> a.mDamageMultiplier, PINNING_SHOT_2_DAMAGE_MULTIPLIER, false, Ability::isLevelTwo)
+			.add(" max health.");
+	}
 }

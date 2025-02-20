@@ -240,8 +240,9 @@ public class GravityBomb extends DepthsAbility {
 	}
 
 	private static Description<GravityBomb> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<GravityBomb>(color)
-			.add("Swap hands to launch two flying bombs that arm after 0.75 seconds and explode after ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to launch two flying bombs that arm after 0.75 seconds and explode after ")
 			.addDuration(DURATION)
 			.add(" seconds. Enemies near a bomb are afflicted with Slow Falling. Hitting a bomb with a projectile detonates it early, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)

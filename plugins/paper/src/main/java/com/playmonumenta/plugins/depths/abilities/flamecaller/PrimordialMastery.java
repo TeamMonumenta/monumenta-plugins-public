@@ -46,7 +46,7 @@ public class PrimordialMastery extends DepthsAbility {
 	}
 
 	private static Description<PrimordialMastery> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<PrimordialMastery>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Your abilities deal ")
 			.addPercent(a -> a.mDamageModifier, SPELL_MOD[rarity - 1], false, true)
 			.add(" more damage.");

@@ -182,8 +182,9 @@ public class IceBarrier extends DepthsAbility {
 	}
 
 	private static Description<IceBarrier> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<IceBarrier>(color)
-			.add("Right click while sneaking to place an ice marker up to ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to place an ice marker up to ")
 			.add(a -> a.mRange, CAST_RANGE)
 			.add(" blocks away. Placing a second marker within ")
 			.addDuration(CAST_TIME)

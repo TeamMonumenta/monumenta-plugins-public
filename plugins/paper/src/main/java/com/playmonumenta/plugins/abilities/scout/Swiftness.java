@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.SwiftnessCS;
@@ -13,7 +15,6 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Material;
@@ -45,15 +46,7 @@ public class Swiftness extends Ability {
 			.linkedSpell(ClassAbility.SWIFTNESS)
 			.scoreboardId("Swiftness")
 			.shorthandName("Swf")
-			.descriptions(
-				String.format("Gain %s movement speed when you are not inside a town and a passive %s attack speed.",
-					StringUtils.multiplierToPercentageWithSign(SPEED_POTENCY),
-					StringUtils.multiplierToPercentageWithSign(ATTACK_SPEED_POTENCY_1)),
-				String.format("The attack speed is increased to %s and gain Jump Boost %s when you are not inside a town.",
-					StringUtils.multiplierToPercentageWithSign(ATTACK_SPEED_POTENCY_2),
-					StringUtils.toRoman(JUMP_BOOST_POTENCY + 1)),
-				String.format("Breaking a spawner reduces the cooldown of all your skills by %s.",
-					StringUtils.multiplierToPercentageWithSign(ENHANCEMENT_CDR)))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Gain movement speed, attack speed, and increased jump height.")
 			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle jump boost", null,
 				Swiftness::toggleJumpBoost, new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false).sneaking(false)
@@ -69,6 +62,9 @@ public class Swiftness extends Ability {
 			})
 			.displayItem(Material.RABBIT_FOOT);
 
+	private final int mJumpBoostLevel;
+	private final double mSpeed;
+	private final double mAttackSpeed;
 	private final double mEnhancementCDR;
 	private boolean mWasInNoMobilityZone = false;
 	private boolean mJumpBoost;
@@ -77,14 +73,16 @@ public class Swiftness extends Ability {
 	public Swiftness(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		mJumpBoost = !mPlayer.getScoreboardTags().contains(NO_JUMP_BOOST_TAG);
+		mJumpBoostLevel = JUMP_BOOST_POTENCY + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
+		mSpeed = SPEED_POTENCY + CharmManager.getLevelPercentDecimal(player, CHARM_SPEED);
+		mAttackSpeed = (isLevelTwo() ? ATTACK_SPEED_POTENCY_2 : ATTACK_SPEED_POTENCY_1) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK_SPEED);
 		/* This looks goofy but it makes CDR stacking with the charm effect multiplicative similar to other CDR sources */
 		mEnhancementCDR = 1 - (1 - ENHANCEMENT_CDR) * (1 - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_CDR));
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new SwiftnessCS());
 
 		addMovementSpeed(mPlayer);
 		EntityUtils.addAttribute(mPlayer, Attribute.GENERIC_ATTACK_SPEED,
-			new AttributeModifier(ATTACK_SPEED_SRC, (isLevelTwo() ? ATTACK_SPEED_POTENCY_2 : ATTACK_SPEED_POTENCY_1) +
-				CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK_SPEED), AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			new AttributeModifier(ATTACK_SPEED_SRC, mAttackSpeed, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 
 	@Override
@@ -112,7 +110,7 @@ public class Swiftness extends Ability {
 
 		if (oneSecond && isLevelTwo() && !mWasInNoMobilityZone && mJumpBoost) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 21,
-				JUMP_BOOST_POTENCY + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST), true, false));
+				mJumpBoostLevel, true, false));
 		}
 	}
 
@@ -127,7 +125,7 @@ public class Swiftness extends Ability {
 			mJumpBoost = true;
 			mPlayer.removeScoreboardTag(NO_JUMP_BOOST_TAG);
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 21,
-				JUMP_BOOST_POTENCY + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST), true, false));
+				mJumpBoostLevel, true, false));
 			mCosmetic.toggleJumpBoostOn(mPlayer);
 			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned on");
 		}
@@ -135,10 +133,9 @@ public class Swiftness extends Ability {
 		return true;
 	}
 
-	private static void addMovementSpeed(final Player player) {
+	private void addMovementSpeed(final Player player) {
 		EntityUtils.addAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED,
-			new AttributeModifier(SPEED_SRC, SPEED_POTENCY +
-				CharmManager.getLevelPercentDecimal(player, CHARM_SPEED), AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			new AttributeModifier(SPEED_SRC, mSpeed, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 
 	private static void removeMovementSpeed(final Player player) {
@@ -152,5 +149,30 @@ public class Swiftness extends Ability {
 	@Override
 	public @Nullable String getMode() {
 		return mJumpBoost ? null : "disabled";
+	}
+
+	private static Description<Swiftness> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Gain ")
+			.addPercent(a -> a.mSpeed, SPEED_POTENCY)
+			.add(" movement speed when you are not inside a town and a passive ")
+			.addPercent(a -> a.mAttackSpeed, ATTACK_SPEED_POTENCY_1, false, Ability::isLevelOne)
+			.add(" attack speed.");
+	}
+
+	private static Description<Swiftness> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The attack speed is increased to ")
+			.addPercent(a -> a.mAttackSpeed, ATTACK_SPEED_POTENCY_2, false, Ability::isLevelTwo)
+			.add("and gain Jump Boost ")
+			.addPotionAmplifier(a -> a.mJumpBoostLevel, JUMP_BOOST_POTENCY)
+			.add(" when you are not inside a town.");
+	}
+
+	private static Description<Swiftness> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Breaking a spawner reduces the cooldown of all your skills by ")
+			.addPercent(a -> a.mEnhancementCDR, ENHANCEMENT_CDR)
+			.add(".");
 	}
 }

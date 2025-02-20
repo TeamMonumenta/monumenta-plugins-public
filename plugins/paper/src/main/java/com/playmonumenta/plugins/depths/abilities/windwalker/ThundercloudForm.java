@@ -269,14 +269,15 @@ public class ThundercloudForm extends DepthsAbility implements AbilityWithDurati
 	}
 
 	private static Description<ThundercloudForm> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ThundercloudForm>(color)
-			.add("Swap hands to launch upwards, dealing ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to launch upwards, dealing ")
 			.addDepthsDamage(a -> a.mLaunchDamage, LAUNCH_DAMAGE[rarity - 1], true)
 			.add(" magic damage to mobs within ")
 			.add(a -> a.mLaunchRadius, LAUNCH_RADIUS)
 			.add(" blocks and knocking them away, and enter flight for ")
 			.addDuration(a -> a.mFlightDuration, FLIGHT_DURATION)
-			.add(" seconds. While in flight, swap hands again to throw a bolt of lightning that deals ")
+			.add(" seconds. While in flight, trigger again to throw a bolt of lightning that deals ")
 			.addDepthsDamage(a -> a.mLightningDamage, LIGHTNING_DAMAGE[rarity - 1], true)
 			.add(" magic damage to the first enemy it strikes and ")
 			.addDepthsDamage(a -> a.mAOEDamage, AOE_DAMAGE[rarity - 1], true)

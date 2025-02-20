@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -37,9 +39,6 @@ public class HolyJavelin extends Ability {
 	private static final int FIRE_DURATION = 5 * 20;
 	private static final int COOLDOWN = 10 * 20;
 
-	private final double mDamage;
-	private final double mUndeadDamage;
-
 	public static final String CHARM_DAMAGE = "Holy Javelin Damage";
 	public static final String CHARM_COOLDOWN = "Holy Javelin Cooldown";
 	public static final String CHARM_RANGE = "Holy Javelin Range";
@@ -51,23 +50,7 @@ public class HolyJavelin extends Ability {
 			.scoreboardId("HolyJavelin")
 			.shorthandName("HJ")
 			.actionBarColor(TextColor.color(255, 255, 50))
-			.descriptions(
-				("While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to %d blocks or until it hits a solid block. " +
-					"It deals %d magic damage to all undead enemies in a %s-block cube around it along its path, and %d magic damage to non-undead, and sets them all on fire for %ss. " +
-					"Attacking an undead enemy with that left-click transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. Cooldown: %ss.")
-					.formatted(
-						RANGE,
-						UNDEAD_DAMAGE_1,
-						(SIZE - 0.2),
-						DAMAGE_1,
-						(FIRE_DURATION / 20),
-						(COOLDOWN / 20)
-				),
-				"Damage is increased to %d against undead, and to %d against non-undead."
-					.formatted(
-						UNDEAD_DAMAGE_2,
-						DAMAGE_2
-					))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Throw a piercing spear of light that ignites and damages mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HolyJavelin::cast,
@@ -75,6 +58,11 @@ public class HolyJavelin extends Ability {
 					.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.GOLDEN_SWORD)
 			.priorityAmount(1001); // shortly after divine justice and luminous infusion
+
+	private final double mDamage;
+	private final double mUndeadDamage;
+	private final double mRange;
+	private final double mSize;
 
 	private @Nullable Crusade mCrusade;
 	private @Nullable DivineJustice mDivineJustice;
@@ -86,6 +74,8 @@ public class HolyJavelin extends Ability {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mUndeadDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2);
+		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
+		mSize = CharmManager.getRadius(mPlayer, CHARM_SIZE, SIZE);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HolyJavelinCS());
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -122,18 +112,16 @@ public class HolyJavelin extends Ability {
 			return false;
 		}
 		putOnCooldown();
-		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-		double size = CharmManager.getRadius(mPlayer, CHARM_SIZE, SIZE);
 
 		World world = mPlayer.getWorld();
 		mCosmetic.javelinSound(world, mPlayer.getLocation());
 		Location startLoc = mPlayer.getEyeLocation();
 
-		Location endLoc = LocationUtils.rayTraceToBlock(mPlayer, range, loc -> mCosmetic.javelinHitBlock(mPlayer, loc, world));
+		Location endLoc = LocationUtils.rayTraceToBlock(mPlayer, mRange, loc -> mCosmetic.javelinHitBlock(mPlayer, loc, world));
 
-		mCosmetic.javelinParticle(mPlayer, startLoc, endLoc, size);
+		mCosmetic.javelinParticle(mPlayer, startLoc, endLoc, mSize);
 
-		for (LivingEntity enemy : Hitbox.approximateCylinder(startLoc, endLoc, size, true).accuracy(0.5).getHitMobs()) {
+		for (LivingEntity enemy : Hitbox.approximateCylinder(startLoc, endLoc, mSize, true).accuracy(0.5).getHitMobs()) {
 			double damage = Crusade.enemyTriggersAbilities(enemy, mCrusade) ? mUndeadDamage : mDamage;
 			if (enemy != triggeringEnemy) {
 				// Triggering enemy would've already received the melee damage from Luminous Infusion
@@ -143,5 +131,31 @@ public class HolyJavelin extends Ability {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
 		}
 		return true;
+	}
+
+	private static Description<HolyJavelin> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to throw a piercing spear of light ")
+			.add(a -> a.mSize, SIZE)
+			.add(" blocks wide, instantly travelling up to ")
+			.add(a -> a.mRange, RANGE)
+			.add(" blocks or until it hits a solid block. It deals ")
+			.add(a -> a.mUndeadDamage, UNDEAD_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage to all undead enemies along its path, and ")
+			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage to non-undead, and sets them all on fire for ")
+			.addDuration(FIRE_DURATION)
+			.add(" seconds. Attacking an undead enemy while triggering transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<HolyJavelin> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mUndeadDamage, UNDEAD_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" against undead and ")
+			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" against non-undead.");
 	}
 }

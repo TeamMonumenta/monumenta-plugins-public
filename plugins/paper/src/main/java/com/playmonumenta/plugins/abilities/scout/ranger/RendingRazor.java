@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.RendingRazorCS;
@@ -16,7 +18,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class RendingRazor extends Ability {
 	private static final int REND_DAMAGE_2 = 22;
 	private static final int COOLDOWN_1 = TICKS_PER_SECOND * 8;
 	private static final int COOLDOWN_2 = TICKS_PER_SECOND * 6;
-	private static final double RAZOR_TRAVEL_TIME = TICKS_PER_SECOND * 2.0;
+	private static final int RAZOR_TRAVEL_TIME = TICKS_PER_SECOND * 2;
 	private static final double MAXIMUM_BLOCK_DISTANCE = 14.0;
 	private static final double MAXIMUM_REND_DISTANCE = 60.0;
 	private static final float PULL_FORCE = 0.5f;
@@ -61,24 +62,7 @@ public class RendingRazor extends Ability {
 			.linkedSpell(ClassAbility.RENDING_RAZOR)
 			.scoreboardId("RendingRazor")
 			.shorthandName("RR")
-			.descriptions(
-				String.format(AbilityTrigger.Key.RIGHT_CLICK + " with no usable items to toss a spinning razor that " +
-					"travels %s blocks and deals %s Projectile damage when it embeds itself into an enemy. The razor " +
-					"lasts for %ss. If the enemy is still alive, recasting the skill rends the razor out of the " +
-					"enemy, pulling it slightly and dealing %s Projectile damage to it and all enemies that the " +
-					"razor passes through. Cooldown: %ss.",
-					MAXIMUM_BLOCK_DISTANCE,
-					EMBED_DAMAGE_1,
-					StringUtils.ticksToSeconds(RAZOR_TRAVEL_TIME),
-					REND_DAMAGE_1,
-					StringUtils.ticksToSeconds(COOLDOWN_1)),
-				String.format("The razor's damage is increased to %s for the impact and %s for the rend. " +
-					"Additionally, all enemies damaged by the razor receive %s Slowness for %ss. Cooldown: %ss.",
-					EMBED_DAMAGE_2,
-					REND_DAMAGE_2,
-					StringUtils.multiplierToPercentageWithSign(SLOW_EFFECT_2),
-					StringUtils.ticksToSeconds(SLOW_DURATION_2),
-					StringUtils.ticksToSeconds(COOLDOWN_2)))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Throw a razor that embeds itself into a hit enemy. Recasting the skill returns the " +
 				"razor and damages enemies in its path.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
@@ -268,5 +252,34 @@ public class RendingRazor extends Ability {
 			mPlugin.mEffectManager.addEffect(target, SLOWNESS_SRC,
 				new PercentSpeed(mSlownessDuration, -1 * mSlownessPotency, SLOWNESS_SRC));
 		}
+	}
+
+	private static Description<RendingRazor> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to toss a spinning razor that travels ")
+			.add(a -> a.mRazorRange, MAXIMUM_BLOCK_DISTANCE)
+			.add(" blocks and deals ")
+			.add(a -> a.mEmbedDamage, EMBED_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" projectile damage when it embeds itself into an enemy. The razor lasts for ")
+			.addDuration(RAZOR_TRAVEL_TIME)
+			.add(" seconds. If the enemy is still alive, recasting the skill rends the razor out of the enemy, pulling it slightly and dealing ")
+			.add(a -> a.mRendDamage, REND_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" projectile damage to it and all enemies that the razor passes through.")
+			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+	}
+
+	private static Description<RendingRazor> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The razor's damage is increased to ")
+			.add(a -> a.mEmbedDamage, EMBED_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" for the impact and ")
+			.add(a -> a.mRendDamage, REND_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" for the rend. Additionally, all enemies damaged by the razor receive ")
+			.addPercent(a -> a.mSlownessPotency, SLOW_EFFECT_2)
+			.add(" slowness for ")
+			.addDuration(a -> a.mSlownessDuration, SLOW_DURATION_2)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
 	}
 }

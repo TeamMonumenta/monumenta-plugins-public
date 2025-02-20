@@ -24,7 +24,7 @@ public class CurseOfRuin extends DepthsAbility {
 	}
 
 	private static Description<CurseOfRuin> getDescription() {
-		return new DescriptionBuilder<CurseOfRuin>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("When you select an ability or upgrade, downgrade a random ability by 1 level.");
 	}
 }

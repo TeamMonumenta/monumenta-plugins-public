@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.warlock;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.PhlegmaticResolveCS;
@@ -17,7 +19,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -39,19 +40,6 @@ public class PhlegmaticResolve extends Ability {
 	private static final double ENHANCEMENT_DAMAGE = 0.05;
 	private static final int ENHANCE_RADIUS = 3;
 
-	private final double mPercentDamageResist;
-	private final double mKBR;
-	private final int mAbilityCap;
-	private final double mAllyModifier;
-	private final double mRadius;
-	private final double mEnhanceRadius;
-	private final double[] mEnhancementDamageSpread = {0, 0, 0};
-	private double mLastMaxDamage = 0;
-	private double mLastPreMitigationDamage = 0;
-	private int mLastPlayedSoundTick = 0;
-	private boolean mDamagedLastWindow = false;
-	private final PhlegmaticResolveCS mCosmetic;
-
 	public static final String CHARM_RESIST = "Phlegmatic Resolve Resistance";
 	public static final String CHARM_KBR = "Phlegmatic Resolve Knockback Resistance";
 	public static final String CHARM_ABILITY_CAP = "Phlegmatic Resolve Ability Cap";
@@ -64,25 +52,25 @@ public class PhlegmaticResolve extends Ability {
 		new AbilityInfo<>(PhlegmaticResolve.class, "Phlegmatic Resolve", PhlegmaticResolve::new)
 			.scoreboardId("Phlegmatic")
 			.shorthandName("PR")
-			.descriptions(
-				String.format("For each ability on cooldown, gain +%s%% Resistance and +%s Knockback Resistance, capped at %s abilities.",
-					StringUtils.multiplierToPercentage(-PERCENT_DAMAGE_RESIST_1),
-					StringUtils.formatDecimal(PERCENT_KNOCKBACK_RESIST * 10),
-					StringUtils.formatDecimal(ABILITY_CAP)
-				),
-				String.format("Increase to +%s%% Resistance per ability on cooldown, and players within %s blocks are given %s%% of your bonuses. (Does not stack with multiple Warlocks.)",
-					StringUtils.multiplierToPercentage(-PERCENT_DAMAGE_RESIST_2),
-					StringUtils.formatDecimal(RADIUS),
-					StringUtils.multiplierToPercentage(ALLY_MODIFIER)
-				),
-				String.format("All non-ailment damage taken is instead converted into a short Damage-over-Time effect. " +
-						"A third of the damage stored is dealt every second for 3s. Each time this stored damage is dealt, deal %s%% of the initial damage to all mobs in a %s block radius.",
-					StringUtils.multiplierToPercentage(ENHANCEMENT_DAMAGE),
-					StringUtils.formatDecimal(ENHANCE_RADIUS)
-				))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Gain resistance and knockback resistance for each ability on cooldown.")
 			.linkedSpell(ClassAbility.PHLEGMATIC_RESOLVE)
 			.displayItem(Material.SHIELD);
+
+	private final double mPercentDamageResist;
+	private final double mKBR;
+	private final int mAbilityCap;
+	private final double mAllyModifier;
+	private final double mRadius;
+	private final double mEnhanceRadius;
+	private final double mEnhancementDamage;
+
+	private final double[] mEnhancementDamageSpread = {0, 0, 0};
+	private double mLastMaxDamage = 0;
+	private double mLastPreMitigationDamage = 0;
+	private int mLastPlayedSoundTick = 0;
+	private boolean mDamagedLastWindow = false;
+	private final PhlegmaticResolveCS mCosmetic;
 
 	public PhlegmaticResolve(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -92,6 +80,7 @@ public class PhlegmaticResolve extends Ability {
 		mAllyModifier = ALLY_MODIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY);
 		mRadius = CharmManager.getRadius(player, CHARM_RANGE, RADIUS);
 		mEnhanceRadius = CharmManager.getRadius(player, CHARM_ENHANCE_RADIUS, ENHANCE_RADIUS);
+		mEnhancementDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE, ENHANCEMENT_DAMAGE);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PhlegmaticResolveCS());
 	}
 
@@ -130,7 +119,7 @@ public class PhlegmaticResolve extends Ability {
 					mCosmetic.enhanceDamageTick(mPlayer, mEnhanceRadius, mEnhancementDamageSpread);
 
 					// AoE Effect
-					double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE, mLastPreMitigationDamage * ENHANCEMENT_DAMAGE);
+					double damage = mLastPreMitigationDamage * mEnhancementDamage;
 					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), mEnhanceRadius);
 					for (LivingEntity mob : hitbox.getHitMobs()) {
 						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.OTHER, damage, mInfo.getLinkedSpell(), true);
@@ -232,5 +221,36 @@ public class PhlegmaticResolve extends Ability {
 			// Only set damage to 0 so that kb occurs.
 			event.setFlatDamage(0);
 		}
+	}
+
+	private static Description<PhlegmaticResolve> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("For each ability on cooldown, gain ")
+			.addPercent(a -> a.mPercentDamageResist, PERCENT_DAMAGE_RESIST_1, false, Ability::isLevelOne)
+			.add(" resistance and ")
+			.addPercent(a -> a.mKBR, PERCENT_KNOCKBACK_RESIST)
+			.add(" knockback resistance, capped at ")
+			.add(a -> a.mAbilityCap, ABILITY_CAP)
+			.add(" abilities.");
+	}
+
+	private static Description<PhlegmaticResolve> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Resistance is increased to ")
+			.addPercent(a -> a.mPercentDamageResist, PERCENT_DAMAGE_RESIST_2, false, Ability::isLevelTwo)
+			.add(" per ability on cooldown, and other players within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks are given ")
+			.addPercent(a -> a.mAllyModifier, ALLY_MODIFIER)
+			.add(" of your buffs from this ability.");
+	}
+
+	private static Description<PhlegmaticResolve> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("All non-ailment damage taken is instead converted into a short Damage-over-Time effect. A third of the damage stored is dealt every second for 3 seconds. Each time this stored damage is dealt, deal ")
+			.addPercent(a -> a.mEnhancementDamage, ENHANCEMENT_DAMAGE)
+			.add(" of the initial damage to all mobs within ")
+			.add(a -> a.mEnhanceRadius, ENHANCE_RADIUS)
+			.add(" blocks.");
 	}
 }

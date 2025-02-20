@@ -139,8 +139,8 @@ public class Rebirth extends DepthsAbility {
 		mPlugin.mEffectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME, new PercentDamageReceived(RESISTANCE_DURATION[mRarity - 1], -1));
 	}
 
-	private static Description<Rebirth> getDescription(int rarity, TextColor textColor) {
-		DescriptionBuilder<Rebirth> desc = new DescriptionBuilder<Rebirth>(textColor)
+	private static Description<Rebirth> getDescription(int rarity, TextColor color) {
+		DescriptionBuilder<Rebirth> desc = new DescriptionBuilder<>(() -> INFO, color)
 			.add("When you would permanently die, you are reborn, gaining 100% Resistance for ")
 			.addDuration(a -> RESISTANCE_DURATION[rarity - 1], RESISTANCE_DURATION[rarity - 1], false, true)
 			.add(" seconds and refunding the revive duration lost from that death.")

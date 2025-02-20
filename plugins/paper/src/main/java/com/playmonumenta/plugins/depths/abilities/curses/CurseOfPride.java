@@ -67,7 +67,7 @@ public class CurseOfPride extends DepthsAbility {
 	}
 
 	private static Description<CurseOfPride> getDescription() {
-		return new DescriptionBuilder<CurseOfPride>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Unlock all trees. Having more than ")
 			.add(MAX_TREE_ABILITIES)
 			.add(" abilities from one tree makes you take ")

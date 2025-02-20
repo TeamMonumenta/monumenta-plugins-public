@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.GraspingClawsCS;
@@ -22,7 +24,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,19 +76,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 					.linkedSpell(ClassAbility.GRASPING_CLAWS)
 					.scoreboardId("GraspingClaws")
 					.shorthandName("GC")
-					.descriptions(
-							("Pressing the drop key while sneaking and holding a scythe or projectile weapon fires a projectile " +
-									"that pulls nearby enemies towards it once it makes contact with a mob or block. " +
-									"Mobs caught in the projectile's %s block radius are given %s%% Slowness for %s seconds and take %s magic damage. Cooldown: %ss.")
-									.formatted(PULL_RADIUS, StringUtils.multiplierToPercentage(AMPLIFIER_1), StringUtils.ticksToSeconds(DURATION), PULL_DAMAGE, StringUtils.ticksToSeconds(COOLDOWN)),
-							("Slowness is increased to %s%%. " +
-									"After the projectile lands, your next melee scythe attack within %s seconds will deal %s + %s%% of the attack’s damage as magic damage to all mobs in a %s block radius.")
-									.formatted(StringUtils.multiplierToPercentage(AMPLIFIER_2), StringUtils.ticksToSeconds(CLEAVE_WINDOW), CLEAVE_FLAT_DAMAGE, StringUtils.multiplierToPercentage(CLEAVE_PERCENT_DAMAGE), CLEAVE_RADIUS),
-							("When the projectile lands, an impenetrable cage is summoned at its location. " +
-									"Non-boss mobs within a %s block radius of the location cannot enter or exit the cage, " +
-									"and players within the cage are granted %s%% max health healing every second. " +
-									"The cage disappears after %s seconds. Mobs that are immune to crowd control cannot be trapped.")
-									.formatted(CAGE_RADIUS, StringUtils.multiplierToPercentage(HEAL_AMOUNT), StringUtils.ticksToSeconds(CAGE_DURATION)))
+					.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 					.simpleDescription("Fire a projectile that damages, pulls, and slows mobs.")
 					.cooldown(COOLDOWN, CHARM_COOLDOWN)
 					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GraspingClaws::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
@@ -95,6 +84,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 					.displayItem(Material.BOW);
 
 	private final double mAmplifier;
+	private final int mSlowDuration;
 	private final double mPullDamage;
 	private final double mPullRadius;
 	private final double mCleaveDamageFlat;
@@ -103,6 +93,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 	private final double mCageRadius;
 	private final double mCageHeal;
 	private final int mCageDuration;
+
 	private final Map<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
 	private @Nullable BukkitRunnable mCleaveRunnable;
 	private int mCurrDuration = -1;
@@ -112,10 +103,11 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 	public GraspingClaws(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mAmplifier = CharmManager.getLevelPercentDecimal(player, CHARM_SLOW) + (isLevelOne() ? AMPLIFIER_1 : AMPLIFIER_2);
+		mSlowDuration = CharmManager.getDuration(mPlayer, CHARM_SLOW_DURATION, DURATION);
 		mPullDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_PULL_DAMAGE, PULL_DAMAGE);
 		mPullRadius = CharmManager.getRadius(mPlayer, CHARM_PULL_RADIUS, PULL_RADIUS);
-		mCleaveDamageFlat = CLEAVE_FLAT_DAMAGE;
-		mCleaveDamagePercent = CLEAVE_PERCENT_DAMAGE;
+		mCleaveDamageFlat = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CLEAVE_DAMAGE, CLEAVE_FLAT_DAMAGE);
+		mCleaveDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CLEAVE_DAMAGE, CLEAVE_PERCENT_DAMAGE);
 		mCleaveRadius = CharmManager.getRadius(player, CHARM_CLEAVE_RADIUS, CLEAVE_RADIUS);
 		mCageRadius = CharmManager.getRadius(player, CHARM_CAGE_RADIUS, CAGE_RADIUS);
 		mCageHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_CAGE_HEALING, HEAL_AMOUNT);
@@ -144,11 +136,10 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 			World world = proj.getWorld();
 			mCosmetic.onLand(mPlayer, world, loc, mPullRadius);
 
-			int duration = CharmManager.getDuration(mPlayer, CHARM_SLOW_DURATION, DURATION);
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mPullRadius, mPlayer)) {
 				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), mPullDamage, true, true, false);
 				MovementUtils.pullTowards(proj, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL_STRENGTH, PULL_SPEED));
-				EntityUtils.applySlow(mPlugin, duration, mAmplifier, mob);
+				EntityUtils.applySlow(mPlugin, mSlowDuration, mAmplifier, mob);
 			}
 
 			if (isLevelTwo()) {
@@ -186,7 +177,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 			mCleaveRunnable.cancel();
 			mCleaveRunnable = null;
 
-			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CLEAVE_DAMAGE, mCleaveDamageFlat + event.getDamage() * mCleaveDamagePercent);
+			double damage = mCleaveDamageFlat + event.getDamage() * mCleaveDamagePercent;
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), mCleaveRadius)) {
 				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
 			}
@@ -278,5 +269,46 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 && isEnhanced() ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
+
+	private static Description<GraspingClaws> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to fire a projectile that pulls mobs within ")
+			.add(a -> a.mPullRadius, PULL_RADIUS)
+			.add(" blocks towards it once it makes contact with a mob or block. Pulled mobs are dealt ")
+			.add(a -> a.mPullDamage, PULL_DAMAGE)
+			.add(" magic damage and afflicted with ")
+			.addPercent(a -> a.mAmplifier, AMPLIFIER_1, false, Ability::isLevelOne)
+			.add(" slowness for ")
+			.addDuration(a -> a.mSlowDuration, DURATION)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<GraspingClaws> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Slowness is increased to ")
+			.addPercent(a -> a.mAmplifier, AMPLIFIER_2, false, Ability::isLevelTwo)
+			.add(". After the projectile lands, your next melee scythe attack within ")
+			.addDuration(CLEAVE_WINDOW)
+			.add(" seconds will deal ")
+			.add(a -> a.mCleaveDamageFlat, CLEAVE_FLAT_DAMAGE)
+			.add(" + ")
+			.addPercent(a -> a.mCleaveDamagePercent, CLEAVE_PERCENT_DAMAGE)
+			.add(" of the attack’s damage as magic damage to all mobs within ")
+			.add(a -> a.mCleaveRadius, CLEAVE_RADIUS)
+			.add(" blocks.");
+	}
+
+	private static Description<GraspingClaws> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When the projectile lands, an impenetrable cage that lasts ")
+			.addDuration(a -> a.mCageDuration, CAGE_DURATION)
+			.add(" seconds is summoned at its location. Mobs within ")
+			.add(a -> a.mCageRadius, CAGE_RADIUS)
+			.add(" blocks of the center cannot enter or exit the cage, and players in the cage heal ")
+			.addPercent(a -> a.mCageHeal, HEAL_AMOUNT)
+			.add(" max health healing every second. Mobs that are immune to crowd control cannot be trapped.");
 	}
 }

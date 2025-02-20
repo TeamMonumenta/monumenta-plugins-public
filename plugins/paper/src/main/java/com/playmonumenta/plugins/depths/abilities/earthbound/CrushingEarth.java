@@ -124,8 +124,9 @@ public class CrushingEarth extends DepthsAbility {
 
 
 	private static Description<CrushingEarth> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<CrushingEarth>(color)
-			.add("Right click to deal ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to deal ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" melee damage to all mobs in a ")
 			.add(a -> a.mRange, RANGE)

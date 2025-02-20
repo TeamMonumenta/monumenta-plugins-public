@@ -76,7 +76,7 @@ public class DarkCombos extends DepthsCombosAbility {
 	}
 
 	private static Description<DarkCombos> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DarkCombos>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Every ")
 			.add(a -> a.mHitRequirement, HIT_REQUIREMENT, true)
 			.add(" melee attacks, apply ")

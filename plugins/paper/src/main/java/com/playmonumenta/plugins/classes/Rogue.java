@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
-import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 
@@ -41,9 +40,7 @@ public class Rogue extends PlayerClass {
 		mClassGlassFiller = Material.GRAY_STAINED_GLASS_PANE;
 		mDisplayItem = Material.STONE_SWORD;
 		mClassDescription = "Rogues excel in one-on-one battles, using precise strikes to bring down dangerous elite enemies.";
-		mClassPassiveDescription = String.format("While holding two swords, deal %s%% more melee damage to elite enemies, and %s%% more to bosses.",
-			StringUtils.multiplierToPercentage(Dethroner.PASSIVE_DAMAGE_ELITE_MODIFIER - 1), StringUtils.multiplierToPercentage(Dethroner.PASSIVE_DAMAGE_BOSS_MODIFIER - 1));
-		mClassPassiveName = "Dethroner";
+		mPassive = Dethroner.INFO;
 
 		mSpecOne.mAbilities.add(BladeDance.INFO);
 		mSpecOne.mAbilities.add(DeadlyRonde.INFO);

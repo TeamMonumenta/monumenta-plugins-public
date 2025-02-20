@@ -4,6 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.ThuribleProcessionCS;
@@ -66,18 +69,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			.scoreboardId("Thurible")
 			.shorthandName("TP")
 			.actionBarColor(TextColor.color(255, 195, 0))
-			.descriptions(
-				"The Hierophant passively builds up buffs, which are applied to all players in a 30 block radius. " +
-					"Buffs end and the buildup resets upon taking damage that causes you to drop below 60% of your max health, unless the full set of buffs have been obtained. " +
-					"Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. " +
-					"Progression - +10% Attack Speed (after 4s of no health threshold reached), " +
-					"+10% Speed (after 8s of no health threshold reached), " +
-					"+10% Attack and Projectile Damage (after 12s of no health threshold reached), " +
-					"Cleric's passive heal is doubled, to 10% of max health every 5s (after 16s of no health threshold reached)",
-				"Progression - +15% Attack Speed (after 4s of no health threshold reached), " +
-					"+15% Speed (after 8s of no health threshold reached), " +
-					"+15% Attack and Projectile Damage (after 12s of no health threshold reached), " +
-					"Cleric's passive heal is tripled, to 15% of max health every 5s (after 16s of no health threshold reached)")
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Keep high health to passively build up buffs that are shared with nearby players.")
 			.cooldown(THURIBLE_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.GLOWSTONE_DUST);
@@ -86,6 +78,8 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	private final double mSpeedPotency;
 	private final double mDamagePotency;
 	private final double mHealingPotency;
+	private final int mEffectDuration;
+	private final int mPassiveDuration;
 	private final ThuribleProcessionCS mCosmetic;
 	private int mSeconds = 0;
 	private int mBuffs = 0;
@@ -99,6 +93,8 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 		mDamagePotency = effectPotency + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mHealingPotency = (isLevelTwo() ? THURIBLE_HEALING_PERCENT_2 : THURIBLE_HEALING_PERCENT_1)
 			+ CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEAL);
+		mEffectDuration = CharmManager.getDuration(mPlayer, CHARM_EFFECT_DURATION, EFFECTS_DURATION);
+		mPassiveDuration = CharmManager.getDuration(mPlayer, CHARM_EFFECT_DURATION, PASSIVE_DURATION);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new ThuribleProcessionCS());
 	}
@@ -108,7 +104,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 		if (!isOnCooldown() && mBuffs > 0 && mPlayer.getHealth() - event.getFinalDamage(true) <= EntityUtils.getMaxHealth(mPlayer) * DAMAGE_BREAK_PERCENT) {
 			//Give everyone buffs from the array
 			if (mBuffs == 4) {
-				applyBuffs(EFFECTS_DURATION);
+				applyBuffs(mEffectDuration);
 				putOnCooldown();
 			}
 
@@ -126,7 +122,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 		if (oneSecond) {
 			mSeconds++;
 			updateBuffs();
-			applyBuffs(PASSIVE_DURATION);
+			applyBuffs(mPassiveDuration);
 		}
 		if (mBuffs == 1) {
 			mCosmetic.firstBuffs(mPlayer);
@@ -160,7 +156,6 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	private void applyBuffs(int duration) {
 		//Give everyone buffs from the array
 		List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
-		duration = CharmManager.getDuration(mPlayer, CHARM_EFFECT_DURATION, duration);
 		for (Player pl : players) {
 			Effect[] effects = getEffectArray(duration);
 			for (int i = 0; i < mBuffs; i++) {
@@ -212,5 +207,37 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
 		}
 		return output;
+	}
+
+	private static Description<ThuribleProcession> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The Hierophant passively builds up buffs, which are applied to all players within ")
+			.add(a -> THURIBLE_RADIUS, THURIBLE_RADIUS)
+			.add(" blocks. Buffs end and the buildup resets upon taking damage that causes you to drop below ")
+			.addPercent(DAMAGE_BREAK_PERCENT)
+			.add(" of your max health, unless the full set of buffs have been obtained. Then all players (including the Hierophant) get ")
+			.addDuration(a -> a.mEffectDuration, EFFECTS_DURATION)
+			.add(" seconds of all built-up buffs. After that, the timer resets and the Procession begins anew. Progression - ")
+			.addPercent(a -> a.mAttackSpeedPotency, EFFECT_PERCENT_1, false, Ability::isLevelOne)
+			.add(" Attack Speed (after 4s of no health threshold reached), ")
+			.addPercent(a -> a.mSpeedPotency, EFFECT_PERCENT_1, false, Ability::isLevelOne)
+			.add(" Speed (after 8s of no health threshold reached), ")
+			.addPercent(a -> a.mDamagePotency, EFFECT_PERCENT_1, false, Ability::isLevelOne)
+			.add(" Attack and Projectile Damage (after 12s of no health threshold reached), Cleric's passive heal is doubled, to ")
+			.addPercent(a -> (1 + a.mHealingPotency) * Rejuvenation.PERCENT_HEAL, (1 + THURIBLE_HEALING_PERCENT_1) * Rejuvenation.PERCENT_HEAL, false, Ability::isLevelOne)
+			.add(" of max health every 5s (after 16s of no health threshold reached)");
+	}
+
+	private static Description<ThuribleProcession> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Progression - ")
+			.addPercent(a -> a.mAttackSpeedPotency, EFFECT_PERCENT_2, false, Ability::isLevelTwo)
+			.add(" Attack Speed (after 4s of no health threshold reached), ")
+			.addPercent(a -> a.mSpeedPotency, EFFECT_PERCENT_2, false, Ability::isLevelTwo)
+			.add(" Speed (after 8s of no health threshold reached), ")
+			.addPercent(a -> a.mDamagePotency, EFFECT_PERCENT_2, false, Ability::isLevelTwo)
+			.add(" Attack and Projectile Damage (after 12s of no health threshold reached), Cleric's passive heal is doubled, to ")
+			.addPercent(a -> (1 + a.mHealingPotency) * Rejuvenation.PERCENT_HEAL, (1 + THURIBLE_HEALING_PERCENT_2) * Rejuvenation.PERCENT_HEAL, false, Ability::isLevelOne)
+			.add(" of max health every 5s (after 16s of no health threshold reached)");
 	}
 }

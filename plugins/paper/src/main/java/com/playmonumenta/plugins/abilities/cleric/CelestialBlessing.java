@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.CelestialBlessingCS;
@@ -14,7 +16,6 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -48,19 +49,7 @@ public class CelestialBlessing extends Ability {
 			.linkedSpell(ClassAbility.CELESTIAL_BLESSING)
 			.scoreboardId("Celestial")
 			.shorthandName("CB")
-			.descriptions(("Left-click while sneaking to grant all players within a %s block radius %s%% " +
-				"damage and %s%% speed for %ss. Dealing damage affected by this effect triggers Crusade's target " +
-				"marking. Cooldown: %ss.")
-				.formatted(CELESTIAL_RADIUS,
-					StringUtils.multiplierToPercentage(CELESTIAL_1_EXTRA_DAMAGE),
-					StringUtils.multiplierToPercentage(CELESTIAL_EXTRA_SPEED),
-					StringUtils.ticksToSeconds(CELESTIAL_DURATION),
-					StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN)),
-				"Increases the buff to %s%% damage."
-					.formatted(StringUtils.multiplierToPercentage(CELESTIAL_2_EXTRA_DAMAGE)),
-				("Celestial Blessing can be extended by %ss by performing a fully-charged melee attack, critical " +
-					"projectile attack, and ability hit on any enemy during its duration.")
-					.formatted(StringUtils.ticksToSeconds(CELESTIAL_BUFF_EXTENSION_DURATION_ENHANCED)))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Grant yourself and nearby players speed and increased damage.")
 			.cooldown(CELESTIAL_COOLDOWN, CELESTIAL_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CelestialBlessing::cast,
@@ -124,5 +113,34 @@ public class CelestialBlessing extends Ability {
 			Crusade.addCrusadeTag(enemy, mCrusade);
 		}
 		return false;
+	}
+
+	private static Description<CelestialBlessing> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to grant all players within ")
+			.add(a -> a.mRadius, CELESTIAL_RADIUS)
+			.add(" blocks ")
+			.addPercent(a -> a.mExtraDamage, CELESTIAL_1_EXTRA_DAMAGE, false, Ability::isLevelOne)
+			.add(" damage and ")
+			.addPercent(a -> a.mSpeedPotency, CELESTIAL_EXTRA_SPEED)
+			.add(" speed for ")
+			.addDuration(a -> a.mDuration, CELESTIAL_DURATION)
+			.add(" seconds. Dealing damage affected by this effect triggers Crusade's target marking.")
+			.addCooldown(CELESTIAL_COOLDOWN);
+	}
+
+	private static Description<CelestialBlessing> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage buff is increased to ")
+			.addPercent(a -> a.mExtraDamage, CELESTIAL_2_EXTRA_DAMAGE, false, Ability::isLevelTwo)
+			.add(".");
+	}
+
+	private static Description<CelestialBlessing> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Celestial Blessing can be extended by ")
+			.addDuration(CELESTIAL_BUFF_EXTENSION_DURATION_ENHANCED)
+			.add(" by performing a fully-charged melee attack, critical projectile attack, and ability hit on any enemy during its duration.");
 	}
 }

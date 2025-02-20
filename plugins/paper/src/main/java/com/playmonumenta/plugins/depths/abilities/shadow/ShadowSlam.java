@@ -153,7 +153,7 @@ public final class ShadowSlam extends DepthsAbility {
 
 
 	private static Description<ShadowSlam> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ShadowSlam>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When you fall more than ")
 			.add(AUTOMATIC_THRESHOLD)
 			.add(" blocks, landing causes a slam, dealing ")

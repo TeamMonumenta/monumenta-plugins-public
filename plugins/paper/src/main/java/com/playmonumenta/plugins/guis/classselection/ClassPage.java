@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -140,22 +141,6 @@ public class ClassPage extends Page {
 		boolean otherChosen,
 		boolean chosen
 	) {
-		if (mGui.isClassPermLocked(classToItemize)) {
-			mGui.setItem(
-				row,
-				column,
-				GUIUtils.createBasicItem(
-					Material.BARRIER,
-					classToItemize.mClassName,
-					classToItemize.mClassColor,
-					true,
-					"This class is currently unavailable to you.",
-					NamedTextColor.RED
-				)
-			);
-			return;
-		}
-
 		if (mGui.isClassLocked(classToItemize)) {
 			mGui.setItem(
 				row,
@@ -202,12 +187,12 @@ public class ClassPage extends Page {
 			classItem.setItemMeta(newMeta);
 		}
 
-		if (classToItemize.mClassPassiveDescription != null && classToItemize.mClassPassiveName != null) {
+		if (classToItemize.mPassive != null) {
 			ItemMeta newMeta = classItem.getItemMeta();
 			GUIUtils.splitLoreLine(
 				newMeta,
-				classToItemize.mClassPassiveName + " (Passive): " + classToItemize.mClassPassiveDescription,
-				NamedTextColor.GREEN,
+				Component.text(classToItemize.mPassive.getDisplayName() + " (Passive): ", NamedTextColor.GREEN)
+					.append(classToItemize.mPassive.getDescription(1, mGui.mPlayer, true)),
 				30,
 				false
 			);

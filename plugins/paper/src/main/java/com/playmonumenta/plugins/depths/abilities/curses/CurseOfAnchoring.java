@@ -23,7 +23,7 @@ public class CurseOfAnchoring extends DepthsAbility {
 	}
 
 	private static Description<CurseOfAnchoring> getDescription() {
-		return new DescriptionBuilder<CurseOfAnchoring>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Your Swap trigger is permanently locked.");
 	}
 }

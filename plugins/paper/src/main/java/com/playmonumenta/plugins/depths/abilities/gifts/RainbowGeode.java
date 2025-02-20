@@ -31,7 +31,7 @@ public class RainbowGeode extends DepthsAbility {
 	}
 
 	private static Description<RainbowGeode> getDescription() {
-		return new DescriptionBuilder<RainbowGeode>().add("You now have the choice to skip room rewards. Gain a ")
+		return new DescriptionBuilder<>(() -> INFO).add("You now have the choice to skip room rewards. Gain a ")
 			.add(DepthsTree.PRISMATIC.getNameComponent())
 			.add(" ability selection every time you skip three rewards.")
 			.add((a, p) -> a != null && a.mDepthsPlayer != null

@@ -123,7 +123,7 @@ public class Permafrost extends DepthsAbility {
 	}
 
 	private static Description<Permafrost> getDescription(int rarity, TextColor color) {
-		DescriptionBuilder<Permafrost> desc = new DescriptionBuilder<Permafrost>(color)
+		DescriptionBuilder<Permafrost> desc = new DescriptionBuilder<>(() -> INFO, color)
 			.add("Breaking a spawner spawns ice around it that lasts for ")
 			.addDuration(a -> a.mIceDuration, ICE_TICKS[rarity - 1], false, true)
 			.add(" seconds. Mobs within ")

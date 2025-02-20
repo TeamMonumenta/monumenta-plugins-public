@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.AmplifyingHexCS;
@@ -26,6 +28,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -67,25 +70,21 @@ public class AmplifyingHex extends Ability {
 			.linkedSpell(ClassAbility.AMPLIFYING)
 			.scoreboardId("AmplifyingHex")
 			.shorthandName("AH")
-			.descriptions(
-				"Left click while sneaking with a scythe to unleash a magic cone up to 8 blocks in front of you, " +
-					"dealing magic damage equal to 2 + (0.5 * Player Level, capped based on region: R1 Level 7 / R2 Level 14 / R3 Level 21) " +
-					"to each enemy for each debuff it has. Debuffs include, but are not limited to, Fire, Slowness, Weaken, Decay, Bleed, and more. " +
-					"Deal an additional +1 damage for each extra level of debuff above 1, capped at 2 extra levels per debuff. 20% Slowness, Decay 2, etc. count as level 2 debuffs. Cooldown: 10s.",
-				"Range increased to 10 blocks. The extra debuff level damage is increased to +2 per extra level, and the extra debuff level cap is increased to 3 extra levels.",
-				"For every 1% health you have above 80% of your max health, Amplifying Hex will deal 1.25% more damage to enemies and deal 1% max health damage to yourself.")
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Deal damage to mobs in front of you for each debuff they currently have.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AmplifyingHex::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
 			.displayItem(Material.DRAGON_BREATH);
 
-	private final float mAmplifierDamage;
+	private final double mFlatDamage;
+	private final double mAmplifierDamage;
+	private final double mRegionCap;
 	private final int mAmplifierCap;
-	private final float mRadius;
+	private final double mDamagePerPoint;
+	private double mDamage = 0;
+	private final double mRadius;
 	private final double mConeAngle;
-	private final float mRegionCap;
-	private float mDamage = 0f;
 	private final double mEnhanceHealthThreshold;
 	private final double mEnhanceDamageBonus;
 
@@ -93,13 +92,15 @@ public class AmplifyingHex extends Ability {
 
 	public AmplifyingHex(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mAmplifierDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_POTENCY, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2);
-		mAmplifierCap = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_POTENCY_CAP, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
-		mRadius = (float) CharmManager.getRadius(player, CHARM_RANGE, isLevelOne() ? RADIUS_1 : RADIUS_2);
+		mFlatDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, FLAT_DAMAGE);
+		mDamagePerPoint = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_PER_SKILL_POINT);
+		mRegionCap = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_CAP : ServerProperties.getClassSpecializationsEnabled(player) ? R2_CAP : R1_CAP);
+		mAmplifierDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, CharmManager.calculateFlatAndPercentValue(player, CHARM_POTENCY, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2));
+		mAmplifierCap = (isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2) + (int) CharmManager.getLevel(player, CHARM_POTENCY_CAP);
+		mRadius = CharmManager.getRadius(player, CHARM_RANGE, isLevelOne() ? RADIUS_1 : RADIUS_2);
 		mConeAngle = Math.min(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CONE, ANGLE), 180);
-		mRegionCap = ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_CAP : ServerProperties.getClassSpecializationsEnabled(player) ? R2_CAP : R1_CAP;
-
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AmplifyingHexCS());
+		mEnhanceHealthThreshold = ENHANCEMENT_HEALTH_THRESHOLD + CharmManager.getLevelPercentDecimal(player, CHARM_ENHANCE_HEALTH);
+		mEnhanceDamageBonus = CharmManager.calculateFlatAndPercentValue(player, CHARM_ENHANCE_DAMAGE, ENHANCEMENT_DAMAGE_MOD);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			int charmPower = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.CHARM_POWER).orElse(0);
@@ -108,11 +109,10 @@ public class AmplifyingHex extends Ability {
 				                 AbilityUtils.getEffectiveTotalSpecPoints(player) +
 				                 ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
 				                 charmPower;
-			mDamage = DAMAGE_PER_SKILL_POINT * totalLevel;
+			mDamage = mFlatDamage + mDamagePerPoint * Math.min(totalLevel, mRegionCap);
 		});
 
-		mEnhanceHealthThreshold = ENHANCEMENT_HEALTH_THRESHOLD + CharmManager.getLevelPercentDecimal(player, CHARM_ENHANCE_HEALTH);
-		mEnhanceDamageBonus = CharmManager.calculateFlatAndPercentValue(player, CHARM_ENHANCE_DAMAGE, ENHANCEMENT_DAMAGE_MOD);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AmplifyingHexCS());
 	}
 
 	public boolean cast() {
@@ -234,8 +234,7 @@ public class AmplifyingHex extends Ability {
 			if (debuffCount > 0) {
 				mCosmetic.onHit(mPlayer, mob);
 
-				double finalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, debuffCount * (FLAT_DAMAGE + Math.min(mDamage, mRegionCap)) + amplifierCount * mAmplifierDamage);
-				finalDamage *= (1 + percentBoost);
+				double finalDamage = (mDamage + amplifierCount * mAmplifierDamage) * (1 + percentBoost);
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.getLinkedSpell(), true);
 				MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 			}
@@ -244,4 +243,48 @@ public class AmplifyingHex extends Ability {
 		return true;
 	}
 
+	private static Description<AmplifyingHex> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to unleash a magic cone up to ")
+			.add(a -> a.mRadius, RADIUS_1, false, Ability::isLevelOne)
+			.add(" blocks in front of you, dealing magic damage equal to ")
+			.add(a -> a.mFlatDamage, FLAT_DAMAGE)
+			.add(" + (")
+			.add(a -> a.mDamagePerPoint, DAMAGE_PER_SKILL_POINT)
+			.add(" * Player Level, capped ")
+			.add((a, p) -> {
+				if (p == null) {
+					return Component.text("based on region: R1 Level 7 / R2 Level 14 / R3 Level 21");
+				} else {
+					return Component.text("at Level " + (ServerProperties.getAbilityEnhancementsEnabled(p) ? R3_CAP : ServerProperties.getClassSpecializationsEnabled(p) ? R2_CAP : R1_CAP));
+				}
+			})
+			.add(") to each enemy for each debuff it has. Debuffs include, but are not limited to, Fire, Slowness, Weaken, Decay, Bleed, and more. Deal an additional ")
+			.add(a -> a.mAmplifierDamage, AMPLIFIER_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" damage for each extra level of debuff above 1, capped at ")
+			.add(a -> a.mAmplifierCap, AMPLIFIER_CAP_2, false, Ability::isLevelOne)
+			.add(" extra levels per debuff. 20% Slowness, Decay 2, etc. count as level 2 debuffs.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<AmplifyingHex> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Range increased to ")
+			.add(a -> a.mRadius, RADIUS_2, false, Ability::isLevelTwo)
+			.add(" blocks. The extra debuff level damage is increased to ")
+			.add(a -> a.mAmplifierDamage, AMPLIFIER_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" per extra level, and the extra debuff level cap is increased to ")
+			.add(a -> a.mAmplifierCap, AMPLIFIER_CAP_2, false, Ability::isLevelTwo)
+			.add(" extra levels.");
+	}
+
+	private static Description<AmplifyingHex> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("For every 1% health you have above ")
+			.addPercent(a -> a.mEnhanceHealthThreshold, ENHANCEMENT_HEALTH_THRESHOLD)
+			.add(" of your max health, this ability deals ")
+			.addPercent(a -> a.mEnhanceDamageBonus, ENHANCEMENT_DAMAGE_MOD)
+			.add(" more damage and damages yourself by 1% max health.");
+	}
 }

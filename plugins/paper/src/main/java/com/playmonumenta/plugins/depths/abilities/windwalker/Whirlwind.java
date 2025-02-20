@@ -94,7 +94,7 @@ public class Whirlwind extends DepthsAbility {
 	}
 
 	private static Description<Whirlwind> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Whirlwind>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Breaking a spawner knocks back all mobs within ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks with a speed of ")

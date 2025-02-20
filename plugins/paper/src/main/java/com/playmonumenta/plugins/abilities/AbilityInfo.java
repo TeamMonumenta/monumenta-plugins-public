@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -170,6 +171,16 @@ public class AbilityInfo<T extends Ability> {
 
 	public AbilityInfo<T> descriptions(String level1, String level2, String enhancement) {
 		mDescriptions = Stream.of(level1, level2, enhancement).map(Component::text).map(c -> (Description<T>) (a, p) -> c).toList();
+		return this;
+	}
+
+	public AbilityInfo<T> descriptions(Description<T> level1, Description<T> level2) {
+		mDescriptions = Arrays.asList(level1, level2);
+		return this;
+	}
+
+	public AbilityInfo<T> descriptions(Description<T> level1, Description<T> level2, Description<T> enhancement) {
+		mDescriptions = Arrays.asList(level1, level2, enhancement);
 		return this;
 	}
 
@@ -346,10 +357,6 @@ public class AbilityInfo<T extends Ability> {
 		return mDescriptions.stream().map(d -> d.get(ability, player)).toList();
 	}
 
-	public Component getDescription(int level) {
-		return getDescription(level, null, false);
-	}
-
 	public Component getDescription(int level, @Nullable Player player, boolean useAbility) {
 		return getDescription(level, player, useAbility ? getPlayerAbility(Plugin.getInstance(), player) : null);
 	}
@@ -359,7 +366,7 @@ public class AbilityInfo<T extends Ability> {
 	}
 
 	public Component getFormattedDescription(@Nullable Player player, int skillLevel, boolean enabled) throws IndexOutOfBoundsException {
-		Component description = getDescription(skillLevel);
+		Component description = getDescription(skillLevel, player, true);
 
 		String displayName = mDisplayName;
 		if (displayName == null) {

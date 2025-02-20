@@ -61,7 +61,7 @@ public class BrambleShell extends DepthsAbility {
 	}
 
 	private static Description<BrambleShell> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<BrambleShell>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Whenever an enemy deals melee or projectile damage to you, they take ")
 			.addDepthsDamage(a -> a.mDamage, BRAMBLE_DAMAGE[rarity - 1], true)
 			.add(" melee damage.");

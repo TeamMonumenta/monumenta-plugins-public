@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.WindBombCS;
@@ -23,7 +25,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,27 +79,7 @@ public class WindBomb extends Ability {
 			.linkedSpell(ClassAbility.WIND_BOMB)
 			.scoreboardId("WindBomb")
 			.shorthandName("WB")
-			.descriptions(
-				String.format(
-					AbilityTrigger.Key.SWAP + " while sneaking and holding a projectile weapon to throw a projectile " +
-					"that, upon contact with the ground or an enemy, deals %s of your projectile damage to mobs in " +
-					"a %s block radius and launches them into the air, giving them Slow Falling and %s Weakness for " +
-					"%ss. Cooldown: %ss.",
-					StringUtils.multiplierToPercentageWithSign(DAMAGE_FRACTION_1),
-					RADIUS,
-					StringUtils.multiplierToPercentageWithSign(WEAKEN_EFFECT),
-					StringUtils.ticksToSeconds(DURATION),
-					StringUtils.ticksToSeconds(COOLDOWN_1)),
-				String.format(
-					"The damage is increased to %s of your projectile damage and the cooldown is reduced to %ss. " +
-					"Additionally, a hit dealt to an airborne enemy deals %s more damage but the bonus damage can " +
-					"only be applied to the same enemy again if it has been hit by a Wind Bomb.",
-					StringUtils.multiplierToPercentageWithSign(DAMAGE_FRACTION_2),
-					StringUtils.ticksToSeconds(COOLDOWN_2),
-					StringUtils.multiplierToPercentageWithSign(MIDAIR_DAMAGE_BONUS)),
-				String.format("On impact, generate a vortex that pulls mobs within %s blocks toward the center for %s seconds.",
-					PULL_RADIUS,
-					StringUtils.ticksToSeconds(PULL_DURATION)))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Throw a bomb that damages and launches mobs up in the air, weakening them.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WindBomb::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
@@ -120,7 +101,7 @@ public class WindBomb extends Ability {
 	public WindBomb(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 
-		mDamageFraction = isLevelTwo() ? DAMAGE_FRACTION_2 : DAMAGE_FRACTION_1;
+		mDamageFraction = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelTwo() ? DAMAGE_FRACTION_2 : DAMAGE_FRACTION_1);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 		mEffectDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		mWeaknessPotency = WEAKEN_EFFECT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
@@ -141,7 +122,6 @@ public class WindBomb extends Ability {
 		final ThrowableProjectile proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, mPlayer.getWorld(), VELOCITY, mCosmetic.getProjectileName(), mCosmetic.getProjectileParticle(), LocationUtils.isLocationInWater(mPlayer.getLocation()));
 		double damage = ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(),
 			AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) * mDamageFraction;
-		damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 		final ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		mProjectiles.add(Triple.of(proj, damage, playerItemStats));
 		putOnCooldown();
@@ -239,5 +219,39 @@ public class WindBomb extends Ability {
 			event.updateDamageWithMultiplier(mMidairDamageMult);
 		}
 		return false;
+	}
+
+	private static Description<WindBomb> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to throw a projectile that, upon contact with the ground or an enemy, deals ")
+			.addPercent(a -> a.mDamageFraction, DAMAGE_FRACTION_1, false, Ability::isLevelOne)
+			.add(" of your projectile damage to mobs within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks and launches them into the air, giving them Slow Falling and ")
+			.addPercent(a -> a.mWeaknessPotency, WEAKEN_EFFECT)
+			.add(" weakness for ")
+			.addDuration(a -> a.mEffectDuration, DURATION)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+	}
+
+	private static Description<WindBomb> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage is increased to ")
+			.addPercent(a -> a.mDamageFraction, DAMAGE_FRACTION_2, false, Ability::isLevelTwo)
+			.add(" of your projectile damage. Additionally, a hit dealt to an airborne enemy deals ")
+			.addPercent(a -> a.mMidairDamageMult, MIDAIR_DAMAGE_BONUS)
+			.add(" more damage but the bonus damage can only be applied to the same enemy again if it has been hit by a Wind Bomb.")
+			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+	}
+
+	private static Description<WindBomb> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("On impact, generate a vortex that pulls mobs within ")
+			.add(a -> a.mEnhancePullRadius, PULL_RADIUS)
+			.add(" blocks toward the center for ")
+			.addDuration(a -> a.mEnhancePullDuration, PULL_DURATION)
+			.add(" seconds.");
 	}
 }

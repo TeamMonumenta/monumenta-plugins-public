@@ -701,8 +701,9 @@ public class ChromaBlade extends DepthsAbility {
 	}
 
 	private static Description<ChromaBlade> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
-			.add("Right click while sneaking to unleash two slashes that each deal ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to unleash two slashes that each deal ")
 			.addDepthsDamage(a -> DAMAGE[rarity - 1], DAMAGE[rarity - 1], true)
 			.add(" melee damage. If your weapon's attack speed is below 1.3, perform slower, wider slashes with 25% increased cooldown instead.")
 			.add(" Additionally, gain a bonus effect depending on the tree of the last ability you used.")
@@ -728,49 +729,49 @@ public class ChromaBlade extends DepthsAbility {
 	}
 
 	private static Description<ChromaBlade> getFrostbornDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nFrostborn").color(TextColor.color(DepthsUtils.FROSTBORN)))
 			.add(" - Replace the second slash with a shockwave that creates ice and applies 20% Slow for 8s.");
 	}
 
 	private static Description<ChromaBlade> getFlamecallerDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nFlamecaller").color(TextColor.color(DepthsUtils.FLAMECALLER)))
 			.add(" - Increase the size of both slashes by 75% and ignite mobs hit for 8s.");
 	}
 
 	private static Description<ChromaBlade> getDawnbringerDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nDawnbringer").color(TextColor.color(DepthsUtils.DAWNBRINGER)))
 			.add(" - Mobs hit by a slash drop a piece of Chroma that when picked up, grants 1 absorption health, up to 6, for 10s.");
 	}
 
 	private static Description<ChromaBlade> getEarthboundDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nEarthbound").color(TextColor.color(DepthsUtils.EARTHBOUND)))
 			.add(" - Replace the second slash with an earthquake that pulls, taunts, and applies 20% Weaken to mobs for 8s.");
 	}
 
 	private static Description<ChromaBlade> getShadowdancerDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nShadowdancer").color(TextColor.color(DepthsUtils.SHADOWDANCER)))
 			.add(" - Silence mobs hit for 1s. If the slash brings a non-Boss mob under 20% HP, they die instantly.");
 	}
 
 	private static Description<ChromaBlade> getSteelsageDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nSteelsage").color(TextColor.color(DepthsUtils.STEELSAGE)))
 			.add(" - If a slash doesn't hit any mobs, it continues forward as a projectile.");
 	}
 
 	private static Description<ChromaBlade> getWindwalkerDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nWindwalker").color(TextColor.color(DepthsUtils.WINDWALKER)))
 			.add(" - Additionally dash forwards while slashing. Each slash reduces your skill cooldowns by 1.5s if it hits a mob.");
 	}
 
 	private static Description<ChromaBlade> getPrismaticDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\n").append(DepthsTree.PRISMATIC.color("Prismatic")))
 			.add(" - Add a third cross-slash that is 50% larger and deals 65% more damage.");
 	}

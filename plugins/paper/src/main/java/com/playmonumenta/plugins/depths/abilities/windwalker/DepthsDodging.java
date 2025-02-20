@@ -153,7 +153,7 @@ public class DepthsDodging extends DepthsAbility {
 	}
 
 	private static Description<DepthsDodging> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsDodging>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("You dodge the next projectile or potion attack that would have hit you, nullifying the damage.")
 			.addCooldown(COOLDOWN[rarity - 1], true);
 	}

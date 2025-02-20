@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.IndependentIframeTracker;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
@@ -87,9 +89,10 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private static @Nullable ItemStack BRUTAL_POTION = null;
 
 	public static final AbilityInfo<AlchemistPotions> INFO =
-			new AbilityInfo<>(AlchemistPotions.class, null, AlchemistPotions::new)
+			new AbilityInfo<>(AlchemistPotions.class, "Alchemist Potions", AlchemistPotions::new)
 				.hotbarName("A") // Have this as "A" to make it sorted in front of everything (alphabetically)
 				.linkedSpell(ClassAbility.ALCHEMIST_POTION)
+				.description(getDescription())
 				.canUse(player -> AbilityUtils.getClassNum(player) == Alchemist.CLASS_ID);
 
 	public final GruesomeAlchemyCS mCosmetic;
@@ -255,7 +258,9 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, getDamage(playerItemStats));
 
 			if (isGruesome) {
-				damage *= GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_DAMAGE);
+				damage *= GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_DAMAGE_MULTIPLIER);
+			} else {
+				damage *= 1 + CharmManager.getLevelPercentDecimal(mPlayer, BrutalAlchemy.CHARM_DAMAGE_MULTIPLIER);
 			}
 
 			double finalDamage = damage;
@@ -490,5 +495,14 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
 
 		return output;
+	}
+
+	private static Description<AlchemistPotions> getDescription() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Allows using Alchemical Utensils. You gain 1 potion every ")
+			.addDuration(POTIONS_TIMER_BASE)
+			.add(" seconds, up to a maximum of ")
+			.add(a -> a.mMaxCharges, MAX_CHARGES)
+			.add(".");
 	}
 }

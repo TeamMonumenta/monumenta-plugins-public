@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.ByMyBladeCS;
@@ -15,7 +17,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -49,26 +50,12 @@ public final class ByMyBlade extends Ability {
 			.linkedSpell(ClassAbility.BY_MY_BLADE)
 			.scoreboardId("ByMyBlade")
 			.shorthandName("BmB")
-			.descriptions(
-				String.format("While holding two swords, performing a critical melee attack deals %s Melee damage to " +
-					"the hit enemy and grants Haste %s for %ss. Cooldown: %ss.",
-					DAMAGE_1,
-					HASTE_POTENCY + 1,
-					StringUtils.ticksToSeconds(ATTACK_SPEED_DURATION),
-					StringUtils.ticksToSeconds(COOLDOWN)),
-				String.format("The damage is increased to %s and additionally gain %s Attack Speed for %s.",
-					DAMAGE_2,
-					StringUtils.multiplierToPercentageWithSign(ATTACK_SPEED_2),
-					StringUtils.ticksToSeconds(ATTACK_SPEED_DURATION)),
-				String.format("By My Blade does %s extra damage. Killing an enemy with this ability heals you for " +
-					"%s of your max health which is increased to %s if the target was an elite or boss.",
-					StringUtils.multiplierToPercentageWithSign(ENHANCEMENT_DAMAGE_MULT),
-					StringUtils.multiplierToPercentageWithSign(ENHANCEMENT_HEAL_PERCENT),
-					StringUtils.multiplierToPercentageWithSign(ENHANCEMENT_HEAL_PERCENT_ELITE)))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Critical melee hits periodically do more damage and give Attack Speed.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.SKELETON_SKULL);
 
+	private final double mDamageBonusBase;
 	private final double mDamageBonus;
 	private final double mAttackSpeedAmplifier;
 	private final int mAttackSpeedDuration;
@@ -78,8 +65,8 @@ public final class ByMyBlade extends Ability {
 
 	public ByMyBlade(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
-		mDamageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
-			(isLevelTwo() ? DAMAGE_2 : DAMAGE_1) * (isEnhanced() ? 1 + ENHANCEMENT_DAMAGE_MULT : 1));
+		mDamageBonusBase = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, (isLevelTwo() ? DAMAGE_2 : DAMAGE_1));
+		mDamageBonus = mDamageBonusBase * (isEnhanced() ? 1 + ENHANCEMENT_DAMAGE_MULT : 1);
 		mAttackSpeedAmplifier = ATTACK_SPEED_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK_SPEED_AMPLIFIER);
 		mAttackSpeedDuration = CharmManager.getDuration(mPlayer, CHARM_ATTACK_SPEED_DURATION, ATTACK_SPEED_DURATION);
 		mEnhancementHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALTH, ENHANCEMENT_HEAL_PERCENT);
@@ -128,5 +115,39 @@ public final class ByMyBlade extends Ability {
 			mCosmetic.bmbDamage(mPlayer.getWorld(), mPlayer, enemy, level);
 		}
 		return false;
+	}
+
+	private static Description<ByMyBlade> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("While holding two swords, performing a critical melee attack deals ")
+			.add(a -> a.mDamageBonusBase, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" melee damage to the hit enemy and grants Haste ")
+			.addPotionAmplifier(a -> HASTE_POTENCY, HASTE_POTENCY)
+			.add(" for ")
+			.addDuration(a -> a.mAttackSpeedDuration, ATTACK_SPEED_DURATION)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<ByMyBlade> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage is increased to ")
+			.add(a -> a.mDamageBonusBase, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" and additionally gain ")
+			.addPercent(a -> a.mAttackSpeedAmplifier, ATTACK_SPEED_2)
+			.add(" attack speed for ")
+			.addDuration(a -> a.mAttackSpeedDuration, ATTACK_SPEED_DURATION)
+			.add(" seconds.");
+	}
+
+	private static Description<ByMyBlade> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("By My Blade does ")
+			.addPercent(ENHANCEMENT_DAMAGE_MULT)
+			.add(" extra damage. Killing an enemy with this ability heals you for ")
+			.addPercent(a -> a.mEnhancementHeal, ENHANCEMENT_HEAL_PERCENT)
+			.add(" of your max health which is increased to ")
+			.addPercent(a -> a.mEnhancementHealElite, ENHANCEMENT_HEAL_PERCENT_ELITE)
+			.add(" if the target was an elite or boss.");
 	}
 }

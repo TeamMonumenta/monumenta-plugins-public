@@ -50,20 +50,9 @@ public class ClassSelectionGui extends Gui {
 	}
 
 	protected boolean isClassLocked(PlayerClass testClass) {
-		if (
-			testClass.mQuestReq != null
-				&& !AbilityUtils.getEffectiveSpecs(mPlayer)
-				&& ScoreboardUtils.getScoreboardValue(mPlayer, testClass.mQuestReq).orElse(0) < testClass.mQuestReqMin
-		) {
-			return true;
-		}
-
-		return isClassPermLocked(testClass);
-	}
-
-	protected boolean isClassPermLocked(PlayerClass testClass) {
-		return testClass.mPermissionString != null
-			&& !mPlayer.hasPermission(testClass.mPermissionString);
+		return testClass.mQuestReq != null
+			       && !AbilityUtils.getEffectiveSpecs(mPlayer)
+			       && ScoreboardUtils.getScoreboardValue(mPlayer, testClass.mQuestReq).orElse(0) < testClass.mQuestReqMin;
 	}
 
 	protected int remainingSkillPoints() {
@@ -242,7 +231,7 @@ public class ClassSelectionGui extends Gui {
 			"Level " + level,
 			displayedClass.mClassColor,
 			true,
-			ability.getDescription(level).color(NamedTextColor.WHITE),
+			ability.getDescription(level, mPlayer, true).color(NamedTextColor.WHITE),
 			30,
 			true
 		);
@@ -288,7 +277,7 @@ public class ClassSelectionGui extends Gui {
 				ItemStack disabledEn = GUIUtils.createBasicItem(newMat, 1,
 					"Enhancement", displayedClass.mClassColor, true,
 					Component.text("Cannot Select; Choose levels in the ability first. Description: ")
-						.append(ability.getDescription(3)),
+						.append(ability.getDescription(3, mPlayer, true)),
 					30, true);
 				GUIUtils.setGuiNbtTag(disabledEn, "texture", "skill_select_en_disabled", mGuiTextures);
 				setItem(row, column, disabledEn);
@@ -307,7 +296,7 @@ public class ClassSelectionGui extends Gui {
 		newMat = hasEnhancement ? Material.YELLOW_STAINED_GLASS_PANE : Material.ORANGE_STAINED_GLASS_PANE;
 		newItem = GUIUtils.createBasicItem(newMat, 1,
 			"Enhancement", displayedClass.mClassColor, true,
-			ability.getDescription(3), 30, true);
+			ability.getDescription(3, mPlayer, true), 30, true);
 		GUIUtils.setGuiNbtTag(
 			newItem,
 			"texture",

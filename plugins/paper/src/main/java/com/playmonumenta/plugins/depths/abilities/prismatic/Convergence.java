@@ -111,7 +111,7 @@ public class Convergence extends DepthsAbility {
 	}
 
 	private static Description<Convergence> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Convergence>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Breaking a spawner or killing an Elite mob triggers each of your living teammates' spawner break abilities at ")
 			.add(DepthsUtils.getRarityComponent(rarity))
 			.add(" level.")

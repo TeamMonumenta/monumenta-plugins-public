@@ -586,18 +586,18 @@ public class ItemStatUtils {
 				abilities.addAll(playerClass.mAbilities);
 				abilities.addAll(playerClass.mSpecOne.mAbilities);
 				abilities.addAll(playerClass.mSpecTwo.mAbilities);
+				abilities.add(playerClass.mPassive);
+				if (playerClass.mSpecOne.mPassive != null) {
+					abilities.add(playerClass.mSpecOne.mPassive);
+				}
+				if (playerClass.mSpecTwo.mPassive != null) {
+					abilities.add(playerClass.mSpecTwo.mPassive);
+				}
 
-				List<String> abilityNames = new ArrayList<>();
-				abilityNames.add(playerClass.mClassPassiveName);
-				abilities.forEach(a -> abilityNames.add(a.getDisplayName()));
-
-				for (String name : abilityNames) {
-					if (line.contains(name)) {
+				for (AbilityInfo<?> ability : abilities) {
+					if (ability.getDisplayName() != null && line.contains(ability.getDisplayName())) {
 						return playerClass;
 					}
-				}
-				if (line.contains(playerClass.mClassPassiveName)) {
-					return playerClass;
 				}
 			}
 			// The real ability name is "Alchemist Potions", but charms don't use the "s"

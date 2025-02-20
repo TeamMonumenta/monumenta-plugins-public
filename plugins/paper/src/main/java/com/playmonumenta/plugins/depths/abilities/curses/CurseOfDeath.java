@@ -29,7 +29,7 @@ public class CurseOfDeath extends DepthsAbility {
 	}
 
 	private static Description<CurseOfDeath> getDescription() {
-		return new DescriptionBuilder<CurseOfDeath>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Your grave revive timer is reduced by 2 deaths' worth.")
 			.add((a, p) -> {
 				if (a == null || p == null) {

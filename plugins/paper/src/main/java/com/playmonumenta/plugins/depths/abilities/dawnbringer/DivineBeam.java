@@ -163,7 +163,7 @@ public class DivineBeam extends DepthsAbility {
 	}
 
 	private static Description<DivineBeam> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DivineBeam>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Shooting a projectile while sneaking instead shoots a beam of light, healing players hit for ")
 			.addPercent(a -> a.mHeal, HEAL[rarity - 1], false, true)
 			.add(" of their max health and stunning non-Elite mobs hit for ")

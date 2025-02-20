@@ -24,7 +24,7 @@ public class CurseOfObscurity extends DepthsAbility {
 	}
 
 	private static Description<CurseOfObscurity> getDescription() {
-		return new DescriptionBuilder<CurseOfObscurity>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("One of your ability or upgrade choices is hidden.");
 	}
 }

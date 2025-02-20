@@ -196,8 +196,9 @@ public class Sidearm extends DepthsAbility implements AbilityWithChargesOrStacks
 	}
 
 	private static Description<Sidearm> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Sidearm>(color)
-			.add("Right click to fire a flintlock shot, dealing ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to fire a flintlock shot, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" projectile damage to the first mob hit and having a range of ")
 			.add(a -> a.mRange, RANGE)

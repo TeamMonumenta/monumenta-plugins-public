@@ -230,7 +230,7 @@ public class FrigidCombos extends DepthsAbility {
 	}
 
 	private static Description<FrigidCombos> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<FrigidCombos>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When you melee attack an enemy, deal ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage to mobs within ")

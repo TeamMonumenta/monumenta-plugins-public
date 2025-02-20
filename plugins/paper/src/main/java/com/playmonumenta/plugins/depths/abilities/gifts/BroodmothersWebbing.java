@@ -38,6 +38,6 @@ public class BroodmothersWebbing extends DepthsAbility {
 	}
 
 	private static Description<BroodmothersWebbing> getDescription() {
-		return new DescriptionBuilder<BroodmothersWebbing>().add("Select another player to receive a protective webbing. The next time they die, their negative effects are cleansed and they are healed to full health.");
+		return new DescriptionBuilder<>(() -> INFO).add("Select another player to receive a protective webbing. The next time they die, their negative effects are cleansed and they are healed to full health.");
 	}
 }

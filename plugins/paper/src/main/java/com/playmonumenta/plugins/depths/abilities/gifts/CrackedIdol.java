@@ -31,7 +31,7 @@ public class CrackedIdol extends DepthsAbility {
 	}
 
 	private static Description<CrackedIdol> getDescription() {
-		return new DescriptionBuilder<CrackedIdol>().add("Gain +10% damage, resistance, speed, and ability rarity odds. The next time you die, permanently lose these effects.");
+		return new DescriptionBuilder<>(() -> INFO).add("Gain +10% damage, resistance, speed, and ability rarity odds. The next time you die, permanently lose these effects.");
 	}
 
 	@Override

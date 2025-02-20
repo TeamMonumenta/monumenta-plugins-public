@@ -200,7 +200,7 @@ public class SteelStallion extends DepthsAbility implements AbilityWithDuration 
 	}
 
 	private static Description<SteelStallion> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<SteelStallion>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When your health drops below ")
 			.addPercent(TRIGGER_HEALTH)
 			.add(", summon and ride a horse with ")
@@ -211,7 +211,9 @@ public class SteelStallion extends DepthsAbility implements AbilityWithDuration 
 			.add(a -> a.mSpeed, SPEED[rarity - 1], false, null, true)
 			.add(" and a jump strength of ")
 			.add(a -> a.mJumpStrength, JUMP_STRENGTH[rarity - 1], false, null, true)
-			.add(". Press drop to dismount the horse.")
+			.add(". ")
+			.addTrigger()
+			.add(" to dismount the horse.")
 			.addCooldown(COOLDOWN);
 	}
 

@@ -165,8 +165,9 @@ public class Aeroblast extends DepthsAbility {
 	}
 
 	private static Description<Aeroblast> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Aeroblast>(color)
-			.add("Right click while sneaking to blow a front-facing gust of wind, dealing ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to blow a front-facing gust of wind, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage to all mobs up to ")
 			.add(a -> a.mSize, SIZE)

@@ -58,7 +58,7 @@ public class EarthenWrath extends DepthsAbility {
 		new DepthsAbilityInfo<>(EarthenWrath.class, ABILITY_NAME, EarthenWrath::new, DepthsTree.EARTHBOUND, DepthsTrigger.SWAP)
 			.linkedSpell(ClassAbility.EARTHEN_WRATH)
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenWrath::cast, DepthsTrigger.SWAP.mTrigger, new AbilityTriggerInfo.TriggerRestriction(DepthsTrigger.DEPTHS_TRIGGER_RESTRICTION.getDisplay(), DepthsTrigger.DEPTHS_TRIGGER_RESTRICTION.getPredicate().and(p -> !isWrathing(p)))))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenWrath::cast, DepthsTrigger.SWAP.mTrigger, new AbilityTriggerInfo.TriggerRestriction(DepthsTrigger.DEPTHS_TRIGGER_RESTRICTION.getDisplay(), DepthsTrigger.DEPTHS_TRIGGER_RESTRICTION.getPredicate().and(p -> !isWrathing(p)), false)))
 			.displayItem(Material.TURTLE_HELMET)
 			.descriptions(EarthenWrath::getDescription);
 
@@ -252,8 +252,9 @@ public class EarthenWrath extends DepthsAbility {
 	}
 
 	private static Description<EarthenWrath> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<EarthenWrath>(color)
-			.add("Swap hands to redirect all damage allies in a ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to redirect all damage allies in a ")
 			.add(a -> a.mTransferRadius, TRANSFER_RADIUS)
 			.add(" block radius take from mobs (excluding percent health damage) to you at a ")
 			.addPercent(a -> a.mDamageReduction, PERCENT_DAMAGE_REDUCTION[rarity - 1], false, true)

@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -25,7 +27,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Collection;
 import java.util.Objects;
 import org.bukkit.Bukkit;
@@ -84,37 +85,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			.linkedSpell(ClassAbility.HEAVENLY_BOON)
 			.scoreboardId("HeavenlyBoon")
 			.shorthandName("HB")
-			.descriptions(
-				String.format(
-					"Whenever you are hit with a positive splash potion, the effects are also given to other " +
-					"players in a %s block radius. In addition, whenever an undead mob you have hit within %ss dies " +
-					"or you deal enough non-true damage to a boss (R1 %s/R2 %s/R3 %s), you have a %s chance to be " +
-					"splashed with a %s Instant Health potion, with an additional effect of either Regen %s, " +
-					"%s Strength, %s Resistance, %s Speed, or %s Absorption with a %ss duration.",
-					HEAVENLY_BOON_RADIUS,
-					StringUtils.ticksToSeconds(MOB_EFFECT_DURATION),
-					BOSS_DAMAGE_THRESHOLD_R1,
-					BOSS_DAMAGE_THRESHOLD_R2,
-					BOSS_DAMAGE_THRESHOLD_R3,
-					StringUtils.multiplierToPercentageWithSign(HEAVENLY_BOON_1_CHANCE),
-					StringUtils.multiplierToPercentageWithSign(HEAVENLY_BOON_HEAL),
-					HEAVENLY_BOON_REGEN,
-					StringUtils.multiplierToPercentageWithSign(HEAVENLY_BOON_STRENGTH),
-					StringUtils.multiplierToPercentageWithSign(HEAVENLY_BOON_RESISTANCE),
-					StringUtils.multiplierToPercentageWithSign(HEAVENLY_BOON_SPEED),
-					StringUtils.multiplierToPercentageWithSign(HEAVENLY_BOON_ABSORPTION),
-					StringUtils.ticksToSeconds(HEAVENLY_BOON_DURATION_1)),
-				String.format(
-					"The chance to be splashed upon killing an undead mob is increased to %s. Boon generated " +
-					"potions now give %ss effect duration.",
-					StringUtils.multiplierToPercentageWithSign(HEAVENLY_BOON_2_CHANCE),
-					StringUtils.ticksToSeconds(HEAVENLY_BOON_DURATION_2)),
-				String.format(
-					"When a potion is created by this skill, decrease all other ability cooldowns of all players in " +
-					"the radius by %s (max %ss). Cooldown: %ss.",
-					StringUtils.multiplierToPercentageWithSign(ENHANCEMENT_CDR),
-					StringUtils.ticksToSeconds(ENHANCEMENT_CDR_CAP),
-					StringUtils.ticksToSeconds(ENHANCEMENT_COOLDOWN)))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Share all positive splash potion effects with nearby players and occasionally generate splash potions when killing Undead enemies.")
 			.cooldown(0, 0, ENHANCEMENT_COOLDOWN, CHARM_ENHANCE_COOLDOWN)
 			.displayItem(Material.SPLASH_POTION);
@@ -286,5 +257,50 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				}
 			}
 		}
+	}
+
+	// This one is kind of terrible so I just didn't include a bunch of stuff
+	private static Description<HeavenlyBoon> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Whenever you are hit with a positive splash potion, the effects are also given to other players within ")
+			.add(a -> a.mRadius, HEAVENLY_BOON_RADIUS)
+			.add(" blocks. In addition, whenever an undead mob you have hit within ")
+			.addDuration(MOB_EFFECT_DURATION)
+			.add(" seconds dies or you deal enough non-true damage to a boss (R1 " + BOSS_DAMAGE_THRESHOLD_R1 + "/R2 " + BOSS_DAMAGE_THRESHOLD_R2 + "/R3 " + BOSS_DAMAGE_THRESHOLD_R3 + "), you have a ")
+			.addPercent(a -> a.mChance, HEAVENLY_BOON_1_CHANCE, false, Ability::isLevelOne)
+			.add(" chance to be splashed with a ")
+			.addPercent(HEAVENLY_BOON_HEAL)
+			.add(" Instant Health potion, with an additional effect of either Regeneration ")
+			.addPotionAmplifier(HEAVENLY_BOON_REGEN)
+			.add(", ")
+			.addPercent(HEAVENLY_BOON_STRENGTH)
+			.add(" strength, ")
+			.addPercent(HEAVENLY_BOON_RESISTANCE)
+			.add(" resistance, ")
+			.addPercent(HEAVENLY_BOON_SPEED)
+			.add(" speed, or ")
+			.addPercent(HEAVENLY_BOON_ABSORPTION)
+			.add(" absorption with a ")
+			.addDuration(HEAVENLY_BOON_DURATION_1)
+			.add(" second duration.");
+	}
+
+	private static Description<HeavenlyBoon> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The chance to be splashed upon killing an undead mob is increased to ")
+			.addPercent(a -> a.mChance, HEAVENLY_BOON_2_CHANCE, false, Ability::isLevelTwo)
+			.add(". Boon generated potions now give ")
+			.addDuration(HEAVENLY_BOON_DURATION_2)
+			.add(" second effect duration.");
+	}
+
+	private static Description<HeavenlyBoon> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When a potion is created by this skill, decrease all other ability cooldowns of all players in the radius by ")
+			.addPercent(a -> a.mEnhanceCDR, ENHANCEMENT_CDR)
+			.add(" (max ")
+			.addDuration(a -> a.mEnhanceCDRCap, ENHANCEMENT_CDR_CAP)
+			.add(" seconds).")
+			.addCooldown(ENHANCEMENT_COOLDOWN, Ability::isEnhanced);
 	}
 }

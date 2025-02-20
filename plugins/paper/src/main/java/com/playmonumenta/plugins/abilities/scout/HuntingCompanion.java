@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.HuntingCompanionCS;
@@ -98,21 +100,7 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 					.linkedSpell(ClassAbility.HUNTING_COMPANION)
 					.scoreboardId("HuntingCompanion")
 					.shorthandName("HC")
-					.descriptions(
-							"Swap hands while holding a projectile weapon to summon an invulnerable fox companion. " +
-									"The fox attacks the nearest mob within " + DETECTION_RANGE + " blocks. " +
-									"The fox prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. " +
-									"The fox deals damage equal to " + (int) (100 * DAMAGE_FRACTION_1) + "% of your mainhand's projectile damage, amplified by both melee and projectile damage from gear. " +
-									"Once per mob, the fox stuns upon attack for " + STUN_TIME_1 / 20 + " seconds, except for elites and bosses. " +
-									"When a mob that was damaged by the fox dies, you heal " + (int) (HEALING_PERCENT * 100) + "% of your max health. " +
-									"The fox disappears after " + DURATION / 20 + " seconds. Triggering while on cooldown will clear the specified target. " +
-									"If used while in water, an axolotl is spawned instead, and if used while in lava, a strider is spawned instead. Cooldown: " + COOLDOWN / 20 + "s.",
-							"Damage is increased to " + (int) (100 * DAMAGE_FRACTION_2) + "% of your projectile damage and the stun time is increased to " + STUN_TIME_2 / 20 + " seconds.",
-							"Also summon an invulnerable eagle (parrot). " +
-									"The eagle deals the same damage as the fox and targets similarly, although the two will always avoid targeting the same mob at once. " +
-									"The eagle can swoop towards its target. " +
-									"The eagle applies " + (int) (BLEED_AMOUNT * 100) + "% Bleed for " + BLEED_DURATION / 20 + "s instead of stunning, which can be reapplied on a mob. " +
-									"If used in water, a dolphin is spawned instead.")
+					.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 					.simpleDescription("Summon a fox to help you fight and stun mobs.")
 					.cooldown(COOLDOWN, CHARM_COOLDOWN)
 					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HuntingCompanion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
@@ -134,7 +122,7 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 
 	public HuntingCompanion(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamageFraction = isLevelOne() ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2;
+		mDamageFraction = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2);
 		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, (isLevelOne() ? STUN_TIME_1 : STUN_TIME_2));
 		mBleedDuration = isEnhanced() ? CharmManager.getDuration(mPlayer, CHARM_BLEED_DURATION, BLEED_DURATION) : 0;
 		mBleedAmount = isEnhanced() ? BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER) : 0;
@@ -159,7 +147,6 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(inMainHand, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
-		damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
@@ -484,5 +471,40 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
+
+	private static Description<HuntingCompanion> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to summon a fox companion. The fox attacks the nearest mob within ")
+			.add(a -> DETECTION_RANGE, DETECTION_RANGE)
+			.add(" blocks. The fox prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The fox deals damage equal to ")
+			.addPercent(a -> a.mDamageFraction, DAMAGE_FRACTION_1, false, Ability::isLevelOne)
+			.add(" of your mainhand's projectile damage, amplified by both melee and projectile damage from gear. Once per mob, the fox stuns upon attack for ")
+			.addDuration(a -> a.mStunDuration, STUN_TIME_1, false, Ability::isLevelOne)
+			.add(" seconds, except for elites and bosses. When a mob that was damaged by the fox dies, you heal ")
+			.addPercent(a -> a.mHealingPercent, HEALING_PERCENT)
+			.add(" of your max health. The fox disappears after ")
+			.addDuration(a -> a.mMaxDuration, DURATION)
+			.add(" seconds. Triggering while on cooldown will clear the specified target. If used while in water, an axolotl is spawned instead, and if used while in lava, a strider is spawned instead.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<HuntingCompanion> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.addPercent(a -> a.mDamageFraction, DAMAGE_FRACTION_2, false, Ability::isLevelTwo)
+			.add(" of your projectile damage and the stun time is increased to ")
+			.addDuration(a -> a.mStunDuration, STUN_TIME_2, false, Ability::isLevelTwo)
+			.add(" seconds.");
+	}
+
+	private static Description<HuntingCompanion> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Also summon an invulnerable eagle companion (parrot). The eagle deals the same damage as the fox and targets similarly, although the two will always avoid targeting the same mob at once. The eagle can swoop towards its target. The eagle applies ")
+			.addPercent(a -> a.mBleedAmount, BLEED_AMOUNT)
+			.add(" bleed for ")
+			.addDuration(a -> a.mBleedDuration, BLEED_DURATION)
+			.add(" seconds instead of stunning, which can be reapplied on a mob. If used in water, a dolphin is spawned instead.");
 	}
 }

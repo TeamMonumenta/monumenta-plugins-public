@@ -263,8 +263,9 @@ public class SparkOfInspiration extends DepthsAbility {
 	}
 
 	private static Description<SparkOfInspiration> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<SparkOfInspiration>(color)
-			.add("Swap hands while looking at a player within ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger("looking at a player")
+			.add(" within ")
 			.add(a -> a.mRange, CAST_RANGE)
 			.add(" blocks to instantly heal both of you for 100% of your max HP and empower both of you for the next ")
 			.addDuration(a -> a.mBuffDuration, BUFF_DURATION[rarity - 1], false, true)

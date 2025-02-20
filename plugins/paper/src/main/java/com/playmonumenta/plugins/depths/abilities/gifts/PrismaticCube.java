@@ -43,7 +43,7 @@ public class PrismaticCube extends DepthsAbility {
 	}
 
 	private static Description<PrismaticCube> getDescription() {
-		return new DescriptionBuilder<PrismaticCube>().add("Replace one random active ability with a ")
+		return new DescriptionBuilder<>(() -> INFO).add("Replace one random active ability with a ")
 			.add(DepthsTree.PRISMATIC.getNameComponent())
 			.add(" ability.");
 	}

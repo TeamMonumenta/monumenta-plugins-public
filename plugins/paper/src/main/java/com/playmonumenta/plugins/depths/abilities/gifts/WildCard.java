@@ -23,6 +23,6 @@ public class WildCard extends DepthsAbility {
 	}
 
 	private static Description<WildCard> getDescription() {
-		return new DescriptionBuilder<WildCard>().add("Every time you enter a Wildcard room, upgrade a random ability by one level.");
+		return new DescriptionBuilder<>(() -> INFO).add("Every time you enter a Wildcard room, upgrade a random ability by one level.");
 	}
 }

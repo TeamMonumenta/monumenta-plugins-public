@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.ShieldWallCS;
@@ -19,7 +21,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,22 +59,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 					.linkedSpell(ClassAbility.SHIELD_WALL)
 					.scoreboardId("ShieldWall")
 					.shorthandName("SW")
-					.descriptions(
-							String.format("Press the swap key while holding a shield in either hand to create a %s degree arc of particles from 1 block below to %s blocks above the user's location and with a %s block radius in front of the user. " +
-											"Enemies that pass through the wall are dealt %s melee damage and knocked back. The wall also blocks all enemy projectiles such as arrows or fireballs. The wall lasts %s seconds. The wall moves along with the user. Triggering again while active makes the wall stationary at the same location for the remainder of the duration, with radius increased to %s blocks. Cooldown: %ss.",
-									SHIELD_WALL_ANGLE,
-									SHIELD_WALL_HEIGHT,
-									SHIELD_WALL_RADIUS,
-									SHIELD_WALL_DAMAGE,
-									StringUtils.ticksToSeconds(SHIELD_WALL_1_DURATION),
-									SHIELD_WALL_RADIUS_STATIONARY,
-									StringUtils.ticksToSeconds(SHIELD_WALL_1_COOLDOWN)
-							),
-							String.format("The shield lasts %s seconds instead. Cooldown: %ss.",
-									StringUtils.ticksToSeconds(SHIELD_WALL_2_DURATION),
-									StringUtils.ticksToSeconds(SHIELD_WALL_2_COOLDOWN)
-							)
-					)
+					.descriptions(getDescription1(), getDescription2())
 					.simpleDescription("Deploy a wall that can block projectiles and mobs from entering.")
 					.cooldown(SHIELD_WALL_1_COOLDOWN, SHIELD_WALL_2_COOLDOWN, CHARM_COOLDOWN)
 					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", shieldWall -> shieldWall.cast(false), new AbilityTrigger(AbilityTrigger.Key.SWAP),
@@ -206,5 +192,32 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
+
+	private static Description<ShieldWall> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to create a ")
+			.add(a -> a.mAngle, SHIELD_WALL_ANGLE)
+			.add(" degree arc of particles from 1 block below to ")
+			.add(a -> a.mHeight, SHIELD_WALL_HEIGHT)
+			.add(" blocks above the user's location and with a ")
+			.add(a -> a.mRadius, SHIELD_WALL_RADIUS)
+			.add(" block radius in front of the user. Enemies that pass through the wall are dealt ")
+			.add(a -> a.mDamage, SHIELD_WALL_DAMAGE)
+			.add(" melee damage and knocked back. The wall also blocks all enemy projectiles. The wall lasts ")
+			.addDuration(a -> a.mDuration, SHIELD_WALL_1_DURATION, false, Ability::isLevelOne)
+			.add(" seconds and moves along with the user. Triggering again while active makes the wall stationary at the same location for the remainder of the duration, with radius increased to ")
+			.add(a -> a.mRadiusStationary, SHIELD_WALL_RADIUS_STATIONARY)
+			.add(" blocks.")
+			.addCooldown(SHIELD_WALL_1_COOLDOWN, Ability::isLevelOne);
+	}
+
+	private static Description<ShieldWall> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The shield wall lasts ")
+			.addDuration(a -> a.mDuration, SHIELD_WALL_2_DURATION, false, Ability::isLevelTwo)
+			.add(" seconds instead.")
+			.addCooldown(SHIELD_WALL_2_COOLDOWN, Ability::isLevelTwo);
 	}
 }

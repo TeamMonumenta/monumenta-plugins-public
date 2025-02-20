@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.IlluminateCS;
@@ -19,7 +21,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashSet;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -70,36 +71,7 @@ public class Illuminate extends Ability {
 			.linkedSpell(ClassAbility.ILLUMINATE)
 			.scoreboardId("Illuminate")
 			.shorthandName("IL")
-			.descriptions(
-				String.format("Pressing the drop key will fire a holy projectile that travels for %s blocks, " +
-					"leaving behind a %s-block wide trail that lasts for %ss and grants +%s%% Speed to all players inside it. " +
-					"Buffs linger for %ss upon leaving the area. " +
-					"Upon hitting a mob, block, or reaching its max distance, the projectile explodes, dealing %s magic damage " +
-					"in a %s-block radius to all mobs and knocking them away. Cooldown: %ss.",
-					StringUtils.formatDecimal(ILLUMINATE_MAX_RANGE),
-					StringUtils.formatDecimal(ILLUMINATE_TRAIL_WIDTH),
-					StringUtils.ticksToSeconds(ILLUMINATE_TRAIL_DURATION_1),
-					StringUtils.multiplierToPercentage(ILLUMINATE_SPEED_BUFF),
-					StringUtils.ticksToSeconds(ILLUMINATE_BUFF_DURATION),
-					StringUtils.formatDecimal(ILLUMINATE_DAMAGE_1),
-					StringUtils.formatDecimal(ILLUMINATE_RADIUS),
-					StringUtils.ticksToSeconds(COOLDOWN_1)
-				),
-				String.format("The damage is increased from %s to %s, and the trail's duration is increased from %ss to %ss. " +
-					"Additionally, players within the trail also gain +%s%% Strength. Cooldown: %ss.",
-					StringUtils.formatDecimal(ILLUMINATE_DAMAGE_1),
-					StringUtils.formatDecimal(ILLUMINATE_DAMAGE_2),
-					StringUtils.ticksToSeconds(ILLUMINATE_TRAIL_DURATION_1),
-					StringUtils.ticksToSeconds(ILLUMINATE_TRAIL_DURATION_2),
-					StringUtils.multiplierToPercentage(ILLUMINATE_STRENGTH_BUFF),
-					StringUtils.ticksToSeconds(COOLDOWN_2)
-				),
-				String.format("A sanctified area is placed wherever Illuminate explodes, granting the same effects as the trail within a %s-block radius and lasting for the same duration. " +
-					"Enemies within Illuminate's trail take %s magic damage every %ss.",
-					StringUtils.formatDecimal(ILLUMINATE_ENHANCE_RADIUS),
-					StringUtils.formatDecimal(ILLUMINATE_ENHANCE_DAMAGE),
-					StringUtils.ticksToSeconds(ILLUMINATE_ENHANCE_COOLDOWN)
-				))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Fire an explosive projectile forwards while leaving behind a trail that buffs allies.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Illuminate::cast, new AbilityTrigger(AbilityTrigger.Key.DROP)))
@@ -316,5 +288,49 @@ public class Illuminate extends Ability {
 		if (mSanctifiedZoneRunnable != null && !mSanctifiedZoneRunnable.isCancelled()) {
 			mSanctifiedZoneRunnable.cancel();
 		}
+	}
+
+	private static Description<Illuminate> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to fire a holy projectile that travels for ")
+			.add(a -> a.mMaxRange, ILLUMINATE_MAX_RANGE)
+			.add(" blocks, leaving behind a ")
+			.add(a -> a.mTrailWidth, ILLUMINATE_TRAIL_WIDTH)
+			.add(" block wide trail that lasts for ")
+			.addDuration(a -> a.mTrailDuration, ILLUMINATE_TRAIL_DURATION_1, false, Ability::isLevelOne)
+			.add(" seconds and grants ")
+			.addPercent(a -> a.mSpeedBuff, ILLUMINATE_SPEED_BUFF)
+			.add(" speed to all players inside it. Buffs linger for ")
+			.addDuration(ILLUMINATE_BUFF_DURATION)
+			.add(" seconds upon leaving the area. Upon hitting a mob, block, or reaching its max distance, the projectile explodes, dealing ")
+			.add(a -> a.mDamage, ILLUMINATE_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage to mobs within ")
+			.add(a -> a.mRadius, ILLUMINATE_RADIUS)
+			.add(" blocks and knocking them away.")
+			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+	}
+
+	private static Description<Illuminate> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage is increased to ")
+			.add(a -> a.mDamage, ILLUMINATE_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(", and the trail's duration is increased to ")
+			.addDuration(a -> a.mTrailDuration, ILLUMINATE_TRAIL_DURATION_2, false, Ability::isLevelTwo)
+			.add(" seconds. Additionally, players within the trail also gain ")
+			.addPercent(a -> a.mStrengthBuff, ILLUMINATE_STRENGTH_BUFF)
+			.add(" strength.")
+			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+	}
+
+	private static Description<Illuminate> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("A sanctified area is placed wherever Illuminate explodes, granting the same effects as the trail within a ")
+			.add(a -> a.mEnhanceRadius, ILLUMINATE_ENHANCE_RADIUS)
+			.add(" block radius and lasting for the same duration. Enemies within Illuminate's trail take ")
+			.add(a -> a.mEnhanceDamage, ILLUMINATE_ENHANCE_DAMAGE)
+			.add(" magic damage every ")
+			.addDuration(ILLUMINATE_ENHANCE_COOLDOWN)
+			.add(" second.");
 	}
 }

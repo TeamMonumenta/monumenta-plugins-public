@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -54,18 +57,16 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			.linkedSpell(ClassAbility.TACTICAL_MANEUVER)
 			.scoreboardId("TacticalManeuver")
 			.shorthandName("TM")
-			.descriptions(
-				String.format("Press the drop key while not sneaking to dash forward, dealing %d damage to the first enemy hit, and stunning it and all enemies in a %d block radius for %d second. " +
-					              "Press the drop key while sneaking to leap backwards, dealing %d damage to enemies in a %d block radius and knocking them away. " +
-					              "Cooldown: %ds. Charges: %d.",
-					TACTICAL_DASH_DAMAGE, TACTICAL_MANEUVER_RADIUS, TACTICAL_DASH_STUN_DURATION / 20, TACTICAL_LEAP_DAMAGE, TACTICAL_MANEUVER_RADIUS, TACTICAL_MANEUVER_1_COOLDOWN / 20, TACTICAL_MANEUVER_1_MAX_CHARGES),
-				String.format("Cooldown: %ds. Charges: %d.", TACTICAL_MANEUVER_2_COOLDOWN / 20, TACTICAL_MANEUVER_2_MAX_CHARGES))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Dash forward and stun nearby mobs. While sneaking, dash backwards and knock away nearby mobs.")
 			.cooldown(TACTICAL_MANEUVER_1_COOLDOWN, TACTICAL_MANEUVER_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("castForward", "dash forwards", tm -> tm.cast(true), new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false)))
 			.addTrigger(new AbilityTriggerInfo<>("castBackwards", "leap backwards", tm -> tm.cast(false), new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true)))
 			.displayItem(Material.STRING);
 
+	private final double mDamage;
+	private final double mRadius;
+	private final int mDuration;
 	private int mLastCastTicks = 0;
 	private @Nullable SwiftCuts mSwiftCuts;
 	private final TacticalManeuverCS mCosmetic;
@@ -74,6 +75,9 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		super(plugin, player, INFO);
 		mMaxCharges = (isLevelOne() ? TACTICAL_MANEUVER_1_MAX_CHARGES : TACTICAL_MANEUVER_2_MAX_CHARGES) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_LEAP_DAMAGE);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TACTICAL_MANEUVER_RADIUS);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TACTICAL_DASH_STUN_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TacticalManeuverCS());
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -100,8 +104,6 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			cooldown = (int) (cooldown * (1 - mSwiftCuts.getTacticalManeuverCDR()));
 		}
 		putOnCooldown(cooldown);
-
-		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TACTICAL_MANEUVER_RADIUS);
 
 		World world = mPlayer.getWorld();
 		if (forwards) {
@@ -138,10 +140,9 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 					LivingEntity le = EntityUtils.getNearestMob(mPlayer.getLocation(), 2);
 					if (le != null) {
-						DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_DASH_DAMAGE), mInfo.getLinkedSpell(), true);
-						int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TACTICAL_DASH_STUN_DURATION);
-						for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), radius)) {
-							EntityUtils.applyStun(mPlugin, duration, e);
+						DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
+						for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), mRadius)) {
+							EntityUtils.applyStun(mPlugin, mDuration, e);
 						}
 						mCosmetic.maneuverHitEffect(world, mPlayer);
 
@@ -152,8 +153,8 @@ public class TacticalManeuver extends MultipleChargeAbility {
 				}
 			}.runTaskTimer(mPlugin, 0, 1));
 		} else {
-			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius, mPlayer)) {
-				DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_LEAP_DAMAGE), mInfo.getLinkedSpell(), true);
+			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius, mPlayer)) {
+				DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
 				MovementUtils.knockAway(mPlayer, le, TACTICAL_LEAP_KNOCKBACK_SPEED);
 			}
 
@@ -163,5 +164,34 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			mPlayer.setVelocity(vel);
 		}
 		return true;
+	}
+
+	private static Description<TacticalManeuver> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger(0)
+			.add(" to dash forward, dealing ")
+			.add(a -> a.mDamage, TACTICAL_DASH_DAMAGE)
+			.add(" damage to the first enemy hit, and stunning it and all enemies within ")
+			.add(a -> a.mRadius, TACTICAL_MANEUVER_RADIUS)
+			.add("blocks for ")
+			.addDuration(a -> a.mDuration, TACTICAL_DASH_STUN_DURATION)
+			.add(" second. ")
+			.addTrigger(1)
+			.add(" to leap backwards, dealing ")
+			.add(a -> a.mDamage, TACTICAL_DASH_DAMAGE)
+			.add(" damage to enemies within ")
+			.add(a -> a.mRadius, TACTICAL_MANEUVER_RADIUS)
+			.add(" blocks and knocking them away. Charges: ")
+			.add(a -> a.mMaxCharges, TACTICAL_MANEUVER_1_MAX_CHARGES, false, Ability::isLevelOne)
+			.add(".")
+			.addCooldown(TACTICAL_MANEUVER_1_COOLDOWN, Ability::isLevelOne);
+	}
+
+	private static Description<TacticalManeuver> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Charges: ")
+			.add(a -> a.mMaxCharges, TACTICAL_MANEUVER_2_MAX_CHARGES, false, Ability::isLevelTwo)
+			.add(".")
+			.addCooldown(TACTICAL_MANEUVER_2_COOLDOWN, Ability::isLevelTwo);
 	}
 }

@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -56,19 +59,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 			.linkedSpell(ClassAbility.BODKIN_BLITZ)
 			.scoreboardId("BodkinBlitz")
 			.shorthandName("BB")
-			.descriptions(
-				String.format("Sneak right click while holding two swords to teleport %s blocks forwards. Gain %s second of Stealth upon teleporting. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. Cooldown: %ss. Charges: %s.",
-					DISTANCE_1,
-					STEALTH_DURATION_1 / 20,
-					BONUS_DMG_1,
-					COOLDOWN_1 / 20,
-					MAX_CHARGES
-				),
-				String.format("Range increased to %s blocks, Stealth increased to %s seconds. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. Cooldown: %ss.",
-					DISTANCE_2,
-					STEALTH_DURATION_2 / 20.0,
-					BONUS_DMG_2,
-					COOLDOWN_2 / 20))
+			.descriptions(getDescription1(), getDescritpion2())
 			.simpleDescription("Teleport forward, gaining momentary stealth and bonus melee damage.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BodkinBlitz::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true),
@@ -77,6 +68,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 	private final int mStealthDuration;
 	private final double mBonusDmg;
+	private final double mDistance;
 
 	private @Nullable BukkitRunnable mRunnable = null;
 	private boolean mTeleporting = false;
@@ -92,6 +84,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 		mStealthDuration = CharmManager.getDuration(player, CHARM_STEALTH, (isLevelOne() ? STEALTH_DURATION_1 : STEALTH_DURATION_2));
 		mBonusDmg = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2);
+		mDistance = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BodkinBlitzCS());
 	}
 
@@ -118,7 +111,6 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		cancelOnDeath(new BukkitRunnable() {
 			final BoundingBox mPlayerBox = mPlayer.getBoundingBox();
 			final Vector mDirection = mPlayer.getLocation().getDirection().normalize();
-			final double mDistance = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
 			final double mDistancePerTick = mDistance / TELEPORT_TICKS;
 			int mTick = 0;
 			Location mLastTpLoc = mPlayer.getLocation();
@@ -210,4 +202,30 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		return false; // already prevents multiple calls by clearing mRunnable
 	}
 
+	private static Description<BodkinBlitz> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			       .addTrigger()
+			       .add(" to teleport ")
+			       .add(a -> a.mDistance, DISTANCE_1, false, Ability::isLevelOne)
+			       .add(" blocks forwards. Upon teleporting, you gain ")
+			       .add(a -> a.mStealthDuration, STEALTH_DURATION_1, false, Ability::isLevelOne)
+			       .add(" second of Stealth and your next melee attack deals ")
+			       .add(a -> a.mBonusDmg, BONUS_DMG_1, false, Ability::isLevelOne)
+			       .add(" bonus damage if your target is not focused on you. Charges: ")
+			       .add(a -> a.mMaxCharges, MAX_CHARGES)
+			       .add(".")
+			       .addCooldown(COOLDOWN_1, Ability::isLevelOne);
+	}
+
+	private static Description<BodkinBlitz> getDescritpion2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			       .add("Range is increased to ")
+			       .add(a -> a.mDistance, DISTANCE_2, false, Ability::isLevelTwo)
+			       .add(" blocks, Stealth duration is increased to ")
+			       .addDuration(a -> a.mStealthDuration, STEALTH_DURATION_2, false, Ability::isLevelOne)
+			       .add(" seconds, and bonus damage is increased to ")
+			       .add(a -> a.mBonusDmg, BONUS_DMG_2, false, Ability::isLevelTwo)
+			       .add(".")
+			       .addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+	}
 }

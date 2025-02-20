@@ -40,7 +40,7 @@ public class NorthernStar extends DepthsAbility {
 	}
 
 	private static Description<NorthernStar> getDescription() {
-		return new DescriptionBuilder<NorthernStar>().add("The next " + STACKS + " elite rooms offer an additional reward.")
+		return new DescriptionBuilder<>(() -> INFO).add("The next " + STACKS + " elite rooms offer an additional reward.")
 			.add((a, p) -> a != null && a.mDepthsPlayer != null
 				? Component.text("\nRemaining rewards: " + a.mDepthsPlayer.mNorthernStarStacks)
 				: Component.empty());

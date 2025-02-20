@@ -67,7 +67,7 @@ public class Pyromania extends DepthsAbility {
 	}
 
 	private static Description<Pyromania> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Pyromania>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("For every mob and player on fire (up to 10, total) within ")
 			.add(a -> a.mRadius, rarity == 6 ? TWISTED_RADIUS : RADIUS, false, null, rarity == 6)
 			.add(" blocks of you, gain ")

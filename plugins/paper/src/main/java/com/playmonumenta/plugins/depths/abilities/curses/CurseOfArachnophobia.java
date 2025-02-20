@@ -49,7 +49,7 @@ public class CurseOfArachnophobia extends DepthsAbility {
 	}
 
 	private static Description<CurseOfArachnophobia> getDescription() {
-		return new DescriptionBuilder<CurseOfArachnophobia>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Deal ")
 			.addPercent(DAMAGE_DEALT)
 			.add(" less to and take ")

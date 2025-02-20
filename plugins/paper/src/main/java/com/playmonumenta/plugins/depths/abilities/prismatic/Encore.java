@@ -196,8 +196,9 @@ public class Encore extends DepthsAbility {
 	}
 
 	private static Description<Encore> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Encore>(color)
-			.add("Left click while sneaking to cause the next active ability you cast to be recast at no cooldown cost ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to cause the next active ability you cast to be recast at no cooldown cost ")
 			.addDuration(DELAY)
 			.add(" seconds later.")
 			.addCooldown(COOLDOWN[rarity - 1], true);

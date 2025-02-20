@@ -185,8 +185,9 @@ public class Fireball extends DepthsAbility {
 	}
 
 	private static Description<Fireball> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Fireball>(color)
-			.add("Right click to throw a fireball in the direction you are facing. When the fireball collides with a surface or enemy, it explodes, dealing ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to throw a fireball in the direction you are facing. When the fireball collides with a surface or enemy, it explodes, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage and sets enemies ablaze for ")
 			.addDuration(a -> a.mFireDuration, FIRE_TICKS)

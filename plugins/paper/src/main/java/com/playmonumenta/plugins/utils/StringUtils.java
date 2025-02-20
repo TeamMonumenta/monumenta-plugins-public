@@ -278,6 +278,10 @@ public class StringUtils {
 		return ticksToSeconds((int) ticks);
 	}
 
+	public static String ticksToMinutes(double ticks) {
+		return to2DP(ticks / 1200d);
+	}
+
 	// Converts to 2dp with no trailing zeros, for display purposes
 	public static String to2DP(double value) {
 		return new DecimalFormat("#.##").format(value);

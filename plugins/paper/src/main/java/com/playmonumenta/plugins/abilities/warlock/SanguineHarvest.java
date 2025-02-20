@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.SanguineHarvestCS;
@@ -19,7 +21,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,28 +62,18 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	public static final String CHARM_HEAL = "Sanguine Harvest Healing";
 	public static final String CHARM_KNOCKBACK = "Sanguine Harvest Knockback";
 	public static final String CHARM_BLEED = "Sanguine Harvest Bleed Amplifier";
+	public static final String CHARM_BLEED_DURATION = "Sanguine Harvest Bleed Duration";
 	public static final String CHARM_DAMAGE_BOOST = "Sanguine Harvest Damage Boost Amplifier";
+	public static final String CHARM_BLIGHT_DURATION = "Sanguine Harvest Blight Duration";
+	public static final String CHARM_BLIGHT_VULN_PER_DEBUFF = "Sanguine Harvest Blight Vulnerability Per Debuff";
 
 	public static final AbilityInfo<SanguineHarvest> INFO =
-		new AbilityInfo<>(SanguineHarvest.class, "Sanguine Harvest", SanguineHarvest::new)
-			.linkedSpell(ClassAbility.SANGUINE_HARVEST)
-			.scoreboardId("SanguineHarvest")
-			.shorthandName("SH")
-			.actionBarColor(TextColor.color(179, 0, 0))
-			.descriptions(
-				("Enemies you damage with an ability are afflicted with Bleed II for %s seconds. " +
-					"Bleed gives mobs 10%% Slowness and 10%% Weaken per level if the mob is below 50%% Max Health. " +
-					"Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. " +
-					"This projectile travels up to %s blocks and upon contact with a block or enemy or reaching max range, it explodes, " +
-					"knocking back all mobs within %s blocks and applying a blood mark to them for %ss. " +
-					"Any player that kills a marked mob is healed for %s%% of max health. Cooldown: %ss.")
-					.formatted(StringUtils.ticksToSeconds(BLEED_DURATION), RANGE, RADIUS, StringUtils.ticksToSeconds(MARK_DURATION), StringUtils.multiplierToPercentage(HEAL_PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN)),
-				("Increase the mark's healing to %s%% of max health. " +
-					"Melee attacks against marked mobs heal the player for %s%% of their max health, deal %s%% more damage, and consume the mark.")
-					.formatted(StringUtils.multiplierToPercentage(HEAL_PERCENT_2), StringUtils.multiplierToPercentage(HEAL_PERCENT_2), StringUtils.multiplierToPercentage(DAMAGE_BOOST)),
-				("Sanguine Harvest creates a %s-block cone of blight on the ground that lasts for %ss. " +
-					"Mobs in the blighted area take %s%% extra damage per debuff they currently have. Blight is not counted as a debuff.")
-					.formatted(RANGE, StringUtils.ticksToSeconds(ENHANCEMENT_BLIGHT_DURATION), StringUtils.multiplierToPercentage(ENHANCEMENT_DMG_INCREASE)))
+			new AbilityInfo<>(SanguineHarvest.class, "Sanguine Harvest", SanguineHarvest::new)
+					.linkedSpell(ClassAbility.SANGUINE_HARVEST)
+					.scoreboardId("SanguineHarvest")
+					.shorthandName("SH")
+					.actionBarColor(TextColor.color(179, 0, 0))
+					.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Passively apply Bleed with your abilities. Activate to mark mobs, healing whoever kills them.")
 			.quest216Message("-------s-------m-------")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
@@ -91,13 +82,17 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 			.displayItem(Material.NETHER_STAR);
 
 	private final double mRadius;
-	private final double mBleedLevel;
 	private final double mHealPercent;
 	private final double mDamageBoost;
+	private final double mBleedLevel;
+	private final int mBleedDuration;
+	private final double mRange;
+	private final int mBlightDuration;
+	private final double mBlightVulnPerDebuff;
 
 	private int mCurrDuration = -1;
 
-	private final ArrayList<Location> mMarkedLocations = new ArrayList<>(); // To mark locations (Even if block is not replaced)
+	private final List<Location> mMarkedLocations = new ArrayList<>(); // To mark locations (Even if block is not replaced)
 
 	private final SanguineHarvestCS mCosmetic;
 
@@ -107,6 +102,10 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 		mHealPercent = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
 		mDamageBoost = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE_BOOST) + DAMAGE_BOOST;
 		mBleedLevel = CharmManager.getLevelPercentDecimal(player, CHARM_BLEED) + BLEED_LEVEL;
+		mBleedDuration = CharmManager.getDuration(mPlayer, CHARM_BLEED_DURATION, BLEED_DURATION);
+		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
+		mBlightDuration = CharmManager.getDuration(mPlayer, CHARM_BLIGHT_DURATION, ENHANCEMENT_BLIGHT_DURATION);
+		mBlightVulnPerDebuff = ENHANCEMENT_DMG_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLIGHT_VULN_PER_DEBUFF);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SanguineHarvestCS());
 	}
 
@@ -122,14 +121,12 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 		World world = mPlayer.getWorld();
 		mCosmetic.onCast(world, loc);
 
-		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-
 		if (isEnhanced()) {
 			mMarkedLocations.clear();
 			mCosmetic.onEnhancementCast(mPlayer, mPlayer.getLocation());
 			Vector v;
 			for (double degree = -40; degree < 40; degree += 10) {
-				for (double r = 0; r <= range; r += 0.55) {
+				for (double r = 0; r <= mRange; r += HITBOX_LENGTH) {
 					double radian = Math.toRadians(degree);
 					v = new Vector(Math.cos(radian) * r, 0, Math.sin(radian) * r);
 					v = VectorUtils.rotateZAxis(v, mPlayer.getLocation().getPitch());
@@ -172,12 +169,12 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 			}
 		}
 
-		RayTraceResult result = world.rayTrace(loc, direction, range, FluidCollisionMode.NEVER, true, 0.425,
+		RayTraceResult result = world.rayTrace(loc, direction, mRange, FluidCollisionMode.NEVER, true, 0.425,
 			e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
 
 		Location endLoc;
 		if (result == null) {
-			endLoc = loc.clone().add(direction.multiply(range));
+			endLoc = loc.clone().add(direction.multiply(mRange));
 		} else {
 			endLoc = result.getHitPosition().toLocation(world);
 		}
@@ -203,7 +200,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 		if (event.getAbility() == null || event.getAbility().isFake()) {
 			return false;
 		}
-		EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel, enemy);
+		EntityUtils.applyBleed(mPlugin, mBleedDuration, mBleedLevel, enemy);
 		return false; // applies bleed on damage to all mobs hit, causes no recursion
 	}
 
@@ -215,7 +212,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 
 				@Override
 				public void run() {
-					if (mTicks > ENHANCEMENT_BLIGHT_DURATION || mMarkedLocations.isEmpty()) {
+					if (mTicks > mBlightDuration || mMarkedLocations.isEmpty()) {
 						mMarkedLocations.clear();
 						this.cancel();
 						return;
@@ -229,7 +226,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 							List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(location, 1);
 							for (LivingEntity mob : nearbyMobs) {
 								if (mob.getBoundingBox().overlaps(boundingBox)) {
-									mPlugin.mEffectManager.addEffect(mob, BLIGHT_EFFECT_NAME, new SanguineHarvestBlight(20, ENHANCEMENT_DMG_INCREASE, mPlugin));
+									mPlugin.mEffectManager.addEffect(mob, BLIGHT_EFFECT_NAME, new SanguineHarvestBlight(20, mBlightVulnPerDebuff, mPlugin));
 								}
 							}
 						}
@@ -253,11 +250,51 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 
 	@Override
 	public int getInitialAbilityDuration() {
-		return isEnhanced() ? ENHANCEMENT_BLIGHT_DURATION : 0;
+		return isEnhanced() ? mBlightDuration : 0;
 	}
 
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 && isEnhanced() ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
+
+	private static Description<SanguineHarvest> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Mobs you damage with an ability are afflicted with ")
+			.addPercent(a -> a.mBleedLevel, BLEED_LEVEL)
+			.add(" Bleed for ")
+			.addDuration(a -> a.mBleedDuration, BLEED_DURATION)
+			.add(" seconds. ")
+			.addTrigger()
+			.add(" to fire a burst of darkness which travels up to ")
+			.add(a -> a.mRange, RANGE)
+			.add(" blocks. Upon reaching max range or contacting a block or mob, it explodes, knocking back all mobs within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks and applying a blood mark to them for ")
+			.addDuration(MARK_DURATION)
+			.add(" seconds. Any player that kills a marked mob is healed for ")
+			.addPercent(a -> a.mHealPercent, HEAL_PERCENT_1, false, Ability::isLevelOne)
+			.add(" max health.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<SanguineHarvest> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Healing from marked mobs is increased to")
+			.addPercent(a -> a.mHealPercent, HEAL_PERCENT_2, false, Ability::isLevelTwo)
+			.add(" max health. Additionally, melee attacks against marked mobs heal the player for the full amount, deal ")
+			.addPercent(a -> a.mDamageBoost, DAMAGE_BOOST)
+			.add(" more damage, and consume the mark.");
+	}
+
+	private static Description<SanguineHarvest> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When cast, a ")
+			.add(a -> a.mRange, RANGE)
+			.add(" block cone of blight is created on the ground which lasts for ")
+			.add(a -> a.mBlightDuration, ENHANCEMENT_BLIGHT_DURATION)
+			.add(" seconds. Mobs in the blighted area take ")
+			.addPercent(a -> a.mBlightVulnPerDebuff, ENHANCEMENT_DMG_INCREASE)
+			.add(" extra damage per debuff they currently have. Blight is not counted as a debuff.");
 	}
 }

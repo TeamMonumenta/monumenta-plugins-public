@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -35,8 +38,8 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	private static final float BLADE_KNOCKBACK = 0.4f;
 	private static final double BLADE_WEAKEN = 0.3;
 	private static final double BLADE_SLOWNESS = 0.2;
-	private static final int BLADE_1_DURATION = 3 * 20;
-	private static final int BLADE_2_DURATION = 15;
+	private static final int DEBUFF_DURATION = 3 * 20;
+	private static final int STUN_DURATION = 15;
 	private static final double THROW_RADIUS = 3;
 	private static final double BLADE_RADIUS = 1;
 	private static final int BLADE_MAX_CHARGES = 2;
@@ -49,8 +52,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	public static final String CHARM_COOLDOWN = "Whirling Blade Cooldown";
 	public static final String CHARM_WEAKEN = "Whirling Blade Weakness Amplifier";
 	public static final String CHARM_SLOWNESS = "Whirling Blade Slowness Amplifier";
-	public static final String CHARM_WEAKEN_DURATION = "Whirling Blade Weakness Duration";
-	public static final String CHARM_SLOWNESS_DURATION = "Whirling Blade Slowness Duration";
+	public static final String CHARM_DURATION = "Whirling Blade Debuff Duration";
 	public static final String CHARM_STUN_DURATION = "Whirling Blade Stun Duration";
 
 	public static final AbilityInfo<WhirlingBlade> INFO =
@@ -59,11 +61,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 			.scoreboardId("WhirlingBlade")
 			.shorthandName("WB")
 			.hotbarName("Whrl")
-			.descriptions(
-				"Swap hands while holding a melee weapon to throw a whirling blade that circles around you, " +
-					"knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits within a radius of " + (THROW_RADIUS + BLADE_RADIUS) + " and inflicts " + (int) (100 * BLADE_WEAKEN) + "% weakness and " + (int) (100 * BLADE_SLOWNESS) + "% slowness for " + BLADE_1_DURATION / 20 + "s. " +
-					"Cooldown: " + BLADE_COOLDOWN / 20 + "s. Charges: " + BLADE_MAX_CHARGES + ".",
-				"The damage is increased to " + BLADE_2_DAMAGE + " and also stun for " + BLADE_2_DURATION / 20.0 + "s.")
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Damage, weaken, and knock nearby mobs back.")
 			.cooldown(BLADE_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WhirlingBlade::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP)
@@ -72,6 +70,12 @@ public class WhirlingBlade extends MultipleChargeAbility {
 
 	private final double mDamage;
 	private final float mKnockback;
+	private final double mThrowRadius;
+	private final double mBladeRadius;
+	private final double mWeaken;
+	private final double mSlow;
+	private final int mDuration;
+	private final int mStunDuration;
 	private @Nullable SwiftCuts mSwiftCuts;
 
 	private int mLastCastTicks = 0;
@@ -82,6 +86,12 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? BLADE_1_DAMAGE : BLADE_2_DAMAGE);
 		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, BLADE_KNOCKBACK);
+		mThrowRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, THROW_RADIUS);
+		mBladeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BLADE_RADIUS);
+		mWeaken = BLADE_WEAKEN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
+		mSlow = BLADE_SLOWNESS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DEBUFF_DURATION);
+		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, STUN_DURATION);
 		mMaxCharges = BLADE_MAX_CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
 
@@ -100,26 +110,19 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		}
 		mLastCastTicks = ticks;
 
-		double throwRad = CharmManager.getRadius(mPlayer, CHARM_RADIUS, THROW_RADIUS);
-		double bladeRad = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BLADE_RADIUS);
+		double throwRad = mThrowRadius;
+		double bladeRad = mBladeRadius;
 		double dmg = mDamage;
 
 		if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
-			double charmBuff = (1 + CharmManager.getLevelPercentDecimal(mPlayer, SwiftCuts.CHARM_ENHANCE));
-			throwRad *= (1 + SwiftCuts.WHIRLING_BLADE_BUFF * charmBuff);
-			bladeRad *= (1 + SwiftCuts.WHIRLING_BLADE_BUFF * charmBuff);
-			dmg *= (1 + SwiftCuts.WHIRLING_BLADE_BUFF * charmBuff);
+			throwRad *= mSwiftCuts.getWhirlingBladeBuff();
+			bladeRad *= mSwiftCuts.getWhirlingBladeBuff();
+			dmg *= mSwiftCuts.getWhirlingBladeBuff();
 		}
 
 		double throwRadius = throwRad;
 		double bladeRadius = bladeRad;
 		double damage = dmg;
-
-		double weakenAmount = BLADE_WEAKEN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
-		double slowAmount = BLADE_SLOWNESS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
-		int weakenDuration = CharmManager.getDuration(mPlayer, CHARM_WEAKEN_DURATION, BLADE_1_DURATION);
-		int slownessDuration = CharmManager.getDuration(mPlayer, CHARM_SLOWNESS_DURATION, BLADE_1_DURATION);
-		int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, BLADE_2_DURATION);
 
 		final World mWorld = mPlayer.getWorld();
 		final Location mLoc = mPlayer.getEyeLocation().add(0, -0.5, 0);
@@ -156,11 +159,11 @@ public class WhirlingBlade extends MultipleChargeAbility {
 					if (mBox1.overlaps(mob.getBoundingBox()) || mBox2.overlaps(mob.getBoundingBox()) || mBox3.overlaps(mob.getBoundingBox())) {
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.getLinkedSpell(), true);
 						MovementUtils.knockAway(mPlayer, mob, mKnockback, true);
-						EntityUtils.applyWeaken(mPlugin, weakenDuration, weakenAmount, mob);
-						EntityUtils.applySlow(mPlugin, slownessDuration, slowAmount, mob);
+						EntityUtils.applyWeaken(mPlugin, mDuration, mWeaken, mob);
+						EntityUtils.applySlow(mPlugin, mDuration, mSlow, mob);
 						mCosmetic.hitMob(mPlayer, mob.getLocation(), mWorld);
 						if (isLevelTwo()) {
-							EntityUtils.applyStun(mPlugin, stunDuration, mob);
+							EntityUtils.applyStun(mPlugin, mStunDuration, mob);
 						}
 						mobIter.remove();
 					}
@@ -178,5 +181,33 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		}.runTaskTimer(mPlugin, 0, 1));
 
 		return true;
+	}
+
+	private static Description<WhirlingBlade> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to throw a whirling blade that circles around you, knocking back and dealing ")
+			.add(a -> a.mDamage, BLADE_1_DAMAGE, false, Ability::isLevelOne)
+			.add(" melee damage to enemies it hits within a radius of ")
+			.add(a -> a.mThrowRadius + a.mBladeRadius, THROW_RADIUS + BLADE_RADIUS)
+			.add(" and inflicts ")
+			.addPercent(a -> a.mWeaken, BLADE_WEAKEN)
+			.add(" weakness and ")
+			.addPercent(a -> a.mSlow, BLADE_SLOWNESS)
+			.add(" slowness for ")
+			.addDuration(a -> a.mDuration, DEBUFF_DURATION)
+			.add(" seconds. Charges: ")
+			.add(a -> a.mMaxCharges, BLADE_MAX_CHARGES)
+			.add(".")
+			.addCooldown(BLADE_COOLDOWN);
+	}
+
+	private static Description<WhirlingBlade> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage is increased to ")
+			.add(a -> a.mDamage, BLADE_2_DAMAGE, false, Ability::isLevelTwo)
+			.add(" and also stun for ")
+			.addDuration(a -> a.mStunDuration, STUN_DURATION)
+			.add(" seconds.");
 	}
 }

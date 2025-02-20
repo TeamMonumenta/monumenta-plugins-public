@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.EscapeDeathCS;
@@ -17,7 +19,6 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -49,28 +50,19 @@ public class EscapeDeath extends Ability {
 	public static final String CHARM_ABSORPTION = "Escape Death Absorption Health";
 	public static final String CHARM_JUMP = "Escape Death Jump Boost Amplifier";
 	public static final String CHARM_SPEED = "Escape Death Speed Amplifier";
+	public static final String CHARM_DURATION = "Escape Death Buff Duration";
 	public static final String CHARM_COOLDOWN = "Escape Death Cooldown";
+	public static final String CHARM_RADIUS = "Escape Death Radius";
 	public static final String CHARM_STUN_DURATION = "Escape Death Stun Duration";
+	public static final String CHARM_HEALING = "Escape Death Healing";
+	public static final String CHARM_REGENERATION_DURATION = "Escape Death Regeneration Duration";
 
 	public static final AbilityInfo<EscapeDeath> INFO =
 		new AbilityInfo<>(EscapeDeath.class, "Escape Death", EscapeDeath::new)
 			.linkedSpell(ClassAbility.ESCAPE_DEATH)
 			.scoreboardId("EscapeDeath")
 			.shorthandName("ED")
-			.descriptions(
-				String.format("When taking damage leaves you below %s hearts, throw a paralyzing grenade that stuns all enemies within %s blocks for %s seconds. Cooldown: %ss.",
-					(int) TRIGGER_THRESHOLD_HEALTH / 2,
-					RANGE,
-					STUN_DURATION / 20,
-					COOLDOWN / 20),
-				String.format("When this skill is triggered, also gain %s absorption health for %s seconds, %s%% Speed, and Jump Boost %s. If damage taken would kill you but could have been prevented by this skill it will instead do so.",
-					ABSORPTION_HEALTH,
-					BUFF_DURATION / 20,
-					(int) (SPEED_PERCENT * 100),
-					StringUtils.toRoman(JUMP_BOOST_AMPLIFIER + 1)),
-				String.format("When this skill is triggered, gain a regenerating effect that heals you for %s%% hp every second for %ss. The effect is canceled if you take damage from an enemy.",
-					(int) (ENHANCEMENT_HEAL_PERCENT * 100),
-					ENHANCEMENT_DURATION / 20))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("When health drops below a threshold, stun nearby mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("toggleJumpBoost", "toggle jump boost", EscapeDeath::toggleJumpBoost,
@@ -78,10 +70,26 @@ public class EscapeDeath extends Ability {
 			.displayItem(Material.DRAGON_BREATH)
 			.priorityAmount(10000);
 
+	private final double mAbsorptionHealth;
+	private final double mSpeed;
+	private final int mJumpBoost;
+	private final int mDuration;
+	private final double mRadius;
+	private final int mStunDuration;
+	private final double mHealing;
+	private final int mRegenDuration;
 	private final EscapeDeathCS mCosmetic;
 
 	public EscapeDeath(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mAbsorptionHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, ABSORPTION_HEALTH);
+		mSpeed = SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
+		mJumpBoost = JUMP_BOOST_AMPLIFIER + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, BUFF_DURATION);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RANGE);
+		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, STUN_DURATION);
+		mHealing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, ENHANCEMENT_HEAL_PERCENT);
+		mRegenDuration = CharmManager.getDuration(mPlayer, CHARM_REGENERATION_DURATION, ENHANCEMENT_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EscapeDeathCS());
 	}
 
@@ -104,10 +112,9 @@ public class EscapeDeath extends Ability {
 			mPlugin.mEffectManager.clearEffects(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN);
 		}
 
-		double absorptionHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, ABSORPTION_HEALTH);
 		if (!event.isBlocked() && !isOnCooldown()) {
 			double newHealth = mPlayer.getHealth() - event.getFinalDamage(true);
-			boolean dealDamageLater = newHealth < 0 && newHealth > -absorptionHealth && isLevelTwo();
+			boolean dealDamageLater = newHealth < 0 && newHealth > -mAbsorptionHealth && isLevelTwo();
 			if (newHealth <= TRIGGER_THRESHOLD_HEALTH && (newHealth > 0 || dealDamageLater)) {
 				mPlugin.mEffectManager.damageEvent(event);
 				event.setLifelineCancel(true);
@@ -121,19 +128,17 @@ public class EscapeDeath extends Ability {
 
 				putOnCooldown();
 
-				int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, STUN_DURATION);
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE, mPlayer)) {
-					EntityUtils.applyStun(mPlugin, stunDuration, mob);
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius, mPlayer)) {
+					EntityUtils.applyStun(mPlugin, mStunDuration, mob);
 				}
 
 				if (isLevelTwo()) {
-					AbsorptionUtils.addAbsorption(mPlayer, absorptionHealth, absorptionHealth, BUFF_DURATION);
+					AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, mDuration);
 					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME,
-						new PercentSpeed(BUFF_DURATION, SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), PERCENT_SPEED_EFFECT_NAME)
+						new PercentSpeed(mDuration, mSpeed, PERCENT_SPEED_EFFECT_NAME)
 							.deleteOnAbilityUpdate(true));
 					if (!mPlayer.getScoreboardTags().contains(DISABLE_JUMP_BOOST_TAG)) {
-						mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-							new PotionEffect(PotionEffectType.JUMP, BUFF_DURATION, JUMP_BOOST_AMPLIFIER + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP), true, true));
+						mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, mDuration, mJumpBoost, true, true));
 					}
 				}
 
@@ -141,7 +146,7 @@ public class EscapeDeath extends Ability {
 					// This check ensures that no "dupe" regeneration runnables occurs.
 					// If escape death somehow "double procs", simply reset the ticks variable.
 					mPlugin.mEffectManager.addEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN,
-						new CustomRegeneration(ENHANCEMENT_DURATION, ENHANCEMENT_HEAL_PERCENT *
+						new CustomRegeneration(mRegenDuration, mHealing *
 							EntityUtils.getMaxHealth(mPlayer), mPlugin).deleteOnAbilityUpdate(true));
 				}
 
@@ -166,5 +171,39 @@ public class EscapeDeath extends Ability {
 	@Override
 	public void onHurtFatal(DamageEvent event) {
 		onHurt(event, null, null);
+	}
+
+	private static Description<EscapeDeath> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When taking damage leaves you below ")
+			.add(a -> TRIGGER_THRESHOLD_HEALTH, TRIGGER_THRESHOLD_HEALTH)
+			.add(" health, throw a paralyzing grenade that stuns all mobs within ")
+			.add(a -> a.mRadius, RANGE)
+			.add(" blocks for ")
+			.addDuration(a -> a.mStunDuration, STUN_DURATION)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<EscapeDeath> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When this ability is triggered, you gain ")
+			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH)
+			.add(" absorption health, ")
+			.addPercent(a -> a.mSpeed, SPEED_PERCENT)
+			.add(" speed, and Jump Boost ")
+			.addPotionAmplifier(a -> a.mJumpBoost, JUMP_BOOST_AMPLIFIER)
+			.add(" for ")
+			.addDuration(a -> a.mDuration, BUFF_DURATION)
+			.add(" seconds. If damage taken would kill you but could have been prevented by this skill it will instead do so.");
+	}
+
+	private static Description<EscapeDeath> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When this ability is triggered, you gain a regenerating effect that heals you for ")
+			.addPercent(a -> a.mHealing, ENHANCEMENT_HEAL_PERCENT)
+			.add(" max health every second for ")
+			.addDuration(a -> a.mRegenDuration, ENHANCEMENT_DURATION)
+			.add(" seconds. The effect is canceled if you take damage from an enemy.");
 	}
 }

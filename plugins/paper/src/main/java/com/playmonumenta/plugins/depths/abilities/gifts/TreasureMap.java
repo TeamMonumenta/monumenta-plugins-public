@@ -42,7 +42,7 @@ public class TreasureMap extends DepthsAbility {
 	}
 
 	private static Description<TreasureMap> getDescription() {
-		return new DescriptionBuilder<TreasureMap>().add("Once your team selects one of each room type, gain 2 ")
+		return new DescriptionBuilder<>(() -> INFO).add("Once your team selects one of each room type, gain 2 ")
 			.add(DepthsTree.PRISMATIC.getNameComponent())
 			.add(" ability selections.")
 			.add((a, p) -> {

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -173,11 +174,11 @@ public class SkillPage extends Page {
 			30,
 			false
 		);
-		if (spec.mPassiveName != null) {
+		if (spec.mPassive != null) {
 			GUIUtils.splitLoreLine(
 				newMeta,
-				spec.mPassiveName + " (Passive): " + spec.mPassiveDescription,
-				NamedTextColor.GREEN,
+				Component.text(spec.mPassive.getDisplayName() + " (Passive): ", NamedTextColor.GREEN)
+					.append(spec.mPassive.getDescription(1, mGui.mPlayer, true)),
 				30,
 				false
 			);

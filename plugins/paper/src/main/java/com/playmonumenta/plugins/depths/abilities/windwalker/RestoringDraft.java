@@ -151,7 +151,7 @@ public final class RestoringDraft extends DepthsAbility {
 
 
 	private static Description<RestoringDraft> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<RestoringDraft>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Falling more than ")
 			.add(AUTOMATIC_THRESHOLD)
 			.add(" blocks heals you by ")

@@ -100,8 +100,8 @@ public class Diversity extends DepthsAbility {
 		Plugin.getInstance().mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(80, SPEED[mRarity - 1], SPEED_EFFECT_ATTR_NAME).displaysTime(false));
 	}
 
-	private static Description<Diversity> getDescription(int rarity, TextColor textColor) {
-		return new DescriptionBuilder<Diversity>(textColor)
+	private static Description<Diversity> getDescription(int rarity, TextColor color) {
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("After you possess abilities from six unique trees, gain ")
 			.addPercent(a -> SPEED[rarity - 1], SPEED[rarity - 1], false, true)
 			.add(" speed permanently, and your chances of finding better abilities are increased by ")

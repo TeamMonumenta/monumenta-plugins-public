@@ -196,7 +196,7 @@ public class Cryobox extends DepthsAbility {
 	}
 
 	private static Description<Cryobox> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Cryobox>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When your health drops below ")
 			.addPercent(TRIGGER_HEALTH)
 			.add(", gain ")

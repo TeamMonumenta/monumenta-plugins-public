@@ -120,7 +120,7 @@ public class Apocalypse extends DepthsAbility {
 	}
 
 	private static Description<Apocalypse> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Apocalypse>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When your health drops below ")
 			.addPercent(TRIGGER_HEALTH)
 			.add(", ignore the hit and instead deal ")

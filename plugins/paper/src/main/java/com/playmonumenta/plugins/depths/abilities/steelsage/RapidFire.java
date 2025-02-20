@@ -136,8 +136,9 @@ public class RapidFire extends DepthsAbility {
 	}
 
 	private static Description<RapidFire> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<RapidFire>(color)
-			.add("Left clicking with a projectile weapon shoots a flurry of ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to shoot a flurry of ")
 			.add(a -> a.mArrows, ARROWS[rarity - 1], false, null, true)
 			.add(" projectiles in the direction that you are looking that deal ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE, false)

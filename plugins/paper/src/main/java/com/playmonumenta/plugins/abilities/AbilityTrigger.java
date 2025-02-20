@@ -157,7 +157,13 @@ public class AbilityTrigger {
 	}
 
 	public enum LookDirection {
-		DOWN, LEVEL, UP
+		DOWN("down"), LEVEL("level"), UP("up");
+
+		final String mName;
+
+		LookDirection(String name) {
+			mName = name;
+		}
 	}
 
 	private static final AtomicInteger mNextMetadataId = new AtomicInteger();

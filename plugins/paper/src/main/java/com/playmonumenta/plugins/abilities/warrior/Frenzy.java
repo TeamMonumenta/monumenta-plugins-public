@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.FrenzyCS;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
@@ -37,10 +39,7 @@ public class Frenzy extends Ability {
 		new AbilityInfo<>(Frenzy.class, "Frenzy", Frenzy::new)
 			.scoreboardId("Frenzy")
 			.shorthandName("Fnz")
-			.descriptions(
-				"Gain +30% Attack Speed for 5 seconds after killing a mob.",
-				"Gain +40% Attack Speed and +20% Speed for 5 seconds after killing a mob.",
-				"Additionally, your next melee damage within 5 seconds after getting a kill deals 20% extra damage.")
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Killing mobs increases your speed and attack speed.")
 			.quest216Message("-------3-------o-------")
 			.displayItem(Material.FEATHER);
@@ -80,5 +79,34 @@ public class Frenzy extends Ability {
 					.damageTypes(EnumSet.of(DamageEvent.DamageType.MELEE)).deleteOnAbilityUpdate(true));
 			mCosmetic.frenzyEnhancement(mPlayer);
 		}
+	}
+
+	private static Description<Frenzy> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Gain ")
+			.addPercent(a -> a.mPercentAttackSpeedEffect, PERCENT_ATTACK_SPEED_EFFECT_1, false, Ability::isLevelOne)
+			.add(" attack speed for ")
+			.addDuration(a -> a.mDuration, DURATION)
+			.add(" seconds after killing a mob.");
+	}
+
+	private static Description<Frenzy> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Attack speed is increased to ")
+			.addPercent(a -> a.mPercentAttackSpeedEffect, PERCENT_ATTACK_SPEED_EFFECT_2, false, Ability::isLevelTwo)
+			.add(" and also gain ")
+			.addPercent(a -> a.mSpeedPotency, PERCENT_SPEED)
+			.add(" speed for ")
+			.addDuration(a -> a.mDuration, DURATION)
+			.add(" seconds.");
+	}
+
+	private static Description<Frenzy> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Additionally, your next melee damage within ")
+			.add(a -> a.mDuration, DURATION)
+			.add(" seconds after getting a kill deals ")
+			.addPercent(a -> a.mEnhanceDamageMult, DAMAGE_BONUS)
+			.add(" extra damage.");
 	}
 }

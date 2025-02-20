@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.BodyguardCS;
@@ -15,7 +17,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Location;
@@ -49,19 +50,7 @@ public class Bodyguard extends Ability {
 			.linkedSpell(ClassAbility.BODYGUARD)
 			.scoreboardId("Bodyguard")
 			.shorthandName("Bg")
-			.descriptions(
-				String.format("Left-click the air twice while looking directly at another player within %s blocks to " +
-					"charge to them (cannot be used in safezones). Upon arriving, knock away all mobs within " +
-					"%s blocks. Both you and the other player gain %s absorption health for %ss. Left-click " +
-					"twice while looking down to cast on yourself. Cooldown: %ss.",
-					RANGE,
-					RADIUS,
-					ABSORPTION_HEALTH_1,
-					StringUtils.ticksToSeconds(BUFF_DURATION),
-					StringUtils.ticksToSeconds(COOLDOWN)),
-				String.format("The absorption health is increased to %s. Additionally, affected mobs are stunned for %ss.",
-					ABSORPTION_HEALTH_2,
-					StringUtils.ticksToSeconds(STUN_DURATION)))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Teleport to another player, giving them and yourself absorption and stunning nearby mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("castSelf", "cast on self or others", bg -> bg.cast(true),
@@ -138,5 +127,31 @@ public class Bodyguard extends Ability {
 
 	private void giveAbsorption(final Player player) {
 		AbsorptionUtils.addAbsorption(player, mAbsorptionHealth, mAbsorptionHealth, mAbsorptionDuration);
+	}
+
+	private static Description<Bodyguard> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger(1, "looking directly at another player")
+			.add(" within ")
+			.add(a -> a.mRange, RANGE)
+			.add("blocks to charge to them. Upon arriving, knock away all mobs within ")
+			.add(a -> a.mKnockbackRadius, RADIUS)
+			.add(" blocks. Both you and the other player gain ")
+			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_1, false, Ability::isLevelOne)
+			.add(" absorption health for ")
+			.addDuration(a -> a.mAbsorptionDuration, BUFF_DURATION)
+			.add(" seconds. ")
+			.addTrigger(0)
+			.add(" to cast on yourself.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<Bodyguard> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The absorption health is increased to ")
+			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_2, false, Ability::isLevelTwo)
+			.add(". Additionally, affected mobs are stunned for ")
+			.addDuration(a -> a.mStunDuration, STUN_DURATION)
+			.add(" seconds.");
 	}
 }

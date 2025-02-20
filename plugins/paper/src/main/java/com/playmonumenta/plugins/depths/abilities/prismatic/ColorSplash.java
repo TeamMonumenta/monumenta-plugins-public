@@ -682,8 +682,9 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
-			.add("Swap hands to cast a unique ability after ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to cast a unique ability after ")
 			.addDuration(ACTIVATION_DELAY)
 			.add("s. This ability cycles through your available trees in the order you have them.")
 			.addCooldown(COOLDOWN)
@@ -697,7 +698,7 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getFrostbornDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nFrostborn").color(TextColor.color(DepthsUtils.FROSTBORN)))
 			.add(" - For ")
 			.addDuration(FROSTBORN_DURATION)
@@ -711,7 +712,7 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getFlamecallerDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nFlamecaller").color(TextColor.color(DepthsUtils.FLAMECALLER)))
 			.add(" - For ")
 			.addDuration(FLAMECALLER_DURATION)
@@ -723,7 +724,7 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getDawnbringerDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nDawnbringer").color(TextColor.color(DepthsUtils.DAWNBRINGER)))
 			.add(" - For ")
 			.addDuration(DAWNBRINGER_DURATION)
@@ -741,7 +742,7 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getEarthboundDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nEarthbound").color(TextColor.color(DepthsUtils.EARTHBOUND)))
 			.add(" - For ")
 			.addDuration(EARTHBOUND_DURATION)
@@ -760,7 +761,7 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getShadowdancerDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nShadowdancer").color(TextColor.color(DepthsUtils.SHADOWDANCER)))
 			.add(" - For ")
 			.addDuration(SHADOWDANCER_DURATION)
@@ -772,23 +773,23 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getSteelsageDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nSteelsage").color(TextColor.color(DepthsUtils.STEELSAGE)))
 			.add(" - For ")
 			.addDuration(STEELSAGE_DURATION)
 			.add("s, ride an invincible horse. While on the horse, any melee damage you would take is negated, and you deal ")
 			.addPercent(a -> STEELSAGE_PROJ_DAMAGE_MULTIPLIER[rarity - 1], STEELSAGE_PROJ_DAMAGE_MULTIPLIER[rarity - 1], false, true)
-			.add(" more projectile damage. Swap hands again while active to dismount.");
+			.add(" more projectile damage. Trigger again while active to dismount.");
 	}
 
 	private static Description<ColorSplash> getWindwalkerDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nWindwalker").color(TextColor.color(DepthsUtils.WINDWALKER)))
 			.add(" - For ")
 			.addDuration(WINDWALKER_DURATION)
 			.add("s, gain ")
 			.addPercent(a -> WINDWALKER_SPEED[rarity - 1], WINDWALKER_SPEED[rarity - 1], false, true)
-			.add(" speed. Additionally, every time you swap hands, you initiate a Wind Walk, gaining ")
+			.add(" speed. Additionally, every time you trigger again, you initiate a Wind Walk, gaining ")
 			.addDuration(WINDWALKER_IFRAMES)
 			.add("s of Invincibility Frames, launching yourself, applying levitation and ")
 			.addPercent(WINDWALKER_VULNERABILITY)

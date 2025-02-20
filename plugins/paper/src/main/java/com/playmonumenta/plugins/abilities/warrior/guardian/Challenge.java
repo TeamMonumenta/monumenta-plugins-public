@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -20,7 +22,6 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -72,28 +73,7 @@ public class Challenge extends Ability {
 			.linkedSpell(ClassAbility.CHALLENGE)
 			.scoreboardId("Challenge")
 			.shorthandName("Ch")
-			.descriptions(
-				String.format("Left-clicking while sneaking makes all mobs within %s blocks target you. You gain " +
-					"%s Absorption and %s melee damage per affected mob (up to %s Absorption and %s melee damage) " +
-					"for %s seconds. Cooldown: %ss.",
-					CHALLENGE_RANGE,
-					ABSORPTION_PER_MOB_1,
-					StringUtils.multiplierToPercentageWithSign(PERCENT_DAMAGE_DEALT_PER_1),
-					MAX_ABSORPTION_1,
-					StringUtils.multiplierToPercentageWithSign(PERCENT_DAMAGE_DEALT_EFFECT_1),
-					StringUtils.ticksToSeconds(DURATION),
-					StringUtils.ticksToSeconds(COOLDOWN)),
-				String.format("Gain %s Absorption and %s melee damage per affected mob (up to %s Absorption and " +
-					"%s melee damage) instead. For each taunted mob killed (up to %s), gain a stackable %s speed for " +
-					"%s seconds and reduce the cooldown of Guardian skills by %s seconds.",
-					ABSORPTION_PER_MOB_2,
-					StringUtils.multiplierToPercentageWithSign(PERCENT_DAMAGE_DEALT_PER_2),
-					MAX_ABSORPTION_2,
-					StringUtils.multiplierToPercentageWithSign(PERCENT_DAMAGE_DEALT_EFFECT_2),
-					KILLED_MOBS_CAP,
-					StringUtils.multiplierToPercentageWithSign(SPEED_PER),
-					StringUtils.ticksToSeconds(DURATION),
-					StringUtils.ticksToSeconds(CDR_PER)))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Taunt nearby enemies and gain absorption and melee damage.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Challenge::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true)))
@@ -196,5 +176,45 @@ public class Challenge extends Ability {
 			!mob.isDead()).forEach(mob -> mPlugin.mEffectManager.clearEffects(mob, AFFECTED_MOB_EFFECT_NAME));
 		mAffectedEntities = new ArrayList<>();
 		mKillCount = 0;
+	}
+
+	private static Description<Challenge> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to make all mobs within ")
+			.add(a -> a.mRadius, CHALLENGE_RANGE)
+			.add(" blocks target you. You gain ")
+			.add(a -> a.mAbsorptionPerMob, ABSORPTION_PER_MOB_1, false, Ability::isLevelOne)
+			.add(" absorption and ")
+			.addPercent(a -> a.mPercentDamageDealtPerMob, PERCENT_DAMAGE_DEALT_PER_1, false, Ability::isLevelOne)
+			.add(" melee damage per affected mob (up to ")
+			.add(a -> a.mMaxAbsorption, MAX_ABSORPTION_1, false, Ability::isLevelOne)
+			.add(" absorption and ")
+			.addPercent(a -> a.mPercentDamageDealtEffect, PERCENT_DAMAGE_DEALT_EFFECT_1, false, Ability::isLevelOne)
+			.add(" melee damage) for ")
+			.addDuration(a -> a.mDuration, DURATION)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<Challenge> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Gain ")
+			.add(a -> a.mAbsorptionPerMob, ABSORPTION_PER_MOB_2, false, Ability::isLevelTwo)
+			.add(" absorption and ")
+			.addPercent(a -> a.mPercentDamageDealtPerMob, PERCENT_DAMAGE_DEALT_PER_2, false, Ability::isLevelTwo)
+			.add(" melee damage per affected mob (up to ")
+			.add(a -> a.mMaxAbsorption, ABSORPTION_PER_MOB_2, false, Ability::isLevelTwo)
+			.add(" absorption and ")
+			.addPercent(a -> a.mPercentDamageDealtEffect, PERCENT_DAMAGE_DEALT_EFFECT_2, false, Ability::isLevelTwo)
+			.add(" melee damage) instead. For each taunted mob killed (up to ")
+			.add(a -> a.mKilledMobsCap, KILLED_MOBS_CAP)
+			.add("), gain a stackable ")
+			.addPercent(a -> a.mSpeedPerMob, SPEED_PER)
+			.add(" speed for ")
+			.addDuration(a -> a.mDuration, DURATION)
+			.add(" seconds and reduce the cooldown of Guardian skills by ")
+			.addDuration(a -> a.mCDRPerMob, CDR_PER)
+			.add(" seconds.");
 	}
 }

@@ -105,7 +105,7 @@ public class Multiplicity extends DepthsAbility {
 	}
 
 	private static Description<Multiplicity> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Multiplicity>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("After casting 3 abilities from different trees in a row, refund ")
 			.addPercent(a -> CDR[rarity - 1], CDR[rarity - 1], false, true)
 			.add(" of those abilities' cooldowns and gain ")

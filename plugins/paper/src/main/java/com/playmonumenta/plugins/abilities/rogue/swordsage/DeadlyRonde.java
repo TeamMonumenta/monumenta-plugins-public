@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.DeadlyRondeCS;
@@ -46,48 +48,42 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	public static final String CHARM_KNOCKBACK = "Deadly Ronde Knockback";
 	public static final String CHARM_STACKS = "Deadly Ronde Max Stacks";
 	public static final String CHARM_SPEED = "Deadly Ronde Speed Amplifier";
+	public static final String CHARM_DECAY_TIME = "Deadly Ronde Stack Decay Time";
 
 	public static final AbilityInfo<DeadlyRonde> INFO =
 		new AbilityInfo<>(DeadlyRonde.class, "Deadly Ronde", DeadlyRonde::new)
 			.linkedSpell(ClassAbility.DEADLY_RONDE)
 			.scoreboardId("DeadlyRonde")
 			.shorthandName("DR")
-			.descriptions(
-				String.format("After casting a skill, gain a stack of Deadly Ronde for %s seconds, stacking up to %s times. " +
-					              "While Deadly Ronde is active, you gain %s%% Speed, and your next melee attack consumes a stack to fire a flurry of blades, " +
-					              "that fire in a thin cone with a radius of %s blocks and deal %s melee damage to all enemies they hit.",
-					RONDE_DECAY_TIMER / 20,
-					RONDE_1_MAX_STACKS,
-					(int) (RONDE_SPEED_BONUS * 100),
-					RONDE_RADIUS,
-					RONDE_1_DAMAGE
-				),
-				String.format("Damage increased to %s, and you can now store up to %s stacks.",
-					RONDE_2_DAMAGE,
-					RONDE_2_MAX_STACKS))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Damage nearby mobs when striking after casting an ability.")
 			.displayItem(Material.BLAZE_ROD);
 
 	private @Nullable BukkitRunnable mActiveRunnable = null;
 	private int mRondeStacks = 0;
 
+	private final double mRadius;
 	private final double mDamage;
 	private final float mKnockback;
 	private final int mMaxStacks;
+	private final double mSpeed;
+	private final int mDecayTime;
 	private final DeadlyRondeCS mCosmetic;
 
 	public DeadlyRonde(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RONDE_RADIUS);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? RONDE_1_DAMAGE : RONDE_2_DAMAGE);
 		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, RONDE_KNOCKBACK_SPEED);
-		mMaxStacks = (int) ((isLevelOne() ? RONDE_1_MAX_STACKS : RONDE_2_MAX_STACKS) + CharmManager.getLevel(mPlayer, CHARM_STACKS));
+		mMaxStacks = (isLevelOne() ? RONDE_1_MAX_STACKS : RONDE_2_MAX_STACKS) + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
+		mSpeed = RONDE_SPEED_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
+		mDecayTime = CharmManager.getDuration(mPlayer, CHARM_DECAY_TIME, RONDE_DECAY_TIMER);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DeadlyRondeCS());
 	}
 
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
 		/* Re-up the duration every time an ability is cast */
-		double speed = RONDE_SPEED_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 		if (mActiveRunnable != null) {
 			mActiveRunnable.cancel();
 		} else {
@@ -98,8 +94,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 				public void run() {
 					mTicks++;
 					mCosmetic.rondeTickEffect(mPlayer, getCharges(), mTicks);
-					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde",
-						new PercentSpeed(6, speed, "DeadlyRondeMod").deleteOnAbilityUpdate(true));
+					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde", new PercentSpeed(6, mSpeed, "DeadlyRondeMod").displaysTime(false).deleteOnAbilityUpdate(true));
 					if (mActiveRunnable == null) {
 						this.cancel();
 					}
@@ -140,8 +135,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			double damage = mDamage * damageRatio;
 
 			double angle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, RONDE_ANGLE);
-			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RONDE_RADIUS);
-			Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), radius, Math.toRadians(angle));
+			Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), mRadius, Math.toRadians(angle));
 
 			for (LivingEntity mob : hitbox.getHitMobs()) {
 				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.getLinkedSpell(), true);
@@ -149,7 +143,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			}
 
 			World world = mPlayer.getWorld();
-			mCosmetic.rondeHitEffect(world, mPlayer, radius, RONDE_RADIUS, isLevelTwo());
+			mCosmetic.rondeHitEffect(world, mPlayer, mRadius, RONDE_RADIUS, isLevelTwo());
 
 			mActiveRunnable.cancel();
 			mActiveRunnable = null;
@@ -203,5 +197,29 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
 
 		return output;
+	}
+
+	private static Description<DeadlyRonde> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("After casting an ability, gain a stack of Deadly Ronde for ")
+			.addDuration(a -> a.mDecayTime, RONDE_DECAY_TIMER)
+			.add(" seconds, stacking up to ")
+			.add(a -> a.mMaxStacks, RONDE_1_MAX_STACKS, false, Ability::isLevelOne)
+			.add(" times. While Deadly Ronde is active, you gain ")
+			.addPercent(a -> a.mSpeed, RONDE_SPEED_BONUS)
+			.add(" speed, and your next melee attack consumes a stack to fire a flurry of blades in a thin cone with a radius of ")
+			.add(a -> a.mRadius, RONDE_RADIUS)
+			.add(" blocks, dealing ")
+			.add(a -> a.mDamage, RONDE_1_DAMAGE, false, Ability::isLevelOne)
+			.add(" melee damage to mobs they hit.");
+	}
+
+	private static Description<DeadlyRonde> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mDamage, RONDE_2_DAMAGE, false, Ability::isLevelTwo)
+			.add(", and you can now have up to ")
+			.add(a -> a.mMaxStacks, RONDE_2_MAX_STACKS, false, Ability::isLevelTwo)
+			.add(" stacks.");
 	}
 }

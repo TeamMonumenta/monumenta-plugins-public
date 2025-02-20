@@ -319,7 +319,7 @@ public class DiscoBall extends DepthsAbility {
 	}
 
 	private static Description<DiscoBall> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DiscoBall>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Fire a projectile weapon while sneaking to summon a spinning Disco Ball above where your projectile lands. The ball lasts ")
 			.addDuration(DURATION)
 			.add(" seconds, and rains ")

@@ -1,11 +1,14 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
@@ -18,13 +21,13 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -67,34 +70,7 @@ public class LuminousInfusion extends MultipleChargeAbility implements KillTrigg
 			.linkedSpell(ClassAbility.LUMINOUS_INFUSION)
 			.scoreboardId("LuminousInfusion")
 			.shorthandName("LI")
-			.descriptions(
-				String.format(
-					"Killing an Undead enemy or dealing %s/%s damage against a Boss in R2 and R3 respectively grants " +
-					"%d stack of Luminosity capped at %s stacks. " + AbilityTrigger.Key.RIGHT_CLICK + " while not " +
-					"sneaking or holding usable items to prime one stack of Luminosity, or all stacks while looking " +
-					"down. Luminosity unprimes after %ss of inactivity. With %s or more primed stacks, the next " +
-					"attack or ability against an undead enemy is infused with explosive power that deals %d Magic " +
-					"damage per stack to it and other Undead enemies, or half damage against Non-undead, in a %s " +
-					"blocks per stack radius around it and knocking other enemies away from it.",
-					BOSS_DMG_THRESHOLD_R2,
-					BOSS_DMG_THRESHOLD_R3,
-					STACKS_PER_KILL,
-					MAX_STACKS,
-					StringUtils.ticksToSeconds(EXPIRE_TICKS),
-					MIN_STACKS_TO_ACTIVATE,
-					DAMAGE_UNDEAD_1,
-					StringUtils.to2DP(RADIUS)
-				),
-				String.format(
-					"The damage per stack is increased to %s. With at least one primed stack, the next critical " +
-					"melee attack against an Undead enemy consumes one stack of Luminousity to trigger Divine " +
-					"Justice for %s of your critical attack damage. Undead enemies hit by Luminous explosions are " +
-					"set on fire for %ss.",
-					DAMAGE_UNDEAD_2,
-					StringUtils.multiplierToPercentageWithSign(DIVINE_JUSTICE_DMG_MULT),
-					StringUtils.ticksToSeconds(FIRE_DURATION_2)
-				)
-			)
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Upon activating, the next damage dealt to an Undead enemy causes an explosion.")
 			.addTrigger(new AbilityTriggerInfo<>("castOne", "activate one stack",
 				li -> li.cast(false, false), new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK)
@@ -297,5 +273,51 @@ public class LuminousInfusion extends MultipleChargeAbility implements KillTrigg
 	@Override
 	public @Nullable String getMode() {
 		return mPrimedStacks > 0 ? "active" : null;
+	}
+
+	private static Description<LuminousInfusion> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Killing an Undead enemy or dealing ")
+			.add((a, p) -> {
+				Description<LuminousInfusion> subDescription;
+				if (p == null) {
+					subDescription = new DescriptionBuilder<>(() -> INFO)
+						.add(aa -> BOSS_DMG_THRESHOLD_R2, BOSS_DMG_THRESHOLD_R2)
+						.add(" damage against a boss (")
+						.add(aa -> BOSS_DMG_THRESHOLD_R3, BOSS_DMG_THRESHOLD_R3)
+						.add(" in Region 3)");
+				} else {
+					subDescription = new DescriptionBuilder<>(() -> INFO)
+						.add(aa -> aa.mTracker.getThreshold(), ServerProperties.getAbilityEnhancementsEnabled(p) ? BOSS_DMG_THRESHOLD_R3 : BOSS_DMG_THRESHOLD_R2)
+						.add(" damage against a boss");
+				}
+				return subDescription.get(a, p);
+			})
+			.add(" grants ")
+			.add(a -> a.mStacksPerKill, STACKS_PER_KILL)
+			.add(" stack of Luminosity capped at ")
+			.add(a -> a.mMaxCharges, MAX_STACKS)
+			.add(" stacks. ")
+			.addTrigger()
+			.add(" to prime one stack of Luminosity, or all stacks while looking down. Luminosity unprimes after ")
+			.addDuration(EXPIRE_TICKS)
+			.add(" seconds of inactivity. With ")
+			.add(a -> a.mMinStacksToActivate, MIN_STACKS_TO_ACTIVATE)
+			.add(" or more primed stacks, the next attack or ability against an undead enemy is infused with explosive power that deals ")
+			.add(a -> a.mDamagePerStack, DAMAGE_UNDEAD_1, false, Ability::isLevelOne)
+			.add(" magic damage per stack to it and other Undead enemies, or half damage against Non-undead, in a ")
+			.add(a -> a.mRadiusPerStack, RADIUS)
+			.add(" blocks per stack radius around it and knocking other enemies away from it.");
+	}
+
+	private static Description<LuminousInfusion> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage per stack is increased to ")
+			.add(a -> a.mDamagePerStack, DAMAGE_UNDEAD_2, false, Ability::isLevelTwo)
+			.add(". With at least one primed stack, the next critical melee attack against an Undead enemy consumes one stack of Luminousity to trigger Divine Justice for ")
+			.addPercent(a -> a.mDivineJusticeDmgMult, DIVINE_JUSTICE_DMG_MULT)
+			.add(" of your critical attack damage. Undead enemies hit by Luminous explosions are set on fire for ")
+			.addDuration(a -> a.mFireDuration, FIRE_DURATION_2)
+			.add(" seconds.");
 	}
 }

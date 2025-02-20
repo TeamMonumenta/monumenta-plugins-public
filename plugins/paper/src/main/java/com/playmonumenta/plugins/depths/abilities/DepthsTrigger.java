@@ -27,7 +27,7 @@ public enum DepthsTrigger {
 	public static final AbilityTriggerInfo.TriggerRestriction DEPTHS_TRIGGER_RESTRICTION = new AbilityTriggerInfo.TriggerRestriction("holding a melee or projectile weapon or tool", player -> {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		return DepthsUtils.isWeaponItem(item) || item.getType() == Material.TRIDENT || ItemUtils.isProjectileWeapon(item) || ItemUtils.isPickaxe(item) || ItemUtils.isShovel(item);
-	});
+	}, false);
 
 	public final AbilityTrigger mTrigger;
 	public final String mName;

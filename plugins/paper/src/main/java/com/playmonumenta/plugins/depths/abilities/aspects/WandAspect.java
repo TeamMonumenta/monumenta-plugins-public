@@ -55,7 +55,7 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 	}
 
 	public static Description<WandAspect> getDescription() {
-		return new DescriptionBuilder<WandAspect>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("You deal " + DAMAGE + " extra melee damage while holding a wand, and all ability damage is increased by ")
 			.addPercent(SPELL_MOD)
 			.add(" of the wand's Spell Power. The next three abilities you find are guaranteed to be in active trigger slots.")

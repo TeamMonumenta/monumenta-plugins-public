@@ -102,7 +102,7 @@ public class Sundrops extends DepthsAbility {
 	}
 
 	private static Description<Sundrops> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Sundrops>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Whenever a player in your party breaks a spawner, there is a ")
 			.addPercent(a -> a.mDropChance, DROP_CHANCE[rarity - 1], false, true)
 			.add(" chance of spawning a sundrop that lasts ")

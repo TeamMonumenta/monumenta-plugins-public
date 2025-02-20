@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -41,31 +43,31 @@ public class EnchantedPrayer extends Ability {
 	public static final String CHARM_EFFECT_RANGE = "Enchanted Prayer Attack Range";
 	public static final String CHARM_COOLDOWN = "Enchanted Prayer Cooldown";
 
-	private final double mDamage;
-	private final double mHeal;
-
-	private @Nullable Crusade mCrusade;
-
-	private final EnchantedPrayerCS mCosmetic;
-
 	public static final AbilityInfo<EnchantedPrayer> INFO =
 		new AbilityInfo<>(EnchantedPrayer.class, "Enchanted Prayer", EnchantedPrayer::new)
 			.linkedSpell(ClassAbility.ENCHANTED_PRAYER)
 			.scoreboardId("EPrayer")
 			.shorthandName("EP")
-			.descriptions(
-				"Swapping while sneaking enchants the weapons of all players in a 15 block radius with holy magic. " +
-					"Their next melee or projectile attack deals an additional 12 magic damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 15s.",
-				"Damage is increased to 20. Healing is increased to 20% of max health.")
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("The next attack by you and nearby players causes an explosion and heals the player.")
 			.cooldown(ENCHANTED_PRAYER_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EnchantedPrayer::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
 			.displayItem(Material.CHORUS_FRUIT);
 
+	private final double mDamage;
+	private final double mHeal;
+	private final double mRange;
+	private final double mExplosionRadius;
+
+	private @Nullable Crusade mCrusade;
+	private final EnchantedPrayerCS mCosmetic;
+
 	public EnchantedPrayer(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? ENCHANTED_PRAYER_1_DAMAGE : ENCHANTED_PRAYER_2_DAMAGE);
 		mHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEAL, isLevelOne() ? ENCHANTED_PRAYER_1_HEAL : ENCHANTED_PRAYER_2_HEAL);
+		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, ENCHANTED_PRAYER_RANGE);
+		mExplosionRadius = CharmManager.getRadius(mPlayer, CHARM_EFFECT_RANGE, ENCHANTED_PRAYER_EFFECT_SIZE);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EnchantedPrayerCS());
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
@@ -83,13 +85,37 @@ public class EnchantedPrayer extends Ability {
 		Location loc = mPlayer.getLocation();
 		mCosmetic.onCast(mPlugin, mPlayer, world, loc);
 
-		for (Player p : PlayerUtils.playersInRange(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, ENCHANTED_PRAYER_RANGE), true)) {
+		for (Player p : PlayerUtils.playersInRange(loc, mRange, true)) {
 			mCosmetic.applyToPlayer(p, mPlayer);
 			mPlugin.mEffectManager.addEffect(p, "EnchantedPrayerEffect",
 					new EnchantedPrayerAoE(mPlugin, ENCHANTED_PRAYER_COOLDOWN, mDamage, mHeal, p, AFFECTED_DAMAGE_TYPES,
-						CharmManager.getRadius(mPlayer, CHARM_EFFECT_RANGE, ENCHANTED_PRAYER_EFFECT_SIZE), mPlayer, mCrusade, mCosmetic)
+						mExplosionRadius, mPlayer, mCrusade, mCosmetic)
 						.deleteOnAbilityUpdate(true));
 		}
 		return true;
+	}
+
+	private static Description<EnchantedPrayer> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to enchant the weapons of all players within ")
+			.add(a -> a.mRange, ENCHANTED_PRAYER_RANGE)
+			.add(" blocks with holy magic. Their next melee or projectile attack deals an additional ")
+			.add(a -> a.mDamage, ENCHANTED_PRAYER_1_DAMAGE, false, Ability::isLevelOne)
+			.add(" magic damage to enemies within ")
+			.add(a -> a.mExplosionRadius, ENCHANTED_PRAYER_EFFECT_SIZE)
+			.add(" blocks while healing the player for ")
+			.addPercent(a -> a.mHeal, ENCHANTED_PRAYER_1_HEAL, false, Ability::isLevelOne)
+			.add(" of max health.")
+			.addCooldown(ENCHANTED_PRAYER_COOLDOWN);
+	}
+
+	private static Description<EnchantedPrayer> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mDamage, ENCHANTED_PRAYER_2_DAMAGE, false, Ability::isLevelTwo)
+			.add(". Healing is increased to ")
+			.addPercent(a -> a.mHeal, ENCHANTED_PRAYER_2_HEAL)
+			.add(" of max health.");
 	}
 }

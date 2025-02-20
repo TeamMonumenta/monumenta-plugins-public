@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.SpellshockCS;
@@ -19,7 +21,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.NavigableSet;
 import org.bukkit.Location;
@@ -87,42 +88,14 @@ public class Spellshock extends Ability {
 	public static final String CHARM_ENHANCE_DAMAGE = "Spellshock Enhancement Damage Amplifier";
 	public static final String CHARM_ENHANCE_SLOW = "Spellshock Enhancement Slowness Amplifier";
 	public static final String CHARM_ENHANCE_WEAK = "Spellshock Enhancement Weakness Amplifier";
+	public static final String CHARM_RADIUS = "Spellshock Radius";
 
 	public static final AbilityInfo<Spellshock> INFO =
 		new AbilityInfo<>(Spellshock.class, NAME, Spellshock::new)
 			.linkedSpell(ABILITY)
 			.scoreboardId("SpellShock")
 			.shorthandName("SS")
-			.descriptions(String.format("Hitting an enemy with a spell inflicts Static for %s seconds. Hitting an " +
-					"enemy inflicted with Static triggers a spellshock centered on the enemy that deals %s of the " +
-					"triggering spell's damage to all enemies within %s blocks. Spellshocks can cause chain " +
-					"reactions on enemies with Static, but an enemy can only be hit by a spellshock once per tick. " +
-					"If a Static enemy is hit by a Melee attack, the hit gains %s Melee damage, the enemy receives " +
-					"%s Slowness for %ss, and the Static dissipates.",
-					StringUtils.ticksToSeconds(STATIC_DURATION),
-					StringUtils.multiplierToPercentageWithSign(DAMAGE_1),
-					SPELLSHOCK_RADIUS,
-					StringUtils.multiplierToPercentageWithSign(MELEE_BONUS_1),
-					StringUtils.multiplierToPercentageWithSign(SLOW_POTENCY),
-					StringUtils.ticksToSeconds(SLOW_DURATION)),
-				String.format("Spellshocks deal %s of the triggering spell's damage and Melee attacks gain %s Melee " +
-					"damage. Additionally, gain %s Speed for %ss whenever a spellshock is triggered.",
-					StringUtils.multiplierToPercentageWithSign(DAMAGE_2),
-					StringUtils.multiplierToPercentageWithSign(MELEE_BONUS_2),
-					StringUtils.multiplierToPercentageWithSign(SPEED_POTENCY),
-					StringUtils.ticksToSeconds(SPEED_DURATION)),
-				String.format("Hitting an enemy inflicted with Static with certain spell types grants additional " +
-					"effects or applies additional debuffs. Arcane spells grant %s Speed for %ss that stacks up to %s " +
-					"times, Fire spells gain %s Magic damage, enemies hit by Ice spells receive %s Slowness for %ss, " +
-					"and enemies hit by Lightning spells receive %s Weakness for %ss.",
-					StringUtils.multiplierToPercentage(ENHANCE_SPEED_POTENCY),
-					StringUtils.ticksToSeconds(ENHANCEMENT_EFFECT_DURATION),
-					ENHANCE_SPEED_MAX_STACKS,
-					StringUtils.multiplierToPercentageWithSign(ENHANCE_DAMAGE_MULT),
-					StringUtils.multiplierToPercentageWithSign(ENHANCE_SLOW_POTENCY),
-					StringUtils.ticksToSeconds(ENHANCEMENT_EFFECT_DURATION),
-					StringUtils.multiplierToPercentageWithSign(ENHANCE_WEAK_POTENCY),
-					StringUtils.ticksToSeconds(ENHANCEMENT_EFFECT_DURATION)))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Deal extra damage to nearby enemies when damaging an enemy recently damaged by a spell.")
 			.displayItem(Material.GLOWSTONE_DUST);
 
@@ -135,6 +108,7 @@ public class Spellshock extends Ability {
 	private final double mEnhanceDamageMult;
 	private final double mEnhanceSlowPotency;
 	private final double mEnhanceWeakPotency;
+	private final double mRadius;
 
 	public Spellshock(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
@@ -146,6 +120,7 @@ public class Spellshock extends Ability {
 		mEnhanceDamageMult = 1 + CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE, ENHANCE_DAMAGE_MULT);
 		mEnhanceSlowPotency = -1 * (ENHANCE_SLOW_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_SLOW));
 		mEnhanceWeakPotency = -1 * (ENHANCE_WEAK_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_WEAK));
+		mRadius = CharmManager.getDuration(player, CHARM_RADIUS, SPELLSHOCK_RADIUS);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new SpellshockCS());
 
@@ -235,7 +210,7 @@ public class Spellshock extends Ability {
 				// spellshock triggering other spellshocks propagates the damage at 100%
 				final double spellShockDamage = eventAbility == ClassAbility.SPELLSHOCK ? event.getDamage() : event.getDamage() * mSpellDamageMult;
 				final Location loc = LocationUtils.getHalfHeightLocation(enemy);
-				final Hitbox hitbox = new Hitbox.SphereHitbox(loc, SPELLSHOCK_RADIUS);
+				final Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
 				for (final LivingEntity hitMob : hitbox.getHitMobs()) {
 					if (hitMob.isDead()) {
 						continue;
@@ -257,5 +232,56 @@ public class Spellshock extends Ability {
 			}
 		}
 		return false; // Needs to apply to all damaged mobs. Uses an internal check to prevent recursion on dealing damage.
+	}
+
+	private static Description<Spellshock> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Hitting an enemy with a spell inflicts Static for ")
+			.addDuration(STATIC_DURATION)
+			.add(" seconds. Hitting an enemy inflicted with Static triggers a spellshock centered on the enemy that deals ")
+			.addPercent(a -> a.mSpellDamageMult, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" of the triggering spell's damage to all enemies within ")
+			.add(a -> a.mRadius, SPELLSHOCK_RADIUS)
+			.add(" blocks. Spellshocks can cause chain reactions on enemies with Static, but an enemy can only be hit by a spellshock once per tick. If a Static enemy is hit by a Melee attack, the hit gains ")
+			.addPercent(a -> a.mMeleeBonusMult, MELEE_BONUS_1, false, Ability::isLevelOne)
+			.add(" melee damage, the enemy receives ")
+			.addPercent(a -> a.mSlowPotency, SLOW_POTENCY)
+			.add(" slowness for ")
+			.addDuration(SLOW_DURATION)
+			.add(" seconds, and the Static dissipates.");
+	}
+
+	private static Description<Spellshock> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Spellshocks deal ")
+			.addPercent(a -> a.mSpellDamageMult, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" of the triggering spell's damage and melee attacks gain ")
+			.addPercent(a -> a.mMeleeBonusMult, MELEE_BONUS_2, false, Ability::isLevelTwo)
+			.add(" melee damage. Additionally, gain ")
+			.addPercent(a -> a.mSpeedPotency, SPEED_POTENCY)
+			.add(" speed for ")
+			.addDuration(SPEED_DURATION)
+			.add(" seconds whenever a spellshock is triggered.");
+	}
+
+	private static Description<Spellshock> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Hitting an enemy inflicted with Static with certain spell types grants additional effects or applies additional debuffs. Arcane spells grant ")
+			.addPercent(a -> a.mEnhanceSpeedPotency, ENHANCE_SPEED_POTENCY)
+			.add(" speed for ")
+			.addDuration(ENHANCEMENT_EFFECT_DURATION)
+			.add(" seconds that stacks up to ")
+			.add(a -> ENHANCE_SPEED_MAX_STACKS, ENHANCE_SPEED_MAX_STACKS)
+			.add(" times, Fire spells gain ")
+			.addPercent(a -> a.mEnhanceDamageMult, ENHANCE_DAMAGE_MULT)
+			.add(" magic damage, enemies hit by Ice spells receive ")
+			.addPercent(a -> a.mEnhanceSlowPotency, ENHANCE_SLOW_POTENCY)
+			.add(" slowness for ")
+			.addDuration(ENHANCEMENT_EFFECT_DURATION)
+			.add(" seconds, and enemies hit by Lightning spells receive ")
+			.addPercent(a -> a.mEnhanceWeakPotency, ENHANCE_WEAK_POTENCY)
+			.add(" weakness for ")
+			.addDuration(ENHANCEMENT_EFFECT_DURATION)
+			.add(" seconds.");
 	}
 }

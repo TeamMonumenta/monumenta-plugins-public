@@ -174,7 +174,7 @@ public class Skyhook extends DepthsAbility {
 	}
 
 	private static Description<Skyhook> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Skyhook>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Shooting a projectile while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location and reduce all other ability cooldowns by ")
 			.addPercent(a -> a.mCDRPerBlock, CDR_PERCENT_PER_BLOCK)
 			.add(" per block traveled, up to a maximum of 5 seconds.")

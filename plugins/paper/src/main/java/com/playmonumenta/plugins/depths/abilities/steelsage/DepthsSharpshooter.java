@@ -87,7 +87,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 	}
 
 	private static Description<DepthsSharpshooter> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsSharpshooter>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("You deal ")
 			.addPercent(a -> a.mPassiveDamage, PASSIVE_DAMAGE[rarity - 1], false, true)
 			.add(" more projectile damage. ")

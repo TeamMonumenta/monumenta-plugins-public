@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import java.util.ArrayList;
+import java.util.List;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
@@ -13,18 +14,16 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings("NullAway.Init")
 public abstract class PlayerClass {
 
-	public ArrayList<AbilityInfo<?>> mAbilities = new ArrayList<>();
+	public List<AbilityInfo<?>> mAbilities = new ArrayList<>();
 	public int mClass;
 	public String mClassName;
 	public TextColor mClassColor;
 	public Material mClassGlassFiller;
 	public Material mDisplayItem;
 	public @Nullable String mQuestReq = null;
-	public @Nullable String mPermissionString = null;
 	public int mQuestReqMin;
 	public String mClassDescription;
-	public String mClassPassiveDescription;
-	public String mClassPassiveName;
+	public AbilityInfo<?> mPassive;
 
 	public PlayerSpec mSpecOne = new PlayerSpec();
 	public PlayerSpec mSpecTwo = new PlayerSpec();

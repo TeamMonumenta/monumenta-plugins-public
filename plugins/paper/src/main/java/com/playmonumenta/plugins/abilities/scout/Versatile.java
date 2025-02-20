@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.scout;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Scout;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -17,7 +19,8 @@ public class Versatile extends Ability {
 	public static final float DAMAGE_MULTIPLY_PROJ = 0.40f;
 
 	public static final AbilityInfo<Versatile> INFO =
-		new AbilityInfo<>(Versatile.class, null, Versatile::new)
+		new AbilityInfo<>(Versatile.class, "Versatile", Versatile::new)
+			.description(getDescription())
 			.canUse(player -> AbilityUtils.getClassNum(player) == Scout.CLASS_ID);
 
 	public Versatile(Plugin plugin, Player player) {
@@ -43,6 +46,15 @@ public class Versatile extends Ability {
 			}
 		}
 		return false; // no recursion possible as we only change the damage amount
+	}
+
+	private static Description<Versatile> getDescription() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Gain ")
+			.addPercent(DAMAGE_MULTIPLY_MELEE)
+			.add(" of your % Projectile Damage as Attack Damage and ")
+			.addPercent(DAMAGE_MULTIPLY_PROJ)
+			.add(" of your % Attack Damage as Projectile Damage.");
 	}
 
 }

@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.EagleEyeCS;
@@ -58,14 +60,7 @@ public class EagleEye extends Ability {
 			.linkedSpell(ClassAbility.EAGLE_EYE)
 			.scoreboardId("Tinkering")
 			.shorthandName("EE")
-			.descriptions(
-				String.format("When you left-click while sneaking you reveal all enemies in a %d block radius, " +
-					              "giving them the glowing effect for %d seconds. Affected enemies have %d%% Vulnerability. " +
-					              "If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by %d seconds. " +
-					              "This skill can not be activated if you have a pickaxe in your mainhand. Cooldown: %ds.",
-					EAGLE_EYE_RADIUS, EAGLE_EYE_DURATION / 20, (int) (EAGLE_EYE_1_VULN_LEVEL * 100), EAGLE_EYE_REFRESH / 20, EAGLE_EYE_COOLDOWN / 20),
-				String.format("The effect is increased to %d%% Vulnerability.", (int) (EAGLE_EYE_2_VULN_LEVEL * 100)),
-				"Your first attack against every enemy affected by this ability will deal " + (int) (ENHANCEMENT_DAMAGE_PERCENT * 100) + "% extra damage.")
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Reveal nearby mobs, making them more vulnerable to attacks.")
 			.cooldown(EAGLE_EYE_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EagleEye::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).fallThrough()
@@ -73,12 +68,18 @@ public class EagleEye extends Ability {
 			.displayItem(Material.ENDER_EYE);
 
 	private final double mVulnLevel;
+	private final double mRadius;
+	private final int mDuration;
+	private final int mRefresh;
 	private List<LivingEntity> mEntitiesAffected = new ArrayList<>(); // Used for tracking Entities on a first hit.
 	private final EagleEyeCS mCosmetic;
 
 	public EagleEye(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mVulnLevel = (isLevelOne() ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EAGLE_EYE_RADIUS);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, EAGLE_EYE_DURATION);
+		mRefresh = CharmManager.getDuration(mPlayer, CHARM_REFRESH, EAGLE_EYE_REFRESH);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EagleEyeCS());
 	}
 
@@ -91,7 +92,7 @@ public class EagleEye extends Ability {
 		World world = mPlayer.getWorld();
 		mCosmetic.eyeStart(world, mPlayer, mPlayer.getLocation());
 
-		mEntitiesAffected = new Hitbox.SphereHitbox(mPlayer.getEyeLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, EAGLE_EYE_RADIUS)).getHitMobs();
+		mEntitiesAffected = new Hitbox.SphereHitbox(mPlayer.getEyeLocation(), mRadius).getHitMobs();
 
 		for (LivingEntity mob : mEntitiesAffected) {
 			// Don't apply vulnerability to arena mobs
@@ -99,15 +100,13 @@ public class EagleEye extends Ability {
 				continue;
 			}
 
-			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, EAGLE_EYE_DURATION);
-
 			// If enhanced, add two glowing instances and remove the enhancement bonus glow on the first hit
 			if (isEnhanced()) {
-				GlowingManager.startGlowing(mob, mCosmetic.enhancementGlowColor(), duration, GlowingManager.PLAYER_ABILITY_PRIORITY + 1, p -> canSeeGlowing(p, mPlayer), "EagleEyeEnhancement-" + mPlayer.name());
+				GlowingManager.startGlowing(mob, mCosmetic.enhancementGlowColor(), mDuration, GlowingManager.PLAYER_ABILITY_PRIORITY + 1, p -> canSeeGlowing(p, mPlayer), "EagleEyeEnhancement-" + mPlayer.name());
 			}
-			GlowingManager.startGlowing(mob, NamedTextColor.WHITE, duration, GlowingManager.PLAYER_ABILITY_PRIORITY, p -> canSeeGlowing(p, mPlayer), null);
+			GlowingManager.startGlowing(mob, NamedTextColor.WHITE, mDuration, GlowingManager.PLAYER_ABILITY_PRIORITY, p -> canSeeGlowing(p, mPlayer), null);
 
-			EntityUtils.applyVulnerability(mPlugin, duration, mVulnLevel, mob);
+			EntityUtils.applyVulnerability(mPlugin, mDuration, mVulnLevel, mob);
 
 			new BukkitRunnable() {
 				int mTicks = 0;
@@ -116,10 +115,10 @@ public class EagleEye extends Ability {
 				public void run() {
 					mTicks++;
 					if (mob.isDead() || !mob.isValid()) {
-						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, CharmManager.getDuration(mPlayer, CHARM_REFRESH, EAGLE_EYE_REFRESH));
+						mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.EAGLE_EYE, mRefresh);
 						this.cancel();
 					}
-					if (mTicks >= duration) {
+					if (mTicks >= mDuration) {
 						this.cancel();
 						mEntitiesAffected.clear();
 					}
@@ -160,4 +159,32 @@ public class EagleEye extends Ability {
 		return false;
 	}
 
+	private static Description<EagleEye> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to reveal all enemies within ")
+			.add(a -> a.mRadius, EAGLE_EYE_RADIUS)
+			.add(" blocks, giving them the glowing effect for ")
+			.addDuration(a -> a.mDuration, EAGLE_EYE_DURATION)
+			.add(" seconds. Affected enemies have ")
+			.addPercent(a -> a.mVulnLevel, EAGLE_EYE_1_VULN_LEVEL, false, Ability::isLevelOne)
+			.add(" vulnerability. If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by ")
+			.addDuration(a -> a.mRefresh, EAGLE_EYE_REFRESH)
+			.add(" seconds.")
+			.addCooldown(EAGLE_EYE_COOLDOWN);
+	}
+
+	private static Description<EagleEye> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The vulnerability is increased to ")
+			.addPercent(a -> a.mVulnLevel, EAGLE_EYE_2_VULN_LEVEL, false, Ability::isLevelTwo)
+			.add(".");
+	}
+
+	private static Description<EagleEye> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Your first attack against every enemy affected by this ability will deal ")
+			.addPercent(ENHANCEMENT_DAMAGE_PERCENT)
+			.add(" extra damage.");
+	}
 }

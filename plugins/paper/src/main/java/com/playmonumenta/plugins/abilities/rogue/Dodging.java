@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.DodgingCS;
@@ -45,10 +47,6 @@ public class Dodging extends Ability {
 	 * Because of the way the ability system works, one event triggers (which puts
 	 * it on cooldown), then the other event is missed because the skill is on
 	 * cooldown...
-	 *
-	 * So this skill has mInfo.ignoreCooldown = true, meaning the events will always
-	 * be triggered here, even when the skill is on cooldown. It must check itself
-	 * that cooldown is active and behave accordingly.
 	 */
 
 	/*
@@ -66,32 +64,31 @@ public class Dodging extends Ability {
 
 	public static final String CHARM_COOLDOWN = "Dodging Cooldown";
 	public static final String CHARM_SPEED = "Dodging Speed Amplifier";
+	public static final String CHARM_DURATION = "Doding Speed Duration";
+	public static final String CHARM_REFLECTED_DAMAGE = "Dodging Reflected Damage";
 
 	public static final AbilityInfo<Dodging> INFO =
 		new AbilityInfo<>(Dodging.class, "Dodging", Dodging::new)
 			.linkedSpell(ClassAbility.DODGING)
 			.scoreboardId("Dodging")
 			.shorthandName("Dg")
-			.descriptions(
-				String.format("Blocks an arrow, thrown potion, blaze fireball, or snowball that would have hit you. Cooldown: %ss.",
-					DODGING_COOLDOWN_1 / 20),
-				String.format("The cooldown is reduced to %ss. When this ability is triggered, you gain +%s%% Speed for %ss.",
-					DODGING_COOLDOWN_2 / 20,
-					(int) (PERCENT_SPEED * 100),
-					DODGING_SPEED_EFFECT_DURATION / 20),
-				"The projectile you dodged is now reflected back to the enemy at 3x damage.")
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Dodge a projectile that would otherwise hit you.")
 			.cooldown(DODGING_COOLDOWN_1, DODGING_COOLDOWN_2, CHARM_COOLDOWN)
 			.displayItem(Material.SHIELD);
 
-	private final double mSpeedPotency;
+	private final double mSpeed;
+	private final int mDuration;
+	private final double mReflectedDamage;
+
 	private final DodgingCS mCosmetic;
 	private int mTriggerTick = 0;
 
 	public Dodging(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
-		// NOTE: This skill will get events even when it is on cooldown!
-		mSpeedPotency = PERCENT_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
+		mSpeed = PERCENT_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DODGING_SPEED_EFFECT_DURATION);
+		mReflectedDamage = ENHANCEMENT_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REFLECTED_DAMAGE);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new DodgingCS());
 	}
 
@@ -124,7 +121,7 @@ public class Dodging extends Ability {
 				if (source != null) {
 					deflectParticles(source);
 
-					DamageUtils.damage(mPlayer, source, DamageType.PROJECTILE_SKILL, event.getOriginalDamage() * ENHANCEMENT_DAMAGE, mInfo.getLinkedSpell(), true);
+					DamageUtils.damage(mPlayer, source, DamageType.PROJECTILE_SKILL, event.getOriginalDamage() * mReflectedDamage, mInfo.getLinkedSpell(), true);
 					// mPlayer.sendMessage(source.getName() + " HP: " + source.getHealth() + " / " + source.getMaxHealth() + " (-" + event.getOriginalDamage() + ")");
 
 					// If applicable (either arrow or trident), apply knockback
@@ -178,7 +175,6 @@ public class Dodging extends Ability {
 					if (arrow.hasCustomEffects()) {
 						for (PotionEffect potionEffect : arrow.getCustomEffects()) {
 							PotionUtils.applyPotion(mPlayer, livingEntity, potionEffect);
-							// mPlayer.sendMessage("Applied " + potionEffect);
 						}
 					}
 				}
@@ -194,7 +190,7 @@ public class Dodging extends Ability {
 	public boolean playerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities,
 											   ThrownPotion potion, PotionSplashEvent event) {
 		// If potion is thrown by a player or a non-living entity (trap), let it continue.
-		if (!(event.getEntity().getShooter() instanceof LivingEntity) || event.getEntity().getShooter() instanceof Player) {
+		if (!(event.getEntity().getShooter() instanceof LivingEntity enemy) || enemy instanceof Player) {
 			return true;
 		}
 
@@ -202,13 +198,12 @@ public class Dodging extends Ability {
 
 		// If Dodging is enhanced: Return the potion effects to sender (probably the witch).
 		// If code is here we already know it is a living entity.
-		if (isEnhanced() && dodgeCheck && EntityUtils.isHostileMob((LivingEntity) event.getEntity().getShooter())) {
-			LivingEntity enemy = (LivingEntity) event.getEntity().getShooter();
+		if (isEnhanced() && dodgeCheck && EntityUtils.isHostileMob(enemy)) {
 
 			// (I am pretty sure the only potion throwers are in fact, witches)
 			// (But for a more general case, I will default use the enemy's attack damage stat, like how witches do.)
 			double damage = EntityUtils.getAttributeOrDefault(enemy, Attribute.GENERIC_ATTACK_DAMAGE, 1);
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage * ENHANCEMENT_DAMAGE, mInfo.getLinkedSpell(), true);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage * mReflectedDamage, mInfo.getLinkedSpell(), true);
 
 			for (PotionEffect potionEffect : potion.getEffects()) {
 				PotionUtils.applyPotion(mPlayer, enemy, potionEffect);
@@ -226,17 +221,12 @@ public class Dodging extends Ability {
 			return true;
 		}
 
-		/*
-		 * Must check with cooldown timers directly because isAbilityOnCooldown always returns
-		 * false (because ignoreCooldown is true)
-		 */
 		if (isOnCooldown()) {
 			/*
 			 * This ability is actually on cooldown (and was not triggered this tick)
 			 * Don't process dodging
 			 */
 			return false;
-
 		}
 
 		/*
@@ -249,8 +239,7 @@ public class Dodging extends Ability {
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
 		World world = mPlayer.getWorld();
 		if (isLevelTwo()) {
-			mPlugin.mEffectManager.addEffect(mPlayer, ATTR_NAME,
-				new PercentSpeed(DODGING_SPEED_EFFECT_DURATION, mSpeedPotency, ATTR_NAME).deleteOnAbilityUpdate(true));
+			mPlugin.mEffectManager.addEffect(mPlayer, ATTR_NAME, new PercentSpeed(mDuration, mSpeed, ATTR_NAME).deleteOnAbilityUpdate(true));
 
 			mCosmetic.dodgeEffectLv2(mPlayer, world, loc);
 		}
@@ -274,5 +263,28 @@ public class Dodging extends Ability {
 			particleLocation.add(direction);
 			mCosmetic.deflectTrailEffect(mPlayer, particleLocation);
 		}
+	}
+
+	private static Description<Dodging> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Block an arrow, thrown potion, blaze fireball, or snowball that would have hit you.")
+			.addCooldown(DODGING_COOLDOWN_1, Ability::isLevelOne);
+	}
+
+	private static Description<Dodging> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When this ability is triggered, you gain ")
+			.addPercent(a -> a.mSpeed, PERCENT_SPEED)
+			.add(" speed for ")
+			.addDuration(a -> a.mDuration, DODGING_SPEED_EFFECT_DURATION)
+			.add(" seconds.")
+			.addCooldown(DODGING_COOLDOWN_2, Ability::isLevelTwo);
+	}
+
+	private static Description<Dodging> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The projectile you dodged is now reflected back to the source at ")
+			.addPercent(a -> a.mReflectedDamage, ENHANCEMENT_DAMAGE)
+			.add(" damage.");
 	}
 }

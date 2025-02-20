@@ -34,7 +34,7 @@ public class Generosity extends DepthsAbility {
 	}
 
 	private static Description<Generosity> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Generosity>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Once per floor, removing or mutating away an ability gifts it to all other teammates, provided they have an open slot for it. The donated ability's level will be ")
 			.add(DepthsUtils.getRarityComponent(rarity))
 			.add(".");

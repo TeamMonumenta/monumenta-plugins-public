@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.CleansingRainCS;
@@ -15,9 +17,9 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -46,14 +48,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 			.linkedSpell(ClassAbility.CLEANSING_RAIN)
 			.scoreboardId("Cleansing")
 			.shorthandName("CR")
-			.descriptions(
-				"Right click while sneaking and looking upwards to summon a \"cleansing rain\" that follows you, " +
-					"removing negative effects from players within %s blocks, including yourself, and lasts for %s seconds. Cooldown: %ss."
-						.formatted(CLEANSING_RADIUS, StringUtils.ticksToSeconds(CLEANSING_DURATION), StringUtils.ticksToSeconds(CLEANSING_1_COOLDOWN)),
-				"Additionally grants %s%% Damage Reduction to all players in the radius. Cooldown: %ss."
-					.formatted(StringUtils.multiplierToPercentage(Math.abs(PERCENT_DAMAGE_RESIST)), StringUtils.ticksToSeconds(CLEANSING_2_COOLDOWN)),
-				"The radius increases to %s blocks, and each player touched by the rain keeps its effect for the cast duration."
-					.formatted(CLEANSING_RADIUS_ENHANCED))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Summon a rain cloud that cleanses debuffs and grants resistance to players below it.")
 			.cooldown(CLEANSING_1_COOLDOWN, CLEANSING_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CleansingRain::cast,
@@ -185,5 +180,31 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
+
+	private static Description<CleansingRain> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to summon a \"cleansing rain\" that follows you, removing negative effects from players within ")
+			.add(a -> a.mRadius, CLEANSING_RADIUS, false, Predicate.not(Ability::isEnhanced))
+			.add(" blocks, including yourself, and lasts for ")
+			.addDuration(a -> a.mRainDuration, CLEANSING_DURATION)
+			.add(" seconds.")
+			.addCooldown(CLEANSING_1_COOLDOWN, Ability::isLevelOne);
+	}
+
+	private static Description<CleansingRain> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Additionally grants ")
+			.addPercent(a -> a.mResistancePotency, PERCENT_DAMAGE_RESIST)
+			.add(" resistance to all players in the radius.")
+			.addCooldown(CLEANSING_2_COOLDOWN, Ability::isLevelTwo);
+	}
+
+	private static Description<CleansingRain> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The radius increases to ")
+			.add(a -> a.mRadius, CLEANSING_RADIUS_ENHANCED, false, Ability::isEnhanced)
+			.add(" blocks, and each player touched by the rain keeps its effect for the cast duration.");
 	}
 }

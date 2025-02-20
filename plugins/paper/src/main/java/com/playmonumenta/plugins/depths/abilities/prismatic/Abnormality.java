@@ -47,7 +47,7 @@ public class Abnormality extends DepthsAbility {
 	}
 
 	public static Description<Abnormality> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Abnormality>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Gain a random ability at ")
 			.add(DepthsRarity.TWISTED.getDisplay())
 			.add(" rarity, a selection of ")

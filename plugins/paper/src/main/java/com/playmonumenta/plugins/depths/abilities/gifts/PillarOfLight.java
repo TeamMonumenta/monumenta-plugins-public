@@ -24,6 +24,6 @@ public class PillarOfLight extends DepthsAbility {
 	}
 
 	private static Description<PillarOfLight> getDescription() {
-		return new DescriptionBuilder<PillarOfLight>().add("The radius in which you can revive teammates triples.");
+		return new DescriptionBuilder<>(() -> INFO).add("The radius in which you can revive teammates triples.");
 	}
 }

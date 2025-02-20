@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.SharpshooterCS;
@@ -13,7 +15,6 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -44,26 +45,15 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		new AbilityInfo<>(Sharpshooter.class, "Sharpshooter", Sharpshooter::new)
 			.scoreboardId("Sharpshooter")
 			.shorthandName("Ss")
-			.descriptions(
-				String.format("Your projectiles deal %s more damage.",
-					StringUtils.multiplierToPercentageWithSign(PERCENT_BASE_DAMAGE)),
-				String.format("Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to " +
-					"%s. Stacks decay after %ss of not gaining a stack. Each stack increases the damage " +
-					"bonus by an additional %s. Additionally, gain a %s chance to not consume arrows.",
-					MAX_STACKS,
-					StringUtils.ticksToSeconds(SHARPSHOOTER_DECAY_TIMER),
-					StringUtils.multiplierToPercentageWithSign(PERCENT_DAMAGE_PER_STACK),
-					StringUtils.multiplierToPercentageWithSign(ARROW_SAVE_CHANCE)),
-				String.format("The damage bonus is further increased by %s per block of distance between you and " +
-					"the target, up to %s blocks.",
-					StringUtils.multiplierToPercentageWithSign(DAMAGE_PER_BLOCK),
-					MAX_DISTANCE))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Gain increased projectile damage. Landing shots further increases damage.")
 			.displayItem(Material.TARGET);
 
 	private final int mMaxStacks;
 	private final int mDecayTime;
+	private final double mDamagePerStack;
 	private final double mArrowSaveChance;
+	private final double mMaxDistance;
 	private final SharpshooterCS mCosmetic;
 
 	private int mStacks = 0;
@@ -73,7 +63,9 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		super(plugin, player, INFO);
 		mMaxStacks = MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 		mDecayTime = CharmManager.getDuration(mPlayer, CHARM_DECAY, SHARPSHOOTER_DECAY_TIMER);
+		mDamagePerStack = PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE);
 		mArrowSaveChance = ARROW_SAVE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RETRIEVAL);
+		mMaxDistance = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DISTANCE, MAX_DISTANCE);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new SharpshooterCS());
 	}
 
@@ -87,14 +79,14 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 			double multiplier = 1 + PERCENT_BASE_DAMAGE;
 			if (!huntingCompanion) {
 				if (isLevelTwo()) {
-					multiplier += mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE));
+					multiplier += mStacks * mDamagePerStack;
 				}
 				if (isEnhanced()) {
-					multiplier += Math.min(enemy.getLocation().distance(mPlayer.getLocation()), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DISTANCE, MAX_DISTANCE)) * DAMAGE_PER_BLOCK;
+					multiplier += Math.min(enemy.getLocation().distance(mPlayer.getLocation()), mMaxDistance) * DAMAGE_PER_BLOCK;
 				}
 			} else {
 				// half stack bonus for hunting companion
-				multiplier += mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE)) / 2;
+				multiplier += mStacks * mDamagePerStack / 2;
 			}
 
 			event.updateDamageWithMultiplier(multiplier);
@@ -173,5 +165,34 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		} else {
 			return Component.text("");
 		}
+	}
+
+	private static Description<Sharpshooter> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Your projectiles deal ")
+			.addPercent(PERCENT_BASE_DAMAGE)
+			.add(" more damage.");
+	}
+
+	private static Description<Sharpshooter> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to ")
+			.add(a -> a.mMaxStacks, MAX_STACKS)
+			.add(". Stacks decay after ")
+			.addDuration(a -> a.mDecayTime, SHARPSHOOTER_DECAY_TIMER)
+			.add(" seconds of not gaining a stack. Each stack increases the damage bonus by an additional ")
+			.addPercent(a -> a.mDamagePerStack, PERCENT_DAMAGE_PER_STACK)
+			.add(". Additionally, gain a ")
+			.addPercent(a -> a.mArrowSaveChance, ARROW_SAVE_CHANCE)
+			.add(" chance to not consume arrows.");
+	}
+
+	private static Description<Sharpshooter> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage bonus is further increased by ")
+			.addPercent(DAMAGE_PER_BLOCK)
+			.add(" per block of distance between you and the target, up to ")
+			.add(a -> a.mMaxDistance, MAX_DISTANCE)
+			.add(" blocks.");
 	}
 }

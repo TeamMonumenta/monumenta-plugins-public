@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.HandOfLightCS;
@@ -16,7 +18,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -60,33 +61,7 @@ public class HandOfLight extends Ability {
 			.linkedSpell(ClassAbility.HAND_OF_LIGHT)
 			.scoreboardId("Healing")
 			.shorthandName("HoL")
-			.descriptions(
-				String.format("Right click while sneaking and holding a weapon or tool to heal all other players in a %s block cone in front of you or within %s blocks of you " +
-					"for %s hearts + %s%% of their max health and gives them regen %s for %s seconds. " +
-					"Additionally, damage all mobs in the area with magic damage equal to %s times the number of undead mobs in the range, up to %s damage. " +
-					"If holding a shield, the trigger is changed to sneak + right click. Cooldown: %ss.",
-					RANGE,
-					NEARBY_SPHERE_RANGE,
-					FLAT_1 / 2,
-					StringUtils.multiplierToPercentage(PERCENT_1),
-					REGEN_LEVEL + 1,
-					StringUtils.ticksToSeconds(REGEN_DURATION),
-					DAMAGE_PER_1,
-					DAMAGE_MAX_1,
-					StringUtils.ticksToSeconds(HEALING_1_COOLDOWN)),
-				String.format("The healing is improved to %s hearts + %s%% of their max health. Damage is increased to %s damage per undead mob, up to %s. Cooldown: %ss.",
-					FLAT_2 / 2,
-					StringUtils.multiplierToPercentage(PERCENT_2),
-					DAMAGE_PER_2,
-					DAMAGE_MAX_2,
-					StringUtils.ticksToSeconds(HEALING_2_COOLDOWN)),
-				String.format("The cone is changed to a sphere of equal range, centered on the Cleric." +
-					              " The cooldown is reduced by %s%% for each 4 health healed, capped at %s%% cooldown." +
-					              " All Undead caught in the radius are stunned for %ss.",
-					(int) (ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED * 100),
-					(int) (ENHANCEMENT_COOLDOWN_REDUCTION_MAX * 100),
-					ENHANCEMENT_UNDEAD_STUN_DURATION / 20.0
-				))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Heal all players in front of the Cleric, and damage all mobs based on the number of Undead in the area.")
 			.cooldown(HEALING_1_COOLDOWN, HEALING_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HandOfLight::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
@@ -94,7 +69,7 @@ public class HandOfLight extends Ability {
 			.displayItem(Material.PINK_DYE);
 
 	private final double mRange;
-	private final int mFlat;
+	private final double mFlat;
 	private final double mPercent;
 	private final double mDamagePer;
 	private final double mDamageMax;
@@ -106,10 +81,10 @@ public class HandOfLight extends Ability {
 	public HandOfLight(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-		mFlat = isLevelOne() ? FLAT_1 : FLAT_2;
-		mPercent = isLevelOne() ? PERCENT_1 : PERCENT_2;
-		mDamagePer = isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2;
-		mDamageMax = isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
+		mFlat = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, isLevelOne() ? FLAT_1 : FLAT_2);
+		mPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, isLevelOne() ? PERCENT_1 : PERCENT_2);
+		mDamagePer = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2);
+		mDamageMax = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS());
 
@@ -143,7 +118,6 @@ public class HandOfLight extends Ability {
 			}
 		}
 		double damage = Math.min(undeadMobs.size() * mDamagePer, mDamageMax);
-		damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 		double cooldown = getModifiedCooldown();
 
 		if (damage > 0) {
@@ -165,7 +139,7 @@ public class HandOfLight extends Ability {
 			for (Player p : nearbyPlayers) {
 				double maxHealth = EntityUtils.getMaxHealth(p);
 				double healthBeforeHeal = p.getHealth();
-				PlayerUtils.healPlayer(mPlugin, p, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, mFlat + mPercent * maxHealth), mPlayer);
+				PlayerUtils.healPlayer(mPlugin, p, mFlat + mPercent * maxHealth, mPlayer);
 				healthHealed += p.getHealth() - healthBeforeHeal;
 
 				Location loc = p.getLocation();
@@ -186,5 +160,53 @@ public class HandOfLight extends Ability {
 
 		putOnCooldown((int) cooldown);
 		return true;
+	}
+
+	private static Description<HandOfLight> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to heal all other players in a ")
+			.add(a -> a.mRange, RANGE)
+			.add(" block cone in front of you or within ")
+			.add(a -> NEARBY_SPHERE_RANGE, NEARBY_SPHERE_RANGE)
+			.add(" blocks of you for ")
+			.add(a -> a.mFlat, FLAT_1, false, Ability::isLevelOne)
+			.add(" health + ")
+			.addPercent(a -> a.mPercent, PERCENT_1, false, Ability::isLevelOne)
+			.add(" of their max health and gives them Regeneration ")
+			.addPotionAmplifier(REGEN_LEVEL)
+			.add(" for ")
+			.addDuration(REGEN_DURATION)
+			.add(" seconds. Additionally, damage all mobs in the area with magic damage equal to ")
+			.add(a -> a.mDamagePer, DAMAGE_PER_1, false, Ability::isLevelOne)
+			.add(" times the number of undead mobs in the range, up to ")
+			.add(a -> a.mDamageMax, DAMAGE_MAX_1, false, Ability::isLevelOne)
+			.add(" damage.")
+			.addCooldown(HEALING_1_COOLDOWN, Ability::isLevelOne);
+	}
+
+	private static Description<HandOfLight> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The healing is improved to ")
+			.add(a -> a.mFlat, FLAT_2, false, Ability::isLevelTwo)
+			.add(" health + ")
+			.addPercent(a -> a.mPercent, PERCENT_2, false, Ability::isLevelTwo)
+			.add(" of their max health. Damage is increased to ")
+			.add(a -> a.mDamagePer, DAMAGE_PER_2, false, Ability::isLevelTwo)
+			.add(" damage per undead mob, up to ")
+			.add(a -> a.mDamageMax, DAMAGE_MAX_2, false, Ability::isLevelTwo)
+			.add(".")
+			.addCooldown(HEALING_2_COOLDOWN, Ability::isLevelTwo);
+	}
+
+	private static Description<HandOfLight> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The cone is changed to a sphere of equal range, centered on the Cleric. The cooldown is reduced by ")
+			.addPercent(ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED)
+			.add(" for each 4 health healed, capped at ")
+			.addPercent(ENHANCEMENT_COOLDOWN_REDUCTION_MAX)
+			.add(" cooldown. All Undead caught in the radius are stunned for ")
+			.addDuration(ENHANCEMENT_UNDEAD_STUN_DURATION)
+			.add(" seconds.");
 	}
 }

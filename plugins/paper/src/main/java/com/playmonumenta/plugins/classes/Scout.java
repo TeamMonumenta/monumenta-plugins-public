@@ -37,11 +37,7 @@ public class Scout extends PlayerClass {
 		mClassGlassFiller = Material.LIGHT_BLUE_STAINED_GLASS_PANE;
 		mDisplayItem = Material.BOW;
 		mClassDescription = "Scouts are agile masters of archery and exploration.";
-		mClassPassiveDescription = String.format("Gain %s of your Projectile Damage %% as Attack Damage and " +
-			"%s of your Attack Damage %% as Projectile Damage.",
-			StringUtils.multiplierToPercentageWithSign(Versatile.DAMAGE_MULTIPLY_MELEE),
-			StringUtils.multiplierToPercentageWithSign(Versatile.DAMAGE_MULTIPLY_PROJ));
-		mClassPassiveName = "Versatile";
+		mPassive = Versatile.INFO;
 
 		mSpecOne.mAbilities.addAll(List.of(RendingRazor.INFO, WhirlingBlade.INFO, TacticalManeuver.INFO));
 		mSpecOne.mSpecQuestScoreboard = "Quest103e";

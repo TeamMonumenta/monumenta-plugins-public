@@ -53,7 +53,7 @@ public class DepthsDethroner extends DepthsAbility {
 	}
 
 	private static Description<DepthsDethroner> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsDethroner>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("You deal ")
 			.addPercent(a -> a.mEliteDamage, ELITE_DAMAGE[rarity - 1], false, true)
 			.add(" more damage to elites and ")

@@ -68,7 +68,7 @@ public class CurseOfGluttony extends DepthsAbility {
 	}
 
 	private static Description<CurseOfGluttony> getDescription() {
-		return new DescriptionBuilder<CurseOfGluttony>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Lose your 2 highest rarity abilities.");
 	}
 }

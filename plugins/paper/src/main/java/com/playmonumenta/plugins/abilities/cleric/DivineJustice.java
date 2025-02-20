@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.DivineJusticeCS;
@@ -69,34 +71,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.linkedSpell(ABILITY)
 			.scoreboardId("DivineJustice")
 			.shorthandName("DJ")
-			.descriptions(
-				String.format(
-					"Critical melee or projectile attacks deal %s plus %s%% of your critical attack damage as magic damage to undead enemies.",
-					DAMAGE,
-					StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER_1)
-				),
-				String.format(
-					"The damage is increased to %s plus %s%% of your critical attack damage. Additionally, killing an undead " +
-						"enemy heals you for %s%% of your max health and heals players within %s blocks of you for %s%% of their max health.",
-					DAMAGE,
-					StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER_2),
-					StringUtils.multiplierToPercentage(HEALING_MULTIPLIER_OWN),
-					RADIUS,
-					StringUtils.multiplierToPercentage(HEALING_MULTIPLIER_OTHER)
-				),
-				String.format(
-					"Undead killed have a %s%% chance to drop Purified Ash which lingers for %ss." +
-						" Clerics with this ability who pick it up get %s%% increased undead damage for %ss." +
-						" This effect stacks up to %s%% and the duration is refreshed on each pickup." +
-						" Bone Shards can be consumed from the inventory by right-clicking to get the max effect for %s minutes.",
-					StringUtils.multiplierToPercentage(ENHANCEMENT_ASH_CHANCE),
-					StringUtils.ticksToSeconds(ENHANCEMENT_ASH_DURATION),
-					StringUtils.multiplierToPercentage(ENHANCEMENT_ASH_BONUS_DAMAGE),
-					StringUtils.ticksToSeconds(ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION),
-					StringUtils.multiplierToPercentage(ENHANCEMENT_BONUS_DAMAGE_MAX),
-					ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION / Constants.TICKS_PER_MINUTE
-				)
-			)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Deal extra damage on critical melee or projectile attacks against Undead enemies and heal when killing Undead enemies.")
 			.remove(DivineJustice::remove)
 			.displayItem(Material.IRON_SWORD);
@@ -106,6 +81,10 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	// Passive damage to share with Holy Javelin
 	public double mLastPassiveDJDamage = 0;
 
+	private final double mPercentDamage;
+	private final double mSelfHeal;
+	private final double mAllyHeal;
+	private final double mRadius;
 	private final double mEnhanceDamage;
 	private final int mEnhanceDuration;
 
@@ -116,6 +95,10 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	public DivineJustice(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mPercentDamage = (isLevelOne() ? DAMAGE_MULTIPLIER_1 : DAMAGE_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mSelfHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF, HEALING_MULTIPLIER_OWN);
+		mAllyHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, HEALING_MULTIPLIER_OTHER);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_HEAL_RADIUS, RADIUS);
 		mEnhanceDamage = ENHANCEMENT_ASH_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE);
 		mEnhanceDuration = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_DURATION, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new DivineJusticeCS());
@@ -138,13 +121,13 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			// TODO: Remove DivineJusticeInvuln and use OnHitTimerEffect
 			final DivineJusticeInvuln divineJusticeInvuln = mPlugin.mEffectManager.getActiveEffect(enemy, DivineJusticeInvuln.class);
 			if (divineJusticeInvuln == null) {
-				mLastPassiveDJDamage = calculateDamage(event, (isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1), isMeleeCrit, false);
+				mLastPassiveDJDamage = calculateDamage(event, mPercentDamage, isMeleeCrit, false);
 				DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveDJDamage, mInfo.getLinkedSpell(), true, false);
 				mPlugin.mEffectManager.addEffect(enemy, DivineJusticeInvuln.SOURCE, new DivineJusticeInvuln(DivineJusticeInvuln.DURATION, mLastPassiveDJDamage));
 				onDamageCosmeticEffects(enemy);
 			} else {
 				/* The enemy has been hit by DJ recently. Check to see if the new hit can apply more damage */
-				final double attemptDamage = calculateDamage(event, (isLevelTwo() ? DAMAGE_MULTIPLIER_2 : DAMAGE_MULTIPLIER_1), isMeleeCrit, false);
+				final double attemptDamage = calculateDamage(event, mPercentDamage, isMeleeCrit, false);
 				final int duration = divineJusticeInvuln.getDuration();
 				final double magnitude = divineJusticeInvuln.getMagnitude();
 
@@ -163,14 +146,9 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	@Override
 	public void entityDeathEvent(EntityDeathEvent entityDeathEvent, boolean dropsLoot) {
 		if (isLevelTwo() && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)) {
-			PlayerUtils.healPlayer(mPlugin, mPlayer,
-				CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF, EntityUtils.getMaxHealth(mPlayer) * HEALING_MULTIPLIER_OWN)
-			);
-			final List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_HEAL_RADIUS, RADIUS), true);
-			players.forEach(otherPlayer -> PlayerUtils.healPlayer(mPlugin, otherPlayer,
-				CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, EntityUtils.getMaxHealth(otherPlayer) * HEALING_MULTIPLIER_OTHER),
-				mPlayer
-			));
+			PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * mSelfHeal);
+			final List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, mRadius, true);
+			players.forEach(otherPlayer -> PlayerUtils.healPlayer(mPlugin, otherPlayer, EntityUtils.getMaxHealth(otherPlayer) * mAllyHeal, mPlayer));
 
 			players.add(mPlayer);
 			mCosmetic.justiceKill(mPlayer, entityDeathEvent.getEntity().getLocation());
@@ -216,7 +194,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 		 * Event's flat damage does not include crit bonus and does not include gear/potion/skill buffs, thus readd crit
 		 * bonus for melee crits */
 		return (isLuminous ? 0 : DAMAGE) + event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
-			Math.max((multiplier + (isLuminous ? 0 : CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE))), 0.0);
+			Math.max(multiplier, 0.0);
 	}
 
 	private void onDamageCosmeticEffects(final LivingEntity enemy) {
@@ -323,5 +301,46 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	@Override
 	public int getMaxCharges() {
 		return isEnhanced() ? (int) Math.round(100 * ENHANCEMENT_BONUS_DAMAGE_MAX) : 0;
+	}
+
+	private static Description<DivineJustice> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Critical melee or projectile attacks deal ")
+			.add(a -> DAMAGE, DAMAGE)
+			.add(" plus ")
+			.addPercent(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_1, false, Ability::isLevelOne)
+			.add(" of your critical attack damage as magic damage to undead enemies.");
+	}
+
+	private static Description<DivineJustice> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage is increased to ")
+			.add(a -> DAMAGE, DAMAGE)
+			.add(" plus ")
+			.addPercent(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_2, false, Ability::isLevelTwo)
+			.add(" of your critical attack damage. Additionally, killing an undead enemy heals you for ")
+			.addPercent(a -> a.mSelfHeal, HEALING_MULTIPLIER_OWN)
+			.add(" of your max health and heals players within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks of you for ")
+			.addPercent(a -> a.mAllyHeal, HEALING_MULTIPLIER_OTHER)
+			.add(" of their max health.");
+	}
+
+	private static Description<DivineJustice> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Undead killed have a ")
+			.addPercent(ENHANCEMENT_ASH_CHANCE)
+			.add(" chance to drop Purified Ash which lingers for ")
+			.addDuration(ENHANCEMENT_ASH_DURATION)
+			.add(" seconds. Clerics with this ability who pick it up get ")
+			.addPercent(a -> a.mEnhanceDamage, ENHANCEMENT_ASH_BONUS_DAMAGE)
+			.add(" increased undead damage for ")
+			.addDuration(a -> a.mEnhanceDuration, ENHANCEMENT_ASH_DURATION)
+			.add(" seconds. This effect stacks up to ")
+			.addPercent(ENHANCEMENT_BONUS_DAMAGE_MAX)
+			.add(" and the duration is refreshed on each pickup. Bone Shards can be consumed from the inventory by right clicking to get the max effect for ")
+			.add(a -> ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION, ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION, false, StringUtils::ticksToMinutes)
+			.add(" minutes.");
 	}
 }

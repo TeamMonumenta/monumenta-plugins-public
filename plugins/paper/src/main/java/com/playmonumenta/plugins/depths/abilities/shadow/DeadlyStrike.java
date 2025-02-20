@@ -43,7 +43,7 @@ public class DeadlyStrike extends DepthsAbility {
 	}
 
 	private static Description<DeadlyStrike> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DeadlyStrike>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("You deal ")
 			.addPercent(a -> a.mDamage, DAMAGE[rarity - 1], false, true)
 			.add(" more melee damage.");

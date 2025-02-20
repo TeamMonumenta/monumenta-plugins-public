@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.scout;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.VolleyCS;
@@ -54,16 +56,7 @@ public class Volley extends Ability {
 			.linkedSpell(ClassAbility.VOLLEY)
 			.scoreboardId("Volley")
 			.shorthandName("Vly")
-			.descriptions(
-				String.format("When you shoot a projectile while sneaking, you shoot a volley consisting of %d projectiles instead. " +
-					              "Only one arrow is consumed, and each projectile deals %d%% bonus damage. Cooldown: %ds.",
-					VOLLEY_1_ARROW_COUNT,
-					(int) ((VOLLEY_1_DAMAGE_MULTIPLIER - 1) * 100),
-					VOLLEY_COOLDOWN / 20),
-				String.format("Increases the number of projectiles to %d and enhances the damage bonus to %d%%.",
-					VOLLEY_2_ARROW_COUNT,
-					(int) ((VOLLEY_2_DAMAGE_MULTIPLIER - 1) * 100)),
-				String.format("Volley now fires in a 360 degree arc. The projectiles inflict %d%% Bleed for %ds.", (int) (ENHANCEMENT_BLEED_POTENCY * 100), ENHANCEMENT_BLEED_DURATION / 20))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Fire a volley of projectiles in front of you.")
 			.cooldown(VOLLEY_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.ARROW)
@@ -76,7 +69,7 @@ public class Volley extends Ability {
 	public Volley(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mArrows = (isLevelOne() ? VOLLEY_1_ARROW_COUNT : VOLLEY_2_ARROW_COUNT) + (int) CharmManager.getLevel(mPlayer, CHARM_ARROWS);
-		mMultiplier = isLevelOne() ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER;
+		mMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? VOLLEY_1_DAMAGE_MULTIPLIER : VOLLEY_2_DAMAGE_MULTIPLIER);
 		mVolley = new HashSet<>();
 		mVolleyHitMap = new HashMap<>();
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new VolleyCS());
@@ -144,7 +137,7 @@ public class Volley extends Ability {
 		Entity proj = event.getDamager();
 		if (event.getType() == DamageType.PROJECTILE && mVolley.contains(proj)) {
 			if (notBeenHit(enemy)) {
-				event.updateDamageWithMultiplier(mMultiplier * (1 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
+				event.updateDamageWithMultiplier(mMultiplier);
 				mCosmetic.volleyHit(mPlayer, enemy);
 				if (isEnhanced()) {
 					EntityUtils.applyBleed(mPlugin, ENHANCEMENT_BLEED_DURATION, ENHANCEMENT_BLEED_POTENCY, enemy);
@@ -167,4 +160,31 @@ public class Volley extends Ability {
 		return true;
 	}
 
+	private static Description<Volley> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When you shoot a projectile while sneaking, you shoot a volley consisting of ")
+			.add(a -> a.mArrows, VOLLEY_1_ARROW_COUNT, false, Ability::isLevelOne)
+			.add(" projectiles instead. Only one arrow is consumed, and each projectile deals ")
+			.addPercent(a -> a.mMultiplier - 1, VOLLEY_1_DAMAGE_MULTIPLIER - 1, false, Ability::isLevelOne)
+			.add(" bonus damage.")
+			.addCooldown(VOLLEY_COOLDOWN);
+	}
+
+	private static Description<Volley> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Increases the number of projectiles to ")
+			.add(a -> a.mArrows, VOLLEY_2_ARROW_COUNT, false, Ability::isLevelTwo)
+			.add(" and enhances the damage bonus to ")
+			.addPercent(a -> a.mMultiplier - 1, VOLLEY_2_DAMAGE_MULTIPLIER - 1, false, Ability::isLevelTwo)
+			.add(".");
+	}
+
+	private static Description<Volley> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Volley now fires in a 360 degree arc. The projectiles inflict ")
+			.addPercent(ENHANCEMENT_BLEED_POTENCY)
+			.add(" bleed for ")
+			.addDuration(ENHANCEMENT_BLEED_DURATION)
+			.add(" seconds.");
+	}
 }

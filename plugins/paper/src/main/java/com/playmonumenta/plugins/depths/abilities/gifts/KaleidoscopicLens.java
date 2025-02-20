@@ -40,7 +40,7 @@ public class KaleidoscopicLens extends DepthsAbility {
 	}
 
 	private static Description<KaleidoscopicLens> getDescription() {
-		return new DescriptionBuilder<KaleidoscopicLens>().add("Lose your current trees. Gain the trees you didn't have previously, and a ")
+		return new DescriptionBuilder<>(() -> INFO).add("Lose your current trees. Gain the trees you didn't have previously, and a ")
 			.add(DepthsTree.PRISMATIC.getNameComponent())
 			.add(" ability selection.");
 	}

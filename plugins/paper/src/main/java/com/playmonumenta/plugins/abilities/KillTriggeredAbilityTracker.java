@@ -27,6 +27,10 @@ public class KillTriggeredAbilityTracker {
 		this(linkedAbility, ServerProperties.getAbilityEnhancementsEnabled(player) ? r3damage : (ServerProperties.getClassSpecializationsEnabled(player) ? r2damage : r1damage));
 	}
 
+	public int getThreshold() {
+		return mDamageDealtToBossesPerKill;
+	}
+
 	public void updateDamageDealtToBosses(DamageEvent event) {
 		// Prevent Cloak and Dagger's and Luminous Infusion's damage from counting towards boss damage thresholds
 		if (event.getAbility() == ClassAbility.CLOAK_AND_DAGGER || event.getAbility() == ClassAbility.LUMINOUS_INFUSION) {

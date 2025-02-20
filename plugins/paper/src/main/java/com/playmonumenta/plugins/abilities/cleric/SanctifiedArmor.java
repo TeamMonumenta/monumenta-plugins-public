@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.cleric;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.bosses.bosses.HostileBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -16,7 +18,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -63,33 +64,7 @@ public class SanctifiedArmor extends Ability {
 			.linkedSpell(ClassAbility.SANCTIFIED_ARMOR)
 			.scoreboardId("Sanctified")
 			.shorthandName("Sa")
-			.descriptions(
-				("Whenever you are damaged by melee or projectile hits from an undead enemy, deal true damage to the undead based on its max health." +
-					" For every 1%% health the Cleric has above %s%% max health, deal 1%% of the undead's max health, up to a maximum of %s%%." +
-					" Damage is capped based on current region (R1 %d/R2 %d/R3 %d damage)." +
-					" This can only affect each mob once every %ss.")
-					.formatted(
-						StringUtils.multiplierToPercentage(MIN_HEALTH_PERCENT_1),
-						StringUtils.multiplierToPercentage(MAX_PERCENT_DAMAGE_1),
-						L1_DAMAGE_CAP_R1,
-						L1_DAMAGE_CAP_R2,
-						L1_DAMAGE_CAP_R3,
-						StringUtils.ticksToSeconds(DAMAGE_COOLDOWN_1)
-					),
-				("The Cleric's health threshold is reduced to %s%%, and up to %s%% of the undead's max health can be dealt" +
-					" (Capped at R1 %d/R2 %d/R3 %d damage). The undead enemy is also afflicted with %s%% Slowness for" +
-					" %ss. This can only affect each mob once every %ss.")
-					.formatted(
-						StringUtils.multiplierToPercentage(MIN_HEALTH_PERCENT_2),
-						StringUtils.multiplierToPercentage(MAX_PERCENT_DAMAGE_2),
-						L2_DAMAGE_CAP_R1,
-						L2_DAMAGE_CAP_R2,
-						L2_DAMAGE_CAP_R3,
-						StringUtils.multiplierToPercentage(SLOWNESS_AMPLIFIER_2),
-						StringUtils.ticksToSeconds(SLOWNESS_DURATION),
-						StringUtils.ticksToSeconds(DAMAGE_COOLDOWN_2)
-					),
-				"If the most recently affected mob is killed by any means other than Sanctified Armor or Thorns damage, regain half the health lost from the last damage taken.")
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("When taking damage from an Undead enemy, deal damage back based on your current health.")
 			.quest216Message("-------h-------e-------")
 			.displayItem(Material.IRON_CHESTPLATE)
@@ -99,7 +74,9 @@ public class SanctifiedArmor extends Ability {
 	private final double mMinHealthPercent;
 	private final double mDamageCap;
 	private final double mCooldown;
-	private final Map<UUID, Integer> mMobsIframeMap;
+	private final int mDuration;
+	private final double mSlow;
+	private final Map<UUID, Integer> mMobsIframeMap = new HashMap<>();
 
 	private @Nullable UUID mLastAffectedMob = null;
 	private double mLastDamage;
@@ -120,7 +97,8 @@ public class SanctifiedArmor extends Ability {
 		} else {
 			mDamageCap = ServerProperties.getAbilityEnhancementsEnabled(player) ? L2_DAMAGE_CAP_R3 : (ServerProperties.getClassSpecializationsEnabled(player) ? L2_DAMAGE_CAP_R2 : L2_DAMAGE_CAP_R1);
 		}
-		mMobsIframeMap = new HashMap<>();
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SLOWNESS_DURATION);
+		mSlow = SLOWNESS_AMPLIFIER_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SanctifiedArmorCS());
 
@@ -154,7 +132,7 @@ public class SanctifiedArmor extends Ability {
 
 			MovementUtils.knockAway(mPlayer, source, KNOCKBACK_SPEED, KNOCKBACK_SPEED, true);
 			if (isLevelTwo()) {
-				EntityUtils.applySlow(mPlugin, CharmManager.getDuration(mPlayer, CHARM_DURATION, SLOWNESS_DURATION), SLOWNESS_AMPLIFIER_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), source);
+				EntityUtils.applySlow(mPlugin, mDuration, mSlow, source);
 				mCosmetic.sanctOnTrigger2(world, mPlayer, loc, source);
 			} else {
 				mCosmetic.sanctOnTrigger1(world, mPlayer, loc, source);
@@ -225,5 +203,36 @@ public class SanctifiedArmor extends Ability {
 				mLastDamageType = DamageType.THORNS;
 			}
 		}
+	}
+
+	private static Description<SanctifiedArmor> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Whenever you are damaged by melee or projectile hits from an undead enemy, deal true damage to the undead based on its max health. For every 1% health the Cleric has above ")
+			.addPercent(a -> a.mMinHealthPercent, MIN_HEALTH_PERCENT_1, true, Ability::isLevelOne)
+			.add(" max health, deal 1% of the undead's max health, up to a maximum of ")
+			.addPercent(a -> a.mMaxPercentDamage, MAX_PERCENT_DAMAGE_1, false, Ability::isLevelOne)
+			.add(". Damage is capped based on current region (R1 " + L1_DAMAGE_CAP_R1 + "/R2 " + L1_DAMAGE_CAP_R2 + "/R3 " + L1_DAMAGE_CAP_R3 + " damage). This can only affect each mob once every ")
+			.add(a -> a.mCooldown, DAMAGE_COOLDOWN_1, true, Ability::isLevelOne)
+			.add(" seconds.");
+	}
+
+	private static Description<SanctifiedArmor> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The Cleric's health threshold is reduced to ")
+			.addPercent(a -> a.mMinHealthPercent, MIN_HEALTH_PERCENT_2, true, Ability::isLevelTwo)
+			.add(", and up to ")
+			.addPercent(a -> a.mMaxPercentDamage, MAX_PERCENT_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" of the undead's max health can be dealt (Capped at R1 " + L2_DAMAGE_CAP_R1 + "/R2 " + L2_DAMAGE_CAP_R2 + "/R3 " + L2_DAMAGE_CAP_R3 + " damage). The undead enemy is also afflicted with ")
+			.addPercent(a -> a.mSlow, SLOWNESS_AMPLIFIER_2)
+			.add(" slowness for ")
+			.addDuration(a -> a.mDuration, SLOWNESS_DURATION)
+			.add(" seconds. This can only affect each mob once every ")
+			.add(a -> a.mCooldown, DAMAGE_COOLDOWN_2, true, Ability::isLevelTwo)
+			.add(" seconds.");
+	}
+
+	private static Description<SanctifiedArmor> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("If the most recently affected mob is killed by any means other than Sanctified Armor or Thorns damage, regain half the health lost from the last damage taken.");
 	}
 }

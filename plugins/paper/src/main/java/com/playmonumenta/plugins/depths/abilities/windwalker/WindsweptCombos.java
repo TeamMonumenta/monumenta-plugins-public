@@ -105,7 +105,7 @@ public class WindsweptCombos extends DepthsCombosAbility {
 	}
 
 	private static Description<WindsweptCombos> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<WindsweptCombos>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Every ")
 			.add(a -> a.mHitRequirement, HIT_REQUIREMENT, true)
 			.add(" melee strikes, gain ")

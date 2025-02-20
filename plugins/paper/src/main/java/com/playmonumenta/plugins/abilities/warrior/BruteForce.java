@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.BruteForceCS;
@@ -16,7 +18,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -49,18 +50,7 @@ public class BruteForce extends Ability {
 			.linkedSpell(ClassAbility.BRUTE_FORCE)
 			.scoreboardId("BruteForce")
 			.shorthandName("BF")
-			.descriptions(
-				String.format("Performing a critical melee attack deals %s damage and applies knockback to the " +
-					"hit enemy and all enemies within a %s block radius. Bosses do not take knockback.",
-					BRUTE_FORCE_DAMAGE,
-					BRUTE_FORCE_RADIUS),
-				String.format("The damage is increased to %s plus %s of the critical attack's damage.",
-					BRUTE_FORCE_DAMAGE,
-					StringUtils.multiplierToPercentageWithSign(BRUTE_FORCE_2_MODIFIER)),
-				String.format("Triggering this ability causes a subsequent wave after %ss centered on the " +
-					"hit enemy that deals %s of the damage and applies knockback.",
-					StringUtils.ticksToSeconds(ENHANCEMENT_DELAY),
-					StringUtils.multiplierToPercentageWithSign(ENHANCEMENT_DAMAGE_RATIO)))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Critical melee attacks deal extra damage and knock back nearby mobs.")
 			.displayItem(Material.STONE_AXE);
 
@@ -167,5 +157,32 @@ public class BruteForce extends Ability {
 		}
 
 		mCosmetic.bruteOnDamage(mPlayer, loc.getWorld(), loc, mWaveRadius, mComboNumber);
+	}
+
+	private static Description<BruteForce> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Performing a critical melee attack deals ")
+			.add(a -> a.mFlatDamage, BRUTE_FORCE_DAMAGE)
+			.add(" damage and applies knockback to the hit enemy and all enemies within a ")
+			.add(a -> a.mWaveRadius, BRUTE_FORCE_RADIUS)
+			.add(" blocks. Bosses do not take knockback.");
+	}
+
+	private static Description<BruteForce> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage is increased to ")
+			.add(a -> a.mFlatDamage, BRUTE_FORCE_DAMAGE)
+			.add(" plus ")
+			.addPercent(a -> a.mMultiplier, BRUTE_FORCE_2_MODIFIER)
+			.add(" of the critical attack's damage.");
+	}
+
+	private static Description<BruteForce> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Triggering this ability causes a subsequent wave after ")
+			.addDuration(a -> a.mEnhanceWaveDelay, ENHANCEMENT_DELAY)
+			.add(" seconds centered on the hit enemy that deals ")
+			.addPercent(a -> a.mEnhanceDamageMult, ENHANCEMENT_DAMAGE_RATIO)
+			.add(" of the damage and applies knockback.");
 	}
 }

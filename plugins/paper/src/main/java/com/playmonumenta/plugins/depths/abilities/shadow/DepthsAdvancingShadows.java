@@ -155,8 +155,9 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	}
 
 	private static Description<DepthsAdvancingShadows> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsAdvancingShadows>(color)
-			.add("Right click while looking directly at a hostile mob within ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger("looking at a hostile mob")
+			.add(" within ")
 			.add(a -> a.mRange, ADVANCING_SHADOWS_RANGE)
 			.add(" blocks to teleport to it and gain ")
 			.addPercent(a -> a.mDamage, DAMAGE[rarity - 1], false, true)

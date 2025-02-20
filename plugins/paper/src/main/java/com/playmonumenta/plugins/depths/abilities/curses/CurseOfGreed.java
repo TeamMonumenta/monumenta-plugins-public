@@ -54,7 +54,7 @@ public class CurseOfGreed extends DepthsAbility {
 	}
 
 	private static Description<CurseOfGreed> getDescription() {
-		return new DescriptionBuilder<CurseOfGreed>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Lose ")
 			.addPercent(-PERCENT_MAX_HEALTH)
 			.add(" max health for each ability you have at ")

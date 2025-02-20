@@ -53,7 +53,7 @@ public class DepthsRejuvenation extends DepthsAbility {
 	}
 
 	private static Description<DepthsRejuvenation> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsRejuvenation>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("All players within ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks of you (including yourself) heal ")

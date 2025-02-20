@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.cleric;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.CrusadeCS;
@@ -25,26 +27,33 @@ public class Crusade extends Ability {
 	public static final double ENHANCEMENT_RADIUS = 8;
 	public static final int ENHANCEMENT_MAX_MOBS = 5;
 	public static final double ENHANCEMENT_BONUS_DAMAGE = 0.08;
+
+	public static final String CHARM_DURATION = "Crusade Duration";
+	public static final String CHARM_RADIUS = "Crusade Enhancement Radius";
 	public static final String CHARM_DAMAGE = "Crusade Enhancement Damage Amplifier";
+	public static final String CHARM_MAX_MOBS = "Crusade Enhancement Max Mobs";
 
 	public static final AbilityInfo<Crusade> INFO =
 		new AbilityInfo<>(Crusade.class, NAME, Crusade::new)
 			.linkedSpell(ABILITY)
 			.scoreboardId(NAME)
 			.shorthandName("Crs")
-			.descriptions(
-				"Your abilities now treat \"human-like\" enemies, such as illagers and witches, as Undead.",
-				"After being damaged or debuffed by cleric abilities, any mob will count as undead for the next 10s.",
-				String.format("Gain %s%% ability damage for every undead mob within %s blocks, including those marked by Crusade, capping at %s mobs.",
-					(int) (ENHANCEMENT_BONUS_DAMAGE * 100), ENHANCEMENT_RADIUS, ENHANCEMENT_MAX_MOBS)
-			)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Passively count Humanoid mobs as Undead. Temporarily mark Monstrous mobs as Undead with abilities.")
 			.displayItem(Material.ZOMBIE_HEAD);
 
+	private final int mDuration;
+	private final double mRadius;
+	private final double mDamagePerMob;
+	private final int mMaxMobs;
 	private final CrusadeCS mCosmetic;
 
 	public Crusade(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TAG_DURATION);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_RADIUS);
+		mDamagePerMob = ENHANCEMENT_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mMaxMobs = ENHANCEMENT_MAX_MOBS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_MOBS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CrusadeCS());
 	}
 
@@ -55,10 +64,9 @@ public class Crusade extends Ability {
 		}
 
 		if (isEnhanced()) {
-			long numMobs = new Hitbox.SphereHitbox(mPlayer.getLocation(), ENHANCEMENT_RADIUS)
-				.getHitMobs().stream().filter(e -> enemyTriggersAbilities(e, this)).limit(ENHANCEMENT_MAX_MOBS).count();
-			double damagePerMob = ENHANCEMENT_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
-			event.updateDamageWithMultiplier(1 + damagePerMob * numMobs);
+			long numMobs = new Hitbox.SphereHitbox(mPlayer.getLocation(), mRadius)
+				.getHitMobs().stream().filter(e -> enemyTriggersAbilities(e, this)).limit(mMaxMobs).count();
+			event.updateDamageWithMultiplier(1 + mDamagePerMob * numMobs);
 			mCosmetic.crusadeEnhancement(mPlayer, numMobs);
 		}
 
@@ -73,7 +81,7 @@ public class Crusade extends Ability {
 
 	private void addCrusadeTag(LivingEntity enemy) {
 		if (isLevelTwo() && !EntityUtils.isUndead(enemy) && !EntityUtils.isHumanlike(enemy)) {
-			mPlugin.mEffectManager.addEffect(enemy, "CrusadeTag", new CrusadeTag(TAG_DURATION, mCosmetic));
+			mPlugin.mEffectManager.addEffect(enemy, "CrusadeTag", new CrusadeTag(mDuration, mCosmetic));
 		}
 	}
 
@@ -83,5 +91,28 @@ public class Crusade extends Ability {
 		}
 
 		crusade.addCrusadeTag(enemy);
+	}
+
+	private static Description<Crusade> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Your abilities now treat \"human-like\" enemies, such as illagers and witches, as Undead.");
+	}
+
+	private static Description<Crusade> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("After being damaged or debuffed by cleric abilities, any mob will count as undead for the next ")
+			.addDuration(a -> a.mDuration, TAG_DURATION)
+			.add(" seconds.");
+	}
+
+	private static Description<Crusade> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Gain ")
+			.addPercent(a -> a.mDamagePerMob, ENHANCEMENT_BONUS_DAMAGE)
+			.add(" ability damage for every undead mob within ")
+			.add(a -> a.mRadius, ENHANCEMENT_RADIUS)
+			.add(" blocks, including those marked by Crusade, capping at ")
+			.add(a -> a.mMaxMobs, ENHANCEMENT_MAX_MOBS)
+			.add(" mobs.");
 	}
 }

@@ -48,7 +48,7 @@ public class OrbOfDarkness extends DepthsAbility {
 	}
 
 	private static Description<OrbOfDarkness> getDescription() {
-		return new DescriptionBuilder<OrbOfDarkness>().add("Lose all of your ")
+		return new DescriptionBuilder<>(() -> INFO).add("Lose all of your ")
 			.add(DepthsTree.PRISMATIC.getNameComponent())
 			.add(" abilities. For every ability lost, gain two ")
 			.add(DepthsRarity.TWISTED.getDisplay())

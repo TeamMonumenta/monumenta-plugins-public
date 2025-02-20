@@ -337,7 +337,7 @@ public class EternalSavior extends DepthsAbility {
 	}
 
 	private static Description<EternalSavior> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<EternalSavior>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When your health drops below ")
 			.addPercent(TRIGGER_HEALTH)
 			.add(", enter stasis for ")

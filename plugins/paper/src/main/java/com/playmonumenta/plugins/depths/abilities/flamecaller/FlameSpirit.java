@@ -140,7 +140,7 @@ public class FlameSpirit extends DepthsAbility {
 	}
 
 	private static Description<FlameSpirit> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<FlameSpirit>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Breaking a spawner summons a spirit that deals ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage in a ")

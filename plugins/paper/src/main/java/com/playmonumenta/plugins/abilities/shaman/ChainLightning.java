@@ -5,20 +5,19 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.ChainLightningCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -57,24 +56,7 @@ public class ChainLightning extends MultipleChargeAbility {
 			.linkedSpell(ClassAbility.CHAIN_LIGHTNING)
 			.scoreboardId("ChainLightning")
 			.shorthandName("CL")
-			.descriptions(
-				String.format("Right click while holding a melee weapon to cast a splitting beam of lightning, bouncing between up to %s mobs"
-					+ " within line of sight of each other and within %s blocks of the last target hit " +
-					"and dealing %s damage to each. Will also bounce to nearby totems without consuming a hit target. %s charges, %ss cooldown.",
-					TARGETS_1,
-					BOUNCE_RANGE,
-					DAMAGE_1,
-					CHARGES,
-					StringUtils.ticksToSeconds(COOLDOWN)
-				),
-				String.format("Damage increased to %s and now hits %s targets.",
-					DAMAGE_2,
-					TARGETS_2),
-				String.format("Now causes each totem it bounces off of to instantly pulse it's effects at " +
-					"%s%% efficiency for damaging totems and %s%% efficiency for the rest.",
-					StringUtils.multiplierToPercentage(ENHANCE_NEGATIVE_EFFICIENCY),
-					StringUtils.multiplierToPercentage(ENHANCE_POSITIVE_EFFICIENCY))
-			)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Flings lightning at mobs in a medium radius in front of you, bouncing between mobs and totems.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ChainLightning::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false)
@@ -94,9 +76,6 @@ public class ChainLightning extends MultipleChargeAbility {
 
 	public ChainLightning(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
 		mMaxCharges = CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mBounceRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BOUNCE_RANGE);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
@@ -239,5 +218,38 @@ public class ChainLightning extends MultipleChargeAbility {
 			}
 		}
 		return totalBounces - totalTotems;
+	}
+
+	private static Description<ChainLightning> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to cast a beam of lightning, bouncing between up to ")
+			.add(a -> a.mTargets, TARGETS_1, false, Ability::isLevelOne)
+			.add(" mobs within line of sight of each other and within ")
+			.add(a -> a.mBounceRange, BOUNCE_RANGE)
+			.add(" blocks of the last target hit, dealing ")
+			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage to each. The beam can also bounce to nearby totems without consuming a hit target. Charges: ")
+			.add(a -> a.mMaxCharges, CHARGES)
+			.add(".")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<ChainLightning> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(". Up to ")
+			.add(a -> a.mTargets, TARGETS_2, false, Ability::isLevelTwo)
+			.add(" mobs can now be targeted.");
+	}
+
+	private static Description<ChainLightning> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Each totem the beam bounces off of now instantly pulses its effects at ")
+			.addPercent(ENHANCE_NEGATIVE_EFFICIENCY)
+			.add(" efficiency for damaging totems and ")
+			.addPercent(ENHANCE_POSITIVE_EFFICIENCY)
+			.add(" efficiency for non-damaging totems.");
 	}
 }

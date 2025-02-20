@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.QuickdrawCS;
@@ -18,7 +20,6 @@ import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -37,7 +38,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class Quickdraw extends Ability {
-	private static final int DAMAGE_1 = 13;
+	private static final int DAMAGE = 13;
 	private static final int COOLDOWN_1 = Constants.TICKS_PER_SECOND * 6;
 	private static final int COOLDOWN_2 = Constants.TICKS_PER_SECOND * 3;
 	private static final int PIERCE_LVL = 1;
@@ -51,16 +52,7 @@ public class Quickdraw extends Ability {
 			.linkedSpell(ClassAbility.QUICKDRAW)
 			.scoreboardId("Quickdraw")
 			.shorthandName("Qd")
-			.descriptions(
-				String.format("Left-clicking with a projectile weapon fires a %d damage projectile that inherits " +
-					"the enchantments of that weapon except those that modify base weapon damage. This skill can " +
-					"only apply Recoil once before touching the ground. Cooldown: %ss.",
-					DAMAGE_1,
-					StringUtils.ticksToSeconds(COOLDOWN_1)),
-				String.format("Cooldown: %ss.",
-					StringUtils.ticksToSeconds(COOLDOWN_2)),
-				String.format("Arrows shot with this skill are given +%s Piercing.",
-					PIERCE_LVL))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Instantly fire a held projectile weapon.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Quickdraw::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
@@ -70,11 +62,13 @@ public class Quickdraw extends Ability {
 	public @Nullable Projectile mProjectile;
 
 	private final double mDamage;
+	private final int mPiercing;
 	private final QuickdrawCS mCosmetic;
 
 	public Quickdraw(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_1);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
+		mPiercing = PIERCE_LVL + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new QuickdrawCS());
 	}
 
@@ -154,7 +148,7 @@ public class Quickdraw extends Ability {
 
 		proj.setShooter(mPlayer);
 		if (proj instanceof final AbstractArrow arrow) {
-			arrow.setPierceLevel(Math.max(0, Math.min((isEnhanced() ? PIERCE_LVL + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING) : 0), 127)));
+			arrow.setPierceLevel(Math.max(0, Math.min((isEnhanced() ? mPiercing : 0), 127)));
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 		}
@@ -191,5 +185,26 @@ public class Quickdraw extends Ability {
 
 	public boolean isQuickDraw(final Projectile projectile) {
 		return projectile == mProjectile;
+	}
+
+	private static Description<Quickdraw> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to fire a ")
+			.add(a -> a.mDamage, DAMAGE)
+			.add(" damage projectile that inherits the enchantments of that weapon except those that modify base weapon damage. This skill can only apply Recoil once before touching the ground.")
+			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+	}
+
+	private static Description<Quickdraw> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+	}
+
+	private static Description<Quickdraw> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Projectiles shot with this skill are given +")
+			.add(a -> a.mPiercing, PIERCE_LVL)
+			.add(" Piercing.");
 	}
 }

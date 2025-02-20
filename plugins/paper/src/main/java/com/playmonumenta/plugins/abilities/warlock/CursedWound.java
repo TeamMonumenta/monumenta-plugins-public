@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.CursedWoundCS;
@@ -60,18 +62,15 @@ public class CursedWound extends Ability {
 			.scoreboardId("CursedWound")
 			.shorthandName("CW")
 			.actionBarColor(TextColor.color(217, 217, 217))
-			.descriptions(
-				"Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3 block radius around it with 1 damage every second for 6s. " +
-					"Your melee attacks passively deal 5% more damage per ability on cooldown, capped at 3 abilities.",
-				"Your melee attacks passively deal 10% more damage per ability on cooldown instead.",
-				"When you kill a mob with a melee scythe attack, all debuffs (excluding stuns and silences) on the mob get stored in your scythe. " +
-					"Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +
-					"as well as 3% of your melee attack's damage as magic damage per effect."
-				)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Your attacks deal more damage for each ability on cooldown and apply damage over time.")
 			.displayItem(Material.GOLDEN_SWORD);
 
 	private final double mCursedWoundDamage;
+	private final int mAbilityCap;
+	private final double mDOTDamage;
+	private final double mRadius;
+
 	private @Nullable Collection<PotionEffect> mStoredPotionEffects;
 	private @Nullable HashMap<String, Effect> mStoredCustomEffects;
 	private int mStoredFireTicks;
@@ -80,7 +79,10 @@ public class CursedWound extends Ability {
 
 	public CursedWound(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mCursedWoundDamage = CharmManager.getLevel(player, CHARM_CAP) + (isLevelOne() ? CURSED_WOUND_DAMAGE_1 : CURSED_WOUND_DAMAGE_2);
+		mCursedWoundDamage = (isLevelOne() ? CURSED_WOUND_DAMAGE_1 : CURSED_WOUND_DAMAGE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mAbilityCap = CURSED_WOUND_CAP + (int) CharmManager.getLevel(mPlayer, CHARM_CAP);
+		mDOTDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT, CURSED_WOUND_DOT_DAMAGE);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, CURSED_WOUND_RADIUS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CursedWoundCS());
 	}
 
@@ -98,11 +100,10 @@ public class CursedWound extends Ability {
 				}
 
 				double damage = event.getDamage() * DAMAGE_PER_EFFECT_RATIO * debuffCount;
-				double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, CURSED_WOUND_RADIUS);
 				if (damage > 0) {
 					Map<String, JsonObject> serializedEffects = new HashMap<>();
 					mStoredCustomEffects.forEach((source, effect) -> serializedEffects.put(source, effect.serialize()));
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), radius)) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), mRadius)) {
 						mStoredPotionEffects.forEach(mob::addPotionEffect);
 						EntityUtils.applyFire(mPlugin, mStoredFireTicks, mob, mPlayer, null);
 						serializedEffects.forEach((source, jsonEffect) -> {
@@ -124,7 +125,7 @@ public class CursedWound extends Ability {
 					mStoredCustomEffects = null;
 
 
-					mCosmetic.onReleaseStoredEffects(mPlayer, enemy, radius);
+					mCosmetic.onReleaseStoredEffects(mPlayer, enemy, mRadius);
 				}
 			}
 
@@ -137,7 +138,7 @@ public class CursedWound extends Ability {
 				}
 			}
 
-			event.updateDamageWithMultiplier(1 + (Math.min(cooldowns, CURSED_WOUND_CAP + CharmManager.getLevel(mPlayer, CHARM_CAP)) * (mCursedWoundDamage + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE))));
+			event.updateDamageWithMultiplier(1 + (Math.min(cooldowns, mAbilityCap) * mCursedWoundDamage));
 
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
 				mCosmetic.onCriticalAttack(world, mPlayer, enemy, cooldowns);
@@ -145,7 +146,7 @@ public class CursedWound extends Ability {
 				for (LivingEntity mob : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CURSED_WOUND_RADIUS).getHitMobs()) {
 					mCosmetic.onEffectApplication(mPlayer, mob);
 					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME,
-						new CustomDamageOverTime(CURSED_WOUND_DURATION, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT, CURSED_WOUND_DOT_DAMAGE),
+						new CustomDamageOverTime(CURSED_WOUND_DURATION, mDOTDamage,
 							CURSED_WOUND_DOT_PERIOD, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageType.AILMENT));
 				}
 			}
@@ -187,4 +188,34 @@ public class CursedWound extends Ability {
 		}
 	}
 
+	private static Description<CursedWound> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Attacking a mob with a critical scythe attack passively afflicts it and all mobs within ")
+			.add(a -> a.mRadius, CURSED_WOUND_RADIUS)
+			.add(" blocks around it with ")
+			.add(a -> a.mDOTDamage, CURSED_WOUND_DOT_DAMAGE)
+			.add(" damage every second for ")
+			.addDuration(CURSED_WOUND_DURATION)
+			.add(" seconds. Your melee scythe attacks passively deal ")
+			.addPercent(a -> a.mCursedWoundDamage, CURSED_WOUND_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" more damage per ability on cooldown, capped at ")
+			.add(a -> a.mAbilityCap, CURSED_WOUND_CAP)
+			.add(" abilities.");
+	}
+
+	private static Description<CursedWound> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Your melee scythe attacks now passively deal ")
+			.add(a -> a.mCursedWoundDamage, CURSED_WOUND_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" more damage per ability on cooldown instead.");
+	}
+
+	private static Description<CursedWound> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When you kill a mob with a melee scythe attack, all debuffs (excluding stuns and silences) on the mob get stored in your scythe. Then, on your next melee scythe attack, all mobs within ")
+			.add(a -> a.mRadius, CURSED_WOUND_RADIUS)
+			.add(" blocks of the target are inflicted with the effects stored in your scythe, as well as ")
+			.addPercent(DAMAGE_PER_EFFECT_RATIO)
+			.add(" of your melee attack's damage as magic damage per effect.");
+	}
 }

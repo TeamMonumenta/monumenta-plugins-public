@@ -154,7 +154,7 @@ public class DepthsVolley extends DepthsAbility {
 	}
 
 	private static Description<DepthsVolley> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsVolley>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Shooting a projectile while sneaking shoots a volley consisting of ")
 			.add(a -> a.mArrows, ARROWS[rarity - 1], false, null, true)
 			.add(" projectiles instead. Only one arrow is consumed, and each projectile deals ")

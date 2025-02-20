@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.HauntingShadesCS;
@@ -57,26 +59,30 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 					.linkedSpell(ClassAbility.HAUNTING_SHADES)
 					.scoreboardId("HauntingShades")
 					.shorthandName("HS")
-					.descriptions(
-							"Press the swap key while not sneaking with a scythe to conjure a Shade at the target block or mob location. " +
-									"Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability. A Shade fades back into darkness after 7 seconds. Cooldown: 10s.",
-							"Players within 6 blocks of the shade are given 10% damage dealt and gain a custom healing effect that regenerates 2.5% of max health every second for 1 second. " +
-									"Effects do not stack with other Tenebrists.")
+					.descriptions(getDescription1(), getDescription2())
 					.simpleDescription("Place a Shade that debuffs nearby enemies with Vulnerability.")
 					.cooldown(COOLDOWN, CHARM_COOLDOWN)
 					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HauntingShades::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
 							AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
 					.displayItem(Material.SKELETON_SKULL);
 
-	private final HauntingShadesCS mCosmetic;
 
 	private final int mMaxDuration;
+	private final double mRadius;
+	private final double mHealing;
+	private final double mStrength;
+	private final double mVuln;
 	private int mCurrDuration = -1;
+	private final HauntingShadesCS mCosmetic;
 
 	public HauntingShades(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HauntingShadesCS());
 		mMaxDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SHADES_DURATION);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
+		mHealing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT);
+		mStrength = EFFECT_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mVuln = VULN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HauntingShadesCS());
 	}
 
 	public boolean cast() {
@@ -147,7 +153,6 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 
 		ClientModHandler.updateAbility(mPlayer, this);
 		new BukkitRunnable() {
-			final double mAoeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 			int mT = 0;
 
 			@Override
@@ -156,32 +161,26 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 				mCurrDuration++;
 				if (mT % 5 == 0) {
 					if (isLevelTwo()) {
-						List<Player> affectedPlayers = PlayerUtils.playersInRange(bLoc, mAoeRadius, true);
+						List<Player> affectedPlayers = PlayerUtils.playersInRange(bLoc, mRadius, true);
 
-						double healPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT);
-						double strength = EFFECT_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 						for (Player p : affectedPlayers) {
 							double maxHealth = EntityUtils.getMaxHealth(p);
-							mPlugin.mEffectManager.addEffect(p, HEAL_NAME,
-								new CustomRegeneration(EFFECT_DURATION, maxHealth * healPercent, mPlayer, mPlugin)
-									.deleteOnAbilityUpdate(true));
-							mPlugin.mEffectManager.addEffect(p, STR_NAME,
-								new PercentDamageDealt(EFFECT_DURATION, strength).deleteOnAbilityUpdate(true));
+							mPlugin.mEffectManager.addEffect(p, HEAL_NAME, new CustomRegeneration(EFFECT_DURATION, maxHealth * mHealing, mPlayer, mPlugin).displaysTime(false).deleteOnAbilityUpdate(true));
+							mPlugin.mEffectManager.addEffect(p, STR_NAME, new PercentDamageDealt(EFFECT_DURATION, mStrength).displaysTime(false).deleteOnAbilityUpdate(true));
 						}
 					}
 
-					List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(bLoc, mAoeRadius);
-					double vuln = VULN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
+					List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(bLoc, mRadius);
 					for (LivingEntity m : affectedMobs) {
-						EntityUtils.applyVulnerability(mPlugin, EFFECT_DURATION, vuln, m);
+						EntityUtils.applyVulnerability(mPlugin, EFFECT_DURATION, mVuln, m);
 					}
 				}
 
-				mCosmetic.shadesTickEffect(mPlugin, world, mPlayer, bLoc, mAoeRadius, mT);
+				mCosmetic.shadesTickEffect(mPlugin, world, mPlayer, bLoc, mRadius, mT);
 
 				if (mT >= mMaxDuration || mPlayer.isDead() || !mPlayer.isOnline()) {
 					stand.remove();
-					mCosmetic.shadesEndEffect(world, mPlayer, bLoc, mAoeRadius);
+					mCosmetic.shadesEndEffect(world, mPlayer, bLoc, mRadius);
 					this.cancel();
 				}
 			}
@@ -203,5 +202,29 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
+
+	private static Description<HauntingShades> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to conjure a Shade which lasts ")
+			.addDuration(a -> a.mMaxDuration, SHADES_DURATION)
+			.add(" seconds at the target block or mob location. Mobs within ")
+			.add(a -> a.mRadius, AOE_RANGE)
+			.add(" blocks of a Shade are afflicted with ")
+			.addPercent(a -> a.mVuln, VULN)
+			.add(" vulnerability.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<HauntingShades> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Players within ")
+			.add(a -> a.mRadius, AOE_RANGE)
+			.add(" blocks of the Shade are given ")
+			.add(a -> a.mStrength, EFFECT_LEVEL)
+			.add(" strength and heal ")
+			.addPercent(a -> a.mHealing, HEAL_PERCENT)
+			.add(" of their max health each second.");
 	}
 }

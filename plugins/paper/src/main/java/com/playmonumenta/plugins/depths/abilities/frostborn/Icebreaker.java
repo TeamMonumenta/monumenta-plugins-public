@@ -64,7 +64,7 @@ public class Icebreaker extends DepthsAbility {
 	}
 
 	private static Description<Icebreaker> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Icebreaker>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Damage you deal is increased by ")
 			.addPercent(a -> a.mIceMultiplier, ICE_DAMAGE[rarity - 1], false, true)
 			.add(" if the mob is on ice or ")

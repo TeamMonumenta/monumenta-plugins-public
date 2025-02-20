@@ -39,6 +39,6 @@ public class BrokenClock extends DepthsAbility {
 	}
 
 	private static Description<BrokenClock> getDescription() {
-		return new DescriptionBuilder<BrokenClock>().add("Gain nothing now. If you defeat the next boss, gain three celestial gift selections instead of one.");
+		return new DescriptionBuilder<>(() -> INFO).add("Gain nothing now. If you defeat the next boss, gain three celestial gift selections instead of one.");
 	}
 }

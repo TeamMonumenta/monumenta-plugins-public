@@ -37,7 +37,7 @@ public class TwistedScroll extends DepthsAbility {
 	}
 
 	private static Description<TwistedScroll> getDescription() {
-		return new DescriptionBuilder<TwistedScroll>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Select an ability to upgrade to ")
 			.add(DepthsRarity.TWISTED.getDisplay())
 			.add(" level.");

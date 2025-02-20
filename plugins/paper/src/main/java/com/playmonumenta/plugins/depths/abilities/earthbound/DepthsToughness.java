@@ -39,7 +39,7 @@ public class DepthsToughness extends DepthsAbility {
 	}
 
 	private static Description<DepthsToughness> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsToughness>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Gain ")
 			.addPercent(a -> a.mPercentMaxHealth, PERCENT_MAX_HEALTH[rarity - 1], false, true)
 			.add(" max health.");
