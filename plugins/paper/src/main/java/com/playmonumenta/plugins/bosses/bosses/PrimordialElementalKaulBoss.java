@@ -42,6 +42,16 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		mBoss.setRemoveWhenFarAway(false);
 		final Location spawnLoc = mBoss.getLocation();
 
+		final int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		final int hpDelta = 768;
+		final double bossTargetHp = 1.1 * hpDelta * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
+
+		EntityUtils.setMaxHealthAndHealth(mBoss, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
+
+		GlowingManager.startGlowing(mBoss, NamedTextColor.GOLD, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1);
+
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellRaiseJungle(plugin, mBoss, 10, detectionRange, 20 * 8, 20 * 20),
 			new SpellEarthenRupture(plugin, mBoss),
@@ -76,18 +86,5 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 			Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
 			mob.setTarget(newTarget);
 		}
-	}
-
-	@Override
-	public void init() {
-		final int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
-		final int hpDelta = 768;
-		final double bossTargetHp = 1.1 * hpDelta * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
-
-		EntityUtils.setMaxHealthAndHealth(mBoss, bossTargetHp);
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-
-		GlowingManager.startGlowing(mBoss, NamedTextColor.GOLD, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1);
 	}
 }

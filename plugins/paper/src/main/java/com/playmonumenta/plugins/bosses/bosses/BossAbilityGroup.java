@@ -388,7 +388,8 @@ public abstract class BossAbilityGroup {
 	}
 
 	/*
-	 * Called only the first time the boss is summoned into the world
+	 * Called only the first time the boss is instantiated with /bossfight or BossManager.createBoss()
+	 * Not called when mobs spawned with /los summon or are reloaded
 	 *
 	 * Useful to set the bosses health / armor / etc. based on # of players
 	 */
