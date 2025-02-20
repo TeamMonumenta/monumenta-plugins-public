@@ -145,7 +145,7 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 			.addPercent(a -> a.mLevelBowMultiplier, BOW_MULTIPLIER_1, false, Ability::isLevelOne)
 			.add(" of the projectile weapon's original damage, ")
 			.add(convert(ice().add("and for the ice spirit, an additional ")
-				.add(a -> a.mLevelBowMultiplier, ElementalSpiritIce.BOW_MULTIPLIER_1, false, Ability::isLevelOne)
+				.addPercent(a -> a.mLevelBowMultiplier, ElementalSpiritIce.BOW_MULTIPLIER_1, false, Ability::isLevelOne)
 				.add(". Independent")))
 			.addCooldown(COOLDOWN_TICKS);
 	}
@@ -155,7 +155,12 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 			.add("Fire spirit damage is increased to ")
 			.add(a -> a.mLevelDamage, DAMAGE_2, false, Ability::isLevelTwo)
 			.add(convert(ice().add(". Ice spirit damage is increased to ")
-				.add(a -> a.mLevelDamage, DAMAGE_2, false, Ability::isLevelTwo)));
+				.add(a -> a.mLevelDamage, ElementalSpiritIce.DAMAGE_2, false, Ability::isLevelTwo)))
+			.add(" The Elemental Arrows projectile damage multiplier is increased to ")
+			.addPercent(a -> a.mLevelBowMultiplier, BOW_MULTIPLIER_2, false, Ability::isLevelTwo)
+			.add(convert(ice().add(" for the fire spirit and ")
+				.addPercent(a -> a.mLevelBowMultiplier, ElementalSpiritIce.BOW_MULTIPLIER_2, false, Ability::isLevelTwo)
+				.add(" for the ice spirit.")));
 	}
 
 	private static Description<ElementalSpiritFire> convert(Description<ElementalSpiritIce> ice) {

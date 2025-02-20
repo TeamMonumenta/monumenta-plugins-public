@@ -71,7 +71,7 @@ public class Sanctuary extends Ability {
 	private static Description<Sanctuary> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Additionally inflicts ")
-			.add(a -> a.mVulnerabilityPercent, VULNERABILITY_PERCENT)
+			.addPercent(a -> a.mVulnerabilityPercent, VULNERABILITY_PERCENT)
 			.add(" vulnerability to mobs within range.");
 	}
 }

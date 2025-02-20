@@ -104,7 +104,7 @@ public class Frenzy extends Ability {
 	private static Description<Frenzy> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Additionally, your next melee damage within ")
-			.add(a -> a.mDuration, DURATION)
+			.addDuration(a -> a.mDuration, DURATION)
 			.add(" seconds after getting a kill deals ")
 			.addPercent(a -> a.mEnhanceDamageMult, DAMAGE_BONUS)
 			.add(" extra damage.");

@@ -64,7 +64,8 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			.addTrigger(new AbilityTriggerInfo<>("castBackwards", "leap backwards", tm -> tm.cast(false), new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true)))
 			.displayItem(Material.STRING);
 
-	private final double mDamage;
+	private final double mLeapDamage;
+	private final double mDashDamage;
 	private final double mRadius;
 	private final int mDuration;
 	private int mLastCastTicks = 0;
@@ -75,7 +76,8 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		super(plugin, player, INFO);
 		mMaxCharges = (isLevelOne() ? TACTICAL_MANEUVER_1_MAX_CHARGES : TACTICAL_MANEUVER_2_MAX_CHARGES) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_LEAP_DAMAGE);
+		mLeapDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_LEAP_DAMAGE);
+		mDashDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_DASH_DAMAGE);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TACTICAL_MANEUVER_RADIUS);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TACTICAL_DASH_STUN_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TacticalManeuverCS());
@@ -140,7 +142,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 					LivingEntity le = EntityUtils.getNearestMob(mPlayer.getLocation(), 2);
 					if (le != null) {
-						DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
+						DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, mDashDamage, mInfo.getLinkedSpell(), true);
 						for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), mRadius)) {
 							EntityUtils.applyStun(mPlugin, mDuration, e);
 						}
@@ -154,7 +156,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			}.runTaskTimer(mPlugin, 0, 1));
 		} else {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), mRadius, mPlayer)) {
-				DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
+				DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, mLeapDamage, mInfo.getLinkedSpell(), true);
 				MovementUtils.knockAway(mPlayer, le, TACTICAL_LEAP_KNOCKBACK_SPEED);
 			}
 
@@ -170,15 +172,15 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		return new DescriptionBuilder<>(() -> INFO)
 			.addTrigger(0)
 			.add(" to dash forward, dealing ")
-			.add(a -> a.mDamage, TACTICAL_DASH_DAMAGE)
+			.add(a -> a.mDashDamage, TACTICAL_DASH_DAMAGE)
 			.add(" damage to the first enemy hit, and stunning it and all enemies within ")
 			.add(a -> a.mRadius, TACTICAL_MANEUVER_RADIUS)
-			.add("blocks for ")
+			.add(" blocks for ")
 			.addDuration(a -> a.mDuration, TACTICAL_DASH_STUN_DURATION)
 			.add(" second. ")
 			.addTrigger(1)
 			.add(" to leap backwards, dealing ")
-			.add(a -> a.mDamage, TACTICAL_DASH_DAMAGE)
+			.add(a -> a.mLeapDamage, TACTICAL_LEAP_DAMAGE)
 			.add(" damage to enemies within ")
 			.add(a -> a.mRadius, TACTICAL_MANEUVER_RADIUS)
 			.add(" blocks and knocking them away. Charges: ")

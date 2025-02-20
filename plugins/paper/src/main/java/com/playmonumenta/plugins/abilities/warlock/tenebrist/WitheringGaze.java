@@ -115,13 +115,13 @@ public class WitheringGaze extends Ability {
 			.add(" to unleash a ")
 			.add(a -> a.mRange, WITHERING_GAZE_RANGE)
 			.add(" block long cone in the direction you are facing. Mobs in the cone are stunned for ")
-			.add(a -> a.mStunDuration, WITHERING_GAZE_STUN_DURATION)
+			.addDuration(a -> a.mStunDuration, WITHERING_GAZE_STUN_DURATION)
 			.add(" seconds (elites and bosses are rooted instead) and dealt ")
 			.add(a -> a.mDOTDamage, WITHERING_GAZE_DOT_DAMAGE)
 			.add(" every ")
 			.addDuration(WITHERING_GAZE_DOT_PERIOD)
 			.add(" seconds for ")
-			.addDuration(a -> a.mDOTDuration, WITHERING_GAZE_DOT_DURATION_1, false, Ability::isLevelTwo)
+			.addDuration(a -> a.mDOTDuration, WITHERING_GAZE_DOT_DURATION_1, false, Ability::isLevelOne)
 			.add(" seconds.")
 			.addCooldown(WITHERING_GAZE_1_COOLDOWN, Ability::isLevelOne);
 	}

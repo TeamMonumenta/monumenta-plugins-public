@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.NavigableSet;
@@ -96,11 +95,11 @@ public class DesecratingShot extends Ability {
 	private static Description<DesecratingShot> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Shooting a mob with a critical projectile deals ")
-			.add(a -> a.mDamagePercent, DAMAGE_1, false, Ability::isLevelOne)
+			.addPercent(a -> a.mDamagePercent, DAMAGE_1, false, Ability::isLevelOne)
 			.add(" of the projectile damage as magic damage to mobs within ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks and applies ")
-			.add(a -> a.mWeaknessPercent, WEAKNESS_1, false, Ability::isLevelTwo)
+			.addPercent(a -> a.mWeaknessPercent, WEAKNESS_1, false, Ability::isLevelOne)
 			.add(" weaken for ")
 			.addDuration(a -> a.mDuration, WEAKNESS_DURATION)
 			.add(" seconds to them.")
@@ -112,7 +111,7 @@ public class DesecratingShot extends Ability {
 			.add("Damage is increased to ")
 			.addPercent(a -> a.mDamagePercent, DAMAGE_2, false, Ability::isLevelTwo)
 			.add(" of the projectile damage and weaken is increased to ")
-			.add(a -> a.mWeaknessPercent, WEAKNESS_2, false, Ability::isLevelTwo)
+			.addPercent(a -> a.mWeaknessPercent, WEAKNESS_2, false, Ability::isLevelTwo)
 			.add(".");
 	}
 }

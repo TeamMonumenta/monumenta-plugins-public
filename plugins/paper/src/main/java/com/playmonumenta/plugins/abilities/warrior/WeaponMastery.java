@@ -123,9 +123,9 @@ public class WeaponMastery extends Ability {
 	private static Description<WeaponMastery> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Your sword damage is increased by ")
-			.add(a -> a.mDamageBonusSwordFlat, SWORD_2_DAMAGE_FLAT)
+			.add(a -> a.mDamageBonusSwordFlat, SWORD_2_DAMAGE_FLAT, false, Ability::isLevelTwo)
 			.add(" plus ")
-			.addPercent(a -> a.mDamageBonusSword - (a.isEnhanced() ? ENHANCED_DAMAGE : 0), SWORD_2_DAMAGE)
+			.addPercent(a -> a.mDamageBonusSword - (a.isEnhanced() ? ENHANCED_DAMAGE : 0), SWORD_2_DAMAGE, false, Ability::isLevelTwo)
 			.add(" of final damage dealt. The axe damage buffs are increased to ")
 			.add(a -> a.mDamageBonusAxeFlat, AXE_2_DAMAGE_FLAT, false, Ability::isLevelTwo)
 			.add(" plus ")

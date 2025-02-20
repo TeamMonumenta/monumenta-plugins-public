@@ -155,7 +155,7 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 
 	// Adds 1 because potion amplifiers are lies
 	public DescriptionBuilder<T> addPotionAmplifier(Function<T, Integer> getter, int baseAmplifier) {
-		return add(getter, baseAmplifier, false, d -> StringUtils.toRoman(1 + d.intValue()), false);
+		return add(a -> getter.apply(a) + 1, baseAmplifier + 1, false, d -> StringUtils.toRoman(d.intValue()), false);
 	}
 
 	public DescriptionBuilder<T> addPotionAmplifier(Function<T, Integer> getter, int baseAmplifier, Predicate<Ability> levelCondition) {

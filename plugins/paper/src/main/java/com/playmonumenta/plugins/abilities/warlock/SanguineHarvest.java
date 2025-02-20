@@ -280,7 +280,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 
 	private static Description<SanguineHarvest> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Healing from marked mobs is increased to")
+			.add("Healing from marked mobs is increased to ")
 			.addPercent(a -> a.mHealPercent, HEAL_PERCENT_2, false, Ability::isLevelTwo)
 			.add(" max health. Additionally, melee attacks against marked mobs heal the player for the full amount, deal ")
 			.addPercent(a -> a.mDamageBoost, DAMAGE_BOOST)

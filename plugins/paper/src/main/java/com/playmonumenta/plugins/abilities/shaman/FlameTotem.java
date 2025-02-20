@@ -188,7 +188,7 @@ public class FlameTotem extends TotemAbility {
 	private static Description<FlameTotem> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Now throws ")
-			.add(a -> a.mBombCount - 1, ENHANCE_BOMB_BONUS)
+			.add(a -> ENHANCE_BOMB_BONUS, ENHANCE_BOMB_BONUS)
 			.add(" extra fireball each second and applies inferno at ")
 			.addPercent(a -> a.mEnhanceInfernoScale, ENHANCE_INFERNO_SCALE)
 			.add(" efficiency.");

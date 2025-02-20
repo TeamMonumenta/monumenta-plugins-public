@@ -45,7 +45,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	private static final double MAGIC_DAMAGE_INCREASE_1 = 0.2;
 	private static final double MAGIC_DAMAGE_INCREASE_2 = 0.3;
 	private static final double MAGIC_DAMAGE_INCREASE_BURST = 0.5;
-	private static final int BURST_SECONDS = 5;
+	private static final int BURST_DURATION = 5 * 20;
 	private static final int BURST_COOLDOWN = 20 * 20;
 	private static final String TABOO_HEALING_SICKNESS = "TabooHealingSickness";
 	private static final String TABOO_ABSORPTION_SICKNESS = "TabooAbsorptionSickness";
@@ -123,7 +123,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 		mHealing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING_PENALTY, PERCENT_HEALING_PENALTY);
 		mAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_PENALTY, PERCENT_ABSORPTION_PENALTY);
 		mMagicDamageIncreaseBurst = MAGIC_DAMAGE_INCREASE_BURST + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_BURST);
-		mBurstDuration = CharmManager.getDuration(mPlayer, CHARM_BURST_DURATION, BURST_SECONDS);
+		mBurstDuration = CharmManager.getDuration(mPlayer, CHARM_BURST_DURATION, BURST_DURATION);
 
 		clearSicknessEffects();
 
@@ -319,7 +319,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 			.add(" magic damage, but makes you lose ")
 			.addPercent(a -> a.mHealthDamagePercent, PERCENT_HEALTH_DAMAGE)
 			.add(" of your health per second, which bypasses resistances and absorption, but cannot kill you. This empowered effect lasts for ")
-			.addDuration(a -> a.mBurstDuration, BURST_SECONDS)
+			.addDuration(a -> a.mBurstDuration, BURST_DURATION)
 			.add(" seconds, and you cannot deactivate Taboo during it.")
 			.addCooldown(BURST_COOLDOWN);
 	}

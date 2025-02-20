@@ -204,28 +204,28 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 	private static Description<BodkinBlitz> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
-			       .addTrigger()
-			       .add(" to teleport ")
-			       .add(a -> a.mDistance, DISTANCE_1, false, Ability::isLevelOne)
-			       .add(" blocks forwards. Upon teleporting, you gain ")
-			       .add(a -> a.mStealthDuration, STEALTH_DURATION_1, false, Ability::isLevelOne)
-			       .add(" second of Stealth and your next melee attack deals ")
-			       .add(a -> a.mBonusDmg, BONUS_DMG_1, false, Ability::isLevelOne)
-			       .add(" bonus damage if your target is not focused on you. Charges: ")
-			       .add(a -> a.mMaxCharges, MAX_CHARGES)
-			       .add(".")
-			       .addCooldown(COOLDOWN_1, Ability::isLevelOne);
+			.addTrigger()
+			.add(" to teleport ")
+			.add(a -> a.mDistance, DISTANCE_1, false, Ability::isLevelOne)
+			.add(" blocks forwards. Upon teleporting, you gain ")
+			.add(a -> a.mStealthDuration, STEALTH_DURATION_1, false, Ability::isLevelOne)
+			.add(" second of Stealth and your next melee attack deals ")
+			.add(a -> a.mBonusDmg, BONUS_DMG_1, false, Ability::isLevelOne)
+			.add(" bonus damage if your target is not focused on you. Charges: ")
+			.add(a -> a.mMaxCharges, MAX_CHARGES)
+			.add(".")
+			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
 	}
 
 	private static Description<BodkinBlitz> getDescritpion2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			       .add("Range is increased to ")
-			       .add(a -> a.mDistance, DISTANCE_2, false, Ability::isLevelTwo)
-			       .add(" blocks, Stealth duration is increased to ")
-			       .addDuration(a -> a.mStealthDuration, STEALTH_DURATION_2, false, Ability::isLevelOne)
-			       .add(" seconds, and bonus damage is increased to ")
-			       .add(a -> a.mBonusDmg, BONUS_DMG_2, false, Ability::isLevelTwo)
-			       .add(".")
-			       .addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+			.add("Range is increased to ")
+			.add(a -> a.mDistance, DISTANCE_2, false, Ability::isLevelTwo)
+			.add(" blocks, Stealth duration is increased to ")
+			.addDuration(a -> a.mStealthDuration, STEALTH_DURATION_2, false, Ability::isLevelTwo)
+			.add(" seconds, and bonus damage is increased to ")
+			.add(a -> a.mBonusDmg, BONUS_DMG_2, false, Ability::isLevelTwo)
+			.add(".")
+			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
 	}
 }

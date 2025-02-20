@@ -200,7 +200,9 @@ public class Quickdraw extends Ability {
 
 	private static Description<Quickdraw> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+			.add("Cooldown: ")
+			.addDuration(a -> a.getCharmCooldown(COOLDOWN_2), COOLDOWN_2, true, Ability::isLevelTwo)
+			.add("s.");
 	}
 
 	private static Description<Quickdraw> getDescriptionEnhancement() {

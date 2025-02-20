@@ -110,7 +110,7 @@ public class MagmaShield extends Ability {
 				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME,
 					new PercentDamageReceived(mEnhancementDuration, mFireBonusDamage, EnumSet.of(DamageType.FIRE)));
 				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_INFERNO_DAMAGE_BONUS_EFFECT_NAME,
-					new PercentAbilityDamageReceived(mEnhancementDuration, mFireDuration, EnumSet.of(ClassAbility.INFERNO)));
+					new PercentAbilityDamageReceived(mEnhancementDuration, mFireBonusDamage, EnumSet.of(ClassAbility.INFERNO)));
 				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME,
 					new PercentAbilityDamageReceived(mEnhancementDuration, mFireAbilityBonusDamage,
 						EnumSet.of(ClassAbility.MAGMA_SHIELD, ClassAbility.ELEMENTAL_ARROWS_FIRE, ClassAbility.ELEMENTAL_SPIRIT_FIRE,

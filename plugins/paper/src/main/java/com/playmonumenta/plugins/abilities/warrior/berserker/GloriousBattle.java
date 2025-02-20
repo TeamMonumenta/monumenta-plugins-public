@@ -274,7 +274,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Dealing indirect damage with an ability grants you a Glorious Battle stack. ")
 			.addTrigger()
-			.add(" to consume a stack and charge forward at")
+			.add(" to consume a stack and charge forward at ")
 			.add(a -> a.mVelocity, VELOCITY_1, false, Ability::isLevelOne)
 			.add(" blocks per second, gaining full knockback resistance until landing. Vertical movement speed is capped at ")
 			.add(a -> VERTICAL_SPEED_CAP, VERTICAL_SPEED_CAP)

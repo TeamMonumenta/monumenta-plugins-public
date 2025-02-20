@@ -157,7 +157,7 @@ public class WindWalk extends MultipleChargeAbility {
 		return new DescriptionBuilder<>(() -> INFO)
 			.addTrigger()
 			.add(" to dash in the direction you are facing, stunning and levitating enemies for ")
-			.add(a -> a.mDuration, WIND_WALK_DURATION)
+			.addDuration(a -> a.mDuration, WIND_WALK_DURATION)
 			.add(" seconds. Elites are not levitated. Charges: ")
 			.add(a -> a.mMaxCharges, WIND_WALK_MAX_CHARGES)
 			.add(".")

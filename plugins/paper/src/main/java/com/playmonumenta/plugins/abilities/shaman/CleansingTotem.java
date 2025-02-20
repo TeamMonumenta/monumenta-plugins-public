@@ -161,7 +161,7 @@ public class CleansingTotem extends TotemAbility {
 	private static Description<CleansingTotem> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Duration is increased to ")
-			.addDuration(a -> a.mDuration, DURATION_2)
+			.addDuration(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
 			.add(" seconds. Now additionally cleanses debuffs from players ")
 			.add(a -> a.mCleanses, CLEANSES)
 			.add(" times evenly throughout the duration.");

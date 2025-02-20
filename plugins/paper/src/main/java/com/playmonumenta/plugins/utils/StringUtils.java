@@ -140,6 +140,12 @@ public class StringUtils {
 	}
 
 	public static String toRoman(int number) {
+		if (number == 0) {
+			return "0";
+		}
+		if (number < 0) {
+			return "-" + toRoman(-number);
+		}
 		Map.Entry<Integer, String> entry = TO_ROMAN_MAP.floorEntry(number);
 		Integer l = entry.getKey();
 		if (l == null) {

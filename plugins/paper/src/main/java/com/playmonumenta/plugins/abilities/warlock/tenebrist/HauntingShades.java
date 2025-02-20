@@ -222,7 +222,7 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 			.add("Players within ")
 			.add(a -> a.mRadius, AOE_RANGE)
 			.add(" blocks of the Shade are given ")
-			.add(a -> a.mStrength, EFFECT_LEVEL)
+			.addPercent(a -> a.mStrength, EFFECT_LEVEL)
 			.add(" strength and heal ")
 			.addPercent(a -> a.mHealing, HEAL_PERCENT)
 			.add(" of their max health each second.");

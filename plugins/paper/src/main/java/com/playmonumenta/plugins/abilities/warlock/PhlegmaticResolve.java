@@ -31,8 +31,8 @@ public class PhlegmaticResolve extends Ability {
 
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "PhlegmaticPercentDamageResistEffect";
 	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "PhlegmaticPercentKnockbackResistEffect";
-	private static final double PERCENT_DAMAGE_RESIST_1 = -0.03;
-	private static final double PERCENT_DAMAGE_RESIST_2 = -0.05;
+	private static final double PERCENT_DAMAGE_RESIST_1 = 0.03;
+	private static final double PERCENT_DAMAGE_RESIST_2 = 0.05;
 	private static final double PERCENT_KNOCKBACK_RESIST = 0.1;
 	private static final int ABILITY_CAP = 3;
 	private static final int RADIUS = 7;
@@ -74,7 +74,7 @@ public class PhlegmaticResolve extends Ability {
 
 	public PhlegmaticResolve(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mPercentDamageResist = (isLevelOne() ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2) - CharmManager.getLevelPercentDecimal(player, CHARM_RESIST);
+		mPercentDamageResist = (isLevelOne() ? PERCENT_DAMAGE_RESIST_1 : PERCENT_DAMAGE_RESIST_2) + CharmManager.getLevelPercentDecimal(player, CHARM_RESIST);
 		mKBR = CharmManager.getLevel(player, CHARM_KBR) / 10 + PERCENT_KNOCKBACK_RESIST;
 		mAbilityCap = ABILITY_CAP + (int) CharmManager.getLevel(player, CHARM_ABILITY_CAP);
 		mAllyModifier = ALLY_MODIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ALLY);
@@ -156,7 +156,7 @@ public class PhlegmaticResolve extends Ability {
 
 		mCosmetic.periodicTrigger(mPlayer, mPlayer, cooldowns);
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
-			new PercentDamageReceived(20, mPercentDamageResist * cooldowns)
+			new PercentDamageReceived(20, -mPercentDamageResist * cooldowns)
 				.displaysTime(false).deleteOnAbilityUpdate(true));
 		mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME,
 			new PercentKnockbackResist(20, mKBR * cooldowns, KNOCKBACK_RESIST_EFFECT_NAME)
@@ -166,7 +166,7 @@ public class PhlegmaticResolve extends Ability {
 			for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, mRadius, true)) {
 				mCosmetic.periodicTrigger(mPlayer, p, cooldowns);
 				mPlugin.mEffectManager.addEffect(p, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
-					new PercentDamageReceived(20, mPercentDamageResist * cooldowns * mAllyModifier)
+					new PercentDamageReceived(20, -mPercentDamageResist * cooldowns * mAllyModifier)
 						.displaysTime(false).deleteOnAbilityUpdate(true));
 				mPlugin.mEffectManager.addEffect(p, KNOCKBACK_RESIST_EFFECT_NAME,
 					new PercentKnockbackResist(20, mKBR * cooldowns * mAllyModifier, KNOCKBACK_RESIST_EFFECT_NAME)

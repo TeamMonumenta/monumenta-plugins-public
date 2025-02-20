@@ -173,7 +173,7 @@ public class BruteForce extends Ability {
 			.add("The damage is increased to ")
 			.add(a -> a.mFlatDamage, BRUTE_FORCE_DAMAGE)
 			.add(" plus ")
-			.addPercent(a -> a.mMultiplier, BRUTE_FORCE_2_MODIFIER)
+			.addPercent(a -> a.mMultiplier, BRUTE_FORCE_2_MODIFIER, false, Ability::isLevelTwo)
 			.add(" of the critical attack's damage.");
 	}
 

@@ -259,7 +259,7 @@ public class Bezoar extends Ability {
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks of the Alchemist spawns a Bezoar that lingers for ")
 			.addDuration(a -> a.mLingerTime, LINGER_TIME)
-			.add(". Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates ")
+			.add(" seconds. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates ")
 			.addPercent(a -> a.mHealPercent, HEAL_PERCENT)
 			.add(" of max health every second for ")
 			.addDuration(a -> a.mHealDuration, HEAL_DURATION)
@@ -286,7 +286,7 @@ public class Bezoar extends Ability {
 			.add(" potions, and gives the same effects as bezoars, while also granting ")
 			.add(a -> PHILOSOPHER_STONE_ABSORPTION_AMOUNT, PHILOSOPHER_STONE_ABSORPTION_AMOUNT)
 			.add(" absorption for ")
-			.add(PHILOSOPHER_STONE_ABSORPTION_DURATION)
+			.addDuration(PHILOSOPHER_STONE_ABSORPTION_DURATION)
 			.add(" seconds.");
 	}
 }

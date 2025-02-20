@@ -336,7 +336,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.add(" seconds. Clerics with this ability who pick it up get ")
 			.addPercent(a -> a.mEnhanceDamage, ENHANCEMENT_ASH_BONUS_DAMAGE)
 			.add(" increased undead damage for ")
-			.addDuration(a -> a.mEnhanceDuration, ENHANCEMENT_ASH_DURATION)
+			.addDuration(a -> a.mEnhanceDuration, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION)
 			.add(" seconds. This effect stacks up to ")
 			.addPercent(ENHANCEMENT_BONUS_DAMAGE_MAX)
 			.add(" and the duration is refreshed on each pickup. Bone Shards can be consumed from the inventory by right clicking to get the max effect for ")

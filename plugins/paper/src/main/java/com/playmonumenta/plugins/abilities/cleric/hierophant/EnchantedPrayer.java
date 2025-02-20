@@ -115,7 +115,7 @@ public class EnchantedPrayer extends Ability {
 			.add("Damage is increased to ")
 			.add(a -> a.mDamage, ENCHANTED_PRAYER_2_DAMAGE, false, Ability::isLevelTwo)
 			.add(". Healing is increased to ")
-			.addPercent(a -> a.mHeal, ENCHANTED_PRAYER_2_HEAL)
+			.addPercent(a -> a.mHeal, ENCHANTED_PRAYER_2_HEAL, false, Ability::isLevelTwo)
 			.add(" of max health.");
 	}
 }

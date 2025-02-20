@@ -79,7 +79,7 @@ public class TotemicProjection extends Ability {
 
 	public TotemicProjection(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mSlownessPercent = isLevelTwo() ? SLOWNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS_PERCENT) : 0;
+		mSlownessPercent = SLOWNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS_PERCENT);
 		mSlownessDuration = CharmManager.getDuration(mPlayer, CHARM_SLOWNESS_DURATION, SLOWNESS_DURATION);
 		mEnhanceDamageDuration = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_DAMAGE_DURATION, ENHANCE_DAMAGE_PERCENT_DURATION);
 		mEnhanceDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE_PERCENT_PER, ENHANCE_DAMAGE_PERCENT_PER);
@@ -209,7 +209,7 @@ public class TotemicProjection extends Ability {
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks of the landing location are slowed by ")
 			.addPercent(a -> a.mSlownessPercent, SLOWNESS_PERCENT)
-			.add("  for ")
+			.add(" for ")
 			.addDuration(a -> a.mSlownessDuration, SLOWNESS_DURATION)
 			.add(" seconds.")
 			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);

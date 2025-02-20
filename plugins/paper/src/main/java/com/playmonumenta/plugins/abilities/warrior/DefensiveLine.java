@@ -29,8 +29,8 @@ import org.bukkit.entity.Player;
 public class DefensiveLine extends Ability {
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "DefensiveLinePercentDamageReceivedEffect";
 	private static final String NEGATE_DAMAGE_EFFECT_NAME = "DefensiveLineNegateDamageEffect";
-	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_1 = -0.20;
-	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_2 = -0.30;
+	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_1 = 0.20;
+	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_2 = 0.30;
 	private static final int DURATION = 20 * 10;
 	private static final int COOLDOWN = 20 * 30;
 	private static final int RADIUS = 8;
@@ -65,7 +65,7 @@ public class DefensiveLine extends Ability {
 		super(plugin, player, INFO);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS);
-		mPercentDamageReceived = (isLevelOne() ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2) - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
+		mPercentDamageReceived = (isLevelOne() ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
 		mKnockAwayRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, KNOCK_AWAY_RADIUS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DefensiveLineCS());
 	}
@@ -88,7 +88,7 @@ public class DefensiveLine extends Ability {
 			Location loc = player.getLocation();
 
 			mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME,
-				new PercentDamageReceived(mDuration, mPercentDamageReceived).deleteOnAbilityUpdate(true));
+				new PercentDamageReceived(mDuration, -mPercentDamageReceived).deleteOnAbilityUpdate(true));
 			if (isEnhanced()) {
 				mPlugin.mEffectManager.addEffect(player, NEGATE_DAMAGE_EFFECT_NAME,
 					new NegateDamage(mDuration, (int) (1 + CharmManager.getLevel(mPlayer, CHARM_NEGATIONS)),
@@ -111,7 +111,7 @@ public class DefensiveLine extends Ability {
 			.addPercent(a -> a.mPercentDamageReceived, PERCENT_DAMAGE_RECEIVED_EFFECT_1, false, Ability::isLevelOne)
 			.add(" resistance for ")
 			.addDuration(a -> a.mDuration, DURATION)
-			.add("seconds. Additionally, mobs within ")
+			.add(" seconds. Additionally, mobs within ")
 			.add(a -> a.mKnockAwayRadius, KNOCK_AWAY_RADIUS)
 			.add(" blocks of an affected player are knocked back.")
 			.addCooldown(COOLDOWN);

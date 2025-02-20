@@ -164,7 +164,7 @@ public class Swiftness extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The attack speed is increased to ")
 			.addPercent(a -> a.mAttackSpeed, ATTACK_SPEED_POTENCY_2, false, Ability::isLevelTwo)
-			.add("and gain Jump Boost ")
+			.add(" and gain Jump Boost ")
 			.addPotionAmplifier(a -> a.mJumpBoostLevel, JUMP_BOOST_POTENCY)
 			.add(" when you are not inside a town.");
 	}

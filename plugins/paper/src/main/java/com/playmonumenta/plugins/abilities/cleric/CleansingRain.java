@@ -29,7 +29,7 @@ import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class CleansingRain extends Ability implements AbilityWithDuration {
 	private static final int CLEANSING_DURATION = TICKS_PER_SECOND * 15;
-	private static final double PERCENT_DAMAGE_RESIST = -0.2;
+	private static final double PERCENT_DAMAGE_RESIST = 0.2;
 	private static final int CLEANSING_EFFECT_DURATION = TICKS_PER_SECOND * 3;
 	private static final int CLEANSING_APPLY_PERIOD = 1;
 	private static final int CLEANSING_RADIUS = 4;
@@ -68,7 +68,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 		super(plugin, player, INFO);
 		mRainDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, CLEANSING_DURATION);
 		mRadius = CharmManager.getRadius(player, CHARM_RANGE, isEnhanced() ? CLEANSING_RADIUS_ENHANCED : CLEANSING_RADIUS);
-		mResistancePotency = PERCENT_DAMAGE_RESIST - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
+		mResistancePotency = PERCENT_DAMAGE_RESIST + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
 		mRainRunnable = null;
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CleansingRainCS());
 	}
@@ -115,7 +115,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 
 					if (isLevelTwo()) {
 						mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
-							new PercentDamageReceived(CLEANSING_EFFECT_DURATION, mResistancePotency)
+							new PercentDamageReceived(CLEANSING_EFFECT_DURATION, -mResistancePotency)
 								.deleteOnAbilityUpdate(true));
 					}
 				}
@@ -136,7 +136,7 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 
 						if (isLevelTwo()) {
 							mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
-								new PercentDamageReceived(CLEANSING_EFFECT_DURATION, mResistancePotency)
+								new PercentDamageReceived(CLEANSING_EFFECT_DURATION, -mResistancePotency)
 									.deleteOnAbilityUpdate(true));
 						}
 					}

@@ -206,7 +206,7 @@ public class CursedWound extends Ability {
 	private static Description<CursedWound> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Your melee scythe attacks now passively deal ")
-			.add(a -> a.mCursedWoundDamage, CURSED_WOUND_DAMAGE_2, false, Ability::isLevelTwo)
+			.addPercent(a -> a.mCursedWoundDamage, CURSED_WOUND_DAMAGE_2, false, Ability::isLevelTwo)
 			.add(" more damage per ability on cooldown instead.");
 	}
 

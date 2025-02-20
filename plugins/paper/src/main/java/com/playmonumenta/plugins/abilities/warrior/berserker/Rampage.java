@@ -229,7 +229,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 				return subDescription.get(a, p);
 			})
 			.add(". Stacks decay by 1 every ")
-			.addDuration(a -> a.mTimeToStackDecay, RAMPAGE_STACK_DECAY_TIME, true)
+			.addDuration(a -> RAMPAGE_STACK_DECAY_TIME, RAMPAGE_STACK_DECAY_TIME, true)
 			.add(" seconds of not dealing melee damage and cap at ")
 			.add(a -> a.mStackLimit, RAMPAGE_1_STACK_LIMIT, false, Ability::isLevelOne)
 			.add(". Passively gain ")

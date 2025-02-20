@@ -195,7 +195,7 @@ public class SoulRend extends Ability {
 			.add(" seconds, causing your next ")
 			.add(a -> a.mMarks, MARK_COUNT)
 			.add(" critical scythe attacks against them to heal you for ")
-			.add(a -> a.mHealPercent, MARK_HEAL_PERCENT)
+			.addPercent(a -> a.mHealPercent, MARK_HEAL_PERCENT)
 			.add(" of the damage dealt, capped at ")
 			.add(a -> a.mHealCap, MARK_HEAL_CAP)
 			.add(" health per hit. Killing the mob heals you for ")

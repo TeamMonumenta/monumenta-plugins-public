@@ -204,7 +204,7 @@ public class LightningTotem extends TotemAbility {
 			.add(" seconds. Charge up time: ")
 			.addDuration(PULSE_DELAY)
 			.add("s. Duration: ")
-			.add(a -> a.mDuration, TOTEM_DURATION)
+			.addDuration(a -> a.mDuration, TOTEM_DURATION)
 			.add("s.")
 			.addCooldown(COOLDOWN);
 	}
@@ -225,7 +225,7 @@ public class LightningTotem extends TotemAbility {
 			.add(" blocks of the center every ")
 			.addDuration(a -> a.mInterval, INTERVAL)
 			.add(" seconds for ")
-			.add(a -> a.mStormDuration, STORM_DURATION)
+			.addDuration(a -> a.mStormDuration, STORM_DURATION)
 			.add(" seconds.");
 	}
 }

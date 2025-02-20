@@ -106,7 +106,7 @@ public class WindBomb extends Ability {
 		mEffectDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		mWeaknessPotency = WEAKEN_EFFECT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
 		mVelocityMultSquared = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEIGHT, 1);
-		mMidairDamageMult = 1 + MIDAIR_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER);
+		mMidairDamageMult = MIDAIR_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER);
 		mEnhancePullVelocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_VELOCITY);
 		mEnhancePullRadius = CharmManager.getRadius(mPlayer, CHARM_VORTEX_RADIUS, PULL_RADIUS);
 		mEnhancePullDuration = CharmManager.getDuration(mPlayer, CHARM_VORTEX_DURATION, PULL_DURATION);
@@ -216,7 +216,7 @@ public class WindBomb extends Ability {
 		if (isLevelTwo() && (playerName == null || !playerName.asString().equals(mPlayer.getName())) && LocationUtils.isAirborne(enemy)
 			&& event.getType() != DamageEvent.DamageType.TRUE) {
 			MetadataUtils.setMetadata(enemy, MIDAIR_DAMAGE_METAKEY, new FixedMetadataValue(mPlugin, mPlayer.getName()));
-			event.updateDamageWithMultiplier(mMidairDamageMult);
+			event.updateDamageWithMultiplier(1 + mMidairDamageMult);
 		}
 		return false;
 	}

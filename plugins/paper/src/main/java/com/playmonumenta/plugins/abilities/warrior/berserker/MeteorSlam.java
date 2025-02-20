@@ -47,19 +47,15 @@ public final class MeteorSlam extends Ability {
 	public static final int SIZE_1 = 2;
 	public static final int SIZE_2 = 3;
 	public static final int JUMP_AMPLIFIER_1 = 3;
-	public static final int JUMP_LEVEL_1 = JUMP_AMPLIFIER_1 + 1;
 	public static final int JUMP_AMPLIFIER_2 = 4;
-	public static final int JUMP_LEVEL_2 = JUMP_AMPLIFIER_2 + 1;
 	public static final int DURATION_SECONDS = 2;
 	public static final int DURATION_TICKS = DURATION_SECONDS * 20;
 	public static final int AUTOMATIC_THRESHOLD = 3; // Minimum fall distance for landing to automatically trigger slam attack
 	public static final int SCALING_THRESHOLD = 4; // Blocks fallen after which damage per block fallen increment does not increase
 	public static final double REDUCED_THRESHOLD_1 = 5; // Fall distance past which damage transitions from starting to ending damage
 	public static final double REDUCED_THRESHOLD_2 = 5.5;
-	public static final int COOLDOWN_SECONDS_1 = 8;
-	public static final int COOLDOWN_TICKS_1 = COOLDOWN_SECONDS_1 * 20;
-	public static final int COOLDOWN_SECONDS_2 = 6;
-	public static final int COOLDOWN_TICKS_2 = COOLDOWN_SECONDS_2 * 20;
+	public static final int COOLDOWN_TICKS_1 = 8 * 20;
+	public static final int COOLDOWN_TICKS_2 = 6 * 20;
 
 	public static final String CHARM_DAMAGE = "Meteor Slam Damage";
 	public static final String CHARM_RADIUS = "Meteor Slam Radius";
@@ -235,7 +231,7 @@ public final class MeteorSlam extends Ability {
 			.add(" for ")
 			.addDuration(a -> a.mDuration, DURATION_TICKS)
 			.add(" seconds.")
-			.addCooldown(COOLDOWN_SECONDS_1, Ability::isLevelOne)
+			.addCooldown(COOLDOWN_TICKS_1, Ability::isLevelOne)
 			.add(" Falling more than ")
 			.add(a -> a.mThreshold, AUTOMATIC_THRESHOLD, true)
 			.add(" blocks generates a slam when you land, dealing melee damage to all enemies in a ")
@@ -258,7 +254,7 @@ public final class MeteorSlam extends Ability {
 			.add("Jump Boost level is increased to ")
 			.add(a -> a.mLevelJumpAmplifier, JUMP_AMPLIFIER_2, false, Ability::isLevelTwo)
 			.add(".")
-			.addCooldown(COOLDOWN_SECONDS_2, Ability::isLevelTwo)
+			.addCooldown(COOLDOWN_TICKS_2, Ability::isLevelTwo)
 			.add(" Radius is increased to ")
 			.add(a -> a.mLevelSize, SIZE_2, false, Ability::isLevelTwo)
 			.add(" blocks.  Reduction threshold is increased to ")

@@ -10,11 +10,11 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.RendingRazorCS;
-import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -43,7 +43,6 @@ public class RendingRazor extends Ability {
 	private static final double MAXIMUM_REND_DISTANCE = 60.0;
 	private static final float PULL_FORCE = 0.5f;
 	private static final double REND_SPEED = 1.0; // blocks per tick
-	private static final String SLOWNESS_SRC = "RendingRazorSlowness";
 	private static final double SLOW_EFFECT_2 = 0.2;
 	private static final int SLOW_DURATION_2 = TICKS_PER_SECOND * 4;
 
@@ -91,9 +90,8 @@ public class RendingRazor extends Ability {
 			(isLevelTwo() ? EMBED_DAMAGE_2 : EMBED_DAMAGE_1));
 		mRendDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_REND_DAMAGE,
 			(isLevelTwo() ? REND_DAMAGE_2 : REND_DAMAGE_1));
-		mSlownessDuration = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SLOWNESS_DURATION,
-			SLOW_DURATION_2);
-		mSlownessPotency = CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
+		mSlownessDuration = CharmManager.getDuration(mPlayer, CHARM_SLOWNESS_DURATION, SLOW_DURATION_2);
+		mSlownessPotency = SLOW_EFFECT_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
 		mRazorRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RAZOR_RANGE, MAXIMUM_BLOCK_DISTANCE);
 		mRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RAZOR_SIZE, 1);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new RendingRazorCS());
@@ -249,8 +247,7 @@ public class RendingRazor extends Ability {
 
 	private void applySlowness(final LivingEntity target) {
 		if (isLevelTwo()) {
-			mPlugin.mEffectManager.addEffect(target, SLOWNESS_SRC,
-				new PercentSpeed(mSlownessDuration, -1 * mSlownessPotency, SLOWNESS_SRC));
+			EntityUtils.applySlow(mPlugin, mSlownessDuration, mSlownessPotency, target);
 		}
 	}
 

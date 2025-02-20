@@ -219,13 +219,12 @@ public class PrismaticShield extends Ability {
 			.add(" absorption health. Knocked back enemies are stunned for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION)
 			.add(" seconds.");
-
 	}
 
 	private static Description<PrismaticShield> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("After Prismatic Shield is activated, in the next ")
-			.add(a -> a.mEnhancementDuration, ENHANCEMENT_DURATION)
+			.addDuration(a -> a.mEnhancementDuration, ENHANCEMENT_DURATION)
 			.add(" seconds, you deal ")
 			.addPercent(a -> a.mDamageBuff, DAMAGE_BUFF_PERCENT)
 			.add(" more damage and every spell that deals damage to at least one enemy will heal you for ")

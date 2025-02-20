@@ -124,8 +124,8 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 		super(plugin, player, INFO);
 		mDamageFraction = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2);
 		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, (isLevelOne() ? STUN_TIME_1 : STUN_TIME_2));
-		mBleedDuration = isEnhanced() ? CharmManager.getDuration(mPlayer, CHARM_BLEED_DURATION, BLEED_DURATION) : 0;
-		mBleedAmount = isEnhanced() ? BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER) : 0;
+		mBleedDuration = CharmManager.getDuration(mPlayer, CHARM_BLEED_DURATION, BLEED_DURATION);
+		mBleedAmount = BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER);
 		mHealingPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEALING_PERCENT);
 		mSummons = new HashMap<>();
 		mRunnable = null;

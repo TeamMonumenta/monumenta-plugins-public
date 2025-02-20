@@ -206,14 +206,14 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			.add(" seconds of Stealth and (")
 			.addPercent(a -> a.mDamageMultiplier, CLOAK_1_DAMAGE_MULTIPLIER, false, Ability::isLevelOne)
 			.add(" * X) melee damage on your next melee attack while in Stealth, where X is the number of stacks you had at activation. Performing a successful melee attack or switching from your held swords ends Stealth. You must have at least ")
-			.add(a -> a.mCloakOnActivation, CLOAK_MIN_STACKS)
+			.add(a -> CLOAK_MIN_STACKS, CLOAK_MIN_STACKS)
 			.add(" stacks for activation.");
 	}
 
 	private static Description<CloakAndDagger> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The stack cap is increased to ")
-			.add(a -> a.mMaxStacks, CLOAK_1_MAX_STACKS, false, Ability::isLevelTwo)
+			.add(a -> a.mMaxStacks, CLOAK_2_MAX_STACKS, false, Ability::isLevelTwo)
 			.add(" and the melee damage is increased to (")
 			.addPercent(a -> a.mDamageMultiplier, CLOAK_2_DAMAGE_MULTIPLIER, false, Ability::isLevelTwo)
 			.add(" * X).");

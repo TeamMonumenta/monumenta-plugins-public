@@ -268,7 +268,7 @@ public class Panacea extends Ability implements AbilityWithDuration {
 			.add(" absorption health to other players per enemy touched (maximum ")
 			.add(a -> a.mMaxAbsorption, PANACEA_MAX_SHIELD)
 			.add(" absorption), lasting ")
-			.add(a -> a.mAbsorptionDuration, PANACEA_ABSORPTION_DURATION)
+			.addDuration(a -> a.mAbsorptionDuration, PANACEA_ABSORPTION_DURATION)
 			.add(" seconds. After hitting a block or traveling ")
 			.add(a -> a.mMaxDuration * a.mMoveSpeed, PANACEA_MAX_DURATION * PANACEA_MOVE_SPEED)
 			.add(" blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time.")

@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -45,10 +46,8 @@ public class Spellshock extends Ability {
 	private static final String DAMAGED_THIS_TICK_METAKEY = "SpellshockDamagedThisTick";
 	private static final String SPELLSHOCK_STATIC_SRC = "SpellShockStaticEffect";
 	private static final String SPEED_SRC = "SpellShockPercentSpeedEffect";
-	private static final String SLOW_SRC = "SpellShockPercentSlowEffect";
 	private static final String ENHANCE_SPEED_METAKEY = "SpellshockUTick";
 	private static final String ENHANCE_SPEED_SRC = "SpellShockEnhancePercentSpeedEffect";
-	private static final String ENHANCE_SLOW_SRC = "SpellShockEnhancementPercentSlowEffect";
 	private static final double DAMAGE_1 = 0.2;
 	private static final double DAMAGE_2 = 0.3;
 	private static final double MELEE_BONUS_1 = 0.1;
@@ -113,13 +112,13 @@ public class Spellshock extends Ability {
 	public Spellshock(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		mSpellDamageMult = (isLevelOne() ? DAMAGE_1 : DAMAGE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPELL);
-		mMeleeBonusMult = 1 + (isLevelOne() ? MELEE_BONUS_1 : MELEE_BONUS_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_MELEE);
+		mMeleeBonusMult = (isLevelOne() ? MELEE_BONUS_1 : MELEE_BONUS_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_MELEE);
 		mSpeedPotency = SPEED_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
-		mSlowPotency = -1 * (SLOW_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW));
+		mSlowPotency = SLOW_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW);
 		mEnhanceSpeedPotency = ENHANCE_SPEED_POTENCY;
-		mEnhanceDamageMult = 1 + CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE, ENHANCE_DAMAGE_MULT);
-		mEnhanceSlowPotency = -1 * (ENHANCE_SLOW_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_SLOW));
-		mEnhanceWeakPotency = -1 * (ENHANCE_WEAK_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_WEAK));
+		mEnhanceDamageMult = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE, ENHANCE_DAMAGE_MULT);
+		mEnhanceSlowPotency = ENHANCE_SLOW_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_SLOW);
+		mEnhanceWeakPotency = ENHANCE_WEAK_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_WEAK);
 		mRadius = CharmManager.getDuration(player, CHARM_RADIUS, SPELLSHOCK_RADIUS);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new SpellshockCS());
@@ -146,14 +145,13 @@ public class Spellshock extends Ability {
 
 		if (isEnhanced() && existingStatic != null) {
 			if (FIRE_ABILITIES.contains(eventAbility)) {
-				event.updateDamageWithMultiplier(mEnhanceDamageMult);
+				event.updateDamageWithMultiplier(1 + mEnhanceDamageMult);
 			} else if (ICE_ABILITIES.contains(eventAbility)) {
-				mPlugin.mEffectManager.addEffect(enemy, ENHANCE_SLOW_SRC,
-					new PercentSpeed(ENHANCEMENT_EFFECT_DURATION, mEnhanceSlowPotency, ENHANCE_SLOW_SRC));
+				EntityUtils.applySlow(mPlugin, ENHANCEMENT_EFFECT_DURATION, mEnhanceSlowPotency, enemy);
 			} else if (eventAbility == ClassAbility.THUNDER_STEP) {
 				/* This will also happen for Thunder Elemental Arrows, but it is handled in ElementalArrows.java */
 				mPlugin.mEffectManager.addEffect(enemy, ENHANCE_WEAK_SRC,
-					new PercentDamageDealt(ENHANCEMENT_EFFECT_DURATION, mEnhanceWeakPotency)
+					new PercentDamageDealt(ENHANCEMENT_EFFECT_DURATION, -mEnhanceWeakPotency)
 						.damageTypes(ENHANCE_WEAK_AFFECTED_DAMAGE_TYPES));
 			} else if (ARCANE_ABILITIES.contains(eventAbility)) {
 				/* Does not check for Arcane Strike (U) since this can only happen once per tick, does not check for
@@ -183,8 +181,8 @@ public class Spellshock extends Ability {
 		if (event.getType() == DamageType.MELEE
 			&& mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(EnchantmentType.MAGIC_WAND) > 0
 			&& existingStatic != null) {
-			event.updateDamageWithMultiplier(mMeleeBonusMult);
-			mPlugin.mEffectManager.addEffect(enemy, SLOW_SRC, new PercentSpeed(SLOW_DURATION, mSlowPotency, SLOW_SRC));
+			event.updateDamageWithMultiplier(1 + mMeleeBonusMult);
+			EntityUtils.applySlow(mPlugin, SLOW_DURATION, mSlowPotency, enemy);
 			existingStatic.trigger();
 			mCosmetic.meleeClearStatic(mPlayer, enemy);
 		} else if (eventAbility != null && !eventAbility.isFake() && eventAbility != ClassAbility.BLIZZARD

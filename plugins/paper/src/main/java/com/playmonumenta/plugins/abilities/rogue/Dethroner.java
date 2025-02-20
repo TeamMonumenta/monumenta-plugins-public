@@ -44,9 +44,9 @@ public class Dethroner extends Ability {
 	private static Description<Dethroner> getDescription() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("While holding two swords, you deal ")
-			.addPercent(PASSIVE_DAMAGE_ELITE_MODIFIER)
+			.addPercent(PASSIVE_DAMAGE_ELITE_MODIFIER - 1)
 			.add(" more melee damage to elites and ")
-			.addPercent(PASSIVE_DAMAGE_BOSS_MODIFIER)
+			.addPercent(PASSIVE_DAMAGE_BOSS_MODIFIER - 1)
 			.add(" more melee damage to bosses.");
 	}
 }

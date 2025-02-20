@@ -109,7 +109,7 @@ public class AmplifyingHex extends Ability {
 				                 AbilityUtils.getEffectiveTotalSpecPoints(player) +
 				                 ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
 				                 charmPower;
-			mDamage = mFlatDamage + mDamagePerPoint * Math.min(totalLevel, mRegionCap);
+			mDamage = mFlatDamage + Math.min(mDamagePerPoint * totalLevel, mRegionCap);
 		});
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AmplifyingHexCS());
@@ -257,13 +257,13 @@ public class AmplifyingHex extends Ability {
 				if (p == null) {
 					return Component.text("based on region: R1 Level 7 / R2 Level 14 / R3 Level 21");
 				} else {
-					return Component.text("at Level " + (ServerProperties.getAbilityEnhancementsEnabled(p) ? R3_CAP : ServerProperties.getClassSpecializationsEnabled(p) ? R2_CAP : R1_CAP));
+					return Component.text("at Level " + ((ServerProperties.getAbilityEnhancementsEnabled(p) ? R3_CAP : ServerProperties.getClassSpecializationsEnabled(p) ? R2_CAP : R1_CAP) * 2));
 				}
 			})
 			.add(") to each enemy for each debuff it has. Debuffs include, but are not limited to, Fire, Slowness, Weaken, Decay, Bleed, and more. Deal an additional ")
 			.add(a -> a.mAmplifierDamage, AMPLIFIER_DAMAGE_1, false, Ability::isLevelOne)
 			.add(" damage for each extra level of debuff above 1, capped at ")
-			.add(a -> a.mAmplifierCap, AMPLIFIER_CAP_2, false, Ability::isLevelOne)
+			.add(a -> a.mAmplifierCap, AMPLIFIER_CAP_1, false, Ability::isLevelOne)
 			.add(" extra levels per debuff. 20% Slowness, Decay 2, etc. count as level 2 debuffs.")
 			.addCooldown(COOLDOWN);
 	}
@@ -284,7 +284,7 @@ public class AmplifyingHex extends Ability {
 			.add("For every 1% health you have above ")
 			.addPercent(a -> a.mEnhanceHealthThreshold, ENHANCEMENT_HEALTH_THRESHOLD)
 			.add(" of your max health, this ability deals ")
-			.addPercent(a -> a.mEnhanceDamageBonus, ENHANCEMENT_DAMAGE_MOD)
+			.addPercent(a -> a.mEnhanceDamageBonus - 1, ENHANCEMENT_DAMAGE_MOD - 1)
 			.add(" more damage and damages yourself by 1% max health.");
 	}
 }

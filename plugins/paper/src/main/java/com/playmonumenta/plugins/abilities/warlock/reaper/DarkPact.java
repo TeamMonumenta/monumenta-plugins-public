@@ -175,25 +175,25 @@ public class DarkPact extends Ability {
 
 	private static Description<DarkPact> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
-			       .addTrigger()
+			.addTrigger()
 			.add(" to cause a dark aura to form around you. For the next ")
-			       .addDuration(a -> a.mDuration, DURATION)
-			       .add(" seconds, your melee scythe attacks deal ")
-			       .addPercent(a -> a.mPercentDamageDealt, PERCENT_DAMAGE_DEALT_1, false, Ability::isLevelOne)
-			       .add(" more damage. Each kill during this time increases the duration of your aura by ")
-			       .addDuration(a -> a.mDurationIncreaseOnKill, DURATION_INCREASE_ON_KILL)
-			       .add(" second and gives ")
-			       .add(a -> a.mAbsorption, ABSORPTION_ON_KILL)
-			       .add(" absorption health (up to ")
-			       .add(a -> a.mMaxAbsorption, MAX_ABSORPTION)
-			       .add(") for the duration of the aura. However, you cannot heal for ")
-			       .addDuration(a -> a.mDuration, DURATION)
-			       .add(" seconds, and healing is reduced by ")
-			       .addPercent(-EXTENDED_ANTIHEAL)
-			       .add(" until the aura ends. You may retrigger this ability again after ")
-			       .addDuration(CANCEL_WINDOW)
-			       .add(" seconds to cancel your pact.")
-			       .addCooldown(COOLDOWN);
+			.addDuration(a -> a.mDuration, DURATION)
+			.add(" seconds, your melee scythe attacks deal ")
+			.addPercent(a -> a.mPercentDamageDealt, PERCENT_DAMAGE_DEALT_1, false, Ability::isLevelOne)
+			.add(" more damage. Each kill during this time increases the duration of your aura by ")
+			.addDuration(a -> a.mDurationIncreaseOnKill, DURATION_INCREASE_ON_KILL)
+			.add(" second and gives ")
+			.add(a -> a.mAbsorption, ABSORPTION_ON_KILL)
+			.add(" absorption health (up to ")
+			.add(a -> a.mMaxAbsorption, MAX_ABSORPTION)
+			.add(") for the duration of the aura. However, you cannot heal for ")
+			.addDuration(a -> a.mDuration, DURATION)
+			.add(" seconds, and healing is reduced by ")
+			.addPercent(-EXTENDED_ANTIHEAL)
+			.add(" until the aura ends. You may retrigger this ability again after ")
+			.addDuration(CANCEL_WINDOW)
+			.add(" seconds to cancel your pact.")
+			.addCooldown(COOLDOWN);
 	}
 
 	private static Description<DarkPact> getDescription2() {
@@ -206,13 +206,13 @@ public class DarkPact extends Ability {
 				SoulRend soulRend = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(p, SoulRend.class);
 				if (soulRend == null) {
 					subDescription = new DescriptionBuilder<>(() -> SoulRend.INFO)
-						.addPercent(SoulRend.DARK_PACT_HEAL_1)
+						.add(aa -> SoulRend.DARK_PACT_HEAL_1, SoulRend.DARK_PACT_HEAL_1)
 						.add("/")
-						.addPercent(SoulRend.DARK_PACT_HEAL_2)
+						.add(aa -> SoulRend.DARK_PACT_HEAL_2, SoulRend.DARK_PACT_HEAL_2)
 						.add(" health, depending on the level of Soul Rend.");
 				} else {
 					subDescription = new DescriptionBuilder<>(() -> SoulRend.INFO)
-						.addPercent(sr -> sr.mDarkPactHeal, soulRend.isLevelOne() ? SoulRend.DARK_PACT_HEAL_1 : SoulRend.DARK_PACT_HEAL_2)
+						.add(sr -> sr.mDarkPactHeal, soulRend.isLevelOne() ? SoulRend.DARK_PACT_HEAL_1 : SoulRend.DARK_PACT_HEAL_2)
 						.add(" health.");
 				}
 				return subDescription.get(soulRend, p);

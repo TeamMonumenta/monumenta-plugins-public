@@ -180,7 +180,7 @@ public class VoodooBonds extends MultipleChargeAbility {
 			.add(" other mobs on critical strikes. The slash and pin deal ")
 			.add(a -> a.mPinAdditionalDamage, PIN_ADDITIONAL_DAMAGE)
 			.add(" additional damage to already-cursed mobs. Take ")
-			.add(a -> a.mProtectionResist, PROTECTION_RESIST)
+			.addPercent(a -> a.mProtectionResist, PROTECTION_RESIST)
 			.add(" less damage when redirecting damage from other players.");
 	}
 }

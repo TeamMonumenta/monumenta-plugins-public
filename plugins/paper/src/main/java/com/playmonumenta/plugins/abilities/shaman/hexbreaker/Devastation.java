@@ -30,7 +30,7 @@ public class Devastation extends Ability {
 	public static final int RADIUS_2 = 8;
 	public static final int DAMAGE_1 = 23;
 	public static final int DAMAGE_2 = 28;
-	public static final int CDR_ON_KILL = 3;
+	public static final int CDR_ON_KILL = 3 * 20;
 
 	public static final String CHARM_DAMAGE = "Devastation Damage";
 	public static final String CHARM_RADIUS = "Devastation Radius";
@@ -58,7 +58,7 @@ public class Devastation extends Ability {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelOne() ? RADIUS_1 : RADIUS_2);
-		mCooldownReduction = CharmManager.getDuration(mPlayer, CHARM_CDR, 20 * CDR_ON_KILL);
+		mCooldownReduction = CharmManager.getDuration(mPlayer, CHARM_CDR, CDR_ON_KILL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DevastationCS());
 	}
 

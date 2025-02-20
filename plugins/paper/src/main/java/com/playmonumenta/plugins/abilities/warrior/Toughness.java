@@ -46,6 +46,7 @@ public class Toughness extends Ability {
 			.remove(player -> EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, TOUGHNESS_MODIFIER_NAME))
 			.displayItem(Material.IRON_HELMET);
 
+	private final double mBaseHealthBoost;
 	private final double mHealthBoost;
 	private final double mDoTDamageReduction;
 	private final double mHealing;
@@ -54,7 +55,8 @@ public class Toughness extends Ability {
 
 	public Toughness(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mHealthBoost = (isLevelOne() ? PERCENT_HEALTH_1 : PERCENT_HEALTH_2) + (isEnhanced() ? PERCENT_HEALTH_ENHANCEMENT : 0) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALTH);
+		mBaseHealthBoost = (isLevelOne() ? PERCENT_HEALTH_1 : PERCENT_HEALTH_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALTH);
+		mHealthBoost = mBaseHealthBoost + (isEnhanced() ? PERCENT_HEALTH_ENHANCEMENT : 0);
 		mDoTDamageReduction = (isLevelOne() ? DOT_DAMAGE_REDUCTION_1 : DOT_DAMAGE_REDUCTION_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
 		mHealing = HEALING_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALING);
 		mHealthThreshold = HEALTH_THRESHHOLD + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALTH_THRESHOLD);
@@ -83,7 +85,7 @@ public class Toughness extends Ability {
 	private static Description<Toughness> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Gain ")
-			.addPercent(a -> a.mHealthBoost, PERCENT_HEALTH_1, false, Ability::isLevelOne)
+			.addPercent(a -> a.mBaseHealthBoost, PERCENT_HEALTH_1, false, Ability::isLevelOne)
 			.add(" max health and take ")
 			.addPercent(a -> a.mDoTDamageReduction, DOT_DAMAGE_REDUCTION_1, false, Ability::isLevelOne)
 			.add(" less damage from poison, wither, and drowning.");
@@ -92,7 +94,7 @@ public class Toughness extends Ability {
 	private static Description<Toughness> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The max health is increased to ")
-			.addPercent(a -> a.mHealthBoost, PERCENT_HEALTH_2, false, Ability::isLevelTwo)
+			.addPercent(a -> a.mBaseHealthBoost, PERCENT_HEALTH_2, false, Ability::isLevelTwo)
 			.add(" and the damage reduction is increased to ")
 			.addPercent(a -> a.mDoTDamageReduction, DOT_DAMAGE_REDUCTION_2, false, Ability::isLevelTwo)
 			.add(".");

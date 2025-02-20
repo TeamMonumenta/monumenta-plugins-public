@@ -74,7 +74,7 @@ public class WhirlwindTotem extends TotemAbility {
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 		mCDRPerSecond = CDR_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CDR);
 		mCDRMax = CharmManager.getDuration(mPlayer, CHARM_MAX_CDR, CDR_MAX_PER_SECOND);
-		mSpeed = isLevelOne() ? 0 : (SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED));
+		mSpeed = SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 		mDurationBoost = DURATION_BOOST + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DURATION_BOOST);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WhirlwindTotemCS());
@@ -161,7 +161,7 @@ public class WhirlwindTotem extends TotemAbility {
 	private static Description<WhirlwindTotem> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Duration is increased to ")
-			.add(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
+			.addDuration(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
 			.add(" seconds. Now additionally gives ")
 			.addPercent(a -> a.mSpeed, SPEED_PERCENT)
 			.add(" speed to players within range.");

@@ -134,7 +134,7 @@ public class Bodyguard extends Ability {
 			.addTrigger(1, "looking directly at another player")
 			.add(" within ")
 			.add(a -> a.mRange, RANGE)
-			.add("blocks to charge to them. Upon arriving, knock away all mobs within ")
+			.add(" blocks to charge to them. Upon arriving, knock away all mobs within ")
 			.add(a -> a.mKnockbackRadius, RADIUS)
 			.add(" blocks. Both you and the other player gain ")
 			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_1, false, Ability::isLevelOne)

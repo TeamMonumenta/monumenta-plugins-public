@@ -279,7 +279,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 			.add("Recasting this ability while the buff is active refreshes the duration and increases the damage and speed by ")
 			.addPercent(a -> a.mEnhanceEffectBonus, ENHANCED_BONUS)
 			.add(", up to ")
-			.add(a -> a.mMaxStacks, ENHANCED_MAX_STACK)
+			.add(a -> a.mMaxStacks, ENHANCED_MAX_STACK, false, Ability::isEnhanced)
 			.add(" stacks. Stacks decay every ")
 			.addDuration(a -> a.mDuration, DURATION)
 			.add(" seconds.");

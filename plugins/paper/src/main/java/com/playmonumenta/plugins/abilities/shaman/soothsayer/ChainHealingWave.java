@@ -38,7 +38,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 	public static final int BOUNCE_RANGE_2 = 15;
 	public static final double HEAL_PERCENT_1 = 0.3;
 	public static final double HEAL_PERCENT_2 = 0.4;
-	public static final int CDR_ON_KILL = 1;
+	public static final int CDR_ON_KILL = 1 * 20;
 	public static final int CHARGES = 2;
 
 	public static final String CHARM_COOLDOWN = "Chain Healing Wave Cooldown";
@@ -73,7 +73,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 		mBounceRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelTwo() ? BOUNCE_RANGE_2 : BOUNCE_RANGE_1);
 		mTargets = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TARGETS, isLevelOne() ? TARGETS_1 : TARGETS_2);
 		mHealPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
-		mCooldownReduction = CharmManager.getDuration(mPlayer, CHARM_CDR, 20 * CDR_ON_KILL);
+		mCooldownReduction = CharmManager.getDuration(mPlayer, CHARM_CDR, CDR_ON_KILL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChainHealingWaveCS());
 	}
 
