@@ -41,6 +41,7 @@ public final class ByMyBlade extends Ability {
 	public static final String CHARM_DAMAGE = "By My Blade Damage";
 	public static final String CHARM_COOLDOWN = "By My Blade Cooldown";
 	public static final String CHARM_ATTACK_SPEED_AMPLIFIER = "By My Blade Attack Speed Amplifier";
+	public static final String CHARM_HASTE_AMPLIFIER = "By My Blade Haste Amplifier";
 	public static final String CHARM_ATTACK_SPEED_DURATION = "By My Blade Attack Speed Duration";
 	public static final String CHARM_HEALTH = "By My Blade Enhancement Health";
 	public static final String CHARM_ELITE_HEALTH = "By My Blade Enhancement Elite Health";
@@ -58,6 +59,7 @@ public final class ByMyBlade extends Ability {
 	private final double mDamageBonusBase;
 	private final double mDamageBonus;
 	private final double mAttackSpeedAmplifier;
+	private final int mHasteAmplifier;
 	private final int mAttackSpeedDuration;
 	private final double mEnhancementHeal;
 	private final double mEnhancementHealElite;
@@ -68,6 +70,7 @@ public final class ByMyBlade extends Ability {
 		mDamageBonusBase = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, (isLevelTwo() ? DAMAGE_2 : DAMAGE_1));
 		mDamageBonus = mDamageBonusBase * (isEnhanced() ? 1 + ENHANCEMENT_DAMAGE_MULT : 1);
 		mAttackSpeedAmplifier = ATTACK_SPEED_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK_SPEED_AMPLIFIER);
+		mHasteAmplifier = HASTE_POTENCY + (int) CharmManager.getLevel(mPlayer, CHARM_HASTE_AMPLIFIER);
 		mAttackSpeedDuration = CharmManager.getDuration(mPlayer, CHARM_ATTACK_SPEED_DURATION, ATTACK_SPEED_DURATION);
 		mEnhancementHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALTH, ENHANCEMENT_HEAL_PERCENT);
 		mEnhancementHealElite = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ELITE_HEALTH, ENHANCEMENT_HEAL_PERCENT_ELITE);
@@ -81,7 +84,7 @@ public final class ByMyBlade extends Ability {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, mDamageBonus, mInfo.getLinkedSpell(), true);
 			// TODO: Remove Haste when we get to 1.20.5, buff Attack Speed to compensate
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionManager.PotionID.ABILITY_SELF,
-				new PotionEffect(PotionEffectType.FAST_DIGGING, ATTACK_SPEED_DURATION, HASTE_POTENCY, true));
+				new PotionEffect(PotionEffectType.FAST_DIGGING, mAttackSpeedDuration, mHasteAmplifier, true));
 
 			if (isLevelTwo()) {
 				mPlugin.mEffectManager.addEffect(mPlayer, ATTACK_SPEED_SRC, new PercentAttackSpeed(mAttackSpeedDuration,

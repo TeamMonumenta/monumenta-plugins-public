@@ -135,8 +135,8 @@ public class RendingRazor extends Ability {
 				if (!hitEnemies.isEmpty()) {
 					final LivingEntity target = hitEnemies.get(0);
 					mCosmetic.razorHit(mPlayer, target.getLocation());
-					DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.PROJECTILE, mEmbedDamage, mInfo.getLinkedSpell(),
-						false, true);
+					DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.PROJECTILE_SKILL, mEmbedDamage,
+						mInfo.getLinkedSpell(), false, true);
 
 					if (target.isValid() && !target.isDead()) {
 						applySlowness(target);
@@ -209,7 +209,7 @@ public class RendingRazor extends Ability {
 					mHitMobTick.removeIf(mHitEnemies::contains);
 					mHitMobTick.forEach(enemy -> {
 						if (enemy != target) {
-							DamageUtils.damage(mPlayer, enemy, DamageEvent.DamageType.PROJECTILE, mRendDamage,
+							DamageUtils.damage(mPlayer, enemy, DamageEvent.DamageType.PROJECTILE_SKILL, mRendDamage,
 								mInfo.getLinkedSpell(), false, true);
 						}
 

@@ -171,12 +171,14 @@ public class Quickdraw extends Ability {
 				final ItemStat smite = Objects.requireNonNull(EnchantmentType.SMITE.getItemStat());
 				final ItemStat slayer = Objects.requireNonNull(EnchantmentType.SLAYER.getItemStat());
 				final ItemStat duelist = Objects.requireNonNull(EnchantmentType.DUELIST.getItemStat());
+				final ItemStat hexEater = Objects.requireNonNull(EnchantmentType.HEX_EATER.getItemStat());
 				map.set(projDamageAdd, mDamage);
 				map.set(sniper, 0);
 				map.set(pointBlank, 0);
 				map.set(smite, 0);
 				map.set(slayer, 0);
 				map.set(duelist, 0);
+				map.set(hexEater, 0);
 			}
 		}
 
