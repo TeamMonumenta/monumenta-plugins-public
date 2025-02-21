@@ -234,7 +234,7 @@ public class AmplifyingHex extends Ability {
 			if (debuffCount > 0) {
 				mCosmetic.onHit(mPlayer, mob);
 
-				double finalDamage = (mDamage + amplifierCount * mAmplifierDamage) * (1 + percentBoost);
+				double finalDamage = (debuffCount * mDamage + amplifierCount * mAmplifierDamage) * (1 + percentBoost);
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, finalDamage, mInfo.getLinkedSpell(), true);
 				MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 			}
