@@ -1937,6 +1937,5 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void serverTickEndEvent(ServerTickEndEvent event) {
 		ParticleManager.tick();
-		TABIntegration.tick();
 	}
 }
