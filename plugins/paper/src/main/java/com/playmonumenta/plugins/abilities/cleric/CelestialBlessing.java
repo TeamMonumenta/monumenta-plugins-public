@@ -141,6 +141,6 @@ public class CelestialBlessing extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Celestial Blessing can be extended by ")
 			.addDuration(CELESTIAL_BUFF_EXTENSION_DURATION_ENHANCED)
-			.add(" by performing a fully-charged melee attack, critical projectile attack, and ability hit on any enemy during its duration.");
+			.add(" seconds by performing a fully-charged melee attack, critical projectile attack, and ability hit on any enemy during its duration.");
 	}
 }

@@ -188,7 +188,7 @@ public class CounterStrike extends Ability {
 			.add("Take ")
 			.addPercent(a -> a.mResistance, RESISTANCE)
 			.add(" less damage from a mob that has a Counter Strike primed against them. If the Counter Strike was primed while you had absorption active, take ")
-			.add(a -> a.mAbsorptionResistance, ABSORPTION_RESISTANCE)
+			.addPercent(a -> a.mAbsorptionResistance, ABSORPTION_RESISTANCE)
 			.add(" less damage instead, and gain ")
 			.addPercent(a -> a.mKBR, KBR)
 			.add(" Knockback Resistance while the Counter Strike is active. Also, when dealing a Counter Strike, apply ")

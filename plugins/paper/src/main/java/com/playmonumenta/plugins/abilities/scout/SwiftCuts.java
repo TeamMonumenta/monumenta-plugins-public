@@ -142,7 +142,7 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	}
 
 	public double getWhirlingBladeBuff() {
-		return mWhirlingBladeBuff;
+		return 1 + mWhirlingBladeBuff;
 	}
 
 	@Override

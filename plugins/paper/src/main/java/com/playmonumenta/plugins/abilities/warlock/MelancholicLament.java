@@ -254,7 +254,7 @@ public class MelancholicLament extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("For ")
 			.addDuration(a -> a.mEnhanceDuration, ENHANCE_DURATION)
-			.add(" after casting this ability, you and other players within ")
+			.add(" seconds after casting this ability, you and other players within ")
 			.add(a -> a.mEnhanceRadius, ENHANCE_RADIUS)
 			.add(" blocks gain ")
 			.addPercent(a -> a.mEnhanceDamage, ENHANCE_DAMAGE)

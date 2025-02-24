@@ -180,7 +180,7 @@ public class RendingRazor extends Ability {
 		}
 
 		mCosmetic.razorRetrieveSound(mPlayer, target.getLocation());
-		DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.PROJECTILE, mRendDamage, mInfo.getLinkedSpell(),
+		DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.PROJECTILE_SKILL, mRendDamage, mInfo.getLinkedSpell(),
 			false, false);
 		MovementUtils.pullTowardsNormalized(mPlayer.getLocation(), target, PULL_FORCE);
 
