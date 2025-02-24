@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -120,12 +122,18 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 									for (LivingEntity target : targets) {
 										if (target.getBoundingBox().overlaps(box)) {
 											int debuffCount = 0;
+
+											// Count vanilla effects
 											for (PotionEffectType effectType : BAD_EFFECTS) {
 												PotionEffect effect = target.getPotionEffect(effectType);
 												if (effect != null) {
 													debuffCount++;
 												}
 											}
+
+											// Count custom debuffs
+											debuffCount += (int) EffectManager.getInstance().getPriorityEffects(target).values().stream().filter(Effect::isDebuff).count();
+
 											double damage = p.BASE_DAMAGE + p.DAMAGE_PER_DEBUFF * debuffCount;
 
 											if (damage > 0) {
