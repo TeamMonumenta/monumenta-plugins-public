@@ -138,7 +138,7 @@ public class MagmaShield extends Ability {
 
 	private static Description<MagmaShield> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increasd to ")
+			.add("Damage is increased to ")
 			.add(a -> a.mLevelDamage, DAMAGE_2, false, Ability::isLevelTwo)
 			.add(".");
 	}

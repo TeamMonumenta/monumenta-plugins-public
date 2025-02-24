@@ -137,7 +137,7 @@ public class FrostNova extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Damage is increased to ")
 			.add(a -> a.mBaseDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" and base slowness is increasd to ")
+			.add(" and base slowness is increased to ")
 			.addPercent(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_2, false, Ability::isLevelTwo)
 			.add(".");
 	}
