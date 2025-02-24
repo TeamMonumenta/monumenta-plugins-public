@@ -403,7 +403,7 @@ public class TowerGameUtils {
 
 	public static void startMob(LivingEntity mobSpawned, @Nullable TowerMob mob, TowerGame game, boolean playerSummon) {
 		if (BossManager.getInstance() != null) {
-			BossManager.getInstance().createBossInternal(mobSpawned, new GenericTowerMob(TowerManager.mPlugin, mobSpawned.getName(), (Mob) mobSpawned, game, mob, playerSummon));
+			BossManager.getInstance().createBossInternal(mobSpawned, new GenericTowerMob(Plugin.getInstance(), mobSpawned.getName(), (Mob) mobSpawned, game, mob, playerSummon));
 		}
 	}
 

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 import net.kyori.adventure.text.KeybindComponent.KeybindLike;
@@ -260,6 +261,8 @@ public class Constants {
 		HOTBAR_9("key.hotbar.9"),
 		OPTIFINE_ZOOM("of.key.zoom");
 
+		private static final List<Keybind> HOTBAR = List.of(HOTBAR_1, HOTBAR_2, HOTBAR_3, HOTBAR_4, HOTBAR_5, HOTBAR_6, HOTBAR_7, HOTBAR_8, HOTBAR_9);
+
 		private final String mValue;
 
 		Keybind(String value) {
@@ -267,14 +270,12 @@ public class Constants {
 		}
 
 		// 0-indexed to match inventories; index 0 is hotbar slot 1
-		@SuppressWarnings("EnumOrdinal")
 		public static Keybind hotbar(int index) {
 			if (index < 0 || index > 8) {
 				throw new RuntimeException("Invalid hotbar keybind index " + index);
 			}
 
-			Keybind[] values = values();
-			return values[index + HOTBAR_1.ordinal()];
+			return HOTBAR.get(index);
 		}
 
 		public static @Nullable Keybind of(String keybindId) {

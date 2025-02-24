@@ -109,7 +109,7 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 		world.playSound(enemyLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1, SWEEP_PITCH[combo]);
 		world.playSound(enemyLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, TRIDENT_PITCH[combo]);
 		world.playSound(enemyLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1, 0.75f);
-		if (combo >= 2) {
+		if (combo == 2) {
 			world.playSound(enemyLoc, Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
 			world.playSound(enemyLoc, Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, 1, 0.8f);
 		} else {

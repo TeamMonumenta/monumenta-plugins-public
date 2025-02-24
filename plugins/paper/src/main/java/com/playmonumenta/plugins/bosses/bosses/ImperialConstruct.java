@@ -56,7 +56,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("NullAway") // so many...
+// so many...
+@SuppressWarnings("NullAway")
 public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 
 	public static final String identityTag = "boss_imperialconstruct";

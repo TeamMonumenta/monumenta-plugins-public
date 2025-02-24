@@ -144,7 +144,7 @@ public enum PzeroMap {
 		PlayerUtils.playersInRange(mReturnPosition.toLocation(world), radius, true).forEach(player -> {
 			player.sendMessage(Component.text("▂▄▆ Race Results ▆▄▂", PzeroPlayer.SILVER_COLOR, TextDecoration.BOLD));
 			List<PzeroPlayerPlacement> placementsCopy = getPlacements();
-			if (placementsCopy.size() == 0) {
+			if (placementsCopy.isEmpty()) {
 				player.sendMessage(Component.text("Race Cancelled - All players left", NamedTextColor.RED, TextDecoration.BOLD));
 			}
 			placementsCopy.sort(Comparator.comparingInt(placement -> placement.mPlacement));

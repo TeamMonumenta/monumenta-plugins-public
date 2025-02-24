@@ -23,8 +23,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
-
 public class TotemicEmpowerment extends Ability {
 
 	public static final double SPEED = 0.05;

@@ -87,7 +87,7 @@ public class SpellSmokescreen extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return PlayerUtils.playersInRange(mBoss.getLocation(), 7, true).size() > 0;
+		return !PlayerUtils.playersInRange(mBoss.getLocation(), 7, true).isEmpty();
 	}
 
 	@Override

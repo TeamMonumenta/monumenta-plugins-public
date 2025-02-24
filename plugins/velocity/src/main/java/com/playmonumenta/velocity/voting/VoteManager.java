@@ -26,6 +26,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
+@SuppressWarnings("deprecation")
 public class VoteManager {
 	private static final int TICK_PERIOD_SECONDS = 60;
 
@@ -51,7 +52,7 @@ public class VoteManager {
 		List<String> alternateNames = config.mVoting.mAlternateNames;
 		List<Integer> times = config.mVoting.mCooldownMinutes;
 
-		if (urls.size() < 1 || times.size() < 1 || urls.size() != times.size()) {
+		if (urls.isEmpty() || times.isEmpty() || urls.size() != times.size()) {
 			throw new IllegalArgumentException("Voting config sites / cooldown_minutes length mismatch (or they are empty)");
 		}
 

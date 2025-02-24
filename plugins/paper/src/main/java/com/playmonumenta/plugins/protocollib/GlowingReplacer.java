@@ -194,6 +194,7 @@ public class GlowingReplacer extends PacketAdapter implements Listener {
 		return "_glowing_color_" + color + (forPlayers ? "_players" : "") + (unpushable ? "_unpushable" : "");
 	}
 
+	// BKCommonLib insists on using ChatColor
 	@SuppressWarnings("deprecation")
 	private static ChatColor namedTextColorToChatColor(NamedTextColor color) {
 		return ChatColor.valueOf(color.toString().toUpperCase(Locale.ROOT));

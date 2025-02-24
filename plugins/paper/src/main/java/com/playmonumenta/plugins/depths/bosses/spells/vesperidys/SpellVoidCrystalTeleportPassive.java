@@ -55,7 +55,7 @@ public class SpellVoidCrystalTeleportPassive extends Spell {
 		// Prioritizes platforms which doesn't have Boss mobs (Void Magus, Void Crystal and Vesperidys) on it.
 		for (Vesperidys.Platform platform : platforms) {
 			selectedPlatform = platform;
-			if (platform.getMechsOnPlatform().size() <= 0 && platform.getPlayersOnPlatform().size() <= 0) {
+			if (platform.getMechsOnPlatform().isEmpty() && platform.getPlayersOnPlatform().isEmpty()) {
 				break;
 			}
 		}

@@ -259,6 +259,7 @@ public final class SignUtils {
 			close(player, false);
 		}
 
+		@SuppressWarnings("deprecation")
 		private String color(String input) {
 			return ChatColor.translateAlternateColorCodes('&', input);
 		}

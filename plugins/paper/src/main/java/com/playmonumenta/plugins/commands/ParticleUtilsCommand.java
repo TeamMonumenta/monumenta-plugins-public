@@ -22,7 +22,7 @@ import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -79,7 +79,7 @@ public class ParticleUtilsCommand {
 							particle,
 							distanceFalloff,
 							parseExtraData(args.getUnchecked("extra data"), particle),
-							(List<Player>) args.get("allowed viewers")
+							(Collection<Player>) args.get("allowed viewers")
 						);
 					}),
 				// Rectangle
@@ -109,7 +109,7 @@ public class ParticleUtilsCommand {
 							particle,
 							distanceFalloff,
 							parseExtraData(extraData, particle),
-							(List<Player>) args.get("allowed viewers")
+							(Collection<Player>) args.get("allowed viewers")
 						);
 					}),
 				// Circle
@@ -171,7 +171,7 @@ public class ParticleUtilsCommand {
 							particle,
 							distanceFalloff,
 							parseExtraData(extraData, particle),
-							(List<Player>) args.get("allowed viewers"),
+							(Collection<Player>) args.get("allowed viewers"),
 							args.getUnchecked("normal")
 						);
 					}),
@@ -208,7 +208,7 @@ public class ParticleUtilsCommand {
 							args.getUnchecked("telegraph duration"),
 							args.getUnchecked("pulse start offset"),
 							parseExtraData(extraData, particle),
-							(List<Player>) args.get("allowed viewers")
+							(Collection<Player>) args.get("allowed viewers")
 						);
 					}),
 				// Number
@@ -302,16 +302,16 @@ public class ParticleUtilsCommand {
 		}
 	}
 
-	private static void spawnForViewers(List<Player> allowedViewers, AbstractPartialParticle<? extends AbstractPartialParticle<?>> particle) {
+	private static void spawnForViewers(Collection<Player> allowedViewers, AbstractPartialParticle<? extends AbstractPartialParticle<?>> particle) {
 		particle.spawnForPlayers(ParticleCategory.FULL, allowedViewers);
 	}
 
-	private static void spawnForViewers(List<Player> allowedViewers, AbstractPartialParticle<? extends AbstractPartialParticle<?>> particle, @Nullable Player callee) {
+	private static void spawnForViewers(Collection<Player> allowedViewers, AbstractPartialParticle<? extends AbstractPartialParticle<?>> particle, @Nullable Player callee) {
 		particle.spawnForPlayers(ParticleCategory.FULL, allowedViewers, callee);
 	}
 
 	private static void doLine(@Nullable CommandSender callee, Location start, Location end, double countPerMeter, Particle particle,
-							   double distanceFalloff, @Nullable Object data, @Nullable List<Player> allowedViewers) {
+							   double distanceFalloff, @Nullable Object data, @Nullable Collection<Player> allowedViewers) {
 		PPLine line = new PPLine(particle, start, end).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff);
 
 		if (data != null) {
@@ -330,7 +330,7 @@ public class ParticleUtilsCommand {
 	}
 
 	private static void doRectangle(@Nullable CommandSender callee, Location start, double dx, double dz, double countPerMeter,
-									Particle particle, double distanceFalloff, @Nullable Object data, @Nullable List<Player> allowedViewers) {
+									Particle particle, double distanceFalloff, @Nullable Object data, @Nullable Collection<Player> allowedViewers) {
 		PPLine[] sides = {
 			new PPLine(particle, start, start.clone().add(dx, 0, 0)).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff),
 			new PPLine(particle, start.clone().add(dx, 0, 0), start.clone().add(dx, 0, dz)).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff),
@@ -351,7 +351,7 @@ public class ParticleUtilsCommand {
 
 	private static void doCircle(@Nullable CommandSender callee, boolean ringMode, Location center, double radius,
 								 double countPerMeter, Particle particle, double distanceFalloff, @Nullable Object data,
-								 @Nullable List<Player> allowedViewers, @Nullable Location normalLoc) {
+								 @Nullable Collection<Player> allowedViewers, @Nullable Location normalLoc) {
 		PPCircle circle = new PPCircle(particle, center, radius).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff).ringMode(ringMode);
 
 		if (data != null) {
@@ -373,7 +373,7 @@ public class ParticleUtilsCommand {
 
 	private static void doCircleTelegraph(@Nullable CommandSender callee, Location center, double radius, int countPerMeter,
 										  Particle particle, double distanceFalloff, double particleSpeed, int pulses, int telegraphDuration,
-										  int pulseStartOffset, @Nullable Object data, @Nullable List<Player> allowedViewers) {
+										  int pulseStartOffset, @Nullable Object data, @Nullable Collection<Player> allowedViewers) {
 		// Input Validation
 		int finalPulseStartOffset = Math.max(pulseStartOffset, 0);
 		int finalTelegraphDuration = Math.max(telegraphDuration, 1);

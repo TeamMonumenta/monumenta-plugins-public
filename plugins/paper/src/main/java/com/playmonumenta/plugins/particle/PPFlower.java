@@ -3,12 +3,12 @@ package com.playmonumenta.plugins.particle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PPFlower extends AbstractPartialParticle<PPFlower> {
 

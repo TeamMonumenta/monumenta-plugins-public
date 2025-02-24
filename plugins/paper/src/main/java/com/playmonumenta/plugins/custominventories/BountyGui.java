@@ -9,10 +9,10 @@ import com.playmonumenta.plugins.delves.DelveCustomInventory;
 import com.playmonumenta.plugins.delves.DelvePreset;
 import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.guis.Gui;
-import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -274,7 +274,7 @@ public class BountyGui extends Gui {
 
 	public static List<BountyData> parseData(int region) throws Exception {
 		List<BountyData> bounties = new ArrayList<>();
-		String bountyContent = FileUtils.readFile(Plugin.getInstance().getDataFolder().getPath() + "/bounties/region" + region + ".json");
+		String bountyContent = Files.readString(Plugin.getInstance().getDataFolder().toPath().resolve("bounties/region" + region + ".json"));
 		Gson gson = new Gson();
 		JsonObject data = gson.fromJson(bountyContent, JsonObject.class);
 		JsonArray bountyParse = data.get("pois").getAsJsonArray();

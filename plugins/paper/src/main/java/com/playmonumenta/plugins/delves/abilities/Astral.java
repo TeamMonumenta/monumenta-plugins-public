@@ -65,7 +65,7 @@ public class Astral {
 		if (isLocationValidSpawnLoc(currentBlockLocation)) {
 			validSpawnLocs.add(currentBlockLocation);
 		}
-		if (validSpawnLocs.size() > 0) {
+		if (!validSpawnLocs.isEmpty()) {
 			Location loc = validSpawnLocs.get(FastUtils.RANDOM.nextInt(validSpawnLocs.size()));
 			List<String> mobPool = MOB_POOL;
 			if (FastUtils.RANDOM.nextDouble() < 0.0133) {

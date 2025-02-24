@@ -133,7 +133,7 @@ public class PersistentDataCommand {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static void set(CommandSender sender, World world, NamespacedKey key, String dataType, String valueString) throws WrapperCommandSyntaxException {
 		Constants.SupportedPersistentDataType type;
 		try {

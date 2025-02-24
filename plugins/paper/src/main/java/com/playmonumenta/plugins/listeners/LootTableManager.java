@@ -209,7 +209,7 @@ public class LootTableManager implements Listener {
 		mTables.clear();
 
 		Map<NamespacedKey, Path> datapackFiles = FileUtils.getEnabledDatapackFiles("loot_tables", ".json");
-		if (datapackFiles.size() == 0) {
+		if (datapackFiles.isEmpty()) {
 			MMLog.severe("Failed to find any matching loot tables from datapacks - this may be a critical problem");
 		}
 

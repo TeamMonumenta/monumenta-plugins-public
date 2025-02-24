@@ -1034,7 +1034,7 @@ public class ItemUtils {
 	}
 
 	public static void setPlainLore(ReadWriteNBT nbt, @Nullable List<String> plainLore) {
-		if (plainLore != null && plainLore.size() > 0) {
+		if (plainLore != null && !plainLore.isEmpty()) {
 			// addComponent effectively runs:
 			// if (key exists) { return tag(key) } else { return new tag(key) }
 			ReadWriteNBTList<String> loreList = nbt.getOrCreateCompound(PLAIN_KEY).getOrCreateCompound(DISPLAY_KEY).getStringList(LORE_KEY);

@@ -38,6 +38,7 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 		damagee.damage(amount, damager);
 	}
 
+	// Can't get around this
 	@SuppressWarnings("unchecked")
 	public <T extends Entity> T duplicateEntity(T entity) {
 		return (T) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());

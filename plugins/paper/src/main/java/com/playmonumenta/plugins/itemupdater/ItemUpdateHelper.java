@@ -150,7 +150,7 @@ public class ItemUpdateHelper {
 				}
 			}
 		}
-		if (nbt.getKeys().size() == 0) {
+		if (nbt.getKeys().isEmpty()) {
 			parent.removeKey(checkTag);
 		}
 	}
@@ -683,7 +683,7 @@ public class ItemUpdateHelper {
 	}
 
 	public static @Nullable String regenerateStats(ItemStack item) {
-		List<String> errors = new ArrayList<String>(5);
+		List<String> errors = new ArrayList<>(5);
 		NBT.modify(item, nbt -> {
 			ReadableNBT monumenta = nbt.getCompound("Monumenta");
 			if (nbt.hasTag("CustomPotionEffects") && monumenta != null && monumenta.hasTag(ItemStatUtils.STOCK_KEY)) {

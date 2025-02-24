@@ -24,7 +24,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings({"checkstyle:SingleSpaceSeparator", "checkstyle:RegexpSinglelineJava"})
 public class ComponentConfig {
 
 	public static final Map<String, ComponentConfigObject> REGION_CONFIG;

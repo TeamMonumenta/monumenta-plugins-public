@@ -121,7 +121,7 @@ public class AlchemicalArtilleryCS implements CosmeticSkill {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 1.75f);
 
-		if (hitMobs.size() == 0) {
+		if (hitMobs.isEmpty()) {
 			new PartialParticle(Particle.EXPLOSION_LARGE, loc, 5, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(caster);
 			return;
 		}

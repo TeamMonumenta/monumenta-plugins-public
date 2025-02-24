@@ -123,7 +123,7 @@ public class SpellVesperidysSummonAdds extends Spell {
 		// Prioritizes platforms which doesn't have adds on it (including boss itself).
 		for (Vesperidys.Platform platform : platforms) {
 			selectedPlatform = platform;
-			if (platform.getMobsOnPlatform().size() <= 0 && platform.getPlayersOnPlatform().size() <= 0) {
+			if (platform.getMobsOnPlatform().isEmpty() && platform.getPlayersOnPlatform().isEmpty()) {
 				break;
 			}
 		}

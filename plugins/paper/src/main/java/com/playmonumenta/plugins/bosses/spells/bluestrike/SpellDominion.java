@@ -24,7 +24,7 @@ public class SpellDominion extends Spell {
 	Plugin mPlugin;
 	LivingEntity mBoss;
 	Location mSpawnLoc;
-	private List<Player> mWarnedPlayers = new ArrayList<Player>();
+	private List<Player> mWarnedPlayers = new ArrayList<>();
 	private boolean mFightActive;
 
 	public SpellDominion(Plugin plugin, LivingEntity boss, Location spawnLoc, boolean fightActive) {

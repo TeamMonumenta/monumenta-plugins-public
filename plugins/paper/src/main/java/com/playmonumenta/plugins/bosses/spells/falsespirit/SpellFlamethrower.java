@@ -84,7 +84,7 @@ public class SpellFlamethrower extends Spell {
 						new PartialParticle(Particle.CLOUD, endLoc, 1, 0.02, 0.02, 0.02, 0).spawnAsEntityActive(mBoss);
 					}
 
-					List<Block> blocks = new ArrayList<Block>();
+					List<Block> blocks = new ArrayList<>();
 					for (int x = -1; x < 1; x++) {
 						for (int y = -1; y < 1; y++) {
 							for (int z = -1; z < 1; z++) {
@@ -181,7 +181,7 @@ public class SpellFlamethrower extends Spell {
 									}
 								}
 
-								List<Block> blocks = new ArrayList<Block>();
+								List<Block> blocks = new ArrayList<>();
 								for (int x = -1; x < 1; x++) {
 									for (int y = -1; y < 1; y++) {
 										for (int z = -1; z < 1; z++) {

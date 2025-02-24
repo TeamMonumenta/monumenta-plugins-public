@@ -524,7 +524,7 @@ public class PzeroManager implements Listener {
 
 	private @Nullable PzeroPlayer getPzeroPlayer(Player player) {
 		List<PzeroPlayer> playerList = mTrackedPlayers.values().stream().filter(pzPlayer -> pzPlayer.getUniqueId().equals(player.getUniqueId())).toList();
-		if (playerList.size() == 0) {
+		if (playerList.isEmpty()) {
 			return null;
 		}
 

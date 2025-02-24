@@ -83,7 +83,7 @@ public class SpellGhostlyCannons extends Spell {
 							}
 
 							// Target one random player. Have a meteor rain nearby them.
-							if (players.size() >= 1) {
+							if (!players.isEmpty()) {
 								Player rPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
 								Location loc = rPlayer.getLocation();
 								rainCannons(loc.add(FastUtils.randomDoubleInRange(-2, 2), 0, FastUtils.randomDoubleInRange(-2, 2)), players);

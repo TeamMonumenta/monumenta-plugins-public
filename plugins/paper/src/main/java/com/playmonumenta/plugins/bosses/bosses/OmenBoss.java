@@ -113,7 +113,7 @@ public class OmenBoss extends BossAbilityGroup {
 			public void run() {
 				p.SOUND_WARN.play(mBoss.getLocation());
 				List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
-				if (targets.size() > 0) {
+				if (!targets.isEmpty()) {
 					Location targetLoc = targets.get(0).getLocation();
 					targetLoc.setY(mBoss.getLocation().getY());
 					if (p.DO_TARGETING) {

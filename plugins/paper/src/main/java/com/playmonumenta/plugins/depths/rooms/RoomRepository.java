@@ -16,7 +16,6 @@ import com.playmonumenta.structures.StructuresAPI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -30,6 +29,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class contains hard coded information about all the rooms possible in the system, including type, spawner count, load paths, etc.

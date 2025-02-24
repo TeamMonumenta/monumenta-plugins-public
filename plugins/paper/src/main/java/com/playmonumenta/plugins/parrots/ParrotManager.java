@@ -131,8 +131,7 @@ public class ParrotManager implements Listener {
 	protected static final String PLACED_PARROT_TAG = "PlacedParrotPet";
 
 	// The parrot manager is the least of our worries if it somehow gets initialized with a null reference to The Plugin
-	@SuppressWarnings({"NullAway.Init"})
-	private static Plugin mPlugin;
+	private final Plugin mPlugin;
 	// 0 if invisible, 1 if visible.
 	private static final String SCOREBOARD_PARROT_VISIBLE = "ParrotVisible";
 	// 0 if player can hold only one parrot
@@ -287,7 +286,7 @@ public class ParrotManager implements Listener {
 					}
 				}
 			};
-			mPrideRunnable.runTaskTimer(mPlugin, 0, PRIDE_FREQUENCY);
+			mPrideRunnable.runTaskTimer(Plugin.getInstance(), 0, PRIDE_FREQUENCY);
 		}
 	}
 

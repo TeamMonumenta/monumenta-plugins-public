@@ -139,8 +139,10 @@ public class XoRoShiRo128PlusRandom extends Random {
 			return (t >>> Long.numberOfLeadingZeros(nMinus1)) & nMinus1;
 		}
 		// Rejection-based algorithm to get uniform integers in the general case
-		for (long u = t >>> 1; u + nMinus1 - (t = u % n) < 0; u = nextLong() >>> 1) {
+		long u = t >>> 1;
+		while (u + nMinus1 - (t = u % n) < 0) {
 			// Loop
+			u = nextLong() >>> 1;
 		}
 		return t;
 	}

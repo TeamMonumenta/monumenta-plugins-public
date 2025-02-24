@@ -234,7 +234,7 @@ public class PortalTeleportCheck extends BukkitRunnable {
 		UUID playerUuid = player.getUniqueId();
 
 		@Nullable Vector locNow = null;
-		if (mPastPlayerLocs.size() > 0) {
+		if (!mPastPlayerLocs.isEmpty()) {
 			locNow = mPastPlayerLocs.get(0).get(playerUuid);
 		}
 		@Nullable Vector locPrevious1 = null;

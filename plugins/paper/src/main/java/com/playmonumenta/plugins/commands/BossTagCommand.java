@@ -62,6 +62,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+@SuppressWarnings("unchecked")
 public class BossTagCommand {
 
 	private static final Pattern COMMAS_REMOVER = Pattern.compile(",+");
@@ -72,7 +73,6 @@ public class BossTagCommand {
 
 	private static final Map<String, List<Soul>> SEARCH_OUTCOME_MAP = new LinkedHashMap<>();
 
-	@SuppressWarnings("unchecked")
 	public static void register() {
 
 		new CommandAPICommand(COMMAND)
@@ -537,7 +537,7 @@ public class BossTagCommand {
 	private static void showBossTag(Player player) throws WrapperCommandSyntaxException {
 		BookOfSouls bos = getBos(player);
 		NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
-		Set<String> statelessBoss = new HashSet<String>(Arrays.asList(BossManager.getInstance().listStatelessBosses()));
+		Set<String> statelessBoss = new HashSet<>(Arrays.asList(BossManager.getInstance().listStatelessBosses()));
 		Set<String> bossTags = new HashSet<>();
 
 		if (nbtTagsList != null && nbtTagsList.size() > 0) {
@@ -711,7 +711,7 @@ public class BossTagCommand {
 
 		SEARCH_OUTCOME_MAP.put(bossTag, soulsList);
 
-		if (soulsList.size() > 0) {
+		if (!soulsList.isEmpty()) {
 			player.sendMessage(Component.empty()
 				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 				                   .append(Component.text("Run ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
@@ -728,7 +728,7 @@ public class BossTagCommand {
 			throw CommandAPI.failWithString("You must use /bosstag seach " + bossTag + " before using this command");
 		}
 
-		if (souls.size() == 0) {
+		if (souls.isEmpty()) {
 			SEARCH_OUTCOME_MAP.remove(bossTag);
 			throw CommandAPI.failWithString("No BookOfSouls remaining for tag: " + bossTag);
 		}
@@ -746,7 +746,7 @@ public class BossTagCommand {
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 			                   .append(Component.text("Remaining BoS: " + souls.size(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 
-		if (souls.size() == 0) {
+		if (souls.isEmpty()) {
 			SEARCH_OUTCOME_MAP.remove(bossTag);
 		}
 	}

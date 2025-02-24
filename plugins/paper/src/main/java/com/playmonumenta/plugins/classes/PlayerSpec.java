@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
-
-@SuppressWarnings("NullAway.Init") // fields are initialised in subclasses
+// fields are initialised in subclasses
+@SuppressWarnings("NullAway.Init")
 public class PlayerSpec {
 	public ArrayList<AbilityInfo<?>> mAbilities = new ArrayList<>();
 

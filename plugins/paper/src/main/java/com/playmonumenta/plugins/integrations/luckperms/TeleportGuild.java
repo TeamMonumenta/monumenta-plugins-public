@@ -9,6 +9,7 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import net.kyori.adventure.text.Component;
@@ -39,7 +40,7 @@ public class TeleportGuild {
 				.replaceSuggestions(GuildArguments.NAME_SUGGESTIONS))
 			.executes((sender, args) -> {
 				CommandUtils.checkPerm(sender, perms);
-				for (Player player : (List<Player>) args.get("player")) {
+				for (Player player : (Collection<Player>) args.get("player")) {
 					run(player, args.getUnchecked("guild name"));
 				}
 			})

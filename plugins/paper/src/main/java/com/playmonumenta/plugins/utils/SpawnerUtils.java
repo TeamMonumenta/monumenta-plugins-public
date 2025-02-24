@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import com.goncalomb.bukkit.nbteditor.nbt.EntityNBT;
 import com.goncalomb.bukkit.nbteditor.nbt.SpawnerNBTWrapper;
+import com.google.gson.Gson;
 import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -116,6 +117,7 @@ public class SpawnerUtils {
 	private static final NamespacedKey X = NamespacedKeyUtils.fromString("x");
 	private static final NamespacedKey Y = NamespacedKeyUtils.fromString("y");
 	private static final NamespacedKey Z = NamespacedKeyUtils.fromString("z");
+	private static final Gson GSON = new Gson();
 	private static final int MAX_TORCH_TAXICAB_DISTANCE = 8;
 	private static final double SPAWNER_DELAY_MULTIPLIER_CAP = 10;
 	public static final Set<Location> spawnersWithCat = new HashSet<>();
@@ -391,7 +393,7 @@ public class SpawnerUtils {
 		NBTItem item = new NBTItem(spawnerItem);
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() == 0) {
+		if (wantedAction.isEmpty()) {
 			// Create a new container for the action, add the identifier,
 			// and add the compound containing the parameters and their default values.
 			NBTContainer container = new NBTContainer();
@@ -411,7 +413,7 @@ public class SpawnerUtils {
 		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() == 0) {
+		if (wantedAction.isEmpty()) {
 			// Create a new container for the action, add the identifier,
 			// and add the compound containing the parameters and their default values.
 			NBTContainer container = new NBTContainer();
@@ -431,7 +433,7 @@ public class SpawnerUtils {
 	}
 
 	public static void addParametersToCompound(Map<String, Object> parameters, NBTCompound compound) {
-		parameters.forEach(compound::setObject);
+		parameters.forEach((k, v) -> compound.setString(k, GSON.toJson(v)));
 	}
 
 	public static void removeBreakAction(ItemStack spawnerItem, String actionIdentifier) {
@@ -442,7 +444,7 @@ public class SpawnerUtils {
 		NBTItem item = new NBTItem(spawnerItem);
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			// Remove the action
 			breakActions.remove(wantedAction.get(0));
 			spawnerItem.setItemMeta(item.getItem().getItemMeta());
@@ -458,7 +460,7 @@ public class SpawnerUtils {
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			// Set the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
@@ -476,7 +478,7 @@ public class SpawnerUtils {
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			// Set the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
@@ -493,7 +495,7 @@ public class SpawnerUtils {
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			// Try to find the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
@@ -522,7 +524,7 @@ public class SpawnerUtils {
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			// Try to find the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
@@ -550,7 +552,7 @@ public class SpawnerUtils {
 		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			HashMap<String, Object> parameterMap = new HashMap<>(SpawnerActionManager.getActionParameters(actionIdentifier));
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
@@ -784,10 +786,14 @@ public class SpawnerUtils {
 		return new ArrayList<>(Arrays.stream(containers).map(c -> getBlockFromContainer(c, world)).toList());
 	}
 
+	// Need to use TAG_CONTAINER_ARRAY for backwards compatibility
+	@SuppressWarnings("deprecation")
 	private static PersistentDataContainer[] getTorchContainers(CreatureSpawner spawner) {
 		return spawner.getPersistentDataContainer().getOrDefault(TORCH_LOCATIONS, PersistentDataType.TAG_CONTAINER_ARRAY, new PersistentDataContainer[]{});
 	}
 
+	// Need to use TAG_CONTAINER_ARRAY for backwards compatibility
+	@SuppressWarnings("deprecation")
 	private static void setTorches(CreatureSpawner spawner, List<Block> torches) {
 		PersistentDataContainer persistentDataContainer = spawner.getPersistentDataContainer();
 		PersistentDataAdapterContext context = persistentDataContainer.getAdapterContext();

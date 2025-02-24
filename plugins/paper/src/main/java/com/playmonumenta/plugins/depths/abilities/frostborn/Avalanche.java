@@ -78,7 +78,7 @@ public class Avalanche extends DepthsAbility {
 		Location loc = mPlayer.getLocation();
 
 		Set<Location> checkIce = getNearbyIce(loc, mRadius);
-		if (checkIce.size() == 0) {
+		if (checkIce.isEmpty()) {
 			return false;
 		}
 

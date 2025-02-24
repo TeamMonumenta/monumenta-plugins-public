@@ -61,7 +61,7 @@ public class SpellLichSinisterReach extends Spell {
 		if (target == null) {
 			List<Player> players = Lich.playersInRange(mLoc, mRange, true);
 			Collections.shuffle(players);
-			if (players.size() > 0) {
+			if (!players.isEmpty()) {
 				target = players.get(0);
 			}
 		}

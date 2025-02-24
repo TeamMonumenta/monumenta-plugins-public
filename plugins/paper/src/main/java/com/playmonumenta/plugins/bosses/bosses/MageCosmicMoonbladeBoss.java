@@ -68,7 +68,7 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 				mBoss.setGlowing(true);
 				List<? extends LivingEntity> targets = p.TARGETS_DIRECTION.getTargetsList(mBoss);
 
-				if (targets.size() > 0) {
+				if (!targets.isEmpty()) {
 					Location bossEyeLoc = mBoss.getEyeLocation();
 					Location targetLoc = targets.get(0).getLocation().clone().add(0, 1.8, 0);
 					Vector targetDirection = targetLoc.toVector().subtract(bossEyeLoc.toVector()).normalize();
@@ -230,7 +230,7 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 
 			@Override
 			public boolean canRun() {
-				return p.TARGETS_DIRECTION.getTargetsList(mBoss).size() > 0;
+				return !p.TARGETS_DIRECTION.getTargetsList(mBoss).isEmpty();
 			}
 
 			@Override

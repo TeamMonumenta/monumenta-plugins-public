@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PPRectPrism;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -439,7 +440,7 @@ public class ChanceCubes {
 											blockLocation.setY(playerY - dy);
 											BlockState state = blockLocation.getBlock().getState();
 											if (!ignoredMats.contains(state.getType()) &&
-												!state.getType().isInteractable() &&
+												!BlockUtils.INTERACTABLE.contains(state.getType()) &&
 												FastUtils.RANDOM.nextInt(100) < 37) {
 												mBlocksToRestore.add(state);
 											}

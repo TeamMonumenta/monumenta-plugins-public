@@ -196,8 +196,7 @@ public class Wallet {
 			WalletManager.CompressionInfo info = WalletManager.getCompressionInfo(walletItem.mItem);
 			if (info != null) {
 				boolean found = false;
-				for (Iterator<WalletItem> it = wallet.mItems.iterator(); it.hasNext(); ) {
-					WalletItem otherWalletItem = it.next();
+				for (WalletItem otherWalletItem : wallet.mItems) {
 					if (otherWalletItem.mItem.isSimilar(info.mBase)) {
 						otherWalletItem.mAmount += walletItem.mAmount * info.mAmount;
 						found = true;

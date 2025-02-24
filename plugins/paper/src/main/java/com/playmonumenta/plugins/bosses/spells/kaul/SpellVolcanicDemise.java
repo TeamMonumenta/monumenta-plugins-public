@@ -142,7 +142,7 @@ public class SpellVolcanicDemise extends Spell {
 				}
 
 				// Target one random player. Have a meteor rain nearby them.
-				if (players.size() >= 1) {
+				if (!players.isEmpty()) {
 					Player rPlayer = players.get(FastUtils.RANDOM.nextInt(players.size()));
 					Location loc = rPlayer.getLocation();
 					loc.setY(mCenter.getY());
@@ -218,7 +218,7 @@ public class SpellVolcanicDemise extends Spell {
 
 				Hitbox deathBox = new Hitbox.UprightCylinderHitbox(mLoc, 7, DEATH_RADIUS);
 				Hitbox hitBox = new Hitbox.UprightCylinderHitbox(mLoc, 15, HIT_RADIUS);
-				List<Player> hitPlayers = new ArrayList<Player>(hitBox.getHitPlayers(true));
+				List<Player> hitPlayers = new ArrayList<>(hitBox.getHitPlayers(true));
 
 				// Death Zone
 				for (Player player : deathBox.getHitPlayers(true)) {

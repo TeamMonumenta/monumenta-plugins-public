@@ -16,11 +16,9 @@ import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.RendingRazor;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-
 
 public class Scout extends PlayerClass {
 

@@ -182,7 +182,7 @@ public class AlchemicalArtillery extends Ability {
 
 	private boolean hasCollidedWithEnemy(MagmaCube grenade) {
 		Hitbox hitbox = new Hitbox.AABBHitbox(grenade.getWorld(), grenade.getBoundingBox());
-		return hitbox.getHitMobs().size() > 0;
+		return !hitbox.getHitMobs().isEmpty();
 	}
 
 	private void explode(Location loc, ItemStatManager.PlayerItemStats playerItemStats, boolean isGruesome) {

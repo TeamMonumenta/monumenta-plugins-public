@@ -66,7 +66,7 @@ public class ChargedDeath extends Spell {
 
 			List<Player> validPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), Xenotopsis.DETECTION_RANGE, true);
 
-			if (validPlayers.size() == 0) {
+			if (validPlayers.isEmpty()) {
 				return;
 			}
 
@@ -99,7 +99,7 @@ public class ChargedDeath extends Spell {
 					mWorld.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 0.8f, 1.87f);
 					mTargetLocations.forEach(location -> new PartialParticle(Particle.CRIT_MAGIC, location.clone().add(0, 0.3, 0)).count(12).delta(0.3, 0.3, 0.3).extra(0.02).spawnAsBoss());
 				} else {
-					if (mTicks % STRIKE_LOCATION_DELAY == 0 && mTargetLocations.size() > 0) {
+					if (mTicks % STRIKE_LOCATION_DELAY == 0 && !mTargetLocations.isEmpty()) {
 						Location location = mTargetLocations.get(mIndex);
 
 						// visual effect

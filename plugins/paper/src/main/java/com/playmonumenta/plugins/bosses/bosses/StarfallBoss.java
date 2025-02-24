@@ -70,7 +70,7 @@ public class StarfallBoss extends BossAbilityGroup {
 		public SoundsList SOUND_METEOR = SoundsList.fromString("[(ENTITY_BLAZE_SHOOT,3,1)]");
 		public SoundsList SOUND_EXPLOSION = SoundsList.fromString("[(ENTITY_DRAGON_FIREBALL_EXPLODE,3,1)]");
 		@BossParam(help = "LibraryOfSouls name of the mob spawned when the grenade explodes")
-		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
+		public LoSPool SPAWNED_MOB_POOL = LoSPool.LibraryPool.EMPTY;
 		@BossParam(help = "how often particles/sounds spawn during the starfall's falling sequence (BASED ON HEIGHT)")
 		public int FALL_AESTHETIC_INTERVAL = 1;
 		@BossParam(help = "knockback dealt by the meteor")

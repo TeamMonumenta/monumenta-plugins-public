@@ -25,7 +25,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 /**
  * This class allows one Shulker Box to be accessed without being placed.
  */
-@SuppressWarnings("checkstyle:EmptyLineSeparator")
 public class ShulkerInventory {
 	private final Plugin mPlugin;
 	private final Player mPlayer;

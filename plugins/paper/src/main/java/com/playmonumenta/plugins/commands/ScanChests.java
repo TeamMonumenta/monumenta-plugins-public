@@ -116,6 +116,7 @@ public class ScanChests {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private static void scan(Player player, boolean includeEmptyNonChests, boolean includeFilledNonChests) {
 		AtomicInteger lootables = new AtomicInteger(0);
 		AtomicInteger emptyNonChests = new AtomicInteger(0);
@@ -186,7 +187,7 @@ public class ScanChests {
 					          .entrySet().stream()
 					          .map(e -> e.getValue().stream().mapToInt(ItemStack::getAmount).sum()
 						                    + " " + e.getKey().getType() + (e.getKey().getItemMeta() != null && e.getKey().getItemMeta().hasDisplayName()
-							                                                    ? "[" + e.getKey().getItemMeta().getDisplayName() + ChatColor.RESET + "]" : ""))
+							                                                    ? "[" + e.getKey().getItemMeta().displayName() + ChatColor.RESET + "]" : ""))
 					          .collect(Collectors.joining("\n"));
 				return result;
 			});

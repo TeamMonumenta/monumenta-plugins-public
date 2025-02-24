@@ -91,7 +91,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -130,8 +129,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.Nullable;
 
-//@SuppressWarnings("deprecation") // we have to use deprecated boss tags here still
 public class BossManager implements Listener {
 
 	/********************************************************************************

@@ -221,7 +221,7 @@ public class LootingLimiter implements Listener {
 							.orElse(0)).sum());
 						player.sendMessage("    requiredSpawners=" + ServerProperties.getLootingLimiterSpawners());
 						for (Player p : players) {
-							player.sendMessage("    " +  p.getName() + " spawners="
+							player.sendMessage("    " + p.getName() + " spawners="
 								+ ScoreboardUtils.getScoreboardValue(p, SPAWNERS_SCORE).orElse(0));
 						}
 					}
@@ -257,9 +257,9 @@ public class LootingLimiter implements Listener {
 			if (player != null && player.hasPermission(DEBUG_PERMISSION)) {
 				player.sendMessage("LL: chestOpened");
 				for (Player p : players) {
-					player.sendMessage("    " +  p.getName() + " spawners="
+					player.sendMessage("    " + p.getName() + " spawners="
 						+ ScoreboardUtils.getScoreboardValue(p, SPAWNERS_SCORE).orElse(0));
-					player.sendMessage("    " +  p.getName() + " kills="
+					player.sendMessage("    " + p.getName() + " kills="
 						+ ScoreboardUtils.getScoreboardValue(p, KILLS_SCORE).orElse(0));
 				}
 			}

@@ -115,6 +115,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -1230,6 +1231,7 @@ public class EntityUtils {
 		plugin.mEffectManager.clearEffects(mob, "Frozen");
 	}
 
+	@Contract("null -> true")
 	public static boolean shouldCancelSpells(@Nullable LivingEntity entity) {
 		return entity == null || !entity.isValid() || entity.isDead() || isSilenced(entity) || isStunned(entity) || isFrozen(entity);
 	}

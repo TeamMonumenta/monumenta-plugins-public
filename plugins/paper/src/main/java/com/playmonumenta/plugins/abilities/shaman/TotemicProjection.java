@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.*;
-
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;

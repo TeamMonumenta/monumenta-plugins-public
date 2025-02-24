@@ -45,7 +45,7 @@ public class MobRisingBoss extends BossAbilityGroup {
 		public boolean SUMMON_GLOWING = true;
 
 		@BossParam(help = "not written")
-		public LoSPool MOB_POOL = LoSPool.EMPTY;
+		public LoSPool MOB_POOL = LoSPool.LibraryPool.EMPTY;
 		@BossParam(help = "not written")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_SELF_TARGET;
 		@BossParam(help = "not written")
@@ -59,7 +59,7 @@ public class MobRisingBoss extends BossAbilityGroup {
 
 		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		if (p.MOB_POOL != LoSPool.EMPTY) {
+		if (p.MOB_POOL != LoSPool.LibraryPool.EMPTY) {
 			Spell spell = new SpellBaseSummon(
 				plugin,
 				boss,

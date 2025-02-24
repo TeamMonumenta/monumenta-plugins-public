@@ -61,7 +61,7 @@ public class SpellSalientOfDecay extends Spell {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 5, 0.4f);
 		List<Player> players = Lich.playersInRange(mBoss.getLocation(), 50, true);
-		if (SpellDimensionDoor.getShadowed() != null && SpellDimensionDoor.getShadowed().size() > 0) {
+		if (SpellDimensionDoor.getShadowed() != null && !SpellDimensionDoor.getShadowed().isEmpty()) {
 			players.removeAll(SpellDimensionDoor.getShadowed());
 		}
 		List<Player> targets;

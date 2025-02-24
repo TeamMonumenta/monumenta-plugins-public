@@ -98,7 +98,7 @@ public class VesperidysVoidCrystalShadow extends BossAbilityGroup {
 		List<Vesperidys.Platform> bossPlatform = List.of(Objects.requireNonNull(mVesperidys.mPlatformList.getPlatformNearestToEntity(mVesperidys.mBossTwo)));
 		List<Vesperidys.Platform> summonerPlatforms = mVesperidys.mPlatformList.getRandomPlatforms(bossPlatform, 1);
 
-		if (summonerPlatforms.size() > 0) {
+		if (!summonerPlatforms.isEmpty()) {
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, SoundCategory.HOSTILE, 3, 1.5f);
 			int telegraphTicks = 40;
 
@@ -183,7 +183,7 @@ public class VesperidysVoidCrystalShadow extends BossAbilityGroup {
 					}
 
 					if (mDummyTicks > 2 * 20) {
-						if (platform.getPlayersOnPlatform().size() > 0) {
+						if (!platform.getPlayersOnPlatform().isEmpty()) {
 							mViolationComboTicks++;
 							if (mViolationComboTicks > 20) {
 								for (Player player : platform.getPlayersOnPlatform()) {

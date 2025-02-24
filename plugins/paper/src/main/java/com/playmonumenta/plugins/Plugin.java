@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins;
 
+import com.google.common.base.Preconditions;
 import com.playmonumenta.plugins.abilities.AbilityHotbar;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
@@ -201,15 +202,15 @@ public class Plugin extends JavaPlugin {
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
 	// INSTANCE is set if the plugin is properly enabled
-	@SuppressWarnings({"initialization.static.field.uninitialized", "NullAway.Init"})
+	@Nullable
 	private static Plugin INSTANCE;
 
 	public static Plugin getInstance() {
+		Preconditions.checkState(INSTANCE != null, "instance not initialized yet");
 		return INSTANCE;
 	}
 
-	// fields are set as long as the plugin is properly enabled
-	@SuppressWarnings({"initialization.fields.uninitialized", "NullAway.Init"})
+	@SuppressWarnings("NullAway.Init")
 	public Plugin() {
 	}
 
@@ -580,7 +581,7 @@ public class Plugin extends JavaPlugin {
 		if (ServerProperties.getShardName().contains("gallery")
 			|| ServerProperties.getShardName().startsWith("dev")) {
 			GalleryCommands.register();
-			manager.registerEvents(new GalleryManager(this), this);
+			manager.registerEvents(new GalleryManager(), this);
 		}
 
 		if (ServerProperties.getShardName().contains("ring")
@@ -760,7 +761,7 @@ public class Plugin extends JavaPlugin {
 
 	//  Logic that is performed upon disabling the plugin.
 	@Override
-	@SuppressWarnings("NullAway") // we set INSTANCE to null to find bugs easier
+	// we set INSTANCE to null to find bugs easier
 	public void onDisable() {
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
