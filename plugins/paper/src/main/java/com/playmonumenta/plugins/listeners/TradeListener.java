@@ -60,6 +60,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 public class TradeListener implements Listener {
 
 	private static final UUID NULL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+	private static final String DISREGARD_INFUSIONS = "DisregardInfusions";
 
 	// Ignore stat checks for trades between items in these sets
 	private static final ImmutableSet<ImmutableSet<String>> SKIP_STAT_CHECK_TRADES = ImmutableSet.of(
@@ -80,9 +81,6 @@ public class TradeListener implements Listener {
 		InfusionType.SOULBOUND
 	};
 
-	// Items for which to completely disable reskin/dye trades
-	private static final ImmutableSet<String> DISABLED_ITEMS = ImmutableSet.of("Soulsinger");
-
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void tradeWindowOpenEvent(TradeWindowOpenEvent event) {
 
@@ -99,9 +97,14 @@ public class TradeListener implements Listener {
 				continue;
 			}
 			MerchantRecipe recipe = trade.getRecipe();
-			handleReskinTrades(player, trades, trade, recipe);
-			handleDyedTrades(player, trades, trade, recipe);
-			handleSoulboundTradess(player, trade, recipe);
+
+			// Only handle the consideration of dyes/infusions if the trader does NOT have this tag
+			// Use case examples: Halid for Soulsinger, Record-Keeper for SKR Scrolls
+			if (event.getVillager() != null && !event.getVillager().getScoreboardTags().contains(DISREGARD_INFUSIONS)) {
+				handleReskinTrades(player, trades, trade, recipe);
+				handleDyedTrades(player, trades, trade, recipe);
+				handleSoulboundTradess(player, trade, recipe);
+			}
 		}
 		// Custom GUI:
 		if (ScoreboardUtils.getScoreboardValue(player, CustomTradeGui.MAIN).orElse(1) == 1) {
@@ -133,10 +136,7 @@ public class TradeListener implements Listener {
 			if (source.getAmount() != 1 || result.getAmount() != 1) {
 				continue;
 			}
-			if (DISABLED_ITEMS.contains(ItemUtils.getPlainNameIfExists(source))
-				    || DISABLED_ITEMS.contains(ItemUtils.getPlainNameIfExists(result))) {
-				continue;
-			}
+
 			// only consider trades with "Monumenta items" - these should all have a region
 			if (ItemStatUtils.getRegion(source) == Region.NONE
 				    || ItemStatUtils.getRegion(result) == Region.NONE) {
