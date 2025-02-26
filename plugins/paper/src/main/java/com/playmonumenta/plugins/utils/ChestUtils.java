@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelveLootTableGroup;
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.LootTableManager;
 import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -44,6 +45,7 @@ import org.jetbrains.annotations.Nullable;
 public class ChestUtils {
 	public static final NamespacedKey NON_LOOT_LIMITED
 		= Objects.requireNonNull(NamespacedKey.fromString("monumenta:non_looting_limited"));
+	public static final String LOG_SCROLLS_PERMISSION = "monumenta.log.skrscrolls"; // dictates if SKR scrolls are logged or not when obtained
 	private static final double[] BONUS_ITEMS = {
 			0, // Dummy value, this is a player count indexed array
 			0.5,
@@ -241,6 +243,16 @@ public class ChestUtils {
 			}
 		}
 
+		// Logger for SKR Scrolls
+		if (player.hasPermission(LOG_SCROLLS_PERMISSION)) {
+			for (ItemStack thisItem : popLoot) {
+				if (testForScroll(thisItem)) {
+					AuditListener.logPlayer("[Scroll Logger] Player "+player.getName()+" found a SKR Scroll ("+ItemUtils.getPlainNameIfExists(thisItem)+") in a placed chest with loot table "+lootTable.toString()+".");
+					break;
+				}
+			}
+		}
+
 		// Put the remainder of the loot in the original container
 		generateLootInventory(itemsForOrigContainer, inventory, player, true);
 
@@ -276,8 +288,7 @@ public class ChestUtils {
 			int slot = freeSlots.remove(0);
 			inventory.setItem(slot, lootItem);
 			if (!skrScrolls) {
-				if ((InventoryUtils.testForItemWithName(lootItem, "Remnant Scroll", false) &&
-					lootItem.getType().name().contains("SMITHING_TEMPLATE"))) {
+				if (testForScroll(lootItem)) {
 					skrScrolls = true; // SKR Scroll found, alert the player later!
 				}
 			}
@@ -325,6 +336,12 @@ public class ChestUtils {
 		if (skrScrolls) {
 			NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute at %1$s as %1$s run function monumenta:skr/scroll_drop".formatted(player.getName()));
 		}
+	}
+
+	// Test for an SKR Scroll
+	public static boolean testForScroll(ItemStack item) {
+		return (InventoryUtils.testForItemWithName(item, "Remnant Scroll", false) &&
+			item.getType().name().contains("SMITHING_TEMPLATE"));
 	}
 
 	public static boolean isUnscaledChest(Block block) {

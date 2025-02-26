@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.inventories;
 
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -91,6 +92,15 @@ public class LootChestsInInventory implements Listener {
 		LootContext.Builder builder = new LootContext.Builder(player.getLocation());
 		Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, builder.build());
 		item.subtract();
+		// Logger for SKR Scrolls
+		if (player.hasPermission(ChestUtils.LOG_SCROLLS_PERMISSION)) {
+			for (ItemStack thisItem : loot) {
+				if (ChestUtils.testForScroll(thisItem)) {
+					AuditListener.logPlayer("[Scroll Logger] Player "+player.getName()+" found a SKR Scroll ("+ItemUtils.getPlainNameIfExists(thisItem)+") in an inventory chest with loot table "+table.toString()+".");
+					break;
+				}
+			}
+		}
 		ChestUtils.generateLootInventory(loot, inventory, player, true);
 
 		addOrInitializePlayer(player);
