@@ -17,6 +17,7 @@ public class Legionary {
 	private static final double SPAWN_CHANCE_PER_LEVEL = 0.15;
 
 	public static final String DESCRIPTION = "Enemies come in larger numbers.";
+	public static final String AVOID_LEGIONARY = "boss_legionaryimmune";
 
 	public static Component[] rankDescription(int level) {
 			return new Component[]{
@@ -26,7 +27,7 @@ public class Legionary {
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (DelvesUtils.isDelveMob(mob) || EntityUtils.isBoss(mob)) {
+		if (DelvesUtils.isDelveMob(mob) || EntityUtils.isBoss(mob) || mob.getScoreboardTags().contains(AVOID_LEGIONARY)) {
 			return;
 		}
 

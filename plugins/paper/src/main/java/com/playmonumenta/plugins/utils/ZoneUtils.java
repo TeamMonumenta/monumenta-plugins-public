@@ -44,6 +44,7 @@ public class ZoneUtils {
 		NO_EQUIPMENT_DAMAGE("No Equipment Damage"),
 		NO_EXPLOSIONS("No Explosions"),
 		NO_FALL_DAMAGE("No Fall Damage"),
+		NO_GETTING_BOOK_FROM_LECTERN("No Getting Book From Lectern"),
 		NO_MOBILITY_ABILITIES("No Mobility Abilities"),
 		NO_NATURAL_SPAWNS("No Natural Spawns"),
 		NO_PLACING_BOATS("No Placing Boats"),
