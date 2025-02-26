@@ -57,7 +57,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class CharmBagManager implements Listener {
 	private static final String KEY_PLUGIN_DATA = "CharmBag";
-	private static final String SKR_ROOM_COMP_SCORE = "SKRRoomsCompleted";
+	private static final String SKR_COMBAT_ROOM_SCORE = "SKRCombatRooms";
+	private static final String SKR_PUZZLE_ROOM_SCORE = "SKRPuzzleRooms";
 
 	public static final List<PlayerClass> classList = new MonumentaClasses().getClasses();
 	public static final List<String> classListString = new ArrayList<>();
@@ -243,7 +244,8 @@ public class CharmBagManager implements Listener {
 
 	private static boolean checkInvalidCompletionScore(Player player, ItemStack charmBagItem) {
 		// SKR Room Completion Requirement (2 rooms or more)
-		if (ScoreboardUtils.getScoreboardValue(player, SKR_ROOM_COMP_SCORE).orElse(0) < 2) {
+		if (ScoreboardUtils.getScoreboardValue(player, SKR_COMBAT_ROOM_SCORE).orElse(0) +
+			ScoreboardUtils.getScoreboardValue(player, SKR_PUZZLE_ROOM_SCORE).orElse(0) < 2) {
 			player.sendMessage(Component.text("You must complete 2 Silver Knight's Remnants rooms before using the " + ItemUtils.getPlainName(charmBagItem) + "!", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			return true;
