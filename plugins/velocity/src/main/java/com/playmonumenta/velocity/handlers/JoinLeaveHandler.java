@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-@SuppressWarnings("deprecation")
 public class JoinLeaveHandler {
 	final boolean mVanishEnabled;
 

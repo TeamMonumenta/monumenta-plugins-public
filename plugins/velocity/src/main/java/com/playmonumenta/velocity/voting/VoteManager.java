@@ -26,7 +26,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-@SuppressWarnings("deprecation")
 public class VoteManager {
 	private static final int TICK_PERIOD_SECONDS = 60;
 

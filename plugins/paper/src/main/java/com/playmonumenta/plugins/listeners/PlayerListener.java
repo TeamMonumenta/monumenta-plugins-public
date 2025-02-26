@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
-import com.playmonumenta.plugins.integrations.TABIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;

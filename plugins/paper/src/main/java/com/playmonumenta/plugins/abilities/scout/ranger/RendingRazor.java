@@ -186,7 +186,6 @@ public class RendingRazor extends Ability {
 
 		cancelOnDeath(new BukkitRunnable() {
 			final Location mLoc = target.getLocation().add(0, target.getEyeHeight() / 2, 0);
-			int mTicks = 0;
 			boolean mReturnedToPlayer = false;
 			Location mOldPlayerLoc = mPlayer.getLocation();
 			final List<LivingEntity> mHitEnemies = new ArrayList<>();
@@ -239,8 +238,6 @@ public class RendingRazor extends Ability {
 				if (mReturnedToPlayer) {
 					mCosmetic.razorReturned(mPlayer.getLocation());
 				}
-
-				mTicks++;
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
 	}

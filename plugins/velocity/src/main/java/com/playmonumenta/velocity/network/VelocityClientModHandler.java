@@ -14,7 +14,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-@SuppressWarnings("deprecation")
 public class VelocityClientModHandler {
 	public static final ChannelIdentifier CHANNEL_ID = MinecraftChannelIdentifier.create("monumenta", "client_channel_v1");
 

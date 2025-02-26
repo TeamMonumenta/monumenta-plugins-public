@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
@@ -40,7 +39,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
-public class LuminousInfusion extends MultipleChargeAbility implements KillTriggeredAbility, AbilityWithChargesOrStacks {
+public class LuminousInfusion extends MultipleChargeAbility implements KillTriggeredAbility {
 	public double mLastPassiveMeleeDamage = 0; // Passive damage to share with Holy Javelin
 
 	private static final int DAMAGE_UNDEAD_1 = 4;
