@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.TablistCommand;
 import com.playmonumenta.plugins.protocollib.PingListener;
+import com.playmonumenta.plugins.social.SocialManager;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -220,7 +221,7 @@ public class TABIntegration implements Listener {
 		}
 	}
 
-	private static final Map<UUID, MonumentaPlayer> mPlayers = new ConcurrentHashMap<>();
+	public static final Map<UUID, MonumentaPlayer> mPlayers = new ConcurrentHashMap<>();
 
 	public TABIntegration() {
 		INSTANCE = this;
@@ -483,12 +484,45 @@ public class TABIntegration implements Listener {
 			}
 		}
 
+		// friends
+		boolean friendsHasHeader = false;
+		for (MonumentaPlayer friendPlayer : players) {
+			// Hide check
+			if ((!isAdminOrMod && friendPlayer.mIsHidden) || friendPlayer.mIsMod) {
+				continue;
+			}
+			// friendship check
+			if (!isFriend(monuPlayer.mUuid, friendPlayer.mUuid).join()) {
+				continue;
+			}
+			if (!friendsHasHeader) {
+				friendsHasHeader = true;
+				if (modHasHeader) {
+					layout.addFixedSlot(layoutIndex, "");
+					layoutIndex++;
+					if (layoutIndex >= 81) {
+						return layout;
+					}
+				}
+				layout.addFixedSlot(layoutIndex, "&b&lFriends", "mineskin:1749359849");
+				layoutIndex++;
+				if (layoutIndex >= 81) {
+					return layout;
+				}
+			}
+			layout.addFixedSlot(layoutIndex, formatPlayer(friendPlayer, isAdminOrMod), friendPlayer.mSkin, friendPlayer.mPing);
+			layoutIndex++;
+			if (layoutIndex >= 81) {
+				return layout;
+			}
+		}
+
 		// guild
 		boolean guildHasHeader = false;
 		if (monuPlayer.mGuild != null) {
 			for (MonumentaPlayer guildPlayer : players) {
 				// hide check
-				if (!isAdminOrMod && guildPlayer.mIsHidden) {
+				if ((!isAdminOrMod && guildPlayer.mIsHidden) || guildPlayer.mIsMod || isFriend(monuPlayer.mUuid, guildPlayer.mUuid).join()) {
 					continue;
 				}
 				if (guildPlayer.mGuild == null || !guildPlayer.mGuild.equals(monuPlayer.mGuild)) {
@@ -521,10 +555,7 @@ public class TABIntegration implements Listener {
 		boolean regularHasHeader = false;
 		for (MonumentaPlayer regularPlayer : players) {
 			// hide check
-			if (!isAdminOrMod && regularPlayer.mIsHidden) {
-				continue;
-			}
-			if (regularPlayer.mIsMod || (regularPlayer.mGuild != null && regularPlayer.mGuild.equals(monuPlayer.mGuild))) {
+			if ((!isAdminOrMod && regularPlayer.mIsHidden) || regularPlayer.mIsMod || isFriend(monuPlayer.mUuid, regularPlayer.mUuid).join() || (regularPlayer.mGuild != null && regularPlayer.mGuild.equals(monuPlayer.mGuild))) {
 				continue;
 			}
 			if (!regularHasHeader) {
@@ -550,6 +581,10 @@ public class TABIntegration implements Listener {
 		}
 
 		return layout;
+	}
+
+	private CompletableFuture<Boolean> isFriend(UUID playerUuid, UUID friendUuid) {
+		return SocialManager.areFriends(playerUuid, friendUuid);
 	}
 
 	private void setHeaderAndFooter(TabPlayer viewer, MonumentaPlayer player) {

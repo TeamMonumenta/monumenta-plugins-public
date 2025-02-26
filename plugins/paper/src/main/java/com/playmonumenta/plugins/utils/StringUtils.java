@@ -1,6 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +15,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
@@ -469,5 +473,18 @@ public class StringUtils {
 		}
 		// We only get to this point if every character is an integer
 		return Integer.parseInt(s);
+	}
+
+	// Returns the UUID from the input or throws an exception at the player if the input is invalid
+	public static UUID getUuidFromInput(String input) throws WrapperCommandSyntaxException {
+		try {
+			return UUID.fromString(input);
+		} catch (IllegalArgumentException e) {
+			UUID uuid = MonumentaRedisSyncIntegration.cachedNameToUuid(input);
+			if (uuid == null) {
+				throw CommandAPI.failWithString("The player name '" + input + "' couldn't be found. Please check your spelling and ensure proper capitalization.");
+			}
+			return uuid;
+		}
 	}
 }

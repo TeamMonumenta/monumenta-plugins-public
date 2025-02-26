@@ -88,9 +88,11 @@ public class AuditListener implements Listener {
 			JunkItemListener.COMMAND,
 			JunkItemListener.ALIAS
 		)),
+		exactOptionalArguments("(minecraft:)?block (add|remove|list|list_raw)"),
 		exactOptionalArguments("(minecraft:)?(blockinteractions|bi)"),
 		exactOptionalArguments("(minecraft:)?claimraffle"),
 		exactOptionalArguments("(minecraft:)?(disabledrop|dd)"),
+		exactOptionalArguments("(minecraft:)?(friend|f) (add|remove|list|list_raw)"),
 		exactNoArguments("(minecraft:)?gg"),
 		exactOptionalArguments("(minecraft:)?glowing"),
 		exactNoArguments("(minecraft:)?grave list"),
@@ -112,6 +114,8 @@ public class AuditListener implements Listener {
 	);
 
 	private static final List<Pattern> NEVER_IGNORED_COMMAND_REGEX = Arrays.asList(
+		exactOptionalArguments("(minecraft:)?block [^ ]+_other"),
+		exactOptionalArguments("(minecraft:)?(friend|f) [^ ]+_other"),
 		exactOptionalArguments("(minecraft:)?guild mod"),
 		exactOptionalArguments("(minecraft:)?mail mod"),
 		exactOptionalArguments("(minecraft:)?plot access [^ ]+_other")
