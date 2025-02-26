@@ -386,6 +386,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(RunAwayBoss.identityTag, RunAwayBoss::new);
 		registerStatelessBoss(CreipergeuseBoss.identityTag, CreipergeuseBoss::new, new CreipergeuseBoss.Parameters());
 		registerStatelessBoss(SlamAttackBoss.identityTag, SlamAttackBoss::new, new SlamAttackBoss.Parameters());
+		registerStatelessBoss(PassiveBoss.identityTag, PassiveBoss::new);
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);
