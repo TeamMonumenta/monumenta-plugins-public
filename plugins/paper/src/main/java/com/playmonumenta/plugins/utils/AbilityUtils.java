@@ -633,7 +633,9 @@ public class AbilityUtils {
 		Location loc = player.getEyeLocation();
 		ThrowableProjectile proj;
 		if (inWater) {
-			proj = world.spawn(loc, Trident.class);
+			Trident trident = world.spawn(loc, Trident.class);
+			trident.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+			proj = trident;
 		} else {
 			proj = world.spawn(loc, Snowball.class);
 		}

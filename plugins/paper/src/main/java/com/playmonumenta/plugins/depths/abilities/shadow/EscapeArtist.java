@@ -213,6 +213,7 @@ public class EscapeArtist extends DepthsAbility {
 				executeTeleport(proj.getLocation().add(0, 1, 0).setDirection(mPlayer.getEyeLocation().getDirection()));
 			}
 		}
+		proj.remove();
 	}
 
 	public void executeTeleport(Location destination) {

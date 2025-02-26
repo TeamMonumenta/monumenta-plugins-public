@@ -124,6 +124,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 				onTotemHitEntity(hitMob);
 				placeTotem(proj.getLocation(), stats);
 			}
+			proj.remove();
 		}
 	}
 
