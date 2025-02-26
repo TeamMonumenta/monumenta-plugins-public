@@ -199,6 +199,11 @@ public class MarketRedisManager {
 	}
 
 	public static @Nullable List<MarketListing> getListings(String... ids) {
+		// If no ids are provided, return an empty list
+		if (ids.length == 0) {
+			return null;
+		}
+
 		Gson gson = new Gson();
 		List<KeyValue<String, String>> jsons = RedisAPI.getInstance().async().hmget(pathListingHashMap, ids).toCompletableFuture().join();
 		ArrayList<MarketListing> out = new ArrayList<>();
