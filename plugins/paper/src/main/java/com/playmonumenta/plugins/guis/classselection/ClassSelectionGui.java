@@ -17,6 +17,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -351,11 +353,17 @@ public class ClassSelectionGui extends Gui {
 			ScoreboardUtils.setScoreboardValue(mPlayer, objective, 0);
 			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, remainingPointsObjective).orElse(0);
 			ScoreboardUtils.setScoreboardValue(mPlayer, remainingPointsObjective, currentCount + (actualCurrentLevel - level));
+
+			if (actualCurrentLevel != 0) {
+				playSelectionSound(mPlayer, displayedSpec == null ? 0 : null, displayedSpec == null ? null : 0, null);
+			}
 		} else if (level < actualCurrentLevel) {
 			// Level clicked is lower than level existing - remove levels down to clicked level
 			ScoreboardUtils.setScoreboardValue(mPlayer, objective, enhancementOffset + level);
 			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, remainingPointsObjective).orElse(0);
 			ScoreboardUtils.setScoreboardValue(mPlayer, remainingPointsObjective, currentCount + (actualCurrentLevel - level));
+
+			playSelectionSound(mPlayer, displayedSpec == null ? level : null, displayedSpec == null ? null : level, null);
 		} else if (level > actualCurrentLevel) {
 			// Level clicked is higher than level existing - upgrade to clicked level if enough points
 			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, remainingPointsObjective).orElse(0);
@@ -363,6 +371,8 @@ public class ClassSelectionGui extends Gui {
 				// can upgrade
 				ScoreboardUtils.setScoreboardValue(mPlayer, remainingPointsObjective, currentCount - (level - actualCurrentLevel));
 				ScoreboardUtils.setScoreboardValue(mPlayer, objective, enhancementOffset + level);
+
+				playSelectionSound(mPlayer, displayedSpec == null ? level : null, displayedSpec == null ? null : level, null);
 			} else if (displayedSpec == null) {
 				mPlayer.sendMessage("You don't have enough skill points to select this skill!");
 				return;
@@ -400,6 +410,8 @@ public class ClassSelectionGui extends Gui {
 			if (currentCount > 0) {
 				ScoreboardUtils.setScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE, currentCount - 1);
 				ScoreboardUtils.setScoreboardValue(mPlayer, objective, currentLevel + 2);
+
+				playSelectionSound(mPlayer, null, null, 1);
 			} else {
 				mPlayer.sendMessage("You don't have enough enhancement points to select this enhancement!");
 				return;
@@ -409,9 +421,73 @@ public class ClassSelectionGui extends Gui {
 			ScoreboardUtils.setScoreboardValue(mPlayer, objective, currentLevel - 2);
 			int currentCount = ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE).orElse(0);
 			ScoreboardUtils.setScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE, currentCount + 1);
+
+			playSelectionSound(mPlayer, null, null, 0);
 		}
 
 		updatePlayerAbilities();
+	}
+
+	protected void playSelectionSound(Player player, @Nullable Integer skillLevel, @Nullable Integer specLevel, @Nullable Integer enhanceLevel) {
+		if (skillLevel != null) {
+			switch (skillLevel) {
+				case 0: {
+					player.playSound(player, Sound.BLOCK_TRIAL_SPAWNER_PLACE, SoundCategory.PLAYERS, 0.7f, 0.9f);
+					player.playSound(player, Sound.ENTITY_BREEZE_LAND, SoundCategory.PLAYERS, 0.8f, 0.9f);
+					break;
+				}
+				case 1: {
+					player.playSound(player, Sound.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 1f, 1.35f);
+					break;
+				}
+				case 2: {
+					player.playSound(player, Sound.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 1f, 1.7f);
+					player.playSound(player, Sound.BLOCK_CHORUS_FLOWER_GROW, SoundCategory.PLAYERS, 1f, 1.5f);
+					break;
+				}
+				default: {}
+			}
+		}
+
+		if (specLevel != null) {
+			switch (specLevel) {
+				case 0: {
+					player.playSound(player, Sound.BLOCK_TRIAL_SPAWNER_CLOSE_SHUTTER, SoundCategory.PLAYERS, 0.75f, 0.75f);
+					player.playSound(player, Sound.BLOCK_TRIAL_SPAWNER_PLACE, SoundCategory.PLAYERS, 0.75f, 0.6f);
+					break;
+				}
+				case 1: {
+					player.playSound(player, Sound.BLOCK_TRIAL_SPAWNER_SPAWN_MOB, SoundCategory.PLAYERS, 1f, 1.5f);
+					player.playSound(player, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.5f, 1f);
+					break;
+				}
+				case 2: {
+					player.playSound(player, Sound.BLOCK_TRIAL_SPAWNER_SPAWN_MOB, SoundCategory.PLAYERS, 1f, 2f);
+					player.playSound(player, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.5f, 1.28f);
+					break;
+				}
+				default: {
+				}
+			}
+		}
+
+		if (enhanceLevel != null) {
+			switch (enhanceLevel) {
+				case 0: {
+					player.playSound(player, Sound.BLOCK_TRIAL_SPAWNER_CLOSE_SHUTTER, SoundCategory.PLAYERS, 0.75f, 0.75f);
+					player.playSound(player, Sound.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.PLAYERS, 1f, 1.5f);
+					break;
+				}
+				case 1: {
+					player.playSound(player, Sound.BLOCK_TRIAL_SPAWNER_OPEN_SHUTTER, SoundCategory.PLAYERS, 1f, 1.55f);
+					player.playSound(player, Sound.BLOCK_CHORUS_FLOWER_GROW, SoundCategory.PLAYERS, 1f, 1.5f);
+					player.playSound(player, Sound.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.PLAYERS, 1f, 0.8f);
+					break;
+				}
+				default: {
+				}
+			}
+		}
 	}
 
 	protected boolean hasClass() {

@@ -430,7 +430,7 @@ public class AbilityUtils {
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_SPEC_NAME, 0);
 		AbilityManager.getManager().resetPlayerAbilities(player);
 		updateAbilityScores(player);
-		player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 0.7f);
+		player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 0.75f, 1.35f);
 		player.sendMessage(Component.text("Your skill points have been reset. You can pick a new class now.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
 		refreshClass(player);
 	}
@@ -442,7 +442,7 @@ public class AbilityUtils {
 		}
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_SPEC_NAME, 0);
 		updateAbilityScores(player);
-		player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 0.7f);
+		player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 0.75f, 1.35f);
 		player.sendMessage(Component.text("Your specialization points have been reset. You can pick a new specialization now.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
 		refreshClass(player);
 	}

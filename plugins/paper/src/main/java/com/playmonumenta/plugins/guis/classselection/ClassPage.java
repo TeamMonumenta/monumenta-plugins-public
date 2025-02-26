@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -127,6 +129,10 @@ public class ClassPage extends Page {
 					if (event.isShiftClick()) {
 						return;
 					}
+
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_TRIAL_SPAWNER_EJECT_ITEM, SoundCategory.PLAYERS, 1f, 1f);
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
+
 					new AbilityTriggersGui(mGui.mPlayer, true).open();
 				});
 		}
@@ -220,6 +226,11 @@ public class ClassPage extends Page {
 					);
 					mGui.updatePlayerAbilities();
 					MonumentaNetworkRelayIntegration.refreshPlayer(mGui.mPlayer);
+
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.5f, 1.5f);
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.PLAYERS, 1f, 0.5f);
+				} else {
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
 				}
 				mGui.mPage = new SkillPage(mGui, classToItemize);
 				mGui.update();

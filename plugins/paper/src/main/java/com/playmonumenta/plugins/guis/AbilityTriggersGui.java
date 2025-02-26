@@ -21,6 +21,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -58,13 +60,21 @@ public class AbilityTriggersGui extends Gui {
 					"Return to the class selection page.", NamedTextColor.GRAY, 40);
 				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_main_back", mGuiTextures);
 				setItem(0, tempItem)
-					.onLeftClick(() -> new ClassSelectionGui(mPlayer, false).open());
+					.onLeftClick(() -> {
+						new ClassSelectionGui(mPlayer, false).open();
+
+						playButtonSoundNormal(mPlayer);
+					});
 			} else {
 				tempItem = GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
 					"Return to the ability summary page.", NamedTextColor.GRAY, 40);
 				GUIUtils.setGuiNbtTag(tempItem, "texture", "depth_trigger_main_back", mGuiTextures);
 				setItem(0, tempItem)
-					.onLeftClick(() -> new DepthsSummaryGUI(mPlayer).open());
+					.onLeftClick(() -> {
+						new DepthsSummaryGUI(mPlayer).open();
+
+						playButtonSoundNormal(mPlayer);
+					});
 			}
 
 			// help icon
@@ -104,6 +114,8 @@ public class AbilityTriggersGui extends Gui {
 							mSelectedTrigger = trigger;
 							mNewTrigger = new AbilityTrigger(trigger.getTrigger());
 							update();
+
+							playButtonSoundSpecial(mPlayer);
 						})
 						.onRightClick(() -> {
 							if (trigger.getRestriction() == null || trigger.getRestriction().getPredicate().test(mPlayer)) {
@@ -141,6 +153,8 @@ public class AbilityTriggersGui extends Gui {
 							}
 						}
 						update();
+
+						playButtonSoundCancel(mPlayer);
 					});
 			}
 		} else {
@@ -153,6 +167,8 @@ public class AbilityTriggersGui extends Gui {
 						mSelectedAbility = null;
 						mKeyOptionsStartIndex = 0;
 						update();
+
+						playButtonSoundNormal(mPlayer);
 					});
 
 			Objects.requireNonNull(mNewTrigger);
@@ -179,6 +195,8 @@ public class AbilityTriggersGui extends Gui {
 			makeOptionIcons(1, 0, tempItem, mNewTrigger.isEnabled() ? Material.GREEN_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setEnabled(!mNewTrigger.isEnabled());
 				update();
+
+				playButtonSoundNormal(mPlayer);
 			});
 			tempItem = GUIUtils.createBasicItem(Material.JIGSAW, "Key: " + mNewTrigger.getKey(), NamedTextColor.WHITE, false,
 				"Click to cycle through main key.\nNote that this also changes the \"extras\" when changed.", NamedTextColor.GRAY, 40);
@@ -206,6 +224,8 @@ public class AbilityTriggersGui extends Gui {
 					}
 				}
 				update();
+
+				playButtonSoundNormal(mPlayer);
 			});
 			tempItem = GUIUtils.createBasicItem(Material.SHEARS, "Double click: " + (mNewTrigger.isDoubleClick() ? "yes" : "no"), mNewTrigger.isDoubleClick() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
 				"Click to toggle requiring a double click", NamedTextColor.GRAY, 40);
@@ -213,6 +233,8 @@ public class AbilityTriggersGui extends Gui {
 			makeOptionIcons(1, 3, tempItem, mNewTrigger.isDoubleClick() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setDoubleClick(!mNewTrigger.isDoubleClick());
 				update();
+
+				playButtonSoundNormal(mPlayer);
 			});
 			makeBinaryOptionIcon(1, 4, Material.FEATHER, "sneaking", mNewTrigger.getSneaking(), mNewTrigger::setSneaking);
 			makeBinaryOptionIcon(1, 5, Material.IRON_BOOTS, "sprinting", mNewTrigger.getSprinting(), mNewTrigger::setSprinting);
@@ -258,6 +280,8 @@ public class AbilityTriggersGui extends Gui {
 					}
 				}
 				update();
+
+				playButtonSoundNormal(mPlayer);
 			});
 
 			tempItem = GUIUtils.createBasicItem(Material.POINTED_DRIPSTONE, "Allow fall-through: " + (mNewTrigger.isFallThrough() ? "yes" : "no"), mNewTrigger.isFallThrough() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
@@ -266,6 +290,8 @@ public class AbilityTriggersGui extends Gui {
 			makeOptionIcons(1, 8, tempItem, mNewTrigger.isFallThrough() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setFallThrough(!mNewTrigger.isFallThrough());
 				update();
+
+				playButtonSoundNormal(mPlayer);
 			});
 
 			// extras aka key options
@@ -287,6 +313,8 @@ public class AbilityTriggersGui extends Gui {
 				setItem(3, 1, tempItem).onLeftClick(() -> {
 					mKeyOptionsStartIndex -= 6;
 					update();
+
+					playButtonSoundNormal(mPlayer);
 				});
 			}
 			if (mKeyOptionsStartIndex + 7 < AbilityTrigger.KeyOptions.values().length) {
@@ -296,6 +324,8 @@ public class AbilityTriggersGui extends Gui {
 				setItem(3, 8, tempItem).onLeftClick(() -> {
 					mKeyOptionsStartIndex += mKeyOptionsStartIndex == 0 ? 7 : 6;
 					update();
+
+					playButtonSoundNormal(mPlayer);
 				});
 			}
 
@@ -317,6 +347,8 @@ public class AbilityTriggersGui extends Gui {
 						}
 					}
 					update();
+
+					playButtonSoundNormal(mPlayer);
 				});
 			}
 
@@ -346,6 +378,8 @@ public class AbilityTriggersGui extends Gui {
 						mSelectedAbility = null;
 						mKeyOptionsStartIndex = 0;
 						update();
+
+						playButtonSoundSpecial(mPlayer);
 					});
 				}
 				{
@@ -361,6 +395,8 @@ public class AbilityTriggersGui extends Gui {
 						mSelectedAbility = null;
 						mKeyOptionsStartIndex = 0;
 						update();
+
+						playButtonSoundCancel(mPlayer);
 					});
 				}
 			}
@@ -377,6 +413,8 @@ public class AbilityTriggersGui extends Gui {
 					mSelectedAbility = null;
 					mKeyOptionsStartIndex = 0;
 					update();
+
+					playButtonSoundCancel(mPlayer);
 				});
 			}
 		}
@@ -423,6 +461,8 @@ public class AbilityTriggersGui extends Gui {
 		makeOptionIcons(row, column, tempItem, value, () -> {
 			setter.accept(AbilityTrigger.BinaryOption.values()[(value.ordinal() + 1) % AbilityTrigger.BinaryOption.values().length]);
 			update();
+
+			playButtonSoundNormal(mPlayer);
 		});
 	}
 
@@ -430,4 +470,16 @@ public class AbilityTriggersGui extends Gui {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 
+	private void playButtonSoundNormal(Player player) {
+		player.playSound(player, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
+	}
+
+	private void playButtonSoundSpecial(Player player) {
+		player.playSound(player, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
+		player.playSound(player, Sound.BLOCK_TRIAL_SPAWNER_EJECT_ITEM, SoundCategory.PLAYERS, 1f, 1.4f);
+	}
+
+	private void playButtonSoundCancel(Player player) {
+		player.playSound(player, Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 1f, 0.63f);
+	}
 }

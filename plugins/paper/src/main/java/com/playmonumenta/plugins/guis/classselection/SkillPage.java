@@ -11,6 +11,8 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -69,6 +71,8 @@ public class SkillPage extends Page {
 			}
 			mGui.mPage = new ClassPage(mGui);
 			mGui.update();
+
+			mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
 		});
 
 		// Possibly create reset spec item
@@ -159,6 +163,11 @@ public class SkillPage extends Page {
 					);
 					mGui.updatePlayerAbilities();
 					MonumentaNetworkRelayIntegration.refreshPlayer(mGui.mPlayer);
+
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 0.7f, 1.4f);
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.PLAYERS, 1f, 1f);
+				} else {
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
 				}
 				mGui.mPage = new SpecPage(mGui, mClass, spec);
 				mGui.update();
