@@ -75,6 +75,8 @@ public class MasterworkUtils {
 
 	private static final String FISH_MAT = "epic:r3/items/fishing/sand_dollar";
 
+	private static final String SKR_MAT = "epic:r3/dungeons/skr/silver_memory_fragment";
+
 	// Exalted Dungeons
 	private static final String WHITE_MAT = "epic:r1/delves/white/auxiliary/delve_material";
 	private static final String ORANGE_MAT = "epic:r1/delves/orange/auxiliary/delve_material";
@@ -304,6 +306,14 @@ public class MasterworkUtils {
 		}
 	}
 
+	private static class SilverKnightRemnants extends MasterworkCost {
+		private SilverKnightRemnants() {
+			super(Masterwork.III);
+			put(Masterwork.III, SKR_MAT, 4, HYPER_ARCHOS_RING, 4);
+			put(Masterwork.IV, SKR_MAT, 6, PULSATING_DIAMOND, 1, HYPER_ARCHOS_RING, 4);
+		}
+	}
+
 	private static final Map<Location, MasterworkCost> MASTERWORK_COSTS = new HashMap<>();
 	private static final MasterworkCost MISC = new Misc();
 
@@ -329,6 +339,8 @@ public class MasterworkUtils {
 		MASTERWORK_COSTS.put(Location.SIRIUS, new WorldBoss(SIRIUS_FRAG));
 
 		MASTERWORK_COSTS.put(Location.FISHING, new Fish());
+
+		MASTERWORK_COSTS.put(Location.SKR, new SilverKnightRemnants());
 
 		MASTERWORK_COSTS.put(Location.WHITE, new Exalted(WHITE_MAT, Masterwork.II));
 		MASTERWORK_COSTS.put(Location.ORANGE, new Exalted(ORANGE_MAT, Masterwork.II));
