@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
@@ -36,7 +37,7 @@ public class PlayerInventoryManager {
 	 * Needs to be ordered so that trigger orders are correct
 	 */
 
-	private final List<@Nullable ItemStack> mInventoryLastCheck = new ArrayList<>(List.of(new ItemStack[41]));
+	private final List<@Nullable ItemStack> mInventoryLastCheck = Arrays.asList(new ItemStack[41]);
 
 	//Set true when player shift clicks items in inventory so it only runs after inventory is closed
 	private boolean mNeedsUpdate = false;
