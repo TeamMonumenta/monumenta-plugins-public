@@ -58,7 +58,7 @@ public class JumpBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLE_LAND_GROUND = ParticlesList.fromString("[(CLOUD,1,0.1,0.1,0.1,0.1)]");
 		public boolean PREFER_TARGET = true;
 		public boolean IGNORE_WALLS = false;
-		public LoSPool SPAWNED_MOB_POOL = LoSPool.LibraryPool.EMPTY;
+		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
 	}
 
 	public JumpBoss(Plugin plugin, LivingEntity boss) {

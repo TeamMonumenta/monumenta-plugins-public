@@ -212,7 +212,7 @@ public class SpawnerListener implements Listener {
 			// Check the list of mobs from the spawner to see if any should be disposed of
 			// or, if the spawner has a LoS Pool attached, replace it with a mob from the pool first
 			String poolName = SpawnerUtils.getLosPool(event.getSpawner().getBlock());
-			LoSPool losPool = LoSPool.LibraryPool.EMPTY;
+			LoSPool losPool = LoSPool.EMPTY;
 			boolean hasPool = false;
 			if (poolName != null) {
 				hasPool = true;

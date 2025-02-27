@@ -17,8 +17,9 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class LoSPool {
 
+	public static final LoSPool EMPTY = new LibraryPool("");
+
 	public static class LibraryPool extends LoSPool {
-		public static final LoSPool EMPTY = new LibraryPool("");
 
 		private final String mPoolName;
 
