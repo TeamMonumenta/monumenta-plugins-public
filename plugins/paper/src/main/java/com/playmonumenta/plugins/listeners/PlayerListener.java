@@ -1840,10 +1840,8 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerTakeLecternBookEvent(PlayerTakeLecternBookEvent event) {
-
-		event.getPlayer().sendMessage(String.valueOf(ZoneUtils.getZone(event.getPlayer().getLocation(), "default")));
 		if (event.getPlayer().getGameMode() == GameMode.ADVENTURE
-			|| (ZoneUtils.hasZoneProperty(event.getPlayer().getLocation(), ZoneProperty.NO_GETTING_BOOK_FROM_LECTERN) && event.getPlayer().getGameMode() != GameMode.CREATIVE)) {
+			|| (ZoneUtils.hasZoneProperty(event.getLectern().getLocation(), ZoneProperty.NO_GETTING_BOOK_FROM_LECTERN) && event.getPlayer().getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 		}
 	}
