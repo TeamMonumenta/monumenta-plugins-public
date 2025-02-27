@@ -10,6 +10,8 @@ import com.playmonumenta.velocity.integrations.NetworkRelayIntegration;
 import com.playmonumenta.velocity.integrations.PremiumVanishIntegration;
 import com.playmonumenta.velocity.network.VelocityClientModHandler;
 import com.playmonumenta.velocity.voting.VoteManager;
+import com.velocitypowered.api.command.CommandManager;
+import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ListenerCloseEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -73,7 +75,8 @@ public class MonumentaVelocity {
 	@Subscribe
 	public void proxyInitalizeEvent(ProxyInitializeEvent event) {
 		mLoaded = true;
-		PluginManager plugins = mServer.getPluginManager();
+		final PluginManager plugins = mServer.getPluginManager();
+		final CommandManager commandManager = mServer.getCommandManager();
 
 		if (plugins.isLoaded("premiumvanish")) {
 			PremiumVanishIntegration.enable();
@@ -86,7 +89,10 @@ public class MonumentaVelocity {
 		if (plugins.isLoaded("monumenta-redisapi")) {
 			mReconnectHandler = new MonumentaReconnectHandler(this);
 			mServer.getEventManager().register(this, mReconnectHandler);
-			mServer.getCommandManager().register(mServer.getCommandManager().getCommandMeta("rejoin"), new Rejoin(mReconnectHandler));
+			CommandMeta rejoinCommandMeta = commandManager.metaBuilder("rejoin")
+				.plugin(this)
+				.build();
+			commandManager.register(rejoinCommandMeta, new Rejoin(mReconnectHandler));
 		}
 
 		if (plugins.isLoaded("monumenta-network-relay")) {
@@ -96,7 +102,10 @@ public class MonumentaVelocity {
 		if (plugins.isLoaded("nuvotifier")) {
 			try {
 				mVoteManager = new VoteManager(this, mConfig);
-				mServer.getCommandManager().register(mServer.getCommandManager().getCommandMeta("vote"), new Vote(mVoteManager));
+				CommandMeta voteCommandMeta = commandManager.metaBuilder("vote")
+					.plugin(this)
+					.build();
+				mServer.getCommandManager().register(voteCommandMeta, new Vote(mVoteManager));
 				mServer.getEventManager().register(this, mVoteManager);
 			} catch (IllegalArgumentException ex) {
 				mLogger.warn("Failed to initialize voting system:", ex);
