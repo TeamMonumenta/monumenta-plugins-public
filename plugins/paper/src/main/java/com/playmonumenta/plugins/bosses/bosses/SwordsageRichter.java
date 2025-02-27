@@ -64,43 +64,47 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBladeDance(mPlugin, mBoss),
 			new SpellWindWalk(mPlugin, mBoss),
-			new SpellBaseBolt(mPlugin, mBoss, (int) (20 * 2.5), 30, 1.4, 20, 0.5, false, false, 1, 1,
-				(Entity entity, int tick) -> {
+			new SpellBaseBolt(mPlugin, mBoss, (int) (20 * 2.5), 30, 1.4, 20, 0.5, false, false, 1, 1, null) {
+				@Override
+				protected void tickAction(Entity entity, int tick) {
 					float t = tick / 10f;
 					if (tick == 1) {
-						GlowingManager.startGlowing(mBoss, NamedTextColor.RED, (int) (20 * 2.5), GlowingManager.BOSS_SPELL_PRIORITY);
+						GlowingManager.startGlowing(boss, NamedTextColor.RED, (int) (20 * 2.5), GlowingManager.BOSS_SPELL_PRIORITY);
 					}
-					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
-					new PartialParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 2, t);
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME);
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+					new PartialParticle(Particle.EXPLOSION_NORMAL, boss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SWEEP_ATTACK, boss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
+					world.playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 2, t);
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME);
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
 						new BaseMovementSpeedModifyEffect(20 * 2, -0.3));
-				},
+				}
 
-				(Entity entity) -> {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 2, 0);
-					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 30, 0.2, 0, 0.2, 0.15).spawnAsEntityActive(boss);
-				},
+				@Override
+				protected void castAction(Entity entity) {
+					world.playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 2, 0);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, boss.getLocation().add(0, 1, 0), 30, 0.2, 0, 0.2, 0.15).spawnAsEntityActive(boss);
+				}
 
-				(Location loc) -> {
+				@Override
+				protected void particleAction(Location loc) {
 					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, 2);
 					new PartialParticle(Particle.CLOUD, loc, 3, 0.05, 0.05, 0.05, 0.03).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.REDSTONE, loc, 40, 0.25, 0.25, 0.25, BOLT_COLOR).spawnAsEntityActive(boss);
-				},
+				}
 
-				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
+				@Override
+				protected void intersectAction(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) {
 					if (!blocked && player != null) {
-						BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, 15, prevLoc);
+						BossUtils.blockableDamage(boss, player, DamageType.PROJECTILE, 15, prevLoc);
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
 							new PercentSpeed(DEBUFF_DURATION, -0.3, SLOWNESS_SRC));
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
 							new PercentDamageDealt(DEBUFF_DURATION, -0.1));
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
-				},
-				null)
+				}
+			}
 		));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(

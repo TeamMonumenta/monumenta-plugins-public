@@ -78,9 +78,10 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 			() -> new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 150, 2, 2, 2, 0).spawnAsEntityActive(boss)
 		);
 
-		SpellBaseBolt bolt = new SpellBaseBolt(mPlugin, mBoss, (int) (20 * 2.25), 20 * 5, 1.15, detectionRange, 0.5, true, true, 2, 10,
+		SpellBaseBolt bolt = new SpellBaseBolt(mPlugin, mBoss, (int) (20 * 2.25), 20 * 5, 1.15, detectionRange, 0.5, true, true, 2, 10, null) {
 			// Charge-up action
-			(Entity entity, int tick) -> {
+			@Override
+			protected void tickAction(Entity entity, int tick) {
 				float t = tick / 15.0f;
 				if (tick == 1) {
 					GlowingManager.startGlowing(mBoss, NamedTextColor.RED, (int) (20 * 2.25), GlowingManager.BOSS_SPELL_PRIORITY);
@@ -91,23 +92,25 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 				world.playSound(mBoss.getLocation(), Sound.BLOCK_GRASS_BREAK, SoundCategory.HOSTILE, 10, t);
 				mBoss.removePotionEffect(PotionEffectType.SLOW);
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 2, 1));
-			},
+			}
 
-			// Cast action
-			(Entity entity) -> {
+			@Override
+			protected void castAction(Entity entity) {
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 5, 1f);
 				new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 80, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 30, 0.2, 0.45, 0.2,
 					0.1).spawnAsEntityActive(mBoss);
-			},
+			}
 
-			(Location loc) -> {
+			@Override
+			protected void particleAction(Location loc) {
 				new PartialParticle(Particle.BLOCK_CRACK, loc, 10, 0.35, 0.35, 0.35, 0.25,
 					Material.OAK_LEAVES.createBlockData()).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.2, 0.2, 0.2, 0.125).spawnAsEntityActive(mBoss);
-			},
+			}
 
-			(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
+			@Override
+			protected void intersectAction(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) {
 				if (!blocked && player != null) {
 					BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 12, prevLoc);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 7, 1));
@@ -117,9 +120,8 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1.25f);
-			},
-			null
-		);
+			}
+		};
 
 		SpellDelayedAction aoe = new SpellDelayedAction(mPlugin, mBoss.getLocation(), 20 * 3,
 			// Start
