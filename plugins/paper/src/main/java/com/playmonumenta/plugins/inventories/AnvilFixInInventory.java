@@ -100,6 +100,7 @@ public class AnvilFixInInventory implements Listener {
 		if (unshattered || canRepair) {
 			if (!unshattered && item.getItemMeta() instanceof Damageable damageable) {
 				damageable.setDamage(0);
+				item.setItemMeta(damageable);
 			}
 			if (isUpgradedLimeTesseract) {
 				ItemStatUtils.setCharges(anvilOrTess, limeTesseractCharges - 1);
