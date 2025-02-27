@@ -629,8 +629,7 @@ public class SocialManager implements Listener {
 			case MODERATOR_FORCE_ADDED_FRIENDS_NOTIFICATION_CHANNEL -> handleModeratorForceAddedFriendship(data);
 			case REMOVED_FRIEND_NOTIFICATION_CHANNEL -> handleRemovedFriend(data);
 			case MODERATOR_FORCE_REMOVED_FRIENDS_NOTIFICATION_CHANNEL -> handleModeratorForceRemovedFriendship(data);
-			default ->
-				MMLog.severe("Couldn't find a matching switch case to handle this network relay message event in SocialManager.java: " + event.getChannel());
+			default -> break;
 		}
 	}
 
