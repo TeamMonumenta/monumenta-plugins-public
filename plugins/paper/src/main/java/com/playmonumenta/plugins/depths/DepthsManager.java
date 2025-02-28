@@ -175,6 +175,7 @@ import java.io.FileNotFoundException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -407,8 +408,8 @@ public class DepthsManager {
 			e.printStackTrace();
 		}
 		try {
-			Files.move(tempPlayers, Path.of(path + "players.json"));
-			Files.move(tempParties, Path.of(path + "parties.json"));
+			Files.move(tempPlayers, Path.of(path + "players.json"), StandardCopyOption.REPLACE_EXISTING);
+			Files.move(tempParties, Path.of(path + "parties.json"), StandardCopyOption.REPLACE_EXISTING);
 		} catch (Exception e) {
 			MMLog.severe("Caught exception renaming file '" + tempFilePath + "' to '" + path + "': " + e);
 			e.printStackTrace();
