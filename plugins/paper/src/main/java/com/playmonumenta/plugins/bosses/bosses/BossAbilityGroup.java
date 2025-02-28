@@ -241,7 +241,7 @@ public abstract class BossAbilityGroup {
 			SpellCastEvent event = new SpellCastEvent(mBoss, this, sp);
 			Bukkit.getPluginManager().callEvent(event);
 		} else {
-			MMLog.severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() +
+			MMLog.fine("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() +
 				"' but boss does not have this spell!");
 		}
 	}

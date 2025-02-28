@@ -42,7 +42,8 @@ public class Boss {
 	}
 
 	public void onHurt(DamageEvent event) {
-		for (BossAbilityGroup ability : mAbilities) {
+		// Make a copy of the list before iterating as some bosses change their abilities based on a damage threshold
+		for (BossAbilityGroup ability : new ArrayList<>(mAbilities)) {
 			if (!event.isCancelled()) {
 				ability.onHurt(event);
 				ability.triggerOnSpells(spell -> spell.onHurt(event));
@@ -51,7 +52,8 @@ public class Boss {
 	}
 
 	public void onHurtByEntity(DamageEvent event, Entity damager) {
-		for (BossAbilityGroup ability : mAbilities) {
+		// Make a copy of the list before iterating as some bosses change their abilities based on a damage threshold
+		for (BossAbilityGroup ability : new ArrayList<>(mAbilities)) {
 			if (!event.isCancelled()) {
 				ability.onHurtByEntity(event, damager);
 				ability.triggerOnSpells(spell -> spell.onHurtByEntity(event, damager));
@@ -60,7 +62,8 @@ public class Boss {
 	}
 
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		for (BossAbilityGroup ability : mAbilities) {
+		// Make a copy of the list before iterating as some bosses change their abilities based on a damage threshold
+		for (BossAbilityGroup ability : new ArrayList<>(mAbilities)) {
 			if (!event.isCancelled()) {
 				ability.onHurtByEntityWithSource(event, damager, source);
 				ability.triggerOnSpells(spell -> spell.onHurtByEntityWithSource(event, damager, source));
@@ -126,7 +129,8 @@ public class Boss {
 			return;
 		}
 		try {
-			for (BossAbilityGroup ability : mAbilities) {
+			// Make a copy of the list before iterating as some bosses change their abilities based on a damage threshold
+			for (BossAbilityGroup ability : new ArrayList<>(mAbilities)) {
 				ability.bossCastAbility(event);
 				ability.triggerOnSpells(spell -> spell.bossCastAbility(event));
 			}

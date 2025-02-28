@@ -134,7 +134,7 @@ public class DamageListener implements Listener {
 		}
 		if (event.getDamage() < 0 || event.getFinalDamage() < 0) {
 			// (Still) negative: log and fix
-			mPlugin.getLogger().log(Level.WARNING,
+			mPlugin.getLogger().log(Level.FINE,
 					"Negative damage dealt! finalDamage=" + event.getFinalDamage() + ", "
 							+ Arrays.stream(EntityDamageEvent.DamageModifier.values()).map(mod -> mod + "=" + event.getDamage(mod)).collect(Collectors.joining(", ")), new Exception());
 			if (!(event.getEntity() instanceof Player)) { // the negative damage bug doesn't apply to players, and can cause issues with absorption making players invulnerable

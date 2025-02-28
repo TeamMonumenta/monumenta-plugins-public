@@ -180,7 +180,6 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 					int targetIndex = (int) Math.round(mAnimationProgress * particlesPerTick) - 1;
 					Preconditions.checkArgument(mAnimationProgress > 0, "Animation progress must be greater than 0");
 					Preconditions.checkArgument(mIndexPointer >= 0, "Index pointer must be greater than or equal to 0");
-					Preconditions.checkArgument(targetIndex >= 0, "Target index must be greater than or equal to 0");
 
 					for (int index = mIndexPointer; index <= targetIndex; index++) {
 						packagedValues.location(
@@ -196,10 +195,11 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 					} else {
 						mIndexPointer = targetIndex;
 					}
-				} finally {
+				} catch (Exception e) {
 					// Ensure the task is cancelled if an exception is thrown
 					cancel();
 					mRunnable = null;
+					throw e;
 				}
 			}
 		};

@@ -257,7 +257,7 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public void setFlatDamage(double damage) {
 		if (damage < 0) {
-			Plugin.getInstance().getLogger().log(Level.WARNING, "Negative damage dealt: " + damage, new Exception());
+			Plugin.getInstance().getLogger().log(Level.FINE, "Negative damage dealt: " + damage, new Exception());
 		}
 		if (!Double.isFinite(damage)) {
 			Plugin.getInstance().getLogger().log(Level.WARNING, "Non-finite damage dealt: " + damage, new Exception());
@@ -274,7 +274,7 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public void updateDamageWithMultiplier(double damageMultiplier) {
 		if (damageMultiplier < 0) {
-			Plugin.getInstance().getLogger().log(Level.WARNING, "Negative damage multiplier: " + damageMultiplier, new Exception());
+			Plugin.getInstance().getLogger().log(Level.FINE, "Negative damage multiplier: " + damageMultiplier, new Exception());
 		}
 
 		if (damageMultiplier > 1) {
@@ -290,7 +290,7 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public void updateGearDamageWithMultiplier(double damageGearMultiplier) {
 		if (damageGearMultiplier < 0) {
-			Plugin.getInstance().getLogger().log(Level.WARNING, "Negative damage multiplier: " + damageGearMultiplier, new Exception());
+			Plugin.getInstance().getLogger().log(Level.FINE, "Negative damage multiplier: " + damageGearMultiplier, new Exception());
 		}
 
 		// Accumulate damage multiplier

@@ -62,12 +62,15 @@ public class CommandAction implements Action {
 			tooltips.add(Tooltip.ofString(soFar + commandFull + ")", "end command"));
 
 			List<String> tabComplete = commandC.tabComplete(Bukkit.getConsoleSender(), cmd[0], Arrays.copyOfRange(cmd, 1, cmd.length), null);
-			String lastArg = cmd[cmd.length - 1];
-			String suggestionsStart = tabComplete.stream().allMatch(tc -> StringUtils.startsWithIgnoreCase(tc, lastArg))
-				                          ? soFar + commandFull.substring(0, commandFull.lastIndexOf(' ')) + ' ' : soFar + commandFull;
-			tabComplete.stream()
-				.map(s -> Tooltip.ofString(suggestionsStart + s, "command"))
-				.forEach(tooltips::add);
+			// This shouldn't be null - but somehow it is sometimes based on observed exceptions on the play server
+			if (tabComplete != null) {
+				String lastArg = cmd[cmd.length - 1];
+				String suggestionsStart = tabComplete.stream().allMatch(tc -> StringUtils.startsWithIgnoreCase(tc, lastArg))
+					                          ? soFar + commandFull.substring(0, commandFull.lastIndexOf(' ')) + ' ' : soFar + commandFull;
+				tabComplete.stream()
+					.map(s -> Tooltip.ofString(suggestionsStart + s, "command"))
+					.forEach(tooltips::add);
+			}
 		}
 
 		if (!reader.advance(")")) {
