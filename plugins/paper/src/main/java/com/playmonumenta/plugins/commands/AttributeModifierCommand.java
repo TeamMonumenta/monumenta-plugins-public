@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import net.kyori.adventure.text.Component;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -73,6 +74,32 @@ public class AttributeModifierCommand {
 				}
 			})
 			.register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
+			.withArguments(
+				new LiteralArgument("list"),
+				entitiesArg
+			)
+			.executes((sender, args) -> {
+				Collection<Entity> entities = args.getByArgument(entitiesArg);
+				for (Entity entity : entities) {
+					if (entity instanceof Attributable attributable) {
+						for (Attribute attribute : Attribute.values()) {
+							AttributeInstance instance = attributable.getAttribute(attribute);
+							if (instance != null) {
+								Collection<AttributeModifier> modifiers = instance.getModifiers();
+								if (!modifiers.isEmpty()) {
+									sender.sendMessage(Component.text(attribute.getKey().getKey() + ":"));
+									for (AttributeModifier modifier : modifiers) {
+										sender.sendMessage(Component.text(" - " + modifier.getName() + " (" + modifier.getAmount() + ")"));
+									}
+								}
+							}
+						}
+					}
+				}
+			}).register();
 	}
 
 	private static @Nullable Attribute getAttribute(String attr) {

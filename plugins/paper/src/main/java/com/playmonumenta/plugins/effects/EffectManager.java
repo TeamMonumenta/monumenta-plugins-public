@@ -92,7 +92,8 @@ public final class EffectManager implements Listener {
 		}
 
 		public @Nullable Entity getEntity() {
-			return Bukkit.getEntity(mEntityUuid);
+			Entity e = Bukkit.getEntity(mEntityUuid);
+			return e == null ? Bukkit.getPlayer(mEntityUuid) : e;
 		}
 
 		public boolean addEffect(String source, Effect effect) {
