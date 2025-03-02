@@ -15,12 +15,14 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -72,18 +74,17 @@ public class FishingCombatManager implements Listener {
 	private final LoSPool POOL_COMMON = new LoSPool.LibraryPool("~FishingCommonMobs");
 	private final LoSPool POOL_UNCOMMON = new LoSPool.LibraryPool("~FishingUncommonMobs");
 	private final LoSPool POOL_ELITE = new LoSPool.LibraryPool("~FishingEliteMobs");
-	private final HashMap<Player, FishingArena> mPlayerArenaMap = new HashMap<>();
+	private final Map<Player, FishingArena> mPlayerArenaMap = new WeakHashMap<>();
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityDeathEvent(EntityDeathEvent event) {
 		Entity entity = event.getEntity();
-		if (entity instanceof Player player && mPlayerArenaMap.containsKey(player)) {
-			FishingArena arena = mPlayerArenaMap.get(player);
-			if (player.equals(arena.mOwner)) {
+		if (entity instanceof Player player) {
+			FishingArena arena = mPlayerArenaMap.remove(player);
+			if (arena != null && player.equals(arena.mOwner.get())) {
 				ejectMobs(arena, player.getWorld());
 				ejectArena(arena, player.getWorld(), false);
 			}
-			mPlayerArenaMap.remove(entity);
 		}
 	}
 
@@ -95,7 +96,7 @@ public class FishingCombatManager implements Listener {
 		}
 
 		FishingArena arena = mPlayerArenaMap.get(player);
-		if (player.equals(arena.mOwner)) {
+		if (player.equals(arena.mOwner.get())) {
 			ejectMobs(arena, player.getWorld());
 			ejectArena(arena, player.getWorld(), false);
 		} else {
@@ -112,7 +113,7 @@ public class FishingCombatManager implements Listener {
 
 		mPlayerArenaMap.put(player, arena);
 		arena.mOrigin = player.getLocation();
-		arena.mOwner = player;
+		arena.mOwner = new WeakReference<>(player);
 		arena.mOccupied = true;
 		arena.mDifficulty = difficulty;
 
@@ -257,7 +258,7 @@ public class FishingCombatManager implements Listener {
 				if (mTicks >= PORTAL_DURATION) {
 					if (!arena.mActive) {
 						arena.mOccupied = false;
-						mPlayerArenaMap.remove(arena.mOwner);
+						mPlayerArenaMap.remove(arena.mOwner.get());
 					}
 					this.cancel();
 				}

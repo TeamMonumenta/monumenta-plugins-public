@@ -11,8 +11,6 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

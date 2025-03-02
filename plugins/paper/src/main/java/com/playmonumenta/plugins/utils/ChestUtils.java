@@ -247,7 +247,7 @@ public class ChestUtils {
 		if (player.hasPermission(LOG_SCROLLS_PERMISSION)) {
 			for (ItemStack thisItem : popLoot) {
 				if (testForScroll(thisItem)) {
-					AuditListener.logPlayer("[Scroll Logger] Player "+player.getName()+" found a SKR Scroll ("+ItemUtils.getPlainNameIfExists(thisItem)+") in a placed chest with loot table "+lootTable.toString()+".");
+					AuditListener.logPlayer("[Scroll Logger] Player " + player.getName() + " found a SKR Scroll (" + ItemUtils.getPlainNameIfExists(thisItem) + ") in a placed chest with loot table " + lootTable.toString() + ".");
 					break;
 				}
 			}

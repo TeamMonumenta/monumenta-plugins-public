@@ -96,7 +96,7 @@ public class LootChestsInInventory implements Listener {
 		if (player.hasPermission(ChestUtils.LOG_SCROLLS_PERMISSION)) {
 			for (ItemStack thisItem : loot) {
 				if (ChestUtils.testForScroll(thisItem)) {
-					AuditListener.logPlayer("[Scroll Logger] Player "+player.getName()+" found a SKR Scroll ("+ItemUtils.getPlainNameIfExists(thisItem)+") in an inventory chest with loot table "+table.toString()+".");
+					AuditListener.logPlayer("[Scroll Logger] Player " + player.getName() + " found a SKR Scroll (" + ItemUtils.getPlainNameIfExists(thisItem) + ") in an inventory chest with loot table " + table.toString() + ".");
 					break;
 				}
 			}

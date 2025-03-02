@@ -23,6 +23,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTTileEntity;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
+import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -262,8 +263,8 @@ public class SpawnerUtils {
 		}
 
 		new BukkitRunnable() {
-			final Marker mMarker = marker;
-			final PPCircle mHealthyShield = new PPCircle(Particle.SOUL_FIRE_FLAME, mMarker.getLocation(), 1)
+			final WeakReference<Marker> mMarker = new WeakReference<>(marker);
+			final PPCircle mHealthyShield = new PPCircle(Particle.SOUL_FIRE_FLAME, marker.getLocation(), 1)
 				.countPerMeter(2).distanceFalloff(20).ringMode(true);
 			final boolean mHasLosPool = getLosPool(marker.getLocation().getBlock()) != null;
 
@@ -279,8 +280,9 @@ public class SpawnerUtils {
 					return;
 				}
 
-				// If the marker despawned or got removed, cancel the runnable.
-				if (!mMarker.isValid()) {
+				// If the marker despawned, got removed, or was garbage collected somehow, cancel the runnable.
+				Marker markerRef = mMarker.get();
+				if (markerRef == null || !markerRef.isValid()) {
 					cancel();
 					return;
 				}

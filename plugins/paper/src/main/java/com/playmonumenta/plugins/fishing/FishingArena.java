@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.fishing;
 
 import com.google.common.collect.ImmutableList;
+import java.lang.ref.WeakReference;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -94,7 +95,7 @@ enum FishingArena {
 	int mWave = 0;
 	int mDifficulty = 0;
 	@Nullable Location mOrigin = null;
-	@Nullable Player mOwner = null;
+	WeakReference<Player> mOwner = new WeakReference<>(null);
 
 	FishingArena(int radius, Vector coordinates, ImmutableList<Vector> summonCoordinates) {
 		mCoordinates = coordinates;

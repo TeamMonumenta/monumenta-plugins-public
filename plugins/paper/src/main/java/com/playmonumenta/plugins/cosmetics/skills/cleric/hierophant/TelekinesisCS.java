@@ -140,7 +140,7 @@ public class TelekinesisCS extends EnchantedPrayerCS {
 				Location loc = player.getLocation().add(0, 4 + 0.5 * FastUtils.sinDeg(mTicks * 8), 0);
 				display.teleport(loc);
 				display.setRotation(mTicks * 4, 0);
-				if (mKillBoulder == 1) {
+				if (mKillBoulder == 1 || !player.isOnline()) {
 					display.remove();
 					this.cancel();
 				}
