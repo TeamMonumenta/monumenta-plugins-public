@@ -11,7 +11,7 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ShardHealthUtils.ShardHealth;
+import com.playmonumenta.plugins.shardhealth.ShardHealth;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
@@ -659,7 +659,9 @@ public class OrinCustomInventory extends CustomInventory {
 
 			if (player.hasPermission("group.dev")) {
 				ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shardName);
-				shardLore.add((int) (100 * shardHealth.healthScore()) + "% Shard Health (lags/crashes at 0, only devs see this)");
+				shardLore.add(String.format("%5.1f%% Shard Health (lags/crashes at 0, only devs see this)", 100 * shardHealth.healthScore()));
+				shardLore.add(String.format("- %5.1f%% Memory Available", 100 * shardHealth.memoryHealth()));
+				shardLore.add(String.format("- %5.1f%% Tick Spent Idle", 100 * shardHealth.tickHealth()));
 			}
 
 

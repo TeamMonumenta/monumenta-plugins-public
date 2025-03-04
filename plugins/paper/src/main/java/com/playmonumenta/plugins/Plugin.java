@@ -93,6 +93,7 @@ import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
+import com.playmonumenta.plugins.shardhealth.ShardHealthManager;
 import com.playmonumenta.plugins.social.BlockCommand;
 import com.playmonumenta.plugins.social.FriendCommand;
 import com.playmonumenta.plugins.social.SocialManager;
@@ -762,6 +763,8 @@ public class Plugin extends JavaPlugin {
 			DepthsGUICommands.register();
 		}
 
+		ShardHealthManager.startRunningAverageClock(this);
+
 		ParticleManager.init();
 	}
 
@@ -770,6 +773,7 @@ public class Plugin extends JavaPlugin {
 	// we set INSTANCE to null to find bugs easier
 	public void onDisable() {
 		INSTANCE = null;
+		ShardHealthManager.stopRunningAverageClock();
 		getServer().getScheduler().cancelTasks(this);
 		ParticleManager.shutdown();
 

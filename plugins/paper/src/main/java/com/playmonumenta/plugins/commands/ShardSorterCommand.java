@@ -4,10 +4,10 @@ import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.RemotePlayerData;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.shardhealth.ShardHealth;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.DungeonUtils;
 import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.ShardHealthUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -146,7 +146,7 @@ public class ShardSorterCommand {
 				shardPriorityValues = possibleShards.stream()
 					.map(shardName -> {
 						double guildMemberCount = MonumentaNetworkRelayIntegration.guildMembersOnShard(selfGuild, shardName).size();
-						ShardHealthUtils.ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shardName);
+						ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shardName);
 						double guildPortion = Math.min((guildMemberCount / 5) * 25, 25);
 						double healthPortion = 75 * shardHealth.healthScore();
 						return new Pair<>(shardName, guildPortion + healthPortion);
@@ -156,7 +156,7 @@ public class ShardSorterCommand {
 			} else {
 				shardPriorityValues = possibleShards.stream()
 					.map(shardName -> {
-						ShardHealthUtils.ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shardName);
+						ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shardName);
 						return new Pair<>(shardName, 100 * shardHealth.healthScore());
 					})
 					.sorted((a, b) -> (int) (b.getValue() - a.getValue()))

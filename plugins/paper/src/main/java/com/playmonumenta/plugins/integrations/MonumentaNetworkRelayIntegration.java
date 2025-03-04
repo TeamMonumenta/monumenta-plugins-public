@@ -16,7 +16,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.ShardHealthUtils.ShardHealth;
+import com.playmonumenta.plugins.shardhealth.ShardHealth;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -201,13 +201,13 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void gatherHeartbeatData(GatherHeartbeatDataEvent event) {
 		JsonObject data = new JsonObject();
-		data.add("shard_health", ShardHealth.currentHealth().toJson());
+		data.add("shard_health", ShardHealth.averageHealth().toJson());
 		event.setPluginData(MAIN_PLUGIN_HEARTBEAT_IDENTIFIER, data);
 	}
 
 	public static ShardHealth remoteShardHealth(String shardName) {
 		if (shardName.equals(ServerProperties.getShardName())) {
-			return ShardHealth.currentHealth();
+			return ShardHealth.averageHealth();
 		}
 
 		MonumentaNetworkRelayIntegration instance = INSTANCE;
