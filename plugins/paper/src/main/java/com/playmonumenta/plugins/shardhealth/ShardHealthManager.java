@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins.shardhealth;
 
+import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
+import dev.jorel.commandapi.arguments.TextArgument;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +31,52 @@ public class ShardHealthManager {
 	private static @Nullable BukkitRunnable mRunnable = null;
 	private static int mRotatingShardHealthLastUpdate = 0;
 	private static final List<ShardHealth> mRotatingShardHealth = new ArrayList<>();
+
+	public static void registerCommands() {
+		CommandAPICommand instantSubcommand = new CommandAPICommand("instant")
+			.executes((sender, args) -> {
+				sender.sendMessage(Component.text("", NamedTextColor.GOLD).append(ShardHealth.instantHealth()));
+			});
+
+		CommandAPICommand averageSubcommand = new CommandAPICommand("average")
+			.executes((sender, args) -> {
+				sender.sendMessage(Component.text("", NamedTextColor.GOLD).append(ShardHealth.averageHealth()));
+			});
+
+		CommandAPICommand averageDebugSubcommand = new CommandAPICommand("averagedebug")
+			.executes((sender, args) -> {
+				sender.sendMessage(Component.text("Rotating shard health length: " + mRotatingShardHealth.size(), NamedTextColor.GOLD));
+				int i = 0;
+				Iterator<ShardHealth> it = previousInstantHealthIterator();
+				while (it.hasNext()) {
+					i++;
+					it.next();
+				}
+				sender.sendMessage(Component.text("Iterator size: " + i, NamedTextColor.GOLD));
+			});
+
+		CommandAPICommand remoteSubcommand = new CommandAPICommand("remote")
+			.withArguments(new TextArgument("shard")
+				.replaceSuggestions(ArgumentSuggestions.strings(
+					info -> NetworkRelayAPI.getOnlineShardNames().toArray(String[]::new))))
+			.executes((sender, args) -> {
+				String shard = args.getUnchecked("shard");
+				ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shard);
+				if (shardHealth == null) {
+					sender.sendMessage(Component.text("No such shard " + shard, NamedTextColor.RED));
+					return;
+				}
+				sender.sendMessage(Component.text("", NamedTextColor.GOLD).append(shardHealth));
+			});
+
+		new CommandAPICommand("shardhealth")
+			.withPermission("monumenta.command.shardhealth")
+			.withSubcommand(instantSubcommand)
+			.withSubcommand(averageSubcommand)
+			.withSubcommand(averageDebugSubcommand)
+			.withSubcommand(remoteSubcommand)
+			.register();
+	}
 
 	/**
 	 * Pause execution until shard performance improves enough to continue
@@ -241,9 +291,15 @@ public class ShardHealthManager {
 	 * @return An iterator of previous shard health
 	 */
 	public static Iterator<ShardHealth> previousInstantHealthIterator() {
+		int initialRawIndex = mRotatingShardHealthLastUpdate - 1;
+		if (initialRawIndex < 0) {
+			initialRawIndex += mRotatingShardHealth.size();
+		}
+		int finalInitialRawIndex = initialRawIndex;
+
 		return new Iterator<>() {
 			int mRemaining = mRotatingShardHealth.size() - 1;
-			int mRawIndex = mRotatingShardHealthLastUpdate;
+			int mRawIndex = finalInitialRawIndex;
 
 			@Override
 			public boolean hasNext() {
@@ -252,9 +308,13 @@ public class ShardHealthManager {
 
 			@Override
 			public ShardHealth next() {
+				ShardHealth result = mRotatingShardHealth.get(mRawIndex);
 				mRawIndex--;
+				if (mRawIndex < 0) {
+					mRawIndex += mRotatingShardHealth.size();
+				}
 				mRemaining--;
-				return mRotatingShardHealth.get(mRawIndex);
+				return result;
 			}
 		};
 	}

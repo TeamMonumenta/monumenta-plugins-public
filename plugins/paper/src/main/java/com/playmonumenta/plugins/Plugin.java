@@ -330,6 +330,7 @@ public class Plugin extends JavaPlugin {
 		SetMasterwork.register();
 		SkillDescription.register(this);
 		SkillSummary.register(this);
+		ShardHealthManager.registerCommands();
 		ShardSorterCommand.register();
 		SimulateLoot.register(this);
 		SpawnerCountCommand.register();

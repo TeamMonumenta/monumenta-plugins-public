@@ -3,14 +3,17 @@ package com.playmonumenta.plugins.shardhealth;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import java.util.Iterator;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ShardHealth {
+public class ShardHealth implements ComponentLike {
 	private @Nullable Double mHealthScore = null;
 	private double mMemoryHealth;
 	private double mTickHealth;
 
-	private ShardHealth(double memoryHealth, double tickHealth) {
+	protected ShardHealth(double memoryHealth, double tickHealth) {
 		mMemoryHealth = memoryHealth;
 		mTickHealth = tickHealth;
 	}
@@ -146,5 +149,16 @@ public class ShardHealth {
 	public ShardHealth healthScore(@Nullable Double healthScore) {
 		mHealthScore = healthScore;
 		return this;
+	}
+
+	@Override
+	public @NotNull Component asComponent() {
+		return Component.empty()
+			.append(Component.text(String.format("%5.1f%% Shard Health (lags/crashes at 0, only devs see this)", 100 * healthScore())))
+			.append(Component.newline())
+			.append(Component.text(String.format("- %5.1f%% Memory Available", 100 * memoryHealth())))
+			.append(Component.newline())
+			.append(Component.text(String.format("- %5.1f%% Tick Spent Idle", 100 * tickHealth())))
+			;
 	}
 }
