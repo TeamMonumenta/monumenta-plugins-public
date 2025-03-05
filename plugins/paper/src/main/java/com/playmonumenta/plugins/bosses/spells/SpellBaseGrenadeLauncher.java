@@ -83,7 +83,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0, 0.0, null, null);
+			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.LibraryPool.EMPTY, 0.7f, 0.0, 0.0, null, null);
 	}
 
 	public SpellBaseGrenadeLauncher(
@@ -154,7 +154,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0f, 0.0f, additionalParameters, telegraphAesthetics);
+			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, LoSPool.LibraryPool.EMPTY, 0.7f, 0.0f, 0.0f, additionalParameters, telegraphAesthetics);
 	}
 
 	/*

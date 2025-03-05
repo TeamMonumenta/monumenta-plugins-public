@@ -40,19 +40,19 @@ public class WormBoss extends BossAbilityGroup {
 		public double SEGMENT_DISTANCE = 0.8;
 
 		@BossParam(help = "Pool from which to take body segments. If not set, will use a copy of the main mob without passengers. These should probably have the delve immune tag.")
-		public LoSPool BODY_POOL = LoSPool.EMPTY;
+		public LoSPool BODY_POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "Pool from which to take the tail segment. If not set, will use a copy of the main mob without passengers. These should probably have the delve immune tag.")
-		public LoSPool TAIL_POOL = LoSPool.EMPTY;
+		public LoSPool TAIL_POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "Pool from which to take body passengers.")
-		public LoSPool BODY_PASSENGER_POOL = LoSPool.EMPTY;
+		public LoSPool BODY_PASSENGER_POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "How often to place a body passenger (e.g. 3 = every third segment). The first is placed after this many body segments.")
 		public int BODY_PASSENGER_INTERVAL = 1;
 
 		@BossParam(help = "Pool from which to take the tail passenger.")
-		public LoSPool TAIL_PASSENGER_POOL = LoSPool.EMPTY;
+		public LoSPool TAIL_PASSENGER_POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "Size of the body entities (for slimes etc.). -1 to use the head's size. Does not affect body segments if a mob pool is used for body segments.")
 		public int BODY_SIZE = -1;
