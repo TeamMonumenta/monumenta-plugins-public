@@ -68,7 +68,7 @@ public class Quake implements Enchantment {
 				return;
 			}
 
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(target.getLocation(), RADIUS);
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobsInSphere(target.getLocation(), RADIUS, player);
 
 			//Get enchant levels on weapon
 			int fire = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.FIRE_ASPECT);
