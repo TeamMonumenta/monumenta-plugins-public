@@ -35,29 +35,25 @@ public final class ItemDropListener implements Listener {
 	public static final String COMMAND = "disabledrop";
 	public static final String ALIAS = "dd";
 
-	private static final String TIERED_TAG = "DisableDropTiered";
-	private static final String LORE_TAG = "DisableDropLore";
-	private static final String INTERESTING_TAG = "DisableDropInteresting";
-	private static final String ALL_TAG = "DisableDropAll";
-	private static final String EQUIPPED_TAG = "DisableDropEquipped";
-
-	private enum Mode {
-		NONE(null, item -> false),
-		TIERED(TIERED_TAG, item -> {
+	public enum Mode {
+		NONE(null, "None", item -> false),
+		TIERED("DisableDropTiered", "Tiered items", item -> {
 			Tier tier = ItemStatUtils.getTier(item);
 			return tier != Tier.NONE && tier != Tier.CURRENCY && tier != Tier.KEYTIER;
 		}),
-		LORE(LORE_TAG, item -> ItemUtils.hasLore(item) || ItemUtils.isShulkerBox(item.getType())),
-		INTERESTING(INTERESTING_TAG, ItemUtils::isInteresting),
-		ALL(ALL_TAG, item -> true),
-		EQUIPPED(EQUIPPED_TAG, item -> false);
+		LORE("DisableDropLore", "Items with lore", item -> ItemUtils.hasLore(item) || ItemUtils.isShulkerBox(item.getType())),
+		INTERESTING("DisableDropInteresting", "Interesting items", ItemUtils::isInteresting),
+		ALL("DisableDropAll", "All items", item -> true),
+		EQUIPPED("DisableDropEquipped", "Equipped items (hotbar + equipment)", item -> false);
 
 		@Nullable
 		private final String mTag;
+		public final String mDisplayName;
 		private final Predicate<ItemStack> mPredicate;
 
-		Mode(@Nullable String tag, Predicate<ItemStack> mPredicate) {
+		Mode(@Nullable String tag, String displayName, Predicate<ItemStack> mPredicate) {
 			mTag = tag;
+			this.mDisplayName = displayName;
 			this.mPredicate = mPredicate;
 		}
 
@@ -66,7 +62,7 @@ public final class ItemDropListener implements Listener {
 		}
 	}
 
-	private static Mode getPlayerMode(Player player) {
+	public static Mode getPlayerMode(Player player) {
 		final var res = Arrays.stream(Mode.values())
 			.filter(x -> x.mTag != null && ScoreboardUtils.checkTag(player, x.mTag))
 			.findFirst()
@@ -75,7 +71,7 @@ public final class ItemDropListener implements Listener {
 		return res;
 	}
 
-	private static void setPlayerMode(Player player, Mode mode) {
+	public static void setPlayerMode(Player player, Mode mode) {
 		for (Mode x : Mode.values()) {
 			if (x.mTag != null) {
 				player.getScoreboardTags().remove(x.mTag);

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.guis.FishingDifficultyGui;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
 import com.playmonumenta.plugins.guis.MusicGui;
 import com.playmonumenta.plugins.guis.classselection.ClassSelectionGui;
+import com.playmonumenta.plugins.guis.peb.PebGui;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.listeners.IchorListener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -81,7 +82,7 @@ public class CustomInventoryCommands {
 		new CommandAPICommand("openpeb")
 			.withPermission("monumenta.command.openpeb")
 			.executesPlayer((player, args) -> {
-				new PEBCustomInventory(player).openInventory(player, plugin);
+				new PebGui(player).open();
 			})
 			.register();
 
@@ -90,7 +91,7 @@ public class CustomInventoryCommands {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
-				new PEBCustomInventory(player).openInventory(player, plugin);
+				new PebGui(player).open();
 			})
 			.register();
 

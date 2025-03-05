@@ -101,7 +101,7 @@ public class GlowingCommand {
 		};
 
 		private final String mDescription;
-		private final int mPackedIndex;
+		public final int mPackedIndex;
 
 		Option(String description, int packedIndex) {
 			if (packedIndex >= 32) {

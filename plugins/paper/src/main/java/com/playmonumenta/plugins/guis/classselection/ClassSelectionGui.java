@@ -445,7 +445,8 @@ public class ClassSelectionGui extends Gui {
 					player.playSound(player, Sound.BLOCK_CHORUS_FLOWER_GROW, SoundCategory.PLAYERS, 1f, 1.5f);
 					break;
 				}
-				default: {}
+				default: {
+				}
 			}
 		}
 

@@ -75,5 +75,4 @@ public class GuiItem {
 	public ItemStack getItem() {
 		return mItem;
 	}
-
 }

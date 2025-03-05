@@ -128,7 +128,7 @@ public class GUIUtils {
 		meta.lore(lines);
 	}
 
-	private static List<Component> splitLoreLine(Component lore, int maxLength) {
+	public static List<Component> splitLoreLine(Component lore, int maxLength) {
 		String mini = MessagingUtils.toMiniMessage(lore);
 		if (mini.isEmpty()) {
 			return new ArrayList<>();

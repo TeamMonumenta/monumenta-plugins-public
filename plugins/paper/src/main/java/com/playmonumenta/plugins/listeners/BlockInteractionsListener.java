@@ -34,7 +34,7 @@ public final class BlockInteractionsListener implements Listener {
 	public static final String COMMAND = "blockinteractions";
 	public static final String ALIAS = "bi";
 
-	private static final String DISABLE_TAG = "DisableBlockInteractions";
+	public static final String DISABLE_TAG = "DisableBlockInteractions";
 
 	private static final EnumSet<Material> INTERACTABLES = EnumSet.of(
 		Material.LOOM,

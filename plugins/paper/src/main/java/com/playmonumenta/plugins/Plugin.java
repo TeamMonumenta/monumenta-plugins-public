@@ -29,6 +29,7 @@ import com.playmonumenta.plugins.fishing.FishingCombatManager;
 import com.playmonumenta.plugins.fishing.FishingManager;
 import com.playmonumenta.plugins.gallery.GalleryCommands;
 import com.playmonumenta.plugins.gallery.GalleryManager;
+import com.playmonumenta.plugins.guis.lib.GuiListener;
 import com.playmonumenta.plugins.hexfall.HexfallListener;
 import com.playmonumenta.plugins.infinitytower.TowerCommands;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
@@ -580,6 +581,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new WinterListener(), this);
 		new SpawnerVisualisation().register();
 		manager.registerEvents(MailMan.getInstance(), this);
+		manager.registerEvents(new GuiListener(), this);
 		PlayerTitleManager.start();
 
 		if (ServerProperties.getDepthsEnabled()) {

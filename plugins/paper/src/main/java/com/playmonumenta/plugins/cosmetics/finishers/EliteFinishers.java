@@ -19,8 +19,8 @@ import org.bukkit.scoreboard.Team;
 
 public class EliteFinishers {
 
-	private static final String FINISHER_GLOW_TAG = "finisherGlow";
-	private static final String FINISHER_SHOW_TAG = "finisherShow";
+	public static final String FINISHER_GLOW_TAG = "finisherGlow";
+	public static final String FINISHER_SHOW_TAG = "finisherShow";
 
 	private static final ImmutableMap<String, EliteFinisher> FINISHERS =
 		ImmutableMap.<String, EliteFinisher>builder()

@@ -57,7 +57,7 @@ import org.jetbrains.annotations.Nullable;
 public class PotionConsumeListener implements Listener {
 	private static final int DRINK_TICK_DELAY = 4; //How many ticks between each slurp sound
 	private static final int DRINK_DURATION = 24; //Ticks of total drinking
-	private static final String INVENTORY_DRINK_TAG = "InventoryDrinkTag"; //Tag to enable this feature (drink from inventory right click)
+	public static final String INVENTORY_DRINK_TAG = "InventoryDrinkTag"; //Tag to enable this feature (drink from inventory right click)
 	private static final String INVENTORY_DRINK_SLOW_EFFECT_NAME = "InventoryDrinkSlowEffect";
 	private static final ImmutableMap<EffectType, Double> COOLDOWN_EFFECTS = ImmutableMap.<EffectType, Double>builder()
 		.put(EffectType.INSTANT_HEALTH, 0d)
