@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -78,6 +79,7 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 				mBoss.setGlowing(true);
 
 				List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
+				List<LivingEntity> hitTargets = new ArrayList<>();
 				Vector dir = LocationUtils.getDirectionTo(targets.get(0).getLocation(), mBoss.getLocation());
 				Location tloc = mBoss.getLocation().setDirection(dir);
 
@@ -120,7 +122,8 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 									BoundingBox box = BoundingBox.of(l, 0.4, 2, 0.4);
 
 									for (LivingEntity target : targets) {
-										if (target.getBoundingBox().overlaps(box)) {
+										if (target.getBoundingBox().overlaps(box) && !hitTargets.contains(target)) {
+											hitTargets.add(target);
 											int debuffCount = 0;
 
 											// Count vanilla effects
