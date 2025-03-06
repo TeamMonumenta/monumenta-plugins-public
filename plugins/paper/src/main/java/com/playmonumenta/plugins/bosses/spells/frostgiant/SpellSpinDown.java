@@ -56,6 +56,10 @@ public final class SpellSpinDown extends Spell {
 
 	@Override
 	public void run() {
+		if (mFrostGiant.getArenaParticipants().isEmpty()) {
+			return;
+		}
+
 		mCooldown = true;
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, Constants.TICKS_PER_SECOND * 30);
 

@@ -26,9 +26,10 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.Lootable;
 
-public class SpellBlockBreak extends Spell {
+public final class SpellBlockBreak extends Spell {
 	public static final int DEFAULT_REQUIRED_SCORE = 6;
 	public boolean mIsActive = true;
+
 	private static final int HEIGHT_BELOW_WORLD = 100;
 	private final Entity mLauncher;
 	private final List<Material> mNoBreak;

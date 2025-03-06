@@ -8,11 +8,14 @@ import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-public class BlockBreakBoss extends BossAbilityGroup {
+public final class BlockBreakBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blockbreak";
-	public static final int detectionRange = 40;
 
+	@BossParam(help = "The launcher gains the ability to break blocks that obstructs its path. Certain blocks cannot be broken")
 	public static class Parameters extends BossParameters {
+		@BossParam(help = "Range in blocks that players must be in before this passive spell will run")
+		public int DETECTION = 40;
+
 		@BossParam(help = "Whether or not the mob's bounding box affects the range of where blocks are destroyed")
 		public boolean ADAPT_TO_BOUNDING_BOX = false;
 
@@ -20,11 +23,11 @@ public class BlockBreakBoss extends BossAbilityGroup {
 		public boolean ALLOW_FOOTLEVEL_BREAK = false;
 	}
 
-	public BlockBreakBoss(Plugin plugin, LivingEntity boss) {
+	public BlockBreakBoss(final Plugin plugin, final LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
-		List<Spell> passiveSpells = List.of(new SpellBlockBreak(boss, p.ADAPT_TO_BOUNDING_BOX, p.ALLOW_FOOTLEVEL_BREAK));
+		final Parameters p = Parameters.getParameters(mBoss, identityTag, new Parameters());
+		final List<Spell> passiveSpells = List.of(new SpellBlockBreak(mBoss, p.ADAPT_TO_BOUNDING_BOX, p.ALLOW_FOOTLEVEL_BREAK));
 
-		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, p.DETECTION, null);
 	}
 }

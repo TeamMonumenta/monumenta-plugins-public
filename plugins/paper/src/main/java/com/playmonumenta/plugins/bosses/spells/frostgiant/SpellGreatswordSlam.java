@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -127,7 +128,7 @@ public final class SpellGreatswordSlam extends Spell {
 		/* TODO: This runnable should probably get a rewrite so it's not a mess of nested code but it is brittle and I don't want to deal with it */
 		final BukkitRunnable jumpRunnable = new BukkitRunnable() {
 			int mT = 0;
-			final List<Player> mHitPlayers = new ArrayList<>();
+			final List<UUID> mHitPlayers = new ArrayList<>();
 
 			@Override
 			public void run() {
@@ -192,7 +193,7 @@ public final class SpellGreatswordSlam extends Spell {
 										}
 									}
 
-									final BoundingBox box = BoundingBox.of(l, 1, 3.65, 1);
+									final BoundingBox box = BoundingBox.of(l, 1, 5, 1);
 									boxes.add(box);
 									final FallingBlock fallBlock = mWorld.spawn(l.add(0, 0.4, 0), FallingBlock.class,
 										CreatureSpawnEvent.SpawnReason.CUSTOM, (final FallingBlock ice) -> {
@@ -218,11 +219,11 @@ public final class SpellGreatswordSlam extends Spell {
 								}
 								for (final Player player : mFrostGiant.getArenaParticipants()) {
 									for (final BoundingBox box : boxes) {
-										if (player.getBoundingBox().overlaps(box) && !mHitPlayers.contains(player)) {
-											DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, SPELL_NAME);
+										if (player.getBoundingBox().overlaps(box) && !mHitPlayers.contains(player.getUniqueId())) {
+											DamageUtils.damage(mBoss, player, DamageType.MAGIC, 36, null, false, false, SPELL_NAME);
 											AbilityUtils.silencePlayer(player, Constants.TICKS_PER_SECOND * 5);
 											MovementUtils.knockAway(bossLoc, player, 0f, 1.5f, false);
-											mHitPlayers.add(player);
+											mHitPlayers.add(player.getUniqueId());
 											break;
 										}
 									}

@@ -17,7 +17,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-public class SpellBlightCheese extends Spell {
+public final class SpellBlightCheese extends Spell {
 	int mT = 0;
 	LivingEntity mBoss;
 	Location mCenter;

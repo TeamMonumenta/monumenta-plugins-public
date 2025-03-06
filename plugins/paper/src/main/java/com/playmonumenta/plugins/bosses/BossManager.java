@@ -236,7 +236,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(LeapBoss.identityTag, LeapBoss::new);
 		registerStatelessBoss(BarrierBoss.identityTag, BarrierBoss::new, new BarrierBoss.Parameters());
 		registerStatelessBoss(CrowdControlResistanceBoss.identityTag, CrowdControlResistanceBoss::new, new CrowdControlResistanceBoss.Parameters());
-		registerStatelessBoss(MeteorSlamBoss.identityTag, MeteorSlamBoss::new, new MeteorSlamBoss.Parameters());
 		registerStatelessBoss(SwingBoss.identityTag, SwingBoss::new, new SwingBoss.Parameters());
 		registerStatelessBoss(MistMob.identityTag, MistMob::new);
 		registerStatelessBoss(FrostGiantIcicle.identityTag, FrostGiantIcicle::new);
@@ -250,7 +249,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(CoordinatedAttackBoss.identityTag, CoordinatedAttackBoss::new, new CoordinatedAttackBoss.Parameters());
 		registerStatelessBoss(ShiftingBoss.identityTag, ShiftingBoss::new);
 		registerStatelessBoss(BulletHellBoss.identityTag, BulletHellBoss::new, new BulletHellBoss.Parameters());
-		registerStatelessBoss(CarapaceBoss.identityTag, CarapaceBoss::new);
 		registerStatelessBoss(KamikazeBoss.identityTag, KamikazeBoss::new);
 		registerStatelessBoss(TinyBombTossBoss.identityTag, TinyBombTossBoss::new);
 		registerStatelessBoss(AntiRangeBoss.identityTag, AntiRangeBoss::new, new AntiRangeBoss.Parameters());

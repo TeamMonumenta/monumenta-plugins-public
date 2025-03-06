@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.parameters;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.AbstractPartialParticle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.MMLog;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -19,7 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class ParticlesList {
-	private static final EnumSet<Particle> PARTICLES_WITH_PARAMETERS = EnumSet.of(Particle.REDSTONE, Particle.ITEM_CRACK, Particle.BLOCK_CRACK, Particle.BLOCK_CRACK, Particle.FALLING_DUST, Particle.DUST_COLOR_TRANSITION);
+	private static final EnumSet<Particle> PARTICLES_WITH_PARAMETERS = EnumSet.of(Particle.REDSTONE, Particle.ITEM_CRACK, Particle.BLOCK_CRACK, Particle.FALLING_DUST, Particle.DUST_COLOR_TRANSITION);
 
 	public static class CParticle {
 		public Particle mParticle;
@@ -112,8 +113,7 @@ public class ParticlesList {
 			try {
 				new PartialParticle(mParticle, loc, mCount, dx, dy, dz, extra1, extra2).spawnAsEntityActive(boss);
 			} catch (Exception e) {
-				Plugin.getInstance().getLogger().warning("Failed to spawn a particle at loc. Reason: " + e.getMessage());
-				e.printStackTrace();
+				MMLog.warning(() -> "Failed to spawn a particle at loc. Reason: " + e.getMessage());
 			}
 		}
 	}
@@ -158,10 +158,10 @@ public class ParticlesList {
 
 	@Override
 	public String toString() {
-		String msg = "[";
+		StringBuilder msg = new StringBuilder("[");
 		boolean first = true;
 		for (CParticle cParticle : mParticleList) {
-			msg = msg + (first ? "" : ",") + cParticle.toString();
+			msg.append(first ? "" : ",").append(cParticle.toString());
 			first = false;
 		}
 		return msg + "]";
@@ -170,7 +170,7 @@ public class ParticlesList {
 	public static ParticlesList fromString(String string) {
 		ParseResult<ParticlesList> result = fromReader(new StringReader(string), "");
 		if (result.getResult() == null) {
-			Plugin.getInstance().getLogger().warning("Failed to parse '" + string + "' as ParticlesList");
+			MMLog.warning(() -> "Failed to parse '" + string + "' as ParticlesList");
 			Thread.dumpStack();
 			return new ParticlesList(new ArrayList<>(0));
 		}
@@ -321,7 +321,6 @@ public class ParticlesList {
 
 				// End of this particle, loop to next
 				particlesList.add(new CParticle(particle, count.intValue(), dx, dy, dz, velocity));
-				continue;
 			} else {
 				if (!reader.advance(",")) {
 					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "Specify particle-specific parameters")));
@@ -387,7 +386,6 @@ public class ParticlesList {
 
 					// End of this particle, loop to next
 					particlesList.add(new CParticle(particle, count.intValue(), dx, dy, dz, velocity, data));
-					continue;
 				} else {
 					// All other supported parameter particles take a material
 					Material mat = reader.readMaterial();
@@ -412,7 +410,6 @@ public class ParticlesList {
 					} else {
 						particlesList.add(new CParticle(particle, count.intValue(), dx, dy, dz, velocity, mat.createBlockData()));
 					}
-					continue;
 				}
 			}
 		}

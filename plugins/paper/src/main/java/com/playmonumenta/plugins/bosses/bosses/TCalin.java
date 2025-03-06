@@ -176,9 +176,15 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(bolt, charge, aoe));
 
 		List<Spell> passiveSpells = List.of(
-			new SpellBaseAura(mBoss, 8, 5, 8, 10, Particle.FALLING_DUST,
-				Material.ANVIL.createBlockData(), (Player player) ->
-				player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 60, 0, true, true))
+			new SpellBaseAura(mBoss, 8, 5,
+				// Summon particles on boss
+				(final Entity launcher) ->
+					new PartialParticle(Particle.FALLING_DUST, launcher.getLocation().add(0, 1, 0)).count(2)
+						.delta(1).data(Material.ANVIL.createBlockData()).spawnAsEntityActive(launcher),
+				// Effect to apply to each player
+				(final Player player) ->
+				player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 60, 0, true, true)),
+				false
 			)
 		);
 

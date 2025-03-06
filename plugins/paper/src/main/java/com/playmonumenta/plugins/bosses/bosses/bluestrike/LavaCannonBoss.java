@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -89,8 +88,8 @@ public class LavaCannonBoss extends BossAbilityGroup {
 		mPWarning3 = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 10, 0.25, 0.25, 0.25, 0, ORANGE);
 		mPWarning4 = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 5, 0.25, 0.25, 0.25, 0);
 
-		List<Spell> passives = Arrays.asList(
-			new SpellBlockBreak(mBoss) // This is going to be interesting
+		List<Spell> passives = List.of(
+			new SpellBlockBreak(mBoss, true, false) // This is going to be interesting
 		);
 
 		super.constructBoss(SpellManager.EMPTY, passives, 100, null);

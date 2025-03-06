@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -17,60 +18,61 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class AvengerBoss extends BossAbilityGroup {
+public final class AvengerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_avenger";
-	public static final String SPEED_MODIFIER = "AvengerBossSpeedModifier";
+	private static final String SPEED_MODIFIER = "AvengerBossSpeedModifier";
 
+	@BossParam(help = "When a nearby living entity dies, the launcher heals and gains buffs to damage and movement speed")
 	public static class Parameters extends BossParameters {
-		@BossParam(help = "not written")
+		@BossParam(help = "Range in blocks that the launcher searches for players before this spell can run")
 		public int DETECTION = 15;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Maximum amount of stacks the launcher can gain. Governs maximum damage and speed effect potency")
 		public int MAX_STACKS = 10;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Radius in blocks in which dying entities heal and buff the launcher")
 		public int RADIUS = 8;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Percent max health the launcher gains on nearby living entity death")
 		public double HEAL_PERCENT = .1;
 
-		@BossParam(help = "not written")
-		public double SPEED_PERCENT_INCREMENT = 0.06; // Capped at x1.6 Speed by default
+		@BossParam(help = "Movement speed effect potency per stack")
+		public double SPEED_PERCENT_INCREMENT = 0.06;
 
-		@BossParam(help = "not written")
-		public double DAMAGE_PERCENT_INCREMENT = 0.2; // Capped at x3 Damage by deafult
+		@BossParam(help = "Damage effect potency per stack. The buff applies to all damage dealt by this launcher")
+		public double DAMAGE_PERCENT_INCREMENT = 0.2;
 
-		@BossParam(help = "Sounds summoned when a nearby mob dies")
+		@BossParam(help = "Sounds played when a nearby living entity dies")
 		public SoundsList SOUND_DEATH = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,0.1,0.8)]");
 
-		@BossParam(help = "Particle summon when a nearby mob dies")
+		@BossParam(help = "Particles summoned when a nearby living entity dies")
 		public ParticlesList PARTICLE_DEATH = ParticlesList.fromString("[(SPELL_WITCH,20)]");
 
-		@BossParam(help = "Particle that moves from death location to boss in a line")
+		@BossParam(help = "Particles that traces a line between a death location and the launcher")
 		public ParticlesList PARTICLE_VECTOR = ParticlesList.fromString("[(VILLAGER_HAPPY,3)]");
 
-		@BossParam(help = "Particle summon at bos when PARTICLE_VECTOR is over")
+		@BossParam(help = "Particles summoned on the launcher when PARTICLE_VECTOR completes")
 		public ParticlesList PARTICLE_BOSS = ParticlesList.fromString("[(CRIT_MAGIC,20)]");
 
-		@BossParam(help = "Particle summon with PARTICLE_BOSS if boss heals")
+		@BossParam(help = "Particles summoned with PARTICLE_BOSS if the launcher heals")
 		public ParticlesList PARTICLE_HEAL = ParticlesList.fromString("[(HEART,3)]");
 
-		@BossParam(help = "Ticks between death and PARTICLE_BOSS")
+		@BossParam(help = "Time in ticks between a nearby living entity death and the launcher gaining health and buffs")
 		public int VECTOR_TICKS = 12;
 	}
 
-	private int mStacks = 0;
 	private final Parameters mParam;
+	private int mStacks = 0;
 
-	public AvengerBoss(Plugin plugin, LivingEntity boss) {
+	public AvengerBoss(final Plugin plugin, final LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mParam = BossParameters.getParameters(boss, identityTag, new Parameters());
+		mParam = BossParameters.getParameters(mBoss, identityTag, new Parameters());
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), mParam.DETECTION, null);
 	}
 
 	// Use this instead of the attribute to catch ability damage, ranged damage, etc.
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity damgaee) {
+	public void onDamage(final DamageEvent event, final LivingEntity damgaee) {
 		if (mStacks > 0) {
 			event.setFlatDamage(event.getDamage() * (1 + mStacks * mParam.DAMAGE_PERCENT_INCREMENT));
 		}
@@ -82,56 +84,52 @@ public class AvengerBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void nearbyEntityDeath(EntityDeathEvent event) {
-		if (!event.isCancelled() && mBoss != null && !mBoss.isDead()) {
+	public void nearbyEntityDeath(final EntityDeathEvent event) {
+		if (event.isCancelled() || !mBoss.isValid() || mBoss.isDead()) {
+			return;
+		}
 
-			LivingEntity entity = event.getEntity();
+		// Only trigger when the player kills a mob within range
+		final Location deadLoc = event.getEntity().getLocation();
+		final Location bossLoc = mBoss.getLocation();
+		if (event.getEntity().getKiller() == null || deadLoc.distanceSquared(bossLoc) > mParam.RADIUS * mParam.RADIUS) {
+			return;
+		}
 
-			Location deadLoc = entity.getLocation();
-			Location bossLoc = mBoss.getLocation();
+		mParam.SOUND_DEATH.play(bossLoc, 0.1f, 0.8f);
+		mParam.PARTICLE_DEATH.spawn(mBoss, LocationUtils.getEntityCenter(mBoss), 0.25, 0.45, 0.25, 1);
 
-			// Only trigger when the player kills a mob within range
-			if (entity.getKiller() != null
-				    && entity.getLocation().distance(bossLoc) < mParam.RADIUS) {
-				mParam.SOUND_DEATH.play(bossLoc, 0.1f, 0.8f);
-				mParam.PARTICLE_DEATH.spawn(mBoss, bossLoc.clone().add(0, mBoss.getHeight() / 2, 0), 0.25, 0.45, 0.25, 1);
+		new BukkitRunnable() {
+			int mCount = 0;
+			final int mMaxCount = mParam.VECTOR_TICKS;
 
-				new BukkitRunnable() {
-					int mCount = 0;
-					final int mMaxCount = mParam.VECTOR_TICKS;
+			@Override
+			public void run() {
+				mCount++;
+				final Vector particleVector = mBoss.getEyeLocation().subtract(deadLoc).toVector()
+					.multiply((double) mCount / mMaxCount);
+				mParam.PARTICLE_VECTOR.spawn(mBoss, deadLoc.add(particleVector));
 
-					@Override
-					public void run() {
-						if (mCount >= mMaxCount) {
-							mParam.PARTICLE_BOSS.spawn(mBoss, bossLoc, 20, 1.5, 1.5, 1.5);
-							if (mParam.HEAL_PERCENT > 0) {
-								mParam.PARTICLE_HEAL.spawn(mBoss, bossLoc.clone().add(0, 0.5, 1), 1, 1, 1);
-							}
-							this.cancel();
+				if (mCount >= mMaxCount) {
+					mParam.PARTICLE_BOSS.spawn(mBoss, bossLoc, 20, 1.5, 1.5, 1.5);
+					// Increment stacks, and if cap not hit, increase stats
+					if (mStacks < mParam.MAX_STACKS) {
+						mStacks++;
+
+						final AttributeInstance speed = mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+						if (speed != null) {
+							speed.addModifier(new AttributeModifier(SPEED_MODIFIER, mParam.SPEED_PERCENT_INCREMENT,
+								AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 						}
-
-						Location bossEyeLoc = mBoss.getEyeLocation();
-						Vector particleVector = bossEyeLoc.subtract(deadLoc).toVector().multiply((double) mCount / mMaxCount);
-						mParam.PARTICLE_VECTOR.spawn(mBoss, deadLoc.add(particleVector));
-
-						mCount++;
 					}
-				}.runTaskTimer(mPlugin, 0, 1);
 
-				// Heal the mob
-				EntityUtils.healMob(mBoss, EntityUtils.getMaxHealth(mBoss) * mParam.HEAL_PERCENT);
-
-				// Increment stacks, and if cap not hit, increase stats
-				if (mStacks < mParam.MAX_STACKS) {
-					mStacks++;
-
-					AttributeInstance speed = mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-					if (speed != null) {
-						AttributeModifier modifier = new AttributeModifier(SPEED_MODIFIER, mParam.SPEED_PERCENT_INCREMENT, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
-						speed.addModifier(modifier);
+					if (mParam.HEAL_PERCENT > 0) {
+						EntityUtils.healMob(mBoss, EntityUtils.getMaxHealth(mBoss) * mParam.HEAL_PERCENT);
+						mParam.PARTICLE_HEAL.spawn(mBoss, bossLoc.clone().add(0, 0.5, 0), 1, 1, 1);
 					}
+					this.cancel();
 				}
 			}
-		}
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 }

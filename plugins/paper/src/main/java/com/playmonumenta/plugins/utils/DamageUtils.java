@@ -58,8 +58,7 @@ public class DamageUtils {
 		if (damageType != DamageType.TRUE) {
 			List<Effect> effects = Plugin.getInstance().mEffectManager.getEffects(entity);
 			if (effects != null && effects.stream().anyMatch(effect -> effect instanceof PercentDamageReceived dre
-				                                                           && dre.getMagnitude() <= -1
-				                                                           && (dre.getAffectedDamageTypes() == null || dre.getAffectedDamageTypes().contains(damageType)))) {
+				&& dre.getMagnitude() <= -1 && (dre.getAffectedDamageTypes() == null || dre.getAffectedDamageTypes().contains(damageType)))) {
 				return true;
 			}
 		}
@@ -88,7 +87,8 @@ public class DamageUtils {
 	 * @param ability       ClassAbility causing the damage, pass null if not applicable
 	 * @param bypassIFrames whether the damage should bypass IFrames
 	 */
-	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount, @Nullable ClassAbility ability, boolean bypassIFrames) {
+	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount,
+							  @Nullable ClassAbility ability, boolean bypassIFrames) {
 		damage(damager, damagee, type, amount, ability, bypassIFrames, false);
 	}
 
@@ -103,7 +103,8 @@ public class DamageUtils {
 	 * @param bypassIFrames  whether the damage should bypass IFrames
 	 * @param causeKnockback whether the damage should cause knockback
 	 */
-	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount, @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback) {
+	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount,
+							  @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback) {
 		damage(damager, damagee, type, amount, ability, bypassIFrames, causeKnockback, null);
 	}
 
@@ -119,8 +120,11 @@ public class DamageUtils {
 	 * @param causeKnockback whether the damage should cause knockback
 	 * @param bossCause      string to pass for boss death messages
 	 */
-	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount, @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback, @Nullable String bossCause) {
-		damage(damager, damagee, new DamageEvent.Metadata(type, ability, null, bossCause), amount, bypassIFrames, causeKnockback, false);
+	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount,
+							  @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback,
+							  @Nullable String bossCause) {
+		damage(damager, damagee, new DamageEvent.Metadata(type, ability, null, bossCause), amount,
+			bypassIFrames, causeKnockback, false);
 	}
 
 	/**
@@ -136,8 +140,8 @@ public class DamageUtils {
 	 * @param causeKnockback whether the damage should cause knockback
 	 * @param blockable      Whether the damage can be blocked with a shield
 	 */
-	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageEvent.Metadata metadata, double amount, boolean bypassIFrames, boolean causeKnockback, boolean blockable) {
-
+	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageEvent.Metadata metadata,
+							  double amount, boolean bypassIFrames, boolean causeKnockback, boolean blockable) {
 		if (!damagee.isValid() || damagee.isInvulnerable()) {
 			return;
 		}
@@ -180,17 +184,4 @@ public class DamageUtils {
 			}
 		}
 	}
-
-	/*
-	TODO - fix dualTypeDamage not working
-	public static void dualTypeDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double amount, double percentType1) {
-		dualTypeDamage(damager, damagee, type1, type2, amount, percentType1, null, false, true, null);
-	}
-
-	public static void dualTypeDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double amount, double percentType1, @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback, @Nullable String bossCause) {
-		int originalIFrames = damagee.getNoDamageTicks();
-		damage(damager, damagee, type1, amount * percentType1, ability, bypassIFrames, causeKnockback, bossCause);
-		damagee.setNoDamageTicks(originalIFrames);
-		damage(damager, damagee, type2, amount * (1 - percentType1), ability, bypassIFrames, causeKnockback, bossCause);
-	}*/
 }

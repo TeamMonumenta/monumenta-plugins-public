@@ -28,7 +28,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class SpellShuraDagger extends Spell {
+public final class SpellShuraDagger extends Spell {
 
 	private final LivingEntity mBoss;
 	private final Plugin mPlugin;

@@ -26,6 +26,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class BossUtils {
 
 	/**
@@ -126,10 +128,6 @@ public class BossUtils {
 		return bossDamagePercent(boss, target, percentHealth, location, false, null, true);
 	}
 
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw) {
-		return bossDamagePercent(boss, target, percentHealth, location, raw, null, true);
-	}
-
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable String cause) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, cause, true);
 	}
@@ -138,18 +136,11 @@ public class BossUtils {
 		return bossDamagePercent(boss, target, percentHealth, location, false, cause, true);
 	}
 
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable String cause, boolean knockback) {
-		return bossDamagePercent(boss, target, percentHealth, null, false, cause, knockback);
-	}
-
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
-		return bossDamagePercent(boss, target, percentHealth, location, raw, cause, true);
-	}
-
 	/*
-	 * Returns whether or not the player survived (true) or was killed (false)
+	 * Returns whether the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause, boolean knockback) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth,
+											@Nullable Location location, boolean raw, @Nullable String cause, boolean knockback) {
 		if (percentHealth <= 0) {
 			return true;
 		}
@@ -233,11 +224,10 @@ public class BossUtils {
 
 	/**
 	 * Adds modifiers to the existing map from the string
-	 *
 	 * @param s   a string like "[damage=10, cooldown=60, detectionrange=80, singletarget=true....]
-	 * @param map the map where the values ​​will be added
+	 * @param map the map where the values will be added
 	 */
-	public static void addModifiersFromString(Map<String, String> map, String s) {
+	public static void addModifiersFromString(final Map<String, String> map, String s) {
 		if (!s.startsWith("[")) {
 			return;
 		}
@@ -256,22 +246,13 @@ public class BossUtils {
 		for (int i = 0; i < s.length(); i++) {
 			charAtI = s.charAt(i);
 			switch (charAtI) {
-				case '[':
-					squareBrackets++;
-					break;
-				case ']':
-					squareBrackets--;
-					break;
-				case '(':
-					roundBrackets++;
-					break;
-				case ')':
-					roundBrackets--;
-					break;
-				case '"':
-					quoteCount = (quoteCount + 1) % 2;
-					break;
-				default:
+				case '[' -> squareBrackets++;
+				case ']' -> squareBrackets--;
+				case '(' -> roundBrackets++;
+				case ')' -> roundBrackets--;
+				case '"' -> quoteCount = (quoteCount + 1) % 2;
+				default -> {
+				}
 			}
 
 			if (squareBrackets == 0 && roundBrackets == 0 && quoteCount == 0 && charAtI == ',') {
@@ -279,29 +260,29 @@ public class BossUtils {
 				if (toMap.length == 2) {
 					map.put(toMap[0].replace(" ", "").toLowerCase(Locale.getDefault()), toMap[1]);
 				} else {
-					Plugin.getInstance().getLogger().warning("Fail to load: " + s.substring(lastSplitIndex, i) + ". Illegal declaration");
+					MMLog.warning("Fail to load: " + s.substring(lastSplitIndex, i) + ". Illegal declaration");
 				}
 				lastSplitIndex = i + 1;
 			}
 		}
 
 		if (squareBrackets == 0 && roundBrackets == 0 && quoteCount == 0 && lastSplitIndex != s.length()) {
-			toMap = s.substring(lastSplitIndex, s.length()).split("=");
+			toMap = s.substring(lastSplitIndex).split("=");
 			if (toMap.length == 2) {
 				map.put(toMap[0].replace(" ", "").toLowerCase(Locale.getDefault()), toMap[1]);
 			} else {
-				Plugin.getInstance().getLogger().warning("Fail to load: [" + String.join(",", toMap) + "]. Illegal declaration");
+				MMLog.warning("Fail to load: [" + String.join(",", toMap) + "]. Illegal declaration");
 			}
 		} else {
-			Plugin.getInstance().getLogger().warning("Fail too many brackets/quote inside: " + s);
+			MMLog.warning("Fail too many brackets/quote inside: " + s);
 		}
 	}
 
-	public static String translateFieldNameToTag(String fieldName) {
+	public static String translateFieldNameToTag(final String fieldName) {
 		return fieldName.toLowerCase(Locale.getDefault()).replaceAll("[^a-z0-9]", "");
 	}
 
-	public static boolean checkParametersStringProperty(String tag) throws Exception {
+	public static void checkParametersStringProperty(final String tag) throws Exception {
 		int roundBrackets = 0;
 		int squareBrackets = 0;
 		boolean doubleQuote = false;
@@ -309,48 +290,35 @@ public class BossUtils {
 		for (int i = 0; i < tag.length(); i++) {
 			char c = tag.charAt(i);
 			switch (c) {
-				case '[' -> {
-					squareBrackets = doubleQuote ? squareBrackets : squareBrackets + 1;
-				}
-				case ']' -> {
-					squareBrackets = doubleQuote ? squareBrackets : squareBrackets - 1;
-				}
-				case '(' -> {
-					roundBrackets = doubleQuote ? roundBrackets : roundBrackets + 1;
-				}
-				case ')' -> {
-					roundBrackets = doubleQuote ? roundBrackets : roundBrackets - 1;
-				}
-				case '"' -> {
-					doubleQuote = !doubleQuote;
-				}
+				case '[' -> squareBrackets = doubleQuote ? squareBrackets : squareBrackets + 1;
+				case ']' -> squareBrackets = doubleQuote ? squareBrackets : squareBrackets - 1;
+				case '(' -> roundBrackets = doubleQuote ? roundBrackets : roundBrackets + 1;
+				case ')' -> roundBrackets = doubleQuote ? roundBrackets : roundBrackets - 1;
+				case '"' -> doubleQuote = !doubleQuote;
 				default -> {
 				}
 			}
 		}
 
 		if (roundBrackets != 0) {
-			throw new Exception("too many round brackets () " + roundBrackets);
+			throw new Exception("unmatched parentheses () " + roundBrackets);
 		}
 
 		if (squareBrackets != 0) {
-			throw new Exception("too many square brackets [] " + squareBrackets);
+			throw new Exception("unmatched square brackets [] " + squareBrackets);
 		}
 
 		if (doubleQuote) {
-			throw new Exception("too many double_Quote \" ");
+			throw new Exception("unmatched quotation marks \" ");
 		}
-
-		return true;
-
 	}
 
 	@SuppressWarnings("unchecked")
-	public static @Nullable <T extends BossAbilityGroup> T getBossOfClass(Entity entity, Class<T> cls) {
-		BossManager bossManager = BossManager.getInstance();
+	public static @Nullable <T extends BossAbilityGroup> T getBossOfClass(final Entity entity, final Class<T> cls) {
+		final BossManager bossManager = BossManager.getInstance();
 		if (bossManager != null) {
-			List<BossAbilityGroup> abilities = BossManager.getInstance().getAbilities(entity);
-			for (BossAbilityGroup ability : abilities) {
+			final List<BossAbilityGroup> abilities = BossManager.getInstance().getAbilities(entity);
+			for (final BossAbilityGroup ability : abilities) {
 				if (ability.getClass() == cls) {
 					return (T) ability;
 				}
@@ -359,10 +327,10 @@ public class BossUtils {
 		return null;
 	}
 
-	public static int getBlueTimeOfDay(Entity entity) {
+	public static int getBlueTimeOfDay(final Entity entity) {
 		int timeOfDay = 0;
 		if (ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
-			long time = entity.getWorld().getTime();
+			final long time = entity.getWorld().getTime();
 			timeOfDay = (int) Math.floor(time / 6000.0);
 
 			// Pretty sure Time ranges from 0 to 23999, but just in case...
@@ -373,21 +341,20 @@ public class BossUtils {
 		return timeOfDay;
 	}
 
-	public static void hideBossBar(BossBar bar, World world) {
-		for (Player player : world.getPlayers()) {
-			player.hideBossBar(bar);
-		}
+	public static void hideBossBar(final BossBar bar, final World world) {
+		world.getPlayers().forEach(player -> player.hideBossBar(bar));
 	}
 
-	public static void endBossFightEffects(List<Player> players) {
-		endBossFightEffects(null, players, 10 * 20, false, false);
+	public static void endBossFightEffects(final List<Player> players) {
+		endBossFightEffects(null, players, TICKS_PER_SECOND * 10, false, false);
 	}
 
-	public static void endBossFightEffects(@Nullable LivingEntity boss, List<Player> players) {
-		endBossFightEffects(boss, players, 10 * 20, false, false);
+	public static void endBossFightEffects(final @Nullable LivingEntity boss, final List<Player> players) {
+		endBossFightEffects(boss, players, TICKS_PER_SECOND * 10, false, false);
 	}
 
-	public static void endBossFightEffects(@Nullable LivingEntity boss, List<Player> players, int winEffectDuration) {
+	public static void endBossFightEffects(final @Nullable LivingEntity boss, final List<Player> players,
+										   final int winEffectDuration) {
 		endBossFightEffects(boss, players, winEffectDuration, false, false);
 	}
 
@@ -400,7 +367,9 @@ public class BossUtils {
 	 * @param keepBossAlive If true, make boss invulnerable, remove its AI, remove gravity, etc. Defaults to false
 	 * @param removeGlowing If true, remove glowing effect from boss. Defaults to false
 	 */
-	public static void endBossFightEffects(@Nullable LivingEntity boss, List<Player> players, int winEffectDuration, boolean keepBossAlive, boolean removeGlowing) {
+	public static void endBossFightEffects(final @Nullable LivingEntity boss, final List<Player> players,
+										   final int winEffectDuration, final boolean keepBossAlive,
+										   final boolean removeGlowing) {
 		final String BOSS_WIN_RESISTANCE = "BossWinResistance";
 		final String BOSS_WIN_REGENERATION = "BossWinRegeneration";
 		final int REGENERATION_INTERVAL = 12;
@@ -415,7 +384,7 @@ public class BossUtils {
 				boss.setSilent(true);
 				Plugin.getInstance().mEffectManager.clearEffects(boss, PercentDamageReceived.GENERIC_NAME);
 				Plugin.getInstance().mEffectManager.addEffect(boss, PercentDamageReceived.GENERIC_NAME,
-					new PercentDamageReceived(20 * 60, -1.0));
+					new PercentDamageReceived(TICKS_PER_SECOND * 60, -1.0));
 			}
 
 			if (removeGlowing) {
@@ -424,7 +393,7 @@ public class BossUtils {
 			}
 		}
 
-		for (Player player : players) {
+		for (final Player player : players) {
 			Plugin.getInstance().mEffectManager.addEffect(player, BOSS_WIN_RESISTANCE,
 				new PercentDamageReceived(winEffectDuration, -1.0));
 			Plugin.getInstance().mEffectManager.addEffect(player, BOSS_WIN_REGENERATION,

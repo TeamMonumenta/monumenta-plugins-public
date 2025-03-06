@@ -1,21 +1,21 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class SpellBarrier extends Spell {
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
+public class SpellBarrier extends Spell {
 	public static final double CARAPACE_DAMAGE_MODIFIER = 1.3;
 
 	@FunctionalInterface
@@ -62,8 +62,9 @@ public class SpellBarrier extends Spell {
 	private boolean mActive = false;
 	private int mTimer = 0;
 
-	public SpellBarrier(Plugin plugin, LivingEntity boss, int detectionRadius, int rechargeTime, int hitsToBreak, boolean isCarapace, RefreshBarrierAction refreshAction, BarrierRunningAmbientAction ambientRunningAction,
-	                    BreakBarrierAction breakAction) {
+	public SpellBarrier(final Plugin plugin, final LivingEntity boss, final int detectionRadius, final int rechargeTime,
+						final int hitsToBreak, final boolean isCarapace, final RefreshBarrierAction refreshAction,
+						final BarrierRunningAmbientAction ambientRunningAction, final BreakBarrierAction breakAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mActivationRadius = detectionRadius;
@@ -80,7 +81,7 @@ public class SpellBarrier extends Spell {
 		// Might as well not activate it outside of line of sight
 		boolean hasLineOfSight = false;
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mActivationRadius * 4, true)) {
-			if (LocationUtils.hasLineOfSight(mBoss, player)) {
+			if (mBoss.hasLineOfSight(player)) {
 				hasLineOfSight = true;
 				break;
 			}
@@ -89,57 +90,51 @@ public class SpellBarrier extends Spell {
 			return;
 		}
 
-		//Activates once every 5 ticks
-		mTimer -= 5;
+		mTimer -= BossAbilityGroup.PASSIVE_RUN_INTERVAL_DEFAULT;
 		if (!mActive && mTimer <= 0) {
 			mTimer = mRechargeTime;
 			mActive = true;
-			Location loc = mBoss.getLocation();
-			mRefreshAction.run(loc);
+			mRefreshAction.run(mBoss.getLocation());
 			BukkitRunnable runnable = new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (mBoss == null || mBoss.isDead() || !mBoss.isValid() || !mActive) {
+					if (mBoss.isDead() || !mBoss.isValid() || !mActive) {
 						this.cancel();
 					}
 					mBoss.removePotionEffect(PotionEffectType.POISON);
 					mBoss.removePotionEffect(PotionEffectType.WITHER);
-					Location location = mBoss.getLocation();
+					final Location location = mBoss.getLocation();
 					for (double i = 0; i < 360; i += 15) {
 						double radian1 = Math.toRadians(i);
 						location.add(FastUtils.cos(radian1), 0, FastUtils.sin(radian1));
 						mRunningAmbientAction.run(location);
 						location.subtract(FastUtils.cos(radian1), 0, FastUtils.sin(radian1));
 					}
-
 				}
 			};
-			runnable.runTaskTimer(mPlugin, 0, 20 * 1);
+			runnable.runTaskTimer(mPlugin, 0, TICKS_PER_SECOND);
 			mActiveRunnables.add(runnable);
 		}
 	}
 
 	@Override
-	public void onHurt(DamageEvent event) {
+	public void onHurt(final DamageEvent event) {
 		if (mActive) {
-			Location loc = mBoss.getLocation();
+			event.setCancelled(true);
 			mCurrentHits++;
-			if (mCurrentHits == mHitsToBreak) {
+			if (mCurrentHits >= mHitsToBreak) {
 				mCurrentHits = 0;
-				mBreakAction.run(loc);
-				event.setCancelled(true);
 				mActive = false;
 				mTimer = mRechargeTime;
+				mBreakAction.run(mBoss.getLocation());
 				return;
 			}
-			event.setCancelled(true);
-			World world = mBoss.getWorld();
-			world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 1, 1);
+			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 1, 1);
 		}
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity damagee) {
+	public void onDamage(final DamageEvent event, final LivingEntity damagee) {
 		if (mActive && mIsCarapace) {
 			event.setFlatDamage(event.getFlatDamage() * CARAPACE_DAMAGE_MODIFIER);
 		}

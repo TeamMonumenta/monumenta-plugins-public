@@ -23,20 +23,20 @@ public class SwingBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_swing";
 
 	public static class Parameters extends BossParameters {
-		@BossParam(help = "not written")
+		@BossParam(help = "Range in blocks that the launcher searches for players to target with this spell")
 		public int DETECTION = 30;
-		@BossParam(help = "not written")
+		@BossParam(help = "Radius in blocks in which players are damaged when the launcher completes casting")
 		public int RADIUS = 3;
-		@BossParam(help = "not written")
+		@BossParam(help = "Time in ticks between the launcher spawning and the first attempt to cast this spell")
 		public int DELAY = 5 * 20;
-		@BossParam(help = "not written")
+		@BossParam(help = "Time in ticks it takes for this spell to complete its cast")
 		public int DURATION = 15;
-		@BossParam(help = "not written")
+		@BossParam(help = "Time in ticks the launcher waits before casting any other spell when this spell is cast")
 		public int COOLDOWN = 20 * 14;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Melee damage dealt")
 		public int DAMAGE = 30;
-		@BossParam(help = "not written")
+		@BossParam(help = "Percent health True damage dealt")
 		public double DAMAGE_PERCENT = 0.0;
 		@BossParam(help = "Effects applied to players hit by the swing")
 		public EffectsList EFFECTS = EffectsList.EMPTY;

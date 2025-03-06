@@ -16,7 +16,7 @@ import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class SpellShuraPassiveSummon extends Spell {
+public final class SpellShuraPassiveSummon extends Spell {
 	private Plugin mPlugin;
 	private Location mCenter;
 	private int mRadius = 16;

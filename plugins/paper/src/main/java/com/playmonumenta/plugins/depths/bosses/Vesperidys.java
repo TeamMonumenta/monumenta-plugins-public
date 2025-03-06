@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -1462,7 +1463,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 	}
 
 	public void dealPercentageAndCorruptionDamage(Player player, double percentDamage, String cause) {
-		BossUtils.bossDamagePercent(mBoss, player, DepthsParty.getAscensionScaledDamage(percentDamage * crystalDamageMultiplier(), mParty), cause, false);
+		final double damageAmount = DepthsParty.getAscensionScaledDamage(percentDamage * crystalDamageMultiplier(), mParty);
+		DamageUtils.damage(mBoss, player, new DamageEvent.Metadata(DamageEvent.DamageType.TRUE, null,
+			null, cause), damageAmount, true, false, false);
 		if (mMonuPlugin.mEffectManager.hasEffect(player, VoidCorruption.class)) {
 			mMonuPlugin.mEffectManager.getEffects(player, VoidCorruption.class).last().addCorruption(Math.max(1, (int) Math.round(percentDamage * 10 * 5)));
 		}

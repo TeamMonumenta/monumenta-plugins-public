@@ -71,6 +71,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PlayerUtils {
 	public static final String SCOREBOARD_RING_UNLOCK = "R3Access";
+	public static final double BASE_JUMP_HEIGHT = 1.2523;
 
 	public static void callAbilityCastEvent(Player player, Ability ability, ClassAbility spell) {
 		AbilityCastEvent event = new AbilityCastEvent(player, ability, spell);
@@ -574,7 +575,7 @@ public class PlayerUtils {
 	public static double getJumpHeight(Player player) {
 		PotionEffect jump = player.getPotionEffect(PotionEffectType.JUMP);
 		double jumpLevel = (jump == null ? -1 : jump.getAmplifier());
-		return jumpLevel < 0 ? 1.2523 : 0.0308354 * jumpLevel * jumpLevel + 0.744631 * jumpLevel + 1.836131; //
+		return jumpLevel < 0 ? BASE_JUMP_HEIGHT : 0.0308354 * jumpLevel * jumpLevel + 0.744631 * jumpLevel + 1.836131;
 		// Quadratic function taken from mc wiki - thanks mojank!
 	}
 

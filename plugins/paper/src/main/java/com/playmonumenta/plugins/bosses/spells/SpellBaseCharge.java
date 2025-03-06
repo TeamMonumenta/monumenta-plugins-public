@@ -32,16 +32,6 @@ public class SpellBaseCharge extends Spell {
 	}
 
 	@FunctionalInterface
-	public interface WarningParticles {
-		/**
-		 * Particles to indicate the path of the boss's charge
-		 *
-		 * @param loc Location to spawn a particle
-		 */
-		void run(Location loc);
-	}
-
-	@FunctionalInterface
 	public interface StartAction {
 		/**
 		 * Action run when the boss begins the attack
@@ -110,12 +100,6 @@ public class SpellBaseCharge extends Spell {
 	                       @Nullable WarningAction warning, @Nullable ParticleAction warnParticles, @Nullable StartAction start,
 	                       @Nullable HitPlayerAction hitPlayer, @Nullable ParticleAction particle, EndAction end) {
 		this(plugin, boss, range, 160, chargeTicks, false, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
-	}
-
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks,
-	                       @Nullable WarningAction warning, @Nullable ParticleAction warnParticles, @Nullable StartAction start,
-	                       @Nullable HitPlayerAction hitPlayer, @Nullable ParticleAction particle, @Nullable EndAction end) {
-		this(plugin, boss, range, cooldown, chargeTicks, false, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks, boolean stopOnFirstHit,
@@ -235,8 +219,8 @@ public class SpellBaseCharge extends Spell {
 	 * pass through a block. Needed because block.isSolid includes carpets
 	 * @param block The block being checked
 	 */
-	public static boolean passable(Block block) {
-		return block.isPassable() || !block.isSolid();
+	private static boolean notPassable(Block block) {
+		return !block.isPassable() && block.isSolid();
 	}
 
 	/**
@@ -253,8 +237,8 @@ public class SpellBaseCharge extends Spell {
 	 * @param teleBoss       Boolean indicating whether the boss should actually be teleported to the end
 	 * @param stopOnFirstHit Boolean indicating whether the boss should damage only one player at a time
 	 */
-	public static boolean doCharge(LivingEntity target, Entity charger, Location targetLoc, List<? extends LivingEntity> validTargets, @Nullable StartAction start,
-	                               @Nullable ParticleAction particle, @Nullable HitPlayerAction hitPlayer, @Nullable EndAction end, boolean teleBoss, boolean stopOnFirstHit, double yStartAdd) {
+	public static void doCharge(LivingEntity target, Entity charger, Location targetLoc, List<? extends LivingEntity> validTargets, @Nullable StartAction start,
+								@Nullable ParticleAction particle, @Nullable HitPlayerAction hitPlayer, @Nullable EndAction end, boolean teleBoss, boolean stopOnFirstHit, double yStartAdd) {
 		final Location launLoc;
 		if (charger instanceof LivingEntity le) {
 			launLoc = le.getEyeLocation().add(0, yStartAdd, 0);
@@ -274,7 +258,6 @@ public class SpellBaseCharge extends Spell {
 		}
 
 		LivingEntity switchAggro = target;
-		boolean chargeHitsPlayer = false;
 		boolean cancel = false;
 		BoundingBox box = charger.getBoundingBox();
 		List<LivingEntity> hitEntities = new ArrayList<>();
@@ -302,7 +285,7 @@ public class SpellBaseCharge extends Spell {
 				}
 			}
 
-			if (!cancel && (!passable(endLoc.getBlock()) || !passable(endLoc1.getBlock()))) {
+			if (!cancel && (notPassable(endLoc.getBlock()) || notPassable(endLoc1.getBlock()))) {
 				// No longer air - need to go back a bit so we don't tele the boss into a block
 				endLoc.subtract(baseVect.multiply(1));
 				// Charge terminated at a block
@@ -318,7 +301,6 @@ public class SpellBaseCharge extends Spell {
 				}
 				if (player.getWorld() == charger.getWorld() && player.getLocation().distance(endLoc) < 1.8F) {
 					// Hit player - mark this and continue
-					chargeHitsPlayer = true;
 					switchAggro = player;
 
 					if (hitPlayer != null) {
@@ -349,7 +331,6 @@ public class SpellBaseCharge extends Spell {
 			end.run();
 		}
 
-		return chargeHitsPlayer;
 	}
 
 	private void launch(LivingEntity target, List<? extends LivingEntity> targets) {
