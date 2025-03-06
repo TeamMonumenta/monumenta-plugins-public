@@ -69,8 +69,9 @@ public class FishingManager implements Listener {
 	private final ArrayList<Player> mPlayerPrepCombatList = new ArrayList<>();
 	private final FishingCombatManager mCombatManager;
 	private static final String LESSER_LOOT_TABLE = "epic:r3/world/fishing/custom_fishing/cache_lesser";
-	private static final String GREATER_LOOT_TABLE = "epic:r3/world/fishing/custom_fishing/cache_greater";
-	private static final String ABYSSAL_LOOT_TABLE = "epic:r3/world/fishing/custom_fishing/cache_abyssal";
+	private static final String GREATER_LOOT_TABLE = "epic:r3/world/fishing/custom_fishing/cache_greater_v2";
+	private static final String ABYSSAL_LOOT_TABLE_TIER_ONE = "epic:r3/world/fishing/custom_fishing/cache_abyssal1_v2";
+	private static final String ABYSSAL_LOOT_TABLE_TIER_TWO = "epic:r3/world/fishing/custom_fishing/cache_abyssal2_v2";
 	private static final String WEIGHTED_FISH_TABLE = "epic:r3/items/fishing/fish/ring_fish_greater_weighted";
 	private static final String FISH_COMBAT_PERMISSION = "monumenta.fishingcombat";
 
@@ -372,8 +373,14 @@ public class FishingManager implements Listener {
 	}
 
 	public static ItemStack getAbyssalChest(int tier) {
+		String lootTable;
+		switch (tier) {
+			case 1 -> lootTable = ABYSSAL_LOOT_TABLE_TIER_ONE;
+			case 2 -> lootTable = ABYSSAL_LOOT_TABLE_TIER_TWO;
+			default -> throw new IllegalArgumentException("Invalid tier: " + tier);
+		}
 		return ChestUtils.giveChestWithLootTable(
-			ABYSSAL_LOOT_TABLE + tier,
+			lootTable,
 			"Architect's Abyssal Fishing Cache " + StringUtils.toRoman(tier),
 			"#26ABBD",
 			List.of(
