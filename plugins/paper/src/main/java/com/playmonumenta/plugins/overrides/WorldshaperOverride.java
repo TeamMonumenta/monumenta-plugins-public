@@ -91,6 +91,19 @@ public class WorldshaperOverride {
 
 		Mode mode = getMode(item);
 		Predicate<Material> occludingException = null;
+
+		if (mode == Mode.DYNAMIC) {
+			float pitch = player.getLocation().getPitch();
+			boolean onSolidBlock = player.getLocation().clone().add(0, -1, 0).getBlock().isSolid();
+
+			if (pitch >= 45 && pitch <= 90) {
+				mode = onSolidBlock ? Mode.BRIDGE : Mode.FLOOR;
+			} else if (pitch >= -45 && pitch <= 45) {
+				mode = Mode.WALL;
+			} else if (pitch >= -90 && pitch <= -45) {
+				mode = onSolidBlock ? Mode.STAIRS : Mode.FLOOR;
+			}
+		}
 		if (mode == Mode.BRIDGE) {
 			cooldown = 2 * 20;
 
@@ -422,7 +435,8 @@ public class WorldshaperOverride {
 		BRIDGE("Bridge", NamedTextColor.GREEN, 1.0f),
 		STAIRS("Stairs", NamedTextColor.LIGHT_PURPLE, 0.9f),
 		WALL("Wall", NamedTextColor.AQUA, 1.1f),
-		FLOOR("Floor", NamedTextColor.GOLD, 1.2f);
+		FLOOR("Floor", NamedTextColor.GOLD, 1.2f),
+		DYNAMIC("Dynamic", NamedTextColor.DARK_PURPLE, 1.3f);
 
 		private final Component mMessage;
 		private final String mPlainMessage;
