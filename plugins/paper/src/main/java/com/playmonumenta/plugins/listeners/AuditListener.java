@@ -102,7 +102,7 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("peb"),
 		exactOptionalArguments("(minecraft:)?player"),
 		exactOptionalArguments("(playerstats|ps)"),
-		exactOptionalArguments("(minecraft:)?plot (access|region)"),
+		exactOptionalArguments("(minecraft:)?plot (help|add|remove|info|info_raw|region)"),
 		exactOptionalArguments("(minecraft:)?race leaderboard"),
 		exactOptionalArguments("(minecraft:)?(rocketjump|rj)"),
 		exactOptionalArguments("(minecraft:)?toggleswap"),
@@ -118,7 +118,7 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("(minecraft:)?(friend|f) [^ ]+_other"),
 		exactOptionalArguments("(minecraft:)?guild mod"),
 		exactOptionalArguments("(minecraft:)?mail mod"),
-		exactOptionalArguments("(minecraft:)?plot access [^ ]+_other")
+		exactOptionalArguments("(minecraft:)?plot [^ ]+_other")
 	);
 
 	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<>();

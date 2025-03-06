@@ -82,6 +82,7 @@ import com.playmonumenta.plugins.particle.ParticleManager;
 import com.playmonumenta.plugins.player.PlayerSaturationTracker;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.plots.AnimalLimits;
+import com.playmonumenta.plugins.plots.PlotCommand;
 import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.plots.ShopManager;
 import com.playmonumenta.plugins.poi.POICommands;
@@ -389,7 +390,7 @@ public class Plugin extends JavaPlugin {
 		}
 
 		/* Plot commands are valid on all shards */
-		PlotManager.registerCommands();
+		PlotCommand.register();
 
 		mJunkItemsListener = new JunkItemListener();
 		mItemDropListener = new ItemDropListener();
@@ -509,6 +510,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(mPlayerListener, this);
 		manager.registerEvents(new UsernameManager(), this);
 		manager.registerEvents(new SocialManager(), this);
+		manager.registerEvents(new PlotManager(), this);
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, mAbilityManager), this);
 		manager.registerEvents(new VehicleListener(this), this);
