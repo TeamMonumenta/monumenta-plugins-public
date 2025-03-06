@@ -200,7 +200,6 @@ public class Plugin extends JavaPlugin {
 	public PzeroManager mPzeroManager;
 	public ShulkerEquipmentListener mShulkerEquipmentListener;
 	public PlayerListener mPlayerListener;
-	public UsernameManager mUsernameManager;
 	public GrapplingListener mGrapplingListener;
 	public @Nullable AuditListener mAuditListener = null;
 	private @Nullable CustomLogger mLogger = null;
@@ -453,7 +452,6 @@ public class Plugin extends JavaPlugin {
 		mPzeroManager = new PzeroManager();
 		mShulkerEquipmentListener = new ShulkerEquipmentListener(this);
 		mPlayerListener = new PlayerListener(this);
-		mUsernameManager = new UsernameManager(this);
 		mGrapplingListener = new GrapplingListener();
 
 		new ClientModHandler(this);
@@ -509,7 +507,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new AnimalLimits(), this);
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(mPlayerListener, this);
-		manager.registerEvents(mUsernameManager, this);
+		manager.registerEvents(new UsernameManager(), this);
 		manager.registerEvents(new SocialManager(), this);
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, mAbilityManager), this);
