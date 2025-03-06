@@ -64,6 +64,7 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 
 				if (mKillMountOnNoPassenger && passengers.isEmpty()) {
 					boss.setHealth(0);
+					boss.remove();
 				} else {
 					for (Entity entity : passengers) {
 						if (entity instanceof LivingEntity livingEntity) {
