@@ -268,7 +268,7 @@ public class BossTagCommand {
 							.withArguments(
 								new EntitySelectorArgument.ManyEntities("bosses"),
 								new GreedyStringArgument("triggerKey"))
-							.executesPlayer((player, args) -> {
+							.executes((sender, args) -> {
 								String triggerKey = args.getUnchecked("triggerKey");
 								BossManager bossManager = BossManager.getInstance();
 								PhasesManagerBoss boss;
