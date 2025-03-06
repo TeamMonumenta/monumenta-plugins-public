@@ -2,11 +2,14 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 
 import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.List;
 import java.util.Set;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -21,6 +24,7 @@ public class EliteFinishers {
 
 	public static final String FINISHER_GLOW_TAG = "finisherGlow";
 	public static final String FINISHER_SHOW_TAG = "finisherShow";
+	public static final String FINISHER_HIDE_OTHER_TAG = "finisherHideOthers";
 
 	private static final ImmutableMap<String, EliteFinisher> FINISHERS =
 		ImmutableMap.<String, EliteFinisher>builder()
@@ -85,15 +89,16 @@ public class EliteFinishers {
 		mClonedKilledMob.addScoreboardTag("SkillImmune");
 		boolean hasGlowTag = p.getScoreboardTags().contains(FINISHER_GLOW_TAG);
 		boolean hasShowTag = p.getScoreboardTags().contains(FINISHER_SHOW_TAG);
-
+		List<Player> otherPlayers = PlayerUtils.playersInRange(mClonedKilledMob.getLocation(), 8 * 16, true, true);
+		otherPlayers.remove(p);
+		otherPlayers.forEach(player -> {
+			if (player.getScoreboardTags().contains(FINISHER_HIDE_OTHER_TAG)) {
+				player.hideEntity(Plugin.getInstance(), mClonedKilledMob);
+			}
+		});
 		if (hasGlowTag && hasShowTag) {
 			// Both tags present: hide everything
-			GlowingManager.clearAll(mClonedKilledMob);
-			mClonedKilledMob.setInvisible(true);
-			EntityEquipment equipment = mClonedKilledMob.getEquipment();
-			if (equipment != null) {
-				equipment.clear();
-			}
+			mClonedKilledMob.setVisibleByDefault(false);
 		} else if (hasGlowTag) {
 			// Only Glow Tag present: show glowing and hide mob
 			GlowingManager.startGlowing(mClonedKilledMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);

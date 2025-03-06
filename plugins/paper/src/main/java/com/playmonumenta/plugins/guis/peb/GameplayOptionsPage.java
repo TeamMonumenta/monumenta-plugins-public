@@ -48,7 +48,7 @@ final class GameplayOptionsPage extends PebPage {
 		}
 	}
 
-	private enum EliteFinisherSetting {
+	private enum EliteFinisherSelfSetting {
 		GLOW_SHOW(true, true),
 		GLOW_HIDE(true, false),
 		NO_GLOW_SHOW(false, true),
@@ -57,12 +57,12 @@ final class GameplayOptionsPage extends PebPage {
 		private final boolean mGlow;
 		private final boolean mShow;
 
-		EliteFinisherSetting(boolean glow, boolean show) {
+		EliteFinisherSelfSetting(boolean glow, boolean show) {
 			this.mGlow = glow;
 			this.mShow = show;
 		}
 
-		private static EliteFinisherSetting get(Player player) {
+		private static EliteFinisherSelfSetting get(Player player) {
 			boolean glow = ScoreboardUtils.checkTag(player, EliteFinishers.FINISHER_GLOW_TAG);
 			boolean show = ScoreboardUtils.checkTag(player, EliteFinishers.FINISHER_SHOW_TAG);
 
@@ -168,15 +168,21 @@ final class GameplayOptionsPage extends PebPage {
 
 		entry(
 			Material.ZOMBIE_HEAD,
-			"Cloned Finisher Elites Visibility",
-			"Click to toggle whether cloned elites in finishers glow and are visible."
+			"Cloned Finisher Elites Visibility - Self",
+			"Click to toggle whether your cloned elites in finishers glow and are visible."
 		).cycle(
-			ReactiveValue.fromEnum(mGui, EliteFinisherSetting.class, EliteFinisherSetting::get, EliteFinisherSetting::set),
+			ReactiveValue.fromEnum(mGui, EliteFinisherSelfSetting.class, EliteFinisherSelfSetting::get, EliteFinisherSelfSetting::set),
 			"Show and Glow",
 			"Hide and Glow",
 			"Show and Don't Glow",
 			"Hide completely"
 		).set(3, 6);
+
+		entry(
+			Material.SKELETON_SKULL,
+			"Cloned Finisher Elites Visibility - Other",
+			"Click to toggle whether other players' cloned elites in finishers glow and are visible."
+		).invertedToggle("Show Others' Elite Finisher Clone: ", ReactiveValue.tag(mGui, EliteFinishers.FINISHER_HIDE_OTHER_TAG)).set(4, 6);
 
 		entry(
 			Material.ENDER_EYE,
