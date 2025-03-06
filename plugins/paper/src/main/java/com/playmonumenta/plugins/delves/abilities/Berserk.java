@@ -31,7 +31,7 @@ public class Berserk {
 	public static final String DESCRIPTION = "Go berserk by building up a combo.";
 	private static final int MAX_KILL_TIME = 7 * 20;
 	private static final int MIN_KILL_TIME = 3 * 20;
-	private static final double COMBO_MULTI = 0.01;
+	private static final double COMBO_MULTI = 0.03;
 	private static final Map<Player, Integer> berserkCombo = new HashMap<>();
 	private static final Map<Player, BukkitTask> activeBerserk = new HashMap<>();
 	private static final String sourceName = "berserkEffect";
