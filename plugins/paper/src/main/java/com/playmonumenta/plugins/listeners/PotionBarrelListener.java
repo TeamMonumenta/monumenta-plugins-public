@@ -267,7 +267,7 @@ public class PotionBarrelListener implements Listener {
 		event.setCancelled(true);
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		Block clickedBlock = event.getClickedBlock();
 		if (event.getAction() == Action.LEFT_CLICK_BLOCK
@@ -289,10 +289,12 @@ public class PotionBarrelListener implements Listener {
 				int numChests = InventoryUtils.numInInventory(playerInventory, new ItemStack(Material.CHEST));
 				if (numChests == 0) {
 					player.sendMessage(Component.text("You need chests in your inventory to make Carriers!", NamedTextColor.RED));
+					event.setCancelled(true);
 					return;
 				}
 				int remainingSpace = InventoryUtils.numEmptySlots(playerInventory);
 				if (remainingSpace == 0 && numChests != 1) {
+					event.setCancelled(true);
 					return;
 				}
 				boolean festive = ShulkerShortcutListener.isFestivePurpleTesseract(playerInventory.getItemInMainHand());
@@ -317,9 +319,11 @@ public class PotionBarrelListener implements Listener {
 							item.setAmount(item.getAmount() - 27 + carryOver);
 							carryOver = 0;
 							if (makeOne) {
+								event.setCancelled(true);
 								return;
 							}
 							if (numChests <= 0 || remainingSpace < 0 || (remainingSpace == 0 && numChests != 1)) {
+								event.setCancelled(true);
 								return;
 							}
 						}
@@ -347,6 +351,7 @@ public class PotionBarrelListener implements Listener {
 				} else {
 					player.sendMessage(Component.text("This Potion barrel is currently empty!", NamedTextColor.RED));
 				}
+				event.setCancelled(true);
 				return;
 			}
 			if (player.isSneaking()) {
@@ -649,7 +654,7 @@ public class PotionBarrelListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void plockPlaceEvent(BlockPlaceEvent event) {
+	public void blockPlaceEvent(BlockPlaceEvent event) {
 		if (isPotionBarrel(event.getBlock())
 				&& !isValidShard()) {
 			event.setCancelled(true);
@@ -663,7 +668,7 @@ public class PotionBarrelListener implements Listener {
 			ItemStack potionBarrel = InventoryUtils.getItemFromLootTable(event.getBlock().getLocation(), POTION_BARREL_LOOT_TABLE);
 			if (potionBarrel != null) {
 				event.getItems().removeIf(item -> item.getItemStack().getType() == Material.BARREL);
-				event.getItems().add(event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation().add(0.5, 0, 0.5), potionBarrel));
+				event.getItems().add(event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation().toCenterLocation(), potionBarrel));
 			}
 		}
 	}
