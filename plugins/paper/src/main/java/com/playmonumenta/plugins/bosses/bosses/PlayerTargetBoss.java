@@ -24,7 +24,7 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 	public PlayerTargetBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 		if (!(boss instanceof Mob mob)) {
-			throw new Exception(identityTag + " only works on mobs!");
+			throw new Exception(identityTag + " only works on mobs! Entity name='" + boss.getName() + "', tags=[" + String.join(",", boss.getScoreboardTags()) + "]");
 		}
 
 		boss.addScoreboardTag("Hostile");
@@ -63,4 +63,3 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 	}
 
 }
-

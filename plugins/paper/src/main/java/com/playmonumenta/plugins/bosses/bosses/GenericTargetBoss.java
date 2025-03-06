@@ -30,7 +30,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 	public GenericTargetBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 		if (!(boss instanceof Mob mob)) {
-			throw new Exception(identityTag + " only works on mobs!");
+			throw new Exception(identityTag + " only works on mobs! Entity name='" + boss.getName() + "', tags=[" + String.join(",", boss.getScoreboardTags()) + "]");
 		}
 
 		if (boss instanceof Wolf || boss instanceof Golem || boss instanceof Dolphin || boss instanceof Ocelot) {
@@ -88,4 +88,3 @@ public class GenericTargetBoss extends BossAbilityGroup {
 	}
 
 }
-

@@ -26,7 +26,7 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		if (!(boss instanceof Snowman)) {
-			throw new Exception("boss_snowballdamage only works on snowmen!");
+			throw new Exception(identityTag + " only works on snowmen! Entity name='" + boss.getName() + "', tags=[" + String.join(",", boss.getScoreboardTags()) + "]");
 		}
 
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());

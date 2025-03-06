@@ -198,6 +198,9 @@ public class SpawnerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public static void spawnerSpawnEvent(SpawnerSpawnEvent event) {
 		CreatureSpawner spawner = event.getSpawner();
+		if (spawner == null) {
+			return;
+		}
 		Block spawnerBlock = spawner.getBlock();
 
 		if (event.getEntity() instanceof LivingEntity mob) {

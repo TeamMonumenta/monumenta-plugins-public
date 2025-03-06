@@ -10,7 +10,6 @@ import de.tr7zw.nbtapi.NBTItem;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -88,7 +87,14 @@ public class LootChestsInInventory implements Listener {
 			return;
 		}
 		//Make an inventory and do some good ol roundabout population of the loot
-		Inventory inventory = Bukkit.createInventory(null, 27, Objects.requireNonNull(item.getItemMeta().displayName()));
+		Component displayName = item.getItemMeta().displayName();
+		if (displayName == null) {
+			player.sendMessage(Component.text("Only chests with names can be opened in inventory. Please report a bug explaining how you obtained this nameless chest that has a loot table.", NamedTextColor.DARK_RED));
+			event.setCancelled(true);
+			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			return;
+		}
+		Inventory inventory = Bukkit.createInventory(null, 27, displayName);
 		LootContext.Builder builder = new LootContext.Builder(player.getLocation());
 		Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, builder.build());
 		item.subtract();

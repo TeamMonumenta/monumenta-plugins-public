@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.tracking;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Silverfish;
 
@@ -30,7 +32,10 @@ public class SilverfishTracking implements EntityTracking {
 			Silverfish silverfish = silverfishIter.next();
 			if (silverfish != null && silverfish.isValid() && silverfish.getLocation().isChunkLoaded()) {
 				if (ZoneUtils.hasZoneProperty(silverfish, ZoneProperty.ADVENTURE_MODE)) {
-					silverfish.remove();
+					// Remove next tick to avoid ConcurrentModificationException
+					Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+						silverfish.remove();
+					});
 					silverfishIter.remove();
 				} else {
 					// Very infrequently check if the silverfish is still actually there

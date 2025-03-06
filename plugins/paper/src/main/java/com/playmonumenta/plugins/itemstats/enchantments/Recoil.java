@@ -58,6 +58,9 @@ public class Recoil implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		ItemStack item = player.getInventory().getItemInMainHand();
+		if (item.getItemMeta() == null) {
+			return;
+		}
 		Collection<AttributeModifier> modifiers = item.getItemMeta().getAttributeModifiers(Attribute.GENERIC_ATTACK_SPEED);
 		boolean hasCumbersome = ItemStatUtils.hasEnchantment(item, EnchantmentType.CUMBERSOME);
 		if (event.getType() == DamageEvent.DamageType.MELEE

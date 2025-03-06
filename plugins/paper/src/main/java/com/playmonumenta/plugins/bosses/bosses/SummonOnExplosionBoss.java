@@ -52,7 +52,7 @@ public class SummonOnExplosionBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		if (!(boss instanceof Creeper)) {
-			throw new Exception("This boss ability can only be used on Creeper!");
+			throw new Exception(identityTag + " only works on creepers! Entity name='" + boss.getName() + "', tags=[" + String.join(",", boss.getScoreboardTags()) + "]");
 		}
 		mParam = BossParameters.getParameters(boss, identityTag, new Parameters());
 

@@ -72,7 +72,8 @@ public class Boss {
 	}
 
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		for (BossAbilityGroup ability : mAbilities) {
+		// Make a copy of the list before iterating as some bosses change their abilities based on a damage threshold
+		for (BossAbilityGroup ability : new ArrayList<>(mAbilities)) {
 			if (!event.isCancelled()) {
 				ability.onDamage(event, damagee);
 				ability.triggerOnSpells(spell -> spell.onDamage(event, damagee));

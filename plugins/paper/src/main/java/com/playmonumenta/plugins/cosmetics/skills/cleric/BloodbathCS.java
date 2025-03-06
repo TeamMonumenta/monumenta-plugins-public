@@ -60,7 +60,7 @@ public class BloodbathCS extends IlluminateCS {
 
 	@Override
 	public void projectileEffects(Player player, Location loc) {
-		Particle.DustOptions color = new Particle.DustOptions(Color.fromRGB(10 * mProjectileTransition, 240 - 10 * mProjectileTransition, 240 - 10 * mProjectileTransition), 1.2f);
+		Particle.DustOptions color = new Particle.DustOptions(Color.fromRGB(Math.min(255, 10 * mProjectileTransition), Math.max(0, 240 - 10 * mProjectileTransition), Math.max(0, 240 - 10 * mProjectileTransition)), 1.2f);
 		Vector front = loc.getDirection().normalize().multiply(0.75);
 		Vector right = VectorUtils.rotateTargetDirection(front, -90, -90);
 		Vector left = VectorUtils.rotateTargetDirection(front, -90, 90);
