@@ -64,6 +64,7 @@ import static com.playmonumenta.plugins.spawners.types.RallySpawner.setRally;
 public class SpawnerListener implements Listener {
 	private static final int PLAYER_LOGOUT_MOB_PERSIST_RADIUS = 20;
 	private static final int PLAYER_LOGOUT_MOB_PERSIST_TICKS = Constants.TEN_MINUTES;
+	public static final String SPAWNER_ADVANCEMENT_PATH = "monumenta:handbook/spawners_/";
 	public static final Map<Location, UUID> spawnerCatMap = new HashMap<>();
 
 
@@ -462,8 +463,8 @@ public class SpawnerListener implements Listener {
 		Player thisPlayer = event.getPlayer();
 		if (SpawnerUtils.hasShieldsAttribute(block)) {
 			// This is a shielded spawner - grant the shield spawner advancement, if not had already
-			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner")) {
-				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner");
+			if (!AdvancementUtils.checkAdvancement(thisPlayer, SPAWNER_ADVANCEMENT_PATH + "shielded_spawner")) {
+				AdvancementUtils.grantAdvancement(thisPlayer, SPAWNER_ADVANCEMENT_PATH + "shielded_spawner");
 			}
 			if (shieldsBefore != 0 && shieldsAfter == 0) {
 				doShieldFullBreakAnimation(blockLoc);
@@ -472,26 +473,15 @@ public class SpawnerListener implements Listener {
 			}
 		}
 
-		if (SpawnerUtils.getSpawnerType(block, SpawnerUtils.GUARDED_ATTRIBUTE) > 0) {
-			// This is a guarded spawner - grant the guarded spawner advancement, if not had already
-			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/guarded_spawner")) {
-				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/guarded_spawner");
-			}
-		}
+		// Advancement grants for some other spawner types
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.GUARDED_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "guarded_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.CAT_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "cat_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.ENSNARED_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "ensnared_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.PROTECTOR_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "protector_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.DECAYING_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "decaying_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.SEQUENCE_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "sequence_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.RALLY_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "rally_spawner");
 
-		if (SpawnerUtils.getSpawnerType(block, SpawnerUtils.CAT_ATTRIBUTE) > 0) {
-			// This is a cat spawner - grant the cat spawner advancement, if not had already
-			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/cat_spawner")) {
-				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/cat_spawner");
-			}
-		}
-
-		if (SpawnerUtils.getSpawnerType(block, SpawnerUtils.ENSNARED_ATTRIBUTE) > 0) {
-			// This is an ensnared spawner - grant the ensnared spawner advancement, if not had already
-			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/ensnared_spawner")) {
-				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/ensnared_spawner");
-			}
-		}
 	}
 
 	// Only fires if the event has not been cancelled by anything else prior.
@@ -507,11 +497,20 @@ public class SpawnerListener implements Listener {
 			SpawnerUtils.removeEffectsDisplayMarker(block);
 			return;
 		}
-		if (SpawnerUtils.getLosPool(block) != null && !AdvancementUtils.checkAdvancement(event.getPlayer(), "monumenta:handbook/spawners_/random_spawner")) {
-			AdvancementUtils.grantAdvancement(event.getPlayer(), "monumenta:handbook/spawners_/random_spawner");
+		if (SpawnerUtils.getLosPool(block) != null && !AdvancementUtils.checkAdvancement(event.getPlayer(), SPAWNER_ADVANCEMENT_PATH + "random_spawner")) {
+			AdvancementUtils.grantAdvancement(event.getPlayer(), SPAWNER_ADVANCEMENT_PATH + "random_spawner");
 		}
 		SpawnerUtils.removeEffectsDisplayMarker(block);
 		SpawnerActionManager.triggerActions(SpawnerUtils.getBreakActionIdentifiers(block), event.getPlayer(), block, mRecentlyBrokenSpawnerLosPool);
+	}
+
+	public static void manageSpawnerAdvancement(Player player, Block block, String type, String path) {
+		if (SpawnerUtils.getSpawnerType(block, type) > 0) {
+			// This is a spawner of the designated type - grant the advancement if not had already!
+			if (!AdvancementUtils.checkAdvancement(player, path)) {
+				AdvancementUtils.grantAdvancement(player, path);
+			}
+		}
 	}
 
 	public static void doShieldBreakAnimation(Location blockLoc, int shields) {
