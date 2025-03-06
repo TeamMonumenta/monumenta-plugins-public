@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class POICommands {
 
-	private static final int UNIQUE_POIS_NEEDED_SKR = 19;
+	private static final int UNIQUE_POIS_NEEDED_SKR = 12;
 
 	public static void register() {
 
@@ -55,7 +55,7 @@ public class POICommands {
 						}
 					}
 					if (conqueredCount >= UNIQUE_POIS_NEEDED_SKR) {
-						player.sendMessage("You find a scroll from ancient times after clearing " + UNIQUE_POIS_NEEDED_SKR + " pois this week.");
+						player.sendMessage(Component.text("You find a scroll from ancient times after clearing " + UNIQUE_POIS_NEEDED_SKR + " POI's this week.", NamedTextColor.GREEN));
 						player.addScoreboardTag("AllPoisConquered");
 						ItemStack item = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r3/dungeons/skr/standard_scroll"));
 						InventoryUtils.giveItem(player, item);

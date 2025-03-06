@@ -94,11 +94,19 @@ public class LootChestsInInventory implements Listener {
 		item.subtract();
 		// Logger for SKR Scrolls
 		if (player.hasPermission(ChestUtils.LOG_SCROLLS_PERMISSION)) {
+			int fragmentCount = 0;
 			for (ItemStack thisItem : loot) {
 				if (ChestUtils.testForScroll(thisItem)) {
 					AuditListener.logPlayer("[Scroll Logger] Player " + player.getName() + " found a SKR Scroll (" + ItemUtils.getPlainNameIfExists(thisItem) + ") in an inventory chest with loot table " + table.toString() + ".");
 					break;
+				} else if (ChestUtils.LOG_SCROLL_FRAGMENTS && InventoryUtils.testForItemWithName(thisItem, "Remnant", false) &&
+					thisItem.getType().name().contains("FLINT")) {
+					fragmentCount++;
 				}
+			}
+			if (fragmentCount >= 1) {
+				// Temp log for scroll fragments
+				AuditListener.logPlayer("[Scroll Fragment Logger] Player " + player.getName() + " found " + fragmentCount + " SKR scroll fragments in an inventory chest with loot table " + table.toString() + ".");
 			}
 		}
 		ChestUtils.generateLootInventory(loot, inventory, player, true);

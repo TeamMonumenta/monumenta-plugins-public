@@ -292,6 +292,9 @@ public class CharmBagGui extends Gui {
 			oneItem.setAmount(1);
 			mCharmBag.add(mPlayer, oneItem);
 			update();
+		} else if (!CharmBagManager.isCharm(currentItem) && (ItemStatUtils.isNormalCharm(currentItem) || ItemStatUtils.isZenithCharm(currentItem))) {
+			mPlayer.sendMessage(Component.text("This type of charm cannot be put into the " + mPlainName, NamedTextColor.RED));
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.7f);
 		}
 	}
 }

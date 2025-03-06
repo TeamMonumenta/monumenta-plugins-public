@@ -196,7 +196,12 @@ public class CharmBagManager implements Listener {
 						player.playSound(player.getLocation(), Sound.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 1.0f, 0.3f);
 						player.sendMessage(Component.text("Item deposited into your " + ItemUtils.getPlainName(charmBagItem), NamedTextColor.GOLD));
 					} else {
-						player.sendMessage(Component.text("This item cannot be put into the " + ItemUtils.getPlainName(charmBagItem), NamedTextColor.RED));
+						// Special error message if the item is a disallowed charm (non-regular tier)
+						if (!isCharm(cursor) && (ItemStatUtils.isNormalCharm(cursor) || ItemStatUtils.isZenithCharm(cursor))) {
+							player.sendMessage(Component.text("This type of charm cannot be put into the " + ItemUtils.getPlainName(charmBagItem), NamedTextColor.RED));
+						} else {
+							player.sendMessage(Component.text("This item cannot be put into the " + ItemUtils.getPlainName(charmBagItem), NamedTextColor.RED));
+						}
 						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					}
 				}

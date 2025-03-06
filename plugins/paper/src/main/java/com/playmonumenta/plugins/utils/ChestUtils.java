@@ -46,6 +46,8 @@ public class ChestUtils {
 	public static final NamespacedKey NON_LOOT_LIMITED
 		= Objects.requireNonNull(NamespacedKey.fromString("monumenta:non_looting_limited"));
 	public static final String LOG_SCROLLS_PERMISSION = "monumenta.log.skrscrolls"; // dictates if SKR scrolls are logged or not when obtained
+	public static final boolean LOG_SCROLL_FRAGMENTS = true;
+
 	private static final double[] BONUS_ITEMS = {
 			0, // Dummy value, this is a player count indexed array
 			0.5,
@@ -245,11 +247,19 @@ public class ChestUtils {
 
 		// Logger for SKR Scrolls
 		if (player.hasPermission(LOG_SCROLLS_PERMISSION)) {
+			int fragmentCount = 0;
 			for (ItemStack thisItem : popLoot) {
 				if (testForScroll(thisItem)) {
 					AuditListener.logPlayer("[Scroll Logger] Player " + player.getName() + " found a SKR Scroll (" + ItemUtils.getPlainNameIfExists(thisItem) + ") in a placed chest with loot table " + lootTable.toString() + ".");
 					break;
+				} else if (LOG_SCROLL_FRAGMENTS && InventoryUtils.testForItemWithName(thisItem, "Remnant", false) &&
+					thisItem.getType().name().contains("FLINT")) {
+					fragmentCount++;
 				}
+			}
+			if (fragmentCount >= 1) {
+				// Temp log for scroll fragments
+				AuditListener.logPlayer("[Scroll Fragment Logger] Player " + player.getName() + " found " + fragmentCount + " SKR scroll fragments in a placed chest with loot table " + lootTable.toString() + ".");
 			}
 		}
 
