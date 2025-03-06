@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +37,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -47,6 +49,7 @@ public class SocialManager implements Listener {
 	//region <DECLARATIONS>
 	// General
 	private static final String AUDIT_LOG_PREFIX = "[Social Manager] ";
+	private static final Map<UUID, PlayerSocialData> SOCIAL_DATA_MAP = new ConcurrentHashMap<>();
 
 	// Friends
 	private static final String REDIS_SOCIAL_TYPE_FRIEND = "listOfFriends";
@@ -243,6 +246,50 @@ public class SocialManager implements Listener {
 			});
 
 			return future;
+		}
+	}
+
+	public static class PlayerSocialData {
+		private final UUID mPlayerUuid;
+		private final Set<UUID> mFriends = ConcurrentHashMap.newKeySet();
+
+		public PlayerSocialData(UUID playerUuid) {
+			mPlayerUuid = playerUuid;
+			loadFriends();
+		}
+
+		public UUID getPlayerUuid() {
+			return mPlayerUuid;
+		}
+
+		public Set<UUID> getFriends() {
+			return mFriends;
+		}
+
+		public void addFriend(UUID friendUuid) {
+			mFriends.add(friendUuid);
+			RedisAPI.getInstance().async().hset(
+				getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, mPlayerUuid),
+				FRIEND_KEY + friendUuid,
+				friendUuid.toString()
+			);
+		}
+
+		public void removeFriend(UUID friendUuid) {
+			mFriends.remove(friendUuid);
+			RedisAPI.getInstance().async().hdel(
+				getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, mPlayerUuid),
+				FRIEND_KEY + friendUuid
+			);
+		}
+
+		private void loadFriends() {
+			RedisAPI.getInstance().async().hgetall(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, mPlayerUuid)).thenAccept(friends -> {
+				friends.forEach((key, value) -> {
+					UUID friendUuid = UUID.fromString(key.split("\\|")[1]);
+					mFriends.add(friendUuid);
+				});
+			});
 		}
 	}
 
@@ -616,6 +663,20 @@ public class SocialManager implements Listener {
 				});
 			});
 		});
+
+		if (getSocialData(playerUuid) == null) {
+			SOCIAL_DATA_MAP.put(playerUuid, new PlayerSocialData(playerUuid));
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	public void onPlayerLogout(PlayerQuitEvent event) {
+		UUID playerUuid = event.getPlayer().getUniqueId();
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			if (Bukkit.getPlayer(playerUuid) == null) {
+				SOCIAL_DATA_MAP.remove(playerUuid);
+			}
+		}, 15 * 20L);
 	}
 
 	//region <RABBITMQ>
@@ -694,6 +755,15 @@ public class SocialManager implements Listener {
 			if (receiver != null) {
 				receiver.sendMessage(appendPrefix(Component.text("You are now friends with " + resolveName(senderUuid) + ".", NamedTextColor.GREEN)));
 			}
+
+			PlayerSocialData senderData = getSocialData(senderUuid);
+			PlayerSocialData receiverData = getSocialData(receiverUuid);
+			if (senderData != null) {
+				senderData.addFriend(receiverUuid);
+			}
+			if (receiverData != null) {
+				receiverData.addFriend(senderUuid);
+			}
 		}
 	}
 
@@ -722,6 +792,15 @@ public class SocialManager implements Listener {
 				// Notify the sender if a moderator forcefully added them as their friend
 				sender.sendMessage(appendPrefix(Component.text("A moderator forcefully made you and " + resolveName(receiverUuid) + " be friends with each other.", NamedTextColor.GREEN)));
 			}
+
+			PlayerSocialData senderData = getSocialData(senderUuid);
+			PlayerSocialData receiverData = getSocialData(receiverUuid);
+			if (senderData != null) {
+				senderData.addFriend(receiverUuid);
+			}
+			if (receiverData != null) {
+				receiverData.addFriend(senderUuid);
+			}
 		}
 	}
 
@@ -741,6 +820,15 @@ public class SocialManager implements Listener {
 			if (receiver != null) {
 				receiver.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " removed you as a friend!", NamedTextColor.RED)));
 			}
+
+			PlayerSocialData senderData = getSocialData(senderUuid);
+			PlayerSocialData receiverData = getSocialData(receiverUuid);
+			if (senderData != null) {
+				senderData.removeFriend(receiverUuid);
+			}
+			if (receiverData != null) {
+				receiverData.removeFriend(senderUuid);
+			}
 		}
 	}
 
@@ -759,6 +847,15 @@ public class SocialManager implements Listener {
 
 			if (receiver != null) {
 				receiver.sendMessage(appendPrefix(Component.text("A moderator forcefully removed you and " + resolveName(senderUuid) + " as friends.", NamedTextColor.RED)));
+			}
+
+			PlayerSocialData senderData = getSocialData(senderUuid);
+			PlayerSocialData receiverData = getSocialData(receiverUuid);
+			if (senderData != null) {
+				senderData.removeFriend(receiverUuid);
+			}
+			if (receiverData != null) {
+				receiverData.removeFriend(senderUuid);
 			}
 		}
 	}
@@ -867,6 +964,11 @@ public class SocialManager implements Listener {
 
 	public static CompletableFuture<Boolean> hasPlayerBlocked(UUID player, UUID blockedPlayer) {
 		return RedisAPI.getInstance().async().hget(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, player), BLOCKED_KEY + blockedPlayer).toCompletableFuture().thenApply(Objects::nonNull);
+	}
+
+	@Nullable
+	public static PlayerSocialData getSocialData(UUID playerUuid) {
+		return SOCIAL_DATA_MAP.get(playerUuid);
 	}
 	//endregion
 }

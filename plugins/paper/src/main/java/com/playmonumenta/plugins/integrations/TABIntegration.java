@@ -582,10 +582,12 @@ public class TABIntegration implements Listener {
 		return layout;
 	}
 
-	private CompletableFuture<Boolean> isFriend(UUID playerUuid, UUID friendUuid) {
+	public static CompletableFuture<Boolean> isFriend(UUID playerOne, UUID playerTwo) {
+		SocialManager.PlayerSocialData playerOneData = SocialManager.getSocialData(playerOne);
+		if (playerOneData != null) {
+			return CompletableFuture.completedFuture(playerOneData.getFriends().contains(playerTwo));
+		}
 		return CompletableFuture.completedFuture(false);
-		// TODO: fix this to be cached, puts too much load on redis and causes data corruption
-		// return SocialManager.areFriends(playerUuid, friendUuid);
 	}
 
 	private void setHeaderAndFooter(TabPlayer viewer, MonumentaPlayer player) {
