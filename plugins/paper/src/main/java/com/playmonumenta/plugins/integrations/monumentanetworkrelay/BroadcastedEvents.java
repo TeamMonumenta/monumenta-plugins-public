@@ -29,7 +29,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -54,7 +53,7 @@ public class BroadcastedEvents implements Listener {
 
 	private static final Argument<String> SHARD_ARGUMENT = new StringArgument("shard");
 	private static final Argument<String> EVENT_NAME_ARGUMENT = new StringArgument("Event Name")
-			.replaceSuggestions(ArgumentSuggestions.strings(KnownEvent.names()));
+		.replaceSuggestions(ArgumentSuggestions.strings(KnownEvent.names()));
 
 	@MonotonicNonNull
 	private static BukkitTask mPeriodicUpdateTask;
@@ -89,77 +88,87 @@ public class BroadcastedEvents implements Listener {
 		CommandAPICommand root = new CommandAPICommand("eventupdate");
 
 		root.withSubcommands(
-				new CommandAPICommand("clear")
-						.withPermission(perms)
-						.withArguments(EVENT_NAME_ARGUMENT)
-						.executes((sender, args) -> {
-							boolean isPlayerSender = sender instanceof Player;
-							if (isPlayerSender && Objects.equals(ServerProperties.getShardName(), "build")) {
-								throw CommandAPI.failWithString("You cannot use this command on the build shard");
-							}
-							String shard;
-							try {
-								shard = NetworkRelayAPI.getShardName();
-							} catch (Exception ex) {
-								//If failed use the short version.
-								shard = ServerProperties.getShardName();
-							}
+			new CommandAPICommand("clear")
+				.withPermission(perms)
+				.withArguments(EVENT_NAME_ARGUMENT)
+				.executes((sender, args) -> {
+					boolean isPlayerSender = sender instanceof Player;
+					if (isPlayerSender && Objects.equals(ServerProperties.getShardName(), "build")) {
+						throw CommandAPI.failWithString("You cannot use this command on the build shard");
+					}
+					String shard = getThisShardName();
 
-							String eventName = args.getUnchecked("Event Name");
-							Integer timeLeft = -1;
+					String eventName = args.getUnchecked("Event Name");
+					int timeLeft = -1;
 
-							runCommandLogic(sender, shard, eventName, timeLeft, isPlayerSender);
-						}),
-				new CommandAPICommand("clear")
-						.withPermission(perms)
-						.withArguments(List.of(SHARD_ARGUMENT, EVENT_NAME_ARGUMENT))
-						.executes((sender, args) -> {
-							boolean isPlayerSender = sender instanceof Player;
-							if (isPlayerSender && Objects.equals(ServerProperties.getShardName(), "build")) {
-								throw CommandAPI.failWithString("You cannot use this command on the build shard");
-							}
+					runCommandLogic(sender, shard, eventName, timeLeft);
+				}),
+			new CommandAPICommand("clear")
+				.withPermission(perms)
+				.withArguments(List.of(SHARD_ARGUMENT, EVENT_NAME_ARGUMENT))
+				.executes((sender, args) -> {
+					boolean isPlayerSender = sender instanceof Player;
+					if (isPlayerSender && Objects.equals(ServerProperties.getShardName(), "build")) {
+						throw CommandAPI.failWithString("You cannot use this command on the build shard");
+					}
 
-							String shard = args.getUnchecked("shard");
-							String eventName = args.getUnchecked("Event Name");
-							Integer timeLeft = -1;
+					String shard = args.getUnchecked("shard");
+					String eventName = args.getUnchecked("Event Name");
+					Integer timeLeft = -1;
 
-							runCommandLogic(sender, shard, eventName, timeLeft, isPlayerSender);
-						})
+					runCommandLogic(sender, shard, eventName, timeLeft);
+				})
 		);
 
 		root.withSubcommand(
-				new CommandAPICommand("update")
-						.withPermission(perms)
-						.withArguments(EVENT_NAME_ARGUMENT, new IntegerArgument("Time Left"))
-						.executes((sender, args) -> {
-							boolean isPlayerSender = sender instanceof Player;
-							if (isPlayerSender && Objects.equals(ServerProperties.getShardName(), "build")) {
-								throw CommandAPI.failWithString("You cannot use this command on the build shard");
-							}
-							String shard;
-							try {
-								shard = NetworkRelayAPI.getShardName();
-							} catch (Exception ex) {
-								//If failed use the short version.
-								shard = ServerProperties.getShardName();
-							}
+			new CommandAPICommand("update")
+				.withPermission(perms)
+				.withArguments(EVENT_NAME_ARGUMENT, new IntegerArgument("Time Left"))
+				.executes((sender, args) -> {
+					boolean isPlayerSender = sender instanceof Player;
+					if (isPlayerSender && Objects.equals(ServerProperties.getShardName(), "build")) {
+						throw CommandAPI.failWithString("You cannot use this command on the build shard");
+					}
+					String shard = getThisShardName();
 
-							String eventName = args.getUnchecked("Event Name");
-							Integer timeLeft = args.getUnchecked("Time Left");
+					String eventName = args.getUnchecked("Event Name");
+					Integer timeLeft = args.getUnchecked("Time Left");
 
-							runCommandLogic(sender, shard, eventName, timeLeft, isPlayerSender);
-						})
+					runCommandLogic(sender, shard, eventName, timeLeft);
+				})
 		).register();
 	}
 
-	private static void runCommandLogic(CommandSender sender, String shard, String eventName, Integer timeLeft, boolean isPlayerSender) {
-		String expectedShard;
+	public static void updateEvent(String event, int timeLeft) {
+		updateEvent(event, getThisShardName(), timeLeft);
+	}
+
+	public static void updateEvent(String event, String shard, int timeLeft) {
+		runCommandLogic(null, shard, event, timeLeft);
+	}
+
+	public static void clearEvent(String event) {
+		updateEvent(event, -1);
+	}
+
+	public static void clearEvent(String event, String shard) {
+		updateEvent(event, shard, -1);
+	}
+
+	public static String getThisShardName() {
+		String shard;
 		try {
-			expectedShard = NetworkRelayAPI.getShardName();
+			shard = NetworkRelayAPI.getShardName();
 		} catch (Exception ex) {
 			//If failed use the short version.
-			expectedShard = ServerProperties.getShardName();
+			shard = ServerProperties.getShardName();
 		}
+		return shard;
+	}
+
+	private static void runCommandLogic(@Nullable CommandSender sender, String shard, String eventName, int timeLeft) {
+		String expectedShard = getThisShardName();
+		eventName = eventName.toUpperCase(Locale.getDefault());
 
 		if (!Objects.equals(expectedShard, shard)) {
 			if (timeLeft == -1) {
@@ -190,9 +199,11 @@ public class BroadcastedEvents implements Listener {
 				//clear locally.
 				mEventMap.remove(key);
 
-				if (isPlayerSender) {
-					sender.sendMessage(Component.text("Sucessfully cleared event " + key + ".", NamedTextColor.GOLD));
+				String msg = "Sucessfully cleared event " + key + ".";
+				if (sender instanceof Player player) {
+					player.sendMessage(Component.text(msg, NamedTextColor.GOLD));
 				}
+				MMLog.finer(msg);
 				return;
 			}
 
@@ -204,16 +215,20 @@ public class BroadcastedEvents implements Listener {
 				parentEvent.broadcastPeriodicUpdate();
 			}
 
-			if (isPlayerSender) {
-				sender.sendMessage(Component.text("Sucessfully updated event " + key + " with duration " + timeLeft + ".", NamedTextColor.GOLD));
+			String msg = "Sucessfully updated event " + key + " with duration " + timeLeft + ".";
+			if (sender instanceof Player player) {
+				player.sendMessage(Component.text(msg, NamedTextColor.GOLD));
 			}
+			MMLog.finer(msg);
 		} else if (timeLeft != -1) {
 			ParentEvent event = new ParentEvent(shard, eventName, timeLeft);
 			mEventMap.put(key, event);
 
-			if (isPlayerSender) {
-				sender.sendMessage(Component.text("Successfully created new event " + key + " with duration " + timeLeft + ".", NamedTextColor.GOLD));
+			String msg = "Successfully created new event " + key + " with duration " + timeLeft + ".";
+			if (sender instanceof Player player) {
+				player.sendMessage(Component.text(msg, NamedTextColor.GOLD));
 			}
+			MMLog.finer(msg);
 		}
 	}
 
@@ -280,7 +295,6 @@ public class BroadcastedEvents implements Listener {
 			perceptibleEvents.add(event);
 		}
 		perceptibleEvents.sort(Comparator.comparingInt(curr -> (curr.mTimeLeft + (curr.mStatus == EventStatus.IN_PROGRESS ? 1_000_000 : 0))));
-
 		return perceptibleEvents;
 	}
 
@@ -315,7 +329,7 @@ public class BroadcastedEvents implements Listener {
 			}
 
 			String eventName = data.getAsJsonPrimitive(BroadcastedEvents.Event.EVENT_PROP_KEY).getAsString();
-			Integer timeLeft = data.getAsJsonPrimitive(BroadcastedEvents.Event.TIME_PROP_KEY).getAsInt();
+			int timeLeft = data.getAsJsonPrimitive(BroadcastedEvents.Event.TIME_PROP_KEY).getAsInt();
 			String eventStatus = data.getAsJsonPrimitive(BroadcastedEvents.Event.STATUS_PROP_KEY).getAsString().toUpperCase(Locale.getDefault());
 
 			BroadcastedEvents.ChildEvent childEvent = new BroadcastedEvents.ChildEvent(shard, eventName, timeLeft);
@@ -339,21 +353,21 @@ public class BroadcastedEvents implements Listener {
 
 			String shard = ServerProperties.getShardName();
 			String eventName = data.getAsJsonPrimitive(Event.EVENT_PROP_KEY).getAsString();
-			Integer timeLeft = data.getAsJsonPrimitive(BroadcastedEvents.Event.TIME_PROP_KEY).getAsInt();
+			int timeLeft = data.getAsJsonPrimitive(BroadcastedEvents.Event.TIME_PROP_KEY).getAsInt();
 
 			MMLog.finer("[Boss Event Relay/Task] Received Task: " + shard + "@" + eventName);
 			runCommandLogic(Bukkit.createCommandSender((feedback) -> {
 				if (feedback instanceof TextComponent textFeedback) {
 					MMLog.finer("[Boss Event Relay/Task] " + textFeedback.content());
 				}
-			}), shard, eventName, timeLeft, false);
+			}), shard, eventName, timeLeft);
 		}
 	}
 
 	public static class ParentEvent extends Event {
 		private int mLastUpdateSent = -1;
 
-		public ParentEvent(String shard, String eventName, Integer timeLeft) {
+		public ParentEvent(String shard, String eventName, int timeLeft) {
 			super(shard, eventName, timeLeft);
 		}
 
@@ -396,7 +410,7 @@ public class BroadcastedEvents implements Listener {
 	public static class ChildEvent extends Event {
 		private final int mReceivedAt;
 
-		public ChildEvent(String shard, String eventName, Integer timeLeft) {
+		public ChildEvent(String shard, String eventName, int timeLeft) {
 			super(shard, eventName, timeLeft);
 			mReceivedAt = Bukkit.getCurrentTick();
 		}
@@ -413,11 +427,11 @@ public class BroadcastedEvents implements Listener {
 		public final String mEventName;
 
 		//In seconds.
-		public Integer mTimeLeft;
+		public int mTimeLeft;
 
 		public EventStatus mStatus;
 
-		public Event(String shard, String eventName, Integer timeLeft) {
+		public Event(String shard, String eventName, int timeLeft) {
 			mShard = shard;
 			mEventName = eventName;
 			mTimeLeft = timeLeft;
@@ -435,37 +449,33 @@ public class BroadcastedEvents implements Listener {
 			}
 		}
 
-		public void setTimeLeft(Integer timeLeft) {
+		public void setTimeLeft(int timeLeft) {
 			mTimeLeft = timeLeft;
 			mStatus = timeLeft > 0 ? EventStatus.STARTING : EventStatus.IN_PROGRESS;
 		}
 
-		public String getDisplay() {
+		public Component getDisplay() {
 			KnownEvent known = getAsKnownEvent();
 
-			TextColor eventColor = known == KnownEvent.UNKNOWN ? NamedTextColor.YELLOW : known.mColor;
-			Component eventNamePart = Component.text(
-				StringUtils.capitalize(mEventName.toLowerCase(Locale.getDefault())),
-				eventColor,
-				TextDecoration.BOLD
-			);
+			boolean unknown = known == KnownEvent.UNKNOWN;
+			TextColor eventColor = unknown ? NamedTextColor.YELLOW : known.mColor;
+			Component eventNamePart = Component.text(unknown ? StringUtils.capitalize(mEventName.toLowerCase(Locale.getDefault())) : known.mDisplayName, eventColor, TextDecoration.BOLD);
+
+			Component shardPart = Component.text(mShard + ": ", NamedTextColor.GOLD);
 
 			Component statusPart;
 			if (mTimeLeft > 0) {
 				statusPart = Component.text(mTimeLeft + "s", NamedTextColor.GREEN);
 			} else {
-				TextColor statusColor = mStatus.mColor == null ? NamedTextColor.RED : mStatus.mColor;
-				statusPart = Component.text(mTimeLeft + "s", statusColor, TextDecoration.BOLD);
+				TextColor statusColor = (mStatus.mColor == null) ? NamedTextColor.RED : mStatus.mColor;
+				statusPart = Component.text(mStatus.mDisplayedAs, statusColor, TextDecoration.BOLD);
 			}
 
-			final var text = Component.empty()
+			return Component.empty()
 				.append(eventNamePart)
 				.append(Component.text(" "))
-				.append(Component.text(mShard, NamedTextColor.GOLD))
-				.append(Component.text(": "))
+				.append(shardPart)
 				.append(statusPart);
-
-			return LegacyComponentSerializer.legacySection().serialize(text);
 		}
 
 		public KnownEvent getAsKnownEvent() {
@@ -478,26 +488,27 @@ public class BroadcastedEvents implements Listener {
 		public final String mScoreboard;
 		public final int mStep;
 
-		EventRequirement(@NotNull String scoreboard, int step) {
+		public EventRequirement(@NotNull String scoreboard, int step) {
 			mScoreboard = scoreboard;
 			mStep = step;
 		}
 	}
 
 	public enum KnownEvent {
-		KAUL(NamedTextColor.DARK_GREEN, new EventRequirement("Quest21", 20), new EventRequirement("Corrupted", 1)),
-		ELDRASK(NamedTextColor.AQUA, new EventRequirement("Quest101", 12), new EventRequirement("Teal", 1)),
-		HEKAWT(NamedTextColor.GOLD, new EventRequirement("Quest101", 12), new EventRequirement("Fred", 1)),
-		SIRIUS(NamedTextColor.GRAY, new EventRequirement("Quest220", 8), new EventRequirement("Zenith", 1)),
-		UNKNOWN(null);
+		KAUL("Kaul", NamedTextColor.DARK_GREEN, new EventRequirement("Quest21", 20), new EventRequirement("Corrupted", 1)),
+		ELDRASK("Eldrask", NamedTextColor.AQUA, new EventRequirement("Quest101", 12), new EventRequirement("Teal", 1)),
+		HEKAWT("Hekawt", NamedTextColor.GOLD, new EventRequirement("Quest101", 12), new EventRequirement("Fred", 1)),
+		SIRIUS("Sirius", NamedTextColor.GRAY, new EventRequirement("Quest220", 8), new EventRequirement("Zenith", 1)),
+		UNKNOWN("Unknown", null);
 
-		@Nullable
-		public final TextColor mColor;
+		public final String mDisplayName;
+		public final @Nullable TextColor mColor;
 
 		//If none, will not require anything.
 		public final EventRequirement[] mPossibilities;
 
-		KnownEvent(@Nullable TextColor color, EventRequirement... possibleRequirements) {
+		KnownEvent(String displayName, @Nullable TextColor color, EventRequirement... possibleRequirements) {
+			this.mDisplayName = displayName;
 			this.mColor = color;
 			this.mPossibilities = possibleRequirements;
 		}

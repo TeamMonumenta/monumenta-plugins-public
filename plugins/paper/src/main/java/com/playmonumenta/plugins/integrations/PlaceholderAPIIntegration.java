@@ -132,7 +132,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 		if (identifier.startsWith("shrineicon")) {
 			if (identifier.contains("simplified")) {
 				int index = identifier.substring("shrineicon_simplified_".length()).isEmpty() ? 0 :
-					            Integer.parseInt(identifier.substring("shrineicon_simplified_".length()));
+					Integer.parseInt(identifier.substring("shrineicon_simplified_".length()));
 				if (index < mActiveShrines.size()) {
 					ShrineType currentShrine = mActiveShrines.get(index);
 					if (ScoreboardUtils.getScoreboardValue("$PatreonShrine", currentShrine.mObjective).orElse(0) > 1) {
@@ -160,7 +160,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			int remainingTime;
 			if (identifier.contains("simplified")) {
 				int index = identifier.substring("shrine_simplified_".length()).isEmpty() ? 0 :
-					            Integer.parseInt(identifier.substring("shrine_simplified_".length()));
+					Integer.parseInt(identifier.substring("shrine_simplified_".length()));
 				if (index < mActiveShrines.size()) {
 					ShrineType currentShrine = mActiveShrines.get(index);
 					remainingTime = currentShrine.getRemainingTime();
@@ -214,9 +214,9 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			int charmPower = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.CHARM_POWER).orElse(0);
 			charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
 			return Integer.toString(AbilityUtils.getEffectiveTotalSkillPoints(player) +
-					AbilityUtils.getEffectiveTotalSpecPoints(player) +
-					ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
-					charmPower);
+				AbilityUtils.getEffectiveTotalSpecPoints(player) +
+				ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
+				charmPower);
 		}
 
 		//Player equipped title
@@ -247,15 +247,17 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			if (index >= 0 && events.size() > index) {
 				BroadcastedEvents.Event event = events.get(index);
 
-				String display = event.getDisplay();
+				Component display = event.getDisplay();
+				int length = MessagingUtils.plainText(display).length();
 
 				//funny mirrored stuff that only happen when both sides are filled.
 				if ((index + 1) % 2 == 1 && events.size() > (index + 1)) {
 					//Current is on the left
 					BroadcastedEvents.Event mirroredEvent = events.get(index + 1);
-					String mirroredDisplay = mirroredEvent.getDisplay();
+					Component mirroredDisplay = mirroredEvent.getDisplay();
+					int mirroredLength = MessagingUtils.plainText(mirroredDisplay).length();
 
-					int lengthDiff = mirroredDisplay.length() - display.length();
+					int lengthDiff = mirroredLength - length;
 					if (lengthDiff > 0) {
 						//mirrored display is bigger
 						return " ".repeat(lengthDiff) + display;
@@ -263,20 +265,23 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 				} else if ((index + 1) % 2 == 0) {
 					//Current is on the right
 					BroadcastedEvents.Event mirroredEvent = events.get(index - 1);
-					String mirroredDisplay = mirroredEvent.getDisplay();
+					Component mirroredDisplay = mirroredEvent.getDisplay();
+					int mirroredLength = MessagingUtils.plainText(mirroredDisplay).length();
 
-					int lengthDiff = mirroredDisplay.length() - display.length();
+					int lengthDiff = mirroredLength - length;
 					if (lengthDiff > 0) {
 						//mirrored display is bigger
 						return display + " ".repeat(lengthDiff);
 					}
 				}
 
-				return event.getDisplay();
+				@SuppressWarnings("deprecation")
+				String legacy = MessagingUtils.legacyFromComponent(display) + ChatColor.RESET;
+				return legacy;
 			} else if ((index + 1) % 2 == 0 && (events.size() > (index - 1) && !events.isEmpty())) {
 				//Allows for centering footer when first element exists but second doesn't.
 				BroadcastedEvents.Event event = events.get(index - 1);
-				return " ".repeat(event.getDisplay().length());
+				return " ".repeat(MessagingUtils.plainText(event.getDisplay()).length());
 			} else {
 				return "";
 			}
