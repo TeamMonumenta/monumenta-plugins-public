@@ -114,7 +114,8 @@ public class MonumentaVelocity {
 
 		mServer.getEventManager().register(this, new JoinLeaveHandler(this));
 
-		mServer.getEventManager().register(this, new VelocityClientModHandler(mConfig.mAllowPacketPublicizeContent));
+		String envAllowsPacketsPublicizeContent = System.getenv("ALLOW_PACKETS_PUBLICIZE_CONTENT");
+		mServer.getEventManager().register(this, new VelocityClientModHandler(envAllowsPacketsPublicizeContent.equalsIgnoreCase("true")));
 		mServer.getChannelRegistrar().register(VelocityClientModHandler.CHANNEL_ID);
 	}
 
@@ -168,9 +169,6 @@ public class MonumentaVelocity {
 
 		@Setting(value = "version_string")
 		public String mVersionString = "Monumenta 1.19.4-1.20.2";
-
-		@Setting(value = "allow_packets_publicize_content")
-		public Boolean mAllowPacketPublicizeContent = false;
 	}
 
 	@ConfigSerializable
