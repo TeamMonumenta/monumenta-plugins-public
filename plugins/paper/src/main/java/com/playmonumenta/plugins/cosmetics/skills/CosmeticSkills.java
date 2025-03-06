@@ -43,12 +43,26 @@ import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.HypnoticChantCS
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.ImpalingDistortionCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.PrestigiousInfusionCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.RipplingBeamCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.DarkSparkCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.DivergentCausalityCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.GraspOfWinterCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.IngressCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.RenascenceCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.SanguineAegisCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.SeverCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.SmolderingSpinesCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.TransfiguredSpikeCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.TwistedLanceCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.VolcanicBurstCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.VoodooBurstCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.BirthOfANewWorldCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.CacophonyCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.PrestigiousMoonbladeCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.ScissionCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.FracturedSoulCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.IncarnationOfTheFalseSunCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.PrestigiousStarfallCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.SaltTheEarthCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.AstralWeaverCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.DecapitationCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.GalacticCloakCS;
@@ -123,6 +137,8 @@ public class CosmeticSkills {
 		PrestigiousEsotericCS::new,
 		PrestigiousRemedyCS::new,
 		LiferootTonicCS::new,
+
+		//Arcane Alchemist
 		ArcanePotionsCS::new,
 		ArcanePanaceaCS::new,
 		ArcaneTinctureCS::new,
@@ -143,8 +159,10 @@ public class CosmeticSkills {
 		BloodyRetaliationCS::new,
 		PrestigiousInfusionCS::new,
 		PrestigiousBeamCS::new,
-		AwakeningCS::new,
 		RebirthCS::new,
+
+		//Awakened Cleric
+		AwakeningCS::new,
 		SoulStrainCS::new,
 		VitalityExtractionCS::new,
 		BloodbathCS::new,
@@ -167,6 +185,22 @@ public class CosmeticSkills {
 		PrestigiousStarfallCS::new,
 		VoodooBurstCS::new,
 
+		//Dissonant Conductor Mage
+		SmolderingSpinesCS::new,
+		DarkSparkCS::new,
+		IngressCS::new,
+		GraspOfWinterCS::new,
+		RenascenceCS::new,
+		TransfiguredSpikeCS::new,
+		SeverCS::new,
+		DivergentCausalityCS::new,
+		ScissionCS::new,
+		CacophonyCS::new,
+		BirthOfANewWorldCS::new,
+		IncarnationOfTheFalseSunCS::new,
+		SaltTheEarthCS::new,
+		FracturedSoulCS::new,
+
 		//Rogue
 		WindStepCS::new,
 		TranscCombosCS::new,
@@ -174,6 +208,8 @@ public class CosmeticSkills {
 		PrestigiousRondeCS::new,
 		PrestigiousBlitzCS::new,
 		VorpalVinelashCS::new,
+
+		//Astral Rogue
 		StarfireSpinCS::new,
 		StarstruckCS::new,
 		StarburstCS::new,
@@ -213,6 +249,7 @@ public class CosmeticSkills {
 		PrestigiousShadesCS::new,
 		NecromantiaCS::new,
 
+		//Jungleborn Warlock
 		DruidicHexCS::new,
 		ScorchingSigilCS::new,
 		BurstingRootsCS::new,

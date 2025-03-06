@@ -93,7 +93,7 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 		List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + mSize);
 		Vector vectorIncrement = vector.normalize().multiply(increment);
 
-		mCosmetic.fireSpiritActivate(world, playerLocation);
+		mCosmetic.fireSpiritActivate(world, mPlayer, playerLocation, endLocation, vector, HITBOX);
 
 		// Damage action & particles
 		double maxIterations = maxDistance / increment * 1.1;
@@ -112,6 +112,7 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 			// The spirit starts at the player's eyes so this could damage enemies right beside/behind them
 			movingSpiritBox.shift(vectorIncrement);
 			Location newPotentialLocation = movingSpiritBox.getCenter().toLocation(world);
+
 			if (playerLocation.distanceSquared(newPotentialLocation) > maxDistanceSquared) {
 				break;
 			} else {

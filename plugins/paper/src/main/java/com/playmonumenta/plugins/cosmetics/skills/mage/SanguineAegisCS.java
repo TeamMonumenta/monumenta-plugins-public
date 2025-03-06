@@ -124,7 +124,7 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 	}
 
 	@Override
-	public void prismaOnHeal(Player player) {
+	public void prismaOnHeal(Player player, LivingEntity enemy) {
 		Location location = player.getLocation();
 		player.getWorld().playSound(location.clone(), Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_INSIDE, SoundCategory.PLAYERS, 3f, 0.6f);
 

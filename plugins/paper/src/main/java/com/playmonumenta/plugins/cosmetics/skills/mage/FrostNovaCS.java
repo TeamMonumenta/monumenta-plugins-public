@@ -11,6 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -51,5 +52,9 @@ public class FrostNovaCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1.1f, 0.7f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1.2f, 2.0f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.4f, 2.0f);
+	}
+
+	public void enemyEffect(Plugin plugin, Player player, LivingEntity enemy) {
+		//none here!
 	}
 }

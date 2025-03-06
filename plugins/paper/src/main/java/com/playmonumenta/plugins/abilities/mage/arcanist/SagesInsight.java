@@ -44,6 +44,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 
 	public static final AbilityInfo<SagesInsight> INFO =
 		new AbilityInfo<>(SagesInsight.class, NAME, SagesInsight::new)
+			.linkedSpell(ClassAbility.SAGES_INSIGHT)
 			.scoreboardId("SagesInsight")
 			.shorthandName("SgI")
 			.actionBarColor(TextColor.color(222, 219, 36))
@@ -103,7 +104,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 					mPlugin.mEffectManager.addEffect(mPlayer, "SagesExtraSpeed",
 						new PercentSpeed(SPEED_DURATION, mSpeed, ATTR_NAME).deleteOnAbilityUpdate(true));
 				}
-				mCosmetic.insightTrigger(mPlugin, mPlayer);
+				mCosmetic.insightTrigger(mPlugin, mPlayer, mResetSize);
 
 				mStacks = 0;
 				for (ClassAbility s : mResets) {

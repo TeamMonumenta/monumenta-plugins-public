@@ -97,7 +97,7 @@ public class FrostNova extends Ability {
 				}
 			}
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);
-
+			mCosmetic.enemyEffect(mPlugin, mPlayer, mob);
 			if (mob.getFireTicks() > 1) {
 				mob.setFireTicks(1);
 			}

@@ -26,21 +26,21 @@ public class ElementalArrowsCS implements CosmeticSkill {
 		return Material.SPECTRAL_ARROW;
 	}
 
-	public void thunderEffect(Player player, LivingEntity enemy) {
+	public void thunderEffect(Player player, LivingEntity enemy, boolean isLevelTwo, double radius) {
 		Location loc = enemy.getLocation();
 		World world = player.getWorld();
 		new PartialParticle(Particle.END_ROD, loc.clone().add(0, 0.5*enemy.getHeight(), 0), 15, 0.5, 0.5, 0.5, 0.05).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 1.0f, 2.0f);
 	}
 
-	public void iceEffect(Player player, LivingEntity enemy) {
+	public void iceEffect(Player player, LivingEntity enemy, boolean isLevelTwo, double radius) {
 		Location loc = enemy.getLocation();
 		World world = player.getWorld();
 		new PartialParticle(Particle.CLOUD, loc.clone().add(0, 0.5*enemy.getHeight(), 0), 10, 0.5, 0.5, 0.5, 0.05).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 1.2f);
 	}
 
-	public void fireEffect(Player player, LivingEntity enemy) {
+	public void fireEffect(Player player, LivingEntity enemy, boolean isLevelTwo, double radius) {
 		Location loc = enemy.getLocation();
 		World world = player.getWorld();
 		new PartialParticle(Particle.FLAME, loc.clone().add(0, 0.5*enemy.getHeight(), 0), 5, 0.5, 0.5, 0.5, 0.05).spawnAsPlayerActive(player);

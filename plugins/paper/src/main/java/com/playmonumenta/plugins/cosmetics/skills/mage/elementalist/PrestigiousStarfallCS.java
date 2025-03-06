@@ -115,7 +115,7 @@ public class PrestigiousStarfallCS extends StarfallCS implements PrestigeCS {
 	}
 
 	@Override
-	public void starfallFallEffect(World world, Player player, Location loc) {
+	public void starfallFallEffect(World world, Player player, Location loc, Location ogLoc, Location ogMeteorLoc, double tick) {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 1);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.7f, 0.8f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.7f, 1.2f);
@@ -127,7 +127,7 @@ public class PrestigiousStarfallCS extends StarfallCS implements PrestigeCS {
 	}
 
 	@Override
-	public void starfallLandEffect(World world, Player player, Location loc) {
+	public void starfallLandEffect(World world, Player player, Location loc, Location ogLoc, double radius) {
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.0f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.7f, 0.6f);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5f, 0.65f);

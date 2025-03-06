@@ -30,7 +30,7 @@ public class SagesInsightCS implements CosmeticSkill {
 	private static final float[] PITCHES = {1.6f, 1.8f, 1.6f, 1.8f, 2f};
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(222, 219, 36), 1.0f);
 
-	public void insightTrigger(Plugin plugin, Player player) {
+	public void insightTrigger(Plugin plugin, Player player, int resetSize) {
 		World world = player.getWorld();
 		Location loc = player.getLocation();
 		new PartialParticle(Particle.REDSTONE, loc, 20, 1.4, 1.4, 1.4, COLOR).spawnAsPlayerActive(player);

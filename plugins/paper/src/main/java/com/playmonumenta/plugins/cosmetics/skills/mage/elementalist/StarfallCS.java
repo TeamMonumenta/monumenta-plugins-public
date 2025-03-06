@@ -34,13 +34,13 @@ public class StarfallCS implements CosmeticSkill {
 		new PartialParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(player);
 	}
 
-	public void starfallFallEffect(World world, Player player, Location loc) {
+	public void starfallFallEffect(World world, Player player, Location loc, Location ogLoc, Location ogMeteorLoc, double tick) {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 1);
 		new PartialParticle(Particle.FLAME, loc, 25, 0.25, 0.25, 0.25, 0.1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.SMOKE_LARGE, loc, 5, 0.25, 0.25, 0.25, 0.1).spawnAsPlayerActive(player);
 	}
 
-	public void starfallLandEffect(World world, Player player, Location loc) {
+	public void starfallLandEffect(World world, Player player, Location loc, Location ogLoc, double radius) {
 		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 1.0f, 0.1f);
 		world.playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.6f, 2.0f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 0.1f);

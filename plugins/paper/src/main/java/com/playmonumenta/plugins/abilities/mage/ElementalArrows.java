@@ -101,8 +101,8 @@ public class ElementalArrows extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (!(event.getDamager() instanceof Projectile proj)
-			    || !EntityUtils.isAbilityTriggeringProjectile(proj, true)
-			    || event.getType() != DamageType.PROJECTILE) {
+			|| !EntityUtils.isAbilityTriggeringProjectile(proj, true)
+			|| event.getType() != DamageType.PROJECTILE) {
 			return false;
 		}
 		ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(proj);
@@ -114,12 +114,12 @@ public class ElementalArrows extends Ability {
 		if (proj.hasMetadata(FIRE_ARROW_METAKEY)) {
 			applyArrowEffects(event, proj, enemy, thunder, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
 				EntityUtils.applyFire(mPlugin, mDuration, entity, mPlayer, playerItemStats);
-				mCosmetic.fireEffect(mPlayer, enemy);
+				mCosmetic.fireEffect(mPlayer, enemy, isLevelTwo(), mRadius);
 			});
 		} else if (proj.hasMetadata(ICE_ARROW_METAKEY)) {
 			applyArrowEffects(event, proj, enemy, thunder, ABILITY_ICE, playerItemStats, Blaze.class, (entity) -> {
 				EntityUtils.applySlow(mPlugin, mDuration, mSlowAmplifier, entity);
-				mCosmetic.iceEffect(mPlayer, enemy);
+				mCosmetic.iceEffect(mPlayer, enemy, isLevelTwo(), mRadius);
 			});
 		}
 		return false; // creates new damage instances, but of a type it doesn't handle again
@@ -147,7 +147,7 @@ public class ElementalArrows extends Ability {
 
 		if (thunder) {
 			effectAction = effectAction.andThen(entity -> EntityUtils.applyStun(mPlugin, mStunDuration, entity));
-			mCosmetic.thunderEffect(mPlayer, enemy);
+			mCosmetic.thunderEffect(mPlayer, enemy, isLevelTwo(), mRadius);
 			if (mSpellshockEnhanced) {
 				SpellShockStatic existingStatic = mPlugin.mEffectManager.getActiveEffect(enemy, SpellShockStatic.class);
 				if (existingStatic != null && existingStatic.isTriggered()) {
@@ -189,7 +189,7 @@ public class ElementalArrows extends Ability {
 	public static boolean isElementalArrowDamage(DamageEvent event) {
 		// Use the "boss spell name" as marker if it's the main projectile damage or AoE damage
 		return (event.getAbility() == ClassAbility.ELEMENTAL_ARROWS_FIRE || event.getAbility() == ClassAbility.ELEMENTAL_ARROWS_ICE)
-			       && event.getBossSpellName() != null;
+			&& event.getBossSpellName() != null;
 	}
 
 	@Override

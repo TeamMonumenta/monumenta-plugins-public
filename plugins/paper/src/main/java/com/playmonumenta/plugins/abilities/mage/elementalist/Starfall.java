@@ -97,12 +97,12 @@ public class Starfall extends Ability {
 				break;
 			}
 		}
-		launchMeteor(loc, playerItemStats, damage);
+		launchMeteor(loc, mPlayer.getLocation(), playerItemStats, damage);
 
 		return true;
 	}
 
-	private void launchMeteor(final Location loc, final ItemStatManager.PlayerItemStats playerItemStats, final float damage) {
+	private void launchMeteor(final Location loc, final Location ogPlayerLoc, final ItemStatManager.PlayerItemStats playerItemStats, final float damage) {
 		Location ogLoc = loc.clone();
 		loc.add(0, 40, 0);
 
@@ -117,9 +117,9 @@ public class Starfall extends Ability {
 					loc.subtract(0, CharmManager.getExtraPercent(mPlayer, CHARM_FALL_SPEED, FALL_INCREMENT), 0);
 					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
 						if (loc.getY() - ogLoc.getY() <= 2) {
-							mCosmetic.starfallLandEffect(world, mPlayer, loc);
+							double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, SIZE);
+							mCosmetic.starfallLandEffect(world, mPlayer, loc, ogPlayerLoc, radius);
 							this.cancel();
-
 							Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
 							for (LivingEntity e : hitbox.getHitMobs()) {
 								EntityUtils.applyFire(mPlugin, mFireDuration, e, mPlayer, playerItemStats);
@@ -130,7 +130,7 @@ public class Starfall extends Ability {
 						}
 					}
 				}
-				mCosmetic.starfallFallEffect(world, mPlayer, loc);
+				mCosmetic.starfallFallEffect(world, mPlayer, loc, ogPlayerLoc, ogLoc, mT);
 
 				if (mT >= 50) {
 					this.cancel();

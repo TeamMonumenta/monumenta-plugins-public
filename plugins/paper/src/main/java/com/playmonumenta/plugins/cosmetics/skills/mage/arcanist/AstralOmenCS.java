@@ -30,7 +30,7 @@ public class AstralOmenCS implements CosmeticSkill {
 
 	public static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(100, 50, 170), 1f);
 
-	public void clearEffect(Player player, LivingEntity enemy, Map.Entry<AstralOmen.Type, Integer> entry) {
+	public void clearEffect(Player player, LivingEntity enemy, Map.Entry<AstralOmen.Type, Integer> entry, double radius) {
 		new PartialParticle(Particle.GLOW, enemy.getLocation(), 80, 0, 0, 0, 4).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, enemy.getLocation(), entry.getValue() * 5, 0.2, 0.2, 0.2, 0.1, entry.getKey().mColor).spawnAsPlayerActive(player);
 		player.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1.3f, 1.5f);

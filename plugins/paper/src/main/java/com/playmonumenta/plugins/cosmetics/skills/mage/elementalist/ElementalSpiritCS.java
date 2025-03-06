@@ -12,6 +12,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 public class ElementalSpiritCS implements CosmeticSkill {
 
@@ -25,7 +26,7 @@ public class ElementalSpiritCS implements CosmeticSkill {
 		return Material.SUNFLOWER;
 	}
 
-	public void fireSpiritActivate(World world, Location loc) {
+	public void fireSpiritActivate(World world, Player player, Location loc, Location endLoc, Vector dir, double hitbox) {
 		world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.PLAYERS, 1, 0.5f);
 	}
 

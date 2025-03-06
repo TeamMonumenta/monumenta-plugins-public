@@ -41,7 +41,11 @@ public class PrismaticShieldCS implements CosmeticSkill {
 		//Nope!
 	}
 
-	public void prismaOnHeal(Player player) {
+	public void prismaOnHeal(Player player, LivingEntity enemy) {
+		//Nope!
+	}
+
+	public void prismaBuff(Player player, int duration) {
 		//Nope!
 	}
 }

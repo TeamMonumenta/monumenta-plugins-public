@@ -155,7 +155,7 @@ public class AstralOmen extends Ability {
 					}
 					for (Map.Entry<Type, Integer> entry : levels.entrySet()) {
 						if (entry.getValue() > 0) {
-							mCosmetic.clearEffect(mPlayer, enemy, entry);
+							mCosmetic.clearEffect(mPlayer, enemy, entry, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS));
 						}
 					}
 				}

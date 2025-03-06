@@ -106,17 +106,20 @@ public class ThunderStep extends Ability {
 
 		// if enhanced, can teleport back within a short time frame (regardless of if on cooldown or not)
 		if (isEnhanced()
-			    && Bukkit.getServer().getCurrentTick() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
-			    && mLastCastLocation != null
-			    && mLastCastLocation.getWorld() == mPlayer.getWorld()
-			    && mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
+			&& Bukkit.getServer().getCurrentTick() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
+			&& mLastCastLocation != null
+			&& mLastCastLocation.getWorld() == mPlayer.getWorld()
+			&& mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
 
-			doDamage(mPlayer.getLocation(), spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
+			Location recastStartLocation = mPlayer.getLocation();
+			doDamage(recastStartLocation, spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
 			mLastCastLocation.setDirection(mPlayer.getLocation().getDirection());
 			PlayerUtils.playerTeleport(mPlayer, mLastCastLocation);
 			doDamage(mLastCastLocation, spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
+			mCosmetic.trailEffect(mPlayer, recastStartLocation, mLastCastLocation);
 
 			// prevent further back teleports as well as paralyze of any further casts
+			mCosmetic.playerTeleportedBack();
 			mLastCastLocation = null;
 			mLastCastTick = -1;
 			mCanParalyze = false;
@@ -151,18 +154,22 @@ public class ThunderStep extends Ability {
 			null, -1, -1
 		);
 		Location playerEndLocation = movingPlayerBox
-			                             .getCenter()
-			                             .setY(movingPlayerBox.getMinY())
-			                             .toLocation(world)
-			                             .setDirection(vector);
+			.getCenter()
+			.setY(movingPlayerBox.getMinY())
+			.toLocation(world)
+			.setDirection(vector);
 
 		if (!playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)
-			    || ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			|| ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return true;
 		}
 
 		PlayerUtils.playerTeleport(mPlayer, playerEndLocation);
 		doDamage(playerEndLocation, spellDamage, doParalyze);
+		mCosmetic.trailEffect(mPlayer, playerStartLocation, playerEndLocation);
+		if (isEnhanced() && mLastCastTick > -1) {
+			mCosmetic.lingeringEffect(mPlugin, mPlayer, playerStartLocation, BACK_TELEPORT_MAX_DELAY);
+		}
 
 		return true;
 	}

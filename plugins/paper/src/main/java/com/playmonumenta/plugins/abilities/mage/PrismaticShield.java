@@ -150,6 +150,7 @@ public class PrismaticShield extends Ability {
 						}
 						mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, mCDR);
 					}
+					mCosmetic.prismaBuff(mPlayer, mEnhancementDuration);
 				}
 
 				if (dealDamageLater) {
@@ -191,7 +192,7 @@ public class PrismaticShield extends Ability {
 			}
 			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_BUFF_NAME, new PercentDamageDealt(mEnhancementDuration, mDamageBuff).deleteOnAbilityUpdate(true));
 			PlayerUtils.healPlayer(mPlugin, mPlayer, mPercentHeal * EntityUtils.getMaxHealth(mPlayer));
-			mCosmetic.prismaOnHeal(mPlayer);
+			mCosmetic.prismaOnHeal(mPlayer, enemy);
 		}
 		return false; // there may be multiple spells cast in the same tick, need to check them all. No recursion possible as this doesn't deal damage.
 	}
