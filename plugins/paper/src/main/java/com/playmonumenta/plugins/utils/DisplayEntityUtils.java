@@ -69,6 +69,7 @@ public class DisplayEntityUtils {
 						}
 						blockDisplay.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), new Vector3f(1.0f, 1.0f, 1.0f), new Quaternionf()));
 						blockDisplay.setInterpolationDuration(2);
+						EntityUtils.setRemoveEntityOnUnload(blockDisplay);
 						mAllDisplays.add(blockDisplay);
 
 						BukkitRunnable runnable = new BukkitRunnable() {
