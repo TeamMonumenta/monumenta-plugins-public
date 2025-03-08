@@ -9,10 +9,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.redissync.RedisAPI;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -267,11 +269,12 @@ public class SocialManager implements Listener {
 		}
 
 		public void addFriend(UUID friendUuid) {
+			String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
 			mFriends.add(friendUuid);
 			RedisAPI.getInstance().async().hset(
 				getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, mPlayerUuid),
 				FRIEND_KEY + friendUuid,
-				friendUuid.toString()
+				friendUuid.toString() + "|" + timestamp
 			);
 		}
 
@@ -286,7 +289,7 @@ public class SocialManager implements Listener {
 		private void loadFriends() {
 			RedisAPI.getInstance().async().hgetall(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, mPlayerUuid)).thenAccept(friends -> {
 				friends.forEach((key, value) -> {
-					UUID friendUuid = UUID.fromString(key.split("\\|")[1]);
+					UUID friendUuid = UUID.fromString(value.split("\\|")[0]);
 					mFriends.add(friendUuid);
 				});
 			});
@@ -887,7 +890,19 @@ public class SocialManager implements Listener {
 							String[] parts = value.split("\\|");
 
 							UUID friendUuid = UUID.fromString(parts[0]);
-							String friendTimestamp = parts[1];
+							String friendTimestamp;
+							if (parts.length >= 2) {
+								friendTimestamp = parts[1];
+							} else {
+								friendTimestamp = DateTimeFormatter.ISO_INSTANT.format(
+									DateUtils.localDateTime(2025, 3, 6)
+										.toInstant(ZoneOffset.UTC));
+								RedisAPI.getInstance().async().hset(
+									getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, playerUuid),
+									FRIEND_KEY + friendUuid,
+									parts[0] + "|" + friendTimestamp
+								);
+							}
 
 							friendMap.put(friendUuid, new SocialInfo.Friend(friendUuid, friendTimestamp));
 						});
