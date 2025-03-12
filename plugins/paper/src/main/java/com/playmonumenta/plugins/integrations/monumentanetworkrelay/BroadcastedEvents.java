@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.integrations.monumentanetworkrelay;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.playmonumenta.networkrelay.DestOfflineEvent;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEvent;
 import com.playmonumenta.plugins.Plugin;
@@ -20,6 +21,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.concurrent.ConcurrentHashMap;
@@ -296,6 +298,30 @@ public class BroadcastedEvents implements Listener {
 		}
 		perceptibleEvents.sort(Comparator.comparingInt(curr -> (curr.mTimeLeft + (curr.mStatus == EventStatus.IN_PROGRESS ? 1_000_000 : 0))));
 		return perceptibleEvents;
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
+	public void onDestOfflineEvent(@NotNull DestOfflineEvent event) {
+		String destination = event.getDest();
+		if (destination == null) {
+			return;
+		}
+
+		//Clear all events from the given destination.
+		List<String> toRemove = new ArrayList<>();
+		for (Map.Entry<String, Event> entry : mEventMap.entrySet()) {
+			if (entry.getValue().mShard.equals(destination)) {
+				toRemove.add(entry.getKey());
+			}
+		}
+
+		for (String key : toRemove) {
+			mEventMap.remove(key);
+		}
+
+		if (!toRemove.isEmpty()) {
+			MMLog.finer("[Boss Event Relay/Dest Offline] Caught remote destination '" + destination + "' going offline, cleared all related events.");
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)

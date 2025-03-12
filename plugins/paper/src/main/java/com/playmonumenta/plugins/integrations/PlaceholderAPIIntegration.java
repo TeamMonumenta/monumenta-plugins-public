@@ -248,6 +248,8 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 				BroadcastedEvents.Event event = events.get(index);
 
 				Component display = event.getDisplay();
+				@SuppressWarnings("deprecation")
+				String stringDisplay = MessagingUtils.legacyFromComponent(display) + ChatColor.RESET;
 				int length = MessagingUtils.plainText(display).length();
 
 				//funny mirrored stuff that only happen when both sides are filled.
@@ -260,7 +262,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 					int lengthDiff = mirroredLength - length;
 					if (lengthDiff > 0) {
 						//mirrored display is bigger
-						return " ".repeat(lengthDiff) + display;
+						return " ".repeat(lengthDiff) + stringDisplay;
 					}
 				} else if ((index + 1) % 2 == 0) {
 					//Current is on the right
@@ -271,13 +273,11 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 					int lengthDiff = mirroredLength - length;
 					if (lengthDiff > 0) {
 						//mirrored display is bigger
-						return display + " ".repeat(lengthDiff);
+						return stringDisplay + " ".repeat(lengthDiff);
 					}
 				}
-
-				@SuppressWarnings("deprecation")
-				String legacy = MessagingUtils.legacyFromComponent(display) + ChatColor.RESET;
-				return legacy;
+				
+				return stringDisplay;
 			} else if ((index + 1) % 2 == 0 && (events.size() > (index - 1) && !events.isEmpty())) {
 				//Allows for centering footer when first element exists but second doesn't.
 				BroadcastedEvents.Event event = events.get(index - 1);
