@@ -186,6 +186,11 @@ class PebPage extends PagedGui.Page {
 				.set(0, 0);
 		}
 
+		entry(
+			Material.FLINT_AND_STEEL, "Delete P.E.B.s",
+			"Removes P.E.B.s in the inventory"
+		).command("clickable peb_delete").set(0, 8);
+
 		mGui.setItem(0, 4, mTitleItem);
 	}
 
