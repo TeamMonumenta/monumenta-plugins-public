@@ -48,7 +48,6 @@ public class BossBarManager {
 			mBar.addFlag(BossBar.Flag.CREATE_WORLD_FOG);
 			mBar.addFlag(BossBar.Flag.DARKEN_SCREEN);
 		}
-		boss.getWorld().showBossBar(mBar);
 
 		for (Player player : mBoss.getWorld().getPlayers()) {
 			if (player.getLocation().distance(mBoss.getLocation()) < mRange) {
