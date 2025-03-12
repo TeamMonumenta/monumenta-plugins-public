@@ -1098,6 +1098,7 @@ public class CharmManager {
 			MeteorSlam.CHARM_COOLDOWN,
 			MeteorSlam.CHARM_THRESHOLD,
 			Rampage.CHARM_THRESHOLD,
+			Rampage.CHARM_ACTIVE_MIN_STACKS,
 			Bodyguard.CHARM_COOLDOWN,
 			Challenge.CHARM_COOLDOWN,
 			ShieldWall.CHARM_COOLDOWN,

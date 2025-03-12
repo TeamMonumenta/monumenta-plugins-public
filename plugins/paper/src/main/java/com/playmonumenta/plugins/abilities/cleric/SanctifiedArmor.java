@@ -73,7 +73,7 @@ public class SanctifiedArmor extends Ability {
 	private final double mMaxPercentDamage;
 	private final double mMinHealthPercent;
 	private final double mDamageCap;
-	private final double mCooldown;
+	private final int mCooldown;
 	private final int mDuration;
 	private final double mSlow;
 	private final Map<UUID, Integer> mMobsIframeMap = new HashMap<>();
@@ -212,7 +212,7 @@ public class SanctifiedArmor extends Ability {
 			.add(" max health, deal 1% of the undead's max health, up to a maximum of ")
 			.addPercent(a -> a.mMaxPercentDamage, MAX_PERCENT_DAMAGE_1, false, Ability::isLevelOne)
 			.add(". Damage is capped based on current region (R1 " + L1_DAMAGE_CAP_R1 + "/R2 " + L1_DAMAGE_CAP_R2 + "/R3 " + L1_DAMAGE_CAP_R3 + " damage). This can only affect each mob once every ")
-			.add(a -> a.mCooldown, DAMAGE_COOLDOWN_1, true, Ability::isLevelOne)
+			.addDuration(a -> a.mCooldown, DAMAGE_COOLDOWN_1, true, Ability::isLevelOne)
 			.add(" seconds.");
 	}
 
@@ -227,7 +227,7 @@ public class SanctifiedArmor extends Ability {
 			.add(" slowness for ")
 			.addDuration(a -> a.mDuration, SLOWNESS_DURATION)
 			.add(" seconds. This can only affect each mob once every ")
-			.add(a -> a.mCooldown, DAMAGE_COOLDOWN_2, true, Ability::isLevelTwo)
+			.addDuration(a -> a.mCooldown, DAMAGE_COOLDOWN_2, true, Ability::isLevelTwo)
 			.add(" seconds.");
 	}
 

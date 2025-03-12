@@ -208,7 +208,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 			.add(" to teleport ")
 			.add(a -> a.mDistance, DISTANCE_1, false, Ability::isLevelOne)
 			.add(" blocks forwards. Upon teleporting, you gain ")
-			.add(a -> a.mStealthDuration, STEALTH_DURATION_1, false, Ability::isLevelOne)
+			.addDuration(a -> a.mStealthDuration, STEALTH_DURATION_1, false, Ability::isLevelOne)
 			.add(" second of Stealth and your next melee attack deals ")
 			.add(a -> a.mBonusDmg, BONUS_DMG_1, false, Ability::isLevelOne)
 			.add(" bonus damage if your target is not focused on you. Charges: ")

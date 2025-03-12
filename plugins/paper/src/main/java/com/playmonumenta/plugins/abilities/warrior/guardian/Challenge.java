@@ -204,7 +204,7 @@ public class Challenge extends Ability {
 			.add(" absorption and ")
 			.addPercent(a -> a.mPercentDamageDealtPerMob, PERCENT_DAMAGE_DEALT_PER_2, false, Ability::isLevelTwo)
 			.add(" melee damage per affected mob (up to ")
-			.add(a -> a.mMaxAbsorption, ABSORPTION_PER_MOB_2, false, Ability::isLevelTwo)
+			.add(a -> a.mMaxAbsorption, MAX_ABSORPTION_2, false, Ability::isLevelTwo)
 			.add(" absorption and ")
 			.addPercent(a -> a.mPercentDamageDealtEffect, PERCENT_DAMAGE_DEALT_EFFECT_2, false, Ability::isLevelTwo)
 			.add(" melee damage) instead. For each taunted mob killed (up to ")

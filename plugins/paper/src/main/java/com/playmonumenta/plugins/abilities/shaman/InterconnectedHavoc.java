@@ -128,7 +128,7 @@ public class InterconnectedHavoc extends Ability {
 	private static Description<InterconnectedHavoc> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Mobs are now knocked back from the player and stunned for ")
-			.add(a -> a.mStunTime, STUN_TIME)
+			.addDuration(a -> a.mStunTime, STUN_TIME)
 			.add(" seconds when coming in contact with a line for the first time.");
 	}
 }

@@ -79,7 +79,7 @@ public class RestlessSouls extends Ability {
 	private final int mDebuffDuration;
 	private final double mMoveSpeed;
 	private final double mRadius;
-	private final double mDuration;
+	private final int mDuration;
 	private final List<Vex> mVexList = new ArrayList<>();
 	private final RestlessSoulsCS mCosmetic;
 
@@ -250,7 +250,7 @@ public class RestlessSouls extends Ability {
 			.add(" seconds. Vex count is capped at ")
 			.add(a -> a.mVexCap, VEX_CAP_1, false, Ability::isLevelOne)
 			.add(" and each lasts for ")
-			.add(a -> a.mDuration, VEX_DURATION)
+			.addDuration(a -> a.mDuration, VEX_DURATION)
 			.add(" seconds. Each vex can only possess 1 enemy. Enemies killed by the vex will not spawn additional vexes.");
 	}
 

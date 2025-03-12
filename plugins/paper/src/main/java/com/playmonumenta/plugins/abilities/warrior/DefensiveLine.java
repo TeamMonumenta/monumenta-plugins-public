@@ -120,7 +120,7 @@ public class DefensiveLine extends Ability {
 	private static Description<DefensiveLine> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The effect is increased to ")
-			.add(a -> a.mPercentDamageReceived, PERCENT_DAMAGE_RECEIVED_EFFECT_2, false, Ability::isLevelTwo)
+			.addPercent(a -> a.mPercentDamageReceived, PERCENT_DAMAGE_RECEIVED_EFFECT_2, false, Ability::isLevelTwo)
 			.add(" resistance.");
 	}
 
