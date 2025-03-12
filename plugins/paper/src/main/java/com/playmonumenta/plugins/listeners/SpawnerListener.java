@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
 import com.playmonumenta.plugins.spawners.actions.ParticleHaloTask;
+import com.playmonumenta.plugins.spawners.actions.ParticleLineTask;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -306,6 +307,8 @@ public class SpawnerListener implements Listener {
 			if (getProtector(spawnerBlock) && !(mob instanceof Player)) {
 				GlowingManager.startGlowing(mob, NamedTextColor.AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "protectedMob");
 				mob.setInvulnerable(true);
+				ParticleLineTask lineTask = new ParticleLineTask(mob, Particle.SOUL_FIRE_FLAME, spawnerBlock);
+				lineTask.start();
 				if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), spawnerBlock, "protectedMobSummon")) {
 					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
 					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
