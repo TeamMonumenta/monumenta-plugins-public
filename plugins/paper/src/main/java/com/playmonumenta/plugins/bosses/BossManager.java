@@ -369,6 +369,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(SiriusMeleeBoss.identityTag, SiriusMeleeBoss::new);
 		registerStatelessBoss(SiriusNPCBoss.identityTag, SiriusNPCBoss::construct);
 		registerStatelessBoss(SiriusMob.identityTag, SiriusMob::new);
+		registerStatelessBoss(SystemMonitorDisplayBoss.identityTag, SystemMonitorDisplayBoss::new);
 		registerStatelessBoss(GuildDisplayBoss.identityTag, GuildDisplayBoss::new, new GuildDisplayBoss.Parameters());
 		registerStatelessBoss(GroundSeekerBoss.identityTag, GroundSeekerBoss::new, new GroundSeekerBoss.Parameters());
 		registerStatelessBoss(TotemPlatformBoss.identityTag, TotemPlatformBoss::new, new TotemPlatformBoss.Parameters());
