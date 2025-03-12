@@ -72,7 +72,7 @@ public class FrostNova extends Ability {
 	public FrostNova(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mBaseDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mLevelDamage = mBaseDamage * ENHANCED_DAMAGE_MODIFIER;
+		mLevelDamage = mBaseDamage * (isEnhanced() ? ENHANCED_DAMAGE_MODIFIER : 1);
 		mLevelSlowMultiplier = (isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS);
 		mRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE);
