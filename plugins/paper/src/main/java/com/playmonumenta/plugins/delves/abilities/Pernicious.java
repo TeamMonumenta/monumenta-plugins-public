@@ -13,6 +13,7 @@ public class Pernicious {
 
 
 	public static final String DESCRIPTION = "Enemies can destroy terrain.";
+	public static final String AVOID_PERNICIOUS = "boss_perniciousimmune";
 
 	public static Component[] rankDescription(int level) {
 			return new Component[]{
@@ -22,7 +23,7 @@ public class Pernicious {
 
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (!(mob instanceof Vex) && FastUtils.RANDOM.nextDouble() < BLOCK_BREAK_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob)) {
+		if (!(mob instanceof Vex) && FastUtils.RANDOM.nextDouble() < BLOCK_BREAK_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob) && !mob.getScoreboardTags().contains(AVOID_PERNICIOUS)) {
 			mob.addScoreboardTag(BlockBreakBoss.identityTag);
 			mob.addScoreboardTag(BlockBreakBoss.identityTag + "[adapttoboundingbox=true]");
 		}

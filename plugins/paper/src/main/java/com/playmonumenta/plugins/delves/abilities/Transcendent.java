@@ -104,6 +104,7 @@ public class Transcendent {
 	}
 
 	public static final String DESCRIPTION = "Elites become greatly empowered.";
+	public static final String AVOID_TRANSCENDENT = "boss_transcendentimmune";
 
 	public static Component[] rankDescription(int level) {
 		return new Component[]{
@@ -112,7 +113,7 @@ public class Transcendent {
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob) && FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level) {
+		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob) && FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level && !mob.getScoreboardTags().contains(AVOID_TRANSCENDENT)) {
 			EntityEquipment equipment = mob.getEquipment();
 			ItemStack mainhand = equipment == null ? null : equipment.getItemInMainHand();
 			Material material = mainhand == null ? null : mainhand.getType();

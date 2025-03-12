@@ -23,6 +23,7 @@ public class Carapace {
 	}
 
 	public static final String DESCRIPTION = "Enemies gain a protective shell.";
+	public static final String AVOID_CARAPACE = "boss_carapaceimmune";
 
 	public static Component[] rankDescription(int level) {
 		return new Component[]{
@@ -33,7 +34,7 @@ public class Carapace {
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob)) {
+		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob) && !mob.getScoreboardTags().contains(AVOID_CARAPACE)) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			List<String> ability = ABILITY_POOL.get(FastUtils.RANDOM.nextInt(ABILITY_POOL.size()));
 			for (String abilityTag : ability) {

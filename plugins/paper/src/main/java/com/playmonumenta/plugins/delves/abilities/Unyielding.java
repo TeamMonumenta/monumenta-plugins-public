@@ -9,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 public class Unyielding {
 
 	public static final String DESCRIPTION = "Elites find renewed strength at half health.";
+	public static final String AVOID_UNYIELDING = "boss_unyieldingimmune";
 
 	public static Component[] rankDescription(int level) {
 		return new Component[]{
@@ -24,7 +25,7 @@ public class Unyielding {
 		if (level == 0) {
 			return;
 		}
-		if (!DelvesUtils.isDelveMob(mob) && EntityUtils.isElite(mob)) {
+		if (!DelvesUtils.isDelveMob(mob) && EntityUtils.isElite(mob) && !mob.getScoreboardTags().contains(AVOID_UNYIELDING)) {
 			mob.addScoreboardTag(UnyieldingBoss.identityTag);
 			mob.addScoreboardTag(UnyieldingBoss.identityTag + "[healing=0.04,durationticks=60,tickstoheal=2]");
 		}

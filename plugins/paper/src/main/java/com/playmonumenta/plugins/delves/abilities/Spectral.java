@@ -10,6 +10,7 @@ public class Spectral {
 	private static final double SPAWN_CHANCE_PER_LEVEL = 0.07;
 
 	public static final String DESCRIPTION = "Dying enemies transform into new enemies.";
+	public static final String AVOID_SPECTRAL = "boss_spectralimmune";
 
 	public static Component[] rankDescription(int level) {
 		return new Component[]{
@@ -19,7 +20,7 @@ public class Spectral {
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (!DelvesUtils.isDelveMob(mob)) {
+		if (!DelvesUtils.isDelveMob(mob) && !mob.getScoreboardTags().contains(AVOID_SPECTRAL)) {
 			mob.addScoreboardTag(SpectralSummonBoss.identityTag);
 			mob.addScoreboardTag(SpectralSummonBoss.identityTag + "[spawnchance=" + SPAWN_CHANCE_PER_LEVEL * level + "]");
 		}

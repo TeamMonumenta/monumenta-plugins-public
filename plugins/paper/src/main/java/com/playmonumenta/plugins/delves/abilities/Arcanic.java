@@ -99,6 +99,7 @@ public class Arcanic {
 	}
 
 	public static final String DESCRIPTION = "Enemies gain magical abilities.";
+	public static final String AVOID_ARCANIC = "boss_arcanicimmune";
 
 	public static Component[] rankDescription(int level) {
 		return new Component[]{Component.text("Enemies have a " + Math.round(100 * ABILITY_CHANCE_PER_LEVEL * level) + "% chance to be Arcanic.")};
@@ -106,7 +107,7 @@ public class Arcanic {
 
 	public static void applyModifiers(LivingEntity mob, int level) {
 		Player nearestPlayer = EntityUtils.getNearestPlayer(mob.getLocation(), 64);
-		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob)) {
+		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob) && !mob.getScoreboardTags().contains(AVOID_ARCANIC)) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			List<List<String>> abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? ABILITY_POOL_R3 : ABILITY_POOL_R2) : ABILITY_POOL_R1);
 			abilityPool.removeIf(ability -> mob.getScoreboardTags().contains(ability.get(0)));
