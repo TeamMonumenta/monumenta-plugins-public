@@ -285,7 +285,7 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 				activeSpells.add(new SpellAllowTotemThrow(mBoss, true));
 				activeSpells.add(new SpellHyceneaSummonTotemPlatforms(detectionRange, 0, mSpawnLoc));
 				activeSpells.add(new SpellTotemicDestruction(mMonumentaPlugin, mBoss, detectionRange, 14 * 20, mSpawnLoc, 10 * 20));
-				activeSpells.add(new SpellFloralFlechettes(mMonumentaPlugin, mBoss, detectionRange, 18, 90, 4 * 20, 10, 42, true, mSpawnLoc, 4 * 20, 2, 15));
+				activeSpells.add(new SpellFloralFlechettes(mMonumentaPlugin, mBoss, detectionRange, 18, 90, 4 * 20, 20, 42, true, mSpawnLoc, 4 * 20, 2, 15));
 				activeSpells.add(new SpellTotemicDestruction(mMonumentaPlugin, mBoss, detectionRange, 14 * 20, mSpawnLoc, 14 * 20));
 				activeSpells.add(new SpellTotemicDestruction(mMonumentaPlugin, mBoss, detectionRange, 14 * 20, mSpawnLoc, 14 * 20));
 				activeSpells.add(new SpellTotemicDestruction(mMonumentaPlugin, mBoss, detectionRange, 14 * 20, mSpawnLoc, 18 * 20));
@@ -381,7 +381,7 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 				activeSpells.add(new SpellHyceneaDialogue(Component.text("You see tendrils of Blue light begin to wrap themselves around Hycenea.", NamedTextColor.GRAY, TextDecoration.ITALIC), 20 * 13, mSpawnLoc, false));
 
 				// Layered Flechettes + Organic
-				activeSpells.add(new SpellFloralFlechettes(mMonumentaPlugin, mBoss, detectionRange, 18, 90, 3 * 20, 10, 12, true, mSpawnLoc, 0, 2, 0));
+				activeSpells.add(new SpellFloralFlechettes(mMonumentaPlugin, mBoss, detectionRange, 18, 90, 3 * 20, 20, 12, true, mSpawnLoc, 0, 2, 0));
 				activeSpells.add(new SpellOrganicShock(mMonumentaPlugin, mBoss, 10, 18, 500, 20 * 3, 20 * 3, mSpawnLoc));
 				activeSpells.add(new SpellHyceneaDialogue(Component.text("PITIFUL WORM. I WILL CAST YOU INTO NOTHINGNESS. NOT EVEN THE BEYOND WILL HARBOR YOUR MANGLED SOUL.", NamedTextColor.BLUE), 0, mSpawnLoc, true));
 				activeSpells.add(new SpellOrganicShock(mMonumentaPlugin, mBoss, 10, 18, 500, 20 * 3, 20 * 3, mSpawnLoc));
