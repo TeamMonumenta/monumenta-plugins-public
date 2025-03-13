@@ -107,6 +107,10 @@ public class Volley extends Ability {
 
 					mVolley.add(proj);
 
+					if (projectile.getScoreboardTags().contains("SourceQuickDraw")) {
+						proj.addScoreboardTag("SourceQuickDrawVolley");
+					}
+
 					if (proj instanceof AbstractArrow arrow) {
 						arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 

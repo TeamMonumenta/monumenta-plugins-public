@@ -58,7 +58,9 @@ public class PinningShot extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() != DamageType.PROJECTILE || !(event.getDamager() instanceof Projectile proj) || !EntityUtils.isAbilityTriggeringProjectile(proj, false)) {
+		if (event.getType() != DamageType.PROJECTILE || !(event.getDamager() instanceof Projectile proj) ||
+			    !EntityUtils.isAbilityTriggeringProjectile(proj, false) ||
+			    proj.getScoreboardTags().contains("SourceQuickDrawVolley")) {
 			return false;
 		}
 
@@ -111,7 +113,8 @@ public class PinningShot extends Ability {
 			.addPercent(PINNING_SLOW_BOSS)
 			.add(" slowness and no weaken). Shooting a pinned non-boss enemy deals ")
 			.addPercent(a -> a.mDamageMultiplier, PINNING_SHOT_1_DAMAGE_MULTIPLIER, false, Ability::isLevelOne)
-			.add(" of its max health on top of regular damage and removes the pin. A mob cannot be pinned more than once.");
+			.add(" of its max health on top of regular damage and removes the pin. A mob cannot be pinned more than " +
+					"once. This ability cannot be triggered by Volleys initiated by Quickdraw.");
 	}
 
 	private static Description<PinningShot> getDescription2() {

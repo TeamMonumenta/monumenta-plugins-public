@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -38,7 +39,9 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class Quickdraw extends Ability {
-	private static final int DAMAGE = 13;
+	private static final int R1_DAMAGE = 11;
+	private static final int R2_DAMAGE = 17;
+	private static final int R3_DAMAGE = 22;
 	private static final int COOLDOWN_1 = Constants.TICKS_PER_SECOND * 6;
 	private static final int COOLDOWN_2 = Constants.TICKS_PER_SECOND * 3;
 	private static final int PIERCE_LVL = 1;
@@ -67,7 +70,7 @@ public class Quickdraw extends Ability {
 
 	public Quickdraw(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_DAMAGE : ServerProperties.getClassSpecializationsEnabled(player) ? R2_DAMAGE : R1_DAMAGE);
 		mPiercing = PIERCE_LVL + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new QuickdrawCS());
 	}
@@ -142,10 +145,10 @@ public class Quickdraw extends Ability {
 				proj.addScoreboardTag("NoGrapple");
 			}
 			EntityUtils.applyRecoilDisable(mPlugin, 9999, 1, mPlayer);
-			proj.addScoreboardTag("SourceQuickDraw");
 			Bukkit.getScheduler().runTaskLater(mPlugin, mPlayer::updateInventory, 1);
 		}
 
+		proj.addScoreboardTag("SourceQuickDraw");
 		proj.setShooter(mPlayer);
 		if (proj instanceof final AbstractArrow arrow) {
 			arrow.setPierceLevel(Math.max(0, Math.min((isEnhanced() ? mPiercing : 0), 127)));
@@ -192,9 +195,9 @@ public class Quickdraw extends Ability {
 	private static Description<Quickdraw> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.addTrigger()
-			.add(" to fire a ")
-			.add(a -> a.mDamage, DAMAGE)
-			.add(" damage projectile that inherits the enchantments of that weapon except those that modify base weapon damage. This skill can only apply Recoil once before touching the ground.")
+			.add(" to fire a damage projectile that inherits the enchantments of that weapon except those that modify base weapon damage.")
+			.add(" This skill can only apply Recoil once before touching the ground.")
+			.add(" Damage is based on region: R1 = " + R1_DAMAGE + " / R2 = " + R2_DAMAGE + " / R3 = " + R3_DAMAGE + ".")
 			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
 	}
 

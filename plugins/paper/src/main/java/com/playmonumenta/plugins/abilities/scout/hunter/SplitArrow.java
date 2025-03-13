@@ -72,6 +72,10 @@ public class SplitArrow extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && EntityUtils.isHostileMob(enemy)) {
+			if (proj.getScoreboardTags().contains("SourceQuickDrawVolley")) {
+				return false;
+			}
+
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getDamage() * mDamagePercent);
 			int count = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_BOUNCES);
 			if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
@@ -123,7 +127,7 @@ public class SplitArrow extends Ability {
 			.add(a -> a.mRange, SPLIT_ARROW_CHAIN_RANGE)
 			.add(" blocks takes ")
 			.addPercent(a -> a.mDamagePercent, SPLIT_ARROW_1_DAMAGE_PERCENT, false, Ability::isLevelOne)
-			.add(" of the original arrow damage.");
+			.add(" of the original arrow damage. This ability cannot be triggered by Volleys initiated by Quickdraw.");
 	}
 
 	private static Description<SplitArrow> getDescription2() {
