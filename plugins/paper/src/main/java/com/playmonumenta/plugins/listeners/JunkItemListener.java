@@ -92,8 +92,10 @@ public final class JunkItemListener implements Listener {
 				var setting = PlayerSetting.get(sender);
 
 				if (setting.mode() != PlayerSetting.Mode.ALL) {
+					sender.sendMessage(Component.text("You will now pick up all items.", NamedTextColor.GOLD, TextDecoration.BOLD));
 					setting = setting.mode(PlayerSetting.Mode.ALL);
 				} else {
+					sender.sendMessage(Component.text("You will no longer pick up uninteresting items.", NamedTextColor.GOLD, TextDecoration.BOLD));
 					setting = setting.mode(PlayerSetting.Mode.INTERESTING);
 				}
 
