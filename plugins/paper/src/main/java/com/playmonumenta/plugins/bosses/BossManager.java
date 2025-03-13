@@ -177,7 +177,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(ToughBoss.identityTag, ToughBoss::new, new ToughBoss.Parameters());
 		registerStatelessBoss(UnseenBoss.identityTag, UnseenBoss::new, new UnseenBoss.Parameters());
 		registerStatelessBoss(GenericBoss.identityTag, GenericBoss::new, new GenericBoss.Parameters());
-		registerStatelessBoss(HiddenBoss.identityTag, HiddenBoss::new);
+		registerStatelessBoss(HiddenBoss.identityTag, HiddenBoss::new, new HiddenBoss.Parameters());
 		registerStatelessBoss(InvisibleBoss.identityTag, InvisibleBoss::new);
 		registerStatelessBoss(FireResistantBoss.identityTag, FireResistantBoss::new);
 		registerStatelessBoss(HungerCloudBoss.identityTag, HungerCloudBoss::new);
