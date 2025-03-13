@@ -13,6 +13,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -61,7 +62,7 @@ public class PrestigiousRondeCS extends DeadlyRondeCS implements PrestigeCS {
 	}
 
 	@Override
-	public void rondeHitEffect(World world, Player player, double radius, double rondeBaseRadius, boolean lv2) {
+	public void rondeHitEffect(World world, Player player, Entity enemy, double radius, double rondeBaseRadius, boolean lv2) {
 		Vector mFront = player.getEyeLocation().getDirection();
 		Location particleLoc = player.getEyeLocation().add(mFront.multiply(0.6 * radius));
 		double multiplier = radius / rondeBaseRadius;

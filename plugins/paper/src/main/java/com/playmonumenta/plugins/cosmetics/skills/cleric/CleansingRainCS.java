@@ -28,14 +28,14 @@ public class CleansingRainCS implements CosmeticSkill {
 	}
 
 	public void rainCloud(Player player, double ratio, double mRadius) {
-		new PartialParticle(Particle.CLOUD, player.getLocation().add(0, 4, 0), 5, 2.5 * ratio, 0.35, 2.5 * ratio, 0).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.WATER_DROP, player.getLocation().add(0, 2, 0), (int) (15 * ratio * ratio), 2.5 * ratio, 2, 2.5 * ratio, 0.001).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CLOUD, player.getLocation().add(0, 4, 0), 4, 2.5 * ratio, 0.35, 2.5 * ratio, 0).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.WATER_DROP, player.getLocation().add(0, 2, 0), (int) (12 * ratio * ratio), 2.5 * ratio, 2, 2.5 * ratio, 0.001).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), (int) (1 * ratio * ratio), 2 * ratio, 1.5, 2 * ratio, 0.001).spawnAsPlayerActive(player);
 	}
 
 	public void rainEnhancement(Player player, double smallRatio, double mRadius) {
-		new PartialParticle(Particle.CLOUD, player.getLocation().add(0, 4, 0), (int) (5 * smallRatio * smallRatio), 2.5 * smallRatio, 0.35, 2.5 * smallRatio, 0).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.WATER_DROP, player.getLocation().add(0, 2, 0), (int) (15 * smallRatio * smallRatio), 2.5 * smallRatio, 2, 2.5 * smallRatio, 0.001).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CLOUD, player.getLocation().add(0, 4, 0), (int) (4 * smallRatio * smallRatio), 2.5 * smallRatio, 0.35, 2.5 * smallRatio, 0).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.WATER_DROP, player.getLocation().add(0, 2, 0), (int) (12 * smallRatio * smallRatio), 2.5 * smallRatio, 2, 2.5 * smallRatio, 0.001).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 2, 0), (int) (1 * smallRatio * smallRatio), 2 * smallRatio, 1.5, 2 * smallRatio, 0.001).spawnAsPlayerActive(player);
 	}
 }

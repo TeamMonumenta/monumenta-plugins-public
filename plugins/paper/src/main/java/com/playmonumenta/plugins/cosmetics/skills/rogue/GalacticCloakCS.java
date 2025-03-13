@@ -40,7 +40,7 @@ public class GalacticCloakCS extends SmokescreenCS {
 	}
 
 	@Override
-	public void smokescreenEffects(Player player, World world, Location loc) {
+	public void smokescreenEffects(Player player, World world, Location loc, double radius) {
 		ArrayList<Vector> spiralPoints = new ArrayList<>();
 		for (double d = 0; d < SPIRAL_POINTS; d++) {
 			spiralPoints.add(new Vector(loc.getX() + d / 35.0 * FastUtils.cos(d * Math.PI / 21.0), loc.getY() + 0.2, loc.getZ() + d / 35.0 * FastUtils.sin(d * Math.PI / 21.0)));

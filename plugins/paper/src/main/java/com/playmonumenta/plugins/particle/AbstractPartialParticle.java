@@ -520,8 +520,8 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 	}
 
 	private void spawnForPlayersInternal(ParticleCategory source, ParticleCategory otherSource, Collection<Player> players, @Nullable Player sourcePlayer) {
+		this.prepareSpawn();
 		ParticleManager.runOffMainThread((final AbstractPartialParticle<?> self) -> {
-			self.prepareSpawn();
 			players.forEach(player -> {
 				spawnForPlayerInternal(self, player, player == sourcePlayer ? source : otherSource, sourcePlayer);
 			});

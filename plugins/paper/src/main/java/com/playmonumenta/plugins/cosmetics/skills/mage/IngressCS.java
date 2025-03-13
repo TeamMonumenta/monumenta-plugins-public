@@ -63,7 +63,7 @@ public class IngressCS extends ThunderStepCS {
 	}
 
 	@Override
-	public void castEffect(Player player, double ratio) {
+	public void castEffect(Player player, double ratio, double radius) {
 		Location location = player.getLocation();
 		World world = location.getWorld();
 		world.playSound(location, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.PLAYERS, 1f, 1f);

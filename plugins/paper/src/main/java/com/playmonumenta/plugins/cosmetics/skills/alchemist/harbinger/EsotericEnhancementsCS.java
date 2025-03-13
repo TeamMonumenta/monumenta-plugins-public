@@ -44,7 +44,6 @@ public class EsotericEnhancementsCS implements CosmeticSkill {
 	}
 
 	public void explosionEffects(Player player, LivingEntity aberration, double radius) {
-
 	}
 
 	public void expireEffects(Player player, LivingEntity aberration) {

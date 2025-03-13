@@ -117,8 +117,7 @@ public class Starfall extends Ability {
 					loc.subtract(0, CharmManager.getExtraPercent(mPlayer, CHARM_FALL_SPEED, FALL_INCREMENT), 0);
 					if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
 						if (loc.getY() - ogLoc.getY() <= 2) {
-							double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, SIZE);
-							mCosmetic.starfallLandEffect(world, mPlayer, loc, ogPlayerLoc, radius);
+							mCosmetic.starfallLandEffect(world, mPlayer, loc, ogPlayerLoc, mRadius);
 							this.cancel();
 							Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
 							for (LivingEntity e : hitbox.getHitMobs()) {

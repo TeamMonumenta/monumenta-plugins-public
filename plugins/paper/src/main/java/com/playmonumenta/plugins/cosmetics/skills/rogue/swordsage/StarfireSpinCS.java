@@ -52,7 +52,7 @@ public class StarfireSpinCS extends BladeDanceCS {
 	}
 
 	@Override
-	public void danceTick(Player player, World world, Location centre, int tick, double radius) {
+	public void danceTick(Player player, World world, Location centre, int tick, int duration, double radius) {
 		for (Vector v : TRI_UNIT_VECTORS) {
 			for (double i = 1; i <= PARTICLES_PER_LINE; i++) {
 				Location location = centre.clone()

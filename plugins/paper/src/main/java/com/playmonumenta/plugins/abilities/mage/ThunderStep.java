@@ -154,16 +154,15 @@ public class ThunderStep extends Ability {
 			null, -1, -1
 		);
 		Location playerEndLocation = movingPlayerBox
-			.getCenter()
-			.setY(movingPlayerBox.getMinY())
-			.toLocation(world)
-			.setDirection(vector);
+			 .getCenter()
+			 .setY(movingPlayerBox.getMinY())
+			 .toLocation(world)
+			 .setDirection(vector);
 
 		if (!playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)
-			|| ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			    || ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return true;
 		}
-
 		PlayerUtils.playerTeleport(mPlayer, playerEndLocation);
 		doDamage(playerEndLocation, spellDamage, doParalyze);
 		mCosmetic.trailEffect(mPlayer, playerStartLocation, playerEndLocation);
@@ -176,7 +175,7 @@ public class ThunderStep extends Ability {
 
 	public void doDamage(Location location, float spellDamage, boolean enhancementParalyze) {
 		double ratio = mRadius / SIZE;
-		mCosmetic.castEffect(mPlayer, ratio);
+		mCosmetic.castEffect(mPlayer, ratio, mRadius);
 
 		Hitbox hitbox = new Hitbox.SphereHitbox(location.clone().add(0, 0.9, 0), mRadius);
 		List<LivingEntity> enemies = hitbox.getHitMobs();

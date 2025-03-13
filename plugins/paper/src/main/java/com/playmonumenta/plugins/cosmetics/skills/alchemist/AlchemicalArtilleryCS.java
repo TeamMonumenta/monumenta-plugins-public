@@ -131,6 +131,15 @@ public class AlchemicalArtilleryCS implements CosmeticSkill {
 			new PartialParticle(Particle.BLOCK_CRACK, mobLoc, 25, 0, 0, 0, 1, world.getBlockData(mobLoc.clone().subtract(0, 1, 0))).spawnAsPlayerActive(caster);
 			new PartialParticle(Particle.EXPLOSION_LARGE, mobLoc, 5, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(caster);
 		}
+
+		new PPCircle(Particle.REDSTONE, loc, radius)
+			.count(25)
+			.extra(0.0025)
+			.data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f))
+			.spawnAsPlayerActive(caster);
+
+		// explosion effect
+		new PartialParticle(Particle.FLAME, loc, 40, radius / 4, 0, radius / 4, 0.03 * radius).spawnAsPlayerActive(caster);
 	}
 
 }

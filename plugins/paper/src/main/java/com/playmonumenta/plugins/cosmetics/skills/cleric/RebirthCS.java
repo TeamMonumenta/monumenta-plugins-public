@@ -141,7 +141,7 @@ public class RebirthCS extends CelestialBlessingCS {
 			}.runTaskTimer(Plugin.getInstance(), 0, 1);
 
 			ParticleUtils.drawCleaveArc(loc.clone().add(new Vector(0, 1, 0)), 2, 90, 180, 360, 2, i + 45, 0, 0.1, 15,
-				(location, rings) -> new PartialParticle(Particle.SOUL_FIRE_FLAME, location).spawnAsPlayerActive(player));
+				(location, rings, angleProgress) -> new PartialParticle(Particle.SOUL_FIRE_FLAME, location).spawnAsPlayerActive(player));
 
 		}
 		ParticleUtils.drawParticleCircleExplosion(player, loc, 0, 0.5, 0, 0, 40, 3, false, 0, 0.15, Particle.ENCHANTMENT_TABLE);

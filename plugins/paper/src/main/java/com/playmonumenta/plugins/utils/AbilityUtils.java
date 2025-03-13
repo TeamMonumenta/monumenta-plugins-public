@@ -177,7 +177,7 @@ public class AbilityUtils {
 		Location loc = player.getLocation();
 		World world = player.getWorld();
 
-		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 8, 0.25, 0.3, 0.25, 0.1f).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.5f, 2f);
@@ -187,7 +187,7 @@ public class AbilityUtils {
 		Location loc = player.getLocation();
 		World world = player.getWorld();
 
-		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 0.6f, 0.5f);

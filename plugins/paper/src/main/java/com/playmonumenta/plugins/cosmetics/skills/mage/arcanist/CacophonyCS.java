@@ -91,9 +91,9 @@ public class CacophonyCS extends AstralOmenCS {
 		new PartialParticle(Particle.CRIMSON_SPORE, entity.getLocation().add(0, 1, 0), 5, 0, 0, 0, 0.005).spawnAsEnemyBuff();
 		if (Bukkit.getCurrentTick() % 4 == 0) {
 			ParticleUtils.drawCleaveArc(location, 1.6, 0, 10, 170, 1, 0, 0, 0.2, 30,
-				(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, ARCANE_COLOR).spawnAsPlayerActive(player), 10);
+				(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, ARCANE_COLOR).spawnAsPlayerActive(player), 10);
 			ParticleUtils.drawCleaveArc(location, 1.6, 0, 190, 350, 1, 0, 0, 0.2, 30,
-				(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, ARCANE_COLOR).spawnAsPlayerActive(player), 10);
+				(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, ARCANE_COLOR).spawnAsPlayerActive(player), 10);
 		}
 	}
 
@@ -105,9 +105,9 @@ public class CacophonyCS extends AstralOmenCS {
 
 		if (Bukkit.getCurrentTick() % 4 == 0) {
 			ParticleUtils.drawCleaveArc(location, 0.8, 0, 10, 170, 1, 0, 0, 0.2, 30,
-				(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, FIRE_COLOR).spawnAsPlayerActive(player), 12);
+				(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, FIRE_COLOR).spawnAsPlayerActive(player), 12);
 			ParticleUtils.drawCleaveArc(location, 0.8, 0, 190, 350, 1, 0, 0, 0.2, 30,
-				(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, FIRE_COLOR).spawnAsPlayerActive(player), 12);
+				(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, FIRE_COLOR).spawnAsPlayerActive(player), 12);
 		}
 	}
 
@@ -118,9 +118,9 @@ public class CacophonyCS extends AstralOmenCS {
 		new PartialParticle(Particle.CRIMSON_SPORE, entity.getLocation().add(0, 1, 0), 5, 0, 0, 0, 0.005).spawnAsEnemyBuff();
 		if (Bukkit.getCurrentTick() % 4 == 0) {
 			ParticleUtils.drawCleaveArc(location, 2, 180, 10, 170, 1, 0, 0, 0.2, 30,
-				(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, ICE_COLOR).spawnAsPlayerActive(player), 6);
+				(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, ICE_COLOR).spawnAsPlayerActive(player), 6);
 			ParticleUtils.drawCleaveArc(location, 2, 180, 190, 350, 1, 0, 0, 0.2, 30,
-				(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, ICE_COLOR).spawnAsPlayerActive(player), 6);
+				(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, ICE_COLOR).spawnAsPlayerActive(player), 6);
 		}
 	}
 
@@ -131,9 +131,9 @@ public class CacophonyCS extends AstralOmenCS {
 		new PartialParticle(Particle.CRIMSON_SPORE, entity.getLocation().add(0, 1, 0), 5, 0, 0, 0, 0.005).spawnAsEnemyBuff();
 		if (Bukkit.getCurrentTick() % 4 == 0) {
 			ParticleUtils.drawCleaveArc(location, 1.2, 180, 10, 170, 1, 0, 0, 0.2, 30,
-				(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, THUNDER_COLOR).spawnAsPlayerActive(player), 8);
+				(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, THUNDER_COLOR).spawnAsPlayerActive(player), 8);
 			ParticleUtils.drawCleaveArc(location, 1.2, 180, 190, 350, 1, 0, 0, 0.2, 30,
-				(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, THUNDER_COLOR).spawnAsPlayerActive(player), 8);
+				(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, THUNDER_COLOR).spawnAsPlayerActive(player), 8);
 		}
 	}
 

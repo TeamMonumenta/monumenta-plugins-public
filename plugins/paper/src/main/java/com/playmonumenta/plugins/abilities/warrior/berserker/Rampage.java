@@ -108,7 +108,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 			addDamageReductionEffect(false);
 
 			Location loc = mPlayer.getLocation();
-			mCosmetic.onCast(mPlayer, loc, world);
+			mCosmetic.onCast(mPlayer, loc, world, mRadius);
 
 			mStacks = 0;
 			showChargesMessage();

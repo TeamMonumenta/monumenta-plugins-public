@@ -76,7 +76,7 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 
-		mCosmetic.smokescreenEffects(mPlayer, world, loc);
+		mCosmetic.smokescreenEffects(mPlayer, world, loc, mRadius);
 
 		applyEffects(loc);
 		putOnCooldown();

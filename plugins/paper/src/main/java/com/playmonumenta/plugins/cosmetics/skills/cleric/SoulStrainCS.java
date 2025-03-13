@@ -88,7 +88,7 @@ public class SoulStrainCS extends DivineJusticeCS {
 		new PartialParticle(Particle.GLOW, LocationUtils.getHalfHeightLocation(enemy), 12, 0.1, 0.2 * enemy.getHeight(), 0.1, 0.05).spawnAsPlayerActive(player);
 		enemyLoc.setDirection(dir);
 		ParticleUtils.drawHalfArc(enemyLoc.clone().add(0, 1, 0).subtract(dir.clone().multiply(2.25)), 2, ANGLE[combo], 0, 160, 5, 0.15,
-			(Location l, int ring) ->
+			(Location l, int ring, double angleProgress) ->
 				new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0.05, 0.05, 0).data(CYAN).spawnAsPlayerActive(player));
 		if (combo == 2) {
 			world.playSound(enemyLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.7f, 1.2f);

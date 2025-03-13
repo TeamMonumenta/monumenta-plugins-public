@@ -28,6 +28,7 @@ public class PPFlower extends AbstractPartialParticle<PPFlower> {
 	public PPFlower(Particle particle, Location centerLocation, double radius) {
 		super(particle, centerLocation);
 		mRadius = radius;
+		mCount = -1;
 	}
 
 	@Override
@@ -107,6 +108,9 @@ public class PPFlower extends AbstractPartialParticle<PPFlower> {
 
 	@Override
 	protected int getPartialCount(double multiplier, Player player, ParticleCategory source) {
+		if (mCount > 0) {
+			return mCount;
+		}
 		int finalPetals = mSharp ? (mPetals % 2 == 0 ? mPetals * 2 : mPetals) : mPetals;
 		double endAngle = mSharp ? Math.PI * 4 : Math.PI * (finalPetals - 2);
 		double finalAngleStep = mSharp ? mAngleStep / 4.0 : mAngleStep;

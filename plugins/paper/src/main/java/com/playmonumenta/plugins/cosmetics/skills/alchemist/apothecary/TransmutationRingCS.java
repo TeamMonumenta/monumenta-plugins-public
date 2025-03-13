@@ -38,7 +38,7 @@ public class TransmutationRingCS implements CosmeticSkill {
 	}
 
 	public void effectOnKill(Player mPlayer, Location loc) {
-		mPlayer.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.PLAYERS, 1, 2);
+		mPlayer.getWorld().playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.7f, 2);
 	}
 
 }

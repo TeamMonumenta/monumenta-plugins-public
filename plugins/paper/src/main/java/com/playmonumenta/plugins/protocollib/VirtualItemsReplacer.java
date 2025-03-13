@@ -36,6 +36,7 @@ import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
@@ -379,12 +380,8 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			nbt.modifyMeta((nbtr, meta) -> {
 				if (meta instanceof PotionMeta potionMeta) {
 					double ratio = ((double) count) / potionsAbility.getMaxCharges();
-					int color = (int) (ratio * 255);
-					if (potionsAbility.isGruesomeMode()) {
-						potionMeta.setColor(Color.fromRGB(color, 0, 0));
-					} else {
-						potionMeta.setColor(Color.fromRGB(0, color, 0));
-					}
+					Color color = potionsAbility.mCosmetic.splashColor(potionsAbility.isGruesomeMode());
+					potionMeta.setColor(ParticleUtils.getTransition(Color.BLACK, color, ratio));
 				}
 				meta.displayName(ItemUtils.getDisplayName(itemStack).append(Component.text(" (" + count + ")")));
 			});

@@ -37,7 +37,8 @@ public class GloriousBattleCS implements CosmeticSkill {
 	}
 
 	public void gloryOnDamage(World world, Player player, LivingEntity target) {
-		//Nope!
+		world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.0f, 0.5f);
+		new PartialParticle(Particle.SWEEP_ATTACK, target.getLocation(), 2).spawnAsPlayerActive(player);
 	}
 
 	public void gloryOnLand(World world, Player player, Location loc, double radius) {

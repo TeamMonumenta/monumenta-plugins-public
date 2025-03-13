@@ -102,7 +102,7 @@ public class AwakeningCS extends CelestialBlessingCS {
 		Location arcLoc2 = locCaster.clone().add(0, 2.5, 0);
 		arcLoc2.setPitch(0);
 		ParticleUtils.drawHalfArc(arcLoc1, 4 + Math.random(), -10 + 20*Math.random(), 0, 359, 5, 0.2,
-			(Location l, int ring) -> new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 2, 0.05, 0.05, 0.05, 0,
+			(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 2, 0.05, 0.05, 0.05, 0,
 				new Particle.DustTransition(
 					ParticleUtils.getTransition(LIGHT_CYAN, CYAN, ring / 4D).getColor(),
 					ParticleUtils.getTransition(PURPLE, DARK_PURPLE, ring / 4D).getColor(),
@@ -110,7 +110,7 @@ public class AwakeningCS extends CelestialBlessingCS {
 				))
 				.directionalMode(false).spawnAsPlayerActive(caster));
 		ParticleUtils.drawHalfArc(arcLoc2, 4 + Math.random(), 180 + 10 - 20*Math.random(), 0, 359, 5, 0.2,
-			(Location l, int ring) -> new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 2, 0.05, 0.05, 0.05, 0,
+			(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 2, 0.05, 0.05, 0.05, 0,
 				new Particle.DustTransition(
 					ParticleUtils.getTransition(LIGHT_CYAN, CYAN, ring / 4D).getColor(),
 					ParticleUtils.getTransition(PURPLE, DARK_PURPLE, ring / 4D).getColor(),

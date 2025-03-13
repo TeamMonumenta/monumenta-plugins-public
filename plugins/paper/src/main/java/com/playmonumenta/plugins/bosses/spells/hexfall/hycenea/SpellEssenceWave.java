@@ -116,7 +116,7 @@ public class SpellEssenceWave extends Spell {
 
 								new PPBezier(Particle.BLOCK_CRACK, endpoints)
 									.data(data)
-									.count(10)
+									.count(100)
 									.spawnAsBoss();
 
 								if (!moveOrLock) {

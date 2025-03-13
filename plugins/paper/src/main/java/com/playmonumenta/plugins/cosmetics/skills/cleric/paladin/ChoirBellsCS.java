@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -62,8 +63,14 @@ public class ChoirBellsCS implements CosmeticSkill {
 					t -> radius * FastUtils.sin(Math.PI * 2 * t / units),
 					t -> height,
 					(loc, t) -> {
-						new PartialParticle(Particle.VILLAGER_HAPPY, loc, 1).spawnAsPlayerActive(player);
-						new PartialParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 0.25, 0), 1, 0, 0.1).spawnAsPlayerActive(player);
+						new PartialParticle(Particle.REDSTONE, loc, 1)
+							.data(new Particle.DustOptions(ParticleUtils.getTransition(Color.fromRGB(255, 255, 50), Color.ORANGE,
+								mTicks / range * mDelta), (float) (1.6f - mTicks / range * mDelta)))
+							.spawnAsPlayerActive(player);
+						new PartialParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 0.25, 0))
+							.extra(0.1)
+							.directionalMode(true)
+							.spawnAsPlayerActive(player);
 					});
 
 				if (++mTicks > range / mDelta) {

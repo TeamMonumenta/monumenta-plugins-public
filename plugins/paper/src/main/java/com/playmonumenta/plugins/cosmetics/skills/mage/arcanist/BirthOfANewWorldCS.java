@@ -70,14 +70,14 @@ public class BirthOfANewWorldCS extends SagesInsightCS {
 		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 75, 0.05f, 0.05f, 0.05f, 0.5).spawnAsPlayerActive(player);
 
 		ParticleUtils.drawCleaveArc(loc.clone().add(0, 1, 0), 3.5, 165, -80, 260, 6, 0, 0, 0.2, 60,
-			(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+			(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 				new Particle.DustOptions(
 					ParticleUtils.getTransition(LILAC_BASE, LILAC_TIP, ring / 6D),
 					0.6f + (ring * 0.1f)
 				)).spawnAsPlayerActive(player));
 
 		ParticleUtils.drawCleaveArc(loc.clone().add(0, 1, 0), 3.5, -165, 100, 440, 6, 0, 0, 0.2, 60,
-			(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+			(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 				new Particle.DustOptions(
 					ParticleUtils.getTransition(ROSE_BASE, ROSE_TIP, ring / 6D),
 					0.6f + (ring * 0.1f)

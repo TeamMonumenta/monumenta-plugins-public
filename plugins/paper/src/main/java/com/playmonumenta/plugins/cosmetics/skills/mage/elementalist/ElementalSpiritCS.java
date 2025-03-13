@@ -37,7 +37,9 @@ public class ElementalSpiritCS implements CosmeticSkill {
 			.extra(0.05)
 			.spawnAsPlayerActive(player);
 		partialParticle
-			.particle(Particle.SMOKE_LARGE)
+			.location(loc.clone().subtract(0, 1, 0))
+			.particle(Particle.SMOKE_NORMAL)
+			.count(2)
 			.spawnAsPlayerActive(player);
 	}
 

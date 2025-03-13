@@ -127,7 +127,7 @@ public final class SlamAttackBoss extends BossAbilityGroup {
 				Vector dir = LocationUtils.getDirectionTo(pLoc, bossLoc).multiply(2.15);
 				pLoc.setDirection(dir);
 				ParticleUtils.drawHalfArc(pLoc.clone().subtract(dir), 2.15, ANGLES[combo], -40, 140, 8, 0.2,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(COLO_COLOR_BASE, COLO_COLOR_TIP, ring / 8D),
 							0.6f + (ring * 0.1f)

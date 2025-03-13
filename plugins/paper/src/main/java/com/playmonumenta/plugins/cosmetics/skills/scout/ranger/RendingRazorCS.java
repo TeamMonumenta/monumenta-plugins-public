@@ -33,7 +33,7 @@ public class RendingRazorCS implements CosmeticSkill {
 	}
 
 	public void razorProjectileEffects(final Player player, final Location location) {
-		new PartialParticle(Particle.SWEEP_ATTACK, location).count(2).delta(0.1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SWEEP_ATTACK, location).minimumCount(1).count(2).delta(0.1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, location).count(10).delta(0.2).extra(0.1).spawnAsPlayerActive(player);
 		location.getWorld().playSound(location, Sound.ENTITY_BREEZE_JUMP, SoundCategory.PLAYERS, 1, 1);
 	}
@@ -55,7 +55,7 @@ public class RendingRazorCS implements CosmeticSkill {
 	}
 
 	public void razorRetrieve(final Player player, final Location location) {
-		new PartialParticle(Particle.SWEEP_ATTACK, location).count(2).delta(0.1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SWEEP_ATTACK, location).minimumCount(1).count(2).delta(0.1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.END_ROD, location).count(5).delta(0.3).extra(0.1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.DAMAGE_INDICATOR, location).count(5).delta(0.3).extra(0.1).spawnAsPlayerActive(player);
 	}

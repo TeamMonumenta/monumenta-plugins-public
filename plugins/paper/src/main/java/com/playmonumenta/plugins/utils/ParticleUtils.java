@@ -47,7 +47,7 @@ public class ParticleUtils {
 	@FunctionalInterface
 	public interface CleaveAnimation {
 
-		void cleaveAnimation(Location loc, int rings);
+		void cleaveAnimation(Location loc, int rings, double angleProgress);
 
 	}
 
@@ -263,7 +263,7 @@ public class ParticleUtils {
 						vec = VectorUtils.rotateYAxis(vec, finalLoc.getYaw());
 
 						Location l = finalLoc.clone().add(vec);
-						cleaveAnim.cleaveAnimation(l, i + 1);
+						cleaveAnim.cleaveAnimation(l, i + 1, (d - startingDegrees) / (endingDegrees - startingDegrees));
 					}
 
 					mPI += radiusInc * (degreeStep / 2.0);
@@ -418,7 +418,7 @@ public class ParticleUtils {
 						vec = VectorUtils.rotateYAxis(vec, finalLoc.getYaw() + extraYaw);
 
 						Location l = finalLoc.clone().add(vec);
-						cleaveAnim.cleaveAnimation(l, i + 1);
+						cleaveAnim.cleaveAnimation(l, i + 1, (d - startingDegrees) / endingDegrees);
 					}
 
 					mPI += radiusInc * degreeStep;

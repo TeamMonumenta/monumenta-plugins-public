@@ -99,6 +99,7 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 	@Override
 	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		int count = packagedValues.count();
+		packagedValues.count(1);
 		int n = mControlPoints.size() - 1;
 
 		if (mAnimationTicks > 1) {

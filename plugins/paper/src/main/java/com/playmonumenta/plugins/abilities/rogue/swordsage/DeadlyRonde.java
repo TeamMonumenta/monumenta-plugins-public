@@ -84,6 +84,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
 		/* Re-up the duration every time an ability is cast */
+		double speed = RONDE_SPEED_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 		if (mActiveRunnable != null) {
 			mActiveRunnable.cancel();
 		} else {
@@ -94,7 +95,8 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 				public void run() {
 					mTicks++;
 					mCosmetic.rondeTickEffect(mPlayer, getCharges(), mTicks);
-					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde", new PercentSpeed(6, mSpeed, "DeadlyRondeMod").displaysTime(false).deleteOnAbilityUpdate(true));
+					mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde",
+						new PercentSpeed(6, speed, "DeadlyRondeMod").deleteOnAbilityUpdate(true));
 					if (mActiveRunnable == null) {
 						this.cancel();
 					}
@@ -135,7 +137,8 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			double damage = mDamage * damageRatio;
 
 			double angle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, RONDE_ANGLE);
-			Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), mRadius, Math.toRadians(angle));
+			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RONDE_RADIUS);
+			Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), radius, Math.toRadians(angle));
 
 			for (LivingEntity mob : hitbox.getHitMobs()) {
 				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.getLinkedSpell(), true);
@@ -143,7 +146,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			}
 
 			World world = mPlayer.getWorld();
-			mCosmetic.rondeHitEffect(world, mPlayer, mRadius, RONDE_RADIUS, isLevelTwo());
+			mCosmetic.rondeHitEffect(world, mPlayer, enemy, mRadius, RONDE_RADIUS, isLevelTwo());
 
 			mActiveRunnable.cancel();
 			mActiveRunnable = null;

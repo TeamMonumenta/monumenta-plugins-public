@@ -119,6 +119,7 @@ public class ViciousCombos extends Ability {
 			&& Bukkit.getServer().getCurrentTick() < mAbilityCastTime + ENHANCEMENT_CHARGE_LIFETIME) {
 			event.updateDamageWithMultiplier(1 + mEnhancementDamage);
 			mPlugin.mTimers.updateCooldown(mPlayer, mLastAbility, ENHANCEMENT_COOLDOWN_REDUCTION);
+			mCosmetic.enhancedCombo(enemy.getWorld(), mPlayer, enemy);
 
 			clearState();
 		}

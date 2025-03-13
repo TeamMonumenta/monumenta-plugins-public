@@ -84,13 +84,13 @@ public class DecapitationCS extends ByMyBladeCS implements GalleryCS {
 
 		if (level > 1) {
 			ParticleUtils.drawHalfArc(arcCenter, CLEAVE_RADIUS, 37, 30, 150, 3, 0.15,
-				(Location l, int ring) -> {
+				(Location l, int ring, double angleProgress) -> {
 					new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 1, 0, 0, 0, 0,
 						new Particle.DustTransition(BLOOD_COLOR1, BLOOD_COLOR2, 0.7f + (ring * 0.05f)))
 						.spawnAsPlayerActive(player);
 				});
 			ParticleUtils.drawHalfArc(arcCenter, CLEAVE_RADIUS, 143, 30, 150, 3, 0.15,
-				(Location l, int ring) -> {
+				(Location l, int ring, double angleProgress) -> {
 					new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 1, 0, 0, 0, 0,
 						new Particle.DustTransition(BLOOD_COLOR1, BLOOD_COLOR2, 0.7f + (ring * 0.05f)))
 						.spawnAsPlayerActive(player);
@@ -98,7 +98,7 @@ public class DecapitationCS extends ByMyBladeCS implements GalleryCS {
 		} else {
 			int angle = FastUtils.RANDOM.nextDouble() < 0.5 ? 0 : 180;
 			ParticleUtils.drawHalfArc(arcCenter, CLEAVE_RADIUS, angle, 30, 150, 2, 0.1,
-				(Location l, int ring) -> {
+				(Location l, int ring, double angleProgress) -> {
 					new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 1, 0, 0, 0, 0,
 						new Particle.DustTransition(BLOOD_COLOR1, BLOOD_COLOR2, 0.7f + (ring * 0.05f)))
 						.spawnAsPlayerActive(player);

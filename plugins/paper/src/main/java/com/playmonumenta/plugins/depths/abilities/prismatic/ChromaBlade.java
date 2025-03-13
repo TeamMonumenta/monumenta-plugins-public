@@ -468,7 +468,7 @@ public class ChromaBlade extends DepthsAbility {
 		double finalDamageMult = damageMultiplier;
 
 		ParticleUtils.drawHalfArc(getPlayerLocation(0.5), 1.5, angle, startingDegrees, endingDegrees, rings, 0.32, false, isFast ? 50 : 25,
-			(Location l, int ring) -> doSlashParticle(l, ring, hitMobs, isFast, playerItemStats, tree, finalDamageMult)
+			(Location l, int ring, double angleProgress) -> doSlashParticle(l, ring, hitMobs, isFast, playerItemStats, tree, finalDamageMult)
 		);
 		playSlashSound(isFast, tree);
 	}
@@ -619,10 +619,10 @@ public class ChromaBlade extends DepthsAbility {
 			@Override
 			public void run() {
 				ParticleUtils.drawHalfArc(mLoc, mSize, mAngle, 30, 150, 1, 0, false, 180,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer)
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 				ParticleUtils.drawHalfArc(mLoc.subtract(mDir.clone().multiply(0.15)), mSize, mAngle, 30, 150, 1, 0, false, 180,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer)
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 
 				List<LivingEntity> collision = new Hitbox.SphereHitbox(mLoc, mSize).getHitMobs();

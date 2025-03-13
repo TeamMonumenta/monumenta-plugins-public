@@ -61,7 +61,6 @@ public class SpellSlashAttack extends Spell {
 
 	public Vector mKnockback;
 
-	public double mCurrAngleProgress = 0;
 	public boolean mSwitchedColor = false;
 	public Map<Player, Integer> mLastKnockbackTick = new HashMap<>();
 
@@ -165,33 +164,30 @@ public class SpellSlashAttack extends Spell {
 		mActiveRunnables.add(runnableSounds);
 
 		Location startLoc = LocationUtils.getHalfHeightLocation(mBoss);
-		double maxAngleProgress = Math.abs(mEndAngle - mStartAngle) / 2;
-		mCurrAngleProgress = 0;
 		mSwitchedColor = false;
 
 		List<Player> hitPlayers = new ArrayList<>();
 
 		ParticleUtils.drawHalfArc(startLoc, mRadius, selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
-			(Location l, int ring) -> {
-				doSlash(l, ring, startLoc, maxAngleProgress, hitPlayers);
-				mCurrAngleProgress += 5 / (double) mRings;
+			(Location l, int ring, double angleProgress) -> {
+				doSlash(l, ring, angleProgress, startLoc, hitPlayers);
 			}
 		);
 		if (mXSlash) {
 			ParticleUtils.drawHalfArc(startLoc, mRadius, 360 - selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
-				(Location l, int ring) -> {
-					doSlash(l, ring, startLoc, maxAngleProgress, hitPlayers);
+				(Location l, int ring, double angleProgress) -> {
+					doSlash(l, ring, angleProgress, startLoc, hitPlayers);
 				}
 			);
 		}
 	}
 
-	private void doSlash(Location l, int ring, Location startLoc, double maxAngleProgress, List<Player> hitPlayers) {
+	private void doSlash(Location l, int ring, double angleProgress, Location startLoc, List<Player> hitPlayers) {
 		Location finalLoc = l.clone();
 		if (mFollowCaster) {
 			finalLoc.add(LocationUtils.getHalfHeightLocation(mBoss).toVector().subtract(startLoc.toVector()));
 		}
-		Particle.DustOptions data = calculateColorProgress(ring, maxAngleProgress);
+		Particle.DustOptions data = calculateColorProgress(ring, angleProgress);
 		new PartialParticle(Particle.REDSTONE, finalLoc, 1).extra(0)
 			.data(data).spawnAsEntityActive(mBoss);
 		Hitbox hitbox = new Hitbox.AABBHitbox(mBoss.getWorld(), BoundingBox.of(finalLoc, mHitboxSize, mHitboxSize, mHitboxSize));
@@ -238,7 +234,7 @@ public class SpellSlashAttack extends Spell {
 	private void telegraphSLash(double selectedAngle) {
 		Location startLoc = LocationUtils.getHalfHeightLocation(mBoss);
 		ParticleUtils.drawHalfArc(startLoc, mRadius, selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
-			(Location l, int ring) -> {
+			(Location l, int ring, double angleProgress) -> {
 				new PartialParticle(Particle.REDSTONE, l, 1).extra(0)
 					.data(new Particle.DustOptions(Color.WHITE, (mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)))
 					.spawnAsEntityActive(mBoss);
@@ -246,7 +242,7 @@ public class SpellSlashAttack extends Spell {
 		);
 		if (mXSlash) {
 			ParticleUtils.drawHalfArc(startLoc, mRadius, 360 - selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
-				(Location l, int ring) -> {
+				(Location l, int ring, double angleProgress) -> {
 					new PartialParticle(Particle.REDSTONE, l, 1).extra(0)
 						.data(new Particle.DustOptions(Color.WHITE, (mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)))
 						.spawnAsEntityActive(mBoss);
@@ -256,7 +252,7 @@ public class SpellSlashAttack extends Spell {
 		mSoundsTelegraph.play(mBoss.getLocation());
 	}
 
-	Particle.DustOptions calculateColorProgress(int ring, double maxAngleProgress) {
+	Particle.DustOptions calculateColorProgress(int ring, double progress) {
 		Particle.DustOptions data;
 		if (!mHorizontalColor) {
 			int halfRings = mRings / 2;
@@ -274,14 +270,12 @@ public class SpellSlashAttack extends Spell {
 				);
 			}
 		} else {
-			double progress = mCurrAngleProgress / maxAngleProgress;
 			if (!mSwitchedColor) {
 				data = new Particle.DustOptions(
 					ParticleUtils.getTransition(mStartColor, mMidColor, Math.min(progress, 1)),
 					(mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)
 				);
-				if (mCurrAngleProgress >= maxAngleProgress) {
-					mCurrAngleProgress = 0;
+				if (progress >= 1) {
 					mSwitchedColor = true;
 				}
 			} else {

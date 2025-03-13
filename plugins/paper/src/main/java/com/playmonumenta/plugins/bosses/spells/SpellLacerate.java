@@ -137,14 +137,14 @@ public class SpellLacerate extends Spell {
 						Vector targetDirection = loc.toVector().subtract(launcherLoc.toVector()).normalize();
 						Location outerSlashDirection = loc.clone().setDirection(targetDirection);
 						ParticleUtils.drawCleaveArc(outerSlashDirection, mParameters.RADIUS * 0.8, 160, -80, 260, mParameters.RINGS, 0, 0, mParameters.SPACING, 60,
-							(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+							(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 								new Particle.DustOptions(
 									ParticleUtils.getTransition(mParameters.SLASH_COLOR_INNER, mParameters.SLASH_COLOR_OUTER, ring / 8D),
 									(mParameters.FORCED_PARTICLE_SIZE > 0) ? (float) mParameters.FORCED_PARTICLE_SIZE : 0.6f + (ring * 0.1f)
 								)).spawnAsEntityActive(mLauncher));
 
 						ParticleUtils.drawCleaveArc(outerSlashDirection, mParameters.RADIUS * 0.8, 20, -80, 260, mParameters.RINGS, 0, 0, mParameters.SPACING, 60,
-							(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+							(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 								new Particle.DustOptions(
 									ParticleUtils.getTransition(mParameters.SLASH_COLOR_INNER, mParameters.SLASH_COLOR_OUTER, ring / 8D),
 									(mParameters.FORCED_PARTICLE_SIZE > 0) ? (float) mParameters.FORCED_PARTICLE_SIZE : 0.6f + (ring * 0.1f)

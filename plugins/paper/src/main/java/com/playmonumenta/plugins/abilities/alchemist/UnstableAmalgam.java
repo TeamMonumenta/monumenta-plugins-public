@@ -171,6 +171,7 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 		mCurrDuration = 0;
 
 		Entity e = LibraryOfSoulsIntegration.summon(loc, "UnstableAmalgam");
+
 		if (e instanceof Slime amalgam) {
 			mAmalgam = amalgam;
 

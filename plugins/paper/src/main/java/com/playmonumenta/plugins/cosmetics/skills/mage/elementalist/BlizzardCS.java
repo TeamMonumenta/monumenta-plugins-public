@@ -48,9 +48,9 @@ public class BlizzardCS implements CosmeticSkill {
 		new PartialParticle(Particle.SNOWBALL, loc, 4).delta(radius / 2).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CLOUD, loc, 2).delta(radius / 2).extra(0.05).spawnAsPlayerActive(player);
 		if (ticks % 5 == 0 || ticks % 5 == 1) {
-			new PPCircle(Particle.SNOWFLAKE, loc.clone().add(0, FastUtils.randomDoubleInRange(2, 2.5), 0), radius * 0.9).extraRange(0.4, 0.7).countPerMeter(0.35).innerRadiusFactor(0.1)
+			new PPCircle(Particle.SNOWFLAKE, loc.clone().add(0, FastUtils.randomDoubleInRange(2, 2.5), 0), radius * 0.9).extraRange(0.4, 0.7).countPerMeter(0.175).innerRadiusFactor(0.1)
 				.directionalMode(true).delta(-0.35, 0.4, 1).rotateDelta(true).spawnAsPlayerActive(player);
-			new PPCircle(Particle.SNOWFLAKE, loc.clone().add(0, FastUtils.randomDoubleInRange(-0.25, 0.25), 0), radius).extraRange(0.25, 0.55).countPerMeter(0.35).innerRadiusFactor(0.1)
+			new PPCircle(Particle.SNOWFLAKE, loc.clone().add(0, FastUtils.randomDoubleInRange(-0.25, 0.25), 0), radius).extraRange(0.25, 0.55).countPerMeter(0.175).innerRadiusFactor(0.1)
 				.directionalMode(true).delta(-0.25, 1, 1).rotateDelta(true).spawnAsPlayerActive(player);
 		}
 		double angle = ticks * 3 % 60;

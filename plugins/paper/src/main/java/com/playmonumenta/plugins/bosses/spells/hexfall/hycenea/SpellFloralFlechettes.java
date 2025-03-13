@@ -187,14 +187,14 @@ public class SpellFloralFlechettes extends Spell {
 									Vector end = mVec.clone().multiply(mRadius).setY(Math.random());
 
 									new PPBezier(Particle.BLOCK_CRACK, mSpawnLoc.clone().add(start), mSpawnLoc.clone().add(middle), mSpawnLoc.clone().add(end))
-										.count(15)
+										.count(120)
 										.delay(mInterval)
 										.data(Material.FLOWERING_AZALEA_LEAVES.createBlockData())
 										.spawnAsBoss();
 
 									if (mBackwardsLine) {
 										new PPBezier(Particle.BLOCK_CRACK, mSpawnLoc.clone().add(start.rotateAroundY(Math.toRadians(180))), mSpawnLoc.clone().add(middle.rotateAroundY(Math.toRadians(180))), mSpawnLoc.clone().add(end.rotateAroundY(Math.toRadians(180))))
-											.count(15)
+											.count(120)
 											.delay(mInterval)
 											.data(Material.FLOWERING_AZALEA_LEAVES.createBlockData())
 											.spawnAsBoss();

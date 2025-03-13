@@ -57,33 +57,33 @@ public class ScissionCS extends CosmicMoonbladeCS {
 		switch (mCombo) {
 			case 0 -> {
 				ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), 1.5, 210, -20, 190, 3, 0, 0, 0.2, 40,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(BLACK, LIGHTER_RED, ring / 3D), 1f)
 					).spawnAsPlayerActive(player), 4);
 
 				if (range * 0.4 >= 2.6) {
 					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.4, 210, 45, 135, (int) (0.5 * range), 0, 0, 0.2, 90,
-						(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+						(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 							new Particle.DustOptions(
 								ParticleUtils.getTransition(BLACK, DARK_RED, (double) ring / (int) (0.5 * range)), 0.6f)
 						).spawnAsPlayerActive(player), 3), 2);
 				}
 
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.5, 210, 45, 135, (int) (0.5 * range), 0, 0, 0.2, 90,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(BLACK, LIGHTER_RED, (double) ring / (int) (0.5 * range)), 0.7f)
 					).spawnAsPlayerActive(player), 3), 2);
 
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.65, 210, 45, 135, (int) (0.5 * range), 0, 0, 0.2, 90,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(DARK_RED, LIGHTER_RED, (double) ring / (int) (0.5 * range)), 0.9f)
 					).spawnAsPlayerActive(player), 3), 4);
 
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.8, 210, 45, 135, (int) range, 0, 0, 0.2, 90,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(DARK_RED, ROSE, (double) ring / (int) range), 1f + (ring * 0.1f))
 					).spawnAsPlayerActive(player), 3), 4);
@@ -96,33 +96,33 @@ public class ScissionCS extends CosmicMoonbladeCS {
 
 			case 1 -> {
 				ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), 1.5, -20, -10, 225, 3, 0, 0, 0.2, 40,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(BLACK, LIGHTER_RED, ring / 3D), 1f)
 					).spawnAsPlayerActive(player), 4);
 
 				if (range * 0.4 >= 2.6) {
 					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.4, -20, 45, 135, (int) (0.5 * range), 0, 0, 0.15, 90,
-						(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+						(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 							new Particle.DustOptions(
 								ParticleUtils.getTransition(BLACK, DARK_RED, (double) ring / (int) (0.5 * range)), 0.6f)
 						).spawnAsPlayerActive(player), 3), 2);
 				}
 
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.5, -20, 45, 135, (int) (0.5 * range), 0, 0, 0.2, 90,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(BLACK, LIGHTER_RED, (double) ring / (int) (0.5 * range)), 0.7f)
 					).spawnAsPlayerActive(player), 3), 2);
 
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.65, -20, 45, 135, (int) (0.5 * range), 0, 0, 0.2, 90,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(DARK_RED, LIGHTER_RED, (double) ring / (int) (0.5 * range)), 0.9f)
 					).spawnAsPlayerActive(player), 3), 4);
 
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.8, -20, 45, 135, (int) range, 0, 0, 0.2, 90,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(DARK_RED, ROSE, (double) ring / (int) range), 1f + (ring * 0.1f))
 					).spawnAsPlayerActive(player), 3), 4);
@@ -136,33 +136,33 @@ public class ScissionCS extends CosmicMoonbladeCS {
 
 			default -> {
 				ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), 1.5, 10, -80, 220, 3, 0, 0, 0.2, 60,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(BLACK, LIGHTER_RED, ring / 3D), 1f)
 					).spawnAsPlayerActive(player), 4);
 
 				if (range * 0.4 >= 2.6) {
 					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.4, 10, 45, 135, (int) (0.5 * range), 0, 0, 0.15, 90,
-						(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+						(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 							new Particle.DustOptions(
 								ParticleUtils.getTransition(BLACK, DARK_RED, (double) ring / (int) (0.5 * range)), 0.6f)
 						).spawnAsPlayerActive(player), 3), 2);
 				}
 
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.5, 10, 45, 135, (int) (0.5 * range), 0, 0, 0.2, 90,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(BLACK, LIGHTER_RED, (double) ring / (int) (0.5 * range)), 0.7f)
 					).spawnAsPlayerActive(player), 3), 2);
 
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.65, 10, 45, 135, (int) (0.5 * range), 0, 0, 0.2, 90,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(DARK_RED, LIGHTER_RED, (double) ring / (int) (0.5 * range)), 0.9f)
 					).spawnAsPlayerActive(player), 3), 4);
 
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> ParticleUtils.drawCleaveArc(origin.clone().add(0, 1, 0), range * 0.8, 10, 45, 135, (int) range, 0, 0, 0.2, 90,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(
 							ParticleUtils.getTransition(DARK_RED, ROSE, (double) ring / (int) range), 1f + (ring * 0.1f))
 					).spawnAsPlayerActive(player), 3), 4);

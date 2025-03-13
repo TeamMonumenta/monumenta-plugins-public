@@ -45,8 +45,7 @@ public class BodkinBlitzCS implements StealthCosmeticSkill {
 		world.playSound(tpLoc, Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1f, 0.75f);
 		world.playSound(tpLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 1f);
 
-		new PartialParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 30, 0.25, 0.5, 0.25, 0.18).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_LARGE, tpLoc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.04).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SMOKE_NORMAL, tpLoc.clone().add(0, 1, 0), 15, 0.5, 0.25, 0.5, 0.1).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SPELL_WITCH, tpLoc.clone().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_NORMAL, tpLoc.clone().add(0, 1, 0), 50, 0.75, 0.5, 0.75, 0.05).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CRIT, tpLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.3).spawnAsPlayerActive(mPlayer);

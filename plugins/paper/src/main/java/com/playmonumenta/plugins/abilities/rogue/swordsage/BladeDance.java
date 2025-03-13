@@ -89,12 +89,13 @@ public class BladeDance extends Ability {
 		mIsActive = true;
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
+			final int mDuration = CharmManager.getDuration(mPlayer, CHARM_RESIST, INVULN_DURATION);
 
 			@Override
 			public void run() {
 				mTicks += 1;
 				Location loc = mPlayer.getLocation();
-				mCosmetic.danceTick(mPlayer, world, loc, mTicks, mRadius);
+				mCosmetic.danceTick(mPlayer, world, loc, mTicks, mInvulnDuration, mRadius);
 
 				if (mTicks >= mInvulnDuration) {
 					mIsActive = false;

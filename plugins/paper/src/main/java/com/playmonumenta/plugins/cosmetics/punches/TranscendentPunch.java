@@ -85,7 +85,7 @@ public class TranscendentPunch implements PlayerPunch {
 						});
 
 					ParticleUtils.drawCleaveArc(newLoc, 3.5, 160, -80, 260, 8, 0, 0, 0.2, 60,
-						(Location l, int ring) -> {
+						(Location l, int ring, double angleProgress) -> {
 							new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 								new Particle.DustOptions(
 									ParticleUtils.getTransition(TRANSC_SLASH_COLOR_BASE, TRANSC_SLASH_COLOR_TIP, ring / 8D),
@@ -94,7 +94,7 @@ public class TranscendentPunch implements PlayerPunch {
 						});
 
 					ParticleUtils.drawCleaveArc(newLoc, 3.5, 20, -80, 260, 8, 0, 0, 0.2, 60,
-						(Location l, int ring) -> {
+						(Location l, int ring, double angleProgress) -> {
 							new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 								new Particle.DustOptions(
 									ParticleUtils.getTransition(TRANSC_SLASH_COLOR_BASE, TRANSC_SLASH_COLOR_TIP, ring / 8D),

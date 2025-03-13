@@ -149,7 +149,7 @@ public class WindBomb extends Ability {
 
 			event.setCancelled(true);
 			mProjectiles.remove(triple);
-			mCosmetic.onLand(mPlugin, mPlayer, proj.getWorld(), loc, mRadius);
+			mCosmetic.onLand(mPlayer, proj.getWorld(), loc, mRadius);
 
 			final List<LivingEntity> launchedMobs = new Hitbox.SphereHitbox(loc, mRadius).getHitMobs();
 			for (final LivingEntity mob : launchedMobs) {
@@ -169,7 +169,7 @@ public class WindBomb extends Ability {
 
 			if (isEnhanced()) {
 				loc.add(0, 2, 0);
-				mCosmetic.onVortexSpawn(mPlayer, proj.getWorld(), loc);
+				mCosmetic.onVortexSpawn(mPlayer, proj.getWorld(), loc, mEnhancePullDuration);
 
 				new BukkitRunnable() {
 					int mTicks = 0;

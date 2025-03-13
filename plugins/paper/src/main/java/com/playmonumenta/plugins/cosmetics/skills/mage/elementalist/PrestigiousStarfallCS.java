@@ -132,11 +132,16 @@ public class PrestigiousStarfallCS extends StarfallCS implements PrestigeCS {
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.7f, 0.6f);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5f, 0.65f);
 		world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.4f, 0.7f);
-		new PartialParticle(Particle.FLAME, loc, 150, 0, 0, 0, 0.235).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CLOUD, loc, 75, 0, 0, 0, 0.2).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, loc, 350, 2.5, 1.75, 2.5, 0, GOLD_COLOR).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, loc, 300, 2.5, 1.75, 2.5, 0, BURN_COLOR).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, loc, 150, 2.5, 1.75, 2.5, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FLAME, loc, 150, 0, 0, 0, radius * 0.05).spawnAsPlayerActive(player);
+		new PPCircle(Particle.EXPLOSION_NORMAL, loc.clone().add(0, 0.2, 0), 0.5)
+			.count(40)
+			.rotateDelta(true).directionalMode(true)
+			.delta(0.1, 0, 0)
+			.extra(radius)
+			.spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, loc, 350, radius / 2, 1.75, radius / 2, 0, GOLD_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, loc, 300, radius / 2, 1.75, radius / 2, 0, BURN_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, loc, 150, radius / 2, 1.75, radius / 2, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
 	}
 
 }
