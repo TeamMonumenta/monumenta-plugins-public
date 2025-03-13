@@ -63,12 +63,10 @@ public final class ItemDropListener implements Listener {
 	}
 
 	public static Mode getPlayerMode(Player player) {
-		final var res = Arrays.stream(Mode.values())
+		return Arrays.stream(Mode.values())
 			.filter(x -> x.mTag != null && ScoreboardUtils.checkTag(player, x.mTag))
 			.findFirst()
 			.orElse(Mode.NONE);
-		System.out.println(res);
-		return res;
 	}
 
 	public static void setPlayerMode(Player player, Mode mode) {
@@ -91,8 +89,10 @@ public final class ItemDropListener implements Listener {
 			.withAliases(ALIAS)
 			.executesPlayer((sender, args) -> {
 				if (getPlayerMode(sender) == Mode.NONE) {
+					sender.sendMessage(Component.text("You can no longer drop tiered items.", NamedTextColor.GOLD, TextDecoration.BOLD));
 					setPlayerMode(sender, Mode.TIERED);
 				} else {
+					sender.sendMessage(Component.text("You can now drop all items.", NamedTextColor.GOLD, TextDecoration.BOLD));
 					setPlayerMode(sender, Mode.NONE);
 				}
 			})
