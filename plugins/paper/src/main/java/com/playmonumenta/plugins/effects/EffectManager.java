@@ -425,6 +425,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(PoisonImmunity.effectID, PoisonImmunity::deserialize);
 		mEffectDeserializer.put(RejuvenationHealing.effectID, RejuvenationHealing::deserialize);
 		mEffectDeserializer.put(DamageImmunity.effectID, DamageImmunity::deserialize);
+		mEffectDeserializer.put(ImpactVulnerability.effectID, ImpactVulnerability::deserialize);
 	}
 
 	private static final int PERIOD = 5;

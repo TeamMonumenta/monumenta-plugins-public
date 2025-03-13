@@ -90,6 +90,7 @@ public enum EnchantmentType {
 	GILLS(new Gills(), false, false, false, false),
 	GRAPPLING(new Grappling(), true, false, false, false),
 	HEX_EATER(new HexEater(), true, false, false, true),
+	IMPACT(new Impact(), true, false, false, false),
 	INFERNO(new Inferno(), true, false, false, true),
 	INTOXICATING_WARMTH(new IntoxicatingWarmth(), false, false, false, false),
 	INSTANT_DRINK(new InstantDrink(), false, false, false, false),
