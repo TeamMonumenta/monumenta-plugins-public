@@ -116,7 +116,7 @@ public abstract class Gui implements InventoryHolder {
 	 * </p>
 	 */
 	void update() {
-		Preconditions.checkState(mInventory != null, "open() called after inventory was disposed");
+		Preconditions.checkState(mInventory != null, "update() called after inventory was disposed");
 		if (!mIsDirty) {
 			return;
 		}

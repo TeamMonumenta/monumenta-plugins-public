@@ -34,8 +34,8 @@ public final class FacingBoss extends BossAbilityGroup {
 		}
 		LivingEntity facingTarget = targets.get(0);
 
-		if (p.PREFER_TARGET && ((Mob) boss).getTarget() != null) {
-			facingTarget = ((Mob) boss).getTarget();
+		if (p.PREFER_TARGET && boss instanceof Mob mob && mob.getTarget() != null) {
+			facingTarget = mob.getTarget();
 		}
 
 		LivingEntity finalFacingTarget = facingTarget;
@@ -58,4 +58,3 @@ public final class FacingBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, -1, null, 0, 1);
 	}
 }
-

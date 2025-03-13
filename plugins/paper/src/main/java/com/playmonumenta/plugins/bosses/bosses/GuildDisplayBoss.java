@@ -223,8 +223,8 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 
 	@Override
 	public void unload() {
-		for (Pair pa : mPairs) {
-			pa.delete();
-		}
+		// Would really like to remove the entities here, but removal isn't allowed during chunk unloading
+		// Instead just clear the list, the entities have REMOVE_ON_UNLOAD tag so they'll be removed when the chunk loads next
+		mPairs.clear();
 	}
 }

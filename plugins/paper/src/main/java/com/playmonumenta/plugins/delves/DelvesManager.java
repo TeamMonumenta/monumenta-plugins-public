@@ -356,7 +356,7 @@ public class DelvesManager implements Listener {
 					delvesApplied.forEach((mod, level) -> mod.applyDelve(livingEntity, level));
 					Riftborn.applyModifiers(temp.getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
 					Chronology.applyModifiers(temp, delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
-				} else if (event instanceof SpawnerSpawnEvent spawnerSpawnEvent) {
+				} else if (event instanceof SpawnerSpawnEvent spawnerSpawnEvent && spawnerSpawnEvent.getSpawner() != null) {
 					// normal spawn - handle all the mods
 					Riftborn.applyModifiers(spawnerSpawnEvent.getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
 					Chronology.applyModifiers(spawnerSpawnEvent.getSpawner(), delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
