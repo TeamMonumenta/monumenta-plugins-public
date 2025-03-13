@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -25,6 +26,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -181,7 +183,10 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	}
 
 	/**
-	 * A terrible workaround to be able to deal Divine Justice damage with Luminous Infusion
+	 * A terrible workaround to be able to deal Divine Justice damage with Luminous Infusion.<br>
+	 * Notes: Luminous infusion does not apply DJ's flat damage or charm effects.<br>
+	 * The event's flat damage does not include any damage multipliers. This formula readds the crit bonus if
+	 * <code>isMeleeCrit</code> is true and the player's held weapon does not have the Cumbersome enchantment.
 	 * @param event Event that caused the damage
 	 * @param multiplier Damage multiplier to use
 	 * @param isMeleeCrit Whether the conditions for a melee crit are fulfilled
@@ -189,11 +194,8 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	 * @return Damage to deal to the evildoer
 	 */
 	public double calculateDamage(final DamageEvent event, final double multiplier, final boolean isMeleeCrit, final boolean isLuminous) {
-		/* Notes:
-		 * Luminous infusion does not apply DJ's flat damage or charm effects
-		 * Event's flat damage does not include crit bonus and does not include gear/potion/skill buffs, thus readd crit
-		 * bonus for melee crits */
-		return (isLuminous ? 0 : DAMAGE) + event.getFlatDamage() * (isMeleeCrit ? CritScaling.CRIT_BONUS : 1.0) *
+		final boolean weaponHasCumbersome = ItemStatUtils.hasEnchantment(mPlayer.getInventory().getItemInMainHand(), EnchantmentType.CUMBERSOME);
+		return (isLuminous ? 0 : DAMAGE) + event.getFlatDamage() * (isMeleeCrit && !weaponHasCumbersome ? CritScaling.CRIT_BONUS : 1.0) *
 			Math.max(multiplier, 0.0);
 	}
 

@@ -39,12 +39,12 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
-public class LuminousInfusion extends MultipleChargeAbility implements KillTriggeredAbility {
+public final class LuminousInfusion extends MultipleChargeAbility implements KillTriggeredAbility {
 	public double mLastPassiveMeleeDamage = 0; // Passive damage to share with Holy Javelin
 
 	private static final int DAMAGE_UNDEAD_1 = 4;
 	private static final double DAMAGE_UNDEAD_2 = 5.5;
-	private static final double DIVINE_JUSTICE_DMG_MULT = 0.2;
+	private static final double DIVINE_JUSTICE_DMG_MULT = 0.3;
 	private static final int MIN_STACKS_TO_ACTIVATE = 2;
 	private static final int MAX_STACKS = 6;
 	private static final double RADIUS = 2.0 / 3.0;
@@ -52,8 +52,8 @@ public class LuminousInfusion extends MultipleChargeAbility implements KillTrigg
 	private static final float KNOCKBACK_SPEED = 0.7f;
 	private static final int EXPIRE_TICKS = TICKS_PER_SECOND * 4;
 	private static final int STACKS_PER_KILL = 1;
-	private static final int BOSS_DMG_THRESHOLD_R2 = 300;
-	private static final int BOSS_DMG_THRESHOLD_R3 = 450;
+	private static final int BOSS_DMG_THRESHOLD_R2 = 200;
+	private static final int BOSS_DMG_THRESHOLD_R3 = 300;
 
 	public static final String CHARM_DAMAGE = "Luminous Infusion Damage";
 	public static final String CHARM_RADIUS = "Luminous Infusion Radius";
@@ -255,16 +255,6 @@ public class LuminousInfusion extends MultipleChargeAbility implements KillTrigg
 	}
 
 	@Override
-	public int getCharges() {
-		return mCharges;
-	}
-
-	@Override
-	public int getMaxCharges() {
-		return mMaxCharges;
-	}
-
-	@Override
 	public ChargeType getChargeType() {
 		return ChargeType.STACKS;
 	}
@@ -313,7 +303,7 @@ public class LuminousInfusion extends MultipleChargeAbility implements KillTrigg
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The damage per stack is increased to ")
 			.add(a -> a.mDamagePerStack, DAMAGE_UNDEAD_2, false, Ability::isLevelTwo)
-			.add(". With at least one primed stack, the next critical melee attack against an Undead enemy consumes one stack of Luminousity to trigger Divine Justice for ")
+			.add(". With at least one primed stack, the next critical melee attack against an Undead enemy consumes one stack of Luminousity to trigger Divine Justice for an additional ")
 			.addPercent(a -> a.mDivineJusticeDmgMult, DIVINE_JUSTICE_DMG_MULT)
 			.add(" of your critical attack damage. Undead enemies hit by Luminous explosions are set on fire for ")
 			.addDuration(a -> a.mFireDuration, FIRE_DURATION_2)

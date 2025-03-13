@@ -8,17 +8,17 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.BruteForceCS;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.EnumSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,15 +28,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.HALF_TICKS_PER_SECOND;
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
-public class BruteForce extends Ability {
+public final class BruteForce extends Ability {
 	private static final float BRUTE_FORCE_RADIUS = 2.0f;
 	private static final int BRUTE_FORCE_DAMAGE = 2;
 	private static final double BRUTE_FORCE_2_MODIFIER = 0.1;
 	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
 	private static final double ENHANCEMENT_DAMAGE_RATIO = 0.75;
-	private static final int ENHANCEMENT_DELAY = 10;
+	private static final int ENHANCEMENT_DELAY = HALF_TICKS_PER_SECOND;
 
 	public static final String CHARM_RADIUS = "Brute Force Radius";
 	public static final String CHARM_DAMAGE = "Brute Force Damage";
@@ -85,35 +86,12 @@ public class BruteForce extends Ability {
 			return false;
 		}
 
-		// Accounts for base weapon damage, the crit mult, gear attribute damage, and charms (in the constructor)
-		double baseAoEDamage = event.getDamage() * mMultiplier + mFlatDamage;
-		double damageMult = 1;
-
-		/*
-		 * TODO: This is a hacky workaround to get damage buffs to work with the waves while preventing each wave from
-		 *  receiving damage buffs again because it is a new DamageEvent with DamageType Melee Skill. Waves use DamageType
-		 *   OTHER instead. This causes issues with Rampage's damage tracking and the First Strike enchantment. Note
-		 *    that debuffs are still multiplicative
-		 */
-		if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageDealt.class)) {
-			for (final Effect priorityEffects : mPlugin.mEffectManager.getPriorityEffects(mPlayer).values()) {
-				if (priorityEffects instanceof final PercentDamageDealt damageEffect) {
-					final EnumSet<DamageType> types = damageEffect.getAffectedDamageTypes();
-					if (types == null || types.contains(DamageType.MELEE)) {
-						if (damageEffect.isBuff()) {
-							damageMult += damageEffect.getMagnitude();
-						} else {
-							damageMult *= (1 - damageEffect.getMagnitude());
-						}
-					}
-				}
-			}
-		}
-
-		baseAoEDamage *= damageMult;
+		// Event's flat damage does not include any multipliers, readd crit scaling if Cumbersome is not present
+		final boolean weaponHasCumbersome = ItemStatUtils.hasEnchantment(mPlayer.getInventory().getItemInMainHand(), EnchantmentType.CUMBERSOME);
+		final double baseDamage = mMultiplier * (event.getFlatDamage() * (weaponHasCumbersome ? 1 : CritScaling.CRIT_BONUS)) + mFlatDamage;
 		final int waveCount = 1 + (isEnhanced() ? mEnhanceWaves : 0);
 		for (int i = 0; i < waveCount; i++) {
-			final double damage = baseAoEDamage * Math.pow(mEnhanceDamageMult, i); // Reduces damage if waveCount > 1
+			final double damage = baseDamage * Math.pow(mEnhanceDamageMult, i); // Reduces damage if waveCount > 1
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> wave(enemy, mPlayer.getLocation(), damage),
 				(long) mEnhanceWaveDelay * i);
 		}
@@ -148,7 +126,7 @@ public class BruteForce extends Ability {
 	private void wave(final LivingEntity target, final Location playerLoc, final double damage) {
 		final Location loc = target.getLocation().add(0, 0.75, 0);
 		for (final LivingEntity mob : new Hitbox.SphereHitbox(loc, mWaveRadius).getHitMobs()) {
-			DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damage,
+			DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage,
 				mob == target ? ClassAbility.BRUTE_FORCE : ClassAbility.BRUTE_FORCE_AOE, true);
 
 			if (!EntityUtils.isBoss(mob)) {

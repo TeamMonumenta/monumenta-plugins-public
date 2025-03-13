@@ -32,11 +32,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-public class Rampage extends Ability implements AbilityWithChargesOrStacks {
+public final class Rampage extends Ability implements AbilityWithChargesOrStacks {
 
 	private static final int RAMPAGE_STACK_DECAY_TIME = 20 * 5;
-	private static final int RAMPAGE_1_DAMAGE_PER_STACK = 50;
-	private static final int RAMPAGE_2_DAMAGE_PER_STACK = 35;
+	private static final int RAMPAGE_1_DAMAGE_PER_STACK = 75;
+	private static final int RAMPAGE_2_DAMAGE_PER_STACK = 50;
 	private static final double R3_DAMAGE_PER_STACK_MULTIPLIER = 2;
 	private static final int ACTIVE_MIN_STACKS = 10;
 	private static final int RAMPAGE_1_STACK_LIMIT = 15;
