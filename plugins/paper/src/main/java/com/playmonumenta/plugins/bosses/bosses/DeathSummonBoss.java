@@ -17,6 +17,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
+
 public class DeathSummonBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_death_summon";
 
@@ -71,6 +73,11 @@ public class DeathSummonBoss extends BossAbilityGroup {
 		Random r = new Random();
 		for (int i = 0; i < mParam.MOB_COUNT; i++) {
 			Entity entity = mParam.POOL.spawn(loc);
+
+			// Include the original mob's metadata for spawner counting to prevent mob farming
+			if (entity != null && mBoss.hasMetadata(SPAWNER_COUNT_METAKEY)) {
+				entity.setMetadata(SPAWNER_COUNT_METAKEY, mBoss.getMetadata(SPAWNER_COUNT_METAKEY).get(0));
+			}
 
 			//Applies a random velocity inside the given constraints to each entity when spawning
 			//The velocity will be applied after the AI is returned as mobs with noAI are unaffected by velocity

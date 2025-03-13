@@ -14,6 +14,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
+
 /**
  * Spawn mobs around boss locations
  */
@@ -223,6 +225,12 @@ public class SpellBaseSummon extends Spell {
 			}
 
 			Entity entity = mSummon.run(loc.clone().subtract(0, mDeepness, 0), mTimes);
+
+			// Include the original mob's metadata for spawner counting to prevent mob farming
+			if (entity != null && mBoss.hasMetadata(SPAWNER_COUNT_METAKEY)) {
+				entity.setMetadata(SPAWNER_COUNT_METAKEY, mBoss.getMetadata(SPAWNER_COUNT_METAKEY).get(0));
+			}
+
 			if (entity instanceof Mob mob) {
 				mob.setAI(false);
 

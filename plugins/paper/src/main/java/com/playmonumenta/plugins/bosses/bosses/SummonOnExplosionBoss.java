@@ -17,6 +17,8 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
+
 public class SummonOnExplosionBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_summon_on_explode";
@@ -70,6 +72,12 @@ public class SummonOnExplosionBoss extends BossAbilityGroup {
 			double hpPercent = health/maxHealth;
 			for (int i = 0; i < mParam.MOB_COUNT; i++) {
 				Entity entity = mParam.POOL.spawn(mBoss.getLocation());
+
+				// Include the original mob's metadata for spawner counting to prevent mob farming
+				if (entity != null && mBoss.hasMetadata(SPAWNER_COUNT_METAKEY)) {
+					entity.setMetadata(SPAWNER_COUNT_METAKEY, mBoss.getMetadata(SPAWNER_COUNT_METAKEY).get(0));
+				}
+
 				if (entity instanceof LivingEntity livingEntity) {
 					//Decrease its percent hp by the percent health the spawner is missing times the transfer amount.
 					livingEntity.setHealth(

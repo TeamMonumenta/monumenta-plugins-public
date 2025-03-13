@@ -120,7 +120,6 @@ public class DamageListener implements Listener {
 		// Needs to check for holding a shield since the mob's attack may have disabled it.
 		if (event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0
 			    && event.getEntity() instanceof Player player
-			    && player.getActiveItem() != null
 			    && player.getActiveItem().getType() == Material.SHIELD) {
 			event.setDamage(originalDamage);
 		}
@@ -173,13 +172,17 @@ public class DamageListener implements Listener {
 
 		event.updateDamageWithMultiplier(EntityUtils.vulnerabilityMult(damagee));
 
+		// If this event was caused by /kill, the entity should immediately die with no further processing
+		if (event.getCause().equals(DamageCause.KILL)) {
+			damagee.setHealth(0);
+		}
+
 		// Player getting damaged
 		if (damagee instanceof Player player) {
 			mPlugin.mItemStatManager.onHurt(mPlugin, player, event, damager, source);
 			mPlugin.mAbilityManager.onHurt(player, event, damager, source);
 
-			if (event.getFinalDamage(true) >= player.getHealth()
-				    && !event.isCancelled()) {
+			if (event.getFinalDamage(true) >= player.getHealth() && !event.isCancelled()) {
 				mPlugin.mAbilityManager.onHurtFatal(player, event);
 				mPlugin.mItemStatManager.onHurtFatal(mPlugin, player, event);
 			}
@@ -263,7 +266,7 @@ public class DamageListener implements Listener {
 		UUID uuid = proj.getUniqueId();
 		if (proj instanceof AbstractArrow arrow && !(proj instanceof Trident)) {
 			ItemStack item = arrow.getItemStack();
-			if (item != null && item.getType() != Material.AIR) {
+			if (item.getType() != Material.AIR) {
 				NBT.get(item, nbt -> {
 					ReadableNBT enchantments = ItemStatUtils.getEnchantments(nbt);
 

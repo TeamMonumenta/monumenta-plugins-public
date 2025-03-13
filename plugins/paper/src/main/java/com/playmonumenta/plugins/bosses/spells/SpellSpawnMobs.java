@@ -13,6 +13,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
+import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
+
 public class SpellSpawnMobs extends Spell {
 	public static final int DEFAULT_MOB_CAP_RADIUS = 10;
 	public static final boolean DEFAULT_LINE_OF_SIGHT = false;
@@ -79,7 +81,13 @@ public class SpellSpawnMobs extends Spell {
 				continue;
 			}
 			Entity entity = LibraryOfSoulsIntegration.summon(sLoc, mSummonName);
+
 			if (entity != null) {
+				// Include the original mob's metadata for spawner counting to prevent mob farming
+				if (mBoss.hasMetadata(SPAWNER_COUNT_METAKEY)) {
+					entity.setMetadata(SPAWNER_COUNT_METAKEY, mBoss.getMetadata(SPAWNER_COUNT_METAKEY).get(0));
+				}
+
 				summonPlugins(entity);
 			}
 		}

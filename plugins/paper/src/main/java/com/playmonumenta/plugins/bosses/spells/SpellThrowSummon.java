@@ -20,6 +20,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
+
 public class SpellThrowSummon extends Spell {
 
 	private final int mMobCapRange;
@@ -127,6 +129,11 @@ public class SpellThrowSummon extends Spell {
 			if (e == null) {
 				MMLog.warning("Misconfigured SpellThrowSummon boss, unknown soul '" + soul + "' used by boss '" + mBoss.getName() + "'");
 				return;
+			}
+
+			// Include the original mob's metadata for spawner counting to prevent mob farming
+			if (mBoss.hasMetadata(SPAWNER_COUNT_METAKEY)) {
+				e.setMetadata(SPAWNER_COUNT_METAKEY, mBoss.getMetadata(SPAWNER_COUNT_METAKEY).get(0));
 			}
 
 			if (mRemoveOnDeath) {

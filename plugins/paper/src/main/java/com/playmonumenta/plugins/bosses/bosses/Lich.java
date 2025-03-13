@@ -335,12 +335,12 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 				new SpellGraspingHands(mPlugin, mBoss),
 				new SpellRaiseDead(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
 				new SpellSalientOfDecay(mPlugin, mBoss),
-				new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling)));
+				new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange)));
 
 		SpellManager phase2Spells = new SpellManager(
 			Arrays.asList(
 				new SpellGraspingHands(mPlugin, mBoss),
-				new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
+				new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange),
 				new SpellRaiseDead(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
 				new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal)));
 
@@ -942,7 +942,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 					SpellManager keyAlive = new SpellManager(
 						Arrays.asList(
 							new SpellDiesIrae(mPlugin, mBoss, mKey, mStart.getLocation(), detectionRange, mCeiling, mCrystalLoc, mShieldCrystal),
-							new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
+							new SpellSoulShackle(mPlugin, mBoss, mStart.getLocation(), detectionRange),
 							new SpellRaiseDead(mPlugin, mBoss, mStart.getLocation(), detectionRange, mCeiling),
 							new SpellDarkOmen(mPlugin, mBoss, mStart.getLocation(), detectionRange) // ult + dialogue?
 						));

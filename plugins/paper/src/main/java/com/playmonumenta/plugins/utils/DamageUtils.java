@@ -142,7 +142,8 @@ public class DamageUtils {
 	 */
 	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageEvent.Metadata metadata,
 							  double amount, boolean bypassIFrames, boolean causeKnockback, boolean blockable) {
-		if (!damagee.isValid() || damagee.isInvulnerable()) {
+
+		if (!damagee.isValid() || isImmuneToDamage(damagee, metadata.getType())) {
 			return;
 		}
 
