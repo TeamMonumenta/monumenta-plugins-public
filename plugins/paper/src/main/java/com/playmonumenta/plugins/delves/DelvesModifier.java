@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.delves.abilities.Dreadful;
 import com.playmonumenta.plugins.delves.abilities.Entropy;
 import com.playmonumenta.plugins.delves.abilities.Fragile;
 import com.playmonumenta.plugins.delves.abilities.Haunted;
+import com.playmonumenta.plugins.delves.abilities.HealCut;
 import com.playmonumenta.plugins.delves.abilities.Infernal;
 import com.playmonumenta.plugins.delves.abilities.Legionary;
 import com.playmonumenta.plugins.delves.abilities.Pernicious;
@@ -64,12 +65,13 @@ public enum DelvesModifier {
 	HAUNTED(21, null, createIcon(Material.CARVED_PUMPKIN, Component.text("Haunted", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Haunted.DESCRIPTION), Haunted::rankDescription, 26, 5),
     // Keep experimental modifiers after here
 	CHANCECUBES(22, null, createIcon(Material.GOLD_BLOCK, Component.text("Chance Cubes", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), ChanceCubes.DESCRIPTION), ChanceCubes::rankDescription, 27, 6),
-	BERSERK(23, null, createIcon(Material.REDSTONE, Component.text("Berserk", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Berserk.DESCRIPTION), Berserk::rankDescription, 28, 5);
+	BERSERK(23, null, createIcon(Material.REDSTONE, Component.text("Berserk", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Berserk.DESCRIPTION), Berserk::rankDescription, 28, 5),
+	HEALCUT(24, null, createIcon(Material.ROTTEN_FLESH, Component.text("Rot", NamedTextColor.DARK_GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), HealCut.DESCRIPTION), HealCut::rankDescription, 29, 3);
 
 	private static final List<DelvesModifier> DEATH_TRIGGER_MODIFIERS = List.of(SPECTRAL, DREADFUL);
 	private static final List<DelvesModifier> ROTATING_DELVE_MODIFIERS = List.of(ASSASSINS, ASTRAL, UNYIELDING, CHRONOLOGY, RIFTBORN, HAUNTED, FRAGILE);
 	private static final List<DelvesModifier> SPAWN_TRIGGER_MODIFIERS = List.of(ARCANIC, INFERNAL, TRANSCENDENT, CHIVALROUS, BLOODTHIRSTY, PERNICIOUS, LEGIONARY, CARAPACE, TWISTED, ASSASSINS, VENGEANCE, UNYIELDING);
-	private static final List<DelvesModifier> EXPERIMENTAL_DELVE_MODIFIERS = List.of(CHANCECUBES, BERSERK);
+	private static final List<DelvesModifier> EXPERIMENTAL_DELVE_MODIFIERS = List.of(CHANCECUBES, BERSERK, HEALCUT);
 
 	private final int mIndex;
 	private final @Nullable BiConsumer<LivingEntity, Integer> mApplyFunc;

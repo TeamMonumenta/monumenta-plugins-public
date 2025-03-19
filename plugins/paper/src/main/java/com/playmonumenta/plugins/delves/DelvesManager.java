@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.delves.abilities.Chronology;
 import com.playmonumenta.plugins.delves.abilities.Colossal;
 import com.playmonumenta.plugins.delves.abilities.Fragile;
 import com.playmonumenta.plugins.delves.abilities.Haunted;
+import com.playmonumenta.plugins.delves.abilities.HealCut;
 import com.playmonumenta.plugins.delves.abilities.Infernal;
 import com.playmonumenta.plugins.delves.abilities.Riftborn;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
@@ -63,6 +64,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
@@ -529,6 +531,14 @@ public class DelvesManager implements Listener {
 		for (Block block : event.blockList()) {
 			spawnerBreakEventHandler(block);
 		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onEntityRegainHealthEvent(EntityRegainHealthEvent event) {
+		if (!DelvesUtils.isInDelvableWorld(event.getEntity().getWorld()) || !Plugin.IS_PLAY_SERVER) {
+			return;
+		}
+		HealCut.applyHealcut(event, DelvesUtils.getModifierLevel(event.getEntity().getLocation(), DelvesModifier.HEALCUT));
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
