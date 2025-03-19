@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.managers;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.networkchat.commands.ChatCommand;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEvent;
 import com.playmonumenta.plugins.Plugin;
@@ -28,6 +27,8 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.jetbrains.annotations.NotNull;
+
+import static com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS;
 
 public class UsernameManager implements Listener {
 	//region <DECLARATIONS>
@@ -187,7 +188,7 @@ public class UsernameManager implements Listener {
 			/* /badname add <username> */
 			.withSubcommand(new CommandAPICommand(SUBCOMMAND_ADD)
 				// Suggest names of every player to have joined the server
-				.withArguments(new StringArgument("username").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
+				.withArguments(new StringArgument("username").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
 				.executesPlayer((moderator, args) -> {
 					String username = (String) args.get("username");
 
@@ -234,7 +235,7 @@ public class UsernameManager implements Listener {
 			/* /badname check <username> */
 			.withSubcommand(new CommandAPICommand(SUBCOMMAND_CHECK)
 				// Suggest names of every player to have joined the server
-				.withArguments(new StringArgument("username").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
+				.withArguments(new StringArgument("username").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
 				.executesPlayer((moderator, args) -> {
 					String username = (String) args.get("username");
 

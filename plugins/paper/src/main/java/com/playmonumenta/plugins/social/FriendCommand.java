@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.social;
 
-import com.playmonumenta.networkchat.commands.ChatCommand;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.TABIntegration;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -26,8 +24,10 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS;
+import static com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration.ALL_OTHER_CACHED_PLAYER_NAMES_SUGGESTIONS;
 
 public class FriendCommand {
 	private static final String COMMAND = "friend";
@@ -60,15 +60,8 @@ public class FriendCommand {
 
 			/* /friend add <player> */
 			.withSubcommand(new CommandAPICommand(SUBCOMMAND_ADD)
-				// Suggest all online players except for the command sender and those who are vanished or in spectator mode
-				.withArguments(new StringArgument("player")
-					.replaceSuggestions(ArgumentSuggestions.strings((info) ->
-						Bukkit.getOnlinePlayers().stream()
-							.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
-							.map(Player::getName)
-							.toArray(String[]::new)
-					))
-				)
+				// Suggest all online players except for the command sender and those who are vanished
+				.withArguments(new StringArgument("player").replaceSuggestions(ALL_OTHER_CACHED_PLAYER_NAMES_SUGGESTIONS))
 				.executesPlayer((sender, args) -> {
 					SocialManager.sendFriendRequest(sender.getUniqueId(), StringUtils.getUuidFromInput((String) args.get("player")));
 				})
@@ -139,8 +132,8 @@ public class FriendCommand {
 				.withPermission(PERMISSION_ADD_OTHER)
 				// Suggest names of every player to have joined the server for both arguments
 				.withArguments(
-					new StringArgument("player one").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
-					new StringArgument("player two").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
+					new StringArgument("player one").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
+					new StringArgument("player two").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
 				)
 				.executesPlayer((moderator, args) -> {
 					SocialManager.addFriend(moderator, StringUtils.getUuidFromInput((String) args.get("player one")), StringUtils.getUuidFromInput((String) args.get("player two")));
@@ -153,7 +146,7 @@ public class FriendCommand {
 				.withArguments(
 					// Suggest names of every player to have joined the server for the first argument
 					new StringArgument("player one")
-						.replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
+						.replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
 					// Suggest added friends of previous name argument for the second argument
 					new StringArgument("player two")
 						.replaceSuggestions(ArgumentSuggestions.stringsAsync((info) -> {
@@ -194,7 +187,7 @@ public class FriendCommand {
 			.withSubcommand(new CommandAPICommand(SUBCOMMAND_LIST_OTHER)
 				.withPermission(PERMISSION_LIST_OTHER)
 				// Suggest names of every player to have joined the server
-				.withArguments(new StringArgument("player").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
+				.withArguments(new StringArgument("player").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
 				.executesPlayer((moderator, args) -> {
 					String playerName = (String) args.get("player");
 					UUID playerUuid = StringUtils.getUuidFromInput(playerName);
@@ -216,7 +209,7 @@ public class FriendCommand {
 			.withSubcommand(new CommandAPICommand(SUBCOMMAND_LIST_RAW_OTHER)
 				.withPermission(PERMISSION_LIST_OTHER)
 				// Suggest names of every player to have joined the server
-				.withArguments(new StringArgument("player").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
+				.withArguments(new StringArgument("player").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
 				.withOptionalArguments(new IntegerArgument("page", 1))
 				.executesPlayer((moderator, args) -> {
 					String playerName = (String) args.get("player");
@@ -231,8 +224,8 @@ public class FriendCommand {
 				.withPermission(PERMISSION_CHECK)
 				// Suggest names of every player to have joined the server for both arguments
 				.withArguments(
-					new StringArgument("player one").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
-					new StringArgument("player two").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
+					new StringArgument("player one").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
+					new StringArgument("player two").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
 				)
 				.executesPlayer((moderator, args) -> {
 					String playerOneName = (String) args.get("player one");

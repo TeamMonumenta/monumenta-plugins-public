@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.social;
 
-import com.playmonumenta.networkchat.commands.ChatCommand;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -20,8 +18,10 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS;
+import static com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration.ALL_OTHER_CACHED_PLAYER_NAMES_SUGGESTIONS;
 
 public class BlockCommand {
 	private static final String COMMAND = "block";
@@ -48,15 +48,8 @@ public class BlockCommand {
 
 			/* /block add <player> */
 			.withSubcommand(new CommandAPICommand(SUBCOMMAND_ADD)
-				// Suggest all online players except for the command sender and those who are vanished or in spectator mode
-				.withArguments(new StringArgument("player")
-					.replaceSuggestions(ArgumentSuggestions.strings((info) ->
-						Bukkit.getOnlinePlayers().stream()
-							.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
-							.map(Player::getName)
-							.toArray(String[]::new)
-					))
-				)
+				// Suggest all online players except for the command sender and those who are vanished
+				.withArguments(new StringArgument("player").replaceSuggestions(ALL_OTHER_CACHED_PLAYER_NAMES_SUGGESTIONS))
 				.executesPlayer((sender, args) -> {
 					SocialManager.blockPlayer(sender.getUniqueId(), StringUtils.getUuidFromInput((String) args.get("player")));
 				})
@@ -124,7 +117,7 @@ public class BlockCommand {
 			.withSubcommand(new CommandAPICommand(SUBCOMMAND_LIST_OTHER)
 				.withPermission(PERMISSION_LIST_OTHER)
 				// Suggest names of every player to have joined the server
-				.withArguments(new StringArgument("player").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
+				.withArguments(new StringArgument("player").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
 				.executesPlayer((moderator, args) -> {
 					String playerName = (String) args.get("player");
 					UUID playerUuid = StringUtils.getUuidFromInput(playerName);
@@ -146,7 +139,7 @@ public class BlockCommand {
 			.withSubcommand(new CommandAPICommand(SUBCOMMAND_LIST_RAW_OTHER)
 				.withPermission(PERMISSION_LIST_OTHER)
 				// Suggest names of every player to have joined the server
-				.withArguments(new StringArgument("player").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
+				.withArguments(new StringArgument("player").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS))
 				.withOptionalArguments(new IntegerArgument("page", 1))
 				.executesPlayer((moderator, args) -> {
 					String playerName = (String) args.get("player");
@@ -161,8 +154,8 @@ public class BlockCommand {
 				.withPermission(PERMISSION_CHECK)
 				// Suggest names of every player to have joined the server for both arguments
 				.withArguments(
-					new StringArgument("player one").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
-					new StringArgument("player two").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
+					new StringArgument("player one").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
+					new StringArgument("player two").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
 				)
 				.executesPlayer((moderator, args) -> {
 					String playerOneName = (String) args.get("player one");

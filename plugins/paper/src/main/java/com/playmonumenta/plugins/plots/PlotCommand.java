@@ -1,11 +1,9 @@
 package com.playmonumenta.plugins.plots;
 
-import com.playmonumenta.networkchat.commands.ChatCommand;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -30,6 +28,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS;
+import static com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration.ALL_OTHER_CACHED_PLAYER_NAMES_SUGGESTIONS;
 
 public class PlotCommand {
 	private static final String COMMAND = "plot";
@@ -80,15 +81,8 @@ public class PlotCommand {
 
 			/* /plot add <player> */
 			.withSubcommand(new CommandAPICommand(SUBCOMMAND_ADD)
-				// Suggest all online players except for the command sender and those who are vanished or in spectator mode
-				.withArguments(new StringArgument("player")
-					.replaceSuggestions(ArgumentSuggestions.strings((info) ->
-						Bukkit.getOnlinePlayers().stream()
-							.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
-							.map(Player::getName)
-							.toArray(String[]::new)
-					))
-				)
+				// Suggest all online players except for the command sender and those who are vanished
+				.withArguments(new StringArgument("player").replaceSuggestions(ALL_OTHER_CACHED_PLAYER_NAMES_SUGGESTIONS))
 				.withOptionalArguments(new StringArgument("duration"))
 				.executesPlayer((sender, args) -> {
 					PlotManager.plotAccessAdd(sender, sender.getUniqueId(), StringUtils.getUuidFromInput((String) args.get("player")), (String) args.get("duration"));
@@ -193,8 +187,8 @@ public class PlotCommand {
 				.withPermission(PERMISSION_ADD_OTHER)
 				// Suggest names of every player to have joined the server for both arguments
 				.withArguments(
-					new StringArgument("plot owner").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
-					new StringArgument("other player").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
+					new StringArgument("plot owner").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
+					new StringArgument("other player").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
 				)
 				.withOptionalArguments(new StringArgument("duration"))
 				.executesPlayer((moderator, args) -> {
@@ -210,7 +204,7 @@ public class PlotCommand {
 				.withArguments(
 					// Suggest names of every player to have joined the server for the first argument
 					new StringArgument("plot owner")
-						.replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
+						.replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS),
 					// Suggest all players with access to previous name argument's plot for the second argument
 					new StringArgument("other player")
 						.replaceSuggestions(ArgumentSuggestions.stringsAsync((info) -> {
@@ -242,7 +236,7 @@ public class PlotCommand {
 			/* /plot info <player> */
 			.withSubcommand(new CommandAPICommand(SUBCOMMAND_INFO)
 				// Suggest names of every player to have joined the server
-				.withArguments(new StringArgument("player").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
+				.withArguments(new StringArgument("player").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
 					.withPermission(PERMISSION_INFO_OTHER))
 				.executesPlayer((moderator, args) -> {
 					String playerName = (String) args.get("player");
@@ -264,7 +258,7 @@ public class PlotCommand {
 			/* /plot info_raw <player> */
 			.withSubcommand(new CommandAPICommand(SUBCOMMAND_INFO_RAW)
 				// Suggest names of every player to have joined the server
-				.withArguments(new StringArgument("player").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
+				.withArguments(new StringArgument("player").replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS)
 					.withPermission(PERMISSION_INFO_OTHER))
 				.executesPlayer((moderator, args) -> {
 					String playerName = (String) args.get("player");
