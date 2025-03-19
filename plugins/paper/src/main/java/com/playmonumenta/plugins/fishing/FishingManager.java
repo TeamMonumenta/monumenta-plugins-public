@@ -120,6 +120,7 @@ public class FishingManager implements Listener {
 					if (overrideItem != null) {
 						caughtItemStack.setItemMeta(overrideItem.getItemMeta());
 						caughtItemStack = caughtItemStack.withType(overrideItem.getType());
+						caughtItem.setItemStack(caughtItemStack);
 					}
 				}
 
