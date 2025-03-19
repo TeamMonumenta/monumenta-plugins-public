@@ -36,6 +36,7 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blockplacer";
 	public static final String PREVENT_BLOCK_PLACEMENT = "disable_boss_blockplacer";
 
+	private static final double PREVENT_PLACING_RADIUS = 2.5;
 	private static final int IDLE_TIME = 6 * TICKS_PER_SECOND;
 	private static final int NEW_TARGET_RANGE = 25;
 	private static final int BEELINE_DISTANCE = 8;
@@ -151,6 +152,12 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 				}
 
 				private void bridge(final Pathfinder pathfinder, final Location bossLoc, final Location targetLoc) {
+					if (!PlayerUtils.playersInRange(bossLoc, PREVENT_PLACING_RADIUS, true).isEmpty()) {
+						MMLog.finest(() -> "[BlockPlacerBoss] Launcher " + mMob.getName() + " attempted to place " +
+								"a block but was too close to one or more players");
+						return;
+					}
+
 					final Vector euclideanVec = targetLoc.clone().subtract(bossLoc).toVector().normalize();
 					final Location posXDir = bossLoc.clone().add(1, -1, 0);
 					final Location negXDir = bossLoc.clone().add(-1, -1, 0);
@@ -184,7 +191,7 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 							|| LocationUtils.blocksIntersectEntity(loc.getWorld(), List.of(loc),
 								hitbox -> hitbox.getHitEntities(e -> e instanceof LivingEntity && !e.isInvulnerable()))) {
 							MMLog.finest(() -> "[BlockPlacerBoss] Launcher " + mMob.getName() + " attempted to place " +
-								"a block but couldn't");
+								"a block but failed the final placement check");
 							continue;
 						}
 
