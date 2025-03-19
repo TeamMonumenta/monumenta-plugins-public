@@ -18,6 +18,8 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -119,8 +121,8 @@ public class LuckPermsIntegration implements Listener {
 
 		URL skinUrl;
 		try {
-			skinUrl = new URL("http://textures.minecraft.net/texture/4091640da9e8fe0bf259919ecce7ddef87aaf8ba6eabfbaacf2df1d2a24d80d9");
-		} catch (MalformedURLException e) {
+			skinUrl = new URI("http://textures.minecraft.net/texture/4091640da9e8fe0bf259919ecce7ddef87aaf8ba6eabfbaacf2df1d2a24d80d9").toURL();
+		} catch (MalformedURLException | URISyntaxException ignored) {
 			skinUrl = null;
 		}
 

@@ -12,6 +12,7 @@ import dev.jorel.commandapi.wrappers.FunctionWrapper;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import net.kyori.adventure.text.Component;
@@ -32,7 +33,7 @@ public class NameMCVerify extends GenericCommand {
 					Player player = args.getUnchecked("player");
 					Objective objective = args.getUnchecked("objective");
 					try {
-						URL url = new URL("https://api.namemc.com/server/server.playmonumenta.com/likes?profile=" + player.getUniqueId());
+						URL url = new URI("https://api.namemc.com/server/server.playmonumenta.com/likes?profile=" + player.getUniqueId()).toURL();
 
 						HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 						conn.setRequestMethod("GET");
