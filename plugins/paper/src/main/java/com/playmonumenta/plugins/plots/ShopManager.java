@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.plots;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
@@ -289,6 +290,16 @@ public class ShopManager implements Listener {
 
 			if (x1 == null || y1 == null || z1 == null || x2 == null || y2 == null || z2 == null || ownerName == null || ownerUUID == null || originalEntityMat == null) {
 				throw CommandAPI.failWithString("Shop entity is missing a required tag");
+			}
+
+			String updatedOwnerName = MonumentaRedisSyncIntegration.cachedUuidToName(ownerUUID);
+			if (updatedOwnerName != null && !ownerName.equals(updatedOwnerName)) {
+				shopEntity.removeScoreboardTag("shop_ownerName=" + ownerName);
+				ownerName = updatedOwnerName;
+				shopEntity.addScoreboardTag("shop_ownerName=" + ownerName);
+				if (ownerGuildName == null) {
+					shopEntity.customName(Component.text(ownerName + "'s Shop", NamedTextColor.AQUA));
+				}
 			}
 
 			return new Shop(new Location(shopEntity.getWorld(), x1, y1, z1), new Location(shopEntity.getWorld(), x2, y2, z2),
