@@ -633,7 +633,7 @@ public class GalleryGame {
 
 	public void playerLeave(Player target) {
 		mPlayersMap.remove(target.getUniqueId());
-		for (GalleryGrave grave : mGraves) {
+		for (GalleryGrave grave : new ArrayList<>(mGraves)) {
 			if (grave.getPlayer().getPlayer() != null && grave.getPlayer().getPlayer().equals(target)) {
 				grave.removeGrave();
 			}
