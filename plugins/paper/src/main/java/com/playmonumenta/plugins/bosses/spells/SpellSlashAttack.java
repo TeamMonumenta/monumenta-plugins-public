@@ -187,7 +187,7 @@ public class SpellSlashAttack extends Spell {
 		if (mFollowCaster) {
 			finalLoc.add(LocationUtils.getHalfHeightLocation(mBoss).toVector().subtract(startLoc.toVector()));
 		}
-		Particle.DustOptions data = calculateColorProgress(ring, angleProgress);
+		Particle.DustOptions data = calculateColorProgress(ring, angleProgress * 2);
 		new PartialParticle(Particle.REDSTONE, finalLoc, 1).extra(0)
 			.data(data).spawnAsEntityActive(mBoss);
 		Hitbox hitbox = new Hitbox.AABBHitbox(mBoss.getWorld(), BoundingBox.of(finalLoc, mHitboxSize, mHitboxSize, mHitboxSize));
@@ -252,7 +252,7 @@ public class SpellSlashAttack extends Spell {
 		mSoundsTelegraph.play(mBoss.getLocation());
 	}
 
-	Particle.DustOptions calculateColorProgress(int ring, double progress) {
+	Particle.DustOptions calculateColorProgress(int ring, double twiceProgress) {
 		Particle.DustOptions data;
 		if (!mHorizontalColor) {
 			int halfRings = mRings / 2;
@@ -272,15 +272,15 @@ public class SpellSlashAttack extends Spell {
 		} else {
 			if (!mSwitchedColor) {
 				data = new Particle.DustOptions(
-					ParticleUtils.getTransition(mStartColor, mMidColor, Math.min(progress, 1)),
+					ParticleUtils.getTransition(mStartColor, mMidColor, Math.min(twiceProgress, 1)),
 					(mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)
 				);
-				if (progress >= 1) {
+				if (twiceProgress >= 1) {
 					mSwitchedColor = true;
 				}
 			} else {
 				data = new Particle.DustOptions(
-					ParticleUtils.getTransition(mMidColor, mEndColor, Math.min(progress, 1)),
+					ParticleUtils.getTransition(mMidColor, mEndColor, Math.min(twiceProgress - 1, 1)),
 					(mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)
 				);
 			}

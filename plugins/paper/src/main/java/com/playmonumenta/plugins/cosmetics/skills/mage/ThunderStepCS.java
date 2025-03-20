@@ -46,7 +46,7 @@ public class ThunderStepCS implements CosmeticSkill {
 			.petals(3)
 			.sharp(true)
 			.angleStep(0.125)
-			.transitionColors(Color.YELLOW, Color.YELLOW.mixColors(Color.BLACK), 1.5f)
+			.transitionColors(Color.YELLOW, Color.YELLOW.mixColors(Color.BLACK), 1.1f)
 			.spawnAsPlayerActive(player);
 
 		new BukkitRunnable() {
@@ -54,9 +54,9 @@ public class ThunderStepCS implements CosmeticSkill {
 
 			@Override
 			public void run() {
-				new PPCircle(Particle.REDSTONE, location.clone().add(new Vector(0, mTicks / 2.6, 0)), radius * mTicks / 5.0)
+				new PPCircle(Particle.REDSTONE, location.clone().add(new Vector(0, mTicks / 2.6, 0)), radius * 0.5 + 0.5 * mTicks / 5.0)
 					.count((int) (30 * ratio * ratio * (6 - mTicks) / 5.0))
-					.data(new Particle.DustOptions(ParticleUtils.getTransition(Color.YELLOW, Color.YELLOW.mixColors(Color.BLACK), mTicks / 5.0), 1.2f))
+					.data(new Particle.DustOptions(ParticleUtils.getTransition(Color.YELLOW, Color.YELLOW.mixColors(Color.BLACK), mTicks / 5.0), 1.1f))
 					.delta(0.3)
 					.spawnAsPlayerActive(player);
 				mTicks++;
@@ -97,7 +97,7 @@ public class ThunderStepCS implements CosmeticSkill {
 							sparkParticle(player, startLoc.clone(), VectorUtils.randomUnitVector().multiply(FastUtils.randomDoubleInRange(1, 2)), 0.5f);
 						}
 					}
-					new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 2, 0.5, 0.5, 0.5, 0.1, new Particle.DustOptions(Color.YELLOW, 1.0f)).spawnAsPlayerActive(player);
+					new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.1, new Particle.DustOptions(Color.YELLOW, 1.0f)).spawnAsPlayerActive(player);
 
 					if (mTicks >= duration) {
 						this.cancel();

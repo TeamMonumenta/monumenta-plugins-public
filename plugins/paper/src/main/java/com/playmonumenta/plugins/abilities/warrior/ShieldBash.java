@@ -101,6 +101,7 @@ public class ShieldBash extends Ability {
 		if (isLevelTwo()) {
 			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mob), mRadius);
 			for (LivingEntity le : hitbox.getHitMobs(mob)) {
+				mCosmetic.onHitSurroundingMobs(mPlayer, world, eyeLoc, le.getEyeLocation());
 				bash(le, ClassAbility.SHIELD_BASH_AOE);
 			}
 		}

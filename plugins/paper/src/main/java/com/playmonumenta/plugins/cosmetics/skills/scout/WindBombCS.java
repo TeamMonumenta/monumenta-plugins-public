@@ -64,8 +64,7 @@ public class WindBombCS implements CosmeticSkill {
 	}
 
 	public void onVortexTick(Player player, Location loc, double radius, int tick) {
-		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 3, radius * 0.3, radius * 0.3, radius * 0.3, 0.1).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CLOUD, loc, 4, 1, 2, 1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CLOUD, loc, 3, 1, 2, 1).spawnAsPlayerActive(player);
 
 		if (tick % 10 == 0) {
 			new BukkitRunnable() {
@@ -74,18 +73,12 @@ public class WindBombCS implements CosmeticSkill {
 				@Override
 				public void run() {
 					double multiplier = Math.pow((4 - mTicks) / 3.0, 1.6);
-					new PPCircle(Particle.CLOUD, loc.clone().subtract(new Vector(0, mTicks / 2.0, 0)), radius * multiplier)
-						.count(10)
-						.delta(multiplier)
-						.extra(0.1)
-						.extraVariance(0.05)
-						.spawnAsPlayerActive(player);
 
 					new PPCircle(Particle.FIREWORKS_SPARK, loc.clone().subtract(new Vector(0, mTicks / 2.0, 0)), radius * multiplier)
 						.count(30)
 						.directionalMode(true).rotateDelta(true)
-						.delta(-multiplier, 0, 0.25)
-						.extra(0.8)
+						.delta(-multiplier, 0, 0.15)
+						.extra(0.75)
 						.extraVariance(0.1)
 						.spawnAsPlayerActive(player);
 					mTicks++;

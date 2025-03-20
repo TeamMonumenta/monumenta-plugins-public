@@ -36,8 +36,6 @@ public class BladeDanceCS implements CosmeticSkill {
 		world.playSound(loc, Sound.BLOCK_GRINDSTONE_USE, SoundCategory.PLAYERS, 0.5f, 1.2f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.6f, 0.1f);
 		world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 2.0f, 1.0f);
-		Location modifiedLoc = loc.clone().add(0, 1, 0);
-		new PartialParticle(Particle.VILLAGER_ANGRY, modifiedLoc, 6, 0.45, 0.5, 0.45, 0).spawnAsPlayerActive(player);
 	}
 
 	public void danceTick(Player player, World world, Location loc, int tick, int duration, double danceRadius) {
@@ -46,21 +44,16 @@ public class BladeDanceCS implements CosmeticSkill {
 
 		Location loc2 = LocationUtils.getHalfHeightLocation(player);
 		loc2.setPitch(0);
+
+		double angle = FastUtils.randomDoubleInRange(0, 360);
+		double multiplier = FastUtils.randomDoubleInRange(0.35, 0.9);
+		ParticleUtils.drawHalfArc(loc2, danceRadius * multiplier, FastUtils.randomIntInRange(-10, 10) * 5 * multiplier + (FastUtils.randomBoolean() ? 180 : 0),
+			angle, angle + 160, 1, 0.25, false, (int) (40 + 50.0 * tick / duration), (location, ring, angleProgress) -> {
+				new PartialParticle(Particle.REDSTONE, location)
+					.data(new Particle.DustOptions(ParticleUtils.getTransition(Color.fromRGB(0x999999), ACCENT_COLOR, multiplier), 0.9f))
+					.spawnAsPlayerActive(player);
+			});
 		if (tick % 2 == 0) {
-			double multiplier = (double) (duration - tick) / duration * 0.7 + 0.3;
-			if (tick % 4 == 0) {
-				ParticleUtils.drawHalfArc(loc2, danceRadius * multiplier, FastUtils.randomDoubleInRange(-10, 10), 0, 180, 2, 0.25, false, 60 * (tick + 2) / duration, (location, ring, angleProgress) -> {
-					new PartialParticle(Particle.REDSTONE, location)
-						.data(new Particle.DustOptions(ParticleUtils.getTransition(Color.fromRGB(0x999999), ACCENT_COLOR, (double) ring / 8 + (double) tick / duration), 0.8f))
-						.spawnAsPlayerActive(player);
-				});
-			} else if (tick % 4 == 2) {
-				ParticleUtils.drawHalfArc(loc2, danceRadius * multiplier, FastUtils.randomDoubleInRange(-10, 10), 180, 360, 2, 0.25, false, 60 * (tick + 2) / duration, (location, ring, angleProgress) -> {
-					new PartialParticle(Particle.REDSTONE, location)
-						.data(new Particle.DustOptions(ParticleUtils.getTransition(Color.fromRGB(0x999999), ACCENT_COLOR, (double) ring / 8 + (double) tick / duration), 0.8f))
-						.spawnAsPlayerActive(player);
-				});
-			}
 			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.7f, pitch);
 			world.playSound(loc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.4f, 2.0f);
 			world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.0f, 0.6f);
@@ -78,8 +71,6 @@ public class BladeDanceCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.PLAYERS, 0.8f, 2.0f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 2.4f, 0.7f);
 
-		new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0).spawnAsPlayerActive(player);
-
 		new PPCircle(Particle.CRIT, loc.clone().add(0, 1, 0), danceRadius / 2)
 			.count(50)
 			.delta(0.5, 0, 1)
@@ -93,9 +84,9 @@ public class BladeDanceCS implements CosmeticSkill {
 
 
 		for (int i = 0; i < 2; i++) {
-			ParticleUtils.drawHalfArc(loc2, danceRadius - 1, i == 0 ? -12 : 360 + 12, i * 180 + 90, 450 + i * 180, 8, 0.25, false, 60, (location, ring, angleProgress) -> {
+			ParticleUtils.drawHalfArc(loc2, danceRadius - 1.75, i == 0 ? -12 : 360 + 12, i * 180 + 90, 450 + i * 180, 7, 0.25, false, 90, (location, ring, angleProgress) -> {
 				new PartialParticle(Particle.REDSTONE, location)
-					.data(new Particle.DustOptions(ParticleUtils.getTransition(ACCENT_COLOR, Color.GRAY, angleProgress), 1.1f))
+					.data(new Particle.DustOptions(ParticleUtils.getTransition(ACCENT_COLOR, Color.GRAY, angleProgress), 1.2f))
 					.spawnAsPlayerActive(player);
 			});
 		}

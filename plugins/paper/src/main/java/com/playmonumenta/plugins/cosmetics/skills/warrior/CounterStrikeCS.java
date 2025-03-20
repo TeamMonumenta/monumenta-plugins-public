@@ -54,6 +54,6 @@ public class CounterStrikeCS implements CosmeticSkill {
 
 	private void passiveParticles(Player player, Location enemyLoc, Color color) {
 		new PartialParticle(Particle.REDSTONE, enemyLoc.add(0, 1, 0), 4, 0.35, 0.4, 0.35, new Particle.DustOptions(color, 0.5f)).spawnForPlayer(ParticleCategory.OWN_PASSIVE, player);
-		new PPPillar(Particle.REDSTONE, enemyLoc, 2).data(new Particle.DustOptions(color, 0.72f)).count(5).spawnForPlayer(ParticleCategory.OWN_PASSIVE, player);
+		new PPPillar(Particle.REDSTONE, enemyLoc, 2).data(new Particle.DustOptions(color, 0.82f)).count(6).spawnForPlayer(ParticleCategory.OWN_PASSIVE, player);
 	}
 }

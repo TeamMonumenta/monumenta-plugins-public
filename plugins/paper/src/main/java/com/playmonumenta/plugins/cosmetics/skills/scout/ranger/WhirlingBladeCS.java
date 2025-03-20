@@ -63,7 +63,7 @@ public class WhirlingBladeCS implements CosmeticSkill {
 				(pLoc, ring, angleProgress) -> {
 					new PartialParticle(Particle.REDSTONE, pLoc, 1)
 						.count(1)
-						.data(new Particle.DustOptions(ParticleUtils.getTransition(Color.fromRGB(150, 255, 255), Color.WHITE, Math.min(angleProgress + 0.5 * ring / rings, 1)), 0.6f + (float) (0.4f * angleProgress)))
+						.data(new Particle.DustOptions(ParticleUtils.getTransition(Color.fromRGB(150, 255, 255), Color.WHITE, Math.min(angleProgress + 0.5 * ring / rings, 1)), 0.7f + 0.8f * (float) angleProgress * ring / rings))
 						.spawnAsPlayerActive(player);
 				});
 		}

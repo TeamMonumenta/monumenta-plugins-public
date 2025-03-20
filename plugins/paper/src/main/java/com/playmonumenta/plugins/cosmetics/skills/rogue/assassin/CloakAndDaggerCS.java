@@ -19,8 +19,7 @@ import org.bukkit.util.Vector;
 
 public class CloakAndDaggerCS implements StealthCosmeticSkill {
 	private static final int[] ANGLES = {0, 180};
-	private static final double[] OFFSET_X = {0.5, -0.5};
-	private static final Color ACCENT_COLOR = Color.fromRGB(0x29073c);
+	private static final double[] ROTATIONS = {25, -25};
 
 	private int mCombo = 0;
 	@Override
@@ -50,13 +49,12 @@ public class CloakAndDaggerCS implements StealthCosmeticSkill {
 		loc.add(0, 1, 0);
 
 		Location pLoc = mPlayer.getLocation().add(0, 1, 0);
-		Vector dir = LocationUtils.getDirectionTo(loc, pLoc.clone().subtract(0, 0.5, 0)).multiply(3.6);
-		loc.setDirection(dir);
-		Vector vec = VectorUtils.rotateYAxis(dir, 90).normalize().setY(0).multiply(OFFSET_X[mCombo] * 3);
-		ParticleUtils.drawHalfArc(loc.clone().subtract(dir).add(vec), 3.2, ANGLES[mCombo], 20, 100, 4, 0.35, false, 45,
+		Vector dir = LocationUtils.getDirectionTo(loc, pLoc.clone().subtract(0, 0.5, 0)).multiply(3.5);
+		loc.setDirection(VectorUtils.rotateYAxis(dir, ROTATIONS[mCombo])).subtract(dir);
+		ParticleUtils.drawHalfArc(loc, 3, ANGLES[mCombo], -20, 95, 10, 0.2, false, 40,
 			(location, ring, angleProgress) -> {
 				new PartialParticle(Particle.REDSTONE, location)
-					.data(new Particle.DustOptions(ParticleUtils.getTransition(ACCENT_COLOR, Color.fromRGB(0x6b0000), angleProgress), 1.1f))
+					.data(new Particle.DustOptions(ParticleUtils.getTransition(Color.fromRGB(0x302133), Color.fromRGB(0xcf0e2a), Math.pow(angleProgress, 2)), 1.1f + (float) angleProgress * ring / 18.0f))
 					.spawnAsPlayerActive(mPlayer);
 		});
 

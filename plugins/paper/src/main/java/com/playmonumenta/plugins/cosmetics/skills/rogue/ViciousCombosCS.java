@@ -49,15 +49,15 @@ public class ViciousCombosCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 0.3f, 0.7f);
 
 		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0))
-			.count(30)
+			.count(20)
 			.delta(0.2, 0.5, 0.2)
-			.extra(0.2)
+			.extra(0.5)
 			.spawnAsPlayerActive(player);
 
 		new PartialParticle(Particle.CRIT, loc.clone().add(0, 1, 0))
-			.count(20)
+			.count(15)
 			.delta(0.2, 0.5, 0.2)
-			.extra(0.2)
+			.extra(0.5)
 			.spawnAsPlayerActive(player);
 
 		Vector vec = loc.clone().subtract(player.getLocation()).toVector().normalize().multiply(3);
@@ -115,11 +115,12 @@ public class ViciousCombosCS implements CosmeticSkill {
 
 
 		for (int i = 0; i < 2; i++) {
-			ParticleUtils.drawHalfArc(fakeLoc, fakeLoc.distance(loc), i == 0 ? - 20 : 180 + 20, 30, 170, 5, 0.5, false, 40, (location, rings, angleProgress) -> {
-				new PartialParticle(Particle.REDSTONE, location)
-					.data(new Particle.DustOptions(ParticleUtils.getTransition(ACCENT_COLOR, Color.WHITE, angleProgress), 1.2f))
-					.spawnAsPlayerActive(player);
-			});
+			ParticleUtils.drawHalfArc(fakeLoc, fakeLoc.distance(loc), i == 0 ? -20 : 180 + 20, 30, 170, 8, 0.2, false, 40,
+				(location, ring, angleProgress) -> {
+					new PartialParticle(Particle.REDSTONE, location)
+						.data(new Particle.DustOptions(ParticleUtils.getTransition(ACCENT_COLOR, Color.WHITE, angleProgress), 0.8f + (float) angleProgress * ring / 8 * 0.6f))
+						.spawnAsPlayerActive(player);
+				});
 		}
 	}
 }
