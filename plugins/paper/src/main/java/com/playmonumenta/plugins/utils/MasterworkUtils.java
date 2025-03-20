@@ -73,6 +73,8 @@ public class MasterworkUtils {
 
 	private static final String SIRIUS_FRAG = "epic:r3/fragments/starblight_fragment";
 
+	private static final String HUNTS_MAT = "epic:r3/hunts/currency/ruck";
+
 	private static final String FISH_MAT = "epic:r3/items/fishing/sand_dollar";
 
 	private static final String SKR_MAT = "epic:r3/dungeons/skr/silver_memory_fragment";
@@ -268,6 +270,13 @@ public class MasterworkUtils {
 		}
 	}
 
+	private static class Hunts extends MasterworkCost {
+		private Hunts() {
+			super(Masterwork.IV);
+			put(Masterwork.IV, HUNTS_MAT, 6, HYPER_ARCHOS_RING, 4);
+		}
+	}
+
 	private static class Fish extends MasterworkCost {
 		private Fish() {
 			super(Masterwork.II);
@@ -337,6 +346,8 @@ public class MasterworkUtils {
 		MASTERWORK_COSTS.put(Location.GODSPORE, new Boss(GODSPORE_MAT));
 
 		MASTERWORK_COSTS.put(Location.SIRIUS, new WorldBoss(SIRIUS_FRAG));
+
+		MASTERWORK_COSTS.put(Location.HUNTS, new Hunts());
 
 		MASTERWORK_COSTS.put(Location.FISHING, new Fish());
 

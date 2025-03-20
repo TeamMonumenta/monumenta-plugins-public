@@ -137,13 +137,18 @@ public class SpellManager {
 	}
 
 	public void cancelAll() {
+		cancelAll(false);
+	}
+
+	public void cancelAll(boolean onPhaseChange) {
 		if (!mIsEmpty) {
-			for (Spell spell : mReadySpells.values()) {
-				spell.cancel();
+			List<Spell> spells = new ArrayList<>();
+			spells.addAll(mReadySpells.values());
+			spells.addAll(mCooldownSpells);
+			if (onPhaseChange) {
+				spells.removeIf(Spell::persistOnPhaseChange);
 			}
-			for (Spell spell : mCooldownSpells) {
-				spell.cancel();
-			}
+			spells.forEach(Spell::cancel);
 		}
 	}
 

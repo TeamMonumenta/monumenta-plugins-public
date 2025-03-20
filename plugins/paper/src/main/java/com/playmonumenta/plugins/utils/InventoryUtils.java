@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -420,6 +421,11 @@ public class InventoryUtils {
 				giveItem(player, item, player.getInventory(), silent);
 			}
 		}
+	}
+
+	public static void giveItemWithWarningAfterDelay(Player player, ItemStack item) {
+		player.sendMessage(Component.text("Make at least one space available in your inventory!", NamedTextColor.DARK_RED, TextDecoration.BOLD));
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> giveItem(player, item), 5 * 20);
 	}
 
 	public static void giveItemFromLootTable(Player player, NamespacedKey key, int amount) {

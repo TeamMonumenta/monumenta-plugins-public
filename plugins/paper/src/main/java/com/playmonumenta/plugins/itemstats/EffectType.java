@@ -1,38 +1,7 @@
 package com.playmonumenta.plugins.itemstats;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
-import com.playmonumenta.plugins.effects.AbilityCooldownIncrease;
-import com.playmonumenta.plugins.effects.AbsorptionSickness;
-import com.playmonumenta.plugins.effects.ArrowSaving;
-import com.playmonumenta.plugins.effects.Bleed;
-import com.playmonumenta.plugins.effects.BonusSoulThreads;
-import com.playmonumenta.plugins.effects.BoonOfKnightlyPrayer;
-import com.playmonumenta.plugins.effects.BoonOfTheFracturedTree;
-import com.playmonumenta.plugins.effects.BoonOfThePit;
-import com.playmonumenta.plugins.effects.CrystallineBlessing;
-import com.playmonumenta.plugins.effects.DeepGodsEndowment;
-import com.playmonumenta.plugins.effects.DurabilitySaving;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.FishQualityIncrease;
-import com.playmonumenta.plugins.effects.GiftOfTheStars;
-import com.playmonumenta.plugins.effects.HealingSickness;
-import com.playmonumenta.plugins.effects.NegateDamage;
-import com.playmonumenta.plugins.effects.PercentAttackSpeed;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.effects.PercentExperience;
-import com.playmonumenta.plugins.effects.PercentHeal;
-import com.playmonumenta.plugins.effects.PercentHealthBoost;
-import com.playmonumenta.plugins.effects.PercentKnockbackResist;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.effects.PoisonImmunity;
-import com.playmonumenta.plugins.effects.SilverPrayer;
-import com.playmonumenta.plugins.effects.SkySeekersGrace;
-import com.playmonumenta.plugins.effects.StarCommunion;
-import com.playmonumenta.plugins.effects.Stasis;
-import com.playmonumenta.plugins.effects.TemporalFlux;
-import com.playmonumenta.plugins.effects.TuathanBlessing;
+import com.playmonumenta.plugins.effects.*;
 import com.playmonumenta.plugins.effects.hexfall.CreepingDeath;
 import com.playmonumenta.plugins.effects.hexfall.DeathImmunity;
 import com.playmonumenta.plugins.effects.hexfall.DeathVulnerability;
@@ -201,6 +170,7 @@ public enum EffectType {
 	SEED_EXHAUSTION("SeedExhaustion", "Seed Exhaustion", false, false, false),
 	LIFE_IMMUNITY("LifeImmortality", "Life Immortality", false, false, false),
 	DEATH_IMMUNITY("DeathImmortality", "Death Immortality", false, false, false),
+	PARASITES("Parasites", "Parasites", false, false, true),
 
 	BOON_OF_THE_PIT("BoonOfThePit", "Boon of the Pit", true, false, true),
 	BOON_OF_SILVER_SCALES("BoonOfSilverScales", "Boon of Silver Scales", true, false, true),
@@ -534,6 +504,7 @@ public enum EffectType {
 			case CREEPING_DEATH -> new CreepingDeath(duration, plugin);
 			case LIFE_IMMUNITY -> new LifeImmunity(duration);
 			case DEATH_IMMUNITY -> new DeathImmunity(duration);
+			case PARASITES -> new Parasites(duration);
 
 			case BOON_OF_THE_PIT -> new BoonOfThePit(duration);
 			case BOON_OF_SILVER_SCALES -> new AbilityCooldownDecrease(duration, 0.05);

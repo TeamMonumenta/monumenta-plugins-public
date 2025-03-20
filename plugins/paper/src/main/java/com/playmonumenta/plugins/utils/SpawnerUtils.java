@@ -999,9 +999,9 @@ public class SpawnerUtils {
 			Location currentLocation = queue.poll();
 			if (world.getBlockAt(currentLocation).getType() == Material.AIR) {
 				int airCount = 0;
-				for (BlockFace face : BlockFace.values()) {
+				for (BlockFace face : BlockUtils.CARTESIAN_BLOCK_FACES) {
 					// check only horizontal faces
-					if (face != BlockFace.UP && face != BlockFace.DOWN && face.isCartesian()) {
+					if (face != BlockFace.UP && face != BlockFace.DOWN) {
 						if (world.getBlockAt(currentLocation.getBlock().getRelative(face).getLocation()).getType() == Material.AIR) {
 							airCount++;
 						}

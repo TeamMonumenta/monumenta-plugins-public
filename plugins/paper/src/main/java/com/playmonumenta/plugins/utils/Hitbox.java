@@ -370,6 +370,26 @@ public abstract class Hitbox {
 	}
 
 	/**
+	 * Creates the union of a list of hitboxes, see Hitbox#union for details
+	 *
+	 * @param hitboxes  A non-empty list of hitboxes
+	 */
+	public static Hitbox unionOf(List<? extends Hitbox> hitboxes) {
+		if (hitboxes.isEmpty()) {
+			throw new IllegalArgumentException("Tried to find the union of an empty list of hitboxes!");
+		}
+		Hitbox result = new EmptyHitbox(hitboxes.get(0).getBoundingBox(), hitboxes.get(0).getWorld());
+		for (Hitbox other : hitboxes) {
+			result = result.union(other);
+		}
+		return result;
+	}
+
+	public static Hitbox unionOfAABB(List<BoundingBox> boundingBoxes, World world) {
+		return unionOf(boundingBoxes.stream().map(bb -> new AABBHitbox(world, bb)).toList());
+	}
+
+	/**
 	 * Creates a new hitbox as the union of this hitbox and the given hitbox.
 	 * Entities will be in this union hitbox if they are in either (or both) of the partial hitboxes.
 	 * <p>

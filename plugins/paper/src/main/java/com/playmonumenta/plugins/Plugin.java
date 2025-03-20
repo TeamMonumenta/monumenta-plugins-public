@@ -31,6 +31,8 @@ import com.playmonumenta.plugins.gallery.GalleryCommands;
 import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.guis.lib.GuiListener;
 import com.playmonumenta.plugins.hexfall.HexfallListener;
+import com.playmonumenta.plugins.hunts.HuntsCommand;
+import com.playmonumenta.plugins.hunts.HuntsManager;
 import com.playmonumenta.plugins.infinitytower.TowerCommands;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
@@ -203,6 +205,7 @@ public class Plugin extends JavaPlugin {
 	public PlayerListener mPlayerListener;
 	public GrapplingListener mGrapplingListener;
 	public @Nullable AuditListener mAuditListener = null;
+	public HuntsManager mHuntsManager;
 	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
@@ -371,6 +374,7 @@ public class Plugin extends JavaPlugin {
 		StatTrackAdd.register();
 		PlaySoundsCommand.register();
 		CloseInventoryCommand.register();
+		HuntsCommand.register(this);
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -454,6 +458,7 @@ public class Plugin extends JavaPlugin {
 		mShulkerEquipmentListener = new ShulkerEquipmentListener(this);
 		mPlayerListener = new PlayerListener(this);
 		mGrapplingListener = new GrapplingListener();
+		mHuntsManager = new HuntsManager(this);
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();

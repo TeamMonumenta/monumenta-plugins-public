@@ -49,8 +49,8 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	private static final List<ItemStack> mInvalidItems;
 	private static final ItemStack mRefundItem;
 	// We'll want to turn this back on at some point later.
-	private static final ItemStack mMaxLevelReachedItem;
-	private static final ItemStack mMaxLevelReachedRevelationItem;
+	public static final ItemStack mMaxLevelReachedItem;
+	public static final ItemStack mMaxLevelReachedRevelationItem;
 
 	private final Map<Integer, ItemClicked> mMapFunction;
 
@@ -98,6 +98,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		addItems(DelveInfusionSelection.DECAPITATION, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Decapitation.DAMAGE_MLT_PER_LVL * i) + "% additional damage" + perLevel + " on a critical melee strike.");
 		addItems(DelveInfusionSelection.CELESTIAL, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Celestial.DAMAGE_BONUS_PER_LEVEL * i) + "% additional damage" + perLevel + " to mobs that are at a higher elevation than you.");
 		addItems(DelveInfusionSelection.FERVOR, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Fervor.PERCENT_DAMAGE_PER_LEVEL * i) + "% additional damage" + perLevel + " for 3s after gaining a buff that lasts at least 5s.");
+		addItems(DelveInfusionSelection.STURDY, (i, perLevel) -> "Reduces the duration shields are stunned for by " + StringUtils.multiplierToPercentageWithSign(Sturdy.CDR_PER_LEVEL * i) + perLevel + ".");
 
 		mInvalidItems = Stream.of("helmet", "chestplate", "leggings", "boots", "main hand", "off hand")
 			.map(s -> GUIUtils.createBasicItem(Material.ARMOR_STAND, "Invalid Item", NamedTextColor.GRAY, true, "Your " + s + " can't be infused.", NamedTextColor.DARK_GRAY)).toList();
@@ -260,7 +261,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 					}
 
 					int slot = (row * 9) + 2 + level;
-					if (level < DelveInfusionUtils.MAX_LEVEL) {
+					if (level < DelveInfusionUtils.MAX_LEVEL && !infusion.isViewOnly()) {
 						//if we didn't reach max level then load item to infuse
 						DelveInfusionUtils.DelveInfusionMaterial delveInfusionMaterial = DelveInfusionUtils.getDelveInfusionMaterial(item);
 						ItemStack infuseItem = GUIUtils.createBasicItem(Material.ENCHANTED_BOOK, "Click to infuse to level " + (level + 1), NamedTextColor.DARK_AQUA, true,

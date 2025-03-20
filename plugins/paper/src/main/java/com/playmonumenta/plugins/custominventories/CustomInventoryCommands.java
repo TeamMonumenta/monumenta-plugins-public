@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.depths.guis.DepthsAscensionGUI;
 import com.playmonumenta.plugins.depths.guis.ZenithCharmPowerGUI;
 import com.playmonumenta.plugins.guis.FishingDifficultyGui;
+import com.playmonumenta.plugins.guis.HuntsInfusionGUI;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
 import com.playmonumenta.plugins.guis.MusicGui;
 import com.playmonumenta.plugins.guis.classselection.ClassSelectionGui;
@@ -421,6 +422,12 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
 				new EnchantopediaGui(player).open();
+			})
+			.register();
+		new CommandAPICommand("openhuntsinfusiongui")
+			.withPermission("monumenta.command.openhuntsinfusiongui")
+			.executesPlayer((player, args) -> {
+				new HuntsInfusionGUI(player).open();
 			})
 			.register();
 	}

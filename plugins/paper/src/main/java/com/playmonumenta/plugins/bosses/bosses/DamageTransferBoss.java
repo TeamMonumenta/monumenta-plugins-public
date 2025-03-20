@@ -16,9 +16,11 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class DamageTransferBoss extends BossAbilityGroup {
 
@@ -85,9 +87,9 @@ public class DamageTransferBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossIgnited(int ticks) {
+	public void bossIgnited(int ticks, @Nullable Entity igniter) {
 		if (mTarget != null && !mTarget.isDead()) {
-			EntityUtils.setFireTicksIfLower(ticks, mTarget);
+			EntityUtils.setFireTicksIfLower(ticks, mTarget, igniter);
 			mBoss.setFireTicks(0);
 		} else {
 			mBoss.setFireTicks(ticks);

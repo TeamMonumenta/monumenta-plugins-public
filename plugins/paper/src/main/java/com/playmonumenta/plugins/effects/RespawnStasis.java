@@ -41,6 +41,7 @@ public class RespawnStasis extends Stasis {
 	public static final int MINIMUM_DURATION = 10;
 	public static final int SPECTATE_DURATION = 3 * 20;
 	public static final String SPECTATE_DISABLE_TAG = "RespawnStasisSpectateDisable";
+	public static final String TEMP_NO_SPECTATE_TAG = "TempRespawnStasisNoSpectate";
 
 	int mShatter;
 	int mShatterLevel;
@@ -75,6 +76,7 @@ public class RespawnStasis extends Stasis {
 				&& !player.getScoreboardTags().contains(SPECTATE_DISABLE_TAG)
 				&& !ZoneUtils.hasZoneProperty(mDeathLocation, ZoneUtils.ZoneProperty.NO_SPECTATOR_ON_DEATH)
 				&& !ZoneUtils.hasZoneProperty(mRespawnLocation, ZoneUtils.ZoneProperty.NO_SPECTATOR_ON_RESPAWN)
+				&& !player.getScoreboardTags().contains(TEMP_NO_SPECTATE_TAG)
 			) {
 				Location spectateLocation = findSpectateLocation(mDeathLocation, player);
 				ArmorStand stand = spectateLocation.getWorld().spawn(spectateLocation, ArmorStand.class, s -> {
@@ -109,6 +111,8 @@ public class RespawnStasis extends Stasis {
 				}
 				startEffects(player);
 			}
+
+			player.removeScoreboardTag(TEMP_NO_SPECTATE_TAG);
 
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> showMessages(player, false));
 

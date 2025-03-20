@@ -55,6 +55,8 @@ public enum MonumentaContent {
 	SIRIUS("sirius", ContentType.BOSS, 3),
 	GALLERY_ROUND("galleryround", ContentType.OTHER, 0),
 	GODSPORE("godspore", ContentType.BOSS, 3),
+	HUNTS_SPOILED("huntsspoiled", ContentType.BOSS, 3),
+	HUNTS_UNSPOILED("huntsunspoiled", ContentType.BOSS, 3),
 	KINGS_BOUNTY("r1daily", ContentType.OTHER, 0),
 	CELSIAN_BOUNTY("r2daily", ContentType.OTHER, 0),
 	RING_BOUNTY("r3daily", ContentType.OTHER, 0),

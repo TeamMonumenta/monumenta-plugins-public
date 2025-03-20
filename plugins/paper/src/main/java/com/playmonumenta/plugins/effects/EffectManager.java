@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
@@ -394,6 +395,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(RespawnStasis.effectID, RespawnStasis::deserialize);
 		mEffectDeserializer.put(ThuribleBonusHealing.effectID, ThuribleBonusHealing::deserialize);
 		mEffectDeserializer.put(TuathanBlessing.effectID, TuathanBlessing::deserialize);
+		mEffectDeserializer.put(UamielPetrification.effectID, UamielPetrification::deserialize);
 		mEffectDeserializer.put(UnstableAmalgamDisable.effectID, UnstableAmalgamDisable::deserialize);
 		mEffectDeserializer.put(VengefulTag.effectID, VengefulTag::deserialize);
 		mEffectDeserializer.put(VoodooBondsCurse.effectID, VoodooBondsCurse::deserialize);
@@ -426,6 +428,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(RejuvenationHealing.effectID, RejuvenationHealing::deserialize);
 		mEffectDeserializer.put(DamageImmunity.effectID, DamageImmunity::deserialize);
 		mEffectDeserializer.put(ImpactVulnerability.effectID, ImpactVulnerability::deserialize);
+		mEffectDeserializer.put(Parasites.effectID, Parasites::deserialize);
 	}
 
 	private static final int PERIOD = 5;
@@ -1122,6 +1125,19 @@ public final class EffectManager implements Listener {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
 					effectGroup.last().onTargetSwap(event);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void entityApplyEffectTypeFromPotion(EffectTypeApplyFromPotionEvent event) {
+		Entity entity = event.getEntity();
+		Effects effects = mEntities.get(entity.getUniqueId());
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().entityApplyEffectTypeFromPotion(entity, event);
 				}
 			}
 		}

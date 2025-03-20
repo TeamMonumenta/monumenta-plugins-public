@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import com.destroystokyo.paper.MaterialSetTag;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -467,6 +469,8 @@ public class BlockUtils {
 		Material.YELLOW_SHULKER_BOX
 	);
 
+	public static final Set<BlockFace> CARTESIAN_BLOCK_FACES = Arrays.stream(BlockFace.values()).filter(BlockFace::isCartesian).collect(Collectors.toSet());
+
 	public static boolean isLosBlockingBlock(Block block) {
 		return isLosBlockingBlock(block.getType());
 	}
@@ -485,8 +489,8 @@ public class BlockUtils {
 
 	public static boolean isWaterlogged(BlockState block) {
 		BlockData data = block.getBlockData();
-		if (data instanceof Waterlogged) {
-			return ((Waterlogged) data).isWaterlogged();
+		if (data instanceof Waterlogged waterlogged) {
+			return waterlogged.isWaterlogged();
 		}
 		return false;
 	}
@@ -604,6 +608,15 @@ public class BlockUtils {
 		return Math.abs(block2.getX() - block1.getX()) + Math.abs(block2.getY() - block1.getY()) + Math.abs(block2.getZ() - block1.getZ());
 	}
 
+	public static boolean isExposed(Block block) {
+		return !block.getRelative(BlockFace.UP).isSolid()
+				|| !block.getRelative(BlockFace.DOWN).isSolid()
+				|| !block.getRelative(BlockFace.NORTH).isSolid()
+				|| !block.getRelative(BlockFace.SOUTH).isSolid()
+				|| !block.getRelative(BlockFace.EAST).isSolid()
+				|| !block.getRelative(BlockFace.WEST).isSolid();
+	}
+
 	private static class Node {
 		private final Block mBlock;
 		private int mDistanceTo;
@@ -685,6 +698,25 @@ public class BlockUtils {
 					Location check = new Location(world, x, by, z);
 					if (check.distance(loc) <= radius) {
 						blocks.add(check.getBlock());
+					}
+				}
+			}
+		}
+		return blocks;
+	}
+
+	public static List<Block> getBlocksInCylinder(Location loc, double radius, double height) {
+		World world = loc.getWorld();
+		double bx = loc.getX();
+		double by = loc.getY();
+		double bz = loc.getZ();
+		List<Block> blocks = new ArrayList<>();
+		for (double x = bx - radius; x <= bx + radius; x++) {
+			for (double z = bz - height; z <= bz + radius; z++) {
+				Vector check = new Vector(x, by, z);
+				if (check.distance(loc.toVector()) <= radius) {
+					for (double y = by - height / 2; y <= by + height / 2; y++) {
+						blocks.add(new Location(world, x, y, z).getBlock());
 					}
 				}
 			}

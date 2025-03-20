@@ -182,6 +182,10 @@ public class LocationUtils {
 	}
 
 	public static boolean hasNearbyBlock(Location center, int radius, Material material) {
+		return hasNearbyBlock(center, radius, List.of(material));
+	}
+
+	public static boolean hasNearbyBlock(Location center, int radius, List<Material> materials) {
 		int cx = center.getBlockX();
 		int cy = center.getBlockY();
 		int cz = center.getBlockZ();
@@ -190,7 +194,7 @@ public class LocationUtils {
 		for (int x = cx - radius; x <= cx + radius; x++) {
 			for (int z = cz - radius; z <= cz + radius; z++) {
 				for (int y = (cy - radius); y <= (cy + radius); y++) {
-					if (world.getType(x, y, z) == material) {
+					if (materials.contains(world.getType(x, y, z))) {
 						return true;
 					}
 				}
@@ -697,6 +701,35 @@ public class LocationUtils {
 			clone.setY(below.getY() + 0.5);
 			return fallToGround(clone, minHeight);
 		}
+	}
+
+	public static Location emergeFromGround(Location loc, double maxHeight) {
+		Location clone = loc.clone();
+		Block block = clone.getBlock();
+		if (!block.isSolid()) {
+			return clone;
+		}
+		double newY = block.getBoundingBox().getMaxY();
+		if (newY < clone.getY()) {
+			return clone;
+		}
+		if (newY >= maxHeight) {
+			clone.setY(maxHeight + 0.01);
+			return clone;
+		}
+		clone.setY(newY + 0.5);
+		return emergeFromGround(clone, maxHeight);
+	}
+
+	public static Location mapToGround(Location startLocation, int maxVerticalRange) {
+		// Start at the bottom and move up
+		for (int i = 0; i < maxVerticalRange * 2; i++) {
+			Location testLocation = startLocation.clone().add(0, i, 0);
+			if (!testLocation.getBlock().isSolid()) {
+				return testLocation;
+			}
+		}
+		return startLocation;
 	}
 
 	public static double distanceToGround(Location loc, double minHeight, double maxDistance) {

@@ -46,11 +46,11 @@ public class MovementUtils {
 		Vector dir = target.getLocation().subtract(loc.toVector()).toVector();
 
 		if (dir.length() < 0.001) {
-			/* If the direction magnitude is too small, escape, rather than divide by zero / infinity */
-			return;
+			dir = new Vector(0, 0, 0);
+		} else {
+			dir = dir.normalize().multiply(speed);
 		}
 
-		dir = dir.normalize().multiply(speed);
 		dir.setY(y);
 		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
 		if (mult > 0 || !useKnockbackRes) {

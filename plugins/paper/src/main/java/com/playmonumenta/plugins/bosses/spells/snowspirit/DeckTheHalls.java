@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -86,13 +87,9 @@ public class DeckTheHalls extends Spell {
 						}
 					}
 
-					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
-						for (BoundingBox box : boxes) {
-							if (player.getBoundingBox().overlaps(box)) {
-								DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Deck the Halls");
-								break;
-							}
-						}
+					Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+					for (Player player : hitbox.getHitPlayers(true)) {
+						DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Deck the Halls");
 					}
 
 

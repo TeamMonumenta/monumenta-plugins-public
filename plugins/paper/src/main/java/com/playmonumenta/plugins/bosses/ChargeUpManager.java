@@ -1,6 +1,9 @@
 package com.playmonumenta.plugins.bosses;
 
 import com.playmonumenta.plugins.Plugin;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -21,6 +24,8 @@ public class ChargeUpManager {
 
 	private final int mRange;
 	private final BossBar mBar;
+
+	private final Set<UUID> mExcludedPlayers = new HashSet<>();
 
 	public ChargeUpManager(Entity boss, int chargeTime, Component title, BossBar.Color color, BossBar.Overlay style, int range) {
 		this(boss.getLocation(), boss, chargeTime, title, color, style, range);
@@ -93,7 +98,7 @@ public class ChargeUpManager {
 		}
 
 		for (Player player : mLoc.getWorld().getPlayers()) {
-			if ((!mRequireBoss || (mBoss != null && mBoss.isValid())) && player.getLocation().distance(mLoc) < mRange) {
+			if ((!mRequireBoss || (mBoss != null && mBoss.isValid())) && player.getLocation().distance(mLoc) < mRange && !mExcludedPlayers.contains(player.getUniqueId())) {
 				player.showBossBar(mBar);
 			} else {
 				player.hideBossBar(mBar);
@@ -166,5 +171,9 @@ public class ChargeUpManager {
 
 	public void remove() {
 		mLoc.getWorld().hideBossBar(mBar);
+	}
+
+	public void excludePlayer(Player player) {
+		mExcludedPlayers.add(player.getUniqueId());
 	}
 }

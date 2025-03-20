@@ -81,11 +81,6 @@ public class WormBoss extends BossAbilityGroup {
 			@Override
 			public void run() {
 				if (!mBoss.isValid()) {
-					if (!mBoss.isDead()) {
-						for (LivingEntity part : mParts) {
-							part.remove();
-						}
-					}
 					cancel();
 					return;
 				}

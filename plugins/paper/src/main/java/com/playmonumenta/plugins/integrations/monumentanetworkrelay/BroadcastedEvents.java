@@ -6,6 +6,7 @@ import com.playmonumenta.networkrelay.DestOfflineEvent;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEvent;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.hunts.HuntsManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -116,7 +117,7 @@ public class BroadcastedEvents implements Listener {
 
 					String shard = args.getUnchecked("shard");
 					String eventName = args.getUnchecked("Event Name");
-					Integer timeLeft = -1;
+					int timeLeft = -1;
 
 					runCommandLogic(sender, shard, eventName, timeLeft);
 				})
@@ -277,20 +278,18 @@ public class BroadcastedEvents implements Listener {
 
 		for (Event event : getCurrentEvents().values()) {
 			KnownEvent knownEvent = KnownEvent.get(event.mEventName.toUpperCase(Locale.getDefault()));
-			if (knownEvent != KnownEvent.UNKNOWN) {
-				if (knownEvent.mPossibilities.length > 0) {
-					boolean canSee = false;
-					for (final var possibility : knownEvent.mPossibilities) {
-						OptionalInt score = ScoreboardUtils.getScoreboardValue(player, possibility.mScoreboard);
-						if (score.isPresent() && score.getAsInt() >= possibility.mStep) {
-							canSee = true;
-							break;
-						}
+			if (knownEvent != KnownEvent.UNKNOWN && knownEvent.mPossibilities.length > 0) {
+				boolean canSee = false;
+				for (EventRequirement possibility : knownEvent.mPossibilities) {
+					OptionalInt score = ScoreboardUtils.getScoreboardValue(player, possibility.mScoreboard);
+					if (score.isPresent() && score.getAsInt() >= possibility.mStep) {
+						canSee = true;
+						break;
 					}
+				}
 
-					if (!canSee) {
-						continue;
-					}
+				if (!canSee) {
+					continue;
 				}
 			}
 
@@ -448,7 +447,6 @@ public class BroadcastedEvents implements Listener {
 		public static final String TIME_PROP_KEY = "timeLeft";
 		public static final String STATUS_PROP_KEY = "status";
 
-
 		public final String mShard;
 		public final String mEventName;
 
@@ -510,11 +508,10 @@ public class BroadcastedEvents implements Listener {
 	}
 
 	public static class EventRequirement {
-		@NotNull
 		public final String mScoreboard;
 		public final int mStep;
 
-		public EventRequirement(@NotNull String scoreboard, int step) {
+		public EventRequirement(String scoreboard, int step) {
 			mScoreboard = scoreboard;
 			mStep = step;
 		}
@@ -525,6 +522,12 @@ public class BroadcastedEvents implements Listener {
 		ELDRASK("Eldrask", NamedTextColor.AQUA, new EventRequirement("Quest101", 12), new EventRequirement("Teal", 1)),
 		HEKAWT("Hekawt", NamedTextColor.GOLD, new EventRequirement("Quest101", 12), new EventRequirement("Fred", 1)),
 		SIRIUS("Sirius", NamedTextColor.GRAY, new EventRequirement("Quest220", 8), new EventRequirement("Zenith", 1)),
+		ALOC_ACOC(HuntsManager.QuarryType.ALOC_ACOC),
+		CORE_ELEMENTAL(HuntsManager.QuarryType.CORE_ELEMENTAL),
+		STEEL_WING_HAWK(HuntsManager.QuarryType.STEEL_WING_HAWK),
+		THE_IMPENETRABLE(HuntsManager.QuarryType.THE_IMPENETRABLE),
+		UAMIEL(HuntsManager.QuarryType.UAMIEL),
+		EXPERIMENT_SEVENTY_ONE(HuntsManager.QuarryType.EXPERIMENT_SEVENTY_ONE),
 		UNKNOWN("Unknown", null);
 
 		public final String mDisplayName;
@@ -537,6 +540,10 @@ public class BroadcastedEvents implements Listener {
 			this.mDisplayName = displayName;
 			this.mColor = color;
 			this.mPossibilities = possibleRequirements;
+		}
+
+		KnownEvent(HuntsManager.QuarryType quarryType) {
+			this(quarryType.getName(), quarryType.getColor(), new EventRequirement("HuntsLodge", 2));
 		}
 
 		public static String[] names() {

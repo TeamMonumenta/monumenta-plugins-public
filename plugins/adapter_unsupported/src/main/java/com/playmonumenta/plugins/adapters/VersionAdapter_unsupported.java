@@ -89,6 +89,7 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 
 	}
 
+
 	@Override
 	public void setAttackRange(Creature entity, double attackRange) {
 

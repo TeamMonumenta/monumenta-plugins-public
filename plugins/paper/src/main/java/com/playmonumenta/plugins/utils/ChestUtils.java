@@ -393,10 +393,14 @@ public class ChestUtils {
 				                                    && (((Chest) doubleChestInventory.getLeftSide().getHolder()).hasLootTable() || ((Chest) doubleChestInventory.getRightSide().getHolder()).hasLootTable())));
 	}
 
-	public static ItemStack giveChestWithLootTable(String lootTable, String chestName, String chestNameColor, List<Component> lore) {
+	public static ItemStack giveChestWithLootTable(String lootTable, String chestName, @Nullable String chestNameColor, List<Component> lore) {
 		ItemStack chest = new ItemStack(Material.CHEST);
 		if (chest.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof Chest chestMeta) {
-			blockMeta.displayName(Component.text(chestName).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true).color(TextColor.fromHexString(chestNameColor)));
+			Component name = Component.text(chestName).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true);
+			if (chestNameColor != null) {
+				name = name.color(TextColor.fromHexString(chestNameColor));
+			}
+			blockMeta.displayName(name);
 			chestMeta.setLootTable(Bukkit.getLootTable(NamespacedKey.fromString(lootTable)));
 			blockMeta.setBlockState(chestMeta);
 			blockMeta.lore(lore);

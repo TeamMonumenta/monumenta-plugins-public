@@ -789,10 +789,14 @@ public class EntityUtils {
 	}
 
 	public static @Nullable Player getNearestPlayer(Location loc, double radius) {
-		return PlayerUtils.playersInRange(loc, radius, true)
-			       .stream()
-			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-			       .orElse(null);
+		return getNearestPlayer(loc, PlayerUtils.playersInRange(loc, radius, true));
+	}
+
+	public static @Nullable Player getNearestPlayer(Location loc, List<Player> players) {
+		return players
+			.stream()
+			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			.orElse(null);
 	}
 
 	/**
@@ -1001,23 +1005,27 @@ public class EntityUtils {
 		return highest;
 	}
 
-	public static void setFireTicksIfLower(int fireTicks, LivingEntity target) {
+	public static void setFireTicksIfLower(int fireTicks, LivingEntity target, @Nullable Entity applier) {
 		if (target.getFireTicks() < fireTicks && !isFireResistant(target)) {
 			target.setFireTicks(fireTicks);
 			if (!(target instanceof Player)) {
-				BossManager.getInstance().bossIgnited(target, fireTicks);
+				BossManager.getInstance().bossIgnited(target, fireTicks, applier);
 			}
 		}
 	}
 
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, @Nullable LivingEntity applier) {
-		if (applier instanceof Player player) {
+		applyFire(plugin, fireTicks, target, applier, true);
+	}
+
+	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, @Nullable LivingEntity applier, boolean applyInferno) {
+		if (applier instanceof Player player && applyInferno) {
 			applyFire(plugin, fireTicks, target, player, plugin.mItemStatManager.getPlayerItemStats(player));
 		} else if (target instanceof Player player) {
 			fireTicks = FireProtection.getFireDuration(fireTicks, plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.FIRE_PROTECTION));
-			setFireTicksIfLower(fireTicks, player);
+			setFireTicksIfLower(fireTicks, player, null);
 		} else {
-			setFireTicksIfLower(fireTicks, target);
+			setFireTicksIfLower(fireTicks, target, applier);
 		}
 	}
 
@@ -1034,8 +1042,7 @@ public class EntityUtils {
 		if (inferno > 0) {
 			Inferno.apply(plugin, player, playerItemStats, (int) Math.floor(inferno * infernoScale), target, fireTicks);
 		}
-
-		setFireTicksIfLower(fireTicks, target);
+		setFireTicksIfLower(fireTicks, target, player);
 	}
 
 	public static void applyTaunt(LivingEntity tauntedEntity, Player targetedPlayer) {

@@ -71,14 +71,15 @@ public interface VersionAdapter {
 	/**
 	 * Make this entity lose all desire to attack any Entity and make this only attack entities accepted by the predicate
 	 *
-	 * @param entity        The entity
-	 * @param action        The damage action that will cat when this entity hit someone
-	 * @param predicate     Predicate used for check which entity attack and which not
-	 * @param attackRange   Attack range of this entity
+	 * @param entity      The entity
+	 * @param action      The damage action that will cat when this entity hit someone
+	 * @param predicate   Predicate used for check which entity attack and which not
+	 * @param attackRange Attack range of this entity
 	 */
 	void setFriendly(Creature entity, DamageAction action, Predicate<LivingEntity> predicate, double attackRange);
 
 	void setHuntingCompanion(Creature entity, DamageAction action, double attackRange);
+
 
 	interface DamageAction {
 		void damage(LivingEntity entity);

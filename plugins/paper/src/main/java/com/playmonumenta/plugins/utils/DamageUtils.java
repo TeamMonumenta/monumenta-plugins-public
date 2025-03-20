@@ -6,12 +6,15 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.listeners.StasisListener;
 import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -184,5 +187,18 @@ public class DamageUtils {
 				NmsUtils.getVersionAdapter().setAttackCooldown(damager, originalAttackCooldown);
 			}
 		}
+	}
+
+	public static @Nullable ItemStatManager.PlayerItemStats getDamagingPlayerItemStats(DamageEvent event) {
+		if (event.getDamager() instanceof Projectile projectile) {
+			ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(projectile);
+			if (playerItemStats != null) {
+				return playerItemStats;
+			}
+		}
+		if (event.getSource() instanceof Player player) {
+			return Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
+		}
+		return null;
 	}
 }

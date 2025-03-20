@@ -76,6 +76,12 @@ import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.bosses.GalleryMobRisingBoss;
 import com.playmonumenta.plugins.gallery.bosses.GallerySummonMobBoss;
+import com.playmonumenta.plugins.hunts.bosses.AlocAcoc;
+import com.playmonumenta.plugins.hunts.bosses.CoreElemental;
+import com.playmonumenta.plugins.hunts.bosses.ExperimentSeventyOne;
+import com.playmonumenta.plugins.hunts.bosses.SteelWingHawk;
+import com.playmonumenta.plugins.hunts.bosses.TheImpenetrable;
+import com.playmonumenta.plugins.hunts.bosses.Uamiel;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -111,6 +117,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -433,6 +440,13 @@ public class BossManager implements Listener {
 		registerStatefulBoss(Xenotopsis.identityTag, Xenotopsis::new);
 		registerStatefulBoss(ExaltedCAxtal.identityTag, ExaltedCAxtal::new);
 		registerStatefulBoss(Sirius.identityTag, Sirius::new);
+		registerStatefulBoss(AlocAcoc.identityTag, AlocAcoc::new);
+		registerStatefulBoss(CoreElemental.identityTag, CoreElemental::new);
+		registerStatefulBoss(SteelWingHawk.identityTag, SteelWingHawk::new);
+		registerStatefulBoss(TheImpenetrable.identityTag, TheImpenetrable::new);
+		registerStatefulBoss(Uamiel.identityTag, Uamiel::new);
+		registerStatefulBoss(ExperimentSeventyOne.identityTag, ExperimentSeventyOne::new);
+
 	}
 
 	private static void registerStatelessBoss(String identityTag, StatelessBossConstructor constructor) {
@@ -471,6 +485,7 @@ public class BossManager implements Listener {
 	private final Map<UUID, Boss> mBosses;
 	private boolean mNearbyEntityDeathEnabled = false;
 	private boolean mNearbyBlockBreakEnabled = false;
+	private boolean mNearbyBlockPlaceEnabled = false;
 	private boolean mNearbyPlayerDeathEnabled = false;
 	private double mMaximumEntityDeathRange = 12.0;
 
@@ -582,6 +597,21 @@ public class BossManager implements Listener {
 				Boss boss = mBosses.get(m.getUniqueId());
 				if (boss != null) {
 					boss.nearbyBlockBreak(event);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void blockPlaceEvent(BlockPlaceEvent event) {
+		if (mNearbyBlockPlaceEnabled) {
+			/* For performance reasons this check is only enabled when there is a loaded
+			 * boss that is using this feature
+			 */
+			for (LivingEntity m : EntityUtils.getNearbyMobs(event.getBlock().getLocation(), 62.0)) {
+				Boss boss = mBosses.get(m.getUniqueId());
+				if (boss != null) {
+					boss.nearbyBlockPlace(event);
 				}
 			}
 		}
@@ -895,11 +925,11 @@ public class BossManager implements Listener {
 	}
 
 	// Only acts on fire applied by the plugin, called in EntityUtils
-	public void bossIgnited(Entity entity, int ticks) {
+	public void bossIgnited(Entity entity, int ticks, @Nullable Entity applier) {
 		Boss boss = mBosses.get(entity.getUniqueId());
 
 		if (boss != null) {
-			boss.bossIgnited(ticks);
+			boss.bossIgnited(ticks, applier);
 		}
 	}
 
@@ -1061,6 +1091,10 @@ public class BossManager implements Listener {
 			mNearbyBlockBreakEnabled = true;
 		}
 
+		if (ability.hasNearbyBlockPlaceTrigger()) {
+			mNearbyBlockPlaceEnabled = true;
+		}
+
 		if (ability.hasNearbyPlayerDeathTrigger()) {
 			mNearbyPlayerDeathEnabled = true;
 		}
@@ -1102,6 +1136,21 @@ public class BossManager implements Listener {
 			 */
 			if (mBosses.values().stream().noneMatch(Boss::hasNearbyBlockBreakTrigger)) {
 				mNearbyBlockBreakEnabled = false;
+			}
+		}
+
+		if (boss.hasNearbyBlockPlaceTrigger()) {
+			if (!mNearbyBlockPlaceEnabled) {
+				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyBlockPlaceTrigger but feature was not enabled. Definitely a bug!");
+			}
+
+			/*
+			 * This boss was at least contributing to keeping this feature enabled
+			 *
+			 * Need to check all other loaded bosses to see if it still needs to be enabled
+			 */
+			if (mBosses.values().stream().noneMatch(Boss::hasNearbyBlockPlaceTrigger)) {
+				mNearbyBlockPlaceEnabled = false;
 			}
 		}
 
@@ -1184,6 +1233,7 @@ public class BossManager implements Listener {
 		sender.sendMessage("Total number of loaded bosses: " + mBosses.size());
 		sender.sendMessage("mNearbyEntityDeathEnabled: " + mNearbyEntityDeathEnabled);
 		sender.sendMessage("mNearbyBlockBreakEnabled: " + mNearbyBlockBreakEnabled);
+		sender.sendMessage("mNearbyBlockPlaceEnabled: " + mNearbyBlockPlaceEnabled);
 		sender.sendMessage("mNearbyPlayerDeathEnabled: " + mNearbyPlayerDeathEnabled);
 
 		Map<String, Integer> bossCounts = new HashMap<>();

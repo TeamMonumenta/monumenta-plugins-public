@@ -25,6 +25,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -70,7 +71,7 @@ public abstract class BossAbilityGroup {
 			phaseAction.accept(mBoss);
 		}
 
-		mActiveSpells.cancelAll();
+		mActiveSpells.cancelAll(true);
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
 		MMLog.fine("Changed phase for " + mIdentityTag + ". Boss's health is currently at " +
@@ -360,8 +361,9 @@ public abstract class BossAbilityGroup {
 
 	}
 
-	// Only acts on fire applied by the plugin
-	public void bossIgnited(int ticks) {
+
+	// Only acts on fire applied by plugin
+	public void bossIgnited(int time, @Nullable Entity igniter) {
 
 	}
 
@@ -437,6 +439,14 @@ public abstract class BossAbilityGroup {
 	}
 
 	public boolean hasNearbyBlockBreakTrigger() {
+		return false;
+	}
+
+	public void nearbyBlockPlace(BlockPlaceEvent event) {
+
+	}
+
+	public boolean hasNearbyBlockPlaceTrigger() {
 		return false;
 	}
 

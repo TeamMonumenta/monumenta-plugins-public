@@ -215,6 +215,14 @@ public class StringUtils {
 		return String.format("%d:%02d:%02d", hours, minutes, seconds);
 	}
 
+	public static String longToOptionalHoursMinuteAndSeconds(long i) {
+		if (i >= 3600) {
+			return longToHoursMinuteAndSeconds(i);
+		} else {
+			return intToMinuteAndSeconds((int) i);
+		}
+	}
+
 	public static String ticksToTime(int ticks) {
 		int minutes = (ticks / 20) / 60;
 		int seconds = (ticks - ((minutes * 60) * 20)) / 20;

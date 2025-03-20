@@ -14,8 +14,10 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class ImmortalPassengerBoss extends BossAbilityGroup {
 
@@ -88,10 +90,10 @@ public class ImmortalPassengerBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossIgnited(int ticks) {
+	public void bossIgnited(int ticks, @Nullable Entity applier) {
 		if (mTransferDamage) {
 			if (mBoss.getVehicle() instanceof LivingEntity vehicle) {
-				EntityUtils.setFireTicksIfLower(ticks, vehicle);
+				EntityUtils.setFireTicksIfLower(ticks, vehicle, applier);
 			}
 			mBoss.setFireTicks(0);
 		}

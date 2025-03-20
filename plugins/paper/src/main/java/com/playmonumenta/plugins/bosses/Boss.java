@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -166,9 +167,9 @@ public class Boss {
 	}
 
 	// Only acts on fire applied by the plugin
-	public void bossIgnited(int ticks) {
+	public void bossIgnited(int ticks, @Nullable Entity applier) {
 		for (BossAbilityGroup ability : mAbilities) {
-			ability.bossIgnited(ticks);
+			ability.bossIgnited(ticks, applier);
 		}
 	}
 
@@ -279,6 +280,21 @@ public class Boss {
 	public boolean hasNearbyBlockBreakTrigger() {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (ability.hasNearbyBlockBreakTrigger()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void nearbyBlockPlace(BlockPlaceEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.nearbyBlockPlace(event);
+		}
+	}
+
+	public boolean hasNearbyBlockPlaceTrigger() {
+		for (BossAbilityGroup ability : mAbilities) {
+			if (ability.hasNearbyBlockPlaceTrigger()) {
 				return true;
 			}
 		}

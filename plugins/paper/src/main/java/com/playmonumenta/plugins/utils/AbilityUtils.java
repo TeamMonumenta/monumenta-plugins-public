@@ -711,4 +711,22 @@ public class AbilityUtils {
 			return volley != null && volley.mVolley.contains(proj);
 		}
 	}
+
+	// Intended for the purpose of damage that shouldn't be considered when spoiling some hunts quarries
+	// Might be useful elsewhere but make sure it is actually the right set of conditions there too
+	public static boolean isIndirectDamage(DamageEvent event) {
+		if (event.getDamage() < 0.01) {
+			return true;
+		}
+		DamageEvent.DamageType type = event.getType();
+		if (type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.THORNS || type == DamageEvent.DamageType.POISON || type == DamageEvent.DamageType.FIRE) {
+			return true;
+		}
+		ClassAbility ca = event.getAbility();
+		if (ca == ClassAbility.HUNTING_COMPANION || ca == ClassAbility.RESTLESS_SOULS || ca == ClassAbility.BRUTE_FORCE_AOE || ca == ClassAbility.METEOR_SLAM || ca == ClassAbility.SCORCHED_EARTH || ca == ClassAbility.BRUTAL_ALCHEMY
+			|| ca == ClassAbility.ESOTERIC_ENHANCEMENTS || ca == ClassAbility.FLAME_TOTEM || ca == ClassAbility.LIGHTNING_TOTEM || ca == ClassAbility.INTERCONNECTED_HAVOC || ca == ClassAbility.CRYSTALLINE_COMBOS || ca == ClassAbility.DECAYED_TOTEM || ca == ClassAbility.ILLUMINATE) {
+			return true;
+		}
+		return false;
+	}
 }

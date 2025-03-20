@@ -128,7 +128,6 @@ public enum ClassAbility {
 	BRUTE_FORCE("Brute Force"),
 	BRUTE_FORCE_AOE("Brute Force"), // special case for glorious battle
 	COUNTER_STRIKE("Counter Strike"),
-	COUNTER_STRIKE_AOE("Counter Strike"), // special case for glorious battle
 	DEFENSIVE_LINE("Defensive Line"),
 	RIPOSTE("Riposte"),
 	SHIELD_BASH("Shield Bash"),
@@ -171,7 +170,6 @@ public enum ClassAbility {
 	// [Shaman]
 	CLEANSING_TOTEM("Cleansing Totem"),
 	EARTHEN_TREMOR("Earthen Tremor"),
-	FLAME_SPIRIT("Flame Spirit"),
 	FLAME_TOTEM("Flame Totem"),
 	INTERCONNECTED_HAVOC("Interconnected Havoc"),
 	CHAIN_LIGHTNING("Chain Lightning"),
@@ -194,6 +192,7 @@ public enum ClassAbility {
 	APOCALYPSE("Apocalypse"),
 	DETONATION("Detonation"),
 	FIREBALL("Fireball"),
+	FLAME_SPIRIT("Flame Spirit"),
 	FLAMESTRIKE("Flamestrike"),
 	IGNEOUS_RUNE("Igneous Rune"),
 	VOLCANIC_COMBOS("Volcanic Combos"),

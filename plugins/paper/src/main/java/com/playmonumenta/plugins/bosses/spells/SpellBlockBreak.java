@@ -26,7 +26,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.Lootable;
 
-public final class SpellBlockBreak extends Spell {
+public class SpellBlockBreak extends Spell {
 	public static final int DEFAULT_REQUIRED_SCORE = 6;
 	public boolean mIsActive = true;
 
@@ -106,6 +106,10 @@ public final class SpellBlockBreak extends Spell {
 
 	@Override
 	public void run() {
+		if (!canRun()) {
+			// The canRun() method doesn't normally do anything for passives but might as well just use it here if bosses want to add some check
+			return;
+		}
 		tryToBreakBlocks(DEFAULT_REQUIRED_SCORE);
 	}
 

@@ -20,6 +20,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Snowball;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ImmortalMountBoss extends BossAbilityGroup {
 
@@ -115,10 +116,10 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossIgnited(int ticks) {
+	public void bossIgnited(int ticks, @Nullable Entity applier) {
 		if (mTransferDamage) {
 			if (mPassenger != null) {
-				EntityUtils.setFireTicksIfLower(ticks, mPassenger);
+				EntityUtils.setFireTicksIfLower(ticks, mPassenger, applier);
 			}
 			mBoss.setFireTicks(0);
 		}

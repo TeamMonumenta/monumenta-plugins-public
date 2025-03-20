@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.guis.HuntsInfusionGUI;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
@@ -63,6 +64,8 @@ public class DelveInfusionUtils {
 		DECAPITATION("decapitation", InfusionType.DECAPITATION, Location.BLUESTRIKE, Material.WITHER_SKELETON_SKULL, "Shattered Masks", NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
 		CELESTIAL("celestial", InfusionType.CELESTIAL, Location.STARPOINT, Material.DEEPSLATE_BRICKS, "Dust of the Herald", NamespacedKeyUtils.fromString("epic:r3/items/currency/dust_of_the_herald"), PlayerUtils.SCOREBOARD_RING_UNLOCK),
 		FERVOR("fervor", InfusionType.FERVOR, Location.HEXFALL, Material.DRAGON_BREATH, "Fragrant Branch of Fen", NamespacedKeyUtils.fromString("epic:r3/items/currency/fragrant_branch_of_fen"), "Ruten"),
+
+		STURDY("sturdy", InfusionType.STURDY, Location.HUNTS, Material.SHIELD, "Hyperchromatic Archos Rings", NamespacedKeyUtils.fromString("epic:r3/items/currency/hyperchromatic_archos_ring"), "HuntsUnspoiledWins"),
 
 		REFUND("refund", null, null, Material.GRINDSTONE, null, null, (String[]) null);
 
@@ -139,11 +142,16 @@ public class DelveInfusionUtils {
 			}
 			return mLocation.getColor();
 		}
+
+		public boolean isViewOnly() {
+			return this == STURDY;
+		}
 	}
 
 	public enum DelveInfusionMaterial {
 		VOIDSTAINED_GEODE("geode", "Voidstained Geodes", "epic:r2/depths/loot/voidstained_geode"),
-		INDIGO_BLIGHTDUST("blightdust", "Indigo Blightdust", "epic:r3/items/currency/indigo_blightdust");
+		INDIGO_BLIGHTDUST("blightdust", "Indigo Blightdust", "epic:r3/items/currency/indigo_blightdust"),
+		RUCKS("rucks", "Rucks", "epic:r3/hunts/currency/ruck");
 
 		public static final String KEY = "DelveInfusionMaterial";
 
@@ -170,6 +178,7 @@ public class DelveInfusionUtils {
 			return switch (this) {
 				case VOIDSTAINED_GEODE -> INDIGO_BLIGHTDUST;
 				case INDIGO_BLIGHTDUST -> VOIDSTAINED_GEODE;
+				case RUCKS -> RUCKS;
 			};
 		}
 
@@ -177,6 +186,7 @@ public class DelveInfusionUtils {
 			return switch (this) {
 				case VOIDSTAINED_GEODE -> Component.text(" ⚓", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false);
 				case INDIGO_BLIGHTDUST -> Component.text(" ✵", TextColor.fromHexString("#FF9CF0")).decoration(TextDecoration.ITALIC, false);
+				case RUCKS -> Component.text(" ⌘", TextColor.fromHexString("#4C8F4D")).decoration(TextDecoration.ITALIC, false);
 			};
 		}
 	}
@@ -207,11 +217,16 @@ public class DelveInfusionUtils {
 		DelveInfusionSelection infusion = getCurrentInfusion(item);
 		if (infusion == null) {
 			return;
+		} else if (infusion == DelveInfusionSelection.STURDY) {
+			// redirect to the HuntsInfusionGUI, as it uses different items
+			HuntsInfusionGUI.refundSturdy(item, player);
+			return;
 		}
 		InfusionType infusionType = infusion.getInfusionType();
 		if (infusionType == null) {
 			return;
 		}
+
 		DelveInfusionMaterial delveInfusionMaterial = getDelveInfusionMaterial(item);
 
 		int level = getInfuseLevel(item) - 1;
@@ -258,7 +273,7 @@ public class DelveInfusionUtils {
 		}
 	}
 
-	private static int getInfuseLevel(ItemStack item) {
+	public static int getInfuseLevel(ItemStack item) {
 		int level = 0;
 		for (DelveInfusionSelection d : DelveInfusionSelection.values()) {
 			level += ItemStatUtils.getInfusionLevel(item, d.getInfusionType());

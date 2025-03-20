@@ -5,8 +5,12 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +27,7 @@ public class BossBarManager {
 	private final BossBar mBar;
 	private int mEventCursor;
 	private final boolean mCapDamage;
+	private final Function<LivingEntity, Location> mLocationFunction;
 
 	public BossBarManager(LivingEntity boss, int range, BossBar.Color color, BossBar.Overlay style, @Nullable Map<Integer, BossHealthAction> events) {
 		this(boss, range, color, style, events, true);
@@ -33,11 +38,20 @@ public class BossBarManager {
 	}
 
 	public BossBarManager(LivingEntity boss, int range, BossBar.Color color, BossBar.Overlay style, @Nullable Map<Integer, BossHealthAction> events, boolean bossFog, boolean capDamage) {
+		this(boss, range, color, style, events, bossFog, capDamage, Entity::getLocation);
+	}
+
+	public BossBarManager(LivingEntity boss, int range, BossBar.Color color, BossBar.Overlay style, @Nullable Map<Integer, BossHealthAction> events, boolean bossFog, boolean capDamage, Location centerLocation) {
+		this(boss, range, color, style, events, bossFog, capDamage, b -> centerLocation);
+	}
+
+	public BossBarManager(LivingEntity boss, int range, BossBar.Color color, BossBar.Overlay style, @Nullable Map<Integer, BossHealthAction> events, boolean bossFog, boolean capDamage, Function<LivingEntity, Location> locationFunction) {
 		mBoss = boss;
 		mRange = range;
 		mEvents = events;
 		mEventCursor = 100;
 		mCapDamage = capDamage;
+		mLocationFunction = locationFunction;
 		double progress = mBoss.getHealth() / EntityUtils.getMaxHealth(mBoss);
 		while (mEvents != null && mEventCursor > (progress * 100)) {
 			mEventCursor--;
@@ -49,8 +63,9 @@ public class BossBarManager {
 			mBar.addFlag(BossBar.Flag.DARKEN_SCREEN);
 		}
 
+		Location loc = locationFunction.apply(boss);
 		for (Player player : mBoss.getWorld().getPlayers()) {
-			if (player.getLocation().distance(mBoss.getLocation()) < mRange) {
+			if (player.getLocation().distanceSquared(loc) < range * range) {
 				mBar.addViewer(player);
 			}
 		}
@@ -61,8 +76,9 @@ public class BossBarManager {
 			mBoss.getWorld().hideBossBar(mBar);
 		}
 
-		for (Player player : mBoss.getWorld().getPlayers()) {
-			if (player.getLocation().distance(mBoss.getLocation()) < mRange) {
+		Location loc = mLocationFunction.apply(mBoss);
+		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+			if (player.getWorld().equals(loc.getWorld()) && player.getLocation().distanceSquared(loc) < mRange * mRange) {
 				mBar.addViewer(player);
 			} else {
 				mBar.removeViewer(player);
@@ -136,5 +152,9 @@ public class BossBarManager {
 			return 0;
 		}
 		return mEvents.keySet().stream().filter(i -> i < mEventCursor).mapToInt(i -> i).max().orElse(0);
+	}
+
+	public boolean removeHealthEvent(int percent) {
+		return mEvents != null && mEvents.remove(percent) != null;
 	}
 }

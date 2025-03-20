@@ -130,6 +130,7 @@ public enum Location {
 	SKR("skr", "Silver Knight's Remnants", TextColor.fromHexString("#E8C392")),
 	// bosses
 	SIRIUS("sirius", "The Final Blight", TextColor.fromHexString("#34CFBC")),
+	HUNTS("hunts", "Diamenean Hunts", TextColor.fromHexString("#414e18")),
 
 	// events, legacy
 	VALENTINE("valentine", "Valentine Event", TextColor.fromHexString("#FF7F7F")),

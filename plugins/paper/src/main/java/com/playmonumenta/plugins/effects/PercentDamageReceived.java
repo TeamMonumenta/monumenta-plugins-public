@@ -19,8 +19,8 @@ public class PercentDamageReceived extends Effect {
 	public static final String effectID = "PercentDamageReceived";
 	public static final String GENERIC_NAME = "PercentDamageReceived";
 
-	private final double mAmount;
-	private final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
+	protected final double mAmount;
+	protected final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
 
 	public PercentDamageReceived(final int duration, final double amount, final @Nullable EnumSet<DamageType> affectedDamageTypes) {
 		super(duration, effectID);
