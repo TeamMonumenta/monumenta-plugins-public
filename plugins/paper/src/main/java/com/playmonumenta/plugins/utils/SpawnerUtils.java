@@ -270,19 +270,14 @@ public class SpawnerUtils {
 
 			@Override
 			public void run() {
-				// if no one within 20 blocks, don't play effects
-				if (PlayerUtils.playersInRange(marker.getLocation(), 20, false).isEmpty()) {
-					return;
-				}
-
-				if (marker.getLocation().getWorld().getPlayers().isEmpty()) {
+				Marker markerRef = mMarker.get();
+				// If the marker despawned, got removed, or was garbage collected somehow, cancel the runnable.
+				if (markerRef == null || !markerRef.isValid()) {
 					cancel();
 					return;
 				}
 
-				// If the marker despawned, got removed, or was garbage collected somehow, cancel the runnable.
-				Marker markerRef = mMarker.get();
-				if (markerRef == null || !markerRef.isValid()) {
+				if (markerRef.getLocation().getWorld().getPlayers().isEmpty()) {
 					cancel();
 					return;
 				}
@@ -291,6 +286,11 @@ public class SpawnerUtils {
 				if (!isSpawner(spawnerBlock)) {
 					// The spawner was destroyed and the marker somehow is still lingering around.
 					cancel();
+					return;
+				}
+
+				// if no one within 20 blocks, don't play effects
+				if (PlayerUtils.playersInRange(markerRef.getLocation(), 20, false).isEmpty()) {
 					return;
 				}
 
