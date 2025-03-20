@@ -202,9 +202,7 @@ public final class LuminousInfusion extends MultipleChargeAbility implements Kil
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveMeleeDamage, mDivineJustice.getInfo().getLinkedSpell(), true);
 		}
 
-		/* Why are lambdas like this */
-		final int finalChargesToConsume = chargesToConsume;
-		Bukkit.getScheduler().runTask(mPlugin, () -> mPrimedStacks = Math.max(mPrimedStacks - finalChargesToConsume, 0));
+		mPrimedStacks = Math.max(mPrimedStacks - chargesToConsume, 0);
 
 		return false;
 	}
