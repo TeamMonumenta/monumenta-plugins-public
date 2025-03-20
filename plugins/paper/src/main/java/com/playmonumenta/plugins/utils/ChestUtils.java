@@ -275,8 +275,14 @@ public class ChestUtils {
 	}
 
 	public static void generateLootInventory(Collection<ItemStack> populatedLoot, Inventory inventory, Player player, boolean randomlyDistribute) {
-		List<ItemStack> lootList = populatedLoot.stream()
+		// consolidation
+		Inventory tempFakeInventory = Bukkit.createInventory(null, 27);
+		for (ItemStack lootItem : populatedLoot) {
+			tempFakeInventory.addItem(lootItem);
+		}
+		List<ItemStack> lootList = Arrays.stream(tempFakeInventory.getContents())
 			.filter((item) -> item != null && !item.getType().isAir()).toList();
+		tempFakeInventory.clear();
 
 		List<Integer> freeSlots = new ArrayList<>(27);
 		for (int i = 0; i < 27; i++) {
