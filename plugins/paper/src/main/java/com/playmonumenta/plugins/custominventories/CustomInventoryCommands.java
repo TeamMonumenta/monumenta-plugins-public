@@ -430,6 +430,14 @@ public class CustomInventoryCommands {
 				new HuntsInfusionGUI(player).open();
 			})
 			.register();
+		new CommandAPICommand("openhuntsinfusiongui")
+			.withPermission("monumenta.command.openhuntsinfusiongui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
+				new HuntsInfusionGUI(player).open();
+			})
+			.register();
 	}
 
 	private static void emote(Player player) {
