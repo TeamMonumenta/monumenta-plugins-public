@@ -29,6 +29,7 @@ public class ZoneUtils {
 		DISABLE_GRAVES("Disable Graves"),
 		DISABLE_MAGIC_TESS("DisableMagicTess"),
 		DISABLE_REDSTONE_INTERACTIONS("Disable Redstone Interactions"),
+		EXPLOSION_PROOF_CHESTS("Explosion Proof Chests"),
 		FESTIVE_TESSERACT_DISABLED("Festive Tesseract Disabled"),
 		ITEM_FRAMES_EDITABLE("Item Frames Editable"),
 		LAND_BOAT_POSSIBLE("Land Boat Possible"),

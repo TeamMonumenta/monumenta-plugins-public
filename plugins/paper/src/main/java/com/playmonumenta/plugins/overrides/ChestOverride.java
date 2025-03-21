@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.TOVUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -162,7 +163,9 @@ public class ChestOverride extends BaseOverride {
 
 	@Override
 	public boolean blockExplodeInteraction(Plugin plugin, Block block) {
-		if (commandChest(block)) {
+		if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.EXPLOSION_PROOF_CHESTS)) {
+			return false;
+		} else if (commandChest(block)) {
 			return false;
 		} else if (!breakable(block)) {
 			return false;
