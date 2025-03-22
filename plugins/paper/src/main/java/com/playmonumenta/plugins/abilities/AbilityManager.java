@@ -170,7 +170,6 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -948,7 +947,7 @@ public class AbilityManager {
 				if (triggerInfo.check(player, key)) {
 					foundTrigger = true;
 					// the cast here is fine, as we're calling the action with the ability we got the action from
-					boolean succeeded = ((Predicate<Ability>) triggerInfo.getAction()).test(ability);
+					boolean succeeded = ((AbilityTriggerInfo.TriggerAction<Ability>) triggerInfo.getAction()).run(ability);
 					if (succeeded || !triggerInfo.getTrigger().isFallThrough()) {
 						return true;
 					}

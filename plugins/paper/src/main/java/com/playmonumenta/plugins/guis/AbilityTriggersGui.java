@@ -120,7 +120,7 @@ public class AbilityTriggersGui extends Gui {
 						.onRightClick(() -> {
 							if (trigger.getRestriction() == null || trigger.getRestriction().getPredicate().test(mPlayer)) {
 								// cast is fine here, as the trigger is for the ability we got it from
-								((AbilityTriggerInfo) trigger).getAction().test(ability);
+								((AbilityTriggerInfo) trigger).getAction().run(ability);
 							}
 						});
 					i++;
