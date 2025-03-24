@@ -239,7 +239,10 @@ public class SwiftSpikes extends Spell {
 			}
 		}
 		if (target != null) {
-			result.add(getCenteredOnNearestGround(target.getLocation(), 5));
+			Location l = getCenteredOnNearestGround(target.getLocation(), 5);
+			if (l != null) {
+				result.add(l);
+			}
 			players.remove(target);
 		}
 

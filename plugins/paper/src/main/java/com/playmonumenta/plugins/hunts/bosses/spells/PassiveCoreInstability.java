@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.hunts.bosses.CoreElemental;
-import com.playmonumenta.plugins.hunts.bosses.Quarry;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -32,12 +31,12 @@ public class PassiveCoreInstability extends Spell {
 	private static final Particle.DustOptions RED_PARTICLE = new Particle.DustOptions(Color.RED, 1);
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
-	private final Quarry mQuarry;
+	private final CoreElemental mQuarry;
 	private final int mOuterRadius;
 	public int mUnstable = 0;
 	private final List<ChargeUpManager> mChargeUpList = new ArrayList<>();
 
-	public PassiveCoreInstability(Plugin plugin, LivingEntity boss, Quarry quarry, int outerRadius) {
+	public PassiveCoreInstability(Plugin plugin, LivingEntity boss, CoreElemental quarry, int outerRadius) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mQuarry = quarry;
@@ -70,7 +69,7 @@ public class PassiveCoreInstability extends Spell {
 		if (event.getSpell() instanceof SpellPyroclasticSlam) {
 			cancelChargeUps();
 		}
-		if (event.getSpell() instanceof CoreElemental.CoreElementalBase spell) {
+		if (event.getSpell() instanceof CoreElemental.CoreElementalBase spell && !mQuarry.mIsCastingBanish) {
 			castAbility(spell);
 		}
 	}
@@ -83,6 +82,11 @@ public class PassiveCoreInstability extends Spell {
 			BukkitRunnable runnable = new BukkitRunnable() {
 				@Override
 				public void run() {
+					if (mQuarry.mIsCastingBanish) {
+						this.cancel();
+						cancelChargeUps();
+						return;
+					}
 					if (chargeUp.nextTick()) {
 						castSpell(spell, chargeUp);
 						this.cancel();
@@ -140,11 +144,20 @@ public class PassiveCoreInstability extends Spell {
 			BukkitRunnable runnable = new BukkitRunnable() {
 				@Override
 				public void run() {
+					if (mQuarry.mIsCastingBanish) {
+						this.cancel();
+						return;
+					}
 					if (chargeUp.previousTick()) {
-						mUnstable--;
-						chargeUp.remove();
 						this.cancel();
 					}
+				}
+
+				@Override
+				public synchronized void cancel() {
+					super.cancel();
+					chargeUp.remove();
+					mUnstable--;
 				}
 			};
 			runnable.runTaskTimer(mPlugin, 4, 1);

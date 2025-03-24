@@ -470,7 +470,7 @@ public class TheImpenetrable extends Quarry {
 
 	@Override
 	public String getAdvancement() {
-		return "monumenta:challenges/r3/hunts/the_imepenetrable";
+		return "monumenta:challenges/r3/hunts/the_impenetrable";
 	}
 
 	@Override

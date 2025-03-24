@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.hunts.bosses.spells;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.hunts.bosses.Quarry;
+import com.playmonumenta.plugins.hunts.bosses.SteelWingHawk;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +41,12 @@ public class BanishFallDistance extends Spell {
 	public void run() {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE, true, true);
 		for (Player p : players) {
-			p.sendMessage(Component.text("Feathers begin to cover you making it difficult to move.", NamedTextColor.BLUE));
+			p.sendMessage(Component.text("Your eyelids begin to feel heavy...", SteelWingHawk.COLOR));
+			p.playSound(p.getLocation(), Sound.ENTITY_FOX_SCREECH, SoundCategory.HOSTILE, 2.0f, 1.2f);
+			p.playSound(p.getLocation(), Sound.ENTITY_FOX_SCREECH, SoundCategory.HOSTILE, 2.0f, 1.5f);
+			p.playSound(p.getLocation(), Sound.ENTITY_PARROT_IMITATE_PHANTOM, SoundCategory.HOSTILE, 2.0f,  1.2f);
 		}
-		ChargeUpManager chargeUp = new ChargeUpManager(mBoss, DURATION, Component.text(String.format("Planting Feathers (%s)", Quarry.BANISH_CHARACTER), NamedTextColor.RED), BossBar.Color.RED, BossBar.Overlay.PROGRESS, RANGE);
+		ChargeUpManager chargeUp = new ChargeUpManager(mBoss, DURATION, Component.text(String.format("Soporific Shriek (%s)", Quarry.BANISH_CHARACTER), NamedTextColor.RED), BossBar.Color.RED, BossBar.Overlay.PROGRESS, RANGE);
 		mActiveTasks.add(new BukkitRunnable() {
 			int mTicks = 0;
 
@@ -52,15 +56,20 @@ public class BanishFallDistance extends Spell {
 				List<Player> toRemove = new ArrayList<>();
 				for (Player p : players) {
 					if (p.getFallDistance() >= FALL_DISTANCE) {
-						p.sendMessage(Component.text("The feathers that cover you begin to fall off.", NamedTextColor.BLUE));
+						p.sendMessage(Component.text("The fall jolts you back awake!", SteelWingHawk.COLOR));
 						toRemove.add(p);
 						chargeUp.excludePlayer(p);
 					}
 				}
 				players.removeAll(toRemove);
+				if (mTicks == DURATION / 2) {
+					for (Player p : players) {
+						p.sendMessage(Component.text("Your mind is starting to slip away...", SteelWingHawk.COLOR));
+					}
+				}
 				if (mTicks >= DURATION) {
 					for (Player p : players) {
-						p.sendMessage(Component.text("Before you get suffocated by feathers, you retreat to the lodge.", NamedTextColor.BLUE));
+						p.sendMessage(Component.text("The shrill noise fully works itself into your mind. Sweet slumber takes you...", SteelWingHawk.COLOR));
 						p.playSound(p, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1, 0.5f);
 						mQuarry.banish(p);
 					}

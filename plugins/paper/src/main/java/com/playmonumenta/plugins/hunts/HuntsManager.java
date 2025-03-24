@@ -367,7 +367,7 @@ public class HuntsManager {
 						}
 						MonumentaNetworkRelayIntegration.broadcastCommand("hunts forcesummon " + quarry.name() + " " + shard);
 					}
-				}, 5 * 20);
+				}, 15 * 20);
 			} else {
 				mNextQuarry.summon(mWorld);
 			}

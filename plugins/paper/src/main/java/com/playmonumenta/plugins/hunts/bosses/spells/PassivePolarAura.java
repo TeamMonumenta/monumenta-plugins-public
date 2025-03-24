@@ -189,7 +189,7 @@ public class PassivePolarAura extends Spell {
 		for (Player player : players) {
 			createFrostbiteBar(player);
 		}
-		for (Player player : mFrostbiteBossBars.keySet()) {
+		for (Player player : new HashSet<>(mFrostbiteBossBars.keySet())) {
 			if (!players.contains(player)) {
 				clearPlayerFrostbiteBar(player);
 			}

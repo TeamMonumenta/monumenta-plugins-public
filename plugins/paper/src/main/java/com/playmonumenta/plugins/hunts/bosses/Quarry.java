@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.scriptedquests.commands.Leaderboard;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -296,8 +297,8 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 		unspoiledPlayers.removeAll(spoiledPlayers);
 
 		for (Player player : allPlayers) {
-			ScoreboardUtils.addScore(player, GENERAL_WINS_SCOREBOARD, 1);
-			ScoreboardUtils.addScore(player, getWinsScoreboard(), 1);
+			addLeaderboardScore(player, GENERAL_WINS_SCOREBOARD);
+			addLeaderboardScore(player, getWinsScoreboard());
 			if (ScoreboardUtils.getScoreboardValue(player, getWinsScoreboard()).orElse(0) == 1) {
 				AdvancementUtils.grantAdvancement(player, getAdvancement());
 			}
@@ -309,8 +310,8 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 			InventoryUtils.giveItemWithWarningAfterDelay(player, unspoiledChest.clone());
 			player.sendMessage(Component.text(mQuarryType.getName() + " has been slain and you obtained the complete haul of the loot.", mQuarryType.getColor()));
 
-			ScoreboardUtils.addScore(player, GENERAL_UNSPOILED_WINS_SCOREBOARD, 1);
-			ScoreboardUtils.addScore(player, getUnspoiledWinsScoreboard(), 1);
+			addLeaderboardScore(player, GENERAL_UNSPOILED_WINS_SCOREBOARD);
+			addLeaderboardScore(player, getUnspoiledWinsScoreboard());
 			Bukkit.getPluginManager().callEvent(new MonumentaEvent(player, "huntsunspoiled"));
 			if (ScoreboardUtils.getScoreboardValue(player, getUnspoiledWinsScoreboard()).orElse(0) == 1) {
 				player.addScoreboardTag(getQuestTag());
@@ -330,6 +331,11 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 		for (Player player : noRewardsPlayers) {
 			player.sendMessage(Component.text(mQuarryType.getName() + " has been slain, but you did not arrive soon enough to get rewards or credit!", NamedTextColor.RED));
 		}
+	}
+
+	private void addLeaderboardScore(Player player, String objective) {
+		ScoreboardUtils.addScore(player, objective, 1);
+		Leaderboard.leaderboardUpdate(player, objective);
 	}
 
 	@Override
