@@ -57,9 +57,16 @@ public class Impact implements Enchantment {
 			EntityUtils.getStackedMobsBelow(enemy.getVehicle(), targetStack);
 		}
 
-		for (LivingEntity target : targetStack) {
-			plugin.mEffectManager.addEffect(target, EFFECT_ID, new ImpactVulnerability(40));
-		}
+		//Apply the effect 1 tick later to avoid making the attack that applies the effect cancel it
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				for (LivingEntity target : targetStack) {
+					plugin.mEffectManager.addEffect(target, EFFECT_ID, new ImpactVulnerability(40));
+				}
+			}
+		}.runTaskLater(plugin, 1);
+
 
 		new BukkitRunnable() {
 
@@ -116,7 +123,7 @@ public class Impact implements Enchantment {
 
 			}
 
-		}.runTaskTimer(plugin, 0, 2);
+		}.runTaskTimer(plugin, 1, 2);
 
 	}
 
