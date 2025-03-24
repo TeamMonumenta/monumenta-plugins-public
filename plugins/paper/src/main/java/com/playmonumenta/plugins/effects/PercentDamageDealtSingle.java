@@ -10,6 +10,8 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
+
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +21,7 @@ public final class PercentDamageDealtSingle extends PercentDamageDealt {
 
 	private boolean mHasDoneDamage;
 	private final boolean mMultiplicative;
+	private final Consumer<DamageEvent> mOnUse;
 
 	public PercentDamageDealtSingle(final int duration, final double amount) {
 		this(duration, amount, null, false);
@@ -26,9 +29,16 @@ public final class PercentDamageDealtSingle extends PercentDamageDealt {
 
 	public PercentDamageDealtSingle(final int duration, final double amount,
 									final @Nullable EnumSet<DamageType> affectedDamageTypes, final boolean multiplicative) {
+		this(duration, amount, affectedDamageTypes, multiplicative, null);
+	}
+
+	public PercentDamageDealtSingle(final int duration, final double amount,
+	                                final @Nullable EnumSet<DamageType> affectedDamageTypes, final boolean multiplicative,
+	                                final @Nullable Consumer<DamageEvent> onUse) {
 		super(duration, amount, affectedDamageTypes, effectID);
 		mHasDoneDamage = false;
 		mMultiplicative = multiplicative;
+		mOnUse = onUse;
 	}
 
 	@Override
@@ -52,6 +62,10 @@ public final class PercentDamageDealtSingle extends PercentDamageDealt {
 				event.setFlatDamage(event.getFlatDamage() * (1 + mAmount));
 			} else {
 				event.updateDamageWithMultiplier(Math.max(0, 1 + mAmount));
+			}
+
+			if (mOnUse != null) {
+				mOnUse.accept(event);
 			}
 		}
 	}

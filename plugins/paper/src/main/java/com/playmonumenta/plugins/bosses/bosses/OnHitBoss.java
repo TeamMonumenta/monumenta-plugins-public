@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.NmsUtils;
+
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -61,6 +62,7 @@ public class OnHitBoss extends BossAbilityGroup {
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (mParams.CAN_BLOCK && event.isBlockedByShield()) {
 			// Attack was blocked
+			event.setEffects(mParams.EFFECTS.mEffectList);
 			return;
 		}
 

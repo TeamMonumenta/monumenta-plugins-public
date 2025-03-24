@@ -286,17 +286,17 @@ public class OmenBoss extends BossAbilityGroup {
 						p.SOUND_HIT.play(player.getLocation());
 						if (p.DAMAGE > 0) {
 							if (p.RESPECT_IFRAMES && player.getNoDamageTicks() == 0) {
-								BossUtils.blockableDamage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+								BossUtils.blockableDamage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList);
 								MovementUtils.knockAway(origin, player, p.KB_X, p.KB_Y);
 							} else if (!p.RESPECT_IFRAMES) {
-								BossUtils.blockableDamage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+								BossUtils.blockableDamage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList);
 								MovementUtils.knockAway(origin, player, p.KB_X, p.KB_Y);
 							}
 
 						}
 
 						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME);
+							BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME, p.EFFECTS.mEffectList);
 							MovementUtils.knockAway(origin, player, p.KB_X, p.KB_Y);
 						}
 						p.EFFECTS.apply(player, mBoss);

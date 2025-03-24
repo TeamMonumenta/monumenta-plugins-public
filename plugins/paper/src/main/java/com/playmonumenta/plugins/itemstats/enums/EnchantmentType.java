@@ -129,6 +129,7 @@ public enum EnchantmentType {
 	VERSATILITY(new Versatility(), true, false, false, true),
 	RELIC(new Relic(), false, false, false, false),
 	OUTRAGE(new Outrage(), true, false, false, false),
+	RETALIATION(new Retaliation(), false, false, false, false),
 
 	// Curses
 	CURSE_OF_ANEMIA(new CurseOfAnemia(), true, true, false, false),

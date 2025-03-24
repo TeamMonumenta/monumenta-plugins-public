@@ -134,7 +134,7 @@ public class EffectsList {
 		}
 
 		// Common to both potion effects and custom effects
-		private final String mName;
+		public final String mName;
 
 		// Only for potion effects
 		private final @Nullable PotionEffectType mEffect;
@@ -210,6 +210,14 @@ public class EffectsList {
 			}
 		}
 
+		public @Nullable PotionEffectType getEffect() {
+			return mEffect;
+		}
+
+		public String getCustomEffect() {
+			return mName;
+		}
+
 		@Override
 		public String toString() {
 			if (mEffect != null) {
@@ -238,12 +246,11 @@ public class EffectsList {
 		}
 	}
 
-	private final List<Effect> mEffectList;
+	public final List<Effect> mEffectList;
 	public static final EffectsList EMPTY = fromString("[]");
 
 	private EffectsList(List<Effect> effects) {
 		mEffectList = effects;
-
 	}
 
 	public void apply(LivingEntity player, LivingEntity boss) {

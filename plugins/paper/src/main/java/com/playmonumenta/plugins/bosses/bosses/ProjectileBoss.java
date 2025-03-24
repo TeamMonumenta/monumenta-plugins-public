@@ -232,11 +232,11 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 	private void onHitActions(final Parameters p, final LivingEntity launcher, final LivingEntity affected, final @Nullable Location prevLoc) {
 		if (p.DAMAGE > 0) {
-			BossUtils.blockableDamage(launcher, affected, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc);
+			BossUtils.blockableDamage(launcher, affected, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc, p.EFFECTS.mEffectList);
 		}
 
 		if (p.DAMAGE_PERCENTAGE > 0.0) {
-			BossUtils.bossDamagePercent(mBoss, affected, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME);
+			BossUtils.bossDamagePercent(mBoss, affected, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME, p.EFFECTS.mEffectList);
 		}
 
 		if (p.HEAL_AMOUNT > 0) {

@@ -244,11 +244,11 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 
 	public void damageAction(LivingEntity target) {
 		if (mParams.DAMAGE > 0) {
-			BossUtils.blockableDamage(mBoss, target, DamageEvent.DamageType.MAGIC, mParams.DAMAGE, mParams.SPELL_NAME, mBoss.getLocation());
+			BossUtils.blockableDamage(mBoss, target, DamageEvent.DamageType.MAGIC, mParams.DAMAGE, mParams.SPELL_NAME, mBoss.getLocation(), mParams.EFFECTS.mEffectList);
 		}
 
 		if (mParams.DAMAGE_PERCENTAGE > 0.0) {
-			BossUtils.bossDamagePercent(mBoss, target, mParams.DAMAGE_PERCENTAGE, mBoss.getLocation(), mParams.SPELL_NAME);
+			BossUtils.bossDamagePercent(mBoss, target, mParams.DAMAGE_PERCENTAGE, mBoss.getLocation(), mParams.SPELL_NAME, mParams.EFFECTS.mEffectList);
 		}
 
 		mParams.EFFECTS.apply(target, mBoss);

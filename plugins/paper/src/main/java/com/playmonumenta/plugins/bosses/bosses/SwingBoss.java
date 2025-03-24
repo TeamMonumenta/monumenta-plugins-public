@@ -97,11 +97,11 @@ public class SwingBoss extends BossAbilityGroup {
 					}
 
 					if (p.DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, player, DamageType.MELEE, p.DAMAGE);
+						BossUtils.blockableDamage(boss, player, DamageType.MELEE, p.DAMAGE, p.EFFECTS.mEffectList);
 					}
 
 					if (p.DAMAGE_PERCENT > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENT, mBoss.getLocation());
+						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENT, mBoss.getLocation(), p.EFFECTS.mEffectList);
 					}
 
 					p.EFFECTS.apply(player, mBoss);

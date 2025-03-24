@@ -149,11 +149,11 @@ public class GroundSeekerBoss extends BossAbilityGroup {
 								p.SOUND_HIT.play(player.getLocation());
 
 								if (p.DAMAGE > 0) {
-									BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, loc);
+									BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList);
 								}
 
 								if (p.DAMAGE_PERCENTAGE > 0.0) {
-									BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, loc, p.SPELL_NAME);
+									BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList);
 								}
 								p.EFFECTS.apply(player, boss);
 

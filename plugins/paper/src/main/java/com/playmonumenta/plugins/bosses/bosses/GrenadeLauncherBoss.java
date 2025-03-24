@@ -162,11 +162,11 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 				//hit actions
 
 				if (p.DAMAGE > 0) {
-					BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.DAMAGE, p.SPELL_NAME, loc);
+					BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList);
 				}
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {
-					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, loc, p.SPELL_NAME);
+					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList);
 				}
 
 				p.EFFECTS.apply(target, boss);

@@ -103,7 +103,7 @@ public class ShatterBoss extends BossAbilityGroup {
 				}
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {
-					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME, p.EFFECTS.mEffectList);
 				}
 
 				p.EFFECTS.apply(target, boss);

@@ -131,7 +131,7 @@ public final class ChargerBoss extends BossAbilityGroup {
 			(LivingEntity target) -> {
 				p.PARTICLE_HIT.spawn(mBoss, target.getEyeLocation(), 0.4d, 0.4d, 0.4d, 0.4d);
 				if (p.DAMAGE > 0) {
-					BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+					BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList);
 				}
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {

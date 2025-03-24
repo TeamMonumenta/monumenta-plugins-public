@@ -185,14 +185,14 @@ public final class SlamAttackBoss extends BossAbilityGroup {
 			(Player player) -> {
 				if (p.DAMAGE > 0) {
 					if (p.CAN_BLOCK) {
-						BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MELEE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+						BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MELEE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList);
 					} else {
 						DamageUtils.damage(boss, player, DamageEvent.DamageType.MELEE, p.DAMAGE, null, false, true, p.SPELL_NAME);
 					}
 				}
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {
-					BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.CAN_BLOCK ? mBoss.getLocation() : null, p.SPELL_NAME);
+					BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, p.CAN_BLOCK ? mBoss.getLocation() : null, p.SPELL_NAME, p.EFFECTS.mEffectList);
 				}
 				p.EFFECTS.apply(player, mBoss);
 			}

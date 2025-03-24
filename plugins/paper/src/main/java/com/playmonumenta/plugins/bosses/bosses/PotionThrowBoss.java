@@ -174,7 +174,7 @@ public class PotionThrowBoss extends BossAbilityGroup {
 				}
 
 				if (mParams.DAMAGE_PERCENTAGE > 0.0) {
-					BossUtils.bossDamagePercent(mBoss, enemy, mParams.DAMAGE_PERCENTAGE, mParams.SPELL_NAME);
+					BossUtils.bossDamagePercent(mBoss, enemy, mParams.DAMAGE_PERCENTAGE, mParams.SPELL_NAME, mParams.EFFECTS_ENEMY.mEffectList);
 				}
 				mParams.EFFECTS_ENEMY.apply(enemy, mBoss);
 			}
