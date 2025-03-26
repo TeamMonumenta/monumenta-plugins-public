@@ -64,7 +64,7 @@ public class HuntsManager {
 	private static final String ANNOUNCEMENT_DISABLE_TAG = "HuntsAnnouncementDisable";
 
 	private static final int MEAN_SECONDS = 120 * 60;
-	private static final int SD_SECONDS = 15 * 60;
+	private static final int SD_SECONDS = 10 * 60;
 
 	private static final int WARNING_15 = 15 * 60;
 	private static final int WARNING_5 = 5 * 60;
@@ -481,7 +481,7 @@ public class HuntsManager {
 	private CompletableFuture<Long> setRandomTime() {
 		long seconds = (long) FastUtils.RANDOM.nextGaussian(MEAN_SECONDS, SD_SECONDS);
 		// Always within 2 standard deviations to avoid extreme edge cases
-		seconds = Math.max(MEAN_SECONDS - 2 * SD_SECONDS, Math.min(MEAN_SECONDS + 2 * SD_SECONDS, seconds));
+		seconds = Math.max(MEAN_SECONDS - 3 * SD_SECONDS, Math.min(MEAN_SECONDS + 3 * SD_SECONDS, seconds));
 		return setTime(seconds);
 	}
 

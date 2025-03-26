@@ -97,6 +97,8 @@ public class SteelWingHawk extends Quarry {
 
 	@Override
 	public void onHurt(DamageEvent event) {
+		super.onHurt(event);
+
 		Location loc = mBoss.getLocation();
 		if (loc.getY() > mSpawnLoc.getY() + 10 && mFeathers > 0 && event.getSource() instanceof Player player && event.getType() == DamageEvent.DamageType.PROJECTILE && MetadataUtils.checkOnceInRecentTicks(mPlugin, player, "SteelWingHawkFeather", 2 * 20)) {
 			mFeathers -= 1;
