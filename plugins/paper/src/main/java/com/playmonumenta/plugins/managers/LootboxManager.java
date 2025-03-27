@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.managers;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.inventories.ClickLimiter;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -77,6 +79,10 @@ public class LootboxManager implements Listener {
 	public static final String LOOTBOX_MAX_SHARES_KEY = "ShareMax";
 	public static final String LOOTSHARE_ITEM_KEY = "item";
 	public static final String LOOTSHARE_AMOUNT_KEY = "amount";
+	public static final List<Tier> VALUABLE_TIERS = Arrays.asList(
+		Tier.RARE, Tier.EPIC, Tier.LEGENDARY,
+		Tier.RARE_CHARM, Tier.EPIC_CHARM, Tier.ARTIFACT,
+		Tier.EVENT_CURRENCY);
 
 	public static final EnumSet<InventoryType> ALLOWED_CONTAINERS = EnumSet.of(
 		InventoryType.CHEST,
@@ -207,6 +213,7 @@ public class LootboxManager implements Listener {
 		List<ItemStack> filteredLoot = new ArrayList<>();
 		// list of items that don't pass pickup filters
 		List<ItemStack> rejectedLoot = new ArrayList<>();
+		List<ItemStack> valuableLoot = new ArrayList<>();
 		for (ItemStack item : loot) {
 			if (ItemUtils.isNullOrAir(item)) {
 				continue;
@@ -215,12 +222,30 @@ public class LootboxManager implements Listener {
 				rejectedLoot.add(item);
 				continue;
 			}
+			if (VALUABLE_TIERS.contains(ItemStatUtils.getTier(item))) {
+				valuableLoot.add(item);
+				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS,
+					SoundCategory.PLAYERS, 0.2f, 1.6f);
+			}
 			filteredLoot.add(item);
 		}
 		createLootshare(player, lootbox, filteredLoot);
 
 		// update the lootbox after a delay
 		updateLootboxLoreDelay(player, lootbox, LOOTBOX_UPDATE_LORE_DELAY);
+
+		if (!valuableLoot.isEmpty()) {
+			StringJoiner itemJoiner = new StringJoiner("\r\n");
+			for (ItemStack item : valuableLoot) {
+				if (item.getItemMeta().displayName() != null) {
+					itemJoiner.add(ItemUtils.getPlainName(item) + " x" + item.getAmount());
+				}
+			}
+			player.sendMessage(Component.text("You received valuable loot!")
+				.color(NamedTextColor.GOLD)
+				.decoration(TextDecoration.BOLD, true)
+				.hoverEvent(Component.text(itemJoiner.toString())));
+		}
 
 		return rejectedLoot;
 	}
@@ -737,6 +762,15 @@ public class LootboxManager implements Listener {
 			}
 		}
 		return null;
+	}
+
+	public static Boolean hasEpicLootbox(Inventory inventory) {
+		for (ItemStack item : inventory.getContents()) {
+			if (isEpicLootbox(item)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static boolean isLootbox(ItemStack item) {

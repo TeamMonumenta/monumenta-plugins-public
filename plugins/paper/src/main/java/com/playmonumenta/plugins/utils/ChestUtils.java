@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelveLootTableGroup;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.LootTableManager;
 import com.playmonumenta.plugins.managers.LootboxManager;
@@ -41,6 +42,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class ChestUtils {
 	public static final NamespacedKey NON_LOOT_LIMITED
@@ -59,6 +61,7 @@ public class ChestUtils {
 			4.4,
 			4.5
 	};
+	private static final String CHEST_SOLO_LOOT_EFFECT_NAME = "LootboxSoloLootSlownessEffect";
 
 	private static boolean lootTableInventoryHasBonusRolls(Inventory inventory) {
 		if (!(inventory.getHolder() instanceof Lootable lootable)) {
@@ -72,24 +75,24 @@ public class ChestUtils {
 		return lootEntry != null && lootEntry.hasBonusRolls();
 	}
 
-	public static void generateContainerLootWithScaling(Player player, Block block) {
+	public static void generateContainerLootWithScaling(Player player, Block block, Plugin plugin) {
 		if (block.getState() instanceof Container container) {
 			Inventory inventory = container.getInventory();
 			if (inventory instanceof DoubleChestInventory doubleChest) {
 				boolean forceLootShare = lootTableInventoryHasBonusRolls(doubleChest.getLeftSide());
-				generateContainerLootWithScaling(player, doubleChest.getLeftSide());
-				generateContainerLootWithScaling(player, doubleChest.getRightSide(), forceLootShare);
+				generateContainerLootWithScaling(player, doubleChest.getLeftSide(), plugin);
+				generateContainerLootWithScaling(player, doubleChest.getRightSide(), forceLootShare, plugin);
 			} else {
-				generateContainerLootWithScaling(player, inventory);
+				generateContainerLootWithScaling(player, inventory, plugin);
 			}
 		}
 	}
 
-	private static void generateContainerLootWithScaling(Player player, Inventory inventory) {
-		generateContainerLootWithScaling(player, inventory, false);
+	private static void generateContainerLootWithScaling(Player player, Inventory inventory, Plugin plugin) {
+		generateContainerLootWithScaling(player, inventory, false, plugin);
 	}
 
-	private static void generateContainerLootWithScaling(Player player, Inventory inventory, boolean forceLootshare) {
+	private static void generateContainerLootWithScaling(Player player, Inventory inventory, boolean forceLootshare, Plugin plugin) {
 		if (!(inventory.getHolder() instanceof Lootable lootable)) {
 			return;
 		}
@@ -166,17 +169,31 @@ public class ChestUtils {
 		Set<String> noSharePlayers = new TreeSet<>();
 		// if lootbox isn't enabled for this shard or
 		// if the opener is the only player, don't bother trying to give them a lootshare
-		if (ServerProperties.getLootBoxEnabled() && !(nearbyPlayers.size() == 1 && nearbyPlayers.contains(player))) {
+		boolean useLootboxOnSelf = player.getScoreboardTags().contains("UseLootboxOnSelf")
+			&& LootboxManager.hasEpicLootbox(player.getInventory());
+		if (ServerProperties.getLootBoxEnabled() &&
+			!(nearbyPlayers.size() == 1 && nearbyPlayers.contains(player))) {
 			int bucketIdx = 0; // Start at 0
 			for (Player other : nearbyPlayers) {
-				if (other.getUniqueId().equals(player.getUniqueId())) {
-					// Don't give lootshare to self
+				//if not tagged, don't give lootshare to the opener
+				if (other.getUniqueId().equals(player.getUniqueId()) && !useLootboxOnSelf) {
 					itemsForOrigContainer.addAll(itemBuckets.get(bucketIdx));
 					bucketIdx++;
 					continue;
 				}
-				// otherwise give lootshare to other players
+				// otherwise give lootshare to players
 				@Nullable List<ItemStack> rejectedItems = LootboxManager.giveShareToPlayer(new ArrayList<>(itemBuckets.get(bucketIdx)), other);
+				// if tagged, close the chest
+				if (other.getUniqueId().equals(player.getUniqueId()) && useLootboxOnSelf) {
+					plugin.mEffectManager.addEffect(other, CHEST_SOLO_LOOT_EFFECT_NAME,
+						new PercentSpeed(30, -0.8, CHEST_SOLO_LOOT_EFFECT_NAME).displays(false));
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							player.closeInventory();
+						}
+					}.runTaskLater(Plugin.getInstance(), 1);
+				}
 				// rejectedItems will be null if player has no lootbox
 				// if rejectedItems is empty or has items, that means player has a lootbox
 				if (rejectedItems == null) {

@@ -185,6 +185,14 @@ final class GameplayOptionsPage extends PebPage {
 		).invertedToggle("Show Others' Elite Finisher Clone: ", ReactiveValue.tag(mGui, EliteFinishers.FINISHER_HIDE_OTHER_TAG)).set(4, 6);
 
 		entry(
+			Material.CHEST,
+			"Toggle auto-storage of LOOTBOX shares",
+			"Click to toggle whether your shares of a loot chest are stored in the LOOTBOX if you open the chest." +
+				" Also automatically closes the chest. Only works with the Box of Endless Echoes, " +
+				"and applies 1.5s of slowness to you upon opening the chest."
+		).toggle("Auto-store: ", "UseLootboxOnSelf").set(4, 2);
+
+		entry(
 			Material.ENDER_EYE,
 			"Toggle Spectating After Death",
 			"Click to toggle whether you spectate the area in which you die for 3 seconds after dying."

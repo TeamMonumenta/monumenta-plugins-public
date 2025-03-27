@@ -139,7 +139,7 @@ public class ChestOverride extends BaseOverride {
 
 		// This will be allowed, should just generate the loot directly before the player actually finishes opening
 		DelveLootTableGroup.setDelveLootTable(player, block);
-		ChestUtils.generateContainerLootWithScaling(player, block);
+		ChestUtils.generateContainerLootWithScaling(player, block, plugin);
 
 		return true;
 	}
@@ -157,7 +157,7 @@ public class ChestOverride extends BaseOverride {
 		}
 
 		DelveLootTableGroup.setDelveLootTable(player, block);
-		ChestUtils.generateContainerLootWithScaling(player, block);
+		ChestUtils.generateContainerLootWithScaling(player, block, plugin);
 		return TOVUtils.canBreak(plugin, player, block, event);
 	}
 
@@ -184,7 +184,7 @@ public class ChestOverride extends BaseOverride {
 		if (!players.isEmpty()) {
 			Player player = players.get(0);
 			DelveLootTableGroup.setDelveLootTable(player, block);
-			ChestUtils.generateContainerLootWithScaling(player, block);
+			ChestUtils.generateContainerLootWithScaling(player, block, plugin);
 		}
 
 		return true;
