@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -120,13 +121,10 @@ public class CounterHit extends Spell {
 					}
 				}
 
-				for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
-					for (BoundingBox box : boxes) {
-						if (player.getBoundingBox().overlaps(box)) {
-							BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MELEE_SKILL, DASH_DAMAGE);
-							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 8, 1));
-						}
-					}
+				Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+				for (Player player : hitbox.getHitPlayers(true)) {
+					BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MELEE_SKILL, DASH_DAMAGE);
+					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 8, 1));
 				}
 			});
 	}

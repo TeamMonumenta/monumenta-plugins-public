@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -59,13 +60,9 @@ public class SundialSlash extends Spell {
 				}
 
 				if (mT % TIME_PER == 0 && mT > 0) {
-					for (Player player : PlayerUtils.playersInRange(bossLoc, RADIUS, true)) {
-						for (BoundingBox box : boxes) {
-							if (box.overlaps(player.getBoundingBox())) {
-								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MELEE, DAMAGE, null, false, true, "Sundial Slash");
-								break;
-							}
-						}
+					Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+					for (Player player : hitbox.getHitPlayers(true)) {
+						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MELEE, DAMAGE, null, false, true, "Sundial Slash");
 					}
 
 					mDeg += DEGREES;

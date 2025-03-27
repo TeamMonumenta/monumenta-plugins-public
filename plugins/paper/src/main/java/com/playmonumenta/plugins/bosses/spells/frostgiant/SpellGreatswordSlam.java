@@ -6,13 +6,14 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -217,15 +218,14 @@ public final class SpellGreatswordSlam extends Spell {
 										mWorld.playSound(l, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0.5f);
 									}
 								}
-								for (final Player player : mFrostGiant.getArenaParticipants()) {
-									for (final BoundingBox box : boxes) {
-										if (player.getBoundingBox().overlaps(box) && !mHitPlayers.contains(player.getUniqueId())) {
-											DamageUtils.damage(mBoss, player, DamageType.MAGIC, 36, null, false, false, SPELL_NAME);
-											AbilityUtils.silencePlayer(player, Constants.TICKS_PER_SECOND * 5);
-											MovementUtils.knockAway(bossLoc, player, 0f, 1.5f, false);
-											mHitPlayers.add(player.getUniqueId());
-											break;
-										}
+
+								Hitbox hitbox = Hitbox.unionOfAABB(boxes, mWorld);
+								for (final Player player : hitbox.getHitPlayers(true)) {
+									if (!mHitPlayers.contains(player.getUniqueId())) {
+										DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, 36, null, false, false, SPELL_NAME);
+										AbilityUtils.silencePlayer(player, Constants.TICKS_PER_SECOND * 5);
+										MovementUtils.knockAway(bossLoc, player, 0f, 1.5f, false);
+										mHitPlayers.add(player.getUniqueId());
 									}
 								}
 								mRadius++;

@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -137,16 +138,10 @@ public class Rewind extends Spell {
 					}
 
 					//Damage player by 35 in cone after warning is over (2 seconds) and knock player away
-					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
-
-						List<Player> hitPlayers = new ArrayList<>();
-						for (BoundingBox box : boxes) {
-							if (player.getBoundingBox().overlaps(box) && !hitPlayers.contains(player)) {
-								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.BLAST, DAMAGE, null, true, true, "Shatter");
-								MovementUtils.knockAway(mCenter, player, 0, .75f, false);
-								hitPlayers.add(player);
-							}
-						}
+					Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+					for (Player player : hitbox.getHitPlayers(true)) {
+						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.BLAST, DAMAGE, null, true, true, "Shatter");
+						MovementUtils.knockAway(mCenter, player, 0, .75f, false);
 					}
 
 					BukkitRunnable inner = new BukkitRunnable() {

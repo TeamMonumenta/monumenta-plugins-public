@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -208,15 +209,12 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 												world.playSound(l, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0);
 											}
 										}
-										for (LivingEntity target : mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs()) {
-
-											for (BoundingBox box : boxes) {
-												if (target.getBoundingBox().overlaps(box) && !mHitPlayers.contains(target)) {
-													DamageUtils.damage(mBoss, target, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false);
-													MovementUtils.knockAway(loc, target, 0f, 1.5f, false);
-													mHitPlayers.add(target);
-													break;
-												}
+										Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+										for (LivingEntity target : hitbox.getHitEntitiesByClass(LivingEntity.class)) {
+											if ((mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs()).contains(target) && !mHitPlayers.contains(target)) {
+												DamageUtils.damage(mBoss, target, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false);
+												MovementUtils.knockAway(loc, target, 0f, 1.5f, false);
+												mHitPlayers.add(target);
 											}
 										}
 										mRadius++;
