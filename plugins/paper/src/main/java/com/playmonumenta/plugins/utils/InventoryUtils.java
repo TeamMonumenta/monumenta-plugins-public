@@ -685,4 +685,16 @@ public class InventoryUtils {
 			}
 		}
 	}
+
+	public static void swapTwoInventoryItems(Player player, int slot1, int slot2) {
+		if (player.hasPermission("monumenta.bosstag.canbefuddle")) {
+			Inventory inv = player.getInventory();
+			@Nullable ItemStack[] items = inv.getContents();
+			ItemStack firstItem = items[slot1];
+			ItemStack secondItem = items[slot2];
+			items[slot1] = secondItem;
+			items[slot2] = firstItem;
+			inv.setContents(items);
+		}
+	}
 }
