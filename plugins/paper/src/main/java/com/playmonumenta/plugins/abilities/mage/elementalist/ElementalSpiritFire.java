@@ -157,7 +157,7 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 			.add(a -> a.mLevelDamage, DAMAGE_2, false, Ability::isLevelTwo)
 			.add(convert(ice().add(". Ice spirit damage is increased to ")
 				.add(a -> a.mLevelDamage, ElementalSpiritIce.DAMAGE_2, false, Ability::isLevelTwo)))
-			.add(" The Elemental Arrows projectile damage multiplier is increased to ")
+			.add(". The Elemental Arrows projectile damage multiplier is increased to ")
 			.addPercent(a -> a.mLevelBowMultiplier, BOW_MULTIPLIER_2, false, Ability::isLevelTwo)
 			.add(convert(ice().add(" for the fire spirit and ")
 				.addPercent(a -> a.mLevelBowMultiplier, ElementalSpiritIce.BOW_MULTIPLIER_2, false, Ability::isLevelTwo)

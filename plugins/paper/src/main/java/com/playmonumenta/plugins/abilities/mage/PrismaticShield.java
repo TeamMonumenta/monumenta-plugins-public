@@ -219,7 +219,7 @@ public class PrismaticShield extends Ability {
 			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_2, false, Ability::isLevelTwo)
 			.add(" absorption health. Knocked back enemies are stunned for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" seconds.");
+			.add(" second.");
 	}
 
 	private static Description<PrismaticShield> getDescriptionEnhancement() {
@@ -232,7 +232,7 @@ public class PrismaticShield extends Ability {
 			.addPercent(a -> a.mPercentHeal, HEAL_PERCENT)
 			.add(" of your max health. Additionally, your abilities' cooldowns are reduced by ")
 			.addDuration(a -> a.mCDR, ENHANCEMENT_COOLDOWN_REDUCTION_TICKS)
-			.add(".");
+			.add(" seconds.");
 	}
 
 }

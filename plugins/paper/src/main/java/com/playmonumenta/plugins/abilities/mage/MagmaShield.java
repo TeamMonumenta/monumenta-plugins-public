@@ -151,7 +151,7 @@ public class MagmaShield extends Ability {
 			.addPercent(a -> a.mFireAbilityBonusDamage, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS)
 			.add(" from fire based abilities for ")
 			.addDuration(a -> a.mEnhancementDuration, ENHANCEMENT_BONUS_DURATION)
-			.add(".");
+			.add(" seconds.");
 	}
 
 }

@@ -197,7 +197,7 @@ public class LightningTotem extends TotemAbility {
 			.addTrigger()
 			.add(" to fire a projectile that summons a Lightning Totem. The totem will target a mob within ")
 			.add(a -> a.mRadius, AOE_RANGE)
-			.add(" blocks with priority towards boss and elite mobs and deal ")
+			.add(" blocks with priority towards Boss and Elite mobs and deal ")
 			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
 			.add(" magic damage every ")
 			.add(a -> a.mInterval, INTERVAL, true)

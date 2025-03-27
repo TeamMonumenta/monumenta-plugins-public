@@ -148,7 +148,7 @@ public class FrostNova extends Ability {
 			.addPercent(ENHANCED_DAMAGE_MODIFIER - 1)
 			.add(". Non elites and bosses are frozen for ")
 			.addDuration(a -> a.mFrozenDuration, ENHANCED_FROZEN_DURATION)
-			.add(", having their AI and gravity removed.")
+			.add(" second, having their AI and gravity removed.")
 			.addCooldown(ENHANCED_COOLDOWN_TICKS, Ability::isEnhanced);
 	}
 

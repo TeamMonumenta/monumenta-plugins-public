@@ -89,7 +89,7 @@ public class CoupDeGrace extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("If melee damage you deal brings a normal mob below ")
 			.addPercent(a -> a.mNormalThreshold, COUP_1_NORMAL_THRESHOLD, false, Ability::isLevelOne)
-			.add(" health or an elite mob below ")
+			.add(" health or an Elite mob below ")
 			.addPercent(a -> a.mEliteThreshold, COUP_1_ELITE_THRESHOLD, false, Ability::isLevelOne)
 			.add(" health, they die instantly.");
 	}
@@ -100,6 +100,6 @@ public class CoupDeGrace extends Ability {
 			.addPercent(a -> a.mNormalThreshold, COUP_2_NORMAL_THRESHOLD, false, Ability::isLevelTwo)
 			.add(" for normal enemies and ")
 			.addPercent(a -> a.mEliteThreshold, COUP_2_ELITE_THRESHOLD, false, Ability::isLevelTwo)
-			.add(" for elites.");
+			.add(" for Elites.");
 	}
 }

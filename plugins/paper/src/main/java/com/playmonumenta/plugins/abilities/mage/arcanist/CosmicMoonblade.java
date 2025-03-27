@@ -174,7 +174,7 @@ public class CosmicMoonblade extends Ability {
 			.addPercent(a -> a.mLevelReduction, REDUCTION_MULTIPLIER_2, false, Ability::isLevelTwo)
 			.add(" (Max ")
 			.addDuration(a -> a.mLevelCap, CAP_TICKS_2, false, Ability::isLevelTwo)
-			.add(" seconds) per blade and damage is increased to ")
+			.add(" second) per blade and damage is increased to ")
 			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
 			.add(". Additionally reduce all cooldowns including Cosmic Moonblade by ")
 			.addPercent(a -> a.mKillCDR, REDUCTION_MULTIPLIER_KILL)

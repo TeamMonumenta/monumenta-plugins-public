@@ -151,6 +151,6 @@ public final class ByMyBlade extends Ability {
 			.addPercent(a -> a.mEnhancementHeal, ENHANCEMENT_HEAL_PERCENT)
 			.add(" of your max health which is increased to ")
 			.addPercent(a -> a.mEnhancementHealElite, ENHANCEMENT_HEAL_PERCENT_ELITE)
-			.add(" if the target was an elite or boss.");
+			.add(" if the target was an Elite or Boss mob.");
 	}
 }

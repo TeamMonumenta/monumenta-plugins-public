@@ -56,7 +56,7 @@ public class ArcaneStrike extends Ability {
 			.shorthandName("AS")
 			.actionBarColor(TextColor.color(220, 147, 249))
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Attack an enemy with a wand to damage and ignite nearby mobs.")
+			.simpleDescription("Attack an enemy with a wand to damage nearby mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.GOLDEN_SWORD);
 

@@ -50,7 +50,7 @@ public class ViciousCombos extends Ability {
 			.scoreboardId("ViciousCombos")
 			.shorthandName("VC")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Killing mobs reduces cooldowns, and killing elite mobs completely refresh them.")
+			.simpleDescription("Killing mobs reduces cooldowns, and killing Elite mobs completely refreshes them.")
 			.quest216Message("-------n-------u-------")
 			.displayItem(Material.ZOMBIE_HEAD);
 

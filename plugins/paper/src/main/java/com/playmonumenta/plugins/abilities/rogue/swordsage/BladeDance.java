@@ -140,7 +140,7 @@ public class BladeDance extends Ability {
 			.add(a -> a.mDamage, DANCE_1_DAMAGE, false, Ability::isLevelOne)
 			.add(" melee damage to mobs within ")
 			.add(a -> a.mRadius, DANCE_RADIUS)
-			.add(" blocks and root them for ")
+			.add(" blocks and roots them for ")
 			.addDuration(a -> a.mSlowDuration, SLOW_DURATION_1, false, Ability::isLevelOne)
 			.add(" seconds.")
 			.addCooldown(COOLDOWN_1, Ability::isLevelOne);

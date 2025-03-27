@@ -293,7 +293,7 @@ public class AdvancingShadows extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("If the mob you teleported to dies within ")
 			.addDuration(a -> a.mRecastTimer, ENHANCEMENT_KILL_REQUIREMENT_TIME)
-			.add(" seconds, you can recast Advancing Shadows again in the next ")
+			.add(" second, you can recast Advancing Shadows again in the next ")
 			.addDuration(ENHANCEMENT_CHAIN_DURATION)
 			.add(" seconds. Recasts provide ")
 			.addPercent(0.5)

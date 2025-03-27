@@ -285,10 +285,10 @@ public class FishingCombatManager implements Listener {
 	}
 
 	private void initiateCombat(Player player, FishingArena arena) {
-		ejectMobs(arena, player.getWorld());
 		arena.mWave = 1;
 		spawnWave(arena.mWave, player, arena, arena.mDifficulty);
 		trackArena(player, arena);
+		ejectMobs(arena, player.getWorld());
 	}
 
 	private void spawnWave(int wave, Player player, FishingArena arena, int difficulty) {
@@ -298,7 +298,7 @@ public class FishingCombatManager implements Listener {
 			int mMobsSpawned = 0;
 			@Override
 			public void run() {
-				if (mMobsSpawned > mobTypes.length - 1) {
+				if (mMobsSpawned > mobTypes.length - 1 || !arena.mOccupied) {
 					this.cancel();
 					return;
 				}
