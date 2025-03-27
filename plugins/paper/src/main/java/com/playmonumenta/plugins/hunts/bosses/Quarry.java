@@ -299,9 +299,7 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 		for (Player player : allPlayers) {
 			addLeaderboardScore(player, GENERAL_WINS_SCOREBOARD);
 			addLeaderboardScore(player, getWinsScoreboard());
-			if (ScoreboardUtils.getScoreboardValue(player, getWinsScoreboard()).orElse(0) == 1) {
-				AdvancementUtils.grantAdvancement(player, getAdvancement());
-			}
+			AdvancementUtils.grantAdvancement(player, getAdvancement());
 		}
 
 		ItemStack unspoiledChest = ChestUtils.giveChestWithLootTable(getUnspoiledLootTable(), mQuarryType.getName() + " Yield (Unspoiled)", null, List.of(Component.text("The complete harvest from the quarry.", NamedTextColor.DARK_GRAY)));
@@ -313,9 +311,9 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 			addLeaderboardScore(player, GENERAL_UNSPOILED_WINS_SCOREBOARD);
 			addLeaderboardScore(player, getUnspoiledWinsScoreboard());
 			Bukkit.getPluginManager().callEvent(new MonumentaEvent(player, "huntsunspoiled"));
+			AdvancementUtils.grantAdvancement(player, getAdvancementUnspoiled());
 			if (ScoreboardUtils.getScoreboardValue(player, getUnspoiledWinsScoreboard()).orElse(0) == 1) {
 				player.addScoreboardTag(getQuestTag());
-				AdvancementUtils.grantAdvancement(player, getAdvancementUnspoiled());
 				MonumentaNetworkRelayIntegration.broadcastCommand("tellmini msg @a <italic><gold>" + player.getName() + "</gold> has defeated " + mQuarryType.getName() + " without spoiling for the first time!");
 			}
 		}

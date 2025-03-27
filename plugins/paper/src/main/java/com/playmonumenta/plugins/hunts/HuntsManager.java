@@ -25,6 +25,7 @@ import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.RBoardAPI;
 import com.playmonumenta.structures.StructuresAPI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -496,7 +497,8 @@ public class HuntsManager {
 	}
 
 	private CompletableFuture<Long> setRandomQuarry() {
-		return setQuarry(FastUtils.RANDOM.nextInt(0, QuarryType.values().length));
+		List<QuarryType> quarries = Arrays.stream(QuarryType.values()).filter(q -> q != mNextQuarry).toList();
+		return setQuarry(FastUtils.getRandomElement(quarries));
 	}
 
 	@SuppressWarnings("EnumOrdinal")

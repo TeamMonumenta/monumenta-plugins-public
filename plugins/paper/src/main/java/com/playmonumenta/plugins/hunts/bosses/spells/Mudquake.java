@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -73,14 +74,15 @@ public class Mudquake extends Spell {
 				mChargeUp.setProgress((float)mTicks / WINDUP_DURATION);
 
 				if (mTicks % 10 == 0 && mTicks < WINDUP_DURATION) {
-					for (Block block : mExperiment.getMudBlocks()) {
-						if (block.getRelative(BlockFace.UP).isEmpty()) {
-							new PartialParticle(Particle.BLOCK_CRACK, block.getLocation().clone().add(0, 1, 0))
-								.data(Material.MUD.createBlockData())
-								.delta(0.5, 0, 0.5)
-								.count(4)
-								.spawnAsBoss();
-						}
+					List<Block> mudBlocks = getSurfaceMudBlocks();
+					int count = (int) (4.5 - (2.5 * Math.min(mudBlocks.size(), 100)) / 100);
+					for (Block block : mudBlocks) {
+						new PartialParticle(Particle.BLOCK_CRACK, block.getLocation().clone().add(0, 1, 0))
+							.data(Material.MUD.createBlockData())
+							.delta(0.5, 0, 0.5)
+							.count(count)
+							.distanceFalloff(25)
+							.spawnAsBoss();
 					}
 
 					mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 10, 0.5f);
@@ -88,15 +90,16 @@ public class Mudquake extends Spell {
 				}
 
 				if (mTicks == WINDUP_DURATION) {
-					for (Block block : mExperiment.getMudBlocks()) {
-						if (block.getRelative(BlockFace.UP).isEmpty()) {
-							new PartialParticle(Particle.CRIT, block.getLocation().clone().add(FastUtils.randomDoubleInRange(-0.5, 0.5), 1, FastUtils.randomDoubleInRange(-0.5, 0.5)))
-								.delta(0, 0.5, 0)
-								.extra(2)
-								.directionalMode(true)
-								.count(4)
-								.spawnAsBoss();
-						}
+					List<Block> mudBlocks = getSurfaceMudBlocks();
+					int count = (int) (4.5 - (2.5 * Math.min(mudBlocks.size(), 100)) / 100);
+					for (Block block : mudBlocks) {
+						new PartialParticle(Particle.CRIT, block.getLocation().clone().add(FastUtils.randomDoubleInRange(-0.5, 0.5), 1, FastUtils.randomDoubleInRange(-0.5, 0.5)))
+							.delta(0, 0.5, 0)
+							.extra(2)
+							.directionalMode(true)
+							.count(count)
+							.distanceFalloff(25)
+							.spawnAsBoss();
 					}
 
 					mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 10.5f, 2);
@@ -125,6 +128,10 @@ public class Mudquake extends Spell {
 		};
 		runnable.runTaskTimer(mPlugin, 0, 1);
 		mActiveRunnables.add(runnable);
+	}
+
+	private List<Block> getSurfaceMudBlocks() {
+		return mExperiment.getMudBlocks().stream().filter(b -> b.getRelative(BlockFace.UP).isEmpty()).toList();
 	}
 
 	@Override

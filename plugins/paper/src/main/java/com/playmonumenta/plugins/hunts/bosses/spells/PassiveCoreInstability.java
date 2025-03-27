@@ -69,7 +69,7 @@ public class PassiveCoreInstability extends Spell {
 		if (event.getSpell() instanceof SpellPyroclasticSlam) {
 			cancelChargeUps();
 		}
-		if (event.getSpell() instanceof CoreElemental.CoreElementalBase spell && !mQuarry.mIsCastingBanish) {
+		if (event.getSpell() instanceof CoreElemental.CoreElementalBase spell) {
 			castAbility(spell);
 		}
 	}
