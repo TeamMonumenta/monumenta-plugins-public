@@ -14,6 +14,7 @@ import java.util.UUID;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -109,6 +110,9 @@ public class SpellRaiseJungle extends Spell {
 					}
 					Location spawn = sLoc.clone().subtract(0, 1.75, 0); // should end up 1.5 blocks below the arena floor
 					LivingEntity ele = (LivingEntity) LibraryOfSoulsIntegration.summon(spawn, "EarthElemental");
+					if (ele != null) {
+						ele.customName(Component.text("Mushroom Elemental", NamedTextColor.GRAY, TextDecoration.BOLD));
+					}
 					Location scLoc = sLoc.clone();
 					if (ele != null && !mSummoned.contains(ele.getUniqueId())) {
 						mSummoned.add(ele.getUniqueId());

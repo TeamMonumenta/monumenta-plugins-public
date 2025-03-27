@@ -53,6 +53,7 @@ import java.util.UUID;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -190,7 +191,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					if (player.isSleeping()) {
 						DamageUtils.damage(mBoss, player, DamageType.OTHER, 22);
 						EffectType.applyEffect(EffectType.SLOW, player, 15 * 20, 0.3, "KaulAntiSleepSlowness", false);
-						player.sendMessage(Component.text("THE JUNGLE FORBIDS YOU TO DREAM.", NamedTextColor.DARK_GREEN));
+						player.sendMessage(Component.text("THE TOPPINGS FORBID YOU TO DREAM.", NamedTextColor.DARK_GREEN));
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 1, 0.85f);
 					}
 				}
@@ -308,9 +309,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			Collection<Player> players = getArenaParticipants();
 			Component message;
 			if (players.size() <= 1) {
-				message = Component.text("THE JUNGLE WILL NOT ALLOW A LONE MORTAL LIKE YOU TO LIVE. PERISH, FOOLISH USURPER!", NamedTextColor.DARK_GREEN);
+				message = Component.text("ONLY ONE OF YOU? I SWORE I ORDERED WAY MORE PIZZAS THAN THAT. AH WELL, I'LL TAKE WHAT I CAN GET. LIKE PINEAPPLE ON PIZZA, YOU MUST BE DESTROYED!", NamedTextColor.DARK_GREEN);
 			} else {
-				message = Component.text("THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USURPERS.", NamedTextColor.DARK_GREEN);
+				message = Component.text("I WILL TAKE THOSE PIZZAS AND EAT THEM... ALONG WITH YOU! I'M HUNGRY, DON'T JUDGE.", NamedTextColor.DARK_GREEN);
 			}
 			players.forEach(p -> p.sendMessage(message));
 		});
@@ -326,7 +327,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		// Phase 2
 		events.put(66, mBoss -> {
 			MMLog.info(() -> "[Kaul] A Kaul fight got to 66% health");
-			sendDialogue("THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.");
+			sendDialogue("OKAY I'M REALLY HUNGRY NOW. I'LL EVEN TAKE ANCHOVIES AT THIS POINT.");
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
@@ -442,7 +443,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		// Phase 2.5
 		events.put(50, mBoss -> {
 			MMLog.info(() -> "[Kaul] A Kaul fight got to 50% health");
-			sendDialogue("THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.");
+			sendDialogue("THE SAUCE AND THE BODY MUST BE ENTWINED. I SUMMON FORTH MY PIZZA ELEMENTAL TO HELP. HE WILL GRIND YOU INTO MUSH...ROOMS.");
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
@@ -479,6 +480,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 							Material.DIRT.createBlockData()).spawnAsBoss();
 						LivingEntity miniboss = (LivingEntity) LibraryOfSoulsIntegration.summon(mLoc, primordial);
 						MMLog.info(() -> "[Kaul] Kaul has summoned the Primordial Elemental");
+						if (miniboss != null) {
+							miniboss.customName(Component.text("Pizza Elemental", NamedTextColor.GREEN, TextDecoration.BOLD));
+						}
 						new BukkitRunnable() {
 							@Override
 							public void run() {
@@ -528,7 +532,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		// Phase 3
 		events.put(33, mBoss -> {
 			MMLog.info(() -> "[Kaul] A Kaul fight got to 33% health");
-			sendDialogue("YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.");
+			sendDialogue("YOU'RE REALLY MAKING ME FIGHT FOR MY FOOD. I WILL REIGN SUPREME THOUGH!");
 			knockback(plugin, 10);
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
@@ -674,7 +678,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		// Phase 3.25
 		//Summons a Immortal Elemental at 30% HP
 		events.put(30, mBoss -> {
-			sendDialogue("PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.");
+			sendDialogue("PIZZA ELEMENTAL, RETURN. TAKE DOWN THESE MEAT LOVERS FOR ME.");
 			summonImmortal(plugin, world);
 		});
 
@@ -691,7 +695,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 		events.put(10, mBoss -> {
 			MMLog.info(() -> "[Kaul] A Kaul fight got to 10% health");
-			sendDialogue("THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.");
+			sendDialogue("THE PEPPERONI SHALL RAIN DOWN UPON YOU, LIKE METEORS FROM THE HEAVENS. FACE MY HUNGER, ZA-LORDS.");
 			changePhase(phase4Spells, phase4PassiveSpells, null);
 			// Force casting Volcanic Demise teleports Kaul back to his camp spot on top of the shrine and whatnot
 			// See bossCastAbility() for more info
@@ -746,6 +750,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					new PartialParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1).spawnAsBoss();
 					LivingEntity miniboss = (LivingEntity) LibraryOfSoulsIntegration.summon(mLoc, immortal);
 					MMLog.info(() -> "[Kaul] Kaul has summoned the Immortal Elemental");
+					if (miniboss != null) {
+						miniboss.customName(Component.text("Immortal Pizza Elemental", NamedTextColor.RED, TextDecoration.BOLD));
+					}
 					if (miniboss != null) {
 						new BukkitRunnable() {
 							@Override
@@ -903,9 +910,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		}
 		mDefeated = true;
 		String[] dio = new String[] {
-			"AS ALL RETURNS TO ROT, SO TOO HAS THIS ECHO FALLEN.",
-			"DO NOT THINK THIS ABSOLVES YOUR BLASPHEMY. RETURN HERE AGAIN, AND YOU WILL PERISH.",
-			"NOW... THE JUNGLE... MUST SLEEP..."
+			"AS PIZZA WOULD ENTER MY STOMACH, SO TOO MUST I REENTER THE GROUND.",
+			"I AM VANQUISHED; AN EMPTY TRAY. I SHALL REST AND BE MADE ANEW, LIKE DOUGH IN THE OVEN.",
+			"NOW... I MUST... BAKE..."
 		};
 		knockback(mPlugin, 10);
 		mAdvancements.forEach(KaulAdvancementHandler::onBossDeath);
@@ -1039,8 +1046,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
 				String[] dio = new String[] {
-					"THE JUNGLE'S WILL IS UNASSAILABLE, YET YOU SCURRY ACROSS MY SHRINE LIKE ANTS.",
-					"IS THE DEFILEMENT OF THE DREAM NOT ENOUGH!?"
+					"ARE YOU MY PIZZA DELIVERY PEOPLE? I ORDERED IT AGES AGO.",
+					"THE APP SAID 35 MINUTES, AND IT'S BEEN LIKE 40 YEARS."
 				};
 
 				new BukkitRunnable() {
