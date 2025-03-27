@@ -90,9 +90,11 @@ public final class BruteForce extends Ability {
 		final boolean weaponHasCumbersome = ItemStatUtils.hasEnchantment(mPlayer.getInventory().getItemInMainHand(), EnchantmentType.CUMBERSOME);
 		final double baseDamage = mMultiplier * (event.getFlatDamage() * (weaponHasCumbersome ? 1 : CritScaling.CRIT_BONUS)) + mFlatDamage;
 		final int waveCount = 1 + (isEnhanced() ? mEnhanceWaves : 0);
+		final float kbMultiplier = 1 + (0.25f * ItemStatUtils.getEnchantmentLevel(mPlayer.getEquipment().getItemInMainHand(), EnchantmentType.KNOCKBACK));
+
 		for (int i = 0; i < waveCount; i++) {
 			final double damage = baseDamage * Math.pow(mEnhanceDamageMult, i); // Reduces damage if waveCount > 1
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> wave(enemy, mPlayer.getLocation(), damage),
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> wave(enemy, mPlayer.getLocation(), damage, kbMultiplier),
 				(long) mEnhanceWaveDelay * i);
 		}
 
@@ -123,13 +125,16 @@ public final class BruteForce extends Ability {
 		return true;
 	}
 
-	private void wave(final LivingEntity target, final Location playerLoc, final double damage) {
+	private void wave(final LivingEntity target, final Location playerLoc, final double damage, float kbMultiplier) {
 		final Location loc = target.getLocation().add(0, 0.75, 0);
 		for (final LivingEntity mob : new Hitbox.SphereHitbox(loc, mWaveRadius).getHitMobs()) {
 			DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage,
 				mob == target ? ClassAbility.BRUTE_FORCE : ClassAbility.BRUTE_FORCE_AOE, true);
 
-			if (!EntityUtils.isBoss(mob)) {
+			if (!EntityUtils.isBoss(mob) && mob == target) {
+				MovementUtils.knockAway(playerLoc, mob, mForceScalar * kbMultiplier, mForceScalar / 2.0f, true);
+			}
+			else if (!EntityUtils.isBoss(mob)) {
 				MovementUtils.knockAway(playerLoc, mob, mForceScalar, mForceScalar / 2.0f, true);
 			}
 		}

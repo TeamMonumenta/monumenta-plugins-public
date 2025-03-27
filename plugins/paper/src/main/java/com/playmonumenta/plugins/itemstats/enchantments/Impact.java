@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.HitKnockbackVulnerability;
 import com.playmonumenta.plugins.effects.ImpactVulnerability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
@@ -11,23 +12,31 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class Impact implements Enchantment {
 
 	private static final Particle.DustOptions DUST_OPTIONS = new Particle.DustOptions(Color.WHITE, 1.2f);
 	private static final String EFFECT_ID = "ImpactVulnerability";
+	private static final String KB_EFFECT_ID = "ImpactKbVulnerability";
+
+	private final Map<Player, ImpactInstance> mDamageInTick = new HashMap<>();
+	private @Nullable BukkitTask mRunDamageTask = null;
 
 	@Override
 	public EnchantmentType getEnchantmentType() {
@@ -40,30 +49,61 @@ public class Impact implements Enchantment {
 	}
 
 	@Override
+	public double getPriorityAmount() {
+		return 5600;
+	}
+
+	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 
-		if (event.getType() != DamageEvent.DamageType.MELEE || player.getCooledAttackStrength(0) <= 0.9) {
+		if ((event.getType() == DamageEvent.DamageType.MELEE && player.getCooledAttackStrength(0) >= 0.9) || event.getType() == DamageEvent.DamageType.MELEE_SKILL) {
+
+			mDamageInTick.computeIfAbsent(player, key -> new ImpactInstance(value, plugin)).addEvent(enemy, event);
+
+		} else if (event.getType() == DamageEvent.DamageType.PROJECTILE) {
+			applyImpact(plugin, player, value, List.of(event), enemy);
+		} else {
 			return;
 		}
 
-		double damage = event.getFinalDamage(true);
-		Vector kbDirection = player.getEyeLocation().getDirection();
-
-
-		List<LivingEntity> targetStack = new ArrayList<>();
-
-		EntityUtils.getStackedMobsAbove(enemy, targetStack);
-		if (enemy.getVehicle() != null) {
-			EntityUtils.getStackedMobsBelow(enemy.getVehicle(), targetStack);
+		//The KB resistance needs to be applied before abilities are casted
+		if (!EntityUtils.isBoss(enemy) && !EntityUtils.isCCImmuneMob(enemy) && !EntityUtils.isTrainingDummy(enemy) && enemy.hasGravity() && enemy.hasAI()) {
+			plugin.mEffectManager.addEffect(enemy, KB_EFFECT_ID, new HitKnockbackVulnerability(80, -0.1 * value));
 		}
+
+		if (mRunDamageTask == null || !Bukkit.getScheduler().isQueued(mRunDamageTask.getTaskId())) {
+			mRunDamageTask = Bukkit.getScheduler().runTaskLater(plugin, this::task, 1);
+		}
+
+	}
+
+	private void task() {
+
+		mDamageInTick.forEach((p, instance) -> {
+			if (instance.mMap.values().stream().anyMatch(events -> events.stream().anyMatch(event -> event.getType() == DamageEvent.DamageType.MELEE))) {
+				instance.mMap.forEach((entity, events) -> applyImpact(instance.mPlugin, p, instance.mValue, events, entity));
+			}
+		});
+		mDamageInTick.clear();
+		mRunDamageTask = null;
+	}
+
+
+	private void applyImpact(Plugin plugin, Player player, double value, List<DamageEvent> events, LivingEntity enemy) {
+
+		double damage = 0;
+		for (DamageEvent event : events) {
+			damage += event.getFinalDamage(true);
+		}
+		final double finalDamage = damage;
+
+		Vector kbDirection = player.getEyeLocation().getDirection();
 
 		//Apply the effect 1 tick later to avoid making the attack that applies the effect cancel it
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				for (LivingEntity target : targetStack) {
-					plugin.mEffectManager.addEffect(target, EFFECT_ID, new ImpactVulnerability(40));
-				}
+				plugin.mEffectManager.addEffect(enemy, EFFECT_ID, new ImpactVulnerability(80));
 			}
 		}.runTaskLater(plugin, 1);
 
@@ -75,37 +115,18 @@ public class Impact implements Enchantment {
 			@Override
 			public void run() {
 
-				LivingEntity primaryTarget = enemy;
-
-				if (primaryTarget.isDead()) {
-
-					for (LivingEntity target : targetStack) {
-						if (!target.isDead()) {
-							primaryTarget = target;
-						}
-					}
-				}
-
-				Effect impactEffect = plugin.mEffectManager.getActiveEffect(primaryTarget, EFFECT_ID);
-
-
+				Effect impactEffect = plugin.mEffectManager.getActiveEffect(enemy, EFFECT_ID);
 				if (impactEffect == null || impactEffect.getDuration() <= 0) {
 					this.cancel();
 					return;
 				}
-
-				if (checkForImpact(mFallDistanceLastTick, kbDirection, primaryTarget, targetStack)) {
-
-					onImpact(player, primaryTarget, targetStack, damage, (int) value);
-
-					for (LivingEntity target : targetStack) {
-						plugin.mEffectManager.clearEffects(target, EFFECT_ID);
-					}
-
+				if (checkForImpact(mFallDistanceLastTick, kbDirection, enemy)) {
+					onImpact(player, enemy, finalDamage, (int) value);
+					plugin.mEffectManager.clearEffects(enemy, EFFECT_ID);
 					this.cancel();
 				}
 
-				mFallDistanceLastTick = EntityUtils.getEntityStackBase(primaryTarget).getFallDistance();
+				mFallDistanceLastTick = EntityUtils.getEntityStackBase(enemy).getFallDistance();
 
 				double widthDelta = PartialParticle.getWidthDelta(enemy);
 				double heightDelta = PartialParticle.getHeightDelta(enemy);
@@ -124,34 +145,30 @@ public class Impact implements Enchantment {
 			}
 
 		}.runTaskTimer(plugin, 1, 2);
-
 	}
 
-	private boolean checkForImpact(double fallDistanceLastTick, Vector direction, LivingEntity primaryTarget, List<LivingEntity> targetStack) {
+	private boolean checkForImpact(double fallDistanceLastTick, Vector direction, LivingEntity target) {
 
-		Entity bottomEntity = EntityUtils.getEntityStackBase(targetStack.get(0));
-
-		if (fallDistanceLastTick > 2.8 && bottomEntity.isOnGround()) {
+		if (fallDistanceLastTick > 2.8 && target.isOnGround()) {
 
 			new PartialParticle(
 				Particle.EXPLOSION_LARGE,
-				LocationUtils.getHeightLocation(bottomEntity, 0.1),
+				LocationUtils.getHeightLocation(target, 0.1),
 				1
 			).spawnAsEnemy();
 
 			return true;
 		}
 
-
-		BoundingBox offsetBox = primaryTarget.getBoundingBox().clone();
+		BoundingBox offsetBox = target.getBoundingBox().clone();
 		offsetBox.shift(direction.getX(), 0.15, direction.getZ());
-		offsetBox.expand(-0.05, -0.4, -0.05);
+		offsetBox.expand(0.1, -0.4, 0.1);
 
-		if (LocationUtils.collidesWithBlocks(offsetBox, primaryTarget.getWorld())) {
+		if (LocationUtils.collidesWithBlocks(offsetBox, target.getWorld())) {
 
 			new PartialParticle(
 				Particle.EXPLOSION_LARGE,
-				LocationUtils.getHeightLocation(primaryTarget, 0.65),
+				LocationUtils.getHeightLocation(target, 0.65),
 				1
 			).spawnAsEnemy();
 
@@ -162,19 +179,34 @@ public class Impact implements Enchantment {
 		return false;
 	}
 
-	private void onImpact(Player player, LivingEntity primaryTarget, List<LivingEntity> targets, double originalDamage, int level) {
+	private void onImpact(Player player, LivingEntity target, double originalDamage, int level) {
 
 		double finalDamage = originalDamage * 0.1 * level;
 
-		for (LivingEntity e : targets) {
-			DamageUtils.damage(player, e, DamageEvent.DamageType.MELEE_ENCH, finalDamage, null, true);
+		DamageUtils.damage(player, target, DamageEvent.DamageType.MELEE_ENCH, finalDamage, null, true);
+
+		World world = target.getWorld();
+		world.playSound(target.getLocation(), Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1.5f, 1.35f);
+		world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1.5f, 0.5f);
+		world.playSound(target.getLocation(), Sound.BLOCK_POINTED_DRIPSTONE_LAND, SoundCategory.PLAYERS, 1.7f, 0.5f);
+		world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.7f, 0.5f);
+
+	}
+
+	private static class ImpactInstance {
+
+		private final double mValue;
+		private final Plugin mPlugin;
+		private final Map<LivingEntity, List<DamageEvent>> mMap = new HashMap<>();
+
+		private ImpactInstance(double value, Plugin plugin) {
+			mValue = value;
+			mPlugin = plugin;
 		}
 
-		World world = primaryTarget.getWorld();
-		world.playSound(primaryTarget.getLocation(), Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1.5f, 1.35f);
-		world.playSound(primaryTarget.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1.5f, 0.5f);
-		world.playSound(primaryTarget.getLocation(), Sound.BLOCK_POINTED_DRIPSTONE_LAND, SoundCategory.PLAYERS, 1.7f, 0.5f);
-		world.playSound(primaryTarget.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.7f, 0.5f);
+		private void addEvent(LivingEntity entity, DamageEvent event) {
+			mMap.computeIfAbsent(entity, damageEvent -> new ArrayList<>()).add(event);
+		}
 
 	}
 
