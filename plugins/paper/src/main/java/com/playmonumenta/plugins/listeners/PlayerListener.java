@@ -331,7 +331,12 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void playerChangeWorldEvent(PlayerChangedWorldEvent event) {
-		InventoryUtils.removeSpecialItems(event.getPlayer(), false, true, false);
+		Player player = event.getPlayer();
+
+		InventoryUtils.removeSpecialItems(player, false, true, false);
+
+		/* Remove portals from player */
+		PortalManager.clearAllPortals(player);
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
