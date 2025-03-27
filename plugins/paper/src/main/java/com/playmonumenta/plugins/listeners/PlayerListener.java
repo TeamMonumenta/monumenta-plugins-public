@@ -99,6 +99,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -387,7 +388,7 @@ public class PlayerListener implements Listener {
 			}
 		} else if (action == Action.PHYSICAL) {
 			mPlugin.mItemOverrides.physicalBlockInteraction(mPlugin, player, action, block, event);
-				if (event.useInteractedBlock() == Event.Result.DENY) {
+			if (event.useInteractedBlock() == Event.Result.DENY) {
 				return;
 			}
 		}
@@ -1047,6 +1048,21 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mAbilityManager.playerDeathEvent(player, event);
 		mPlugin.mItemStatManager.onDeath(mPlugin, player, event);
+
+		// Clear any enderpearls related to this player
+		for (World world : Bukkit.getWorlds()) {
+			// Copy list to prevent concurrent modification exception
+			for (Entity entity : new ArrayList<>(world.getEntitiesByClasses(EnderPearl.class))) {
+				if (
+					entity instanceof EnderPearl enderPearl
+						&& enderPearl.getShooter() instanceof Player thrower
+						// Avoid comparison with stale player object; go by player UUID instead
+						&& player.getUniqueId().equals(thrower.getUniqueId())
+				) {
+					enderPearl.remove();
+				}
+			}
+		}
 
 		// Give the player a NewDeath score of 1 so the city guides will give items again
 		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
