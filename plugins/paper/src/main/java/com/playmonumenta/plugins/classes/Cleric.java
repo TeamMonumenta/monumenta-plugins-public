@@ -36,11 +36,11 @@ public class Cleric extends PlayerClass {
 		mAbilities.add(Illuminate.INFO);
 		mAbilities.add(SanctifiedArmor.INFO);
 		mClass = CLASS_ID;
-		mClassName = "Cleric";
+		mClassName = "Clark";
 		mClassColor = TextColor.fromHexString("#FFC644");
 		mClassGlassFiller = Material.YELLOW_STAINED_GLASS_PANE;
 		mDisplayItem = Material.POPPY;
-		mClassDescription = "Clerics are mighty healers and specialize in fighting the undead.";
+		mClassDescription = "Clarks are mighty healers and specialize in fighting the undead.";
 		mPassive = Rejuvenation.INFO;
 
 		mSpecOne.mAbilities.add(HolyJavelin.INFO);

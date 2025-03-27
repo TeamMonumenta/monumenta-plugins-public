@@ -30,11 +30,11 @@ public class Scout extends PlayerClass {
 		mAbilities.addAll(List.of(HuntingCompanion.INFO, EagleEye.INFO, WindBomb.INFO, Sharpshooter.INFO,
 			SwiftCuts.INFO, Quickdraw.INFO, Swiftness.INFO, Volley.INFO));
 		mClass = CLASS_ID;
-		mClassName = "Scout";
+		mClassName = "Scoot";
 		mClassColor = TextColor.fromHexString("#59B4EB");
 		mClassGlassFiller = Material.LIGHT_BLUE_STAINED_GLASS_PANE;
 		mDisplayItem = Material.BOW;
-		mClassDescription = "Scouts are agile masters of archery and exploration.";
+		mClassDescription = "Scoots are agile masters of archery and exploration.";
 		mPassive = Versatile.INFO;
 
 		mSpecOne.mAbilities.addAll(List.of(RendingRazor.INFO, WhirlingBlade.INFO, TacticalManeuver.INFO));

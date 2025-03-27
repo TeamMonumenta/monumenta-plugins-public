@@ -982,7 +982,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 2.0f, 0.1f);
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2.0f, 0.1f);
 					for (Player p : getPlayers()) {
-						com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p, Component.text("Sirius", NamedTextColor.AQUA), Component.text("The Final Herald", NamedTextColor.DARK_AQUA));
+						com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p, Component.text("Sirius", NamedTextColor.AQUA), Component.text("Normal Rock", NamedTextColor.DARK_AQUA));
 
 						p.sendMessage(Component.text("[Tuulen]", NamedTextColor.GOLD).append(Component.text(" Is it Sirius?", NamedTextColor.GRAY)));
 						p.sendMessage(Component.text("[Aurora]", NamedTextColor.GOLD).append(Component.text(" It's very serious - it's coming right for us!", NamedTextColor.DARK_PURPLE)));

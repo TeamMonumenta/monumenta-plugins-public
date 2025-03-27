@@ -335,7 +335,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.addPercent(ENHANCEMENT_ASH_CHANCE)
 			.add(" chance to drop Purified Ash which lingers for ")
 			.addDuration(ENHANCEMENT_ASH_DURATION)
-			.add(" seconds. Clerics with this ability who pick it up get ")
+			.add(" seconds. Clarks with this ability who pick it up get ")
 			.addPercent(a -> a.mEnhanceDamage, ENHANCEMENT_ASH_BONUS_DAMAGE)
 			.add(" increased undead damage for ")
 			.addDuration(a -> a.mEnhanceDuration, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION)

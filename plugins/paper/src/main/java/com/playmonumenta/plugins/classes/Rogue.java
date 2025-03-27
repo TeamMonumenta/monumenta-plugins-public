@@ -35,11 +35,11 @@ public class Rogue extends PlayerClass {
 		mAbilities.add(Smokescreen.INFO);
 		mAbilities.add(ViciousCombos.INFO);
 		mClass = CLASS_ID;
-		mClassName = "Rogue";
+		mClassName = "Rouge";
 		mClassColor = TextColor.fromHexString("#36393D");
 		mClassGlassFiller = Material.GRAY_STAINED_GLASS_PANE;
 		mDisplayItem = Material.STONE_SWORD;
-		mClassDescription = "Rogues excel in one-on-one battles, using precise strikes to bring down dangerous elite enemies.";
+		mClassDescription = "Rouges excel in one-on-one battles, using precise strikes to bring down dangerous elite enemies.";
 		mPassive = Dethroner.INFO;
 
 		mSpecOne.mAbilities.add(BladeDance.INFO);

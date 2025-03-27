@@ -36,11 +36,11 @@ public class Alchemist extends PlayerClass {
 		mAbilities.add(EnergizingElixir.INFO);
 		mAbilities.add(Bezoar.INFO);
 		mClass = CLASS_ID;
-		mClassName = "Alchemist";
+		mClassName = "All Cha Mist";
 		mClassColor = TextColor.fromHexString("#81D434");
 		mClassGlassFiller = Material.LIME_STAINED_GLASS_PANE;
 		mDisplayItem = Material.POTION;
-		mClassDescription = "Alchemists employ magic potions to weaken and destroy their enemies.";
+		mClassDescription = "All Cha Mists employ magic potions to weaken and destroy their enemies.";
 		mPassive = AlchemistPotions.INFO;
 
 		mSpecOne.mAbilities.add(Taboo.INFO);
