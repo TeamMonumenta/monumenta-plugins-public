@@ -36,6 +36,7 @@ public class Rogue extends PlayerClass {
 		mAbilities.add(ViciousCombos.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Rouge";
+		mClassPlainName = "Rogue";
 		mClassColor = TextColor.fromHexString("#36393D");
 		mClassGlassFiller = Material.GRAY_STAINED_GLASS_PANE;
 		mDisplayItem = Material.STONE_SWORD;

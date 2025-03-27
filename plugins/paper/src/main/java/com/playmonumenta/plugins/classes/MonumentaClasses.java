@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
 
 public class MonumentaClasses {
+	public static final MonumentaClasses INSTANCE = new MonumentaClasses();
 	public ArrayList<PlayerClass> mClasses = new ArrayList<>();
 	public final ImmutableList<AbilityInfo<?>> mTriggerOrder;
 

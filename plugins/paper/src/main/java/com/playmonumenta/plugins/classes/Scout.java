@@ -31,6 +31,7 @@ public class Scout extends PlayerClass {
 			SwiftCuts.INFO, Quickdraw.INFO, Swiftness.INFO, Volley.INFO));
 		mClass = CLASS_ID;
 		mClassName = "Scoot";
+		mClassPlainName = "Scout";
 		mClassColor = TextColor.fromHexString("#59B4EB");
 		mClassGlassFiller = Material.LIGHT_BLUE_STAINED_GLASS_PANE;
 		mDisplayItem = Material.BOW;

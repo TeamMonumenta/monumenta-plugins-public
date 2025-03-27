@@ -37,6 +37,7 @@ public class Alchemist extends PlayerClass {
 		mAbilities.add(Bezoar.INFO);
 		mClass = CLASS_ID;
 		mClassName = "All Cha Mist";
+		mClassPlainName = "Alchemist";
 		mClassColor = TextColor.fromHexString("#81D434");
 		mClassGlassFiller = Material.LIME_STAINED_GLASS_PANE;
 		mDisplayItem = Material.POTION;

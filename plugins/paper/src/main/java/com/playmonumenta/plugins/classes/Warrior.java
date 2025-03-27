@@ -37,6 +37,7 @@ public class Warrior extends PlayerClass {
 		mAbilities.add(WeaponMastery.INFO);
 		mClass = CLASS_ID;
 		mClassName = "War Roar";
+		mClassPlainName = "Warrior";
 		mClassColor = TextColor.fromHexString("#D32818");
 		mClassGlassFiller = Material.RED_STAINED_GLASS_PANE;
 		mDisplayItem = Material.STONE_AXE;

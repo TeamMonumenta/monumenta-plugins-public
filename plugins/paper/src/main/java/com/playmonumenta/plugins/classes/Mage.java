@@ -36,6 +36,7 @@ public class Mage extends PlayerClass {
 		mAbilities.add(PrismaticShield.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Magie";
+		mClassPlainName = "Mage";
 		mClassColor = TextColor.fromHexString("#A129D3");
 		mClassGlassFiller = Material.PURPLE_STAINED_GLASS_PANE;
 		mDisplayItem = Material.BLAZE_ROD;
