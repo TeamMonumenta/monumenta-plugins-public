@@ -36,13 +36,13 @@ public class Warlock extends PlayerClass {
 		mAbilities.add(SanguineHarvest.INFO);
 		mAbilities.add(SoulRend.INFO);
 		mClass = CLASS_ID;
-		mClassName = "War Luck";
+		mClassName = "Warlock";
 		mClassColor = TextColor.fromHexString("#F0489E");
 		mClassGlassFiller = Material.MAGENTA_STAINED_GLASS_PANE;
 		mDisplayItem = Material.STONE_HOE;
 		mQuestReq = "Quest13";
 		mQuestReqMin = 1;
-		mClassDescription = "War Lucks use scythes in combination with dark magic to bring suffering and death to their enemies.";
+		mClassDescription = "Warlocks use scythes in combination with dark magic to bring suffering and death to their enemies.";
 		mPassive = Culling.INFO;
 
 		mSpecOne.mAbilities.add(DarkPact.INFO);

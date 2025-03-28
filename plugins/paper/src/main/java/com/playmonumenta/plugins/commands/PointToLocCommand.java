@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -79,9 +78,7 @@ public class PointToLocCommand {
 						} else {
 							double length = startpoint.distanceSquared(endpoint);
 							Color helixColor;
-							if (ServerProperties.getShardName().startsWith("valley")) {
-								helixColor = Color.ORANGE;
-							} else if (length < 100 * 100) {
+							if (length < 100 * 100) {
 								helixColor = Color.GREEN;
 							} else if (length < 250 * 250) {
 								helixColor = Color.YELLOW;

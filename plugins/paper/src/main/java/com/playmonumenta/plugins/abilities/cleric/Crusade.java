@@ -100,7 +100,7 @@ public class Crusade extends Ability {
 
 	private static Description<Crusade> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("After being damaged or debuffed by Clark abilities, any mob will count as undead for the next ")
+			.add("After being damaged or debuffed by cleric abilities, any mob will count as undead for the next ")
 			.addDuration(a -> a.mDuration, TAG_DURATION)
 			.add(" seconds.");
 	}

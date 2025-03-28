@@ -89,7 +89,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private static @Nullable ItemStack BRUTAL_POTION = null;
 
 	public static final AbilityInfo<AlchemistPotions> INFO =
-			new AbilityInfo<>(AlchemistPotions.class, "All Cha Mist Potions", AlchemistPotions::new)
+			new AbilityInfo<>(AlchemistPotions.class, "Alchemist Potions", AlchemistPotions::new)
 				.hotbarName("A") // Have this as "A" to make it sorted in front of everything (alphabetically)
 				.linkedSpell(ClassAbility.ALCHEMIST_POTION)
 				.description(getDescription())

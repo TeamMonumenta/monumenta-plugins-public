@@ -39,9 +39,9 @@ public class Shaman extends PlayerClass {
 		mAbilities.add(EarthenTremor.INFO);
 		mAbilities.add(CrystallineCombos.INFO);
 		mClass = CLASS_ID;
-		mClassName = "Ja Man";
+		mClassName = "Shaman";
 		mDisplayItem = Material.TOTEM_OF_UNDYING;
-		mClassDescription = "Ja Men excel in strategic positioning and location defense, using their stationary totems to control the battle.";
+		mClassDescription = "Shamans excel in strategic positioning and location defense, using their stationary totems to control the battle.";
 		mPassive = TotemicEmpowerment.INFO;
 
 		mSpecOne.mAbilities.add(Sanctuary.INFO);

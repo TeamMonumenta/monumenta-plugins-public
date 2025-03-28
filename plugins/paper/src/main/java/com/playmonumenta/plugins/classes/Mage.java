@@ -35,11 +35,11 @@ public class Mage extends PlayerClass {
 		mAbilities.add(ThunderStep.INFO);
 		mAbilities.add(PrismaticShield.INFO);
 		mClass = CLASS_ID;
-		mClassName = "Magie";
+		mClassName = "Mage";
 		mClassColor = TextColor.fromHexString("#A129D3");
 		mClassGlassFiller = Material.PURPLE_STAINED_GLASS_PANE;
 		mDisplayItem = Material.BLAZE_ROD;
-		mClassDescription = "Magies are masters of area control, freezing, wounding, and igniting enemies with their strikes.";
+		mClassDescription = "Mages are masters of area control, freezing, wounding, and igniting enemies with their strikes.";
 		mPassive = Channeling.INFO;
 
 		mSpecOne.mAbilities.add(AstralOmen.INFO);
@@ -49,7 +49,7 @@ public class Mage extends PlayerClass {
 		mSpecOne.mSpecialization = ARCANIST_SPEC_ID;
 		mSpecOne.mSpecName = "Arcanist";
 		mSpecOne.mDisplayItem = Material.DRAGON_BREATH;
-		mSpecOne.mDescription = "Arcanists are Magies that specialize at controlling their skill cooldowns and getting up close.";
+		mSpecOne.mDescription = "Arcanists are mages that specialize at controlling their skill cooldowns and getting up close.";
 
 		mSpecTwo.mAbilities.add(Blizzard.INFO);
 		mSpecTwo.mAbilities.add(ElementalSpiritFire.INFO);

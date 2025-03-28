@@ -62,7 +62,7 @@ public class HandOfLight extends Ability {
 			.scoreboardId("Healing")
 			.shorthandName("HoL")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Heal all players in front of the Clark, and damage all mobs based on the number of Undead in the area.")
+			.simpleDescription("Heal all players in front of the Cleric, and damage all mobs based on the number of Undead in the area.")
 			.cooldown(HEALING_1_COOLDOWN, HEALING_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HandOfLight::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
 				                                                                        .keyOptions(AbilityTrigger.KeyOptions.SNEAK_WITH_SHIELD).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS_EXCEPT_SHIELD)))
@@ -201,7 +201,7 @@ public class HandOfLight extends Ability {
 
 	private static Description<HandOfLight> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("The cone is changed to a sphere of equal range, centered on the Clark. The cooldown is reduced by ")
+			.add("The cone is changed to a sphere of equal range, centered on the Cleric. The cooldown is reduced by ")
 			.addPercent(ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED)
 			.add(" for each 4 health healed, capped at ")
 			.addPercent(ENHANCEMENT_COOLDOWN_REDUCTION_MAX)

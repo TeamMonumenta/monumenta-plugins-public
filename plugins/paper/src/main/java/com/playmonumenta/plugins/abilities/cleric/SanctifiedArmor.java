@@ -207,7 +207,7 @@ public class SanctifiedArmor extends Ability {
 
 	private static Description<SanctifiedArmor> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Whenever you are damaged by melee or projectile hits from an undead enemy, deal true damage to the undead based on its max health. For every 1% health the Clark has above ")
+			.add("Whenever you are damaged by melee or projectile hits from an undead enemy, deal true damage to the undead based on its max health. For every 1% health the Cleric has above ")
 			.addPercent(a -> a.mMinHealthPercent, MIN_HEALTH_PERCENT_1, true, Ability::isLevelOne)
 			.add(" max health, deal 1% of the undead's max health, up to a maximum of ")
 			.addPercent(a -> a.mMaxPercentDamage, MAX_PERCENT_DAMAGE_1, false, Ability::isLevelOne)
@@ -218,7 +218,7 @@ public class SanctifiedArmor extends Ability {
 
 	private static Description<SanctifiedArmor> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("The Clark's health threshold is reduced to ")
+			.add("The Cleric's health threshold is reduced to ")
 			.addPercent(a -> a.mMinHealthPercent, MIN_HEALTH_PERCENT_2, true, Ability::isLevelTwo)
 			.add(", and up to ")
 			.addPercent(a -> a.mMaxPercentDamage, MAX_PERCENT_DAMAGE_2, false, Ability::isLevelTwo)

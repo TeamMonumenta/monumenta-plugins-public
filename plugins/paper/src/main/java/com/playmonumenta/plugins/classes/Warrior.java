@@ -36,11 +36,11 @@ public class Warrior extends PlayerClass {
 		mAbilities.add(Toughness.INFO);
 		mAbilities.add(WeaponMastery.INFO);
 		mClass = CLASS_ID;
-		mClassName = "War Roar";
+		mClassName = "Warrior";
 		mClassColor = TextColor.fromHexString("#D32818");
 		mClassGlassFiller = Material.RED_STAINED_GLASS_PANE;
 		mDisplayItem = Material.STONE_AXE;
-		mClassDescription = "War Roars specialize in melee combat, being able to both deal and survive heavy damage.";
+		mClassDescription = "Warriors specialize in melee combat, being able to both deal and survive heavy damage.";
 		mPassive = Formidable.INFO;
 
 		mSpecOne.mAbilities.add(GloriousBattle.INFO);
