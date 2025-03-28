@@ -37,7 +37,6 @@ public class Warlock extends PlayerClass {
 		mAbilities.add(SoulRend.INFO);
 		mClass = CLASS_ID;
 		mClassName = "War Luck";
-		mClassPlainName = "Warlock";
 		mClassColor = TextColor.fromHexString("#F0489E");
 		mClassGlassFiller = Material.MAGENTA_STAINED_GLASS_PANE;
 		mDisplayItem = Material.STONE_HOE;

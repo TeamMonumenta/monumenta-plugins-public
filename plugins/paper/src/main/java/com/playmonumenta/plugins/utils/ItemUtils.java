@@ -3,8 +3,6 @@ package com.playmonumenta.plugins.utils;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.MonumentaClasses;
-import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
@@ -1136,9 +1134,6 @@ public class ItemUtils {
 			return "";
 		}
 		String plainText = MessagingUtils.plainText(formattedText);
-		for (PlayerClass playerClass : MonumentaClasses.INSTANCE.mClasses) {
-			plainText = plainText.replace(playerClass.mClassName, playerClass.mClassPlainName);
-		}
 		return NON_PLAIN_REGEX.matcher(plainText).replaceAll("").trim();
 	}
 

@@ -259,7 +259,7 @@ public class ClientModHandler {
 			if (playerClass.mAbilities.stream().anyMatch(sameClass)
 				|| playerClass.mSpecOne.mAbilities.stream().anyMatch(sameClass)
 				|| playerClass.mSpecTwo.mAbilities.stream().anyMatch(sameClass)) {
-				return playerClass.mClassPlainName;
+				return playerClass.mClassName;
 			}
 		}
 		return null;

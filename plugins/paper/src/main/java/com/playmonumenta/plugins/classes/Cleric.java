@@ -37,7 +37,6 @@ public class Cleric extends PlayerClass {
 		mAbilities.add(SanctifiedArmor.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Clark";
-		mClassPlainName = "Cleric";
 		mClassColor = TextColor.fromHexString("#FFC644");
 		mClassGlassFiller = Material.YELLOW_STAINED_GLASS_PANE;
 		mDisplayItem = Material.POPPY;

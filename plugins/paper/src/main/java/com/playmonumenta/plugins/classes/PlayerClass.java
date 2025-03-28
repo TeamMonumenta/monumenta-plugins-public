@@ -17,7 +17,6 @@ public abstract class PlayerClass {
 	public List<AbilityInfo<?>> mAbilities = new ArrayList<>();
 	public int mClass;
 	public String mClassName;
-	public String mClassPlainName;
 	public TextColor mClassColor;
 	public Material mClassGlassFiller;
 	public Material mDisplayItem;
