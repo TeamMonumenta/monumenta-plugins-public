@@ -82,11 +82,6 @@ public class PassiveCoreInstability extends Spell {
 			BukkitRunnable runnable = new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (mQuarry.mIsCastingBanish) {
-						this.cancel();
-						cancelChargeUps();
-						return;
-					}
 					if (chargeUp.nextTick()) {
 						castSpell(spell, chargeUp);
 						this.cancel();
@@ -97,7 +92,6 @@ public class PassiveCoreInstability extends Spell {
 			runnable.runTaskTimer(mPlugin, 0, 1);
 			mActiveRunnables.add(runnable);
 		}
-
 	}
 
 	private void castSpell(CoreElemental.CoreElementalBase spell, ChargeUpManager chargeUp) {
