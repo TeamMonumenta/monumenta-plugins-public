@@ -27,6 +27,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
@@ -208,7 +209,7 @@ public class BanishCoreLevitation extends Spell implements CoreElemental.CoreEle
 	}
 
 	@Override
-	public void onHurt(DamageEvent event) {
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
 		// Remove player from banish
 		if (event.getSource() instanceof Player player
 			&& mAffectedPlayers.contains(player)) {
