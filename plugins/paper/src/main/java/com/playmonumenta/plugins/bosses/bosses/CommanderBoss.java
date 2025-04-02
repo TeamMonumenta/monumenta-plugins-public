@@ -57,7 +57,7 @@ public final class CommanderBoss extends BossAbilityGroup {
 
 	@Override
 	public void onHurt(DamageEvent event) {
-		if (!mSummonedReinforcements && mBoss.getHealth() < EntityUtils.getMaxHealth(mBoss) / 2) {
+		if (!mSummonedReinforcements && !EntityUtils.shouldCancelSpells(mBoss) && mBoss.getHealth() < EntityUtils.getMaxHealth(mBoss) / 2) {
 			mSummonedReinforcements = true;
 
 			World world = mBoss.getWorld();
