@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -267,8 +268,12 @@ public class LuckPermsIntegration implements Listener {
 		return result;
 	}
 
-	public static CompletableFuture<@Nullable Group> getGuildByPlotId(long guildPlot) {
+	public static CompletableFuture<@Nullable Group> getGuildByPlotId(@Nullable Long guildPlot) {
 		CompletableFuture<Group> future = new CompletableFuture<>();
+		if (guildPlot == null) {
+			future.complete(null);
+			return future;
+		}
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
 				MetaNode desiredPlotMetaKey = MetaNode.builder(GUILD_ROOT_PLOT_MK, String.valueOf(guildPlot)).build();
@@ -289,6 +294,29 @@ public class LuckPermsIntegration implements Listener {
 			}
 		});
 		return future;
+	}
+
+	public static @Nullable Group getLoadedGuildByPlotId(@Nullable Long guildPlot) {
+		if (guildPlot == null) {
+			return null;
+		}
+		String guildPlotIdStr = String.valueOf(guildPlot);
+
+		for (Group group : getLoadedGroups()) {
+			for (MetaNode metaNode : group.getNodes(NodeType.META)) {
+				if (!GUILD_ROOT_PLOT_MK.equals(metaNode.getMetaKey())) {
+					continue;
+				}
+
+				if (!guildPlotIdStr.equals(metaNode.getMetaValue())) {
+					continue;
+				}
+
+				return group;
+			}
+		}
+
+		return null;
 	}
 
 	public static User getUser(Player player) {
@@ -871,12 +899,22 @@ public class LuckPermsIntegration implements Listener {
 		return result;
 	}
 
+	public static Audience onlineDevOpAudience() {
+		Set<Player> devOps = new HashSet<>();
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (player.hasPermission("group.devops")) {
+				devOps.add(player);
+			}
+		}
+		return Audience.audience(devOps);
+	}
+
 	public static Set<Player> getOnlineGuildInvites(Group guildRoot) {
 		Set<Player> result = new HashSet<>();
 
-		String inheritencePerm = "group." + GuildInviteLevel.GUEST_INVITE.groupNameFromRoot(guildRoot);
+		String inheritancePerm = "group." + GuildInviteLevel.GUEST_INVITE.groupNameFromRoot(guildRoot);
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.hasPermission(inheritencePerm)) {
+			if (player.hasPermission(inheritancePerm)) {
 				result.add(player);
 			}
 		}
@@ -896,9 +934,9 @@ public class LuckPermsIntegration implements Listener {
 				}
 			}
 		} else {
-			String inheritencePerm = "group." + GuildAccessLevel.GUEST.groupNameFromRoot(guildRoot);
+			String inheritancePerm = "group." + GuildAccessLevel.GUEST.groupNameFromRoot(guildRoot);
 			for (Player player : Bukkit.getOnlinePlayers()) {
-				if (player.hasPermission(inheritencePerm)) {
+				if (player.hasPermission(inheritancePerm)) {
 					result.add(player);
 				}
 			}
@@ -971,10 +1009,10 @@ public class LuckPermsIntegration implements Listener {
 
 	// runSync: if true, run method on the thread it's called from
 	public static void setGuildBanner(@Nullable CommandSender sender,
-	                                  Group guild,
-	                                  Plugin plugin,
-	                                  ItemStack guildBanner,
-	                                  boolean runSync) {
+									  Group guild,
+									  Plugin plugin,
+									  ItemStack guildBanner,
+									  boolean runSync) {
 		if (sender == null) {
 			sender = Bukkit.getConsoleSender();
 		}
@@ -1147,23 +1185,61 @@ public class LuckPermsIntegration implements Listener {
 	}
 
 	public static ItemStack getNonNullGuildBanner(Player player) {
-		Group guild = getGuild(player);
-		if (guild == null) {
-			ItemStack item = new ItemStack(Material.BLUE_BANNER);
-			ItemMeta meta = item.getItemMeta();
-			if (meta instanceof BannerMeta bannerMeta) {
-				// https://www.planetminecraft.com/banner/the-earth-408589/
-				bannerMeta.addPattern(new Pattern(DyeColor.LIME, PatternType.GLOBE));
-				bannerMeta.addPattern(new Pattern(DyeColor.GREEN, PatternType.GLOBE));
-				bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.CURLY_BORDER));
-				bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.BORDER));
-				bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_BOTTOM));
-				bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_TOP));
-			}
-			item.setItemMeta(meta);
-			return item;
+		ItemStack guildBanner = getGuildBanner(player);
+		if (guildBanner == null) {
+			return defaultGuildBanner();
 		}
-		return getGuildBanner(guild);
+		return guildBanner;
+	}
+
+	public static @Nullable Group getSelectedGuildPlotGuild(Player player) {
+		return getLoadedGuildByPlotId(
+			(long) ScoreboardUtils.getScoreboardValue(player, GuildPlotUtils.LAST_GUILD_WORLD_OBJECTIVE)
+				.orElse(0)
+		);
+	}
+
+	public static @Nullable ItemStack getSelectedGuildPlotBanner(Player player) {
+		Group selectedGuild = getSelectedGuildPlotGuild(player);
+		if (selectedGuild == null) {
+			return null;
+		}
+		return getGuildBanner(selectedGuild);
+	}
+
+	public static ItemStack getGuildPlotsBanner(Player player) {
+		ItemStack selectedBanner = getSelectedGuildPlotBanner(player);
+		if (selectedBanner == null) {
+			return defaultGuildBanner();
+		}
+		return selectedBanner;
+	}
+
+	public static Component getSelectedGuildPlotName(Player player) {
+		Group selectedGuild = getSelectedGuildPlotGuild(player);
+		if (selectedGuild == null) {
+			return GuildPlotUtils.FALLBACK_WORLD_COMPONENT;
+		}
+		return Component.empty()
+			.append(Component.text("", NamedTextColor.GOLD)
+				.append(getGuildFullComponent(selectedGuild)))
+			.append(Component.text(" Guild Plot"));
+	}
+
+	public static ItemStack defaultGuildBanner() {
+		ItemStack item = new ItemStack(Material.BLUE_BANNER);
+		ItemMeta meta = item.getItemMeta();
+		if (meta instanceof BannerMeta bannerMeta) {
+			// https://www.planetminecraft.com/banner/the-earth-408589/
+			bannerMeta.addPattern(new Pattern(DyeColor.LIME, PatternType.GLOBE));
+			bannerMeta.addPattern(new Pattern(DyeColor.GREEN, PatternType.GLOBE));
+			bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.CURLY_BORDER));
+			bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.BORDER));
+			bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_BOTTOM));
+			bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_TOP));
+		}
+		item.setItemMeta(meta);
+		return item;
 	}
 
 	// This method is not to change the color/plain tag but to re-create and set the colored version.

@@ -44,6 +44,7 @@ import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.TABIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildPermissions;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.Lockdown;
@@ -53,6 +54,7 @@ import com.playmonumenta.plugins.inventories.CharmBagManager;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.inventories.LootChestsInInventory;
 import com.playmonumenta.plugins.inventories.PlayerInventoryView;
+import com.playmonumenta.plugins.inventories.SharedVaultManager;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -69,6 +71,8 @@ import com.playmonumenta.plugins.managers.PlayerTitleManager;
 import com.playmonumenta.plugins.managers.PlaylistManager;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
 import com.playmonumenta.plugins.managers.UsernameManager;
+import com.playmonumenta.plugins.managers.travelanchor.TravelAnchorCommands;
+import com.playmonumenta.plugins.managers.travelanchor.TravelAnchorManager;
 import com.playmonumenta.plugins.market.MarketCommands;
 import com.playmonumenta.plugins.market.MarketListener;
 import com.playmonumenta.plugins.market.MarketManager;
@@ -350,6 +354,7 @@ public class Plugin extends JavaPlugin {
 		DataCollectionCommand.register();
 		ToggleSwap.register();
 		ToggleTrail.register();
+		TravelAnchorCommands.register();
 		UnsignBook.register();
 		UpTimeCommand.register();
 		UpdateChestItems.register();
@@ -510,6 +515,7 @@ public class Plugin extends JavaPlugin {
 		if (!IS_PLAY_SERVER) {
 			manager.registerEvents(NodePlanner.getInstance(), this);
 		}
+		Location spawn = Bukkit.getWorlds().get(0).getSpawnLocation();
 		manager.registerEvents(new AnimalLimits(), this);
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(mPlayerListener, this);
@@ -522,6 +528,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new WorldListener(this), this);
 		manager.registerEvents(new ShulkerShortcutListener(this), this);
 		manager.registerEvents(mShulkerEquipmentListener, this);
+		manager.registerEvents(TravelAnchorManager.getInstance(), this);
 		manager.registerEvents(new ExplosionManager(), this);
 		manager.registerEvents(new LootboxManager(this), this);
 		manager.registerEvents(new PortableEnderListener(), this);
@@ -565,13 +572,15 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(PortalManager.getInstance(), this);
 		manager.registerEvents(new LootingLimiter(), this);
 		manager.registerEvents(new InventoryUpdateListener(), this);
-		WalletManager.initialize(new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
+		GuildPlotUtils.initialize(spawn);
+		WalletManager.initialize(spawn);
 		manager.registerEvents(new WalletManager(), this);
 		CharmBagManager.initialize(new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
 		manager.registerEvents(new CharmBagManager(), this);
 		manager.registerEvents(new CustomContainerItemManager(), this);
 		manager.registerEvents(StatTrackManager.getInstance(), this);
 		manager.registerEvents(new PotionBarrelListener(), this);
+		manager.registerEvents(new SharedVaultManager(), this);
 		manager.registerEvents(TemporaryBlockChangeManager.INSTANCE, this);
 		manager.registerEvents(new TorchListener(), this);
 		manager.registerEvents(new MarketListener(), this);

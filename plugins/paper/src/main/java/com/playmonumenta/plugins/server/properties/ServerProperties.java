@@ -58,6 +58,7 @@ public class ServerProperties {
 	private boolean mInfusionsEnabled = true;
 	private boolean mMasterworkRefundEnabled = false;
 	private boolean mLootBoxEnabled = true;
+	private boolean mSharedVaultEnabled = true;
 	private boolean mShardOpen = true;
 	private int mHTTPStatusPort = 8000;
 
@@ -189,6 +190,10 @@ public class ServerProperties {
 		return INSTANCE.mLootBoxEnabled;
 	}
 
+	public static boolean getSharedVaultEnabled() {
+		return INSTANCE.mSharedVaultEnabled;
+	}
+
 	public static boolean getShardOpen() {
 		return INSTANCE.mShardOpen;
 	}
@@ -296,6 +301,7 @@ public class ServerProperties {
 			mInfusionsEnabled = getPropertyValueBool(object, "infusionsEnabled", mInfusionsEnabled);
 			mMasterworkRefundEnabled = getPropertyValueBool(object, "masterworkRefundEnabled", mMasterworkRefundEnabled);
 			mLootBoxEnabled = getPropertyValueBool(object, "lootBoxEnabled", mLootBoxEnabled);
+			mSharedVaultEnabled = getPropertyValueBool(object, "sharedVaultEnabled", mSharedVaultEnabled);
 			mShardOpen = getPropertyValueBool(object, "shardOpen", mShardOpen);
 			mHTTPStatusPort = getPropertyValueInt(object, "httpStatusPort", mHTTPStatusPort);
 
@@ -372,6 +378,7 @@ public class ServerProperties {
 		out.add("infusionsEnabled = " + mInfusionsEnabled);
 		out.add("masterworkRefundEnabled = " + mMasterworkRefundEnabled);
 		out.add("lootBoxEnabled = " + mLootBoxEnabled);
+		out.add("sharedVaultEnabled = " + mSharedVaultEnabled);
 		out.add("shardOpen = " + mShardOpen);
 		out.add("httpStatusPort = " + mHTTPStatusPort);
 

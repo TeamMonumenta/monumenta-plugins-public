@@ -20,21 +20,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public enum GuildPermission {
-	GUILD_SHOP(
-		"guild_shop",
-		GuildAccessLevel.MANAGER,
-		false,
-		"Manage Guild Shop",
-		"Allows members to manage a guild shop"
-	),
-	MAIL(
-		"mail",
-		GuildAccessLevel.MANAGER,
-		false,
-		"Access Mail",
-		"Allows members to access mail to/from a guild"
-	),
+	// It's safe to re-order these; only affects the order in the GUI
 	CHAT(
+		"chat",
 		"chat",
 		GuildAccessLevel.MEMBER,
 		true,
@@ -43,26 +31,108 @@ public enum GuildPermission {
 	),
 	VISIT(
 		"visit",
+		"visit",
 		GuildAccessLevel.MEMBER,
 		true,
 		"Visit Plot",
-		"Allows guests to visit a guild's plot and guild island"
+		"Allows players to visit a guild's plot and guild island"
 	),
-	/* TODO: Add these once we add move guild plots into worlds, which makes these checks easier
-	ITEMS(
-		"items",
+	VIEW_ITEMS(
+		"view_items",
+		"view_items",
 		GuildAccessLevel.MEMBER,
 		true,
-		"Access Items",
-		"Allows players to interact with items on a guild's plot"
+		"View Items",
+		"Allows players to view items in containers on a guild's plot"
+	),
+	MOVE_ITEMS(
+		"move_items",
+		"move_items",
+		GuildAccessLevel.MEMBER,
+		true,
+		"Move Items",
+		"Allows players to move items in containers on a guild's plot"
 	),
 	SURVIVAL(
+		"survival",
 		"survival",
 		GuildAccessLevel.MEMBER,
 		true,
 		"Survival Mode",
-		"Allows guests to place and break blocks on a guild's plot"
-	),// */
+		"Allows players to place and break blocks on a guild's plot"
+	),
+	USE_TRAVEL_ANCHOR(
+		"use_travel_anchor",
+		"use_travel_anchor",
+		GuildAccessLevel.MEMBER,
+		true,
+		"Use Travel Anchors",
+		"Allows players to make changes to travel anchors"
+	),
+	EDIT_TRAVEL_ANCHOR(
+		"edit_travel_anchor",
+		"edit_travel_anchor",
+		GuildAccessLevel.MEMBER,
+		true,
+		"Edit Travel Anchors",
+		"Allows players to teleport using travel anchors"
+	),
+	USE_VAULT(
+		"use_vault",
+		"use_vault",
+		GuildAccessLevel.MEMBER,
+		true,
+		"Use Vault",
+		"Allows players to use vaults owned by the guild"
+	),
+	EDIT_VAULT_OWNERSHIP(
+		"edit_vault_ownership",
+		"edit_vault_ownership",
+		GuildAccessLevel.MANAGER,
+		false,
+		"Edit Vault Ownership",
+		"Allows members to mark/unmark a vault as owned by the guild"
+	),
+	EGGS(
+		"eggs",
+		"eggs",
+		GuildAccessLevel.MEMBER,
+		false,
+		"Use Eggs and Egginator",
+		"Allows members to use spawn eggs, or an Egginator to pick up purchased entities"
+	),
+	GUILD_SHOP(
+		"guild_shop",
+		"guild_shop",
+		GuildAccessLevel.MANAGER,
+		false,
+		"Manage Guild Shop",
+		"Allows members to manage a guild shop"
+	),
+	MAIL(
+		"mail",
+		"mail",
+		GuildAccessLevel.MANAGER,
+		false,
+		"Access Mail",
+		"Allows members to access mail to/from a guild"
+	),
+	MOVE_SPAWN(
+		"move_spawn",
+		"move_spawn",
+		GuildAccessLevel.MANAGER,
+		false,
+		"Move the Guild Plot Spawn",
+		"Allows members to move your guild plot's spawn location"
+	),
+	CHANGE_TIME(
+		"change_time",
+		"change_time",
+		GuildAccessLevel.MANAGER,
+		false,
+		"Change the Guild Plot's Time",
+		"Allows members to change your guild plot's time of day"
+	),
 	;
 
 	public static final String GUILD_PERM_PREFIX = "guild.perm.";
@@ -79,6 +149,7 @@ public enum GuildPermission {
 	}
 
 	public final String mSubPerm;
+	public final String mArgument;
 	public final GuildAccessLevel mDefaultAccessLevel;
 	public final boolean mGuestPerm;
 	public final String mLabel;
@@ -86,12 +157,14 @@ public enum GuildPermission {
 
 	GuildPermission(
 		String subPerm,
+		String argument,
 		GuildAccessLevel defaultAccessLevel,
 		boolean guestPerm,
 		String label,
 		String description
 	) {
 		mSubPerm = subPerm;
+		mArgument = argument;
 		mDefaultAccessLevel = defaultAccessLevel;
 		mGuestPerm = guestPerm;
 		mLabel = label;
@@ -291,11 +364,14 @@ public enum GuildPermission {
 		return hasAccess(guild, LuckPermsIntegration.getUser(player));
 	}
 
-	public boolean hasAccess(Group guild, PermissionHolder permissionHolder) {
+	public boolean hasAccess(@Nullable Group guild, PermissionHolder permissionHolder) {
 		return checkAccess(guild, permissionHolder).mResult;
 	}
 
-	public GuildPermissionResult checkAccess(Group guild, PermissionHolder permissionHolder) {
+	public GuildPermissionResult checkAccess(@Nullable Group guild, PermissionHolder permissionHolder) {
+		if (guild == null) {
+			return new GuildPermissionResult(null, false);
+		}
 		Boolean value;
 
 		value = getExplicitPermission(guild, permissionHolder);

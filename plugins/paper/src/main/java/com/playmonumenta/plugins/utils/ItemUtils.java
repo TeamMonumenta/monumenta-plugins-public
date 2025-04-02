@@ -1272,7 +1272,14 @@ public class ItemUtils {
 		if (itemStack == null) {
 			return false;
 		}
-		return switch (itemStack.getType()) {
+		return isBanner(itemStack.getType());
+	}
+
+	public static boolean isBanner(@Nullable Material material) {
+		if (material == null) {
+			return false;
+		}
+		return switch (material) {
 			case BLACK_BANNER, BLACK_WALL_BANNER, BLUE_BANNER, BLUE_WALL_BANNER, BROWN_BANNER, BROWN_WALL_BANNER, CYAN_BANNER, CYAN_WALL_BANNER,
 					 GRAY_BANNER, GRAY_WALL_BANNER, GREEN_BANNER, GREEN_WALL_BANNER, LIGHT_BLUE_BANNER, LIGHT_BLUE_WALL_BANNER,
 					 LIGHT_GRAY_BANNER, LIGHT_GRAY_WALL_BANNER, LIME_BANNER, LIME_WALL_BANNER, MAGENTA_BANNER, MAGENTA_WALL_BANNER,

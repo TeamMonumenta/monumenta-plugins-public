@@ -317,7 +317,7 @@ public class CreateGuildCommand {
 						NamedTextColor.WHITE,
 						TextDecoration.BOLD)
 					.append(Component.text(guildName, guildColor)
-						.hoverEvent(guildBanner))
+						.hoverEvent(LuckPermsIntegration.getGuildFullComponent(guildRootGroup)))
 					.append(Component.text("!!"));
 
 				MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] "

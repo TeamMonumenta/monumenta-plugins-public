@@ -267,13 +267,13 @@ public class GuildRecipient implements Recipient {
 	}
 
 	@Override
-	public boolean nonMemberCheck(Player viewer) {
+	public boolean nonMemberCheck(Player viewer, GuildPermission guildPermission) {
 		if (mGuildRoot == null) {
 			return true;
 		}
 
 		User user = LuckPermsIntegration.getUser(viewer);
-		return !GuildPermission.MAIL.hasAccess(mGuildRoot, user);
+		return !guildPermission.hasAccess(mGuildRoot, user);
 	}
 
 	@Override

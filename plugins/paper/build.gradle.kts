@@ -64,7 +64,11 @@ bukkit {
 	apiVersion = "1.19"
 	name = "Monumenta"
 	authors = listOf("The Monumenta Team")
-	depend = listOf("CommandAPI", "ScriptedQuests")
+	depend = listOf(
+		"BKCommonLib",
+		"CommandAPI",
+		"ScriptedQuests"
+	)
 	softDepend = listOf(
 		"NBTAPI",
 		"MonumentaRedisSync",
@@ -74,7 +78,6 @@ bukkit {
 		"CoreProtect",
 		"NBTEditor",
 		"LibraryOfSouls",
-		"BKCommonLib",
 		"MonumentaNetworkChat",
 		"MonumentaNetworkRelay",
 		"PremiumVanish",

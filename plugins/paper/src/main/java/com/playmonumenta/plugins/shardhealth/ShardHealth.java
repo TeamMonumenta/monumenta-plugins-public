@@ -72,7 +72,7 @@ public class ShardHealth implements ComponentLike {
 
 	public static ShardHealth defaultTargetHealth() {
 		return new ShardHealth(
-			0.4,
+			0.3,
 			0.7
 		);
 	}

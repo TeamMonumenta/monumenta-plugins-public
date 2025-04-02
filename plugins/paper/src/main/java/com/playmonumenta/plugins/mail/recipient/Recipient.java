@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.mail.recipient;
 
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.mail.MailGui;
 import com.playmonumenta.plugins.mail.MailGuiSettings;
 import com.playmonumenta.plugins.mail.Mailbox;
@@ -135,9 +136,18 @@ public interface Recipient extends Comparable<Recipient> {
 	/**
 	 * Checks if the viewing player is/is not a member of this recipient (player, member of guild, etc.)
 	 * @param viewer the player viewing this recipient's mail
-	 * @return true if the viewer is neither this recipient nor a member of this recipient
+	 * @return true if the viewer is neither this recipient nor a member of this recipient with mail access
 	 */
-	boolean nonMemberCheck(Player viewer);
+	default boolean nonMemberCheck(Player viewer) {
+		return nonMemberCheck(viewer, GuildPermission.MAIL);
+	}
+
+	/**
+	 * Checks if the viewing player is/is not a member of this recipient (player, member of guild, etc.)
+	 * @param viewer the player request this recipient's permission
+	 * @return true if the viewer is neither this recipient nor a member of this recipient with access
+	 */
+	boolean nonMemberCheck(Player viewer, GuildPermission guildPermission);
 
 	/**
 	 * Checks if this recipient's mail is locked and unable to be interacted with

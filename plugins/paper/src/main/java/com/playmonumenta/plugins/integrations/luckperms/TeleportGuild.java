@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -48,6 +50,11 @@ public class TeleportGuild {
 	}
 
 	private static void run(Player player, @Nullable String guildName) {
+		if (!ServerProperties.getShardName().equals("plots")) {
+			player.sendMessage(Component.text("This command only works on the plots shard", NamedTextColor.RED));
+			return;
+		}
+
 		World world = player.getWorld();
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			User user = LuckPermsIntegration.getUser(player);
@@ -83,7 +90,7 @@ public class TeleportGuild {
 			String actualGuildName = LuckPermsIntegration.getNonNullGuildName(group);
 
 			if (LuckPermsIntegration.isLocked(group)) {
-				if (player.isOp()) {
+				if (player.hasPermission(GuildGui.MOD_GUI_PERMISSION)) {
 					player.sendMessage(Component.text("The guild " + actualGuildName
 						+ " is locked, but your operator status lets you bypass this.", NamedTextColor.GOLD));
 				} else {
@@ -95,7 +102,7 @@ public class TeleportGuild {
 			}
 
 			if (!GuildPermission.VISIT.hasAccess(group, user)) {
-				if (player.isOp()) {
+				if (player.hasPermission(GuildGui.MOD_GUI_PERMISSION)) {
 					player.sendMessage(Component.text("The guild " + actualGuildName
 						+ " has not granted you permission to visit their plot, but your operator status lets you bypass this.", NamedTextColor.GOLD));
 				} else {

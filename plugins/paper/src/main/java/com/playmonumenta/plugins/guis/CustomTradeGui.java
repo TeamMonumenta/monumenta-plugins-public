@@ -78,11 +78,11 @@ public class CustomTradeGui extends Gui {
 	private final int mPebTradeGUITheme = ScoreboardUtils.getScoreboardValue(mPlayer, THEME).orElse(0);
 	// SPACING: 0: auto. 1: force 16. 2: force 28.
 	private final int mPebTradeGUISpacing = ScoreboardUtils.getScoreboardValue(mPlayer, SPACING).orElse(0);
-	// PREVIEWDISPLAY: 0: display price on preview. 1: dont.
+	// PREVIEWDISPLAY: 0: display price on preview. 1: don't.
 	private final int mPebTradeGUIPreviewDisplay = ScoreboardUtils.getScoreboardValue(mPlayer, PREVIEWDISPLAY).orElse(0);
-	// TRADEORG: 0: split trades by type. 1: dont.
+	// TRADEORG: 0: split trades by type. 1: don't.
 	private final int mPebTradeGUITradeOrg = ScoreboardUtils.getScoreboardValue(mPlayer, TRADEORG).orElse(0);
-	// CONFIRM: 0: bring up confirm menu. 1: dont.
+	// CONFIRM: 0: bring up confirm menu. 1: don't.
 	private final int mPebTradeGUIConfirm = ScoreboardUtils.getScoreboardValue(mPlayer, CONFIRM).orElse(0);
 	// QUICKBUY: 0: shift click on preview trade to buy 1. 1: disabled.
 	private final int mPebTradeGUIQuickBuy = ScoreboardUtils.getScoreboardValue(mPlayer, QUICKBUY).orElse(0);
@@ -570,9 +570,8 @@ public class CustomTradeGui extends Gui {
 		setItem(4, 3, backButton).onLeftClick(this::navToGeneralView);
 		// Confirm/Deny Button:
 		if (tradeReq.status() || tradeReq.isCreative()) {
-			setItem(4, 5, createConfirmButton(mSelectedTrade, recipe, tradeReq)).onLeftClick(() -> {
-				buyNow(mSelectedTrade, mSelectedTradeMultiplier);
-			});
+			setItem(4, 5, createConfirmButton(mSelectedTrade, recipe, tradeReq))
+				.onLeftClick(() -> buyNow(mSelectedTrade, mSelectedTradeMultiplier));
 		} else {
 			setItem(4, 5, createConfirmButton(mSelectedTrade, recipe, tradeReq));
 		}
@@ -960,10 +959,10 @@ public class CustomTradeGui extends Gui {
 		tradeItemList.add(trade.getRecipe().getResult());
 		for (ItemStack tradeReq : tradeItemList) {
 			int itemAmount = tradeReq.getAmount();
-			int itemTradeMultipler = 64 / itemAmount;
-			if (itemTradeMultipler < maxTradeMultiplier) {
+			int itemTradeMultiplier = 64 / itemAmount;
+			if (itemTradeMultiplier < maxTradeMultiplier) {
 				// Take the min of all the itemTradeMultipliers.
-				maxTradeMultiplier = itemTradeMultipler;
+				maxTradeMultiplier = itemTradeMultiplier;
 			}
 		}
 		return maxTradeMultiplier;

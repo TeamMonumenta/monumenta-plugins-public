@@ -14,10 +14,28 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.group.Group;
+import net.luckperms.api.node.NodeType;
+import net.luckperms.api.node.types.MetaNode;
+import net.luckperms.api.query.QueryOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
+import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_TP_MK;
+
 public class UpdateGuilds {
+	private static final List<GuildPermission> newPermissions = List.of(
+		GuildPermission.VIEW_ITEMS,
+		GuildPermission.MOVE_ITEMS,
+		GuildPermission.SURVIVAL,
+		GuildPermission.EDIT_VAULT_OWNERSHIP,
+		GuildPermission.USE_VAULT,
+		GuildPermission.EDIT_TRAVEL_ANCHOR,
+		GuildPermission.USE_TRAVEL_ANCHOR,
+		GuildPermission.MOVE_SPAWN,
+		GuildPermission.CHANGE_TIME,
+		GuildPermission.EGGS
+	);
+
 	public static void register(Plugin plugin) {
 		// guild mod update
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.guild.mod.update");
@@ -69,10 +87,26 @@ public class UpdateGuilds {
 							continue;
 						}
 
-						for (GuildPermission guildPermission : GuildPermission.values()) {
+						for (GuildPermission guildPermission : newPermissions) {
 							if (accessLevel.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
 								guildPermission.setExplicitPermission(guildRoot, accessGroup, true).join();
 							}
+						}
+					}
+
+					Group guestGroup = GuildAccessLevel.GUEST.loadGroupFromRoot(guildRoot).join().orElse(null);
+					if (guestGroup == null) {
+						sender.sendMessage(Component.text("- Could not find guest group for " + guildId));
+					} else {
+						boolean foundPlotLocation = false;
+						for (MetaNode node : guestGroup.resolveInheritedNodes(NodeType.META, QueryOptions.nonContextual())) {
+							if (node.getMetaKey().equals(GUILD_TP_MK)) {
+								foundPlotLocation = true;
+								break;
+							}
+						}
+						if (foundPlotLocation) {
+							GuildFlag.OWNS_PLOT.setFlag(guildRoot, true);
 						}
 					}
 

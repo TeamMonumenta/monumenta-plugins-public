@@ -4,25 +4,28 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.PlotsGuildBounds;
 import com.playmonumenta.plugins.integrations.luckperms.TeleportGuildGui;
+import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
 import com.playmonumenta.plugins.plots.ShopManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-import java.util.ArrayList;
+import com.playmonumenta.scriptedquests.zones.Zone;
+import com.playmonumenta.scriptedquests.zones.ZoneManager;
+import com.playmonumenta.scriptedquests.zones.ZoneNamespace;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.event.EventBus;
@@ -43,7 +46,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -58,11 +60,20 @@ import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegrat
 import static com.playmonumenta.plugins.integrations.luckperms.OffDutyCommand.ON_DUTY_PERM_STRING;
 
 public class Lockdown implements Listener {
+	public static String PLOT_ZONE_NAMESPACE_NAME = "Guild Lockdown (Buildable)";
+	public static String MAILBOX_ZONE_NAMESPACE_NAME = "Guild Lockdown (Mailbox)";
+
 	// The presence of a map indicates a guild is locked, even if the map is empty (for non-plots shards)
-	private static final Map<String, Map<UUID, List<BoundingBox>>> mLockedDownAreas = new HashMap<>();
+	private static final ConcurrentSkipListSet<Long> mLockedGuildIds = new ConcurrentSkipListSet<>();
+	private static final Map<String, Map<String, PlotsGuildBounds>> mLockedDownAreas = new HashMap<>();
 	private static final Set<UUID> mTeleportingPlayers = new HashSet<>();
 
 	public Lockdown() {
+		ZoneManager zoneManager = ZoneManager.getInstance();
+		ZoneNamespace plotZoneNamespace = new ZoneNamespace(PLOT_ZONE_NAMESPACE_NAME);
+		zoneManager.registerPluginZoneNamespace(plotZoneNamespace);
+		ZoneNamespace mailboxZoneNamespace = new ZoneNamespace(MAILBOX_ZONE_NAMESPACE_NAME);
+		zoneManager.registerPluginZoneNamespace(mailboxZoneNamespace);
 	}
 
 	public static void registerLuckPermsEvents(Plugin plugin, EventBus eventBus) {
@@ -115,19 +126,26 @@ public class Lockdown implements Listener {
 				}
 				guild = testGuild;
 
-				Map<UUID, List<BoundingBox>> lockedGuildAreas = new HashMap<>();
+				Map<String, PlotsGuildBounds> lockedGuildAreas = new HashMap<>();
 				mLockedDownAreas.put(guild.getName(), lockedGuildAreas);
+				Long guildPlotId = LuckPermsIntegration.getGuildPlotId(guild);
+				if (guildPlotId == null) {
+					MMLog.warning("[Guild Lockdown Kicker] (" + mIterations + "/" + numGuilds + ") Could not get guild's plot ID!");
+				} else {
+					mLockedGuildIds.add(guildPlotId);
+				}
 				if (originalPlotsWorld != null) {
 					final int currentIter = mIterations;
 					MMLog.info("[Guild Lockdown Kicker] (" + currentIter + "/" + numGuilds
 						+ ") Checking guild plot locations...");
 					Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-						List<BoundingBox> boundingBoxes
-							= getOriginalGuildPlotAndIslands(originalPlotsWorld, guild, true).join();
+						PlotsGuildBounds plotsGuildBounds
+							= getOriginalGuildPlotAndIslands(originalPlotsWorld, guild).join();
 						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-							lockedGuildAreas.put(originalPlotsWorld.getUID(), boundingBoxes);
+							lockedGuildAreas.put(originalPlotsWorld.getName(), plotsGuildBounds);
+							refreshZones();
 							MMLog.info("[Guild Lockdown Kicker] (" + currentIter + "/" + numGuilds
-								+ ") Registered guild plot locations...");
+								+ ") Registered guild plot locations.");
 						});
 					});
 				}
@@ -195,8 +213,13 @@ public class Lockdown implements Listener {
 
 			// Identify and delete guild lockdown info for guilds that no longer exist (no need to alert anyone)
 			Set<String> guildIds = new HashSet<>();
+			Set<Long> guildPlotIds = new HashSet<>();
 			for (Group guild : guilds) {
 				guildIds.add(guild.getName());
+				Long guildPlotId = LuckPermsIntegration.getGuildPlotId(guild);
+				if (guildPlotId != null) {
+					guildPlotIds.add(guildPlotId);
+				}
 			}
 			Set<String> deletedGuilds = new HashSet<>(mLockedDownAreas.keySet());
 			deletedGuilds.removeAll(guildIds);
@@ -205,12 +228,19 @@ public class Lockdown implements Listener {
 					mLockedDownAreas.remove(deletedGuild);
 				}
 			});
+			ConcurrentSkipListSet<Long> deletedGuildPlotIds = new ConcurrentSkipListSet<>(mLockedGuildIds);
+			deletedGuildPlotIds.removeAll(guildPlotIds);
+			mLockedGuildIds.removeAll(deletedGuildPlotIds);
 
 			// The rest of these sort out locked/unlocked state as needed
 			for (Group guild : guilds) {
-				Map<UUID, List<BoundingBox>> lockedAreas = mLockedDownAreas.get(guild.getName());
+				Long guildPlotId = LuckPermsIntegration.getGuildPlotId(guild);
+				if (guildPlotId == null) {
+					// Already warned about above
+					continue;
+				}
 
-				boolean wasLocked = lockedAreas != null;
+				boolean wasLocked = mLockedGuildIds.contains(guildPlotId);
 				boolean isLocked = LuckPermsIntegration.isLocked(guild);
 
 				// Unlock guilds that are no longer locked
@@ -227,21 +257,25 @@ public class Lockdown implements Listener {
 	}
 
 	private static void onLockdownStart(Group guild) {
-		Map<UUID, List<BoundingBox>> lockedGuildAreas = new HashMap<>();
+		Map<String, PlotsGuildBounds> lockedGuildAreas = new HashMap<>();
 		mLockedDownAreas.put(guild.getName(), lockedGuildAreas);
+		Long guildPlotId = LuckPermsIntegration.getGuildPlotId(guild);
+		mLockedGuildIds.add(guildPlotId);
 
-		boolean isOriginalPlotsShard = "plots".equals(ServerProperties.getShardName());
 		World originalPlotsWorld;
-		if (isOriginalPlotsShard) {
+		if ("plots".equals(ServerProperties.getShardName())) {
 			originalPlotsWorld = Bukkit.getWorlds().get(0);
 
 			lockOriginalGuildMarketPlot(originalPlotsWorld, guild);
 
 			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-				List<BoundingBox> boundingBoxes
-					= getOriginalGuildPlotAndIslands(originalPlotsWorld, guild, true).join();
+				PlotsGuildBounds plotsGuildBounds
+					= getOriginalGuildPlotAndIslands(originalPlotsWorld, guild).join();
 				Bukkit.getScheduler().runTask(Plugin.getInstance(),
-					() -> lockedGuildAreas.put(originalPlotsWorld.getUID(), boundingBoxes));
+					() -> {
+						lockedGuildAreas.put(originalPlotsWorld.getName(), plotsGuildBounds);
+						refreshZones();
+					});
 			});
 		}
 
@@ -263,6 +297,10 @@ public class Lockdown implements Listener {
 
 	private static void onLockdownEnd(Group guild) {
 		mLockedDownAreas.remove(guild.getName());
+		Long guildPlotId = LuckPermsIntegration.getGuildPlotId(guild);
+		if (guildPlotId != null) {
+			mLockedGuildIds.remove(guildPlotId);
+		}
 		Component unlockMessage = Component.text("A moderator has ended the lockdown for the guild ", NamedTextColor.GOLD)
 			.append(Component.text("", NamedTextColor.WHITE)
 				.append(LuckPermsIntegration.getGuildFullComponent(guild)))
@@ -280,6 +318,7 @@ public class Lockdown implements Listener {
 				0.7f,
 				Constants.Note.FS3.mPitch);
 		}
+		refreshZones();
 	}
 
 	private static void lockOriginalGuildMarketPlot(World originalPlotsWorld, Group guild) {
@@ -329,46 +368,73 @@ public class Lockdown implements Listener {
 	}
 
 	private static void checkPlayerLockout(Player player, Group guild, boolean hasNotSeenMessage) {
-		Map<UUID, List<BoundingBox>> lockedAreas = mLockedDownAreas.get(guild.getName());
-		if (lockedAreas == null) {
-			// This must be empty but not null if the guild is locked
+		if (!LuckPermsIntegration.isLocked(guild)) {
 			return;
 		}
+
+		Map<String, PlotsGuildBounds> lockedAreas = mLockedDownAreas.get(guild.getName());
 
 		boolean requiresMessage = hasNotSeenMessage && player.hasPermission("group." + guild.getName());
 		boolean requiresTp = false;
 		Location playerLocation = player.getLocation();
 		Location spawnLocation = player.getRespawnLocation();
 
-		Set<UUID> checkedWorldIds = new HashSet<>();
-		checkedWorldIds.add(playerLocation.getWorld().getUID());
+		Set<String> checkedWorldNames = new HashSet<>();
+		checkedWorldNames.add(playerLocation.getWorld().getName());
 		if (spawnLocation != null) {
-			checkedWorldIds.add(spawnLocation.getWorld().getUID());
+			checkedWorldNames.add(spawnLocation.getWorld().getName());
 		}
 
-		for (Map.Entry<UUID, List<BoundingBox>> lockedAreaEntry : lockedAreas.entrySet()) {
-			UUID worldId = lockedAreaEntry.getKey();
-			if (!checkedWorldIds.contains(worldId)) {
-				continue;
-			}
-
-			for (BoundingBox guildPlotOrIsland : lockedAreaEntry.getValue()) {
-				if (worldId.equals(playerLocation.getWorld().getUID())
-					&& guildPlotOrIsland.overlaps(player.getBoundingBox())) {
-					requiresTp = true;
+		// On the plots shard
+		if (lockedAreas != null) {
+			for (Map.Entry<String, PlotsGuildBounds> lockedAreaEntry : lockedAreas.entrySet()) {
+				String worldName = lockedAreaEntry.getKey();
+				if (!checkedWorldNames.contains(worldName)) {
+					continue;
 				}
 
-				if (spawnLocation != null
-					&& worldId.equals(spawnLocation.getWorld().getUID())
-					&& guildPlotOrIsland.contains(spawnLocation.toVector())) {
-					player.setRespawnLocation(null);
+				for (BoundingBox guildPlotOrIsland : lockedAreaEntry.getValue().allBbs()) {
+					if (worldName.equals(playerLocation.getWorld().getName())
+						&& guildPlotOrIsland.overlaps(player.getBoundingBox())) {
+						requiresTp = true;
+					}
+
+					if (spawnLocation != null
+						&& worldName.equals(spawnLocation.getWorld().getName())
+						&& guildPlotOrIsland.contains(spawnLocation.toVector())) {
+						player.setRespawnLocation(null);
+					}
 				}
 			}
 		}
 
-		if (requiresTp && !player.isOp()) {
-			mTeleportingPlayers.add(player.getUniqueId());
-			player.teleport(player.getWorld().getSpawnLocation());
+		// On the guildplots shard
+		Long guildPlotId = LuckPermsIntegration.getGuildPlotId(guild);
+		if (
+			ServerProperties.getShardName().startsWith(GuildPlotUtils.SHARD_NAME)
+			&& guildPlotId != null
+		) {
+			String guildPlotWorldName = GuildPlotUtils.guildPlotName(guildPlotId);
+			if (spawnLocation != null && guildPlotWorldName.equals(spawnLocation.getWorld().getName())) {
+				player.setRespawnLocation(null);
+			}
+			requiresTp |= playerLocation.getWorld().getName().equals(guildPlotWorldName);
+		}
+
+		if (requiresTp) {
+			if (player.hasPermission(GuildGui.MOD_GUI_PERMISSION)) {
+				player.sendMessage(Component.text(
+					"Your operator status allows you to stay in this locked guild plot.",
+					NamedTextColor.RED
+				));
+			} else {
+				mTeleportingPlayers.add(player.getUniqueId());
+				if (ServerProperties.getShardName().startsWith(GuildPlotUtils.SHARD_NAME)) {
+					GuildPlotUtils.sendGuildPlotFallbackWorld(player, false);
+				} else {
+					player.teleport(player.getWorld().getSpawnLocation());
+				}
+			}
 		}
 		if (requiresMessage || requiresTp) {
 			player.sendMessage(getLockdownMessage(guild));
@@ -383,182 +449,82 @@ public class Lockdown implements Listener {
 		}
 	}
 
-	public static CompletableFuture<List<BoundingBox>> getOriginalGuildPlotAndIslands(
+	public static CompletableFuture<@Nullable PlotsGuildBounds> getOriginalGuildPlotAndIslands(
 		World originalPlotsWorld,
-		Group guild,
-		boolean lockArea
+		Group guild
 	) {
-		CompletableFuture<List<BoundingBox>> future = new CompletableFuture<>();
+		CompletableFuture<@Nullable PlotsGuildBounds> future = new CompletableFuture<>();
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			List<BoundingBox> result = new ArrayList<>();
+			PlotsGuildBounds plotsGuildBounds = PlotsGuildBounds.getGuildBounds(originalPlotsWorld, guild).join();
+			if (plotsGuildBounds == null) {
+				future.complete(null);
+				return;
+			}
 
-			Optional<Location> optGuildPlotEntrance = getAlignedPlotEntrance(originalPlotsWorld, guild).join();
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-				if (optGuildPlotEntrance.isEmpty()) {
-					future.complete(result);
-					return;
-				}
-				Location guildPlotEntrance = optGuildPlotEntrance.get();
+				// Get door bounding box
+				BoundingBox doorBb = plotsGuildBounds.doorBb();
 
-				Vector plotDirection = VectorUtils.nearestCardinalDirection(guildPlotEntrance.getDirection());
-				Vector plotSidewaysDirection = VectorUtils.swapXZAxes(plotDirection);
-
-				// Prepare to locate the corner
-				Location plotCornerA = new Location(guildPlotEntrance.getWorld(),
-					guildPlotEntrance.getX(),
-					10.0,
-					guildPlotEntrance.getZ(),
-					guildPlotEntrance.getYaw(),
-					0.0f)
-					.add(plotDirection.clone().multiply(5));
-
-				// Find back side of sponge
-				while (true) {
-					Location testLoc = plotCornerA.clone().add(plotDirection);
-					if (!testLoc.getBlock().getType().equals(Material.SPONGE)) {
-						break;
-					}
-					plotCornerA = testLoc;
-				}
-
-				// Find back corner of sponge
-				while (true) {
-					Location testLoc = plotCornerA.clone().add(plotSidewaysDirection);
-					if (!testLoc.getBlock().getType().equals(Material.SPONGE)) {
-						break;
-					}
-					plotCornerA = testLoc;
-				}
-
-				// Extend a block beyond barrier in case anyone's clipping inside
-				plotCornerA
-					.add(plotDirection.clone().multiply(2))
-					.add(plotSidewaysDirection.clone().multiply(2));
-
-				// Include the box just outside the sponge for the door, plus a block
-				Location plotCornerB = plotCornerA.clone()
-					.add(plotDirection.clone().multiply(-40))
-					.add(plotSidewaysDirection.clone().multiply(-34));
-				BoundingBox originalGuildPlot = new BoundingBox(plotCornerA.getX(),
-					10.0,
-					plotCornerA.getZ(),
-					plotCornerB.getX(),
-					152.0,
-					plotCornerB.getZ())
-					// Plus 1 to include the full blocks
-					.expand(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
-
-				result.add(originalGuildPlot);
-
-				if (lockArea) {
-					// Get door bounding box
-					Vector doorCornerA = plotCornerA.toVector().clone()
-						.add(plotDirection.clone().multiply(-39))
-						.add(plotSidewaysDirection.clone().multiply(-15));
-					Vector doorCornerB = plotCornerA.toVector().clone()
-						.add(plotDirection.clone().multiply(-39))
-						.add(plotSidewaysDirection.clone().multiply(-19));
-					BoundingBox originalGuildPlotDoor = new BoundingBox(doorCornerA.getX(),
-						99.0,
-						doorCornerA.getZ(),
-						doorCornerB.getX(),
-						103.0,
-						doorCornerB.getZ())
-						// Plus 1 to include the full blocks
-						.expand(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
-
-					for (int x = (int) originalGuildPlotDoor.getMinX(); x < originalGuildPlotDoor.getMaxX(); x++) {
-						for (int z = (int) originalGuildPlotDoor.getMinZ(); z < originalGuildPlotDoor.getMaxZ(); z++) {
-							for (int y = (int) originalGuildPlotDoor.getMinY(); y < originalGuildPlotDoor.getMaxY(); y++) {
-								originalPlotsWorld.setBlockData(x, y, z, Material.BARRIER.createBlockData());
-							}
+				for (int x = (int) doorBb.getMinX(); x < doorBb.getMaxX(); x++) {
+					for (int z = (int) doorBb.getMinZ(); z < doorBb.getMaxZ(); z++) {
+						for (int y = (int) doorBb.getMinY(); y < doorBb.getMaxY(); y++) {
+							originalPlotsWorld.setBlockData(x, y, z, Material.BARRIER.createBlockData());
 						}
 					}
 				}
-
-				for (Entity entity : originalPlotsWorld.getNearbyEntities(originalGuildPlot)) {
-					if (!(entity instanceof Villager) || !"Lectros".equals(MessagingUtils.plainText(entity.customName()))) {
-						continue;
-					}
-					OptionalInt optX = ScoreboardUtils.getScoreboardValue(entity, "plotx");
-					OptionalInt optZ = ScoreboardUtils.getScoreboardValue(entity, "plotz");
-
-					if (optX.isEmpty() || optZ.isEmpty()) {
-						continue;
-					}
-
-					BoundingBox guildIsland = getGuildIslandBB(originalPlotsWorld, optX.getAsInt(), optZ.getAsInt());
-					if (guildIsland != null) {
-						result.add(guildIsland);
-					}
-				}
-
-				future.complete(result);
+				future.complete(plotsGuildBounds);
 			});
 		});
 		return future;
 	}
 
-	private static CompletableFuture<Optional<Location>> getAlignedPlotEntrance(World originalPlotsWorld, Group guild) {
-		CompletableFuture<Optional<Location>> future = new CompletableFuture<>();
-
+	private static void refreshZones() {
 		if (!"plots".equals(ServerProperties.getShardName())) {
-			future.complete(Optional.empty());
-			return future;
+			return;
 		}
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			Optional<Location> optGuildPlotEntrance = LuckPermsIntegration.getGuildTp(originalPlotsWorld, guild).join();
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-				if (optGuildPlotEntrance.isEmpty()) {
-					future.complete(Optional.empty());
-					return;
+		ZoneManager zoneManager = ZoneManager.getInstance();
+		ZoneNamespace plotZoneNamespace = new ZoneNamespace(PLOT_ZONE_NAMESPACE_NAME);
+		ZoneNamespace mailboxZoneNamespace = new ZoneNamespace(MAILBOX_ZONE_NAMESPACE_NAME);
+
+		int lockdownBoxNum = 1;
+		for (Map<String, PlotsGuildBounds> guildLockdownEntry : mLockedDownAreas.values()) {
+			for (Map.Entry<String, PlotsGuildBounds> worldEntries : guildLockdownEntry.entrySet()) {
+				String worldName = worldEntries.getKey();
+				String escapedWorldName = Pattern.quote(worldName);
+				PlotsGuildBounds plotsGuildBounds = worldEntries.getValue();
+
+				for (BoundingBox bb : plotsGuildBounds.allBuildable()) {
+					Zone zone = new Zone(
+						plotZoneNamespace,
+						escapedWorldName,
+						bb.getMin(),
+						// Zones add this back in automatically
+						bb.getMax().subtract(new Vector(1.0, 1.0, 1.0)),
+						"Buildable Lockdown Bounding Box " + lockdownBoxNum,
+						Set.of("On Lockdown")
+					);
+					plotZoneNamespace.addZone(zone);
+					lockdownBoxNum++;
 				}
-				Location guildPlotEntrance = optGuildPlotEntrance.get();
 
-				// Force block coordinates and direction to cardinal direction (can otherwise be off a few degrees)
-				int yaw = (Math.floorMod((int) guildPlotEntrance.getYaw() + 45, 360) / 90) * 90;
-				future.complete(Optional.of(new Location(originalPlotsWorld,
-					guildPlotEntrance.getBlockX(),
-					guildPlotEntrance.getBlockY(),
-					guildPlotEntrance.getBlockZ(),
-					yaw,
-					0.0f)));
-			});
-		});
-
-		return future;
-	}
-
-	private static @Nullable BoundingBox getGuildIslandBB(World world, int x, int z) {
-		Location start = new Location(world, x, 10, z);
-
-		if (!start.getBlock().getType().equals(Material.SPONGE)) {
-			return null;
+				for (BoundingBox bb : plotsGuildBounds.mailboxBbs()) {
+					Zone zone = new Zone(
+						mailboxZoneNamespace,
+						escapedWorldName,
+						bb.getMin(),
+						// Zones add this back in automatically
+						bb.getMax().subtract(new Vector(1.0, 1.0, 1.0)),
+						"Mailbox Lockdown Bounding Box " + lockdownBoxNum,
+						Set.of("On Lockdown")
+					);
+					mailboxZoneNamespace.addZone(zone);
+					lockdownBoxNum++;
+				}
+			}
 		}
 
-		int minX = x;
-		while (new Location(world, minX - 1, 10, z).getBlock().getType().equals(Material.SPONGE)) {
-			minX--;
-		}
-
-		int maxX = x;
-		while (new Location(world, maxX + 1, 10, z).getBlock().getType().equals(Material.SPONGE)) {
-			maxX++;
-		}
-
-		int minZ = z;
-		while (new Location(world, x, 10, minZ - 1).getBlock().getType().equals(Material.SPONGE)) {
-			minZ--;
-		}
-
-
-		int maxZ = z;
-		while (new Location(world, x, 10, maxZ + 1).getBlock().getType().equals(Material.SPONGE)) {
-			maxZ++;
-		}
-
-		// Include the block beyond the barrier around the guild island
-		return new BoundingBox(minX - 2, 10.0, minZ - 2, maxX + 3, 153.0, maxZ + 3);
+		zoneManager.replacePluginZoneNamespace(plotZoneNamespace);
+		zoneManager.replacePluginZoneNamespace(mailboxZoneNamespace);
 	}
 }

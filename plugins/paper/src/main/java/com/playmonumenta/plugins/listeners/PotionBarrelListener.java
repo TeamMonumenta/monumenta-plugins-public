@@ -66,9 +66,9 @@ public class PotionBarrelListener implements Listener {
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		Inventory barrelInventory = event.getInventory();
 		if (!(barrelInventory.getType() == InventoryType.BARREL
-				&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
-				&& isPotionBarrel(blockInventoryHolder.getBlock())
-				&& event.getWhoClicked() instanceof Player player)) {
+			&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
+			&& isPotionBarrel(blockInventoryHolder.getBlock())
+			&& event.getWhoClicked() instanceof Player player)) {
 			return;
 		}
 		if (event.getClick() == ClickType.UNKNOWN) {
@@ -138,7 +138,7 @@ public class PotionBarrelListener implements Listener {
 				case LEFT, RIGHT -> {
 					// Take a potion onto the cursor, or deposit one from the cursor
 					event.setCancelled(true);
-					if (cursorItem != null && cursorItem.getType() != Material.AIR) {
+					if (cursorItem.getType() != Material.AIR) {
 						if (ItemUtils.isSomePotion(cursorItem)) {
 							ItemStack barrelPotion = getBarrelPotion(barrelInventory);
 							if (barrelPotion == null || barrelPotion.isSimilar(cursorItem)) {
@@ -230,9 +230,9 @@ public class PotionBarrelListener implements Listener {
 	public void inventoryDragEvent(InventoryDragEvent event) {
 		Inventory barrelInventory = event.getInventory();
 		if (!(barrelInventory.getType() == InventoryType.BARREL
-				&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
-				&& isPotionBarrel(blockInventoryHolder.getBlock())
-				&& event.getWhoClicked() instanceof Player player)) {
+			&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
+			&& isPotionBarrel(blockInventoryHolder.getBlock())
+			&& event.getWhoClicked() instanceof Player player)) {
 			return;
 		}
 		if (event.getRawSlots().stream().allMatch(slot -> event.getView().getInventory(slot) == player.getInventory())) {
@@ -271,8 +271,8 @@ public class PotionBarrelListener implements Listener {
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		Block clickedBlock = event.getClickedBlock();
 		if (event.getAction() == Action.LEFT_CLICK_BLOCK
-				&& clickedBlock != null
-				&& isPotionBarrel(clickedBlock)) {
+			&& clickedBlock != null
+			&& isPotionBarrel(clickedBlock)) {
 			Barrel barrel = (Barrel) clickedBlock.getState(false);
 			Player player = event.getPlayer();
 			PlayerInventory playerInventory = player.getInventory();
@@ -280,7 +280,7 @@ public class PotionBarrelListener implements Listener {
 			if (ShulkerShortcutListener.isPurpleTesseract(playerInventory.getItemInMainHand())) {
 				if (!player.hasPermission(PERMISSION_PURPLE_TESSERACT)) {
 					player.sendMessage(ItemUtils.getDisplayName(playerInventory.getItemInMainHand())
-							.append(Component.text(" has been disabled due to a bug", NamedTextColor.RED)));
+						.append(Component.text(" has been disabled due to a bug", NamedTextColor.RED)));
 					errorSound(player);
 					event.setCancelled(true);
 					return;
@@ -470,10 +470,10 @@ public class PotionBarrelListener implements Listener {
 					int added = addToBarrel(barrelInventory, playerItem);
 					totalAdded += added;
 				} else if (ShulkerEquipmentListener.isPotionInjectorItem(playerItem)
-						&& playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
-						&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+					&& playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
+					&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
 					if (InventoryUtils.numEmptySlots(shulkerBox.getInventory()) > 0
-							&& Arrays.stream(shulkerBox.getInventory().getContents()).anyMatch(barrelPotion::isSimilar)) {
+						&& Arrays.stream(shulkerBox.getInventory().getContents()).anyMatch(barrelPotion::isSimilar)) {
 						injectorRefilled += takeAll(barrelInventory, shulkerBox.getInventory());
 						blockStateMeta.setBlockState(shulkerBox);
 						playerItem.setItemMeta(blockStateMeta);
@@ -484,9 +484,9 @@ public class PotionBarrelListener implements Listener {
 						}
 					}
 				} else if ((ShulkerShortcutListener.isPurpleTesseractContainer(playerItem)
-						|| (ItemUtils.isShulkerBox(playerItem.getType()) && !ShulkerShortcutListener.isRestrictedShulker(playerItem)))
-						&& playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
-						&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+					|| (ItemUtils.isShulkerBox(playerItem.getType()) && !ShulkerShortcutListener.isRestrictedShulker(playerItem)))
+					&& playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
+					&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
 					boolean changed = false;
 					for (ItemStack shulkerItem : shulkerBox.getInventory()) {
 						if (shulkerItem != null && shulkerItem.isSimilar(barrelPotion)) {
@@ -532,10 +532,11 @@ public class PotionBarrelListener implements Listener {
 	public void inventoryMoveItemEvent(InventoryMoveItemEvent event) {
 		Inventory barrelInventory = event.getDestination();
 		if (!(barrelInventory.getType() == InventoryType.BARREL
-				&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
-				&& isPotionBarrel(blockInventoryHolder.getBlock()))) {
+			&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
+			&& isPotionBarrel(blockInventoryHolder.getBlock()))) {
 			return;
 		}
+
 		// Cancel dropper item transfer events
 		event.setCancelled(true);
 	}
@@ -619,7 +620,7 @@ public class PotionBarrelListener implements Listener {
 		ItemStack carrier = new ItemStack(festive ? Material.GREEN_SHULKER_BOX : Material.PURPLE_SHULKER_BOX);
 		BlockStateMeta meta = (BlockStateMeta) carrier.getItemMeta();
 		meta.displayName(Component.text(festive ? "Carrier of Festivity" : "Carrier of Emotion", festive ? NamedTextColor.RED : NamedTextColor.DARK_PURPLE)
-				.decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			.decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 		ShulkerBox shulkerBox = (ShulkerBox) meta.getBlockState();
 		for (int i = 0; i < num; i++) {
 			ItemStack singlePotion = ItemUtils.clone(potion);
@@ -647,7 +648,7 @@ public class PotionBarrelListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
 		if (isPotionBarrel(event.getBlock())
-				&& !((Barrel) event.getBlock().getState()).getInventory().isEmpty()) {
+			&& !((Barrel) event.getBlock().getState()).getInventory().isEmpty()) {
 			event.setCancelled(true);
 			event.getPlayer().sendMessage(Component.text("You cannot break a filled " + POTION_BARREL_NAME + "! Empty it first.", NamedTextColor.RED));
 		}
@@ -656,7 +657,7 @@ public class PotionBarrelListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
 		if (isPotionBarrel(event.getBlock())
-				&& !isValidShard()) {
+			&& !isValidShard()) {
 			event.setCancelled(true);
 		}
 	}
@@ -675,24 +676,25 @@ public class PotionBarrelListener implements Listener {
 
 	private static boolean isPotionBarrel(Block block) {
 		return block.getType() == Material.BARREL
-				&& isPotionBarrel(block.getState());
+			&& isPotionBarrel(block.getState());
 	}
 
 	private static boolean isPotionBarrel(BlockState blockState) {
 		return blockState instanceof Barrel barrel
-				&& barrel.customName() != null
-				&& POTION_BARREL_NAME.equals(MessagingUtils.plainText(barrel.customName()));
+			&& barrel.customName() != null
+			&& POTION_BARREL_NAME.equals(MessagingUtils.plainText(barrel.customName()));
 	}
 
 	private static boolean isValidShard() {
 		return ServerProperties.getShardName().equals("playerplots")
-				|| ServerProperties.getShardName().startsWith("dev")
-				|| ServerProperties.getShardName().equals("plots");
+			|| ServerProperties.getShardName().equals("guildplots")
+			|| ServerProperties.getShardName().startsWith("dev")
+			|| ServerProperties.getShardName().equals("plots");
 	}
 
 	private static boolean isShopLocation(Location location) {
 		return ServerProperties.getShardName().equals("plots")
-				&& ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE);
+			&& ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE);
 	}
 
 }

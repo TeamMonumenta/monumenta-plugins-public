@@ -65,7 +65,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -1952,12 +1951,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 										mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
 										for (Player player : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											if (
-												player.getGameMode() != GameMode.CREATIVE
-													&& player.getGameMode() != GameMode.SPECTATOR
-											) {
-												ZoneUtils.setExpectedGameMode(player);
-											}
+											ZoneUtils.setExpectedGameMode(player, true);
 										}
 									}
 									mT++;

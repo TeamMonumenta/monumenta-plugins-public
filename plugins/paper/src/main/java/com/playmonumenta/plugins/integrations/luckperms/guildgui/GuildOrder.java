@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
@@ -16,11 +17,12 @@ import java.util.function.Function;
 import net.kyori.adventure.text.Component;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 // Order of enum values determines order displayed in GUI; first entry is default
 // Up to 9 entries may be defined (corresponding to the 9 hotbar slots)
 public enum GuildOrder {
-	TAG("[Guild Tag]",
+	TAG("[Guild Tag]", false,
 		(PlayerGuildInfo guildInfo) -> {
 			CompletableFuture<String> future = new CompletableFuture<>();
 
@@ -41,7 +43,7 @@ public enum GuildOrder {
 
 			return future;
 		}),
-	NAME("Guild Name",
+	NAME("Guild Name", false,
 		(PlayerGuildInfo guildInfo) -> {
 			CompletableFuture<String> future = new CompletableFuture<>();
 
@@ -61,7 +63,7 @@ public enum GuildOrder {
 
 			return future;
 		}),
-	COUNT("Member Count",
+	COUNT("Member Count", false,
 		(PlayerGuildInfo guildInfo) -> {
 			CompletableFuture<String> future = new CompletableFuture<>();
 
@@ -98,17 +100,51 @@ public enum GuildOrder {
 			});
 
 			return future;
-		});
+		}),
+	PLOT_ID("Plot ID", true,
+		(PlayerGuildInfo guildInfo) -> {
+			CompletableFuture<String> future = new CompletableFuture<>();
+
+			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+				Group guild = guildInfo.getGuild();
+				Long plotNumber = LuckPermsIntegration.getGuildPlotId(guild);
+				if (plotNumber == null) {
+					plotNumber = 0L;
+				}
+				String plotNumberStr = String.format("%016x", plotNumber);
+				try {
+					Component guildFullComponent = LuckPermsIntegration.getGuildFullComponent(guild);
+					String guildFullPlainString = MessagingUtils.plainText(guildFullComponent);
+					future.complete(plotNumberStr + StringUtils.getNaturalSortKey(guildFullPlainString));
+				} catch (Exception ex) {
+					Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+						MMLog.warning("Exception sorting guild " + guild.getName() + " with sort type TAG");
+						MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
+					});
+					future.complete(plotNumberStr + "~ERROR " + guild.getName());
+				}
+			});
+
+			return future;
+		}),
+	;
 
 	public final String mName;
+	public final boolean mModOnly;
 	private final Function<PlayerGuildInfo, CompletableFuture<String>> mSortMethod;
 
-	GuildOrder(String name, Function<PlayerGuildInfo, CompletableFuture<String>> sortMethod) {
+	GuildOrder(String name, boolean modOnly, Function<PlayerGuildInfo, CompletableFuture<String>> sortMethod) {
 		mName = name;
+		mModOnly = modOnly;
 		mSortMethod = sortMethod;
 	}
 
 	public static GuildOrder DEFAULT = TAG;
+
+	public static List<GuildOrder> visibleGuildOrders(Player player) {
+		boolean maySeeModOnly = player.hasPermission(GuildGui.MOD_GUI_PERMISSION);
+		return Arrays.stream(values()).filter(guildOrder -> maySeeModOnly || !guildOrder.mModOnly).toList();
+	}
 
 	// Must always be unique for different guilds
 	public CompletableFuture<String> sortKey(PlayerGuildInfo guildInfo) {

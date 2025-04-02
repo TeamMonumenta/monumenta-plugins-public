@@ -88,7 +88,7 @@ public class ShardHealthManager {
 	public static CompletableFuture<Void> awaitShardHealth(@Nullable Audience audience) {
 		return awaitShardHealth(
 			audience,
-			0.3,
+			0.2,
 			ShardHealth.defaultTargetHealth(),
 			10L, // Maintain health for half a second
 			10 // Average over half a second

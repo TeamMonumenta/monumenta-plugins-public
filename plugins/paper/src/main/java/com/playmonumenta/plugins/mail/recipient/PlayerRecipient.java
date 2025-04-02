@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.mail.recipient;
 
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.mail.NoMailAccessException;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -178,7 +179,7 @@ public class PlayerRecipient implements Recipient {
 	}
 
 	@Override
-	public boolean nonMemberCheck(Player viewer) {
+	public boolean nonMemberCheck(Player viewer, GuildPermission guildPermission) {
 		return !viewer.getUniqueId().equals(mPlayerId);
 	}
 

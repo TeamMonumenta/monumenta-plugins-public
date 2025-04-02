@@ -2,12 +2,15 @@ package com.playmonumenta.plugins.integrations.luckperms.listeners;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.Gui;
+import com.playmonumenta.plugins.integrations.luckperms.GuildFlag;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.TeleportGuildGui;
 import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
 import com.playmonumenta.plugins.mail.MailMan;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -74,7 +77,7 @@ public class GuildPermissions implements Listener {
 				if (guildId == null || guildPermission == null) {
 					return;
 				}
-				refreshPermissions(user, guildId, guildPermission, false);
+				refreshPermissions(user, guildId, guildPermission);
 			}
 		}
 	}
@@ -102,7 +105,7 @@ public class GuildPermissions implements Listener {
 				if (guildId == null || guildPermission == null) {
 					return;
 				}
-				refreshPermissions(user, guildId, guildPermission, true);
+				refreshPermissions(user, guildId, guildPermission);
 			}
 		}
 	}
@@ -128,6 +131,7 @@ public class GuildPermissions implements Listener {
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		mUserData.computeIfAbsent(event.getPlayer().getUniqueId(), k -> new ConcurrentHashMap<>());
 		refreshPermissions(event.getPlayer());
+		kickFromInaccessibleGuildPlots(event.getPlayer());
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -144,14 +148,14 @@ public class GuildPermissions implements Listener {
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				User user = LuckPermsIntegration.getUser(player);
 				if (user.getInheritedGroups(QueryOptions.defaultContextualOptions()).contains(guildRoot)) {
-					boolean hasAccess = guildPermission.hasAccess(guildRoot, user);
-					refreshPermissions(user, guildRoot.getName(), guildPermission, hasAccess);
+					refreshPermissions(user, guildRoot.getName(), guildPermission);
 				}
 			}
 		});
 	}
 
-	public static void refreshPermissions(User user, String guildId, GuildPermission guildPermission, boolean isEnabled) {
+	public static void refreshPermissions(User user, String guildId, GuildPermission guildPermission) {
+		Group guild = LuckPermsIntegration.loadGroup(guildId).join().orElse(null);
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			UUID playerId = user.getUniqueId();
 			Player player = Bukkit.getPlayer(playerId);
@@ -161,7 +165,7 @@ public class GuildPermissions implements Listener {
 			ConcurrentSkipListSet<GuildPermission> guildPermissions = mUserData
 				.computeIfAbsent(playerId, k -> new ConcurrentHashMap<>())
 				.computeIfAbsent(guildId, k -> new ConcurrentSkipListSet<>());
-			if (isEnabled) {
+			if (guildPermission.hasAccess(guild, user)) {
 				if (guildPermissions.add(guildPermission)) {
 					applyPermissionChange(player, guildId, guildPermission, true);
 				}
@@ -251,9 +255,55 @@ public class GuildPermissions implements Listener {
 			if (openGui instanceof TeleportGuildGui teleportGuildGui) {
 				teleportGuildGui.refresh();
 			}
+			kickFromInaccessibleGuildPlots(player);
 		}
 		if (GuildPermission.MAIL.equals(guildPermission)) {
 			MailMan.playerGuildChange(player);
+		}
+		if (GuildPermission.SURVIVAL.equals(guildPermission)) {
+			ZoneUtils.setExpectedGameMode(player, true);
+		}
+	}
+
+	public static void kickFromInaccessibleGuildPlots(Player player) {
+		Long guildPlotNumber;
+		Set<Long> accessibleGuildPlotIds = new HashSet<>();
+		for (Group guildGroup : LuckPermsIntegration.getRelevantGuilds(player, true, false)) {
+			if (LuckPermsIntegration.isLocked(guildGroup)) {
+				continue;
+			}
+
+			if (!GuildFlag.OWNS_PLOT.hasFlag(guildGroup)) {
+				continue;
+			}
+
+			if (!GuildPermission.VISIT.hasAccess(guildGroup, player)) {
+				continue;
+			}
+
+			guildPlotNumber = LuckPermsIntegration.getGuildPlotId(guildGroup);
+			if (guildPlotNumber == null) {
+				continue;
+			}
+
+			accessibleGuildPlotIds.add(guildPlotNumber);
+		}
+
+		guildPlotNumber = GuildPlotUtils.getLastGuildPlotScore(player);
+		if (
+				guildPlotNumber > 0
+						&& !accessibleGuildPlotIds.contains(guildPlotNumber)
+		) {
+			GuildPlotUtils.sendGuildPlotFallbackWorld(player, false);
+		}
+
+		guildPlotNumber = GuildPlotUtils.getGuildPlotNumber(player.getRespawnLocation());
+		if (
+				guildPlotNumber != null
+						&& guildPlotNumber != 0
+						&& !accessibleGuildPlotIds.contains(guildPlotNumber)
+		) {
+			player.setRespawnLocation(null);
 		}
 	}
 }

@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBos
 import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -38,6 +39,7 @@ import de.tr7zw.nbtapi.NBTEntity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -74,6 +76,7 @@ import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -134,6 +137,8 @@ public class EntityListener implements Listener {
 	private static final String AREA_EFFECT_CLOUD_POTION_METAKEY = "MonumentaAreaEffectCloudPotion";
 
 	public static final String PROJECTILE_PASSTHROUGH_TAG = "projectile_passthrough";
+
+	public static final Set<String> mProtectHangingWorlds = new HashSet<>();
 
 	Plugin mPlugin;
 	AbilityManager mAbilities;
@@ -214,6 +219,12 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
+			if (damager instanceof Player playerDamager && damagee instanceof ArmorStand) {
+				if (GuildPlotUtils.guildPlotInventoryModificationBlocked(playerDamager)) {
+					event.setCancelled(true);
+					return;
+				}
+			}
 			if (damagee instanceof ArmorStand || damagee.isInvulnerable()) {
 				return;
 			}
@@ -230,14 +241,11 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
-			if (playerDamager.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(damagee)) {
+			if (GuildPlotUtils.guildPlotInventoryModificationBlocked(playerDamager)) {
 				event.setCancelled(true);
 			}
 		} else if (damager instanceof Projectile proj && proj.getShooter() instanceof Player player) {
-			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
-			if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(damagee)) {
-				damager.remove();
+			if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -381,6 +389,26 @@ public class EntityListener implements Listener {
 		Entity damager = event.getRemover();
 		Hanging entity = event.getEntity();
 		Location loc = entity.getLocation();
+
+		// Guildplots checks
+		if (damager instanceof Player player) {
+			// If hurt by a player in adventure mode we want to prevent the break;
+
+			if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
+				event.setCancelled(true);
+				return;
+			}
+		} else if (damager instanceof Projectile projectile) {
+			// If hurt by a projectile from a player in adventure mode.
+
+			ProjectileSource source = projectile.getShooter();
+			if (source instanceof Player player) {
+				if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
 
 		if (ZoneUtils.hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE)) {
 			if (damager instanceof Player && entity instanceof ItemFrame itemFrame && itemFrame.getItem().getType() != Material.AIR && ZoneUtils.hasZoneProperty(loc, ZoneProperty.ITEM_FRAMES_EDITABLE)) {
@@ -1058,8 +1086,25 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void entityTeleportEvent(EntityTeleportEvent event) {
+		Entity entity = event.getEntity();
+		if (
+			mProtectHangingWorlds.contains(entity.getWorld().getName())
+			&& (entity instanceof Shulker)
+		) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void hangingBreakEvent(HangingBreakEvent event) {
-		if (event.getEntity() instanceof ItemFrame frame
+		Entity entity = event.getEntity();
+		if (mProtectHangingWorlds.contains(entity.getWorld().getName())) {
+			event.setCancelled(true);
+			return;
+		}
+
+		if (entity instanceof ItemFrame frame
 				&& INVISIBLE_ITEM_FRAME_NAME.equals(frame.getName())
 				&& !(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
 			event.setCancelled(true);

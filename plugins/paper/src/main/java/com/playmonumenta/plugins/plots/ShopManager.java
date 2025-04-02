@@ -923,19 +923,17 @@ public class ShopManager implements Listener {
 		/* This command was initiated by a player interacting with the NPC - check permissions */
 		if (shop.isGuildShop()) {
 			Group guild = LuckPermsIntegration.getGuild(player);
+			String msg = "You must have permission to manage the shop for the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 			if (guild == null) {
-				String msg = "You must be a *manager* or *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 				player.sendMessage(Component.text(msg, NamedTextColor.RED));
 				throw CommandAPI.failWithString(msg);
 			}
 			String guildName = LuckPermsIntegration.getUnlockedGuildName(guild);
 			if (guildName == null || !guildName.equalsIgnoreCase(shop.mOwnerGuildName)) {
-				String msg = "You must be a *manager* or *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 				player.sendMessage(Component.text(msg, NamedTextColor.RED));
 				throw CommandAPI.failWithString(msg);
 			}
 			if (!GuildPermission.GUILD_SHOP.hasAccess(guild, player)) {
-				String msg = "You must have permission to manage the shop for the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 				player.sendMessage(Component.text(msg, NamedTextColor.RED));
 				throw CommandAPI.failWithString(msg);
 			}

@@ -31,6 +31,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -72,6 +73,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,9 +83,18 @@ public class WorldListener implements Listener {
 	public static final NamespacedKey ENTITY_SCORES_DATA_KEY = NamespacedKeyUtils.fromString("monumenta:entity_scores");
 	public int mEntityScoreLastDeleteTick = Integer.MIN_VALUE;
 	public Set<String> mEntityScoresDeletedThisTick = new HashSet<>();
+	private static final ConcurrentHashMap<String, BoundingBox> mEntityScoreLoadBounds = new ConcurrentHashMap<>();
 
 	public WorldListener(Plugin plugin) {
 		mPlugin = plugin;
+	}
+
+	public static void startLoadingScoresInBounds(String worldName, BoundingBox bb) {
+		mEntityScoreLoadBounds.put(worldName, bb);
+	}
+
+	public static void stopLoadingScoresInBounds(String worldName, BoundingBox bb) {
+		mEntityScoreLoadBounds.remove(worldName, bb);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -91,6 +102,12 @@ public class WorldListener implements Listener {
 		Entity entity = event.getEntity();
 
 		MessagingUtils.updatePlainName(entity);
+
+		Location loc = entity.getLocation();
+		BoundingBox bb = mEntityScoreLoadBounds.get(loc.getWorld().getName());
+		if (bb != null && bb.contains(loc.toVector())) {
+			loadEntityScores(List.of(entity));
+		}
 
 		Bukkit.getScheduler().runTask(mPlugin, () -> mPlugin.mTrackingManager.addEntity(entity));
 	}
@@ -140,7 +157,7 @@ public class WorldListener implements Listener {
 		}
 	}
 
-	public void loadEntityScores(Collection<Entity> entities) {
+	public static void loadEntityScores(Collection<Entity> entities) {
 		Gson gson = new Gson();
 		for (Entity entity : entities) {
 			if (entity instanceof Player) {

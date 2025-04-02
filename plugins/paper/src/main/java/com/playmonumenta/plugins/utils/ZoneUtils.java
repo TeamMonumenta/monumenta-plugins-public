@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.scriptedquests.Plugin;
 import com.playmonumenta.scriptedquests.zones.Zone;
@@ -91,6 +92,11 @@ public class ZoneUtils {
 
 	// Returns if the player is expected to be in Survival Mode or Adventure Mode for their given circumstances
 	public static GameMode expectedGameMode(Player player) {
+		GameMode guildPlotGameMode = GuildPlotUtils.guildPlotGameMode(player);
+		if (guildPlotGameMode != null) {
+			return guildPlotGameMode;
+		}
+
 		GameMode currentGameMode = player.getGameMode();
 		Location location = player.getLocation();
 
@@ -130,6 +136,18 @@ public class ZoneUtils {
 	}
 
 	public static void setExpectedGameMode(Player player) {
+		setExpectedGameMode(player, false);
+	}
+
+	public static void setExpectedGameMode(Player player, boolean onlyFromSurvivalAdventure) {
+		GameMode currentGamemode = player.getGameMode();
+		if (
+			onlyFromSurvivalAdventure &&
+			!GameMode.ADVENTURE.equals(currentGamemode)
+			&& !GameMode.SURVIVAL.equals(currentGamemode)
+		) {
+			return;
+		}
 		player.setGameMode(expectedGameMode(player));
 	}
 

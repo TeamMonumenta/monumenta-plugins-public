@@ -72,24 +72,8 @@ public class PermissionView extends View {
 		}
 
 		// firstRow is for permissions, targetRow is the PermissionHolder
-		int rows = Math.floorDiv(Math.max(0, shownPermissions.size() - 1), COLUMNS) + 1;
-		// Make sure there's enough room for all icons (bottom-align, assuming they fit on one page)
-		int firstRow = 6 - rows;
-		// If the first row is >= the bottom row, shift it up one to visually center it better
-		if (firstRow >= 5) {
-			firstRow--;
-		}
-		// row 0 is the header, to be avoided (leaving 1 row for target subheading)
-		if (firstRow < 2) {
-			firstRow = 2;
-		}
-		// Target row goes above permission rows
-		int targetRow = firstRow - 1;
-		// If there's only one permission row, shift this up by 1 to avoid too many empty rows in a row
-		if (targetRow >= 3) {
-			targetRow--;
-		}
-		// ...and yes, that whole section can be rewritten as we see fit.
+		int firstRow = 3;
+		int targetRow = 2;
 
 		Component targetName = mTargetIcon.getItemMeta().displayName();
 		GuiItem targetIcon = mGui.setItem(targetRow, TARGET_X, mTargetIcon);

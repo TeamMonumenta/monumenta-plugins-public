@@ -110,7 +110,7 @@ public class EmergencyLockdownView extends View {
 				));
 			}
 		} else {
-			if (!mGui.mPlayer.isOp()) {
+			if (!mGui.mPlayer.hasPermission(GuildGui.MOD_GUI_PERMISSION)) {
 				meta.displayName(Component.text("End Lockdown (No Access)", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
 					.decoration(TextDecoration.ITALIC, false));
 				meta.lore(List.of(
@@ -203,10 +203,10 @@ public class EmergencyLockdownView extends View {
 				});
 		}
 
-		if (isLocked && mGui.mPlayer.isOp()) {
+		if (isLocked && mGui.mPlayer.hasPermission(GuildGui.MOD_GUI_PERMISSION)) {
 			guiItem
 				.onClick((InventoryClickEvent event) -> {
-					if (!mGui.mPlayer.isOp()) {
+					if (!mGui.mPlayer.hasPermission(GuildGui.MOD_GUI_PERMISSION)) {
 						mGui.mPlayer.sendMessage(
 							Component.text("Sorry! You lost access before hitting confirm.",
 								NamedTextColor.RED, TextDecoration.BOLD));
@@ -258,7 +258,7 @@ public class EmergencyLockdownView extends View {
 	}
 
 	private boolean hasLockdownAccess() {
-		return mGui.mPlayer.isOp() || (
+		return mGui.mPlayer.hasPermission(GuildGui.MOD_GUI_PERMISSION) || (
 			mGui.isManager()
 				&& mGui.mPlayer.hasPermission(ACTIVATE_LOCKDOWN)
 		);

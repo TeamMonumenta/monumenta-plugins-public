@@ -5,8 +5,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.GuildAccessLevel;
+import com.playmonumenta.plugins.integrations.luckperms.GuildFlag;
 import com.playmonumenta.plugins.integrations.luckperms.GuildInviteLevel;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.PlayerGuildInfo;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
@@ -65,6 +67,9 @@ public class GuildGui extends MailGui {
 	protected static final int ROW_LABEL_X = 0;
 	protected static final int PAGE_HEIGHT = 5;
 
+	public static final String GUI_PERMISSION = "monumenta.command.guild.gui";
+	public static final String MOD_GUI_PERMISSION = "monumenta.command.guild.mod.gui";
+
 	public static Map<String, Consumer<GuildGui>> VIEW_ARGUMENTS = Map.of(
 		"all", gui -> gui.setView(new AllGuildsView(gui, GuildOrder.DEFAULT)),
 		"accessible", gui -> gui.setView(new AccessibleGuildsView(gui, GuildOrder.DEFAULT)),
@@ -83,8 +88,8 @@ public class GuildGui extends MailGui {
 	protected View mView;
 
 	public static void register(Plugin plugin) {
-		CommandPermission perms = CommandPermission.fromString("monumenta.command.guild.gui");
-		CommandPermission permsMod = CommandPermission.fromString("monumenta.command.guild.mod.gui");
+		CommandPermission perms = CommandPermission.fromString(GUI_PERMISSION);
+		CommandPermission permsMod = CommandPermission.fromString(MOD_GUI_PERMISSION);
 
 		new CommandAPICommand("guild")
 			.withArguments(new LiteralArgument("gui"))
@@ -264,6 +269,7 @@ public class GuildGui extends MailGui {
 	 * - Your Accessible Guilds (or for target player in mod GUI)
 	 * - Guild members/guests for selected guild
 	 * - Guild mailbox
+	 * - Guild settings (like plot ownership)
 	 * - Emergency Lock to prevent edits/access until mod intervention
 	 */
 	private void setHeader() {
@@ -275,9 +281,9 @@ public class GuildGui extends MailGui {
 		guildOrderLore.add(Component.empty());
 		guildOrderLore.add(Component.text("Sort order (hotbar keys to select):", NamedTextColor.GRAY)
 			.decoration(TextDecoration.ITALIC, false));
-		GuildOrder[] orders = GuildOrder.values();
+		List<GuildOrder> orders = GuildOrder.visibleGuildOrders(mPlayer);
 		for (int i = 0; i < 9; i++) {
-			if (i >= orders.length) {
+			if (i >= orders.size()) {
 				break;
 			}
 
@@ -285,7 +291,7 @@ public class GuildGui extends MailGui {
 				Component.text("", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false)
 					.append(Component.keybind(Constants.Keybind.hotbar(i)))
-					.append(Component.text(": " + orders[i].mName)));
+					.append(Component.text(": " + orders.get(i).mName)));
 		}
 
 		item = new ItemStack(Material.BLUE_BANNER);
@@ -312,12 +318,11 @@ public class GuildGui extends MailGui {
 			.onClick((InventoryClickEvent event) -> {
 				GuildOrder order;
 				if (event.getClick().equals(ClickType.NUMBER_KEY)) {
-					GuildOrder[] guildOrders = GuildOrder.values();
 					int index = event.getHotbarButton();
-					if (index < 0 || index >= guildOrders.length) {
+					if (index < 0 || index >= orders.size()) {
 						order = GuildOrder.DEFAULT;
 					} else {
-						order = guildOrders[index];
+						order = orders.get(index);
 					}
 				} else {
 					order = GuildOrder.DEFAULT;
@@ -352,12 +357,11 @@ public class GuildGui extends MailGui {
 			.onClick((InventoryClickEvent event) -> {
 				GuildOrder order;
 				if (event.getClick().equals(ClickType.NUMBER_KEY)) {
-					GuildOrder[] guildOrders = GuildOrder.values();
 					int index = event.getHotbarButton();
-					if (index < 0 || index >= guildOrders.length) {
+					if (index < 0 || index >= orders.size()) {
 						order = GuildOrder.DEFAULT;
 					} else {
-						order = guildOrders[index];
+						order = orders.get(index);
 					}
 				} else {
 					order = GuildOrder.DEFAULT;
@@ -435,6 +439,12 @@ public class GuildGui extends MailGui {
 					mPlayer.sendMessage(Component.text("You do not have access to your guild's mail.", NamedTextColor.RED));
 					mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				});
+		}
+
+		GuiItem guiItem = setItem(HEADER_Y, 5,
+			GUIUtils.createBasicItem(Material.REDSTONE_TORCH, "Guild Settings", NamedTextColor.GRAY));
+		if (mGuildGroup != null) {
+			guiItem.onClick((InventoryClickEvent event) -> setView(new SettingsView(this)));
 		}
 
 		// Emergency Lockdown (with confirm screen)
@@ -600,13 +610,21 @@ public class GuildGui extends MailGui {
 					.append(Component.text(": Give up guest access")));
 			}
 		}
-		if (mPlayer.isOp()) {
+		if (mPlayer.hasPermission("monumenta.command.guild.mod")) {
 			lore.add(Component.text("Extra dev/mod info:", NamedTextColor.DARK_GRAY)
 				.decoration(TextDecoration.ITALIC, false));
 			lore.add(Component.text("Guild LP Group: " + guild.getName(), NamedTextColor.DARK_GRAY)
 				.decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text("Plot World ID (does not guarantee plot is purchased): " + LuckPermsIntegration.getGuildPlotId(guild), NamedTextColor.DARK_GRAY)
+			lore.add(Component.text("Plot World ID: " + LuckPermsIntegration.getGuildPlotId(guild), NamedTextColor.DARK_GRAY)
 				.decoration(TextDecoration.ITALIC, false));
+			lore.add(GuildFlag.OWNS_PLOT.description(guild)
+				.decoration(TextDecoration.ITALIC, false));
+			if (GuildFlag.OWNS_PLOT.hasFlag(guild)) {
+				lore.add(Component.text("", NamedTextColor.DARK_GRAY)
+					.decoration(TextDecoration.ITALIC, false)
+					.append(Component.keybind(Constants.Keybind.SWAP_OFFHAND))
+					.append(Component.text(" to teleport to guild plot")));
+			}
 		}
 		meta.lore(lore);
 
@@ -614,6 +632,14 @@ public class GuildGui extends MailGui {
 		GuiItem guiItem = setItem(row, column, new GuiItem(item, false));
 
 		guiItem.onClick((InventoryClickEvent event) -> {
+			if (
+				mPlayer.hasPermission(MOD_GUI_PERMISSION)
+					&& event.getClick().equals(ClickType.SWAP_OFFHAND)
+					&& GuildFlag.OWNS_PLOT.hasFlag(guild)
+			) {
+				GuildPlotUtils.sendGuildPlotWorld(mPlayer, guild);
+				return;
+			}
 			if (LuckPermsIntegration.isLocked(guild)) {
 				mPlayer.sendMessage(Component.text("That guild is on lockdown; you may not interact with it at this time.", NamedTextColor.RED));
 				mPlayer.playSound(mPlayer,
@@ -739,26 +765,40 @@ public class GuildGui extends MailGui {
 		Material material;
 		Component name;
 		List<Component> lore = new ArrayList<>();
+		Component permissionHeader;
 		switch (accessLevel) {
 			case FOUNDER -> {
 				material = Material.NETHERITE_HELMET;
 				name = Component.text("Founder", NamedTextColor.DARK_GRAY);
+				permissionHeader = Component.text(
+						"Founder permissions:",
+						NamedTextColor.DARK_GRAY
+					)
+					.decoration(TextDecoration.ITALIC, false);
 			}
 			case MANAGER -> {
 				material = Material.DIAMOND_HELMET;
 				name = Component.text("Manager", NamedTextColor.AQUA);
+				permissionHeader = Component.text("Manager permissions:", NamedTextColor.AQUA)
+					.decoration(TextDecoration.ITALIC, false);
 			}
 			case MEMBER -> {
 				material = Material.GOLDEN_HELMET;
 				name = Component.text("Member", NamedTextColor.GOLD);
+				permissionHeader = Component.text("Members permissions:", NamedTextColor.GOLD)
+					.decoration(TextDecoration.ITALIC, false);
 			}
 			case GUEST -> {
 				material = Material.IRON_HELMET;
 				name = Component.text("Guest", NamedTextColor.GRAY);
+				permissionHeader = Component.text("Guests permissions:", NamedTextColor.GRAY)
+					.decoration(TextDecoration.ITALIC, false);
 			}
 			default -> {
 				material = Material.LEATHER_HELMET;
-				name = Component.text("None?", NamedTextColor.BLACK);
+				name = Component.text("None?", NamedTextColor.RED);
+				permissionHeader = Component.text("None permissions (should not appear!):", NamedTextColor.RED)
+					.decoration(TextDecoration.ITALIC, false);
 			}
 		}
 		switch (accessLevel) {
@@ -797,9 +837,6 @@ public class GuildGui extends MailGui {
 						.decoration(TextDecoration.ITALIC, false));
 				// fall through
 			case MEMBER:
-				lore.add(
-					Component.text("Members and up:", NamedTextColor.GOLD)
-						.decoration(TextDecoration.ITALIC, false));
 				break;
 			case GUEST:
 				lore.add(
@@ -811,6 +848,7 @@ public class GuildGui extends MailGui {
 					.decoration(TextDecoration.ITALIC, false));
 		}
 
+		lore.add(permissionHeader);
 		Group guildRoot = LuckPermsIntegration.getGuildRoot(mGuildGroup);
 		Group displayedAccessLevel;
 		if (guildRoot != null) {
@@ -838,7 +876,7 @@ public class GuildGui extends MailGui {
 			lore.add(Component.text("", NamedTextColor.GRAY)
 				.decoration(TextDecoration.ITALIC, false)
 				.append(Component.keybind(Constants.Keybind.HOTBAR_1))
-				.append(Component.text(": Edit Guild's Guest Permissions")));
+				.append(Component.text(": Edit Guild's " + accessLevel.name() + " Permissions")));
 		}
 
 		ItemStack item = new ItemStack(material);
@@ -1004,7 +1042,7 @@ public class GuildGui extends MailGui {
 			return true;
 		}
 
-		if (mPlayer.isOp()) {
+		if (mPlayer.hasPermission(MOD_GUI_PERMISSION)) {
 			if (showErrorMessages) {
 				mPlayer.sendMessage(Component.text(
 					"Your operator status bypassed the guild manager requirement to manage guild permissions.",

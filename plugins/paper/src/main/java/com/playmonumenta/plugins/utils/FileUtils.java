@@ -24,7 +24,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 
 public class FileUtils {
 	public static void writeFile(Path fileName, String contents) throws IOException {
@@ -66,13 +71,31 @@ public class FileUtils {
 		}
 
 		Gson gson;
-	try (var writer = Files.newBufferedWriter(file)) {
+		try (var writer = Files.newBufferedWriter(file)) {
 			GsonBuilder gsonBuilder = new GsonBuilder();
 			if (!escapeHtmlCharacters) {
 				gsonBuilder.disableHtmlEscaping();
 			}
 			gson = gsonBuilder.create();
 			gson.toJson(json, writer);
+		}
+	}
+
+	public static void writeJsonSafely(String fileName, JsonObject json, boolean escapeHtmlCharacters) throws IOException {
+		String tempFileName = fileName + ".tmp";
+		writeJson(tempFileName, json, escapeHtmlCharacters);
+
+		File file = new File(fileName);
+		File tempFile = new File(tempFileName);
+
+		if (file.isFile()) {
+			if (!file.delete()) {
+				MMLog.warning("Failed to delete " + fileName + " before replacing it");
+			}
+		}
+
+		if (!tempFile.renameTo(file)) {
+			MMLog.warning("Failed to rename " + tempFileName + " to " + fileName);
 		}
 	}
 
@@ -85,6 +108,86 @@ public class FileUtils {
 
 		return gson.fromJson(reader, JsonObject.class);
 
+	}
+
+	public static File getWorldMonumentaFolder(World world) {
+		File worldFolder = world.getWorldFolder();
+		return new File(worldFolder, "monumenta");
+	}
+
+	public static File getChunkMonumentaFolder(Location location) {
+		File worldMonumentaFolder = getWorldMonumentaFolder(location.getWorld());
+		Chunk chunk = location.getChunk();
+
+		int cx = chunk.getX();
+		int cz = chunk.getX();
+
+		int rx = cx >> 5;
+		int rz = cz >> 5;
+
+		File monumentaRegionFolder = new File(worldMonumentaFolder, String.format("r.%d.%d", rx, rz));
+		return new File(monumentaRegionFolder, String.format("c.%d.%d", cx, cz));
+	}
+
+	public static File getBlockMonumentaFile(Block block, String prefix, String suffix) {
+		return getBlockMonumentaFile(block.getState(), prefix, suffix);
+	}
+
+	public static File getBlockMonumentaFile(BlockState block, String prefix, String suffix) {
+		Location loc = block.getLocation();
+		File chunkMonumentaFolder = getChunkMonumentaFolder(loc);
+		int x = loc.getBlockX();
+		int y = loc.getBlockY();
+		int z = loc.getBlockZ();
+
+		String fileName = String.format("%s%d.%d.%d%s", prefix, x, y, z, suffix);
+		File file = new File(chunkMonumentaFolder, fileName);
+		File tempFile = new File(chunkMonumentaFolder, fileName + ".tmp");
+		if (!file.isFile() && tempFile.isFile()) {
+			// file was being replaced with tempFile, but interrupted; safe to use tempFile instead
+			if (!tempFile.renameTo(file)) {
+				return tempFile;
+			}
+		}
+		return file;
+	}
+
+	/**
+	 * If the target path is a file or empty folder, delete it,
+	 * recursively delete parent folders if they are now empty,
+	 * and return true if anything was deleted at all, otherwise false.
+	 * @param path The path to be deleted
+	 * @return Returns true if a file/folder was deleted, otherwise false
+	 * @throws Exception Any exceptions related to these action are to be handled by the caller.
+	 */
+	public static boolean deletePathAndEmptyParentFolders(File path) throws Exception {
+		boolean deletedSomething = false;
+
+		// Delete the target path
+		if (path.isDirectory()) {
+			// If the target path has child paths, or this cannot be determined, abort
+			File[] children = path.listFiles();
+			if (children == null || children.length > 0) {
+				return false;
+			}
+			if (path.delete()) {
+				deletedSomething = true;
+			}
+		} else if (path.isFile()) {
+			if (path.delete()) {
+				deletedSomething = true;
+			}
+		} else if (path.exists()) {
+			// Some other path type? Links or block devices maybe? Not handled at any rate, abort.
+			return false;
+		}
+
+		// Either we deleted something, or there was nothing to delete; recurse
+		if (deletePathAndEmptyParentFolders(path.getParentFile())) {
+			deletedSomething = true;
+		}
+
+		return deletedSomething;
 	}
 
 	/**

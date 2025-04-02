@@ -266,7 +266,13 @@ public class WalletManager implements Listener {
 						return;
 					}
 					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-					new WalletGui(player, wallet, settings, walletItem.getItemMeta().displayName()).open();
+					new WalletGui(
+						player,
+						wallet,
+						settings,
+						walletItem.getItemMeta().displayName(),
+						false
+					).open();
 				} else if (event.getClick() == ClickType.SWAP_OFFHAND) {
 					// quick-fill wallet
 					event.setCancelled(true);
