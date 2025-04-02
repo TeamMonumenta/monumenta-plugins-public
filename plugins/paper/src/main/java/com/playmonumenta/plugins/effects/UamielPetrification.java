@@ -22,7 +22,7 @@ public class UamielPetrification extends ZeroArgumentEffect {
 	@Override
 	public void entityApplyEffectTypeFromPotion(Entity entity, EffectTypeApplyFromPotionEvent event) {
 		ItemStack itemStack = event.getItem();
-		if (itemStack.getType() == Material.POTION && !ItemStatUtils.hasEnchantment(itemStack, EnchantmentType.INFINITY) && event.getEffectType().isPositive()) {
+		if (itemStack.getType() == Material.POTION && !ItemStatUtils.hasEnchantment(itemStack, EnchantmentType.INFINITY)) {
 			setDuration(0);
 		}
 	}
