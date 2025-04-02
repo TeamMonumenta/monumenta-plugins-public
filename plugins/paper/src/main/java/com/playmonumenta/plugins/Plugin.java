@@ -210,6 +210,7 @@ public class Plugin extends JavaPlugin {
 	public GrapplingListener mGrapplingListener;
 	public @Nullable AuditListener mAuditListener = null;
 	public HuntsManager mHuntsManager;
+	public BalanceModeManager mBalanceModeManager;
 	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
@@ -304,6 +305,7 @@ public class Plugin extends JavaPlugin {
 		NameMCVerify.register(this);
 		if (!IS_PLAY_SERVER) {
 			NodePlanner.registerCommands();
+			BalanceModeManager.register();
 		}
 		POICommands.register();
 		PointToLocCommand.register(this);
@@ -464,6 +466,7 @@ public class Plugin extends JavaPlugin {
 		mPlayerListener = new PlayerListener(this);
 		mGrapplingListener = new GrapplingListener();
 		mHuntsManager = new HuntsManager(this);
+		mBalanceModeManager = new BalanceModeManager();
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
