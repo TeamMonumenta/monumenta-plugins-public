@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.hunts.bosses;
 
+import com.playmonumenta.libraryofsouls.bestiary.BestiaryManager;
+import com.playmonumenta.libraryofsouls.commands.LibraryOfSoulsCommand;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -24,6 +26,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.commands.Leaderboard;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -298,7 +301,12 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 
 		for (Player player : allPlayers) {
 			addLeaderboardScore(player, GENERAL_WINS_SCOREBOARD);
-			addLeaderboardScore(player, getWinsScoreboard());
+			int kills = addLeaderboardScore(player, getWinsScoreboard());
+			try {
+				BestiaryManager.setKillsForMob(player, LibraryOfSoulsCommand.getSoul(getBestiaryLoS()), kills);
+			} catch (WrapperCommandSyntaxException e) {
+				MMLog.severe("[Hunts] Caught exception finding SoulEntry for " + getBestiaryLoS() + ": " + e);
+			}
 			AdvancementUtils.grantAdvancement(player, getAdvancement());
 		}
 
@@ -331,9 +339,18 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 		}
 	}
 
-	private void addLeaderboardScore(Player player, String objective) {
-		ScoreboardUtils.addScore(player, objective, 1);
+	private int addLeaderboardScore(Player player, String objective) {
+		int total = ScoreboardUtils.addScore(player, objective, 1);
 		Leaderboard.leaderboardUpdate(player, objective);
+		return total;
+	}
+
+	private String getBestiaryLoS() {
+		if (mQuarryType == HuntsManager.QuarryType.THE_IMPENETRABLE) {
+			return "TheImpenetrable";
+		} else {
+			return mQuarryType.getLos();
+		}
 	}
 
 	@Override

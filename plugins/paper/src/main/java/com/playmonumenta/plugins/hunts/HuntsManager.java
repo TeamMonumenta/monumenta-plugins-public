@@ -87,7 +87,7 @@ public class HuntsManager {
 			SteelWingHawk.COLOR, Sound.ENTITY_PHANTOM_SWOOP, "Screeches tear down through the boughs. Steel Wing Hawk begins to stir."
 		),
 		THE_IMPENETRABLE(
-			"The Impenetrable", "TheImpenetrable", TheImpenetrable.identityTag,
+			"The Impenetrable", "TheImpenetrableVehicle", TheImpenetrable.identityTag,
 			new Vector(-206, 40, -353), new Vector(-245, 33, -395), TheImpenetrable.INNER_RADIUS,
 			TheImpenetrable.COLOR, Sound.ENTITY_SHULKER_SHOOT, "The caves chime as inexplicable phenomena occur. The Impenetrable is about to appear."
 		),

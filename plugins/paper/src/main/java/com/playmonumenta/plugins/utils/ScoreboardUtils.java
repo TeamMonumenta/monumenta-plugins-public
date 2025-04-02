@@ -191,9 +191,11 @@ public class ScoreboardUtils {
 		}
 	}
 
-	public static void addScore(Entity entity, String objectiveName, int add) {
+	public static int addScore(Entity entity, String objectiveName, int add) {
 		int amount = getScoreboardValue(entity, objectiveName).orElse(0);
-		setScoreboardValue(entity, objectiveName, amount + add);
+		int newAmount = amount + add;
+		setScoreboardValue(entity, objectiveName, newAmount);
+		return newAmount;
 	}
 
 	public static Objective createObjective(String name, Component displayName) {
