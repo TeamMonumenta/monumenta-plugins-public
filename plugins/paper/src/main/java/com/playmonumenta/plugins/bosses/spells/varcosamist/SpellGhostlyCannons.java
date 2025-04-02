@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -126,10 +128,12 @@ public class SpellGhostlyCannons extends Spell {
 					for (Player player : players) {
 						// Player gets more particles the closer they are to the landing area
 						double dist = player.getLocation().distance(mLoc);
-						double step = dist < 10 ? 0.5 : (dist < 15 ? 1 : 3);
-						for (double deg = 0; deg < 360; deg += (step * 45)) {
-							new PartialParticle(Particle.REDSTONE, mLoc.clone().add(FastUtils.cos(deg) * size, 0, FastUtils.sin(deg) * size), 1, 0.15, 0.15, 0.15, 0, CANNONS_COLOR).spawnAsEntityActive(mBoss);
-						}
+						int count = dist < 10 ? 15 : (dist < 15 ? 10 : 5);
+						new PPCircle(Particle.REDSTONE, mLoc.clone(), size)
+							.delta(0.15)
+							.count(count)
+							.data(CANNONS_COLOR)
+							.spawnForPlayer(ParticleCategory.BOSS, player);
 					}
 				}
 				Location particle = mLoc.clone().add(0, mTicks / 3.0, 0);
