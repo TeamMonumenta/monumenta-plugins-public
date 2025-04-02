@@ -292,7 +292,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 			.add("When cast, a ")
 			.add(a -> a.mRange, RANGE)
 			.add(" block cone of blight is created on the ground which lasts for ")
-			.add(a -> a.mBlightDuration, ENHANCEMENT_BLIGHT_DURATION)
+			.addDuration(a -> a.mBlightDuration, ENHANCEMENT_BLIGHT_DURATION)
 			.add(" seconds. Mobs in the blighted area take ")
 			.addPercent(a -> a.mBlightVulnPerDebuff, ENHANCEMENT_DMG_INCREASE)
 			.add(" extra damage per debuff they currently have. Blight is not counted as a debuff.");

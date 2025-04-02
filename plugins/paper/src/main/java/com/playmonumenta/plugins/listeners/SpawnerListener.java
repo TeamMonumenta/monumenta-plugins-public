@@ -130,6 +130,7 @@ public class SpawnerListener implements Listener {
 	private static final int PLAYER_CHECK_RADIUS_SQUARED = 5 * 5;
 	private static final int INACTIVITY_TIMER = 20 * 45;
 	private static final int CLEANER_INTERVAL = 20 * 30;
+	private static final double PROTECTOR_MAX_DISTANCE_SQUARED = 50 * 50;
 	private static final Map<UUID, MobInfo> mMobInfos = new HashMap<>();
 	/*
 	 * Need to use the full spawner Location, not just x/y/z, to ensure that only this
@@ -189,6 +190,29 @@ public class SpawnerListener implements Listener {
 
 					if (spawnerInfo.isEmpty()) {
 						spawnerInfoIter.remove();
+					}
+				}
+
+				// check protected mob distances from their spawners
+				for (Map.Entry<Location, List<MobInfo>> entry : mSpawnerInfos.entrySet()) {
+					Location spawnerLoc = entry.getKey();
+					Block spawnerBlock = spawnerLoc.getBlock();
+					if (!getProtector(spawnerBlock)) {
+						continue;
+					}
+					List<MobInfo> spawnerInfo = entry.getValue();
+					for (MobInfo info : spawnerInfo) {
+						LivingEntity mob = info.getMob();
+						if (mob != null && !mob.isDead() && mob.isValid() && mob.isInvulnerable()) {
+							double distanceSquared = mob.getLocation().distanceSquared(spawnerLoc);
+							if (distanceSquared > PROTECTOR_MAX_DISTANCE_SQUARED) {
+
+								MMLog.fine(() -> "SpawnerListener: Removed protection from mob due to distance from spawner: " + mob.getUniqueId() +
+									" (distance: " + Math.sqrt(distanceSquared) + " blocks)");
+								mob.setInvulnerable(false);
+								GlowingManager.clear(mob, "protectedMob");
+							}
+						}
 					}
 				}
 			}

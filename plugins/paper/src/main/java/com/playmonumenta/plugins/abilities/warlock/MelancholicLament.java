@@ -246,7 +246,7 @@ public class MelancholicLament extends Ability {
 			.add(" seconds will silence all mobs within ")
 			.add(a -> a.mSilenceRadius, SILENCE_RADIUS)
 			.add(" blocks for ")
-			.add(a -> a.mSilenceDuration, SILENCE_DURATION)
+			.addDuration(a -> a.mSilenceDuration, SILENCE_DURATION)
 			.add(".");
 	}
 

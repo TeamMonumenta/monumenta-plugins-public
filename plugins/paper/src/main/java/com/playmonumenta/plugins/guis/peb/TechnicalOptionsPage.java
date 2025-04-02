@@ -52,7 +52,7 @@ final class TechnicalOptionsPage extends PebPage {
 		entry(
 			Material.GLOWSTONE,
 			"Show name on patron buff announcement",
-			"Toggle whether your IGN is in the announcement when they activate <gold>Pateron</gold> buffs."
+			"Toggle whether your IGN is in the announcement when they activate <gold>Patreon</gold> buffs."
 		).invertedToggle("Show name: ", "patreon_shrine_privacy").set(2, 6);
 
 		entry(

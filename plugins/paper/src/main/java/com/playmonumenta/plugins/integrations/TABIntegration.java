@@ -380,7 +380,7 @@ public class TABIntegration implements Listener {
 
 	private CachedLayout createBaseLayout() {
 		CachedLayout layout = new CachedLayout();
-		layout.addFixedSlot(1, " &6Patreon Shrine", "%monumenta_patron_shrine%");
+		layout.addFixedSlot(1, "&6Patreon Shrine", "%monumenta_patron_shrine%");
 		String[] shrines = {"Speed", "Resistance", "Strength", "Intuitive", "Thrift", "Harvester"};
 		int shrineIndex = 2;
 		for (String shrine : shrines) {
