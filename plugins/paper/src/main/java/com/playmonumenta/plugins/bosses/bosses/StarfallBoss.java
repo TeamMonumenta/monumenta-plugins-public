@@ -40,7 +40,7 @@ public class StarfallBoss extends BossAbilityGroup {
 		public int TRACKING = 20;
 
 		public int LOCKING_DURATION = 20 * 2;
-		public int METEOR_SPEED = 2;
+		public double METEOR_SPEED = 2;
 		public double HEIGHT = 16;
 
 		@BossParam(help = "The radius of the explosion")
