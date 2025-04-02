@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
@@ -52,7 +53,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 				}
 
 				if (mLastTarget != null) {
-					if (!mLastTarget.isValid() || mLastTarget.isDead() || (mLastTarget instanceof Player player && AbilityUtils.isStealthed(player))) {
+					if (!mLastTarget.isValid() || mLastTarget.isDead() || (mLastTarget instanceof Player player && (AbilityUtils.isStealthed(player) || player.getGameMode() == GameMode.SPECTATOR))) {
 						mLastTarget = null;
 						mob.setTarget(null);
 					}
