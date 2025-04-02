@@ -1580,15 +1580,14 @@ public class LuckPermsIntegration implements Listener {
 		}, 1L);
 	}
 
-	public static @Nullable JsonObject getPluginData(UUID uuid) {
+	public static void getPluginData(JsonObject pluginData, UUID uuid) {
 		if (UM == null) {
-			return null;
+			return;
 		}
 		@Nullable User user = UM.getUser(uuid);
 		if (user == null) {
-			return null;
+			return;
 		}
-		JsonObject pluginData = new JsonObject();
 		CachedPermissionData permissionData = user.getCachedData().getPermissionData();
 		CachedMetaData metaData = user.getCachedData().getMetaData();
 
@@ -1612,6 +1611,5 @@ public class LuckPermsIntegration implements Listener {
 			.ifPresent(skin ->
 				pluginData.addProperty("signed_texture", skin.getValue() + ";" + skin.getSignature())
 			);
-		return pluginData;
 	}
 }

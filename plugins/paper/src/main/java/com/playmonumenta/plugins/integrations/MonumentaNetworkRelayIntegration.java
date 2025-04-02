@@ -229,11 +229,10 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 
 	// TAB stuff
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
-	public void gatherPluginDataEvent(GatherRemotePlayerDataEvent event) {
-		JsonObject data = LuckPermsIntegration.getPluginData(event.mRemotePlayer.getUuid());
-		if (data != null) {
-			event.setPluginData("monumenta", data);
-		}
+	public void gatherRemoteDataEvent(GatherRemotePlayerDataEvent event) {
+		JsonObject data = new JsonObject();
+		LuckPermsIntegration.getPluginData(data, event.mRemotePlayer.getUuid());
+		event.setPluginData("monumenta", data);
 	}
 
 	// Updates RemotePlayer information for other shards
