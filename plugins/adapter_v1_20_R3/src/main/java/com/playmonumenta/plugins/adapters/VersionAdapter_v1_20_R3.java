@@ -46,6 +46,7 @@ import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
+import net.minecraft.world.entity.ai.goal.SwellGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -81,6 +82,7 @@ import org.bukkit.craftbukkit.v1_20_R3.util.CraftVector;
 import org.bukkit.entity.AbstractSkeleton;
 import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Drowned;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
@@ -605,6 +607,10 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 						|| goal.getGoal() instanceof Bee.BeeGoToKnownFlowerGoal
 						|| goal.getGoal() instanceof Bee.BeeGrowCropGoal
 				);
+			}
+		} else if (mob instanceof Creeper) {
+			if (mob.getScoreboardTags().contains("boss_creeper_no_swell")) {
+				availableGoals.removeIf(goal -> goal.getGoal() instanceof SwellGoal);
 			}
 		}
 		// prevent all mobs from attacking iron golems and turtles
