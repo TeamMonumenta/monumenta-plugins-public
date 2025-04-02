@@ -299,7 +299,7 @@ public class SpellBaseCharge extends Spell {
 				if (hitEntities.contains(player)) {
 					continue;
 				}
-				if (player.getWorld() == charger.getWorld() && player.getLocation().distance(endLoc) < 1.8F) {
+				if (player.getWorld() == charger.getWorld() && player.getBoundingBox().overlaps(box)) {
 					// Hit player - mark this and continue
 					switchAggro = player;
 
