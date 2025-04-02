@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import io.papermc.paper.entity.TeleportFlag;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -172,7 +173,7 @@ public class Rewind extends Spell {
 											LivingEntity mob = entry.getKey();
 											if (mob.getType() != EntityType.SHULKER || !mob.getScoreboardTags().contains("NoMove")) {
 												Location destination = origin.clone().add(entry.getValue());
-												mob.teleport(destination);
+												mob.teleport(destination, TeleportFlag.EntityState.RETAIN_PASSENGERS, TeleportFlag.EntityState.RETAIN_VEHICLE);
 												new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, destination.clone().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
 											}
 										}
