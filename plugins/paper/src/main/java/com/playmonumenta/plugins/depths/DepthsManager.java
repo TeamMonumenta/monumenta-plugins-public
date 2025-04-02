@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.delves.DelvesUtils;
+import com.playmonumenta.plugins.delves.abilities.Twisted;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
@@ -1483,6 +1484,15 @@ public class DepthsManager {
 					dp.sendMessage("There are enemies blocking you from opening the next room!");
 					return;
 				}
+			}
+
+			// block if twisted exists
+			if (p.getWorld().getEntities().stream()
+				.anyMatch(e -> e.getScoreboardTags().contains(Twisted.TWISTED_MINIBOSS_TAG) && e.getX() < l.getX())) {
+				dp.sendMessage(Component.text("A ").color(NamedTextColor.LIGHT_PURPLE)
+					.append(Component.text("TWISTED").decorate(TextDecoration.OBFUSCATED).color(DepthsRarity.TWISTED.getColor()))
+					.append(Component.text(" is blocking the door.").color(NamedTextColor.LIGHT_PURPLE)));
+				return;
 			}
 
 			// Store the location to spawn the next room from
