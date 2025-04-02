@@ -54,7 +54,7 @@ public class TheImpenetrable extends Quarry {
 	public static final String identityTag = "boss_theimpenetrable";
 	public static final TextColor COLOR = NamedTextColor.LIGHT_PURPLE;
 
-	public static final int INNER_RADIUS = 35;
+	public static final int INNER_RADIUS = 40;
 	public static final int OUTER_RADIUS = 70;
 
 	// Maximum health of the boss
@@ -155,18 +155,31 @@ public class TheImpenetrable extends Quarry {
 							mCooldownTicks = mTeleportSpell.cooldownTicks();
 							mSpellsBeforeTeleport = (int) FastUtils.randomDoubleInRange(1, 2.5); // Bias towards 1 spell
 						} else {
-							Spell nextSpell = closedSpells.get(FastUtils.randomIntInRange(0, closedSpells.size() - 1));
-							nextSpell.run();
-							mCooldownTicks = nextSpell.cooldownTicks();
+							List<Spell> spellList = new ArrayList<>(closedSpells.stream().filter(Spell::canRun).toList());
+							Collections.shuffle(spellList);
+							if (spellList.isEmpty()) {
+								mCooldownTicks = 20;
+							} else {
+								Spell nextSpell = spellList.get(0);
+								nextSpell.run();
+								mCooldownTicks = nextSpell.cooldownTicks();
+							}
 
 							mSpellsBeforeTeleport--;
 							mSpellsThisPhase--;
 						}
 					} else {
 						// Open phase actions
-						Spell nextSpell = openSpells.get(FastUtils.randomIntInRange(0, openSpells.size() - 1));
-						nextSpell.run();
-						mCooldownTicks = nextSpell.cooldownTicks();
+						List<Spell> spellList = new ArrayList<>(openSpells.stream().filter(Spell::canRun).toList());
+						Collections.shuffle(spellList);
+						if (spellList.isEmpty()) {
+							mCooldownTicks = 20;
+						} else {
+							Spell nextSpell = spellList.get(0);
+							nextSpell.run();
+							mCooldownTicks = nextSpell.cooldownTicks();
+						}
+
 						mSpellsThisPhase--;
 					}
 				}

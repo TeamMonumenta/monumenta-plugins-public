@@ -3,8 +3,10 @@ package com.playmonumenta.plugins.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -13,6 +15,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class Parasites extends Effect {
 	public static final String effectID = "Parasites";
 	public static final String GENERIC_NAME = "Parasites";
@@ -20,6 +26,8 @@ public class Parasites extends Effect {
 	private static final int DURATION = 20 * 5;
 
 	private final double mAmount;
+
+	private final Map<UUID, BossBar> mBossBars = new HashMap<>();
 
 	public Parasites(double amount) {
 		this(DURATION, amount);
@@ -70,6 +78,20 @@ public class Parasites extends Effect {
 				player.playSound(player, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 2f, 0.65f);
 			}
 		}
+
+		BossBar bar = mBossBars.getOrDefault(player.getUniqueId(), BossBar.bossBar(Component.text(GENERIC_NAME, TextColor.color(201, 129, 40)), 0, BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS));
+		bar.progress((float) mAmount);
+		mBossBars.put(player.getUniqueId(), bar);
+		player.showBossBar(bar);
+	}
+
+	@Override
+	public void entityLoseEffect(Entity entity) {
+		super.entityLoseEffect(entity);
+
+		if (entity instanceof Player player) {
+			player.hideBossBar(mBossBars.get(player.getUniqueId()));
+		}
 	}
 
 	@Override
@@ -86,6 +108,13 @@ public class Parasites extends Effect {
 					.delta(0.4, 0.4, 0.4)
 					.extra(0.02)
 					.spawnAsBoss();
+			}
+		}
+
+		if (entity instanceof Player player) {
+			BossBar bar = mBossBars.get(player.getUniqueId());
+			if (bar != null) {
+				bar.name(Component.text(GENERIC_NAME, mAmount == 1 ? TextColor.color(181, 74, 53) : TextColor.color(201, 129, 40)));
 			}
 		}
 	}

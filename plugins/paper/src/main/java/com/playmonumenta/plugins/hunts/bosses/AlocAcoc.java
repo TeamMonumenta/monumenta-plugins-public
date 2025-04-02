@@ -54,7 +54,7 @@ import org.jetbrains.annotations.Nullable;
 public class AlocAcoc extends Quarry {
 	public static final String identityTag = "boss_alocacoc";
 	public static final TextColor COLOR = TextColor.color(137, 207, 240);
-	public static final int INNER_RADIUS = 35;
+	public static final int INNER_RADIUS = 40;
 	public static final int OUTER_RADIUS = 60;
 	private static final int HEALTH = 11000;
 

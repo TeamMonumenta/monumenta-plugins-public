@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.NavigableSet;
 import org.bukkit.Color;
@@ -29,6 +30,7 @@ import org.bukkit.util.Vector;
 
 public class ToxicRepulsion extends Spell {
 	private static final int TELEGRAPH_DURATION = 25;
+	private static final double ACTIVATION_RANGE = 7;
 
 	private static final int SCREAM_WAVES = 10;
 	private static final int SCREAM_WAVE_TIME = 4;
@@ -64,7 +66,8 @@ public class ToxicRepulsion extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return mExperimentSeventyOne.canRunSpell(this);
+		return mExperimentSeventyOne.canRunSpell(this)
+			&& !PlayerUtils.playersInRange(mBoss.getLocation(), ACTIVATION_RANGE, true).isEmpty();
 	}
 
 	@Override

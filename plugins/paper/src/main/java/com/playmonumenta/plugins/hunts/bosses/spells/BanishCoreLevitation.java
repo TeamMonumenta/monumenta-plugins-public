@@ -46,7 +46,7 @@ public class BanishCoreLevitation extends Spell implements CoreElemental.CoreEle
 	// For how long the players have to hit the boss within
 	private static final int DURATION = 13 * 20;
 	// Maximum distance from the boss that the players can receive levitation effect
-	private static final int LEVITATION_RANGE = 9;
+	private static final int LEVITATION_RANGE = 14;
 	private final LivingEntity mBoss;
 	private final Plugin mPlugin;
 	private final CoreElemental mQuarry;

@@ -80,7 +80,7 @@ public class TerrestrialShield extends Spell {
 
 	private BlockDisplay createDisplay() {
 		return mBoss.getWorld().spawn(mBoss.getLocation(), BlockDisplay.class, display -> {
-			display.setBlock(Material.POLISHED_ANDESITE.createBlockData());
+			display.setBlock(Material.CHISELED_TUFF.createBlockData());
 			display.setVisibleByDefault(false);
 			EntityUtils.setRemoveEntityOnUnload(display);
 		});

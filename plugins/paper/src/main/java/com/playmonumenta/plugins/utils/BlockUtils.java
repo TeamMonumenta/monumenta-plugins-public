@@ -686,7 +686,7 @@ public class BlockUtils {
 		return -1;
 	}
 
-	public static List<Block> getBlocksInCylinder(Location loc, double radius) {
+	public static List<Block> getBlocksInSphere(Location loc, double radius) {
 		World world = loc.getWorld();
 		double bx = loc.getX();
 		double by = loc.getY();
@@ -695,7 +695,7 @@ public class BlockUtils {
 		for (double x = bx - radius; x <= bx + radius; x++) {
 			for (double y = by - radius; y <= by + radius; y++) {
 				for (double z = bz - radius; z <= bz + radius; z++) {
-					Location check = new Location(world, x, by, z);
+					Location check = new Location(world, x, y, z);
 					if (check.distance(loc) <= radius) {
 						blocks.add(check.getBlock());
 					}

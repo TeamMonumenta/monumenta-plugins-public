@@ -7,6 +7,7 @@ import org.bukkit.entity.LivingEntity;
 
 public class PassiveMudTrail extends Spell {
 	private static final int MUD_TIME = 10 * 20;
+	private static final double HITBOX_SIZE_MULT = 0.7;
 
 	private final LivingEntity mBoss;
 	private final ExperimentSeventyOne mExperimentSeventyOne;
@@ -27,8 +28,8 @@ public class PassiveMudTrail extends Spell {
 		if (mTicks == 5) {
 			mTicks = 0;
 
-			double hitboxSizeX = mBoss.getBoundingBox().getWidthX();
-			double hitboxSizeZ = mBoss.getBoundingBox().getWidthZ();
+			double hitboxSizeX = mBoss.getBoundingBox().getWidthX() * HITBOX_SIZE_MULT;
+			double hitboxSizeZ = mBoss.getBoundingBox().getWidthZ() * HITBOX_SIZE_MULT;
 			for (int x = 0; x <= Math.ceil(hitboxSizeX); x++) {
 				for (int z = 0; z <= Math.ceil(hitboxSizeZ); z++) {
 					Block mudBlock = mBoss.getLocation().clone().add(-hitboxSizeX / 2 + x, -0.5, -hitboxSizeZ / 2 + z).getBlock();

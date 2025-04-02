@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.hunts.bosses.spells;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.hunts.bosses.ExperimentSeventyOne;
@@ -18,10 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import net.kyori.adventure.bossbar.BossBar;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -42,6 +37,7 @@ import org.joml.Matrix4f;
 public class MudGeysers extends Spell {
 	private static final int WINDUP_DURATION = 2 * 20;
 	private static final int GEYSER_ANIMATION = (int) (0.5 * 20);
+	private static final double GEYSER_DURATION = 5 * 20;
 	private static final double RADIUS = 3.25;
 	private static final double DAMAGE = 75;
 	private static final Material[] GEYSER_BLOCKS = new Material[] {
@@ -50,14 +46,14 @@ public class MudGeysers extends Spell {
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
+	private final World mWorld;
 	private final ExperimentSeventyOne mExperiment;
-	private final ChargeUpManager mChargeUp;
 
 	public MudGeysers(Plugin plugin, LivingEntity boss, ExperimentSeventyOne experiment) {
 		mPlugin = plugin;
 		mBoss = boss;
+		mWorld = boss.getWorld();
 		mExperiment = experiment;
-		mChargeUp = new ChargeUpManager(mBoss, WINDUP_DURATION, Component.text(""), BossBar.Color.RED, BossBar.Overlay.PROGRESS, 60);
 	}
 
 	@Override
@@ -70,11 +66,6 @@ public class MudGeysers extends Spell {
 			chosenLocs.add(LocationUtils.fallToGround(location, 5).add(0, 0.75, 0));
 		}
 
-		mChargeUp.reset();
-		mChargeUp.setTitle(Component.text("Releasing ", NamedTextColor.RED).append(Component.text("Mud Geysers", NamedTextColor.GRAY, TextDecoration.BOLD)));
-		mChargeUp.update();
-
-		World world = mBoss.getWorld();
 		List<List<Location>> windupLocs = new ArrayList<>();
 		for (Location loc : chosenLocs) {
 			List<Location> locs = getLocationsInCircle(loc, (int) RADIUS)
@@ -118,42 +109,65 @@ public class MudGeysers extends Spell {
 							new PPCircle(Particle.BLOCK_CRACK, loc, RADIUS - 0.25).data(Material.MUD.createBlockData()).ringMode(false).countPerMeter(2).spawnAsBoss();
 							new PPCircle(Particle.REDSTONE, loc, RADIUS).data(new Particle.DustOptions(Color.fromRGB(200, 80, 0), 1f)).countPerMeter(2).spawnAsBoss();
 							new PPSpiral(Particle.WATER_DROP, loc, RADIUS).count(1).spawnAsBoss();
-							world.playSound(loc, Sound.BLOCK_MUD_STEP, 1f, 0.5f);
-							world.playSound(loc, Sound.BLOCK_SOUL_SAND_STEP, 1f, 0.5f);
+							mWorld.playSound(loc, Sound.BLOCK_MUD_STEP, 1f, 0.5f);
+							mWorld.playSound(loc, Sound.BLOCK_SOUL_SAND_STEP, 1f, 0.5f);
 						}
 					}
-				} else if (mTicks < WINDUP_DURATION + GEYSER_ANIMATION) {
+				} else if (mTicks < WINDUP_DURATION + GEYSER_DURATION) {
 					if (mTicks == WINDUP_DURATION) {
-						for (Location loc : chosenLocs) {
-							world.playSound(loc, Sound.ENTITY_WITHER_BREAK_BLOCK, 1.8f, 2f);
-							world.playSound(loc, Sound.AMBIENT_UNDERWATER_EXIT, 2f, 0.6f);
-							world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_INSIDE, 2f, 0.75f);
-							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2f, 0.6f);
-
-							// Damage players
-							Hitbox hitbox = new Hitbox.UprightCylinderHitbox(loc.clone().subtract(0, 2, 0), 10, RADIUS);
-							for (Player p : hitbox.getHitPlayers(false)) {
-								DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, "Mud Geysers");
-								MovementUtils.knockAway(loc, p, 0.3f, 1.5f, false);
-								p.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 1f, 1f);
-							}
+						for (Location location : chosenLocs) {
+							mWorld.playSound(location, Sound.ENTITY_WITHER_BREAK_BLOCK, 1.8f, 2f);
+							mWorld.playSound(location, Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_INSIDE, 2f, 0.75f);
+							mWorld.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, 2f, 0.6f);
 						}
 					}
-					double dustDelta = Math.max(RADIUS / 2 - 0.25, 0);
-					double blockDelta = Math.max(RADIUS / 2 - 0.5, 0);
-					final double dy = 1;
-					for (Location loc : chosenLocs) {
-						new PartialParticle(Particle.REDSTONE, loc, 30, dustDelta, dy, dustDelta, 0.1, new Particle.DustOptions(Color.fromRGB(68, 64, 64), 1.5f)).spawnAsBoss();
-						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, blockDelta, dy, blockDelta, 0.1, Bukkit.createBlockData(Material.SOUL_SAND)).spawnAsBoss();
-						loc.add(0, dy, 0);
+					if ((mTicks - WINDUP_DURATION) % GEYSER_ANIMATION == 0) {
+						for (Location location : chosenLocs) {
+							launchGeyser(location.clone());
+						}
 					}
 				} else {
 					this.cancel();
 				}
-				mChargeUp.setProgress((float) mTicks / WINDUP_DURATION);
 				mTicks++;
+				if (mBoss.isDead()) {
+					this.cancel();
+				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	private void launchGeyser(Location location) {
+		mWorld.playSound(location, Sound.AMBIENT_UNDERWATER_EXIT, 2f, 0.6f);
+
+		// Damage players
+		Hitbox hitbox = new Hitbox.UprightCylinderHitbox(location.clone().subtract(0, 2, 0), 10, RADIUS);
+		for (Player p : hitbox.getHitPlayers(false)) {
+			DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, "Mud Geysers");
+			MovementUtils.knockAway(location, p, 0.3f, 1.5f, false);
+			p.playSound(location, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 1f, 1f);
+		}
+
+		double dustDelta = Math.max(RADIUS / 2 - 0.25, 0);
+		double blockDelta = Math.max(RADIUS / 2 - 0.5, 0);
+		final double dy = 1;
+		BukkitRunnable runnable = new BukkitRunnable() {
+			int mTicks = 0;
+
+			@Override
+			public void run() {
+				new PartialParticle(Particle.REDSTONE, location, 30, dustDelta, dy, dustDelta, 0.1, new Particle.DustOptions(Color.fromRGB(68, 64, 64), 1.5f)).spawnAsBoss();
+				new PartialParticle(Particle.BLOCK_CRACK, location, 30, blockDelta, dy, blockDelta, 0.1, Bukkit.createBlockData(Material.SOUL_SAND)).spawnAsBoss();
+				location.add(0, dy, 0);
+
+				mTicks++;
+				if (mTicks > GEYSER_ANIMATION || mBoss.isDead()) {
+					this.cancel();
+				}
+			}
+		};
+		mActiveRunnables.add(runnable);
+		runnable.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	private BlockDisplay spawnGeyserBlock(Location loc) {

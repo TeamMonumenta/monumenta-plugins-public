@@ -43,6 +43,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -67,6 +68,9 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 	private static final int BANISH_PERCENT = 75;
 
 	public static final String BANISH_CHARACTER = "⚠";
+	public static final String SPOIL_CHARACTER = "❌";
+
+	private static final int TEMPORARY_BLOCK_DURATION = 10 * 20;
 
 	private static final String GENERAL_WINS_SCOREBOARD = "HuntsWins";
 	private static final String GENERAL_UNSPOILED_WINS_SCOREBOARD = "HuntsUnspoiledWins";
@@ -92,6 +96,7 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 	private boolean mHasBanished;
 
 	public final Set<Block> mBreakableBlocks = new HashSet<>();
+	public final Map<Block, Integer> mDecayingBlocks = new HashMap<>();
 	private final Set<UUID> mBlockBreakMessagedPlayers = new HashSet<>();
 
 	public Quarry(Plugin plugin, String identityTag, LivingEntity boss, Location spawnLoc, Location endLoc, double radiusInner, double radiusOuter, HuntsManager.QuarryType quarryType) {
@@ -186,6 +191,9 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 			// Don't add a player to the spoiled list if they are not properly in the fight or if they are already spoiled
 			return false;
 		}
+
+		MessagingUtils.sendTitle(player, Component.text(""), Component.text(SPOIL_CHARACTER, mQuarryType.getColor()));
+
 		mSpoiledPlayers.add(uuid);
 		MMLog.fine("[Hunts] Player " + player.getName() + " spoiled quarry " + mBoss.getName());
 		return true;
@@ -243,16 +251,20 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 	public void nearbyBlockBreak(BlockBreakEvent event) {
 		super.nearbyBlockBreak(event);
 
-		if (!isBreakable(event.getBlock())) {
+		Block block = event.getBlock();
+		if (!isBreakable(block)) {
 			event.setCancelled(true);
 
 			Player player = event.getPlayer();
 			UUID uuid = player.getUniqueId();
 			if (!mBlockBreakMessagedPlayers.contains(uuid)) {
 				mBlockBreakMessagedPlayers.add(uuid);
-				player.sendMessage(Component.text("You should focus on fighting the beast, not breaking the ground!", NamedTextColor.RED));
+				player.sendMessage(Component.text("It is too dangerous to break this while the beast is nearby!", NamedTextColor.RED));
 				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 1, 0.63f);
 			}
+		} else {
+			mBreakableBlocks.remove(block);
+			mDecayingBlocks.remove(block);
 		}
 	}
 
@@ -269,7 +281,37 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 	public void nearbyBlockPlace(BlockPlaceEvent event) {
 		super.nearbyBlockPlace(event);
 
-		mBreakableBlocks.add(event.getBlockPlaced());
+		Block block = event.getBlockPlaced();
+		mBreakableBlocks.add(block);
+		mDecayingBlocks.put(block, Bukkit.getCurrentTick());
+		new BukkitRunnable() {
+			int mTicks = 0;
+
+			@Override
+			public void run() {
+				if (Bukkit.getCurrentTick() - mDecayingBlocks.get(block) == TEMPORARY_BLOCK_DURATION / 2) {
+					block.setType(Material.BLACK_STAINED_GLASS);
+				}
+				if (Bukkit.getCurrentTick() - mDecayingBlocks.get(block) == TEMPORARY_BLOCK_DURATION) {
+					this.cancel();
+				}
+
+				mTicks++;
+				if (!mBreakableBlocks.contains(block)) {
+					this.cancel();
+				}
+			}
+
+			@Override
+			public synchronized void cancel() throws IllegalStateException {
+				super.cancel();
+
+				mBreakableBlocks.remove(block);
+				mDecayingBlocks.remove(block);
+
+				block.setType(Material.AIR);
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	public abstract String getUnspoiledLootTable();

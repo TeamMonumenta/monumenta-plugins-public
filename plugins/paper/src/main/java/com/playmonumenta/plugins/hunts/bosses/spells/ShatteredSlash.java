@@ -10,6 +10,8 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -21,6 +23,8 @@ import org.bukkit.util.Vector;
 public class ShatteredSlash extends Spell {
 	// Lifetime of the windup portion of the spell in ticks
 	private static final int WINDUP_DURATION = 25;
+
+	private static final double ACTIVATION_RANGE = 6;
 
 	private static final int ATTACK_DAMAGE = 90;
 	private static final int FRAGMENT_ATTACK_DAMAGE = 65;
@@ -41,6 +45,11 @@ public class ShatteredSlash extends Spell {
 		mWorld = boss.getWorld();
 
 		mEnhanced = enhanced;
+	}
+
+	@Override
+	public boolean canRun() {
+		return !PlayerUtils.playersInRange(mBoss.getLocation(), ACTIVATION_RANGE, true).isEmpty();
 	}
 
 	@Override

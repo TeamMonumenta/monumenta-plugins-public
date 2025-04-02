@@ -30,6 +30,7 @@ import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExperimentSeventyOne extends Quarry {
 	public static final String identityTag = "boss_experimentseventyone";
 
-	public static final int INNER_RADIUS = 40;
+	public static final int INNER_RADIUS = 30;
 	public static final int OUTER_RADIUS = 65;
 	private static final int MAX_HEALTH = 8000;
 	private static final double MOVEMENT_SPEED = 0.29;
@@ -81,6 +82,7 @@ public class ExperimentSeventyOne extends Quarry {
 	public static final int HIGH_PLAYER_CUTOFF = 5;
 
 	private static final double DAMAGE_REDUCTION_PER_WORM = 0.05;
+	private static final int DAMAGE_REDUCTION_TELEGRAPH_COOLDOWN = 20 * 3;
 
 	private static final double DAMAGE_REDUCTION_DISTANCE = 8;
 
@@ -180,6 +182,10 @@ public class ExperimentSeventyOne extends Quarry {
 				}
 
 				manageMudTimings();
+
+				if (mTicks % DAMAGE_REDUCTION_TELEGRAPH_COOLDOWN == 0) {
+					mWorms.forEach(e -> ParticleUtils.launchOrb(new Vector(0, 1, 0), e.getLocation(), e, mBoss, 200, null, new Particle.DustOptions(Color.fromRGB(110, 63, 19), 1.2f), en -> {}));
+				}
 
 				mLeapCooldown--;
 				if (mLeapCooldown <= 0 && !mMonumentaPlugin.mEffectManager.hasEffect(mBoss, "SelfRoot") && getCurrentTarget() != null && mBoss.getLocation().distance(getCurrentTarget().getLocation()) > LEAP_DISTANCE) {
@@ -330,12 +336,12 @@ public class ExperimentSeventyOne extends Quarry {
 		mBreakableBlocks.remove(block);
 	}
 
-	private boolean isOpenSpot(Block block) {
-		Location loc = block.getLocation();
-		if (LocationUtils.hasLineOfSight(loc.clone().add(0, 2, 0), mBoss.getLocation())) {
-			return true;
+	private boolean isHiddenSpot(Block block) {
+		Location loc = block.getLocation().clone().add(0, 1, 0);
+		if (LocationUtils.hasLineOfSight(loc, mBoss.getLocation())) {
+			return false;
 		}
-		return !LocationUtils.rayTraceToBlock(loc, new Vector(0, 1, 0), 10, null).add(0, 0.1, 0).getBlock().isSolid();
+		return LocationUtils.rayTraceToBlock(loc, new Vector(0, 1, 0), 10, null).add(0, 0.1, 0).getBlock().isSolid();
 	}
 
 	public void placeWormSpawner(Block block) {
@@ -343,7 +349,7 @@ public class ExperimentSeventyOne extends Quarry {
 		if (block.getType().getHardness() == -1
 				|| ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)
 				|| isWormSpawner(block)
-				|| !isOpenSpot(block)) {
+				|| isHiddenSpot(block)) {
 			return;
 		}
 
@@ -359,6 +365,12 @@ public class ExperimentSeventyOne extends Quarry {
 			.delta(0.25, 0, 0.25)
 			.spawnAsBoss();
 
+		// override any decaying blocks with a spawner that turns into air
+		if (mDecayingBlocks.containsKey(block)) {
+			mDecayingBlocks.remove(block);
+			block.setType(Material.AIR);
+		}
+
 		TemporaryBlockChangeManager.INSTANCE.changeBlock(block, WORM_SPAWNER, PERMANENT_MUD_DURATION);
 		mWormSpawners.put(block, INITIAL_WORM_SPAWNER_COOLDOWN);
 		mBreakableBlocks.add(block);
@@ -372,13 +384,20 @@ public class ExperimentSeventyOne extends Quarry {
 		// never place mud on top of a worm spawner or in an invalid location
 		if (block.getType().getHardness() == -1
 				|| ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)
-				|| isWormSpawner(block)) {
+				|| isWormSpawner(block)
+				|| block.getRelative(BlockFace.UP).isSolid()) {
 			return;
 		}
 
 		if (isMudTrail(block)) {
 			TemporaryBlockChangeManager.INSTANCE.increaseDuration(block, time);
 		} else {
+			// override any decaying blocks with mud that turns into air
+			if (mDecayingBlocks.containsKey(block)) {
+				mDecayingBlocks.remove(block);
+				block.setType(Material.AIR);
+			}
+
 			TemporaryBlockChangeManager.INSTANCE.changeBlock(block, MUD_TRAIL, time);
 			mMudReplacements.add(block);
 			mBreakableBlocks.add(block);

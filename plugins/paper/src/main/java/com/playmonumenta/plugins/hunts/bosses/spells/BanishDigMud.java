@@ -46,7 +46,7 @@ public class BanishDigMud extends Spell {
 	public void run() {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE, true, true);
 		for (Player player : players) {
-			player.sendMessage(Component.text("You find yourself struggling to get through the mud.", ExperimentSeventyOne.TEXT_COLOR));
+			player.sendMessage(Component.text("The mud begins to creep further along the ground...", ExperimentSeventyOne.TEXT_COLOR));
 			// Give the players Muddied effect
 			EffectManager.getInstance().addEffect(player, MUDDIED_EFFECT_SOURCE, new Muddied(DURATION + 5, MUD_BLOCKS_TO_BREAK));
 		}

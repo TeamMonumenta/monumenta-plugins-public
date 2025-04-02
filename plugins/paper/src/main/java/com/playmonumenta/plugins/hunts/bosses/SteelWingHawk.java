@@ -46,8 +46,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class SteelWingHawk extends Quarry {
 	public static final String identityTag = "boss_steel_wing_hawk";
 	private static final int HEALTH = 8500;
-	public static final int INNER_RADIUS = 30;
-	public static final int OUTER_RADIUS = 45;
+	public static final int INNER_RADIUS = 50;
+	public static final int OUTER_RADIUS = 70;
 	public static final TextColor COLOR = TextColor.color(166, 161, 172);
 
 	private static final int EFFECT_DURATION = 30 * 20;

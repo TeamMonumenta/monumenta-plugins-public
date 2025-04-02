@@ -15,8 +15,10 @@ import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -51,11 +53,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Shulker;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class HuntsManager {
+public class HuntsManager implements Listener {
 	private static final String HUNTS_SCOREHOLDER = "$Hunts";
 	private static final String TIME_OBJECTIVE = "HuntsSpawnTime";
 	private static final String BAITED_OBJECTIVE = "HuntsBaited";
@@ -64,9 +73,12 @@ public class HuntsManager {
 
 	private static final String ANNOUNCEMENT_DISABLE_TAG = "HuntsAnnouncementDisable";
 
+	private static final String CLASS_DISABLE_TAG = "HuntsDisableClass";
+
 	private static final int MEAN_SECONDS = 120 * 60;
 	private static final int SD_SECONDS = 10 * 60;
 
+	private static final int WARNING_30 = 30 * 60;
 	private static final int WARNING_15 = 15 * 60;
 	private static final int WARNING_5 = 5 * 60;
 
@@ -181,7 +193,14 @@ public class HuntsManager {
 		}
 
 		public void respawnArena(World world) {
-			StructuresAPI.loadAndPasteStructure(String.format("ring/hunts/%s", mName.replaceAll(" ", "")), mRespawnArenaPos.toLocation(world), false, false);
+			StructuresAPI.loadAndPasteStructure(String.format("ring/hunts/%s", mName.replaceAll(" ", "")), mRespawnArenaPos.toLocation(world), false, false)
+				.thenAccept((v) -> {
+					for (Player player : PlayerUtils.playersInRange(getLocation(world), mInnerRadius, true)) {
+						if (player.getEyeLocation().getBlock().isSolid()) {
+							player.teleport(LocationUtils.mapToGround(player.getLocation().clone().add(0, 5, 0), 5));
+						}
+					}
+				});
 		}
 	}
 
@@ -193,6 +212,7 @@ public class HuntsManager {
 	private boolean mIsBaited;
 	private long mSpawnTime;
 
+	private boolean mTriggeredThirty = false;
 	private boolean mTriggeredFifteen = false;
 	private boolean mTriggeredFive = false;
 
@@ -226,7 +246,7 @@ public class HuntsManager {
 			public void run() {
 				if (isCorrectInstance()) {
 					long remainingTime = getRemainingTime();
-					if (remainingTime <= WARNING_15) {
+					if (remainingTime <= WARNING_30) {
 						if (remainingTime <= 0) {
 							summonQuarry();
 							//TODO spawn message
@@ -238,17 +258,36 @@ public class HuntsManager {
 								mTriggeredFive = true;
 								MMLog.fine("[Hunts] Sent 5 minute warning");
 							}
-						} else {
+						} else if (remainingTime <= WARNING_15) {
 							if (!mTriggeredFifteen) {
 								sendWarning();
 								mTriggeredFifteen = true;
+
+								if (mNextQuarry != null && mWorld != null) {
+									mNextQuarry.respawnArena(mWorld);
+								}
+
 								MMLog.fine("[Hunts] Sent 15 minute warning");
+							}
+						} else {
+							if (!mTriggeredThirty) {
+								sendWarning();
+								mTriggeredThirty = true;
+								MMLog.fine("[Hunts] Sent 30 minute warning");
 							}
 						}
 
-						if (mNextQuarry != null) {
-							BroadcastedEvents.updateEvent(mNextQuarry.name(), (int) remainingTime);
-							preSpawnParticles(mNextQuarry, remainingTime);
+						if (getRemainingTime() < WARNING_15) {
+							if (mNextQuarry != null) {
+								BroadcastedEvents.updateEvent(mNextQuarry.name(), (int) remainingTime);
+								preSpawnParticles(mNextQuarry, remainingTime);
+							}
+
+							if (mWorld != null) {
+								for (Player player : mWorld.getPlayers()) {
+									updatePlayerWaiting(player);
+								}
+							}
 						}
 					}
 
@@ -342,6 +381,16 @@ public class HuntsManager {
 					}
 				}
 
+				for (Player player : mWorld.getPlayers()) {
+					if (player.getScoreboardTags().contains(CLASS_DISABLE_TAG)) {
+						player.removeScoreboardTag(CLASS_DISABLE_TAG);
+						player.removeScoreboardTag("disable_class");
+						AbilityUtils.refreshClass(player);
+
+						player.sendMessage(Component.text("The Hunt has begun and your class has been reenabled!", NamedTextColor.GRAY, TextDecoration.ITALIC));
+					}
+				}
+
 				for (String shard : instanceMap.keySet()) {
 					if (shard.equals(mNextInstance)) {
 						// Exclude this instance, no need to transfer
@@ -394,6 +443,7 @@ public class HuntsManager {
 		)
 			.thenRun(this::refreshOthers)
 			.thenRun(() -> {
+				mTriggeredThirty = false;
 				mTriggeredFifteen = false;
 				mTriggeredFive = false;
 			});
@@ -576,12 +626,24 @@ public class HuntsManager {
 			return;
 		}
 
-		Component message1 = Component.text(mNextQuarry.mWarning, mNextQuarry.mColor);
-		Component message2 = Component.text(mNextQuarry.getName() + " will be hunted on " + mNextInstance + " in " + mins + " minutes!", NamedTextColor.GRAY, TextDecoration.ITALIC);
-		for (Player player : players) {
-			player.sendMessage(message1);
-			player.sendMessage(message2);
-			player.playSound(player, mNextQuarry.mSound, SoundCategory.HOSTILE, mins > 5 ? 2.0f : 1.5f, 1.0f);
+		if (mins > 15) {
+			Component message1 = Component.text("The creatures of the Ring are unsettled... A great beast begins to stir.", com.playmonumenta.plugins.itemstats.enums.Location.HUNTS.getColor());
+			Component message2 = Component.text("A quarry will emerge in " + mins + " minutes!", NamedTextColor.GRAY, TextDecoration.ITALIC);
+			for (Player player : players) {
+				player.sendMessage(message1);
+				player.sendMessage(message2);
+				player.playSound(player, Sound.ENTITY_PARROT_FLY, SoundCategory.HOSTILE, 5f, 0.5f);
+				player.playSound(player, Sound.ENTITY_PARROT_FLY, SoundCategory.HOSTILE, 5f, 1f);
+				player.playSound(player, Sound.ENTITY_PARROT_FLY, SoundCategory.HOSTILE, 5f, 2f);
+			}
+ 		} else {
+			Component message1 = Component.text(mNextQuarry.mWarning, mNextQuarry.mColor);
+			Component message2 = Component.text(mNextQuarry.getName() + " will be hunted on " + mNextInstance + " in " + mins + " minutes!", NamedTextColor.GRAY, TextDecoration.ITALIC);
+			for (Player player : players) {
+				player.sendMessage(message1);
+				player.sendMessage(message2);
+				player.playSound(player, mNextQuarry.mSound, SoundCategory.HOSTILE, mins > 5 ? 2.0f : 1.5f, 1.0f);
+			}
 		}
 	}
 
@@ -645,5 +707,78 @@ public class HuntsManager {
 			.count((int) (20 - 8 * ((double) timeRemaining) / WARNING_15))
 			.delta(quarryType.mInnerRadius * 0.35, quarryType.mInnerRadius * 0.2, quarryType.mInnerRadius * 0.35)
 			.spawnAsBoss();
+	}
+
+	private void playerEnterWaitingArea(Player player) {
+		player.addScoreboardTag("disable_class");
+		AbilityUtils.refreshClass(player);
+
+		if (mNextQuarry != null) {
+			player.sendMessage(Component.text("You have entered the range of " + mNextQuarry.getName() + ".", mNextQuarry.mColor));
+			player.sendMessage(Component.text("Your class has been disabled before the fight.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+		}
+	}
+
+	private void playerExitWaitingArea(Player player) {
+		player.removeScoreboardTag("disable_class");
+		AbilityUtils.refreshClass(player);
+
+		if (mNextQuarry != null) {
+			player.sendMessage(Component.text("You have exited the range of " + mNextQuarry.getName() + ".", mNextQuarry.mColor));
+		}
+		player.sendMessage(Component.text("Your class has been reenabled.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+	}
+
+	private void updatePlayerWaiting(Player player) {
+		if (mNextQuarry != null) {
+			if (player.getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius) {
+				if (!player.getScoreboardTags().contains(CLASS_DISABLE_TAG)) {
+					player.addScoreboardTag(CLASS_DISABLE_TAG);
+					playerEnterWaitingArea(player);
+				}
+			} else {
+				if (player.getScoreboardTags().contains(CLASS_DISABLE_TAG)) {
+					player.removeScoreboardTag(CLASS_DISABLE_TAG);
+					playerExitWaitingArea(player);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void onBlockBreak(BlockBreakEvent event) {
+		if (getRemainingTime() < WARNING_15 && mNextQuarry != null
+				&& event.getBlock().getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius) {
+			event.getPlayer().sendMessage(Component.text("The quarry will appear soon, it is best to leave the ground undisturbed.", NamedTextColor.RED));
+			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 1, 0.63f);
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void onBlockPlace(BlockPlaceEvent event) {
+		if (getRemainingTime() < WARNING_15 && mNextQuarry != null
+				&& event.getBlock().getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius) {
+			event.getPlayer().sendMessage(Component.text("The quarry will appear soon, it is best to leave the ground undisturbed.", NamedTextColor.RED));
+			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 1, 0.63f);
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+		if (getRemainingTime() < WARNING_15 && mWorld == player.getWorld()) {
+			updatePlayerWaiting(player);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onQuit(PlayerQuitEvent event) {
+		Player player = event.getPlayer();
+		if (player.getScoreboardTags().contains(CLASS_DISABLE_TAG)) {
+			player.removeScoreboardTag(CLASS_DISABLE_TAG);
+			playerExitWaitingArea(player);
+		}
 	}
 }

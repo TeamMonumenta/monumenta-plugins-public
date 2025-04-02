@@ -64,8 +64,8 @@ public class CoreElemental extends Quarry {
 	private static final int HEALTH = 6000;
 	private static final double KNOCKBACK_RESISTANCE = 0.7;
 	private static final int MELEE_DAMAGE = 45;
-	public static final int INNER_RADIUS = 50;
-	public static final int OUTER_RADIUS = 80;
+	public static final int INNER_RADIUS = 30;
+	public static final int OUTER_RADIUS = 50;
 	private static final int NUMBER_OF_FISSURE = 5;
 	private static final int NUMBER_OF_PHASE = 3;
 	private static final int[] PHASE_HEALTH = {30, 50, 70};

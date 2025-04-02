@@ -599,6 +599,7 @@ public class Plugin extends JavaPlugin {
 		new SpawnerVisualisation().register();
 		manager.registerEvents(MailMan.getInstance(), this);
 		manager.registerEvents(new GuiListener(), this);
+		manager.registerEvents(mHuntsManager, this);
 		PlayerTitleManager.start();
 
 		if (ServerProperties.getDepthsEnabled()) {
