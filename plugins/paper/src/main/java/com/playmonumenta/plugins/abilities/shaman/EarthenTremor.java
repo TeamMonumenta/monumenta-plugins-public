@@ -140,7 +140,7 @@ public class EarthenTremor extends Ability {
 			.addTrigger()
 			.add(" to summon an earthen tremor at your location that deals ")
 			.add(a -> a.mDamageBase, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" %s magic damage to mobs within ")
+			.add(" magic damage to mobs within ")
 			.add(a -> a.mRadius, RANGE)
 			.add(" blocks and pushes them away.")
 			.addCooldown(COOLDOWN);

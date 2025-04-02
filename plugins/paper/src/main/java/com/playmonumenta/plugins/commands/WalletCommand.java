@@ -201,10 +201,11 @@ public class WalletCommand {
 
 				wallet.remove(player, ItemUtils.clone(removed));
 				long remaining = wallet.count(removed);
+				int withdrawnAmount = removed.getAmount(); // Capture the correct amount of items being withdrawn to display to the player; the line below somehow modifies it and shows a wrong number
 				InventoryUtils.giveItem(player, removed);
 
 				player.sendMessage(Component.text("Withdrew ", NamedTextColor.GREEN).append(
-					Component.text(removed.getAmount() + " " + ItemUtils.getPlainNameOrDefault(removed), NamedTextColor.WHITE).append(
+					Component.text(withdrawnAmount + " " + ItemUtils.getPlainNameOrDefault(removed), NamedTextColor.WHITE).append(
 						Component.text(" from your wallet. ", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)).append(
 						Component.text("(Remaining in wallet: " + remaining + ")", NamedTextColor.GRAY)
 					)));

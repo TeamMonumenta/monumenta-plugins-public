@@ -615,7 +615,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			.add(" to change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). This skill can only apply Recoil once per max charge before touching the ground. Charges: ")
 			.add(a -> a.mMaxCharges, HALLOWED_1_MAX_CHARGES, false, Ability::isLevelOne)
 			.add(".")
-			.addCooldown(HALLOWED_2_COOLDOWN, Ability::isLevelOne);
+			.addCooldown(HALLOWED_1_COOLDOWN, Ability::isLevelOne);
 	}
 
 	private static Description<HallowedBeam> getDescription2() {
