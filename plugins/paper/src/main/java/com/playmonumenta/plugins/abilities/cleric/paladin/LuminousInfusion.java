@@ -1,16 +1,8 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
-import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
+import com.playmonumenta.plugins.abilities.*;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -27,6 +19,9 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -39,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
-public final class LuminousInfusion extends MultipleChargeAbility implements KillTriggeredAbility {
+public final class LuminousInfusion extends Ability implements KillTriggeredAbility, AbilityWithChargesOrStacks {
 	public double mLastPassiveMeleeDamage = 0; // Passive damage to share with Holy Javelin
 
 	private static final int DAMAGE_UNDEAD_1 = 4;
@@ -93,6 +88,8 @@ public final class LuminousInfusion extends MultipleChargeAbility implements Kil
 	private final int mMinStacksToActivate;
 	private final KillTriggeredAbilityTracker mTracker;
 	private final LuminousInfusionCS mCosmetic;
+	private final int mMaxCharges;
+	private int mCharges;
 
 	private int mKillCount = 0;
 	private int mPrimedStacks = 0;
@@ -106,7 +103,7 @@ public final class LuminousInfusion extends MultipleChargeAbility implements Kil
 		mMinStacksToActivate = MIN_STACKS_TO_ACTIVATE + (int) CharmManager.getLevel(mPlayer, CHARM_MIN_STACKS);
 		mStacksPerKill = STACKS_PER_KILL + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS_PER_KILL);
 		mMaxCharges = MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_STACKS);
-		mCharges = getCharges();
+		mCharges = 0;
 
 		mDamagePerStack = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
 			(isLevelTwo() ? DAMAGE_UNDEAD_2 : DAMAGE_UNDEAD_1));
@@ -258,6 +255,50 @@ public final class LuminousInfusion extends MultipleChargeAbility implements Kil
 	}
 
 	@Override
+	public int getCharges() {
+		return mCharges;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return mMaxCharges;
+	}
+
+	// Call this when the ability is cast; returns whether a charge was consumed or not
+	private boolean consumeCharge() {
+		if (mCharges > 0) {
+			mCharges--;
+			PlayerUtils.callAbilityCastEvent(mPlayer, this, ClassAbility.LUMINOUS_INFUSION);
+			if (mMaxCharges > 1) {
+				showChargesMessage();
+			}
+			ClientModHandler.updateAbility(mPlayer, this);
+			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION, mCharges);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean incrementCharge() {
+		if (mCharges < mMaxCharges) {
+			mCharges++;
+			if (mMaxCharges > 1) {
+				showChargesMessage();
+			} else {
+				showOffCooldownMessage();
+			}
+			ClientModHandler.updateAbility(mPlayer, this);
+			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION, mCharges);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
 	public @Nullable String getMode() {
 		return mPrimedStacks > 0 ? "active" : null;
 	}
@@ -307,4 +348,24 @@ public final class LuminousInfusion extends MultipleChargeAbility implements Kil
 			.addDuration(a -> a.mFireDuration, FIRE_DURATION_2)
 			.add(" seconds.");
 	}
+
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		TextColor color = INFO.getActionBarColor();
+		String name = INFO.getHotbarName();
+
+		int charges = getCharges();
+		int maxCharges = getMaxCharges();
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text(name != null ? name : "Error", color))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
+
+		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+
+		return output;
+	}
+
 }

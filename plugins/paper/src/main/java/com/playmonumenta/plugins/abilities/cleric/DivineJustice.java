@@ -32,6 +32,10 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import java.util.NavigableSet;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -344,5 +348,29 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.add(" and the duration is refreshed on each pickup. Bone Shards can be consumed from the inventory by right clicking to get the max effect for ")
 			.add(a -> ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION, ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION, false, StringUtils::ticksToMinutes)
 			.add(" minutes.");
+	}
+
+
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		if (isEnhanced()) {
+			TextColor color = INFO.getActionBarColor();
+			String name = INFO.getHotbarName();
+
+			int charges = getCharges();
+			int maxCharges = getMaxCharges();
+
+			// String output.
+			Component output = Component.text("[", NamedTextColor.YELLOW)
+				.append(Component.text(name != null ? name : "Error", color))
+				.append(Component.text("]", NamedTextColor.YELLOW))
+				.append(Component.text(": ", NamedTextColor.WHITE));
+
+			output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+
+			return output;
+		} else {
+			return Component.text("");
+		}
 	}
 }

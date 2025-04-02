@@ -24,6 +24,11 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.EnumSet;
 import java.util.NavigableSet;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -218,5 +223,31 @@ public class DarkPact extends Ability {
 				return subDescription.get(soulRend, p);
 			})
 			.add(" Nearby players are still healed as normal.");
+	}
+
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		ClassAbility classAbility = INFO.getLinkedSpell();
+		int remainingCooldown = classAbility == null ? 0 : mPlugin.mTimers.getCooldown(mPlayer.getUniqueId(), classAbility);
+		TextColor color = INFO.getActionBarColor();
+		String name = INFO.getHotbarName();
+
+
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text(name != null ? name : "Error", !mActive ? NamedTextColor.GRAY : color))
+			.append(Component.text("]", NamedTextColor.YELLOW));
+
+			output = output.append(Component.text(": ", NamedTextColor.WHITE));
+
+		if (mActive && (CANCEL_WINDOW - (Bukkit.getServer().getCurrentTick() - mStartingTick)) > 0) {
+			output = output.append(Component.text(((int) Math.ceil(Math.max(0, 20 + CANCEL_WINDOW - (Bukkit.getServer().getCurrentTick() - mStartingTick))) / TICKS_PER_SECOND) + "s", NamedTextColor.DARK_RED));
+		} else if (remainingCooldown > 0) {
+			output = output.append(Component.text(((int) Math.ceil(remainingCooldown / 20.0)) + "s", NamedTextColor.GRAY));
+		} else {
+			output = output.append(Component.text("✓", NamedTextColor.GREEN, TextDecoration.BOLD));
+		}
+
+		return output;
 	}
 }
