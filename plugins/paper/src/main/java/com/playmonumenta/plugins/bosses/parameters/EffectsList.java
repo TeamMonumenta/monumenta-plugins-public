@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -42,6 +43,9 @@ public class EffectsList {
 			EFFECT_RUNNER.put("pull", (p, boss, duration) -> MovementUtils.pullTowardsByUnit(boss, p, duration));
 			EFFECT_RUNNER.put("pushforce", (p, boss, duration) -> MovementUtils.knockAway(boss, p, duration, false));
 			EFFECT_RUNNER.put("push", (p, boss, duration) -> MovementUtils.knockAwayRealistic(boss.getLocation(), p, duration, 0.5f, true));
+			EFFECT_RUNNER.put("InstantHealthPercent", (target, boss, strength) -> {
+				EffectType.applyEffect(EffectType.INSTANT_HEALTH, target, 1, strength, "EffectListInstantHealthPercent", false);
+			});
 
 			CUSTOM_EFFECT_RUNNER = new HashMap<>();
 			CUSTOM_EFFECT_RUNNER.put("CustomSpeed", (target, boss, duration, strength, effectName) -> {
