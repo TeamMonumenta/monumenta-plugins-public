@@ -94,6 +94,9 @@ public class RejuvenationHealing extends Effect {
 		return true;
 	}
 
+	/**
+	 * @apiNote if you're searching for what is displayed as "Rejuvenation Heal" in tab, go to {@link ThuribleBonusHealing}
+	 */
 	@Override
 	public @Nullable Component getSpecificDisplay() {
 		return null;

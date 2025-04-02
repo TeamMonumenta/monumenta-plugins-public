@@ -12,6 +12,11 @@ public class ThuribleBonusHealing extends SingleArgumentEffect {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return String.format("ThuribleBonusHealing duration=%d healing=%f", this.getDuration(), mAmount);
 	}

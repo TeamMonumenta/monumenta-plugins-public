@@ -52,6 +52,11 @@ public class EnchantedPrayerAoE extends Effect {
 	}
 
 	@Override
+	public boolean isBuff() {
+		return true;
+	}
+
+	@Override
 	public double getMagnitude() {
 		return Math.abs(mDamageAmount);
 	}
