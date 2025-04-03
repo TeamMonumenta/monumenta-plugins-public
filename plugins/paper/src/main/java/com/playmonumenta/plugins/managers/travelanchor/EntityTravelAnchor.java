@@ -54,6 +54,9 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 	}
 
 	public static void removeAnchor(Entity entity) {
+		if (!entity.isValid()) {
+			return;
+		}
 		PersistentDataContainer pdc = entity.getPersistentDataContainer();
 		pdc.remove(TRAVEL_ANCHOR_PDC_KEY);
 		entity.removeScoreboardTag(TRAVEL_ANCHOR_TAG);

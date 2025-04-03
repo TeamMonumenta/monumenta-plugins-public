@@ -56,6 +56,13 @@ public class TravelAnchorManager implements Listener {
 		worldAnchors.removeAnchor(entity);
 	}
 
+	public void unloadAnchor(Entity entity) {
+		World world = entity.getWorld();
+		UUID worldId = world.getUID();
+		WorldTravelAnchors worldAnchors = mWorlds.computeIfAbsent(worldId, k -> new WorldTravelAnchors(world));
+		worldAnchors.unloadAnchor(entity);
+	}
+
 	public WorldTravelAnchors anchorsInWorld(World world) {
 		UUID worldId = world.getUID();
 		return mWorlds.computeIfAbsent(worldId, k -> new WorldTravelAnchors(world));

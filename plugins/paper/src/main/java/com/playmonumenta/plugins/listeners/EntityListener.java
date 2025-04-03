@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.managers.travelanchor.TravelAnchorManager;
 import com.playmonumenta.plugins.player.EnderPearlTracker;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -474,6 +475,7 @@ public class EntityListener implements Listener {
 	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
 		Entity entity = event.getEntity();
 		mPlugin.mTrackingManager.removeEntity(entity);
+		TravelAnchorManager.getInstance().unloadAnchor(entity);
 	}
 
 	// Player shoots an arrow.
