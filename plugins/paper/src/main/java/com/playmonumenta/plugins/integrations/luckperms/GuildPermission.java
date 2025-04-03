@@ -67,7 +67,7 @@ public enum GuildPermission {
 		GuildAccessLevel.MEMBER,
 		true,
 		"Use Travel Anchors",
-		"Allows players to make changes to travel anchors"
+		"Allows players to teleport using travel anchors"
 	),
 	EDIT_TRAVEL_ANCHOR(
 		"edit_travel_anchor",
@@ -75,7 +75,7 @@ public enum GuildPermission {
 		GuildAccessLevel.MEMBER,
 		true,
 		"Edit Travel Anchors",
-		"Allows players to teleport using travel anchors"
+		"Allows players to make changes to travel anchors"
 	),
 	USE_VAULT(
 		"use_vault",
