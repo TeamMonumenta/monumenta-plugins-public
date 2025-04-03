@@ -50,7 +50,7 @@ public class DamageTransferBoss extends BossAbilityGroup {
 				targets.remove(mBoss);
 				for (LivingEntity e : targets) {
 					DamageTransferBoss otherBoss = BossManager.getInstance().getBoss(e, DamageTransferBoss.class);
-					if (otherBoss != null && otherBoss.mTarget == mBoss) {
+					if (otherBoss != null && otherBoss.mTarget.equals(mBoss)) {
 						continue;
 					}
 					mTarget = e;
@@ -66,23 +66,19 @@ public class DamageTransferBoss extends BossAbilityGroup {
 	public void onHurt(DamageEvent event) {
 		if (mTarget != null && !mTarget.isDead() && event.getSource() != null) {
 			mBossDamageThisTick += event.getDamage();
+			event.setFlatDamage(0);
 			// Do this at the end of the tick so we can't miss the passenger being damaged
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				DamageUtils.damage(null, mTarget, event.getType(), mBossDamageThisTick, null, false);
 				mBossDamageThisTick = 0;
 			}, 0);
-		} else {
-			DamageUtils.damage(null, mBoss, event.getType(), event.getDamage(), null, false);
 		}
-		event.setFlatDamage(0);
 	}
 
 	@Override
 	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
 		if (mTarget != null && !mTarget.isDead() && COPIED_EFFECTS.contains(event.getEffect().getClass())) {
 			event.setEntity(mTarget);
-		} else {
-			event.setEntity(mBoss);
 		}
 	}
 
@@ -91,8 +87,6 @@ public class DamageTransferBoss extends BossAbilityGroup {
 		if (mTarget != null && !mTarget.isDead()) {
 			EntityUtils.setFireTicksIfLower(ticks, mTarget, igniter);
 			mBoss.setFireTicks(0);
-		} else {
-			mBoss.setFireTicks(ticks);
 		}
 	}
 }
