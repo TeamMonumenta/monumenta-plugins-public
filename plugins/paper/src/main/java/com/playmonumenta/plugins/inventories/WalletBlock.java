@@ -154,14 +154,14 @@ public class WalletBlock extends BaseWallet {
 
 	@Override
 	public void logAddItem(Player player, ItemStack currency) {
-		AuditListener.log("+AddItemToWalletBlock: " + player.getName() + " added to wallet at `/world "
+		AuditListener.logPlayer("+AddItemToWalletBlock: " + player.getName() + " added to wallet at `/world "
 			+ mWorldName + "` `/tp @s " + mX + " " + mY + " " + mZ
 			+ "`: " + AuditListener.getItemLogString(currency));
 	}
 
 	@Override
 	public void logRemoveItem(Player player, ItemStack currency) {
-		AuditListener.log("-RemoveItemFromWalletBlock: " + player.getName() + " added to wallet at `/world "
+		AuditListener.logPlayer("-RemoveItemFromWalletBlock: " + player.getName() + " added to wallet at `/world "
 			+ mWorldName + "` `/tp @s " + mX + " " + mY + " " + mZ
 			+ "`: " + AuditListener.getItemLogString(currency));
 	}
