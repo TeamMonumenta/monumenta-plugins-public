@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.itemstats.enchantments.Snowy;
-import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Optional;

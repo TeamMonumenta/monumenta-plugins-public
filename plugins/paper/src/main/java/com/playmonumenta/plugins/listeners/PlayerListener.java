@@ -99,7 +99,6 @@ import org.bukkit.block.data.type.Light;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Animals;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
@@ -695,7 +694,6 @@ public class PlayerListener implements Listener {
 				&& player.getGameMode() != GameMode.CREATIVE
 		) {
 			event.setCancelled(true);
-			return;
 		}
 	}
 

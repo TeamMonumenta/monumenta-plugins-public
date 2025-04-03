@@ -21,7 +21,7 @@ public final class PercentDamageDealtSingle extends PercentDamageDealt {
 
 	private boolean mHasDoneDamage;
 	private final boolean mMultiplicative;
-	private final Consumer<DamageEvent> mOnUse;
+	private final @Nullable Consumer<DamageEvent> mOnUse;
 
 	public PercentDamageDealtSingle(final int duration, final double amount) {
 		this(duration, amount, null, false);
