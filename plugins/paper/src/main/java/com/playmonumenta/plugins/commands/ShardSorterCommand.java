@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.shardhealth.ShardHealth;
 import com.playmonumenta.plugins.utils.DateUtils;
-import com.playmonumenta.plugins.utils.DungeonUtils;
+import com.playmonumenta.plugins.utils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -59,7 +59,7 @@ public class ShardSorterCommand {
 						for (ShardSorterData shardSorterData : SHARD_SORTER_DATA) {
 							shards.add(shardSorterData.mShardName);
 						}
-						for (DungeonUtils.DungeonCommandMapping mapping : DungeonUtils.DungeonCommandMapping.values()) {
+						for (DungeonCommandMapping mapping : DungeonCommandMapping.values()) {
 							String shardName = mapping.getShardName();
 							if (shardName != null) {
 								shards.add(shardName);

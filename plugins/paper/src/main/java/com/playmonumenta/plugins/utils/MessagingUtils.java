@@ -275,6 +275,18 @@ public class MessagingUtils {
 		return Duration.ofMillis(t * 50L);
 	}
 
+	public static String concatenateStringsWithAnd(List<String> strings) {
+		if (strings.isEmpty()) {
+			return "";
+		} else if (strings.size() == 1) {
+			return strings.get(0);
+		} else if (strings.size() == 2) {
+			return strings.get(0) + " and " + strings.get(1);
+		} else {
+			return String.join(", ", strings.subList(0, strings.size() - 1)) + ", and " + strings.get(strings.size() - 1);
+		}
+	}
+
 	public static Component concatenateComponents(List<Component> components) {
 		return concatenateComponents(components, Component.newline());
 	}

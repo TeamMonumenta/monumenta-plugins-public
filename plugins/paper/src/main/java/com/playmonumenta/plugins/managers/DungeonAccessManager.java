@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.managers;
 
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
-import com.playmonumenta.plugins.utils.DungeonUtils.DungeonCommandMapping;
+import com.playmonumenta.plugins.utils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;

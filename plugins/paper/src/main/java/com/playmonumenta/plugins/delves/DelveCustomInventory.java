@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.custominventories.BountyGui;
 import com.playmonumenta.plugins.delves.abilities.Entropy;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DungeonUtils;
+import com.playmonumenta.plugins.utils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -510,7 +510,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 		lore.add(Component.text(""));
 
-		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(mDungeonName);
+		DungeonCommandMapping mapping = DungeonCommandMapping.getByShard(mDungeonName);
 		boolean exalted = mapping != null && mapping.getTypeName() != null && ScoreboardUtils.getScoreboardValue(mOwner, mapping.getTypeName()).orElse(0) == 1;
 		double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeonName, exalted);
 		lore.add(Component.text("Stat Multipliers from Base Dungeon:", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));

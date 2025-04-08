@@ -7,7 +7,7 @@ import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.plots.PlotManager;
-import com.playmonumenta.plugins.utils.DungeonUtils;
+import com.playmonumenta.plugins.utils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -127,7 +127,7 @@ public class ServerProperties {
 			}
 		}
 
-		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(shard);
+		DungeonCommandMapping mapping = DungeonCommandMapping.getByShard(shard);
 		if (mapping == null) {
 			return null;
 		}

@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -665,6 +666,14 @@ public class PlayerUtils {
 
 	public static List<String> sortedPlayerNames(Collection<Player> players) {
 		return StringUtils.sortedStrings(players.stream().map(Player::getName).toList());
+	}
+
+	public static Collection<Player> playerSortedByNames(Collection<Player> players) {
+		TreeMap<String, Player> playerTreeMap = new TreeMap<>();
+		for (Player player : players) {
+			playerTreeMap.put(StringUtils.getNaturalSortKey(player.getName()), player);
+		}
+		return playerTreeMap.values();
 	}
 
 	public static void playerTeleport(Player player, Location location) {

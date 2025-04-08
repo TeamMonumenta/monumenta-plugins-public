@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DungeonUtils;
+import com.playmonumenta.plugins.utils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.structures.StructuresPlugin;
@@ -142,7 +142,7 @@ public class StatMultiplier {
 		} else {
 			Player player = EntityUtils.getNearestPlayer(loc, 64);
 			if (player != null) {
-				DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(shardType);
+				DungeonCommandMapping mapping = DungeonCommandMapping.getByShard(shardType);
 				if (mapping != null) {
 					String typeName = mapping.getTypeName();
 					boolean exaltedDungeon = false;
