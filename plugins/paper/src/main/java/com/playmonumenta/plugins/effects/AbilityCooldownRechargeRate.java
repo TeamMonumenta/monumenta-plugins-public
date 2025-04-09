@@ -1,13 +1,14 @@
 package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.Constants.QUARTER_TICKS_PER_SECOND;
 
 public class AbilityCooldownRechargeRate extends SingleArgumentEffect {
 	public static final String GENERIC_NAME = "AbilityCooldownRechargeRate";
@@ -23,11 +24,12 @@ public class AbilityCooldownRechargeRate extends SingleArgumentEffect {
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		if (twoHertz && entity instanceof Player player) {
-			int reduction = (int) Math.floor(Constants.HALF_TICKS_PER_SECOND * mAmount);
+		// This logic should run on the same interval as Plugin.getInstance().mTimers is updated, see Plugin.java
+		if (fourHertz && entity instanceof Player player) {
+			int reduction = (int) Math.floor(QUARTER_TICKS_PER_SECOND * mAmount);
 
 			// handle overflow: we can't reduce by decimal ticks, so sum up the overflow each time and reduce by an additional tick when overflow > 1.
-			double overflow = Constants.HALF_TICKS_PER_SECOND * mAmount - reduction;
+			double overflow = QUARTER_TICKS_PER_SECOND * mAmount - reduction;
 			mOverflow += overflow;
 
 			if (mOverflow >= 1) {

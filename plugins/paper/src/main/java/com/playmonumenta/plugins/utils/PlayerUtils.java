@@ -73,6 +73,8 @@ import org.jetbrains.annotations.Nullable;
 public class PlayerUtils {
 	public static final String SCOREBOARD_RING_UNLOCK = "R3Access";
 	public static final double BASE_JUMP_HEIGHT = 1.2523;
+	public static final int MAX_FOOD_LEVEL = 20;
+	public static final int MAX_FOOD_SATURATION_LEVEL = 20;
 
 	public static void callAbilityCastEvent(Player player, Ability ability, ClassAbility spell) {
 		AbilityCastEvent event = new AbilityCastEvent(player, ability, spell);
@@ -244,6 +246,14 @@ public class PlayerUtils {
 				curse.setDuration(ticks);
 			}
 		}
+	}
+
+	public static void addFoodLevel(final Player player, final int amount) {
+		player.setFoodLevel(Math.min(MAX_FOOD_LEVEL, player.getFoodLevel() + amount));
+	}
+
+	public static void addFoodSaturationLevel(final Player player, final float amount) {
+		player.setSaturation(Math.min(player.getFoodLevel(), Math.min(player.getSaturation() + amount, MAX_FOOD_SATURATION_LEVEL)));
 	}
 
 	public static double healPlayer(Plugin plugin, Player player, double healAmount) {
