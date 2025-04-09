@@ -15,6 +15,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
+import dev.jorel.commandapi.arguments.LocationType;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class WalletCommand {
 			.withSubcommand(
 				new CommandAPICommand("openvault")
 					.withPermission("monumenta.command.openwallet")
-					.withArguments(new LocationArgument("vault location"))
+					.withArguments(new LocationArgument("vault location", LocationType.BLOCK_POSITION))
 					.executes((sender, args) -> {
 						Player viewer = CommandUtils.getPlayerFromSender(sender);
 						Location loc = Objects.requireNonNull(args.getUnchecked("vault location"));
