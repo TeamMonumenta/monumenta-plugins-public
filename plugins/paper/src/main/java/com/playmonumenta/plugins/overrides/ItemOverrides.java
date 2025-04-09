@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTItem;
@@ -241,7 +242,7 @@ public final class ItemOverrides {
 	}
 
 	public void leftClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item,
-									 @Nullable Block block, PlayerInteractEvent event) {
+	                                 @Nullable Block block, PlayerInteractEvent event) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		BaseOverride itemOverride = mItems.get(itemType);
@@ -261,7 +262,7 @@ public final class ItemOverrides {
 	}
 
 	public void physicalBlockInteraction(Plugin plugin, Player player, Action action,
-									   Block block, PlayerInteractEvent event) {
+	                                     Block block, PlayerInteractEvent event) {
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		BaseOverride blockOverride = mItems.get(blockType);
 
@@ -273,7 +274,7 @@ public final class ItemOverrides {
 	}
 
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity,
-											   ItemStack itemInHand) {
+	                                           ItemStack itemInHand) {
 		Material itemType = (itemInHand != null) ? itemInHand.getType() : Material.AIR;
 		BaseOverride override = mItems.get(itemType);
 
@@ -311,8 +312,9 @@ public final class ItemOverrides {
 	}
 
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item,
-										 BlockPlaceEvent event) {
+	                                     BlockPlaceEvent event) {
 		boolean eventCancelled = false;
+		Block block = event.getBlockPlaced();
 
 		//  If it's not a certain lore item go ahead and run the normal override place interaction.
 		BaseOverride override = mItems.get(item.getType());
@@ -331,14 +333,20 @@ public final class ItemOverrides {
 		}
 
 		// Don't allow placing blocks on top of barriers for plots
-		if (event.getBlockPlaced().getLocation().getBlockY() > 0 && !player.getGameMode().equals(GameMode.CREATIVE)) {
-			Material belowMat = event.getBlockPlaced().getRelative(BlockFace.DOWN).getType();
+		if (
+			// The top of guildplots is outside the world;
+			// no need to check there, and we want to allow placing on the barrier floor
+			!GuildPlotUtils.isGuildPlot(block.getLocation())
+				&& block.getLocation().getBlockY() > 0
+				&& !player.getGameMode().equals(GameMode.CREATIVE)
+		) {
+			Material belowMat = block.getRelative(BlockFace.DOWN).getType();
 			if (belowMat.equals(Material.BARRIER)) {
 				eventCancelled = true;
 			}
 
 			// Don't allow players to place rail on bedrock because of a dumb mojang bug
-			Material blockPlacedMat = event.getBlockPlaced().getType();
+			Material blockPlacedMat = block.getType();
 			if (belowMat.equals(Material.BEDROCK) &&
 				(blockPlacedMat.equals(Material.RAIL) ||
 					blockPlacedMat.equals(Material.POWERED_RAIL) ||

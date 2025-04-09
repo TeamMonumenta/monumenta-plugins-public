@@ -164,6 +164,9 @@ public class ZoneUtils {
 	}
 
 	public static boolean inPlot(Location loc, boolean isTownWorld) {
+		if (GuildPlotUtils.isGuildPlot(loc)) {
+			return true;
+		}
 		if (hasZoneProperty(loc, ZoneProperty.PLOT)) {
 			return true;
 		}
