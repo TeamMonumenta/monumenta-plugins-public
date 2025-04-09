@@ -58,10 +58,9 @@ public class FishingManager implements Listener {
 		() -> new PointAndClickFM(130, 7, 0.4, false, false),
 		() -> new PointAndClickFM(150, 6, 0.5, true, false),
 		() -> new PointAndClickFM(150, 8, 0.4, false, true),
-		() -> new MinesweeperFM(40 * 20, 4, 5),
-		() -> new MinesweeperFM(30 * 20, 3, 4),
-		() -> new MinesweeperFM(55 * 20, 6, 6),
-		() -> new MinesweeperFM(180 * 20, 14, 9)
+		() -> new MinesweeperFM(45 * 20, 4, 5),
+		() -> new MinesweeperFM(35 * 20, 3, 4),
+		() -> new MinesweeperFM(60 * 20, 6, 6)
 	);
 	private final HashMap<Player, FishingMinigame> mPlayerMinigameMap = new HashMap<>();
 	private final HashMap<Player, FishHook> mPlayerFishHookMap = new HashMap<>();
