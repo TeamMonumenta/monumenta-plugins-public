@@ -129,23 +129,18 @@ public class BalanceModeManager {
 	// returns true if "balanced", else false
 	private float evaluateItem(ItemStack item, Slot slot, Player player, float nextImbalance, @Nullable List<String> spreadsheetData, JsonObject oData) {
 		StringBuilder spreadsheetString = new StringBuilder(ItemUtils.getPlainName(item) + "\t" + item.getType().name() + "\t3\t");
-		float[] spreadsheetValues = new float[61];
+		float[] spreadsheetValues = new float[62];
 		int mw = MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item));
 		spreadsheetString.append(mw <= 3 ? "Rare" : mw <= 5 ? "Artifact" : mw == 6 ? "Epic" : "Legendary");
 		spreadsheetString.append("\t").append(mw).append("\t\t").append(ItemStatUtils.getLocation(item).getDisplayName());
 		spreadsheetString.append("\t\t").append(mw + 4);
-
-		float attrArmor = (float) ItemStatUtils.getAttributeAmount(item, AttributeType.ARMOR, Operation.ADD, slot);
-		float attrAgility = (float) ItemStatUtils.getAttributeAmount(item, AttributeType.AGILITY, Operation.ADD, slot);
-		spreadsheetValues[0] = attrArmor;
-		spreadsheetValues[1] = attrAgility;
 
 		float meleeProtScore = calcProtValue(item, EnchantmentType.MELEE_PROTECTION, EnchantmentType.MELEE_FRAGILITY, spreadsheetValues, 2, oData);
 		float projProtScore = calcProtValue(item, EnchantmentType.PROJECTILE_PROTECTION, EnchantmentType.PROJECTILE_FRAGILITY, spreadsheetValues, 3, oData);
 		float magicProtScore = calcProtValue(item, EnchantmentType.MAGIC_PROTECTION, EnchantmentType.MAGIC_FRAGILITY, spreadsheetValues, 5, oData);
 		float blastProtScore = calcProtValue(item, EnchantmentType.BLAST_PROTECTION, EnchantmentType.BLAST_FRAGILITY, spreadsheetValues, 4, oData);
 
-		float armorValueMult = attrAgility + attrArmor > 0f ? calcArmorValue(item, slot, spreadsheetValues, oData) : 1f;
+		float armorValueMult = calcArmorValue(item, slot, spreadsheetValues, oData);
 		float enchantValueMult = calcBaseEnchantValues(item, slot, spreadsheetValues, oData);
 
 		// This function is a mess but its a very important one so its heavily obfuscated
@@ -245,6 +240,7 @@ public class BalanceModeManager {
 		int enchSapper = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SAPPER);
 		int enchFirstStrike = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.FIRST_STRIKE);
 		int enchStamina = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STAMINA);
+		int enchRetaliation = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.RETALIATION);
 		int enchTrivium = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.TRIVIUM);
 		int enchFractal = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.FRACTAL);
 		int enchTechnique = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.TECHNIQUE);
@@ -320,7 +316,8 @@ public class BalanceModeManager {
 		spreadsheetValues[57] = mending;
 		spreadsheetValues[58] = unbreakable;
 		spreadsheetValues[59] = shield;
-		spreadsheetValues[60] = enchAbyssal;
+		spreadsheetValues[60] = enchRetaliation;
+		spreadsheetValues[61] = enchAbyssal;
 
 		// THE WILD WILD WEST OF HEALTH CALCULATIONS ------------------------------------------------------------------------------------
 		float artificialSustenance = oData.get("art_sust_base").getAsFloat();
@@ -361,7 +358,7 @@ public class BalanceModeManager {
 		// THE DAMAGE ZONE (OUCH) -------------------------------------------------------------------------------------------------------
 		float meleeScore = (1 +
 			oData.get("ms_bmult").getAsFloat() *
-				(attrMeleeDamage + enchFirstStrike * oData.get("ms_fmult").getAsFloat() + enchStamina * oData.get("ms_smult").getAsFloat()))
+				(attrMeleeDamage + enchFirstStrike * oData.get("ms_fmult").getAsFloat() + enchStamina * oData.get("ms_smult").getAsFloat() + enchRetaliation * oData.get("ms_rmult").getAsFloat()))
 			* (1 + oData.get("ms_asmult").getAsFloat() * attrAttackSpeedPercent) - 1;
 		meleeScore /= meleeMult;
 		float projScore = (1 + oData.get("ps_pmult").getAsFloat() * attrProjDamage + oData.get("ps_psmult").getAsFloat() * attrProjSpeed)
@@ -441,6 +438,9 @@ public class BalanceModeManager {
 	private float calcArmorValue(ItemStack item, Slot slot, float[] spreadsheetValues, JsonObject oData) {
 		float attrArmor = (float) ItemStatUtils.getAttributeAmount(item, AttributeType.ARMOR, Operation.ADD, slot);
 		float attrAgility = (float) ItemStatUtils.getAttributeAmount(item, AttributeType.AGILITY, Operation.ADD, slot);
+
+		spreadsheetValues[0] = attrArmor;
+		spreadsheetValues[1] = attrAgility;
 
 		int enchInure = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.INURE);
 		int enchShielding = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SHIELDING);
