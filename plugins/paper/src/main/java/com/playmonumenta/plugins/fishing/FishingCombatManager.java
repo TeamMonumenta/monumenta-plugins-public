@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
 import com.playmonumenta.plugins.events.MonumentaEvent;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPSpiral;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -158,7 +159,7 @@ public class FishingCombatManager implements Listener {
 					ScoreboardUtils.setScoreboardValue(player, COMBAT_TOTAL, playerTotal + 1);
 					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " " + COMBAT_TOTAL);
 
-					InventoryUtils.giveItem(player, reward);
+					InventoryUtils.dropTempOwnedItem(reward, player.getLocation(), player);
 
 					Bukkit.getPluginManager().callEvent(new MonumentaEvent(player, "fishingcombat"));
 				}
@@ -185,13 +186,19 @@ public class FishingCombatManager implements Listener {
 				player.playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1f, 1.5f);
 				for (int i = 0; i < arena.mDifficulty + 2; i++) {
 					ItemStack fish = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(FISH_TABLE));
+					if (fish == null) {
+						continue;
+					}
 					if (ItemStatUtils.getFishQuality(fish) == 5) {
 						FishingManager.fiveStarAesthetics(player);
 					}
-					InventoryUtils.giveItem(player, fish);
+					InventoryUtils.dropTempOwnedItem(fish, player.getLocation(), player);
 				}
 				player.sendMessage(Component.text("You have been awarded some EXP and fish for your participation.", NamedTextColor.GRAY));
 				player.giveExp(ExperienceUtils.getTotalExperience(10));
+
+				// Call seasonal pass incrementer for fishing combats for players other than the main fisher
+				Bukkit.getPluginManager().callEvent(new MonumentaEvent(player, "fishingcombat"));
 			}
 		}
 	}
@@ -294,11 +301,13 @@ public class FishingCombatManager implements Listener {
 	private void spawnWave(int wave, Player player, FishingArena arena, int difficulty) {
 		int[] mobTypes = WAVE_MOB_TYPES[wave - 1 + 3 * difficulty];
 		int delayBetweenMobs = MOB_SPAWN_DELAYS[difficulty];
+		arena.mSpawning = true;
 		new BukkitRunnable() {
 			int mMobsSpawned = 0;
 			@Override
 			public void run() {
 				if (mMobsSpawned > mobTypes.length - 1 || !arena.mOccupied) {
+					arena.mSpawning = false;
 					this.cancel();
 					return;
 				}
@@ -321,9 +330,21 @@ public class FishingCombatManager implements Listener {
 				}
 
 				int radius = arena.mRadius;
-				Hitbox arenaSpace = new Hitbox.SphereHitbox(new Location(player.getWorld(), arena.mCoordinates.getX(), arena.mCoordinates.getY(), arena.mCoordinates.getZ()), radius);
-				if (arenaSpace.getHitMobs().isEmpty()) {
+				Location arenaCenter = new Location(player.getWorld(), arena.mCoordinates.getX(), arena.mCoordinates.getY(), arena.mCoordinates.getZ());
+				List<LivingEntity> allArenaEnemies = EntityUtils.getNearbyMobs(arenaCenter, radius);
+				if (allArenaEnemies.isEmpty()) {
 					progressWave(player, arena);
+				}
+
+				// Count enemies and if there's 3 or less (and the wave is finished spawning), then make them glow.
+				List<LivingEntity> nonScalesEnemies = new ArrayList<>();
+				allArenaEnemies.forEach((enemy) -> {
+					if (!enemy.getName().equals("Deepslate Scales")) {  // Don't count Deepslate Scales (they're worm segments)
+						nonScalesEnemies.add(enemy);
+					}
+				});
+				if (!arena.mSpawning && !nonScalesEnemies.isEmpty() && nonScalesEnemies.size() < 4) {
+					nonScalesEnemies.forEach((enemy) -> GlowingManager.startGlowing(enemy, NamedTextColor.AQUA, -1, 1));
 				}
 			}
 		}.runTaskTimer(Plugin.getInstance(), 80, 80);
@@ -332,9 +353,9 @@ public class FishingCombatManager implements Listener {
 	private void spawnMob(int type, Location location, Player player, int difficulty) {
 		Entity entity;
 		switch (type) {
-			default -> entity = POOL_COMMON.spawn(location);
 			case 1 -> entity = POOL_UNCOMMON.spawn(location);
 			case 2 -> entity = POOL_ELITE.spawn(location);
+			default -> entity = POOL_COMMON.spawn(location);
 		}
 		if (difficulty > 0 && entity instanceof LivingEntity livingEntity) {
 			double damageMultiplier = 1 + difficulty * 0.3;

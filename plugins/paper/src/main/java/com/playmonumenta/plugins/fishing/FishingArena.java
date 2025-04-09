@@ -92,6 +92,7 @@ enum FishingArena {
 	final int mRadius;
 	boolean mOccupied = false;
 	boolean mActive = false;
+	boolean mSpawning = false;
 	int mWave = 0;
 	int mDifficulty = 0;
 	@Nullable Location mOrigin = null;

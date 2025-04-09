@@ -127,6 +127,14 @@ public class FishingManager implements Listener {
 
 				modifyAndAssessFishQuality(player, caughtItemStack, baitInfo);
 			}
+
+			// Fished up items should be owned by the fisher for 10 secs
+			caughtItem.setOwner(player.getUniqueId());
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				if (caughtItem.isValid()) {
+					caughtItem.setOwner(null);
+				}
+			}, 200);
 		}
 	}
 
@@ -293,11 +301,11 @@ public class FishingManager implements Listener {
 
 			modifyAndAssessFishQuality(player, reward, baitInfo);
 
-			InventoryUtils.giveItem(player, reward);
+			InventoryUtils.dropTempOwnedItem(reward, player.getLocation(), player);
 		} else {
 			ItemStack reward = new ItemStack(Material.CHEST);
 			reward.setItemMeta(getLesserChest().getItemMeta());
-			InventoryUtils.giveItem(player, reward);
+			InventoryUtils.dropTempOwnedItem(reward, player.getLocation(), player);
 		}
 		removeHook(player, true);
 	}
