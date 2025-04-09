@@ -117,7 +117,7 @@ public class SpellSnowStorm extends Spell {
 					new PPExplosion(Particle.SNOWFLAKE, target).spawnAsBoss();
 					for (Player p : PlayerUtils.playersInRange(target, radius, true, true)) {
 						BossUtils.blockableDamage(mBoss, p, DamageEvent.DamageType.BLAST, DAMAGE, "Snow Storm", target);
-						mAura.addFrostbite(p, 0.02f);
+						mAura.addFrostbite(p, 0.175f);
 						p.playSound(p, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.HOSTILE, 2, 0.62f);
 					}
 					mBulletCount--;

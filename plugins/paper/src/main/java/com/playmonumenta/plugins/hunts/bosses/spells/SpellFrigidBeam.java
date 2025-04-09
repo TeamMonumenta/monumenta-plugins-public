@@ -123,7 +123,7 @@ public class SpellFrigidBeam extends Spell {
 						Hitbox hitbox = new Hitbox.AABBHitbox(mWorld, BoundingBox.of(hitboxPosition, HITBOX_SIZE, HITBOX_SIZE, HITBOX_SIZE));
 						for (Player player : hitbox.getHitPlayers(true)) {
 							DamageUtils.damage(mBoss, player, DamageEvent.DamageType.PROJECTILE, DAMAGE, null, false, false, "Frigid Beam");
-							mAlocAcoc.mAura.addFrostbite(player, 0.025f);
+							mAlocAcoc.mAura.addFrostbite(player, 0.2125f);
 							player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1f, 0.75f);
 						}
 					}

@@ -94,8 +94,9 @@ public class ExperimentSeventyOne extends Quarry {
 	public static final TextColor TEXT_COLOR = TextColor.color(179, 118, 48);
 
 	public static final Material MUD_TRAIL = Material.MUD;
-	public static final Material WORM_SPAWNER = Material.MUDDY_MANGROVE_ROOTS;
+	public static final Material WORM_SPAWNER = Material.MANGROVE_ROOTS;
 	public static final List<Material> MUD_TRAIL_BLOCKS = List.of(MUD_TRAIL, WORM_SPAWNER);
+	public static final List<Material> INVALID_MUD_BLOCKS = List.of(Material.SPRUCE_WOOD, Material.DARK_OAK_LEAVES, Material.JUNGLE_LEAVES, Material.OAK_LEAVES);
 
 	private static final int MUD_EFFECT_DURATION = 2 * 20;
 	private static final String MUD_SLOWNESS_TAG = "ExperimentMudSlowness";
@@ -269,11 +270,11 @@ public class ExperimentSeventyOne extends Quarry {
 	}
 
 	private int getMaxWorms() {
-		return Math.max((int)(1.5 + 1.5 * Math.pow(mPlayers.size(), 0.75)), 15);
+		return Math.min((int)(2 * Math.pow(mPlayers.size(), 0.617)), 8);
 	}
 
 	private int getWormSpawnDelay() {
-		return Math.max((int)(20 * (14 - 2 * Math.sqrt(mPlayers.size()))), 4 * 20);
+		return Math.max((int)(20 * (15 - 2.25 * Math.sqrt(mPlayers.size()))), 4 * 20);
 	}
 
 	private void manageMudEffects() {
@@ -349,6 +350,7 @@ public class ExperimentSeventyOne extends Quarry {
 		if (block.getType().getHardness() == -1
 				|| ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)
 				|| isWormSpawner(block)
+				|| INVALID_MUD_BLOCKS.contains(block.getType())
 				|| isHiddenSpot(block)) {
 			return;
 		}
@@ -385,6 +387,7 @@ public class ExperimentSeventyOne extends Quarry {
 		if (block.getType().getHardness() == -1
 				|| ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)
 				|| isWormSpawner(block)
+				|| INVALID_MUD_BLOCKS.contains(block.getType())
 				|| block.getRelative(BlockFace.UP).isSolid()) {
 			return;
 		}

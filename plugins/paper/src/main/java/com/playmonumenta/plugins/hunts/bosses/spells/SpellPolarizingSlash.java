@@ -135,7 +135,7 @@ public class SpellPolarizingSlash extends Spell {
 		Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
 		for (Player p : hitbox.getHitPlayers(true)) {
 			DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MELEE, DAMAGE, null, false, false, "Polarizing Slash");
-			mAura.addFrostbite(p, 0.015f);
+			mAura.addFrostbite(p, 0.125f);
 		}
 
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 3, 0.5f);

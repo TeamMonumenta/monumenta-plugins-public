@@ -137,6 +137,7 @@ public class AlocAcoc extends Quarry {
 				if (!player.getUniqueId().equals(uuid)) {
 					BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MELEE, event.getDamage(), "Frozen Cleave", null);
 				}
+				mAura.addFrostbite(player, 0.1f);
 			}
 
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, 0.5f);

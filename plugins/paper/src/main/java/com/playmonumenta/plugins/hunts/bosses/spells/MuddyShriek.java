@@ -129,7 +129,7 @@ public class MuddyShriek extends Spell {
 		mWorld.playSound(start, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 5f, 0.8f);
 
 		List<Integer> allRanges = new ArrayList<>();
-		for (int i = 1; i < CONE_RANGE; i++) {
+		for (int i = 1; i <= CONE_RANGE; i++) {
 			allRanges.add(i);
 		}
 		Collections.shuffle(allRanges);
@@ -171,7 +171,9 @@ public class MuddyShriek extends Spell {
 				}
 
 				if (validRanges.contains(mStep)) {
-					mExperimentSeventyOne.placeWormSpawner(mudBlocks.remove(FastUtils.randomIntInRange(0, mudBlocks.size() - 1)));
+					Block spawner = FastUtils.getRandomElement(mudBlocks);
+					mudBlocks.remove(spawner);
+					mExperimentSeventyOne.placeWormSpawner(spawner);
 				}
 				if (mPermanentMud) {
 					mudBlocks.forEach(mExperimentSeventyOne::placeMudBlock);

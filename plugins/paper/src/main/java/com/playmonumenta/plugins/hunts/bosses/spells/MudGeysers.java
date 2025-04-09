@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.hunts.bosses.ExperimentSeventyOne;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPSpiral;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -27,6 +26,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -39,7 +39,7 @@ public class MudGeysers extends Spell {
 	private static final int GEYSER_ANIMATION = (int) (0.5 * 20);
 	private static final double GEYSER_DURATION = 5 * 20;
 	private static final double RADIUS = 3.25;
-	private static final double DAMAGE = 75;
+	private static final double DAMAGE = 60;
 	private static final Material[] GEYSER_BLOCKS = new Material[] {
 		Material.MUD, Material.SOUL_SAND
 	};
@@ -149,15 +149,36 @@ public class MudGeysers extends Spell {
 		}
 
 		double dustDelta = Math.max(RADIUS / 2 - 0.25, 0);
-		double blockDelta = Math.max(RADIUS / 2 - 0.5, 0);
 		final double dy = 1;
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
 
 			@Override
 			public void run() {
-				new PartialParticle(Particle.REDSTONE, location, 30, dustDelta, dy, dustDelta, 0.1, new Particle.DustOptions(Color.fromRGB(68, 64, 64), 1.5f)).spawnAsBoss();
-				new PartialParticle(Particle.BLOCK_CRACK, location, 30, blockDelta, dy, blockDelta, 0.1, Bukkit.createBlockData(Material.SOUL_SAND)).spawnAsBoss();
+				new PPCircle(Particle.REDSTONE, location, RADIUS)
+					.data(new Particle.DustOptions(Color.fromRGB(68, 64, 64), 1.5f))
+					.ringMode(false)
+					.count(15)
+					.delta(0, dustDelta, 0)
+					.spawnAsBoss();
+				new PPCircle(Particle.REDSTONE, location, RADIUS)
+					.data(new Particle.DustOptions(Color.fromRGB(68, 64, 64), 1.5f))
+					.ringMode(true)
+					.count(15)
+					.delta(0, dustDelta, 0)
+					.spawnAsBoss();
+				new PPCircle(Particle.BLOCK_CRACK, location, RADIUS)
+					.data(Material.SOUL_SAND.createBlockData())
+					.ringMode(false)
+					.count(15)
+					.delta(0, dustDelta, 0)
+					.spawnAsBoss();
+				new PPCircle(Particle.BLOCK_CRACK, location, RADIUS)
+					.data(Material.SOUL_SAND.createBlockData())
+					.ringMode(true)
+					.count(15)
+					.delta(0, dustDelta, 0)
+					.spawnAsBoss();
 				location.add(0, dy, 0);
 
 				mTicks++;
@@ -172,10 +193,11 @@ public class MudGeysers extends Spell {
 
 	private BlockDisplay spawnGeyserBlock(Location loc) {
 		// move one block down and center location
-		loc = loc.clone().add(-0.5, -1.5, -0.5);
+		loc = loc.clone().add(-0.5, -1.5, -0.5).setDirection(new Vector(1, 0, 0));
 		return loc.getWorld().spawn(loc, BlockDisplay.class, entity -> {
 			entity.setBlock(GEYSER_BLOCKS[FastUtils.randomIntInRange(0, 1)].createBlockData());
 			entity.setPersistent(false);
+			entity.setBrightness(new Display.Brightness(0, 15));
 			EntityUtils.setRemoveEntityOnUnload(entity);
 		});
 	}

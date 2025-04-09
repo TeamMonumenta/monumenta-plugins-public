@@ -92,7 +92,7 @@ public class SpellSnowyBolts extends Spell {
 			for (Player p : PlayerUtils.playersInRange(box.getCenter().toLocation(mBoss.getWorld()), 5, true)) {
 				if (p.getBoundingBox().overlaps(box)) {
 					DamageUtils.damage(mBoss, p, DamageEvent.DamageType.PROJECTILE, DAMAGE, null, false, true, "Snowy Bolts");
-					mAura.addFrostbite(p, 0.02f);
+					mAura.addFrostbite(p, 0.175f);
 					new PPExplosion(Particle.CLOUD, box.getCenter().toLocation(mBoss.getWorld())).spawnAsBoss();
 					runnable.cancel();
 					return;
