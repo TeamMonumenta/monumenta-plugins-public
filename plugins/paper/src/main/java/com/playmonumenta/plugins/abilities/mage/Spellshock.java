@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.EnumSet;
 import java.util.NavigableSet;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -193,6 +194,12 @@ public class Spellshock extends Ability {
 			if (existingStatic != null && !existingStatic.isTriggered()) {
 				// Arcane Strike cannot trigger static (but can apply it)
 				if (eventAbility == ClassAbility.ARCANE_STRIKE || eventAbility == ClassAbility.ARCANE_STRIKE_ENHANCED) {
+					// In fact the melee hit will eat the static that Arcane strike should create since it runs after, but we add the static back after to simulate an order reversal.
+					Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+						SpellShockStatic newStatic = new SpellShockStatic(STATIC_DURATION, mCosmetic);
+						mPlugin.mEffectManager.clearEffects(enemy, SPELLSHOCK_STATIC_SRC); // Need to clear the old static else the new one will inherit its mTriggered status
+						mPlugin.mEffectManager.addEffect(enemy, SPELLSHOCK_STATIC_SRC, newStatic);
+					});
 					return false;
 				}
 
@@ -223,6 +230,9 @@ public class Spellshock extends Ability {
 				// Spellshock and Elemental Arrows cannot apply static (but can trigger it)
 				if (eventAbility == ClassAbility.SPELLSHOCK || eventAbility == ClassAbility.ELEMENTAL_ARROWS_FIRE
 					|| eventAbility == ClassAbility.ELEMENTAL_ARROWS_ICE || eventAbility == ClassAbility.ELEMENTAL_ARROWS) {
+					return false;
+				} else if (eventAbility == ClassAbility.ARCANE_STRIKE || eventAbility == ClassAbility.ARCANE_STRIKE_ENHANCED) { // Arcane strike should apply Static later to stop the melee attack eating the static
+					Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> mPlugin.mEffectManager.addEffect(enemy, SPELLSHOCK_STATIC_SRC, new SpellShockStatic(STATIC_DURATION, mCosmetic)));
 					return false;
 				}
 
