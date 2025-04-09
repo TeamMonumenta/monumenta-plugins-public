@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.WormBoss;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -29,6 +30,7 @@ public class Cloaked implements Enchantment {
 	public static double applyCloaked(DamageEvent event, Plugin plugin, Player player) {
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(player.getLocation(), RADIUS);
 		mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+		mobs.removeIf(mob -> mob.getScoreboardTags().contains(WormBoss.IGNORE_WORM_TAG));
 		if (mobs.size() <= MOB_CAP) {
 			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CLOAKED) * AGIL_BONUS_PER_LEVEL;
 		} else {

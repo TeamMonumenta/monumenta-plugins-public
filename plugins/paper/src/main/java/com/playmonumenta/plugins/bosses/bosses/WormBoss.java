@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class WormBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_worm";
+	public static final String IGNORE_WORM_TAG = "boss_ignore_worm_segment";
 
 	public static class Parameters extends BossParameters {
 		public int DETECTION = 64;
@@ -108,7 +109,6 @@ public class WormBoss extends BossAbilityGroup {
 	}
 
 	private void summonPart(Parameters params, int index, boolean tail) {
-
 		double logIndex = Math.log(1 + index / 6.0);
 		Location spawnLocation = mBoss.getLocation().add(VectorUtils.rotateYAxis(new Vector(mBoss.getWidth() * (0.8 + logIndex), 0, 0), 500 * logIndex));
 		LivingEntity part = null;
@@ -118,20 +118,28 @@ public class WormBoss extends BossAbilityGroup {
 		}
 		if (part == null) {
 			part = EntityUtils.copyMob(mBoss, spawnLocation);
-			part.addScoreboardTag(DelvesManager.AVOID_MODIFIERS);
-			part.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
-			part.addScoreboardTag(EntityUtils.DONT_ENTER_BOATS_TAG);
-			int size = tail ? params.TAIL_SIZE : params.BODY_SIZE;
-			if (size >= 0) {
-				EntityUtils.setSize(part, size);
-			}
-			Component customName = mBoss.customName();
-			if (customName != null) {
-				part.customName(customName.append(Component.text(tail ? " Tail" : " Body")));
-			}
 		}
+		part.addScoreboardTag(DelvesManager.AVOID_MODIFIERS);
+		part.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
+		part.addScoreboardTag(EntityUtils.DONT_ENTER_BOATS_TAG);
+		part.addScoreboardTag(IGNORE_WORM_TAG);
+		int size = tail ? params.TAIL_SIZE : params.BODY_SIZE;
+		if (size >= 0) {
+			EntityUtils.setSize(part, size);
+		}
+		Component customName = mBoss.customName();
+		if (customName != null) {
+			part.customName(customName.append(Component.text(tail ? " Tail" : " Body")));
+		}
+
 		part.setSilent(true);
-		part.getPassengers().forEach(p -> p.setSilent(true));
+		part.getPassengers().forEach(p -> {
+			p.setSilent(true);
+			p.addScoreboardTag(DelvesManager.AVOID_MODIFIERS);
+			p.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
+			p.addScoreboardTag(EntityUtils.DONT_ENTER_BOATS_TAG);
+			p.addScoreboardTag(IGNORE_WORM_TAG);
+		});
 		mParts.add(part);
 
 		if (tail || index % params.BODY_PASSENGER_INTERVAL == 0) {
