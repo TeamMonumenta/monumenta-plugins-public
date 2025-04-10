@@ -728,7 +728,8 @@ public class EntityTargets implements Cloneable {
 				if (limit == null) {
 					options.add("," + LIMIT_STRING);
 				}
-				if (filters == null) {
+				// 'filters' is only valid if a supported target class has been specified
+				if (filters == null && (target == TARGETS.PLAYER || target == TARGETS.MOB || target == TARGETS.ENTITY)) {
 					options.add("," + FILTERS_STRING);
 				}
 				if (tags == null) {
@@ -747,7 +748,10 @@ public class EntityTargets implements Cloneable {
 					return ParseResult.of(Objects.requireNonNull(parseLimit.getTooltip()));
 				}
 				targets.mLimit = limit;
-			} else if (filters == null && reader.advance(FILTERS_STRING + "[")) {
+			} else if (filters == null &&
+					   // 'filters' is only valid if a supported target class has been specified
+			           (target == TARGETS.PLAYER || target == TARGETS.MOB || target == TARGETS.ENTITY) &&
+			           reader.advance(FILTERS_STRING + "[")) {
 				filters = new ArrayList<>(4);
 				while (!reader.advance("]")) {
 					if (!filters.isEmpty()
@@ -807,6 +811,8 @@ public class EntityTargets implements Cloneable {
 						filters.add(filter);
 					} /* else if (target == TARGETS.SELF) {
 						// I'm not sure if we need some conditions for this since it would be a "fake" Stateful boss
+						// NOTE: If more allowed target types are supported, filters= enablement checks need to be modified in 2x places in this file.
+						// Those checks exist because otherwise it's possible to fall into this while loop and get stuck forever, never parsing the tag against a valid filter
 					}*/
 				}
 				targets.mFilters = filters;
