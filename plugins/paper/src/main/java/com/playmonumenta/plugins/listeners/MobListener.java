@@ -6,7 +6,6 @@ import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -45,7 +44,6 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Vex;
@@ -350,22 +348,6 @@ public class MobListener implements Listener {
 		// Obviously there is no reasonable case where a mob should target itself so disable any time that happens
 		if (event.getTarget() == event.getEntity()) {
 			event.setCancelled(true);
-		}
-
-		// Match Chivalrous mob's targets with the mount
-		if (Chivalrous.isChivalrousName(event.getEntity().getName())
-				&& event.getTarget() instanceof LivingEntity livingTarget) {
-			event.getEntity().getPassengers().forEach(entity -> {
-				if (entity instanceof Mob mob) {
-					mob.setTarget(livingTarget);
-				}
-			});
-		}
-		if (event.getEntity().getScoreboardTags().contains(Chivalrous.CHIVALROUS_PASSENGER_TAG)
-				&& event.getTarget() instanceof LivingEntity livingTarget) {
-			if (event.getEntity().getVehicle() instanceof Mob mob) {
-				mob.setTarget(livingTarget);
-			}
 		}
 	}
 

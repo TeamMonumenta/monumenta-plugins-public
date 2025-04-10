@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
+import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
@@ -944,6 +945,28 @@ public class EntityListener implements Listener {
 					event.setCancelled(true);
 				} else {
 					mAbilities.entityTargetLivingEntityEvent(player, event);
+				}
+			}
+
+			/* NOTE:
+			 * Ignore IntelliJ's warning about the method annotation here. The event can be cancelled
+			 */
+			if (event.isCancelled()) {
+				return;
+			}
+
+			// Match
+			// Chivalrous mob's targets with the mount
+			if (Chivalrous.isChivalrousName(event.getEntity().getName())) {
+				event.getEntity().getPassengers().forEach(mount -> {
+					if (mount instanceof Mob mob) {
+						mob.setTarget(target);
+					}
+				});
+			}
+			if (event.getEntity().getScoreboardTags().contains(Chivalrous.CHIVALROUS_PASSENGER_TAG)) {
+				if (event.getEntity().getVehicle() instanceof Mob mob) {
+					mob.setTarget(target);
 				}
 			}
 		}
