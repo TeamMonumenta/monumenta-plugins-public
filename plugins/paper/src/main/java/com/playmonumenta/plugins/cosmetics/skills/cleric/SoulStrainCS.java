@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
@@ -48,7 +47,7 @@ public class SoulStrainCS extends DivineJusticeCS {
 		return NAME;
 	}
 
-	private static final Particle.DustOptions CYAN = new Particle.DustOptions(Color.fromRGB(0, 235, 235), 0.8f);
+	private static final Particle.DustTransition CYAN = new Particle.DustTransition(Color.fromRGB(0, 235, 235), Color.fromRGB(0, 126, 112), 1.15f);
 	private static final double[] ANGLE = {200, -22.5, -95};
 
 	@Override
@@ -84,12 +83,7 @@ public class SoulStrainCS extends DivineJusticeCS {
 		world.playSound(enemyLoc, Sound.BLOCK_SHROOMLIGHT_FALL, SoundCategory.PLAYERS, 1.7f, 0.7f);
 		world.playSound(enemyLoc, Sound.BLOCK_SCULK_BREAK, SoundCategory.PLAYERS, 2.0f, 1.0f);
 		world.playSound(enemyLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.0f, 0.8f);
-		new PartialParticle(Particle.SCULK_CHARGE_POP, LocationUtils.getHalfHeightLocation(enemy), 20, 0.1, 0.2 * enemy.getHeight(), 0.1, 0.05).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.GLOW, LocationUtils.getHalfHeightLocation(enemy), 12, 0.1, 0.2 * enemy.getHeight(), 0.1, 0.05).spawnAsPlayerActive(player);
-		enemyLoc.setDirection(dir);
-		ParticleUtils.drawHalfArc(enemyLoc.clone().add(0, 1, 0).subtract(dir.clone().multiply(2.25)), 2, ANGLE[combo], 0, 160, 5, 0.15,
-			(Location l, int ring, double angleProgress) ->
-				new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0.05, 0.05, 0).data(CYAN).spawnAsPlayerActive(player));
+
 		if (combo == 2) {
 			world.playSound(enemyLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.7f, 1.2f);
 			world.playSound(enemyLoc, Sound.BLOCK_GRINDSTONE_USE, SoundCategory.PLAYERS, 0.75f, 1.1f);
@@ -114,9 +108,25 @@ public class SoulStrainCS extends DivineJusticeCS {
 				new PPLine(Particle.REDSTONE, loc2, loc2.clone().subtract(front.clone().multiply(2))).data(RED).countPerMeter(12).delta(delta, 0, delta).spawnAsPlayerActive(player);
 				new PPCircle(Particle.REDSTONE, loc.clone().add(right.clone().multiply(0.5)).subtract(front.clone().multiply(1.5)), width / 2).data(RED).countPerMeter(12).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			}
-			new PPCircle(Particle.ENCHANTMENT_TABLE, enemyLoc, hieroglyphRadius).countPerMeter(12).extraRange(0.1, 0.15).innerRadiusFactor(1)
+			new PPCircle(Particle.ENCHANTMENT_TABLE, enemyLoc, hieroglyphRadius).countPerMeter(8).extraRange(0.1, 0.15).innerRadiusFactor(1)
 				.directionalMode(true).delta(-2, 0.2, 8).rotateDelta(true).spawnAsPlayerActive(player);
 		}
+
+		if (enemyLoc.getY() + 1 > enemy.getEyeLocation().getY()) {
+			enemyLoc = enemy.getEyeLocation();
+		} else {
+			enemyLoc.add(0, 1, 0);
+		}
+		enemyLoc.setDirection(dir);
+
+		new PartialParticle(Particle.SCULK_CHARGE_POP, enemyLoc, 8, 0.1, 0.2 * enemy.getHeight(), 0.1, 0.05).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.GLOW, enemyLoc, 6, 0.1, 0.2 * enemy.getHeight(), 0.1, 0.05).spawnAsPlayerActive(player);
+
+		ParticleUtils.drawHalfArc(enemyLoc.clone().subtract(dir.clone().multiply(2.25)), 2, ANGLE[combo], 0, 155, 1, 0.1, (Location l, int ring, double angleProgress) -> {
+			new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 2, 0.06, 0.06, 0.06, 0).data(CYAN).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.SPELL_MOB, l, FastUtils.roundRandomly(0.25)).delta(0, 0.96, 0.96).extra(1).directionalMode(true).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.SPELL_MOB_AMBIENT, l, FastUtils.roundRandomly(0.35)).delta(0, 0.9, 0.8).extra(1).directionalMode(true).spawnAsPlayerActive(player);
+		});
 	}
 
 	@Override

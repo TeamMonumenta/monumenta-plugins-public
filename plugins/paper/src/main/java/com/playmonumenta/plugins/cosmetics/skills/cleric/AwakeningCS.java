@@ -52,18 +52,17 @@ public class AwakeningCS extends CelestialBlessingCS {
 	@Override
 	public void tickEffect(Player player, Player target, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		Location loc = target.getLocation().add(0, 1, 0);
-		new PartialParticle(Particle.REDSTONE, loc, 2, 0.8, 0.8, 0.8, 0).data(LIGHT_CYAN).spawnAsPlayerBuff(player);
-		new PartialParticle(Particle.REDSTONE, loc, 2, 0.8, 0.8, 0.8, 0).data(CYAN).spawnAsPlayerBuff(player);
-		new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 1, 0.8, 0.8, 0.8, 0).spawnAsPlayerBuff(player);
+		new PartialParticle(Particle.REDSTONE, loc, 2, 0.8, 0.8, 0.8, 0).data(LIGHT_CYAN).spawnAsPlayerBuff(target);
+		new PartialParticle(Particle.REDSTONE, loc, 2, 0.8, 0.8, 0.8, 0).data(CYAN).spawnAsPlayerBuff(target);
+		new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 1, 0.8, 0.8, 0.8, 0).spawnAsPlayerBuff(target);
 	}
 
 	@Override
 	public void loseEffect(Player player, Player target) {
 		Location loc = target.getLocation();
-		World world = target.getWorld();
-		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.PLAYERS, 0.6f, 0.6f);
-		world.playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 0.6f);
-		new PartialParticle(Particle.END_ROD, loc.clone().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0.1).spawnAsPlayerBuff(player);
+		target.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.PLAYERS, 0.6f, 0.6f);
+		target.playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 0.6f);
+		new PartialParticle(Particle.END_ROD, loc.clone().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0.1).spawnAsPlayerBuff(target);
 	}
 
 	@Override

@@ -105,6 +105,7 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	private final double mExplodeRadius;
 	private @Nullable SwiftCuts mSwiftCuts;
 	private int mCurrDuration = -1;
+	private int mLastPrimeTick = 0;
 
 	private final PredatorStrikeCS mCosmetic;
 
@@ -125,11 +126,14 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		}
 
 		if (mDeactivationRunnable == null) {
-			mCosmetic.strikeSoundReady(mPlayer.getWorld(), mPlayer);
+			if (Bukkit.getCurrentTick() - mLastPrimeTick > 10) {
+				mCosmetic.strikeSoundReady(mPlayer.getWorld(), mPlayer);
+			}
 		} else {
 			mDeactivationRunnable.cancel();
 		}
 		mCurrDuration = 0;
+		mLastPrimeTick = Bukkit.getCurrentTick();
 
 		mDeactivationRunnable = new BukkitRunnable() {
 			int mTicks = 0;

@@ -55,12 +55,12 @@ public class RebirthCS extends CelestialBlessingCS {
 		if (twoHertz) {
 			new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 3)
 				.delta(0.08)
-				.spawnAsPlayerBuff(player);
+				.spawnAsPlayerBuff(target);
 		}
 		new PartialParticle(Particle.REDSTONE, loc, 6)
 			.delta(0.4)
 			.data(new Particle.DustOptions(Color.AQUA.mixColors(Color.WHITE), 0.8f))
-			.spawnAsPlayerBuff(player);
+			.spawnAsPlayerBuff(target);
 
 	}
 
@@ -74,9 +74,9 @@ public class RebirthCS extends CelestialBlessingCS {
 		new PPSpiral(Particle.SOUL_FIRE_FLAME, loc.clone().add(new Vector(0, 0.1, 0)), 3)
 			.ticks(10)
 			.countPerBlockPerCurve(8)
-			.spawnAsPlayerBuff(player);
+			.spawnAsPlayerBuff(target);
 
-		ParticleUtils.drawParticleCircleExplosion(player, loc, 0, 0.5, 0, 0, 25, 3, false, 0, 0.15, Particle.CRIT_MAGIC);
+		ParticleUtils.drawParticleCircleExplosion(target, loc, 0, 0.5, 0, 0, 25, 3, false, 0, 0.15, Particle.CRIT_MAGIC);
 
 		if (target != player) {
 			createOrb(new Vector(0, 0.6, 0), loc, player, player);
