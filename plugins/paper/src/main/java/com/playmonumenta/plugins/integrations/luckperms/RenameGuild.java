@@ -169,10 +169,6 @@ public class RenameGuild {
 			}
 
 			for (GuildAccessLevel accessLevel : GuildAccessLevel.values()) {
-				if (GuildAccessLevel.NONE.equals(accessLevel)) {
-					continue;
-				}
-
 				Group accessGroup = accessLevel.loadGroupFromRoot(currentRoot).join().orElse(null);
 				if (accessGroup == null) {
 					future.complete(Component.text("Unable to load '"
@@ -265,10 +261,6 @@ public class RenameGuild {
 			}
 
 			for (GuildAccessLevel accessLevel : GuildAccessLevel.values()) {
-				if (accessLevel.equals(GuildAccessLevel.NONE)) {
-					continue;
-				}
-
 				String oldChildId = accessLevel.groupNameFromRoot(oldRootId);
 				String newChildId = accessLevel.groupNameFromRoot(newRootId);
 				try {
@@ -369,10 +361,6 @@ public class RenameGuild {
 
 
 			for (GuildAccessLevel accessLevel : GuildAccessLevel.values()) {
-				if (accessLevel.equals(GuildAccessLevel.NONE)) {
-					continue;
-				}
-
 				Group accessGroup = accessLevel.loadGroupFromRoot(newRoot).join().orElse(null);
 				if (accessGroup == null) {
 					future.complete(Component.text("Unable to load access level "

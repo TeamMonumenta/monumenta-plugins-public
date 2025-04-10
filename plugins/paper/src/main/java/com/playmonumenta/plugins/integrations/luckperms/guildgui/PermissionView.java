@@ -72,8 +72,8 @@ public class PermissionView extends View {
 		}
 
 		// firstRow is for permissions, targetRow is the PermissionHolder
-		int firstRow = 3;
-		int targetRow = 2;
+		int firstRow = 2;
+		int targetRow = 1;
 
 		Component targetName = mTargetIcon.getItemMeta().displayName();
 		GuiItem targetIcon = mGui.setItem(targetRow, TARGET_X, mTargetIcon);

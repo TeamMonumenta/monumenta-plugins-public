@@ -16,7 +16,9 @@ public enum GuildAccessLevel {
 	MANAGER("manager", "manager", "Manager"),
 	MEMBER("member", "member", "Member"),
 	GUEST("guest", "guest", "Guest"),
-	NONE("none", "kick", "Not in Guild");
+	NONE("none", "kick", "Not in Guild"),
+	BLOCKED("blocked", "block", "Blocked"),
+	;
 
 	public final String mId;
 	public final String mArgument;
@@ -115,6 +117,7 @@ public enum GuildAccessLevel {
 				if (NONE.equals(targetLevel)) {
 					LuckPermsIntegration.pushUserUpdate(target);
 					future.complete(target);
+					return;
 				}
 
 				Group targetGroup = targetLevel.loadGroupFromRoot(guild).join().orElse(null);

@@ -115,7 +115,7 @@ public class TeleportGuildGui extends Gui {
 						PAGE_START_X + x,
 						fallbackIcon)
 						.onClick((InventoryClickEvent event) ->
-							GuildPlotUtils.sendGuildPlotFallbackWorld(mPlayer, true));
+							GuildPlotUtils.sendGuildPlotHub(mPlayer, true));
 				}
 			}
 		}
@@ -273,7 +273,7 @@ public class TeleportGuildGui extends Gui {
 			List<@Nullable PlayerGuildInfo> guilds = mOrder.sortGuilds(
 				PlayerGuildInfo.ofCollection(
 						mPlayerUser,
-						LuckPermsIntegration.getRelevantGuilds(mPlayerUser, true, false)
+						LuckPermsIntegration.getGuilds().join()
 					).join()
 					.stream()
 					.filter(playerGuildInfo -> (

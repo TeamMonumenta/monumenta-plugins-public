@@ -555,7 +555,9 @@ public class GuildGui extends MailGui {
 		if (LuckPermsIntegration.isLocked(guild)) {
 			lore.add(Component.text("CURRENTLY ON LOCKDOWN", NamedTextColor.DARK_GRAY, TextDecoration.BOLD));
 		} else {
-			if (accessLevel.compareTo(GuildAccessLevel.MEMBER) <= 0) {
+			if (accessLevel.equals(GuildAccessLevel.BLOCKED)) {
+				lore.add(Component.text("You are blocked from this guild.", NamedTextColor.RED));
+			} else if (accessLevel.compareTo(GuildAccessLevel.MEMBER) <= 0) {
 				lore.add(Component.text("", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false)
 					.append(Component.keybind(Constants.Keybind.HOTBAR_9))
@@ -650,7 +652,10 @@ public class GuildGui extends MailGui {
 				refresh();
 				return;
 			}
-			if (accessLevel.compareTo(GuildAccessLevel.MEMBER) <= 0) {
+			if (accessLevel.equals(GuildAccessLevel.BLOCKED)) {
+				// No access; do default refresh
+				refresh();
+			} else if (accessLevel.compareTo(GuildAccessLevel.MEMBER) <= 0) {
 				if (event.getHotbarButton() == 8) {
 					GuildAccessLevel currentAccessLevel = LuckPermsIntegration.getAccessLevel(guild, mTargetUser);
 					if (!currentAccessLevel.equals(accessLevel)) {
@@ -732,21 +737,21 @@ public class GuildGui extends MailGui {
 				}
 			} else if (accessLevel.equals(GuildAccessLevel.GUEST)) {
 				if (event.getHotbarButton() == 8) {
-				GuildAccessLevel currentAccessLevel = LuckPermsIntegration.getAccessLevel(guild, mTargetUser);
-				if (!currentAccessLevel.equals(accessLevel)) {
-					refresh();
-					return;
-				}
-
-				Bukkit.getScheduler().runTaskAsynchronously(mMainPlugin, () -> {
-					GuildAccessLevel.setAccessLevel(mTargetUser, guild, GuildAccessLevel.NONE).join();
-					Bukkit.getScheduler().runTask(mMainPlugin, () -> {
-						mPlayer.sendMessage(Component.text("You gave up your guest access to ", NamedTextColor.GOLD)
-							.append(LuckPermsIntegration.getGuildFullComponent(guild))
-							.append(Component.text(".")));
+					GuildAccessLevel currentAccessLevel = LuckPermsIntegration.getAccessLevel(guild, mTargetUser);
+					if (!currentAccessLevel.equals(accessLevel)) {
 						refresh();
+						return;
+					}
+
+					Bukkit.getScheduler().runTaskAsynchronously(mMainPlugin, () -> {
+						GuildAccessLevel.setAccessLevel(mTargetUser, guild, GuildAccessLevel.NONE).join();
+						Bukkit.getScheduler().runTask(mMainPlugin, () -> {
+							mPlayer.sendMessage(Component.text("You gave up your guest access to ", NamedTextColor.GOLD)
+								.append(LuckPermsIntegration.getGuildFullComponent(guild))
+								.append(Component.text(".")));
+							refresh();
+						});
 					});
-				});
 				}
 			}
 		});
@@ -756,7 +761,7 @@ public class GuildGui extends MailGui {
 		ItemStack item = getAccessHeaderIcon(accessLevel);
 
 		GuiItem guiItem = setItem(row, column, item);
-		if (!GuildAccessLevel.FOUNDER.equals(accessLevel)) {
+		if (!(GuildAccessLevel.FOUNDER.equals(accessLevel) || GuildAccessLevel.BLOCKED.equals(accessLevel))) {
 			guiItem.onClick(onAccessHeaderClick(accessLevel));
 		}
 	}
@@ -794,58 +799,24 @@ public class GuildGui extends MailGui {
 				permissionHeader = Component.text("Guests permissions:", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false);
 			}
+			case BLOCKED -> {
+				material = Material.BARRIER;
+				name = Component.text("Blocked", NamedTextColor.RED);
+				permissionHeader = Component.text("Not allowed to interact with the guild", NamedTextColor.RED)
+					.decoration(TextDecoration.ITALIC, false);
+			}
+			case NONE -> {
+				material = Material.LEATHER_BOOTS;
+				name = Component.text("Public", NamedTextColor.GREEN);
+				permissionHeader = Component.text("Default permissions:", NamedTextColor.RED)
+					.decoration(TextDecoration.ITALIC, false);
+			}
 			default -> {
 				material = Material.LEATHER_HELMET;
 				name = Component.text("None?", NamedTextColor.RED);
 				permissionHeader = Component.text("None permissions (should not appear!):", NamedTextColor.RED)
 					.decoration(TextDecoration.ITALIC, false);
 			}
-		}
-		switch (accessLevel) {
-			case FOUNDER:
-				lore.add(
-					Component.text("Founders:", NamedTextColor.DARK_GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May promote and demote", NamedTextColor.DARK_GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("  members to managers", NamedTextColor.DARK_GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May promote but not demote", NamedTextColor.DARK_GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("  members to founders", NamedTextColor.DARK_GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				// fall through
-			case MANAGER:
-				lore.add(
-					Component.text("Managers and up:", NamedTextColor.AQUA)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May add and remove", NamedTextColor.AQUA)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("  guests and members", NamedTextColor.AQUA)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("- May lock the guild until", NamedTextColor.AQUA)
-						.decoration(TextDecoration.ITALIC, false));
-				lore.add(
-					Component.text("  a moderator is available", NamedTextColor.AQUA)
-						.decoration(TextDecoration.ITALIC, false));
-				// fall through
-			case MEMBER:
-				break;
-			case GUEST:
-				lore.add(
-					Component.text("Guests:", NamedTextColor.GRAY)
-						.decoration(TextDecoration.ITALIC, false));
-				break;
-			default:
-				lore.add(Component.text("- This should not appear!", NamedTextColor.RED)
-					.decoration(TextDecoration.ITALIC, false));
 		}
 
 		lore.add(permissionHeader);
@@ -870,7 +841,8 @@ public class GuildGui extends MailGui {
 
 		if (
 			!GuildAccessLevel.FOUNDER.equals(accessLevel)
-			&& mayManagePermissions(accessLevel, false)
+				&& !GuildAccessLevel.BLOCKED.equals(accessLevel)
+				&& mayManagePermissions(accessLevel, false)
 		) {
 			lore.add(Component.empty());
 			lore.add(Component.text("", NamedTextColor.GRAY)
@@ -905,7 +877,7 @@ public class GuildGui extends MailGui {
 			) {
 				View view = new PermissionView(
 					this,
-					accessLevel.equals(GuildAccessLevel.GUEST),
+					accessLevel.equals(GuildAccessLevel.GUEST) || accessLevel.equals(GuildAccessLevel.NONE),
 					accessLevelGroup,
 					getAccessHeaderIcon(accessLevel),
 					() -> {
@@ -965,7 +937,7 @@ public class GuildGui extends MailGui {
 		}
 
 		GuildAccessLevel accessLevel = playerGuildInfo.getAccessLevel();
-		if (!GuildAccessLevel.FOUNDER.equals(accessLevel)) {
+		if (!(GuildAccessLevel.FOUNDER.equals(accessLevel) || GuildAccessLevel.BLOCKED.equals(accessLevel))) {
 			for (GuildPermission guildPermission : GuildPermission.values()) {
 				if (playerGuildInfo.getGuildPermissions().contains(guildPermission)) {
 					lore.add(Component.text("- May ", NamedTextColor.GREEN)
@@ -979,7 +951,10 @@ public class GuildGui extends MailGui {
 			}
 			lore.add(Component.empty());
 
-			if (mayManagePermissions(accessLevel, false)) {
+			if (
+				mayManagePermissions(accessLevel, false)
+					&& !GuildAccessLevel.NONE.equals(accessLevel)
+			) {
 				Component baseLoreFormatting = Component.text("", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false);
 
@@ -1000,11 +975,13 @@ public class GuildGui extends MailGui {
 			if (
 				event.getHotbarButton() == 0
 					&& !GuildAccessLevel.FOUNDER.equals(accessLevel)
+					&& !GuildAccessLevel.NONE.equals(accessLevel)
+					&& !GuildAccessLevel.BLOCKED.equals(accessLevel)
 					&& mayManagePermissions(accessLevel, false)
 			) {
 				View view = new PermissionView(
 					this,
-					playerGuildInfo.getAccessLevel().equals(GuildAccessLevel.GUEST),
+					accessLevel.equals(GuildAccessLevel.GUEST),
 					playerGuildInfo.getUser(),
 					getPlayerIconItem(playerGuildInfo),
 					() -> {
@@ -1024,21 +1001,27 @@ public class GuildGui extends MailGui {
 		};
 	}
 
-	protected boolean isManager() {
-		return isAccessLevel(GuildAccessLevel.MANAGER);
-	}
-
-	protected boolean isAccessLevel(GuildAccessLevel accessLevel) {
-		Group guildAccessGroup = LuckPermsIntegration.getGuild(mTargetUser);
-		Group guildRoot = LuckPermsIntegration.getGuildRoot(guildAccessGroup);
-		return guildAccessGroup != null
-			&& guildRoot != null
-			&& guildRoot.equals(LuckPermsIntegration.getGuildRoot(mGuildGroup))
-			&& GuildAccessLevel.byGroup(guildAccessGroup).compareTo(accessLevel) <= 0;
-	}
-
 	protected boolean mayManagePermissions(GuildAccessLevel targetLevel, boolean showErrorMessages) {
-		if (isAccessLevel(targetLevel.compareTo(GuildAccessLevel.MANAGER) <= 0 ? GuildAccessLevel.FOUNDER : GuildAccessLevel.MANAGER)) {
+		Group guildRoot = LuckPermsIntegration.getGuildRoot(mGuildGroup);
+		if (guildRoot == null) {
+			return false;
+		}
+
+		User user = LuckPermsIntegration.getUser(mPlayer);
+		GuildAccessLevel playerLevel = LuckPermsIntegration.getAccessLevel(guildRoot, user);
+
+		// Access levels with hard-coded permissions
+		if (
+			GuildAccessLevel.FOUNDER.equals(targetLevel)
+				|| GuildAccessLevel.BLOCKED.equals(targetLevel)
+		) {
+			return false;
+		}
+
+		if (
+			GuildPermission.MANAGE_MEMBERSHIP.hasAccess(guildRoot, user)
+				&& playerLevel.compareTo(targetLevel) < 0
+		) {
 			return true;
 		}
 
@@ -1051,9 +1034,16 @@ public class GuildGui extends MailGui {
 			return true;
 		} else {
 			if (showErrorMessages) {
-				mPlayer.sendMessage(Component.text(
-					"You need to be a guild manager to manage guild permissions.",
-					NamedTextColor.RED));
+				if (GuildPermission.MANAGE_MEMBERSHIP.hasAccess(guildRoot, user)) {
+					mPlayer.sendMessage(Component.text(
+						"You need to have the Manage Invites and Access permission to do that.",
+						NamedTextColor.RED));
+				}
+				if (playerLevel.compareTo(targetLevel) < 0) {
+					mPlayer.sendMessage(Component.text(
+						"You need to have a higher access level to do that.",
+						NamedTextColor.RED));
+				}
 			}
 			return false;
 		}

@@ -65,7 +65,8 @@ public class Stuck {
 							case 0:
 								World world = mTarget.getWorld();
 								if (GuildPlotUtils.isGuildPlot(world)) {
-									GuildPlotUtils.sendGuildPlotFallbackWorld(mTarget, false);
+									mTarget.teleport(world.getSpawnLocation());
+									GuildPlotUtils.sendGuildPlotHub(mTarget, false);
 								} else {
 									mTarget.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
 								}

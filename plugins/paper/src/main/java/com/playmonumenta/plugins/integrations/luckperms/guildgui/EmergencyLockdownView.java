@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -92,9 +93,9 @@ public class EmergencyLockdownView extends View {
 				meta.displayName(Component.text("Confirm Lockdown (No Access)", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
 					.decoration(TextDecoration.ITALIC, false));
 				meta.lore(List.of(
-					Component.text("You need to be a guild manager, guild founder,", NamedTextColor.RED)
+					Component.text("You need to have the lockdown permission", NamedTextColor.RED)
 						.decoration(TextDecoration.ITALIC, false),
-					Component.text(" or server operator to lock down the guild.", NamedTextColor.RED)
+					Component.text(" or be a server operator to lock down the guild.", NamedTextColor.RED)
 						.decoration(TextDecoration.ITALIC, false)
 				));
 			} else {
@@ -258,8 +259,12 @@ public class EmergencyLockdownView extends View {
 	}
 
 	private boolean hasLockdownAccess() {
+		Group guildRoot = LuckPermsIntegration.getGuildRoot(mGui.mGuildGroup);
+		if (guildRoot == null) {
+			return false;
+		}
 		return mGui.mPlayer.hasPermission(GuildGui.MOD_GUI_PERMISSION) || (
-			mGui.isManager()
+			GuildPermission.LOCKDOWN.hasAccess(guildRoot, mGui.mPlayer)
 				&& mGui.mPlayer.hasPermission(ACTIVATE_LOCKDOWN)
 		);
 	}

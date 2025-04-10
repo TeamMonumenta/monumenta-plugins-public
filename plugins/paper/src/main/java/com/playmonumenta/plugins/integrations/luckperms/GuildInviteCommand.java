@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -81,17 +82,25 @@ public class GuildInviteCommand {
 	}
 
 	public static void runAsPlayer(Plugin plugin, Player inviter, String invitedName, GuildInviteLevel inviteLevel) {
-		Group guild = LuckPermsIntegration.getGuild(inviter);
-		if (guild == null) {
+		Group guildRoot = LuckPermsIntegration.getGuildRoot(LuckPermsIntegration.getGuild(inviter));
+		if (guildRoot == null) {
 			inviter.sendMessage(Component.text("You are not in a guild", NamedTextColor.RED));
 			return;
 		}
-		if (GuildAccessLevel.MANAGER.compareTo(GuildAccessLevel.byGroup(guild)) < 0) {
-			inviter.sendMessage(Component.text("You must be a manager or founder to manage guild invites", NamedTextColor.RED));
+		if (!GuildPermission.MANAGE_MEMBERSHIP.hasAccess(guildRoot, inviter)) {
+			inviter.sendMessage(Component.text("You do not have permission to manage invites for your guild.", NamedTextColor.RED));
+			return;
+		}
+		if (!MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), inviter, "Guild Invite", 10)) {
+			inviter.sendMessage(Component.text("Slow down! You're sending invites too fast.", NamedTextColor.RED));
+			return;
+		}
+		if (!MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), inviter, "Guild Invite " + invitedName, 1200)) {
+			inviter.sendMessage(Component.text("Don't spam! Please wait a minute and try again.", NamedTextColor.RED));
 			return;
 		}
 
-		runSetInvite(plugin, inviter, invitedName, guild, inviteLevel);
+		runSetInvite(plugin, inviter, invitedName, guildRoot, inviteLevel);
 	}
 
 	public static void runAsMod(Plugin plugin, CommandSender inviter, String guildName, String invitedName, GuildInviteLevel inviteLevel) {
@@ -103,7 +112,7 @@ public class GuildInviteCommand {
 
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			try {
-				Group root = LuckPermsIntegration.GM.loadGroup(guildId).join().orElse(null);
+				Group root = LuckPermsIntegration.getGuildRoot(LuckPermsIntegration.GM.loadGroup(guildId).join().orElse(null));
 				if (root == null) {
 					Bukkit.getScheduler().runTask(plugin,
 						() -> inviter.sendMessage(Component.text("Could not find guild " + guildName, NamedTextColor.RED)));
@@ -120,13 +129,7 @@ public class GuildInviteCommand {
 		});
 	}
 
-	private static void runSetInvite(Plugin plugin, CommandSender inviter, String invitedName, Group guild, GuildInviteLevel inviteLevel) {
-		Group guildRoot = LuckPermsIntegration.getGuildRoot(guild);
-		if (guildRoot == null) {
-			inviter.sendMessage(Component.text("Could not get the root group for guild " + guild.getName() + "; has it been updated?", NamedTextColor.RED));
-			return;
-		}
-
+	private static void runSetInvite(Plugin plugin, CommandSender inviter, String invitedName, Group guildRoot, GuildInviteLevel inviteLevel) {
 		UUID invitedUuid = MonumentaRedisSyncIntegration.cachedNameToUuid(invitedName);
 		if (invitedUuid == null) {
 			inviter.sendMessage(Component.text("Could not get the player " + invitedName + "; have they joined the game before?", NamedTextColor.RED));

@@ -29,7 +29,9 @@ public class GuildMembersView extends View {
 		GuildAccessLevel.FOUNDER,
 		GuildAccessLevel.MANAGER,
 		GuildAccessLevel.MEMBER,
-		GuildAccessLevel.GUEST
+		GuildAccessLevel.GUEST,
+		GuildAccessLevel.NONE,
+		GuildAccessLevel.BLOCKED
 	);
 	private static final List<GuildInviteLevel> GUILD_INVITE_LEVELS = List.of(
 		GuildInviteLevel.MEMBER_INVITE,

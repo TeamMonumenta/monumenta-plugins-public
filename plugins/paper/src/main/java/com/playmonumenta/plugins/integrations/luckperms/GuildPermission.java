@@ -133,6 +133,22 @@ public enum GuildPermission {
 		"Change the Guild Plot's Time",
 		"Allows members to change your guild plot's time of day"
 	),
+	MANAGE_MEMBERSHIP(
+		"manage_membership",
+		"manage_membership",
+		GuildAccessLevel.MANAGER,
+		false,
+		"Manage Invites and Access",
+		"Allows members send and revoke invites, as well as promote/demote/kick/block players"
+	),
+	LOCKDOWN(
+		"lockdown",
+		"lockdown",
+		GuildAccessLevel.MANAGER,
+		false,
+		"Lock Down the Guild",
+		"Allows members to lock everyone out of the guild until a moderator intervenes"
+	),
 	;
 
 	public static final String GUILD_PERM_PREFIX = "guild.perm.";
@@ -369,16 +385,19 @@ public enum GuildPermission {
 	}
 
 	public GuildPermissionResult checkAccess(@Nullable Group guild, PermissionHolder permissionHolder) {
+		// Guild not found
 		if (guild == null) {
 			return new GuildPermissionResult(null, false);
 		}
 		Boolean value;
 
+		// Permission set for this permissionHolder in particular
 		value = getExplicitPermission(guild, permissionHolder);
 		if (value != null) {
 			return new GuildPermissionResult(permissionHolder, value);
 		}
 
+		// Permission set for the permissionHolder's group (or its parents)
 		for (Group userParentGroup : permissionHolder.getInheritedGroups(QueryOptions.nonContextual())) {
 			value = getExplicitPermission(guild, userParentGroup);
 			if (value != null) {
@@ -386,6 +405,22 @@ public enum GuildPermission {
 			}
 		}
 
+		// Public access check
+		Group guildRoot = LuckPermsIntegration.getGuildRoot(guild);
+		if (permissionHolder instanceof User user && guildRoot != null) {
+			GuildAccessLevel accessLevel = LuckPermsIntegration.getAccessLevel(guildRoot, user);
+			if (GuildAccessLevel.NONE.equals(accessLevel)) {
+				Group noneGroup = GuildAccessLevel.NONE.getLoadedGroupFromRoot(guildRoot);
+				if (noneGroup != null) {
+					value = getExplicitPermission(guildRoot, noneGroup);
+					if (value != null) {
+						return new GuildPermissionResult(noneGroup, value);
+					}
+				}
+			}
+		}
+
+		// No matches, denied
 		return new GuildPermissionResult(null, false);
 	}
 

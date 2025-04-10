@@ -150,6 +150,8 @@ public class CreateGuildCommand {
 
 		// Guild name sanitization for command usage
 		String guildRootGroupId = LuckPermsIntegration.getGuildId(guildTag);
+		String guildBlockedGroupId = GuildAccessLevel.BLOCKED.groupNameFromRoot(guildRootGroupId);
+		String guildNoneGroupId = GuildAccessLevel.NONE.groupNameFromRoot(guildRootGroupId);
 		String guildGuestGroupId = GuildAccessLevel.GUEST.groupNameFromRoot(guildRootGroupId);
 		String guildMemberGroupId = GuildAccessLevel.MEMBER.groupNameFromRoot(guildRootGroupId);
 		String guildManagerGroupId = GuildAccessLevel.MANAGER.groupNameFromRoot(guildRootGroupId);
@@ -159,13 +161,17 @@ public class CreateGuildCommand {
 		String guildMemberInviteGroupId = GuildInviteLevel.MEMBER_INVITE.groupNameFromRoot(guildRootGroupId);
 
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			for (String groupId : List.of(guildRootGroupId,
+			for (String groupId : List.of(
+				guildRootGroupId,
+				guildBlockedGroupId,
+				guildNoneGroupId,
 				guildGuestGroupId,
 				guildMemberGroupId,
 				guildManagerGroupId,
 				guildFounderGroupId,
 				guildGuestInviteGroupId,
-				guildMemberInviteGroupId)) {
+				guildMemberInviteGroupId
+			)) {
 				try {
 					if (LuckPermsIntegration.GM.loadGroup(groupId).join().isPresent()) {
 						Bukkit.getScheduler().runTask(plugin, () -> sender.sendMessage(Component.text(
@@ -211,6 +217,14 @@ public class CreateGuildCommand {
 			guildMemberInviteGroupData.add(InheritanceNode.builder(guildGuestInviteGroup).build());
 			LuckPermsIntegration.GM.saveGroup(guildMemberInviteGroup).join();
 
+			Group guildBlockedGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildBlockedGroupId).join();
+			NodeMap guildBlockedGroupData = guildBlockedGroup.data();
+			guildBlockedGroupData.add(InheritanceNode.builder(guildRootGroup).build());
+
+			Group guildNoneGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildNoneGroupId).join();
+			NodeMap guildNoneGroupData = guildNoneGroup.data();
+			guildNoneGroupData.add(InheritanceNode.builder(guildRootGroup).build());
+
 			Group guildGuestGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildGuestGroupId).join();
 			NodeMap guildGuestGroupData = guildGuestGroup.data();
 			guildGuestGroupData.add(InheritanceNode.builder(guildRootGroup).build());
@@ -242,8 +256,11 @@ public class CreateGuildCommand {
 				if (GuildAccessLevel.MEMBER.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
 					guildPermission.setExplicitPermission(guildRootGroup, guildMemberGroup, true).join();
 				}
+				guildPermission.setExplicitPermission(guildRootGroup, guildBlockedGroup, false).join();
 			}
 
+			LuckPermsIntegration.GM.saveGroup(guildBlockedGroup).join();
+			LuckPermsIntegration.GM.saveGroup(guildNoneGroup).join();
 			LuckPermsIntegration.GM.saveGroup(guildGuestGroup).join();
 			LuckPermsIntegration.GM.saveGroup(guildMemberGroup).join();
 			LuckPermsIntegration.GM.saveGroup(guildManagerGroup).join();

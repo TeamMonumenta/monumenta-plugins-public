@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -475,7 +474,7 @@ public class LuckPermsIntegration implements Listener {
 	public static GuildAccessLevel getAccessLevel(Group guildRoot, User user) {
 		QueryOptions options = QueryOptions.builder(QueryMode.CONTEXTUAL).flag(Flag.RESOLVE_INHERITANCE, true).build();
 
-		GuildAccessLevel level = GuildAccessLevel.NONE;
+		GuildAccessLevel level = null;
 		for (Group group : user.getInheritedGroups(options)) {
 			if (!group.getName().startsWith(guildRoot.getName()) || group.getName().equals(guildRoot.getName())) {
 				continue;
@@ -487,9 +486,12 @@ public class LuckPermsIntegration implements Listener {
 				continue;
 			}
 
-			if (level.compareTo(groupAccessLevel) > 0) {
+			if (level == null || level.compareTo(groupAccessLevel) > 0) {
 				level = groupAccessLevel;
 			}
+		}
+		if (level == null) {
+			level = GuildAccessLevel.NONE;
 		}
 
 		return level;
@@ -1193,10 +1195,7 @@ public class LuckPermsIntegration implements Listener {
 	}
 
 	public static @Nullable Group getSelectedGuildPlotGuild(Player player) {
-		return getLoadedGuildByPlotId(
-			(long) ScoreboardUtils.getScoreboardValue(player, GuildPlotUtils.LAST_GUILD_WORLD_OBJECTIVE)
-				.orElse(0)
-		);
+		return getLoadedGuildByPlotId(GuildPlotUtils.getLastGuildPlotScore(player));
 	}
 
 	public static @Nullable ItemStack getSelectedGuildPlotBanner(Player player) {

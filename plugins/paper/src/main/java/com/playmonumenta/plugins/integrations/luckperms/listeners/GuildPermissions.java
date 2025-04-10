@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.integrations.luckperms.listeners;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.Gui;
-import com.playmonumenta.plugins.integrations.luckperms.GuildFlag;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -129,9 +128,10 @@ public class GuildPermissions implements Listener {
 	// Local events
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerJoinEvent(PlayerJoinEvent event) {
-		mUserData.computeIfAbsent(event.getPlayer().getUniqueId(), k -> new ConcurrentHashMap<>());
-		refreshPermissions(event.getPlayer());
-		kickFromInaccessibleGuildPlots(event.getPlayer());
+		Player player = event.getPlayer();
+		mUserData.computeIfAbsent(player.getUniqueId(), k -> new ConcurrentHashMap<>());
+		refreshPermissions(player);
+		GuildPlotUtils.guildPlotAccessCheckAndKick(player);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -149,6 +149,9 @@ public class GuildPermissions implements Listener {
 				User user = LuckPermsIntegration.getUser(player);
 				if (user.getInheritedGroups(QueryOptions.defaultContextualOptions()).contains(guildRoot)) {
 					refreshPermissions(user, guildRoot.getName(), guildPermission);
+				} else if (GuildPermission.VISIT.equals(guildPermission)) {
+					// Check anyway (for public visit access)
+					GuildPlotUtils.guildPlotAccessCheckAndKick(player);
 				}
 			}
 		});
@@ -255,7 +258,7 @@ public class GuildPermissions implements Listener {
 			if (openGui instanceof TeleportGuildGui teleportGuildGui) {
 				teleportGuildGui.refresh();
 			}
-			kickFromInaccessibleGuildPlots(player);
+			GuildPlotUtils.guildPlotAccessCheckAndKick(player);
 		}
 		if (GuildPermission.MAIL.equals(guildPermission)) {
 			MailMan.playerGuildChange(player);
@@ -265,45 +268,4 @@ public class GuildPermissions implements Listener {
 		}
 	}
 
-	public static void kickFromInaccessibleGuildPlots(Player player) {
-		Long guildPlotNumber;
-		Set<Long> accessibleGuildPlotIds = new HashSet<>();
-		for (Group guildGroup : LuckPermsIntegration.getRelevantGuilds(player, true, false)) {
-			if (LuckPermsIntegration.isLocked(guildGroup)) {
-				continue;
-			}
-
-			if (!GuildFlag.OWNS_PLOT.hasFlag(guildGroup)) {
-				continue;
-			}
-
-			if (!GuildPermission.VISIT.hasAccess(guildGroup, player)) {
-				continue;
-			}
-
-			guildPlotNumber = LuckPermsIntegration.getGuildPlotId(guildGroup);
-			if (guildPlotNumber == null) {
-				continue;
-			}
-
-			accessibleGuildPlotIds.add(guildPlotNumber);
-		}
-
-		guildPlotNumber = GuildPlotUtils.getLastGuildPlotScore(player);
-		if (
-				guildPlotNumber > 0
-						&& !accessibleGuildPlotIds.contains(guildPlotNumber)
-		) {
-			GuildPlotUtils.sendGuildPlotFallbackWorld(player, false);
-		}
-
-		guildPlotNumber = GuildPlotUtils.getGuildPlotNumber(player.getRespawnLocation());
-		if (
-				guildPlotNumber != null
-						&& guildPlotNumber != 0
-						&& !accessibleGuildPlotIds.contains(guildPlotNumber)
-		) {
-			player.setRespawnLocation(null);
-		}
-	}
 }

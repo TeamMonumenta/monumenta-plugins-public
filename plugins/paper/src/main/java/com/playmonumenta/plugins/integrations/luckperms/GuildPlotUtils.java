@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
+import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -135,7 +136,7 @@ public class GuildPlotUtils {
 		}
 	}
 
-	public static void sendGuildPlotFallbackWorld(Player player, boolean transferFromOtherShard) {
+	public static void sendGuildPlotHub(Player player, boolean transferFromOtherShard) {
 		ScoreboardUtils.setScoreboardValue(player, LAST_GUILD_WORLD_OBJECTIVE, 0);
 		if (ServerProperties.getShardName().startsWith(SHARD_NAME)) {
 			try {
@@ -152,7 +153,7 @@ public class GuildPlotUtils {
 
 	public static void sendGuildPlotWorld(Player player, @Nullable Group guild) {
 		if (guild == null) {
-			sendGuildPlotFallbackWorld(player, true);
+			sendGuildPlotHub(player, true);
 			return;
 		}
 
@@ -248,19 +249,46 @@ public class GuildPlotUtils {
 			return GameMode.ADVENTURE;
 		}
 
-		Group guild = null;
-		for (Group possibleGuild : LuckPermsIntegration.getRelevantGuilds(player, true, false)) {
-			if (guildPlotNumber.equals(LuckPermsIntegration.getGuildPlotId(possibleGuild))) {
-				guild = possibleGuild;
-				break;
-			}
-		}
+		Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotNumber);
 		if (guild == null) {
 			return GameMode.ADVENTURE;
 		}
 
 		boolean hasPerm = GuildPermission.SURVIVAL.hasAccess(guild, player);
 		return hasPerm ? GameMode.SURVIVAL : GameMode.ADVENTURE;
+	}
+
+	/**
+	 * Kick players who should not be on a guild plot
+	 *
+	 * @param player The player to be checked
+	 */
+	public static void guildPlotAccessCheckAndKick(Player player) {
+		Location loc = player.getLocation();
+		if (!isGuildPlot(loc)) {
+			// Not a guild plot
+			return;
+		}
+
+		if (player.hasPermission(GuildGui.MOD_GUI_PERMISSION)) {
+			// Moderators bypass this check
+			return;
+		}
+
+		Long guildPlotId = getGuildPlotNumber(loc);
+		Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotId);
+		if (guild != null) {
+			if (
+				!LuckPermsIntegration.isLocked(guild)
+					&& GuildPermission.VISIT.hasAccess(guild, player)
+			) {
+				return;
+			}
+		} // else the guild can't be found, probably deleted?
+
+		// Checks failed, kick them!
+		player.teleport(loc.getWorld().getSpawnLocation());
+		sendGuildPlotHub(player, false);
 	}
 
 	/**
@@ -279,13 +307,7 @@ public class GuildPlotUtils {
 			return false;
 		}
 
-		Group guild = null;
-		for (Group possibleGuild : LuckPermsIntegration.getRelevantGuilds(player, true, false)) {
-			if (guildPlotNumber.equals(LuckPermsIntegration.getGuildPlotId(possibleGuild))) {
-				guild = possibleGuild;
-				break;
-			}
-		}
+		Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotNumber);
 		if (guild == null) {
 			return true;
 		}
@@ -294,6 +316,10 @@ public class GuildPlotUtils {
 	}
 
 	public static boolean guildPlotInventoryViewBlocked(Player player, Inventory inventory) {
+		if (player.getGameMode().equals(GameMode.CREATIVE)) {
+			return false;
+		}
+
 		if (!guildPlotInventoryViewBlocked(player)) {
 			return false;
 		}
@@ -329,13 +355,7 @@ public class GuildPlotUtils {
 			return false;
 		}
 
-		Group guild = null;
-		for (Group possibleGuild : LuckPermsIntegration.getRelevantGuilds(player, true, false)) {
-			if (guildPlotNumber.equals(LuckPermsIntegration.getGuildPlotId(possibleGuild))) {
-				guild = possibleGuild;
-				break;
-			}
-		}
+		Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotNumber);
 		if (guild == null) {
 			return true;
 		}
@@ -348,6 +368,10 @@ public class GuildPlotUtils {
 	}
 
 	public static boolean guildPlotInventoryModificationBlocked(Player player, Inventory inventory) {
+		if (player.getGameMode().equals(GameMode.CREATIVE)) {
+			return false;
+		}
+
 		if (!guildPlotInventoryModificationBlocked(player)) {
 			return false;
 		}
@@ -378,13 +402,7 @@ public class GuildPlotUtils {
 			return false;
 		}
 
-		Group guild = null;
-		for (Group possibleGuild : LuckPermsIntegration.getRelevantGuilds(player, true, false)) {
-			if (guildPlotNumber.equals(LuckPermsIntegration.getGuildPlotId(possibleGuild))) {
-				guild = possibleGuild;
-				break;
-			}
-		}
+		Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotNumber);
 		if (guild == null) {
 			return true;
 		}
@@ -403,13 +421,7 @@ public class GuildPlotUtils {
 			return false;
 		}
 
-		Group guild = null;
-		for (Group possibleGuild : LuckPermsIntegration.getRelevantGuilds(player, true, true)) {
-			if (guildPlotNumber.equals(LuckPermsIntegration.getGuildPlotId(possibleGuild))) {
-				guild = possibleGuild;
-				break;
-			}
-		}
+		Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotNumber);
 		if (guild == null) {
 			return true;
 		}
@@ -428,13 +440,7 @@ public class GuildPlotUtils {
 			return false;
 		}
 
-		Group guild = null;
-		for (Group possibleGuild : LuckPermsIntegration.getRelevantGuilds(player, true, false)) {
-			if (guildPlotNumber.equals(LuckPermsIntegration.getGuildPlotId(possibleGuild))) {
-				guild = possibleGuild;
-				break;
-			}
-		}
+		Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotNumber);
 		if (guild == null) {
 			return true;
 		}
@@ -453,13 +459,7 @@ public class GuildPlotUtils {
 			return false;
 		}
 
-		Group guild = null;
-		for (Group possibleGuild : LuckPermsIntegration.getRelevantGuilds(player, true, false)) {
-			if (guildPlotNumber.equals(LuckPermsIntegration.getGuildPlotId(possibleGuild))) {
-				guild = possibleGuild;
-				break;
-			}
-		}
+		Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotNumber);
 		if (guild == null) {
 			return true;
 		}
@@ -478,13 +478,7 @@ public class GuildPlotUtils {
 			return false;
 		}
 
-		Group guild = null;
-		for (Group possibleGuild : LuckPermsIntegration.getRelevantGuilds(player, true, false)) {
-			if (guildPlotNumber.equals(LuckPermsIntegration.getGuildPlotId(possibleGuild))) {
-				guild = possibleGuild;
-				break;
-			}
-		}
+		Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotNumber);
 		if (guild == null) {
 			return true;
 		}

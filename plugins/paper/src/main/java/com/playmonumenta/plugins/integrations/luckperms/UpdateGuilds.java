@@ -11,29 +11,21 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.luckperms.api.model.data.NodeMap;
 import net.luckperms.api.model.group.Group;
-import net.luckperms.api.node.NodeType;
-import net.luckperms.api.node.types.MetaNode;
-import net.luckperms.api.query.QueryOptions;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.types.InheritanceNode;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GUILD_TP_MK;
-
 public class UpdateGuilds {
 	private static final List<GuildPermission> newPermissions = List.of(
-		GuildPermission.VIEW_ITEMS,
-		GuildPermission.MOVE_ITEMS,
-		GuildPermission.SURVIVAL,
-		GuildPermission.EDIT_VAULT_OWNERSHIP,
-		GuildPermission.USE_VAULT,
-		GuildPermission.EDIT_TRAVEL_ANCHOR,
-		GuildPermission.USE_TRAVEL_ANCHOR,
-		GuildPermission.MOVE_SPAWN,
-		GuildPermission.CHANGE_TIME,
-		GuildPermission.EGGS
+		GuildPermission.MANAGE_MEMBERSHIP,
+		GuildPermission.LOCKDOWN
 	);
 
 	public static void register(Plugin plugin) {
@@ -69,53 +61,89 @@ public class UpdateGuilds {
 			}
 
 			for (Group memberGroup : guilds) {
-				Group guildRoot = LuckPermsIntegration.getGuildRoot(memberGroup);
-				if (guildRoot == null) {
+				Group guildRootGroup = LuckPermsIntegration.getGuildRoot(memberGroup);
+				if (guildRootGroup == null) {
 					sender.sendMessage(Component.text("Failed to identify root of " + memberGroup.getFriendlyName(), NamedTextColor.RED));
 					continue;
 				}
-				String guildId = guildRoot.getName();
+				String guildRootGroupId = guildRootGroup.getName();
 				try {
 					for (GuildAccessLevel accessLevel : List.of(
 						GuildAccessLevel.FOUNDER,
 						GuildAccessLevel.MANAGER,
 						GuildAccessLevel.MEMBER
 					)) {
-						Group accessGroup = accessLevel.loadGroupFromRoot(guildRoot).join().orElse(null);
+						Group accessGroup = accessLevel.loadGroupFromRoot(guildRootGroup).join().orElse(null);
 						if (accessGroup == null) {
-							sender.sendMessage(Component.text("- Could not find " + accessLevel.mId + " group for " + guildId));
+							sender.sendMessage(Component.text("- Could not find " + accessLevel.mId + " group for " + guildRootGroupId));
 							continue;
 						}
 
 						for (GuildPermission guildPermission : newPermissions) {
 							if (accessLevel.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
-								guildPermission.setExplicitPermission(guildRoot, accessGroup, true).join();
+								guildPermission.setExplicitPermission(guildRootGroup, accessGroup, true).join();
 							}
 						}
 					}
 
-					Group guestGroup = GuildAccessLevel.GUEST.loadGroupFromRoot(guildRoot).join().orElse(null);
+					Group guestGroup = GuildAccessLevel.GUEST.loadGroupFromRoot(guildRootGroup).join().orElse(null);
 					if (guestGroup == null) {
-						sender.sendMessage(Component.text("- Could not find guest group for " + guildId));
-					} else {
-						boolean foundPlotLocation = false;
-						for (MetaNode node : guestGroup.resolveInheritedNodes(NodeType.META, QueryOptions.nonContextual())) {
-							if (node.getMetaKey().equals(GUILD_TP_MK)) {
-								foundPlotLocation = true;
-								break;
-							}
-						}
-						if (foundPlotLocation) {
-							GuildFlag.OWNS_PLOT.setFlag(guildRoot, true);
-						}
+						sender.sendMessage(Component.text("- Could not find guest group for " + guildRootGroupId));
 					}
 
-					sender.sendMessage(Component.text("Updated " + guildId, NamedTextColor.GREEN));
+					String guildBlockedGroupId = GuildAccessLevel.BLOCKED.groupNameFromRoot(guildRootGroupId);
+					String guildNoneGroupId = GuildAccessLevel.NONE.groupNameFromRoot(guildRootGroupId);
+
+					Group guildBlockedGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildBlockedGroupId).join();
+					NodeMap guildBlockedGroupData = guildBlockedGroup.data();
+					guildBlockedGroupData.add(InheritanceNode.builder(guildRootGroup).build());
+
+					Group guildNoneGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildNoneGroupId).join();
+					NodeMap guildNoneGroupData = guildNoneGroup.data();
+					guildNoneGroupData.add(InheritanceNode.builder(guildRootGroup).build());
+
+					for (GuildPermission guildPermission : GuildPermission.values()) {
+						guildPermission.setExplicitPermission(guildRootGroup, guildBlockedGroup, false).join();
+					}
+
+					LuckPermsIntegration.GM.saveGroup(guildBlockedGroup).join();
+					LuckPermsIntegration.GM.saveGroup(guildNoneGroup).join();
+
+					sender.sendMessage(Component.text("Updated " + guildRootGroupId, NamedTextColor.GREEN));
 				} catch (Exception ex) {
-					sender.sendMessage(Component.text("Failed to update " + guildId + ":", NamedTextColor.RED));
+					sender.sendMessage(Component.text("Failed to update " + guildRootGroupId + ":", NamedTextColor.RED));
 					MessagingUtils.sendStackTrace(sender, ex);
 				}
 			}
+
+			sender.sendMessage(Component.text("Done with guilds, updating players:", NamedTextColor.GREEN));
+			Set<UUID> allUsers = LuckPermsIntegration.UM.getUniqueUsers().join();
+			int userIndex = 0;
+			int numUsers = allUsers.size();
+			for (UUID userId : allUsers) {
+				userIndex++;
+				if (userIndex % 1000 == 0) {
+					sender.sendMessage(Component.text("Updating user " + userIndex + "/" + numUsers + "...", NamedTextColor.YELLOW));
+				}
+
+				User user = LuckPermsIntegration.UM.getUser(userId);
+				if (user == null) {
+					continue;
+				}
+
+				for (Group guild : guilds) {
+					GuildAccessLevel accessLevel = LuckPermsIntegration.getAccessLevel(guild, user);
+					if (!GuildAccessLevel.NONE.equals(accessLevel)) {
+						continue;
+					}
+
+					String guildTag = LuckPermsIntegration.getGuildPlainTag(guild);
+					if (guildTag != null) {
+						GuildPermission.clearExplicitPermissions(user, guildTag);
+					}
+				}
+			}
+
 			sender.sendMessage(Component.text("Done!", NamedTextColor.GREEN));
 		});
 	}
