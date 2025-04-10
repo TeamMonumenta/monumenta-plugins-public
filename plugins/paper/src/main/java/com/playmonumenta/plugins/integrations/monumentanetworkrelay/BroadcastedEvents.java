@@ -485,7 +485,7 @@ public class BroadcastedEvents implements Listener {
 			TextColor eventColor = unknown ? NamedTextColor.YELLOW : known.mColor;
 			Component eventNamePart = Component.text(unknown ? StringUtils.capitalize(mEventName.toLowerCase(Locale.getDefault())) : known.mDisplayName, eventColor, TextDecoration.BOLD);
 
-			Component shardPart = Component.text(mShard + ": ", NamedTextColor.GOLD);
+			Component shardPart = Component.text((known.mDisplayShard ? " " + mShard : "") + ": ", NamedTextColor.GOLD);
 
 			Component statusPart;
 			if (mTimeLeft > 0) {
@@ -497,7 +497,6 @@ public class BroadcastedEvents implements Listener {
 
 			return Component.empty()
 				.append(eventNamePart)
-				.append(Component.text(" "))
 				.append(shardPart)
 				.append(statusPart);
 		}
@@ -518,32 +517,34 @@ public class BroadcastedEvents implements Listener {
 	}
 
 	public enum KnownEvent {
-		KAUL("Kaul", NamedTextColor.DARK_GREEN, new EventRequirement("Quest21", 20), new EventRequirement("Corrupted", 1)),
-		ELDRASK("Eldrask", NamedTextColor.AQUA, new EventRequirement("Quest101", 12), new EventRequirement("Teal", 1)),
-		HEKAWT("Hekawt", NamedTextColor.GOLD, new EventRequirement("Quest101", 12), new EventRequirement("Fred", 1)),
-		SIRIUS("Sirius", NamedTextColor.GRAY, new EventRequirement("Quest220", 8), new EventRequirement("Zenith", 1)),
+		KAUL("Kaul", NamedTextColor.DARK_GREEN, true, new EventRequirement("Quest21", 20), new EventRequirement("Corrupted", 1)),
+		ELDRASK("Eldrask", NamedTextColor.AQUA, true, new EventRequirement("Quest101", 12), new EventRequirement("Teal", 1)),
+		HEKAWT("Hekawt", NamedTextColor.GOLD, true, new EventRequirement("Quest101", 12), new EventRequirement("Fred", 1)),
+		SIRIUS("Sirius", NamedTextColor.GRAY, true, new EventRequirement("Quest220", 8), new EventRequirement("Zenith", 1)),
 		ALOC_ACOC(HuntsManager.QuarryType.ALOC_ACOC),
 		CORE_ELEMENTAL(HuntsManager.QuarryType.CORE_ELEMENTAL),
 		STEEL_WING_HAWK(HuntsManager.QuarryType.STEEL_WING_HAWK),
 		THE_IMPENETRABLE(HuntsManager.QuarryType.THE_IMPENETRABLE),
 		UAMIEL(HuntsManager.QuarryType.UAMIEL),
 		EXPERIMENT_SEVENTY_ONE(HuntsManager.QuarryType.EXPERIMENT_SEVENTY_ONE),
-		UNKNOWN("Unknown", null);
+		UNKNOWN("Unknown", null, true);
 
 		public final String mDisplayName;
 		public final @Nullable TextColor mColor;
+		public final boolean mDisplayShard;
 
 		//If none, will not require anything.
 		public final EventRequirement[] mPossibilities;
 
-		KnownEvent(String displayName, @Nullable TextColor color, EventRequirement... possibleRequirements) {
-			this.mDisplayName = displayName;
-			this.mColor = color;
-			this.mPossibilities = possibleRequirements;
+		KnownEvent(String displayName, @Nullable TextColor color, boolean displayShard, EventRequirement... possibleRequirements) {
+			mDisplayName = displayName;
+			mColor = color;
+			mPossibilities = possibleRequirements;
+			mDisplayShard = displayShard;
 		}
 
 		KnownEvent(HuntsManager.QuarryType quarryType) {
-			this(quarryType.getName(), quarryType.getColor(), new EventRequirement("HuntsLodge", 2));
+			this(quarryType.getName(), quarryType.getColor(), false, new EventRequirement("HuntsLodge", 2));
 		}
 
 		public static String[] names() {

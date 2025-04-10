@@ -1,6 +1,12 @@
 package com.playmonumenta.plugins.hunts;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
+import com.playmonumenta.networkrelay.NetworkRelayMessageEvent;
+import com.playmonumenta.networkrelay.RemotePlayerData;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.hunts.bosses.AlocAcoc;
@@ -11,7 +17,6 @@ import com.playmonumenta.plugins.hunts.bosses.TheImpenetrable;
 import com.playmonumenta.plugins.hunts.bosses.Uamiel;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
-import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -34,14 +39,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.luckperms.api.model.group.Group;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -63,13 +68,15 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public class HuntsManager implements Listener {
 	private static final String HUNTS_SCOREHOLDER = "$Hunts";
 	private static final String TIME_OBJECTIVE = "HuntsSpawnTime";
 	private static final String BAITED_OBJECTIVE = "HuntsBaited";
 	private static final String QUARRY_OBJECTIVE = "HuntsNextQuarry";
-	private static final String INSTANCE_OBJECTIVE = "HuntsNextInstance";
+	private static final String IN_RANGE_CHANNEL = "com.playmonumenta.plugins.hunts.HuntsManager.playersInRange";
+	private static final String TRANSFER_REQUEST_CHANNEL = "com.playmonumenta.plugins.hunts.HuntsManager.transferRequest";
 
 	private static final String ANNOUNCEMENT_DISABLE_TAG = "HuntsAnnouncementDisable";
 
@@ -157,6 +164,16 @@ public class HuntsManager implements Listener {
 				return null;
 			}
 
+			for (Player player : world.getPlayers()) {
+				if (player.getScoreboardTags().contains(CLASS_DISABLE_TAG)) {
+					player.removeScoreboardTag(CLASS_DISABLE_TAG);
+					player.removeScoreboardTag("disable_class");
+					AbilityUtils.refreshClass(player);
+
+					player.sendMessage(Component.text("The Hunt has begun and your class has been reenabled!", NamedTextColor.GRAY, TextDecoration.ITALIC));
+				}
+			}
+
 			Location loc = getLocation(world);
 			if (!loc.isChunkLoaded()) {
 				BroadcastedEvents.clearEvent(name());
@@ -178,13 +195,11 @@ public class HuntsManager implements Listener {
 
 				try {
 					BossManager.createBoss(null, quarry, mTag, loc);
-					BroadcastedEvents.updateEvent(name(), 0);
 					MMLog.fine("[Hunts] Successfully summoned quarry " + mName);
 				} catch (Exception e) {
-					BroadcastedEvents.clearEvent(name());
-					MMLog.severe("[Hunts] Failed to initialize boss tag " + mTag);
-					e.printStackTrace();
+					MMLog.severe("[Hunts] Failed to initialize boss tag " + mTag, e);
 				}
+				BroadcastedEvents.clearEvent(name());
 				return quarry;
 			} else {
 				MMLog.severe("[Hunts] Failed to get quarry " + mLos + " from Library of Souls!");
@@ -208,13 +223,14 @@ public class HuntsManager implements Listener {
 
 	// In practice these should never be null because the initialization will set them
 	private @Nullable QuarryType mNextQuarry = null;
-	private @Nullable String mNextInstance = null;
 	private boolean mIsBaited;
 	private long mSpawnTime;
 
 	private boolean mTriggeredThirty = false;
 	private boolean mTriggeredFifteen = false;
 	private boolean mTriggeredFive = false;
+	private final Map<String, Set<UUID>> mPlayersInRange = new TreeMap<>();
+	private boolean mSpawningBoss = false; // True if this shard is in the 15 second waiting time before spawning a boss
 
 	public final Plugin mPlugin;
 	public final @Nullable World mWorld;
@@ -223,17 +239,31 @@ public class HuntsManager implements Listener {
 		mPlugin = plugin;
 		mWorld = Bukkit.getWorld("Project_Epic-ring");
 
+		boolean isRingShard;
+		boolean isOverseerShard;
+		String shardName = NetworkRelayAPI.getShardName();
+		if (shardName.startsWith("ring")) {
+			isRingShard = true;
+			isOverseerShard = shardName.equals("ring");
+		} else {
+			isRingShard = false;
+			isOverseerShard = false;
+		}
+
 		refresh().thenRun(() -> {
 			// If there was a hunt that should have happened here but this shard was down, do it again later
-			if (getRemainingTime() <= 0 && isCorrectInstance()) {
-				setRandomTime().thenRun(this::refreshOthers);
+			if (isOverseerShard && getRemainingTime() <= 0) {
+				setTime(WARNING_15).thenRun(this::refreshOthers);
 			}
 			MMLog.info("[Hunts] Restarted timer due it being negative when manager was initialized");
 		});
-		initializeTimer();
+
+		if (isRingShard) {
+			initializeTimer(isOverseerShard);
+		}
 	}
 
-	public void initializeTimer() {
+	public void initializeTimer(boolean overseer) {
 		if (!Plugin.IS_PLAY_SERVER) {
 			return;
 		}
@@ -244,185 +274,60 @@ public class HuntsManager implements Listener {
 
 			@Override
 			public void run() {
-				if (isCorrectInstance()) {
-					long remainingTime = getRemainingTime();
-					if (remainingTime <= WARNING_30) {
-						if (remainingTime <= 0) {
-							summonQuarry();
-							//TODO spawn message
-							MMLog.fine("[Hunts] Timer is up and this is the correct instance, summoning quarry");
-							return;
-						} else if (remainingTime <= WARNING_5) {
-							if (!mTriggeredFive) {
-								sendWarning();
-								mTriggeredFive = true;
-								MMLog.fine("[Hunts] Sent 5 minute warning");
-							}
-						} else if (remainingTime <= WARNING_15) {
-							if (!mTriggeredFifteen) {
+				long remainingTime = getRemainingTime();
+				if (remainingTime <= WARNING_30) {
+					if (remainingTime <= 0) {
+						if (overseer) {
+							sendTransferRequest();
+							MMLog.fine("[Hunts] Timer is up, sending transfer request");
+						}
+						return;
+					} else if (remainingTime <= WARNING_5) {
+						// Start broadcasting which players are in range at the 5 minutes mark
+						sendLocalPlayersInRange();
+						if (overseer && !mTriggeredFive) {
+							sendWarning();
+							mTriggeredFive = true;
+							MMLog.fine("[Hunts] Sent 5 minute warning");
+						}
+					} else if (remainingTime <= WARNING_15) {
+						if (!mTriggeredFifteen) {
+							if (overseer) {
 								sendWarning();
 								mTriggeredFifteen = true;
-
-								if (mNextQuarry != null && mWorld != null) {
-									mNextQuarry.respawnArena(mWorld);
-								}
-
 								MMLog.fine("[Hunts] Sent 15 minute warning");
 							}
-						} else {
-							if (!mTriggeredThirty) {
-								sendWarning();
-								mTriggeredThirty = true;
-								MMLog.fine("[Hunts] Sent 30 minute warning");
+
+							if (mNextQuarry != null && mWorld != null) {
+								mNextQuarry.respawnArena(mWorld);
 							}
 						}
-
-						if (getRemainingTime() < WARNING_15) {
-							if (mNextQuarry != null) {
-								BroadcastedEvents.updateEvent(mNextQuarry.name(), (int) remainingTime);
-								preSpawnParticles(mNextQuarry, remainingTime);
-							}
-
-							if (mWorld != null) {
-								for (Player player : mWorld.getPlayers()) {
-									updatePlayerWaiting(player);
-								}
-							}
+					} else {
+						if (overseer && !mTriggeredThirty) {
+							sendWarning();
+							mTriggeredThirty = true;
+							MMLog.fine("[Hunts] Sent 30 minute warning");
 						}
 					}
 
+					if (getRemainingTime() < WARNING_15) {
+						if (mNextQuarry != null) {
+							if (overseer) {
+								BroadcastedEvents.updateEvent(mNextQuarry.name(), (int) remainingTime);
+							}
+							preSpawnParticles(mNextQuarry, remainingTime);
+						}
+
+						if (mWorld != null) {
+							for (Player player : mWorld.getPlayers()) {
+								updatePlayerWaiting(player);
+							}
+						}
+					}
 				}
 			}
 		};
 		mRunnable.runTaskTimer(mPlugin, 5 * 20, 5 * 20);
-	}
-
-	private boolean isCorrectInstance() {
-		try {
-			return NetworkRelayAPI.getShardName().equals(mNextInstance);
-		} catch (Exception e) {
-			MMLog.severe("[Hunts] Exception caught when checking instance name.");
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	public void summonQuarry() {
-		if (mWorld != null && mNextQuarry != null && mNextInstance != null) {
-			List<Player> players = PlayerUtils.playersInRange(mNextQuarry.mSpawnLoc.toLocation(mWorld), mNextQuarry.mInnerRadius, true);
-			int count = players.size();
-			int extraInstances = count / 10;
-			if (extraInstances > 0) {
-				Map<String, List<Player>> instanceMap = new HashMap<>();
-				instanceMap.put(mNextInstance, new ArrayList<>());
-
-				Set<String> ringShards = getRingShards();
-				int prevNum;
-				if (mNextInstance.equals("ring")) {
-					prevNum = 1;
-				} else {
-					prevNum = Integer.parseInt(mNextInstance.split("-")[1]);
-				}
-				for (int i = 0; i < extraInstances; i++) {
-					String test = "ring-" + (prevNum + 1);
-					if (ringShards.contains(test)) {
-						instanceMap.put(test, new ArrayList<>());
-						prevNum = prevNum + 1;
-					} else {
-						instanceMap.put("ring", new ArrayList<>());
-						prevNum = 1;
-					}
-				}
-
-				Map<Group, List<Player>> guildMap = new HashMap<>();
-				List<Player> noGuildPlayers = new ArrayList<>();
-				for (Player player: players) {
-					Group guildMembershipGroup = LuckPermsIntegration.getGuild(player);
-					Group guildRoot = LuckPermsIntegration.getGuildRoot(guildMembershipGroup);
-					if (guildRoot == null) {
-						noGuildPlayers.add(player);
-					} else {
-						guildMap.computeIfAbsent(guildRoot, key -> new ArrayList<>()).add(player);
-					}
-				}
-
-				int maxPlayersPer = (int) Math.ceil(((double) count) / (1 + extraInstances));
-
-				while (!guildMap.isEmpty()) {
-					Group guild = guildMap.keySet().stream().max(Comparator.comparingInt(g -> Objects.requireNonNull(guildMap.get(g)).size())).get(); // Not empty, must be some maximum
-					List<Player> members = Objects.requireNonNull(guildMap.get(guild));
-					List<String> availableShards = instanceMap.keySet().stream().filter(s -> Objects.requireNonNull(instanceMap.get(s)).size() + members.size() <= maxPlayersPer).toList();
-					if (availableShards.isEmpty()) {
-						// We can't fit everyone, need to split up
-						String leastPopulatedShard = instanceMap.keySet().stream().min(Comparator.comparingInt(s -> Objects.requireNonNull(instanceMap.get(s)).size())).orElse(null);
-						if (leastPopulatedShard == null) {
-							// Should never happen, give up
-							MMLog.warning("[Hunts] Error in shard sorting algorithm - no shards available for guild sorting!");
-							break;
-						}
-						List<Player> shardPlayers = Objects.requireNonNull(instanceMap.get(leastPopulatedShard));
-						Collections.shuffle(members);
-						for (int i = 0; i < maxPlayersPer - shardPlayers.size(); i++) {
-							shardPlayers.add(members.remove(i)); // members size decreases, making progress
-						}
-					} else {
-						String shard = FastUtils.getRandomElement(availableShards);
-						List<Player> shardPlayers = Objects.requireNonNull(instanceMap.get(shard));
-						shardPlayers.addAll(members);
-						guildMap.remove(guild);
-					}
-				}
-
-				Collections.shuffle(noGuildPlayers);
-				for (String shard : instanceMap.keySet()) {
-					List<Player> shardPlayers = Objects.requireNonNull(instanceMap.get(shard));
-					while (shardPlayers.size() < maxPlayersPer && !noGuildPlayers.isEmpty()) {
-						shardPlayers.add(noGuildPlayers.remove(0));
-					}
-				}
-
-				for (Player player : mWorld.getPlayers()) {
-					if (player.getScoreboardTags().contains(CLASS_DISABLE_TAG)) {
-						player.removeScoreboardTag(CLASS_DISABLE_TAG);
-						player.removeScoreboardTag("disable_class");
-						AbilityUtils.refreshClass(player);
-
-						player.sendMessage(Component.text("The Hunt has begun and your class has been reenabled!", NamedTextColor.GRAY, TextDecoration.ITALIC));
-					}
-				}
-
-				for (String shard : instanceMap.keySet()) {
-					if (shard.equals(mNextInstance)) {
-						// Exclude this instance, no need to transfer
-						continue;
-					}
-					for (Player player : instanceMap.get(shard)) {
-						try {
-							MonumentaRedisSyncAPI.sendPlayer(player, shard);
-						} catch (Exception e) {
-							MMLog.severe("[Hunts] Failed to sort players to shard " + shard);
-						}
-					}
-				}
-
-				// Give players time to switch their instance before spawning
-				QuarryType quarry = mNextQuarry;
-				String thisInstance = mNextInstance;
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					quarry.summon(mWorld);
-					// Don't duplicate instances if we happen to have way too many players
-					for (String shard : instanceMap.keySet()) {
-						if (shard.equals(thisInstance)) {
-							continue;
-						}
-						MonumentaNetworkRelayIntegration.broadcastCommand("hunts forcesummon " + quarry.name() + " " + shard);
-					}
-				}, 15 * 20);
-			} else {
-				mNextQuarry.summon(mWorld);
-			}
-		}
-		startRandomHunt();
 	}
 
 	public void forceSummon(QuarryType quarry) {
@@ -432,14 +337,13 @@ public class HuntsManager implements Listener {
 	}
 
 	public void startRandomHunt() {
-		if (getRemainingTime() > 0 && mNextQuarry != null && mNextInstance != null) {
-			BroadcastedEvents.clearEvent(mNextQuarry.name(), mNextInstance);
+		if (getRemainingTime() > 0 && mNextQuarry != null) {
+			BroadcastedEvents.clearEvent(mNextQuarry.name(), "ring");
 		}
 		CompletableFuture.allOf(
 			setRandomTime(),
 			setBaited(false),
-			setRandomQuarry(),
-			setRandomInstance()
+			setRandomQuarry()
 		)
 			.thenRun(this::refreshOthers)
 			.thenRun(() -> {
@@ -463,8 +367,7 @@ public class HuntsManager implements Listener {
 		return CompletableFuture.allOf(
 			RBoardAPI.getAsLong(HUNTS_SCOREHOLDER, QUARRY_OBJECTIVE, 0).whenComplete((val, ex) -> {
 				if (ex != null) {
-					MMLog.warning("[Hunts] Encountered exception when refreshing next Quarry:");
-					ex.printStackTrace();
+					MMLog.warning("[Hunts] Encountered exception when refreshing next Quarry:", ex);
 				} else {
 					int score = val.intValue();
 					if (score >= QuarryType.values().length) {
@@ -476,29 +379,9 @@ public class HuntsManager implements Listener {
 				}
 			}),
 
-			RBoardAPI.getAsLong(HUNTS_SCOREHOLDER, INSTANCE_OBJECTIVE, 1).whenComplete((val, ex) -> {
-				if (ex != null) {
-					MMLog.warning("[Hunts] Encountered exception when refreshing next instance:");
-					ex.printStackTrace();
-				} else {
-					String nextInstance = null;
-					if (val > 1) {
-						for (String shard : getRingShards()) {
-							if (shard.endsWith("-" + val)) {
-								nextInstance = shard;
-								break;
-							}
-						}
-					}
-					mNextInstance = nextInstance == null ? "ring" : nextInstance;
-					MMLog.finer("[Hunts] Next instance is " + mNextInstance);
-				}
-			}),
-
 			RBoardAPI.getAsLong(HUNTS_SCOREHOLDER, BAITED_OBJECTIVE, 0).whenComplete((val, ex) -> {
 				if (ex != null) {
-					MMLog.warning("[Hunts] Encountered exception when refreshing baited status:");
-					ex.printStackTrace();
+					MMLog.warning("[Hunts] Encountered exception when refreshing baited status:", ex);
 				} else {
 					mIsBaited = val > 0;
 					MMLog.finer("[Hunts] Next baited status is " + mIsBaited);
@@ -507,8 +390,7 @@ public class HuntsManager implements Listener {
 
 			RBoardAPI.getAsLong(HUNTS_SCOREHOLDER, TIME_OBJECTIVE, 0).whenComplete((val, ex) -> {
 				if (ex != null) {
-					MMLog.warning("[Hunts] Encountered exception when refreshing spawn time:");
-					ex.printStackTrace();
+					MMLog.warning("[Hunts] Encountered exception when refreshing spawn time:", ex);
 				} else {
 					mSpawnTime = val;
 					MMLog.finer("[Hunts] Next spawn time is " + mSpawnTime);
@@ -523,8 +405,7 @@ public class HuntsManager implements Listener {
 			shards.removeIf(shard -> !shard.startsWith("ring"));
 			return shards;
 		} catch (Exception e) {
-			MMLog.severe("[Hunts] Caught exception when finding online shards");
-			e.printStackTrace();
+			MMLog.severe("[Hunts] Caught exception when finding online shards", e);
 		}
 		return new HashSet<>();
 	}
@@ -561,12 +442,6 @@ public class HuntsManager implements Listener {
 		return RBoardAPI.set(HUNTS_SCOREHOLDER, QUARRY_OBJECTIVE, ordinal);
 	}
 
-	private CompletableFuture<Long> setRandomInstance() {
-		int instance = FastUtils.RANDOM.nextInt(1, getRingShards().size() + 1);
-		MMLog.finer("[Hunts] Set next instance to " + instance);
-		return RBoardAPI.set(HUNTS_SCOREHOLDER, INSTANCE_OBJECTIVE, instance);
-	}
-
 	public void bait(Player player, QuarryType quarry) {
 		if (mIsBaited) {
 			player.sendMessage(Component.text("A Quarry has already been baited! You must wait until the next Hunt to bait another one.", NamedTextColor.RED));
@@ -583,7 +458,7 @@ public class HuntsManager implements Listener {
 	}
 
 	public void track(Player player) {
-		if (mNextQuarry == null || mNextInstance == null) {
+		if (mNextQuarry == null) {
 			player.sendMessage(Component.text("Encountered an error; please try again soon."));
 			return;
 		}
@@ -600,7 +475,7 @@ public class HuntsManager implements Listener {
 		Component message = Component.empty()
 			.append(Component.text("The next Quarry to be hunted is ", NamedTextColor.GOLD))
 			.append(Component.text(mNextQuarry.getName(), NamedTextColor.DARK_RED, TextDecoration.BOLD))
-			.append(Component.text((mIsBaited ? ", which has been baited" : "") + ". It will appear on " + mNextInstance + timeDisplay + ".", NamedTextColor.GOLD));
+			.append(Component.text((mIsBaited ? ", which has been baited" : "") + ". It will appear " + timeDisplay + ".", NamedTextColor.GOLD));
 		player.sendMessage(message);
 	}
 
@@ -608,27 +483,26 @@ public class HuntsManager implements Listener {
 		try {
 			NetworkRelayAPI.sendBroadcastCommand("hunts warn");
 		} catch (Exception e) {
-			MMLog.warning("[Hunts] Caught exception sending warning message:");
-			e.printStackTrace();
+			MMLog.warning("[Hunts] Caught exception sending warning message:", e);
 		}
 	}
 
 	public void warn(List<Player> players) {
-		if (mNextQuarry == null || mNextInstance == null) {
-			MMLog.severe("[Hunts] Could not warn players due to null mNextQuarry or mNextInstance");
+		if (mNextQuarry == null) {
+			MMLog.severe("[Hunts] Could not warn players due to null mNextQuarry");
 			return;
 		}
 
 		players.removeIf(player -> !hasLodgeAnnouncementScore(player));
 		players.removeIf(player -> ScoreboardUtils.checkTag(player, ANNOUNCEMENT_DISABLE_TAG));
-		int mins = (int) Math.round(getRemainingTime() / 60.0);
-		if (mins <= 1) {
+		int minutes = (int) Math.round(getRemainingTime() / 60.0);
+		if (minutes <= 1) {
 			return;
 		}
 
-		if (mins > 15) {
+		if (minutes > 15) {
 			Component message1 = Component.text("The creatures of the Ring are unsettled... A great beast begins to stir.", com.playmonumenta.plugins.itemstats.enums.Location.HUNTS.getColor());
-			Component message2 = Component.text("A quarry will emerge in " + mins + " minutes!", NamedTextColor.GRAY, TextDecoration.ITALIC);
+			Component message2 = Component.text("A quarry will emerge in " + minutes + " minutes!", NamedTextColor.GRAY, TextDecoration.ITALIC);
 			for (Player player : players) {
 				player.sendMessage(message1);
 				player.sendMessage(message2);
@@ -638,11 +512,11 @@ public class HuntsManager implements Listener {
 			}
  		} else {
 			Component message1 = Component.text(mNextQuarry.mWarning, mNextQuarry.mColor);
-			Component message2 = Component.text(mNextQuarry.getName() + " will be hunted on " + mNextInstance + " in " + mins + " minutes!", NamedTextColor.GRAY, TextDecoration.ITALIC);
+			Component message2 = Component.text(mNextQuarry.getName() + " will be hunted in " + minutes + " minutes!", NamedTextColor.GRAY, TextDecoration.ITALIC);
 			for (Player player : players) {
 				player.sendMessage(message1);
 				player.sendMessage(message2);
-				player.playSound(player, mNextQuarry.mSound, SoundCategory.HOSTILE, mins > 5 ? 2.0f : 1.5f, 1.0f);
+				player.playSound(player, mNextQuarry.mSound, SoundCategory.HOSTILE, minutes > 5 ? 2.0f : 1.5f, 1.0f);
 			}
 		}
 	}
@@ -779,6 +653,282 @@ public class HuntsManager implements Listener {
 		if (player.getScoreboardTags().contains(CLASS_DISABLE_TAG)) {
 			player.removeScoreboardTag(CLASS_DISABLE_TAG);
 			playerExitWaitingArea(player);
+		}
+	}
+
+	private void sendLocalPlayersInRange() {
+		if (mWorld != null && mNextQuarry != null) {
+			JsonArray playerIdsJson = new JsonArray();
+			for (Player player : PlayerUtils.playersInRange(mNextQuarry.mSpawnLoc.toLocation(mWorld), mNextQuarry.mInnerRadius, true)) {
+				playerIdsJson.add(player.getUniqueId().toString());
+			}
+			JsonObject data = new JsonObject();
+			data.add("players", playerIdsJson);
+			try {
+				NetworkRelayAPI.sendBroadcastMessage(IN_RANGE_CHANNEL, data);
+			} catch (Exception e) {
+				MMLog.warning("[Hunts] Failed to broadcast local players in range");
+			}
+		}
+	}
+
+	private void receiveRemotePlayersInRange(String sourceShard, JsonObject data) {
+		Set<UUID> playersInRange = new HashSet<>();
+		if (data.get("players") instanceof JsonArray playersJson) {
+			for (JsonElement playerElement : playersJson) {
+				if (playerElement instanceof JsonPrimitive playerPrimitive && playerPrimitive.isString()) {
+					playersInRange.add(UUID.fromString(playerPrimitive.getAsString()));
+				}
+			}
+		}
+		mPlayersInRange.put(sourceShard, playersInRange);
+	}
+
+	private static class PlayerGuildInfo {
+		private final UUID mUUID;
+		private final @Nullable String mGuild;
+
+		private PlayerGuildInfo(UUID uuid) {
+			mUUID = uuid;
+			RemotePlayerData remoteData = MonumentaNetworkRelayIntegration.getRemotePlayer(uuid);
+			if (remoteData != null) {
+				mGuild = MonumentaNetworkRelayIntegration.remotePlayerGuild(remoteData);
+			} else {
+				// Should never happen; remoteData should not be null
+				mGuild = null;
+			}
+		}
+	}
+
+	private void sendTransferRequest() {
+		JsonObject transferData = new JsonObject();
+
+		// We will modify this map to determine where to send people
+		// By starting with where people are, we can minimize the total number of transfers
+		int count = 0;
+		Map<String, List<PlayerGuildInfo>> instanceMap = new HashMap<>();
+		for (Map.Entry<String, Set<UUID>> entry : mPlayersInRange.entrySet()) {
+			String shard = entry.getKey();
+			for (UUID uuid : entry.getValue()) {
+				instanceMap.computeIfAbsent(shard, s -> new ArrayList<>()).add(new PlayerGuildInfo(uuid));
+				count++;
+			}
+		}
+
+		int totalInstances = 1 + count / 10;
+		int maxPlayersPer = (int) Math.ceil(((double) count) / totalInstances);
+
+		// Players who don't fit into any existing shards
+		List<PlayerGuildInfo> pool = new ArrayList<>();
+
+		// Move players from overpopulated shards into the pool
+		for (List<PlayerGuildInfo> shardPlayers : instanceMap.values()) {
+			if (shardPlayers.size() >= maxPlayersPer) {
+				// This shard has too many players!
+				// Find the largest guild that can't fit and put them in the pool
+				int lockedPlayers = 0;
+				Map<String, List<PlayerGuildInfo>> guildMap = sortGuildList(shardPlayers);
+
+				// Biggest guilds first
+				List<Map.Entry<String, List<PlayerGuildInfo>>> sortedGuilds = guildMap.entrySet().stream()
+					.sorted(Comparator.comparingInt((Map.Entry<String, List<PlayerGuildInfo>> entry) -> entry.getKey().equals("") ? -1 : entry.getValue().size()).reversed())
+					.toList();
+
+				for (Map.Entry<String, List<PlayerGuildInfo>> entry : sortedGuilds) {
+					List<PlayerGuildInfo> guildPlayers = entry.getValue();
+					if (lockedPlayers + guildPlayers.size() > maxPlayersPer) {
+						if (entry.getKey().equals("")) {
+							Collections.shuffle(guildPlayers);
+							// Lock in individual players
+							while (lockedPlayers <= maxPlayersPer) {
+								if (guildPlayers.isEmpty()) {
+									break;
+								}
+								guildPlayers.remove(0);
+								lockedPlayers++;
+							}
+						}
+
+						// This guild (or remaining individual players) can't fit; put them in the pool
+						shardPlayers.removeAll(guildPlayers);
+						pool.addAll(guildPlayers);
+					} else {
+						lockedPlayers += guildPlayers.size();
+					}
+				}
+			}
+		}
+
+		// Move players from underpopulated shards into the pool
+		while (instanceMap.keySet().size() > totalInstances) {
+			Map.Entry<String, List<PlayerGuildInfo>> lowestShard = instanceMap.entrySet().stream()
+				.min(Comparator.comparingInt((Map.Entry<String, List<PlayerGuildInfo>> entry) -> entry.getValue().size()))
+				.orElse(null);
+			if (lowestShard == null) {
+				// Should never happen
+				break;
+			}
+			// Forget about this shard and put them in the pool
+			List<PlayerGuildInfo> removed = instanceMap.remove(lowestShard.getKey());
+			pool.addAll(removed);
+		}
+
+		// If we don't have enough instances, add the healthiest ones
+		if (instanceMap.keySet().size() < totalInstances) {
+			Set<String> possibleShards = getRingShards();
+			possibleShards.removeAll(instanceMap.keySet());
+			Comparator<String> comparator = Comparator.comparingDouble(shard -> MonumentaNetworkRelayIntegration.remoteShardHealth(shard).healthScore());
+			List<String> sortedShards = possibleShards.stream()
+				.sorted(comparator.reversed())
+				.toList();
+			for (int i = 0; i < totalInstances - instanceMap.keySet().size(); i++) {
+				instanceMap.put(sortedShards.get(i), new ArrayList<>());
+			}
+		}
+
+		//Now we can finally add people from the pool back in
+		Map<String, List<PlayerGuildInfo>> guildMap = sortGuildList(pool);
+		List<PlayerGuildInfo> noGuildPlayers = guildMap.remove("");
+		if (noGuildPlayers == null) {
+			noGuildPlayers = new ArrayList<>();
+		}
+
+		while (!guildMap.isEmpty()) {
+			Map.Entry<String, List<PlayerGuildInfo>> guildEntry = guildMap.entrySet().stream()
+				.max(Comparator.comparingInt(entry -> entry.getValue().size()))
+				.get(); // Not empty, must be some maximum
+
+			String guild = guildEntry.getKey();
+			List<PlayerGuildInfo> members = guildEntry.getValue();
+
+			List<Map.Entry<String, List<PlayerGuildInfo>>> availableShardEntries = instanceMap.entrySet().stream()
+				.filter(entry -> entry.getValue().size() + members.size() <= maxPlayersPer)
+				.toList();
+
+			if (availableShardEntries.isEmpty()) {
+				// We can't fit everyone, need to split up
+				Map.Entry<String, List<PlayerGuildInfo>> leastPopulatedShardEntry = instanceMap.entrySet().stream()
+					.min(Comparator.comparingInt(entry -> entry.getValue().size()))
+					.orElse(null);
+				if (leastPopulatedShardEntry == null) {
+					// Should never happen, give up
+					MMLog.warning("[Hunts] Error in shard sorting algorithm - no shards available for guild sorting!");
+					break;
+				}
+				List<PlayerGuildInfo> shardPlayers = leastPopulatedShardEntry.getValue();
+				Collections.shuffle(members);
+				for (int i = 0; i < maxPlayersPer - shardPlayers.size(); i++) {
+					shardPlayers.add(members.remove(i)); // members size decreases, making progress
+				}
+			} else {
+				Map.Entry<String, List<PlayerGuildInfo>> shardEntry = FastUtils.getRandomElement(availableShardEntries);
+				List<PlayerGuildInfo> shardPlayers = shardEntry.getValue();
+				shardPlayers.addAll(members);
+				guildMap.remove(guild);
+			}
+		}
+
+		Collections.shuffle(noGuildPlayers);
+		for (PlayerGuildInfo playerId : noGuildPlayers) {
+			Map.Entry<String, List<PlayerGuildInfo>> leastPopulatedShardEntry = instanceMap.entrySet().stream()
+				.min(Comparator.comparingInt(entry -> entry.getValue().size()))
+				.orElse(null);
+			if (leastPopulatedShardEntry == null) {
+				// Should never happen, give up
+				MMLog.warning("[Hunts] Error in shard sorting algorithm - no shards available for guildless player!");
+				break;
+			}
+
+			leastPopulatedShardEntry.getValue().add(playerId);
+		}
+
+		for (Map.Entry<String, List<PlayerGuildInfo>> shardPlayerEntries : instanceMap.entrySet()) {
+			String targetShard = shardPlayerEntries.getKey();
+			for (PlayerGuildInfo playerId : shardPlayerEntries.getValue()) {
+				transferData.addProperty(playerId.mUUID.toString(), targetShard);
+			}
+		}
+
+		try {
+			NetworkRelayAPI.sendBroadcastMessage(TRANSFER_REQUEST_CHANNEL, transferData);
+		} catch (Exception e) {
+			MMLog.warning("[Hunts] Failed to broadcast transfer request");
+		}
+		startRandomHunt();
+	}
+
+	// Puts unguilded players into the empty string
+	private Map<String, List<PlayerGuildInfo>> sortGuildList(List<PlayerGuildInfo> guildList) {
+		Map<String, List<PlayerGuildInfo>> map = new HashMap<>();
+		for (PlayerGuildInfo player : guildList) {
+			map.computeIfAbsent(player.mGuild == null ? "" : player.mGuild, g -> new ArrayList<>()).add(player);
+		}
+		return map;
+	}
+
+	private void receiveTransferRequest(JsonObject data) {
+		String thisShard = NetworkRelayAPI.getShardName();
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			String playerId = player.getUniqueId().toString();
+			if (data.get(playerId) instanceof JsonPrimitive targetPrimitive && targetPrimitive.isString()) {
+				String targetShard = targetPrimitive.getAsString();
+
+				if (thisShard.equals(targetShard)) {
+					// The player is already here
+					continue;
+				}
+
+				try {
+					MonumentaRedisSyncAPI.sendPlayer(player, targetShard);
+				} catch (Exception e) {
+					MMLog.severe("[Hunts] Failed to sort players to shard " + targetShard);
+				}
+			}
+		}
+
+		if (mSpawningBoss) {
+			return;
+		}
+
+
+		// If this shard is one of the target shards, summon the boss locally after a delay
+		for (JsonElement targetElement : data.asMap().values()) {
+			if (!(targetElement instanceof JsonPrimitive targetPrimitive && targetPrimitive.isString())) {
+				continue;
+			}
+
+			String targetShard = targetPrimitive.getAsString();
+			if (!thisShard.equals(targetShard)) {
+				continue;
+			}
+
+			// Found a match, summon the boss; just make sure to
+			// give players time to switch their instance before spawning
+			QuarryType quarry = mNextQuarry;
+			if (quarry == null || mWorld == null) {
+				// No quarry to spawn?
+				break;
+			}
+			mSpawningBoss = true;
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				quarry.summon(mWorld);
+				mSpawningBoss = false;
+			}, 15 * 20);
+			break;
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void networkRelayMessageEvent(@NotNull NetworkRelayMessageEvent event) {
+		JsonObject data = event.getData();
+		switch (event.getChannel()) {
+			case IN_RANGE_CHANNEL -> {
+				String source = event.getSource();
+				Plugin.getInstance().mHuntsManager.receiveRemotePlayersInRange(source, data);
+			}
+			case TRANSFER_REQUEST_CHANNEL -> Plugin.getInstance().mHuntsManager.receiveTransferRequest(data);
+			default -> {
+			}
 		}
 	}
 }

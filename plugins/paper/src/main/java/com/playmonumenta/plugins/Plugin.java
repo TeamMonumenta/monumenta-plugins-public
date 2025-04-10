@@ -593,6 +593,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new IchorListener(), this);
 		manager.registerEvents(new DiscoveryManager(), this);
 		manager.registerEvents(mGrapplingListener, this);
+		manager.registerEvents(mHuntsManager, this);
 		manager.registerEvents(new CelestialGemListener(), this);
 		manager.registerEvents(new UnlockEnchantmentListener(), this);
 		manager.registerEvents(new WinterListener(), this);

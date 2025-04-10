@@ -319,7 +319,7 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 	public abstract String getSpoiledLootTable();
 
 	public String getWinsScoreboard() {
-		return mQuarryType.getLos() + "Wins";
+		return getBestiaryLoS() + "Wins";
 	}
 
 	public String getUnspoiledWinsScoreboard() {
