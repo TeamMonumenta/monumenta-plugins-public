@@ -131,7 +131,7 @@ public class BossUtils {
 			}
 			ItemUtils.damageShield(player, durability);
 			if (ItemStatUtils.hasEnchantment(player.getInventory().getItemInOffHand(), EnchantmentType.RETALIATION)) {
-				new Retaliation().startEffect(player, effects, damage, damager, true);
+				new Retaliation().startEffect(player, effects, damager, true);
 			}
 			return false;
 		} else {
@@ -197,16 +197,13 @@ public class BossUtils {
 				}
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				ItemUtils.damageShield(player, (int) Math.ceil(toTake / 2.5));
-				if (ItemStatUtils.hasEnchantment(player.getInventory().getItemInOffHand(), EnchantmentType.RETALIATION)) {
-					new Retaliation().startEffect(player, effects, toTake, boss, true);
-				}
 			} else {
 				NmsUtils.getVersionAdapter().stunShield(player, (int) (20 * percentHealth * 20));
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				ItemUtils.damageShield(player, (int)(percentHealth * 20 / 2.5));
-				if (ItemStatUtils.hasEnchantment(player.getInventory().getItemInOffHand(), EnchantmentType.RETALIATION)) {
-					new Retaliation().startEffect(player, effects, percentHealth * 20, boss, true);
-				}
+			}
+			if (ItemStatUtils.hasEnchantment(player.getInventory().getItemInOffHand(), EnchantmentType.RETALIATION)) {
+				new Retaliation().startEffect(player, effects, boss, true);
 			}
 		} else {
 			double absorp = AbsorptionUtils.getAbsorption(target);
