@@ -73,6 +73,7 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.CHANCECUBES, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.BERSERK, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.HEALCUT, 2);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.GRAVITY, 1);
 
 		// Depths endless changes- use dev2 for testing
 		if (ServerProperties.getShardName().startsWith("depths")
@@ -145,6 +146,8 @@ public class DelvesUtils {
 			case 2874, 2875 -> List.of(experimentalMods.get(0), experimentalMods.get(1));
 			// week starting friday march 14, 2025
 			case 2881, 2882 -> List.of(experimentalMods.get(2));
+			// week starting friday april 4, 2025
+			case 2884, 2885, 2886, 2887 -> List.of(experimentalMods.get(3));
 			default -> Collections.emptyList();
 		};
 	}
