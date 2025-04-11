@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.BlockUtils;
 import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -84,7 +85,7 @@ public class Gravity {
 		if (level == 0) {
 			return;
 		}
-		Set<Block> blocksToUpdate = Set.of();
+		Set<Block> blocksToUpdate = new HashSet<>();
 		for (Block block : blocks) {
 			Location loc = block.getLocation().add(0, 1, 0);
 			blocksToUpdate.add(loc.getBlock());
@@ -130,7 +131,7 @@ public class Gravity {
 			return;
 		}
 		if (event.getType() == DamageType.FALL) {
-			event.updateDamageWithMultiplier(3.5);
+			event.setFlatDamage(event.getDamage() * 2.5);
 		}
 	}
 }
