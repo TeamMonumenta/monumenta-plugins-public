@@ -194,8 +194,14 @@ public class SpawnerListener implements Listener {
 				}
 
 				// check protected mob distances from their spawners
-				for (Map.Entry<Location, List<MobInfo>> entry : mSpawnerInfos.entrySet()) {
+				Iterator<Map.Entry<Location, List<MobInfo>>> it = mSpawnerInfos.entrySet().iterator();
+				while (it.hasNext()) {
+					Map.Entry<Location, List<MobInfo>> entry = it.next();
 					Location spawnerLoc = entry.getKey();
+					if (!spawnerLoc.isWorldLoaded() || !spawnerLoc.isChunkLoaded()) {
+						it.remove();
+						continue;
+					}
 					Block spawnerBlock = spawnerLoc.getBlock();
 					if (!getProtector(spawnerBlock)) {
 						continue;
