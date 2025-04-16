@@ -116,8 +116,7 @@ public abstract class Gui implements InventoryHolder {
 	 * </p>
 	 */
 	void update() {
-		Preconditions.checkState(mInventory != null, "update() called after inventory was disposed");
-		if (!mIsDirty) {
+		if (mInventory == null || !mIsDirty) {
 			return;
 		}
 
@@ -162,8 +161,8 @@ public abstract class Gui implements InventoryHolder {
 	 * @throws IllegalStateException If called after inventory disposal or outside render()
 	 */
 	public final void setItem(int i, GuiItem item) {
-		Preconditions.checkState(mInventory != null, "setItem called after inventory was disposed");
 		Preconditions.checkState(mIsRendering, "setItem() called outside of render()");
+		Preconditions.checkState(mInventory != null, "setItem called after inventory was disposed");
 		mInventory.setItem(i, item.getItem());
 		mItems.set(i, item);
 	}
@@ -188,7 +187,10 @@ public abstract class Gui implements InventoryHolder {
 	 * @throws IllegalStateException If called after inventory disposal
 	 */
 	public void open() {
-		Preconditions.checkState(mInventory != null, "open() called after inventory was disposed");
+		if(mInventory == null) {
+			return;
+		}
+
 		update();
 		mPlayer.openInventory(mInventory);
 	}
@@ -199,14 +201,17 @@ public abstract class Gui implements InventoryHolder {
 	 * @throws IllegalStateException If called after inventory disposal
 	 */
 	public void close() {
-		Preconditions.checkState(mInventory != null, "close() called after inventory was disposed");
+		if(mInventory == null) {
+			return;
+		}
+
 		mInventory.close();
 		mInventory = null;
 	}
 
 	@Override
 	public @NotNull Inventory getInventory() {
-		Preconditions.checkState(mInventory != null, "setItem called after inventory was disposed");
+		Preconditions.checkState(mInventory != null, "getInventory() called after inventory was disposed");
 		return mInventory;
 	}
 
