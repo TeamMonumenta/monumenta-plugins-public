@@ -140,6 +140,7 @@ public class SpellDeathlyCharge extends Spell {
 			BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, DAMAGE, "Deathly Charge", mBoss.getLocation());
 			AbilityUtils.silencePlayer(player, 5 * 20);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 5, 1));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME);
 			if (BossUtils.bossDamageBlocked(player, loc)) {
 				MovementUtils.knockAway(mBoss.getLocation(), player, 0.6f, 0.6f, false);
 			}
