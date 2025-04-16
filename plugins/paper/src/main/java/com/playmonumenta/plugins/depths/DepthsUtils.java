@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -174,19 +173,8 @@ public class DepthsUtils {
 			return false; // return whether we placed ice or not
 		}
 
-		Material iceMaterial = ICE_MATERIAL;
-
-		//Check for permafrost to increase ice duration
-		Permafrost permafrost = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(p, Permafrost.class);
-		if (permafrost != null) {
-			ticks += permafrost.getBonusIceDuration();
-			if (permafrost.getAbilityScore() == 6) {
-				iceMaterial = Permafrost.PERMAFROST_ICE_MATERIAL;
-			}
-		}
-
 		BlockData bd = l.getWorld().getBlockAt(l).getBlockData();
-		l.getBlock().setType(iceMaterial);
+		l.getBlock().setType(ICE_MATERIAL);
 		iceActive.put(l, bd);
 		iceBarrier.put(l, isBarrier);
 
@@ -210,7 +198,7 @@ public class DepthsUtils {
 	}
 
 	public static boolean isIce(Material material) {
-		return material == ICE_MATERIAL || material == Permafrost.PERMAFROST_ICE_MATERIAL;
+		return material == ICE_MATERIAL;
 	}
 
 	/**
@@ -434,6 +422,9 @@ public class DepthsUtils {
 		json.addProperty("treasure_score", depthsParty.mTreasureScore);
 		json.addProperty("content_type", dp.getContent().name());
 		json.addProperty("victory", victory);
+		json.addProperty("f1_timestamp", depthsParty.mFloor1Timestamp);
+		json.addProperty("f2_timestamp", depthsParty.mFloor2Timestamp);
+		json.addProperty("f3_timestamp", depthsParty.mFloor3Timestamp);
 		json.add("abilities", abilityObjectInJson);
 		json.add("removed_abilities", removedAbilitiesJsonArray);
 		json.add("initial_players", initialPlayersJsonArray);

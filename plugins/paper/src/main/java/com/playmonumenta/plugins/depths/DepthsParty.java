@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -132,6 +133,10 @@ public class DepthsParty {
 	public DepthsContent mContent;
 	public @Nullable Vector mDeathWaitingRoomPoint;
 	public int mAscension;
+	// timestamp of floor clear times for data collection
+	public long mFloor1Timestamp;
+	public long mFloor2Timestamp;
+	public long mFloor3Timestamp;
 	//The last tick where a room started to spawn
 	public transient int mLastLoadStartTick = 0;
 
@@ -200,6 +205,9 @@ public class DepthsParty {
 		mSpawnedReward = false;
 		mRoomStartX = loc.getBlockX();
 		mContent = DepthsUtils.getDepthsContent();
+		mFloor1Timestamp = -1;
+		mFloor2Timestamp = -1;
+		mFloor3Timestamp = -1;
 
 		//Attempt to set locations for the next floor lobby to load
 		Collection<ArmorStand> nearbyStands = loc.getNearbyEntitiesByType(ArmorStand.class, 100.0);
@@ -482,40 +490,51 @@ public class DepthsParty {
 
 		//Give extra rewards to all players if it's the starter room in depths 2
 
-		if (mRoomNumber == 1 && mContent == DepthsContent.CELESTIAL_ZENITH) {
-			try {
+		if (mRoomNumber == 1) {
+			if (mContent == DepthsContent.CELESTIAL_ZENITH) {
+				try {
+					DepthsRewardType rewardType = DepthsUtils.rewardFromRoom(room.mRoomType);
+					if (rewardType != null) {
+						for (DepthsPlayer dp : mPlayersInParty) {
+							dp.mActiveSelectionsRemaining = 3;
+							if (getAscension() >= DepthsEndlessDifficulty.ASCENSION_CURSE_START) {
+								dp.mEarnedRewards.add(DepthsRewardType.CURSE);
+							}
+							dp.mEarnedRewards.add(DepthsRewardType.PRISMATIC);
+							dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
+							dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
+							dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
+							dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
+						}
+					}
+					// Add delve points for ascension
+					if (mAscension > 0) {
+						int totalPoints = 0;
+						for (int x : DepthsEndlessDifficulty.ASCENSION_DELVE_POINTS) {
+							if (x <= mAscension) {
+								totalPoints += DepthsEndlessDifficulty.ASCENSION_DELVE_POINTS_AMOUNT;
+							}
+						}
+						DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints / 2, mDelveModifiers, false);
+						if (mAscension >= DepthsEndlessDifficulty.ASCENSION_TWISTED) {
+							DepthsEndlessDifficulty.applyTwisted(this);
+							if (mAscension >= DepthsEndlessDifficulty.ASCENSION_CHRONOLOGY) {
+								DepthsEndlessDifficulty.applyChronology(this);
+							}
+						}
+
+					}
+				} catch (Exception e) {
+					MMLog.warning("Null depths party member");
+					e.printStackTrace();
+				}
+			} else if (mContent == DepthsContent.DARKEST_DEPTHS) {
 				DepthsRewardType rewardType = DepthsUtils.rewardFromRoom(room.mRoomType);
 				if (rewardType != null) {
 					for (DepthsPlayer dp : mPlayersInParty) {
-						if (getAscension() >= DepthsEndlessDifficulty.ASCENSION_CURSE_START) {
-							dp.mEarnedRewards.add(DepthsRewardType.CURSE);
-						}
-						dp.mEarnedRewards.add(DepthsRewardType.PRISMATIC);
-						dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
-						dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
 						dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
 					}
 				}
-				// Add delve points for ascension
-				if (mAscension > 0) {
-					int totalPoints = 0;
-					for (int x : DepthsEndlessDifficulty.ASCENSION_DELVE_POINTS) {
-						if (x <= mAscension) {
-							totalPoints += DepthsEndlessDifficulty.ASCENSION_DELVE_POINTS_AMOUNT;
-						}
-					}
-					DepthsEndlessDifficulty.applyDelvePointsToParty(this, totalPoints / 2, mDelveModifiers, false);
-					if (mAscension >= DepthsEndlessDifficulty.ASCENSION_TWISTED) {
-						DepthsEndlessDifficulty.applyTwisted(this);
-						if (mAscension >= DepthsEndlessDifficulty.ASCENSION_CHRONOLOGY) {
-							DepthsEndlessDifficulty.applyChronology(this);
-						}
-					}
-
-				}
-			} catch (Exception e) {
-				MMLog.warning("Null depths party member");
-				e.printStackTrace();
 			}
 		}
 
@@ -588,6 +607,13 @@ public class DepthsParty {
 	}
 
 	public void incrementFloor() {
+		if (mFloorNumber == 1) {
+			mFloor1Timestamp = Instant.now().getEpochSecond();
+		} else if (mFloorNumber == 2) {
+			mFloor2Timestamp = Instant.now().getEpochSecond();
+		} else if (mFloorNumber == 3) {
+			mFloor3Timestamp = Instant.now().getEpochSecond();
+		}
 		mFloorNumber++;
 	}
 

@@ -106,7 +106,16 @@ public class CharmFactory {
 		Map.entry("Frost Nova Radius", "Snowstorm Radius"),
 		Map.entry("Frost Nova Slowness Amplifier", "Snowstorm Slowness per Stack"),
 		Map.entry("Frost Nova Slow Duration", "Snowstorm Slowness Duration"),
-		Map.entry("Frost Nova Ice Duration", "Snowstorm Ice Duration")
+		Map.entry("Frost Nova Ice Duration", "Snowstorm Ice Duration"),
+
+		Map.entry("Permafrost Ice Bonus Duration", "Permafrost Debuff Duration"),
+		Map.entry("Permafrost Trail Duration", "Permafrost Slowness Amplifier"),
+		Map.entry("Permafrost Trail Ice Duration", "Permafrost Vulnerability Amplifier"),
+		Map.entry("Whirlwind Radius", "Whirlwind Cooldown"),
+		Map.entry("Whirlwind Knockback", "Whirlwind Cooldown Reduction"),
+		Map.entry("Precision Strike Damage", "Rapid Fire Damage"),
+		Map.entry("Precision Strike Range Requirement", "Split Arrow Range"),
+		Map.entry("Precision Strike Max Stacks", "Sharpshooter Max Stacks")
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {

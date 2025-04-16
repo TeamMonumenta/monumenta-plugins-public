@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.prismatic.Convergence;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -228,7 +229,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		}
 
 		// Make sure player doesn't already have an ability with the same trigger
-		if (mDepthsTrigger != DepthsTrigger.PASSIVE) {
+		if (mDepthsTrigger != DepthsTrigger.PASSIVE && (mDepthsTrigger != DepthsTrigger.WILDCARD || !Convergence.canGainWildcards(player))) {
 			for (DepthsAbilityInfo<?> ability : DepthsManager.getAbilities()) {
 				// Iterate over abilities and return false if the player has an ability with the same trigger already
 				if (ability.getDepthsTrigger() == mDepthsTrigger && dp.hasAbility(ability.getDisplayName())) {
@@ -238,7 +239,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		}
 
 		//Skip passive abilities if they have wand aspect charges
-		if (dp.mWandAspectCharges > 0 && mDepthsTrigger == DepthsTrigger.PASSIVE && mDepthsTree != DepthsTree.PRISMATIC && mDepthsTree != DepthsTree.CURSE) {
+		if (dp.mActiveSelectionsRemaining > 0 && mDepthsTrigger == DepthsTrigger.PASSIVE && mDepthsTree != DepthsTree.PRISMATIC && mDepthsTree != DepthsTree.CURSE) {
 			return false;
 		}
 

@@ -17,7 +17,7 @@ public enum DepthsTrigger {
 	RIGHT_CLICK("Right Click", new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS_EXCEPT_SHIELD)),
 	SHIFT_LEFT_CLICK("Sneak Left Click", new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_SHOVEL)),
 	SHIFT_RIGHT_CLICK("Sneak Right Click", new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS_EXCEPT_SHIELD)),
-	SPAWNER("Spawner Break"),
+	WILDCARD("Wildcard"),
 	SHIFT_BOW("Sneak Bow"),
 	SWAP("Swap", new AbilityTrigger(AbilityTrigger.Key.SWAP)),
 	LIFELINE("Lifeline"),

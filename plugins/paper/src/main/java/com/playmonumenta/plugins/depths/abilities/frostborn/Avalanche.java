@@ -31,7 +31,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -119,14 +118,8 @@ public class Avalanche extends DepthsAbility {
 				mPulses++;
 				if (mPulses >= NUM_PULSES) {
 					for (Location l : mIceToBreak) {
-						Block b = l.getBlock();
-						if (b.getType() == Permafrost.PERMAFROST_ICE_MATERIAL) {
-							//If special permafrost ice, set to normal ice instead of destroying
-							b.setType(DepthsUtils.ICE_MATERIAL);
-						} else {
-							b.setBlockData(DepthsUtils.iceActive.get(l));
-							DepthsUtils.iceActive.remove(l);
-						}
+						l.getBlock().setBlockData(DepthsUtils.iceActive.get(l));
+						DepthsUtils.iceActive.remove(l);
 
 						Location aboveLoc = l.clone().add(0.5, 1, 0.5);
 						new PartialParticle(Particle.REDSTONE, aboveLoc.clone().add(0, 0.6, 0), 7, 0.3, 0.5, 0.3, ICE_PARTICLE_COLOR).spawnAsPlayerActive(mPlayer);

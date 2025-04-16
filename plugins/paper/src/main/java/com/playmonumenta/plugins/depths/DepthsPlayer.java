@@ -69,8 +69,8 @@ public class DepthsPlayer {
 	public boolean mUsedAbilityMutation;
 	//Whether or not they have used generosity on this floor
 	public boolean mUsedGenerosity;
-	//Remaining active ability only wand aspect uses
-	public int mWandAspectCharges = 0;
+	//Remaining active ability only uses
+	public int mActiveSelectionsRemaining = 0;
 
 	//Individual treasure score. Copied from the party's treasure score when they die.
 	public int mFinalTreasureScore;
@@ -84,6 +84,8 @@ public class DepthsPlayer {
 	public int mDeathRoom;
 	// Number of times this player has died as relevant for graves (gets reduced with bosses beaten, so is not an accurate total count)
 	public int mNumDeaths;
+	// Number of times this player disconnected near mobs
+	public int mDisconnects;
 	// Remaining number of unused rerolls
 	public int mRerolls;
 	// Rerolls previously gained from Opportunity

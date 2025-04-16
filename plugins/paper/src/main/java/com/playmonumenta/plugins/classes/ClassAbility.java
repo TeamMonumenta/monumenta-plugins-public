@@ -244,6 +244,7 @@ public enum ClassAbility {
 	AVALANCHE("Avalanche"),
 	PIERCING_COLD("Piercing Cold"),
 	CRYOBOX("Cryobox"),
+	PERMAFROST("Permafrost"),
 
 	// EARTHBORN
 	BRAMBLE_SHELL("Bramble Shell"),
@@ -253,6 +254,7 @@ public enum ClassAbility {
 	EARTHQUAKE("Earthquake"),
 	IRON_GRIP("Iron Grip"),
 	TAUNT("Taunt"),
+	ENTRENCH("Entrench"),
 
 	//PRISMATIC
 	CHROMA_BLADE("Chroma Blade"),

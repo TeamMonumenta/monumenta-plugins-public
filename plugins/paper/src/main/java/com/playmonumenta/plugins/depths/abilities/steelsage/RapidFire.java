@@ -50,7 +50,7 @@ public class RapidFire extends DepthsAbility {
 	public static final String CHARM_COOLDOWN = "Rapid Fire Cooldown";
 
 	public static final DepthsAbilityInfo<RapidFire> INFO =
-		new DepthsAbilityInfo<>(RapidFire.class, ABILITY_NAME, RapidFire::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(RapidFire.class, ABILITY_NAME, RapidFire::new, DepthsTree.STEELSAGE, DepthsTrigger.WILDCARD)
 			.linkedSpell(ClassAbility.RAPIDFIRE)
 			.cooldown(CHARM_COOLDOWN, COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RapidFire::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).fallThrough(),

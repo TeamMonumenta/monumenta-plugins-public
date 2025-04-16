@@ -17,6 +17,7 @@ import java.util.Set;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,40 +31,48 @@ public class PhantomForceBoss extends BossAbilityGroup {
 	private @Nullable Player mPlayer = null;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 	private double mDamage;
-	private double mWeakenAmount;
-	private int mWeakenDuration;
+	private double mRadius;
+	private double mVulnerabilityAmount;
+	private int mVulnerabilityDuration;
 
 	public PhantomForceBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		boss.setInvulnerable(true);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
-	public void spawn(Player player, double damage, double weakenAmount, int weakenDuration, ItemStatManager.PlayerItemStats playerItemStats) {
+	public void spawn(Player player, double damage, double radius, double vulnerabilityAmount, int vulnerabilityDuration, ItemStatManager.PlayerItemStats playerItemStats) {
 		mPlayer = player;
 		mDamage = damage;
-		mWeakenAmount = weakenAmount;
-		mWeakenDuration = weakenDuration;
+		mRadius = radius;
+		mVulnerabilityAmount = vulnerabilityAmount;
+		mVulnerabilityDuration = vulnerabilityDuration;
 		mPlayerItemStats = playerItemStats;
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		event.setCancelled(true);
-		attack(damagee);
+	public void onHurtByEntity(DamageEvent event, Entity damager) {
+		if (damager instanceof Player && event.getType() == DamageType.MELEE) {
+			explode();
+		} else {
+			event.setCancelled(true);
+		}
 	}
 
-	public void attack(LivingEntity damagee) {
-		if (mPlayer == null) {
-			return;
+	// can trigger in DepthsListener
+	public void explode() {
+		World world = mBoss.getWorld();
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 1f, 0.7f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, 1f, 1.75f);
+		world.playSound(mBoss.getLocation(), Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.7f, 1.6f);
+
+		if (mPlayer != null) {
+			new PartialParticle(Particle.SQUID_INK, LocationUtils.getEntityCenter(mBoss), 10).delta(0.5).spawnAsPlayerActive(mPlayer);
 		}
 
-		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_PHANTOM_BITE, SoundCategory.PLAYERS, 0.7f, 0.8f);
-		new PartialParticle(Particle.SQUID_INK, LocationUtils.getEntityCenter(damagee), 10).delta(0.5).spawnAsPlayerActive(mPlayer);
-
-		DamageUtils.damage(mPlayer, damagee, new DamageEvent.Metadata(DamageType.MELEE_SKILL, ClassAbility.PHANTOM_FORCE, mPlayerItemStats), mDamage, true, true, false);
-		EntityUtils.applyWeaken(Plugin.getInstance(), mWeakenDuration, mWeakenAmount, damagee);
-
+		EntityUtils.getNearbyMobs(mBoss.getLocation(), mRadius, mBoss).forEach(mob -> {
+			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MELEE_SKILL, ClassAbility.PHANTOM_FORCE, mPlayerItemStats), mDamage, true, true, false);
+			EntityUtils.applyVulnerability(Plugin.getInstance(), mVulnerabilityDuration, mVulnerabilityAmount, mob);
+		});
 		mBoss.remove();
 	}
 

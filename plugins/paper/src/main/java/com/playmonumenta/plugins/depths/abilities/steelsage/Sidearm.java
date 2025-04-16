@@ -43,7 +43,7 @@ public class Sidearm extends DepthsAbility implements AbilityWithChargesOrStacks
 	public static final int MAX_CHARGES = 3;
 	private static final int COOLDOWN = 14 * 20;
 	private static final int KILL_COOLDOWN_REDUCTION = 3 * 20;
-	private static final int[] DAMAGE = {12, 15, 18, 21, 24, 30};
+	private static final int[] DAMAGE = {15, 18, 21, 24, 27, 33};
 	private static final int RANGE = 14;
 
 	private static final Particle.DustOptions SIDEARM_COLOR = new Particle.DustOptions(Color.fromRGB(130, 130, 130), 1.0f);

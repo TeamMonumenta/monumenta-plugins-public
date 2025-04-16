@@ -132,7 +132,6 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsVolley;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FireworkBlast;
 import com.playmonumenta.plugins.depths.abilities.steelsage.FocusedCombos;
 import com.playmonumenta.plugins.depths.abilities.steelsage.GravityBomb;
-import com.playmonumenta.plugins.depths.abilities.steelsage.PrecisionStrike;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Scrapshot;
 import com.playmonumenta.plugins.depths.abilities.steelsage.Sidearm;
@@ -520,6 +519,11 @@ public class DepthsManager {
 			return;
 		}
 
+		// convergence adjust wildcard count
+		if (Convergence.ABILITY_NAME.equals(name)) {
+			Convergence.onLevelChange(p, level);
+		}
+
 		int previousLevel = dp.getLevelInAbility(name);
 		int displayLevel = level == 0 ? previousLevel : level;
 		if (level > 0) {
@@ -532,8 +536,8 @@ public class DepthsManager {
 
 		//Adjust wand aspect active logic
 		DepthsTree tree = info.getDepthsTree();
-		if (dp.mWandAspectCharges > 0 && previousLevel == 0 && Arrays.asList(DepthsTree.OWNABLE_TREES).contains(tree) && info.getDepthsTrigger().isActive()) {
-			dp.mWandAspectCharges--;
+		if (dp.mActiveSelectionsRemaining > 0 && previousLevel == 0 && Arrays.asList(DepthsTree.OWNABLE_TREES).contains(tree) && info.getDepthsTrigger().isActive()) {
+			dp.mActiveSelectionsRemaining--;
 		}
 
 		if (announceToTeam || announceToSelf) {
@@ -611,7 +615,6 @@ public class DepthsManager {
 			FireworkBlast.INFO,
 			FocusedCombos.INFO,
 			GravityBomb.INFO,
-			PrecisionStrike.INFO,
 			RapidFire.INFO,
 			Scrapshot.INFO,
 			Sidearm.INFO,
@@ -1019,8 +1022,8 @@ public class DepthsManager {
 		}
 
 		// Prevent getting no ability options due to wand aspect
-		if (offeredItems.isEmpty() && dp.mWandAspectCharges > 0) {
-			dp.mWandAspectCharges = 0;
+		if (offeredItems.isEmpty() && dp.mActiveSelectionsRemaining > 0) {
+			dp.mActiveSelectionsRemaining = 0;
 			// Recalculate options. Will never call itself more than once
 			return getAbilityUnlocks(p);
 		}

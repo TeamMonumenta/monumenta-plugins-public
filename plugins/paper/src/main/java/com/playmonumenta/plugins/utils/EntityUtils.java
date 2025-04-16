@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.RecoilDisable;
+import com.playmonumenta.plugins.effects.SelfishVulnerability;
 import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -841,6 +842,10 @@ public class EntityUtils {
 
 	public static void applyVulnerability(Plugin plugin, int ticks, double amount, LivingEntity mob) {
 		plugin.mEffectManager.addEffect(mob, VULNERABILITY_EFFECT_NAME, new PercentDamageReceived(ticks, amount));
+	}
+
+	public static void applySelfishVulnerability(Plugin plugin, int ticks, double amount, LivingEntity mob, Player target) {
+		plugin.mEffectManager.addEffect(mob, VULNERABILITY_EFFECT_NAME, new SelfishVulnerability(ticks, amount, target));
 	}
 
 	public static boolean isVulnerable(Plugin plugin, LivingEntity mob) {

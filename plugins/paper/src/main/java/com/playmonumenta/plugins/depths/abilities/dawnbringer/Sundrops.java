@@ -40,7 +40,7 @@ public class Sundrops extends DepthsAbility {
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "SundropsPercentDamageReceivedEffect";
 
 	public static final DepthsAbilityInfo<Sundrops> INFO =
-		new DepthsAbilityInfo<>(Sundrops.class, ABILITY_NAME, Sundrops::new, DepthsTree.DAWNBRINGER, DepthsTrigger.SPAWNER)
+		new DepthsAbilityInfo<>(Sundrops.class, ABILITY_NAME, Sundrops::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
 			.displayItem(Material.HONEYCOMB_BLOCK)
 			.descriptions(Sundrops::getDescription)
 			.singleCharm(false);

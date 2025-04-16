@@ -62,7 +62,7 @@ public class LightningBottle extends DepthsAbility implements AbilityWithCharges
 	private static final int IFRAME_BETWEEN_POT = 10;
 
 	public static final DepthsAbilityInfo<LightningBottle> INFO =
-		new DepthsAbilityInfo<>(LightningBottle.class, ABILITY_NAME, LightningBottle::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
+		new DepthsAbilityInfo<>(LightningBottle.class, ABILITY_NAME, LightningBottle::new, DepthsTree.DAWNBRINGER, DepthsTrigger.WILDCARD)
 			.linkedSpell(ClassAbility.LIGHTNING_BOTTLE)
 			.displayItem(Material.BREWING_STAND)
 			.descriptions(LightningBottle::getDescription);
