@@ -44,12 +44,14 @@ public class EliteFinishers {
 			.put(ImplosionFinisher.NAME, new ImplosionFinisher())
 			.put(LightningFinisher.NAME, new LightningFinisher())
 			.put(LocustSwarmFinisher.NAME, new LocustSwarmFinisher())
+			.put(MaledictioRanae.NAME, new MaledictioRanae())
 			.put(MegalovaniaFinisher.NAME, new MegalovaniaFinisher())
 			.put(MoneyRainFinisher.NAME, new MoneyRainFinisher())
 			.put(PaintSplashFinisher.NAME, new PaintSplashFinisher())
 			.put(PoultryficationFinisher.NAME, new PoultryficationFinisher())
 			.put(Promenade.NAME, new Promenade())
 			.put(ShootingStarFinisher.NAME, new ShootingStarFinisher())
+			.put(SinkholeFinisher.NAME, new SinkholeFinisher())
 			.put(SplishSplashFinisher.NAME, new SplishSplashFinisher())
 			.put(SupernovaFinisher.NAME, new SupernovaFinisher())
 			.put(SwordRainFinisher.NAME, new SwordRainFinisher())
@@ -80,42 +82,47 @@ public class EliteFinishers {
 
 	public static LivingEntity createClonedMob(LivingEntity killedMob, Player p, NamedTextColor color) {
 		LivingEntity mClonedKilledMob = EntityUtils.copyMob(killedMob);
-		mClonedKilledMob.setHealth(1);
-		mClonedKilledMob.setInvulnerable(true);
-		ScoreboardUtils.addEntityToTeam(mClonedKilledMob, "finisher", NamedTextColor.WHITE).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 		mClonedKilledMob.setGravity(false);
 		mClonedKilledMob.setAI(false);
 		mClonedKilledMob.setSilent(true);
-		mClonedKilledMob.addScoreboardTag("SkillImmune");
+
+		return modifyFinisherMob(mClonedKilledMob, p, color);
+	}
+
+	public static LivingEntity modifyFinisherMob(LivingEntity killedMob, Player p, NamedTextColor color) {
+		killedMob.setHealth(1);
+		killedMob.setInvulnerable(true);
+		ScoreboardUtils.addEntityToTeam(killedMob, "finisher", NamedTextColor.WHITE).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+		killedMob.addScoreboardTag("SkillImmune");
 		boolean hasGlowTag = p.getScoreboardTags().contains(FINISHER_GLOW_TAG);
 		boolean hasShowTag = p.getScoreboardTags().contains(FINISHER_SHOW_TAG);
-		List<Player> otherPlayers = PlayerUtils.playersInRange(mClonedKilledMob.getLocation(), 8 * 16, true, true);
+		List<Player> otherPlayers = PlayerUtils.playersInRange(killedMob.getLocation(), 8 * 16, true, true);
 		otherPlayers.remove(p);
 		otherPlayers.forEach(player -> {
 			if (player.getScoreboardTags().contains(FINISHER_HIDE_OTHER_TAG)) {
-				player.hideEntity(Plugin.getInstance(), mClonedKilledMob);
+				player.hideEntity(Plugin.getInstance(), killedMob);
 			}
 		});
 		if (hasGlowTag && hasShowTag) {
 			// Both tags present: hide everything
-			mClonedKilledMob.setVisibleByDefault(false);
+			killedMob.setVisibleByDefault(false);
 		} else if (hasGlowTag) {
 			// Only Glow Tag present: show glowing and hide mob
-			GlowingManager.startGlowing(mClonedKilledMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);
-			mClonedKilledMob.setInvisible(true);
-			EntityEquipment equipment = mClonedKilledMob.getEquipment();
+			GlowingManager.startGlowing(killedMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);
+			killedMob.setInvisible(true);
+			EntityEquipment equipment = killedMob.getEquipment();
 			if (equipment != null) {
 				equipment.clear();
 			}
 		} else if (hasShowTag) {
 			// Only Show Tag present: remove glowing, show mob
-			GlowingManager.clearAll(mClonedKilledMob);
+			GlowingManager.clearAll(killedMob);
 		} else {
 			// Neither tag present: show everything by default (glowing)
-			GlowingManager.startGlowing(mClonedKilledMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);
+			GlowingManager.startGlowing(killedMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);
 		}
 
-		return mClonedKilledMob;
+		return killedMob;
 	}
 
 	public static boolean canAccess(Player player) {
