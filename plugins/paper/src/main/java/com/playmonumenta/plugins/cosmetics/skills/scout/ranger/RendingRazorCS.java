@@ -29,13 +29,16 @@ public class RendingRazorCS implements CosmeticSkill {
 		world.playSound(playerLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 0.7f);
 		world.playSound(playerLoc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1, 0.7f);
 		world.playSound(playerLoc, Sound.ENTITY_BREEZE_SHOOT, SoundCategory.PLAYERS, 1, 2);
-		world.playSound(playerLoc, Sound.ENTITY_BREEZE_JUMP, SoundCategory.PLAYERS, 1, 1.4f);
+		world.playSound(playerLoc, "minecraft:entity.breeze.charge", SoundCategory.PLAYERS, 1, 1.4f);
 	}
 
 	public void razorProjectileEffects(final Player player, final Location location) {
 		new PartialParticle(Particle.SWEEP_ATTACK, location).minimumCount(1).count(2).delta(0.1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, location).count(10).delta(0.2).extra(0.1).spawnAsPlayerActive(player);
-		location.getWorld().playSound(location, Sound.ENTITY_BREEZE_JUMP, SoundCategory.PLAYERS, 1, 1);
+	}
+
+	public void razorTravelSound(final Player player, final Location location) {
+		location.getWorld().playSound(location, "minecraft:entity.breeze.charge", SoundCategory.PLAYERS, 1, 1);
 	}
 
 	public void razorHit(final Player player, final Location location) {
@@ -68,7 +71,7 @@ public class RendingRazorCS implements CosmeticSkill {
 	public void razorReturned(final Location playerLoc) {
 		final World world = playerLoc.getWorld();
 		world.playSound(playerLoc, Sound.ENTITY_EVOKER_CAST_SPELL, 0.4f, 1.6f);
-		world.playSound(playerLoc, Sound.ENTITY_BREEZE_JUMP, 1, 1.5f);
+		world.playSound(playerLoc, "minecraft:entity.breeze.charge", 1, 1.5f);
 		world.playSound(playerLoc, Sound.ENTITY_WITCH_THROW, 1, 0.7f);
 	}
 }

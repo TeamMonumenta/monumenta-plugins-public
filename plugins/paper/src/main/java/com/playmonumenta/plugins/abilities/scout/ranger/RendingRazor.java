@@ -129,6 +129,9 @@ public class RendingRazor extends Ability {
 				mRazorLoc = mPlayer.getEyeLocation().add(inc);
 
 				mCosmetic.razorProjectileEffects(mPlayer, mRazorLoc);
+				if (mTicks % 3 == 0) {
+					mCosmetic.razorTravelSound(mPlayer, mRazorLoc);
+				}
 				final List<LivingEntity> hitEnemies = new Hitbox.SphereHitbox(mRazorLoc, mRadius).getHitMobs();
 				if (!hitEnemies.isEmpty()) {
 					final LivingEntity target = hitEnemies.get(0);
@@ -185,6 +188,8 @@ public class RendingRazor extends Ability {
 		MovementUtils.pullTowardsNormalized(mPlayer.getLocation(), target, PULL_FORCE);
 
 		cancelOnDeath(new BukkitRunnable() {
+
+			int mTicks = 0;
 			final Location mLoc = target.getLocation().add(0, target.getEyeHeight() / 2, 0);
 			boolean mReturnedToPlayer = false;
 			Location mOldPlayerLoc = mPlayer.getLocation();
@@ -231,6 +236,9 @@ public class RendingRazor extends Ability {
 
 				// This should stay out of the for loop to prevent particle/sfx spam
 				mCosmetic.razorRetrieve(mPlayer, mLoc);
+				if (mTicks % 3 == 0) {
+					mCosmetic.razorTravelSound(mPlayer, mLoc);
+				}
 				if (!mHitMobTick.isEmpty()) {
 					mCosmetic.razorPierce(mHitMobTick.get(0).getLocation());
 				}
@@ -238,6 +246,7 @@ public class RendingRazor extends Ability {
 				if (mReturnedToPlayer) {
 					mCosmetic.razorReturned(mPlayer.getLocation());
 				}
+				mTicks++;
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
 	}
