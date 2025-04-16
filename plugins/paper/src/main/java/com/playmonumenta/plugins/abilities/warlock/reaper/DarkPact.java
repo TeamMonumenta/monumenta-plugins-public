@@ -125,6 +125,8 @@ public class DarkPact extends Ability {
 				.damageTypes(EnumSet.of(DamageType.MELEE)).deleteOnAbilityUpdate(true));
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(mDuration, PERCENT_HEAL)
 			.deleteOnAbilityUpdate(true));
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(mDuration, EXTENDED_ANTIHEAL)
+			.deleteOnAbilityUpdate(true));
 		mPlugin.mEffectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(mDuration,
 			(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.tick(mPlayer, fourHertz, twoHertz, oneHertz),
 			(entity) -> mCosmetic.loseEffect(mPlayer)).deleteOnAbilityUpdate(true));
@@ -139,28 +141,20 @@ public class DarkPact extends Ability {
 			return;
 		}
 
-		NavigableSet<Effect> aestheticsEffects = mPlugin.mEffectManager.getEffects(mPlayer, AESTHETICS_EFFECT_NAME);
-		if (aestheticsEffects != null) {
-			AbsorptionUtils.addAbsorption(mPlayer, mAbsorption, mMaxAbsorption, aestheticsEffects.last().getDuration());
-			for (Effect effect : aestheticsEffects) {
-				effect.setDuration(effect.getDuration() + mDurationIncreaseOnKill);
-			}
+		Effect aestheticsEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, AESTHETICS_EFFECT_NAME);
+		if (aestheticsEffect != null) {
+			AbsorptionUtils.addAbsorption(mPlayer, mAbsorption, mMaxAbsorption, aestheticsEffect.getDuration());
+			aestheticsEffect.setDuration(aestheticsEffect.getDuration() + mDurationIncreaseOnKill);
 			mCosmetic.onKill(mPlayer, event.getEntity());
 		}
-		NavigableSet<Effect> percentDamageEffects = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME);
-		if (percentDamageEffects != null) {
-			for (Effect effect : percentDamageEffects) {
-				effect.setDuration(effect.getDuration() + mDurationIncreaseOnKill);
-			}
+		Effect percentDamageEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME);
+		if (percentDamageEffect != null) {
+			percentDamageEffect.setDuration(percentDamageEffect.getDuration() + mDurationIncreaseOnKill);
 		}
 		NavigableSet<Effect> antiHealEffects = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_HEAL_EFFECT_NAME);
 		if (antiHealEffects != null) {
-			int totalDuration = 0;
-			for (Effect effect : antiHealEffects) {
-				totalDuration = Math.max(effect.getDuration() + mDurationIncreaseOnKill, totalDuration);
-			}
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME,
-				new PercentHeal(totalDuration, EXTENDED_ANTIHEAL).deleteOnAbilityUpdate(true));
+			Effect extendedAntiheal = antiHealEffects.first();
+			extendedAntiheal.setDuration(extendedAntiheal.getDuration() + mDurationIncreaseOnKill);
 		}
 	}
 
