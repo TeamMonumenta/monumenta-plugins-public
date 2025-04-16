@@ -83,6 +83,7 @@ import com.playmonumenta.plugins.hunts.bosses.SteelWingHawk;
 import com.playmonumenta.plugins.hunts.bosses.TheImpenetrable;
 import com.playmonumenta.plugins.hunts.bosses.Uamiel;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -1190,6 +1191,11 @@ public class BossManager implements Listener {
 	}
 
 	private void processEntity(LivingEntity entity) {
+		if (ServerProperties.isBossProcessingDisabled()) {
+			// Crash recovery property
+			return;
+		}
+
 		if (mBosses.containsKey(entity.getUniqueId())) {
 			// already loaded
 			return;

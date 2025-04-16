@@ -50,6 +50,7 @@ public class ServerProperties {
 	private boolean mKeepLowTierInventory = false;
 	private boolean mClassSpecializationsEnabled = false;
 	private boolean mAbilityEnhancementsEnabled = false;
+	private boolean mDisableBossProcessing = false;
 	private boolean mAuditMessagesEnabled = true;
 	private boolean mRepairExplosions = false;
 	private @Nullable Pattern mRepairExplosionsWorldPattern = null;
@@ -153,6 +154,10 @@ public class ServerProperties {
 			return INSTANCE.mAbilityEnhancementsEnabled;
 		}
 		return effectiveRegion == 0 || effectiveRegion >= 3;
+	}
+
+	public static boolean isBossProcessingDisabled() {
+		return INSTANCE.mDisableBossProcessing;
 	}
 
 	public static String getGameplayDataExportPath() {
@@ -282,6 +287,7 @@ public class ServerProperties {
 			mKeepLowTierInventory = getPropertyValueBool(object, "keepLowTierInventory", mKeepLowTierInventory);
 			mClassSpecializationsEnabled = getPropertyValueBool(object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
 			mAbilityEnhancementsEnabled = getPropertyValueBool(object, "abilityEnhancementsEnabled", mAbilityEnhancementsEnabled);
+			mDisableBossProcessing = getPropertyValueBool(object, "disableBossProcessing", mDisableBossProcessing);
 			mAuditMessagesEnabled = getPropertyValueBool(object, "auditMessagesEnabled", mAuditMessagesEnabled);
 			mRepairExplosions = getPropertyValueBool(object, "repairExplosions", mRepairExplosions);
 			String repairExplosionsWorldPattern = getPropertyValueString(object, "repairExplosionsWorldPattern", null);
@@ -370,6 +376,7 @@ public class ServerProperties {
 		out.add("keepLowTierInventory = " + mKeepLowTierInventory);
 		out.add("classSpecializationsEnabled = " + mClassSpecializationsEnabled);
 		out.add("abilityEnhancementsEnabled = " + mAbilityEnhancementsEnabled);
+		out.add("disableBossProcessing = " + mDisableBossProcessing);
 		out.add("auditMessagesEnabled = " + mAuditMessagesEnabled);
 		out.add("repairExplosions = " + mRepairExplosions);
 		out.add("repairExplosionsWorldPattern = " + (mRepairExplosionsWorldPattern == null ? null : mRepairExplosionsWorldPattern.pattern()));
