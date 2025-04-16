@@ -189,7 +189,8 @@ public class WalletManager implements Listener {
 		new ItemUtils.ItemIdentifier(Material.AMETHYST_CLUSTER, "Crystal Cluster"), new WalletSettings(Region.ISLES, false),
 		new ItemUtils.ItemIdentifier(Material.AMETHYST_BLOCK, "Crystal Collector"), new WalletSettings(Region.ISLES, true),
 		new ItemUtils.ItemIdentifier(Material.PORKCHOP, "Piggy Bank"), new WalletSettings(Region.RING, false),
-		new ItemUtils.ItemIdentifier(Material.FLOWER_POT, "Bag of Hoarding"), MAX_SETTINGS
+		new ItemUtils.ItemIdentifier(Material.FLOWER_POT, "Bag of Hoarding"), MAX_SETTINGS,
+		new ItemUtils.ItemIdentifier(Material.RESPAWN_ANCHOR, "Sketched Bag of Hoarding"), MAX_SETTINGS
 	);
 
 	private static final Map<UUID, Wallet> mWallets = new HashMap<>();
@@ -265,7 +266,14 @@ public class WalletManager implements Listener {
 					if (checkNotSoulbound(player, walletItem)) {
 						return;
 					}
-					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+
+					if (walletItem.getType() == Material.RESPAWN_ANCHOR) {
+						// Unique opening sound for Sketched Bag of Hoarding
+						player.playSound(player.getLocation(), Sound.ITEM_BOTTLE_FILL, SoundCategory.PLAYERS, 1.0f, 0.8f);
+					} else {
+						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+					}
+
 					new WalletGui(
 						player,
 						wallet,
