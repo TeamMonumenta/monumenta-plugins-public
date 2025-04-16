@@ -36,6 +36,7 @@ public class SpellBlockBreak extends Spell {
 	private final int mXRad;
 	private final int mYRad;
 	private final int mZRad;
+	private final int mYOffset;
 	private final int mArenaFloorY;
 	private final boolean mBreakBossArena;
 	private final boolean mFlattenArena;
@@ -60,13 +61,19 @@ public class SpellBlockBreak extends Spell {
 
 	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int arenaFloorY,
 						   final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean breakFootLevel) {
-		this(launcher, xRad, yRad, zRad, arenaFloorY, adaptToBoundingBox, breakBossArena, false,
+		this(launcher, xRad, yRad, zRad, 0, arenaFloorY, adaptToBoundingBox, breakBossArena, breakFootLevel);
+	}
+
+	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int yOffset, final int arenaFloorY,
+						   final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean breakFootLevel) {
+		this(launcher, xRad, yRad, zRad, yOffset, arenaFloorY, adaptToBoundingBox, breakBossArena, false,
 			breakFootLevel, true, false, Material.AIR);
 	}
 
+
 	public SpellBlockBreak(final Entity launcher, final boolean adaptToBoundingBox, final boolean breakFootLevel,
 						   final boolean onlyForcecast) {
-		this(launcher, 1, 3, 1, launcher.getWorld().getMinHeight() - HEIGHT_BELOW_WORLD,
+		this(launcher, 1, 3, 1, 0, launcher.getWorld().getMinHeight() - HEIGHT_BELOW_WORLD,
 			adaptToBoundingBox, true, false, breakFootLevel, true,
 			onlyForcecast, Material.AIR);
 	}
@@ -77,6 +84,7 @@ public class SpellBlockBreak extends Spell {
 	 * @param xRad X radius to check for blocks
 	 * @param yRad Y radius to check for blocks
 	 * @param zRad Z radius to check for blocks
+	 * @param yOffset Vertical offset for block break volume
 	 * @param arenaFloorY For bosses with a dedicated arena. Only used if breakBossArena is set to false
 	 * @param adaptToBoundingBox Whether the launcher should check for blocks to break depending on the radii or its bounding box
 	 * @param breakBossArena If the launcher should be able to break the arena floor
@@ -86,7 +94,7 @@ public class SpellBlockBreak extends Spell {
 	 * @param onlyForcecast Whether to run this spell manually. Used during the launcher's pathfinding calculations. Defaults to false
 	 * @param noBreak List of block materials the launcher should not break
 	 */
-	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int arenaFloorY,
+	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int yOffset, final int arenaFloorY,
 						   final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean flattenArena,
 						   final boolean breakFootLevel, final boolean breakOverheadBlocks, final boolean onlyForcecast,
 						   final Material... noBreak) {
@@ -95,6 +103,7 @@ public class SpellBlockBreak extends Spell {
 		mXRad = xRad;
 		mYRad = yRad;
 		mZRad = zRad;
+		mYOffset = yOffset;
 		mArenaFloorY = arenaFloorY;
 		mBreakBossArena = breakBossArena;
 		mFlattenArena = flattenArena;
@@ -139,7 +148,7 @@ public class SpellBlockBreak extends Spell {
 		final int yRad = (int) (mAdaptToBoundingBox ? Math.ceil(mLauncher.getBoundingBox().getHeight()) : mYRad);
 		final int zRad = (int) (mAdaptToBoundingBox ? Math.round(mLauncher.getBoundingBox().getWidthZ()) : mZRad);
 		final double testLocX = loc.getX();
-		double testLocY = loc.getY() - 1.0;
+		double testLocY = loc.getY() - 1.0 + mYOffset;
 		final double testLocZ = loc.getZ();
 		final Location testLoc = new Location(loc.getWorld(), 0, 0, 0);
 		Block testBlock;

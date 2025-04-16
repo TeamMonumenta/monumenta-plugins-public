@@ -311,7 +311,7 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 			new SpellFrostbite(mPlugin, this),
 			new SpellHailstorm(mPlugin, mBoss, HAILSTORM_RADIUS, mStartLoc),
 			new GiantStomp(mPlugin, this),
-			new SpellBlockBreak(mBoss, 3, 15, 3, 75, false, true,
+			new SpellBlockBreak(mBoss, 3, 15, 3, 0, 75, false, true,
 				true, false, false, false, Material.AIR),
 			new SpellRemoveLevitation(mBoss),
 			conditionalTeleport

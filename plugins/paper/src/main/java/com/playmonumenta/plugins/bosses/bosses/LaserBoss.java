@@ -110,7 +110,7 @@ public class LaserBoss extends BossAbilityGroup {
 		}
 
 		/* I am NOT writing another constructor for these shenanigans - Spy */
-		SpellBlockBreak blockBreakAtLaserEnd = new SpellBlockBreak(boss, p.BLOCK_BREAK_RADIUS, p.BLOCK_BREAK_RADIUS, p.BLOCK_BREAK_RADIUS,
+		SpellBlockBreak blockBreakAtLaserEnd = new SpellBlockBreak(boss, p.BLOCK_BREAK_RADIUS, p.BLOCK_BREAK_RADIUS, p.BLOCK_BREAK_RADIUS, 0,
 			-65, false, true, false, true, true, true, Material.AIR);
 		Spell laser = new SpellBaseLaser(plugin, boss, p.DURATION, false, p.COOLDOWN,
 			() -> p.TARGETS.getTargetsList(mBoss),

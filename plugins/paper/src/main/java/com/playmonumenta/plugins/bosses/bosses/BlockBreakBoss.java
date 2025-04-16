@@ -21,13 +21,30 @@ public final class BlockBreakBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Whether or not blocks at the same level as where the mob is standing will be destroyed")
 		public boolean ALLOW_FOOTLEVEL_BREAK = false;
+
+		@BossParam(help = "")
+		public int X_RADIUS = 1;
+
+		@BossParam(help = "")
+		public int Y_RADIUS = 3;
+
+		@BossParam(help = "")
+		public int Z_RADIUS = 1;
+
+		@BossParam(help = "Vertical offset for block break volume")
+		public int Y_OFFSET = 0;
+
+		@BossParam(help = "How often the block break is casted")
+		public int COOLDOWN = PASSIVE_RUN_INTERVAL_DEFAULT;
 	}
 
 	public BlockBreakBoss(final Plugin plugin, final LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		final Parameters p = Parameters.getParameters(mBoss, identityTag, new Parameters());
-		final List<Spell> passiveSpells = List.of(new SpellBlockBreak(mBoss, p.ADAPT_TO_BOUNDING_BOX, p.ALLOW_FOOTLEVEL_BREAK));
+		final List<Spell> passiveSpells = List.of(
+			new SpellBlockBreak(mBoss, p.X_RADIUS, p.Y_RADIUS, p.Z_RADIUS, p.Y_OFFSET, mBoss.getWorld().getMinHeight() - 100, p.ADAPT_TO_BOUNDING_BOX, true, p.ALLOW_FOOTLEVEL_BREAK)
+		);
 
-		super.constructBoss(SpellManager.EMPTY, passiveSpells, p.DETECTION, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, p.DETECTION, null, 0, p.COOLDOWN);
 	}
 }

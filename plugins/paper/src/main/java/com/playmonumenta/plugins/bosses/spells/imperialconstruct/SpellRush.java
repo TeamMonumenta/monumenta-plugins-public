@@ -44,7 +44,7 @@ public class SpellRush extends Spell {
 		mStartLoc = startLoc;
 		mRange = range;
 
-		mBlockBreak = new SpellBlockBreak(mBoss, 5, 5, 5, -65, false, true, false, true, true, false, Material.AIR);
+		mBlockBreak = new SpellBlockBreak(mBoss, 5, 5, 5, 0, -65, false, true, false, true, true, false, Material.AIR);
 	}
 
 	@Override
