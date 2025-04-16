@@ -135,6 +135,7 @@ public class MusicGui extends Gui {
 				addMusicItem(1, 1, Material.MUSIC_DISC_WAIT, "For Queen and Country", Location.FROSTGIANT, "Frostgate", "BobbyJonesSr", "epic:music.frostgate", 243, checkAdvance("monumenta:quests/r2/frostgate"));
 				addMusicItem(1, 2, Material.MUSIC_DISC_MALL, "Frigid and Forlorn", Location.FROSTGIANT, "Nightroost", "BobbyJonesSr", "epic:music.nightroost", 215, checkAdvance("monumenta:quests/r2/nightroost"));
 				addMusicItem(1, 3, Material.MUSIC_DISC_WAIT, "Snowflake's Refuge", Location.FROSTGIANT, "Wispervale", "Casiel368", "epic:music.wispervale", 223, checkAdvance("monumenta:quests/r2/wispervale"));
+				addMusicItem(1, 4, Material.MUSIC_DISC_STRAD, "Frozen Aspiration", Location.FROSTGIANT, "Chillwind", "Salamanderlonk", "epic:music.chillwind", 143, checkAdvance("monumenta:quests/r2/frostgate"));
 
 				addMusicItem(1, 5, Material.MUSIC_DISC_13, "For Gold and Glory", Location.AMBER, "Alnera", "BobbyJonesSr", "epic:music.alnera", 265, checkAdvance("monumenta:quests/r2/alnera"));
 				addMusicItem(1, 6, Material.MUSIC_DISC_BLOCKS, "Arid and Adrift", Location.RUSH, "Rahkeri", "BobbyJonesSr", "epic:music.rahkeri", 222, checkAdvance("monumenta:quests/r2/rahkeri"));
