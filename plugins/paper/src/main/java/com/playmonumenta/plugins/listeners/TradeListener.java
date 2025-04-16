@@ -86,8 +86,26 @@ public class TradeListener implements Listener {
 
 		// For "re-skin" trades, add trades matching a player's existing items that preserve added infusions etc.
 
+		final ItemStack emerald = new ItemStack(Material.EMERALD);
+
 		Player player = event.getPlayer();
 		List<TradeWindowOpenEvent.Trade> trades = event.getTrades();
+
+		// Remove any trades with vanilla emeralds
+		trades.removeIf(trade -> {
+			MerchantRecipe recipe = trade.getRecipe();
+			if (emerald.isSimilar(recipe.getResult())) {
+				return true;
+			}
+
+			for (ItemStack ingredient : recipe.getIngredients()) {
+				if (emerald.isSimilar(ingredient)) {
+					return true;
+				}
+			}
+
+			return false;
+		});
 		int numTrades = trades.size();
 		for (int i = 0; i < numTrades; i++) {
 			TradeWindowOpenEvent.Trade trade = trades.get(i);
