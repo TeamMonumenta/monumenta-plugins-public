@@ -486,6 +486,8 @@ public class BalanceModeManager {
 		if (armorScore > 0 && agilityScore > 0) {
 			armorScore = (armorScore + agilityScore) * oData.get("mixed").getAsFloat();
 			agilityScore = 0f;
+		} else if (armorScore == 0 && agilityScore == 0) {
+			return 1f;
 		}
 
 		// very obfuscated calculation (what a mess!)
