@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.parameters.phases;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -23,7 +24,27 @@ public class CommandAction implements Action {
 
 	@Override
 	public void runAction(LivingEntity boss) {
-		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + boss.getUniqueId() + " at @s run " + mCommand);
+		// There are several times when even though the command is run in the context of a mob, that mob is no longer present in the world, causing "execute as <mob> to fail"
+		final String cmdStr;
+		if (boss.isDead()) {
+			// If a mob has died, can't execute a command as them. Instead, run this as the server but positioned where the mob was located
+			cmdStr = "execute in " + (boss.getWorld() == Bukkit.getWorlds().get(0) ? "minecraft:overworld" : boss.getWorld().getName()) +
+			         " positioned " + boss.getX() + " " + boss.getY() + " " + boss.getZ() +
+			         " run " + mCommand;
+			Plugin.getInstance().getLogger().finer("Running command for dead boss as server '" + boss.getName() + "': " + cmdStr);
+			NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmdStr);
+		} else if (boss.getWorld().getEntity(boss.getUniqueId()) == null) {
+			// If a mob isn't dead but hasn't been added to the world yet, run the command on the next tick, which should be after world addition is completed
+			cmdStr = "execute as " + boss.getUniqueId() + " at @s run " + mCommand;
+			Plugin.getInstance().getLogger().finer("Running command on next tick for mob '" + boss.getName() + "' being added to world: " + cmdStr);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmdStr);
+			}, 1);
+		} else {
+			cmdStr = "execute as " + boss.getUniqueId() + " at @s run " + mCommand;
+			Plugin.getInstance().getLogger().finer("Running command as boss '" + boss.getName() + "': " + cmdStr);
+			NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmdStr);
+		}
 	}
 
 	public static ParseResult<Action> fromReader(StringReader reader) {
