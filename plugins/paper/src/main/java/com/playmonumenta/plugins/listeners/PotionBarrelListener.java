@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -71,12 +72,19 @@ public class PotionBarrelListener implements Listener {
 			&& event.getWhoClicked() instanceof Player player)) {
 			return;
 		}
+
+		if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (event.getClick() == ClickType.UNKNOWN) {
 			// disable all unknown/modded clicks
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 			return;
 		}
+
 		ItemStack cursorItem = event.getCursor();
 		ItemStack clickedItem = event.getCurrentItem();
 		if (event.getClickedInventory() != barrelInventory) {
@@ -235,10 +243,17 @@ public class PotionBarrelListener implements Listener {
 			&& event.getWhoClicked() instanceof Player player)) {
 			return;
 		}
+
+		if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (event.getRawSlots().stream().allMatch(slot -> event.getView().getInventory(slot) == player.getInventory())) {
 			// Dragging around the player inventory only is allowed.
 			return;
 		}
+
 		if (event.getRawSlots().stream().allMatch(slot -> event.getView().getInventory(slot) == barrelInventory)) {
 			// If dragging only over the barrel inventory, just deposit all dragged potions.
 			// This can happen when a click turns into a tiny drag for example.
@@ -270,11 +285,22 @@ public class PotionBarrelListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		Block clickedBlock = event.getClickedBlock();
-		if (event.getAction() == Action.LEFT_CLICK_BLOCK
-			&& clickedBlock != null
-			&& isPotionBarrel(clickedBlock)) {
+		Player player = event.getPlayer();
+		if (!(
+			clickedBlock != null
+				&& clickedBlock.getType().equals(Material.BARREL)
+				&& isPotionBarrel(clickedBlock)
+		)) {
+			return;
+		}
+
+		if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
+			event.setCancelled(true);
+			return;
+		}
+
+		if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
 			Barrel barrel = (Barrel) clickedBlock.getState(false);
-			Player player = event.getPlayer();
 			PlayerInventory playerInventory = player.getInventory();
 			Inventory barrelInventory = barrel.getInventory();
 			if (ShulkerShortcutListener.isPurpleTesseract(playerInventory.getItemInMainHand())) {
@@ -531,9 +557,11 @@ public class PotionBarrelListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void inventoryMoveItemEvent(InventoryMoveItemEvent event) {
 		Inventory barrelInventory = event.getDestination();
-		if (!(barrelInventory.getType() == InventoryType.BARREL
-			&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
-			&& isPotionBarrel(blockInventoryHolder.getBlock()))) {
+		if (!(
+			barrelInventory.getType() == InventoryType.BARREL
+				&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
+				&& isPotionBarrel(blockInventoryHolder.getBlock())
+		)) {
 			return;
 		}
 
@@ -656,8 +684,13 @@ public class PotionBarrelListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
-		if (isPotionBarrel(event.getBlock())
-			&& !isValidShard()) {
+		if (
+			isPotionBarrel(event.getBlock())
+				&& (
+				!isValidShard()
+					|| GuildPlotUtils.guildPlotInventoryModificationBlocked(event.getPlayer())
+			)
+		) {
 			event.setCancelled(true);
 		}
 	}

@@ -11,21 +11,14 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.luckperms.api.model.data.NodeMap;
 import net.luckperms.api.model.group.Group;
-import net.luckperms.api.model.user.User;
-import net.luckperms.api.node.types.InheritanceNode;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 public class UpdateGuilds {
 	private static final List<GuildPermission> newPermissions = List.of(
-		GuildPermission.MANAGE_MEMBERSHIP,
-		GuildPermission.LOCKDOWN
 	);
 
 	public static void register(Plugin plugin) {
@@ -86,61 +79,19 @@ public class UpdateGuilds {
 						}
 					}
 
-					Group guestGroup = GuildAccessLevel.GUEST.loadGroupFromRoot(guildRootGroup).join().orElse(null);
-					if (guestGroup == null) {
-						sender.sendMessage(Component.text("- Could not find guest group for " + guildRootGroupId));
+					Group blockedGroup = GuildAccessLevel.BLOCKED.loadGroupFromRoot(guildRootGroup).join().orElse(null);
+					if (blockedGroup == null) {
+						sender.sendMessage(Component.text("- Could not find blocked group for " + guildRootGroupId));
+					} else {
+						for (GuildPermission guildPermission : newPermissions) {
+							guildPermission.setExplicitPermission(guildRootGroup, blockedGroup, false).join();
+						}
 					}
-
-					String guildBlockedGroupId = GuildAccessLevel.BLOCKED.groupNameFromRoot(guildRootGroupId);
-					String guildNoneGroupId = GuildAccessLevel.NONE.groupNameFromRoot(guildRootGroupId);
-
-					Group guildBlockedGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildBlockedGroupId).join();
-					NodeMap guildBlockedGroupData = guildBlockedGroup.data();
-					guildBlockedGroupData.add(InheritanceNode.builder(guildRootGroup).build());
-
-					Group guildNoneGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildNoneGroupId).join();
-					NodeMap guildNoneGroupData = guildNoneGroup.data();
-					guildNoneGroupData.add(InheritanceNode.builder(guildRootGroup).build());
-
-					for (GuildPermission guildPermission : GuildPermission.values()) {
-						guildPermission.setExplicitPermission(guildRootGroup, guildBlockedGroup, false).join();
-					}
-
-					LuckPermsIntegration.GM.saveGroup(guildBlockedGroup).join();
-					LuckPermsIntegration.GM.saveGroup(guildNoneGroup).join();
 
 					sender.sendMessage(Component.text("Updated " + guildRootGroupId, NamedTextColor.GREEN));
 				} catch (Exception ex) {
 					sender.sendMessage(Component.text("Failed to update " + guildRootGroupId + ":", NamedTextColor.RED));
 					MessagingUtils.sendStackTrace(sender, ex);
-				}
-			}
-
-			sender.sendMessage(Component.text("Done with guilds, updating players:", NamedTextColor.GREEN));
-			Set<UUID> allUsers = LuckPermsIntegration.UM.getUniqueUsers().join();
-			int userIndex = 0;
-			int numUsers = allUsers.size();
-			for (UUID userId : allUsers) {
-				userIndex++;
-				if (userIndex % 1000 == 0) {
-					sender.sendMessage(Component.text("Updating user " + userIndex + "/" + numUsers + "...", NamedTextColor.YELLOW));
-				}
-
-				User user = LuckPermsIntegration.UM.getUser(userId);
-				if (user == null) {
-					continue;
-				}
-
-				for (Group guild : guilds) {
-					GuildAccessLevel accessLevel = LuckPermsIntegration.getAccessLevel(guild, user);
-					if (!GuildAccessLevel.NONE.equals(accessLevel)) {
-						continue;
-					}
-
-					String guildTag = LuckPermsIntegration.getGuildPlainTag(guild);
-					if (guildTag != null) {
-						GuildPermission.clearExplicitPermissions(user, guildTag);
-					}
 				}
 			}
 
