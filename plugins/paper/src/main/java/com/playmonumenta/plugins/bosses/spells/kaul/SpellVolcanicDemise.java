@@ -276,7 +276,7 @@ public class SpellVolcanicDemise extends Spell {
 	@Override
 	public void run() {
 		for (Player player : getValidTargetPlayers()) {
-			player.sendMessage(Component.text("SCRAM! DO NOT ANNOY MY PIZZA TIME!", NamedTextColor.GREEN));
+			player.sendMessage(Component.text("SCATTER, INSECTS.", NamedTextColor.GREEN));
 		}
 
 		// For the advancement "Such Devastation"
