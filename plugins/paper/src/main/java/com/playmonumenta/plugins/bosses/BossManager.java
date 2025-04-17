@@ -854,8 +854,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	/* Kind of a weird one - not hooked to bosses but used for snowman killer */
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		if (player.hasMetadata(WinterSnowmanEventBoss.deathMetakey)) {
