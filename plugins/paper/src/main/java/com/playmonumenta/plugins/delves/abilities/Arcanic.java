@@ -46,19 +46,19 @@ public class Arcanic {
 		//ProjectileBoss - tracking
 		List<String> trackingProjectile = new ArrayList<>();
 		trackingProjectile.add(ProjectileBoss.identityTag);
-		trackingProjectile.add(ProjectileBoss.identityTag + "[damage=12,speed=0.2,delay=20,cooldown=320,turnradius=3.141],spellname=\"" + TRACKING_SPELL_NAME + "\"");
+		trackingProjectile.add(ProjectileBoss.identityTag + "[damage=12,speed=0.2,delay=20,cooldown=320,turnradius=3.141,spellname=\"" + TRACKING_SPELL_NAME + "\"]");
 		trackingProjectile.add(ProjectileBoss.identityTag + "[soundstart=[(BLOCK_BEACON_POWER_SELECT,1,0.5)],soundlaunch=[(ENTITY_EVOKER_CAST_SPELL,1,0.5)],soundprojectile=[(BLOCK_BEACON_POWER_SELECT,0.4,0.5)],soundhit=[(BLOCK_BEACON_DEACTIVATE,1,0.5)]]");
 		trackingProjectile.add(ProjectileBoss.identityTag + "[particlelaunch=[(SPELL_WITCH,40,0,0,0,0.3)],particleprojectile=[(SPELL_WITCH,6,0,0,0,0.3),(SMOKE_LARGE,2,0.2,0.2,0.2,0)],particlehit=[(SPELL_WITCH,50,0,0,0,0.3)]]");
 		ABILITY_POOL_R1.add(trackingProjectile);
 		trackingProjectile = new ArrayList<>();
 		trackingProjectile.add(ProjectileBoss.identityTag);
-		trackingProjectile.add(ProjectileBoss.identityTag + "[damage=30,speed=0.2,delay=20,cooldown=320,turnradius=3.141,spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		trackingProjectile.add(ProjectileBoss.identityTag + "[damage=25,speed=0.2,delay=20,cooldown=320,turnradius=3.141,spellname=\"" + TRACKING_SPELL_NAME + "\"]");
 		trackingProjectile.add(ProjectileBoss.identityTag + "[soundstart=[(BLOCK_BEACON_POWER_SELECT,1,0.5)],soundlaunch=[(ENTITY_EVOKER_CAST_SPELL,1,0.5)],soundprojectile=[(BLOCK_BEACON_POWER_SELECT,0.4,0.5)],soundhit=[(BLOCK_BEACON_DEACTIVATE,1,0.5)]]");
 		trackingProjectile.add(ProjectileBoss.identityTag + "[particlelaunch=[(SPELL_WITCH,40,0,0,0,0.3)],particleprojectile=[(SPELL_WITCH,6,0,0,0,0.3),(SMOKE_LARGE,2,0.2,0.2,0.2,0)],particlehit=[(SPELL_WITCH,50,0,0,0,0.3)]]");
 		ABILITY_POOL_R2.add(trackingProjectile);
 		trackingProjectile = new ArrayList<>();
 		trackingProjectile.add(ProjectileBoss.identityTag);
-		trackingProjectile.add(ProjectileBoss.identityTag + "[damage=40,speed=0.2,delay=20,cooldown=320,turnradius=3.141,spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		trackingProjectile.add(ProjectileBoss.identityTag + "[damage=35,speed=0.2,delay=20,cooldown=320,turnradius=3.141,spellname=\"" + TRACKING_SPELL_NAME + "\"]");
 		trackingProjectile.add(ProjectileBoss.identityTag + "[soundstart=[(BLOCK_BEACON_POWER_SELECT,1,0.5)],soundlaunch=[(ENTITY_EVOKER_CAST_SPELL,1,0.5)],soundprojectile=[(BLOCK_BEACON_POWER_SELECT,0.4,0.5)],soundhit=[(BLOCK_BEACON_DEACTIVATE,1,0.5)]]");
 		trackingProjectile.add(ProjectileBoss.identityTag + "[particlelaunch=[(SPELL_WITCH,40,0,0,0,0.3)],particleprojectile=[(SPELL_WITCH,6,0,0,0,0.3),(SMOKE_LARGE,2,0.2,0.2,0.2,0)],particlehit=[(SPELL_WITCH,50,0,0,0,0.3)]]");
 		ABILITY_POOL_R3.add(trackingProjectile);

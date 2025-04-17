@@ -85,7 +85,7 @@ public final class AvengerBoss extends BossAbilityGroup {
 
 	@Override
 	public void nearbyEntityDeath(final EntityDeathEvent event) {
-		if (event.isCancelled() || !mBoss.isValid() || mBoss.isDead()) {
+		if (event.isCancelled() || !mBoss.isValid() || mBoss.isDead() || mStacks >= mParam.MAX_STACKS) {
 			return;
 		}
 
@@ -111,21 +111,22 @@ public final class AvengerBoss extends BossAbilityGroup {
 				mParam.PARTICLE_VECTOR.spawn(mBoss, deadLoc.add(particleVector));
 
 				if (mCount >= mMaxCount) {
-					mParam.PARTICLE_BOSS.spawn(mBoss, bossLoc, 20, 1.5, 1.5, 1.5);
-					// Increment stacks, and if cap not hit, increase stats
+					// Increment stacks, and if cap not hit, increase stats and heal
 					if (mStacks < mParam.MAX_STACKS) {
 						mStacks++;
+
+						mParam.PARTICLE_BOSS.spawn(mBoss, bossLoc, 20, 1.5, 1.5, 1.5);
 
 						final AttributeInstance speed = mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
 						if (speed != null) {
 							speed.addModifier(new AttributeModifier(SPEED_MODIFIER, mParam.SPEED_PERCENT_INCREMENT,
 								AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 						}
-					}
 
-					if (mParam.HEAL_PERCENT > 0) {
-						EntityUtils.healMob(mBoss, EntityUtils.getMaxHealth(mBoss) * mParam.HEAL_PERCENT);
-						mParam.PARTICLE_HEAL.spawn(mBoss, bossLoc.clone().add(0, 0.5, 0), 1, 1, 1);
+						if (mParam.HEAL_PERCENT > 0) {
+							EntityUtils.healMob(mBoss, EntityUtils.getMaxHealth(mBoss) * mParam.HEAL_PERCENT);
+							mParam.PARTICLE_HEAL.spawn(mBoss, bossLoc.clone().add(0, 0.5, 0), 1, 1, 1);
+						}
 					}
 					this.cancel();
 				}
