@@ -34,12 +34,12 @@ public class CommandAction implements Action {
 			Plugin.getInstance().getLogger().finer("Running command for dead boss as server '" + boss.getName() + "': " + cmdStr);
 			NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmdStr);
 		} else if (boss.getWorld().getEntity(boss.getUniqueId()) == null) {
-			// If a mob isn't dead but hasn't been added to the world yet, run the command on the next tick, which should be after world addition is completed
+			// If a mob isn't dead but hasn't been added to the world yet, run the command as soon as possible, which should be after world addition is completed
 			cmdStr = "execute as " + boss.getUniqueId() + " at @s run " + mCommand;
 			Plugin.getInstance().getLogger().finer("Running command on next tick for mob '" + boss.getName() + "' being added to world: " + cmdStr);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 				NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmdStr);
-			}, 1);
+			});
 		} else {
 			cmdStr = "execute as " + boss.getUniqueId() + " at @s run " + mCommand;
 			Plugin.getInstance().getLogger().finer("Running command as boss '" + boss.getName() + "': " + cmdStr);
