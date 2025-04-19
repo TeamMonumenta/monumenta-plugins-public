@@ -152,6 +152,7 @@ public enum GuildPermission {
 	;
 
 	public static final String GUILD_PERM_PREFIX = "guild.perm.";
+	public static final String DISABLE_GUILD_PERM_PREFIX = "guild.disable_perm.";
 	public static final Pattern RE_GUILD_PERM_ID = Pattern.compile("^guild\\.perm\\.([^.]+)\\.([^.]+)$");
 
 	public static class GuildPermissionResult {
@@ -194,6 +195,11 @@ public enum GuildPermission {
 			return null;
 		}
 		return guildPermissionStringPrefix(partialId) + mSubPerm;
+	}
+
+	// Used to disable a permission due to bugs
+	public String globalDisablePermissionString() {
+		return DISABLE_GUILD_PERM_PREFIX + mSubPerm;
 	}
 
 	public static String guildPermissionStringPrefix(String guildPlainTag) {
@@ -385,6 +391,11 @@ public enum GuildPermission {
 	}
 
 	public GuildPermissionResult checkAccess(@Nullable Group guild, PermissionHolder permissionHolder) {
+		// Check if disabled due to bug
+		if (LuckPermsIntegration.hasPermission(permissionHolder, globalDisablePermissionString()).orElse(false)) {
+			return new GuildPermissionResult(null, false);
+		}
+
 		// Guild not found
 		if (guild == null) {
 			return new GuildPermissionResult(null, false);

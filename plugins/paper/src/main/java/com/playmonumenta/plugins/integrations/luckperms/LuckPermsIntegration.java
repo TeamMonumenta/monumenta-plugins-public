@@ -44,6 +44,7 @@ import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.cacheddata.CachedPermissionData;
 import net.luckperms.api.event.EventBus;
 import net.luckperms.api.messaging.MessagingService;
+import net.luckperms.api.model.PermissionHolder;
 import net.luckperms.api.model.data.NodeMap;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
@@ -54,6 +55,7 @@ import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.matcher.NodeMatcher;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.MetaNode;
+import net.luckperms.api.node.types.PermissionNode;
 import net.luckperms.api.node.types.PrefixNode;
 import net.luckperms.api.platform.PlayerAdapter;
 import net.luckperms.api.query.Flag;
@@ -347,6 +349,15 @@ public class LuckPermsIntegration implements Listener {
 			// Remove the permission
 			user.data().remove(Node.builder(permission).build());
 		});
+	}
+
+	public static Optional<Boolean> hasPermission(PermissionHolder permissionHolder, String permission) {
+		for (PermissionNode node : permissionHolder.resolveInheritedNodes(NodeType.PERMISSION, QueryOptions.nonContextual())) {
+			if (node.getKey().equals(permission)) {
+				return Optional.of(node.getValue());
+			}
+		}
+		return Optional.empty();
 	}
 
 	/**

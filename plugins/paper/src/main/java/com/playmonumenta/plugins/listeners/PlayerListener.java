@@ -627,8 +627,8 @@ public class PlayerListener implements Listener {
 			return;
 		} else if (clickedEntity instanceof ItemFrame frame) {
 
-			// Guild plot inventory view permission
-			if (GuildPlotUtils.guildPlotInventoryViewBlocked(player)) {
+			// Guild plot inventory modification permission
+			if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -781,20 +781,8 @@ public class PlayerListener implements Listener {
 		}
 
 		ClickType clickType = event.getClick();
-		Inventory clickedInventory = event.getClickedInventory();
 		Inventory topInventory = event.getView().getTopInventory();
-		if (clickedInventory != null && GuildPlotUtils.guildPlotInventoryModificationBlocked(player, clickedInventory)) {
-			event.setCancelled(true);
-			return;
-		}
-		if (
-			clickedInventory instanceof PlayerInventory
-				&& (
-				ClickType.SHIFT_LEFT.equals(clickType)
-					|| ClickType.SHIFT_RIGHT.equals(clickType)
-			)
-			&& GuildPlotUtils.guildPlotInventoryModificationBlocked(player, topInventory)
-		) {
+		if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player, topInventory)) {
 			event.setCancelled(true);
 			return;
 		}

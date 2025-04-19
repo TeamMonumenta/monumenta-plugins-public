@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.inventories;
 
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -43,6 +44,14 @@ public class LootChestsInInventory implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
+		Player player = (Player) event.getWhoClicked();
+
+		Inventory topInventory = event.getView().getTopInventory();
+		if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player, topInventory)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (!event.getClick().equals(ClickType.RIGHT)) {
 			return;
 		}
@@ -56,8 +65,6 @@ public class LootChestsInInventory implements Listener {
 		if (!item.getType().equals(Material.CHEST)) {
 			return;
 		}
-
-		Player player = (Player)event.getWhoClicked();
 
 		//This is needed for it to work
 		NBTItem nbti = new NBTItem(item);
