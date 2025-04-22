@@ -18,14 +18,12 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.io.File;
 import java.util.Iterator;
-import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -35,9 +33,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 public class WalletBlock extends BaseWallet {
-
-	public static final NamespacedKey WALLET_BLOCK_PDC_KEY = Objects.requireNonNull(NamespacedKey.fromString("monumenta:wallet_block"));
-
 	public boolean mIsOwnerLoaded = true;
 	public @Nullable Recipient mOwner;
 	public final String mWorldName;
@@ -154,16 +149,14 @@ public class WalletBlock extends BaseWallet {
 
 	@Override
 	public void logAddItem(Player player, ItemStack currency) {
-		AuditListener.logPlayer("+AddItemToWalletBlock: " + player.getName() + " added to wallet at `/world "
-			+ mWorldName + "` `/tp @s " + mX + " " + mY + " " + mZ
-			+ "`: " + AuditListener.getItemLogString(currency));
+		AuditListener.logPlayer("+AddItemToWalletBlock: " + player.getName() + " added to wallet at "
+			+ this + "`: " + AuditListener.getItemLogString(currency));
 	}
 
 	@Override
 	public void logRemoveItem(Player player, ItemStack currency) {
-		AuditListener.logPlayer("-RemoveItemFromWalletBlock: " + player.getName() + " added to wallet at `/world "
-			+ mWorldName + "` `/tp @s " + mX + " " + mY + " " + mZ
-			+ "`: " + AuditListener.getItemLogString(currency));
+		AuditListener.logPlayer("-RemoveItemFromWalletBlock: " + player.getName() + " added to wallet at"
+			+ this + "`: " + AuditListener.getItemLogString(currency));
 	}
 
 	@Override
@@ -298,6 +291,11 @@ public class WalletBlock extends BaseWallet {
 	public void onUpdate() {
 		super.onUpdate();
 		serialize();
+	}
+
+	@Override
+	public String toString() {
+		return "`/world " + mWorldName + "` `/tp @s " + mX + " " + mY + " " + mZ;
 	}
 
 	@Override

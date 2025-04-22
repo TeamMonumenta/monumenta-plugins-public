@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.integrations.luckperms.PlayerGuildInfo;
 import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildOrder;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
 import com.playmonumenta.plugins.inventories.BaseWallet;
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.mail.recipient.MailDirection;
 import com.playmonumenta.plugins.mail.recipient.PlayerRecipient;
 import com.playmonumenta.plugins.mail.recipient.Recipient;
@@ -217,6 +218,7 @@ public class WalletOwnerGui extends Gui {
 
 		mWallet.setOwner(recipient);
 		mParentGui.open();
+		AuditListener.logPlayer("[Shared Vault] " + mPlayer.getName() + " changed the owner of the wallet for " + mWallet);
 	}
 
 	public void refresh() {

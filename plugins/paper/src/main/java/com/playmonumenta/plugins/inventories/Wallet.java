@@ -130,6 +130,15 @@ public class Wallet extends BaseWallet {
 	}
 
 	@Override
+	public String toString() {
+		String result = MonumentaRedisSyncIntegration.cachedUuidToName(mOwner);
+		if (result == null) {
+			return mOwner.toString();
+		}
+		return result;
+	}
+
+	@Override
 	public int hashCode() {
 		return mOwner.hashCode();
 	}
