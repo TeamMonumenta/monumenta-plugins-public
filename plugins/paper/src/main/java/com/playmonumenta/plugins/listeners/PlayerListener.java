@@ -361,6 +361,26 @@ public class PlayerListener implements Listener {
 		if (
 			player.getGameMode() != GameMode.CREATIVE
 				&& block != null
+				&& block.getType().equals(Material.DRAGON_EGG)
+		) {
+			GameMode guildPlotGameMode = GuildPlotUtils.guildPlotGameMode(player);
+			if (
+				player.getGameMode() == GameMode.ADVENTURE
+					|| ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.RESTRICTED)
+					|| (
+					guildPlotGameMode != null
+						&& guildPlotGameMode != GameMode.SURVIVAL
+				)
+			) {
+				event.setCancelled(true);
+				event.setUseInteractedBlock(Event.Result.DENY);
+				return;
+			}
+		}
+
+		if (
+			player.getGameMode() != GameMode.CREATIVE
+				&& block != null
 				&& !(blockData instanceof Powerable)
 				&& ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.RESTRICTED)
 		) {
