@@ -305,4 +305,13 @@ public class MessagingUtils {
 		return Component.join(joinConfiguration, components);
 	}
 
+	public static List<Component> recursiveComponents(Component component) {
+		List<Component> result = new ArrayList<>();
+		result.add(component);
+		for (Component child : component.children()) {
+			result.addAll(recursiveComponents(child));
+		}
+		return result;
+	}
+
 }

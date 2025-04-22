@@ -160,8 +160,10 @@ public class SignOverride extends BaseOverride {
 			boolean hasText = false;
 			List<Component> displayedLines = new ArrayList<>();
 			for (Component component : facingSide.lines()) {
-				if (component.clickEvent() != null) {
-					return output;
+				for (Component nestedComponent : MessagingUtils.recursiveComponents(component)) {
+					if (nestedComponent.clickEvent() != null) {
+						return output;
+					}
 				}
 				String line = MessagingUtils.PLAIN_SERIALIZER.serialize(component).trim();
 				if (line.matches("^[-=+~]*$")) {
