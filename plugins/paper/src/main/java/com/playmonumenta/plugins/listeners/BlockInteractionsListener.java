@@ -37,6 +37,7 @@ public final class BlockInteractionsListener implements Listener {
 	public static final String DISABLE_TAG = "DisableBlockInteractions";
 
 	private static final EnumSet<Material> INTERACTABLES = EnumSet.of(
+		Material.DECORATED_POT,
 		Material.LOOM,
 		Material.CRAFTING_TABLE,
 		Material.STONECUTTER,
