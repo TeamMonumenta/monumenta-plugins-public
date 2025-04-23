@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.google.common.base.Ascii;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.papermc.paper.datapack.Datapack;
 import java.awt.geom.AffineTransform;
@@ -58,11 +59,11 @@ public class FileUtils {
 		return matchedFiles;
 	}
 
-	public static void writeJson(String fileName, JsonObject json) throws IOException {
+	public static void writeJson(String fileName, JsonElement json) throws IOException {
 		writeJson(fileName, json, true);
 	}
 
-	public static void writeJson(String fileName, JsonObject json, boolean escapeHtmlCharacters) throws IOException {
+	public static void writeJson(String fileName, JsonElement json, boolean escapeHtmlCharacters) throws IOException {
 		// Do not attempt to catch exceptions here - let them propagate to the caller
 		Path file = Path.of(fileName);
 

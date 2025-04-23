@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
 import com.playmonumenta.plugins.discoveries.DiscoveryManager;
 import com.playmonumenta.plugins.effects.EffectManager;
@@ -776,6 +777,14 @@ public class Plugin extends JavaPlugin {
 		} catch (Exception e) {
 			// Failed to export skills to json, non-critical error.
 			getLogger().warning("Failed to export skills.");
+		}
+
+		try {
+			String skillExportPath = getDataFolder() + File.separator + "exported_zenith_charm_effects.json";
+			FileUtils.writeJson(skillExportPath, CharmEffects.dumpAsJson());
+		} catch (Exception e) {
+			// Failed to export skills to json, non-critical error.
+			getLogger().warning("Failed to export zenith charm effects.");
 		}
 
 		/* If this is the depths shard, enable depths manager */

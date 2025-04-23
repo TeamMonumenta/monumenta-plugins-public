@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.depths.charmfactory;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.BottledSunlight;
@@ -78,6 +81,7 @@ import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
 import com.playmonumenta.plugins.depths.abilities.windwalker.ThundercloudForm;
 import com.playmonumenta.plugins.depths.abilities.windwalker.Whirlwind;
 import com.playmonumenta.plugins.depths.abilities.windwalker.WindsweptCombos;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
@@ -266,7 +270,7 @@ public enum CharmEffects {
 	ICE_LANCE_RANGE("Ice Lance Range", IceLance.INFO, false, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	ICE_LANCE_DEBUFF_AMPLIFIER("Ice Lance Debuff Amplifier", IceLance.INFO, false, true, 5, 40, new double[] {5, 7.5, 10, 12.5, 15}),
 	ICE_LANCE_DURATION("Ice Lance Debuff Duration", IceLance.INFO, true, false, 0.25, 4.0, new double[] {0.5, 0.75, 1.0, 1.25, 1.5}),
-	ICE_LANCE_ICE_DURATION("Ice Lance Ice Duration", Permafrost.INFO, false, false, 0.0, 0.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
+	ICE_LANCE_ICE_DURATION("Ice Lance Ice Duration", IceLance.INFO, false, false, 0.0, 0.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
 	PERMAFROST_DEBUFF_DURATION("Permafrost Debuff Duration", Permafrost.INFO, true, false, 0.5, 5.0, new double[] {0.5, 1.0, 1.5, 2.0, 2.5}),
 	PERMAFROST_ICE_DURATION("Permafrost Ice Duration", Permafrost.INFO, false, false, 2.0, 0.0, new double[] {2.0, 3.0, 4.0, 5.0, 6.0}),
 	PERMAFROST_RADIUS("Permafrost Radius", Permafrost.INFO, false, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
@@ -503,5 +507,30 @@ public enum CharmEffects {
 
 	public String getEffectName() {
 		return mEffectName;
+	}
+
+	public static JsonArray dumpAsJson() {
+		final var result = new JsonArray();
+
+		for (final var value : values()) {
+			final var obj = new JsonObject();
+			obj.addProperty("effectName", value.mEffectName);
+			obj.addProperty("ability", value.mAbility);
+			obj.addProperty("isOnlyPositive", value.mIsOnlyPositive);
+			obj.addProperty("isPercent", value.mIsPercent);
+			obj.addProperty("variance", value.mVariance);
+			obj.addProperty("effectCap", value.mEffectCap);
+			obj.addProperty("tree", value.mTree.getDisplayName());
+
+			final var rarityCap = extraRarityCaps.get(value.mEffectName);
+			obj.addProperty("maxRarity", Objects.requireNonNullElseGet(rarityCap,
+				() -> CharmEffectActions.LEGENDARY.mRarity));
+			final var rarityValues = new JsonArray();
+			Arrays.stream(value.mRarityValues).mapToObj(JsonPrimitive::new).forEach(rarityValues::add);
+			obj.add("rarityValues", rarityValues);
+			result.add(obj);
+		}
+
+		return result;
 	}
 }
