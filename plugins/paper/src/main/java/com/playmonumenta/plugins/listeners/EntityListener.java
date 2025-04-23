@@ -879,10 +879,15 @@ public class EntityListener implements Listener {
 
 		if (event.getHitBlock() != null) {
 			Block block = event.getHitBlock();
+			Material type = block.getType();
 
-			if (block.getType() == Material.DECORATED_POT && ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE) && !ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.CAN_SHOOT_POTS)) {
-				// Prevent decorated pots from being broken in adventure mode zones UNLESS the DecoratedPotsShoot zone exists
-				event.setCancelled(true);
+			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+				if (type == Material.DECORATED_POT && !ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.CAN_SHOOT_POTS)) {
+					// Prevent decorated pots from being broken in adventure mode zones UNLESS the DecoratedPotsShoot zone exists
+					event.setCancelled(true);
+				} else if (type == Material.POINTED_DRIPSTONE) {
+					event.setCancelled(true);
+				}
 			}
 		}
 
