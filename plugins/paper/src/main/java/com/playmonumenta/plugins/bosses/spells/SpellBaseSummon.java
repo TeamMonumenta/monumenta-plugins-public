@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import io.papermc.paper.entity.TeleportFlag;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -258,7 +260,7 @@ public class SpellBaseSummon extends Spell {
 						}
 
 						Location mobLoc = mob.getLocation().add(0, mDeepness / mSummoningDuration, 0);
-						mob.teleport(mobLoc);
+						mob.teleport(mobLoc, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
 						mSummonAnimation.run(mob, mobLoc, mTimer);
 
 						mTimer += 1;
