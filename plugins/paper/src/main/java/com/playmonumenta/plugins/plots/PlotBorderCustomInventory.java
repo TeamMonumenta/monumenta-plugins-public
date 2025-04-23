@@ -107,6 +107,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		BORDER_ITEMS.add(new TeleportEntry(2, 22, "SKT Teal Arena", "The silver knights keep watch over this plot.", Material.IRON_SWORD, "SKT Teal Arena", "pass/skttealarena"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 23, "Monumenta Spawn Box", "Pulled directly from the new spawn location, with its scenic views and stylized signage.", Material.OAK_SIGN, "Monumenta Spawn Box", "pass/spawnbox"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 24, "Sierhaven", "Located right in the town square of Sierhaven.", Material.GREEN_CONCRETE, "Sierhaven", "pass/sierhaven"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 30, "Hycenea", "Long separated by Silver, here Wolf and Witch united once more.", Material.JUNGLE_WOOD, "Hycenea", "pass/hexfallwitch"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 31, "Ta'Ksaav", "The mystical village only seen in dreams.", Material.WHEAT, "taksaav", "pass/taksaav"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 32, "Port Manteau", "Located right in the middle of the Architect's Ring's very own fishing town.", Material.ACACIA_BOAT, "portmanteau", "pass/portmanteau"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 33, "Al Malakut", "A view from the fiery end of the Valley of Forgotten Pharoahs", Material.CHISELED_SANDSTONE, "valleyofforgottenpharaohs", "pass/valleyofforgottenpharaohs"));
