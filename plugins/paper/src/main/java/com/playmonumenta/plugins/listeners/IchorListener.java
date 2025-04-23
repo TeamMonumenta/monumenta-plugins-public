@@ -145,7 +145,7 @@ public class IchorListener implements Listener {
 	}
 
 	private boolean isInfiniteConsumable(ItemStack item) {
-		return (item.getType().isEdible() || item.getType() == Material.POTION) && ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY);
+		return (item.getType().isEdible() || item.getType() == Material.POTION || item.getType() == Material.ROTTEN_FLESH) && ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY);
 	}
 
 	public static @Nullable InfusionType getIchorInfusion(ItemStack item) {
