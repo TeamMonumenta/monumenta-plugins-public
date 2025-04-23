@@ -361,7 +361,7 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	private static Description<PredatorStrike> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The damage now increases by ")
-			.add(a -> a.mDistanceScale, DISTANCE_SCALE_2, false, Ability::isLevelTwo)
+			.addPercent(a -> a.mDistanceScale, DISTANCE_SCALE_2, false, Ability::isLevelTwo)
 			.add(" for each block of distance (up to the same cap), and the final damage cap is doubled.")
 			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
 	}
