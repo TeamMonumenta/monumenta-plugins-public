@@ -34,6 +34,7 @@ public class EliteFinishers {
 			.put(CoolFireworkFinisher.NAME, new CoolFireworkFinisher())
 			.put(CornucopiaFinisher.NAME, new CornucopiaFinisher())
 			.put(DefaultDanceFinisher.NAME, new DefaultDanceFinisher())
+			.put(DoofFinisher.NAME, new DoofFinisher())
 			.put(DragonsBreathFinisher.NAME, new DragonsBreathFinisher())
 			.put(EntombFinisher.NAME, new EntombFinisher())
 			.put(ExcaliburFinisher.NAME, new ExcaliburFinisher())
