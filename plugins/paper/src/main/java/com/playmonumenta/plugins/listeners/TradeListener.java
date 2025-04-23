@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -275,46 +275,53 @@ public class TradeListener implements Listener {
 			}
 
 			Predicate<Material> isSameType = type -> type == source.getType();
-			Consumer<ItemStack> clearDye;
-			BiConsumer<ItemStack, ItemStack> copyDye;
+			Function<ItemStack, ItemStack> clearDye;
+			BiFunction<ItemStack, ItemStack, ItemStack> copyDye;
 			if (ItemUtils.isShulkerBox(source.getType())) {
 				isSameType = ItemUtils::isShulkerBox;
 				clearDye = itemStack -> {
-					itemStack = itemStack.withType(Material.SHULKER_BOX);
+					ItemStack result = itemStack.withType(Material.SHULKER_BOX);
 					// Adds the default Bukkit block state tags if absent
-					BlockStateMeta bsm = (BlockStateMeta) itemStack.getItemMeta();
+					BlockStateMeta bsm = (BlockStateMeta) result.getItemMeta();
 					bsm.setBlockState(bsm.getBlockState());
-					itemStack.setItemMeta(bsm);
+					result.setItemMeta(bsm);
+					return result;
 				};
 				copyDye = (from, to) -> {
-					to = to.withType(from.getType());
-					NBT.modify(to, nbt -> {
+					ItemStack result = to.withType(from.getType());
+					NBT.modify(result, nbt -> {
 						nbt.removeKey("BlockEntityTag");
 						NBTCompound fromShulker = new NBTItem(from).getCompound("BlockEntityTag");
 						if (fromShulker != null) {
 							nbt.getOrCreateCompound("BlockEntityTag").mergeCompound(fromShulker);
 						}
 					});
+					return result;
 				};
 			} else if (source.getItemMeta() instanceof LeatherArmorMeta
 				           && !ItemUtils.getPlainLoreIfExists(source).contains("Arena of Terth")) {
 				clearDye = itemStack -> {
-					LeatherArmorMeta meta = (LeatherArmorMeta) itemStack.getItemMeta();
+					ItemStack result = itemStack.clone();
+					LeatherArmorMeta meta = (LeatherArmorMeta) result.getItemMeta();
 					meta.setColor(Color.WHITE);
-					itemStack.setItemMeta(meta);
+					result.setItemMeta(meta);
+					return result;
 				};
 				copyDye = (from, to) -> {
 					LeatherArmorMeta fromMeta = (LeatherArmorMeta) from.getItemMeta();
-					LeatherArmorMeta toMeta = (LeatherArmorMeta) from.getItemMeta();
+					LeatherArmorMeta toMeta = (LeatherArmorMeta) to.getItemMeta();
 					toMeta.setColor(fromMeta.getColor());
 					to.setItemMeta(toMeta);
+					return to;
 				};
 			} else if (source.getType() == Material.SHIELD) {
 				// Using Bukkit's shield API doesn't work properly and doesn't support shields without banners), so edit NBT directly
 				clearDye = itemStack -> {
-					NBT.modify(itemStack, nbt -> {
+					ItemStack result = itemStack.clone();
+					NBT.modify(result, nbt -> {
 						nbt.removeKey("BlockEntityTag");
 					});
+					return result;
 				};
 				copyDye = (from, to) -> {
 					NBT.modify(to, nbt -> {
@@ -324,6 +331,7 @@ public class TradeListener implements Listener {
 							nbt.getOrCreateCompound("BlockEntityTag").mergeCompound(fromBanner);
 						}
 					});
+					return to;
 				};
 			} else {
 				continue;
@@ -339,16 +347,14 @@ public class TradeListener implements Listener {
 				}
 
 				// check that the items are similar ignoring dye
-				ItemStack clearedPlayerItem = ItemUtils.clone(playerItem);
-				clearDye.accept(clearedPlayerItem);
-				ItemStack clearedSourceItem = ItemUtils.clone(source);
-				clearDye.accept(clearedSourceItem);
+				ItemStack clearedPlayerItem = clearDye.apply(ItemUtils.clone(playerItem));
+				ItemStack clearedSourceItem = clearDye.apply(ItemUtils.clone(source));
 				if (!clearedPlayerItem.isSimilar(clearedSourceItem)) {
 					continue;
 				}
 
 				ItemStack newSource = ItemUtils.clone(source);
-				copyDye.accept(playerItem, newSource);
+				newSource = copyDye.apply(playerItem, newSource);
 
 				// create the new trade
 				MerchantRecipe newRecipe = new MerchantRecipe(recipe.getResult(), recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(),
