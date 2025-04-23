@@ -87,7 +87,7 @@ public class DepthsVolley extends DepthsAbility {
 		mDepthsVolley.clear();
 		mDepthsVolleyHitMap.clear();
 
-		float projSpeed = (float) projectile.getVelocity().length();
+		float projSpeed = ItemUtils.getVanillaProjectileSpeed(mPlayer.getInventory().getItemInMainHand());
 		// Give time for other skills to set data
 		new BukkitRunnable() {
 			@Override

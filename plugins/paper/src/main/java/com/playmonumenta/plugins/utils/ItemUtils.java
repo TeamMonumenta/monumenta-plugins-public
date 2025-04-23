@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
+import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
@@ -473,6 +474,13 @@ public class ItemUtils {
 		Material.BARRIER,
 		Material.BEDROCK
 	);
+
+	private static final Map<Material, Float> VANILLA_PROJECTILE_SPEEDS = ImmutableMap.<Material, Float>builder()
+		.put(Material.SNOWBALL, 1.5f)
+		.put(Material.TRIDENT, 2.5f)
+		.put(Material.BOW, 3.0f)
+		.put(Material.CROSSBOW, 3.15f)
+		.build();
 
 	private static final EnumSet<Material> DEFAULT_ATTRIBUTE_MATERIALS = EnumSet.of(Material.TRIDENT); // tridents also count since they have melee attack damage
 
@@ -1198,6 +1206,10 @@ public class ItemUtils {
 		} else {
 			return false;
 		}
+	}
+
+	public static float getVanillaProjectileSpeed(ItemStack mainhandItem) {
+		return VANILLA_PROJECTILE_SPEEDS.getOrDefault(mainhandItem.getType(), 1.5f);
 	}
 
 	/*

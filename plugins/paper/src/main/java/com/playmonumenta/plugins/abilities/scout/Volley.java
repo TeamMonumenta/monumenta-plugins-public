@@ -89,7 +89,7 @@ public class Volley extends Ability {
 		// Garbage Collector at home
 		mVolley.clear();
 		mVolleyHitMap.clear();
-		float arrowSpeed = (float) projectile.getVelocity().length();
+		float arrowSpeed = ItemUtils.getVanillaProjectileSpeed(mPlayer.getInventory().getItemInMainHand());
 		// Give time for other skills to set data
 		new BukkitRunnable() {
 			@Override
