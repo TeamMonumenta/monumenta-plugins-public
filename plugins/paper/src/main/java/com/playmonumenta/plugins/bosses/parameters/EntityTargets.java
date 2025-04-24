@@ -142,6 +142,12 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return launcher instanceof Mob mob && entity.equals(mob.getTarget());
 			}
+		},
+		HAS_LINEOFSIGHT {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return launcher.hasLineOfSight(entity);
+			}
 		};
 	}
 

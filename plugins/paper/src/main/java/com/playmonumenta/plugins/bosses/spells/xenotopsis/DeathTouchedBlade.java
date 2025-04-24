@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -65,7 +66,7 @@ public class DeathTouchedBlade extends Spell {
 
 	@Override
 	public void run() {
-		final SpellSlashAttack mVisualSlash = new SpellSlashAttack(mPlugin, mBoss, 0, mXenotopsis.scaleDamage(ATTACK_DAMAGE), 0, mBladeRadius, -50, 50, "Death Touched Blade", 8, -40, 540, 0.12, "505a63", "323947", "09091B", "false", "false", new Vector(0.2, 0.15, 0.2), "true", 0.65, "false", 0.2, 0.8, DamageEvent.DamageType.MELEE, SoundsList.EMPTY, SoundsList.fromString("[(ENTITY_GLOW_SQUID_SQUIRT,0.8,1.7)]"), SoundsList.EMPTY, SoundsList.EMPTY, false, 8, true);
+		final SpellSlashAttack mVisualSlash = new SpellSlashAttack(mPlugin, mBoss, 0, mXenotopsis.scaleDamage(ATTACK_DAMAGE), 0, mBladeRadius, -50, 50, "Death Touched Blade", 8, -40, 540, 0.12, Color.fromRGB(0x505a63), Color.fromRGB(0x323947), Color.fromRGB(0x09091B), false, false, false, false, new Vector(0.2, 0.15, 0.2), true, 0.65, false, false, 0.2, 0.8, DamageEvent.DamageType.MELEE, SoundsList.EMPTY, SoundsList.fromString("[(ENTITY_GLOW_SQUID_SQUIRT,0.8,1.7)]"), SoundsList.EMPTY, SoundsList.EMPTY, false, 1, 10, false, false, 8, true);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;

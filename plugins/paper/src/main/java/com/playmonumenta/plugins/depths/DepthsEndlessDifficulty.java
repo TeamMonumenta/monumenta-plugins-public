@@ -69,7 +69,7 @@ public class DepthsEndlessDifficulty {
 	}
 
 	public static void applyTwisted(DepthsParty party) {
-		assignDelvePoints(party, (player, shard) -> DelvesUtils.setDelvePoint(null, player, shard, DelvesModifier.TWISTED, 5));
+		assignDelvePoints(party, (player, shard) -> DelvesUtils.setDelvePoint(null, player, shard, DelvesModifier.TWISTED, 1));
 	}
 
 	public static void applyChronology(DepthsParty party) {

@@ -58,6 +58,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -1825,4 +1826,63 @@ public class ItemUtils {
 		return new ArrayList<>(lore);
 	}
 
+	public static EquipmentItems getEquipmentItems(EntityEquipment equipment)  {
+		return new EquipmentItems(equipment);
+	}
+
+	public static void setEquipmentItems(EntityEquipment equipment, EquipmentItems items)  {
+		equipment.setArmorContents(items.getArmor());
+		equipment.setItemInMainHand(items.getMainhand());
+		equipment.setItemInOffHand(items.getOffhand());
+	}
+
+	public static class EquipmentItems {
+		private final ItemStack mHelmet;
+		private final ItemStack mChestplate;
+		private final ItemStack mLeggings;
+		private final ItemStack mBoots;
+		private final ItemStack mMainhand;
+		private final ItemStack mOffhand;
+
+		private final ItemStack[] mArmor;
+
+		public EquipmentItems(EntityEquipment equipment) {
+			mHelmet = equipment.getHelmet();
+			mChestplate = equipment.getChestplate();
+			mLeggings = equipment.getLeggings();
+			mBoots = equipment.getBoots();
+			mMainhand = equipment.getItemInMainHand();
+			mOffhand = equipment.getItemInOffHand();
+
+			mArmor = equipment.getArmorContents();
+		}
+
+		public ItemStack[] getArmor() {
+			return mArmor;
+		}
+
+		public ItemStack getOffhand() {
+			return mOffhand;
+		}
+
+		public ItemStack getMainhand() {
+			return mMainhand;
+		}
+
+		public ItemStack getBoots() {
+			return mBoots;
+		}
+
+		public ItemStack getLeggings() {
+			return mLeggings;
+		}
+
+		public ItemStack getChestplate() {
+			return mChestplate;
+		}
+
+		public ItemStack getHelmet() {
+			return mHelmet;
+		}
+	}
 }

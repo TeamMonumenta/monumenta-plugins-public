@@ -253,7 +253,7 @@ public class EffectsList {
 	public final List<Effect> mEffectList;
 	public static final EffectsList EMPTY = fromString("[]");
 
-	private EffectsList(List<Effect> effects) {
+	public EffectsList(List<Effect> effects) {
 		mEffectList = effects;
 	}
 

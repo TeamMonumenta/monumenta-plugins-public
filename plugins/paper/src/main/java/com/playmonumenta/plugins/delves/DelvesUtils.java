@@ -62,7 +62,7 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.CARAPACE, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.VENGEANCE, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ENTROPY, 5);
-		MODIFIER_RANK_CAPS.put(DelvesModifier.TWISTED, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.TWISTED, 2);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.FRAGILE, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ASSASSINS, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.UNYIELDING, 1);

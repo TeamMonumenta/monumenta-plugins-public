@@ -88,7 +88,7 @@ public class ShatteredSlash extends Spell {
 				}
 
 				if (mTicks == WINDUP_DURATION) {
-					SpellSlashAttack slash = new SpellSlashAttack(mPlugin, mBoss, 0, ATTACK_DAMAGE, 0, 1.2, FastUtils.randomDoubleInRange(-15, 15), FastUtils.randomDoubleInRange(-15, 15), "Shattered Slash", 7, -40, 380, 0.4, "38175C", "8344C9", "B8A6E3", "false", "false", new Vector(3, 0.3, 3), "true", 0.2, "false", 0.3, 1.0, DamageEvent.DamageType.MELEE, SoundsList.EMPTY, SoundsList.fromString("[(ENTITY_GLOW_SQUID_SQUIRT,0.8,1.7)]"), SoundsList.EMPTY, SoundsList.EMPTY, false, 8, true);
+					SpellSlashAttack slash = new SpellSlashAttack(mPlugin, mBoss, 0, ATTACK_DAMAGE, 0, 1.2, FastUtils.randomDoubleInRange(-15, 15), FastUtils.randomDoubleInRange(-15, 15), "Shattered Slash", 7, -40, 380, 0.4, Color.fromRGB(0x38175C), Color.fromRGB(0x8344C9), Color.fromRGB(0xB8A6E3), false, false, false, false, new Vector(3, 0.3, 3), true, 0.2, false, false, 0.3, 1.0, DamageEvent.DamageType.MELEE, SoundsList.EMPTY, SoundsList.fromString("[(ENTITY_GLOW_SQUID_SQUIRT,0.8,1.7)]"), SoundsList.EMPTY, SoundsList.EMPTY, false, 1, 1, false, false, 8, true);
 					slash.run();
 
 					mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_FALL, SoundCategory.HOSTILE, 5.0f, 0.81f);
@@ -150,7 +150,7 @@ public class ShatteredSlash extends Spell {
 
 					for (Location extraLocation : extraLocs) {
 						ArmorStand tempMarker = mWorld.spawn(extraLocation, ArmorStand.class);
-						SpellSlashAttack slash = new SpellSlashAttack(mPlugin, tempMarker, 0, FRAGMENT_ATTACK_DAMAGE, 0, 0.1, FastUtils.randomDoubleInRange(-15, 15), FastUtils.randomDoubleInRange(-15, 15), "Shattered Slash", 4, -40, 380, 0.4, "38175C", "8344C9", "B8A6E3", "false", "false", new Vector(3, 0.3, 3), "true", 0.4, "false", 0.3, 0.75, DamageEvent.DamageType.MELEE, SoundsList.EMPTY, SoundsList.fromString("[(ENTITY_GLOW_SQUID_SQUIRT,0.8,1.7)]"), SoundsList.EMPTY, SoundsList.EMPTY, false, 8, true);
+						SpellSlashAttack slash = new SpellSlashAttack(mPlugin, tempMarker, 0, FRAGMENT_ATTACK_DAMAGE, 0, 0.1, FastUtils.randomDoubleInRange(-15, 15), FastUtils.randomDoubleInRange(-15, 15), "Shattered Slash", 4, -40, 380, 0.4, Color.fromRGB(0x38175), Color.fromRGB(0x8344C9), Color.fromRGB(0xB8A6E3), false, false, false, false, new Vector(3, 0.3, 3), true, 0.4, false, false, 0.3, 0.75, DamageEvent.DamageType.MELEE, SoundsList.EMPTY, SoundsList.fromString("[(ENTITY_GLOW_SQUID_SQUIRT,0.8,1.7)]"), SoundsList.EMPTY, SoundsList.EMPTY, false, 1, 1, false, false, 8, true);
 						slash.run();
 						tempMarker.remove();
 					}

@@ -222,6 +222,10 @@ public class DelvesManager implements Listener {
 						}
 
 						int lvl = delveObj.getAsJsonPrimitive("delveModLvl").getAsInt();
+						// Replace old, higher uses of Twisted from before the rework decreasing max level 5 -> 2
+						if (delveMod == DelvesModifier.TWISTED && lvl > 2) {
+							lvl = 1;
+						}
 
 						if (lvl > 0) {
 							info.put(delveMod, lvl);
@@ -565,7 +569,7 @@ public class DelvesManager implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onLoom(final StructureGrowEvent event) {
 		if (!DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
@@ -601,7 +605,7 @@ public class DelvesManager implements Listener {
 			}
 
 		}.runTaskLater(Plugin.getInstance(), 2);
-	} 
+	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockExplodeEventLate(BlockExplodeEvent event) {

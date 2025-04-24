@@ -88,7 +88,7 @@ public class SoundsList {
 
 	private final List<CSound> mSoundsList;
 
-	private SoundsList(List<CSound> sounds) {
+	public SoundsList(List<CSound> sounds) {
 		mSoundsList = sounds;
 	}
 

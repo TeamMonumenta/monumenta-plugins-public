@@ -65,7 +65,7 @@ public class DepthsAscensionGUI extends Gui {
 			DELVE_POINTS_PER_LEVEL * 6, Material.CRYING_OBSIDIAN, 22),
 		new AscensionLevelDetails(12, "The time to revive is reduced.",
 			DELVE_POINTS_PER_LEVEL * 6, Material.CRYING_OBSIDIAN, 23),
-		new AscensionLevelDetails(13, "Your party is assigned max Twisted delve points.",
+		new AscensionLevelDetails(13, "Your party is assigned Twisted 1.",
 			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 24),
 		new AscensionLevelDetails(14, "You will no longer be offered active abilities in a tree that you have 4 active abilities from.",
 			DELVE_POINTS_PER_LEVEL * 7, Material.CRYING_OBSIDIAN, 25),
