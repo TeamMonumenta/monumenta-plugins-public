@@ -3,7 +3,9 @@ package com.playmonumenta.plugins.bosses.spells;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -31,6 +33,7 @@ public class SpellShieldStun extends Spell {
 		if (damagee instanceof Player player && event.getType() == mDamageType) {
 			if (event.isBlockedByShield()) {
 				NmsUtils.getVersionAdapter().stunShield(player, mStunTicks);
+				player.playSound(player.getLocation(), Sound.ITEM_SHIELD_BREAK, 0.8f, 0.8f + FastUtils.RANDOM.nextFloat() * 0.4F);
 				event.setFlatDamage(0);
 			} else if (Shielding.doesShieldingApply(player, damagee) && event.getDamage() > 0) {
 				Shielding.disable(player);
