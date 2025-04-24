@@ -1,12 +1,14 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Retaliation;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.listeners.StasisListener;
@@ -66,6 +68,38 @@ public class DamageUtils {
 			}
 		}
 		return StasisListener.isInStasis(entity);
+	}
+
+	/**
+	 * Deal True damage to a LivingEntity based on its maximum health as determined by
+	 * <code>EntityUtils#getMaxHealth</code>. True damage cannot be negated by damage resistances or blocked by
+	 * player invulnerability ticks (iframes) but this method does allow it to be blocked by a shield using the vanilla
+	 * checks for backwards compatibility with <code>BossUtils#bossDamagePercent</code>. Refer to the
+	 * <code>VersionAdapter</code> for more information
+	 * @param damager LivingEntity dealing damage, pass null if not applicable
+	 * @param damagee LivingEntity receiving damage
+	 * @param percentHealth How much of the entity's health should be damaged
+	 * @param causeKnockback Whether the damage should cause knockback
+	 * @param blockable Whether the damage can be blocked with a shield
+	 * @param cause Used for player death messages
+	 * @param isBossAbility Whether this damage originated from a Boss. Only used by the Retaliation enchantment
+	 * @param effects Statuses applied to the player with this attack. Only used by the Retaliation enchantment
+	 */
+	public static void damagePercentHealth(@Nullable final LivingEntity damager, final LivingEntity damagee,
+										   final double percentHealth, final boolean causeKnockback,
+										   final boolean blockable, final String cause, final boolean isBossAbility,
+										   final List<EffectsList.Effect> effects) {
+		final double damageToTake = percentHealth * EntityUtils.getMaxHealth(damagee);
+
+		// TODO: Retaliation should not be in this part of the damage pipeline. DamageUtils shouldn't need to know about
+		//  effects as this reduces the modularity/separation of concerns for the two systems. Move to DamageListener
+		if (damagee instanceof final Player player &&
+			ItemStatUtils.hasEnchantment(player.getInventory().getItemInOffHand(), EnchantmentType.RETALIATION)) {
+			new Retaliation().startEffect(player, effects, damager, isBossAbility);
+		}
+
+		damage(damager, damagee, new DamageEvent.Metadata(DamageType.TRUE, null, null, cause),
+			damageToTake, true, causeKnockback, blockable);
 	}
 
 	/**
@@ -145,8 +179,13 @@ public class DamageUtils {
 	 */
 	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageEvent.Metadata metadata,
 							  double amount, boolean bypassIFrames, boolean causeKnockback, boolean blockable) {
-
 		if (!damagee.isValid() || isImmuneToDamage(damagee, metadata.getType())) {
+			return;
+		}
+
+		if (amount <= 0.0) {
+			MMLog.severe(() -> "[DamageUtils] Something tried to apply negative damage! No damage will be applied." +
+				"damagee: " + damagee.getName() + " metadata: " + metadata);
 			return;
 		}
 

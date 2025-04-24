@@ -40,7 +40,7 @@ public final class NovaBoss extends BossAbilityGroup {
 		@BossParam(help = "You should not use this. use TARGETS instead.", deprecated = true)
 		public boolean NEED_LINE_OF_SIGHT = true;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Percent health True damage to deal to hit targets")
 		public double DAMAGE_PERCENTAGE = 0.0;
 
 		@BossParam(help = "Effect applied to players hit by the nova")
@@ -123,7 +123,8 @@ public final class NovaBoss extends BossAbilityGroup {
 						}
 
 						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.CAN_BLOCK ? mBoss.getLocation() : null, p.SPELL_NAME, p.EFFECTS.mEffectList);
+							DamageUtils.damagePercentHealth(mBoss, target, p.DAMAGE_PERCENTAGE, true,
+								p.CAN_BLOCK, p.SPELL_NAME, true, p.EFFECTS.mEffectList);
 						}
 						p.EFFECTS.apply(target, mBoss);
 					}

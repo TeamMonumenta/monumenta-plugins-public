@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -22,7 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-public class OmenBoss extends BossAbilityGroup {
+public final class OmenBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_omen";
 
 	public static class Parameters extends BossParameters {
@@ -58,7 +59,7 @@ public class OmenBoss extends BossAbilityGroup {
 		public int SPLIT_ANGLE = 90;
 		@BossParam(help = "spell damage")
 		public double DAMAGE = 20;
-		@BossParam(help = "spell damage in %")
+		@BossParam(help = "Percent max health True damage")
 		public double DAMAGE_PERCENTAGE = 0;
 		@BossParam(help = "horizontal knockback velocity")
 		public float KB_X = 0.6f;
@@ -296,7 +297,8 @@ public class OmenBoss extends BossAbilityGroup {
 						}
 
 						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME, p.EFFECTS.mEffectList);
+							DamageUtils.damagePercentHealth(mBoss, player, p.DAMAGE_PERCENTAGE, false,
+								true, p.SPELL_NAME, true, p.EFFECTS.mEffectList);
 							MovementUtils.knockAway(origin, player, p.KB_X, p.KB_Y);
 						}
 						p.EFFECTS.apply(player, mBoss);

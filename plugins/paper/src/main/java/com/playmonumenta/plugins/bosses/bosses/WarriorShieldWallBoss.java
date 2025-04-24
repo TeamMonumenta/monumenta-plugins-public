@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -24,7 +25,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class WarriorShieldWallBoss extends BossAbilityGroup {
+public final class WarriorShieldWallBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_warrior_shield_wall";
 
 	public static class Parameters extends BossParameters {
@@ -135,7 +136,8 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 								}
 
 								if (p.DAMAGE_PERCENTAGE > 0) {
-									BossUtils.bossDamagePercent(mBoss, le, p.DAMAGE_PERCENTAGE, shieldLocation, p.SPELL_NAME, p.EFFECTS.mEffectList);
+									DamageUtils.damagePercentHealth(mBoss, le, p.DAMAGE_PERCENTAGE, true,
+										true, p.SPELL_NAME, true, p.EFFECTS.mEffectList);
 								}
 
 								p.EFFECTS.apply(le, boss);
