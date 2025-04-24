@@ -164,20 +164,36 @@ public class SpellBaseLeapAttack extends Spell {
 		mInitiateAesthetic.run(mWorld, mBoss.getEyeLocation());
 
 		Vector offset = locTarget.clone().subtract(loc).toVector().normalize().multiply(mRunDistance);
-		Location moveTo = loc.clone().add(offset);
-		int i;
-		for (i = 0; i < 3; i++) {
-			if (!moveTo.getBlock().isPassable()) {
-				moveTo.add(0, 1, 0);
+		Location locTest = loc.clone().add(offset);
+
+		boolean foundMoveTo = false;
+
+		for (int i = 0; i < 4; i++) {
+			if (locTest.getBlock().isSolid()) {
+				locTest.add(0, 1, 0);
 			} else {
+				foundMoveTo = true;
 				break;
 			}
 		}
-
-		if (i == 3 && checkPassable) {
-			// Failed to find a good path
+		if (!foundMoveTo) {
+			locTest = loc.clone().add(offset);
+			for (int i = 0; i < 4; i++) {
+				if (locTest.getBlock().isSolid()) {
+					locTest.subtract(0, 1, 0);
+				} else {
+					foundMoveTo = true;
+					break;
+				}
+			}
+		}
+		if (!foundMoveTo && checkPassable) {
 			return;
 		}
+
+		Location moveTo = locTest;
+		moveTo.setY(moveTo.getBlockY() + moveTo.getBlock().getBoundingBox().getHeight());
+
 
 		((Mob) mBoss).getPathfinder().moveTo(moveTo);
 
