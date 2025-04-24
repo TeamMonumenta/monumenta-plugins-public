@@ -203,7 +203,7 @@ public class SpellBullet extends Spell {
 							double rotation = mTicks / mRotationSpeed * Math.PI;
 							if (mTicks % 10 == 0) {
 								for (int i = 0; i < 4; i++) {
-									summonMarker(new Vector(1, 0, 0).rotateAroundY(rotation + i * Math.PI / 2.0), mDetectRange);
+									summonMarker(new Vector(1, 0, 0).rotateAroundY(rotation + i * Math.PI / 2.5), mDetectRange);
 								}
 								List<Player> players = EntityUtils.getNearestPlayers(mCaster.getLocation(), mDetectRange);
 								for (Player player : players) {
