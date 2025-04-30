@@ -259,6 +259,8 @@ public class WalletManager implements Listener {
 
 			Wallet wallet = getWallet(player);
 
+			boolean isSketchedBagOfHoarding = walletItem.getType() == Material.RESPAWN_ANCHOR;
+
 			if (ItemUtils.isNullOrAir(event.getCursor())) {
 				if (event.getClick() == ClickType.RIGHT) {
 					// open wallet
@@ -267,7 +269,7 @@ public class WalletManager implements Listener {
 						return;
 					}
 
-					if (walletItem.getType() == Material.RESPAWN_ANCHOR) {
+					if (isSketchedBagOfHoarding) {
 						// Unique opening sound for Sketched Bag of Hoarding
 						player.playSound(player.getLocation(), Sound.ITEM_BOTTLE_FILL, SoundCategory.PLAYERS, 1.0f, 0.8f);
 					} else {
@@ -315,13 +317,18 @@ public class WalletManager implements Listener {
 						}
 						String depositedHoverString = depositedItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
 							                              .collect(Collectors.joining("\n"));
-						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						if (isSketchedBagOfHoarding) {
+							player.playSound(player.getLocation(), Sound.ITEM_BOTTLE_EMPTY, SoundCategory.PLAYERS, 1.0f, 0.75f);
+						} else {
+							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						}
+
 						player.sendMessage(Component.text(deposited + " item" + (deposited == 1 ? "" : "s") + " deposited into your " + ItemUtils.getPlainName(walletItem), NamedTextColor.GOLD)
-							                   .hoverEvent(HoverEvent.showText(Component.text(depositedHoverString, NamedTextColor.GRAY)))
-							                   .append(Component.text(" "))
-							                   .append(Component.text("[undo]", NamedTextColor.GRAY)
-								                           .hoverEvent(HoverEvent.showText(undoTooltip))
-								                           .clickEvent(ClickEvent.runCommand(undoCommand))));
+							.hoverEvent(HoverEvent.showText(Component.text(depositedHoverString, NamedTextColor.GRAY)))
+							.append(Component.text(" "))
+							.append(Component.text("[undo]", NamedTextColor.GRAY)
+								.hoverEvent(HoverEvent.showText(undoTooltip))
+								.clickEvent(ClickEvent.runCommand(undoCommand))));
 					}
 				}
 			} else {
@@ -334,11 +341,19 @@ public class WalletManager implements Listener {
 					if (canPutIntoWallet(cursor, settings)) {
 						wallet.add(player, cursor);
 						event.getView().setCursor(cursor);
-						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						if (isSketchedBagOfHoarding) {
+							player.playSound(player.getLocation(), Sound.ITEM_BOTTLE_EMPTY, SoundCategory.PLAYERS, 1.0f, 0.75f);
+						} else {
+							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						}
 						player.sendMessage(Component.text("Item deposited into your " + ItemUtils.getPlainName(walletItem), NamedTextColor.GOLD));
 					} else {
 						player.sendMessage(Component.text("This item cannot be put into the " + ItemUtils.getPlainName(walletItem), NamedTextColor.RED));
-						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						if (isSketchedBagOfHoarding) {
+							player.playSound(player.getLocation(), Sound.ITEM_BUCKET_FILL_LAVA, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						} else {
+							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						}
 					}
 				}
 			}
