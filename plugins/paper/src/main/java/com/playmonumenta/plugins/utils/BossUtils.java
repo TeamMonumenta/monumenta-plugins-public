@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -383,15 +384,15 @@ public class BossUtils {
 		world.getPlayers().forEach(player -> player.hideBossBar(bar));
 	}
 
-	public static void endBossFightEffects(final List<Player> players) {
+	public static void endBossFightEffects(final Collection<Player> players) {
 		endBossFightEffects(null, players, TICKS_PER_SECOND * 10, false, false);
 	}
 
-	public static void endBossFightEffects(final @Nullable LivingEntity boss, final List<Player> players) {
+	public static void endBossFightEffects(final @Nullable LivingEntity boss, final Collection<Player> players) {
 		endBossFightEffects(boss, players, TICKS_PER_SECOND * 10, false, false);
 	}
 
-	public static void endBossFightEffects(final @Nullable LivingEntity boss, final List<Player> players,
+	public static void endBossFightEffects(final @Nullable LivingEntity boss, final Collection<Player> players,
 										   final int winEffectDuration) {
 		endBossFightEffects(boss, players, winEffectDuration, false, false);
 	}
@@ -405,7 +406,7 @@ public class BossUtils {
 	 * @param keepBossAlive If true, make boss invulnerable, remove its AI, remove gravity, etc. Defaults to false
 	 * @param removeGlowing If true, remove glowing effect from boss. Defaults to false
 	 */
-	public static void endBossFightEffects(final @Nullable LivingEntity boss, final List<Player> players,
+	public static void endBossFightEffects(final @Nullable LivingEntity boss, final Collection<Player> players,
 										   final int winEffectDuration, final boolean keepBossAlive,
 										   final boolean removeGlowing) {
 		final String BOSS_WIN_RESISTANCE = "BossWinResistance";

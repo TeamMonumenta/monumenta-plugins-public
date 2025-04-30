@@ -746,7 +746,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		}
 		mDefeated = true;
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true, true);
 		if (players.isEmpty()) {
 			return;
 		}

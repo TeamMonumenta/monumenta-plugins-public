@@ -313,7 +313,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		Location loc = mBoss.getLocation();
-		List<Player> players = PlayerUtils.playersInRange(loc, detectionRange, true);
+		List<Player> players = PlayerUtils.playersInRange(loc, detectionRange, true, true);
 
 		BossUtils.endBossFightEffects(players);
 

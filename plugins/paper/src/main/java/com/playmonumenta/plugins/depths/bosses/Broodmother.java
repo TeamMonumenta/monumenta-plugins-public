@@ -298,8 +298,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 			mLaserCores.removeAllCores();
 		}
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		BossUtils.endBossFightEffects(players);
+		BossUtils.endBossFightEffects(PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true, true));
 
 		mLegSweep.stopLegTasks();
 		mTantrum.stopTantrumTasks();
