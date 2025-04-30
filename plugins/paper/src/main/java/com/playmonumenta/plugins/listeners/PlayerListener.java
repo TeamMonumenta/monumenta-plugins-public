@@ -1208,7 +1208,7 @@ public class PlayerListener implements Listener {
 		} else if (event.getState() == State.CAUGHT_ENTITY || event.getState() == State.CAUGHT_FISH) {
 			mPlugin.mTrackingManager.mFishingHook.removeEntity(player);
 
-			if (event.getState() == State.CAUGHT_ENTITY && !EntityUtils.isHostileMob(event.getCaught())) {
+			if (event.getState() == State.CAUGHT_ENTITY && (!EntityUtils.isHostileMob(event.getCaught()) || EntityUtils.isCCImmuneMob(event.getCaught()))) {
 				event.setCancelled(true);
 			}
 		}
