@@ -115,7 +115,9 @@ public class CharmFactory {
 		Map.entry("Whirlwind Knockback", "Whirlwind Cooldown Reduction"),
 		Map.entry("Precision Strike Damage", "Rapid Fire Damage"),
 		Map.entry("Precision Strike Range Requirement", "Split Arrow Range"),
-		Map.entry("Precision Strike Max Stacks", "Sharpshooter Max Stacks")
+		Map.entry("Precision Strike Max Stacks", "Sharpshooter Max Stacks"),
+		Map.entry("Phantom Force Weaken Amplifier", "Phantom Force Vulnerability Amplifier"),
+		Map.entry("Phantom Force Weaken Duration", "Phantom Force Vulnerability Duration")
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {

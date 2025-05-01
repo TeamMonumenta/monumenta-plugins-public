@@ -422,6 +422,7 @@ public class DepthsUtils {
 		json.addProperty("treasure_score", depthsParty.mTreasureScore);
 		json.addProperty("content_type", dp.getContent().name());
 		json.addProperty("victory", victory);
+		json.addProperty("start_timestamp", depthsParty.mStartTimestamp);
 		json.addProperty("f1_timestamp", depthsParty.mFloor1Timestamp);
 		json.addProperty("f2_timestamp", depthsParty.mFloor2Timestamp);
 		json.addProperty("f3_timestamp", depthsParty.mFloor3Timestamp);

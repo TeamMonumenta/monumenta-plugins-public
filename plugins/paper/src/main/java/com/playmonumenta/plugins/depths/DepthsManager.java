@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.depths;
 
-import com.comphenix.protocol.wrappers.Pair;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.playmonumenta.plugins.Plugin;
@@ -153,6 +152,7 @@ import com.playmonumenta.plugins.depths.guis.gifts.BroodmothersWebbingGUI;
 import com.playmonumenta.plugins.depths.guis.gifts.CallicarpasPointedHatGUI;
 import com.playmonumenta.plugins.depths.guis.gifts.ForsakenGrimoireTreeGUI;
 import com.playmonumenta.plugins.depths.guis.gifts.PoetsQuillRemoveGUI;
+import com.playmonumenta.plugins.depths.guis.gifts.PrismaticCubeGUI;
 import com.playmonumenta.plugins.depths.guis.gifts.StatueOfRegretRemoveGUI;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
@@ -953,21 +953,23 @@ public class DepthsManager {
 			List<DepthsTree> giftFilter = new ArrayList<>();
 			giftFilter.add(DepthsTree.GIFT);
 			allItems = initItems(giftFilter, p, dp);
-		} else if (dp.mPointedHatTree != null && dp.mPointedHatStacks > 0) {
-			// callicarpa's pointed hat trigger
-			allItems = initItems(List.of(dp.mPointedHatTree), p, dp);
-			dp.mPointedHatStacks--;
-			if (dp.mPointedHatStacks == 0) {
-				setPlayerLevelInAbility(CallicarpasPointedHat.ABILITY_NAME, p, dp, 0, false, false);
-				dp.mPointedHatTree = null;
-			}
 		} else {
 			List<DepthsTree> cappedTrees = new ArrayList<>();
 			if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ACTIVE_TREE_CAP) {
 				List<DepthsTree> trees = getActiveAbilityTrees(dp);
 				cappedTrees = Arrays.stream(DepthsTree.values()).filter(tree -> trees.stream().filter(t -> t == tree).count() >= 4).toList();
 			}
-			allItems = initItems(dp.mEligibleTrees, reward == DepthsRewardType.ABILITY_ELITE, p, dp, cappedTrees);
+			// callicarpa's pointed hat trigger
+			if (dp.mPointedHatTree != null && dp.mPointedHatStacks > 0) {
+				allItems = initItems(List.of(dp.mPointedHatTree), reward == DepthsRewardType.ABILITY_ELITE, p, dp, cappedTrees);
+				dp.mPointedHatStacks--;
+				if (dp.mPointedHatStacks == 0) {
+					setPlayerLevelInAbility(CallicarpasPointedHat.ABILITY_NAME, p, dp, 0, false, false);
+					dp.mPointedHatTree = null;
+				}
+			} else {
+				allItems = initItems(dp.mEligibleTrees, reward == DepthsRewardType.ABILITY_ELITE, p, dp, cappedTrees);
+			}
 		}
 
 		// Return 3 choices of items
@@ -1560,6 +1562,9 @@ public class DepthsManager {
 				return true;
 			} else if (reward == DepthsRewardType.STATUE) {
 				new StatueOfRegretRemoveGUI(p).open();
+				return true;
+			} else if (reward == DepthsRewardType.CUBE) {
+				new PrismaticCubeGUI(p).open();
 				return true;
 			}
 		}
@@ -2309,31 +2314,9 @@ public class DepthsManager {
 		return getPlayerAbilities(dp).stream().anyMatch(info -> info.getDepthsTrigger().isActive());
 	}
 
-	public @Nullable Pair<String, String> getRandomReplaceablePrismatic(Player player) {
-		// maps a trigger to a list of prismatic abilities in case there are more than one prismatic abilities to a trigger
-		Map<DepthsTrigger, List<DepthsAbilityInfo<?>>> prismaticMap = new HashMap<>();
-		getPrismaticAbilities().forEach((a) -> {
-			DepthsTrigger trigger = a.getDepthsTrigger();
-			List<DepthsAbilityInfo<?>> list = prismaticMap.computeIfAbsent(trigger, k -> new ArrayList<>());
-			list.add(a);
-		});
-
-		List<DepthsAbilityInfo<?>> abilities = getPlayerAbilities(player);
-		abilities.removeIf((a) -> !a.getDepthsTrigger().isActive() || a.getDepthsTree() == DepthsTree.PRISMATIC);
-		if (abilities.isEmpty()) {
-			return null;
-		}
-		Collections.shuffle(abilities);
-
-		// go through each ability to find an active a replacement
-		for (DepthsAbilityInfo<?> a : abilities) {
-			DepthsTrigger trigger = a.getDepthsTrigger();
-			List<DepthsAbilityInfo<?>> prismatics = prismaticMap.getOrDefault(trigger, new ArrayList<>());
-			if (!prismatics.isEmpty()) {
-				return new Pair<>(a.getDisplayName(), FastUtils.getRandomElement(prismatics).getDisplayName());
-			}
-		}
-		return null;
+	public @Nullable String getRandomReplaceablePrismatic(DepthsTrigger trigger) {
+		List<DepthsAbilityInfo<?>> prismaticList = getPrismaticAbilities().stream().filter(a -> a.getDepthsTrigger() == trigger).toList();
+		return prismaticList.isEmpty() ? null : FastUtils.getRandomElement(prismaticList).getDisplayName();
 	}
 
 	public void grantRewardType(Player player, @Nullable String arg) {

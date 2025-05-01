@@ -134,6 +134,7 @@ public class DepthsParty {
 	public @Nullable Vector mDeathWaitingRoomPoint;
 	public int mAscension;
 	// timestamp of floor clear times for data collection
+	public long mStartTimestamp;
 	public long mFloor1Timestamp;
 	public long mFloor2Timestamp;
 	public long mFloor3Timestamp;
@@ -205,6 +206,7 @@ public class DepthsParty {
 		mSpawnedReward = false;
 		mRoomStartX = loc.getBlockX();
 		mContent = DepthsUtils.getDepthsContent();
+		mStartTimestamp = Instant.now().getEpochSecond();
 		mFloor1Timestamp = -1;
 		mFloor2Timestamp = -1;
 		mFloor3Timestamp = -1;

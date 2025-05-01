@@ -34,7 +34,7 @@ public class CurseOfArachnophobia extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (DamageEvent.DamageType.getScalableDamageType().contains(event.getType()) &&
-			(enemy instanceof Spider || ScoreboardUtils.checkTag(enemy, Broodmother.identityTag) || enemy.getName().equals(Broodmother.LIMB_NAME))) {
+			(enemy instanceof Spider || ScoreboardUtils.checkTag(enemy, Broodmother.identityTag) || enemy.getName().equals(Broodmother.LIMB_PLAIN_NAME))) {
 			event.updateDamageWithMultiplier(1 - DAMAGE_DEALT);
 		}
 		return false;

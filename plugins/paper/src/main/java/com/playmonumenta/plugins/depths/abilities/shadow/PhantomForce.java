@@ -73,8 +73,8 @@ public class PhantomForce extends DepthsAbility {
 		mSpawnCount = (mRarity == 6 ? TWISTED_SPAWN_COUNT : SPAWN_COUNT) + (int) CharmManager.getLevel(mPlayer, CharmEffects.PHANTOM_FORCE_SPAWN_COUNT.mEffectName);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.PHANTOM_FORCE_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
 		mRadius = CharmManager.calculateFlatAndPercentValue(player, CharmEffects.PHANTOM_FORCE_RADIUS.mEffectName, RADIUS);
-		mVulnerabilityAmount = VULNERABILITY_AMOUNT[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.PHANTOM_FORCE_WEAKEN_AMOUNT.mEffectName);
-		mVulnerabilityDuration = CharmManager.getDuration(mPlayer, CharmEffects.PHANTOM_FORCE_WEAKEN_DURATION.mEffectName, VULNERABILITY_DURATION);
+		mVulnerabilityAmount = VULNERABILITY_AMOUNT[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.PHANTOM_FORCE_VULNERABILITY_AMPLIFIER.mEffectName);
+		mVulnerabilityDuration = CharmManager.getDuration(mPlayer, CharmEffects.PHANTOM_FORCE_VULNERABILITY_DURATION.mEffectName, VULNERABILITY_DURATION);
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.PHANTOM_FORCE_VEX_DURATION.mEffectName, DURATION);
 		mSpeed = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.PHANTOM_FORCE_MOVEMENT_SPEED.mEffectName, MOVEMENT_SPEED);
 	}

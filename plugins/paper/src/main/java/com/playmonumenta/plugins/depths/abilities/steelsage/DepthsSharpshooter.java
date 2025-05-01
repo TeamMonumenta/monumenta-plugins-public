@@ -1,9 +1,11 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
@@ -31,6 +33,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 	public static final DepthsAbilityInfo<DepthsSharpshooter> INFO =
 		new DepthsAbilityInfo<>(DepthsSharpshooter.class, ABILITY_NAME, DepthsSharpshooter::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
+			.linkedSpell(ClassAbility.SHARPSHOOTER_DEPTHS)
 			.displayItem(Material.TARGET)
 			.descriptions(DepthsSharpshooter::getDescription)
 			.singleCharm(false);
@@ -40,7 +43,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 	private final double mPassiveDamage;
 	private final double mStackDamage;
 
-	private int mStacks = 0;
+	private int mStacks;
 	private int mTicksToStackDecay = 0;
 
 	public DepthsSharpshooter(Plugin plugin, Player player) {
@@ -49,6 +52,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 		mDecayTimerLength = CharmManager.getDuration(mPlayer, CharmEffects.SHARPSHOOTER_DECAY_TIMER.mEffectName, mRarity >= 6 ? TWISTED_SHARPSHOOTER_DECAY_TIMER : SHARPSHOOTER_DECAY_TIMER);
 		mPassiveDamage = PASSIVE_DAMAGE[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SHARPSHOOTER_PASSIVE_DAMAGE.mEffectName);
 		mStackDamage = DAMAGE_PER_STACK[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SHARPSHOOTER_DAMAGE_PER_STACK.mEffectName);
+		mStacks = Math.min(AbilityManager.getManager().getTrackedCharges(mPlayer, ClassAbility.SHARPSHOOTER_DEPTHS), mMaxStacks);
 	}
 
 	@Override
@@ -65,6 +69,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 				if (mStacks < mMaxStacks) {
 					mStacks++;
 					showChargesMessage();
+					AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.SHARPSHOOTER_DEPTHS, mStacks);
 					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			}
@@ -81,6 +86,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 				mTicksToStackDecay = mDecayTimerLength;
 				mStacks--;
 				showChargesMessage();
+				AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.SHARPSHOOTER_DEPTHS, mStacks);
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}

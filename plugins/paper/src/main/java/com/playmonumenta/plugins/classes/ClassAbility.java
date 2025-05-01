@@ -208,6 +208,7 @@ public enum ClassAbility {
 	SIDEARM("Sidearm"),
 	STEEL_STALLION("Steel Stallion"),
 	VOLLEY_DEPTHS("Volley"),
+	SHARPSHOOTER_DEPTHS("Sharpshooter"),
 
 	// WINDWALKER
 	GUARDING_BOLT("Guarding Bolt"),

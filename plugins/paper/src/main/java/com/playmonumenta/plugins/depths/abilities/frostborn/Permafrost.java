@@ -46,6 +46,8 @@ public class Permafrost extends DepthsAbility implements AbilityWithChargesOrSta
 	public static final double RADIUS = 4;
 	public static final double SLOWNESS = 0.2;
 	public static final double[] VULNERABILITY = {0.1, 0.13, 0.16, 0.19, 0.22, 0.28};
+	public static final int MAX_CHARGES = 3;
+	public static final int KILLS_PER_CHARGE = 3;
 	public static final String DEBUFF_SOURCE = "PermafrostDebuff";
 
 	public static final DepthsAbilityInfo<Permafrost> INFO =
@@ -53,7 +55,7 @@ public class Permafrost extends DepthsAbility implements AbilityWithChargesOrSta
 			.linkedSpell(ClassAbility.PERMAFROST)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Permafrost::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false)
-					.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS_EXCEPT_SHIELD)
+					.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
 					.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.QUARTZ)
 			.descriptions(Permafrost::getDescription);
@@ -74,7 +76,7 @@ public class Permafrost extends DepthsAbility implements AbilityWithChargesOrSta
 		mRadius = CharmManager.getRadius(mPlayer, CharmEffects.PERMAFROST_RADIUS.mEffectName, RADIUS);
 		mSlowness = SLOWNESS + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.PERMAFROST_SLOWNESS_AMPLIFIER.mEffectName);
 		mVulnerability = VULNERABILITY[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.PERMAFROST_VULNERABILITY_AMPLIFIER.mEffectName);
-		mCharges = 0;
+		mCharges = Math.min(AbilityManager.getManager().getTrackedCharges(mPlayer, ClassAbility.PERMAFROST), MAX_CHARGES);
 		mMobKills = 0;
 	}
 
@@ -148,7 +150,7 @@ public class Permafrost extends DepthsAbility implements AbilityWithChargesOrSta
 
 	private static Description<Permafrost> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<>(() -> INFO, color)
-			.add("For every 3 mobs you kill, gain 1 charge, up to a maximum of 3. ")
+			.add("For every " + KILLS_PER_CHARGE + " mobs you kill, gain 1 charge, up to a maximum of " + MAX_CHARGES + ". ")
 			.addTrigger()
 			.add(" to consume the charge, spawning ice in a ")
 			.add(a -> a.mRadius, RADIUS)
@@ -165,9 +167,12 @@ public class Permafrost extends DepthsAbility implements AbilityWithChargesOrSta
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
+		if (mCharges == MAX_CHARGES) {
+			return;
+		}
 		mMobKills++;
-		if (mMobKills == 3) {
-			mCharges = Math.min(getMaxCharges(), mCharges + 1);
+		if (mMobKills == KILLS_PER_CHARGE) {
+			mCharges = Math.min(MAX_CHARGES, mCharges + 1);
 			mMobKills = 0;
 			mPlayer.playSound(mPlayer, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 2f, (float) (mCharges * 0.25 + 0.75));
 			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.PERMAFROST, mCharges);
@@ -182,7 +187,7 @@ public class Permafrost extends DepthsAbility implements AbilityWithChargesOrSta
 
 	@Override
 	public int getMaxCharges() {
-		return 3;
+		return MAX_CHARGES;
 	}
 
 	private Vector getXZDirection() {
