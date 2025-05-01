@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -86,7 +88,7 @@ public class Twisted {
 				spawnSinceLast = MAP_WORLD_SPAWN_COUNT.getOrDefault(mob.getWorld().getUID(), 1);
 			}
 
-			if (shouldSpawn(level, spawnSinceLast) && !checkIfUnreachable(mob.getLocation())) {
+			if (shouldSpawn(level, spawnSinceLast, mob) && !checkIfUnreachable(mob.getLocation())) {
 				//spawn a twisted mob
 				spawnTwisted(mob, spawnSinceLast < 1000, level);
 				//a twisted mob is spawned -> resetting the counter
@@ -108,9 +110,9 @@ public class Twisted {
 		}
 	}
 
-	public static boolean shouldSpawn(int level, int spawns) {
+	public static boolean shouldSpawn(int level, int spawns, LivingEntity mob) {
 		BigDecimal randomChance = BigDecimal.valueOf(FastUtils.RANDOM.nextDouble());
-		BigDecimal chance = getSpawnChance(level, spawns).multiply(BigDecimal.valueOf(2));
+		BigDecimal chance = getSpawnChance(level, spawns, mob).multiply(BigDecimal.valueOf(2));
 		return !(randomChance.subtract(chance).doubleValue() > 0);
 	}
 
@@ -135,16 +137,17 @@ public class Twisted {
 
 
 	// formula reference https://media.discordapp.net/attachments/981850439781847060/990909284483215370/unknown.png
-	public static BigDecimal getSpawnChance(int level, int spawnsSinceLastTwisted) {
-		if (spawnsSinceLastTwisted <= 50 - 20 * level) {
-			//lower limit
-			return BigDecimal.ZERO;
-		}
-		if (spawnsSinceLastTwisted >= 250 - 50 * level) {
+	public static BigDecimal getSpawnChance(int level, int spawnsSinceLastTwisted, LivingEntity mob) {
+		if (spawnsSinceLastTwisted >= 200 - 50 * level) {
 			//upper limit limit
 			return BigDecimal.ONE;
 		}
-		BigDecimal exp = BigDecimal.ONE.divide(BigDecimal.valueOf(0.02).multiply(BigDecimal.valueOf(level)), RoundingMode.HALF_UP);
+		if (spawnsSinceLastTwisted <= 50 - 10 * level || (level == 2 && PlayerUtils.playersInLootScalingRange(mob.getLocation()).size() <= EntityUtils.getNearbyMobs(mob.getLocation(), 40, EnumSet.of(EntityType.WITHER_SKELETON)).stream().filter(DelvesUtils::isValidTwistedMob).toList().size())) {
+			//lower limit
+			return BigDecimal.ZERO;
+		}
+
+		BigDecimal exp = BigDecimal.ONE.divide(level >= 2 ? BigDecimal.valueOf(0.035) : BigDecimal.valueOf(0.02), RoundingMode.HALF_UP);
 		BigDecimal numerator = exp.pow(spawnsSinceLastTwisted).multiply(BigDecimal.valueOf(Math.pow(Math.E, -exp.doubleValue())));
 		BigDecimal fact = new BigDecimal(FastUtils.bigFact(spawnsSinceLastTwisted));
 		return numerator.divide(fact, RoundingMode.HALF_UP);
