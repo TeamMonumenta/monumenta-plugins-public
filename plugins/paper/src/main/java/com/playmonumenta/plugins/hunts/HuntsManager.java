@@ -622,7 +622,8 @@ public class HuntsManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event) {
 		if (getRemainingTime() < WARNING_15 && mNextQuarry != null
-				&& event.getBlock().getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius) {
+				&& event.getBlock().getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius
+			&& mWorld == event.getPlayer().getWorld()) {
 			event.getPlayer().sendMessage(Component.text("The quarry will appear soon, it is best to leave the ground undisturbed.", NamedTextColor.RED));
 			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 1, 0.63f);
 			event.setCancelled(true);
@@ -632,7 +633,8 @@ public class HuntsManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent event) {
 		if (getRemainingTime() < WARNING_15 && mNextQuarry != null
-				&& event.getBlock().getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius) {
+				&& event.getBlock().getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius
+			&& mWorld == event.getPlayer().getWorld()) {
 			event.getPlayer().sendMessage(Component.text("The quarry will appear soon, it is best to leave the ground undisturbed.", NamedTextColor.RED));
 			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 1, 0.63f);
 			event.setCancelled(true);
