@@ -456,7 +456,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 				Block block = mLocation.getBlock();
 				if (mCollidesWithBlocks && mCollisionDelayTicks <= 0) {
 					if (!block.isLiquid() && mHitbox.overlaps(block.getBoundingBox())) {
-						mHitAction.run(mWorld, null, mLocation.subtract(mDirection.multiply(0.5)), null);
+						mHitAction.run(mWorld, null, mLocation.subtract(mDirection.multiply(0.5)), mLocation.subtract(mDirection.multiply(0.5)));
 						this.cancel();
 						if (!mLingers) {
 							mActiveRunnables.remove(this);

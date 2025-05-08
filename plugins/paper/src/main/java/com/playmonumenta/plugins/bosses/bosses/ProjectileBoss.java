@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit.LIMITSENUM;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -157,6 +158,12 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Sound used when the projectile hit something")
 		public SoundsList SOUND_HIT = SoundsList.fromString("[(ENTITY_GENERIC_DEATH,0.5,0.5)]");
+
+		@BossParam(help = "Entities summoned on hit")
+		public LoSPool HIT_SUMMONS = LoSPool.LibraryPool.EMPTY;
+
+		@BossParam(help = "If hit summons should spawn on collision with a wall")
+		public boolean SUMMON_ON_COLLISION = true;
 	}
 
 	public ProjectileBoss(Plugin plugin, LivingEntity boss) {
@@ -208,6 +215,13 @@ public class ProjectileBoss extends BossAbilityGroup {
 			},
 			// Hit Action
 			(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
+
+				if (target != null) {
+					p.HIT_SUMMONS.spawn(loc);
+				} else if (p.SUMMON_ON_COLLISION) {
+					p.HIT_SUMMONS.spawn(prevLoc);
+				}
+
 				if (!p.DAMAGE_PLAYER_ONLY || target instanceof Player) {
 					p.SOUND_HIT.play(loc, 0.5f, 0.5f);
 					p.PARTICLE_HIT.spawn(mBoss, loc, 0d, 0d, 0d, 0.25d);
