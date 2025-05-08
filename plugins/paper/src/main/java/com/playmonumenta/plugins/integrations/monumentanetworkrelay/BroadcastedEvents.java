@@ -184,7 +184,7 @@ public class BroadcastedEvents implements Listener {
 					NetworkRelayAPI.sendMessage(shard, PROXIED_TASK_BROADCAST_CHANNEL, data);
 					MMLog.finer("Sent event clear task to shard " + shard);
 				} catch (Exception ex) {
-					MMLog.warning("Failed to send task task to shard " + shard, ex);
+					MMLog.warning("Failed to send task to shard " + shard, ex);
 				}
 			}
 			return;
@@ -348,7 +348,7 @@ public class BroadcastedEvents implements Listener {
 			}
 
 			String shard = data.getAsJsonPrimitive(BroadcastedEvents.Event.SHARD_PROP_KEY).getAsString();
-			if (Objects.equals(ServerProperties.getShardName(), shard)) {
+			if (Objects.equals(NetworkRelayAPI.getShardName(), shard)) {
 				//should already have the parent version so ignore message.
 				return;
 			}
@@ -376,7 +376,7 @@ public class BroadcastedEvents implements Listener {
 				return;
 			}
 
-			String shard = ServerProperties.getShardName();
+			String shard = NetworkRelayAPI.getShardName();
 			String eventName = data.getAsJsonPrimitive(Event.EVENT_PROP_KEY).getAsString();
 			int timeLeft = data.getAsJsonPrimitive(BroadcastedEvents.Event.TIME_PROP_KEY).getAsInt();
 
