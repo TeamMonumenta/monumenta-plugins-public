@@ -142,27 +142,27 @@ public enum DelvePreset {
 		entry(DelvesModifier.CHRONOLOGY, 1),
 		entry(DelvesModifier.LEGIONARY, 7),
 		entry(DelvesModifier.SPECTRAL, 10),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.PERNICIOUS, 10),
-		entry(DelvesModifier.BLOODTHIRSTY, 4)
+		entry(DelvesModifier.BLOODTHIRSTY, 3)
 	)),
 	ORANGE(52, "orange", 100, Material.ORANGE_WOOL, Map.ofEntries(
 		entry(DelvesModifier.ARCANIC, 5),
 		entry(DelvesModifier.CHIVALROUS, 5),
 		entry(DelvesModifier.CARAPACE, 10),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.BLOODTHIRSTY, 10),
 		entry(DelvesModifier.LEGIONARY, 7),
-		entry(DelvesModifier.COLOSSAL, 4),
+		entry(DelvesModifier.COLOSSAL, 3),
 		entry(DelvesModifier.UNYIELDING, 1)
 	)),
 	MAGENTA(53, "magenta", 100, Material.MAGENTA_WOOL, Map.ofEntries(
 		entry(DelvesModifier.PERNICIOUS, 5),
 		entry(DelvesModifier.DREADFUL, 10),
 		entry(DelvesModifier.SPECTRAL, 7),
-		entry(DelvesModifier.COLOSSAL, 4),
+		entry(DelvesModifier.COLOSSAL, 3),
 		entry(DelvesModifier.INFERNAL, 10),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.LEGIONARY, 2),
 		entry(DelvesModifier.CARAPACE, 3),
 		entry(DelvesModifier.HAUNTED, 1)
@@ -170,15 +170,15 @@ public enum DelvePreset {
 	LIGHTBLUE(54, "lightblue", 100, Material.LIGHT_BLUE_WOOL, Map.ofEntries(
 		entry(DelvesModifier.ARCANIC, 17),
 		entry(DelvesModifier.TRANSCENDENT, 10),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.CARAPACE, 8),
-		entry(DelvesModifier.INFERNAL, 6),
+		entry(DelvesModifier.INFERNAL, 5),
 		entry(DelvesModifier.ASTRAL, 1)
 	)),
 	YELLOW(55, "yellow", 100, Material.YELLOW_WOOL, Map.ofEntries(
 		entry(DelvesModifier.COLOSSAL, 5),
-		entry(DelvesModifier.VENGEANCE, 14),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.VENGEANCE, 13),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.PERNICIOUS, 5),
 		entry(DelvesModifier.INFERNAL, 5),
 		entry(DelvesModifier.UNYIELDING, 1),
@@ -186,35 +186,35 @@ public enum DelvePreset {
 		entry(DelvesModifier.RIFTBORN, 1)
 	)),
 	WILLOWS(56, "willows", 100, Material.MOSSY_COBBLESTONE, Map.ofEntries(
-		entry(DelvesModifier.LEGIONARY, 5),
+		entry(DelvesModifier.LEGIONARY, 7),
 		entry(DelvesModifier.DREADFUL, 5),
-		entry(DelvesModifier.TWISTED, 2),
-		entry(DelvesModifier.PERNICIOUS, 5),
+		entry(DelvesModifier.TWISTED, 5),
+		entry(DelvesModifier.PERNICIOUS, 3),
 		entry(DelvesModifier.RIFTBORN, 1),
-		entry(DelvesModifier.BLOODTHIRSTY, 2),
+		entry(DelvesModifier.BLOODTHIRSTY, 3),
 		entry(DelvesModifier.VENGEANCE, 10),
 		entry(DelvesModifier.ASSASSINS, 1),
 		entry(DelvesModifier.UNYIELDING, 1)
 	)),
 	REVERIE(57, "reverie", 100, Material.NETHER_WART_BLOCK, Map.ofEntries(
-		entry(DelvesModifier.TWISTED, 1),
-		entry(DelvesModifier.PERNICIOUS, 7),
+		entry(DelvesModifier.TWISTED, 5),
+		entry(DelvesModifier.PERNICIOUS, 6),
 		entry(DelvesModifier.RIFTBORN, 1),
 		entry(DelvesModifier.VENGEANCE, 34)
 	)),
 	LIME(58, "lime", 100, Material.LIME_WOOL, Map.ofEntries(
 		entry(DelvesModifier.INFERNAL, 7),
-		entry(DelvesModifier.ARCANIC, 14),
+		entry(DelvesModifier.ARCANIC, 13),
 		entry(DelvesModifier.PERNICIOUS, 5),
 		entry(DelvesModifier.LEGIONARY, 10),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.RIFTBORN, 1),
 		entry(DelvesModifier.TRANSCENDENT, 5)
 	)),
 	PINK(59, "pink", 100, Material.PINK_WOOL, Map.ofEntries(
 		entry(DelvesModifier.LEGIONARY, 7),
-		entry(DelvesModifier.VENGEANCE, 14),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.VENGEANCE, 13),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.PERNICIOUS, 5),
 		entry(DelvesModifier.RIFTBORN, 1),
 		entry(DelvesModifier.TRANSCENDENT, 10),
@@ -223,18 +223,18 @@ public enum DelvePreset {
 	GRAY(60, "gray", 100, Material.GRAY_WOOL, Map.ofEntries(
 		entry(DelvesModifier.SPECTRAL, 15),
 		entry(DelvesModifier.DREADFUL, 10),
-		entry(DelvesModifier.COLOSSAL, 6),
+		entry(DelvesModifier.COLOSSAL, 5),
 		entry(DelvesModifier.PERNICIOUS, 5),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.ASTRAL, 1),
 		entry(DelvesModifier.HAUNTED, 1)
 	)),
 	LIGHTGRAY(61, "lightgray", 100, Material.LIGHT_GRAY_WOOL, Map.ofEntries(
 		entry(DelvesModifier.VENGEANCE, 17),
 		entry(DelvesModifier.CARAPACE, 10),
-		entry(DelvesModifier.ARCANIC, 4),
+		entry(DelvesModifier.ARCANIC, 3),
 		entry(DelvesModifier.PERNICIOUS, 5),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.ASTRAL, 1),
 		entry(DelvesModifier.RIFTBORN, 1)
 	)),
@@ -242,17 +242,17 @@ public enum DelvePreset {
 		entry(DelvesModifier.VENGEANCE, 5),
 		entry(DelvesModifier.INFERNAL, 12),
 		entry(DelvesModifier.PERNICIOUS, 5),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.LEGIONARY, 7),
 		entry(DelvesModifier.SPECTRAL, 5),
-		entry(DelvesModifier.BLOODTHIRSTY, 7),
+		entry(DelvesModifier.BLOODTHIRSTY, 6),
 		entry(DelvesModifier.RIFTBORN, 1)
 	)),
 	PURPLE(63, "purple", 100, Material.PURPLE_WOOL, Map.ofEntries(
 		entry(DelvesModifier.PERNICIOUS, 8),
-		entry(DelvesModifier.COLOSSAL, 6),
+		entry(DelvesModifier.COLOSSAL, 5),
 		entry(DelvesModifier.BLOODTHIRSTY, 17),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.CHRONOLOGY, 1),
 		entry(DelvesModifier.HAUNTED, 1),
 		entry(DelvesModifier.ASSASSINS, 1)
@@ -261,17 +261,17 @@ public enum DelvePreset {
 		entry(DelvesModifier.TRANSCENDENT, 12),
 		entry(DelvesModifier.CHRONOLOGY, 1),
 		entry(DelvesModifier.PERNICIOUS, 8),
-		entry(DelvesModifier.ARCANIC, 11),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.ARCANIC, 10),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.ASSASSINS, 1),
 		entry(DelvesModifier.RIFTBORN, 1)
 	)),
 	SHIFTING(65, "shiftingcity", 100, Material.PRISMARINE, Map.ofEntries(
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.COLOSSAL, 5),
 		entry(DelvesModifier.CHRONOLOGY, 1),
 		entry(DelvesModifier.PERNICIOUS, 5),
-		entry(DelvesModifier.ARCANIC, 6),
+		entry(DelvesModifier.ARCANIC, 5),
 		entry(DelvesModifier.TRANSCENDENT, 10),
 		entry(DelvesModifier.DREADFUL, 10),
 		entry(DelvesModifier.ASSASSINS, 1)
@@ -281,25 +281,25 @@ public enum DelvePreset {
 		entry(DelvesModifier.TRANSCENDENT, 10),
 		entry(DelvesModifier.CHRONOLOGY, 1),
 		entry(DelvesModifier.PERNICIOUS, 10),
-		entry(DelvesModifier.TWISTED, 1),
-		entry(DelvesModifier.BLOODTHIRSTY, 6),
+		entry(DelvesModifier.TWISTED, 5),
+		entry(DelvesModifier.BLOODTHIRSTY, 5),
 		entry(DelvesModifier.DREADFUL, 8)
 	)),
 	BLUE(67, "blue", 100, Material.BLUE_WOOL, Map.ofEntries(
 		entry(DelvesModifier.INFERNAL, 10),
 		entry(DelvesModifier.TRANSCENDENT, 10),
 		entry(DelvesModifier.ASTRAL, 1),
-		entry(DelvesModifier.PERNICIOUS, 6),
+		entry(DelvesModifier.PERNICIOUS, 5),
 		entry(DelvesModifier.ARCANIC, 10),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.RIFTBORN, 1)
 	)),
 	BROWN(68, "brown", 100, Material.BROWN_WOOL, Map.ofEntries(
 		entry(DelvesModifier.COLOSSAL, 15),
 		entry(DelvesModifier.HAUNTED, 1),
 		entry(DelvesModifier.CARAPACE, 15),
-		entry(DelvesModifier.SPECTRAL, 6),
-		entry(DelvesModifier.TWISTED, 1),
+		entry(DelvesModifier.SPECTRAL, 5),
+		entry(DelvesModifier.TWISTED, 5),
 		entry(DelvesModifier.DREADFUL, 5)
 	));
 

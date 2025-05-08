@@ -175,6 +175,8 @@ public class DelveCustomInventory extends CustomInventory {
 	private int mTotalPoint;
 	private int mAlreadyRolledEntropy;
 
+	private final Map<DelvesModifier, DelvesModifier> mSelectedVariants = new HashMap<>();
+
 	/**
 	 * Configuration options for this DelveCustomInventory.
 	 *
@@ -431,6 +433,8 @@ public class DelveCustomInventory extends CustomInventory {
 				mods.remove(experimental);
 			}
 		}
+		mods.removeIf(variantMod -> variantMod.getIndex() == -1);
+		mods.replaceAll(this::updateToVariant);
 
 		if (mDungeonName.startsWith("ring")) {
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
@@ -469,6 +473,29 @@ public class DelveCustomInventory extends CustomInventory {
 		}
 
 		return mods;
+	}
+
+	private DelvesModifier updateToVariant(DelvesModifier modifier) {
+		// Twisted -> Tormented
+		if (modifier.equals(DelvesModifier.TWISTED) && ((mPointSelected.get(DelvesModifier.TWISTED_TORMENTED) != null && mPointSelected.get(DelvesModifier.TWISTED_TORMENTED) > 0) || mSelectedVariants.get(DelvesModifier.TWISTED) == DelvesModifier.TWISTED_TORMENTED)) {
+			modifier = DelvesModifier.TWISTED_TORMENTED;
+			mSelectedVariants.put(DelvesModifier.TWISTED, DelvesModifier.TWISTED_TORMENTED);
+		}
+		return modifier;
+	}
+
+	private DelvesModifier clickChangeBetweenVariant(DelvesModifier modifier, Player playerWhoClicked) {
+		// Twisted <-> Tormented
+		if (modifier.equals(DelvesModifier.TWISTED)) {
+			modifier = DelvesModifier.TWISTED_TORMENTED;
+			mSelectedVariants.put(DelvesModifier.TWISTED, DelvesModifier.TWISTED_TORMENTED);
+			playerWhoClicked.playSound(playerWhoClicked.getLocation(), "block.vault.activate", SoundCategory.PLAYERS, 1f, 1f);
+		} else if (modifier.equals(DelvesModifier.TWISTED_TORMENTED)) {
+			modifier = DelvesModifier.TWISTED;
+			mSelectedVariants.remove(DelvesModifier.TWISTED);
+			playerWhoClicked.playSound(playerWhoClicked.getLocation(), "block.vault.deactivate", SoundCategory.PLAYERS, 1f, 1f);
+		}
+		return modifier;
 	}
 
 	/**
@@ -602,7 +629,13 @@ public class DelveCustomInventory extends CustomInventory {
 				DelvesModifier mod = mods.get(index);
 
 				if (row == MODS_ROW) {
-					mPointSelected.put(mod, 0);
+					if (event.isShiftClick()) {
+						mPointSelected.put(mod, 0);
+						mod = clickChangeBetweenVariant(mod, playerWhoClicked);
+						mInventory.setItem(event.getSlot(), mod.getIcon());
+					} else {
+						mPointSelected.put(mod, 0);
+					}
 				} else {
 					int finalPoint = DelvesUtils.getMaxPointAssignable(mod, 5 - row);
 					mPointSelected.put(mod, finalPoint);

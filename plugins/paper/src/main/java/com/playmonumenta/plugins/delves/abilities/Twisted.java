@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -52,18 +53,32 @@ public class Twisted {
 	private static final int MAX_DISTANCE_FROM_PLAYERS = 20;
 
 	public static final String DESCRIPTION = "Something, everything is wrong...";
+	public static final Component[] DESCRIPTION_HOWTOVARIANT = {Component.text("Shift Click", NamedTextColor.YELLOW).append(Component.text(" to switch to a harder version", NamedTextColor.GRAY)), Component.text("of this modifier for more Delve Points.", NamedTextColor.GRAY), Component.text("Team play is recommended!", NamedTextColor.GRAY)};
+	public static final String DESCRIPTION_TORMENTED = "Dark spirits ravage the dreamscape...";
+	public static final Component[] DESCRIPTION_TORMENT_HOWTOVARIANT = {Component.text("Shift Click", NamedTextColor.YELLOW).append(Component.text(" to switch back to the regular", NamedTextColor.GRAY)), Component.text("version of this modifier.", NamedTextColor.GRAY)};
 
 	public static Component[] rankDescription(int level) {
 		return new Component[]{
-				switch (level) {
-					case 1 -> Component.text("Mors").decorate(TextDecoration.OBFUSCATED).append(Component.text(" non a")).append(Component.text("ccip").decorate(TextDecoration.OBFUSCATED)).append(Component.text("it excusatio")).append(Component.text("nes").decorate(TextDecoration.OBFUSCATED));
-					case 2 -> Component.text("For").append(Component.text("tu").decorate(TextDecoration.OBFUSCATED)).append(Component.text("na ")).append(Component.text("fav").decorate(TextDecoration.OBFUSCATED)).append(Component.text("et fo")).append(Component.text("rtib").decorate(TextDecoration.OBFUSCATED)).append(Component.text("u")).append(Component.text("s").decorate(TextDecoration.OBFUSCATED));
-					default -> Component.text("Lorem ipsum dolor sit amet");
-				}
+			switch (level) {
+				case 1 -> Component.text("M").decorate(TextDecoration.OBFUSCATED).append(Component.text("or")).append(Component.text("tu").decorate(TextDecoration.OBFUSCATED)).append(Component.text("i non mo")).append(Component.text("rd").decorate(TextDecoration.OBFUSCATED)).append(Component.text("ent"));
+				case 2 -> Component.text("Mors").decorate(TextDecoration.OBFUSCATED).append(Component.text(" non a")).append(Component.text("ccip").decorate(TextDecoration.OBFUSCATED)).append(Component.text("it excusatio")).append(Component.text("nes").decorate(TextDecoration.OBFUSCATED));
+				case 3 -> Component.text("Quid").append(Component.text("quid in").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" altum ")).append(Component.text("for").decorate(TextDecoration.OBFUSCATED)).append(Component.text("tuna ")).append(Component.text("tulit").decorate(TextDecoration.OBFUSCATED)).append(Component.text(", ruitura ")).append(Component.text("levat.").decorate(TextDecoration.OBFUSCATED));
+				case 4 -> Component.text("Nec").decorate(TextDecoration.OBFUSCATED).append(Component.text(" vita ")).append(Component.text("nec").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" fortuna ")).append(Component.text("hominibus ").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" perpes ")).append(Component.text("est").decorate(TextDecoration.OBFUSCATED));
+				case 5 -> Component.text("For").append(Component.text("tu").decorate(TextDecoration.OBFUSCATED)).append(Component.text("na ")).append(Component.text("fav").decorate(TextDecoration.OBFUSCATED)).append(Component.text("et fo")).append(Component.text("rtib").decorate(TextDecoration.OBFUSCATED)).append(Component.text("u")).append(Component.text("s").decorate(TextDecoration.OBFUSCATED));
+				default -> Component.text("Lorem ipsum dolor sit amet");
+			}
 		};
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
+		apply(mob, level, false);
+	}
+
+	public static void applyModifiersTormented(LivingEntity mob, int level) {
+		apply(mob, level, true);
+	}
+
+	public static void apply(LivingEntity mob, int level, boolean isTormented) {
 		List<Player> players = PlayerUtils.playersInRange(mob.getLocation(), MAX_DISTANCE_FROM_PLAYERS, true, false);
 		if (players.isEmpty()) {
 			return;
@@ -88,12 +103,12 @@ public class Twisted {
 				spawnSinceLast = MAP_WORLD_SPAWN_COUNT.getOrDefault(mob.getWorld().getUID(), 1);
 			}
 
-			if (shouldSpawn(level, spawnSinceLast, mob) && !checkIfUnreachable(mob.getLocation())) {
+			if (shouldSpawn(level, spawnSinceLast, mob, isTormented) && !checkIfUnreachable(mob.getLocation())) {
 				//spawn a twisted mob
-				spawnTwisted(mob, spawnSinceLast < 1000, level);
+				spawnTwisted(mob, spawnSinceLast < 1000, isTormented);
 				//a twisted mob is spawned -> resetting the counter
 
-				spawnSinceLast = spawnSinceLast > 1000 ? spawnSinceLast - 1000 : 1;
+				spawnSinceLast = spawnSinceLast > 1000 && !isTormented ? spawnSinceLast - 1000 : 1;
 				if (poiName != null) {
 					MAP_R3_POI_SPAWN_COUNT.put(poiName, spawnSinceLast);
 				} else {
@@ -110,9 +125,10 @@ public class Twisted {
 		}
 	}
 
-	public static boolean shouldSpawn(int level, int spawns, LivingEntity mob) {
+
+	public static boolean shouldSpawn(int level, int spawns, LivingEntity mob, boolean isTormented) {
 		BigDecimal randomChance = BigDecimal.valueOf(FastUtils.RANDOM.nextDouble());
-		BigDecimal chance = getSpawnChance(level, spawns, mob).multiply(BigDecimal.valueOf(2));
+		BigDecimal chance = getSpawnChance(level, spawns, mob, isTormented).multiply(BigDecimal.valueOf(2));
 		return !(randomChance.subtract(chance).doubleValue() > 0);
 	}
 
@@ -137,23 +153,23 @@ public class Twisted {
 
 
 	// formula reference https://media.discordapp.net/attachments/981850439781847060/990909284483215370/unknown.png
-	public static BigDecimal getSpawnChance(int level, int spawnsSinceLastTwisted, LivingEntity mob) {
-		if (spawnsSinceLastTwisted >= 200 - 50 * level) {
-			//upper limit limit
-			return BigDecimal.ONE;
-		}
-		if (spawnsSinceLastTwisted <= 50 - 10 * level || (level == 2 && PlayerUtils.playersInLootScalingRange(mob.getLocation()).size() <= EntityUtils.getNearbyMobs(mob.getLocation(), 40, EnumSet.of(EntityType.WITHER_SKELETON)).stream().filter(DelvesUtils::isValidTwistedMob).toList().size())) {
+
+	public static BigDecimal getSpawnChance(int level, int spawnsSinceLastTwisted, LivingEntity mob, boolean isTormented) {
+		if (spawnsSinceLastTwisted <= 50 - 10 * level || (isTormented && PlayerUtils.playersInLootScalingRange(mob.getLocation()).size() <= EntityUtils.getNearbyMobs(mob.getLocation(), 40, EnumSet.of(EntityType.WITHER_SKELETON)).stream().filter(DelvesUtils::isValidTwistedMob).toList().size())) {
 			//lower limit
 			return BigDecimal.ZERO;
 		}
-
-		BigDecimal exp = BigDecimal.ONE.divide(level >= 2 ? BigDecimal.valueOf(0.035) : BigDecimal.valueOf(0.02), RoundingMode.HALF_UP);
+		if (spawnsSinceLastTwisted >= 200 - (isTormented ? 20 : 10) * level) {
+			//upper limit limit
+			return BigDecimal.ONE;
+		}
+		BigDecimal exp = BigDecimal.ONE.divide(BigDecimal.valueOf(isTormented ? 0.008 : 0.005).multiply(BigDecimal.valueOf(level)), RoundingMode.HALF_UP);
 		BigDecimal numerator = exp.pow(spawnsSinceLastTwisted).multiply(BigDecimal.valueOf(Math.pow(Math.E, -exp.doubleValue())));
 		BigDecimal fact = new BigDecimal(FastUtils.bigFact(spawnsSinceLastTwisted));
 		return numerator.divide(fact, RoundingMode.HALF_UP);
 	}
 
-	public static void spawnTwisted(LivingEntity mob, boolean normalSummon, int level) {
+	public static void spawnTwisted(LivingEntity mob, boolean normalSummon, boolean isTormented) {
 		List<LivingEntity> mobsInArea = EntityUtils.getNearbyMobs(mob.getLocation(), 16);
 		mobsInArea.remove(mob);
 		Location spawningLoc = mob.getLocation().clone();
@@ -219,7 +235,7 @@ public class Twisted {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			LivingEntity twistedMob = null;
 			boolean isWaterLoc = BlockUtils.containsWater(spawningLoc.getBlock());
-			String pool = level == 2 ? POOL_NAME_SPECS : (isWaterLoc ? POOL_NAME_WATER : normalSummon ? POOL_NAME : POOL_NAME_NORMAL);
+			String pool = isTormented ? POOL_NAME_SPECS : (isWaterLoc ? POOL_NAME_WATER : normalSummon ? POOL_NAME : POOL_NAME_NORMAL);
 			Map<Soul, Integer> mobsPool = LibraryOfSoulsIntegration.getPool(pool);
 			if (mobsPool != null) {
 				for (Map.Entry<Soul, Integer> entry : mobsPool.entrySet()) {
@@ -250,6 +266,4 @@ public class Twisted {
 		int spawnSinceLast = MAP_R3_POI_SPAWN_COUNT.getOrDefault(poiName, 1);
 		MAP_R3_POI_SPAWN_COUNT.put(poiName, spawnSinceLast + 1000);
 	}
-
-
 }
