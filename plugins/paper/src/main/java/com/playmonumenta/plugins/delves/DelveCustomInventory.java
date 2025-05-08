@@ -433,7 +433,7 @@ public class DelveCustomInventory extends CustomInventory {
 				mods.remove(experimental);
 			}
 		}
-		mods.removeIf(variantMod -> variantMod.getIndex() == -1);
+		mods.removeAll(DelvesModifier.variantDelveModifiers());
 		mods.replaceAll(this::updateToVariant);
 
 		if (mDungeonName.startsWith("ring")) {

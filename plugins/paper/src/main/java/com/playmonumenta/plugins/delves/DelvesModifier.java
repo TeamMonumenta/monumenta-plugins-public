@@ -76,6 +76,7 @@ public enum DelvesModifier {
 	private static final List<DelvesModifier> ROTATING_DELVE_MODIFIERS = List.of(ASSASSINS, ASTRAL, UNYIELDING, CHRONOLOGY, RIFTBORN, HAUNTED, FRAGILE);
 	private static final List<DelvesModifier> SPAWN_TRIGGER_MODIFIERS = List.of(ARCANIC, INFERNAL, TRANSCENDENT, CHIVALROUS, BLOODTHIRSTY, PERNICIOUS, LEGIONARY, CARAPACE, TWISTED, ASSASSINS, VENGEANCE, UNYIELDING);
 	private static final List<DelvesModifier> EXPERIMENTAL_DELVE_MODIFIERS = List.of(CHANCECUBES, BERSERK, HEALCUT, GRAVITY);
+	private static final List<DelvesModifier> VARIANT_MODIFIERS = List.of(TWISTED_TORMENTED);
 
 	private final int mIndex;
 	private final @Nullable BiConsumer<LivingEntity, Integer> mApplyFunc;
@@ -159,6 +160,10 @@ public enum DelvesModifier {
 		return new ArrayList<>(EXPERIMENTAL_DELVE_MODIFIERS);
 	}
 
+	public static List<DelvesModifier> variantDelveModifiers() {
+		return new ArrayList<>(VARIANT_MODIFIERS);
+	}
+
 	public static List<DelvesModifier> entropyAssignable() {
 		List<DelvesModifier> mods = valuesList();
 		mods.remove(ENTROPY);
@@ -166,6 +171,7 @@ public enum DelvesModifier {
 		mods.remove(FRAGILE);
 		mods.removeAll(ROTATING_DELVE_MODIFIERS);
 		mods.removeAll(EXPERIMENTAL_DELVE_MODIFIERS);
+		mods.removeAll(VARIANT_MODIFIERS);
 		return mods;
 	}
 

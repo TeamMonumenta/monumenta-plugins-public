@@ -337,6 +337,7 @@ public class DelvesUtils {
 			mods.remove(DelvesModifier.TWISTED);
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
 			mods.removeAll(DelvesModifier.experimentalDelveModifiers());
+			mods.removeAll(DelvesModifier.variantDelveModifiers());
 
 			while (pointsToAssign > 0) {
 				if (mods.isEmpty()) {
