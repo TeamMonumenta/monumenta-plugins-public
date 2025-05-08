@@ -37,10 +37,10 @@ import org.jetbrains.annotations.Nullable;
 public class AlchemicalArtillery extends Ability {
 	private static final int COOLDOWN = 20 * 6;
 
-	private static final double ARTILLERY_1_DAMAGE_MULTIPLIER = 0.75;
-	private static final double ARTILLERY_2_DAMAGE_MULTIPLIER = 1.5;
-	private static final double ARTILLERY_1_DAMAGE_RAW = 4.5;
-	private static final double ARTILLERY_2_DAMAGE_RAW = 6;
+	private static final double ARTILLERY_1_DAMAGE_MULTIPLIER = 0.7;
+	private static final double ARTILLERY_2_DAMAGE_MULTIPLIER = 1.0;
+	private static final double ARTILLERY_1_DAMAGE_RAW = 6;
+	private static final double ARTILLERY_2_DAMAGE_RAW = 7;
 	private static final double ARTILLERY_RANGE_MULTIPLIER = 1.5;
 	private static final int ARTILLERY_POTION_COST = 2;
 	private static final int AFTERSHOCK_DELAY = 20;

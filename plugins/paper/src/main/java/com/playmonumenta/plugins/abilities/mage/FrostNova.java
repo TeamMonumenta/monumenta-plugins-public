@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.FrostNovaCS;
+import com.playmonumenta.plugins.effects.CholericFlamesAntiHeal;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
@@ -38,8 +39,10 @@ public class FrostNova extends Ability {
 	public static final double ENHANCED_DAMAGE_MODIFIER = 1.15;
 	public static final int DURATION_TICKS = 4 * Constants.TICKS_PER_SECOND;
 	public static final int ENHANCED_FROZEN_DURATION = 1 * Constants.TICKS_PER_SECOND;
-	public static final int COOLDOWN_TICKS = 18 * Constants.TICKS_PER_SECOND;
-	public static final int ENHANCED_COOLDOWN_TICKS = 16 * Constants.TICKS_PER_SECOND;
+	public static final int COOLDOWN_TICKS_1 = 18 * Constants.TICKS_PER_SECOND;
+	public static final int COOLDOWN_TICKS_2 = 16 * Constants.TICKS_PER_SECOND;
+	public static final int ENHANCED_COOLDOWN_TICKS = -1 * Constants.TICKS_PER_SECOND;
+	public static final String ANTIHEAL_EFFECT = "FrostNovaAntiHeal";
 
 	public static final String CHARM_DAMAGE = "Frost Nova Damage";
 	public static final String CHARM_COOLDOWN = "Frost Nova Cooldown";
@@ -55,7 +58,7 @@ public class FrostNova extends Ability {
 			.shorthandName("FN")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Damage and slow nearby mobs.")
-			.cooldown(COOLDOWN_TICKS, COOLDOWN_TICKS, ENHANCED_COOLDOWN_TICKS, CHARM_COOLDOWN)
+			.cooldown(COOLDOWN_TICKS_1, COOLDOWN_TICKS_2, COOLDOWN_TICKS_1 - ENHANCED_COOLDOWN_TICKS, COOLDOWN_TICKS_2 - ENHANCED_COOLDOWN_TICKS ,CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FrostNova::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
 			.displayItem(Material.ICE);
@@ -94,6 +97,8 @@ public class FrostNova extends Ability {
 				EntityUtils.applySlow(mPlugin, mDuration, mLevelSlowMultiplier, mob);
 				if (isEnhanced()) {
 					EntityUtils.applyFreeze(mPlugin, mFrozenDuration, mob);
+					// Choleric Flame already uses an anti heal effect, no need to create a new one as long as name is different.
+					mPlugin.mEffectManager.addEffect(mob, ANTIHEAL_EFFECT, new CholericFlamesAntiHeal(mFrozenDuration));
 				}
 			}
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);
@@ -130,7 +135,7 @@ public class FrostNova extends Ability {
 			.add(" seconds, and extinguishing them if they're on fire. Slowness is reduced by ")
 			.addPercent(ELITE_SLOW_MULTIPLIER_REDUCTION)
 			.add(" on elites and bosses, and all players in the nova are also extinguished.")
-			.addCooldown(COOLDOWN_TICKS, a -> !a.isEnhanced());
+			.addCooldown(COOLDOWN_TICKS_1, a -> !a.isEnhanced());
 	}
 
 	private static Description<FrostNova> getDescription2() {
@@ -139,7 +144,8 @@ public class FrostNova extends Ability {
 			.add(a -> a.mBaseDamage, DAMAGE_2, false, Ability::isLevelTwo)
 			.add(" and base slowness is increased to ")
 			.addPercent(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(".");
+			.add(".")
+			.addCooldown(COOLDOWN_TICKS_2, a -> !a.isEnhanced());
 	}
 
 	private static Description<FrostNova> getDescriptionEnhancement() {
@@ -148,8 +154,9 @@ public class FrostNova extends Ability {
 			.addPercent(ENHANCED_DAMAGE_MODIFIER - 1)
 			.add(". Non elites and bosses are frozen for ")
 			.addDuration(a -> a.mFrozenDuration, ENHANCED_FROZEN_DURATION)
-			.add(" second, having their AI and gravity removed.")
-			.addCooldown(ENHANCED_COOLDOWN_TICKS, Ability::isEnhanced);
+			.add(" second, having their AI and gravity removed and gain 100% Anti-Heal. Cooldown is further reduced by ")
+			.addDuration(ENHANCED_COOLDOWN_TICKS)
+			.add(" seconds.");
 	}
 
 }

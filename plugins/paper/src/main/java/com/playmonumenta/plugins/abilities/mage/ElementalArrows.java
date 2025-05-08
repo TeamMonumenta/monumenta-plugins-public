@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.ElementalArrowsCS;
+import com.playmonumenta.plugins.cosmetics.skills.mage.SpellshockCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.SpellShockStatic;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -149,13 +150,11 @@ public class ElementalArrows extends Ability {
 			effectAction = effectAction.andThen(entity -> EntityUtils.applyStun(mPlugin, mStunDuration, entity));
 			mCosmetic.thunderEffect(mPlayer, enemy, isLevelTwo(), mRadius);
 			if (mSpellshockEnhanced) {
-				SpellShockStatic existingStatic = mPlugin.mEffectManager.getActiveEffect(enemy, SpellShockStatic.class);
-				if (existingStatic != null && existingStatic.isTriggered()) {
-					final double weaknessMultiplier = -1 * (Spellshock.ENHANCE_WEAK_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, Spellshock.CHARM_ENHANCE_WEAK));
-					mPlugin.mEffectManager.addEffect(enemy, Spellshock.ENHANCE_WEAK_SRC,
-						new PercentDamageDealt(Spellshock.ENHANCEMENT_EFFECT_DURATION, weaknessMultiplier)
-							.damageTypes(Spellshock.ENHANCE_WEAK_AFFECTED_DAMAGE_TYPES));
-				}
+				SpellshockCS spellShockCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new SpellshockCS());
+				double spellShockLightningDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, Spellshock.CHARM_ENHANCE_LIGHTNING_DAMAGE, Spellshock.ENHANCE_LIGHTNING_DAMAGE);
+				double spellShockLightningRange = CharmManager.calculateFlatAndPercentValue(mPlayer, Spellshock.CHARM_ENHANCE_LIGHTNING_RANGE, Spellshock.ENHANCE_LIGHTNING_RANGE);
+
+				Spellshock.spellShockThunder(mPlayer, enemy, spellShockLightningRange, spellShockLightningDamage, Spellshock.ENHANCE_THUNDER, spellShockCosmetic);
 			}
 		}
 		effectAction.accept(enemy);

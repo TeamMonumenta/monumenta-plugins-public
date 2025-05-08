@@ -37,13 +37,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class Taboo extends Ability implements AbilityWithDuration {
 	private static final int CHARGE_TIME_REDUCTION = 10;
-	private static final double PERCENT_HEALTH_DAMAGE = 0.07;
+	private static final double PERCENT_HEALTH_DAMAGE = 0.05;
 	private static final double PERCENT_HEALING_PENALTY = 0.5;
 	private static final double PERCENT_ABSORPTION_PENALTY = 0.5;
 	private static final double PERCENT_KNOCKBACK_RESIST = 0.5;
 	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "TabooKnockbackResistanceEffect";
-	private static final double MAGIC_DAMAGE_INCREASE_1 = 0.2;
-	private static final double MAGIC_DAMAGE_INCREASE_2 = 0.3;
+	private static final double MAGIC_DAMAGE_INCREASE = 0.2;
 	private static final double MAGIC_DAMAGE_INCREASE_BURST = 0.5;
 	private static final int BURST_DURATION = 5 * 20;
 	private static final int BURST_COOLDOWN = 20 * 20;
@@ -116,7 +115,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	public Taboo(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
-		mMagicDamageIncrease = (isLevelOne() ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mMagicDamageIncrease = MAGIC_DAMAGE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mRechargeRateDecrease = CharmManager.getDuration(mPlayer, CHARM_RECHARGE, CHARGE_TIME_REDUCTION);
 		mHealthDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF_DAMAGE, PERCENT_HEALTH_DAMAGE);
 		mKBR = PERCENT_KNOCKBACK_RESIST + CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK_RESISTANCE) / 10;
@@ -298,7 +297,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 			.add(" to consume a potion and undergo a taboo transformation. While transformed, you recharge potions ")
 			.addDuration(a -> a.mRechargeRateDecrease, CHARGE_TIME_REDUCTION)
 			.add(" seconds faster, deal ")
-			.addPercent(a -> a.mMagicDamageIncrease, MAGIC_DAMAGE_INCREASE_1, false, Ability::isLevelOne)
+			.addPercent(a -> a.mMagicDamageIncrease, MAGIC_DAMAGE_INCREASE, false, Ability::isLevelOne)
 			.add(" more magic damage, and gain ")
 			.addPercent(a -> a.mKBR, PERCENT_KNOCKBACK_RESIST)
 			.add(" knockback resistance. However, you also lose ")
@@ -312,9 +311,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 
 	private static Description<Taboo> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("The effect now grants you ")
-			.addPercent(a -> a.mMagicDamageIncrease, MAGIC_DAMAGE_INCREASE_2, false, Ability::isLevelTwo)
-			.add(" magic damage. Additionally, while it is active, activate it again while looking down to consume another potion and enter burst mode, which gives you an additional ")
+			.add("While Taboo is active, activate it again while looking down to consume another potion and enter burst mode, which gives you an additional ")
 			.addPercent(a -> a.mMagicDamageIncreaseBurst, MAGIC_DAMAGE_INCREASE_BURST)
 			.add(" magic damage, but makes you lose ")
 			.addPercent(a -> a.mHealthDamagePercent, PERCENT_HEALTH_DAMAGE)

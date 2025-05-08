@@ -14,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 
 public class SpellshockCS implements CosmeticSkill {
@@ -52,5 +53,28 @@ public class SpellshockCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.75f, 2.5f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.75f, 2.0f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.75f, 1.5f);
+	}
+
+	public void damageOverTimeEffects(LivingEntity target) {
+		new PartialParticle(Particle.CRIT_MAGIC, target.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
+		new PartialParticle(Particle.ENCHANTMENT_TABLE, target.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
+	}
+
+	public void enhancedLightning(LivingEntity from, LivingEntity to) {
+		World world = from.getWorld();
+		Location locFrom = from.getLocation();
+		Location locTo = to.getLocation();
+		Vector dir = LocationUtils.getDirectionTo(locTo, locFrom);
+		dir.multiply(0.2);
+		double step = locFrom.distance(locTo) / 0.2;
+		Location pLoc = locFrom.add(0, 1.2, 0);
+		for (int i = 0; i < step; i++) {
+			pLoc.add(dir);
+			new PartialParticle(Particle.END_ROD, pLoc, 2, 0.05, 0.05, 0.05, 0).spawnAsEnemy();
+		}
+		world.playSound(locFrom, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 0.3f, 1f);
+		world.playSound(locFrom, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 0.3f, 1.5f);
+		world.playSound(locTo, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 0.3f, 1.5f);
+		world.playSound(locTo, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 0.3f, 2f);
 	}
 }

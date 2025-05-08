@@ -13,7 +13,10 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -39,9 +42,11 @@ public class ArcaneStrike extends Ability {
 	private static final float RADIUS = 4.0f;
 	private static final int DAMAGE_1 = 4;
 	private static final int DAMAGE_2 = 7;
+	private static final double WAND_SCALING_1 = 0.1;
+	private static final double WAND_SCALING_2 = 0.2;
 	private static final int BONUS_DAMAGE_1 = 2;
 	private static final int BONUS_DAMAGE_2 = 3;
-	private static final double ENHANCEMENT_DAMAGE_MULTIPLIER = 1.4;
+	private static final double ENHANCEMENT_DAMAGE_MULTIPLIER = 1.15;
 	private static final int COOLDOWN = 5 * 20;
 
 	public static final String CHARM_DAMAGE = "Arcane Strike Damage";
@@ -63,6 +68,7 @@ public class ArcaneStrike extends Ability {
 	private final double mDamageBonus;
 	private final double mDamageBonusAffected;
 	private final double mRadius;
+	private final double mWandScaling;
 
 	private final ArcaneStrikeCS mCosmetic;
 
@@ -71,6 +77,7 @@ public class ArcaneStrike extends Ability {
 		mDamageBonus = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mDamageBonusAffected = CharmManager.calculateFlatAndPercentValue(player, CHARM_BONUS, isLevelOne() ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2);
 		mRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, RADIUS);
+		mWandScaling = isLevelOne() ? WAND_SCALING_1 : WAND_SCALING_2;
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ArcaneStrikeCS());
 	}
 
@@ -93,6 +100,11 @@ public class ArcaneStrike extends Ability {
 						        && !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
 					preSpellPowerDamage += mDamageBonusAffected;
 				}
+
+				// Base damage scaling from wands + fist damage
+				final ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
+				double attackDamageAdd = ItemStatUtils.getAttributeAmount(inMainHand, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
+				preSpellPowerDamage += (attackDamageAdd + 1) * mWandScaling;
 
 				float dmg = SpellPower.getSpellDamage(mPlugin, mPlayer, (float) preSpellPowerDamage);
 
@@ -159,7 +171,9 @@ public class ArcaneStrike extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing ")
 			.add(a -> a.mDamageBonus, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" arcane magic damage to all mobs within ")
+			.add(" + ")
+			.addPercent(a -> a.mWandScaling, WAND_SCALING_1)
+			.add(" of your wand's base damage as arcane magic damage to all mobs within ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks around the target. Enemies that are on fire or slowed take ")
 			.add(a -> a.mDamageBonusAffected, BONUS_DAMAGE_1, false, Ability::isLevelOne)
@@ -171,7 +185,9 @@ public class ArcaneStrike extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The damage is increased to ")
 			.add(a -> a.mDamageBonus, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(". Mobs that are on fire or slowed take ")
+			.add(" + ")
+			.addPercent(a -> a.mWandScaling, WAND_SCALING_2)
+			.add(" of your wand's base damage. Mobs that are on fire or slowed take ")
 			.add(a -> a.mDamageBonusAffected, BONUS_DAMAGE_2, false, Ability::isLevelTwo)
 			.add(" additional damage.");
 	}

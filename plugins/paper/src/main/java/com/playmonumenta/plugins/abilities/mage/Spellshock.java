@@ -9,21 +9,23 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.SpellshockCS;
-import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SpellShockStatic;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
-import java.util.NavigableSet;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,21 +36,20 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Spellshock extends Ability {
 	public static final String NAME = "Spellshock";
 	public static final ClassAbility ABILITY = ClassAbility.SPELLSHOCK;
+	public static final ClassAbility ENHANCE_ARCANE = ClassAbility.SPELLSHOCK_ARCANE;
+	public static final ClassAbility ENHANCE_THUNDER = ClassAbility.SPELLSHOCK_THUNDER;
 
 	/* These are also used by Elemental Arrows */
-	public static final String ENHANCE_WEAK_SRC = "SpellshockEnhanceWeakness";
-	public static final double ENHANCE_WEAK_POTENCY = 0.2;
 	public static final int ENHANCEMENT_EFFECT_DURATION = Constants.TICKS_PER_SECOND * 6;
-	public static final EnumSet<DamageType> ENHANCE_WEAK_AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageType.MELEE,
-		DamageType.PROJECTILE
-	);
+	public static final int ENHANCE_LIGHTNING_DAMAGE = 5;
+	public static final int ENHANCE_LIGHTNING_RANGE = 7;
 
 	private static final String DAMAGED_THIS_TICK_METAKEY = "SpellshockDamagedThisTick";
 	private static final String SPELLSHOCK_STATIC_SRC = "SpellShockStaticEffect";
 	private static final String SPEED_SRC = "SpellShockPercentSpeedEffect";
-	private static final String ENHANCE_SPEED_METAKEY = "SpellshockUTick";
-	private static final String ENHANCE_SPEED_SRC = "SpellShockEnhancePercentSpeedEffect";
+	private static final String ENHANCE_DOT_EFFECT_NAME = "SpellShockEnhanceDoTEffect";
+	private static final int ENHANCE_DOT_DAMAGE = 3;
+	private static final int ENHANCE_DOT_DURATION = Constants.TICKS_PER_SECOND * 3;
 	private static final double DAMAGE_1 = 0.2;
 	private static final double DAMAGE_2 = 0.3;
 	private static final double MELEE_BONUS_1 = 0.1;
@@ -59,10 +60,10 @@ public class Spellshock extends Ability {
 	private static final int SPEED_DURATION = Constants.TICKS_PER_SECOND * 6;
 	private static final int SLOW_DURATION = Constants.HALF_TICKS_PER_SECOND;
 	private static final double SLOW_POTENCY = 0.3;
-	private static final double ENHANCE_SPEED_POTENCY = 0.03;
-	private static final int ENHANCE_SPEED_MAX_STACKS = 5;
 	private static final double ENHANCE_DAMAGE_MULT = 0.2;
 	private static final double ENHANCE_SLOW_POTENCY = 0.15;
+	private static final double ENHANCE_VULN_POTENCY = 0.15;
+
 	private static final EnumSet<ClassAbility> FIRE_ABILITIES = EnumSet.of(
 		ClassAbility.MAGMA_SHIELD,
 		ClassAbility.ELEMENTAL_ARROWS_FIRE,
@@ -87,7 +88,12 @@ public class Spellshock extends Ability {
 	public static final String CHARM_SLOW = "Spellshock Slowness Amplifier";
 	public static final String CHARM_ENHANCE_DAMAGE = "Spellshock Enhancement Damage Amplifier";
 	public static final String CHARM_ENHANCE_SLOW = "Spellshock Enhancement Slowness Amplifier";
+	public static final String CHARM_ENHANCE_VULN = "Spellshock Enhancement Vulnerability Amplifier";
 	public static final String CHARM_ENHANCE_WEAK = "Spellshock Enhancement Weakness Amplifier";
+	public static final String CHARM_ENHANCE_DOT_DAMAGE = "Spellshock Enhancement DoT Damage";
+	public static final String CHARM_ENHANCE_DOT_DURATION = "Spellshock Enhancement DoT Duration";
+	public static final String CHARM_ENHANCE_LIGHTNING_DAMAGE = "Spellshock Enhancement Lightning Damage";
+	public static final String CHARM_ENHANCE_LIGHTNING_RANGE = "Spellshock Enhancement Lightning Range";
 	public static final String CHARM_RADIUS = "Spellshock Radius";
 
 	public static final AbilityInfo<Spellshock> INFO =
@@ -104,10 +110,13 @@ public class Spellshock extends Ability {
 	private final double mMeleeBonusMult;
 	private final double mSpeedPotency;
 	private final double mSlowPotency;
-	private final double mEnhanceSpeedPotency;
 	private final double mEnhanceDamageMult;
 	private final double mEnhanceSlowPotency;
-	private final double mEnhanceWeakPotency;
+	private final double mEnhanceVulnPotency;
+	private final double mEnhanceDoTDamage;
+	private final int mEnhanceDoTDuration;
+	private final double mEnhanceLightningDamage;
+	private final double mEnhanceLightningRange;
 	private final double mRadius;
 
 	public Spellshock(final Plugin plugin, final Player player) {
@@ -116,10 +125,13 @@ public class Spellshock extends Ability {
 		mMeleeBonusMult = (isLevelOne() ? MELEE_BONUS_1 : MELEE_BONUS_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_MELEE);
 		mSpeedPotency = SPEED_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 		mSlowPotency = SLOW_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW);
-		mEnhanceSpeedPotency = ENHANCE_SPEED_POTENCY;
 		mEnhanceDamageMult = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE, ENHANCE_DAMAGE_MULT);
 		mEnhanceSlowPotency = ENHANCE_SLOW_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_SLOW);
-		mEnhanceWeakPotency = ENHANCE_WEAK_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_WEAK);
+		mEnhanceVulnPotency = ENHANCE_VULN_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_VULN);
+		mEnhanceDoTDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DOT_DAMAGE, ENHANCE_DOT_DAMAGE);
+		mEnhanceDoTDuration = (int) Math.floor(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DOT_DURATION, ENHANCE_DOT_DURATION));
+		mEnhanceLightningDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_LIGHTNING_DAMAGE, ENHANCE_LIGHTNING_DAMAGE);
+		mEnhanceLightningRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_LIGHTNING_RANGE, ENHANCE_LIGHTNING_RANGE);
 		mRadius = CharmManager.getDuration(player, CHARM_RADIUS, SPELLSHOCK_RADIUS);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new SpellshockCS());
@@ -149,33 +161,17 @@ public class Spellshock extends Ability {
 				event.updateDamageWithMultiplier(1 + mEnhanceDamageMult);
 			} else if (ICE_ABILITIES.contains(eventAbility)) {
 				EntityUtils.applySlow(mPlugin, ENHANCEMENT_EFFECT_DURATION, mEnhanceSlowPotency, enemy);
+				EntityUtils.applyVulnerability(mPlugin, ENHANCEMENT_EFFECT_DURATION, mEnhanceVulnPotency, enemy);
 			} else if (eventAbility == ClassAbility.THUNDER_STEP) {
-				/* This will also happen for Thunder Elemental Arrows, but it is handled in ElementalArrows.java */
-				mPlugin.mEffectManager.addEffect(enemy, ENHANCE_WEAK_SRC,
-					new PercentDamageDealt(ENHANCEMENT_EFFECT_DURATION, -mEnhanceWeakPotency)
-						.damageTypes(ENHANCE_WEAK_AFFECTED_DAMAGE_TYPES));
+				// RNG 5 mob damage in 5 blocks, prioritizing elites and bosses
+				float dmg = SpellPower.getSpellDamage(mPlugin, mPlayer, (float) mEnhanceLightningDamage);
+				spellShockThunder(mPlayer, enemy, mEnhanceLightningRange, dmg, ENHANCE_THUNDER, mCosmetic);
 			} else if (ARCANE_ABILITIES.contains(eventAbility)) {
-				/* Does not check for Arcane Strike (U) since this can only happen once per tick, does not check for
-				 * Astral Omen to prevent triggering every spell */
-				if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, ENHANCE_SPEED_METAKEY)) {
-					final NavigableSet<Effect> oldEffects = mPlugin.mEffectManager.getEffects(mPlayer, ENHANCE_SPEED_SRC);
-					if (oldEffects != null && !oldEffects.isEmpty()) {
-						final Effect oldEffect = oldEffects.last();
-						final int oldStacks = (int) Math.round(oldEffect.getMagnitude() / ENHANCE_SPEED_POTENCY);
-						if (oldStacks >= ENHANCE_SPEED_MAX_STACKS) {
-							oldEffect.setDuration(ENHANCEMENT_EFFECT_DURATION);
-						} else {
-							oldEffect.clearEffect();
-							mPlugin.mEffectManager.addEffect(mPlayer, ENHANCE_SPEED_SRC,
-								new PercentSpeed(ENHANCEMENT_EFFECT_DURATION, mEnhanceSpeedPotency * (oldStacks + 1), ENHANCE_SPEED_SRC)
-									.deleteOnAbilityUpdate(true));
-						}
-					} else {
-						mPlugin.mEffectManager.addEffect(mPlayer, ENHANCE_SPEED_SRC,
-							new PercentSpeed(ENHANCEMENT_EFFECT_DURATION, mEnhanceSpeedPotency, ENHANCE_SPEED_SRC)
-								.deleteOnAbilityUpdate(true));
-					}
-				}
+				// 3 magic dot per second for 3s
+				float dotDmg = SpellPower.getSpellDamage(mPlugin, mPlayer, (float) mEnhanceDoTDamage);
+				CustomDamageOverTime dot = new CustomDamageOverTime(mEnhanceDoTDuration, dotDmg, Constants.TICKS_PER_SECOND, mPlayer, ENHANCE_ARCANE, DamageEvent.DamageType.MAGIC);
+				dot.setVisuals(this.mCosmetic::damageOverTimeEffects);
+				mPlugin.mEffectManager.addEffect(enemy, ENHANCE_DOT_EFFECT_NAME, dot);
 			}
 		}
 
@@ -187,7 +183,8 @@ public class Spellshock extends Ability {
 			existingStatic.trigger();
 			mCosmetic.meleeClearStatic(mPlayer, enemy);
 		} else if (eventAbility != null && !eventAbility.isFake() && eventAbility != ClassAbility.BLIZZARD
-			&& eventAbility != ClassAbility.ASTRAL_OMEN) {
+			&& eventAbility != ClassAbility.ASTRAL_OMEN && eventAbility != ClassAbility.SPELLSHOCK_ARCANE
+			&& eventAbility != ClassAbility.SPELLSHOCK_THUNDER) {
 			// Check if the mob has static, and trigger it if possible; otherwise, apply/refresh it
 			// We don't directly remove the effect, because we don't want mobs with static to immediately be re-applied
 			// with it, so set flags instead
@@ -242,6 +239,37 @@ public class Spellshock extends Ability {
 		return false; // Needs to apply to all damaged mobs. Uses an internal check to prevent recursion on dealing damage.
 	}
 
+	public static void spellShockThunder(Player player, LivingEntity from, double range, double damage, ClassAbility ability, SpellshockCS mCosmetic) {
+		//get targets
+		Location loc = from.getLocation();
+		List<LivingEntity> targets = EntityUtils.getNearbyMobs(loc, range);
+		List<LivingEntity> elites = new ArrayList<>();
+		List<LivingEntity> mobs = new ArrayList<>();
+		targets.removeIf(e -> e == from);
+		for (LivingEntity mob : targets) {
+			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
+				elites.add(mob);
+			} else {
+				mobs.add(mob);
+			}
+		}
+
+		//choose target
+		LivingEntity target = null;
+		if (!elites.isEmpty()) {
+			Collections.shuffle(elites);
+			target = elites.get(0);
+		} else if (!mobs.isEmpty()) {
+			Collections.shuffle(mobs);
+			target = mobs.get(0);
+		}
+		if (target != null) {
+			// attack target
+			DamageUtils.damage(player, target, DamageType.MAGIC, damage, ability, true, false);
+			mCosmetic.enhancedLightning(from, target);
+		}
+	}
+
 	private static Description<Spellshock> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Hitting an enemy with a spell inflicts Static for ")
@@ -274,22 +302,23 @@ public class Spellshock extends Ability {
 
 	private static Description<Spellshock> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Hitting an enemy inflicted with Static with certain spell types grants additional effects or applies additional debuffs. Arcane spells grant ")
-			.addPercent(a -> a.mEnhanceSpeedPotency, ENHANCE_SPEED_POTENCY)
-			.add(" speed for ")
-			.addDuration(ENHANCEMENT_EFFECT_DURATION)
-			.add(" seconds that stacks up to ")
-			.add(a -> ENHANCE_SPEED_MAX_STACKS, ENHANCE_SPEED_MAX_STACKS)
-			.add(" times, Fire spells gain ")
+			.add("Hitting an enemy inflicted with Static with certain spell types grants additional effects or applies additional debuffs. Arcane spells apply a magic DoT, dealing ")
+			.add(a -> a.mEnhanceDoTDamage, ENHANCE_DOT_DAMAGE)
+			.add(" damage per second for ")
+			.addDuration(ENHANCE_DOT_DURATION)
+			.add(" seconds. Fire spells gain ")
 			.addPercent(a -> a.mEnhanceDamageMult, ENHANCE_DAMAGE_MULT)
 			.add(" magic damage, enemies hit by Ice spells receive ")
 			.addPercent(a -> a.mEnhanceSlowPotency, ENHANCE_SLOW_POTENCY)
-			.add(" slowness for ")
+			.add(" slowness and ")
+			.addPercent(a -> a.mEnhanceVulnPotency, ENHANCE_VULN_POTENCY)
+			.add(" vulnerability for ")
 			.addDuration(ENHANCEMENT_EFFECT_DURATION)
-			.add(" seconds, and enemies hit by Lightning spells receive ")
-			.addPercent(a -> a.mEnhanceWeakPotency, ENHANCE_WEAK_POTENCY)
-			.add(" weakness for ")
-			.addDuration(ENHANCEMENT_EFFECT_DURATION)
-			.add(" seconds.");
+			.add(" seconds, and enemies hit by Lightning spells deal ")
+			.add(a -> a.mEnhanceLightningDamage, ENHANCE_LIGHTNING_DAMAGE)
+			.add(" damage to a random mob within ")
+			.add(a -> a.mEnhanceLightningRange, ENHANCE_LIGHTNING_RANGE)
+			.add(" blocks, prioritizing Elites and Bosses.")
+			.add(" All damage dealt by this Enhancement will not trigger nor apply Static, and is scaled by Spell Power");
 	}
 }

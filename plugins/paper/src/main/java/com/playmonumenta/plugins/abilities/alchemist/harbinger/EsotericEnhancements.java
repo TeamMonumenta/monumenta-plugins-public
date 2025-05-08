@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -38,10 +39,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class EsotericEnhancements extends Ability implements PotionAbility {
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 1;
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.5;
-	private static final double ABERRATION_POTION_DAMAGE_RAW_1 = 6;
-	private static final double ABERRATION_POTION_DAMAGE_RAW_2 = 7.5;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.8;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.0;
+	private static final double ABERRATION_POTION_DAMAGE_RAW_1 = 7.5;
+	private static final double ABERRATION_POTION_DAMAGE_RAW_2 = 9;
 	private static final double ABERRATION_DAMAGE_RADIUS = 3;
 	private static final int ABERRATION_SUMMON_DURATION = 30;
 	private static final double ABERRATION_BLEED_AMOUNT = 0.2;
@@ -51,6 +52,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	private static final double MAX_TARGET_Y = 6;
 	private static final int ABERRATION_LIFETIME = 15 * 20;
 	private static final int TICK_INTERVAL = 5;
+	private static final int TICK_INTERVAL_TARGET_RESET = 30;
 
 	public static final String CHARM_DAMAGE = "Esoteric Enhancements Damage";
 	public static final String CHARM_RADIUS = "Esoteric Enhancements Radius";
@@ -81,6 +83,8 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	private final Map<LivingEntity, Integer> mAppliedMobs = new HashMap<>();
 	private final EsotericEnhancementsCS mCosmetic;
 
+	private List<LivingEntity> mTargets;
+
 	public EsotericEnhancements(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? ABERRATION_POTION_DAMAGE_MULTIPLIER_1 : ABERRATION_POTION_DAMAGE_MULTIPLIER_2);
@@ -89,6 +93,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ABERRATION_DAMAGE_RADIUS);
 		mBleedDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_BLEED_DURATION);
 		mBleed = ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED);
+		mTargets = new ArrayList<>();
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EsotericEnhancementsCS());
 	}
@@ -103,10 +108,20 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 
 			// If it's still in the list, it was applied recently enough
 			if (mAppliedMobs.remove(mob) != null) {
+				mTargets.clear();
 				int num = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CREEPER);
-				for (int i = 0; i < num; i++) {
-					summonAberration(mob.getLocation(), playerItemStats);
-				}
+				Location summonLoc = mob.getLocation();
+				//summoning each should be delayed by 1 tick to prevent creepers targetting the same enemy?
+				new BukkitRunnable() {
+					int mCount = 0;
+					@Override public void run() {
+						summonAberration(summonLoc, playerItemStats);
+						mCount++;
+						if (mCount >= num) {
+							this.cancel();
+						}
+					}
+				}.runTaskTimer(mPlugin, 0, 1);
 				putOnCooldown();
 			}
 		}
@@ -153,10 +168,12 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 					}
 
 					if (mTicks % TICK_INTERVAL == 0) {
-						if (!isValidTarget(aberration, mTarget, true)) {
-							LivingEntity newTarget = findTarget(aberration);
+						//target validation checking needs to be empty list
+						if (!isValidTarget(aberration, mTarget, true, new ArrayList<>())) {
+							LivingEntity newTarget = findTarget(aberration, mTargets);
 							if (newTarget != null) {
 								mTarget = newTarget;
+								mTargets.add(newTarget);
 							}
 						}
 
@@ -174,6 +191,11 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 						}
 					}
 
+					mTargets.removeIf(e -> e.isDead() || !e.isValid());
+					if ((mTicks + 1) % TICK_INTERVAL_TARGET_RESET == 0) {
+						mTargets.clear();
+					}
+
 					mCosmetic.periodicEffects(mPlayer, aberration, mTicks);
 
 					mTicks += 1;
@@ -183,14 +205,23 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 		}, 1);
 	}
 
-	private boolean isValidTarget(Creeper aberration, @Nullable LivingEntity mob, boolean withPathfinding) {
+	private boolean isValidTarget(Creeper aberration, @Nullable LivingEntity mob, boolean withPathfinding, List<LivingEntity> targets) {
+		List<LivingEntity> nearbyTargeted = new ArrayList<>();
+		if (!targets.isEmpty()) {
+			for (LivingEntity le : targets) {
+				nearbyTargeted.addAll(EntityUtils.getNearbyMobs(le.getLocation(), 2));
+				nearbyTargeted.add(le);
+			}
+		}
+
 		return mob != null
 			       && mob.isValid()
 			       && mob.getLocation().distance(aberration.getLocation()) <= 1.5 * ABERRATION_TARGET_RADIUS
 			       && Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= 1.5 * MAX_TARGET_Y
 			       && !DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC)
 			       && !mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)
-			       && (!withPathfinding || canPathfind(aberration, mob));
+			       && (!withPathfinding || canPathfind(aberration, mob))
+				   && !nearbyTargeted.contains(mob);
 	}
 
 	private boolean canPathfind(Creeper aberration, LivingEntity mob) {
@@ -202,11 +233,11 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	 * Finds a target for the aberration. Prioritizes targets that it can see and pathfind to within 1.5 meters, then ones it cannot see but pathfind to,
 	 * followed by ones it can only see,and finally any within the targeting radius, always prioritizing the highest-health targets among those groups.
 	 */
-	private @Nullable LivingEntity findTarget(Creeper aberration) {
+	private @Nullable LivingEntity findTarget(Creeper aberration, List<LivingEntity> targets) {
 
 		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(aberration.getLocation(), ABERRATION_TARGET_RADIUS, aberration).stream()
 			                                .filter(mob -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= MAX_TARGET_Y)
-			                                .filter(mob -> isValidTarget(aberration, mob, false))
+			                                .filter(mob -> isValidTarget(aberration, mob, false, targets))
 			                                .sorted(Comparator.comparingDouble(Damageable::getHealth).reversed())
 			                                .toList();
 

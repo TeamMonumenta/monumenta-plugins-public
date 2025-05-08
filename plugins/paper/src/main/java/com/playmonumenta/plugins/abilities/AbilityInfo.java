@@ -153,6 +153,12 @@ public class AbilityInfo<T extends Ability> {
 		return this;
 	}
 
+	public AbilityInfo<T> cooldown(int cooldown1, int cooldown2, int cooldownEnhanced1, int cooldownEnhanced2, String charmCooldown) {
+		mCooldowns = List.of(cooldown1, cooldown2, cooldownEnhanced1, cooldownEnhanced2);
+		mCharmCooldown = charmCooldown;
+		return this;
+	}
+
 	public AbilityInfo<T> cooldown(String charmCooldown, int... cooldowns) {
 		mCooldowns = IntList.of(cooldowns);
 		mCharmCooldown = charmCooldown;
