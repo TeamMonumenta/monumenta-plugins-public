@@ -8,9 +8,10 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.Arrays;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -22,12 +23,17 @@ import org.bukkit.entity.Projectile;
 import org.jetbrains.annotations.Nullable;
 
 public class Retaliation implements Enchantment {
-	private static final String[] VALID_DEBUFFS = {"fire", "CustomSlow", "slow", "wither", "poison", "hunger", "CustomAntiHeal", "silence"};
 	private static final String EFFECT_SOURCE = "RetaliationEffect";
 	private static final int EFFECT_DURATION = 4 * 20;
-	private static final double BASE_DAMAGE = 0.25;
-	private static final double ELITE_BONUS = 0.15;
-	private static final double BOSS_BONUS = 0.25;
+	public static final double BASE_DAMAGE = 0.35;
+	public static final double ELITE_DAMAGE = 0.50;
+	public static final double BOSS_DAMAGE = 0.65;
+	private static final List<String> DOT_DEBUFFS = List.of("fire", "wither", "poison");
+	public static final String DOT_NAME = "☠";
+	private static final List<String> WEAK_DEBUFFS = List.of("weakness", "CustomDamageDecrease", "hunger", "CustomVulnerability");
+	public static final String WEAK_NAME = "\uD83D\uDDE1";
+	private static final List<String> SLOW_DEBUFFS = List.of("slow", "CustomSlow", "silence", "CustomAntiHeal");
+	public static final String SLOW_NAME = "⚓";
 
 	private int mLastProcTick = 0;
 
@@ -65,20 +71,24 @@ public class Retaliation implements Enchantment {
 		Plugin.getInstance().mEffectManager.clearEffects(player, EFFECT_SOURCE);
 
 		// Bosstag effects
-		StringBuilder debuffTypes = new StringBuilder();
+		Set<String> debuffTypes = new ObjectArraySet<>();
 		for (EffectsList.Effect effect : effectsList) {
-			if (!Arrays.stream(VALID_DEBUFFS).toList().contains(effect.mName)) {
-				continue;
+			if (DOT_DEBUFFS.contains(effect.mName)) {
+				debuffTypes.add(DOT_NAME);
 			}
-			debuffTypes.append(effect.mName);
+			if (WEAK_DEBUFFS.contains(effect.mName)) {
+				debuffTypes.add(WEAK_NAME);
+			}
+			if (SLOW_DEBUFFS.contains(effect.mName)) {
+				debuffTypes.add(SLOW_NAME);
+			}
 		}
 
 		// Mob type effects, don't apply if this was triggered by an ability
 		if (damager != null && !isBossAbility) {
 			switch (damager.getType()) {
-				case WITHER_SKELETON, WITHER_SKULL -> debuffTypes.append("wither");
-				case BEE, CAVE_SPIDER, PUFFERFISH -> debuffTypes.append("poison");
-				case HUSK -> debuffTypes.append("hunger");
+				case WITHER_SKELETON, WITHER_SKULL, BEE, CAVE_SPIDER, PUFFERFISH -> debuffTypes.add(DOT_NAME);
+				case HUSK -> debuffTypes.add(WEAK_NAME);
 				default -> {}
 			}
 		}
@@ -87,20 +97,20 @@ public class Retaliation implements Enchantment {
 			damager = (Entity) projectile.getShooter();
 			// Blazes and flame arrows
 			if (projectile.getFireTicks() > 0) {
-				debuffTypes.append("fire");
+				debuffTypes.add(DOT_NAME);
 			}
 			// Stray arrows
 			if (damager != null && damager.getType() == EntityType.STRAY) {
-				debuffTypes.append("slowness");
+				debuffTypes.add(SLOW_NAME);
 			}
 		}
 
-		double damage = BASE_DAMAGE + (damager != null && EntityUtils.isElite(damager) ? ELITE_BONUS : (damager != null && EntityUtils.isBoss(damager) ? BOSS_BONUS : 0));
+		double damage = damager != null && EntityUtils.isElite(damager) ? ELITE_DAMAGE : (damager != null && EntityUtils.isBoss(damager) ? BOSS_DAMAGE : BASE_DAMAGE);
 
-		if (damage == 0.5) {
+		if (damage == BOSS_DAMAGE) {
 			player.playSound(player, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1f, 1.4f);
 			player.playSound(player, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.HOSTILE, 0.65f, 1.2f);
-		} else if (damage == 0.4) {
+		} else if (damage == ELITE_DAMAGE) {
 			player.playSound(player, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1f, 1.6f);
 			player.playSound(player, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.HOSTILE, 0.5f, 1.4f);
 		} else {
@@ -108,31 +118,8 @@ public class Retaliation implements Enchantment {
 			player.playSound(player, Sound.ITEM_TRIDENT_RETURN, SoundCategory.HOSTILE, 0.8f, 1.0f);
 		}
 
-		Plugin.getInstance().mEffectManager.addEffect(player, EFFECT_SOURCE, new RetaliationEffect(EFFECT_DURATION, damage, debuffTypes.toString(), getDebuffIcons(debuffTypes.toString())));
-	}
-
-	public String getDebuffIcons(String debuffTypes) {
-		StringBuilder icons = new StringBuilder();
-
-		if (debuffTypes.contains("fire")) {
-			icons.append("\uD83D\uDD25");
-		}
-		if (debuffTypes.contains("CustomSlow") || debuffTypes.contains("slowness")) {
-			icons.append("⚓");
-		}
-		if (debuffTypes.contains("wither") || debuffTypes.contains("poison")) {
-			icons.append("☠");
-		}
-		if (debuffTypes.contains("hunger")) {
-			icons.append("\uD83C\uDF56");
-		}
-		if (debuffTypes.contains("CustomAntiHeal")) {
-			icons.append("❤");
-		}
-		if (debuffTypes.contains("silence")) {
-			icons.append("⏳");
-		}
-
-		return icons.toString();
+		StringBuilder debuffTypesString = new StringBuilder();
+		debuffTypes.forEach(debuffTypesString::append);
+		Plugin.getInstance().mEffectManager.addEffect(player, EFFECT_SOURCE, new RetaliationEffect(EFFECT_DURATION, damage, debuffTypesString.toString()));
 	}
 }

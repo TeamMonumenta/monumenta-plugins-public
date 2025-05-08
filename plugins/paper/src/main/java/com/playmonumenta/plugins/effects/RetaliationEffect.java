@@ -3,11 +3,11 @@ package com.playmonumenta.plugins.effects;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.itemstats.enchantments.Retaliation;
 import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
@@ -18,37 +18,28 @@ import org.jetbrains.annotations.Nullable;
 
 public class RetaliationEffect extends Effect {
 	public static final String effectID = "RetaliationEffect";
-	private static final String DAMAGE_BONUS_SOURCE = "RetaliationDamage";
-	private static final EnumSet<DamageType> VALID_HIT_DAMAGE_TYPES = DamageType.getScalableDamageType();
+	private static final EnumSet<DamageType> SOUND_AND_DEBUFF_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE, DamageType.PROJECTILE);
+	private static final EnumSet<DamageType> HALVED_BONUS_DAMAGE_TYPES = EnumSet.of(DamageType.PROJECTILE, DamageType.PROJECTILE_SKILL, DamageType.MAGIC);
 
-	private static final int BURNING_DURATION = 10 * 20;
-	private static final double BURNING_VULN = 0.15;
-	private static final String BURNING_SOURCE = "RetaliationBurningAttack";
-	private static final int SLOWING_DURATION = 10 * 20;
-	private static final double SLOWING_SLOW = 0.15;
-	private static final String SLOWING_SOURCE = "RetaliationSlowingAttack";
-	private static final int SICKENING_DURATION = 5 * 20;
-	private static final double SICKENING_DAMAGE_PER_10T = 5;
-	private static final String SICKENING_SOURCE = "RetaliationSickeningAttack";
-	private static final int HUNGERING_DURATION = 10 * 20;
-	private static final double HUNGERING_WEAKEN = 0.15;
-	private static final String HUNGERING_SOURCE = "RetaliationHungeringAttack";
-	private static final int ANTIHEAL_DURATION = 10 * 20;
-	private static final double ANTIHEAL_STRENGTH = 1;
-	private static final String ANTIHEAL_SOURCE = "RetaliationAntihealAttack";
-	private static final int SILENCE_DURATION = 3 * 20;
-	private static final String SILENCE_SOURCE = "RetaliationSilencingAttack";
+	private static final int DOT_DURATION = 5 * 20;
+	private static final double DOT_DAMAGE_PER_10T = 5;
+	private static final String DOT_SOURCE = "RetaliationDot";
+
+	private static final int WEAK_DURATION = 5 * 20;
+	private static final double WEAK_POTENCY = 0.2;
+	private static final String WEAK_SOURCE = "RetaliationWeak";
+
+	private static final int SLOW_DURATION = 5 * 20;
+	private static final double SLOW_POTENCY = 0.2;
+	private static final String SLOW_SOURCE = "RetaliationSlow";
 
 	private final double mAmount;
 	private String mDebuffTypes;
-	private final String mIcons;
-	private boolean mHasDamagedThisTick = false;
 
-	public RetaliationEffect(int duration, double amount, String debuffTypes, String icons) {
+	public RetaliationEffect(int duration, double amount, String debuffTypes) {
 		super(duration, effectID);
 		mAmount = amount;
 		mDebuffTypes = debuffTypes;
-		mIcons = icons;
 	}
 
 	@Override
@@ -60,62 +51,58 @@ public class RetaliationEffect extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
-		switch (mDebuffTypes) {
-			case "fire" -> entity.sendActionBar(Component.text("Retaliation primed! " + mIcons, NamedTextColor.RED));
-			case "CustomSlow", "slowness" -> entity.sendActionBar(Component.text("Retaliation primed! " + mIcons, NamedTextColor.GRAY));
-			case "wither", "poison" -> entity.sendActionBar(Component.text("Retaliation primed! " + mIcons, NamedTextColor.DARK_GRAY));
-			case "hunger" -> entity.sendActionBar(Component.text("Retaliation primed! " + mIcons, NamedTextColor.DARK_GREEN));
-			case "CustomAntiHeal" -> entity.sendActionBar(Component.text("Retaliation primed! " + mIcons, NamedTextColor.DARK_RED));
-			case "silence" -> entity.sendActionBar(Component.text("Retaliation primed! " + mIcons, NamedTextColor.WHITE));
-			case "" -> entity.sendActionBar(Component.text("Retaliation primed!", NamedTextColor.GOLD));
-			default -> entity.sendActionBar(Component.text("Retaliation primed! " + mIcons, NamedTextColor.DARK_PURPLE));
+		NamedTextColor color = NamedTextColor.GRAY;
+		if (mAmount == Retaliation.BOSS_DAMAGE) {
+			color = NamedTextColor.RED;
+		} else if (mAmount == Retaliation.ELITE_DAMAGE) {
+			color = NamedTextColor.GOLD;
 		}
+
+		if (mDebuffTypes.isEmpty()) {
+			entity.sendActionBar(Component.text("Retaliation primed!", color));
+			return;
+		}
+		Component icons = Component.text("");
+		if (mDebuffTypes.contains(Retaliation.DOT_NAME)) {
+			icons = icons.append(Component.text(Retaliation.DOT_NAME, TextColor.color(60, 40, 50)));
+		}
+		if (mDebuffTypes.contains(Retaliation.WEAK_NAME)) {
+			icons = icons.append(Component.text(Retaliation.WEAK_NAME, TextColor.color(150, 50, 75)));
+		}
+		if (mDebuffTypes.contains(Retaliation.SLOW_NAME)) {
+			icons = icons.append(Component.text(Retaliation.SLOW_NAME, TextColor.color(75, 85, 100)));
+		}
+
+		entity.sendActionBar(Component.text("Retaliation primed! ", color).append(Component.text("[", NamedTextColor.GRAY)).append(icons).append(Component.text("]", NamedTextColor.GRAY)));
 	}
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
-		Plugin plugin = Plugin.getInstance();
-		if (VALID_HIT_DAMAGE_TYPES.contains(event.getType()) && entity instanceof Player player && !mHasDamagedThisTick) {
-			if (!mDebuffTypes.isEmpty()) {
-				player.playSound(enemy.getLocation(), Sound.BLOCK_TRIAL_SPAWNER_SPAWN_MOB, SoundCategory.HOSTILE, 1f, 1f);
+		if (!DamageType.getScalableDamageType().contains(event.getType())) {
+			return;
+		}
+		event.updateGearDamageWithMultiplier(1 + (HALVED_BONUS_DAMAGE_TYPES.contains(event.getType()) ? mAmount * 0.5 : mAmount));
 
-				if (mDebuffTypes.contains("fire")) {
-					plugin.mEffectManager.addEffect(enemy, BURNING_SOURCE, new PercentDamageReceived(BURNING_DURATION, BURNING_VULN));
-					EntityUtils.applyFire(plugin, BURNING_DURATION, enemy, player);
-				}
-				if (mDebuffTypes.contains("CustomSlow") || mDebuffTypes.contains("slowness")) {
-					plugin.mEffectManager.addEffect(enemy, SLOWING_SOURCE, new PercentSpeed(SLOWING_DURATION, -SLOWING_SLOW, "RetaliationSlowing"));
-				}
-				if (mDebuffTypes.contains("wither") || mDebuffTypes.contains("poison")) {
-					plugin.mEffectManager.addEffect(enemy, SICKENING_SOURCE, new CustomDamageOverTime(SICKENING_DURATION, SICKENING_DAMAGE_PER_10T, 10, null, null));
+		Plugin plugin = Plugin.getInstance();
+		if (SOUND_AND_DEBUFF_DAMAGE_TYPES.contains(event.getType()) && entity instanceof Player player) {
+			player.playSound(entity.getLocation(), Sound.BLOCK_TRIAL_SPAWNER_OPEN_SHUTTER, 1f, 1f);
+			if (!mDebuffTypes.isEmpty()) {
+				player.playSound(enemy.getLocation(), Sound.BLOCK_TRIAL_SPAWNER_SPAWN_MOB, SoundCategory.HOSTILE, 1.35f, 1f);
+
+				if (mDebuffTypes.contains(Retaliation.DOT_NAME)) {
+					plugin.mEffectManager.addEffect(enemy, DOT_SOURCE, new CustomDamageOverTime(DOT_DURATION, DOT_DAMAGE_PER_10T, 10, null, null));
+					player.setFireTicks(0);
 					plugin.mPotionManager.clearPotionEffectType(player, PotionEffectType.POISON);
 					plugin.mPotionManager.clearPotionEffectType(player, PotionEffectType.WITHER);
 				}
-				if (mDebuffTypes.contains("hunger")) {
-					plugin.mEffectManager.addEffect(enemy, HUNGERING_SOURCE, new PercentDamageDealt(HUNGERING_DURATION, -HUNGERING_WEAKEN));
+				if (mDebuffTypes.contains(Retaliation.WEAK_NAME)) {
+					plugin.mEffectManager.addEffect(enemy, WEAK_SOURCE, new PercentDamageDealt(WEAK_DURATION, -WEAK_POTENCY));
 				}
-				if (mDebuffTypes.contains("CustomAntiHeal")) {
-					plugin.mEffectManager.addEffect(enemy, ANTIHEAL_SOURCE, new PercentHeal(ANTIHEAL_DURATION, -ANTIHEAL_STRENGTH));
+				if (mDebuffTypes.contains(Retaliation.SLOW_NAME)) {
+					plugin.mEffectManager.addEffect(enemy, SLOW_SOURCE, new PercentSpeed(SLOW_DURATION, -SLOW_POTENCY, SLOW_SOURCE));
 				}
-				if (mDebuffTypes.contains("silence")) {
-					plugin.mEffectManager.addEffect(enemy, SILENCE_SOURCE, new AbilitySilence(SILENCE_DURATION));
-				}
+				mDebuffTypes = "";
 			}
-
-			plugin.mEffectManager.addEffect(enemy, DAMAGE_BONUS_SOURCE, new PercentDamageReceived(1, mAmount, VALID_HIT_DAMAGE_TYPES) {
-				@Override
-				public void onHurt(LivingEntity entity2, DamageEvent event2) {
-					// The damage bonus effect must only work for the player applying it
-					if (VALID_HIT_DAMAGE_TYPES.contains(event2.getType()) && event2.getDamager() == entity)	{
-					event2.updateDamageWithMultiplier(1 + mAmount);
-						player.playSound(entity2.getLocation(), Sound.BLOCK_TRIAL_SPAWNER_OPEN_SHUTTER, 1.25f, 1f);
-					}
-				}
-			});
-			mDebuffTypes = "";
-
-			mHasDamagedThisTick = true;
-			Bukkit.getScheduler().runTask(plugin, () -> mHasDamagedThisTick = false);
 		}
 	}
 
@@ -131,7 +118,7 @@ public class RetaliationEffect extends Effect {
 
 	@Override
 	public @Nullable String getDisplayedName() {
-		return "+" + (int) (100 * mAmount) + "% Retaliation" + (mDebuffTypes.isEmpty() ? "" : " " + mIcons);
+		return "+" + (int) (100 * mAmount) + "% Retaliation" + (mDebuffTypes.isEmpty() ? "" : " [" + mDebuffTypes + "]");
 	}
 
 	@Override
