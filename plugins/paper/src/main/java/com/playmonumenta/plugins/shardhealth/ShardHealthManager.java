@@ -4,6 +4,8 @@ import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.shardhealth.g1.G1Listener;
+import com.playmonumenta.plugins.utils.MMLog;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.TextArgument;
@@ -28,11 +30,17 @@ public class ShardHealthManager {
 	private static final int HEAP_DUMP_AFTER_TICKS = 20 * 60 * 20;
 	private static boolean mCreatedAutoHeapDump = false;
 
+	public static final G1Listener G1_LISTENER = new G1Listener();
+
 	private static @Nullable BukkitRunnable mRunnable = null;
 	private static int mRotatingShardHealthLastUpdate = 0;
 	private static final List<ShardHealth> mRotatingShardHealth = new ArrayList<>();
 
-	public static void registerCommands() {
+	public static void init() {
+		if (!G1_LISTENER.beginListen()) {
+			MMLog.severe("failed to initialize G1 garbage collector shard health gatherer... did we switch go ZGC?");
+		}
+
 		CommandAPICommand instantSubcommand = new CommandAPICommand("instant")
 			.executes((sender, args) -> {
 				sender.sendMessage(Component.text("", NamedTextColor.GOLD).append(ShardHealth.instantHealth()));
@@ -82,6 +90,7 @@ public class ShardHealthManager {
 	 * Pause execution until shard performance improves enough to continue
 	 * If the health starts in good condition, continues immediately
 	 * This version attempts to provide sane defaults
+	 *
 	 * @param audience The players to notify of paused execution via actionbar messages
 	 * @return A CompletableFuture to wait for completion of before continuing
 	 */
@@ -98,9 +107,10 @@ public class ShardHealthManager {
 	/**
 	 * Pause execution until shard performance improves enough to continue
 	 * If the health starts in good condition, continues immediately
+	 *
 	 * @param audience               The players to notify of paused execution via actionbar messages
 	 * @param minHealthScore         The minimum overall health required to continue;
-	 *                                  1.0 is impossibly good, 0.0 is lagging or dead
+	 *                               1.0 is impossibly good, 0.0 is lagging or dead
 	 * @param minTargetHealth        The specific health score targets to meet
 	 * @param maintainHealthForTicks The number of ticks the shard must remain healthy before the pause ends; 0 to disable
 	 * @param averageOverTicks       Get the average shard health over this many ticks
@@ -189,6 +199,7 @@ public class ShardHealthManager {
 
 	/**
 	 * Returns a combined score of server performance
+	 *
 	 * @return Combined server performance, 1.0 is impossibly good
 	 */
 	public static double serverHealthScore() {
@@ -197,6 +208,7 @@ public class ShardHealthManager {
 
 	/**
 	 * Check how much memory is unallocated
+	 *
 	 * @return How much memory is unallocated on a scale of 0.0 to 1.0
 	 */
 	public static double unallocatedMemoryPercent() {
@@ -216,6 +228,7 @@ public class ShardHealthManager {
 	/**
 	 * Returns what percent of the last tick was not used - will be equal to 0 if that tick took too long!
 	 * Note that the current tick's info isn't available until the next tick.
+	 *
 	 * @return The percent of the last tick that is not being used on a scale of 0.0 to 1.0
 	 */
 	public static double lastTickUnusedPercent() {
@@ -243,6 +256,8 @@ public class ShardHealthManager {
 				if (lastTick < 0) {
 					return;
 				}
+
+				G1_LISTENER.tick();
 
 				// Intentionally 1 higher to avoid issues with async code
 				int maxSizeForAverages = MAX_TICKS_FOR_AVERAGES + 1;
@@ -288,6 +303,7 @@ public class ShardHealthManager {
 	/**
 	 * Returns an iterator of shard health for each of the previous ticks, starting with the previous tick and working backwards.
 	 * Stops iterating when out of ticks with health data, or when the rotating list catches up with the last written tick
+	 *
 	 * @return An iterator of previous shard health
 	 */
 	public static Iterator<ShardHealth> previousInstantHealthIterator() {

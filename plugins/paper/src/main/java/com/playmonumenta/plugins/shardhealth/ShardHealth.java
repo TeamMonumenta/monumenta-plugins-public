@@ -2,9 +2,11 @@ package com.playmonumenta.plugins.shardhealth;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.playmonumenta.plugins.shardhealth.g1.G1GcHealth;
 import java.util.Iterator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,10 +14,12 @@ public class ShardHealth implements ComponentLike {
 	private @Nullable Double mHealthScore = null;
 	private double mMemoryHealth;
 	private double mTickHealth;
+	private @Nullable G1GcHealth mGcHealth;
 
-	protected ShardHealth(double memoryHealth, double tickHealth) {
+	protected ShardHealth(double memoryHealth, double tickHealth, @Nullable G1GcHealth gcHealth) {
 		mMemoryHealth = memoryHealth;
 		mTickHealth = tickHealth;
+		mGcHealth = gcHealth;
 	}
 
 	/**
@@ -54,7 +58,8 @@ public class ShardHealth implements ComponentLike {
 
 		return new ShardHealth(
 			aveMem / actualTicks,
-			aveTickUnused / actualTicks
+			aveTickUnused / actualTicks,
+			ShardHealthManager.G1_LISTENER.getHealth()
 		);
 	}
 
@@ -66,21 +71,24 @@ public class ShardHealth implements ComponentLike {
 	public static ShardHealth instantHealth() {
 		return new ShardHealth(
 			ShardHealthManager.unallocatedMemoryPercent(),
-			ShardHealthManager.lastTickUnusedPercent()
+			ShardHealthManager.lastTickUnusedPercent(),
+			ShardHealthManager.G1_LISTENER.getHealth()
 		);
 	}
 
 	public static ShardHealth defaultTargetHealth() {
 		return new ShardHealth(
 			0.3,
-			0.7
+			0.7,
+			null
 		);
 	}
 
 	public static ShardHealth unacceptableTargetHealth() {
 		return new ShardHealth(
 			0.0,
-			0.0
+			0.0,
+			null
 		);
 	}
 
@@ -108,6 +116,8 @@ public class ShardHealth implements ComponentLike {
 			result.tickHealth(tickHealthPrimitive.getAsDouble());
 		}
 
+		result.gcHealth(G1GcHealth.fromJson(object.get("gcHealth")));
+
 		return result;
 	}
 
@@ -117,6 +127,10 @@ public class ShardHealth implements ComponentLike {
 		result.addProperty("healthScore", healthScore());
 		result.addProperty("memoryHealth", memoryHealth());
 		result.addProperty("tickHealth", tickHealth());
+
+		if (gcHealth() != null) {
+			result.add("gcHealth", gcHealth().toJson());
+		}
 
 		return result;
 	}
@@ -149,6 +163,17 @@ public class ShardHealth implements ComponentLike {
 	public ShardHealth healthScore(@Nullable Double healthScore) {
 		mHealthScore = healthScore;
 		return this;
+	}
+
+	public ShardHealth gcHealth(@Nullable G1GcHealth health) {
+		mGcHealth = health;
+		return this;
+	}
+
+	@Contract(pure = true)
+	@Nullable
+	public G1GcHealth gcHealth() {
+		return mGcHealth;
 	}
 
 	@Override

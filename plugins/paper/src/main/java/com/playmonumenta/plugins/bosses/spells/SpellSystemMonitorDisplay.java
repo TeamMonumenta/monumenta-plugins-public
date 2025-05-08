@@ -1,37 +1,138 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import static com.playmonumenta.plugins.Constants.Tags.REMOVE_ON_UNLOAD;
-
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.plugins.bosses.bosses.SystemMonitorDisplayBoss;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.shardhealth.ShardHealth;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import net.kyori.adventure.key.Key;
+import com.playmonumenta.plugins.shardhealth.g1.G1GcHealth;
+import com.playmonumenta.plugins.utils.TableFormatter;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.util.HSVLike;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.TextDisplay;
 
+import static com.playmonumenta.plugins.Constants.Tags.REMOVE_ON_UNLOAD;
+
 public class SpellSystemMonitorDisplay extends Spell {
-	private static final String SHARD_HEADER = "Shard";
-	private static final String HEALTH_HEADER = "Health";
-	private static final String MEMORY_HEADER = "Memory";
-	private static final String TICK_HEADER = "Idle Time";
-	private static final int HEALTH_COL_LENGTH = HEALTH_HEADER.length();
-	private static final int MEMORY_COL_LENGTH = MEMORY_HEADER.length();
-	private static final int TICK_COL_LENGTH = TICK_HEADER.length();
+	private static final int KIB_FACTOR = 1024;
+	private static final int MIB_FACTOR = KIB_FACTOR * KIB_FACTOR;
+	private static final int GIB_FACTOR = MIB_FACTOR * KIB_FACTOR;
+	public static final DecimalFormat NUMBER_FORMATTER = new DecimalFormat("0.###");
+
+	private static final ShardHealth YELLOW_HEALTH = ShardHealth.defaultTargetHealth();
+	private static final Color BACKGROUND_COLOR = Color.fromARGB(255, 0x2E, 0x34, 0x36);
 
 	private final Entity mBoss;
+	private final boolean mIncludeGcInfo;
 
-	public SpellSystemMonitorDisplay(final Entity boss) {
+	public SpellSystemMonitorDisplay(final Entity boss, boolean includeGcInfo) {
 		mBoss = boss;
+		mIncludeGcInfo = includeGcInfo;
+	}
+
+	private static Component coloredStat(ShardHealth health, Function<ShardHealth, Double> func) {
+		double value = func.apply(health);
+		return Component.text(String.format("%.2f", value), mixColors(func.apply(YELLOW_HEALTH), value));
+	}
+
+	private static String formatByte(double bytes) {
+		if (bytes == 0) {
+			return "0";
+		}
+
+		if (bytes > GIB_FACTOR) {
+			return NUMBER_FORMATTER.format(bytes / GIB_FACTOR) + " GiB";
+		} else if (bytes > MIB_FACTOR) {
+			return NUMBER_FORMATTER.format(bytes / MIB_FACTOR) + " MiB";
+		} else if (bytes > KIB_FACTOR) {
+			return NUMBER_FORMATTER.format(bytes / KIB_FACTOR) + " KiB";
+		}
+
+		return NUMBER_FORMATTER.format(bytes) + " B";
+	}
+
+	private TableFormatter.TabulationResult computeText() {
+		final var shards = new ArrayList<>(NetworkRelayAPI.getOnlineShardNames());
+		shards.sort(String::compareTo);
+
+		List<List<Component>> table = new ArrayList<>();
+
+		for (final var shard : shards) {
+			ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shard);
+			final var gcHealth = Objects.requireNonNullElse(
+				shardHealth.gcHealth(),
+				new G1GcHealth(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+			);
+
+			final var entries = new ArrayList<>(List.of(
+				Component.text(shard),
+				coloredStat(shardHealth, ShardHealth::healthScore),
+				coloredStat(shardHealth, ShardHealth::memoryHealth),
+				coloredStat(shardHealth, ShardHealth::tickHealth)
+			));
+
+			if (mIncludeGcInfo) {
+				entries.addAll(List.of(
+					Component.text(
+						String.format(
+							"%s/%s/%.2f",
+							(int) gcHealth.oldGenCycleInInterval(),
+							formatByte(gcHealth.averageOldGenFreed()),
+							gcHealth.averageOldGenTime()
+						)
+					),
+					Component.text(
+						String.format(
+							"%s/%s/%.2f",
+							(int) gcHealth.youngGenCycleInInterval(),
+							formatByte(gcHealth.averageYoungGenFreed()),
+							gcHealth.averageYoungGenTime()
+						)
+					),
+					Component.text(
+						String.format(
+							"%s/%s/%.2f",
+							(int) gcHealth.concurrentCycleInInterval(),
+							formatByte(gcHealth.averageConcurrentFreed()),
+							gcHealth.averageConcurrentTime()
+						)
+					),
+					Component.text(
+						String.format(
+							"%s/%s/%.2f",
+							(int) gcHealth.overallCyclesInInterval(),
+							formatByte(gcHealth.averageOverallFreed()),
+							gcHealth.averageOverallTime()
+						)
+					)
+				));
+			}
+
+			table.add(entries);
+		}
+
+		final var headers = new ArrayList<>(List.of("Shard", "Health", "Memory", "Idle Time"));
+
+		if (mIncludeGcInfo) {
+			headers.addAll(List.of("G1 Old", "G1 Young", "G1 Concurrent", "G1 Overall"));
+		}
+
+		return TableFormatter.tabulate(
+			TextColor.color(BACKGROUND_COLOR.asRGB()),
+			headers.stream().map(Component::text).toList(),
+			table,
+			" | "
+		);
 	}
 
 	@Override
@@ -54,53 +155,13 @@ public class SpellSystemMonitorDisplay extends Spell {
 			textDisplay = loc.getWorld().spawn(loc, TextDisplay.class);
 			textDisplay.addScoreboardTag(SystemMonitorDisplayBoss.identityTag);
 			textDisplay.addScoreboardTag(REMOVE_ON_UNLOAD);
-			textDisplay.setBackgroundColor(Color.fromARGB(255, 0x2E, 0x34, 0x36));
+			textDisplay.setBackgroundColor(BACKGROUND_COLOR);
 		}
 
-		ShardHealth yellowHealth = ShardHealth.defaultTargetHealth();
-
-		int maxShardNameLength = SHARD_HEADER.length();
-		TreeSet<String> shardNames = new TreeSet<>(NetworkRelayAPI.getOnlineShardNames());
-		for (String shardName : shardNames) {
-			maxShardNameLength = Math.max(maxShardNameLength, shardName.length());
-		}
-
-		int lineWidth = 10 + maxShardNameLength + HEALTH_COL_LENGTH + MEMORY_COL_LENGTH + TICK_COL_LENGTH;
-		// ...of course this is in pixels; just going to set it wider than needed
-		textDisplay.setLineWidth(16 * lineWidth);
-
-		Component header = Component.text("")
-			.font(Key.key("minecraft:uniform"))
-			.append(Component.text(String.format(
-				"%" + maxShardNameLength + "s | %" + HEALTH_COL_LENGTH + "s | %" + MEMORY_COL_LENGTH +"s | %" + TICK_COL_LENGTH + "s",
-				SHARD_HEADER,
-				HEALTH_HEADER,
-				MEMORY_HEADER,
-				TICK_HEADER
-			), NamedTextColor.GOLD))
-			.append(Component.newline());
-
-		TreeMap<String, Component> sortedShardLines = new TreeMap<>();
-		for (String shardName : shardNames) {
-			ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shardName);
-
-			TextColor healthTextColor = mixColors(yellowHealth.healthScore(), shardHealth.healthScore());
-			TextColor memoryTextColor = mixColors(yellowHealth.memoryHealth(), shardHealth.memoryHealth());
-			TextColor tickTextColor = mixColors(yellowHealth.tickHealth(), shardHealth.tickHealth());
-
-			Component shardComponent = Component.text(String.format("%" + maxShardNameLength + "s | ", shardName), healthTextColor)
-				.append(Component.text(String.format("%" + HEALTH_COL_LENGTH + ".2f", 100 * shardHealth.healthScore())))
-				.append(Component.text(" | "))
-				.append(Component.text(String.format("%" + MEMORY_COL_LENGTH + ".2f", 100 * shardHealth.memoryHealth()), memoryTextColor))
-				.append(Component.text(" | "))
-				.append(Component.text(String.format("%" + TICK_COL_LENGTH + ".2f", 100 * shardHealth.tickHealth()), tickTextColor))
-				;
-
-			sortedShardLines.put(shardName, shardComponent);
-		}
-
-		textDisplay.text(header
-			.append(Component.join(JoinConfiguration.newlines(), sortedShardLines.values())));
+		final var tabResult = computeText();
+		textDisplay.setAlignment(TextDisplay.TextAlignment.CENTER);
+		textDisplay.setLineWidth(TableFormatter.UNIT_TO_PX * tabResult.width());
+		textDisplay.text(Component.empty().font(NamespacedKey.fromString("minecraft:uniform")).append(tabResult.text()));
 	}
 
 	private static TextColor mixColors(
@@ -148,6 +209,6 @@ public class SpellSystemMonitorDisplay extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return 1;
+		return 10; // no need to fire this every tick...
 	}
 }
