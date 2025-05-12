@@ -70,6 +70,7 @@ import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.managers.PlayerSkinManager;
 import com.playmonumenta.plugins.managers.PlayerTitleManager;
 import com.playmonumenta.plugins.managers.PlaylistManager;
+import com.playmonumenta.plugins.managers.SmartFurnaceManager;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
 import com.playmonumenta.plugins.managers.UsernameManager;
 import com.playmonumenta.plugins.managers.travelanchor.TravelAnchorCommands;
@@ -532,6 +533,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new WorldListener(this), this);
 		manager.registerEvents(new ShulkerShortcutListener(this), this);
 		manager.registerEvents(mShulkerEquipmentListener, this);
+		manager.registerEvents(SmartFurnaceManager.getInstance(), this);
 		manager.registerEvents(TravelAnchorManager.getInstance(), this);
 		manager.registerEvents(new ExplosionManager(), this);
 		manager.registerEvents(new LootboxManager(this), this);
