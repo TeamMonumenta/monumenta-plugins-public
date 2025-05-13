@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.listeners;
 import com.destroystokyo.paper.event.entity.EndermanEscapeEvent;
 import com.destroystokyo.paper.event.entity.EntityZapEvent;
 import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
+import com.playmonumenta.papermixins.paperapi.v1.event.IronGolemHealEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
@@ -485,4 +486,8 @@ public class MobListener implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void ironGolemHealEvent(IronGolemHealEvent event) {
+		event.setCancelled(true);
+	}
 }

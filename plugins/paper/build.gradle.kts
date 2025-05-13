@@ -23,6 +23,7 @@ dependencies {
 	implementation("com.opencsv:opencsv:5.5") // generateitems
 	implementation("org.apache.commons:commons-lang3:3.17.0")
 	implementation("org.apache.commons:commons-math3:3.6.1")
+	implementation("com.playmonumenta.papermixins:plugin-api:2.0.5")
 
 	compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 	compileOnly("dev.jorel:commandapi-bukkit-core:9.4.1")
