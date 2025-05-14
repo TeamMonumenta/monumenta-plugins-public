@@ -25,10 +25,8 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -84,9 +82,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private int mChargeTime;
 	private final IndependentIframeTracker mIframeTracker;
 	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
-
-	private static @Nullable ItemStack GRUESOME_POTION = null;
-	private static @Nullable ItemStack BRUTAL_POTION = null;
 
 	public static final AbilityInfo<AlchemistPotions> INFO =
 			new AbilityInfo<>(AlchemistPotions.class, "Alchemist Potions", AlchemistPotions::new)
@@ -179,23 +174,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	 * This function will set the given ThrownPotion potion to an Alchemist Potion, ONLY to an aesthetic level
 	 */
 	public void setPotionAlchemistPotionAesthetic(ThrownPotion potion, boolean gruesome) {
-		if (BRUTAL_POTION == null || GRUESOME_POTION == null) {
-			ItemStack basePotion = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKeyUtils.fromString("epic:r1/items/alchemists_potion"));
-			if (basePotion == null) {
-				mPlugin.getLogger().severe("Failed to get alchemist's potion from loot table!");
-				return;
-			}
-
-			BRUTAL_POTION = basePotion.clone();
-			GRUESOME_POTION = basePotion.clone();
-		}
-
-		ItemStack item;
-		if (gruesome) {
-			item = GRUESOME_POTION.clone();
-		} else {
-			item = BRUTAL_POTION.clone();
-		}
+		ItemStack item = potion.getItem();
 		item.editMeta(m -> {
 			((PotionMeta) m).setColor(mCosmetic.splashColor(gruesome));
 		});
@@ -475,10 +454,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	@Override
 	public @Nullable String getMode() {
 		return isGruesomeMode() ? "gruesome" : null;
-	}
-
-	public boolean isAlchemistPotion(ThrownPotion potion) {
-		return BRUTAL_POTION != null && ItemUtils.getPlainNameIfExists(BRUTAL_POTION).equals(ItemUtils.getPlainNameIfExists(potion.getItem()));
 	}
 
 	@Override
