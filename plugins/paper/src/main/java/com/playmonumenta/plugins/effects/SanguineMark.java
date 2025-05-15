@@ -16,15 +16,17 @@ public class SanguineMark extends Effect {
 	private final boolean mLevelTwo;
 	private final double mHealPercent;
 	private final double mDamageBoost;
+	private int mMarks;
 	private final Player mPlayer;
 	private final Plugin mPlugin;
 	private final SanguineHarvestCS mCosmetic;
 
-	public SanguineMark(boolean isLevelTwo, double healPercent, double damage, int duration, Player player, Plugin plugin, SanguineHarvestCS cosmetic) {
+	public SanguineMark(boolean isLevelTwo, double healPercent, double damage, int marks, int duration, Player player, Plugin plugin, SanguineHarvestCS cosmetic) {
 		super(duration, effectID);
 		mLevelTwo = isLevelTwo;
 		mHealPercent = healPercent;
 		mDamageBoost = damage;
+		mMarks = marks;
 		mPlayer = player;
 		mPlugin = plugin;
 		mCosmetic = cosmetic;
@@ -50,7 +52,10 @@ public class SanguineMark extends Effect {
 			double maxHealth = EntityUtils.getMaxHealth(player);
 			PlayerUtils.healPlayer(mPlugin, player, mHealPercent * maxHealth, mPlayer);
 
-			clearEffect();
+			mMarks--;
+			if (mMarks <= 0) {
+				clearEffect();
+			}
 		}
 	}
 

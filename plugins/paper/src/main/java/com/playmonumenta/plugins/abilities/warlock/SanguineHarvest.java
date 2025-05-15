@@ -49,6 +49,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	private static final int MARK_DURATION = 20 * 20;
 	private static final int COOLDOWN = 20 * 20;
 	private static final double HITBOX_LENGTH = 0.55;
+	private static final int MARKS = 1;
 
 	private static final double ENHANCEMENT_DMG_INCREASE = 0.03;
 	private static final int ENHANCEMENT_BLIGHT_DURATION = 20 * 6;
@@ -66,6 +67,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	public static final String CHARM_DAMAGE_BOOST = "Sanguine Harvest Damage Boost Amplifier";
 	public static final String CHARM_BLIGHT_DURATION = "Sanguine Harvest Blight Duration";
 	public static final String CHARM_BLIGHT_VULN_PER_DEBUFF = "Sanguine Harvest Blight Vulnerability Per Debuff";
+	public static final String CHARM_MARKS = "Sanguine Harvest Marks";
 
 	public static final AbilityInfo<SanguineHarvest> INFO =
 			new AbilityInfo<>(SanguineHarvest.class, "Sanguine Harvest", SanguineHarvest::new)
@@ -89,6 +91,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	private final double mRange;
 	private final int mBlightDuration;
 	private final double mBlightVulnPerDebuff;
+	private final int mMarks;
 
 	private int mCurrDuration = -1;
 
@@ -106,6 +109,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 		mBlightDuration = CharmManager.getDuration(mPlayer, CHARM_BLIGHT_DURATION, ENHANCEMENT_BLIGHT_DURATION);
 		mBlightVulnPerDebuff = ENHANCEMENT_DMG_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLIGHT_VULN_PER_DEBUFF);
+		mMarks = MARKS + (int) CharmManager.getLevel(player, CHARM_MARKS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SanguineHarvestCS());
 	}
 
@@ -191,7 +195,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			MovementUtils.knockAway(loc, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, 0.2f), 0.2f, true);
-			mPlugin.mEffectManager.addEffect(mob, SANGUINE_NAME, new SanguineMark(isLevelTwo(), mHealPercent, mDamageBoost, MARK_DURATION, mPlayer, mPlugin, mCosmetic));
+			mPlugin.mEffectManager.addEffect(mob, SANGUINE_NAME, new SanguineMark(isLevelTwo(), mHealPercent, mDamageBoost, mMarks, MARK_DURATION, mPlayer, mPlugin, mCosmetic));
 		}
 	}
 

@@ -129,7 +129,7 @@ public class LightningTotem extends TotemAbility {
 			}
 		}
 		double damageApplied = (mDamage + mDecayedTotemBuff)
-			* (bonusAction ? ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY : 1);
+			* (bonusAction ? (ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_NEGATIVE_TOTEM_EFFICIENCY)) : 1);
 		if (mTarget != null) {
 			DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC,
 				mInfo.getLinkedSpell(), stats), damageApplied, true, false, false);

@@ -41,6 +41,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	private static final double RONDE_ANGLE = 35;
 	private static final float RONDE_KNOCKBACK_SPEED = 0.14f;
 	private static final float RONDE_ATTACK_SPEED_SCALING_PORTION = 0.35f;
+	private static final int RONDE_STACKS_REQ = 1;
 
 	public static final String CHARM_DAMAGE = "Deadly Ronde Damage";
 	public static final String CHARM_RADIUS = "Deadly Ronde Radius";
@@ -49,6 +50,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	public static final String CHARM_STACKS = "Deadly Ronde Max Stacks";
 	public static final String CHARM_SPEED = "Deadly Ronde Speed Amplifier";
 	public static final String CHARM_DECAY_TIME = "Deadly Ronde Stack Decay Time";
+	public static final String CHARM_STACKS_REQ = "Deadly Ronde Stack Requirement";
 
 	public static final AbilityInfo<DeadlyRonde> INFO =
 		new AbilityInfo<>(DeadlyRonde.class, "Deadly Ronde", DeadlyRonde::new)
@@ -68,6 +70,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	private final int mMaxStacks;
 	private final double mSpeed;
 	private final int mDecayTime;
+	private final int mStacksReq;
 	private final DeadlyRondeCS mCosmetic;
 
 	public DeadlyRonde(Plugin plugin, Player player) {
@@ -78,6 +81,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		mMaxStacks = (isLevelOne() ? RONDE_1_MAX_STACKS : RONDE_2_MAX_STACKS) + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 		mSpeed = RONDE_SPEED_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 		mDecayTime = CharmManager.getDuration(mPlayer, CHARM_DECAY_TIME, RONDE_DECAY_TIMER);
+		mStacksReq = RONDE_STACKS_REQ + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS_REQ);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DeadlyRondeCS());
 	}
 
@@ -129,9 +133,9 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mActiveRunnable != null
-			    && event.getType() == DamageType.MELEE
-			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)
-				&& mRondeStacks > 0) {
+			&& event.getType() == DamageType.MELEE
+			&& InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)
+			&& mRondeStacks > 0 && mRondeStacks >= mStacksReq) {
 			float cooldownRatio = mPlayer.getCooledAttackStrength(0);
 			float damageRatio = (1 - RONDE_ATTACK_SPEED_SCALING_PORTION) + (RONDE_ATTACK_SPEED_SCALING_PORTION * cooldownRatio);
 			double damage = mDamage * damageRatio;
@@ -151,7 +155,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			mActiveRunnable.cancel();
 			mActiveRunnable = null;
 
-			mRondeStacks--;
+			mRondeStacks -= mStacksReq;
 			showChargesMessage();
 			ClientModHandler.updateAbility(mPlayer, this);
 			if (mRondeStacks > 0) {

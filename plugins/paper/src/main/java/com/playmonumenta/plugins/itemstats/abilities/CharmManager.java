@@ -289,6 +289,7 @@ public class CharmManager {
 			ThunderStep.CHARM_COOLDOWN,
 			ThunderStep.CHARM_DISTANCE,
 			ThunderStep.CHARM_RADIUS,
+			ThunderStep.CHARM_ENHANCEMENT_DURATION,
 			PrismaticShield.CHARM_DURATION,
 			PrismaticShield.CHARM_KNOCKBACK,
 			PrismaticShield.CHARM_STUN,
@@ -529,6 +530,7 @@ public class CharmManager {
 			DeadlyRonde.CHARM_STACKS,
 			DeadlyRonde.CHARM_SPEED,
 			DeadlyRonde.CHARM_DECAY_TIME,
+			DeadlyRonde.CHARM_STACKS_REQ,
 			WindWalk.CHARM_CHARGE,
 			WindWalk.CHARM_COOLDOWN,
 			WindWalk.CHARM_COOLDOWN_REDUCTION,
@@ -762,6 +764,7 @@ public class CharmManager {
 			AmplifyingHex.CHARM_POTENCY_CAP,
 			AmplifyingHex.CHARM_ENHANCE_HEALTH,
 			AmplifyingHex.CHARM_ENHANCE_DAMAGE,
+			AmplifyingHex.CHARM_MAX_DEBUFFS,
 			CholericFlames.CHARM_COOLDOWN,
 			CholericFlames.CHARM_DAMAGE,
 			CholericFlames.CHARM_DURATION,
@@ -813,6 +816,7 @@ public class CharmManager {
 			SanguineHarvest.CHARM_DAMAGE_BOOST,
 			SanguineHarvest.CHARM_BLIGHT_DURATION,
 			SanguineHarvest.CHARM_BLIGHT_VULN_PER_DEBUFF,
+			SanguineHarvest.CHARM_MARKS,
 			SoulRend.CHARM_COOLDOWN,
 			SoulRend.CHARM_HEAL,
 			SoulRend.CHARM_PACT_HEAL,
@@ -879,6 +883,8 @@ public class CharmManager {
 			EagleEye.CHARM_RADIUS,
 			EagleEye.CHARM_REFRESH,
 			EagleEye.CHARM_VULN,
+			EagleEye.CHARM_DAMAGE,
+			EagleEye.CHARM_HITS,
 			HuntingCompanion.CHARM_DAMAGE,
 			HuntingCompanion.CHARM_DURATION,
 			HuntingCompanion.CHARM_COOLDOWN,
@@ -973,6 +979,8 @@ public class CharmManager {
 			ChainLightning.CHARM_TARGETS,
 			ChainLightning.CHARM_CHARGES,
 			ChainLightning.CHARM_KNOCKBACK,
+			ChainLightning.CHARM_POSITIVE_TOTEM_EFFICIENCY,
+			ChainLightning.CHARM_NEGATIVE_TOTEM_EFFICIENCY,
 			CrystallineCombos.CHARM_CRYSTAL_DAMAGE,
 			CrystallineCombos.CHARM_CRYSTAL_RANGE,
 			CrystallineCombos.CHARM_CRYSTAL_STACK_THRESHOLD,
@@ -1093,6 +1101,7 @@ public class CharmManager {
 			EscapeDeath.CHARM_COOLDOWN,
 			Smokescreen.CHARM_COOLDOWN,
 			BladeDance.CHARM_COOLDOWN,
+			DeadlyRonde.CHARM_STACKS_REQ,
 			WindWalk.CHARM_COOLDOWN,
 			BodkinBlitz.CHARM_COOLDOWN,
 			BruteForce.CHARM_WAVE_DELAY,
@@ -1125,6 +1134,7 @@ public class CharmManager {
 			AlchemicalArtillery.CHARM_AFTERSHOCK_DELAY,
 			AmplifyingHex.CHARM_COOLDOWN,
 			AmplifyingHex.CHARM_ENHANCE_HEALTH,
+			AmplifyingHex.CHARM_MAX_DEBUFFS,
 			CholericFlames.CHARM_COOLDOWN,
 			GraspingClaws.CHARM_COOLDOWN,
 			MelancholicLament.CHARM_COOLDOWN,
@@ -1204,6 +1214,7 @@ public class CharmManager {
 		//Also make sure the charm list has space for the new charm if it exists
 		//Also make sure it's not a stack (only one item)
 		//Also parse the charm's power budget and make sure adding it would not overflow
+		//Also check there's no conflicts with locked stats
 
 		//Check item stack for valid name and amount
 		if (charm == null || p == null || charm.getAmount() != 1 || !charm.hasItemMeta() || !charm.getItemMeta().hasDisplayName()) {
@@ -1225,8 +1236,16 @@ public class CharmManager {
 					return false;
 				}
 				int powerBudget = 0;
-				//Check naming of each charm
 				for (ItemStack c : charms) {
+					//Check for conflicts with locked stats
+					for (CharmManager.CharmParsedInfo info : readCharm(c)) {
+						for (CharmManager.CharmParsedInfo info2 : readCharm(charm)) {
+							if (info.mEffect.equals(info2.mEffect) && (info.mIsLocked || info2.mIsLocked)) {
+								return false;
+							}
+						}
+					}
+					//Check naming of each charm
 					if (Objects.equals(c.getItemMeta().displayName(), charm.getItemMeta().displayName())) {
 						return false;
 					}
@@ -1312,7 +1331,7 @@ public class CharmManager {
 		AbilityManager.getManager().updatePlayerAbilities(p, true);
 	}
 
-	private static final Pattern CHARM_LINE_PATTERN = Pattern.compile("([-+]?\\d+(?:\\.\\d+)?)(%)? (.+)");
+	private static final Pattern CHARM_LINE_PATTERN = Pattern.compile("([*🔒] ?)?([-+]?\\d+(?:\\.\\d+)?)(%)? (.+)");
 
 	//Helper method to parse item for charm effects
 	private List<CharmParsedInfo> readCharm(ItemStack itemStack) {
@@ -1337,10 +1356,11 @@ public class CharmManager {
 		if (!matcher.matches()) {
 			return null;
 		}
-		double value = Double.parseDouble(matcher.group(1));
-		boolean percent = matcher.group(2) != null;
-		String effect = matcher.group(3);
-		return new CharmParsedInfo(value, percent, effect);
+		boolean locked = matcher.group(1) != null;
+		double value = Double.parseDouble(matcher.group(2));
+		boolean percent = matcher.group(3) != null;
+		String effect = matcher.group(4);
+		return new CharmParsedInfo(value, percent, locked, effect);
 	}
 
 	/**
@@ -1384,7 +1404,7 @@ public class CharmManager {
 			.reduce(
 				new TreeMap<>(),
 				(map, charm) -> {
-					final var newName = charm.mEffect + (charm.mIsPercent ? "%" : ""); // we add a percent sign here (see method getSummaryOfAllAttributesAsComponents)
+					final var newName = charm.mEffect + (charm.mIsPercent ? "%" : "") + (charm.mIsLocked ? "🔒" : ""); // we add a percent sign here (see method getSummaryOfAllAttributesAsComponents)
 					map.put(newName, map.getOrDefault(newName, 0.0) + charm.mValue);
 					return map;
 				},
@@ -1419,7 +1439,7 @@ public class CharmManager {
 		Set<String> orderedEffects = summary.keySet();
 
 		for (String s : orderedEffects) {
-			final var normalized = s.replace("%", "");
+			final var normalized = s.replace("%", "").replace("🔒", "");
 			double baseValue = summary.getOrDefault(s, 0.0);
 			double value = getValueOrCap(baseValue, normalized, charmType); // we need to replace % here otherwise things don't work correctly (see bug 19814)
 			if (value != 0) {
@@ -1611,7 +1631,6 @@ public class CharmManager {
 	public static double calculateFlatAndPercentValue(Player player, String charmEffectName, double baseValue) {
 		double flatLevel = getInstance().getValueOfAttribute(player, charmEffectName);
 		double percentLevel = getInstance().getValueOfAttribute(player, charmEffectName + "%");
-
 		return (baseValue + flatLevel) * ((percentLevel / 100.0) + 1);
 	}
 
@@ -1646,11 +1665,13 @@ public class CharmManager {
 	public static class CharmParsedInfo {
 		public double mValue;
 		public boolean mIsPercent;
+		public boolean mIsLocked;
 		public String mEffect;
 
-		public CharmParsedInfo(double value, boolean isPercent, String effect) {
+		public CharmParsedInfo(double value, boolean isPercent, boolean locked, String effect) {
 			mValue = value;
 			mIsPercent = isPercent;
+			mIsLocked = locked;
 			mEffect = effect;
 		}
 
@@ -1659,6 +1680,7 @@ public class CharmManager {
 			return "CharmParsedInfo{" +
 				"mValue=" + mValue +
 				", mIsPercent=" + mIsPercent +
+				", mIsLocked=" + mIsLocked +
 				", mEffect='" + mEffect + '\'' +
 				'}';
 		}

@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.EagleEyeCS;
+import com.playmonumenta.plugins.effects.EagleEyeEnhancement;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.managers.GlowingManager;
@@ -34,12 +35,15 @@ public class EagleEye extends Ability {
 	private static final double EAGLE_EYE_2_VULN_LEVEL = 0.35;
 	private static final int EAGLE_EYE_RADIUS = 24;
 	private static final double ENHANCEMENT_DAMAGE_PERCENT = 0.35;
+	private static final int ENHANCEMENT_HITS = 1;
 
 	public static final String CHARM_DURATION = "Eagle Eye Duration";
 	public static final String CHARM_COOLDOWN = "Eagle Eye Cooldown";
 	public static final String CHARM_VULN = "Eagle Eye Vulnerability Amplifier";
 	public static final String CHARM_RADIUS = "Eagle Eye Radius";
 	public static final String CHARM_REFRESH = "Eagle Eye Refresh";
+	public static final String CHARM_DAMAGE = "Eagle Eye Enhancement Damage";
+	public static final String CHARM_HITS = "Eagle Eye Enhancement Hits";
 
 	public static final String GLOWING_OPTION_SCOREBOARD_NAME = "EagleEyeGlowingOption";
 
@@ -72,6 +76,8 @@ public class EagleEye extends Ability {
 	private final int mDuration;
 	private final int mRefresh;
 	private List<LivingEntity> mEntitiesAffected = new ArrayList<>(); // Used for tracking Entities on a first hit.
+	private final double mDamage;
+	private final int mHits;
 	private final EagleEyeCS mCosmetic;
 
 	public EagleEye(Plugin plugin, Player player) {
@@ -80,6 +86,8 @@ public class EagleEye extends Ability {
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EAGLE_EYE_RADIUS);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, EAGLE_EYE_DURATION);
 		mRefresh = CharmManager.getDuration(mPlayer, CHARM_REFRESH, EAGLE_EYE_REFRESH);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ENHANCEMENT_DAMAGE_PERCENT);
+		mHits = ENHANCEMENT_HITS + (int) CharmManager.getLevel(mPlayer, CHARM_HITS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EagleEyeCS());
 	}
 
@@ -94,14 +102,16 @@ public class EagleEye extends Ability {
 
 		mEntitiesAffected = new Hitbox.SphereHitbox(mPlayer.getEyeLocation(), mRadius).getHitMobs();
 
+
 		for (LivingEntity mob : mEntitiesAffected) {
 			// Don't apply vulnerability to arena mobs
 			if (mob.getScoreboardTags().contains("arena_mob")) {
 				continue;
 			}
 
-			// If enhanced, add two glowing instances and remove the enhancement bonus glow on the first hit
+			// If enhanced, add two glowing instances and remove the enhancement bonus glow later
 			if (isEnhanced()) {
+				mPlugin.mEffectManager.addEffect(mob, "EagleEye", new EagleEyeEnhancement(mDamage, mHits, mDuration, mPlayer, mCosmetic));
 				GlowingManager.startGlowing(mob, mCosmetic.enhancementGlowColor(), mDuration, GlowingManager.PLAYER_ABILITY_PRIORITY + 1, p -> canSeeGlowing(p, mPlayer), "EagleEyeEnhancement-" + mPlayer.name());
 			}
 			GlowingManager.startGlowing(mob, NamedTextColor.WHITE, mDuration, GlowingManager.PLAYER_ABILITY_PRIORITY, p -> canSeeGlowing(p, mPlayer), null);
@@ -138,25 +148,6 @@ public class EagleEye extends Ability {
 		int value = Math.min(Math.max(0, ScoreboardUtils.getScoreboardValue(player, GLOWING_OPTION_SCOREBOARD_NAME).orElse(0)), GlowingOption.values().length);
 		GlowingOption option = GlowingOption.values()[value];
 		return option == GlowingOption.ALL || (option == GlowingOption.OWN && player == sourcePlayer);
-	}
-
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		DamageEvent.DamageType type = event.getType();
-		if (type == DamageEvent.DamageType.TRUE || type == DamageEvent.DamageType.OTHER || type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.FIRE || type == DamageEvent.DamageType.POISON) {
-			return false;
-		}
-
-		if (isEnhanced() && mEntitiesAffected.contains(enemy)) {
-			event.updateDamageWithMultiplier(1 + ENHANCEMENT_DAMAGE_PERCENT);
-			mEntitiesAffected.remove(enemy);
-			mCosmetic.eyeFirstStrike(enemy.getWorld(), mPlayer, enemy);
-
-			// Revert glowing color to normal white
-			GlowingManager.clear(enemy, "EagleEyeEnhancement-" + mPlayer.name());
-		}
-
-		return false;
 	}
 
 	private static Description<EagleEye> getDescription1() {

@@ -111,7 +111,7 @@ public class FlameTotem extends TotemAbility {
 	public void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean bonusAction) {
 		List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null);
 		double damageApplied = (mDamage + mDecayedTotemBuff)
-			* (bonusAction ? ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY : 1);
+			* (bonusAction ? (ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_NEGATIVE_TOTEM_EFFICIENCY)) : 1);
 		Collections.shuffle(affectedMobs);
 		List<LivingEntity> impactedMobs = new ArrayList<>();
 		List<LivingEntity> targetMobs = new ArrayList<>();

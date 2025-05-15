@@ -66,6 +66,7 @@ public class ThunderStep extends Ability {
 	public static final String CHARM_COOLDOWN = "Thunder Step Cooldown";
 	public static final String CHARM_RADIUS = "Thunder Step Radius";
 	public static final String CHARM_DISTANCE = "Thunder Step Distance";
+	public static final String CHARM_ENHANCEMENT_DURATION = "Thunder Step Enhancement Duration";
 
 	public static final AbilityInfo<ThunderStep> INFO =
 		new AbilityInfo<>(ThunderStep.class, NAME, ThunderStep::new)
@@ -82,6 +83,7 @@ public class ThunderStep extends Ability {
 	private final double mLevelDamage;
 	private final double mLevelDistance;
 	private final double mRadius;
+	private final int mBackTeleportMaxDelay;
 
 	private final ThunderStepCS mCosmetic;
 
@@ -94,6 +96,7 @@ public class ThunderStep extends Ability {
 		mLevelDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelDistance = CharmManager.calculateFlatAndPercentValue(player, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
 		mRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, SIZE);
+		mBackTeleportMaxDelay = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_ENHANCEMENT_DURATION, BACK_TELEPORT_MAX_DELAY);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ThunderStepCS());
 	}
 
@@ -106,7 +109,7 @@ public class ThunderStep extends Ability {
 
 		// if enhanced, can teleport back within a short time frame (regardless of if on cooldown or not)
 		if (isEnhanced()
-			&& Bukkit.getServer().getCurrentTick() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
+			&& Bukkit.getServer().getCurrentTick() <= mLastCastTick + mBackTeleportMaxDelay
 			&& mLastCastLocation != null
 			&& mLastCastLocation.getWorld() == mPlayer.getWorld()
 			&& mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
@@ -167,7 +170,7 @@ public class ThunderStep extends Ability {
 		doDamage(playerEndLocation, spellDamage, doParalyze);
 		mCosmetic.trailEffect(mPlayer, playerStartLocation, playerEndLocation);
 		if (isEnhanced() && mLastCastTick > -1) {
-			mCosmetic.lingeringEffect(mPlugin, mPlayer, playerStartLocation, BACK_TELEPORT_MAX_DELAY);
+			mCosmetic.lingeringEffect(mPlugin, mPlayer, playerStartLocation, mBackTeleportMaxDelay);
 		}
 
 		return true;

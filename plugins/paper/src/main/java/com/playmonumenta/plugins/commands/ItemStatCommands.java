@@ -281,11 +281,11 @@ public class ItemStatCommands {
 							return;
 						}
 						int index = args.getByArgument(indexArg);
-						String lore = args.getByArgument(charmEffectArgument);
+						String lore = args.getByArgument(charmEffectArgument).replace("*", "🔒");
 
 						CharmManager.CharmParsedInfo parsedInfo = CharmManager.readCharmLine(lore);
 						if (parsedInfo == null) {
-							player.sendMessage(Component.text("Invalid charm effect! Make sure it starts with a number, optionally a percent sign, then a space, then an effect name.", NamedTextColor.RED));
+							player.sendMessage(Component.text("Invalid charm effect! Make sure it starts with a number, optionally a percent sign and asterisk for locked, then a space, then an effect name.", NamedTextColor.RED));
 							return;
 						}
 						if (!Plugin.getInstance().mCharmManager.mCharmEffectList.contains(parsedInfo.mEffect)) {
@@ -345,7 +345,7 @@ public class ItemStatCommands {
 							return;
 						}
 						int index = args.getByArgument(indexArg);
-						String lore = args.getByArgument(charmEffectArgument);
+						String lore = args.getByArgument(charmEffectArgument).replace("*", "🔒");
 
 						CharmManager.CharmParsedInfo parsedInfo = CharmManager.readCharmLine(lore);
 						if (parsedInfo == null) {

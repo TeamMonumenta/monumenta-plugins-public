@@ -129,7 +129,7 @@ public class DecayedTotem extends TotemAbility {
 		if (dealDamage) {
 			DamageUtils.damage(mPlayer, target,
 				new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats),
-				mDamage * (bonusAction ? ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY : 1), true, false, false);
+				mDamage * (bonusAction ? (ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_NEGATIVE_TOTEM_EFFICIENCY)) : 1), true, false, false);
 		}
 		EntityUtils.applySlow(mPlugin, duration, mSlowness, target);
 	}

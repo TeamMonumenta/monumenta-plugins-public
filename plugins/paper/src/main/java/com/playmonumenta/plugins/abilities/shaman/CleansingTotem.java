@@ -103,7 +103,7 @@ public class CleansingTotem extends TotemAbility {
 			List<Player> players = PlayerUtils.playersInRange(standLocation, mRadius, true);
 			for (Player p : players) {
 				PlayerUtils.healPlayer(mPlugin, p,
-					EntityUtils.getMaxHealth(p) * mHealPercent * ChainLightning.ENHANCE_POSITIVE_EFFICIENCY);
+					EntityUtils.getMaxHealth(p) * mHealPercent * (ChainLightning.ENHANCE_POSITIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_POSITIVE_TOTEM_EFFICIENCY)));
 				mCosmetic.cleansingTotemHeal(mPlayer);
 			}
 			if (isLevelTwo()) {

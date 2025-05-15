@@ -50,6 +50,8 @@ public class ChainLightning extends MultipleChargeAbility {
 	public static final String CHARM_CHARGES = "Chain Lightning Charges";
 	public static final String CHARM_KNOCKBACK = "Chain Lightning Knockback";
 	public static final String CHARM_INITIAL_RANGE = "Chain Lightning Initial Range";
+	public static final String CHARM_POSITIVE_TOTEM_EFFICIENCY = "Chain Lightning Non-Damaging Totem Efficiency";
+	public static final String CHARM_NEGATIVE_TOTEM_EFFICIENCY = "Chain Lightning Damaging Totem Efficiency";
 
 	public static final AbilityInfo<ChainLightning> INFO =
 		new AbilityInfo<>(ChainLightning.class, "Chain Lightning", ChainLightning::new)
@@ -69,6 +71,8 @@ public class ChainLightning extends MultipleChargeAbility {
 	public final double mDamage;
 	private final double mInitialRange;
 	private int mLastCastTicks = 0;
+	public final double mPositiveEfficiency;
+	public final double mNegativeEfficiency;
 	private final ChainLightningCS mCosmetic;
 
 
@@ -81,6 +85,8 @@ public class ChainLightning extends MultipleChargeAbility {
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mTargets = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TARGETS, isLevelOne() ? TARGETS_1 : TARGETS_2);
 		mInitialRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_INITIAL_RANGE, INITIAL_RANGE);
+		mPositiveEfficiency = ENHANCE_POSITIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_POSITIVE_TOTEM_EFFICIENCY);
+		mNegativeEfficiency = ENHANCE_NEGATIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_NEGATIVE_TOTEM_EFFICIENCY);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChainLightningCS());
 	}
 
@@ -247,9 +253,9 @@ public class ChainLightning extends MultipleChargeAbility {
 	private static Description<ChainLightning> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Each totem the beam bounces off of now instantly pulses its effects at ")
-			.addPercent(ENHANCE_NEGATIVE_EFFICIENCY)
+			.addPercent(a -> a.mNegativeEfficiency, ENHANCE_NEGATIVE_EFFICIENCY)
 			.add(" efficiency for damaging totems and ")
-			.addPercent(ENHANCE_POSITIVE_EFFICIENCY)
+			.addPercent(a -> a.mPositiveEfficiency, ENHANCE_POSITIVE_EFFICIENCY)
 			.add(" efficiency for non-damaging totems.");
 	}
 }

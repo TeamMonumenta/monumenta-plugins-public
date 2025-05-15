@@ -112,7 +112,7 @@ public class WhirlwindTotem extends TotemAbility {
 					}
 					int totalCD = abil.getModifiedCooldown();
 					int reducedCD = Math.min((int) (totalCD * mCDRPerSecond
-						* ChainLightning.ENHANCE_POSITIVE_EFFICIENCY), mCDRMax);
+						* (ChainLightning.ENHANCE_POSITIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_POSITIVE_TOTEM_EFFICIENCY))), mCDRMax);
 					mPlugin.mTimers.updateCooldown(p, linkedSpell, reducedCD);
 					mPlugin.mTimers.updateCooldown(p, linkedSpell, reducedCD);
 				}
