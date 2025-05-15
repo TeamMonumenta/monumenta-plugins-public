@@ -200,8 +200,10 @@ public class SpellOmen extends Spell {
 		//damage
 		if (!warning) {
 			for (Player player : damage) {
-				mP.SOUND_HIT.play(player.getLocation());
+				boolean playedSound = false;
 				if (mP.DAMAGE > 0) {
+					mP.SOUND_HIT.play(player.getLocation());
+					playedSound = true;
 					if (mP.RESPECT_IFRAMES && player.getNoDamageTicks() == 0) {
 						BossUtils.blockableDamage(mBoss, player, mP.DAMAGE_TYPE, mP.DAMAGE, mP.SPELL_NAME, mBoss.getLocation(), mP.EFFECTS.mEffectList);
 						MovementUtils.knockAway(origin, player, mP.KB_X, mP.KB_Y);
@@ -213,9 +215,18 @@ public class SpellOmen extends Spell {
 				}
 
 				if (mP.DAMAGE_PERCENTAGE > 0.0) {
-					DamageUtils.damagePercentHealth(mBoss, player, mP.DAMAGE_PERCENTAGE, false,
-						true, mP.SPELL_NAME, true, mP.EFFECTS.mEffectList);
-					MovementUtils.knockAway(origin, player, mP.KB_X, mP.KB_Y);
+					if (!playedSound) {
+						mP.SOUND_HIT.play(player.getLocation());
+					}
+					if (mP.RESPECT_IFRAMES && player.getNoDamageTicks() == 0) {
+						DamageUtils.damagePercentHealth(mBoss, player, mP.DAMAGE_PERCENTAGE, false,
+							true, mP.SPELL_NAME, true, mP.EFFECTS.mEffectList);
+						MovementUtils.knockAway(origin, player, mP.KB_X, mP.KB_Y);
+					} else if (!mP.RESPECT_IFRAMES) {
+						DamageUtils.damagePercentHealth(mBoss, player, mP.DAMAGE_PERCENTAGE, false,
+							true, mP.SPELL_NAME, true, mP.EFFECTS.mEffectList);
+						MovementUtils.knockAway(origin, player, mP.KB_X, mP.KB_Y);
+					}
 				}
 				mP.EFFECTS.apply(player, mBoss);
 

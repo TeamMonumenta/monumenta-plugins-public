@@ -46,6 +46,7 @@ public abstract class BossAbilityGroup {
 	protected final Plugin mPlugin;
 	private final String mIdentityTag;
 
+	private int mDetectionRange;
 	private @Nullable BossBarManager mBossBar;
 	public SpellManager mActiveSpells;
 	private List<Spell> mPassiveSpells;
@@ -55,6 +56,7 @@ public abstract class BossAbilityGroup {
 	private boolean mUnloaded = false;
 	private int mNextActiveTimer = 0;
 	public boolean mDead = false;
+	private long mPassiveIntervalTicks;
 
 	protected BossAbilityGroup(Plugin plugin, String identityTag, LivingEntity boss) {
 		mPlugin = plugin;
@@ -65,12 +67,29 @@ public abstract class BossAbilityGroup {
 		mPassiveSpells = Collections.emptyList();
 	}
 
-	public void changePhase(SpellManager activeSpells, List<Spell> passiveSpells,
-							@Nullable Consumer<LivingEntity> phaseAction) {
+	public void changePhase(SpellManager activeSpells,
+							List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction) {
+
+		changePhase(activeSpells, passiveSpells, phaseAction, 0);
+	}
+
+	public void changePhase(SpellManager activeSpells,
+							List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction, int spellDelay) {
 		if (phaseAction != null) {
 			phaseAction.accept(mBoss);
 		}
-
+		if (spellDelay > 0) {
+			if (mTaskActive != null) {
+				mTaskActive.cancel();
+				mTaskActive = getSpellCastRunnable();
+				mTaskActive.runTaskTimer(mPlugin, spellDelay, 2L);
+			}
+			if (mTaskPassive != null) {
+				mTaskPassive.cancel();
+				mTaskPassive = getPassiveSpellCastRunnable();
+				mTaskPassive.runTaskTimer(mPlugin, spellDelay, mPassiveIntervalTicks);
+			}
+		}
 		mActiveSpells.cancelAll(true);
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
@@ -123,12 +142,22 @@ public abstract class BossAbilityGroup {
 	public void constructBoss(BossAbilityGroup this, SpellManager activeSpells, List<Spell> passiveSpells,
 							  int detectionRange, @Nullable BossBarManager bossBar, long spellDelay,
 							  long passiveIntervalTicks, boolean preventSameSpellTwiceInARow) {
+		mDetectionRange = detectionRange;
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
 		mPreventSameSpellTwiceInARow = preventSameSpellTwiceInARow;
 
-		mTaskPassive = new BukkitRunnable() {
+		mPassiveIntervalTicks = passiveIntervalTicks;
+		mTaskPassive = getPassiveSpellCastRunnable();
+		mTaskPassive.runTaskTimer(mPlugin, 1, mPassiveIntervalTicks);
+
+		mTaskActive = getSpellCastRunnable();
+		mTaskActive.runTaskTimer(mPlugin, spellDelay, 2L);
+	}
+
+	private BukkitRunnable getPassiveSpellCastRunnable() {
+		return new BukkitRunnable() {
 			private long mMissingTicks = 0;
 
 			@Override
@@ -137,7 +166,7 @@ public abstract class BossAbilityGroup {
 					mBossBar.update();
 				}
 
-				mMissingTicks += passiveIntervalTicks;
+				mMissingTicks += mPassiveIntervalTicks;
 				if (mMissingTicks > 100) {
 					mMissingTicks = 0;
 					/* Check if somehow the boss entity is missing even though this is still running */
@@ -149,7 +178,7 @@ public abstract class BossAbilityGroup {
 				}
 
 				/* Don't run abilities if players aren't present */
-				if (detectionRange > 0 && PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).isEmpty()) {
+				if (mDetectionRange > 0 && PlayerUtils.playersInRange(mBoss.getLocation(), mDetectionRange, true).isEmpty()) {
 					return;
 				}
 
@@ -163,9 +192,10 @@ public abstract class BossAbilityGroup {
 				}
 			}
 		};
-		mTaskPassive.runTaskTimer(mPlugin, 1, passiveIntervalTicks);
+	}
 
-		mTaskActive = new BukkitRunnable() {
+	private BukkitRunnable getSpellCastRunnable() {
+		return new BukkitRunnable() {
 			private boolean mDisabled = true;
 			private int mMissingTicks = 0;
 
@@ -190,7 +220,7 @@ public abstract class BossAbilityGroup {
 				}
 
 				/* Don't progress if players aren't present */
-				if (detectionRange > 0 && PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).isEmpty()) {
+				if (mDetectionRange > 0 && PlayerUtils.playersInRange(mBoss.getLocation(), mDetectionRange, true).isEmpty()) {
 					if (!mDisabled) {
 						/* Cancel all the spells just in case they were activated */
 						mDisabled = true;
@@ -216,7 +246,6 @@ public abstract class BossAbilityGroup {
 				}
 			}
 		};
-		mTaskActive.runTaskTimer(mPlugin, spellDelay, 2L);
 	}
 
 	private void handleMissingBoss() {
@@ -426,6 +455,10 @@ public abstract class BossAbilityGroup {
 		return 0;
 	}
 
+	public boolean deadEntityWithinRange(Location location) {
+		return location.distanceSquared(mBoss.getLocation()) <= maxEntityDeathRange() * maxEntityDeathRange();
+	}
+
 	/*
 	 * Called when a player breaks a block within 60 blocks
 	 *
@@ -448,6 +481,14 @@ public abstract class BossAbilityGroup {
 
 	public boolean hasNearbyBlockPlaceTrigger() {
 		return false;
+	}
+
+	public double maxPlayerDeathRange() {
+		return 75.0;
+	}
+
+	public boolean deadPlayerWithinRange(Location location) {
+		return location.distanceSquared(mBoss.getLocation()) <= maxPlayerDeathRange() * maxPlayerDeathRange();
 	}
 
 	/*

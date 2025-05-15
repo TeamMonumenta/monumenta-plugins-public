@@ -71,6 +71,16 @@ public class BossBarManager {
 		}
 	}
 
+	public void setBossFog(boolean value) {
+		if (value) {
+			mBar.addFlag(BossBar.Flag.CREATE_WORLD_FOG);
+			mBar.addFlag(BossBar.Flag.DARKEN_SCREEN);
+		} else {
+			mBar.removeFlag(BossBar.Flag.CREATE_WORLD_FOG);
+			mBar.removeFlag(BossBar.Flag.DARKEN_SCREEN);
+		}
+	}
+
 	public void update() {
 		if (mBoss.getHealth() <= 0) {
 			mBoss.getWorld().hideBossBar(mBar);

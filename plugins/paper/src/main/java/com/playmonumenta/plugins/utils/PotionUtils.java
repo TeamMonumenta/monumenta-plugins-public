@@ -223,6 +223,15 @@ public class PotionUtils {
 		return false;
 	}
 
+	public static void clearPositives(Plugin plugin, Player player) {
+		for (PotionEffectType type : POSITIVE_EFFECTS) {
+			if (Objects.equals(type, PotionEffectType.GLOWING)) {
+				continue;
+			}
+			plugin.mPotionManager.clearPotionEffectType(player, type);
+		}
+	}
+
 	public static boolean hasNegativeEffects(PotionEffectType type) {
 		return NEGATIVE_EFFECTS.contains(type);
 	}

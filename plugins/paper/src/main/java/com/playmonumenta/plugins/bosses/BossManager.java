@@ -29,6 +29,9 @@ import com.playmonumenta.plugins.bosses.bosses.hexfall.HyceneaRageOfTheWolf;
 import com.playmonumenta.plugins.bosses.bosses.hexfall.Ruten;
 import com.playmonumenta.plugins.bosses.bosses.hexfall.TotemPlatformBoss;
 import com.playmonumenta.plugins.bosses.bosses.hexfall.VoodooTotemBoss;
+import com.playmonumenta.plugins.bosses.bosses.intruder.FacelessOneBoss;
+import com.playmonumenta.plugins.bosses.bosses.intruder.IntruderBoss;
+import com.playmonumenta.plugins.bosses.bosses.intruder.SourcelessGazeBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichAlchBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichClericBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichConquestBoss;
@@ -393,8 +396,11 @@ public class BossManager implements Listener {
 		registerStatelessBoss(RunAwayBoss.identityTag, RunAwayBoss::new);
 		registerStatelessBoss(CreipergeuseBoss.identityTag, CreipergeuseBoss::new, new CreipergeuseBoss.Parameters());
 		registerStatelessBoss(SlamAttackBoss.identityTag, SlamAttackBoss::new, new SlamAttackBoss.Parameters());
+		registerStatelessBoss(LucidRendBoss.identityTag, LucidRendBoss::new, new LucidRendBoss.Parameters());
 		registerStatelessBoss(ProsecutorJudgementChainBoss.identityTag, ProsecutorJudgementChainBoss::new, new ProsecutorJudgementChainBoss.Parameters());
 		registerStatelessBoss(VanguardChallengeBoss.identityTag, VanguardChallengeBoss::new, new VanguardChallengeBoss.Parameters());
+		registerStatelessBoss(FacelessOneBoss.identityTag, FacelessOneBoss::new);
+		registerStatelessBoss(SourcelessGazeBoss.identityTag, SourcelessGazeBoss::new, new SourcelessGazeBoss.Parameters());
 		registerStatelessBoss(PassiveBoss.identityTag, PassiveBoss::new);
 		registerStatelessBoss(StealthBoss.identityTag, StealthBoss::new, new StealthBoss.Parameters());
 		registerStatelessBoss(RamBoss.identityTag, RamBoss::new, new RamBoss.Parameters());
@@ -452,7 +458,7 @@ public class BossManager implements Listener {
 		registerStatefulBoss(TheImpenetrable.identityTag, TheImpenetrable::new);
 		registerStatefulBoss(Uamiel.identityTag, Uamiel::new);
 		registerStatefulBoss(ExperimentSeventyOne.identityTag, ExperimentSeventyOne::new);
-
+		registerStatefulBoss(IntruderBoss.identityTag, IntruderBoss::new);
 	}
 
 	private static void registerStatelessBoss(String identityTag, StatelessBossConstructor constructor) {
@@ -493,7 +499,10 @@ public class BossManager implements Listener {
 	private boolean mNearbyBlockBreakEnabled = false;
 	private boolean mNearbyBlockPlaceEnabled = false;
 	private boolean mNearbyPlayerDeathEnabled = false;
-	private double mMaximumEntityDeathRange = 12.0;
+	private static final double DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE = 12.0;
+	private static final double DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE = 75.0;
+	private double mMaximumEntityDeathRange = DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE;
+	private double mMaximumPlayerDeathRange = DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE;
 
 	public BossManager(Plugin plugin) {
 		INSTANCE = this;
@@ -876,7 +885,7 @@ public class BossManager implements Listener {
 			/* For performance reasons this check is only enabled when there is a loaded
 			 * boss that is using this feature
 			 */
-			for (LivingEntity m : EntityUtils.getNearbyMobs(player.getLocation(), 75.0)) {
+			for (LivingEntity m : EntityUtils.getNearbyMobs(player.getLocation(), mMaximumPlayerDeathRange)) {
 				Boss boss = mBosses.get(m.getUniqueId());
 				if (boss != null) {
 					boss.nearbyPlayerDeath(event);
@@ -1104,8 +1113,12 @@ public class BossManager implements Listener {
 			mNearbyPlayerDeathEnabled = true;
 		}
 
-		if (ability.maxEntityDeathRange() > 0) {
+		if (ability.maxEntityDeathRange() > mMaximumEntityDeathRange) {
 			mMaximumEntityDeathRange = ability.maxEntityDeathRange();
+		}
+
+		if (ability.maxPlayerDeathRange() > mMaximumPlayerDeathRange) {
+			mMaximumPlayerDeathRange = ability.maxPlayerDeathRange();
 		}
 	}
 
@@ -1127,6 +1140,13 @@ public class BossManager implements Listener {
 			if (mBosses.values().stream().noneMatch(Boss::hasNearbyEntityDeathTrigger)) {
 				mNearbyEntityDeathEnabled = false;
 			}
+			mMaximumEntityDeathRange = mBosses.values().stream()
+				.map(b -> b.getAbilities().stream()
+					.map(BossAbilityGroup::maxEntityDeathRange)
+					.max(java.util.Comparator.naturalOrder())
+					.orElse(DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE))
+				.max(java.util.Comparator.naturalOrder())
+				.orElse(DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE);
 		}
 
 		if (boss.hasNearbyBlockBreakTrigger()) {
@@ -1172,6 +1192,13 @@ public class BossManager implements Listener {
 			if (mBosses.values().stream().noneMatch(Boss::hasNearbyPlayerDeathTrigger)) {
 				mNearbyPlayerDeathEnabled = false;
 			}
+			mMaximumPlayerDeathRange = mBosses.values().stream()
+				.map(b -> b.getAbilities().stream()
+					.map(BossAbilityGroup::maxPlayerDeathRange)
+					.max(java.util.Comparator.naturalOrder())
+					.orElse(DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE))
+				.max(java.util.Comparator.naturalOrder())
+				.orElse(DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE);
 		}
 	}
 

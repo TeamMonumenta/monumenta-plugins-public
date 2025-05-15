@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -257,8 +258,11 @@ public class Boss {
 	}
 
 	public void nearbyEntityDeath(EntityDeathEvent event) {
+		Location location = event.getEntity().getLocation();
 		for (BossAbilityGroup ability : mAbilities) {
-			ability.nearbyEntityDeath(event);
+			if (ability.deadEntityWithinRange(location)) {
+				ability.nearbyEntityDeath(event);
+			}
 		}
 	}
 
@@ -302,8 +306,11 @@ public class Boss {
 	}
 
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		Location location = event.getPlayer().getLocation();
 		for (BossAbilityGroup ability : mAbilities) {
-			ability.nearbyPlayerDeath(event);
+			if (ability.deadPlayerWithinRange(location)) {
+				ability.nearbyPlayerDeath(event);
+			}
 		}
 	}
 

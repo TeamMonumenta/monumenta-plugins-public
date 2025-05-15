@@ -69,6 +69,11 @@ public class Reincarnation extends Effect {
 	}
 
 	@Override
+	public @Nullable String getDisplayedName() {
+		return "Reincarnation";
+	}
+
+	@Override
 	public @Nullable Component getSpecificDisplay() {
 		return Component.text(String.format("%d", (long) mStacks) + " " + GENERIC_NAME + (mStacks > 1 ? "s" : ""), NamedTextColor.GREEN);
 	}

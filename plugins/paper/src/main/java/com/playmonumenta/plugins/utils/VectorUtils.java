@@ -153,6 +153,11 @@ public class VectorUtils {
 		return v;
 	}
 
+	public static Vector randomHorizontalUnitVector() {
+		double angle = FastUtils.randomDoubleInRange(0, Math.PI * 2);
+		return new Vector(FastUtils.sin(angle), 0, FastUtils.cos(angle));
+	}
+
 	/**
 	 * Creates a list of direction vectors that are not close to each other.
 	 * Will try up to 100 times per vector to make a random vector that isn't close to another vector already.

@@ -12,6 +12,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import org.bukkit.Chunk;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -669,9 +670,7 @@ public class LocationUtils {
 
 	public static Location randomLocationInDonut(Location center, double minRadius, double maxRadius) {
 		double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
-		double diff = Math.abs(maxRadius - minRadius);
-		double ratio = diff / maxRadius;
-		double r = Math.sqrt(FastUtils.randomDoubleInRange(ratio * ratio, 1)) * maxRadius;
+		double r = Math.sqrt(FastUtils.randomDoubleInRange(minRadius / maxRadius, 1)) * maxRadius;
 		return center.clone().add(r * FastUtils.cos(theta), 0, r * FastUtils.sin(theta));
 	}
 
@@ -680,6 +679,73 @@ public class LocationUtils {
 		double r = Math.sqrt(FastUtils.RANDOM.nextDouble()) * radius;
 		return center.clone().add(r * FastUtils.cos(theta), 0, r * FastUtils.sin(theta));
 	}
+
+	public static Location randomSafeLocationInCircle(Location center, double radius, Predicate<Location> safePredicate) {
+		Location loc = randomLocationInCircle(center, radius);
+		if (safePredicate.test(loc)) {
+			return loc;
+		}
+		for (int safety = 0; safety < 20; safety++) {
+			Location possibleLoc = getNearbySafeLocation(loc, location ->
+				safePredicate.test(location) && location.distance(center) <= radius);
+			if (safePredicate.test(possibleLoc)) {
+				return possibleLoc;
+			}
+			loc = randomLocationInCircle(center, radius);
+		}
+		return loc;
+	}
+
+	public static Location randomSafeLocationInDonut(Location center, double minRadius, double maxRadius, Predicate<Location> safePredicate) {
+		Location loc = randomLocationInDonut(center, minRadius, maxRadius);
+		if (safePredicate.test(loc)) {
+			return loc;
+		}
+		for (int safety = 0; safety < 20; safety++) {
+			Location possibleLoc = getNearbySafeLocation(loc, location -> {
+				double distance = location.distance(center);
+				return safePredicate.test(location) && distance <= maxRadius && distance >= minRadius;
+			});
+			if (safePredicate.test(possibleLoc)) {
+				return possibleLoc;
+			}
+			loc = randomLocationInDonut(center, minRadius, maxRadius);
+		}
+		return loc;
+	}
+
+	/*
+	 * This is probably really inefficient
+	 * If there are no safe blocks within 10 blocks, fallbacks to original location
+	 */
+	public static Location getNearbySafeLocation(Location loc, Predicate<Location> safePredicate) {
+		for (int safety = 1; safety < 5; safety++) {
+			Location testLoc1 = loc.clone().add(-safety - 1, 0, 0);
+			Location testLoc2 = loc.clone().add(-safety - 1, 0, safety * 2);
+			for (int x = 0; x <= safety * 2; x += 2) {
+				if (safePredicate.test(testLoc1.add(1, 0, 0))) {
+					return testLoc1;
+				}
+				if (safePredicate.test(testLoc2.add(1, 0, 0))) {
+					return testLoc2;
+				}
+			}
+			testLoc1 = loc.clone().add(0, 0, -safety);
+			testLoc2 = loc.clone().add(safety * 2, 0, -safety);
+
+			for (int z = 1; z < safety * 2; z += 2) {
+				if (safePredicate.test(testLoc1.add(0, 0, 1))) {
+					return testLoc1;
+				}
+				if (safePredicate.test(testLoc2.add(0, 0, 1))) {
+					return testLoc2;
+				}
+			}
+		}
+		// Fallback
+		return loc;
+	}
+
 
 	public static Location fallToGround(Location loc, double minHeight) {
 		Location clone = loc.clone();

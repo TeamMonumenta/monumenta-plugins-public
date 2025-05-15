@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.Collection;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.advancement.Advancement;
@@ -7,6 +8,13 @@ import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
 
 public class AdvancementUtils {
+	public static void grantAdvancement(Collection<Player> players, String key) {
+		NamespacedKey namespacedKey = NamespacedKey.fromString(key);
+		if (namespacedKey != null) {
+			players.forEach(player -> grantAdvancement(player, namespacedKey));
+		}
+	}
+
 	public static void grantAdvancement(Player player, String key) {
 		NamespacedKey namespacedKey = NamespacedKey.fromString(key);
 		if (namespacedKey != null) {

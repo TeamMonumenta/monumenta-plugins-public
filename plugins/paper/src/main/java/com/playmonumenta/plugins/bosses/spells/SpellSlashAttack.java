@@ -158,7 +158,7 @@ public class SpellSlashAttack extends Spell {
 		}
 	}
 
-	private double selectAngle() {
+	protected double selectAngle() {
 		return Math.random() * (mMaxAngle - mMinAngle) + mMinAngle;
 	}
 
