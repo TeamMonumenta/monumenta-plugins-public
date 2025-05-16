@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 
 public class EagleEyeEnhancement extends Effect {
 	public static final String effectID = "EagleEyeEnhancement";
@@ -25,7 +26,7 @@ public class EagleEyeEnhancement extends Effect {
 	@Override
 	public void onHurt(LivingEntity livingEntity, DamageEvent event) {
 		DamageEvent.DamageType type = event.getType();
-		if (type == DamageEvent.DamageType.TRUE || type == DamageEvent.DamageType.OTHER || type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.FIRE || type == DamageEvent.DamageType.POISON || event.getDamager() != mPlayer) {
+		if (type == DamageEvent.DamageType.TRUE || type == DamageEvent.DamageType.OTHER || type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.FIRE || type == DamageEvent.DamageType.POISON || mPlayer != (event.getDamager() instanceof Projectile ? ((Projectile) event.getDamager()).getShooter() : event.getDamager())) {
 			return;
 		}
 		mCosmetic.eyeFirstStrike(livingEntity.getWorld(), mPlayer, livingEntity);
