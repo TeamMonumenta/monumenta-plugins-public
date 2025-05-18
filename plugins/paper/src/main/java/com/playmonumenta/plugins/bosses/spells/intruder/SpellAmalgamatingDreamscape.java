@@ -45,7 +45,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -174,8 +173,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 			.filter(Block::isSolid)
 			.toList());
 		Collections.shuffle(blocks);
-		List<Player> players = IntruderBoss.playersInRange(mBoss.getLocation());
-		players.forEach(player ->
+		IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player ->
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 5 * 20, 1, true, false)));
 
 		mChargeUpManager.setTime(0);
@@ -186,7 +184,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 			@Override
 			public void run() {
 				if (mChargeUpManager.nextTick()) {
-					players.forEach(player ->
+					IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player ->
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 3 * 20, 1, true, false)));
 					this.cancel();
 					startSummon();
@@ -242,8 +240,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 			.filter(Block::isSolid)
 			.toList());
 		Collections.shuffle(blocks);
-		List<Player> players = IntruderBoss.playersInRange(mBoss.getLocation());
-		players.forEach(player -> {
+		IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player -> {
 				player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 5 * 20, 1, true, false));
 			}
 		);
@@ -256,7 +253,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 			@Override
 			public void run() {
 				if (mChargeUpManager.nextTick()) {
-					players.forEach(player ->
+					IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player ->
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 3 * 20, 1, true, false)));
 					this.cancel();
 					summonNext();
@@ -291,7 +288,6 @@ public class SpellAmalgamatingDreamscape extends Spell {
 			finishSpell();
 			return;
 		}
-		List<Player> players = IntruderBoss.playersInRange(mBoss.getLocation());
 		mNarration.narration(mNarrations.get(0));
 		mNarrations.remove(0);
 
@@ -313,7 +309,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 
 			List<String> mSouls = new ArrayList<>(exaltedDungeon.mSouls);
 
-			players.forEach(player -> {
+			IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player -> {
 				player.teleport(tpLocation);
 				player.playSound(player.getLocation(), Sound.ENTITY_WARDEN_EMERGE, SoundCategory.HOSTILE, 2.0f, 1.5f);
 				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 5.5f, 0.2f);
@@ -421,8 +417,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 		mBoss.setInvulnerable(false);
 		mBoss.setInvisible(false);
 
-		List<Player> players = IntruderBoss.playersInRange(mBoss.getLocation());
-		players.forEach(player -> {
+		IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player -> {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1, true, false));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 1, true, false));
 			player.teleport(mCenter.clone().add(new Vector(0, 3, 5)));

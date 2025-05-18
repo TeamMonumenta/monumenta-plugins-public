@@ -761,6 +761,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		getPassives().forEach(Spell::cancel);
 		mLucidRend.killLucidRends();
 		mAbhorrentHallucination.killHallucination();
+		mNightmarishCarvings.killDisplays();
 		// remove sourceless gaze
 		EntityUtils.getNearbyMobs(mSpawnLoc, DETECTION_RANGE, DETECTION_RANGE, DETECTION_RANGE, entity ->
 			entity.getScoreboardTags().contains(SourcelessGazeBoss.identityTag)).forEach(Entity::remove);

@@ -160,7 +160,7 @@ public class SpellCognitiveDistortion extends Spell {
 	}
 
 	private void failMechanic() {
-		mDialogue.dialogue("NO ONE WILl BE THERE. TO SAVE YOU FROM THE DARK.");
+		mDialogue.dialogue("NO ONE WILL BE THERE. TO SAVE YOU FROM THE DARK.");
 		mNarration.narration("The cold and dark pierce your very being...");
 		IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player -> {
 			EffectManager.getInstance().addEffect(player, WEAKNESS_SOURCE, new PercentDamageDealt(DEBUFF_DURATION, -0.3).deleteOnLogout(true));

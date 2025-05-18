@@ -108,7 +108,6 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 			.countPerMeter(1)
 			.spawnAsBoss();
 		new PartialParticle(Particle.FLASH, mCenter).minimumCount(1).spawnAsBoss();
-		finishSpell();
 	}
 
 	@Override
@@ -333,12 +332,16 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 		mExtraPower += mExtraPowerPerCast;
 		mCastNumber++;
 
+		killDisplays();
+		super.cancel();
+	}
+
+	public void killDisplays() {
 		mCarvings.keySet().forEach(Entity::remove);
 		mCarvings.clear();
 		mTextDisplays.forEach(Entity::remove);
 		mTextDisplays.clear();
 		mChargeUpManager.remove();
-		super.cancel();
 	}
 
 	@Override

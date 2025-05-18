@@ -124,7 +124,7 @@ public class SpellPsychicMiasma extends Spell {
 					spawnLoc.setPitch(0);
 
 					BlockDisplay display = mBoss.getWorld().spawn(spawnLoc, BlockDisplay.class);
-					display.setBlock(Bukkit.createBlockData(Material.RED_STAINED_GLASS));
+					display.setBlock(Bukkit.createBlockData(Material.PINK_STAINED_GLASS));
 					display.setTransformation(new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(SIZE, SIZE, 0.5f), new AxisAngle4f()));
 					display.setInterpolationDelay(-1);
 					display.addScoreboardTag(TAG);

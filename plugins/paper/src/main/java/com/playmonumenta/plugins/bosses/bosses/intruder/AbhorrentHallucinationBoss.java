@@ -48,12 +48,11 @@ public class AbhorrentHallucinationBoss extends BossAbilityGroup {
 			teleportSpell.doTeleport();
 			Objects.requireNonNull(LibraryOfSoulsIntegration.summon(boss.getLocation(), elitesList.get(2))).addScoreboardTag(SUMMON_TAG);
 		});
-		int playerCount = IntruderBoss.playersInRange(boss.getLocation()).size();
 
 		SpellManager spellManager = new SpellManager(List.of(
 			new SpellThrowSummon(
 				plugin, boss, new EntityTargets(EntityTargets.TARGETS.PLAYER, 100, false),
-				playerCount, 8 * 20, "~FacelessArmada",
+				1, 8 * 20, "~FacelessArmada",
 				true, 3, 0, 1.0f,
 				25, 0, 0.8, 200,
 				20, false, "", false,

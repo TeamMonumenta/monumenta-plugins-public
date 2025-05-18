@@ -6,12 +6,8 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,9 +25,6 @@ public class SpellAntiCheese extends Spell {
 	private static final String SPELL_NAME = "Crushing Conscience";
 	private static final double DAMAGE_PERCENT = 0.25;
 	private static final int IMMUNITY_TICKS = 10;
-	private static final int MAX_HEIGHT = 8;
-	private static final int MAX_AIR_HEIGHT = 12;
-
 	public SpellAntiCheese(Plugin plugin, LivingEntity boss, Location center) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -43,18 +36,6 @@ public class SpellAntiCheese extends Spell {
 
 	@Override
 	public void run() {
-		List<Player> players = IntruderBoss.playersInRange(mCenter);
-		players.stream().filter(player ->
-				player.getLocation().getY() - mCenter.getY() > (PlayerUtils.isFreeFalling(player) ? MAX_AIR_HEIGHT : MAX_HEIGHT)
-					&& !mDamagedPlayers.contains(player) && !mAmalgamatingDreamscape)
-			.forEach(player -> {
-				mDamagedPlayers.add(player);
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> mDamagedPlayers.remove(player), IMMUNITY_TICKS);
-				BossUtils.bossDamagePercent(mBoss, player, DAMAGE_PERCENT, SPELL_NAME);
-				player.setVelocity(LocationUtils.getDirectionTo(mCenter, player.getLocation()));
-				player.sendMessage(Component.text("YOU CAN NOT. FLEE.", IntruderBoss.TEXT_COLOR, TextDecoration.BOLD));
-			});
-
 		EntityUtils.getNearbyMobs(mCenter, IntruderBoss.DETECTION_RANGE)
 			.stream().filter(this::inStillwater)
 			.forEach(this::throwEntity);
