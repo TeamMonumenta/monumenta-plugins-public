@@ -7,11 +7,9 @@ import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import com.playmonumenta.plugins.mail.recipient.PlayerRecipient;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.FileUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.io.File;
 import java.util.HashMap;
@@ -27,22 +25,18 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.EnchantingTable;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -57,7 +51,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class SharedVaultManager implements Listener {
 	public static final String SHARED_VAULT_NAME = "Shared Vault";
-	public static final NamespacedKey SHARED_VAULT_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/shared_vault");
 	public static final Permission PERMISSION_SHARED_VAULT = new Permission("monumenta.shared_vault");
 
 	private static final Map<String, Map<Long, Set<WalletBlock>>> mLoadedSharedVaults = new HashMap<>();
@@ -309,21 +302,6 @@ public class SharedVaultManager implements Listener {
 		WalletBlock vault = getOrRegisterWallet(block.getState());
 		if (vault != null) {
 			vault.setOwner(new PlayerRecipient(player.getUniqueId()));
-		}
-	}
-
-	// Replace drop on breaking the shared vault with the item from the loot table (with description text)
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void blockDropItemEvent(BlockDropItemEvent event) {
-		if (isSharedVault(event.getBlockState())) {
-			ItemStack sharedVaultItem = InventoryUtils.getItemFromLootTable(event.getBlock().getLocation(), SHARED_VAULT_LOOT_TABLE);
-			if (sharedVaultItem != null) {
-				for (Item item : event.getItems()) {
-					if (Material.ENCHANTING_TABLE.equals(item.getItemStack().getType())) {
-						item.setItemStack(sharedVaultItem.clone());
-					}
-				}
-			}
 		}
 	}
 

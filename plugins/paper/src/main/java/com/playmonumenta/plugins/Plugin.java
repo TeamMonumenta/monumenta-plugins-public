@@ -559,6 +559,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new BrewingListener(), this);
 		manager.registerEvents(new ItemUpdateManager(this), this);
 		manager.registerEvents(new DamageListener(this), this);
+		manager.registerEvents(new DroppedItemReplacementListener(), this);
+		manager.registerEvents(new RenameOnPlaceListener(), this);
 		manager.registerEvents(mItemStatManager, this);
 		manager.registerEvents(new StasisListener(), this);
 		manager.registerEvents(new TradeListener(), this);

@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.managers;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.ShulkerShortcutListener;
 import com.playmonumenta.plugins.utils.BlockUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.function.Predicate;
@@ -12,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.Block;
@@ -20,11 +18,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.ShulkerBox;
-import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
@@ -135,31 +131,6 @@ public class SmartFurnaceManager implements Listener {
 
 			// Update the items after the event; handling this mid-event might mean the furnace isn't fully ready
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> moveFurnaceItems(event.getBlock().getState()));
-		}
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void blockDropItemEvent(BlockDropItemEvent event) {
-		BlockState blockState = event.getBlockState();
-		SmartFurnaceType smartFurnaceType = SmartFurnaceType.getType(blockState);
-		if (smartFurnaceType == null) {
-			return;
-		}
-
-		ItemStack smartFurnaceItem = InventoryUtils.getItemFromLootTable(event.getBlock().getLocation(), NamespacedKey.fromString(smartFurnaceType.mLootTable));
-		if (smartFurnaceItem != null) {
-			for (Item item : event.getItems()) {
-				ItemStack itemStack = item.getItemStack();
-				ItemMeta meta = itemStack.getItemMeta();
-				Component displayName = meta.displayName();
-				if (
-					itemStack.getType().equals(smartFurnaceType.mMat)
-						&& displayName != null
-						&& MessagingUtils.plainText(displayName).equals(smartFurnaceType.mName)
-				) {
-					item.setItemStack(smartFurnaceItem.asQuantity(itemStack.getAmount()));
-				}
-			}
 		}
 	}
 

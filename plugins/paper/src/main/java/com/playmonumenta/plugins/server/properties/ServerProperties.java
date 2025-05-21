@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -72,6 +73,8 @@ public class ServerProperties {
 	private final EnumSet<Material> mAlwaysPickupMats = EnumSet.noneOf(Material.class);
 	private final EnumSet<Material> mNamedPickupMats = EnumSet.noneOf(Material.class);
 
+	private final Set<String> mFormattingFreeBlockNames = new TreeSet<>();
+	private final List<NamespacedKey> mDroppedItemReplacements = new ArrayList<>();
 	private final List<NamespacedKey> mEggifySpawnEggs = new ArrayList<>();
 	private int mLootingLimiterMobKills = 0;
 	private int mLootingLimiterSpawners = 0;
@@ -239,6 +242,14 @@ public class ServerProperties {
 		return INSTANCE.mNamedPickupMats;
 	}
 
+	public static Set<String> getFormatingFreeBlockNames() {
+		return INSTANCE.mFormattingFreeBlockNames;
+	}
+
+	public static List<NamespacedKey> getDroppedItemReplacements() {
+		return INSTANCE.mDroppedItemReplacements;
+	}
+
 	public static List<NamespacedKey> getEggifySpawnEggs() {
 		return INSTANCE.mEggifySpawnEggs;
 	}
@@ -332,6 +343,8 @@ public class ServerProperties {
 			getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender, mAlwaysPickupMats);
 			getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender, mNamedPickupMats);
 
+			getPropertyValueCollection(plugin, object, "formattingFreeBlockNames", sender, String::toString, mFormattingFreeBlockNames);
+			getPropertyValueCollection(plugin, object, "droppedItemReplacements", sender, NamespacedKeyUtils::fromString, mDroppedItemReplacements);
 			getPropertyValueCollection(plugin, object, "eggifySpawnEggs", sender, NamespacedKeyUtils::fromString, mEggifySpawnEggs);
 
 			mLootingLimiterMobKills = getPropertyValueInt(object, "lootingLimiterMobKills", mLootingLimiterMobKills);
@@ -399,6 +412,8 @@ public class ServerProperties {
 		out.add("alwaysPickupMaterials = [" + mAlwaysPickupMats.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
 		out.add("namedPickupMaterials = [" + mNamedPickupMats.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
 
+		out.add("formattingFreeBlockNames = <set of " + mFormattingFreeBlockNames.size() + " block names>");
+		out.add("droppedItemReplacements = <set of " + mDroppedItemReplacements.size() + " loot tables>");
 		out.add("eggifySpawnEggs = <set of " + mEggifySpawnEggs.size() + " loot tables>");
 
 		out.add("lootingLimiterMobKills = " + mLootingLimiterMobKills);
@@ -453,7 +468,7 @@ public class ServerProperties {
 	}
 
 	private <T> void getPropertyValueCollection(Plugin plugin, JsonObject object, String propertyName, @Nullable CommandSender sender,
-												Function<String, T> parser, Collection<T> collection) {
+	                                            Function<String, T> parser, Collection<T> collection) {
 		JsonElement element = object.get(propertyName);
 		if (element != null) {
 			collection.clear();

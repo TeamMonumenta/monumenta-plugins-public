@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBT;
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Barrel;
@@ -37,7 +35,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -58,7 +55,6 @@ import org.jetbrains.annotations.Nullable;
 public class PotionBarrelListener implements Listener {
 
 	public static final String POTION_BARREL_NAME = "Potion Barrel";
-	public static final NamespacedKey POTION_BARREL_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/potion_barrel");
 	public static final Permission PERMISSION_PURPLE_TESSERACT = new Permission("monumenta.tesseract.purple");
 
 	// inventory handling
@@ -692,18 +688,6 @@ public class PotionBarrelListener implements Listener {
 			)
 		) {
 			event.setCancelled(true);
-		}
-	}
-
-	// Replace drop on breaking the barrel with the item from the loot table (with description text)
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void blockDropItemEvent(BlockDropItemEvent event) {
-		if (isPotionBarrel(event.getBlockState())) {
-			ItemStack potionBarrel = InventoryUtils.getItemFromLootTable(event.getBlock().getLocation(), POTION_BARREL_LOOT_TABLE);
-			if (potionBarrel != null) {
-				event.getItems().removeIf(item -> item.getItemStack().getType() == Material.BARREL);
-				event.getItems().add(event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation().toCenterLocation(), potionBarrel));
-			}
 		}
 	}
 

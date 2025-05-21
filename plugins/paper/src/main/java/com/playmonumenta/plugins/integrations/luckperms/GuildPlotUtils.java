@@ -21,10 +21,14 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Nameable;
 import org.bukkit.World;
+import org.bukkit.block.Barrel;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.LoomInventory;
 import org.bukkit.inventory.PlayerInventory;
@@ -324,8 +328,29 @@ public class GuildPlotUtils {
 			return false;
 		}
 
-		if (player.equals(inventory.getHolder())) {
+		InventoryHolder holder = inventory.getHolder();
+		if (player.equals(holder)) {
 			return false;
+		}
+
+		if (holder instanceof Nameable nameable) {
+			Component customName = nameable.customName();
+
+			if (
+				customName != null
+					&& holder instanceof Barrel
+					&& MessagingUtils.plainText(customName).equals("Sharrel")
+			) {
+				return false;
+			}
+
+			if (
+				customName != null
+					&& holder instanceof Chest
+					&& MessagingUtils.plainText(customName).equals("Community Chest")
+			) {
+				return false;
+			}
 		}
 
 		if (inventory.equals(player.getEnderChest())) {
@@ -376,8 +401,29 @@ public class GuildPlotUtils {
 			return false;
 		}
 
-		if (player.equals(inventory.getHolder())) {
+		InventoryHolder holder = inventory.getHolder();
+		if (player.equals(holder)) {
 			return false;
+		}
+
+		if (holder instanceof Nameable nameable) {
+			Component customName = nameable.customName();
+
+			if (
+				customName != null
+					&& holder instanceof Barrel
+					&& MessagingUtils.plainText(customName).equals("Sharrel")
+			) {
+				return false;
+			}
+
+			if (
+				customName != null
+					&& holder instanceof Chest
+					&& MessagingUtils.plainText(customName).equals("Community Chest")
+			) {
+				return false;
+			}
 		}
 
 		if (inventory.equals(player.getEnderChest())) {

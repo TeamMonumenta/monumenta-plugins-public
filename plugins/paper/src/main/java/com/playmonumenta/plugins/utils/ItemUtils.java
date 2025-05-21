@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
+import com.playmonumenta.plugins.itemstats.enchantments.Undroppable;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
@@ -638,6 +639,14 @@ public class ItemUtils {
 
 	public static boolean shouldDropEquipment(@Nullable ItemStack item) {
 		if (item == null) {
+			return false;
+		}
+
+		if (new ItemStack(Material.NETHER_STAR).isSimilar(item)) {
+			return false;
+		}
+
+		if (Undroppable.isUndroppable(item)) {
 			return false;
 		}
 
