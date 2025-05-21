@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +47,7 @@ public class SpellParasomnicMist extends Spell {
 	private static final double SPEED = 3;
 
 	private static final int RANGE = 50;
-	private static final int CHARGE_UP_TIME = 4 * 20;
+	private static final int CHARGE_UP_TIME = 6 * 20;
 	private static final int DURATION = 15 * 20;
 	private static final int KILL_DURATION = 2 * 20;
 
@@ -138,9 +137,9 @@ public class SpellParasomnicMist extends Spell {
 						.extra(0.7)
 						.spawnAsBoss();
 
-					mBoss.teleport(mCenter);
-					mPlayers.forEach(player -> player.hideEntity(mPlugin, mBoss));
 					mBoss.setInvisible(false);
+					mBoss.teleport(mCenter.clone().subtract(0, 15, 0));
+					mPlayers.forEach(player -> player.hideEntity(mPlugin, mBoss));
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 5));
@@ -150,26 +149,14 @@ public class SpellParasomnicMist extends Spell {
 
 	private class SafeZone {
 		private final Location mLocation;
-		private State mState = State.NONE;
 
-
-		private enum State {
-			NONE(new Particle.DustTransition(Color.fromRGB(0x6b0000), Color.BLACK, 1.4f)),
-			ONE(new Particle.DustTransition(Color.fromRGB(0x006b00), Color.GREEN, 1.4f)),
-			TOO_MANY(new Particle.DustTransition(Color.fromRGB(0x6b6b00), Color.YELLOW, 1.4f));
-
-			private final Particle.DustTransition mDustTransition;
-
-			State(Particle.DustTransition dustTransition) {
-				mDustTransition = dustTransition;
-			}
-		}
 		public SafeZone(Location location) {
 			mLocation = location;
 			safeZoneTask();
 			movementRunnable();
 			new PPPillar(Particle.END_ROD, location, 20)
-				.count(40)
+				.count(90)
+				.delta(0.1)
 				.spawnAsBoss();
 		}
 
@@ -181,15 +168,21 @@ public class SpellParasomnicMist extends Spell {
 				public void run() {
 					if (mTicks % 10 == 0) {
 						if (mTicks <= CHARGE_UP_TIME) {
-							new PPCircle(Particle.DUST_COLOR_TRANSITION, mLocation, mSafeZoneRadius)
+							new PPCircle(Particle.SOUL_FIRE_FLAME, mLocation, mSafeZoneRadius)
 								.countPerMeter(4)
-								.data(mState.mDustTransition)
+								.spawnAsBoss();
+
+							new PPCircle(Particle.SOUL_FIRE_FLAME, mLocation, mSafeZoneRadius)
+								.directionalMode(true)
+								.delta(0, 1, 0)
+								.countPerMeter(3)
+								.extraRange(0.15, 0.25)
 								.spawnAsBoss();
 						} else {
 							new PPCircle(Particle.SOUL_FIRE_FLAME, mLocation, mSafeZoneRadius)
 								.countPerMeter(3)
 								.rotateDelta(true).directionalMode(true)
-								.delta(-0.06, 0, 0)
+								.delta(-0.06, -0.03, 0)
 								.extra(1)
 								.spawnAsBoss();
 						}
@@ -200,14 +193,7 @@ public class SpellParasomnicMist extends Spell {
 							.spawnAsBoss();
 					}
 
-					List<Player> players = PlayerUtils.playersInRange(mLocation, mSafeZoneRadius, true, false);
-					mState = switch (players.size()) {
-						case 0 -> State.NONE;
-						case 1 -> State.ONE;
-						default -> State.TOO_MANY;
-					};
-
-					mTicks += 1;
+					mTicks++;
 					if (mTicks >= CHARGE_UP_TIME + DURATION + KILL_DURATION) {
 						mLocation.getWorld().playSound(mLocation, Sound.ENTITY_WARDEN_DEATH, SoundCategory.HOSTILE, 1.5f, 1.6f);
 						new PartialParticle(Particle.FLASH, mLocation).minimumCount(1).spawnAsBoss();

@@ -391,7 +391,7 @@ public class SpellScreamroom extends Spell {
 			if (!playerScreamroom.mKilled) {
 				Player player = playerScreamroom.mPlayer;
 				player.sendMessage(Component.text("The effects of the barrier distort your soul...", NamedTextColor.GRAY, TextDecoration.ITALIC));
-				EffectManager.getInstance().addEffect(player, "ScreamroomDistortion", new PercentHealthBoost(30 * 20, -.30, "ScreamroomDistortion"));
+				EffectManager.getInstance().addEffect(player, "ScreamroomDistortion", new PercentHealthBoost(60 * 20, -.30, "ScreamroomDistortion"));
 				mOnDistort.accept(player);
 				playerScreamroom.removeScreamroom();
 			}

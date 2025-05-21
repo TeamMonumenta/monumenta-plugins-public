@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +23,7 @@ public class SpellIntruderAdvancements extends Spell {
 	private int killedShadowCount = 0;
 	private final List<Player> mPlayers;
 	private boolean mHasLuciae;
+	private boolean mGrantedFacelessDozen = false;
 
 	public SpellIntruderAdvancements(LivingEntity boss) {
 		mBoss = boss;
@@ -43,9 +43,6 @@ public class SpellIntruderAdvancements extends Spell {
 		if (mHasLuciae) {
 			LibraryOfSoulsIntegration.summon(mBoss.getLocation(), "AntumbralStalker");
 			mBoss.addScoreboardTag(IntruderBoss.STALKER_ACTIVE_TAG);
-			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 100.0, true)) {
-				player.sendMessage(String.valueOf(mBoss.getScoreboardTags().contains(IntruderBoss.STALKER_ACTIVE_TAG)));
-			}
 		}
 	}
 
@@ -77,9 +74,13 @@ public class SpellIntruderAdvancements extends Spell {
 	}
 
 	public void checkFacelessOnes() {
+		if (mGrantedFacelessDozen) {
+			return;
+		}
 		long facelessOneCount = EntityUtils.getNearbyMobs(mBoss.getLocation(), IntruderBoss.DETECTION_RANGE)
 			.stream().filter(entity -> entity.getScoreboardTags().contains("FacelessOne")).count();
 		if (facelessOneCount >= 18) {
+			mGrantedFacelessDozen = true;
 			// Grant Faceless Crowd
 			AdvancementUtils.grantAdvancement(mPlayers, "monumenta:challenges/r3/intruder/faceless_dozen");
 		}

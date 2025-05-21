@@ -212,7 +212,6 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			summonSourcelessGazes();
 		});
 		events.put(90, lBoss -> {
-			mActiveSpells.cancelAll();
 			changePassivePhase(addSpell(getPassives(), mPsychicMiasma));
 			forceCastSpell(SpellCognitiveDistortion.class);
 			mPsychicMiasma.forceOnCooldown();
@@ -286,6 +285,8 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			forceCastSpell(SpellAbhorrentHallucination.class);
 		});
 		events.put(30, lBoss -> {
+			mActiveSpells.cancelAll();
+			mPassives.forEach(Spell::cancel);
 			forceCastSpell(SpellParasomnicMist.class);
 		});
 		events.put(27, lBoss -> {
@@ -352,6 +353,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 				mCount++;
 				if (mCount >= GAZE_COUNT) {
 					this.cancel();
+					mIntruderAdvancements.checkFacelessOnes();
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, GAZE_SUMMON_INTERVAL);
@@ -759,6 +761,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 	private void resetBoss() {
 		mActiveSpells.cancelAll();
 		getPassives().forEach(Spell::cancel);
+		mPsychicMiasma.cancel();
 		mLucidRend.killLucidRends();
 		mAbhorrentHallucination.killHallucination();
 		mNightmarishCarvings.killDisplays();
@@ -785,7 +788,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			// Only reset boss arena if you lose as win mech modifies arena
 			resetBossArena();
 		}
-		EntityUtils.getNearbyMobs(mSpawnLoc, 30, DETECTION_RANGE, 30, EntityUtils::isHostileMob).forEach(Entity::remove);
+		EntityUtils.getNearbyMobs(mSpawnLoc, DETECTION_RANGE, DETECTION_RANGE, DETECTION_RANGE, EntityUtils::isHostileMob).forEach(Entity::remove);
 
 	}
 

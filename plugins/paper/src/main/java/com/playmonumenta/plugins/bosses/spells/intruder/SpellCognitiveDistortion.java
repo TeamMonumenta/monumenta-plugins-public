@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.util.Objects;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -61,7 +63,7 @@ public class SpellCognitiveDistortion extends Spell {
 	public static final int Y_OFFSET = 50;
 	public static final double SPREAD_RANGE = 10;
 	public static final int CAST_TIME = 10 * 20;
-	public static final int DEBUFF_DURATION = 30 * 20;
+	public static final int DEBUFF_DURATION = 60 * 20;
 	public static final double CIRCLE_RADIUS = 3;
 
 	public SpellCognitiveDistortion(Plugin plugin, LivingEntity boss, List<Player> players, Location centerLocation, IntruderBoss.Dialogue dialogue, IntruderBoss.Narration narration) {
@@ -165,7 +167,7 @@ public class SpellCognitiveDistortion extends Spell {
 		IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player -> {
 			EffectManager.getInstance().addEffect(player, WEAKNESS_SOURCE, new PercentDamageDealt(DEBUFF_DURATION, -0.3).deleteOnLogout(true));
 			EffectManager.getInstance().addEffect(player, ANTI_HEAL_SOURCE, new PercentHeal(DEBUFF_DURATION, -0.5).deleteOnLogout(true));
-			EffectManager.getInstance().addEffect(player, SLOWNESS_SOURCE, new PercentSpeed(DEBUFF_DURATION, -0.3, SPELL_NAME).deleteOnLogout(true));
+			EffectManager.getInstance().addEffect(player, SLOWNESS_SOURCE, new PercentSpeed(DEBUFF_DURATION, -0.4, SPELL_NAME).deleteOnLogout(true));
 		});
 		finishSpell();
 	}
@@ -217,6 +219,7 @@ public class SpellCognitiveDistortion extends Spell {
 				.delta(0.4, 0, 0)
 				.extraRange(0.1, CIRCLE_RADIUS)
 				.spawnAsBoss();
+			player.showTitle(Title.title(Component.empty(), Component.text("TOGETHER", NamedTextColor.WHITE), Title.Times.times(Duration.ZERO, Duration.ofMillis(500), Duration.ofMillis(100))));
 		} else {
 			for (int i = 0; i < 5; i++) {
 				player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, 0.3f, 0.1f);
@@ -236,6 +239,7 @@ public class SpellCognitiveDistortion extends Spell {
 			new PartialParticle(Particle.VIBRATION, player.getLocation())
 				.data(new Vibration(new Vibration.Destination.BlockDestination(mShiftedLoc), 10))
 				.spawnAsBoss();
+			player.showTitle(Title.title(Component.empty(), Component.text("ALONE", NamedTextColor.GRAY), Title.Times.times(Duration.ZERO, Duration.ofMillis(500), Duration.ofMillis(100))));
 		}
 		return together;
 	}
@@ -260,6 +264,7 @@ public class SpellCognitiveDistortion extends Spell {
 					.delta(0.4, 0, 0)
 					.extraRange(0.1, CIRCLE_RADIUS)
 					.spawnAsBoss();
+				player.showTitle(Title.title(Component.empty(), Component.text("TOGETHER", NamedTextColor.WHITE), Title.Times.times(Duration.ZERO, Duration.ofMillis(500), Duration.ofMillis(100))));
 			} else {
 				for (int i = 0; i < 5; i++) {
 					player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, 0.3f, 0.1f);
@@ -267,6 +272,7 @@ public class SpellCognitiveDistortion extends Spell {
 				if (FastUtils.RANDOM.nextBoolean()) {
 					player.playSound(player.getLocation().add(VectorUtils.randomUnitVector().multiply(3)), Sound.AMBIENT_SOUL_SAND_VALLEY_MOOD, 2f, 0.1f);
 				}
+				player.showTitle(Title.title(Component.empty(), Component.text("ALONE", NamedTextColor.GRAY), Title.Times.times(Duration.ZERO, Duration.ofMillis(500), Duration.ofMillis(100))));
 			}
 			List.copyOf(mPlayers).stream().filter(playerOther -> playerOther != player).forEach(playerOther -> {
 				player.playSound(loc, Sound.ENTITY_WARDEN_HEARTBEAT, 3.0f, 1.0f);

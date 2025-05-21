@@ -21,6 +21,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,7 +46,7 @@ public class SpellPsychicMiasma extends Spell {
 	private static final int SIZE = 5;
 	private static final float KNOCKBACK = 1.1f;
 	private static final double SPEED = 0.2;
-	private static final double SPEED_HIT = 0.4;
+	private static final double SPEED_HIT = 0.34;
 	private static final List<Integer> OFFSETS;
 	private static final List<Integer> DIRECTIONS;
 	public static final String TAG = "PsychicMiasma";
@@ -103,19 +104,19 @@ public class SpellPsychicMiasma extends Spell {
 					Location spawnLoc = mCenter.clone();
 					Vector direction = switch (mShuffledDirection.get(mCount++) % 4) {
 						case 0 -> {
-							spawnLoc.add(new Vector(30, 0, getRandomHorizontal(mCount)));
+							spawnLoc.add(new Vector(35, 0, getRandomHorizontal(mCount)));
 							yield new Vector(-1, 0, 0);
 						}
 						case 1 -> {
-							spawnLoc.add(new Vector(-30, 0, -getRandomHorizontal(mCount)));
+							spawnLoc.add(new Vector(-35, 0, -getRandomHorizontal(mCount)));
 							yield new Vector(1, 0, 0);
 						}
 						case 2 -> {
-							spawnLoc.add(new Vector(getRandomHorizontal(mCount), 0, 30));
+							spawnLoc.add(new Vector(getRandomHorizontal(mCount), 0, 35));
 							yield new Vector(0, 0, -1);
 						}
 						case 3 -> {
-							spawnLoc.add(new Vector(-getRandomHorizontal(mCount), 0, -30));
+							spawnLoc.add(new Vector(-getRandomHorizontal(mCount), 0, -35));
 							yield new Vector(0, 0, 1);
 						}
 						default -> throw new IllegalStateException("Unexpected value!");
@@ -125,6 +126,7 @@ public class SpellPsychicMiasma extends Spell {
 
 					BlockDisplay display = mBoss.getWorld().spawn(spawnLoc, BlockDisplay.class);
 					display.setBlock(Bukkit.createBlockData(Material.PINK_STAINED_GLASS));
+					display.setBrightness(new Display.Brightness(15, 15));
 					display.setTransformation(new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(SIZE, SIZE, 0.5f), new AxisAngle4f()));
 					display.setInterpolationDelay(-1);
 					display.addScoreboardTag(TAG);
@@ -138,24 +140,15 @@ public class SpellPsychicMiasma extends Spell {
 					BukkitRunnable miasmaRunnable = new BukkitRunnable() {
 						final List<Player> mPlayers = IntruderBoss.playersInRange(mBoss.getLocation());
 						final Vector mCorner = VectorUtils.rotateYAxis(direction, -90).multiply(SIZE);
-						final Vector mOffset = new Vector();
 						double mBlocks = 0;
 						double mSpeed = SPEED;
 
 						@Override
 						public void run() {
-							mOffset.add(direction.clone().multiply(mSpeed));
 							mBlocks += mSpeed;
-							Transformation transformation = display.getTransformation();
-							display.setInterpolationDuration(1);
-							display.setTransformation(new Transformation(
-								new Vector3f(0, 0, (float) mBlocks),
-								transformation.getLeftRotation(),
-								transformation.getScale(),
-								transformation.getRightRotation()
-							));
+							display.teleport(display.getLocation().add(direction.clone().multiply(mSpeed)));
 
-							Location wallLoc = display.getLocation().add(mOffset);
+							Location wallLoc = display.getLocation();
 							BoundingBox box = BoundingBox.of(wallLoc, wallLoc.clone().add(mCorner.clone().add(new Vector(0, SIZE, 0))));
 							new PPLine(Particle.REDSTONE, wallLoc, wallLoc.clone().add(mCorner)).countPerMeter(1).delta(0.2).data(new Particle.DustOptions(Color.fromRGB(0xec1023), 0.9f)).spawnAsBoss();
 
@@ -167,7 +160,7 @@ public class SpellPsychicMiasma extends Spell {
 								MovementUtils.knockAway(player.getLocation().subtract(direction), player, KNOCKBACK, false);
 								mSpeed = SPEED_HIT;
 							});
-							if (mBlocks > 60) {
+							if (mBlocks > 70) {
 								this.cancel();
 							}
 						}

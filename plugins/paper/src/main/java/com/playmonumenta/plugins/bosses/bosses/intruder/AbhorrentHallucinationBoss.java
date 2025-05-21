@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.bosses.spells.SpellSpawnMobs;
 import com.playmonumenta.plugins.bosses.spells.SpellThrowSummon;
 import com.playmonumenta.plugins.bosses.spells.intruder.SpellAbhorrentHallucinationTeleport;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -68,7 +67,7 @@ public class AbhorrentHallucinationBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
-		if (event.getSpell() instanceof SpellSpawnMobs) {
+		if (event.getSpell() instanceof SpellThrowSummon) {
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.AMBIENT_CAVE, SoundCategory.HOSTILE, 3.0f, 0.5f, 45);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.AMBIENT_CAVE, SoundCategory.HOSTILE, 2.0f, 1.4f, 4);
 		}

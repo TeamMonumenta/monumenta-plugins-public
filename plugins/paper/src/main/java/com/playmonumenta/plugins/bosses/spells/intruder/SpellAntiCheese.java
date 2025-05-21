@@ -22,7 +22,6 @@ public class SpellAntiCheese extends Spell {
 	private final LivingEntity mBoss;
 	private final Location mCenter;
 
-	private static final String SPELL_NAME = "Crushing Conscience";
 	private static final double DAMAGE_PERCENT = 0.25;
 	private static final int IMMUNITY_TICKS = 10;
 	public SpellAntiCheese(Plugin plugin, LivingEntity boss, Location center) {

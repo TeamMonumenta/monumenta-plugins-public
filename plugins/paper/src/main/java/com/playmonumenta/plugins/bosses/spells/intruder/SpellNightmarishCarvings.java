@@ -66,7 +66,6 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 
 	private int mCastNumber = 0;
 	private static final int BUFF_DURATION = 120 * 60 * 20;
-	private static final int REINCARNATION_DURATION = 4 * 60 * 20;
 	private static final int CHARGE_TIME = 15 * 20;
 
 	public SpellNightmarishCarvings(Plugin plugin, LivingEntity boss, List<Player> players, Location center, IntruderBoss.Dialogue dialogue, IntruderBoss.Narration narration, double extraPowerPerCast) {
@@ -116,6 +115,7 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 			player.playSound(mLauncher.getLocation(), Sound.ITEM_TOTEM_USE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 			PlayerUtils.killPlayer(player, mLauncher, SPELL_NAME, true, true, true);
 		});
+		killDisplays();
 		super.cancel();
 	}
 
@@ -144,25 +144,19 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 
 		if (mCastNumber < 2) {
 			mCarvings.put(summonCarving(mCenter.clone().add(new Vector(0, -2, 3)),
-				CarvingType.DAMAGE.getColor(),
-				"CarvingofWrath"), CarvingType.DAMAGE);
+				"CarvingofWrath", CarvingType.DAMAGE), CarvingType.DAMAGE);
 			mCarvings.put(summonCarving(mCenter.clone().add(new Vector(3, -2, -3)),
-				CarvingType.RESISTANCE.getColor(),
-				"CarvingofFortitude"), CarvingType.RESISTANCE);
+				"CarvingofFortitude", CarvingType.RESISTANCE), CarvingType.RESISTANCE);
 			mCarvings.put(summonCarving(mCenter.clone().add(new Vector(-3, -2, -3)),
-				CarvingType.SPEED.getColor(),
-				"CarvingofOmen"), CarvingType.SPEED);
+				"CarvingofOmen", CarvingType.SPEED), CarvingType.SPEED);
 
 		} else {
 			mCarvings.put(summonCarving(mCenter.clone().add(new Vector(0, -2, 3)),
-				CarvingType.HEALING.getColor(),
-				"CarvingofRestoration"), CarvingType.HEALING);
+				"CarvingofRestoration", CarvingType.HEALING), CarvingType.HEALING);
 			mCarvings.put(summonCarving(mCenter.clone().add(new Vector(3, -2, -3)),
-				CarvingType.ABILITY_COOLDOWN.getColor(),
-				"CarvingofPerspicacity"), CarvingType.ABILITY_COOLDOWN);
+				"CarvingofPerspicacity", CarvingType.ABILITY_COOLDOWN), CarvingType.ABILITY_COOLDOWN);
 			mCarvings.put(summonCarving(mCenter.clone().add(new Vector(-3, -2, -3)),
-				CarvingType.REINCARNATION.getColor(),
-				"CarvingofResilience"), CarvingType.REINCARNATION);
+				"CarvingofResilience", CarvingType.REINCARNATION), CarvingType.REINCARNATION);
 
 			mNarration.narration("The Carvings feel different this time.");
 			mNarration.narration("Your mind rebells against the <obfuscated>lxxxxxxx</obfuscated>.");
@@ -194,7 +188,7 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 			.spawnAsBoss();
 	}
 
-	private Entity summonCarving(Location location, TextColor color, String name) {
+	private Entity summonCarving(Location location, String name, CarvingType type) {
 		Entity summon = Objects.requireNonNull(LibraryOfSoulsIntegration.summon(location, name));
 
 		TextDisplay text = location.getWorld().spawn(location.clone().add(0, summon.getHeight() + 4, 0), TextDisplay.class);
@@ -210,8 +204,10 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 		));
 		text.setBrightness(new Display.Brightness(15, 15));
 		text.setBackgroundColor(Color.fromARGB(0x00000000));
-		mPlayers.forEach(player -> player.sendMessage(summon.getName()));
-		text.text(summon.name().color(color));
+		Component coloredName = summon.name().color(type.getColor());
+		text.text(coloredName);
+
+		mPlayers.forEach(player -> player.sendMessage(coloredName.hoverEvent(type.getMessage(mExtraPower))));
 
 		return summon;
 	}
@@ -219,22 +215,22 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 	public enum CarvingType {
 		DAMAGE(true, true,
 			extra -> new PercentDamageDealt(BUFF_DURATION, 0.15 + extra),
-			extra -> List.of(
-				MessagingUtils.fromMiniMessage("<color:gray>The carving strengthens both you and the <obfuscated>lxxxxxxx</obfuscated>.</color>"),
+			extra ->
+				MessagingUtils.fromMiniMessage("<color:gray>The carving strengthens both you and the <obfuscated>lxxxxxxx</obfuscated>.</color>\n").append(
 				Component.text(String.format("+%d%% Damage.", (int) (15 + extra * 100)), TextColor.color(0xb80217))
 			),
 			TextColor.color(0xb80217)),
 		RESISTANCE(true, true,
 			extra -> new PercentDamageReceived(BUFF_DURATION, -0.15 - extra / 2),
-			extra -> List.of(
-				MessagingUtils.fromMiniMessage("<color:gray>The carving fortifies both you and the <obfuscated>lxxxxxxx</obfuscated>.</color>"),
+			extra ->
+				MessagingUtils.fromMiniMessage("<color:gray>The carving fortifies both you and the <obfuscated>lxxxxxxx</obfuscated>.</color>\n").append(
 				Component.text(String.format("+%d%% Resistance.", (int) (15 + extra * 50)), TextColor.color(0x7b0fff))
 			),
 			TextColor.color(0x7b0fff)),
 		SPEED(true, true,
 			extra -> new PercentSpeed(BUFF_DURATION, 0.15 + extra, "NightmarishCarvings"),
-			extra -> List.of(
-				MessagingUtils.fromMiniMessage("<color:gray>The carving accelerates both you and the <obfuscated>lxxxxxxx</obfuscated>.</color>"),
+			extra ->
+				MessagingUtils.fromMiniMessage("<color:gray>The carving accelerates both you and the <obfuscated>lxxxxxxx</obfuscated>.</color>\n").append(
 				Component.text(String.format("+%d%% Speed.", (int) (15 + extra * 100)), TextColor.color(0x0fefff))
 			),
 			TextColor.color(0x0fefff)),
@@ -242,33 +238,33 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 		// Last one
 		HEALING(false, true,
 			extra -> new PercentHeal(BUFF_DURATION, 0.25),
-			extra -> List.of(
-				Component.text("The carving revitalizes you.", NamedTextColor.GRAY),
+			extra ->
+				Component.text("The carving revitalizes you.\n", NamedTextColor.GRAY).append(
 				Component.text(String.format("+%d%% Healing.", 25), TextColor.color(0xfd245e))
 			),
 			TextColor.color(0xfd245e)),
 		ABILITY_COOLDOWN(false, true,
 			extra -> new AbilityCooldownDecrease(BUFF_DURATION, 0.25),
-			extra -> List.of(
-				Component.text("The carving hastens you.", NamedTextColor.GRAY),
+			extra ->
+				Component.text("The carving hastens you.\n", NamedTextColor.GRAY).append(
 				Component.text(String.format("-%d%% Ability Cooldown.", 25), TextColor.color(0x8bfe3e))
 			),
 			TextColor.color(0x8bfe3e)),
 		REINCARNATION(false, true,
-			extra -> new Reincarnation(REINCARNATION_DURATION, 1),
-			extra -> List.of(
-				Component.text("The carving reinforces you.", NamedTextColor.GRAY),
-				Component.text(String.format("For the next %d seconds...", REINCARNATION_DURATION / 20), TextColor.color(0xfe9e11))
+			extra -> new Reincarnation(BUFF_DURATION, 1),
+			extra ->
+				Component.text("The carving reinforces you.\n", NamedTextColor.GRAY).append(
+				Component.text("You've gained Reincarnation against death...", TextColor.color(0xfe9e11))
 			),
 			TextColor.color(0xfe9e11));
 
 		private final boolean mLauncherGetsBuff;
 		private final boolean mPlayerGetsBuff;
 		private final Function<Double, Effect> mBuff;
-		private final Function<Double, List<Component>> mMessage;
+		private final Function<Double, Component> mMessage;
 		private final TextColor mColor;
 
-		CarvingType(boolean bossGetsBuff, boolean playerGetsBuff, Function<Double, Effect> buff, Function<Double, List<Component>> message, TextColor color) {
+		CarvingType(boolean bossGetsBuff, boolean playerGetsBuff, Function<Double, Effect> buff, Function<Double, Component> message, TextColor color) {
 			mLauncherGetsBuff = bossGetsBuff;
 			mPlayerGetsBuff = playerGetsBuff;
 			mBuff = buff;
@@ -288,7 +284,7 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 			return mBuff.apply(add);
 		}
 
-		public List<Component> getMessage(double add) {
+		public Component getMessage(double add) {
 			return mMessage.apply(add);
 		}
 
@@ -309,9 +305,7 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 		LivingEntity entity = event.getEntity();
 		if (mCarvings.containsKey(entity)) {
 			CarvingType chosenCarving = Objects.requireNonNull(mCarvings.get(entity));
-			chosenCarving.getMessage(mExtraPower).forEach(component -> {
-				mPlayers.forEach(player -> player.sendMessage(component));
-			});
+			mPlayers.forEach(player -> player.sendMessage(chosenCarving.getMessage(mExtraPower)));
 
 			if (chosenCarving.isPlayerGetsBuff()) {
 				mPlayers.forEach(player -> {

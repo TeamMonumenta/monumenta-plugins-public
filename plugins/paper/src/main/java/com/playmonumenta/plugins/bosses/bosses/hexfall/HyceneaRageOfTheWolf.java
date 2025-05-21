@@ -102,6 +102,7 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 				plugin.mEffectManager.clearEffects(p, BluePercentDamageDealt.effectID);
 				plugin.mEffectManager.addEffect(p, Reincarnation.GENERIC_NAME, new Reincarnation(20 * 6000, 1));
 				mPlayersStartingFight.add(p);
+				p.sendMessage(Component.text("You've gained Reincarnation against death...", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			}
 		);
 	}

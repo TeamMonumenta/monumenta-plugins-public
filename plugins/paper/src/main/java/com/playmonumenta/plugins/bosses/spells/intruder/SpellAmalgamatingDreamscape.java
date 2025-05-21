@@ -170,7 +170,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 
 	private void breakMain() {
 		List<Block> blocks = new ArrayList<>(BlockUtils.getBlocksInCube(mCenter, 30).stream()
-			.filter(Block::isSolid)
+			.filter(block -> block.isSolid() && block.getType() != Material.REDSTONE_BLOCK)
 			.toList());
 		Collections.shuffle(blocks);
 		IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player ->
@@ -237,7 +237,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 	private void cutscene(Location loc) {
 		Location location = loc.clone();
 		List<Block> blocks = new ArrayList<>(BlockUtils.getBlocksInCube(mCenter, 30).stream()
-			.filter(Block::isSolid)
+			.filter(block -> block.isSolid() && block.getType() != Material.REDSTONE_BLOCK)
 			.toList());
 		Collections.shuffle(blocks);
 		IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player -> {
@@ -332,11 +332,10 @@ public class SpellAmalgamatingDreamscape extends Spell {
 				public void run() {
 					if (mChargeUpManager.previousTick(5)) {
 						mNarration.narration("You feel the apparitions closing in on you...");
-						cutscene(bossSpawnLocation);
 						new PartialParticle(Particle.FLASH, bossSpawnLocation).minimumCount(1).spawnAsBoss();
 						// Punish players who take too long
 						IntruderBoss.playersInRange(tpLocation).forEach(player ->
-							PlayerUtils.killPlayer(player, mBoss, SPELL_NAME, true, true, false));
+							PlayerUtils.killPlayer(player, mBoss, SPELL_NAME, true, true, true));
 						this.cancel();
 					} else if (mChargeUpManager.getTime() % 20 == 0) {
 						if (mSouls.isEmpty()) {

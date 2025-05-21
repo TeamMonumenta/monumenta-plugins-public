@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
 import net.kyori.adventure.bossbar.BossBar;
@@ -70,16 +71,20 @@ public class SpellMalevolentConduit extends SpellNova {
 			@Override
 			public void run() {
 				if (mChargeUpManager.getTime() % 10 == 0) {
-					new PPCircle(Particle.SQUID_INK, mLauncher.getLocation().add(new Vector(0, 0.2, 0)), mRadius)
-						.count(100)
-						.directionalMode(true)
-						.delta(-0.5, -0.1, 0)
-						.extra(1)
-						.rotateDelta(true)
-						.spawnAsBoss();
+					if (mChargeUpManager.getTime() < mDuration - 20) {
+						new PPCircle(Particle.REVERSE_PORTAL, mLauncher.getLocation().add(new Vector(0, 0.2, 0)), mRadius)
+							.count(200)
+							.directionalMode(true)
+							.delta(-0.45, 0, 0)
+							.extra(1)
+							.rotateDelta(true)
+							.spawnAsBoss();
+					}
 
-					new PPCircle(Particle.SQUID_INK, mLauncher.getLocation().add(new Vector(0, 0.2, 0)), mRadius)
+					new PPCircle(Particle.DUST_COLOR_TRANSITION, mLauncher.getLocation().add(new Vector(0, 0.2, 0)), mRadius)
+						.data(new Particle.DustTransition(Color.PURPLE, Color.FUCHSIA, 2.0f))
 						.count(80)
+						.delta(0.1)
 						.spawnAsBoss();
 
 					new PPCircle(Particle.SPELL_WITCH, mLauncher.getLocation().add(new Vector(0, 0.2, 0)), mRadius)
@@ -99,6 +104,7 @@ public class SpellMalevolentConduit extends SpellNova {
 	protected void chargeCircleAction(Location loc, double radius) {
 		double timeStart = radius / mRadius * mDuration;
 		double timeEnd = (radius - (double) mRadius / mDuration) / mRadius * mDuration;
+		Color color = ParticleUtils.getTransition(Color.FUCHSIA, Color.RED, radius / mRadius);
 
 		for (int i = 0; i < 10; i++) {
 			double time = timeStart + (timeEnd - timeStart) * i / 10;
@@ -112,13 +118,13 @@ public class SpellMalevolentConduit extends SpellNova {
 			pLoc.setZ(pLoc.getZ() + z * mult);
 			pLoc.setY(pLoc.getY() + y);
 			new PartialParticle(Particle.DUST_COLOR_TRANSITION, pLoc)
-				.data(new Particle.DustTransition(Color.RED, Color.fromRGB(0x2b0000), 1.45f))
+				.data(new Particle.DustTransition(color, Color.RED, 1.45f))
 				.delta(0.075)
 				.spawnAsBoss();
 		}
 
 		new PartialParticle(Particle.REDSTONE, loc.clone().add(new Vector(0, 5, 0)))
-			.data(new Particle.DustOptions(Color.RED, 2.0f))
+			.data(new Particle.DustOptions(color, 2.0f))
 			.spawnAsBoss();
 		super.chargeCircleAction(loc, radius);
 	}
