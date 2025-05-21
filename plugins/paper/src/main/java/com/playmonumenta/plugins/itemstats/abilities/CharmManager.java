@@ -1331,7 +1331,7 @@ public class CharmManager {
 		AbilityManager.getManager().updatePlayerAbilities(p, true);
 	}
 
-	private static final Pattern CHARM_LINE_PATTERN = Pattern.compile("([*🔒] ?)?([-+]?\\d+(?:\\.\\d+)?)(%)? (.+)");
+	private static final Pattern CHARM_LINE_PATTERN = Pattern.compile("([*🔒\uD87D\uDD12] ?)?([-+]?\\d+(?:\\.\\d+)?)(%)? (.+)");
 
 	//Helper method to parse item for charm effects
 	private List<CharmParsedInfo> readCharm(ItemStack itemStack) {
