@@ -154,6 +154,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	public void throwPotion(boolean gruesome) {
 		if (decrementCharge()) {
 			ThrownPotion thrownPotion = mPlayer.launchProjectile(ThrownPotion.class);
+			thrownPotion.setItem(mPlayer.getEquipment().getItemInMainHand());
 			setPotionToAlchemistPotion(thrownPotion, gruesome);
 		}
 	}
