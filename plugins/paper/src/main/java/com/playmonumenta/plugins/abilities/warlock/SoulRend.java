@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.NavigableSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -109,14 +110,18 @@ public class SoulRend extends Ability {
 			mCosmetic.rendHitSound(world, loc);
 			mCosmetic.rendHitParticle(mPlayer, loc);
 
+			@Nullable
 			NavigableSet<Effect> darkPactEffects = mPlugin.mEffectManager.getEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
 			if (darkPactEffects != null) {
 				if (mDarkPact != null && mDarkPact.isLevelTwo()) {
-					int currPactDuration = darkPactEffects.last().getDuration();
+					NavigableSet<Effect> previousDarkPactEffects = new ConcurrentSkipListSet<>(darkPactEffects);
+
 					mPlugin.mEffectManager.clearEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
 					healPlayer(mPlayer, mHeal, enemy, mDarkPactHeal);
-					mPlugin.mEffectManager.addEffect(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME,
-						new PercentHeal(currPactDuration, -1).deleteOnAbilityUpdate(true));
+
+					// give back the dark pact effects
+					previousDarkPactEffects.forEach(effect ->
+						mPlugin.mEffectManager.addEffect(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME, new PercentHeal(effect.getDuration(), -effect.getMagnitude()).deleteOnAbilityUpdate(true)));
 
 				} else if (isEnhanced()) {
 					// All healing converted to absorption

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -24,7 +25,6 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.EnumSet;
 import java.util.NavigableSet;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -35,8 +35,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
-
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class DarkPact extends Ability {
 	public static final String PERCENT_HEAL_EFFECT_NAME = "DarkPactPercentHealEffect";
@@ -153,6 +151,7 @@ public class DarkPact extends Ability {
 		}
 		NavigableSet<Effect> antiHealEffects = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_HEAL_EFFECT_NAME);
 		if (antiHealEffects != null) {
+			// extend the non -100% healing effect
 			Effect extendedAntiheal = antiHealEffects.first();
 			extendedAntiheal.setDuration(extendedAntiheal.getDuration() + mDurationIncreaseOnKill);
 		}
