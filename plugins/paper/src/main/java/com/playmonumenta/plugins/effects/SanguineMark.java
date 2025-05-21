@@ -61,7 +61,7 @@ public class SanguineMark extends Effect {
 
 	@Override
 	public void onDeath(EntityDeathEvent event) {
-		if (event.getEntity().getKiller() != null) {
+		if (event.getEntity().getKiller() != null && mMarks > 0) {
 			Player player = event.getEntity().getKiller();
 
 			mCosmetic.onDeath(event.getEntity(), player);
