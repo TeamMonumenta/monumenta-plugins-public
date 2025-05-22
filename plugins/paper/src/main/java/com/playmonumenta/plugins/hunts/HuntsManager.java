@@ -176,7 +176,7 @@ public class HuntsManager implements Listener {
 
 			Location loc = getLocation(world);
 			if (!loc.isChunkLoaded()) {
-				BroadcastedEvents.clearEvent(name());
+				BroadcastedEvents.clearEvent(name(), "ring");
 				MMLog.fine("[Hunts] Failed to summon quarry " + mName + " because the chunk was unloaded.");
 				return null;
 			}
@@ -199,7 +199,7 @@ public class HuntsManager implements Listener {
 				} catch (Exception e) {
 					MMLog.severe("[Hunts] Failed to initialize boss tag " + mTag, e);
 				}
-				BroadcastedEvents.clearEvent(name());
+				BroadcastedEvents.clearEvent(name(), "ring");
 				return quarry;
 			} else {
 				MMLog.severe("[Hunts] Failed to get quarry " + mLos + " from Library of Souls!");
