@@ -180,7 +180,7 @@ public class Grappling implements Enchantment {
 		if (player.isSneaking()) {
 			hook.pullTowards(player, level);
 			if (hook.mEmbedMob != null) {
-				pullMob(player, hook.getEmbedMob(), MOB_HORIZONTAL_SPEED, level);
+				pullMob(player, hook.mEmbedMob, MOB_HORIZONTAL_SPEED, level);
 			}
 			return;
 		}
@@ -508,7 +508,7 @@ public class Grappling implements Enchantment {
 			return mHitBlock;
 		}
 
-		public Mob getEmbedMob() {
+		public @Nullable Mob getEmbedMob() {
 			return mEmbedMob;
 		}
 	}

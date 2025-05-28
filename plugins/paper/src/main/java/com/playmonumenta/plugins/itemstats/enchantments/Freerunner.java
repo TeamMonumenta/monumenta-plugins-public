@@ -48,7 +48,7 @@ public class Freerunner implements Enchantment {
 		Collection<LivingEntity> nearbyEntities = player.getLocation().getNearbyLivingEntities(NEARBY_ENEMY_RANGE);
 		for (LivingEntity entity : nearbyEntities) {
 			if ((!(entity instanceof Player) && entity.getScoreboardTags().contains("Boss"))
-				|| (EntityUtils.isHostileMob(entity))) {
+				|| EntityUtils.isHostileMob(entity)) {
 				return false;
 			}
 		}

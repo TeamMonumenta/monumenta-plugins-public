@@ -218,7 +218,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 				if (target != null) {
 					p.HIT_SUMMONS.spawn(loc);
-				} else if (p.SUMMON_ON_COLLISION) {
+				} else if (p.SUMMON_ON_COLLISION && prevLoc != null) {
 					p.HIT_SUMMONS.spawn(prevLoc);
 				}
 
@@ -226,7 +226,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 					p.SOUND_HIT.play(loc, 0.5f, 0.5f);
 					p.PARTICLE_HIT.spawn(mBoss, loc, 0d, 0d, 0d, 0.25d);
 
-					if (target != null) {
+					if (target != null && prevLoc != null) {
 						onHitActions(p, mBoss, target, prevLoc);
 					}
 
@@ -236,7 +236,9 @@ public class ProjectileBoss extends BossAbilityGroup {
 						final List<Player> hitPlayers = new Hitbox.AABBHitbox(world,
 							new BoundingBox().shift(loc).expand(p.AOE_RADIUS)).getHitPlayers(true);
 						hitPlayers.removeIf(player -> player == target);
-						hitPlayers.forEach(player -> onHitActions(p, mBoss, player, prevLoc));
+						if (prevLoc != null) {
+							hitPlayers.forEach(player -> onHitActions(p, mBoss, player, prevLoc));
+						}
 					}
 				}
 			});
