@@ -64,6 +64,13 @@ public final class WingedBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Ignore blocks and be able to move through walls")
 		public boolean IGNORE_BLOCKS = false;
+
+		@BossParam(help = "Whether or not if the boss should spawn wings")
+		public boolean HAS_WINGS = true;
+
+		@BossParam(help = "Should the boss bob up and down")
+		public boolean OSCILLATE = true;
+
 	}
 
 	public WingedBoss(Plugin plugin, LivingEntity boss) {
@@ -81,19 +88,23 @@ public final class WingedBoss extends BossAbilityGroup {
 		boss.setGravity(false);
 
 		// Spawn wings
-		Collection<Entity> wings = createWings(spawnLoc);
-		List<ItemStack[]> armorList = banner(p.BANNER_PATTERN);
-		wings.forEach(e -> {
-			if (e instanceof ArmorStand stand) {
-				if (stand.getScoreboardTags().contains("left")) {
-					stand.getEquipment().setArmorContents(armorList.get(0));
-				} else {
-					stand.getEquipment().setArmorContents(armorList.get(1));
+		Collection<Entity> wings;
+		if(p.HAS_WINGS) {
+			wings = createWings(spawnLoc);
+			List<ItemStack[]> armorList = banner(p.BANNER_PATTERN);
+			wings.forEach(e -> {
+				if (e instanceof ArmorStand stand) {
+					if (stand.getScoreboardTags().contains("left")) {
+						stand.getEquipment().setArmorContents(armorList.get(0));
+					} else {
+						stand.getEquipment().setArmorContents(armorList.get(1));
+					}
+					stand.removeScoreboardTag("winged_wing");
 				}
-				stand.removeScoreboardTag("winged_wing");
-			}
-		});
-
+			});
+		} else {
+			wings = List.of();
+		}
 		new BukkitRunnable() {
 			final LinearInterpolator mInterp = new LinearInterpolator();
 			final PolynomialSplineFunction mFunction = mInterp.interpolate(distanceThresholds, speedValues);
@@ -105,7 +116,9 @@ public final class WingedBoss extends BossAbilityGroup {
 			@Override
 			public void run() {
 				if (!mBoss.isValid() || mBoss.isDead()) {
-					destroyWings(wings);
+					if(p.HAS_WINGS) {
+						destroyWings(wings);
+					}
 
 					this.cancel();
 					return;
@@ -118,19 +131,24 @@ public final class WingedBoss extends BossAbilityGroup {
 
 				// Temporarily stop flying if stunned
 				if (EntityUtils.isStunned(mBoss)) {
-					wings.forEach(e -> {
-						if (e instanceof ArmorStand stand) {
-							stand.teleport(mBoss.getLocation().add(0, p.WING_Y_OFFSET, 0));
-						}
-					});
+					if(p.HAS_WINGS) {
+						wings.forEach(e -> {
+							if (e instanceof ArmorStand stand) {
+								stand.teleport(mBoss.getLocation().add(0, p.WING_Y_OFFSET, 0));
+							}
+						});
+					}
 					return;
+
 				}
 
 				// Make the target detection more accurate by ignoring oscillation
 				Location loc = mBoss.getLocation();
 				Location middleLoc = loc.clone().add(0, FastUtils.cosDeg(mVerticalOscillation * 6), 0);
 
-				oscillateY(loc, FastUtils.sinDeg(mVerticalOscillation * 6) * 0.1, p.VERTICAL, p.IGNORE_BLOCKS);
+				// Is oscillate enabled?
+				double movementY = p.OSCILLATE? FastUtils.sinDeg(mVerticalOscillation * 6) * 0.1:0;
+				oscillateY(loc, movementY, p.VERTICAL, p.IGNORE_BLOCKS);
 
 				LivingEntity target = ((Mob) mBoss).getTarget();
 				double mobSpeed = EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0.2);
@@ -138,12 +156,14 @@ public final class WingedBoss extends BossAbilityGroup {
 					moveEntity(loc, target, middleLoc, p.VERTICAL, mFunction, mobSpeed, p.IGNORE_BLOCKS);
 				}
 
-				flapWings(wings, mReverseWingOscillation, p.WING_Y_OFFSET);
+				if(p.HAS_WINGS){
+					flapWings(wings, mReverseWingOscillation, p.WING_Y_OFFSET);
 
-				mWingOscillation++;
-				if (mWingOscillation == 27) {
-					mReverseWingOscillation = !mReverseWingOscillation;
-					mWingOscillation = 0;
+					mWingOscillation++;
+					if (mWingOscillation == 27) {
+						mReverseWingOscillation = !mReverseWingOscillation;
+						mWingOscillation = 0;
+					}
 				}
 
 				mVerticalOscillation++;
