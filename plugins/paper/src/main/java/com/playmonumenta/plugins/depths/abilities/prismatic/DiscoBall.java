@@ -346,6 +346,7 @@ public class DiscoBall extends DepthsAbility {
 
 	private static Component findMissingTrees(DepthsParty party, Component currComponent) {
 		Set<String> activeTreeNames = getActiveDepthTreesFromParty(party).stream()
+			.filter(tree -> tree != DepthsTree.PRISMATIC)
 			.map(DepthsTree::getDisplayName)
 			.collect(Collectors.toSet());
 
@@ -371,10 +372,10 @@ public class DiscoBall extends DepthsAbility {
 		party.mPlayersInParty.forEach(dPlayer -> {
 			List<DepthsAbilityInfo<?>> abilities = DepthsManager.getInstance().getPlayerAbilities(dPlayer);
 			Set<DepthsTree> playerTrees = abilities.stream()
-				.filter(depthsAbilityInfo -> depthsAbilityInfo.getDepthsTrigger().isActive()) // handles both cases
+				.filter(depthsAbilityInfo -> depthsAbilityInfo.getDepthsTrigger().isActive())
 				.map(DepthsAbilityInfo::getDepthsTree)
 				.filter(Objects::nonNull)
-				.filter(tree -> tree != DepthsTree.CURSE && tree != DepthsTree.PRISMATIC && tree != DepthsTree.GIFT)
+				.filter(tree -> tree != DepthsTree.CURSE && tree != DepthsTree.GIFT)
 				.collect(Collectors.toSet());
 			activeTrees.addAll(playerTrees);
 		});
