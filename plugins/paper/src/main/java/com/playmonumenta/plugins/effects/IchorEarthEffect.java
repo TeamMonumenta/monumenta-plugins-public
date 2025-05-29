@@ -50,7 +50,7 @@ public class IchorEarthEffect extends Effect {
 	}
 
 	@Override
-	public void onHurtByEntity(LivingEntity entity, DamageEvent event, Entity damager) {
+	public void onHurt(LivingEntity entity, DamageEvent event) {
 		DamageType type = event.getType();
 		if (!VALID_HIT_DAMAGE_TYPES.contains(type) || event.isBlocked()) {
 			return;
