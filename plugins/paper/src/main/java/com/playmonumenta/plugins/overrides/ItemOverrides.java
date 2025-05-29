@@ -332,6 +332,12 @@ public final class ItemOverrides {
 			eventCancelled = true;
 		}
 
+		// Don't allow placing unbreakable blocks
+		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE &&
+			ServerProperties.getUnbreakableBlocks().contains(block.getType())) {
+			eventCancelled = true;
+		}
+
 		// Don't allow placing blocks on top of barriers for plots
 		if (
 			// The top of guildplots is outside the world;
