@@ -98,6 +98,7 @@ import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.Light;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Allay;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
@@ -614,7 +615,10 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void playerInteractEntityEventWithCancelled(PlayerInteractEntityEvent event) {
-
+		if (event.getRightClicked() instanceof Allay) {
+			event.setCancelled(true);
+			return;
+		}
 		// Need to ignore the left click that follows this right click, thus handle cancelled events too
 		mPlugin.mAbilityManager.playerInteractEntityEvent(event);
 
