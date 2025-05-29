@@ -59,7 +59,7 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 			}
 			Component output = Component.empty().append(base);
 			double diff = getter.apply(a).doubleValue() - baseValue;
-			if (Math.abs(diff) > 0.01) {
+			if (Math.abs(diff) >= 0.01 || getHighestDigit(diff) >= getHighestDigit(baseValue) - 1) {
 				boolean positive = diff >= 0;
 				String sign = positive ? "+" : "";
 				TextColor color = CharmManager.getCharmEffectColor(positive, invertColor);
@@ -232,5 +232,9 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 			output = output.append(desc.get(ability, player));
 		}
 		return output;
+	}
+
+	private static int getHighestDigit(double d) {
+		return (int) Math.floor(Math.log10(d));
 	}
 }

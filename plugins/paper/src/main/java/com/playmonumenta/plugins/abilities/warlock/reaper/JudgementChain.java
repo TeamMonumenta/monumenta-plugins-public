@@ -181,7 +181,7 @@ public class JudgementChain extends MultipleChargeAbility {
 		EntityUtils.applyTaunt(entity, mPlayer);
 		EntityUtils.applySlow(mPlugin, mDebuffDuration, mSlowAmount, entity);
 		EntityUtils.applyWeaken(mPlugin, mDebuffDuration, mWeakenAmount, entity);
-		mPlugin.mEffectManager.addEffect(entity, EFFECT_NAME, new JudgementChainMobEffect(mChainDuration, mPlayer, mCosmetic.glowColor()));
+		mPlugin.mEffectManager.addEffect(entity, EFFECT_NAME, new JudgementChainMobEffect(mChainDuration, mCosmetic.glowColor()));
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;

@@ -137,22 +137,27 @@ public class Spellshock extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new SpellshockCS());
 
 		// Wait a tick so that it can iterate through the ability manager properly, handles thunder arrows for the enhancement.
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (isEnhanced()) {
-					for (final Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
-						if (abil instanceof final ElementalArrows elementalArrows && elementalArrows.isEnhanced()) {
-							elementalArrows.mSpellshockEnhanced = true;
-						}
+		if (isEnhanced()) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					ElementalArrows elementalArrows = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
+					if (elementalArrows != null && elementalArrows.isEnhanced()) {
+						elementalArrows.mSpellshockEnhanced = true;
 					}
 				}
-			}
-		}.runTaskLater(mPlugin, 1);
+			}.runTaskLater(mPlugin, 1);
+		}
 	}
 
 	@Override
 	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
+		DamageType type = event.getType();
+		if (type == DamageType.TRUE) {
+			// Fixes a bug involving elemental arrows triggering this twice, once magic and once true
+			return false;
+		}
+
 		final ClassAbility eventAbility = event.getAbility();
 		final SpellShockStatic existingStatic = mPlugin.mEffectManager.getActiveEffect(enemy, SpellShockStatic.class);
 
@@ -175,7 +180,7 @@ public class Spellshock extends Ability {
 			}
 		}
 
-		if (event.getType() == DamageType.MELEE
+		if (type == DamageType.MELEE
 			&& mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(EnchantmentType.MAGIC_WAND) > 0
 			&& existingStatic != null) {
 			event.updateDamageWithMultiplier(1 + mMeleeBonusMult);

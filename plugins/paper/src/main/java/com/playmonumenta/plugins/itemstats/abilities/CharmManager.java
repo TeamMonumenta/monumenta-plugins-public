@@ -1586,13 +1586,12 @@ public class CharmManager {
 	/**
 	 * Get the scaled radius of a skill
 	 * @param player The player with the charm effect
-	 * @param charmEffectName Name of the charm effect. Warning: This only detects charms that use percentages!
+	 * @param charmEffectName Name of the charm effect
 	 * @param baseRadius Initial radius of the skill
 	 * @return The scaled radius or 0.1, whichever is greater
 	 */
 	public static double getRadius(Player player, String charmEffectName, double baseRadius) {
-		double level = getInstance().getValueOfAttribute(player, charmEffectName + "%");
-		return Math.max(0.1, baseRadius * ((level / 100.0) + 1));
+		return Math.max(0.1, calculateFlatAndPercentValue(player, charmEffectName, baseRadius));
 	}
 
 	// This is still used in two places which do not handle the conversion to getDuration well, so they have been left for now

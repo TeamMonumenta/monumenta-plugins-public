@@ -384,9 +384,6 @@ public class ChromaBlade extends DepthsAbility {
 
 		Consumer<Double> action = angle -> {
 			slash(isFast, playerItemStats, DepthsTree.WINDWALKER, hitMobs, angle, startingDegrees, endingDegrees, rings);
-			if (!hitMobs.isEmpty()) {
-				reduceCooldowns();
-			}
 		};
 
 		action.accept(angle1);
@@ -524,6 +521,13 @@ public class ChromaBlade extends DepthsAbility {
 						EntityUtils.applySilence(mPlugin, 20, target);
 						if (target.isValid() && !EntityUtils.isBoss(target) && target.getHealth() < 0.2 * EntityUtils.getMaxHealth(target)) {
 							doExecute(target);
+						}
+					}
+					case WINDWALKER -> {
+						// Reduce cooldowns when we've hit the first mob of each slash
+						// Previously didn't work probably because the slashes are delayed
+						if (hitMobs.size() == 1) {
+							reduceCooldowns();
 						}
 					}
 					default -> { }
