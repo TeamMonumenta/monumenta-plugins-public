@@ -22,6 +22,8 @@ public class ImpenetrableTeleport extends Spell {
 	// Minimum distance for the teleport
 	private static final int TELEPORT_RADIUS_MIN = 7;
 
+	private static final int MAX_DISTANCE_FROM_SPAWN = TheImpenetrable.OUTER_RADIUS - 5;
+	private static final int MAX_SKY_LIGHT_LEVEL = 5;
 
 	private final LivingEntity mBoss;
 
@@ -52,7 +54,7 @@ public class ImpenetrableTeleport extends Spell {
 
 			Location tpTo = TheImpenetrable.getOnNearestGround(tLoc, 5);
 			if (tpTo != null) {
-				if (tpTo.distanceSquared(mBossSpawnLoc) >= TheImpenetrable.OUTER_RADIUS * TheImpenetrable.OUTER_RADIUS) {
+				if (tpTo.distanceSquared(mBossSpawnLoc) >= MAX_DISTANCE_FROM_SPAWN * MAX_DISTANCE_FROM_SPAWN || tpTo.getBlock().getLightFromSky() > MAX_SKY_LIGHT_LEVEL) {
 					// Don't let it leave the area out of the players' control
 					continue;
 				}
