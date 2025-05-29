@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
@@ -53,7 +54,7 @@ public class HexEater implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		int level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.HEX_EATER);
-		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE) {
+		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE || event.getAbility() == ClassAbility.ALCHEMIST_POTION) {
 			applyHexDamage(plugin, event.getDamager() instanceof Projectile, player, level, enemy, event);
 		}
 	}

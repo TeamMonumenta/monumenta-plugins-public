@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
@@ -43,7 +44,7 @@ public class Chaotic implements Enchantment {
 		if (event.getType() == DamageType.MELEE) {
 			new PartialParticle(Particle.DAMAGE_INDICATOR, enemy.getLocation().add(0, 1, 0), 1, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
 			event.setFlatDamage(Math.max(0, event.getFlatDamage() + rand * player.getCooledAttackStrength(0)));
-		} else if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
+		} else if ((event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) || event.getAbility() == ClassAbility.ALCHEMIST_POTION) {
 			event.setFlatDamage(Math.max(0, event.getFlatDamage() + rand));
 		}
 	}

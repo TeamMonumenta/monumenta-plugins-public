@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.FirstStrikeCooldown;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -22,7 +23,7 @@ import org.bukkit.entity.Player;
 public class FirstStrike implements Enchantment {
 
 	private static final double DAMAGE_PER_LEVEL = 0.1;
-	private static final double PROJ_REDUCTION = 0.75;
+	private static final double RANGED_REDUCTION = 0.75;
 	private static final int DURATION = 3 * 20;
 	private static final String SOURCE = "FirstStrikeDisable";
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(244, 141, 123), 0.75f);
@@ -70,10 +71,10 @@ public class FirstStrike implements Enchantment {
 			Bukkit.getScheduler().runTaskLater(plugin, () -> mMeleeAttacked = false, 1);
 		}
 
-		//onDamageDelayed does not include projectile damage
-		if (PROJ_DAMAGE_TYPES.contains(type) &&
+		//onDamageDelayed does not include projectile and potion damage
+		if ((PROJ_DAMAGE_TYPES.contains(type) || event.getAbility() == ClassAbility.ALCHEMIST_POTION) &&
 			plugin.mEffectManager.getEffects(enemy, SOURCE + player.getName()) == null) {
-			double bonus = DAMAGE_PER_LEVEL * level * PROJ_REDUCTION;
+			double bonus = DAMAGE_PER_LEVEL * level * RANGED_REDUCTION;
 			triggerFirstStrike(plugin, player, bonus, event, enemy);
 		}
 	}
@@ -83,13 +84,9 @@ public class FirstStrike implements Enchantment {
 		DamageType type = event.getType();
 
 		if ((MELEE_DAMAGE_TYPES.contains(type)
-			&& ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand()))
-			|| PROJ_DAMAGE_TYPES.contains(type)) {
+			&& ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand()))) {
 			if (plugin.mEffectManager.getEffects(enemy, SOURCE + player.getName()) == null) {
 				double bonus = DAMAGE_PER_LEVEL * level;
-				if (PROJ_DAMAGE_TYPES.contains(type)) {
-					bonus *= PROJ_REDUCTION;
-				}
 
 				// has not melee hit at the same tick, do not trigger first strike
 				if (MELEE_DAMAGE_TYPES.contains(type) && !mMeleeAttacked) {
@@ -113,7 +110,7 @@ public class FirstStrike implements Enchantment {
 			heightDelta / 2, doubleWidthDelta).spawnAsEnemy();
 		new PartialParticle(Particle.REDSTONE, LocationUtils.getHeightLocation(enemy, 0.8), 6, doubleWidthDelta,
 			heightDelta / 2, doubleWidthDelta, 1, COLOR).spawnAsEnemy();
-		enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.8f, 0.45f);
+		enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.8f, event.getAbility() == ClassAbility.ALCHEMIST_POTION ? 0.3f : 0.45f);
 
 		//delay the cd effect so all damage events of the same tick can get scaled
 		Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.mEffectManager.addEffect(enemy,
