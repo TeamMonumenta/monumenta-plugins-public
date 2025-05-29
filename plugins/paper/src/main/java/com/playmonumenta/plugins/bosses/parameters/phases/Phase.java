@@ -245,7 +245,6 @@ public class Phase {
 		ACTION_BUILDER_MAP.put("FLAG", FlagSetAction::fromReader);
 	}
 
-
 	public static ParseResult<Phase> fromReader(StringReader reader) {
 		List<Trigger> triggerList = new ArrayList<>();
 		List<Action> actionsList = new ArrayList<>();

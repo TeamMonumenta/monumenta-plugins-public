@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.BossPhasesList;
 import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
+import com.playmonumenta.plugins.bosses.parameters.Tokenizer;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -43,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -139,6 +141,19 @@ public class BossTagCommand {
 				new CommandAPICommand("list")
 					.executesPlayer((player, args) -> {
 						listBossTags(player);
+					})
+			)
+			.withSubcommand(
+				new CommandAPICommand("tags")
+					.executesPlayer((player, args) -> {
+						listBossTagsWithoutParameters(player);
+					})
+			)
+			.withSubcommand(
+				new CommandAPICommand("parameters")
+					.withArguments(new GreedyStringArgument("boss_tag").replaceSuggestions(ArgumentSuggestions.stringsWithTooltipsCollection(BossTagCommand::suggestionBossTagBasedonBoSAndParams)))
+					.executesPlayer((player, args) -> {
+						listBossTagParameters(player, args.getUnchecked("boss_tag"));
 					})
 			)
 			.withSubcommand(
@@ -467,6 +482,8 @@ public class BossTagCommand {
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 			                   .append(Component.text("Tag added! ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+
+		listBossTagParameters(player, getTagComponent(newTag));
 	}
 
 	private static BookOfSouls getBos(Player player) throws WrapperCommandSyntaxException {
@@ -841,13 +858,95 @@ public class BossTagCommand {
 		);
 	}
 
+	private static void listBossTagParameters(Player player, String boss_tag) throws WrapperCommandSyntaxException {
+		BookOfSouls bos = getBos(player);
+		NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
+
+		player.sendMessage(Component.empty()
+			.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			.append(MessagingUtils.fromMiniMessage(String.format("<color:gray>Parameters of <color:gold>%s</color>:</color>", boss_tag)))
+		);
+
+		// Preserve ordering of elements
+		Map<Integer, String> relevantTags = new TreeMap<>();
+
+		for (int i = 0; i < nbtTagsList.size(); i++) {
+			String tagString = (String) nbtTagsList.get(i);
+
+			String parameterComponent = getParameterComponent(tagString);
+			if (getTagComponent(tagString).equals(boss_tag) && !parameterComponent.isEmpty()) {
+				relevantTags.put(i, parameterComponent);
+			}
+		}
+		for (Map.Entry<Integer, String> entry : relevantTags.entrySet()) {
+			Integer index = entry.getKey();
+			String parameters = entry.getValue();
+
+			player.sendMessage(
+				Component.empty()
+					.append(Component.text("[X]", NamedTextColor.RED)
+						.hoverEvent(HoverEvent.showText(Component.text("Click to delete this tag", NamedTextColor.RED)))
+						.clickEvent(ClickEvent.suggestCommand("/bosstag delete " + index)))
+					.append(Component.text(" "))
+					.append(formatTag(parameters)
+						.clickEvent(ClickEvent.suggestCommand(String.format("/bosstag edit %d %s%s", index, boss_tag, parameters)))));
+		}
+	}
+
+	private static String getParameterComponent(String tagString) {
+		int endIndex = tagString.indexOf("[");
+		return endIndex == -1 ? "" : tagString.substring(endIndex);
+	}
+
+	private static String getTagComponent(String tagString) {
+		int endIndex = tagString.indexOf("[");
+		return endIndex == -1 ? tagString : tagString.substring(0, endIndex);
+	}
+	
+	private static Component formatTag(String raw) {
+		if (Objects.equals(raw, "")) {
+			return Component.empty();
+		}
+		return new Tokenizer(raw).getTokens().syntaxHighlight();
+	}
+
+	private static void listBossTagsWithoutParameters(Player player) throws WrapperCommandSyntaxException {
+		BookOfSouls bos = getBos(player);
+		NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
+
+		Set<String> tags = new HashSet<>();
+
+		for (int i = 0; i < nbtTagsList.size(); i++) {
+			String tagString = (String) nbtTagsList.get(i);
+			int endIndex = tagString.indexOf("[");
+			String name = tagString.substring(0, endIndex == -1 ? tagString.length() : endIndex);
+			tags.add(name);
+		}
+
+		player.sendMessage(Component.empty()
+			.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			.append(Component.text("Tags in BoS:", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+
+		tags.forEach(name -> {
+			player.sendMessage(
+				Component.empty()
+					.append(Component.text("[X]", NamedTextColor.RED)
+						.hoverEvent(HoverEvent.showText(Component.text("Click to remove all tags", NamedTextColor.RED)))
+						.clickEvent(ClickEvent.suggestCommand("/bosstag remove " + name)))
+					.append(Component.text(" "))
+					.append(Component.text(name, NamedTextColor.WHITE)
+						.clickEvent(ClickEvent.suggestCommand("/bosstag parameters " + name))));
+		});
+	}
+
 	private static void listBossTags(Player player) throws WrapperCommandSyntaxException {
 		BookOfSouls bos = getBos(player);
 		NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
 
 		player.sendMessage(Component.empty()
-			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			                   .append(Component.text("Tags in BoS:", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			.append(Component.text("Tags in BoS:", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 
 
@@ -856,11 +955,11 @@ public class BossTagCommand {
 			player.sendMessage(
 				Component.empty()
 					.append(Component.text("[X]", NamedTextColor.RED)
-						        .hoverEvent(HoverEvent.showText(Component.text("Click to delete this tag", NamedTextColor.RED)))
-						        .clickEvent(ClickEvent.suggestCommand("/bosstag delete " + i)))
+						.hoverEvent(HoverEvent.showText(Component.text("Click to delete this tag", NamedTextColor.RED)))
+						.clickEvent(ClickEvent.suggestCommand("/bosstag delete " + i)))
 					.append(Component.text(" "))
-					.append(Component.text(tagString, NamedTextColor.WHITE)
-						        .clickEvent(ClickEvent.suggestCommand("/bosstag edit " + i + " " + tagString))));
+					.append(Component.text(getTagComponent(tagString)).append(formatTag(getParameterComponent(tagString)))
+						.clickEvent(ClickEvent.suggestCommand("/bosstag edit " + i + " " + tagString))));
 		}
 	}
 
@@ -880,7 +979,8 @@ public class BossTagCommand {
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 			                   .append(Component.text("Tag " + tag + " removed!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
-		listBossTags(player);
+
+		listBossTagParameters(player, getTagComponent(tag));
 	}
 
 	private static void editBossTag(Player player, int index, String tag) throws WrapperCommandSyntaxException {
@@ -899,7 +999,8 @@ public class BossTagCommand {
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 			                   .append(Component.text("Tag edited!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
-		listBossTags(player);
+
+		listBossTagParameters(player, getTagComponent(tag));
 	}
 
 	/**

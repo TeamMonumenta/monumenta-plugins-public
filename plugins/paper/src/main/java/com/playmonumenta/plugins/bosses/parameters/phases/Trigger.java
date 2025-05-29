@@ -4,6 +4,9 @@ import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,6 +78,14 @@ public abstract class Trigger {
 
 	public enum TriggerOperation {
 		AND, OR, XOR;
+	}
+
+	private static final Set<String> OPERATION_NAMES = Arrays.stream(TriggerOperation.values())
+		.map(Enum::name)
+		.collect(Collectors.toSet());
+
+	public static boolean isOperator(String identifier) {
+		return identifier.equals("->") || OPERATION_NAMES.contains(identifier);
 	}
 
 	@FunctionalInterface

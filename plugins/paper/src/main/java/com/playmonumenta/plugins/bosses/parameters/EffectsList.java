@@ -14,9 +14,11 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.bukkit.Registry;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -28,6 +30,11 @@ public class EffectsList {
 	public static class Effect {
 		public static final Map<String, EffectRunner> EFFECT_RUNNER;
 		public static final Map<String, CustomEffectRunner> CUSTOM_EFFECT_RUNNER;
+		private static final Set<String> EFFECT_NAMES;
+
+		public static Set<String> getEffectNames() {
+			return EFFECT_NAMES;
+		}
 
 		static {
 			EFFECT_RUNNER = new HashMap<>();
@@ -134,7 +141,12 @@ public class EffectsList {
 
 
 
-
+			Set<String> normal = new HashSet<>(EFFECT_RUNNER.keySet());
+			normal.addAll(CUSTOM_EFFECT_RUNNER.keySet());
+			normal.addAll(Registry.POTION_EFFECT_TYPE.stream()
+				.map(potionEffectType -> potionEffectType.getKey().getKey())
+				.toList());
+			EFFECT_NAMES = normal;
 		}
 
 		// Common to both potion effects and custom effects
