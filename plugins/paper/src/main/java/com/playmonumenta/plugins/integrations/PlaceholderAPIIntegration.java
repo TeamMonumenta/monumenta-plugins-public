@@ -229,6 +229,14 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			}
 		}
 
+		if (identifier.startsWith("yaw")) {
+			return Double.toString(player.getYaw());
+		}
+
+		if (identifier.startsWith("pitch")) {
+			return Double.toString(player.getPitch());
+		}
+
 		//Player title but with replacement if empty, and no space after
 		if (identifier.startsWith("title_default_")) {
 			Cosmetic title = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.TITLE);
