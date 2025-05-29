@@ -19,6 +19,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
+import io.papermc.paper.event.player.PlayerPurchaseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -497,22 +498,46 @@ public class TradeListener implements Listener {
 		}
 	}
 
+	// Prevent trading with vanilla emeralds in case they bypass hiding the trade
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerPurchaseEvent(PlayerPurchaseEvent event) {
+		final ItemStack emerald = new ItemStack(Material.EMERALD);
+
+		MerchantRecipe recipe = event.getTrade();
+
+		if (emerald.isSimilar(recipe.getResult())) {
+			event.setCancelled(true);
+			return;
+		}
+
+		for (ItemStack ingredient : recipe.getIngredients()) {
+			if (emerald.isSimilar(ingredient)) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+	}
+
 	private static boolean isInvalidItem(MerchantInventory merchantInventory, int slot) {
 		if (slot >= merchantInventory.getSize()) {
 			return false;
 		}
+
 		ItemStack item = merchantInventory.getItem(slot);
 		if (item == null) {
 			return false;
 		}
+
 		MerchantRecipe merchantRecipe = merchantInventory.getSelectedRecipe();
 		if (merchantRecipe == null) {
 			return true;
 		}
+
 		List<ItemStack> ingredients = merchantRecipe.getIngredients();
 		if (slot >= ingredients.size()) {
 			return true;
 		}
+
 		ItemStack ingredient = ingredients.get(slot);
 		return isShulkerBoxWithContents(item, ingredient) || isNotVanillaItem(item, ingredient);
 	}
