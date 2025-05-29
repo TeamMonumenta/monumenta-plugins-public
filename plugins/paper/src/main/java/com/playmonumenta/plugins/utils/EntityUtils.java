@@ -1122,7 +1122,7 @@ public class EntityUtils {
 	}
 
 	public static void applyStun(Plugin plugin, int ticks, LivingEntity mob) {
-		if (isCCImmuneMob(mob) || !mob.hasAI()) {
+		if (isCCImmuneMob(mob)) {
 			return;
 		}
 
