@@ -48,7 +48,7 @@ public class SpellTwistedReplicants extends Spell {
 	private final IntruderBoss.Narration mNarration;
 
 	public static final String SPAWNED_TAG = "TwistedReplicantSpawn";
-	private static final ImmutableMap<Integer, String> mReplicantNames = ImmutableMap.<Integer, String>builder()
+	private static final ImmutableMap<Integer, String> REPLICANT_NAMES = ImmutableMap.<Integer, String>builder()
 		.put(Mage.ARCANIST_SPEC_ID, "TwistedMoonweaver")
 		.put(Mage.ELEMENTALIST_SPEC_ID, "TwistedPrimordialist")
 		.put(Warrior.BERSERKER_SPEC_ID, "TwistedRevenant")
@@ -103,7 +103,7 @@ public class SpellTwistedReplicants extends Spell {
 		mSpecCounter = mSpecs.size();
 		mSpecs.forEach(spec -> {
 				Mob replicant = (Mob) Objects.requireNonNull(LibraryOfSoulsIntegration.summon(LocationUtils.randomSafeLocationInCircle(location, 3, loc -> !loc.getBlock().isSolid()).subtract(0, Y_OFFSET, 0),
-					mReplicantNames.getOrDefault(spec, FastUtils.getRandomElement(mReplicantNames.values().stream().toList()))));
+					REPLICANT_NAMES.getOrDefault(spec, FastUtils.getRandomElement(REPLICANT_NAMES.values().stream().toList()))));
 				bossRise(replicant);
 
 				replicant.addScoreboardTag(StatMultiplierBoss.identityTag);

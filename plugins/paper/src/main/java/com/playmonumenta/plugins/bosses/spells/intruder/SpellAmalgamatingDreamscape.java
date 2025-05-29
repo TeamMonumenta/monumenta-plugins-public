@@ -334,8 +334,11 @@ public class SpellAmalgamatingDreamscape extends Spell {
 						mNarration.narration("You feel the apparitions closing in on you...");
 						new PartialParticle(Particle.FLASH, bossSpawnLocation).minimumCount(1).spawnAsBoss();
 						// Punish players who take too long
-						IntruderBoss.playersInRange(tpLocation).forEach(player ->
-							PlayerUtils.killPlayer(player, mBoss, SPELL_NAME, true, true, true));
+						IntruderBoss.playersInRange(tpLocation).forEach(player -> {
+							EffectManager.getInstance().clearEffects(player, "NightmarishCarvingsReincarnation");
+							// Fix bypassing reincarnation
+							PlayerUtils.killPlayer(player, mBoss, SPELL_NAME, true, true, true);
+						});
 						this.cancel();
 					} else if (mChargeUpManager.getTime() % 20 == 0) {
 						if (mSouls.isEmpty()) {

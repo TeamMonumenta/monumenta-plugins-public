@@ -15,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 public class SpellAbhorrentHallucinationTeleport extends Spell {
 	private final LivingEntity mBoss;
 	private final Location mCenterLocation;
+	private final int mFloorYLevel;
 	private final int mTeleportRange;
 
 	private final SpellCooldownManager mSpellCooldownManager;
@@ -22,6 +23,7 @@ public class SpellAbhorrentHallucinationTeleport extends Spell {
 	public SpellAbhorrentHallucinationTeleport(LivingEntity boss, Location centerLocation, int teleportRange) {
 		mBoss = boss;
 		mCenterLocation = centerLocation;
+		mFloorYLevel = mCenterLocation.getBlockY() - 1;
 		mTeleportRange = teleportRange;
 		mSpellCooldownManager = new SpellCooldownManager(60 * 20, 20, boss::isValid, boss::hasAI);
 	}
@@ -38,7 +40,12 @@ public class SpellAbhorrentHallucinationTeleport extends Spell {
 	// Teleport without setting the cooldown
 	public void doTeleport() {
 		Location newLocation = LocationUtils.randomSafeLocationInDonut(mBoss.getLocation(), mTeleportRange, mTeleportRange,
-			location -> !location.getBlock().isSolid() && location.distance(mCenterLocation) <= 25);
+			location -> {
+				Location floor = location.clone();
+				floor.setY(mFloorYLevel);
+				return floor.getBlock().getType() != SpellLiminalCorruption.MATERIAL &&
+					!location.getBlock().isSolid() && location.distance(mCenterLocation) <= 25;
+			});
 		new PPLine(Particle.DUST_COLOR_TRANSITION, mBoss.getLocation().add(0, 0.5, 0), newLocation.clone().add(0, 0.5, 0))
 			.countPerMeter(10)
 			.data(new Particle.DustTransition(Color.BLACK, Color.fromRGB(0x6b0000), 5.0f))

@@ -49,14 +49,14 @@ public class SpellSinkingNightmares extends Spell {
 		mCenter = center;
 
 		mDialogue = dialogue;
-		mChargeUpManager = new ChargeUpManager(mBoss, CHARGE_TIME, Component.text("Channeling ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)), BossBar.Color.RED, BossBar.Overlay.PROGRESS, IntruderBoss.DETECTION_RANGE);
+		mChargeUpManager = new ChargeUpManager(mBoss, CHARGE_TIME, Component.text("Preparing ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)), BossBar.Color.RED, BossBar.Overlay.PROGRESS, IntruderBoss.DETECTION_RANGE);
 	}
 
 	@Override
 	public void run() {
 		mChargeUpManager.setTime(0);
 		mChargeUpManager.setChargeTime(CHARGE_TIME);
-		mChargeUpManager.setTitle(Component.text("Channeling ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
+		mChargeUpManager.setTitle(Component.text("Preparing ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
 
 		mBoss.setAI(false);
 		mBoss.setInvulnerable(true);
@@ -82,7 +82,7 @@ public class SpellSinkingNightmares extends Spell {
 					if (mChargeUpManager.nextTick()) {
 						mChargeUpManager.setTime(DURATION);
 						mChargeUpManager.setChargeTime(DURATION);
-						mChargeUpManager.setTitle(Component.text("Casting  ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
+						mChargeUpManager.setTitle(Component.text("Unleashing  ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
 						mStarted = true;
 					}
 				} else {

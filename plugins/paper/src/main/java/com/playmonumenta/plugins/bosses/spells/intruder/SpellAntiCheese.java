@@ -54,7 +54,11 @@ public class SpellAntiCheese extends Spell {
 	}
 
 	private void throwEntity(LivingEntity entity) {
+		Location location = entity.getLocation();
+		location.setY(mCenter.getY() + 1);
+		entity.teleport(location);
 		entity.setVelocity(new Vector(0, 1.6, 0));
+
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> entity.setVelocity(LocationUtils.getDirectionTo(mCenter, entity.getLocation()).multiply(2)), 10);
 		entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 1));
 	}

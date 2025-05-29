@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.delves.mobabilities.TwistedMiniBoss;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentHealthBoost;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.effects.SingleArgumentEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
@@ -57,11 +58,11 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class SpellScreamroom extends Spell {
+	public static final String DEBUFF_ID = "ScreamroomDistortion";
 	private final IntruderBoss.Dialogue mDialogue;
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -105,7 +106,7 @@ public class SpellScreamroom extends Spell {
 
 		private final BukkitTask mSoulCaptureTask;
 
-		public PlayerScreamroom(@NotNull Player player) {
+		public PlayerScreamroom(Player player) {
 			Location blockLocation = player.getLocation();
 			blockLocation.setY(mYLevel);
 			player.teleport(blockLocation);
@@ -293,7 +294,7 @@ public class SpellScreamroom extends Spell {
 	@SuppressWarnings("ReturnValueIgnored")
 	@Override
 	public void run() {
-		List<Player> mPlayers = IntruderBoss.playersInRange(mBoss.getLocation());
+		List<Player> players = IntruderBoss.playersInRange(mBoss.getLocation());
 		mSpellCooldownManager.setOnCooldown();
 		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);
@@ -307,7 +308,7 @@ public class SpellScreamroom extends Spell {
 		});
 
 		mDialogue.dialogue(2 * 20, List.of("YOU WILL KNOW. ISOLATION.", "YOUR REGRETS. WILL HAUNT YOU."));
-		mPlayers.forEach(player -> {
+		players.forEach(player -> {
 			player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, SoundCategory.HOSTILE, 3f, 1f, 20);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, CHARGE_TIME, 1));
 		});
@@ -332,19 +333,23 @@ public class SpellScreamroom extends Spell {
 						mChargeUpManager.setColor(BossBar.Color.RED);
 						mChargeUpManager.setTitle(Component.text("Casting ", NamedTextColor.GOLD).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
 						mChargeUpManager.update();
-						mPlayers.forEach(player -> player.setVelocity(new Vector()));
+						players.removeIf(player -> player.getScoreboardTags().contains(IntruderBoss.DEAD_TAG));
+
+						players.forEach(player -> player.setVelocity(new Vector()));
 						mStarted = true;
 
 						mScreamrooms.clear();
-						mPlayers.forEach(player -> {
+						players.forEach(player -> {
 							mScreamrooms.add(new PlayerScreamroom(player));
 						});
 					} else {
 						mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 0.3f, 0.5f + 1.5f * mChargeUpManager.getChargeTime() / CHARGE_TIME, 7);
 						if (mChargeUpManager.getTime() == CHARGE_TIME - 20) {
-							mPlayers.forEach(player ->EffectManager.getInstance().addEffect(player, "ScreamroomRoot", new PercentSpeed(20, -1.0, "ScreamroomRoot")));
+							players.removeIf(player -> player.getScoreboardTags().contains(IntruderBoss.DEAD_TAG));
+							players.forEach(player ->EffectManager.getInstance().addEffect(player, "ScreamroomRoot", new PercentSpeed(20, -1.0, "ScreamroomRoot")));
 						} else if (mChargeUpManager.getTime() == CHARGE_TIME - 10) {
-							mPlayers.stream().reduce((player1, player2) -> {
+							players.removeIf(player -> player.getScoreboardTags().contains(IntruderBoss.DEAD_TAG));
+							players.stream().reduce((player1, player2) -> {
 								if (isOverlapping(player1, player2)) {
 									MovementUtils.knockAway(player2.getLocation(), player1, 2, 0.08f, false);
 									MovementUtils.knockAway(player1.getLocation(), player2, 2, 0.08f, false);
@@ -354,9 +359,11 @@ public class SpellScreamroom extends Spell {
 						}
 						double progress = (double) mChargeUpManager.getTime() / CHARGE_TIME;
 						if (mChargeUpManager.getTime() % 10 == 0) {
-							mPlayers.forEach(player -> {
+							players.removeIf(player -> player.getScoreboardTags().contains(IntruderBoss.DEAD_TAG));
+
+							players.forEach(player -> {
 								double size = SIZE + 1 - progress;
-								boolean overlapped = mPlayers.stream().anyMatch(otherPlayer -> otherPlayer != player && isOverlapping(otherPlayer, player));
+								boolean overlapped = players.stream().anyMatch(otherPlayer -> otherPlayer != player && isOverlapping(otherPlayer, player));
 								ParticleUtils.drawRectangleTelegraph(player.getLocation().subtract(size / 2, 0, size / 2), size, size, 8, 1, 1, SIZE * 0.04 * progress,
 									overlapped ? Particle.FLAME : Particle.SOUL_FIRE_FLAME,
 									mPlugin, mBoss);
@@ -373,9 +380,9 @@ public class SpellScreamroom extends Spell {
 						this.cancel();
 					} else {
 						if (mChargeUpManager.getTime() % 20 == 0) {
-							mPlayers.forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 2.2f, 1.5f * (mChargeUpManager.getTime() + 1) / mChargeUpManager.getChargeTime()));
+							players.forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 2.2f, 1.5f * (mChargeUpManager.getTime() + 1) / mChargeUpManager.getChargeTime()));
 						}
-						mPlayers.forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 0.6f, 1.5f * (mChargeUpManager.getTime() + 1) / mChargeUpManager.getChargeTime()));
+						players.forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 0.6f, 1.5f * (mChargeUpManager.getTime() + 1) / mChargeUpManager.getChargeTime()));
 					}
 				}
 			}
@@ -391,7 +398,14 @@ public class SpellScreamroom extends Spell {
 			if (!playerScreamroom.mKilled) {
 				Player player = playerScreamroom.mPlayer;
 				player.sendMessage(Component.text("The effects of the barrier distort your soul...", NamedTextColor.GRAY, TextDecoration.ITALIC));
-				EffectManager.getInstance().addEffect(player, "ScreamroomDistortion", new PercentHealthBoost(60 * 20, -.30, "ScreamroomDistortion"));
+				double previousPower = 0;
+				if (EffectManager.getInstance().hasEffect(player, DEBUFF_ID)) {
+					previousPower = Objects.requireNonNull(EffectManager.getInstance().getEffects(player, DEBUFF_ID)).stream()
+						.filter(effect -> effect instanceof SingleArgumentEffect)
+						.reduce(0.0, (d, effect) -> d + effect.getMagnitude(), Double::sum);
+				}
+				EffectManager.getInstance().clearEffects(player, DEBUFF_ID);
+				EffectManager.getInstance().addEffect(player, DEBUFF_ID, new PercentHealthBoost(60 * 60 * 20, -.10 - previousPower, DEBUFF_ID));
 				mOnDistort.accept(player);
 				playerScreamroom.removeScreamroom();
 			}

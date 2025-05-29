@@ -28,7 +28,7 @@ public class SpellLucidRend extends Spell {
 
 	@Override
 	public void run() {
-		mDialogue.dialogue(0, List.of("I. WILL. CARVE MY WAY OUT.", "IF I MUST.."));
+		mDialogue.dialogue(0, List.of("I. WILL. CARVE MY WAY OUT.", "IF I MUST."));
 
 		new BukkitRunnable() {
 			int mSpawned = 0;

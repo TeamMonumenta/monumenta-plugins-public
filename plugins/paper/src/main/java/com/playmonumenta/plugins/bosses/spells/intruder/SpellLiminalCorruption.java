@@ -39,6 +39,7 @@ public class SpellLiminalCorruption extends Spell {
 	private final IntruderBoss.Dialogue mDialogue;
 
 	public static final String SPELL_NAME = "Liminal Corruption";
+	public static final Material MATERIAL = Material.GRAY_GLAZED_TERRACOTTA;
 	private static final int TELEGRAPH_DURATION = 4 * 20;
 	private static final int TELEGRAPH_INTERVAL = 20;
 	public static final double RIFT_STEP = 0.9;
@@ -214,7 +215,7 @@ public class SpellLiminalCorruption extends Spell {
 								}
 							}
 							this.cancel();
-							BlockData blockData = Material.GRAY_GLAZED_TERRACOTTA.createBlockData();
+							BlockData blockData = MATERIAL.createBlockData();
 							blockData.rotate(FastUtils.getRandomElement(Arrays.stream(StructureRotation.values()).toList()));
 							TemporaryBlockChangeManager.INSTANCE.changeBlock(bLoc.getBlock(), blockData, mDuration);
 							mDangerousBlocks.add(bLoc.clone().toBlockLocation().add(0.5, 1, 0.5));

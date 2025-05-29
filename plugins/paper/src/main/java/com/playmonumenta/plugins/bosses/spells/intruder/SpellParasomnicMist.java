@@ -3,15 +3,18 @@ package com.playmonumenta.plugins.bosses.spells.intruder;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
+import com.playmonumenta.plugins.bosses.bosses.LucidRendBoss;
 import com.playmonumenta.plugins.bosses.bosses.intruder.IntruderBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentHeal;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPillar;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -26,6 +29,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -38,28 +42,25 @@ public class SpellParasomnicMist extends Spell {
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final Location mCenter;
-	private List<Player> mPlayers;
 	private final IntruderBoss.Dialogue mDialogue;
 	@Nullable
 	private SafeZone mSafeZone;
 
-	private static final int CHANGE_DIRECTION_INTERVAL = 5 * 20;
-	private static final double SPEED = 3;
+	private static final int CHANGE_DIRECTION_INTERVAL = 3 * 20;
+	private static final double SPEED = 3.9;
 
 	private static final int RANGE = 50;
 	private static final int CHARGE_UP_TIME = 6 * 20;
 	private static final int DURATION = 15 * 20;
-	private static final int KILL_DURATION = 2 * 20;
 
 	private double mSafeZoneRadius = 3;
 	private final ChargeUpManager mChargeUpManager;
 	private static final String SPELL_NAME = "Parasomnic Mist (☠)";
 
-	public SpellParasomnicMist(Plugin plugin, LivingEntity boss, Location center, List<Player> players, IntruderBoss.Dialogue dialogue) {
+	public SpellParasomnicMist(Plugin plugin, LivingEntity boss, Location center, IntruderBoss.Dialogue dialogue) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mCenter = center;
-		mPlayers = List.copyOf(players);
 		mDialogue = dialogue;
 		mChargeUpManager = new ChargeUpManager(mBoss, CHARGE_UP_TIME, Component.text("Charging ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)), BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, RANGE);
 
@@ -69,40 +70,48 @@ public class SpellParasomnicMist extends Spell {
 	public void run() {
 		mSafeZoneRadius = mBoss.getScoreboardTags().contains(IntruderBoss.STALKER_ACTIVE_TAG) ? 4 : 3;
 		mDialogue.dialogue(2 * 20, List.of("THERE IS TOO MUCH. NOISE. YOU NEED. TO SINK.", "DEEPER. INTO. THE MIST."));
-		mPlayers = IntruderBoss.playersInRange(mBoss.getLocation());
-		mChargeUpManager.setTitle(Component.text("Charging ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
+		mChargeUpManager.setTitle(Component.text("Preparing ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
 		mChargeUpManager.setColor(BossBar.Color.YELLOW);
 		mChargeUpManager.setChargeTime(CHARGE_UP_TIME);
 
+		List<Player> players = IntruderBoss.playersInRange(mBoss.getLocation());
+
+		List<Entity> lucidRends = new ArrayList<>(EntityUtils.getNearbyMobs(mBoss.getLocation(), IntruderBoss.DETECTION_RANGE, IntruderBoss.DETECTION_RANGE, IntruderBoss.DETECTION_RANGE,
+			entity -> entity.getScoreboardTags().contains("LucidRend")));
+		lucidRends.forEach(entity -> {
+			entity.addScoreboardTag(LucidRendBoss.DISABLE_TAG);
+			EffectManager.getInstance().addEffect(entity, "MistSlow", new PercentSpeed(CHARGE_UP_TIME + DURATION, -1.0, "MistSlow"));
+			EntityUtils.teleportStack(entity, mCenter.clone().subtract(0, 10, 0));
+		});
+
 		mActiveTasks.add(new BukkitRunnable() {
-			int mState = 0;
+			boolean mCasting = false;
 
 			@Override
 			public void run() {
-				if (mState == 0) {
+				if (mCasting) {
+					if (mChargeUpManager.previousTick(1)) {
+						mChargeUpManager.remove();
+						players.forEach(player -> {
+							player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.4f, 0.1f);
+							player.setCollidable(false);
+							player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 5, 1, true, false));
+							player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 1, true, false));
+						});
+						lucidRends.forEach(entity -> {
+							entity.removeScoreboardTag(LucidRendBoss.DISABLE_TAG);
+							EffectManager.getInstance().clearEffects(entity, "MistSlow");
+							EntityUtils.teleportStack(entity, mCenter.clone().add(0, 1, 0));
+						});
+						this.cancel();
+					}
+				} else {
 					if (mChargeUpManager.nextTick(1)) {
-						mChargeUpManager.setTitle(Component.text("Channeling  ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
+						mChargeUpManager.setTitle(Component.text("Unleashing  ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
 						mChargeUpManager.setColor(BossBar.Color.RED);
 						mChargeUpManager.setTime(DURATION);
 						mChargeUpManager.setChargeTime(DURATION);
-						mState = 1;
-					}
-				} else if (mState == 1) {
-					if (mChargeUpManager.previousTick(1)) {
-						mChargeUpManager.setTime(KILL_DURATION);
-						mChargeUpManager.setChargeTime(KILL_DURATION);
-						mChargeUpManager.setTitle(Component.text("Casting  ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
-						mPlayers.forEach(player -> {
-							player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.4f, 0.1f);
-							player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, KILL_DURATION, 1, true, false));
-							player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 1, true, false));
-						});
-
-						mState = 2;
-					}
-				} else if (mState == 2) {
-					if (mChargeUpManager.previousTick(1)) {
-						mChargeUpManager.remove();
+						mCasting = true;
 					}
 				}
 			}
@@ -126,7 +135,7 @@ public class SpellParasomnicMist extends Spell {
 					.data(new Particle.DustTransition(Color.BLACK, Color.fromRGB(0x6b0000), 5.0f))
 					.spawnAsBoss();
 
-				mPlayers.forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.3f, 0.75f + (float) mTicks / CHARGE_UP_TIME));
+				players.forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.3f, 0.75f + (float) mTicks / CHARGE_UP_TIME));
 
 				mTicks += 5;
 				if (mTicks >= CHARGE_UP_TIME) {
@@ -139,7 +148,7 @@ public class SpellParasomnicMist extends Spell {
 
 					mBoss.setInvisible(false);
 					mBoss.teleport(mCenter.clone().subtract(0, 15, 0));
-					mPlayers.forEach(player -> player.hideEntity(mPlugin, mBoss));
+					players.forEach(player -> player.hideEntity(mPlugin, mBoss));
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 5));
@@ -166,10 +175,10 @@ public class SpellParasomnicMist extends Spell {
 
 				@Override
 				public void run() {
-					if (mTicks % 10 == 0) {
+					if (mTicks % 5 == 0) {
 						if (mTicks <= CHARGE_UP_TIME) {
 							new PPCircle(Particle.SOUL_FIRE_FLAME, mLocation, mSafeZoneRadius)
-								.countPerMeter(4)
+								.countPerMeter(3)
 								.spawnAsBoss();
 
 							new PPCircle(Particle.SOUL_FIRE_FLAME, mLocation, mSafeZoneRadius)
@@ -180,21 +189,21 @@ public class SpellParasomnicMist extends Spell {
 								.spawnAsBoss();
 						} else {
 							new PPCircle(Particle.SOUL_FIRE_FLAME, mLocation, mSafeZoneRadius)
-								.countPerMeter(3)
+								.countPerMeter(2.5)
 								.rotateDelta(true).directionalMode(true)
-								.delta(-0.06, -0.03, 0)
+								.delta(-0.05, -0.05, 0)
 								.extra(1)
 								.spawnAsBoss();
 						}
 
 						new PartialParticle(Particle.END_ROD, mLocation)
-							.count(4)
+							.count(3)
 							.delta(mSafeZoneRadius / 2.0)
 							.spawnAsBoss();
 					}
 
 					mTicks++;
-					if (mTicks >= CHARGE_UP_TIME + DURATION + KILL_DURATION) {
+					if (mTicks >= CHARGE_UP_TIME + DURATION) {
 						mLocation.getWorld().playSound(mLocation, Sound.ENTITY_WARDEN_DEATH, SoundCategory.HOSTILE, 1.5f, 1.6f);
 						new PartialParticle(Particle.FLASH, mLocation).minimumCount(1).spawnAsBoss();
 						this.cancel();
@@ -210,17 +219,6 @@ public class SpellParasomnicMist extends Spell {
 
 				@Override
 				public void run() {
-					mTicks += 1;
-					if (mTicks >= DURATION) {
-						new PPCircle(Particle.SQUID_INK, mLocation.clone().add(new Vector(0, 0.15, 0)), 0.5)
-							.count(30)
-							.rotateDelta(true).directionalMode(true)
-							.delta(1, 0, 0)
-							.extra(0.5)
-							.spawnAsBoss();
-						this.cancel();
-						return;
-					}
 					// If it should change directions
 					if (mTicks % CHANGE_DIRECTION_INTERVAL == 0 || willRunIntoWall(mDirection.clone().multiply(2))) {
 						int mSafety = 0;
@@ -234,8 +232,12 @@ public class SpellParasomnicMist extends Spell {
 						} while (willRunIntoWall(mDirection));
 						mLocation.getWorld().playSound(mLocation, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 2.0f, 2.0f);
 					}
-					double velocity = Math.abs(FastUtils.sin(mTicks * CHANGE_DIRECTION_INTERVAL / Math.PI)) * SPEED / 20;
+					double velocity = Math.abs(FastUtils.sin(mTicks * Math.PI / CHANGE_DIRECTION_INTERVAL)) * SPEED / 20;
 					mLocation.add(mDirection.clone().multiply(velocity));
+					mTicks++;
+					if (mTicks > DURATION) {
+						this.cancel();
+					}
 				}
 
 				private boolean willRunIntoWall(Vector direction) {
@@ -247,9 +249,10 @@ public class SpellParasomnicMist extends Spell {
 	}
 
 	public void masterTask(Location mCenter) {
-		mPlayers.forEach(player -> {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, DURATION + KILL_DURATION, 1, true, false, false));
-			EffectManager.getInstance().addEffect(player, "ParasomnicAnemia", new PercentHeal(DURATION + KILL_DURATION, -1.0));
+		List<Player> players = IntruderBoss.playersInRange(mBoss.getLocation());
+		players.forEach(player -> {
+			player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, DURATION, 1, true, false, false));
+			EffectManager.getInstance().addEffect(player, "ParasomnicAnemia", new PercentHeal(DURATION, -1.0));
 		});
 
 
@@ -264,28 +267,19 @@ public class SpellParasomnicMist extends Spell {
 					.data(new Particle.DustTransition(Color.RED, Color.fromRGB(0x6b0000), 5.0f))
 					.spawnAsBoss();
 
-				List<Player> players = new ArrayList<>(mPlayers);
-				mPlayers.forEach(player -> {
+				players.forEach(player -> {
 					player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.HOSTILE, 0.5f, 0.1f + (float) mTicks / DURATION);
 				});
-				players.removeIf(player -> mSafeZone != null && mSafeZone.mLocation.distance(player.getLocation()) <= mSafeZoneRadius);
+				players.stream()
+					.filter(player -> mSafeZone == null || mSafeZone.mLocation.distance(player.getLocation()) > mSafeZoneRadius)
+					.forEach(player -> {
+						// Damage
+						if (mTicks % 10 == 0) {
+							DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, 4, null, true);
+						}
+					});
 
-				// Damage
-				if (mTicks % 4 == 0) {
-					players.forEach(player -> {
-						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, 2, null, true);
-					});
-				}
-				if (mTicks >= DURATION) {
-					players.forEach(player -> {
-						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, 10, null, true);
-						player.playSound(player.getLocation(), Sound.ENTITY_WARDEN_DEATH, SoundCategory.HOSTILE, 1.9f, 0.5f);
-					});
-				}
-				if (mTicks > DURATION + KILL_DURATION) {
-					players.forEach(player -> {
-						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, 1000000, null, false);
-					});
+				if (mTicks > DURATION) {
 					this.cancel();
 
 					finishSpell();
@@ -298,8 +292,18 @@ public class SpellParasomnicMist extends Spell {
 	private void finishSpell() {
 		mBoss.setAI(true);
 		mBoss.setInvulnerable(false);
-		mPlayers.forEach(player -> player.showEntity(mPlugin, mBoss));
+		IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player -> {
+			player.setCollidable(true);
+			player.showEntity(mPlugin, mBoss);
+		});
 		mBoss.teleport(mCenter);
+	}
+
+	@Override
+	public void cancel() {
+		IntruderBoss.playersInRange(mBoss.getLocation(), true).forEach(player -> {
+			player.setCollidable(true);
+		});
 	}
 
 	public void replaceBlocks(Location loc) {
@@ -312,7 +316,7 @@ public class SpellParasomnicMist extends Spell {
 				public void run() {
 					mLoc.add(mVec);
 					if (mLoc.getBlock().getType().isSolid()) {
-						TemporaryBlockChangeManager.INSTANCE.changeBlock(mLoc.getBlock(), Material.CRIMSON_NYLIUM, CHARGE_UP_TIME + DURATION + KILL_DURATION);
+						TemporaryBlockChangeManager.INSTANCE.changeBlock(mLoc.getBlock(), Material.CRIMSON_NYLIUM, CHARGE_UP_TIME + DURATION);
 					} else {
 						this.cancel();
 						return;
@@ -328,7 +332,7 @@ public class SpellParasomnicMist extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return CHARGE_UP_TIME + DURATION + KILL_DURATION + 20;
+		return CHARGE_UP_TIME + DURATION + 20;
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.effects.SingleArgumentEffect;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
@@ -63,7 +64,7 @@ public class SpellCognitiveDistortion extends Spell {
 	public static final int Y_OFFSET = 50;
 	public static final double SPREAD_RANGE = 10;
 	public static final int CAST_TIME = 10 * 20;
-	public static final int DEBUFF_DURATION = 60 * 20;
+	public static final int DEBUFF_DURATION = 60 * 60 * 20;
 	public static final double CIRCLE_RADIUS = 3;
 
 	public SpellCognitiveDistortion(Plugin plugin, LivingEntity boss, List<Player> players, Location centerLocation, IntruderBoss.Dialogue dialogue, IntruderBoss.Narration narration) {
@@ -165,9 +166,21 @@ public class SpellCognitiveDistortion extends Spell {
 		mDialogue.dialogue("NO ONE WILL BE THERE. TO SAVE YOU FROM THE DARK.");
 		mNarration.narration("The cold and dark pierce your very being...");
 		IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player -> {
-			EffectManager.getInstance().addEffect(player, WEAKNESS_SOURCE, new PercentDamageDealt(DEBUFF_DURATION, -0.3).deleteOnLogout(true));
-			EffectManager.getInstance().addEffect(player, ANTI_HEAL_SOURCE, new PercentHeal(DEBUFF_DURATION, -0.5).deleteOnLogout(true));
-			EffectManager.getInstance().addEffect(player, SLOWNESS_SOURCE, new PercentSpeed(DEBUFF_DURATION, -0.4, SPELL_NAME).deleteOnLogout(true));
+			double previousPower = 0;
+			// Use weakness source as a basis for additional debuff
+			if (EffectManager.getInstance().hasEffect(player, WEAKNESS_SOURCE)) {
+				previousPower = Objects.requireNonNull(EffectManager.getInstance().getEffects(player, WEAKNESS_SOURCE)).stream()
+					.filter(effect -> effect instanceof SingleArgumentEffect)
+					.reduce(0.0, (d, effect) -> d + effect.getMagnitude(), Double::sum);
+			}
+
+			EffectManager.getInstance().clearEffects(player, WEAKNESS_SOURCE);
+			EffectManager.getInstance().clearEffects(player, ANTI_HEAL_SOURCE);
+			EffectManager.getInstance().clearEffects(player, SLOWNESS_SOURCE);
+
+			EffectManager.getInstance().addEffect(player, WEAKNESS_SOURCE, new PercentDamageDealt(DEBUFF_DURATION, -0.1 - previousPower).deleteOnLogout(true));
+			EffectManager.getInstance().addEffect(player, ANTI_HEAL_SOURCE, new PercentHeal(DEBUFF_DURATION, -0.1 - previousPower).deleteOnLogout(true));
+			EffectManager.getInstance().addEffect(player, SLOWNESS_SOURCE, new PercentSpeed(DEBUFF_DURATION, -0.1 - previousPower, SLOWNESS_SOURCE).deleteOnLogout(true));
 		});
 		finishSpell();
 	}

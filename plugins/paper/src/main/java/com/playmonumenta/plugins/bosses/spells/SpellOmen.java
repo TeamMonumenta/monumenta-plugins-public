@@ -8,7 +8,11 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -93,6 +97,7 @@ public class SpellOmen extends Spell {
 	}
 
 	public void launchBlade(List<Vector> basevec, boolean warning, double yaw) {
+		Set<Player> hitPlayers = new HashSet<>();
 		//loop for each direction, starting +Z, clockwise
 		for (int i = 0; i < mP.SPLITS; i++) {
 			List<Vector> vec = new ArrayList<>(basevec);
@@ -111,7 +116,7 @@ public class SpellOmen extends Spell {
 			//launch blade tip
 			if (mP.INSTANT) {
 				int mT = 0;
-				moveBlade(mT, startLoc, dir, warning, vec);
+				moveBlade(mT, startLoc, dir, warning, vec, hitPlayers);
 			} else {
 				new BukkitRunnable() {
 					int mT = 0;
@@ -131,7 +136,7 @@ public class SpellOmen extends Spell {
 								mP.SOUND_WAVE.play(anchor);
 							}
 							//construct blade
-							createBlade(anchor, startLoc, vec, warning);
+							createBlade(anchor, startLoc, vec, warning, hitPlayers);
 						}
 					}
 
@@ -141,7 +146,7 @@ public class SpellOmen extends Spell {
 		}
 	}
 
-	public void moveBlade(int mT, Location startLoc, Vector dir, boolean warning, List<Vector> vec) {
+	public void moveBlade(int mT, Location startLoc, Vector dir, boolean warning, List<Vector> vec, Collection<Player> hitPlayers) {
 		Location anchor = startLoc.clone();
 		while (anchor.distance(startLoc) < mP.MAX_RANGE) {
 			mT++;
@@ -153,12 +158,12 @@ public class SpellOmen extends Spell {
 					mP.SOUND_WAVE.play(anchor);
 				}
 				//construct blade
-				createBlade(anchor, startLoc, vec, warning);
+				createBlade(anchor, startLoc, vec, warning, hitPlayers);
 			}
 		}
 	}
 
-	public void createBlade(Location startLoc, Location origin, List<Vector> vec, boolean warning) {
+	public void createBlade(Location startLoc, Location origin, List<Vector> vec, boolean warning, Collection<Player> hitPlayers) {
 		List<Location> locAll = new ArrayList<>();
 		//construct blade
 		for (int j = 1; j <= 2; j++) {
@@ -200,36 +205,33 @@ public class SpellOmen extends Spell {
 		//damage
 		if (!warning) {
 			for (Player player : damage) {
-				boolean playedSound = false;
-				if (mP.DAMAGE > 0) {
-					mP.SOUND_HIT.play(player.getLocation());
-					playedSound = true;
-					if (mP.RESPECT_IFRAMES && player.getNoDamageTicks() == 0) {
-						BossUtils.blockableDamage(mBoss, player, mP.DAMAGE_TYPE, mP.DAMAGE, mP.SPELL_NAME, mBoss.getLocation(), mP.EFFECTS.mEffectList);
-						MovementUtils.knockAway(origin, player, mP.KB_X, mP.KB_Y);
-					} else if (!mP.RESPECT_IFRAMES) {
-						BossUtils.blockableDamage(mBoss, player, mP.DAMAGE_TYPE, mP.DAMAGE, mP.SPELL_NAME, mBoss.getLocation(), mP.EFFECTS.mEffectList);
-						MovementUtils.knockAway(origin, player, mP.KB_X, mP.KB_Y);
-					}
-
-				}
-
-				if (mP.DAMAGE_PERCENTAGE > 0.0) {
-					if (!playedSound) {
-						mP.SOUND_HIT.play(player.getLocation());
-					}
-					if (mP.RESPECT_IFRAMES && player.getNoDamageTicks() == 0) {
-						DamageUtils.damagePercentHealth(mBoss, player, mP.DAMAGE_PERCENTAGE, false,
-							true, mP.SPELL_NAME, true, mP.EFFECTS.mEffectList);
-						MovementUtils.knockAway(origin, player, mP.KB_X, mP.KB_Y);
-					} else if (!mP.RESPECT_IFRAMES) {
-						DamageUtils.damagePercentHealth(mBoss, player, mP.DAMAGE_PERCENTAGE, false,
-							true, mP.SPELL_NAME, true, mP.EFFECTS.mEffectList);
-						MovementUtils.knockAway(origin, player, mP.KB_X, mP.KB_Y);
-					}
-				}
 				mP.EFFECTS.apply(player, mBoss);
+				if (mP.DAMAGE > 0 || mP.DAMAGE_PERCENTAGE > 0) {
+					mP.SOUND_HIT.play(player.getLocation());
+				}
+				if (mP.RESPECT_IFRAMES && !hitPlayers.contains(player)) {
+					if (mP.DAMAGE > 0 ) {
+						BossUtils.blockableDamage(mBoss, player, mP.DAMAGE_TYPE, mP.DAMAGE, mP.SPELL_NAME, mBoss.getLocation(), mP.EFFECTS.mEffectList);
+						hitPlayers.add(player);
+					}
+					if (mP.DAMAGE_PERCENTAGE > 0) {
+						DamageUtils.damagePercentHealth(mBoss, player, mP.DAMAGE_PERCENTAGE, false,
+							true, mP.SPELL_NAME, true, mP.EFFECTS.mEffectList);
+						hitPlayers.add(player);
+					}
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> hitPlayers.remove(player), 10);
 
+					MovementUtils.knockAway(origin, player, mP.KB_X, mP.KB_Y);
+				} else if (!mP.RESPECT_IFRAMES) {
+					if (mP.DAMAGE_PERCENTAGE > 0) {
+						DamageUtils.damagePercentHealth(mBoss, player, mP.DAMAGE_PERCENTAGE, false,
+							true, mP.SPELL_NAME, true, mP.EFFECTS.mEffectList);
+					}
+					if (mP.DAMAGE > 0 ) {
+						BossUtils.blockableDamage(mBoss, player, mP.DAMAGE_TYPE, mP.DAMAGE, mP.SPELL_NAME, mBoss.getLocation(), mP.EFFECTS.mEffectList);
+					}
+					MovementUtils.knockAway(origin, player, mP.KB_X, mP.KB_Y);
+				}
 			}
 		}
 	}

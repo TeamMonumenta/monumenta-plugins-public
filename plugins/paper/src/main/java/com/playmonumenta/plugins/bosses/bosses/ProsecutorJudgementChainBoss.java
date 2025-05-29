@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellProsecutorJudgementChain;
+import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.List;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -30,6 +31,10 @@ public class ProsecutorJudgementChainBoss extends BossAbilityGroup {
 		public int BREAK_REQUIREMENT = 1;
 		@BossParam(help = "Ticks in between pulls")
 		public int PULL_FREQUENCY = 2;
+		@BossParam(help = "Whether it should cancel on damage")
+		public boolean CANCEL_ON_DAMAGE = false;
+		@BossParam(help = "What damage type it should cancel on.")
+		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MELEE;
 		@BossParam(help = "Particles of the chain")
 		public ParticlesList PARTICLE_CHAIN = new ParticlesList(List.of(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 50)));
 		@BossParam(help = "Sound played each pull")

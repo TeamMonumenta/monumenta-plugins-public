@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -86,6 +87,12 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 	public static final TextColor TEXT_COLOR = TextColor.color(0x8b0000);
 	public static final int DETECTION_RANGE = 512;
 	public static final double MAX_HEALTH = 25000;
+	public static final Set<String> DEBUFFS_TO_CLEANSE = Set.of(SpellAmalgamatingDreamscape.ANTIHEAL_SOURCE,
+		SpellAmalgamatingDreamscape.WEAKNESS_SOURCE,
+		SpellCognitiveDistortion.SLOWNESS_SOURCE,
+		SpellCognitiveDistortion.WEAKNESS_SOURCE,
+		SpellCognitiveDistortion.ANTI_HEAL_SOURCE,
+		SpellScreamroom.DEBUFF_ID);
 	private static final int GAZE_SUMMON_INTERVAL = 15;
 	private static final int GAZE_COUNT = 3;
 
@@ -119,6 +126,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 	private final List<Spell> mPassives;
 
 	private final BossBarManager mBossBarManager;
+	private final Set<Player> mWarned = new HashSet<>();
 
 	@FunctionalInterface
 	public interface Dialogue {
@@ -157,7 +165,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 	}
 
 	private @Nullable BukkitRunnable mSoundRunnable;
-	private boolean mDeafeated = false;
+	private boolean mDefeated = false;
 	private boolean mPartyDefeated = false;
 
 	public IntruderBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
@@ -189,7 +197,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			mAbhorrentHallucination = new SpellAbhorrentHallucination(plugin, boss, spawnLoc, this::dialogue, () -> forceCastSpell(SpellNightmarishCarvings.class)),
 			mTwistedReplicants = new SpellTwistedReplicants(plugin, boss, mPlayers, spawnLoc.getBlockY(), this::dialogue, this::narration),
 			new SpellSinkingNightmares(plugin, boss, spawnLoc, this::dialogue),
-			new SpellParasomnicMist(plugin, boss, spawnLoc, mPlayers, this::dialogue),
+			new SpellParasomnicMist(plugin, boss, spawnLoc, this::dialogue),
 			mShadowRealmClone = new SpellCognitiveDistortion(plugin, boss, mPlayers, spawnLoc, this::dialogue, this::narration),
 			mAmalgamatingDreamscape = new SpellAmalgamatingDreamscape(plugin, boss, spawnLoc, this::desperation, this::dialogue, this::narration),
 			mEngulfingPsyche = new SpellEngulfingPsyche(plugin, boss, spawnLoc)
@@ -234,7 +242,6 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		events.put(75, lBoss -> {
 			mLiminalCorruption.forceOnCooldown();
 			changePassivePhase(addSpell(getPassives(), mLiminalCorruption));
-			forceCastSpell(SpellLucidRend.class);
 		});
 		events.put(72, lBoss -> {
 			summonSourcelessGazes();
@@ -248,13 +255,9 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			forceCastSpell(SpellAbhorrentHallucination.class);
 		});
 		events.put(50, lBoss -> {
-			dialogue(20, List.of("THESE BLADES.", "I DONT. NEED THEM NOW.", "THEIR TIME. HAS PASSED."));
-			mLucidRend.killLucidRends();
-		});
-		events.put(45, b -> {
 			forceCastSpell(SpellTwistedReplicants.class);
 		});
-		events.put(40, lBoss -> {
+		events.put(45, lBoss -> {
 			mPsychicMiasma.forceCast();
 			changePhase(new SpellManager(addSpell(getActiveSpells(), mNightmareSlash)),
 				removeSpells(getPassives(), List.of(SpellTwistedSwipe.class, SpellLiminalCorruption.class, SpellPsychicMiasma.class)), null);
@@ -281,6 +284,9 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			mSoundRunnable.runTaskTimer(plugin, 0, 433);
 			forceCastSpell(SpellSinkingNightmares.class);
 		});
+		events.put(40, lBoss -> {
+			forceCastSpell(SpellLucidRend.class);
+		});
 		events.put(35, lBoss -> {
 			forceCastSpell(SpellAbhorrentHallucination.class);
 		});
@@ -293,6 +299,8 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			forceCastSpell(SpellCognitiveDistortion.class);
 		});
 		events.put(25, lBoss -> {
+			mLucidRend.killLucidRends();
+
 			mSpellAntiCheese.setAmalgamatingDreamscape(true);
 			changePhase(new SpellManager(List.of(mAmalgamatingDreamscape)), mPassives, null, 40);
 			forceCastSpell(SpellAmalgamatingDreamscape.class);
@@ -321,7 +329,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 
 		// if the fight is on the first start
 		if (!isTrue(mSeenCutscene)) {//First Fight Tag Armor Stand
-			beginingCutscene();
+			beginningCutscene();
 			triggerMechanic(mSeenCutscene, true);
 		} else {
 			bossReveal();
@@ -367,7 +375,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		armorStand.getLocation().getBlock().setType(value ? Material.REDSTONE_BLOCK : Material.AIR);
 	}
 
-	private void beginingCutscene() {
+	private void beginningCutscene() {
 		mBoss.setAI(false);
 		mBoss.setInvulnerable(true);
 		mBoss.setGravity(false);
@@ -458,24 +466,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 	}
 
 	private void startBoss() {
-		playersInRange(mSpawnLoc).forEach(player -> {
-			// Assure no carvings remain after death
-			@Nullable
-			List<EffectManager.EffectPair> effectPairs = EffectManager.getInstance().getEffectPairs(player);
-			if (effectPairs != null) {
-				effectPairs.stream()
-					.filter(effect ->
-						effect.mSource.startsWith("NightmarishCarvings") ||
-							Set.of(SpellAmalgamatingDreamscape.ANTIHEAL_SOURCE,
-									SpellAmalgamatingDreamscape.WEAKNESS_SOURCE,
-									SpellCognitiveDistortion.SLOWNESS_SOURCE,
-									SpellCognitiveDistortion.WEAKNESS_SOURCE,
-									SpellCognitiveDistortion.ANTI_HEAL_SOURCE)
-								.contains(effect.mSource)
-					)
-					.forEach(effectPair -> effectPair.mEffect.clearEffect());
-			}
-		});
+		playersInRange(mSpawnLoc).forEach(IntruderBoss::clearBossSpecificEffects);
 		constructBoss(new SpellManager(mBaseActiveSpells), mPassives, DETECTION_RANGE, mBossBarManager, 40, 1, true);
 
 		mIntruderAdvancements.bossStarted();
@@ -488,6 +479,19 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			player.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.4f, 0.1f);
 			player.playSound(mBoss.getLocation(), Sound.AMBIENT_UNDERWATER_LOOP_ADDITIONS_ULTRA_RARE, 6.0f, 1.5f);
 		});
+	}
+
+	private static void clearBossSpecificEffects(Player player) {
+		@Nullable
+		List<EffectManager.EffectPair> effectPairs = EffectManager.getInstance().getEffectPairs(player);
+		if (effectPairs != null) {
+			effectPairs.stream()
+				.filter(effect ->
+					effect.mSource.startsWith("NightmarishCarvings") ||
+						DEBUFFS_TO_CLEANSE.contains(effect.mSource)
+				)
+				.forEach(effectPair -> effectPair.mEffect.clearEffect());
+		}
 	}
 
 	private void bossReveal() {
@@ -516,8 +520,8 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		if (!mDeafeated) {
-			mDeafeated = true;
+		if (!mDefeated) {
+			mDefeated = true;
 			if (event != null) {
 				event.setCancelled(true);
 				event.setReviveHealth(100);
@@ -548,7 +552,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (mAbhorrentHallucination.getHallucinationActive() && source instanceof Player) {
+		if (mAbhorrentHallucination.getHallucinationActive() && source instanceof Player player) {
 			new PartialParticle(Particle.SQUID_INK, mBoss.getLocation())
 				.count(15)
 				.extra(0.25)
@@ -557,8 +561,14 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			mBoss.getWorld().playSound(loc, Sound.ENTITY_BREEZE_HURT, SoundCategory.HOSTILE, 0.6f, 1.5f);
 			mBoss.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1.2f, 0.25f);
 
+			if (!mWarned.contains(player)) {
+				narration("Your attacks pass through the <obfuscated>lxxxxxxx</obfuscated>'s body.");
+				mWarned.add(player);
+			}
+
 			new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0)).count(20).delta(0)
 				.extra(0.3).spawnAsEntityActive(mBoss);
+			event.setCancelled(true);
 		}
 	}
 
@@ -589,13 +599,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			Player player = event.getPlayer();
 			player.addScoreboardTag(DEAD_TAG);
 
-			@Nullable
-			List<EffectManager.EffectPair> effectPairs = EffectManager.getInstance().getEffectPairs(player);
-			if (effectPairs != null) {
-				effectPairs.stream()
-					.filter(effect -> effect.mSource.startsWith("NightmarishCarvings"))
-					.forEach(effectPair -> effectPair.mEffect.clearEffect());
-			}
+			clearBossSpecificEffects(player);
 
 			if (playersInRange(mBoss.getLocation()).isEmpty()) {
 				lossCutscene();
@@ -636,6 +640,9 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 	}
 
 	public void desperation() {
+		if (mPartyDefeated) {
+			return;
+		}
 		List<Player> mPlayers = playersInRange(mBoss.getLocation());
 		resetBossArena();
 		mSpellAntiCheese.setAmalgamatingDreamscape(false);
@@ -697,12 +704,9 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 					player.setRotation((float) yawPitch[0], (float) yawPitch[1]);
 				});
 				mTicks++;
-				if (mTicks == 4 * 20) {
+				if (mTicks == 4 * 20 && !EntityUtils.shouldCancelSpells(mBoss)) {
 					forceCastSpell(SpellEngulfingPsyche.class);
-				}
-				if (mTicks > 6 * 20) {
 					this.cancel();
-					mEngulfingPsyche.prepareBorder();
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
@@ -770,25 +774,19 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			entity.getScoreboardTags().contains(SourcelessGazeBoss.identityTag)).forEach(Entity::remove);
 
 		// Clear effects on win
-		playersInRange(mSpawnLoc).forEach(player -> {
-			@Nullable
-			List<EffectManager.EffectPair> effectPairs = EffectManager.getInstance().getEffectPairs(player);
-			if (effectPairs != null) {
-				effectPairs.stream()
-					.filter(effect -> effect.mSource.startsWith("NightmarishCarvings"))
-					.forEach(effectPair -> effectPair.mEffect.clearEffect());
-			}
-		});
+		playersInRange(mSpawnLoc).forEach(IntruderBoss::clearBossSpecificEffects);
 
 		if (mSoundRunnable != null) {
 			mSoundRunnable.cancel();
 		}
-		if (!mDeafeated) {
+		if (!mDefeated) {
 			triggerMechanic(mEnableDetectionCircle, true);
 			// Only reset boss arena if you lose as win mech modifies arena
 			resetBossArena();
 		}
-		EntityUtils.getNearbyMobs(mSpawnLoc, DETECTION_RANGE, DETECTION_RANGE, DETECTION_RANGE, EntityUtils::isHostileMob).forEach(Entity::remove);
+		EntityUtils.getNearbyMobs(mSpawnLoc, DETECTION_RANGE, DETECTION_RANGE, DETECTION_RANGE, entity ->
+				EntityUtils.isHostileMob(entity) || entity.getScoreboardTags().contains("IronMaiden"))
+			.forEach(Entity::remove);
 
 	}
 
