@@ -25,7 +25,6 @@ import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.UUID;
-import org.jetbrains.annotations.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -50,6 +49,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class Grappling implements Enchantment {
 	private static final double MAX_VERTICAL_PER_LEVEL = 1;
@@ -338,14 +338,13 @@ public class Grappling implements Enchantment {
 
 	private static void handleMob(Player player, double level, ProjectileHitEvent event, Projectile proj, Mob mob) {
 		// Cancel the knockback from the bow shot
-		//TODO: Probably oughtta block targeting CC-immune mobs altogether.
 		event.setCancelled(true);
 		proj.remove();
 
 		Vector v = mob.getLocation().subtract(player.getLocation()).toVector();
 
 		if (v.lengthSquared() > level * level) {
-			doFailEffects(player, mob.getLocation());
+			doFailEffects(player, mob.getLocation().add(0, mob.getHeight() / 2, 0));
 
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> decrementShotsFired(player), COOLDOWN);
 			return;
@@ -357,7 +356,12 @@ public class Grappling implements Enchantment {
 
 	public static void pullMob(LivingEntity stationary, LivingEntity mover, double speed, double level) {
 		if (EntityUtils.isBoss(mover) || EntityUtils.isCCImmuneMob(mover)) {
-			//TODO: May want to consider special failure effects if the mob is CC immune, some kind of chain break sfx?
+			if (stationary instanceof Player p) {
+				p.playSound(p.getLocation(), Sound.BLOCK_WET_GRASS_BREAK, SoundCategory.PLAYERS, 1.0f, 0.5f);
+				p.playSound(p.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.0f, 0.5f);
+				p.playSound(p.getLocation(), Sound.ENTITY_LEASH_KNOT_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				new PPLine(Particle.SMOKE_NORMAL, p.getEyeLocation(), mover.getLocation().add(0, mover.getHeight() / 2, 0)).countPerMeter(2).spawnAsPlayerActive(p);
+			}
 			return;
 		}
 		mover.setVelocity(calcVelocity(stationary.getEyeLocation(), mover.getLocation(), speed, level));
