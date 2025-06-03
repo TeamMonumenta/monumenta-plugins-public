@@ -79,6 +79,8 @@ public class G1Listener {
 				case OLD -> mOldGenTracker.handleEvent(info);
 				case YOUNG -> mYoungGenTracker.handleEvent(info);
 				case CONCURRENT -> mConcurrentTracker.handleEvent(info);
+				default -> {
+				}
 			}
 
 			mOverallTracker.handleEvent(info);

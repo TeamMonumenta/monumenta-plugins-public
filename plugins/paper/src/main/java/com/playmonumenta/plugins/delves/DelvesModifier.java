@@ -1,30 +1,6 @@
 package com.playmonumenta.plugins.delves;
 
-import com.playmonumenta.plugins.delves.abilities.Arcanic;
-import com.playmonumenta.plugins.delves.abilities.Assassins;
-import com.playmonumenta.plugins.delves.abilities.Astral;
-import com.playmonumenta.plugins.delves.abilities.Berserk;
-import com.playmonumenta.plugins.delves.abilities.Bloodthirsty;
-import com.playmonumenta.plugins.delves.abilities.Carapace;
-import com.playmonumenta.plugins.delves.abilities.ChanceCubes;
-import com.playmonumenta.plugins.delves.abilities.Chivalrous;
-import com.playmonumenta.plugins.delves.abilities.Chronology;
-import com.playmonumenta.plugins.delves.abilities.Colossal;
-import com.playmonumenta.plugins.delves.abilities.Dreadful;
-import com.playmonumenta.plugins.delves.abilities.Entropy;
-import com.playmonumenta.plugins.delves.abilities.Fragile;
-import com.playmonumenta.plugins.delves.abilities.Gravity;
-import com.playmonumenta.plugins.delves.abilities.Haunted;
-import com.playmonumenta.plugins.delves.abilities.HealCut;
-import com.playmonumenta.plugins.delves.abilities.Infernal;
-import com.playmonumenta.plugins.delves.abilities.Legionary;
-import com.playmonumenta.plugins.delves.abilities.Pernicious;
-import com.playmonumenta.plugins.delves.abilities.Riftborn;
-import com.playmonumenta.plugins.delves.abilities.Spectral;
-import com.playmonumenta.plugins.delves.abilities.Transcendent;
-import com.playmonumenta.plugins.delves.abilities.Twisted;
-import com.playmonumenta.plugins.delves.abilities.Unyielding;
-import com.playmonumenta.plugins.delves.abilities.Vengeance;
+import com.playmonumenta.plugins.delves.abilities.*;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +42,7 @@ public enum DelvesModifier {
 	CHRONOLOGY(19, null, createIcon(Material.CLOCK, Component.text("Chronology", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Chronology.DESCRIPTION), Chronology::rankDescription, 25, 5),
 	RIFTBORN(20, null, createIcon(Material.END_PORTAL_FRAME, Component.text("Riftborn", NamedTextColor.DARK_BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Riftborn.DESCRIPTION), Riftborn::rankDescription, 26, 5),
 	HAUNTED(21, null, createIcon(Material.CARVED_PUMPKIN, Component.text("Haunted", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Haunted.DESCRIPTION), Haunted::rankDescription, 27, 5),
-    // Keep experimental modifiers after here
+	// Keep experimental modifiers after here
 	CHANCECUBES(22, null, createIcon(Material.GOLD_BLOCK, Component.text("Chance Cubes", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), ChanceCubes.DESCRIPTION), ChanceCubes::rankDescription, 28, 6),
 	BERSERK(23, null, createIcon(Material.REDSTONE, Component.text("Berserk", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Berserk.DESCRIPTION), Berserk::rankDescription, 29, 5),
 	HEALCUT(24, null, createIcon(Material.ROTTEN_FLESH, Component.text("Rot", NamedTextColor.DARK_GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), HealCut.DESCRIPTION), HealCut::rankDescription, 30, 3),
@@ -189,6 +165,7 @@ public enum DelvesModifier {
 	public static ItemStack createIcon(Material material, Component name, String[] description) {
 		return GUIUtils.createBasicItem(material, 1, name, Arrays.asList(description), NamedTextColor.WHITE);
 	}
+
 	public static ItemStack createIconWithVariant(Material material, Component name, String description, Component[] variant) {
 		List<Component> desc = new ArrayList<>();
 		desc.add(Component.text(description, NamedTextColor.WHITE));

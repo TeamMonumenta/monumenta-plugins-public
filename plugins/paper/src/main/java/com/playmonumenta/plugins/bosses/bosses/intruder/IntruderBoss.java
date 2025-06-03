@@ -328,7 +328,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		mBossBarManager = new BossBarManager(mBoss, DETECTION_RANGE, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, events, false, true);
 
 		// if the fight is on the first start
-		if (!isTrue(mSeenCutscene)) {//First Fight Tag Armor Stand
+		if (!isTrue(mSeenCutscene)) { //First Fight Tag Armor Stand
 			beginningCutscene();
 			triggerMechanic(mSeenCutscene, true);
 		} else {

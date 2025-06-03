@@ -44,7 +44,7 @@ public class BanishFallDistance extends Spell {
 			p.sendMessage(Component.text("Your eyelids begin to feel heavy...", SteelWingHawk.COLOR));
 			p.playSound(p.getLocation(), Sound.ENTITY_FOX_SCREECH, SoundCategory.HOSTILE, 2.0f, 1.2f);
 			p.playSound(p.getLocation(), Sound.ENTITY_FOX_SCREECH, SoundCategory.HOSTILE, 2.0f, 1.5f);
-			p.playSound(p.getLocation(), Sound.ENTITY_PARROT_IMITATE_PHANTOM, SoundCategory.HOSTILE, 2.0f,  1.2f);
+			p.playSound(p.getLocation(), Sound.ENTITY_PARROT_IMITATE_PHANTOM, SoundCategory.HOSTILE, 2.0f, 1.2f);
 		}
 		ChargeUpManager chargeUp = new ChargeUpManager(mBoss, DURATION, Component.text(String.format("Soporific Shriek (%s)", Quarry.BANISH_CHARACTER), NamedTextColor.RED), BossBar.Color.RED, BossBar.Overlay.PROGRESS, RANGE);
 		mActiveTasks.add(new BukkitRunnable() {

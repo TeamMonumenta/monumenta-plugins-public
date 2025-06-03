@@ -643,6 +643,7 @@ public enum DungeonCommandMapping {
 		player.sendMessage(Component.text(
 			"Your delve bounty expired - talk to Knight-Errant Reynart for another!", NamedTextColor.AQUA));
 	}
+
 	public void showHeadsUpMessage(Collection<Player> players) {
 		if (players.isEmpty()) {
 			// No one to summarize

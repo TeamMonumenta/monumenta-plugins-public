@@ -103,6 +103,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("checkstyle:TypeName")
 public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 	public static class CustomDamageSource extends DamageSource {
 		private final boolean mBlockable;
@@ -150,6 +151,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 
 		public static class Builder {
 			private final PathfinderMob mMob;
+			@Nullable
 			private DamageAction mAction = null;
 			private boolean mRequireSight = false;
 			private RangePredicate mRangeChecker = (mob, target, attackRangeSqr) -> {
@@ -475,6 +477,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		server.getCommands().performCommand(parsed, command);
 	}
 
+	@Override
 	public boolean hasCollision(World world, BoundingBox aabb) {
 		final var bb = new AABB(
 			aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(),
@@ -625,12 +628,10 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		return Component.Serializer.fromJson(GsonComponentSerializer.gson().serialize(component));
 	}
 
+	@SuppressWarnings("ReferenceEquality")
 	@Override
-	public boolean isSameItem(@Nullable ItemStack item1,
-							  @Nullable ItemStack item2) {
-		return item1 == item2
-			|| item1 instanceof CraftItemStack craftItem1 && item2 instanceof CraftItemStack craftItem2
-			&& craftItem1.handle == craftItem2.handle;
+	public boolean isSameItem(@Nullable ItemStack item1, @Nullable ItemStack item2) {
+		return item1 == item2 || (item1 instanceof CraftItemStack lhs && item2 instanceof CraftItemStack rhs && lhs.handle == rhs.handle);
 	}
 
 	@Override
@@ -658,6 +659,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		((CraftEntity) entity).getHandle().moveTo(target.getX(), target.getY(), target.getZ(), yaw, pitch);
 	}
 
+	@Override
 	public JsonObject getScoreHolderScoresAsJson(String scoreHolder, org.bukkit.scoreboard.Scoreboard scoreboard) {
 		final var nmsScoreboard = ((CraftScoreboard) scoreboard).getHandle();
 
@@ -674,6 +676,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		return data;
 	}
 
+	@Override
 	public void resetScoreHolderScores(String scoreHolder, org.bukkit.scoreboard.Scoreboard scoreboard) {
 		Scoreboard nmsScoreboard = ((CraftScoreboard) scoreboard).getHandle();
 		nmsScoreboard.resetAllPlayerScores(() -> scoreHolder);

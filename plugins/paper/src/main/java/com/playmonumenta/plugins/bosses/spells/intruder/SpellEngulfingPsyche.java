@@ -48,7 +48,7 @@ public class SpellEngulfingPsyche extends Spell {
 
 	//Each ring layer removed, increment to keep track of location
 	private int mRingIncrement = 0;
-
+	private final Set<Player> mHitPlayers = new HashSet<>();
 
 	private final Set<Block> mChangedBlocks = new HashSet<>();
 	private final List<TextDisplay> mAnnoys = new ArrayList<>();
@@ -65,7 +65,6 @@ public class SpellEngulfingPsyche extends Spell {
 		mPlugin = plugin;
 		mCenter = centerLocation;
 	}
-	Set<Player> mHitPlayers = new HashSet<>();
 
 	public void prepareBorder() {
 		mActiveTasks.add(new BukkitRunnable() {

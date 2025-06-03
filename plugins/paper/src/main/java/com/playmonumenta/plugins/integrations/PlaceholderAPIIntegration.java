@@ -284,7 +284,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 						return stringDisplay + " ".repeat(lengthDiff);
 					}
 				}
-				
+
 				return stringDisplay;
 			} else if ((index + 1) % 2 == 0 && (events.size() > (index - 1) && !events.isEmpty())) {
 				//Allows for centering footer when first element exists but second doesn't.

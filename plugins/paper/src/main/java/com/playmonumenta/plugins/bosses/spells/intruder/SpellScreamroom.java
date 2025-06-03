@@ -346,7 +346,7 @@ public class SpellScreamroom extends Spell {
 						mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 0.3f, 0.5f + 1.5f * mChargeUpManager.getChargeTime() / CHARGE_TIME, 7);
 						if (mChargeUpManager.getTime() == CHARGE_TIME - 20) {
 							players.removeIf(player -> player.getScoreboardTags().contains(IntruderBoss.DEAD_TAG));
-							players.forEach(player ->EffectManager.getInstance().addEffect(player, "ScreamroomRoot", new PercentSpeed(20, -1.0, "ScreamroomRoot")));
+							players.forEach(player -> EffectManager.getInstance().addEffect(player, "ScreamroomRoot", new PercentSpeed(20, -1.0, "ScreamroomRoot")));
 						} else if (mChargeUpManager.getTime() == CHARGE_TIME - 10) {
 							players.removeIf(player -> player.getScoreboardTags().contains(IntruderBoss.DEAD_TAG));
 							players.stream().reduce((player1, player2) -> {

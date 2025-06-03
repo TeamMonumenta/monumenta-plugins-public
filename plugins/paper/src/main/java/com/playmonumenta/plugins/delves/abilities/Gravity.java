@@ -6,15 +6,11 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BlockUtils;
-
-
-import net.kyori.adventure.text.Component;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,7 +20,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-
 import org.jetbrains.annotations.Nullable;
 
 
@@ -38,7 +33,7 @@ public class Gravity {
 			return new Component[] {
 				Component.text("Blocks players place down fall if they are not supported in a + pattern below,"),
 				Component.text("fall damage increases by 150%, and recoil velocity is decreased by 34%")
-		};	
+		};
 	}
 
 	public static void applyModifiers(Block block, @Nullable Block blockUnder, int level) {
@@ -51,10 +46,9 @@ public class Gravity {
 			return;
 		}
 		if (!block.isPassable() && (block.getType() == Material.NETHERITE_BLOCK || (!BlockUtils.VALUABLES.contains(block.getType()) && !BlockUtils.CONTAINERS.contains(block.getType())))) {
-            BlockData blockData = block.getBlockData();
-            block.setType(Material.AIR);
-			FallingBlock fallingBlock = block.getWorld().spawn(block.getLocation().add(0.5, 0, 0.5), FallingBlock.class, (fallBlock) -> {
-				((FallingBlock) fallBlock).setBlockData(blockData);});
+			BlockData blockData = block.getBlockData();
+			block.setType(Material.AIR);
+			FallingBlock fallingBlock = block.getWorld().spawn(block.getLocation().add(0.5, 0, 0.5), FallingBlock.class, (fallBlock) -> fallBlock.setBlockData(blockData));
 			fallingBlock.setMetadata(PLAYER_PLACED_METADATA_KEY, new FixedMetadataValue(Plugin.getInstance(), true));
 			fallingBlock.setDropItem(false);
 			block.getWorld().playSound(block.getLocation(), "block.gravel.break", 1.0f, 1.0f);
@@ -112,8 +106,7 @@ public class Gravity {
 			});
 			for (Block support : supportList) {
 				if (support.isEmpty() || support.isLiquid()) {
-					FallingBlock fallingBlock = loc.getWorld().spawn(support.getLocation().add(0.5, 0, 0.5), FallingBlock.class, (fallBlock) -> {
-						((FallingBlock) fallBlock).setBlockData(blockData);});
+					FallingBlock fallingBlock = loc.getWorld().spawn(support.getLocation().add(0.5, 0, 0.5), FallingBlock.class, (fallBlock) -> fallBlock.setBlockData(blockData));
 					fallingBlock.setMetadata(PLAYER_PLACED_METADATA_KEY, new FixedMetadataValue(Plugin.getInstance(), true));
 					fallingBlock.setDropItem(false);
 					loc.getBlock().setType(Material.AIR);

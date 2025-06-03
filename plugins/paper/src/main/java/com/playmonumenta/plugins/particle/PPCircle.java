@@ -144,7 +144,7 @@ public class PPCircle extends AbstractPartialParticle<PPCircle> {
 
 	/**
 	 * Limits the circle to the given degrees, starting at the x-axis and turning towards z.
-	 * Turns off randomized angles when used, and enabled inclusion of both start and end if giving an arc < 360°.
+	 * Turns off randomized angles when used, and enabled inclusion of both start and end if giving an arc &lt; 360°.
 	 */
 	public PPCircle arcDegree(double startAngleDeg, double endAngleDeg) {
 		mStartAngleDeg = startAngleDeg;

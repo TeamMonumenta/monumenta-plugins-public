@@ -34,7 +34,7 @@ public class RampageCS implements CosmeticSkill {
 			.extra(radius * 0.07)
 			.spawnAsPlayerActive(player);
 		new PartialParticle(Particle.EXPLOSION_LARGE, loc).minimumCount(1).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.SWEEP_ATTACK, loc.clone().add(0, 1, 0), 25, radius / 2, radius / 3, radius  / 2, 0).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SWEEP_ATTACK, loc.clone().add(0, 1, 0), 25, radius / 2, radius / 3, radius / 2, 0).spawnAsPlayerActive(player);
 		new PPCircle(Particle.FLAME, loc.clone().add(0, 0.1, 0), 0.5)
 			.count(50)
 			.delta(0.07, 0, 0)

@@ -89,7 +89,8 @@ public class Retaliation implements Enchantment {
 			switch (damager.getType()) {
 				case WITHER_SKELETON, WITHER_SKULL, BEE, CAVE_SPIDER, PUFFERFISH -> debuffTypes.add(DOT_NAME);
 				case HUSK -> debuffTypes.add(WEAK_NAME);
-				default -> {}
+				default -> {
+				}
 			}
 		}
 

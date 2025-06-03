@@ -11,7 +11,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
-public class StealthBoss extends BossAbilityGroup{
+public class StealthBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_stealth";
 
 	public static class Parameters extends BossParameters {
@@ -59,6 +59,7 @@ public class StealthBoss extends BossAbilityGroup{
 		@BossParam(help = "Spell Name (also used for the damage it does)")
 		public String SPELL_NAME = "Stealth";
 	}
+
 	Parameters mParameters = new Parameters();
 
 	public StealthBoss(Plugin plugin, LivingEntity boss) {

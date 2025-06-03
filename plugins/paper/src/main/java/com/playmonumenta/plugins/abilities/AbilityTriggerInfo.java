@@ -176,7 +176,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 
 	public Component getAsNaturalLanguage(@Nullable String extraCondition) {
 		AbilityTrigger.Key key = mTrigger.getKey();
-		Component keyComp = switch(key) {
+		Component keyComp = switch (key) {
 			case RIGHT_CLICK -> Component.text("Right click");
 			case LEFT_CLICK -> Component.text("Left click");
 			case SWAP -> Component.text("Press ").append(Component.keybind(Constants.Keybind.SWAP_OFFHAND));

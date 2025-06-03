@@ -82,7 +82,7 @@ public class SpellSlashAttack extends Spell {
 							boolean xSlash, boolean mirroredSlash, boolean fullArc, boolean horizontalColor, Vector knockback, boolean knockAway, double kbrEffectiveness,
 							boolean followCaster, boolean followTelegraphRotation, double hitboxSize, double forcedParticleSize, DamageEvent.DamageType damageType,
 							SoundsList soundsTelegraph, SoundsList soundsSlashStart, SoundsList soundsSlashTick, SoundsList soundsSlashEnd,
-							boolean flipSlash,int slashes, int slashinterval, boolean reselectSlashAngle,
+							boolean flipSlash, int slashes, int slashinterval, boolean reselectSlashAngle,
 							boolean multiHit, int multihitInterval, boolean respectIframes) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -205,7 +205,7 @@ public class SpellSlashAttack extends Spell {
 			);
 			if (mXSlash) {
 				ParticleUtils.drawCleaveArc(startLoc, mRadius, (mMirroredSlash ? 180 : 360) - (mFlipped ? 180 - selectedAngle : selectedAngle), mStartAngle, mEndAngle, mRings, 0, 0, mSpacing, 40,
-					(Location l , int ring, double angleProgress) -> {
+					(Location l, int ring, double angleProgress) -> {
 						slashParticle(l, ring, angleProgress, startLoc, hitPlayers);
 					}
 				);

@@ -79,7 +79,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 	private BukkitTask mCountdownTask;
 	@Nullable
 	private Entity mExaltedBoss;
-	private List<String> mNarrations = new ArrayList<>();
+	private final List<String> mNarrations = new ArrayList<>();
 	private boolean mStalker = false;
 
 	private enum ExaltedDungeon {
@@ -387,7 +387,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 	private void bossSummoned(Entity summon) {
 		summon.addScoreboardTag(StatMultiplierBoss.identityTag);
 		summon.addScoreboardTag(StatMultiplierBoss.identityTag + "[damagemult=1.4]");
-		EntityUtils.scaleMaxHealth((LivingEntity) summon,  0.2, "AmalgamatingDreamscape");
+		EntityUtils.scaleMaxHealth((LivingEntity) summon, 0.2, "AmalgamatingDreamscape");
 
 		new PartialParticle(Particle.SMOKE_LARGE, summon.getLocation())
 			.count(15)
@@ -401,7 +401,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 	private void mobSummoned(Entity summon) {
 		summon.addScoreboardTag(StatMultiplierBoss.identityTag);
 		summon.addScoreboardTag(StatMultiplierBoss.identityTag + "[damagemult=1.4]");
-		EntityUtils.scaleMaxHealth((LivingEntity) summon,  0.2, "AmalgamatingDreamscape");
+		EntityUtils.scaleMaxHealth((LivingEntity) summon, 0.2, "AmalgamatingDreamscape");
 
 		summon.setVelocity(VectorUtils.randomUnitVector().setY(0.6).multiply(0.7));
 		new PartialParticle(Particle.SMOKE_NORMAL, summon.getLocation())

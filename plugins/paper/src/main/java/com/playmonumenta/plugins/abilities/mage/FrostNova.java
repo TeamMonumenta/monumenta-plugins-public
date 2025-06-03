@@ -58,7 +58,7 @@ public class FrostNova extends Ability {
 			.shorthandName("FN")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Damage and slow nearby mobs.")
-			.cooldown(COOLDOWN_TICKS_1, COOLDOWN_TICKS_2, COOLDOWN_TICKS_1 - ENHANCED_COOLDOWN_TICKS, COOLDOWN_TICKS_2 - ENHANCED_COOLDOWN_TICKS ,CHARM_COOLDOWN)
+			.cooldown(COOLDOWN_TICKS_1, COOLDOWN_TICKS_2, COOLDOWN_TICKS_1 - ENHANCED_COOLDOWN_TICKS, COOLDOWN_TICKS_2 - ENHANCED_COOLDOWN_TICKS, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FrostNova::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
 			.displayItem(Material.ICE);

@@ -88,6 +88,7 @@ public class BossUtils {
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable Location location) {
 		return blockableDamage(damager, damagee, type, damage, null, location, new ArrayList<>());
 	}
+
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location) {
 		return blockableDamage(damager, damagee, type, damage, cause, location, new ArrayList<>());
 	}

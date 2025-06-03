@@ -22,6 +22,7 @@ public class CloakAndDaggerCS implements StealthCosmeticSkill {
 	private static final double[] ROTATIONS = {25, -25};
 
 	private int mCombo = 0;
+
 	@Override
 	public ClassAbility getAbility() {
 		return ClassAbility.CLOAK_AND_DAGGER;

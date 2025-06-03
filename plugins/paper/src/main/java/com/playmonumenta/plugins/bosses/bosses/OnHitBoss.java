@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.NmsUtils;
-
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;

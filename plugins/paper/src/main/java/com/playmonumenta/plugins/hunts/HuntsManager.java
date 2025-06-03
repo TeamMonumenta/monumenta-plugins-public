@@ -510,7 +510,7 @@ public class HuntsManager implements Listener {
 				player.playSound(player, Sound.ENTITY_PARROT_FLY, SoundCategory.HOSTILE, 5f, 1f);
 				player.playSound(player, Sound.ENTITY_PARROT_FLY, SoundCategory.HOSTILE, 5f, 2f);
 			}
- 		} else {
+		} else {
 			Component message1 = Component.text(mNextQuarry.mWarning, mNextQuarry.mColor);
 			Component message2 = Component.text(mNextQuarry.getName() + " will be hunted in " + minutes + " minutes!", NamedTextColor.GRAY, TextDecoration.ITALIC);
 			for (Player player : players) {

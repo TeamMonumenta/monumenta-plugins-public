@@ -187,7 +187,7 @@ public abstract class Gui implements InventoryHolder {
 	 * @throws IllegalStateException If called after inventory disposal
 	 */
 	public void open() {
-		if(mInventory == null) {
+		if (mInventory == null) {
 			return;
 		}
 
@@ -201,7 +201,7 @@ public abstract class Gui implements InventoryHolder {
 	 * @throws IllegalStateException If called after inventory disposal
 	 */
 	public void close() {
-		if(mInventory == null) {
+		if (mInventory == null) {
 			return;
 		}
 

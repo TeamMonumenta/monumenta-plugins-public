@@ -1835,11 +1835,11 @@ public class ItemUtils {
 		return new ArrayList<>(lore);
 	}
 
-	public static EquipmentItems getEquipmentItems(EntityEquipment equipment)  {
+	public static EquipmentItems getEquipmentItems(EntityEquipment equipment) {
 		return new EquipmentItems(equipment);
 	}
 
-	public static void setEquipmentItems(EntityEquipment equipment, EquipmentItems items)  {
+	public static void setEquipmentItems(EntityEquipment equipment, EquipmentItems items) {
 		equipment.setArmorContents(items.getArmor());
 		equipment.setItemInMainHand(items.getMainhand());
 		equipment.setItemInOffHand(items.getOffhand());

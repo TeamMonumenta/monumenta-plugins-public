@@ -84,7 +84,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
 import org.jetbrains.annotations.Nullable;
 
 
@@ -222,7 +221,7 @@ public class DelvesManager implements Listener {
 						}
 
 						int lvl = delveObj.getAsJsonPrimitive("delveModLvl").getAsInt();
-						
+
 						if (lvl > 0) {
 							info.put(delveMod, lvl);
 						}
@@ -551,13 +550,13 @@ public class DelvesManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onFallBlock(final EntityChangeBlockEvent event) {
+	public void onFallBlock(final EntityChangeBlockEvent event) {
 		if (!DelvesUtils.isInDelvableWorld(event.getBlock().getWorld())
 			|| !Plugin.IS_PLAY_SERVER) {
 			return;
 		}
-        if (event.getEntity() instanceof FallingBlock fallingBlock) {
-            Location loc = event.getEntity().getLocation();
+		if (event.getEntity() instanceof FallingBlock fallingBlock) {
+			Location loc = event.getEntity().getLocation();
 			if (event.getTo() == fallingBlock.getBlockData().getMaterial() && fallingBlock.hasMetadata(Gravity.PLAYER_PLACED_METADATA_KEY)) {
 				if (Gravity.checkForSupport(loc, fallingBlock.getBlockData(), DelvesUtils.getModifierLevel(loc, DelvesModifier.GRAVITY))) {
 					event.setCancelled(true);
@@ -567,7 +566,7 @@ public class DelvesManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onLoom(final StructureGrowEvent event) {
+	public void onLoom(final StructureGrowEvent event) {
 		if (!DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
 			|| !Plugin.IS_PLAY_SERVER) {
 			return;
@@ -580,8 +579,8 @@ public class DelvesManager implements Listener {
 				Block block = loc.getBlock();
 				Block blockUnder = loc.clone().add(0, -1, 0).getBlock();
 				Gravity.applyModifiers(block, blockUnder, DelvesUtils.getModifierLevel(block.getLocation(), DelvesModifier.GRAVITY));
-				}
-			}.runTaskLater(Plugin.getInstance(), 2);
+			}
+		}.runTaskLater(Plugin.getInstance(), 2);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

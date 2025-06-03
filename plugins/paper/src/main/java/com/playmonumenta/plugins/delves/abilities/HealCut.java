@@ -1,4 +1,5 @@
 package com.playmonumenta.plugins.delves.abilities;
+
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -13,18 +14,18 @@ public class HealCut {
 		};
 	}
 
-    public static void applyHealcut(EntityRegainHealthEvent event, int level) {
+	public static void applyHealcut(EntityRegainHealthEvent event, int level) {
 		if (level == 0) {
 			return;
 		}
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
 			if (level > 1) {
-            	event.setAmount(event.getAmount() * (1 - CUT_AMOUNT / 100.0));
+				event.setAmount(event.getAmount() * (1 - CUT_AMOUNT / 100.0));
 			}
-            if (player.getSaturation() > 0) {
-                player.setSaturation((float) Math.min(player.getSaturation(), 0.3));
-            }
-        }
+			if (player.getSaturation() > 0) {
+				player.setSaturation((float) Math.min(player.getSaturation(), 0.3));
+			}
+		}
 	}
 }

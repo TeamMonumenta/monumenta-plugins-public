@@ -174,7 +174,8 @@ public class SinkholeFinisher implements EliteFinisher {
 			case MUD, SOUL_SAND -> display.setBlock(Material.WITHER_ROSE.createBlockData());
 			case MYCELIUM, DRIPSTONE_BLOCK -> display.setBlock(Material.BROWN_MUSHROOM.createBlockData());
 			case ROOTED_DIRT, PACKED_MUD -> display.setBlock(Material.RED_MUSHROOM.createBlockData());
-			default -> {}
+			default -> {
+			}
 		}
 		EntityUtils.setRemoveEntityOnUnload(display);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), display::remove, DURATION);

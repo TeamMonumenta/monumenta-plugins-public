@@ -108,7 +108,7 @@ public class SpellTwistedReplicants extends Spell {
 
 				replicant.addScoreboardTag(StatMultiplierBoss.identityTag);
 				replicant.addScoreboardTag(StatMultiplierBoss.identityTag + "[damagemult=1.4]");
-				EntityUtils.scaleMaxHealth(replicant,  0.2, "TwistedReplicant");
+				EntityUtils.scaleMaxHealth(replicant, 0.2, "TwistedReplicant");
 
 				replicant.addScoreboardTag(SPAWNED_TAG);
 				replicant.setLootTable(LootTables.EMPTY.getLootTable());

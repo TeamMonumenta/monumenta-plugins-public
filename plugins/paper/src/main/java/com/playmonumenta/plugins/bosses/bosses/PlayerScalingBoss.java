@@ -43,8 +43,7 @@ public class PlayerScalingBoss extends BossAbilityGroup {
 		int playerCount;
 		if (p.DO_LOCAL_SCALING) {
 			playerCount = PlayerUtils.playersInRange(boss.getLocation(), p.LOCAL_SCALING_RANGE, true).size();
-		}
-		else {
+		} else {
 			playerCount = 0;
 
 			for (Player player : boss.getWorld().getPlayers()) {

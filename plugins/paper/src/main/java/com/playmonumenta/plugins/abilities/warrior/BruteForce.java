@@ -133,8 +133,7 @@ public final class BruteForce extends Ability {
 
 			if (!EntityUtils.isBoss(mob) && mob == target) {
 				MovementUtils.knockAway(playerLoc, mob, mForceScalar * kbMultiplier, mForceScalar / 2.0f, true);
-			}
-			else if (!EntityUtils.isBoss(mob)) {
+			} else if (!EntityUtils.isBoss(mob)) {
 				MovementUtils.knockAway(playerLoc, mob, mForceScalar, mForceScalar / 2.0f, true);
 			}
 		}

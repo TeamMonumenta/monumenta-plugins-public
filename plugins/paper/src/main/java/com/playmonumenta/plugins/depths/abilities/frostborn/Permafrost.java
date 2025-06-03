@@ -91,10 +91,10 @@ public class Permafrost extends DepthsAbility implements AbilityWithChargesOrSta
 		final double start = (FastUtils.randomBoolean() ? Math.PI : -Math.PI) * 2 / 3;
 		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;
-			final double increment = -start / 12;
-			final Location originalLocation = mPlayer.getEyeLocation();
-			final Vector originalDirection = getXZDirection();
-			final Vector direction = originalDirection.clone().multiply(mRadius).rotateAroundY(start);
+			final double mIncrement = -start / 12;
+			final Location mOriginalLocation = mPlayer.getEyeLocation();
+			final Vector mOriginalDirection = getXZDirection();
+			final Vector mDirection = mOriginalDirection.clone().multiply(mRadius).rotateAroundY(start);
 
 			@Override
 			public void run() {
@@ -103,13 +103,13 @@ public class Permafrost extends DepthsAbility implements AbilityWithChargesOrSta
 					return;
 				}
 				for (int i = 0; i < 5; i++) {
-					Location loc = originalLocation.clone().add(direction);
+					Location loc = mOriginalLocation.clone().add(mDirection);
 					loc = LocationUtils.fallToGround(loc, mPlayer.getLocation().getY() - 0.5);
 					Block block = loc.getBlock();
 					DepthsUtils.iceExposedBlock(block, mIceDuration, mPlayer);
-					DepthsUtils.iceExposedBlock(block.getRelative(originalDirection.getX() > 0 ? BlockFace.EAST : BlockFace.WEST), mIceDuration, mPlayer);
-					DepthsUtils.iceExposedBlock(block.getRelative(originalDirection.getZ() > 0 ? BlockFace.SOUTH : BlockFace.NORTH), mIceDuration, mPlayer);
-					direction.rotateAroundY(increment);
+					DepthsUtils.iceExposedBlock(block.getRelative(mOriginalDirection.getX() > 0 ? BlockFace.EAST : BlockFace.WEST), mIceDuration, mPlayer);
+					DepthsUtils.iceExposedBlock(block.getRelative(mOriginalDirection.getZ() > 0 ? BlockFace.SOUTH : BlockFace.NORTH), mIceDuration, mPlayer);
+					mDirection.rotateAroundY(mIncrement);
 				}
 				mT++;
 			}

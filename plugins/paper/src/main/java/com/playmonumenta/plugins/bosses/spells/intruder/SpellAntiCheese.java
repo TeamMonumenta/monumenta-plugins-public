@@ -24,6 +24,7 @@ public class SpellAntiCheese extends Spell {
 
 	private static final double DAMAGE_PERCENT = 0.25;
 	private static final int IMMUNITY_TICKS = 10;
+
 	public SpellAntiCheese(Plugin plugin, LivingEntity boss, Location center) {
 		mPlugin = plugin;
 		mBoss = boss;

@@ -131,6 +131,8 @@ public interface VersionAdapter {
 	Object toVanillaChatComponent(Component component);
 
 	/**
+	 * Check if two ItemStack instances refer to the same vanilla stack.
+	 *
 	 * @return Whether the given item stacks refer to the same vanilla stack. Can e.g. be used to test if an item is still in an inventory, and not just an exact copy.
 	 */
 	boolean isSameItem(@Nullable ItemStack item1, @Nullable ItemStack item2);

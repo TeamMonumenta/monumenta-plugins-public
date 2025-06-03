@@ -92,8 +92,7 @@ public class SpellMalevolentConduit extends SpellNova {
 						.delta(0.4)
 						.spawnAsBoss();
 				}
-				if (mChargeUpManager.nextTick(2))
-				{
+				if (mChargeUpManager.nextTick(2)) {
 					this.cancel();
 				}
 			}

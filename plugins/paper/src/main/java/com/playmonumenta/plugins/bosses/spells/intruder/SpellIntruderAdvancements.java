@@ -20,7 +20,7 @@ public class SpellIntruderAdvancements extends Spell {
 	private final List<Player> mDistortedPlayers = new ArrayList<>();
 	public boolean mShadowscapeDuo = true;
 
-	private int killedShadowCount = 0;
+	private int mKilledShadowCount = 0;
 	private final List<Player> mPlayers;
 	private boolean mHasLuciae;
 	private boolean mGrantedFacelessDozen = false;
@@ -94,13 +94,14 @@ public class SpellIntruderAdvancements extends Spell {
 
 	public void bossNearbyEntityDeath(EntityDeathEvent event) {
 		if (event.getEntity().getScoreboardTags().contains("LiminalShadow")) {
-			killedShadowCount++;
+			mKilledShadowCount++;
 		}
-		if (killedShadowCount >= 25) {
+		if (mKilledShadowCount >= 25) {
 			// Grant Lights On
 			AdvancementUtils.grantAdvancement(mPlayers, "monumenta:challenges/r3/intruder/lights_on");
 		}
 	}
+
 	@Override
 	public int cooldownTicks() {
 		return 0;

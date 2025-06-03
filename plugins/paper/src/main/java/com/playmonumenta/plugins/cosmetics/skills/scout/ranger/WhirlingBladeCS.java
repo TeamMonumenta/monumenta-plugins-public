@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public class WhirlingBladeCS implements CosmeticSkill {
-	float startingAngle = 0;
+	private float mStartingAngle = 0;
 
 	@Override
 	public ClassAbility getAbility() {
@@ -30,7 +30,7 @@ public class WhirlingBladeCS implements CosmeticSkill {
 	}
 
 	public void onCast(Player player, Location loc, World world) {
-		startingAngle = player.getLocation().getYaw();
+		mStartingAngle = player.getLocation().getYaw();
 	}
 
 	public void hitMob(Player player, Location loc, World world) {
@@ -52,10 +52,10 @@ public class WhirlingBladeCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.3f, 1.7f);
 		world.playSound(loc, Sound.ENTITY_BREEZE_DEATH, SoundCategory.PLAYERS, 0.2f, 1.7f);
 
-		Location location = player.getEyeLocation().add(VectorUtils.rotateYAxis(new Vector(-1, -0.5, 0), startingAngle - degrees));
+		Location location = player.getEyeLocation().add(VectorUtils.rotateYAxis(new Vector(-1, -0.5, 0), mStartingAngle - degrees));
 		float pitch = FastUtils.randomFloatInRange(8, 12) * (FastUtils.RANDOM.nextBoolean() ? -1.0f : 0.5f);
 		location.setPitch(pitch);
-		location.setYaw(startingAngle - degrees + 15);
+		location.setYaw(mStartingAngle - degrees + 15);
 
 		if (degrees % 60 == 0) {
 			final int rings = (int) ((throwRadius + bladeRadius - 1.5) / 0.3);

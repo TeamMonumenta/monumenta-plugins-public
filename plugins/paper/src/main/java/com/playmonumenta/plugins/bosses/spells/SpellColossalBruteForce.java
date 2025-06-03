@@ -43,14 +43,14 @@ public class SpellColossalBruteForce extends SpellBaseSeekingAoE {
 	/**
 	 * @param plugin               Plugin
 	 * @param caster               The boss casting the spell
-	 * @param targets			   Targets
+	 * @param targets              Targets
 	 * @param delay                Time it takes for the spell to trigger after it has finished charging and become stationary
 	 * @param cooldown             Cooldown
 	 * @param radius               Radius
 	 * @param count                Amount of spells per player
 	 * @param incrementDelay       Time between each consecutive spell when count is above 1
-	 * @param damage			   Damage
-	 * @param damagePercentage	   Percentage damage
+	 * @param damage               Damage
+	 * @param damagePercentage     Percentage damage
 	 * @param canMoveWhileCharging If the boss can move while in the charge up phase
 	 * @param canMoveWhileCasting  If the boss can move in the period between the charge up is finished and the spell is triggered
 	 */
@@ -101,7 +101,8 @@ public class SpellColossalBruteForce extends SpellBaseSeekingAoE {
 	}
 
 	@Override
-	protected void castAction(Location location, int spellCount) {}
+	protected void castAction(Location location, int spellCount) {
+	}
 
 	@Override
 	protected void outburstAction(Location location, int spellCount) {

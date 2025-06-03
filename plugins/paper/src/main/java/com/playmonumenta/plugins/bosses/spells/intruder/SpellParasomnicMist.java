@@ -116,7 +116,6 @@ public class SpellParasomnicMist extends Spell {
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
-		
 
 		mBoss.setAI(false);
 		mBoss.setInvulnerable(true);

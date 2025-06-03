@@ -1,16 +1,5 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import net.ltgt.gradle.errorprone.CheckSeverity
-import net.ltgt.gradle.errorprone.errorprone
-import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
-
-plugins {
-	id("com.github.johnrengelman.shadow") version "7.1.2"
-	id("com.playmonumenta.plugins.java-conventions")
-	id("com.playmonumenta.deployment") version "1.+"
-	id("net.minecrell.plugin-yml.bukkit") version "0.5.1" // Generates plugin.yml
-	id("java")
-	id("net.ltgt.errorprone") version "3.1.0"
-	id("net.ltgt.nullaway") version "1.6.0"
+repositories {
+	maven("https://maven.playpro.com/")
 }
 
 dependencies {
@@ -54,66 +43,6 @@ dependencies {
 	errorprone("com.uber.nullaway:nullaway:0.10.18")
 }
 
-group = "com.playmonumenta"
-description = "Monumenta Main Plugin"
-version = rootProject.version
-
-// Configure plugin.yml generation
-bukkit {
-	load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
-	main = "com.playmonumenta.plugins.Plugin"
-	apiVersion = "1.19"
-	name = "Monumenta"
-	authors = listOf("The Monumenta Team")
-	depend = listOf(
-		"BKCommonLib",
-		"CommandAPI",
-		"ScriptedQuests"
-	)
-	softDepend = listOf(
-		"NBTAPI",
-		"MonumentaRedisSync",
-		"PlaceholderAPI",
-		"ChestSort",
-		"LuckPerms",
-		"CoreProtect",
-		"NBTEditor",
-		"LibraryOfSouls",
-		"MonumentaNetworkChat",
-		"MonumentaNetworkRelay",
-		"PremiumVanish",
-		"ProtocolLib",
-		"PrometheusExporter",
-		"MonumentaStructureManagement",
-		"MonumentaWorldManagement",
-		"TAB"
-	)
-}
-
-tasks.withType<JavaCompile>().configureEach {
-	options.compilerArgs.add("-Xmaxwarns")
-	options.compilerArgs.add("10000")
-
-	options.compilerArgs.add("-Xlint:deprecation")
-
-	options.errorprone {
-		option("NullAway:AnnotatedPackages", "com.playmonumenta")
-
-		allErrorsAsWarnings.set(true)
-
-		/*** Disabled checks ***/
-		// These we almost certainly don't want
-		check("InlineMeSuggester", CheckSeverity.OFF) // We won't keep deprecated stuff around long enough for this to matter
-		check("CatchAndPrintStackTrace", CheckSeverity.OFF) // This is the primary way a lot of exceptions are handled
-		check("FutureReturnValueIgnored", CheckSeverity.OFF) // This one is dumb and doesn't let you check return values with .whenComplete()
-		check("ImmutableEnumChecker", CheckSeverity.OFF) // Would like to turn this on but we'd have to annotate a bunch of base classes
-		check("LockNotBeforeTry", CheckSeverity.OFF) // Very few locks in our code, those that we have are simple and refactoring like this would be ugly
-		check("StaticAssignmentInConstructor", CheckSeverity.OFF) // We have tons of these on purpose
-		check("StringSplitter", CheckSeverity.OFF) // We have a lot of string splits too which are fine for this use
-		check("MutablePublicArray", CheckSeverity.OFF) // These are bad practice but annoying to refactor and low risk of actual bugs
-	}
-}
-
 // Relocation / shading
 tasks {
 	shadowJar {
@@ -134,5 +63,3 @@ tasks {
 		}
 	}
 }
-
-ssh.easySetup(tasks.named<ShadowJar>("shadowJar").get(), "Monumenta")

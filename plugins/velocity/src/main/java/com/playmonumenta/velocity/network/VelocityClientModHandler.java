@@ -63,6 +63,7 @@ public class VelocityClientModHandler {
 	/**
 	 * sent on login, gives information that the client should know first and foremost.
 	 */
+	@SuppressWarnings("checkstyle:MemberName")
 	public static class ServerInfoPacket implements Packet {
 		String _type = "ServerInfoPacket";
 

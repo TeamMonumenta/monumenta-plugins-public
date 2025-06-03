@@ -60,6 +60,7 @@ public class SpellLingeringScar extends Spell {
 		mYLevel = yLevel;
 		mSpellCooldownManager = new SpellCooldownManager(10 * 20, mBoss::isValid, mBoss::hasAI);
 	}
+
 	@Override
 	public void run() {
 		if (!canRun()) {

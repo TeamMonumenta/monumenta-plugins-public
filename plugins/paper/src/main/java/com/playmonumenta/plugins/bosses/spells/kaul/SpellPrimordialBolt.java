@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
-import com.playmonumenta.plugins.bosses.bosses.*;
+import com.playmonumenta.plugins.bosses.bosses.Kaul;
+import com.playmonumenta.plugins.bosses.bosses.PrimordialElementalKaulBoss;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseBolt;
 import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;

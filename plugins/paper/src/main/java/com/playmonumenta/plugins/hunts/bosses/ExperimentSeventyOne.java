@@ -185,7 +185,8 @@ public class ExperimentSeventyOne extends Quarry {
 				manageMudTimings();
 
 				if (mTicks % DAMAGE_REDUCTION_TELEGRAPH_COOLDOWN == 0) {
-					mWorms.forEach(e -> ParticleUtils.launchOrb(new Vector(0, 1, 0), e.getLocation(), e, mBoss, 200, null, new Particle.DustOptions(Color.fromRGB(110, 63, 19), 1.2f), en -> {}));
+					mWorms.forEach(e -> ParticleUtils.launchOrb(new Vector(0, 1, 0), e.getLocation(), e, mBoss, 200, null, new Particle.DustOptions(Color.fromRGB(110, 63, 19), 1.2f), en -> {
+					}));
 				}
 
 				mLeapCooldown--;
