@@ -96,6 +96,29 @@ public class ZoneUtils {
 			return guildPlotGameMode;
 		}
 
+		GameMode currentGameMode = player.getGameMode();
+		Location location = player.getLocation();
+
+		/*
+		 * Checks for the plots shards, where plots may be present, but there isn't a zone for each plot.
+		 * This depends on the presence of sponge at y=10 and meeting the requirements to own a plot.
+		 * There's also an exception to allow building just outside a plot.
+		 */
+		if (hasZoneProperty(player, ZoneProperty.SHOPS_POSSIBLE)) {
+			boolean isInPlot = inPlot(location, ServerProperties.getIsTownWorld());
+			if (!isInPlot) {
+				return GameMode.ADVENTURE;
+			} else if (
+				currentGameMode == GameMode.ADVENTURE
+					&& location.getY() > ServerProperties.getPlotSurvivalMinHeight()
+					&& ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_LEVEL).orElse(0) >= 5
+			) {
+				return GameMode.SURVIVAL;
+			} else {
+				return currentGameMode;
+			}
+		}
+
 		/*
 		 * Everything after this point covers everywhere else in the game:
 		 * - Player plots have a zone covering the plot bounds
@@ -143,8 +166,20 @@ public class ZoneUtils {
 		if (GuildPlotUtils.isGuildPlot(loc)) {
 			return true;
 		}
+		if (hasZoneProperty(loc, ZoneProperty.PLOT)) {
+			return true;
+		}
+		if (!isTownWorld &&
+			!hasZoneProperty(loc, ZoneProperty.SHOPS_POSSIBLE)) {
+			return false;
+		}
 
-		return hasZoneProperty(loc, ZoneProperty.PLOT);
+		return isSurvivalModeInPlots(loc);
+	}
+
+	private static boolean isSurvivalModeInPlots(Location loc) {
+		Material mat = loc.getWorld().getBlockAt(loc.getBlockX(), 10, loc.getBlockZ()).getType();
+		return mat == Material.SPONGE || (mat.equals(Material.WET_SPONGE) && loc.getY() < 53);
 	}
 
 	public static boolean playerCanMineBlock(Player player, Block block) {

@@ -34,7 +34,8 @@ public class CurseOfCorruption implements Enchantment {
 	@Override
 	public void onEquipmentUpdate(Plugin plugin, Player player) {
 		int level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CURSE_OF_CORRUPTION);
-		if (level > 1) {
+		boolean plots = ZoneUtils.hasZoneProperty(player, ZoneProperty.SHOPS_POSSIBLE);
+		if (level > 1 && !plots) {
 			mCorruptionPlayers.add(player);
 			if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.BLINDNESS, PotionEffect.INFINITE_DURATION, 0, true, false));
@@ -43,7 +44,7 @@ public class CurseOfCorruption implements Enchantment {
 			plugin.mEffectManager.addEffect(player, SLOWNESS_SOURCE,
 				new PercentSpeed(Integer.MAX_VALUE, SLOWNESS_AMOUNT_PER_LEVEL * (level - 1), SLOWNESS_SOURCE).displaysTime(false));
 			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, PotionEffect.INFINITE_DURATION, level - 1, true, false));
-		} else if (mCorruptionPlayers.remove(player)) {
+		} else if (mCorruptionPlayers.remove(player) || plots) {
 			plugin.mEffectManager.clearEffects(player, SLOWNESS_SOURCE);
 			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.BLINDNESS);
 			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.SLOW_DIGGING);

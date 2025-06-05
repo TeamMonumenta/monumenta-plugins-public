@@ -112,6 +112,16 @@ public class PlayerTracking implements EntityTracking {
 				}
 			}
 
+			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SHOPS_POSSIBLE)) {
+				GameMode expectedGameMode = ZoneUtils.expectedGameMode(player);
+
+				if (mode == GameMode.SURVIVAL && expectedGameMode == GameMode.ADVENTURE) {
+					player.setGameMode(GameMode.ADVENTURE);
+				} else if (mode == GameMode.ADVENTURE && expectedGameMode == GameMode.SURVIVAL) {
+					player.setGameMode(GameMode.SURVIVAL);
+				}
+			}
+
 			// Give potion effects to those in a City;
 			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SPEED_2)) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CAPITAL_SPEED_EFFECT);
