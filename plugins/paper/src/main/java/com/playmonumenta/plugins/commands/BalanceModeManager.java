@@ -4,12 +4,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.itemstats.enums.AttributeType;
-import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
-import com.playmonumenta.plugins.itemstats.enums.ItemType;
-import com.playmonumenta.plugins.itemstats.enums.Masterwork;
-import com.playmonumenta.plugins.itemstats.enums.Operation;
-import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemstats.enums.*;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MasterworkUtils;
@@ -19,13 +14,13 @@ import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import dev.jorel.commandapi.CommandAPICommand;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.commons.math3.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -79,13 +74,19 @@ public class BalanceModeManager {
 		}
 
 		if (item.getType() == Material.CHEST) {
+			boolean anyR1R2Items = false;
 			ArrayList<String> spreadsheetData = new ArrayList<>();
 			ReadableNBTList<ReadWriteNBT> nbtItemList = ItemUtils.getContainerItems(item);
 			if (nbtItemList == null || nbtItemList.isEmpty()) {
 				return;
 			}
 			for (ReadWriteNBT nbtItem : nbtItemList) {
-				determineSlotAndEvaluate(NBT.itemStackFromNBT(nbtItem), player, spreadsheetData, oData);
+				ItemStack itemStack = NBT.itemStackFromNBT(nbtItem);
+				anyR1R2Items = ItemStatUtils.getRegion(itemStack) != Region.RING || anyR1R2Items;
+				determineSlotAndEvaluate(itemStack, player, spreadsheetData, oData);
+			}
+			if (anyR1R2Items) {
+				return;
 			}
 
 			StringBuilder fullSheetString = new StringBuilder();
@@ -109,13 +110,23 @@ public class BalanceModeManager {
 				continue;
 			}
 			int mwLevel = MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item));
-			if (mwLevel < 0 || s == Slot.MAINHAND) {
-				player.sendMessage(Component.text("Only Masterwork non-Mainhand items are currently supported by Balance Mode.", NamedTextColor.DARK_GRAY));
+			Region region = ItemStatUtils.getRegion(item);
+
+			if (s == Slot.MAINHAND) {
+				player.sendMessage(Component.text("Mainhand items are currently not supported by Balance Mode.", NamedTextColor.DARK_GRAY));
+				return;
+			}
+			if (region == Region.RING && mwLevel < 0) {
+				player.sendMessage(Component.text("Cannot evaluate R3 items with no Masterwork.", NamedTextColor.DARK_GRAY));
 				return;
 			}
 
+
 			// Evaluate the item and store its imbalance
-			float imbalance = evaluateItem(item, s, player, 0f, spreadsheetData, oData);
+			float imbalance = evaluateItem(item, s, player, 0f, spreadsheetData, oData, region);
+			if (region != Region.RING) {
+				return;
+			}
 
 			// Evaluate the previous item
 			float evaluationLimit = oData.get("evaluation_limit").getAsFloat();
@@ -126,13 +137,13 @@ public class BalanceModeManager {
 				if (allMasterworks.isEmpty() || ItemStatUtils.getMasterwork(item) == baseMasterwork) {
 					return;
 				}
-				evaluateItem(allMasterworks.get(mwLevel - 1 - MasterworkUtils.getMasterworkAsInt(baseMasterwork)), s, player, imbalance, spreadsheetData, oData);
+				evaluateItem(allMasterworks.get(mwLevel - 1 - MasterworkUtils.getMasterworkAsInt(baseMasterwork)), s, player, imbalance, spreadsheetData, oData, region);
 			}
 		}
 	}
 
 	// returns true if "balanced", else false
-	private float evaluateItem(ItemStack item, Slot slot, Player player, float nextImbalance, @Nullable List<String> spreadsheetData, JsonObject oData) {
+	private float evaluateItem(ItemStack item, Slot slot, Player player, float nextImbalance, @Nullable List<String> spreadsheetData, JsonObject oData, Region region) {
 		StringBuilder spreadsheetString = new StringBuilder(ItemUtils.getPlainName(item) + "\t" + item.getType().name() + "\t3\t");
 		float[] spreadsheetValues = new float[62];
 		int mw = MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item));
@@ -145,23 +156,64 @@ public class BalanceModeManager {
 		float magicProtScore = calcProtValue(item, EnchantmentType.MAGIC_PROTECTION, EnchantmentType.MAGIC_FRAGILITY, spreadsheetValues, 5, oData);
 		float blastProtScore = calcProtValue(item, EnchantmentType.BLAST_PROTECTION, EnchantmentType.BLAST_FRAGILITY, spreadsheetValues, 4, oData);
 
-		float armorValueMult = calcArmorValue(item, slot, spreadsheetValues, oData);
-		float enchantValueMult = calcBaseEnchantValues(item, slot, spreadsheetValues, oData);
+		float armorValueMult = calcArmorValue(item, slot, spreadsheetValues, oData, region);
+		float enchantValueMult = calcBaseEnchantValues(item, slot, spreadsheetValues, oData, region);
 
 		// This function is a mess but its a very important one so its heavily obfuscated
+		String regionString = region == Region.VALLEY ? "v" : region == Region.ISLES ? "i" : "r";
 		float result = obOp("op1",
 			obOp("op2", enchantValueMult, armorValueMult,
 				obOp("op3",
 					obOp("op4",
-						obOp("op5", oData.get("mepc").getAsFloat(), sqrtOrZero(meleeProtScore)),
-						obOp("op6", oData.get("ppc").getAsFloat(), sqrtOrZero(projProtScore)),
-						obOp("op7", oData.get("mapc").getAsFloat(), sqrtOrZero(magicProtScore)),
-						obOp("op8", oData.get("bpc").getAsFloat(), sqrtOrZero(blastProtScore))
+						obOp("op5", oData.get("mepc" + regionString).getAsFloat(), sqrtOrZero(meleeProtScore)),
+						obOp("op6", oData.get("ppc" + regionString).getAsFloat(), sqrtOrZero(projProtScore)),
+						obOp("op7", oData.get("mapc" + regionString).getAsFloat(), sqrtOrZero(magicProtScore)),
+						obOp("op8", oData.get("bpc" + regionString).getAsFloat(), sqrtOrZero(blastProtScore))
 						),
 					oData.get("pc").getAsFloat())),
 			oData.get("fc1").getAsFloat() / oData.get("fc2").getAsFloat());
 
 		// Calculations over, now it's time to check the budget and display info.
+		if (region == Region.VALLEY || region == Region.ISLES) {
+			List<Pair<String, Float>> budgets = region == Region.VALLEY ? List.of(
+				new Pair<>("T1", oData.get("budget_v1").getAsFloat()),
+				new Pair<>("T2", oData.get("budget_v2").getAsFloat()),
+				new Pair<>("T3 / Low Uncommon", oData.get("budget_v3").getAsFloat()),
+				new Pair<>("T4 / Mid Uncommon", oData.get("budget_v4").getAsFloat()),
+				new Pair<>("T5 / High Uncommon / Low Rare", oData.get("budget_v5").getAsFloat()),
+				new Pair<>("Mid Rare", oData.get("budget_v6").getAsFloat()),
+				new Pair<>("High Rare", oData.get("budget_v7").getAsFloat()),
+				new Pair<>("Artifact", oData.get("budget_v8").getAsFloat()),
+				new Pair<>("Epic", oData.get("budget_v9").getAsFloat())
+			) : List.of(
+				new Pair<>("T1", oData.get("budget_i1").getAsFloat()),
+				new Pair<>("T2", oData.get("budget_i2").getAsFloat()),
+				new Pair<>("T3", oData.get("budget_i3").getAsFloat()),
+				new Pair<>("T4 / Low Uncommon", oData.get("budget_i4").getAsFloat()),
+				new Pair<>("T5 / Mid Uncommon / Low Rare", oData.get("budget_i5").getAsFloat()),
+				new Pair<>("High Uncommon / Mid Rare", oData.get("budget_i6").getAsFloat()),
+				new Pair<>("High Rare", oData.get("budget_i7").getAsFloat()),
+				new Pair<>("Very High Rare / Low Artifact", oData.get("budget_i8").getAsFloat()),
+				new Pair<>("Mid Artifact", oData.get("budget_i9").getAsFloat()),
+				new Pair<>("High Artifact", oData.get("budget_i10").getAsFloat()),
+				new Pair<>("Epic", oData.get("budget_i11").getAsFloat())
+			);
+
+			int minDiffIndex = 0;
+			for (int i = 1; i < budgets.size(); i++) {
+				if (Math.abs(budgets.get(i).getValue() - result) < Math.abs(budgets.get(minDiffIndex).getValue() - result)) {
+					minDiffIndex = i;
+				}
+			}
+
+			Component evaluation = Component.text(ItemUtils.getPlainName(item) + " has ")
+				.append(Component.text(result, NamedTextColor.GOLD))
+				.append(Component.text(" value.\n - Estimated tier: "))
+				.append(Component.text(budgets.get(minDiffIndex).getKey(), NamedTextColor.LIGHT_PURPLE));
+			float diff = result - budgets.get(minDiffIndex).getValue();
+			player.sendMessage(evaluation.append(Component.text(" (" + (diff < 0 ? "" : "+") + Math.round(diff * 1000) / 1000f + ")", NamedTextColor.GRAY)));
+			return 0;
+		}
 
 		float budget = getBudget(item, oData);
 		float difference = result - budget;
@@ -215,7 +267,7 @@ public class BalanceModeManager {
 		return val > 0f ? (float) Math.sqrt(val) : 0f;
 	}
 
-	private float calcBaseEnchantValues(ItemStack item, Slot slot, float[] spreadsheetValues, JsonObject oData) {
+	private float calcBaseEnchantValues(ItemStack item, Slot slot, float[] spreadsheetValues, JsonObject oData, Region region) {
 		// PREDEFINED CONSTANTS ---------------------------------------------------------------------------------------------------------
 		float meleeMult = oData.get("melee_constant").getAsFloat();
 		float projMult = oData.get("proj_constant").getAsFloat();
@@ -336,11 +388,11 @@ public class BalanceModeManager {
 		float totalHealth = (standardHP + attrHP) * (1 + attrPercentHP);
 
 		// obfuscated health calculations
-		if (totalHealth > standardHP) {
+		if (totalHealth > standardHP + (region == Region.RING ? 0 : 2)) {
 			for (int i = 0; i < Math.floor(totalHealth - standardHP); i++) {
 				artificialAnemia = obOp("op_health1", artificialAnemia, obOp("op_health2", 1f, obOp("op_health3", standardHP, i)));
 			}
-		} else if (totalHealth < standardHP) {
+		} else if (totalHealth < standardHP - (region == Region.RING ? 0 : 2)) {
 			for (int i = 0; i < Math.floor(standardHP - totalHealth); i++) {
 				artificialSustenance = obOp("op_health1", artificialSustenance, obOp("op_health2", 1f, obOp("op_health3", standardHP, -i)));
 			}
@@ -415,6 +467,9 @@ public class BalanceModeManager {
 				: enchRespiration == 2 ? oData.get("respiration2").getAsFloat()
 				: oData.get("respiration3").getAsFloat();
 		float waterScore = oData.get("depth_strider").getAsFloat() * enchDepthStrider + oData.get("aqua_affinity").getAsFloat() * enchAquaAffinity + respirationScore + oData.get("gills").getAsFloat() * enchGills + oData.get("abyssal").getAsFloat() * enchAbyssal;
+		if (region == Region.VALLEY) {
+			waterScore /= 3;
+		}
 
 		return obOp("op_enchants3", obOp("op_enchants1", totalHealth, standardHP),
 			(oData.get("final_enchant1").getAsFloat() + obOp("op_enchants2", healthScore, oData.get("final_enchant2").getAsFloat())),
@@ -422,7 +477,7 @@ public class BalanceModeManager {
 			(oData.get("final_enchant4").getAsFloat() + speedScore),
 			(oData.get("final_enchant5").getAsFloat() + oData.get("final_enchant6").getAsFloat() * attrKbr),
 			obOp("op_enchants4", oData.get("final_enchant7").getAsFloat(), shield),
-			obOp("op_enchants4", oData.get("final_enchant8").getAsFloat(), waterScore),
+			obOp("op_enchants4", region == Region.RING ? oData.get("final_enchant8").getAsFloat() : oData.get("final_enchant8_2").getAsFloat(), waterScore),
 			obOp("op_enchants5", oData.get("final_enchant9").getAsFloat(), enchFireProt),
 			obOp("op_enchants5", oData.get("final_enchant10").getAsFloat(), enchFeatherFalling),
 			obOp("op_enchants5", oData.get("final_enchant11").getAsFloat(), enchSecondWind),
@@ -440,7 +495,7 @@ public class BalanceModeManager {
 			obOp("op_enchants8", oData.get("final_enchant23").getAsFloat(), mending));
 	}
 
-	private float calcArmorValue(ItemStack item, Slot slot, float[] spreadsheetValues, JsonObject oData) {
+	private float calcArmorValue(ItemStack item, Slot slot, float[] spreadsheetValues, JsonObject oData, Region region) {
 		float attrArmor = (float) ItemStatUtils.getAttributeAmount(item, AttributeType.ARMOR, Operation.ADD, slot);
 		float attrAgility = (float) ItemStatUtils.getAttributeAmount(item, AttributeType.AGILITY, Operation.ADD, slot);
 
@@ -470,22 +525,23 @@ public class BalanceModeManager {
 		spreadsheetValues[52] = enchCloaked;
 
 		// SITUATIONAL DEFENSE VALUE ----------------------------------------------------------------------------------------------------
+		String regionString = region == Region.VALLEY ? "v" : region == Region.ISLES ? "i" : "r";
 		float armorScore =
 			obOp("op_situational",
 				oData.get("armor").getAsFloat() * attrArmor,
-				oData.get("inure").getAsFloat() * enchInure,
-				oData.get("shielding").getAsFloat() * enchShielding,
-				oData.get("steadfast").getAsFloat() * enchSteadfast,
-				oData.get("poise").getAsFloat() * enchPoise,
-				oData.get("guard").getAsFloat() * enchGuard);
+				oData.get("inure" + regionString).getAsFloat() * enchInure,
+				oData.get("shielding" + regionString).getAsFloat() * enchShielding,
+				oData.get("steadfast" + regionString).getAsFloat() * enchSteadfast,
+				oData.get("poise" + regionString).getAsFloat() * enchPoise,
+				oData.get("guard" + regionString).getAsFloat() * enchGuard);
 		float agilityScore =
 			obOp("op_situational",
 				oData.get("agility").getAsFloat() * attrAgility,
-				oData.get("reflexes").getAsFloat() * enchReflexes,
-				oData.get("tempo").getAsFloat() * enchTempo,
-				oData.get("evasion").getAsFloat() * enchEvasion,
-				oData.get("ethereal").getAsFloat() * enchEthereal,
-				oData.get("cloaked").getAsFloat() * enchCloaked);
+				oData.get("reflexes" + regionString).getAsFloat() * enchReflexes,
+				oData.get("tempo" + regionString).getAsFloat() * enchTempo,
+				oData.get("evasion" + regionString).getAsFloat() * enchEvasion,
+				oData.get("ethereal" + regionString).getAsFloat() * enchEthereal,
+				oData.get("cloaked" + regionString).getAsFloat() * enchCloaked);
 
 		// PROT AND ARMOR THINGS --------------------------------------------------------------------------------------------------------
 		if (armorScore > 0 && agilityScore > 0) {
