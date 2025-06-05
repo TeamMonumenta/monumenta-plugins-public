@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.EntityGlowEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
@@ -158,6 +159,12 @@ public class Boss {
 	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.customEffectAppliedToBoss(event);
+		}
+	}
+
+	public void bossGlowed(EntityGlowEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossGlowed(event);
 		}
 	}
 

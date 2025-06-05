@@ -77,6 +77,7 @@ import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalS
 import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalWind;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.EntityGlowEvent;
 import com.playmonumenta.plugins.gallery.bosses.GalleryMobRisingBoss;
 import com.playmonumenta.plugins.gallery.bosses.GallerySummonMobBoss;
 import com.playmonumenta.plugins.hunts.bosses.AlocAcoc;
@@ -926,6 +927,14 @@ public class BossManager implements Listener {
 
 		if (boss != null) {
 			boss.customEffectAppliedToBoss(event);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void bossGlowed(EntityGlowEvent event) {
+		Boss boss = mBosses.get(event.getEntity().getUniqueId());
+		if (boss != null) {
+			boss.bossGlowed(event);
 		}
 	}
 

@@ -212,7 +212,9 @@ public class AdvancingShadows extends Ability {
 				public void run() {
 					if (mT > mRecastTimer) {
 						mEnhancementChain = 0;
-						glowingEffect.clear();
+						if (glowingEffect != null) {
+							glowingEffect.clear();
+						}
 
 						cancel();
 						return;
