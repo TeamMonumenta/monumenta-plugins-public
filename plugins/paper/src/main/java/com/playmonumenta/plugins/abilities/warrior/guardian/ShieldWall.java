@@ -54,6 +54,9 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	public static final String CHARM_HEIGHT = "Shield Wall Height";
 	public static final String CHARM_RADIUS = "Shield Wall Radius";
 
+	private static final AbilityTriggerInfo.TriggerRestriction RESTRICTION = new AbilityTriggerInfo.TriggerRestriction("holding a shield in either hand",
+		player -> player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD);
+
 	public static final AbilityInfo<ShieldWall> INFO =
 			new AbilityInfo<>(ShieldWall.class, "Shield Wall", ShieldWall::new)
 					.linkedSpell(ClassAbility.SHIELD_WALL)
@@ -62,12 +65,9 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 					.descriptions(getDescription1(), getDescription2())
 					.simpleDescription("Deploy a wall that can block projectiles and mobs from entering.")
 					.cooldown(SHIELD_WALL_1_COOLDOWN, SHIELD_WALL_2_COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", shieldWall -> shieldWall.cast(false), new AbilityTrigger(AbilityTrigger.Key.SWAP),
-							new AbilityTriggerInfo.TriggerRestriction("holding a shield in either hand",
-									player -> player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD)))
-					.addTrigger(new AbilityTriggerInfo<>("caststationary", "cast stationary", shieldWall -> shieldWall.cast(true), new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false),
-							new AbilityTriggerInfo.TriggerRestriction("holding a shield in either hand",
-								player -> player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD)))
+					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", "Moves after being cast, recasting will make it stationary.", shieldWall -> shieldWall.cast(false, true), new AbilityTrigger(AbilityTrigger.Key.SWAP), RESTRICTION))
+					.addTrigger(new AbilityTriggerInfo<>("castmoving", "cast moving", "Moves after being cast, does nothing when recast.", shieldWall -> shieldWall.cast(false, false), new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false), RESTRICTION))
+					.addTrigger(new AbilityTriggerInfo<>("caststationary", "cast stationary", "Will never move when cast. If cast with a different trigger, using this trigger will make it stationary.", shieldWall -> shieldWall.cast(true, true), new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false), RESTRICTION))
 					.displayItem(Material.STONE_BRICK_WALL);
 
 	private final int mDuration;
@@ -95,9 +95,9 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldWallCS());
 	}
 
-	public boolean cast(boolean deposit) {
+	public boolean cast(boolean deposit, boolean canRecast) {
 		if (isOnCooldown()) {
-			if (mDeposited) {
+			if (mDeposited || !canRecast) {
 				return false;
 			}
 			mDeposited = true;
