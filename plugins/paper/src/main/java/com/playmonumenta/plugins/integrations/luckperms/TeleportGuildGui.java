@@ -15,6 +15,7 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -78,6 +79,13 @@ public class TeleportGuildGui extends Gui {
 		super(player, 54, Component.text("Teleport to Guild"));
 		mMainPlugin = plugin;
 		mPlayerUser = LuckPermsIntegration.getUser(mPlayer);
+
+		// Faster initial load
+		CompletableFuture<List<Group>> nonPublicGuildsFuture = new CompletableFuture<>();
+		nonPublicGuildsFuture.complete(new ArrayList<>(LuckPermsIntegration.getRelevantGuilds(mPlayerUser, true, false)));
+		refresh(nonPublicGuildsFuture);
+
+		// Include public guilds
 		refresh();
 	}
 
@@ -267,31 +275,47 @@ public class TeleportGuildGui extends Gui {
 	}
 
 	public void refresh() {
+		refresh(LuckPermsIntegration.getGuilds());
+	}
+
+	public void refresh(CompletableFuture<List<Group>> guildsFuture) {
 		Bukkit.getScheduler().runTaskAsynchronously(mMainPlugin, () -> {
 			mPlayerUser = LuckPermsIntegration.loadUser(mPlayerUser.getUniqueId()).join();
 
-			List<@Nullable PlayerGuildInfo> guilds = mOrder.sortGuilds(
-				PlayerGuildInfo.ofCollection(
-						mPlayerUser,
-						LuckPermsIntegration.getGuilds().join()
-					).join()
-					.stream()
-					.filter(playerGuildInfo -> (
-						playerGuildInfo.getGuildPermissions().contains(GuildPermission.VISIT)
-							&& playerGuildInfo.getGuildFlags().contains(GuildFlag.OWNS_PLOT)
-					))
-					.collect(Collectors.toList())
-			).join();
+			List<PlayerGuildInfo> unsortedGuilds = PlayerGuildInfo.ofCollection(
+					mPlayerUser,
+					guildsFuture.join()
+				).join()
+				.stream()
+				.filter(playerGuildInfo -> (
+					playerGuildInfo.getGuildPermissions().contains(GuildPermission.VISIT)
+						&& playerGuildInfo.getGuildFlags().contains(GuildFlag.OWNS_PLOT)
+				))
+				.collect(Collectors.toList());
+
+			List<@Nullable PlayerGuildInfo> guilds = new ArrayList<>();
+			guilds.add(null);
 
 			Group mainGuild = LuckPermsIntegration.getGuild(mPlayerUser);
 			if (mainGuild != null) {
 				PlayerGuildInfo mainGuildInfo = PlayerGuildInfo.of(mPlayerUser, mainGuild).join();
-				if (mainGuildInfo != null && guilds.contains(mainGuildInfo)) {
-					guilds.remove(mainGuildInfo);
-					guilds.add(0, mainGuildInfo);
+				if (mainGuildInfo != null && unsortedGuilds.contains(mainGuildInfo)) {
+					unsortedGuilds.remove(mainGuildInfo);
+					guilds.add(mainGuildInfo);
 				}
 			}
-			guilds.add(0, null);
+
+			// Guest guilds
+			guilds.addAll(mOrder.sortGuilds(unsortedGuilds.stream()
+				.filter(playerGuildInfo -> !playerGuildInfo.getAccessLevel().equals(GuildAccessLevel.NONE))
+				.toList()
+			).join());
+
+			// Public guilds
+			guilds.addAll(mOrder.sortGuilds(unsortedGuilds.stream()
+				.filter(playerGuildInfo -> playerGuildInfo.getAccessLevel().equals(GuildAccessLevel.NONE))
+				.toList()
+			).join());
 
 			Bukkit.getScheduler().runTask(mMainPlugin, () -> {
 				// Handle this list sync so that it can't be modified during reads
