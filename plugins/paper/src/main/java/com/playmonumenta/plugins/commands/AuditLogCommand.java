@@ -22,7 +22,7 @@ public class AuditLogCommand {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.withArguments(new TextArgument("message"))
 			.executes((sender, args) -> {
-				AuditListener.log(((String) args.getUnchecked("message")).replaceAll("@S", ((Player) args.getUnchecked("player")).getName()));
+				AuditListener.logPlayer(((String) args.getUnchecked("message")).replaceAll("@S", ((Player) args.getUnchecked("player")).getName()));
 			})
 			.register();
 		new CommandAPICommand("auditlogsevere")
