@@ -23,7 +23,6 @@ import org.bukkit.entity.Player;
 public class FirstStrike implements Enchantment {
 
 	private static final double DAMAGE_PER_LEVEL = 0.1;
-	private static final double RANGED_REDUCTION = 0.75;
 	private static final int DURATION = 3 * 20;
 	private static final String SOURCE = "FirstStrikeDisable";
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(244, 141, 123), 0.75f);
@@ -74,7 +73,7 @@ public class FirstStrike implements Enchantment {
 		//onDamageDelayed does not include projectile and potion damage
 		if ((PROJ_DAMAGE_TYPES.contains(type) || event.getAbility() == ClassAbility.ALCHEMIST_POTION) &&
 			plugin.mEffectManager.getEffects(enemy, SOURCE + player.getName()) == null) {
-			double bonus = DAMAGE_PER_LEVEL * level * RANGED_REDUCTION;
+			double bonus = DAMAGE_PER_LEVEL * level;
 			triggerFirstStrike(plugin, player, bonus, event, enemy);
 		}
 	}
