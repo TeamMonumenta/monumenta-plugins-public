@@ -32,7 +32,7 @@ public class TwistedScroll extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.TWISTED);
+		dp.addReward(DepthsRoomType.DepthsRewardType.TWISTED);
 		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
 	}
 

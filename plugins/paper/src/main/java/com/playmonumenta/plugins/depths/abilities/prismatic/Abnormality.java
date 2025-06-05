@@ -31,16 +31,15 @@ public class Abnormality extends DepthsAbility {
 
 	public static void gain(Player player) {
 		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
-		// Weird things might happen if you get abnormality again from a second source (wheel) before choosing the prismatic but the safest thing to do is just do nothing
-		if (dp == null || dp.mAbnormalityLevel > 0) {
+		if (dp == null) {
 			return;
 		}
-		dp.mAbnormalityLevel = dp.getLevelInAbility(ABILITY_NAME);
+		int level = dp.getLevelInAbility(ABILITY_NAME);
 
 		int[] placeholder = {100, 0, 0, 0, 0};
 		DepthsManager.getInstance().getRandomAbility(player, dp, placeholder, null, true);
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.PRISMATIC);
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.CURSE);
+		dp.addReward(DepthsRoomType.DepthsRewardType.PRISMATIC, level);
+		dp.addReward(DepthsRoomType.DepthsRewardType.CURSE);
 		dp.mRerolls++;
 
 		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);

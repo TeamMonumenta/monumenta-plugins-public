@@ -39,7 +39,7 @@ public class PoetsQuill extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.POETS);
+		dp.addReward(DepthsRoomType.DepthsRewardType.POETS);
 	}
 
 	private static Description<PoetsQuill> getDescription() {

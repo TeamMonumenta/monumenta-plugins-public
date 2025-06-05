@@ -188,6 +188,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import net.kyori.adventure.text.Component;
@@ -766,7 +767,7 @@ public class DepthsManager {
 	}
 
 	public static List<DepthsAbilityInfo<?>> getFilteredAbilities(List<DepthsTree> filter) {
-		return getFilteredAbilities(filter, List.of());
+		return getFilteredAbilities(filter, List.of(), List.of());
 	}
 
 	/**
@@ -775,11 +776,11 @@ public class DepthsManager {
 	 * @param filter the valid trees to filter by
 	 * @return list of filtered abilities
 	 */
-	public static List<DepthsAbilityInfo<?>> getFilteredAbilities(List<DepthsTree> filter, List<DepthsTree> noActiveTrees) {
+	public static List<DepthsAbilityInfo<?>> getFilteredAbilities(List<DepthsTree> filter, List<DepthsTree> noActiveTrees, List<DepthsAbilityInfo<?>> excludedAbilities) {
 		List<DepthsAbilityInfo<?>> filteredList = new ArrayList<>();
 		for (DepthsAbilityInfo<?> da : getAbilities()) {
 			DepthsTree tree = da.getDepthsTree();
-			if (tree != null && filter.contains(tree) && !(da.getDepthsTrigger() != DepthsTrigger.PASSIVE && noActiveTrees.contains(tree))) {
+			if (tree != null && filter.contains(tree) && !(da.getDepthsTrigger() != DepthsTrigger.PASSIVE && noActiveTrees.contains(tree)) && !excludedAbilities.contains(da)) {
 				filteredList.add(da);
 			}
 		}
@@ -823,64 +824,44 @@ public class DepthsManager {
 		return getAbilitiesOfTree(DepthsTree.GIFT);
 	}
 
-	private List<DepthsAbilityItem> initItems(List<DepthsTree> filter, Player p, DepthsPlayer dp) {
-		return initItems(filter, false, p, dp, List.of());
-	}
-
 	/**
 	 * This method generates ability items for the players with random rarities.
 	 */
-	private List<DepthsAbilityItem> initItems(List<DepthsTree> filter, boolean isElite, Player p, DepthsPlayer dp, List<DepthsTree> noActiveTrees) {
+	private List<DepthsAbilityItem> initItems(List<DepthsTree> filter, Function<Integer, Integer> rarityFunction, Player p, DepthsPlayer dp, List<DepthsTree> noActiveTrees, List<DepthsAbilityInfo<?>> excludedAbilities) {
 		List<DepthsAbilityItem> items = new ArrayList<>();
-		int forceLevel = filter.contains(DepthsTree.PRISMATIC) ? dp.mAbnormalityLevel : 0;
 
-		for (DepthsAbilityInfo<?> da : getFilteredAbilities(filter, noActiveTrees)) {
-			int rarity;
-			int preIncreaseRarity;
-			if (forceLevel > 0) {
-				rarity = forceLevel;
-				preIncreaseRarity = 0;
-				if (da == Abnormality.INFO) {
-					continue;
-				}
-			} else {
-				// Get a number 1 to 100
-				int roll = mRandom.nextInt(100) + 1;
+		for (DepthsAbilityInfo<?> da : getFilteredAbilities(filter, noActiveTrees, excludedAbilities)) {
+			// Get a number 1 to 100
+			int roll = mRandom.nextInt(100) + 1;
 
-				DepthsParty party = getPartyFromId(dp);
-				if (party != null && party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_STARTING_RARITY) {
-					roll -= DepthsEndlessDifficulty.ASCENSION_STARTING_RARITY_AMOUNT;
-				}
-
-				preIncreaseRarity = getRarity(roll, isElite);
-
-				//Add enlightenment level to roll if applicable
-				Enlightenment enlightenment = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(p, Enlightenment.class);
-				if (enlightenment != null) {
-					roll += (int) (enlightenment.getRarityIncrease() * 100);
-				}
-				// Add Diversity's rarity increase to roll if applicable
-				Diversity diversity = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(p, Diversity.class);
-				if (diversity != null) {
-					roll += (int) (diversity.getRarityIncrease() * 100);
-				}
-				// cracked idol ability rarity trigger
-				if (dp.hasAbility(CrackedIdol.ABILITY_NAME)) {
-					roll += 10;
-				}
-
-				rarity = getRarity(roll, isElite);
+			DepthsParty party = getPartyFromId(dp);
+			if (party != null && party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_STARTING_RARITY) {
+				roll -= DepthsEndlessDifficulty.ASCENSION_STARTING_RARITY_AMOUNT;
 			}
+
+			int preIncreaseRarity = rarityFunction.apply(roll);
+
+			//Add enlightenment level to roll if applicable
+			Enlightenment enlightenment = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(p, Enlightenment.class);
+			if (enlightenment != null) {
+				roll += (int) (enlightenment.getRarityIncrease() * 100);
+			}
+			// Add Diversity's rarity increase to roll if applicable
+			Diversity diversity = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(p, Diversity.class);
+			if (diversity != null) {
+				roll += (int) (diversity.getRarityIncrease() * 100);
+			}
+			// cracked idol ability rarity trigger
+			if (dp.hasAbility(CrackedIdol.ABILITY_NAME)) {
+				roll += 10;
+			}
+
+			int rarity = rarityFunction.apply(roll);
 
 			DepthsAbilityItem item = da.getAbilityItem(rarity, p, 0, preIncreaseRarity, false);
 			if (item != null) {
 				items.add(item);
 			}
-		}
-
-		if (forceLevel > 0) {
-			// We've used this abnormality prismatic selection
-			dp.mAbnormalityLevel = 0;
 		}
 
 		return items;
@@ -940,36 +921,49 @@ public class DepthsManager {
 		List<DepthsAbilityItem> allItems;
 
 		//Filter the item offerings by the player's eligible trees for that run
-		DepthsRewardType reward = dp.mEarnedRewards.peek();
-		if (reward == DepthsRewardType.PRISMATIC) {
+		DepthsReward reward = dp.peekReward();
+		DepthsRewardType rewardType = reward.mRewardType;
+		if (rewardType == DepthsRewardType.PRISMATIC) {
 			List<DepthsTree> prismaticFilter = new ArrayList<>();
 			prismaticFilter.add(DepthsTree.PRISMATIC);
-			allItems = initItems(prismaticFilter, p, dp);
-		} else if (reward == DepthsRewardType.CURSE) {
+			Function<Integer, Integer> rarityFunction;
+			List<DepthsAbilityInfo<?>> excludedAbilities;
+			if (reward.mForceLevel > 0) {
+				rarityFunction = roll -> reward.mForceLevel;
+				excludedAbilities = List.of(Abnormality.INFO);
+			} else {
+				rarityFunction = roll -> getRarity(roll, false);
+				excludedAbilities = List.of();
+			}
+			allItems = initItems(prismaticFilter, rarityFunction, p, dp, List.of(), excludedAbilities);
+		} else if (rewardType == DepthsRewardType.CURSE) {
 			List<DepthsTree> curseFilter = new ArrayList<>();
 			curseFilter.add(DepthsTree.CURSE);
-			allItems = initItems(curseFilter, p, dp);
-		} else if (reward == DepthsRewardType.GIFT) {
+			allItems = initItems(curseFilter, roll -> 1, p, dp, List.of(), List.of());
+		} else if (rewardType == DepthsRewardType.GIFT) {
 			List<DepthsTree> giftFilter = new ArrayList<>();
 			giftFilter.add(DepthsTree.GIFT);
-			allItems = initItems(giftFilter, p, dp);
+			allItems = initItems(giftFilter, roll -> 1, p, dp, List.of(), List.of());
 		} else {
 			List<DepthsTree> cappedTrees = new ArrayList<>();
 			if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ACTIVE_TREE_CAP) {
 				List<DepthsTree> trees = getActiveAbilityTrees(dp);
 				cappedTrees = Arrays.stream(DepthsTree.values()).filter(tree -> trees.stream().filter(t -> t == tree).count() >= 4).toList();
 			}
+
+			List<DepthsTree> possibleTrees = dp.mEligibleTrees;
+
 			// callicarpa's pointed hat trigger
 			if (dp.mPointedHatTree != null && dp.mPointedHatStacks > 0) {
-				allItems = initItems(List.of(dp.mPointedHatTree), reward == DepthsRewardType.ABILITY_ELITE, p, dp, cappedTrees);
+				possibleTrees = List.of(dp.mPointedHatTree);
 				dp.mPointedHatStacks--;
 				if (dp.mPointedHatStacks == 0) {
 					setPlayerLevelInAbility(CallicarpasPointedHat.ABILITY_NAME, p, dp, 0, false, false);
 					dp.mPointedHatTree = null;
 				}
-			} else {
-				allItems = initItems(dp.mEligibleTrees, reward == DepthsRewardType.ABILITY_ELITE, p, dp, cappedTrees);
 			}
+
+			allItems = initItems(possibleTrees, roll -> getRarity(roll, rewardType == DepthsRewardType.ABILITY_ELITE), p, dp, cappedTrees, List.of());
 		}
 
 		// Return 3 choices of items
@@ -983,7 +977,7 @@ public class DepthsManager {
 		Collections.shuffle(allItems);
 
 		// Guarantee Twisted Scroll by swapping to front.
-		if (dp.mEarnedRewards.peek() == DepthsRewardType.GIFT) {
+		if (dp.peekRewardType() == DepthsRewardType.GIFT) {
 			IntStream.range(0, allItems.size())
 				.filter(index -> allItems.get(index).mAbility.equals(TwistedScroll.ABILITY_NAME))
 				.findFirst()
@@ -1355,8 +1349,8 @@ public class DepthsManager {
 					Player p = dp.getPlayer();
 					if (p != null && dp.hasAbility(TreasureMap.ABILITY_NAME)) {
 						dp.sendMessage("After looking through all the rooms with your Treasure Map, you were able to find 2 prismatic ability rewards!");
-						dp.mEarnedRewards.add(DepthsRewardType.PRISMATIC);
-						dp.mEarnedRewards.add(DepthsRewardType.PRISMATIC);
+						dp.addReward(DepthsRewardType.PRISMATIC);
+						dp.addReward(DepthsRewardType.PRISMATIC);
 						TreasureMap.playSounds(p);
 						setPlayerLevelInAbility(TreasureMap.ABILITY_NAME, p, dp, 0, false, false);
 					}
@@ -1538,7 +1532,7 @@ public class DepthsManager {
 
 		//First - check if the player has any rewards to open
 		if (!dp.mEarnedRewards.isEmpty()) {
-			DepthsRewardType reward = dp.mEarnedRewards.peek();
+			DepthsRewardType reward = dp.peekRewardType();
 			if (reward == DepthsRewardType.ABILITY || reward == DepthsRewardType.ABILITY_ELITE || reward == DepthsRewardType.PRISMATIC || reward == DepthsRewardType.CURSE || reward == DepthsRewardType.GIFT) {
 				DepthsGUICommands.ability(p, fromSummaryGUI);
 				return true;
@@ -1650,14 +1644,14 @@ public class DepthsManager {
 				break;
 			}
 			int level = dp.getLevelInAbility(da.getDisplayName());
-			if (level == 0 || (level >= 5 && !(dp.mEarnedRewards.peek() == DepthsRewardType.TWISTED)) || level >= 6 || WeaponAspectDepthsAbility.class.isAssignableFrom(da.getAbilityClass())) {
+			if (level == 0 || (level >= 5 && !(dp.peekRewardType() == DepthsRewardType.TWISTED)) || level >= 6 || WeaponAspectDepthsAbility.class.isAssignableFrom(da.getAbilityClass())) {
 				continue;
 			} else {
 				int newRarity;
 				//If they're in an elite room, their reward is +2 levels instead
-				if (dp.mEarnedRewards.peek() == DepthsRewardType.UPGRADE_ELITE) {
+				if (dp.peekRewardType() == DepthsRewardType.UPGRADE_ELITE) {
 					newRarity = Math.min(5, level + 2 + depths2UpgradeBonus);
-				} else if (dp.mEarnedRewards.peek() == DepthsRewardType.TWISTED) {
+				} else if (dp.peekRewardType() == DepthsRewardType.TWISTED) {
 					newRarity = 6;
 				} else {
 					newRarity = Math.min(5, level + 1 + depths2UpgradeBonus);
@@ -1865,18 +1859,18 @@ public class DepthsManager {
 			});
 
 			if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_CURSE_FLOOR) {
-				party.mPlayersInParty.forEach(dp -> dp.mEarnedRewards.add(DepthsRewardType.CURSE));
+				party.mPlayersInParty.forEach(dp -> dp.addReward(DepthsRewardType.CURSE));
 				party.sendMessage("You have been laden with an additional curse after clearing the floor!");
 			}
 			//Give celestial gift for beating boss in depths 2
 			party.mPlayersInParty.forEach(dp -> {
-				dp.mEarnedRewards.add(DepthsRewardType.GIFT);
+				dp.addReward(DepthsRewardType.GIFT);
 				// broken clock trigger
 				if (dp.hasAbility(BrokenClock.ABILITY_NAME)) {
 					Player player = dp.getPlayer();
 					if (player != null) {
-						dp.mEarnedRewards.add(DepthsRewardType.GIFT);
-						dp.mEarnedRewards.add(DepthsRewardType.GIFT);
+						dp.addReward(DepthsRewardType.GIFT);
+						dp.addReward(DepthsRewardType.GIFT);
 						BrokenClock.playSound(player);
 						setPlayerLevelInAbility(BrokenClock.ABILITY_NAME, player, dp, 0, false, false);
 					}
@@ -2323,7 +2317,7 @@ public class DepthsManager {
 		DepthsPlayer dp = getDepthsPlayer(player);
 		if (dp != null && arg != null) {
 			DepthsRewardType type = DepthsRewardType.valueOf(arg);
-			dp.mEarnedRewards.add(type);
+			dp.addReward(type);
 		}
 	}
 

@@ -75,7 +75,7 @@ public class DepthsPlayer {
 	//Individual treasure score. Copied from the party's treasure score when they die.
 	public int mFinalTreasureScore;
 	//Reward queue implementation to let the player catch up on reward chests they have missed later
-	public Queue<DepthsRewardType> mEarnedRewards;
+	public Queue<DepthsReward> mEarnedRewards;
 	//Opened but unclaimed ability reward options
 	public @Nullable List<DepthsAbilityItem> mAbilityOfferings;
 	//Opened but unclaimed upgrade reward options
@@ -100,9 +100,6 @@ public class DepthsPlayer {
 
 	// Whether the player should be killed on login. Currently used when the party abandons the player.
 	public boolean mZenithAbandonedByParty = false;
-
-	// Whether the player is currently processing Abnormality
-	public int mAbnormalityLevel = 0;
 
 	// The current counter of the player's Curse of Chaos ability
 	public int mCurseofChaosCount = 0;
@@ -316,6 +313,22 @@ public class DepthsPlayer {
 			return false;
 		}
 		return mAbilities.containsKey(abilityName);
+	}
+
+	public void addReward(DepthsRewardType rewardType) {
+		addReward(rewardType, 0);
+	}
+
+	public void addReward(DepthsRewardType rewardType, int forceLevel) {
+		mEarnedRewards.add(new DepthsReward(rewardType, forceLevel));
+	}
+
+	public DepthsReward peekReward() {
+		return mEarnedRewards.peek();
+	}
+
+	public DepthsRewardType peekRewardType() {
+		return peekReward().mRewardType;
 	}
 
 	public List<String> getSolarRayUniqueMobNames() {

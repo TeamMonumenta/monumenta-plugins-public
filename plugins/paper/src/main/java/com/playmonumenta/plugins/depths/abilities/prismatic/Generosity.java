@@ -74,7 +74,7 @@ public class Generosity extends DepthsAbility {
 						.noneMatch(abilityInfo -> abilityInfo.getDepthsTrigger().equals(finalRemovedAbilityInfo.getDepthsTrigger()))
 				) {
 					foundPlayer = true;
-					dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.GENEROSITY);
+					dp.addReward(DepthsRoomType.DepthsRewardType.GENEROSITY);
 					dp.mGenerosityGifts.add(removedAbilityInfo.getAbilityItem(generosityLevel, otherPlayer, currentLevel));
 					otherPlayer.playSound(otherPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					Component abilityName = removedAbilityInfo.getNameWithHover(generosityLevel, 0, otherPlayer, false);

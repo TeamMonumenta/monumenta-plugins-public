@@ -40,8 +40,8 @@ public class OrbOfDarkness extends DepthsAbility {
 			String name = dai.getDisplayName();
 			if (dp.hasAbility(name)) {
 				dm.setPlayerLevelInAbility(name, player, dp, 0, true, true);
-				dp.mEarnedRewards.offer(DepthsRoomType.DepthsRewardType.TWISTED);
-				dp.mEarnedRewards.offer(DepthsRoomType.DepthsRewardType.TWISTED);
+				dp.addReward(DepthsRoomType.DepthsRewardType.TWISTED);
+				dp.addReward(DepthsRoomType.DepthsRewardType.TWISTED);
 			}
 		}
 		player.playSound(player, Sound.BLOCK_PORTAL_TRIGGER, 0.7f, 1.7f);

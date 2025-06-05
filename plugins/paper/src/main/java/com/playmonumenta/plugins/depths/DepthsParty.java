@@ -272,7 +272,7 @@ public class DepthsParty {
 
 			DepthsRewardType rewardType = DepthsUtils.rewardFromRoom(mCurrentRoomType);
 			if (rewardType != null) {
-				mPlayersInParty.forEach(dp -> dp.mEarnedRewards.add(rewardType));
+				mPlayersInParty.forEach(dp -> dp.addReward(rewardType));
 			}
 
 			sendMessage(Component.text("This room's ").append(DepthsUtils.rewardComponent(mCurrentRoomType))
@@ -292,7 +292,7 @@ public class DepthsParty {
 					// northern star trigger
 					if (dp.hasAbility(NorthernStar.ABILITY_NAME)) {
 						dp.mNorthernStarStacks--;
-						dp.mEarnedRewards.add(rewardType);
+						dp.addReward(rewardType);
 						if (dp.mNorthernStarStacks == 0) {
 							DepthsManager.getInstance().setPlayerLevelInAbility(NorthernStar.ABILITY_NAME, p, dp, 0, false, false);
 						}
@@ -500,13 +500,13 @@ public class DepthsParty {
 						for (DepthsPlayer dp : mPlayersInParty) {
 							dp.mActiveSelectionsRemaining = 3;
 							if (getAscension() >= DepthsEndlessDifficulty.ASCENSION_CURSE_START) {
-								dp.mEarnedRewards.add(DepthsRewardType.CURSE);
+								dp.addReward(DepthsRewardType.CURSE);
 							}
-							dp.mEarnedRewards.add(DepthsRewardType.PRISMATIC);
-							dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
-							dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
-							dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
-							dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
+							dp.addReward(DepthsRewardType.PRISMATIC);
+							dp.addReward(DepthsRewardType.ABILITY);
+							dp.addReward(DepthsRewardType.ABILITY);
+							dp.addReward(DepthsRewardType.ABILITY);
+							dp.addReward(DepthsRewardType.ABILITY);
 						}
 					}
 					// Add delve points for ascension
@@ -534,7 +534,7 @@ public class DepthsParty {
 				DepthsRewardType rewardType = DepthsUtils.rewardFromRoom(room.mRoomType);
 				if (rewardType != null) {
 					for (DepthsPlayer dp : mPlayersInParty) {
-						dp.mEarnedRewards.add(DepthsRewardType.ABILITY);
+						dp.addReward(DepthsRewardType.ABILITY);
 					}
 				}
 			}
@@ -545,7 +545,7 @@ public class DepthsParty {
 			try {
 				DepthsRewardType rewardType = DepthsUtils.rewardFromRoom(room.mRoomType);
 				if (rewardType != null) {
-					mPlayersInParty.forEach((dp) -> dp.mEarnedRewards.add(rewardType));
+					mPlayersInParty.forEach((dp) -> dp.addReward(rewardType));
 				}
 			} catch (Exception e) {
 				MMLog.warning("Null depths party member");

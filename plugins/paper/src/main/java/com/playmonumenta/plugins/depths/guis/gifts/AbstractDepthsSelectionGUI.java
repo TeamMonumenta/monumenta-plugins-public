@@ -46,7 +46,7 @@ public abstract class AbstractDepthsSelectionGUI<T> extends Gui {
 		if (mSelections.isEmpty() || mSelections.size() > 8) {
 			// abort if selections are invalid, this should never happen
 			mDepthsPlayer.sendMessage("You do not meet the requirements for " + mGiftAbility + ", removing gift...");
-			if (DepthsRoomType.DepthsRewardType.GIFT_REWARDS.contains(mDepthsPlayer.mEarnedRewards.peek())) {
+			if (DepthsRoomType.DepthsRewardType.GIFT_REWARDS.contains(mDepthsPlayer.peekRewardType())) {
 				mDepthsPlayer.mEarnedRewards.poll();
 			}
 			DepthsManager.getInstance().setPlayerLevelInAbility(mGiftAbility, mPlayer, mDepthsPlayer, 0, false, false);
@@ -62,7 +62,7 @@ public abstract class AbstractDepthsSelectionGUI<T> extends Gui {
 				// if not chaining guis
 				if (mShouldReturn) {
 					// should always be a gift reward but just in case
-					if (DepthsRoomType.DepthsRewardType.GIFT_REWARDS.contains(mDepthsPlayer.mEarnedRewards.peek())) {
+					if (DepthsRoomType.DepthsRewardType.GIFT_REWARDS.contains(mDepthsPlayer.peekRewardType())) {
 						mDepthsPlayer.mEarnedRewards.poll();
 					}
 					if (!mDepthsPlayer.mEarnedRewards.isEmpty()) {

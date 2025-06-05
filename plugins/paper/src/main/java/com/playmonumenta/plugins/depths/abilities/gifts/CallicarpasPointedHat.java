@@ -38,7 +38,7 @@ public class CallicarpasPointedHat extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.POINTED);
+		dp.addReward(DepthsRoomType.DepthsRewardType.POINTED);
 	}
 
 	private static Description<CallicarpasPointedHat> getDescription() {

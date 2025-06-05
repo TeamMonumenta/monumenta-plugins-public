@@ -32,7 +32,7 @@ public class ForsakenGrimoire extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.GRIMOIRE);
+		dp.addReward(DepthsRoomType.DepthsRewardType.GRIMOIRE);
 	}
 
 	private static Description<ForsakenGrimoire> getDescription() {

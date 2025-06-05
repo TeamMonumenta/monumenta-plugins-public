@@ -32,7 +32,7 @@ public class StatueOfRegret extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.STATUE);
+		dp.addReward(DepthsRoomType.DepthsRewardType.STATUE);
 	}
 
 	private static Description<StatueOfRegret> getDescription() {

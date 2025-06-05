@@ -34,7 +34,7 @@ public class BroodmothersWebbing extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.WEBBING);
+		dp.addReward(DepthsRoomType.DepthsRewardType.WEBBING);
 	}
 
 	private static Description<BroodmothersWebbing> getDescription() {

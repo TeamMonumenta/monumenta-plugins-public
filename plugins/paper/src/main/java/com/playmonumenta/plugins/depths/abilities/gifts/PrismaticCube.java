@@ -32,7 +32,7 @@ public class PrismaticCube extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.CUBE);
+		dp.addReward(DepthsRoomType.DepthsRewardType.CUBE);
 	}
 
 	private static boolean hasActive(Player player) {
