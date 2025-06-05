@@ -13,10 +13,12 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPillar;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,11 +46,12 @@ public class SpellParasomnicMist extends Spell {
 	private final LivingEntity mBoss;
 	private final Location mCenter;
 	private final IntruderBoss.Dialogue mDialogue;
+	private final Team mUnpushableTeam;
 	@Nullable
 	private SafeZone mSafeZone;
 
 	private static final int CHANGE_DIRECTION_INTERVAL = 3 * 20;
-	private static final double SPEED = 3.9;
+	private static final double SPEED = 0.175;
 
 	private static final int RANGE = 50;
 	private static final int CHARGE_UP_TIME = 6 * 20;
@@ -63,7 +67,7 @@ public class SpellParasomnicMist extends Spell {
 		mCenter = center;
 		mDialogue = dialogue;
 		mChargeUpManager = new ChargeUpManager(mBoss, CHARGE_UP_TIME, Component.text("Charging ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)), BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, RANGE);
-
+		mUnpushableTeam = ScoreboardUtils.getExistingTeamOrCreate(TrackingManager.UNPUSHABLE_TEAM);
 	}
 
 	@Override
@@ -94,7 +98,7 @@ public class SpellParasomnicMist extends Spell {
 						mChargeUpManager.remove();
 						players.forEach(player -> {
 							player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.4f, 0.1f);
-							player.setCollidable(false);
+							mUnpushableTeam.addEntity(player);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 5, 1, true, false));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 1, true, false));
 						});
@@ -219,7 +223,7 @@ public class SpellParasomnicMist extends Spell {
 				@Override
 				public void run() {
 					// If it should change directions
-					if (mTicks % CHANGE_DIRECTION_INTERVAL == 0 || willRunIntoWall(mDirection.clone().multiply(2))) {
+					if (mTicks % CHANGE_DIRECTION_INTERVAL == 0) {
 						int mSafety = 0;
 						do {
 							mSafety++;
@@ -231,7 +235,7 @@ public class SpellParasomnicMist extends Spell {
 						} while (willRunIntoWall(mDirection));
 						mLocation.getWorld().playSound(mLocation, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 2.0f, 2.0f);
 					}
-					double velocity = Math.abs(FastUtils.sin(mTicks * Math.PI / CHANGE_DIRECTION_INTERVAL)) * SPEED / 20;
+					double velocity = Math.abs(FastUtils.sin(mTicks * Math.PI / CHANGE_DIRECTION_INTERVAL)) * SPEED;
 					mLocation.add(mDirection.clone().multiply(velocity));
 					mTicks++;
 					if (mTicks > DURATION) {
@@ -240,7 +244,8 @@ public class SpellParasomnicMist extends Spell {
 				}
 
 				private boolean willRunIntoWall(Vector direction) {
-					Location nextLoc = mLocation.clone().add(direction);
+					// By integration, the location of the circle after CHANGE_DIRECTION_INTERVAL
+					Location nextLoc = mLocation.clone().add(direction.clone().multiply(2 * SPEED * CHANGE_DIRECTION_INTERVAL / Math.PI));
 					return nextLoc.distance(mCenter) >= 25 - mSafeZoneRadius || nextLoc.getBlock().isSolid();
 				}
 			}.runTaskTimer(mPlugin, CHARGE_UP_TIME, 1));
@@ -292,7 +297,7 @@ public class SpellParasomnicMist extends Spell {
 		mBoss.setAI(true);
 		mBoss.setInvulnerable(false);
 		IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player -> {
-			player.setCollidable(true);
+			mUnpushableTeam.removeEntity(player);
 			player.showEntity(mPlugin, mBoss);
 		});
 		mBoss.teleport(mCenter);
@@ -300,9 +305,10 @@ public class SpellParasomnicMist extends Spell {
 
 	@Override
 	public void cancel() {
-		IntruderBoss.playersInRange(mBoss.getLocation(), true).forEach(player -> {
-			player.setCollidable(true);
-		});
+		if (isRunning()) {
+			finishSpell();
+		}
+		super.cancel();
 	}
 
 	public void replaceBlocks(Location loc) {

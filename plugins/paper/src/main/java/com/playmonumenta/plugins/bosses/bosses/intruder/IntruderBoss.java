@@ -189,6 +189,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		mLiminalCorruption = new SpellLiminalCorruption(plugin, boss, this::dialogue, false);
 		mMalevolentConduit = new SpellMalevolentConduit(plugin, boss, this::dialogue, this::narration);
 		mNightmareSlash = new SpellNightmareSlash(boss);
+		mEngulfingPsyche = new SpellEngulfingPsyche(plugin, boss, spawnLoc);
 
 		mBaseActiveSpells = List.of(
 			new SpellCerebralOnslaught(plugin, boss, spawnLoc),
@@ -199,8 +200,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			new SpellSinkingNightmares(plugin, boss, spawnLoc, this::dialogue),
 			new SpellParasomnicMist(plugin, boss, spawnLoc, this::dialogue),
 			mShadowRealmClone = new SpellCognitiveDistortion(plugin, boss, mPlayers, spawnLoc, this::dialogue, this::narration),
-			mAmalgamatingDreamscape = new SpellAmalgamatingDreamscape(plugin, boss, spawnLoc, this::desperation, this::dialogue, this::narration),
-			mEngulfingPsyche = new SpellEngulfingPsyche(plugin, boss, spawnLoc)
+			mAmalgamatingDreamscape = new SpellAmalgamatingDreamscape(plugin, boss, spawnLoc, this::desperation, this::dialogue, this::narration)
 		);
 
 		mSpellsDesperation = List.of(
@@ -306,12 +306,12 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			forceCastSpell(SpellAmalgamatingDreamscape.class);
 		});
 		events.put(18, lBoss -> {
-			forceCastSpell(SpellEngulfingPsyche.class);
+			mEngulfingPsyche.run();
 		});
 
 		events.put(10, lBoss -> {
 			changePassivePhase(removeSpells(getPassives(), List.of(SpellTwistedSwipe.class)));
-			forceCastSpell(SpellEngulfingPsyche.class);
+			mEngulfingPsyche.run();
 			mLiminalScar.setLastStand();
 			mDesperateCerebralOutburst.setLastStand();
 		});
@@ -611,6 +611,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		if (!mPartyDefeated) {
 			mPartyDefeated = true;
 			mBoss.setAI(false);
+			mEngulfingPsyche.cancel();
 			mActiveSpells.cancelAll();
 			dialogue(2 * 20, List.of("FLEETING MIND...", "NEW. BETTER. CONTROL."), mBoss::remove);
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> triggerMechanic(mAllDead, true), 3 * 20);
@@ -649,7 +650,6 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		mBossBarManager.setBossFog(true);
 
 		List<Spell> spells = List.of(
-			mEngulfingPsyche,
 			new SpellBaseSummon(mPlugin, mBoss, 12 * 20, 80, 0, 3, false, true, false,
 				() -> 1,
 				() -> List.of(LocationUtils.randomSafeLocationInDonut(mSpawnLoc, mEngulfingPsyche.getSafeRadius() - 1, 25, location -> !location.getBlock().isSolid())),
@@ -692,7 +692,6 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, SoundCategory.HOSTILE, 2.0f, Constants.Note.C5.mPitch, 36);
 			player.playSound(player.getLocation(), Sound.BLOCK_SCULK_SHRIEKER_SHRIEK, SoundCategory.HOSTILE, 3.0f, 0.1f, 4);
 		});
-		mEngulfingPsyche.prepareBorder();
 
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -705,7 +704,8 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 				});
 				mTicks++;
 				if (mTicks == 4 * 20 && !EntityUtils.shouldCancelSpells(mBoss)) {
-					forceCastSpell(SpellEngulfingPsyche.class);
+					mEngulfingPsyche.prepareBorder();
+					mEngulfingPsyche.run();
 					this.cancel();
 				}
 			}
@@ -723,6 +723,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 
 	public void deathCutscene() {
 		mBoss.setInvulnerable(true);
+		mEngulfingPsyche.finishAnimation();
 		List<Player> mPlayers = playersInRange(mBoss.getLocation());
 		mPlayers.forEach(player -> {
 			player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, SoundCategory.HOSTILE, 2.0f, 1.5f, 28);
@@ -766,6 +767,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		mActiveSpells.cancelAll();
 		getPassives().forEach(Spell::cancel);
 		mPsychicMiasma.cancel();
+		mEngulfingPsyche.cancel();
 		mLucidRend.killLucidRends();
 		mAbhorrentHallucination.killHallucination();
 		mNightmarishCarvings.killDisplays();

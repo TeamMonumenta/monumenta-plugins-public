@@ -236,7 +236,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 
 	private void cutscene(Location loc) {
 		Location location = loc.clone();
-		List<Block> blocks = new ArrayList<>(BlockUtils.getBlocksInCube(mCenter, 30).stream()
+		List<Block> blocks = new ArrayList<>(BlockUtils.getBlocksInCube(location, 30).stream()
 			.filter(block -> block.isSolid() && block.getType() != Material.REDSTONE_BLOCK)
 			.toList());
 		Collections.shuffle(blocks);
@@ -428,6 +428,7 @@ public class SpellAmalgamatingDreamscape extends Spell {
 			LibraryOfSoulsIntegration.summon(mBoss.getLocation(), "AntumbralStalker");
 		}
 		mFinishAction.run();
+		cancel();
 	}
 
 	public void bossNearbyDeathEvent(EntityDeathEvent event) {

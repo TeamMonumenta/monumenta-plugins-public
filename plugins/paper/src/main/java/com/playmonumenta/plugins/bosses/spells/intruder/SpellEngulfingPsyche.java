@@ -8,12 +8,14 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -94,6 +96,68 @@ public class SpellEngulfingPsyche extends Spell {
 				});
 			}
 		}.runTaskTimer(mPlugin, 0, 2));
+		replaceBlocks(mCenter.clone().subtract(0, 1.0, 0));
+	}
+
+	// Prepares outer blocks
+	private void replaceBlocks(Location center) {
+		for (int i = 0; i < 360; i++) {
+			final Vector mVec = VectorUtils.rotateYAxis(new Vector(1, 0, 0), i);
+			new BukkitRunnable() {
+				private final Location mLoc = center.clone().add(mVec.clone().multiply(20));
+
+				@Override
+				public void run() {
+					mLoc.add(mVec);
+					if (mLoc.getBlock().getType().isSolid()) {
+						Block block = mLoc.getBlock();
+						TemporaryBlockChangeManager.INSTANCE.changeBlock(block, Material.CRIMSON_NYLIUM, 60 * 60 * 20);
+						mChangedBlocks.add(block);
+					} else {
+						this.cancel();
+						return;
+					}
+
+					// Safety
+					if (mLoc.distance(center) > 50) {
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
+		}
+	}
+
+	public void finishAnimation() {
+		cancelAnimation(mCenter.clone().subtract(0, 1, 0));
+	}
+
+	private void cancelAnimation(Location center) {
+		if (!isRunning()) {
+			return;
+		}
+		cancelTasks();
+		for (int i = 0; i < 360; i++) {
+			final Vector mVec = VectorUtils.rotateYAxis(new Vector(1, 0, 0), i);
+			new BukkitRunnable() {
+				private final Location mLoc = center.clone();
+
+				@Override
+				public void run() {
+					mLoc.add(mVec);
+					new PartialParticle(Particle.DUST_COLOR_TRANSITION, mLoc.clone().add(0, 1, 0))
+						.data(new Particle.DustTransition(Color.RED, Color.BLACK, 1.3f))
+						.delta(0.1)
+						.spawnAsBoss();
+
+					TemporaryBlockChangeManager.INSTANCE.revertChangedBlock(mLoc.getBlock(), Material.CRIMSON_NYLIUM);
+
+					// Safety
+					if (mLoc.distance(center) > 50) {
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
+		}
 	}
 
 	@Override
@@ -180,9 +244,13 @@ public class SpellEngulfingPsyche extends Spell {
 
 	@Override
 	public void cancel() {
-		super.cancel();
 		TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(mChangedBlocks, Material.CRIMSON_NYLIUM);
 		mChangedBlocks.clear();
+		cancelTasks();
+	}
+
+	private void cancelTasks() {
+		super.cancel();
 		mAnnoys.forEach(Entity::remove);
 		mAnnoys.clear();
 	}
