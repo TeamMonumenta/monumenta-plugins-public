@@ -216,6 +216,6 @@ public class SoulRend extends Ability {
 			.add(a -> a.mAbsorptionCap, ABSORPTION_CAP)
 			.add(" absorption health, which lasts ")
 			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
-			.add(".");
+			.add(" seconds.");
 	}
 }
