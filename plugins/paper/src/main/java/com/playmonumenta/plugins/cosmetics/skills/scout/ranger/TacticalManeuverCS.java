@@ -9,6 +9,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -44,7 +45,7 @@ public class TacticalManeuverCS implements CosmeticSkill {
 		new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
 	}
 
-	public void maneuverHitEffect(World world, Player mPlayer) {
+	public void maneuverHitEffect(World world, Player mPlayer, LivingEntity le) {
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 2.0f, 0.5f);
 		new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);

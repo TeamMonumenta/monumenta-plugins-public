@@ -87,6 +87,7 @@ import com.playmonumenta.plugins.cosmetics.skills.scout.EverseeingEyeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.TwistedCompanionCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PrestigiousPinningShotCS;
+import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.ButterflyEffectCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.PrestigiousManeuverCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.VerdantRazorCS;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.AbyssalEffigyCS;
@@ -230,6 +231,7 @@ public class CosmeticSkills {
 		TwistedCompanionCS::new,
 		EverseeingEyeCS::new,
 		PrestigiousManeuverCS::new,
+		ButterflyEffectCS::new,
 		PrestigiousPinningShotCS::new,
 		VerdantRazorCS::new,
 

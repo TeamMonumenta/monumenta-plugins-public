@@ -146,7 +146,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 						for (LivingEntity e : EntityUtils.getNearbyMobs(le.getLocation(), mRadius)) {
 							EntityUtils.applyStun(mPlugin, mDuration, e);
 						}
-						mCosmetic.maneuverHitEffect(world, mPlayer);
+						mCosmetic.maneuverHitEffect(world, mPlayer, le);
 
 						this.cancel();
 					}

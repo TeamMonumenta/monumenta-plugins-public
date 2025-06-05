@@ -13,6 +13,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -151,7 +152,7 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 	}
 
 	@Override
-	public void maneuverHitEffect(World world, Player mPlayer) {
+	public void maneuverHitEffect(World world, Player mPlayer, LivingEntity le) {
 		Location loc = mPlayer.getLocation();
 		new PartialParticle(Particle.SPELL_INSTANT, loc, 100, 0.65, 0.35, 0.65, 0.3).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CLOUD, loc, 15, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
