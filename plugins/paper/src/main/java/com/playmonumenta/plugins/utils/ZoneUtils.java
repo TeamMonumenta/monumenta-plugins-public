@@ -64,7 +64,6 @@ public class ZoneUtils {
 		NO_VIRTUAL_INVENTORIES("No Virtual Inventories"),
 		OVERWORLD_BLOCK_RESET("OverworldBlockReset"),
 		PLOT("Plot"),
-		PLOTS_POSSIBLE("Plots Possible"),
 		PORTAL_GUN_ENABLED("Portal Gun Enabled"),
 		PRECIOUS_BLOCK_DROPS_DISABLED("Precious Block Drops Disabled"),
 		RAISE_GRAVE_ABOVE_ZONE("Raise Grave Above Zone"),
@@ -95,29 +94,6 @@ public class ZoneUtils {
 		GameMode guildPlotGameMode = GuildPlotUtils.guildPlotGameMode(player);
 		if (guildPlotGameMode != null) {
 			return guildPlotGameMode;
-		}
-
-		GameMode currentGameMode = player.getGameMode();
-		Location location = player.getLocation();
-
-		/*
-		 * Checks for the plots shards, where plots may be present, but there isn't a zone for each plot.
-		 * This depends on the presence of sponge at y=10 and meeting the requirements to own a plot.
-		 * There's also an exception to allow building just outside a plot.
-		 */
-		if (hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
-			boolean isInPlot = inPlot(location, ServerProperties.getIsTownWorld());
-			if (!isInPlot) {
-				return GameMode.ADVENTURE;
-			} else if (
-				currentGameMode == GameMode.ADVENTURE
-					&& location.getY() > ServerProperties.getPlotSurvivalMinHeight()
-					&& ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_LEVEL).orElse(0) >= 5
-			) {
-				return GameMode.SURVIVAL;
-			} else {
-				return currentGameMode;
-			}
 		}
 
 		/*
@@ -167,20 +143,8 @@ public class ZoneUtils {
 		if (GuildPlotUtils.isGuildPlot(loc)) {
 			return true;
 		}
-		if (hasZoneProperty(loc, ZoneProperty.PLOT)) {
-			return true;
-		}
-		if (!isTownWorld &&
-			!hasZoneProperty(loc, ZoneProperty.PLOTS_POSSIBLE)) {
-			return false;
-		}
 
-		return isSurvivalModeInPlots(loc);
-	}
-
-	private static boolean isSurvivalModeInPlots(Location loc) {
-		Material mat = loc.getWorld().getBlockAt(loc.getBlockX(), 10, loc.getBlockZ()).getType();
-		return mat == Material.SPONGE || (mat.equals(Material.WET_SPONGE) && loc.getY() < 53);
+		return hasZoneProperty(loc, ZoneProperty.PLOT);
 	}
 
 	public static boolean playerCanMineBlock(Player player, Block block) {
