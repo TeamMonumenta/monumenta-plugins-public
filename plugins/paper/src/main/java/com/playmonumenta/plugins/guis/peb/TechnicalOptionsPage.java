@@ -66,13 +66,10 @@ final class TechnicalOptionsPage extends PebPage {
 			"Show Overworld POI Titles",
 			"Toggle seeing titles appear upon entering certain Overworld Points of Interest."
 		).invertedToggle("POI titles: ", ReactiveValue.binaryScoreboard(mGui, "POITitles", false)).set(3, 3);
-/*new PebItem(31, "Auto-Abandon Completed Dungeons",
-				"Click to disable or enable automatically abandoning completed dungeon instances when a new week starts.", NamedTextColor.LIGHT_PURPLE,
-				Material.DAYLIGHT_DETECTOR, false).serverCommand("execute as @S run function monumenta:mechanisms/auto_dungeon_abandon_toggle"),*/
 		entry(
 			Material.DAYLIGHT_DETECTOR,
 			"Auto-Abandon Completed Dungeons",
-			"Click to disable or enable automatically abandoning completed dungeon instances when a new week starts."
+			"Click to disable or enable automatically abandoning completed dungeon instances a week after your last visit."
 		).invertedToggle("Auto-abandon: ", ReactiveValue.tag(mGui, "NoAutoDungeonAbandon")).set(3, 4);
 
 		entry(
