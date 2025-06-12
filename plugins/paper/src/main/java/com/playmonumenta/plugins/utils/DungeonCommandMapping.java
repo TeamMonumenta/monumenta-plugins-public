@@ -21,6 +21,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -663,6 +665,9 @@ public enum DungeonCommandMapping {
 			Player player = ownEntry.getKey();
 			PlayerDungeonStatus ownStatus = ownEntry.getValue();
 
+			boolean shouldPlayErrorSound = false;
+			boolean shouldPlayWarningSound = false;
+
 			List<String> ownInstance = new ArrayList<>();
 			List<String> noInstance = new ArrayList<>();
 			List<String> otherNoAbandonNoInvite = new ArrayList<>();
@@ -683,22 +688,56 @@ public enum DungeonCommandMapping {
 
 				if (!otherStatus.mHasInstance) {
 					noInstance.add(otherStatus.mPlayerName);
+
+					if (ownStatus.mHasInstance && !ownStatus.mCanInvite) {
+						if (ownStatus.mCanAbandon) {
+							shouldPlayWarningSound = true;
+						} else {
+							shouldPlayErrorSound = true;
+						}
+					}
 				} else if (ownStatus.mAccessScore == otherStatus.mAccessScore) {
+					// Same instance, or neither has an instance
+
 					if (ownStatus.mHasInstance) {
 						ownInstance.add(otherStatus.mPlayerName);
 					}
 				} else {
+					// Other player is not in the same instance, target player may or may not have one
+
 					if (otherStatus.mCanAbandon) {
 						if (otherStatus.mCanInvite) {
 							otherYesAbandonYesInvite.add(otherStatus.mPlayerName);
 						} else {
 							otherYesAbandonNoInvite.add(otherStatus.mPlayerName);
 						}
+
+						if (ownStatus.mHasInstance) {
+							if (ownStatus.mCanInvite || ownStatus.mCanAbandon) {
+								shouldPlayWarningSound = true;
+							} else {
+								shouldPlayErrorSound = true;
+							}
+						}
 					} else {
+						// Other player can't abandon
+
 						if (otherStatus.mCanInvite) {
 							otherNoAbandonYesInvite.add(otherStatus.mPlayerName);
+
+							if (ownStatus.mHasInstance) {
+								if (ownStatus.mCanAbandon) {
+									shouldPlayWarningSound = true;
+								} else {
+									shouldPlayErrorSound = true;
+								}
+							}
 						} else {
 							otherNoAbandonNoInvite.add(otherStatus.mPlayerName);
+
+							if (ownStatus.mHasInstance) {
+								shouldPlayErrorSound = true;
+							}
 						}
 					}
 				}
@@ -788,6 +827,12 @@ public enum DungeonCommandMapping {
 					.append(Component.text(MessagingUtils.concatenateStringsWithAnd(otherNoAbandonNoInvite),
 						ownStatus.mHasInstance ? NamedTextColor.RED : NamedTextColor.GREEN))
 				);
+			}
+
+			if (shouldPlayErrorSound) {
+				player.playSound(player, Sound.ENTITY_SHULKER_DEATH, SoundCategory.HOSTILE, 1.0f, 1.0f);
+			} else if (shouldPlayWarningSound) {
+				player.playSound(player, Sound.ENTITY_SHULKER_HURT, SoundCategory.HOSTILE, 1.0f, 1.0f);
 			}
 		}
 	}
