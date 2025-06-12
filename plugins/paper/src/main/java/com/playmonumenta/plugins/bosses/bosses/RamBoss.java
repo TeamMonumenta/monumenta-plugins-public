@@ -55,6 +55,8 @@ public class RamBoss extends BossAbilityGroup {
 		public float VELOCITY = 0.5f;
 		@BossParam(help = "Damage for any player hit by the ram")
 		public float DAMAGE = 20;
+		@BossParam(help = "True damage percent for any player hit by the ram")
+		public float DAMAGE_PERCENTAGE = 0;
 		@BossParam(help = "Damage type for the damage")
 		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MAGIC;
 		@BossParam(help = "Horizontal knockback velocity")
@@ -75,6 +77,8 @@ public class RamBoss extends BossAbilityGroup {
 		public int TELEGRAPH_INTERVAL = 10;
 		@BossParam(help = "Cancels when damaging an enemy")
 		public boolean CANCEL_ON_DAMAGE = false;
+		@BossParam(help = "Changes target to the targeted player")
+		public boolean CHANGE_TARGET = true;
 		@BossParam(help = "Distance to the target location which would automatically cancel the spell")
 		public double END_DISTANCE_THRESHOLD = 2.5;
 		@BossParam(help = "Targets for person targeted by ram")

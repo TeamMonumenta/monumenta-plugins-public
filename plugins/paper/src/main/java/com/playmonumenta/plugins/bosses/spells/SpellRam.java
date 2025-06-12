@@ -11,8 +11,8 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -37,7 +37,8 @@ public class SpellRam extends Spell {
 		if (targets.isEmpty()) {
 			return;
 		}
-		Location endLoc = targets.get(0).getLocation();
+		LivingEntity target = targets.get(0);
+		Location endLoc = target.getLocation();
 		if (mParameters.TELEGRAPH_DURATION > 0) {
 			mParameters.SOUND_TEL.play(mBoss.getLocation());
 		}
@@ -54,14 +55,15 @@ public class SpellRam extends Spell {
 					return;
 				}
 
-				Creature c = (Creature) mBoss;
-				Pathfinder pathfinder = c.getPathfinder();
+				if (mBoss instanceof Mob c) {
+					Pathfinder pathfinder = c.getPathfinder();
 
-				pathfinder.stopPathfinding();
+					pathfinder.stopPathfinding();
+				}
 
 
 				double[] yawPitch = VectorUtils.vectorToRotation(endLoc.clone().subtract(mBoss.getLocation()).toVector());
-				c.setRotation((float) yawPitch[0], (float) yawPitch[1]);
+				mBoss.setRotation((float) yawPitch[0], (float) yawPitch[1]);
 
 				if (mTicks % mParameters.SOUND__INTERVAL == 0) {
 					mParameters.SOUND_RAM_TICK.play(mBoss.getLocation());
@@ -87,7 +89,12 @@ public class SpellRam extends Spell {
 
 					for (Player p : players) {
 						mHitPlayers.add(p);
-						DamageUtils.damage(mBoss, p, mParameters.DAMAGE_TYPE, mParameters.DAMAGE, null, false, true, mParameters.SPELL_NAME);
+						if (mParameters.DAMAGE > 0) {
+							DamageUtils.damage(mBoss, p, mParameters.DAMAGE_TYPE, mParameters.DAMAGE, null, false, false, mParameters.SPELL_NAME);
+						}
+						if (mParameters.DAMAGE_PERCENTAGE > 0) {
+							DamageUtils.damagePercentHealth(mBoss, p, mParameters.DAMAGE_PERCENTAGE, false, false, mParameters.SPELL_NAME, true, mParameters.EFFECTS_HIT.mEffectList);
+						}
 						MovementUtils.knockAway(loc, p, mParameters.KB_XZ, mParameters.KB_Y, false);
 						mParameters.EFFECTS_HIT.apply(p, mBoss);
 						mHitPlayer = true;
@@ -100,7 +107,9 @@ public class SpellRam extends Spell {
 				}
 
 				if (mTicks >= mParameters.RAM_DURATION + mParameters.TELEGRAPH_DURATION || (mHitPlayer && mParameters.CANCEL_ON_DAMAGE) || endLoc.distance(mBoss.getLocation()) < mParameters.END_DISTANCE_THRESHOLD) {
-					c.setTarget(EntityUtils.getNearestPlayer(c.getLocation(), 15));
+					if (mParameters.CHANGE_TARGET && mBoss instanceof Mob c) {
+						c.setTarget(target);
+					}
 					mParameters.PARTICLE_END.spawn(mBoss, mBoss.getLocation());
 					mParameters.SOUND_END.play(mBoss.getLocation());
 					this.cancel();
