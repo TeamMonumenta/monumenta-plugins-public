@@ -326,7 +326,7 @@ public final class ParrotCustomInventory extends Gui {
 
 		int corridorsScore = ScoreboardUtils.getScoreboardValue(mPlayer, "RogEndless").orElse(0);
 		createParrotItems(ParrotVariant.CORRIDORS, ParrotGUIPage.R1, 19,
-			List.of("Requires clearing floor 12 from Ephemeral Corridors", "You have cleared floor " + corridorsScore),
+			List.of("Requires clearing floor 12 from Ephemeral Corridors", "You have cleared floor " + (corridorsScore - 1)),
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(mPlayer, "RogEndless").orElse(0) > 12,
 			ImmutableMap.of(persistentParchment, 24));
 
