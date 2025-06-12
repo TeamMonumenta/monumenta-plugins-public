@@ -47,6 +47,7 @@ public class Twisted {
 	private static final String POOL_NAME_NORMAL = "~TwistedNormal";
 	private static final String POOL_NAME_WATER = "~TwistedWater";
 	private static final String POOL_NAME_SPECS = "~SpecTwistedBoss";
+	private static final String POOL_NAME_WATER_SPEC = "~SpecTwistedWaterBoss";
 
 	private static final int ANIMATION_DURATION = 20 * 2;
 	private static final int MAX_SPIRAL_ANIMATOR_COUNT = 3;
@@ -235,7 +236,7 @@ public class Twisted {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			LivingEntity twistedMob = null;
 			boolean isWaterLoc = BlockUtils.containsWater(spawningLoc.getBlock());
-			String pool = isTormented ? POOL_NAME_SPECS : (isWaterLoc ? POOL_NAME_WATER : normalSummon ? POOL_NAME : POOL_NAME_NORMAL);
+			String pool = isTormented ? (isWaterLoc ? POOL_NAME_WATER_SPEC : POOL_NAME_SPECS) : (isWaterLoc ? POOL_NAME_WATER : normalSummon ? POOL_NAME : POOL_NAME_NORMAL);
 			Map<Soul, Integer> mobsPool = LibraryOfSoulsIntegration.getPool(pool);
 			if (mobsPool != null) {
 				for (Map.Entry<Soul, Integer> entry : mobsPool.entrySet()) {
