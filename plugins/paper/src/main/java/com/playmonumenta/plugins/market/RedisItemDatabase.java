@@ -1,13 +1,17 @@
 package com.playmonumenta.plugins.market;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.DateUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,6 +47,15 @@ public class RedisItemDatabase {
 		RedisAPI.getInstance().async().hset(mPathIDBItemToID, mojangson, idStr).toCompletableFuture().join();
 		RedisAPI.getInstance().async().hset(mPathIDBIDToItem, idStr, mojangson).toCompletableFuture().join();
 		return id;
+	}
+
+	// This should only be used to update the same item in place, ie when handling lore text on items with the Dirty flag
+	private static void updateItemEntryInRedis(long id, ItemStack item) {
+		saveToCache(id, item);
+		String mojangson = ItemUtils.serializeItemStack(item);
+		String idStr = String.valueOf(id);
+		RedisAPI.getInstance().async().hset(mPathIDBItemToID, mojangson, idStr).toCompletableFuture().join();
+		RedisAPI.getInstance().async().hset(mPathIDBIDToItem, idStr, mojangson).toCompletableFuture().join();
 	}
 
 	private static long getNextItemID() {
@@ -84,6 +97,15 @@ public class RedisItemDatabase {
 			AuditListener.logMarket("PAAAAAAAANIC; no item found in database for id " + id + ". ping @ray and tell him his code sucks");
 			return new ItemStack(Material.STONE, 1);
 		}
+
+		// Check dirty flag for if lore text needs updating
+		if (ItemStatUtils.isDirty(item)) {
+			List<String> itemPath = new ArrayList<>();
+			itemPath.add("RedisItemDatabase[" + id + "]");
+			ItemUpdateManager.updateNested(itemPath, item);
+			updateItemEntryInRedis(id, item.asOne());
+		}
+
 		return item.asOne();
 	}
 
