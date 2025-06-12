@@ -174,7 +174,6 @@ public class LuckPermsIntegration implements Listener {
 		OffDutyCommand.register();
 		SetGuildTeleport.register(plugin);
 		StreamerModeCommand.register();
-		TeleportGuild.register();
 		TeleportGuildGui.register(plugin);
 		TestGuild.register();
 		TransferLPPermissions.register(plugin);
