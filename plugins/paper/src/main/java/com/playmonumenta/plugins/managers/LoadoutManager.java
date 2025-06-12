@@ -59,6 +59,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -927,7 +928,7 @@ public class LoadoutManager implements Listener {
 		public @Nullable Loadout mBackSwapLoadout;
 
 		public int mMaxLoadouts = 3;
-
+		public int mMaxLoadoutPages = 1;
 		private JsonObject toJson() {
 			JsonObject json = new JsonObject();
 			JsonArray loadoutsJson = new JsonArray();
@@ -937,6 +938,8 @@ public class LoadoutManager implements Listener {
 			json.add("loadouts", loadoutsJson);
 			json.add("backSwapLoadout", mBackSwapLoadout == null ? null : mBackSwapLoadout.toJson());
 			json.addProperty("maxLoadouts", mMaxLoadouts);
+			json.addProperty("maxLoadoutPages", mMaxLoadoutPages);
+
 			return json;
 		}
 
@@ -947,6 +950,7 @@ public class LoadoutManager implements Listener {
 			}
 			data.mBackSwapLoadout = json.get("backSwapLoadout") == null ? null : Loadout.fromJson(json.getAsJsonObject("backSwapLoadout"));
 			data.mMaxLoadouts = json.getAsJsonPrimitive("maxLoadouts").getAsInt();
+			data.mMaxLoadoutPages = Optional.ofNullable(json.getAsJsonPrimitive("maxLoadoutPages")).map(JsonPrimitive::getAsInt).orElse(1);
 			return data;
 		}
 
