@@ -650,10 +650,6 @@ public class ItemUtils {
 			return false;
 		}
 
-		if (new ItemStack(Material.ARMOR_STAND).isSimilar(item)) {
-			return true;
-		}
-
 		return item.hasItemMeta() && item.getItemMeta().hasLore() && !InventoryUtils.testForItemWithLore(item, "$$");
 	}
 

@@ -59,6 +59,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -415,8 +416,14 @@ public class MobListener implements Listener {
 			return;
 		}
 
-		// TODO: workaround for item drop chance equipment not working in 1.20.4
-		event.getDrops().removeIf(itemStack -> !ItemUtils.shouldDropEquipment(itemStack));
+		// Don't drop equipment that doesn't have lore (let non-equipment drops without lore still drop)
+		EntityEquipment equipment = livingEntity.getEquipment();
+		if (equipment != null) {
+			for (EquipmentSlot slot : EquipmentSlot.values()) {
+				ItemStack equipped = equipment.getItem(slot);
+				event.getDrops().removeIf(itemStack -> itemStack.isSimilar(equipped) && !ItemUtils.shouldDropEquipment(itemStack));
+			}
+		}
 
 		//Give wither to vexes spawned from the evoker that died so they die over time
 		if (livingEntity instanceof Evoker) {
