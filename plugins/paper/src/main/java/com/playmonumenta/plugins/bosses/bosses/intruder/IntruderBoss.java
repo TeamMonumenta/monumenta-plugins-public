@@ -45,6 +45,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.scriptedquests.managers.SongManager;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -212,6 +213,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, lBoss -> {
 			summonSourcelessGazes();
+			SongManager.playBossSong(mPlayers, new SongManager.Song("epic:music.intruder_phase1", SoundCategory.RECORDS, 244.8, true, 1, 1), true, boss, true, 0, 20);
 		});
 		events.put(97, lBoss -> {
 			summonSourcelessGazes();
@@ -256,6 +258,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		});
 		events.put(50, lBoss -> {
 			forceCastSpell(SpellTwistedReplicants.class);
+			SongManager.playBossSong(mPlayers, new SongManager.Song("epic:music.intruder_phase2", SoundCategory.RECORDS, 328.3, true, 1, 1), true, boss, true, 0, 20);
 		});
 		events.put(45, lBoss -> {
 			mPsychicMiasma.forceCast();
@@ -648,6 +651,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		resetBossArena();
 		mSpellAntiCheese.setAmalgamatingDreamscape(false);
 		mBossBarManager.setBossFog(true);
+		SongManager.playBossSong(mPlayers, new SongManager.Song("epic:music.intruder_phase3", SoundCategory.RECORDS, 53, false, 1, 1), true, mBoss, true, 0, 20);
 
 		List<Spell> spells = List.of(
 			new SpellBaseSummon(mPlugin, mBoss, 12 * 20, 80, 0, 3, false, true, false,

@@ -192,6 +192,10 @@ public class MusicGui extends Gui {
 				addMusicItem(4, 1, Material.MUSIC_DISC_STRAD, "Ancient Automation", Location.SILVER, "Silver Construct", "Salamanderlonk", ImperialConstruct.MUSIC_TITLE, ImperialConstruct.MUSIC_DURATION, checkScore("SKT"));
 				addMusicItem(4, 2, Material.MUSIC_DISC_OTHERSIDE, "The Fate of Time", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE_1, TealSpirit.MUSIC_DURATION_1, checkScore("SKT"));
 				addMusicItem(4, 3, Material.MUSIC_DISC_OTHERSIDE, "The Hour of Oblivion", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE_2, TealSpirit.MUSIC_DURATION_2, checkScore("SKT"));
+
+				addMusicItem(4, 5, Material.MUSIC_DISC_BLOCKS, "Usurpation I: They Can Hear You Breathe", Location.TWISTED_INTRUDER, "Twisted Intruder", "Xernial", "epic:music.intruder_phase1", 244.8, checkScore("TwistedXWins"));
+				addMusicItem(4, 6, Material.MUSIC_DISC_BLOCKS, "Usurpation II: Waking Shadows", Location.TWISTED_INTRUDER, "Twisted Intruder", "Xernial", "epic:music.intruder_phase2", 328.3, checkScore("TwistedXWins"));
+				addMusicItem(4, 7, Material.MUSIC_DISC_BLOCKS, "Usurpation III: The Staring Eclipse", Location.TWISTED_INTRUDER, "Twisted Intruder", "Xernial", "epic:music.intruder_phase3", 53, checkScore("TwistedXWins"));
 			}
 
 			case DUNGEONS -> {
