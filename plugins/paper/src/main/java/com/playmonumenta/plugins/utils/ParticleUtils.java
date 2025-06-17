@@ -1050,6 +1050,22 @@ public class ParticleUtils {
 		}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
 	}
 
+	public static void drawFlag(Player player, Location loc, List<Color> colors, float size) {
+		Location eLoc = loc.clone();
+		eLoc.setPitch(0);
+		eLoc.setYaw(player.getLocation().getYaw() - 90);
+
+		Vector horizontal = eLoc.getDirection();
+
+		for (Color color : colors) {
+			new PPLine(Particle.REDSTONE, eLoc.clone().subtract(horizontal), eLoc.clone().add(horizontal))
+				.countPerMeter(8)
+				.data(new Particle.DustOptions(color, size))
+				.spawnAsPlayerActive(player);
+			eLoc.subtract(0, size / 8, 0);
+		}
+	}
+
 	public static void spawnParticleAsLivingEntity(PartialParticle pp, LivingEntity living) {
 		if (living instanceof Player playerLiving) {
 			pp.spawnAsPlayerActive(playerLiving);

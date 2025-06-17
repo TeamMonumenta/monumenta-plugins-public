@@ -62,6 +62,7 @@ public class EliteFinishers {
 			.put(WarmFireworkFinisher.NAME, new WarmFireworkFinisher())
 			.put(Whirlpool.NAME, new Whirlpool())
 			.put(Woolerman.NAME, new Woolerman())
+			.put(PrideFinisher.NAME, new PrideFinisher())
 			.build();
 
 	// Delegate based on elite finisher name
