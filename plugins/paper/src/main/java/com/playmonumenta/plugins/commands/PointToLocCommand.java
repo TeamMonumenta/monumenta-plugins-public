@@ -3,15 +3,18 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.BooleanArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.FloatArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.ParticleArgument;
 import dev.jorel.commandapi.wrappers.ParticleData;
+import java.util.Collection;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -20,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public class PointToLocCommand {
+	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
 		// Point to Location command
 		// draws a line of particles from the player's location, towards the target location
@@ -37,6 +41,7 @@ public class PointToLocCommand {
 				new FloatArgument("radius"),
 				new BooleanArgument("skrUsage")
 			)
+			.withOptionalArguments(new EntitySelectorArgument.ManyPlayers("allowed viewers"))
 			.executes((sender, args) -> {
 				Player player = (Player) CommandUtils.getCallee(sender);
 				Location startpoint = ((Location) args.getUnchecked("start")).clone();
@@ -50,6 +55,7 @@ public class PointToLocCommand {
 				ParticleData<?> helixParticleData = (ParticleData<?>) args.getUnchecked("helixParticle");
 				float radius = (float) args.getUnchecked("radius");
 				boolean skr = (boolean) args.getUnchecked("skrUsage");
+				Collection<Player> allowedViewers = (Collection<Player>) args.get("allowed viewers");
 
 				Vector right;
 				Vector up;
@@ -60,7 +66,6 @@ public class PointToLocCommand {
 					right = direction.clone().crossProduct(new Vector(0, 1, 0)).normalize();
 					up = direction.clone().crossProduct(right).normalize();
 				}
-				// Particle.DustTransition skrColours = new Particle.DustTransition(Color.fromRGB(255, 13, 247), Color.fromRGB(75, 35, 158), 1f);
 				final int[] mAngleOne = {0};
 				final int[] mAngleTwo = {180};
 
@@ -71,10 +76,12 @@ public class PointToLocCommand {
 						}
 						startpoint.add(endNormalized);
 						endNormalized.multiply(acceleration);
-						new PartialParticle(midParticleData.particle(), startpoint, 2, 0, 0, 0).spawnAsPlayerActive(player);
+						PartialParticle midParticle = new PartialParticle(midParticleData.particle(), startpoint, 2, 0, 0, 0);
+						PPCircle helix1;
+						PPCircle helix2;
 						if (!skr) {
-							new PPCircle(helixParticleData.particle(), startpoint, radius).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleOne[0], mAngleOne[0]).spawnAsEnemy();
-							new PPCircle(helixParticleData.particle(), startpoint, radius).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleTwo[0], mAngleTwo[0]).spawnAsEnemy();
+							helix1 = new PPCircle(helixParticleData.particle(), startpoint, radius).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleOne[0], mAngleOne[0]);
+							helix2 = new PPCircle(helixParticleData.particle(), startpoint, radius).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleTwo[0], mAngleTwo[0]);
 						} else {
 							double length = startpoint.distanceSquared(endpoint);
 							Color helixColor;
@@ -88,8 +95,17 @@ public class PointToLocCommand {
 								helixColor = Color.RED;
 							}
 							Particle.DustTransition skrColours = new Particle.DustTransition(helixColor, helixColor, 1f);
-							new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleOne[0], mAngleOne[0]).spawnAsEnemy();
-							new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleTwo[0], mAngleTwo[0]).spawnAsEnemy();
+							helix1 = new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleOne[0], mAngleOne[0]);
+							helix2 = new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleTwo[0], mAngleTwo[0]);
+						}
+						if (allowedViewers != null) {
+							midParticle.spawnForPlayers(ParticleCategory.FULL, allowedViewers);
+							helix1.spawnForPlayers(ParticleCategory.FULL, allowedViewers);
+							helix2.spawnForPlayers(ParticleCategory.FULL, allowedViewers);
+						} else {
+							midParticle.spawnAsPlayerActive(player);
+							helix1.spawnAsEnemy();
+							helix2.spawnAsEnemy();
 						}
 						mAngleOne[0] = (mAngleOne[0] + 10) % 360;
 						mAngleTwo[0] = (mAngleTwo[0] + 10) % 360;
@@ -99,4 +115,3 @@ public class PointToLocCommand {
 			.register();
 	}
 }
-
