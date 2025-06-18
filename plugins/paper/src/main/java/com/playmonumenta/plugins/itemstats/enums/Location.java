@@ -123,11 +123,12 @@ public enum Location {
 	AMBER("amber", "item name color", TextColor.fromHexString("#FFBF00")),
 	GOLD("gold", "item name color", TextColor.fromHexString("#FFD700")),
 	DARKBLUE("darkblue", "itemnamecolor", TextColor.fromHexString("#FFFFAA")),
-	INDIGO("indigo", "item name color", TextColor.fromHexString("#6F00FF")),
+	INDIGO("indigo", "Phyrrys, City of Fallen Stars", TextColor.fromHexString("#6F00FF")),
 	MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8")),
 	ZENITH("zenith", "The Celestial Zenith", TextColor.fromHexString("#FF9CF0")),
 	FISHING("fishing", "Architect's Ring Fishing", TextColor.fromHexString("#A9D1D0")),
 	SKR("skr", "Silver Knight's Remnants", TextColor.fromHexString("#E8C392")),
+	// REKKENGULCH("rekkengulch", "Rekkengulch", TextColor.fromHexString("#8E432D")),
 	// bosses
 	SIRIUS("sirius", "The Final Blight", TextColor.fromHexString("#34CFBC")),
 	HUNTS("hunts", "Diamenean Hunts", TextColor.fromHexString("#414e18")),

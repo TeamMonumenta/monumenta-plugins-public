@@ -133,6 +133,7 @@ public class DelvesManager implements Listener {
 		"portal",
 		"blue",
 		"brown",
+		"indigo",
 		"zenith",
 		"futurama"
 	);

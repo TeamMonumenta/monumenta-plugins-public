@@ -41,6 +41,7 @@ public enum MonumentaContent {
 	RUSH_WAVE("rushwave", ContentType.OTHER, 0),
 	BLUE("blue", ContentType.DUNGEON, 3),
 	BROWN("brown", ContentType.DUNGEON, 3),
+	INDIGO("indigo", ContentType.DUNGEON, 3),
 	GREEN("green", ContentType.DUNGEON, 3),
 	RED("red", ContentType.DUNGEON, 3),
 	BLACK("black", ContentType.DUNGEON, 3),
