@@ -304,9 +304,8 @@ public class SpawnerListener implements Listener {
 							line.countPerMeter(10).spawnAsEnemy();
 						}
 					}
-					if (getProtector(spawnerBlock) && !(spawnedEntity instanceof Player)) {
-						GlowingManager.startGlowing(spawnedEntity, NamedTextColor.AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "protectedMob");
-						spawnedEntity.setInvulnerable(true);
+					if (getProtector(spawnerBlock)) {
+						applyProtectorEffect(spawnedEntity, spawnerBlock);
 						if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), spawnerBlock, "protectedMobSummon")) {
 							spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
 							spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
@@ -334,11 +333,8 @@ public class SpawnerListener implements Listener {
 			}
 
 			// make mob invulnerable if the spawner is protected
-			if (getProtector(spawnerBlock) && !(mob instanceof Player)) {
-				GlowingManager.startGlowing(mob, NamedTextColor.AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "protectedMob");
-				mob.setInvulnerable(true);
-				ParticleLineTask lineTask = new ParticleLineTask(mob, Particle.SOUL_FIRE_FLAME, spawnerBlock);
-				lineTask.start();
+			if (getProtector(spawnerBlock)) {
+				applyProtectorEffect(mob, spawnerBlock);
 				if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), spawnerBlock, "protectedMobSummon")) {
 					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
 					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
@@ -577,8 +573,7 @@ public class SpawnerListener implements Listener {
 				for (MobInfo mobInfo : spawnerInfo) {
 					LivingEntity mob = mobInfo.getMob();
 					if (mob != null) {
-						mob.setInvulnerable(false);
-						GlowingManager.clear(mob, "protectedMob");
+						removeProtectorEffect(mob);
 					}
 				}
 			}
@@ -665,6 +660,38 @@ public class SpawnerListener implements Listener {
 
 		if (shields > 0 || losPool != null || decaying > 0 || protector || !breakActions.isEmpty()) {
 			SpawnerUtils.addEffectsDisplayMarker(block);
+		}
+	}
+
+	private static List<Entity> getEntityStack(Entity baseEntity) {
+		List<Entity> entityStack = new ArrayList<>();
+		entityStack.add(baseEntity);
+		int i = 0;
+		while (i < entityStack.size()) {
+			entityStack.addAll(entityStack.get(i).getPassengers());
+			i++;
+		}
+		return entityStack;
+	}
+
+	private static void applyProtectorEffect(Entity baseEntity, Block spawnerBlock) {
+		for (Entity entityInStack : getEntityStack(baseEntity)) {
+			if (entityInStack instanceof LivingEntity livingEntityInStack && !(entityInStack instanceof Player)) {
+				GlowingManager.startGlowing(livingEntityInStack, NamedTextColor.AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "protectedMob");
+				livingEntityInStack.setInvulnerable(true);
+				if (baseEntity.equals(entityInStack)) { // only draw line from base entity to avoid clutter
+					new ParticleLineTask(livingEntityInStack, Particle.SOUL_FIRE_FLAME, spawnerBlock).start();
+				}
+			}
+		}
+	}
+
+	private static void removeProtectorEffect(Entity baseEntity) {
+		for (Entity entityInStack : getEntityStack(baseEntity)) {
+			if (entityInStack instanceof LivingEntity livingEntityInStack && !(entityInStack instanceof Player)) {
+				livingEntityInStack.setInvulnerable(false);
+				GlowingManager.clear(livingEntityInStack, "protectedMob");
+			}
 		}
 	}
 }
