@@ -341,48 +341,9 @@ public class Constants {
 			Material.CARVED_PUMPKIN
 		);
 
-		public static final EnumSet<Material> SWORDS = EnumSet.of(
-			Material.WOODEN_SWORD,
-			Material.STONE_SWORD,
-			Material.GOLDEN_SWORD,
-			Material.IRON_SWORD,
-			Material.DIAMOND_SWORD,
-			Material.NETHERITE_SWORD
-		);
 		public static final EnumSet<Material> BOWS = EnumSet.of(
 			Material.BOW,
 			Material.CROSSBOW
-		);
-		public static final EnumSet<Material> HOES = EnumSet.of(
-			Material.WOODEN_HOE,
-			Material.STONE_HOE,
-			Material.GOLDEN_HOE,
-			Material.IRON_HOE,
-			Material.DIAMOND_HOE,
-			Material.NETHERITE_HOE
-		);
-		public static final EnumSet<Material> PICKAXES = EnumSet.of(
-			Material.WOODEN_PICKAXE,
-			Material.STONE_PICKAXE,
-			Material.GOLDEN_PICKAXE,
-			Material.IRON_PICKAXE,
-			Material.DIAMOND_PICKAXE,
-			Material.NETHERITE_PICKAXE
-		);
-		public static final EnumSet<Material> AXES = EnumSet.of(
-			Material.WOODEN_AXE,
-			Material.STONE_AXE,
-			Material.GOLDEN_AXE,
-			Material.IRON_AXE,
-			Material.DIAMOND_AXE,
-			Material.NETHERITE_AXE
-		);
-		public static final EnumSet<Material> SHOVELS = EnumSet.of(
-			Material.WOODEN_SHOVEL,
-			Material.STONE_SHOVEL,
-			Material.GOLDEN_SHOVEL,
-			Material.IRON_SHOVEL,
-			Material.NETHERITE_SHOVEL
 		);
 
 		public static final EnumSet<Material> POTIONS = EnumSet.of(

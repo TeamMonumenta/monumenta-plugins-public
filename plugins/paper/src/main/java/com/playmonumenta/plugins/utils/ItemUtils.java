@@ -491,12 +491,12 @@ public class ItemUtils {
 
 	static {
 		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.ARMOR);
-		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.AXES);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Tag.ITEMS_AXES.getValues());
 		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.BOWS); // technically doesn't apply to bows since it's melee attack damage
-		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.HOES);
-		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.PICKAXES);
-		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SHOVELS);
-		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SWORDS);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Tag.ITEMS_HOES.getValues());
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Tag.ITEMS_PICKAXES.getValues());
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Tag.ITEMS_SHOVELS.getValues());
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Tag.ITEMS_SWORDS.getValues());
 		// ! for future minecraft versions: add more items with base vanilla attributes
 
 		registerBannerType(Material.WHITE_BANNER, Material.WHITE_WALL_BANNER);
@@ -1181,7 +1181,7 @@ public class ItemUtils {
 
 	public static boolean isSword(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			return Materials.SWORDS.contains(itemStack.getType());
+			return Tag.ITEMS_SWORDS.isTagged(itemStack.getType());
 		} else {
 			return false;
 		}
@@ -1223,7 +1223,7 @@ public class ItemUtils {
 	 */
 	public static boolean isHoe(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			return Materials.HOES.contains(itemStack.getType());
+			return Tag.ITEMS_HOES.isTagged(itemStack.getType());
 		} else {
 			return false;
 		}
@@ -1239,18 +1239,18 @@ public class ItemUtils {
 
 	public static boolean isPickaxe(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			return Materials.PICKAXES.contains(itemStack.getType());
+			return Tag.ITEMS_PICKAXES.isTagged(itemStack.getType());
 		} else {
 			return false;
 		}
 	}
 
 	public static boolean isAxe(@Nullable ItemStack itemStack) {
-		return itemStack != null && Materials.AXES.contains(itemStack.getType());
+		return itemStack != null && Tag.ITEMS_AXES.isTagged(itemStack.getType());
 	}
 
 	public static boolean isShovel(@Nullable ItemStack itemStack) {
-		return itemStack != null && Materials.SHOVELS.contains(itemStack.getType());
+		return itemStack != null && Tag.ITEMS_SHOVELS.isTagged(itemStack.getType());
 	}
 
 	public static boolean isSomePotion(@Nullable ItemStack itemStack) {

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -10,13 +9,17 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.EnumSet;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.Tag;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.CheckReturnValue;
 
@@ -53,6 +56,18 @@ public class Multitool implements Enchantment {
 	// (that code prevents using abilities with right clicks when holding a multitool)
 	@Override
 	public void onPlayerInteract(Plugin plugin, Player player, double levelUnused, PlayerInteractEvent event) {
+		// Ignore offhand
+		if (!EquipmentSlot.HAND.equals(event.getHand())) {
+			return;
+		}
+
+		// Swap to best tool when left clicking a block
+		if (Action.LEFT_CLICK_BLOCK.equals(event.getAction())) {
+			onLeftClickBlock(plugin, player, event);
+			return;
+		}
+
+		// Ignore right click event if that is not the multitool trigger
 		if (ScoreboardUtils.getScoreboardValue(player, MULTITOOL_TRIGGER_OPTION_SCORE).orElse(0) != TRIGGER_OPTION_RIGHT_CLICK) {
 			return;
 		}
@@ -92,6 +107,29 @@ public class Multitool implements Enchantment {
 		}
 	}
 
+	private void onLeftClickBlock(Plugin plugin, Player player, PlayerInteractEvent event) {
+		Block block = event.getClickedBlock();
+		if (block == null) {
+			return;
+		}
+		Material blockMat = block.getType();
+		ItemStack tool = player.getInventory().getItemInMainHand();
+		Material toolMat = tool.getType();
+		int multitoolLevel = ItemStatUtils.getEnchantmentLevel(tool, EnchantmentType.MULTITOOL);
+		Material bestToolMat = getBestMaterial(blockMat, toolMat, multitoolLevel);
+		if (toolMat.equals(bestToolMat)) {
+			return;
+		}
+
+		// Only allow swapping once every 2 ticks at most to prevent accidental double-swaps
+		if (MetadataUtils.checkOnceInRecentTicks(plugin, player, "MultitoolMutex", 1)) {
+			tool = tool.withType(bestToolMat);
+			player.getInventory().setItemInMainHand(tool);
+			playSwapSound(player, bestToolMat);
+			player.updateInventory();
+		}
+	}
+
 	@Override
 	public void onPlayerSwapHands(Plugin plugin, Player player, double value, PlayerSwapHandItemsEvent event) {
 		if (ScoreboardUtils.getScoreboardValue(player, MULTITOOL_TRIGGER_OPTION_SCORE).orElse(0) != TRIGGER_OPTION_SWAP) {
@@ -128,50 +166,105 @@ public class Multitool implements Enchantment {
 		if (MetadataUtils.checkOnceInRecentTicks(plugin, player, "MultitoolMutex", 1)) {
 			Material mat = getNextMaterial(item.getType(), ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.MULTITOOL));
 			item = item.withType(mat);
-			player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, SoundCategory.PLAYERS, 1, 2F);
+			playSwapSound(player, mat);
 			player.updateInventory();
 		}
 
 		return item;
 	}
 
+	public static void playSwapSound(Player player, Material newMaterial) {
+		player.playSound(player, Sound.BLOCK_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 2.0F);
+		if (Tag.ITEMS_AXES.isTagged(newMaterial)) {
+			player.playSound(player, Sound.BLOCK_WOOD_BREAK, SoundCategory.PLAYERS, 1.0f, 0.707f);
+		} else if (Tag.ITEMS_SHOVELS.isTagged(newMaterial)) {
+			player.playSound(player, Sound.ITEM_SHOVEL_FLATTEN, SoundCategory.PLAYERS, 0.5f, 1.414f);
+		} else if (Tag.ITEMS_PICKAXES.isTagged(newMaterial)) {
+			player.playSound(player, Sound.BLOCK_STONE_HIT, SoundCategory.PLAYERS, 1.0f, 0.707f);
+		} else if (Material.SHEARS.equals(newMaterial)) {
+			player.playSound(player, Sound.BLOCK_GRASS_HIT, SoundCategory.PLAYERS, 1.0f, 0.707f);
+		} else {
+			player.playSound(player, Sound.UI_LOOM_SELECT_PATTERN, SoundCategory.PLAYERS, 1.0f, 1.414f);
+		}
+	}
+
 	public static boolean isValidMultitoolMaterial(Material mat) {
-		return Constants.Materials.PICKAXES.contains(mat)
-			       || Constants.Materials.AXES.contains(mat)
-			       || Constants.Materials.SHOVELS.contains(mat)
+		return Tag.ITEMS_PICKAXES.isTagged(mat)
+			       || Tag.ITEMS_AXES.isTagged(mat)
+			       || Tag.ITEMS_SHOVELS.isTagged(mat)
 			       || mat == Material.COMPASS
 			       || mat == Material.SHEARS;
 	}
 
-	public static Material getNextMaterial(Material mat, int level) {
-		if (mat == Material.COMPASS) {
-			return Material.SHEARS;
-		} else if (mat == Material.SHEARS) {
-			return Material.COMPASS;
-		}
+	public static List<Material> getMaterials(Material mat, int level) {
 		String[] str = mat.toString().split("_", 2);
-		if (Constants.Materials.AXES.contains(mat)) {
-			return Material.valueOf(str[0] + "_SHOVEL");
-		} else if (Constants.Materials.SHOVELS.contains(mat)) {
-			if (level > 1) {
-				return Material.valueOf(str[0] + "_PICKAXE");
-			} else {
-				return Material.valueOf(str[0] + "_AXE");
+		if (level == 1) {
+			if (Material.COMPASS.equals(mat) || Material.SHEARS.equals(mat)) {
+				return List.of(Material.COMPASS, Material.SHEARS);
 			}
-		} else if (Constants.Materials.PICKAXES.contains(mat)) {
-			return Material.valueOf(str[0] + "_AXE");
+			if (
+				Tag.ITEMS_AXES.isTagged(mat)
+					|| Tag.ITEMS_SHOVELS.isTagged(mat)
+			) {
+				return List.of(
+					Material.valueOf(str[0] + "_AXE"),
+					Material.valueOf(str[0] + "_SHOVEL")
+				);
+			}
 		}
-		return mat;
+		if (level == 2) {
+			if (
+				Tag.ITEMS_AXES.isTagged(mat)
+					|| Tag.ITEMS_SHOVELS.isTagged(mat)
+					|| Tag.ITEMS_PICKAXES.isTagged(mat)
+			) {
+				return List.of(
+					Material.valueOf(str[0] + "_AXE"),
+					Material.valueOf(str[0] + "_SHOVEL"),
+					Material.valueOf(str[0] + "_PICKAXE")
+				);
+			}
+		}
+		return List.of(mat);
+	}
+
+	public static Material getNextMaterial(Material mat, int level) {
+		List<Material> materials = getMaterials(mat, level);
+		int numMats = materials.size();
+		int oldIndex = materials.indexOf(mat);
+		int index = (oldIndex + 1) % numMats;
+		return materials.get(index);
+	}
+
+	public static Material getBestMaterial(Material blockMat, Material toolMat, int level) {
+		if (Material.COMPASS.equals(toolMat)) {
+			// Never auto-swap a compass
+			return toolMat;
+		}
+
+		Material bestMat = toolMat;
+		for (Material testMat : getMaterials(toolMat, level)) {
+			if (Tag.ITEMS_AXES.isTagged(testMat) && Tag.MINEABLE_AXE.isTagged(blockMat)) {
+				bestMat = testMat;
+			}
+			if (Tag.ITEMS_SHOVELS.isTagged(testMat) && Tag.MINEABLE_SHOVEL.isTagged(blockMat)) {
+				bestMat = testMat;
+			}
+			if (Tag.ITEMS_PICKAXES.isTagged(testMat) && Tag.MINEABLE_PICKAXE.isTagged(blockMat)) {
+				bestMat = testMat;
+			}
+		}
+		return bestMat;
 	}
 
 	public static Material getBaseMaterial(Material mat) {
 		if (mat == Material.COMPASS || mat == Material.SHEARS) {
 			return Material.COMPASS;
 		}
-		if (Constants.Materials.AXES.contains(mat)) {
+		if (Tag.ITEMS_AXES.isTagged(mat)) {
 			return mat;
 		}
-		if (Constants.Materials.SHOVELS.contains(mat) || Constants.Materials.PICKAXES.contains(mat)) {
+		if (Tag.ITEMS_SHOVELS.isTagged(mat) || Tag.ITEMS_PICKAXES.isTagged(mat)) {
 			String[] str = mat.toString().split("_", 2);
 			return Material.valueOf(str[0] + "_AXE");
 		}
