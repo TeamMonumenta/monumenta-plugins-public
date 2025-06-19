@@ -106,6 +106,7 @@ import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.shardhealth.ShardHealthManager;
 import com.playmonumenta.plugins.social.BlockCommand;
 import com.playmonumenta.plugins.social.FriendCommand;
+import com.playmonumenta.plugins.social.SocialDataMigrationCommand;
 import com.playmonumenta.plugins.social.SocialManager;
 import com.playmonumenta.plugins.spawners.SpawnerVisualisation;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
@@ -345,6 +346,7 @@ public class Plugin extends JavaPlugin {
 		ShardHealthManager.init();
 		ShardSorterCommand.register();
 		SimulateLoot.register(this);
+		SocialDataMigrationCommand.register(); // TODO: remove this after migration is complete
 		SpawnerCountCommand.register();
 		Spawn.register();
 		SpawnPointReset.register();

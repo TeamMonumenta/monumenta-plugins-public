@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.guis.lib;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.common.base.Preconditions;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -10,14 +11,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import javax.annotation.concurrent.Immutable;
+
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -25,6 +30,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -279,11 +285,25 @@ public final class GuiItem {
 					.toList()
 			);
 
-			stack.setItemMeta(meta);
+			if ((stack.getType() == Material.PLAYER_HEAD || stack.getType() == Material.PLAYER_WALL_HEAD) && mHeadOwner != null && meta instanceof SkullMeta skullMeta) {
+				UUID ownerUuid = mHeadOwner.getUniqueId();
+				String ownerName = mHeadOwner.getName();
+				PlayerProfile playerProfile;
 
-			if ((stack.getType() == Material.PLAYER_HEAD || stack.getType() == Material.PLAYER_WALL_HEAD) && mHeadOwner != null) {
-				GUIUtils.setSkullOwner(stack, mHeadOwner);
+				if (ownerName == null) {
+					ownerName = MonumentaRedisSyncAPI.cachedUuidToName(ownerUuid);
+				}
+
+				if (ownerName == null) {
+					playerProfile = Bukkit.createProfile(ownerUuid);
+				} else {
+					playerProfile = Bukkit.createProfile(ownerUuid, ownerName);
+				}
+
+				skullMeta.setPlayerProfile(playerProfile);
 			}
+
+			stack.setItemMeta(meta);
 
 			if (mSetPlainTag) {
 				ItemUtils.setPlainTag(stack);

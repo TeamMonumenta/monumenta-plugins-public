@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.TablistCommand;
 import com.playmonumenta.plugins.protocollib.PingListener;
+import com.playmonumenta.plugins.social.PlayerSocialCache;
 import com.playmonumenta.plugins.social.SocialManager;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.text.MessageFormat;
@@ -296,11 +297,11 @@ public class TABIntegration implements Listener {
 
 	@SuppressWarnings("PMD.EmptyCatchBlock")
 	public void refreshOnlinePlayer(UUID uuid, boolean latency) {
+		Player bukkitPlayer = Bukkit.getPlayer(uuid);
+		if (bukkitPlayer == null) {
+			return;
+		}
 		if (latency) {
-			Player bukkitPlayer = Bukkit.getPlayer(uuid);
-			if (bukkitPlayer == null) {
-				return;
-			}
 			refreshPing(bukkitPlayer).join();
 		}
 		TabPlayer viewer = mTab.getPlayer(uuid);
@@ -311,8 +312,9 @@ public class TABIntegration implements Listener {
 		if (monuPlayer == null) {
 			return;
 		}
+		Boolean swapFriendsAndGuild = bukkitPlayer.hasPermission("monumenta.tablist.swapfriendsandguild");
 		CachedLayout layout = createBaseLayout();
-		layout = calculateLayout(layout, monuPlayer);
+		layout = calculateLayout(layout, monuPlayer, swapFriendsAndGuild);
 		if (layout.isSameLayout(monuPlayer.mLastLayout)) {
 			return;
 		}
@@ -452,7 +454,7 @@ public class TABIntegration implements Listener {
 		}
 	}
 
-	private CachedLayout calculateLayout(CachedLayout layout, MonumentaPlayer monuPlayer) {
+	private CachedLayout calculateLayout(CachedLayout layout, MonumentaPlayer monuPlayer, Boolean swapFriendsAndGuild) {
 		// not optimized at all, store permission/meta somewhere when initially fetching the player
 		int layoutIndex = 21;
 
@@ -484,52 +486,20 @@ public class TABIntegration implements Listener {
 			}
 		}
 
-		// friends
 		boolean friendsHasHeader = false;
-		for (MonumentaPlayer friendPlayer : players) {
-			// Hide check
-			if ((!isAdminOrMod && friendPlayer.mIsHidden) || friendPlayer.mIsMod) {
-				continue;
-			}
-			// friendship check
-			if (!isFriend(monuPlayer.mUuid, friendPlayer.mUuid).join()) {
-				continue;
-			}
-			if (!friendsHasHeader) {
-				friendsHasHeader = true;
-				if (modHasHeader) {
-					layout.addFixedSlot(layoutIndex, "");
-					layoutIndex++;
-					if (layoutIndex >= 81) {
-						return layout;
-					}
-				}
-				layout.addFixedSlot(layoutIndex, "&b&lFriends", "mineskin:1749359849");
-				layoutIndex++;
-				if (layoutIndex >= 81) {
-					return layout;
-				}
-			}
-			layout.addFixedSlot(layoutIndex, formatPlayer(friendPlayer, isAdminOrMod), friendPlayer.mSkin, friendPlayer.mPing);
-			layoutIndex++;
-			if (layoutIndex >= 81) {
-				return layout;
-			}
-		}
-
-		// guild
 		boolean guildHasHeader = false;
-		if (monuPlayer.mGuild != null) {
-			for (MonumentaPlayer guildPlayer : players) {
+		if (!swapFriendsAndGuild) {
+			// friends
+			for (MonumentaPlayer friendPlayer : players) {
 				// hide check
-				if ((!isAdminOrMod && guildPlayer.mIsHidden) || guildPlayer.mIsMod || isFriend(monuPlayer.mUuid, guildPlayer.mUuid).join()) {
+				if ((!isAdminOrMod && friendPlayer.mIsHidden) || friendPlayer.mIsMod) {
 					continue;
 				}
-				if (guildPlayer.mGuild == null || !guildPlayer.mGuild.equals(monuPlayer.mGuild)) {
+				if (!isFriend(monuPlayer.mUuid, friendPlayer.mUuid).join()) {
 					continue;
 				}
-				if (!guildHasHeader) {
-					guildHasHeader = true;
+				if (!friendsHasHeader) {
+					friendsHasHeader = true;
 					if (modHasHeader) {
 						layout.addFixedSlot(layoutIndex, "");
 						layoutIndex++;
@@ -537,13 +507,113 @@ public class TABIntegration implements Listener {
 							return layout;
 						}
 					}
-					layout.addFixedSlot(layoutIndex, "&a&lGuild", "mineskin:224445819");
+					layout.addFixedSlot(layoutIndex, "&b&lFriends", "mineskin:1749359849");
 					layoutIndex++;
 					if (layoutIndex >= 81) {
 						return layout;
 					}
 				}
-				layout.addFixedSlot(layoutIndex, formatPlayer(guildPlayer, isAdminOrMod), guildPlayer.mSkin, guildPlayer.mPing);
+				layout.addFixedSlot(layoutIndex, formatPlayer(friendPlayer, isAdminOrMod), friendPlayer.mSkin, friendPlayer.mPing);
+				layoutIndex++;
+				if (layoutIndex >= 81) {
+					return layout;
+				}
+			}
+
+			// guild
+			if (monuPlayer.mGuild != null) {
+				for (MonumentaPlayer guildPlayer : players) {
+					// hide check
+					if ((!isAdminOrMod && guildPlayer.mIsHidden) || guildPlayer.mIsMod || isFriend(monuPlayer.mUuid, guildPlayer.mUuid).join()) {
+						continue;
+					}
+					if (guildPlayer.mGuild == null || !guildPlayer.mGuild.equals(monuPlayer.mGuild)) {
+						continue;
+					}
+					if (!guildHasHeader) {
+						guildHasHeader = true;
+						if (modHasHeader || friendsHasHeader) {
+							layout.addFixedSlot(layoutIndex, "");
+							layoutIndex++;
+							if (layoutIndex >= 81) {
+								return layout;
+							}
+						}
+						layout.addFixedSlot(layoutIndex, "&a&lGuild", "mineskin:224445819");
+						layoutIndex++;
+						if (layoutIndex >= 81) {
+							return layout;
+						}
+					}
+					layout.addFixedSlot(layoutIndex, formatPlayer(guildPlayer, isAdminOrMod), guildPlayer.mSkin, guildPlayer.mPing);
+					layoutIndex++;
+					if (layoutIndex >= 81) {
+						return layout;
+					}
+				}
+			}
+		} else {
+			// guild
+			if (monuPlayer.mGuild != null) {
+				for (MonumentaPlayer guildPlayer : players) {
+					// hide check
+					if ((!isAdminOrMod && guildPlayer.mIsHidden) || guildPlayer.mIsMod) {
+						continue;
+					}
+					if (guildPlayer.mGuild == null || !guildPlayer.mGuild.equals(monuPlayer.mGuild)) {
+						continue;
+					}
+					if (!guildHasHeader) {
+						guildHasHeader = true;
+						if (modHasHeader) {
+							layout.addFixedSlot(layoutIndex, "");
+							layoutIndex++;
+							if (layoutIndex >= 81) {
+								return layout;
+							}
+						}
+						layout.addFixedSlot(layoutIndex, "&a&lGuild", "mineskin:224445819");
+						layoutIndex++;
+						if (layoutIndex >= 81) {
+							return layout;
+						}
+					}
+					layout.addFixedSlot(layoutIndex, formatPlayer(guildPlayer, isAdminOrMod), guildPlayer.mSkin, guildPlayer.mPing);
+					layoutIndex++;
+					if (layoutIndex >= 81) {
+						return layout;
+					}
+				}
+			}
+
+			// friends
+			for (MonumentaPlayer friendPlayer : players) {
+				// hide check
+				if ((!isAdminOrMod && friendPlayer.mIsHidden) || friendPlayer.mIsMod) {
+					continue;
+				}
+				if (!isFriend(monuPlayer.mUuid, friendPlayer.mUuid).join()) {
+					continue;
+				}
+				if (friendPlayer.mGuild != null && friendPlayer.mGuild.equals(monuPlayer.mGuild)) {
+					continue;
+				}
+				if (!friendsHasHeader) {
+					friendsHasHeader = true;
+					if (modHasHeader || guildHasHeader) {
+						layout.addFixedSlot(layoutIndex, "");
+						layoutIndex++;
+						if (layoutIndex >= 81) {
+							return layout;
+						}
+					}
+					layout.addFixedSlot(layoutIndex, "&b&lFriends", "mineskin:1749359849");
+					layoutIndex++;
+					if (layoutIndex >= 81) {
+						return layout;
+					}
+				}
+				layout.addFixedSlot(layoutIndex, formatPlayer(friendPlayer, isAdminOrMod), friendPlayer.mSkin, friendPlayer.mPing);
 				layoutIndex++;
 				if (layoutIndex >= 81) {
 					return layout;
@@ -560,7 +630,7 @@ public class TABIntegration implements Listener {
 			}
 			if (!regularHasHeader) {
 				regularHasHeader = true;
-				if (modHasHeader || guildHasHeader) {
+				if (modHasHeader || friendsHasHeader || guildHasHeader) {
 					layout.addFixedSlot(layoutIndex, "");
 					layoutIndex++;
 					if (layoutIndex >= 81) {
@@ -584,7 +654,7 @@ public class TABIntegration implements Listener {
 	}
 
 	public static CompletableFuture<Boolean> isFriend(UUID playerOne, UUID playerTwo) {
-		SocialManager.PlayerSocialData playerOneData = SocialManager.getSocialData(playerOne);
+		PlayerSocialCache playerOneData = SocialManager.getSocialCache(playerOne);
 		if (playerOneData != null) {
 			return CompletableFuture.completedFuture(playerOneData.getFriends().contains(playerTwo));
 		}

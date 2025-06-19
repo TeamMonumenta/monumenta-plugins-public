@@ -214,7 +214,7 @@ final class GameplayOptionsPage extends PebPage {
 			Material.FEATHER,
 			"Opt Out of Player Punches",
 			"Click to toggle whether you are opted out of being able to punch other players and having the ability to be launched."
-		).lore("").lore("Player punches: " + (playerPunchesOptOut.get() ? "<white>opted out" : "<white>opted in")).onMouseClick(() -> {
+		).lore("").lore("Player Punches: " + (playerPunchesOptOut.get() ? "<white>opted out" : "<white>opted in")).onMouseClick(() -> {
 			UUID playerUuid = getPlayer().getUniqueId();
 			CosmeticsManager cosmeticsManager = CosmeticsManager.getInstance();
 			long currentTime = System.currentTimeMillis();

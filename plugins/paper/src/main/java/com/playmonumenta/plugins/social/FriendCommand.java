@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.social;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.TABIntegration;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
@@ -24,6 +26,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import static com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS;
@@ -77,12 +80,26 @@ public class FriendCommand {
 							return CompletableFuture.completedFuture(new String[0]);
 						}
 
-						return SocialManager.getFriends(sender.getUniqueId()).thenApply(friends ->
-							friends.stream()
+						UUID senderUuid = sender.getUniqueId();
+
+						// Load the sender's social cache from memory or from Redis
+						return SocialManager.loadSocialCaches(senderUuid).thenApply(socialCaches -> {
+							if (socialCaches == null) {
+								return new String[0];
+							}
+
+							PlayerSocialCache senderCache = socialCaches.get(senderUuid);
+
+							// This shouldn't occur if loadSocialCaches didn't return null
+							if (senderCache == null) {
+								return new String[0];
+							}
+
+							return senderCache.getFriends().stream()
 								.map(SocialManager::resolveName)
 								.filter(Objects::nonNull)
-								.toArray(String[]::new)
-						);
+								.toArray(String[]::new);
+						});
 					}))
 				)
 				.executesPlayer((sender, args) -> {
@@ -96,7 +113,7 @@ public class FriendCommand {
 					String senderName = sender.getName();
 					UUID senderUuid = sender.getUniqueId();
 
-					SocialManager.getSocialInfo(senderUuid).thenCompose(SocialManager.SocialInfo::populateNamesAndHeads).whenComplete((senderSocialInfo, throwable) -> {
+					SocialManager.getSocialDisplayInfo(senderUuid).whenCompleteAsync((senderSocialDisplayInfo, throwable) -> {
 						if (throwable != null) {
 							MMLog.severe("Caught exception trying to list friends for player " + senderName + " : " + throwable.getMessage());
 							sender.sendMessage(Component.text("An error occurred while trying to list friends. Please report this: " + throwable.getMessage(), NamedTextColor.RED));
@@ -104,8 +121,8 @@ public class FriendCommand {
 							return;
 						}
 
-						new FriendListGui(sender, senderName, senderUuid, senderSocialInfo).open();
-					});
+						new FriendListGui(sender, senderName, senderUuid, senderSocialDisplayInfo).open();
+					}, runnable -> Bukkit.getScheduler().runTask(Plugin.getInstance(), runnable));
 				})
 			)
 
@@ -160,12 +177,24 @@ public class FriendCommand {
 								return CompletableFuture.completedFuture(new String[0]);
 							}
 
-							return SocialManager.getFriends(playerOneUuid).thenApply(friends ->
-								friends.stream()
+							// Load player one's social cache from memory or from Redis
+							return SocialManager.loadSocialCaches(playerOneUuid).thenApply(socialCaches -> {
+								if (socialCaches == null) {
+									return new String[0];
+								}
+
+								PlayerSocialCache playerOneCache = socialCaches.get(playerOneUuid);
+
+								// This shouldn't occur if loadSocialCaches didn't return null
+								if (playerOneCache == null) {
+									return new String[0];
+								}
+
+								return playerOneCache.getFriends().stream()
 									.map(SocialManager::resolveName)
 									.filter(Objects::nonNull)
-									.toArray(String[]::new)
-							);
+									.toArray(String[]::new);
+							});
 						}))
 				)
 				.executesPlayer((moderator, args) -> {
@@ -192,7 +221,7 @@ public class FriendCommand {
 					String playerName = (String) args.get("player");
 					UUID playerUuid = StringUtils.getUuidFromInput(playerName);
 
-					SocialManager.getSocialInfo(playerUuid).thenCompose(SocialManager.SocialInfo::populateNamesAndHeads).whenComplete((playerSocialInfo, throwable) -> {
+					SocialManager.getSocialDisplayInfo(playerUuid).whenCompleteAsync((playerSocialDisplayInfo, throwable) -> {
 						if (throwable != null) {
 							MMLog.severe("Caught exception trying to list friends for player " + playerName + " : " + throwable.getMessage());
 							moderator.sendMessage(Component.text("An error occurred while trying to list friends. Please report this: " + throwable.getMessage(), NamedTextColor.RED));
@@ -200,8 +229,8 @@ public class FriendCommand {
 							return;
 						}
 
-						new FriendListGui(moderator, playerName, playerUuid, playerSocialInfo).open();
-					});
+						new FriendListGui(moderator, playerName, playerUuid, playerSocialDisplayInfo).open();
+					}, runnable -> Bukkit.getScheduler().runTask(Plugin.getInstance(), runnable));
 				})
 			)
 
@@ -238,8 +267,24 @@ public class FriendCommand {
 						return;
 					}
 
-					SocialManager.areFriends(playerOneUuid, playerTwoUuid).thenAccept(areFriends -> {
-						if (areFriends) {
+					// Load player one's social cache from memory or from Redis
+					SocialManager.loadSocialCaches(playerOneUuid).thenAccept(socialCaches -> {
+						if (socialCaches == null) {
+							moderator.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
+							MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerOneUuid + ". Is Redis down?");
+							return;
+						}
+
+						PlayerSocialCache playerOneCache = socialCaches.get(playerOneUuid);
+
+						// This shouldn't occur if loadSocialCaches didn't return null
+						if (playerOneCache == null) {
+							moderator.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
+							MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerOneUuid + ". Is Redis down?");
+							return;
+						}
+
+						if (playerOneCache.isFriendsWith(playerTwoUuid)) {
 							moderator.sendMessage(SocialManager.appendPrefix(Component.text(playerOneName + " and " + playerTwoName + " are friends.", NamedTextColor.GREEN)));
 						} else {
 							moderator.sendMessage(SocialManager.appendPrefix(Component.text(playerOneName + " and " + playerTwoName + " are not friends.", NamedTextColor.RED)));
@@ -256,24 +301,45 @@ public class FriendCommand {
 		final boolean isSelf = commandSender.getUniqueId().equals(playerUuid);
 		final boolean commandSenderCanSeeVanished = commandSender.hasPermission("group.devops");
 
-		SocialManager.getFriends(playerUuid).thenAccept(listOfFriends -> {
-			if (listOfFriends.isEmpty()) {
+		// Load the sender's social cache from memory or from Redis
+		SocialManager.loadSocialCaches(playerUuid).thenAccept(socialCaches -> {
+			if (socialCaches == null) {
+				commandSender.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED)));
+				MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?");
+				return;
+			}
+
+			// Fetch the sender's social cache
+			PlayerSocialCache playerCache = socialCaches.get(playerUuid);
+
+			// This shouldn't occur if loadSocialCaches didn't return null
+			if (playerCache == null) {
+				commandSender.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED)));
+				MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?");
+				return;
+			}
+
+			Set<UUID> friendSet = playerCache.getFriends();
+			if (friendSet.isEmpty()) {
 				commandSender.sendMessage(SocialManager.appendPrefix(Component.text((isSelf ? "You have " : SocialManager.resolveName(playerUuid) + " has ") + "no friends added.", NamedTextColor.RED)));
 				return;
 			}
 
+			List<UUID> friends = new ArrayList<>(friendSet);
 			List<UUID> onlineFriends = new ArrayList<>();
 			List<UUID> offlineFriends = new ArrayList<>();
 			Map<UUID, String> friendNames = new HashMap<>();
 
-			for (UUID friendUuid : listOfFriends) {
+			// Parse each friend to be sorted to display as either online or offline
+			for (UUID friendUuid : friends) {
 				String friendName = SocialManager.resolveName(friendUuid);
 				friendNames.put(friendUuid, friendName);
-				TABIntegration.MonumentaPlayer monuPlayer = TABIntegration.mPlayers.get(friendUuid);
 
+				TABIntegration.MonumentaPlayer monuPlayer = TABIntegration.mPlayers.get(friendUuid);
 				boolean isOnline = monuPlayer != null && !monuPlayer.getShardId().isEmpty();
 				boolean isVanished = monuPlayer != null && monuPlayer.mIsHidden;
 
+				// Show a vanished friend as online only if the command sender has permission to see vanished players
 				if (isOnline && (!isVanished || commandSenderCanSeeVanished)) {
 					onlineFriends.add(friendUuid);
 				} else {
@@ -281,9 +347,11 @@ public class FriendCommand {
 				}
 			}
 
+			// Sort online and offline friends by alphabetical order
 			onlineFriends.sort(Comparator.comparing(friendNames::get, String.CASE_INSENSITIVE_ORDER));
 			offlineFriends.sort(Comparator.comparing(friendNames::get, String.CASE_INSENSITIVE_ORDER));
 
+			// Display online friends first before offline friends
 			List<UUID> sortedFriends = new ArrayList<>();
 			sortedFriends.addAll(onlineFriends);
 			sortedFriends.addAll(offlineFriends);
@@ -311,9 +379,10 @@ public class FriendCommand {
 				String friendName = friendNames.get(friendUuid);
 				String shardInfo = " (offline)";
 				TextColor shardColor = NamedTextColor.RED;
-				TABIntegration.MonumentaPlayer monuPlayer = TABIntegration.mPlayers.get(friendUuid);
 
+				TABIntegration.MonumentaPlayer monuPlayer = TABIntegration.mPlayers.get(friendUuid);
 				if (monuPlayer != null && !monuPlayer.getShardId().isEmpty()) {
+					// Show a vanished friend's shard only if the command sender can see vanished players
 					if (monuPlayer.mIsHidden && commandSenderCanSeeVanished) {
 						shardInfo = " (vanished: " + monuPlayer.getShardId() + ")";
 						shardColor = NamedTextColor.GRAY;

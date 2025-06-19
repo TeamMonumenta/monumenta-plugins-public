@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.social;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -10,6 +11,7 @@ import dev.jorel.commandapi.arguments.StringArgument;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
@@ -18,6 +20,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import static com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS;
@@ -65,12 +68,26 @@ public class BlockCommand {
 							return CompletableFuture.completedFuture(new String[0]);
 						}
 
-						return SocialManager.getBlockedPlayers(sender.getUniqueId()).thenApply(blockedPlayers ->
-							blockedPlayers.stream()
+						UUID senderUuid = sender.getUniqueId();
+
+						// Load the sender's social cache from memory or from Redis
+						return SocialManager.loadSocialCaches(senderUuid).thenApply(socialCaches -> {
+							if (socialCaches == null) {
+								return new String[0];
+							}
+
+							PlayerSocialCache senderCache = socialCaches.get(senderUuid);
+
+							// This shouldn't occur if loadSocialCaches didn't return null
+							if (senderCache == null) {
+								return new String[0];
+							}
+
+							return senderCache.getBlockedPlayers().stream()
 								.map(SocialManager::resolveName)
 								.filter(Objects::nonNull)
-								.toArray(String[]::new)
-						);
+								.toArray(String[]::new);
+						});
 					}))
 				)
 				.executesPlayer((sender, args) -> {
@@ -84,7 +101,7 @@ public class BlockCommand {
 					String senderName = sender.getName();
 					UUID senderUuid = sender.getUniqueId();
 
-					SocialManager.getSocialInfo(senderUuid).thenCompose(SocialManager.SocialInfo::populateNamesAndHeads).whenComplete((senderSocialInfo, throwable) -> {
+					SocialManager.getSocialDisplayInfo(senderUuid).whenCompleteAsync((senderSocialDisplayInfo, throwable) -> {
 						if (throwable != null) {
 							MMLog.severe("Caught exception trying to list blocked players for player " + senderName + " : " + throwable.getMessage());
 							sender.sendMessage(Component.text("An error occurred while trying to list blocked players. Please report this: " + throwable.getMessage(), NamedTextColor.RED));
@@ -92,8 +109,8 @@ public class BlockCommand {
 							return;
 						}
 
-						new BlockedPlayersGui(sender, senderName, senderUuid, senderSocialInfo).open();
-					});
+						new BlockListGui(sender, senderName, senderUuid, senderSocialDisplayInfo).open();
+					}, runnable -> Bukkit.getScheduler().runTask(Plugin.getInstance(), runnable));
 				})
 			)
 
@@ -122,7 +139,7 @@ public class BlockCommand {
 					String playerName = (String) args.get("player");
 					UUID playerUuid = StringUtils.getUuidFromInput(playerName);
 
-					SocialManager.getSocialInfo(playerUuid).thenCompose(SocialManager.SocialInfo::populateNamesAndHeads).whenComplete((playerSocialInfo, throwable) -> {
+					SocialManager.getSocialDisplayInfo(playerUuid).whenCompleteAsync((playerSocialDisplayInfo, throwable) -> {
 						if (throwable != null) {
 							MMLog.severe("Caught exception trying to list blocked players for player " + playerName + " : " + throwable.getMessage());
 							moderator.sendMessage(Component.text("An error occurred while trying to list blocked players. Please report this: " + throwable.getMessage(), NamedTextColor.RED));
@@ -130,8 +147,8 @@ public class BlockCommand {
 							return;
 						}
 
-						new BlockedPlayersGui(moderator, playerName, playerUuid, playerSocialInfo).open();
-					});
+						new BlockListGui(moderator, playerName, playerUuid, playerSocialDisplayInfo).open();
+					}, runnable -> Bukkit.getScheduler().runTask(Plugin.getInstance(), runnable));
 				})
 			)
 
@@ -168,8 +185,24 @@ public class BlockCommand {
 						return;
 					}
 
-					SocialManager.hasPlayerBlocked(playerOneUuid, playerTwoUuid).thenAccept(isBlocked -> {
-						if (isBlocked) {
+					// Load player one's social cache from memory or from Redis
+					SocialManager.loadSocialCaches(playerOneUuid).thenAccept(socialCaches -> {
+						if (socialCaches == null) {
+							moderator.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
+							MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerOneUuid + ". Is Redis down?");
+							return;
+						}
+
+						PlayerSocialCache playerOneCache = socialCaches.get(playerOneUuid);
+
+						// This shouldn't occur if loadSocialCaches didn't return null
+						if (playerOneCache == null) {
+							moderator.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
+							MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerOneUuid + ". Is Redis down?");
+							return;
+						}
+
+						if (playerOneCache.hasBlocked(playerTwoUuid)) {
 							moderator.sendMessage(SocialManager.appendPrefix(Component.text(playerOneName + " has " + playerTwoName + " blocked.", NamedTextColor.GREEN)));
 						} else {
 							moderator.sendMessage(SocialManager.appendPrefix(Component.text(playerOneName + " does not have " + playerTwoName + " blocked.", NamedTextColor.RED)));
@@ -185,13 +218,32 @@ public class BlockCommand {
 	private static void listRaw(Player commandSender, String playerName, UUID playerUuid, int requestedPage) {
 		final boolean isSelf = commandSender.getUniqueId().equals(playerUuid);
 
-		SocialManager.getBlockedPlayers(playerUuid).thenAccept(listOfBlockedPlayers -> {
-			if (listOfBlockedPlayers.isEmpty()) {
+		// Load the sender's social cache from memory or from Redis
+		SocialManager.loadSocialCaches(playerUuid).thenAccept(socialCaches -> {
+			if (socialCaches == null) {
+				commandSender.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED)));
+				MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?");
+				return;
+			}
+
+			// Fetch the sender's social cache
+			PlayerSocialCache playerCache = socialCaches.get(playerUuid);
+
+			// This shouldn't occur if loadSocialCaches didn't return null
+			if (playerCache == null) {
+				commandSender.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED)));
+				MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?");
+				return;
+			}
+
+			Set<UUID> blockedSet = playerCache.getBlockedPlayers();
+			if (blockedSet.isEmpty()) {
 				commandSender.sendMessage(SocialManager.appendPrefix(Component.text((isSelf ? "You have " : SocialManager.resolveName(playerUuid) + " has ") + "no one blocked.", NamedTextColor.RED)));
 				return;
 			}
 
-			List<String> blockedNames = listOfBlockedPlayers.stream()
+			// Sort blocked players by alphabetical order
+			List<String> blockedNames = blockedSet.stream()
 				.map(SocialManager::resolveName)
 				.sorted(String.CASE_INSENSITIVE_ORDER)
 				.toList();

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.social;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.gson.JsonObject;
 import com.playmonumenta.networkchat.RemotePlayerListener;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
@@ -9,21 +8,15 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.listeners.AuditListener;
-import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.redissync.RedisAPI;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,16 +26,12 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,351 +39,140 @@ import org.jetbrains.annotations.Nullable;
 public class SocialManager implements Listener {
 	//region <DECLARATIONS>
 	// General
-	private static final String AUDIT_LOG_PREFIX = "[Social Manager] ";
-	private static final Map<UUID, PlayerSocialData> SOCIAL_DATA_MAP = new ConcurrentHashMap<>();
+	static final String LOG_PREFIX = "[Social Manager] ";
+	private static final Map<UUID, PlayerSocialCache> SOCIAL_CACHE_MAP = new ConcurrentHashMap<>();
 
 	// Friends
-	private static final String REDIS_SOCIAL_TYPE_FRIEND = "listOfFriends";
-	private static final String FRIEND_KEY = "friendsWith|";
-	private static final String REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST = "listOfPendingFriendRequests";
-	private static final String PENDING_FRIEND_REQUEST_KEY = "pendingFriendRequestFrom|";
+	static final String REDIS_SOCIAL_TYPE_FRIEND = "friends";
+	static final String REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST = "pendingFriendRequests";
 	private static final long FRIEND_REQUEST_EXPIRATION_TIME = 600; // 10 minutes
-	private static final Map<String, BukkitTask> PENDING_FRIEND_REQUESTS = new ConcurrentHashMap<>();
+	private static final Map<String, BukkitTask> PENDING_FRIEND_REQUESTS_MAP = new ConcurrentHashMap<>();
+	private static final Map<String, CompletableFuture<Void>> PENDING_FRIEND_REMOVALS_MAP = new ConcurrentHashMap<>();
 
 	// Blocking
-	private static final String REDIS_SOCIAL_TYPE_BLOCKED = "listOfBlockedPlayers";
-	private static final String BLOCKED_KEY = "hasBlocked|";
+	static final String REDIS_SOCIAL_TYPE_BLOCKED = "blocked";
 	private static final String BLOCK_EXEMPTION_PERMISSION = "monumenta.social.blockexemption";
+	private static final Map<String, CompletableFuture<Void>> PENDING_UNBLOCKS_MAP = new ConcurrentHashMap<>();
 
 	// RabbitMQ channels
-	private static final String INCOMING_FRIEND_REQUEST_NOTIFICATION_CHANNEL = "incomingFriendRequestNotificationChannel";
-	private static final String FRIEND_REQUEST_EXPIRATION_NOTIFICATION_CHANNEL = "friendRequestExpirationNotificationChannel";
-	private static final String FRIEND_REQUEST_ACCEPTED_NOTIFICATION_CHANNEL = "friendRequestAcceptedNotificationChannel";
-	private static final String MODERATOR_FORCE_ADDED_FRIENDS_NOTIFICATION_CHANNEL = "moderatorForceAddedFriendsNotificationChannel";
-	private static final String REMOVED_FRIEND_NOTIFICATION_CHANNEL = "removedFriendNotificationChannel";
-	private static final String MODERATOR_FORCE_REMOVED_FRIENDS_NOTIFICATION_CHANNEL = "moderatorForceRemovedFriendsNotificationChannel";
+	private static final String INCOMING_FRIEND_REQUEST_CHANNEL = "incomingFriendRequestChannel";
+	private static final String FRIEND_REQUEST_EXPIRATION_CHANNEL = "friendRequestExpirationChannel";
+	private static final String ADDED_FRIEND_CHANNEL = "addedFriendChannel";
+	private static final String MODERATOR_FORCE_ADDED_FRIENDS_CHANNEL = "moderatorForceAddedFriendsChannel";
+	private static final String REMOVED_FRIEND_CHANNEL = "removedFriendChannel";
+	private static final String MODERATOR_FORCE_REMOVED_FRIENDS_CHANNEL = "moderatorForceRemovedFriendsChannel";
+	private static final String BLOCKED_PLAYER_CHANNEL = "blockedPlayerChannel";
+	private static final String UNBLOCKED_PLAYER_CHANNEL = "unblockedPlayerChannel";
 	//endregion
-
-	//region <HELPER FUNCTIONS>
-	static Component appendPrefix(Component message) {
-		Component prefix = Component.empty().append(Component.text("Social > ", NamedTextColor.GOLD));
-
-		return prefix.append(message);
-	}
-
-	static Component appendHeaderAndFooter(Component message) {
-		Component header = Component.empty().append(Component.text("-----------------------------------------------------", NamedTextColor.BLUE, TextDecoration.STRIKETHROUGH));
-		Component body = Component.empty().append(message);
-		Component footer = Component.empty().append(Component.text("-----------------------------------------------------", NamedTextColor.BLUE, TextDecoration.STRIKETHROUGH));
-
-		return
-			header.append(Component.newline())
-				.append(body).append(Component.newline())
-				.append(footer);
-	}
-
-	static String resolveName(UUID uuid) {
-		String cachedName = MonumentaRedisSyncIntegration.cachedUuidToName(uuid);
-		return cachedName != null ? cachedName : String.valueOf(uuid);
-	}
-
-	private static String formatTimestamp(String isoTimestamp) {
-		try {
-			Instant instant = Instant.parse(isoTimestamp);
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy").withZone(ZoneId.systemDefault());
-			return formatter.format(instant);
-		} catch (DateTimeParseException e) {
-			return "Unknown Date";
-		}
-	}
-
-	private static String getRedisPath(String socialType, UUID uuid) {
-		return "socialData:" + socialType + ":" + uuid;
-	}
-
-	private static void broadcastNotification(String channel, Map<String, String> jsonProperties, String logMessage) {
-		JsonObject jsonObject = new JsonObject();
-
-		for (Map.Entry<String, String> entry : jsonProperties.entrySet()) {
-			jsonObject.addProperty(entry.getKey(), entry.getValue());
-		}
-
-		try {
-			NetworkRelayAPI.sendBroadcastMessage(channel, jsonObject);
-		} catch (Exception exception) {
-			MMLog.warning(logMessage);
-		}
-	}
-	//endregion
-
-	public static class SocialInfo {
-		public static class Friend {
-			final UUID mFriendUuid;
-			final String mFriendTimestamp;
-			@Nullable String mFriendName = null;
-			@Nullable PlayerProfile mFriendProfile = null;
-			@Nullable ItemStack mFriendHead = null;
-
-			Friend(UUID friendUuid, String friendTimestamp) {
-				mFriendUuid = friendUuid;
-				mFriendTimestamp = friendTimestamp;
-			}
-		}
-
-		public static class BlockedPlayer {
-			final UUID mBlockedUuid;
-			final String mBlockedTimestamp;
-			@Nullable String mBlockedName = null;
-			@Nullable PlayerProfile mBlockedProfile = null;
-			@Nullable ItemStack mBlockedHead = null;
-
-			BlockedPlayer(UUID blockedUuid, String blockedTimestamp) {
-				mBlockedUuid = blockedUuid;
-				mBlockedTimestamp = blockedTimestamp;
-			}
-		}
-
-		// UUID of the player
-		final UUID mPlayerUuid;
-
-		// Map of the player's friends
-		final Map<UUID, Friend> mFriendMap;
-
-		// Map of the player's blocked users
-		final Map<UUID, BlockedPlayer> mBlockedMap;
-
-		protected SocialInfo(UUID playerUuid, Map<UUID, Friend> friendMap, Map<UUID, BlockedPlayer> blockedMap) {
-			mPlayerUuid = playerUuid;
-			mFriendMap = friendMap;
-			mBlockedMap = blockedMap;
-		}
-
-		// Call this to fetch player names and heads
-		CompletableFuture<SocialInfo> populateNamesAndHeads() {
-			CompletableFuture<SocialInfo> future = new CompletableFuture<>();
-
-			// Populate all the names and profiles on the main thread
-			for (Map.Entry<UUID, Friend> entry : mFriendMap.entrySet()) {
-				UUID uuid = entry.getKey();
-				Friend friend = entry.getValue();
-				friend.mFriendName = MonumentaRedisSyncIntegration.cachedUuidToName(uuid);
-				friend.mFriendProfile = Bukkit.getServer().createProfile(uuid);
-			}
-
-			for (Map.Entry<UUID, BlockedPlayer> entry : mBlockedMap.entrySet()) {
-				UUID uuid = entry.getKey();
-				BlockedPlayer blockedPlayer = entry.getValue();
-				blockedPlayer.mBlockedName = MonumentaRedisSyncIntegration.cachedUuidToName(uuid);
-				blockedPlayer.mBlockedProfile = Bukkit.getServer().createProfile(uuid);
-			}
-
-			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-				// Complete all the profiles asynchronously
-				for (Map.Entry<UUID, Friend> entry : mFriendMap.entrySet()) {
-					PlayerProfile playerProfile = entry.getValue().mFriendProfile;
-
-					if (playerProfile != null) {
-						playerProfile.complete();
-					}
-				}
-
-				for (Map.Entry<UUID, BlockedPlayer> entry : mBlockedMap.entrySet()) {
-					PlayerProfile playerProfile = entry.getValue().mBlockedProfile;
-
-					if (playerProfile != null) {
-						playerProfile.complete();
-					}
-				}
-
-				// Switch back to the main thread to finish assembling all the heads
-				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-					for (Map.Entry<UUID, Friend> entry : mFriendMap.entrySet()) {
-						Friend friend = entry.getValue();
-
-						ItemStack friendHead = new ItemStack(Material.PLAYER_HEAD, 1);
-						SkullMeta skullMeta = (SkullMeta) friendHead.getItemMeta();
-						skullMeta.setPlayerProfile(friend.mFriendProfile);
-						skullMeta.displayName(Component.text(friend.mFriendName, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-						List<Component> loreBuilder = new ArrayList<>();
-						loreBuilder.add(Component.text("Friends since:", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false));
-						loreBuilder.add(Component.text(formatTimestamp(friend.mFriendTimestamp), NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false));
-						skullMeta.lore(loreBuilder);
-						skullMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-						friendHead.setItemMeta(skullMeta);
-
-						friend.mFriendHead = friendHead;
-					}
-
-					for (Map.Entry<UUID, BlockedPlayer> entry : mBlockedMap.entrySet()) {
-						BlockedPlayer blockedPlayer = entry.getValue();
-
-						ItemStack blockedHead = new ItemStack(Material.PLAYER_HEAD, 1);
-						SkullMeta skullMeta = (SkullMeta) blockedHead.getItemMeta();
-						skullMeta.setPlayerProfile(blockedPlayer.mBlockedProfile);
-						skullMeta.displayName(Component.text(blockedPlayer.mBlockedName, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-						List<Component> loreBuilder = new ArrayList<>();
-						loreBuilder.add(Component.text("Blocked since:", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false));
-						loreBuilder.add(Component.text(formatTimestamp(blockedPlayer.mBlockedTimestamp), NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false));
-						skullMeta.lore(loreBuilder);
-						skullMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-						blockedHead.setItemMeta(skullMeta);
-
-						blockedPlayer.mBlockedHead = blockedHead;
-					}
-
-					// Complete the future on the main thread
-					future.complete(this);
-				});
-			});
-
-			return future;
-		}
-	}
-
-	public static class PlayerSocialData {
-		private final UUID mPlayerUuid;
-		private final Set<UUID> mFriends = ConcurrentHashMap.newKeySet();
-
-		public PlayerSocialData(UUID playerUuid) {
-			mPlayerUuid = playerUuid;
-			loadFriends();
-		}
-
-		public UUID getPlayerUuid() {
-			return mPlayerUuid;
-		}
-
-		public Set<UUID> getFriends() {
-			return mFriends;
-		}
-
-		public void addFriend(UUID friendUuid) {
-			String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
-			mFriends.add(friendUuid);
-			RedisAPI.getInstance().async().hset(
-				getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, mPlayerUuid),
-				FRIEND_KEY + friendUuid,
-				friendUuid.toString() + "|" + timestamp
-			);
-		}
-
-		public void removeFriend(UUID friendUuid) {
-			mFriends.remove(friendUuid);
-			RedisAPI.getInstance().async().hdel(
-				getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, mPlayerUuid),
-				FRIEND_KEY + friendUuid
-			);
-		}
-
-		private void loadFriends() {
-			RedisAPI.getInstance().async().hgetall(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, mPlayerUuid)).thenAccept(friends -> {
-				friends.forEach((key, value) -> {
-					UUID friendUuid = UUID.fromString(value.split("\\|")[0]);
-					mFriends.add(friendUuid);
-				});
-			});
-		}
-	}
 
 	//region <FRIENDS>
 	static void sendFriendRequest(UUID senderUuid, UUID receiverUuid) {
 		Player sender = Bukkit.getPlayer(senderUuid);
 
-		// Prevent players from adding themselves
-		if (senderUuid.equals(receiverUuid)) {
-			if (sender != null) {
-				sender.sendMessage(appendPrefix(Component.text("You cannot add yourself as a friend!", NamedTextColor.RED)));
-			}
-			return;
-		}
-
-		// Check if the sender and the receiver are already friends
-		areFriends(senderUuid, receiverUuid).thenAccept(alreadyFriends -> {
-			if (alreadyFriends) {
+		// Load the sender's and the receiver's social cache from memory or from Redis
+		loadSocialCaches(senderUuid, receiverUuid).thenAccept(socialCaches -> {
+			if (socialCaches == null) {
 				if (sender != null) {
-					sender.sendMessage(appendPrefix(Component.text("You are already friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
+					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED)));
+				}
+
+				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
+				return;
+			}
+
+			// Fetch the sender's and the receiver's social cache
+			PlayerSocialCache senderCache = socialCaches.get(senderUuid);
+			PlayerSocialCache receiverCache = socialCaches.get(receiverUuid);
+
+			// This shouldn't occur if loadSocialCaches didn't return null
+			if (senderCache == null || receiverCache == null) {
+				if (sender != null) {
+					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED)));
+				}
+
+				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
+				return;
+			}
+
+			// Perform checks to see if the sender can be friends with the receiver
+			PlayerSocialCache.FriendshipCheckResult result = senderCache.canBecomeFriendsWith(receiverCache);
+
+			if (result != PlayerSocialCache.FriendshipCheckResult.OK) {
+				Component errorMessage = switch (result) {
+					case SELF -> Component.text("You cannot add yourself as a friend!", NamedTextColor.RED);
+					case ALREADY_FRIENDS ->
+						Component.text("You are already friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED);
+					default ->
+						Component.text("You cannot add " + resolveName(receiverUuid) + " as a friend!", NamedTextColor.RED);
+				};
+
+				if (sender != null) {
+					sender.sendMessage(appendPrefix(errorMessage));
+				}
+
+				return;
+			}
+
+			// Check if the sender already has a pending friend request from the receiver
+			if (senderCache.getPendingFriendRequests().containsKey(receiverUuid)) {
+				// Automatically accept the request if there is one pending
+				addFriend(null, senderUuid, receiverUuid);
+				return;
+			}
+
+			// Check if the receiver already has a pending friend request from the sender
+			if (receiverCache.getPendingFriendRequests().containsKey(senderUuid)) {
+				if (sender != null) {
+					sender.sendMessage(appendPrefix(Component.text("You have already sent a friend request to " + resolveName(receiverUuid) + "!", NamedTextColor.YELLOW)));
 				}
 				return;
 			}
 
-			// Check if either player has blocked the other
-			CompletableFuture<Boolean> senderBlockedReceiver = hasPlayerBlocked(senderUuid, receiverUuid);
-			CompletableFuture<Boolean> receiverBlockedSender = hasPlayerBlocked(receiverUuid, senderUuid);
+			// Calculate the expiration time in seconds from now
+			long expirationTime = System.currentTimeMillis() / 1000 + FRIEND_REQUEST_EXPIRATION_TIME;
 
-			CompletableFuture.allOf(senderBlockedReceiver, receiverBlockedSender).thenRun(() -> {
-				if (senderBlockedReceiver.join() || receiverBlockedSender.join()) {
+			// Send the pending friend request to the receiver in Redis
+			RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString(), String.valueOf(expirationTime)).thenAccept(success -> {
+				if (!success) {
 					if (sender != null) {
-						sender.sendMessage(appendPrefix(Component.text("You cannot send a friend request to " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
+						sender.sendMessage(appendPrefix(Component.text("An error occurred while sending your friend request. Please report this as a bug if this keeps happening.", NamedTextColor.RED)));
 					}
 					return;
 				}
 
-				// Check if the sender already has a pending request from the receiver
-				RedisAPI.getInstance().async().hget(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, senderUuid), PENDING_FRIEND_REQUEST_KEY + receiverUuid).thenAccept(existingRequest -> {
-					if (existingRequest != null) {
-						// Automatically accept the request if there is one pending
-						addFriend(null, senderUuid, receiverUuid);
-						return;
-					}
+				// Notify the sender about the pending friend request
+				if (sender != null) {
+					sender.sendMessage(appendPrefix(Component.text("You have sent a friend request to " + resolveName(receiverUuid) + "! They have " + FRIEND_REQUEST_EXPIRATION_TIME / 60L + " minutes to accept before it expires.", NamedTextColor.YELLOW)));
+				}
 
-					// Check if the receiver already has a pending request from the sender
-					RedisAPI.getInstance().async().hget(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), PENDING_FRIEND_REQUEST_KEY + senderUuid).thenAccept(pendingStatus -> {
-						if (pendingStatus != null) {
-							if (sender != null) {
-								sender.sendMessage(appendPrefix(Component.text("You have already sent a friend request to " + resolveName(receiverUuid) + "!", NamedTextColor.YELLOW)));
-							}
-							return;
-						}
-
-						// Send and store the pending request with an expiration time
-						long expirationTime = System.currentTimeMillis() / 1000 + FRIEND_REQUEST_EXPIRATION_TIME;
-						RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), PENDING_FRIEND_REQUEST_KEY + senderUuid, String.valueOf(expirationTime)).thenAccept(success -> {
-							if (!success) {
-								if (sender != null) {
-									sender.sendMessage(appendPrefix(Component.text("An error occurred while sending your friend request. Please report this as a bug if this keeps happening.", NamedTextColor.RED)));
-								}
-								return;
-							}
-
-							// Notify the sender about the pending request
-							if (sender != null) {
-								sender.sendMessage(appendPrefix(Component.text("You have sent a friend request to " + resolveName(receiverUuid) + "! They have " + FRIEND_REQUEST_EXPIRATION_TIME / 60L + " minutes to accept before it expires.", NamedTextColor.YELLOW)));
-							}
-
-							// Notify the receiver about the pending request via RabbitMQ
-							Map<String, String> jsonProperties = Map.of(
-								"senderUuid", String.valueOf(senderUuid),
-								"receiverUuid", String.valueOf(receiverUuid)
-							);
-							broadcastNotification(INCOMING_FRIEND_REQUEST_NOTIFICATION_CHANNEL, jsonProperties, "Failed to notify other shards of an incoming friend request via RabbitMQ.");
-
-							// Schedule the request expiration task
-							BukkitTask expirationTask = Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> expireFriendRequest(senderUuid, receiverUuid), FRIEND_REQUEST_EXPIRATION_TIME * 20L);
-
-							// Add the request expiration task to the map for possible cancellation
-							PENDING_FRIEND_REQUESTS.put(senderUuid + "_" + receiverUuid, expirationTask);
-						});
-					});
-				});
+				// Broadcast to all shards via RabbitMQ to
+				// add the pending friend request in memory,
+				// to notify the receiver about the request,
+				// and to schedule the friend request expiration task
+				Map<String, String> jsonProperties = Map.of(
+					"senderUuid", senderUuid.toString(),
+					"receiverUuid", receiverUuid.toString(),
+					"expirationTime", String.valueOf(expirationTime)
+				);
+				broadcastNotification(INCOMING_FRIEND_REQUEST_CHANNEL, jsonProperties, "Failed to notify other shards of an incoming friend request via RabbitMQ.");
 			});
 		});
 	}
 
 	private static void expireFriendRequest(UUID senderUuid, UUID receiverUuid) {
-		RedisAPI.getInstance().async().hget(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), PENDING_FRIEND_REQUEST_KEY + senderUuid).thenAccept(storedTime -> {
+		RedisAPI.getInstance().async().hget(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString()).thenAccept(storedTime -> {
 			if (storedTime != null && Long.parseLong(storedTime) <= System.currentTimeMillis() / 1000) {
-				// Remove the pending request from the receiver
-				RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), PENDING_FRIEND_REQUEST_KEY + senderUuid);
+				// Remove the pending friend request from the receiver in Redis
+				RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString());
 
-				// Remove the request expiration task from the map
-				PENDING_FRIEND_REQUESTS.remove(senderUuid + "_" + receiverUuid);
-
-				// Notify the sender and the receiver about the request expiration via RabbitMQ
+				// Broadcast to all shards via RabbitMQ to
+				// discard the friend request expiration task
+				// and notify the sender and the receiver about the friend request expiration
 				Map<String, String> jsonProperties = Map.of(
-					"senderUuid", String.valueOf(senderUuid),
-					"receiverUuid", String.valueOf(receiverUuid)
+					"senderUuid", senderUuid.toString(),
+					"receiverUuid", receiverUuid.toString()
 				);
-				broadcastNotification(FRIEND_REQUEST_EXPIRATION_NOTIFICATION_CHANNEL, jsonProperties, "Failed to notify other shards of an expired friend request via RabbitMQ.");
+				broadcastNotification(FRIEND_REQUEST_EXPIRATION_CHANNEL, jsonProperties, "Failed to notify other shards of an expired friend request via RabbitMQ.");
 			}
 		});
 	}
@@ -402,145 +180,202 @@ public class SocialManager implements Listener {
 	static void addFriend(@Nullable Player moderator, UUID senderUuid, UUID receiverUuid) {
 		Player sender = Bukkit.getPlayer(senderUuid);
 
-		// Prevent a player from having themselves be added as a friend
-		if (senderUuid.equals(receiverUuid)) {
-			if (moderator != null) {
-				moderator.sendMessage(appendPrefix(Component.text("You cannot make a player be their own friend!", NamedTextColor.RED)));
-			} else {
-				if (sender != null) {
-					sender.sendMessage(appendPrefix(Component.text("You cannot add yourself as a friend!", NamedTextColor.RED)));
-				}
-			}
-			return;
-		}
+		// Load the sender's and the receiver's social cache from memory or from Redis
+		loadSocialCaches(senderUuid, receiverUuid).thenAccept(socialCaches -> {
+			if (socialCaches == null) {
+				Component errorMessage = Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED);
 
-		// Check if the sender and receiver are already friends
-		areFriends(senderUuid, receiverUuid).thenAccept(alreadyFriends -> {
-			if (alreadyFriends) {
 				if (moderator != null) {
-					moderator.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " is already friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
-				} else {
-					if (sender != null) {
-						sender.sendMessage(appendPrefix(Component.text("You are already friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
-					}
+					moderator.sendMessage(appendPrefix(errorMessage));
+				} else if (sender != null) {
+					sender.sendMessage(appendPrefix(errorMessage));
 				}
+
+				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
 				return;
 			}
 
-			// Check if either player has blocked the other
-			CompletableFuture<Boolean> senderBlockedReceiver = hasPlayerBlocked(senderUuid, receiverUuid);
-			CompletableFuture<Boolean> receiverBlockedSender = hasPlayerBlocked(receiverUuid, senderUuid);
+			// Fetch the sender's and the receiver's social cache
+			PlayerSocialCache senderCache = socialCaches.get(senderUuid);
+			PlayerSocialCache receiverCache = socialCaches.get(receiverUuid);
 
-			CompletableFuture.allOf(senderBlockedReceiver, receiverBlockedSender).thenRun(() -> {
-				if (senderBlockedReceiver.join() || receiverBlockedSender.join()) {
-					if (moderator != null) {
-						moderator.sendMessage(appendPrefix(Component.text("You cannot make these players be friends because one or both of them has the other player blocked!", NamedTextColor.RED)));
-					} else {
-						if (sender != null) {
-							sender.sendMessage(appendPrefix(Component.text("You cannot add " + resolveName(receiverUuid) + " as a friend!", NamedTextColor.RED)));
-						}
-					}
-					return;
-				}
+			// This shouldn't occur if loadSocialCaches didn't return null
+			if (senderCache == null || receiverCache == null) {
+				Component errorMessage = Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED);
 
-				// Cancel all pending friend request expiration tasks if applicable
-				BukkitTask expirationTaskOne = PENDING_FRIEND_REQUESTS.remove(senderUuid + "_" + receiverUuid);
-				if (expirationTaskOne != null) {
-					expirationTaskOne.cancel();
-				}
-
-				BukkitTask expirationTaskTwo = PENDING_FRIEND_REQUESTS.remove(receiverUuid + "_" + senderUuid);
-				if (expirationTaskTwo != null) {
-					expirationTaskTwo.cancel();
-				}
-
-				// Get the current timestamp
-				String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
-
-				// Set the sender and the receiver as friends with the current timestamp
-				CompletableFuture<Boolean> futureSender = RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, senderUuid), FRIEND_KEY + receiverUuid, receiverUuid + "|" + timestamp).toCompletableFuture();
-				CompletableFuture<Boolean> futureReceiver = RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, receiverUuid), FRIEND_KEY + senderUuid, senderUuid + "|" + timestamp).toCompletableFuture();
-
-				CompletableFuture.allOf(futureSender, futureReceiver).thenRun(() -> {
-					if (futureSender.join() && futureReceiver.join()) {
-						// Clean up all pending friend requests if applicable
-						RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, senderUuid), PENDING_FRIEND_REQUEST_KEY + receiverUuid);
-						RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), PENDING_FRIEND_REQUEST_KEY + senderUuid);
-
-						// Notify the sender and the receiver via RabbitMQ
-						Map<String, String> jsonProperties = Map.of(
-							"senderUuid", String.valueOf(senderUuid),
-							"receiverUuid", String.valueOf(receiverUuid)
-						);
-						broadcastNotification(FRIEND_REQUEST_ACCEPTED_NOTIFICATION_CHANNEL, jsonProperties, "Failed to notify other shards of an accepted friend request via RabbitMQ.");
-
-						if (moderator != null) {
-							UUID moderatorUuid = moderator.getUniqueId();
-
-							// Notify the sender and the receiver via RabbitMQ if a moderator forcefully designated them as friends or
-							// Notify the sender/receiver via RabbitMQ if a moderator forcefully added them as their friend
-							Map<String, String> moderatorJsonProperties = Map.of(
-								"moderatorUuid", String.valueOf(moderatorUuid),
-								"senderUuid", String.valueOf(senderUuid),
-								"receiverUuid", String.valueOf(receiverUuid)
-							);
-							broadcastNotification(MODERATOR_FORCE_ADDED_FRIENDS_NOTIFICATION_CHANNEL, moderatorJsonProperties, "Failed to notify other shards of a friendship formed by a moderator via RabbitMQ.");
-
-							moderator.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " are now friends with each other.", NamedTextColor.GREEN)));
-							AuditListener.log(AUDIT_LOG_PREFIX + moderator.getName() + " forcefully made " + resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " be friends.");
-						}
-					}
-				});
-			});
-		});
-	}
-
-	static void removeFriend(@Nullable Player moderator, UUID senderUuid, UUID receiverUuid) {
-		// Check if the sender and receiver are friends
-		areFriends(senderUuid, receiverUuid).thenAccept(areFriends -> {
-			if (!areFriends) {
 				if (moderator != null) {
-					moderator.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " is not friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
-				} else {
-					Player sender = Bukkit.getPlayer(senderUuid);
-					if (sender != null) {
-						sender.sendMessage(appendPrefix(Component.text("You are not friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
-					}
+					moderator.sendMessage(appendPrefix(errorMessage));
+				} else if (sender != null) {
+					sender.sendMessage(appendPrefix(errorMessage));
 				}
+
+				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
 				return;
 			}
 
-			// Remove the sender and the receiver as friends
-			CompletableFuture<Boolean> futureSender = RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, senderUuid), FRIEND_KEY + receiverUuid).thenApply((val) -> val == 1L).toCompletableFuture();
-			CompletableFuture<Boolean> futureReceiver = RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, receiverUuid), FRIEND_KEY + senderUuid).thenApply((val) -> val == 1L).toCompletableFuture();
+			// Perform checks to see if the sender can be friends with the receiver
+			PlayerSocialCache.FriendshipCheckResult result = senderCache.canBecomeFriendsWith(receiverCache);
 
-			CompletableFuture.allOf(futureSender, futureReceiver).thenRun(() -> {
-				if (futureSender.join() && futureReceiver.join()) {
-					// Notify the sender and receiver about friend removal via RabbitMQ
+			if (result != PlayerSocialCache.FriendshipCheckResult.OK) {
+				Component errorMessage = switch (result) {
+					case SELF -> moderator != null
+						? Component.text("You cannot make a player be their own friend!", NamedTextColor.RED)
+						: Component.text("You cannot add yourself as a friend!", NamedTextColor.RED);
+
+					case ALREADY_FRIENDS -> moderator != null
+						? Component.text(resolveName(senderUuid) + " is already friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)
+						: Component.text("You are already friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED);
+
+					case BLOCKED -> moderator != null
+						? Component.text("You cannot make these players be friends because one or both has the other blocked!", NamedTextColor.RED)
+						: Component.text("You cannot add " + resolveName(receiverUuid) + " as a friend!", NamedTextColor.RED);
+
+					default -> moderator != null
+						? Component.text("You cannot add " + resolveName(receiverUuid) + " as " + resolveName(senderUuid) + "'s friend!", NamedTextColor.RED)
+						: Component.text("You cannot add " + resolveName(receiverUuid) + " as a friend!", NamedTextColor.RED);
+				};
+
+				if (moderator != null) {
+					moderator.sendMessage(appendPrefix(errorMessage));
+				} else if (sender != null) {
+					sender.sendMessage(appendPrefix(errorMessage));
+				}
+
+				return;
+			}
+
+			// Fetch the current timestamp
+			String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
+
+			// Set the sender and the receiver as friends in Redis
+			CompletableFuture<Boolean> senderRedisFuture = RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, senderUuid), receiverUuid.toString(), timestamp).toCompletableFuture();
+			CompletableFuture<Boolean> receiverRedisFuture = RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, receiverUuid), senderUuid.toString(), timestamp).toCompletableFuture();
+
+			CompletableFuture.allOf(senderRedisFuture, receiverRedisFuture).thenRun(() -> {
+				if (senderRedisFuture.join() && receiverRedisFuture.join()) {
+					// Clean up the pending friend requests in Redis
+					RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, senderUuid), receiverUuid.toString());
+					RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString());
+
+					// Broadcast to all shards via RabbitMQ to
+					// set the sender and the receiver as friends in memory,
+					// clean up the pending friend requests in memory,
+					// cancel the friend request expiration task,
+					// and to notify them
 					Map<String, String> jsonProperties = Map.of(
-						"senderUuid", String.valueOf(senderUuid),
-						"receiverUuid", String.valueOf(receiverUuid)
+						"senderUuid", senderUuid.toString(),
+						"receiverUuid", receiverUuid.toString(),
+						"timestamp", timestamp
 					);
-					broadcastNotification(REMOVED_FRIEND_NOTIFICATION_CHANNEL, jsonProperties, "Failed to notify other shards of a friend being removed via RabbitMQ.");
+					broadcastNotification(ADDED_FRIEND_CHANNEL, jsonProperties, "Failed to notify other shards of a new friendship via RabbitMQ.");
 
 					if (moderator != null) {
 						UUID moderatorUuid = moderator.getUniqueId();
 
-						// Notify the sender and the receiver via RabbitMQ if a moderator forcefully removed them as friends
-						if (!moderatorUuid.equals(senderUuid) && !moderatorUuid.equals(receiverUuid)) {
-							Map<String, String> moderatorJsonProperties = Map.of(
-								"moderatorUuid", String.valueOf(moderatorUuid),
-								"senderUuid", String.valueOf(senderUuid),
-								"receiverUuid", String.valueOf(receiverUuid)
-							);
-							broadcastNotification(MODERATOR_FORCE_REMOVED_FRIENDS_NOTIFICATION_CHANNEL, moderatorJsonProperties, "Failed to notify other shards of a friendship ended by a moderator via RabbitMQ.");
+						// Notify the sender and the receiver via RabbitMQ if a moderator forcefully designated them as friends or
+						// notify the sender/receiver via RabbitMQ if a moderator forcefully added them as their friend
+						Map<String, String> moderatorJsonProperties = Map.of(
+							"moderatorUuid", moderatorUuid.toString(),
+							"senderUuid", senderUuid.toString(),
+							"receiverUuid", receiverUuid.toString(),
+							"timestamp", timestamp
+						);
+						broadcastNotification(MODERATOR_FORCE_ADDED_FRIENDS_CHANNEL, moderatorJsonProperties, "Failed to notify other shards of a new friendship formed by a moderator via RabbitMQ.");
 
-							moderator.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " are no longer friends with each other.", NamedTextColor.GREEN)));
-							AuditListener.log(AUDIT_LOG_PREFIX + moderator.getName() + " forcefully removed " + resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " as friends.");
-						}
+						moderator.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " are now friends.", NamedTextColor.GREEN)));
+						AuditListener.log(LOG_PREFIX + moderator.getName() + " forcefully made " + resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " be friends.");
 					}
 				}
 			});
+		});
+	}
+
+	static CompletableFuture<Void> removeFriend(@Nullable Player moderator, UUID senderUuid, UUID receiverUuid) {
+		Player sender = Bukkit.getPlayer(senderUuid);
+
+		// Load the sender's social cache from memory or from Redis
+		return loadSocialCaches(senderUuid).thenCompose(socialCaches -> {
+			if (socialCaches == null) {
+				Component errorMessage = Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED);
+
+				if (moderator != null) {
+					moderator.sendMessage(appendPrefix(errorMessage));
+				} else if (sender != null) {
+					sender.sendMessage(appendPrefix(errorMessage));
+				}
+
+				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?");
+				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?"));
+			}
+
+			// Fetch the sender's social cache
+			PlayerSocialCache senderCache = socialCaches.get(senderUuid);
+
+			// This shouldn't occur if loadSocialCaches didn't return null
+			if (senderCache == null) {
+				Component errorMessage = Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED);
+
+				if (moderator != null) {
+					moderator.sendMessage(appendPrefix(errorMessage));
+				} else if (sender != null) {
+					sender.sendMessage(appendPrefix(errorMessage));
+				}
+
+				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?");
+				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?"));
+			}
+
+			// Check if the sender and the receiver are friends
+			if (!senderCache.isFriendsWith(receiverUuid)) {
+				if (moderator != null) {
+					moderator.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " is not friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
+				} else if (sender != null) {
+					sender.sendMessage(appendPrefix(Component.text("You are not friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
+				}
+
+				return CompletableFuture.completedFuture(null);
+			}
+
+			// Remove the sender and the receiver as friends in Redis
+			CompletableFuture<Boolean> senderRedisFuture = RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, senderUuid), receiverUuid.toString()).thenApply(val -> val == 1L).toCompletableFuture();
+			CompletableFuture<Boolean> receiverRedisFuture = RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, receiverUuid), senderUuid.toString()).thenApply(val -> val == 1L).toCompletableFuture();
+
+			// Create a pending future for the friend removal operation to be completed by RabbitMQ confirmation
+			String friendKey = getSocialPairKey(senderUuid, receiverUuid);
+			CompletableFuture<Void> syncFuture = new CompletableFuture<>();
+			PENDING_FRIEND_REMOVALS_MAP.put(friendKey, syncFuture);
+
+			return CompletableFuture.allOf(senderRedisFuture, receiverRedisFuture).thenRun(() -> {
+				if (senderRedisFuture.join() && receiverRedisFuture.join()) {
+					if (moderator != null) {
+						UUID moderatorUuid = moderator.getUniqueId();
+
+						// Broadcast to all shards via RabbitMQ to
+						// remove the sender and the receiver as friends in memory and
+						// to notify them if a moderator forcefully removed them as friends
+						if (!moderatorUuid.equals(senderUuid) && !moderatorUuid.equals(receiverUuid)) {
+							Map<String, String> moderatorJsonProperties = Map.of(
+								"moderatorUuid", moderatorUuid.toString(),
+								"senderUuid", senderUuid.toString(),
+								"receiverUuid", receiverUuid.toString()
+							);
+							broadcastNotification(MODERATOR_FORCE_REMOVED_FRIENDS_CHANNEL, moderatorJsonProperties, "Failed to notify other shards of a friendship ended by a moderator via RabbitMQ.");
+
+							moderator.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " are no longer friends with each other.", NamedTextColor.GREEN)));
+							AuditListener.log(LOG_PREFIX + moderator.getName() + " forcefully removed " + resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " as friends.");
+						}
+					} else {
+						// Broadcast to all shards via RabbitMQ to
+						// remove the sender and the receiver as friends in memory
+						// and to notify them
+						Map<String, String> jsonProperties = Map.of(
+							"senderUuid", senderUuid.toString(),
+							"receiverUuid", receiverUuid.toString()
+						);
+						broadcastNotification(REMOVED_FRIEND_CHANNEL, jsonProperties, "Failed to notify other shards of a friend being removed via RabbitMQ.");
+					}
+				}
+			}).thenCompose(v -> syncFuture);
 		});
 	}
 	//endregion
@@ -549,24 +384,48 @@ public class SocialManager implements Listener {
 	static void blockPlayer(UUID senderUuid, UUID receiverUuid) {
 		Player sender = Bukkit.getPlayer(senderUuid);
 
-		// Prevent players from blocking themselves
-		if (senderUuid.equals(receiverUuid)) {
-			if (sender != null) {
-				sender.sendMessage(appendPrefix(Component.text("You cannot block yourself!", NamedTextColor.RED)));
-			}
-			return;
-		}
-
-		// Check if the sender already has the receiver blocked
-		hasPlayerBlocked(senderUuid, receiverUuid).thenAccept(alreadyBlocked -> {
-			if (alreadyBlocked) {
+		// Load the sender's and the receiver's social cache from memory or from Redis
+		loadSocialCaches(senderUuid, receiverUuid).thenAccept(socialCaches -> {
+			if (socialCaches == null) {
 				if (sender != null) {
-					sender.sendMessage(appendPrefix(Component.text("You already blocked " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
+					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
 				}
+
+				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
 				return;
 			}
 
-			// Check if the receiver has block exemption permission
+			PlayerSocialCache senderCache = socialCaches.get(senderUuid);
+			PlayerSocialCache receiverCache = socialCaches.get(receiverUuid);
+
+			// This shouldn't occur if loadSocialCaches didn't return null
+			if (senderCache == null || receiverCache == null) {
+				if (sender != null) {
+					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
+				}
+
+				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
+				return;
+			}
+
+			// Perform synchronous checks to see if the sender can block the receiver
+			PlayerSocialCache.BlockCheckResult result = senderCache.canBlockPlayer(receiverCache);
+
+			if (result != PlayerSocialCache.BlockCheckResult.OK) {
+				Component errorMessage = switch (result) {
+					case SELF -> Component.text("You cannot block yourself!", NamedTextColor.RED);
+					case ALREADY_BLOCKED -> Component.text("You already blocked " + resolveName(receiverUuid) + "!", NamedTextColor.RED);
+					default -> Component.text("You cannot block " + resolveName(receiverUuid) + "!", NamedTextColor.RED);
+				};
+
+				if (sender != null) {
+					sender.sendMessage(appendPrefix(errorMessage));
+				}
+
+				return;
+			}
+
+			// Check if the receiver has the block exemption permission
 			LuckPermsIntegration.loadUser(receiverUuid).thenAcceptAsync(receiver -> {
 				if (receiver.getCachedData().getPermissionData().checkPermission(BLOCK_EXEMPTION_PERMISSION).asBoolean()) {
 					if (sender != null) {
@@ -575,124 +434,185 @@ public class SocialManager implements Listener {
 					return;
 				}
 
-				// Get the current timestamp
+				// Fetch the current timestamp
 				String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
 
-				// Block the receiver and store the current timestamp
-				RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, senderUuid), BLOCKED_KEY + receiverUuid, receiverUuid + "|" + timestamp).thenRun(() -> {
+				// Set the receiver as blocked in Redis
+				RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, senderUuid), receiverUuid.toString(), timestamp).thenRun(() -> {
 					if (sender != null) {
 						sender.sendMessage(appendPrefix(Component.text("You have blocked " + resolveName(receiverUuid) + ".", NamedTextColor.GREEN)));
 					}
 
-					// Cancel all pending friend request expiration tasks if applicable
-					BukkitTask expirationTaskOne = PENDING_FRIEND_REQUESTS.remove(senderUuid + "_" + receiverUuid);
-					if (expirationTaskOne != null) {
-						expirationTaskOne.cancel();
-					}
-
-					BukkitTask expirationTaskTwo = PENDING_FRIEND_REQUESTS.remove(receiverUuid + "_" + senderUuid);
-					if (expirationTaskTwo != null) {
-						expirationTaskTwo.cancel();
-					}
-
-					// Remove all pending friend requests if applicable
-					RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, senderUuid), PENDING_FRIEND_REQUEST_KEY + receiverUuid);
-					RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), PENDING_FRIEND_REQUEST_KEY + senderUuid);
+					// Remove all pending friend requests from Redis
+					RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, senderUuid), receiverUuid.toString());
+					RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString());
 
 					// Check if the sender and the receiver are friends
-					areFriends(senderUuid, receiverUuid).thenAccept(areFriends -> {
-						if (areFriends) {
-							// Remove the receiver as a friend
-							removeFriend(null, senderUuid, receiverUuid);
-						}
-					});
+					if (senderCache.isFriendsWith(receiverUuid)) {
+						// Remove the receiver as a friend
+						removeFriend(null, senderUuid, receiverUuid);
+					}
+
+					// Broadcast to all shards via RabbitMQ to
+					// set the receiver as blocked in memory,
+					// to remove all pending friend requests from memory,
+					// and to cancel all friend request expiration tasks
+					Map<String, String> jsonProperties = Map.of(
+						"senderUuid", senderUuid.toString(),
+						"receiverUuid", receiverUuid.toString(),
+						"timestamp", timestamp
+					);
+					broadcastNotification(BLOCKED_PLAYER_CHANNEL, jsonProperties, "Failed to notify other shards of a player being blocked via RabbitMQ.");
 				});
 			});
 		});
 	}
 
-	static void unblockPlayer(UUID senderUuid, UUID receiverUuid) {
+	static CompletableFuture<Void> unblockPlayer(UUID senderUuid, UUID receiverUuid) {
 		Player sender = Bukkit.getPlayer(senderUuid);
 
-		// Check if the receiver is blocked
-		hasPlayerBlocked(senderUuid, receiverUuid).thenAccept(isBlocked -> {
-			if (!isBlocked) {
+		// Load the sender's social cache from memory or from Redis
+		return loadSocialCaches(senderUuid).thenCompose(socialCaches -> {
+			if (socialCaches == null) {
+				if (sender != null) {
+					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
+				}
+
+				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?");
+				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?"));
+			}
+
+			// Fetch the sender's social cache
+			PlayerSocialCache senderCache = socialCaches.get(senderUuid);
+
+			// This shouldn't occur if loadSocialCaches didn't return null
+			if (senderCache == null) {
+				if (sender != null) {
+					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
+				}
+
+				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?");
+				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?"));
+			}
+
+			// Check if the receiver is blocked
+			if (!senderCache.hasBlocked(receiverUuid)) {
 				if (sender != null) {
 					sender.sendMessage(appendPrefix(Component.text("You do not have " + resolveName(receiverUuid) + " blocked!", NamedTextColor.RED)));
 				}
-				return;
+
+				return CompletableFuture.completedFuture(null);
 			}
 
-			// Remove the block on the receiver
-			RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, senderUuid), BLOCKED_KEY + receiverUuid).thenRun(() -> {
+			// Remove the block on the receiver in Redis
+			CompletableFuture<Boolean> senderRedisFuture = RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, senderUuid), receiverUuid.toString()).thenApply(val -> val == 1L).toCompletableFuture();
+
+			// Create a pending future for the unblock operation to be completed by RabbitMQ confirmation
+			String unblockKey = getSocialPairKey(senderUuid, receiverUuid);
+			CompletableFuture<Void> syncFuture = new CompletableFuture<>();
+			PENDING_UNBLOCKS_MAP.put(unblockKey, syncFuture);
+
+			return senderRedisFuture.thenRun(() -> {
 				if (sender != null) {
 					sender.sendMessage(appendPrefix(Component.text("You have unblocked " + resolveName(receiverUuid) + ".", NamedTextColor.GREEN)));
 				}
-			});
+
+				// Broadcast to all shards via RabbitMQ to
+				// remove the block on the receiver in memory
+				Map<String, String> jsonProperties = Map.of(
+					"senderUuid", senderUuid.toString(),
+					"receiverUuid", receiverUuid.toString()
+				);
+				broadcastNotification(UNBLOCKED_PLAYER_CHANNEL, jsonProperties, "Failed to notify other shards of a player being unblocked via RabbitMQ.");
+			}).thenCompose(v -> syncFuture);
 		});
 	}
 	//endregion
 
+	//region <EVENT HANDLERS>
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void onPlayerLogin(PlayerLoginEvent event) {
 		UUID playerUuid = event.getPlayer().getUniqueId();
 		long currentTime = System.currentTimeMillis() / 1000;
 
-		// Check for expired friend requests when the player joins in case a shard went down before the corresponding expiration tasks could run
-		RedisAPI.getInstance().async().hgetall(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, playerUuid)).thenAccept(data -> {
-			data.forEach((key, value) -> {
-				long storedTime = Long.parseLong(value);
-				if (currentTime >= storedTime) {
-					// Remove expired friend requests
-					RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, playerUuid), key);
-				}
-			});
-		});
+		// Check for expired friend requests when the player joins in case a shard went down before the corresponding friend request expiration tasks could run
+		CompletableFuture<Void> expiredFriendRequestsFuture = RedisAPI.getInstance().async()
+			.hgetall(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, playerUuid))
+			.thenAccept(data ->
+				data.forEach((key, value) -> {
+					long storedTime = Long.parseLong(value);
+					if (currentTime >= storedTime) {
+						// Remove expired friend requests
+						RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, playerUuid), key);
+					}
+				})
+			)
+			.toCompletableFuture();
 
 		// Check the player's block list to see if any blocked players now have the block exemption permission
-		RedisAPI.getInstance().async().hgetall(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, playerUuid)).thenAccept(data -> {
-			data.forEach((key, value) -> {
-				// Split the "UUID|timestamp" string
-				String[] parts = value.split("\\|");
+		CompletableFuture<Void> blockExemptedFuture = RedisAPI.getInstance().async()
+			.hgetall(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, playerUuid))
+			.thenCompose(data -> {
+				// Track all asynchronous LuckPerms tasks to run
+				List<CompletableFuture<Void>> unblockFutures = new ArrayList<>();
 
-				// Extract the UUID
-				UUID blockedPlayerUuid = UUID.fromString(parts[0]);
+				data.forEach((key, value) -> {
+					UUID blockedPlayerUuid = UUID.fromString(key);
+					CompletableFuture<Void> unblockFuture = LuckPermsIntegration.loadUser(blockedPlayerUuid).thenAcceptAsync(blockedUser -> {
+						if (blockedUser.getCachedData().getPermissionData().checkPermission(BLOCK_EXEMPTION_PERMISSION).asBoolean()) {
+							// Automatically unblock the exempted player
+							unblockPlayer(playerUuid, blockedPlayerUuid);
+						}
+					});
 
-				LuckPermsIntegration.loadUser(blockedPlayerUuid).thenAcceptAsync(blockedUser -> {
-					if (blockedUser.getCachedData().getPermissionData().checkPermission(BLOCK_EXEMPTION_PERMISSION).asBoolean()) {
-						// Automatically unblock the exempted player
-						unblockPlayer(playerUuid, blockedPlayerUuid);
-					}
+					// Track the current LuckPerms task
+					unblockFutures.add(unblockFuture);
 				});
-			});
-		});
 
-		if (getSocialData(playerUuid) == null) {
-			SOCIAL_DATA_MAP.put(playerUuid, new PlayerSocialData(playerUuid));
-		}
+				// Wait for all asynchronous LuckPerms tasks to finish
+				return CompletableFuture.allOf(unblockFutures.toArray(new CompletableFuture[0]));
+			})
+			.toCompletableFuture();
+
+		// Load the player's social cache into memory after the previous checks complete
+		CompletableFuture.allOf(expiredFriendRequestsFuture, blockExemptedFuture)
+			.thenCompose(v -> PlayerSocialCache.load(playerUuid))
+			.thenAccept(socialCache -> SOCIAL_CACHE_MAP.put(playerUuid, socialCache));
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void onPlayerLogout(PlayerQuitEvent event) {
 		UUID playerUuid = event.getPlayer().getUniqueId();
+		PlayerSocialCache cachedAtLogout = SOCIAL_CACHE_MAP.get(playerUuid);
+
+		// Cache cleanup task
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			if (Bukkit.getPlayer(playerUuid) == null) {
-				SOCIAL_DATA_MAP.remove(playerUuid);
+			Player player = Bukkit.getPlayer(playerUuid);
+			boolean stillOffline = (player == null || !player.isOnline());
+			boolean cacheUnchanged = SOCIAL_CACHE_MAP.get(playerUuid) == cachedAtLogout;
+
+			// Check that the cache remains unchanged in case the player reconnects or returns to the same shard and gets a new cache before the cleanup task is run
+			if (stillOffline && cacheUnchanged) {
+				// Unload the player's social cache from memory if they are offline or in a different shard for 15 seconds
+				SOCIAL_CACHE_MAP.remove(playerUuid);
 			}
 		}, 15 * 20L);
 	}
+	//endregion
 
 	//region <RABBITMQ>
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void networkRelayMessageEvent(@NotNull NetworkRelayMessageEvent event) {
 		JsonObject data = event.getData();
 		switch (event.getChannel()) {
-			case INCOMING_FRIEND_REQUEST_NOTIFICATION_CHANNEL -> handleIncomingFriendRequest(data);
-			case FRIEND_REQUEST_EXPIRATION_NOTIFICATION_CHANNEL -> handleExpiredFriendRequest(data);
-			case FRIEND_REQUEST_ACCEPTED_NOTIFICATION_CHANNEL -> handleAcceptedFriendRequest(data);
-			case MODERATOR_FORCE_ADDED_FRIENDS_NOTIFICATION_CHANNEL -> handleModeratorForceAddedFriendship(data);
-			case REMOVED_FRIEND_NOTIFICATION_CHANNEL -> handleRemovedFriend(data);
-			case MODERATOR_FORCE_REMOVED_FRIENDS_NOTIFICATION_CHANNEL -> handleModeratorForceRemovedFriendship(data);
+			case INCOMING_FRIEND_REQUEST_CHANNEL -> handleIncomingFriendRequest(data);
+			case FRIEND_REQUEST_EXPIRATION_CHANNEL -> handleExpiredFriendRequest(data);
+			case ADDED_FRIEND_CHANNEL -> handleAddedFriend(data);
+			case MODERATOR_FORCE_ADDED_FRIENDS_CHANNEL -> handleModeratorForceAddedFriendship(data);
+			case REMOVED_FRIEND_CHANNEL -> handleRemovedFriend(data);
+			case MODERATOR_FORCE_REMOVED_FRIENDS_CHANNEL -> handleModeratorForceRemovedFriendship(data);
+			case BLOCKED_PLAYER_CHANNEL -> handleBlockedPlayer(data);
+			case UNBLOCKED_PLAYER_CHANNEL -> handleUnblockedPlayer(data);
 			default -> {
 				// Do nothing
 			}
@@ -700,13 +620,31 @@ public class SocialManager implements Listener {
 	}
 
 	private void handleIncomingFriendRequest(JsonObject data) {
-		if (data.has("senderUuid") && data.has("receiverUuid")) {
+		if (data.has("senderUuid") && data.has("receiverUuid") && data.has("expirationTime")) {
 			UUID senderUuid = UUID.fromString(data.get("senderUuid").getAsString());
 			UUID receiverUuid = UUID.fromString(data.get("receiverUuid").getAsString());
+			long expirationTime = data.get("expirationTime").getAsLong();
 
 			Player receiver = Bukkit.getPlayer(receiverUuid);
+			PlayerSocialCache receiverCache = getSocialCache(receiverUuid);
 
-			// Notify the receiver about the pending request
+			// Send the pending friend request to the receiver in memory
+			if (receiverCache != null) {
+				receiverCache.addPendingFriendRequest(senderUuid, expirationTime);
+			}
+
+			// Calculate how many seconds remain until the friend request expires
+			long remainingSeconds = expirationTime - (System.currentTimeMillis() / 1000);
+
+			if (remainingSeconds > 0) {
+				// Schedule the friend request expiration task
+				BukkitTask expirationTask = Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> expireFriendRequest(senderUuid, receiverUuid), remainingSeconds * 20L);
+
+				// Track the friend request expiration task for possible cancellation
+				PENDING_FRIEND_REQUESTS_MAP.put(senderUuid + "_" + receiverUuid, expirationTask);
+			}
+
+			// Notify the receiver about the pending friend request
 			if (receiver != null) {
 				Component message = Component.text("Friend request from ", NamedTextColor.YELLOW);
 				Component playerComponent = RemotePlayerListener.getPlayerComponent(senderUuid).clickEvent(null);
@@ -730,8 +668,17 @@ public class SocialManager implements Listener {
 
 			Player sender = Bukkit.getPlayer(senderUuid);
 			Player receiver = Bukkit.getPlayer(receiverUuid);
+			PlayerSocialCache receiverCache = getSocialCache(receiverUuid);
 
-			// Notify the sender and the receiver about the request expiration
+			// Remove the pending friend request from the receiver in memory
+			if (receiverCache != null) {
+				receiverCache.removePendingFriendRequest(senderUuid);
+			}
+
+			// Discard the friend request expiration task
+			clearExpirationTasks(senderUuid, receiverUuid);
+
+			// Notify the sender and the receiver about the friend request expiration
 			if (sender != null) {
 				sender.sendMessage(appendPrefix(Component.text("Your friend request to " + resolveName(receiverUuid) + " has expired.", NamedTextColor.RED)));
 			}
@@ -742,15 +689,32 @@ public class SocialManager implements Listener {
 		}
 	}
 
-	private void handleAcceptedFriendRequest(JsonObject data) {
-		if (data.has("senderUuid") && data.has("receiverUuid")) {
+	private void handleAddedFriend(JsonObject data) {
+		if (data.has("senderUuid") && data.has("receiverUuid") && data.has("timestamp")) {
 			UUID senderUuid = UUID.fromString(data.get("senderUuid").getAsString());
 			UUID receiverUuid = UUID.fromString(data.get("receiverUuid").getAsString());
+			String timestamp = data.get("timestamp").getAsString();
 
 			Player sender = Bukkit.getPlayer(senderUuid);
 			Player receiver = Bukkit.getPlayer(receiverUuid);
+			PlayerSocialCache senderCache = getSocialCache(senderUuid);
+			PlayerSocialCache receiverCache = getSocialCache(receiverUuid);
 
-			// Notify the sender and the receiver about the accepted request
+			// Set the sender and the receiver as friends in memory and clean up the pending friend requests in memory
+			if (senderCache != null) {
+				senderCache.addFriend(receiverUuid, timestamp);
+				senderCache.removePendingFriendRequest(receiverUuid);
+			}
+
+			if (receiverCache != null) {
+				receiverCache.addFriend(senderUuid, timestamp);
+				receiverCache.removePendingFriendRequest(senderUuid);
+			}
+
+			// Cancel the friend request expiration task
+			clearExpirationTasks(senderUuid, receiverUuid);
+
+			// Notify the sender and the receiver about their new friendship
 			if (sender != null) {
 				sender.sendMessage(appendPrefix(Component.text("You are now friends with " + resolveName(receiverUuid) + ".", NamedTextColor.GREEN)));
 			}
@@ -758,26 +722,34 @@ public class SocialManager implements Listener {
 			if (receiver != null) {
 				receiver.sendMessage(appendPrefix(Component.text("You are now friends with " + resolveName(senderUuid) + ".", NamedTextColor.GREEN)));
 			}
-
-			PlayerSocialData senderData = getSocialData(senderUuid);
-			PlayerSocialData receiverData = getSocialData(receiverUuid);
-			if (senderData != null) {
-				senderData.addFriend(receiverUuid);
-			}
-			if (receiverData != null) {
-				receiverData.addFriend(senderUuid);
-			}
 		}
 	}
 
 	private void handleModeratorForceAddedFriendship(JsonObject data) {
-		if (data.has("moderatorUuid") && data.has("senderUuid") && data.has("receiverUuid")) {
+		if (data.has("moderatorUuid") && data.has("senderUuid") && data.has("receiverUuid") && data.has("timestamp")) {
 			UUID moderatorUuid = UUID.fromString(data.get("moderatorUuid").getAsString());
 			UUID senderUuid = UUID.fromString(data.get("senderUuid").getAsString());
 			UUID receiverUuid = UUID.fromString(data.get("receiverUuid").getAsString());
+			String timestamp = data.get("timestamp").getAsString();
 
 			Player sender = Bukkit.getPlayer(senderUuid);
 			Player receiver = Bukkit.getPlayer(receiverUuid);
+			PlayerSocialCache senderCache = getSocialCache(senderUuid);
+			PlayerSocialCache receiverCache = getSocialCache(receiverUuid);
+
+			// Set the sender and the receiver as friends in memory and clean up the pending friend requests in memory
+			if (senderCache != null) {
+				senderCache.addFriend(receiverUuid, timestamp);
+				senderCache.removePendingFriendRequest(receiverUuid);
+			}
+
+			if (receiverCache != null) {
+				receiverCache.addFriend(senderUuid, timestamp);
+				receiverCache.removePendingFriendRequest(senderUuid);
+			}
+
+			// Cancel the friend request expiration task
+			clearExpirationTasks(senderUuid, receiverUuid);
 
 			if (!moderatorUuid.equals(senderUuid) && !moderatorUuid.equals(receiverUuid)) {
 				// Notify the sender and the receiver if a moderator forcefully designated them as friends
@@ -795,15 +767,6 @@ public class SocialManager implements Listener {
 				// Notify the sender if a moderator forcefully added them as their friend
 				sender.sendMessage(appendPrefix(Component.text("A moderator forcefully made you and " + resolveName(receiverUuid) + " be friends with each other.", NamedTextColor.GREEN)));
 			}
-
-			PlayerSocialData senderData = getSocialData(senderUuid);
-			PlayerSocialData receiverData = getSocialData(receiverUuid);
-			if (senderData != null) {
-				senderData.addFriend(receiverUuid);
-			}
-			if (receiverData != null) {
-				receiverData.addFriend(senderUuid);
-			}
 		}
 	}
 
@@ -814,8 +777,19 @@ public class SocialManager implements Listener {
 
 			Player sender = Bukkit.getPlayer(senderUuid);
 			Player receiver = Bukkit.getPlayer(receiverUuid);
+			PlayerSocialCache senderCache = getSocialCache(senderUuid);
+			PlayerSocialCache receiverCache = getSocialCache(receiverUuid);
 
-			// Notify the sender and the receiver about friend removal
+			// Remove the sender and the receiver as friends in memory
+			if (senderCache != null) {
+				senderCache.removeFriend(receiverUuid);
+			}
+
+			if (receiverCache != null) {
+				receiverCache.removeFriend(senderUuid);
+			}
+
+			// Notify the sender and the receiver about the friend removal
 			if (sender != null) {
 				sender.sendMessage(appendPrefix(Component.text("You are no longer friends with " + resolveName(receiverUuid) + "!", NamedTextColor.GREEN)));
 			}
@@ -824,13 +798,13 @@ public class SocialManager implements Listener {
 				receiver.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " removed you as a friend!", NamedTextColor.RED)));
 			}
 
-			PlayerSocialData senderData = getSocialData(senderUuid);
-			PlayerSocialData receiverData = getSocialData(receiverUuid);
-			if (senderData != null) {
-				senderData.removeFriend(receiverUuid);
-			}
-			if (receiverData != null) {
-				receiverData.removeFriend(senderUuid);
+			// Complete the pending future associated with the friend removal
+			String friendKey = getSocialPairKey(senderUuid, receiverUuid);
+			CompletableFuture<Void> future = PENDING_FRIEND_REMOVALS_MAP.remove(friendKey);
+
+			if (future != null) {
+				// Mark the cache update as complete
+				future.complete(null);
 			}
 		}
 	}
@@ -842,6 +816,17 @@ public class SocialManager implements Listener {
 
 			Player sender = Bukkit.getPlayer(senderUuid);
 			Player receiver = Bukkit.getPlayer(receiverUuid);
+			PlayerSocialCache senderCache = getSocialCache(senderUuid);
+			PlayerSocialCache receiverCache = getSocialCache(receiverUuid);
+
+			// Remove the sender and the receiver as friends in memory
+			if (senderCache != null) {
+				senderCache.removeFriend(receiverUuid);
+			}
+
+			if (receiverCache != null) {
+				receiverCache.removeFriend(senderUuid);
+			}
 
 			// Notify the sender and the receiver if a moderator forcefully removed them as friends
 			if (sender != null) {
@@ -852,138 +837,204 @@ public class SocialManager implements Listener {
 				receiver.sendMessage(appendPrefix(Component.text("A moderator forcefully removed you and " + resolveName(senderUuid) + " as friends.", NamedTextColor.RED)));
 			}
 
-			PlayerSocialData senderData = getSocialData(senderUuid);
-			PlayerSocialData receiverData = getSocialData(receiverUuid);
-			if (senderData != null) {
-				senderData.removeFriend(receiverUuid);
+			// Complete the pending future associated with the friend removal
+			String friendKey = getSocialPairKey(senderUuid, receiverUuid);
+			CompletableFuture<Void> future = PENDING_FRIEND_REMOVALS_MAP.remove(friendKey);
+
+			if (future != null) {
+				// Mark the cache update as complete
+				future.complete(null);
 			}
-			if (receiverData != null) {
-				receiverData.removeFriend(senderUuid);
+		}
+	}
+
+	private void handleBlockedPlayer(JsonObject data) {
+		if (data.has("senderUuid") && data.has("receiverUuid") && data.has("timestamp")) {
+			UUID senderUuid = UUID.fromString(data.get("senderUuid").getAsString());
+			UUID receiverUuid = UUID.fromString(data.get("receiverUuid").getAsString());
+			String timestamp = data.get("timestamp").getAsString();
+
+			PlayerSocialCache senderCache = getSocialCache(senderUuid);
+			PlayerSocialCache receiverCache = getSocialCache(receiverUuid);
+
+			// Set the receiver as blocked in memory and remove all pending friend requests from memory
+			if (senderCache != null) {
+				senderCache.blockPlayer(receiverUuid, timestamp);
+				senderCache.removePendingFriendRequest(receiverUuid);
+			}
+
+			if (receiverCache != null) {
+				receiverCache.removePendingFriendRequest(senderUuid);
+			}
+
+			// Cancel all friend request expiration tasks
+			clearExpirationTasks(senderUuid, receiverUuid);
+		}
+	}
+
+	private void handleUnblockedPlayer(JsonObject data) {
+		if (data.has("senderUuid") && data.has("receiverUuid")) {
+			UUID senderUuid = UUID.fromString(data.get("senderUuid").getAsString());
+			UUID receiverUuid = UUID.fromString(data.get("receiverUuid").getAsString());
+
+			PlayerSocialCache senderCache = getSocialCache(senderUuid);
+
+			// Remove the block on the receiver in memory
+			if (senderCache != null) {
+				senderCache.unblockPlayer(receiverUuid);
+			}
+
+			// Complete the pending future associated with the block removal
+			String unblockKey = getSocialPairKey(senderUuid, receiverUuid);
+			CompletableFuture<Void> future = PENDING_UNBLOCKS_MAP.remove(unblockKey);
+
+			if (future != null) {
+				// Mark the cache update as complete
+				future.complete(null);
 			}
 		}
 	}
 	//endregion
 
-	//region <GETTERS>
-	static CompletableFuture<SocialInfo> getSocialInfo(UUID playerUuid) {
-		CompletableFuture<SocialInfo> future = new CompletableFuture<>();
+	//region <HELPER FUNCTIONS>
+	static Component appendPrefix(Component message) {
+		Component prefix = Component.empty().append(Component.text("Social > ", NamedTextColor.GOLD));
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			try {
-				// Fetch friends and blocked players separately
-				CompletableFuture<Map<String, String>> friendDataFuture = RedisAPI.getInstance().async().hgetall(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, playerUuid)).toCompletableFuture();
-				CompletableFuture<Map<String, String>> blockedDataFuture = RedisAPI.getInstance().async().hgetall(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, playerUuid)).toCompletableFuture();
+		return prefix.append(message);
+	}
 
-				// Combine both futures
-				CompletableFuture.allOf(friendDataFuture, blockedDataFuture).thenRun(() -> {
-					try {
-						Map<String, String> friendData = friendDataFuture.get();
-						Map<String, String> blockedData = blockedDataFuture.get();
+	static Component appendHeaderAndFooter(Component message) {
+		Component header = Component.empty().append(Component.text("-----------------------------------------------------", NamedTextColor.BLUE, TextDecoration.STRIKETHROUGH));
+		Component body = Component.empty().append(message);
+		Component footer = Component.empty().append(Component.text("-----------------------------------------------------", NamedTextColor.BLUE, TextDecoration.STRIKETHROUGH));
 
-						Map<UUID, SocialInfo.Friend> friendMap = new HashMap<>();
-						Map<UUID, SocialInfo.BlockedPlayer> blockedPlayerMap = new HashMap<>();
+		return
+			header.append(Component.newline())
+				.append(body).append(Component.newline())
+				.append(footer);
+	}
 
-						// Process friend data
-						friendData.forEach((key, value) -> {
-							// String format: UUID|timestamp
-							// Split the string format
-							String[] parts = value.split("\\|");
+	static String resolveName(UUID uuid) {
+		String cachedName = MonumentaRedisSyncIntegration.cachedUuidToName(uuid);
+		return cachedName != null ? cachedName : uuid.toString();
+	}
 
-							UUID friendUuid = UUID.fromString(parts[0]);
-							String friendTimestamp;
-							if (parts.length >= 2) {
-								friendTimestamp = parts[1];
-							} else {
-								friendTimestamp = DateTimeFormatter.ISO_INSTANT.format(
-									DateUtils.localDateTime(2025, 3, 6)
-										.toInstant(ZoneOffset.UTC));
-								RedisAPI.getInstance().async().hset(
-									getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, playerUuid),
-									FRIEND_KEY + friendUuid,
-									parts[0] + "|" + friendTimestamp
-								);
-							}
+	static String formatTimestamp(String isoTimestamp) {
+		try {
+			Instant instant = Instant.parse(isoTimestamp);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy").withZone(ZoneId.systemDefault());
+			return formatter.format(instant);
+		} catch (DateTimeParseException exception) {
+			return "Unknown Date";
+		}
+	}
 
-							friendMap.put(friendUuid, new SocialInfo.Friend(friendUuid, friendTimestamp));
-						});
+	static CompletableFuture<@Nullable Map<UUID, PlayerSocialCache>> loadSocialCaches(UUID... uuids) {
+		// Hold the final <UUID, PlayerSocialCache> pairs
+		Map<UUID, PlayerSocialCache> result = new ConcurrentHashMap<>();
 
-						// Process blocked data
-						blockedData.forEach((key, value) -> {
-							// String format: UUID|timestamp
-							// Split the string format
-							String[] parts = value.split("\\|");
+		// Track all asynchronous load tasks to run
+		List<CompletableFuture<Boolean>> futures = new ArrayList<>();
 
-							UUID blockedUuid = UUID.fromString(parts[0]);
-							String blockedTimestamp = parts[1];
+		for (UUID uuid : uuids) {
+			PlayerSocialCache cache = getSocialCache(uuid);
 
-							blockedPlayerMap.put(blockedUuid, new SocialInfo.BlockedPlayer(blockedUuid, blockedTimestamp));
-						});
-
-						SocialInfo socialInfo = new SocialInfo(playerUuid, friendMap, blockedPlayerMap);
-
-						// Complete the future on the main thread for easy use of .whenCompleted()
-						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> future.complete(socialInfo));
-					} catch (Exception exception) {
-						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> future.completeExceptionally(exception));
+			if (cache != null) {
+				// Use the existing cache if it's already loaded
+				result.put(uuid, cache);
+			} else {
+				// Load the missing cache from Redis
+				CompletableFuture<Boolean> future = PlayerSocialCache.load(uuid).thenApply(loaded -> {
+					if (loaded != null) {
+						// Use the newly loaded cache
+						result.put(uuid, loaded);
+						return true;
 					}
+
+					// Return false if the cache failed to load
+					return false;
 				});
-			} catch (Exception exception) {
-				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> future.completeExceptionally(exception));
+
+				// Track the current loading task
+				futures.add(future);
 			}
-		});
+		}
 
-		return future;
-	}
+		// Wait for all asynchronous loading tasks to finish before checking if any failed to load
+		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(v -> {
+			boolean allSucceeded = futures.stream().allMatch(f -> f.getNow(false));
 
-	public static CompletableFuture<List<UUID>> getFriends(UUID playerUuid) {
-		return RedisAPI.getInstance().async().hgetall(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, playerUuid)).toCompletableFuture().thenApply(data -> {
-			if (data.isEmpty()) {
-				return Collections.emptyList();
-			}
-
-			return data.values().stream()
-				.map(value -> {
-					// Split the "UUID|timestamp" string
-					String[] parts = value.split("\\|");
-
-					// Extract the UUID
-					return UUID.fromString(parts[0]);
-				})
-				.toList();
+			// Return null if any tasks failed to load a cache
+			return allSucceeded ? result : null;
 		});
 	}
 
-	public static CompletableFuture<Boolean> areFriends(UUID playerOne, UUID playerTwo) {
-		CompletableFuture<Boolean> checkOne = RedisAPI.getInstance().async().hget(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, playerOne), FRIEND_KEY + playerTwo).toCompletableFuture().thenApply(Objects::nonNull);
-		CompletableFuture<Boolean> checkTwo = RedisAPI.getInstance().async().hget(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, playerTwo), FRIEND_KEY + playerOne).toCompletableFuture().thenApply(Objects::nonNull);
-		return checkOne.thenCombine(checkTwo, (one, two) -> one && two);
-	}
-
-	public static CompletableFuture<List<UUID>> getBlockedPlayers(UUID playerUuid) {
-		return RedisAPI.getInstance().async().hgetall(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, playerUuid)).toCompletableFuture().thenApply(data -> {
-			if (data.isEmpty()) {
-				return Collections.emptyList();
+	static CompletableFuture<PlayerSocialDisplayInfo> getSocialDisplayInfo(UUID playerUuid) {
+		return loadSocialCaches(playerUuid).thenCompose(socialCaches -> {
+			if (socialCaches == null) {
+				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?");
+				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?"));
 			}
 
-			return data.values().stream()
-				.map(value -> {
-					// Split the "UUID|timestamp" string
-					String[] parts = value.split("\\|");
+			// Fetch the player's social cache
+			PlayerSocialCache playerCache = socialCaches.get(playerUuid);
 
-					// Extract the UUID
-					return UUID.fromString(parts[0]);
-				})
-				.toList();
+			// This shouldn't occur if loadSocialCaches didn't return null
+			if (playerCache == null) {
+				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?");
+				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?"));
+			}
+
+			return PlayerSocialDisplayInfo.getSocialInfoFromSocialCache(playerCache);
 		});
 	}
 
-	public static CompletableFuture<Boolean> hasPlayerBlocked(UUID player, UUID blockedPlayer) {
-		return RedisAPI.getInstance().async().hget(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, player), BLOCKED_KEY + blockedPlayer).toCompletableFuture().thenApply(Objects::nonNull);
+	private static void clearExpirationTasks(UUID firstUuid, UUID secondUuid) {
+		BukkitTask firstTask = PENDING_FRIEND_REQUESTS_MAP.remove(firstUuid + "_" + secondUuid);
+		if (firstTask != null) {
+			firstTask.cancel();
+		}
+
+		BukkitTask secondTask = PENDING_FRIEND_REQUESTS_MAP.remove(secondUuid + "_" + firstUuid);
+		if (secondTask != null) {
+			secondTask.cancel();
+		}
 	}
 
+	static String getRedisPath(String socialType, UUID uuid) {
+		return "social:" + socialType + ":" + uuid;
+	}
+
+	private static void broadcastNotification(String channel, Map<String, String> jsonProperties, String logMessage) {
+		JsonObject jsonObject = new JsonObject();
+
+		for (Map.Entry<String, String> entry : jsonProperties.entrySet()) {
+			jsonObject.addProperty(entry.getKey(), entry.getValue());
+		}
+
+		try {
+			NetworkRelayAPI.sendBroadcastMessage(channel, jsonObject);
+		} catch (Exception exception) {
+			MMLog.warning(logMessage);
+		}
+	}
+
+	private static String getSocialPairKey(UUID uuid1, UUID uuid2) {
+		// Generate a consistent key for a pair of UUIDs regardless of their order
+		return uuid1.compareTo(uuid2) < 0 ? uuid1 + "-" + uuid2 : uuid2 + "-" + uuid1;
+	}
+	//endregion
+
+	//region <GETTERS>
+	/**
+	 * Retrieves the in-memory {@code PlayerSocialCache} for the specified player if one has already been loaded.
+	 *
+	 * @param playerUuid the UUID of the player whose cache is requested (must not be {@code null})
+	 * @return the cached {@code PlayerSocialCache}, or {@code null} if no cache is currently stored
+	 */
 	@Nullable
-	public static PlayerSocialData getSocialData(UUID playerUuid) {
-		return SOCIAL_DATA_MAP.get(playerUuid);
+	public static PlayerSocialCache getSocialCache(UUID playerUuid) {
+		return SOCIAL_CACHE_MAP.get(playerUuid);
 	}
 	//endregion
 }

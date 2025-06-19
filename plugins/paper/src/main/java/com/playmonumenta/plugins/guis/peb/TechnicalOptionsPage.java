@@ -88,7 +88,7 @@ final class TechnicalOptionsPage extends PebPage {
 			Material.CARTOGRAPHY_TABLE,
 			"Spoof World Names",
 			"Click to enable or disable spoofing of shard-specific world names. This is helpful for world map mods to be able to detect worlds better."
-		).toggle("Mode: ", WorldNameCommand.TAG).set(4, 3);
+		).toggle("Mode: ", WorldNameCommand.TAG).set(4, 2);
 
 		entry(
 			Material.BEEHIVE,
@@ -98,7 +98,7 @@ final class TechnicalOptionsPage extends PebPage {
 		).invertedToggle(
 			"Custom textures: ",
 			ReactiveValue.binaryScoreboard(mGui, GUIUtils.GUI_TEXTURES_OBJECTIVE, false)
-		).set(4, 4);
+		).set(4, 3);
 
 		entry(
 			Material.FLOWER_BANNER_PATTERN,
@@ -108,6 +108,15 @@ final class TechnicalOptionsPage extends PebPage {
 		).toggle(
 			"Simple tab list: ",
 			ReactiveValue.permission(mGui, "monumenta.tablist.simplified")
+		).set(4, 4);
+
+		entry(
+			Material.FLOWER_BANNER_PATTERN,
+			"Swap Friends and Guild Sections in Tab List",
+			"Click to swap the positions of the Friends and Guild sections in the tab list."
+		).toggle(
+			"Swap Friends and Guild: ",
+			ReactiveValue.togglePermission(mGui, "monumenta.tablist.swapfriendsandguild")
 		).set(4, 5);
 	}
 }

@@ -71,6 +71,7 @@ public abstract class Gui implements InventoryHolder {
 	 * @param size   The initial size of the inventory (must be multiple of 9)
 	 */
 	protected Gui(Player player, ItemStack filler, Component title, int size) {
+		Preconditions.checkState(Bukkit.isPrimaryThread(), "off-main gui creation is not allowed");
 		mFiller = filler;
 		mPlayer = player;
 		recreateInventory(size, title);
@@ -161,6 +162,7 @@ public abstract class Gui implements InventoryHolder {
 	 * @throws IllegalStateException If called after inventory disposal or outside render()
 	 */
 	public final void setItem(int i, GuiItem item) {
+		Preconditions.checkState(Bukkit.isPrimaryThread(), "off-main gui operation is not allowed");
 		Preconditions.checkState(mIsRendering, "setItem() called outside of render()");
 		Preconditions.checkState(mInventory != null, "setItem called after inventory was disposed");
 		mInventory.setItem(i, item.getItem());
@@ -178,6 +180,7 @@ public abstract class Gui implements InventoryHolder {
 	 * </p>
 	 */
 	public final void markDirty() {
+		Preconditions.checkState(Bukkit.isPrimaryThread(), "off-main gui operation is not allowed");
 		this.mIsDirty = true;
 	}
 
@@ -187,6 +190,7 @@ public abstract class Gui implements InventoryHolder {
 	 * @throws IllegalStateException If called after inventory disposal
 	 */
 	public void open() {
+		Preconditions.checkState(Bukkit.isPrimaryThread(), "off-main gui operation is not allowed");
 		if (mInventory == null) {
 			return;
 		}
@@ -201,6 +205,7 @@ public abstract class Gui implements InventoryHolder {
 	 * @throws IllegalStateException If called after inventory disposal
 	 */
 	public void close() {
+		Preconditions.checkState(Bukkit.isPrimaryThread(), "off-main gui operation is not allowed");
 		if (mInventory == null) {
 			return;
 		}
