@@ -36,7 +36,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
-public abstract class BossParameters {
+public abstract class BossParameters implements Cloneable {
 
 	public static <T extends BossParameters> T getParameters(Entity boss, String identityTag, T parameters) {
 		String modTag = identityTag + "[";
@@ -349,5 +349,13 @@ public abstract class BossParameters {
 		ParseResult<T> res = ParseResult.of(parameters);
 		res.mDeprecatedParameters = deprecatedParameters;
 		return res;
+	}
+	@SuppressWarnings("unchecked")
+	public static <T extends BossParameters> T shallowClone(T parameters) {
+		try {
+			return (T) parameters.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError();
+		}
 	}
 }

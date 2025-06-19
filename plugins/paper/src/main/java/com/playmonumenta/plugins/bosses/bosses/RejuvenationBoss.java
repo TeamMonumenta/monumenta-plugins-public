@@ -68,44 +68,7 @@ public class RejuvenationBoss extends BossAbilityGroup {
 			p.PARTICLE_RADIUS = p.RANGE;
 		}
 
-		Spell spell = new SpellMobHealAoE(
-			plugin,
-			boss,
-			p.COOLDOWN,
-			p.DURATION,
-			p.PARTICLE_RADIUS,
-			p.CAN_MOVE,
-			() -> {
-				return p.TARGETS.getTargetsList(mBoss);
-			},
-			(Location loc, int ticks) -> {
-				p.PARTICLE_CHARGE_AIR.spawn(boss, loc, 3.5, 3.5, 3.5, 0.25);
-				if (ticks <= (p.DURATION - 5) && ticks % 2 == 0) {
-					p.SOUND_CHARGE.play(mBoss.getLocation(), 0.8f, 0.25f + ((float) ticks / (float) 100));
-				}
-			},
-			(Location loc, int ticks) -> {
-				p.PARTICLE_CHARGE_CIRCLE.spawn(boss, loc, 0.25, 0.25, 0.25);
-			},
-			(Location loc, int ticks) -> {
-				p.PARTICLE_OUTBURST_AIR.spawn(boss, loc, 3.5, 3.5, 3.5, 0.25);
-				p.SOUND_OUTBURST_CIRCLE.play(loc);
-			},
-			(Location loc, int ticks) -> {
-				p.PARTICLE_OUTBURST_CIRCLE.spawn(boss, loc);
-			},
-			(LivingEntity target) -> {
-				double healed = EntityUtils.healMob(target, p.HEAL);
-				if (p.OVERHEAL && healed < p.HEAL) {
-					double missing = p.HEAL - healed;
-					AbsorptionUtils.addAbsorption(target, missing, p.HEAL, -1);
-				}
-
-				if (healed > 0) {
-					p.PARTICLE_HEAL.spawn(boss, target.getEyeLocation());
-				}
-			}
-		);
+		Spell spell = new SpellMobHealAoE(plugin, boss, p);
 
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}

@@ -57,6 +57,7 @@ import com.playmonumenta.plugins.bosses.bosses.sirius.SiriusNPCBoss;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.chunk.ChunkFullLoadEvent;
 import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
+import com.playmonumenta.plugins.delves.mobabilities.ArcanicBoss;
 import com.playmonumenta.plugins.delves.mobabilities.DreadfulSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.SpectralSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
@@ -299,6 +300,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(StatMultiplierBoss.identityTag, StatMultiplierBoss::new, new StatMultiplierBoss.Parameters());
 		registerStatelessBoss(SpectralSummonBoss.identityTag, SpectralSummonBoss::new, new SpectralSummonBoss.Parameters());
 		registerStatelessBoss(DreadfulSummonBoss.identityTag, DreadfulSummonBoss::new, new DreadfulSummonBoss.Parameters());
+		registerStatelessBoss(ArcanicBoss.identityTag, ArcanicBoss::new, new ArcanicBoss.Parameters());
 		registerStatelessBoss(FriendlyBoss.identityTag, FriendlyBoss::new, new FriendlyBoss.Parameters());
 		registerStatelessBoss(MageCosmicMoonbladeBoss.identityTag, MageCosmicMoonbladeBoss::new, new MageCosmicMoonbladeBoss.Parameters());
 		registerStatelessBoss(WarriorShieldWallBoss.identityTag, WarriorShieldWallBoss::new, new WarriorShieldWallBoss.Parameters());

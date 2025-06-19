@@ -104,55 +104,7 @@ public final class ChargerBoss extends BossAbilityGroup {
 			//by default Charger don't take player in stealth.
 		}
 
-		final Spell spell = new SpellBaseCharge(mPlugin, mBoss, p.COOLDOWN, p.DURATION, p.STOP_ON_HIT,
-			0, 0, 0,
-			() -> {
-				List<? extends LivingEntity> targetList = p.TARGETS.getTargetsList(mBoss);
-				if (p.MIN_DISTANCE > 0) {
-					targetList.removeIf(target -> target.getLocation()
-						.distanceSquared(mBoss.getLocation()) < p.MIN_DISTANCE * p.MIN_DISTANCE);
-				}
-				return targetList;
-			},
-			// Warning sound/particles at boss location and slow boss
-			(LivingEntity player) -> {
-				p.PARTICLE_WARNING.spawn(mBoss, mBoss.getLocation(), 2d, 2d, 2d);
-				p.SOUND_WARNING.play(mBoss.getLocation(), 1f, 1.5f);
-				mBoss.setAI(false);
-			},
-			// Warning particles
-			(Location loc) -> p.PARTICLE_TELL.spawn(mBoss, loc, 0.65d, 0.65d, 0.65d),
-			// Charge attack sound/particles at boss location
-			(LivingEntity player) -> {
-				p.PARTICLE_ROAR.spawn(mBoss, mBoss.getLocation(), 0.3d, 0.3d, 0.3d, 0.15d);
-				p.SOUND_ROAR.play(mBoss.getLocation(), 1f, 1.5f);
-			},
-			// Attack hit a player
-			(LivingEntity target) -> {
-				p.PARTICLE_HIT.spawn(mBoss, target.getEyeLocation(), 0.4d, 0.4d, 0.4d, 0.4d);
-				if (p.DAMAGE > 0) {
-					BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList);
-				}
-
-				if (p.DAMAGE_PERCENTAGE > 0.0) {
-					DamageUtils.damage(mBoss, target, new DamageEvent.Metadata(DamageType.TRUE, null, null, p.SPELL_NAME),
-						EntityUtils.getMaxHealth(target) * p.DAMAGE_PERCENTAGE, true, true, true);
-				}
-
-				if (p.CHANGE_TARGET && mBoss instanceof Mob mobAI && !(target instanceof Player player && AbilityUtils.isStealthed(player))) {
-					mobAI.setTarget(target);
-				}
-
-				p.EFFECTS.apply(target, mBoss);
-			},
-			// Attack particles
-			(Location loc) -> p.PARTICLE_ATTACK.spawn(mBoss, loc),
-			// Ending particles on boss
-			() -> {
-				p.PARTICLE_ROAR.spawn(mBoss, mBoss.getLocation(), 0.3, 0.3, 0.3, 0.15);
-				p.SOUND_ROAR.play(mBoss.getLocation(), 1f, 1.5f);
-				mBoss.setAI(true);
-			});
+		final Spell spell = new SpellBaseCharge(mPlugin, mBoss, p);
 
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}

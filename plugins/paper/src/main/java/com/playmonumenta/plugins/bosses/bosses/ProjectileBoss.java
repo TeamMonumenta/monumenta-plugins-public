@@ -170,8 +170,6 @@ public class ProjectileBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		final Parameters p = BossParameters.getParameters(mBoss, identityTag, new Parameters());
-		final int lifetimeTicks = (int) (p.DISTANCE / p.SPEED);
-
 		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT) {
 			//same object
 			//probably an older mob version?
@@ -188,71 +186,18 @@ public class ProjectileBoss extends BossAbilityGroup {
 			p.MIRROR = 0;
 		}
 
-		final Spell spell = new SpellBaseSeekingProjectile(mPlugin, mBoss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL,
-			p.COOLDOWN, p.SPELL_DELAY, p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH,
-			p.SPLIT, p.SPLIT_ANGLE, p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS,
-			p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
-			//spell targets
-			() -> p.TARGETS.getTargetsList(mBoss),
-			// Initiate Aesthetic
-			(World world, Location loc, int ticks) -> {
-				if (p.SPELL_DELAY > 0) {
-					GlowingManager.startGlowing(mBoss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
-				}
-				p.SOUND_START.play(loc);
-			},
-			// Launch Aesthetic
-			(World world, Location loc, int ticks) -> {
-				p.PARTICLE_LAUNCH.spawn(mBoss, loc);
-				p.SOUND_LAUNCH.play(loc);
-			},
-			// Projectile Aesthetic
-			(World world, Location loc, int ticks) -> {
-				p.PARTICLE_PROJECTILE.spawn(mBoss, loc, 0.1, 0.1, 0.1, 0.1);
-				if (ticks % 40 == 0) {
-					p.SOUND_PROJECTILE.play(loc);
-				}
-			},
-			// Hit Action
-			(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
-
-				if (target != null) {
-					p.HIT_SUMMONS.spawn(loc);
-				} else if (p.SUMMON_ON_COLLISION && prevLoc != null) {
-					p.HIT_SUMMONS.spawn(prevLoc);
-				}
-
-				if (!p.DAMAGE_PLAYER_ONLY || target instanceof Player) {
-					p.SOUND_HIT.play(loc, 0.5f, 0.5f);
-					p.PARTICLE_HIT.spawn(mBoss, loc, 0d, 0d, 0d, 0.25d);
-
-					if (target != null && prevLoc != null) {
-						onHitActions(p, mBoss, target, prevLoc);
-					}
-
-					if (p.AOE_RADIUS > 0) {
-						/* TODO: This could be generalized to work with all LivingEntities with some effort. I only
-						 *  made it work with players since I'm strictly importing functionality from KineticProjectileBoss */
-						final List<Player> hitPlayers = new Hitbox.AABBHitbox(world,
-							new BoundingBox().shift(loc).expand(p.AOE_RADIUS)).getHitPlayers(true);
-						hitPlayers.removeIf(player -> player == target);
-						if (prevLoc != null) {
-							hitPlayers.forEach(player -> onHitActions(p, mBoss, player, prevLoc));
-						}
-					}
-				}
-			});
+		final Spell spell = new SpellBaseSeekingProjectile(plugin, mBoss, p);
 
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 
-	private void onHitActions(final Parameters p, final LivingEntity launcher, final LivingEntity affected, final @Nullable Location prevLoc) {
+	public static void onHitActions(final Parameters p, final LivingEntity launcher, final LivingEntity affected, final @Nullable Location prevLoc) {
 		if (p.DAMAGE > 0) {
 			BossUtils.blockableDamage(launcher, affected, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc, p.EFFECTS.mEffectList);
 		}
 
 		if (p.DAMAGE_PERCENTAGE > 0.0) {
-			BossUtils.bossDamagePercent(mBoss, affected, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME, p.EFFECTS.mEffectList);
+			BossUtils.bossDamagePercent(launcher, affected, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME, p.EFFECTS.mEffectList);
 		}
 
 		if (p.HEAL_AMOUNT > 0) {

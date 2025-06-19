@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -12,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -146,6 +151,63 @@ public class SpellBaseSeekingProjectile extends Spell {
 			0, 0, 0, 0, 200.0, 100.0, 1, 30, speed, turnRadius,
 			lifetimeTicks, hitboxLength, lingers, collidesWithBlocks, 0.5, 0.125, collidesWithOthers, collisionCheckDelay,
 			targets, initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
+	}
+
+	public SpellBaseSeekingProjectile(Plugin mPlugin, LivingEntity mBoss, ProjectileBoss.Parameters p){
+		this(mPlugin, mBoss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL,
+		 p.COOLDOWN, p.SPELL_DELAY, p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH,
+		 p.SPLIT, p.SPLIT_ANGLE, p.SPEED, p.TURN_RADIUS, (int) (p.DISTANCE / p.SPEED), p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS,
+		 p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
+		 //spell targets
+			() -> p.TARGETS.getTargetsList(mBoss),
+			// Initiate Aesthetic
+			(World world, Location loc, int ticks) -> {
+				if (p.SPELL_DELAY > 0) {
+					GlowingManager.startGlowing(mBoss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
+				}
+				p.SOUND_START.play(loc);
+			},
+			// Launch Aesthetic
+			(World world, Location loc, int ticks) -> {
+				p.PARTICLE_LAUNCH.spawn(mBoss, loc);
+				p.SOUND_LAUNCH.play(loc);
+			},
+			// Projectile Aesthetic
+			(World world, Location loc, int ticks) -> {
+				p.PARTICLE_PROJECTILE.spawn(mBoss, loc, 0.1, 0.1, 0.1, 0.1);
+				if (ticks % 40 == 0) {
+					p.SOUND_PROJECTILE.play(loc);
+				}
+			},
+			// Hit Action
+			(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
+
+				if (target != null) {
+					p.HIT_SUMMONS.spawn(loc);
+				} else if (p.SUMMON_ON_COLLISION && prevLoc != null) {
+					p.HIT_SUMMONS.spawn(prevLoc);
+				}
+
+				if (!p.DAMAGE_PLAYER_ONLY || target instanceof Player) {
+					p.SOUND_HIT.play(loc, 0.5f, 0.5f);
+					p.PARTICLE_HIT.spawn(mBoss, loc, 0d, 0d, 0d, 0.25d);
+
+					if (target != null && prevLoc != null) {
+						ProjectileBoss.onHitActions(p, mBoss, target, prevLoc);
+					}
+
+					if (p.AOE_RADIUS > 0) {
+						/* TODO: This could be generalized to work with all LivingEntities with some effort. I only
+						 *  made it work with players since I'm strictly importing functionality from KineticProjectileBoss */
+						final List<Player> hitPlayers = new Hitbox.AABBHitbox(world,
+							new BoundingBox().shift(loc).expand(p.AOE_RADIUS)).getHitPlayers(true);
+						hitPlayers.removeIf(player -> player == target);
+						if (prevLoc != null) {
+							hitPlayers.forEach(player -> ProjectileBoss.onHitActions(p, mBoss, player, prevLoc));
+						}
+					}
+				}
+			});
 	}
 
 	/**
