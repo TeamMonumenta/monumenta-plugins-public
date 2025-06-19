@@ -125,7 +125,7 @@ public class LoadoutManagerGui extends Gui {
 
 			setItem(5, GUIUtils.createBasicItem(Material.MAP, "Available Loadout Pages: " + mLoadoutData.mMaxLoadoutPages,
 				NamedTextColor.GOLD, true, """
-					Click to buy an additional Page for the cost of 1 Armory Page Upgrader, Purchased at Caroline."""))
+					Click to buy an additional Page for the cost of 1 Armory Page Upgrader, Purchased at the Portal Rare Trader."""))
 				.onLeftClick(() -> {
 					if (mLoadoutData.mMaxLoadoutPages >= MAX_PAGES) {
 						mPlayer.sendMessage(Component.text("You have already reached the maximum number of loadout pages!", NamedTextColor.RED));
