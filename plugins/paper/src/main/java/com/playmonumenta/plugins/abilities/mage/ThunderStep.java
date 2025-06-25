@@ -211,7 +211,7 @@ public class ThunderStep extends Ability {
 			.add(a -> a.mLevelDamage, DAMAGE_1, false, Ability::isLevelOne)
 			.add(" thunder magic damage to all enemies within ")
 			.add(a -> a.mRadius, SIZE)
-			.add(" blocks around you and knocking them away. The next moment, you teleport in the direction you're looking, travelling up to ")
+			.add(" blocks around you. The next moment, you teleport in the direction you're looking, travelling up to ")
 			.add(a -> a.mLevelDistance, DISTANCE_1, false, Ability::isLevelOne)
 			.add(" blocks or until you hit a solid block, and repeat the thunder attack at your destination.")
 			.addCooldown(COOLDOWN_TICKS);
