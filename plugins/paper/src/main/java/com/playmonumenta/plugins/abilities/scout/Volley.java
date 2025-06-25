@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.cosmetics.skills.scout.VolleyCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.HashMap;
@@ -78,8 +79,11 @@ public class Volley extends Ability {
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (!mPlayer.isSneaking()
-			    || isOnCooldown()
-			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			|| isOnCooldown()
+			|| !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			return true;
+		}
+		if (Grappling.playerHoldingHook(mPlayer)) {
 			return true;
 		}
 

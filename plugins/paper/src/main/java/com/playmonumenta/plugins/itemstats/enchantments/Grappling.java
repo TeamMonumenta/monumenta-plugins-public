@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.protocollib.PingListener;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -84,25 +83,19 @@ public class Grappling implements Enchantment {
 	public void onProjectileLaunch(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile projectile) {
 		ItemStack bow = player.getInventory().getItemInMainHand();
 		if (ItemStatUtils.getEnchantmentLevel(bow, getEnchantmentType()) < 1
-			|| ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)
+			|| (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.FORCE_ENABLE_GRAPPLING_HOOK))
 			|| projectile.getScoreboardTags().contains("NoGrapple")) {
 			return;
 		}
 		if (plugin.mEffectManager.hasEffect(player, ItemCooldown.toSource(getEnchantmentType()))) {
-			if (!projectile.getScoreboardTags().contains("SourceQuickDraw")) {
-				player.sendMessage(Component.text("Your " + ItemUtils.getPlainName(bow) + " is still on cooldown!", TextColor.fromHexString("#D02E28")));
-				event.setCancelled(true);
-			}
+			player.sendMessage(Component.text("Your " + ItemUtils.getPlainName(bow) + " is still on cooldown!", TextColor.fromHexString("#D02E28")));
+			event.setCancelled(true);
 			return;
 		}
 
 		if (player.getGameMode() != GameMode.CREATIVE) {
 			// Decrement charges
-			int maxCharges = 1;
-			if (ServerProperties.getShardName().startsWith("dev")
-				|| ServerProperties.getShardName().contains("dungeon")) {
-				maxCharges = ScoreboardUtils.getScoreboardValue(player, MAX_CHARGES_SCOREBOARD).orElse(1);
-			}
+			int maxCharges = ScoreboardUtils.getScoreboardValue(player, MAX_CHARGES_SCOREBOARD).orElse(1);
 			synchronized (player) {
 				int shotsFired = mPlayerShotsFiredMap.getOrDefault(player.getUniqueId(), 0) + 1;
 				mPlayerShotsFiredMap.put(player.getUniqueId(), shotsFired);
@@ -137,7 +130,7 @@ public class Grappling implements Enchantment {
 
 	// Called by GrapplingListener
 	public static void handleProjectileHit(Player player, double level, ProjectileHitEvent event, Projectile proj) {
-		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)
+		if ((ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.FORCE_ENABLE_GRAPPLING_HOOK))
 			|| proj.getScoreboardTags().contains("NoGrapple")) {
 			return;
 		}
@@ -439,6 +432,10 @@ public class Grappling implements Enchantment {
 					+ (ScoreboardUtils.getScoreboardValue(player, MAX_CHARGES_SCOREBOARD).orElse(1) - shotsFired + 1),
 				NamedTextColor.YELLOW));
 		}
+	}
+
+	public static boolean playerHoldingHook(Player player) {
+		return ItemStatUtils.getEnchantmentLevel(player.getInventory().getItemInMainHand(), EnchantmentType.GRAPPLING) > 0;
 	}
 
 	private static class PickupHook {

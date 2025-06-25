@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PredatorStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
@@ -174,6 +175,9 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (mDeactivationRunnable == null || !EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
+			return true;
+		}
+		if (Grappling.playerHoldingHook(mPlayer)) {
 			return true;
 		}
 		mDeactivationRunnable.cancel();

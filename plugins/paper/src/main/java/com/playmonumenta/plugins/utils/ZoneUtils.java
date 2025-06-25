@@ -32,6 +32,7 @@ public class ZoneUtils {
 		DISABLE_REDSTONE_INTERACTIONS("Disable Redstone Interactions"),
 		EXPLOSION_PROOF_CHESTS("Explosion Proof Chests"),
 		FESTIVE_TESSERACT_DISABLED("Festive Tesseract Disabled"),
+		FORCE_ENABLE_GRAPPLING_HOOK("Force Enable Grappling Hook"),
 		ITEM_FRAMES_EDITABLE("Item Frames Editable"),
 		LAND_BOAT_POSSIBLE("Land Boat Possible"),
 		LOOTING_LIMITER_DISABLED("Looting Limiter Disabled"),
