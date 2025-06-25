@@ -410,6 +410,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(PlayerScalingBoss.identityTag, PlayerScalingBoss::new, new PlayerScalingBoss.Parameters());
 		registerStatelessBoss(ProjectileEntityBoss.identityTag, ProjectileEntityBoss::new, new ProjectileEntityBoss.Parameters());
 		registerStatelessBoss(BefuddleBoss.identityTag, BefuddleBoss::new, new BefuddleBoss.Parameters());
+		registerStatelessBoss(ChargeManagerBoss.identityTag, ChargeManagerBoss::new, new ChargeManagerBoss.Parameters());
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);
