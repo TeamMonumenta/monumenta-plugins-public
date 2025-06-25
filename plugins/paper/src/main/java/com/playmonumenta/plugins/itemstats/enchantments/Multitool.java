@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Material;
@@ -121,13 +122,10 @@ public class Multitool implements Enchantment {
 			return;
 		}
 
-		// Only allow swapping once every 2 ticks at most to prevent accidental double-swaps
-		if (MetadataUtils.checkOnceInRecentTicks(plugin, player, "MultitoolMutex", 1)) {
-			tool = tool.withType(bestToolMat);
-			player.getInventory().setItemInMainHand(tool);
-			playSwapSound(player, bestToolMat);
-			player.updateInventory();
-		}
+		tool = tool.withType(bestToolMat);
+		player.getInventory().setItemInMainHand(tool);
+		playSwapSound(player, bestToolMat);
+		player.updateInventory();
 	}
 
 	@Override
@@ -242,18 +240,32 @@ public class Multitool implements Enchantment {
 			return toolMat;
 		}
 
-		Material bestMat = toolMat;
+		// Skip any block that can always be instantly mined (or can't be mined, which is conveniently negative)
+		if (blockMat.getHardness() <= 0.0f) {
+			return toolMat;
+		}
+
+		// Get a list of acceptable tools; there may be more than one
+		List<Material> bestMats = new ArrayList<>();
 		for (Material testMat : getMaterials(toolMat, level)) {
 			if (Tag.ITEMS_AXES.isTagged(testMat) && Tag.MINEABLE_AXE.isTagged(blockMat)) {
-				bestMat = testMat;
+				bestMats.add(testMat);
 			}
 			if (Tag.ITEMS_SHOVELS.isTagged(testMat) && Tag.MINEABLE_SHOVEL.isTagged(blockMat)) {
-				bestMat = testMat;
+				bestMats.add(testMat);
 			}
 			if (Tag.ITEMS_PICKAXES.isTagged(testMat) && Tag.MINEABLE_PICKAXE.isTagged(blockMat)) {
-				bestMat = testMat;
+				bestMats.add(testMat);
 			}
 		}
+
+		// If the list of acceptable tools is empty or includes the current tool, don't switch...
+		Material bestMat = toolMat;
+		if (!bestMats.isEmpty() && !bestMats.contains(toolMat)) {
+			// ...otherwise, pick any of the valid tools
+			bestMat = bestMats.get(0);
+		}
+
 		return bestMat;
 	}
 
