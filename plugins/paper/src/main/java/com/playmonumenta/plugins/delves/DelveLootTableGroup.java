@@ -89,6 +89,12 @@ public class DelveLootTableGroup {
 		new DelveLootTableGroup("r3/delves/brown/base_lootroom_boss", "r3/delves/brown/dmat_lootroom_boss", "r3/delves/brown/cmat_lootroom_boss", "r3/dungeons/brown/lootroom_boss").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r3/delves/brown/base_lootroom_rare", "r3/delves/brown/dmat_lootroom_rare", "r3/delves/brown/cmat_lootroom_rare", "r3/dungeons/brown/lootroom_rare").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
+		new DelveLootTableGroup("r3/delves/indigo/base_city", "r3/delves/indigo/dmat_city", "r3/delves/indigo/cmat_city", "r3/dungeons/indigo/city").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/delves/indigo/base_tower", "r3/delves/indigo/dmat_tower", "r3/delves/indigo/cmat_tower", "r3/dungeons/indigo/tower").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/delves/indigo/base_outworld", "r3/delves/indigo/dmat_outworld", "r3/delves/indigo/cmat_outworld", "r3/dungeons/indigo/outworld").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/delves/indigo/base_lootroom_boss", "r3/delves/indigo/dmat_lootroom_boss", "r3/delves/indigo/cmat_lootroom_boss", "r3/dungeons/indigo/lootroom_boss").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/delves/indigo/base_lootroom_rare", "r3/delves/indigo/dmat_lootroom_rare", "r3/delves/indigo/cmat_lootroom_rare", "r3/dungeons/indigo/lootroom_rare").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
 		// R3 Overworld Delves
 		// amanita
 		new DelveLootTableGroup("r3/world/poi/amanita_colony/delves/base_chest", "r3/world/poi/amanita_colony/delves/dmat_chest", "r3/world/poi/amanita_colony/delves/cmat_chest", "r3/world/poi/amanita_colony/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
