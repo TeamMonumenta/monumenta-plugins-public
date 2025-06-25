@@ -144,12 +144,53 @@ public class WalletUtils {
 		}
 	}
 
+	public static void refundDebt(Debt debt, Player player, boolean notify) {
+		final int oneStack = debt.mItem.getMaxStackSize();
+		if (debt.mInventoryDebt > 0) {
+			if (debt.mInventoryDebt <= oneStack) {
+				InventoryUtils.giveItem(player, debt.mItem.asQuantity(debt.mInventoryDebt));
+			} else {
+				int left = debt.mInventoryDebt;
+				while (left > 0) {
+					int toGive = Math.min(left, oneStack);
+					InventoryUtils.giveItem(player, debt.mItem.asQuantity(toGive));
+					left -= toGive;
+				}
+			}
+		}
+		if (debt.mWalletDebt > 0) {
+			if (debt.mWalletDebt <= oneStack) {
+				WalletManager.getWallet(player).add(player, debt.mItem.asQuantity(debt.mWalletDebt));
+			} else {
+				int left = debt.mWalletDebt;
+				while (left > 0) {
+					int toGive = Math.min(left, oneStack);
+					WalletManager.getWallet(player).add(player, debt.mItem.asQuantity(toGive));
+					left -= toGive;
+				}
+			}
+			if (notify) {
+				notifyDepositIntoWallet(debt, player);
+			}
+		}
+	}
+
 	public static void notifyRemovalFromWallet(Debt debt, Player player) {
 		if (debt.mWalletDebt > 0) {
 			player.sendMessage(Component.text("Removed ", NamedTextColor.GREEN).append(
 				Component.text(debt.mWalletDebt + " " + ItemUtils.getPlainNameOrDefault(debt.mItem), NamedTextColor.WHITE).append(
 					Component.text(" from your wallet. ", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)).append(
 					Component.text("(Remaining: " + (debt.mNumInWallet - debt.mWalletDebt) + ")", NamedTextColor.GRAY)
+				)));
+		}
+	}
+
+	public static void notifyDepositIntoWallet(Debt debt, Player player) {
+		if (debt.mWalletDebt > 0) {
+			player.sendMessage(Component.text("Deposited ", NamedTextColor.GREEN).append(
+				Component.text(debt.mWalletDebt + " " + ItemUtils.getPlainNameOrDefault(debt.mItem), NamedTextColor.WHITE).append(
+					Component.text(" to your wallet. ", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)).append(
+					Component.text("(Total: " + (debt.mNumInWallet - debt.mWalletDebt) + ")", NamedTextColor.GRAY)
 				)));
 		}
 	}

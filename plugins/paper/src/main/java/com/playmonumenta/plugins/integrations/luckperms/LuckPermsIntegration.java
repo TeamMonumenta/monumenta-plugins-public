@@ -94,6 +94,7 @@ public class LuckPermsIntegration implements Listener {
 	public static final String GUILD_ROOT_ID_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "id";
 	public static final String GUILD_ROOT_LOCKDOWN_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "lockdown";
 	public static final String GUILD_ROOT_PLOT_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "plot";
+	public static final String GUILD_ROOT_PLOT_TYPE_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "plot_type";
 	public static final String GUILD_ROOT_COLOR_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "color";
 	public static final String GUILD_ROOT_PLAIN_TAG_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "plain_tag";
 	public static final String GUILD_ROOT_TAG_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "tag";
@@ -771,6 +772,65 @@ public class LuckPermsIntegration implements Listener {
 		}
 
 		return null;
+	}
+
+	public static int getPlotTypeId(Group group) {
+		try {
+			Group root = getGuildRoot(group);
+			if (root == null) {
+				return 0;
+			}
+
+			for (MetaNode node : root.getNodes(NodeType.META)) {
+				if (node.getMetaKey().equals(GUILD_ROOT_PLOT_TYPE_MK)) {
+					return Integer.parseInt(node.getMetaValue());
+				}
+			}
+		} catch (Exception ex) {
+			MMLog.warning("An error occurred getting the guild plot type ID:");
+			MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
+			return 0;
+		}
+
+		return 0;
+	}
+
+	public static GuildPlotType getPlotType(Group group) {
+		return GuildPlotType.byScore(getPlotTypeId(group));
+	}
+
+	public static CompletableFuture<Void> setPlotType(Group group, GuildPlotType plotType) {
+		CompletableFuture<Void> future = new CompletableFuture<>();
+
+		Group root = getGuildRoot(group);
+		if (root == null) {
+			future.completeExceptionally(new NullPointerException("Guild has no root node"));
+			return future;
+		}
+
+		List<MetaNode> toDelete = new ArrayList<>();
+		for (MetaNode node : root.getNodes(NodeType.META)) {
+			if (node.getMetaKey().equals(GUILD_ROOT_PLOT_TYPE_MK)) {
+				toDelete.add(node);
+			}
+		}
+		for (MetaNode node : toDelete) {
+			root.data().remove(node);
+		}
+
+		root.data().add(MetaNode.builder(GUILD_ROOT_PLOT_TYPE_MK, Integer.toString(plotType.mScore)).build());
+
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			try {
+				GM.saveGroup(root).join();
+				pushUpdate();
+				future.complete(null);
+			} catch (Exception ex) {
+				future.completeExceptionally(ex);
+			}
+		});
+
+		return future;
 	}
 
 	public static CompletableFuture<User> loadUser(UUID playerId) {

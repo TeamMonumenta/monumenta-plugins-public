@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 public class GuildPlotUtils {
 	public static Pattern RE_GUILD_PLOT_NAME = Pattern.compile("^guildplot(\\d+)$");
 	public static final String LAST_GUILD_WORLD_OBJECTIVE = "Guild";
+	public static final String LAST_GUILD_WORLD_TYPE_OBJECTIVE = "GuildPlotType";
 	public static final String SHARD_NAME = "guildplots";
 	public static final Component FALLBACK_WORLD_COMPONENT
 		= Component.text("Guild Hub", NamedTextColor.LIGHT_PURPLE)
@@ -119,6 +120,7 @@ public class GuildPlotUtils {
 			);
 			return;
 		}
+		int guildPlotType = LuckPermsIntegration.getPlotTypeId(guild);
 		if (guildPlotId <= 0 || guildPlotId > Integer.MAX_VALUE) {
 			player.sendMessage(Component.text("", NamedTextColor.RED)
 				.append(LuckPermsIntegration.getGuildFullComponent(guild))
@@ -128,6 +130,7 @@ public class GuildPlotUtils {
 		}
 
 		ScoreboardUtils.setScoreboardValue(player, LAST_GUILD_WORLD_OBJECTIVE, guildPlotId.intValue());
+		ScoreboardUtils.setScoreboardValue(player, LAST_GUILD_WORLD_TYPE_OBJECTIVE, guildPlotType);
 	}
 
 	public static void sendToGuildPlotsShard(Player player) {

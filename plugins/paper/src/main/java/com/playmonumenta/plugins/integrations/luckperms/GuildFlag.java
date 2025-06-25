@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
+import com.playmonumenta.plugins.Plugin;
+import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -8,6 +10,7 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.PermissionNode;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
 public enum GuildFlag {
@@ -73,10 +76,13 @@ public enum GuildFlag {
 		return false;
 	}
 
-	public void setFlag(Group guild, boolean value) {
+	public CompletableFuture<Void> setFlag(Group guild, boolean value) {
+		CompletableFuture<Void> future = new CompletableFuture<>();
+
 		Group guildRoot = LuckPermsIntegration.getGuildRoot(guild);
 		if (guildRoot == null) {
-			return;
+			future.completeExceptionally(new NullPointerException("Could not identify guild root"));
+			return future;
 		}
 
 		String flagPerm = guildFlagPerm();
@@ -96,7 +102,16 @@ public enum GuildFlag {
 			data.add(permissionNode);
 		}
 
-		LuckPermsIntegration.GM.saveGroup(guildRoot);
-		LuckPermsIntegration.pushUpdate();
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			try {
+				LuckPermsIntegration.GM.saveGroup(guildRoot).join();
+				LuckPermsIntegration.pushUpdate();
+				future.complete(null);
+			} catch (Exception ex) {
+				future.completeExceptionally(ex);
+			}
+		});
+
+		return future;
 	}
 }
