@@ -857,14 +857,25 @@ public class PlayerListener implements Listener {
 			EffectManager.getInstance().addEffect(player, GearChanged.effectID, new GearChanged(GearChanged.DURATION));
 		}
 
-		if (player.getGameMode() != GameMode.CREATIVE
-			&& event.getClickedInventory() == player.getInventory()
-			&& 36 <= event.getSlot() && event.getSlot() <= 40
-			&& (ItemUtils.isNullOrAir(event.getCursor())
-			|| clickType.isShiftClick()
-			|| clickType == ClickType.UNKNOWN
-			|| (clickType == ClickType.NUMBER_KEY && ItemUtils.isNullOrAir(player.getInventory().getItem(event.getHotbarButton()))))
-			&& (player.getLocation().getY() < player.getWorld().getMinHeight() || EntityUtils.touchesLava(player))) {
+		if (
+			player.getGameMode() != GameMode.CREATIVE &&
+				event.getClickedInventory() == player.getInventory() &&
+				36 <= event.getSlot() && event.getSlot() <= 40 &&
+				(
+					ItemUtils.isNullOrAir(event.getCursor()) ||
+						clickType.isShiftClick() ||
+						clickType == ClickType.UNKNOWN ||
+						(
+							clickType == ClickType.NUMBER_KEY
+								&& ItemUtils.isNullOrAir(player.getInventory().getItem(event.getHotbarButton())
+							)
+						)
+				) &&
+				(
+					player.getLocation().getY() < player.getWorld().getMinHeight() ||
+						EntityUtils.touchesLava(player)
+				)
+		) {
 			player.sendMessage(Component.text("Unequipping gear in lava or void is not allowed!", NamedTextColor.RED));
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
@@ -872,18 +883,20 @@ public class PlayerListener implements Listener {
 		}
 
 		if (
-			!mPlugin.mItemOverrides.inventoryClickInteraction(mPlugin, player, event)
-				|| !mPlugin.mItemOverrides.inventoryClickEvent(mPlugin, player, event)
+			!mPlugin.mItemOverrides.inventoryClickInteraction(mPlugin, player, event) ||
+				!mPlugin.mItemOverrides.inventoryClickEvent(mPlugin, player, event)
 		) {
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 		}
 
 		// If right-clicking charm, open GUI
-		if (clickType == ClickType.RIGHT
-			&& item != null
-			&& item.getAmount() == 1
-			&& ItemUtils.isNullOrAir(event.getCursor())) {
+		if (
+			clickType == ClickType.RIGHT &&
+				item != null &&
+				item.getAmount() == 1 &&
+				ItemUtils.isNullOrAir(event.getCursor())
+		) {
 			for (CharmManager.CharmType charmType : CharmManager.CharmType.values()) {
 				if (charmType.isCharm(item)) {
 					new CharmsGUI(player, charmType).open();
@@ -892,21 +905,22 @@ public class PlayerListener implements Listener {
 			}
 		}
 
-		if (clickType == ClickType.SWAP_OFFHAND
-			&& event.getClickedInventory() == player.getInventory()
-			&& ItemUtils.isNullOrAir(event.getCursor())
-			&& ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)) {
-			event.setCurrentItem(Multitool.swap(mPlugin, (Player) event.getWhoClicked(), item));
-			event.setCancelled(true);
-			GUIUtils.refreshOffhand(event);
+		if (
+			clickType == ClickType.SWAP_OFFHAND &&
+				event.getClickedInventory() == player.getInventory() &&
+				ItemUtils.isNullOrAir(event.getCursor()) &&
+				item != null &&
+				ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)
+		) {
+			Multitool.onSwapInInventory(event, player, item);
 		}
 
 		if (
-			item != null
-				&& item.getType() == Material.WRITTEN_BOOK
-				&& item.getAmount() == 1
-				&& ItemUtils.isNullOrAir(event.getCursor())
-				&& clickType == ClickType.RIGHT
+			item != null &&
+				item.getType() == Material.WRITTEN_BOOK &&
+				item.getAmount() == 1 &&
+				ItemUtils.isNullOrAir(event.getCursor()) &&
+				clickType == ClickType.RIGHT
 		) {
 			player.openBook(item);
 			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1, 1);

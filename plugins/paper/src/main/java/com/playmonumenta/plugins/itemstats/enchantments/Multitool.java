@@ -11,6 +11,8 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -18,6 +20,7 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -31,6 +34,8 @@ import org.jetbrains.annotations.CheckReturnValue;
  * Name/Lore/Stats.
  */
 public class Multitool implements Enchantment {
+
+	public static final String MULTITOOL_DISABLE_AUTO_SWAP_TAG = "DisableMultitoolAutoSwap";
 
 	public static final String MULTITOOL_TRIGGER_OPTION_SCORE = "MultitoolTrigger";
 	public static final int TRIGGER_OPTION_RIGHT_CLICK = 0;
@@ -62,9 +67,9 @@ public class Multitool implements Enchantment {
 			return;
 		}
 
-		// Swap to best tool when left clicking a block
+		// Swap to best tool when left-clicking a block
 		if (Action.LEFT_CLICK_BLOCK.equals(event.getAction())) {
-			onLeftClickBlock(plugin, player, event);
+			onLeftClickBlock(player, event);
 			return;
 		}
 
@@ -108,7 +113,28 @@ public class Multitool implements Enchantment {
 		}
 	}
 
-	private void onLeftClickBlock(Plugin plugin, Player player, PlayerInteractEvent event) {
+	public static void onSwapInInventory(InventoryClickEvent event, Player player, ItemStack item) {
+		Material mat = item.getType();
+		int level = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.MULTITOOL);
+		if (getMaterials(mat, level).contains(Material.COMPASS)) {
+			return;
+		}
+
+		if (ScoreboardUtils.toggleTag(player, MULTITOOL_DISABLE_AUTO_SWAP_TAG)) {
+			player.sendMessage(Component.text("Multitool Auto-Swap disabled.", NamedTextColor.GOLD));
+		} else {
+			player.sendMessage(Component.text("Multitool Auto-Swap enabled.", NamedTextColor.GOLD));
+		}
+
+		player.playSound(player, Sound.BLOCK_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 2.0F);
+		event.setCancelled(true);
+	}
+
+	private void onLeftClickBlock(Player player, PlayerInteractEvent event) {
+		if (player.getScoreboardTags().contains(MULTITOOL_DISABLE_AUTO_SWAP_TAG)) {
+			return;
+		}
+
 		Block block = event.getClickedBlock();
 		if (block == null) {
 			return;
