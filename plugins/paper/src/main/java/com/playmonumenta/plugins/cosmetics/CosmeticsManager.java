@@ -521,13 +521,13 @@ public class CosmeticsManager implements Listener {
 		Vector playerDirection = bully.getLocation().getDirection();
 
 		for (Player target : bully.getWorld().getPlayers()) {
-			/* The target cannot:
-			- be the bully themselves
-			- (be less than a tier 1 patron, be a non-moderator, or be a non-developer) and (be opted out of player punches)
-			- be vanished or in spectator mode
+			/* The target:
+			- cannot be the bully themselves
+			- (must be friends with the bully OR be a developer/moderator) and (must not have the bully blocked and vice versa) and (must not be opted out of Player Punches)
+			- cannot be vanished or in spectator mode
 			 */
 			if (target == bully ||
-				!PlayerPunches.canBePunched(target) ||
+				!PlayerPunches.canBePunched(bully, target) ||
 				PremiumVanishIntegration.isInvisibleOrSpectator(target)) {
 				continue;
 			}

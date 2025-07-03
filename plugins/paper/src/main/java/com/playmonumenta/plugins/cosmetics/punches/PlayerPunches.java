@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.social.PlayerSocialCache;
+import com.playmonumenta.plugins.social.SocialManager;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Set;
 import org.bukkit.Material;
@@ -42,14 +44,28 @@ public class PlayerPunches {
 			ServerProperties.getShardName().equals("plots");
 	}
 
-	public static boolean canAccess(Player player) {
-		return ((ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) >= Constants.PATREON_TIER_1) || player.hasPermission("group.dev")) &&
-			!player.hasPermission("monumenta.cosmetics.punchoptout");
+	public static boolean canAccess(Player bully) {
+		boolean isTierOnePatron = ScoreboardUtils.getScoreboardValue(bully, Constants.Objectives.PATREON_DOLLARS).orElse(0) >= Constants.PATREON_TIER_1;
+		boolean isStaff = bully.hasPermission("group.dev");
+		boolean isOptOut = bully.hasPermission("monumenta.cosmetics.punchoptout");
+
+		return (isTierOnePatron || isStaff) && !isOptOut;
 	}
 
-	public static boolean canBePunched(Player player) {
-		return ((ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) >= Constants.PATREON_TIER_1) || player.hasPermission("group.dev")) &&
-			!player.hasPermission("monumenta.cosmetics.punchoptout");
+	public static boolean canBePunched(Player bully, Player victim) {
+		PlayerSocialCache bullyCache = SocialManager.getSocialCache(bully.getUniqueId());
+		PlayerSocialCache victimCache = SocialManager.getSocialCache(victim.getUniqueId());
+
+		if (bullyCache != null && victimCache != null) {
+			boolean isFriends = victimCache.getFriends().contains(bully.getUniqueId());
+			boolean isStaff = victim.hasPermission("group.dev");
+			boolean isBlockedBetween = victimCache.isBlockedBetween(bullyCache);
+			boolean isOptOut = victim.hasPermission("monumenta.cosmetics.punchoptout");
+
+			return (isFriends || isStaff) && !isBlockedBetween && !isOptOut;
+		}
+
+		return false;
 	}
 
 	public static void handleLogin(Player player) {
