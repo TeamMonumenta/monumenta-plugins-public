@@ -189,7 +189,7 @@ public enum DelvePreset {
 		entry(DelvesModifier.LEGIONARY, 7),
 		entry(DelvesModifier.DREADFUL, 5),
 		entry(DelvesModifier.TWISTED, 5),
-		entry(DelvesModifier.PERNICIOUS, 3),
+		entry(DelvesModifier.PERNICIOUS, 5),
 		entry(DelvesModifier.RIFTBORN, 1),
 		entry(DelvesModifier.BLOODTHIRSTY, 3),
 		entry(DelvesModifier.VENGEANCE, 10),

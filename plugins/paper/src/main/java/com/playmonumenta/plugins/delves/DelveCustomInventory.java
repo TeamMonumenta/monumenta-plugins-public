@@ -133,6 +133,7 @@ public class DelveCustomInventory extends CustomInventory {
 		DUNGEON_FUNCTION_MAPPINGS.put("portal", "function monumenta:lobbies/dps/new");
 		DUNGEON_FUNCTION_MAPPINGS.put("blue", "function monumenta:lobbies/d12/new");
 		DUNGEON_FUNCTION_MAPPINGS.put("brown", "function monumenta:lobbies/d13/new");
+		DUNGEON_FUNCTION_MAPPINGS.put("indigo", "function monumenta:lobbies/di/new");
 
 		CHALL_FUNCTION_MAPPINGS.put("white", "function monumenta:lobbies/d1/new_challenge");
 		CHALL_FUNCTION_MAPPINGS.put("orange", "function monumenta:lobbies/d2/new_challenge");
@@ -152,6 +153,7 @@ public class DelveCustomInventory extends CustomInventory {
 		CHALL_FUNCTION_MAPPINGS.put("shiftingcity", "function monumenta:lobbies/drl2/new_challenge");
 		CHALL_FUNCTION_MAPPINGS.put("blue", "function monumenta:lobbies/d12/new_challenge");
 		CHALL_FUNCTION_MAPPINGS.put("brown", "function monumenta:lobbies/d13/new_challenge");
+		CHALL_FUNCTION_MAPPINGS.put("indigo", "function monumenta:lobbies/di/new_challenge");
 	}
 
 	private static final int MODS_ROW = 5;
