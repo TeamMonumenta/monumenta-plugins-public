@@ -61,7 +61,7 @@ public enum DungeonCommandMapping {
 	// Architect's Ring
 	BLUE(Location.BLUE, "blue", false, false, "D12Access", "D12Finished", "D12StartDate", 21, "D12LastVisit", 17, null, null, DelvePreset.BLUE, "ring"),
 	BROWN(Location.BROWN, "brown", false, false, "D13Access", "D13Finished", "D13StartDate", 21, "D13LastVisit", 18, null, null, DelvePreset.BROWN, "ring"),
-	INDIGO(Location.INDIGO, "indigo", false, false, "DIAccess", "DIFinished", "DIStartDate", 21, "DILastVisit", -1, null, null, DelvePreset.BROWN, "ring"),
+	INDIGO(Location.INDIGO, "indigo", false, false, "DIAccess", "DIFinished", "DIStartDate", 21, "DILastVisit", 19, null, null, DelvePreset.INDIGO, "ring"),
 
 	SKT(Location.SILVER, "skt", false, true, "DSKTAccess", "DSKTChests", "DSKTStartDate", 7, "DSKTLastVisit", -1, null, null, null, "SPECIAL_CASE_SKT"),
 	RUIN(Location.BLUESTRIKE, "ruin", false, false, "DMASAccess", "DMASFinished", null, null, null, -1, null, null, null, "ring"),
