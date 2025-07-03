@@ -50,6 +50,7 @@ public class Blizzard extends Ability {
 	public static final String CHARM_RANGE = "Blizzard Range";
 	public static final String CHARM_DURATION = "Blizzard Duration";
 	public static final String CHARM_SLOW = "Blizzard Slowness Amplifier";
+	public static final String CHARM_DELAY = "Blizzard Tick Delay";
 
 	public static final AbilityInfo<Blizzard> INFO =
 		new AbilityInfo<>(Blizzard.class, NAME, Blizzard::new)
@@ -67,6 +68,7 @@ public class Blizzard extends Ability {
 	private final double mLevelSize;
 	private final double mLevelSlowMultiplier;
 	private final int mDuration;
+	private final int mTickDelay;
 
 	private final BlizzardCS mCosmetic;
 
@@ -76,6 +78,7 @@ public class Blizzard extends Ability {
 		mLevelSize = CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, isLevelOne() ? SIZE_1 : SIZE_2);
 		mLevelSlowMultiplier = (isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS);
+		mTickDelay = CharmManager.getDuration(mPlayer, CHARM_DELAY, DAMAGE_INTERVAL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BlizzardCS());
 	}
 
@@ -112,7 +115,7 @@ public class Blizzard extends Ability {
 					}
 				}
 
-				if (mTicks % DAMAGE_INTERVAL == 0) {
+				if (mTicks % mTickDelay == 0) {
 					for (LivingEntity mob : mobs) {
 						DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), spellDamage, true, false, false);
 					}
