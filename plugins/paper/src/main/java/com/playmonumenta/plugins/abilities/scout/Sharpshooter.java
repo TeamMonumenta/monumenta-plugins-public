@@ -27,9 +27,11 @@ import org.jetbrains.annotations.Nullable;
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
-	private static final double PERCENT_BASE_DAMAGE = 0.2;
+	private static final double PERCENT_BASE_DAMAGE = 0.15;
+	private static final double PERCENT_BASE_DAMAGE_L2 = 0.2;
 	private static final int SHARPSHOOTER_DECAY_TIMER = TICKS_PER_SECOND * 5;
-	private static final int MAX_STACKS = 8;
+	private static final int MAX_STACKS = 4;
+	private static final int MAX_STACKS_2 = 8;
 	private static final double PERCENT_DAMAGE_PER_STACK = 0.03;
 	private static final double DAMAGE_PER_BLOCK = 0.015;
 	private static final double MAX_DISTANCE = 16;
@@ -61,7 +63,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	public Sharpshooter(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
-		mMaxStacks = MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
+		mMaxStacks = isLevelTwo() ? MAX_STACKS_2 : MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 		mDecayTime = CharmManager.getDuration(mPlayer, CHARM_DECAY, SHARPSHOOTER_DECAY_TIMER);
 		mDamagePerStack = PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE);
 		mArrowSaveChance = ARROW_SAVE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RETRIEVAL);
@@ -76,7 +78,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 		mCosmetic.hitEffect(mPlayer, enemy);
 		if (huntingCompanion || type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
-			double multiplier = 1 + PERCENT_BASE_DAMAGE;
+			double multiplier = 1 + (isLevelTwo() ? PERCENT_BASE_DAMAGE_L2 : PERCENT_BASE_DAMAGE);
 			if (!huntingCompanion) {
 				if (isLevelTwo()) {
 					multiplier += mStacks * mDamagePerStack;
@@ -91,7 +93,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 			event.updateDamageWithMultiplier(multiplier);
 
-			if (!huntingCompanion && isLevelTwo() && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage())
+			if (!huntingCompanion && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage())
 				&& (type != DamageType.PROJECTILE || (event.getDamager() instanceof final Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)))) {
 				mTicksToStackDecay = mDecayTime;
 
@@ -146,42 +148,42 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public @Nullable Component getHotbarMessage() {
-		if (isLevelTwo()) {
-			final TextColor color = INFO.getActionBarColor();
-			final String name = INFO.getHotbarName();
-			final int charges = getCharges();
-			final int maxCharges = getMaxCharges();
+		final TextColor color = INFO.getActionBarColor();
+		final String name = INFO.getHotbarName();
+		final int charges = getCharges();
+		final int maxCharges = getMaxCharges();
 
-			// String output.
-			Component output = Component.text("[", NamedTextColor.YELLOW)
-				.append(Component.text(name != null ? name : "Error", color))
-				.append(Component.text("]", NamedTextColor.YELLOW))
-				.append(Component.text(": ", NamedTextColor.WHITE));
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text(name != null ? name : "Error", color))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
 
-			output = output.append(Component.text(charges + "/" + maxCharges,
-				(charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+		output = output.append(Component.text(charges + "/" + maxCharges,
+			(charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
 
-			return output;
-		} else {
-			return Component.text("");
-		}
+		return output;
 	}
 
 	private static Description<Sharpshooter> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Your projectiles deal ")
 			.addPercent(PERCENT_BASE_DAMAGE)
-			.add(" more damage.");
-	}
-
-	private static Description<Sharpshooter> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to ")
+			.add(" more damage. Additionally, each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to ")
 			.add(a -> a.mMaxStacks, MAX_STACKS)
 			.add(". Stacks decay after ")
 			.addDuration(a -> a.mDecayTime, SHARPSHOOTER_DECAY_TIMER)
 			.add(" seconds of not gaining a stack. Each stack increases the damage bonus by an additional ")
 			.addPercent(a -> a.mDamagePerStack, PERCENT_DAMAGE_PER_STACK)
+			.add(".");
+	}
+
+	private static Description<Sharpshooter> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Your Sharpshooter's Max Stacks is increased to ")
+			.add(a -> a.mMaxStacks, MAX_STACKS_2)
+			.add(". The base projectile damage bonus is increased to ")
+			.addPercent(PERCENT_BASE_DAMAGE_L2)
 			.add(". Additionally, gain a ")
 			.addPercent(a -> a.mArrowSaveChance, ARROW_SAVE_CHANCE)
 			.add(" chance to not consume arrows.");

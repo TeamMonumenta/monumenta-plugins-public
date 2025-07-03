@@ -32,12 +32,12 @@ import org.jetbrains.annotations.Nullable;
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class RendingRazor extends Ability {
-	private static final int EMBED_DAMAGE_1 = 12;
-	private static final int EMBED_DAMAGE_2 = 16;
-	private static final int REND_DAMAGE_1 = 16;
-	private static final int REND_DAMAGE_2 = 22;
-	private static final int COOLDOWN_1 = TICKS_PER_SECOND * 8;
-	private static final int COOLDOWN_2 = TICKS_PER_SECOND * 6;
+	private static final int EMBED_DAMAGE_1 = 16;
+	private static final int EMBED_DAMAGE_2 = 20;
+	private static final int REND_DAMAGE_1 = 20;
+	private static final int REND_DAMAGE_2 = 26;
+	private static final int COOLDOWN_1 = TICKS_PER_SECOND * 6;
+	private static final int COOLDOWN_2 = TICKS_PER_SECOND * 4;
 	private static final int RAZOR_TRAVEL_TIME = TICKS_PER_SECOND * 2;
 	private static final double MAXIMUM_BLOCK_DISTANCE = 14.0;
 	private static final double MAXIMUM_REND_DISTANCE = 60.0;
