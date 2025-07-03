@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -28,7 +27,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class HandOfLight extends Ability {
 	public static final int RANGE = 12;
@@ -76,8 +74,6 @@ public class HandOfLight extends Ability {
 
 	private final HandOfLightCS mCosmetic;
 
-	private @Nullable Crusade mCrusade;
-
 	public HandOfLight(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
@@ -87,8 +83,6 @@ public class HandOfLight extends Ability {
 		mDamageMax = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS());
-
-		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
 
 	public boolean cast() {
@@ -110,7 +104,7 @@ public class HandOfLight extends Ability {
 
 		boolean doCooldown = false;
 		List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
-		undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob, mCrusade));
+		undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob));
 		if (isEnhanced()) {
 			undeadMobs.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_UNDEAD_STUN_DURATION, mob));
 			if (!undeadMobs.isEmpty()) {

@@ -28,10 +28,11 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
-import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
+import com.playmonumenta.plugins.abilities.cleric.TouchofRadiance;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
@@ -389,6 +390,19 @@ public class CharmManager {
 			DivineJustice.CHARM_HEAL_RADIUS,
 			DivineJustice.CHARM_ENHANCE_DAMAGE,
 			DivineJustice.CHARM_ENHANCE_DURATION,
+			TouchofRadiance.CHARM_RANGE,
+			TouchofRadiance.CHARM_WEAKNESS,
+			TouchofRadiance.CHARM_RADIUS,
+			TouchofRadiance.CHARM_CDR,
+			TouchofRadiance.CHARM_CDR_ALLY,
+			TouchofRadiance.CHARM_KBR,
+			TouchofRadiance.CHARM_KBR_ALLY,
+			TouchofRadiance.CHARM_STUN_DURATION,
+			TouchofRadiance.CHARM_WEAKNESS_DURATION,
+			TouchofRadiance.CHARM_ENHANCE_DAMAGE,
+			TouchofRadiance.CHARM_ENHANCE_STUN_DURATION,
+			TouchofRadiance.CHARM_DURATION,
+			TouchofRadiance.CHARM_COOLDOWN,
 			HeavenlyBoon.CHARM_CHANCE,
 			HeavenlyBoon.CHARM_DURATION,
 			HeavenlyBoon.CHARM_RADIUS,
@@ -402,9 +416,6 @@ public class CharmManager {
 			HeavenlyBoon.CHARM_ENHANCE_CDR,
 			HeavenlyBoon.CHARM_ENHANCE_CDR_CAP,
 			Crusade.CHARM_DURATION,
-			Crusade.CHARM_RADIUS,
-			Crusade.CHARM_DAMAGE,
-			Crusade.CHARM_MAX_MOBS,
 			CleansingRain.CHARM_COOLDOWN,
 			CleansingRain.CHARM_RANGE,
 			CleansingRain.CHARM_REDUCTION,
@@ -1090,6 +1101,7 @@ public class CharmManager {
 			ElementalSpiritFire.CHARM_COOLDOWN,
 			CelestialBlessing.CHARM_COOLDOWN,
 			CleansingRain.CHARM_COOLDOWN,
+			TouchofRadiance.CHARM_COOLDOWN,
 			HandOfLight.CHARM_COOLDOWN,
 			HeavenlyBoon.CHARM_ENHANCE_COOLDOWN,
 			HolyJavelin.CHARM_COOLDOWN,

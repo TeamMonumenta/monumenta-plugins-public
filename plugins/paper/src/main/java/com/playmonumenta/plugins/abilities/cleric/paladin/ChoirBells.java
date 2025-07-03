@@ -93,7 +93,7 @@ public class ChoirBells extends Ability {
 			mCosmetic.bellsApplyEffect(mPlayer, mob);
 			EntityUtils.applySlow(mPlugin, mDuration, mSlownessAmount, mob);
 
-			if (Crusade.enemyTriggersAbilities(mob, mCrusade)) {
+			if (Crusade.enemyTriggersAbilities(mob)) {
 				// Infusion
 				EntityUtils.applyTaunt(mob, mPlayer);
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, true);

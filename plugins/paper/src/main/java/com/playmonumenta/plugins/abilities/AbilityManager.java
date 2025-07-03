@@ -25,11 +25,12 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
-import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
+import com.playmonumenta.plugins.abilities.cleric.TouchofRadiance;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
@@ -301,7 +302,7 @@ public class AbilityManager {
 			CelestialBlessing.INFO,
 			CleansingRain.INFO,
 			HandOfLight.INFO,
-			Rejuvenation.INFO,
+			TouchofRadiance.INFO,
 			DivineJustice.INFO,
 			HeavenlyBoon.INFO,
 			Crusade.INFO,
@@ -396,6 +397,7 @@ public class AbilityManager {
 			// sharing it to its Javelin AoE
 			HolyJavelin.INFO,
 			ChoirBells.INFO,
+			Rejuvenation.INFO,
 
 			// HIEROPHANT
 			EnchantedPrayer.INFO,

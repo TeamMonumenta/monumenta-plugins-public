@@ -73,7 +73,7 @@ public enum ClassAbility {
 	HAND_OF_LIGHT("Hand of Light"),
 	SANCTIFIED_ARMOR("Sanctified Armor"),
 	ILLUMINATE("Illuminate"),
-	CRUSADE("Crusade"),
+	TOUCH_OF_RADIANCE("Touch of Radiance"),
 	HEAVENLY_BOON("Heavenly Boon"),
 
 	// Hierophant

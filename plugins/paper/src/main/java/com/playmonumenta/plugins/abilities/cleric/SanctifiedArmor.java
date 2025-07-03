@@ -85,8 +85,6 @@ public class SanctifiedArmor extends Ability {
 
 	private final SanctifiedArmorCS mCosmetic;
 
-	private @Nullable Crusade mCrusade;
-
 	public SanctifiedArmor(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mMaxPercentDamage = isLevelOne() ? MAX_PERCENT_DAMAGE_1 : MAX_PERCENT_DAMAGE_2;
@@ -101,8 +99,6 @@ public class SanctifiedArmor extends Ability {
 		mSlow = SLOWNESS_AMPLIFIER_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SanctifiedArmorCS());
-
-		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
 
 	@Override
@@ -126,7 +122,7 @@ public class SanctifiedArmor extends Ability {
 			return;
 		}
 
-		if (Crusade.enemyTriggersAbilities(source, mCrusade)) {
+		if (Crusade.enemyTriggersAbilities(source)) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
 

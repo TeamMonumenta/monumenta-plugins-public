@@ -237,6 +237,10 @@ public class PotionUtils {
 	}
 
 	public static void clearNegatives(Plugin plugin, Player player) {
+		clearNegatives(plugin, player, Constants.THIRTY_MINUTES);
+	}
+
+	public static void clearNegatives(Plugin plugin, Player player, int maxDuration) {
 		boolean dolphin = player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE);
 		for (PotionEffectType type : NEGATIVE_EFFECTS) {
 			if (player.hasPotionEffect(type)) {

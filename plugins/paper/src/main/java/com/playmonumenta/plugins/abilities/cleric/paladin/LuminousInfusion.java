@@ -190,7 +190,7 @@ public final class LuminousInfusion extends Ability implements KillTriggeredAbil
 	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
 		mTracker.updateDamageDealtToBosses(event);
 
-		final boolean triggersCrusade = Crusade.enemyTriggersAbilities(enemy, mCrusade);
+		final boolean triggersCrusade = Crusade.enemyTriggersAbilities(enemy);
 		final boolean isMeleeCrit = event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer);
 		int chargesToConsume = 0;
 
@@ -226,7 +226,7 @@ public final class LuminousInfusion extends Ability implements KillTriggeredAbil
 		for (final LivingEntity entity : new Hitbox.SphereHitbox(loc, stacks * mRadiusPerStack).getHitMobs()) {
 			mCosmetic.infusionSpreadEffect(world, mPlayer, damagee, entity, volumeScaling);
 
-			if (Crusade.enemyTriggersAbilities(entity, mCrusade)) {
+			if (Crusade.enemyTriggersAbilities(entity)) {
 				DamageUtils.damage(mPlayer, entity, DamageType.MAGIC, totalDamage, mInfo.getLinkedSpell(), true);
 				if (isLevelTwo()) {
 					EntityUtils.applyFire(Plugin.getInstance(), mFireDuration, entity, mPlayer);

@@ -117,8 +117,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private final int mEnhanceCDRCap;
 	private final HeavenlyBoonCS mCosmetic;
 
-	private @Nullable Crusade mCrusade;
-
 	public HeavenlyBoon(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		mTracker = new KillTriggeredAbilityTracker(mPlayer, this, BOSS_DAMAGE_THRESHOLD_R1, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
@@ -138,8 +136,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, HEAVENLY_BOON_RADIUS);
 		mEnhanceCDR = ENHANCEMENT_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_CDR);
 		mEnhanceCDRCap = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_CDR_CAP, ENHANCEMENT_CDR_CAP);
-
-		Bukkit.getScheduler().runTask(mPlugin, () -> mCrusade = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class));
 	}
 
 	/*
@@ -214,7 +210,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	@Override
 	public void triggerOnKill(final LivingEntity mob) {
 		if (
-			Crusade.enemyTriggersAbilities(mob, mCrusade)
+			Crusade.enemyTriggersAbilities(mob)
 				&& FastUtils.RANDOM.nextDouble() < mChance
 				&& !ServerProperties.getShardName().equals("plots")
 				&& !ServerProperties.getShardName().equals("playerplots")

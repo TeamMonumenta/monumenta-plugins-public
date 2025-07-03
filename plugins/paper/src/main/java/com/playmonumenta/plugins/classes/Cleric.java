@@ -8,10 +8,11 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
-import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
+import com.playmonumenta.plugins.abilities.cleric.TouchofRadiance;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
+import com.playmonumenta.plugins.abilities.cleric.hierophant.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
@@ -32,7 +33,7 @@ public class Cleric extends PlayerClass {
 		mAbilities.add(DivineJustice.INFO);
 		mAbilities.add(HandOfLight.INFO);
 		mAbilities.add(HeavenlyBoon.INFO);
-		mAbilities.add(Crusade.INFO);
+		mAbilities.add(TouchofRadiance.INFO);
 		mAbilities.add(Illuminate.INFO);
 		mAbilities.add(SanctifiedArmor.INFO);
 		mClass = CLASS_ID;
@@ -41,7 +42,7 @@ public class Cleric extends PlayerClass {
 		mClassGlassFiller = Material.YELLOW_STAINED_GLASS_PANE;
 		mDisplayItem = Material.POPPY;
 		mClassDescription = "Clerics are mighty healers and specialize in fighting the undead.";
-		mPassive = Rejuvenation.INFO;
+		mPassive = Crusade.INFO;
 
 		mSpecOne.mAbilities.add(HolyJavelin.INFO);
 		mSpecOne.mAbilities.add(ChoirBells.INFO);
@@ -60,6 +61,7 @@ public class Cleric extends PlayerClass {
 		mSpecTwo.mSpecName = "Hierophant";
 		mSpecTwo.mDisplayItem = Material.DRAGON_BREATH;
 		mSpecTwo.mDescription = "Hierophants specialize in support and have mastered healing. They will make sure the living stay living.";
+		mSpecTwo.mPassive = Rejuvenation.INFO;
 
 		mTriggerOrder = ImmutableList.of(
 			EnchantedPrayer.INFO,
@@ -73,6 +75,7 @@ public class Cleric extends PlayerClass {
 			CleansingRain.INFO,
 			DivineJustice.INFO,
 			HandOfLight.INFO, // after cleansing rain and luminous infusion
+			TouchofRadiance.INFO,
 			Illuminate.INFO
 		);
 	}

@@ -122,7 +122,7 @@ public class HolyJavelin extends Ability {
 		mCosmetic.javelinParticle(mPlayer, startLoc, endLoc, mSize);
 
 		for (LivingEntity enemy : Hitbox.approximateCylinder(startLoc, endLoc, mSize, true).accuracy(0.5).getHitMobs()) {
-			double damage = Crusade.enemyTriggersAbilities(enemy, mCrusade) ? mUndeadDamage : mDamage;
+			double damage = Crusade.enemyTriggersAbilities(enemy) ? mUndeadDamage : mDamage;
 			if (enemy != triggeringEnemy) {
 				// Triggering enemy would've already received the melee damage from Luminous Infusion
 				damage += bonusDamage;

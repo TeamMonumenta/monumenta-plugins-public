@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.abilities.cleric;
+package com.playmonumenta.plugins.abilities.cleric.hierophant;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -29,7 +29,7 @@ public class Rejuvenation extends Ability {
 	public static final AbilityInfo<Rejuvenation> INFO =
 		new AbilityInfo<>(Rejuvenation.class, "Rejuvenation", Rejuvenation::new)
 			.description(getDescription())
-			.canUse(player -> AbilityUtils.getClassNum(player) == Cleric.CLASS_ID);
+			.canUse(player -> AbilityUtils.getSpecNum(player) == Cleric.HIEROPHANT_SPEC_ID);
 
 	private final double mRadius;
 	private final double mHealing;

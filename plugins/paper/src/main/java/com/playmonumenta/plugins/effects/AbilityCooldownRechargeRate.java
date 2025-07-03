@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
@@ -15,10 +16,17 @@ public class AbilityCooldownRechargeRate extends SingleArgumentEffect {
 	public static final String effectID = "AbilityCooldownRechargeRate";
 
 	public double mOverflow;
+	private final @Nullable ClassAbility mExcept;
 
 	public AbilityCooldownRechargeRate(int duration, double amount) {
 		super(duration, amount, effectID);
+		mExcept = null;
+		mOverflow = 0;
+	}
 
+	public AbilityCooldownRechargeRate(int duration, double amount, @Nullable ClassAbility except) {
+		super(duration, amount, effectID);
+		mExcept = except;
 		mOverflow = 0;
 	}
 
@@ -36,8 +44,11 @@ public class AbilityCooldownRechargeRate extends SingleArgumentEffect {
 				mOverflow -= 1;
 				reduction += 1;
 			}
-
-			Plugin.getInstance().mTimers.updateCooldowns(player, reduction);
+			if (mExcept != null) {
+				Plugin.getInstance().mTimers.updateCooldownsExcept(player, mExcept, reduction);
+			} else {
+				Plugin.getInstance().mTimers.updateCooldowns(player, reduction);
+			}
 		}
 	}
 

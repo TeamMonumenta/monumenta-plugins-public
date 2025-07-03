@@ -96,7 +96,6 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	private int mComboNumber = 0;
 	private @Nullable BukkitRunnable mComboRunnable = null;
 	private double mPriorAmount = 0;
-	private @Nullable Crusade mCrusade;
 
 	public DivineJustice(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -107,14 +106,12 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 		mEnhanceDamage = ENHANCEMENT_ASH_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE);
 		mEnhanceDuration = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_DURATION, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new DivineJusticeCS());
-
-		Bukkit.getScheduler().runTask(mPlugin, () -> mCrusade = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class));
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		/* Prevent DJ from triggering if the enemy is not affected by Crusade */
-		if (!Crusade.enemyTriggersAbilities(enemy, mCrusade)) {
+		if (!Crusade.enemyTriggersAbilities(enemy)) {
 			return false;
 		}
 
@@ -150,7 +147,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent entityDeathEvent, boolean dropsLoot) {
-		if (isLevelTwo() && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)) {
+		if (isLevelTwo() && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity())) {
 			PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * mSelfHeal);
 			final List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, mRadius, true);
 			players.forEach(otherPlayer -> PlayerUtils.healPlayer(mPlugin, otherPlayer, EntityUtils.getMaxHealth(otherPlayer) * mAllyHeal, mPlayer));
@@ -161,7 +158,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCosmetic.justiceHealSound(players, mCosmetic.getHealPitchOther()), 2);
 		}
 
-		if (isEnhanced() && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
+		if (isEnhanced() && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity())
 			&& FastUtils.RANDOM.nextDouble() <= ENHANCEMENT_ASH_CHANCE) {
 			spawnAsh(entityDeathEvent.getEntity().getLocation());
 		}
@@ -283,7 +280,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	private void addEnhancementEffect(Player player, int duration, double bonusDamage) {
 		mPlugin.mEffectManager.addEffect(player, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME,
 			new PercentDamageDealt(duration, bonusDamage).priority(2)
-				.predicate((attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)).deleteOnAbilityUpdate(true));
+				.predicate((attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy)).deleteOnAbilityUpdate(true));
 		ClientModHandler.updateAbility(player, this);
 	}
 

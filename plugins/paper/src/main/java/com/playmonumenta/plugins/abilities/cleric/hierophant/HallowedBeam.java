@@ -453,13 +453,13 @@ public class HallowedBeam extends MultipleChargeAbility {
 		}
 	}
 
-	private final class HostileComparator implements Comparator<LivingEntity> {
+	private static final class HostileComparator implements Comparator<LivingEntity> {
 		@Override
 		public int compare(LivingEntity a, LivingEntity b) {
 			if (!ENABLE_OPTIMAL_MOB_TARGETING) {
 				return 0;
 			}
-			return Boolean.compare(Crusade.enemyTriggersAbilities(a, mCrusade), Crusade.enemyTriggersAbilities(b, mCrusade));
+			return Boolean.compare(Crusade.enemyTriggersAbilities(a), Crusade.enemyTriggersAbilities(b));
 		}
 	}
 
@@ -522,7 +522,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			targetLocation = LocationUtils.getEntityCenter(livingEntity);
 		}
 		int stunDuration;
-		if (Crusade.enemyTriggersAbilities(livingEntity, mCrusade)) {
+		if (Crusade.enemyTriggersAbilities(livingEntity)) {
 			double damage = calculateDamage(livingEntity);
 			if (!mainTarget) {
 				damage *= 0.5;

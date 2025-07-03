@@ -24,7 +24,6 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneEnha
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneScorchedEarthCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneTabooCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.PrestigiousEsotericCS;
-import com.playmonumenta.plugins.cosmetics.skills.cleric.AnathemaCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.AwakeningCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.BloodbathCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.BloodyRetaliationCS;
@@ -179,7 +178,6 @@ public class CosmeticSkills {
 		BloodbathCS::new,
 		PurgingPyreCS::new,
 		ContortingBoltCS::new,
-		AnathemaCS::new,
 		ForceFieldCS::new,
 		RipplingBeamCS::new,
 		HypnoticChantCS::new,
