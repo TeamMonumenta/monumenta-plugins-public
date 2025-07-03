@@ -95,7 +95,7 @@ public class MovementUtils {
 		}
 		BossManager.getInstance().entityKnockedAway(target, speed);
 		Vector dir = target.getLocation().subtract(location.toVector()).toVector().multiply(-speed);
-		if (dir.getY() < 0) {
+		if (dir.getY() < 0 && target.isOnGround()) {
 			dir.setY(0.5f);
 		}
 		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
@@ -139,7 +139,7 @@ public class MovementUtils {
 			return;
 		}
 		dir = dir.normalize().multiply(-speed);
-		if (dir.getY() < 0) {
+		if (dir.getY() < 0 && target.isOnGround()) {
 			dir.setY(0.5f);
 		}
 		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
