@@ -41,14 +41,14 @@ public class Spellshock extends Ability {
 
 	/* These are also used by Elemental Arrows */
 	public static final int ENHANCEMENT_EFFECT_DURATION = Constants.TICKS_PER_SECOND * 6;
-	public static final int ENHANCE_LIGHTNING_DAMAGE = 5;
+	public static final int ENHANCE_LIGHTNING_DAMAGE = 4;
 	public static final int ENHANCE_LIGHTNING_RANGE = 7;
 
 	private static final String DAMAGED_THIS_TICK_METAKEY = "SpellshockDamagedThisTick";
 	private static final String SPELLSHOCK_STATIC_SRC = "SpellShockStaticEffect";
 	private static final String SPEED_SRC = "SpellShockPercentSpeedEffect";
 	private static final String ENHANCE_DOT_EFFECT_NAME = "SpellShockEnhanceDoTEffect";
-	private static final int ENHANCE_DOT_DAMAGE = 3;
+	private static final double ENHANCE_DOT_DAMAGE = 1.5;
 	private static final int ENHANCE_DOT_DURATION = Constants.TICKS_PER_SECOND * 3;
 	private static final double DAMAGE_1 = 0.2;
 	private static final double DAMAGE_2 = 0.3;
@@ -62,7 +62,7 @@ public class Spellshock extends Ability {
 	private static final double SLOW_POTENCY = 0.3;
 	private static final double ENHANCE_DAMAGE_MULT = 0.2;
 	private static final double ENHANCE_SLOW_POTENCY = 0.15;
-	private static final double ENHANCE_VULN_POTENCY = 0.15;
+	private static final double ENHANCE_VULN_POTENCY = 0.1;
 
 	private static final EnumSet<ClassAbility> FIRE_ABILITIES = EnumSet.of(
 		ClassAbility.MAGMA_SHIELD,
