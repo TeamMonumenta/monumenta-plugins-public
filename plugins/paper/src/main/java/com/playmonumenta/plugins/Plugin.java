@@ -630,6 +630,11 @@ public class Plugin extends JavaPlugin {
 			manager.registerEvents(new HexfallListener(), this);
 		}
 
+		if (ServerProperties.getShardName().contains("indigo")
+			|| ServerProperties.getShardName().startsWith("dev")) {
+			manager.registerEvents(new IndigoListener(), this);
+		}
+
 		//TODO Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			int mTicks = 0;

@@ -7,8 +7,10 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
+import com.playmonumenta.plugins.listeners.IndigoListener;
 import com.playmonumenta.plugins.listeners.RepairExplosionsListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -83,6 +85,11 @@ public class WorldshaperOverride {
 			// Requirements for using Worldshaper's Loom is SKT savage.
 			player.sendMessage(Component.text("You need to have cleared Silver Knight's Tomb Savage in order to use this item!", NamedTextColor.RED));
 			return false;
+		}
+
+		if (ServerProperties.getShardName().contains("indigo")
+			|| ServerProperties.getShardName().startsWith("dev")) {
+			IndigoListener.revokeBlocklessEligibility(player);
 		}
 
 		// A list of locations we want to place the block in the world.
