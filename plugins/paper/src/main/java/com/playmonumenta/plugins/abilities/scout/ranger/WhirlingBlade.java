@@ -54,6 +54,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	public static final String CHARM_SLOWNESS = "Whirling Blade Slowness Amplifier";
 	public static final String CHARM_DURATION = "Whirling Blade Debuff Duration";
 	public static final String CHARM_STUN_DURATION = "Whirling Blade Stun Duration";
+	public static final String CHARM_CYCLES = "Whirling Blade Cycles";
 
 	public static final AbilityInfo<WhirlingBlade> INFO =
 		new AbilityInfo<>(WhirlingBlade.class, "Whirling Blade", WhirlingBlade::new)
@@ -76,6 +77,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	private final double mSlow;
 	private final int mDuration;
 	private final int mStunDuration;
+	private final int mCycles;
 	private @Nullable SwiftCuts mSwiftCuts;
 
 	private int mLastCastTicks = 0;
@@ -93,6 +95,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DEBUFF_DURATION);
 		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, STUN_DURATION);
 		mMaxCharges = BLADE_MAX_CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
+		mCycles = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CYCLES);
 		mCharges = getTrackedCharges();
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WhirlingBladeCS());
@@ -129,18 +132,23 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		final Vector mEyeDir = mLoc.getDirection();
 		mCosmetic.onCast(mPlayer, mLoc, mWorld);
 
+		castBlade(mLoc, throwRadius, mEyeDir, bladeRadius, damage, mWorld, mCycles);
+
+		return true;
+	}
+
+	private void castBlade(Location location, double throwRadius, Vector eyeDir, double bladeRadius, double damage, World world, int cyclesLeft) {
 		cancelOnDeath(new BukkitRunnable() {
-
 			// Convoluted range parameter makes sure we grab all possible entities to be hit without recalculating manually
-			final List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(mLoc, 4 * throwRadius, mPlayer);
+			final List<LivingEntity> mMobs = EntityUtils.getNearbyMobs(location, 4 * throwRadius, mPlayer);
 
-			double mStartAngle = Math.atan(mEyeDir.getZ() / mEyeDir.getX());
+			double mStartAngle = Math.atan(eyeDir.getZ() / eyeDir.getX());
 			int mIncrementDegrees = 0;
 
 			@Override
 			public void run() {
 				if (mIncrementDegrees == 0) {
-					if (mEyeDir.getX() < 0) {
+					if (eyeDir.getX() < 0) {
 						mStartAngle += Math.PI;
 					}
 					mStartAngle += Math.PI * 90 / 180;
@@ -161,7 +169,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 						MovementUtils.knockAway(mPlayer, mob, mKnockback, true);
 						EntityUtils.applyWeaken(mPlugin, mDuration, mWeaken, mob);
 						EntityUtils.applySlow(mPlugin, mDuration, mSlow, mob);
-						mCosmetic.hitMob(mPlayer, mob.getLocation(), mWorld);
+						mCosmetic.hitMob(mPlayer, mob.getLocation(), world);
 						if (isLevelTwo()) {
 							EntityUtils.applyStun(mPlugin, mStunDuration, mob);
 						}
@@ -170,17 +178,18 @@ public class WhirlingBlade extends MultipleChargeAbility {
 				}
 
 				Location loc = mPlayer.getLocation();
-				mCosmetic.tick(mPlayer, bladeLoc1, mWorld, loc, throwRadius, bladeRadius, mIncrementDegrees);
+				mCosmetic.tick(mPlayer, bladeLoc1, world, loc, throwRadius, bladeRadius, mIncrementDegrees);
 
 				mIncrementDegrees += 30;
-				if (mIncrementDegrees > 360) {
-					mCosmetic.end(mWorld, loc, mPlayer);
+				if (mIncrementDegrees >= 360) {
+					mCosmetic.end(world, loc, mPlayer);
 					this.cancel();
+					if (cyclesLeft > 1) {
+						castBlade(location, throwRadius, eyeDir, bladeRadius, damage, world, cyclesLeft - 1);
+					}
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
-
-		return true;
 	}
 
 	private static Description<WhirlingBlade> getDescription1() {

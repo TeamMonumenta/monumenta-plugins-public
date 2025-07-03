@@ -961,6 +961,7 @@ public class CharmManager {
 			WhirlingBlade.CHARM_SLOWNESS,
 			WhirlingBlade.CHARM_DURATION,
 			WhirlingBlade.CHARM_STUN_DURATION,
+			WhirlingBlade.CHARM_CYCLES,
 
 			//Shaman
 			TotemicEmpowerment.CHARM_SPEED,
