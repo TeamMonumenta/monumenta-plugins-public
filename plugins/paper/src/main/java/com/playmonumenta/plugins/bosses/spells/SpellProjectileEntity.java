@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -152,19 +153,25 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 				mBaseDir, offsetYaw, offsetPitch);
 
 			int mTicks = 0;
-			@Nullable LivingEntity target = initialTarget;
+			@Nullable
+			LivingEntity target = initialTarget;
 
 			@Override
 			public void run() {
 				mTicks++;
 
 				// If lingering is enabled, try searching for a new target
-				if ((target != null && (!target.isValid() || target.isDead() || !target.getWorld().equals(mLocation.getWorld())))
-					|| !Double.isFinite(mDirection.getX())) {
+				if (target == null ||
+					!target.isValid() ||
+					target.isDead() ||
+					!target.getWorld().equals(mLocation.getWorld()) ||
+					!Double.isFinite(mDirection.getX()) ||
+					(target instanceof Player p && p.getGameMode() == GameMode.SPECTATOR)) {
 					if (mParameters.LINGERS && projEntity instanceof LivingEntity lEntity) {
 						// Get the projectile entity possible target candidates based on boss targets, omit itself
 						List<? extends LivingEntity> filter = projEntityTargets.getTargetsList(lEntity);
-						filter.removeIf(t -> t.equals(projEntity));
+						filter.removeIf(t -> t.equals(projEntity)
+							|| (t instanceof Player p && (p.getGameMode() == GameMode.SPECTATOR)));
 						target = EntityUtils.getNearestMob(mLocation, filter); // If target is null, projectile exist will continue without a target
 					} else {
 						this.cancel();
@@ -173,7 +180,8 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 				}
 
 				if (target != null) {
-					Vector newDirection = target.getEyeLocation().add(0, mParameters.AIM_OFFSET, 0).subtract(mLocation).toVector();
+					@SuppressWarnings("ConstantConditions")
+					Vector newDirection = target == null ? mDirection : target.getEyeLocation().add(0, mParameters.AIM_OFFSET, 0).subtract(mLocation).toVector();
 					if (newDirection.length() > 2 * maxRange) {
 						this.cancel();
 						return;
@@ -219,7 +227,7 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 						}
 					}
 				}
-				if(target==null) {
+				if (target == null) {
 					shift.multiply(mParameters.SPEED_LINGER);
 				}
 				Location prevLoc = mLocation.clone();
@@ -243,7 +251,7 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 					}
 					// Is projectile facing applicable to this mob?
 					if (mParameters.FACE) {
-						double[] yawPitch = VectorUtils.vectorToRotation(mLocation.clone().subtract(prevLoc).toVector());
+						double[] yawPitch = VectorUtils.vectorToRotation(mLocation.clone().subtract(prevLoc).toVector().normalize());
 						projEntity.setRotation((float) yawPitch[0], (float) yawPitch[1]);
 					}
 				} else {
