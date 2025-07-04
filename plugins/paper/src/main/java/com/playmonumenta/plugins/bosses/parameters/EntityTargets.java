@@ -1,16 +1,14 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -272,42 +270,6 @@ public class EntityTargets implements Cloneable {
 		}
 
 		public static final TagsListFiter DEFAULT = new TagsListFiter(new LinkedHashSet<>());
-
-		public static ParseResult<TagsListFiter> parseResult(StringReader reader, String hoverDescription) {
-			if (!reader.advance("[")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "[", hoverDescription)));
-			}
-
-			Set<String> tags = new LinkedHashSet<>();
-			boolean atLeastOneTagsIter = false;
-
-			while (true) {
-				if (reader.advance("]")) {
-					break;
-				}
-
-				if (atLeastOneTagsIter) {
-					if (!reader.advance(",")) {
-						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
-							Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
-					}
-				}
-
-				atLeastOneTagsIter = true;
-
-
-				String tag = reader.readString();
-
-				if (tag == null) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "\"tagggg\"", "write tag")));
-				}
-
-				tags.add(tag);
-			}
-
-			return ParseResult.of(new TagsListFiter(tags));
-		}
 	}
 
 	public static class Limit {
@@ -483,58 +445,6 @@ public class EntityTargets implements Cloneable {
 		public static final Limit DEFAULT_ONE = new Limit(1, SORTING.RANDOM);
 		public static final Limit CLOSER_ONE = new Limit(1, SORTING.CLOSER);
 		public static final Limit DEFAULT_CLOSER = new Limit(LIMITSENUM.ALL, SORTING.CLOSER);
-
-		//format (num,sortingEnum) || (limitEnum,sortingEnum)
-		public static ParseResult<Limit> fromReader(StringReader reader, String hoverDescription) {
-			if (!reader.advance("(")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", hoverDescription)));
-			}
-
-			LIMITSENUM limit = reader.readEnum(LIMITSENUM.values());
-			Long number = null;
-			if (limit == null) {
-				number = reader.readLong();
-				if (number == null) {
-					// Entry not valid, offer all entries as completions
-					List<Tooltip<String>> suggArgs = new ArrayList<>(LIMITSENUM.values().length + 1);
-					String soFar = reader.readSoFar();
-					for (LIMITSENUM valid : LIMITSENUM.values()) {
-						suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
-					}
-					suggArgs.add(Tooltip.ofString(soFar + "1", "Specify the numbers"));
-
-					return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
-				}
-			}
-
-			if (!reader.advance(",")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", hoverDescription)));
-			}
-
-			SORTING sort = reader.readEnum(SORTING.values());
-
-			if (sort == null) {
-				// Entry not valid, offer all entries as completions
-				List<Tooltip<String>> suggArgs = new ArrayList<>(SORTING.values().length);
-				String soFar = reader.readSoFar();
-				for (SORTING valid : SORTING.values()) {
-					suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
-				}
-				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
-			}
-
-			if (!reader.advance(")")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
-			}
-
-			if (limit == null) {
-				return ParseResult.of(new Limit(Objects.requireNonNull(number).intValue(), sort));
-			} else {
-				return ParseResult.of(new Limit(limit, sort));
-			}
-		}
-
-
 	}
 
 
@@ -554,7 +464,7 @@ public class EntityTargets implements Cloneable {
 	private double mRange;
 	private Boolean mOptional = true;
 	private Limit mLimit;
-	private List<EntityFilter> mFilters;
+	private Collection<EntityFilter> mFilters;
 	private TagsListFiter mTagsFilter;
 
 
@@ -574,7 +484,11 @@ public class EntityTargets implements Cloneable {
 		this(targets, range, optional, limit, filters, TagsListFiter.DEFAULT);
 	}
 
-	public EntityTargets(TARGETS targets, double range, boolean optional, Limit limit, List<EntityFilter> filters, TagsListFiter tagsfilter) {
+	public EntityTargets(TARGETS targets, double range, boolean optional, Limit.LIMITSENUM limitsenum, Limit.SORTING sorting, @Nullable List<EntityFilter> filters, List<String> tagsListFilter) {
+		this(targets, range, optional, new Limit(limitsenum, sorting), filters == null ? List.of() : filters, new TagsListFiter(new HashSet<>(tagsListFilter)));
+	}
+
+	public EntityTargets(TARGETS targets, double range, boolean optional, Limit limit, Collection<EntityFilter> filters, TagsListFiter tagsfilter) {
 		mTargets = targets;
 		mRange = range;
 		mOptional = optional;
@@ -657,183 +571,6 @@ public class EntityTargets implements Cloneable {
 	}
 
 	public static EntityTargets fromString(String string) {
-		ParseResult<EntityTargets> result = fromReader(new StringReader(string), "");
-		if (result.getResult() == null) {
-			Plugin.getInstance().getLogger().warning("Failed to parse '" + string + "' as EntityTargets");
-			Thread.dumpStack();
-			return new EntityTargets(TARGETS.MOB, 25);
-		}
-
-		return result.getResult();
+		return Parser.parseOrDefault(Parser.getParserMethod(EntityTargets.class), string, new EntityTargets(TARGETS.MOB, 25));
 	}
-
-
-	public static ParseResult<EntityTargets> fromReader(StringReader reader, String hoverDescription) {
-		if (!reader.advance("[")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "[", hoverDescription)));
-		}
-
-		TARGETS target = reader.readEnum(TARGETS.values());
-		if (target == null) {
-				// Entry not valid, offer all entries as completions
-				List<Tooltip<String>> suggArgs = new ArrayList<>(TARGETS.values().length);
-				String soFar = reader.readSoFar();
-				for (TARGETS valid : TARGETS.values()) {
-					suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
-				}
-				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
-		}
-
-		if (!reader.advance(",")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", hoverDescription)));
-		}
-
-		Double range = reader.readDouble();
-		if (range == null) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "10.0", hoverDescription)));
-		}
-
-		if (!reader.advance(",")) {
-			if (!reader.advance("]")) {
-				return ParseResult.of(Tooltip.arrayOf(
-					Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
-					Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
-			}
-			return ParseResult.of(new EntityTargets(target, range));
-		}
-
-		Boolean optional = reader.readBoolean();
-		if (optional == null) {
-			switch (target) {
-				case PLAYER -> {
-					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.ofString(reader.readSoFar() + "true", "true -> target player in stealth"),
-						Tooltip.ofString(reader.readSoFar() + "false", "false -> DON'T target player in stealth")));
-				}
-				case MOB, ENTITY -> {
-					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.ofString(reader.readSoFar() + "true", "true -> DON'T include the launcher"),
-						Tooltip.ofString(reader.readSoFar() + "false", "false -> include the launcher")));
-				}
-				default -> {
-					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.ofString(reader.readSoFar() + "true", "not used >.<"),
-						Tooltip.ofString(reader.readSoFar() + "false", "not used >.>")));
-				}
-			}
-		}
-
-		EntityTargets targets = new EntityTargets(target, range, optional);
-		Limit limit = null;
-		List<EntityFilter> filters = null;
-		TagsListFiter tags = null;
-		while (!reader.advance("]")) {
-			if (!reader.advance(",")) {
-				List<String> options = new ArrayList<>();
-				options.add("]");
-				if (limit == null) {
-					options.add("," + LIMIT_STRING);
-				}
-				// 'filters' is only valid if a supported target class has been specified
-				if (filters == null && (target == TARGETS.PLAYER || target == TARGETS.MOB || target == TARGETS.ENTITY)) {
-					options.add("," + FILTERS_STRING);
-				}
-				if (tags == null) {
-					options.add("," + TAGS_FILTER_STRING + "[");
-				}
-				if (options.size() > 1) {
-					options.add(0, ",");
-				}
-				return ParseResult.of(options.stream().map(o -> Tooltip.ofString(reader.readSoFar() + o, hoverDescription)).toList());
-			}
-
-			if (limit == null && reader.advance(LIMIT_STRING)) {
-				ParseResult<Limit> parseLimit = Limit.fromReader(reader, hoverDescription);
-				limit = parseLimit.getResult();
-				if (limit == null) {
-					return ParseResult.of(Objects.requireNonNull(parseLimit.getTooltip()));
-				}
-				targets.mLimit = limit;
-			} else if (filters == null &&
-					   // 'filters' is only valid if a supported target class has been specified
-			           (target == TARGETS.PLAYER || target == TARGETS.MOB || target == TARGETS.ENTITY) &&
-			           reader.advance(FILTERS_STRING + "[")) {
-				filters = new ArrayList<>(4);
-				while (!reader.advance("]")) {
-					if (!filters.isEmpty()
-						    && !reader.advance(",")) {
-						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
-							Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
-					}
-
-					if (target == TARGETS.PLAYER) {
-						//read the playerfilter
-						PLAYERFILTER filter = reader.readEnum(PLAYERFILTER.values());
-						if (filter == null) {
-							// Entry not valid, offer all entries as completions
-							List<Tooltip<String>> suggArgs = new ArrayList<>(PLAYERFILTER.values().length + 1);
-							String soFar = reader.readSoFar();
-							if (filters.isEmpty()) {
-								suggArgs.add(Tooltip.ofString(soFar + "]", hoverDescription));
-							}
-							for (PLAYERFILTER valid : PLAYERFILTER.values()) {
-								suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
-							}
-							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
-						}
-						filters.add(filter);
-					} else if (target == TARGETS.MOB) {
-						//read the mobs
-						MOBFILTER filter = reader.readEnum(MOBFILTER.values());
-						if (filter == null) {
-							// Entry not valid, offer all entries as completions
-							List<Tooltip<String>> suggArgs = new ArrayList<>(MOBFILTER.values().length + 1);
-							String soFar = reader.readSoFar();
-							if (filters.isEmpty()) {
-								suggArgs.add(Tooltip.ofString(soFar + "]", hoverDescription));
-							}
-							for (MOBFILTER valid : MOBFILTER.values()) {
-								suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
-							}
-							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
-						}
-						filters.add(filter);
-					} else if (target == TARGETS.ENTITY) {
-						//read for entity
-						ENTITYFILTERENUM filter = reader.readEnum(ENTITYFILTERENUM.values());
-						if (filter == null) {
-							// Entry not valid, offer all entries as completions
-							List<Tooltip<String>> suggArgs = new ArrayList<>(ENTITYFILTERENUM.values().length + 1);
-							String soFar = reader.readSoFar();
-							if (filters.isEmpty()) {
-								suggArgs.add(Tooltip.ofString(soFar + "]", hoverDescription));
-							}
-							for (ENTITYFILTERENUM valid : ENTITYFILTERENUM.values()) {
-								suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
-							}
-							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
-						}
-						filters.add(filter);
-					} /* else if (target == TARGETS.SELF) {
-						// I'm not sure if we need some conditions for this since it would be a "fake" Stateful boss
-						// NOTE: If more allowed target types are supported, filters= enablement checks need to be modified in 2x places in this file.
-						// Those checks exist because otherwise it's possible to fall into this while loop and get stuck forever, never parsing the tag against a valid filter
-					}*/
-				}
-				targets.mFilters = filters;
-			} else if (tags == null && reader.advance(TAGS_FILTER_STRING)) {
-				ParseResult<TagsListFiter> parseTags = TagsListFiter.parseResult(reader, hoverDescription);
-				tags = parseTags.getResult();
-				if (tags == null) {
-					return ParseResult.of(Objects.requireNonNull(parseTags.getTooltip()));
-				}
-				targets.mTagsFilter = tags;
-			}
-		}
-
-		return ParseResult.of(targets);
-
-	}
-
 }

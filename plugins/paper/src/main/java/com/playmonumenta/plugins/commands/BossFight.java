@@ -28,9 +28,7 @@ public class BossFight {
 
 		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new EntitySelectorArgument.OneEntity("entity"));
-		arguments.add(new StringArgument("boss_tag").replaceSuggestions(ArgumentSuggestions.strings(
-			(info) -> BossManager.getInstance().listBosses()
-		)));
+		arguments.add(new StringArgument("boss_tag").replaceSuggestions(ArgumentSuggestions.strings(BossManager.listBosses())));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)

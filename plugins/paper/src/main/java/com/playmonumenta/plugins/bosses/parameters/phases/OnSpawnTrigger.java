@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.bosses.parameters.phases;
 
-import com.playmonumenta.plugins.bosses.parameters.ParseResult;
-import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import org.bukkit.entity.LivingEntity;
 
 public class OnSpawnTrigger extends Trigger {
+	public static final String IDENTIFIER = "ON_SPAWN";
 
 	@Override public boolean onSpawn(LivingEntity boss) {
 		return true;
@@ -18,7 +17,4 @@ public class OnSpawnTrigger extends Trigger {
 
 	}
 
-	public static ParseResult<Trigger> fromReader(StringReader reader) {
-		return ParseResult.of(new OnSpawnTrigger());
-	}
 }

@@ -1,16 +1,22 @@
 package com.playmonumenta.plugins.bosses.parameters.phases;
 
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.bosses.parameters.ParseResult;
-import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class Trigger {
+
+	public static List<String> OPERATION_NAMES = new ArrayList<>(Arrays.stream(Trigger.TriggerOperation.values())
+		.map(Enum::name)
+		.toList());
+
+	static {
+		OPERATION_NAMES.add("->");
+	}
 
 	private boolean mIsNegated;
 
@@ -22,7 +28,8 @@ public abstract class Trigger {
 
 	public final boolean realTest(LivingEntity boss) {
 		boolean testResult = test(boss);
-		return (testResult && !isNegated()) || (!testResult && isNegated());
+		// xor
+		return testResult != isNegated();
 	}
 
 
@@ -80,17 +87,7 @@ public abstract class Trigger {
 		AND, OR, XOR;
 	}
 
-	private static final Set<String> OPERATION_NAMES = Arrays.stream(TriggerOperation.values())
-		.map(Enum::name)
-		.collect(Collectors.toSet());
-
 	public static boolean isOperator(String identifier) {
-		return identifier.equals("->") || OPERATION_NAMES.contains(identifier);
+		return OPERATION_NAMES.contains(identifier);
 	}
-
-	@FunctionalInterface
-	public interface TriggerBuilder {
-		ParseResult<Trigger> buildTrigger(StringReader reader);
-	}
-
 }

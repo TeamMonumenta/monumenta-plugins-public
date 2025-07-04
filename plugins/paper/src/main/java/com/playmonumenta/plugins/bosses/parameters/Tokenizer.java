@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.parameters;
 
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.bosses.parameters.phases.Trigger;
-import it.unimi.dsi.fastutil.objects.ObjectBooleanImmutablePair;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -12,119 +11,134 @@ import java.util.regex.Pattern;
 
 public class Tokenizer {
 	private static final Pattern CONSTANT = Pattern.compile("^[A-Z]+(?:_[A-Z]+)*$");
-	private State mState;
 	private final List<Tokens.Token> mTokens = new ArrayList<>();
+	private final List<IntermediateToken> mIntermediateTokens = new ArrayList<>();
 
+	private State mState;
 	private int mStartingIndex = 0;
 	private int mIndex = -1;
 	private final String mRaw;
 	StringBuilder mLexeme = new StringBuilder();
 	private char mCurrentChar;
 	// State -> (Terminal or not?, New State)
-	private static final EnumMap<State, Function<Character, ObjectBooleanImmutablePair<State>>> TRANSITION_TABLE = new EnumMap<>(State.class);
+	private static final EnumMap<State, Function<Character, TokenizeResult>> TRANSITION_TABLE = new EnumMap<>(State.class);
 
-	static  {
-		TRANSITION_TABLE.put(State.EQUALS, character -> ObjectBooleanImmutablePair.of(getFirstState(character), true));
-		TRANSITION_TABLE.put(State.OPEN_SQUARE, character -> ObjectBooleanImmutablePair.of(getFirstState(character), true));
-		TRANSITION_TABLE.put(State.OPEN_ROUND, character -> ObjectBooleanImmutablePair.of(getFirstState(character), true));
-		TRANSITION_TABLE.put(State.CLOSE_ROUND, character -> ObjectBooleanImmutablePair.of(getFirstState(character), true));
-		TRANSITION_TABLE.put(State.COLON, character -> ObjectBooleanImmutablePair.of(getFirstState(character), true));
-		TRANSITION_TABLE.put(State.COMMA, character -> ObjectBooleanImmutablePair.of(getFirstState(character), true));
-		TRANSITION_TABLE.put(State.SPACE, character -> ObjectBooleanImmutablePair.of(getFirstState(character), false));
-		TRANSITION_TABLE.put(State.CLOSE_SQUARE, character ->
-			switch (character) {
-				case ',' -> ObjectBooleanImmutablePair.of(State.COMMA, true);
-				case ']' -> ObjectBooleanImmutablePair.of(State.CLOSE_SQUARE, true);
-				case ')' -> ObjectBooleanImmutablePair.of(State.CLOSE_ROUND, true);
-				case ':' -> ObjectBooleanImmutablePair.of(State.COLON, true);
-				default -> ObjectBooleanImmutablePair.of(State.IDENTIFIER, false);
-			}
-		);
+	private record TokenizeResult(
+		State state,
+		boolean addToken,
+		boolean addCharacter
+	) {
+		private TokenizeResult(State state, boolean addToken) {
+			this(state, addToken, true);
+		}
+	}
+
+	static {
+		TRANSITION_TABLE.put(State.EQUALS, character -> new TokenizeResult(getFirstState(character), true));
+		TRANSITION_TABLE.put(State.OPEN_SQUARE, character -> new TokenizeResult(getFirstState(character), true));
+		TRANSITION_TABLE.put(State.OPEN_ROUND, character -> new TokenizeResult(getFirstState(character), true));
+		TRANSITION_TABLE.put(State.CLOSE_ROUND, character -> new TokenizeResult(getFirstState(character), true));
+		TRANSITION_TABLE.put(State.COLON, character -> new TokenizeResult(getFirstState(character), true));
+		TRANSITION_TABLE.put(State.COMMA, character -> new TokenizeResult(getFirstState(character), true));
+		TRANSITION_TABLE.put(State.SPACE, character -> new TokenizeResult(getFirstState(character), false));
+		TRANSITION_TABLE.put(State.CLOSE_SQUARE, character -> new TokenizeResult(getFirstState(character), true));
 		TRANSITION_TABLE.put(State.INTEGER, character -> {
-			if (Character.isDigit(character) || character == 'f' || character == 'd') return ObjectBooleanImmutablePair.of(State.INTEGER, false);
+			if (Character.isDigit(character) || character == 'f' || character == 'd')
+				return new TokenizeResult(State.INTEGER, false);
 			return switch (character) {
-				case '.' -> ObjectBooleanImmutablePair.of(State.FRACTION, false);
-				case ',' -> ObjectBooleanImmutablePair.of(State.COMMA, true);
-				case ']' -> ObjectBooleanImmutablePair.of(State.CLOSE_SQUARE, true);
-				case ')' -> ObjectBooleanImmutablePair.of(State.CLOSE_ROUND, true);
+				case '.' -> new TokenizeResult(State.FRACTION, false);
+				case ',' -> new TokenizeResult(State.COMMA, true);
+				case ']' -> new TokenizeResult(State.CLOSE_SQUARE, true);
+				case ')' -> new TokenizeResult(State.CLOSE_ROUND, true);
 				// May be operator
-				case '>' -> ObjectBooleanImmutablePair.of(State.IDENTIFIER, false);
-				case ':' -> ObjectBooleanImmutablePair.of(State.COLON, true);
-				default -> ObjectBooleanImmutablePair.of(State.IDENTIFIER, false);
+				case '>' -> new TokenizeResult(State.ARROW, false);
+				case ':' -> new TokenizeResult(State.COLON, true);
+				case ' ' -> new TokenizeResult(State.SPACE, true);
+				default -> new TokenizeResult(State.IDENTIFIER, false);
 			};
 		});
 		TRANSITION_TABLE.put(State.FRACTION, character -> {
 			if (Character.isDigit(character) || character == 'f' || character == 'd')
-				return ObjectBooleanImmutablePair.of(State.FRACTION, false);
+				return new TokenizeResult(State.FRACTION, false);
 			return switch (character) {
-				case ',' -> ObjectBooleanImmutablePair.of(State.COMMA, true);
-				case ']' -> ObjectBooleanImmutablePair.of(State.CLOSE_SQUARE, true);
-				case ')' -> ObjectBooleanImmutablePair.of(State.CLOSE_ROUND, true);
-				case ':' -> ObjectBooleanImmutablePair.of(State.COLON, true);
-				default -> ObjectBooleanImmutablePair.of(State.IDENTIFIER, false);
+				case ',' -> new TokenizeResult(State.COMMA, true);
+				case ']' -> new TokenizeResult(State.CLOSE_SQUARE, true);
+				case ')' -> new TokenizeResult(State.CLOSE_ROUND, true);
+				case ':' -> new TokenizeResult(State.COLON, true);
+				case ' ' -> new TokenizeResult(State.SPACE, true);
+				default -> new TokenizeResult(State.IDENTIFIER, false);
 			};
 		});
 		TRANSITION_TABLE.put(State.HEX_PREF, character -> {
 			if (isHexCharacter(character))
-				return ObjectBooleanImmutablePair.of(State.HEX, false);
+				return new TokenizeResult(State.HEX, false);
 			return switch (character) {
-				case ',' -> ObjectBooleanImmutablePair.of(State.COMMA, true);
-				case ']' -> ObjectBooleanImmutablePair.of(State.CLOSE_SQUARE, true);
-				case ')' -> ObjectBooleanImmutablePair.of(State.CLOSE_ROUND, true);
-				case ':' -> ObjectBooleanImmutablePair.of(State.COLON, true);
-				default -> ObjectBooleanImmutablePair.of(State.IDENTIFIER, false);
+				case ',' -> new TokenizeResult(State.COMMA, true);
+				case ']' -> new TokenizeResult(State.CLOSE_SQUARE, true);
+				case ')' -> new TokenizeResult(State.CLOSE_ROUND, true);
+				case ':' -> new TokenizeResult(State.COLON, true);
+				case ' ' -> new TokenizeResult(State.SPACE, true);
+				default -> new TokenizeResult(State.IDENTIFIER, false);
 			};
 		});
 		TRANSITION_TABLE.put(State.HEX, character -> {
 			if (isHexCharacter(character))
-				return ObjectBooleanImmutablePair.of(State.HEX, false);
+				return new TokenizeResult(State.HEX, false);
 			return switch (character) {
-				case ',' -> ObjectBooleanImmutablePair.of(State.COMMA, true);
-				case ']' -> ObjectBooleanImmutablePair.of(State.CLOSE_SQUARE, true);
-				case ')' -> ObjectBooleanImmutablePair.of(State.CLOSE_ROUND, true);
-				case ':' -> ObjectBooleanImmutablePair.of(State.COLON, true);
-				default -> ObjectBooleanImmutablePair.of(State.IDENTIFIER, false);
+				case ',' -> new TokenizeResult(State.COMMA, true);
+				case ']' -> new TokenizeResult(State.CLOSE_SQUARE, true);
+				case ')' -> new TokenizeResult(State.CLOSE_ROUND, true);
+				case ':' -> new TokenizeResult(State.COLON, true);
+				case ' ' -> new TokenizeResult(State.SPACE, true);
+				default -> new TokenizeResult(State.IDENTIFIER, false);
 			};
 		});
 		TRANSITION_TABLE.put(State.IDENTIFIER, character ->
 			switch (character) {
-				case ',' -> ObjectBooleanImmutablePair.of(State.COMMA, true);
-				case '=' -> ObjectBooleanImmutablePair.of(State.EQUALS, true);
-				case ']' -> ObjectBooleanImmutablePair.of(State.CLOSE_SQUARE, true);
-				case '[' -> ObjectBooleanImmutablePair.of(State.OPEN_SQUARE, true);
-				case '(' -> ObjectBooleanImmutablePair.of(State.OPEN_ROUND, true);
-				case ')' -> ObjectBooleanImmutablePair.of(State.CLOSE_ROUND, true);
-				case ' ' -> ObjectBooleanImmutablePair.of(State.SPACE, true);
-				case ':' -> ObjectBooleanImmutablePair.of(State.COLON, true);
-				default -> ObjectBooleanImmutablePair.of(State.IDENTIFIER, false);
+				case ',' -> new TokenizeResult(State.COMMA, true);
+				case '=' -> new TokenizeResult(State.EQUALS, true);
+				case ']' -> new TokenizeResult(State.CLOSE_SQUARE, true);
+				case '[' -> new TokenizeResult(State.OPEN_SQUARE, true);
+				case '(' -> new TokenizeResult(State.OPEN_ROUND, true);
+				case ')' -> new TokenizeResult(State.CLOSE_ROUND, true);
+				case ' ' -> new TokenizeResult(State.SPACE, true);
+				case '-' -> new TokenizeResult(State.INTEGER, true); // Bosstag Phase manager '->' operator
+				case ':' -> new TokenizeResult(State.COLON, true);
+				default -> new TokenizeResult(State.IDENTIFIER, false);
 			}
 		);
 		TRANSITION_TABLE.put(State.QUOTE_START, character -> {
 			if (character == '"')
-				return ObjectBooleanImmutablePair.of(State.QUOTE_END, false);
-			return ObjectBooleanImmutablePair.of(State.QUOTED_STRING, false);
+				return new TokenizeResult(State.QUOTE_END, true);
+			return new TokenizeResult(State.QUOTED_STRING, true);
 		});
 		TRANSITION_TABLE.put(State.QUOTED_STRING, character -> {
-			if (character == '"')
-				return ObjectBooleanImmutablePair.of(State.QUOTE_END, false);
-			return ObjectBooleanImmutablePair.of(State.QUOTED_STRING, false);
+			if (character == '\\') {
+				return new TokenizeResult(State.ESCAPE_CHARACTER, false, false);
+			} else if (character == '"')
+				return new TokenizeResult(State.QUOTE_END, true);
+			return new TokenizeResult(State.QUOTED_STRING, false);
 		});
+		TRANSITION_TABLE.put(State.ESCAPE_CHARACTER, character -> new TokenizeResult(State.QUOTED_STRING, false));
 		TRANSITION_TABLE.put(State.QUOTE_END, character ->
 			switch (character) {
-				case ',' -> ObjectBooleanImmutablePair.of(State.COMMA, true);
-				case ']' -> ObjectBooleanImmutablePair.of(State.CLOSE_SQUARE, true);
-				case ')' -> ObjectBooleanImmutablePair.of(State.CLOSE_ROUND, true);
-				case ':' -> ObjectBooleanImmutablePair.of(State.COLON, true);
-				default -> ObjectBooleanImmutablePair.of(State.IDENTIFIER, false);
+				case ',' -> new TokenizeResult(State.COMMA, true);
+				case ']' -> new TokenizeResult(State.CLOSE_SQUARE, true);
+				case ')' -> new TokenizeResult(State.CLOSE_ROUND, true);
+				case ':' -> new TokenizeResult(State.COLON, true);
+				default -> new TokenizeResult(State.IDENTIFIER, true);
 			}
 		);
+		TRANSITION_TABLE.put(State.ARROW, character -> new TokenizeResult(getFirstState(character), true));
 	}
 
 	public Tokenizer(String raw) {
 		mRaw = raw;
 
+		// initialization: character will not be able to add a token because there was no previous character to make a token!
 		advance();
 		mState = getFirstState(mCurrentChar);
+		mLexeme.append(mCurrentChar);
 
 		while (true) {
 			advance();
@@ -133,23 +147,27 @@ public class Tokenizer {
 				addToken();
 				break;
 			}
-			ObjectBooleanImmutablePair<State> information = Objects.requireNonNull(TRANSITION_TABLE.get(mState)).apply(mCurrentChar);
-			if (information.valueBoolean()) {
+			TokenizeResult information = Objects.requireNonNull(TRANSITION_TABLE.get(mState)).apply(mCurrentChar);
+			if (information.addToken()) {
 				addToken();
 			}
-			mState = information.first();
-			if (information.first() == State.SPACE) {
+			mState = information.state();
+			if (mState == State.SPACE) {
 				// skip spaces
 				mStartingIndex++;
 				continue;
 			}
 
-			mLexeme.append(mCurrentChar);
+			if (information.addCharacter()) {
+				mLexeme.append(mCurrentChar);
+			}
 		}
+
+		processIdentifierTypes();
 	}
 
 	public Tokens getTokens() {
-		return new Tokens(ImmutableList.copyOf(mTokens));
+		return new Tokens(ImmutableList.copyOf(mTokens), mRaw);
 	}
 
 	private void advance() {
@@ -171,19 +189,12 @@ public class Tokenizer {
 		FRACTION(string -> Tokens.TokenType.FLOATING_POINT), // .345
 		HEX_PREF(string -> Tokens.TokenType.STRING), // #
 		HEX(string -> Tokens.TokenType.HEXADECIMAL), // ab22
-		IDENTIFIER(string -> {
-			if (Trigger.isOperator(string)) {
-				return Tokens.TokenType.TRIGGER_OPERATOR;
-			} else if (string.equals("true") || string.equals("false")) {
-				return Tokens.TokenType.BOOLEAN;
-			} else if (CONSTANT.matcher(string).matches()) {
-				return Tokens.TokenType.CONSTANT;
-			}
-			return Tokens.TokenType.STRING;
-		}), // (cheating) "Hello." "WORLD"
-		QUOTE_START(string -> Tokens.TokenType.STRING),
+		IDENTIFIER(string -> Tokens.TokenType.STRING), // (cheating) "Hello." "WORLD"
+		ARROW(string -> Tokens.TokenType.TRIGGER_OPERATOR),
+		QUOTE_START(string -> Tokens.TokenType.QUOTE),
 		QUOTED_STRING(string -> Tokens.TokenType.STRING),
-		QUOTE_END(string -> Tokens.TokenType.STRING),
+		ESCAPE_CHARACTER(string -> Tokens.TokenType.STRING),
+		QUOTE_END(string -> Tokens.TokenType.QUOTE),
 		;
 
 		private final Function<String, Tokens.TokenType> mTypeTranslator;
@@ -198,21 +209,47 @@ public class Tokenizer {
 	}
 
 	private void addToken() {
-		if (mState == State.QUOTE_END) {
-			// strip the quotes from the string!
-			mLexeme.deleteCharAt(mLexeme.length() - 1);
-			mLexeme.deleteCharAt(0);
-		}
 		String content = mLexeme.toString();
 		Tokens.TokenType type = mState.getType(content);
-		// parameter name silliness
-		if (mCurrentChar == '=') type = Tokens.TokenType.PARAMETER_NAME;
 
-		mTokens.add(new Tokens.Token(type, content, mStartingIndex, mIndex));
+		mIntermediateTokens.add(new IntermediateToken(type, content, mStartingIndex, mIndex));
 
 		// reset lexeme
 		mLexeme.setLength(0);
 		mStartingIndex = mIndex;
+	}
+
+	private void processIdentifierTypes() {
+		int len = mIntermediateTokens.size();
+
+		boolean inString = false;
+
+		for (int i = 0; i < len; i++) {
+			IntermediateToken intermediateToken = mIntermediateTokens.get(i);
+			String value = intermediateToken.mValue;
+
+			if (intermediateToken.mType == Tokens.TokenType.QUOTE) {
+				inString = !inString;
+			}
+
+			if (!inString) {
+
+				Tokens.TokenType nextType = i == len - 1 ? Tokens.TokenType.TERMINATOR : mIntermediateTokens.get(i + 1).mType;
+				if (intermediateToken.mType == Tokens.TokenType.STRING && nextType == Tokens.TokenType.EQUALS) {
+					intermediateToken.setType(Tokens.TokenType.PARAMETER_NAME);
+				} else if (nextType != Tokens.TokenType.STRING) {
+					if (value.equals("true") || value.equals("false")) {
+						intermediateToken.setType(Tokens.TokenType.BOOLEAN);
+					} else if (CONSTANT.matcher(value).matches()) {
+						intermediateToken.setType(Tokens.TokenType.CONSTANT);
+					}
+				} else if (Trigger.isOperator(value)) {
+					intermediateToken.setType(Tokens.TokenType.TRIGGER_OPERATOR);
+				}
+			}
+
+			mTokens.add(intermediateToken.toToken());
+		}
 	}
 
 	private static State getFirstState(char character) {
@@ -239,4 +276,30 @@ public class Tokenizer {
 			(character >= 'a' && character <= 'f');
 	}
 
+	private static class IntermediateToken {
+		private Tokens.TokenType mType;
+		private final String mValue;
+		private final int mStarting;
+		private final int mEnding;
+
+		public IntermediateToken(Tokens.TokenType type, String value, int starting, int ending) {
+			mType = type;
+			mValue = value;
+			mStarting = starting;
+			mEnding = ending;
+		}
+
+		public void setType(Tokens.TokenType type) {
+			mType = type;
+		}
+
+		public Tokens.Token toToken() {
+			return new Tokens.Token(mType, mValue, mStarting, mEnding);
+		}
+
+		@Override
+		public String toString() {
+			return String.format("{<%s>: '%s'}", mType, mValue);
+		}
+	}
 }

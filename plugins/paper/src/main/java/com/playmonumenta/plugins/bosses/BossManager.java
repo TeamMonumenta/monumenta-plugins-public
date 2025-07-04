@@ -1090,15 +1090,15 @@ public class BossManager implements Listener {
 	}
 
 	/* Machine-readable list */
-	public String[] listBosses() {
+	public static Set<String> listBosses() {
 		Set<String> allBossTags = new HashSet<>(mStatelessBosses.keySet());
 		allBossTags.addAll(mStatefulBosses.keySet());
-		return allBossTags.toArray(String[]::new);
+		return allBossTags;
 	}
 
 	/* Machine-readable list */
-	public String[] listStatelessBosses() {
-		return mStatelessBosses.keySet().toArray(String[]::new);
+	public static Set<String> getStatelessBossNames() {
+		return mStatelessBosses.keySet();
 	}
 
 	/********************************************************************************
@@ -1245,6 +1245,7 @@ public class BossManager implements Listener {
 		}
 
 		Set<String> tags = entity.getScoreboardTags();
+
 		if (!tags.isEmpty()) {
 			Boss boss = null;
 			/*

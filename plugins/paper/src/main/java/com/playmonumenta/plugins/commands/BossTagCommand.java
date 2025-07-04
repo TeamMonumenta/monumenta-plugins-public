@@ -12,8 +12,7 @@ import com.playmonumenta.plugins.bosses.bosses.BossParameters;
 import com.playmonumenta.plugins.bosses.bosses.PhasesManagerBoss;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.BossPhasesList;
-import com.playmonumenta.plugins.bosses.parameters.ParseResult;
-import com.playmonumenta.plugins.bosses.parameters.StringReader;
+import com.playmonumenta.plugins.bosses.parameters.Parser;
 import com.playmonumenta.plugins.bosses.parameters.Tokenizer;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -44,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -63,6 +61,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("unchecked")
 public class BossTagCommand {
@@ -89,7 +88,7 @@ public class BossTagCommand {
 
 			.withSubcommand(
 				new CommandAPICommand("info")
-					.withArguments(new StringArgument("boss_tag").includeSuggestions(ArgumentSuggestions.strings(t -> getPossibleBosses(t.currentArg()))))
+					.withArguments(new StringArgument("boss_tag").includeSuggestions(ArgumentSuggestions.strings(BossManager.getStatelessBossNames())))
 					.executesPlayer((player, args) -> {
 						try {
 							infoBossTag(player, args.getUnchecked("boss_tag"));
@@ -218,14 +217,15 @@ public class BossTagCommand {
 			.withSubcommand(
 				new CommandAPICommand("los_errors")
 					.executesPlayer((player, args) -> {
-						checkAllLos(player, true);
+						checkAllLos(player, true, true);
 					})
 			)
 			.withSubcommand(
 				new CommandAPICommand("los_errors")
 					.withArguments(new BooleanArgument("spawn chest"))
+					.withArguments(new BooleanArgument("include deprecated"))
 					.executesPlayer((player, args) -> {
-						checkAllLos(player, args.getUnchecked("spawn chest"));
+						checkAllLos(player, args.getUnchecked("spawn chest"), args.getUnchecked("include deprecated"));
 					})
 			)
 
@@ -301,61 +301,24 @@ public class BossTagCommand {
 
 	}
 
-	private static List<Tooltip<String>> suggestionsBossTag(SuggestionInfo<CommandSender> info) {
+	private static Collection<Tooltip<String>> suggestionsBossTag(SuggestionInfo<CommandSender> info) {
 		String currentArg = info.currentArg();
 
-		String[] bossTags = getPossibleBosses(currentArg);
+		String tagComponent = getTagComponent(currentArg);
+		@Nullable
+		BossParameters bossParameters = BossManager.mBossParameters.get(tagComponent);
 
-		if (bossTags.length == 1) {
-			String description = "undefined";
-			BossParameters parameters = BossManager.mBossParameters.get(bossTags[0]);
-			if (parameters != null) {
-				BossParam annotations = parameters.getClass().getAnnotation(BossParam.class);
-				if (annotations != null) {
-					description = annotations.help();
-				}
-			}
-			if (BossManager.mBossParameters.containsKey(bossTags[0])) {
-				return List.of(
-					Tooltip.ofString(bossTags[0], description),
-					Tooltip.ofString(bossTags[0] + "[", description)
-				);
-			} else {
-				// Tag is a real tag but doesn't have parameters - don't bother offering opening [
-				return List.of(Tooltip.ofString(bossTags[0], description));
-			}
-		} else if (bossTags.length > 1) {
-			List<Tooltip<String>> entries = new ArrayList<>(bossTags.length);
-			for (String bossTag : bossTags) {
-				String description = "undefined";
-				BossParameters parameters = BossManager.mBossParameters.get(bossTag);
-				if (parameters != null) {
-					BossParam annotations = parameters.getClass().getAnnotation(BossParam.class);
-					if (annotations != null) {
-						description = annotations.help();
-					}
-				}
-				entries.add(Tooltip.ofString(bossTag, description));
-			}
-			return entries;
-		} else {
-			StringReader reader = new StringReader(info.currentArg());
-			String currentBossTag = reader.readUntil("[");
-			if (currentBossTag == null) {
-				// Invalid, boss tag doesn't match any suggestions and has no opening bracket for arguments
-				return List.of();
-			}
-
-			BossParameters parameter = BossManager.mBossParameters.get(currentBossTag);
-			if (parameter == null) {
-				// Invalid, boss tag doesn't have parameters
-				return List.of();
-			}
-
-			// TODO: parameter.clone(), very important!
-			ParseResult<BossParameters> result = BossParameters.parseParameters(reader, parameter, false);
-			if (result.getTooltip() != null) {
-				return result.getTooltip();
+		if (!BossManager.getStatelessBossNames().contains(tagComponent)) {
+			return BossManager.getStatelessBossNames().stream()
+				.map(s -> Tooltip.ofString(s, "Ability Tag"))
+				.toList();
+		} else if (bossParameters != null){
+			// Is complete tag
+			String parameterComponent = getParameterComponent(currentArg);
+			try {
+				Parser.parseParameters(bossParameters, new Tokenizer(parameterComponent).getTokens());
+			} catch (Parser.ParseError e) {
+				return e.getSuggestions(tagComponent);
 			}
 		}
 		return List.of();
@@ -387,21 +350,6 @@ public class BossTagCommand {
 		public Boolean getDeprecated() {
 			return mIsDeprecated;
 		}
-	}
-
-	private static String[] getPossibleBosses(String possibleBossTag) {
-		if (possibleBossTag == null || possibleBossTag.isEmpty()) {
-			return BossManager.getInstance().listStatelessBosses();
-		}
-		List<String> bossTagList = new ArrayList<>();
-
-		for (String bossTag : BossManager.getInstance().listStatelessBosses()) {
-			if (bossTag.startsWith(possibleBossTag)) {
-				bossTagList.add(bossTag);
-			}
-		}
-
-		return bossTagList.toArray(new String[0]);
 	}
 
 	private static void addNewBossTag(Player player, String newTag) throws WrapperCommandSyntaxException {
@@ -507,7 +455,7 @@ public class BossTagCommand {
 			}
 			throw CommandAPI.failWithString("That Book of Souls is corrupted!");
 		}
-		throw CommandAPI.failWithString("No Book of Souls found in slot " + Integer.toString(index));
+		throw CommandAPI.failWithString("No Book of Souls found in slot " + index);
 	}
 
 	private static void infoBossTag(Player player, String bossTag) throws IllegalArgumentException, IllegalAccessException {
@@ -554,7 +502,7 @@ public class BossTagCommand {
 	private static void showBossTag(Player player) throws WrapperCommandSyntaxException {
 		BookOfSouls bos = getBos(player);
 		NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
-		Set<String> statelessBoss = new HashSet<>(Arrays.asList(BossManager.getInstance().listStatelessBosses()));
+		Set<String> statelessBoss = new HashSet<>(BossManager.getStatelessBossNames());
 		Set<String> bossTags = new HashSet<>();
 
 		if (nbtTagsList != null && nbtTagsList.size() > 0) {
@@ -868,7 +816,7 @@ public class BossTagCommand {
 		);
 
 		// Preserve ordering of elements
-		Map<Integer, String> relevantTags = new TreeMap<>();
+		Map<Integer, String> relevantTags = new HashMap<>();
 
 		for (int i = 0; i < nbtTagsList.size(); i++) {
 			String tagString = (String) nbtTagsList.get(i);
@@ -902,7 +850,8 @@ public class BossTagCommand {
 		int endIndex = tagString.indexOf("[");
 		return endIndex == -1 ? tagString : tagString.substring(0, endIndex);
 	}
-	
+
+	// format tags until we get a parser with a tokenizer
 	private static Component formatTag(String raw) {
 		if (Objects.equals(raw, "")) {
 			return Component.empty();
@@ -1209,61 +1158,59 @@ public class BossTagCommand {
 		);
 	}
 
-	private static List<String> checkEntity(Component description, String soulLabel, NBTTagCompound entityNBT, Player sender) {
+	private static List<String> checkEntity(Component description, String soulLabel, NBTTagCompound entityNBT, Player sender, boolean checkDepreacted) {
 
 		List<String> errors = new ArrayList<>();
 
-		List<String> bosTags = new ArrayList<>();
 		NBTTagList tags = entityNBT.getList("Tags");
 		if (tags != null) {
+			String customName = entityNBT.getString("CustomName");
+			Component bossDescription = (customName == null || customName.isEmpty() ? Component.text("Unnamed " + entityNBT.getString("id"), NamedTextColor.BLUE) : MessagingUtils.parseComponent(customName)).append(description);
+
 			for (int i = 0; i < tags.size(); i++) {
 				String tag = (String) tags.get(i);
-				if (BossManager.mBossParameters.get(tag) != null) {
-					//this Soul may be with some parameters, lets save it to check later
-					bosTags.add(tag);
+				//found a param string
+
+				String tagComponent = getTagComponent(tag);
+				String parameterComponent = getParameterComponent(tag);
+				@Nullable
+				BossParameters parameters = BossManager.mBossParameters.get(tagComponent);
+
+				if (parameterComponent.isEmpty() || parameters == null) {
+					continue;
 				}
-			}
-		}
+				try {
+					Set<String> deprecatedParamsUsed = Parser.parseParameters(parameters, new Tokenizer(parameterComponent).getTokens());
 
-		String customName = entityNBT.getString("CustomName");
-		Component bossDescription = (customName == null || customName.isEmpty() ? Component.text("Unnamed " + entityNBT.getString("id"), NamedTextColor.BLUE) : MessagingUtils.parseComponent(customName)).append(description);
-
-		for (String bossTag : bosTags) {
-			for (int i = 0; i < tags.size(); i++) {
-				String tag = (String) tags.get(i);
-				if (tag.startsWith(bossTag + "[")) {
-					//found a param string
-					StringReader reader = new StringReader(tag);
-					reader.advance(bossTag);
-
-					Component descWithClickEvent = bossDescription.hoverEvent(HoverEvent.showText(Component.text("Click to get (base) BoS")))
-						                               .clickEvent(ClickEvent.runCommand("/los get " + soulLabel));
-					ParseResult<?> result = BossParameters.parseParametersWithWarnings(descWithClickEvent, reader, Objects.requireNonNull(BossManager.mBossParameters.get(bossTag)), List.of(sender));
-
-					if (result.getResult() == null) {
-						errors.add(tag);
-					} else if (result.mDeprecatedParameters != null) {
+					if (checkDepreacted && !deprecatedParamsUsed.isEmpty()) {
 						sender.sendMessage(Component.text("[BossParameters] ", NamedTextColor.GOLD)
-							                   .append(Component.text("problems during parsing tag for ", NamedTextColor.RED))
-							                   .append(descWithClickEvent)
-							                   .append(Component.text(" | on tag: ", NamedTextColor.RED))
-							                   .append(Component.text(reader.getString(), NamedTextColor.WHITE))
-							                   .append(Component.text(" | deprecated parameter(s) used: ", NamedTextColor.RED))
-							                   .append(Component.text(result.mDeprecatedParameters.toString(), NamedTextColor.YELLOW)));
-						errors.add(tag + " contains deprecated parameter(s): " + result.mDeprecatedParameters);
+							.append(Component.text("problems during parsing tag for ", NamedTextColor.RED))
+							.append(bossDescription.hoverEvent(HoverEvent.showText(Component.text("Click to get (base) BoS")))
+								.clickEvent(ClickEvent.runCommand("/los get " + soulLabel)))
+							.append(Component.text(" | on tag: ", NamedTextColor.RED))
+							.append(Component.text(tag, NamedTextColor.WHITE))
+							.append(Component.text(" | deprecated parameter(s) used: ", NamedTextColor.RED))
+							.append(Component.text(deprecatedParamsUsed.toString(), NamedTextColor.YELLOW)));
+						errors.add(tag + " contains deprecated parameter(s): " + deprecatedParamsUsed);
 					}
+				} catch (Parser.ParseError e) {
+					errors.add(tag);
+				} catch (Exception e) {
+					sender.sendMessage(Component.text(String.format("EXCEPTION In %s: ", soulLabel), NamedTextColor.RED));
+					sender.sendMessage(e.getMessage());
+					sender.sendMessage(Component.text("Tag: ").append(new Tokenizer(tag).getTokens().syntaxHighlight()));
 				}
 			}
-		}
 
-		// recursively check passengers
-		NBTTagList passengers = entityNBT.getList("Passengers");
-		if (passengers != null) {
-			for (Object passenger : passengers.getAsArray()) {
-				TextComponent nestedDescription = Component.text(" (passenger of ", NamedTextColor.GRAY).append(bossDescription).append(Component.text(")", NamedTextColor.GRAY));
-				List<String> passengerErrors = checkEntity(nestedDescription, soulLabel, (NBTTagCompound) passenger, sender);
-				for (String passengerError : passengerErrors) {
-					errors.add("  in passenger: " + passengerError);
+			// recursively check passengers
+			NBTTagList passengers = entityNBT.getList("Passengers");
+			if (passengers != null) {
+				for (Object passenger : passengers.getAsArray()) {
+					TextComponent nestedDescription = Component.text(" (passenger of ", NamedTextColor.GRAY).append(bossDescription).append(Component.text(")", NamedTextColor.GRAY));
+					List<String> passengerErrors = checkEntity(nestedDescription, soulLabel, (NBTTagCompound) passenger, sender, checkDepreacted);
+					for (String passengerError : passengerErrors) {
+						errors.add("  in passenger: " + passengerError);
+					}
 				}
 			}
 		}
@@ -1272,7 +1219,7 @@ public class BossTagCommand {
 
 	}
 
-	public static void checkAllLos(Player player, boolean spawnChest) {
+	public static void checkAllLos(Player player, boolean spawnChest, boolean checkDeprecated) {
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
@@ -1280,12 +1227,12 @@ public class BossTagCommand {
 		);
 
 		Map<Soul, List<String>> soulDeprecatedTagMap = new LinkedHashMap<>();
-		for (String soulName : LibraryOfSoulsIntegration.getSoulNames()) {
+ 		for (String soulName : LibraryOfSoulsIntegration.getSoulNames()) {
 			Soul soul = SoulsDatabase.getInstance().getSoul(soulName);
 			if (soul == null) {
 				continue;
 			}
-			List<String> errors = checkEntity(Component.text(" (soul label: " + soul.getLabel() + ")", NamedTextColor.BLUE), soul.getLabel(), soul.getNBT(), player);
+			List<String> errors = checkEntity(Component.text(" (soul label: " + soul.getLabel() + ")", NamedTextColor.BLUE), soul.getLabel(), soul.getNBT(), player, checkDeprecated);
 			if (!errors.isEmpty()) {
 				soulDeprecatedTagMap.put(soul, errors);
 			}
@@ -1298,7 +1245,7 @@ public class BossTagCommand {
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			                   .append(Component.text("Found some problems on: " + soulDeprecatedTagMap.keySet().size(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("Found some problems on: " + soulDeprecatedTagMap.size(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 
 		if (spawnChest && !soulDeprecatedTagMap.isEmpty()) {

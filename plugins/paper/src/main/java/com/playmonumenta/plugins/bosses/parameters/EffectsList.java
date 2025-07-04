@@ -11,15 +11,9 @@ import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import dev.jorel.commandapi.Tooltip;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import org.bukkit.Registry;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -27,13 +21,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 public class EffectsList {
-	public static class Effect {
+	public abstract static class Effect {
 		public static final Map<String, EffectRunner> EFFECT_RUNNER;
 		public static final Map<String, CustomEffectRunner> CUSTOM_EFFECT_RUNNER;
-		private static final Set<String> EFFECT_NAMES;
 
-		public static Set<String> getEffectNames() {
-			return EFFECT_NAMES;
+		protected Effect(String name) {
+			mName = name;
 		}
 
 		static {
@@ -135,132 +128,102 @@ public class EffectsList {
 					}
 				}
 			});
-
-
-
-
-
-
-			Set<String> normal = new HashSet<>(EFFECT_RUNNER.keySet());
-			normal.addAll(CUSTOM_EFFECT_RUNNER.keySet());
-			normal.addAll(Registry.POTION_EFFECT_TYPE.stream()
-				.map(potionEffectType -> potionEffectType.getKey().getKey())
-				.toList());
-			EFFECT_NAMES = normal;
 		}
 
-		// Common to both potion effects and custom effects
 		public final String mName;
 
-		// Only for potion effects
-		private final @Nullable PotionEffectType mEffect;
-		private final int mAmplifier;
-		private final int mDurationTicks;
-
-		// Only for custom effects
-		private final float mCustomEffectStrength;
-		private final float mCustomEffectDuration;
-		private final @Nullable String mCustomEffectSource;
-
-		// This constructor for custom effects used in EFFECT_RUNNER
-		public Effect(String name, float effectStrength) {
-			mName = name;
-			mCustomEffectStrength = effectStrength;
-
-			mCustomEffectDuration = 0;
-			mCustomEffectSource = null;
-
-			mDurationTicks = 0;
-			mAmplifier = 0;
-			mEffect = null;
-		}
-
-		// This constructor for custom effects used in CUSTOM_EFFECT_RUNNER
-		public Effect(String name, float effectDuration, float effectStrength, @Nullable String effectSource) {
-			mName = name;
-			mCustomEffectDuration = effectDuration;
-			mCustomEffectStrength = effectStrength;
-			mCustomEffectSource = effectSource;
-
-			mDurationTicks = 0;
-			mAmplifier = 0;
-			mEffect = null;
-
-		}
-
-		// This constructor for potion effects
-		public Effect(PotionEffectType effect, int duration, int amplifier) {
-			mName = effect.getKey().getKey();
-			mDurationTicks = duration;
-			mAmplifier = amplifier;
-			mEffect = effect;
-
-			mCustomEffectDuration = 0;
-			mCustomEffectStrength = 0;
-			mCustomEffectSource = null;
-
-		}
-
-		// This constructor for potion effects with default amplifier (0)
-		public Effect(PotionEffectType effect, int duration) {
-			this(effect, duration, 0);
-		}
-
-		public void apply(LivingEntity p, LivingEntity boss) {
-			if (mEffect != null) {
-				if (p instanceof Player player) {
-					Plugin.getInstance().mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(mEffect, mDurationTicks, mAmplifier, true, false, true));
-				} else {
-					p.addPotionEffect(new PotionEffect(mEffect, mDurationTicks, mAmplifier, true, false, true));
-				}
-			} else {
-				EffectRunner runner = EFFECT_RUNNER.get(mName);
-				if (runner != null) {
-					runner.apply(p, boss, mCustomEffectStrength);
-				}
-
-				CustomEffectRunner cRunner = CUSTOM_EFFECT_RUNNER.get(mName);
-				if (cRunner != null) {
-					cRunner.apply(p, boss, mCustomEffectDuration, mCustomEffectStrength, mCustomEffectSource);
-				}
-			}
-		}
-
-		public @Nullable PotionEffectType getEffect() {
-			return mEffect;
-		}
-
-		public String getCustomEffect() {
-			return mName;
-		}
+		abstract void apply(LivingEntity p, LivingEntity boss);
 
 		@Override
 		public String toString() {
-			if (mEffect != null) {
-				return "(" + mName + "," + mDurationTicks + "," + mAmplifier + ")";
-			} else {
-				if (EFFECT_RUNNER.get(mName) != null) {
-					return "(" + mName + "," + mCustomEffectStrength + ")";
-				}
-
-				if (CUSTOM_EFFECT_RUNNER.get(mName) != null) {
-					return "(" + mName + "," + mCustomEffectDuration + "," + mCustomEffectStrength + (mCustomEffectSource != null ? ",\"" + mCustomEffectSource + "\")" : ")");
-				}
-
-				return "INVALID";
-			}
+			return String.format("(%s)", mName);
 		}
 
 		@FunctionalInterface
-		private interface EffectRunner {
+		public interface EffectRunner {
 			void apply(LivingEntity p, LivingEntity boss, float duration);
 		}
 
 		@FunctionalInterface
-		private interface CustomEffectRunner {
+		public interface CustomEffectRunner {
 			void apply(LivingEntity p, LivingEntity boss, float duration, float strength, @Nullable String customEffectName);
 		}
 	}
+
+	public static final class CustomSingleArgumentEffect extends Effect {
+		private final int mDuration;
+		private final float mAmplifier;
+		@Nullable
+		private final String mSource;
+
+		public CustomSingleArgumentEffect(String effectIdentifier, int duration, float amplifier, @Nullable String source) {
+			super(effectIdentifier);
+
+			mDuration = duration;
+			mAmplifier = amplifier;
+			mSource = source;
+		}
+
+		@Override
+		void apply(LivingEntity p, LivingEntity boss) {
+			CustomEffectRunner cRunner = CUSTOM_EFFECT_RUNNER.get(mName);
+			if (cRunner != null) {
+				cRunner.apply(p, boss, mDuration, mAmplifier, mSource);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return String.format("(%s,%d,%f,%s)", mName, mDuration, mAmplifier,mSource);
+		}
+	}
+
+	public static final class CustomEffect extends Effect {
+		private final float mAmplifier;
+
+		public CustomEffect(String effectIdentifier, float amplifier) {
+			super(effectIdentifier);
+
+			mAmplifier = amplifier;
+		}
+
+		@Override
+		void apply(LivingEntity p, LivingEntity boss) {
+			EffectRunner runner = EFFECT_RUNNER.get(mName);
+			if (runner != null) {
+				runner.apply(p, boss, mAmplifier);
+			}
+		}
+	}
+
+	public static final class VanillaEffect extends Effect {
+		private final PotionEffectType mEffect;
+		private final int mDuration;
+		private final int mAmplifier;
+
+		public VanillaEffect(PotionEffectType effect, int duration, int amplifier) {
+			super(effect.key().value());
+
+			mEffect = effect;
+			mDuration = duration;
+			mAmplifier = amplifier;
+		}
+
+		@Override
+		void apply(LivingEntity p, LivingEntity boss) {
+			if (p instanceof Player player) {
+				Plugin.getInstance().mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(mEffect, mDuration, mAmplifier, true, false, true));
+			} else {
+				p.addPotionEffect(new PotionEffect(mEffect, mDuration, mAmplifier, true, false, true));
+			}
+		}
+
+		@Override
+		public String toString() {
+			return String.format("(%s,%d)", mName, mAmplifier);
+		}
+	}
+
 
 	public final List<Effect> mEffectList;
 	public static final EffectsList EMPTY = fromString("[]");
@@ -290,178 +253,6 @@ public class EffectsList {
 	}
 
 	public static EffectsList fromString(String string) {
-		ParseResult<EffectsList> result = fromReader(new StringReader(string), "");
-		if (result.getResult() == null) {
-			Plugin.getInstance().getLogger().warning("Failed to parse '" + string + "' as EffectsList");
-			Thread.dumpStack();
-			return new EffectsList(new ArrayList<>(0));
-		}
-
-		return result.getResult();
-	}
-
-	/*
-	 * Parses an EffectsList at the next position in the StringReader.
-	 * If this item parses successfully:
-	 *   The returned ParseResult will contain a non-null getResult() and a null getTooltip()
-	 *   The reader will be advanced to the next character past this EffectsList value.
-	 * Else:
-	 *   The returned ParseResult will contain a null getResult() and a non-null getTooltip()
-	 *   The reader will not be advanced
-	 */
-	public static ParseResult<EffectsList> fromReader(StringReader reader, String hoverDescription) {
-		if (!reader.advance("[")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "[", hoverDescription)));
-		}
-
-		List<Effect> effectsList = new ArrayList<>(4);
-
-		boolean atLeastOneEffectIter = false;
-		while (true) {
-			// Start trying to parse the next individual effect entry in the list
-
-			if (reader.advance("]")) {
-				// Got closing bracket and parsed rest successfully - complete effect list, break this loop
-				break;
-			}
-
-			if (atLeastOneEffectIter) {
-				if (!reader.advance(",")) {
-					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
-						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)
-					));
-				}
-				if (!reader.advance("(")) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", hoverDescription)));
-				}
-			} else {
-				if (!reader.advance("(")) {
-					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.ofString(reader.readSoFar() + "(", hoverDescription),
-						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)
-					));
-				}
-			}
-
-			atLeastOneEffectIter = true;
-
-			final boolean foundCustomPotionEffect;
-			PotionEffectType effect = reader.readPotionEffectType();
-			String customEffect = null;
-			if (effect == null) {
-				// Failed to read potion effect type - maybe it's a specialty effect instead?
-				customEffect = reader.readOneOf(Effect.EFFECT_RUNNER.keySet());
-				if (customEffect == null) {
-					customEffect = reader.readOneOf(Effect.CUSTOM_EFFECT_RUNNER.keySet());
-				}
-				if (customEffect == null) {
-					// Nope, neither matched
-					List<PotionEffectType> potionEffectTypes = Registry.POTION_EFFECT_TYPE.stream().toList();
-					List<Tooltip<String>> suggArgs = new ArrayList<>(potionEffectTypes.size() + Effect.EFFECT_RUNNER.size() + Effect.CUSTOM_EFFECT_RUNNER.size());
-					String soFar = reader.readSoFar();
-					for (String valid : Effect.EFFECT_RUNNER.keySet()) {
-						suggArgs.add(Tooltip.ofString(soFar + valid, hoverDescription));
-					}
-					for (String valid : Effect.CUSTOM_EFFECT_RUNNER.keySet()) {
-						suggArgs.add(Tooltip.ofString(soFar + valid, hoverDescription));
-					}
-					for (PotionEffectType valid : potionEffectTypes) {
-						suggArgs.add(Tooltip.ofString(soFar + valid.getKey().getKey(), hoverDescription));
-					}
-					return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
-				}
-				foundCustomPotionEffect = Effect.CUSTOM_EFFECT_RUNNER.get(customEffect) != null;
-			} else {
-				foundCustomPotionEffect = false;
-			}
-
-			if (!reader.advance(",")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", hoverDescription)));
-			}
-
-			Long durationInTicks = 0L;
-			Double effectStrength = 0d;
-			if (effect != null || foundCustomPotionEffect) {
-				durationInTicks = reader.readLong();
-				if (durationInTicks == null || durationInTicks <= 0) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "20", "Duration in ticks > 0")));
-				}
-			} else {
-				effectStrength = reader.readDouble();
-				if (effectStrength == null) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Custom effect strength")));
-				}
-			}
-
-			if ((effect == null && !foundCustomPotionEffect) || !reader.advance(",")) {
-				if (!reader.advance(")")) {
-					if (foundCustomPotionEffect) {
-						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.ofString(reader.readSoFar() + ",", "Specify strength")));
-					} else {
-						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.ofString(reader.readSoFar() + ",", "Specify amplifier"),
-							Tooltip.ofString(reader.readSoFar() + ")", "Use 0 as amplifier")
-						));
-					}
-				}
-				// End of this effect, loop to next
-				if (effect != null) {
-					effectsList.add(new Effect(effect, durationInTicks.intValue()));
-				} else {
-					//effect from effectRunner
-					effectsList.add(new Effect(Objects.requireNonNull(customEffect), effectStrength.floatValue()));
-				}
-				continue;
-			}
-
-			// Only foundPotionEffect = true possible after this point
-			// Amplifier only relevant to potion effect, not custom effects
-
-			Double amplifier = reader.readDouble();
-			if (amplifier == null) {
-				if (foundCustomPotionEffect) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Effect strength percentage")));
-				} else {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "0", "Effect amplifier, starting at 0 for first level")));
-				}
-			}
-
-			if (!reader.advance(",")) {
-				if (!reader.advance(")")) {
-					if (foundCustomPotionEffect) {
-						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.ofString(reader.readSoFar() + ",", "Specify source"),
-							Tooltip.ofString(reader.readSoFar() + ")", "Use default source")
-						));
-					} else {
-						return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
-					}
-				}
-
-				if (effect == null) {
-					effectsList.add(new Effect(Objects.requireNonNull(customEffect), durationInTicks.floatValue(), amplifier.floatValue(), null));
-				} else {
-					effectsList.add(new Effect(effect, durationInTicks.intValue(), amplifier.intValue()));
-				}
-				continue;
-			}
-
-			String source = reader.readString();
-			if (source == null) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "\"EffectsList" + customEffect + "\"", "Effect source")));
-			}
-
-			if (!reader.advance(")")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
-			}
-
-
-			// End of this effect, loop to next
-			effectsList.add(new Effect(Objects.requireNonNull(customEffect), durationInTicks.intValue(), amplifier.floatValue(), source));
-		}
-
-		return ParseResult.of(new EffectsList(effectsList));
+		return Parser.parseOrDefault(Parser.getParserMethod(EffectsList.class), string, EMPTY);
 	}
 }

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
@@ -30,8 +31,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
-
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class BossUtils {
 	/**
@@ -319,7 +318,16 @@ public class BossUtils {
 	}
 
 	public static String translateFieldNameToTag(final String fieldName) {
-		return fieldName.toLowerCase(Locale.getDefault()).replaceAll("[^a-z0-9]", "");
+		StringBuilder stringBuilder = new StringBuilder();
+		for (int i = 0; i < fieldName.length(); i++) {
+			char c = fieldName.charAt(i);
+			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z')) {
+				stringBuilder.append(c);
+			} else if (c >= 'A' && c <= 'Z') {
+				stringBuilder.append(Character.toLowerCase(c));
+			}
+ 		}
+		return stringBuilder.toString();
 	}
 
 	public static void checkParametersStringProperty(final String tag) throws Exception {
