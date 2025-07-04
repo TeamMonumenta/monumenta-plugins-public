@@ -15,6 +15,12 @@ import com.playmonumenta.plugins.bosses.spells.SpellMobHealAoE;
 import com.playmonumenta.plugins.delves.abilities.Arcanic;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiConsumer;
+import org.bukkit.Color;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -22,10 +28,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiConsumer;
 
 public class ArcanicBoss extends BossAbilityGroup {
 	public static final String identityTag = "arcanic_ability";
@@ -54,14 +56,35 @@ public class ArcanicBoss extends BossAbilityGroup {
 
 		mMissileParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mMissileParameters.DETECTION, false, new EntityTargets.Limit(1), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
 
-		mMissileParameters.PARTICLE_LAUNCH = ParticlesList.fromString("[(REDSTONE,100,1,1,1,0,#9500ff)]");
-		mMissileParameters.PARTICLE_PROJECTILE = ParticlesList.fromString("[(SPELL_WITCH,4,0,0,0,0.3),(DUST_COLOR_TRANSITION,1,0,0,0,0,#9500ff,GRAY,2),(SMOKE_NORMAL,5,0,0,0,0.1)]");
-		mMissileParameters.PARTICLE_HIT = ParticlesList.fromString("[(SPELL_WITCH,40,0,0,0,0.3)]");
+		mMissileParameters.PARTICLE_LAUNCH = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 100, 1.0, 1.0, 1.0, 0.0, new Particle.DustOptions(Color.fromRGB(0x9500ff), 1.0f)))
+			.build();
+		mMissileParameters.PARTICLE_PROJECTILE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_WITCH, 4, 0.0, 0.0, 0.0, 0.3))
+			.add(new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 1, 0.0, 0.0, 0.0, 0.0, new Particle.DustTransition(Color.fromRGB(0x9500ff), Color.GRAY, 2.0f)))
+			.add(new ParticlesList.CParticle(Particle.SMOKE_NORMAL, 5, 0.0, 0.0, 0.0, 0.1))
+			.build();
+		mMissileParameters.PARTICLE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_WITCH, 40, 0.0, 0.0, 0.0, 0.3))
+			.build();
 
-		mMissileParameters.SOUND_START = SoundsList.fromString("[(BLOCK_BEACON_POWER_SELECT,1,0.5),(ENTITY_WARDEN_SONIC_CHARGE,1,1.5)]");
-		mMissileParameters.SOUND_LAUNCH = SoundsList.fromString("[(ENTITY_EVOKER_CAST_SPELL,1,0.7),(ENTITY_BREEZE_SHOOT,1,0.5),(ENTITY_BLAZE_SHOOT,1,0.65)]");
-		mMissileParameters.SOUND_HIT = SoundsList.fromString("[(BLOCK_BEACON_DEACTIVATE,1,0.5),(ENTITY_BREEZE_HURT,1,0.5),(ENTITY_PHANTOM_DEATH,1,0.75)]");
-		mMissileParameters.SOUND_PROJECTILE = SoundsList.fromString("[(BLOCK_BEACON_POWER_SELECT,0.4,0.5)]");
+		mMissileParameters.SOUND_START = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_BEACON_POWER_SELECT, 1.0f, 0.5f))
+			.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_SONIC_CHARGE, 1.0f, 1.5f))
+			.build();
+		mMissileParameters.SOUND_LAUNCH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_EVOKER_CAST_SPELL, 1.0f, 0.7f))
+			.add(new SoundsList.CSound(Sound.ENTITY_BREEZE_SHOOT, 1.0f, 0.5f))
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.65f))
+			.build();
+		mMissileParameters.SOUND_HIT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_BEACON_DEACTIVATE, 1.0f, 0.5f))
+			.add(new SoundsList.CSound(Sound.ENTITY_BREEZE_HURT, 1.0f, 0.5f))
+			.add(new SoundsList.CSound(Sound.ENTITY_PHANTOM_DEATH, 1.0f, 0.75f))
+			.build();
+		mMissileParameters.SOUND_PROJECTILE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_BEACON_POWER_SELECT, 0.4f, 0.5f))
+			.build();
 
 		/* ---------------- Arcanic Arrow ----------------*/
 		final ProjectileBoss.Parameters mArrowParameters = new ProjectileBoss.Parameters();
@@ -77,12 +100,27 @@ public class ArcanicBoss extends BossAbilityGroup {
 		mArrowParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mArrowParameters.DETECTION, false, new EntityTargets.Limit(1), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
 
 		mArrowParameters.PARTICLE_LAUNCH = ParticlesList.EMPTY;
-		mArrowParameters.PARTICLE_PROJECTILE = ParticlesList.fromString("[(FIREWORKS_SPARK,5,0.1,0.1,0.1,0.05),(CRIT_MAGIC,20,0.2,0.2,0.2,0.1)]");
-		mArrowParameters.PARTICLE_HIT = ParticlesList.fromString("[(FIREWORKS_SPARK,30,0,0,0,0.25)]");
+		mArrowParameters.PARTICLE_PROJECTILE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 5, 0.1, 0.1, 0.1, 0.05))
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 20, 0.2, 0.2, 0.2, 0.1))
+			.build();
+		mArrowParameters.PARTICLE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 30, 0.0, 0.0, 0.0, 0.25))
+			.build();
 
-		mArrowParameters.SOUND_START = SoundsList.fromString("[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,1.5),(ITEM_CROSSBOW_QUICK_CHARGE_3,1,0.75)]");
-		mArrowParameters.SOUND_LAUNCH = SoundsList.fromString("[(ENTITY_FIREWORK_ROCKET_LAUNCH,1,0.75),(ITEM_CROSSBOW_SHOOT,1,1.75),(ENTITY_BLAZE_SHOOT,1.0,1.35)]");
-		mArrowParameters.SOUND_HIT = SoundsList.fromString("[(ENTITY_FIREWORK_ROCKET_TWINKLE,1,1.25),(ITEM_TRIDENT_HIT,1,1.75)]");
+		mArrowParameters.SOUND_START = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1.0f, 1.5f))
+			.add(new SoundsList.CSound(Sound.ITEM_CROSSBOW_QUICK_CHARGE_3, 1.0f, 0.75f))
+			.build();
+		mArrowParameters.SOUND_LAUNCH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1.0f, 0.75f))
+			.add(new SoundsList.CSound(Sound.ITEM_CROSSBOW_SHOOT, 1.0f, 1.75f))
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 1.0f, 1.35f))
+			.build();
+		mArrowParameters.SOUND_HIT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1.0f, 1.25f))
+			.add(new SoundsList.CSound(Sound.ITEM_TRIDENT_HIT, 1.0f, 1.75f))
+			.build();
 		mArrowParameters.SOUND_PROJECTILE = SoundsList.EMPTY;
 
 		/* ---------------- Arcanic Charge ----------------*/
@@ -92,13 +130,33 @@ public class ArcanicBoss extends BossAbilityGroup {
 
 		mChargeParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mChargeParameters.DETECTION, false, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
 
-		mChargeParameters.PARTICLE_WARNING = ParticlesList.fromString("[(VILLAGER_ANGRY,15,0.25,1.25,0.25,0.0),(REDSTONE,100,1,1,1,0,RED)]");
-		mChargeParameters.PARTICLE_TELL = ParticlesList.fromString("[(CRIT,2,0.5,0.5,0.5,0.0)]");
-		mChargeParameters.PARTICLE_ROAR = ParticlesList.fromString("[(SMOKE_LARGE,45,0.0,0.0,0.0,0.0)]");
-		mChargeParameters.PARTICLE_ATTACK = ParticlesList.fromString("[(FLAME,2,0.5,0.5,0.5,0.01),(FLAME,1,0.1,0.1,0.1,0.15),(REDSTONE,3,0.5,0.5,0.5,0,#2D2B2D,1.25),(SMOKE_NORMAL,2,0.1,0.1,0.1,0.15),(DUST_COLOR_TRANSITION,1,0.2,0.2,0.2,0,RED,#2D2B2D,2)]");
+		mChargeParameters.PARTICLE_WARNING = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.VILLAGER_ANGRY, 15, 0.25, 1.25, 0.25, 0.0))
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 100, 1.0, 1.0, 1.0, 0.0, new Particle.DustOptions(Color.RED, 1.0f)))
+			.build();
+		mChargeParameters.PARTICLE_TELL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 2, 0.5, 0.5, 0.5, 0.0))
+			.build();
+		mChargeParameters.PARTICLE_ROAR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 45, 0.0, 0.0, 0.0, 0.0))
+			.build();
+		mChargeParameters.PARTICLE_ATTACK = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 2, 0.5, 0.5, 0.5, 0.01))
+			.add(new ParticlesList.CParticle(Particle.FLAME, 1, 0.1, 0.1, 0.1, 0.15))
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 3, 0.5, 0.5, 0.5, 0.0, new Particle.DustOptions(Color.fromRGB(0x2d2b2d), 1.25f)))
+			.add(new ParticlesList.CParticle(Particle.SMOKE_NORMAL, 2, 0.1, 0.1, 0.1, 0.15))
+			.add(new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 1, 0.2, 0.2, 0.2, 0.0, new Particle.DustTransition(Color.RED, Color.fromRGB(0x2d2b2d), 2.0f)))
+			.build();
 
-		mChargeParameters.SOUND_WARNING = SoundsList.fromString("[(ENTITY_ELDER_GUARDIAN_CURSE,1,1.5),(ENTITY_ELDER_GUARDIAN_DEATH,1,2),(ENTITY_ILLUSIONER_PREPARE_BLINDNESS,1,1.65)]");
-		mChargeParameters.SOUND_ROAR = SoundsList.fromString("[(ENTITY_BLAZE_SHOOT,1.0,0.7),(ENTITY_WARDEN_ATTACK_IMPACT,1,0.5)]");
+		mChargeParameters.SOUND_WARNING = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1.0f, 1.5f))
+			.add(new SoundsList.CSound(Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1.0f, 2.0f))
+			.add(new SoundsList.CSound(Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1.0f, 1.65f))
+			.build();
+		mChargeParameters.SOUND_ROAR = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.7f))
+			.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_ATTACK_IMPACT, 1.0f, 0.5f))
+			.build();
 
 		mChargeParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mChargeParameters.DETECTION, false, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
 		/* ---------------- Arcanic Rejuvenation ----------------*/
@@ -108,14 +166,35 @@ public class ArcanicBoss extends BossAbilityGroup {
 		mRejuvenationParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.MOB, mRejuvenationParameters.RANGE, false);
 		mRejuvenationParameters.PARTICLE_RADIUS = mRejuvenationParameters.RANGE;
 
-		mRejuvenationParameters.PARTICLE_CHARGE_AIR = ParticlesList.fromString("[(COMPOSTER,2,0.0,0.0,0.0,0.0)]");
-		mRejuvenationParameters.PARTICLE_CHARGE_CIRCLE = ParticlesList.fromString("[(SPELL_INSTANT,2,0.0,0.0,0.0,0.0),(DUST_COLOR_TRANSITION,1,0.25,0.25,0.25,0,LIME,YELLOW,1.1),(TOTEM,1,0,0,0,0)]");
+		mRejuvenationParameters.PARTICLE_CHARGE_AIR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.COMPOSTER, 2, 0.0, 0.0, 0.0, 0.0))
+			.build();
+		mRejuvenationParameters.PARTICLE_CHARGE_CIRCLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_INSTANT, 2, 0.0, 0.0, 0.0, 0.0))
+			.add(new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 1, 0.25, 0.25, 0.25, 0.0, new Particle.DustTransition(Color.LIME, Color.YELLOW, 1.1f)))
+			.add(new ParticlesList.CParticle(Particle.TOTEM, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 		mRejuvenationParameters.PARTICLE_OUTBURST_AIR = ParticlesList.EMPTY;
-		mRejuvenationParameters.PARTICLE_HEAL = ParticlesList.fromString("[(FIREWORKS_SPARK,4,0.25,0.5,0.25,0.3),(HEART,3,0.4,0.5,0.4,0.0)]");
-		mRejuvenationParameters.PARTICLE_OUTBURST_CIRCLE = ParticlesList.fromString("[(SPELL_INSTANT,2,0.25,0.25,0.25,0.35),(TOTEM,2,0.25,0.25,0.25,0.15)]");
+		mRejuvenationParameters.PARTICLE_HEAL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 4, 0.25, 0.5, 0.25, 0.3))
+			.add(new ParticlesList.CParticle(Particle.HEART, 3, 0.4, 0.5, 0.4, 0.0))
+			.build();
+		mRejuvenationParameters.PARTICLE_OUTBURST_CIRCLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_INSTANT, 2, 0.25, 0.25, 0.25, 0.35))
+			.add(new ParticlesList.CParticle(Particle.TOTEM, 2, 0.25, 0.25, 0.25, 0.15))
+			.build();
 
-		mRejuvenationParameters.SOUND_CHARGE = SoundsList.fromString("[(ITEM_TRIDENT_RETURN,0.8),(BLOCK_AMETHYST_BLOCK_RESONATE,1)]");
-		mRejuvenationParameters.SOUND_OUTBURST_CIRCLE = SoundsList.fromString("[(ENTITY_EVOKER_CAST_SPELL,2,1.5),(ENTITY_ZOMBIE_VILLAGER_CONVERTED,2,2.0),(BLOCK_AMETHYST_BLOCK_CHIME,3,1.5),(BLOCK_AMETHYST_BLOCK_CHIME,3,1.5),(BLOCK_AMETHYST_BLOCK_CHIME,3,1.5)]");
+		mRejuvenationParameters.SOUND_CHARGE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_TRIDENT_RETURN, 0.8f, 1.0f))
+			.add(new SoundsList.CSound(Sound.BLOCK_AMETHYST_BLOCK_RESONATE, 1.0f, 1.0f))
+			.build();
+		mRejuvenationParameters.SOUND_OUTBURST_CIRCLE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_EVOKER_CAST_SPELL, 2.0f, 1.5f))
+			.add(new SoundsList.CSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2.0f, 2.0f))
+			.add(new SoundsList.CSound(Sound.BLOCK_AMETHYST_BLOCK_CHIME, 3.0f, 1.5f))
+			.add(new SoundsList.CSound(Sound.BLOCK_AMETHYST_BLOCK_CHIME, 3.0f, 1.5f))
+			.add(new SoundsList.CSound(Sound.BLOCK_AMETHYST_BLOCK_CHIME, 3.0f, 1.5f))
+			.build();
 
 		mRejuvenationParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.MOB, mRejuvenationParameters.RANGE, false);
 

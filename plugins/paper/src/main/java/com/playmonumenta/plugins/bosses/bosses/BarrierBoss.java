@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
@@ -7,11 +8,12 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBarrier;
 import java.util.List;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public final class BarrierBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_barrier";
@@ -31,13 +33,19 @@ public final class BarrierBoss extends BossAbilityGroup {
 		public boolean IS_CARAPACE = false;
 
 		@BossParam(help = "Particles summoned around the launcher")
-		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,4,0,1,0,0,#ffffff,2)]");
+		public ParticlesList PARTICLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 4, 0.0, 1.0, 0.0, 0.0, new Particle.DustOptions(Color.WHITE, 2.0f)))
+			.build();
 
 		@BossParam(help = "Sounds played when the barrier refreshes")
-		public SoundsList SOUND_REFRESH = SoundsList.fromString("[(BLOCK_BEACON_ACTIVATE,1,1)]");
+		public SoundsList SOUND_REFRESH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_BEACON_ACTIVATE, 1.0f, 1.0f))
+			.build();
 
 		@BossParam(help = "Sounds played when the barrier is broken")
-		public SoundsList SOUND_BREAK = SoundsList.fromString("[(ITEM_SHIELD_BREAK,1,1)]");
+		public SoundsList SOUND_BREAK = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_SHIELD_BREAK, 1.0f, 1.0f))
+			.build();
 	}
 
 	public BarrierBoss(final Plugin plugin, final LivingEntity boss) {

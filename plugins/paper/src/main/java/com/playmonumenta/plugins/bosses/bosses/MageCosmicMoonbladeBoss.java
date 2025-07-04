@@ -13,7 +13,10 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -43,13 +46,23 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 		public EntityTargets TARGETS_DIRECTION = EntityTargets.GENERIC_ONE_PLAYER_CLOSER_TARGET;
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.clone().setRange(6);
 
-		public ParticlesList PARTICLE_TELL = ParticlesList.fromString("[(REDSTONE,1,0,0,0,0.1,WHITE,1)]");
+		public ParticlesList PARTICLE_TELL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 1, 0.0, 0.0, 0.0, 0.1, new Particle.DustOptions(Color.WHITE, 1.0f)))
+			.build();
 
-		public SoundsList SOUND_TELL = SoundsList.fromString("[(ENTITY_EVOKER_PREPARE_ATTACK,1,2)]");
+		public SoundsList SOUND_TELL = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_EVOKER_PREPARE_ATTACK, 1.0f, 2.0f))
+			.build();
 
-		public ParticlesList PARTICLE_SWING = ParticlesList.fromString("[(REDSTONE,1,0,0,0,0.1,#6acbff,1),(REDSTONE,1,0,0,0,0.1,#a8e2ff,1)]");
+		public ParticlesList PARTICLE_SWING = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 1, 0.0, 0.0, 0.0, 0.1, new Particle.DustOptions(Color.fromRGB(0x6acbff), 1.0f)))
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 1, 0.0, 0.0, 0.0, 0.1, new Particle.DustOptions(Color.fromRGB(0xa8e2ff), 1.0f)))
+			.build();
 
-		public SoundsList SOUND_SWING = SoundsList.fromString("[(ENTITY_PLAYER_ATTACK_SWEEP,0.75,0.8),(ENTITY_WITHER_SHOOT,0.75,0)]");
+		public SoundsList SOUND_SWING = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.8f))
+			.add(new SoundsList.CSound(Sound.ENTITY_WITHER_SHOOT, 0.75f, 0.0f))
+			.build();
 	}
 
 	public final Parameters mParams;

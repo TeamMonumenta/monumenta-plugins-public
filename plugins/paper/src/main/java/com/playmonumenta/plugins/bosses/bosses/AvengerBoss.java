@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.Collections;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
@@ -43,19 +45,29 @@ public final class AvengerBoss extends BossAbilityGroup {
 		public double DAMAGE_PERCENT_INCREMENT = 0.2;
 
 		@BossParam(help = "Sounds played when a nearby living entity dies")
-		public SoundsList SOUND_DEATH = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,0.1,0.8)]");
+		public SoundsList SOUND_DEATH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_GROWL, 0.1f, 0.8f))
+			.build();
 
 		@BossParam(help = "Particles summoned when a nearby living entity dies")
-		public ParticlesList PARTICLE_DEATH = ParticlesList.fromString("[(SPELL_WITCH,20)]");
+		public ParticlesList PARTICLE_DEATH = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_WITCH, 20, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particles that traces a line between a death location and the launcher")
-		public ParticlesList PARTICLE_VECTOR = ParticlesList.fromString("[(VILLAGER_HAPPY,3)]");
+		public ParticlesList PARTICLE_VECTOR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.VILLAGER_HAPPY, 3, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particles summoned on the launcher when PARTICLE_VECTOR completes")
-		public ParticlesList PARTICLE_BOSS = ParticlesList.fromString("[(CRIT_MAGIC,20)]");
+		public ParticlesList PARTICLE_BOSS = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 20, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particles summoned with PARTICLE_BOSS if the launcher heals")
-		public ParticlesList PARTICLE_HEAL = ParticlesList.fromString("[(HEART,3)]");
+		public ParticlesList PARTICLE_HEAL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.HEART, 3, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Time in ticks between a nearby living entity death and the launcher gaining health and buffs")
 		public int VECTOR_TICKS = 12;

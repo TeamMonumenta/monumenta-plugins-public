@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellCooldownManager;
 import com.playmonumenta.plugins.bosses.spells.SpellSlashAttack;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.ParticleUtils;
-import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -25,13 +24,15 @@ public class SpellNightmareSlash extends SpellSlashAttack {
 			Color.fromRGB(0xff3333),
 			false, true, false, true, new Vector(1, 0.5, 1), true, 1,
 			false, true, 0.5, -1, DamageEvent.DamageType.MELEE,
-			new SoundsList(List.of(
-				new SoundsList.CSound(Sound.ENTITY_WARDEN_DEATH, 2.1f, 0.01f), new SoundsList.CSound(Sound.ENTITY_WARDEN_SONIC_CHARGE, 2.5f, 0.1f)
-			)),
-			new SoundsList(List.of(
-				new SoundsList.CSound(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.5f, 0.1f), new SoundsList.CSound(Sound.ENTITY_WITHER_SKELETON_HURT, 1.5f, 0.1f),
-				new SoundsList.CSound(Sound.ENTITY_WITHER_HURT, 0.4f, 0.5f)
-			)),
+			SoundsList.builder()
+				.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_DEATH, 2.1f, 0.01f))
+				.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_SONIC_CHARGE, 2.5f, 0.1f))
+				.build(),
+			SoundsList.builder()
+				.add(new SoundsList.CSound(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.5f, 0.1f))
+				.add(new SoundsList.CSound(Sound.ENTITY_WITHER_SKELETON_HURT, 1.5f, 0.1f))
+				.add(new SoundsList.CSound(Sound.ENTITY_WITHER_HURT, 0.4f, 0.5f))
+				.build(),
 			SoundsList.EMPTY,
 			SoundsList.EMPTY,
 			true, 2, 20, false,

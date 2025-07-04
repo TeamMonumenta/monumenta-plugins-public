@@ -11,8 +11,10 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffectType;
 
 public class SizeChangerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_size_changer";
@@ -37,10 +39,14 @@ public class SizeChangerBoss extends BossAbilityGroup {
 		public int DETECTION = 20;
 
 		@BossParam(help = "Effects applyed to the mob when the size change")
-		public EffectsList EFFECTS = EffectsList.fromString("[(GLOWING,20,0)]");
+		public EffectsList EFFECTS = EffectsList.builder()
+			.add(new EffectsList.VanillaEffect(PotionEffectType.GLOWING, 20, 0))
+			.build();
 
 		@BossParam(help = "Particles summon in circle around the mob, leave empty for no particles")
-		public ParticlesList PARTICLES = ParticlesList.fromString("[(FLAME,1,0,0,0,0.05)]");
+		public ParticlesList PARTICLES = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 1, 0.0, 0.0, 0.0, 0.05))
+			.build();
 
 		public SoundsList SOUNDS = SoundsList.EMPTY;
 	}

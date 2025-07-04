@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellProsecutorJudgementChain;
 import com.playmonumenta.plugins.events.DamageEvent;
-import java.util.List;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -36,13 +35,21 @@ public class ProsecutorJudgementChainBoss extends BossAbilityGroup {
 		@BossParam(help = "What damage type it should cancel on.")
 		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MELEE;
 		@BossParam(help = "Particles of the chain")
-		public ParticlesList PARTICLE_CHAIN = new ParticlesList(List.of(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 50)));
+		public ParticlesList PARTICLE_CHAIN = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 50))
+			.build();
 		@BossParam(help = "Sound played each pull")
-		public SoundsList SOUND_PULL = new SoundsList(List.of(new SoundsList.CSound(Sound.BLOCK_CHAIN_BREAK, 2.0f, 0.5f)));
+		public SoundsList SOUND_PULL = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_CHAIN_BREAK, 2.0f, 0.5f))
+			.build();
 		@BossParam(help = "Sound played each break")
-		public SoundsList SOUND_CHIP = new SoundsList(List.of(new SoundsList.CSound(Sound.ITEM_AXE_SCRAPE, 0.5f, 1.2f)));
+		public SoundsList SOUND_CHIP = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_AXE_SCRAPE, 0.5f, 1.2f))
+			.build();
 		@BossParam(help = "Sound played each break")
-		public SoundsList SOUND_BREAK = new SoundsList(List.of(new SoundsList.CSound(Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, 1.2f, 2.0f)));
+		public SoundsList SOUND_BREAK = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, 1.2f, 2.0f))
+			.build();
 		@BossParam(help = "not written")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_ONE_PLAYER_CLOSER_TARGET;
 	}

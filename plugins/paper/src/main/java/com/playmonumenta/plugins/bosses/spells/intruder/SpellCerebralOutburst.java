@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellCooldownManager;
 import com.playmonumenta.plugins.bosses.spells.SpellOmen;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -28,32 +27,32 @@ public class SpellCerebralOutburst extends SpellOmen {
 		super(plugin, launcher, new OmenBoss.Parameters());
 		mDialogue = dialogue;
 
-		mP.SOUND_HIT = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_HURT, 1.2f, 0.4f)
-		));
-		mP.SOUND_WARN = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_WARDEN_DEATH, 0.3f, 0.1f),
-			new SoundsList.CSound(Sound.ENTITY_WARDEN_HEARTBEAT, 4.0f, 0.5f)
-		));
-		mP.SOUND_LAUNCH = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_ELDER_GUARDIAN_HURT, 2.0f, 0.1f),
-			new SoundsList.CSound(Sound.ENTITY_WARDEN_SONIC_BOOM, 0.7f, 0.5f),
-			new SoundsList.CSound(Sound.ENTITY_WARDEN_SONIC_CHARGE, 0.8f, 0.8f)
-		));
+		mP.SOUND_HIT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_HURT, 1.2f, 0.4f))
+			.build();
+		mP.SOUND_WARN = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_DEATH, 0.3f, 0.1f))
+			.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_HEARTBEAT, 4.0f, 0.5f))
+			.build();
+		mP.SOUND_LAUNCH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ELDER_GUARDIAN_HURT, 2.0f, 0.1f))
+			.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_SONIC_BOOM, 0.7f, 0.5f))
+			.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_SONIC_CHARGE, 0.8f, 0.8f))
+			.build();
 		mP.SOUND_TEL = SoundsList.EMPTY;
-		mP.PARTICLE_TEL = new ParticlesList(List.of(
-			new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 1, 0, 0, 0, 0,
+		mP.PARTICLE_TEL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 1, 0, 0, 0, 0,
 				new Particle.DustTransition(Color.WHITE, Color.FUCHSIA, 2.5f)))
-		);
-		mP.PARTICLE_OMEN = new ParticlesList(List.of(
-			new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 1, 0, 0.4, 0, 0,
+			.build();
+		mP.PARTICLE_OMEN = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 1, 0, 0.4, 0, 0,
 				new Particle.DustTransition(Color.FUCHSIA, Color.RED, 1.2f)))
-		);
-		mP.PARTICLE_TEL_SWIRL = new ParticlesList(List.of(
-			new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 1, 0, 0, 0, 0,
-				new Particle.DustTransition(Color.RED, Color.PURPLE, 1.0f)),
-			new ParticlesList.CParticle(Particle.END_ROD, 1, 0.0, 0.0, 0.0, 9999)
-		));
+			.build();
+		mP.PARTICLE_TEL_SWIRL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 1, 0, 0, 0, 0,
+				new Particle.DustTransition(Color.RED, Color.PURPLE, 1.0f)))
+			.add(new ParticlesList.CParticle(Particle.END_ROD, 1, 0.0, 0.0, 0.0, 9999))
+			.build();
 		mP.SAFESPOT_SIZE = 0;
 		mP.MAX_RANGE = 40;
 		mP.DETECTION = 100;

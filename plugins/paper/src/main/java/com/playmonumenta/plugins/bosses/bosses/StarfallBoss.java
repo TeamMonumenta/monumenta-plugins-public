@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -61,14 +63,29 @@ public class StarfallBoss extends BossAbilityGroup {
 		@BossParam(help = "the height above the target location to put particlecircle tracking particles")
 		public double LOCKING_CIRCLE_HEIGHT = 0.3;
 
-		public ParticlesList PARTICLE_CIRCLE = ParticlesList.fromString("[(FLAME,1,0,0,0,0.1)]");
+		public ParticlesList PARTICLE_CIRCLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 1, 0.0, 0.0, 0.0, 0.1))
+			.build();
 
-		public ParticlesList PARTICLE_METEOR = ParticlesList.fromString("[(FLAME,30,0.1,0.1,0.1,0.1),(SMOKE_LARGE,3)]");
-		public ParticlesList PARTICLE_EXPLOSION = ParticlesList.fromString("[(FLAME,175,0.1,0.1,0.1,0.25),(SMOKE_LARGE,50,0,0,0,0.25),(EXPLOSION_NORMAL,50,0,0,0,0.25)]");
+		public ParticlesList PARTICLE_METEOR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 30, 0.1, 0.1, 0.1, 0.1))
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 3, 0.0, 0.0, 0.0, 0.0))
+			.build();
+		public ParticlesList PARTICLE_EXPLOSION = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 175, 0.1, 0.1, 0.1, 0.25))
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 50, 0.0, 0.0, 0.0, 0.25))
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_NORMAL, 50, 0.0, 0.0, 0.0, 0.25))
+			.build();
 
-		public SoundsList SOUND_LOCKING = SoundsList.fromString("[(ITEM_FIRECHARGE_USE,1,0)]");
-		public SoundsList SOUND_METEOR = SoundsList.fromString("[(ENTITY_BLAZE_SHOOT,3,1)]");
-		public SoundsList SOUND_EXPLOSION = SoundsList.fromString("[(ENTITY_DRAGON_FIREBALL_EXPLODE,3,1)]");
+		public SoundsList SOUND_LOCKING = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_FIRECHARGE_USE, 1.0f, 0.0f))
+			.build();
+		public SoundsList SOUND_METEOR = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 3.0f, 1.0f))
+			.build();
+		public SoundsList SOUND_EXPLOSION = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 3.0f, 1.0f))
+			.build();
 		@BossParam(help = "LibraryOfSouls name of the mob spawned when the grenade explodes")
 		public LoSPool SPAWNED_MOB_POOL = LoSPool.LibraryPool.EMPTY;
 		@BossParam(help = "how often particles/sounds spawn during the starfall's falling sequence (BASED ON HEIGHT)")

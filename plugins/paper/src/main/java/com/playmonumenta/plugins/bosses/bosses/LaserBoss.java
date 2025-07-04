@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
@@ -77,16 +79,25 @@ public class LaserBoss extends BossAbilityGroup {
 
 		//particle & sound used!
 		@BossParam(help = "Sound used each tick on each player")
-		public SoundsList SOUND_TICKS = SoundsList.fromString("[(ENTITY_SHULKER_BULLET_HIT)]");
+	  	public SoundsList SOUND_TICKS = SoundsList.builder()
+		.add(new SoundsList.CSound(Sound.ENTITY_SHULKER_BULLET_HIT, 1.0f, 1.0f))
+		.build();
 
 		@BossParam(help = "Particle used for the laser")
-		public ParticlesList PARTICLE_LASER = ParticlesList.fromString("[(CRIT,1),(CRIT_MAGIC,1)]");
+		public ParticlesList PARTICLE_LASER = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 1, 0.0, 0.0, 0.0, 0.0))
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particle used when the cast is over")
-		public ParticlesList PARTICLE_END = ParticlesList.fromString("[(EXPLOSION_NORMAL,35)]");
+		public ParticlesList PARTICLE_END = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_NORMAL, 35, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound used when the cast is over")
-		public SoundsList SOUND_END = SoundsList.fromString("[(ENTITY_DRAGON_FIREBALL_EXPLODE,0.6,1.5)]");
+		public SoundsList SOUND_END = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.6f, 1.5f))
+			.build();
 
 		@BossParam(help = "not written")
 		public int PARTICLE_FREQUENCY = 1;
@@ -170,4 +181,3 @@ public class LaserBoss extends BossAbilityGroup {
 
 	}
 }
-

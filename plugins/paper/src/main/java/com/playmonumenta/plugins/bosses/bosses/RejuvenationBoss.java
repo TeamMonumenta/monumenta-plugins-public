@@ -7,9 +7,8 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellMobHealAoE;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 
 /* TODO: Merge this with NovaBoss */
@@ -41,19 +40,37 @@ public class RejuvenationBoss extends BossAbilityGroup {
 		public EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.clone().setOptional(false);
 
 
-		public ParticlesList PARTICLE_CHARGE_AIR = ParticlesList.fromString("[(SPELL_INSTANT,3)]");
+		public ParticlesList PARTICLE_CHARGE_AIR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_INSTANT, 3, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
-		public ParticlesList PARTICLE_CHARGE_CIRCLE = ParticlesList.fromString("[(SPELL_INSTANT,3)]");
+		public ParticlesList PARTICLE_CHARGE_CIRCLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_INSTANT, 3, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
-		public SoundsList SOUND_CHARGE = SoundsList.fromString("[(ITEM_TRIDENT_RETURN,0.8)]");
+		public SoundsList SOUND_CHARGE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_TRIDENT_RETURN, 0.8f, 1.0f))
+			.build();
 
-		public SoundsList SOUND_OUTBURST_CIRCLE = SoundsList.fromString("[(ENTITY_ILLUSIONER_CAST_SPELL,3,1.25),(ENTITY_ZOMBIE_VILLAGER_CONVERTED,3,2)]");
+		public SoundsList SOUND_OUTBURST_CIRCLE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ILLUSIONER_CAST_SPELL, 3.0f, 1.25f))
+			.add(new SoundsList.CSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 3.0f, 2.0f))
+			.build();
 
-		public ParticlesList PARTICLE_OUTBURST_AIR = ParticlesList.fromString("[(FIREWORKS_SPARK,3),(VILLAGER_HAPPY,3,3.5,3.5,3.5,0.5)]");
+		public ParticlesList PARTICLE_OUTBURST_AIR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 3, 0.0, 0.0, 0.0, 0.0))
+			.add(new ParticlesList.CParticle(Particle.VILLAGER_HAPPY, 3, 3.5, 3.5, 3.5, 0.5))
+			.build();
 
-		public ParticlesList PARTICLE_OUTBURST_CIRCLE = ParticlesList.fromString("[(CRIT_MAGIC,3,0.25,0.25,0.25,0.35),(FIREWORKS_SPARK,2,0.25,0.25,0.25,0.15)]");
+		public ParticlesList PARTICLE_OUTBURST_CIRCLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 3, 0.25, 0.25, 0.25, 0.35))
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 2, 0.25, 0.25, 0.25, 0.15))
+			.build();
 
-		public ParticlesList PARTICLE_HEAL = ParticlesList.fromString("[(FIREWORKS_SPARK,3,0.25,0.5,0.25,0.3),(HEART,3,0.4,0.5,0.4)]");
+		public ParticlesList PARTICLE_HEAL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 3, 0.25, 0.5, 0.25, 0.3))
+			.add(new ParticlesList.CParticle(Particle.HEART, 3, 0.4, 0.5, 0.4, 0.0))
+			.build();
 
 	}
 

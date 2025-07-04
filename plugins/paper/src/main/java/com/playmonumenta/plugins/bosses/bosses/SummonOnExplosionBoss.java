@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
@@ -8,6 +9,8 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import java.util.Collections;
 import java.util.Objects;
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -16,8 +19,6 @@ import org.bukkit.entity.Mob;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
-
-import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
 
 public class SummonOnExplosionBoss extends BossAbilityGroup {
 
@@ -29,10 +30,14 @@ public class SummonOnExplosionBoss extends BossAbilityGroup {
 		public LoSPool POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "Particles summon when the mob spawm")
-		public ParticlesList PARTICLES = ParticlesList.fromString("[(SOUL_FIRE_FLAME,20,0.7,0.7,0.7,0.2)]");
+		public ParticlesList PARTICLES = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SOUL_FIRE_FLAME, 20, 0.7, 0.7, 0.7, 0.2))
+			.build();
 
 		@BossParam(help = "Sounds summon when the mob spawm")
-		public SoundsList SOUNDS = SoundsList.fromString("[(BLOCK_SOUL_SAND_FALL,2,0.5)]");
+		public SoundsList SOUNDS = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_SOUL_SAND_FALL, 2.0f, 0.5f))
+			.build();
 
 		@BossParam(help = "Delay for the mob spawned to get AI activated")
 		public int MOB_AI_DELAY = 0;

@@ -11,6 +11,8 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -36,9 +38,14 @@ public class FlowerPlaceBoss extends BossAbilityGroup {
 		@BossParam(help = "works with any block but just use a flower vro")
 		public Material FLOWER = Material.BLUE_ORCHID;
 		@BossParam(help = "Sound played when the explosion hits a player")
-		public SoundsList SOUND_FLOWER = SoundsList.fromString("[(ENTITY_PLAYER_LEVELUP,0.6,1.5),(BLOCK_FLOWERING_AZALEA_PLACE,0.6,1)]");
+		public SoundsList SOUND_FLOWER = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_PLAYER_LEVELUP, 0.6f, 1.5f))
+			.add(new SoundsList.CSound(Sound.BLOCK_FLOWERING_AZALEA_PLACE, 0.6f, 1.0f))
+			.build();
 		@BossParam(help = "Particles to spawn on plant.")
-		public ParticlesList PARTICLES_FLOWER = ParticlesList.fromString("[(COMPOSTER,2,0.1,0.3,0.1,0.1)]");
+		public ParticlesList PARTICLES_FLOWER = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.COMPOSTER, 2, 0.1, 0.3, 0.1, 0.1))
+			.build();
 
 	}
 
@@ -118,5 +125,3 @@ public class FlowerPlaceBoss extends BossAbilityGroup {
 	}
 
 }
-
-

@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellVanguardChallenge;
-import java.util.List;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -24,7 +23,9 @@ public class VanguardChallengeBoss extends BossAbilityGroup {
 		@BossParam(help = "Ticks between force-looks")
 		public int INTERVAL = 2;
 		@BossParam(help = "Sound played on cast")
-		public SoundsList SOUND = new SoundsList(List.of(new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.2f, 2.0f)));
+		public SoundsList SOUND = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.2f, 2.0f))
+			.build();
 		@BossParam(help = "Effects applied to affected targets")
 		public EffectsList EFFECT_TARGET = EffectsList.EMPTY;
 		@BossParam(help = "Effects applied to boss")

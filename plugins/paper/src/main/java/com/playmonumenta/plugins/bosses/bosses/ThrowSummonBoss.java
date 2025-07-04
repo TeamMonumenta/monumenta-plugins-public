@@ -6,7 +6,9 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellThrowSummon;
-import java.util.Arrays;
+import java.util.List;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -70,10 +72,14 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 		public boolean REMOVE_ON_DEATH = false;
 
 		@BossParam(help = "Particles played when the boss throws a mob")
-		public ParticlesList THROW_PARTICLE = ParticlesList.fromString("[(FLAME,10,0.2,0.2,0.2,0.1)]");
+		public ParticlesList THROW_PARTICLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 10, 0.2, 0.2, 0.2, 0.1))
+			.build();
 
 		@BossParam(help = "Sound played when the boss throws a mob")
-		public SoundsList THROW_SOUND = SoundsList.fromString("[(ENTITY_SHULKER_SHOOT,1,1)]");
+		public SoundsList THROW_SOUND = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_SHULKER_SHOOT, 1.0f, 1.0f))
+			.build();
 	}
 
 	public ThrowSummonBoss(Plugin plugin, LivingEntity boss) {
@@ -85,7 +91,7 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 
 		//Super hacky fix since trying to do it on the target part of the tag didn't work. no idea why
 		if (p.LINE_OF_SIGHT) {
-			targets = targets.setFilters(Arrays.asList(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+			targets = targets.setFilters(List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
 		}
 
 		//This used to overwrite any targeting info if the range wasn't 8. Wack

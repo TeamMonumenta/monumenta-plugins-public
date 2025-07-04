@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -84,17 +85,24 @@ public class LucidRendBoss extends BossAbilityGroup {
 		@BossParam(help = "Minimum interval to when slashattack can hit again")
 		public int MULTIHIT_INTERVAL = 8;
 		@BossParam(help = "The particles spawned in a cross shape when the sword slashes.")
-		public ParticlesList CROSS_PARTICLE = new ParticlesList(List.of(new ParticlesList.CParticle(Particle.END_ROD, 30)));
+		public ParticlesList CROSS_PARTICLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.END_ROD, 30))
+			.build();
 		@BossParam(help = "The type of the damage dealt by the attack. Default: MELEE")
 		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MELEE;
 		@BossParam(help = "The sound at the start of telegraph. Default: ENTITY_PLAYER_BREATH and ENTITY_IRON_GOLEM_DEATH")
-		public SoundsList SOUND_TELEGRAPH = SoundsList.fromString("[(ENTITY_PLAYER_BREATH,2,0.7),(ENTITY_IRON_GOLEM_DEATH,2.0,2.0)]");
+		public SoundsList SOUND_TELEGRAPH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_PLAYER_BREATH, 2.0f, 0.7f))
+			.add(new SoundsList.CSound(Sound.ENTITY_IRON_GOLEM_DEATH, 2.0f, 2.0f))
+			.build();
 		@BossParam(help = "The sound at the start of the slash. Default: ENTITY_PLAYER_ATTACK_SWEEP")
-		public SoundsList SOUND_SLASH_START = SoundsList.fromString("[(ENTITY_PLAYER_ATTACK_SWEEP,1,1)]");
+		public SoundsList SOUND_SLASH_START = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f))
+			.build();
 		@BossParam(help = "The sound at every tick of the slash. Default: EMPTY")
-		public SoundsList SOUND_SLASH_TICK = SoundsList.fromString("[]");
+		public SoundsList SOUND_SLASH_TICK = SoundsList.EMPTY;
 		@BossParam(help = "The sound at the end of the slash. Default: EMPTY")
-		public SoundsList SOUND_SLASH_END = SoundsList.fromString("[]");
+		public SoundsList SOUND_SLASH_END = SoundsList.EMPTY;
 	}
 
 	Parameters mParams = new Parameters();

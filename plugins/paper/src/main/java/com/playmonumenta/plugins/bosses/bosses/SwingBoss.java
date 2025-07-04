@@ -10,7 +10,9 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -46,16 +48,25 @@ public class SwingBoss extends BossAbilityGroup {
 		public Sound SOUND = Sound.ENTITY_PLAYER_ATTACK_SWEEP;
 
 		@BossParam(help = "Particle summon around the boss in the air ")
-		public ParticlesList PARTICLE_CHARGE = ParticlesList.fromString("[(SWEEP_ATTACK,1)]");
+		public ParticlesList PARTICLE_CHARGE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SWEEP_ATTACK, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particle summon around the boss on the terrain")
-		public ParticlesList PARTICLE_CIRCLE = ParticlesList.fromString("[(CRIT,12)]");
+		public ParticlesList PARTICLE_CIRCLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 12, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound played when the ability explode")
-		public SoundsList SOUND_EXPLODE = SoundsList.fromString("[(ENTITY_PLAYER_ATTACK_STRONG,1.5,0.65)]");
+		public SoundsList SOUND_EXPLODE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_PLAYER_ATTACK_STRONG, 1.5f, 0.65f))
+			.build();
 
 		@BossParam(help = "Particle summon when the ability explode")
-		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.fromString("[(SWEEP_ATTACK,24,0.1,0.1,0.1,0.3),(REDSTONE,48,0.25,0.25,0.25,0,#ffffff,2)]");
+		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SWEEP_ATTACK, 24, 0.1, 0.1, 0.1, 0.3))
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 48, 0.25, 0.25, 0.25, 0.0, new Particle.DustOptions(Color.WHITE, 2.0f)))
+			.build();
 
 	}
 

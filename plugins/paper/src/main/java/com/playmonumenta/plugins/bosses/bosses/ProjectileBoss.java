@@ -12,19 +12,15 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.List;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 
 public class ProjectileBoss extends BossAbilityGroup {
@@ -139,25 +135,40 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		//particle & sound used!
 		@BossParam(help = "Sound played at the start")
-		public SoundsList SOUND_START = SoundsList.fromString("[(ENTITY_BLAZE_AMBIENT,1.5,1)]");
+            public SoundsList SOUND_START = SoundsList.builder()
+	.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_AMBIENT, 1.5f, 1.0f))
+	.build();
 
 		@BossParam(help = "Particle used when launching the projectile")
-		public ParticlesList PARTICLE_LAUNCH = ParticlesList.fromString("[(EXPLOSION_LARGE,1)]");
+            public ParticlesList PARTICLE_LAUNCH = ParticlesList.builder()
+	.add(new ParticlesList.CParticle(Particle.EXPLOSION_LARGE, 1, 0.0, 0.0, 0.0, 0.0))
+	.build();
 
 		@BossParam(help = "Sound used when launching the projectile")
-		public SoundsList SOUND_LAUNCH = SoundsList.fromString("[(ENTITY_BLAZE_SHOOT,0.5,0.5)]");
+            public SoundsList SOUND_LAUNCH = SoundsList.builder()
+	.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f))
+	.build();
 
 		@BossParam(help = "Particle used for the projectile")
-		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.fromString("[(FLAME, 4, 0.05, 0.05, 0.05, 0.1),(SMOKE_LARGE, 3, 0.25, 0.25, 0.25)]");
+            public ParticlesList PARTICLE_PROJECTILE = ParticlesList.builder()
+	.add(new ParticlesList.CParticle(Particle.FLAME, 4, 0.05, 0.05, 0.05, 0.1))
+	.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 3, 0.25, 0.25, 0.25, 0.0))
+	.build();
 
 		@BossParam(help = "Sound summoned every 2 sec on the projectile location")
-		public SoundsList SOUND_PROJECTILE = SoundsList.fromString("[(ENTITY_BLAZE_BURN,0.5,0.2)]");
+            public SoundsList SOUND_PROJECTILE = SoundsList.builder()
+	.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_BURN, 0.5f, 0.2f))
+	.build();
 
 		@BossParam(help = "Particle used when the projectile hit something")
-		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(CLOUD,50,0,0,0,0.25)]");
+            public ParticlesList PARTICLE_HIT = ParticlesList.builder()
+	.add(new ParticlesList.CParticle(Particle.CLOUD, 50, 0.0, 0.0, 0.0, 0.25))
+	.build();
 
 		@BossParam(help = "Sound used when the projectile hit something")
-		public SoundsList SOUND_HIT = SoundsList.fromString("[(ENTITY_GENERIC_DEATH,0.5,0.5)]");
+            public SoundsList SOUND_HIT = SoundsList.builder()
+	.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_DEATH, 0.5f, 0.5f))
+	.build();
 
 		@BossParam(help = "Entities summoned on hit")
 		public LoSPool HIT_SUMMONS = LoSPool.LibraryPool.EMPTY;

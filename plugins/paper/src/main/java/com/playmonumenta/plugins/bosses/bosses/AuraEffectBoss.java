@@ -8,6 +8,8 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAura;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
+import org.bukkit.Color;
+import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -34,10 +36,14 @@ public final class AuraEffectBoss extends BossAbilityGroup {
 		public int PASSIVE_RATE = PASSIVE_RUN_INTERVAL_DEFAULT;
 
 		@BossParam(help = "Particles summoned in the effect area")
-		public ParticlesList PARTICLE = ParticlesList.fromString("[(REDSTONE,20,0,0,0,0,#ffffff,2.0)]");
+		public ParticlesList PARTICLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 20, 0.0, 0.0, 0.0, 0.0, new Particle.DustOptions(Color.WHITE, 2.0f)))
+			.build();
 
 		@BossParam(help = "Particles summoned at the launcher")
-		public ParticlesList PARTICLE_ENTITY = ParticlesList.fromString("[(REDSTONE,2,1,1,1,0,#ffffff,2.0)]");
+		public ParticlesList PARTICLE_ENTITY = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 2, 1.0, 1.0, 1.0, 0.0, new Particle.DustOptions(Color.WHITE, 2.0f)))
+			.build();
 
 		@BossParam(help = "Effects applied to players in range")
 		public EffectsList EFFECTS = EffectsList.EMPTY;

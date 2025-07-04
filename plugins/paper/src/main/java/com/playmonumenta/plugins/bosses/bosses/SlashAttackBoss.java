@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Color;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
@@ -91,13 +92,15 @@ public class SlashAttackBoss extends BossAbilityGroup {
 		@BossParam(help = "The type of the damage dealt by the attack. Default: MELEE")
 		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MELEE;
 		@BossParam(help = "The sound at the start of telegraph. Default: EMPTY")
-		public SoundsList SOUND_TELEGRAPH = SoundsList.fromString("[]");
+		public SoundsList SOUND_TELEGRAPH = SoundsList.EMPTY;
 		@BossParam(help = "The sound at the start of the slash. Default: ENTITY_PLAYER_ATTACK_SWEEP")
-		public SoundsList SOUND_SLASH_START = SoundsList.fromString("[(ENTITY_PLAYER_ATTACK_SWEEP,1,1)]");
+		public SoundsList SOUND_SLASH_START = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f))
+			.build();
 		@BossParam(help = "The sound at every tick of the slash. Default: EMPTY")
-		public SoundsList SOUND_SLASH_TICK = SoundsList.fromString("[]");
+		public SoundsList SOUND_SLASH_TICK = SoundsList.EMPTY;
 		@BossParam(help = "The sound at the end of the slash. Default: EMPTY")
-		public SoundsList SOUND_SLASH_END = SoundsList.fromString("[]");
+		public SoundsList SOUND_SLASH_END = SoundsList.EMPTY;
 	}
 
 	public final Parameters mParams;

@@ -7,13 +7,12 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.Collections;
+import java.util.List;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Collections;
-import java.util.List;
 
 public final class TpBehindBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tpbehind";
@@ -44,25 +43,25 @@ public final class TpBehindBoss extends BossAbilityGroup {
 		public int DISTANCE = 4;
 
 		@BossParam(help = "Sound telegraph before teleport")
-		public SoundsList SOUND_TEL = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_WITCH_AMBIENT, 1.4f, 0.5f)
-		));
+		public SoundsList SOUND_TEL = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WITCH_AMBIENT, 1.4f, 0.5f))
+			.build();
 
 		@BossParam(help = "Sound after teleporting")
-		public SoundsList SOUND_TP = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_ENDERMAN_TELEPORT, 3.0f, 0.7f)
-		));
+		public SoundsList SOUND_TP = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ENDERMAN_TELEPORT, 3.0f, 0.7f))
+			.build();
 
 		@BossParam(help = "Particle telegraph before teleport")
-		public ParticlesList PARTICLE_TEL = new ParticlesList(List.of(
-			new ParticlesList.CParticle(Particle.PORTAL, 10, 1, 1, 1, 0.03)
-		));
+		public ParticlesList PARTICLE_TEL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.PORTAL, 10, 1, 1, 1, 0.03))
+			.build();
 
 		@BossParam(help = "Particle after teleport")
-		public ParticlesList PARTICLE_TP = new ParticlesList(List.of(
-			new ParticlesList.CParticle(Particle.SPELL_WITCH, 30, 0.25, 0.45, 0.25, 1),
-			new ParticlesList.CParticle(Particle.SMOKE_LARGE, 12, 0, 0.45, 0, 0.125)
-		));
+		public ParticlesList PARTICLE_TP = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_WITCH, 30, 0.25, 0.45, 0.25, 1))
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 12, 0, 0.45, 0, 0.125))
+			.build();
 		@BossParam(help = "Teleports to the mob's target (Overwrites TARGETS parameter)")
 		public boolean PREFER_TARGET = false;
 

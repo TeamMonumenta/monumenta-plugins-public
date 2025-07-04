@@ -43,13 +43,18 @@ public class SpellMalevolentConduit extends SpellNova {
 
 	public SpellMalevolentConduit(Plugin plugin, LivingEntity boss, IntruderBoss.Dialogue dialogue, IntruderBoss.Narration narration) {
 		super(plugin, boss, 14, "Malevolent Conduit", 4 * 20, 30 * 20, false, false, Sound.ENTITY_WITHER_SPAWN, 0.25f, 2,
-			ParticlesList.EMPTY, new ParticlesList(List.of(
-				new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 5, 0, 0, 0, 0,
-					new Particle.DustTransition(Color.PURPLE, Color.BLACK, 2.0f))
-			)),
-			new ParticlesList(List.of(new ParticlesList.CParticle(Particle.SPELL_WITCH, 20, 0, 0, 0))),
+			ParticlesList.EMPTY, ParticlesList.builder()
+				.add(new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 5, 0, 0, 0, 0,
+					new Particle.DustTransition(Color.PURPLE, Color.BLACK, 2.0f)))
+				.build(),
+			ParticlesList.builder()
+				.add(new ParticlesList.CParticle(Particle.SPELL_WITCH, 20, 0, 0, 0))
+				.build(),
 			new EntityTargets(EntityTargets.TARGETS.PLAYER, 14, true, EntityTargets.Limit.DEFAULT),
-			new SoundsList(List.of(new SoundsList.CSound(Sound.ENTITY_WARDEN_SONIC_CHARGE, 1f, 0.1f))), 1);
+			SoundsList.builder()
+				.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_SONIC_CHARGE, 1f, 0.1f))
+				.build(),
+			1);
 		mBoss = boss;
 		mDialogue = dialogue;
 		mNarration = narration;

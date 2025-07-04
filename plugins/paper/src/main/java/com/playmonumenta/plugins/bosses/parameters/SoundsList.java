@@ -90,7 +90,7 @@ public class SoundsList {
 		mSoundsList = sounds;
 	}
 
-	public static final SoundsList EMPTY = new SoundsList(new ArrayList<>());
+	public static final SoundsList EMPTY = new SoundsList(List.of());
 
 	public static SoundsList fromString(String string) {
 		return Parser.parseOrDefault(Parser.getParserMethod(SoundsList.class), string, EMPTY);
@@ -145,5 +145,27 @@ public class SoundsList {
 			first = false;
 		}
 		return msg + "]";
+	}
+
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+		private Builder() {
+
+		}
+
+		List<CSound> mSounds = new ArrayList<>();
+
+		public Builder add(CSound sound) {
+			mSounds.add(sound);
+			return this;
+		}
+
+		public SoundsList build() {
+			return new SoundsList(mSounds);
+		}
 	}
 }

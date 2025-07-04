@@ -8,10 +8,9 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellProjectileEntity;
 import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.List;
 
 public class ProjectileEntityBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_projectile_entity";
@@ -92,25 +91,25 @@ public class ProjectileEntityBoss extends BossAbilityGroup {
 		// Standard Sound & Particles
 
 		@BossParam(help = "Sound played at the start")
-		public SoundsList SOUND_START = new SoundsList(List.of());
+		public SoundsList SOUND_START = SoundsList.EMPTY;
 
 		@BossParam(help = "Particle used when launching the projectile")
-		public ParticlesList PARTICLE_LAUNCH = new ParticlesList(List.of());
+		public ParticlesList PARTICLE_LAUNCH = ParticlesList.EMPTY;
 
 		@BossParam(help = "Sound used when launching the projectile")
-		public SoundsList SOUND_LAUNCH = new SoundsList(List.of());
+		public SoundsList SOUND_LAUNCH = SoundsList.EMPTY;
 
 		@BossParam(help = "Particle used for the projectile")
-		public ParticlesList PARTICLE_PROJECTILE = new ParticlesList(List.of());
+		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.EMPTY;
 
 		@BossParam(help = "Sound summoned every 2 sec on the projectile location")
-		public SoundsList SOUND_PROJECTILE = new SoundsList(List.of());
+		public SoundsList SOUND_PROJECTILE = SoundsList.EMPTY;
 
 		@BossParam(help = "Particle used when the projectile hit something")
-		public ParticlesList PARTICLE_HIT = new ParticlesList(List.of());
+		public ParticlesList PARTICLE_HIT = ParticlesList.EMPTY;
 
 		@BossParam(help = "Sound used when the projectile hit something")
-		public SoundsList SOUND_HIT = new SoundsList(List.of());
+		public SoundsList SOUND_HIT = SoundsList.EMPTY;
 
 		// Unique parameters for a "entity projectile"
 		@BossParam(help = "Maximum duration the projectile can exist (In ticks)")

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
@@ -8,20 +9,13 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
-import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public final class ChargerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_charger";
@@ -70,25 +64,41 @@ public final class ChargerBoss extends BossAbilityGroup {
 
 		//Particle & Sounds!
 		@BossParam(help = "Particles spawned at the launcher's location when it begins to channel the spell")
-		public ParticlesList PARTICLE_WARNING = ParticlesList.fromString("[(VILLAGER_ANGRY,50)]");
+		public ParticlesList PARTICLE_WARNING = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.VILLAGER_ANGRY, 50, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sounds played at the launcher's location when it begins to channel the spell")
-		public SoundsList SOUND_WARNING = SoundsList.fromString("[(ENTITY_ELDER_GUARDIAN_CURSE,1,1.5)]");
+		public SoundsList SOUND_WARNING = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1.0f, 1.5f))
+			.build();
 
 		@BossParam(help = "Particles spawned along the charge path")
-		public ParticlesList PARTICLE_TELL = ParticlesList.fromString("[(CRIT,2)]");
+		public ParticlesList PARTICLE_TELL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 2, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particles spawned on a hit target")
-		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(BLOCK_CRACK,5,0.4,0.4,0.4,0.4,REDSTONE_BLOCK),(BLOCK_CRACK,12,0.4,0.4,0.4,0.4,REDSTONE_WIRE)]");
+		public ParticlesList PARTICLE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK))
+			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE))
+			.build();
 
 		@BossParam(help = "Particles spawned at the start and end locations of the charge")
-		public ParticlesList PARTICLE_ROAR = ParticlesList.fromString("[(SMOKE_LARGE,125)]");
+		public ParticlesList PARTICLE_ROAR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 125, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound played at the start and end locations of the charge")
-		public SoundsList SOUND_ROAR = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,1,1.5)]");
+		public SoundsList SOUND_ROAR = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0f, 1.5f))
+			.build();
 
 		@BossParam(help = "Particles spawned when the charge hits a target")
-		public ParticlesList PARTICLE_ATTACK = ParticlesList.fromString("[(FLAME,4,0.5,0.5,0.5,0.075),(CRIT,8,0.5,0.5,0.5,0.75)]");
+		public ParticlesList PARTICLE_ATTACK = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 4, 0.5, 0.5, 0.5, 0.075))
+			.add(new ParticlesList.CParticle(Particle.CRIT, 8, 0.5, 0.5, 0.5, 0.75))
+			.build();
 	}
 
 	public ChargerBoss(final Plugin plugin, final LivingEntity boss) {

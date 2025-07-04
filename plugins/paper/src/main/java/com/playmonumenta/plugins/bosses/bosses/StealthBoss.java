@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellStealth;
-import java.util.List;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -16,30 +15,29 @@ public class StealthBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Particles spawned when the boss goes into stealth")
-		public ParticlesList PARTICLE_STEALTH = new ParticlesList(List.of(
-			new ParticlesList.CParticle(Particle.SMOKE_LARGE, 20, 0.5, 0.5, 0.5, 0.2)
-		));
+		public ParticlesList PARTICLE_STEALTH = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 20, 0.5, 0.5, 0.5, 0.2))
+			.build();
 		@BossParam(help = "Particles spawned when the boss goes out of stealth")
-		public ParticlesList PARTICLE_EXIT = new ParticlesList(List.of(
-			new ParticlesList.CParticle(Particle.SMOKE_LARGE, 15, 0.5, 0.5, 0.5, 0.2)
-		));
+		public ParticlesList PARTICLE_EXIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 15, 0.5, 0.5, 0.5, 0.2))
+			.build();
 		@BossParam(help = "Particles spawned when the boss hits a player and exits stealth")
-		public ParticlesList PARTICLE_HIT = new ParticlesList(List.of(
-			new ParticlesList.CParticle(Particle.SMOKE_LARGE, 15, 0.5, 0.5, 0.5, 0.2)
-		));
+		public ParticlesList PARTICLE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 15, 0.5, 0.5, 0.5, 0.2))
+			.build();
 		@BossParam(help = "Sound played when the boss goes into stealth")
-		public SoundsList SOUND_STEALTH = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.2f, 0.5f)
-		));
+		public SoundsList SOUND_STEALTH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.2f, 0.5f))
+			.build();
 		@BossParam(help = "Sound played when the boss goes out of stealth")
-		public SoundsList SOUND_EXIT = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 1.6f, 0.1f)
-		));
+		public SoundsList SOUND_EXIT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 1.6f, 0.1f))
+			.build();
 		@BossParam(help = "Sound played when the boss hits a player and exits stealth")
-		public SoundsList SOUND_HIT = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 1.6f, 0.1f)
-
-		));
+		public SoundsList SOUND_HIT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 1.6f, 0.1f))
+			.build();
 		@BossParam(help = "Effects given to the boss when it enters stealth")
 		public EffectsList EFFECTS_STEALTH = EffectsList.EMPTY;
 		@BossParam(help = "Effects given to the player when the boss hits a player and exits stealth")

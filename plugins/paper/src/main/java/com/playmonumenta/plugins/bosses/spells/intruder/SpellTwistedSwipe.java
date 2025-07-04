@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellCooldownManager;
 import com.playmonumenta.plugins.bosses.spells.SpellSlashAttack;
 import com.playmonumenta.plugins.events.DamageEvent;
-import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -24,12 +23,13 @@ public class SpellTwistedSwipe extends SpellSlashAttack {
 			Color.fromRGB(0xff3333),
 			false, true, false, true, new Vector(1, 0.5, 1), true, 1,
 			false, true, 0.5, -1, DamageEvent.DamageType.MELEE,
-			new SoundsList(List.of(
-				new SoundsList.CSound(Sound.ENTITY_WITHER_SKELETON_AMBIENT, 2.0f, 0.1f)
-			)),
-			new SoundsList(List.of(
-				new SoundsList.CSound(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.4f), new SoundsList.CSound(Sound.ENTITY_WITHER_SKELETON_HURT, 0.8f, 0.1f)
-			)),
+			SoundsList.builder()
+				.add(new SoundsList.CSound(Sound.ENTITY_WITHER_SKELETON_AMBIENT, 2.0f, 0.1f))
+				.build(),
+			SoundsList.builder()
+				.add(new SoundsList.CSound(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.4f))
+				.add(new SoundsList.CSound(Sound.ENTITY_WITHER_SKELETON_HURT, 0.8f, 0.1f))
+				.build(),
 			SoundsList.EMPTY,
 			SoundsList.EMPTY,
 			true, 2, 15, false,

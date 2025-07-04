@@ -8,6 +8,9 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellOmen;
 import com.playmonumenta.plugins.events.DamageEvent;
+import org.bukkit.Color;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -74,21 +77,36 @@ public final class OmenBoss extends BossAbilityGroup {
 		@BossParam(help = "whether the spell respects iframes")
 		public boolean RESPECT_IFRAMES = true;
 		@BossParam(help = "sound of omen launch")
-		public SoundsList SOUND_LAUNCH = SoundsList.fromString("[(ENTITY_WITHER_SHOOT, 1, 0.75)]");
+		public SoundsList SOUND_LAUNCH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WITHER_SHOOT, 1.0f, 0.75f))
+			.build();
 		@BossParam(help = "sound of getting hit")
-		public SoundsList SOUND_HIT = SoundsList.fromString("[(ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2.0)]");
+		public SoundsList SOUND_HIT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1.0f, 2.0f))
+			.build();
 		@BossParam(help = "sound that plays throughout the telegraph's duration")
-		public SoundsList SOUND_WAVE = SoundsList.fromString("[]");
+		public SoundsList SOUND_WAVE = SoundsList.EMPTY;
 		@BossParam(help = "(VERY OPTIONAL) sound that plays constantly for the duration of the omen's actual travel time")
-		public SoundsList SOUND_TEL = SoundsList.fromString("[(UI_TOAST_IN, 1.5, 1.9)]");
+		public SoundsList SOUND_TEL = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.UI_TOAST_IN, 1.5f, 1.9f))
+			.build();
 		@BossParam(help = "sound that plays at the start of the spell cast")
-		public SoundsList SOUND_WARN = SoundsList.fromString("[(ENTITY_WITHER_AMBIENT, 1.0, 1.0)]");
+		public SoundsList SOUND_WARN = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WITHER_AMBIENT, 1.0f, 1.0f))
+			.build();
 		@BossParam(help = "particles of the omen telegraph")
-		public ParticlesList PARTICLE_TEL_SWIRL = ParticlesList.fromString("[(SOUL_FIRE_FLAME, 1, 0.1, 0.1, 0.1, 0)]");
+		public ParticlesList PARTICLE_TEL_SWIRL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SOUL_FIRE_FLAME, 1, 0.1, 0.1, 0.1, 0.0))
+			.build();
 		@BossParam(help = "particles of the omen telegraph")
-		public ParticlesList PARTICLE_TEL = ParticlesList.fromString("[(REDSTONE, 1, 0.1, 0.1, 0.1, 0, RED, 0.8)]");
+		public ParticlesList PARTICLE_TEL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 1, 0.1, 0.1, 0.1, 0.0, new Particle.DustOptions(Color.RED, 0.8f)))
+			.build();
 		@BossParam(help = "particles of the omen")
-		public ParticlesList PARTICLE_OMEN = ParticlesList.fromString("[(REDSTONE, 1, 0.1, 0.1, 0.1, 0, #c700ff, 1),(SOUL_FIRE_FLAME, 1, 0.1, 0.1, 0.1, 0)]");
+		public ParticlesList PARTICLE_OMEN = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 1, 0.1, 0.1, 0.1, 0.0, new Particle.DustOptions(Color.fromRGB(0xc700ff), 1.0f)))
+			.add(new ParticlesList.CParticle(Particle.SOUL_FIRE_FLAME, 1, 0.1, 0.1, 0.1, 0.0))
+			.build();
 		@BossParam(help = "targets of the spell, if targeting param is set to true")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_ONE_PLAYER_TARGET;
 

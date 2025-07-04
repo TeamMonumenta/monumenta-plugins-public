@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
@@ -40,11 +42,19 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
 
-		public SoundsList SOUND_START = SoundsList.fromString("[(ITEM_CROSSBOW_LOADING_START,5,0.5)]");
-		public SoundsList SOUND_END = SoundsList.fromString("[(ITEM_CROSSBOW_LOADING_MIDDLE,5,0.5)]");
-		public SoundsList SOUND_SHOOT = SoundsList.fromString("[(ITEM_CROSSBOW_SHOOT,5,0.5)]");
+		public SoundsList SOUND_START = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_CROSSBOW_LOADING_START, 5.0f, 0.5f))
+			.build();
+		public SoundsList SOUND_END = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_CROSSBOW_LOADING_MIDDLE, 5.0f, 0.5f))
+			.build();
+		public SoundsList SOUND_SHOOT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_CROSSBOW_SHOOT, 5.0f, 0.5f))
+			.build();
 
-		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.fromString("[(CRIT,1)]");
+		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 	}
 
 	private final Set<AbstractArrow> mVolleyArrowSet = new HashSet<>();

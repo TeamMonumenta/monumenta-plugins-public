@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellRam;
 import com.playmonumenta.plugins.events.DamageEvent;
-import java.util.List;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -18,33 +17,33 @@ public class RamBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Particles spawned when the boss casts ram")
-		public ParticlesList PARTICLE_LAUNCH = new ParticlesList(List.of(
-			new ParticlesList.CParticle(Particle.EXPLOSION_HUGE, 1, 2, 2, 2)
-		));
+		public ParticlesList PARTICLE_LAUNCH = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_HUGE, 1, 2, 2, 2))
+			.build();
 		@BossParam(help = "Particles spawned for the telegraph")
-		public ParticlesList PARTICLE_TEL = new ParticlesList(List.of(
-			new ParticlesList.CParticle(Particle.WAX_OFF, 1)
-		));
+		public ParticlesList PARTICLE_TEL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.WAX_OFF, 1))
+			.build();
 		@BossParam(help = "Particles spawned for the telegraph")
-		public ParticlesList PARTICLE_END = new ParticlesList(List.of(
-			new ParticlesList.CParticle(Particle.CLOUD, 10, 1, 1, 1, 1)
-		));
+		public ParticlesList PARTICLE_END = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 10, 1, 1, 1, 1))
+			.build();
 		@BossParam(help = "Sound played when the boss telegraphs the direction of the ram")
-		public SoundsList SOUND_TEL = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_RAVAGER_ROAR, 5.0f, 1.0f)
-		));
+		public SoundsList SOUND_TEL = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_RAVAGER_ROAR, 5.0f, 1.0f))
+			.build();
 		@BossParam(help = "Sound played when the boss rams")
-		public SoundsList SOUND_LAUNCH = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f)
-		));
+		public SoundsList SOUND_LAUNCH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f))
+			.build();
 		@BossParam(help = "Sound played when the boss finishes ramming")
-		public SoundsList SOUND_END = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f)
-		));
+		public SoundsList SOUND_END = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f))
+			.build();
 		@BossParam(help = "Sound played when the boss ramming with a frequency")
-		public SoundsList SOUND_RAM_TICK = new SoundsList(List.of(
-			new SoundsList.CSound(Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f)
-		));
+		public SoundsList SOUND_RAM_TICK = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f))
+			.build();
 		@BossParam(help = "Ticks between each sound_ram_tick played")
 		public int SOUND__INTERVAL = 4;
 		@BossParam(help = "Effects given to the player when the ram hits a target")

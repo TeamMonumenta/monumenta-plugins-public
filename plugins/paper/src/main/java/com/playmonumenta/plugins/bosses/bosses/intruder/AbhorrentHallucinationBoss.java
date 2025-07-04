@@ -55,10 +55,11 @@ public class AbhorrentHallucinationBoss extends BossAbilityGroup {
 				true, 3, 0, 1.0f,
 				25, 0, 0.8, 200,
 				20, false, "", false,
-				new ParticlesList(List.of(
-					new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 25, 0.5, 5.0, 0.5, 1.0,
-						new Particle.DustTransition(Color.BLACK, Color.fromRGB(0x6b0000), 5.0f))
-				)), SoundsList.EMPTY)
+				ParticlesList.builder()
+					.add(new ParticlesList.CParticle(Particle.DUST_COLOR_TRANSITION, 25, 0.5, 5.0, 0.5, 1.0,
+						new Particle.DustTransition(Color.BLACK, Color.fromRGB(0x6b0000), 5.0f)))
+					.build(),
+				SoundsList.EMPTY)
 		));
 		BossBarManager bossBar = new BossBarManager(boss, IntruderBoss.DETECTION_RANGE, BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_12, events, false, true);
 

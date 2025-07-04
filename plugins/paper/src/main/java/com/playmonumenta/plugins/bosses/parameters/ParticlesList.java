@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.AbstractPartialParticle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.MMLog;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.bukkit.Location;
@@ -15,7 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class ParticlesList {
-
 	public static class CParticle {
 		public Particle mParticle;
 		public int mCount;
@@ -112,7 +112,7 @@ public class ParticlesList {
 		}
 	}
 
-	public static final ParticlesList EMPTY = fromString("[]");
+	public static final ParticlesList EMPTY = new ParticlesList(List.of());
 
 	private final List<CParticle> mParticleList;
 
@@ -163,5 +163,22 @@ public class ParticlesList {
 
 	public static ParticlesList fromString(String string) {
 		return Parser.parseOrDefault(Parser.getParserMethod(ParticlesList.class), string, EMPTY);
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+		List<CParticle> mParticles = new ArrayList<>();
+
+		public Builder add(CParticle particle) {
+			mParticles.add(particle);
+			return this;
+		}
+
+		public ParticlesList build() {
+			return new ParticlesList(mParticles);
+		}
 	}
 }

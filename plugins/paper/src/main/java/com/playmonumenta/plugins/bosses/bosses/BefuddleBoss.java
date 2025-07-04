@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import java.util.Collections;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -30,7 +31,9 @@ public class BefuddleBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLE = ParticlesList.EMPTY;
 
 		@BossParam(help = "Sound played when the player got hit by the boss")
-		public SoundsList SOUND = SoundsList.fromString("[(ENTITY_ELDER_GUARDIAN_CURSE,1.1,0.8)]");
+		public SoundsList SOUND = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1.1f, 0.8f))
+			.build();
 
 		@BossParam(help = "if set, makes boss_befuddle only trigger when the spell with this name deals damage")
 		public String SPELL_NAME = "";

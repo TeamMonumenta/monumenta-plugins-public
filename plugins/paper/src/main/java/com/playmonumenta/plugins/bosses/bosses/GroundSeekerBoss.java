@@ -15,6 +15,9 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.List;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -56,21 +59,37 @@ public class GroundSeekerBoss extends BossAbilityGroup {
 		@BossParam(help = "LOS name of the mob when the seeker hits its target")
 		public LoSPool SPAWNED_MOB_POOL = LoSPool.LibraryPool.EMPTY;
 		@BossParam(help = "particles around the boss while it telegraphs")
-		public ParticlesList PARTICLE_CHARGE = ParticlesList.fromString("[(CRIT,8,1,0.1,1,0.25)]");
+		public ParticlesList PARTICLE_CHARGE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 8, 1.0, 0.1, 1.0, 0.25))
+			.build();
 		@BossParam(help = "particles created in the telegraphed line")
-		public ParticlesList PARTICLE_LAUNCH = ParticlesList.fromString("[(EXPLOSION_LARGE,1,0,0,0,0)]");
+		public ParticlesList PARTICLE_LAUNCH = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_LARGE, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 		@BossParam(help = "particles spawned as the rift is created")
-		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.fromString("[(BLOCK_CRACK,10,0.25,0.25,0.25,0.25,ROOTED_DIRT)]");
+		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 10, 0.25, 0.25, 0.25, 0.25, Material.ROOTED_DIRT))
+			.build();
 		@BossParam(help = "particle above rift while it lingers")
-		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(EXPLOSION_LARGE,1,0,0,0,0.1)]");
+		public ParticlesList PARTICLE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_LARGE, 1, 0.0, 0.0, 0.0, 0.1))
+			.build();
 		@BossParam(help = "sound played when the mob starts telegraphing")
-		public SoundsList SOUND_WARN = SoundsList.fromString("[(ENTITY_RAVAGER_ROAR,1.1,0.5)]");
+		public SoundsList SOUND_WARN = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_RAVAGER_ROAR, 1.1f, 0.5f))
+			.build();
 		@BossParam(help = "sound played as the seeker first shoots out")
-		public SoundsList SOUND_LAUNCH = SoundsList.fromString("[(ENTITY_WITHER_BREAK_BLOCK,1,0.75)]");
+		public SoundsList SOUND_LAUNCH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WITHER_BREAK_BLOCK, 1.0f, 0.75f))
+			.build();
 		@BossParam(help = "sound played every 2 ticks when the seeker travels")
-		public SoundsList SOUND_SEEKER = SoundsList.fromString("[(BLOCK_GRASS_BREAK,0.6,0.5)]");
+		public SoundsList SOUND_SEEKER = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_GRASS_BREAK, 0.6f, 0.5f))
+			.build();
 		@BossParam(help = "sound played when the seeker hits")
-		public SoundsList SOUND_HIT = SoundsList.fromString("[(BLOCK_POINTED_DRIPSTONE_LAND,1.1,0.5)]");
+		public SoundsList SOUND_HIT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_POINTED_DRIPSTONE_LAND, 1.1f, 0.5f))
+			.build();
 	}
 
 	public GroundSeekerBoss(Plugin plugin, LivingEntity boss) {
@@ -196,5 +215,3 @@ public class GroundSeekerBoss extends BossAbilityGroup {
 
 	}
 }
-
-

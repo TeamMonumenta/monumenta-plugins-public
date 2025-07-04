@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
@@ -15,7 +16,10 @@ import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.AbstractMap;
 import java.util.List;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,8 +27,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
-
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public final class PounceBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_pounce";
@@ -59,28 +61,48 @@ public final class PounceBoss extends BossAbilityGroup {
 
 		//Particles & Sounds
 		@BossParam(help = "Sounds played at the launcher's location when it begins to channel the spell")
-		public SoundsList SOUND_START = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,1,1)]");
+		public SoundsList SOUND_START = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0f, 1.0f))
+			.build();
 
 		@BossParam(help = "Particles spawned at the launcher's location when it begins to channel the spell")
-		public ParticlesList PARTICLE_START = ParticlesList.fromString("[(LAVA,15)]");
+		public ParticlesList PARTICLE_START = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.LAVA, 15, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particles spawned at the start of the leap")
-		public ParticlesList PARTICLE_LEAP = ParticlesList.fromString("[(LAVA,15)]");
+		public ParticlesList PARTICLE_LEAP = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.LAVA, 15, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sounds played at the start of the leap")
-		public SoundsList SOUND_LEAP = SoundsList.fromString("[(ENTITY_HORSE_JUMP,1,1)]");
+		public SoundsList SOUND_LEAP = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_HORSE_JUMP, 1.0f, 1.0f))
+			.build();
 
 		@BossParam(help = "Particles spawned while the launcher is leaping")
-		public ParticlesList PARTICLE_LEAPING = ParticlesList.fromString("[(REDSTONE,4,0.5,0.5,0.5,0,#ffffff,1)]");
+		public ParticlesList PARTICLE_LEAPING = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 4, 0.5, 0.5, 0.5, 0.0, new Particle.DustOptions(Color.WHITE, 1.0f)))
+			.build();
 
 		@BossParam(help = "Particles spawned as a ring when the launcher collides with a hit player or block")
-		public ParticlesList PARTICLE_RING = ParticlesList.fromString("[(FLAME,1,0.1,0.1,0.1,0.1),(CLOUD,1,0.1,0.1,0.1,0.1)]");
+		public ParticlesList PARTICLE_RING = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 1, 0.1, 0.1, 0.1, 0.1))
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 1, 0.1, 0.1, 0.1, 0.1))
+			.build();
 
 		@BossParam(help = "Sounds played when the launcher collides with a hit player or block")
-		public SoundsList SOUND_HIT = SoundsList.fromString("[(ENTITY_GENERIC_EXPLODE,1.3,0),(ENTITY_GENERIC_EXPLODE,2,1.25)]");
+		public SoundsList SOUND_HIT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_EXPLODE, 1.3f, 0.0f))
+			.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 1.25f))
+			.build();
 
 		@BossParam(help = "Particles spawned when the launcher collides with a hit player or block")
-		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(FLAME,60,0,0,0,0.2),(EXPLOSION_NORMAL,20,0,0,0,0.3),(LAVA,27,3,0.25,3,0)]");
+		public ParticlesList PARTICLE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 60, 0.0, 0.0, 0.0, 0.2))
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_NORMAL, 20, 0.0, 0.0, 0.0, 0.3))
+			.add(new ParticlesList.CParticle(Particle.LAVA, 27, 3.0, 0.25, 3.0, 0.0))
+			.build();
 	}
 
 	public PounceBoss(final Plugin plugin, final LivingEntity boss) {

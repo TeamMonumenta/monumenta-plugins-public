@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -254,5 +255,26 @@ public class EffectsList {
 
 	public static EffectsList fromString(String string) {
 		return Parser.parseOrDefault(Parser.getParserMethod(EffectsList.class), string, EMPTY);
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+		private Builder() {
+
+		}
+
+		List<Effect> mEffects = new ArrayList<>();
+
+		public Builder add(Effect effect) {
+			mEffects.add(effect);
+			return this;
+		}
+
+		public EffectsList build() {
+			return new EffectsList(mEffects);
+		}
 	}
 }

@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -53,7 +54,9 @@ public final class NovaBoss extends BossAbilityGroup {
 
 		//particle & sound used!
 		@BossParam(help = "Particle summon on the air")
-		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(CLOUD,5)]");
+		public ParticlesList PARTICLE_AIR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 5, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound used when charging the ability")
 		public Sound SOUND_CHARGE = Sound.ENTITY_WITCH_CELEBRATE;
@@ -65,13 +68,21 @@ public final class NovaBoss extends BossAbilityGroup {
 		public int SOUND_CHARGE_FREQUENCY = 1;
 
 		@BossParam(help = "Particle summon around the boss when loading the spell")
-		public ParticlesList PARTICLE_LOAD = ParticlesList.fromString("[(CRIT,12)]");
+		public ParticlesList PARTICLE_LOAD = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 12, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound used when the spell is casted (when explode)")
-		public SoundsList SOUND_CAST = SoundsList.fromString("[(ENTITY_WITCH_DRINK,1.5,0.65),(ENTITY_WITCH_DRINK,1.5,0.55)]");
+		public SoundsList SOUND_CAST = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WITCH_DRINK, 1.5f, 0.65f))
+			.add(new SoundsList.CSound(Sound.ENTITY_WITCH_DRINK, 1.5f, 0.55f))
+			.build();
 
 		@BossParam(help = "Particle summoned when the spell explode")
-		public ParticlesList PARTICLE_EXPLODE = ParticlesList.fromString("[(CRIT,24,0.1,0.1,0.1,0.3),(CRIT_MAGIC,24,0.25,0.25,0.25,0.1)]");
+		public ParticlesList PARTICLE_EXPLODE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 24, 0.1, 0.1, 0.1, 0.3))
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 24, 0.25, 0.25, 0.25, 0.1))
+			.build();
 
 	}
 

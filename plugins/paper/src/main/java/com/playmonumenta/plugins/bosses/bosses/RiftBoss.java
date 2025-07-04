@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
@@ -73,20 +75,38 @@ public class RiftBoss extends BossAbilityGroup {
 		public Material MATERIAL = Material.CRYING_OBSIDIAN;
 
 		@BossParam(help = "particles around the boss while it telegraphs")
-		public ParticlesList PARTICLE_BOSS_CHARGE = ParticlesList.fromString("[(CLOUD,8,1,0.1,1,0.25),(SMOKE_LARGE,5,1,0.1,1,0.25)]");
+		public ParticlesList PARTICLE_BOSS_CHARGE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 8, 1.0, 0.1, 1.0, 0.25))
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 5, 1.0, 0.1, 1.0, 0.25))
+			.build();
 		@BossParam(help = "particles created in the telegraphed line")
-		public ParticlesList PARTICLE_RIFT_CHARGE = ParticlesList.fromString("[(SQUID_INK,1,0.25,0.25,0.25,0)]");
+		public ParticlesList PARTICLE_RIFT_CHARGE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SQUID_INK, 1, 0.25, 0.25, 0.25, 0.0))
+			.build();
 		@BossParam(help = "particles spawned as the rift is created")
-		public ParticlesList PARTICLE_RIFT_GROW = ParticlesList.fromString("[(CLOUD,3,0.5,0.5,0.5,0.25),(EXPLOSION_NORMAL,3,0.5,0.5,0.5,0.125)]");
+		public ParticlesList PARTICLE_RIFT_GROW = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 3, 0.5, 0.5, 0.5, 0.25))
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_NORMAL, 3, 0.5, 0.5, 0.5, 0.125))
+			.build();
 		@BossParam(help = "particle above rift while it lingers")
-		public ParticlesList PARTICLE_RIFT_LINGER = ParticlesList.fromString("[(EXPLOSION_NORMAL,1,0.5,0.5,0.5,0.1),(DAMAGE_INDICATOR,1,0.5,0.5,0.5,0.1)]");
+		public ParticlesList PARTICLE_RIFT_LINGER = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_NORMAL, 1, 0.5, 0.5, 0.5, 0.1))
+			.add(new ParticlesList.CParticle(Particle.DAMAGE_INDICATOR, 1, 0.5, 0.5, 0.5, 0.1))
+			.build();
 
 		@BossParam(help = "sound played when the mob starts telegraphing")
-		public SoundsList SOUND_WARN = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,3,0.5)]");
+		public SoundsList SOUND_WARN = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_GROWL, 3.0f, 0.5f))
+			.build();
 		@BossParam(help = "sound played while the lines are telegraphed")
-		public SoundsList SOUND_CHARGE = SoundsList.fromString("[(BLOCK_END_PORTAL_FRAME_FILL,1.25,1),(ENTITY_ENDER_DRAGON_HURT,1.25,1)]");
+		public SoundsList SOUND_CHARGE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.25f, 1.0f))
+			.add(new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_HURT, 1.25f, 1.0f))
+			.build();
 		@BossParam(help = "sound played as the rift is created")
-		public SoundsList SOUND_RIFT = SoundsList.fromString("[(BLOCK_CHAIN_BREAK,1,0.85)]");
+		public SoundsList SOUND_RIFT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_CHAIN_BREAK, 1.0f, 0.85f))
+			.build();
 
 	}
 

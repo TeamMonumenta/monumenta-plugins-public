@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellColossalBruteForce;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -38,7 +39,9 @@ public final class SlamAttackBoss extends BossAbilityGroup {
 		@BossParam(help = "If the boss can move while unleashing the attack")
 		public boolean CAN_MOVE_WHEN_CASTING = false;
 		@BossParam(help = "Sound played while charging")
-		public SoundsList CHARGE_SOUND = SoundsList.fromString("[(ENTITY_BLAZE_BURN,0.5,0.2)]");
+		public SoundsList CHARGE_SOUND = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_BURN, 0.5f, 0.2f))
+			.build();
 	}
 
 	public SlamAttackBoss(Plugin plugin, LivingEntity boss) {
