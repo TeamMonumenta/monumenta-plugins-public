@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.StringUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTEntity;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,28 +36,38 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemDiscovery {
-	public Marker mMarkerEntity;
+	public WeakReference<Marker> mMarkerWeakRef;
 	public int mId;
 	public ItemDiscoveryTier mTier;
 	public NamespacedKey mLootTablePath;
 	public @Nullable NamespacedKey mOptionalFunctionPath;
 
 	public ItemDiscovery(Marker markerEntity, int id, ItemDiscoveryTier tier, NamespacedKey lootTablePath, @Nullable NamespacedKey optionalFunctionPath) {
-		mMarkerEntity = markerEntity;
+		mMarkerWeakRef = new WeakReference<>(markerEntity);
 		mId = id;
 		mTier = tier;
 		mLootTablePath = lootTablePath;
 		mOptionalFunctionPath = optionalFunctionPath;
 	}
 
+	@Nullable
+	public Marker getMarker() {
+		Marker marker = mMarkerWeakRef.get();
+		return (marker != null && marker.isValid()) ? marker : null;
+	}
+
 	// manager for the visual effects shown by discoveries
 	public void runEffect(List<Player> players, boolean collected) {
 		int tick = Bukkit.getCurrentTick();
+		Marker marker = getMarker();
+		if (marker == null) {
+			return;
+		}
 		if (!collected) {
-			mTier.mPeriodicEffect.accept(tick, mMarkerEntity.getLocation().clone(), players);
+			mTier.mPeriodicEffect.accept(tick, marker.getLocation().clone(), players);
 		} else {
 			if (tick % 5 == 0) {
-				new PartialParticle(Particle.FALLING_DUST, mMarkerEntity.getLocation())
+				new PartialParticle(Particle.FALLING_DUST, marker.getLocation())
 					.delta(0.05f, 0.05f, 0.05f)
 					.count(2)
 					.data(Material.DEEPSLATE.createBlockData())
@@ -133,13 +144,20 @@ public class ItemDiscovery {
 		for (ItemStack item : items) {
 			InventoryUtils.giveItemWithStacksizeCheck(player, item);
 		}
-		mTier.mCollectSound.accept(player, mMarkerEntity.getLocation());
+		Marker marker = getMarker();
+		if (marker != null) {
+			mTier.mCollectSound.accept(player, marker.getLocation());
+		}
 		return true;
 	}
 
 	// transfer data onto the marker entity
 	public void writeDataOnMarker() {
-		NBTEntity entity = new NBTEntity(mMarkerEntity);
+		Marker marker = getMarker();
+		if (marker == null) {
+			return;
+		}
+		NBTEntity entity = new NBTEntity(marker);
 		NBTCompound container = entity.getPersistentDataContainer().getOrCreateCompound("discovery");
 		container.setInteger("id", mId);
 		container.setString("tier", mTier.name());
@@ -149,18 +167,22 @@ public class ItemDiscovery {
 
 	public JsonObject toJson() {
 		JsonObject object = new JsonObject();
+		Marker marker = getMarker();
+		if (marker == null) {
+			return object;
+		}
 		object.addProperty("id", mId);
 		object.addProperty("tier", mTier.name());
 		object.addProperty("loot", mLootTablePath.getNamespace() + ":" + mLootTablePath.getKey());
 		object.addProperty("function", mOptionalFunctionPath == null ? "" : (mOptionalFunctionPath.getNamespace() + ":" + mOptionalFunctionPath.getKey()));
-		object.addProperty("marker_uuid", mMarkerEntity.getUniqueId().toString());
+		object.addProperty("marker_uuid", marker.getUniqueId().toString());
 
 		JsonObject location = new JsonObject();
 		location.addProperty("shard", ServerProperties.getShardName());
-		location.addProperty("world", mMarkerEntity.getWorld().getKey().asString());
-		location.addProperty("x", mMarkerEntity.getLocation().getX());
-		location.addProperty("y", mMarkerEntity.getLocation().getY());
-		location.addProperty("z", mMarkerEntity.getLocation().getZ());
+		location.addProperty("world", marker.getWorld().getKey().asString());
+		location.addProperty("x", marker.getLocation().getX());
+		location.addProperty("y", marker.getLocation().getY());
+		location.addProperty("z", marker.getLocation().getZ());
 		object.add("location", location);
 
 		return object;

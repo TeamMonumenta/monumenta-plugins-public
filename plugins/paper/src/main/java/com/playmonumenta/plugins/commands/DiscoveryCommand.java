@@ -37,6 +37,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.entity.Marker;
 import org.bukkit.entity.Player;
 import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -76,13 +77,16 @@ public class DiscoveryCommand {
 			new CommandAPICommand("getnearestid")
 				.executesPlayer((player, args) -> {
 					ItemDiscovery nearest = DiscoveryManager.getNearestToLocation(player.getLocation());
-
 					if (nearest == null) {
 						player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
 						return;
 					}
+					Marker discoveryMarker = nearest.getMarker();
+					if (discoveryMarker == null) {
+						return;
+					}
 
-					Location location = nearest.mMarkerEntity.getLocation();
+					Location location = discoveryMarker.getLocation();
 					player.sendMessage(Component.text(String.format("Discovery with id %s is at [%s, %s, %s]", nearest.mId, MathUtil.round(location.x(), 2), MathUtil.round(location.y(), 2), MathUtil.round(location.z(), 2)), MESSAGE_COLOR)
 						.hoverEvent(HoverEvent.showText(Component.text("Click to teleport")))
 						.clickEvent(ClickEvent.runCommand(String.format("/tp %s %s %s", location.x(), location.y(), location.z()))));
@@ -167,8 +171,11 @@ public class DiscoveryCommand {
 							.executesPlayer((player, args) -> {
 								ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
 								if (discovery != null) {
-									discovery.mMarkerEntity.teleport((Location) args.getUnchecked("new location"));
-									player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
+									Marker discoveryMarker = discovery.getMarker();
+									if (discoveryMarker != null) {
+										discoveryMarker.teleport((Location) args.getUnchecked("new location"));
+										player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
+									}
 								} else {
 									player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
 								}
@@ -182,8 +189,11 @@ public class DiscoveryCommand {
 							.executesPlayer((player, args) -> {
 								ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
 								if (discovery != null) {
-									discovery.mMarkerEntity.teleport(discovery.mMarkerEntity.getLocation().clone().add(args.getUnchecked("x"), args.getUnchecked("y"), args.getUnchecked("z")));
-									player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
+									Marker discoveryMarker = discovery.getMarker();
+									if (discoveryMarker != null) {
+										discoveryMarker.teleport(discoveryMarker.getLocation().clone().add(args.getUnchecked("x"), args.getUnchecked("y"), args.getUnchecked("z")));
+										player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
+									}
 								} else {
 									player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
 								}
@@ -262,7 +272,12 @@ public class DiscoveryCommand {
 									return;
 								}
 
-								discoveries.forEach(discovery -> discovery.mMarkerEntity.teleport((Location) args.getUnchecked("new location")));
+								discoveries.forEach(discovery -> {
+									Marker discoveryMarker = discovery.getMarker();
+									if (discoveryMarker != null) {
+										discoveryMarker.teleport((Location) args.getUnchecked("new location"));
+									}
+								});
 
 								player.sendMessage(Component.text(String.format("Updated %s %s", discoveries.size(), discoveries.size() == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 							}),
@@ -281,7 +296,12 @@ public class DiscoveryCommand {
 									return;
 								}
 
-								discoveries.forEach(discovery -> discovery.mMarkerEntity.teleport(discovery.mMarkerEntity.getLocation().clone().add(args.getUnchecked("x"), args.getUnchecked("y"), args.getUnchecked("z"))));
+								discoveries.forEach(discovery -> {
+									Marker discoveryMarker = discovery.getMarker();
+									if (discoveryMarker != null) {
+										discoveryMarker.teleport(discoveryMarker.getLocation().clone().add(args.getUnchecked("x"), args.getUnchecked("y"), args.getUnchecked("z")));
+									}
+								});
 
 								player.sendMessage(Component.text(String.format("Updated %s %s", discoveries.size(), discoveries.size() == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 							})
@@ -316,12 +336,17 @@ public class DiscoveryCommand {
 
 						@Override
 						public void run() {
-							discoveries.forEach(discovery -> ParticleUtils.drawSevenSegmentNumber(
-								discovery.mId,
-								discovery.mMarkerEntity.getLocation().clone().add(0, 1.5, 0),
-								player, 0.65, 0.5,
-								Particle.SCRAPE,
-								null));
+							discoveries.forEach(discovery -> {
+								Marker discoveryMarker = discovery.getMarker();
+								if (discoveryMarker != null) {
+									ParticleUtils.drawSevenSegmentNumber(
+											discovery.mId,
+											discoveryMarker.getLocation().clone().add(0, 1.5, 0),
+											player, 0.65, 0.5,
+											Particle.SCRAPE,
+											null);
+								}
+							});
 							mIters++;
 							if (mIters >= 10) {
 								this.cancel();
@@ -583,17 +608,21 @@ public class DiscoveryCommand {
 	}
 
 	private static Component formatDiscoveryListElement(ItemDiscovery discovery) {
+		Marker discoveryMarker = discovery.getMarker();
+		if (discoveryMarker == null) {
+			return Component.text("unloaded");
+		}
 		return formatDiscoveryListElement(
 			discovery.mId,
-			discovery.mMarkerEntity.getUniqueId().toString(),
+			discoveryMarker.getUniqueId().toString(),
 			discovery.mTier.name(),
 			discovery.mLootTablePath.getNamespace() + ":" + discovery.mLootTablePath.getKey(),
 			discovery.mOptionalFunctionPath == null ? "None" : (discovery.mOptionalFunctionPath.getNamespace() + ":" + discovery.mOptionalFunctionPath.getKey()),
 			ServerProperties.getShardName(),
-			discovery.mMarkerEntity.getWorld().getKey().asString(),
-			discovery.mMarkerEntity.getLocation().getX(),
-			discovery.mMarkerEntity.getLocation().getY(),
-			discovery.mMarkerEntity.getLocation().getZ(),
+			discoveryMarker.getWorld().getKey().asString(),
+			discoveryMarker.getLocation().getX(),
+			discoveryMarker.getLocation().getY(),
+			discoveryMarker.getLocation().getZ(),
 			-1
 		);
 	}
@@ -618,7 +647,7 @@ public class DiscoveryCommand {
 				.appendNewline()
 				.append(Component.text("Loot: " + lootPath))
 				.appendNewline()
-				.append(Component.text("Function: " + (functionPath.equals("") ? "None" : functionPath)))
+				.append(Component.text("Function: " + (functionPath.isEmpty() ? "None" : functionPath)))
 				.appendNewline()
 				.append(Component.text(shard == null || ServerProperties.getShardName().equals(shard) ? "World: " + world : "Shard: " + shard)) // if the shard matches the current shard, display the world
 				.appendNewline()
