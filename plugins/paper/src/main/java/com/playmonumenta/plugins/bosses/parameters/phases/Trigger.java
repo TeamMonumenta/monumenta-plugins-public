@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class Trigger {
 
-	public static List<String> OPERATION_NAMES = new ArrayList<>(Arrays.stream(Trigger.TriggerOperation.values())
+	public static final List<String> OPERATION_NAMES = new ArrayList<>(Arrays.stream(Trigger.TriggerOperation.values())
 		.map(Enum::name)
 		.toList());
 

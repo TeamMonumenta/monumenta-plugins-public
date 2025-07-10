@@ -1538,14 +1538,6 @@ public class Parser {
 		}
 
 		public Suggestion map(Function<String, String> mapper) {
-			// prevent useless creation of new arraylists
-			if (body instanceof ArrayList<String> list) {
-				ListIterator<String> listIterator = list.listIterator();
-				while (listIterator.hasNext()) {
-					String next = listIterator.next();
-					listIterator.set(mapper.apply(next));
-				}
-			}
 			Collection<String> newStrings = new ArrayList<>(body.size());
 			for (String string : body) {
 				newStrings.add(mapper.apply(string));
