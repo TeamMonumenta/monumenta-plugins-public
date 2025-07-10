@@ -65,7 +65,7 @@ public class SanctifiedArmor extends Ability {
 			.scoreboardId("Sanctified")
 			.shorthandName("Sa")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("When taking damage from an Undead enemy, deal damage back based on your current health.")
+			.simpleDescription("When taking damage from a Heretic, deal damage back based on your current health.")
 			.quest216Message("-------h-------e-------")
 			.displayItem(Material.IRON_CHESTPLATE)
 			.priorityAmount(5000); // after all damage modifiers, but before lifelines, to get the proper final damage
@@ -203,9 +203,9 @@ public class SanctifiedArmor extends Ability {
 
 	private static Description<SanctifiedArmor> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Whenever you are damaged by melee or projectile hits from an undead enemy, deal true damage to the undead based on its max health. For every 1% health the Cleric has above ")
+			.add("Whenever you are damaged by melee or projectile hits from a Heretic, deal true damage to the Heretic based on its max health. For every 1% health the Cleric has above ")
 			.addPercent(a -> a.mMinHealthPercent, MIN_HEALTH_PERCENT_1, true, Ability::isLevelOne)
-			.add(" max health, deal 1% of the undead's max health, up to a maximum of ")
+			.add(" max health, deal 1% of the Heretic's max health, up to a maximum of ")
 			.addPercent(a -> a.mMaxPercentDamage, MAX_PERCENT_DAMAGE_1, false, Ability::isLevelOne)
 			.add(". Damage is capped based on current region (R1 " + L1_DAMAGE_CAP_R1 + "/R2 " + L1_DAMAGE_CAP_R2 + "/R3 " + L1_DAMAGE_CAP_R3 + " damage). This can only affect each mob once every ")
 			.addDuration(a -> a.mCooldown, DAMAGE_COOLDOWN_1, true, Ability::isLevelOne)
@@ -218,7 +218,7 @@ public class SanctifiedArmor extends Ability {
 			.addPercent(a -> a.mMinHealthPercent, MIN_HEALTH_PERCENT_2, true, Ability::isLevelTwo)
 			.add(", and up to ")
 			.addPercent(a -> a.mMaxPercentDamage, MAX_PERCENT_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" of the undead's max health can be dealt (Capped at R1 " + L2_DAMAGE_CAP_R1 + "/R2 " + L2_DAMAGE_CAP_R2 + "/R3 " + L2_DAMAGE_CAP_R3 + " damage). The undead enemy is also afflicted with ")
+			.add(" of the Heretic's max health can be dealt (Capped at R1 " + L2_DAMAGE_CAP_R1 + "/R2 " + L2_DAMAGE_CAP_R2 + "/R3 " + L2_DAMAGE_CAP_R3 + " damage). The Heretic is also afflicted with ")
 			.addPercent(a -> a.mSlow, SLOWNESS_AMPLIFIER_2)
 			.add(" slowness for ")
 			.addDuration(a -> a.mDuration, SLOWNESS_DURATION)

@@ -86,7 +86,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			.scoreboardId("HeavenlyBoon")
 			.shorthandName("HB")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Share all positive splash potion effects with nearby players and occasionally generate splash potions when killing Undead enemies.")
+			.simpleDescription("Share all positive splash potion effects with nearby players and occasionally generate splash potions when killing Heretics.")
 			.cooldown(0, 0, ENHANCEMENT_COOLDOWN, CHARM_ENHANCE_COOLDOWN)
 			.displayItem(Material.SPLASH_POTION);
 
@@ -263,7 +263,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Whenever you are hit with a positive splash potion, the effects are also given to other players within ")
 			.add(a -> a.mRadius, HEAVENLY_BOON_RADIUS)
-			.add(" blocks. In addition, whenever an undead mob you have hit within ")
+			.add(" blocks. In addition, whenever a Heretic you have hit within ")
 			.addDuration(MOB_EFFECT_DURATION)
 			.add(" seconds dies or you deal enough non-true damage to a boss (R1 " + BOSS_DAMAGE_THRESHOLD_R1 + "/R2 " + BOSS_DAMAGE_THRESHOLD_R2 + "/R3 " + BOSS_DAMAGE_THRESHOLD_R3 + "), you have a ")
 			.addPercent(a -> a.mChance, HEAVENLY_BOON_1_CHANCE, false, Ability::isLevelOne)
@@ -286,7 +286,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	private static Description<HeavenlyBoon> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("The chance to be splashed upon killing an undead mob is increased to ")
+			.add("The chance to be splashed upon killing a Heretic is increased to ")
 			.addPercent(a -> a.mChance, HEAVENLY_BOON_2_CHANCE, false, Ability::isLevelTwo)
 			.add(". Boon generated potions now give ")
 			.addDuration(HEAVENLY_BOON_DURATION_2)

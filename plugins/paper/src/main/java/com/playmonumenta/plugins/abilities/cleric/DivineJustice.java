@@ -77,7 +77,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.scoreboardId("DivineJustice")
 			.shorthandName("DJ")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Deal extra damage on critical melee or projectile attacks against Undead enemies and heal when killing Undead enemies.")
+			.simpleDescription("Deal extra damage on critical melee or projectile attacks against Heretics and heal yourself and nearby players when killing them.")
 			.remove(DivineJustice::remove)
 			.displayItem(Material.IRON_SWORD);
 
@@ -311,7 +311,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.add(a -> DAMAGE, DAMAGE)
 			.add(" plus ")
 			.addPercent(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_1, false, Ability::isLevelOne)
-			.add(" of your critical attack damage as magic damage to undead enemies.");
+			.add(" of your critical attack damage as magic damage to Heretics.");
 	}
 
 	private static Description<DivineJustice> getDescription2() {
@@ -320,7 +320,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.add(a -> DAMAGE, DAMAGE)
 			.add(" plus ")
 			.addPercent(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(" of your critical attack damage. Additionally, killing an undead enemy heals you for ")
+			.add(" of your critical attack damage. Additionally, killing a Heretic heals you for ")
 			.addPercent(a -> a.mSelfHeal, HEALING_MULTIPLIER_OWN)
 			.add(" of your max health and heals players within ")
 			.add(a -> a.mRadius, RADIUS)
@@ -331,13 +331,13 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	private static Description<DivineJustice> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Undead killed have a ")
+			.add("Heretics killed have a ")
 			.addPercent(ENHANCEMENT_ASH_CHANCE)
 			.add(" chance to drop Purified Ash which lingers for ")
 			.addDuration(ENHANCEMENT_ASH_DURATION)
 			.add(" seconds. Clerics with this ability who pick it up get ")
 			.addPercent(a -> a.mEnhanceDamage, ENHANCEMENT_ASH_BONUS_DAMAGE)
-			.add(" increased undead damage for ")
+			.add(" increased Heretic damage for ")
 			.addDuration(a -> a.mEnhanceDuration, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION)
 			.add(" seconds. This effect stacks up to ")
 			.addPercent(ENHANCEMENT_BONUS_DAMAGE_MAX)

@@ -32,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 public class HolyJavelin extends Ability {
 	private static final int RANGE = 12;
 	private static final double SIZE = 0.95;
-	private static final int UNDEAD_DAMAGE_1 = 22;
-	private static final int UNDEAD_DAMAGE_2 = 36;
+	private static final int HERETIC_DAMAGE_1 = 22;
+	private static final int HERETIC_DAMAGE_2 = 36;
 	private static final int DAMAGE_1 = 11;
 	private static final int DAMAGE_2 = 22;
 	private static final int FIRE_DURATION = 5 * 20;
@@ -60,7 +60,7 @@ public class HolyJavelin extends Ability {
 			.priorityAmount(1001); // shortly after divine justice and luminous infusion
 
 	private final double mDamage;
-	private final double mUndeadDamage;
+	private final double mHereticDamage;
 	private final double mRange;
 	private final double mSize;
 
@@ -73,7 +73,7 @@ public class HolyJavelin extends Ability {
 	public HolyJavelin(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mUndeadDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2);
+		mHereticDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? HERETIC_DAMAGE_1 : HERETIC_DAMAGE_2);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 		mSize = CharmManager.getRadius(mPlayer, CHARM_SIZE, SIZE);
 
@@ -122,7 +122,7 @@ public class HolyJavelin extends Ability {
 		mCosmetic.javelinParticle(mPlayer, startLoc, endLoc, mSize);
 
 		for (LivingEntity enemy : Hitbox.approximateCylinder(startLoc, endLoc, mSize, true).accuracy(0.5).getHitMobs()) {
-			double damage = Crusade.enemyTriggersAbilities(enemy) ? mUndeadDamage : mDamage;
+			double damage = Crusade.enemyTriggersAbilities(enemy) ? mHereticDamage : mDamage;
 			if (enemy != triggeringEnemy) {
 				// Triggering enemy would've already received the melee damage from Luminous Infusion
 				damage += bonusDamage;
@@ -141,21 +141,21 @@ public class HolyJavelin extends Ability {
 			.add(" blocks wide, instantly travelling up to ")
 			.add(a -> a.mRange, RANGE)
 			.add(" blocks or until it hits a solid block. It deals ")
-			.add(a -> a.mUndeadDamage, UNDEAD_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage to all undead enemies along its path, and ")
+			.add(a -> a.mHereticDamage, HERETIC_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage to all Heretics along its path, and ")
 			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage to non-undead, and sets them all on fire for ")
+			.add(" magic damage to non-Heretics, and sets them all on fire for ")
 			.addDuration(FIRE_DURATION)
-			.add(" seconds. Attacking an undead enemy while triggering transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear.")
+			.add(" seconds. Attacking a Heretic while triggering transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear.")
 			.addCooldown(COOLDOWN);
 	}
 
 	private static Description<HolyJavelin> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Damage is increased to ")
-			.add(a -> a.mUndeadDamage, UNDEAD_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" against undead and ")
+			.add(a -> a.mHereticDamage, HERETIC_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" against Heretics and ")
 			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" against non-undead.");
+			.add(" against non-Heretics.");
 	}
 }

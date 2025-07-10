@@ -79,7 +79,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final int HALLOWED_DAMAGE_REDUCTION_DURATION = 20 * 5;
 	private static final String PERCENT_DAMAGE_RESIST_EFFECT_NAME = "HallowedPercentDamageResistEffect";
 	private static final int HALLOWED_RADIUS = 4;
-	private static final int HALLOWED_UNDEAD_STUN = 20; // 20 * 1
+	private static final int HALLOWED_HERETIC_STUN = 20; // 20 * 1
 	private static final int HALLOWED_LIVING_STUN = 20 * 2;
 	private static final int CAST_RANGE = 30;
 	private static final double HEALING_THRESHOLD = 0.995;
@@ -109,7 +109,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			.scoreboardId("HallowedBeam")
 			.shorthandName("HB")
 			.descriptions(getDescription1(), getDescription2())
-			.simpleDescription("Heal a targeted player, damage a targeted Undead, or stun a targeted non-Undead from a distance.")
+			.simpleDescription("Heal a targeted player, damage a targeted Heretic, or stun a targeted non-Heretic from a distance.")
 			.cooldown(HALLOWED_1_COOLDOWN, HALLOWED_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HallowedBeam::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
@@ -148,7 +148,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private final double mHeal;
 	private final double mResistance;
 	private final int mResistanceDuration;
-	private final int mUndeadStunDuration;
+	private final int mHereticStunDuration;
 	private final int mLivingStunDuration;
 	// Targeting
 	private final Predicate<Entity> mPlayerFilter;
@@ -162,7 +162,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEAL, HALLOWED_HEAL_PERCENT);
 		mResistance = HALLOWED_DAMAGE_REDUCTION_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
 		mResistanceDuration = CharmManager.getDuration(mPlayer, CHARM_RESISTANCE_DURATION, HALLOWED_DAMAGE_REDUCTION_DURATION);
-		mUndeadStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN, HALLOWED_UNDEAD_STUN);
+		mHereticStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN, HALLOWED_HERETIC_STUN);
 		mLivingStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN, HALLOWED_LIVING_STUN);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HallowedBeamCS());
 		double healingThreshold = CharmManager.getLevelPercentDecimal(player, CHARM_HEALING_PERCENT_THRESHOLD);
@@ -535,7 +535,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 				EntityUtils.applyFire(mPlugin, 20 * 15, livingEntity, mPlayer);
 			}
 
-			stunDuration = mUndeadStunDuration;
+			stunDuration = mHereticStunDuration;
 
 			mCosmetic.beamHarmCrusade(mPlayer, livingEntity, targetLocation);
 		} else {
@@ -606,9 +606,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 			.addPercent(a -> a.mHeal, HALLOWED_HEAL_PERCENT)
 			.add(" of their max health, knocking back enemies within ")
 			.add(a -> HALLOWED_RADIUS, HALLOWED_RADIUS)
-			.add(" blocks. If aimed at an Undead, it instantly deals magic damage equal to your projectile damage to the target, and stuns them for ")
-			.addDuration(a -> a.mUndeadStunDuration, HALLOWED_UNDEAD_STUN)
-			.add(" second. If aimed at a non-undead mob, it instantly stuns them for ")
+			.add(" blocks. If aimed at a Heretic, it instantly deals magic damage equal to your projectile damage to the target, and stuns them for ")
+			.addDuration(a -> a.mHereticStunDuration, HALLOWED_HERETIC_STUN)
+			.add(" second. If aimed at a non-Heretic mob, it instantly stuns them for ")
 			.addDuration(a -> a.mLivingStunDuration, HALLOWED_LIVING_STUN)
 			.add(" seconds. ")
 			.addTrigger(1)

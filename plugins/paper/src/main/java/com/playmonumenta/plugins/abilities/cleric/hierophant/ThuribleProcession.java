@@ -218,25 +218,25 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			.addDuration(a -> a.mEffectDuration, EFFECTS_DURATION)
 			.add(" seconds of all built-up buffs. After that, the timer resets and the Procession begins anew. Progression - ")
 			.addPercent(a -> a.mAttackSpeedPotency, EFFECT_PERCENT_1, false, Ability::isLevelOne)
-			.add(" Attack Speed (after 4s of no health threshold reached), ")
+			.add(" Attack Speed (after 4s), ")
 			.addPercent(a -> a.mSpeedPotency, EFFECT_PERCENT_1, false, Ability::isLevelOne)
-			.add(" Speed (after 8s of no health threshold reached), ")
+			.add(" Speed (after 8s), ")
 			.addPercent(a -> a.mDamagePotency, EFFECT_PERCENT_1, false, Ability::isLevelOne)
-			.add(" Attack and Projectile Damage (after 12s of no health threshold reached), Cleric's passive heal is doubled, to ")
+			.add(" Attack and Projectile Damage (after 12s), and Rejuvenation's heal is doubled, to ")
 			.addPercent(a -> (1 + a.mHealingPotency) * Rejuvenation.PERCENT_HEAL, (1 + THURIBLE_HEALING_PERCENT_1) * Rejuvenation.PERCENT_HEAL, false, Ability::isLevelOne)
-			.add(" of max health every 5s (after 16s of no health threshold reached)");
+			.add(" of max health every 5s (after 16s).");
 	}
 
 	private static Description<ThuribleProcession> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Progression - ")
 			.addPercent(a -> a.mAttackSpeedPotency, EFFECT_PERCENT_2, false, Ability::isLevelTwo)
-			.add(" Attack Speed (after 4s of no health threshold reached), ")
+			.add(" Attack Speed (after 4s), ")
 			.addPercent(a -> a.mSpeedPotency, EFFECT_PERCENT_2, false, Ability::isLevelTwo)
-			.add(" Speed (after 8s of no health threshold reached), ")
+			.add(" Speed (after 8s), ")
 			.addPercent(a -> a.mDamagePotency, EFFECT_PERCENT_2, false, Ability::isLevelTwo)
-			.add(" Attack and Projectile Damage (after 12s of no health threshold reached), Cleric's passive heal is doubled, to ")
+			.add(" Attack and Projectile Damage (after 12s), Cleric's passive heal is doubled, to ")
 			.addPercent(a -> (1 + a.mHealingPotency) * Rejuvenation.PERCENT_HEAL, (1 + THURIBLE_HEALING_PERCENT_2) * Rejuvenation.PERCENT_HEAL, false, Ability::isLevelTwo)
-			.add(" of max health every 5s (after 16s of no health threshold reached)");
+			.add(" of max health every 5s (after 16s).");
 	}
 }

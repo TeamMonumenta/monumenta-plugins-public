@@ -61,7 +61,7 @@ public class Crusade extends Ability {
 
 	private static Description<Crusade> getDescription() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Human-like enemies are treated as Undead by your abilities. After being damaged or debuffed by an ability, any mob will count as Undead by your abilities for the next ")
+			.add("After being damaged or debuffed by an ability, any mob will be treated as a Heretic by your abilities for ")
 			.addDuration(a -> a.mDuration, TAG_DURATION)
 			.add(" seconds.");
 	}

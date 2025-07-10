@@ -75,7 +75,7 @@ public class TouchofRadiance extends Ability {
 			.shorthandName("ToR")
 			.actionBarColor(TextColor.color(255, 160, 30))
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Link with a player or an Undead to speed up your cooldown recharge rate and weaken enemies.")
+			.simpleDescription("Link with a player or a Heretic to speed up your cooldown recharge rate and weaken enemies.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", TouchofRadiance::cast,
 				new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true)))
@@ -154,23 +154,23 @@ public class TouchofRadiance extends Ability {
 				mPlugin.mEffectManager.addEffect(targetPlayer, "ToRenhance-" + targetPlayer.getName(), new TouchofRadianceEnhancement(mPlugin, targetPlayer, mEnhanceDamage, mEnhanceStunDuration, mBuffDuration, null, true).deleteOnAbilityUpdate(true));
 			}
 		} else {
-			//Undead cast
-			LivingEntity targetUndead = EntityUtils.getHostileEntityAtCursor(mPlayer, mRange, e -> Crusade.enemyTriggersAbilities((LivingEntity) e));
-			if (targetUndead != null) {
-				EntityUtils.applyStun(mPlugin, mStunDuration, targetUndead);
+			//Heretic cast
+			LivingEntity targetHeretic = EntityUtils.getHostileEntityAtCursor(mPlayer, mRange, e -> Crusade.enemyTriggersAbilities((LivingEntity) e));
+			if (targetHeretic != null) {
+				EntityUtils.applyStun(mPlugin, mStunDuration, targetHeretic);
 				if (isLevelTwo()) {
-					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(targetUndead.getLocation(), mWeaknessRadius);
+					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(targetHeretic.getLocation(), mWeaknessRadius);
 					mobs.forEach(m -> {
 						mPlugin.mEffectManager.addEffect(m, WEAKNESS_EFFECT_NAME, new PercentDamageDealt(mWeaknessDuration, -mWeakness));
 						Crusade.addCrusadeTag(m, mCrusade);
 					});
-					mCosmetic.applyWeakness(mPlayer, targetUndead, mWeaknessRadius);
+					mCosmetic.applyWeakness(mPlayer, targetHeretic, mWeaknessRadius);
 				}
 				if (isEnhanced()) {
-					mPlugin.mEffectManager.addEffect(mPlayer, "ToRenhance-" + mPlayer.getName(), new TouchofRadianceEnhancement(mPlugin, mPlayer, mEnhanceDamage, mEnhanceStunDuration, mBuffDuration, targetUndead).deleteOnAbilityUpdate(true));
-					GlowingManager.startGlowing(targetUndead, NamedTextColor.YELLOW, mBuffDuration, 1, null, "ToRenhanceGlowing");
+					mPlugin.mEffectManager.addEffect(mPlayer, "ToRenhance-" + mPlayer.getName(), new TouchofRadianceEnhancement(mPlugin, mPlayer, mEnhanceDamage, mEnhanceStunDuration, mBuffDuration, targetHeretic).deleteOnAbilityUpdate(true));
+					GlowingManager.startGlowing(targetHeretic, NamedTextColor.YELLOW, mBuffDuration, 1, null, "ToRenhanceGlowing");
 				}
-				mCosmetic.castOnUndead(mPlayer, targetUndead);
+				mCosmetic.castOnHeretic(mPlayer, targetHeretic);
 			} else {
 				return false;
 			}
@@ -197,13 +197,13 @@ public class TouchofRadiance extends Ability {
 	private static Description<TouchofRadiance> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.addTrigger()
-			.add(" while looking at another player or an Undead mob within ")
+			.add(" while looking at another player or a Heretic within ")
 			.add(a -> a.mRange, RANGE)
 			.add(" blocks to gain ")
 			.addPercent(a -> a.mCDR, CDR_1, false, Predicate.not(Ability::isLevelTwo))
 			.add(" faster cooldown recharge rate for all other abilities and 50% knockback resistance for ")
 			.addDuration(a -> a.mBuffDuration, DURATION)
-			.add(" seconds. If looking at a player, they gain the same buffs. If looking at an Undead, it is stunned for ")
+			.add(" seconds. If looking at a player, they gain the same buffs. If looking at a Heretic, it is stunned for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION)
 			.add(" seconds. Players are prioritized when searching for a target.")
 			.addCooldown(COOLDOWN);
@@ -225,7 +225,7 @@ public class TouchofRadiance extends Ability {
 
 	private static Description<TouchofRadiance> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("After killing a targeted mob, your next attack on an Undead deals ")
+			.add("After killing a targeted mob, your next attack on a Heretic deals ")
 			.add(a -> a.mEnhanceDamage, ENHANCE_DAMAGE)
 			.add(" magic damage to it and stuns it for ")
 			.addDuration(a -> a.mEnhanceStunDuration, ENHANCE_STUN_DURATION)

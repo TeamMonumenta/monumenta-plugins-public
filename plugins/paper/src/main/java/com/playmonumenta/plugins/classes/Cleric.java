@@ -41,7 +41,7 @@ public class Cleric extends PlayerClass {
 		mClassColor = TextColor.fromHexString("#FFC644");
 		mClassGlassFiller = Material.YELLOW_STAINED_GLASS_PANE;
 		mDisplayItem = Material.POPPY;
-		mClassDescription = "Clerics are mighty healers and specialize in fighting the undead.";
+		mClassDescription = "Clerics are mighty healers and specialize in fighting 'Heretics'. A Heretic is defined as a Humanoid or Undead mob.";
 		mPassive = Crusade.INFO;
 
 		mSpecOne.mAbilities.add(HolyJavelin.INFO);
@@ -51,7 +51,7 @@ public class Cleric extends PlayerClass {
 		mSpecOne.mSpecialization = PALADIN_SPEC_ID;
 		mSpecOne.mSpecName = "Paladin";
 		mSpecOne.mDisplayItem = Material.GHAST_TEAR;
-		mSpecOne.mDescription = "Paladins are mighty healers that have mastered combating undead foes. They will make sure the dead stay dead.";
+		mSpecOne.mDescription = "Paladins are mighty fighters that have mastered combating Heretics. They will make sure the dead stay dead.";
 
 		mSpecTwo.mAbilities.add(EnchantedPrayer.INFO);
 		mSpecTwo.mAbilities.add(ThuribleProcession.INFO);

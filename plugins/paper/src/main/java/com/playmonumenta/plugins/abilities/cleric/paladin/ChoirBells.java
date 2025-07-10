@@ -115,7 +115,7 @@ public class ChoirBells extends Ability {
 			.addPercent(a -> a.mSlownessAmount, SLOWNESS_AMPLIFIER_1, false, Ability::isLevelOne)
 			.add(" slowness for ")
 			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds. Undead enemies also switch targets over to you, are dealt ")
+			.add(" seconds. Heretics also switch targets over to you, are dealt ")
 			.add(a -> a.mDamage, DAMAGE)
 			.add(" magic damage, and are afflicted with ")
 			.addPercent(a -> a.mVulnerabilityEffect, VULNERABILITY_EFFECT_1, false, Ability::isLevelOne)

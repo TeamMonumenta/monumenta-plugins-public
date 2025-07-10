@@ -55,7 +55,7 @@ public class TouchofRadianceCS implements CosmeticSkill {
 		createLink(player, target, player);
 	}
 
-	public void castOnUndead(Player player, LivingEntity target) {
+	public void castOnHeretic(Player player, LivingEntity target) {
 		player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 1.1f, 1.2f);
 		target.getWorld().playSound(target.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.4f, 1.5f);
 

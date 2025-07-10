@@ -45,8 +45,8 @@ import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 public final class LuminousInfusion extends Ability implements KillTriggeredAbility, AbilityWithChargesOrStacks {
 	public double mLastPassiveMeleeDamage = 0; // Passive damage to share with Holy Javelin
 
-	private static final int DAMAGE_UNDEAD_1 = 4;
-	private static final double DAMAGE_UNDEAD_2 = 5.5;
+	private static final int DAMAGE_HERETIC_1 = 4;
+	private static final double DAMAGE_HERETIC_2 = 5.5;
 	private static final double DIVINE_JUSTICE_DMG_MULT = 0.3;
 	private static final int MIN_STACKS_TO_ACTIVATE = 2;
 	private static final int MAX_STACKS = 6;
@@ -73,7 +73,7 @@ public final class LuminousInfusion extends Ability implements KillTriggeredAbil
 			.scoreboardId("LuminousInfusion")
 			.shorthandName("LI")
 			.descriptions(getDescription1(), getDescription2())
-			.simpleDescription("Upon activating, the next damage dealt to an Undead enemy causes an explosion.")
+			.simpleDescription("Upon activating, the next damage dealt to a Heretic causes an explosion.")
 			.addTrigger(new AbilityTriggerInfo<>("castOne", "activate one stack",
 				li -> li.cast(false, false), new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK)
 					.lookDirections(AbilityTrigger.LookDirection.LEVEL, AbilityTrigger.LookDirection.UP).sneaking(false)
@@ -114,7 +114,7 @@ public final class LuminousInfusion extends Ability implements KillTriggeredAbil
 		mCharges = 0;
 
 		mDamagePerStack = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
-			(isLevelTwo() ? DAMAGE_UNDEAD_2 : DAMAGE_UNDEAD_1));
+			(isLevelTwo() ? DAMAGE_HERETIC_2 : DAMAGE_HERETIC_1));
 		mRadiusPerStack = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 		mDivineJusticeDmgMult = DIVINE_JUSTICE_DMG_MULT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MULTIPLIER);
 		mFireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, FIRE_DURATION_2);
@@ -313,7 +313,7 @@ public final class LuminousInfusion extends Ability implements KillTriggeredAbil
 
 	private static Description<LuminousInfusion> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Killing an Undead enemy or dealing ")
+			.add("Killing a Heretic or dealing ")
 			.add((a, p) -> {
 				Description<LuminousInfusion> subDescription;
 				if (p == null) {
@@ -339,20 +339,20 @@ public final class LuminousInfusion extends Ability implements KillTriggeredAbil
 			.addDuration(EXPIRE_TICKS)
 			.add(" seconds of inactivity. With ")
 			.add(a -> a.mMinStacksToActivate, MIN_STACKS_TO_ACTIVATE)
-			.add(" or more primed stacks, the next attack or ability against an undead enemy is infused with explosive power that deals ")
-			.add(a -> a.mDamagePerStack, DAMAGE_UNDEAD_1, false, Ability::isLevelOne)
-			.add(" magic damage per stack to it and other Undead enemies, or half damage against Non-undead, in a ")
+			.add(" or more primed stacks, the next attack or ability against a Heretic is infused with explosive power that deals ")
+			.add(a -> a.mDamagePerStack, DAMAGE_HERETIC_1, false, Ability::isLevelOne)
+			.add(" magic damage per stack to it and other Heretics, or half damage against non-Heretics, in a ")
 			.add(a -> a.mRadiusPerStack, RADIUS)
-			.add(" blocks per stack radius around it and knocking other enemies away from it.");
+			.add(" blocks per stack radius around it and knocks other enemies away from it.");
 	}
 
 	private static Description<LuminousInfusion> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The damage per stack is increased to ")
-			.add(a -> a.mDamagePerStack, DAMAGE_UNDEAD_2, false, Ability::isLevelTwo)
-			.add(". With at least one primed stack, the next critical melee attack against an Undead enemy consumes one stack of Luminousity to trigger Divine Justice for an additional ")
+			.add(a -> a.mDamagePerStack, DAMAGE_HERETIC_2, false, Ability::isLevelTwo)
+			.add(". With at least one primed stack, the next critical melee attack against a Heretic consumes one stack of Luminosity to trigger Divine Justice for an additional ")
 			.addPercent(a -> a.mDivineJusticeDmgMult, DIVINE_JUSTICE_DMG_MULT)
-			.add(" of your critical attack damage. Undead enemies hit by Luminous explosions are set on fire for ")
+			.add(" of your critical attack damage. Heretics hit by Luminous explosions are set on fire for ")
 			.addDuration(a -> a.mFireDuration, FIRE_DURATION_2)
 			.add(" seconds.");
 	}

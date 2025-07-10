@@ -47,7 +47,7 @@ public class HandOfLight extends Ability {
 	private static final int REGEN_DURATION = 4 * 20;
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED = 0.025;
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_MAX = 0.5;
-	private static final int ENHANCEMENT_UNDEAD_STUN_DURATION = 10;
+	private static final int ENHANCEMENT_HERETIC_STUN_DURATION = 10;
 
 	public static final String CHARM_DAMAGE = "Hand of Light Damage";
 	public static final String CHARM_COOLDOWN = "Hand of Light Cooldown";
@@ -60,7 +60,7 @@ public class HandOfLight extends Ability {
 			.scoreboardId("Healing")
 			.shorthandName("HoL")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Heal all players in front of the Cleric, and damage all mobs based on the number of Undead in the area.")
+			.simpleDescription("Heal all players in front of the Cleric, and damage all mobs based on the number of Heretics in the area.")
 			.cooldown(HEALING_1_COOLDOWN, HEALING_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HandOfLight::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
 				                                                                        .keyOptions(AbilityTrigger.KeyOptions.SNEAK_WITH_SHIELD).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS_EXCEPT_SHIELD)))
@@ -103,15 +103,15 @@ public class HandOfLight extends Ability {
 		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
 		boolean doCooldown = false;
-		List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
-		undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob));
+		List<LivingEntity> heretics = new ArrayList<>(nearbyMobs);
+		heretics.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob));
 		if (isEnhanced()) {
-			undeadMobs.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_UNDEAD_STUN_DURATION, mob));
-			if (!undeadMobs.isEmpty()) {
+			heretics.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_HERETIC_STUN_DURATION, mob));
+			if (!heretics.isEmpty()) {
 				doCooldown = true;
 			}
 		}
-		double damage = Math.min(undeadMobs.size() * mDamagePer, mDamageMax);
+		double damage = Math.min(heretics.size() * mDamagePer, mDamageMax);
 		double cooldown = getModifiedCooldown();
 
 		if (damage > 0) {
@@ -119,7 +119,7 @@ public class HandOfLight extends Ability {
 			for (LivingEntity mob : nearbyMobs) {
 				Location loc = mob.getLocation();
 				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
-				mCosmetic.lightDamageEffect(mPlayer, loc, mob, undeadMobs);
+				mCosmetic.lightDamageEffect(mPlayer, loc, mob, heretics);
 			}
 			mCosmetic.lightDamageCastEffect(world, userLoc, mPlugin, mPlayer, (float) mRange, !isEnhanced() ? HEALING_DOT_ANGLE : -1, nearbyMobs);
 		}
@@ -167,13 +167,13 @@ public class HandOfLight extends Ability {
 			.add(a -> a.mFlat, FLAT_1, false, Ability::isLevelOne)
 			.add(" health + ")
 			.addPercent(a -> a.mPercent, PERCENT_1, false, Ability::isLevelOne)
-			.add(" of their max health and gives them Regeneration ")
+			.add(" of their max health, and give them Regeneration ")
 			.addPotionAmplifier(REGEN_LEVEL)
 			.add(" for ")
 			.addDuration(REGEN_DURATION)
 			.add(" seconds. Additionally, damage all mobs in the area with magic damage equal to ")
 			.add(a -> a.mDamagePer, DAMAGE_PER_1, false, Ability::isLevelOne)
-			.add(" times the number of undead mobs in the range, up to ")
+			.add(" times the number of Heretics in the range, up to ")
 			.add(a -> a.mDamageMax, DAMAGE_MAX_1, false, Ability::isLevelOne)
 			.add(" damage.")
 			.addCooldown(HEALING_1_COOLDOWN, Ability::isLevelOne);
@@ -187,7 +187,7 @@ public class HandOfLight extends Ability {
 			.addPercent(a -> a.mPercent, PERCENT_2, false, Ability::isLevelTwo)
 			.add(" of their max health. Damage is increased to ")
 			.add(a -> a.mDamagePer, DAMAGE_PER_2, false, Ability::isLevelTwo)
-			.add(" damage per undead mob, up to ")
+			.add(" damage per Heretic, up to ")
 			.add(a -> a.mDamageMax, DAMAGE_MAX_2, false, Ability::isLevelTwo)
 			.add(".")
 			.addCooldown(HEALING_2_COOLDOWN, Ability::isLevelTwo);
@@ -199,8 +199,8 @@ public class HandOfLight extends Ability {
 			.addPercent(ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED)
 			.add(" for each 4 health healed, capped at ")
 			.addPercent(ENHANCEMENT_COOLDOWN_REDUCTION_MAX)
-			.add(" cooldown. All Undead caught in the radius are stunned for ")
-			.addDuration(ENHANCEMENT_UNDEAD_STUN_DURATION)
+			.add(" cooldown. All Heretics caught in the radius are stunned for ")
+			.addDuration(ENHANCEMENT_HERETIC_STUN_DURATION)
 			.add(" seconds.");
 	}
 }
