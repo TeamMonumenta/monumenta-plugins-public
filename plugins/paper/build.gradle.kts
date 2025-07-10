@@ -22,6 +22,8 @@ dependencies {
 	compileOnly("net.coreprotect:coreprotect:2.15.0") {
 		exclude(group = "org.bukkit")
 	}
+	compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core:2.9.1")
+	compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit:2.9.1")
 	compileOnly("com.playmonumenta:scripted-quests:7.0:all")
 	compileOnly("com.playmonumenta:redissync:5.2:all")
 	compileOnly("com.playmonumenta:monumenta-network-chat:2.13")

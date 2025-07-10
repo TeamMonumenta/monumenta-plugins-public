@@ -59,7 +59,7 @@ public class ShardHealth implements ComponentLike {
 		return new ShardHealth(
 			aveMem / actualTicks,
 			aveTickUnused / actualTicks,
-			ShardHealthManager.G1_LISTENER.getHealth()
+			null
 		);
 	}
 
