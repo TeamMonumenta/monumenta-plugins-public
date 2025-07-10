@@ -76,62 +76,63 @@ public class UpdateGuilds {
 			return;
 		}
 
-		List<Group> guilds;
-		try {
-			guilds = LuckPermsIntegration.getGuilds().join();
-		} catch (Exception ex) {
-			sender.sendMessage(Component.text("Failed to get list of guilds:", NamedTextColor.RED));
-			MessagingUtils.sendStackTrace(sender, ex);
-			return;
-		}
-
-		for (Group memberGroup : guilds) {
-			Group guildRootGroup = LuckPermsIntegration.getGuildRoot(memberGroup);
-			if (guildRootGroup == null) {
-				sender.sendMessage(Component.text("Failed to identify root of " + memberGroup.getFriendlyName(), NamedTextColor.RED));
-				continue;
-			}
-			String guildRootGroupId = guildRootGroup.getName();
-			try {
-				for (GuildAccessLevel accessLevel : List.of(
-					GuildAccessLevel.FOUNDER,
-					GuildAccessLevel.MANAGER,
-					GuildAccessLevel.MEMBER
-				)) {
-					Group accessGroup = accessLevel.loadGroupFromRoot(guildRootGroup).join().orElse(null);
-					if (accessGroup == null) {
-						sender.sendMessage(Component.text("- Could not find " + accessLevel.mId + " group for " + guildRootGroupId));
-						continue;
-					}
-
-					for (GuildPermission guildPermission : mNewPermissions) {
-						if (accessLevel.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
-							guildPermission.setExplicitPermission(guildRootGroup, accessGroup, true).join();
-						}
-					}
-				}
-
-				Group blockedGroup = GuildAccessLevel.BLOCKED.loadGroupFromRoot(guildRootGroup).join().orElse(null);
-				if (blockedGroup == null) {
-					sender.sendMessage(Component.text("- Could not find blocked group for " + guildRootGroupId));
-				} else {
-					for (GuildPermission guildPermission : mNewPermissions) {
-						guildPermission.setExplicitPermission(guildRootGroup, blockedGroup, false).join();
-					}
-				}
-
-				sender.sendMessage(Component.text("Updated " + guildRootGroupId, NamedTextColor.GREEN));
-			} catch (Exception ex) {
-				sender.sendMessage(Component.text("Failed to update " + guildRootGroupId + ":", NamedTextColor.RED));
-				MessagingUtils.sendStackTrace(sender, ex);
-			}
-		}
-
 		// -384 to -228, 228 to 383
 		// -384,0,-384
 		// 383,511,-228
 
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+			List<Group> guilds;
+			try {
+				guilds = LuckPermsIntegration.getGuilds().join();
+			} catch (Exception ex) {
+				sender.sendMessage(Component.text("Failed to get list of guilds:", NamedTextColor.RED));
+				MessagingUtils.sendStackTrace(sender, ex);
+				return;
+			}
+
+			for (Group memberGroup : guilds) {
+				Group guildRootGroup = LuckPermsIntegration.getGuildRoot(memberGroup);
+				if (guildRootGroup == null) {
+					sender.sendMessage(Component.text("Failed to identify root of " + memberGroup.getFriendlyName(), NamedTextColor.RED));
+					continue;
+				}
+				String guildRootGroupId = guildRootGroup.getName();
+				try {
+					for (GuildAccessLevel accessLevel : List.of(
+						GuildAccessLevel.FOUNDER,
+						GuildAccessLevel.MANAGER,
+						GuildAccessLevel.MEMBER
+					)) {
+						Group accessGroup = accessLevel.loadGroupFromRoot(guildRootGroup).join().orElse(null);
+						if (accessGroup == null) {
+							sender.sendMessage(Component.text("- Could not find " + accessLevel.mId + " group for " + guildRootGroupId));
+							continue;
+						}
+
+						for (GuildPermission guildPermission : mNewPermissions) {
+							if (accessLevel.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
+								guildPermission.setExplicitPermission(guildRootGroup, accessGroup, true).join();
+							}
+						}
+					}
+
+					Group blockedGroup = GuildAccessLevel.BLOCKED.loadGroupFromRoot(guildRootGroup).join().orElse(null);
+					if (blockedGroup == null) {
+						sender.sendMessage(Component.text("- Could not find blocked group for " + guildRootGroupId));
+					} else {
+						for (GuildPermission guildPermission : mNewPermissions) {
+							guildPermission.setExplicitPermission(guildRootGroup, blockedGroup, false).join();
+						}
+					}
+
+					sender.sendMessage(Component.text("Updated " + guildRootGroupId, NamedTextColor.GREEN));
+				} catch (Exception ex) {
+					sender.sendMessage(Component.text("Failed to update " + guildRootGroupId + ":", NamedTextColor.RED));
+					MessagingUtils.sendStackTrace(sender, ex);
+				}
+			}
+
+
 			// Get sorted list for a sense of how far along we are
 			NavigableSet<Long> plotNumbers = new TreeSet<>();
 			for (String worldName : MonumentaWorldManagementAPI.getAvailableWorlds()) {
