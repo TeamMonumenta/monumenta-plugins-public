@@ -220,6 +220,15 @@ public final class ItemOverrides {
 
 		BaseOverride snowballOverride = new SnowballOverride();
 		mItems.put(Material.SNOWBALL, snowballOverride);
+
+		BaseOverride interactableBlockOverride = new InteractableBlockOverride();
+		for (Material button : Tag.BUTTONS.getValues()) {
+			mItems.put(button, interactableBlockOverride);
+		}
+		for (Material plate : Tag.PRESSURE_PLATES.getValues()) {
+			mItems.put(plate, interactableBlockOverride);
+		}
+		mItems.put(Material.LEVER, interactableBlockOverride);
 	}
 
 	public void rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {
