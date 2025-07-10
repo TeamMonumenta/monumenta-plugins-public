@@ -85,7 +85,7 @@ public class EagleEye extends Ability {
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EAGLE_EYE_RADIUS);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, EAGLE_EYE_DURATION);
 		mRefresh = CharmManager.getDuration(mPlayer, CHARM_REFRESH, EAGLE_EYE_REFRESH);
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ENHANCEMENT_DAMAGE_PERCENT);
+		mDamage = ENHANCEMENT_DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mHits = ENHANCEMENT_HITS + (int) CharmManager.getLevel(mPlayer, CHARM_HITS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EagleEyeCS());
 	}

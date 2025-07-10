@@ -63,7 +63,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	public Sharpshooter(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
-		mMaxStacks = isLevelTwo() ? MAX_STACKS_2 : MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
+		mMaxStacks = (isLevelTwo() ? MAX_STACKS_2 : MAX_STACKS) + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 		mDecayTime = CharmManager.getDuration(mPlayer, CHARM_DECAY, SHARPSHOOTER_DECAY_TIMER);
 		mDamagePerStack = PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE);
 		mArrowSaveChance = ARROW_SAVE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RETRIEVAL);
