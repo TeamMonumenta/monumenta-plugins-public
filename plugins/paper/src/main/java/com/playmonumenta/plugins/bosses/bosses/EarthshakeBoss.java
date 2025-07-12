@@ -90,7 +90,7 @@ public class EarthshakeBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLES_EXPLOSION = ParticlesList.builder()
 			.add(new ParticlesList.CParticle(Particle.CLOUD, 150, 0.0, 0.0, 0.0, 0.5))
 			.add(new ParticlesList.CParticle(Particle.LAVA, 35, 2.0, 1.0, 2.0, 0.0))
-			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 200, 2.0, 1.0, 2.0, 0.0, Material.DIRT))
+			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 200, 2.0, 1.0, 2.0, 0.0, Material.DIRT.createBlockData()))
 			.add(new ParticlesList.CParticle(Particle.CAMPFIRE_COSY_SMOKE, 35, 2.0, 1.0, 2.0, 0.1))
 			.build();
 
@@ -106,7 +106,7 @@ public class EarthshakeBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Particles to spawn every tick at the target location while the spell is charging.")
 		public ParticlesList PARTICLES_CHARGE = ParticlesList.builder()
-			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 2, 2.0, 0.1, 2.0, 0.0, Material.STONE))
+			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 2, 2.0, 0.1, 2.0, 0.0, Material.STONE.createBlockData()))
 			.add(new ParticlesList.CParticle(Particle.LAVA, 2, 0.25, 0.25, 0.25, 0.1))
 			.build();
 
@@ -117,7 +117,7 @@ public class EarthshakeBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Particles to spawn every 20 ticks at the target location while the spell is charging.")
 		public ParticlesList PARTICLES_CHARGE_TWENTY_TICKS = ParticlesList.builder()
-			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 80, 2.0, 0.1, 2.0, 0.0, Material.DIRT))
+			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 80, 2.0, 0.1, 2.0, 0.0, Material.DIRT.createBlockData()))
 			.add(new ParticlesList.CParticle(Particle.CAMPFIRE_COSY_SMOKE, 8, 2.0, 0.1, 2.0, 0.0))
 			.build();
 

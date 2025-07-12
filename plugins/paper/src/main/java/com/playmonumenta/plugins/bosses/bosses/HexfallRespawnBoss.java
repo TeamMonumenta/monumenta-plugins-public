@@ -55,7 +55,7 @@ public class HexfallRespawnBoss extends BossAbilityGroup {
 		@BossParam(help = "particles played at the mob when it respawns")
 		public ParticlesList PARTICLE_RESPAWNED = ParticlesList.builder()
 			.add(new ParticlesList.CParticle(Particle.TOTEM, 30, 0.0, 0.0, 0.0, 0.8))
-			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 15, 0.2, 0.2, 0.2, 0.0, Material.BLUE_ORCHID))
+			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 15, 0.2, 0.2, 0.2, 0.0, Material.BLUE_ORCHID.createBlockData()))
 			.build();
 	}
 

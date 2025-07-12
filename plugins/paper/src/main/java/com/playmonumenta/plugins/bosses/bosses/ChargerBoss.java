@@ -80,8 +80,8 @@ public final class ChargerBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Particles spawned on a hit target")
 		public ParticlesList PARTICLE_HIT = ParticlesList.builder()
-			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK))
-			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE))
+			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData()))
+			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData()))
 			.build();
 
 		@BossParam(help = "Particles spawned at the start and end locations of the charge")

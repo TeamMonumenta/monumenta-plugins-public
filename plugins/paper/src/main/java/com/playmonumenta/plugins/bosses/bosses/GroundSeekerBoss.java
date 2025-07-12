@@ -68,7 +68,7 @@ public class GroundSeekerBoss extends BossAbilityGroup {
 			.build();
 		@BossParam(help = "particles spawned as the rift is created")
 		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.builder()
-			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 10, 0.25, 0.25, 0.25, 0.25, Material.ROOTED_DIRT))
+			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 10, 0.25, 0.25, 0.25, 0.25, Material.ROOTED_DIRT.createBlockData()))
 			.build();
 		@BossParam(help = "particle above rift while it lingers")
 		public ParticlesList PARTICLE_HIT = ParticlesList.builder()
