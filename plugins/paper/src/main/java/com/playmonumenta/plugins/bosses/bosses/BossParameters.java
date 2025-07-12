@@ -13,7 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-public abstract class BossParameters {
+public abstract class BossParameters implements Cloneable {
 
 	public static <T extends BossParameters> T getParameters(Entity boss, String identityTag, T parameters) {
 		String modTag = identityTag + "[";
@@ -50,5 +50,10 @@ public abstract class BossParameters {
 		} catch (CloneNotSupportedException e) {
 			throw new AssertionError();
 		}
+	}
+
+	@Override
+	public BossParameters clone() throws CloneNotSupportedException {
+		return (BossParameters) super.clone();
 	}
 }
