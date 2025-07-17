@@ -150,7 +150,7 @@ public class DepthsSummaryGUI extends Gui {
 			if (getItem(i) == null) {
 				DepthsTrigger trigger = TRIGGER_MAP.get(i);
 				if (trigger != null) {
-					setItem(i, trigger.getNoAbilityItem());
+					setItem(i, trigger.getNoAbilityItem(mTargetPlayer));
 				}
 			}
 		}

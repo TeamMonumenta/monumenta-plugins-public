@@ -908,8 +908,7 @@ public class DepthsManager {
 	public @Nullable List<DepthsAbilityItem> getAbilityUnlocks(Player p) {
 
 		DepthsPlayer dp = getDepthsPlayer(p);
-		DepthsParty party = getPartyFromId(dp);
-		if (dp == null || party == null) {
+		if (dp == null) {
 			return null;
 		}
 
@@ -945,12 +944,6 @@ public class DepthsManager {
 			giftFilter.add(DepthsTree.GIFT);
 			allItems = initItems(giftFilter, roll -> 1, p, dp, List.of(), List.of());
 		} else {
-			List<DepthsTree> cappedTrees = new ArrayList<>();
-			if (party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ACTIVE_TREE_CAP) {
-				List<DepthsTree> trees = getActiveAbilityTrees(dp);
-				cappedTrees = Arrays.stream(DepthsTree.values()).filter(tree -> trees.stream().filter(t -> t == tree).count() >= 4).toList();
-			}
-
 			List<DepthsTree> possibleTrees = dp.mEligibleTrees;
 
 			// callicarpa's pointed hat trigger
@@ -963,7 +956,7 @@ public class DepthsManager {
 				}
 			}
 
-			allItems = initItems(possibleTrees, roll -> getRarity(roll, rewardType == DepthsRewardType.ABILITY_ELITE), p, dp, cappedTrees, List.of());
+			allItems = initItems(possibleTrees, roll -> getRarity(roll, rewardType == DepthsRewardType.ABILITY_ELITE), p, dp, getCappedTrees(dp), List.of());
 		}
 
 		// Return 3 choices of items
@@ -1026,6 +1019,16 @@ public class DepthsManager {
 
 		dp.mAbilityOfferings = offeredItems;
 		return offeredItems;
+	}
+
+	public List<DepthsTree> getCappedTrees(DepthsPlayer dp) {
+		List<DepthsTree> cappedTrees = new ArrayList<>();
+		DepthsParty party = getPartyFromId(dp);
+		if (party != null && party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ACTIVE_TREE_CAP) {
+			List<DepthsTree> trees = getActiveAbilityTrees(dp);
+			cappedTrees = Arrays.stream(DepthsTree.values()).filter(tree -> trees.stream().filter(t -> t == tree).count() >= 4).toList();
+		}
+		return cappedTrees;
 	}
 
 	/**
@@ -2285,10 +2288,9 @@ public class DepthsManager {
 		List<DepthsAbilityItem> abilityOfferings = dp.mAbilityOfferings;
 		if (abilityOfferings != null) {
 			abilityOfferings.removeIf(dai -> dp.mAbilities.keySet().stream().map(this::getAbility).filter(Objects::nonNull).anyMatch(info -> dai.mAbility.equals(info.getDisplayName()) || (dai.mTrigger != DepthsTrigger.PASSIVE && info.getDepthsTrigger() == dai.mTrigger)));
-			DepthsParty party = getPartyFromId(dp);
-			if (party != null && party.getAscension() >= DepthsEndlessDifficulty.ASCENSION_ACTIVE_TREE_CAP) {
-				List<DepthsTree> trees = getActiveAbilityTrees(dp);
-				abilityOfferings.removeIf(dai -> dai.mTrigger != DepthsTrigger.PASSIVE && trees.stream().filter(t -> t == dai.mTree).count() >= 4);
+			List<DepthsTree> cappedTrees = getCappedTrees(dp);
+			if (!cappedTrees.isEmpty()) {
+				abilityOfferings.removeIf(dai -> dai.mTrigger != DepthsTrigger.PASSIVE && cappedTrees.contains(dai.mTree));
 			}
 			if (abilityOfferings.isEmpty()) {
 				dp.mAbilityOfferings = null;

@@ -102,7 +102,7 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 			if (checkItem != null && checkItem.getType() == FILLER) {
 				DepthsTrigger trigger = TRIGGER_MAP.get(i);
 				if (trigger != null) {
-					mInventory.setItem(i, trigger.getNoAbilityItem());
+					mInventory.setItem(i, trigger.getNoAbilityItem(dp));
 				}
 			}
 		}

@@ -2,10 +2,19 @@ package com.playmonumenta.plugins.depths.abilities;
 
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsPlayer;
+import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.guis.DepthsSummaryGUI;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -42,8 +51,24 @@ public enum DepthsTrigger {
 		mName = name;
 	}
 
-	public ItemStack getNoAbilityItem() {
-		return GUIUtils.createBasicItem(Material.RED_STAINED_GLASS_PANE, "No " + mName + (this == WEAPON_ASPECT ? "!" : " ability!"), NamedTextColor.RED);
+	public ItemStack getNoAbilityItem(DepthsPlayer dp) {
+		List<Component> lore = new ArrayList<>();
+		if (this != WEAPON_ASPECT) {
+			lore.add(Component.text("Possible abilities:", NamedTextColor.GRAY));
+			List<DepthsTree> cappedTrees = DepthsManager.getInstance().getCappedTrees(dp);
+			List<DepthsTree> sortedTrees = new ArrayList<>(dp.mEligibleTrees);
+			sortedTrees.sort(Comparator.comparingInt(t -> DepthsSummaryGUI.TREE_LOCATIONS.get(dp.mEligibleTrees.indexOf(t))));
+			for (DepthsTree tree : sortedTrees) {
+				boolean capped = cappedTrees.contains(tree);
+				for (DepthsAbilityInfo<?> info : DepthsManager.getAbilitiesOfTree(tree).stream().filter(i -> i.getDepthsTrigger() == this).toList()) {
+					lore.add(info.getColoredName().decoration(TextDecoration.STRIKETHROUGH, capped));
+				}
+			}
+			if (lore.size() == 1) {
+				lore.add(Component.text("None", NamedTextColor.GRAY));
+			}
+		}
+		return GUIUtils.createBasicItem(Material.RED_STAINED_GLASS_PANE, 1, Component.text("No " + mName + (this == WEAPON_ASPECT ? "!" : " ability!"), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false), lore, true);
 	}
 
 	public boolean isActive() {

@@ -311,6 +311,9 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			} else {
 				lore.add(mDepthsTree.getNameComponent());
 			}
+			if (mDepthsTrigger != DepthsTrigger.PASSIVE) {
+				lore.add(Component.text(mDepthsTrigger.mName + " Slot", NamedTextColor.DARK_GRAY));
+			}
 			meta.lore(lore);
 		}
 		Component description = getDescription(mHasLevels ? rarity : 1, player, useAbility);
