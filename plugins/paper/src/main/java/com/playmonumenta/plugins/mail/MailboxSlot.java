@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.market.RedisItemDatabase;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -382,6 +383,12 @@ public class MailboxSlot {
 		}
 
 		return result;
+	}
+
+	public ItemStack getGuiItem() {
+		ItemStack item = getItem();
+		GUIUtils.setPlaceholder(item);
+		return item;
 	}
 
 	public static String describeNestedItem(@Nullable ItemStack itemStack) {

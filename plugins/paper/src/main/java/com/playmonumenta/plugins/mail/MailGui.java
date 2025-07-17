@@ -357,12 +357,16 @@ public abstract class MailGui extends Gui implements Comparable<MailGui> {
 				TextColor confirmationColor = TextColor.color(0x7f, 0xbf, 0xff);
 				Component confirmationMessage;
 				if (returnedItems.isEmpty()) {
-					confirmationMessage = Component.text("Sent ", confirmationColor)
-						.append(Component.text("[", NamedTextColor.RED)
-							.append(ItemUtils.getDisplayName(newMailItem))
-							.append(Component.text("]"))
-							.hoverEvent(newMailItem))
-						.append(Component.text("!"));
+					if (ItemUtils.isNullOrAir(newMailItem)) {
+						confirmationMessage = null;
+					} else {
+						confirmationMessage = Component.text("Sent ", confirmationColor)
+							.append(Component.text("[", NamedTextColor.RED)
+								.append(ItemUtils.getDisplayName(newMailItem))
+								.append(Component.text("]"))
+								.hoverEvent(newMailItem))
+							.append(Component.text("!"));
+					}
 				} else if (ItemUtils.isNullOrAir(newMailItem)) {
 					confirmationMessage = Component.text("Received ", confirmationColor)
 						.append(Component.join(joinConfiguration, returnedItemComponents))
@@ -378,7 +382,9 @@ public abstract class MailGui extends Gui implements Comparable<MailGui> {
 						.append(Component.join(joinConfiguration, returnedItemComponents))
 						.append(Component.text("!"));
 				}
-				mPlayer.sendMessage(confirmationMessage);
+				if (confirmationMessage != null) {
+					mPlayer.sendMessage(confirmationMessage);
+				}
 
 				mPlayer.playSound(mPlayer, Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f);
 

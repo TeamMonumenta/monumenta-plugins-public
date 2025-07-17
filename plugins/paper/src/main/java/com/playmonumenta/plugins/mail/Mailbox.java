@@ -261,7 +261,7 @@ public class Mailbox implements Comparable<Mailbox> {
 					continue;
 				}
 
-				result.put(slot, mailboxSlot.getItem());
+				result.put(slot, mailboxSlot.getGuiItem());
 			}
 
 			mMailItems = result;
@@ -288,7 +288,7 @@ public class Mailbox implements Comparable<Mailbox> {
 				if (mailboxSlot == null) {
 					mMailItems.remove(slot);
 				} else {
-					mMailItems.put(slot, mailboxSlot.getItem());
+					mMailItems.put(slot, mailboxSlot.getGuiItem());
 				}
 
 				loadLockFromRedis(slot).join();
