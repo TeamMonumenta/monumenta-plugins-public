@@ -45,6 +45,7 @@ public class LightningTotem extends TotemAbility {
 	private static final double STORM_DAMAGE_PERCENT = 0.35;
 	private static final int STORM_DAMAGE_RADIUS = 2;
 	private static final int STORM_DURATION = 7 * 20;
+	private static final int STORM_INTERVAL = 2 * 20;
 	public static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.25f);
 	public static final Particle.DustOptions DUST_GRAY_LARGE = new Particle.DustOptions(Color.fromRGB(51, 51, 51), 2);
 
@@ -56,6 +57,7 @@ public class LightningTotem extends TotemAbility {
 	public static final String CHARM_STORM_RADIUS = "Lightning Totem Lightning Storm Radius";
 	public static final String CHARM_STORM_DURATION = "Lightning Totem Lightning Storm Duration";
 	public static final String CHARM_PULSE_DELAY = "Lightning Totem Pulse Delay";
+	public static final String CHARM_STORM_PULSE_DELAY = "Lightning Totem Lightning Storm Pulse Delay";
 
 	public static final AbilityInfo<LightningTotem> INFO =
 		new AbilityInfo<>(LightningTotem.class, "Lightning Totem", LightningTotem::new)
@@ -79,6 +81,7 @@ public class LightningTotem extends TotemAbility {
 	private final int mStormDuration;
 	private final List<Location> mAllLocs = new ArrayList<>();
 	private final int mInterval;
+	private final int mStormInterval;
 	private final List<BukkitTask> mStormTasks = new ArrayList<>();
 	private final LightningTotemCS mCosmetic;
 
@@ -91,6 +94,7 @@ public class LightningTotem extends TotemAbility {
 		mStormRadius = CharmManager.getRadius(mPlayer, CHARM_STORM_RADIUS, STORM_DAMAGE_RADIUS);
 		mStormDuration = CharmManager.getDuration(mPlayer, CHARM_STORM_DURATION, STORM_DURATION);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
+		mStormInterval = CharmManager.getDuration(mPlayer, CHARM_STORM_PULSE_DELAY, STORM_INTERVAL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new LightningTotemCS());
 	}
 
@@ -158,7 +162,7 @@ public class LightningTotem extends TotemAbility {
 					public void run() {
 						mCosmetic.lightningTotemEnhancementStorm(mPlayer, mLoc, mStormRadius);
 
-						if (mTicks % mInterval == 0) {
+						if (mTicks % mStormInterval == 0) {
 							mCosmetic.lightningTotemEnhancementStrike(mPlayer, mLoc, mStormRadius);
 							for (LivingEntity entity : EntityUtils.getNearbyMobsInSphere(mLoc, mStormRadius, mTarget)) {
 								DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(
@@ -223,7 +227,7 @@ public class LightningTotem extends TotemAbility {
 			.add(" of the main magic damage to all mobs within ")
 			.add(a -> a.mStormRadius, STORM_DAMAGE_RADIUS)
 			.add(" blocks of the center every ")
-			.addDuration(a -> a.mInterval, INTERVAL)
+			.addDuration(a -> a.mStormInterval, STORM_INTERVAL)
 			.add(" seconds for ")
 			.addDuration(a -> a.mStormDuration, STORM_DURATION)
 			.add(" seconds.");

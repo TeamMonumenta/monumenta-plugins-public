@@ -33,7 +33,7 @@ public class DefensiveLine extends Ability {
 	private static final double PERCENT_DAMAGE_RECEIVED_EFFECT_2 = 0.30;
 	private static final int DURATION = 20 * 10;
 	private static final int COOLDOWN = 20 * 30;
-	private static final int RADIUS = 8;
+	private static final int RANGE = 8;
 	private static final int KNOCK_AWAY_RADIUS = 3;
 	private static final float KNOCK_AWAY_SPEED = 0.25f;
 
@@ -41,6 +41,7 @@ public class DefensiveLine extends Ability {
 	public static final String CHARM_DURATION = "Defensive Line Duration";
 	public static final String CHARM_COOLDOWN = "Defensive Line Cooldown";
 	public static final String CHARM_RANGE = "Defensive Line Range";
+	public static final String CHARM_RADIUS = "Defensive Line Radius";
 	public static final String CHARM_KNOCKBACK = "Defensive Line Knockback";
 	public static final String CHARM_NEGATIONS = "Defensive Line Damage Negation";
 
@@ -55,7 +56,7 @@ public class DefensiveLine extends Ability {
 			.displayItem(Material.CHAIN);
 
 	private final int mDuration;
-	private final double mRadius;
+	private final double mRange;
 	private final double mPercentDamageReceived;
 	private final double mKnockAwayRadius;
 
@@ -64,9 +65,9 @@ public class DefensiveLine extends Ability {
 	public DefensiveLine(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
-		mRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS);
+		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 		mPercentDamageReceived = (isLevelOne() ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
-		mKnockAwayRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, KNOCK_AWAY_RADIUS);
+		mKnockAwayRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, KNOCK_AWAY_RADIUS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DefensiveLineCS());
 	}
 
@@ -79,7 +80,7 @@ public class DefensiveLine extends Ability {
 		World world = mPlayer.getWorld();
 		Location location = mPlayer.getLocation();
 
-		List<Player> players = PlayerUtils.playersInRange(location, mRadius, true);
+		List<Player> players = PlayerUtils.playersInRange(location, mRange, true);
 		players.removeIf(player -> player.getScoreboardTags().contains("disable_class"));
 
 		mCosmetic.onCast(mPlugin, mPlayer, world, location, players);
@@ -106,7 +107,7 @@ public class DefensiveLine extends Ability {
 	private static Description<DefensiveLine> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Block while sneaking to grant yourself and other players within ")
-			.add(a -> a.mRadius, RADIUS)
+			.add(a -> a.mRange, RANGE)
 			.add(" blocks ")
 			.addPercent(a -> a.mPercentDamageReceived, PERCENT_DAMAGE_RECEIVED_EFFECT_1, false, Ability::isLevelOne)
 			.add(" resistance for ")
