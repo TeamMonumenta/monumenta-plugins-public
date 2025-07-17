@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -58,9 +57,11 @@ public class SpellCerebralOnslaught extends Spell {
 					if (mTicks >= SPAWN_COOLDOWN) {
 						mTicks = 0;
 						for (int i = 0; i < 3; i++) {
-							Entity summon = Objects.requireNonNull(LibraryOfSoulsIntegration.summon(LocationUtils.randomSafeLocationInCircle(mCenter, 25, location ->
-								mSpawnedLocations.stream().allMatch(loc -> loc.distance(location) > 3)), "CerebralOnslaught"));
-							summon.addScoreboardTag(SPAWN_TAG);
+							Entity summon = LibraryOfSoulsIntegration.summon(LocationUtils.randomSafeLocationInCircle(mCenter, 25, location ->
+								mSpawnedLocations.stream().allMatch(loc -> loc.distance(location) > 3)), "CerebralOnslaught");
+							if (summon != null) {
+								summon.addScoreboardTag(SPAWN_TAG);
+							}
 							mSpawnedLocations.add(summon.getLocation());
 						}
 						mSpawned++;
@@ -71,7 +72,11 @@ public class SpellCerebralOnslaught extends Spell {
 					if (mTicks >= SPAWN_COOLDOWN) {
 						Location location = mBoss.getLocation();
 						location.setY(mCenter.getY());
-						LibraryOfSoulsIntegration.summon(location, "CerebralOvercharge");
+						Entity summon = LibraryOfSoulsIntegration.summon(location, "CerebralOvercharge");
+						if (summon != null) {
+							summon.addScoreboardTag(SPAWN_TAG);
+						}
+
 						EntityUtils.selfRoot(mBoss, OVERCHARGE_TIME);
 						new BukkitRunnable() {
 							@Override

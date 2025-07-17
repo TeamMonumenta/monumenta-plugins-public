@@ -790,8 +790,10 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			// Only reset boss arena if you lose as win mech modifies arena
 			resetBossArena();
 		}
-		EntityUtils.getNearbyMobs(mSpawnLoc, DETECTION_RANGE, DETECTION_RANGE, DETECTION_RANGE, entity ->
-				EntityUtils.isHostileMob(entity) || entity.getScoreboardTags().contains("IronMaiden"))
+		EntityUtils.getNearbyMobs(mSpawnLoc, DETECTION_RANGE, DETECTION_RANGE, DETECTION_RANGE, entity -> {
+				Set<String> scoreboardTags = entity.getScoreboardTags();
+				return EntityUtils.isHostileMob(entity) || scoreboardTags.contains("IronMaiden") || scoreboardTags.contains(SpellCerebralOnslaught.SPAWN_TAG);
+			})
 			.forEach(Entity::remove);
 
 	}
@@ -870,7 +872,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 
 	public static List<Player> playersInRange(Location bossLoc, boolean includeDead) {
 		List<Player> players = new ArrayList<>();
-		PlayerUtils.playersInRange(bossLoc, DETECTION_RANGE, true).forEach(player -> {
+		PlayerUtils.playersInRange(bossLoc, DETECTION_RANGE, true, true).forEach(player -> {
 			if (includeDead || !player.getScoreboardTags().contains(DEAD_TAG)) {
 				players.add(player);
 			}
