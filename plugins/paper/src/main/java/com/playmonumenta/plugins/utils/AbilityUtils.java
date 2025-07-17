@@ -733,8 +733,8 @@ public class AbilityUtils {
 			return true;
 		}
 		ClassAbility ca = event.getAbility();
-		if (ca == ClassAbility.HUNTING_COMPANION || ca == ClassAbility.RESTLESS_SOULS || ca == ClassAbility.BRUTE_FORCE_AOE || ca == ClassAbility.METEOR_SLAM || ca == ClassAbility.SCORCHED_EARTH || ca == ClassAbility.BRUTAL_ALCHEMY
-			|| ca == ClassAbility.ESOTERIC_ENHANCEMENTS || ca == ClassAbility.FLAME_TOTEM || ca == ClassAbility.LIGHTNING_TOTEM || ca == ClassAbility.INTERCONNECTED_HAVOC || ca == ClassAbility.CRYSTALLINE_COMBOS || ca == ClassAbility.DECAYED_TOTEM || ca == ClassAbility.ILLUMINATE) {
+		if (ca == ClassAbility.HUNTING_COMPANION || ca == ClassAbility.RESTLESS_SOULS || ca == ClassAbility.BRUTE_FORCE_AOE || ca == ClassAbility.METEOR_SLAM || ca == ClassAbility.SCORCHED_EARTH || ca == ClassAbility.BRUTAL_ALCHEMY  || ca == ClassAbility.PANACEA || ca == ClassAbility.ESOTERIC_ENHANCEMENTS
+			|| ca == ClassAbility.ELEMENTAL_SPIRIT_ICE || ca == ClassAbility.FLAME_TOTEM || ca == ClassAbility.LIGHTNING_TOTEM || ca == ClassAbility.INTERCONNECTED_HAVOC || ca == ClassAbility.CRYSTALLINE_COMBOS || ca == ClassAbility.DECAYED_TOTEM || ca == ClassAbility.ILLUMINATE || ca == ClassAbility.SANCTIFIED_ARMOR) {
 			return true;
 		}
 		return false;
