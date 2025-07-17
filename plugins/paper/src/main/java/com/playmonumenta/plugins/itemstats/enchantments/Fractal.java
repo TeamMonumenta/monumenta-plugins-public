@@ -18,10 +18,10 @@ import org.bukkit.entity.Player;
 
 public class Fractal implements Enchantment {
 	private static final int DURATION = 2 * 20;
-	private static final double DAMAGE_PER_LEVEL = 0.05;
+	private static final double DAMAGE_PER_LEVEL = 0.1;
 	private static final String SOURCE = "FractalVuln";
 	private static final String SOURCE_DISABLE = "FractalDisable";
-	private static final int DISABLE_DURATION = 10000 * 20;
+	private static final int DISABLE_DURATION = 6 * 20;
 
 	@Override
 	public EnchantmentType getEnchantmentType() {
