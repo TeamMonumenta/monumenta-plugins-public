@@ -55,8 +55,8 @@ public class EarthAspect implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		DamageEvent.DamageType type = event.getType();
-		if ((type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE || event.getAbility() == ClassAbility.EXPLOSIVE) {
-			if (type == DamageEvent.DamageType.PROJECTILE || event.getAbility() == ClassAbility.EXPLOSIVE) {
+		if ((type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE) {
+			if (type == DamageEvent.DamageType.PROJECTILE) {
 				level /= 2;
 			}
 			apply(plugin, player, level, type);
