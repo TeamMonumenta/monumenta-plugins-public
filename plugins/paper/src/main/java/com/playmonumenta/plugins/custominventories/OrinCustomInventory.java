@@ -437,6 +437,8 @@ public class OrinCustomInventory extends CustomInventory {
 			"D13Access", 1, sendToDungeonAction(DungeonCommandMapping.BROWN), null, 1, null));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(7, 4), "Hexfall", "Click to teleport!", Material.MOSSY_STONE_BRICKS,
 			"DHFAccess", 1, sendToDungeonAction(DungeonCommandMapping.HEXFALL), null, 1, null));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(8, 4), "Indigo", "Click to teleport!", Material.PURPLE_CONCRETE_POWDER,
+			"DIAccess", 1, sendToDungeonAction(DungeonCommandMapping.INDIGO), null, 1, null));
 	}
 
 	private TeleporterPage mCurrentPage;
