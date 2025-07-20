@@ -70,6 +70,7 @@ public class ServerProperties {
 	private List<String> mDisableEntityScoresInWorlds = new ArrayList<>();
 
 	private final EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
+	private final EnumSet<Material> mPreciousBlocks = EnumSet.noneOf(Material.class);
 	private final EnumSet<Material> mAlwaysPickupMats = EnumSet.noneOf(Material.class);
 	private final EnumSet<Material> mNamedPickupMats = EnumSet.noneOf(Material.class);
 
@@ -234,6 +235,10 @@ public class ServerProperties {
 		return INSTANCE.mUnbreakableBlocks;
 	}
 
+	public static Set<Material> getPreciousBlocks() {
+		return INSTANCE.mPreciousBlocks;
+	}
+
 	public static Set<Material> getAlwaysPickupMats() {
 		return INSTANCE.mAlwaysPickupMats;
 	}
@@ -343,6 +348,17 @@ public class ServerProperties {
 			getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender, mAlwaysPickupMats);
 			getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender, mNamedPickupMats);
 
+			// Set default value
+			mPreciousBlocks.clear();
+			mPreciousBlocks.addAll(EnumSet.of(
+				Material.IRON_BLOCK,
+				Material.GOLD_BLOCK,
+				Material.DIAMOND_BLOCK,
+				Material.NETHERITE_BLOCK
+			));
+			// Replace default value if possible
+			getPropertyValueMaterialList(plugin, object, "preciousBlocks", sender, mPreciousBlocks);
+
 			getPropertyValueCollection(plugin, object, "formattingFreeBlockNames", sender, String::toString, mFormattingFreeBlockNames);
 			getPropertyValueCollection(plugin, object, "droppedItemReplacements", sender, NamespacedKeyUtils::fromString, mDroppedItemReplacements);
 			getPropertyValueCollection(plugin, object, "eggifySpawnEggs", sender, NamespacedKeyUtils::fromString, mEggifySpawnEggs);
@@ -409,6 +425,7 @@ public class ServerProperties {
 		out.add("disableEntityScoresInWorlds = [" + String.join(" ", mDisableEntityScoresInWorlds) + "]");
 
 		out.add("unbreakableBlocks = [" + mUnbreakableBlocks.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
+		out.add("preciousBlocks = [" + mPreciousBlocks.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
 		out.add("alwaysPickupMaterials = [" + mAlwaysPickupMats.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
 		out.add("namedPickupMaterials = [" + mNamedPickupMats.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
 

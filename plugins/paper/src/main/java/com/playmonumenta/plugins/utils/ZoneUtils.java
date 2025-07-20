@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.scriptedquests.Plugin;
 import com.playmonumenta.scriptedquests.zones.Zone;
-import java.util.List;
 import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -87,8 +86,6 @@ public class ZoneUtils {
 			return mPropertyName;
 		}
 	}
-
-	public static List<Material> PRECIOUS_BLOCKS = List.of(Material.IRON_BLOCK, Material.GOLD_BLOCK, Material.DIAMOND_BLOCK, Material.NETHERITE_BLOCK);
 
 	// Returns if the player is expected to be in Survival Mode or Adventure Mode for their given circumstances
 	public static GameMode expectedGameMode(Player player) {
