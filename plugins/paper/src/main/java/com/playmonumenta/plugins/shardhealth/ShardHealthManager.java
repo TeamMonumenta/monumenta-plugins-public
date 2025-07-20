@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.shardhealth;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.shardhealth.g1.G1Listener;
 import com.playmonumenta.plugins.utils.MMLog;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -281,7 +280,7 @@ public class ShardHealthManager {
 							Bukkit.getServer().getConsoleSender(),
 							"spark heapdump"
 						);
-						MonumentaNetworkRelayIntegration.sendAdminMessage("<" + ServerProperties.getShardName() + "> Automatic heap dump due to low memory");
+						MonumentaNetworkRelayIntegration.sendAdminMessage("<" + NetworkRelayAPI.getShardName() + "> Automatic heap dump due to low memory");
 
 						// TODO Schedule a restart; details not yet determined, but we don't want to kick people from strikes by accident
 					}
