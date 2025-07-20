@@ -58,6 +58,9 @@ public class MasterworkUtils {
 	private static final String BROWN_FRAG = "epic:r3/fragments/brown_fragment";
 	private static final String BROWN_MAT = "epic:r3/items/currency/broken_god_gearframe";
 
+	private static final String INDIGO_FRAG = "epic:r3/fragments/indigo_tnemgarf";
+	private static final String INDIGO_MAT = "epic:r3/items/currency/crumbled_etiroetem";
+
 	private static final String PORTAL_FRAG = "epic:r3/fragments/companion_fragment";
 	private static final String PORTAL_MAT = "epic:r3/items/currency/corrupted_circuit";
 
@@ -334,6 +337,7 @@ public class MasterworkUtils {
 		MASTERWORK_COSTS.put(Location.SILVER, new Generic(SKT_FRAG, SKT_MAT, Masterwork.II));
 		MASTERWORK_COSTS.put(Location.BLUE, new Generic(BLUE_FRAG, BLUE_MAT, Masterwork.II));
 		MASTERWORK_COSTS.put(Location.BROWN, new Generic(BROWN_FRAG, BROWN_MAT, Masterwork.II));
+		MASTERWORK_COSTS.put(Location.INDIGO, new Generic(INDIGO_FRAG, INDIGO_MAT, Masterwork.III));
 
 		MASTERWORK_COSTS.put(Location.SCIENCE, new Generic(PORTAL_FRAG, PORTAL_MAT, Masterwork.III));
 		MASTERWORK_COSTS.put(Location.BLUESTRIKE, new Generic(MASK_FRAG, MASK_MAT, Masterwork.III));
