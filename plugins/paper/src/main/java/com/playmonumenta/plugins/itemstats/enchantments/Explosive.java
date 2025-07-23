@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.EnumSet;
 import java.util.List;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -32,6 +33,7 @@ public class Explosive implements Enchantment {
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
+	private static final String EXPLODED_THIS_TICK_METADATA = "ExplosiveThisTick";
 
 	@Override
 	public String getName() {
@@ -55,7 +57,7 @@ public class Explosive implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageEvent.DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true) && EntityUtils.isHostileMob(enemy)) {
+		if (event.getType() == DamageEvent.DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true) && EntityUtils.isHostileMob(enemy) && MetadataUtils.checkOnceThisTick(plugin, enemy, EXPLODED_THIS_TICK_METADATA)) {
 			ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(projectile);
 			if (playerItemStats == null) {
 				return;
@@ -89,7 +91,7 @@ public class Explosive implements Enchantment {
 			//Visual feedback
 			float multiplier = 1f;
 			if (AbilityUtils.isVolley(player, projectile)) {
-				multiplier = 0.1f;
+				multiplier = 0.15f;
 			} else if (itemStatsMap.get(EnchantmentType.MULTISHOT) == 1 ) {
 				multiplier = 0.4f;
 			}
