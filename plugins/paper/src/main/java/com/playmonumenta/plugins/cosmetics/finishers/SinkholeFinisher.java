@@ -41,12 +41,15 @@ public class SinkholeFinisher implements EliteFinisher {
 			return;
 		}
 
+		final Location mLoc = killedMob.getLocation().clone();
+		Location antiDivByZero = mLoc.clone();
+		antiDivByZero.setPitch(0);
+		final Vector mDir = antiDivByZero.getDirection();
+		final double mWidth = killedMob.getWidth();
+		final double mHeight = killedMob.getHeight();
+
 		new BukkitRunnable() {
-			final Location mLoc = killedMob.getLocation().clone();
-			final Vector mDir = mLoc.getDirection().setY(0).normalize();
 			int mTicks = 0;
-			final double mWidth = killedMob.getWidth();
-			final double mHeight = killedMob.getHeight();
 			@Nullable LivingEntity mClonedKilledMob;
 
 			final List<ItemDisplay> mMudDisplays = new ArrayList<>();

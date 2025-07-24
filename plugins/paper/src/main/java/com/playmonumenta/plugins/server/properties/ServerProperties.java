@@ -84,6 +84,8 @@ public class ServerProperties {
 	private boolean mTrickyCreepersEnabled = true;
 	private @Nullable String mGameplayDataExportPath = null;
 
+	private JsonObject mDebugParameters = new JsonObject();
+
 	private final Map<String, Integer> mShardCounts = new HashMap<>();
 
 	public ServerProperties() {
@@ -283,6 +285,86 @@ public class ServerProperties {
 		return INSTANCE.mMasterworkRefundEnabled;
 	}
 
+	public static boolean getDebugParameter(String parameterName, boolean defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isBoolean()
+		) {
+			return parameterPrimitive.getAsBoolean();
+		}
+		return defaultValue;
+	}
+
+	public static byte getDebugParameter(String parameterName, byte defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsByte();
+		}
+		return defaultValue;
+	}
+
+	public static short getDebugParameter(String parameterName, short defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsShort();
+		}
+		return defaultValue;
+	}
+
+	public static int getDebugParameter(String parameterName, int defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsInt();
+		}
+		return defaultValue;
+	}
+
+	public static long getDebugParameter(String parameterName, long defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsLong();
+		}
+		return defaultValue;
+	}
+
+	public static float getDebugParameter(String parameterName, float defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsFloat();
+		}
+		return defaultValue;
+	}
+
+	public static double getDebugParameter(String parameterName, double defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsDouble();
+		}
+		return defaultValue;
+	}
+
+	public static String getDebugParameter(String parameterName, String defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isString()
+		) {
+			return parameterPrimitive.getAsString();
+		}
+		return defaultValue;
+	}
+
 	public static int getShardCount(String shard) {
 		return INSTANCE.mShardCounts.getOrDefault(shard, 1);
 	}
@@ -370,6 +452,12 @@ public class ServerProperties {
 			mDepthsEnabled = getPropertyValueBool(object, "depthsEnabled", mDepthsEnabled);
 			mTrickyCreepersEnabled = getPropertyValueBool(object, "trickyCreepersEnabled", mTrickyCreepersEnabled);
 
+			if (!(object.get("debugParameters") instanceof JsonObject debugParameters)) {
+				mDebugParameters = new JsonObject();
+			} else {
+				mDebugParameters = debugParameters;
+			}
+
 			JsonElement shardCounts = object.get("shardCounts");
 			if (shardCounts != null) {
 				mShardCounts.clear();
@@ -440,6 +528,8 @@ public class ServerProperties {
 		out.add("depthsEnabled = " + mDepthsEnabled + " (NB: changing this requires a restart)");
 
 		out.add("trickyCreepersEnabled = " + mTrickyCreepersEnabled);
+
+		out.add("debugParameters = " + mDebugParameters.toString());
 
 		out.add("shardCounts = " + mShardCounts);
 

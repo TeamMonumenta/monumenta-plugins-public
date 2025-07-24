@@ -43,6 +43,7 @@ public class EliteFinishers {
 			.put(FishedUpFinisher.NAME, new FishedUpFinisher())
 			.put(FrozenSolidFinisher.NAME, new FrozenSolidFinisher())
 			.put(GongFinisher.NAME, new GongFinisher())
+			.put(GrindsMyGearsFinisher.NAME, new GrindsMyGearsFinisher())
 			.put(ImplosionFinisher.NAME, new ImplosionFinisher())
 			.put(LightningFinisher.NAME, new LightningFinisher())
 			.put(LocustSwarmFinisher.NAME, new LocustSwarmFinisher())
@@ -51,6 +52,7 @@ public class EliteFinishers {
 			.put(MoneyRainFinisher.NAME, new MoneyRainFinisher())
 			.put(PaintSplashFinisher.NAME, new PaintSplashFinisher())
 			.put(PoultryficationFinisher.NAME, new PoultryficationFinisher())
+			.put(PrideFinisher.NAME, new PrideFinisher())
 			.put(Promenade.NAME, new Promenade())
 			.put(ShootingStarFinisher.NAME, new ShootingStarFinisher())
 			.put(SinkholeFinisher.NAME, new SinkholeFinisher())
@@ -63,7 +65,6 @@ public class EliteFinishers {
 			.put(WarmFireworkFinisher.NAME, new WarmFireworkFinisher())
 			.put(Whirlpool.NAME, new Whirlpool())
 			.put(Woolerman.NAME, new Woolerman())
-			.put(PrideFinisher.NAME, new PrideFinisher())
 			.build();
 
 	// Delegate based on elite finisher name
