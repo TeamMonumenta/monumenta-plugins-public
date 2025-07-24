@@ -48,7 +48,7 @@ public class ChestUtils {
 	public static final NamespacedKey NON_LOOT_LIMITED
 		= Objects.requireNonNull(NamespacedKey.fromString("monumenta:non_looting_limited"));
 	public static final String LOG_SCROLLS_PERMISSION = "monumenta.log.skrscrolls"; // dictates if SKR scrolls are logged or not when obtained
-	public static final boolean LOG_SCROLL_FRAGMENTS = true;
+	public static final boolean LOG_SCROLL_FRAGMENTS = false;
 
 	private static final double[] BONUS_ITEMS = {
 			0, // Dummy value, this is a player count indexed array
