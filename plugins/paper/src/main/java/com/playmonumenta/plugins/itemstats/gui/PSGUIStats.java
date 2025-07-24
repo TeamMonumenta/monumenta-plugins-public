@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Choler;
 import com.playmonumenta.plugins.itemstats.infusions.Decapitation;
 import com.playmonumenta.plugins.itemstats.infusions.Execution;
 import com.playmonumenta.plugins.itemstats.infusions.Fueled;
+import com.playmonumenta.plugins.itemstats.infusions.Orbital;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemstats.infusions.Tenacity;
 import com.playmonumenta.plugins.itemstats.infusions.Vengeful;
@@ -217,6 +218,7 @@ class PSGUIStats {
 		damageMultiplier *= Tenacity.getDamageTakenMultiplier(getInfusion(InfusionType.TENACITY));
 		damageMultiplier *= Carapace.getDamageTakenMultiplier(getInfusion(InfusionType.CARAPACE));
 		damageMultiplier *= Fueled.getDamageTakenMultiplier(getInfusion(InfusionType.FUELED));
+		damageMultiplier *= Orbital.getDamageTakenMultiplier(getInfusion(InfusionType.ORBITAL));
 
 		return damageMultiplier;
 	}

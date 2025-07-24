@@ -65,6 +65,7 @@ public class DelveInfusionUtils {
 		DECAPITATION("decapitation", InfusionType.DECAPITATION, Location.BLUESTRIKE, Material.WITHER_SKELETON_SKULL, "Shattered Masks", NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
 		CELESTIAL("celestial", InfusionType.CELESTIAL, Location.STARPOINT, Material.DEEPSLATE_BRICKS, "Dust of the Herald", NamespacedKeyUtils.fromString("epic:r3/items/currency/dust_of_the_herald"), PlayerUtils.SCOREBOARD_RING_UNLOCK),
 		FERVOR("fervor", InfusionType.FERVOR, Location.HEXFALL, Material.DRAGON_BREATH, "Fragrant Branch of Fen", NamespacedKeyUtils.fromString("epic:r3/items/currency/fragrant_branch_of_fen"), "Ruten"),
+		ORBITAL("orbital" , InfusionType.ORBITAL, Location.INDIGO, Material.PURPLE_CONCRETE_POWDER, "Crumbled Setiroetem", NamespacedKeyUtils.fromString("epic:r3/items/currency/crumbled_etiroetem"), "Indigo"),
 
 		STURDY("sturdy", InfusionType.STURDY, Location.HUNTS, Material.SHIELD, "Hyperchromatic Archos Rings", NamespacedKeyUtils.fromString("epic:r3/items/currency/hyperchromatic_archos_ring"), "HuntsUnspoiledWins"),
 		FREERUNNER("freerunner", InfusionType.FREERUNNER, Location.SKR, Material.FEATHER, "Hyperchromatic Archos Rings", NamespacedKeyUtils.fromString("epic:r3/items/currency/hyperchromatic_archos_ring"), "SKRRoomsCompleted"),

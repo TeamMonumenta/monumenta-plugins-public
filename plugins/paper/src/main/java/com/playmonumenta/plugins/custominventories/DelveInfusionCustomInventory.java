@@ -99,6 +99,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		addItems(DelveInfusionSelection.CELESTIAL, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Celestial.DAMAGE_BONUS_PER_LEVEL * i) + "% additional damage" + perLevel + " to mobs that are at a higher elevation than you.");
 		addItems(DelveInfusionSelection.FERVOR, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Fervor.PERCENT_DAMAGE_PER_LEVEL * i) + "% additional damage" + perLevel + " for 3s after gaining a buff that lasts at least 5s.");
 		addItems(DelveInfusionSelection.STURDY, (i, perLevel) -> "Reduces the duration shields are stunned for by " + StringUtils.multiplierToPercentageWithSign(Sturdy.CDR_PER_LEVEL * i) + perLevel + ".");
+		addItems(DelveInfusionSelection.ORBITAL, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Orbital.DAMAGE_REDUCTION_PER_LEVEL * i) + "% Damage Reduction" + perLevel + " against aerial mobs and knocks them downward.");
 
 		mInvalidItems = Stream.of("helmet", "chestplate", "leggings", "boots", "main hand", "off hand")
 			.map(s -> GUIUtils.createBasicItem(Material.ARMOR_STAND, "Invalid Item", NamedTextColor.GRAY, true, "Your " + s + " can't be infused.", NamedTextColor.DARK_GRAY)).toList();
@@ -173,8 +174,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 		itemPlacements.put(DelveInfusionSelection.SOOTHING, 27);
 		itemPlacements.put(DelveInfusionSelection.FUELED, 28);
-		itemPlacements.put(DelveInfusionSelection.REFRESH, 29);
-		itemPlacements.put(DelveInfusionSelection.FERVOR, 30);
+		itemPlacements.put(DelveInfusionSelection.ORBITAL, 29);
+		itemPlacements.put(DelveInfusionSelection.REFRESH, 30);
+		itemPlacements.put(DelveInfusionSelection.FERVOR, 31);
 
 		itemPlacements.put(DelveInfusionSelection.QUENCH, 36);
 		itemPlacements.put(DelveInfusionSelection.GRACE, 37);

@@ -45,16 +45,17 @@ public enum InfusionType {
 	MITOSIS(new Mitosis(), "", true, false, false, false, true, true, true, false),
 	NATANT(new Natant(), "", true, false, false, false, true, true, true, false),
 	NUTRIMENT(new Nutriment(), "", true, false, false, false, true, true, true, false),
+	ORBITAL(new Orbital(), "", true, false, false, false, true, true, true, false),
 	PENNATE(new Pennate(), "", true, false, false, false, true, true, true, false),
 	QUENCH(new Quench(), "", true, false, false, false, true, true, true, false),
 	REFLECTION(new Reflection(), "", true, false, false, false, true, true, true, false),
 	REFRESH(new Refresh(), "", true, false, false, false, true, true, true, false),
 	SOOTHING(new Soothing(), "", true, false, false, false, true, true, true, false),
+	STURDY(new Sturdy(), "", true, false, false, false, true, true, true, false),
 	UNDERSTANDING(new Understanding(), "", true, false, false, false, true, true, true, false),
 	UNYIELDING(new Unyielding(), "", true, false, false, false, true, true, true, false),
 	USURPER(new Usurper(), "", true, false, false, false, true, true, true, false),
 	VENGEFUL(new Vengeful(), "", true, false, false, false, true, true, true, false),
-	STURDY(new Sturdy(), "", true, false, false, false, true, true, true, false),
 
 	// Other Added Tags
 	LOCKED(new Locked(), "", false, false, false, false, false, false, false, false),
