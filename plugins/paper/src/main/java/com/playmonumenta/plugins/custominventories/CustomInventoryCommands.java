@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.guis.FishingDifficultyGui;
 import com.playmonumenta.plugins.guis.HuntsInfusionGUI;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
 import com.playmonumenta.plugins.guis.MusicGui;
+import com.playmonumenta.plugins.guis.SKRInfusionGUI;
 import com.playmonumenta.plugins.guis.classselection.ClassSelectionGui;
 import com.playmonumenta.plugins.guis.peb.PebGui;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
@@ -436,6 +437,20 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
 				new HuntsInfusionGUI(player).open();
+			})
+			.register();
+		new CommandAPICommand("openskrinfusiongui")
+			.withPermission("monumenta.command.openskrinfusiongui")
+			.executesPlayer((player, args) -> {
+				new SKRInfusionGUI(player).open();
+			})
+			.register();
+		new CommandAPICommand("openskrinfusiongui")
+			.withPermission("monumenta.command.openskrinfusiongui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
+				new SKRInfusionGUI(player).open();
 			})
 			.register();
 	}

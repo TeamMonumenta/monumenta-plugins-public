@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enums;
 
 import com.playmonumenta.plugins.itemstats.ItemStat;
+import com.playmonumenta.plugins.itemstats.enchantments.Freerunner;
 import com.playmonumenta.plugins.itemstats.enchantments.Hexed;
 import com.playmonumenta.plugins.itemstats.infusions.*;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -37,6 +38,7 @@ public enum InfusionType {
 	EXECUTION(new Execution(), "", true, false, false, false, true, true, true, false),
 	EXPEDITE(new Expedite(), "", true, false, false, false, true, true, true, false),
 	FERVOR(new Fervor(), "", true, false, false, false, true, true, true, false),
+	FREERUNNER(new Freerunner(), "", true, false, false, false, true, true, true, false),
 	FUELED(new Fueled(), "", true, false, false, false, true, true, true, false),
 	GALVANIC(new Galvanic(), "", true, false, false, false, true, true, true, false),
 	GRACE(new Grace(), "", true, false, false, false, true, true, true, false),
@@ -53,6 +55,7 @@ public enum InfusionType {
 	USURPER(new Usurper(), "", true, false, false, false, true, true, true, false),
 	VENGEFUL(new Vengeful(), "", true, false, false, false, true, true, true, false),
 	STURDY(new Sturdy(), "", true, false, false, false, true, true, true, false),
+
 	// Other Added Tags
 	LOCKED(new Locked(), "", false, false, false, false, false, false, false, false),
 	ENLIGHTENING(new Enlightening(), "", false, false, false, false, true, false, false, false),

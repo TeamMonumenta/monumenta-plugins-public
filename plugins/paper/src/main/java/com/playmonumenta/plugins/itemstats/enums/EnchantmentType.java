@@ -82,7 +82,6 @@ public enum EnchantmentType {
 	EXPLODING(new Explosive(), true, false, false, true),
 	ICE_ASPECT(new IceAspect(), true, false, false, true),
 	FIRE_ASPECT(new FireAspect(), true, false, false, true),
-	FREERUNNER(new Freerunner(), true, false, false, false),
 	THUNDER_ASPECT(new ThunderAspect(), true, false, false, true),
 	WIND_ASPECT(new WindAspect(), true, false, false, true),
 	EARTH_ASPECT(new EarthAspect(), true, false, false, true),

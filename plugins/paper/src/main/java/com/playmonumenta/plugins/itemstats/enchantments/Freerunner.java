@@ -3,7 +3,9 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.LivingEntity;
@@ -12,7 +14,7 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.EnumSet;
 
-public class Freerunner implements Enchantment {
+public class Freerunner implements Infusion {
 
 	public static final double NEARBY_ENEMY_RANGE = 18;
 
@@ -25,13 +27,8 @@ public class Freerunner implements Enchantment {
 	public String getName() { return "Freerunner"; }
 
 	@Override
-	public EnchantmentType getEnchantmentType() {
-		return EnchantmentType.FREERUNNER;
-	}
-
-	@Override
-	public EnumSet<Slot> getSlots() {
-		return EnumSet.of(Slot.OFFHAND, Slot.MAINHAND, Slot.HEAD, Slot.CHEST, Slot.LEGS, Slot.FEET);
+	public InfusionType getInfusionType() {
+		return InfusionType.FREERUNNER;
 	}
 
 	@Override
