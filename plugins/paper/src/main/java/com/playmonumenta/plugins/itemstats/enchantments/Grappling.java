@@ -137,8 +137,13 @@ public class Grappling implements Enchantment {
 
 		if (event.getHitBlock() != null) {
 			handleBlock(player, level, proj, event.getHitBlock());
-		} else if (event.getHitEntity() != null && event.getHitEntity() instanceof Mob m) {
-			handleMob(player, level, event, proj, m);
+		} else if (event.getHitEntity() != null) {
+			if (event.getHitEntity() instanceof Mob m) {
+				handleMob(player, level, event, proj, m);
+			} else {
+				doFailEffects(player, event.getHitEntity().getLocation());
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> decrementShotsFired(player), COOLDOWN);
+			}
 		}
 	}
 
@@ -283,11 +288,11 @@ public class Grappling implements Enchantment {
 						finalMobGlow.clear();
 					}
 				}
-				if (mTicks >= cooldownRemaining * hz / 20) {
-					mRechargeImmediately = true;
+				if (!hook.isValid()) {
 					this.cancel();
 				}
-				if (!hook.isValid()) {
+				if (mTicks >= cooldownRemaining * hz / 20) {
+					mRechargeImmediately = true;
 					this.cancel();
 				}
 				if (hook.getLocation().distanceSquared(player.getLocation()) < PICKUP_RANGE_SQUARED) {
@@ -432,6 +437,15 @@ public class Grappling implements Enchantment {
 					+ (ScoreboardUtils.getScoreboardValue(player, MAX_CHARGES_SCOREBOARD).orElse(1) - shotsFired + 1),
 				NamedTextColor.YELLOW));
 		}
+	}
+
+	public static void untrackPlayer(Player player) {
+		if (mPlayerHookMap.containsKey(player.getUniqueId())) {
+			mPlayerHookMap.get(player.getUniqueId()).remove();
+			mPlayerHookMap.remove(player.getUniqueId());
+		}
+		mPlayerShotsFiredMap.remove(player.getUniqueId());
+		mPlayerMostRecentPingMap.remove(player.getUniqueId());
 	}
 
 	public static boolean playerHoldingHook(Player player) {
