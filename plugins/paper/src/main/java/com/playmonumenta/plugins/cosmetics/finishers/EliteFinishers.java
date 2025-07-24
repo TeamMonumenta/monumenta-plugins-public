@@ -28,6 +28,7 @@ public class EliteFinishers {
 
 	private static final ImmutableMap<String, EliteFinisher> FINISHERS =
 		ImmutableMap.<String, EliteFinisher>builder()
+			.put(AdvancedAudioMechanism.NAME, new AdvancedAudioMechanism())
 			.put(BirthdayThemeFinisher.NAME, new BirthdayThemeFinisher())
 			.put(CakeifyFinisher.NAME, new CakeifyFinisher())
 			.put(ChainedFinisher.NAME, new ChainedFinisher())
