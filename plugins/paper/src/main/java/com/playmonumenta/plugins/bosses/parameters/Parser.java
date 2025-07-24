@@ -92,6 +92,11 @@ public class Parser {
 		}
 	}
 
+	@FunctionalInterface
+	public interface ClassPredictor<T> {
+		Class<? extends T> predict(Tokens tokens) throws ParseError;
+	}
+
 	private static Type[] getTypeArguments(Type fieldGenericType) {
 		Preconditions.checkArgument(fieldGenericType instanceof ParameterizedType);
 		ParameterizedType parameterizedType = (ParameterizedType) fieldGenericType;
@@ -110,15 +115,17 @@ public class Parser {
 		.put(LoSPool.class, Parser::parseLosPool)
 		.put(ParticlesList.class, tokens -> Result.of(new ParticlesList(parseList(tokens, t -> parseObject(t, ParticlesList.CParticle.class, false)).data)))
 		.put(SoundsList.class, tokens -> Result.of(new SoundsList(parseList(tokens, t -> parseObject(t, SoundsList.CSound.class, false)).data)))
-		.put(EffectsList.class, tokens -> Result.of(new EffectsList(parseList(tokens, t -> parsePredicatedObject(t, () -> {
-			String value = t.peek().getValue();
+		.put(EffectsList.class, tokens -> Result.of(new EffectsList(parseList(tokens, t -> parsePredicatedObject(t, t1 -> {
+			String value = t1.peek().getValue();
 			if (EffectsList.Effect.EFFECT_RUNNER.containsKey(value)) {
 				return EffectsList.CustomEffect.class;
 			} else if (EffectsList.Effect.CUSTOM_EFFECT_RUNNER.containsKey(value)) {
 				return EffectsList.CustomSingleArgumentEffect.class;
-			} else {
+			} else if (getRegistrySuggestions(Registry.POTION_EFFECT_TYPE).contains(value.toLowerCase(Locale.ROOT))){
 				return EffectsList.VanillaEffect.class;
 			}
+			throw new ParseError(String.format("Invalid Effect Type: %s", value), t1.getIndex() + 1, t1)
+				.suggests(EffectsList.Effect.EFFECT_IDENTIFIERS, "Effect Identifiers");
 		}, false)).data)))
 		.put(EntityTargets.class, tokens -> parseObject(tokens, EntityTargets.class, true))
 		.put(BossPhasesList.class, tokens -> Result.of(new BossPhasesList(parseList(tokens, t -> parseObject(t, Phase.class, false)).data)))
@@ -1076,9 +1083,9 @@ public class Parser {
 		return Result.of(value);
 	}
 
-	public static <T> Result<T> parsePredicatedObject(Tokens tokens, Supplier<Class<? extends T>> classGetter, boolean squareBrackets) throws ParseError {
+	public static <T> Result<T> parsePredicatedObject(Tokens tokens, ClassPredictor<T> classGetter, boolean squareBrackets) throws ParseError {
 		tokens.consume(squareBrackets ? Tokens.TokenType.OPEN_SQUARE : Tokens.TokenType.OPEN_ROUND);
-		T value = parseObjectParameters(tokens, classGetter.get(), squareBrackets ? Tokens.TokenType.CLOSE_SQUARE : Tokens.TokenType.CLOSE_ROUND);
+		T value = parseObjectParameters(tokens, classGetter.predict(tokens), squareBrackets ? Tokens.TokenType.CLOSE_SQUARE : Tokens.TokenType.CLOSE_ROUND);
 		tokens.consume(squareBrackets ? Tokens.TokenType.CLOSE_SQUARE : Tokens.TokenType.CLOSE_ROUND);
 		return Result.of(value);
 	}

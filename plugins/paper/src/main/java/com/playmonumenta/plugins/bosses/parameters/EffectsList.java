@@ -1,20 +1,19 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.EffectManager;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
-import com.playmonumenta.plugins.effects.PercentHeal;
-import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.potion.PotionManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import org.bukkit.Registry;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -26,6 +25,8 @@ public class EffectsList {
 		public static final Map<String, EffectRunner> EFFECT_RUNNER;
 		public static final Map<String, CustomEffectRunner> CUSTOM_EFFECT_RUNNER;
 
+		public static final Set<String> EFFECT_IDENTIFIERS;
+
 		protected Effect(String name) {
 			mName = name;
 		}
@@ -33,13 +34,10 @@ public class EffectsList {
 		static {
 			EFFECT_RUNNER = new HashMap<>();
 			EFFECT_RUNNER.put("fire", (p, boss, duration) -> EntityUtils.applyFire(Plugin.getInstance(), (int) duration, p, boss));
-			EFFECT_RUNNER.put("silence", (p, boss, duration) -> {
-				if (p instanceof Player player) {
-					AbilityUtils.silencePlayer(player, (int) duration);
-				} else {
-					EntityUtils.applySilence(Plugin.getInstance(), (int) duration, p);
-				}
-			});
+			EFFECT_RUNNER.put("silence",
+				(target, boss, duration) ->
+					EffectType.applyEffect(EffectType.SILENCE, target, (int) duration, 1, null, false)
+			);
 			EFFECT_RUNNER.put("pullforce", (p, boss, duration) -> MovementUtils.pullTowards(boss, p, duration));
 			EFFECT_RUNNER.put("pull", (p, boss, duration) -> MovementUtils.pullTowardsByUnit(boss, p, duration));
 			EFFECT_RUNNER.put("pushforce", (p, boss, duration) -> MovementUtils.knockAway(boss, p, duration, false));
@@ -47,88 +45,43 @@ public class EffectsList {
 			EFFECT_RUNNER.put("InstantHealthPercent", (target, boss, strength) -> {
 				EffectType.applyEffect(EffectType.INSTANT_HEALTH, target, 1, strength, "EffectListInstantHealthPercent", false);
 			});
+			EFFECT_RUNNER.put("InstantDamagePercent", (target, boss, strength) -> {
+				EffectType.applyEffect(EffectType.INSTANT_DAMAGE, target, 1, strength, "EffectListInstantDamagePercent", false);
+			});
+
 
 			CUSTOM_EFFECT_RUNNER = new HashMap<>();
-			CUSTOM_EFFECT_RUNNER.put("CustomSpeed", (target, boss, duration, strength, effectName) -> {
-				if (EffectManager.getInstance() != null && strength > 0) {
-					if (effectName != null) {
-						EffectManager.getInstance().addEffect(target, effectName, new PercentSpeed((int) duration, strength, effectName));
-					} else {
-						EffectManager.getInstance().addEffect(target, "EffectListCustomSpeed", new PercentSpeed((int) duration, strength, "EffectListCustomSpeed"));
-					}
-				}
-			});
-			CUSTOM_EFFECT_RUNNER.put("CustomSlow", (target, boss, duration, strength, effectName) -> {
-				if (EffectManager.getInstance() != null && strength > 0) {
-					if (effectName != null) {
-						EffectManager.getInstance().addEffect(target, effectName, new PercentSpeed((int) duration, -strength, effectName));
-					} else {
-						EffectManager.getInstance().addEffect(target, "EffectListCustomSlow", new PercentSpeed((int) duration, -strength, "EffectListCustomSlow"));
-					}
-				}
-			});
+			// not a vanilla potion effect or custom implemented effect
+			for (EffectType effectType : EffectType.values()) {
+				if (effectType.getPotionEffectType() == null && !EnumSet.of(
+					EffectType.INSTANT_HEALTH,
+					EffectType.INSTANT_DAMAGE
+				).contains(effectType)) {
 
-			CUSTOM_EFFECT_RUNNER.put("CustomHeal", (target, boss, duration, strength, effectName) -> {
-				if (EffectManager.getInstance() != null && strength > 0) {
-					if (effectName != null) {
-						EffectManager.getInstance().addEffect(target, effectName, new PercentHeal((int) duration, strength));
-					} else {
-						EffectManager.getInstance().addEffect(target, "EffectListCustomHeal", new PercentHeal((int) duration, strength));
+					String type = effectType.getType();
+					if (effectType.isConstant()) {
+						EFFECT_RUNNER.put("Custom" + type,
+							(target, boss, duration) ->
+								EffectType.applyEffect(effectType, target, (int) duration, 1, null, false)
+						);
+					}
+					else {// for some reason DamageIncrease is called 'damage' here?
+						CUSTOM_EFFECT_RUNNER.put("Custom" + (type.equals("damage") ? "DamageIncrease" : type),
+							(target, boss, duration, strength, effectName) ->
+								EffectType.applyEffect(effectType, target, duration, strength, effectName, false)
+						);
 					}
 				}
-			});
+			}
+			// Aliases
+			CUSTOM_EFFECT_RUNNER.put("CustomDamageDecrease", Objects.requireNonNull(CUSTOM_EFFECT_RUNNER.get("CustomWeakness")));
 
-			CUSTOM_EFFECT_RUNNER.put("CustomAntiHeal", (target, boss, duration, strength, effectName) -> {
-				if (EffectManager.getInstance() != null && strength > 0) {
-					if (effectName != null) {
-						target.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, (int) duration, (int) (strength/0.1), true, false, true));
-						EffectManager.getInstance().addEffect(target, effectName, new PercentHeal((int) duration, -strength));
-					} else {
-						target.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, (int) duration, (int) (strength/0.1), true, false, true));
-						EffectManager.getInstance().addEffect(target, "EffectListCustomAntiHeal", new PercentHeal((int) duration, -strength));
-					}
-				}
-			});
-
-			CUSTOM_EFFECT_RUNNER.put("CustomResistance", (target, boss, duration, strength, effectName) -> {
-				if (EffectManager.getInstance() != null && strength > 0) {
-					if (effectName != null) {
-						EffectManager.getInstance().addEffect(target, effectName, new PercentDamageReceived((int) duration, -strength));
-					} else {
-						EffectManager.getInstance().addEffect(target, "EffectListCustomResistance", new PercentDamageReceived((int) duration, -strength));
-					}
-				}
-			});
-
-			CUSTOM_EFFECT_RUNNER.put("CustomVulnerability", (target, boss, duration, strength, effectName) -> {
-				if (EffectManager.getInstance() != null && strength > 0) {
-					if (effectName != null) {
-						EffectManager.getInstance().addEffect(target, effectName, new PercentDamageReceived((int) duration, strength));
-					} else {
-						EffectManager.getInstance().addEffect(target, "EffectListCustomVulnerability", new PercentDamageReceived((int) duration, strength));
-					}
-				}
-			});
-
-			CUSTOM_EFFECT_RUNNER.put("CustomDamageIncrease", (target, boss, duration, strength, effectName) -> {
-				if (EffectManager.getInstance() != null && strength > 0) {
-					if (effectName != null) {
-						EffectManager.getInstance().addEffect(target, effectName, new PercentDamageDealt((int) duration, strength));
-					} else {
-						EffectManager.getInstance().addEffect(target, "EffectListCustomDamageIncrease", new PercentDamageDealt((int) duration, strength));
-					}
-				}
-			});
-
-			CUSTOM_EFFECT_RUNNER.put("CustomDamageDecrease", (target, boss, duration, strength, effectName) -> {
-				if (EffectManager.getInstance() != null && strength > 0) {
-					if (effectName != null) {
-						EffectManager.getInstance().addEffect(target, effectName, new PercentDamageDealt((int) duration, -strength));
-					} else {
-						EffectManager.getInstance().addEffect(target, "EffectListCustomDamageIncrease", new PercentDamageDealt((int) duration, -strength));
-					}
-				}
-			});
+			HashSet<String> hashSet = new HashSet<>(EFFECT_RUNNER.keySet());
+			hashSet.addAll(CUSTOM_EFFECT_RUNNER.keySet());
+			for (PotionEffectType potionEffectType : Registry.POTION_EFFECT_TYPE) {
+				hashSet.add(potionEffectType.getKey().getKey());
+			}
+			EFFECT_IDENTIFIERS = hashSet;
 		}
 
 		public final String mName;
@@ -147,7 +100,7 @@ public class EffectsList {
 
 		@FunctionalInterface
 		public interface CustomEffectRunner {
-			void apply(LivingEntity p, LivingEntity boss, float duration, float strength, @Nullable String customEffectName);
+			void apply(LivingEntity p, LivingEntity boss, int duration, float strength, @Nullable String customEffectName);
 		}
 	}
 
