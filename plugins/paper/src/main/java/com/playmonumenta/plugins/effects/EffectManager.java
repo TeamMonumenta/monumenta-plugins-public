@@ -97,12 +97,7 @@ public final class EffectManager implements Listener {
 			return e == null ? Bukkit.getPlayer(mEntityUuid) : e;
 		}
 
-		public boolean addEffect(String source, Effect effect) {
-			final Entity entity = getEntity();
-			if (entity == null) {
-				return false;
-			}
-
+		public boolean addEffect(String source, Entity entity, Effect effect) {
 			boolean wasUpdated = false;
 			if (effect.mUsed) {
 				// Each entity must have their own instance of an effect, they cannot be shared
@@ -236,11 +231,7 @@ public final class EffectManager implements Listener {
 			return false;
 		}
 
-		public @Nullable NavigableSet<Effect> clearEffects(String source) {
-			final Entity entity = getEntity();
-			if (entity == null) {
-				return null;
-			}
+		public @Nullable NavigableSet<Effect> clearEffects(String source, Entity entity) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
 				NavigableSet<Effect> removedEffectGroup = priorityEffects.remove(source);
 				if (removedEffectGroup != null) {
@@ -252,11 +243,7 @@ public final class EffectManager implements Listener {
 			return null;
 		}
 
-		public void clearEffects() {
-			final Entity entity = getEntity();
-			if (entity == null) {
-				return;
-			}
+		public void clearEffects(Entity entity) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
 				for (NavigableSet<Effect> removedEffect : priorityEffects.values()) {
 					removedEffect.last().entityLoseEffect(entity);
@@ -604,7 +591,7 @@ public final class EffectManager implements Listener {
 			effect = event.getEffect();
 
 			Effects effects = mEntities.computeIfAbsent(entity.getUniqueId(), Effects::new);
-			if (effects.addEffect(source, effect)) {
+			if (effects.addEffect(source, entity, effect)) {
 				ClientModHandler.updateEffect(entity, effect, source, false);
 			}
 		}
@@ -767,7 +754,7 @@ public final class EffectManager implements Listener {
 	public @Nullable NavigableSet<Effect> clearEffects(Entity entity, String source) {
 		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
-			NavigableSet<Effect> removedEffects = effects.clearEffects(source);
+			NavigableSet<Effect> removedEffects = effects.clearEffects(source, entity);
 			if (entity instanceof Player player
 				&& removedEffects != null) {
 				for (Effect effect : removedEffects) {
@@ -788,7 +775,7 @@ public final class EffectManager implements Listener {
 	public void clearEffects(Entity entity) {
 		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
-			effects.clearEffects();
+			effects.clearEffects(entity);
 			if (entity instanceof Player player) {
 				ClientModHandler.updateEffects(player);
 			}
