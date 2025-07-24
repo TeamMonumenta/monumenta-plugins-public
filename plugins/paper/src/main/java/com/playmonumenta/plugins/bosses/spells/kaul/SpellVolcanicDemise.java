@@ -216,13 +216,18 @@ public class SpellVolcanicDemise extends Spell {
 					.distanceFalloff(20).spawnAsBoss();
 				mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.9f);
 
-				Hitbox deathBox = new Hitbox.UprightCylinderHitbox(mLoc, 7, DEATH_RADIUS);
-				Hitbox hitBox = new Hitbox.UprightCylinderHitbox(mLoc, 15, HIT_RADIUS);
+				// Meteor should deal 1000 blast damage if you're in the 2 block death cylinder
+				// If you're clipped by the edge it deals less
+				Location mLowerLoc = mLoc.clone().add(0, -8, 0);
+				// The hitbox should start 8 blocks below the ground, so it can hit players in the ground.
+				Hitbox deathBox = new Hitbox.UprightCylinderHitbox(mLowerLoc, 15, DEATH_RADIUS);
+				Hitbox hitBox = new Hitbox.UprightCylinderHitbox(mLowerLoc, 23, HIT_RADIUS);
 				List<Player> hitPlayers = new ArrayList<>(hitBox.getHitPlayers(true));
+				List<Player> deathPlayers = new ArrayList<>(deathBox.getHitPlayers(true));
 
 				// Death Zone
-				for (Player player : deathBox.getHitPlayers(true)) {
-					DamageUtils.damage(mBoss, player, DamageType.BLAST, 1000, null, false, true, SPELL_NAME);
+				for (Player player : deathPlayers) {
+					DamageUtils.damage(mBoss, player, DamageType.BLAST, 1000, null, true, true, SPELL_NAME);
 					MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
 					hitPlayers.remove(player);
 				}
