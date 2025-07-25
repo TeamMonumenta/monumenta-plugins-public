@@ -130,7 +130,7 @@ public class ShardHealthManager {
 		Audience finalAudience = audience;
 
 		if (minTargetHealth == null) {
-			minTargetHealth = ShardHealth.unacceptableTargetHealth();
+			minTargetHealth = ShardHealth.zeroHealth();
 		}
 		ShardHealth finalMinTargetHealth = minTargetHealth;
 

@@ -71,7 +71,7 @@ public class SpellSystemMonitorDisplay extends Spell {
 			ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shard);
 			final var gcHealth = Objects.requireNonNullElse(
 				shardHealth.gcHealth(),
-				new G1GcHealth(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+				G1GcHealth.zeroHealth()
 			);
 
 			final var entries = new ArrayList<>(List.of(

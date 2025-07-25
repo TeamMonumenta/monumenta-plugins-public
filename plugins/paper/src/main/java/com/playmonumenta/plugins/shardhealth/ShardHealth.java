@@ -42,25 +42,21 @@ public class ShardHealth implements ComponentLike {
 		Iterator<ShardHealth> previousHealthIt = ShardHealthManager.previousInstantHealthIterator();
 		int remainingTicks = ticks;
 		int actualTicks = 0;
-		double aveMem = 0.0;
-		double aveTickUnused = 0.0;
+		ShardHealth averageHealth = zeroHealth();
 		while (remainingTicks > 0 && previousHealthIt.hasNext()) {
 			remainingTicks--;
 			actualTicks++;
 			ShardHealth prevHealth = previousHealthIt.next();
-			aveMem += prevHealth.mMemoryHealth;
-			aveTickUnused += prevHealth.mTickHealth;
+			averageHealth.add(prevHealth);
 		}
 
 		if (actualTicks <= 0) {
 			actualTicks = 1;
 		}
 
-		return new ShardHealth(
-			aveMem / actualTicks,
-			aveTickUnused / actualTicks,
-			null
-		);
+		averageHealth.divide(actualTicks);
+
+		return averageHealth;
 	}
 
 	/**
@@ -80,15 +76,15 @@ public class ShardHealth implements ComponentLike {
 		return new ShardHealth(
 			0.3,
 			0.7,
-			null
+			G1GcHealth.defaultTargetHealth()
 		);
 	}
 
-	public static ShardHealth unacceptableTargetHealth() {
+	public static ShardHealth zeroHealth() {
 		return new ShardHealth(
 			0.0,
 			0.0,
-			null
+			G1GcHealth.zeroHealth()
 		);
 	}
 
@@ -133,6 +129,26 @@ public class ShardHealth implements ComponentLike {
 		}
 
 		return result;
+	}
+
+	protected void add(ShardHealth other) {
+		mMemoryHealth += other.mMemoryHealth;
+		mTickHealth += other.mTickHealth;
+		if (other.mGcHealth != null) {
+			if (mGcHealth == null) {
+				mGcHealth = other.mGcHealth;
+			} else {
+				mGcHealth = mGcHealth.add(other.mGcHealth);
+			}
+		} // else GcHealth is the same anyways
+	}
+
+	protected void divide(int divisor) {
+		mMemoryHealth /= divisor;
+		mTickHealth /= divisor;
+		if (mGcHealth != null) {
+			mGcHealth = mGcHealth.divide(divisor);
+		}
 	}
 
 	public double memoryHealth() {

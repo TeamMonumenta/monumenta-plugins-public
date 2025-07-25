@@ -26,6 +26,28 @@ public record G1GcHealth(
 	double averageOverallFreed,
 	double averageOverallTime
 ) {
+	public static G1GcHealth defaultTargetHealth() {
+		// TODO Set actual default values
+		return zeroHealth();
+	}
+
+	public static G1GcHealth zeroHealth() {
+		return new G1GcHealth(
+			0.0,
+			0.0,
+			0.0,
+			0.0,
+			0.0,
+			0.0,
+			0.0,
+			0.0,
+			0.0,
+			0.0,
+			0.0,
+			0.0
+		);
+	}
+
 	@Nullable
 	public static G1GcHealth fromJson(@Nullable JsonElement element) {
 		if (!(element instanceof JsonObject object)) {
@@ -65,5 +87,42 @@ public record G1GcHealth(
 		}
 
 		return object;
+	}
+
+	public G1GcHealth add(@Nullable G1GcHealth other) {
+		if (other == null) {
+			return this;
+		}
+		return new G1GcHealth(
+			oldGenCycleInInterval + other.oldGenCycleInInterval,
+			averageOldGenFreed + other.averageOldGenFreed,
+			averageOldGenTime + other.averageOldGenTime,
+			youngGenCycleInInterval + other.youngGenCycleInInterval,
+			averageYoungGenFreed + other.averageYoungGenFreed,
+			averageYoungGenTime + other.averageYoungGenTime,
+			concurrentCycleInInterval + other.concurrentCycleInInterval,
+			averageConcurrentFreed + other.averageConcurrentFreed,
+			averageConcurrentTime + other.averageConcurrentTime,
+			overallCyclesInInterval + other.overallCyclesInInterval,
+			averageOverallFreed + other.averageOverallFreed,
+			averageOverallTime + other.averageOverallTime
+		);
+	}
+
+	public G1GcHealth divide(int divisor) {
+		return new G1GcHealth(
+			oldGenCycleInInterval / divisor,
+			averageOldGenFreed / divisor,
+			averageOldGenTime / divisor,
+			youngGenCycleInInterval / divisor,
+			averageYoungGenFreed / divisor,
+			averageYoungGenTime / divisor,
+			concurrentCycleInInterval / divisor,
+			averageConcurrentFreed / divisor,
+			averageConcurrentTime / divisor,
+			overallCyclesInInterval / divisor,
+			averageOverallFreed / divisor,
+			averageOverallTime / divisor
+		);
 	}
 }

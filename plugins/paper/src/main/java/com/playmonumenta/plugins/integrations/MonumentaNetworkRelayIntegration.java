@@ -212,7 +212,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 
 		MonumentaNetworkRelayIntegration instance = INSTANCE;
 		if (instance == null) {
-			return ShardHealth.unacceptableTargetHealth();
+			return ShardHealth.zeroHealth();
 		}
 
 		JsonObject remoteMainPluginHeartbeatData
@@ -224,7 +224,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 			return ShardHealth.fromJson(shardHealthJson);
 		}
 
-		return ShardHealth.unacceptableTargetHealth();
+		return ShardHealth.zeroHealth();
 	}
 
 	// TAB stuff
