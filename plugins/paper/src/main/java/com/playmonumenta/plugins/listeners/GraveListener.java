@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.itemstats.enums.PickupFilterResult;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -258,7 +259,8 @@ public class GraveListener implements Listener {
 			case NONE, ZERO, I, II, III, KEYTIER, QUEST_COMPASS -> false;
 			// Do not grave Carriers of Explosions unless they carry contents that can grave
 			case SHULKER_BOX -> PickupFilterResult.TIERED.equals(PickupFilterResult.getFilterResult(item));
-			default -> true;
+			// Do not grave if item has Special Lore ("Taking this item outside of the dungeon..."), else, do grave
+			default -> !InventoryUtils.containsSpecialLore(item);
 		};
 	}
 
