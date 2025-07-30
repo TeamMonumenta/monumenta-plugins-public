@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
+import com.playmonumenta.networkrelay.shardhealth.ShardHealthManager;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.shardhealth.ShardHealthManager;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.worlds.paper.MonumentaWorldManagementAPI;

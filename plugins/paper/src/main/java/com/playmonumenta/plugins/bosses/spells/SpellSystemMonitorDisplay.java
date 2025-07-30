@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
+import com.playmonumenta.networkrelay.shardhealth.ShardHealth;
+import com.playmonumenta.networkrelay.shardhealth.g1.G1GcHealth;
 import com.playmonumenta.plugins.bosses.bosses.SystemMonitorDisplayBoss;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
-import com.playmonumenta.plugins.shardhealth.ShardHealth;
-import com.playmonumenta.plugins.shardhealth.g1.G1GcHealth;
 import com.playmonumenta.plugins.utils.TableFormatter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
