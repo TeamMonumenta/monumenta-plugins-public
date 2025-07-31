@@ -249,7 +249,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 							continue;
 						}
 						final int reducedCD = Math.min((int) (ability.getModifiedCooldown() * mEnhanceCDR), mEnhanceCDRCap);
-						mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, reducedCD);
+						mPlugin.mTimers.updateCooldown(player, linkedSpell, reducedCD);
 					}
 
 					mCosmetic.enhanceCDR(player);
