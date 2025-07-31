@@ -133,11 +133,10 @@ public class SpawnerUtils {
 	 */
 	public static boolean tryBreakSpawner(Block block, int damage, boolean tryBreak) {
 		// start ensnare if needed
-		if (getSpawnerType(block, ENSNARED_ATTRIBUTE) > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
-			List<Entity> nearbyEntities = (List<Entity>) block.getWorld().getNearbyEntities(block.getLocation().clone().add(0.5, 0.5, 0.5), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE));
-			boolean hasNearbyMobs = nearbyEntities.stream()
-				.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && entity.isValid());
-			if (hasNearbyMobs) {
+		int ensnared = getSpawnerType(block, ENSNARED_ATTRIBUTE);
+		if (ensnared > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
+			List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(block.getLocation().clone().add(0.5, 0.5, 0.5), ensnared);
+			if (nearbyEntities.stream().anyMatch(e -> !e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))) {
 				block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.75f, 2f);
 				startEnsnarementCheck(block);
 			}
