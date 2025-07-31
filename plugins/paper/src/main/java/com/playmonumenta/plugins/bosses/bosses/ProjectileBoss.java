@@ -185,7 +185,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 			//same object
 			//probably an older mob version?
 			//build a new target from others config
-			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 			//by default ProjectileBoss doesn't take player in stealth and need line of sight.
 		}
 

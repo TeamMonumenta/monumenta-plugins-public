@@ -50,7 +50,7 @@ public class AbhorrentHallucinationBoss extends BossAbilityGroup {
 
 		SpellManager spellManager = new SpellManager(List.of(
 			new SpellThrowSummon(
-				plugin, boss, new EntityTargets(EntityTargets.TARGETS.PLAYER, 100, false),
+				plugin, boss, new EntityTargets(EntityTargets.TARGETS.PLAYER, 100, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED)),
 				1, 8 * 20, "~FacelessArmada",
 				true, 3, 0, 1.0f,
 				25, 0, 0.8, 200,

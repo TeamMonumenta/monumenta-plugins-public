@@ -66,45 +66,38 @@ public class EntityTargets implements Cloneable {
 	 */
 
 	public interface EntityFinder {
-		List<? extends LivingEntity> getTargets(LivingEntity launcher, Location loc, double range, boolean optional);
+		List<? extends LivingEntity> getTargets(LivingEntity launcher, Location loc, double range);
 	}
 
 	//enum don't works with generics
 	public enum TARGETS implements EntityFinder {
 		PLAYER {
 			@Override
-			public List<Player> getTargets(LivingEntity launcher, Location loc, double range, boolean includeNonTargetable) {
-				return PlayerUtils.playersInRange(loc, range, includeNonTargetable);
+			public List<Player> getTargets(LivingEntity launcher, Location loc, double range) {
+				return PlayerUtils.playersInRange(loc, range, true);
 			}
 		},
 		MOB {
 			@Override
-			public List<LivingEntity> getTargets(LivingEntity launcher, Location loc, double range, boolean notIncludeLauncher) {
-				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, range, launcher);
-				if (!notIncludeLauncher) {
-					mobs.add(launcher);
-				}
-				return mobs;
+			public List<LivingEntity> getTargets(LivingEntity launcher, Location loc, double range) {
+				return EntityUtils.getNearbyMobs(loc, range);
 			}
 		},
 		ENTITY {
 			@Override
-			public List<LivingEntity> getTargets(LivingEntity launcher, Location loc, double range, boolean notIncludeLauncher) {
+			public List<LivingEntity> getTargets(LivingEntity launcher, Location loc, double range) {
 				Collection<Entity> entities = loc.getWorld().getNearbyEntities(loc, range, range, range);
-				if (notIncludeLauncher) {
-					entities.remove(launcher);
-				}
 				entities.removeIf(entity -> !(entity instanceof LivingEntity));
 				List<LivingEntity> entitiesList = new ArrayList<>(entities.size());
 				for (Entity entity : entities) {
-					entitiesList.add((LivingEntity)entity);
+					entitiesList.add((LivingEntity) entity);
 				}
 				return entitiesList;
 			}
 		},
 		SELF {
 			@Override
-			public List<LivingEntity> getTargets(LivingEntity launcher, Location notUsed, double notUsed2, boolean notUsed3) {
+			public List<LivingEntity> getTargets(LivingEntity launcher, Location notUsed, double notUsed2) {
 				return List.of(launcher);
 			}
 		};
@@ -204,6 +197,12 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return launcher.hasLineOfSight(entity);
 			}
+		},
+		NOT_STEALTHED {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return !(entity instanceof Player p && AbilityUtils.isStealthed(p));
+			}
 		};
 
 	}
@@ -233,6 +232,12 @@ public class EntityTargets implements Cloneable {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return launcher.hasLineOfSight(entity);
+			}
+		},
+		NOT_SELF {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return !launcher.equals(entity);
 			}
 		};
 
@@ -448,13 +453,13 @@ public class EntityTargets implements Cloneable {
 	}
 
 
-	public static final EntityTargets GENERIC_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_PLAYER_TARGET_LINE_OF_SIGHT = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.DEFAULT, List.of(PLAYERFILTER.HAS_LINEOFSIGHT), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_MOB_TARGET = new EntityTargets(TARGETS.MOB, 30, true, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_SELF_TARGET = new EntityTargets(TARGETS.SELF, 0, false, Limit.DEFAULT, new ArrayList<>(), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_ONE_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.DEFAULT_ONE, new ArrayList<>(), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_ONE_PLAYER_CLOSER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.CLOSER_ONE, new ArrayList<>(), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_ONE_PLAYER_CLOSER_TARGET_LINE_OF_SIGHT = new EntityTargets(TARGETS.PLAYER, 30, true, Limit.CLOSER_ONE, List.of(PLAYERFILTER.HAS_LINEOFSIGHT), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, Limit.DEFAULT, List.of(), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_PLAYER_TARGET_LINE_OF_SIGHT = new EntityTargets(TARGETS.PLAYER, 30, Limit.DEFAULT, List.of(PLAYERFILTER.HAS_LINEOFSIGHT), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_MOB_TARGET = new EntityTargets(TARGETS.MOB, 30, Limit.DEFAULT, List.of(MOBFILTER.NOT_SELF), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_SELF_TARGET = new EntityTargets(TARGETS.SELF, 0, Limit.DEFAULT, List.of(), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_ONE_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, Limit.DEFAULT_ONE, List.of(), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_ONE_PLAYER_CLOSER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, Limit.CLOSER_ONE, List.of(), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_ONE_PLAYER_CLOSER_TARGET_LINE_OF_SIGHT = new EntityTargets(TARGETS.PLAYER, 30, Limit.CLOSER_ONE, List.of(PLAYERFILTER.HAS_LINEOFSIGHT), TagsListFiter.DEFAULT);
 
 	private static final String LIMIT_STRING = "limit=";
 	private static final String FILTERS_STRING = "filters=";
@@ -462,36 +467,30 @@ public class EntityTargets implements Cloneable {
 
 	private final TARGETS mTargets;
 	private double mRange;
-	private Boolean mOptional = true;
 	private Limit mLimit;
 	private Collection<EntityFilter> mFilters;
 	private TagsListFiter mTagsFilter;
 
 
 	public EntityTargets(TARGETS targets, double range) {
-		this(targets, range, true);
+		this(targets, range, Limit.DEFAULT);
 	}
 
-	public EntityTargets(TARGETS targets, double range, boolean optional) {
-		this(targets, range, optional, Limit.DEFAULT);
+	public EntityTargets(TARGETS targets, double range, Limit limit) {
+		this(targets, range, limit, List.of());
 	}
 
-	public EntityTargets(TARGETS targets, double range, boolean optional, Limit limit) {
-		this(targets, range, optional, limit, new ArrayList<>());
+	public EntityTargets(TARGETS targets, double range, Limit limit, List<EntityFilter> filters) {
+		this(targets, range, limit, filters, TagsListFiter.DEFAULT);
 	}
 
-	public EntityTargets(TARGETS targets, double range, boolean optional, Limit limit, List<EntityFilter> filters) {
-		this(targets, range, optional, limit, filters, TagsListFiter.DEFAULT);
+	public EntityTargets(TARGETS targets, double range, Limit.LIMITSENUM limitsenum, Limit.SORTING sorting, @Nullable List<EntityFilter> filters, List<String> tagsListFilter) {
+		this(targets, range, new Limit(limitsenum, sorting), filters == null ? List.of() : filters, new TagsListFiter(new HashSet<>(tagsListFilter)));
 	}
 
-	public EntityTargets(TARGETS targets, double range, boolean optional, Limit.LIMITSENUM limitsenum, Limit.SORTING sorting, @Nullable List<EntityFilter> filters, List<String> tagsListFilter) {
-		this(targets, range, optional, new Limit(limitsenum, sorting), filters == null ? List.of() : filters, new TagsListFiter(new HashSet<>(tagsListFilter)));
-	}
-
-	public EntityTargets(TARGETS targets, double range, boolean optional, Limit limit, Collection<EntityFilter> filters, TagsListFiter tagsfilter) {
+	public EntityTargets(TARGETS targets, double range, Limit limit, Collection<EntityFilter> filters, TagsListFiter tagsfilter) {
 		mTargets = targets;
 		mRange = range;
-		mOptional = optional;
 		mLimit = limit;
 		mFilters = filters;
 		mTagsFilter = tagsfilter;
@@ -499,7 +498,7 @@ public class EntityTargets implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "[" + mTargets.name() + "," + mRange + "," + mOptional.toString() + "," + LIMIT_STRING + mLimit.toString() + "," + FILTERS_STRING + mFilters + "," + TAGS_FILTER_STRING + mTagsFilter.toString() + "]";
+		return "[" + mTargets.name() + "," + mRange + "," + LIMIT_STRING + mLimit.toString() + "," + FILTERS_STRING + mFilters + "," + TAGS_FILTER_STRING + mTagsFilter.toString() + "]";
 	}
 
 	public List<? extends LivingEntity> getTargetsList(LivingEntity boss) {
@@ -507,7 +506,7 @@ public class EntityTargets implements Cloneable {
 	}
 
 	public List<? extends LivingEntity> getTargetsListByLocation(LivingEntity boss, Location loc) {
-		List<? extends LivingEntity> list = mTargets.getTargets(boss, loc, mRange, mOptional);
+		List<? extends LivingEntity> list = mTargets.getTargets(boss, loc, mRange);
 
 		if (!mTagsFilter.mTags.isEmpty() || !mFilters.isEmpty()) {
 			for (LivingEntity entity : new ArrayList<>(list)) {
@@ -541,11 +540,6 @@ public class EntityTargets implements Cloneable {
 		return this;
 	}
 
-	public EntityTargets setOptional(boolean opt) {
-		mOptional = opt;
-		return this;
-	}
-
 	public EntityTargets setLimit(Limit limit) {
 		mLimit = limit;
 		return this;
@@ -558,7 +552,7 @@ public class EntityTargets implements Cloneable {
 
 	@Override
 	public EntityTargets clone() {
-		return new EntityTargets(mTargets, mRange, mOptional, mLimit, mFilters, mTagsFilter);
+		return new EntityTargets(mTargets, mRange, mLimit, mFilters, mTagsFilter);
 	}
 
 	public List<Location> getTargetsLocationList(LivingEntity boss) {

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellRam;
 import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.List;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -81,7 +82,7 @@ public class RamBoss extends BossAbilityGroup {
 		@BossParam(help = "Distance to the target location which would automatically cancel the spell")
 		public double END_DISTANCE_THRESHOLD = 2.5;
 		@BossParam(help = "Targets for person targeted by ram")
-		public EntityTargets TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, 30, false, new EntityTargets.Limit(1, EntityTargets.Limit.SORTING.FARTHER));
+		public EntityTargets TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, 30, new EntityTargets.Limit(1, EntityTargets.Limit.SORTING.FARTHER), List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 	}
 
 	Parameters mParameters = new Parameters();

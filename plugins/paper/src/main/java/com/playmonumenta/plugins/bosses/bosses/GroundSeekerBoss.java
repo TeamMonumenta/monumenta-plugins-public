@@ -39,7 +39,7 @@ public class GroundSeekerBoss extends BossAbilityGroup {
 		@BossParam(help = "name of this spell")
 		public String SPELL_NAME = "Ground Seeker";
 		@BossParam(help = "targets of the spell")
-		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.setOptional(false);
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.clone().setFilters(List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 		@BossParam(help = "spell delay")
 		public int SPELL_DELAY = 2 * 20;
 		@BossParam(help = "whether the mob can move while charging up or not")

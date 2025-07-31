@@ -30,7 +30,7 @@ public class DamageTransferBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "targeted entity/entities. don't have 2 mobs target each other with this ability (it can crash the shard)")
-		public EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.setRange(15);
+		public EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.clone().setRange(15);
 		@BossParam(help = "detection radius")
 		public int DETECTION = 30;
 

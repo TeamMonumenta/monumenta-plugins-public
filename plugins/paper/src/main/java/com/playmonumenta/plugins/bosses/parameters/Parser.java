@@ -320,7 +320,6 @@ public class Parser {
 		.put(EntityTargets.class, () -> ObjectConstructor.builder()
 			.put("type", (tokens, parameters) -> parseEnum(tokens, EntityTargets.TARGETS.class))
 			.put("range", ParameterParserMethod.of(Parser::parseDouble), 10.0)
-			.put("optional", ParameterParserMethod.of(Parser::parseBoolean), true, false)
 			.put("limit", (tokens, parameters) -> parseObject(tokens, EntityTargets.Limit.class, false), EntityTargets.Limit.DEFAULT, false)
 			.put("filters", (tokens, parameters) -> {
 				EntityTargets.TARGETS targets = (EntityTargets.TARGETS) parameters.nonNullValue("type");
@@ -347,7 +346,6 @@ public class Parser {
 				new EntityTargets(
 					(EntityTargets.TARGETS) parameters.nonNullValue("type"),
 					(Double) parameters.nonNullValue("range"),
-					(Boolean) parameters.nonNullValue("optional"),
 					(EntityTargets.Limit) parameters.nonNullValue("limit"),
 					(Collection<EntityTargets.EntityFilter>) parameters.nonNullValue("filters"),
 					new EntityTargets.TagsListFiter((Set<String>) parameters.nonNullValue("tags"))

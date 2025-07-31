@@ -83,7 +83,7 @@ public class ProjectileEntityBoss extends BossAbilityGroup {
 		public double SPEED_BLOCK = 1;
 
 		@BossParam(help = "Conditions to choose valid entities of this spell")
-		public EntityTargets TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, 40, false, new EntityTargets.Limit(EntityTargets.Limit.LIMITSENUM.ALL), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+		public EntityTargets TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, 40, new EntityTargets.Limit(EntityTargets.Limit.LIMITSENUM.ALL), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 
 		@BossParam(help = "If the casting boss gets interrupted (ie. death, stunned), should the projectile linger?")
 		public boolean LINGERS = true;

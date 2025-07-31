@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -63,7 +62,7 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		public EntityTargets BOMB_TARGET = EntityTargets.GENERIC_ONE_PLAYER_TARGET.clone().setFilters(List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
 
 		@BossParam(help = "Determines which nearby players should be hit by the explosion and the radius of the lingering")
-		public EntityTargets EXPLOSION_TARGET = new EntityTargets(EntityTargets.TARGETS.PLAYER, 3, true, EntityTargets.Limit.DEFAULT, new ArrayList<>(), EntityTargets.TagsListFiter.DEFAULT);
+		public EntityTargets EXPLOSION_TARGET = new EntityTargets(EntityTargets.TARGETS.PLAYER, 3, EntityTargets.Limit.DEFAULT, List.of(), EntityTargets.TagsListFiter.DEFAULT);
 
 		@BossParam(help = "Particles played when a bomb is thrown")
 		public ParticlesList PARTICLE_LAUNCH = ParticlesList.EMPTY;

@@ -38,7 +38,7 @@ public class SpellAxtalTotem extends Spell {
 			@Override
 			public void run() {
 				List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
-				EntityTargets target = EntityTargets.GENERIC_ONE_PLAYER_TARGET.setOptional(false).setRange(mRange);
+				EntityTargets target = EntityTargets.GENERIC_ONE_PLAYER_TARGET.clone().setFilters(List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED)).setRange(mRange);
 				int count = (int) Math.min(Math.ceil(players.size() / 2.0) + 1, 6);
 				String summonPool = "~ExAxtalTotem";
 				double distanceScalar = 0.95;

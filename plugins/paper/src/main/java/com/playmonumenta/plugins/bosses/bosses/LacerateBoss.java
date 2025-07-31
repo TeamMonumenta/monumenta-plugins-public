@@ -171,7 +171,7 @@ public class LacerateBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT) {
-			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RANGE, false, EntityTargets.Limit.DEFAULT_ONE, p.LINE_OF_SIGHT ? List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT) : Collections.emptyList());
+			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RANGE, EntityTargets.Limit.DEFAULT_ONE, p.LINE_OF_SIGHT ? List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED) : Collections.emptyList());
 		}
 
 		Spell spell = new SpellLacerate(plugin, boss, p);

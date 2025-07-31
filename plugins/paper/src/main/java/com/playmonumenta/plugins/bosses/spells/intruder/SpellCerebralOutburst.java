@@ -63,7 +63,7 @@ public class SpellCerebralOutburst extends SpellOmen {
 		mP.PARTICLE_GAP_TEL = 0.1;
 		mP.WIDTH = 10;
 		mP.DEGREE_OFFSET = 0;
-		mP.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, 100.0, true, new EntityTargets.Limit(EntityTargets.Limit.LIMITSENUM.ALL, EntityTargets.Limit.SORTING.CLOSER));
+		mP.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, 100.0, new EntityTargets.Limit(EntityTargets.Limit.LIMITSENUM.ALL, EntityTargets.Limit.SORTING.CLOSER));
 		mP.DAMAGE = enhanced ? 75 : 65;
 		mP.TEL_DURATION = 2 * 20;
 		mP.COOLDOWN = enhanced ? 5 * 20 : 10 * 20;

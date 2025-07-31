@@ -61,7 +61,7 @@ public class VesperidysVoidCrystalDawn extends BossAbilityGroup {
 	private static final int PARTICLE_RADIUS = 10;
 	private static final boolean CAN_MOVE = false;
 	private static final boolean OVERHEAL = true;
-	private final EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.clone().setOptional(false);
+	private final EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.clone();
 	private static final ParticlesList PARTICLE_CHARGE_AIR = ParticlesList.builder()
 		.add(new ParticlesList.CParticle(Particle.SPELL_INSTANT, 3))
 		.build();

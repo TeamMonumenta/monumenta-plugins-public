@@ -45,7 +45,7 @@ public class SpellTpBehindPlayer extends Spell {
 		mParameters.DELAY = delay;
 		mParameters.STUN = stun;
 		mParameters.PREFER_TARGET = !random;
-		mParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, range, false, new EntityTargets.Limit(EntityTargets.Limit.LIMITSENUM.ALL, EntityTargets.Limit.SORTING.RANDOM));
+		mParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, range, new EntityTargets.Limit(EntityTargets.Limit.LIMITSENUM.ALL, EntityTargets.Limit.SORTING.RANDOM), List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 	}
 
 	@Override

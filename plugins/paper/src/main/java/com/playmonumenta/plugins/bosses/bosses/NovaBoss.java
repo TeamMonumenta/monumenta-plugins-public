@@ -95,7 +95,7 @@ public final class NovaBoss extends BossAbilityGroup {
 			//same object
 			//probably an older mob version?
 			//build a new target from others config
-			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.RADIUS, true);
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.RADIUS, EntityTargets.Limit.DEFAULT);
 			//by default LaserBoss take player in stealth.
 		} else {
 			p.NEED_LINE_OF_SIGHT = false;

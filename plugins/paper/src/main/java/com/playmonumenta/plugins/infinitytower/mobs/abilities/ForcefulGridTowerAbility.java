@@ -33,9 +33,9 @@ public class ForcefulGridTowerAbility extends TowerAbility {
 		EntityTargets targets;
 
 		if (isPlayerMob) {
-			targets = new EntityTargets(EntityTargets.TARGETS.MOB, 100, false, new EntityTargets.Limit(1, EntityTargets.Limit.SORTING.FARTHER), List.of(), new EntityTargets.TagsListFiter(new HashSet<>(List.of(TowerConstants.MOB_TAG_FLOOR_TEAM))));
+			targets = new EntityTargets(EntityTargets.TARGETS.MOB, 100, new EntityTargets.Limit(1, EntityTargets.Limit.SORTING.FARTHER), List.of(), new EntityTargets.TagsListFiter(new HashSet<>(List.of(TowerConstants.MOB_TAG_FLOOR_TEAM))));
 		} else {
-			targets = new EntityTargets(EntityTargets.TARGETS.MOB, 100, false, new EntityTargets.Limit(1, EntityTargets.Limit.SORTING.FARTHER), List.of(), new EntityTargets.TagsListFiter(new HashSet<>(List.of(TowerConstants.MOB_TAG_PLAYER_TEAM))));
+			targets = new EntityTargets(EntityTargets.TARGETS.MOB, 100, new EntityTargets.Limit(1, EntityTargets.Limit.SORTING.FARTHER), List.of(), new EntityTargets.TagsListFiter(new HashSet<>(List.of(TowerConstants.MOB_TAG_PLAYER_TEAM))));
 		}
 
 

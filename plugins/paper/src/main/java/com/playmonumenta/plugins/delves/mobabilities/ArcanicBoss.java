@@ -54,7 +54,7 @@ public class ArcanicBoss extends BossAbilityGroup {
 		mMissileParameters.COOLDOWN = 320;
 		mMissileParameters.TURN_RADIUS = 3.14;
 
-		mMissileParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mMissileParameters.DETECTION, false, new EntityTargets.Limit(1), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+		mMissileParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mMissileParameters.DETECTION, new EntityTargets.Limit(1), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 
 		mMissileParameters.PARTICLE_LAUNCH = ParticlesList.builder()
 			.add(new ParticlesList.CParticle(Particle.REDSTONE, 100, 1.0, 1.0, 1.0, 0.0, new Particle.DustOptions(Color.fromRGB(0x9500ff), 1.0f)))
@@ -97,7 +97,7 @@ public class ArcanicBoss extends BossAbilityGroup {
 		mArrowParameters.TURN_RADIUS = 0;
 		mArrowParameters.DISTANCE = 32;
 
-		mArrowParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mArrowParameters.DETECTION, false, new EntityTargets.Limit(1), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+		mArrowParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mArrowParameters.DETECTION, new EntityTargets.Limit(1), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 
 		mArrowParameters.PARTICLE_LAUNCH = ParticlesList.EMPTY;
 		mArrowParameters.PARTICLE_PROJECTILE = ParticlesList.builder()
@@ -128,7 +128,7 @@ public class ArcanicBoss extends BossAbilityGroup {
 		final int[] CHARGE_SPELL_DAMAGE = {15, 30, 45};
 		mChargeParameters.SPELL_NAME = Arcanic.CHARGE_SPELL_NAME;
 
-		mChargeParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mChargeParameters.DETECTION, false, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+		mChargeParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mChargeParameters.DETECTION, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 
 		mChargeParameters.PARTICLE_WARNING = ParticlesList.builder()
 			.add(new ParticlesList.CParticle(Particle.VILLAGER_ANGRY, 15, 0.25, 1.25, 0.25, 0.0))
@@ -158,12 +158,12 @@ public class ArcanicBoss extends BossAbilityGroup {
 			.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_ATTACK_IMPACT, 1.0f, 0.5f))
 			.build();
 
-		mChargeParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mChargeParameters.DETECTION, false, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+		mChargeParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mChargeParameters.DETECTION, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 		/* ---------------- Arcanic Rejuvenation ----------------*/
 		final RejuvenationBoss.Parameters mRejuvenationParameters = new RejuvenationBoss.Parameters();
 		final int[] REJUVENATION_SPELL_HEAL = {12, 25, 35};
 
-		mRejuvenationParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.MOB, mRejuvenationParameters.RANGE, false);
+		mRejuvenationParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.MOB, mRejuvenationParameters.RANGE);
 		mRejuvenationParameters.PARTICLE_RADIUS = mRejuvenationParameters.RANGE;
 
 		mRejuvenationParameters.PARTICLE_CHARGE_AIR = ParticlesList.builder()
@@ -196,7 +196,7 @@ public class ArcanicBoss extends BossAbilityGroup {
 			.add(new SoundsList.CSound(Sound.BLOCK_AMETHYST_BLOCK_CHIME, 3.0f, 1.5f))
 			.build();
 
-		mRejuvenationParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.MOB, mRejuvenationParameters.RANGE, false);
+		mRejuvenationParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.MOB, mRejuvenationParameters.RANGE);
 
 		for (int i = 0; i < 3; i++) {
 			cloneParams(mMissileParameters, MISSILE_SPELL_DAMAGE[i], MISSILE_PARAMETERS, (param, value) -> param.DAMAGE = value);

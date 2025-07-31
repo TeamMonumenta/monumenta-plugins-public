@@ -26,8 +26,8 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 	private static final double DISTANCE = 15;
 	private static final int DESPAWN_TIMER = 20 * 20;
 
-	private static final EntityTargets TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, 100, false, EntityTargets.Limit.CLOSER_ONE);
-	private static final EntityTargets TARGET_DESPAWN = new EntityTargets(EntityTargets.TARGETS.PLAYER, DISTANCE, true, EntityTargets.Limit.CLOSER_ONE);
+	private static final EntityTargets TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, 100, EntityTargets.Limit.CLOSER_ONE, List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED));
+	private static final EntityTargets TARGET_DESPAWN = new EntityTargets(EntityTargets.TARGETS.PLAYER, DISTANCE, EntityTargets.Limit.CLOSER_ONE);
 
 	public GenericGalleryMobBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);

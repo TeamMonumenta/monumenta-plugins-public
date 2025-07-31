@@ -89,7 +89,7 @@ public class VesperidysVoidCrystalWind extends BossAbilityGroup {
 		p.NEED_PLAYERS = false;
 
 		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET) {
-			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RADIUS, true, EntityTargets.Limit.DEFAULT);
+			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RADIUS, EntityTargets.Limit.DEFAULT, List.of());
 			//by default Force boss hit all the player in range even the players in stealth
 		}
 

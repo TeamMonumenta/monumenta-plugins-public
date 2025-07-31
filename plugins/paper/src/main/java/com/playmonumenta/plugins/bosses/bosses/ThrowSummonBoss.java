@@ -22,7 +22,7 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 		@BossParam(help = "not written", deprecated = true)
 		public double RADIUS = 8;
 		@BossParam(help = "targets of the ability")
-		public EntityTargets TARGETS = EntityTargets.GENERIC_ONE_PLAYER_CLOSER_TARGET.setOptional(false).setRange(8);
+		public EntityTargets TARGETS = EntityTargets.GENERIC_ONE_PLAYER_CLOSER_TARGET.clone().setFilters(List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED)).setRange(8);
 
 		@BossParam(help = "toggle for requiring line of sight")
 		public boolean LINE_OF_SIGHT = false;
@@ -96,7 +96,7 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 
 		//This used to overwrite any targeting info if the range wasn't 8. Wack
 		if (p.RADIUS != 8) {
-			targets = targets.setOptional(false).setRange(p.RADIUS);
+			targets = targets.setFilters(List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED)).setRange(p.RADIUS);
 		}
 
 		Spell spell = new SpellThrowSummon(plugin, boss, targets, p.LOBS, p.COOLDOWN, p.SPAWNEDMOB, p.POOL, p.LOB_DELAY,

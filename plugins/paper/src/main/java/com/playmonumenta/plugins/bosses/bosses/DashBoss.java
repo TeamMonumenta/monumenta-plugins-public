@@ -64,7 +64,7 @@ public class DashBoss extends BossAbilityGroup {
 
 		mParams = Parameters.getParameters(boss, identityTag, new Parameters());
 		if (mParams.TARGET == EntityTargets.GENERIC_PLAYER_TARGET) {
-			mParams.TARGET = new EntityTargets(EntityTargets.TARGETS.PLAYER, mParams.MIN_RANGE, false, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+			mParams.TARGET = new EntityTargets(EntityTargets.TARGETS.PLAYER, mParams.MIN_RANGE, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 		}
 		SpellManager activeSpells = new SpellManager(List.of(
 			new SpellDash(plugin, boss, mParams.COOLDOWN, mParams.MIN_RANGE, mParams.TARGET, mParams.PREFER_TARGET, mParams.JUMP_VELOCITY, mParams.VELOCITY, mParams.SOUND_START, mParams.SOUND_LAND, mParams.PARTICLE_START, mParams.PARTICLE_AIR, mParams.PARTICLE_LAND)

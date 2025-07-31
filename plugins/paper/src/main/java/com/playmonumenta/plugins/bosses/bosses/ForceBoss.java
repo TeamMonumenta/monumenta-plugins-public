@@ -98,7 +98,7 @@ public class ForceBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET) {
-			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RADIUS, true, EntityTargets.Limit.DEFAULT);
+			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RADIUS, EntityTargets.Limit.DEFAULT);
 			//by default Force boss hit all the player in range even the players in stealth
 		}
 		final double currentRadius = p.TARGETS.getRange();

@@ -63,7 +63,7 @@ public class SpellLiminalCorruption extends Spell {
 		mDialogue = dialogue;
 		mDuration = enhanced ? 9 * 20 : 20 * 20;
 
-		mTargets = new EntityTargets(EntityTargets.TARGETS.PLAYER, 30, true, EntityTargets.Limit.DEFAULT_ONE);
+		mTargets = new EntityTargets(EntityTargets.TARGETS.PLAYER, 30, EntityTargets.Limit.DEFAULT_ONE);
 		mSpellCooldownManager = new SpellCooldownManager(enhanced ? 10 * 20 : 40 * 20, boss::isValid, boss::hasAI);
 	}
 

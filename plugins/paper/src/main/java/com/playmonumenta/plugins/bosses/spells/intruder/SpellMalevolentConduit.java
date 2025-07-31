@@ -50,7 +50,7 @@ public class SpellMalevolentConduit extends SpellNova {
 			ParticlesList.builder()
 				.add(new ParticlesList.CParticle(Particle.SPELL_WITCH, 20, 0, 0, 0))
 				.build(),
-			new EntityTargets(EntityTargets.TARGETS.PLAYER, 14, true, EntityTargets.Limit.DEFAULT),
+			new EntityTargets(EntityTargets.TARGETS.PLAYER, 14, EntityTargets.Limit.DEFAULT, List.of()),
 			SoundsList.builder()
 				.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_SONIC_CHARGE, 1f, 0.1f))
 				.build(),

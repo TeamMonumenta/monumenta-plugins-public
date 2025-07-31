@@ -77,7 +77,6 @@ public final class TpBehindBoss extends BossAbilityGroup {
 			activeSpells = new SpellManager(List.of(
 				new SpellTpBehindPlayer(plugin, boss, mParameters)
 			));
-
 		}
 		Parameters.getParameters(boss, identityTag, mParameters);
 		super.constructBoss(activeSpells, Collections.emptyList(), mParameters.DETECTION, null, mParameters.INIT_DELAY);

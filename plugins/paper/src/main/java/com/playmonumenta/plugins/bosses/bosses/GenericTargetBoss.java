@@ -21,7 +21,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_generictarget";
 
 	public static class Parameters extends BossParameters {
-		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.clone().setOptional(false);
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.clone().setFilters(List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 		public boolean TARGET_EVERY_TICK = false;
 		public int DELAY = 10;
 	}
