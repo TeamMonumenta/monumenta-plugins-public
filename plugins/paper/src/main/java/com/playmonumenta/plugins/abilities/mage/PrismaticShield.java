@@ -107,7 +107,7 @@ public class PrismaticShield extends Ability {
 			double healthRemaining = mPlayer.getHealth() - event.getFinalDamage(true);
 
 			// Health is less than 0 but does not penetrate the absorption shield
-			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -OVERKILL_PROTECTION_MULTIPLIER * (mAbsorptionHealth + 1);
+			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -OVERKILL_PROTECTION_MULTIPLIER * mAbsorptionHealth;
 
 			if (healthRemaining <= mTriggerHealth) {
 				mPlugin.mEffectManager.damageEvent(event);
