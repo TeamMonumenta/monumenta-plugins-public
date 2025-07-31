@@ -19,22 +19,26 @@ public class IndigoListener implements Listener {
 		Block block = event.getBlock();
 		Material mat = block.getType();
 
-		if (mat != Material.TORCH) {
-			// Tesseract exceptions
-			if (mat == Material.PURPLE_STAINED_GLASS
-				|| mat == Material.CYAN_STAINED_GLASS
-				|| mat == Material.MAGENTA_STAINED_GLASS) {
-				Location loc = block.getLocation();
-				// Remove eligibility if the block hasn't changed 1 tick later
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-					if (loc.getBlock().getType() == mat) {
-						revokeBlocklessEligibility(player);
-					}
-				}, 1);
-				return;
-			}
-			revokeBlocklessEligibility(player);
+		// Some actions, such as tilling dirt is technically "placing" a block.
+		// We're only interested in cases where a collidable block is placed.
+		if (event.getBlockReplacedState().getType().isSolid() || !mat.isCollidable()) {
+			return;
 		}
+
+		// Tesseract exceptions
+		if (mat == Material.PURPLE_STAINED_GLASS
+			|| mat == Material.CYAN_STAINED_GLASS
+			|| mat == Material.MAGENTA_STAINED_GLASS) {
+			Location loc = block.getLocation();
+			// Remove eligibility if the block hasn't changed 1 tick later
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				if (loc.getBlock().getType() == mat) {
+					revokeBlocklessEligibility(player);
+				}
+			}, 1);
+			return;
+		}
+		revokeBlocklessEligibility(player);
 	}
 
 	public static void revokeBlocklessEligibility(Player player) {
