@@ -452,7 +452,7 @@ public enum DungeonCommandMapping {
 	}
 
 	public List<Component> getDungeonAccessTimeInfo(Player player, int date) {
-		String dungeonName = getLocationName();
+		String dungeonName = getShardName();
 		Integer durationDays = getDurationDays();
 
 		if (durationDays == null) {
