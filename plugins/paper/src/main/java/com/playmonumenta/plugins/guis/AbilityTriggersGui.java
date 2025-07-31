@@ -82,7 +82,7 @@ public class AbilityTriggersGui extends Gui {
 				"""
 					Click on a trigger to change it.
 					Triggers are shown in the order they are handled. Whenever a key is pressed, the top-left trigger is checked first if it matches. If not, the next trigger is checked, and so forth until a trigger matches and casts its ability.
-					Eagle Eye is an exception: it allows other abilities to trigger after it.
+					If the ability cannot cast and "fall-through" is enabled on the trigger, the next trigger is checked.
 					Right-click a trigger to immediately perform the trigger's action (e.g. toggle some state).""", NamedTextColor.GRAY, 40);
 			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_main_help", mGuiTextures);
 			setItem(4, tempItem);
