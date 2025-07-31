@@ -21,17 +21,11 @@ public final class TpBehindBoss extends BossAbilityGroup {
 		@BossParam(help = "Time (in ticks) it remains in place")
 		public int STUN = 10;
 
-		@BossParam(help = "DEPRECATED. Use targets for choosing the radius instead", deprecated = true)
-		public int RANGE = 80;
-
 		@BossParam(help = "Delay before teleporting")
 		public int DELAY = 50;
 
 		@BossParam(help = "Distance to a player before casting")
 		public int DETECTION = 20;
-
-		@BossParam(help = "DEPRECATED. Use prefertarget for teleporting to target", deprecated = true)
-		public String RANDOM = "null";
 
 		@BossParam(help = "not written")
 		public int COOLDOWN = 12 * 20;
@@ -62,7 +56,7 @@ public final class TpBehindBoss extends BossAbilityGroup {
 			.add(new ParticlesList.CParticle(Particle.SPELL_WITCH, 30, 0.25, 0.45, 0.25, 1))
 			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 12, 0, 0.45, 0, 0.125))
 			.build();
-		@BossParam(help = "Teleports to the mob's target (Overwrites TARGETS parameter)")
+		@BossParam(help = "Teleports to the mob's target (Overwrites limit in TARGETS' parameter)")
 		public boolean PREFER_TARGET = false;
 
 		@BossParam(help = "not written")
@@ -83,13 +77,7 @@ public final class TpBehindBoss extends BossAbilityGroup {
 			activeSpells = new SpellManager(List.of(
 				new SpellTpBehindPlayer(plugin, boss, mParameters)
 			));
-			// I can't think of a better way to deprecate this
-			if (!mParameters.RANDOM.equals("null")) {
-				mParameters.PREFER_TARGET = !Boolean.parseBoolean(mParameters.RANDOM);
-			}
-			if (mParameters.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET) {
-				mParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, mParameters.RANGE, false, new EntityTargets.Limit(EntityTargets.Limit.LIMITSENUM.ALL, EntityTargets.Limit.SORTING.RANDOM));
-			}
+
 		}
 		Parameters.getParameters(boss, identityTag, mParameters);
 		super.constructBoss(activeSpells, Collections.emptyList(), mParameters.DETECTION, null, mParameters.INIT_DELAY);
