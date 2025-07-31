@@ -201,4 +201,9 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	public void sendOpenSignPacket(Player player, int blockX, int blockY, int blockZ, boolean b) {
 
 	}
+
+	@Override
+	public void setHeadRotation(Entity bukkitEntity, float yaw, float pitch) {
+
+	}
 }

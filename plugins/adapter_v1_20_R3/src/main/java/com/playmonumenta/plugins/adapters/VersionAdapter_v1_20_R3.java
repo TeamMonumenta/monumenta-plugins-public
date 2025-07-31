@@ -821,4 +821,11 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 	public void sendOpenSignPacket(Player player, int blockX, int blockY, int blockZ, boolean b) {
 		((CraftPlayer) player).getHandle().connection.send(new ClientboundOpenSignEditorPacket(new BlockPos(blockX, blockY, blockZ), b));
 	}
+
+	@Override
+	public void setHeadRotation(Entity bukkitEntity, float yaw, float pitch) {
+		net.minecraft.world.entity.Entity handle = ((CraftEntity) bukkitEntity).getHandle();
+		handle.setXRot(pitch);
+		handle.setYHeadRot(yaw);
+	}
 }
