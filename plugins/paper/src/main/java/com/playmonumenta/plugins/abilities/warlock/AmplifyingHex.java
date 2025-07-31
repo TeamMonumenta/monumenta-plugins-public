@@ -302,7 +302,7 @@ public class AmplifyingHex extends Ability {
 			.add("For every 1% health you have above ")
 			.addPercent(a -> a.mEnhanceHealthThreshold, ENHANCEMENT_HEALTH_THRESHOLD)
 			.add(" of your max health, this ability deals ")
-			.addPercent(a -> a.mEnhanceDamageBonus - 1, ENHANCEMENT_DAMAGE_MOD - 1)
+			.addPercent(a -> a.mEnhanceDamageBonus / 100, ENHANCEMENT_DAMAGE_MOD / 100)
 			.add(" more damage and damages yourself by 1% max health.");
 	}
 }
