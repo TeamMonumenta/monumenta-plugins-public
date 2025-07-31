@@ -281,7 +281,7 @@ public class ItemStatCommands {
 							return;
 						}
 						int index = args.getByArgument(indexArg);
-						String lore = args.getByArgument(charmEffectArgument).replace("*", "🔒");
+						String lore = args.getByArgument(charmEffectArgument).replace("#", "# ");
 
 						CharmManager.CharmParsedInfo parsedInfo = CharmManager.readCharmLine(lore);
 						if (parsedInfo == null) {
@@ -345,7 +345,7 @@ public class ItemStatCommands {
 							return;
 						}
 						int index = args.getByArgument(indexArg);
-						String lore = args.getByArgument(charmEffectArgument).replace("*", "🔒");
+						String lore = args.getByArgument(charmEffectArgument).replace("#", "# ");
 
 						CharmManager.CharmParsedInfo parsedInfo = CharmManager.readCharmLine(lore);
 						if (parsedInfo == null) {

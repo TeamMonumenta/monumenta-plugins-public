@@ -1352,7 +1352,7 @@ public class CharmManager {
 		AbilityManager.getManager().updatePlayerAbilities(p, true);
 	}
 
-	private static final Pattern CHARM_LINE_PATTERN = Pattern.compile("([*🔒\uD87D\uDD12] ?)?([-+]?\\d+(?:\\.\\d+)?)(%)? (.+)");
+	private static final Pattern CHARM_LINE_PATTERN = Pattern.compile("(# )?([-+]?\\d+(?:\\.\\d+)?)(%)? (.+)");
 
 	//Helper method to parse item for charm effects
 	private List<CharmParsedInfo> readCharm(ItemStack itemStack) {
@@ -1425,7 +1425,7 @@ public class CharmManager {
 			.reduce(
 				new TreeMap<>(),
 				(map, charm) -> {
-					final var newName = charm.mEffect + (charm.mIsPercent ? "%" : "") + (charm.mIsLocked ? "🔒" : ""); // we add a percent sign here (see method getSummaryOfAllAttributesAsComponents)
+					final var newName = charm.mEffect + (charm.mIsPercent ? " %" : "") + (charm.mIsLocked ? " (LOCKED)" : ""); // we add a percent sign here (see method getSummaryOfAllAttributesAsComponents)
 					map.put(newName, map.getOrDefault(newName, 0.0) + charm.mValue);
 					return map;
 				},
@@ -1460,7 +1460,7 @@ public class CharmManager {
 		Set<String> orderedEffects = summary.keySet();
 
 		for (String s : orderedEffects) {
-			final var normalized = s.replace("%", "").replace("🔒", "");
+			final var normalized = s.replace("%", "").replace("# ", "");
 			double baseValue = summary.getOrDefault(s, 0.0);
 			double value = getValueOrCap(baseValue, normalized, charmType); // we need to replace % here otherwise things don't work correctly (see bug 19814)
 			if (value != 0) {
