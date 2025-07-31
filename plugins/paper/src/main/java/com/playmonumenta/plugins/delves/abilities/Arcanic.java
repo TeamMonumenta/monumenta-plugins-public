@@ -48,7 +48,7 @@ public class Arcanic {
 			World world = mob.getWorld();
 			world.playSound(mob.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 0.85f, 2f);
 			world.playSound(mob.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.HOSTILE, 0.85f, 2f);
-			new PartialParticle(Particle.FIREWORKS_SPARK, mob.getEyeLocation().add(0, 0.9, 0), 10, 0.1, 0.1, 0.1, 0.15);
+			new PartialParticle(Particle.FIREWORKS_SPARK, mob.getEyeLocation().add(0, 0.9, 0), 10, 0.1, 0.1, 0.1, 0.15).spawnAsEnemy();
 		}
 	}
 }
