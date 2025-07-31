@@ -16,10 +16,10 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -57,7 +57,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	private final double mSpeed;
 	private final int mDecayTimer;
 	private final List<ClassAbility> mResets = new ArrayList<>();
-	private final Map<ClassAbility, Boolean> mStacksMap = new HashMap<>();
+	private final Set<ClassAbility> mCastAbilities = new HashSet<>(); // Set of abilities that have been cast but not yet dealt damage. When they deal damage they are removed from the set and add to mStacks
 	private final SagesInsightCS mCosmetic;
 
 	private int mStacks = 0;
@@ -95,10 +95,15 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 		}
 		mTicksToStackDecay = mDecayTimer;
 
-		Boolean bool = mStacksMap.get(ability);
-		if (bool != null && bool) {
+		// the cast ability and damage ability for elemental arrows are different
+		// elemental arrows enhancement has a cooldown whereas the others don't so that's the only one we care about here
+		if (ability == ClassAbility.ELEMENTAL_ARROWS_FIRE || ability == ClassAbility.ELEMENTAL_ARROWS_ICE) {
+			ability = ClassAbility.ELEMENTAL_ARROWS;
+		}
+
+
+		if (mCastAbilities.remove(ability)) {
 			mStacks++;
-			mStacksMap.put(ability, false);
 			if (mStacks >= mMaxStacks) {
 				if (mSpeed > 0) {
 					mPlugin.mEffectManager.addEffect(mPlayer, "SagesExtraSpeed",
@@ -128,7 +133,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
 		ClassAbility cast = event.getSpell();
-		mStacksMap.put(cast, true);
+		mCastAbilities.add(cast);
 
 		mResets.add(cast);
 		if (mResets.size() > mResetSize) {
