@@ -54,7 +54,7 @@ final class GlowingOptionsPage extends PebPage {
 		super.render();
 
 		// Toggle items
-		addOption(Material.PLAYER_WALL_HEAD, "Other Players", GlowingCommand.Option.OTHER_PLAYERS, 1);
+		addOption(Material.PLAYER_WALL_HEAD, "Other Players", GlowingCommand.Option.OTHER_PLAYERS, 0);
 		addOption(Material.PLAYER_HEAD, "Yourself", GlowingCommand.Option.SELF, 1);
 		addOption(Material.ZOMBIE_HEAD, "Mobs", GlowingCommand.Option.MOBS, 2);
 		addOption(Material.WITHER_SKELETON_SKULL, "Elite Mobs", GlowingCommand.Option.ELITES, 3);
