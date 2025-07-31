@@ -61,8 +61,8 @@ public class SpellCerebralOnslaught extends Spell {
 								mSpawnedLocations.stream().allMatch(loc -> loc.distance(location) > 3)), "CerebralOnslaught");
 							if (summon != null) {
 								summon.addScoreboardTag(SPAWN_TAG);
+								mSpawnedLocations.add(summon.getLocation());
 							}
-							mSpawnedLocations.add(summon.getLocation());
 						}
 						mSpawned++;
 						mChargeUpManager.setTime(0);
