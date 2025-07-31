@@ -68,7 +68,7 @@ public class DelveInfusionUtils {
 		ORBITAL("orbital" , InfusionType.ORBITAL, Location.INDIGO, Material.PURPLE_CONCRETE_POWDER, "Crumbled Setiroetem", NamespacedKeyUtils.fromString("epic:r3/items/currency/crumbled_etiroetem"), "Indigo"),
 
 		STURDY("sturdy", InfusionType.STURDY, Location.HUNTS, Material.SHIELD, "Hyperchromatic Archos Rings", NamespacedKeyUtils.fromString("epic:r3/items/currency/hyperchromatic_archos_ring"), "HuntsUnspoiledWins"),
-		FREERUNNER("freerunner", InfusionType.FREERUNNER, Location.SKR, Material.FEATHER, "Hyperchromatic Archos Rings", NamespacedKeyUtils.fromString("epic:r3/items/currency/hyperchromatic_archos_ring"), "SKRRoomsCompleted"),
+		CELERITY("celerity", InfusionType.CELERITY, Location.SKR, Material.FEATHER, "Hyperchromatic Archos Rings", NamespacedKeyUtils.fromString("epic:r3/items/currency/hyperchromatic_archos_ring"), "SKRRoomsCompleted"),
 		REFUND("refund", null, null, Material.GRINDSTONE, null, null, (String[]) null);
 
 		private final String mLabel;
@@ -146,7 +146,7 @@ public class DelveInfusionUtils {
 		}
 
 		public boolean isViewOnly() {
-			return this == STURDY;
+			return this == STURDY || this == CELERITY;
 		}
 	}
 
@@ -188,8 +188,8 @@ public class DelveInfusionUtils {
 
 		public Component getIcon() {
 			return switch (this) {
-				case VOIDSTAINED_GEODE -> Component.text(" ⚓", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false);
-				case INDIGO_BLIGHTDUST -> Component.text(" ✵", TextColor.fromHexString("#FF9CF0")).decoration(TextDecoration.ITALIC, false);
+				case VOIDSTAINED_GEODE -> Component.text(" ⚓", Location.DEPTHS.getColor()).decoration(TextDecoration.ITALIC, false);
+				case INDIGO_BLIGHTDUST -> Component.text(" ✵", Location.ZENITH.getColor()).decoration(TextDecoration.ITALIC, false);
 				case MEMORY_FRAGMENTS -> Component.text(" \uD83E\uDEB6", TextColor.fromHexString("#8bb7c3")).decoration(TextDecoration.ITALIC, false);
 				case RUCKS -> Component.text(" ⌘", TextColor.fromHexString("#4C8F4D")).decoration(TextDecoration.ITALIC, false);
 			};
@@ -226,9 +226,9 @@ public class DelveInfusionUtils {
 			// redirect to the HuntsInfusionGUI, as it uses different items
 			HuntsInfusionGUI.refundSturdy(item, player);
 			return;
-		} else if (infusion == DelveInfusionSelection.FREERUNNER) {
-			// redirect to the HuntsInfusionGUI, as it uses different items
-			SKRInfusionGUI.refundFreerunner(item, player);
+		} else if (infusion == DelveInfusionSelection.CELERITY) {
+			// redirect to the SKRInfusionGUI, as it uses different items
+			SKRInfusionGUI.refundCelerity(item, player);
 			return;
 		}
 		InfusionType infusionType = infusion.getInfusionType();

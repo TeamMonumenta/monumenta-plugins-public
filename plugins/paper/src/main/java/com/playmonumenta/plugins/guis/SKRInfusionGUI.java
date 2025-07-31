@@ -1,9 +1,8 @@
 package com.playmonumenta.plugins.guis;
 
-import com.playmonumenta.plugins.itemstats.enchantments.Freerunner;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
-import com.playmonumenta.plugins.itemstats.infusions.Sturdy;
+import com.playmonumenta.plugins.itemstats.infusions.Celerity;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils.DelveInfusionMaterial;
@@ -42,9 +41,9 @@ public class SKRInfusionGUI extends Gui {
 	private static final ItemStack REFUND_ITEM = GUIUtils.createBasicItem(Material.GRINDSTONE,
 		"Click to refund this item's infusions.", NamedTextColor.DARK_GRAY, true,
 		"You will receive " + (DelveInfusionUtils.FULL_REFUND ? "100" : (int) (DelveInfusionUtils.REFUND_PERCENT * 100)) + "% of the experience, and all of the materials back.", NamedTextColor.GRAY);
-	private static final ItemStack FREERUNNER_INFO_ITEM = GUIUtils.createBasicItem(Material.FEATHER, 1,
-		"Freerunner", Location.SKR.getColor(), true,
-		Component.text("Gain LVL*" + StringUtils.multiplierToPercentageWithSign(Freerunner.SPEED_BONUS) + " Speed if there are no hostile mobs within an 18 block radius.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+	private static final ItemStack CELERITY_INFO_ITEM = GUIUtils.createBasicItem(Material.FEATHER, 1,
+		"Celerity", Location.SKR.getColor(), true,
+		Component.text("Gain " + StringUtils.multiplierToPercentageWithSign(Celerity.SPEED_BONUS) + " Speed per level if there are no hostile mobs within an 18 block radius.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 			.appendNewline()
 			.append(Component.text("Requires Silver Memory Fragments and Hyperchromatic Archos Rings", NamedTextColor.DARK_GRAY)),
 		30, true);
@@ -56,7 +55,7 @@ public class SKRInfusionGUI extends Gui {
 
 	@Override
 	protected void setup() {
-		setItem(0, 4, FREERUNNER_INFO_ITEM);
+		setItem(0, 4, CELERITY_INFO_ITEM);
 
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 		DelveInfusionSelection infusion = DelveInfusionUtils.getCurrentInfusion(mainhand);
@@ -68,20 +67,20 @@ public class SKRInfusionGUI extends Gui {
 			setItem(1, 1, mainhand);
 
 			if (level > 0) {
-				if (infusion != DelveInfusionSelection.FREERUNNER) {
-					// item is already infused, but not with freerunner
+				if (infusion != DelveInfusionSelection.CELERITY) {
+					// item is already infused, but not with celerity
 					setItem(1, 0, REFUND_ITEM).onClick((clickEvent) -> {
 						DelveInfusionUtils.refundInfusion(mainhand, mPlayer);
 						open();
 					});
 					setItem(1, 2, GUIUtils.createBasicItem(Material.BARRIER,
 						"Cannot Infuse", NamedTextColor.RED, true,
-						"This item already has a Delve Infusion on it. Refund it to infuse it with Freerunner."));
+						"This item already has a Delve Infusion on it. Refund it to infuse it with Celerity."));
 					return;
 				} else {
 					// item is infused with freerunner, use sturdy refund method
 					setItem(1, 0, REFUND_ITEM).onClick((clickEvent) -> {
-						refundFreerunner(mainhand, mPlayer);
+						refundCelerity(mainhand, mPlayer);
 						open();
 					});
 				}
@@ -89,10 +88,10 @@ public class SKRInfusionGUI extends Gui {
 
 			// create level panes
 			for (int i = 0; i < level; i++) {
-				ItemStack levelItem = GUIUtils.createBasicItem(Material.SHIELD, 1,
-					Component.text("Freerunner", Location.SKR.getColor()).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)
+				ItemStack levelItem = GUIUtils.createBasicItem(Material.FEATHER, 1,
+					Component.text("Celerity", Location.SKR.getColor()).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)
 						.append(Component.text(" [Lv. " + (i + 1) + "]", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)),
-					Component.text("Reduces the duration shields are stunned for by " + StringUtils.multiplierToPercentageWithSign(Sturdy.CDR_PER_LEVEL * (i + 1)) + ".", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+					Component.text("Gain " + StringUtils.multiplierToPercentageWithSign(Celerity.SPEED_BONUS * (i + 1)) + " Speed if there are no hostile mobs within an 18 block radius.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 					30, true);
 
 				setItem(1, 2 + i, levelItem);
@@ -111,10 +110,10 @@ public class SKRInfusionGUI extends Gui {
 				if (!ItemStatUtils.hasInfusion(mainhand, InfusionType.REVELATION)) {
 					setItem(1, 6, mMaxLevelReachedItem);
 				} else {
-					ItemStack level5item = GUIUtils.createBasicItem(Material.SHIELD, 1,
-						Component.text("Sturdy", Location.HUNTS.getColor()).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)
+					ItemStack level5item = GUIUtils.createBasicItem(Material.FEATHER, 1,
+						Component.text("Celerity", Location.SKR.getColor()).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)
 							.append(Component.text(" [Lv. 5]", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)),
-						Component.text("Gain " + StringUtils.multiplierToPercentageWithSign(Freerunner.SPEED_BONUS * 5) + " speed.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+						Component.text("Gain " + StringUtils.multiplierToPercentageWithSign(Celerity.SPEED_BONUS * 5) + " Speed if there are no hostile mobs within an 18 block radius.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 						30, true);
 					setItem(1, 6, level5item);
 					setItem(1, 7, mMaxLevelReachedRevelationItem);
@@ -140,7 +139,7 @@ public class SKRInfusionGUI extends Gui {
 
 		try {
 			if (payInfusion(item, level)) {
-				DelveInfusionUtils.infuseItem(p, item, DelveInfusionSelection.FREERUNNER, DelveInfusionMaterial.MEMORY_FRAGMENTS);
+				DelveInfusionUtils.infuseItem(p, item, DelveInfusionSelection.CELERITY, DelveInfusionMaterial.MEMORY_FRAGMENTS);
 				open();
 			} else {
 				p.sendMessage(Component.text("You don't have enough experience and/or currency for this infusion.", NamedTextColor.RED));
@@ -152,7 +151,7 @@ public class SKRInfusionGUI extends Gui {
 	}
 
 	private boolean payInfusion(ItemStack item, int level) {
-		if (DelveInfusionSelection.FREERUNNER.getLootTable() == null || level <= 0) {
+		if (DelveInfusionSelection.CELERITY.getLootTable() == null || level <= 0) {
 			return false;
 		}
 
@@ -173,13 +172,13 @@ public class SKRInfusionGUI extends Gui {
 		String matStr = mats.stream().filter(it -> it != null && it.getAmount() > 0)
 			.map(it -> "'" + ItemUtils.getPlainName(it) + ":" + it.getAmount() + "'")
 			.collect(Collectors.joining(","));
-		AuditListener.logPlayer("[Delve Infusion] Item infused - player=" + mPlayer.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + DelveInfusionSelection.FREERUNNER.getLabel()
+		AuditListener.logPlayer("[Delve Infusion] Item infused - player=" + mPlayer.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + DelveInfusionSelection.CELERITY.getLabel()
 			+ "', new level=" + level + ", stack size=" + item.getAmount() + ", material cost=" + matStr + ", XP cost=" + xpCost);
 
 		return true;
 	}
 
-	public static void refundFreerunner(ItemStack item, Player player) {
+	public static void refundCelerity(ItemStack item, Player player) {
 		DelveInfusionSelection infusion = DelveInfusionUtils.getCurrentInfusion(item);
 		if (infusion == null) {
 			return;

@@ -51,6 +51,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	// We'll want to turn this back on at some point later.
 	public static final ItemStack mMaxLevelReachedItem;
 	public static final ItemStack mMaxLevelReachedRevelationItem;
+	public static final ItemStack mWrongGUIItem;
 
 	private final Map<Integer, ItemClicked> mMapFunction;
 
@@ -99,6 +100,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		addItems(DelveInfusionSelection.CELESTIAL, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Celestial.DAMAGE_BONUS_PER_LEVEL * i) + "% additional damage" + perLevel + " to mobs that are at a higher elevation than you.");
 		addItems(DelveInfusionSelection.FERVOR, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Fervor.PERCENT_DAMAGE_PER_LEVEL * i) + "% additional damage" + perLevel + " for 3s after gaining a buff that lasts at least 5s.");
 		addItems(DelveInfusionSelection.STURDY, (i, perLevel) -> "Reduces the duration shields are stunned for by " + StringUtils.multiplierToPercentageWithSign(Sturdy.CDR_PER_LEVEL * i) + perLevel + ".");
+		addItems(DelveInfusionSelection.CELERITY, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentageWithSign(Celerity.SPEED_BONUS * i) + " Speed if there are no hostile mobs within an 18 block radius.");
 		addItems(DelveInfusionSelection.ORBITAL, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Orbital.DAMAGE_REDUCTION_PER_LEVEL * i) + "% Damage Reduction" + perLevel + " against aerial mobs and knocks them downward.");
 
 		mInvalidItems = Stream.of("helmet", "chestplate", "leggings", "boots", "main hand", "off hand")
@@ -112,6 +114,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 		// Echo shard for item with Revelation & max level
 		mMaxLevelReachedRevelationItem = GUIUtils.createBasicItem(Material.ECHO_SHARD, "Revelation!", NamedTextColor.DARK_AQUA, true, "You've reached the max Delve Infusion level on this item, and Invoked it to its true potential.", NamedTextColor.DARK_AQUA);
+
+		// Barrier for item that has a view-only infusion that is not infused at the Delve Infusion Station, like Sturdy
+		mWrongGUIItem = GUIUtils.createBasicItem(Material.BARRIER, "Cannot Upgrade", NamedTextColor.RED, true, "You cannot upgrade this Delve Infusion here. Return to the original infusion location to upgrade this item.", NamedTextColor.GRAY);
 	}
 
 	public DelveInfusionCustomInventory(Player owner) {
@@ -263,7 +268,10 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 					}
 
 					int slot = (row * 9) + 2 + level;
-					if (level < DelveInfusionUtils.MAX_LEVEL && !infusion.isViewOnly()) {
+					if (level < DelveInfusionUtils.MAX_LEVEL && infusion.isViewOnly()) {
+						// This infusion is not fully upgraded, and is view-only
+						mInventory.setItem(slot, mWrongGUIItem);
+					} else if (level < DelveInfusionUtils.MAX_LEVEL) {
 						//if we didn't reach max level then load item to infuse
 						DelveInfusionUtils.DelveInfusionMaterial delveInfusionMaterial = DelveInfusionUtils.getDelveInfusionMaterial(item);
 						ItemStack infuseItem = GUIUtils.createBasicItem(Material.ENCHANTED_BOOK, "Click to infuse to level " + (level + 1), NamedTextColor.DARK_AQUA, true,

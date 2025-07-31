@@ -1,34 +1,30 @@
-package com.playmonumenta.plugins.itemstats.enchantments;
+package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
-import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
-import java.util.EnumSet;
 
-public class Freerunner implements Infusion {
+public class Celerity implements Infusion {
 
 	public static final double NEARBY_ENEMY_RANGE = 18;
 
 	public static final double SPEED_BONUS = 0.025;
 
 	private static final int EFFECT_DURATION = 10;
-	private static final String PERCENT_SPEED_EFFECT_NAME = "FreerunnerPercentSpeedEffect";
+	private static final String PERCENT_SPEED_EFFECT_NAME = "CelerityPercentSpeedEffect";
 
 	@Override
-	public String getName() { return "Freerunner"; }
+	public String getName() { return "Celerity"; }
 
 	@Override
 	public InfusionType getInfusionType() {
-		return InfusionType.FREERUNNER;
+		return InfusionType.CELERITY;
 	}
 
 	@Override
