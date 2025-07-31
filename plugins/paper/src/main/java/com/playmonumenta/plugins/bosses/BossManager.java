@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
+import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
@@ -948,6 +949,14 @@ public class BossManager implements Listener {
 
 		if (boss != null) {
 			boss.bossExploded(event);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void bossKnockedBackEntity(EntityKnockbackByEntityEvent event) {
+		Boss boss = mBosses.get(event.getHitBy().getUniqueId());
+		if (boss != null) {
+			boss.bossKnockedBackEntity(event);
 		}
 	}
 

@@ -754,6 +754,7 @@ public class CharmManager {
 			EsotericEnhancements.CHARM_FUSE,
 			EsotericEnhancements.CHARM_SPEED,
 			EsotericEnhancements.CHARM_CREEPER,
+			EsotericEnhancements.CHARM_KNOCKBACK,
 			ScorchedEarth.CHARM_DAMAGE,
 			ScorchedEarth.CHARM_COOLDOWN,
 			ScorchedEarth.CHARM_CHARGES,

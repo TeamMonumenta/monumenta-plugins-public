@@ -789,14 +789,16 @@ public class EntityListener implements Listener {
 	// Cancel explosions in adventure zones
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
+		// Alchemical aberrations should never explode any blocks, but we don't want to cancel the event
+		if (event.getEntity().getScoreboardTags().contains(AlchemicalAberrationBoss.identityTag)) {
+			event.blockList().clear();
+			return;
+		}
+
 		// Cancel the event immediately if within a no-explosions zone
 		if (ZoneUtils.hasZoneProperty(event.getLocation(), ZoneProperty.NO_EXPLOSIONS)) {
 			event.setCancelled(true);
 			return;
-		}
-
-		if (event.getEntity().getScoreboardTags().contains(AlchemicalAberrationBoss.identityTag)) {
-			event.blockList().clear();
 		}
 
 		Iterator<Block> iter = event.blockList().iterator();

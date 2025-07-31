@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.BossBarManager;
@@ -395,6 +396,9 @@ public abstract class BossAbilityGroup {
 
 	}
 
+	public void bossKnockedBackEntity(EntityKnockbackByEntityEvent event) {
+
+	}
 
 	// Only acts on fire applied by plugin
 	public void bossIgnited(int time, @Nullable Entity igniter) {

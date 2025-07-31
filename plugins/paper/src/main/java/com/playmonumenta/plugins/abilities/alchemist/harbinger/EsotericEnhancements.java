@@ -63,6 +63,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	public static final String CHARM_REACTION_TIME = "Esoteric Enhancements Reaction Time";
 	public static final String CHARM_FUSE = "Esoteric Enhancements Fuse Time";
 	public static final String CHARM_SPEED = "Esoteric Enhancements Speed";
+	public static final String CHARM_KNOCKBACK = "Esoteric Enhancements Knockback";
 
 	public static final AbilityInfo<EsotericEnhancements> INFO =
 		new AbilityInfo<>(EsotericEnhancements.class, "Esoteric Enhancements", EsotericEnhancements::new)
@@ -80,10 +81,11 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	private final double mRadius;
 	private final int mBleedDuration;
 	private final double mBleed;
+	private final double mKnockbackMultiplier;
 	private final Map<LivingEntity, Integer> mAppliedMobs = new HashMap<>();
 	private final EsotericEnhancementsCS mCosmetic;
 
-	private List<LivingEntity> mTargets;
+	private final List<LivingEntity> mTargets;
 
 	public EsotericEnhancements(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -93,6 +95,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ABERRATION_DAMAGE_RADIUS);
 		mBleedDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_BLEED_DURATION);
 		mBleed = ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED);
+		mKnockbackMultiplier = 1 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_KNOCKBACK);
 		mTargets = new ArrayList<>();
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EsotericEnhancementsCS());
@@ -144,7 +147,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 			}
 
 			double damage = mDamageRaw + mDamageMultiplier * playerItemStats.getItemStats().get(AttributeType.POTION_DAMAGE.getItemStat());
-			alchemicalAberrationBoss.spawn(mPlayer, damage, mRadius, mBleedDuration, mBleed, playerItemStats, mCosmetic);
+			alchemicalAberrationBoss.spawn(mPlayer, damage, mRadius, mBleedDuration, mBleed, mKnockbackMultiplier, playerItemStats, mCosmetic);
 
 			aberration.setMaxFuseTicks(CharmManager.getDuration(mPlayer, CHARM_FUSE, aberration.getMaxFuseTicks()));
 			aberration.setExplosionRadius((int) mRadius);

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses;
 
+import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
@@ -171,6 +172,12 @@ public class Boss {
 	public void bossExploded(EntityExplodeEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossExploded(event);
+		}
+	}
+
+	public void bossKnockedBackEntity(EntityKnockbackByEntityEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossKnockedBackEntity(event);
 		}
 	}
 

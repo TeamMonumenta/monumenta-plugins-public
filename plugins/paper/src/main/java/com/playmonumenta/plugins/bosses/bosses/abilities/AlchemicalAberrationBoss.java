@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses.abilities;
 
+import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -10,6 +11,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -27,6 +29,7 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 	private double mRadius = 0;
 	private int mBleedDuration = 0;
 	private double mBleedAmount = 0;
+	private double mKnockbackMultiplier = 1;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 	private EsotericEnhancementsCS mCosmetic = new EsotericEnhancementsCS();
 
@@ -38,12 +41,13 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
-	public void spawn(Player player, double damage, double radius, int bleedDuration, double bleedAmount, ItemStatManager.PlayerItemStats playerItemStats, EsotericEnhancementsCS cosmetic) {
+	public void spawn(Player player, double damage, double radius, int bleedDuration, double bleedAmount, double knockbackMultiplier, ItemStatManager.PlayerItemStats playerItemStats, EsotericEnhancementsCS cosmetic) {
 		mPlayer = player;
 		mDamage = damage;
 		mRadius = radius;
 		mBleedDuration = bleedDuration;
 		mBleedAmount = bleedAmount;
+		mKnockbackMultiplier = knockbackMultiplier;
 		mPlayerItemStats = playerItemStats;
 		mCosmetic = cosmetic;
 	}
@@ -60,14 +64,19 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		// Set damage to 0 for non-boss hostile mobs to apply normal knockback. Bosses should not take any knockback
-		if (EntityUtils.isHostileMob(damagee)
-			&& !EntityUtils.isCCImmuneMob(damagee)) {
-			event.setFlatDamage(0);
-		} else {
+	public void bossKnockedBackEntity(EntityKnockbackByEntityEvent event) {
+		LivingEntity knocked = event.getEntity();
+		if (!EntityUtils.isHostileMob(knocked) || EntityUtils.isCCImmuneMob(knocked)) {
 			event.setCancelled(true);
+			return;
 		}
+		double kbr = EntityUtils.getAttributeBaseOrDefault(knocked, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
+		event.setAcceleration(event.getAcceleration().multiply(Math.max(0, (1 - kbr) * mKnockbackMultiplier)));
+	}
+
+	@Override
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		event.setFlatDamage(0);
 	}
 
 	@Override
