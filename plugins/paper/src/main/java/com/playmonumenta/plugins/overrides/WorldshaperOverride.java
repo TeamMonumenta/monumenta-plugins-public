@@ -89,7 +89,7 @@ public class WorldshaperOverride {
 
 		if (ServerProperties.getShardName().contains("indigo")
 			|| ServerProperties.getShardName().startsWith("dev")) {
-			IndigoListener.revokeBlocklessEligibility(player);
+			IndigoListener.revokeBlocklessEligibility(player, "Worldshaper's loom used");
 		}
 
 		// A list of locations we want to place the block in the world.
