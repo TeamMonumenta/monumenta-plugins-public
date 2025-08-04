@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -25,8 +26,6 @@ public class EntityTargets implements Cloneable {
 	 *                                         where: TARGETS ∈ {PLAYER, MOB, ENTITY}
 	 *                             range
 	 *                                         where: range is a double that let you choose the range in where to search for targets
-	 *                               opt
-	 *                                         where: opt is a boolean used for targets function {includeNonTargetable, notIncludeLauncher} by default true
 	 *                                limit=?
 	 *                                         where: ? is in {(number,sorted), (enum,sorted)} &&
 	 *                                             where: sorted ∈ {RANDOM, CLOSER, FARTHER, LOWER_HP, HIGHER_HP, NONE(?)} &&
@@ -42,15 +41,19 @@ public class EntityTargets implements Cloneable {
 	 *                                                        if TARGETS == PLAYER :
 	 *                                                               enumFilters ∈ {isStealthed, isMage, isAlch, isRogue, .......}
 	 *                                                        if TARGETS == MOB :
-	 *                                                               enumFilters ∈ {isElite, isBoss, isZombie, isScheleton, .....}
+	 *                                                               enumFilters ∈ {isElite, isBoss, isZombie, notSelf, .....}
 	 *                                                        if TARGETS == ENTITY :
 	 *                                                               enumFilters ∈ {isArmorStand, isMob, isVillager,  ...........}
 	 *                                                   }
 	 *                                        the filters will filter the result of TARGETS so that:
-	 *                                            {for each entity in TARGETS.getTargets(), enitity ∈ filteredList if and only if ∃ enumFilter in enumFiltersList | enumFilter(entity) == true}
+	 *                                            {for each entity in TARGETS.getTargets(), enitity ∈ filteredList if and only if
+	 *                                                ∀(entity, filter(entity) == true) for all filters ∈ allMatchFilters, allMatchFilters = {filter : filter.anyMatchMode() == false}} AND
+	 *                                                (∃(entity, filter(entity) == true) for all filters ∈ anyMatchFilters, anyMatchFilters = {filter : filter.anyMatchMode() == true} OR anyMatchFilters = Ø)
+	 *                                            (Basically if all the non-mutually exclusive filters pass AND any the mutually exclusive filters pass OR there are no mutually exclusive filters)
 	 *                                tags=?
-	 *                                         where: ? is a list of TagString && ----- work like filters
-	 *
+	 *                                         where: ? is a list of TagString && ----- work like filters, is considered a mutually exclusive filter BUT entities are only filtered AFTER filtering from `filters=[...]`
+	 *                                excludeTagged=?
+	 *                                         whether tag filters should exclude instead
 	 *
 	 *         targetsParam=[TARGETS,range]
 	 *         targetsParam=[TARGETS,range,opt]
@@ -106,6 +109,9 @@ public class EntityTargets implements Cloneable {
 	public interface EntityFilter {
 		<V extends Entity> boolean filter(LivingEntity launcher, V entity);
 
+		default boolean anyMatchType() {
+			return false;
+		}
 	}
 
 	//-----------------------------------------------------MOB FILTERS------------------------------------------------------------------------------------
@@ -115,11 +121,21 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return EntityUtils.isBoss(entity);
 			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
+			}
 		},
 		IS_ELITE {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return EntityUtils.isElite(entity);
+			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
 			}
 		},
 		NOT_SELF {
@@ -149,11 +165,21 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return entity instanceof Player player && AbilityUtils.getClassNum(player) == 0;
 			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
+			}
 		},
 		IS_MAGE {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return entity instanceof Player player && PlayerUtils.isMage(player);
+			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
 			}
 		},
 		IS_WARRIOR {
@@ -161,11 +187,21 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return entity instanceof Player player && PlayerUtils.isWarrior(player);
 			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
+			}
 		},
 		IS_CLERIC {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return entity instanceof Player player && PlayerUtils.isCleric(player);
+			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
 			}
 		},
 		IS_ROGUE {
@@ -173,11 +209,21 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return entity instanceof Player player && PlayerUtils.isRogue(player);
 			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
+			}
 		},
 		IS_ALCHEMIST {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return entity instanceof Player player && PlayerUtils.isAlchemist(player);
+			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
 			}
 		},
 		IS_SCOUT {
@@ -185,11 +231,21 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return entity instanceof Player player && PlayerUtils.isScout(player);
 			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
+			}
 		},
 		IS_WARLOCK {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return entity instanceof Player player && PlayerUtils.isWarlock(player);
+			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
 			}
 		},
 		HAS_LINEOFSIGHT {
@@ -203,6 +259,12 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return !(entity instanceof Player p && AbilityUtils.isStealthed(p));
 			}
+		},
+		IS_TARGET {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return launcher instanceof Mob mob && entity.equals(mob.getTarget());
+			}
 		};
 
 	}
@@ -215,17 +277,32 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return entity.getType() == EntityType.ARMOR_STAND;
 			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
+			}
 		},
 		IS_HOSTILE {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return EntityUtils.isHostileMob(entity);
 			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
+			}
 		},
 		IS_PLAYER {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return entity instanceof Player;
+			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
 			}
 		},
 		HAS_LINEOFSIGHT {
@@ -239,13 +316,19 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return !launcher.equals(entity);
 			}
+		},
+		IS_TARGET {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return launcher instanceof Mob mob && entity.equals(mob.getTarget());
+			}
 		};
 
 	}
 
 
 	public static class TagsListFiter implements EntityFilter {
-		private Set<String> mTags;
+		private final Set<String> mTags;
 
 		public TagsListFiter(Set<String> tags) {
 			mTags = tags;
@@ -336,29 +419,22 @@ public class EntityTargets implements Cloneable {
 			CLOSER {
 				@Override
 				public <V extends Entity> void sort(Location loc, List<V> list) {
-					Collections.sort(list, (e1, e2) -> {
-						return Double.compare(
-							loc.distance(e1.getLocation()),
-							loc.distance(e2.getLocation())
-						);
-					});
+					list.sort(Comparator.comparingDouble(e -> loc.distance(e.getLocation())));
 				}
 			},
 			FARTHER {
 				@Override
 				public <V extends Entity> void sort(Location loc, List<V> list) {
-					Collections.sort(list, (e1, e2) -> {
-						return Double.compare(
-							loc.distance(e2.getLocation()),
-							loc.distance(e1.getLocation())
-						);
-					});
+					list.sort((e1, e2) -> Double.compare(
+						loc.distance(e2.getLocation()),
+						loc.distance(e1.getLocation())
+					));
 				}
 			},
 			LOWER_HP {
 				@Override
 				public <V extends Entity> void sort(Location loc, List<V> list) {
-					Collections.sort(list, (e1, e2) -> {
+					list.sort((e1, e2) -> {
 						// Entities with no health are counted as 0 health,
 						// for satisfying comparator contract.
 						double e1Health = 0;
@@ -453,13 +529,13 @@ public class EntityTargets implements Cloneable {
 	}
 
 
-	public static final EntityTargets GENERIC_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, Limit.DEFAULT, List.of(), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_PLAYER_TARGET_LINE_OF_SIGHT = new EntityTargets(TARGETS.PLAYER, 30, Limit.DEFAULT, List.of(PLAYERFILTER.HAS_LINEOFSIGHT), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_MOB_TARGET = new EntityTargets(TARGETS.MOB, 30, Limit.DEFAULT, List.of(MOBFILTER.NOT_SELF), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_SELF_TARGET = new EntityTargets(TARGETS.SELF, 0, Limit.DEFAULT, List.of(), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_ONE_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, Limit.DEFAULT_ONE, List.of(), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_ONE_PLAYER_CLOSER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, Limit.CLOSER_ONE, List.of(), TagsListFiter.DEFAULT);
-	public static final EntityTargets GENERIC_ONE_PLAYER_CLOSER_TARGET_LINE_OF_SIGHT = new EntityTargets(TARGETS.PLAYER, 30, Limit.CLOSER_ONE, List.of(PLAYERFILTER.HAS_LINEOFSIGHT), TagsListFiter.DEFAULT);
+	public static final EntityTargets GENERIC_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, Limit.DEFAULT, List.of(), TagsListFiter.DEFAULT, false);
+	public static final EntityTargets GENERIC_PLAYER_TARGET_LINE_OF_SIGHT = new EntityTargets(TARGETS.PLAYER, 30, Limit.DEFAULT, List.of(PLAYERFILTER.HAS_LINEOFSIGHT), TagsListFiter.DEFAULT, false);
+	public static final EntityTargets GENERIC_MOB_TARGET = new EntityTargets(TARGETS.MOB, 30, Limit.DEFAULT, List.of(MOBFILTER.NOT_SELF), TagsListFiter.DEFAULT, false);
+	public static final EntityTargets GENERIC_SELF_TARGET = new EntityTargets(TARGETS.SELF, 0, Limit.DEFAULT, List.of(), TagsListFiter.DEFAULT, false);
+	public static final EntityTargets GENERIC_ONE_PLAYER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, Limit.DEFAULT_ONE, List.of(), TagsListFiter.DEFAULT, false);
+	public static final EntityTargets GENERIC_ONE_PLAYER_CLOSER_TARGET = new EntityTargets(TARGETS.PLAYER, 30, Limit.CLOSER_ONE, List.of(), TagsListFiter.DEFAULT, false);
+	public static final EntityTargets GENERIC_ONE_PLAYER_CLOSER_TARGET_LINE_OF_SIGHT = new EntityTargets(TARGETS.PLAYER, 30, Limit.CLOSER_ONE, List.of(PLAYERFILTER.HAS_LINEOFSIGHT), TagsListFiter.DEFAULT, false);
 
 	private static final String LIMIT_STRING = "limit=";
 	private static final String FILTERS_STRING = "filters=";
@@ -469,8 +545,8 @@ public class EntityTargets implements Cloneable {
 	private double mRange;
 	private Limit mLimit;
 	private Collection<EntityFilter> mFilters;
-	private TagsListFiter mTagsFilter;
-
+	private final TagsListFiter mTagsFilter;
+	private final boolean mExcludeTagged;
 
 	public EntityTargets(TARGETS targets, double range) {
 		this(targets, range, Limit.DEFAULT);
@@ -481,19 +557,20 @@ public class EntityTargets implements Cloneable {
 	}
 
 	public EntityTargets(TARGETS targets, double range, Limit limit, List<EntityFilter> filters) {
-		this(targets, range, limit, filters, TagsListFiter.DEFAULT);
+		this(targets, range, limit, filters, TagsListFiter.DEFAULT, false);
 	}
 
 	public EntityTargets(TARGETS targets, double range, Limit.LIMITSENUM limitsenum, Limit.SORTING sorting, @Nullable List<EntityFilter> filters, List<String> tagsListFilter) {
-		this(targets, range, new Limit(limitsenum, sorting), filters == null ? List.of() : filters, new TagsListFiter(new HashSet<>(tagsListFilter)));
+		this(targets, range, new Limit(limitsenum, sorting), filters == null ? List.of() : filters, new TagsListFiter(new HashSet<>(tagsListFilter)), false);
 	}
 
-	public EntityTargets(TARGETS targets, double range, Limit limit, Collection<EntityFilter> filters, TagsListFiter tagsfilter) {
+	public EntityTargets(TARGETS targets, double range, Limit limit, Collection<EntityFilter> filters, TagsListFiter tagsfilter, boolean excludeTagged) {
 		mTargets = targets;
 		mRange = range;
 		mLimit = limit;
 		mFilters = filters;
 		mTagsFilter = tagsfilter;
+		mExcludeTagged = excludeTagged;
 	}
 
 	@Override
@@ -506,27 +583,28 @@ public class EntityTargets implements Cloneable {
 	}
 
 	public List<? extends LivingEntity> getTargetsListByLocation(LivingEntity boss, Location loc) {
+		// Mutable List
 		List<? extends LivingEntity> list = mTargets.getTargets(boss, loc, mRange);
 
-		if (!mTagsFilter.mTags.isEmpty() || !mFilters.isEmpty()) {
-			for (LivingEntity entity : new ArrayList<>(list)) {
-
-				if (mTagsFilter.filter(boss, entity)) {
-					continue;
-				}
-
-				boolean dontRemove = false;
-				for (EntityFilter filter : mFilters) {
-					if (filter.filter(boss, entity)) {
-						dontRemove = true;
-						break;
-					}
-				}
-				if (!dontRemove) {
-					list.remove(entity);
+		// pass = !(any modeAll fail) && (any modeAny pass || modeAny = {})
+		if (!mFilters.isEmpty()) list.removeIf( entity -> {
+			boolean modeAllOneFailed = false;
+			boolean modeAnyOnePassed = false;
+			boolean hasModeAny = false;
+			for (EntityFilter filter : mFilters) {
+				if (filter.anyMatchType()) {
+					hasModeAny = true;
+					if (filter.filter(boss, entity)) modeAnyOnePassed = true;
+				} else {
+					if (!filter.filter(boss, entity)) modeAllOneFailed = true;
 				}
 			}
-		}
+
+			return modeAllOneFailed || (hasModeAny && !modeAnyOnePassed);
+		});
+		if (!mTagsFilter.mTags.isEmpty()) list.removeIf(entity ->
+			// RemoveIf (mExcludeTagged == FALSE AND filter() == FALSE) OR (mExcludeTagged == TRUE AND filter() == TRUE)
+			mExcludeTagged == mTagsFilter.filter(boss, entity));
 
 		return mLimit.sort(loc, list);
 	}
@@ -552,7 +630,7 @@ public class EntityTargets implements Cloneable {
 
 	@Override
 	public EntityTargets clone() {
-		return new EntityTargets(mTargets, mRange, mLimit, mFilters, mTagsFilter);
+		return new EntityTargets(mTargets, mRange, mLimit, mFilters, mTagsFilter, false);
 	}
 
 	public List<Location> getTargetsLocationList(LivingEntity boss) {
