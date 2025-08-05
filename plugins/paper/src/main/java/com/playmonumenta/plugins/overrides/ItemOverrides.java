@@ -123,6 +123,7 @@ public final class ItemOverrides {
 		mItems.put(Material.FIREWORK_ROCKET, new FireworkOverride());
 		mItems.put(Material.HOPPER, new HopperOverride());
 		mItems.put(Material.MAGMA_BLOCK, new MagmaOverride());
+		mItems.put(Material.MOVING_PISTON, new MovingPistonOverride());
 		mItems.put(Material.BEACON, new BeaconOverride());
 		mItems.put(Material.TRIDENT, new TridentOverride());
 		mItems.put(Material.BONE, new BoneOverride());
