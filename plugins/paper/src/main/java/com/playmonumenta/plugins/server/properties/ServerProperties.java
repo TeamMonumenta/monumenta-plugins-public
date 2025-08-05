@@ -434,9 +434,10 @@ public class ServerProperties {
 			mPreciousBlocks.clear();
 			mPreciousBlocks.addAll(EnumSet.of(
 				Material.IRON_BLOCK,
+				Material.RAW_IRON_BLOCK,
 				Material.GOLD_BLOCK,
-				Material.DIAMOND_BLOCK,
-				Material.NETHERITE_BLOCK
+				Material.RAW_GOLD_BLOCK,
+				Material.DIAMOND_BLOCK
 			));
 			// Replace default value if possible
 			getPropertyValueMaterialList(plugin, object, "preciousBlocks", sender, mPreciousBlocks);

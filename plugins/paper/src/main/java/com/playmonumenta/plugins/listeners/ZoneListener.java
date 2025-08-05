@@ -171,7 +171,7 @@ public class ZoneListener implements Listener {
 			&& ServerProperties.getPreciousBlocks().contains(event.getItemDrop().getItemStack().getType())) {
 			event.setCancelled(true);
 			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_SHULKER_HURT_CLOSED, 1, 1);
-			event.getPlayer().sendMessage(Component.text("You get the feeling that discarding this item here would be a bad idea...", NamedTextColor.RED));
+			event.getPlayer().sendMessage(Component.text("You get the feeling that discarding this valuable block here would be a bad idea...", NamedTextColor.RED));
 		}
 	}
 
@@ -182,7 +182,7 @@ public class ZoneListener implements Listener {
 			&& ServerProperties.getPreciousBlocks().contains(event.getBlockPlaced().getType())) {
 			event.setCancelled(true);
 			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_SHULKER_HURT_CLOSED, 1, 1);
-			event.getPlayer().sendMessage(Component.text("You get the feeling that placing this item here would be a bad idea...", NamedTextColor.RED));
+			event.getPlayer().sendMessage(Component.text("You get the feeling that placing this valuable block here would be a bad idea...", NamedTextColor.RED));
 		}
 	}
 
