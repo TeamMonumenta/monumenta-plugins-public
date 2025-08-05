@@ -301,6 +301,7 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 		mParameters.SOUND_HIT.play(loc, 0.5f, 0.5f);
 		mParameters.PARTICLE_HIT.spawn(mBoss, loc, 0d, 0d, 0d, 0.25d);
 		if (mParameters.DAMAGE > 0 && target != null) {
+			mParameters.EFFECTS.apply(target, mBoss);
 			BossUtils.blockableDamage(mBoss, target, mParameters.DAMAGE_TYPE, mParameters.DAMAGE,
 				mParameters.SPELL_NAME, prevLoc, mParameters.EFFECTS.mEffectList);
 		}
