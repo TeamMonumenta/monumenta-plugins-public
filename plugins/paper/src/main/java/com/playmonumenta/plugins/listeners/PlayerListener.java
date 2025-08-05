@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.managers.DungeonAccessManager;
@@ -534,10 +535,9 @@ public class PlayerListener implements Listener {
 		}
 
 		// Only allow placing monument wools on Monuments
-		if (
-			player.getGameMode() == GameMode.ADVENTURE
-				&& ItemUtils.isWool(block.getType())
-				&& !ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.MONUMENT)
+		if (ItemUtils.isWool(block.getType())
+			&& ItemStatUtils.getTier(item) == Tier.TROPHY
+			&& !ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.MONUMENT)
 		) {
 			event.setCancelled(true);
 			return;
