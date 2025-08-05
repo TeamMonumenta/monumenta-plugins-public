@@ -5,8 +5,10 @@ import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.EnumSet;
 import java.util.List;
@@ -17,6 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class Multiload implements Enchantment {
 
@@ -54,7 +57,7 @@ public class Multiload implements Enchantment {
 		// When loading the crossbow, set level as ammo count.
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			ItemStack crossbow = event.getCrossbow();
-			if (crossbow != null && crossbow.getItemMeta() instanceof CrossbowMeta crossbowMeta) {
+			if (crossbow.getItemMeta() instanceof CrossbowMeta crossbowMeta) {
 				ItemStack ammoItem = crossbowMeta.getChargedProjectiles().get(0);
 				int maxAmmo = (int) level + 1;
 				int ammoToAccount = maxAmmo - 1;
@@ -95,22 +98,23 @@ public class Multiload implements Enchantment {
 		loadCrossbow(player, crossbow, ammoItem, maxAmmo, getAmmoCount(crossbow) - 1);
 	}
 
-	private static int getAmmoCount(ItemStack crossbow) {
+	private static int getAmmoCount(@Nullable ItemStack crossbow) {
 		if (crossbow == null || crossbow.getType() != Material.CROSSBOW) {
 			return 0;
 		}
 		return NBT.get(crossbow, nbt -> {
-			return nbt.getOrDefault(AMMO_KEY, 0);
+			ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+			return playerModified == null ? 0 : playerModified.getOrDefault(AMMO_KEY, 0);
 		});
 	}
 
-	private static void setAmmoCount(ItemStack crossbow, int amount) {
+	private static void setAmmoCount(@Nullable ItemStack crossbow, int amount) {
 		if (crossbow == null || crossbow.getType() != Material.CROSSBOW) {
 			return;
 		}
-		// Modifies the item directly to set amount of ammo
-		NBTItem nbtItem = new NBTItem(crossbow);
-		nbtItem.setInteger(AMMO_KEY, amount);
-		crossbow.setItemMeta(nbtItem.getItem().getItemMeta());
+		NBT.modify(crossbow, nbt -> {
+			ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(nbt);
+			playerModified.setInteger(AMMO_KEY, amount);
+		});
 	}
 }

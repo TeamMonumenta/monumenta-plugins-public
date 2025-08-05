@@ -134,6 +134,10 @@ public class Constants {
 		public static final String DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING = "DepthStriderRiptideDisable";
 	}
 
+	public static class Permissions {
+		public static final String CAN_PLACE_SHULKER = "monumenta.canplaceshulker";
+	}
+
 	// Note blocks
 	public static class NotePitches {
 		public static final float FS0 = calculatePitch(0);

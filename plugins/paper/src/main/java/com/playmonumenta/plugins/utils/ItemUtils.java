@@ -298,26 +298,6 @@ public class ItemUtils {
 		Material.MANGROVE_BUTTON
 	);
 
-	public static final Set<Material> shulkerBoxes = EnumSet.of(
-		Material.SHULKER_BOX,
-		Material.WHITE_SHULKER_BOX,
-		Material.ORANGE_SHULKER_BOX,
-		Material.MAGENTA_SHULKER_BOX,
-		Material.LIGHT_BLUE_SHULKER_BOX,
-		Material.YELLOW_SHULKER_BOX,
-		Material.LIME_SHULKER_BOX,
-		Material.PINK_SHULKER_BOX,
-		Material.GRAY_SHULKER_BOX,
-		Material.LIGHT_GRAY_SHULKER_BOX,
-		Material.CYAN_SHULKER_BOX,
-		Material.PURPLE_SHULKER_BOX,
-		Material.BLUE_SHULKER_BOX,
-		Material.BROWN_SHULKER_BOX,
-		Material.GREEN_SHULKER_BOX,
-		Material.RED_SHULKER_BOX,
-		Material.BLACK_SHULKER_BOX
-	);
-
 	public static final Set<Material> ranged = EnumSet.of(
 		Material.BOW,
 		Material.CROSSBOW,
@@ -713,7 +693,7 @@ public class ItemUtils {
 	}
 
 	public static boolean isShulkerBox(@Nullable Material mat) {
-		return mat != null && shulkerBoxes.contains(mat);
+		return mat != null && Tag.SHULKER_BOXES.isTagged(mat);
 	}
 
 	//Returns true if the item material is something a player can launch an AbstractArrow/Projectile from

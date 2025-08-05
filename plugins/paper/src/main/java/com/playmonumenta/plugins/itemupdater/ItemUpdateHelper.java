@@ -17,6 +17,8 @@ import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.QuiverListener;
+import com.playmonumenta.plugins.overrides.FirmamentOverride;
+import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -399,6 +401,25 @@ public class ItemUpdateHelper {
 			if (ItemStatUtils.isUpgradedLimeTesseract(item)) {
 				lore.add(Component.text("Stored anvils: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
 					         .append(Component.text(ItemStatUtils.getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+			}
+
+			// Add/update firmament lore
+			FirmamentOverride.FirmamentType firmamentType = FirmamentOverride.getFirmamentType(item);
+			if (firmamentType != null) {
+				Component line = Component.text(firmamentType.mMaterialName + " ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+				boolean disabled = FirmamentOverride.isDisabled(playerModified);
+				if (disabled) {
+					line = line.append(Component.text("Disabled", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+				} else {
+					line = line.append(Component.text("Enabled", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+				}
+				lore.add(line);
+			}
+
+			// Add/update worldshaper's loom lore
+			if (WorldshaperOverride.isWorldshaperItem(item)) {
+				int modeIndex = WorldshaperOverride.getModeIndex(playerModified);
+				lore.add(WorldshaperOverride.Mode.values()[modeIndex].mMessage);
 			}
 
 			int shatterLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);

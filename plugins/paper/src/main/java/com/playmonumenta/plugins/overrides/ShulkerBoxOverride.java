@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.overrides;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Sound;
@@ -12,14 +13,13 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class ShulkerBoxOverride extends BaseOverride {
-	private static final String CAN_PLACE_SHULKER_PERM = "monumenta.canplaceshulker";
 
 	@Override
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
 		if (FirmamentOverride.isFirmamentItem(item)) {
 			return FirmamentOverride.placeBlock(player, item, event);
 		} else {
-			return player.hasPermission(CAN_PLACE_SHULKER_PERM);
+			return player.hasPermission(Constants.Permissions.CAN_PLACE_SHULKER);
 		}
 	}
 
@@ -55,7 +55,7 @@ public class ShulkerBoxOverride extends BaseOverride {
 		Player nearbyPlayer = EntityUtils.getNearestPlayer(block.getLocation(), 10);
 		if (nearbyPlayer != null) {
 			// Check permission to enable placing shulkers, just so this can be turned off via perms if needed
-			return nearbyPlayer.hasPermission(CAN_PLACE_SHULKER_PERM);
+			return nearbyPlayer.hasPermission(Constants.Permissions.CAN_PLACE_SHULKER);
 		}
 		return false; // Don't allow shulkers to be placed by dispensers if no player is nearby
 	}
