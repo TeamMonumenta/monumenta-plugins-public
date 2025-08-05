@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.destroystokyo.paper.entity.Pathfinder;
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.utils.BlockUtils;
@@ -10,15 +12,16 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -34,6 +37,18 @@ import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
  */
 public final class BlockPlacerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blockplacer";
+	private final Parameters mParameters;
+
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "Changes the type of block the mob uses. Invalid options default to polished blackstone bricks.")
+		public Material block = Material.POLISHED_BLACKSTONE_BRICKS;
+
+		@BossParam(help = "Change the sound of the block being placed.")
+		public SoundsList sound_place = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_NETHER_BRICKS_PLACE, 1f, 0.6f))
+			.build();
+	}
+
 	public static final String PREVENT_BLOCK_PLACEMENT = "disable_boss_blockplacer";
 
 	private static final double PREVENT_PLACING_RADIUS = 2.5;
@@ -45,8 +60,6 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 	private static final EnumSet<Material> CANNOT_REPLACE_MATERIALS = EnumSet.of(
 		Material.END_PORTAL
 	);
-	private static final Material BRIDGE_MAT = Material.POLISHED_BLACKSTONE_BRICKS;
-
 	private final Mob mMob = (Mob) mBoss;
 	private Location mLastLocation = mMob.getLocation();
 	private int mNoTargetTicks = 0;
@@ -54,8 +67,15 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 
 	public BlockPlacerBoss(final Plugin plugin, final LivingEntity boss) {
 		super(plugin, identityTag, boss);
+		mParameters = BossParameters.getParameters(boss, identityTag, new BlockPlacerBoss.Parameters());
 
 		final SpellBlockBreak blockBreakToTarget = new SpellBlockBreak(mBoss, true, false, true);
+
+		// Prevent blocks that shouldn't be used for placing
+		if (!mParameters.block.isBlock() || !mParameters.block.isSolid() ||
+			BlockUtils.isValuableBlock(mParameters.block) || BlockUtils.isMechanicalBlock(mParameters.block) || mParameters.block.equals(Material.BEACON)) {
+			mParameters.block = Material.POLISHED_BLACKSTONE_BRICKS;
+		}
 
 		final List<Spell> spells = List.of(
 			blockBreakToTarget,
@@ -110,7 +130,7 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 					if (mLowMovementTicks >= TICKS_PER_SECOND * 4) {
 						/* Launcher likely boxed itself inside a cage and needs to be rescued */
 						final List<Block> nearbyBridgeBlocks = BlockUtils.getBlocksInCube(bossLoc, 3);
-						nearbyBridgeBlocks.removeIf(block -> block.getType() != BRIDGE_MAT);
+						nearbyBridgeBlocks.removeIf(block -> block.getType() != mParameters.block);
 						blockBreakToTarget.breakBlocks(bossLoc, nearbyBridgeBlocks);
 						mLowMovementTicks = 0;
 						return;
@@ -126,7 +146,7 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 					} else {
 						final double distanceToTargetFlat = bossLoc.clone().subtract(targetLoc).toVector().setY(0).length();
 						if (mBoss.hasLineOfSight(target) && distanceToTargetFlat < BEELINE_DISTANCE / 2.0
-							    && targetLoc.getY() - bossLoc.getY() < BEELINE_DISTANCE / 2.0) {
+							&& targetLoc.getY() - bossLoc.getY() < BEELINE_DISTANCE / 2.0) {
 							MMLog.finest(() -> "[BlockPlacerBoss] Launcher " + mMob.getName() + " is attempting to " +
 								"bridge to " + mMob.getTarget() + " because its path is not null and the target is " +
 								"within beeline distance");
@@ -139,8 +159,8 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 						if ((distanceToTarget > 2 && (finalPoint == null || finalPoint.distance(bossLoc) < 1))
 							|| nextPoint == null
 							|| (distanceToTarget < Objects.requireNonNull(path.getNextPoint()).distance(targetLoc)
-							    && (distanceToTarget < BEELINE_DISTANCE
-									|| path.getFinalPoint().distance(targetLoc) > BEELINE_DISTANCE))) {
+							&& (distanceToTarget < BEELINE_DISTANCE
+							|| path.getFinalPoint().distance(targetLoc) > BEELINE_DISTANCE))) {
 							if (!blockBreakToTarget.tryToBreakBlocks(SpellBlockBreak.DEFAULT_REQUIRED_SCORE)) {
 								MMLog.finest(() -> "[BlockPlacerBoss] Launcher " + mMob.getName() + " is attempting " +
 									"to bridge to " + mMob.getTarget() + " because there are no available blocks to " +
@@ -154,7 +174,7 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 				private void bridge(final Pathfinder pathfinder, final Location bossLoc, final Location targetLoc) {
 					if (!PlayerUtils.playersInRange(bossLoc, PREVENT_PLACING_RADIUS, true).isEmpty()) {
 						MMLog.finest(() -> "[BlockPlacerBoss] Launcher " + mMob.getName() + " attempted to place " +
-								"a block but was too close to one or more players");
+							"a block but was too close to one or more players");
 						return;
 					}
 
@@ -189,15 +209,14 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 						if (CANNOT_REPLACE_MATERIALS.contains(material) || block.isSolid() || BlockUtils.containsWater(block)
 							|| ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)
 							|| LocationUtils.blocksIntersectEntity(loc.getWorld(), List.of(loc),
-								hitbox -> hitbox.getHitEntities(e -> e instanceof LivingEntity && !e.isInvulnerable()))) {
+							hitbox -> hitbox.getHitEntities(e -> e instanceof LivingEntity && !e.isInvulnerable()))) {
 							MMLog.finest(() -> "[BlockPlacerBoss] Launcher " + mMob.getName() + " attempted to place " +
 								"a block but failed the final placement check");
 							continue;
 						}
 
-						block.setType(BRIDGE_MAT);
-						loc.getWorld().playSound(loc, Sound.BLOCK_NETHER_BRICKS_PLACE, SoundCategory.BLOCKS, 1f,
-							FastUtils.randomFloatInRange(0.5f, 0.7f));
+						block.setType(mParameters.block);
+						mParameters.sound_place.play(boss.getLocation());
 						pathfinder.moveTo(loc.clone().add(0, 1, 0));
 						Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () ->
 							pathfinder.moveTo(loc.clone().add(0, 1, 0)), 5);

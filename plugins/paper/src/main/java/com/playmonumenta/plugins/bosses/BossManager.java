@@ -306,7 +306,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(MageCosmicMoonbladeBoss.identityTag, MageCosmicMoonbladeBoss::new, new MageCosmicMoonbladeBoss.Parameters());
 		registerStatelessBoss(WarriorShieldWallBoss.identityTag, WarriorShieldWallBoss::new, new WarriorShieldWallBoss.Parameters());
 		registerStatelessBoss(DodgeBoss.identityTag, DodgeBoss::new, new DodgeBoss.Parameters());
-		registerStatelessBoss(BlockPlacerBoss.identityTag, BlockPlacerBoss::new);
+		registerStatelessBoss(BlockPlacerBoss.identityTag, BlockPlacerBoss::new, new BlockPlacerBoss.Parameters());
 		registerStatelessBoss(ScoutVolleyBoss.identityTag, ScoutVolleyBoss::new, new ScoutVolleyBoss.Parameters());
 		registerStatelessBoss(WarlockAmpHexBoss.identityTag, WarlockAmpHexBoss::new, new WarlockAmpHexBoss.Parameters());
 		registerStatelessBoss(LimitedLifespanBoss.identityTag, LimitedLifespanBoss::new, new LimitedLifespanBoss.Parameters());
