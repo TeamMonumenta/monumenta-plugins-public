@@ -1684,6 +1684,7 @@ public class PlayerListener implements Listener {
 	public void abilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
 		mPlugin.mAbilityManager.abilityCastEvent(player, event);
+		mPlugin.mItemStatManager.onAbilityCast(mPlugin, player, event);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -353,6 +354,10 @@ public interface ItemStat {
 	 * @param event the associated CustomEffectApplyEvent
 	 */
 	default void onCustomEffectApply(Plugin plugin, Player player, double value, CustomEffectApplyEvent event) {
+
+	}
+
+	default void onAbilityCast(Plugin plugin, Player player, double value, AbilityCastEvent event) {
 
 	}
 }

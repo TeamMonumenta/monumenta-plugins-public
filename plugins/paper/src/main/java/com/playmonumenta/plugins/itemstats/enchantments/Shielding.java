@@ -14,9 +14,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class Shielding implements Enchantment {
-
-	public static final double ARMOR_BONUS_PER_LEVEL = 0.2;
-	public static final double ARMOR_BONUS_PER_LEVEL_DISABLED = 0.1;
+	public static final double DISABLED_MULTIPLIER = 0.5;
 	public static final double DISTANCE = 2.5;
 	public static final int DISABLE_DURATION = 5 * 20;
 	private static final String DISABLE_METAKEY = "ShieldingDisabled";
@@ -34,7 +32,7 @@ public class Shielding implements Enchantment {
 	public static double applyShielding(DamageEvent event, Plugin plugin, Player player) {
 		LivingEntity source = event.getSource();
 		if (doesShieldingApply(player, source)) {
-			double bonusPerLevel = MetadataUtils.happenedInRecentTicks(player, DISABLE_METAKEY, DISABLE_DURATION) ? ARMOR_BONUS_PER_LEVEL_DISABLED : ARMOR_BONUS_PER_LEVEL;
+			double bonusPerLevel = MetadataUtils.happenedInRecentTicks(player, DISABLE_METAKEY, DISABLE_DURATION) ? DISABLED_MULTIPLIER : 1;
 			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SHIELDING) * bonusPerLevel;
 		}
 		return 0;

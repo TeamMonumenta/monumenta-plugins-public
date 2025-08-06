@@ -33,8 +33,8 @@ public class Agility implements Attribute {
 		if (value > 0 && event.getType().isDefendable() && plugin.mItemStatManager.getAttributeAmount(player, AttributeType.ARMOR) <= 0) {
 			boolean adaptability = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADAPTABILITY) > 0;
 			double damageMultiplier = Armor.getDamageMultiplier(0, Armor.getSecondaryEnchantsMod(event, plugin, player),
-				value, getSecondaryEnchantsMod(event, plugin, player),
-				Armor.getSecondaryEnchantCap(player), adaptability, 0, event.getType().isEnvironmental());
+				value, getSecondaryEnchantsLevel(event, plugin, player),
+				Armor.getSecondaryEnchantCap(player), Armor.getSecondaryEHPMultiplier(player), adaptability, 0, event.getType().isEnvironmental());
 			event.setFlatDamage(event.getDamage() * damageMultiplier);
 		}
 	}
@@ -42,7 +42,7 @@ public class Agility implements Attribute {
 	/**
 	 * Gets the total modifier (0-based) of agility from secondary enchants for the given event and player.
 	 */
-	public static double getSecondaryEnchantsMod(DamageEvent event, Plugin plugin, Player player) {
+	public static double getSecondaryEnchantsLevel(DamageEvent event, Plugin plugin, Player player) {
 		return Tempo.applyTempo(event, plugin, player)
 			+ Reflexes.applyReflexes(event, plugin, player)
 			+ Evasion.applyEvasion(event, plugin, player)

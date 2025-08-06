@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class Illuminate extends Ability {
+	private static final ClassAbility ILLUMINATE_DOT_ABILITY = ClassAbility.ILLUMINATE_DOT;
 	private static final int COOLDOWN_1 = TICKS_PER_SECOND * 14;
 	private static final int COOLDOWN_2 = TICKS_PER_SECOND * 12;
 	private static final int ILLUMINATE_MAX_RANGE = 24;
@@ -202,7 +203,7 @@ public class Illuminate extends Ability {
 
 				if (isEnhanced() && mTicks % ILLUMINATE_ENHANCE_COOLDOWN == 0) {
 					for (final LivingEntity mob : mMobsInZone) {
-						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mEnhanceDamage, mInfo.getLinkedSpell(), true);
+						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mEnhanceDamage, ILLUMINATE_DOT_ABILITY, true);
 						mCosmetic.enhanceTickDamageEffect(mPlayer, mob);
 					}
 				}

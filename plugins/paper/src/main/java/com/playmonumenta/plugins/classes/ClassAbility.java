@@ -73,6 +73,7 @@ public enum ClassAbility {
 	HAND_OF_LIGHT("Hand of Light"),
 	SANCTIFIED_ARMOR("Sanctified Armor"),
 	ILLUMINATE("Illuminate"),
+	ILLUMINATE_DOT("Illuminate DoT"),
 	TOUCH_OF_RADIANCE("Touch of Radiance"),
 	HEAVENLY_BOON("Heavenly Boon"),
 
@@ -120,6 +121,7 @@ public enum ClassAbility {
 	DARK_PACT("Dark Pact"),
 	JUDGEMENT_CHAIN("Judgement Chain"),
 	VOODOO_BONDS("Voodoo Bonds"),
+	VOODOO_BONDS_PIN("Voodoo Bonds Pin"),
 
 	// Tenebrist
 	HAUNTING_SHADES("Haunting Shades"),

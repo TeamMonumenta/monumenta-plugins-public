@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Orbital;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemstats.infusions.Tenacity;
 import com.playmonumenta.plugins.itemstats.infusions.Vengeful;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import java.util.Arrays;
@@ -175,8 +176,6 @@ class PSGUIStats {
 	}
 
 	double getDamageTakenMultiplier(@Nullable Protection protection, @Nullable Protection inverseProtection) {
-		boolean region2 = mPlayerItemStats.getRegion().compareTo(Region.ISLES) >= 0;
-
 		double damageMultiplier = 1;
 		if (protection != null && inverseProtection != null) {
 			double armor = get(AttributeType.ARMOR);
@@ -186,9 +185,9 @@ class PSGUIStats {
 			double agilityBonus = 0;
 			for (PSGUISecondaryStat stat : mSettings.mSecondaryStatEnabled) {
 				if (stat.isArmorModifier()) {
-					armorBonus += Shielding.ARMOR_BONUS_PER_LEVEL * get(stat.getEnchantmentType());
+					armorBonus += get(stat.getEnchantmentType());
 				} else {
-					agilityBonus += Shielding.ARMOR_BONUS_PER_LEVEL * get(stat.getEnchantmentType());
+					agilityBonus += get(stat.getEnchantmentType());
 				}
 			}
 
@@ -197,7 +196,7 @@ class PSGUIStats {
 				             + (inverseProtection.getEPF() * get(inverseProtection.getEnchantmentType()));
 
 			damageMultiplier = Armor.getDamageMultiplier(armor, armorBonus, agility, agilityBonus,
-				Armor.getSecondaryEnchantCap(region2), adaptability, epf, protection.getType().isEnvironmental());
+				Armor.getSecondaryEnchantCap(ServerProperties.getRegion(mPlayer)), Armor.getSecondaryEHPMultiplier(mPlayer), adaptability, epf, protection.getType().isEnvironmental());
 		}
 
 		// when Steadfast is enabled, also include Second Wind in calculation

@@ -177,6 +177,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private final Player mViewer;
 	private final @Nullable Player mTargetPlayer;
 	private final boolean mFromPDGui;
+	private Region mRegion;
 
 	public PlayerItemStatsGUI(Player player) {
 		this(player, null, false);
@@ -198,6 +199,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		Region region = Stream.of(mLeftStats.getMaximumRegion(false, ServerProperties.getRegion(player)), mRightStats.getMaximumRegion(false, ServerProperties.getRegion(player)))
 			                              .max(Comparator.naturalOrder())
 			                              .orElse(ServerProperties.getRegion(player));
+		mRegion = region;
 		mLeftStats.mPlayerItemStats.setRegion(region);
 		mRightStats.mPlayerItemStats.setRegion(region);
 		final var infusionSettingCount = InfusionSetting.values().length;
@@ -308,6 +310,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				Region region = mLeftStats.mPlayerItemStats.getRegion() == Region.VALLEY ? Region.ISLES
 					                              : mLeftStats.mPlayerItemStats.getRegion() == Region.ISLES ? Region.RING
 						                                : Region.VALLEY;
+				mRegion = region;
 				mLeftStats.mPlayerItemStats.setRegion(region);
 				mRightStats.mPlayerItemStats.setRegion(region);
 				generateInventory();
@@ -526,7 +529,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			} else {
 				meta.displayName(stat.getDisplay(false));
 			}
-			meta.lore(stat.getDisplayLore());
+			meta.lore(stat.getDisplayLore(mRegion));
 			item.setItemMeta(meta);
 			mInventory.setItem(stat.getSlot(), item);
 		}

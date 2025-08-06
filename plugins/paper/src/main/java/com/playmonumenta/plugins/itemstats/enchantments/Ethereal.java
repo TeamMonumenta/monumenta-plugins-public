@@ -11,8 +11,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class Ethereal implements Enchantment {
-
-	private static final double AGIL_BONUS_PER_LEVEL = 0.2;
 	public static final int PAST_HIT_DURATION_TIME = (int) (1.5 * 20);
 	private static final String ETHEREAL_EFFECT_NAME = "EtherealEffect";
 
@@ -33,12 +31,12 @@ public class Ethereal implements Enchantment {
 		}
 		plugin.mEffectManager.clearEffects(player, ETHEREAL_EFFECT_NAME);
 		// dummy amount (only used for inure)
-		plugin.mEffectManager.addEffect(player, ETHEREAL_EFFECT_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME, 1));
+		plugin.mEffectManager.addEffect(player, ETHEREAL_EFFECT_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME));
 	}
 
 	public static double applyEthereal(DamageEvent event, Plugin plugin, Player player) {
 		if (plugin.mEffectManager.hasEffect(player, ETHEREAL_EFFECT_NAME)) {
-			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ETHEREAL) * AGIL_BONUS_PER_LEVEL;
+			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ETHEREAL);
 		} else {
 			return 0;
 		}

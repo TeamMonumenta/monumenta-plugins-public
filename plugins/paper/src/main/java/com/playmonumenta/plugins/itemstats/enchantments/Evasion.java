@@ -10,8 +10,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class Evasion implements Enchantment {
-
-	private static final double AGIL_BONUS_PER_LEVEL = 0.2;
 	public static final int DISTANCE = 4;
 
 	@Override
@@ -30,7 +28,7 @@ public class Evasion implements Enchantment {
 			Location playerLoc = player.getLocation();
 			Location mobLoc = source.getLocation();
 			if (playerLoc.distance(mobLoc) >= DISTANCE) {
-				return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.EVASION) * AGIL_BONUS_PER_LEVEL;
+				return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.EVASION);
 			}
 		}
 		return 0;

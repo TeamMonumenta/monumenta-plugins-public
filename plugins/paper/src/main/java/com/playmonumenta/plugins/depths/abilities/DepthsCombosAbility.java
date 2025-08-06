@@ -31,7 +31,7 @@ public abstract class DepthsCombosAbility extends DepthsAbility {
 			mComboCount++;
 			if (mComboCount >= mHitRequirement) {
 				mComboCount = 0;
-				mPlugin.mEffectManager.addEffect(mPlayer, COOLDOWN_EFFECT, new OnHitTimerEffect(COOLDOWN_DURATION, 1));
+				mPlugin.mEffectManager.addEffect(mPlayer, COOLDOWN_EFFECT, new OnHitTimerEffect(COOLDOWN_DURATION));
 				activate(event, enemy);
 			}
 		}

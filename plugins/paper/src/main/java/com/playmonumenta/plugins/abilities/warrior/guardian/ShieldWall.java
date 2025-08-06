@@ -160,7 +160,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 						}
 						mCosmetic.shieldOnHit(world, le.getLocation(), mPlayer, enteredWall ? 1 : 0.5f);
 						MovementUtils.knockAway(mLoc, le, mKnockback, y, true);
-						mPlugin.mEffectManager.addEffect(le, ON_HIT_EFFECT + mPlayer.getName(), new OnHitTimerEffect(5, 0));
+						mPlugin.mEffectManager.addEffect(le, ON_HIT_EFFECT + mPlayer.getName(), new OnHitTimerEffect(5));
 					}
 
 					mMobsAlreadyHit.add(le);

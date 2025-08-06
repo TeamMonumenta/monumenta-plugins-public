@@ -127,7 +127,7 @@ public class VoodooBonds extends MultipleChargeAbility {
 		hitMobs.addAll(Hitbox.approximateCone(mPlayer.getEyeLocation(), 5, Math.toRadians(45)).getHitMobs());
 		for (LivingEntity mob : hitMobs) {
 			mCosmetic.hitMob(mPlayer, mob);
-			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MELEE_SKILL, mPinDamage, ClassAbility.VOODOO_BONDS, true, true);
+			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MELEE_SKILL, mPinDamage, ClassAbility.VOODOO_BONDS_PIN, true, true);
 
 			if (isLevelTwo() && mPlugin.mEffectManager.hasEffect(mob, CURSE_EFFECT)) {
 				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MELEE_SKILL, mPinAdditionalDamage, ClassAbility.VOODOO_BONDS, true, false);
