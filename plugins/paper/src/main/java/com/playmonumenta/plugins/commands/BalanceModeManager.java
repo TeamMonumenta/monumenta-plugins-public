@@ -421,7 +421,7 @@ public class BalanceModeManager {
 		float projScore = (1 + oData.get("ps_pmult").getAsFloat() * attrProjDamage + oData.get("ps_psmult").getAsFloat() * attrProjSpeed)
 			* (1 + oData.get("ps_tmult").getAsFloat() * attrThrowRate) - 1;
 		projScore /= projMult;
-		float magicScore = oData.get("ws_mmult").getAsFloat() * attrMagicDamage + oData.get("ws_tmult").getAsFloat() * enchTrivium + oData.get("ws_fmult").getAsFloat() * enchFractal;
+		float magicScore = oData.get("ws_mmult").getAsFloat() * (attrMagicDamage + oData.get("ws_tmult").getAsFloat() * enchTrivium + oData.get("ws_fmult").getAsFloat() * enchFractal);
 		magicScore /= magicMult;
 		float infernoScore = oData.get("os_imult").getAsFloat() * enchInferno;
 		float thornsScore = oData.get("os_tmult").getAsFloat() * attrThornsFlat;
