@@ -945,7 +945,10 @@ public final class EffectManager implements Listener {
 					Effect effect = pair.mEffect;
 					String source = pair.mSource;
 
-					// DeathPersistent effects are not modified
+					if (source.startsWith("DeathPersistent")) {
+						// Don't alter duration for these effects.
+						continue;
+					}
 
 					if (effect.isBuff() && !source.startsWith("PatronShrine")) {
 						// Effect is Buff, set duration based on Phylactery value.
