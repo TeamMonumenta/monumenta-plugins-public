@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemupdater;
 
 import com.google.common.collect.Multimap;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
+import com.playmonumenta.plugins.hunts.HuntsManager.QuarryType;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.itemstats.EffectType;
@@ -25,6 +26,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTType;
@@ -298,6 +300,13 @@ public class ItemUpdateHelper {
 							name = MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(playerUuid);
 						}
 						infusionMap.put(type, type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY), name));
+						continue;
+					}
+					if (type == InfusionType.HUNT_TRACK) {
+						QuarryType quarry = QuarryType.values()[infusion.getInteger(ItemStatUtils.LEVEL_KEY) - 1];
+						String name = MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(UUID.fromString(infusion.getString(ItemStatUtils.INFUSER_KEY)));
+						Component display = Component.text("Hunted " + quarry.getName() + " " + ScoreboardUtils.getScoreboardValue(name, quarry.getLos() + "WinsUnspoiled").orElse(0) + " times.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+						infusionMap.put(type, display);
 						continue;
 					}
 					Component display = type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY));

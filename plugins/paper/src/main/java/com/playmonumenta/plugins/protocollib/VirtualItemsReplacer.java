@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
 import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
@@ -346,6 +347,15 @@ public class VirtualItemsReplacer extends PacketAdapter {
 					});
 				}
 			}
+		}
+
+		// Update Hunt Track items
+		if (ItemStatUtils.getInfusionLevel(itemStack, InfusionType.HUNT_TRACK) > 0) {
+			ItemUpdateHelper.generateItemStats(itemStack);
+			NBT.modify(itemStack, nbt -> {
+				markVirtual(nbt);
+			});
+			return itemStack;
 		}
 
 		return itemStack;

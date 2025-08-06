@@ -84,6 +84,7 @@ public enum InfusionType {
 	GILDED(new Gilded(), "Gilded", false, false, true, false, false, false, false, false),
 	SHATTERED(new Shattered(), "", true, false, false, false, false, false, false, false),
 	HEXED(new Hexed(), "", false, false, false, false, false, false, false, false),
+	HUNT_TRACK(new HuntTrack(), "", false, false, false, false, false, false, false, false),
 	// Stat tracking stuff
 	STAT_TRACK(new StatTrack(), "Tracked", false, false, false, false, false, false, false, false),
 	STAT_TRACK_KILLS(new StatTrackKills(), "", true, false, false, true, false, false, false, false),
