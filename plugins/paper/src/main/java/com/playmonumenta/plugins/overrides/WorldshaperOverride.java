@@ -89,6 +89,10 @@ public class WorldshaperOverride {
 			return false;
 		}
 
+		if (Plugin.getInstance().mHuntsManager.checkPreSpawnProtection(player, player.getLocation().getBlock())) {
+			return false;
+		}
+
 		if (ServerProperties.getShardName().contains("indigo")
 			|| ServerProperties.getShardName().startsWith("dev")) {
 			IndigoListener.revokeBlocklessEligibility(player, "Worldshaper's loom used");

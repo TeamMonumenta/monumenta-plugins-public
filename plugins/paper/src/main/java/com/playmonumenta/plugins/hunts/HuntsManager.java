@@ -54,6 +54,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -619,24 +620,34 @@ public class HuntsManager implements Listener {
 		}
 	}
 
+	/**
+	 * Checks whether a player trying to break or place a block should be cancelled due to the boss spawning soon
+	 *
+	 * @param player the player placing or breaking the block
+	 * @param block  the block that is being modified
+	 * @return true if the modification should be prevented, false if it should be allowed
+	 */
+	public boolean checkPreSpawnProtection(Player player, Block block) {
+		if (getRemainingTime() < WARNING_15 && mNextQuarry != null
+			    && block.getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius
+			    && mWorld == player.getWorld()) {
+			player.sendMessage(Component.text("The quarry will appear soon, it is best to leave the ground undisturbed.", NamedTextColor.RED));
+			player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 1, 0.63f);
+			return true;
+		}
+		return false;
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event) {
-		if (getRemainingTime() < WARNING_15 && mNextQuarry != null
-				&& event.getBlock().getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius
-			&& mWorld == event.getPlayer().getWorld()) {
-			event.getPlayer().sendMessage(Component.text("The quarry will appear soon, it is best to leave the ground undisturbed.", NamedTextColor.RED));
-			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 1, 0.63f);
+		if (checkPreSpawnProtection(event.getPlayer(), event.getBlock())) {
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent event) {
-		if (getRemainingTime() < WARNING_15 && mNextQuarry != null
-				&& event.getBlock().getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius
-			&& mWorld == event.getPlayer().getWorld()) {
-			event.getPlayer().sendMessage(Component.text("The quarry will appear soon, it is best to leave the ground undisturbed.", NamedTextColor.RED));
-			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 1, 0.63f);
+		if (checkPreSpawnProtection(event.getPlayer(), event.getBlock())) {
 			event.setCancelled(true);
 		}
 	}
