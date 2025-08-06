@@ -17,6 +17,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Shulker;
 
 public class Arcanic {
 
@@ -37,11 +38,13 @@ public class Arcanic {
 
 	public static void applyModifiers(LivingEntity mob, int level) {
 		Player nearestPlayer = EntityUtils.getNearestPlayer(mob.getLocation(), 64);
-		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob) && !mob.getScoreboardTags().contains(AVOID_ARCANIC)) {
+		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob) && !mob.getScoreboardTags().contains(AVOID_ARCANIC) && !mob.getScoreboardTags().contains("boss_immortalmount") && !mob.getScoreboardTags().contains("boss_delveimmune")) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			int region = (ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? 3 : 2) : 1);
 			String ability = FastUtils.getRandomElement(Arrays.asList(ArcanicBoss.ArcanicSpell.values())).name();
-
+			if (mob instanceof Shulker && ability.equals("CHARGE")) {
+				return;
+			}
 			mob.addScoreboardTag(ArcanicBoss.identityTag);
 			mob.addScoreboardTag(ArcanicBoss.identityTag + "[spell=" + ability + ",region=" + region + "]");
 
