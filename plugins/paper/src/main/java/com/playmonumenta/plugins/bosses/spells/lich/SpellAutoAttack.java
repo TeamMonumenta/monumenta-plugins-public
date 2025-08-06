@@ -285,10 +285,14 @@ public class SpellAutoAttack extends Spell {
 		}
 
 		BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, damage, cause, mBoss.getLocation());
-		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, VULNERABILITY_SRC,
-			new PercentDamageReceived(TICKS_PER_SECOND * 5, damageReceived));
-		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
-			new PercentDamageDealt(TICKS_PER_SECOND * 5, damageDealt));
+		if (damageReceived != 0) {
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, VULNERABILITY_SRC,
+				new PercentDamageReceived(TICKS_PER_SECOND * 5, damageReceived));
+		}
+		if (damageDealt != 0) {
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
+				new PercentDamageDealt(TICKS_PER_SECOND * 5, damageDealt));
+		}
 	}
 
 	@Override
