@@ -45,13 +45,13 @@ public class Illuminate extends Ability {
 	private static final int ILLUMINATE_BUFF_DURATION = TICKS_PER_SECOND * 4;
 	private static final double ILLUMINATE_SPEED_BUFF = 0.20;
 	private static final double ILLUMINATE_STRENGTH_BUFF = 0.10;
-	private static final double ILLUMINATE_DAMAGE_1 = 8;
-	private static final double ILLUMINATE_DAMAGE_2 = 13;
+	private static final double ILLUMINATE_DAMAGE_1 = 11;
+	private static final double ILLUMINATE_DAMAGE_2 = 15;
 	private static final double ILLUMINATE_RADIUS = 4.5;
 	private static final float ILLUMINATE_KNOCKBACK = 0.5f;
 	private static final double ILLUMINATE_ENHANCE_RADIUS = 6.0;
 	private static final double ILLUMINATE_ENHANCE_DAMAGE = 1;
-	private static final int ILLUMINATE_ENHANCE_COOLDOWN = TICKS_PER_SECOND;
+	private static final int ILLUMINATE_ENHANCE_COOLDOWN = TICKS_PER_SECOND / 2;
 
 	public static final String CHARM_COOLDOWN = "Illuminate Cooldown";
 	public static final String CHARM_RANGE = "Illuminate Max Range";
@@ -331,6 +331,6 @@ public class Illuminate extends Ability {
 			.add(a -> a.mEnhanceDamage, ILLUMINATE_ENHANCE_DAMAGE)
 			.add(" magic damage every ")
 			.addDuration(ILLUMINATE_ENHANCE_COOLDOWN)
-			.add(" second.");
+			.add(" seconds.");
 	}
 }

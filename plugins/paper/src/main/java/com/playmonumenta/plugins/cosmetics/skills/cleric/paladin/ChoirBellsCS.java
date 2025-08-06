@@ -46,9 +46,8 @@ public class ChoirBellsCS implements CosmeticSkill {
 		return Material.BELL;
 	}
 
-	public void bellsCastEffect(Player player, double range) {
+	public void bellsCastEffect(Player player, double range, Location loc) {
 		new BukkitRunnable() {
-			final Location mCenter = player.getLocation();
 			final double mDelta = 0.8;
 			int mTicks = 0;
 
@@ -57,7 +56,7 @@ public class ChoirBellsCS implements CosmeticSkill {
 				double radius = (mTicks + 1.5) * mDelta;
 				double height = (FastUtils.cos(mTicks * Math.PI / 4) + 1) * Math.exp(-0.06 * mTicks) * 1.25;
 				int units = (mTicks + 3) * 3;
-				ParticleUtils.drawCurve(mCenter, 1, units,
+				ParticleUtils.drawCurve(loc, 1, units,
 					new Vector(0, 0, 1), new Vector(1, 0, 0), new Vector(0, 1, 0),
 					t -> radius * FastUtils.cos(Math.PI * 2 * t / units),
 					t -> radius * FastUtils.sin(Math.PI * 2 * t / units),
@@ -85,7 +84,7 @@ public class ChoirBellsCS implements CosmeticSkill {
 			@Override
 			public void run() {
 				for (SoundsList.CSound sound : SOUNDS[mTicks]) {
-					sound.play(player.getLocation(), SoundCategory.PLAYERS);
+					sound.play(loc, SoundCategory.PLAYERS);
 				}
 				if (++mTicks >= SOUNDS.length) {
 					this.cancel();

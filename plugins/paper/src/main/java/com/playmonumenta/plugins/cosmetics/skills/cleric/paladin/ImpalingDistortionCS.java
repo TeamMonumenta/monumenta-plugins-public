@@ -60,7 +60,6 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 
 	@Override
 	public void infusionStartEffect(World world, Player player, Location loc, int stacks) {
-		MessagingUtils.sendActionBarMessage(player, "An intense pressure emerges in the air... (" + stacks + ")", TextColor.color(50, 180, 200));
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1.6f, 0.6f);
 		ParticleUtils.explodingRingEffect(Plugin.getInstance(), loc.subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0), 2, 0, 4,
 			List.of(

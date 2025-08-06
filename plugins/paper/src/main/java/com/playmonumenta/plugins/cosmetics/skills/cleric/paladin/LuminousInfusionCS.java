@@ -33,7 +33,6 @@ public class LuminousInfusionCS implements CosmeticSkill {
 	}
 
 	public void infusionStartEffect(World world, Player player, Location loc, int stacks) {
-		MessagingUtils.sendActionBarMessage(player, "Holy energy radiates from your hands... (" + stacks + ")", NamedTextColor.YELLOW);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.8f, 2.0f);
 		world.playSound(loc, Sound.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 0.6f, 1.5f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.PLAYERS, 0.6f, 2.0f);

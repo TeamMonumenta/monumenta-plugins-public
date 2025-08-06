@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
+import com.playmonumenta.plugins.abilities.cleric.paladin.Unwavering;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 
@@ -51,7 +52,8 @@ public class Cleric extends PlayerClass {
 		mSpecOne.mSpecialization = PALADIN_SPEC_ID;
 		mSpecOne.mSpecName = "Paladin";
 		mSpecOne.mDisplayItem = Material.GHAST_TEAR;
-		mSpecOne.mDescription = "Paladins are mighty fighters that have mastered combating Heretics. They will make sure the dead stay dead.";
+		mSpecOne.mDescription = "Paladins are forefront fighters, charging into battle and vanquishing Heretics with heavy attacks in quick succession.";
+		mSpecOne.mPassive = Unwavering.INFO;
 
 		mSpecTwo.mAbilities.add(EnchantedPrayer.INFO);
 		mSpecTwo.mAbilities.add(ThuribleProcession.INFO);

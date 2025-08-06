@@ -32,8 +32,8 @@ public class KillTriggeredAbilityTracker {
 	}
 
 	public void updateDamageDealtToBosses(DamageEvent event) {
-		// Prevent Cloak and Dagger's and Luminous Infusion's damage from counting towards boss damage thresholds
-		if (event.getAbility() == ClassAbility.CLOAK_AND_DAGGER || event.getAbility() == ClassAbility.LUMINOUS_INFUSION) {
+		// Prevent Cloak and Dagger's damage from counting towards boss damage thresholds
+		if (event.getAbility() == ClassAbility.CLOAK_AND_DAGGER) {
 			return;
 		}
 

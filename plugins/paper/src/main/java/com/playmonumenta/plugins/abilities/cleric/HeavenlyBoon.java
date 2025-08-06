@@ -209,14 +209,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	@Override
 	public void triggerOnKill(final LivingEntity mob) {
-		if (
-			Crusade.enemyTriggersAbilities(mob)
-				&& FastUtils.RANDOM.nextDouble() < mChance
-				&& !ServerProperties.getShardName().equals("plots")
-				&& !ServerProperties.getShardName().equals("playerplots")
-				&& !ServerProperties.getShardName().equals("guildplots")
-		) {
-
+		if (Crusade.enemyTriggersAbilities(mob) && FastUtils.RANDOM.nextDouble() < mChance) {
 			final ImmutableList<NamespacedKey> lootTables = isLevelOne() ? LEVEL_1_POTIONS : LEVEL_2_POTIONS;
 			final NamespacedKey lootTable = lootTables.get(FastUtils.RANDOM.nextInt(lootTables.size()));
 			final ItemStack potion = InventoryUtils.getItemFromLootTable(mPlayer, lootTable);

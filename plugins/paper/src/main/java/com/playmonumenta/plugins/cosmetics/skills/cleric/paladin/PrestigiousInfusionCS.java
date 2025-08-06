@@ -74,7 +74,6 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 
 	@Override
 	public void infusionStartEffect(World world, Player player, Location loc, int stacks) {
-		MessagingUtils.sendActionBarMessage(player, "Holy energy radiates from prestige... (" + stacks + ")", TextColor.color(255, 168, 16));
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.6f, 1.2f);
 		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.95f, 1.4f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.25f, 0.75f);

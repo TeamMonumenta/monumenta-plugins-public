@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric.paladin;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -9,10 +10,7 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
-import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
-import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
-import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.LuminousInfusionCS;
@@ -24,48 +22,35 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Bukkit;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+public class LuminousInfusion extends Ability implements AbilityWithChargesOrStacks {
+	public static final int R2_DAMAGE = 8;
+	public static final int R3_DAMAGE = 11;
+	public static final int R2_HERETIC_DAMAGE = 16;
+	public static final int R3_HERETIC_DAMAGE = 22;
+	public static final int CHARGES_1 = 2;
+	public static final int CHARGES_2 = 3;
 
-public final class LuminousInfusion extends Ability implements KillTriggeredAbility, AbilityWithChargesOrStacks {
-	public double mLastPassiveMeleeDamage = 0; // Passive damage to share with Holy Javelin
-
-	private static final int DAMAGE_HERETIC_1 = 4;
-	private static final double DAMAGE_HERETIC_2 = 5.5;
-	private static final double DIVINE_JUSTICE_DMG_MULT = 0.3;
-	private static final int MIN_STACKS_TO_ACTIVATE = 2;
-	private static final int MAX_STACKS = 6;
-	private static final double RADIUS = 2.0 / 3.0;
-	private static final int FIRE_DURATION_2 = TICKS_PER_SECOND * 3;
-	private static final float KNOCKBACK_SPEED = 0.7f;
-	private static final int EXPIRE_TICKS = TICKS_PER_SECOND * 4;
-	private static final int STACKS_PER_KILL = 1;
-	private static final int BOSS_DMG_THRESHOLD_R2 = 200;
-	private static final int BOSS_DMG_THRESHOLD_R3 = 300;
+	private static final double RADIUS = 4;
+	private static final int FIRE_DURATION = Constants.TICKS_PER_SECOND * 3;
+	private static final int COOLDOWN_1 = Constants.TICKS_PER_SECOND * 18;
+	private static final int COOLDOWN_2 = Constants.TICKS_PER_SECOND * 18;
+	private static final float KNOCKBACK_SPEED = 0.55f;
 
 	public static final String CHARM_DAMAGE = "Luminous Infusion Damage";
+	public static final String CHARM_COOLDOWN = "Luminous Infusion Cooldown";
 	public static final String CHARM_RADIUS = "Luminous Infusion Radius";
-	public static final String CHARM_MIN_STACKS = "Luminous Infusion Minimum Stack Threshold";
-	public static final String CHARM_MAX_STACKS = "Luminous Infusion Max Stacks";
-	public static final String CHARM_DAMAGE_MULTIPLIER = "Luminous Infusion Damage Multiplier";
+	public static final String CHARM_CHARGES = "Luminous Infusion Charges";
 	public static final String CHARM_FIRE_DURATION = "Luminous Infusion Fire Duration";
-	public static final String CHARM_KILL_REQUIREMENT = "Luminous Infusion Kill Requirement";
-	public static final String CHARM_STACKS_PER_KILL = "Luminous Infusion Stacks Per Kill";
+	public static final String CHARM_KNOCKBACK = "Luminous Infusion Knockback";
 
 	public static final AbilityInfo<LuminousInfusion> INFO =
 		new AbilityInfo<>(LuminousInfusion.class, "Luminous Infusion", LuminousInfusion::new)
@@ -73,106 +58,68 @@ public final class LuminousInfusion extends Ability implements KillTriggeredAbil
 			.scoreboardId("LuminousInfusion")
 			.shorthandName("LI")
 			.descriptions(getDescription1(), getDescription2())
-			.simpleDescription("Upon activating, the next damage dealt to a Heretic causes an explosion.")
-			.addTrigger(new AbilityTriggerInfo<>("castOne", "activate one stack",
-				li -> li.cast(false, false), new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK)
-					.lookDirections(AbilityTrigger.LookDirection.LEVEL, AbilityTrigger.LookDirection.UP).sneaking(false)
-					.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
-			.addTrigger(new AbilityTriggerInfo<>("castHalf", "activate half of current stacks",
-				li -> li.cast(false, true), new AbilityTrigger(AbilityTrigger.Key.SWAP)
-				.sneaking(true).enabled(false)))
-			.addTrigger(new AbilityTriggerInfo<>("castAll", "activate all stacks",
-				li -> li.cast(true, false), new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK)
-				.lookDirections(AbilityTrigger.LookDirection.DOWN).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
-				.sneaking(false)))
+			.simpleDescription("Upon activating, your next attack on a Heretic causes an explosion.")
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", LuminousInfusion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)))
 			.displayItem(Material.BLAZE_POWDER);
 
-	private final double mDamagePerStack;
-	private final double mRadiusPerStack;
-	private final double mDivineJusticeDmgMult;
-	private final int mFireDuration;
-	private final int mKillReqForStack;
-	private final int mStacksPerKill;
-	private final int mMinStacksToActivate;
-	private final KillTriggeredAbilityTracker mTracker;
-	private final LuminousInfusionCS mCosmetic;
+	private final double mDamage;
+	private final double mHereticDamage;
+	private final double mRadius;
 	private final int mMaxCharges;
-	private int mCharges;
+	private final int mFireDuration;
+	private final float mKnocback;
+	private final LuminousInfusionCS mCosmetic;
+	private boolean mActive = false;
+	private int mPrimedCharges;
+	private int mRemainingCharges = 0;
+	private boolean mWasOnCooldown;
 
-	private int mKillCount = 0;
-	private int mPrimedStacks = 0;
-	private @Nullable Crusade mCrusade;
-	private @Nullable DivineJustice mDivineJustice;
-	private @Nullable BukkitRunnable mCancelRunnable;
-
-	public LuminousInfusion(final Plugin plugin, final Player player) {
+	public LuminousInfusion(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mKillReqForStack = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_KILL_REQUIREMENT);
-		mMinStacksToActivate = MIN_STACKS_TO_ACTIVATE + (int) CharmManager.getLevel(mPlayer, CHARM_MIN_STACKS);
-		mStacksPerKill = STACKS_PER_KILL + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS_PER_KILL);
-		mMaxCharges = MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_STACKS);
-		mCharges = 0;
-
-		mDamagePerStack = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
-			(isLevelTwo() ? DAMAGE_HERETIC_2 : DAMAGE_HERETIC_1));
-		mRadiusPerStack = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
-		mDivineJusticeDmgMult = DIVINE_JUSTICE_DMG_MULT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MULTIPLIER);
-		mFireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, FIRE_DURATION_2);
-		mTracker = new KillTriggeredAbilityTracker(mPlayer, this, BOSS_DMG_THRESHOLD_R2, BOSS_DMG_THRESHOLD_R2, BOSS_DMG_THRESHOLD_R3);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new LuminousInfusionCS());
-
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, Crusade.class);
-			mDivineJustice = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, DivineJustice.class);
-		});
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_DAMAGE : R2_DAMAGE);
+		mHereticDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_HERETIC_DAMAGE : R2_HERETIC_DAMAGE);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new LuminousInfusionCS());
+		mMaxCharges = (isLevelOne() ? CHARGES_1 : CHARGES_2) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
+		mFireDuration = CharmManager.getDuration(player, CHARM_FIRE_DURATION, FIRE_DURATION);
+		mKnocback = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_KNOCKBACK, KNOCKBACK_SPEED);
 	}
 
-	public boolean cast(final boolean all, final boolean half) {
-		if (!consumeCharge()) {
+	public boolean cast() {
+		if (mRemainingCharges <= 0) {
 			return false;
 		}
 
-		if (mPrimedStacks == 0) {
-			mCosmetic.infusionStartEffect(mPlayer.getWorld(), mPlayer, mPlayer.getLocation(), mPrimedStacks);
+		mActive = true;
+		int oldHits = mPrimedCharges;
+		mRemainingCharges--;
+		mPrimedCharges++;
+
+		AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.SIDEARM, mRemainingCharges);
+		ClientModHandler.updateAbility(mPlayer, this);
+
+		mCosmetic.infusionStartMsg(mPlayer, mPrimedCharges);
+		if (oldHits == 0) {
+			mCosmetic.infusionStartEffect(mPlayer.getWorld(), mPlayer, mPlayer.getLocation(), mPrimedCharges);
 		} else {
-			mCosmetic.infusionAddStack(mPlayer.getWorld(), mPlayer, mPlayer.getLocation(), mPrimedStacks);
+			mCosmetic.infusionAddStack(mPlayer.getWorld(), mPlayer, mPlayer.getLocation(), mPrimedCharges);
+			return true;
 		}
+		putOnCooldown();
 
-		mPrimedStacks = Math.min(mPrimedStacks + 1, mMaxCharges);
-
-		if (all) {
-			for (int i = mCharges; i > 0; i--) {
-				consumeCharge();
-				mPrimedStacks = Math.min(mPrimedStacks + 1, mMaxCharges);
-			}
-		} else if (half) {
-			for (int i = mCharges / 2; i > 0; i--) {
-				consumeCharge();
-				mPrimedStacks = Math.min(mPrimedStacks + 1, mMaxCharges);
-			}
-		}
-
-		mCosmetic.infusionStartMsg(mPlayer, mPrimedStacks);
-
-		if (mCancelRunnable != null) {
-			mCancelRunnable.cancel();
-		}
-
-		mCancelRunnable = new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;
+			final int EXPIRE_TICKS = getModifiedCooldown();
 
 			@Override
 			public void run() {
 				mT++;
-				mCosmetic.infusionTickEffect(mPlayer, mT);
-				if (mT >= EXPIRE_TICKS || mPrimedStacks <= 0) {
-					for (int i = mPrimedStacks; i > 0; i--) {
-						incrementCharge();
-						if (mCharges == mMaxCharges) {
-							mCosmetic.gainMaxCharge(mPlayer, mPlayer.getLocation());
-						}
-					}
-					mPrimedStacks = 0;
+				if (mPrimedCharges > 0) {
+					mCosmetic.infusionTickEffect(mPlayer, mT);
+				}
+				if (mT >= EXPIRE_TICKS || (!mActive && mRemainingCharges <= 0)) {
+					mActive = false;
 					if (mT >= EXPIRE_TICKS) {
 						mCosmetic.infusionExpireMsg(mPlayer);
 						ClientModHandler.updateAbility(mPlayer, LuminousInfusion.this);
@@ -180,91 +127,87 @@ public final class LuminousInfusion extends Ability implements KillTriggeredAbil
 					this.cancel();
 				}
 			}
-		};
-
-		cancelOnDeath(mCancelRunnable.runTaskTimer(Plugin.getInstance(), 1, 1));
+		}.runTaskTimer(Plugin.getInstance(), 1, 1));
 		return true;
 	}
 
 	@Override
-	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
-		mTracker.updateDamageDealtToBosses(event);
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		boolean enemyTriggersAbilities = Crusade.enemyTriggersAbilities(enemy);
 
-		final boolean triggersCrusade = Crusade.enemyTriggersAbilities(enemy);
-		final boolean isMeleeCrit = event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer);
-		int chargesToConsume = 0;
-
-		// The short circuiting on this check is very fragile. Don't reorder anything!
-		if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "LIExplosionCap") &&
-			mPrimedStacks >= mMinStacksToActivate && triggersCrusade && event.getAbility() != mInfo.getLinkedSpell()) {
-			execute(enemy, mPrimedStacks);
-			chargesToConsume += mPrimedStacks;
+		if (mActive && enemyTriggersAbilities) {
+			execute(enemy);
 		}
-
-		if (isLevelTwo() && triggersCrusade && mDivineJustice != null && isMeleeCrit && mPrimedStacks > 0) {
-			chargesToConsume++;
-			mLastPassiveMeleeDamage = mDivineJustice.calculateDamage(event, mDivineJusticeDmgMult, true, true);
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveMeleeDamage, mDivineJustice.getInfo().getLinkedSpell(), true);
-		}
-
-		mPrimedStacks = Math.max(mPrimedStacks - chargesToConsume, 0);
-
 		return false;
 	}
 
-	private void execute(final LivingEntity damagee, final int stacks) {
+	public void execute(LivingEntity damagee) {
+		mPrimedCharges--;
+		mActive = false;
+
+		// if there are hits remaining, turn back on after a tick to prevent looping
+		if (mPrimedCharges > 0) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					mActive = true;
+					ClientModHandler.updateAbility(mPlayer, ClassAbility.LUMINOUS_INFUSION);
+				}
+			}.runTaskLater(Plugin.getInstance(), 1);
+		}
+
+		DamageUtils.damage(mPlayer, damagee, DamageType.MAGIC, mHereticDamage, mInfo.getLinkedSpell(), true);
+		mCosmetic.infusionHitEffect(mPlayer.getWorld(), mPlayer, damagee, mRadius, 1f, 1f);
 		ClientModHandler.updateAbility(mPlayer, this);
 
-		final double ratio = (double) stacks / mMaxCharges;
-		final float volumeScaling = (float) Math.sqrt(ratio);
-		final Location loc = damagee.getLocation();
-		loc.add(0, damagee.getHeight() / 2.0, 0);
-		final World world = mPlayer.getWorld();
-		mCosmetic.infusionHitEffect(world, mPlayer, damagee, stacks * mRadiusPerStack, ratio, volumeScaling);
+		// Exclude the damagee so that the knockaway is valid
+		List<LivingEntity> affected = new Hitbox.SphereHitbox(damagee.getLocation(), mRadius).getHitMobs(damagee);
+		for (LivingEntity e : affected) {
+			// Reduce overall volume of noise the more mobs there are, but still make it louder for more mobs
+			double volume = 0.6 / Math.sqrt(affected.size());
+			mCosmetic.infusionSpreadEffect(mPlayer.getWorld(), mPlayer, damagee, e, (float) volume);
 
-		final double totalDamage = stacks * mDamagePerStack;
-		for (final LivingEntity entity : new Hitbox.SphereHitbox(loc, stacks * mRadiusPerStack).getHitMobs()) {
-			mCosmetic.infusionSpreadEffect(world, mPlayer, damagee, entity, volumeScaling);
-
-			if (Crusade.enemyTriggersAbilities(entity)) {
-				DamageUtils.damage(mPlayer, entity, DamageType.MAGIC, totalDamage, mInfo.getLinkedSpell(), true);
-				if (isLevelTwo()) {
-					EntityUtils.applyFire(Plugin.getInstance(), mFireDuration, entity, mPlayer);
-				}
+			if (isLevelTwo()) {
+				EntityUtils.applyFire(Plugin.getInstance(), mFireDuration, e, mPlayer);
+			}
+			if (Crusade.enemyTriggersAbilities(e)) {
+				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, mHereticDamage, mInfo.getLinkedSpell(), true);
 			} else {
-				DamageUtils.damage(mPlayer, entity, DamageType.MAGIC, 0.5 * totalDamage, mInfo.getLinkedSpell(), true);
-				Crusade.addCrusadeTag(entity, mCrusade);
+				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
 			}
-			if (!entity.equals(damagee)) {
-				MovementUtils.knockAway(loc, entity, KNOCKBACK_SPEED, KNOCKBACK_SPEED / 2, true);
-			}
+			MovementUtils.knockAway(damagee.getLocation(), e, mKnocback, mKnocback / 2, true);
 		}
 	}
 
 	@Override
-	public void entityDeathEvent(final EntityDeathEvent event, final boolean shouldGenDrops) {
-		mKillCount++;
-		if (mKillCount >= mKillReqForStack) {
-			triggerOnKill(event.getEntity());
-			mKillCount = 0;
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (mWasOnCooldown && !isOnCooldown()) {
+			mPrimedCharges = 0;
+			mRemainingCharges = mMaxCharges;
+			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION, mRemainingCharges);
+
+			Location loc = mPlayer.getLocation();
+			mCosmetic.gainMaxCharge(mPlayer, loc);
+
+			showOffCooldownMessage();
+			ClientModHandler.updateAbility(mPlayer, this);
+		}
+
+		mWasOnCooldown = isOnCooldown();
+
+		if (!isOnCooldown() && mRemainingCharges != mMaxCharges) {
+			putOnCooldown();
 		}
 	}
 
 	@Override
-	public void triggerOnKill(final LivingEntity mob) {
-		for (int stacks = 0; stacks < mStacksPerKill; stacks++) {
-			incrementCharge();
-		}
-	}
-
-	@Override
-	public ChargeType getChargeType() {
-		return ChargeType.STACKS;
+	public @Nullable String getMode() {
+		return mActive ? "active" : null;
 	}
 
 	@Override
 	public int getCharges() {
-		return mCharges;
+		return mRemainingCharges;
 	}
 
 	@Override
@@ -272,108 +215,27 @@ public final class LuminousInfusion extends Ability implements KillTriggeredAbil
 		return mMaxCharges;
 	}
 
-	// Call this when the ability is cast; returns whether a charge was consumed or not
-	private boolean consumeCharge() {
-		if (mCharges > 0) {
-			mCharges--;
-			PlayerUtils.callAbilityCastEvent(mPlayer, this, ClassAbility.LUMINOUS_INFUSION);
-			if (mMaxCharges > 1) {
-				showChargesMessage();
-			}
-			ClientModHandler.updateAbility(mPlayer, this);
-			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION, mCharges);
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private boolean incrementCharge() {
-		if (mCharges < mMaxCharges) {
-			mCharges++;
-			if (mMaxCharges > 1) {
-				showChargesMessage();
-			} else {
-				showOffCooldownMessage();
-			}
-			ClientModHandler.updateAbility(mPlayer, this);
-			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION, mCharges);
-
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public @Nullable String getMode() {
-		return mPrimedStacks > 0 ? "active" : null;
-	}
-
 	private static Description<LuminousInfusion> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Killing a Heretic or dealing ")
-			.add((a, p) -> {
-				Description<LuminousInfusion> subDescription;
-				if (p == null) {
-					subDescription = new DescriptionBuilder<>(() -> INFO)
-						.add(aa -> BOSS_DMG_THRESHOLD_R2, BOSS_DMG_THRESHOLD_R2)
-						.add(" damage against a boss (")
-						.add(aa -> BOSS_DMG_THRESHOLD_R3, BOSS_DMG_THRESHOLD_R3)
-						.add(" in Region 3)");
-				} else {
-					subDescription = new DescriptionBuilder<>(() -> INFO)
-						.add(aa -> aa.mTracker.getThreshold(), ServerProperties.getAbilityEnhancementsEnabled(p) ? BOSS_DMG_THRESHOLD_R3 : BOSS_DMG_THRESHOLD_R2)
-						.add(" damage against a boss");
-				}
-				return subDescription.get(a, p);
-			})
-			.add(" grants ")
-			.add(a -> a.mStacksPerKill, STACKS_PER_KILL)
-			.add(" stack of Luminosity capped at ")
-			.add(a -> a.mMaxCharges, MAX_STACKS)
-			.add(" stacks. ")
 			.addTrigger()
-			.add(" to prime one stack of Luminosity, or all stacks while looking down. Luminosity unprimes after ")
-			.addDuration(EXPIRE_TICKS)
-			.add(" seconds of inactivity. With ")
-			.add(a -> a.mMinStacksToActivate, MIN_STACKS_TO_ACTIVATE)
-			.add(" or more primed stacks, the next attack or ability against a Heretic is infused with explosive power that deals ")
-			.add(a -> a.mDamagePerStack, DAMAGE_HERETIC_1, false, Ability::isLevelOne)
-			.add(" magic damage per stack to it and other Heretics, or half damage against non-Heretics, in a ")
-			.add(a -> a.mRadiusPerStack, RADIUS)
-			.add(" blocks per stack radius around it and knocks other enemies away from it.");
+			.add(" to charge your hands with holy light. The next attack or ability you perform against a Heretic causes a ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" block radius explosion that deals R2: " + R2_HERETIC_DAMAGE + " / R3: ")
+			.add(a -> ServerProperties.getAbilityEnhancementsEnabled(a.mPlayer) ? a.mHereticDamage : R3_HERETIC_DAMAGE, R3_HERETIC_DAMAGE)
+			.add(" magic damage to it and other Heretics or R2: " + R2_DAMAGE + " / R3: ")
+			.add(a -> ServerProperties.getAbilityEnhancementsEnabled(a.mPlayer) ? a.mDamage : R3_DAMAGE, R3_DAMAGE)
+			.add(" damage to non-Heretics. Enemies are knocked away from the hit Heretic. ")
+			.add(a -> a.mMaxCharges, CHARGES_1, false, Ability::isLevelOne)
+			.add(" charges. Having multiple charges primed at once will cause one explosion at a time, and all charges are replenished when cooldown expires.")
+			.addCooldown(COOLDOWN_1);
 	}
 
 	private static Description<LuminousInfusion> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage per stack is increased to ")
-			.add(a -> a.mDamagePerStack, DAMAGE_HERETIC_2, false, Ability::isLevelTwo)
-			.add(". With at least one primed stack, the next critical melee attack against a Heretic consumes one stack of Luminosity to trigger Divine Justice for an additional ")
-			.addPercent(a -> a.mDivineJusticeDmgMult, DIVINE_JUSTICE_DMG_MULT)
-			.add(" of your critical attack damage. Heretics hit by Luminous explosions are set on fire for ")
-			.addDuration(a -> a.mFireDuration, FIRE_DURATION_2)
+			.add("Max charges increased to ")
+			.add(a -> a.mMaxCharges, CHARGES_2, false, Ability::isLevelTwo)
+			.add(". Mobs hit by an explosion are set on fire for ")
+			.addDuration(a -> a.mFireDuration, FIRE_DURATION, false, Ability::isLevelTwo)
 			.add(" seconds.");
 	}
-
-	@Override
-	public @Nullable Component getHotbarMessage() {
-		TextColor color = INFO.getActionBarColor();
-		String name = INFO.getHotbarName();
-
-		int charges = getCharges();
-		int maxCharges = getMaxCharges();
-
-		// String output.
-		Component output = Component.text("[", NamedTextColor.YELLOW)
-			.append(Component.text(name != null ? name : "Error", color))
-			.append(Component.text("]", NamedTextColor.YELLOW))
-			.append(Component.text(": ", NamedTextColor.WHITE));
-
-		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
-
-		return output;
-	}
-
 }

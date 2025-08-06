@@ -229,7 +229,7 @@ public class ClientModHandler {
 	 */
 	private static boolean shouldHandleAbility(Player player, Ability ability) {
 		return ability != null
-			&& (ability.getInfo().getBaseCooldown(player, ability.getAbilityScore()) > 0 || ability instanceof AbilityWithChargesOrStacks
+			&& (ability.getInfo().getBaseCooldown(player, ability.getAbilityScore()) > 0 || (ability instanceof AbilityWithChargesOrStacks && ((AbilityWithChargesOrStacks) ability).getMaxCharges() > 0)
 			|| ability instanceof AlchemicalArtillery || ability instanceof Swiftness || ability instanceof OneWithTheWind); // these are passives with modes
 	}
 

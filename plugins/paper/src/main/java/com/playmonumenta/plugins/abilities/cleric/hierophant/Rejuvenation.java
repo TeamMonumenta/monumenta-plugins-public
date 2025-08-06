@@ -19,6 +19,7 @@ public class Rejuvenation extends Ability {
 	private static final int HEAL_INTERVAL = TICKS_PER_SECOND * 5;
 	public static final double PERCENT_HEAL = 0.05;
 	private static final double HEALTH_LIMIT = 0.5;
+	public static final double DJ_MULTIPLIER = 0.1;
 
 	private static final String REGENERATION_EFFECT = "RejuvenationRegenerationEffect";
 
@@ -34,12 +35,14 @@ public class Rejuvenation extends Ability {
 	private final double mRadius;
 	private final double mHealing;
 	private final double mThreshold;
+	private final double mPercentDamage;
 
 	public Rejuvenation(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 		mHealing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, PERCENT_HEAL);
 		mThreshold = HEALTH_LIMIT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_THRESHOLD);
+		mPercentDamage = DJ_MULTIPLIER;
 	}
 
 	@Override
@@ -56,9 +59,15 @@ public class Rejuvenation extends Ability {
 		}
 	}
 
+	public double getDJBonus() {
+		return mPercentDamage;
+	}
+
 	private static Description<Rejuvenation> getDescription() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("You and other players within ")
+			.add("Divine Justice's % multiplier is increased by ")
+			.addPercent(a -> a.mPercentDamage, DJ_MULTIPLIER)
+			.add(", and you and other players within ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks heal ")
 			.addPercent(a -> a.mHealing, PERCENT_HEAL)

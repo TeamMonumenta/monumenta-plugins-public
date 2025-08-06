@@ -46,8 +46,8 @@ public class HypnoticChantCS extends ChoirBellsCS {
 	Particle.DustOptions GREEN = new Particle.DustOptions(Color.fromRGB(0, 210, 170), 0.9f);
 
 	@Override
-	public void bellsCastEffect(Player player, double range) {
-		Location l = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0);
+	public void bellsCastEffect(Player player, double range, Location loc) {
+		Location l = loc.subtract(0, LocationUtils.distanceToGround(loc, 0, PlayerUtils.getJumpHeight(player)), 0);
 		World world = player.getWorld();
 		world.playSound(l, Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1.8f, 0.8f);
 		world.playSound(l, Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.PLAYERS, 0.8f, 2.0f);

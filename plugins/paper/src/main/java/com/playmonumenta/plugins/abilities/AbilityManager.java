@@ -34,6 +34,7 @@ import com.playmonumenta.plugins.abilities.cleric.hierophant.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
+import com.playmonumenta.plugins.abilities.cleric.paladin.Unwavering;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
@@ -391,15 +392,13 @@ public class AbilityManager {
 
 			//********** CLERIC **********//
 			// PALADIN
-			// LI needs to run first to process its passive melee damage
+			Unwavering.INFO,
 			LuminousInfusion.INFO,
-			// HJ runs afterwards and can use that value in the same event,
-			// sharing it to its Javelin AoE
 			HolyJavelin.INFO,
 			ChoirBells.INFO,
-			Rejuvenation.INFO,
 
 			// HIEROPHANT
+			Rejuvenation.INFO,
 			EnchantedPrayer.INFO,
 			HallowedBeam.INFO,
 			ThuribleProcession.INFO,
