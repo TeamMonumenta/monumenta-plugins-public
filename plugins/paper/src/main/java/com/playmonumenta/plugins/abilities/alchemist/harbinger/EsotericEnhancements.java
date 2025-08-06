@@ -39,10 +39,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class EsotericEnhancements extends Ability implements PotionAbility {
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.8;
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.0;
-	private static final double ABERRATION_POTION_DAMAGE_RAW_1 = 7.5;
-	private static final double ABERRATION_POTION_DAMAGE_RAW_2 = 9;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.9;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.25;
+	private static final double ABERRATION_POTION_DAMAGE_RAW_1 = 7;
+	private static final double ABERRATION_POTION_DAMAGE_RAW_2 = 8;
 	private static final double ABERRATION_DAMAGE_RADIUS = 3;
 	private static final int ABERRATION_SUMMON_DURATION = 30;
 	private static final double ABERRATION_BLEED_AMOUNT = 0.2;
@@ -114,7 +114,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 				mTargets.clear();
 				int num = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CREEPER);
 				Location summonLoc = mob.getLocation();
-				//summoning each should be delayed by 1 tick to prevent creepers targetting the same enemy?
+				//summoning each should be delayed by 2 tick to prevent creepers targetting the same enemy?
 				new BukkitRunnable() {
 					int mCount = 0;
 					@Override public void run() {
@@ -124,7 +124,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 							this.cancel();
 						}
 					}
-				}.runTaskTimer(mPlugin, 0, 1);
+				}.runTaskTimer(mPlugin, 0, 2);
 				putOnCooldown();
 			}
 		}
@@ -171,8 +171,13 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 					}
 
 					if (mTicks % TICK_INTERVAL == 0) {
-						//target validation checking needs to be empty list
-						if (!isValidTarget(aberration, mTarget, true, new ArrayList<>())) {
+						/* target validation can sometimes return false even if the target is clearly alive and force target switch
+						 * if it already have target and target health > 0, do not switch targets
+						 *
+						 * target validation checking needs to be empty list for all living mobs nearby
+						 */
+						if (!(mTarget != null && mTarget.getHealth() > 0) &&
+							    !isValidTarget(aberration, mTarget, true, new ArrayList<>())) {
 							LivingEntity newTarget = findTarget(aberration, mTargets);
 							if (newTarget != null) {
 								mTarget = newTarget;
@@ -209,6 +214,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	}
 
 	private boolean isValidTarget(Creeper aberration, @Nullable LivingEntity mob, boolean withPathfinding, List<LivingEntity> targets) {
+		// remove nearby mobs around target to prevent overspill damage
 		List<LivingEntity> nearbyTargeted = new ArrayList<>();
 		if (!targets.isEmpty()) {
 			for (LivingEntity le : targets) {

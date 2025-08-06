@@ -669,6 +669,7 @@ public class CharmManager {
 			AlchemicalArtillery.CHARM_COOLDOWN,
 			AlchemicalArtillery.CHARM_AFTERSHOCK_DAMAGE,
 			AlchemicalArtillery.CHARM_AFTERSHOCK_DELAY,
+			AlchemicalArtillery.CHARM_AFTERSHOCK_COUNT,
 			AlchemicalArtillery.CHARM_DAMAGE,
 			AlchemicalArtillery.CHARM_RADIUS,
 			AlchemicalArtillery.CHARM_VELOCITY,

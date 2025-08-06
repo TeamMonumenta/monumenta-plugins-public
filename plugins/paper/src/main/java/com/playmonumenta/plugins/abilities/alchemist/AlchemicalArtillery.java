@@ -37,14 +37,15 @@ import org.jetbrains.annotations.Nullable;
 public class AlchemicalArtillery extends Ability {
 	private static final int COOLDOWN = 20 * 6;
 
-	private static final double ARTILLERY_1_DAMAGE_MULTIPLIER = 0.7;
-	private static final double ARTILLERY_2_DAMAGE_MULTIPLIER = 1.0;
-	private static final double ARTILLERY_1_DAMAGE_RAW = 6;
-	private static final double ARTILLERY_2_DAMAGE_RAW = 7;
+	private static final double ARTILLERY_1_DAMAGE_MULTIPLIER = 0.75;
+	private static final double ARTILLERY_2_DAMAGE_MULTIPLIER = 1.5;
+	private static final double ARTILLERY_1_DAMAGE_RAW = 5;
+	private static final double ARTILLERY_2_DAMAGE_RAW = 6.5;
 	private static final double ARTILLERY_RANGE_MULTIPLIER = 1.5;
 	private static final int ARTILLERY_POTION_COST = 2;
 	private static final int AFTERSHOCK_DELAY = 20;
-	private static final double AFTERSHOCK_DAMAGE_MULTIPLIER = 0.1;
+	private static final int AFTERSHOCK_COUNT = 1;
+	private static final double AFTERSHOCK_DAMAGE_MULTIPLIER = 0.15;
 
 	public static final String CHARM_COOLDOWN = "Alchemical Artillery Cooldown";
 	public static final String CHARM_DAMAGE = "Alchemical Artillery Damage";
@@ -53,6 +54,7 @@ public class AlchemicalArtillery extends Ability {
 	public static final String CHARM_SIZE = "Alchemical Artillery Size";
 	public static final String CHARM_AFTERSHOCK_DAMAGE = "Alchemical Artillery Aftershock Damage";
 	public static final String CHARM_AFTERSHOCK_DELAY = "Alchemical Artillery Aftershock Delay";
+	public static final String CHARM_AFTERSHOCK_COUNT = "Alchemical Artillery Aftershocks";
 	public static final String CHARM_COST = "Alchemical Artillery Potion Cost";
 
 	public static final AbilityInfo<AlchemicalArtillery> INFO =
@@ -74,6 +76,7 @@ public class AlchemicalArtillery extends Ability {
 	private final double mDamageRaw;
 	private final int mDelay;
 	private final double mAftershockMult;
+	private final double mAftershockCount;
 	private final int mCost;
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
@@ -87,6 +90,7 @@ public class AlchemicalArtillery extends Ability {
 		mDamageRaw = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? ARTILLERY_1_DAMAGE_RAW : ARTILLERY_2_DAMAGE_RAW);
 		mDelay = CharmManager.getDuration(mPlayer, CHARM_AFTERSHOCK_DELAY, AFTERSHOCK_DELAY);
 		mAftershockMult = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AFTERSHOCK_DAMAGE, AFTERSHOCK_DAMAGE_MULTIPLIER);
+		mAftershockCount = AFTERSHOCK_COUNT + (int) CharmManager.getLevel(mPlayer, CHARM_AFTERSHOCK_COUNT);
 		mCost = ARTILLERY_POTION_COST + (int) CharmManager.getLevel(mPlayer, CHARM_COST);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AlchemicalArtilleryCS());
@@ -214,17 +218,25 @@ public class AlchemicalArtillery extends Ability {
 
 	private void aftershock(Location loc, double radius, double damage, ItemStatManager.PlayerItemStats playerItemStats, boolean isGruesome) {
 		double finalDamage = damage * mAftershockMult;
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
-			List<LivingEntity> mobs = hitbox.getHitMobs();
+		new BukkitRunnable() {
+			int mCount = 0;
+			@Override public void run() {
+				Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
+				List<LivingEntity> mobs = hitbox.getHitMobs();
 
-			mCosmetic.aftershockEffect(mPlayer, loc, radius, mobs);
+				mCosmetic.aftershockEffect(mPlayer, loc, radius, mobs);
 
-			for (LivingEntity mob : mobs) {
-				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), finalDamage, true, false, false);
-				applyEffects(mob, playerItemStats, isGruesome, true);
+				for (LivingEntity mob : mobs) {
+					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), finalDamage, true, false, false);
+					applyEffects(mob, playerItemStats, isGruesome, true);
+				}
+
+				mCount++;
+				if (mCount >= mAftershockCount) {
+					this.cancel();
+				}
 			}
-		}, mDelay);
+		}.runTaskTimer(mPlugin, mDelay, mDelay);
 	}
 
 	private void applyEffects(LivingEntity entity, ItemStatManager.PlayerItemStats playerItemStats, boolean isGruesome, boolean invert) {
@@ -269,9 +281,11 @@ public class AlchemicalArtillery extends Ability {
 
 	private static Description<AlchemicalArtillery> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Add an aftershock to the explosion, which happens ")
+			.add("Add ")
+			.add(a -> a.mAftershockCount, AFTERSHOCK_COUNT)
+			.add(" aftershock to the explosion, which happens ")
 			.addDuration(a -> a.mDelay, AFTERSHOCK_DELAY, true)
-			.add(" after it, and deals ")
+			.add(" second after each explosion or aftershock, and deals ")
 			.addPercent(a -> a.mAftershockMult, AFTERSHOCK_DAMAGE_MULTIPLIER)
 			.add(" of the original explosion damage. If possible, the aftershock also applies the potion effect opposite of the one that you have selected.");
 	}
