@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.Collections;
@@ -84,7 +85,11 @@ public final class AvengerBoss extends BossAbilityGroup {
 
 	// Use this instead of the attribute to catch ability damage, ranged damage, etc.
 	@Override
-	public void onDamage(final DamageEvent event, final LivingEntity damgaee) {
+	public void onDamage(final DamageEvent event, final LivingEntity damagee) {
+		if (event.getType() == DamageType.TRUE) {
+			return;
+		}
+
 		if (mStacks > 0) {
 			event.setFlatDamage(event.getDamage() * (1 + mStacks * mParam.DAMAGE_PERCENT_INCREMENT));
 		}

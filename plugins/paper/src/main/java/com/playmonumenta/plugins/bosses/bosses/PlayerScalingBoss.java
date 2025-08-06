@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.GameMode;
@@ -60,6 +61,9 @@ public class PlayerScalingBoss extends BossAbilityGroup {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (event.getType() == DamageType.TRUE) {
+			return;
+		}
 		event.setFlatDamage(event.getDamage() * mDamageMultiplier);
 	}
 
