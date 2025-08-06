@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.RendingRazorCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -133,6 +134,7 @@ public class RendingRazor extends Ability {
 					mCosmetic.razorTravelSound(mPlayer, mRazorLoc);
 				}
 				final List<LivingEntity> hitEnemies = new Hitbox.SphereHitbox(mRazorLoc, mRadius).getHitMobs();
+				hitEnemies.removeIf(e -> e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 				if (!hitEnemies.isEmpty()) {
 					final LivingEntity target = hitEnemies.get(0);
 					mCosmetic.razorHit(mPlayer, target.getLocation());
