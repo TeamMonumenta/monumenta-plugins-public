@@ -63,7 +63,7 @@ public class SinkholeFinisher implements EliteFinisher {
 				double sineWaveOffsetPlus15t = Math.sin(Math.toRadians((15 + mTicks) * 4.5));
 				if (mTicks == 0) {
 					killedMob.remove();
-					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.DARK_GREEN);
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.DARK_GREEN, false, false, true);
 
 					new PartialParticle(Particle.SMOKE_NORMAL, mLoc).count(25).delta(0.2).extra(0.15).spawnAsPlayerActive(p);
 					mLoc.getWorld().playSound(mLoc, Sound.BLOCK_SCULK_BREAK, SoundCategory.PLAYERS, 1.6f, 0.5f);

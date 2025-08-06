@@ -53,7 +53,7 @@ public class EntombFinisher implements EliteFinisher {
 				if (mTicks == 0) {
 					// Let's let the mob freeze
 					killedMob.remove();
-					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.DARK_AQUA);
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.DARK_AQUA, false, false, true);
 				}
 				if (mLayer < LAYERMAX) {
 					mLayer++;

@@ -63,7 +63,7 @@ public class ExcaliburFinisher implements EliteFinisher {
 				playSong(p.getWorld(), p.getLocation(), mTicks, mobsKilled);
 				if (mTicks == 0) {
 					killedMob.remove();
-					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.GRAY);
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.GRAY, false, false, true);
 				}
 				if (mTicks <= 20) {
 					mExcalibur.setRightArmPose(new EulerAngle(-Math.PI / 2.0 + 0.75 * Math.PI / 20.0 * mTicks, EntityUtils.getCounterclockwiseAngle(mExcalibur, killedMob), mSlashAngle));

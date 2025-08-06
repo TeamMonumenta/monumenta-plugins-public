@@ -42,7 +42,7 @@ public class FrozenSolidFinisher implements EliteFinisher {
 				if (mTicks == 0) {
 					// Let's let the mob freeze
 					killedMob.remove();
-					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.BLUE);
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.BLUE, false, false, true);
 					// Figure out where and when to generate ice
 					BoundingBox box = mClonedKilledMob.getBoundingBox();
 					for (double x = box.getMinX(); x <= box.getMaxX(); x += 0.6) {

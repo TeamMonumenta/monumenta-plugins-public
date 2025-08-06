@@ -30,6 +30,7 @@ public class EliteFinishers {
 		ImmutableMap.<String, EliteFinisher>builder()
 			.put(AdvancedAudioMechanism.NAME, new AdvancedAudioMechanism())
 			.put(BirthdayThemeFinisher.NAME, new BirthdayThemeFinisher())
+			.put(BlastOffFinisher.NAME, new BlastOffFinisher())
 			.put(CakeifyFinisher.NAME, new CakeifyFinisher())
 			.put(ChainedFinisher.NAME, new ChainedFinisher())
 			.put(CoolFireworkFinisher.NAME, new CoolFireworkFinisher())
@@ -84,11 +85,11 @@ public class EliteFinishers {
 		}
 	}
 
-	public static LivingEntity createClonedMob(LivingEntity killedMob, Player p, NamedTextColor color) {
+	public static LivingEntity createClonedMob(LivingEntity killedMob, Player p, NamedTextColor color, boolean gravity, boolean ai, boolean silent) {
 		LivingEntity mClonedKilledMob = EntityUtils.copyMob(killedMob);
-		mClonedKilledMob.setGravity(false);
-		mClonedKilledMob.setAI(false);
-		mClonedKilledMob.setSilent(true);
+		mClonedKilledMob.setGravity(gravity);
+		mClonedKilledMob.setAI(ai);
+		mClonedKilledMob.setSilent(silent);
 
 		return modifyFinisherMob(mClonedKilledMob, p, color);
 	}

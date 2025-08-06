@@ -36,12 +36,10 @@ public class GrindsMyGearsFinisher implements EliteFinisher {
 
 	private static final Matrix4f GEAR_BASE_TRANSFORM = new Matrix4f()
 		.translate(-0.5f, -0.125f, -0.1875f)
-		.scale(1.0f, 0.25f, 0.1875f)
-		;
+		.scale(1.0f, 0.25f, 0.1875f);
 	private static final Matrix4f GEAR_TOOTH_TRANSFORM = new Matrix4f()
 		.translate(-0.25f, -0.09375f, -0.0625f)
-		.scale(0.5f, 0.1875f, 0.5f)
-		;
+		.scale(0.5f, 0.1875f, 0.5f);
 
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
@@ -49,7 +47,7 @@ public class GrindsMyGearsFinisher implements EliteFinisher {
 			return;
 		}
 
-		LivingEntity clonedEntity = EliteFinishers.createClonedMob(le, p, NamedTextColor.GOLD);
+		LivingEntity clonedEntity = EliteFinishers.createClonedMob(le, p, NamedTextColor.GOLD, false, false, true);
 		clonedEntity.setInvulnerable(true);
 		final UUID cloneId = clonedEntity.getUniqueId();
 		killedMob.remove();
@@ -69,8 +67,7 @@ public class GrindsMyGearsFinisher implements EliteFinisher {
 			Matrix4f hiddenTransform = new Matrix4f()
 				.scale(0.0f)
 				.rotate(isEven ? HIDDEN_ROTATION : -HIDDEN_ROTATION, 0.0f, 1.0f, 0.0f)
-				.translate(0.0f, hiddenHeight, 0.0f)
-				;
+				.translate(0.0f, hiddenHeight, 0.0f);
 
 			Gear gear = new Gear(gearSectionLoc, 12, 0.33f * (gearNum + 1) * width);
 			gear.setTransformation(hiddenTransform);
@@ -115,8 +112,7 @@ public class GrindsMyGearsFinisher implements EliteFinisher {
 					Matrix4f transform = new Matrix4f()
 						.scale(1.0f - hiddenPercent)
 						.rotate(hiddenPercent * (isEven ? HIDDEN_ROTATION : -HIDDEN_ROTATION), 0.0f, 1.0f, 0.0f)
-						.translate(0.0f, hiddenPercent * hiddenHeight, 0.0f)
-						;
+						.translate(0.0f, hiddenPercent * hiddenHeight, 0.0f);
 					gear.setInterpolate();
 					gear.setTransformation(transform);
 
@@ -145,8 +141,7 @@ public class GrindsMyGearsFinisher implements EliteFinisher {
 						isEven = !isEven;
 						Matrix4f transform = new Matrix4f()
 							.rotate(hiddenPercent * (isEven ? HIDDEN_ROTATION : -HIDDEN_ROTATION), 0.0f, 1.0f, 0.0f)
-							.translate(0.0f, hiddenPercent * hiddenHeight, 0.0f)
-							;
+							.translate(0.0f, hiddenPercent * hiddenHeight, 0.0f);
 						gear.setInterpolate();
 						gear.setTransformation(transform);
 					}
@@ -200,8 +195,7 @@ public class GrindsMyGearsFinisher implements EliteFinisher {
 					.rotate(angle, 0.0f, 1.0f, 0.0f)
 					.scale(scale)
 					.translate(0.0f, 0.0f, 1.0f)
-					.scale((isEven ? 1.0f : 1.001f) * sectionScale)
-					;
+					.scale((isEven ? 1.0f : 1.001f) * sectionScale);
 				mSections.add(new GearSection(loc, sectionTransform));
 
 				angle += rotationIncrement;

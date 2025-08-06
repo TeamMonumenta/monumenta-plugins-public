@@ -63,7 +63,7 @@ public class ChainedFinisher implements EliteFinisher {
 				if (mTicks == 0) {
 					// summon
 					killedMob.remove();
-					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.DARK_AQUA);
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.DARK_AQUA, false, false, true);
 					BoundingBox box = mClonedKilledMob.getBoundingBox();
 					loc1.add((box.getWidthX() / 2) + 3 + 0.35, 1, 0.6);
 					loc2.add(-(box.getWidthX() / 2) - 2.25 + 0.35, 1, 0.6);
@@ -105,7 +105,7 @@ public class ChainedFinisher implements EliteFinisher {
 					// does loop on sword face
 					sword1.setRightArmPose(new EulerAngle(-(Math.PI / 2.0) + (Math.PI / 20) * (2 * (mTicks - 1)), 0, 0));
 					sword2.setRightArmPose(new EulerAngle(-(Math.PI / 2.0) + (Math.PI / 20) * (2 * (mTicks - 1)), 0, 0));
-					sword3.setRightArmPose(new EulerAngle(-(Math.PI / 2.0) + (Math.PI / 20) * (2 * (mTicks - 1)), 3 * Math.PI/2, 0));
+					sword3.setRightArmPose(new EulerAngle(-(Math.PI / 2.0) + (Math.PI / 20) * (2 * (mTicks - 1)), 3 * Math.PI / 2, 0));
 
 					rise.add(0, 0.2, 0);
 					if (mClonedKilledMob != null) {
