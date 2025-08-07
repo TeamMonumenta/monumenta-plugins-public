@@ -22,14 +22,7 @@ public class IchorEarthEffect extends Effect {
 			DamageType.BLAST,
 			DamageType.MAGIC
 	);
-	private static final EnumSet<DamageType> ALL_DAMAGE_TYPES = EnumSet.of(
-			DamageType.MELEE,
-			DamageType.MELEE_ENCH,
-			DamageType.MELEE_SKILL,
-			DamageType.PROJECTILE,
-			DamageType.PROJECTILE_SKILL,
-			DamageType.MAGIC
-	);
+	private static final EnumSet<DamageType> ALL_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	private boolean mWasHit = false;
 	private final double mEffectMultiplier;

@@ -24,14 +24,7 @@ public class VoodooBondsCurse extends Effect {
 	private final int mSpreadCount;
 	private final double mSpreadRadius;
 	private final VoodooBondsCS mCosmetic;
-	private final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageType.MELEE,
-		DamageType.MELEE_SKILL,
-		DamageType.MELEE_ENCH,
-		DamageType.PROJECTILE,
-		DamageType.PROJECTILE_SKILL,
-		DamageType.MAGIC
-	);
+	private final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	public VoodooBondsCurse(Player player, int duration, double damage, double radius, int spreadCount, double spreadRadius, VoodooBondsCS cosmetic) {
 		super(duration, effectID);

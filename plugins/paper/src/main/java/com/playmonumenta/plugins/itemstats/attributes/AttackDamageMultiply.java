@@ -40,7 +40,7 @@ public class AttackDamageMultiply implements Attribute {
 			return;
 		}
 
-		if (type == DamageType.MELEE || type == DamageType.MELEE_SKILL) {
+		if (DamageType.getAllMeleeTypes().contains(type)) {
 			event.updateGearDamageWithMultiplier(value);
 		}
 	}

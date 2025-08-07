@@ -33,12 +33,14 @@ public class MagicDamageMultiply implements Attribute {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		DamageType type = event.getType();
+
 		if (DepthsManager.getInstance().isInSystem(player)) {
 			// Handled in DepthsListener
 			return;
 		}
 
-		if (event.getType() == DamageType.MAGIC) {
+		if (DamageType.getAllMagicTypes().contains(type)) {
 			event.updateGearDamageWithMultiplier(value);
 		}
 	}

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
@@ -9,13 +10,11 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.*;
+
 import java.util.EnumSet;
 import java.util.List;
-import com.playmonumenta.plugins.utils.LocationUtils;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -52,12 +51,20 @@ public class Explosive implements Enchantment {
 
 	@Override
 	public double getPriorityAmount() {
-		return 5002;
+		return 19;
 	}
+	// After Hex Eater, should be the last "flat" damage event
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageEvent.DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true) && EntityUtils.isHostileMob(enemy) && MetadataUtils.checkOnceThisTick(plugin, enemy, EXPLODED_THIS_TICK_METADATA)) {
+		if (event.getType() == DamageEvent.DamageType.PROJECTILE
+			&& event.getDamager() instanceof Projectile projectile
+			&& EntityUtils.isAbilityTriggeringProjectile(projectile, true)
+			&& EntityUtils.isHostileMob(enemy)
+			&& MetadataUtils.checkOnceThisTick(plugin, enemy, EXPLODED_THIS_TICK_METADATA)
+			&& !(projectile.hasMetadata(ElementalArrows.FIRE_ARROW_METAKEY)
+			|| projectile.hasMetadata(ElementalArrows.ICE_ARROW_METAKEY)
+			|| projectile.hasMetadata(ElementalArrows.THUNDER_ARROW_METAKEY))) {
 			ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(projectile);
 			if (playerItemStats == null) {
 				return;
@@ -81,10 +88,13 @@ public class Explosive implements Enchantment {
 			BoundingBox box = BoundingBox.of(location, RADIUS, RADIUS, RADIUS);
 			nearbyMobs.remove(enemy);
 
-			double damage = value * DAMAGE_PERCENTAGE_PER_LEVEL * event.getDamage();
+			double damage = event.getFlatDamage() * value * DAMAGE_PERCENTAGE_PER_LEVEL;
+
 			for (LivingEntity mob : nearbyMobs) {
-				if (mob.getBoundingBox().overlaps(box)) {
-					DamageUtils.damage(player, mob, new DamageEvent.Metadata(DamageEvent.DamageType.TRUE, ClassAbility.EXPLOSIVE, playerItemStats), damage, true, true, false);
+				BoundingBox mobBox = mob.getBoundingBox();
+				if (box.overlaps(mobBox)) {
+					// Deal damage.
+					DamageUtils.damage(player, mob, DamageEvent.DamageType.PROJECTILE_ENCH, damage, ClassAbility.EXPLOSIVE, false);
 				}
 			}
 
@@ -92,7 +102,7 @@ public class Explosive implements Enchantment {
 			float multiplier = 1f;
 			if (AbilityUtils.isVolley(player, projectile)) {
 				multiplier = 0.15f;
-			} else if (itemStatsMap.get(EnchantmentType.MULTISHOT) == 1 ) {
+			} else if (itemStatsMap.get(EnchantmentType.MULTISHOT) == 1) {
 				multiplier = 0.4f;
 			}
 			particles(location, player, multiplier);

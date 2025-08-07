@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.SharpshooterCS;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -73,16 +72,13 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
-		final DamageType type = event.getType();
 		final boolean huntingCompanion = event.getAbility() == ClassAbility.HUNTING_COMPANION;
 
 		mCosmetic.hitEffect(mPlayer, enemy);
-		if (huntingCompanion || type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
+		if (huntingCompanion || event.getType() == DamageEvent.DamageType.PROJECTILE || event.getType() == DamageEvent.DamageType.PROJECTILE_SKILL || event.getType() == DamageEvent.DamageType.PROJECTILE_ENCH) {
 			double multiplier = 1 + (isLevelTwo() ? PERCENT_BASE_DAMAGE_L2 : PERCENT_BASE_DAMAGE);
 			if (!huntingCompanion) {
-				if (isLevelTwo()) {
-					multiplier += mStacks * mDamagePerStack;
-				}
+				multiplier += mStacks * mDamagePerStack;
 				if (isEnhanced()) {
 					multiplier += Math.min(enemy.getLocation().distance(mPlayer.getLocation()), mMaxDistance) * DAMAGE_PER_BLOCK;
 				}
@@ -93,8 +89,8 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 			event.updateDamageWithMultiplier(multiplier);
 
-			if (!huntingCompanion && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage())
-				&& (type != DamageType.PROJECTILE || (event.getDamager() instanceof final Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)))) {
+			if (!huntingCompanion
+				&& (event.getDamager() instanceof final Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true))) {
 				mTicksToStackDecay = mDecayTime;
 
 				if (mStacks < mMaxStacks) {

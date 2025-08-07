@@ -30,11 +30,12 @@ public class Perspicacity implements Infusion {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() != DamageType.MAGIC) {
-			return;
+		DamageType type = event.getType();
+
+		if (DamageType.getAllMagicTypes().contains(type)) {
+			double abilityDmgBuffPct = value * getDamageForRegion(player);
+			event.updateGearDamageWithMultiplier(1.0 + abilityDmgBuffPct);
 		}
-		double abilityDmgBuffPct = value * getDamageForRegion(player);
-		event.updateGearDamageWithMultiplier(1.0 + abilityDmgBuffPct);
 	}
 
 	public static double getDamageForRegion(Player player) {

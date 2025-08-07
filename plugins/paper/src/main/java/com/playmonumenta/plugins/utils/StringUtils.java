@@ -334,7 +334,7 @@ public class StringUtils {
 				String typeString;
 				switch (type) {
 					case MELEE, MELEE_ENCH, MELEE_SKILL -> typeString = "Melee";
-					case PROJECTILE, PROJECTILE_SKILL -> typeString = "Projectile";
+					case PROJECTILE, PROJECTILE_ENCH, PROJECTILE_SKILL -> typeString = "Projectile";
 					case MAGIC -> typeString = "Magic";
 					case BLAST -> typeString = "Blast";
 					case FALL -> typeString = "Fall";

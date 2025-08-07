@@ -21,14 +21,7 @@ public class Fervor implements Infusion {
 	private static final int BUFF_DURATION_THRESHOLD = TICKS_PER_SECOND * 5;
 	public static final double PERCENT_DAMAGE_PER_LEVEL = 0.015;
 	private static final String PERCENT_DAMAGE_EFFECT_NAME = "FervorPercentDamageEffect";
-	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageEvent.DamageType.MELEE,
-		DamageEvent.DamageType.MELEE_ENCH,
-		DamageEvent.DamageType.MELEE_SKILL,
-		DamageEvent.DamageType.PROJECTILE,
-		DamageEvent.DamageType.PROJECTILE_SKILL,
-		DamageEvent.DamageType.MAGIC
-	);
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	@Override
 	public String getName() {

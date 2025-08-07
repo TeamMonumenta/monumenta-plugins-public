@@ -56,7 +56,9 @@ public class Impact implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 
-		if ((event.getType() == DamageEvent.DamageType.MELEE && player.getCooledAttackStrength(0) >= 0.9) || event.getType() == DamageEvent.DamageType.MELEE_SKILL) {
+		if (((event.getType() == DamageEvent.DamageType.MELEE || event.getType() == DamageEvent.DamageType.MELEE_ENCH)
+			&& player.getCooledAttackStrength(0) >= 0.9)
+			|| event.getType() == DamageEvent.DamageType.MELEE_SKILL) {
 
 			mDamageInTick.computeIfAbsent(player, key -> new ImpactInstance(value, plugin)).addEvent(enemy, event);
 

@@ -39,7 +39,7 @@ public class Versatile extends Ability {
 			if (percentproj > 1) {
 				event.updateDamageWithMultiplier((1 + (percentproj - 1) * DAMAGE_MULTIPLY_MELEE));
 			}
-		} else if (event.getType() == DamageEvent.DamageType.PROJECTILE || event.getType() == DamageEvent.DamageType.PROJECTILE_SKILL) {
+		} else if (event.getType() == DamageEvent.DamageType.PROJECTILE || event.getType() == DamageEvent.DamageType.PROJECTILE_SKILL || event.getType() == DamageEvent.DamageType.PROJECTILE_ENCH) {
 			double percentatk = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, AttributeType.ATTACK_DAMAGE_MULTIPLY);
 			if (percentatk > 1) {
 				event.updateDamageWithMultiplier((1 + (percentatk - 1) * DAMAGE_MULTIPLY_PROJ));

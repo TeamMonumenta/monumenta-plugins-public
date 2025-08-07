@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -21,7 +20,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-
 public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChargesOrStacks {
 
 	public static final String ABILITY_NAME = "Sharpshooter";
@@ -57,7 +55,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.PROJECTILE_SKILL) {
+		if (event.getType() == DamageEvent.DamageType.PROJECTILE || event.getType() == DamageEvent.DamageType.PROJECTILE_SKILL || event.getType() == DamageEvent.DamageType.PROJECTILE_ENCH) {
 			double mult = 1 + mPassiveDamage + mStacks * mStackDamage;
 			event.updateDamageWithMultiplier(mult);
 

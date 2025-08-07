@@ -24,7 +24,6 @@ public enum EnchantmentType {
 	SKT_DAMAGE_TAKEN(new SKTQuestDamageTaken(), false, false, false, false),
 
 	// Vanilla
-	SWEEPING_EDGE(Enchantment.SWEEPING_EDGE, "Sweeping Edge", true, false, false, false),
 	KNOCKBACK(Enchantment.KNOCKBACK, "Knockback", true, false, false, false),
 	LOOTING(Enchantment.LOOT_BONUS_MOBS, "Looting", true, false, false, false),
 	RIPTIDE(Enchantment.RIPTIDE, "Riptide", true, false, false, false),
@@ -116,6 +115,7 @@ public enum EnchantmentType {
 	SLAYER(new Slayer(), true, false, false, true),
 	SMITE(new Smite(), true, false, false, true),
 	SNIPER(new Sniper(), true, false, false, true),
+	SWEEPING_EDGE(new SweepingEdge(), true, false, false, false),
 	REVERB(new Reverb(), true, false, false, true),
 	STAMINA(new Stamina(), true, false, false, true),
 	STARVATION(new Starvation(), true, true, false, false),

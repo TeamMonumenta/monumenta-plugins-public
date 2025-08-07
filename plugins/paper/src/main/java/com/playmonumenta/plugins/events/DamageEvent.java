@@ -32,6 +32,7 @@ public class DamageEvent extends Event implements Cancellable {
 		MELEE_ENCH(false, true, "Melee Enchantment"),
 		PROJECTILE(false, true, "Projectile"),
 		PROJECTILE_SKILL(false, true, "Projectile Skill"),
+		PROJECTILE_ENCH(false, true, "Projectile Enchantment"),
 		MAGIC(false, true, "Magic"),
 		THORNS(false, true, "Thorns"),
 		BLAST(false, true, "Blast"),
@@ -112,7 +113,30 @@ public class DamageEvent extends Event implements Cancellable {
 		}
 
 		public static EnumSet<DamageType> getAllProjectileTypes() {
-			return EnumSet.of(PROJECTILE, PROJECTILE_SKILL);
+			return EnumSet.of(PROJECTILE, PROJECTILE_SKILL, PROJECTILE_ENCH);
+		}
+
+		public static EnumSet<DamageType> getAllMagicTypes() {
+			// Might create MAGIC_ENCH to handle Trivium properly in the future, not this PR though
+			return EnumSet.of(MAGIC);
+		}
+
+		public static EnumSet<DamageType> getAllMeleeAndProjectileTypes() {
+			EnumSet<DamageType> enumSet = getAllMeleeTypes();
+			enumSet.addAll(getAllProjectileTypes());
+			return enumSet;
+		}
+
+		public static EnumSet<DamageType> getAllProjectileAndMagicTypes() {
+			EnumSet<DamageType> enumSet = getAllProjectileTypes();
+			enumSet.addAll(getAllMagicTypes());
+			return enumSet;
+		}
+
+		public static EnumSet<DamageType> getAllMeleeProjectileAndMagicTypes() {
+			EnumSet<DamageType> enumSet = getAllMeleeAndProjectileTypes();
+			enumSet.addAll(getAllMagicTypes());
+			return enumSet;
 		}
 	}
 

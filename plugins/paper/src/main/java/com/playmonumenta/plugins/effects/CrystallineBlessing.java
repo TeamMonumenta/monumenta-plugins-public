@@ -22,14 +22,7 @@ public class CrystallineBlessing extends ZeroArgumentEffect {
 	private static final int DUR = 3 * 20;
 	private static final double DAMAGE_PERCENT = 0.15;
 	private static final String ATTR_NAME = "CrystallineBlessing";
-	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-			DamageType.MELEE,
-			DamageType.MELEE_ENCH,
-			DamageType.MELEE_SKILL,
-			DamageType.PROJECTILE,
-			DamageType.PROJECTILE_SKILL,
-			DamageType.MAGIC
-	);
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	private static final Particle.DustOptions DARK_COLOR = new Particle.DustOptions(Color.fromRGB(131, 63, 171), 1.0f);
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(201, 127, 245), 1.0f);

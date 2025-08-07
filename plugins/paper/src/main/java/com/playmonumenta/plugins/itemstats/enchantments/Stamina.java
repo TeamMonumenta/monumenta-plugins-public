@@ -28,13 +28,7 @@ public class Stamina implements Enchantment {
 	private static final double DAMAGE_CAP = 0.1;
 	private static final int DURATION = TICKS_PER_SECOND * 5;
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(241, 190, 84), 0.75f);
-	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageEvent.DamageType.MELEE,
-		DamageEvent.DamageType.MELEE_ENCH,
-		DamageEvent.DamageType.MELEE_SKILL,
-		DamageEvent.DamageType.PROJECTILE,
-		DamageEvent.DamageType.PROJECTILE_SKILL
-	);
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeAndProjectileTypes();
 
 	@Override
 	public String getName() {

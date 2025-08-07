@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class SpellParadoxSwap extends Spell {
 
-	private static final EnumSet<DamageEvent.DamageType> AFFECTED_TYPES = EnumSet.of(DamageEvent.DamageType.MELEE, DamageEvent.DamageType.MELEE_SKILL, DamageEvent.DamageType.MELEE_ENCH, DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.PROJECTILE_SKILL, DamageEvent.DamageType.MAGIC);
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_TYPES = EnumSet.of(DamageEvent.DamageType.MELEE, DamageEvent.DamageType.MELEE_SKILL, DamageEvent.DamageType.MELEE_ENCH, DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.PROJECTILE_SKILL, DamageEvent.DamageType.PROJECTILE_ENCH, DamageEvent.DamageType.MAGIC);
 	private static final int COOLDOWN = 20 * 5;
 	private final int mRange;
 	private final Plugin mPlugin;

@@ -566,6 +566,8 @@ public class AbilityUtils {
 	private static final EnumSet<ClassAbility> TRIGGERS_ASPECTS = EnumSet.of(
 		ClassAbility.ERUPTION,
 		ClassAbility.QUAKE,
+		ClassAbility.SWEEPING_EDGE,
+		ClassAbility.ARCANE_THRUST,
 		ClassAbility.EXPLOSIVE,
 		ClassAbility.ARCANE_STRIKE_ENHANCED,
 		ClassAbility.PREDATOR_STRIKE,
@@ -579,9 +581,12 @@ public class AbilityUtils {
 
 		// Is:
 		// Melee from a weapon that is not only a projectile weapon
+		// Melee Enchantment damage (Sweeping Edge and Arcane Thrust)
 		// Projectile
 		// One of a few "class abilities" that trigger aspects (i.e. Eruption, Quake)
-		return (type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE || TRIGGERS_ASPECTS.contains(event.getAbility());
+		return (type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand()))
+			|| type == DamageEvent.DamageType.PROJECTILE
+			|| TRIGGERS_ASPECTS.contains(event.getAbility());
 	}
 
 	public static void produceDurationString(LivingEntity totem, ArmorStand target, int totalDuration, int currentDuration, double whirlwindBuffed, boolean decayBuffed) {

@@ -40,14 +40,7 @@ public final class RageOfTheKeter implements Enchantment {
 	private static final int FOOD_RESTORED = 4;
 	private static final int FOOD_SATURATION_RESTORED = 4;
 	public static final Material COOLDOWN_ITEM = Material.POPPED_CHORUS_FRUIT;
-	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageType.MELEE,
-		DamageType.MELEE_ENCH,
-		DamageType.MELEE_SKILL,
-		DamageType.PROJECTILE,
-		DamageType.PROJECTILE_SKILL,
-		DamageType.MAGIC
-	);
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	public static final String CHARM_COOLDOWN = "Rage of the Keter Cooldown";
 	public static final String CHARM_DAMAGE = "Rage of the Keter Damage";

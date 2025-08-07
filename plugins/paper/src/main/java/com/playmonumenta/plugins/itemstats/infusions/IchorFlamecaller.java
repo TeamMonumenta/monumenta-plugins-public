@@ -30,14 +30,7 @@ public class IchorFlamecaller implements Infusion {
 	private static final double SPEED = 0.1;
 	private static final String EFFECT = "IchorFlameDamageEffect";
 	private static final String SPEED_EFFECT = "IchorFlameSpeedEffect";
-	private static final EnumSet<DamageEvent.DamageType> AFFECTED_PRISMATIC_DAMAGE_TYPES = EnumSet.of(
-		DamageEvent.DamageType.MELEE,
-		DamageEvent.DamageType.MELEE_ENCH,
-		DamageEvent.DamageType.MELEE_SKILL,
-		DamageEvent.DamageType.PROJECTILE,
-		DamageEvent.DamageType.PROJECTILE_SKILL,
-		DamageEvent.DamageType.MAGIC
-	);
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_PRISMATIC_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 	public static final String DESCRIPTION = String.format("Gain %s%% magic damage per mob on fire within %s blocks (%s%% cap) for %s seconds. Gain %s%% speed for %s seconds instead if there are none. Cooldown: %s seconds.",
 		StringUtils.multiplierToPercentage(MAGIC_DAMAGE_PER),
 		RANGE,

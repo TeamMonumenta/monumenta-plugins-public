@@ -19,14 +19,7 @@ public class Execution implements Infusion {
 	private static final int DURATION = 4 * 20;
 	public static final double PERCENT_DAMAGE_PER_LEVEL = 0.015;
 	private static final String PERCENT_DAMAGE_EFFECT_NAME = "ExecutionPercentDamageEffect";
-	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-			DamageType.MELEE,
-			DamageType.MELEE_ENCH,
-			DamageType.MELEE_SKILL,
-			DamageType.PROJECTILE,
-			DamageType.PROJECTILE_SKILL,
-			DamageType.MAGIC
-	);
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	@Override
 	public String getName() {

@@ -276,6 +276,8 @@ public enum ClassAbility {
 	// Used to trigger other events
 	ERUPTION("Eruption", true),
 	QUAKE("Quake", true),
+	SWEEPING_EDGE("Sweeping Edge", true),
+	ARCANE_THRUST("Arcane Thrust", true),
 	EXPLOSIVE("Explosive", true),
 	INFERNO("Inferno", true),
 	REVERB("Reverb", true),

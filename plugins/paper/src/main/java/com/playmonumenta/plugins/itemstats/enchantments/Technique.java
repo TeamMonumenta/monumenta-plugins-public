@@ -27,8 +27,8 @@ public class Technique implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if ((event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MAGIC ||
-			     event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.PROJECTILE_SKILL) &&
+		DamageType type = event.getType();
+		if ((type == DamageType.MELEE_SKILL || DamageType.getAllProjectileAndMagicTypes().contains(type)) &&
 			    withinDistance(player, enemy)) {
 			double bonus = DAMAGE_PER_LEVEL * level;
 			if (event.getType() == DamageType.PROJECTILE) {

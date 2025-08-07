@@ -86,17 +86,8 @@ public class DamageListener implements Listener {
 				event.setDamage(EntityUtils.getAttributeOrDefault(wither, Attribute.GENERIC_ATTACK_DAMAGE, event.getDamage()));
 			}
 
-			if (entityDamageByEntityEvent.getDamager() instanceof Player player
-				    && event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
-				PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStats(player);
-				double sweepingEdgeLevel = ItemStatUtils.getEnchantmentLevel(player.getInventory().getItemInMainHand(), EnchantmentType.SWEEPING_EDGE);
-				if (playerItemStats != null && sweepingEdgeLevel > 0) {
-					double damage = (1 + playerItemStats.getItemStats().get(AttributeType.ATTACK_DAMAGE_ADD.getItemStat()))
-						                * playerItemStats.getItemStats().get(AttributeType.ATTACK_DAMAGE_MULTIPLY.getItemStat());
-					event.setDamage(1 + damage * (sweepingEdgeLevel / (sweepingEdgeLevel + 1)));
-				} else {
-					event.setDamage(1);
-				}
+			if (event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
+				event.setDamage(1);
 			}
 		}
 

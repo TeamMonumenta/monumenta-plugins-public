@@ -196,7 +196,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	private static String getTypeSymbol(DamageEvent.DamageType type) {
 		return switch (type) {
 			case MELEE, MELEE_SKILL, MELEE_ENCH -> "🗡";
-			case PROJECTILE, PROJECTILE_SKILL -> "🏹";
+			case PROJECTILE, PROJECTILE_SKILL, PROJECTILE_ENCH -> "🏹";
 			case MAGIC -> "⭐";
 			case AILMENT -> "☠";
 			default -> "";

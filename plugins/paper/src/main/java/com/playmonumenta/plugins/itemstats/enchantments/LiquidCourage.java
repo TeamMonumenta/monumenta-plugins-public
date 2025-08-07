@@ -37,14 +37,7 @@ public class LiquidCourage implements Enchantment {
 	private static final double AMOUNT = 0.2;
 	private static final int CHARGES = 3;
 	private static final String COURAGE_EFFECT_SOURCE = "LiquidCourageEffect";
-	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageEvent.DamageType.MELEE,
-		DamageEvent.DamageType.MELEE_ENCH,
-		DamageEvent.DamageType.MELEE_SKILL,
-		DamageEvent.DamageType.PROJECTILE,
-		DamageEvent.DamageType.PROJECTILE_SKILL,
-		DamageEvent.DamageType.MAGIC
-	);
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	public static final Material COOLDOWN_ITEM = Material.HONEYCOMB;
 
