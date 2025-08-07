@@ -119,7 +119,7 @@ public class TowerMobAbility {
 					BossManager.getInstance().createBossInternal(mob,
 						new TowerAbility(Plugin.getInstance(), "Jungle's Vengenance", mob, game, towerMob, playerMob) {
 
-							final EntityTargets mTargets = new EntityTargets(EntityTargets.TARGETS.MOB, 5, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED), new EntityTargets.TagsListFiter(Set.of(mIsPlayerMob ? TowerConstants.MOB_TAG_FLOOR_TEAM : TowerConstants.MOB_TAG_PLAYER_TEAM)), false);
+							final EntityTargets mTargets = new EntityTargets(EntityTargets.TARGETS.MOB, 5, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED), new EntityTargets.TagsListFiter(Set.of(mIsPlayerMob ? TowerConstants.MOB_TAG_FLOOR_TEAM : TowerConstants.MOB_TAG_PLAYER_TEAM)));
 
 							@Override
 							public void death(@Nullable EntityDeathEvent event) {

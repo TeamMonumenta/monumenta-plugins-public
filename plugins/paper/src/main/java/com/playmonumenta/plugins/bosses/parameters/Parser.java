@@ -342,15 +342,13 @@ public class Parser {
 				}
 			}, Set.of(), false)
 			.put("tags", (tokens, parameters) -> parseCollection(tokens, Parser::parseString, new HashSet<>()), Set.of(), false)
-			.put("excludeTagged", ParameterParserMethod.of(Parser::parseBoolean),false, false)
 			.build(parameters ->
 				new EntityTargets(
 					(EntityTargets.TARGETS) parameters.nonNullValue("type"),
 					(Double) parameters.nonNullValue("range"),
 					(EntityTargets.Limit) parameters.nonNullValue("limit"),
 					(Collection<EntityTargets.EntityFilter>) parameters.nonNullValue("filters"),
-					new EntityTargets.TagsListFiter((Set<String>) parameters.nonNullValue("tags")),
-					(Boolean) parameters.nonNullValue("excludeTagged"))))
+					new EntityTargets.TagsListFiter((Set<String>) parameters.nonNullValue("tags")))))
 		.put(EntityTargets.Limit.class, () -> ObjectConstructor.builder()
 			.put("limit", (tokens, parameters) -> {
 				if (tokens.peek().getType() == Tokens.TokenType.INTEGER) {
