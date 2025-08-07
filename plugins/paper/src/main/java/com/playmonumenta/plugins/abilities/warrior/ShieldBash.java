@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,6 +41,7 @@ public class ShieldBash extends Ability {
 	public static final String CHARM_DAMAGE = "Shield Bash Damage";
 	public static final String CHARM_DURATION = "Shield Bash Duration";
 	public static final String CHARM_COOLDOWN = "Shield Bash Cooldown";
+	public static final String CHARM_KNOCKBACK = "Shield Bash Knockback";
 	public static final String CHARM_RADIUS = "Shield Bash Radius";
 	public static final String CHARM_RANGE = "Shield Bash Range";
 	public static final String CHARM_PARRY_DURATION = "Shield Bash Parry Duration";
@@ -58,6 +60,7 @@ public class ShieldBash extends Ability {
 	private final double mRange;
 	private final double mRadius;
 	private final double mDamage;
+	private final double mKnockback;
 	private final int mStunDuration;
 	private final int mParryDuration;
 	private final double mCDR;
@@ -75,6 +78,7 @@ public class ShieldBash extends Ability {
 		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SHIELD_BASH_STUN);
 		mParryDuration = CharmManager.getDuration(mPlayer, CHARM_PARRY_DURATION, ENHANCEMENT_BLOCKING_DURATION);
 		mCDR = ENHANCEMENT_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CDR);
+		mKnockback = CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldBashCS());
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mCounterStrike = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, CounterStrike.class);
@@ -130,6 +134,9 @@ public class ShieldBash extends Ability {
 
 	private void bash(LivingEntity le, ClassAbility ca) {
 		DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, mDamage, ca, true, true);
+		if (mKnockback != 0) {
+			MovementUtils.knockAway(mPlayer, le, (float) mKnockback);
+		}
 		if (EntityUtils.isBoss(le) || EntityUtils.isElite(le)) {
 			EntityUtils.applySlow(mPlugin, mStunDuration, .99, le);
 		} else {
