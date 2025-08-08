@@ -110,6 +110,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			mTimeUntilDecay = mDecayTime;
 		}
 		cancelOnDeath(new BukkitRunnable() {
+			private final int mTimeout = mDecayTime * mMaxStacks;
 			int mTicks = 0;
 
 			@Override
@@ -119,6 +120,11 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 				mPlugin.mEffectManager.addEffect(mPlayer, "DeadlyRonde",
 					new PercentSpeed(6, speed, "DeadlyRondeMod").deleteOnAbilityUpdate(true));
 				if (mRondeStacks <= 0) {
+					this.cancel();
+				}
+
+				//Logged off or something probably
+				if (mTicks > mTimeout) {
 					this.cancel();
 				}
 			}
