@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
@@ -41,6 +42,13 @@ public class Punch implements Enchantment {
 
 	@Override
 	public void onProjectileHit(Plugin plugin, Player player, double level, ProjectileHitEvent event, Projectile projectile) {
+		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
+		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager().getPlugin("ScriptedQuests");
+		if (!(event.getHitEntity() instanceof LivingEntity)
+			|| event.getHitEntity() instanceof Villager
+			|| scriptedQuestsPlugin.mNpcManager.isQuestNPC(event.getHitEntity())) {
+			return;
+		}
 		float speed = KB_VEL_BASE + KB_VEL_PER_LEVEL * (float) level;
 		// Enemy is punched with fixed Y velocity, in the horizontal direction the arrow was travelling, with fixed speed.
 		Vector vector = projectile.getVelocity().clone()
@@ -53,9 +61,6 @@ public class Punch implements Enchantment {
 				.setY(VERTICAL_LAUNCH);
 		}
 		// TODO: Override the Minecraft Punch behaviour so that it doesn't perform a normal amount of KB via... mixin? Then rewrite this section so that it doesn't delay the KB by one tick
-		if (!(event.getHitEntity() instanceof LivingEntity)) {
-			return;
-		}
 		final LivingEntity enemy = (LivingEntity) event.getHitEntity();
 		// Sorry. Java requires that I input a "final" into the lambda expression.
 		final Vector dir = vector.clone();
