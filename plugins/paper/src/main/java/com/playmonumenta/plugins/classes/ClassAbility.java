@@ -31,8 +31,8 @@ public enum ClassAbility {
 	MANA_LANCE("Mana Lance"),
 	PRISMATIC_SHIELD("Prismatic Shield"),
 	SPELLSHOCK(Spellshock.NAME),
-	SPELLSHOCK_ARCANE("Spell Shock Arcane Enhancement"),
-	SPELLSHOCK_THUNDER("Spell Shock Thunder Enhancement"),
+	SPELLSHOCK_ARCANE("Spellshock Arcane Enhancement"),
+	SPELLSHOCK_THUNDER("Spellshock Thunder Enhancement"),
 	THUNDER_STEP(ThunderStep.NAME),
 
 	// Arcanist

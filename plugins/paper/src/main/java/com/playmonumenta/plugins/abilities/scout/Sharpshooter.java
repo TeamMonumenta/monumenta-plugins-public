@@ -73,9 +73,10 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	@Override
 	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
 		final boolean huntingCompanion = event.getAbility() == ClassAbility.HUNTING_COMPANION;
+		final DamageEvent.DamageType type = event.getType();
 
 		mCosmetic.hitEffect(mPlayer, enemy);
-		if (huntingCompanion || event.getType() == DamageEvent.DamageType.PROJECTILE || event.getType() == DamageEvent.DamageType.PROJECTILE_SKILL || event.getType() == DamageEvent.DamageType.PROJECTILE_ENCH) {
+		if (huntingCompanion || DamageEvent.DamageType.getAllProjectileTypes().contains(type)) {
 			double multiplier = 1 + (isLevelTwo() ? PERCENT_BASE_DAMAGE_L2 : PERCENT_BASE_DAMAGE);
 			if (!huntingCompanion) {
 				multiplier += mStacks * mDamagePerStack;
@@ -90,7 +91,9 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 			event.updateDamageWithMultiplier(multiplier);
 
 			if (!huntingCompanion
-				&& (event.getDamager() instanceof final Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true))) {
+				&& ((event.getDamager() instanceof final Projectile projectile
+				&& EntityUtils.isAbilityTriggeringProjectile(projectile, true))
+				|| type == DamageEvent.DamageType.PROJECTILE_SKILL)) {
 				mTicksToStackDecay = mDecayTime;
 
 				if (mStacks < mMaxStacks) {

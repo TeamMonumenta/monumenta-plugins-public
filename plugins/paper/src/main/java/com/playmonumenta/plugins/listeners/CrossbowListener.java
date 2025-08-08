@@ -50,10 +50,12 @@ public class CrossbowListener implements Listener {
 			arrow.setFireTicks(100);
 		}
 
-		// Handle Punch on crossbows (for both players and mobs)
-		int punch = crossbow.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK);
-		if (punch > 0) {
-			arrow.setKnockbackStrength(punch);
+		// Only handle Punch on crossbows for entities - otherwise the punch on player crossbows will be too high
+		if (!(event.getEntity() instanceof Player)) {
+			int punch = crossbow.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK);
+			if (punch > 0) {
+				arrow.setKnockbackStrength(punch);
+			}
 		}
 
 		// For players: Handle Infinity on crossbows

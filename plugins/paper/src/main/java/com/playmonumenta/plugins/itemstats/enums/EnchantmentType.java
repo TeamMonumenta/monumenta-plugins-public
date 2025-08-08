@@ -24,10 +24,8 @@ public enum EnchantmentType {
 	SKT_DAMAGE_TAKEN(new SKTQuestDamageTaken(), false, false, false, false),
 
 	// Vanilla
-	KNOCKBACK(Enchantment.KNOCKBACK, "Knockback", true, false, false, false),
 	LOOTING(Enchantment.LOOT_BONUS_MOBS, "Looting", true, false, false, false),
 	RIPTIDE(Enchantment.RIPTIDE, "Riptide", true, false, false, false),
-	PUNCH(Enchantment.ARROW_KNOCKBACK, "Punch", true, false, false, false),
 	QUICK_CHARGE(Enchantment.QUICK_CHARGE, "Quick Charge", true, false, false, false),
 	MULTISHOT(Enchantment.MULTISHOT, "Multishot", false, false, false, false),
 	INFINITY(Enchantment.ARROW_INFINITE, "Infinity", false, false, false, false),
@@ -95,6 +93,7 @@ public enum EnchantmentType {
 	INSTANT_DRINK(new InstantDrink(), false, false, false, false),
 	INTUITION(new Intuition(), false, false, false, true),
 	JUNGLES_NOURISHMENT(new JunglesNourishment(), false, false, false, false),
+	KNOCKBACK(new Knockback(), true, false, false, true),
 	LIFE_DRAIN(new LifeDrain(), true, false, false, true),
 	LIQUID_COURAGE(new LiquidCourage(), false, false, false, false),
 	MULTILOAD(new Multiload(), true, false, false, false),
@@ -103,6 +102,7 @@ public enum EnchantmentType {
 	REGENERATION(new Regeneration(), true, false, false, true),
 	POINT_BLANK(new PointBlank(), true, false, false, true),
 	PIERCING(new Piercing(), true, false, false, true),
+	PUNCH(new Punch(), true, false, false, true),
 	WORLDLY_PROTECTION(new WorldlyProtection(), true, false, false, false),
 	QUAKE(new Quake(), true, false, false, true),
 	RAGE_OF_THE_KETER(new RageOfTheKeter(), false, false, false, false),

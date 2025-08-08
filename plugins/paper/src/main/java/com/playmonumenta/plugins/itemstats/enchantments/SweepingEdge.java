@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
+import static com.playmonumenta.plugins.itemstats.enchantments.Knockback.KB_VEL_PER_LEVEL;
 
 public class SweepingEdge implements Enchantment {
 	// Specify how much the Sweeping Edge hitbox expands (in ALL directions) compared to the hitbox of the enemy you hit.
@@ -25,6 +26,7 @@ public class SweepingEdge implements Enchantment {
 	private static final double Z_EXPANSION = 1.0;
 	private static final double TRANSFER_COEFFICIENT = 0.2;
 	private static final double PLAYER_REACH = 3.0;
+	private static final float KNOCKBACK_TRANSFER_COEFFICIENT = 0.8f;
 
 	@Override
 	public String getName() {
@@ -83,6 +85,7 @@ public class SweepingEdge implements Enchantment {
 				int bleed = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.BLEEDING);
 				int wind = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
 				int impact = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.IMPACT);
+				int knockback = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.KNOCKBACK);
 
 
 				// List of the locations of mobs hit by the sweep attack.
@@ -101,7 +104,18 @@ public class SweepingEdge implements Enchantment {
 						// Deal damage.
 						DamageUtils.damage(player, mob, DamageType.MELEE_ENCH, damage, ClassAbility.SWEEPING_EDGE, false);
 						// Deal knockback.
-						MovementUtils.knockAway(player.getLocation(), mob, 0.25f, 0.25f);
+						float speed = KNOCKBACK_TRANSFER_COEFFICIENT * (0.4f + KB_VEL_PER_LEVEL * (float) knockback);
+						Vector vector = enemy.getLocation().clone().toVector().subtract(player.getLocation().toVector());
+						vector.setY(0);
+						if (vector.length() < 0.001) {
+							vector = new Vector(0, KNOCKBACK_TRANSFER_COEFFICIENT * 0.4f, 0);
+						} else {
+							vector.normalize()
+								.multiply(speed)
+								.setY(KNOCKBACK_TRANSFER_COEFFICIENT * 0.4f);
+						}
+						// Knocks everything in the same direction as the central mob
+						MovementUtils.knockAwayDirection(vector, mob, 0.5f, true, false);
 					}
 				}
 				// Get the player location, to play sounds later
