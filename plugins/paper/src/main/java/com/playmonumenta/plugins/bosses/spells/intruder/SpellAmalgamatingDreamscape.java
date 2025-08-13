@@ -87,8 +87,8 @@ public class SpellAmalgamatingDreamscape extends Spell {
 		ORANGE("ManifestedWingedTitan", List.of("#DreamscapeOrange1", "#DreamscapeOrange2"), "DreamscapeOrange"),
 		MAGENTA("ManifestedCVaatktheSoulblighter", List.of("#DreamscapeMagenta1", "#DreamscapeMagenta2"), "DreamscapeMagenta"),
 		LIGHT_BLUE("ManifestedHeraldofSecretStars", List.of("#DreamscapeLightblue1", "#DreamscapeLightblue2"), "DreamscapeLightBlue"),
-		YELLOW("~DreamscapeYellowBoss", List.of("#DreamscapeYellow1", "#DreamscapeYellow2"), "DreamscapeYellow"),
-		WILLOWS("ManifestedVeiltornHelminthMount", List.of("#DreamscapeWillows1", "#DreamscapeWillows2"), "DreamscapeWillows");
+		YELLOW("~DreamscapeYellowBoss", List.of("#DreamscapeYellow1", "#DreamscapeYellow2"), "DreamscapeYellow");
+		//WILLOWS("ManifestedVeiltornHelminthMount", List.of("#DreamscapeWillows1", "#DreamscapeWillows2"), "DreamscapeWillows");
 
 		public final String mBossSoul;
 		public final List<String> mSouls;
