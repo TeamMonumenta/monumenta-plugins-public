@@ -75,6 +75,11 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.BERSERK, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.HEALCUT, 2);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.GRAVITY, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.IDOLATRY, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.REGENERATING, 3);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.BLOODLUST, 4);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.BOUNTIFUL, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.CLOAKED, 3);
 
 		// Depths endless changes- use dev2 for testing
 		if (ServerProperties.getShardName().startsWith("depths")
@@ -124,16 +129,7 @@ public class DelvesUtils {
 		long week = DateUtils.getWeeklyVersion() + nextWeek;
 		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(week / nWeekRotation.size()));
 		List<DelvesModifier> selectedModifiers = nWeekRotation.get((int) (DateUtils.getWeeklyVersion() % nWeekRotation.size()));
-		if (DateUtils.getWeeklyVersion() == 2859) {
-			DelvesModifier hauntedModifier = DelvesModifier.HAUNTED;
-			if (!selectedModifiers.contains(hauntedModifier)) {
-				selectedModifiers = new ArrayList<>(selectedModifiers);
-				selectedModifiers.add(hauntedModifier);
-			}
-			MODIFIER_RANK_CAPS.put(DelvesModifier.HAUNTED, 2);
-		} else {
-			MODIFIER_RANK_CAPS.put(DelvesModifier.HAUNTED, 1);
-		}
+		MODIFIER_RANK_CAPS.put(DelvesModifier.HAUNTED, 1);
 
 		return selectedModifiers;
 	}
@@ -141,14 +137,8 @@ public class DelvesUtils {
 	public static List<DelvesModifier> getExperimentalDelveModifier() {
 		List<DelvesModifier> experimentalMods = DelvesModifier.experimentalDelveModifiers();
 		return switch ((int) DateUtils.getWeeklyVersion()) {
-			// week starting friday august 30, 2024
-			case 2853 -> List.of(experimentalMods.get(0));
-			// week starting friday january 24, 2025
-			case 2874, 2875 -> List.of(experimentalMods.get(0), experimentalMods.get(1));
-			// week starting friday march 14, 2025
-			case 2881, 2882 -> List.of(experimentalMods.get(2));
-			// week starting friday april 4, 2025
-			case 2884, 2885, 2886, 2887 -> List.of(experimentalMods.get(3));
+			// week starting friday august 8, 2025
+			case 2902, 2903, 2904, 2905, 2906 -> List.of(experimentalMods.get(4), experimentalMods.get(5), experimentalMods.get(6), experimentalMods.get(7), experimentalMods.get(8));
 			default -> Collections.emptyList();
 		};
 	}

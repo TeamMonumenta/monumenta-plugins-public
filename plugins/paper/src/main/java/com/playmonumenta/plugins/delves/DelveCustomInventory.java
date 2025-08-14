@@ -83,7 +83,9 @@ public class DelveCustomInventory extends CustomInventory {
 				 .decoration(TextDecoration.ITALIC, false),
 		new String[] {
 			"Some of these modifiers are randomly available each week.",
-			"Selecting at least one will result in 25% increased XP."
+			"Selecting at least one will result in increased XP, ",
+			"depending on the level of the modifier relative to maximum, ",
+			"capping at 25%."
 		}
 	);
 	private static final ItemStack EXPERIMENTAL_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(
@@ -91,7 +93,7 @@ public class DelveCustomInventory extends CustomInventory {
 		Component.text("Experimental Modifier", NamedTextColor.AQUA, TextDecoration.BOLD)
 			.decoration(TextDecoration.ITALIC, false),
 		new String[] {
-			"This is a one-time event modifier that will not be coming back."
+			"This is a one-time event modifier that may or may not be coming back."
 		}
 	);
 	private static final ItemStack LEFT_ARROW_ITEM = GUIUtils.createBasicItem(
@@ -229,10 +231,8 @@ public class DelveCustomInventory extends CustomInventory {
 	/**
 	 * Returns a mapping of the points initially selected when
 	 * this menu is shown to the player.
-	 *
 	 * With no delve preset, the player will be shown
 	 * the delve modifiers in their current dungeon.
-	 *
 	 * Precondition: mOwner, mDungeonName, mConfig are initialized.
 	 */
 	private Map<DelvesModifier, Integer> getInitialPoints() {
@@ -440,6 +440,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 		if (mDungeonName.startsWith("ring")) {
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
+			mods.remove(DelvesModifier.BOUNTIFUL);
 			mods.remove(DelvesModifier.ENTROPY);
 			return mods;
 		}

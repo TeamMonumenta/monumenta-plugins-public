@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.commands.SpawnerCountCommand;
 import com.playmonumenta.plugins.delves.abilities.Astral;
 import com.playmonumenta.plugins.delves.abilities.Berserk;
+import com.playmonumenta.plugins.delves.abilities.Bountiful;
 import com.playmonumenta.plugins.delves.abilities.ChanceCubes;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Chronology;
@@ -18,6 +19,7 @@ import com.playmonumenta.plugins.delves.abilities.Fragile;
 import com.playmonumenta.plugins.delves.abilities.Gravity;
 import com.playmonumenta.plugins.delves.abilities.Haunted;
 import com.playmonumenta.plugins.delves.abilities.HealCut;
+import com.playmonumenta.plugins.delves.abilities.Idolatry;
 import com.playmonumenta.plugins.delves.abilities.Infernal;
 import com.playmonumenta.plugins.delves.abilities.Riftborn;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
@@ -86,6 +88,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.delves.DelvesUtils.MODIFIER_RANK_CAPS;
 
 public class DelvesManager implements Listener {
 	public static final String KEY_DELVES_PLUGIN_DATA = "MonumentaDelves";
@@ -365,10 +368,12 @@ public class DelvesManager implements Listener {
 					CreatureSpawner temp = NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE;
 					delvesApplied.forEach((mod, level) -> mod.applyDelve(livingEntity, level));
 					Riftborn.applyModifiers(temp.getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
+					Idolatry.applyModifiers(temp.getBlock(), delvesApplied.getOrDefault(DelvesModifier.IDOLATRY, 0));
 					Chronology.applyModifiers(temp, delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
 				} else if (event instanceof SpawnerSpawnEvent spawnerSpawnEvent && spawnerSpawnEvent.getSpawner() != null) {
 					// normal spawn - handle all the mods
 					Riftborn.applyModifiers(spawnerSpawnEvent.getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
+					Idolatry.applyModifiers(spawnerSpawnEvent.getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.IDOLATRY, 0));
 					Chronology.applyModifiers(spawnerSpawnEvent.getSpawner(), delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
 
 					delvesApplied.forEach((mod, level) -> mod.applyDelve(livingEntity, level));
@@ -446,7 +451,7 @@ public class DelvesManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void playerWalk(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		if (getRank(player, DelvesModifier.ASTRAL) == 0
+		if ((getRank(player, DelvesModifier.ASTRAL) == 0 && getRank(player, DelvesModifier.BOUNTIFUL) == 0)
 			|| player.getGameMode() == GameMode.SPECTATOR
 			|| player.getGameMode() == GameMode.CREATIVE) {
 			return;
@@ -456,12 +461,15 @@ public class DelvesManager implements Listener {
 		if (resistanceLevel < 5) {
 			List<Chunk> chunkList = LocationUtils.getSurroundingChunks(event.getTo().getBlock(), 32);
 			for (Chunk chunk : chunkList) {
-				for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST, false)) {
+				for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST || b.getType() == Material.SPAWNER, false)) {
 					if (interestingBlock instanceof Chest chest
-						    && LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32)
-						    && ChestUtils.isAstrableChest(chest)
-						    && PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
+						&& LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32)
+						&& ChestUtils.isAstrableChest(chest)
+						&& PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
 						Astral.applyModifiers(chest, getRank(player, DelvesModifier.ASTRAL));
+					} else if (interestingBlock instanceof CreatureSpawner spawner
+						&& LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), spawner.getRequiredPlayerRange()*2)){
+						Bountiful.applyModifiers(spawner, getRank(player, DelvesModifier.BOUNTIFUL));
 					}
 				}
 			}
@@ -490,13 +498,16 @@ public class DelvesManager implements Listener {
 			return;
 		}
 		Player player = event.getPlayer();
+		double expBuffPct = 0;
 		for (DelvesModifier mod : DelvesModifier.rotatingDelveModifiers()) {
 			if (getRank(player, mod) > 0) {
-				double expBuffPct = .25;
-				event.setAmount((int)(event.getAmount() * (1.0 + expBuffPct)));
-				return;
+				double expBuffPctPerMod = .25 * (double) getRank(player, mod) / MODIFIER_RANK_CAPS.get(mod);
+				if (expBuffPctPerMod > expBuffPct) {
+					expBuffPct = expBuffPctPerMod;
+				}
 			}
 		}
+		event.setAmount((int)(event.getAmount() * (1.0 + expBuffPct)));
 	}
 
 	@EventHandler(ignoreCancelled = true)

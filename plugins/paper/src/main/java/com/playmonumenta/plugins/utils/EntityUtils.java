@@ -1614,4 +1614,24 @@ public class EntityUtils {
 
 		return 0;
 	}
+
+	// returns change in mob's health
+	public static double healMobPercent(LivingEntity mob, double healPercentage) {
+		// note that healPercentage is a percentage - 100 is a full heal, 50 is a half heal, etc.
+		if (healPercentage <= 0 || mob.isDead()) {
+			return 0;
+		}
+		double healAmount = getMaxHealth(mob) * healPercentage / 100;
+		EntityRegainHealthEvent event = new EntityRegainHealthEvent(mob, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
+		Bukkit.getPluginManager().callEvent(event);
+		if (!event.isCancelled()) {
+			double oldHealth = mob.getHealth();
+			double newHealth = Math.min(oldHealth + event.getAmount(), getMaxHealth(mob));
+			mob.setHealth(newHealth);
+
+			return newHealth - oldHealth;
+		}
+
+		return 0;
+	}
 }

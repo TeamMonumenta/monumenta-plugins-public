@@ -1,25 +1,36 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.bosses.StealthBoss;
+import com.playmonumenta.plugins.delves.abilities.Cloaked;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class SpellStealth extends Spell {
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final StealthBoss.Parameters mParameters;
+	Map<Entity, ItemUtils.EquipmentItems> mCloakedMobs = new HashMap<>();
 
 	@Nullable
 	private ItemUtils.EquipmentItems mEquipmentItems;
 
 	private boolean mActive = false;
 	private boolean mWasGlowing = false;
+
+	public static final String STEALTH_IMMUNE = "boss_stealthimmune";
 
 	public SpellStealth(Plugin plugin, LivingEntity boss, StealthBoss.Parameters parameters) {
 		mPlugin = plugin;
@@ -50,13 +61,60 @@ public class SpellStealth extends Spell {
 		}
 		mBoss.setInvisible(true);
 
-		mActive = true;
-		mActiveTasks.add(new BukkitRunnable() {
-			@Override
-			public void run() {
-				endStealth();
+		if (mParameters.STEALTH_PASSENGERS) {
+			List<Entity> cloakedMobsList = mBoss.getPassengers();
+			for (Entity cloakedMob : cloakedMobsList) {
+				if (!(cloakedMob.getScoreboardTags().contains(STEALTH_IMMUNE)
+					|| cloakedMob.getScoreboardTags().contains(Cloaked.AVOID_CLOAKED))) {
+					if (cloakedMob instanceof LivingEntity) {
+						@Nullable
+						EntityEquipment cloakedMobEquipment = ((LivingEntity) cloakedMob).getEquipment();
+						if (cloakedMobEquipment != null) {
+							ItemUtils.EquipmentItems cloakedMobEquipmentItems = ItemUtils.getEquipmentItems(cloakedMobEquipment);
+							cloakedMobEquipment.clear();
+							mCloakedMobs.put(cloakedMob, cloakedMobEquipmentItems);
+						} else {
+							mCloakedMobs.put(cloakedMob, null);
+						}
+					} else {
+						mCloakedMobs.put(cloakedMob, null);
+					}
+					cloakedMob.setInvisible(true);
+				}
 			}
-		}.runTaskLater(mPlugin, mParameters.DURATION));
+		}
+
+
+		mActive = true;
+		if (mParameters.DURATION >= 0) {
+			mActiveTasks.add(new BukkitRunnable() {
+				@Override
+				public void run() {
+					endStealth();
+				}
+			}.runTaskLater(mPlugin, mParameters.DURATION));
+		}
+
+		if (mParameters.PROXIMITY_CHECK) {
+			// For performance reasons, we don't run this unless the parameter is enabled
+			mActiveTasks.add(new BukkitRunnable() {
+				@Override
+					public void run() {
+					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mParameters.PROXIMITY, true, false);
+					if (!players.isEmpty()) {
+						for (Player p : players) {
+							// Method might not be performant. Keep stealth detection ranges low.
+							if (mBoss.hasLineOfSight(p)) {
+								endStealth();
+								this.cancel();
+							}
+						}
+					}
+				}
+			}.runTaskTimer(mPlugin, 0, 1));
+			// This method might not be performant. MUST CHECK the lag on a server when running full delves with it.
+			// If needed, we might have to make them unstealth after some number of ticks.
+		}
 	}
 
 	private void endStealth() {
@@ -76,9 +134,24 @@ public class SpellStealth extends Spell {
 		@Nullable
 		EntityEquipment entityEquipment = mBoss.getEquipment();
 		if (entityEquipment != null) {
+			// This is probably causing the bug where vanities vanish - the entityEquipment is supposed to be null after we cleared it????
+			// Fixable but not tonight, scream at me next week
 			ItemUtils.setEquipmentItems(entityEquipment, mEquipmentItems);
 		}
 		mBoss.setInvisible(false);
+
+		if (mParameters.STEALTH_PASSENGERS) {
+			for (Entity cloakedMob : mCloakedMobs.keySet()) {
+				if (mCloakedMobs.get(cloakedMob) != null) {
+					@Nullable
+					EntityEquipment cloakedMobEquipment = ((LivingEntity) cloakedMob).getEquipment();
+					if (cloakedMobEquipment != null) {
+						ItemUtils.setEquipmentItems(cloakedMobEquipment, mCloakedMobs.get(cloakedMob));
+					}
+				}
+				cloakedMob.setInvisible(false);
+			}
+		}
 	}
 
 	@Override

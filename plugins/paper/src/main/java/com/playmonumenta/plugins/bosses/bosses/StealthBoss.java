@@ -32,17 +32,17 @@ public class StealthBoss extends BossAbilityGroup {
 			.build();
 		@BossParam(help = "Sound played when the boss goes out of stealth")
 		public SoundsList SOUND_EXIT = SoundsList.builder()
-			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 1.6f, 0.1f))
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 1.6f, 0.5f))
 			.build();
 		@BossParam(help = "Sound played when the boss hits a player and exits stealth")
 		public SoundsList SOUND_HIT = SoundsList.builder()
-			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 1.6f, 0.1f))
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 1.6f, 0.5f))
 			.build();
 		@BossParam(help = "Effects given to the boss when it enters stealth")
 		public EffectsList EFFECTS_STEALTH = EffectsList.EMPTY;
 		@BossParam(help = "Effects given to the player when the boss hits a player and exits stealth")
 		public EffectsList EFFECTS_HIT = EffectsList.EMPTY;
-		@BossParam(help = "Stealth time in ticks, set to -1 to have infinite stea")
+		@BossParam(help = "Stealth time in ticks, set to -1 to have infinite stealth")
 		public int DURATION = 10 * 20;
 		@BossParam(help = "Damage to the entity when the boss hits a player and exits stealth")
 		public int DAMAGE = 20;
@@ -56,6 +56,12 @@ public class StealthBoss extends BossAbilityGroup {
 		public int DETECTION = 32;
 		@BossParam(help = "Spell Name (also used for the damage it does)")
 		public String SPELL_NAME = "Stealth";
+		@BossParam(help = "Whether to exit Stealth when near a player")
+		public boolean PROXIMITY_CHECK = false;
+		@BossParam(help = "Distance from player before automatically exiting Stealth (requires PROXIMITY_CHECK)")
+		public int PROXIMITY = 6;
+		@BossParam(help = "Whether to Stealth all entities riding this boss")
+		public boolean STEALTH_PASSENGERS = true;
 	}
 
 	Parameters mParameters = new Parameters();

@@ -51,7 +51,8 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 
 	public static final String PREVENT_BLOCK_PLACEMENT = "disable_boss_blockplacer";
 
-	private static final double PREVENT_PLACING_RADIUS = 2.5;
+	private static final double PREVENT_PLACING_RADIUS = 3.5;
+	private static final double PREVENT_PLACING_HEIGHT = 7;
 	private static final int IDLE_TIME = 6 * TICKS_PER_SECOND;
 	private static final int NEW_TARGET_RANGE = 25;
 	private static final int BEELINE_DISTANCE = 8;
@@ -127,14 +128,57 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 						/* Launcher likely can't navigate to the target's loc */
 						blockBreakToTarget.tryToBreakBlocks(SpellBlockBreak.DEFAULT_REQUIRED_SCORE / 2);
 					}
-					if (mLowMovementTicks >= TICKS_PER_SECOND * 4) {
+					final Vector bossToPlayerVec = targetLoc.clone().subtract(bossLoc).toVector();
+					if (mLowMovementTicks >= TICKS_PER_SECOND * 4
+						|| (bossToPlayerVec.getY() < 0
+						&& bossToPlayerVec.getY() > -PREVENT_PLACING_HEIGHT
+						&& Math.abs(bossToPlayerVec.getX()) < 1
+						&& Math.abs(bossToPlayerVec.getZ()) < 1)) {
 						/* Launcher likely boxed itself inside a cage and needs to be rescued */
+						/* Or the launcher is directly above the player and we want it to jump down and engage */
 						final List<Block> nearbyBridgeBlocks = BlockUtils.getBlocksInCube(bossLoc, 3);
 						nearbyBridgeBlocks.removeIf(block -> block.getType() != mParameters.block);
 						blockBreakToTarget.breakBlocks(bossLoc, nearbyBridgeBlocks);
 						mLowMovementTicks = 0;
 						return;
 					}
+
+					/* Launcher is falling pretty fast and below the target */
+					if (mBoss.getVelocity().getY() < -1
+						&& mBoss.getY() < target.getY()) {
+						/* Downwards velocity of 1 corresponds to about 7 blocks of freefall */
+						mBoss.setVelocity(mBoss.getVelocity().clone().setY(0.1));
+						List<Location> floorLocs = new ArrayList<>();
+
+						for (int x = -1; x <= 1; x++) {
+							for (int z = -1; z <= 1; z++) {
+								floorLocs.add(mBoss.getLocation().add(x, -1, z));
+							}
+						}
+						for (Location loc: floorLocs) {
+							final Block block = loc.getBlock();
+							final Material material = block.getType();
+							if (!PlayerUtils.playersInRange(bossLoc, PREVENT_PLACING_RADIUS, true).isEmpty()) {
+								MMLog.finest(() -> "[BlockPlacerBoss] Launcher " + mMob.getName() + " attempted to place " +
+									"a floor but was too close to one or more players");
+								return;
+							}
+							// If block is in cannot replace mats or is a solid or is water or the location is in adventure
+							// mode or the location intersects an entity's box, don't replace that block
+							if (CANNOT_REPLACE_MATERIALS.contains(material) || block.isSolid() || BlockUtils.containsWater(block)
+								|| ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)
+								|| LocationUtils.blocksIntersectEntity(loc.getWorld(), List.of(loc),
+								hitbox -> hitbox.getHitEntities(e -> e instanceof LivingEntity && !e.isInvulnerable()))) {
+								MMLog.finest(() -> "[BlockPlacerBoss] Launcher " + mMob.getName() + " attempted to place " +
+									"a block but failed the final placement check");
+								continue;
+							}
+
+							block.setType(mParameters.block);
+							mParameters.sound_place.play(boss.getLocation());
+						}
+					}
+
 
 					if (path == null) {
 						if (!blockBreakToTarget.tryToBreakBlocks(SpellBlockBreak.DEFAULT_REQUIRED_SCORE)) {
@@ -178,7 +222,16 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 						return;
 					}
 
-					final Vector euclideanVec = targetLoc.clone().subtract(bossLoc).toVector().normalize();
+					final Vector bossToPlayerVec = targetLoc.clone().subtract(bossLoc).toVector();
+					if (bossToPlayerVec.getY() < 0
+						&& bossToPlayerVec.getY() > -PREVENT_PLACING_HEIGHT
+						&& Math.abs(bossToPlayerVec.getX()) < PREVENT_PLACING_RADIUS
+						&& Math.abs(bossToPlayerVec.getZ()) < PREVENT_PLACING_RADIUS) {
+						MMLog.finest(() -> "[BlockPlacerBoss] Launcher " + mMob.getName() + " attempted to place " +
+							"a block but was too close above its target");
+						return;
+					}
+					final Vector euclideanVec = bossToPlayerVec.clone().normalize();
 					final Location posXDir = bossLoc.clone().add(1, -1, 0);
 					final Location negXDir = bossLoc.clone().add(-1, -1, 0);
 					final Location posZDir = bossLoc.clone().add(0, -1, 1);
