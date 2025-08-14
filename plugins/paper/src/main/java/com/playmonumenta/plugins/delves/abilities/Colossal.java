@@ -16,7 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class Colossal {
 
-	private static final double SPAWN_CHANCE_PER_LEVEL = 0.05;
+	private static final double SPAWN_CHANCE_PER_LEVEL = 0.03;
 	private static final LoSPool COLOSSAL_LAND_POOL = new LoSPool.LibraryPool("~DelveColossalLand");
 	private static final LoSPool COLOSSAL_WATER_POOL = new LoSPool.LibraryPool("~DelveColossalWater");
 

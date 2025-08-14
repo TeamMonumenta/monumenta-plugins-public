@@ -10,7 +10,8 @@ public class Entropy {
 
 	public static Component[] rankDescription(int level) {
 			return new Component[]{
-				Component.text(DEPTH_POINTS_ASSIGNED_PER_LEVEL * level + " Delve Points are randomly assigned.")
+				Component.text(DEPTH_POINTS_ASSIGNED_PER_LEVEL * level + " Delve Points are randomly assigned."),
+				Component.text("Additional points may exceed the modifier's cap.")
 			};
 	}
 

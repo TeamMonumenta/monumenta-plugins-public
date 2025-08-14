@@ -7,7 +7,7 @@ import org.bukkit.entity.LivingEntity;
 
 public class Spectral {
 
-	private static final double SPAWN_CHANCE_PER_LEVEL = 0.07;
+	private static final double SPAWN_CHANCE_PER_LEVEL = 0.04;
 
 	public static final String DESCRIPTION = "Dying enemies transform into new enemies.";
 	public static final String AVOID_SPECTRAL = "boss_spectralimmune";

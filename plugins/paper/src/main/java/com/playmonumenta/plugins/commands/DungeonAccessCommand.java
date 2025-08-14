@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvePreset;
 import com.playmonumenta.plugins.delves.DelvesManager;
+import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -153,7 +154,8 @@ public class DungeonAccessCommand extends GenericCommand {
 		RBoardAPI.add("$Last", mapping.getAccessName(), 1).thenAccept(accessScore
 			-> Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> { // must run on main server thread
 			// Neither delvePreset nor shardName are null if useDelvePreset is true, but nullaway won't let me remove this
-			if (useDelvePreset && delvePreset != null && shardName != null) {
+			// When starting a challenge delve, this runs twice. Entropy rolls gets overriden as a result.
+			if (useDelvePreset && delvePreset != null && shardName != null && !delvePreset.mModifiers.containsKey((DelvesModifier.ENTROPY))) {
 				DelvesManager.savePlayerData(keyPlayer, shardName, delvePreset.mModifiers, delvePreset.mId);
 			}
 			if (mapping.getFinishedName() != null) {

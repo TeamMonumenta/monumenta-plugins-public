@@ -297,12 +297,17 @@ public class DelveCustomInventory extends CustomInventory {
 		int entropyExtraPoints =
 			Entropy.getDepthPointsAssigned(mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0)) -
 			Entropy.getDepthPointsAssigned(mAlreadyRolledEntropy);
+		// Let Entropy exceed the base limit
+		/*
 		int entropyMaxAssignable =
 			DelvesModifier.entropyAssignable()
 						  .stream()
 						  .mapToInt(mod -> DelvesUtils.getMaxPointAssignable(mod, 1000) - mPointSelected.getOrDefault(mod, 0))
 						  .sum();
 		mTotalPoint += Math.min(entropyExtraPoints, entropyMaxAssignable);
+		*/
+
+		mTotalPoint += entropyExtraPoints;
 
 		if (mTotalPoint > DelvesUtils.MAX_DEPTH_POINTS) {
 			mTotalPoint = DelvesUtils.MAX_DEPTH_POINTS;
@@ -738,22 +743,16 @@ public class DelveCustomInventory extends CustomInventory {
 					List<DelvesModifier> entropyableMods = DelvesModifier.entropyAssignable();
 
 					while (entropyPoints > 0) {
-						if (entropyableMods.isEmpty()) {
-							break;
-						}
 						DelvesModifier mod = entropyableMods.get(FastUtils.RANDOM.nextInt(entropyableMods.size()));
 						int oldValue = mPointSelected.getOrDefault(mod, 0);
-						if (oldValue == DelvesUtils.getMaxPointAssignable(mod, oldValue + 1)) {
-							entropyableMods.remove(mod);
-							continue;
-						}
 						mPointSelected.put(mod, oldValue + 1);
 						entropyPoints--;
 					}
 				}
 
 				int presetId = 0;
-				if (mConfig.preset() != null && DelvePreset.validatePresetModifiers(mPointSelected, mConfig.preset(), true)) {
+				if (mConfig.preset() != null &&  	// If the preset contains Entropy, it shouldn't be exact
+					DelvePreset.validatePresetModifiers(mPointSelected, mConfig.preset(), !mConfig.preset().mModifiers.containsKey(DelvesModifier.ENTROPY))) {
 					presetId = mConfig.preset().getId();
 				}
 

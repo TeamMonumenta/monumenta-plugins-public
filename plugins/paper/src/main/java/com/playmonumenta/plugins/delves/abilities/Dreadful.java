@@ -8,7 +8,7 @@ import org.bukkit.entity.LivingEntity;
 
 public class Dreadful {
 
-	private static final double SPAWN_CHANCE_PER_LEVEL = 0.2;
+	private static final double SPAWN_CHANCE_PER_LEVEL = 0.12;
 
 	public static final String DESCRIPTION = "Dying elites transform into new enemies.";
 	public static final String AVOID_DREADFUL = "boss_dreadfulimmune";

@@ -232,10 +232,13 @@ public class DelvesUtils {
 					Collections.shuffle(mods);
 					DelvesModifier mod = mods.get(0);
 					int oldValue = info.get(mod);
+					// Let Entropy exceed the limit
+					/*
 					if (oldValue == getMaxPointAssignable(mod, oldValue + 1)) {
 						mods.remove(mod);
 						continue;
 					}
+					*/
 					info.put(mod, oldValue + 1);
 					pointsToAssign--;
 				}

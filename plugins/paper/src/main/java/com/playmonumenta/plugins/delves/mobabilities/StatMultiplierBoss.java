@@ -33,7 +33,7 @@ public class StatMultiplierBoss extends BossAbilityGroup {
 
 		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
 		Player nearestPlayer = EntityUtils.getNearestPlayer(boss.getLocation(), 64);
-		mDamageRegionStatMult = (ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? StatMultiplier.DELVE_MOB_STAT_MULTIPLIER_R2 : StatMultiplier.DELVE_MOB_STAT_MULTIPLIER_R1);
+		mDamageRegionStatMult = (ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? StatMultiplier.DELVE_MOB_STAT_MULTIPLIER_R3_DAMAGE : StatMultiplier.DELVE_MOB_STAT_MULTIPLIER_R2) : StatMultiplier.DELVE_MOB_STAT_MULTIPLIER_R1);
 		mDamageStatMult = p.DAMAGE_STAT_MULT;
 		mDamageMultiplier = p.DAMAGE_MULT;
 
