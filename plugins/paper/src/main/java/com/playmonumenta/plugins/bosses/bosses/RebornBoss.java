@@ -59,11 +59,10 @@ public class RebornBoss extends BossAbilityGroup {
 	public void onHurt(DamageEvent event) {
 		if (mParams.REBORN_TIMES > mTimesReborn && mBoss.getHealth() - event.getFinalDamage(true) <= 0) {
 			mTimesReborn++;
-			event.setCancelled(true);
+			event.setFlatDamage(0.001);
 			if (mParams.IS_INVULNERABLE) {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, "REBORN_INVULN", new PercentDamageReceived(mParams.INVULN_DURATION, -4));
 			}
-			event.setFlatDamage(0);
 			mParams.SOUND_REBORN.play(mBoss.getLocation());
 			mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * mParams.REBORN_PERCENT_HEALTH);
 			mBoss.setFireTicks(-1);
