@@ -141,7 +141,7 @@ public class WeaponMastery extends Ability {
 			.addPercent(a -> a.mWeaken, SWORD_WEAKEN)
 			.add(" weaken for ")
 			.addDuration(a -> a.mWeakenDuration, SWORD_WEAKEN_DURATION)
-			.add(" when using a sword. Gain ")
+			.add(" seconds when using a sword. Gain ")
 			.addPercent(a -> a.mAttackSpeed, AXE_SPEED)
 			.add(" speed when holding an axe.");
 	}

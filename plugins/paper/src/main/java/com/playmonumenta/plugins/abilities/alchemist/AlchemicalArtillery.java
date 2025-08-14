@@ -261,7 +261,7 @@ public class AlchemicalArtillery extends Ability {
 			.add(" to launch a heavy bomb that explodes on contact with the ground, lava, or a hostile, or after 6 seconds, dealing ")
 			.add(a -> a.mDamageRaw, ARTILLERY_1_DAMAGE_RAW, false, Ability::isLevelOne)
 			.add(" + ")
-			.addPercent(a -> a.mDamageMult, ARTILLERY_1_DAMAGE_MULTIPLIER, false, Ability::isLevelTwo)
+			.addPercent(a -> a.mDamageMult, ARTILLERY_1_DAMAGE_MULTIPLIER, false, Ability::isLevelOne)
 			.add(" of your potion's damage and applying your selected potion's effects, in an area that is ")
 			.addPercent(a -> a.mRadiusMult, ARTILLERY_RANGE_MULTIPLIER)
 			.add(" of your potion's radius. The initial speed of the bomb scales with your projectile speed. This costs you ")

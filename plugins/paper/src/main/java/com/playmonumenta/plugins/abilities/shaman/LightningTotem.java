@@ -204,7 +204,7 @@ public class LightningTotem extends TotemAbility {
 			.add(" blocks with priority towards Boss and Elite mobs and deal ")
 			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
 			.add(" magic damage every ")
-			.add(a -> a.mInterval, INTERVAL, true)
+			.addDuration(a -> a.mInterval, INTERVAL, true)
 			.add(" seconds. Charge up time: ")
 			.addDuration(PULSE_DELAY)
 			.add("s. Duration: ")

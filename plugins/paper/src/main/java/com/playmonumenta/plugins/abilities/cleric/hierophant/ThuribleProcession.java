@@ -229,7 +229,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			.addPercent(a -> a.mSpeedPotency, EFFECT_PERCENT_2, false, Ability::isLevelTwo)
 			.add(" Speed (after 8s), ")
 			.addPercent(a -> a.mDamagePotency, EFFECT_PERCENT_2, false, Ability::isLevelTwo)
-			.add(" Attack and Projectile Damage (after 12s), Cleric's passive heal is doubled, to ")
+			.add(" Attack and Projectile Damage (after 12s), and Rejuvenation's heal is tripled, to ")
 			.addPercent(a -> (1 + a.mHealingPotency) * Rejuvenation.PERCENT_HEAL, (1 + THURIBLE_HEALING_PERCENT_2) * Rejuvenation.PERCENT_HEAL, false, Ability::isLevelTwo)
 			.add(" of max health every 5s (after 16s).");
 	}
