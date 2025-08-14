@@ -124,7 +124,7 @@ public class Gravity {
 			return;
 		}
 		if (event.getType() == DamageType.FALL) {
-			event.setFlatDamage(event.getDamage() * 2.5);
+			event.setFlatDamage(event.getFlatDamage() * 2.5);
 		}
 	}
 }
