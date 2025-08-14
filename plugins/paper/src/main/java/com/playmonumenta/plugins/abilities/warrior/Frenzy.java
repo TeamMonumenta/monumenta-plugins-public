@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.FrenzyCS;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
-import com.playmonumenta.plugins.effects.PercentDamageDealtSingle;
+import com.playmonumenta.plugins.effects.PercentDamageDealtSingleTick;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -29,6 +29,11 @@ public class Frenzy extends Ability {
 	private static final String PERCENT_ATTACK_SPEED_EFFECT_NAME = "FrenzyPercentAttackSpeedEffect";
 	private static final String PERCENT_SPEED_EFFECT_NAME = "FrenzyPercentSpeedEffect";
 	private static final String PERCENT_DAMAGE_SINGLE_EFFECT_NAME = "FrenzyPercentDamageDealtSingleEffect";
+	private final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
+		DamageEvent.DamageType.MELEE,
+		DamageEvent.DamageType.MELEE_ENCH
+	);
+
 
 	public static final String CHARM_DURATION = "Frenzy Duration";
 	public static final String CHARM_ATTACK_SPEED = "Frenzy Attack Speed";
@@ -75,8 +80,8 @@ public class Frenzy extends Ability {
 
 		if (isEnhanced()) {
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_SINGLE_EFFECT_NAME,
-				new PercentDamageDealtSingle(mDuration, mEnhanceDamageMult)
-					.damageTypes(EnumSet.of(DamageEvent.DamageType.MELEE)).deleteOnAbilityUpdate(true));
+				new PercentDamageDealtSingleTick(mDuration, mEnhanceDamageMult)
+					.damageTypes(AFFECTED_DAMAGE_TYPES).deleteOnAbilityUpdate(true));
 			mCosmetic.frenzyEnhancement(mPlayer);
 		}
 	}
@@ -103,7 +108,7 @@ public class Frenzy extends Ability {
 
 	private static Description<Frenzy> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Additionally, your next melee damage within ")
+			.add("Additionally, your next melee swing within ")
 			.addDuration(a -> a.mDuration, DURATION)
 			.add(" seconds after getting a kill deals ")
 			.addPercent(a -> a.mEnhanceDamageMult, DAMAGE_BONUS)

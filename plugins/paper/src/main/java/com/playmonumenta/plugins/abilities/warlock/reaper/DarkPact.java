@@ -120,7 +120,7 @@ public class DarkPact extends Ability {
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
 			new PercentDamageDealt(mDuration, mPercentDamageDealt)
 				.predicate((entity, enemy) -> entity instanceof Player player && ItemUtils.isHoe(player.getInventory().getItemInMainHand()))
-				.damageTypes(EnumSet.of(DamageType.MELEE)).deleteOnAbilityUpdate(true));
+				.damageTypes(DamageType.getAllMeleeTypes()).deleteOnAbilityUpdate(true));
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(mDuration, PERCENT_HEAL)
 			.deleteOnAbilityUpdate(true));
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_HEAL_EFFECT_NAME, new PercentHeal(mDuration, EXTENDED_ANTIHEAL)

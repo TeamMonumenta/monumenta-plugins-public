@@ -75,7 +75,7 @@ public class Skirmisher extends Ability {
 			World world = mPlayer.getWorld();
 
 			// If Enhanced and triggers on a melee strike,
-			if (isEnhanced() && event.getType() == DamageType.MELEE) {
+			if (isEnhanced() && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH)) {
 				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(loc, mSplashRadius, enemy);
 				for (int i = 0; i < mSplashTargets; i++) {
 					nearbyEntities.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
@@ -91,7 +91,7 @@ public class Skirmisher extends Ability {
 				}
 			}
 
-			if (event.getAbility() != mInfo.getLinkedSpell() && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)) {
+			if (event.getAbility() != mInfo.getLinkedSpell() && (DamageType.getAllMeleeTypes().contains(event.getType()))) {
 				if (EntityUtils.getNearbyMobs(loc, mFriendlyRadius, enemy).size() >= MOB_COUNT_CUTOFF
 					    || (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
 					event.addUnmodifiableDamage(mGroupedFlatDamage);

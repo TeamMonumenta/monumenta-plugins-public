@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -70,6 +71,7 @@ public class Riposte extends Ability implements AbilityWithDuration {
 
 	private @Nullable BukkitRunnable mRunnable = null;
 	private int mCurrDuration = -1;
+	private boolean mHasTriggeredSwordL2 = false;
 
 	public Riposte(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
@@ -100,6 +102,7 @@ public class Riposte extends Ability implements AbilityWithDuration {
 
 		if (isLevelTwo() && holdingSword) {
 			mCurrDuration = 0;
+			mHasTriggeredSwordL2 = false;
 			mRunnable = new BukkitRunnable() {
 				@Override
 				public void run() {
@@ -142,12 +145,19 @@ public class Riposte extends Ability implements AbilityWithDuration {
 
 	@Override
 	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE
+		if ((event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH)
 				&& ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())
 				&& mCurrDuration != -1) {
 			event.updateDamageWithMultiplier(1 + mSwordDamage);
-			if (mRunnable != null && !mRunnable.isCancelled()) {
-				mRunnable.cancel();
+			if (mRunnable != null && !mRunnable.isCancelled() && !mHasTriggeredSwordL2) {
+				// Disable next tick, buff only for this tick
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					if (mRunnable != null) {
+						mRunnable.cancel();
+					}
+				}, 1);
+				mHasTriggeredSwordL2 = true;
+				// Prevent it from making one Runnable per event - optimisation
 			}
 			mCosmetic.onSwordAttack(mPlayer.getWorld(), mPlayer.getLocation());
 		}
@@ -174,7 +184,7 @@ public class Riposte extends Ability implements AbilityWithDuration {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Blocking a melee attack with Riposte's effect while holding a sword grants ")
 			.addPercent(a -> a.mSwordDamage, RIPOSTE_SWORD_BONUS_DAMAGE)
-			.add(" extra damage on your next sword attack within ")
+			.add(" extra damage on your next sword swing within ")
 			.addDuration(a -> a.mMaxSwordDuration, RIPOSTE_SWORD_DURATION)
 			.add(" seconds. Blocking with Riposte's effect while holding an axe stuns the attacking mob for ")
 			.addDuration(a -> a.mStunDuration, RIPOSTE_AXE_DURATION)

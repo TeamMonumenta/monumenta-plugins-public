@@ -49,6 +49,7 @@ public class Reflexes implements Enchantment {
 		DamageType.MELEE_SKILL,
 		DamageType.PROJECTILE,
 		DamageType.PROJECTILE_SKILL,
+		DamageType.PROJECTILE_ENCH,
 		DamageType.MAGIC
 	);
 

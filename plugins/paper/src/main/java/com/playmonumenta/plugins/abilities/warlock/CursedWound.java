@@ -88,10 +88,15 @@ public class CursedWound extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
+		if (!ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
+			return false;
+		}
+
+		DamageType type = event.getType();
+		if (type == DamageType.MELEE || type == DamageType.MELEE_ENCH) {
 			World world = mPlayer.getWorld();
 
-			if (isEnhanced() && mStoredPotionEffects != null && mStoredCustomEffects != null) {
+			if (isEnhanced() && type == DamageType.MELEE && mStoredPotionEffects != null && mStoredCustomEffects != null) {
 				int debuffCount = mStoredPotionEffects.size() + mStoredCustomEffects.size();
 
 				// do not double-count fire ticks and inferno
@@ -140,7 +145,7 @@ public class CursedWound extends Ability {
 
 			event.updateDamageWithMultiplier(1 + (Math.min(cooldowns, mAbilityCap) * mCursedWoundDamage));
 
-			if (PlayerUtils.isFallingAttack(mPlayer)) {
+			if (type == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) {
 				mCosmetic.onCriticalAttack(world, mPlayer, enemy, cooldowns);
 				ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 				for (LivingEntity mob : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CURSED_WOUND_RADIUS).getHitMobs()) {

@@ -5,12 +5,15 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.WeaponMasteryCS;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.SweepingEdge;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Material;
@@ -73,14 +76,24 @@ public class WeaponMastery extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
+		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH) {
+			double flatDamageRatio = 1;
+			if (event.getType() == DamageType.MELEE_ENCH) {
+				if (event.getAbility() == ClassAbility.ARCANE_THRUST) {
+					double arcaneThrust = mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.ARCANE_THRUST);
+					flatDamageRatio = arcaneThrust / (arcaneThrust + 1);
+				} else if (event.getAbility() == ClassAbility.SWEEPING_EDGE) {
+					double sweepingEdge = mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.SWEEPING_EDGE);
+					flatDamageRatio = sweepingEdge * SweepingEdge.TRANSFER_COEFFICIENT;
+				}
+			}
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isAxe(mainHand)) {
-				event.addUnmodifiableDamage(mDamageBonusAxeFlat);
+				event.addUnmodifiableDamage(flatDamageRatio * mDamageBonusAxeFlat);
 				event.updateDamageWithMultiplier(1 + mDamageBonusAxe);
 				mCosmetic.weaponMasteryAxeHit(mPlayer);
 			} else if (ItemUtils.isSword(mainHand)) {
-				event.addUnmodifiableDamage(mDamageBonusSwordFlat);
+				event.addUnmodifiableDamage(flatDamageRatio * mDamageBonusSwordFlat);
 				event.updateDamageWithMultiplier(1 + mDamageBonusSword);
 				mCosmetic.weaponMasterySwordHit(mPlayer);
 				if (isEnhanced()) {
@@ -113,7 +126,7 @@ public class WeaponMastery extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("You gain ")
 			.addPercent(a -> a.mDamageReduction, WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE)
-			.add(" resistance while holding a sword. Additionally, your axe damage is increased by ")
+			.add(" resistance while holding a sword. Additionally, your axe damage is increased by an unscalable ")
 			.add(a -> a.mDamageBonusAxeFlat, AXE_1_DAMAGE_FLAT, false, Ability::isLevelOne)
 			.add(" plus ")
 			.addPercent(a -> a.mDamageBonusAxe - (a.isEnhanced() ? ENHANCED_DAMAGE : 0), AXE_1_DAMAGE, false, Ability::isLevelOne)
@@ -122,11 +135,11 @@ public class WeaponMastery extends Ability {
 
 	private static Description<WeaponMastery> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your sword damage is increased by ")
+			.add("Your sword swing's damage is increased by an unscalable ")
 			.add(a -> a.mDamageBonusSwordFlat, SWORD_2_DAMAGE_FLAT, false, Ability::isLevelTwo)
 			.add(" plus ")
 			.addPercent(a -> a.mDamageBonusSword - (a.isEnhanced() ? ENHANCED_DAMAGE : 0), SWORD_2_DAMAGE, false, Ability::isLevelTwo)
-			.add(" of final damage dealt. The axe damage buffs are increased to ")
+			.add(" of final damage dealt. The axe damage buffs are increased to an unscalable ")
 			.add(a -> a.mDamageBonusAxeFlat, AXE_2_DAMAGE_FLAT, false, Ability::isLevelTwo)
 			.add(" plus ")
 			.addPercent(a -> a.mDamageBonusAxe - (a.isEnhanced() ? ENHANCED_DAMAGE : 0), AXE_2_DAMAGE, false, Ability::isLevelTwo)

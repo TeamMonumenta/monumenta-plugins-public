@@ -24,9 +24,10 @@ public class SweepingEdge implements Enchantment {
 	private static final double X_EXPANSION = 1.0;
 	private static final double Y_EXPANSION = 0.25;
 	private static final double Z_EXPANSION = 1.0;
-	private static final double TRANSFER_COEFFICIENT = 0.2;
 	private static final double PLAYER_REACH = 3.0;
 	private static final float KNOCKBACK_TRANSFER_COEFFICIENT = 0.8f;
+
+	public static final double TRANSFER_COEFFICIENT = 0.2;
 
 	@Override
 	public String getName() {
