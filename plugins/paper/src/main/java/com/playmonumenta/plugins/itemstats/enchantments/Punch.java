@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -46,6 +47,7 @@ public class Punch implements Enchantment {
 		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager().getPlugin("ScriptedQuests");
 		if (!(event.getHitEntity() instanceof LivingEntity)
 			|| event.getHitEntity() instanceof Villager
+			|| event.getHitEntity() instanceof ArmorStand
 			|| scriptedQuestsPlugin.mNpcManager.isQuestNPC(event.getHitEntity())) {
 			return;
 		}
