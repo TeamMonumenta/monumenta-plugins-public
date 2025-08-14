@@ -150,6 +150,9 @@ public class SpellBaseCharge extends Spell {
 				p.PARTICLE_ROAR.spawn(mBoss, mBoss.getLocation(), 0.3, 0.3, 0.3, 0.15);
 				p.SOUND_ROAR.play(mBoss.getLocation(), 1f, 1.5f);
 				mBoss.setAI(true);
+				if(mBoss instanceof Mob mobAI && mobAI.getTarget() instanceof Player player && AbilityUtils.isStealthed(player)) {
+					((Mob) mBoss).setTarget(null);
+				}
 			});
 	}
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks,
