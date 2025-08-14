@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.integrations;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.playmonumenta.networkrelay.GatherHeartbeatDataEvent;
 import com.playmonumenta.networkrelay.GatherRemotePlayerDataEvent;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.RemotePlayerAPI;
@@ -15,7 +14,6 @@ import com.playmonumenta.networkrelay.RemotePlayerUpdatedEvent;
 import com.playmonumenta.networkrelay.shardhealth.ShardHealth;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.HashMap;
 import java.util.Map;
@@ -197,34 +195,13 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 		sendAuditLogMessage(message, AUDIT_LOG_REPORT_CHANNEL);
 	}
 
-	// Heartbeat stuff
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
-	public void gatherHeartbeatData(GatherHeartbeatDataEvent event) {
-		JsonObject data = new JsonObject();
-		data.add("shard_health", ShardHealth.averageHealth().toJson());
-		event.setPluginData(MAIN_PLUGIN_HEARTBEAT_IDENTIFIER, data);
-	}
-
 	public static ShardHealth remoteShardHealth(String shardName) {
-		if (shardName.equals(ServerProperties.getShardName())) {
-			return ShardHealth.averageHealth();
-		}
-
 		MonumentaNetworkRelayIntegration instance = INSTANCE;
 		if (instance == null) {
 			return ShardHealth.zeroHealth();
 		}
 
-		JsonObject remoteMainPluginHeartbeatData
-			= NetworkRelayAPI.getHeartbeatPluginData(shardName, MAIN_PLUGIN_HEARTBEAT_IDENTIFIER);
-		if (
-			remoteMainPluginHeartbeatData != null
-				&& remoteMainPluginHeartbeatData.get("shard_health") instanceof JsonObject shardHealthJson
-		) {
-			return ShardHealth.fromJson(shardHealthJson);
-		}
-
-		return ShardHealth.zeroHealth();
+		return NetworkRelayAPI.remoteShardHealth(shardName);
 	}
 
 	// TAB stuff
