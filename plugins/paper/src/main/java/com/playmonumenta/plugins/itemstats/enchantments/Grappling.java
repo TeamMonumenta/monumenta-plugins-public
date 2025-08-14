@@ -477,7 +477,10 @@ public class Grappling implements Enchantment {
 		}
 		mPlayerShotsFiredMap.remove(player.getUniqueId());
 		mPlayerMostRecentPingMap.remove(player.getUniqueId());
-		mPlayerCooldownMap.remove(player.getUniqueId()).cancel();
+		BukkitTask task = mPlayerCooldownMap.remove(player.getUniqueId());
+		if (task != null) {
+			task.cancel();
+		}
 	}
 
 	public static boolean playerHoldingHook(Player player) {
