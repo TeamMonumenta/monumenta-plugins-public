@@ -4,12 +4,16 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -25,17 +29,13 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 public class Reverb implements Enchantment {
 	private static final int DETECTION_RADIUS = 8;
 	private static final double OVERKILL_DAMAGE_MULTIPLIER_PER_LEVEL = 0.1;
 	private static final double HIGHEST_DAMAGE_MULTIPLIER_PER_LEVEL = 0.05;
 
-	private double mDamageThisTick = 0;
-	private double mHighestDamageThisTick = 0;
-	private double mEnemyHealth = 0;
-	private @Nullable LivingEntity mEntity;
+	private static final Map<UUID, Map<UUID, ReverbInstance>> INSTANCE_MAP = new HashMap<>();
 
 	@Override
 	public EnchantmentType getEnchantmentType() {
@@ -54,9 +54,10 @@ public class Reverb implements Enchantment {
 			(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK ||
 			event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE
 			|| event.getAbility() == ClassAbility.REVERB)) {
-			mEnemyHealth = enemy.getHealth();
-			mEntity = enemy;
-			mDamageThisTick = 0;
+			INSTANCE_MAP
+				.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>())
+				.computeIfAbsent(enemy.getUniqueId(), key -> new ReverbInstance())
+				.setEnemyHealth(enemy.getHealth());
 		}
 	}
 
@@ -65,14 +66,22 @@ public class Reverb implements Enchantment {
 	public void onDamageDelayed(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		// Don't want to include damage done to other entities, so we make sure the only one that's counted is the one that receives the ENTITY_ATTACK.
 		// Also, don't include 'Coup de Grace', it deals 9000 damage and doesn't make sense here anyway.
-		if (enemy != mEntity || event.getAbility() == ClassAbility.COUP_DE_GRACE) {
+		if (event.getAbility() == ClassAbility.COUP_DE_GRACE) {
+			return;
+		}
+
+		Map<UUID, ReverbInstance> playerMap = INSTANCE_MAP.get(player.getUniqueId());
+		if (playerMap == null) {
+			return;
+		}
+
+		ReverbInstance reverbInstance = playerMap.get(enemy.getUniqueId());
+		if (reverbInstance == null) {
 			return;
 		}
 
 		// Calculate damage dealt this tick by adding to mDamageThisTick for every valid DamageEvent.
-		double damage = event.getDamage();
-		mDamageThisTick += damage;
-		mHighestDamageThisTick = FastMath.max(damage, mHighestDamageThisTick);
+		reverbInstance.damageDelayed(event.getDamage());
 
 		DamageEvent.DamageType type = event.getType();
 		World world = enemy.getWorld();
@@ -83,15 +92,24 @@ public class Reverb implements Enchantment {
 			world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 1.0f, 0.5f);
 		}
 
+		// Should not be possible for this to be null considering the enchant was triggered but whatever
+		ItemStatManager.PlayerItemStats eventStats = event.getPlayerItemStats();
+		ItemStatManager.PlayerItemStats playerItemStats = eventStats == null ? null : new ItemStatManager.PlayerItemStats(eventStats);
+
 		// Start the task 1 tick later, to give ample time to sum the damage, and check if the mob is definitely dead.
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			if (mDamageThisTick != 0) {
-				// Calculate overkill damage, if it's less than 0 (thus not a kill), exit.
-				double overkill = FastMath.max(mDamageThisTick - mEnemyHealth, 0);
-				double highestDamage = mHighestDamageThisTick;
-				// mDamageThisTick, mHighestDamageThisTick, mEnemyHealth, mEntity are no longer needed, we can get rid of them safely since 1 tick has passed.
-				// Also prevents the task from running multiple times with the above check.
-				resetValues();
+			if (reverbInstance.mIsValid) {
+				// Calculate overkill damage
+				double overkill = FastMath.max(reverbInstance.mDamageThisTick - reverbInstance.mEnemyHealth, 0);
+				double highestDamage = reverbInstance.mHighestDamageThisTick;
+
+				// Invalidate the reverb instance and remove it from the map
+				reverbInstance.mIsValid = false;
+				playerMap.remove(enemy.getUniqueId());
+				if (playerMap.isEmpty()) {
+					INSTANCE_MAP.remove(player.getUniqueId());
+				}
+
 				if (!enemy.isDead()) {
 					return;
 				}
@@ -129,7 +147,7 @@ public class Reverb implements Enchantment {
 							world.playSound(targetLocation, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 0.6f);
 
 							double finalDamage = value * (overkill * OVERKILL_DAMAGE_MULTIPLIER_PER_LEVEL + highestDamage * HIGHEST_DAMAGE_MULTIPLIER_PER_LEVEL);
-							DamageUtils.damage(player, hitMob, DamageEvent.DamageType.OTHER, finalDamage, ClassAbility.REVERB, true, false);
+							DamageUtils.damage(player, hitMob, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, ClassAbility.REVERB, playerItemStats), finalDamage, true, false, false);
 
 							this.cancel();
 							return;
@@ -148,13 +166,6 @@ public class Reverb implements Enchantment {
 				}.runTaskTimer(plugin, 0, 1);
 			}
 		}, 1);
-	}
-
-	private void resetValues() {
-		mDamageThisTick = 0;
-		mHighestDamageThisTick = 0;
-		mEnemyHealth = 0;
-		mEntity = null;
 	}
 
 	private void drawParticle(Location location, Color color) {
@@ -187,6 +198,22 @@ public class Reverb implements Enchantment {
 			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_VEX_HURT, 2.0f, 0.6f);
 			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_ALLAY_HURT, 0.2f, 0.6f);
 			world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 0.5f, 0.7f);
+		}
+	}
+
+	private static class ReverbInstance {
+		private double mDamageThisTick = 0;
+		private double mHighestDamageThisTick = 0;
+		private double mEnemyHealth = 0;
+		private boolean mIsValid = true;
+
+		private void setEnemyHealth(double enemyHealth) {
+			mEnemyHealth = enemyHealth;
+		}
+
+		private void damageDelayed(double damage) {
+			mDamageThisTick += damage;
+			mHighestDamageThisTick = FastMath.max(damage, mHighestDamageThisTick);
 		}
 	}
 }
