@@ -286,6 +286,7 @@ public class CharmManager {
 			ManaLance.CHARM_CHARGES,
 			ManaLance.CHARM_COOLDOWN,
 			ManaLance.CHARM_RANGE,
+			ManaLance.CHARM_SIZE,
 			ThunderStep.CHARM_DAMAGE,
 			ThunderStep.CHARM_COOLDOWN,
 			ThunderStep.CHARM_DISTANCE,

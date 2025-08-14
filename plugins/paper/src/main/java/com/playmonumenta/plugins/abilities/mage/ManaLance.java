@@ -33,11 +33,13 @@ public class ManaLance extends MultipleChargeAbility {
 	private static final int COOLDOWN_2 = 3 * 20;
 	private static final int RANGE = 8;
 	private static final float KNOCKBACK = 0.25f;
+	private static final double SIZE = 0.70f;
 
 	public static final String CHARM_DAMAGE = "Mana Lance Damage";
 	public static final String CHARM_COOLDOWN = "Mana Lance Cooldown";
 	public static final String CHARM_RANGE = "Mana Lance Range";
 	public static final String CHARM_CHARGES = "Mana Lance Charge";
+	public static final String CHARM_SIZE = "Mana Lance Size";
 
 	public static final AbilityInfo<ManaLance> INFO =
 		new AbilityInfo<>(ManaLance.class, "Mana Lance", ManaLance::new)
@@ -53,6 +55,7 @@ public class ManaLance extends MultipleChargeAbility {
 
 	private final double mDamage;
 	private final double mRange;
+	private final double mSize;
 	private int mLastCastTicks = 0;
 
 	private final ManaLanceCS mCosmetic;
@@ -64,6 +67,7 @@ public class ManaLance extends MultipleChargeAbility {
 		mCharges = getTrackedCharges();
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RANGE);
+		mSize = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, SIZE);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ManaLanceCS());
 	}
@@ -84,7 +88,7 @@ public class ManaLance extends MultipleChargeAbility {
 		Location endLoc = LocationUtils.rayTraceToBlock(mPlayer, mRange, loc -> mCosmetic.lanceHitBlock(mPlayer, loc, world));
 
 		boolean hit = false;
-		for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, 0.7, true).accuracy(0.5).getHitMobs()) {
+		for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, mSize, true).accuracy(0.5).getHitMobs()) {
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
 
 			MovementUtils.knockAway(mPlayer.getLocation(), mob, KNOCKBACK, KNOCKBACK, true);
@@ -95,7 +99,7 @@ public class ManaLance extends MultipleChargeAbility {
 			}
 		}
 
-		mCosmetic.lanceParticle(mPlayer, startLoc, endLoc);
+		mCosmetic.lanceParticle(mPlayer, startLoc, endLoc, mSize);
 		mCosmetic.lanceSound(world, mPlayer, mPlayer.getLocation());
 
 		return true;

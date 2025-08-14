@@ -50,7 +50,7 @@ public class TwistedLanceCS extends ManaLanceCS {
 	}
 
 	@Override
-	public void lanceParticle(Player player, Location startLoc, Location endLoc) {
+	public void lanceParticle(Player player, Location startLoc, Location endLoc, double size) {
 
 		Location l = startLoc.clone();
 		Vector dir = startLoc.getDirection().multiply(1.0 / 3);

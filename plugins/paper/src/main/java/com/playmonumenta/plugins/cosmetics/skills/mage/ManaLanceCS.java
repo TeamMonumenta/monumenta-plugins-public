@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.cosmetics.skills.mage;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
-import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,10 +13,12 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class ManaLanceCS implements CosmeticSkill {
 
-	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
+	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 0.9f);
 
 	@Override
 	public ClassAbility getAbility() {
@@ -28,13 +31,27 @@ public class ManaLanceCS implements CosmeticSkill {
 	}
 
 	public void lanceHitBlock(Player player, Location loc, World world) {
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.65f);
-		new PartialParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(player);
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.65f);
+				new PartialParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(player);
+			}
+		}.runTaskLater(Plugin.getInstance(), 2);
 	}
 
-	public void lanceParticle(Player player, Location startLoc, Location endLoc) {
-		new PPLine(Particle.EXPLOSION_NORMAL, startLoc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0.05).extra(0.025).spawnAsPlayerActive(player);
-		new PPLine(Particle.REDSTONE, startLoc, endLoc).shiftStart(0.75).countPerMeter(18).delta(0.35).data(MANA_LANCE_COLOR).spawnAsPlayerActive(player);
+
+	public void lanceParticle(Player player, Location startLoc, Location endLoc, double size) {
+		Vector dir = endLoc.clone().subtract(startLoc).toVector();
+		ParticleUtils.drawParticleLineSlash(startLoc.clone().add(dir.clone().multiply(0.5)).add(dir.clone().normalize().multiply(0.75)), dir, 0.0d, 0.5 * dir.length() - 0.75, 0.1, 2,
+			(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> new PartialParticle(Particle.REDSTONE, lineLoc, 1, size / 7, size / 7, size / 7, MANA_LANCE_COLOR)
+				.spawnAsPlayerActive(player));
+		ParticleUtils.drawParticleLineSlash(startLoc.clone().add(dir.clone().multiply(0.5)).add(dir.clone().normalize().multiply(0.75)), dir, 0.0d, 0.5 * dir.length() - 0.75, 0.2, 3,
+			(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> new PartialParticle(Particle.REDSTONE, lineLoc, 2, 0.5 * size, 0.5 * size, 0.5 * size, MANA_LANCE_COLOR)
+				.spawnAsPlayerActive(player));
+		ParticleUtils.drawParticleLineSlash(startLoc.clone().add(dir.clone().multiply(0.5)).add(dir.clone().normalize().multiply(1.05)), dir, 0.0d, 0.5 * dir.length() - 1.05, 0.6, 4,
+			(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> new PartialParticle(Particle.EXPLOSION_NORMAL, lineLoc, 1)
+				.spawnAsPlayerActive(player));
 	}
 
 	public void lanceSound(World world, Player player, Location loc) {

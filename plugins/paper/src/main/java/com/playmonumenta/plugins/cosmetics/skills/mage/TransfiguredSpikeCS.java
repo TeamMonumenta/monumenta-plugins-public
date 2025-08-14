@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.mage;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.particle.PPParametric;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -42,11 +41,6 @@ public class TransfiguredSpikeCS extends ManaLanceCS {
 	}
 
 	@Override
-	public ClassAbility getAbility() {
-		return ClassAbility.MANA_LANCE;
-	}
-
-	@Override
 	public Material getDisplayItem() {
 		return Material.WEEPING_VINES;
 	}
@@ -60,7 +54,7 @@ public class TransfiguredSpikeCS extends ManaLanceCS {
 	}
 
 	@Override
-	public void lanceParticle(Player player, Location startLoc, Location endLoc) {
+	public void lanceParticle(Player player, Location startLoc, Location endLoc, double size) {
 		Vector dir = player.getEyeLocation().getDirection();
 		Vector crossXZ = dir.clone().crossProduct(new Vector(0, 1, 0)).normalize();
 		Vector crossY = dir.clone().crossProduct(crossXZ).normalize();
