@@ -26,7 +26,13 @@ public class FirstStrike implements Enchantment {
 	private static final String SOURCE = "FirstStrikeDisable";
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(244, 141, 123), 0.75f);
 
-	private static final EnumSet<DamageEvent.DamageType> SAME_TICK_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeAndProjectileTypes();
+	private static final EnumSet<DamageEvent.DamageType> SAME_TICK_DAMAGE_TYPES = EnumSet.of(
+		DamageType.MELEE,
+		DamageType.MELEE_SKILL,
+		DamageType.MELEE_ENCH,
+		DamageType.PROJECTILE_SKILL,
+		DamageType.PROJECTILE_ENCH
+	);
 
 	private static final EnumSet<DamageEvent.DamageType> ACTIVATION_DAMAGE_TYPES = EnumSet.of(
 		DamageType.MELEE,
@@ -68,7 +74,9 @@ public class FirstStrike implements Enchantment {
 		}
 
 		//onDamageDelayed does not include potion damage
-		if ((event.getAbility() == ClassAbility.ALCHEMIST_POTION) &&
+		// For some godforsaken reason, onDamageDelayed does not play nice with PROJECTILE type damage. It does not accurately update the damage despite passing through the triggerFirstStrike method.
+		// As a workaround, PROJECTILE damage will mark the mob to take increased damage that tick but will instead have its damage boost handled here.
+		if ((event.getAbility() == ClassAbility.ALCHEMIST_POTION || event.getType() == DamageType.PROJECTILE) &&
 			plugin.mEffectManager.getEffects(enemy, SOURCE + player.getName()) == null) {
 			double bonus = DAMAGE_PER_LEVEL * level;
 			triggerFirstStrike(plugin, player, bonus, event, enemy);
