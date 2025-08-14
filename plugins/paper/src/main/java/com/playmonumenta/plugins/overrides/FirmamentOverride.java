@@ -19,6 +19,7 @@ import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -49,6 +50,15 @@ public class FirmamentOverride {
 			mMaterialName = materialName;
 			mItemName = itemName;
 			mMaterial = material;
+		}
+
+		public Component getMessage(boolean disabled) {
+			Component line = Component.text(mMaterialName + " ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+			if (disabled) {
+				return line.append(Component.text("Disabled", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+			} else {
+				return line.append(Component.text("Enabled", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+			}
 		}
 	}
 
@@ -159,7 +169,8 @@ public class FirmamentOverride {
 	}
 
 	public static boolean changeMode(ItemStack item, Player player) {
-		if (!isFirmamentItem(item)) {
+		FirmamentType type = getFirmamentType(item);
+		if (type == null) {
 			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe
 			return false;
 		}
@@ -171,6 +182,7 @@ public class FirmamentOverride {
 			ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(nbt);
 			boolean previouslyDisabled = isDisabled(playerModified);
 			playerModified.setBoolean(DISABLED_KEY, !previouslyDisabled);
+			player.sendMessage(type.getMessage(!previouslyDisabled));
 			player.playSound(player.getLocation(), previouslyDisabled ? Sound.BLOCK_SHULKER_BOX_OPEN : Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
 		});
 		ItemUpdateHelper.generateItemStats(item);

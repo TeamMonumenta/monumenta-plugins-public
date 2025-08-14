@@ -415,14 +415,7 @@ public class ItemUpdateHelper {
 			// Add/update firmament lore
 			FirmamentOverride.FirmamentType firmamentType = FirmamentOverride.getFirmamentType(item);
 			if (firmamentType != null) {
-				Component line = Component.text(firmamentType.mMaterialName + " ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
-				boolean disabled = FirmamentOverride.isDisabled(playerModified);
-				if (disabled) {
-					line = line.append(Component.text("Disabled", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-				} else {
-					line = line.append(Component.text("Enabled", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
-				}
-				lore.add(line);
+				lore.add(firmamentType.getMessage(FirmamentOverride.isDisabled(playerModified)));
 			}
 
 			// Add/update worldshaper's loom lore
