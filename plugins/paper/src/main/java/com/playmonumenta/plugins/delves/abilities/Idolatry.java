@@ -26,7 +26,7 @@ public class Idolatry {
 		return new Component[]{
 			Component.text("Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance"),
 			Component.text("to produce a slow-moving Idol. While an enemy is within "),
-			Component.text("a 8 block radius of an alive Idol, 75% of the damage it"),
+			Component.text("a 8 block radius of an alive Idol, some of the damage it"),
 			Component.text("takes will instead be redirected to the Idol.")
 		};
 	}

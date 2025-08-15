@@ -67,6 +67,7 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 	public void onEntityDamaged(DamageEvent event) {
 		LivingEntity damagedEntity = event.getDamagee();
 		if (mBoss == null || mBoss.isDead()
+			|| damagedEntity.getWorld() != mBoss.getWorld()
 			|| event.getType() == DamageEvent.DamageType.TRUE
 			|| damagedEntity instanceof Player
 			|| damagedEntity.getScoreboardTags().contains(identityTag)
