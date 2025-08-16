@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentAbilityDamageReceived;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -68,14 +72,21 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 		LivingEntity damagedEntity = event.getDamagee();
 		if (mBoss == null || mBoss.isDead()
 			|| damagedEntity.getWorld() != mBoss.getWorld()
-			|| event.getType() == DamageEvent.DamageType.TRUE
+			|| mBoss.getLocation().distanceSquared(damagedEntity.getLocation()) > mParams.RADIUS * mParams.RADIUS
+			|| damagedEntity.equals(mBoss)
+			|| event.getType() == DamageEvent.DamageType.PROJECTILE // Prevents doubled Projectile damage
+			|| ElementalArrows.isElementalArrowDamage(event) // Prevents doubled EArrows damage
 			|| damagedEntity instanceof Player
+			|| damagedEntity instanceof Creeper
+			|| DelvesUtils.isDelveMob(damagedEntity)
+			|| EntityUtils.isSilenced(mBoss)
 			|| damagedEntity.getScoreboardTags().contains(identityTag)
 			|| damagedEntity.getScoreboardTags().contains(IDOLATRY_IMMUNE_TAG)
-			|| damagedEntity.equals(mBoss)
-			|| mBoss.getLocation().distanceSquared(damagedEntity.getLocation()) > mParams.RADIUS * mParams.RADIUS) {
-			return;
-		}
+			|| event.getAbility() == ClassAbility.COUP_DE_GRACE) {
+				return;
+		} // This event is called a LOT and has a LOT of if statements. someone very very experienced with the damage pipeline should optimise the order
+		// Note on the doubled proj and earrows damage: Projectile hits deal both a normal and a True damage pop, because of... iframes probably.
+		// Despite allegedly cancelling if the event is cancelled, Idolatry processes both.
 
 		// reduces damage on mob once, but sends to other damage amount to other idols
 		String metadataKey = PROCESSED_METADATA_PREFIX + damagedEntity.getWorld().getFullTime() + event.getAbility();
@@ -125,7 +136,7 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 					int i = 0;
 					while (i < mParams.MAX_REDIRECTS && !sortedEntityDamageMap.isEmpty()) {
 						// Update to getLast() method when upgrading to Java 21
-						DamageUtils.damage((LivingEntity) event.getDamager(),
+						DamageUtils.damage(null,
 							mBoss,
 							DamageEvent.DamageType.TRUE,
 							sortedEntityDamageMap.remove(sortedEntityDamageMap.size() - 1),
@@ -166,5 +177,4 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 			event.setCancelled(true);
 		}
 	}
-
 }

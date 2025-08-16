@@ -17,8 +17,9 @@ public class Bloodlust {
 	private static final double MOB_RADIUS = 256;
 
 	public static final String DESCRIPTION = "Enemies coordinate attacks on players when they die.";
-	public static final String AVOID_BLOODLUST = "boss_bloodthirstyimmune";
+	public static final String AVOID_BLOODTHIRSTY = "boss_bloodthirstyimmune";
 	// Assuming that whatever we bothered to block from getting Bloodthirsty launched needs to also be blocked from Bloodlust
+	public static final String AVOID_BLOODLUST = "boss_bloodlustimmune";
 
 	public static Component[] rankDescription(int level) {
 		return new Component[] {
@@ -34,7 +35,7 @@ public class Bloodlust {
 
 	public static void applyModifiers(LivingEntity mob, int level) {
 		// This runs prior to BossManager parsing, so we can just add tags directly
-		if (!DelvesUtils.isDelveMob(mob) && !mob.getScoreboardTags().contains(AVOID_BLOODLUST)) {
+		if (!DelvesUtils.isDelveMob(mob) && !mob.getScoreboardTags().contains(AVOID_BLOODLUST) && !mob.getScoreboardTags().contains(AVOID_BLOODTHIRSTY)) {
 			if (EntityUtils.isElite(mob)) {
 				if (BLOODLUST_CHANCE_ELITE * level >= 1
 					|| FastUtils.RANDOM.nextDouble() < BLOODLUST_CHANCE_ELITE * level) {
