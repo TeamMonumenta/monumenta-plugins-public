@@ -138,7 +138,7 @@ public class DelvesUtils {
 		List<DelvesModifier> experimentalMods = DelvesModifier.experimentalDelveModifiers();
 		return switch ((int) DateUtils.getWeeklyVersion()) {
 			// week starting friday august 8, 2025
-			case 2902, 2903, 2904, 2905, 2906 -> List.of(experimentalMods.get(4), experimentalMods.get(5), experimentalMods.get(6), experimentalMods.get(7), experimentalMods.get(8));
+			case 2902, 2903, 2904, 2905, 2906 -> List.of(experimentalMods.get(4), experimentalMods.get(5), experimentalMods.get(6), experimentalMods.get(7));
 			default -> Collections.emptyList();
 		};
 	}

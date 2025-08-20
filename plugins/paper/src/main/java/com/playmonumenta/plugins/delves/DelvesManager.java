@@ -454,7 +454,7 @@ public class DelvesManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void playerWalk(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		if ((getRank(player, DelvesModifier.ASTRAL) == 0 && getRank(player, DelvesModifier.BOUNTIFUL) == 0)
+		if (getRank(player, DelvesModifier.ASTRAL) == 0
 			|| player.getGameMode() == GameMode.SPECTATOR
 			|| player.getGameMode() == GameMode.CREATIVE) {
 			return;
@@ -464,16 +464,17 @@ public class DelvesManager implements Listener {
 		if (resistanceLevel < 5) {
 			List<Chunk> chunkList = LocationUtils.getSurroundingChunks(event.getTo().getBlock(), 32);
 			for (Chunk chunk : chunkList) {
-				for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST || b.getType() == Material.SPAWNER, false)) {
+				for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST, false)) {
 					if (interestingBlock instanceof Chest chest
 						&& LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32)
 						&& ChestUtils.isAstrableChest(chest)
 						&& PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
 						Astral.applyModifiers(chest, getRank(player, DelvesModifier.ASTRAL));
-					} else if (interestingBlock instanceof CreatureSpawner spawner
-						&& LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), spawner.getRequiredPlayerRange()*2)){
-						Bountiful.applyModifiers(spawner, getRank(player, DelvesModifier.BOUNTIFUL));
 					}
+//					else if (interestingBlock instanceof CreatureSpawner spawner
+//						&& LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), spawner.getRequiredPlayerRange()*2)){
+//						Bountiful.applyModifiers(spawner, getRank(player, DelvesModifier.BOUNTIFUL));
+//					}
 				}
 			}
 		}
