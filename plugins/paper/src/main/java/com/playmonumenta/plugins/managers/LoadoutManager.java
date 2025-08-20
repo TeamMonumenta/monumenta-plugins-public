@@ -110,7 +110,7 @@ public class LoadoutManager implements Listener {
 	private static final ImmutableSet<Location> EXALTED_LOCATIONS = ImmutableSet.of(
 		// Region 1
 		Location.LABS, Location.WHITE, Location.ORANGE, Location.MAGENTA,
-		Location.LIGHTBLUE, Location.YELLOW, Location.REVERIE,
+		Location.LIGHTBLUE, Location.YELLOW, Location.REVERIE, Location.OVERWORLD1,
 		Location.WILLOWS, Location.WILLOWSKIN, Location.EPHEMERAL, Location.EPHEMERAL_ENHANCEMENTS,
 		Location.SANCTUM, Location.VERDANT, Location.VERDANTSKIN,
 		Location.AZACOR, Location.KAUL, Location.DIVINE, Location.ROYAL,
