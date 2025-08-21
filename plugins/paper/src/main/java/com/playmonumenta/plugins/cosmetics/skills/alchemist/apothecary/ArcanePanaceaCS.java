@@ -10,13 +10,8 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
+
+import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -105,12 +100,8 @@ public class ArcanePanaceaCS extends PanaceaCS {
 			return;
 		}
 
-		if (radius >= RADIUS_FOR_DOUBLING) {
-			trailEffect(player, loc, radius / 2, CAST_RING_RADIUS, totalTicks, increment, false);
-			trailEffect(player, loc, radius, CAST_RING_RADIUS * 2, totalTicks, increment, true);
-		} else {
-			trailEffect(player, loc, radius, CAST_RING_RADIUS, totalTicks, increment, false);
-		}
+		trailEffect(player, loc, radius / 2, CAST_RING_RADIUS, totalTicks, increment, false);
+		trailEffect(player, loc, radius, CAST_RING_RADIUS * 2, totalTicks, increment, true);
 	}
 
 	private void trailEffect(Player player, Location loc, double radius, double initialRadius, int totalTicks, Vector increment, boolean invert) {
@@ -121,12 +112,15 @@ public class ArcanePanaceaCS extends PanaceaCS {
 		double degrees = totalTicks * 12;
 		if (invert) {
 			degrees = 180 - degrees;
+
 		}
 		Vector vec = new Vector(FastUtils.cosDeg(degrees) * radius, 0, FastUtils.sinDeg(degrees) * radius);
 		vec = VectorUtils.rotateXAxis(vec, loc.getPitch() - 90);
 		vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 		new PPPeriodic(Particle.WAX_ON, loc.clone().add(vec)).manualTimeOverride(totalTicks).spawnAsPlayerActive(player);
+		new PPPeriodic(Particle.ELECTRIC_SPARK, loc.clone().add(vec)).manualTimeOverride(totalTicks).spawnAsPlayerActive(player);
 		new PPPeriodic(Particle.SCRAPE, loc.clone().subtract(vec)).manualTimeOverride(totalTicks).spawnAsPlayerActive(player);
+		new PPPeriodic(Particle.ELECTRIC_SPARK, loc.clone().subtract(vec)).manualTimeOverride(totalTicks).spawnAsPlayerActive(player);
 
 		// secondary enchantment particles, one half-step behind
 		double degreesHalfStep = degrees + (invert ? 6 : -6);
