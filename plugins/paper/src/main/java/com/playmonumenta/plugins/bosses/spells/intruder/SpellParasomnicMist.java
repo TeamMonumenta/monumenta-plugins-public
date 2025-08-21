@@ -88,6 +88,8 @@ public class SpellParasomnicMist extends Spell {
 			EntityUtils.teleportStack(entity, mCenter.clone().subtract(0, 10, 0));
 		});
 
+		players.forEach(mUnpushableTeam::addPlayer);
+
 		mActiveTasks.add(new BukkitRunnable() {
 			boolean mCasting = false;
 
@@ -98,7 +100,6 @@ public class SpellParasomnicMist extends Spell {
 						mChargeUpManager.remove();
 						players.forEach(player -> {
 							player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.4f, 0.1f);
-							mUnpushableTeam.addEntity(player);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 5, 1, true, false));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 1, true, false));
 						});
