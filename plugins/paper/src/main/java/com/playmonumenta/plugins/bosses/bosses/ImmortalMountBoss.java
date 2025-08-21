@@ -50,6 +50,7 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		mTransferDamage = p.TRANSFER_DAMAGE;
 		mKillMountOnNoPassenger = p.KILL_MOUNT_ON_NO_PASSENGER;
+		boss.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
 
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {

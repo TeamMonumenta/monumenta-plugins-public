@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,8 +24,8 @@ public class HeavenlyBoonTracker extends Effect {
 	@Override
 	public void onDeath(final EntityDeathEvent event) {
 		final Player player = Bukkit.getPlayer(mPlayerId);
-		// Player logged off OR Player used
-		if (player == null) {
+		// Player logged off OR Player used OR Mob has ignore-death-triggers tag
+		if (player == null || event.getEntity().getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
 			return;
 		}
 

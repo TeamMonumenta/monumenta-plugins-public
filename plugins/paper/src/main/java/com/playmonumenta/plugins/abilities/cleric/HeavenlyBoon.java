@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.effects.HeavenlyBoonTracker;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -29,7 +28,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
 import java.util.Objects;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
@@ -37,7 +35,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 	private static final String BOON_EFFECT_NAME = "ClericHeavenlyBoonTracker";
@@ -238,7 +235,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				for (final Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
 					for (final Ability ability : mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilities()) {
 						final ClassAbility linkedSpell = ability.getInfo().getLinkedSpell();
-						if (ability == this || linkedSpell == null) {
+						if (linkedSpell == ClassAbility.HEAVENLY_BOON || linkedSpell == null) {
 							continue;
 						}
 						final int reducedCD = Math.min((int) (ability.getModifiedCooldown() * mEnhanceCDR), mEnhanceCDRCap);

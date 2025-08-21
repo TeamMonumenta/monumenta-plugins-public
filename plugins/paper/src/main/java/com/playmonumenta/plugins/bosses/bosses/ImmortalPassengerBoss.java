@@ -46,6 +46,7 @@ public class ImmortalPassengerBoss extends BossAbilityGroup {
 		// these bosses break when reloaded (won't be passengers to the correct boss)
 		EntityUtils.setRemoveEntityOnUnload(boss);
 		boss.setRemoveWhenFarAway(true);
+		boss.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
 
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
