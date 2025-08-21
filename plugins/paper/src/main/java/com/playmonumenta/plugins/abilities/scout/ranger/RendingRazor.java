@@ -139,7 +139,7 @@ public class RendingRazor extends Ability {
 					final LivingEntity target = hitEnemies.get(0);
 					mCosmetic.razorHit(mPlayer, target.getLocation());
 					DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.PROJECTILE_SKILL, mEmbedDamage,
-						mInfo.getLinkedSpell(), false, true);
+						mInfo.getLinkedSpell(), true, true);
 
 					if (target.isValid() && !target.isDead()) {
 						applySlowness(target);
@@ -186,7 +186,7 @@ public class RendingRazor extends Ability {
 
 		mCosmetic.razorRetrieveSound(mPlayer, target.getLocation());
 		DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.PROJECTILE_SKILL, mRendDamage, mInfo.getLinkedSpell(),
-			false, false);
+			true, false);
 		MovementUtils.pullTowardsNormalized(mPlayer.getLocation(), target, PULL_FORCE);
 
 		cancelOnDeath(new BukkitRunnable() {
@@ -214,7 +214,7 @@ public class RendingRazor extends Ability {
 					mHitMobTick.forEach(enemy -> {
 						if (enemy != target) {
 							DamageUtils.damage(mPlayer, enemy, DamageEvent.DamageType.PROJECTILE_SKILL, mRendDamage,
-								mInfo.getLinkedSpell(), false, true);
+								mInfo.getLinkedSpell(), true, true);
 						}
 
 						if (enemy.isValid() && !enemy.isDead()) {
