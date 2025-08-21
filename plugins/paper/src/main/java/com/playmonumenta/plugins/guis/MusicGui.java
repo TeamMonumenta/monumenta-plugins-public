@@ -118,17 +118,19 @@ public class MusicGui extends Gui {
 
 				addMusicItem(2, 1, Material.MUSIC_DISC_WARD, "Brothers of the Jungle", Location.VERDANT, "Verdant Remnants", "CmdrGod", "epic:music.vrsanctum", 366, checkScore("Quest21", 20));
 				addMusicItem(2, 2, Material.MUSIC_DISC_WARD, "Cry of the Remnants", Location.VERDANT, "R'Kitxet", "CmdrGod", "epic:music.vrboss", 239, checkScore("Verdant"));
-				addMusicItem(2, 3, Material.MUSIC_DISC_FAR, "Soulbinder", Location.SANCTUM, "C'Shura", "Whitebeard_OP", "epic:music.cshura", 230, checkScore("Sanctum"));
+				addMusicItem(2, 3, Material.MUSIC_DISC_FAR, "Forsworn Sanctum", Location.SANCTUM, "Forsworn Sanctum", "YaKo", "epic:music.forsworn", 132, checkScore("Sanctum"));
+				addMusicItem(2, 4, Material.MUSIC_DISC_FAR, "Soulbinder", Location.SANCTUM, "C'Shura", "Whitebeard_OP", "epic:music.cshura", 230, checkScore("Sanctum"));
 				addMusicItem(2, 5, Material.MUSIC_DISC_CHIRP, "Soulspeaker", Location.REVERIE, "C'Axtal", "Whitebeard_OP", "epic:music.caxtal", 151, checkScore("Corrupted"));
 				addMusicItem(2, 6, Material.MUSIC_DISC_BLOCKS, "Tenebrae", Location.AZACOR, "Azacor", "Whitebeard_OP", "epic:music.azacor", 251, checkScore("AzacorNormalWin") || checkScore("AzacorHardWin"));
 				addMusicItem(2, 7, Material.MUSIC_DISC_CAT, "Heart of the Jungle", Location.KAUL, "Kaul", "Whitebeard_OP", "epic:music.kaul", 220, checkScore("KaulWins"));
 
 				addMusicItem(3, 1, Material.MUSIC_DISC_PIGSTEP, "Realm of Fate", Location.AMBER, "King's Valley", "Corpe_", "epic:music.valley", 174, true);
-				addMusicItem(3, 2, Material.MUSIC_DISC_FAR, "Jovial Jaunt", Location.OVERWORLD1, "Racing Theme", "Whitebeard_OP", "epic:music.racegeneric", 113, true);
-				addMusicItem(3, 3, Material.MUSIC_DISC_MELLOHI, "Endless Tactics", Location.BLITZ, "Blitz", "Whitebeard_OP", "epic:music.blitz", 118, checkScore("Blitz", 10));
+				addMusicItem(3,2, Material.MUSIC_DISC_WARD, "Unfamiliar Wilds", Location.AMBER, "King's Valley", "Salamanderlonk", "epic:music.valleyjungle", 151, true);
+				addMusicItem(3, 3, Material.MUSIC_DISC_FAR, "Jovial Jaunt", Location.OVERWORLD1, "Racing Theme", "Whitebeard_OP", "epic:music.racegeneric", 113, true);
+				addMusicItem(3, 5, Material.MUSIC_DISC_MELLOHI, "Endless Tactics", Location.BLITZ, "Blitz", "Whitebeard_OP", "epic:music.blitz", 118, checkScore("Blitz", 10));
 
-				addMusicItem(3, 5, Material.MUSIC_DISC_13, "Sacred Temple", Location.AMBER, "The Monument", "Whitebeard_OP", "epic:music.monument", 244, checkAdvance("monumenta:handbook/important_sites/r1/monument"));
-				addMusicItem(3, 6, Material.MUSIC_DISC_5, "Unknown Anomaly", Location.STARPOINT, "All That Remains", "CmdrGod", "epic:music.unknownatr", 180, checkScore("Quest54", 36));
+				addMusicItem(3, 6, Material.MUSIC_DISC_13, "Sacred Temple", Location.AMBER, "The Monument", "Whitebeard_OP", "epic:music.monument", 244, checkAdvance("monumenta:handbook/important_sites/r1/monument"));
+				addMusicItem(3, 7, Material.MUSIC_DISC_5, "Unknown Anomaly", Location.STARPOINT, "All That Remains", "CmdrGod", "epic:music.unknownatr", 180, checkScore("Quest54", 36));
 			}
 
 			case ISLES -> {
