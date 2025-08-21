@@ -47,11 +47,14 @@ public class Infernal {
 
 	private static final HashSet<Block> mInfernalCooldown = new HashSet<>();
 	public static void applyModifiers(Block block, int level) {
-		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level && !mInfernalCooldown.contains(block)) {
-				mInfernalCooldown.add(block);
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-					mInfernalCooldown.remove(block);
-				}, Constants.TICKS_PER_SECOND);
+		if(mInfernalCooldown.contains(block)) {
+			return;
+		}
+		mInfernalCooldown.add(block);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			mInfernalCooldown.remove(block);
+		}, Constants.TICKS_PER_SECOND);
+		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level) {
 				Location spawningLoc = block.getLocation().clone();
 
 				// don't spawn directly in the mob, and try 20 times to find an open spot

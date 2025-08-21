@@ -369,13 +369,13 @@ public class DelvesManager implements Listener {
 					CreatureSpawner temp = NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE;
 					delvesApplied.forEach((mod, level) -> mod.applyDelve(livingEntity, level));
 					Riftborn.applyModifiers(temp.getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
-					Idolatry.applyModifiers(temp.getBlock(), delvesApplied.getOrDefault(DelvesModifier.IDOLATRY, 0));
+					Idolatry.applyModifiers(temp, delvesApplied.getOrDefault(DelvesModifier.IDOLATRY, 0));
 					Chronology.applyModifiers(temp, delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
 					Infernal.applyModifiers(temp.getBlock(), delvesApplied.getOrDefault(DelvesModifier.INFERNAL, 0));
 				} else if (event instanceof SpawnerSpawnEvent spawnerSpawnEvent && spawnerSpawnEvent.getSpawner() != null) {
 					// normal spawn - handle all the mods
 					Riftborn.applyModifiers(spawnerSpawnEvent.getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
-					Idolatry.applyModifiers(spawnerSpawnEvent.getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.IDOLATRY, 0));
+					Idolatry.applyModifiers(spawnerSpawnEvent.getSpawner(), delvesApplied.getOrDefault(DelvesModifier.IDOLATRY, 0));
 					Chronology.applyModifiers(spawnerSpawnEvent.getSpawner(), delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
 					Infernal.applyModifiers(spawnerSpawnEvent.getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.INFERNAL, 0));
 

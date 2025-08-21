@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTTileEntity;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,6 +14,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
+import org.bukkit.block.CreatureSpawner;
 
 import java.util.HashSet;
 
@@ -31,15 +34,16 @@ public class Idolatry {
 			Component.text("Creepers and Delve Mobs do not respect Idols.")
 		};
 	}
-
-	private static final HashSet<Block> mIdolatryCooldown = new HashSet<>();
-	public static void applyModifiers(Block block, int level) {
-		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level && !mIdolatryCooldown.contains(block)) {
-			mIdolatryCooldown.add(block);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				mIdolatryCooldown.remove(block);
-			}, Constants.TICKS_PER_SECOND);
-			Location spawningLoc = block.getLocation().clone();
+	// MetaData saves by location, so use PersistentData to handle PoI respawns and whatnot.
+	private static final String IDOLATRY_CHECK = "IdolatryCheck";
+	public static void applyModifiers(CreatureSpawner spawner, int level) {
+		NBTCompound persistentDataContainer = new NBTTileEntity(spawner).getPersistentDataContainer();
+		if(persistentDataContainer.hasTag(IDOLATRY_CHECK)) {
+			return;
+		}
+		persistentDataContainer.setBoolean(IDOLATRY_CHECK, true);
+		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level) {
+			Location spawningLoc = spawner.getLocation().clone();
 			// don't spawn directly in the mob, and try 20 times to find an open spot
 			for (int j = 0; j < 20; j++) {
 				double r = FastUtils.randomDoubleInRange(0.5, 1);
@@ -49,7 +53,7 @@ public class Idolatry {
 
 				Location testLoc = spawningLoc.clone().add(x, 0, z);
 
-				if (block.getWorld().getBlockAt(testLoc).isPassable()) {
+				if (spawner.getWorld().getBlockAt(testLoc).isPassable()) {
 					spawningLoc = testLoc.clone();
 					break;
 				}

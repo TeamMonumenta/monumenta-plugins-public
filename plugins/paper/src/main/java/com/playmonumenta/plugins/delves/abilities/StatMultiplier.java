@@ -34,8 +34,8 @@ public class StatMultiplier {
 
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.4;
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
-	public static final double DELVE_MOB_STAT_MULTIPLIER_R3_HEALTH = 1.6;
-	public static final double DELVE_MOB_STAT_MULTIPLIER_R3_DAMAGE = 1.3;
+	public static final double DELVE_MOB_STAT_MULTIPLIER_R3_HEALTH = 1.7;
+	public static final double DELVE_MOB_STAT_MULTIPLIER_R3_DAMAGE = 1.2;
 
 	static {
 		//r1 shards
