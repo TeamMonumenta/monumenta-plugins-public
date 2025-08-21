@@ -63,10 +63,13 @@ public class ButterflyEffectCS extends TacticalManeuverCS {
 	}
 
 	public void doEffect(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.4f, 1f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.2f, 1f);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_WOOL_PLACE, SoundCategory.PLAYERS, 2f, 0.8f);
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEEHIVE_EXIT, SoundCategory.PLAYERS, 0.5f, 1.9f);
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 0.8f, 1f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_WOOL_PLACE, SoundCategory.PLAYERS, 2f, 0.8f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_WOOL_PLACE, SoundCategory.PLAYERS, 2f, 0.8f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEEHIVE_EXIT, SoundCategory.PLAYERS, 1.5f, 1.9f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 2f, 1f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 0.4f, 1f);
 		if (activeManeuvers.getOrDefault(mPlayer.getUniqueId(), false)) {
 			return;
 		}
