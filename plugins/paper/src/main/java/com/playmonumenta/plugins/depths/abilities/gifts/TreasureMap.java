@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
+import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
@@ -30,6 +31,14 @@ public class TreasureMap extends DepthsAbility {
 
 	public TreasureMap(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+	}
+
+	public static void trigger(Player player, DepthsPlayer dp) {
+		dp.sendMessage("After looking through all the rooms with your Treasure Map, you were able to find 2 prismatic ability rewards!");
+		dp.addReward(DepthsRoomType.DepthsRewardType.PRISMATIC);
+		dp.addReward(DepthsRoomType.DepthsRewardType.PRISMATIC);
+		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
+		playSounds(player);
 	}
 
 	public static void playSounds(Player player) {

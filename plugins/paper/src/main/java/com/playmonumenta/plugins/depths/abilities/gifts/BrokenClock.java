@@ -3,10 +3,13 @@ package com.playmonumenta.plugins.depths.abilities.gifts;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -24,6 +27,13 @@ public class BrokenClock extends DepthsAbility {
 
 	public BrokenClock(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+	}
+
+	public static void trigger(Player player, DepthsPlayer dp) {
+		dp.addReward(DepthsRoomType.DepthsRewardType.GIFT);
+		dp.addReward(DepthsRoomType.DepthsRewardType.GIFT);
+		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
+		playSound(player);
 	}
 
 	public static void playSound(Player player) {

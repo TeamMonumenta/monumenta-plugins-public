@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.depths.abilities.curses;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
@@ -21,6 +23,12 @@ public class CurseOfChaos extends DepthsAbility {
 
 	public CurseOfChaos(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+	}
+
+	public static void trigger(Player player, DepthsPlayer dp) {
+		dp.sendMessage("Chaos surges within you...");
+		DepthsManager.getInstance().chaos(player, true);
+		dp.mCurseofChaosCount = 0;
 	}
 
 	private static Description<CurseOfChaos> getDescription() {

@@ -479,10 +479,13 @@ public class DepthsParty {
 		for (DepthsPlayer dp : mPlayersInParty) {
 			if (dp.hasAbility(CurseOfChaos.ABILITY_NAME)) {
 				dp.mCurseofChaosCount++;
-				if (dp.mCurseofChaosCount > CurseOfChaos.ROOMS && dp.getPlayer() != null) {
-					dp.sendMessage("Chaos surges within you...");
-					DepthsManager.getInstance().chaos(dp.getPlayer(), true);
-					dp.mCurseofChaosCount = 0;
+				if (dp.mCurseofChaosCount > CurseOfChaos.ROOMS) {
+					Player player = dp.getPlayer();
+					if (player != null) {
+						CurseOfChaos.trigger(player, dp);
+					} else {
+						dp.mTriggerCurseOfChaos++;
+					}
 				}
 			}
 		}

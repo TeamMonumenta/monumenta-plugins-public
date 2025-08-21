@@ -1346,18 +1346,18 @@ public class DepthsManager {
 		// since treasure map is only offered past floor 1, prevent removing
 		// room types if on floor 1 to prevent instant proc
 		if (party.getFloor() != 1) {
-			party.mTreasureMapRooms.remove(roomType);
-			if (party.mTreasureMapRooms.isEmpty()) {
-				party.mPlayersInParty.forEach((dp) -> {
-					Player p = dp.getPlayer();
-					if (p != null && dp.hasAbility(TreasureMap.ABILITY_NAME)) {
-						dp.sendMessage("After looking through all the rooms with your Treasure Map, you were able to find 2 prismatic ability rewards!");
-						dp.addReward(DepthsRewardType.PRISMATIC);
-						dp.addReward(DepthsRewardType.PRISMATIC);
-						TreasureMap.playSounds(p);
-						setPlayerLevelInAbility(TreasureMap.ABILITY_NAME, p, dp, 0, false, false);
+			if (party.mTreasureMapRooms.remove(roomType) && party.mTreasureMapRooms.isEmpty()) {
+				// Only triggers once total, when the set went from nonempty to empty
+				for (DepthsPlayer dp : party.mPlayersInParty) {
+					if (dp.hasAbility(TreasureMap.ABILITY_NAME)) {
+						Player p = dp.getPlayer();
+						if (p != null) {
+							TreasureMap.trigger(p, dp);
+						} else {
+							dp.mTriggerTreasureMap = true;
+						}
 					}
-				});
+				}
 			}
 		}
 
@@ -1370,7 +1370,9 @@ public class DepthsManager {
 				if (dp.hasAbility(WildCard.ABILITY_NAME)) {
 					Player p = dp.getPlayer();
 					if (p != null) {
-						increaseRandomAbilityLevel(p, dp, 1);
+						WildCard.trigger(p, dp);
+					} else {
+						dp.mTriggerWildCard++;
 					}
 				}
 			}
@@ -1872,10 +1874,9 @@ public class DepthsManager {
 				if (dp.hasAbility(BrokenClock.ABILITY_NAME)) {
 					Player player = dp.getPlayer();
 					if (player != null) {
-						dp.addReward(DepthsRewardType.GIFT);
-						dp.addReward(DepthsRewardType.GIFT);
-						BrokenClock.playSound(player);
-						setPlayerLevelInAbility(BrokenClock.ABILITY_NAME, player, dp, 0, false, false);
+						BrokenClock.trigger(player, dp);
+					} else {
+						dp.mTriggerBrokenClock = true;
 					}
 				}
 			});

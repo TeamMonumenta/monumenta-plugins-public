@@ -791,10 +791,10 @@ public class DepthsListener implements Listener {
 		DepthsPlayer dp = manager.getDepthsPlayer(player);
 		MMLog.finer("Player " + player.getName() + " logged in. has_depths_player=" + (dp != null));
 		if (dp != null) {
-			boolean shouldOfflineTeleport = true;
+			boolean stillInGame = true;
 
 			if (dp.mDead) {
-				shouldOfflineTeleport = false;
+				stillInGame = false;
 				sendPlayerToLootRoom(player, true);
 				MMLog.info(player.getName() + " was sent to the loot room because they logged in while awaiting respawn.");
 			}
@@ -825,7 +825,7 @@ public class DepthsListener implements Listener {
 				if (dp.mZenithAbandonedByParty) {
 					MMLog.finer(player.getName() + " logged in with zenith sacrificed tag (send to lootroom on login due to being abandoned by their party while logged out). ");
 					sendPlayerToLootRoom(player, false); // Assumes that treasure score was successfully set.
-					shouldOfflineTeleport = false;
+					stillInGame = false;
 					player.sendMessage(Component.text("Your party has abandoned you...", NamedTextColor.DARK_AQUA));
 					AuditListener.logDeath(player.getName() + " logged in with zenith sacrificed tag (send to lootroom on login due to being abandoned by their party while logged out). ");
 				}
@@ -833,13 +833,14 @@ public class DepthsListener implements Listener {
 				if (disconnectAnticheese && dp.mDisconnects >= 2) {
 					player.sendMessage(Component.text("You have been punished for your hubris.", NamedTextColor.DARK_AQUA));
 					sendPlayerToLootRoom(player, true);
-					shouldOfflineTeleport = false;
+					stillInGame = false;
 					MMLog.info(player.getName() + " was punished for their hubris (send to lootroom on login due to anticheese) in Zenith. They \"died\" " + dp.mNumDeaths + " times, including artificial deaths from anticheese.");
 					AuditListener.logDeath(player.getName() + " was punished for their hubris (send to lootroom on login due to anticheese) in Zenith. They \"died\" " + dp.mNumDeaths + " times, including artificial deaths from anticheese.");
 				}
 			}
-			if (shouldOfflineTeleport) {
+			if (stillInGame) {
 				dp.doOfflineTeleport();
+				dp.triggerQueuedAbilities(player);
 			}
 		}
 

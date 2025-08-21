@@ -3,6 +3,10 @@ package com.playmonumenta.plugins.depths;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfChaos;
+import com.playmonumenta.plugins.depths.abilities.gifts.BrokenClock;
+import com.playmonumenta.plugins.depths.abilities.gifts.TreasureMap;
+import com.playmonumenta.plugins.depths.abilities.gifts.WildCard;
 import com.playmonumenta.plugins.depths.guis.DepthsTreeGUI;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -128,6 +132,13 @@ public class DepthsPlayer {
 
 	// The last time the player logged out. If 0, then they haven't logged out yet.
 	public long mLastLogoutTime = 0;
+
+	// There's some abilities that need to activate on players that are offline but won't work.
+	// These variables store which need to be activated when they log in.
+	public boolean mTriggerBrokenClock = false;
+	public boolean mTriggerTreasureMap = false;
+	public int mTriggerWildCard = 0;
+	public int mTriggerCurseOfChaos = 0;
 
 	// Abilities that the player can receive from Generosity
 	public final List<DepthsAbilityItem> mGenerosityGifts = new ArrayList<>();
@@ -299,6 +310,28 @@ public class DepthsPlayer {
 		mOfflineTeleportYaw = null;
 		mOfflineTeleportPitch = null;
 		return true;
+	}
+
+	public void triggerQueuedAbilities(Player player) {
+		if (mTriggerBrokenClock) {
+			BrokenClock.trigger(player, this);
+			mTriggerBrokenClock = false;
+		}
+
+		if (mTriggerTreasureMap) {
+			TreasureMap.trigger(player, this);
+			mTriggerTreasureMap = false;
+		}
+
+		while (mTriggerWildCard > 0) {
+			WildCard.trigger(player, this);
+			mTriggerWildCard--;
+		}
+
+		while (mTriggerCurseOfChaos > 0) {
+			CurseOfChaos.trigger(player, this);
+			mTriggerCurseOfChaos--;
+		}
 	}
 
 	public int getLevelInAbility(@Nullable String abilityName) {
