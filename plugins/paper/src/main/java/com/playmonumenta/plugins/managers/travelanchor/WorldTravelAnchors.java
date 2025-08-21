@@ -12,10 +12,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class WorldTravelAnchors {
 	private final UUID mWorldId;
+	private final WorldAnchorGroups mAnchorGroups;
 	private final Map<UUID, EntityTravelAnchor> mTravelAnchors = new HashMap<>();
 
 	public WorldTravelAnchors(World world) {
 		mWorldId = world.getUID();
+		mAnchorGroups = new WorldAnchorGroups(world);
 		for (Entity entity : world.getEntities()) {
 			if (EntityTravelAnchor.isTravelAnchor(entity)) {
 				mTravelAnchors.put(entity.getUniqueId(), EntityTravelAnchor.loadAnchor(entity));
@@ -25,6 +27,10 @@ public class WorldTravelAnchors {
 
 	public @Nullable World getWorld() {
 		return Bukkit.getWorld(mWorldId);
+	}
+
+	public WorldAnchorGroups getAnchorGroups() {
+		return mAnchorGroups;
 	}
 
 	public @Nullable EntityTravelAnchor newAnchor(Entity entity) {
@@ -38,8 +44,8 @@ public class WorldTravelAnchors {
 		}
 
 		EntityTravelAnchor anchor = EntityTravelAnchor.newAnchor(entity);
-		anchor.update();
 		mTravelAnchors.put(entityId, anchor);
+		anchor.update();
 		return anchor;
 	}
 
@@ -85,6 +91,7 @@ public class WorldTravelAnchors {
 	}
 
 	public void updateAnchors() {
+		mAnchorGroups.save();
 		for (EntityTravelAnchor anchor : mTravelAnchors.values()) {
 			anchor.update();
 		}

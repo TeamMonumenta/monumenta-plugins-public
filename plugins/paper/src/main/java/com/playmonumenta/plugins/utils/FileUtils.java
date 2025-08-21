@@ -116,6 +116,19 @@ public class FileUtils {
 		return new File(worldFolder, "monumenta");
 	}
 
+	public static File getWorldMonumentaFile(World world, String fileName) {
+		File worldMonumentaFolder = getWorldMonumentaFolder(world);
+		File file = new File(worldMonumentaFolder, fileName);
+		File tempFile = new File(worldMonumentaFolder, fileName + ".tmp");
+		if (!file.isFile() && tempFile.isFile()) {
+			// file was being replaced with tempFile, but interrupted; safe to use tempFile instead
+			if (!tempFile.renameTo(file)) {
+				return file;
+			}
+		}
+		return file;
+	}
+
 	public static File getChunkMonumentaFolder(Location location) {
 		File worldMonumentaFolder = getWorldMonumentaFolder(location.getWorld());
 		Chunk chunk = location.getChunk();
@@ -130,27 +143,32 @@ public class FileUtils {
 		return new File(monumentaRegionFolder, String.format("c.%d.%d", cx, cz));
 	}
 
+	public static File getChunkMonumentaFile(Location location, String fileName) {
+		File chunkMonumentaFolder = getChunkMonumentaFolder(location);
+
+		File file = new File(chunkMonumentaFolder, fileName);
+		File tempFile = new File(chunkMonumentaFolder, fileName + ".tmp");
+		if (!file.isFile() && tempFile.isFile()) {
+			// file was being replaced with tempFile, but interrupted; safe to use tempFile instead
+			if (!tempFile.renameTo(file)) {
+				return file;
+			}
+		}
+		return file;
+	}
+
 	public static File getBlockMonumentaFile(Block block, String prefix, String suffix) {
 		return getBlockMonumentaFile(block.getState(), prefix, suffix);
 	}
 
 	public static File getBlockMonumentaFile(BlockState block, String prefix, String suffix) {
 		Location loc = block.getLocation();
-		File chunkMonumentaFolder = getChunkMonumentaFolder(loc);
 		int x = loc.getBlockX();
 		int y = loc.getBlockY();
 		int z = loc.getBlockZ();
 
 		String fileName = String.format("%s%d.%d.%d%s", prefix, x, y, z, suffix);
-		File file = new File(chunkMonumentaFolder, fileName);
-		File tempFile = new File(chunkMonumentaFolder, fileName + ".tmp");
-		if (!file.isFile() && tempFile.isFile()) {
-			// file was being replaced with tempFile, but interrupted; safe to use tempFile instead
-			if (!tempFile.renameTo(file)) {
-				return tempFile;
-			}
-		}
-		return file;
+		return getChunkMonumentaFile(loc, fileName);
 	}
 
 	/**

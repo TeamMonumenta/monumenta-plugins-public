@@ -7,7 +7,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -33,6 +36,7 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 	private final UUID mEntityId;
 	private String mLabel;
 	private TextColor mColor;
+	private final Set<UUID> mGroups = new HashSet<>();
 	private UUID mLastWorld;
 	private Vector mLastLoc;
 
@@ -113,6 +117,18 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 			mColor = DEFAULT_COLOR;
 		}
 
+		if (data.get("mGroups") instanceof JsonArray groupsJsonArray) {
+			for (JsonElement groupJsonElement : groupsJsonArray) {
+				if (groupJsonElement instanceof JsonPrimitive groupJsonPrimitive && groupJsonPrimitive.isString()) {
+					try {
+						mGroups.add(UUID.fromString(groupJsonPrimitive.getAsString()));
+					} catch (Exception ignored) {
+						// This shouldn't happen, silently ignore it
+					}
+				}
+			}
+		}
+
 		if (data.get("mLastWorld") instanceof JsonPrimitive worldIdPrimitive && worldIdPrimitive.isString()) {
 			mLastWorld = UUID.fromString(worldIdPrimitive.getAsString());
 		} else {
@@ -149,6 +165,12 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 		lastLoc.add(mLastLoc.getZ());
 		result.add("mLastLoc", lastLoc);
 
+		JsonArray groupArray = new JsonArray();
+		for (UUID groupId : groupIds()) {
+			groupArray.add(groupId.toString());
+		}
+		result.add("mGroups", groupArray);
+
 		result.addProperty("mLabel", mLabel);
 		result.addProperty("mColor", mColor.asHexString());
 
@@ -173,6 +195,98 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 
 	public TextColor color() {
 		return mColor;
+	}
+
+	public void pruneDeletedGroups() {
+		World world = lastWorld();
+		if (world == null) {
+			return;
+		}
+
+		WorldAnchorGroups worldAnchorGroups = TravelAnchorManager.getInstance()
+			.anchorsInWorld(world)
+			.getAnchorGroups();
+
+		mGroups.removeIf(groupId -> worldAnchorGroups.anchorGroup(groupId) == null);
+
+		if (mGroups.isEmpty()) {
+			mGroups.add(WorldAnchorGroups.DEFAULT_GROUP_UUID);
+		}
+	}
+
+	protected Set<UUID> groupIds() {
+		if (mGroups.isEmpty()) {
+			mGroups.add(WorldAnchorGroups.DEFAULT_GROUP_UUID);
+		}
+		return mGroups;
+	}
+
+	public Set<AnchorGroup> groups() {
+		Set<AnchorGroup> groups = new TreeSet<>();
+
+		World world = lastWorld();
+		if (world == null) {
+			return groups;
+		}
+
+		WorldAnchorGroups worldAnchorGroups = TravelAnchorManager.getInstance()
+			.anchorsInWorld(world)
+			.getAnchorGroups();
+
+		for (UUID groupId : groupIds()) {
+			AnchorGroup anchorGroup = worldAnchorGroups.anchorGroup(groupId);
+			if (anchorGroup != null) {
+				groups.add(anchorGroup);
+			}
+		}
+
+		return groups;
+	}
+
+	public Set<AnchorGroup> commonGroups(EntityTravelAnchor other) {
+		Set<AnchorGroup> groups = new TreeSet<>();
+
+		World world = lastWorld();
+		if (world == null || !world.equals(other.lastWorld())) {
+			return groups;
+		}
+
+		WorldAnchorGroups worldAnchorGroups = TravelAnchorManager.getInstance()
+			.anchorsInWorld(world)
+			.getAnchorGroups();
+
+		Set<UUID> commonGroupIds = new HashSet<>(groupIds());
+		commonGroupIds.retainAll(other.groupIds());
+
+		for (UUID groupId : commonGroupIds) {
+			AnchorGroup anchorGroup = worldAnchorGroups.anchorGroup(groupId);
+			if (anchorGroup != null) {
+				groups.add(anchorGroup);
+			}
+		}
+
+		return groups;
+	}
+
+	public boolean cannotAccess(EntityTravelAnchor other) {
+		return commonGroups(other).isEmpty();
+	}
+
+	public boolean inGroup(AnchorGroup group) {
+		return groupIds().contains(group.id());
+	}
+
+	public void addToGroup(AnchorGroup group) {
+		mGroups.add(group.id());
+	}
+
+	public boolean removeFromGroup(AnchorGroup group) {
+		UUID groupId = group.id();
+		if (groupIds().contains(groupId) && mGroups.size() <= 1) {
+			return false;
+		}
+		mGroups.remove(groupId);
+		return true;
 	}
 
 	public @Nullable World lastWorld() {
@@ -212,6 +326,8 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 		} else {
 			mColor = DEFAULT_COLOR;
 		}
+
+		pruneDeletedGroups();
 
 		PersistentDataContainer pdc = entity.getPersistentDataContainer();
 		pdc.set(TRAVEL_ANCHOR_PDC_KEY, PersistentDataType.STRING, toJson().toString());

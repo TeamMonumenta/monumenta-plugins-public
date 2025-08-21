@@ -19,11 +19,12 @@ import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class TravelAnchorManager implements Listener {
 	public static final String TRAVEL_ANCHOR_TAG = "TravelAnchor";
-	public static final NamespacedKey TRAVEL_ANCHOR_PDC_KEY
+	public static final @NotNull NamespacedKey TRAVEL_ANCHOR_PDC_KEY
 		= Objects.requireNonNull(NamespacedKey.fromString("monumenta:travel_anchor"));
 
 	private static @Nullable TravelAnchorManager INSTANCE = null;

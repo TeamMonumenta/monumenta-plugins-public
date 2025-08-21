@@ -47,6 +47,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -694,6 +695,30 @@ public class ItemUtils {
 
 	public static boolean isShulkerBox(@Nullable Material mat) {
 		return mat != null && Tag.SHULKER_BOXES.isTagged(mat);
+	}
+
+	public static Material shulkerBoxOfDyeColor(@Nullable DyeColor dyeColor) {
+		if (dyeColor == null) {
+			return Material.SHULKER_BOX;
+		}
+		return switch (dyeColor) {
+			case WHITE -> Material.WHITE_SHULKER_BOX;
+			case ORANGE -> Material.ORANGE_SHULKER_BOX;
+			case MAGENTA -> Material.MAGENTA_SHULKER_BOX;
+			case LIGHT_BLUE -> Material.LIGHT_BLUE_SHULKER_BOX;
+			case YELLOW -> Material.YELLOW_SHULKER_BOX;
+			case LIME -> Material.LIME_SHULKER_BOX;
+			case PINK -> Material.PINK_SHULKER_BOX;
+			case GRAY -> Material.GRAY_SHULKER_BOX;
+			case LIGHT_GRAY -> Material.LIGHT_GRAY_SHULKER_BOX;
+			case CYAN -> Material.CYAN_SHULKER_BOX;
+			case PURPLE -> Material.PURPLE_SHULKER_BOX;
+			case BLUE -> Material.BLUE_SHULKER_BOX;
+			case BROWN -> Material.BROWN_SHULKER_BOX;
+			case GREEN -> Material.GREEN_SHULKER_BOX;
+			case RED -> Material.RED_SHULKER_BOX;
+			case BLACK -> Material.BLACK_SHULKER_BOX;
+		};
 	}
 
 	//Returns true if the item material is something a player can launch an AbstractArrow/Projectile from

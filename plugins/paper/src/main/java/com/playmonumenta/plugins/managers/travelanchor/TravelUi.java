@@ -18,15 +18,18 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class TravelUi extends BukkitRunnable {
-	private final Player mPlayer;
+	protected final Player mPlayer;
 	private final Interaction mSeat;
 	private int mWarmupDelay = 20;
-	private int mAnimationPhase = 0;
+	protected int mRainbowAnimationPhase = 0;
+	protected int mGroupIndex = 0;
+	protected final EntityTravelAnchor mStartingAnchor;
 	private final HashMap<UUID, TravelUiTarget> mAnchorToTarget = new HashMap<>();
-	private @Nullable TravelUiTarget mClosestTarget = null;
+	protected @Nullable TravelUiTarget mClosestTarget = null;
 
-	public TravelUi(Player player) {
+	public TravelUi(Player player, EntityTravelAnchor travelAnchor) {
 		mPlayer = player;
+		mStartingAnchor = travelAnchor;
 
 		Location loc = player.getLocation();
 		World world = loc.getWorld();
@@ -39,19 +42,22 @@ public class TravelUi extends BukkitRunnable {
 			interaction.addPassenger(mPlayer);
 		});
 
-		Location eyeLoc = mPlayer.getEyeLocation();
-
 		for (EntityTravelAnchor anchor : TravelAnchorManager.getInstance().anchorsInWorld(world).getAnchors()) {
-			TravelUiTarget uiTarget = new TravelUiTarget(eyeLoc, anchor, mPlayer);
+			if (shouldHideAnchor(anchor)) {
+				continue;
+			}
+
+			TravelUiTarget uiTarget = new TravelUiTarget(this, anchor);
 			mAnchorToTarget.put(anchor.getEntityId(), uiTarget);
 		}
 	}
 
 	@Override
 	public void run() {
-		mAnimationPhase -= 5;
-		if (mAnimationPhase < 0) {
-			mAnimationPhase += 360;
+		mRainbowAnimationPhase -= 5;
+		if (mRainbowAnimationPhase < 0) {
+			mRainbowAnimationPhase += 360;
+			mGroupIndex++;
 		}
 
 		// Abort early if the player is offline or this has been tampered with
@@ -79,6 +85,14 @@ public class TravelUi extends BukkitRunnable {
 			if (target.shouldRemove()) {
 				toEntitiesUnlink.addAll(target.getEntityIds());
 				target.remove();
+				continue;
+			}
+
+			EntityTravelAnchor anchor = target.getAnchor();
+			if (shouldHideAnchor(anchor)) {
+				// No longer in a common group
+				toEntitiesUnlink.addAll(target.getEntityIds());
+				target.remove();
 			}
 		}
 		for (UUID entityId : toEntitiesUnlink) {
@@ -86,13 +100,17 @@ public class TravelUi extends BukkitRunnable {
 		}
 
 		// Process new anchors
-		Location eyeLoc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
 		for (EntityTravelAnchor anchor : TravelAnchorManager.getInstance().anchorsInWorld(world).getAnchors()) {
 			if (mAnchorToTarget.containsKey(anchor.getEntityId())) {
 				continue;
 			}
-			TravelUiTarget uiTarget = new TravelUiTarget(eyeLoc, anchor, mPlayer);
+
+			if (shouldHideAnchor(anchor)) {
+				continue;
+			}
+
+			TravelUiTarget uiTarget = new TravelUiTarget(this, anchor);
 			mAnchorToTarget.put(anchor.getEntityId(), uiTarget);
 		}
 
@@ -101,6 +119,8 @@ public class TravelUi extends BukkitRunnable {
 		double closestLookDiff = 5.0;
 		TravelUiTarget closestTarget = null;
 		for (TravelUiTarget target : mAnchorToTarget.values()) {
+			target.animate();
+
 			double lookDiff = lookDir.distanceSquared(target.getDir());
 			if (lookDiff >= closestLookDiff) {
 				continue;
@@ -109,13 +129,7 @@ public class TravelUi extends BukkitRunnable {
 			closestTarget = target;
 		}
 		if (!Objects.equals(mClosestTarget, closestTarget)) {
-			if (mClosestTarget != null) {
-				mClosestTarget.highlight(false, 0);
-			}
 			mClosestTarget = closestTarget;
-		}
-		if (mClosestTarget != null) {
-			mClosestTarget.highlight(true, mAnimationPhase);
 		}
 
 		// Players leaving their seat at this point indicates a teleport attempt - go to the closest target
@@ -148,5 +162,9 @@ public class TravelUi extends BukkitRunnable {
 		}
 		mAnchorToTarget.clear();
 		mClosestTarget = null;
+	}
+
+	private boolean shouldHideAnchor(EntityTravelAnchor anchor) {
+		return mStartingAnchor.cannotAccess(anchor);
 	}
 }

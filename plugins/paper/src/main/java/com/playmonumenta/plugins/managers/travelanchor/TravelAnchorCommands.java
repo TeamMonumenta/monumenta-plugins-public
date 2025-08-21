@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.managers.travelanchor;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
+import com.playmonumenta.plugins.managers.travelanchor.gui.AnchorGroupGui;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -22,6 +23,7 @@ public class TravelAnchorCommands {
 		new CommandAPICommand("travelanchor")
 			.withPermission("monumenta.command.travelanchor")
 			.withSubcommand(getAddSubcommand())
+			.withSubcommand(getGroupsSubcommand())
 			.withSubcommand(getRemoveSubcommand())
 			.withSubcommand(getRenameSubcommand())
 			.withSubcommand(getTravelSubcommand())
@@ -107,8 +109,37 @@ public class TravelAnchorCommands {
 			});
 	}
 
+	public static CommandAPICommand getGroupsSubcommand() {
+		return new CommandAPICommand("groups")
+			.withArguments(ANCHOR_ARG)
+			.executes((sender, args) -> {
+				if (!(CommandUtils.getCallee(sender) instanceof Player player)) {
+					sender.sendMessage(Component.text("This command must be run as a player.", NamedTextColor.RED));
+					return;
+				}
+
+				if (GuildPlotUtils.guildPlotEditTravelAnchorBlocked(player)) {
+					player.sendMessage(GuildPlotUtils.NO_TRAVEL_ANCHOR_ACCESS_COMPONENT);
+					return;
+				}
+
+				Entity anchorEntity = Objects.requireNonNull(args.getByArgument(ANCHOR_ARG));
+				EntityTravelAnchor anchor = TravelAnchorManager
+					.getInstance()
+					.anchorsInWorld(anchorEntity.getWorld())
+					.getAnchor(anchorEntity);
+				if (anchor == null) {
+					sender.sendMessage(Component.text("That entity is not a travel anchor right now.", NamedTextColor.RED));
+					return;
+				}
+
+				new AnchorGroupGui(player, anchor).open();
+			});
+	}
+
 	public static CommandAPICommand getTravelSubcommand() {
 		return new CommandAPICommand("travel")
+			.withArguments(ANCHOR_ARG)
 			.executes((sender, args) -> {
 				if (!(CommandUtils.getCallee(sender) instanceof Player player)) {
 					sender.sendMessage(Component.text("This command must be run as a player.", NamedTextColor.RED));
@@ -120,7 +151,19 @@ public class TravelAnchorCommands {
 					return;
 				}
 
-				new TravelUi(player).runTaskTimer(Plugin.getInstance(), 0L, 1L);
+				Entity anchorEntity = Objects.requireNonNull(args.getByArgument(ANCHOR_ARG));
+				EntityTravelAnchor anchor = TravelAnchorManager
+					.getInstance()
+					.anchorsInWorld(anchorEntity.getWorld())
+					.getAnchor(anchorEntity);
+
+				if (anchor == null) {
+					sender.sendMessage(Component.text("That entity is not a travel anchor right now.", NamedTextColor.RED));
+					return;
+				}
+
+				new TravelUi(player, anchor)
+					.runTaskTimer(Plugin.getInstance(), 0L, 1L);
 			});
 	}
 

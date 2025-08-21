@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.integrations.luckperms.guildgui;
+package com.playmonumenta.plugins.managers.travelanchor.gui;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -10,25 +10,20 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public abstract class View {
-	protected final GuildGui mGui;
+public abstract class AnchorGroupView {
+	public static final int HEADER_Y = 0;
+
+	protected final AnchorGroupGui mGui;
 	protected int mPage = 0;
 
-	public View(GuildGui gui) {
+	public AnchorGroupView(AnchorGroupGui gui) {
 		mGui = gui;
 	}
 
 	public abstract void setup();
 
-	/*
-	 * Reloads any data that may have changed, then runs mGui.update()
-	 * If async code is required, mGui.syncUpdate() may be used as a shortcut
-	 */
-	public void refresh() {
-	}
-
 	protected int rowsPerPage() {
-		return GuildGui.PAGE_HEIGHT;
+		return 5;
 	}
 
 	protected void setPageArrows(int totalRows) {
@@ -45,7 +40,7 @@ public abstract class View {
 			meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE, TextDecoration.BOLD)
 				.decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
-			mGui.setItem(GuildGui.HEADER_Y, 0, item).onClick((InventoryClickEvent event) -> clickPrev());
+			mGui.setItem(HEADER_Y, 0, item).onClick((InventoryClickEvent event) -> clickPrev());
 		}
 
 		if (mPage < maxPage) {
@@ -54,7 +49,7 @@ public abstract class View {
 			meta.displayName(Component.text("Next Page", NamedTextColor.WHITE, TextDecoration.BOLD)
 				.decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
-			mGui.setItem(GuildGui.HEADER_Y, 8, item).onClick((InventoryClickEvent event) -> clickNext());
+			mGui.setItem(HEADER_Y, 8, item).onClick((InventoryClickEvent event) -> clickNext());
 		}
 	}
 
@@ -68,5 +63,8 @@ public abstract class View {
 		mPage++;
 		mGui.mPlayer.playSound(mGui.mPlayer, Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f);
 		mGui.update();
+	}
+
+	protected void handleShiftClickedFromInventory(ItemStack item) {
 	}
 }
