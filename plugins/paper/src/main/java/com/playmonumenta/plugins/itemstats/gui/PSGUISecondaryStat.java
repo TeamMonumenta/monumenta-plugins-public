@@ -33,7 +33,7 @@ enum PSGUISecondaryStat {
 	STEADFAST(3, Material.LEAD, EnchantmentType.STEADFAST, true, """
 		Gain A EHP as B
 		scaling with the amount of missing HP, up to %s%%.
-		Also calculates bonus from Second Wind when enabled.""".formatted(Steadfast.MISSING_HEALTH_MAXIMUM)),
+		Also calculates bonus from Second Wind when enabled.""".formatted(StringUtils.multiplierToPercentage(Steadfast.MISSING_HEALTH_MAXIMUM))),
 	ETHEREAL(5, Material.PHANTOM_MEMBRANE, EnchantmentType.ETHEREAL, false, """
 		Gain A EHP as B
 		on hits taken within %s seconds of any previous hit.""".formatted(StringUtils.ticksToSeconds(Ethereal.PAST_HIT_DURATION_TIME))),
