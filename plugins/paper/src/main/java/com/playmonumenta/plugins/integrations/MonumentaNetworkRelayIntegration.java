@@ -11,6 +11,7 @@ import com.playmonumenta.networkrelay.RemotePlayerLoadedEvent;
 import com.playmonumenta.networkrelay.RemotePlayerProxy;
 import com.playmonumenta.networkrelay.RemotePlayerUnloadedEvent;
 import com.playmonumenta.networkrelay.RemotePlayerUpdatedEvent;
+import com.playmonumenta.networkrelay.shardhealth.LowMemoryEvent;
 import com.playmonumenta.networkrelay.shardhealth.ShardHealth;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -287,5 +288,16 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void remotePlayerUpdated(RemotePlayerUpdatedEvent event) {
 		TABIntegration.loadRemotePlayer(event.mRemotePlayer);
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void lowMemory(LowMemoryEvent event) {
+		Bukkit.getServer().dispatchCommand(
+			Bukkit.getServer().getConsoleSender(),
+			"spark heapdump"
+		);
+		sendAdminMessage("<" + NetworkRelayAPI.getShardName() + "> Automatic heap dump due to low memory");
+
+		// TODO Consider automatic restart?
 	}
 }
