@@ -393,7 +393,12 @@ public class SpellAmalgamatingDreamscape extends Spell {
 			.count(15)
 			.extra(0.2)
 			.spawnAsBoss();
-		mExaltedBoss = summon;
+
+		// Gets the topMost hostile mob from this boss to listen to the death event.
+		List<LivingEntity> prior = new ArrayList<>();
+		EntityUtils.getStackedMobsAbove(summon, prior);
+		mExaltedBoss = prior.get(prior.size() - 1);
+
 		EffectManager.getInstance().addEffect(summon, "AmalgamatingDreamscape",
 			new DamageImmunity(20, EnumSet.of(DamageEvent.DamageType.FALL)));
 	}
