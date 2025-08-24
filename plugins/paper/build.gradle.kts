@@ -63,5 +63,7 @@ tasks {
 			exclude(project(":adapter_v1_20_R3"))
 			exclude(project(":velocity"))
 		}
+
+		dependsOn(":adapter_v1_20_R3:remapAccessWidener")
 	}
 }
