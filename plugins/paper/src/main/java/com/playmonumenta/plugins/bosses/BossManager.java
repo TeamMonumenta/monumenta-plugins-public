@@ -174,7 +174,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(CoordinatedAttackOnDeathBoss.identityTag, CoordinatedAttackOnDeathBoss::new, new CoordinatedAttackOnDeathBoss.Parameters());
 		registerStatelessBoss(ShiftingBoss.identityTag, ShiftingBoss::new);
 		registerStatelessBoss(BulletHellBoss.identityTag, BulletHellBoss::new, new BulletHellBoss.Parameters());
-		registerStatelessBoss(KamikazeBoss.identityTag, KamikazeBoss::new);
+		registerStatelessBoss(KamikazeBoss.identityTag, KamikazeBoss::new, new KamikazeBoss.Parameters());
 		registerStatelessBoss(TinyBombTossBoss.identityTag, TinyBombTossBoss::new);
 		registerStatelessBoss(AntiRangeBoss.identityTag, AntiRangeBoss::new, new AntiRangeBoss.Parameters());
 		registerStatelessBoss(AntiMeleeBoss.identityTag, AntiMeleeBoss::new, new AntiMeleeBoss.Parameters());
