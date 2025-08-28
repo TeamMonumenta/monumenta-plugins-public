@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -89,12 +90,19 @@ public class Reverb implements Enchantment {
 		if (type == DamageEvent.DamageType.MELEE) {
 			world.playSound(loc, Sound.ENTITY_ALLAY_ITEM_TAKEN, SoundCategory.PLAYERS, 0.4f, 1.1f);
 			world.playSound(loc, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 0.1f, 0.7f);
-			world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 1.0f, 0.5f);
+			world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.PLAYERS, 1.0f, 0.5f);
 		}
 
-		// Should not be possible for this to be null considering the enchant was triggered but whatever
 		ItemStatManager.PlayerItemStats eventStats = event.getPlayerItemStats();
-		ItemStatManager.PlayerItemStats playerItemStats = eventStats == null ? null : new ItemStatManager.PlayerItemStats(eventStats);
+		if (eventStats == null) {
+			if (event.getDamager() instanceof Projectile projectile) {
+				eventStats = DamageListener.getProjectileItemStats(projectile);
+			}
+			if (eventStats == null) {
+				eventStats = plugin.mItemStatManager.getPlayerItemStats(player);
+			}
+		}
+		ItemStatManager.PlayerItemStats playerItemStats = new ItemStatManager.PlayerItemStats(eventStats);
 
 		// Start the task 1 tick later, to give ample time to sum the damage, and check if the mob is definitely dead.
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -122,7 +130,7 @@ public class Reverb implements Enchantment {
 
 				world.playSound(enemyLocation, Sound.ENTITY_ALLAY_ITEM_TAKEN, SoundCategory.PLAYERS, 2.0f, 0.7f);
 				world.playSound(enemyLocation, Sound.ENTITY_VEX_HURT, SoundCategory.PLAYERS, 5.0f, 0.4f);
-				world.playSound(enemyLocation, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 0.2f, 2.0f);
+				world.playSound(enemyLocation, Sound.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.PLAYERS, 0.2f, 2.0f);
 
 				// Start the particle show, then apply damage.
 				new BukkitRunnable() {
@@ -197,7 +205,7 @@ public class Reverb implements Enchantment {
 			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_ENDER_EYE_DEATH, 0.4f, 0.4f);
 			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_VEX_HURT, 2.0f, 0.6f);
 			AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_ALLAY_HURT, 0.2f, 0.6f);
-			world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 0.5f, 0.7f);
+			world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.PLAYERS, 0.5f, 0.7f);
 		}
 	}
 
