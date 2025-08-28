@@ -49,7 +49,7 @@ public class FlameSpirit extends DepthsAbility {
 	private final int mDuration;
 
 	private int mLastTick;
-	private int mEnemiesKilled;
+	private int mEnemiesDamaged;
 	private @Nullable Location mClosestLocation;
 
 	public FlameSpirit(Plugin plugin, Player player) {
@@ -59,7 +59,7 @@ public class FlameSpirit extends DepthsAbility {
 		mFireDuration = CharmManager.getDuration(player, CharmEffects.FLAME_SPIRIT_FIRE_DURATION.mEffectName, FIRE_TICKS);
 		mDuration = CharmManager.getDuration(player, CharmEffects.FLAME_SPIRIT_DURATION.mEffectName, DURATION);
 		mLastTick = 0;
-		mEnemiesKilled = 0;
+		mEnemiesDamaged = 0;
 	}
 
 	public void summonSpirit() {
@@ -129,25 +129,22 @@ public class FlameSpirit extends DepthsAbility {
 		if (isOnCooldown()) {
 			return false;
 		}
-		if (event.getType() != DamageType.MAGIC || !(event.getDamager() instanceof Player player)) {
-			return false;
-		}
 		int currentTick = Bukkit.getCurrentTick();
 		if (currentTick != mLastTick) {
 			mLastTick = currentTick;
-			mEnemiesKilled = 0;
+			mEnemiesDamaged = 0;
 			mClosestLocation = null;
 		}
-		mEnemiesKilled++;
-		Location playerLoc = player.getLocation();
+		mEnemiesDamaged++;
+		Location playerLoc = mPlayer.getLocation();
 		Location enemyLoc = enemy.getLocation();
 		if (mClosestLocation == null || playerLoc.distanceSquared(enemyLoc) < playerLoc.distanceSquared(mClosestLocation)) {
 			mClosestLocation = enemyLoc;
 		}
-		if (mEnemiesKilled == 3) {
+		if (mEnemiesDamaged == 3) {
 			putOnCooldown();
 			summonSpirit();
-			mEnemiesKilled = 0;
+			mEnemiesDamaged = 0;
 		}
 		return false;
 	}
