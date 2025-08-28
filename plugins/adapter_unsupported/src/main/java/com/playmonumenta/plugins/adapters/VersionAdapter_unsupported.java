@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.adapters;
 
 import com.google.gson.JsonObject;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -14,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
@@ -208,6 +210,25 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
+	public Entity spawnWorldlessEntity(EntityType type, World world) {
+		return null;
+	}
+
+	@Override
+	public void spawnPlayerNametag(Player clientPlayer, Player targetPlayer, Set<Map.Entry<Entity, Entity>> entities) {
+
+	}
+
+	@Override
+	public void removePlayerNametag(Player clientPlayer, Player targetPlayer, Entity ...entities) {
+
+	}
+
+	@Override
+	public void updatePlayerNametag(Player clientPlayer, Entity ...entities) {
+  }
+
+  @Override
 	public double getJumpVelocity(LivingEntity entity) {
 		return 0.0d;
 	}

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.adapters;
 
 import com.google.gson.JsonObject;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -13,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
@@ -201,5 +203,13 @@ public interface VersionAdapter {
 
 	void setHeadRotation(Entity bukkitEntity, float yaw, float pitch);
 
-	double getJumpVelocity(LivingEntity entity);
+	Entity spawnWorldlessEntity(EntityType type, World world);
+
+	void spawnPlayerNametag(Player clientPlayer, Player targetPlayer, Set<Map.Entry<Entity, Entity>> entities);
+
+	void removePlayerNametag(Player clientPlayer, Player targetPlayer, Entity...entities);
+
+	void updatePlayerNametag(Player clientPlayer, Entity...entities);
+
+  double getJumpVelocity(LivingEntity entity);
 }

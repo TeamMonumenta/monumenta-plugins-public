@@ -2,16 +2,21 @@ package com.playmonumenta.plugins.adapters;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.mixinapi.v1.CustomMeleeAttackGoal;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.papermc.paper.adventure.PaperAdventure;
 import io.papermc.paper.util.CollisionUtil;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,13 +30,22 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -86,6 +100,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Drowned;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
@@ -830,6 +845,147 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 	}
 
 	@Override
+	public Entity spawnWorldlessEntity(EntityType type, World world) {
+		Optional<net.minecraft.world.entity.EntityType<?>> entityTypes = net.minecraft.world.entity.EntityType.byString(type.name().toLowerCase(Locale.ROOT));
+		if (entityTypes.isEmpty()) {
+			throw new IllegalArgumentException("Unknown entity type: " + type.name());
+		}
+		net.minecraft.world.entity.Entity entity = entityTypes.get().create(((CraftWorld) world).getHandle());
+		if (entity == null) {
+			throw new IllegalArgumentException("Failed to create entity of type: " + type.name());
+		}
+		return entity.getBukkitEntity();
+	}
+
+	@Override
+	public void spawnPlayerNametag(Player clientPlayer, Player targetPlayer, Set<Map.Entry<Entity, Entity>> entities) {
+		net.minecraft.world.entity.Entity mcTargetPlayer = ((CraftEntity) targetPlayer).getHandle();
+		net.minecraft.server.level.ServerPlayer mcClientPlayer = ((CraftPlayer) clientPlayer).getHandle();
+
+		// Some of these fields probably have to be zeroed
+		List<Packet<ClientGamePacketListener>> list = new ArrayList<>();
+		org.bukkit.Location targetLocation = targetPlayer.getLocation();
+
+		// add text displays
+		for (Map.Entry<Entity, Entity> e : entities) {
+			Entity entity = e.getKey();
+			net.minecraft.world.entity.Entity mcEntity = ((CraftEntity) entity).getHandle();
+			list.add(new ClientboundAddEntityPacket(
+				mcEntity.getId(),
+				mcEntity.getUUID(),
+				targetLocation.getX(),
+				targetLocation.getY(),
+				targetLocation.getZ(),
+				mcEntity.getXRot(),
+				mcEntity.getYRot(),
+				mcEntity.getType(),
+				0,
+				mcEntity.getDeltaMovement(),
+				mcEntity.getYHeadRot()
+			));
+			Packet<ClientGamePacketListener> packet = getEntityDataPacket(mcEntity);
+			if (packet != null) {
+				list.add(packet);
+			}
+
+			Entity entity2 = e.getValue();
+			net.minecraft.world.entity.Entity mcEntity2 = ((CraftEntity) entity2).getHandle();
+			list.add(new ClientboundAddEntityPacket(
+				mcEntity2.getId(),
+				mcEntity2.getUUID(),
+				targetLocation.getX(),
+				targetLocation.getY(),
+				targetLocation.getZ(),
+				mcEntity2.getXRot(),
+				mcEntity2.getYRot(),
+				mcEntity2.getType(),
+				0,
+				mcEntity2.getDeltaMovement(),
+				mcEntity2.getYHeadRot()
+			));
+			packet = getEntityDataPacket(mcEntity2);
+			if (packet != null) {
+				list.add(packet);
+			}
+		}
+
+		List<Entity> meow = new ArrayList<>();
+		for (Map.Entry<Entity, Entity> e : entities) {
+			Entity entity = e.getKey();
+			meow.add(entity);
+		}
+		list.add(getEntityPassengersPacket(mcTargetPlayer, meow.toArray(new Entity[0])));
+		for (Map.Entry<Entity, Entity> e : entities) {
+			Entity entity = e.getKey();
+			Entity entity2 = e.getValue();
+			net.minecraft.world.entity.Entity mcEntity = ((CraftEntity) entity).getHandle();
+			list.add(getEntityPassengersPacket(mcEntity, entity2));
+		}
+		mcClientPlayer.connection.send(new ClientboundBundlePacket(list));
+	}
+
+	@Override
+	public void removePlayerNametag(Player clientPlayer, Player targetPlayer, Entity ...targetEntities) {
+		IntList targetIds = new IntArrayList(targetEntities.length);
+		for (Entity targetEntity : targetEntities) {
+			targetIds.add(targetEntity.getEntityId());
+		}
+
+		net.minecraft.server.level.ServerPlayer mcClientPlayer = ((CraftPlayer) clientPlayer).getHandle();
+		List<Packet<ClientGamePacketListener>> list = new ArrayList<>();
+		list.add(new ClientboundRemoveEntitiesPacket(targetIds));
+		mcClientPlayer.connection.send(new ClientboundBundlePacket(list));
+	}
+
+	@Override
+	public void updatePlayerNametag(Player clientPlayer, Entity ...entities) {
+		List<Packet<ClientGamePacketListener>> list = new ArrayList<>();
+		net.minecraft.server.level.ServerPlayer mcClientPlayer = ((CraftPlayer) clientPlayer).getHandle();
+		for (Entity targetEntity : entities) {
+			net.minecraft.world.entity.Entity mcTargetEntity = ((CraftEntity) targetEntity).getHandle();
+
+			Packet<ClientGamePacketListener> packet = getEntityDataPacket(mcTargetEntity);
+			if (packet != null) {
+				list.add(packet);
+			}
+		}
+		if (!list.isEmpty()) {
+			// no need to bundle if there's only one packet
+			if (list.size() == 1) {
+				mcClientPlayer.connection.send(list.get(0));
+				return;
+			}
+			mcClientPlayer.connection.send(new ClientboundBundlePacket(list));
+		}
+	}
+
+	private @Nullable ClientboundSetEntityDataPacket getEntityDataPacket(net.minecraft.world.entity.Entity entity) {
+		SynchedEntityData synchedEntityData = entity.getEntityData();
+		// usb: accesswidener ftw
+		List<SynchedEntityData.DataValue<?>> list = synchedEntityData.packAll();
+		if (list != null) {
+			return new ClientboundSetEntityDataPacket(entity.getId(), list);
+		}
+		return null;
+	}
+
+	private ClientboundSetPassengersPacket getEntityPassengersPacket(net.minecraft.world.entity.Entity vehicle, Entity ...passengers) {
+		FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+		List<net.minecraft.world.entity.Entity> originalPassengers = vehicle.getPassengers();
+		IntList passengerIds = new IntArrayList();
+		for (net.minecraft.world.entity.Entity p : originalPassengers) {
+			passengerIds.add(p.getId());
+		}
+		for (Entity p : passengers) {
+			passengerIds.add(p.getEntityId());
+		}
+		buf.writeVarInt(vehicle.getId());
+		buf.writeVarIntArray(passengerIds.toIntArray());
+
+		return new ClientboundSetPassengersPacket(buf);
+  }
+    
+  @Override
 	public double getJumpVelocity(LivingEntity entity) {
 		net.minecraft.world.entity.LivingEntity e = ((CraftLivingEntity) entity).getHandle();
 		return e.getJumpPower();
