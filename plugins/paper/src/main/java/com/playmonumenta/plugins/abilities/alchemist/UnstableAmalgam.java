@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.UnstableAmalgamCS;
@@ -240,6 +241,7 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 			if (!EntityUtils.isBoss(mob)) {
 				if (isEnhanced()) {
 					mob.setVelocity(new Vector(0, verticalKnockback, 0));
+					BossManager.getInstance().entityKnockedAway(mob, verticalKnockback);
 				} else {
 					MovementUtils.knockAwayRealistic(loc, mob, horizontalKnockback, verticalKnockback, true);
 				}

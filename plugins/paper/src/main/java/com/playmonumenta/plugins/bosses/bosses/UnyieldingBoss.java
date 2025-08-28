@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
+
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -114,7 +115,9 @@ public class UnyieldingBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossKnockedAway(float speed) {
-		interrupt();
+		if(speed >= 2f) {
+			interrupt();
+		}
 	}
 }
 
