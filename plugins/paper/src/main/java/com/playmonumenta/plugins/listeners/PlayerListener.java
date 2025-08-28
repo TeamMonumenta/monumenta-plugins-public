@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.destroystokyo.paper.event.server.ServerTickEndEvent;
 import com.playmonumenta.plugins.Constants;
@@ -438,11 +439,11 @@ public class PlayerListener implements Listener {
 		// This prevents "ghost" loading crossbows, where the client thinks
 		// the button was held for long enough, but the server disagrees.
 		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
-			&& event.useItemInHand() != Event.Result.DENY
-			&& item != null
-			&& item.getType() == Material.CROSSBOW
-			&& item.getItemMeta() instanceof CrossbowMeta meta
-			&& meta.getChargedProjectiles().isEmpty()) {
+			    && event.useItemInHand() != Event.Result.DENY
+			    && item != null
+			    && item.getType() == Material.CROSSBOW
+			    && item.getItemMeta() instanceof CrossbowMeta meta
+			    && meta.getChargedProjectiles().isEmpty()) {
 			int slot = player.getInventory().getHeldItemSlot();
 			new BukkitRunnable() {
 				@Override
@@ -453,8 +454,8 @@ public class PlayerListener implements Listener {
 					}
 
 					if (slot != player.getInventory().getHeldItemSlot()
-						|| !item.equals(player.getActiveItem())
-						|| !player.isHandRaised()) {
+						    || !item.equals(player.getActiveItem())
+						    || !player.isHandRaised()) {
 						this.cancel();
 						player.updateInventory();
 						return;
@@ -471,12 +472,12 @@ public class PlayerListener implements Listener {
 
 		// Update inventory to handle virtual removal of depth strider while riptiding
 		if (player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING)
-			&& (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
-			&& event.useItemInHand() != Event.Result.DENY
-			&& item != null
-			&& item.getType() == Material.TRIDENT
-			&& item.containsEnchantment(Enchantment.RIPTIDE)
-			&& playerHasDepthStrider(player)) {
+			    && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
+			    && event.useItemInHand() != Event.Result.DENY
+			    && item != null
+			    && item.getType() == Material.TRIDENT
+			    && item.containsEnchantment(Enchantment.RIPTIDE)
+			    && playerHasDepthStrider(player)) {
 
 			Bukkit.getScheduler().runTask(mPlugin, () -> PlayerUtils.resendItems(player,
 				Stream.of(EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD)
@@ -563,9 +564,9 @@ public class PlayerListener implements Listener {
 	public void blockPlaceEventMonitor(BlockPlaceEvent event) {
 		// If replacing a light block in survival mode, place new light blocks around the replaced block to not suddenly make the area much darker
 		if (event.getPlayer().getGameMode() == GameMode.SURVIVAL
-			&& event.getBlockReplacedState().getType() == Material.LIGHT
-			&& event.getBlockReplacedState().getBlockData() instanceof Light light
-			&& light.getLevel() > light.getMinimumLevel()) {
+			    && event.getBlockReplacedState().getType() == Material.LIGHT
+			    && event.getBlockReplacedState().getBlockData() instanceof Light light
+			    && light.getLevel() > light.getMinimumLevel()) {
 			Light lowerAirLight = (Light) Bukkit.createBlockData(Material.LIGHT);
 			lowerAirLight.setLevel(light.getLevel() - 1);
 			Light lowerWaterLight = (Light) Bukkit.createBlockData(Material.LIGHT);
@@ -579,8 +580,8 @@ public class PlayerListener implements Listener {
 				if (relative.getType() == Material.AIR) {
 					relative.setBlockData(lowerAirLight, false);
 				} else if (relative.getType() == Material.WATER
-					&& relative.getBlockData() instanceof Levelled fluid
-					&& fluid.getLevel() == 0) { // 0 == full block of water
+					           && relative.getBlockData() instanceof Levelled fluid
+					           && fluid.getLevel() == 0) { // 0 == full block of water
 					relative.setBlockData(lowerWaterLight, false);
 				}
 			}
@@ -690,7 +691,7 @@ public class PlayerListener implements Listener {
 			}
 
 			if (!event.isCancelled()
-				&& EntityListener.INVISIBLE_ITEM_FRAME_NAME.equals(frame.getName())) {
+				    && EntityListener.INVISIBLE_ITEM_FRAME_NAME.equals(frame.getName())) {
 				Bukkit.getScheduler().runTask(mPlugin, () -> {
 					if (frame.isValid()) {
 						new NBTEntity(frame).setBoolean("Invisible", !ItemUtils.isNullOrAir(frame.getItem()));
@@ -732,14 +733,14 @@ public class PlayerListener implements Listener {
 		ItemStack previousItem = player.getInventory().getItem(event.getPreviousSlot());
 		ItemStack newItem = player.getInventory().getItem(event.getNewSlot());
 		if (((previousItem != null && previousItem.containsEnchantment(Enchantment.RIPTIDE)) || (newItem != null && newItem.containsEnchantment(Enchantment.RIPTIDE)))
-			&& playerHasDepthStrider(player)) {
+			    && playerHasDepthStrider(player)) {
 			Bukkit.getScheduler().runTask(mPlugin, player::updateInventory);
 		}
 	}
 
 	private boolean playerHasDepthStrider(Player player) {
 		return (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE)
-			&& Stream.of(EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD).anyMatch(slot -> player.getEquipment().getItem(slot).containsEnchantment(Enchantment.DEPTH_STRIDER));
+			       && Stream.of(EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD).anyMatch(slot -> player.getEquipment().getItem(slot).containsEnchantment(Enchantment.DEPTH_STRIDER));
 	}
 
 	// The player dropped an item.
@@ -932,7 +933,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void inventoryClickEventHighest(InventoryClickEvent event) {
 		if (event.getClick() == ClickType.SWAP_OFFHAND
-			&& event.getWhoClicked().getScoreboardTags().contains(ToggleSwap.SWAP_INVENTORY_TAG)) {
+			    && event.getWhoClicked().getScoreboardTags().contains(ToggleSwap.SWAP_INVENTORY_TAG)) {
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 		}
@@ -1071,8 +1072,8 @@ public class PlayerListener implements Listener {
 		}
 
 		if (command.startsWith("nbte")
-			|| command.startsWith("nbti")
-			|| command.startsWith("nbtp")) {
+		    || command.startsWith("nbti")
+		    || command.startsWith("nbtp")) {
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				ItemStack item = player.getEquipment().getItemInMainHand();
 				if (item.getAmount() > 0) {
@@ -1407,9 +1408,9 @@ public class PlayerListener implements Listener {
 		}
 
 		if (cause.equals(TeleportCause.CHORUS_FRUIT)
-			|| cause.equals(TeleportCause.END_GATEWAY)
-			|| cause.equals(TeleportCause.END_PORTAL)
-			|| cause.equals(TeleportCause.NETHER_PORTAL)) {
+			    || cause.equals(TeleportCause.END_GATEWAY)
+			    || cause.equals(TeleportCause.END_PORTAL)
+			    || cause.equals(TeleportCause.NETHER_PORTAL)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -1444,7 +1445,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void playerMoveEvent(PlayerMoveEvent event) {
 		if (event instanceof PlayerTeleportEvent
-			|| event.getFrom().getWorld() != event.getTo().getWorld()) {
+			    || event.getFrom().getWorld() != event.getTo().getWorld()) {
 			// Teleports handled in teleport listener. Movement between worlds should be a teleport, but better ignore it just in case.
 			return;
 		}
@@ -1456,14 +1457,14 @@ public class PlayerListener implements Listener {
 
 		// Don't allow moving into any blocks. Still allows moving within a block if somehow stuck in one.
 		BoundingBox fromBox = player.getBoundingBox()
-			.shift(player.getLocation().multiply(-1))
-			.shift(event.getFrom());
+			                      .shift(player.getLocation().multiply(-1))
+			                      .shift(event.getFrom());
 		BoundingBox toBox = player.getBoundingBox()
-			.shift(player.getLocation().multiply(-1))
-			.shift(event.getTo());
+			                    .shift(player.getLocation().multiply(-1))
+			                    .shift(event.getTo());
 		Set<Block> collidingBlocks = NmsUtils.getVersionAdapter().getCollidingBlocks(player.getWorld(), toBox, true);
 		if (!collidingBlocks.isEmpty()
-			&& !NmsUtils.getVersionAdapter().getCollidingBlocks(player.getWorld(), fromBox, true).containsAll(collidingBlocks)) {
+			    && !NmsUtils.getVersionAdapter().getCollidingBlocks(player.getWorld(), fromBox, true).containsAll(collidingBlocks)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -1547,7 +1548,7 @@ public class PlayerListener implements Listener {
 			BlockState state = testblock.getState();
 
 			if (testblock.getType().equals(Material.COMMAND_BLOCK)
-				&& state instanceof CommandBlock commandBlock) {
+			    && state instanceof CommandBlock commandBlock) {
 
 				String str = commandBlock.getCommand();
 
@@ -1659,10 +1660,10 @@ public class PlayerListener implements Listener {
 			 * If that task fires, trigger the extended sneak event and remove the metadata
 			 */
 			int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(mPlugin,
-				() -> {
-					mPlugin.mAbilityManager.playerExtendedSneakEvent(player);
-					player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
-				}, 20);
+					() -> {
+						mPlugin.mAbilityManager.playerExtendedSneakEvent(player);
+						player.removeMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, mPlugin);
+					}, 20);
 
 			player.setMetadata(Constants.PLAYER_SNEAKING_TASK_METAKEY, new FixedMetadataValue(mPlugin, taskId));
 		} else {
@@ -1799,8 +1800,8 @@ public class PlayerListener implements Listener {
 		// update any virtual items back into normal forms to prevent breaking them.
 		// Also update when switching away from creative or spectator to show virtual items again.
 		if (event.getNewGameMode() == GameMode.CREATIVE
-			|| (event.getPlayer().getGameMode() == GameMode.CREATIVE && event.getNewGameMode() != GameMode.SPECTATOR)
-			|| event.getPlayer().getGameMode() == GameMode.SPECTATOR) {
+			    || (event.getPlayer().getGameMode() == GameMode.CREATIVE && event.getNewGameMode() != GameMode.SPECTATOR)
+			    || event.getPlayer().getGameMode() == GameMode.SPECTATOR) {
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> event.getPlayer().updateInventory(), 1);
 		}
 	}
@@ -1810,7 +1811,7 @@ public class PlayerListener implements Listener {
 		// The inventory update initiated above takes a while,
 		// during which the virtual items can become broken anyway, so need to watch for these events as well
 		if ((event.getCurrentItem() != null && VirtualItemsReplacer.isVirtualItem(event.getCurrentItem()))
-			|| VirtualItemsReplacer.isVirtualItem(event.getCursor())) {
+			    || VirtualItemsReplacer.isVirtualItem(event.getCursor())) {
 			event.setCancelled(true);
 		}
 	}
@@ -1926,48 +1927,14 @@ public class PlayerListener implements Listener {
 		event.setCancelled(cancel);
 	}
 
-	private static final Set<DamageCause> DISABLE_KNOCKBACK_DAMAGE_CAUSES = Set.of(
-		DamageCause.CONTACT,
-		DamageCause.FALL,
-		DamageCause.FIRE,
-		DamageCause.FIRE_TICK,
-		DamageCause.LAVA,
-		DamageCause.VOID,
-		DamageCause.STARVATION,
-		DamageCause.POISON,
-		DamageCause.WITHER,
-		DamageCause.HOT_FLOOR);
 
 	private static final Set<DamageCause> SCALABLE_REGION_DAMAGE_CAUSES = Set.of(
 		DamageCause.FIRE_TICK,
 		DamageCause.LAVA
 	);
 
-	private final Set<UUID> mIgnoreKnockbackThisTick = new HashSet<>();
-	private final Set<UUID> mIgnoreKnockbackNextTick = new HashSet<>();
-	private int mKnockbackTaskId = -1;
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	public void entityDamageEvent(EntityDamageEvent event) {
-		if (event.getEntity() instanceof Player player
-			&& player.getNoDamageTicks() <= player.getMaximumNoDamageTicks() / 2.0f // can only take knockback again after half the iframes are over
-			&& DISABLE_KNOCKBACK_DAMAGE_CAUSES.contains(event.getCause())) {
-			mIgnoreKnockbackNextTick.add(player.getUniqueId());
-
-			// NB: The two sets are required because this task runs after the damage event, but before the velocity change event.
-			if (mKnockbackTaskId < 0 || !Bukkit.getScheduler().isQueued(mKnockbackTaskId)) {
-				mKnockbackTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(mPlugin, () -> {
-					mIgnoreKnockbackThisTick.clear();
-					mIgnoreKnockbackThisTick.addAll(mIgnoreKnockbackNextTick);
-					mIgnoreKnockbackNextTick.clear();
-					if (mIgnoreKnockbackThisTick.isEmpty()) {
-						Bukkit.getScheduler().cancelTask(mKnockbackTaskId);
-						mKnockbackTaskId = -1;
-					}
-				}, 0, 1);
-			}
-		}
-
 		// For Fire / Fall damage in R2 and R3, take more damage.
 		if (event.getEntity() instanceof Player player
 			&& SCALABLE_REGION_DAMAGE_CAUSES.contains(event.getCause())) {
@@ -1981,11 +1948,19 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	// Handles cancelled events to properly remove the player from the mIgnoreNextKnockback set even if the event has already been cancelled by another listener
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
-	public void playerVelocityEvent(PlayerVelocityEvent event) {
-		if (mIgnoreKnockbackThisTick.remove(event.getPlayer().getUniqueId())) {
-			event.setCancelled(true);
+	// Workaround to apply Y velocity after a jump due to stupid mojank (mainly for recoil) - usb
+	// See LivingEntity.jumpFromGround (this.setDeltaMovement) - https://discord.com/channels/313066655494438922/320923526133579776/1280335416905699422
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void playerJumpEvent(PlayerJumpEvent event) {
+		final Player player = event.getPlayer();
+		final Vector oldVelocity = player.getVelocity();
+		// Only reapply velocity in the same direction if it is greater than a normal player's jump
+		if (oldVelocity.getY() > NmsUtils.getVersionAdapter().getJumpVelocity(player)) {
+			player.getScheduler().run(mPlugin, (task) -> {
+				Vector velocityNow = player.getVelocity();
+				velocityNow.setY(oldVelocity.getY());
+				player.setVelocity(velocityNow);
+			}, null);
 		}
 	}
 
@@ -2001,9 +1976,9 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void entityShootBowEvent(EntityShootBowEvent event) {
 		if (event.getEntity() instanceof Player player
-			&& event.shouldConsumeItem()
-			&& event.getBow() != null
-			&& event.getBow().getType() == Material.BOW) {
+			    && event.shouldConsumeItem()
+			    && event.getBow() != null
+			    && event.getBow().getType() == Material.BOW) {
 			ArrowConsumeEvent arrowConsumeEvent = new ArrowConsumeEvent(player, event.getConsumable());
 			Bukkit.getPluginManager().callEvent(arrowConsumeEvent);
 			if (arrowConsumeEvent.isCancelled()) {
@@ -2019,10 +1994,10 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityShootBowEventMonitor(EntityShootBowEvent event) {
 		if (event.getEntity() instanceof Player player
-			&& event.getBow() != null
-			&& event.getBow().getType() == Material.CROSSBOW
-			&& event.getProjectile() instanceof AbstractArrow arrow
-			&& arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
+			    && event.getBow() != null
+			    && event.getBow().getType() == Material.CROSSBOW
+			    && event.getProjectile() instanceof AbstractArrow arrow
+			    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
 			ArrowConsumeEvent arrowConsumeEvent = new ArrowConsumeEvent(player, event.getConsumable());
 			Bukkit.getPluginManager().callEvent(arrowConsumeEvent);
 			if (arrowConsumeEvent.isCancelled()) {

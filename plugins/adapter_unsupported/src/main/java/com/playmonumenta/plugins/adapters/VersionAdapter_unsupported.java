@@ -206,4 +206,9 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	public void setHeadRotation(Entity bukkitEntity, float yaw, float pitch) {
 
 	}
+
+	@Override
+	public double getJumpVelocity(LivingEntity entity) {
+		return 0.0d;
+	}
 }

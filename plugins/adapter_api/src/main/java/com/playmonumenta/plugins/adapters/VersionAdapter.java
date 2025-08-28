@@ -200,4 +200,6 @@ public interface VersionAdapter {
 	void sendOpenSignPacket(Player player, int blockX, int blockY, int blockZ, boolean b);
 
 	void setHeadRotation(Entity bukkitEntity, float yaw, float pitch);
+
+	double getJumpVelocity(LivingEntity entity);
 }
