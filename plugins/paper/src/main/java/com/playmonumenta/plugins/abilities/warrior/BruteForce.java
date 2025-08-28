@@ -145,7 +145,7 @@ public final class BruteForce extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Performing a critical melee attack deals ")
 			.add(a -> a.mFlatDamage, BRUTE_FORCE_DAMAGE)
-			.add(" damage and applies knockback to the hit enemy and all enemies within a ")
+			.add(" damage and applies knockback to the hit enemy and all enemies within ")
 			.add(a -> a.mWaveRadius, BRUTE_FORCE_RADIUS)
 			.add(" blocks. Bosses do not take knockback.");
 	}

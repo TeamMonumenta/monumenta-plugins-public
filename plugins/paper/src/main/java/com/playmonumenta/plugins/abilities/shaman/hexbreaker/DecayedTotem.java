@@ -191,6 +191,6 @@ public class DecayedTotem extends TotemAbility {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Damage is now dealt twice as often, and the duration is increased to ")
 			.addDuration(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
-			.add(".");
+			.add(" seconds.");
 	}
 }

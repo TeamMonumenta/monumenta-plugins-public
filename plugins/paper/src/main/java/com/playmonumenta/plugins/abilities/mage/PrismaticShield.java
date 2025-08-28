@@ -205,7 +205,7 @@ public class PrismaticShield extends Ability {
 			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_1, false, Ability::isLevelOne)
 			.add(" absorption health which lasts up to ")
 			.addDuration(a -> a.mAbsorptionDuration, DURATION)
-			.add(". If damage taken would kill you but could have been prevented by up to ")
+			.add(" seconds. If damage taken would kill you but could have been prevented by up to ")
 			.add(a -> OVERKILL_PROTECTION_MULTIPLIER, OVERKILL_PROTECTION_MULTIPLIER)
 			.add(" times this skill's absorption, it will save you from death. In addition, enemies within ")
 			.add(a -> a.mRadius, RADIUS)

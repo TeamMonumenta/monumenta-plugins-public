@@ -247,7 +247,7 @@ public class MelancholicLament extends Ability {
 			.add(a -> a.mSilenceRadius, SILENCE_RADIUS)
 			.add(" blocks for ")
 			.addDuration(a -> a.mSilenceDuration, SILENCE_DURATION)
-			.add(".");
+			.add(" seconds.");
 	}
 
 	private static Description<MelancholicLament> getDescriptionEnhancement() {

@@ -314,7 +314,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Damage is increased to ")
 			.add(a -> a.mCrystalDamage, CRYSTAL_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(". The number of shots increased to ")
+			.add(". The number of shots is increased to ")
 			.add(a -> a.mTotalShots, SHOT_COUNT_2, false, Ability::isLevelTwo)
 			.add(". Stack decay rate is reduced to 1 stack per ")
 			.addDuration(a -> a.mStackDecayTime, STACK_DECAY_TIME_2, false, a -> a.isLevelTwo() && !a.isEnhanced())
@@ -332,7 +332,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 			.addDuration(a -> a.mSpeedDuration, SPEED_DURATION)
 			.add(" seconds. Decay rate is reduced to 1 stack per ")
 			.addDuration(a -> a.mStackDecayTime, STACK_DECAY_TIME_ENHANCE, false, Ability::isEnhanced)
-			.add(". Can now target outside of line of sight.")
+			.add(" seconds. Can now target outside of line of sight.")
 			.addCooldown(COOLDOWN);
 	}
 }
