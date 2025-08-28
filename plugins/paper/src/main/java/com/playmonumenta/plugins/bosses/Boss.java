@@ -16,9 +16,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Vex;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
@@ -178,6 +180,12 @@ public class Boss {
 	public void bossKnockedBackEntity(EntityKnockbackByEntityEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossKnockedBackEntity(event);
+		}
+	}
+
+	public void bossSummonedVex(CreatureSpawnEvent event, Vex vex) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossSummonedVex(event, vex);
 		}
 	}
 

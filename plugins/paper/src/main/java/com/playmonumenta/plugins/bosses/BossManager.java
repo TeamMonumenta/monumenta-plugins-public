@@ -325,6 +325,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(BefuddleBoss.identityTag, BefuddleBoss::new, new BefuddleBoss.Parameters());
 		registerStatelessBoss(ChargeManagerBoss.identityTag, ChargeManagerBoss::new, new ChargeManagerBoss.Parameters());
 		registerStatelessBoss(RegenerationPercentBoss.identityTag, RegenerationPercentBoss::new, new RegenerationPercentBoss.Parameters());
+		registerStatelessBoss(ReplaceVexBoss.identityTag, ReplaceVexBoss::new, new ReplaceVexBoss.Parameters());
 
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -871,6 +872,19 @@ public class BossManager implements Listener {
 		Boss boss = mBosses.get(event.getHitBy().getUniqueId());
 		if (boss != null) {
 			boss.bossKnockedBackEntity(event);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void vexSummoned(CreatureSpawnEvent event) {
+		if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPELL && event.getEntity() instanceof Vex vex) {
+			Mob summoner = vex.getSummoner();
+			if (summoner != null) {
+				Boss boss = mBosses.get(summoner.getUniqueId());
+				if (boss != null) {
+					boss.bossSummonedVex(event, vex);
+				}
+			}
 		}
 	}
 
