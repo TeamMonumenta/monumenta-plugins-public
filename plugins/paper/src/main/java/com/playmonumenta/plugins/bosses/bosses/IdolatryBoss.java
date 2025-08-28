@@ -82,7 +82,8 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 			|| EntityUtils.isSilenced(mBoss)
 			|| damagedEntity.getScoreboardTags().contains(identityTag)
 			|| damagedEntity.getScoreboardTags().contains(IDOLATRY_IMMUNE_TAG)
-			|| event.getAbility() == ClassAbility.COUP_DE_GRACE) {
+			|| event.getAbility() == ClassAbility.COUP_DE_GRACE
+			|| event.getDamager() == damagedEntity) {
 				return;
 		} // This event is called a LOT and has a LOT of if statements. someone very very experienced with the damage pipeline should optimise the order
 		// Note on the doubled proj and earrows damage: Projectile hits deal both a normal and a True damage pop, because of... iframes probably.
@@ -128,7 +129,6 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 		if (mHasNotInitiatedNextTickRunnable) {
 			new BukkitRunnable() {
 				@Override
-				@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 				public void run() {
 					ArrayList<Double> sortedEntityDamageMap = new ArrayList<>(mEntityDamageMap.values());
 					Collections.sort(sortedEntityDamageMap);

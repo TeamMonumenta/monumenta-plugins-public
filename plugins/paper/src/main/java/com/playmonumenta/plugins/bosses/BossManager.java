@@ -186,6 +186,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(JumpBoss.identityTag, JumpBoss::new, new JumpBoss.Parameters());
 		registerStatelessBoss(RebornBoss.identityTag, RebornBoss::new, new RebornBoss.Parameters());
 		registerStatelessBoss(DistanceCloserBoss.identityTag, DistanceCloserBoss::new);
+		registerStatelessBoss(DieIfAloneBoss.identityTag, DieIfAloneBoss::new, new DieIfAloneBoss.Parameters());
 		registerStatelessBoss(AuraEffectBoss.identityTag, AuraEffectBoss::new, new AuraEffectBoss.Parameters());
 		registerStatelessBoss(DummyDecoyBoss.identityTag, DummyDecoyBoss::new);
 		registerStatelessBoss(LaserBoss.identityTag, LaserBoss::new, new LaserBoss.Parameters());
@@ -858,7 +859,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler
 	public void bossExploded(EntityExplodeEvent event) {
 		Boss boss = mBosses.get(event.getEntity().getUniqueId());
 

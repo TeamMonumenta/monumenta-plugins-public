@@ -1,22 +1,17 @@
 package com.playmonumenta.plugins.delves.abilities;
 
-import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTTileEntity;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 
-import java.util.HashSet;
 
 public class Idolatry {
 
@@ -31,7 +26,8 @@ public class Idolatry {
 			Component.text("to produce a slow-moving Idol. While an enemy is within "),
 			Component.text("a 8 block radius of an alive Idol, some of the damage it"),
 			Component.text("takes will instead be redirected to the Idol."),
-			Component.text("Creepers and Delve Mobs do not respect Idols.")
+			Component.text("Creepers and Delve Mobs do not respect Idols."),
+			Component.text("Idols will slowly die without nearby mobs.")
 		};
 	}
 	// MetaData saves by location, so use PersistentData to handle PoI respawns and whatnot.
