@@ -78,7 +78,7 @@ public class ShieldBash extends Ability {
 		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SHIELD_BASH_STUN);
 		mParryDuration = CharmManager.getDuration(mPlayer, CHARM_PARRY_DURATION, ENHANCEMENT_BLOCKING_DURATION);
 		mCDR = ENHANCEMENT_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CDR);
-		mKnockback = CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK);
+		mKnockback = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, 0.35f);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldBashCS());
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mCounterStrike = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, CounterStrike.class);
@@ -133,7 +133,7 @@ public class ShieldBash extends Ability {
 	}
 
 	private void bash(LivingEntity le, ClassAbility ca) {
-		DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, mDamage, ca, true, true);
+		DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, mDamage, ca, true, false);
 		if (mKnockback != 0) {
 			MovementUtils.knockAway(mPlayer, le, (float) mKnockback);
 		}
