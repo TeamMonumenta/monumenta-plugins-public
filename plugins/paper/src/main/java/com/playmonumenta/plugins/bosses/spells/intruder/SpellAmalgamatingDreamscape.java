@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import com.playmonumenta.scriptedquests.growables.GrowableAPI;
@@ -395,9 +396,13 @@ public class SpellAmalgamatingDreamscape extends Spell {
 			.spawnAsBoss();
 
 		// Gets the topMost hostile mob from this boss to listen to the death event.
-		List<LivingEntity> prior = new ArrayList<>();
-		EntityUtils.getStackedMobsAbove(summon, prior);
-		mExaltedBoss = prior.get(prior.size() - 1);
+		List<LivingEntity> entityStack = new ArrayList<>();
+		EntityUtils.getStackedMobsAbove(summon, entityStack);
+		entityStack.removeIf(entity -> entity.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG));
+		if (entityStack.isEmpty()) {
+			MMLog.severe(String.format("Amalgamating Dreamscape failed to assign mExaltedBoss (%s) as all entities mounted on the summon have tag: '%s'!", MessagingUtils.plainText(summon.name()), EntityUtils.IGNORE_DEATH_TRIGGERS_TAG));
+		}
+		mExaltedBoss = entityStack.get(0);
 
 		EffectManager.getInstance().addEffect(summon, "AmalgamatingDreamscape",
 			new DamageImmunity(20, EnumSet.of(DamageEvent.DamageType.FALL)));
