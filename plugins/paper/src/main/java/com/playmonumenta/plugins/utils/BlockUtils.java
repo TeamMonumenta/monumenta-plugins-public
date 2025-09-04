@@ -574,6 +574,10 @@ public class BlockUtils {
 		return MaterialSetTag.CLIMBABLE.isTagged(material);
 	}
 
+	public static boolean isBouncy(Material material) {
+		return MaterialSetTag.BEDS.isTagged(material) || Material.SLIME_BLOCK.equals(material);
+	}
+
 	public static boolean canBeBroken(Block block) {
 		if (block.getType().getHardness() == -1.0F) {
 			return false;

@@ -45,6 +45,7 @@ import com.playmonumenta.plugins.protocollib.VirtualItemsReplacer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -1950,12 +1951,13 @@ public class PlayerListener implements Listener {
 
 	// Workaround to apply Y velocity after a jump due to stupid mojank (mainly for recoil) - usb
 	// See LivingEntity.jumpFromGround (this.setDeltaMovement) - https://discord.com/channels/313066655494438922/320923526133579776/1280335416905699422
+	// TODO: revisit when Paper has PlayerInputEvent to check if jump key was pressed
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerJumpEvent(PlayerJumpEvent event) {
 		final Player player = event.getPlayer();
 		final Vector oldVelocity = player.getVelocity();
 		// Only reapply velocity in the same direction if it is greater than a normal player's jump
-		if (oldVelocity.getY() > NmsUtils.getVersionAdapter().getJumpVelocity(player)) {
+		if (oldVelocity.getY() > NmsUtils.getVersionAdapter().getJumpVelocity(player) && !BlockUtils.isBouncy(event.getFrom().clone().add(0, -1, 0).getBlock().getType())) {
 			player.getScheduler().run(mPlugin, (task) -> {
 				Vector velocityNow = player.getVelocity();
 				velocityNow.setY(oldVelocity.getY());

@@ -984,7 +984,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 
 		return new ClientboundSetPassengersPacket(buf);
   }
-    
+
   @Override
 	public double getJumpVelocity(LivingEntity entity) {
 		net.minecraft.world.entity.LivingEntity e = ((CraftLivingEntity) entity).getHandle();
