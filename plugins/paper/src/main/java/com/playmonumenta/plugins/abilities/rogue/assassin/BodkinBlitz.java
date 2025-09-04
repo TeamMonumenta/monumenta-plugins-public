@@ -28,6 +28,8 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -73,6 +75,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	private @Nullable BukkitRunnable mRunnable = null;
 	private boolean mTeleporting = false;
 	private int mTicks;
+	private boolean mInterruptedTeleport = false;
 
 	private int mLastCastTicks = 0;
 	private final BodkinBlitzCS mCosmetic;
@@ -104,6 +107,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		mLastCastTicks = ticks;
 
 		mTeleporting = true;
+		mInterruptedTeleport = false;
 
 		World world = mPlayer.getWorld();
 		mCosmetic.blitzStartSound(world, loc);
@@ -142,11 +146,14 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					return;
 				}
 
-				// Teleport player
+				// Attempt to teleport player
 				mTick++;
 				if (mTick >= TELEPORT_TICKS) {
 					tpLoc.setDirection(mPlayer.getLocation().getDirection());
-					PlayerUtils.playerTeleport(mPlayer, tpLoc);
+					if (mPlayer.getWorld() == tpLoc.getWorld()
+						&& !mInterruptedTeleport) {
+						PlayerUtils.playerTeleport(mPlayer, tpLoc);
+					}
 
 					mTeleporting = false;
 
@@ -180,6 +187,21 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		}.runTaskTimer(mPlugin, 0, 1));
 
 		return true;
+	}
+
+	@Override
+	public void playerTeleportEvent(PlayerTeleportEvent event) {
+		if (event.getCause() != PlayerTeleportEvent.TeleportCause.PLUGIN
+			&& mTeleporting) {
+			mInterruptedTeleport = true;
+		}
+	}
+
+	@Override
+	public void playerDeathEvent(PlayerDeathEvent event) {
+		if (!event.isCancelled() && mTeleporting) {
+			mInterruptedTeleport = true;
+		}
 	}
 
 	@Override

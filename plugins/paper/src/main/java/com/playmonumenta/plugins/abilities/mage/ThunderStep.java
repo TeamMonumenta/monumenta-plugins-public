@@ -56,7 +56,7 @@ public class ThunderStep extends Ability {
 	public static final double CHECK_INCREMENT = 0.1;
 	public static final int COOLDOWN_TICKS = 20 * 20;
 
-	public static final double BACK_TELEPORT_MAX_DISTANCE = 64;
+	public static final double BACK_TELEPORT_MAX_DISTANCE = 128;
 	public static final int BACK_TELEPORT_MAX_DELAY = 3 * 20;
 	public static final int ENHANCEMENT_BONUS_DAMAGE_TIMER = 30 * 20;
 	public static final int ENHANCEMENT_PARALYZE_DURATION = 5 * 20;
