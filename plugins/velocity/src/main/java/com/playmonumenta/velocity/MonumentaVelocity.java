@@ -1,10 +1,8 @@
 package com.playmonumenta.velocity;
 
 import com.google.inject.Inject;
-import com.playmonumenta.velocity.commands.Rejoin;
 import com.playmonumenta.velocity.commands.Vote;
 import com.playmonumenta.velocity.handlers.JoinLeaveHandler;
-import com.playmonumenta.velocity.handlers.MonumentaReconnectHandler;
 import com.playmonumenta.velocity.integrations.LuckPermsIntegration;
 import com.playmonumenta.velocity.integrations.NetworkRelayIntegration;
 import com.playmonumenta.velocity.integrations.PremiumVanishIntegration;
@@ -56,7 +54,6 @@ public class MonumentaVelocity {
 	public MonumentaVelocityConfiguration mConfig = new MonumentaVelocityConfiguration(); // class with actual data
 
 	private @Nullable VoteManager mVoteManager = null;
-	private @Nullable MonumentaReconnectHandler mReconnectHandler = null;
 
 	@Inject
 	public MonumentaVelocity(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -73,7 +70,7 @@ public class MonumentaVelocity {
 	}
 
 	@Subscribe
-	public void proxyInitalizeEvent(ProxyInitializeEvent event) {
+	public void proxyInitializeEvent(ProxyInitializeEvent event) {
 		mLoaded = true;
 		final PluginManager plugins = mServer.getPluginManager();
 		final CommandManager commandManager = mServer.getCommandManager();
@@ -84,15 +81,6 @@ public class MonumentaVelocity {
 
 		if (plugins.isLoaded("luckperms")) {
 			new LuckPermsIntegration();
-		}
-
-		if (plugins.isLoaded("monumenta-redisapi")) {
-			mReconnectHandler = new MonumentaReconnectHandler(this);
-			mServer.getEventManager().register(this, mReconnectHandler);
-			CommandMeta rejoinCommandMeta = commandManager.metaBuilder("rejoin")
-				.plugin(this)
-				.build();
-			commandManager.register(rejoinCommandMeta, new Rejoin(mReconnectHandler));
 		}
 
 		if (plugins.isLoaded("monumenta-network-relay")) {
@@ -152,17 +140,11 @@ public class MonumentaVelocity {
 
 	@ConfigSerializable
 	public static class MonumentaVelocityConfiguration {
-		@Setting(value = "default_server")
-		public String mDefaultServer = "";
-
 		@Setting(value = "join_messages_enabled")
 		public boolean mJoinMessagesEnabled = true;
 
 		@Setting(value = "voting")
 		public MonumentaVoting mVoting = new MonumentaVoting();
-
-		@Setting(value = "excluded_servers")
-		public List<String> mExcludedServers = new ArrayList<>();
 
 		@Setting(value = "max_player_count")
 		public int mMaxPlayerCount = 400;
