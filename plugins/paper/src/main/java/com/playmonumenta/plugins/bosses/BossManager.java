@@ -129,6 +129,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(HandSwapBoss.identityTag, HandSwapBoss::new, new HandSwapBoss.Parameters());
 		registerStatelessBoss(UnstableBoss.identityTag, UnstableBoss::new, new UnstableBoss.Parameters());
 		registerStatelessBoss(BerserkerBoss.identityTag, BerserkerBoss::new);
+		registerStatelessBoss(NoProjectileLaunchBoss.identityTag, NoProjectileLaunchBoss::new);
 		registerStatelessBoss(SnowballDamageBoss.identityTag, SnowballDamageBoss::new, new SnowballDamageBoss.Parameters());
 		registerStatelessBoss(CorruptInfestedBoss.identityTag, CorruptInfestedBoss::new);
 		registerStatelessBoss(SpecterParticleBoss.identityTag, SpecterParticleBoss::new);

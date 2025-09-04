@@ -166,6 +166,17 @@ public class Phase {
 
 	}
 
+	public boolean onShoot(LivingEntity boss) {
+		List<Trigger> temp = mTriggers.stream()
+			.filter(trigger -> trigger.onShoot(boss))
+			.toList();
+
+		if (!temp.isEmpty()) {
+			runTest(temp, boss);
+			return true;
+		}
+		return false;
+	}
 
 	private void runTest(List<Trigger> triggers, LivingEntity boss) {
 		boolean runActions = true;

@@ -81,6 +81,10 @@ public abstract class Trigger {
 		return false;
 	}
 
+	public boolean onShoot(LivingEntity boss) {
+		return false;
+	}
+
 
 
 	public enum TriggerOperation {

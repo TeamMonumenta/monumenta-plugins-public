@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.bosses.parameters.phases.NearbyPlayersTrigger;
 import com.playmonumenta.plugins.bosses.parameters.phases.OnDamageTrigger;
 import com.playmonumenta.plugins.bosses.parameters.phases.OnDeathTrigger;
 import com.playmonumenta.plugins.bosses.parameters.phases.OnHurtTrigger;
+import com.playmonumenta.plugins.bosses.parameters.phases.OnShootTrigger;
 import com.playmonumenta.plugins.bosses.parameters.phases.OnSpawnTrigger;
 import com.playmonumenta.plugins.bosses.parameters.phases.Phase;
 import com.playmonumenta.plugins.bosses.parameters.phases.RandomAction;
@@ -218,6 +219,7 @@ public class Parser {
 		.put(HealthTrigger.IDENTIFIER, tokens -> parseObject(tokens, HealthTrigger.class, false))
 		.put(CustomTrigger.IDENTIFIER, tokens -> parseObject(tokens, CustomTrigger.class, false))
 		.put(FlagTrigger.IDENTIFIER, tokens -> parseObject(tokens, FlagTrigger.class, false))
+		.put(OnShootTrigger.IDENTIFIER, tokens -> Result.of(new OnShootTrigger()))
 		.build();
 
 
@@ -449,6 +451,9 @@ public class Parser {
 				(String) parameterMap.nonNullValue("key"),
 				(boolean) parameterMap.nonNullValue("startingState")
 			)))
+		.put(OnShootTrigger.class, () -> ObjectConstructor.builder()
+			.build(parameterMap -> new OnShootTrigger())
+		)
 		.put(AddAbilityAction.class, () -> ObjectConstructor.builder()
 			.put("ability", (tokens, parameters) -> parseAnyOf(tokens, BossManager.getStatelessBossNames(), "Ability Tag"))
 			.build(parameterMap -> new AddAbilityAction((String) parameterMap.nonNullValue("ability"))))
@@ -1262,7 +1267,7 @@ public class Parser {
 					Suggestion next = suggestions.next();
 					suggestions.set(Suggestion.of(next.until, next.body, String.format("%s: %s", name, next.tooltip)));
 				}
-				
+
 				e.suggestsMore(List.of(Suggestion.of(startingIndex, Optional.ofNullable(parameter.getValue()).map(Object::toString).orElse(""), name)));
 				throw e;
 			}
@@ -1455,7 +1460,7 @@ public class Parser {
 					}
 				}
 			}
-			
+
 			Collection<Tooltip<String>> tooltips = new ArrayList<>();
 			for (Suggestion.Single single : result) {
 				tooltips.add(Tooltip.ofString(single.body, single.tooltip));
