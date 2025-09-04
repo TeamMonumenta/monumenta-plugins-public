@@ -10,8 +10,10 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.CreatureSpawner;
-
+import org.bukkit.entity.Entity;
 
 public class Idolatry {
 
@@ -32,14 +34,14 @@ public class Idolatry {
 	}
 	// MetaData saves by location, so use PersistentData to handle PoI respawns and whatnot.
 	private static final String IDOLATRY_CHECK = "IdolatryCheck";
-	public static void applyModifiers(CreatureSpawner spawner, int level) {
+	public static void applyModifiers(CreatureSpawner spawner, Entity spawnEntity, int level) {
 		NBTCompound persistentDataContainer = new NBTTileEntity(spawner).getPersistentDataContainer();
 		if(persistentDataContainer.hasTag(IDOLATRY_CHECK)) {
 			return;
 		}
 		persistentDataContainer.setBoolean(IDOLATRY_CHECK, true);
 		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level) {
-			Location spawningLoc = spawner.getLocation().clone();
+			Location spawningLoc = spawnEntity.getLocation().clone();
 			// don't spawn directly in the mob, and try 20 times to find an open spot
 			for (int j = 0; j < 20; j++) {
 				double r = FastUtils.randomDoubleInRange(0.5, 1);
@@ -48,9 +50,12 @@ public class Idolatry {
 				double z = r * Math.sin(theta);
 
 				Location testLoc = spawningLoc.clone().add(x, 0, z);
+				Block spawnBlock = spawningLoc.getWorld().getBlockAt(testLoc);
 
-				if (spawner.getWorld().getBlockAt(testLoc).isPassable()) {
-					spawningLoc = testLoc.clone();
+				// Spawn in the center of a block with 0.3 variance
+				if (spawnBlock.isPassable() && spawnBlock.getRelative(BlockFace.UP).isPassable()) {
+					spawningLoc = spawnBlock.getLocation()
+						.add(FastUtils.randomDoubleInRange(-0.3, 0.3) + 0.5, 0, FastUtils.randomDoubleInRange(-0.3, 0.3) + 0.5);
 					break;
 				}
 			}
