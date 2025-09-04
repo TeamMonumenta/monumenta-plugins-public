@@ -420,6 +420,8 @@ public class CharmManager {
 			Crusade.CHARM_DURATION,
 			CleansingRain.CHARM_COOLDOWN,
 			CleansingRain.CHARM_RANGE,
+			CleansingRain.CHARM_HEALING,
+			CleansingRain.CHARM_HEALING_MAX_DEBUFFS,
 			CleansingRain.CHARM_REDUCTION,
 			CleansingRain.CHARM_DURATION,
 			HandOfLight.CHARM_COOLDOWN,
