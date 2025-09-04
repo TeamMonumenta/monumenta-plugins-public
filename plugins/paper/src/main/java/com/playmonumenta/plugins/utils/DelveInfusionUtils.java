@@ -53,7 +53,7 @@ public class DelveInfusionUtils {
 		MITOSIS("mitosis", InfusionType.MITOSIS, Location.CYAN, Material.CYAN_WOOL, "Feverish Flesh", NamespacedKeyUtils.fromString("epic:r2/delves/cyan/auxiliary/delve_material"), "Cyan"),
 		ARDOR("ardor", InfusionType.ARDOR, Location.PURPLE, Material.PURPLE_WOOL, "Despondent Doubloons", NamespacedKeyUtils.fromString("epic:r2/delves/purple/auxiliary/delve_material"), "Purple"),
 		EPOCH("epoch", InfusionType.EPOCH, Location.TEAL, Material.CYAN_CONCRETE_POWDER, "Weathered Runes", NamespacedKeyUtils.fromString("epic:r2/delves/teal/auxiliary/delve_material"), "Teal"),
-		NATANT("natant", InfusionType.NATANT, Location.SHIFTING, Material.BLUE_CONCRETE, "Primordial Clay", NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material"), "Fred"),
+		NATANT("natant", InfusionType.NATANT, Location.SHIFTING, Material.PRISMARINE_BRICKS, "Primordial Clay", NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material"), "Fred"),
 		UNDERSTANDING("understanding", InfusionType.UNDERSTANDING, Location.FORUM, Material.BOOKSHELF, "Binah Leaves", NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material"), "Forum"),
 
 		SOOTHING("soothing", InfusionType.SOOTHING, Location.BLUE, Material.BLUE_WOOL, "Sorceress' Staves", NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave"), "Blue"),
