@@ -54,7 +54,7 @@ public class WindBombCS implements CosmeticSkill {
 
 			@Override
 			public void run() {
-				world.playSound(loc, Sound.ENTITY_BREEZE_IDLE_GROUND, SoundCategory.PLAYERS, 5.0f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_BREEZE_IDLE_GROUND, SoundCategory.PLAYERS, 1.6f, 0.5f);
 				mTicks += 10;
 				if (mTicks >= enhancePullDuration) {
 					this.cancel();
