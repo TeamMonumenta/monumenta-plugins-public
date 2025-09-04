@@ -213,6 +213,7 @@ public class EntityUtils {
 	public static final String DONT_ENTER_BOATS_TAG = "boss_no_boat_riding";
 	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<>();
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<>();
+	private static final Map<LivingEntity, Integer> FROZEN_MOBS = new HashMap<>(); // Frozen is just stun but without the visuals
 	private static final Map<LivingEntity, Integer> SILENCED_MOBS = new HashMap<>();
 	private static @Nullable BukkitRunnable mobsTracker = null;
 
@@ -230,6 +231,7 @@ public class EntityUtils {
 
 				Iterator<Map.Entry<LivingEntity, Integer>> coolingIter = COOLING_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> stunnedIter = STUNNED_MOBS.entrySet().iterator();
+				Iterator<Map.Entry<LivingEntity, Integer>> frozenIter = FROZEN_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> silencedIter = SILENCED_MOBS.entrySet().iterator();
 
 				while (coolingIter.hasNext()) {
@@ -265,6 +267,21 @@ public class EntityUtils {
 					if (stunned.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
 						removeAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, STUN_ATTR_NAME);
 						stunnedIter.remove();
+					}
+				}
+
+				while (frozenIter.hasNext()) {
+					Map.Entry<LivingEntity, Integer> frozen = frozenIter.next();
+					LivingEntity mob = frozen.getKey();
+					frozen.setValue(frozen.getValue() - 1);
+
+					if (mob instanceof Vex || mob instanceof Flying) {
+						mob.setVelocity(new Vector(0, 0, 0));
+					}
+
+					if (frozen.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
+						removeAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, STUN_ATTR_NAME);
+						frozenIter.remove();
 					}
 				}
 
@@ -1076,14 +1093,19 @@ public class EntityUtils {
 	}
 
 	public static boolean isStunned(Entity mob) {
-		return STUNNED_MOBS.containsKey(mob);
+		return STUNNED_MOBS.containsKey(mob) || FROZEN_MOBS.containsKey(mob);
 	}
 
 	public static void removeStun(LivingEntity mob) {
 		STUNNED_MOBS.put(mob, 0);
+		FROZEN_MOBS.put(mob, 0);
 	}
 
 	public static void applyStun(Plugin plugin, int ticks, LivingEntity mob) {
+		applyStun(plugin, ticks, mob, true);
+	}
+
+	public static void applyStun(Plugin plugin, int ticks, LivingEntity mob, boolean stunVisuals) {
 		if (isCCImmuneMob(mob)) {
 			return;
 		}
@@ -1102,7 +1124,8 @@ public class EntityUtils {
 		}
 
 		// Only reduce speed if mob is not already in map
-		Integer t = STUNNED_MOBS.get(mob);
+		Map<LivingEntity, Integer> mobMap = stunVisuals ? STUNNED_MOBS : FROZEN_MOBS;
+		Integer t = mobMap.get(mob);
 		if (t == null) {
 			addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(STUN_ATTR_NAME, -1, Operation.MULTIPLY_SCALAR_1));
 			if (mob instanceof Mob m) {
@@ -1110,7 +1133,7 @@ public class EntityUtils {
 			}
 		}
 		if (t == null || t < ticks) {
-			STUNNED_MOBS.put(mob, ticks);
+			mobMap.put(mob, ticks);
 		}
 	}
 
@@ -1194,6 +1217,7 @@ public class EntityUtils {
 			return;
 		}
 
+		applyStun(plugin, ticks, mob, false); // Freeze should apply a stun effect to cancel mob spells
 		plugin.mEffectManager.addEffect(mob, "Frozen", new Frozen(ticks));
 	}
 

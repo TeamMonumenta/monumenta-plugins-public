@@ -40,8 +40,8 @@ public class Spellshock extends Ability {
 	public static final ClassAbility ENHANCE_THUNDER = ClassAbility.SPELLSHOCK_THUNDER;
 
 	/* These are also used by Elemental Arrows */
-	public static final int ENHANCEMENT_EFFECT_DURATION = Constants.TICKS_PER_SECOND * 6;
-	public static final int ENHANCE_LIGHTNING_DAMAGE = 4;
+	public static final int ENHANCEMENT_EFFECT_DURATION = Constants.TICKS_PER_SECOND * 3;
+	public static final int ENHANCE_LIGHTNING_DAMAGE = 3;
 	public static final int ENHANCE_LIGHTNING_RANGE = 7;
 
 	private static final String DAMAGED_THIS_TICK_METAKEY = "SpellshockDamagedThisTick";

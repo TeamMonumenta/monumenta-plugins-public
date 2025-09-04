@@ -318,6 +318,8 @@ public class CharmManager {
 			MagmaShield.CHARM_FIRE_BONUS,
 			MagmaShield.CHARM_ABILITY_BONUS,
 			MagmaShield.CHARM_DAMAGE_BONUS_DURATION,
+			MagmaShield.CHARM_ENHANCE_DAMAGE,
+			MagmaShield.CHARM_CHARGES,
 			ArcaneStrike.CHARM_DAMAGE,
 			ArcaneStrike.CHARM_RADIUS,
 			ArcaneStrike.CHARM_BONUS,

@@ -38,7 +38,7 @@ public class FrostNova extends Ability {
 	public static final double ELITE_SLOW_MULTIPLIER_REDUCTION = 0.1;
 	public static final double ENHANCED_DAMAGE_MODIFIER = 1.15;
 	public static final int DURATION_TICKS = 4 * Constants.TICKS_PER_SECOND;
-	public static final int ENHANCED_FROZEN_DURATION = 1 * Constants.TICKS_PER_SECOND;
+	public static final int ENHANCED_FROZEN_DURATION = 2 * Constants.TICKS_PER_SECOND;
 	public static final int COOLDOWN_TICKS_1 = 18 * Constants.TICKS_PER_SECOND;
 	public static final int COOLDOWN_TICKS_2 = 16 * Constants.TICKS_PER_SECOND;
 	public static final int ENHANCED_COOLDOWN_TICKS = 1 * Constants.TICKS_PER_SECOND;
@@ -154,7 +154,7 @@ public class FrostNova extends Ability {
 			.addPercent(ENHANCED_DAMAGE_MODIFIER - 1)
 			.add(". Non elites and bosses are frozen for ")
 			.addDuration(a -> a.mFrozenDuration, ENHANCED_FROZEN_DURATION)
-			.add(" second, having their AI and gravity removed and gain 100% Anti-Heal. Cooldown is further reduced by ")
+			.add(" seconds, having their AI and gravity removed and gain 100% Anti-Heal. Cooldown is further reduced by ")
 			.addDuration(ENHANCED_COOLDOWN_TICKS)
 			.add(" second.");
 	}

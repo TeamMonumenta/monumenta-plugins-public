@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import java.util.EnumSet;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -37,7 +38,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-
 public class ArcaneStrike extends Ability {
 	private static final float RADIUS = 4.0f;
 	private static final int DAMAGE_1 = 4;
@@ -47,12 +47,16 @@ public class ArcaneStrike extends Ability {
 	private static final int BONUS_DAMAGE_1 = 2;
 	private static final int BONUS_DAMAGE_2 = 3;
 	private static final double ENHANCEMENT_DAMAGE_MULTIPLIER = 1.15;
+	private static final double ENHANCEMENT_WEAKNESS_POTENCY = 0.2;
+	private static final int ENHANCEMENT_WEAKNESS_DURATION = Constants.TICKS_PER_SECOND * 8;
 	private static final int COOLDOWN = 5 * 20;
 
 	public static final String CHARM_DAMAGE = "Arcane Strike Damage";
 	public static final String CHARM_RADIUS = "Arcane Strike Radius";
 	public static final String CHARM_BONUS = "Arcane Strike Bonus Damage";
 	public static final String CHARM_COOLDOWN = "Arcane Strike Cooldown";
+	public static final String CHARM_WEAKEN_POTENCY = "Arcane Strike Weakness Potency";
+	public static final String CHARM_WEAKEN_DURATION = "Arcane Strike Weakness Duration";
 
 	public static final AbilityInfo<ArcaneStrike> INFO =
 		new AbilityInfo<>(ArcaneStrike.class, "Arcane Strike", ArcaneStrike::new)
@@ -69,6 +73,8 @@ public class ArcaneStrike extends Ability {
 	private final double mDamageBonusAffected;
 	private final double mRadius;
 	private final double mWandScaling;
+	private final double mWeakenPotency;
+	private final int mWeakenDuration;
 
 	private final ArcaneStrikeCS mCosmetic;
 
@@ -78,6 +84,8 @@ public class ArcaneStrike extends Ability {
 		mDamageBonusAffected = CharmManager.calculateFlatAndPercentValue(player, CHARM_BONUS, isLevelOne() ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2);
 		mRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, RADIUS);
 		mWandScaling = isLevelOne() ? WAND_SCALING_1 : WAND_SCALING_2;
+		mWeakenPotency = ENHANCEMENT_WEAKNESS_POTENCY + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN_POTENCY);
+		mWeakenDuration = CharmManager.getDuration(mPlayer, CHARM_WEAKEN_DURATION, ENHANCEMENT_WEAKNESS_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ArcaneStrikeCS());
 	}
 
@@ -126,6 +134,10 @@ public class ArcaneStrike extends Ability {
 			mCosmetic.onStrike(mPlugin, mPlayer, world, enemyLoc, loc, mRadius);
 
 			if (isEnhanced()) {
+				// Weakness Effect
+				EntityUtils.applyWeaken(mPlugin, mWeakenDuration, mWeakenPotency, enemy,
+					EnumSet.of(DamageType.MELEE, DamageType.PROJECTILE, DamageType.MAGIC, DamageType.BLAST, DamageType.FIRE));
+
 				//Visual feedback
 				ItemStack item = mPlayer.getInventory().getItemInMainHand();
 
@@ -196,7 +208,11 @@ public class ArcaneStrike extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The damage is increased by ")
 			.addPercent(ENHANCEMENT_DAMAGE_MULTIPLIER - 1)
-			.add(". Your enchantment on-hit effects are now also applied to all other enemies hit in the radius.");
+			.add(". Your enchantment on-hit effects are now also applied to all other enemies hit in the radius. Additionally, apply a ")
+			.addPercent(a -> a.mWeakenPotency, ENHANCEMENT_WEAKNESS_POTENCY)
+			.add(" weaken effect to the hit mob that lasts for ")
+			.addDuration(a -> a.mWeakenDuration, ENHANCEMENT_WEAKNESS_DURATION)
+			.add(" seconds and applies to melee, projectile, magic, blast, and fire damage.");
 	}
 
 }
