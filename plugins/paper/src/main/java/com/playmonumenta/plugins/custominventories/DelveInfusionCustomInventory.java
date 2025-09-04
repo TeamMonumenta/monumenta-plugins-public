@@ -193,7 +193,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			if (infusion.isUnlocked(player)) {
 				mInventory.setItem(place, mDelvePanelList.get(infusion));
 				mMapFunction.put(place, (p, inventory, slot) -> {
-					attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion, mDelveInfusionMaterial);
+					attemptInfusion(p, infusedItem, infusion, mDelveInfusionMaterial);
 					mSlotSelected = null;
 				});
 			}
@@ -253,7 +253,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 					mInventory.setItem((row * 9), mRefundItem);
 
 					mMapFunction.put((row * 9), (p, inventory, slot) -> {
-						DelveInfusionUtils.refundInfusion(player.getEquipment().getItem(equipmentSlot), p);
+						DelveInfusionUtils.refundInfusion(item, p);
 					});
 
 					//load the infusion.
@@ -278,7 +278,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 							"You will need " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[level] + " " + delveInfusionMaterial.mItemNamePlural + ", " + DelveInfusionUtils.MAT_COST_PER_INFUSION[level] + " " + infusion.getDelveMatPlural() + ", and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY);
 						mInventory.setItem(slot, infuseItem);
 						mMapFunction.put(slot, (p, inventory, slotClicked) -> {
-							attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion, delveInfusionMaterial);
+							attemptInfusion(p, item, infusion, delveInfusionMaterial);
 						});
 					} else {
 						//Max level reached
@@ -310,7 +310,12 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 						"The first Delve Infusion level costs " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[0] + " " + materials + ", " + DelveInfusionUtils.MAT_COST_PER_INFUSION[0] + " corresponding Delve Materials, and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY);
 					mInventory.setItem((row * 9) + 2 + 4, infuseItem);
 					mMapFunction.put((row * 9) + 2 + 4, (p, inventory, slot) -> {
-						mSlotSelected = equipmentSlot;
+						//check if item in the slot is the same on GUI open and on GUI click, if not, reload the GUI
+						if (item.isSimilar(player.getEquipment().getItem(equipmentSlot))) {
+							mSlotSelected = equipmentSlot;
+						} else {
+							mSlotSelected = null;
+						}
 					});
 				}
 			} else {
