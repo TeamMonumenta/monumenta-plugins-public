@@ -49,7 +49,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 	private static final double AMPLIFIER_2 = 0.3;
 	private static final int PULL_DAMAGE = 3;
 	private static final int CLEAVE_FLAT_DAMAGE = 4;
-	private static final double CLEAVE_PERCENT_DAMAGE = 0.1;
+	private static final double CLEAVE_PERCENT_DAMAGE = 0.3;
 	private static final int CLEAVE_RADIUS = 3;
 	private static final int CLEAVE_WINDOW = 4 * 20;
 	private static final int DURATION = 8 * 20;
@@ -66,7 +66,8 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 	public static final String CHARM_PULL_RADIUS = "Grasping Claws Pull Radius";
 	public static final String CHARM_SLOW = "Grasping Claws Slowness Amplifier";
 	public static final String CHARM_SLOW_DURATION = "Grasping Claws Slowness Duration";
-	public static final String CHARM_CLEAVE_DAMAGE = "Grasping Claws Cleave Damage";
+	public static final String CHARM_CLEAVE_FLAT_DAMAGE = "Grasping Claws Cleave Flat Damage";
+	public static final String CHARM_CLEAVE_PERCENT_DAMAGE = "Grasping Claws Cleave Percent Damage";
 	public static final String CHARM_CLEAVE_RADIUS = "Grasping Claws Cleave Radius";
 	public static final String CHARM_CAGE_RADIUS = "Grasping Claws Cage Radius";
 	public static final String CHARM_CAGE_HEALING = "Grasping Claws Cage Healing";
@@ -107,8 +108,8 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 		mSlowDuration = CharmManager.getDuration(mPlayer, CHARM_SLOW_DURATION, DURATION);
 		mPullDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_PULL_DAMAGE, PULL_DAMAGE);
 		mPullRadius = CharmManager.getRadius(mPlayer, CHARM_PULL_RADIUS, PULL_RADIUS);
-		mCleaveDamageFlat = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CLEAVE_DAMAGE, CLEAVE_FLAT_DAMAGE);
-		mCleaveDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CLEAVE_DAMAGE, CLEAVE_PERCENT_DAMAGE);
+		mCleaveDamageFlat = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CLEAVE_FLAT_DAMAGE, CLEAVE_FLAT_DAMAGE);
+		mCleaveDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CLEAVE_PERCENT_DAMAGE, CLEAVE_PERCENT_DAMAGE);
 		mCleaveRadius = CharmManager.getRadius(player, CHARM_CLEAVE_RADIUS, CLEAVE_RADIUS);
 		mCageRadius = CharmManager.getRadius(player, CHARM_CAGE_RADIUS, CAGE_RADIUS);
 		mCageHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_CAGE_HEALING, HEAL_AMOUNT);

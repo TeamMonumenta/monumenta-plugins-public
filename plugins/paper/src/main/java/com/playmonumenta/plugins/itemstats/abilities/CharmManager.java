@@ -808,7 +808,8 @@ public class CharmManager {
 			GraspingClaws.CHARM_PULL_RADIUS,
 			GraspingClaws.CHARM_SLOW,
 			GraspingClaws.CHARM_SLOW_DURATION,
-			GraspingClaws.CHARM_CLEAVE_DAMAGE,
+			GraspingClaws.CHARM_CLEAVE_FLAT_DAMAGE,
+			GraspingClaws.CHARM_CLEAVE_PERCENT_DAMAGE,
 			GraspingClaws.CHARM_CLEAVE_RADIUS,
 			GraspingClaws.CHARM_CAGE_RADIUS,
 			GraspingClaws.CHARM_CAGE_HEALING,
@@ -1422,7 +1423,6 @@ public class CharmManager {
 	 * @param charmType The type of the charm.
 	 * @return A TreeMap sorted on effect name, representing a summary of all the <code>charmType</code> charm attributes of this player
 	 * @see CharmManager#getSummaryOfAllAttributesAsComponents(Player, CharmType)
-	 * @see com.playmonumenta.plugins.managers.DataCollectionManager.PlayerInformation#PlayerInformation(String, Player)
 	 */
 	@Contract(value = "_, _ -> !null", pure = true)
 	public @NonNull Map<String, Double> getSummaryOfAllAttributes(Player p, CharmType charmType) {
