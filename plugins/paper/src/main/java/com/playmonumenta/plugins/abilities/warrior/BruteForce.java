@@ -35,7 +35,7 @@ public final class BruteForce extends Ability {
 	private static final float BRUTE_FORCE_RADIUS = 2.0f;
 	private static final int BRUTE_FORCE_DAMAGE = 2;
 	private static final double BRUTE_FORCE_2_MODIFIER = 0.1;
-	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.7f;
+	private static final float BRUTE_FORCE_KNOCKBACK_SPEED = 0.45f;
 	private static final double ENHANCEMENT_DAMAGE_RATIO = 0.75;
 	private static final int ENHANCEMENT_DELAY = HALF_TICKS_PER_SECOND;
 
