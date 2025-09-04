@@ -25,6 +25,7 @@ import org.bukkit.Nameable;
 import org.bukkit.World;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
@@ -331,40 +332,7 @@ public class GuildPlotUtils {
 			return false;
 		}
 
-		InventoryHolder holder = inventory.getHolder();
-		if (player.equals(holder)) {
-			return false;
-		}
-
-		if (holder instanceof Nameable nameable) {
-			Component customName = nameable.customName();
-
-			if (
-				customName != null
-					&& holder instanceof Barrel
-					&& MessagingUtils.plainText(customName).equals("Sharrel")
-			) {
-				return false;
-			}
-
-			if (
-				customName != null
-					&& holder instanceof Chest
-					&& MessagingUtils.plainText(customName).equals("Community Chest")
-			) {
-				return false;
-			}
-		}
-
-		if (inventory.equals(player.getEnderChest())) {
-			return false;
-		}
-
-		return !(
-			inventory instanceof CraftingInventory
-				|| inventory instanceof LoomInventory
-				|| inventory instanceof PlayerInventory
-		);
+		return inventoryIsNotAlwaysAllowed(player, inventory);
 	}
 
 	/**
@@ -404,9 +372,36 @@ public class GuildPlotUtils {
 			return false;
 		}
 
+		return inventoryIsNotAlwaysAllowed(player, inventory);
+	}
+
+	public static boolean inventoryIsNotAlwaysAllowed(Player player, Inventory inventory) {
 		InventoryHolder holder = inventory.getHolder();
 		if (player.equals(holder)) {
 			return false;
+		}
+
+		if (
+			holder instanceof DoubleChest doubleChest &&
+				// These checks could be null for virtual inventories, or non-chests for plugin/mod shenanigans
+				doubleChest.getLeftSide() instanceof Chest left &&
+				doubleChest.getRightSide() instanceof Chest right
+		) {
+			Component customName;
+			// In future versions, Northwest (negative-most coordinate) chest's name is used if set, otherwise Southeast if set
+			// In this version, though, left always wins first.
+			customName = left.customName();
+			if (customName == null) {
+				// Not set, use right
+				customName = right.customName();
+			}
+
+			if (
+				customName != null
+					&& MessagingUtils.plainText(customName).equals("Community Chest")
+			) {
+				return false;
+			}
 		}
 
 		if (holder instanceof Nameable nameable) {
