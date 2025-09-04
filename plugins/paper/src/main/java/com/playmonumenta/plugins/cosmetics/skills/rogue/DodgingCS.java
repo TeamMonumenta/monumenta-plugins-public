@@ -31,9 +31,4 @@ public class DodgingCS implements CosmeticSkill {
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1, 1.35f);
 	}
-
-	public void deflectTrailEffect(Player mPlayer, Location particleLocation) {
-		new PartialParticle(Particle.VILLAGER_HAPPY, particleLocation, 3, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CLOUD, particleLocation, 6, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(mPlayer);
-	}
 }

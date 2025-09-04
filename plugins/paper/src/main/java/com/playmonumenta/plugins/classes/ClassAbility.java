@@ -51,6 +51,7 @@ public enum ClassAbility {
 	BY_MY_BLADE("By My Blade"),
 	DAGGER_THROW("Dagger Throw"),
 	DODGING("Dodging"),
+	MAGIC_DODGING("Magic Dodging"),
 	SKIRMISHER("Skirmisher"),
 	ESCAPE_DEATH("Escape Death"),
 	SMOKESCREEN("Smokescreen"),

@@ -68,11 +68,6 @@ public class AstralWeaverCS extends DodgingCS {
 		new PartialParticle(Particle.VILLAGER_HAPPY, loc, 3, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(player);
 	}
 
-	@Override
-	public void deflectTrailEffect(Player player, Location particleLocation) {
-		drawParticle(player, particleLocation, 4);
-	}
-
 	private void drawParticle(Player player, Location loc, int countMultiplier) {
 		switch (FastUtils.randomIntInRange(0, 5)) {
 			case 0 ->

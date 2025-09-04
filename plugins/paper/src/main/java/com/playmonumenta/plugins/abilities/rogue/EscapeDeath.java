@@ -11,14 +11,12 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.EscapeDeathCS;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
+import com.playmonumenta.plugins.effects.EscapeDeathEliteHunt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.*;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,10 +28,13 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public class EscapeDeath extends Ability {
 
 	private static final double TRIGGER_THRESHOLD_HEALTH = 10;
 	private static final int RANGE = 5;
+	private static final int ELITE_HUNT_RANGE = 8;
 	private static final int STUN_DURATION = 20 * 3;
 	private static final int BUFF_DURATION = 20 * 8;
 	private static final int ABSORPTION_HEALTH = 4;
@@ -41,9 +42,12 @@ public class EscapeDeath extends Ability {
 	private static final String PERCENT_SPEED_EFFECT_NAME = "EscapeDeathPercentSpeedEffect";
 	private static final int JUMP_BOOST_AMPLIFIER = 2;
 	private static final int COOLDOWN = 60 * 20;
-	private static final int ENHANCEMENT_DURATION = 4 * 20;
-	private static final double ENHANCEMENT_HEAL_PERCENT = 0.05;
+	private static final int ENHANCEMENT_HEAL_DURATION = 5 * 20;
+	private static final int ENHANCEMENT_HUNT_DURATION = 6 * 20;
+	private static final double ENHANCEMENT_REGEN_HEAL_PERCENT = 0.05;
+	private static final double ENHANCEMENT_HUNT_HEAL_PERCENT = 1.00;
 	private static final String ESCAPE_DEATH_ENHANCEMENT_REGEN = "EscapeDeathEnhancementRegenEffect";
+	private static final String ESCAPE_DEATH_ENHANCEMENT_ELITE_DEBUFF = "EscapeDeathEliteHuntEffect";
 
 	private static final String DISABLE_JUMP_BOOST_TAG = "EscapeDeathNoJumpBoost";
 
@@ -53,8 +57,11 @@ public class EscapeDeath extends Ability {
 	public static final String CHARM_DURATION = "Escape Death Buff Duration";
 	public static final String CHARM_COOLDOWN = "Escape Death Cooldown";
 	public static final String CHARM_RADIUS = "Escape Death Radius";
+	public static final String CHARM_HUNT_RADIUS = "Escape Death Elite Hunt Radius";
 	public static final String CHARM_STUN_DURATION = "Escape Death Stun Duration";
 	public static final String CHARM_HEALING = "Escape Death Healing";
+	public static final String CHARM_ELITE_HEALING = "Escape Death Elite Hunt Healing";
+	public static final String CHARM_ELITE_HUNT_DURATION = "Escape Death Elite Hunt Duration";
 	public static final String CHARM_REGENERATION_DURATION = "Escape Death Regeneration Duration";
 
 	public static final AbilityInfo<EscapeDeath> INFO =
@@ -75,9 +82,12 @@ public class EscapeDeath extends Ability {
 	private final int mJumpBoost;
 	private final int mDuration;
 	private final double mRadius;
+	private final double mHuntRadius;
 	private final int mStunDuration;
 	private final double mHealing;
+	private final double mHuntHealing;
 	private final int mRegenDuration;
+	private final int mHuntDuration;
 	private final EscapeDeathCS mCosmetic;
 
 	public EscapeDeath(Plugin plugin, Player player) {
@@ -87,9 +97,12 @@ public class EscapeDeath extends Ability {
 		mJumpBoost = JUMP_BOOST_AMPLIFIER + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, BUFF_DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RANGE);
+		mHuntRadius = CharmManager.getRadius(mPlayer, CHARM_HUNT_RADIUS, ELITE_HUNT_RANGE);
 		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, STUN_DURATION);
-		mHealing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, ENHANCEMENT_HEAL_PERCENT);
-		mRegenDuration = CharmManager.getDuration(mPlayer, CHARM_REGENERATION_DURATION, ENHANCEMENT_DURATION);
+		mHealing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, ENHANCEMENT_REGEN_HEAL_PERCENT);
+		mHuntHealing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ELITE_HEALING, ENHANCEMENT_HUNT_HEAL_PERCENT);
+		mHuntDuration = CharmManager.getDuration(mPlayer, CHARM_ELITE_HUNT_DURATION, ENHANCEMENT_HUNT_DURATION);
+		mRegenDuration = CharmManager.getDuration(mPlayer, CHARM_REGENERATION_DURATION, ENHANCEMENT_HEAL_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EscapeDeathCS());
 	}
 
@@ -104,14 +117,6 @@ public class EscapeDeath extends Ability {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (mPlugin.mEffectManager.hasEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN)
-			    && !event.isBlocked()
-			    && event.getSource() != null
-			    && EntityUtils.isHostileMob(event.getSource())
-			    && event.getType() != DamageEvent.DamageType.TRUE) {
-			mPlugin.mEffectManager.clearEffects(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN);
-		}
-
 		if (!event.isBlocked() && !isOnCooldown()) {
 			double newHealth = mPlayer.getHealth() - event.getFinalDamage(true);
 			boolean dealDamageLater = newHealth < 0 && newHealth > -mAbsorptionHealth && isLevelTwo();
@@ -143,11 +148,18 @@ public class EscapeDeath extends Ability {
 				}
 
 				if (isEnhanced()) {
-					// This check ensures that no "dupe" regeneration runnables occurs.
-					// If escape death somehow "double procs", simply reset the ticks variable.
-					mPlugin.mEffectManager.addEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN,
-						new CustomRegeneration(mRegenDuration, mHealing *
-							EntityUtils.getMaxHealth(mPlayer), mPlugin).deleteOnAbilityUpdate(true));
+					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), mHuntRadius);
+					mobs.removeIf(mob -> !(EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)));
+
+					if (mobs.isEmpty()) { // If no elite mobs in range
+						mPlugin.mEffectManager.addEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN,
+							new CustomRegeneration(mRegenDuration, mHealing *
+								EntityUtils.getMaxHealth(mPlayer), mPlugin).deleteOnAbilityUpdate(true));
+					} else { // There is an elite or multiple, afflict random one with the hunt effect
+						Entity randomElite = mobs.get(FastUtils.randomIntInRange(0, mobs.size() - 1));
+						mPlugin.mEffectManager.addEffect(randomElite, ESCAPE_DEATH_ENHANCEMENT_ELITE_DEBUFF,
+							new EscapeDeathEliteHunt(mHuntDuration, mPlayer, mHuntHealing));
+					}
 				}
 
 				Location loc = mPlayer.getLocation();
@@ -200,10 +212,16 @@ public class EscapeDeath extends Ability {
 
 	private static Description<EscapeDeath> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("When this ability is triggered, you gain a regenerating effect that heals you for ")
-			.addPercent(a -> a.mHealing, ENHANCEMENT_HEAL_PERCENT)
+			.add("When this ability is triggered, an Elite mob within ")
+			.add(a -> a.mHuntRadius, ELITE_HUNT_RANGE)
+			.add(" blocks will glow for ")
+			.addDuration(a -> a.mHuntDuration, ENHANCEMENT_HUNT_DURATION)
+			.add(" seconds. Killing this glowing Elite will heal for ")
+			.addPercent(a -> a.mHuntHealing, ENHANCEMENT_HUNT_HEAL_PERCENT)
+			.add(" of your max health and cleanse any debuffs. If there are no Elite mobs then instead gain a regenerating effect that heals for ")
+			.addPercent(a -> a.mHealing, ENHANCEMENT_REGEN_HEAL_PERCENT)
 			.add(" max health every second for ")
-			.addDuration(a -> a.mRegenDuration, ENHANCEMENT_DURATION)
-			.add(" seconds. The effect is canceled if you take damage from an enemy.");
+			.addDuration(a -> a.mRegenDuration, ENHANCEMENT_HEAL_DURATION)
+			.add(" seconds.");
 	}
 }

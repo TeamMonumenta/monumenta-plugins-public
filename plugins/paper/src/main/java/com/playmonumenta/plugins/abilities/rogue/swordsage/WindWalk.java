@@ -57,7 +57,7 @@ public class WindWalk extends MultipleChargeAbility {
 			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Dash forwards, stunning and levitating mobs along the path.")
 			.cooldown(WIND_WALK_1_COOLDOWN, WIND_WALK_2_COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WindWalk::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WindWalk::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
 			.displayItem(Material.QUARTZ);
 

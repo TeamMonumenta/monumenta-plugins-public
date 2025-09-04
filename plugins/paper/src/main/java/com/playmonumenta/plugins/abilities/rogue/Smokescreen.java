@@ -11,33 +11,42 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.SmokescreenCS;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Smokescreen extends Ability implements AbilityWithDuration {
 
 	private static final int SMOKESCREEN_RANGE = 6;
-	private static final int SMOKESCREEN_DURATION = 8 * 20;
+	private static final int SMOKESCREEN_RANGE_2 = 8;
+	private static final int SMOKESCREEN_EFFECT_DURATION = 8 * 20;
 	private static final double SMOKESCREEN_SLOWNESS_AMPLIFIER = 0.2;
 	private static final double WEAKEN_EFFECT_1 = 0.2;
 	private static final double WEAKEN_EFFECT_2 = 0.4;
 	private static final int SMOKESCREEN_COOLDOWN = 20 * 20;
 	private static final int ENHANCEMENT_SMOKECLOUD_DURATION = 8 * 20;
-	private static final int ENHANCEMENT_SMOKECLOUD_EFFECT_DURATION = 2 * 20;
-	private static final int ENHANCEMENT_SMOKECLOUD_RADIUS = 4;
+	private static final double VELOCITY = 0.85;
+	private static final double ENHANCEMENT_DAMAGE = 12;
 
 	public static final String CHARM_SLOW = "Smokescreen Slowness Amplifier";
 	public static final String CHARM_WEAKEN = "Smokescreen Weakness Amplifier";
 	public static final String CHARM_COOLDOWN = "Smokescreen Cooldown";
 	public static final String CHARM_RANGE = "Smokescreen Range";
-	public static final String CHARM_DURATION = "Smokescreen Duration";
+	public static final String CHARM_ENHANCEMENT_DURATION = "Smokescreen Pool Duration";
+	public static final String CHARM_EFFECT_DURATION = "Smokescreen Effect Duration";
+	public static final String CHARM_DAMAGE = "Smokescreen Enhancement Damage";
 
 	public static final AbilityInfo<Smokescreen> INFO =
 			new AbilityInfo<>(Smokescreen.class, "Smokescreen", Smokescreen::new)
@@ -47,14 +56,16 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 					.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 					.simpleDescription("Weaken and slow nearby mobs.")
 					.cooldown(SMOKESCREEN_COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Smokescreen::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.DOWN),
+					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Smokescreen::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
 							AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
 					.displayItem(Material.DEAD_TUBE_CORAL);
 
 	private final double mWeakenEffect;
 	private final double mSlownessEffect;
-	private final int mDuration;
+	private final int mPoolDuration;
+	private final int mEffectDuration;
 	private final double mRadius;
+	private final double mDamage;
 
 	private final SmokescreenCS mCosmetic;
 
@@ -64,8 +75,10 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 		super(plugin, player, INFO);
 		mWeakenEffect = CharmManager.getLevelPercentDecimal(player, CHARM_WEAKEN) + (isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2);
 		mSlownessEffect = SMOKESCREEN_SLOWNESS_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW);
-		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, ENHANCEMENT_SMOKECLOUD_DURATION);
-		mRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, SMOKESCREEN_RANGE);
+		mPoolDuration = CharmManager.getDuration(mPlayer, CHARM_ENHANCEMENT_DURATION, ENHANCEMENT_SMOKECLOUD_DURATION);
+		mEffectDuration = CharmManager.getDuration(mPlayer, CHARM_EFFECT_DURATION, SMOKESCREEN_EFFECT_DURATION);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, isLevelOne() ? SMOKESCREEN_RANGE : SMOKESCREEN_RANGE_2);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ENHANCEMENT_DAMAGE);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SmokescreenCS());
 	}
 
@@ -73,55 +86,81 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 		if (isOnCooldown()) {
 			return false;
 		}
-		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 
-		mCosmetic.smokescreenEffects(mPlayer, world, loc, mRadius);
+		ThrowableProjectile proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, mCosmetic.getProjectileName(), null, LocationUtils.isLocationInWater(mPlayer.getLocation()));
+		int cd = getModifiedCooldown();
+		new BukkitRunnable() {
+			int mT = 0;
+			@Override
+			public void run() {
+				if (mT > cd) {
+					proj.remove();
+					this.cancel();
+				}
 
-		applyEffects(loc);
-		putOnCooldown();
+				if (proj.isDead()) {
+					Location loc = proj.getLocation();
+					applyEffects(loc);
+					mCosmetic.smokescreenEffects(mPlayer, world, loc, mRadius);
 
-		if (isEnhanced()) {
-			new BukkitRunnable() {
-				int mT = 0;
+					if (isEnhanced()) {
+						residualDebuffs(loc);
 
-				@Override
-				public void run() {
-					if (mT > mDuration) {
-						this.cancel();
-					} else {
-						if (mT > 0) {
-							mCosmetic.residualEnhanceEffects(mPlayer, world, loc);
-							applyEffects(loc);
-						}
-						mT += 20;
-						mCurrDuration += 20;
+						List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius);
+						mobs.forEach(mob -> DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true));
 					}
-				}
 
-				@Override
-				public synchronized void cancel() {
-					super.cancel();
-					mCurrDuration = -1;
-					ClientModHandler.updateAbility(mPlayer, Smokescreen.this);
+					this.cancel();
 				}
-			}.runTaskTimer(mPlugin, 0, 20);
-		}
+				mT++;
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
+
+		putOnCooldown();
 
 		ClientModHandler.updateAbility(mPlayer, this);
 		return true;
 	}
 
+	private void residualDebuffs(Location loc) {
+		World world = loc.getWorld();
+		new BukkitRunnable() {
+			int mT = 0;
+
+			@Override
+			public void run() {
+				if (mT > mPoolDuration) {
+					this.cancel();
+				} else {
+					if (mT > 0) {
+						mCosmetic.residualEnhanceEffects(mPlayer, world, loc, mRadius);
+						applyEffects(loc);
+					}
+					mT += 20;
+					mCurrDuration += 20;
+				}
+			}
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				mCurrDuration = -1;
+				ClientModHandler.updateAbility(mPlayer, Smokescreen.this);
+			}
+		}.runTaskTimer(mPlugin, 0, 20);
+	}
+
 	private void applyEffects(Location loc) {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mRadius)) {
-			EntityUtils.applySlow(mPlugin, SMOKESCREEN_DURATION, mSlownessEffect, mob);
-			EntityUtils.applyWeaken(mPlugin, SMOKESCREEN_DURATION, mWeakenEffect, mob);
+			EntityUtils.applySlow(mPlugin, mEffectDuration, mSlownessEffect, mob);
+			EntityUtils.applyWeaken(mPlugin, mEffectDuration, mWeakenEffect, mob);
 		}
 	}
 
 	@Override
 	public int getInitialAbilityDuration() {
-		return isEnhanced() ? mDuration : 0;
+		return isEnhanced() ? mPoolDuration : 0;
 	}
 
 	@Override
@@ -132,10 +171,10 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 	private static Description<Smokescreen> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.addTrigger()
-			.add(" to release a cloud of smoke, afflicting all mobs within ")
-			.add(a -> a.mRadius, SMOKESCREEN_RANGE)
+			.add(" to launch a projectile which releases a cloud of smoke, afflicting all mobs within ")
+			.add(a -> a.mRadius, SMOKESCREEN_RANGE, false, Ability::isLevelOne)
 			.add(" blocks with ")
-			.addDuration(SMOKESCREEN_DURATION)
+			.addDuration(SMOKESCREEN_EFFECT_DURATION)
 			.add(" seconds of ")
 			.addPercent(a -> a.mWeakenEffect, WEAKEN_EFFECT_1, false, Ability::isLevelOne)
 			.add(" weaken and ")
@@ -148,17 +187,19 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The weaken debuff is increased to ")
 			.addPercent(a -> a.mWeakenEffect, WEAKEN_EFFECT_2, false, Ability::isLevelTwo)
-			.add(".");
+			.add(" and the radius is increased to ")
+			.add(a -> a.mRadius, SMOKESCREEN_RANGE_2, false, Ability::isLevelTwo)
+			.add(" blocks.");
 	}
 
 	private static Description<Smokescreen> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Leave a ")
-			.add(a -> ENHANCEMENT_SMOKECLOUD_RADIUS, ENHANCEMENT_SMOKECLOUD_RADIUS)
-			.add(" block radius persistent cloud on the ground for ")
-			.addDuration(a -> a.mDuration, ENHANCEMENT_SMOKECLOUD_DURATION)
-			.add(" seconds after activating. Mobs in the cloud gain the same debuffs for ")
-			.addDuration(ENHANCEMENT_SMOKECLOUD_EFFECT_DURATION)
+			.add("The smoke cloud will now deal ")
+			.add(a -> a.mDamage, ENHANCEMENT_DAMAGE)
+			.add(" melee damage on impact and additionally leave a persistent cloud on the ground for ")
+			.addDuration(a -> a.mPoolDuration, ENHANCEMENT_SMOKECLOUD_DURATION)
+			.add(" seconds after activating. Mobs in the cloud gain the debuffs for ")
+			.addDuration(SMOKESCREEN_EFFECT_DURATION)
 			.add(" seconds, pulsing every second.");
 	}
 }

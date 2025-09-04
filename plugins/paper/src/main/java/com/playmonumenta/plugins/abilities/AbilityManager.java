@@ -66,6 +66,7 @@ import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
 import com.playmonumenta.plugins.abilities.rogue.Dethroner;
 import com.playmonumenta.plugins.abilities.rogue.Dodging;
 import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
+import com.playmonumenta.plugins.abilities.rogue.MagicDodging;
 import com.playmonumenta.plugins.abilities.rogue.Skirmisher;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
@@ -272,6 +273,7 @@ public class AbilityManager {
 			DaggerThrow.INFO,
 			Dodging.INFO,
 			Dethroner.INFO,
+			MagicDodging.INFO,
 			Smokescreen.INFO,
 			ViciousCombos.INFO,
 			Skirmisher.INFO,

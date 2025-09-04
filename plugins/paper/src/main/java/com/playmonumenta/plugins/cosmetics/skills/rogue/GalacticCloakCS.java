@@ -47,7 +47,7 @@ public class GalacticCloakCS extends SmokescreenCS {
 		}
 
 		for (double d = 0; d < 2 * Math.PI; d += Math.PI / 20) {
-			drawParticle(new Location(world, loc.getX() + 6 * FastUtils.cos(d), loc.getY(), loc.getZ() + 6 * FastUtils.sin(d)), player, rollColor());
+			drawParticle(new Location(world, loc.getX() + radius * FastUtils.cos(d), loc.getY(), loc.getZ() + radius * FastUtils.sin(d)), player, rollColor());
 		}
 
 		new BukkitRunnable() {
@@ -67,7 +67,7 @@ public class GalacticCloakCS extends SmokescreenCS {
 				mTicks++;
 				if (mTicks >= 20) {
 					for (double d = 0; d < 2 * Math.PI; d += Math.PI / 20) {
-						drawParticle(new Location(world, loc.getX() + 6 * FastUtils.cos(d), loc.getY(), loc.getZ() + 6 * FastUtils.sin(d)), player, rollColor());
+						drawParticle(new Location(world, loc.getX() + radius * FastUtils.cos(d), loc.getY(), loc.getZ() + radius * FastUtils.sin(d)), player, rollColor());
 					}
 					this.cancel();
 				}
@@ -79,9 +79,9 @@ public class GalacticCloakCS extends SmokescreenCS {
 	}
 
 	@Override
-	public void residualEnhanceEffects(Player player, World world, Location loc) {
+	public void residualEnhanceEffects(Player player, World world, Location loc, double radius) {
 		for (double d = 0; d < 2 * Math.PI; d += Math.PI / 20) {
-			drawParticle(new Location(world, loc.getX() + 4 * FastUtils.cos(d), loc.getY(), loc.getZ() + 4 * FastUtils.sin(d)), player, rollColor());
+			drawParticle(new Location(world, loc.getX() + radius * FastUtils.cos(d), loc.getY(), loc.getZ() + radius * FastUtils.sin(d)), player, rollColor());
 		}
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 65, 3.5, 0.2, 3.5, 0.05).spawnAsPlayerActive(player);
 		AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, 0.3f, 1.5f);

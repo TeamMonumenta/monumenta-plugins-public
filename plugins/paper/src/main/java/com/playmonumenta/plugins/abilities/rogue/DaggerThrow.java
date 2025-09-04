@@ -18,26 +18,31 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import java.util.ArrayList;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class DaggerThrow extends Ability {
 
 	private static final String DAGGER_THROW_MOB_HIT_TICK = "HitByDaggerThrowTick";
+	private static final int DAGGER_THROW_RECAST_DELAY = 2;
 	private static final int DAGGER_THROW_COOLDOWN = 12 * 20;
 	private static final int DAGGER_THROW_RANGE = 8;
 	private static final int DAGGER_THROW_1_DAMAGE = 4;
 	private static final int DAGGER_THROW_2_DAMAGE = 8;
 	private static final int DAGGER_THROW_DURATION = 10 * 20;
 	private static final int DAGGER_THROW_SILENCE_DURATION = 2 * 20;
+	private static final int DAGGER_THROW_RECAST_DURATION = 5 * 20;
 	private static final int DAGGER_THROW_DAGGERS = 3;
 	private static final double DAGGER_THROW_1_VULN = 0.2;
 	private static final double DAGGER_THROW_2_VULN = 0.4;
-	private static final double DAGGER_THROW_VULN_ENHANCEMENT = 0.2;
+	private static final double DAGGER_THROW_RECAST_MULTIPLIER = 0.8;
 	private static final double DAGGER_THROW_SPREAD = Math.toRadians(25);
 
 	public static final String CHARM_DAMAGE = "Dagger Throw Damage";
@@ -46,6 +51,8 @@ public class DaggerThrow extends Ability {
 	public static final String CHARM_VULN = "Dagger Throw Vulnerability Amplifier";
 	public static final String CHARM_VULN_DURATION = "Dagger Throw Vulnerability Duration";
 	public static final String CHARM_SILENCE_DURATION = "Dagger Throw Silence Duration";
+	public static final String CHARM_RECAST_DURATION = "Dagger Throw Recast Duration";
+	public static final String CHARM_RECAST_MULTIPLIER = "Dagger Throw Recast Damage Multiplier";
 	public static final String CHARM_DAGGERS = "Dagger Throw Daggers";
 
 	public static final AbilityInfo<DaggerThrow> INFO =
@@ -64,10 +71,15 @@ public class DaggerThrow extends Ability {
 	private final double mRange;
 	private final double mDamage;
 	private final double mVulnBase;
-	private final double mVulnAmplifier;
 	private final int mVulnDuration;
 	private final int mSilenceDuration;
+	private final int mRecastDuration;
+	private final double mRecastMultiplier;
 	private final DaggerThrowCS mCosmetic;
+
+	private boolean mCanRecast = false;
+	private int mCastTime = 0;
+	private final ArrayList<Location> mDaggerEndPoints = new ArrayList<>();
 
 	public DaggerThrow(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -75,21 +87,29 @@ public class DaggerThrow extends Ability {
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, DAGGER_THROW_RANGE);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAGGER_THROW_1_DAMAGE : DAGGER_THROW_2_DAMAGE);
 		mVulnBase = (isLevelOne() ? DAGGER_THROW_1_VULN : DAGGER_THROW_2_VULN) + CharmManager.getLevelPercentDecimal(player, CHARM_VULN);
-		mVulnAmplifier = mVulnBase + (isEnhanced() ? DAGGER_THROW_VULN_ENHANCEMENT : 0);
 		mVulnDuration = CharmManager.getDuration(mPlayer, CHARM_VULN_DURATION, DAGGER_THROW_DURATION);
 		mSilenceDuration = CharmManager.getDuration(mPlayer, CHARM_SILENCE_DURATION, DAGGER_THROW_SILENCE_DURATION);
+		mRecastDuration = CharmManager.getDuration(mPlayer, CHARM_RECAST_DURATION, DAGGER_THROW_RECAST_DURATION);
+		mRecastMultiplier = DAGGER_THROW_RECAST_MULTIPLIER + CharmManager.getLevelPercentDecimal(player, CHARM_RECAST_MULTIPLIER);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DaggerThrowCS());
 	}
 
 	public boolean cast() {
+		World world = mPlayer.getWorld();
 		if (isOnCooldown()) {
-			return false;
+			if (mCanRecast && Bukkit.getServer().getCurrentTick() > mCastTime + DAGGER_THROW_RECAST_DELAY) {
+				recallDaggers(world);
+				return true;
+			} else {
+				return false;
+			}
 		}
 		putOnCooldown();
+		mCastTime = Bukkit.getServer().getCurrentTick();
 
+		// DEFAULT BEHAVIOR
 		Location startLoc = mPlayer.getEyeLocation();
 		Vector dir = startLoc.getDirection();
-		World world = mPlayer.getWorld();
 		mCosmetic.daggerThrowEffect(world, startLoc, mPlayer);
 
 		for (int a = (mDaggers / 2) * -1; a <= (mDaggers / 2); a++) {
@@ -100,21 +120,72 @@ public class DaggerThrow extends Ability {
 			newDir.normalize();
 
 			Location endLoc = LocationUtils.rayTraceToBlock(startLoc, newDir, mRange, loc -> mCosmetic.daggerHitBlockEffect(loc, mPlayer));
-			for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, 0.7, true).accuracy(0.5).getHitMobs()) {
-				if (!MetadataUtils.checkOnceThisTick(mPlugin, mob, DAGGER_THROW_MOB_HIT_TICK)) {
-					continue;
-				}
-				mCosmetic.daggerHitEffect(world, startLoc, mob, mPlayer);
-				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
-				EntityUtils.applyVulnerability(mPlugin, mVulnDuration, mVulnAmplifier, mob);
-				if (isEnhanced()) {
-					EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);
-				}
+
+			traceDaggerPathAndDamage(startLoc, endLoc);
+
+			if (isEnhanced()) {
+				mDaggerEndPoints.add(endLoc);
 			}
-			mCosmetic.daggerParticle(startLoc, endLoc, mPlayer);
 		}
 
+		// CHECK IF ENHANCED TO PREP RECAST
+		if (!isEnhanced()) {
+			return true;
+		}
+
+		mCanRecast = true;
+		new BukkitRunnable() {
+			int mTicks = 0;
+
+			@Override
+			public void run() {
+				if (!mCanRecast) { // Already recalled daggers, cancel runnable
+					this.cancel();
+					return;
+				}
+				if (mTicks >= mRecastDuration || !isOnCooldown()) {
+					recallDaggers(world);
+					this.cancel();
+					return;
+				}
+
+				for (Location location : mDaggerEndPoints) {
+					mCosmetic.daggerParticle(location, location, mPlayer);
+				}
+
+				mTicks += 4;
+			}
+		}.runTaskTimer(mPlugin, 1, 4);
+
 		return true;
+	}
+
+	private void recallDaggers(World world) {
+		mCanRecast = false;
+
+		Location playerLoc = mPlayer.getEyeLocation(); // eye location for consistency with casting
+		mCosmetic.daggerThrowEffect(world, playerLoc, mPlayer);
+
+		for (Location location : mDaggerEndPoints) {
+			traceDaggerPathAndDamage(location, playerLoc);
+		}
+
+		mDaggerEndPoints.clear();
+	}
+
+	private void traceDaggerPathAndDamage(Location startLoc, Location endLoc) {
+		mCosmetic.daggerParticle(startLoc, endLoc, mPlayer);
+		for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, 0.7, true).accuracy(0.5).getHitMobs()) {
+			if (!MetadataUtils.checkOnceThisTick(mPlugin, mob, DAGGER_THROW_MOB_HIT_TICK)) {
+				continue;
+			}
+			mCosmetic.daggerHitEffect(startLoc.getWorld(), endLoc, mob, mPlayer);
+			DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage * mRecastMultiplier, mInfo.getLinkedSpell(), true);
+			EntityUtils.applyVulnerability(mPlugin, mVulnDuration, mVulnBase, mob);
+			if (isEnhanced()) {
+				EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);
+			}
+		}
 	}
 
 	private static Description<DaggerThrow> getDescription1() {
@@ -145,10 +216,12 @@ public class DaggerThrow extends Ability {
 
 	private static Description<DaggerThrow> getDescritpionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Additionally silences hit mobs for ")
+			.add("Your daggers will remain stationary at the end of their path. After ")
+			.addDuration(a -> a.mRecastDuration, DAGGER_THROW_RECAST_DURATION)
+			.add(" seconds, your daggers will be recalled, or you can recast to trigger the recall early. Recalled daggers do ")
+			.addPercent(a -> a.mRecastMultiplier, DAGGER_THROW_RECAST_MULTIPLIER)
+			.add(" of the damage. Your Dagger Throw additionally silences mobs for ")
 			.addDuration(a -> a.mSilenceDuration, DAGGER_THROW_SILENCE_DURATION)
-			.add(" seconds. Vulnerability is increased by ")
-			.addPercent(DAGGER_THROW_VULN_ENHANCEMENT)
-			.add(".");
+			.add(" seconds.");
 	}
 }
