@@ -9,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -45,7 +46,7 @@ public class DieIfAloneBoss extends BossAbilityGroup {
 		for (LivingEntity entity : nearbyEntities) {
 			if (EntityUtils.isHostileMob(entity)) {
 				// This check implicitly excludes the entity itself.
-				Set<String> bosstags = entity.getScoreboardTags();
+				Set<String> bosstags = new HashSet<>(entity.getScoreboardTags());
 				bosstags.retainAll(parameters.DISQUALIFIED_BOSSTAGS);
 				if (bosstags.isEmpty()) {
 					return false;
