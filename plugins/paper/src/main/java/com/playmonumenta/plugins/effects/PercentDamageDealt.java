@@ -25,8 +25,7 @@ public class PercentDamageDealt extends Effect {
 	protected final int mPriority;
 	private @Nullable BiPredicate<LivingEntity, LivingEntity> mPredicate = null;
 
-	private PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes,
-			int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate, String id) {
+	private PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate, String id) {
 		super(duration, id);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
@@ -34,8 +33,7 @@ public class PercentDamageDealt extends Effect {
 		mPredicate = predicate;
 	}
 
-	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes,
-			int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate) {
+	public PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate) {
 		this(duration, amount, affectedDamageTypes, priority, predicate, effectID);
 	}
 
@@ -48,8 +46,7 @@ public class PercentDamageDealt extends Effect {
 	}
 
 	// Only call this in PercentDamageDealtSingle
-	protected PercentDamageDealt(int duration, double amount,
-			@Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes, String effectIdentifier) {
+	protected PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes, String effectIdentifier) {
 		this(duration, amount, affectedDamageTypes, 0, null, effectIdentifier);
 	}
 
@@ -93,8 +90,7 @@ public class PercentDamageDealt extends Effect {
 			return;
 		}
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
-				|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL)
-						&& AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
+			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
 			event.updateDamageWithMultiplier(Math.max(0, 1 + mAmount));
 		}
 	}
