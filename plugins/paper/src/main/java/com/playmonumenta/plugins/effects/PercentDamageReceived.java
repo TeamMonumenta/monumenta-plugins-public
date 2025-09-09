@@ -100,13 +100,14 @@ public class PercentDamageReceived extends Effect {
 
 	@Override
 	public @Nullable Component getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(-mAmount)
-			.append(Component.text(StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + getDisplayedName()));
+		return StringUtils.doubleToColoredAndSignedPercentage(-mAmount).append(
+			getDisplayedName() != null ? Component.text(getDisplayedName()) : Component.empty()
+		);
 	}
 
 	@Override
 	public @Nullable String getDisplayedName() {
-		return "Resistance";
+		return StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + "Resistance";
 	}
 
 	@Override
