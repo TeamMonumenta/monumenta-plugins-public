@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -13,10 +14,13 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class SpellFrostNova extends SpellBaseAoE {
+
+	public EffectsList EFFECTS_ON_HIT = EffectsList.builder()
+		.add(new EffectsList.CustomSingleArgumentEffect("CustomSlow", 50, 0.3f, null))
+		.build();
+
 
 	private final float mMinDamage;
 	private final float mMaxDamage;
@@ -60,7 +64,7 @@ public class SpellFrostNova extends SpellBaseAoE {
 		for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
 			double distance = player.getLocation().distance(mLauncher.getLocation());
 			BossUtils.blockableDamage(mLauncher, player, DamageType.MAGIC, ((mMaxDamage - mMinDamage) * ((mRadius - distance) / mRadius)) + mMinDamage);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 3));
+			EFFECTS_ON_HIT.apply(player, mLauncher);
 		}
 	}
 
