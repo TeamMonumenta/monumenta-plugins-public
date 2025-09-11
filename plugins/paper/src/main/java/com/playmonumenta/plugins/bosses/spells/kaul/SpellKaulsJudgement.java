@@ -61,7 +61,7 @@ import org.jetbrains.annotations.Nullable;
 public class SpellKaulsJudgement extends Spell implements Listener {
 	private static final int KAULS_JUDGEMENT_RANGE = 50;
 	private static final String KAULS_JUDGEMENT_TP_TAG = "KaulsJudgementTPTag";
-	private static final String KAULS_JUDGEMENT_TAG = "KaulsJudgementTag";
+	public static final String KAULS_JUDGEMENT_TAG = "KaulsJudgementTag";
 	private static final String KAULS_JUDGEMENT_MOB_SPAWN_TAG = "KaulsJudgementMobSpawn";
 	private static final String KAULS_JUDGEMENT_MOB_TAG = "deleteelite";
 	private static final int KAULS_JUDGEMENT_TOTAL_TIME = 20 * 55;

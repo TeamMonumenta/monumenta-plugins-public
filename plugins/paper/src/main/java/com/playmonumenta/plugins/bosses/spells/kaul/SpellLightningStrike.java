@@ -217,6 +217,12 @@ public class SpellLightningStrike extends Spell {
 
 			@Override
 			public void run() {
+				// Stop damaging players who just teleported into Judgement
+				if (player.getScoreboardTags().contains(SpellKaulsJudgement.KAULS_JUDGEMENT_TAG)) {
+					this.cancel();
+					return;
+				}
+
 				BossUtils.bossDamagePercent(mKaul.getBoss(), player, SHOCK_DAMAGE_MULTIPLIER, strikeLocation, "Lightning Strike");
 
 				if (mInitialLocationUsed) {
