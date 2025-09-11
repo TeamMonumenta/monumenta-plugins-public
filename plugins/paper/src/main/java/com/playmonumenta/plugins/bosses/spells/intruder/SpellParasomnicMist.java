@@ -179,24 +179,24 @@ public class SpellParasomnicMist extends Spell {
 
 				@Override
 				public void run() {
-					if (mTicks % 5 == 0) {
+					if (mTicks % 4 == 0) {
 						if (mTicks <= CHARGE_UP_TIME) {
 							new PPCircle(Particle.SOUL_FIRE_FLAME, mLocation, mSafeZoneRadius)
-								.countPerMeter(3)
+								.countPerMeter(2)
 								.spawnAsBoss();
 
 							new PPCircle(Particle.SOUL_FIRE_FLAME, mLocation, mSafeZoneRadius)
 								.directionalMode(true)
 								.delta(0, 1, 0)
-								.countPerMeter(3)
+								.countPerMeter(2)
 								.extraRange(0.15, 0.25)
 								.spawnAsBoss();
 						} else {
 							new PPCircle(Particle.SOUL_FIRE_FLAME, mLocation, mSafeZoneRadius)
-								.countPerMeter(2.5)
-								.rotateDelta(true).directionalMode(true)
-								.delta(-0.05, -0.05, 0)
-								.extra(1)
+								.countPerMeter(2)
+								.directionalMode(true)
+								.delta(0.0, -1, 0)
+								.extra(0.05)
 								.spawnAsBoss();
 						}
 
@@ -267,7 +267,7 @@ public class SpellParasomnicMist extends Spell {
 			@Override
 			public void run() {
 				new PartialParticle(Particle.DUST_COLOR_TRANSITION, mCenter)
-					.count(300)
+					.count(175)
 					.delta(RANGE / 2.0)
 					.data(new Particle.DustTransition(Color.RED, Color.fromRGB(0x6b0000), 5.0f))
 					.spawnAsBoss();
