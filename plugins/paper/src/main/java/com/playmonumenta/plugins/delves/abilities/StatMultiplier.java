@@ -100,6 +100,10 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Chittering Gutters", STAR_POINT);
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("The Nadir", STAR_POINT);
 
+		// Overworld
+		final double OVERWORLD = 1.2;
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Fathom's Reach", OVERWORLD);
+
 		// Exalted
 		STAT_COMPENSATION_MAPPINGS.put("whiteexalted", 1.05);
 		STAT_COMPENSATION_MAPPINGS.put("orangeexalted", 1.05);

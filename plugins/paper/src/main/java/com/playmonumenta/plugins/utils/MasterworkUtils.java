@@ -40,6 +40,8 @@ public class MasterworkUtils {
 	private static final String ALACRITY_AUGMENT = "epic:r3/items/currency/alacrity_augment";
 	private static final String INVALID_ITEM = "epic:r3/masterwork/invalid_masterwork_selection";
 
+	private static final String OVERWORLD_FRAG = "epic:r3/fragments/architects_ring_fragment";
+
 	private static final String FOREST_FRAG = "epic:r3/fragments/forest_fragment";
 	private static final String FOREST_MAT = "epic:r3/items/currency/fenian_flower";
 
@@ -235,6 +237,16 @@ public class MasterworkUtils {
 		}
 	}
 
+	private static class RingOverworld extends MasterworkCost {
+		private RingOverworld() {
+			super(Masterwork.I);
+			put(Masterwork.I, OVERWORLD_FRAG, 1, PULSATING_SHARD, 8);
+			put(Masterwork.II, OVERWORLD_FRAG, 1, PULSATING_SHARD, 24);
+			put(Masterwork.III, OVERWORLD_FRAG, 1, PULSATING_SHARD, 32);
+			put(Masterwork.IV, OVERWORLD_FRAG, 1, PULSATING_SHARD, 32, PULSATING_DIAMOND, 1);
+		}
+	}
+
 	private static class Gallery extends MasterworkCost {
 		private Gallery(String mat) {
 			super(Masterwork.III);
@@ -332,6 +344,8 @@ public class MasterworkUtils {
 	private static final MasterworkCost MISC = new Misc();
 
 	static {
+		MASTERWORK_COSTS.put(Location.OVERWORLD3, new RingOverworld());
+
 		MASTERWORK_COSTS.put(Location.FOREST, new Generic(FOREST_FRAG, FOREST_MAT, Masterwork.I));
 		MASTERWORK_COSTS.put(Location.KEEP, new Generic(KEEP_FRAG, KEEP_MAT, Masterwork.I));
 		MASTERWORK_COSTS.put(Location.STARPOINT, new Generic(STAR_FRAG, STAR_MAT, Masterwork.II));
