@@ -690,7 +690,7 @@ public class BossTagCommand {
 		List<Soul> souls = SEARCH_OUTCOME_MAP.get(bossTag);
 
 		if (souls == null) {
-			throw CommandAPI.failWithString("You must use /bosstag seach " + bossTag + " before using this command");
+			throw CommandAPI.failWithString("You must use /bosstag search " + bossTag + " before using this command");
 		}
 
 		if (souls.isEmpty()) {
