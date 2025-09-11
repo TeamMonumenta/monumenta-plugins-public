@@ -127,6 +127,7 @@ public class JudgementChain extends MultipleChargeAbility {
 		if (isLevelTwo()) {
 			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(entityLoc, mExtraTargetRadius, entity);
 			nearbyMobs.removeIf(e -> mPlugin.mEffectManager.hasEffect(e, EFFECT_NAME));
+			nearbyMobs.removeIf(filter.negate());
 			for (int i = 0; i < mExtraTargets; i++) {
 				LivingEntity nearestMob = EntityUtils.getNearestMob(entityLoc, nearbyMobs);
 				if (nearestMob != null) {

@@ -36,6 +36,7 @@ public class CosmicMoonblade extends Ability {
 	private static final int RADIUS = 5;
 	private static final int COOLDOWN = 20 * 8;
 	private static final double ANGLE = 55;
+	private static final int SLASH_INTERVAL_TICKS = 7;
 	public static final double REDUCTION_MULTIPLIER_1 = 0.05;
 	public static final double REDUCTION_MULTIPLIER_2 = 0.1;
 	public static final double REDUCTION_MULTIPLIER_KILL = 0.075;
@@ -47,6 +48,7 @@ public class CosmicMoonblade extends Ability {
 	public static final String CHARM_SPELL_COOLDOWN = "Cosmic Moonblade Cooldown Reduction";
 	public static final String CHARM_DEATH_COOLDOWN = "Cosmic Moonblade On Kill Cooldown Reduction";
 	public static final String CHARM_COOLDOWN = "Cosmic Moonblade Cooldown";
+	public static final String CHARM_SLASH_INTERVAL = "Cosmic Moonblade Slash Interval";
 	public static final String CHARM_CAP = "Cosmic Moonblade Cooldown Cap";
 	public static final String CHARM_DEATH_CAP = "Cosmic Moonblade On Kill Cooldown Cap";
 	public static final String CHARM_RANGE = "Cosmic Moonblade Range";
@@ -68,6 +70,7 @@ public class CosmicMoonblade extends Ability {
 	private final double mLevelReduction;
 	private final int mLevelCap;
 	private final double mRange;
+	private final int mSlashInterval;
 	private final int mTotalSwings;
 	private final double mKillCDR;
 	private final int mKillCDRCap;
@@ -81,6 +84,7 @@ public class CosmicMoonblade extends Ability {
 		mLevelReduction = (isLevelOne() ? REDUCTION_MULTIPLIER_1 : REDUCTION_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SPELL_COOLDOWN);
 		mLevelCap = CharmManager.getDuration(player, CHARM_CAP, (isLevelOne() ? CAP_TICKS_1 : CAP_TICKS_2));
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS);
+		mSlashInterval = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SLASH_INTERVAL, SLASH_INTERVAL_TICKS);
 		mTotalSwings = (int) CharmManager.getLevel(mPlayer, CHARM_SLASH) + SWINGS;
 		mKillCDR = REDUCTION_MULTIPLIER_KILL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DEATH_COOLDOWN);
 		mKillCDRCap = CharmManager.getDuration(mPlayer, CHARM_DEATH_CAP, CAP_TICKS_KILL);
@@ -120,7 +124,7 @@ public class CosmicMoonblade extends Ability {
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 7));
+		}.runTaskTimer(mPlugin, 0, mSlashInterval));
 
 		return true;
 	}

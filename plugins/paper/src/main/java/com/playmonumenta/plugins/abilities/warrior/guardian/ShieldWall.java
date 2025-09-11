@@ -71,7 +71,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 					.displayItem(Material.STONE_BRICK_WALL);
 
 	private final int mDuration;
-	private final int mHeight;
+	private final double mHeight;
 	private final float mKnockback;
 	private final double mDamage;
 	private final double mAngle;
@@ -86,7 +86,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	public ShieldWall(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, (isLevelOne() ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION));
-		mHeight = SHIELD_WALL_HEIGHT + (int) CharmManager.getLevel(mPlayer, CHARM_HEIGHT);
+		mHeight = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEIGHT, SHIELD_WALL_HEIGHT);
 		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, SHIELD_WALL_KNOCKBACK);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_WALL_DAMAGE);
 		mAngle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, SHIELD_WALL_ANGLE);
@@ -131,7 +131,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 
 				double radius = mDeposited ? mRadiusStationary : mRadius;
 
-				Hitbox hitbox = Hitbox.approximateHollowCylinderSegment(mLoc.clone().add(0, -1, 0), mHeight + 1, radius - 0.4, radius + 0.4, Math.toRadians(mAngle) / 2);
+				Hitbox hitbox = Hitbox.approximateHollowCylinderSegment(mLoc.clone().add(0, -1, 0), mHeight + 1, 0.7 * radius - 0.5, 1.15 * radius, Math.toRadians(mAngle) / 2);
 
 				mCosmetic.wallParticles(mPlayer, mLoc, radius, mAngle, mHeight);
 
@@ -205,7 +205,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 			.add(a -> a.mRadius, SHIELD_WALL_RADIUS)
 			.add(" block radius in front of the user. Enemies that pass through the wall are dealt ")
 			.add(a -> a.mDamage, SHIELD_WALL_DAMAGE)
-			.add(" melee damage and knocked back. The wall also blocks all enemy projectiles. The wall lasts ")
+			.add(" melee damage and knocked back. The wall also blocks all nonmagical enemy projectiles. The wall lasts ")
 			.addDuration(a -> a.mDuration, SHIELD_WALL_1_DURATION, false, Ability::isLevelOne)
 			.add(" seconds and moves along with the user. Triggering again while active makes the wall stationary at the same location for the remainder of the duration, with radius increased to ")
 			.add(a -> a.mRadiusStationary, SHIELD_WALL_RADIUS_STATIONARY)

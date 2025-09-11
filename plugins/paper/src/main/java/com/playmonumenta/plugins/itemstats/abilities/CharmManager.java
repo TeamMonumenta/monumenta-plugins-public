@@ -356,6 +356,7 @@ public class CharmManager {
 			CosmicMoonblade.CHARM_SPELL_COOLDOWN,
 			CosmicMoonblade.CHARM_DEATH_COOLDOWN,
 			CosmicMoonblade.CHARM_SLASH,
+			CosmicMoonblade.CHARM_SLASH_INTERVAL,
 			SagesInsight.CHARM_SPEED,
 			SagesInsight.CHARM_ABILITY,
 			SagesInsight.CHARM_DECAY,
