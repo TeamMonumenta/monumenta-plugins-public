@@ -198,8 +198,15 @@ public class AbilityTriggerInfo<T extends Ability> {
 			conditions.add(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON.getDisplay(true));
 		}
 
-		addCondition(conditions, mTrigger.getSneaking(), "sneaking");
-		addCondition(conditions, mTrigger.getSprinting(), "sprinting");
+		AbilityTrigger.BinaryOption sneaking = mTrigger.getSneaking();
+		AbilityTrigger.BinaryOption sprinting = mTrigger.getSprinting();
+		// Don't show "not sneaking" if we require sprinting; don't show "not sprinting" if we require sneaking
+		if (!(sneaking == AbilityTrigger.BinaryOption.FALSE && sprinting == AbilityTrigger.BinaryOption.TRUE)) {
+			addCondition(conditions, sneaking, "sneaking");
+		}
+		if (!(sprinting == AbilityTrigger.BinaryOption.FALSE && sneaking == AbilityTrigger.BinaryOption.TRUE)) {
+			addCondition(conditions, sprinting, "sprinting");
+		}
 		addCondition(conditions, mTrigger.getOnGround(), "on the ground");
 
 		List<AbilityTrigger.LookDirection> dirs = new ArrayList<>(mTrigger.getLookDirections());
