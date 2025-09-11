@@ -12,7 +12,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 public class CurseOfShrapnel implements Enchantment {
 
@@ -44,4 +46,10 @@ public class CurseOfShrapnel implements Enchantment {
 		}
 	}
 
+	@Override
+	public void onProjectileLaunch(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile proj) {
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			DamageUtils.damage(null, player, DamageEvent.DamageType.TRUE, Math.min(level, player.getHealth() - 0.01), null, false, false);
+		});
+	}
 }

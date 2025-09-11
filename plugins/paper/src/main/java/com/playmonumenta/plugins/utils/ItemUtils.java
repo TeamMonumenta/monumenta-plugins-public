@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
+import com.playmonumenta.plugins.itemstats.enchantments.ThrowingKnife;
 import com.playmonumenta.plugins.itemstats.enchantments.Undroppable;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -462,6 +463,7 @@ public class ItemUtils {
 		.put(Material.SNOWBALL, 1.5f)
 		.put(Material.TRIDENT, 2.5f)
 		.put(Material.BOW, 3.0f)
+		.put(Material.DIAMOND_SWORD, ThrowingKnife.getBaseVelocity())
 		.put(Material.CROSSBOW, 3.15f)
 		.build();
 
@@ -1220,7 +1222,7 @@ public class ItemUtils {
 	}
 
 	public static float getVanillaProjectileSpeed(ItemStack mainhandItem) {
-		return VANILLA_PROJECTILE_SPEEDS.getOrDefault(mainhandItem.getType(), 1.5f);
+		return VANILLA_PROJECTILE_SPEEDS.getOrDefault(mainhandItem.getType(), 3.0f);
 	}
 
 	/*
