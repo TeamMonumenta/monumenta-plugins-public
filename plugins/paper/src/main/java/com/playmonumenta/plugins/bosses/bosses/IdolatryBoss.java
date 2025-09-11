@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.effects.PercentAbilityDamageReceived;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 
@@ -22,12 +23,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -76,6 +79,7 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 			|| damagedEntity.equals(mBoss)
 			|| event.getType() == DamageEvent.DamageType.PROJECTILE // Prevents doubled Projectile damage
 			|| ElementalArrows.isElementalArrowDamage(event) // Prevents doubled EArrows damage
+			|| event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION
 			|| damagedEntity instanceof Player
 			|| damagedEntity instanceof Creeper
 			|| DelvesUtils.isDelveMob(damagedEntity)
@@ -136,7 +140,7 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 					int i = 0;
 					while (i < mParams.MAX_REDIRECTS && !sortedEntityDamageMap.isEmpty()) {
 						// Update to getLast() method when upgrading to Java 21
-						DamageUtils.damage(null,
+						DamageUtils.damage(mBoss,
 							mBoss,
 							DamageEvent.DamageType.TRUE,
 							sortedEntityDamageMap.remove(sortedEntityDamageMap.size() - 1),
@@ -161,6 +165,8 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 				damagedEntity.removeMetadata(soundMetadataKey, mPlugin);
 			}, 5L);
 		}
+		// VFX: particle line
+		new PPLine(Particle.SOUL_FIRE_FLAME, damagedEntity.getEyeLocation(), mBoss.getEyeLocation(), 0.08).deltaVariance(true).countPerMeter(2).spawnAsEnemy();
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

@@ -47,7 +47,8 @@ public class CoordinatedAttackOnDeathBoss extends BossAbilityGroup {
 		public int AFFECTED_MOB_CAP = 4;
 	}
 
-	public final String IGNORE_TAG = "boss_coordinatedattackondeath_ignore";
+	public final String IGNORE_TAG = "boss_coordinatedattack_ignore";
+	// Assuming that anything excluded from Bloodthirsty is equally excluded from Bloodlust
 	public final int COOLDOWN_PER_MOB = 6 * 20;
 
 	public CoordinatedAttackOnDeathBoss(Plugin plugin, LivingEntity boss) {

@@ -188,6 +188,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(RebornBoss.identityTag, RebornBoss::new, new RebornBoss.Parameters());
 		registerStatelessBoss(DistanceCloserBoss.identityTag, DistanceCloserBoss::new);
 		registerStatelessBoss(DieIfAloneBoss.identityTag, DieIfAloneBoss::new, new DieIfAloneBoss.Parameters());
+		registerStatelessBoss(DieSlowlyBoss.identityTag, DieSlowlyBoss::new, new DieSlowlyBoss.Parameters());
 		registerStatelessBoss(AuraEffectBoss.identityTag, AuraEffectBoss::new, new AuraEffectBoss.Parameters());
 		registerStatelessBoss(DummyDecoyBoss.identityTag, DummyDecoyBoss::new);
 		registerStatelessBoss(LaserBoss.identityTag, LaserBoss::new, new LaserBoss.Parameters());
