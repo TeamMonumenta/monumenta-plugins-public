@@ -8,7 +8,10 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.PlayerArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -62,6 +65,32 @@ public class Spectate implements Listener {
 				} else {
 					throw CommandAPI.failWithString("This command must be run by a player!");
 				}
+			})
+			.register();
+		registerSpectatorTeleportCommand();
+	}
+
+	private void registerSpectatorTeleportCommand() {
+		new CommandAPICommand("spectatetp")
+			.withPermission(CommandPermission.fromString("monumenta.command.spectate"))
+			.withRequirement(sender -> sender instanceof Player && ((Player) sender).hasMetadata(SPECTATE_METAKEY))
+			.withArguments(new PlayerArgument("target"))
+			.executesPlayer((sender, args) -> {
+				final Player target = (Player) args.get("target");
+
+				if (target == null) {
+					return;
+				}
+				if (target.equals(sender)) {
+					sender.sendMessage(Component.text("You cannot teleport to yourself.", NamedTextColor.RED));
+					return;
+				}
+				sender.teleport(target.getLocation());
+				sender.sendMessage(
+					Component.text("Teleported to ", NamedTextColor.GRAY)
+						.append(target.name().color(NamedTextColor.AQUA))
+						.append(Component.text(".", NamedTextColor.GRAY))
+				);
 			})
 			.register();
 	}
