@@ -147,6 +147,13 @@ public class ClientModHandler {
 		INSTANCE.sendPacket(player, packet);
 	}
 
+	/**
+	 * Sends an updated packet of ONE effect to the player.
+	 * @param entity Entity to update the effect of
+	 * @param effect Effect to update
+	 * @param source Source of the effect
+	 * @param remove Whether to remove the effect or not
+	 */
 	public static void updateEffect(Entity entity, Effect effect, String source, boolean remove) {
 		if (INSTANCE == null
 			|| !(entity instanceof Player player)

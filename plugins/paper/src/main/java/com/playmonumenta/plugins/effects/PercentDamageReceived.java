@@ -107,7 +107,7 @@ public class PercentDamageReceived extends Effect {
 
 	@Override
 	public @Nullable String getDisplayedName() {
-		return StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + "Resistance";
+		return StringUtils.getDamageTypeString(mAffectedDamageTypes, false, null) + " " + "Resistance";
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class NegateDamage extends Effect {
 				mParticleData.spawnAsPlayerActive((Player) entity);
 			}
 			mCount--;
+			ClientModHandler.updateEffects(entity); // Maybe would be better if it only updated this effect? But I don't know what source it needs...
 		}
 	}
 
@@ -111,12 +113,15 @@ public class NegateDamage extends Effect {
 		if (mCount <= 0) {
 			return null;
 		}
-		return Component.text("+" + mCount + StringUtils.getDamageTypeString(mAffectedTypes) + " " + getDisplayedName());
+		return Component.text("+" + mCount + " " + getDisplayedName());
 	}
 
 	@Override
 	public @Nullable String getDisplayedName() {
-		return "Damage Blocked";
+		if (mCount <= 0) {
+			return null;
+		}
+		return StringUtils.getDamageTypeString(mAffectedTypes, false, null) + " " + "Damage Blocked";
 	}
 
 	@Override
