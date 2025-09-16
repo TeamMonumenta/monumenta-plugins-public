@@ -28,6 +28,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -273,7 +274,7 @@ public class FishingCombatManager implements Listener {
 					return;
 				}
 				for (Player player : hitbox.getHitPlayers(false)) {
-					if (!(mPlayerArenaMap.containsKey(player) || arena.mActive)) {
+					if (!(mPlayerArenaMap.containsKey(player) || arena.mActive || player.getGameMode() == GameMode.SPECTATOR)) {
 						continue;
 					}
 					player.teleport(arena.mCoordinates.toLocation(player.getWorld()));
