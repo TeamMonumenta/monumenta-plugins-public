@@ -101,7 +101,7 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("The Nadir", STAR_POINT);
 
 		// Overworld
-		final double OVERWORLD = 1.2;
+		final double OVERWORLD = 1.1;
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Fathom's Reach", OVERWORLD);
 
 		// Exalted
