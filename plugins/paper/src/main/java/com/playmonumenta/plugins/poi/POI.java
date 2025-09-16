@@ -16,6 +16,7 @@ public enum POI {
 	CONSTELLATION_TOWER("constellation_tower", "Constellation Tower", "epic:r3/world/poi/constellation_tower/endweekly_v2", "#342768", "starpoint"),
 	COVEN_FORTRESS("coven_fortress", "Coven Fortress", "epic:r3/world/poi/coven_fortress/endweekly_v2", "#4C8F4D", "wolfswood"),
 	DOOMED_ENCAMPMENT("doomed_encampment", "Doomed Encampment", "epic:r3/world/poi/doomed_encampment/endweekly_v2", "#C4BBA5", "keep"),
+	FATHOMS_REACH("fathoms_reach", "Fathom's Reach", "epic:r3/world/poi/coral_tower/endweekly_v2", "#c2c4c4", "misc"),
 	FORSAKEN_MANOR("forsaken_manor", "Forsaken Manor", "epic:r3/world/poi/forsaken_manor/endweekly_v2", "#C4BBA5", "keep"),
 	LOCUM_VERNANTIA("locum_vernantia", "Locum Vernantia", "epic:r3/world/poi/locum_vernatia/endweekly_v2", "#4C8F4D", "wolfswood"),
 	QUELLED_CONVENT("quelled_convent", "Quelled Convent", "epic:r3/world/poi/cathedral/endweekly_v2", "#C4BBA5", "keep"),
