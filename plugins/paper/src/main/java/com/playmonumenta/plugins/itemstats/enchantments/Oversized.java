@@ -57,9 +57,19 @@ public class Oversized implements Enchantment {
 			// ThrowRate already calls this, but others don't
 			onAnyShoot(player, cooldown, fromThrowingKnife, !fromThrowingKnife);
 		}
-		for (Material mat : new Material[] {Material.TRIDENT, Material.SNOWBALL}) {
-			if (player.getCooldown(mat) < cooldown) {
-				player.setCooldown(mat, cooldown);
+
+		if (player.getCooldown(Material.SNOWBALL) < cooldown) {
+			player.setCooldown(Material.SNOWBALL, cooldown);
+		}
+		// only set tridents on cooldown if the player has a non-riptide trident in hotbar
+		// to prevent riptide tridents from being disabled
+		for (int i = 0; i < 9; i++) {
+			ItemStack item = player.getInventory().getItem(i);
+			if (item != null && item.getType() == Material.TRIDENT
+				&& !ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE)
+				&& player.getCooldown(Material.TRIDENT) < cooldown) {
+				player.setCooldown(Material.TRIDENT, cooldown);
+				break;
 			}
 		}
 	}

@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import org.bukkit.Material;
@@ -129,6 +130,9 @@ public class ThrowRate implements Attribute {
 			}
 		}
 
-		Oversized.onAnyShoot(player, cooldown, true, true);
+		if (proj instanceof Trident || proj instanceof Snowball
+			|| ItemStatUtils.hasEnchantment(player.getEquipment().getItemInMainHand(), EnchantmentType.THROWING_KNIFE)) {
+			Oversized.onAnyShoot(player, cooldown, true, true);
+		}
 	}
 }
