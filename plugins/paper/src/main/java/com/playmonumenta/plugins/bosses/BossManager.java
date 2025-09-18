@@ -180,6 +180,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(AntiRangeBoss.identityTag, AntiRangeBoss::new, new AntiRangeBoss.Parameters());
 		registerStatelessBoss(AntiMeleeBoss.identityTag, AntiMeleeBoss::new, new AntiMeleeBoss.Parameters());
 		registerStatelessBoss(AntiSuffocationBoss.identityTag, AntiSuffocationBoss::new);
+		registerStatelessBoss(AntiCrammingBoss.identityTag, AntiCrammingBoss::new);
 		registerStatelessBoss(DamageCapBoss.identityTag, DamageCapBoss::new, new DamageCapBoss.Parameters());
 		registerStatelessBoss(ImmortalMountBoss.identityTag, ImmortalMountBoss::new, new ImmortalMountBoss.Parameters());
 		registerStatelessBoss(FalseSpiritPortal.identityTag, FalseSpiritPortal::new);
