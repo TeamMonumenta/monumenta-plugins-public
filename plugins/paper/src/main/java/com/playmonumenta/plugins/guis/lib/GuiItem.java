@@ -285,7 +285,7 @@ public final class GuiItem {
 					.toList()
 			);
 
-			if ((stack.getType() == Material.PLAYER_HEAD || stack.getType() == Material.PLAYER_WALL_HEAD) && mHeadOwner != null && meta instanceof SkullMeta skullMeta) {
+			if (stack.getType() == Material.PLAYER_HEAD && mHeadOwner != null && meta instanceof SkullMeta skullMeta) {
 				UUID ownerUuid = mHeadOwner.getUniqueId();
 				String ownerName = mHeadOwner.getName();
 				PlayerProfile playerProfile;

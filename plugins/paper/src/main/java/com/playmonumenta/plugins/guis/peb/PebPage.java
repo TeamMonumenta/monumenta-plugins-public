@@ -27,9 +27,14 @@ class PebPage extends PagedGui.Page {
 
 		protected PebEntryHelper(Material item, String title, String desc) {
 			mBuilder = BUILDER.get().name(title).lore(desc).material(item);
-			if (item == Material.PLAYER_HEAD || item == Material.PLAYER_WALL_HEAD) {
+			if (item == Material.PLAYER_HEAD) {
 				mBuilder.setHead(getPlayer());
 			}
+		}
+
+		protected PebEntryHelper disableHead() {
+			mBuilder.setHead(null);
+			return this;
 		}
 
 		@CheckReturnValue
@@ -169,7 +174,7 @@ class PebPage extends PagedGui.Page {
 			.name(title)
 			.lore(desc);
 
-		if (item == Material.PLAYER_HEAD || item == Material.PLAYER_WALL_HEAD) {
+		if (item == Material.PLAYER_HEAD) {
 			titleBuilder.setHead(getPlayer());
 		}
 

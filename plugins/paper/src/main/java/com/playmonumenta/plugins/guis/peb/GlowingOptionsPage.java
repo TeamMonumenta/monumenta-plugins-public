@@ -54,14 +54,17 @@ final class GlowingOptionsPage extends PebPage {
 		super.render();
 
 		// Toggle items
-		addOption(Material.PLAYER_WALL_HEAD, "Other Players", GlowingCommand.Option.OTHER_PLAYERS, 0);
+		makeOption(Material.PLAYER_HEAD, "Other Players", GlowingCommand.Option.OTHER_PLAYERS)
+			.disableHead()
+			.set(2, 0);
 		addOption(Material.PLAYER_HEAD, "Yourself", GlowingCommand.Option.SELF, 1);
 		addOption(Material.ZOMBIE_HEAD, "Mobs", GlowingCommand.Option.MOBS, 2);
 		addOption(Material.WITHER_SKELETON_SKULL, "Elite Mobs", GlowingCommand.Option.ELITES, 3);
-		addOption(Material.DRAGON_HEAD, "Bosses", GlowingCommand.Option.BOSSES, 4);
-		addOption(Material.GLASS, "Invisible Entities", GlowingCommand.Option.INVISIBLE, 5);
-		addOption(Material.IRON_INGOT, "Items", GlowingCommand.Option.ITEMS, 6);
-		addOption(Material.IRON_NUGGET, "Miscellaneous", GlowingCommand.Option.MISC, 7);
+
+		addOption(Material.DRAGON_HEAD, "Bosses", GlowingCommand.Option.BOSSES, 5);
+		addOption(Material.GLASS, "Invisible Entities", GlowingCommand.Option.INVISIBLE, 6);
+		addOption(Material.IRON_INGOT, "Items", GlowingCommand.Option.ITEMS, 7);
+		addOption(Material.IRON_NUGGET, "Miscellaneous", GlowingCommand.Option.MISC, 8);
 
 		entry(
 			Material.GOLD_INGOT,
@@ -83,9 +86,12 @@ final class GlowingOptionsPage extends PebPage {
 		).cycle(EagleEye.GLOWING_OPTION_SCOREBOARD_NAME, EAGLE_EYE_OPTIONS).set(4, 4);
 	}
 
+	private PebEntryHelper makeOption(Material icon, String name, GlowingCommand.Option option) {
+		return entry(icon, name, "Toggle glowing for " + name.toLowerCase(Locale.ROOT))
+			.invertedToggle("Glowing: ", new GlowingFlag(option));
+	}
+
 	private void addOption(Material icon, String name, GlowingCommand.Option option, int col) {
-		entry(icon, name, "Toggle glowing for " + name.toLowerCase(Locale.ROOT))
-			.invertedToggle("Glowing: ", new GlowingFlag(option))
-			.set(2, col);
+		makeOption(icon, name, option).set(2, col);
 	}
 }
