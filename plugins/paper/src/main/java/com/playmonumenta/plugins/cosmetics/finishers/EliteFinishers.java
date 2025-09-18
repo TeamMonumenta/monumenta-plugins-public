@@ -31,6 +31,7 @@ public class EliteFinishers {
 			.put(AdvancedAudioMechanism.NAME, new AdvancedAudioMechanism())
 			.put(BirthdayThemeFinisher.NAME, new BirthdayThemeFinisher())
 			.put(BlastOffFinisher.NAME, new BlastOffFinisher())
+			.put(BuzzedFinisher.NAME, new BuzzedFinisher())
 			.put(CakeifyFinisher.NAME, new CakeifyFinisher())
 			.put(ChainedFinisher.NAME, new ChainedFinisher())
 			.put(CoolFireworkFinisher.NAME, new CoolFireworkFinisher())
