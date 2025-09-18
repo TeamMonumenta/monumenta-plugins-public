@@ -324,6 +324,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(PassiveBoss.identityTag, PassiveBoss::new);
 		registerStatelessBoss(StealthBoss.identityTag, StealthBoss::new, new StealthBoss.Parameters());
 		registerStatelessBoss(RamBoss.identityTag, RamBoss::new, new RamBoss.Parameters());
+		registerStatelessBoss(BeamBoss.identityTag, BeamBoss::new, new BeamBoss.Parameters());
 		registerStatelessBoss(PlayerScalingBoss.identityTag, PlayerScalingBoss::new, new PlayerScalingBoss.Parameters());
 		registerStatelessBoss(ProjectileEntityBoss.identityTag, ProjectileEntityBoss::new, new ProjectileEntityBoss.Parameters());
 		registerStatelessBoss(BefuddleBoss.identityTag, BefuddleBoss::new, new BefuddleBoss.Parameters());

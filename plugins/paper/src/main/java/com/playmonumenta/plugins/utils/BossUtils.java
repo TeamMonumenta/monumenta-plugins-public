@@ -72,6 +72,18 @@ public class BossUtils {
 		return false;
 	}
 
+	public static int calculateShieldStun(double damage, LivingEntity damagee){
+		int stunTicks = (int) (20 * damage / 2.5);
+
+		// adjust stun time based on region
+		if (damagee instanceof Player player) {
+			// every 2.5 damage = 1s of stun time in R1, 3.5 damage per 1s in R2, and 4 damage per 1s in R3.
+			double stunRatio = ServerProperties.getClassSpecializationsEnabled(player) ? (ServerProperties.getAbilityEnhancementsEnabled(player) ? 4.0 : 3.5) : 2.5;
+			stunTicks = (int) (20 * damage / stunRatio);
+		}
+		return stunTicks;
+	}
+
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage) {
 		return blockableDamage(damager, damagee, type, damage, new ArrayList<>());
 	}
@@ -93,15 +105,11 @@ public class BossUtils {
 	}
 
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location, List<EffectsList.Effect> effects) {
-		int stunTicks = (int) (20 * damage / 2.5);
+		return blockableDamage(damager, damagee, type, damage, cause, location, calculateShieldStun(damage, damagee), effects);
+	}
 
-		// adjust stun time based on region
-		if (damagee instanceof Player player) {
-			// every 2.5 damage = 1s of stun time in R1, 3.5 damage per 1s in R2, and 4 damage per 1s in R3.
-			double stunRatio = ServerProperties.getClassSpecializationsEnabled(player) ? (ServerProperties.getAbilityEnhancementsEnabled(player) ? 4.0 : 3.5) : 2.5;
-			stunTicks = (int) (20 * damage / stunRatio);
-		}
-		return blockableDamage(damager, damagee, type, damage, cause, location, stunTicks, effects);
+	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, List<EffectsList.Effect> effects) {
+		return blockableDamage(damager, damagee, type, damage, bypassIFrames, causeKnockback, cause, location, calculateShieldStun(damage, damagee), (int) (damage / 5), effects);
 	}
 
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location, int stunTicks, List<EffectsList.Effect> effects) {
