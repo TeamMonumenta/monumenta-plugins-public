@@ -64,11 +64,9 @@ public class PurpleTessOverride extends BaseOverride {
 		return false;
 	}
 
-	private static void replaceContents(Container to, Container from) {
-		Inventory toInv = to.getInventory();
-		Inventory fromInv = from.getInventory();
-		for (int i = 0; i < toInv.getSize(); i++) {
-			toInv.setItem(i, fromInv.getItem(i));
+	private static void replaceContents(Inventory to, Inventory from) {
+		for (int i = 0; i < to.getSize(); i++) {
+			to.setItem(i, from.getItem(i));
 		}
 	}
 
@@ -89,6 +87,7 @@ public class PurpleTessOverride extends BaseOverride {
 		Location centerLoc = block.getLocation().add(0.5, 0.5, 0.5);
 
 		Container originalContainer = (Container) block.getState();
+		Inventory originalInventory = originalContainer instanceof Chest chest ? chest.getBlockInventory() : originalContainer.getInventory();
 
 		if (player.isSneaking() && isUpgraded && !PotionBarrelListener.isPotionBarrel(block)) {
 			world.playSound(centerLoc, Sound.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 0.6f, 1.4f, 1);
@@ -98,10 +97,10 @@ public class PurpleTessOverride extends BaseOverride {
 
 			block.setBlockData(blockData);
 			if (block.getState() instanceof Container newContainer) {
-				replaceContents(newContainer, originalContainer);
+				replaceContents(newContainer.getInventory(), originalInventory);
 			}
 		} else {
-			for (@Nullable ItemStack itemStack : originalContainer.getInventory().getContents()) {
+			for (@Nullable ItemStack itemStack : originalInventory.getContents()) {
 				if (itemStack == null) {
 					continue;
 				}
@@ -130,7 +129,7 @@ public class PurpleTessOverride extends BaseOverride {
 				return;
 			}
 
-			replaceContents(shulkerBox, originalContainer);
+			replaceContents(shulkerBox.getInventory(), originalInventory);
 
 			@Nullable
 			Component name = originalContainer.customName();
