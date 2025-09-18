@@ -28,6 +28,7 @@ public class ZoneUtils {
 		CAN_SHOOT_POTS("Can Shoot Pots"),
 		DISABLE_GRAVES("Disable Graves"),
 		DISABLE_MAGIC_TESS("DisableMagicTess"),
+		DISABLE_PURPLE_TESS("DisablePurpleTesseract"),
 		DISABLE_REDSTONE_INTERACTIONS("Disable Redstone Interactions"),
 		EXPLOSION_PROOF_CHESTS("Explosion Proof Chests"),
 		FESTIVE_TESSERACT_DISABLED("Festive Tesseract Disabled"),

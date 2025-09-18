@@ -101,6 +101,8 @@ public final class ItemOverrides {
 		mItems.put(Material.YELLOW_STAINED_GLASS, new YellowTesseractOverride());
 		mItems.put(Material.LIME_STAINED_GLASS, new LimeTesseractOverride());
 		mItems.put(Material.ICE, new FestiveTesseractOverride());
+		mItems.put(Material.PURPLE_STAINED_GLASS, new PurpleTessOverride(false));
+		mItems.put(Material.RED_DYE, new PurpleTessOverride(true));
 
 		mItems.put(InflationOverride.itemMaterial, new InflationOverride());
 

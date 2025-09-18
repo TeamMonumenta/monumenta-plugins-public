@@ -691,7 +691,7 @@ public class PotionBarrelListener implements Listener {
 		}
 	}
 
-	private static boolean isPotionBarrel(Block block) {
+	public static boolean isPotionBarrel(Block block) {
 		return block.getType() == Material.BARREL
 			&& isPotionBarrel(block.getState());
 	}
