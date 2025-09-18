@@ -16,9 +16,9 @@ import com.playmonumenta.plugins.depths.abilities.dawnbringer.SoothingCombos;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.SparkOfInspiration;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.WardOfLight;
+import com.playmonumenta.plugins.depths.abilities.earthbound.BeastsClaw;
 import com.playmonumenta.plugins.depths.abilities.earthbound.BrambleShell;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Bulwark;
-import com.playmonumenta.plugins.depths.abilities.earthbound.CrushingEarth;
 import com.playmonumenta.plugins.depths.abilities.earthbound.DepthsToughness;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenCombos;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
@@ -145,12 +145,12 @@ public enum CharmEffects {
 	WARD_OF_LIGHT_CONE_ANGLE("Ward of Light Cone Angle", WardOfLight.INFO, true, true, 0, 100.0, new double[] {0.0, 0.0, 20.0, 40.0, 60.0}),
 
 	// Earthbound
+	BEASTS_CLAW_COOLDOWN(BeastsClaw.CHARM_COOLDOWN, BeastsClaw.INFO, false, true, 3.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
+	BEASTS_CLAW_DAMAGE("Beast's Claw Damage", BeastsClaw.INFO, false, true, 5.0, 80.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
+	BEASTS_CLAW_VELOCITY("Beast's Claw Velocity", BeastsClaw.INFO, false, true, 3.0, 30.0, new double[] {10.0, 12.0, 14.0, 16.0, 18.0}),
+	BEASTS_CLAW_STUN_DURATION("Beast's Claw Stun Duration", BeastsClaw.INFO, true, false, 0.25, 2.0, new double[] {0.25, 0.5, 0.75, 1.0, 1.25}),
 	BRAMBLE_SHELL_DAMAGE("Bramble Shell Damage", BrambleShell.INFO, false, true, 5.0, 80.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
 	BULWARK_COOLDOWN(Bulwark.CHARM_COOLDOWN, Bulwark.INFO, false, true, 3.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
-	CRUSHING_EARTH_COOLDOWN(CrushingEarth.CHARM_COOLDOWN, CrushingEarth.INFO, false, true, 3.0, -30.0, new double[] {-5.0, -7.5, -10.0, -12.5, -15.0}),
-	CRUSHING_EARTH_DAMAGE("Crushing Earth Damage", CrushingEarth.INFO, false, true, 5.0, 80.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
-	CRUSHING_EARTH_RANGE("Crushing Earth Range", CrushingEarth.INFO, false, true, 5.0, 50.0, new double[] {10.0, 15.0, 20.0, 25.0, 30.0}),
-	CRUSHING_EARTH_STUN_DURATION("Crushing Earth Stun Duration", CrushingEarth.INFO, true, false, 0.25, 2.0, new double[] {0.25, 0.5, 0.75, 1.0, 1.25}),
 	EARTHEN_COMBOS_HIT_REQUIREMENT("Earthen Combos Hit Requirement", EarthenCombos.INFO, true, false, 0.0, -1.0, new double[] {0.0, 0.0, 0.0, 0.0, -1.0}),
 	EARTHEN_COMBOS_RESISTANCE_AMPLIFIER("Earthen Combos Resistance Amplifier", EarthenCombos.INFO, true, true, 2.0, 15.0, new double[] {2.0, 4.0, 6.0, 8.0, 10.0}),
 	EARTHEN_COMBOS_EFFECT_DURATION("Earthen Combos Buff Duration", EarthenCombos.INFO, true, false, 0.5, 5.0, new double[] {0.5, 1.0, 1.5, 2.0, 2.5}),

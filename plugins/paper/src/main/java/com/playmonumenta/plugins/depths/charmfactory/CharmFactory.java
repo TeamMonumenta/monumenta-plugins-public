@@ -117,7 +117,12 @@ public class CharmFactory {
 		Map.entry("Precision Strike Range Requirement", "Split Arrow Range"),
 		Map.entry("Precision Strike Max Stacks", "Sharpshooter Max Stacks"),
 		Map.entry("Phantom Force Weaken Amplifier", "Phantom Force Vulnerability Amplifier"),
-		Map.entry("Phantom Force Weaken Duration", "Phantom Force Vulnerability Duration")
+		Map.entry("Phantom Force Weaken Duration", "Phantom Force Vulnerability Duration"),
+
+		Map.entry("Crushing Earth Damage", "Beast's Claw Damage"),
+		Map.entry("Crushing Earth Cooldown", "Beast's Claw Cooldown"),
+		Map.entry("Crushing Earth Range", "Beast's Claw Velocity"),
+		Map.entry("Crushing Earth Stun Duration", "Beast's Claw Stun Duration")
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {

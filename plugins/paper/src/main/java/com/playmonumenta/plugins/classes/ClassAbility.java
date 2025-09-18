@@ -253,9 +253,9 @@ public enum ClassAbility {
 	PERMAFROST("Permafrost"),
 
 	// EARTHBORN
+	BEASTSCLAW("Beast's Claw"),
 	BRAMBLE_SHELL("Bramble Shell"),
 	BULWARK("Bulwark"),
-	CRUSHING_EARTH("Crushing Earth"),
 	EARTHEN_WRATH("Earthen Wrath"),
 	EARTHQUAKE("Earthquake"),
 	IRON_GRIP("Iron Grip"),

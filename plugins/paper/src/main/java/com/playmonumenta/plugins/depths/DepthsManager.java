@@ -43,9 +43,9 @@ import com.playmonumenta.plugins.depths.abilities.dawnbringer.SoothingCombos;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.SparkOfInspiration;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.Sundrops;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.WardOfLight;
+import com.playmonumenta.plugins.depths.abilities.earthbound.BeastsClaw;
 import com.playmonumenta.plugins.depths.abilities.earthbound.BrambleShell;
 import com.playmonumenta.plugins.depths.abilities.earthbound.Bulwark;
-import com.playmonumenta.plugins.depths.abilities.earthbound.CrushingEarth;
 import com.playmonumenta.plugins.depths.abilities.earthbound.DepthsToughness;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenCombos;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
@@ -691,9 +691,9 @@ public class DepthsManager {
 			PiercingCold.INFO,
 
 			// Earthbound abilities
+			BeastsClaw.INFO,
 			BrambleShell.INFO,
 			Bulwark.INFO,
-			CrushingEarth.INFO,
 			DepthsToughness.INFO,
 			EarthenCombos.INFO,
 			EarthenWrath.INFO,
