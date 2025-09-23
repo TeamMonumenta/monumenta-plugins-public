@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.delves;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.custominventories.BountyGui;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
@@ -137,7 +138,7 @@ public class DelvesUtils {
 	public static List<DelvesModifier> getExperimentalDelveModifier() {
 		List<DelvesModifier> experimentalMods = DelvesModifier.experimentalDelveModifiers();
 		return switch ((int) DateUtils.getWeeklyVersion()) {
-			// week starting friday august 8, 2025
+			// week starting Friday, August 8, 2025
 			case 2902, 2903, 2904, 2905, 2906 -> List.of(experimentalMods.get(6), experimentalMods.get(7));
 			default -> Collections.emptyList();
 		};
@@ -693,6 +694,15 @@ public class DelvesUtils {
 
 	public static Map<String, DelvesManager.DungeonDelveInfo> getOrAddDelveInfoMap(Player player) {
 		return DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>());
+	}
+
+	// Note: This can load one content's delve points into another, should you want to...
+	public static void loadPlayerDungeonData(Player player, String dungeonName, JsonObject dungeonObj) throws RuntimeException {
+		DelvesManager.loadPlayerDungeonData(player, dungeonName, dungeonObj);
+	}
+
+	public static JsonObject convertPlayerDungeonData(Player player, String dungeonName) {
+		return DelvesManager.convertPlayerDungeonData(dungeonName, getDelveInfo(player, dungeonName));
 	}
 
 	// Only use this method if there is no already known player

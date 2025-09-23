@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.commands.SpawnerCountCommand;
 import com.playmonumenta.plugins.delves.abilities.Astral;
 import com.playmonumenta.plugins.delves.abilities.Berserk;
-import com.playmonumenta.plugins.delves.abilities.Bountiful;
 import com.playmonumenta.plugins.delves.abilities.ChanceCubes;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Chronology;
@@ -200,48 +199,52 @@ public class DelvesManager implements Listener {
 			try {
 				String name = dungeonObj.get("dungeonName").getAsString();
 
-				DungeonDelveInfo info = new DungeonDelveInfo();
-
-				JsonElement presetId = dungeonObj.get("presetId");
-				if (presetId != null) {
-					info.mPresetId = presetId.getAsInt();
-				}
-
-				DelvePreset preset = DelvePreset.getDelvePreset(info.mPresetId);
-				// Exempt entropy presets as they have rolled modifiers.
-				if (preset != null && !preset.mModifiers.containsKey(DelvesModifier.ENTROPY)) {
-					// if a preset is saved, ignore the saved modifiers and update to the preset instead
-					info.mModifierPoint.putAll(preset.mModifiers);
-					info.recalculateTotalPoint();
-				} else {
-					JsonArray delveModArr = dungeonObj.getAsJsonArray("delveMods");
-					if (delveModArr == null) {
-						continue;
-					}
-					for (int delveIterator = 0; delveIterator < delveModArr.size(); delveIterator++) {
-						JsonObject delveObj = delveModArr.get(delveIterator).getAsJsonObject();
-						DelvesModifier delveMod = DelvesModifier.fromName(delveObj.getAsJsonPrimitive("delveModName").getAsString());
-						if (delveMod == null) {
-							continue;
-						}
-
-						int lvl = delveObj.getAsJsonPrimitive("delveModLvl").getAsInt();
-
-						if (lvl > 0) {
-							info.put(delveMod, lvl);
-						}
-
-					}
-				}
-
-				DelvesUtils.getOrAddDelveInfoMap(player).putIfAbsent(name, info);
-				DelvesUtils.updateDelveScoreBoard(player);
+				loadPlayerDungeonData(player, name, dungeonObj);
 			} catch (Exception e) {
 				MMLog.warning("[DelveManager] error while loading player info. Reason: " + e.getMessage());
 				e.printStackTrace();
 				player.sendMessage(Component.text("Some of your delve data have not loaded correctly, try reloading!", NamedTextColor.RED).hoverEvent(HoverEvent.showText(Component.text(e.toString()))));
 			}
 		}
+	}
+
+	protected static void loadPlayerDungeonData(Player player, String dungeonName, JsonObject dungeonObj) throws RuntimeException {
+		DungeonDelveInfo info = new DungeonDelveInfo();
+
+		JsonElement presetId = dungeonObj.get("presetId");
+		if (presetId != null) {
+			info.mPresetId = presetId.getAsInt();
+		}
+
+		DelvePreset preset = DelvePreset.getDelvePreset(info.mPresetId);
+		// Exempt entropy presets as they have rolled modifiers.
+		if (preset != null && !preset.mModifiers.containsKey(DelvesModifier.ENTROPY)) {
+			// if a preset is saved, ignore the saved modifiers and update to the preset instead
+			info.mModifierPoint.putAll(preset.mModifiers);
+			info.recalculateTotalPoint();
+		} else {
+			JsonArray delveModArr = dungeonObj.getAsJsonArray("delveMods");
+			if (delveModArr == null) {
+				return;
+			}
+			for (int delveIterator = 0; delveIterator < delveModArr.size(); delveIterator++) {
+				JsonObject delveObj = delveModArr.get(delveIterator).getAsJsonObject();
+				DelvesModifier delveMod = DelvesModifier.fromName(delveObj.getAsJsonPrimitive("delveModName").getAsString());
+				if (delveMod == null) {
+					continue;
+				}
+
+				int lvl = delveObj.getAsJsonPrimitive("delveModLvl").getAsInt();
+
+				if (lvl > 0) {
+					info.put(delveMod, lvl);
+				}
+
+			}
+		}
+
+		DelvesUtils.getOrAddDelveInfoMap(player).putIfAbsent(dungeonName, info);
+		DelvesUtils.updateDelveScoreBoard(player);
 	}
 
 	public static void savePlayerData(Player player, String dungeon, Map<DelvesModifier, Integer> mods, int presetId) {
@@ -286,23 +289,27 @@ public class DelvesManager implements Listener {
 		obj.add("dungeons", dungeons);
 
 		for (Map.Entry<String, DungeonDelveInfo> playerDungeonInfo : delveInfoMap.entrySet()) {
-			JsonObject dungeonObj = new JsonObject();
-			dungeonObj.addProperty("dungeonName", playerDungeonInfo.getKey());
-
-			JsonArray delveModArr = new JsonArray();
-			dungeonObj.add("delveMods", delveModArr);
-			for (Map.Entry<DelvesModifier, Integer> modLevelEntry : playerDungeonInfo.getValue().mModifierPoint.entrySet()) {
-				JsonObject dungeonMod = new JsonObject();
-				dungeonMod.addProperty("delveModName", modLevelEntry.getKey().name());
-				dungeonMod.addProperty("delveModLvl", modLevelEntry.getValue());
-				delveModArr.add(dungeonMod);
-			}
-			dungeonObj.addProperty("presetId", playerDungeonInfo.getValue().mPresetId);
-			dungeons.add(dungeonObj);
-
+			dungeons.add(convertPlayerDungeonData(playerDungeonInfo.getKey(), playerDungeonInfo.getValue()));
 		}
 
 		return obj;
+	}
+
+	protected static JsonObject convertPlayerDungeonData(String dungeonName, DungeonDelveInfo playerDungeonInfo) {
+		JsonObject dungeonObj = new JsonObject();
+		dungeonObj.addProperty("dungeonName", dungeonName);
+
+		JsonArray delveModArr = new JsonArray();
+		dungeonObj.add("delveMods", delveModArr);
+		for (Map.Entry<DelvesModifier, Integer> modLevelEntry : playerDungeonInfo.mModifierPoint.entrySet()) {
+			JsonObject dungeonMod = new JsonObject();
+			dungeonMod.addProperty("delveModName", modLevelEntry.getKey().name());
+			dungeonMod.addProperty("delveModLvl", modLevelEntry.getValue());
+			delveModArr.add(dungeonMod);
+		}
+		dungeonObj.addProperty("presetId", playerDungeonInfo.mPresetId);
+
+		return dungeonObj;
 	}
 
 	public static int getSpawnersBroken(World world) {
