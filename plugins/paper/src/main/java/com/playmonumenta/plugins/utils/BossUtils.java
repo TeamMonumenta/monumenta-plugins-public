@@ -12,6 +12,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Retaliation;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.infusions.Sturdy;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
@@ -135,7 +137,8 @@ public class BossUtils {
 
 		if (damagee instanceof Player player && bossDamageBlocked(player, location)) {
 			if (stunTicks > 0) {
-				NmsUtils.getVersionAdapter().stunShield(player, stunTicks);
+				int finalStunTicks = Sturdy.updateStunCooldown(stunTicks, Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.STURDY));
+				NmsUtils.getVersionAdapter().stunShield(player, finalStunTicks);
 				damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			}
 			ItemUtils.damageShield(player, durability);
@@ -202,12 +205,14 @@ public class BossUtils {
 			 */
 			if (raw) {
 				if (toTake > 1) {
-					NmsUtils.getVersionAdapter().stunShield(player, (int) Math.ceil(toTake * 0.5));
+					int finalStunTicks = Sturdy.updateStunCooldown((int) Math.ceil(toTake * 0.5), Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.STURDY));
+					NmsUtils.getVersionAdapter().stunShield(player, finalStunTicks);
 				}
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				ItemUtils.damageShield(player, (int) Math.ceil(toTake / 2.5));
 			} else {
-				NmsUtils.getVersionAdapter().stunShield(player, (int) (20 * percentHealth * 20));
+				int finalStunTicks = Sturdy.updateStunCooldown((int) (20 * percentHealth * 20), Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.STURDY));
+				NmsUtils.getVersionAdapter().stunShield(player, finalStunTicks);
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				ItemUtils.damageShield(player, (int)(percentHealth * 20 / 2.5));
 			}

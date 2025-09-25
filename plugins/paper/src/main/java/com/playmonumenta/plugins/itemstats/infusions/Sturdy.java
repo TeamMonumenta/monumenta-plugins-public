@@ -30,10 +30,14 @@ public class Sturdy implements Infusion {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				int shieldBrokenTicks = player.getCooldown(Material.SHIELD);
 				if (shieldBrokenTicks > 0) {
-					int finalTicks = (int) (shieldBrokenTicks * (1 - value * CDR_PER_LEVEL));
+					int finalTicks = updateStunCooldown(shieldBrokenTicks, value);
 					player.setCooldown(Material.SHIELD, finalTicks);
 				}
 			});
 		}
+	}
+
+	public static int updateStunCooldown(double ticks, double value) {
+		return (int) (ticks * (1 - value * CDR_PER_LEVEL));
 	}
 }
