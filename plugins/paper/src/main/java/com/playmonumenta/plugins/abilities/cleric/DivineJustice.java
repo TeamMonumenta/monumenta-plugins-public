@@ -160,6 +160,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 							if (mEnhanceRemainingDuration <= 0) {
 								mEnhanceIsReady = false;
 								ClientModHandler.updateAbility(mPlayer, ABILITY);
+								this.cancel();
 							}
 						}
 					};
