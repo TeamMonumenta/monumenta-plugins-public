@@ -12,12 +12,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,7 +21,14 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Objects;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
@@ -37,35 +38,22 @@ import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
  */
 public final class BlockPlacerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blockplacer";
-	private final Parameters mParameters;
-
-	public static class Parameters extends BossParameters {
-		@BossParam(help = "Changes the type of block the mob uses. Invalid options default to polished blackstone bricks.")
-		public Material block = Material.POLISHED_BLACKSTONE_BRICKS;
-
-		@BossParam(help = "Change the sound of the block being placed.")
-		public SoundsList sound_place = SoundsList.builder()
-			.add(new SoundsList.CSound(Sound.BLOCK_NETHER_BRICKS_PLACE, 1f, 0.6f))
-			.build();
-	}
-
 	public static final String PREVENT_BLOCK_PLACEMENT = "disable_boss_blockplacer";
-
 	private static final double PREVENT_PLACING_RADIUS = 3.5;
 	private static final double PREVENT_PLACING_HEIGHT = 7;
 	private static final int IDLE_TIME = 6 * TICKS_PER_SECOND;
-	private static final int NEW_TARGET_RANGE = 25;
+	private static final int NEW_TARGET_RANGE = 30;
 	private static final int BEELINE_DISTANCE = 8;
 	/* Materials that have collision but should never be replaced when a launcher bridges. Left as a set in case
 	 * Mojank does something silly in the future */
 	private static final EnumSet<Material> CANNOT_REPLACE_MATERIALS = EnumSet.of(
 		Material.END_PORTAL
 	);
+	private final Parameters mParameters;
 	private final Mob mMob = (Mob) mBoss;
 	private Location mLastLocation = mMob.getLocation();
 	private int mNoTargetTicks = 0;
 	private int mLowMovementTicks = 0;
-
 	public BlockPlacerBoss(final Plugin plugin, final LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParameters = BossParameters.getParameters(boss, identityTag, new BlockPlacerBoss.Parameters());
@@ -135,7 +123,7 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 						&& Math.abs(bossToPlayerVec.getX()) < 1
 						&& Math.abs(bossToPlayerVec.getZ()) < 1)) {
 						/* Launcher likely boxed itself inside a cage and needs to be rescued */
-						/* Or the launcher is directly above the player and we want it to jump down and engage */
+						/* Or the launcher is directly above the player, and we want it to jump down and engage */
 						final List<Block> nearbyBridgeBlocks = BlockUtils.getBlocksInCube(bossLoc, 3);
 						nearbyBridgeBlocks.removeIf(block -> block.getType() != mParameters.block);
 						blockBreakToTarget.breakBlocks(bossLoc, nearbyBridgeBlocks);
@@ -144,8 +132,17 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 					}
 
 					/* Launcher is falling pretty fast and below the target */
-					if (mBoss.getVelocity().getY() < -1
-						&& mBoss.getY() < target.getY()) {
+					if (mParameters.loom_floor
+						&& mBoss.getVelocity().getY() < -mParameters.aggressive_fall_velocity
+						&& mBoss.getY() < target.getY() - mParameters.aggressive_loom_height) {
+						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 60, 5));
+					}
+
+					if (mParameters.loom_floor
+						&& ((mBoss.getVelocity().getY() < -mParameters.fall_velocity
+						&& mBoss.getY() < target.getY())
+						|| (mBoss.getVelocity().getY() < -mParameters.aggressive_fall_velocity
+						&& (mBoss.getY() < target.getY() - mParameters.aggressive_loom_height)))) {
 						/* Downwards velocity of 1 corresponds to about 7 blocks of freefall */
 						mBoss.setVelocity(mBoss.getVelocity().clone().setY(0.1));
 						List<Location> floorLocs = new ArrayList<>();
@@ -155,7 +152,7 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 								floorLocs.add(mBoss.getLocation().add(x, -1, z));
 							}
 						}
-						for (Location loc: floorLocs) {
+						for (Location loc : floorLocs) {
 							final Block block = loc.getBlock();
 							final Material material = block.getType();
 							if (!PlayerUtils.playersInRange(bossLoc, PREVENT_PLACING_RADIUS, true).isEmpty()) {
@@ -163,9 +160,9 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 									"a floor but was too close to one or more players");
 								return;
 							}
-							// If block is in cannot replace mats or is a solid or is water or the location is in adventure
+							// If block is in cannot replace mats or is a solid or the location is in adventure
 							// mode or the location intersects an entity's box, don't replace that block
-							if (CANNOT_REPLACE_MATERIALS.contains(material) || block.isSolid() || BlockUtils.containsWater(block)
+							if (CANNOT_REPLACE_MATERIALS.contains(material) || block.isSolid()
 								|| ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)
 								|| LocationUtils.blocksIntersectEntity(loc.getWorld(), List.of(loc),
 								hitbox -> hitbox.getHitEntities(e -> e instanceof LivingEntity && !e.isInvulnerable()))) {
@@ -176,6 +173,15 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 
 							block.setType(mParameters.block);
 							mParameters.sound_place.play(boss.getLocation());
+						}
+					}
+
+					if (mParameters.hydrophobic && (mBoss.isInWater() || mBoss.isInLava())) {
+						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 10, 3));
+						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 10, 5));
+						Location nearestDryLoc = LocationUtils.getNearestDryBlock(bossLoc, 15);
+						if (nearestDryLoc != null) {
+							mBoss.teleport(nearestDryLoc);
 						}
 					}
 
@@ -257,9 +263,9 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 					for (final Location loc : bridgeLocs) {
 						final Block block = loc.getBlock();
 						final Material material = block.getType();
-						// If block is in cannot replace mats or is a solid or is water or the location is in adventure
+						// If block is in cannot replace mats or is a solid or the location is in adventure
 						// mode or the location intersects an entity's box, don't replace that block
-						if (CANNOT_REPLACE_MATERIALS.contains(material) || block.isSolid() || BlockUtils.containsWater(block)
+						if (CANNOT_REPLACE_MATERIALS.contains(material) || block.isSolid()
 							|| ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)
 							|| LocationUtils.blocksIntersectEntity(loc.getWorld(), List.of(loc),
 							hitbox -> hitbox.getHitEntities(e -> e instanceof LivingEntity && !e.isInvulnerable()))) {
@@ -279,5 +285,30 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 		);
 
 		super.constructBoss(SpellManager.EMPTY, spells, NEW_TARGET_RANGE * 2, null);
+	}
+
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "Changes the type of block the mob uses. Invalid options default to polished blackstone bricks.")
+		public Material block = Material.POLISHED_BLACKSTONE_BRICKS;
+
+		@BossParam(help = "Change the sound of the block being placed.")
+		public SoundsList sound_place = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_NETHER_BRICKS_PLACE, 1f, 0.6f))
+			.build();
+
+		@BossParam(help = "Whether the mob places blocks beneath it when freefalling below the player.")
+		public boolean loom_floor = true;
+
+		@BossParam(help = "Downwards velocity that the mob has to fall at before placing a block underneath it. Positive values are downwards.")
+		public double fall_velocity = 0.5;
+
+		@BossParam(help = "Distance below the target player before the mob's loom floor behaviour becomes more aggressive. Set arbitrarily high to disable. Will not work if loom_floor is false.")
+		public int aggressive_loom_height = 15;
+
+		@BossParam(help = "Downwards velocity that the mob has to fall at before placing a block underneath it, under aggressive looming. Positive values are downwards.")
+		public double aggressive_fall_velocity = 0.1;
+
+		@BossParam(help = "Whether the boss attempts to escape liquids.")
+		public boolean hydrophobic = true;
 	}
 }

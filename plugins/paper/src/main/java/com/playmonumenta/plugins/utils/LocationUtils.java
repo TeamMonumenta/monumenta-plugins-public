@@ -204,7 +204,10 @@ public class LocationUtils {
 		return false;
 	}
 
-	// Search a cuboid around a Location and return the first Location found with a block matching one of the given Materials
+	/**
+	 * Search a cuboid around a Location and return the first Location found with a block matching one of the given Materials
+	 * Currently unused. If you wish to use this, upgrade the search to the more efficient version in getNearestDryBlock.
+	 */
 	public static @Nullable Location getNearestBlock(Location center, int radius, Material... materials) {
 		int cx = center.getBlockX();
 		int cy = center.getBlockY();
@@ -232,6 +235,78 @@ public class LocationUtils {
 		}
 		return nearest;
 	}
+
+	/**
+	 * Search a cuboid around a Location and return the first Location which is not submerged. If there is no unsubmerged Location, returns null.
+	 *
+	 * @return Nearest unsubmerged Location. <code>null</code> if no nearby Locations are unsubmerged.
+	 */
+	public static @Nullable Location getNearestDryBlock(Location center, int maxRadius) {
+		int cx = center.getBlockX();
+		int cy = center.getBlockY();
+		int cz = center.getBlockZ();
+		World world = center.getWorld();
+		Location nearest = null;
+		double nearestDistanceSquared = Double.MAX_VALUE;
+
+
+		// The code here is very aesthetically displeasing.
+		// It checks every block around, in an iterative process, going from the smallest radius to the largest.
+		// At each radius, it checks a "shell", which is the surface of a cube.
+		// If it is possible to make the check into a function instead of just copy-pasting the code 3 times, that would be nice.
+		for (int radius = 1; radius <= maxRadius; radius++) {
+			for (double x = cx - radius; x <= cx + radius; x = x + 2 * radius) {
+				for (double z = cz - radius; z <= cz + radius; z++) {
+					for (double y = (cy - radius); y <= (cy + radius); y++) {
+						Location loc = new Location(world, x, y, z);
+						double distanceSquared = ((cx - x) * (cx - x)) + ((cz - z) * (cz - z)) + ((cy - y) * (cy - y));
+						if (distanceSquared < nearestDistanceSquared
+							&& !loc.getBlock().isLiquid()
+							&& loc.getBlock().isPassable()) {
+							nearest = loc;
+							nearestDistanceSquared = distanceSquared;
+							break;
+						}
+					}
+				}
+			}
+			for (double z = cz - radius; z <= cz + radius; z = z + 2 * radius) {
+				for (double x = cx - (radius - 1); x <= cx + (radius - 1); x++) {
+					for (double y = (cy - radius); y <= (cy + radius); y++) {
+						Location loc = new Location(world, x, y, z);
+						double distanceSquared = ((cx - x) * (cx - x)) + ((cz - z) * (cz - z)) + ((cy - y) * (cy - y));
+						if (distanceSquared < nearestDistanceSquared
+							&& !loc.getBlock().isLiquid()
+							&& loc.getBlock().isPassable()) {
+							nearest = loc;
+							nearestDistanceSquared = distanceSquared;
+							break;
+						}
+					}
+				}
+			}
+			for (double y = cy - radius; y <= cy + radius; y = y + 2 * radius) {
+				for (double x = cx - (radius - 1); x <= cx + (radius - 1); x++) {
+					for (double z = cz - (radius - 1); z <= cz + (radius - 1); z++) {
+						Location loc = new Location(world, x, y, z);
+						double distanceSquared = ((cx - x) * (cx - x)) + ((cz - z) * (cz - z)) + ((cy - y) * (cy - y));
+						if (distanceSquared < nearestDistanceSquared
+							&& !loc.getBlock().isLiquid()
+							&& loc.getBlock().isPassable()) {
+							nearest = loc;
+							nearestDistanceSquared = distanceSquared;
+							break;
+						}
+					}
+				}
+			}
+			if (nearest != null) {
+				return nearest;
+			}
+		}
+		return nearest;
+	}
+
 
 	// Search a cuboid around a Location and return a List of all Chests inside the area
 	public static List<Chest> getNearbyChests(Location center, int radius) {
