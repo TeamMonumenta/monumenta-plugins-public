@@ -71,7 +71,7 @@ public class SpiritArcheryGUI extends Gui {
 	};
 	public final Location cornerLoc1 = new Location(mPlayer.getWorld(), 264, 135, -136);
 	private final String[] conditions = {
-		"Labs",
+		"OldLab",
 		"White",
 		"Magenta",
 		"Yellow"
@@ -101,7 +101,7 @@ public class SpiritArcheryGUI extends Gui {
 		for (int iter = 0; iter < 4; iter++) {
 			int i = iter; // Without this line, it complains about effectively non-final expressions in lambdas...
 			if (ScoreboardUtils.getScoreboardValue(mPlayer, conditions[i]).orElse(0) > 0
-				&& ScoreboardUtils.getScoreboardValue(mPlayer, SpiritArcheryMinigame.scoreboard).orElse(0) >= iter) {
+				&& ScoreboardUtils.getScoreboardValue(mPlayer, SpiritArcheryMinigame.scoreboard).orElse(0) >= i) {
 				setItem(1, 2 * i + 1, GUIItems[i])
 					.onClick((clickEvent) -> {
 						MinigameManager instance = MinigameManager.getInstance();
@@ -128,7 +128,7 @@ public class SpiritArcheryGUI extends Gui {
 					"Not Unlocked", NamedTextColor.RED, true,
 					Component.text("You are not yet ready to calm the song of these spirits.")
 						.appendNewline()
-						.append(Component.text("Defeat the " + conditions[i] + " dungeon "
+						.append(Component.text("Defeat the " + (i != 0 ? conditions[i] : "Alchemy Labs") + " dungeon "
 							+ ((iter > 0) ? "and master the previous Spirit Archery difficulty " : "")
 							+ "to prove yourself worthy.")),
 					30, true));
