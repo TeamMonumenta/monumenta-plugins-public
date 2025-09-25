@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.listeners.PotionBarrelListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -23,7 +24,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.block.Barrel;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
@@ -39,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PurpleTessOverride extends BaseOverride {
 	public static final String TESSERACT_NAME = "Tesseract of Emotions";
+	public static final String TESSERACT_NAME_FESTIVE = "The Gift Wrapper";
 	public static final String TESSERACT_NAME_UPGRADED = "Tesseract of Emotions (u)";
 
 	private static final EnumSet<GameMode> DISALLOWED_GAMEMODES = EnumSet.of(GameMode.ADVENTURE, GameMode.SPECTATOR);
@@ -52,7 +53,7 @@ public class PurpleTessOverride extends BaseOverride {
 
 	@Override
 	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
-		if (!InventoryUtils.testForItemWithName(item, TESSERACT_NAME, false)) {
+		if (isTesseract(item, mFestive)) {
 			return true;
 		}
 
@@ -60,8 +61,18 @@ public class PurpleTessOverride extends BaseOverride {
 			return false;
 		}
 
-		commonHandleClick(player, item, block);
+		handleClick(player, item, block);
 		return false;
+	}
+
+	private static boolean isTesseract(ItemStack item, boolean festive) {
+		return festive
+			? !InventoryUtils.testForItemWithName(item, TESSERACT_NAME_FESTIVE, false)
+			: !InventoryUtils.testForItemWithName(item, TESSERACT_NAME, false);
+	}
+
+	private static boolean isUpgraded(ItemStack item) {
+		return InventoryUtils.testForItemWithName(item, TESSERACT_NAME_UPGRADED, false);
 	}
 
 	private static void replaceContents(Inventory to, Inventory from) {
@@ -70,16 +81,16 @@ public class PurpleTessOverride extends BaseOverride {
 		}
 	}
 
-	public void commonHandleClick(Player player, ItemStack item, @Nullable Block block) {
+	public void handleClick(Player player, ItemStack item, @Nullable Block block) {
 		if (block == null) {
 			return;
 		}
 
-		boolean isUpgraded = InventoryUtils.testForItemWithName(item, TESSERACT_NAME_UPGRADED, false);
-		boolean isChest = block.getState() instanceof Chest;
-		boolean isBarrel = block.getState() instanceof Barrel;
+		boolean isUpgraded = isUpgraded(item);
+		boolean isChest = block.getType() == Material.CHEST;
+		boolean isBarrel = block.getType() == Material.BARREL;
 
-		if (!(isChest || (isBarrel && isUpgraded))) {
+		if (!isChest && !(isBarrel && isUpgraded)) {
 			return; // exclude everything but Chests and (Barrels + using upgraded tess)
 		}
 
@@ -87,6 +98,9 @@ public class PurpleTessOverride extends BaseOverride {
 		Location centerLoc = block.getLocation().add(0.5, 0.5, 0.5);
 
 		Container originalContainer = (Container) block.getState();
+		if (originalContainer.isLocked()) {
+			return;
+		}
 		Inventory originalInventory = originalContainer instanceof Chest chest ? chest.getBlockInventory() : originalContainer.getInventory();
 
 		if (player.isSneaking() && isUpgraded && !PotionBarrelListener.isPotionBarrel(block)) {
@@ -100,10 +114,12 @@ public class PurpleTessOverride extends BaseOverride {
 				replaceContents(newContainer.getInventory(), originalInventory);
 			}
 		} else {
+			boolean foundItem = false;
 			for (@Nullable ItemStack itemStack : originalInventory.getContents()) {
 				if (itemStack == null) {
 					continue;
 				}
+				foundItem = true;
 
 				Material type = itemStack.getType();
 				if (ItemUtils.isShulkerBox(type)) {
@@ -118,6 +134,10 @@ public class PurpleTessOverride extends BaseOverride {
 					player.sendMessage(Component.text("You cannot compress a chest that has non-transferable items in it!", NamedTextColor.RED));
 					return;
 				}
+			}
+			if (!foundItem) {
+				player.sendMessage(Component.text("You cannot use this on a chest that is empty or has an unopened loot table.", NamedTextColor.RED));
+				return;
 			}
 
 			ItemStack shulkerItem = new ItemStack(isBarrel ? Material.YELLOW_SHULKER_BOX : Material.SHULKER_BOX);
@@ -174,9 +194,15 @@ public class PurpleTessOverride extends BaseOverride {
 			player.sendMessage(Component.text("You must finish Primeval Creations VI before you can use this tesseract.", NamedTextColor.RED));
 			return false;
 		}
+		if (isUpgraded(item) && !AdvancementUtils.checkAdvancement(player, "monumenta:quests/r2/primevalcreations013")) {
+			player.sendMessage(Component.text("You must finish Primeval Creations 013-2 Wools before you can use this tesseract.", NamedTextColor.RED));
+			return false;
+		}
 		if (ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.DISABLE_PURPLE_TESS) ||
 			DISALLOWED_GAMEMODES.contains(player.getGameMode()) ||
-			ItemStatUtils.hasInfusion(item, InfusionType.SHATTERED)
+			ItemStatUtils.hasInfusion(item, InfusionType.SHATTERED) ||
+			!player.hasPermission("monumenta.tesseract.purple") ||
+			player.getScoreboardTags().contains("DungeonRace")
 		) {
 			return false;
 		}
