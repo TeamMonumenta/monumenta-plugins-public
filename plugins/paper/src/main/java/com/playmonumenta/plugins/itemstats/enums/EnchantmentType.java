@@ -3,16 +3,17 @@ package com.playmonumenta.plugins.itemstats.enums;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.enchantments.*;
 import com.playmonumenta.plugins.utils.StringUtils;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public enum EnchantmentType {
 	// Region Scaling
@@ -116,6 +117,7 @@ public enum EnchantmentType {
 	SMITE(new Smite(), true, false, false, true),
 	SNIPER(new Sniper(), true, false, false, true),
 	SWEEPING_EDGE(new SweepingEdge(), true, false, false, false),
+	SPIRITSHOT(new Spiritshot(), false, false, false, false),
 	REVERB(new Reverb(), true, false, false, true),
 	STAMINA(new Stamina(), true, false, false, true),
 	STARVATION(new Starvation(), true, true, false, false),
@@ -139,7 +141,7 @@ public enum EnchantmentType {
 	CURSE_OF_IRREPARIBILITY(new CurseOfIrreparability(), false, true, false, false),
 	CURSE_OF_CRIPPLING(new CurseOfCrippling(), true, true, false, false),
 	CURSE_OF_CORRUPTION(new CurseOfCorruption(), false, true, false, false),
-	CURSE_OF_EPHEMERALITY(new CurseOfEphemerality(), false, true, true, false),
+	CURSE_OF_EPHEMERALITY(new CurseOfEphemerality(), true, true, true, false),
 	CURSE_OF_SHRAPNEL(new CurseOfShrapnel(), true, true, false, false),
 	CURSE_OF_THE_VEIL(new CurseOfTheVeil(), true, true, false, false),
 	TWO_HANDED(new TwoHanded(), false, true, false, false),
@@ -230,6 +232,10 @@ public enum EnchantmentType {
 		mIsRegionScaled = isRegionScaled;
 	}
 
+	public static @Nullable EnchantmentType getEnchantmentType(String name) {
+		return REVERSE_MAPPINGS.get(name.replace(" ", ""));
+	}
+
 	public @Nullable Enchantment getEnchantment() {
 		return mEnchantment;
 	}
@@ -274,9 +280,5 @@ public enum EnchantmentType {
 				return Component.text(mName + " " + StringUtils.toRoman(level), color).decoration(TextDecoration.ITALIC, false);
 			}
 		}
-	}
-
-	public static @Nullable EnchantmentType getEnchantmentType(String name) {
-		return REVERSE_MAPPINGS.get(name.replace(" ", ""));
 	}
 }

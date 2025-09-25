@@ -802,6 +802,9 @@ public class Plugin extends JavaPlugin {
 		}
 
 		ParticleManager.init();
+
+		Bukkit.getPluginManager().registerEvents(MinigameManager.getInstance(), this);
+		MiniGameCommands.register();
 	}
 
 	//  Logic that is performed upon disabling the plugin.

@@ -512,10 +512,7 @@ public class DelvesManager implements Listener {
 		double expBuffPct = 0;
 		for (DelvesModifier mod : DelvesModifier.rotatingDelveModifiers()) {
 			if (getRank(player, mod) > 0) {
-				double expBuffPctPerMod = .25 * (double) getRank(player, mod) / MODIFIER_RANK_CAPS.get(mod);
-				if (expBuffPctPerMod > expBuffPct) {
-					expBuffPct = expBuffPctPerMod;
-				}
+				expBuffPct = .25;
 			}
 		}
 		event.setAmount((int)(event.getAmount() * (1.0 + expBuffPct)));

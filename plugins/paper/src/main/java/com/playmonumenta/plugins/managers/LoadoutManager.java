@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.guis.LoadoutManagerGui;
 import com.playmonumenta.plugins.inventories.ClickLimiter;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
@@ -164,7 +165,9 @@ public class LoadoutManager implements Listener {
 
 		// higher priority than region + weapon
 		TOOL("tool", "tools?|util(?:s?|it(?:ys?|ies))", 104,
-			item -> (ItemUtils.isShovel(item)
+			item -> (
+				         // special case to exclude Alcyoneus, which is a shovel with spell power
+							(ItemUtils.isShovel(item) && !ItemStatUtils.hasEnchantment(item, EnchantmentType.MAGIC_WAND))
 				         || ItemUtils.isPickaxe(item)
 				         // assume silk touch axes are considered tools, as are axes with no damage added
 				         || (ItemUtils.isAxe(item) && (ItemStatUtils.hasEnchantment(item, EnchantmentType.SILK_TOUCH) || ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 1))
@@ -333,6 +336,11 @@ public class LoadoutManager implements Listener {
 							player.sendMessage(Component.text("Please remove the " + STORAGE_SHULKER_NAME + " from your hotbar to swap loadouts properly!", NamedTextColor.RED));
 							return true;
 						}
+						if (CurseOfEphemerality.isEphemeral(playerItem)) {
+							// Refuse to allow a player to store Ephemeral items
+							player.sendMessage(Component.text("Please remove all Ephemeral items from your hotbar to swap loadouts properly!", NamedTextColor.RED));
+							return true;
+						}
 						if (isLoadoutItem(loadoutItem, matchInfusion, playerItem)) {
 							// Item already equipped, nothing to do, unless they have an ichor infusion, in which case, check if it needs to be swapped
 							InfusionType ichorInfusion = IchorListener.getIchorInfusion(playerItem);
@@ -401,6 +409,11 @@ public class LoadoutManager implements Listener {
 								if (isEquipmentStorageBox(playerItem)) {
 									// Must not move around these boxes - their inventory is currently open
 									player.sendMessage(Component.text("Please remove the " + STORAGE_SHULKER_NAME + " from your hotbar to swap loadouts properly!", NamedTextColor.RED));
+									continue;
+								}
+								if (CurseOfEphemerality.isEphemeral(playerItem)) {
+									// Refuse to allow a player to store Ephemeral items
+									player.sendMessage(Component.text("Ephemeral items must not be stored in the Armory!", NamedTextColor.RED));
 									continue;
 								}
 								if (playerItem != null && !playerItem.getType().isAir()) {

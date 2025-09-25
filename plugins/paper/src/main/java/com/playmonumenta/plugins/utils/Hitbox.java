@@ -437,6 +437,10 @@ public abstract class Hitbox {
 
 	public abstract boolean contains(Vector vector);
 
+	public boolean contains(Location location) {
+		return (contains(location.toVector()) && location.getWorld() == this.getWorld());
+	}
+
 	public abstract boolean intersects(BoundingBox bbox);
 
 	/**

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.guis.HuntsInfusionGUI;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
 import com.playmonumenta.plugins.guis.MusicGui;
 import com.playmonumenta.plugins.guis.SKRInfusionGUI;
+import com.playmonumenta.plugins.guis.SpiritArcheryGUI;
 import com.playmonumenta.plugins.guis.classselection.ClassSelectionGui;
 import com.playmonumenta.plugins.guis.peb.PebGui;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
@@ -451,6 +452,20 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
 				new SKRInfusionGUI(player).open();
+			})
+			.register();
+		new CommandAPICommand("openspiritarcherygui")
+			.withPermission("monumenta.command.openspiritarcherygui")
+			.executesPlayer((player, args) -> {
+				new SpiritArcheryGUI(player).open();
+			})
+			.register();
+		new CommandAPICommand("openspiritarcherygui")
+			.withPermission("monumenta.command.openspiritarcherygui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
+				new SpiritArcheryGUI(player).open();
 			})
 			.register();
 	}

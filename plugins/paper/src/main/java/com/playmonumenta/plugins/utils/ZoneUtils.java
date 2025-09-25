@@ -40,6 +40,7 @@ public class ZoneUtils {
 		LOOTROOM("Lootroom"),
 		MASK_JUMP_BOOST("Mask Jump Boost"),
 		MASK_SPEED("Mask Speed"),
+		MASK_GEAR_PROJECTILE_SPEED("Mask Gear Projectile Speed"),
 		MECHANICAL_ARMORY_DISABLED("MechanicalArmoryDisabled"),
 		MONUMENT("Monument"),
 		NO_BERRY_BUSH_CLICKS("No Berry Bush Clicks"),

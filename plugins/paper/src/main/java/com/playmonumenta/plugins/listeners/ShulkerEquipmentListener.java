@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
@@ -293,11 +294,16 @@ public class ShulkerEquipmentListener implements Listener {
 	}
 
 	/**
-	 * Checks if an item can be put into a loadout lockbox. Non-shulker items aare always allowed.
+	 * Checks if an item can be put into a loadout lockbox. Non-Ephemeral, non-shulker items are allowed.
 	 * For Shulkers, only Firmament, Worldshaper's Loom, and Potion Injector (and skins/upgrades of each) are allowed.
 	 */
 	public static boolean canSwapItem(@Nullable ItemStack item) {
-		return item == null || !ItemUtils.isShulkerBox(item.getType()) || FirmamentOverride.isFirmamentItem(item) || WorldshaperOverride.isWorldshaperItem(item) || isPotionInjectorItem(item);
+		return item == null
+			|| !(CurseOfEphemerality.isEphemeral(item)
+			&& ItemUtils.isShulkerBox(item.getType()))
+			|| FirmamentOverride.isFirmamentItem(item)
+			|| WorldshaperOverride.isWorldshaperItem(item)
+			|| isPotionInjectorItem(item);
 	}
 
 	private boolean swapEquipment(Player player, PlayerInventory pInv, ShulkerBox sbox) {

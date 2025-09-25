@@ -151,7 +151,7 @@ public class SpellBaseCharge extends Spell {
 				p.SOUND_ROAR.play(mBoss.getLocation(), 1f, 1.5f);
 				mBoss.setAI(true);
 				if(mBoss instanceof Mob mobAI && mobAI.getTarget() instanceof Player player && AbilityUtils.isStealthed(player)) {
-					((Mob) mBoss).setTarget(null);
+					mobAI.setTarget(null);
 				}
 			});
 	}
@@ -288,7 +288,7 @@ public class SpellBaseCharge extends Spell {
 	 *
 	 * @param target         The intended target of the attack
 	 * @param charger        The living entity charging the player
-	 * @param validTargets   Other targets (including the target!) who might be indicentally hit by the charge
+	 * @param validTargets   Other targets (including the target!) who might be incidentally hit by the charge
 	 * @param start          Action to run on boss at start location (may be null)
 	 * @param particle       Action to spawn particle at locations along path (may be null)
 	 * @param hitPlayer      Action to run if a player is hit (may be null)
