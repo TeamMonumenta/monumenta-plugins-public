@@ -42,7 +42,7 @@ public class Fervor implements Infusion {
 	@Override
 	public void onCustomEffectApply(Plugin plugin, Player player, double value, CustomEffectApplyEvent event) {
 		Effect effect = event.getEffect();
-		if (effect.isBuff() && effect.getDuration() >= BUFF_DURATION_THRESHOLD) {
+		if (effect.isBuff() && effect.getDuration() >= BUFF_DURATION_THRESHOLD && !event.getSource().startsWith("PatronShrine")) {
 			Location playerLoc = player.getLocation().clone();
 			new PPLine(Particle.REDSTONE, playerLoc.clone().add(0, 1, 0).add(1, 1, 1), playerLoc.clone().add(0, 1, 0).add(-1, -1, -1))
 				.count(8)
