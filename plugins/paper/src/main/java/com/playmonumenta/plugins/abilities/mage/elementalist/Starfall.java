@@ -149,7 +149,7 @@ public class Starfall extends Ability {
 			.add(a -> a.mRadius, SIZE)
 			.add(" blocks around it, setting them on fire for ")
 			.addDuration(a -> a.mFireDuration, FIRE_TICKS)
-			.add(", and knocking them away.")
+			.add("s , and knocking them away.")
 			.addCooldown(COOLDOWN_TICKS);
 	}
 

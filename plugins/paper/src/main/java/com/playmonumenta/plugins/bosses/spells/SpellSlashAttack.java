@@ -288,12 +288,14 @@ public class SpellSlashAttack extends Spell {
 		}
 
 		double kbMultiplier = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0) * mKbrEffectiveness;
-		if (mKnockAway) {
-			MovementUtils.knockAwayRealistic(mBoss.getLocation(), target, (float) (mKnockback.getX() * kbMultiplier), (float) (mKnockback.getY() * kbMultiplier), false);
-		} else {
-			target.setVelocity(mKnockback.multiply(kbMultiplier));
+		if (kbMultiplier != 0) {
+			if (mKnockAway) {
+				MovementUtils.knockAwayRealistic(mBoss.getLocation(), target, (float) (mKnockback.getX() * kbMultiplier), (float) (mKnockback.getY() * kbMultiplier), false);
+			} else {
+				target.setVelocity(mKnockback.multiply(kbMultiplier));
+			}
+			mLastKnockbackTick.put(target, Bukkit.getCurrentTick());
 		}
-		mLastKnockbackTick.put(target, Bukkit.getCurrentTick());
 	}
 
 	private void telegraphSlash(double selectedAngle) {

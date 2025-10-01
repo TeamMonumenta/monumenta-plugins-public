@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -22,6 +23,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -104,7 +106,7 @@ public class StarfallBoss extends BossAbilityGroup {
 			public void run() {
 				if (p.DOES_TARGETING) {
 					List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
-					targets.forEach(e -> spawnStarfall(p, mBoss, e.getLocation(), (ticks, oldLoc) -> ticks <= p.TRACKING ? e.getLocation() : oldLoc));
+					targets.forEach(e -> spawnStarfall(p, mBoss, e.getLocation(), (ticks, oldLoc) -> ((ticks <= p.TRACKING && !e.isDead()) || !(e instanceof Player player && AbilityUtils.isStealthed(player))) ? e.getLocation() : oldLoc));
 				} else {
 					List<Location> locs = new ArrayList<>();
 					for (int i = 1; i <= p.COUNT; i++) {

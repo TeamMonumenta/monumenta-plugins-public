@@ -562,6 +562,7 @@ public class CharmManager {
 			DeadlyRonde.CHARM_SPEED,
 			DeadlyRonde.CHARM_DECAY_TIME,
 			DeadlyRonde.CHARM_STACKS_REQ,
+			DeadlyRonde.CHARM_ATTACK_SPEED_SCALING_PORTION,
 			WindWalk.CHARM_CHARGE,
 			WindWalk.CHARM_COOLDOWN,
 			WindWalk.CHARM_COOLDOWN_REDUCTION,

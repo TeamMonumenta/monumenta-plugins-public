@@ -743,7 +743,12 @@ public class ItemStatCommands {
 			}
 
 			if (operationString.equals("add") && attribute.contains("ProjectileSpeed")) {
-				player.sendMessage("You are using the wrong type of Proj Speed, do multiply");
+				player.sendMessage("You are using the wrong type of Projectile Speed, do multiply");
+				return;
+			}
+
+			if (operationString.equals("multiply") && attribute.contains("KnockbackResistance")) {
+				player.sendMessage("You are using the wrong type of KBR, do add");
 				return;
 			}
 
