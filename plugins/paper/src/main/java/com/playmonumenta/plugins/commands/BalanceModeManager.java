@@ -424,8 +424,10 @@ public class BalanceModeManager {
 		float magicScore = oData.get("ws_mmult").getAsFloat() * (attrMagicDamage + oData.get("ws_tmult").getAsFloat() * enchTrivium + oData.get("ws_fmult").getAsFloat() * enchFractal);
 		magicScore /= magicMult;
 		float infernoScore = oData.get("os_imult").getAsFloat() * enchInferno;
-		float thornsScore = oData.get("os_tmult").getAsFloat() * attrThornsFlat;
-		if (attrThornsPercent > 0) {
+
+		int thornsDiscount = region == Region.RING ? 4 : region == Region.ISLES ? 2 : 1;
+		float thornsScore = oData.get("os_tmult").getAsFloat() * Math.max(0, attrThornsFlat - thornsDiscount);
+		if (attrThornsPercent > 0) { // Unused hopefully but leaving it in so things don't break :)
 			thornsScore += oData.get("os_tmult2").getAsFloat();
 			thornsScore *= (oData.get("os_tmult3").getAsFloat() + attrThornsPercent);
 		}
