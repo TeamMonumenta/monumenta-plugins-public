@@ -11,7 +11,10 @@ import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.DesecratingS
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.EnumSet;
@@ -72,8 +75,15 @@ public class DesecratingShot extends Ability {
 			Location loc = enemy.getLocation();
 
 			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(loc, mRadius);
+
+			ItemStatManager.PlayerItemStats projectileItemStats = DamageListener.getProjectileItemStats(projectile);
+			if (projectileItemStats == null) { // should hopefully never be null but just avoid the null check error :)
+				return false;
+			}
+			double projDamageAdd = projectileItemStats.getMainhandAddStats().get(AttributeType.PROJECTILE_DAMAGE_ADD);
+
 			for (LivingEntity mob : affectedMobs) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, event.getDamage() * mDamagePercent, ClassAbility.DESECRATING_SHOT, false, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, projDamageAdd * mDamagePercent, ClassAbility.DESECRATING_SHOT, false, true);
 				EntityUtils.applyWeaken(mPlugin, mDuration, mWeaknessPercent, mob);
 				mCosmetic.desecratingShotEffect(mPlayer, mob, mPlugin);
 			}
