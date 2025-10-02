@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTCompound;
@@ -126,7 +127,8 @@ public class TradeListener implements Listener {
 			}
 		}
 		// Custom GUI:
-		if (ScoreboardUtils.getScoreboardValue(player, CustomTradeGui.MAIN).orElse(1) == 1) {
+		if (ScoreboardUtils.getScoreboardValue(player, CustomTradeGui.MAIN).orElse(1) == 1
+			&& !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.DISABLE_CUSTOM_TRADE_GUI)) {
 			if (!player.hasPermission(CustomTradeGui.PERMISSION)) {
 				player.sendMessage("The custom trade GUI has been temporarily disabled, opening the vanilla GUI. ");
 				return;

@@ -27,6 +27,7 @@ public class ZoneUtils {
 		CAN_DEPOSIT_INTO_POTS("Can Deposit Into Pots"),
 		CAN_SHOOT_POTS("Can Shoot Pots"),
 		CONDUIT_POWER_WATER("Conduit Power Water"),
+		DISABLE_CUSTOM_TRADE_GUI("Disable Custom Trade GUI"),
 		DISABLE_GRAVES("Disable Graves"),
 		DISABLE_MAGIC_TESS("DisableMagicTess"),
 		DISABLE_PURPLE_TESS("DisablePurpleTesseract"),
