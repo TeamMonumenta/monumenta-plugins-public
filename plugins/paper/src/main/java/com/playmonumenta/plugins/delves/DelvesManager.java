@@ -587,7 +587,8 @@ public class DelvesManager implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onLoom(final StructureGrowEvent event) {
-		if (!DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
+		if (event.getPlayer() == null
+			|| !DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
 			|| !Plugin.IS_PLAY_SERVER) {
 			return;
 		}
