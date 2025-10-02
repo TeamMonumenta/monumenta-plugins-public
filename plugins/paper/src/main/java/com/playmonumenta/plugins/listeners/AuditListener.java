@@ -110,6 +110,7 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("(minecraft:)?(virtualfirmament|vf)"),
 		exactOptionalArguments("(minecraft:)?(viewcharms|vc|viewzenithcharms|vzc)"),
 		exactOptionalArguments("(minecraft:)?wallet withdraw"),
+		exactOptionalArguments("(minecraft:)?punch"),
 		exactOptionalArguments("(spark:)?tps")
 	);
 

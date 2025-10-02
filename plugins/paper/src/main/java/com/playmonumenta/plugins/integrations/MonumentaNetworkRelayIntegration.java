@@ -130,7 +130,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 			JsonObject data = new JsonObject();
 			data.addProperty("message", message);
 			try {
-				NetworkRelayAPI.sendMessage("automation-bot", channel, data);
+				NetworkRelayAPI.sendMessage("*", channel, data);
 			} catch (Exception ex) {
 				instance.mLogger.severe("Failed to send audit log message: " + ex.getMessage());
 				MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
@@ -184,7 +184,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 			JsonObject data = new JsonObject();
 			data.addProperty("message", message);
 			try {
-				NetworkRelayAPI.sendMessage("automation-bot", ADMIN_ALERT_CHANNEL, data);
+				NetworkRelayAPI.sendMessage("*", ADMIN_ALERT_CHANNEL, data);
 			} catch (Exception ex) {
 				instance.mLogger.severe("Failed to send admin alert message: " + ex.getMessage());
 				MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
@@ -210,7 +210,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 	public void gatherRemoteDataEvent(GatherRemotePlayerDataEvent event) {
 		JsonObject data = new JsonObject();
 		LuckPermsIntegration.getPluginData(data, event.mRemotePlayer.getUuid());
-		event.setPluginData("monumenta", data);
+		event.setPluginData(MAIN_PLUGIN_HEARTBEAT_IDENTIFIER, data);
 	}
 
 	// Updates RemotePlayer information for other shards
@@ -242,7 +242,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 		if (minecraftData == null) {
 			return null;
 		}
-		JsonObject monumentaData = minecraftData.getPluginData("monumenta");
+		JsonObject monumentaData = minecraftData.getPluginData(MAIN_PLUGIN_HEARTBEAT_IDENTIFIER);
 		if (monumentaData == null) {
 			return null;
 		}
