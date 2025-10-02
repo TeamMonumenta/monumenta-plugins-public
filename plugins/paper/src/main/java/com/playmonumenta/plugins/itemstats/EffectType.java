@@ -46,7 +46,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 public enum EffectType {
-	//when ever a new EffectType get added here remember to add it also in the switch inside applyEffect(...)
 
 	// type: is the unique key save inside the nbt of the item
 	// name: is the name that the player will see on the item -> format:  +/-dd% name (x:yy)
@@ -73,6 +72,9 @@ public enum EffectType {
 	VANILLA_HUNGER("Hunger", "Hunger", false, false, PotionEffectType.HUNGER),
 	VANILLA_NAUSEA("Nausea", "Nausea", false, true, PotionEffectType.CONFUSION),
 	VANILLA_BADLUCK("BadLuck", "Bad Luck", false, false, PotionEffectType.UNLUCK),
+	VANILLA_DARKNESS("Darkness", "Darkness", false, true, PotionEffectType.DARKNESS),
+	VANILLA_LEVITATION("Levitation", "Levitation", false, false, PotionEffectType.LEVITATION),
+	VANILLA_DOLPHINS_GRACE("DolphinsGrace", "Dolphin's Grace", true, true, PotionEffectType.DOLPHINS_GRACE),
 
 	SPEED("Speed", "Speed", true, false, false, pluginApplicator(PercentSpeed::new)),
 	SLOW("Slow", "Speed", false, false, false, pluginApplicator(
