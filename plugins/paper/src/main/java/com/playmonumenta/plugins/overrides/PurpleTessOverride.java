@@ -25,10 +25,12 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -43,7 +45,7 @@ public class PurpleTessOverride extends BaseOverride {
 	public static final String TESSERACT_NAME_UPGRADED = "Tesseract of Emotions (u)";
 
 	private static final EnumSet<GameMode> DISALLOWED_GAMEMODES = EnumSet.of(GameMode.ADVENTURE, GameMode.SPECTATOR);
-	private static final Set<Material> CHESTS = EnumSet.of(Material.CHEST, Material.TRAPPED_CHEST);
+	private static final Set<Material> CHESTS = EnumSet.of(Material.CHEST, Material.TRAPPED_CHEST, Material.BARREL);
 
 	private final boolean mFestive;
 
@@ -107,7 +109,11 @@ public class PurpleTessOverride extends BaseOverride {
 			world.playSound(centerLoc, Sound.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 0.6f, 1.4f, 1);
 
 			Material material = isChest ? Material.BARREL : Material.CHEST;
-			BlockData blockData = material.createBlockData();
+			BlockData blockData = material.createBlockData(newData -> {
+				if (newData instanceof Directional directional) {
+					directional.setFacing(block.getBlockData() instanceof Directional oldData ? oldData.getFacing() : BlockFace.NORTH);
+				}
+			});
 
 			block.setBlockData(blockData);
 			if (block.getState() instanceof Container newContainer) {
@@ -165,9 +171,7 @@ public class PurpleTessOverride extends BaseOverride {
 			ItemUtils.setDisplayName(shulkerItem, Component.text(plainName, mFestive ? NamedTextColor.RED : NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			ItemUtils.setPlainName(shulkerItem, plainName);
 
-			world.spawn(centerLoc, Item.class, itemEntity -> {
-				itemEntity.setItemStack(shulkerItem);
-			});
+			world.spawn(centerLoc, Item.class, itemEntity -> itemEntity.setItemStack(shulkerItem));
 
 			world.playSound(centerLoc, Sound.ENTITY_SHULKER_TELEPORT, SoundCategory.BLOCKS, 0.4f, 1.9f, 1);
 			new PartialParticle(Particle.BLOCK_CRACK, centerLoc)
