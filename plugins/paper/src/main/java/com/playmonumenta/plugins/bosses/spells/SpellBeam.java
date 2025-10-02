@@ -7,12 +7,14 @@ import com.playmonumenta.plugins.particle.PPParametric;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.FluidCollisionMode;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -65,7 +67,7 @@ public class SpellBeam extends Spell {
 		if (!mParameters.STOP_AT_BLOCK && !mParameters.STOP_AT_PLAYER) {
 			return mParameters.BEAM_RANGE;
 		}
-		Location center = LocationUtils.getHalfHeightLocation(mBoss);
+		Location center = retrieveOffset();
 		RayTraceResult trace = mBoss.getWorld().rayTrace(
 			center,
 			direction,
@@ -94,7 +96,7 @@ public class SpellBeam extends Spell {
 		if (mParameters.FACE_TARGET) {
 			return mBoss.getLocation().getDirection().normalize();
 		}
-		Location bossLoc = LocationUtils.getHalfHeightLocation(mBoss);
+		Location bossLoc = retrieveOffset();
 		Location targetLoc;
 		if (!mParameters.LOCK_PITCH && target.getLocation().getY() >= bossLoc.getY()) {
 			targetLoc = target.getLocation();
@@ -122,11 +124,11 @@ public class SpellBeam extends Spell {
 				@Override
 				public void run() {
 					if (mTicks < mParameters.SPELL_DELAY) {
-						if (mTicks < mParameters.BEAM_TRACK) {
+						if (mTicks < mParameters.BEAM_TRACK && isValidTracking(target)) {
 							mDirection = getTargetVector(target).rotateAroundY(yawRotation[j]);
 						}
 						if (mTicks % mParameters.TELEGRAPH_INTERVAL == 0) {
-							Location start = LocationUtils.getHalfHeightLocation(mBoss);
+							Location start = retrieveOffset();
 							Location end = start.clone().add(mDirection.clone()
 								.multiply(beamCheckDistance(mDirection))
 							);
@@ -143,7 +145,7 @@ public class SpellBeam extends Spell {
 					} else {
 						// Particle Group: Boss
 						for (ParticlesList.CParticle p : mParameters.PARTICLE_BOSS.getParticleList()) {
-							new PartialParticle(p.mParticle, LocationUtils.getHalfHeightLocation(mBoss))
+							new PartialParticle(p.mParticle, retrieveOffset())
 								.count(p.mCount)
 								.delta(p.mDx, p.mDy, p.mDz)
 								.extra(p.mVelocity)
@@ -169,7 +171,7 @@ public class SpellBeam extends Spell {
 		if (EntityUtils.shouldCancelSpells(mBoss)) {
 			return;
 		}
-		Location center = LocationUtils.getHalfHeightLocation(mBoss);
+		Location center = retrieveOffset();
 		double beamRange = beamCheckDistance(direction);
 		Vector beamRangeVector = direction.clone().normalize().multiply(beamRange);
 
@@ -181,6 +183,9 @@ public class SpellBeam extends Spell {
 			mParameters.SOUND_HIT.play(player.getLocation());
 			if (mParameters.DAMAGE > 0) {
 				BossUtils.blockableDamage(mBoss, player, mParameters.DAMAGE_TYPE, mParameters.DAMAGE, !mParameters.RESPECT_IFRAMES, false, mParameters.NAME, mBoss.getLocation(), mParameters.EFFECTS.mEffectList);
+			}
+			if(mParameters.TRUE_DAMAGE_PERCENTAGE > 0) {
+				DamageUtils.damagePercentHealth(mBoss, player, mParameters.TRUE_DAMAGE_PERCENTAGE, false, false, mParameters.NAME, true, mParameters.EFFECTS.mEffectList);
 			}
 			if (mParameters.KB_Y != 0 && mParameters.KB_XZ != 0) {
 				MovementUtils.knockAway(mBoss.getLocation(), player, mParameters.KB_XZ, mParameters.KB_Y, true);
@@ -237,6 +242,19 @@ public class SpellBeam extends Spell {
 				.data(p.mExtra2)
 				.spawnAsEntityActive(mBoss);
 		}
+	}
+
+
+	private Location retrieveOffset() {
+		return LocationUtils.getHalfHeightLocation(mBoss).add(0, mParameters.Y_OFFSET, 0);
+	}
+
+	private boolean isValidTracking(LivingEntity target) {
+		if(target == null) {
+			return false;
+		}
+		return target.isValid() && !target.isDead()	&& target.getWorld().equals(mBoss.getWorld())
+			&& !(target instanceof Player player && player.getGameMode().equals(GameMode.SPECTATOR));
 	}
 
 	@Override

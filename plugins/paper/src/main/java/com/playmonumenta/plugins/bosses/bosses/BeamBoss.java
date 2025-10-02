@@ -79,6 +79,12 @@ public class BeamBoss extends BossAbilityGroup {
 		@BossParam(help = "Change the type of damage the beam is")
 		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MAGIC;
 
+		@BossParam(help = "Percentage of health dealt as true damage")
+		public double TRUE_DAMAGE_PERCENTAGE = 0;
+
+		@BossParam(help = "Y offset of the beam")
+		public double Y_OFFSET = 0;
+
 		// Sounds
 		@BossParam(help = "Sound played when the boss starts casting beam")
 		public SoundsList SOUND_TELE = SoundsList.builder()
