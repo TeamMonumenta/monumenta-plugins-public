@@ -86,6 +86,9 @@ public class AbilityHotbar {
 		int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
 		int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
 		int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
+		int remainingDuration = ability instanceof AbilityWithDuration ? ((AbilityWithDuration) ability).getRemainingAbilityDuration() : 0;
+		double remainingHealth = ability instanceof AbilityWithHealthBar ? ((AbilityWithHealthBar) ability).getRemainingAbilityHealth() : 0;
+		double initialHealth = ability instanceof AbilityWithHealthBar ? ((AbilityWithHealthBar) ability).getInitialAbilityHealth() : 0;
 
 		TextColor color = ability.getInfo().getActionBarColor();
 		String name = getAbilityName(ability);
@@ -100,6 +103,19 @@ public class AbilityHotbar {
 			output = output.append(Component.text(charges + "/" + maxCharges, (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW)));
 		} else if (AbilityUtils.isSilenced(player)) {
 			output = output.append(Component.text(((int) Math.ceil(AbilityUtils.getSilenceDuration(player) / 20.0)) + "s", NamedTextColor.RED));
+		} else if (remainingHealth > 0 && initialHealth > 0) {
+			NamedTextColor healthColor;
+			double percent = remainingHealth / initialHealth;
+			if (percent >= (double) 2 / 3) {
+				healthColor = NamedTextColor.GREEN;
+			} else if (percent >= (double) 1 / 3) {
+				healthColor = NamedTextColor.GOLD;
+			} else {
+				healthColor = NamedTextColor.RED;
+			}
+			output = output.append(Component.text((int) remainingHealth, healthColor).append(Component.text("/" + (int) initialHealth + " HP", NamedTextColor.GRAY)));
+		} else if (remainingDuration > 0) {
+			output = output.append(Component.text(remainingDuration / 20 + "s", NamedTextColor.GREEN));
 		} else if (remainingCooldown > 0) {
 			output = output.append(Component.text(((int) Math.ceil(remainingCooldown / 20.0)) + "s", NamedTextColor.GRAY));
 		} else {

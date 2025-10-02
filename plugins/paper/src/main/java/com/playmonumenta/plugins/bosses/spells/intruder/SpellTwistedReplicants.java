@@ -54,7 +54,7 @@ public class SpellTwistedReplicants extends Spell {
 		.put(Warrior.BERSERKER_SPEC_ID, "TwistedRevenant")
 		.put(Warrior.GUARDIAN_SPEC_ID, "TwistedVanguard")
 		.put(Cleric.PALADIN_SPEC_ID, "TwistedCrusader")
-		.put(Cleric.HIEROPHANT_SPEC_ID, "TwistedBishop")
+		.put(Cleric.SERAPH_SPEC_ID, "TwistedBishop")
 		.put(Rogue.SWORDSAGE_SPEC_ID, "TwistedTempest")
 		.put(Rogue.ASSASSIN_SPEC_ID, "TwistedShadestepper")
 		.put(Alchemist.HARBINGER_SPEC_ID, "TwistedAbomination")

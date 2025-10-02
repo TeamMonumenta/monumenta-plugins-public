@@ -882,6 +882,15 @@ public class LocationUtils {
 		}
 	}
 
+	public static double distanceToGround(Location loc, double minHeight) {
+		Vector toGround = getVectorTo(loc, fallToGround(loc, minHeight));
+		if (toGround.getY() < 0) {
+			return 0;
+		} else {
+			return toGround.getY();
+		}
+	}
+
 	public static @Nullable String getPoiNameFromLocation(Location location) {
 		StructuresPlugin structuresPlugin = StructuresPlugin.getInstance();
 		if (structuresPlugin.mRespawnManager != null) {

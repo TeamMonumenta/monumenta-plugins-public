@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.itemstats.attributes;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.scout.Quickdraw;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentThrowRate;
 import com.playmonumenta.plugins.itemstats.Attribute;
 import com.playmonumenta.plugins.itemstats.enchantments.Oversized;
 import com.playmonumenta.plugins.itemstats.enchantments.Snowy;
@@ -15,6 +17,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -45,12 +48,17 @@ public class ThrowRate implements Attribute {
 	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile proj) {
 		Quickdraw quickdraw = AbilityManager.getManager().getPlayerAbility(player, Quickdraw.class);
 		boolean isQuickdraw = quickdraw != null && quickdraw.isQuickDraw(proj);
+		double effectMultipler = 1;
+		List<Effect> throwRateBonus = plugin.mEffectManager.getPriorityEffects(player).values().stream().filter(e -> e instanceof PercentThrowRate).toList();
+		for (Effect ptr : throwRateBonus) {
+			effectMultipler *= (1 + ptr.getMagnitude() * (ptr.isBuff() ? 1 : -1));
+		}
 
 		if (isQuickdraw) {
 			return;
 		}
 
-		int cooldown = (int) (20 / value);
+		int cooldown = (int) (20 / (value * effectMultipler));
 
 		if (proj instanceof Trident trident) {
 			ItemStack item = trident.getItemStack();

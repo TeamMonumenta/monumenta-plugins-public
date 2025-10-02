@@ -27,14 +27,14 @@ import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.TouchofRadiance;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.abilities.cleric.paladin.Unwavering;
+import com.playmonumenta.plugins.abilities.cleric.seraph.EtherealAscension;
+import com.playmonumenta.plugins.abilities.cleric.seraph.HallowedBeam;
+import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtue;
+import com.playmonumenta.plugins.abilities.cleric.seraph.Rejuvenation;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
@@ -399,11 +399,11 @@ public class AbilityManager {
 			HolyJavelin.INFO,
 			ChoirBells.INFO,
 
-			// HIEROPHANT
+			// SERAPH
 			Rejuvenation.INFO,
-			EnchantedPrayer.INFO,
+			EtherealAscension.INFO,
 			HallowedBeam.INFO,
-			ThuribleProcession.INFO,
+			KeeperVirtue.INFO,
 
 			//********** WARLOCK **********//
 			// REAPER

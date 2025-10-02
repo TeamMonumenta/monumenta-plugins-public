@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -7,7 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.Rejuvenation;
+import com.playmonumenta.plugins.abilities.cleric.seraph.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.paladin.Unwavering;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -38,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 public class DivineJustice extends Ability implements AbilityWithChargesOrStacks, AbilityWithDuration {
 	public static final String NAME = "Divine Justice";
 	public static final ClassAbility ABILITY = ClassAbility.DIVINE_JUSTICE;
+	private static final int MOB_EFFECT_DURATION = (int) (Constants.TICKS_PER_SECOND * 1.5);
 
 	public static final int DAMAGE_1 = 2;
 	public static final int DAMAGE_2 = 3;
@@ -127,6 +129,10 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			&& EntityUtils.isAbilityTriggeringProjectile(projectile, true)
 			&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
 
+			if (isMeleeCrit) {
+				// Mark the tick on melee too for on-kill healing
+				MetadataUtils.markThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName());
+			}
 			mCosmetic.justiceOnDamage(mPlayer, enemy, mPlayer.getWorld(), enemy.getLocation(), PartialParticle.getWidthDelta(enemy) * 1.5, mComboNumber, isEnhanced());
 
 			if (mComboNumber == 0 || mComboRunnable != null) {
@@ -180,7 +186,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent entityDeathEvent, boolean dropsLoot) {
-		if (Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity()) && isLevelTwo()) {
+		if (Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity()) && isLevelTwo() && MetadataUtils.happenedInRecentTicks(entityDeathEvent.getEntity(), "DivineJustice" + mPlayer.getName(), MOB_EFFECT_DURATION)) {
 			PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * mSelfHeal);
 			final List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, mRadius, true);
 			players.forEach(otherPlayer -> PlayerUtils.healPlayer(mPlugin, otherPlayer, EntityUtils.getMaxHealth(otherPlayer) * mAllyHeal, mPlayer));
@@ -218,9 +224,11 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The damage is increased to ")
 			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" plus ")
+			.add(" + ")
 			.addPercent(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(" of your base critical damage. Additionally, killing a Heretic heals you for ")
+			.add(" of your base critical damage. Additionally, killing a Heretic that you have damaged with Divine Justice within the last ")
+			.addDuration(MOB_EFFECT_DURATION)
+			.add(" seconds heals you for ")
 			.addPercent(a -> a.mSelfHeal, HEALING_MULTIPLIER_OWN)
 			.add(" of your max health and heals players within ")
 			.add(a -> a.mRadius, RADIUS)

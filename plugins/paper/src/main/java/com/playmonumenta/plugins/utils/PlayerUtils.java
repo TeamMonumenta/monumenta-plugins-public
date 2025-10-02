@@ -24,10 +24,13 @@ import com.playmonumenta.plugins.effects.hexfall.Reincarnation;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackHealingDone;
 import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -256,24 +259,24 @@ public class PlayerUtils {
 		player.setSaturation(Math.min(player.getFoodLevel(), Math.min(player.getSaturation() + amount, MAX_FOOD_SATURATION_LEVEL)));
 	}
 
-	public static double healPlayer(Plugin plugin, Player player, double healAmount) {
+	public static double healPlayer(Plugin plugin, LivingEntity player, double healAmount) {
 		return healPlayer(plugin, player, healAmount, null);
 	}
 
 	// Returns the change in player's health
-	public static double healPlayer(Plugin plugin, Player player, double healAmount, @Nullable Player sourcePlayer) {
-		if (healAmount <= 0 || player.isDead()) {
+	public static double healPlayer(Plugin plugin, LivingEntity entity, double healAmount, @Nullable Player sourcePlayer) {
+		if (healAmount <= 0 || entity.isDead()) {
 			return 0;
 		}
 
-		boolean sourceIsNotTarget = sourcePlayer != null && player != sourcePlayer;
+		boolean sourceIsNotTarget = sourcePlayer != null && entity != sourcePlayer;
 		if (sourceIsNotTarget && sourcePlayer != null /* needed to satisfy reviewdog */) {
 			double healBonus =
 				plugin.mItemStatManager.getEnchantmentLevel(sourcePlayer, EnchantmentType.TRIAGE) * 0.05;
 			healAmount *= 1 + healBonus;
 		}
 
-		EntityRegainHealthEvent event = new EntityRegainHealthEvent(player, healAmount,
+		EntityRegainHealthEvent event = new EntityRegainHealthEvent(entity, healAmount,
 			EntityRegainHealthEvent.RegainReason.CUSTOM);
 		if (ServerProperties.getDepthsEnabled() && sourceIsNotTarget) {
 			CurseOfDependency.OTHER_PLAYER_EVENT = event;
@@ -282,12 +285,12 @@ public class PlayerUtils {
 		// TODO: terrible hack to prevent a memory leak for players that don't have this curse - usb
 		CurseOfDependency.OTHER_PLAYER_EVENT = null;
 		if (!event.isCancelled()) {
-			double oldHealth = player.getHealth();
-			double newHealth = Math.min(oldHealth + event.getAmount(), EntityUtils.getMaxHealth(player));
-			player.setHealth(newHealth);
+			double oldHealth = entity.getHealth();
+			double newHealth = Math.min(oldHealth + event.getAmount(), EntityUtils.getMaxHealth(entity));
+			entity.setHealth(newHealth);
 
 			// Add to activity
-			if (sourcePlayer != null && player != sourcePlayer && ActivityManager.getManager().isActive(player)) {
+			if (sourcePlayer != null && entity != sourcePlayer && (entity instanceof Player p && ActivityManager.getManager().isActive(p))) {
 				ActivityManager.getManager().addHealingDealt(sourcePlayer, healAmount);
 			}
 			double amountHealed = newHealth - oldHealth;
@@ -335,13 +338,27 @@ public class PlayerUtils {
 	// Launch velocity used to calculate is specifically for PLAYERS shooting BOWS!
 	// Returns from 0.0 to 1.0, with 1.0 being full draw
 	public static double calculateBowDraw(AbstractArrow arrowlike) {
+		if (arrowlike == null) {
+			return 0;
+		}
 		double currentSpeed = arrowlike.getVelocity().length();
-		double maxLaunchSpeed = Constants.PLAYER_BOW_INITIAL_SPEED;
+		ItemStatManager.PlayerItemStats itemStats = DamageListener.getProjectileItemStats(arrowlike);
+		if (itemStats != null) {
+			double projSpeed = itemStats.getItemStats().get(AttributeType.PROJECTILE_SPEED);
+			double maxLaunchSpeed = Constants.PLAYER_BOW_INITIAL_SPEED * projSpeed;
 
-		return Math.min(
-			1,
-			currentSpeed / maxLaunchSpeed
-		);
+			double percentage = currentSpeed / maxLaunchSpeed;
+			// Negative projectile speed
+			if (percentage < 0) {
+				percentage *= -1;
+			}
+			// Often small deviations when fully charged
+			if (percentage >= 0.98) {
+				percentage = 1;
+			}
+			return percentage;
+		}
+		return 0;
 	}
 
 	/*

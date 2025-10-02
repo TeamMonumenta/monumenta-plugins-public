@@ -36,16 +36,16 @@ public class HandOfLight extends Ability {
 	private static final int HEALING_1_COOLDOWN = 14 * 20;
 	private static final int HEALING_2_COOLDOWN = 10 * 20;
 	private static final int FLAT_1 = 4;
-	private static final int FLAT_2 = 8;
+	private static final int FLAT_2 = 6;
 	private static final double PERCENT_1 = 0.1;
-	private static final double PERCENT_2 = 0.2;
+	private static final double PERCENT_2 = 0.15;
 	private static final int DAMAGE_1 = 3;
 	private static final int DAMAGE_2 = 4;
 	private static final int DAMAGE_PER_1 = 2;
 	private static final int DAMAGE_PER_2 = 3;
 	private static final int MAX_MOBS_1 = 5;
 	private static final int MAX_MOBS_2 = 4;
-	private static final int REGEN_LEVEL = 1;
+	private static final int REGEN_LEVEL = 1; // Actually 2 because of how effects work
 	private static final int REGEN_DURATION = 4 * 20;
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED = 0.025;
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_MAX = 0.5;
@@ -56,6 +56,7 @@ public class HandOfLight extends Ability {
 	public static final String CHARM_COOLDOWN = "Hand of Light Cooldown";
 	public static final String CHARM_RANGE = "Hand of Light Range";
 	public static final String CHARM_HEALING = "Hand of Light Healing";
+	public static final String CHARM_REGEN = "Hand of Light Regeneration Amplifier";
 
 	public static final AbilityInfo<HandOfLight> INFO =
 		new AbilityInfo<>(HandOfLight.class, "Hand of Light", HandOfLight::new)
@@ -75,6 +76,7 @@ public class HandOfLight extends Ability {
 	private final double mDamage;
 	private final double mDamagePer;
 	private final int mMaxMobs;
+	private final int mRegenerationLevel;
 
 	private final HandOfLightCS mCosmetic;
 
@@ -86,6 +88,7 @@ public class HandOfLight extends Ability {
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mDamagePer = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2);
 		mMaxMobs = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MAX_MOBS, isLevelOne() ? MAX_MOBS_1 : MAX_MOBS_2);
+		mRegenerationLevel = REGEN_LEVEL + (int) CharmManager.getLevel(player, CHARM_REGEN);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS());
 	}
@@ -142,7 +145,7 @@ public class HandOfLight extends Ability {
 				healthHealed += p.getHealth() - healthBeforeHeal;
 
 				Location loc = p.getLocation();
-				mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, REGEN_DURATION, REGEN_LEVEL, true, true));
+				mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, REGEN_DURATION, mRegenerationLevel, true, true));
 				mCosmetic.lightHealEffect(mPlayer, loc, p);
 			}
 
@@ -173,14 +176,14 @@ public class HandOfLight extends Ability {
 			.add(" health + ")
 			.addPercent(a -> a.mPercent, PERCENT_1, false, Ability::isLevelOne)
 			.add(" of their max health, and give them Regeneration ")
-			.addPotionAmplifier(REGEN_LEVEL)
+			.addPotionAmplifier(a -> a.mRegenerationLevel, REGEN_LEVEL)
 			.add(" for ")
 			.addDuration(REGEN_DURATION)
 			.add(" seconds. Additionally, if there is at least one Heretic in the area, damage all mobs in the area with magic damage equal to ")
 			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" plus ")
+			.add(" + ")
 			.add(a -> a.mDamagePer, DAMAGE_PER_1, false, Ability::isLevelOne)
-			.add(" times the number of Heretics in the range, up to ")
+			.add(" * the number of Heretics in the range, up to ")
 			.add(a -> a.mMaxMobs, MAX_MOBS_1, false, Ability::isLevelOne)
 			.add(" mobs.")
 			.addCooldown(HEALING_1_COOLDOWN, Ability::isLevelOne);
@@ -194,9 +197,9 @@ public class HandOfLight extends Ability {
 			.addPercent(a -> a.mPercent, PERCENT_2, false, Ability::isLevelTwo)
 			.add(" of their max health. Damage is increased to ")
 			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" plus ")
+			.add(" + ")
 			.add(a -> a.mDamagePer, DAMAGE_PER_2, false, Ability::isLevelOne)
-			.add(" times the number of Heretics in the range, up to ")
+			.add(" * the number of Heretics in the range, up to ")
 			.add(a -> a.mMaxMobs, MAX_MOBS_2, false, Ability::isLevelOne)
 			.add(" mobs.")
 			.addCooldown(HEALING_2_COOLDOWN, Ability::isLevelTwo);

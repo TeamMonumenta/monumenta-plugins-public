@@ -21,14 +21,17 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+
 import java.util.List;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,6 +76,7 @@ public class HolyJavelin extends Ability {
 	private final float mVelocity;
 
 	private @Nullable DivineJustice mDivineJustice;
+	private boolean disableMobility = false;
 
 	private final HolyJavelinCS mCosmetic;
 
@@ -122,11 +126,22 @@ public class HolyJavelin extends Ability {
 
 		List<LivingEntity> mobs = Hitbox.approximateCylinder(startLoc, endLoc, mSize, true).accuracy(0.5).getHitMobs();
 
-		if (mobs.isEmpty() && isLevelTwo() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && triggeringEnemy == null) {
+		if (mobs.isEmpty() && isLevelTwo() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && triggeringEnemy == null && !disableMobility) {
 			Vector dir = mPlayer.getLocation().getDirection();
 			dir.setY(dir.getY() + 0.4 * (1 - dir.getY()));
 			dir.multiply(mVelocity);
 			mPlayer.setVelocity(mPlayer.getVelocity().multiply(0.25).add(dir));
+
+			disableMobility = true;
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (((Entity) mPlayer).isOnGround() || mPlayer.isInWater() || mPlayer.isDead() || !mPlayer.isValid() || !mPlayer.isOnline()) {
+						disableMobility = false;
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(Plugin.getInstance(), 0, 1);
 			return true;
 		}
 		for (LivingEntity enemy : mobs) {
@@ -162,7 +177,7 @@ public class HolyJavelin extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("The range is increased to ")
 			.add(a -> a.mRange, RANGE_2, false, Ability::isLevelTwo)
-			.add(" blocks. Additionally, if there are no mobs in the spear's path, throw yourself forward with it.")
+			.add(" blocks. Additionally, if there are no mobs in the spear's path, launch yourself forward with it. You can only launch yourself once before touching the ground again.")
 			.addCooldown(COOLDOWN_2, false, Ability::isLevelTwo);
 	}
 }

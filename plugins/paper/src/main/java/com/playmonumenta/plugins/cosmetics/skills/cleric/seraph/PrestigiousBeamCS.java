@@ -1,12 +1,14 @@
-package com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant;
+package com.playmonumenta.plugins.cosmetics.skills.cleric.seraph;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -158,5 +160,23 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 		new PartialParticle(Particle.SPIT, eLoc, 30, 0, 0, 0, 0.25f).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, eLoc, 30, 1, 1, 1, 0.25).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, eLoc, 75, 1.25, 1, 1.25, 0.5, GOLD_COLOR).spawnAsPlayerActive(player);
+	}
+
+	@Override
+	public void beamSplash(Player player, LivingEntity target, Location targetLocation, double radius) {
+		Color burn = BURN_COLOR.getColor();
+		new PartialParticle(Particle.FLASH, targetLocation.clone().add(0, 1, 0)).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.EXPLOSION_LARGE, targetLocation.clone().add(0, 1, 0)).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, targetLocation.clone().add(0, 0.6, 0), 45, 0.7, 0.4, 0.7, 0.2).data(LIGHT_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, targetLocation.clone().add(0, 0.6, 0), 45, 0.5 * radius, 0.4 * radius, 0.5 * radius, 0.2).data(GOLD_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FIREWORKS_SPARK, targetLocation.clone().add(0, 0.6, 0), 20, 0, 0, 0, 0.25).spawnAsPlayerActive(player);
+		new PPCircle(Particle.SPELL_MOB, targetLocation, radius).extra(1).countPerMeter(2).delta(burn.getRed() / 255D, burn.getGreen() / 255D, burn.getBlue() / 255D).directionalMode(true).spawnAsPlayerActive(player);
+		target.getWorld().playSound(targetLocation, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, 1.5f, 1.6f);
+		target.getWorld().playSound(targetLocation, Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 1.4f);
+	}
+
+	@Override
+	public NamedTextColor beamGlowColor() {
+		return NamedTextColor.GOLD;
 	}
 }

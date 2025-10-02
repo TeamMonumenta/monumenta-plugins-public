@@ -340,7 +340,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(CustomRegeneration.effectID, CustomRegeneration::deserialize);
 		mEffectDeserializer.put(DeepGodsEndowment.effectID, DeepGodsEndowment::deserialize);
 		mEffectDeserializer.put(DurabilitySaving.effectID, DurabilitySaving::deserialize);
-		mEffectDeserializer.put(EnchantedPrayerAoE.effectID, EnchantedPrayerAoE::deserialize);
 		mEffectDeserializer.put(EnergizingElixirStacks.effectID, EnergizingElixirStacks::deserialize);
 		mEffectDeserializer.put(FirstStrikeCooldown.effectID, FirstStrikeCooldown::deserialize);
 		mEffectDeserializer.put(FlatDamageDealt.effectID, FlatDamageDealt::deserialize);
@@ -380,7 +379,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(StarCommunion.effectID, StarCommunion::deserialize);
 		mEffectDeserializer.put(Stasis.effectID, Stasis::deserialize);
 		mEffectDeserializer.put(RespawnStasis.effectID, RespawnStasis::deserialize);
-		mEffectDeserializer.put(ThuribleBonusHealing.effectID, ThuribleBonusHealing::deserialize);
 		mEffectDeserializer.put(TuathanBlessing.effectID, TuathanBlessing::deserialize);
 		mEffectDeserializer.put(UamielPetrification.effectID, UamielPetrification::deserialize);
 		mEffectDeserializer.put(UnstableAmalgamDisable.effectID, UnstableAmalgamDisable::deserialize);

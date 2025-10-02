@@ -1,7 +1,6 @@
-package com.playmonumenta.plugins.abilities.cleric.hierophant;
+package com.playmonumenta.plugins.abilities.cleric.seraph;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
@@ -11,20 +10,17 @@ import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
-import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.HallowedBeamCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.seraph.HallowedBeamCS;
+import com.playmonumenta.plugins.effects.HallowedBeamL2;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
-import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
-import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
-import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
-import com.playmonumenta.plugins.itemstats.enums.Operation;
-import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -54,11 +50,11 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Allay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
@@ -69,10 +65,15 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final boolean ENABLE_OPTIMAL_MOB_TARGETING = false;
 	private static final boolean CONE_AIM_ASSIST = true;
 
-	private static final int HALLOWED_1_MAX_CHARGES = 2;
-	private static final int HALLOWED_2_MAX_CHARGES = 3;
-	private static final int HALLOWED_1_COOLDOWN = 20 * 16;
-	private static final int HALLOWED_2_COOLDOWN = 20 * 12;
+	private static final int HALLOWED_MAX_CHARGES = 3;
+	private static final int HALLOWED_COOLDOWN = 20 * 10;
+	private static final int HALLOWED_DAMAGE_R2 = 25;
+	private static final int HALLOWED_SEAL_DAMAGE_R2 = 9;
+	private static final int HALLOWED_DAMAGE_R3 = 35;
+	private static final int HALLOWED_SEAL_DAMAGE_R3 = 12;
+	private static final int HALLOWED_SEAL_RADIUS = 3;
+	private static final int HALLOWED_SEAL_DURATION = 20 * 5;
+	private static final int HALLOWED_SEALS = 1;
 	private static final int CAST_CLICK_DELAY = 5;
 	private static final double HALLOWED_HEAL_PERCENT = 0.3;
 	private static final double HALLOWED_DAMAGE_REDUCTION_PERCENT = 0.1;
@@ -94,6 +95,10 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private static final String MODE_SCOREBOARD = "HallowedBeamMode";
 
 	public static final String CHARM_DAMAGE = "Hallowed Beam Damage";
+	public static final String CHARM_SEAL_DAMAGE = "Hallowed Beam Seal Damage";
+	public static final String CHARM_SEAL_RADIUS = "Hallowed Beam Seal Radius";
+	public static final String CHARM_SEAL_DURATION = "Hallowed Beam Seal Duration";
+	public static final String CHARM_SEALS = "Hallowed Beam Seals";
 	public static final String CHARM_COOLDOWN = "Hallowed Beam Cooldown";
 	public static final String CHARM_HEAL = "Hallowed Beam Healing";
 	public static final String CHARM_DISTANCE = "Hallowed Beam Distance";
@@ -110,10 +115,10 @@ public class HallowedBeam extends MultipleChargeAbility {
 			.shorthandName("HB")
 			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Heal a targeted player, damage a targeted Heretic, or stun a targeted non-Heretic from a distance.")
-			.cooldown(HALLOWED_1_COOLDOWN, HALLOWED_2_COOLDOWN, CHARM_COOLDOWN)
+			.cooldown(HALLOWED_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HallowedBeam::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-			.addTrigger(new AbilityTriggerInfo<>("swapMode", "swap mode", HallowedBeam::swapMode, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
+			.addTrigger(new AbilityTriggerInfo<>("swapMode", "swap mode", HallowedBeam::swapMode, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).enabled(false),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(Material.BOW);
 
@@ -143,6 +148,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private int mLastCastTicks = 0;
 	private int mLastTryTicks = 0;
 	private final HallowedBeamCS mCosmetic;
+	private final double mDamage;
+	private final double mSealDamage;
+	private final double mSealRadius;
+	private final int mSealDuration;
+	private final int mSeals;
 	private final double mHealingThreshold;
 	private final double mRange;
 	private final double mHeal;
@@ -156,7 +166,12 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 	public HallowedBeam(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mMaxCharges = (int) CharmManager.getLevel(player, CHARM_CHARGE) + (isLevelOne() ? HALLOWED_1_MAX_CHARGES : HALLOWED_2_MAX_CHARGES);
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? HALLOWED_DAMAGE_R3 : HALLOWED_DAMAGE_R2);
+		mSealDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_SEAL_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? HALLOWED_SEAL_DAMAGE_R3 : HALLOWED_SEAL_DAMAGE_R2);
+		mSealRadius = CharmManager.getRadius(player, CHARM_SEAL_RADIUS, HALLOWED_SEAL_RADIUS);
+		mSealDuration = CharmManager.getDuration(player, CHARM_SEAL_DURATION, HALLOWED_SEAL_DURATION);
+		mSeals = HALLOWED_SEALS + (int) CharmManager.getLevel(player, CHARM_SEALS);
+		mMaxCharges = (int) CharmManager.getLevel(player, CHARM_CHARGE) + HALLOWED_MAX_CHARGES;
 		mCharges = getTrackedCharges();
 		mRange = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, CAST_RANGE);
 		mHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEAL, HALLOWED_HEAL_PERCENT);
@@ -176,11 +191,12 @@ public class HallowedBeam extends MultipleChargeAbility {
 			mMode = Mode.values()[Math.max(0, Math.min(modeIndex, Mode.values().length - 1))];
 		}
 
-		mPlayerFilter = e -> e instanceof Player p && p != mPlayer && p.getGameMode() != GameMode.SPECTATOR && !p.isDead() && p.isValid()
+		mPlayerFilter = e -> ((e instanceof Player p && p != mPlayer && p.getGameMode() != GameMode.SPECTATOR) || (e instanceof Allay a && KeeperVirtue.allayBelongsTo(a, player)))
+		&& !e.isDead() && e.isValid()
 		// Do not heal if health is full
-		&& getPercentHealth(p) <= mHealingThreshold
+		&& getPercentHealth((LivingEntity) e) <= mHealingThreshold
 		// Do not heal if there is a custom effect preventing heal
-		&& Plugin.getInstance().mEffectManager.getEffects(p, PercentHeal.class).stream()
+		&& Plugin.getInstance().mEffectManager.getEffects(e, PercentHeal.class).stream()
 			.filter(percentHeal -> percentHeal.getValue() < -0.995).findAny().isEmpty();
 		mHostileFilter = e -> e instanceof LivingEntity le && EntityUtils.isHostileMob(le) && !ScoreboardUtils.checkTag(le, AbilityUtils.IGNORE_TAG) && !le.isDead() && le.isValid();
 
@@ -376,12 +392,12 @@ public class HallowedBeam extends MultipleChargeAbility {
 		// get closest y-level on target entity (extremely necessary)
 		final Vector hitLocation = hitLocationEntityMap.get(targetEntity.getUniqueId());
 		final Vector targetHitLocation = hitLocation != null ? hitLocation
-		: lastRayTraceHitVector != null ? lastRayTraceHitVector
-		: playerEyeLocation.toVector();
+			: lastRayTraceHitVector != null ? lastRayTraceHitVector
+			: playerEyeLocation.toVector();
 		final Location targetLocation = getClosestPointOnBoundingBox(targetEntity.getBoundingBox(), targetHitLocation).toLocation(world);
 
 		if (targetEntity instanceof final Player player) {
-			healPlayer(player, true);
+			healPlayerOrVirtue(player, true);
 			// knockaway enemies from the hit location
 			final Location knockAwayLocation = player.getLocation();
 			for (LivingEntity le : EntityUtils.getNearbyMobs(knockAwayLocation, HALLOWED_RADIUS)) {
@@ -389,6 +405,10 @@ public class HallowedBeam extends MultipleChargeAbility {
 			}
 			mCosmetic.beamHealTarget(mPlayer, player, targetLocation);
 			mCosmetic.beamHealEffect(mPlayer, player, playerLookDirection, mRange, targetLocation);
+		} else if (targetEntity instanceof final Allay allay) {
+			healPlayerOrVirtue(allay, true);
+			mCosmetic.beamHealTarget(mPlayer, allay, targetLocation);
+			mCosmetic.beamHealEffect(mPlayer, allay, playerLookDirection, mRange, targetLocation);
 		} else {
 			damageEntity(targetEntity, true, targetLocation);
 			mCosmetic.beamHarm(mPlayer, targetEntity, playerLookDirection, mRange, targetLocation);
@@ -491,28 +511,14 @@ public class HallowedBeam extends MultipleChargeAbility {
 		return vector;
 	}
 
-	private double calculateDamage(LivingEntity target) {
-		final PlayerInventory inventory = mPlayer.getInventory();
-		final ItemStack inMainHand = inventory.getItemInMainHand();
-
-		double damage = ItemStatUtils.getAttributeAmount(inMainHand, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
-		damage += Sniper.apply(mPlayer, target, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.SNIPER));
-		damage += PointBlank.apply(mPlayer, target, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.POINT_BLANK));
-		// Hallowed Beam has special case for proj damage scaling in ProjectileDamageMultiply. See AbilityUtils for more info
-		damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-		// Cap to not damage negative amounts
-		damage = Math.max(0, damage);
-		return damage;
-	}
-
-	private void healPlayer(Player player, boolean mainTarget) {
-		double healAmount = mHeal * EntityUtils.getMaxHealth(player);
+	private void healPlayerOrVirtue(LivingEntity entity, boolean mainTarget) {
+		double healAmount = mHeal * EntityUtils.getMaxHealth(entity);
 		if (healAmount > 0) {
-			PlayerUtils.healPlayer(mPlugin, player, healAmount, mPlayer);
+			PlayerUtils.healPlayer(mPlugin, entity, healAmount, mPlayer);
 		}
 
 		if (isLevelTwo() && mainTarget) {
-			mPlugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
+			mPlugin.mEffectManager.addEffect(entity, PERCENT_DAMAGE_RESIST_EFFECT_NAME,
 				new PercentDamageReceived(mResistanceDuration, -mResistance).deleteOnAbilityUpdate(true));
 		}
 	}
@@ -521,18 +527,15 @@ public class HallowedBeam extends MultipleChargeAbility {
 		if (targetLocation == null) {
 			targetLocation = LocationUtils.getEntityCenter(livingEntity);
 		}
+
 		int stunDuration;
 		if (Crusade.enemyTriggersAbilities(livingEntity)) {
-			double damage = calculateDamage(livingEntity);
+			double damage = mDamage;
 			if (!mainTarget) {
 				damage *= 0.5;
 			}
 			if (damage > 0) {
 				DamageUtils.damage(mPlayer, livingEntity, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
-			}
-
-			if (mainTarget && mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.FIRE_ASPECT) > 0) {
-				EntityUtils.applyFire(mPlugin, 20 * 15, livingEntity, mPlayer);
 			}
 
 			stunDuration = mHereticStunDuration;
@@ -546,6 +549,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 		if (mainTarget) {
 			EntityUtils.applyStun(mPlugin, stunDuration, livingEntity);
+			if (isLevelTwo()) {
+				mPlugin.mEffectManager.addEffect(livingEntity, "HallowedBeam" + mPlayer.getName(), new HallowedBeamL2(mSealDuration, mPlayer, mSealDamage, mSealRadius, mSeals, mCosmetic));
+			}
 		}
 
 		Crusade.addCrusadeTag(livingEntity, mCrusade);
@@ -606,16 +612,18 @@ public class HallowedBeam extends MultipleChargeAbility {
 			.addPercent(a -> a.mHeal, HALLOWED_HEAL_PERCENT)
 			.add(" of their max health, knocking back enemies within ")
 			.add(a -> HALLOWED_RADIUS, HALLOWED_RADIUS)
-			.add(" blocks. If aimed at a Heretic, it instantly deals magic damage equal to your projectile damage to the target, and stuns them for ")
+			.add(" blocks. If aimed at a Heretic, it instantly deals R2: " + HALLOWED_DAMAGE_R2 + " / R3: ")
+			.add(a -> ServerProperties.getAbilityEnhancementsEnabled(a.mPlayer) ? a.mDamage : HALLOWED_DAMAGE_R3, HALLOWED_DAMAGE_R3)
+			.add(" magic damage to them, applies aspect enchants, and stuns them for ")
 			.addDuration(a -> a.mHereticStunDuration, HALLOWED_HERETIC_STUN)
-			.add(" second. If aimed at a non-Heretic mob, it instantly stuns them for ")
+			.add("s. If aimed at a non-Heretic mob, it instantly stuns them for ")
 			.addDuration(a -> a.mLivingStunDuration, HALLOWED_LIVING_STUN)
-			.add(" seconds. ")
-			.addTrigger(1)
-			.add(" to change the mode of Hallowed Beam between 'Default' (default), 'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). This skill can only apply Recoil once per max charge before touching the ground. Charges: ")
-			.add(a -> a.mMaxCharges, HALLOWED_1_MAX_CHARGES, false, Ability::isLevelOne)
+			.add("s and applies aspect enchants. This skill can only apply Recoil ")
+			.add(a -> a.mMaxCharges, HALLOWED_MAX_CHARGES, false)
+			.add(" times before touching the ground. Charges: ")
+			.add(a -> a.mMaxCharges, HALLOWED_MAX_CHARGES, false)
 			.add(".")
-			.addCooldown(HALLOWED_1_COOLDOWN, Ability::isLevelOne);
+			.addCooldown(HALLOWED_COOLDOWN);
 	}
 
 	private static Description<HallowedBeam> getDescription2() {
@@ -624,9 +632,12 @@ public class HallowedBeam extends MultipleChargeAbility {
 			.addPercent(a -> a.mResistance, HALLOWED_DAMAGE_REDUCTION_PERCENT)
 			.add(" resistance for ")
 			.addDuration(a -> a.mResistanceDuration, HALLOWED_DAMAGE_REDUCTION_DURATION)
-			.add(" seconds. Charges: ")
-			.add(a -> a.mMaxCharges, HALLOWED_2_MAX_CHARGES, false, Ability::isLevelTwo)
-			.add(".")
-			.addCooldown(HALLOWED_2_COOLDOWN, Ability::isLevelTwo);
+			.add(" seconds. Mobs affected are marked by a Holy Seal for ")
+			.addDuration(a -> a.mSealDuration, HALLOWED_SEAL_DURATION)
+			.add(" seconds - your next melee attack, projectile or Ethereal Ascension orb to damage them will explode the Seal, dealing R2: " + HALLOWED_SEAL_DAMAGE_R2 + " / R3: ")
+			.add(a -> ServerProperties.getAbilityEnhancementsEnabled(a.mPlayer) ? a.mSealDamage : HALLOWED_SEAL_DAMAGE_R3, HALLOWED_SEAL_DAMAGE_R3)
+			.add(" magic damage in a ")
+			.add(a -> a.mSealRadius, HALLOWED_SEAL_RADIUS)
+			.add(" block radius.");
 	}
 }

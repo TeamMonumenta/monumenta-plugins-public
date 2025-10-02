@@ -1,12 +1,14 @@
-package com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant;
+package com.playmonumenta.plugins.cosmetics.skills.cleric.seraph;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PPParametric;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -115,7 +117,7 @@ public class HallowedBeamCS implements CosmeticSkill {
 		world.playSound(targetLocation, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1.4f, 2.0f);
 	}
 
-	public void beamHealTarget(Player player, Player target, Location targetLocation) {
+	public void beamHealTarget(Player player, LivingEntity target, Location targetLocation) {
 		Location headLoc = target.getEyeLocation().add(0, 0.1, 0);
 		Location ringLoc = LocationUtils.getHeightLocation(target, 0.2);
 		new PPCircle(Particle.HEART, headLoc, 0.75)
@@ -153,12 +155,25 @@ public class HallowedBeamCS implements CosmeticSkill {
 			.deltaVariance(true, true, true, false, true, true)
 			.spawnAsPlayerActive(player);
 		new PPParametric(Particle.SMALL_FLAME, targetLocation, (parameter, builder) -> {
-				double theta = parameter * Math.PI * 2;
-				builder.offset(FastUtils.cos(theta), builder.offsetY(), FastUtils.sin(theta));
-			})
+			double theta = parameter * Math.PI * 2;
+			builder.offset(FastUtils.cos(theta), builder.offsetY(), FastUtils.sin(theta));
+		})
 			.directionalMode(true)
 			.extra(0.1)
 			.count(45)
 			.spawnAsPlayerActive(player);
+	}
+
+	public void beamSplash(Player player, LivingEntity target, Location targetLocation, double radius) {
+		new PartialParticle(Particle.EXPLOSION_LARGE, targetLocation.clone().add(0, 1, 0)).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FLAME, targetLocation.clone().add(0, 0.6, 0), 20, 0.7, 0.5, 0.7, 0.15).spawnAsPlayerActive(player);
+		new PPCircle(Particle.CLOUD, targetLocation, 0.5 * radius).delta(0.5, 0, 0).extra(0.15).directionalMode(true).rotateDelta(true).countPerMeter(1).spawnAsPlayerActive(player);
+		new PPCircle(Particle.CLOUD, targetLocation, radius).delta(0.5, 0, 0).extra(0.1).directionalMode(true).rotateDelta(true).countPerMeter(0.8).spawnAsPlayerActive(player);
+		target.getWorld().playSound(targetLocation, Sound.ITEM_TOTEM_USE, 0.6f, 2f);
+		target.getWorld().playSound(targetLocation, Sound.ITEM_TRIDENT_RETURN, 1.2f, 1.2f);
+	}
+
+	public NamedTextColor beamGlowColor() {
+		return NamedTextColor.WHITE;
 	}
 }

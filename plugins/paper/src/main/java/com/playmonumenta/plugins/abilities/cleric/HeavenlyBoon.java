@@ -44,20 +44,21 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	 * Changes must be made to the loot tables instead */
 	private static final double HEAVENLY_BOON_HEAL = 0.2;
 	private static final double HEAVENLY_BOON_STRENGTH = 0.1;
-	private static final int HEAVENLY_BOON_REGEN = 1;
+	private static final int HEAVENLY_BOON_REGEN = 0; // Actually 1 because of how effects work
 	private static final double HEAVENLY_BOON_RESISTANCE = 0.1;
 	private static final double HEAVENLY_BOON_SPEED = 0.2;
 	private static final double HEAVENLY_BOON_ABSORPTION = 0.2;
 	private static final int HEAVENLY_BOON_DURATION_1 = Constants.TICKS_PER_SECOND * 20;
 	private static final int HEAVENLY_BOON_DURATION_2 = Constants.TICKS_PER_SECOND * 50;
+	private static final int COOLDOWN_1 = Constants.TICKS_PER_SECOND * 8;
+	private static final int COOLDOWN_2 = Constants.TICKS_PER_SECOND * 6;
 
-	private static final double HEAVENLY_BOON_1_CHANCE = 0.1;
+	private static final double HEAVENLY_BOON_1_CHANCE = 0.2;
 	private static final double HEAVENLY_BOON_2_CHANCE = 0.2;
 	private static final double HEAVENLY_BOON_RADIUS = 12;
 	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0;
-	private static final double ENHANCEMENT_CDR = 0.1;
-	private static final int ENHANCEMENT_CDR_CAP = Constants.TICKS_PER_SECOND;
-	private static final int ENHANCEMENT_COOLDOWN = Constants.TICKS_PER_SECOND * 6;
+	private static final double ENHANCEMENT_CDR = 0.05;
+	private static final int ENHANCEMENT_CDR_CAP = 15;
 	private static final int BOSS_DAMAGE_THRESHOLD_R1 = 100;
 	private static final int BOSS_DAMAGE_THRESHOLD_R2 = 200;
 	private static final int BOSS_DAMAGE_THRESHOLD_R3 = 300;
@@ -65,6 +66,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	public static final String CHARM_CHANCE = "Heavenly Boon Potion Chance";
 	public static final String CHARM_DURATION = "Heavenly Boon Potion Duration";
 	public static final String CHARM_RADIUS = "Heavenly Boon Radius";
+	public static final String CHARM_COOLDOWN = "Heavenly Boon Cooldown";
 
 	public static final String CHARM_HEAL_AMPLIFIER = "Heavenly Boon Healing";
 	public static final String CHARM_REGEN_AMPLIFIER = "Heavenly Boon Regeneration Amplifier";
@@ -73,7 +75,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	public static final String CHARM_RESIST_AMPLIFIER = "Heavenly Boon Resistance Amplifier";
 	public static final String CHARM_ABSORPTION_AMPLIFIER = "Heavenly Boon Absorption Amplifier";
 
-	public static final String CHARM_ENHANCE_COOLDOWN = "Heavenly Boon Enhancement Cooldown";
 	public static final String CHARM_ENHANCE_CDR = "Heavenly Boon Enhancement Cooldown Reduction";
 	public static final String CHARM_ENHANCE_CDR_CAP = "Heavenly Boon Enhancement Cooldown Reduction Cap";
 
@@ -84,7 +85,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			.shorthandName("HB")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Share all positive splash potion effects with nearby players and occasionally generate splash potions when killing Heretics.")
-			.cooldown(0, 0, ENHANCEMENT_COOLDOWN, CHARM_ENHANCE_COOLDOWN)
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.displayItem(Material.SPLASH_POTION);
 
 	private static final ImmutableSet<String> BOON_DROPS = ImmutableSet.of(
@@ -196,7 +197,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 		mTracker.updateDamageDealtToBosses(event);
 
-		if (enemy.isValid()) {
+		if (enemy.isValid() && !isOnCooldown()) {
 			// Construct custom source for each player.
 			final String source = BOON_EFFECT_NAME + mPlayer.getName();
 			mPlugin.mEffectManager.addEffect(enemy, source, new HeavenlyBoonTracker(MOB_EFFECT_DURATION, mPlayer.getUniqueId()));
@@ -206,7 +207,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	@Override
 	public void triggerOnKill(final LivingEntity mob) {
-		if (Crusade.enemyTriggersAbilities(mob) && FastUtils.RANDOM.nextDouble() < mChance) {
+		if (Crusade.enemyTriggersAbilities(mob) && !isOnCooldown() && FastUtils.RANDOM.nextDouble() < mChance) {
 			final ImmutableList<NamespacedKey> lootTables = isLevelOne() ? LEVEL_1_POTIONS : LEVEL_2_POTIONS;
 			final NamespacedKey lootTable = lootTables.get(FastUtils.RANDOM.nextInt(lootTables.size()));
 			final ItemStack potion = InventoryUtils.getItemFromLootTable(mPlayer, lootTable);
@@ -214,6 +215,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				return;
 			}
 
+			putOnCooldown();
 			final ThrownPotion splashPotion = EntityUtils.spawnSplashPotion(mPlayer, potion);
 			PotionUtils.mimicSplashPotionEffect(mPlayer, splashPotion);
 			final String name = ItemUtils.getRawDisplayNameAsString(potion);
@@ -228,10 +230,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			} else if (name.contains("Absorption")) {
 				mCosmetic.splashEffectAbsorption(mPlayer, mob);
 			}
-
-			if (isEnhanced() && !isOnCooldown()) {
-				putOnCooldown();
-
+			if (isEnhanced()) {
 				for (final Player player : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
 					for (final Ability ability : mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilities()) {
 						final ClassAbility linkedSpell = ability.getInfo().getLinkedSpell();
@@ -260,7 +259,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			.add(" chance to be splashed with a ")
 			.addPercent(HEAVENLY_BOON_HEAL)
 			.add(" Instant Health potion, with an additional effect of either Regeneration ")
-			.addPotionAmplifier(HEAVENLY_BOON_REGEN)
+			.addPotionAmplifier(a -> HEAVENLY_BOON_REGEN, HEAVENLY_BOON_REGEN)
 			.add(", ")
 			.addPercent(HEAVENLY_BOON_STRENGTH)
 			.add(" strength, ")
@@ -271,16 +270,16 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			.addPercent(HEAVENLY_BOON_ABSORPTION)
 			.add(" absorption with a ")
 			.addDuration(HEAVENLY_BOON_DURATION_1)
-			.add(" second duration.");
+			.add(" second duration.")
+			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
 	}
 
 	private static Description<HeavenlyBoon> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("The chance to be splashed upon killing a Heretic is increased to ")
-			.addPercent(a -> a.mChance, HEAVENLY_BOON_2_CHANCE, false, Ability::isLevelTwo)
-			.add(". Boon generated potions now give ")
+			.add("Boon generated potions now give ")
 			.addDuration(HEAVENLY_BOON_DURATION_2)
-			.add(" second effect duration.");
+			.add(" second effect duration.")
+			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
 	}
 
 	private static Description<HeavenlyBoon> getDescriptionEnhancement() {
@@ -289,7 +288,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			.addPercent(a -> a.mEnhanceCDR, ENHANCEMENT_CDR)
 			.add(" (max ")
 			.addDuration(a -> a.mEnhanceCDRCap, ENHANCEMENT_CDR_CAP)
-			.add(" seconds).")
-			.addCooldown(ENHANCEMENT_COOLDOWN, Ability::isEnhanced);
+			.add(" seconds).");
 	}
 }

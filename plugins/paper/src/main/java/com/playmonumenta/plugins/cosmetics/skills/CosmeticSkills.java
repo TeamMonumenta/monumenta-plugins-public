@@ -36,14 +36,13 @@ import com.playmonumenta.plugins.cosmetics.skills.cleric.RebirthCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.SoulStrainCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.TouchOfEntropyCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.VitalityExtractionCS;
-import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.AnimatingAuraCS;
-import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.PrestigiousBeamCS;
-import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.SpectralSerpentCS;
-import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.TelekinesisCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.seraph.PrestigiousBeamCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.seraph.SpectralSerpentCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.HypnoticChantCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.ImpalingDistortionCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.PrestigiousInfusionCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.RipplingBeamCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.seraph.VigilantMothdragonCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.AroShockCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.DarkSparkCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.DivergentCausalityCS;
@@ -182,9 +181,9 @@ public class CosmeticSkills {
 		RipplingBeamCS::new,
 		HypnoticChantCS::new,
 		ImpalingDistortionCS::new,
-		TelekinesisCS::new,
-		AnimatingAuraCS::new,
+
 		SpectralSerpentCS::new,
+		VigilantMothdragonCS::new,
 
 		//Mage
 		VolcanicBurstCS::new,

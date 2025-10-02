@@ -66,7 +66,7 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 	}
 
 	@Override
-	public void sanctOnTrigger1(World world, Player player, Location loc, LivingEntity source) {
+	public void sanctApply1(World world, Player player, Location loc, LivingEntity source) {
 		world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.5f, 1.5f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.25f, 1.75f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 5f, 0.5f);
@@ -115,7 +115,7 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 	}
 
 	@Override
-	public void sanctOnTrigger2(World world, Player player, Location loc, LivingEntity source) {
+	public void sanctApply2(World world, Player player, Location loc, LivingEntity source) {
 		world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 2f, 1.5f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.65f, 1.75f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 7f, 0.5f);

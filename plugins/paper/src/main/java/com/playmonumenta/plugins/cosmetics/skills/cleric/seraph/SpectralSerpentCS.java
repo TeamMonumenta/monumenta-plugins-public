@@ -1,6 +1,7 @@
-package com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant;
+package com.playmonumenta.plugins.cosmetics.skills.cleric.seraph;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -8,6 +9,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.AbstractMap;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -66,6 +68,7 @@ public class SpectralSerpentCS extends HallowedBeamCS {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), serpentHead::remove, 8);
 		new BukkitRunnable() {
 			int mSerpentHeadStage = 0;
+
 			@Override
 			public void run() {
 				Vector direction = LocationUtils.getDirectionTo(targetLoc, playerLoc);
@@ -106,6 +109,7 @@ public class SpectralSerpentCS extends HallowedBeamCS {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), serpentHead::remove, 8);
 		new BukkitRunnable() {
 			int mSerpentHeadStage = 0;
+
 			@Override
 			public void run() {
 				Vector direction = LocationUtils.getDirectionTo(targetLoc, playerLoc);
@@ -133,5 +137,20 @@ public class SpectralSerpentCS extends HallowedBeamCS {
 	@Override
 	public void beamHarmOther(Player player, LivingEntity target, Location targetLocation) {
 
+	}
+
+	@Override
+	public void beamSplash(Player player, LivingEntity target, Location targetLocation, double radius) {
+		new PartialParticle(Particle.SONIC_BOOM, targetLocation.clone().add(0, 1, 0)).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT_MAGIC, targetLocation.clone().add(0, 1, 0), 30, 0.7, 0.5, 0.7).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SQUID_INK, targetLocation.clone().add(0, 0.6, 0), 30, 0.25 * radius, 0.2, 0.25 * radius, 0.2).spawnAsPlayerActive(player);
+		new PPCircle(Particle.CRIT_MAGIC, targetLocation, radius).countPerMeter(2.5).delta(0.5, 0.1, 0).extra(1).directionalMode(true).rotateDelta(true).spawnAsPlayerActive(player);
+		target.getWorld().playSound(targetLocation, Sound.ENTITY_WARDEN_SONIC_BOOM, 0.75f, 1.3f);
+		target.getWorld().playSound(targetLocation, Sound.ENTITY_GLOW_SQUID_SQUIRT, 1.4f, 1.3f);
+	}
+
+	@Override
+	public NamedTextColor beamGlowColor() {
+		return NamedTextColor.DARK_AQUA;
 	}
 }

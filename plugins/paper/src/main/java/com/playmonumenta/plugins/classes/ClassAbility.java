@@ -79,9 +79,10 @@ public enum ClassAbility {
 	HEAVENLY_BOON("Heavenly Boon"),
 
 	// Hierophant
-	ENCHANTED_PRAYER("Enchanted Prayer"),
+	ETHEREAL_ASCENSION("Ethereal Ascension"),
 	HALLOWED_BEAM("Hallowed Beam"),
-	THURIBLE_PROCESSION("Thurible Procession"),
+	HALLOWED_BEAM_SEAL("Hallowed Beam"), // Used for differentiating L1 and L2
+	KEEPER_VIRTUE("Keeper Virtue"),
 
 	// Paladin
 	CHOIR_BELLS("Choir Bells"),

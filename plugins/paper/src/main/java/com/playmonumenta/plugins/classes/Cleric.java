@@ -10,14 +10,14 @@ import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.TouchofRadiance;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.Rejuvenation;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import com.playmonumenta.plugins.abilities.cleric.paladin.Unwavering;
+import com.playmonumenta.plugins.abilities.cleric.seraph.EtherealAscension;
+import com.playmonumenta.plugins.abilities.cleric.seraph.HallowedBeam;
+import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtue;
+import com.playmonumenta.plugins.abilities.cleric.seraph.Rejuvenation;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 
@@ -26,7 +26,7 @@ public class Cleric extends PlayerClass {
 
 	public static final int CLASS_ID = 3;
 	public static final int PALADIN_SPEC_ID = 5;
-	public static final int HIEROPHANT_SPEC_ID = 6;
+	public static final int SERAPH_SPEC_ID = 6;
 
 	public Cleric() {
 		mAbilities.add(CelestialBlessing.INFO);
@@ -55,28 +55,29 @@ public class Cleric extends PlayerClass {
 		mSpecOne.mDescription = "Paladins are forefront fighters, charging into battle and vanquishing Heretics with heavy attacks in quick succession.";
 		mSpecOne.mPassive = Unwavering.INFO;
 
-		mSpecTwo.mAbilities.add(EnchantedPrayer.INFO);
-		mSpecTwo.mAbilities.add(ThuribleProcession.INFO);
+		mSpecTwo.mAbilities.add(EtherealAscension.INFO);
 		mSpecTwo.mAbilities.add(HallowedBeam.INFO);
+		mSpecTwo.mAbilities.add(KeeperVirtue.INFO);
 		mSpecTwo.mSpecQuestScoreboard = "Quest103k";
-		mSpecTwo.mSpecialization = HIEROPHANT_SPEC_ID;
-		mSpecTwo.mSpecName = "Hierophant";
-		mSpecTwo.mDisplayItem = Material.DRAGON_BREATH;
-		mSpecTwo.mDescription = "Hierophants specialize in support and have mastered healing. They will make sure the living stay living.";
+		mSpecTwo.mSpecialization = SERAPH_SPEC_ID;
+		mSpecTwo.mSpecName = "Seraph";
+		mSpecTwo.mDisplayItem = Material.OCHRE_FROGLIGHT;
+		mSpecTwo.mDescription = "Seraphim are ranged, agile supporters, capable of aiding allies and smiting enemies from above with divine magic.";
 		mSpecTwo.mPassive = Rejuvenation.INFO;
 
 		mTriggerOrder = ImmutableList.of(
-			EnchantedPrayer.INFO,
-			HallowedBeam.INFO,
-
 			ChoirBells.INFO,
 			HolyJavelin.INFO,
 			LuminousInfusion.INFO,
 
+			EtherealAscension.INFO,
+			HallowedBeam.INFO,
+			KeeperVirtue.INFO,
+
 			CelestialBlessing.INFO,
 			CleansingRain.INFO,
 			DivineJustice.INFO,
-			HandOfLight.INFO, // after cleansing rain and luminous infusion
+			HandOfLight.INFO, // after cleansing rain
 			TouchofRadiance.INFO,
 			Illuminate.INFO
 		);

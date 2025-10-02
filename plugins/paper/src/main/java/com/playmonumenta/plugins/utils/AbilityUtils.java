@@ -308,7 +308,7 @@ public class AbilityUtils {
 			case Warrior.BERSERKER_SPEC_ID -> "Berserker";
 			case Warrior.GUARDIAN_SPEC_ID -> "Guardian";
 			case Cleric.PALADIN_SPEC_ID -> "Paladin";
-			case Cleric.HIEROPHANT_SPEC_ID -> "Hierophant";
+			case Cleric.SERAPH_SPEC_ID -> "Seraph";
 			case Rogue.SWORDSAGE_SPEC_ID -> "Swordsage";
 			case Rogue.ASSASSIN_SPEC_ID -> "Assassin";
 			case Alchemist.HARBINGER_SPEC_ID -> "Harbinger";
@@ -330,7 +330,7 @@ public class AbilityUtils {
 			case "Berserker" -> Warrior.BERSERKER_SPEC_ID;
 			case "Guardian" -> Warrior.GUARDIAN_SPEC_ID;
 			case "Paladin" -> Cleric.PALADIN_SPEC_ID;
-			case "Hierophant" -> Cleric.HIEROPHANT_SPEC_ID;
+			case "Seraph" -> Cleric.SERAPH_SPEC_ID;
 			case "Swordsage" -> Rogue.SWORDSAGE_SPEC_ID;
 			case "Assassin" -> Rogue.ASSASSIN_SPEC_ID;
 			case "Harbinger" -> Alchemist.HARBINGER_SPEC_ID;
@@ -573,7 +573,9 @@ public class AbilityUtils {
 		ClassAbility.PREDATOR_STRIKE,
 		ClassAbility.ALCHEMIST_POTION,
 		ClassAbility.ALCHEMICAL_ARTILLERY,
-		ClassAbility.UNSTABLE_AMALGAM
+		ClassAbility.UNSTABLE_AMALGAM,
+		ClassAbility.ETHEREAL_ASCENSION,
+		ClassAbility.HALLOWED_BEAM
 	);
 
 	public static boolean isAspectTriggeringEvent(DamageEvent event, Player player) {
@@ -714,7 +716,7 @@ public class AbilityUtils {
 	}
 
 	public static boolean hasSpecialProjSkillScaling(@Nullable ClassAbility classAbility) {
-		return classAbility == ClassAbility.HUNTING_COMPANION || classAbility == ClassAbility.HALLOWED_BEAM;
+		return classAbility == ClassAbility.HUNTING_COMPANION;
 	}
 
 	public static boolean isVolley(Player player, Projectile proj) {

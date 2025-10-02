@@ -41,8 +41,7 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 
 	private static final double RADIUS = 4;
 	private static final int FIRE_DURATION = Constants.TICKS_PER_SECOND * 3;
-	private static final int COOLDOWN_1 = Constants.TICKS_PER_SECOND * 18;
-	private static final int COOLDOWN_2 = Constants.TICKS_PER_SECOND * 18;
+	private static final int COOLDOWN = Constants.TICKS_PER_SECOND * 20;
 	private static final float KNOCKBACK_SPEED = 0.55f;
 
 	public static final String CHARM_DAMAGE = "Luminous Infusion Damage";
@@ -59,7 +58,7 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 			.shorthandName("LI")
 			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Upon activating, your next attack on a Heretic causes an explosion.")
-			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", LuminousInfusion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)))
 			.displayItem(Material.BLAZE_POWDER);
 
@@ -227,7 +226,7 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 			.add(" damage to non-Heretics. Enemies are knocked away from the hit Heretic. ")
 			.add(a -> a.mMaxCharges, CHARGES_1, false, Ability::isLevelOne)
 			.add(" charges. Having multiple charges primed at once will cause one explosion at a time, and all charges are replenished when cooldown expires.")
-			.addCooldown(COOLDOWN_1);
+			.addCooldown(COOLDOWN);
 	}
 
 	private static Description<LuminousInfusion> getDescription2() {

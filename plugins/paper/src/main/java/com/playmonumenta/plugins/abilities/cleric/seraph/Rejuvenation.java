@@ -1,4 +1,4 @@
-package com.playmonumenta.plugins.abilities.cleric.hierophant;
+package com.playmonumenta.plugins.abilities.cleric.seraph;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -16,7 +16,7 @@ import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class Rejuvenation extends Ability {
 	private static final int RADIUS = 12;
-	private static final int HEAL_INTERVAL = TICKS_PER_SECOND * 5;
+	private static final int HEAL_INTERVAL = TICKS_PER_SECOND * 3;
 	public static final double PERCENT_HEAL = 0.05;
 	private static final double HEALTH_LIMIT = 0.5;
 	public static final double DJ_MULTIPLIER = 0.1;
@@ -30,7 +30,7 @@ public class Rejuvenation extends Ability {
 	public static final AbilityInfo<Rejuvenation> INFO =
 		new AbilityInfo<>(Rejuvenation.class, "Rejuvenation", Rejuvenation::new)
 			.description(getDescription())
-			.canUse(player -> AbilityUtils.getSpecNum(player) == Cleric.HIEROPHANT_SPEC_ID);
+			.canUse(player -> AbilityUtils.getSpecNum(player) == Cleric.SERAPH_SPEC_ID);
 
 	private final double mRadius;
 	private final double mHealing;

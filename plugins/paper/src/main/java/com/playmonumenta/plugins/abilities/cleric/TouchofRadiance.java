@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.TouchofRadianceCS;
 import com.playmonumenta.plugins.effects.AbilityCooldownRechargeRate;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.effects.TouchofRadianceEnhancement;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -36,31 +35,26 @@ public class TouchofRadiance extends Ability {
 
 	private static final String WEAKNESS_EFFECT_NAME = "TouchofRadianceWeakness";
 	public static final String CDR_EFFECT_NAME = "TouchofRadianceCDR";
-	private static final String KBR_EFFECT_NAME = "TouchofRadianceKBR";
 
 	private static final double WEAKNESS = 0.2;
-	private static final double CDR_1 = 0.35;
+	private static final double CDR_1 = 0.5;
 	private static final double CDR_1_ALLY = 1 * CDR_1;
-	private static final double CDR_2 = 0.5;
+	private static final double CDR_2 = 0.75;
 	private static final double CDR_2_ALLY = 1 * CDR_2;
-	private static final double KBR = 0.5;
-	private static final double KBR_ALLY = 1 * KBR;
 	private static final int STUN_DURATION = 30;
 	private static final int WEAKNESS_DURATION = 7 * 20;
-	private static final int DURATION = 7 * 20;
+	private static final int DURATION = 6 * 20;
 	private static final double RANGE = 16;
 	private static final double RADIUS = 3.5;
 	private static final double ENHANCE_DAMAGE = 9;
 	private static final int ENHANCE_STUN_DURATION = 10;
-	private static final int COOLDOWN = 24 * 20;
+	private static final int COOLDOWN = 30 * 20;
 
 	public static final String CHARM_RANGE = "Touch of Radiance Cast Range";
 	public static final String CHARM_WEAKNESS = "Touch of Radiance Weakness Amplifier";
 	public static final String CHARM_RADIUS = "Touch of Radiance Weakness Radius";
 	public static final String CHARM_CDR = "Touch of Radiance Self Cooldown Recharge Rate";
 	public static final String CHARM_CDR_ALLY = "Touch of Radiance Ally Cooldown Recharge Rate";
-	public static final String CHARM_KBR = "Touch of Radiance Self Knockback Resistance";
-	public static final String CHARM_KBR_ALLY = "Touch of Radiance Ally Knockback Resistance";
 	public static final String CHARM_STUN_DURATION = "Touch of Radiance Stun Duration";
 	public static final String CHARM_WEAKNESS_DURATION = "Touch of Radiance Weakness Duration";
 	public static final String CHARM_DURATION = "Touch of Radiance Buff Duration";
@@ -84,8 +78,6 @@ public class TouchofRadiance extends Ability {
 	private final double mWeakness;
 	private final double mCDR;
 	private final double mCDRAlly;
-	private final double mKBR;
-	private final double mKBRAlly;
 	private final int mStunDuration;
 	private final int mWeaknessDuration;
 	private final int mBuffDuration;
@@ -102,8 +94,6 @@ public class TouchofRadiance extends Ability {
 		mWeakness = WEAKNESS + CharmManager.getLevelPercentDecimal(player, CHARM_WEAKNESS);
 		mCDR = (isLevelOne() ? CDR_1 : CDR_2) + CharmManager.getLevelPercentDecimal(player, CHARM_CDR);
 		mCDRAlly = (isLevelOne() ? CDR_1_ALLY : CDR_2_ALLY) + CharmManager.getLevelPercentDecimal(player, CHARM_CDR_ALLY);
-		mKBR = KBR + CharmManager.getLevelPercentDecimal(player, CHARM_KBR);
-		mKBRAlly = KBR_ALLY + CharmManager.getLevelPercentDecimal(player, CHARM_KBR_ALLY);
 		mStunDuration = CharmManager.getDuration(player, CHARM_STUN_DURATION, STUN_DURATION);
 		mWeaknessDuration = CharmManager.getDuration(player, CHARM_WEAKNESS_DURATION, WEAKNESS_DURATION);
 		mBuffDuration = CharmManager.getDuration(player, CHARM_DURATION, DURATION);
@@ -125,7 +115,6 @@ public class TouchofRadiance extends Ability {
 		Player targetPlayer = EntityUtils.getPlayerAtCursor(mPlayer, mRange, 1);
 		if (targetPlayer != null) {
 			GlowingManager.startGlowing(targetPlayer, NamedTextColor.YELLOW, mBuffDuration, 1);
-			mPlugin.mEffectManager.addEffect(targetPlayer, KBR_EFFECT_NAME, new PercentKnockbackResist(mBuffDuration, mKBRAlly, KBR_EFFECT_NAME).deleteOnAbilityUpdate(true));
 			mPlugin.mEffectManager.addEffect(targetPlayer, CDR_EFFECT_NAME, new AbilityCooldownRechargeRate(mBuffDuration, mCDRAlly, ABILITY) {
 				@Override
 				public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
@@ -177,7 +166,6 @@ public class TouchofRadiance extends Ability {
 		}
 
 		GlowingManager.startGlowing(mPlayer, NamedTextColor.YELLOW, mBuffDuration, 1);
-		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT_NAME, new PercentKnockbackResist(mBuffDuration, mKBR, KBR_EFFECT_NAME).deleteOnAbilityUpdate(true));
 		mPlugin.mEffectManager.addEffect(mPlayer, CDR_EFFECT_NAME, new AbilityCooldownRechargeRate(mBuffDuration, mCDR, ABILITY) {
 			@Override
 			public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
@@ -196,14 +184,14 @@ public class TouchofRadiance extends Ability {
 
 	private static Description<TouchofRadiance> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.addTrigger()
-			.add(" while looking at another player or a Heretic within ")
+			.addTrigger(" while looking at another player or a Heretic")
+			.add(" within ")
 			.add(a -> a.mRange, RANGE)
 			.add(" blocks to gain ")
 			.addPercent(a -> a.mCDR, CDR_1, false, Predicate.not(Ability::isLevelTwo))
-			.add(" faster cooldown recharge rate for all other abilities and 50% knockback resistance for ")
+			.add(" faster cooldown recharge rate for all other abilities for the next ")
 			.addDuration(a -> a.mBuffDuration, DURATION)
-			.add(" seconds. If looking at a player, they gain the same buffs. If looking at a Heretic, it is stunned for ")
+			.add(" seconds. If looking at a player, they gain the same buff. If looking at a Heretic, it is stunned for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION)
 			.add(" seconds. Players are prioritized when searching for a target.")
 			.addCooldown(COOLDOWN);
