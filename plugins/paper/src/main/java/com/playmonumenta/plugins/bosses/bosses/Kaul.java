@@ -1039,8 +1039,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
 				String[] dio = new String[] {
-					"THE JUNGLE'S WILL IS UNASSAILABLE, YET YOU SCURRY ACROSS MY SHRINE LIKE ",
-					mPlayerCount > 1 ? "ANTS." : "AN ANT.",
+					"THE JUNGLE'S WILL IS UNASSAILABLE, YET YOU SCURRY ACROSS MY SHRINE LIKE " + (mPlayerCount > 1 ? "ANTS." : "AN ANT."),
 					"IS THE DEFILEMENT OF THE DREAM NOT ENOUGH!?"
 				};
 
