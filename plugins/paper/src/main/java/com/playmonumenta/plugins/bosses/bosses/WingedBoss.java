@@ -62,6 +62,9 @@ public final class WingedBoss extends BossAbilityGroup {
 		@BossParam(help = "Manual Y offset for wing position relative to the entity")
 		public double WING_Y_OFFSET = 0;
 
+		@BossParam(help ="Manual Y offset for the entity position relative to the target (If vertical is enabled)")
+		public double ENTITY_Y_OFFSET = 0;
+
 		@BossParam(help = "Ignore blocks and be able to move through walls")
 		public boolean IGNORE_BLOCKS = false;
 
@@ -153,7 +156,7 @@ public final class WingedBoss extends BossAbilityGroup {
 				LivingEntity target = ((Mob) mBoss).getTarget();
 				double mobSpeed = EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0.2);
 				if (target != null && mobSpeed != 0) {
-					moveEntity(loc, target, middleLoc, p.VERTICAL, mFunction, mobSpeed, p.IGNORE_BLOCKS);
+					moveEntity(loc, target, middleLoc, p.VERTICAL, mFunction, mobSpeed, p.IGNORE_BLOCKS, p.ENTITY_Y_OFFSET);
 				}
 
 				if(p.HAS_WINGS){
@@ -204,25 +207,33 @@ public final class WingedBoss extends BossAbilityGroup {
 		mBoss.setVelocity(v);
 	}
 
-	private void moveEntity(Location loc, LivingEntity target, Location middleLoc, boolean verticalMovement, PolynomialSplineFunction function, double mobSpeed, boolean ignoreBlocks) {
+	private void moveEntity(Location loc, LivingEntity target, Location middleLoc, boolean verticalMovement, PolynomialSplineFunction function, double mobSpeed, boolean ignoreBlocks, double entityYOffset) {
 		// Make the boss face the target
 		Vector targetDir = target.getLocation().toVector().subtract(loc.toVector());
+
 		double[] targetYawPitch = VectorUtils.vectorToRotation(targetDir);
 		if (!Double.isFinite(targetYawPitch[0]) || !Double.isFinite(targetYawPitch[1])) {
 			targetYawPitch = new double[] {0, 0};
 		}
 		mBoss.setRotation((float) targetYawPitch[0], (float) targetYawPitch[1]);
 
+		// Include entityYOffset for targetEyeLoc
+		Location targetEyeLoc = target.getEyeLocation().add(0, entityYOffset, 0);
+
 		// Move the boss towards the target, use middleLoc (location in the middle of the Y oscillation) for a more accurate distanceToTarget
-		double distanceToTarget = middleLoc.distance(target.getEyeLocation());
+		double distanceToTarget = middleLoc.distance(targetEyeLoc);
 		double speed = function.value(distanceToTarget);
+
 		Location eyeLocation = mBoss.getEyeLocation();
 		eyeLocation.setY(middleLoc.getY() + 0.5);
-		Vector forwards = eyeLocation.getDirection().multiply(speed);
 
-		double yDifference = middleLoc.getY() - target.getEyeLocation().getY();
+		Vector forwards = targetEyeLoc.toVector().subtract(eyeLocation.toVector()).normalize().multiply(speed);
+
+		double yDifference = middleLoc.getY() - targetEyeLoc.getY();
 		// If entity isn't level enough with the player, increase vertical movement by assuming the boss is further than it is in reality
-		if (verticalMovement && (yDifference <= -2.5 || yDifference >= 1.5)) {
+		double upperY = 1.5 + entityYOffset;
+
+		if (verticalMovement && (yDifference <= -2.5 || yDifference >= upperY)) {
 			forwards.setY(eyeLocation.getDirection().getY() * function.value(distanceToTarget + Math.abs(yDifference)));
 		}
 
