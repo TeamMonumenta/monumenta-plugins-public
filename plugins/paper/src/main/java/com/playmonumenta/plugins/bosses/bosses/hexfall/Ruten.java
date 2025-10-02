@@ -69,7 +69,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 	public static final int matrixCoordsFromCenterOffset = 28;
 	public static final int lifeTemplateYOffset = 50;
 	public static final int deathTemplateYOffset = 40;
-	public static final int mHealth = 75000;
+	public static final int mHealth = 60000;
 	private final SequentialSpellManager mSpellQueue;
 	private final Plugin mMonumentaPlugin;
 	private final List<Player> mPlayersStartingFight;
