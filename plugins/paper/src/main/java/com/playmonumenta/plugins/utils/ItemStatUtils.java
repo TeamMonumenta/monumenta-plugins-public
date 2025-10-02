@@ -1045,6 +1045,9 @@ public class ItemStatUtils {
 	}
 
 	public static boolean checkOwnership(Player player, ItemStack item) {
+		if (!hasInfusion(item, InfusionType.OWNED)) {
+			return true;
+		}
 		String infuserGuild = getInfuserNpc(item, InfusionType.OWNED);
 		UUID infuserPlayer = getInfuser(item, InfusionType.OWNED);
 		if (infuserGuild != null && infuserGuild.contains("guild#")) { // guild case, check permissions
