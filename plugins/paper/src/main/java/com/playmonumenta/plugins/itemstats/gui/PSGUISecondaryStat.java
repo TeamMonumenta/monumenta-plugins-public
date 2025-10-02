@@ -41,7 +41,8 @@ enum PSGUISecondaryStat {
 		Gain A EHP as B
 		after damaging enemies directly for %ss.
 		Damage over Time (DoT) abilities and enchants do not
-		trigger Reflexes.""".formatted(StringUtils.ticksToSeconds(Reflexes.REFLEXES_DURATION))),
+		trigger Reflexes. Half of the bonus is granted for
+		an additional %ss.""".formatted(StringUtils.ticksToSeconds(Reflexes.REFLEXES_MAIN_DURATION), StringUtils.ticksToSeconds(Reflexes.REFLEXES_TOTAL_DURATION - Reflexes.REFLEXES_MAIN_DURATION))),
 	EVASION(7, Material.ELYTRA, EnchantmentType.EVASION, false, """
 		Gain A EHP as B
 		when taking damage from a source further

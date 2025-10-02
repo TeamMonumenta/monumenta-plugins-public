@@ -12,7 +12,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class Reflexes implements Enchantment {
-	public static final int REFLEXES_DURATION = 13; // 13 ticks = 0.65 seconds
+	public static final int REFLEXES_TOTAL_DURATION = 20; // 20 ticks = 1 second
+	public static final int REFLEXES_MAIN_DURATION = 13; // 13 ticks = 0.65 seconds
 	private static final String REFLEXES_EFFECT_NAME = "ReflexesEffect";
 	private static final List<ClassAbility> DOT_ABILITY_LIST = List.of(
 		ClassAbility.BLIZZARD,
@@ -74,7 +75,7 @@ public class Reflexes implements Enchantment {
 		if (event.getDamage() < 0.01) {
 			return;
 		}
-		plugin.mEffectManager.addEffect(player, REFLEXES_EFFECT_NAME, new ZeroArgumentEffect(REFLEXES_DURATION, REFLEXES_EFFECT_NAME) {
+		plugin.mEffectManager.addEffect(player, REFLEXES_EFFECT_NAME, new ZeroArgumentEffect(REFLEXES_TOTAL_DURATION, REFLEXES_EFFECT_NAME) {
 			@Override
 			public String toString() {
 				return String.format("%s duration:%d", REFLEXES_EFFECT_NAME, getDuration());
@@ -86,6 +87,9 @@ public class Reflexes implements Enchantment {
 		Effect reflexesEffect = plugin.mEffectManager.getActiveEffect(player, REFLEXES_EFFECT_NAME);
 		if (reflexesEffect == null) {
 			return 0;
+		}
+		if (reflexesEffect.getDuration() <= REFLEXES_TOTAL_DURATION - REFLEXES_MAIN_DURATION) {
+			return (double) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.REFLEXES) / 2;
 		}
 		return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.REFLEXES);
 	}

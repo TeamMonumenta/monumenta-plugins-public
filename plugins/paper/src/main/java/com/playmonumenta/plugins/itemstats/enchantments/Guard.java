@@ -23,7 +23,7 @@ public class Guard implements Enchantment {
 	public static final double HEALTH_RATIO = 0.35;
 	public static final int PAST_HIT_DURATION_TIME_MAINHAND = 6 * 20;
 	public static final int PAST_HIT_DURATION_TIME_OFFHAND = 4 * 20;
-	public static final int PAST_HIT_DURATION_TIME_HEALTH = 4 * 20;
+	public static final int PAST_HIT_DURATION_TIME_HEALTH = 2 * 20;
 	private static final String GUARD_EFFECT_NAME = "GuardEffect";
 
 	@Override
