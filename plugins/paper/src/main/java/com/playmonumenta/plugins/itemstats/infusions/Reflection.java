@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Infusion;
@@ -54,7 +55,7 @@ public class Reflection implements Infusion {
 					new PartialParticle(Particle.SOUL_FIRE_FLAME, player.getLocation(), 2, 0.1, 0.1, 0.1, 0.15).spawnAsPlayerActive(player);
 					if (mTicks >= 20) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), RADIUS, player)) {
-							DamageUtils.damage(player, mob, DamageType.OTHER, reflectedDamage, null, true);
+							DamageUtils.damage(player, mob, DamageType.OTHER, reflectedDamage, ClassAbility.REFLECTION, true);
 						}
 						world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 						new BukkitRunnable() {

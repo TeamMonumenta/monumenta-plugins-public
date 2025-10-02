@@ -282,7 +282,8 @@ public enum ClassAbility {
 	EXPLOSIVE("Explosive", true),
 	INFERNO("Inferno", true),
 	REVERB("Reverb", true),
-	TRIVIUM("Trivium", true)
+	TRIVIUM("Trivium", true),
+	REFLECTION("Reflection", true)
 	;
 
 	private final String mName;

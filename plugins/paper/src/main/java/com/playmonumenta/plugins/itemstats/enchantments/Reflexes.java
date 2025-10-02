@@ -41,7 +41,8 @@ public class Reflexes implements Enchantment {
 		ClassAbility.REFRACTION,
 		ClassAbility.DISCO_BALL,
 		ClassAbility.INFERNO,
-		ClassAbility.REVERB
+		ClassAbility.REVERB,
+		ClassAbility.REFLECTION
 	);
 	private static final List<DamageType> ALLOWED_TYPES = List.of(
 		DamageType.MELEE,

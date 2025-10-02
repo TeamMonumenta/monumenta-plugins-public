@@ -727,6 +727,26 @@ public class AbilityUtils {
 		}
 	}
 
+	private static final EnumSet<ClassAbility> INDIRECT_ABILITIES = EnumSet.of(
+		ClassAbility.HUNTING_COMPANION,
+		ClassAbility.RESTLESS_SOULS,
+		ClassAbility.BRUTE_FORCE_AOE,
+		ClassAbility.METEOR_SLAM,
+		ClassAbility.SCORCHED_EARTH,
+		ClassAbility.BRUTAL_ALCHEMY,
+		ClassAbility.PANACEA,
+		ClassAbility.ESOTERIC_ENHANCEMENTS,
+		ClassAbility.ELEMENTAL_SPIRIT_ICE,
+		ClassAbility.FLAME_TOTEM,
+		ClassAbility.LIGHTNING_TOTEM,
+		ClassAbility.INTERCONNECTED_HAVOC,
+		ClassAbility.CRYSTALLINE_COMBOS,
+		ClassAbility.DECAYED_TOTEM,
+		ClassAbility.ILLUMINATE,
+		ClassAbility.SANCTIFIED_ARMOR,
+		ClassAbility.REFLECTION
+	);
+
 	// Intended for the purpose of damage that shouldn't be considered when spoiling some hunts quarries
 	// Might be useful elsewhere but make sure it is actually the right set of conditions there too
 	public static boolean isIndirectDamage(DamageEvent event) {
@@ -738,10 +758,6 @@ public class AbilityUtils {
 			return true;
 		}
 		ClassAbility ca = event.getAbility();
-		if (ca == ClassAbility.HUNTING_COMPANION || ca == ClassAbility.RESTLESS_SOULS || ca == ClassAbility.BRUTE_FORCE_AOE || ca == ClassAbility.METEOR_SLAM || ca == ClassAbility.SCORCHED_EARTH || ca == ClassAbility.BRUTAL_ALCHEMY  || ca == ClassAbility.PANACEA || ca == ClassAbility.ESOTERIC_ENHANCEMENTS
-			|| ca == ClassAbility.ELEMENTAL_SPIRIT_ICE || ca == ClassAbility.FLAME_TOTEM || ca == ClassAbility.LIGHTNING_TOTEM || ca == ClassAbility.INTERCONNECTED_HAVOC || ca == ClassAbility.CRYSTALLINE_COMBOS || ca == ClassAbility.DECAYED_TOTEM || ca == ClassAbility.ILLUMINATE || ca == ClassAbility.SANCTIFIED_ARMOR) {
-			return true;
-		}
-		return false;
+		return INDIRECT_ABILITIES.contains(ca);
 	}
 }
