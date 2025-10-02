@@ -6,15 +6,13 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -30,6 +28,11 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class Reverb implements Enchantment {
 	private static final int DETECTION_RADIUS = 8;
@@ -48,13 +51,18 @@ public class Reverb implements Enchantment {
 		return "Reverb";
 	}
 
+	@Override
+	public EnumSet<Slot> getSlots() {
+		return EnumSet.of(Slot.MAINHAND, Slot.OFFHAND, Slot.HEAD, Slot.CHEST, Slot.LEGS, Slot.FEET, Slot.PROJECTILE);
+	}
+
 	// Event occurs before the actual damages are applied to the mob, on the same tick.
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (EntityUtils.isHostileMob(enemy) &&
 			(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK ||
-			event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE
-			|| event.getAbility() == ClassAbility.REVERB)) {
+				event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE
+				|| event.getAbility() == ClassAbility.REVERB)) {
 			INSTANCE_MAP
 				.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>())
 				.computeIfAbsent(enemy.getUniqueId(), key -> new ReverbInstance())
@@ -134,11 +142,12 @@ public class Reverb implements Enchantment {
 
 				// Start the particle show, then apply damage.
 				new BukkitRunnable() {
+					final int mBoltDurations = 7;
+					final double[] mRotation = {-3 * Math.PI / 8, 0, 3 * Math.PI / 8};
+					final Color[] mColor = {rollColor(), rollColor(), rollColor()};
 					int mTicks = 0;
 					double mScaledTicks;
-					final int mBoltDurations = 7;
-					final double[] mRotation = { -3 * Math.PI / 8, 0, 3 * Math.PI / 8 };
-					final Color[] mColor = { rollColor(), rollColor(), rollColor() };
+
 					@Override
 					public void run() {
 						// Scaled ticks calculated compressed to [0, 1] and used to do vector magic.

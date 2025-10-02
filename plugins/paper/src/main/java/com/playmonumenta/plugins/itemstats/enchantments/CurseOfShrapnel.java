@@ -1,16 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
-import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
-import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.SpawnerUtils;
+import java.util.EnumSet;
+
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -18,6 +9,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.SpawnerUtils;
 
 public class CurseOfShrapnel implements Enchantment {
 	private static final double PICKAXE_DAMAGE = 1;
@@ -37,6 +41,11 @@ public class CurseOfShrapnel implements Enchantment {
 	@Override
 	public double getPriorityAmount() {
 		return 1;
+	}
+
+	@Override
+	public EnumSet<Slot> getSlots() {
+		return EnumSet.of(Slot.MAINHAND, Slot.PROJECTILE);
 	}
 
 	@Override

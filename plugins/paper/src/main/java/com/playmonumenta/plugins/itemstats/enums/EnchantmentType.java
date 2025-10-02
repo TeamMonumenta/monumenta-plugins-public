@@ -62,6 +62,7 @@ public enum EnchantmentType {
 	ADAPTABILITY(new Adaptability(), false, false, false, true),
 
 	// Custom Enchants
+	KINETICLOADING(new KineticLoading(), false, false, false, false),
 	ABYSSAL(new Abyssal(), true, false, false, true),
 	ADRENALINE(new Adrenaline(), true, false, false, true),
 	APTITUDE(new Aptitude(), true, false, false, true),
@@ -87,6 +88,7 @@ public enum EnchantmentType {
 	FRACTAL(new Fractal(), true, false, false, true),
 	GILLS(new Gills(), false, false, false, false),
 	GRAPPLING(new Grappling(), true, false, false, false),
+	HARPOON(new Harpoon(), true, false, false, true),
 	HEX_EATER(new HexEater(), true, false, false, true),
 	IMPACT(new Impact(), true, false, false, false),
 	INFERNO(new Inferno(), true, false, false, true),
@@ -116,6 +118,8 @@ public enum EnchantmentType {
 	SLAYER(new Slayer(), true, false, false, true),
 	SMITE(new Smite(), true, false, false, true),
 	SNIPER(new Sniper(), true, false, false, true),
+	SKYSEEKER(new Skyseeker(), true, false, false, true),
+	EARTHSEEKER(new Earthseeker(), true, false, false, true),
 	SWEEPING_EDGE(new SweepingEdge(), true, false, false, false),
 	SPIRITSHOT(new Spiritshot(), false, false, false, false),
 	REVERB(new Reverb(), true, false, false, true),

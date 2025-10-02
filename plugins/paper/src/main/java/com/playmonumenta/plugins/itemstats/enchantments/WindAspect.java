@@ -58,10 +58,11 @@ public class WindAspect implements Enchantment {
 			//Get enchant levels on weapon
 			int knockback = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.KNOCKBACK);
 			int punch = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.PUNCH);
+			int harpoon = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.HARPOON);
 
 			DamageEvent.DamageType type = event.getType();
 
-			if (knockback > 0 || punch > 0 || type == DamageEvent.DamageType.MAGIC) {
+			if (knockback > 0 || punch > 0 || harpoon > 0 || type == DamageEvent.DamageType.MAGIC) {
 				launch(plugin, player, enemy, level * (type == DamageEvent.DamageType.MELEE ? player.getCooledAttackStrength(0) : 1), type, false);
 			} else {
 				launch(plugin, player, enemy, level * (type == DamageEvent.DamageType.MELEE ? player.getCooledAttackStrength(0) : 1), type, true);

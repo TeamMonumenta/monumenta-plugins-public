@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -116,6 +117,9 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 					if (s == ClassAbility.MANA_LANCE) {
 						// Special Treatment for Mana Lance because of charged abilities.
 						Objects.requireNonNull(mPlugin.mAbilityManager.getPlayerAbility(mPlayer, ManaLance.class)).incrementCharge();
+					} else if (s == ClassAbility.MAGMA_SHIELD) {
+						// Special Treatment for Magma Shield because of charged abilities.
+						Objects.requireNonNull(mPlugin.mAbilityManager.getPlayerAbility(mPlayer, MagmaShield.class)).incrementCharge();
 					} else {
 						mPlugin.mTimers.removeCooldown(mPlayer, s);
 					}

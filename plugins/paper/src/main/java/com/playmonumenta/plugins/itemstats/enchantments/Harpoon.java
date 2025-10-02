@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -17,19 +16,19 @@ import org.bukkit.util.Vector;
 
 import java.util.EnumSet;
 
-public class Punch implements Enchantment {
-	private static final float KB_VEL_BASE = 0.2f;
+public class Harpoon implements Enchantment {
+	private static final float KB_VEL_BASE = 0.6f;
 	private static final float KB_VEL_PER_LEVEL = 0.6f;
 	private static final float VERTICAL_LAUNCH = 0.28f;
 
 	@Override
 	public String getName() {
-		return "Punch";
+		return "Harpoon";
 	}
 
 	@Override
 	public EnchantmentType getEnchantmentType() {
-		return EnchantmentType.PUNCH;
+		return EnchantmentType.HARPOON;
 	}
 
 	@Override
@@ -39,28 +38,21 @@ public class Punch implements Enchantment {
 
 	@Override
 	public double getPriorityAmount() {
-		return 31;
+		return 32;
 	}
 
 	@Override
 	public void onProjectileHit(Plugin plugin, Player player, double level, ProjectileHitEvent event, Projectile projectile) {
-		applyPunch(plugin, player, level, event.getHitEntity(), projectile);
-	}
-
-	public static void applyPunch(Plugin plugin, Player player, double level, Entity entity, Projectile projectile) {
-		if (level <= 0) {
+		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
+		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager().getPlugin("ScriptedQuests");
+		if (!(event.getHitEntity() instanceof LivingEntity enemy)
+			|| event.getHitEntity() instanceof Villager
+			|| event.getHitEntity() instanceof ArmorStand
+			|| scriptedQuestsPlugin.mNpcManager.isQuestNPC(event.getHitEntity())) {
 			return;
 		}
-		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager().getPlugin("ScriptedQuests");
-		if (!(entity instanceof LivingEntity enemy)
-			|| enemy instanceof Villager
-			|| enemy instanceof ArmorStand
-			|| enemy instanceof Player
-			|| scriptedQuestsPlugin.mNpcManager.isQuestNPC(entity)) {
-			return;
-		}
-		float speed = KB_VEL_BASE + KB_VEL_PER_LEVEL * (float) level;
-		// Enemy is punched with fixed Y velocity, in the horizontal direction the arrow was travelling, with fixed speed.
+		float speed = -KB_VEL_BASE - KB_VEL_PER_LEVEL * (float) level;
+		// Enemy is Harpooned with fixed Y velocity, in the horizontal direction the arrow was travelling, with fixed speed.
 		Vector vector = projectile.getVelocity().clone()
 			.setY(0);
 		if (vector.length() < 0.001) {
@@ -73,6 +65,6 @@ public class Punch implements Enchantment {
 		// TODO: Override the Minecraft Punch behaviour so that it doesn't perform a normal amount of KB via... mixin? Then rewrite this section so that it doesn't delay the KB by one tick
 		// Sorry. Java requires that I input a "final" into the lambda expression.
 		final Vector dir = vector.clone();
-		Bukkit.getScheduler().runTask(plugin, () -> MovementUtils.knockAwayDirection(dir, enemy, 0.5f, true, false));
+		Bukkit.getScheduler().runTask(plugin, () -> MovementUtils.knockAwayDirection(dir, enemy, 0.5f, true, true));
 	}
 }

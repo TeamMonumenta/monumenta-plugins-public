@@ -80,6 +80,7 @@ public class Explosive implements Enchantment {
 			int bleed = (int) itemStatsMap.get(EnchantmentType.BLEEDING);
 			int earth = (int) itemStatsMap.get(EnchantmentType.EARTH_ASPECT);
 			int wind = (int) itemStatsMap.get(EnchantmentType.WIND_ASPECT);
+			int punch = (int) itemStatsMap.get(EnchantmentType.PUNCH);
 
 			Location location = LocationUtils.getEntityCenter(enemy);
 
@@ -95,6 +96,7 @@ public class Explosive implements Enchantment {
 				if (box.overlaps(mobBox)) {
 					// Deal damage.
 					DamageUtils.damage(player, mob, DamageEvent.DamageType.PROJECTILE_ENCH, damage, ClassAbility.EXPLOSIVE, false);
+					Punch.applyPunch(plugin, player, punch, mob, projectile);
 				}
 			}
 

@@ -7,14 +7,13 @@ import com.playmonumenta.plugins.effects.ImpactVulnerability;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Particle;
@@ -29,11 +28,22 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class Impact implements Enchantment {
 
 	private static final Particle.DustOptions DUST_OPTIONS = new Particle.DustOptions(Color.WHITE, 1.2f);
 	private static final String EFFECT_ID = "ImpactVulnerability";
-	private static final String KB_EFFECT_ID = "ImpactKbVulnerability";
+	private static final String KB_EFFECT_ID = "ImpactKBVulnerability";
+	private static final EnumSet<DamageEvent.DamageType> TRIGGERING_DAMAGE_TYPES = EnumSet.of(
+		DamageEvent.DamageType.MELEE,
+		DamageEvent.DamageType.PROJECTILE
+	);
+	private static final String PROJECTILE_METAKEY = "ImpactProjectileHitThisTick"; // Is there a naming convention for this?
 
 	private final Map<Player, ImpactInstance> mDamageInTick = new HashMap<>();
 	private @Nullable BukkitTask mRunDamageTask = null;
@@ -49,26 +59,37 @@ public class Impact implements Enchantment {
 	}
 
 	@Override
+	public EnumSet<Slot> getSlots() {
+		return EnumSet.of(Slot.MAINHAND, Slot.PROJECTILE);
+	}
+
+	@Override
 	public double getPriorityAmount() {
 		return 5600;
 	}
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		if (enemy instanceof Player) {
+			return;
+		}
+		if (event.isCancelled()) {
+			return;
+		}
+		if (event.getType() == DamageEvent.DamageType.PROJECTILE && !MetadataUtils.checkOnceThisTick(plugin, enemy, PROJECTILE_METAKEY)) {
+			return;
+			// Prevent Volley from applying multiple Impacts
+		}
 
-		if (((event.getType() == DamageEvent.DamageType.MELEE || event.getType() == DamageEvent.DamageType.MELEE_ENCH)
-			&& player.getCooledAttackStrength(0) >= 0.9)
-			|| event.getType() == DamageEvent.DamageType.MELEE_SKILL) {
-
+		if (AbilityUtils.isChargedAspectTriggeringEvent(event, player)
+			|| event.getType() == DamageEvent.DamageType.TRUE // I hate the projectile iframe system, can we please just remove them
+		) {
 			mDamageInTick.computeIfAbsent(player, key -> new ImpactInstance(value, plugin)).addEvent(enemy, event);
-
-		} else if (event.getType() == DamageEvent.DamageType.PROJECTILE) {
-			applyImpact(plugin, player, value, List.of(event), enemy);
 		} else {
 			return;
 		}
 
-		//The KB resistance needs to be applied before abilities are casted
+		// The KB resistance needs to be applied before abilities are cast
 		if (!EntityUtils.isBoss(enemy) && !EntityUtils.isCCImmuneMob(enemy) && !EntityUtils.isTrainingDummy(enemy) && enemy.hasGravity() && enemy.hasAI()) {
 			plugin.mEffectManager.addEffect(enemy, KB_EFFECT_ID, new HitKnockbackVulnerability(80, -0.1 * value));
 		}
@@ -82,8 +103,9 @@ public class Impact implements Enchantment {
 	private void task() {
 
 		mDamageInTick.forEach((p, instance) -> {
-			if (instance.mMap.values().stream().anyMatch(events -> events.stream().anyMatch(event -> event.getType() == DamageEvent.DamageType.MELEE))) {
+			if (instance.mMap.values().stream().anyMatch(events -> events.stream().anyMatch(event -> TRIGGERING_DAMAGE_TYPES.contains(event.getType())))) {
 				instance.mMap.forEach((entity, events) -> applyImpact(instance.mPlugin, p, instance.mValue, events, entity));
+				// Impact will only activate if the player dealt MELEE or PROJECTILE damage in the same tick
 			}
 		});
 		mDamageInTick.clear();
@@ -93,6 +115,9 @@ public class Impact implements Enchantment {
 
 	private void applyImpact(Plugin plugin, Player player, double value, List<DamageEvent> events, LivingEntity enemy) {
 
+		if (enemy instanceof Player) {
+			return;
+		}
 		double damage = 0;
 		for (DamageEvent event : events) {
 			damage += event.getFinalDamage(true);
@@ -151,7 +176,7 @@ public class Impact implements Enchantment {
 
 	private boolean checkForImpact(double fallDistanceLastTick, Vector direction, LivingEntity target) {
 
-		if (fallDistanceLastTick > 2.8 && target.isOnGround()) {
+		if (fallDistanceLastTick > 2.0 && target.isOnGround()) {
 
 			new PartialParticle(
 				Particle.EXPLOSION_LARGE,

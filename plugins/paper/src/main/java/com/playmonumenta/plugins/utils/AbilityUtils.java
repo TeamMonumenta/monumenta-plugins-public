@@ -340,7 +340,6 @@ public class AbilityUtils {
 			case "Reaper" -> Warlock.REAPER_SPEC_ID;
 			case "Tenebrist" -> Warlock.TENEBRIST_SPEC_ID;
 			case "Soothsayer" -> Shaman.SOOTHSAYER_ID;
-			case "Soulbreaker" -> Shaman.HEXBREAKER_ID;
 			case "Hexbreaker" -> Shaman.HEXBREAKER_ID;
 			default -> 0;
 		};
@@ -589,6 +588,29 @@ public class AbilityUtils {
 		return (type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand()))
 			|| type == DamageEvent.DamageType.PROJECTILE
 			|| TRIGGERS_ASPECTS.contains(event.getAbility());
+	}
+
+	public static boolean isChargedAspectTriggeringEvent(DamageEvent event, Player player) {
+		DamageEvent.DamageType type = event.getType();
+
+		if (isAspectTriggeringEvent(event, player)) {
+			switch (type) {
+				case MELEE, MELEE_ENCH -> {
+					if (player.getCooledAttackStrength(0) < 0.9) {
+						return false;
+					}
+				}
+				case PROJECTILE -> {
+					if (event.getDamager() instanceof Projectile proj && !EntityUtils.isAbilityTriggeringProjectile(proj, true)) {
+						return false;
+					}
+				}
+				default -> {
+					return true;
+				}
+			}
+		}
+		return true;
 	}
 
 	public static void produceDurationString(LivingEntity totem, ArmorStand target, int totalDuration, int currentDuration, double whirlwindBuffed, boolean decayBuffed) {
