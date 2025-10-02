@@ -3,7 +3,11 @@ package com.playmonumenta.plugins.bosses;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Function;
 import net.kyori.adventure.bossbar.BossBar;
@@ -23,9 +27,8 @@ public class BossBarManager {
 
 	private final LivingEntity mBoss;
 	private final int mRange;
-	private final @Nullable Map<Integer, BossHealthAction> mEvents;
+	private final PriorityQueue<Map.Entry<Integer, BossHealthAction>> mEvents;
 	private final BossBar mBar;
-	private int mEventCursor;
 	private final boolean mCapDamage;
 	private final Function<LivingEntity, Location> mLocationFunction;
 
@@ -48,14 +51,12 @@ public class BossBarManager {
 	public BossBarManager(LivingEntity boss, int range, BossBar.Color color, BossBar.Overlay style, @Nullable Map<Integer, BossHealthAction> events, boolean bossFog, boolean capDamage, Function<LivingEntity, Location> locationFunction) {
 		mBoss = boss;
 		mRange = range;
-		mEvents = events;
-		mEventCursor = 100;
+		mEvents = new PriorityQueue<>(events != null ? events.size() : 1, Comparator.comparing(entry -> -entry.getKey()));
+		if (events != null) {
+			mEvents.addAll(events.entrySet());
+		}
 		mCapDamage = capDamage;
 		mLocationFunction = locationFunction;
-		double progress = mBoss.getHealth() / EntityUtils.getMaxHealth(mBoss);
-		while (mEvents != null && mEventCursor > (progress * 100)) {
-			mEventCursor--;
-		}
 
 		mBar = BossBar.bossBar(Component.text(mBoss.getName()), (float) 0, color, style, Set.of(BossBar.Flag.PLAY_BOSS_MUSIC));
 		if (bossFog) {
@@ -96,45 +97,37 @@ public class BossBarManager {
 		}
 
 		double maxHealth = EntityUtils.getMaxHealth(mBoss);
-		double progress = mBoss.getHealth() / maxHealth;
-		if (mEvents != null) {
-			if (progress * 100 > 99 && mEventCursor >= 99) {
-				BossHealthAction event = mEvents.get(mEventCursor);
-				if (event != null) {
-					MMLog.fine("Running BossHealthAction for " + MessagingUtils.plainText(mBoss.name()) + " at " + mEventCursor + "% health.");
-					event.run(mBoss);
-					if (mCapDamage) {
-						float cap = mEventCursor / 100.f;
-						mBoss.setHealth(maxHealth * cap);
-						mBar.progress(cap);
-					}
-				}
-				mEventCursor--;
-			}
-			while (true) {
-				progress = mBoss.getHealth() / maxHealth;
-				if (mEventCursor <= progress * 100) {
-					break;
-				}
-				BossHealthAction event = mEvents.get(mEventCursor);
-				if (event != null) {
-					MMLog.fine("Running BossHealthAction for " + MessagingUtils.plainText(mBoss.name()) + " at " + mEventCursor + "% health.");
-					event.run(mBoss);
-					if (mCapDamage) {
-						float cap = mEventCursor / 100.f;
-						mBoss.setHealth(maxHealth * cap);
-						mBar.progress(cap);
-					}
-				}
-				mEventCursor--;
-			}
-		}
+		OptionalDouble forceProgress = progressEvents();
+		double progress = forceProgress.orElse(mBoss.getHealth() / maxHealth);
 
 		if (!Double.isFinite(progress) || progress > 1.0f || progress < 0f) {
 			MMLog.warning("Boss '" + mBoss.getName() + "' has invalid health " +
 				mBoss.getHealth() + " out of max " + maxHealth);
 		} else {
+			forceProgress.ifPresent(p -> mBoss.setHealth(maxHealth * p));
 			mBar.progress((float) progress);
+		}
+	}
+
+	public OptionalDouble progressEvents() {
+		double maxHealth = EntityUtils.getMaxHealth(mBoss);
+		double currentPercent = mBoss.getHealth() / maxHealth * 100;
+		if (mEvents == null) {
+			return OptionalDouble.empty();
+		}
+		while (true) {
+			@Nullable
+			Map.Entry<Integer, BossHealthAction> entry = mEvents.peek();
+			if (entry == null || entry.getKey() < currentPercent) {
+				return OptionalDouble.empty();
+			}
+
+			MMLog.fine("Running BossHealthAction for %s at %s%% health.".formatted(MessagingUtils.plainText(mBoss.name()), currentPercent));
+			entry.getValue().run(mBoss);
+			mEvents.remove();
+			if (mCapDamage) {
+				return OptionalDouble.of(entry.getKey() / 100.0);
+			}
 		}
 	}
 
@@ -154,17 +147,11 @@ public class BossBarManager {
 		return mCapDamage;
 	}
 
-	// Returns the highest health percentage (0 through 100) lower than current bar progress with an unused
-    // BossHealthAction
-	// If none exist, returns 0
-	public int getNextHealthThreshold() {
-		if (mEvents == null) {
-			return 0;
-		}
-		return mEvents.keySet().stream().filter(i -> i < mEventCursor).mapToInt(i -> i).max().orElse(0);
+	public Optional<Integer> getNextHealthThreshold() {
+		return Optional.ofNullable(mEvents.peek()).map(Map.Entry::getKey);
 	}
 
 	public boolean removeHealthEvent(int percent) {
-		return mEvents != null && mEvents.remove(percent) != null;
+		return mEvents != null && mEvents.removeIf(entry -> entry.getKey() == percent);
 	}
 }

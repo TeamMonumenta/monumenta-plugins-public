@@ -788,19 +788,22 @@ public class BossManager implements Listener {
 			}
 		}
 
-		if (boss != null && event.getType() != DamageEvent.DamageType.TRUE && event.getFinalDamage(true) >= damagee.getHealth()) {
+		if (boss != null && event.getType() != DamageEvent.DamageType.TRUE) {
 			for (BossAbilityGroup ability : boss.getAbilities()) {
 				BossBarManager bossBar = ability.getBossBar();
-				if (bossBar != null && bossBar.capsDamage()) {
-					int nextEventHealthPercent = bossBar.getNextHealthThreshold();
-					if (nextEventHealthPercent > 0) {
-						double setHealth = nextEventHealthPercent * EntityUtils.getMaxHealth(damagee) / 100;
-						// Adding 1 makes sure we actually go below the threshold but don't kill the boss
-						double newDamage = damagee.getHealth() < setHealth ? 0 : damagee.getHealth() - setHealth + 1;
-						event.setDamageCap(newDamage); // Since we are on HIGHEST, hopefully this will affect nothing other than the actual damage done
-						MMLog.fine("Because of remaining BossHealthAction at " + nextEventHealthPercent + "% health on entity " + MessagingUtils.plainText(damagee.name()) + ", reduced damage to " + newDamage + ".");
-					}
+				if (bossBar == null || !bossBar.capsDamage()) {
+					continue;
 				}
+				bossBar.getNextHealthThreshold().ifPresent(nextHpPercent -> {
+					// Min 1 to make sure we actually go below the threshold but don't kill the boss
+					double setHealth = Math.max(nextHpPercent * EntityUtils.getMaxHealth(damagee) / 100, 1);
+					double health = damagee.getHealth();
+					if (health - event.getFinalDamage(false) >= setHealth) {
+						return;
+					}
+					event.setDamageCap(health - setHealth + 1); // Since we are on HIGHEST, hopefully this will affect nothing other than the actual damage done
+					MMLog.fine("Because of remaining BossHealthAction at " + nextHpPercent + "% health on entity " + MessagingUtils.plainText(damagee.name()) + ", reduced damage to " + (health - setHealth + 1) + ".");
+				});
 			}
 		}
 	}
