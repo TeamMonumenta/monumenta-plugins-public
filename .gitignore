@@ -26,3 +26,6 @@ release.properties
 
 # Git
 .patches/
+
+# PMD
+.pmdCache

@@ -1,0 +1,24 @@
+{
+	"java.configuration.updateBuildConfiguration": "interactive",
+	"java.checkstyle.configuration": "${workspaceFolder}/plugins/config/checkstyle/checkstyle.xml",
+	"java.checkstyle.properties" : {
+		"config_loc" : "${workspaceFolder}/plugins/config/checkstyle/"
+	},
+	"java.checkstyle.version": "10.18.2",
+	"java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx6G -Xms100m -Xlog:disable",
+	"java.format.settings.url": ".vscode/java-formatter.xml",
+	"javaPMD.enableCache": true,
+	"javaPMD.commandBufferSize": 16,
+	"javaPMD.rulesets": [
+		"plugins/pmd-ruleset.xml",
+		"default"
+	],
+  "java.completion.importOrder": [
+    "",
+    "#"
+	],
+	"javaPMD.runOnFileChange": false,
+	"javaPMD.runOnFileOpen": true,
+	"java.dependency.packagePresentation": "hierarchical",
+	"java.project.explorer.showNonJavaResources": false
+}
