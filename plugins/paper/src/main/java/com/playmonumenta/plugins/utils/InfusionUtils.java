@@ -214,6 +214,9 @@ public class InfusionUtils {
 		AuditListener.logPlayer("[Infusion] Refund - player=" + player.getName() + ", item='" + ItemUtils.getPlainName(item) + "', from level=" + level + ", stack size=" + item.getAmount()
 			                        + ", refunded material count=" + refundMaterials + ", refunded XP=" + refundXP);
 
+		if (!ItemStatUtils.checkOwnership(player, item)) {
+			AuditListener.logPlayer("[Ownership Tracker] Player " + player.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+		}
 	}
 
 	private static void giveMaterials(Player player, Region region, int refundMaterials) throws WrapperCommandSyntaxException {
@@ -492,6 +495,9 @@ public class InfusionUtils {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			AuditListener.log("[Infusion] Player " + player.getName() + " infused an item while in creative mode! item='" + ItemUtils.getPlainName(item) + "', to level=" + newLevel
 				                  + ", stack size=" + item.getAmount() + ", normal material cost count=" + amount + ", normal XP cost=" + expCost);
+			if (!ItemStatUtils.checkOwnership(player, item)) {
+				AuditListener.logPlayer("[Ownership Tracker] Player " + player.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+			}
 			return true;
 		}
 
@@ -509,7 +515,9 @@ public class InfusionUtils {
 
 		AuditListener.logPlayer("[Infusion] Item infused - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "', to level=" + newLevel + ", stack size=" + item.getAmount()
 			                        + ", material cost count=" + amount + ", XP cost=" + expCost);
-
+		if (!ItemStatUtils.checkOwnership(player, item)) {
+			AuditListener.logPlayer("[Ownership Tracker] Player " + player.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+		}
 
 		return true;
 	}

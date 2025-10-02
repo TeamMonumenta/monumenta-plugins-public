@@ -140,6 +140,9 @@ public class MasterworkUtils {
 			//if the player is in creative -> free upgrade
 			if (p.getGameMode() == GameMode.CREATIVE) {
 				AuditListener.log("[Masterwork] Player " + p.getName() + (isRefund ? " downgraded" : " upgraded") + " an item in creative mode");
+				if (!ItemStatUtils.checkOwnership(p, item)) {
+					AuditListener.logPlayer("[Ownership Tracker] Player " + p.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+				}
 				return true;
 			}
 
@@ -160,6 +163,9 @@ public class MasterworkUtils {
 					auditString += "," + ItemUtils.getPlainName(itemC) + ":" + itemC.getAmount();
 				}
 				AuditListener.logPlayer(auditString);
+				if (!ItemStatUtils.checkOwnership(p, item)) {
+					AuditListener.logPlayer("[Ownership Tracker] Player " + p.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+				}
 
 				InventoryUtils.giveItem(p, itemA);
 				InventoryUtils.giveItem(p, itemB);
@@ -175,6 +181,9 @@ public class MasterworkUtils {
 						auditString += "," + ItemUtils.getPlainName(itemC) + ":" + itemC.getAmount();
 					}
 					AuditListener.logPlayer(auditString);
+					if (!ItemStatUtils.checkOwnership(p, item)) {
+						AuditListener.logPlayer("[Ownership Tracker] Player " + p.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+					}
 					return true;
 				}
 				return false;

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemstats.enums;
 
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.enchantments.Hexed;
 import com.playmonumenta.plugins.itemstats.infusions.*;
@@ -12,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.luckperms.api.model.group.Group;
 import org.jetbrains.annotations.Nullable;
 
 public enum InfusionType {
@@ -82,6 +84,7 @@ public enum InfusionType {
 	SOULBOUND(new Soulbound(), "Soulbound", false, false, false, false, false, false, false, false),
 	FESTIVE(new Festive(), "Decorated", false, false, true, false, false, false, false, false),
 	GILDED(new Gilded(), "Gilded", false, false, true, false, false, false, false, false),
+	OWNED(new Owned(), "Owned", false, false, false, false, false, false, false, false),
 	SHATTERED(new Shattered(), "", true, false, false, false, false, false, false, false),
 	HEXED(new Hexed(), "", false, false, false, false, false, false, false, false),
 	HUNT_TRACK(new HuntTrack(), "", false, false, false, false, false, false, false, false),
@@ -183,6 +186,13 @@ public enum InfusionType {
 		if (!mHasLevels) {
 			if (mMessage.isEmpty() || infuser == null) {
 				return Component.text(mName, color).decoration(TextDecoration.ITALIC, false);
+			} else if (this == OWNED && infuser.contains("guild#")) {
+				Long guildPlotId = Long.parseLong(infuser.substring(6));
+				Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotId);
+				if (guild == null) {
+					return Component.text(mName, color).decoration(TextDecoration.ITALIC, false);
+				}
+				return Component.text(mName, color).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by ", NamedTextColor.DARK_GRAY).append(Component.text("["+LuckPermsIntegration.getGuildPlainTag(guild)+"]", LuckPermsIntegration.getGuildColor(guild))).append(Component.text(")", NamedTextColor.DARK_GRAY)));
 			} else if (this == SOULBOUND) {
 				return Component.text(mName, color).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " to " + infuser + ")", NamedTextColor.DARK_GRAY));
 			} else {

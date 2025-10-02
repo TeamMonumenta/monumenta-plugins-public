@@ -339,6 +339,7 @@ public class Plugin extends JavaPlugin {
 		SendBlockCrackCommand.register();
 		SetActivity.register(this);
 		SetMasterwork.register();
+		ItemOwnershipCommand.register();
 		SkillDescription.register(this);
 		SkillSummary.register(this);
 		ShardSorterCommand.register();

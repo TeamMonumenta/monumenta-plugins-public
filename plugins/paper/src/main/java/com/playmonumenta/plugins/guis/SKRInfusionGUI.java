@@ -174,6 +174,9 @@ public class SKRInfusionGUI extends Gui {
 			.collect(Collectors.joining(","));
 		AuditListener.logPlayer("[Delve Infusion] Item infused - player=" + mPlayer.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + DelveInfusionSelection.CELERITY.getLabel()
 			+ "', new level=" + level + ", stack size=" + item.getAmount() + ", material cost=" + matStr + ", XP cost=" + xpCost);
+		if (!ItemStatUtils.checkOwnership(mPlayer, item)) {
+			AuditListener.logPlayer("[Ownership Tracker] Player " + mPlayer.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+		}
 
 		return true;
 	}
@@ -220,6 +223,9 @@ public class SKRInfusionGUI extends Gui {
 
 		AuditListener.logPlayer("[Delve Infusion] Refund - player=" + player.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + infusionType
 			+ "', from level=" + level + ", stack size=" + item.getAmount() + ", refunded materials=" + matStr + ", refunded XP=" + totalXP);
+		if (!ItemStatUtils.checkOwnership(player, item)) {
+			AuditListener.logPlayer("[Ownership Tracker] Player " + player.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+		}
 
 	}
 

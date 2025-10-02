@@ -8,6 +8,8 @@ import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
@@ -39,6 +41,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.luckperms.api.model.group.Group;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -1039,6 +1042,16 @@ public class ItemStatUtils {
 
 	public static boolean hasInfusion(@Nullable ItemStack item, InfusionType type) {
 		return getInfusionLevel(item, type) > 0;
+	}
+
+	public static boolean checkOwnership(Player player, ItemStack item) {
+		String infuserGuild = getInfuserNpc(item, InfusionType.OWNED);
+		UUID infuserPlayer = getInfuser(item, InfusionType.OWNED);
+		if (infuserGuild != null && infuserGuild.contains("guild#")) { // guild case, check permissions
+			Long guildPlotId = Long.parseLong(infuserGuild.substring(6));
+			Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotId);
+			return guild == null || GuildPermission.GUILD_OWNED_INFUSION.hasAccess(guild, player);
+		} else return infuserPlayer != null && infuserPlayer.equals(player.getUniqueId()); // player case
 	}
 
 	public static @Nullable ReadWriteNBTCompoundList getAttributes(final ReadWriteNBT nbt) {

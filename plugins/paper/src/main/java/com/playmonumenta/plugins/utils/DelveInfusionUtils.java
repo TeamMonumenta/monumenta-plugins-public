@@ -273,6 +273,9 @@ public class DelveInfusionUtils {
 
 		AuditListener.logPlayer("[Delve Infusion] Refund - player=" + player.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + infusionType
 			                        + "', from level=" + auditLevel + ", stack size=" + item.getAmount() + ", refunded materials=" + matStr + ", refunded XP=" + xp);
+		if (!ItemStatUtils.checkOwnership(player, item)) {
+			AuditListener.logPlayer("[Ownership Tracker] Player " + player.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+		}
 
 	}
 
@@ -304,6 +307,9 @@ public class DelveInfusionUtils {
 		if (selection == DelveInfusionSelection.REFUND || p.getGameMode() == GameMode.CREATIVE) {
 			AuditListener.log("[Delve Infusion] Player " + p.getName() + " infused an item while in creative mode! item='" + ItemUtils.getPlainName(item) + "', infusion type=" + selection.mInfusionType
 				                  + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", normal material cost=" + matStr + ", normal XP cost=" + xpCost);
+			if (!ItemStatUtils.checkOwnership(p, item)) {
+				AuditListener.logPlayer("[Ownership Tracker] Player " + p.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+			}
 			return true;
 		}
 
@@ -320,6 +326,9 @@ public class DelveInfusionUtils {
 
 		AuditListener.logPlayer("[Delve Infusion] Item infused - player=" + p.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + selection.mInfusionType
 			                        + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", material cost=" + matStr + ", XP cost=" + xpCost);
+		if (!ItemStatUtils.checkOwnership(p, item)) {
+			AuditListener.logPlayer("[Ownership Tracker] Player " + p.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+		}
 
 		return true;
 	}

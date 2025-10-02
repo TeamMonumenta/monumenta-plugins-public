@@ -101,6 +101,14 @@ public enum GuildPermission {
 		"Use Eggs and Egginator",
 		"Allows members to use spawn eggs, or an Egginator to pick up purchased entities"
 	),
+	GUILD_OWNED_INFUSION(
+		"guild_owned_infusion",
+		"guild_owned_infusion",
+		GuildAccessLevel.MANAGER,
+		false,
+		"Manage Owned Infusion",
+		"Allows members to interact with the guild's Owned infusion (via adding/removing/editing items)."
+	),
 	GUILD_SHOP(
 		"guild_shop",
 		"guild_shop",
