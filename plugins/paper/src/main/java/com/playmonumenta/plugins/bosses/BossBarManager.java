@@ -51,7 +51,7 @@ public class BossBarManager {
 	public BossBarManager(LivingEntity boss, int range, BossBar.Color color, BossBar.Overlay style, @Nullable Map<Integer, BossHealthAction> events, boolean bossFog, boolean capDamage, Function<LivingEntity, Location> locationFunction) {
 		mBoss = boss;
 		mRange = range;
-		mEvents = new PriorityQueue<>(events != null ? events.size() : 1, Comparator.comparing(entry -> -entry.getKey()));
+		mEvents = new PriorityQueue<>(Math.max(events != null ? events.size() : 1, 1), Comparator.comparing(entry -> -entry.getKey()));
 		if (events != null) {
 			mEvents.addAll(events.entrySet());
 		}
