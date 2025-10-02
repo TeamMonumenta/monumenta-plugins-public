@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -27,11 +28,11 @@ public class MinigameManager implements Listener {
 		}
 		return INSTANCE;
 	}
-	
+
 	@FunctionalInterface
 	public interface MinigameConstructor {
 		Minigame apply(Location location, Minigame.Arguments arguments);
-	} 
+	}
 
 	public MinigameManager() {
 		registerAll();
@@ -106,11 +107,7 @@ public class MinigameManager implements Listener {
 	}
 
 	public boolean checkActiveMinigame(String id) {
-		if (getActiveMinigames().get(id) == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return getActiveMinigames().get(id) != null;
 	}
 
 	public Map<String, MinigameConstructor> getMinigamesRegistered() {
@@ -134,8 +131,15 @@ public class MinigameManager implements Listener {
 	// add events accordingly
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onEntityDeath(EntityDeathEvent event) {
-		getMinigamesInRange(event.getEntity().getLocation()).forEach(minigame -> {
-			minigame.onEntityDeath(event);
-		});
+		getMinigamesInRange(event.getEntity().getLocation()).forEach(minigame ->
+			minigame.onEntityDeath(event)
+		);
+	}
+
+	@EventHandler(priority = EventPriority.LOW)
+	public void onPlayerDeath(PlayerDeathEvent event) {
+		getActiveMinigames().values().forEach(minigame ->
+			minigame.onPlayerDeath(event)
+		);
 	}
 }

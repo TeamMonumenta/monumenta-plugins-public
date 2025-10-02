@@ -25,6 +25,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
@@ -252,6 +253,13 @@ public class SpiritArcheryMinigame extends Minigame {
             }
         }
     }
+
+	@Override
+	public void onPlayerDeath(PlayerDeathEvent event) {
+		if (event.getPlayer() == mPlayer && !event.isCancelled()) {
+			minigameEnd();
+		}
+	}
 
     @Override
     public void onEndMinigame() {

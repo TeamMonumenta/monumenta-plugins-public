@@ -145,8 +145,13 @@ public class InventoryUtils {
 			dropped += removeSpecialItemsFromInventory(player.getEnderChest(), loc, ephemeralOnly, true, dropItems);
 		}
 
+		// Item on cursor
+		@Nullable ItemStack[] items = {player.getItemOnCursor()};
+		dropped += removeSpecialItemsFromInventory(items, loc, ephemeralOnly, false, dropItems);
+		player.setItemOnCursor(items[0]);
+
 		// Armor slots
-		@Nullable ItemStack[] items = player.getInventory().getArmorContents();
+		items = player.getInventory().getArmorContents();
 		dropped += removeSpecialItemsFromInventory(items, loc, ephemeralOnly, false, dropItems);
 		player.getInventory().setArmorContents(items);
 

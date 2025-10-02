@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
@@ -123,5 +124,11 @@ public abstract class Minigame implements Listener {
 
 	public void onEntityDeath(EntityDeathEvent event) {
 
+	}
+
+	public void onPlayerDeath(PlayerDeathEvent event) {
+		if (mHitbox.contains(event.getEntity().getLocation())) {
+			stopMinigame();
+		}
 	}
 }
