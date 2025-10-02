@@ -31,6 +31,12 @@ public class ProjectileEntityBoss extends BossAbilityGroup {
 		@BossParam(help = "Type of damage")
 		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MAGIC;
 
+		@BossParam(help = "Percentage of health done as true damage")
+		public double TRUE_DAMAGE_PERCENTAGE = 0;
+
+		@BossParam(help = "Should the true damage percentage be blockable?")
+		public boolean TRUE_DAMAGE_BLOCK = false;
+
 		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";
 

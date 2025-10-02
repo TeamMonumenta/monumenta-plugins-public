@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -300,10 +301,15 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 	public void projectileHit(@Nullable LivingEntity target, Location loc, Location prevLoc) {
 		mParameters.SOUND_HIT.play(loc, 0.5f, 0.5f);
 		mParameters.PARTICLE_HIT.spawn(mBoss, loc, 0d, 0d, 0d, 0.25d);
-		if (mParameters.DAMAGE > 0 && target != null) {
-			mParameters.EFFECTS.apply(target, mBoss);
-			BossUtils.blockableDamage(mBoss, target, mParameters.DAMAGE_TYPE, mParameters.DAMAGE,
-				mParameters.SPELL_NAME, prevLoc, mParameters.EFFECTS.mEffectList);
+		if(target != null) {
+			if (mParameters.DAMAGE > 0) {
+				BossUtils.blockableDamage(mBoss, target, mParameters.DAMAGE_TYPE, mParameters.DAMAGE,
+					mParameters.SPELL_NAME, prevLoc, mParameters.EFFECTS.mEffectList);
+				mParameters.EFFECTS.apply(target, mBoss);
+			}
+			if (mParameters.TRUE_DAMAGE_PERCENTAGE > 0) {
+				DamageUtils.damagePercentHealth(mBoss, target, mParameters.TRUE_DAMAGE_PERCENTAGE, false, mParameters.TRUE_DAMAGE_BLOCK, mParameters.SPELL_NAME, true, List.of());
+			}
 		}
 	}
 
