@@ -1301,6 +1301,15 @@ public class ItemUtils {
 				   || (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()));
 	}
 
+	public static boolean isUtilityItem(ItemStack item) {
+		return ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)
+					 || ItemStatUtils.hasEnchantment(item, EnchantmentType.RECOIL)
+					 || ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE)
+					 || ItemStatUtils.hasEnchantment(item, EnchantmentType.WORLDLY_PROTECTION)
+					 || item.lore().toString().contains("in inventory")
+					 || item.lore().toString().contains("in mainhand");
+	}
+
 	/**
 	 * Properly clones an item stack. The default clone method does not completely clone all NBT, which can lead to issues.
 	 *

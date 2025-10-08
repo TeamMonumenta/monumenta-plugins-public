@@ -172,9 +172,7 @@ public class LoadoutManager implements Listener {
 				         || item.getType() == Material.SHEARS
 				         || item.getType() == Material.COMPASS
 				         || ItemUtils.isShulkerBox(item.getType())
-				         || ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)
-				         || ItemStatUtils.hasEnchantment(item, EnchantmentType.RECOIL)
-				         || ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE))
+				         || ItemUtils.isUtilityItem(item))
 				        && !ItemStatUtils.isCharm(item)),
 
 		// Consumables are (mostly) region-independent, and charms always R3, so their priority includes the priority a region tag would add
