@@ -217,6 +217,10 @@ public class ServerProperties {
 		return INSTANCE.mShardName;
 	}
 
+	public static boolean isBuildShard() {
+		return getShardName().equals("build");
+	}
+
 	public static boolean getEntityScoresDisabled(World world) {
 		if (world == null) {
 			return true;

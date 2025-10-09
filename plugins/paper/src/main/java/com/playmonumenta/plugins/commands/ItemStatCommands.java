@@ -853,7 +853,7 @@ public class ItemStatCommands {
 
 		new CommandAPICommand("color").withPermission(perms).withArguments(new LiteralArgument("list")).executes((sender, args) -> {
 			Component message = Component.empty();
-			for (Location location : Location.values()) {
+			for (Location location : Location.availableLocations()) {
 				message = message.append(Component.text(location.getName(), location.getColor()).hoverEvent(HoverEvent.showText(Component.text("Click to copy hex code to clipboard"))).clickEvent(ClickEvent.copyToClipboard(location.getColor().asHexString())));
 				message = message.append(Component.text(" "));
 			}
@@ -911,7 +911,7 @@ public class ItemStatCommands {
 	}
 
 	private static Argument<String> getLocationArgument() {
-		Location[] locationsRaw = Location.values();
+		Location[] locationsRaw = Location.availableLocations();
 		String[] locations = new String[locationsRaw.length];
 		for (int i = 0; i < locations.length; i++) {
 			locations[i] = locationsRaw[i].getName();

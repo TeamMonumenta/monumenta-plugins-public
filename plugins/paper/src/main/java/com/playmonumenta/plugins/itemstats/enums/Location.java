@@ -11,8 +11,10 @@ import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkillShopGUI;
 import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import java.util.Arrays;
 import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -128,11 +130,12 @@ public enum Location {
 	ZENITH("zenith", "The Celestial Zenith", TextColor.fromHexString("#FF9CF0")),
 	FISHING("fishing", "Architect's Ring Fishing", TextColor.fromHexString("#A9D1D0")),
 	SKR("skr", "Silver Knight's Remnants", TextColor.fromHexString("#E8C392")),
-	// REKKENGULCH("rekkengulch", "Rekkengulch", TextColor.fromHexString("#8E432D")),
+	REKKENGULCH("rekkengulch", "Rekkengulch", TextColor.fromHexString("#8E432D"), true),
 	// bosses
 	SIRIUS("sirius", "The Final Blight", TextColor.fromHexString("#34CFBC")),
 	HUNTS("hunts", "Diamenean Hunts", TextColor.fromHexString("#414e18")),
 	TWISTED_INTRUDER("twisted", Component.text("Twisted ", TextColor.fromHexString("#6b0000")).decoration(TextDecoration.ITALIC, false).append(Component.text("lxxxxxxx", TextColor.fromHexString("#6b0000")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true))),
+	AURORA("aurora", "Aurora's Endgame", TextColor.fromHexString("#A6CFE3"), true),
 	// events, legacy
 	VALENTINE("valentine", "Valentine Event", TextColor.fromHexString("#FF7F7F")),
 	VALENTINESKIN("valentineskin", "Valentine Skin", TextColor.fromHexString("#FF7F7F")),
@@ -172,19 +175,30 @@ public enum Location {
 	final String mDisplayName;
 	final Component mDisplay;
 	final TextColor mColor;
+	final boolean mBuildHidden;
 
 	Location(String name, String display, TextColor color) {
+		this(name, display, color, false);
+	}
+
+	Location(String name, String display, TextColor color, boolean buildHidden) {
 		mName = name;
 		mDisplayName = display;
 		mDisplay = Component.text(display, color).decoration(TextDecoration.ITALIC, false);
 		mColor = color;
+		mBuildHidden = buildHidden;
 	}
 
 	Location(String name, Component display) {
+		this(name, display, false);
+	}
+
+	Location(String name, Component display, boolean buildHidden) {
 		mName = name;
 		mDisplayName = MessagingUtils.plainText(display);
 		mDisplay = display;
 		mColor = display.color();
+		mBuildHidden = buildHidden;
 	}
 
 	Location(PlayerClass cls) {
@@ -211,8 +225,13 @@ public enum Location {
 		return mColor;
 	}
 
+	public static Location[] availableLocations() {
+		boolean build = ServerProperties.isBuildShard();
+		return Arrays.stream(values()).filter(l -> !(build && l.mBuildHidden)).toArray(Location[]::new);
+	}
+
 	public static Location getLocation(String name) {
-		for (Location location : values()) {
+		for (Location location : availableLocations()) {
 			if (location.getName().replace(" ", "").equals(name.replace(" ", ""))) {
 				return location;
 			}
