@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
@@ -69,7 +70,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		addItems(DelveInfusionSelection.AURA, (i, perLevel) -> "Mobs in a 3 block radius from you are slowed by " + StringUtils.multiplierToPercentage(Aura.SLOW_PER_LEVEL * i) + "%" + perLevel + " for 0.5 seconds. This is refreshed as long as they are in range.");
 		addItems(DelveInfusionSelection.EXPEDITE, (i, perLevel) -> "Damaging an enemy with an ability increases your movement speed by " + StringUtils.multiplierToPercentage(Expedite.PERCENT_SPEED_PER_LEVEL * i) + "%" + perLevel + " for 5 seconds, stacking up to 3 times.");
 		addItems(DelveInfusionSelection.CHOLER, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Choler.DAMAGE_MLT_PER_LVL * i) + "% more damage" + perLevel + " to any mob that is on fire, slowed, or stunned.");
-		addItems(DelveInfusionSelection.UNYIELDING, (i, perLevel) -> "Gain " + StringUtils.to2DP(Unyielding.KB_PER_LEVEL * i * 10) + " Knockback Resistance" + perLevel + ".");
+		addItems(DelveInfusionSelection.UNYIELDING, (i, perLevel) -> "Gain an additive " + StringUtils.multiplierToPercentage(Unyielding.KB_PER_LEVEL * i) + "% Knockback Resistance" + perLevel + ".");
 		addItems(DelveInfusionSelection.USURPER, (i, perLevel) -> "Heal " + StringUtils.multiplierToPercentage(Usurper.HEAL_PCT_PER_LVL * i) + "% of your max health" + perLevel + " whenever you slay an elite or boss enemy.");
 		addItems(DelveInfusionSelection.VENGEFUL, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Vengeful.DAMAGE_MLT_PER_LVL * i) + "% more damage" + perLevel + " against the last enemy that damaged you.");
 		//R2
@@ -234,7 +235,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			}
 		} catch (Exception e) {
 			p.sendMessage(Component.text("If you see this message please contact a mod! (Error in infusing)", NamedTextColor.RED));
-			e.printStackTrace();
+			MMLog.severe("Error in infusing, see " + e.getMessage());
 		}
 	}
 
