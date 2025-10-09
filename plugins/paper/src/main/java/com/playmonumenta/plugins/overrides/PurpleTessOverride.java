@@ -120,12 +120,12 @@ public class PurpleTessOverride extends BaseOverride {
 				replaceContents(newContainer.getInventory(), originalInventory);
 			}
 		} else {
-			boolean foundItem = false;
+			boolean containerEmpty = true;
 			for (@Nullable ItemStack itemStack : originalInventory.getContents()) {
 				if (itemStack == null) {
 					continue;
 				}
-				foundItem = true;
+				containerEmpty = false;
 
 				Material type = itemStack.getType();
 				if (ItemUtils.isShulkerBox(type)) {
@@ -141,16 +141,15 @@ public class PurpleTessOverride extends BaseOverride {
 					return;
 				}
 			}
-			if (!foundItem) {
+			if (containerEmpty) {
 				player.sendMessage(Component.text("You cannot use this on a chest that is empty or has an unopened loot table.", NamedTextColor.RED));
 				return;
 			}
 
-			ItemStack shulkerItem = new ItemStack(isBarrel ? Material.YELLOW_SHULKER_BOX : Material.SHULKER_BOX);
+			ItemStack shulkerItem = new ItemStack(mFestive ? Material.GREEN_SHULKER_BOX : (isBarrel ? Material.YELLOW_SHULKER_BOX : Material.PURPLE_SHULKER_BOX));
 			if (!(shulkerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta)) {
 				return;
 			}
-
 			if (!(blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox)) {
 				return;
 			}
@@ -168,7 +167,7 @@ public class PurpleTessOverride extends BaseOverride {
 
 			// Visuals //
 			String plainName = mFestive ? "Carrier of Festivity" : "Carrier of Emotion";
-			ItemUtils.setDisplayName(shulkerItem, Component.text(plainName, mFestive ? NamedTextColor.RED : NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			ItemUtils.setDisplayName(shulkerItem, Component.text(plainName, mFestive ? NamedTextColor.DARK_RED : NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			ItemUtils.setPlainName(shulkerItem, plainName);
 
 			world.spawn(centerLoc, Item.class, itemEntity -> itemEntity.setItemStack(shulkerItem));
