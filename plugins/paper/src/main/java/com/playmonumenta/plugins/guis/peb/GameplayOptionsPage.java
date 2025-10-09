@@ -227,13 +227,10 @@ final class GameplayOptionsPage extends PebPage {
 				playerPunchesOptOut.set(false);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> PlayerPunches.handleLogin(getPlayer()), 20);
 				getPlayer().sendMessage(Component.text("You have opted back in to Player Punches!", NamedTextColor.GOLD));
-			} else if (PlayerPunches.canAccess(getPlayer())) {
+			} else {
 				playerPunchesOptOut.set(true);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> PlayerPunches.handleLogin(getPlayer()), 20);
 				getPlayer().sendMessage(Component.text("You have opted out of Player Punches!", NamedTextColor.GOLD));
-			} else {
-				getPlayer().sendMessage(Component.text("You do not have access to Player Punches to begin with!", NamedTextColor.GOLD));
-				return;
 			}
 
 			cosmeticsManager.mOptOutPunchCooldowns.put(playerUuid, currentTime);

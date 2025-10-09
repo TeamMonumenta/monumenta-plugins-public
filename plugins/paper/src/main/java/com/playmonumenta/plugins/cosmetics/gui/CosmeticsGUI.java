@@ -406,7 +406,7 @@ public class CosmeticsGUI extends CustomInventory {
 		ItemStack gravePoseItem = GUIUtils.createBasicItem(CosmeticType.GRAVE_POSE.getDisplayItem(null), "Grave Poses", NamedTextColor.GOLD, true, "Select a pose for your graves to take on. Only accessible to patrons.", NamedTextColor.GRAY);
 		mInventory.setItem(GRAVE_POSE_LOC, gravePoseItem);
 
-		ItemStack playerPunchItem = GUIUtils.createBasicItem(CosmeticType.PLAYER_PUNCH.getDisplayItem(null), "Player Punches", NamedTextColor.GOLD, true, "Select a style for your punch ability. Only accessible to patrons, moderators, and developers on playerplots and plots.", NamedTextColor.GRAY);
+		ItemStack playerPunchItem = GUIUtils.createBasicItem(CosmeticType.PLAYER_PUNCH.getDisplayItem(null), "Player Punches", NamedTextColor.GOLD, true, "Select a style for your punch ability. Only accessible to patrons, moderators, and developers on guildplots, playerplots, and plots.", NamedTextColor.GRAY);
 		mInventory.setItem(PLAYER_PUNCH_LOC, playerPunchItem);
 
 		ItemStack vanityItem = GUIUtils.createBasicItem(CosmeticType.VANITY.getDisplayItem(null), "Vanity Manager", NamedTextColor.GOLD, true, "Manage your equipped vanity items.", NamedTextColor.GRAY);
