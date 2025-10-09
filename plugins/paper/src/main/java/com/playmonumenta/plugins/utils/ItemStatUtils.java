@@ -1057,6 +1057,35 @@ public class ItemStatUtils {
 		} else return infuserPlayer != null && infuserPlayer.equals(player.getUniqueId()); // player case
 	}
 
+	public static boolean isOwnable(ItemStack item) {
+		if (item == null) {
+			return false;
+		}
+
+		if (item.getAmount() != 1) {
+			return false;
+		}
+
+		switch (getTier(item)) {
+			case ZENITH_CHARM:
+			case CURRENCY:
+			case EVENT_CURRENCY:
+				return false;
+			case SHULKER_BOX:
+			case QUEST_COMPASS:
+				return true;
+			default:
+				break;
+		}
+
+		Region region = getRegion(item);
+		if (region != Region.VALLEY && region != Region.ISLES && region != Region.RING) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public static @Nullable ReadWriteNBTCompoundList getAttributes(final ReadWriteNBT nbt) {
 		ReadWriteNBT stock = getStock(nbt);
 		if (stock == null) {
