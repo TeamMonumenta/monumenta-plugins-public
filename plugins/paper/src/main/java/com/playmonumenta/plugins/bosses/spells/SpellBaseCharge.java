@@ -420,6 +420,12 @@ public class SpellBaseCharge extends Spell {
 
 				mTicks += 2;
 			}
+
+			@Override
+			public synchronized void cancel() throws IllegalStateException {
+				mBoss.setAI(true);
+				super.cancel();
+			}
 		};
 		runnable.runTaskTimer(mPlugin, 0, 2);
 		mActiveRunnables.add(runnable);
@@ -436,9 +442,6 @@ public class SpellBaseCharge extends Spell {
 			@Override
 			public void run() {
 				if (EntityUtils.shouldCancelSpells(mBoss)) {
-					if (mBoss != null) {
-						mBoss.setAI(true);
-					}
 					this.cancel();
 					return;
 				}
@@ -475,6 +478,12 @@ public class SpellBaseCharge extends Spell {
 				}
 
 				mTicks += 2;
+			}
+
+			@Override
+			public synchronized void cancel() throws IllegalStateException {
+				mBoss.setAI(true);
+				super.cancel();
 			}
 		};
 		runnable.runTaskTimer(mPlugin, 0, 2);
