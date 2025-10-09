@@ -1,15 +1,16 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.seraph.HallowedBeamCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 
 public class HallowedBeamL2 extends Effect {
 	public static final String effectID = "HallowedBeamL2";
@@ -19,6 +20,7 @@ public class HallowedBeamL2 extends Effect {
 	private int mSeals;
 	private final int mSealDuration;
 	private final HallowedBeamCS mCosmetic;
+	private boolean mSealExploded = false;
 
 	public HallowedBeamL2(int duration, Player player, double damage, double radius, int seals, HallowedBeamCS cosmetic) {
 		super(duration, effectID);
@@ -32,16 +34,25 @@ public class HallowedBeamL2 extends Effect {
 
 	@Override
 	public void entityGainEffect(Entity entity) {
-		GlowingManager.startGlowing(entity, mCosmetic.beamGlowColor(), mDuration, GlowingManager.PLAYER_ABILITY_PRIORITY, p -> p.equals(mPlayer), "HallowedBeamGlowing" + mPlayer.getName());
+		mSealExploded = false;
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+		if (!mSealExploded && (entity.isDead() || !entity.isValid())) {
+			LivingEntity transferMob = EntityUtils.getNearestMob(entity.getLocation(), 4);
+			if (transferMob != null) {
+				Plugin.getInstance().mEffectManager.addEffect(transferMob, "HallowedBeam" + mPlayer.getName(), new HallowedBeamL2(mSealDuration, mPlayer, mDamage, mRadius, mSeals, mCosmetic));
+			}
+		}});
+		GlowingManager.startGlowing(entity, mCosmetic.beamGlowColor(), mDuration, GlowingManager.PLAYER_ABILITY_PRIORITY, null, "HallowedBeamGlowing" + mPlayer.getName());
 	}
 
 	@Override
 	public void onHurt(LivingEntity livingEntity, DamageEvent event) {
 		DamageEvent.DamageType type = event.getType();
 		boolean fromEtherealAscension = type == DamageEvent.DamageType.MAGIC && event.getAbility() == ClassAbility.ETHEREAL_ASCENSION;
-		if ((!fromEtherealAscension && type != DamageEvent.DamageType.PROJECTILE && type != DamageEvent.DamageType.MELEE) || mPlayer != (event.getDamager() instanceof Projectile ? ((Projectile) event.getDamager()).getShooter() : event.getDamager())) {
+		if ((!fromEtherealAscension && type != DamageEvent.DamageType.PROJECTILE && type != DamageEvent.DamageType.MELEE)) {
 			return;
 		}
+		mSealExploded = true;
 
 		mCosmetic.beamSplash(mPlayer, livingEntity, livingEntity.getLocation(), mRadius);
 

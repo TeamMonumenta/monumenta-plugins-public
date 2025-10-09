@@ -67,9 +67,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 	private static final int HALLOWED_MAX_CHARGES = 3;
 	private static final int HALLOWED_COOLDOWN = 20 * 10;
-	private static final int HALLOWED_DAMAGE_R2 = 25;
+	private static final int HALLOWED_DAMAGE_R2 = 26;
 	private static final int HALLOWED_SEAL_DAMAGE_R2 = 9;
-	private static final int HALLOWED_DAMAGE_R3 = 35;
+	private static final int HALLOWED_DAMAGE_R3 = 40;
 	private static final int HALLOWED_SEAL_DAMAGE_R3 = 12;
 	private static final int HALLOWED_SEAL_RADIUS = 3;
 	private static final int HALLOWED_SEAL_DURATION = 20 * 5;
@@ -561,11 +561,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 		ItemStack item = mPlayer.getInventory().getItemInMainHand();
 		double recoil = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.RECOIL);
 		if (recoil > 0
-			&& !EntityUtils.isRecoilDisable(mPlugin, mPlayer, mMaxCharges)
+			&& !EntityUtils.isRecoilDisable(mPlugin, mPlayer, 1)
 			&& !mPlayer.isSneaking()
 			&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			Recoil.applyRecoil(mPlayer, recoil);
-			EntityUtils.applyRecoilDisable(mPlugin, 9999, (int) EntityUtils.getRecoilDisableAmount(mPlugin, mPlayer) + 1, mPlayer);
+			EntityUtils.applyRecoilDisable(mPlugin, 9999, 1, mPlayer);
 		}
 	}
 
@@ -573,14 +573,14 @@ public class HallowedBeam extends MultipleChargeAbility {
 		ItemStack item = mPlayer.getInventory().getItemInMainHand();
 		double grappling = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.GRAPPLING);
 		if (grappling > 0
-			&& !EntityUtils.isRecoilDisable(mPlugin, mPlayer, mMaxCharges)
+			&& !EntityUtils.isRecoilDisable(mPlugin, mPlayer, 1)
 			&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			if (getPlayer().isSneaking()) {
 				Grappling.pullMob(mPlayer, target, Grappling.MOB_HORIZONTAL_SPEED, grappling);
 			} else {
 				Grappling.pullMob(target, mPlayer, Grappling.PLAYER_HORIZONTAL_SPEED, grappling);
 			}
-			EntityUtils.applyRecoilDisable(mPlugin, 9999, (int) EntityUtils.getRecoilDisableAmount(mPlugin, mPlayer) + 1, mPlayer);
+			EntityUtils.applyRecoilDisable(mPlugin, 9999, 1, mPlayer);
 		}
 	}
 
@@ -618,9 +618,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			.addDuration(a -> a.mHereticStunDuration, HALLOWED_HERETIC_STUN)
 			.add("s. If aimed at a non-Heretic mob, it instantly stuns them for ")
 			.addDuration(a -> a.mLivingStunDuration, HALLOWED_LIVING_STUN)
-			.add("s and applies aspect enchants. This skill can only apply Recoil ")
-			.add(a -> a.mMaxCharges, HALLOWED_MAX_CHARGES, false)
-			.add(" times before touching the ground. Charges: ")
+			.add("s and applies aspect enchants. This skill can only apply Recoil once before touching the ground. Charges: ")
 			.add(a -> a.mMaxCharges, HALLOWED_MAX_CHARGES, false)
 			.add(".")
 			.addCooldown(HALLOWED_COOLDOWN);
@@ -634,10 +632,10 @@ public class HallowedBeam extends MultipleChargeAbility {
 			.addDuration(a -> a.mResistanceDuration, HALLOWED_DAMAGE_REDUCTION_DURATION)
 			.add(" seconds. Mobs affected are marked by a Holy Seal for ")
 			.addDuration(a -> a.mSealDuration, HALLOWED_SEAL_DURATION)
-			.add(" seconds - your next melee attack, projectile or Ethereal Ascension orb to damage them will explode the Seal, dealing R2: " + HALLOWED_SEAL_DAMAGE_R2 + " / R3: ")
+			.add(" seconds - the next melee attack, projectile or Ethereal Ascension orb to damage them by any player will explode the Seal, dealing R2: " + HALLOWED_SEAL_DAMAGE_R2 + " / R3: ")
 			.add(a -> ServerProperties.getAbilityEnhancementsEnabled(a.mPlayer) ? a.mSealDamage : HALLOWED_SEAL_DAMAGE_R3, HALLOWED_SEAL_DAMAGE_R3)
 			.add(" magic damage in a ")
 			.add(a -> a.mSealRadius, HALLOWED_SEAL_RADIUS)
-			.add(" block radius.");
+			.add(" block radius. If the beam kills the mob, the Seal is instead transferred to the nearest mob within 4 blocks.");
 	}
 }

@@ -96,7 +96,7 @@ public class Explosive implements Enchantment {
 				if (box.overlaps(mobBox)) {
 					// Deal damage.
 					DamageUtils.damage(player, mob, DamageEvent.DamageType.PROJECTILE_ENCH, damage, ClassAbility.EXPLOSIVE, false);
-					Punch.applyPunch(plugin, player, punch, mob, projectile);
+					Punch.applyPunch(plugin, punch, mob, projectile.getVelocity());
 				}
 			}
 

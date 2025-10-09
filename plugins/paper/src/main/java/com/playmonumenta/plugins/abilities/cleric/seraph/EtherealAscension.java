@@ -29,14 +29,17 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -55,22 +58,23 @@ import org.jetbrains.annotations.Nullable;
 
 public class EtherealAscension extends Ability implements AbilityWithDuration {
 
-	private static final double ASCENSION_ORB_DAMAGE_FLAT = 5;
-	private static final double ASCENSION_ORB_DAMAGE_PERCENT = 0.75;
+	private static final double ASCENSION_ORB_DAMAGE_FLAT = 4;
+	private static final double ASCENSION_ORB_DAMAGE_PERCENT = 0.85;
 	private static final double ASCENSION_ORB_RADIUS = 2;
-	private static final double ASCENSION_ORB_TRAVEL_SPEED = 1.6;
+	private static final double ASCENSION_ORB_TRAVEL_SPEED = 1.7;
 	private static final double ASCENSION_ORB_DAMAGE_BONUS = 0.3;
 	private static final int ASCENSION_ORB_HASTE = 1; // Actually 2 because of how effects work
 	private static final int ASCENSION_ORB_BUFF_DURATION = 8 * 20;
 	private static final double ASCENSION_THROW_RATE = 0.1;
 	private static final double ASCENSION_ORB_RADIUS_PERCENT_BONUS = 0.15;
-	private static final int ASCENSION_DURATION_EXTENSION = 5;
-	private static final int ASCENSION_DURATION_MAX_EXTENSION = 3 * 20;
+	private static final int ASCENSION_DURATION_EXTENSION = 10;
+	private static final int ASCENSION_DURATION_MAX_EXTENSION = 4 * 20;
 	private static final double ASCENSION_LAUNCH_KNOCKBACK_RADIUS = 5;
-	private static final double ASCENSION_HOVER_HEIGHT = 2.8;
-	private static final float ASCENSION_LAUNCH_VELOCITY = 0.6f;
+	private static final double ASCENSION_HOVER_HEIGHT = 3.5;
+	private static final float ASCENSION_LAUNCH_VELOCITY = 0.7f;
+	private static final float ASCENSION_DASH_VELOCITY = 0.8f;
 	private static final int ASCENSION_DURATION = 12 * 20;
-	private static final int ASCENSION_COOLDOWN = 40 * 20;
+	private static final int ASCENSION_COOLDOWN = 25 * 20;
 
 	public static final String CHARM_DAMAGE = "Ethereal Ascension Orb Damage";
 	public static final String CHARM_RANGE = "Ethereal Ascension Orb Max Range";
@@ -86,6 +90,7 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 	public static final String CHARM_LAUNCH_KNOCKBACK = "Ethereal Ascension Launch Knockback";
 	public static final String CHARM_LAUNCH_KNOCKBACK_RADIUS = "Ethereal Ascension Launch Knockback Radius";
 	public static final String CHARM_HOVER_HEIGHT = "Ethereal Ascension Hover Height";
+	public static final String CHARM_DASH_VELOCITY = "Ethereal Ascension Dash Velocity";
 	public static final String CHARM_DURATION = "Ethereal Ascension Duration";
 	public static final String CHARM_COOLDOWN = "Ethereal Ascension Cooldown";
 
@@ -95,7 +100,7 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 			.scoreboardId("EtherealAscension")
 			.shorthandName("Asc")
 			.descriptions(getDescription1(), getDescription2())
-			.simpleDescription("Hover above the ground temporarily and convert your projectiles into magical orbs that damage mobs and buff players.")
+			.simpleDescription("Take flight temporarily and convert your projectiles into magical orbs that damage mobs and buff players.")
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EtherealAscension::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
 			.cooldown(ASCENSION_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.TOTEM_OF_UNDYING);
@@ -115,12 +120,14 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 	private final double mAscensionLaunchKnockbackRadius;
 	private final double mAscensionHoverHeight;
 	private final float mAscensionLaunchVelocity;
+	private final float mAscensionDashVelocity;
 	private final int mAscensionDuration;
 	private final EtherealAscensionCS mCosmetic;
 
 	private @Nullable BukkitRunnable mAscendRunnable;
 	private int mCurrentDuration = -1;
 	private int mDurationExtension = 0;
+	private int mMultishotCounter = 0;
 
 	public EtherealAscension(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -139,6 +146,7 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 		mAscensionLaunchKnockbackRadius = CharmManager.getRadius(player, CHARM_LAUNCH_KNOCKBACK_RADIUS, ASCENSION_LAUNCH_KNOCKBACK_RADIUS);
 		mAscensionHoverHeight = CharmManager.calculateFlatAndPercentValue(player, CHARM_HOVER_HEIGHT, ASCENSION_HOVER_HEIGHT);
 		mAscensionLaunchVelocity = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_HOVER_HEIGHT, ASCENSION_LAUNCH_VELOCITY);
+		mAscensionDashVelocity = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DASH_VELOCITY, ASCENSION_DASH_VELOCITY);
 		mAscensionDuration = CharmManager.getDuration(player, CHARM_DURATION, ASCENSION_DURATION);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EtherealAscensionCS());
@@ -146,18 +154,16 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 
 	public boolean cast() {
 		if (isOnCooldown() || mCurrentDuration >= 0 || ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
-			if (isOnCooldown() && mCurrentDuration >= 20) {
+			if (mCurrentDuration >= 20) {
 				// Cancel if active for more than a second
 				if (mAscendRunnable != null) {
-					Plugin.getInstance().mTimers.updateCooldown(mPlayer, ClassAbility.ETHEREAL_ASCENSION, getRemainingAbilityDuration());
+					putOnCooldown();
 					mCosmetic.forceEndAscension(mPlayer, mPlayer.getWorld(), mPlayer.getLocation());
 					mAscendRunnable.cancel();
 				}
 			}
 			return false;
 		}
-
-		putOnCooldown();
 
 		if (mAscendRunnable != null) {
 			mAscendRunnable.cancel();
@@ -170,10 +176,13 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 		mDurationExtension = 0;
 		mCurrentDuration = 1;
 		ClientModHandler.updateAbility(mPlayer, this);
+		mPlayer.setFlySpeed(0);
 		mAscendRunnable = new BukkitRunnable() {
+			int mLastDashTick = 0;
 			@Override
 			public void run() {
-				if (!mPlayer.isOnline() || mPlayer.isDead() || EntityUtils.isSilenced(mPlayer) || ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
+				if (!mPlayer.isOnline() || mPlayer.isDead() || AbilityUtils.isSilenced(mPlayer) || ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
+					putOnCooldown();
 					this.cancel();
 					return;
 				}
@@ -188,16 +197,32 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 					}
 				}
 				if (distance < mAscensionHoverHeight && !mPlayer.isSneaking() && !belowCeiling) {
-					mPlugin.mPotionManager.addPotion(mPlayer, PotionManager.PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.LEVITATION, 9, 1, false, false));
+					int amplifier = 0;
+					if (distance < 0.5 * mAscensionHoverHeight) {
+						amplifier = 2;
+					}
+					mPlugin.mPotionManager.addPotion(mPlayer, PotionManager.PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.LEVITATION, 9, amplifier, false, false));
 				}
 				if (isLevelTwo()) {
 					mPlugin.mEffectManager.addEffect(mPlayer, "EtherealAscensionThrowRate", new PercentThrowRate(10, mAscensionThrowRate).displaysTime(false));
+				}
+				if (Bukkit.getCurrentTick() - mLastDashTick >= 40) {
+					mPlayer.setAllowFlight(true);
+				}
+				if (mPlayer.isFlying()) {
+					mLastDashTick = Bukkit.getCurrentTick();
+					mPlayer.setAllowFlight(false);
+					mPlayer.setFlying(false);
+					mCosmetic.dash(mPlayer, mPlayer.getWorld(), mPlayer.getLocation());
+					Vector dir = mPlayer.getLocation().getDirection().setY(0).normalize();
+					mPlayer.setVelocity(dir.setY(0.35).multiply(mAscensionDashVelocity));
 				}
 				if (mCurrentDuration >= 0) {
 					mCosmetic.tickEffect(mPlayer, mPlayer.getLocation(), mAscensionHoverHeight);
 					mCurrentDuration++;
 				}
 				if (mCurrentDuration > getInitialAbilityDuration()) {
+					putOnCooldown();
 					this.cancel();
 				}
 			}
@@ -206,6 +231,8 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 			public synchronized void cancel() {
 				super.cancel();
 				mCurrentDuration = -1;
+				mPlayer.setAllowFlight(false);
+				mPlayer.setFlying(false);
 				mPlugin.mEffectManager.clearEffects(mPlayer, "EtherealAscensionThrowRate");
 				mPlugin.mPotionManager.clearPotionEffectType(mPlayer, PotionEffectType.SLOW_FALLING);
 				mPlugin.mPotionManager.clearPotionEffectType(mPlayer, PotionEffectType.LEVITATION);
@@ -219,6 +246,15 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
+		ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(projectile);
+		if (mCurrentDuration < 0 || playerItemStats == null) {
+			return true;
+		}
+		ItemStatManager.PlayerItemStats.ItemStatsMap itemStatsMap = playerItemStats.getItemStats();
+		if (itemStatsMap.get(EnchantmentType.GRAPPLING) > 0 || itemStatsMap.get(AttributeType.PROJECTILE_DAMAGE_ADD) <= 0) {
+			return true;
+		}
+
 		double damageMultiplier;
 		boolean isArrow = (projectile instanceof Arrow || projectile instanceof SpectralArrow) && !ThrowingKnife.isThrowingKnife((AbstractArrow) projectile);
 		if (isArrow && !((AbstractArrow) projectile).isShotFromCrossbow()) {
@@ -226,20 +262,29 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 		} else {
 			damageMultiplier = 1;
 		}
-		if (mCurrentDuration < 0 || damageMultiplier < 0.3) {
+		if (damageMultiplier < 0.3) {
 			return true;
 		}
 		World world = projectile.getWorld();
-		Vector dir = projectile.getVelocity().normalize();
-		ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(projectile);
-		if (playerItemStats == null) {
-			return true;
+		Vector dir;
+		if (mMultishotCounter > 0) {
+			dir = NmsUtils.getVersionAdapter().getActualDirection(mPlayer);
+			final Location l = mPlayer.getLocation();
+			l.setPitch(l.getPitch() - 90);
+			dir.rotateAroundNonUnitAxis(l.getDirection(), (mMultishotCounter == 1 ? -1 : 1) * 10.0 * Math.PI / 180);
+		} else {
+			dir = NmsUtils.getVersionAdapter().getActualDirection(mPlayer);
 		}
-		ItemStatManager.PlayerItemStats.ItemStatsMap itemStatsMap = playerItemStats.getItemStats();
 		projectile.remove();
 
+		if (mMultishotCounter == 0) {
+			Bukkit.getScheduler().runTask(mPlugin, () -> mMultishotCounter = 0);
+		}
 		Location startLoc = mPlayer.getEyeLocation();
-		mCosmetic.orbShoot(mPlayer, world, startLoc);
+		if (mMultishotCounter == 0) {
+			mCosmetic.orbShoot(mPlayer, world, startLoc);
+		}
+		mMultishotCounter++;
 
 		cancelOnDeath(new BukkitRunnable() {
 			final Location mLoc = startLoc.clone();
@@ -259,7 +304,7 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 						double radius = mAscensionOrbRadius * (isArrow && isLevelTwo() && damageMultiplier == 1 ? 1 + ASCENSION_ORB_RADIUS_PERCENT_BONUS : 1);
 						Hitbox aoeHitbox = new Hitbox.SphereHitbox(mLoc, radius);
 						aoeHitbox.getHitMobs().forEach(mob -> {
-							if (MetadataUtils.checkOnceInRecentTicks(mPlugin, mob, "EtherealAscensionHit", 9)) {
+							if (MetadataUtils.checkOnceInRecentTicks(mPlugin, mob, "EtherealAscensionHit", 8)) {
 								double damage = itemStatsMap.get(AttributeType.PROJECTILE_DAMAGE_ADD);
 								// Apply all base damage enchants
 								damage += Sniper.apply(mPlayer, mob, itemStatsMap.get(EnchantmentType.SNIPER));
@@ -307,19 +352,19 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 			.addTrigger()
 			.add(" to Ascend and hover above the ground for ")
 			.addDuration(a -> a.mAscensionDuration, ASCENSION_DURATION)
-			.add("s. While Ascended, projectiles you shoot are converted into orbs that move in a straight line, applying aspect enchants and dealing up to ")
+			.add("s. While Ascended, projectiles you shoot turn into orbs that move in a straight line, applying aspect enchants and dealing up to ")
 			.add(a -> a.mAscensionOrbDamageFlat, ASCENSION_ORB_DAMAGE_FLAT)
 			.add(" + ")
 			.addPercent(a -> a.mAscensionOrbDamagePercent, ASCENSION_ORB_DAMAGE_PERCENT)
 			.add(" of your base projectile damage when fully charged, including flat damage buffs, as magic damage to mobs in a ")
 			.add(a -> a.mAscensionOrbRadius, ASCENSION_ORB_RADIUS)
-			.add(" block radius on impact. A mob can only be hit by one orb every 0.5s. Hitting allies with an orb grants them a ")
+			.add(" block radius on impact. A mob can only be hit by one orb every 0.4s. Hitting allies with an orb grants them a ")
 			.addPercent(a -> a.mAscensionOrbDamageBonus, ASCENSION_ORB_DAMAGE_BONUS)
 			.add(" damage bonus and Haste ")
 			.addPotionAmplifier(a -> a.mAscensionOrbHaste, ASCENSION_ORB_HASTE)
 			.add(" for ")
 			.addDuration(a -> a.mAscensionOrbBuffDuration, ASCENSION_ORB_BUFF_DURATION)
-			.add("s. Recast while active to end the Ascension immediately, refunding the remaining duration in cooldown.")
+			.add("s. Double-jumping will cause you to dash forward, at most once every 2s. Ascension ends and goes on cooldown when the duration expires or you recast the ability.")
 			.addCooldown(ASCENSION_COOLDOWN);
 	}
 
@@ -340,6 +385,7 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 	public void invalidate() {
 		if (mAscendRunnable != null && !mAscendRunnable.isCancelled()) {
 			mAscendRunnable.cancel();
+			putOnCooldown();
 		}
 	}
 

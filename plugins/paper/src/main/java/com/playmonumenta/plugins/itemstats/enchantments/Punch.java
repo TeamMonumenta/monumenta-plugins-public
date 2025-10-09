@@ -44,10 +44,10 @@ public class Punch implements Enchantment {
 
 	@Override
 	public void onProjectileHit(Plugin plugin, Player player, double level, ProjectileHitEvent event, Projectile projectile) {
-		applyPunch(plugin, player, level, event.getHitEntity(), projectile);
+		applyPunch(plugin, level, event.getHitEntity(), projectile.getVelocity());
 	}
 
-	public static void applyPunch(Plugin plugin, Player player, double level, Entity entity, Projectile projectile) {
+	public static void applyPunch(Plugin plugin, double level, Entity entity, Vector projVelocity) {
 		if (level <= 0) {
 			return;
 		}
@@ -56,12 +56,12 @@ public class Punch implements Enchantment {
 			|| enemy instanceof Villager
 			|| enemy instanceof ArmorStand
 			|| enemy instanceof Player
-			|| scriptedQuestsPlugin.mNpcManager.isQuestNPC(entity)) {
+			|| (scriptedQuestsPlugin != null && scriptedQuestsPlugin.mNpcManager.isQuestNPC(entity))) {
 			return;
 		}
 		float speed = KB_VEL_BASE + KB_VEL_PER_LEVEL * (float) level;
 		// Enemy is punched with fixed Y velocity, in the horizontal direction the arrow was travelling, with fixed speed.
-		Vector vector = projectile.getVelocity().clone()
+		Vector vector = projVelocity.clone()
 			.setY(0);
 		if (vector.length() < 0.001) {
 			vector = new Vector(0, VERTICAL_LAUNCH, 0);

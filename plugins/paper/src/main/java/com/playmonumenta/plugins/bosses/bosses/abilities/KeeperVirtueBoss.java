@@ -64,6 +64,11 @@ public class KeeperVirtueBoss extends BossAbilityGroup {
 		mBoss.customName(mCosmetic.getComponentName());
 	}
 
+	public void resetActionTicks() {
+		mLastAttackTick = Bukkit.getCurrentTick();
+		mLastHealTick = mLastAttackTick;
+	}
+
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		event.setCancelled(true);

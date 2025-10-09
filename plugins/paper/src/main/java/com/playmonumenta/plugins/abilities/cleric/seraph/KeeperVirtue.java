@@ -50,8 +50,8 @@ import java.util.Objects;
 
 public class KeeperVirtue extends Ability implements AbilityWithHealthBar, AbilityWithDuration {
 	private static final int VIRTUE_COOLDOWN = 20 * 20;
-	private static final int VIRTUE_DAMAGE_R2 = 6;
-	private static final int VIRTUE_DAMAGE_R3 = 8;
+	private static final int VIRTUE_DAMAGE_R2 = 7;
+	private static final int VIRTUE_DAMAGE_R3 = 10;
 	private static final int VIRTUE_ATTACK_DELAY = 25;
 	private static final int VIRTUE_ATTACK_DRAIN = 2;
 	private static final int VIRTUE_ACTION_RANGE = 8;
@@ -204,7 +204,7 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 
 				@Override
 				public void run() {
-					if (mBoss == null || !mBoss.isValid() || !mPlayer.isValid() || !mPlayer.isOnline()) {
+					if (mBoss == null || !mBoss.isValid() || !mPlayer.isValid() || !mPlayer.isOnline() || mBoss.getWorld() != mPlayer.getWorld()) {
 						if (mBoss != null) {
 							invalidate();
 						}
@@ -303,19 +303,21 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 						Location playerLoc = LocationUtils.getEntityCenter(mPlayer);
 						Vector direction = LocationUtils.getDirectionTo(playerLoc, allayLoc);
 						Vector direction2 = direction.clone();
-						double distance = allayLoc.distance(playerLoc);
+						Location allayLoc2 = allayLoc.clone();
+						allayLoc2.setY(playerLoc.getY());
+						double distance = allayLoc2.distance(playerLoc);
 						// Teleport to the player when very far away
 						if (distance > 2 * mDetectionRange) {
 							allayLoc = playerLoc.clone().subtract(direction2.multiply(2));
 						} else {
 							if (distance < 4) {
-								direction2.multiply(Math.max(0, 0.5 * (distance - 2)));
+								direction2.multiply(Math.max(0, 0.5 * (distance - 2))).setY(direction.getY());
 							} else {
-								direction2.multiply(Math.pow(1.2, Math.min(4, distance - 4)));
+								direction2.multiply(Math.pow(1.2, Math.min(4, distance - 4))).setY(direction.getY());
 							}
 							allayLoc.add(direction2.clone().multiply(mMoveSpeed / 20));
 						}
-						allayLoc.setDirection(direction.setY(0));
+						allayLoc.setDirection(direction.clone().setY(0));
 					}
 					// bobbing
 					mBoss.teleport(allayLoc.clone().add(0, FastMath.sin(mRadian) * 0.05, 0));
@@ -358,6 +360,12 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 		if (mBoss == null || Bukkit.getCurrentTick() - mLastToggleTick < 5) {
 			return false;
 		}
+		KeeperVirtueBoss keeperVirtueBoss = BossUtils.getBossOfClass(mBoss, KeeperVirtueBoss.class);
+		if (keeperVirtueBoss == null) {
+			MMLog.warning("Failed to get KeeperVirtueBoss");
+			return false;
+		}
+		keeperVirtueBoss.resetActionTicks();
 		if (mMode == VirtueMode.INACTIVE) {
 			changeMode(mode);
 			mCosmetic.changeModeCast(mBoss, true);

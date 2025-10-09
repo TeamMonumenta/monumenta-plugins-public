@@ -42,6 +42,7 @@ import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.HypnoticChantCS
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.ImpalingDistortionCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.PrestigiousInfusionCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.RipplingBeamCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.seraph.TelekinesisCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.seraph.VigilantMothdragonCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.AroShockCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.DarkSparkCS;
@@ -181,7 +182,7 @@ public class CosmeticSkills {
 		RipplingBeamCS::new,
 		HypnoticChantCS::new,
 		ImpalingDistortionCS::new,
-
+		TelekinesisCS::new,
 		SpectralSerpentCS::new,
 		VigilantMothdragonCS::new,
 

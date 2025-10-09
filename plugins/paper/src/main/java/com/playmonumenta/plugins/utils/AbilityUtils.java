@@ -767,7 +767,7 @@ public class AbilityUtils {
 		ClassAbility.CRYSTALLINE_COMBOS,
 		ClassAbility.DECAYED_TOTEM,
 		ClassAbility.ILLUMINATE,
-		ClassAbility.SANCTIFIED_ARMOR,
+		ClassAbility.KEEPER_VIRTUE,
 		ClassAbility.REFLECTION
 	);
 

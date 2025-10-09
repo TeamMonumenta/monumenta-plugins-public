@@ -478,6 +478,7 @@ public class CharmManager {
 			EtherealAscension.CHARM_LAUNCH_KNOCKBACK,
 			EtherealAscension.CHARM_LAUNCH_KNOCKBACK_RADIUS,
 			EtherealAscension.CHARM_HOVER_HEIGHT,
+			EtherealAscension.CHARM_DASH_VELOCITY,
 			EtherealAscension.CHARM_DURATION,
 			EtherealAscension.CHARM_COOLDOWN,
 			HallowedBeam.CHARM_CHARGE,
