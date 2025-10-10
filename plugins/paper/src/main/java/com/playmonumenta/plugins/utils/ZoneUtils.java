@@ -64,6 +64,7 @@ public class ZoneUtils {
 		NO_SPECTATOR_ON_DEATH("No Spectator On Death"),
 		NO_SPECTATOR_ON_RESPAWN("No Spectator On Respawn"),
 		NO_TRAPDOOR_CLICKS("No Trapdoor Clicks"),
+		NO_TRICKY_TRANSFORMATION("NoTrickyTransformation"),
 		NO_VEHICLES("No Vehicles"),
 		NO_VIRTUAL_INVENTORIES("No Virtual Inventories"),
 		OVERWORLD_BLOCK_RESET("OverworldBlockReset"),
