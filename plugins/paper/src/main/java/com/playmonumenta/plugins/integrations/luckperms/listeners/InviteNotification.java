@@ -30,6 +30,7 @@ import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegrat
 public class InviteNotification {
 	private static final Map<UUID, Set<String>> mUserInvitesPreSync = new HashMap<>();
 
+	@SuppressWarnings("resource")
 	public static void registerLuckPermsEvents(Plugin plugin, EventBus eventBus) {
 		eventBus.subscribe(plugin, NodeAddEvent.class, InviteNotification::nodeAddEvent);
 

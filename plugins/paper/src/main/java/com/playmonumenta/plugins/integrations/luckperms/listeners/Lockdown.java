@@ -12,8 +12,6 @@ import com.playmonumenta.plugins.plots.ShopManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.scriptedquests.zones.ZoneManager;
-import com.playmonumenta.scriptedquests.zones.ZoneNamespace;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,22 +46,12 @@ import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegrat
 import static com.playmonumenta.plugins.integrations.luckperms.OffDutyCommand.ON_DUTY_PERM_STRING;
 
 public class Lockdown implements Listener {
-	public static String PLOT_ZONE_NAMESPACE_NAME = "Guild Lockdown (Buildable)";
-	public static String MAILBOX_ZONE_NAMESPACE_NAME = "Guild Lockdown (Mailbox)";
-
 	// The presence of a map indicates a guild is locked, even if the map is empty (for non-plots shards)
 	private static final ConcurrentSkipListSet<Long> mLockedGuildIds = new ConcurrentSkipListSet<>();
 	private static final Set<String> mLockedDownGuilds = new HashSet<>();
 	private static final Set<UUID> mTeleportingPlayers = new HashSet<>();
 
-	public Lockdown() {
-		ZoneManager zoneManager = ZoneManager.getInstance();
-		ZoneNamespace plotZoneNamespace = new ZoneNamespace(PLOT_ZONE_NAMESPACE_NAME);
-		zoneManager.registerPluginZoneNamespace(plotZoneNamespace);
-		ZoneNamespace mailboxZoneNamespace = new ZoneNamespace(MAILBOX_ZONE_NAMESPACE_NAME);
-		zoneManager.registerPluginZoneNamespace(mailboxZoneNamespace);
-	}
-
+	@SuppressWarnings("resource")
 	public static void registerLuckPermsEvents(Plugin plugin, EventBus eventBus) {
 		eventBus.subscribe(plugin, NodeAddEvent.class, Lockdown::nodeAddEvent);
 		eventBus.subscribe(plugin, NodeRemoveEvent.class, Lockdown::nodeRemoveEvent);
@@ -76,7 +64,7 @@ public class Lockdown implements Listener {
 		});
 	}
 
-	// Guilds are checked a tick at a time to reduce the impact of loading too much of the plots shard
+	// Guild lockdowns are checked async to speed up server startup
 	private static void afterLoad(List<Group> guilds) {
 		final int numGuilds = guilds.size();
 		MMLog.info("[Guild Lockdown Kicker] Going through " + numGuilds + " guilds...");
@@ -98,9 +86,8 @@ public class Lockdown implements Listener {
 				MMLog.warning("[Guild Lockdown Kicker] (" + iterations + "/" + numGuilds + ") Could not get guild's plot ID!");
 			} else {
 				mLockedGuildIds.add(guildPlotId);
+				MMLog.info("[Guild Lockdown Kicker] (" + iterations + "/" + numGuilds + ") Registered locked guild.");
 			}
-			MMLog.info("[Guild Lockdown Kicker] (" + iterations + "/" + numGuilds
-				+ ") Registered guild plot locations.");
 		}
 
 		MMLog.info("[Guild Lockdown Kicker] (" + iterations + "/" + numGuilds + ") finished loading.");

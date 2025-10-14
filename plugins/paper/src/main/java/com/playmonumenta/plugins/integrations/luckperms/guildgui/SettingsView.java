@@ -24,6 +24,7 @@ public class SettingsView extends View {
 		// This will need to be expanded as we go
 		final Group guild = mGui.mGuildGroup;
 		if (guild == null) {
+			mGui.setView(new AllGuildsView(mGui, GuildOrder.DEFAULT));
 			return;
 		}
 

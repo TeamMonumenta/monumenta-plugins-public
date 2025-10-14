@@ -263,8 +263,21 @@ public class GuildAccessCommand {
 						.append(
 							Component.text("/guild invite", NamedTextColor.GOLD)
 								.hoverEvent(Component.text("Click to put command in chat bar", NamedTextColor.GOLD))
-								.clickEvent(ClickEvent.suggestCommand("/guild invite " + targetName + " "))
+								.clickEvent(ClickEvent.suggestCommand("/guild invite " + targetName + " member"))
 						)
+					)
+				);
+				return;
+			} else if (targetAccess.compareTo(GuildAccessLevel.GUEST) <= 0 && targetCurrentAccess.compareTo(GuildAccessLevel.GUEST) > 0) {
+				// Target is either not in the guild - so they cannot be promoted to guest or above
+				Bukkit.getScheduler().runTask(plugin, () ->
+					sender.sendMessage(
+						Component.text("If you want to invite someone to your guild use ", NamedTextColor.RED)
+							.append(
+								Component.text("/guild invite", NamedTextColor.GOLD)
+									.hoverEvent(Component.text("Click to put command in chat bar", NamedTextColor.GOLD))
+									.clickEvent(ClickEvent.suggestCommand("/guild invite " + targetName + " guest"))
+							)
 					)
 				);
 				return;

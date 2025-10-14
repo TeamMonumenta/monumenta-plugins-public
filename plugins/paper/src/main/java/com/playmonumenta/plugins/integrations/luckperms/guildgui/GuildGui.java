@@ -232,6 +232,21 @@ public class GuildGui extends MailGui {
 		refresh();
 	}
 
+	public void refreshIfGuild(Group targetGuild) {
+		final Group ownGroup = mGuildGroup;
+		if (ownGroup == null) {
+			return;
+		}
+		final Group targetRoot = LuckPermsIntegration.getGuildRoot(targetGuild);
+		if (targetRoot == null) {
+			return;
+		}
+
+		if (ownGroup.getIdentifier().equals(targetRoot.getIdentifier())) {
+			refresh();
+		}
+	}
+
 	/*
 	 * Applies any LuckPerms changes that may have occurred while the GUI is open
 	 */

@@ -39,6 +39,7 @@ public class BuyPlotTypeView extends View {
 
 		if (GuildFlag.OWNS_PLOT.hasFlag(guild)) {
 			mGui.setView(new SettingsView(mGui));
+			return;
 		}
 
 		List<Component> plotOwnershipLore = getPlotOwnershipLore();
@@ -138,6 +139,11 @@ public class BuyPlotTypeView extends View {
 					}
 				}
 				case NUMBER_KEY -> {
+					if (GuildFlag.OWNS_PLOT.hasFlag(guild)) {
+						mGui.setView(new SettingsView(mGui));
+						return;
+					}
+
 					int hotbarButton = event.getHotbarButton();
 					if (hotbarButton < 0 || hotbarButton >= GuildPlotUtils.PLOT_COSTS.size()) {
 						return;

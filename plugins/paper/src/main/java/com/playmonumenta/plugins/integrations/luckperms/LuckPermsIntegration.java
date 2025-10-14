@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
+import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildFlags;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildPermissions;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.InviteNotification;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.LPArguments;
@@ -182,6 +183,7 @@ public class LuckPermsIntegration implements Listener {
 
 		EventBus eventBus = LP.getEventBus();
 		GuildArguments.registerLuckPermsEvents(plugin, eventBus);
+		GuildFlags.registerLuckPermsEvents(plugin, eventBus);
 		GuildPermissions.registerLuckPermsEvents(plugin, eventBus);
 		InviteNotification.registerLuckPermsEvents(plugin, eventBus);
 		Lockdown.registerLuckPermsEvents(plugin, eventBus);

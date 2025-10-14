@@ -34,6 +34,7 @@ public class RefreshChat {
 	private static final Map<String, Map<String, String>> mGuildDataPreSync = new HashMap<>();
 	private static final Map<UUID, Set<String>> mUserDataPreSync = new HashMap<>();
 
+	@SuppressWarnings("resource")
 	public static void registerLuckPermsEvents(Plugin plugin, EventBus eventBus) {
 		eventBus.subscribe(plugin, NodeAddEvent.class, RefreshChat::nodeAddEvent);
 		eventBus.subscribe(plugin, NodeRemoveEvent.class, RefreshChat::nodeRemoveEvent);

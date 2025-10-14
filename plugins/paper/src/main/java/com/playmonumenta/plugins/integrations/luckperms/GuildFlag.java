@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.playmonumenta.plugins.Plugin;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -25,6 +27,7 @@ public enum GuildFlag {
 	;
 
 	public static final String GUILD_FLAG_PREFIX = "guild.flag.";
+	public static final Pattern RE_GUILD_FLAG_ID = Pattern.compile("^guild\\.flag\\.([^.]+)$");
 
 	public final String mFlagLpId;
 	public final String mArgument;
@@ -113,5 +116,24 @@ public enum GuildFlag {
 		});
 
 		return future;
+	}
+
+	/**
+	 * Gets the GuildFlag from a given permission node
+	 * @param flagId The flag ID you wish to check
+	 * @return The GuildFlag from a given flag ID, or null if not a GuildFlag
+	 */
+	public static @Nullable GuildFlag getGuildFlag(String flagId) {
+		Matcher matcher = RE_GUILD_FLAG_ID.matcher(flagId);
+		if (!matcher.matches()) {
+			return null;
+		}
+		String guildFlagId = matcher.group(1);
+		for (GuildFlag guildFlag : values()) {
+			if (guildFlag.mFlagLpId.equals(guildFlagId)) {
+				return guildFlag;
+			}
+		}
+		return null;
 	}
 }

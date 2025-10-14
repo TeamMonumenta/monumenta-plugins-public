@@ -42,9 +42,7 @@ public class GuildPermissions implements Listener {
 	private static final ConcurrentMap<UUID, ConcurrentMap<String, ConcurrentSkipListSet<GuildPermission>>> mUserData
 		= new ConcurrentHashMap<>();
 
-	public GuildPermissions() {
-	}
-
+	@SuppressWarnings("resource")
 	public static void registerLuckPermsEvents(Plugin plugin, EventBus eventBus) {
 		eventBus.subscribe(plugin, NodeAddEvent.class, GuildPermissions::nodeAddEvent);
 		eventBus.subscribe(plugin, NodeRemoveEvent.class, GuildPermissions::nodeRemoveEvent);

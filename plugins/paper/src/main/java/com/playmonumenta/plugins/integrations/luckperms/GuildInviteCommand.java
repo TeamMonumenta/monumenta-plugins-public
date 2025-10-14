@@ -14,6 +14,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -28,6 +29,8 @@ public class GuildInviteCommand {
 	private static final Argument<String> USER_ARG = new StringArgument("player").replaceSuggestions(ChatCommand.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS);
 	private static final CommandPermission PERMISSION = CommandPermission.fromString("monumenta.command.guild.invite");
 	private static final CommandPermission PERMISSION_MOD = CommandPermission.fromString("monumenta.command.guild.mod.invite");
+
+	private static final int MAX_INVITES = 4;
 
 	public static CommandAPICommand attach(Plugin plugin, CommandAPICommand root, GuildInviteLevel inviteLevel) {
 		// <playername> <invite level>
@@ -143,7 +146,16 @@ public class GuildInviteCommand {
 					() -> inviter.sendMessage(Component.text("Could not get the LuckPerms data for " + invitedName, NamedTextColor.RED)));
 				return;
 			}
+
 			try {
+				Set<UUID> invitedPlayerIds = LuckPermsIntegration.getAllGuildInvites(guildRoot).join();
+
+				if (!invitedPlayerIds.contains(invitedUuid) && invitedPlayerIds.size() >= MAX_INVITES) {
+					Bukkit.getScheduler().runTask(plugin, () ->
+						inviter.sendMessage(Component.text("Your guild may only invite " + MAX_INVITES + " players at once!", NamedTextColor.RED)));
+					return;
+				}
+
 				GuildInviteLevel.setInviteLevel(invitedUser, guildRoot, inviteLevel).join();
 
 				Bukkit.getScheduler().runTask(plugin, () -> {
