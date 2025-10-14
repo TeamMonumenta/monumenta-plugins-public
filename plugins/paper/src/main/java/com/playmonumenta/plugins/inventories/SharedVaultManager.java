@@ -25,6 +25,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
@@ -310,7 +311,7 @@ public class SharedVaultManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void chunkLoadEvent(ChunkLoadEvent event) {
 		Chunk chunk = event.getChunk();
-		for (BlockState blockState : chunk.getTileEntities()) {
+		for (BlockState blockState : chunk.getTileEntities(b -> b.getType() == Material.ENCHANTING_TABLE, false)) {
 			if (isSharedVault(blockState)) {
 				getOrRegisterWallet(blockState);
 			}

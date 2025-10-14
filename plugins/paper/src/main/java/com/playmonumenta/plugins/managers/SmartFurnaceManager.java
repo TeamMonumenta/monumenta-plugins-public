@@ -103,6 +103,16 @@ public class SmartFurnaceManager implements Listener {
 		public static boolean isSmartFurnace(BlockState blockState) {
 			return getType(blockState) != null;
 		}
+
+		public static boolean mayBeSmartFurnace(final Block block) {
+			final var mat = block.getType();
+			for (final SmartFurnaceType smartFurnaceType : values()) {
+				if (mat == smartFurnaceType.mMat) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
 	private static @Nullable SmartFurnaceManager INSTANCE = null;
@@ -137,7 +147,7 @@ public class SmartFurnaceManager implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void worldLoadEvent(WorldLoadEvent event) {
 		for (Chunk chunk : event.getWorld().getLoadedChunks()) {
-			for (BlockState blockState : chunk.getTileEntities()) {
+			for (BlockState blockState : chunk.getTileEntities(SmartFurnaceType::mayBeSmartFurnace, false)) {
 				moveFurnaceItems(blockState);
 			}
 		}
@@ -145,7 +155,7 @@ public class SmartFurnaceManager implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void chunkLoadEvent(ChunkLoadEvent event) {
-		for (BlockState blockState : event.getChunk().getTileEntities()) {
+		for (BlockState blockState : event.getChunk().getTileEntities(SmartFurnaceType::mayBeSmartFurnace, false)) {
 			moveFurnaceItems(blockState);
 		}
 	}

@@ -87,8 +87,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import static com.playmonumenta.plugins.delves.DelvesUtils.MODIFIER_RANK_CAPS;
-
 public class DelvesManager implements Listener {
 	public static final String KEY_DELVES_PLUGIN_DATA = "MonumentaDelves";
 	protected static final double DELVES_MAX_PARTY_DISTANCE = 32.0;
@@ -471,17 +469,13 @@ public class DelvesManager implements Listener {
 		if (resistanceLevel < 5) {
 			List<Chunk> chunkList = LocationUtils.getSurroundingChunks(event.getTo().getBlock(), 32);
 			for (Chunk chunk : chunkList) {
-				for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST, false)) {
+				for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST || b.getType() == Material.TRAPPED_CHEST, false)) {
 					if (interestingBlock instanceof Chest chest
 						&& LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32)
 						&& ChestUtils.isAstrableChest(chest)
 						&& PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
 						Astral.applyModifiers(chest, getRank(player, DelvesModifier.ASTRAL));
 					}
-//					else if (interestingBlock instanceof CreatureSpawner spawner
-//						&& LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), spawner.getRequiredPlayerRange()*2)){
-//						Bountiful.applyModifiers(spawner, getRank(player, DelvesModifier.BOUNTIFUL));
-//					}
 				}
 			}
 		}

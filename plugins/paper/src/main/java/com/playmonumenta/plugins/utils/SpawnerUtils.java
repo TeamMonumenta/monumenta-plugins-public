@@ -66,7 +66,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
-
 import static com.playmonumenta.plugins.listeners.SpawnerListener.spawnerCatMap;
 import static com.playmonumenta.plugins.spawners.types.RallySpawner.getRally;
 import static com.playmonumenta.plugins.spawners.types.RallySpawner.triggerRallyEffect;
@@ -753,8 +752,9 @@ public class SpawnerUtils {
 				if (!chunk.isLoaded()) {
 					continue;
 				}
-				chunk.getTileEntities();
-				spawners.addAll(chunk.getTileEntities(b -> BlockUtils.taxiCabDistance(block, b) <= MAX_TORCH_TAXICAB_DISTANCE, true).stream().filter(b -> b instanceof CreatureSpawner).map(b -> (CreatureSpawner) b).toList());
+				final var spawners2 = chunk.getTileEntities(b -> b.getType() == Material.SPAWNER && BlockUtils.taxiCabDistance(block, b) <= MAX_TORCH_TAXICAB_DISTANCE, false);
+				final var spawners3 = spawners2.stream().map(b -> (CreatureSpawner) b).toList();
+				spawners.addAll(spawners3);
 			}
 		}
 		return spawners;

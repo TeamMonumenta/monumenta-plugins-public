@@ -527,7 +527,7 @@ public class WorldListener implements Listener {
 		List<Chunk> chunkList = LocationUtils.getSurroundingChunks(spawner, SPAWNER_BREAK_CHEST_CHECK_RADIUS);
 		int chests = 0;
 		for (Chunk chunk : chunkList) {
-			for (BlockState interestingBlock : chunk.getTileEntities()) {
+			for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST || b.getType() == Material.TRAPPED_CHEST, false)) {
 				if (ChestUtils.isUnscaledChest(interestingBlock.getBlock()) && LocationUtils.blocksAreWithinRadius(spawner, interestingBlock.getBlock(), SPAWNER_BREAK_CHEST_CHECK_RADIUS)) {
 					chests++;
 					List<Player> players = PlayerUtils.playersInLootScalingRange(spawner.getLocation());
