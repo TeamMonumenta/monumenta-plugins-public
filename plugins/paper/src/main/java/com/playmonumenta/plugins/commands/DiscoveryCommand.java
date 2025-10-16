@@ -82,7 +82,7 @@ public class DiscoveryCommand {
 						return;
 					}
 
-					Location location = nearest.mMarkerEntity.getLocation();
+					Location location = nearest.mLocation;
 					player.sendMessage(Component.text(String.format("Discovery with id %s is at [%s, %s, %s]", nearest.mId, MathUtil.round(location.x(), 2), MathUtil.round(location.y(), 2), MathUtil.round(location.z(), 2)), MESSAGE_COLOR)
 						.hoverEvent(HoverEvent.showText(Component.text("Click to teleport")))
 						.clickEvent(ClickEvent.runCommand(String.format("/tp %s %s %s", location.x(), location.y(), location.z()))));
@@ -167,7 +167,7 @@ public class DiscoveryCommand {
 							.executesPlayer((player, args) -> {
 								ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
 								if (discovery != null) {
-									discovery.mMarkerEntity.teleport((Location) args.getUnchecked("new location"));
+									discovery.teleport(args.getUnchecked("new location"));
 									player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
 								} else {
 									player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
@@ -182,7 +182,7 @@ public class DiscoveryCommand {
 							.executesPlayer((player, args) -> {
 								ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
 								if (discovery != null) {
-									discovery.mMarkerEntity.teleport(discovery.mMarkerEntity.getLocation().clone().add(args.getUnchecked("x"), args.getUnchecked("y"), args.getUnchecked("z")));
+									discovery.teleport(discovery.mLocation.clone().add(args.getUnchecked("x"), args.getUnchecked("y"), args.getUnchecked("z")));
 									player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
 								} else {
 									player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
@@ -262,7 +262,7 @@ public class DiscoveryCommand {
 									return;
 								}
 
-								discoveries.forEach(discovery -> discovery.mMarkerEntity.teleport((Location) args.getUnchecked("new location")));
+								discoveries.forEach(discovery -> discovery.teleport((Location) args.getUnchecked("new location")));
 
 								player.sendMessage(Component.text(String.format("Updated %s %s", discoveries.size(), discoveries.size() == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 							}),
@@ -281,7 +281,7 @@ public class DiscoveryCommand {
 									return;
 								}
 
-								discoveries.forEach(discovery -> discovery.mMarkerEntity.teleport(discovery.mMarkerEntity.getLocation().clone().add(args.getUnchecked("x"), args.getUnchecked("y"), args.getUnchecked("z"))));
+								discoveries.forEach(discovery -> discovery.teleport(discovery.mLocation.clone().add(args.getUnchecked("x"), args.getUnchecked("y"), args.getUnchecked("z"))));
 
 								player.sendMessage(Component.text(String.format("Updated %s %s", discoveries.size(), discoveries.size() == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 							})
@@ -318,7 +318,7 @@ public class DiscoveryCommand {
 						public void run() {
 							discoveries.forEach(discovery -> ParticleUtils.drawSevenSegmentNumber(
 								discovery.mId,
-								discovery.mMarkerEntity.getLocation().clone().add(0, 1.5, 0),
+								discovery.mLocation.clone().add(0, 1.5, 0),
 								player, 0.65, 0.5,
 								Particle.SCRAPE,
 								null));
@@ -585,15 +585,15 @@ public class DiscoveryCommand {
 	private static Component formatDiscoveryListElement(ItemDiscovery discovery) {
 		return formatDiscoveryListElement(
 			discovery.mId,
-			discovery.mMarkerEntity.getUniqueId().toString(),
+			discovery.mMarkerUUID.toString(),
 			discovery.mTier.name(),
 			discovery.mLootTablePath.getNamespace() + ":" + discovery.mLootTablePath.getKey(),
 			discovery.mOptionalFunctionPath == null ? "None" : (discovery.mOptionalFunctionPath.getNamespace() + ":" + discovery.mOptionalFunctionPath.getKey()),
 			ServerProperties.getShardName(),
-			discovery.mMarkerEntity.getWorld().getKey().asString(),
-			discovery.mMarkerEntity.getLocation().getX(),
-			discovery.mMarkerEntity.getLocation().getY(),
-			discovery.mMarkerEntity.getLocation().getZ(),
+			discovery.mWorldName,
+			discovery.mLocation.getX(),
+			discovery.mLocation.getY(),
+			discovery.mLocation.getZ(),
 			-1
 		);
 	}

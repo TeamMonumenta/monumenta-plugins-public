@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -64,13 +65,16 @@ public class DiscoveryManager implements Listener {
 	private static final ArrayList<ItemDiscovery> mActiveDiscoveries = new ArrayList<>();
 	private static final Map<UUID, List<Integer>> mPlayerDiscoveryData = new HashMap<>();
 
+	// fix for "already collected" message after collecting discovery
+	private static final String INTERACT_METAKEY = "DiscoveryManagerInteract";
+
 	public static void update() {
 		ArrayList<ItemDiscovery> invalidatedDiscoveries = new ArrayList<>();
 		for (ItemDiscovery discovery : mActiveDiscoveries) {
 			// ensure the discovery is valid before proceeding
-			if (discovery.mMarkerEntity.isValid()) {
+			if (discovery.getMarker() != null && discovery.getMarker().isValid()) {
 				// process what to show each nearby player
-				Collection<Player> nearbyPlayers = discovery.mMarkerEntity.getLocation().getNearbyPlayers(DISPLAY_RANGE);
+				Collection<Player> nearbyPlayers = discovery.getMarker().getLocation().getNearbyPlayers(DISPLAY_RANGE);
 				nearbyPlayers.removeIf(player -> !player.hasPermission(VIEW_PERMISSION));
 				List<Player> collectedPlayers = nearbyPlayers.stream().filter(nearbyPlayer -> getCollectedDiscoveries(nearbyPlayer).contains(discovery.mId)).toList();
 
@@ -145,7 +149,7 @@ public class DiscoveryManager implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entityRemoveFromWorld(EntityRemoveFromWorldEvent event) {
 		if (event.getEntity() instanceof Marker marker && marker.getScoreboardTags().contains(DISCOVERY_IDENTIFIER_TAG)) {
-			mActiveDiscoveries.removeIf(itemDiscovery -> itemDiscovery.mMarkerEntity.equals(marker));
+			mActiveDiscoveries.removeIf(itemDiscovery -> itemDiscovery.mMarkerUUID.equals(marker.getUniqueId()));
 		}
 	}
 
@@ -220,13 +224,14 @@ public class DiscoveryManager implements Listener {
 			Player player = event.getPlayer();
 
 			RayTraceResult result = player.getWorld().rayTraceEntities(player.getEyeLocation(), player.getLocation().getDirection(), 3, 0.5, entity -> entity instanceof Marker && entity.getScoreboardTags().contains(DISCOVERY_IDENTIFIER_TAG));
-			if (result != null && result.getHitEntity() instanceof Marker marker) {
+			if (result != null && result.getHitEntity() instanceof Marker marker
+				&& MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, INTERACT_METAKEY, 5)) {
 				if (!player.hasPermission(COLLECT_PERMISSION)) {
 					player.sendActionBar(Component.text("You cannot currently collect this", NamedTextColor.RED));
 					return;
 				}
 
-				Optional<ItemDiscovery> discoveryOptional = mActiveDiscoveries.stream().filter(discovery -> discovery.mMarkerEntity.equals(marker)).findFirst();
+				Optional<ItemDiscovery> discoveryOptional = mActiveDiscoveries.stream().filter(discovery -> discovery.mMarkerUUID.equals(marker.getUniqueId())).findFirst();
 				if (discoveryOptional.isPresent()) {
 					ItemDiscovery targetedDiscovery = discoveryOptional.get();
 
@@ -242,7 +247,7 @@ public class DiscoveryManager implements Listener {
 
 							if (targetedDiscovery.mOptionalFunctionPath != null) {
 								String command = String.format("execute in %s as %s at %s run function %s",
-									targetedDiscovery.mMarkerEntity.getWorld().getKey().asString(),
+									targetedDiscovery.mWorldName,
 									player.getUniqueId(),
 									marker.getUniqueId(),
 									targetedDiscovery.mOptionalFunctionPath);
@@ -254,7 +259,6 @@ public class DiscoveryManager implements Listener {
 							AdvancementUtils.grantAdvancement(player, "monumenta:handbook/money/discoveries");
 						}
 					} else {
-						// player has already collected discovery
 						player.sendActionBar(Component.text("You have already collected this", TextColor.color(117, 117, 117)));
 					}
 				} else {
@@ -307,7 +311,10 @@ public class DiscoveryManager implements Listener {
 	// returns whether the provided discovery was deleted
 	public static boolean removeDiscovery(ItemDiscovery discovery) {
 		boolean wasPresent = mActiveDiscoveries.remove(discovery);
-		discovery.mMarkerEntity.remove();
+		Marker marker = discovery.getMarker();
+		if (marker != null) {
+			marker.remove();
+		}
 		return wasPresent;
 	}
 
@@ -376,14 +383,14 @@ public class DiscoveryManager implements Listener {
 
 	// returns the discovery nearest to the provided location
 	public static @Nullable ItemDiscovery getNearestToLocation(Location location) {
-		List<ItemDiscovery> validDiscoveries = new ArrayList<>(mActiveDiscoveries);
+		List<ItemDiscovery> validDiscoveries = new ArrayList<>();
 		for (ItemDiscovery discovery : mActiveDiscoveries) {
-			if (discovery.mMarkerEntity.getWorld().equals(location.getWorld())) {
+			if (discovery.mWorldName.equals(location.getWorld().getKey().asString())) {
 				validDiscoveries.add(discovery);
 			}
 		}
 		if (!validDiscoveries.isEmpty()) {
-			validDiscoveries.sort(Comparator.comparingDouble(o -> o.mMarkerEntity.getLocation().distance(location)));
+			validDiscoveries.sort(Comparator.comparingDouble(o -> o.mLocation.distance(location)));
 			return validDiscoveries.get(0);
 		}
 
@@ -391,7 +398,7 @@ public class DiscoveryManager implements Listener {
 	}
 
 	public static List<ItemDiscovery> getDiscoveriesInRange(Location location, double range) {
-		return mActiveDiscoveries.stream().filter(discovery -> discovery.mMarkerEntity.getLocation().distance(location) < range).toList();
+		return mActiveDiscoveries.stream().filter(discovery -> discovery.mLocation.distance(location) < range).toList();
 	}
 
 	// returns a list of all loaded discoveries with the provided id
@@ -422,7 +429,7 @@ public class DiscoveryManager implements Listener {
 	// attempt to update the matching entry in the json list
 	// should be executed async
 	private static void updateJsonList(ItemDiscovery discovery) {
-		String uuid = discovery.mMarkerEntity.getUniqueId().toString();
+		String uuid = discovery.mMarkerUUID.toString();
 		RedisAPI.getInstance().async().hset(getRedisStorageKey(), uuid, discovery.toJson().toString()).toCompletableFuture().join();
 	}
 
