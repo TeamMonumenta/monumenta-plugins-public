@@ -170,11 +170,12 @@ public class GuildInviteCommand {
 						default -> inviter.sendMessage(Component.text("Uninvited " + invitedName + " from ", NamedTextColor.GOLD)
 							.append(guildComponent));
 					}
-					if (!inviteLevel.equals(GuildInviteLevel.NONE)) {
-						AuditListener.logPlayer("[Guild] Sent invite - inviter=" + inviter.getName()
+					AuditListener.logPlayer(
+						"[Guild] Sent invite - inviter=" + inviter.getName()
 							+ ", invited=" + invitedName
-							+ ", guild=" + MessagingUtils.plainText(guildComponent));
-					}
+							+ ", guild=" + MessagingUtils.plainText(guildComponent)
+							+ ", level=" + inviteLevel.mArgument
+					);
 				});
 			} catch (Exception ex) {
 				Bukkit.getScheduler().runTask(plugin, () -> {
