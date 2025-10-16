@@ -52,9 +52,9 @@ public class Versatile extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Gain ")
 			.addPercent(DAMAGE_MULTIPLY_MELEE)
-			.add(" of your % Projectile Damage as Attack Damage and ")
+			.add(" of your % Projectile Damage as Class Attack Damage and ")
 			.addPercent(DAMAGE_MULTIPLY_PROJ)
-			.add(" of your % Attack Damage as Projectile Damage.");
+			.add(" of your % Attack Damage as Class Projectile Damage.");
 	}
 
 }

@@ -42,22 +42,22 @@ public enum DelvesModifier {
 	CHRONOLOGY(19, null, createIcon(Material.CLOCK, Component.text("Chronology", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Chronology.DESCRIPTION), Chronology::rankDescription, 25, 5),
 	RIFTBORN(20, null, createIcon(Material.END_PORTAL_FRAME, Component.text("Riftborn", NamedTextColor.DARK_BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Riftborn.DESCRIPTION), Riftborn::rankDescription, 26, 5),
 	HAUNTED(21, null, createIcon(Material.CARVED_PUMPKIN, Component.text("Haunted", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Haunted.DESCRIPTION), Haunted::rankDescription, 27, 5),
+	IDOLATRY(22, null, createIcon(Material.TOTEM_OF_UNDYING, Component.text("Idolatry", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Idolatry.DESCRIPTION), Idolatry::rankDescription, 28, 5),
 	// Keep experimental modifiers after here
-	CHANCECUBES(22, null, createIcon(Material.GOLD_BLOCK, Component.text("Chance Cubes", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), ChanceCubes.DESCRIPTION), ChanceCubes::rankDescription, 28, 6),
-	BERSERK(23, null, createIcon(Material.REDSTONE, Component.text("Berserk", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Berserk.DESCRIPTION), Berserk::rankDescription, 29, 5),
-	HEALCUT(24, null, createIcon(Material.ROTTEN_FLESH, Component.text("Rot", NamedTextColor.DARK_GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), HealCut.DESCRIPTION), HealCut::rankDescription, 30, 3),
-	GRAVITY(25, null, createIcon(Material.APPLE, Component.text("Gravity", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Gravity.DESCRIPTION), Gravity::rankDescription, 31, 5),
-	REGENERATING(26, Regenerating::applyModifiers, createIcon(Material.FIRE_CORAL_FAN, Component.text("Regenerating", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Regenerating.DESCRIPTION), Regenerating::rankDescription, 32, 1),
-	BLOODLUST(27, Bloodlust::applyModifiers, createIcon(Material.ROTTEN_FLESH, Component.text("Bloodlust", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Bloodlust.DESCRIPTION), Bloodlust::rankDescription, 33, 1),
-	CLOAKED(28, Cloaked::applyModifiers, createIcon(Material.PHANTOM_MEMBRANE, Component.text("Cloaked", NamedTextColor.GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Cloaked.DESCRIPTION), Cloaked::rankDescription, 34, 3),
-	IDOLATRY(29, null, createIcon(Material.TOTEM_OF_UNDYING, Component.text("Idolatry", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Idolatry.DESCRIPTION), Idolatry::rankDescription, 35, 1),
-	BOUNTIFUL(30, null, createIcon(Material.GOAT_HORN, Component.text("Bountiful", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Bountiful.DESCRIPTION), Bountiful::rankDescription, 36, 5);
+	CHANCECUBES(201, null, createIcon(Material.GOLD_BLOCK, Component.text("Chance Cubes", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), ChanceCubes.DESCRIPTION), ChanceCubes::rankDescription, 28, 6),
+	BERSERK(202, null, createIcon(Material.REDSTONE, Component.text("Berserk", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Berserk.DESCRIPTION), Berserk::rankDescription, 29, 5),
+	HEALCUT(203, null, createIcon(Material.ROTTEN_FLESH, Component.text("Rot", NamedTextColor.DARK_GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), HealCut.DESCRIPTION), HealCut::rankDescription, 30, 3),
+	GRAVITY(204, null, createIcon(Material.APPLE, Component.text("Gravity", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Gravity.DESCRIPTION), Gravity::rankDescription, 31, 5),
+	REGENERATING(205, Regenerating::applyModifiers, createIcon(Material.FIRE_CORAL_FAN, Component.text("Regenerating", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Regenerating.DESCRIPTION), Regenerating::rankDescription, 32, 1),
+	BLOODLUST(206, Bloodlust::applyModifiers, createIcon(Material.ROTTEN_FLESH, Component.text("Bloodlust", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Bloodlust.DESCRIPTION), Bloodlust::rankDescription, 33, 1),
+	CLOAKED(207, Cloaked::applyModifiers, createIcon(Material.PHANTOM_MEMBRANE, Component.text("Cloaked", NamedTextColor.GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Cloaked.DESCRIPTION), Cloaked::rankDescription, 34, 3),
+	BOUNTIFUL(208, null, createIcon(Material.GOAT_HORN, Component.text("Bountiful", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Bountiful.DESCRIPTION), Bountiful::rankDescription, 36, 5);
 
 
 	private static final List<DelvesModifier> DEATH_TRIGGER_MODIFIERS = List.of(SPECTRAL, DREADFUL, BLOODLUST);
-	private static final List<DelvesModifier> ROTATING_DELVE_MODIFIERS = List.of(ASSASSINS, ASTRAL, UNYIELDING, CHRONOLOGY, RIFTBORN, HAUNTED, FRAGILE);
+	private static final List<DelvesModifier> ROTATING_DELVE_MODIFIERS = List.of(ASSASSINS, ASTRAL, UNYIELDING, CHRONOLOGY, RIFTBORN, HAUNTED, FRAGILE, IDOLATRY);
 	private static final List<DelvesModifier> SPAWN_TRIGGER_MODIFIERS = List.of(ARCANIC, INFERNAL, TRANSCENDENT, CHIVALROUS, BLOODTHIRSTY, PERNICIOUS, LEGIONARY, CARAPACE, TWISTED, ASSASSINS, VENGEANCE, UNYIELDING, REGENERATING, CLOAKED, IDOLATRY);
-	private static final List<DelvesModifier> EXPERIMENTAL_DELVE_MODIFIERS = List.of(CHANCECUBES, BERSERK, HEALCUT, GRAVITY, REGENERATING, BLOODLUST, CLOAKED, IDOLATRY, BOUNTIFUL);
+	private static final List<DelvesModifier> EXPERIMENTAL_DELVE_MODIFIERS = List.of(CHANCECUBES, BERSERK, HEALCUT, GRAVITY, REGENERATING, BLOODLUST, CLOAKED, BOUNTIFUL);
 	private static final List<DelvesModifier> VARIANT_MODIFIERS = List.of(TWISTED_TORMENTED);
 
 	private final int mIndex;

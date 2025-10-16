@@ -76,7 +76,7 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.BERSERK, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.HEALCUT, 2);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.GRAVITY, 1);
-		MODIFIER_RANK_CAPS.put(DelvesModifier.IDOLATRY, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.IDOLATRY, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.REGENERATING, 3);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.BLOODLUST, 4);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.BOUNTIFUL, 1);
@@ -140,6 +140,8 @@ public class DelvesUtils {
 		return switch ((int) DateUtils.getWeeklyVersion()) {
 			// week starting Friday, August 8, 2025
 			case 2902, 2903, 2904, 2905, 2906 -> List.of(experimentalMods.get(6), experimentalMods.get(7));
+			// week starting Friday, October 10, 2025
+			case 2911, 2912, 2913, 2914 -> List.of(experimentalMods.get(5));
 			default -> Collections.emptyList();
 		};
 	}

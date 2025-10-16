@@ -16,7 +16,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class SpellBarrier extends Spell {
-	public static final double CARAPACE_DAMAGE_MODIFIER = 1.3;
 
 	@FunctionalInterface
 	public interface RefreshBarrierAction {
@@ -57,6 +56,7 @@ public class SpellBarrier extends Spell {
 	private final RefreshBarrierAction mRefreshAction;
 	private final BarrierRunningAmbientAction mRunningAmbientAction;
 	private final BreakBarrierAction mBreakAction;
+	private final double mCarapaceDamageModifier;
 
 	private int mCurrentHits = 0;
 	private boolean mActive = false;
@@ -65,6 +65,12 @@ public class SpellBarrier extends Spell {
 	public SpellBarrier(final Plugin plugin, final LivingEntity boss, final int detectionRadius, final int rechargeTime,
 						final int hitsToBreak, final boolean isCarapace, final RefreshBarrierAction refreshAction,
 						final BarrierRunningAmbientAction ambientRunningAction, final BreakBarrierAction breakAction) {
+		this(plugin, boss, detectionRadius, rechargeTime, hitsToBreak, isCarapace, refreshAction, ambientRunningAction, breakAction, 1.3);
+	}
+
+	public SpellBarrier(final Plugin plugin, final LivingEntity boss, final int detectionRadius, final int rechargeTime,
+						final int hitsToBreak, final boolean isCarapace, final RefreshBarrierAction refreshAction,
+						final BarrierRunningAmbientAction ambientRunningAction, final BreakBarrierAction breakAction, final double carapaceDamageModifier) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mActivationRadius = detectionRadius;
@@ -74,6 +80,7 @@ public class SpellBarrier extends Spell {
 		mRefreshAction = refreshAction;
 		mRunningAmbientAction = ambientRunningAction;
 		mBreakAction = breakAction;
+		mCarapaceDamageModifier = carapaceDamageModifier;
 	}
 
 	@Override
@@ -136,7 +143,7 @@ public class SpellBarrier extends Spell {
 	@Override
 	public void onDamage(final DamageEvent event, final LivingEntity damagee) {
 		if (mActive && mIsCarapace) {
-			event.setFlatDamage(event.getFlatDamage() * CARAPACE_DAMAGE_MODIFIER);
+			event.setFlatDamage(event.getFlatDamage() * mCarapaceDamageModifier);
 		}
 	}
 

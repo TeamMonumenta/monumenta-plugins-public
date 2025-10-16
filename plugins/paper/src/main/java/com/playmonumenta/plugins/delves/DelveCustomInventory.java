@@ -83,9 +83,7 @@ public class DelveCustomInventory extends CustomInventory {
 				 .decoration(TextDecoration.ITALIC, false),
 		new String[] {
 			"Some of these modifiers are randomly available each week.",
-			"Selecting at least one will result in increased XP, ",
-			"depending on the level of the modifier relative to maximum, ",
-			"capping at 25%."
+			"Selecting at least one will result in 25% increased XP."
 		}
 	);
 	private static final ItemStack EXPERIMENTAL_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(
@@ -676,7 +674,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 				// Editing the entropy mod at all should mean
 				// that existing already rolled mods are left
-				// on purposefully and you want more random rolls
+				// on purposefully, and you want more random rolls
 				if (mod == DelvesModifier.ENTROPY) {
 					mAlreadyRolledEntropy = 0;
 				}

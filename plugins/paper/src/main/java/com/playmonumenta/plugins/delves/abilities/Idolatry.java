@@ -17,7 +17,7 @@ import org.bukkit.entity.Entity;
 
 public class Idolatry {
 
-	private static final double SPAWN_CHANCE_PER_LEVEL = 0.03;
+	private static final double SPAWN_CHANCE_PER_LEVEL = 0.15;
 	private static final LoSPool IDOLATRY_POOL = new LoSPool.LibraryPool("~Idolatry");
 	public static final String DESCRIPTION = "Spawners have a chance of spawning an immobile Idol.";
 

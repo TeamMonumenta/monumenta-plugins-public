@@ -46,6 +46,9 @@ public final class BarrierBoss extends BossAbilityGroup {
 		public SoundsList SOUND_BREAK = SoundsList.builder()
 			.add(new SoundsList.CSound(Sound.ITEM_SHIELD_BREAK, 1.0f, 1.0f))
 			.build();
+
+		@BossParam(help = "If IS_CARAPACE is true, launcher gains this much damage buff on attacks while the barrier is active. Default 1.3 -> +30% damage buff.")
+		public double CARAPACE_DAMAGE_MODIFIER = 1.3;
 	}
 
 	public BarrierBoss(final Plugin plugin, final LivingEntity boss) {
@@ -56,7 +59,8 @@ public final class BarrierBoss extends BossAbilityGroup {
 			p.IS_CARAPACE,
 			(Location loc) -> p.SOUND_REFRESH.play(loc),
 			(Location loc) -> p.PARTICLE.spawn(mBoss, loc, 0, 1, 0),
-			(Location loc) -> p.SOUND_BREAK.play(loc)));
+			(Location loc) -> p.SOUND_BREAK.play(loc),
+			p.CARAPACE_DAMAGE_MODIFIER));
 		super.constructBoss(SpellManager.EMPTY, passives, p.DETECTION, null);
 	}
 }
