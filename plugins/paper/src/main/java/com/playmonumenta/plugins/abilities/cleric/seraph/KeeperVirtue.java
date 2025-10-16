@@ -69,6 +69,7 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 	private static final int VIRTUE_VULN_DURATION = 4 * 20;
 	private static final int VIRTUE_HEALTH_1 = 30;
 	private static final int VIRTUE_HEALTH_2 = 35;
+	private static final int VIRTUE_MINIMUM_HEALS = 5;
 
 	public static final String CHARM_DAMAGE = "Keeper Virtue Damage";
 	public static final String CHARM_ATTACK_DELAY = "Keeper Virtue Attack Delay";
@@ -126,6 +127,7 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 	private final double mVulnAmplifier;
 	private final int mVulnDuration;
 	private final double mHealth;
+	private final int mMinimumHeals;
 	private final int mCooldown;
 	private final KeeperVirtueCS mCosmetic;
 
@@ -148,6 +150,7 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 		mVulnAmplifier = isLevelTwo() ? VIRTUE_VULN + CharmManager.getLevelPercentDecimal(player, CHARM_VULN) : 0;
 		mVulnDuration = CharmManager.getDuration(player, CHARM_VULN_DURATION, VIRTUE_VULN_DURATION);
 		mHealth = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEALTH, isLevelOne() ? VIRTUE_HEALTH_1 : VIRTUE_HEALTH_2);
+		mMinimumHeals = VIRTUE_MINIMUM_HEALS;
 		mCooldown = CharmManager.getDuration(player, CHARM_COOLDOWN, VIRTUE_COOLDOWN);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new KeeperVirtueCS());
@@ -201,7 +204,7 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 			cancelOnDeath(new BukkitRunnable() {
 				int mTicksElapsed = 0;
 				double mRadian = FastUtils.randomDoubleInRange(0, Math.PI);
-
+				int mHeals = 0;
 				@Override
 				public void run() {
 					if (mBoss == null || !mBoss.isValid() || !mPlayer.isValid() || !mPlayer.isOnline() || mBoss.getWorld() != mPlayer.getWorld()) {
@@ -242,6 +245,7 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 								mBoss.setTarget(randomPlayer);
 								mTarget = randomPlayer;
 								playerVirtueMap.put(mBoss, randomPlayer);
+								mHeals = 0;
 							}
 						}
 						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(pLoc, mDetectionRange, mBoss);
@@ -290,11 +294,12 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 							if (mMode == VirtueMode.ACTIVE_COMBAT) {
 								mBoss.attack(mTarget);
 							} else if (mMode == VirtueMode.ACTIVE_SUPPORT && mTarget instanceof Player player && playerVirtueMap.get(mBoss) == player) {
-								keeperVirtueBoss.healPlayer(player);
-								if (player.getHealth() >= EntityUtils.getMaxHealth(player) * mHealUpperThreshold) {
+								mHeals += keeperVirtueBoss.healPlayer(player);
+								if (player.getHealth() >= EntityUtils.getMaxHealth(player) * mHealUpperThreshold && (mHeals >= mMinimumHeals || player.getHealth() >= EntityUtils.getMaxHealth(player))) {
 									mBoss.setTarget(null);
 									mTarget = null;
 									playerVirtueMap.remove(mBoss);
+									mHeals = 0;
 								}
 							}
 						}
@@ -415,7 +420,7 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 			.add(a -> a.mRegeneration, VIRTUE_REGENERATION)
 			.add(" health every 0.5s and grants you ")
 			.addPercent(a -> a.mSpeedAmplifier, VIRTUE_SPEED)
-			.add(" speed. It can be healed by Hallowed Beam at any time. ")
+			.add(" speed. You can heal it with Hallowed Beam at any time. ")
 			.addTrigger(2)
 			.add(" to toggle it active, making it seek out players within ")
 			.add(a -> a.mDetectionRange, VIRTUE_DETECTION_RANGE)
@@ -425,17 +430,19 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 			.addPercent(a -> a.mHealing, VIRTUE_HEALING)
 			.add(" of their max health every ")
 			.addDuration(a -> a.mHealDelay, VIRTUE_HEAL_DELAY)
-			.add("s until they're up to ")
+			.add("s at least ")
+			.add(a -> a.mMinimumHeals, VIRTUE_MINIMUM_HEALS)
+			.add(" times and until they're up to ")
 			.addPercent(a -> a.mHealUpperThreshold, VIRTUE_HEAL_UPPER_THRESHOLD)
 			.add(" or higher, draining ")
 			.add(a -> a.mHealDrain, VIRTUE_HEAL_DRAIN)
-			.add(" health per heal. If there are no players to heal, it instead seeks out Heretics, dealing R2: " + VIRTUE_DAMAGE_R2 + " / R3: ")
+			.add(" of its health per heal. If no players are found, it instead seeks out Heretics, dealing R2: " + VIRTUE_DAMAGE_R2 + " / R3: ")
 			.add(a -> ServerProperties.getAbilityEnhancementsEnabled(a.mPlayer) ? a.mDamage : VIRTUE_DAMAGE_R3, VIRTUE_DAMAGE_R3)
 			.add(" magic damage to them and draining ")
 			.add(a -> a.mAttackDrain, VIRTUE_ATTACK_DRAIN)
 			.add(" health every ")
 			.addDuration(a -> a.mAttackDelay, VIRTUE_ATTACK_DELAY)
-			.add("s. The Virtue regenerates half as much while active and without a target. If the Virtue dies, it respawns after ")
+			.add("s. The Virtue regenerates half as much while active with no target. If the Virtue dies, it respawns after ")
 			.addDuration(a -> a.mCooldown, VIRTUE_COOLDOWN)
 			.add("s.");
 	}

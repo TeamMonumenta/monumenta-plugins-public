@@ -41,7 +41,7 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 
 	private static final double RADIUS = 4;
 	private static final int FIRE_DURATION = Constants.TICKS_PER_SECOND * 3;
-	private static final int COOLDOWN = Constants.TICKS_PER_SECOND * 20;
+	private static final int COOLDOWN = Constants.TICKS_PER_SECOND * 18;
 	private static final float KNOCKBACK_SPEED = 0.55f;
 
 	public static final String CHARM_DAMAGE = "Luminous Infusion Damage";

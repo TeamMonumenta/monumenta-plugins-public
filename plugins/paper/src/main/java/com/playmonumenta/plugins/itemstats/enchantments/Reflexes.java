@@ -29,6 +29,7 @@ public class Reflexes implements Enchantment {
 		ClassAbility.CRYSTALLINE_COMBOS,
 		ClassAbility.SANCTIFIED_ARMOR,
 		ClassAbility.ILLUMINATE_DOT,
+		ClassAbility.KEEPER_VIRTUE,
 		ClassAbility.BRUTE_FORCE,
 		ClassAbility.BRUTE_FORCE_AOE,
 		ClassAbility.HUNTING_COMPANION,

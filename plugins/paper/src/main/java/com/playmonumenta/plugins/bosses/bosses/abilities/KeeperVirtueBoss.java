@@ -75,9 +75,9 @@ public class KeeperVirtueBoss extends BossAbilityGroup {
 		attack(damagee);
 	}
 
-	public void healPlayer(Player player) {
+	public int healPlayer(Player player) {
 		if (mPlayer == null || Bukkit.getCurrentTick() - mHealDelay < mLastHealTick) {
-			return;
+			return 0;
 		}
 		Location loc = mBoss.getEyeLocation();
 		PlayerUtils.healPlayer(com.playmonumenta.plugins.Plugin.getInstance(), player, mHealing * EntityUtils.getMaxHealth(player), mPlayer);
@@ -99,6 +99,7 @@ public class KeeperVirtueBoss extends BossAbilityGroup {
 			mBoss.setHealth(mBoss.getHealth() - mHealDrain);
 		}
 		ClientModHandler.updateAbility(mPlayer, ClassAbility.KEEPER_VIRTUE);
+		return 1;
 	}
 
 	public void attack(LivingEntity damagee) {

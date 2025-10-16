@@ -458,7 +458,7 @@ public class BossUtils {
 			Plugin.getInstance().mEffectManager.addEffect(player, BOSS_WIN_RESISTANCE,
 				new PercentDamageReceived(winEffectDuration, -1.0));
 			Plugin.getInstance().mEffectManager.addEffect(player, BOSS_WIN_REGENERATION,
-				new CustomRegeneration(winEffectDuration, 1, REGENERATION_INTERVAL, null, Plugin.getInstance()));
+				new CustomRegeneration(winEffectDuration, 1, REGENERATION_INTERVAL, null, false, Plugin.getInstance()));
 			SongManager.stopSong(player, true);
 		}
 	}

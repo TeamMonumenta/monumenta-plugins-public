@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -13,6 +12,8 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.Unwavering;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.DivineJusticeCS;
+import com.playmonumenta.plugins.effects.CustomRegeneration;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -39,13 +40,12 @@ import org.jetbrains.annotations.Nullable;
 public class DivineJustice extends Ability implements AbilityWithChargesOrStacks, AbilityWithDuration {
 	public static final String NAME = "Divine Justice";
 	public static final ClassAbility ABILITY = ClassAbility.DIVINE_JUSTICE;
-	private static final int MOB_EFFECT_DURATION = (int) (Constants.TICKS_PER_SECOND * 1.5);
 
 	public static final int DAMAGE_1 = 2;
 	public static final int DAMAGE_2 = 3;
 	public static final double DAMAGE_MULTIPLIER_1 = 0.15;
 	public static final double DAMAGE_MULTIPLIER_2 = 0.3;
-	public static final double HEALING_MULTIPLIER_OWN = 0.1;
+	public static final double HEALING_MULTIPLIER_OWN = 0.05;
 	public static final double HEALING_MULTIPLIER_OTHER = 0.05;
 	public static final int RADIUS = 12;
 	public static final double ENHANCEMENT_BONUS_DAMAGE = 0.2;
@@ -65,13 +65,13 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.scoreboardId("DivineJustice")
 			.shorthandName("DJ")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Deal extra damage on critical melee or projectile attacks against Heretics and heal yourself and nearby players when killing them.")
+			.simpleDescription("Deal extra damage on critical melee or projectile attacks against Heretics, and heal yourself and nearby players when killing them.")
 			.displayItem(Material.IRON_SWORD);
 
 	public final DivineJusticeCS mCosmetic;
 
 	private final double mDamage;
-	private final double mPercentDamage;
+	private double mPercentDamage = isLevelOne() ? DAMAGE_MULTIPLIER_1 : DAMAGE_MULTIPLIER_2;
 	private final double mSelfHeal;
 	private final double mAllyHeal;
 	private final double mRadius;
@@ -89,8 +89,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	public DivineJustice(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mPercentDamage = isLevelOne() ? DAMAGE_MULTIPLIER_1 : DAMAGE_MULTIPLIER_2;
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mSelfHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF, HEALING_MULTIPLIER_OWN);
 		mAllyHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, HEALING_MULTIPLIER_OTHER);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_HEAL_RADIUS, RADIUS);
@@ -99,10 +98,16 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 		mComboTimer = CharmManager.getDuration(player, CHARM_ENHANCE_COMBO_TIMER, ENHANCEMENT_COMBO_TIMER);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new DivineJusticeCS());
 
-		Bukkit.getScheduler().runTask(plugin,
-			() -> mUnwavering = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Unwavering.class));
-		Bukkit.getScheduler().runTask(plugin,
-			() -> mRejuvenation = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Rejuvenation.class));
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mUnwavering = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Unwavering.class);
+			mRejuvenation = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Rejuvenation.class);
+			if (mUnwavering != null) {
+				mPercentDamage += mUnwavering.getDJBonus();
+			} else if (mRejuvenation != null) {
+				mPercentDamage += mRejuvenation.getDJBonus();
+			}
+			mPercentDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, mPercentDamage);
+		});
 	}
 
 	@Override
@@ -129,10 +134,6 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			&& EntityUtils.isAbilityTriggeringProjectile(projectile, true)
 			&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
 
-			if (isMeleeCrit) {
-				// Mark the tick on melee too for on-kill healing
-				MetadataUtils.markThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName());
-			}
 			mCosmetic.justiceOnDamage(mPlayer, enemy, mPlayer.getWorld(), enemy.getLocation(), PartialParticle.getWidthDelta(enemy) * 1.5, mComboNumber, isEnhanced());
 
 			if (mComboNumber == 0 || mComboRunnable != null) {
@@ -186,10 +187,23 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent entityDeathEvent, boolean dropsLoot) {
-		if (Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity()) && isLevelTwo() && MetadataUtils.happenedInRecentTicks(entityDeathEvent.getEntity(), "DivineJustice" + mPlayer.getName(), MOB_EFFECT_DURATION)) {
-			PlayerUtils.healPlayer(mPlugin, mPlayer, EntityUtils.getMaxHealth(mPlayer) * mSelfHeal);
+		if (Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity()) && isLevelTwo()) {
+			int duration1 = 20;
+			@Nullable Effect djEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, "DivineJusticeSelfHealing");
+			if (djEffect != null && djEffect.getDuration() > 0) {
+				duration1 = Math.min(duration1 + djEffect.getDuration(), 3 * 20);
+			}
+			mPlugin.mEffectManager.addEffect(mPlayer, "DivineJusticeSelfHealing", new CustomRegeneration(duration1, EntityUtils.getMaxHealth(mPlayer) * mSelfHeal * 5 / 20, 5, mPlayer, true, mPlugin));
+
 			final List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, mRadius, true);
-			players.forEach(otherPlayer -> PlayerUtils.healPlayer(mPlugin, otherPlayer, EntityUtils.getMaxHealth(otherPlayer) * mAllyHeal, mPlayer));
+			players.forEach(otherPlayer -> {
+				int duration2 = 20;
+				@Nullable Effect djEffect2 = mPlugin.mEffectManager.getActiveEffect(otherPlayer, "DivineJusticeAllyHealing");
+				if (djEffect2 != null && djEffect2.getDuration() > 0) {
+					duration2 = Math.min(duration2 + djEffect2.getDuration(), 3 * 20);
+				}
+				mPlugin.mEffectManager.addEffect(otherPlayer, "DivineJusticeAllyHealing", new CustomRegeneration(duration2, EntityUtils.getMaxHealth(otherPlayer) * mAllyHeal * 5 / 20, 5, mPlayer, true, mPlugin));
+			});
 
 			players.add(mPlayer);
 			mCosmetic.justiceKill(mPlayer, entityDeathEvent.getEntity().getLocation());
@@ -199,16 +213,9 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	}
 
 	public double calculateDamage(final DamageEvent event, final boolean isMeleeCrit) {
-		double percentDamage = mPercentDamage;
-		if (mUnwavering != null) {
-			percentDamage += mUnwavering.getDJBonus();
-		} else if (mRejuvenation != null) {
-			percentDamage += mRejuvenation.getDJBonus();
-		}
 		final boolean weaponHasCumbersome = ItemStatUtils.hasEnchantment(mPlayer.getInventory().getItemInMainHand(), EnchantmentType.CUMBERSOME);
-		double combinedDamage = mDamage + event.getFlatDamage() * (event.getType() == DamageType.MELEE ? mPlugin.mItemStatManager.getAttributeAmount(mPlayer, AttributeType.ATTACK_DAMAGE_MULTIPLY) * (isMeleeCrit && !weaponHasCumbersome ? CritScaling.CRIT_BONUS : 1.0) : mPlugin.mItemStatManager.getAttributeAmount(mPlayer, AttributeType.PROJECTILE_DAMAGE_MULTIPLY)) *
-			Math.max(percentDamage, 0.0);
-		return CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, combinedDamage);
+		return mDamage + event.getFlatDamage() * (event.getType() == DamageType.MELEE ? mPlugin.mItemStatManager.getAttributeAmount(mPlayer, AttributeType.ATTACK_DAMAGE_MULTIPLY) * (isMeleeCrit && !weaponHasCumbersome ? CritScaling.CRIT_BONUS : 1.0) : mPlugin.mItemStatManager.getAttributeAmount(mPlayer, AttributeType.PROJECTILE_DAMAGE_MULTIPLY)) *
+			Math.max(mPercentDamage, 0.0);
 	}
 
 	private static Description<DivineJustice> getDescription1() {
@@ -226,15 +233,11 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
 			.add(" + ")
 			.addPercent(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(" of your base critical damage. Additionally, killing a Heretic that you have damaged with Divine Justice within the last ")
-			.addDuration(MOB_EFFECT_DURATION)
-			.add(" seconds heals you for ")
-			.addPercent(a -> a.mSelfHeal, HEALING_MULTIPLIER_OWN)
-			.add(" of your max health and heals players within ")
+			.add(" of your base critical damage. Additionally, whenever you kill a Heretic, you and players within ")
 			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks of you for ")
-			.addPercent(a -> a.mAllyHeal, HEALING_MULTIPLIER_OTHER)
-			.add(" of their max health.");
+			.add(" blocks of you regenerate ")
+			.addPercent(a -> a.mSelfHeal, HEALING_MULTIPLIER_OWN)
+			.add(" of their max health over 1 second. Duration stacks on kill up to 3 seconds.");
 	}
 
 	private static Description<DivineJustice> getDescriptionEnhancement() {

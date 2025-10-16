@@ -18,6 +18,7 @@ public class CustomRegeneration extends Effect {
 	private final int mInterval;
 	private final @Nullable Player mSourcePlayer;
 	private final Plugin mPlugin;
+	private final boolean mNormalizedDisplay;
 
 	private int mTicks;
 
@@ -26,16 +27,17 @@ public class CustomRegeneration extends Effect {
 	}
 
 	public CustomRegeneration(int duration, double amount, @Nullable Player sourcePlayer, Plugin plugin) {
-		this(duration, amount, 20, sourcePlayer, plugin);
+		this(duration, amount, 20, sourcePlayer, false, plugin);
 	}
 
-	public CustomRegeneration(int duration, double amount, int interval, @Nullable Player sourcePlayer, Plugin plugin) {
+	public CustomRegeneration(int duration, double amount, int interval, @Nullable Player sourcePlayer, boolean normalizedDisplay, Plugin plugin) {
 		super(duration, effectID);
 		mAmount = amount;
 		mSourcePlayer = sourcePlayer;
 		mPlugin = plugin;
 		mInterval = interval;
 		mTicks = Bukkit.getCurrentTick() % interval;
+		mNormalizedDisplay = normalizedDisplay;
 	}
 
 	@Override
@@ -64,6 +66,7 @@ public class CustomRegeneration extends Effect {
 		object.addProperty("duration", mDuration);
 		object.addProperty("amount", mAmount);
 		object.addProperty("interval", mInterval);
+		object.addProperty("normalizedDisplay", mNormalizedDisplay);
 
 		if (mSourcePlayer != null) {
 			object.addProperty("sourcePlayer", mSourcePlayer.getUniqueId().toString());
@@ -76,13 +79,14 @@ public class CustomRegeneration extends Effect {
 		int duration = object.get("duration").getAsInt();
 		double amount = object.get("amount").getAsDouble();
 		int interval = object.has("interval") ? object.get("interval").getAsInt() : 20;
+		boolean simplifiedDisplay = object.has("normalizedDisplay") && object.get("normalizedDisplay").getAsBoolean();
 
 		@Nullable Player sourcePlayer = null;
 		if (object.has("sourcePlayer")) {
 			sourcePlayer = plugin.getPlayer(UUID.fromString(object.get("sourcePlayer").getAsString()));
 		}
 
-		return new CustomRegeneration(duration, amount, interval, sourcePlayer, plugin);
+		return new CustomRegeneration(duration, amount, interval, sourcePlayer, simplifiedDisplay, plugin);
 	}
 
 	@Override
@@ -92,13 +96,13 @@ public class CustomRegeneration extends Effect {
 
 	@Override
 	public @Nullable Component getSpecificDisplay() {
-		return Component.text("+" + StringUtils.to2DP(mAmount) + " " + getDisplayedName());
+		return Component.text("+" + StringUtils.to2DP(mNormalizedDisplay ? mAmount / mInterval * 20 : mAmount) + getDisplayedName());
 	}
 
 	@Override
 	public @Nullable String getDisplayedName() {
-		String time = mInterval == 20 ? "Second" : StringUtils.ticksToSeconds(mInterval) + " Seconds";
-		return "Regeneration Per " + time;
+		String time = mNormalizedDisplay || mInterval == 20 ? "s" : StringUtils.ticksToSeconds(mInterval) + "s";
+		return "/" + time + " Regeneration";
 	}
 
 	@Override

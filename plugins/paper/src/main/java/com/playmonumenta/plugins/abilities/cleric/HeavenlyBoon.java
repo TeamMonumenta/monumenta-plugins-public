@@ -58,7 +58,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private static final double HEAVENLY_BOON_RADIUS = 12;
 	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0;
 	private static final double ENHANCEMENT_CDR = 0.05;
-	private static final int ENHANCEMENT_CDR_CAP = 15;
+	private static final int ENHANCEMENT_CDR_CAP = 1 * 20;
 	private static final int BOSS_DAMAGE_THRESHOLD_R1 = 100;
 	private static final int BOSS_DAMAGE_THRESHOLD_R2 = 200;
 	private static final int BOSS_DAMAGE_THRESHOLD_R3 = 300;

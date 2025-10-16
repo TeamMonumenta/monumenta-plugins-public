@@ -424,7 +424,7 @@ public class SpellDimensionDoor extends Spell {
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, PercentDamageReceived.GENERIC_NAME,
 							new PercentDamageReceived(20 * 5, -1.0));
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, CustomRegeneration.effectID,
-							new CustomRegeneration(20 * 5, 1.0, 25, null, com.playmonumenta.plugins.Plugin.getInstance()));
+							new CustomRegeneration(20 * 5, 1.0, 25, null, false, com.playmonumenta.plugins.Plugin.getInstance()));
 
 						p.sendMessage(Component.text("Something feels different. The shadows aren't clinging to me anymore.", NamedTextColor.AQUA));
 					} else {

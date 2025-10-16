@@ -40,6 +40,7 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -136,7 +137,7 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 		mAscensionOrbRadius = CharmManager.getRadius(player, CHARM_RADIUS, ASCENSION_ORB_RADIUS);
 		mAscensionOrbTravelSpeed = CharmManager.calculateFlatAndPercentValue(player, CHARM_TRAVEL_SPEED, ASCENSION_ORB_TRAVEL_SPEED);
 		mAscensionOrbKnockback = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_KNOCKBACK, 1);
-		mAscensionOrbDamageBonus = CharmManager.getExtraPercent(player, CHARM_DAMAGE_BONUS, ASCENSION_ORB_DAMAGE_BONUS);
+		mAscensionOrbDamageBonus = ASCENSION_ORB_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE_BONUS);
 		mAscensionOrbHaste = ASCENSION_ORB_HASTE + (int) CharmManager.getLevel(player, CHARM_HASTE);
 		mAscensionOrbBuffDuration = CharmManager.getDuration(player, CHARM_BUFF_DURATION, ASCENSION_ORB_BUFF_DURATION);
 		mAscensionThrowRate = ASCENSION_THROW_RATE + CharmManager.getLevelPercentDecimal(player, CHARM_THROW_RATE);
@@ -190,15 +191,18 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 				Location eyeLoc = mPlayer.getEyeLocation();
 				double distance = LocationUtils.distanceToGround(loc, -64);
 				boolean belowCeiling = false;
-				for (int i = 0; i < 4; i++) {
+				boolean almostBelowCeiling = false;
+				for (int i = 0; i < 6; i++) {
 					eyeLoc.add(0, 0.5, 0);
-					if (!eyeLoc.getBlock().isEmpty()) {
+					if (!eyeLoc.getBlock().isEmpty() && i < 4) {
 						belowCeiling = true;
+					} else if (!eyeLoc.getBlock().isEmpty()) {
+						almostBelowCeiling = true;
 					}
 				}
 				if (distance < mAscensionHoverHeight && !mPlayer.isSneaking() && !belowCeiling) {
 					int amplifier = 0;
-					if (distance < 0.5 * mAscensionHoverHeight) {
+					if (distance < 0.5 * mAscensionHoverHeight && !almostBelowCeiling) {
 						amplifier = 2;
 					}
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionManager.PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.LEVITATION, 9, amplifier, false, false));
@@ -231,13 +235,18 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 			public synchronized void cancel() {
 				super.cancel();
 				mCurrentDuration = -1;
-				mPlayer.setAllowFlight(false);
-				mPlayer.setFlying(false);
 				mPlugin.mEffectManager.clearEffects(mPlayer, "EtherealAscensionThrowRate");
 				mPlugin.mPotionManager.clearPotionEffectType(mPlayer, PotionEffectType.SLOW_FALLING);
 				mPlugin.mPotionManager.clearPotionEffectType(mPlayer, PotionEffectType.LEVITATION);
 				mCosmetic.ascensionEnd(mPlayer, mPlayer.getWorld(), mPlayer.getLocation());
 				ClientModHandler.updateAbility(mPlayer, EtherealAscension.this);
+				if (mPlayer.getGameMode() == GameMode.SPECTATOR || mPlayer.getGameMode() == GameMode.CREATIVE) {
+					mPlayer.setAllowFlight(true);
+					mPlayer.setFlySpeed(0.1f);
+				} else {
+					mPlayer.setAllowFlight(false);
+					mPlayer.setFlying(false);
+				}
 			}
 		};
 		cancelOnDeath(mAscendRunnable.runTaskTimer(mPlugin, 0, 1));
