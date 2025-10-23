@@ -427,6 +427,8 @@ public class OrinCustomInventory extends CustomInventory {
 			Material.PRISMARINE_BRICKS, "DRL2Access", 1, sendToDungeonAction(DungeonCommandMapping.SHIFTINGCITY), null, 1, null));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(6, 5), "The Fallen Forum", "Click to teleport!",
 			Material.BOOKSHELF, "DFFAccess", 1, sendToDungeonAction(DungeonCommandMapping.FORUM), null, 1, null));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(4,6), "Rush of Dissonance", "Click to teleport!",
+			Material.FIRE_CORAL_BLOCK, "DRDAccess", 1, sendToDungeonAction(DungeonCommandMapping.RUSH), null, 1, null));
 
 		//Group: R3 Dungeons
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(7, 3), "Silver Knight's Tomb", "Click to teleport!",

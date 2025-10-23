@@ -98,6 +98,8 @@ import com.playmonumenta.plugins.poi.POIManager;
 import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.protocollib.ProtocolLibIntegration;
+import com.playmonumenta.plugins.rush.RushManager;
+import com.playmonumenta.plugins.rush.RushCommands;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventCommand;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
@@ -632,6 +634,12 @@ public class Plugin extends JavaPlugin {
 		if (ServerProperties.getShardName().contains("indigo")
 			|| ServerProperties.getShardName().startsWith("dev")) {
 			manager.registerEvents(new IndigoListener(), this);
+		}
+
+		if (ServerProperties.getShardName().contains("rush")
+			|| ServerProperties.getShardName().startsWith("dev")) {
+			RushCommands.register();
+			manager.registerEvents(new RushManager(), this);
 		}
 
 		//TODO Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.

@@ -90,6 +90,7 @@ import com.playmonumenta.plugins.hunts.bosses.SteelWingHawk;
 import com.playmonumenta.plugins.hunts.bosses.TheImpenetrable;
 import com.playmonumenta.plugins.hunts.bosses.Uamiel;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
+import com.playmonumenta.plugins.rush.RushDownMobBoss;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -365,6 +366,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(GalleryMobRisingBoss.identityTag, GalleryMobRisingBoss::new, new GalleryMobRisingBoss.Parameters());
 		registerStatelessBoss(GallerySummonMobBoss.identityTag, GallerySummonMobBoss::new, new GallerySummonMobBoss.Parameters());
 		registerStatelessBoss(TagScalingBoss.identityTag, TagScalingBoss::new, new TagScalingBoss.Parameters());
+		registerStatelessBoss(RushDownMobBoss.identityTag, RushDownMobBoss::new);
 		registerStatelessBoss(CancelDamageBoss.identityTag, CancelDamageBoss::new);
 		registerStatelessBoss(ParticleRingBoss.identityTag, ParticleRingBoss::new, new ParticleRingBoss.Parameters());
 		registerStatelessBoss(ShieldStunBoss.identityTag, ShieldStunBoss::new, new ShieldStunBoss.Parameters());

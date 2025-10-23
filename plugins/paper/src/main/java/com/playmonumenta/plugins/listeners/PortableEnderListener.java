@@ -37,9 +37,8 @@ public class PortableEnderListener implements Listener {
 				if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
 					player.sendMessage(Component.text("The void here is too thick to part", NamedTextColor.RED));
 					player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
-				} else if (ScoreboardUtils.getScoreboardValue(player, "RushDown").orElse(0) < 40 &&
-					           ScoreboardUtils.getScoreboardValue(player, "RushDuo").orElse(0) < 80) {
-					player.sendMessage(Component.text("You must conquer Wave 40 of Rush of Dissonance solo or Wave 80 as a duo before you can part the void.", NamedTextColor.RED));
+				} else if (ScoreboardUtils.getScoreboardValue(player, "RemnantUnlocked").orElse(0) < 1) {
+					player.sendMessage(Component.text("You must conquer Round 20 of Rush of Dissonance before you can part the void.", NamedTextColor.RED));
 					player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
 				} else {
 					player.closeInventory(InventoryCloseEvent.Reason.OPEN_NEW);
