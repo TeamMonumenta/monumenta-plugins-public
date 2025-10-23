@@ -57,6 +57,7 @@ public class EliteFinishers {
 			.put(PoultryficationFinisher.NAME, new PoultryficationFinisher())
 			.put(PrideFinisher.NAME, new PrideFinisher())
 			.put(Promenade.NAME, new Promenade())
+			.put(SeasonalFireworks.NAME, new SeasonalFireworks())
 			.put(ShootingStarFinisher.NAME, new ShootingStarFinisher())
 			.put(SinkholeFinisher.NAME, new SinkholeFinisher())
 			.put(SplishSplashFinisher.NAME, new SplishSplashFinisher())
