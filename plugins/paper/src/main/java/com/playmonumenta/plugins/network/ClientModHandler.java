@@ -149,6 +149,7 @@ public class ClientModHandler {
 
 	/**
 	 * Sends an updated packet of ONE effect to the player.
+	 *
 	 * @param entity Entity to update the effect of
 	 * @param effect Effect to update
 	 * @param source Source of the effect
@@ -186,7 +187,7 @@ public class ClientModHandler {
 	}
 
 	public static void silenced(Player player, int duration) {
-		if (INSTANCE == null) {
+		if (INSTANCE == null || !playerHasClientMod(player)) {
 			return;
 		}
 		PlayerStatusPacket packet = new PlayerStatusPacket();
@@ -195,7 +196,7 @@ public class ClientModHandler {
 	}
 
 	public static void updateStrikeChests(Player player, int newLimit, @Nullable Integer count) {
-		if (INSTANCE == null) {
+		if (INSTANCE == null || !playerHasClientMod(player)) {
 			return;
 		}
 		StrikeChestUpdatePacket packet = new StrikeChestUpdatePacket();
@@ -205,6 +206,10 @@ public class ClientModHandler {
 	}
 
 	public static void sendLocationPacket(Player player, String content) {
+		if (INSTANCE == null || !playerHasClientMod(player)) {
+			return;
+		}
+
 		String shard;
 		try {
 			shard = NetworkRelayAPI.getShardName();
@@ -221,6 +226,10 @@ public class ClientModHandler {
 	 * whose name does not bear the one of the content the player is being sent to
 	 */
 	public static void sendLocationPacket(Player player, @NotNull String shard, String content) {
+		if (INSTANCE == null || !playerHasClientMod(player)) {
+			return;
+		}
+
 		LocationUpdatedPacket packet = new LocationUpdatedPacket();
 		packet.shard = shard;
 		packet.content = content;
@@ -370,7 +379,8 @@ public class ClientModHandler {
 		public @Nullable EffectInfo effect;
 	}
 
-	public record EffectInfo(String UUID, int displayPriority, String name, int duration, double power, boolean positive, boolean percentage) {
+	public record EffectInfo(String UUID, int displayPriority, String name, int duration, double power,
+							 boolean positive, boolean percentage) {
 	}
 
 

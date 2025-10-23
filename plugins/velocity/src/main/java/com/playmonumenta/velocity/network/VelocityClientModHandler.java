@@ -51,6 +51,10 @@ public class VelocityClientModHandler {
 	}
 
 	public static void sendServerInfoPacket(Player player) {
+		if (INSTANCE == null || !playerHasClientMod(player)) {
+			return;
+		}
+
 		VelocityClientModHandler.ServerInfoPacket serverInfoPacket = new VelocityClientModHandler.ServerInfoPacket();
 		serverInfoPacket.allowPublicizeContent = mAllowPublicizeContent;
 		INSTANCE.sendPacket(player, serverInfoPacket);
