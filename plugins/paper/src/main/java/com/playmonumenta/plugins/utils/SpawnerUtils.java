@@ -51,14 +51,12 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Cat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Marker;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -131,11 +129,11 @@ public class SpawnerUtils {
 	 * @param damage the damage dealt by the pickaxe.
 	 */
 	public static boolean tryBreakSpawner(Block block, int damage, boolean tryBreak) {
+		Location spawnerCenter = block.getLocation().clone().add(0.5, 0.5, 0.5);
 		// start ensnare if needed
 		int ensnared = getSpawnerType(block, ENSNARED_ATTRIBUTE);
 		if (ensnared > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
-			List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(block.getLocation().clone().add(0.5, 0.5, 0.5), ensnared);
-			if (nearbyEntities.stream().anyMatch(e -> !e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))) {
+			if (ensnareableMobsWithin(spawnerCenter, ensnared)) {
 				block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.75f, 2f);
 				startEnsnarementCheck(block);
 			}
@@ -160,7 +158,7 @@ public class SpawnerUtils {
 					Plugin.getInstance().mEffectManager.addEffect(cat, "spawnerCatVuln", new PercentDamageReceived(30, -1.0));
 					Plugin.getInstance().mEffectManager.addEffect(cat, "spawnerCatSpeed", new PercentSpeed(20, 1, "PercentSpeed"));
 				}
-				PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, block.getLocation().clone().add(0.5, 0.5, 0.5), cat.getLocation().clone().add(0, cat.getHeight() / 2, 0));
+				PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, spawnerCenter, cat.getLocation().clone().add(0, cat.getHeight() / 2, 0));
 				line.countPerMeter(10).spawnAsEnemy();
 				block.getLocation().getWorld().playSound(block.getLocation(), Sound.ENTITY_CAT_HURT, SoundCategory.HOSTILE, 1f, 1f);
 				return false;
@@ -190,11 +188,8 @@ public class SpawnerUtils {
 				block.getLocation().getWorld().playSound(block.getLocation(), Sound.ENTITY_CAT_AMBIENT, SoundCategory.HOSTILE, 1f, 1f);
 
 				// ensure ensnared is checked when a cat spawns
-				if (getSpawnerType(block, ENSNARED_ATTRIBUTE) > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
-					List<Entity> nearbyEntities = (List<Entity>) block.getWorld().getNearbyEntities(block.getLocation().clone().add(0.5, 0.5, 0.5), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE));
-					boolean hasNearbyMobs = nearbyEntities.stream()
-						.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && entity.isValid());
-					if (hasNearbyMobs) {
+				if (ensnared > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
+					if (ensnareableMobsWithin(spawnerCenter, ensnared)) {
 						block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.75f, 2f);
 						startEnsnarementCheck(block);
 					}
@@ -947,9 +942,7 @@ public class SpawnerUtils {
 			private int mTicks = 0;
 			@Override
 			public void run() {
-				List<Entity> nearbyEntities = (List<Entity>) spawnerLocation.getWorld().getNearbyEntities(spawnerLocation, ensnareRadius - 2, ensnareRadius - 2, ensnareRadius - 2);
-				boolean hasNearbyMobs = nearbyEntities.stream()
-					.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && !(entity instanceof Villager) && !(entity instanceof ArmorStand) && entity.isValid());
+				boolean hasNearbyMobs = ensnareableMobsWithin(spawnerLocation, ensnareRadius - 2);
 				boolean hasPlayersInRange = spawnerLocation.getWorld().getPlayers().stream()
 					.anyMatch(player -> player.getLocation().distance(spawnerLocation) <= 10 + 5);
 
@@ -985,6 +978,11 @@ public class SpawnerUtils {
 		};
 		task.runTaskTimer(Plugin.getInstance(), 0, 1);
 		ensnarementTasks.put(block.getLocation(), task);
+	}
+
+	private static boolean ensnareableMobsWithin(Location location, double radius) {
+		List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(location, radius);
+		return nearbyEntities.stream().anyMatch(entity -> !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 	}
 
 	public static Location findValidCatSpawn(Location location, int catRadius) {
