@@ -53,7 +53,7 @@ public class RushManager implements Listener {
 	protected static final int WAVE_PER_ROUND = 4;
 	protected static final int BOSS_ROUND = 20;
 	protected static final int BOSS_INCREMENT = 5;
-	protected static final int SCALING_ROUND = 30;
+	protected static final int SCALING_ROUND = 31;
 
 	private static final Plugin mPlugin = Plugin.getInstance();
 	private static final int MAX_SEARCH_RADIUS = 300;
@@ -142,8 +142,12 @@ public class RushManager implements Listener {
 		String rushType = playerCount > 1 ? RUSH_HIGHEST_ROUND_MULTIPLAYER : RUSH_HIGHEST_ROUND_SOLO;
 
 		int highestRound = ScoreboardUtils.getScoreboardValue(player, rushType).orElse(0);
-		if (round > highestRound) {
+		boolean isHighestRound = round > highestRound;
+
+		if(isHighestRound) {
 			ScoreboardUtils.setScoreboardValue(player, rushType, round);
+		}
+		if(isHighestRound && round >= 8) {
 			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " " + rushType);
 			MonumentaNetworkRelayIntegration.broadcastCommand("tellmini msg @a[all_worlds=true] <italic><gold>" + player.getName() + "</gold> has succumbed to the Rush of Dissonance with a new personal best! (" +
 				(multiplayer ? "" : "Solo ")
@@ -151,7 +155,9 @@ public class RushManager implements Listener {
 		} else {
 			Bukkit.getServer().sendMessage(Component.empty()
 				.append(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
-				.append(Component.text(" has succumbed to the Rush of Dissonance! (" +
+				.append(Component.text(" has succumbed to the Rush of Dissonance! " +
+					(isHighestRound ? "with a new personal best! " : "") +
+					"(" +
 					(multiplayer ? "" : "Solo ")
 					+ "Round Reached: " + round + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 		}

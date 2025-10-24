@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.structures.StructuresAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -37,6 +38,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +58,7 @@ public class RushArena {
 	private static final String STRUCTURE_PATH = "dungeon/rush/";
 
 	private static final Component BOSS_WARNING = Component.text("Something stirs in the nexus...", NamedTextColor.RED).decorate(TextDecoration.ITALIC);
-	private static final Component SCALING_WARNING = Component.text("The nexus has grown full. The denizens of dissonance grows stronger...", NamedTextColor.RED).decorate(TextDecoration.ITALIC);
+	private static final Component SCALING_WARNING = Component.text("The nexus has grown full. The denizens of dissonance grow stronger...", NamedTextColor.RED).decorate(TextDecoration.ITALIC);
 
 	private static final Component BREAK_ASK = Component.text("Want to take a break?", NamedTextColor.GRAY);
 	private static final Component BREAK_PASS = Component.text("Request break window has passed!", NamedTextColor.GRAY);
@@ -320,7 +322,7 @@ public class RushArena {
 			p.sendMessage(Component.text("[Yes]")
 				.color(NamedTextColor.LIGHT_PURPLE)
 				.clickEvent(ClickEvent.callback(audience -> {
-					if (audience instanceof Player pl && pl.getWorld().equals(mWorld)) {
+					if (audience instanceof Player pl && pl.getWorld().getUID().equals(mWorld.getUID())) {
 						if (!mRequestWindow) {
 							pl.sendMessage(BREAK_PASS);
 							return;
@@ -328,7 +330,9 @@ public class RushArena {
 						mPlayers.forEach(pEach -> pEach.sendMessage(MessagingUtils.fromMiniMessage(String.format("<gray><yellow>%s</yellow> wants to take a break!", pl.getName()))));
 						mRequestWindow = false;
 					}
-				})));
+				}, ClickCallback.Options.builder()
+					.lifetime(Duration.ofSeconds(30))
+					.build())));
 		}
 
 		new BukkitRunnable() {
