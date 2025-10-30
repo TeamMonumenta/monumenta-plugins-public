@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,12 +15,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.potion.PotionEffect;
 
 public class TwoHanded implements Enchantment {
 
 	private static final String PERCENT_SPEED_EFFECT_NAME = "TwoHandedPercentSpeedEffect";
-	private static final int PERCENT_SPEED_DURATION = PotionEffect.INFINITE_DURATION;
 	private static final double PERCENT_SPEED = -0.4;
 	private static final double PERCENT_DAMAGE_REDUCTION = 0.6;
 
@@ -42,24 +41,24 @@ public class TwoHanded implements Enchantment {
 
 	public static boolean checkForOffhand(Plugin plugin, Player player) {
 		PlayerInventory inventory = player.getInventory();
-		if (inventory.getItemInOffHand().getType() != Material.AIR && inventory.getItemInMainHand().getType() != Material.AIR
-				&& plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WEIGHTLESS) == 0) {
-			return true;
-		}
-		return false;
+		return inventory.getItemInOffHand().getType() != Material.AIR
+			&& inventory.getItemInMainHand().getType() != Material.AIR
+			&& plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WEIGHTLESS) == 0;
 	}
 
 	@Override
 	public void onEquipmentUpdate(Plugin plugin, Player player) {
-		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TWO_HANDED) == 0) {
-			plugin.mEffectManager.clearEffects(player, PERCENT_SPEED_EFFECT_NAME);
-			return;
-		}
-		if (checkForOffhand(plugin, player)) {
-			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(PERCENT_SPEED_DURATION, PERCENT_SPEED, PERCENT_SPEED_EFFECT_NAME).displaysTime(false));
-		} else {
-			plugin.mEffectManager.clearEffects(player, PERCENT_SPEED_EFFECT_NAME);
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TWO_HANDED) == 0) {
+				plugin.mEffectManager.clearEffects(player, PERCENT_SPEED_EFFECT_NAME);
+				return;
+			}
+			if (checkForOffhand(plugin, player)) {
+				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(Integer.MAX_VALUE, PERCENT_SPEED, PERCENT_SPEED_EFFECT_NAME).displaysTime(false));
+			} else {
+				plugin.mEffectManager.clearEffects(player, PERCENT_SPEED_EFFECT_NAME);
+			}
+		});
 	}
 
 	@Override
