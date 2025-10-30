@@ -6,10 +6,12 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import com.playmonumenta.plugins.Plugin;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Vindicator;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -18,6 +20,7 @@ import java.util.List;
 
 public class RushDownMobBoss extends BossAbilityGroup {
 	public static final String identityTag = "RushDownMob";
+	public static final String SCALING_TAG = "RushSummonedMob";
 
 	protected static final double HEIGHT = 2;
 
@@ -36,6 +39,17 @@ public class RushDownMobBoss extends BossAbilityGroup {
 		final boolean hasAI = mob.hasAI();
 		mob.setAI(false);
 		mob.setInvulnerable(true);
+
+		// Summoned mob not directly spawned by the waves
+		if (ScoreboardUtils.checkTag(boss, SCALING_TAG)) {
+			List<Player> players = (List<Player>) boss.getLocation().getNearbyPlayers(30);
+			RushArena arena = RushManager.mPlayerArenaMap.get(players.get(0));
+			if (arena != null) {
+				RushManager.scaleMobHealthMultiplayer(boss, arena.mRound);
+				RushManager.scaleMobPastRound(boss, arena.mRound);
+			}
+
+		}
 
 		new BukkitRunnable() {
 			int mTimer = 0;

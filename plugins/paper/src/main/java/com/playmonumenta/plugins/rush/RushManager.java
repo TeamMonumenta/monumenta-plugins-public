@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -22,6 +23,8 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -53,7 +56,7 @@ public class RushManager implements Listener {
 	protected static final int WAVE_PER_ROUND = 4;
 	protected static final int BOSS_ROUND = 20;
 	protected static final int BOSS_INCREMENT = 5;
-	protected static final int SCALING_ROUND = 31;
+	protected static final int SCALING_ROUND = 30;
 
 	private static final Plugin mPlugin = Plugin.getInstance();
 	private static final int MAX_SEARCH_RADIUS = 300;
@@ -64,7 +67,9 @@ public class RushManager implements Listener {
 	private static final String RUSH_HIGHEST_ROUND_SOLO = "RushHighestRoundSolo";
 	private static final String RUSH_HIGHEST_ROUND_MULTIPLAYER = "RushHighestRound";
 
-	private static final Component RUSH_ERROR_NO_LOOT_ROOM = Component.text("Unable to find a loot room! Please contact a moderator!", NamedTextColor.RED);
+	private static final Component RUSH_ERROR_NO_LOOT_ROOM = Component.text("Unable to find a loot room! Talk to the Dissonant Converter to claim you loot!", NamedTextColor.RED);
+	protected static final Component BREAK_ASK = Component.text("Want to take a break?", NamedTextColor.GRAY);
+	protected static final Component BREAK_PASS = Component.text("Request break window has passed!", NamedTextColor.GRAY);
 
 	private static final Vector RUSH_LOOT_ROOM_OFFSET = new Vector(-20, 3, 0);
 
@@ -75,23 +80,27 @@ public class RushManager implements Listener {
 	protected static final NamespacedKey RUSH_WAVE_KEY = NamespacedKeyUtils.fromString("monumenta:rush-wave");
 	protected static final NamespacedKey RUSH_PLAYER_COUNT_KEY = NamespacedKeyUtils.fromString("monumenta:rush-player-count");
 	protected static final NamespacedKey RUSH_PLAYER_COMBAT_LOG = NamespacedKeyUtils.fromString("monumenta:rush-combat-log");
+	protected static final String RUSH_FINISHED_SCOREBOARD = "DRDFinished";
 
 	protected static final Map<Player, RushArena> mPlayerArenaMap = new WeakHashMap<>();
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {
-		event.setCancelled(true);
 		attemptEjection(event.getPlayer(), true);
 	}
 
-	// Handling if player quit during combat (ie Logging out, server restart)
+	/*
+	RUSH_PLAYER_COMBAT_LOG tracks whether a player combat logs.
+	DRDFinished tracks any player leaving the instance, if a player
+	has a value of any sorts and have DRDAccess = 0, they can be refunded.
+	 */
 
 	@EventHandler(ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		attemptEjection(event.getPlayer(), false);
 	}
 
-	// Might interact weirdly with weekly resets?
+
 	@EventHandler(ignoreCancelled = true)
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
@@ -108,8 +117,10 @@ public class RushManager implements Listener {
 	public static void attemptEjection(Player player, boolean death) {
 		RushArena arena = mPlayerArenaMap.remove(player);
 		restorePlayer(player);
+		saveRoundToPlayer(player);
 		if (arena != null && arena.mPlayers.remove(player)) {
 			int round = arena.mRound;
+			arena.mPlayerCount = RushArenaUtils.updatePlayerCount(arena.mSpawnStand);
 			Location lootLoc = teleportPlayerToLootroom(player);
 			updatePlayerStats(player, round, arena.mPlayerCount);
 			if (lootLoc != null) {
@@ -120,14 +131,22 @@ public class RushManager implements Listener {
 					player.getPersistentDataContainer().set(RUSH_PLAYER_COMBAT_LOG, PersistentDataType.INTEGER, round);
 				}
 			}
-		} else {
-			printDebugMessage("Unable to properly eject player! A player might be stuck!", player);
+		}
+	}
+
+	private static void saveRoundToPlayer(Player player) {
+		if (!ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.LOOTROOM)) {
+
+			Integer round = RushArenaUtils.getStandOrThrow(player, RushArenaUtils.RUSH_SPAWN_TAG)
+				.getPersistentDataContainer().getOrDefault(RUSH_WAVE_KEY, PersistentDataType.INTEGER, 1);
+			ScoreboardUtils.setScoreboardValue(player, RUSH_FINISHED_SCOREBOARD, round - 1);
 		}
 	}
 
 	private static void displayDeathAndGenerateLoot(Player player, Location lootLoc, int round) {
 		MessagingUtils.sendTitle(player, Component.text("You Died", NamedTextColor.RED), Component.text("You have succumbed on round " + round, NamedTextColor.RED), Title.Times.times(Duration.ofSeconds(0), Duration.ofSeconds(2), Duration.ofSeconds(1)));
-		player.getWorld().playSound(player, Sound.ENTITY_WITHER_SPAWN, SoundCategory.AMBIENT, 1.0f, 1.0f);
+		ScoreboardUtils.setScoreboardValue(player, RUSH_FINISHED_SCOREBOARD, 0);
+		player.playSound(player, Sound.ENTITY_WITHER_SPAWN, SoundCategory.AMBIENT, 1.0f, 1.0f);
 		player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Constants.TICKS_PER_SECOND * 2, 0, false, false, false));
 
 		RushAdvancements.checkWaveConquered(player, round, lootLoc);
@@ -144,11 +163,11 @@ public class RushManager implements Listener {
 		int highestRound = ScoreboardUtils.getScoreboardValue(player, rushType).orElse(0);
 		boolean isHighestRound = round > highestRound;
 
-		if(isHighestRound) {
+		if (isHighestRound) {
 			ScoreboardUtils.setScoreboardValue(player, rushType, round);
-		}
-		if(isHighestRound && round >= 8) {
 			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " " + rushType);
+		}
+		if (isHighestRound && round >= 8) {
 			MonumentaNetworkRelayIntegration.broadcastCommand("tellmini msg @a[all_worlds=true] <italic><gold>" + player.getName() + "</gold> has succumbed to the Rush of Dissonance with a new personal best! (" +
 				(multiplayer ? "" : "Solo ")
 				+ "Highest Round Reached: " + round + ")");
@@ -183,21 +202,38 @@ public class RushManager implements Listener {
 	}
 
 	public static void scaleMobHealthMultiplayer(@Nullable Entity entity, int count) {
-		count--; // Respect indexing
-		if (count > 0 && count < 4 && entity instanceof LivingEntity mob) {
-			EntityUtils.scaleMaxHealth(mob, MOB_COUNT_MULTIPLIER_PER_PLAYER[count] - 1, "RushHealthScale");
+		int scalingCount = count - 1; // Respect indexing
+		if (scalingCount > 0 && scalingCount < 4 && entity instanceof LivingEntity mob) {
+			EntityUtils.scaleMaxHealth(mob, MOB_COUNT_MULTIPLIER_PER_PLAYER[scalingCount] - 1, "RushMultiplayerHealthScale");
+
+			mob.getPassengers().stream()
+				.filter(e -> e instanceof LivingEntity)
+				.forEach(e -> EntityUtils.scaleMaxHealth((LivingEntity) e, MOB_COUNT_MULTIPLIER_PER_PLAYER[scalingCount] - 1, "RushMultiplayerHealthScale"));
 		}
 	}
 
-	public static void scaleMobHealthPastRound(@Nullable Entity entity, int round) {
+	private static final double VULN_SCALING = 0.01;
+	private static final double HP_SCALING = 0.01;
+	private static final double SPEED_SCALING = 0.0015;
+
+	public static void scaleMobPastRound(@Nullable Entity entity, int round) {
 		if (round > SCALING_ROUND && entity instanceof LivingEntity mob) {
-			EntityUtils.scaleMaxHealth(mob, 0.01 * (round - SCALING_ROUND), "RushHealthScale");
+			EntityUtils.scaleMaxHealth(mob, HP_SCALING * (round - SCALING_ROUND), "RushScalingHealthScale");
+			EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier("RushScalingSpeedScale", SPEED_SCALING * (round - SCALING_ROUND), AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+
+			for (Entity e : mob.getPassengers()) {
+				if (e instanceof LivingEntity le) {
+					EntityUtils.scaleMaxHealth(le, HP_SCALING * (round - SCALING_ROUND), "RushScalingHealthScale");
+					EntityUtils.addAttribute(le, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier("RushScalingSpeedScale", SPEED_SCALING * (round - SCALING_ROUND), AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+				}
+			}
+
 		}
 	}
 
 	public static void applyVulnerability(int round, Set<Player> players) {
 		if (round > SCALING_ROUND) {
-			players.forEach(p -> mPlugin.mEffectManager.addEffect(p, RUSH_VULN, new PercentDamageReceived(Integer.MAX_VALUE, (0.01 * (round - SCALING_ROUND))).displaysTime(false)));
+			players.forEach(p -> mPlugin.mEffectManager.addEffect(p, RUSH_VULN, new PercentDamageReceived(Integer.MAX_VALUE, (VULN_SCALING * (round - SCALING_ROUND))).displaysTime(false)));
 		}
 	}
 

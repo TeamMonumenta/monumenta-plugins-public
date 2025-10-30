@@ -481,6 +481,8 @@ public class Plugin extends JavaPlugin {
 
 		SpawnerCommand.register();
 
+		RushCommands.register();
+
 		//  Load info.
 		reloadMonumentaConfig(null);
 
@@ -638,7 +640,6 @@ public class Plugin extends JavaPlugin {
 
 		if (ServerProperties.getShardName().contains("rush")
 			|| ServerProperties.getShardName().startsWith("dev")) {
-			RushCommands.register();
 			manager.registerEvents(new RushManager(), this);
 		}
 

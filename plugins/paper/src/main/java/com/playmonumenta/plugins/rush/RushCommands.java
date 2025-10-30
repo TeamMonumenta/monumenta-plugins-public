@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.rush;
 
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
@@ -21,13 +24,17 @@ public class RushCommands {
 
 
 	public static void register() {
+		if (isRushShard()) {
+			registerPlayerCommands();
+		}
+
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
 			.withSubcommand(new CommandAPICommand("init")
 				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
 					List<Player> players = args.getUnchecked("players");
-					if (players == null) {
+					if (!isRushShard() || players == null) {
 						return -1;
 					}
 					players.removeIf(p -> p.getGameMode() == GameMode.SPECTATOR);
@@ -45,7 +52,7 @@ public class RushCommands {
 				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 				.executes((sender, args) -> {
 					Player player = args.getUnchecked("player");
-					if (player != null) {
+					if (player != null && isRushShard()) {
 						PersistentDataContainer spawnData = RushArenaUtils.getStandOrThrow(player, RushArenaUtils.RUSH_SPAWN_TAG).getPersistentDataContainer();
 						int round = spawnData.getOrDefault(RushManager.RUSH_WAVE_KEY, PersistentDataType.INTEGER, 1);
 						int count = spawnData.getOrDefault(RushManager.RUSH_PLAYER_COUNT_KEY, PersistentDataType.INTEGER, 1);
@@ -62,29 +69,76 @@ public class RushCommands {
 			.withSubcommand(new CommandAPICommand("genloot")
 				.withArguments(
 					new EntitySelectorArgument.OnePlayer("player"),
-					new IntegerArgument("wave")
+					new IntegerArgument("round")
 				).executes((sender, args) -> {
 					Player player = args.getUnchecked("player");
-					int wave = args.getOrDefaultUnchecked("wave", 0);
-					if (player == null || wave <= 1) {
+					int round = args.getOrDefaultUnchecked("round", 0);
+					if (player == null) {
 						return -1;
 					}
-					RushReward.generateLoot(player.getLocation(), wave);
+					RushReward.generateLoot(player.getLocation(), round);
 					return 1;
 				}))
 			.withSubcommand(new CommandAPICommand("setwave")
 				.withArguments(
-					new IntegerArgument("wave")
+					new IntegerArgument("round")
 				).executes((sender, args) -> {
-					int wave = args.getOrDefaultUnchecked("wave", 1);
-					if (sender instanceof Player player) {
+					int round = args.getOrDefaultUnchecked("round", 1);
+					if (sender instanceof Player player && isRushShard()) {
 						RushArenaUtils.getStandOrThrow(player, RushArenaUtils.RUSH_SPAWN_TAG)
 							.getPersistentDataContainer()
-							.set(RushManager.RUSH_WAVE_KEY, PersistentDataType.INTEGER, wave);
+							.set(RushManager.RUSH_WAVE_KEY, PersistentDataType.INTEGER, round);
 						return 1;
 					}
 					return -1;
-				})
-			).register();
+				}))
+			.withSubcommand(new CommandAPICommand("refund")
+				.withArguments(
+					new EntitySelectorArgument.OnePlayer("player")
+				).executes((sender, args) -> {
+					Player player = args.getUnchecked("player");
+					if (player == null) {
+						return -1;
+					}
+					// Round of 0 cannot exist
+					int round = ScoreboardUtils.getScoreboardValue(player, RushManager.RUSH_FINISHED_SCOREBOARD).orElse(0);
+
+					boolean isRefundable = round > 0 &&
+						ScoreboardUtils.getScoreboardValue(player, "DRDAccess").orElse(0) == 0;
+
+					if (isRefundable) {
+						ScoreboardUtils.setScoreboardValue(player, RushManager.RUSH_FINISHED_SCOREBOARD, 0);
+						// genLoot accounts for completed wave only, so add 1
+						RushReward.generateLoot(player.getLocation(), round + 1);
+						return 1;
+					}
+
+					return -1;
+				})).register();
+	}
+
+	// Should be enabled in Rush Shard only
+	private static void registerPlayerCommands() {
+		new CommandAPICommand("rushpause")
+			.executes((sender, args) -> {
+				if (sender instanceof Player pl) {
+					RushArena arena = RushManager.mPlayerArenaMap.get(pl);
+					if (arena == null || !arena.mWorld.getUID().equals(pl.getWorld().getUID()) || !arena.mRequestWindow) {
+						pl.sendMessage(RushManager.BREAK_PASS);
+						return -1;
+					}
+
+					arena.mPlayers.forEach(pEach -> pEach.sendMessage(MessagingUtils.fromMiniMessage(String.format("<gray><yellow>%s</yellow> wants to take a break!", pl.getName()))));
+					arena.mRequestWindow = false;
+
+					return 1;
+				}
+				return -1;
+			}).register();
+	}
+
+	private static boolean isRushShard() {
+		String name = ServerProperties.getShardName();
+		return name.equals("rush") || name.contains("dev");
 	}
 }

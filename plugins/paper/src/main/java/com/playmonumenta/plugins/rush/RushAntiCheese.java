@@ -28,7 +28,7 @@ import java.util.Set;
 public class RushAntiCheese {
 	private static final int TICK_RATE = 5;
 	private static final int RADIUS = 1;
-	private static final int MAX_INACTIVITY = (Constants.TICKS_PER_SECOND * 5) / TICK_RATE;
+	private static final int MAX_INACTIVITY = (Constants.TICKS_PER_SECOND * 6) / TICK_RATE;
 	private static final int DAMAGE_TICK = Constants.TICKS_PER_SECOND / TICK_RATE;
 	private static final Material BREAKABLE_MATERIAL = Material.OBSIDIAN;
 	private static final Material UNBREAKABLE_MATERIAL = Material.COMMAND_BLOCK;
@@ -42,7 +42,7 @@ public class RushAntiCheese {
 
 	// Players should reference mPlayers from RushArena. Should stop if mPlayers is empty.
 
-	public RushAntiCheese(Set<Player> players) {
+	public RushAntiCheese(Set<Player> players, double centerY) {
 		players.forEach(p -> mPlayerTracker.put(p, p.getLocation()));
 		players.forEach(p -> mPlayerInactivity.put(p, 0));
 		mAntiCheese = new BukkitRunnable() {
@@ -59,10 +59,13 @@ public class RushAntiCheese {
 					if (mPlayerTracker.get(p) == null || mPlayerInactivity.get(p) == null) {
 						continue;
 					}
-					if (mPlayerTracker.get(p).distanceSquared(p.getLocation()) <= RADIUS * RADIUS && p.getGameMode().equals(GameMode.SURVIVAL)) {
+					Location pLoc = p.getLocation();
+					boolean isHighLocation = pLoc.getY() - centerY >= 10;
+					if (mPlayerTracker.get(p).distanceSquared(pLoc) <= RADIUS * RADIUS * (isHighLocation ? 1.5 : 1)
+						&& p.getGameMode().equals(GameMode.SURVIVAL)) {
 						int count = mPlayerInactivity.get(p);
 						if (count < MAX_INACTIVITY) {
-							count++;
+							count += isHighLocation ? 2 : 1;
 						} else {
 							count = 0;
 							doAntiCheese(p);

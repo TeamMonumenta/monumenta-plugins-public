@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.structures.StructuresAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -38,7 +37,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -59,10 +57,6 @@ public class RushArena {
 
 	private static final Component BOSS_WARNING = Component.text("Something stirs in the nexus...", NamedTextColor.RED).decorate(TextDecoration.ITALIC);
 	private static final Component SCALING_WARNING = Component.text("The nexus has grown full. The denizens of dissonance grow stronger...", NamedTextColor.RED).decorate(TextDecoration.ITALIC);
-
-	private static final Component BREAK_ASK = Component.text("Want to take a break?", NamedTextColor.GRAY);
-	private static final Component BREAK_PASS = Component.text("Request break window has passed!", NamedTextColor.GRAY);
-
 
 	enum Season {
 		SUMMER("Summer", Component.text("The atmosphere is buzzing with heat...", NamedTextColor.YELLOW),
@@ -123,9 +117,9 @@ public class RushArena {
 	final List<Location> mSpawnPoints = new ArrayList<>();
 	final ArrayList<LoSPool> mMobPool = new ArrayList<>();
 	final World mWorld;
-	final int mPlayerCount;
 	final Set<Player> mPlayers;
 
+	int mPlayerCount;
 	int mRound = 1;
 	Season mSeason;
 	double[] mMobCount = {};
@@ -181,7 +175,7 @@ public class RushArena {
 		mMobPool.add(mSeason.elitePool);
 		mMobPool.add(mSeason.boss);
 
-		mCheese = new RushAntiCheese(mPlayers);
+		mCheese = new RushAntiCheese(mPlayers, mCenter.getY());
 
 		mMobCount = RushManager.calculateMobCount(mRound, false);
 		RushManager.applyVulnerability(mRound, mPlayers);
@@ -202,14 +196,14 @@ public class RushArena {
 	private void teleportPlayers(Location loc) {
 		for (Player p : mPlayers) {
 			p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (int) (TELEPORT_DELAY * 2), 0, false, false, false));
-			mWorld.playSound(p, Sound.ENTITY_GUARDIAN_ATTACK, SoundCategory.HOSTILE, 1f, 1.5f);
-			mWorld.playSound(p, Sound.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.HOSTILE, 1f, 1.5f);
+			p.playSound(p, Sound.ENTITY_GUARDIAN_ATTACK, SoundCategory.HOSTILE, 1f, 1.5f);
+			p.playSound(p, Sound.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.HOSTILE, 1f, 1.5f);
 		}
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			for (Player p : mPlayers) {
 				PlayerUtils.playerTeleport(p, loc);
-				mWorld.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1f, 1.5f);
-				mWorld.playSound(p, Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.BLOCKS, 1f, 2f);
+				p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1f, 1.5f);
+				p.playSound(p, Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.BLOCKS, 1f, 2f);
 				MovementUtils.knockAway(loc.clone().add(0, -1, 0), p, 0.55f, 0.3f, false);
 			}
 		}, TELEPORT_DELAY);
@@ -294,12 +288,12 @@ public class RushArena {
 			SeasonalEventListener.playerRushRound(p);
 			RushManager.restorePlayer(p);
 
-			boolean isScalingRound = mRound == RushManager.SCALING_ROUND;
+			boolean isScalingRound = mRound == RushManager.SCALING_ROUND + 1;
 			boolean isBossRound = mRound >= RushManager.BOSS_ROUND && mRound % RushManager.BOSS_INCREMENT == 0;
 
 			if (isScalingRound || isBossRound) {
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-					mWorld.playSound(p, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.AMBIENT, 5.0f, 0.5f);
+					p.playSound(p, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.AMBIENT, 5.0f, 0.5f);
 					if (isBossRound) {
 						p.sendMessage(BOSS_WARNING);
 					}
@@ -318,21 +312,10 @@ public class RushArena {
 		mRequestWindow = true;
 
 		for (Player p : mPlayers) {
-			p.sendMessage(BREAK_ASK);
+			p.sendMessage(RushManager.BREAK_ASK);
 			p.sendMessage(Component.text("[Yes]")
 				.color(NamedTextColor.LIGHT_PURPLE)
-				.clickEvent(ClickEvent.callback(audience -> {
-					if (audience instanceof Player pl && pl.getWorld().getUID().equals(mWorld.getUID())) {
-						if (!mRequestWindow) {
-							pl.sendMessage(BREAK_PASS);
-							return;
-						}
-						mPlayers.forEach(pEach -> pEach.sendMessage(MessagingUtils.fromMiniMessage(String.format("<gray><yellow>%s</yellow> wants to take a break!", pl.getName()))));
-						mRequestWindow = false;
-					}
-				}, ClickCallback.Options.builder()
-					.lifetime(Duration.ofSeconds(30))
-					.build())));
+				.clickEvent(ClickEvent.runCommand("/rushpause")));
 		}
 
 		new BukkitRunnable() {
@@ -377,7 +360,7 @@ public class RushArena {
 				count--;
 				Entity entity = mMobPool.get(i).spawn(getRandomLoc());
 				RushManager.scaleMobHealthMultiplayer(entity, mPlayerCount);
-				RushManager.scaleMobHealthPastRound(entity, mRound);
+				RushManager.scaleMobPastRound(entity, mRound);
 			}
 		}
 		if (mSeason.equals(Season.FALL) && FastUtils.RANDOM.nextDouble() < 0.05) {

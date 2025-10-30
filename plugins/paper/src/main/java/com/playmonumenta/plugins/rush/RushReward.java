@@ -20,6 +20,8 @@ public class RushReward {
 	private static final NamespacedKey HCS_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:r2/items/currency/hyper_crystalline_shard");
 	private static final NamespacedKey ROSE_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:r2/dungeons/rushdown/replica_rose_wool");
 
+	private static final double SCALING_BOOST = 0.0025;
+
 	public static void generateLoot(Location lootLoc, int round) {
 		if (--round < 1) { // Exclude loot from the round you died on
 			return;
@@ -30,7 +32,8 @@ public class RushReward {
 		for (int i = 1; i <= round; i++) {
 			double[] mobCountByWave = RushManager.calculateMobCount(round, false);
 			for (double v : mobCountByWave) {
-				totalMobs += v * ((RushManager.WAVE_PER_ROUND + RushManager.LAST_WAVE_INCREASE - 1) * 0.425);
+				totalMobs += (RushManager.WAVE_PER_ROUND + RushManager.LAST_WAVE_INCREASE - 1) * 0.425 * v
+					* Math.max(1, 1 + SCALING_BOOST * (round - RushManager.SCALING_ROUND));
 			}
 		}
 		int totalReward = (int) totalMobs;

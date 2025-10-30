@@ -105,6 +105,7 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("(minecraft:)?plot (help|add|remove|info|info_raw|region)"),
 		exactOptionalArguments("(minecraft:)?race leaderboard"),
 		exactOptionalArguments("(minecraft:)?(rocketjump|rj)"),
+		exactNoArguments("(minecraft:)?rushpause"),
 		exactOptionalArguments("(minecraft:)?toggleswap"),
 		exactOptionalArguments("(minecraft:)?toggleworldnames"),
 		exactOptionalArguments("(minecraft:)?(virtualfirmament|vf)"),

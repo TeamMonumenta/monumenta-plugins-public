@@ -20,7 +20,7 @@ public class RushArenaUtils {
 
 	protected static final int RUSH_RADIUS = 32;
 
-	protected static final int SEASON_PARTICLE_COUNT = 60;
+	protected static final int SEASON_PARTICLE_COUNT = 50;
 
 	// TODO: Would this make sense in RushManager?
 	public static ArmorStand getStandOrThrow(Player player, String tag) {
@@ -64,5 +64,16 @@ public class RushArenaUtils {
 			playerCount = count;
 		}
 		return playerCount;
+	}
+
+	protected static int updatePlayerCount(ArmorStand stand) {
+		PersistentDataContainer data = stand.getPersistentDataContainer();
+		Integer count = data.get(RushManager.RUSH_PLAYER_COUNT_KEY, PersistentDataType.INTEGER);
+		if (count == null) {
+			return stand.getWorld().getPlayerCount() - 1;
+		}
+		int newCount = Math.min(1, count - 1);
+		data.set(RushManager.RUSH_PLAYER_COUNT_KEY, PersistentDataType.INTEGER, newCount);
+		return newCount;
 	}
 }
