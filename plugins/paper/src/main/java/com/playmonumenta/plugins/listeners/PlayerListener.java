@@ -1239,7 +1239,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 
-		if (ItemStatUtils.isCharm(item)) {
+		if (ItemStatUtils.isCharm(item) || ItemStatUtils.getTier(item) == Tier.CURRENCY) {
 			event.setCancelled(true);
 			return;
 		}
