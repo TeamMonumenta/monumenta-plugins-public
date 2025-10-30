@@ -87,6 +87,13 @@ public class SignOverride extends BaseOverride {
 							return false;
 						}
 
+						// Prevent placing signs with clickable text outside creative mode (because players have these due to a bug)
+						for (Component nestedComponent : MessagingUtils.recursiveComponents(allSignLines)) {
+							if (nestedComponent.clickEvent() != null) {
+								return false;
+							}
+						}
+
 						new BukkitRunnable() {
 							@Override
 							public void run() {
