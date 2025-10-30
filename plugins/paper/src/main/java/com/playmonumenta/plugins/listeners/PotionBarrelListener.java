@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.chunk.ChunkFullLoadEvent;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -21,14 +23,21 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -50,12 +59,28 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.permissions.Permission;
+import org.bukkit.util.Transformation;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 public class PotionBarrelListener implements Listener {
 
 	public static final String POTION_BARREL_NAME = "Potion Barrel";
 	public static final Permission PERMISSION_PURPLE_TESSERACT = new Permission("monumenta.tesseract.purple");
+	public static final String DISPLAY_TAG = "PotionBarrelDisplay";
+	public static final String POTION_DISPLAY_TAG = "PotionDisplay";
+
+	public PotionBarrelListener() {
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			for (World world : Bukkit.getWorlds()) {
+				for (Chunk chunk : world.getLoadedChunks()) {
+					loadChunk(chunk);
+				}
+			}
+		}, 1L);
+	}
 
 	// inventory handling
 
@@ -598,6 +623,9 @@ public class PotionBarrelListener implements Listener {
 				}
 			}
 		}
+		if (barrelInventory.getHolder() instanceof Barrel barrel) {
+			updateDisplay(barrel.getBlock().getState());
+		}
 		return originalAmount - potion.getAmount();
 	}
 
@@ -618,10 +646,17 @@ public class PotionBarrelListener implements Listener {
 					remainingSpace--;
 					removed++;
 					if (remainingSpace == 0) {
+						if (barrelInventory.getHolder() instanceof Barrel barrel) {
+							updateDisplay(barrel.getBlock().getState());
+						}
 						return removed;
 					}
 				}
 			}
+		}
+
+		if (barrelInventory.getHolder() instanceof Barrel barrel) {
+			updateDisplay(barrel.getBlock().getState());
 		}
 		return removed;
 	}
@@ -631,6 +666,11 @@ public class PotionBarrelListener implements Listener {
 			ItemStack barrelItem = barrelInventory.getItem(i);
 			if (barrelItem != null && barrelItem.isSimilar(item)) {
 				barrelItem.setAmount(barrelItem.getAmount() - 1);
+
+				if (barrelInventory.getHolder() instanceof Barrel barrel) {
+					updateDisplay(barrel.getBlock().getState());
+				}
+
 				return;
 			}
 		}
@@ -671,23 +711,49 @@ public class PotionBarrelListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
-		if (isPotionBarrel(event.getBlock())
-			&& !((Barrel) event.getBlock().getState()).getInventory().isEmpty()) {
-			event.setCancelled(true);
-			event.getPlayer().sendMessage(Component.text("You cannot break a filled " + POTION_BARREL_NAME + "! Empty it first.", NamedTextColor.RED));
+		BlockState blockState = event.getBlock().getState();
+		if (isPotionBarrel(blockState)) {
+			if (((Barrel) blockState).getInventory().isEmpty()) {
+				Location centerLoc = blockState.getLocation().toCenterLocation();
+				for (Entity entity : new ArrayList<>(centerLoc.getNearbyEntities(0.1, 0.1, 0.1))) {
+					if (entity.getScoreboardTags().contains(DISPLAY_TAG)) {
+						entity.remove();
+					}
+				}
+			} else {
+				event.setCancelled(true);
+				event.getPlayer().sendMessage(Component.text("You cannot break a filled " + POTION_BARREL_NAME + "! Empty it first.", NamedTextColor.RED));
+			}
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
+		BlockState blockState = event.getBlock().getState();
 		if (
-			isPotionBarrel(event.getBlock())
-				&& (
-				!isValidShard()
-					|| GuildPlotUtils.guildPlotInventoryModificationBlocked(event.getPlayer())
-			)
+			isPotionBarrel(blockState)
 		) {
-			event.setCancelled(true);
+			if (
+				!isValidShard() ||
+					GuildPlotUtils.guildPlotInventoryModificationBlocked(event.getPlayer()
+				)
+			) {
+				event.setCancelled(true);
+			} else {
+				addDisplay(blockState);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void chunkFullLoadEvent(ChunkFullLoadEvent event) {
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(),
+			() -> loadChunk(event.getChunk()), 1L);
+	}
+
+	public void loadChunk(Chunk chunk) {
+		for (BlockState blockState : chunk.getTileEntities()) {
+			addDisplay(blockState);
 		}
 	}
 
@@ -714,4 +780,64 @@ public class PotionBarrelListener implements Listener {
 			&& ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE);
 	}
 
+	public static void addDisplay(BlockState blockState) {
+		BlockData blockData = blockState.getBlockData();
+		if (
+			blockData instanceof Directional directional &&
+				isPotionBarrel(blockState)
+		) {
+			Vector dir = directional.getFacing().getDirection();
+			Location centerLoc = blockState.getLocation().toCenterLocation();
+			centerLoc.setDirection(dir);
+
+			// Check for existing entity
+			for (Entity entity : centerLoc.getNearbyEntities(0.1, 0.1, 0.1)) {
+				if (entity.getScoreboardTags().contains(DISPLAY_TAG)) {
+					return;
+				}
+			}
+
+			// Spawn a display entity (cleared when unloaded)
+			World world = centerLoc.getWorld();
+			world.spawn(centerLoc, ItemDisplay.class, display -> {
+				display.customName(Component.text("Potion Barrel", NamedTextColor.GOLD));
+				display.setTransformation(new Transformation(
+					new Vector3f(0.0f, 0.0f, 0.5f),
+					new AxisAngle4f((float) Math.PI, 0.0f, 1.0f, 0.0f),
+					new Vector3f(0.5f),
+					new AxisAngle4f()
+				));
+				if (dir.getY() != 0.0) {
+					display.setBillboard(Display.Billboard.VERTICAL);
+				}
+				display.setBrightness(new Display.Brightness(15, 15));
+				Set<String> tags = display.getScoreboardTags();
+				tags.add(DISPLAY_TAG);
+				tags.add(POTION_DISPLAY_TAG);
+				tags.add(Constants.Tags.REMOVE_ON_UNLOAD);
+			});
+			updateDisplay(blockState);
+		}
+	}
+
+	public static void updateDisplay(BlockState blockState) {
+		if (
+			blockState instanceof Barrel barrel &&
+				isPotionBarrel(blockState)
+		) {
+			Inventory inv = barrel.getInventory();
+			ItemStack potion = getBarrelPotion(inv);
+
+			Location centerLoc = blockState.getLocation().toCenterLocation();
+			for (Entity entity : centerLoc.getNearbyEntities(0.1, 0.1, 0.1)) {
+				if (
+					entity instanceof ItemDisplay display &&
+						entity.getScoreboardTags().contains(POTION_DISPLAY_TAG)
+				) {
+					display.setItemStack(potion);
+					return;
+				}
+			}
+		}
+	}
 }
