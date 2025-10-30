@@ -40,9 +40,8 @@ public class VelocityClientModHandler {
 
 		Player player = event.getPlayer();
 		if (!mOnlinePlayersWithClientChannel.contains(player.getUniqueId())) {
-			sendServerInfoPacket(player);
-
 			mOnlinePlayersWithClientChannel.add(player.getUniqueId());
+			sendServerInfoPacket(player);
 		}
 	}
 
