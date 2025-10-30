@@ -766,7 +766,7 @@ public class AbilityUtils {
 		ClassAbility.INTERCONNECTED_HAVOC,
 		ClassAbility.CRYSTALLINE_COMBOS,
 		ClassAbility.DECAYED_TOTEM,
-		ClassAbility.ILLUMINATE,
+		ClassAbility.ILLUMINATE_DOT,
 		ClassAbility.KEEPER_VIRTUE,
 		ClassAbility.REFLECTION
 	);
