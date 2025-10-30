@@ -127,10 +127,8 @@ public class WormBoss extends BossAbilityGroup {
 		if (size >= 0) {
 			EntityUtils.setSize(part, size);
 		}
-		Component customName = mBoss.customName();
-		if (customName != null) {
-			part.customName(customName.append(Component.text(tail ? " Tail" : " Body")));
-		}
+		String name = mBoss.getName();
+		part.customName(Component.text(name + (tail ? " Tail" : " Body")));
 
 		part.setSilent(true);
 		part.getPassengers().forEach(p -> {
