@@ -41,7 +41,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 	private static final int TACTICAL_MANEUVER_2_COOLDOWN = 20 * 8;
 	private static final int TACTICAL_MANEUVER_RADIUS = 3;
 	private static final int TACTICAL_DASH_DAMAGE = 14;
-	private static final int TACTICAL_DASH_STUN_DURATION = 20 * 1;
+	private static final int TACTICAL_DASH_STUN_DURATION = 20;
 	private static final int TACTICAL_LEAP_DAMAGE = 8;
 	private static final float TACTICAL_LEAP_KNOCKBACK_SPEED = 0.5f;
 

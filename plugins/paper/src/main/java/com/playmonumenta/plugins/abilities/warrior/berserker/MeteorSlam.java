@@ -147,7 +147,7 @@ public final class MeteorSlam extends Ability {
 
 	public boolean cast() {
 		if (isOnCooldown()
-			    || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			|| ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return false;
 		}
 		putOnCooldown();
@@ -202,8 +202,8 @@ public final class MeteorSlam extends Ability {
 		 * and reduced cap damage for remainder fall distance
 		 */
 		double slamDamage = (mLevelDamage / 2) * Math.pow(fallDistance, 2) + (mLevelDamage / 2) * fallDistance // quadratic scaling
-			                    + linearFallDist * mLevelDamageCap // linear scaling
-			                    + extraFallDist * mLevelDamageCap * REDUCTION_MULTIPLIER; // reduced scaling
+			+ linearFallDist * mLevelDamageCap // linear scaling
+			+ extraFallDist * mLevelDamageCap * REDUCTION_MULTIPLIER; // reduced scaling
 
 		slamDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, slamDamage);
 

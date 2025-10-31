@@ -94,49 +94,49 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 				// Bloody outline
 				ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 					t -> 0,
-						t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.6, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS,
-						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, BLOOD).spawnAsPlayerActive(player)
+					t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.6, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS,
+					(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, BLOOD).spawnAsPlayerActive(player)
 				);
 				ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 					t -> 0,
-						t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.6, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS,
-						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, BLOOD).spawnAsPlayerActive(player)
+					t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.6, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS,
+					(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, BLOOD).spawnAsPlayerActive(player)
 				);
 				if (mFrame > 0) {
 					// White part, outer
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
-							t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.45, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.8,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 3, 0, 0, 0, 0, OUTER).spawnAsPlayerActive(player)
+						t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.45, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.8,
+						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 3, 0, 0, 0, 0, OUTER).spawnAsPlayerActive(player)
 					);
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
-							t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.45, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.8,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 3, 0, 0, 0, 0, OUTER).spawnAsPlayerActive(player)
+						t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.45, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.8,
+						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 3, 0, 0, 0, 0, OUTER).spawnAsPlayerActive(player)
 					);
 				}
 				if (mFrame > 1) {
 					// Blue part, middle
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
-							t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.3, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.55,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
+						t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.3, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.55,
+						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
 					);
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
-							t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.3, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.55,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
+						t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.3, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.55,
+						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
 					);
 
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
-							t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.2, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.35,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
+						t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.2, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.35,
+						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
 					);
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
-							t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.2, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.35,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
+						t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.2, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.35,
+						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
 					);
 					// Black part, inner
 					new PartialParticle(Particle.REDSTONE, mCenter, 15, 0.2, 0.2, 0.2, 0.1, INNER).spawnAsPlayerActive(player);

@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -88,8 +87,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 	private int mChargeRemain;
 
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, int range, boolean singleTarget, boolean launchTracking, int cooldown, int delay,
-									  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers,
-									  AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers,
+	                                  AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		this(plugin, boss, range, singleTarget, launchTracking, cooldown, delay,
 			speed, turnRadius, lifetimeTicks, hitboxLength, collidesWithBlocks, lingers, 0, false,
 			initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
@@ -100,8 +99,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 	 * @param singleTarget Target random player (true) or all players (false)
 	 */
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, int range, boolean singleTarget, boolean launchTracking, int cooldown, int delay,
-									  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
-									  AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
+	                                  AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();
@@ -145,20 +144,20 @@ public class SpellBaseSeekingProjectile extends Spell {
 	//Constructors above are redirected to this one.
 
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int cooldown, int delay,
-									  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
-									  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
+	                                  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		this(plugin, boss, launchTracking, 1, 40, cooldown, delay,
 			0, 0, 0, 0, 200.0, 100.0, 1, 30, speed, turnRadius,
 			lifetimeTicks, hitboxLength, lingers, collidesWithBlocks, 0.5, 0.125, collidesWithOthers, collisionCheckDelay,
 			targets, initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
 	}
 
-	public SpellBaseSeekingProjectile(Plugin mPlugin, LivingEntity mBoss, ProjectileBoss.Parameters p){
+	public SpellBaseSeekingProjectile(Plugin mPlugin, LivingEntity mBoss, ProjectileBoss.Parameters p) {
 		this(mPlugin, mBoss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL,
-		 p.COOLDOWN, p.SPELL_DELAY, p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH,
-		 p.SPLIT, p.SPLIT_ANGLE, p.SPEED, p.TURN_RADIUS, (int) (p.DISTANCE / p.SPEED), p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS,
-		 p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
-		 //spell targets
+			p.COOLDOWN, p.SPELL_DELAY, p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH,
+			p.SPLIT, p.SPLIT_ANGLE, p.SPEED, p.TURN_RADIUS, (int) (p.DISTANCE / p.SPEED), p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS,
+			p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
+			//spell targets
 			() -> p.TARGETS.getTargetsList(mBoss),
 			// Initiate Aesthetic
 			(World world, Location loc, int ticks) -> {
@@ -238,9 +237,9 @@ public class SpellBaseSeekingProjectile extends Spell {
 	 * @param hitAction           Called when the projectile intersects a player (or possibly a block)
 	 */
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int charge, int chargeInterval, int cooldown, int delay,
-									  double offsetX, double offsetY, double offsetZ, int mirror, double fixYaw, double fixPitch, int split, double splitAngle, double speed, double turnRadius,
-									  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, double speedLiquid, double speedBlocks, boolean collidesWithOthers, int collisionCheckDelay,
-									  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double offsetX, double offsetY, double offsetZ, int mirror, double fixYaw, double fixPitch, int split, double splitAngle, double speed, double turnRadius,
+	                                  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, double speedLiquid, double speedBlocks, boolean collidesWithOthers, int collisionCheckDelay,
+	                                  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();
@@ -409,7 +408,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	}
 
 	public <V extends LivingEntity> void launchDX(V target, Location targetLoc, double offsetX, double offsetY, double offsetZ,
-												  int split, double splitAngle, int mirror, double fixYaw, double fixPitch) {
+	                                              int split, double splitAngle, int mirror, double fixYaw, double fixPitch) {
 		// yaw degrees of splits
 		double[] yaws = new double[split];
 		for (int i = 0; i < split; i++) {
@@ -436,7 +435,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	}
 
 	public <V extends LivingEntity> void launch(V target, Location targetLoc, boolean fixed, double fYaw, double fPitch,
-												double offsetX, double offsetY, double offsetZ, double offsetYaw, double offsetPitch) {
+	                                            double offsetX, double offsetY, double offsetZ, double offsetYaw, double offsetPitch) {
 		if (!targetLoc.getWorld().equals(mBoss.getWorld())) {
 			return;
 		}

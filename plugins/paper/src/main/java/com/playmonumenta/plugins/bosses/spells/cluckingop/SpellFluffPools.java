@@ -21,9 +21,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellFluffPools extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private int mRange;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final int mRange;
 
 	public SpellFluffPools(Plugin plugin, LivingEntity boss, int range) {
 		mPlugin = plugin;

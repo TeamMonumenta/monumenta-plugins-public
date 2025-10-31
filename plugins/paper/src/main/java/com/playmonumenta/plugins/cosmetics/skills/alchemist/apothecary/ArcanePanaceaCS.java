@@ -10,8 +10,13 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -172,8 +177,8 @@ public class ArcanePanaceaCS extends PanaceaCS {
 	@Override
 	public void damageOverTimeEffects(LivingEntity target) {
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, LocationUtils.getHalfHeightLocation(target), 16)
-				.delta(target.getBoundingBox().getWidthX() / 3, target.getBoundingBox().getHeight() / 3, target.getBoundingBox().getWidthZ() / 3)
-				.spawnAsEnemy();
+			.delta(target.getBoundingBox().getWidthX() / 3, target.getBoundingBox().getHeight() / 3, target.getBoundingBox().getWidthZ() / 3)
+			.spawnAsEnemy();
 	}
 
 	private void sounds(World world, Location loc) {

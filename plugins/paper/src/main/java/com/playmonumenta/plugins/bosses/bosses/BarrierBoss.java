@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
@@ -14,6 +13,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public final class BarrierBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_barrier";

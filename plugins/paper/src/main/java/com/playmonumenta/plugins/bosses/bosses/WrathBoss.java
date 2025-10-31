@@ -121,7 +121,7 @@ public class WrathBoss extends BossAbilityGroup {
 								mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1f, 1f);
 								for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), mParams.DAMAGE_RADIUS, true)) {
 									// Bypasses iframes
-									BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE, true, true, mParams.SPELL_NAME, mBoss.getLocation(), (int) (20 * mParams.DAMAGE / 2.5), (int) (mParams.DAMAGE / 5));
+									BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE, true, true, mParams.SPELL_NAME, mBoss.getLocation(), (int) (20 * mParams.DAMAGE / 2.5), mParams.DAMAGE / 5);
 								}
 							}
 						} else {

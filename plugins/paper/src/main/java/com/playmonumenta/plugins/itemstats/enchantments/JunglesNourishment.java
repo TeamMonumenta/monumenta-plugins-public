@@ -51,7 +51,8 @@ public final class JunglesNourishment implements Enchantment {
 		return EnchantmentType.JUNGLES_NOURISHMENT;
 	}
 
-	@Override public EnumSet<Slot> getSlots() {
+	@Override
+	public EnumSet<Slot> getSlots() {
 		return EnumSet.of(Slot.MAINHAND, Slot.OFFHAND);
 	}
 
@@ -74,9 +75,9 @@ public final class JunglesNourishment implements Enchantment {
 			PlayerUtils.healPlayer(plugin, player, healPercent * EntityUtils.getMaxHealth(player), player);
 			player.setFoodLevel(MAX_FOOD_LEVEL);
 			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME,
-					new PercentDamageReceived(resistanceDuration, resistancePotency));
+				new PercentDamageReceived(resistanceDuration, resistancePotency));
 			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()),
-					new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
+				new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
 
 			new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0)).count(20).delta(0.25, 0.5, 0.25).extra(1).spawnAsPlayerActive(player);
 			new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0)).count(25).delta(0.25, 0.45, 0.25).extra(1).spawnAsPlayerActive(player);

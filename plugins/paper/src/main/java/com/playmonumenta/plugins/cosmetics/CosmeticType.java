@@ -29,7 +29,7 @@ public enum CosmeticType {
 	}
 
 	CosmeticType(String displayName, String displayNamePlural, Material material,
-				 @Nullable Function<String, Material> displayItemSupplier) {
+	             @Nullable Function<String, Material> displayItemSupplier) {
 		mDisplayName = displayName;
 		mDisplayNamePlural = displayNamePlural;
 		mDisplayItem = material;

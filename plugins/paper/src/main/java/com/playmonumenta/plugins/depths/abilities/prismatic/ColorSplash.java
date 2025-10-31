@@ -322,6 +322,7 @@ public class ColorSplash extends DepthsAbility {
 		cancelOnDeath(new BukkitRunnable() {
 			Location mCurrLoc = LocationUtils.rayTraceToBlock(mPlayer, 200);
 			int mTicks = 1;
+
 			@Override
 			public void run() {
 				Location eyeLoc = mPlayer.getEyeLocation();
@@ -396,6 +397,7 @@ public class ColorSplash extends DepthsAbility {
 		mDawnbringerActive = true;
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks % DAWNBRINGER_HEAL_INTERVAL == 0) {
@@ -493,6 +495,7 @@ public class ColorSplash extends DepthsAbility {
 		mShadowdancerActive = true;
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks % SHADOWDANCER_STEALTH_INTERVAL == 0) {
@@ -596,6 +599,7 @@ public class ColorSplash extends DepthsAbility {
 		cancelOnDeath(new BukkitRunnable() {
 			final ArrayList<UUID> mHitMobs = new ArrayList<>();
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
@@ -610,7 +614,7 @@ public class ColorSplash extends DepthsAbility {
 					return;
 				}
 
-				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7/Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7 / Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
 
 				new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), WINDWALKER_RADIUS).getHitMobs()
 					.stream().filter(mob -> !mHitMobs.contains(mob.getUniqueId()) && !EntityUtils.isBoss(mob)).forEach(mob -> {

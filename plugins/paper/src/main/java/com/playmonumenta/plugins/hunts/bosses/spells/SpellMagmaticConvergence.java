@@ -64,6 +64,7 @@ public class SpellMagmaticConvergence extends Spell implements CoreElemental.Cor
 		// Telegraph
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTick = 0;
+
 			@Override
 			public void run() {
 				if (mTick % 10 == 0) {
@@ -109,7 +110,8 @@ public class SpellMagmaticConvergence extends Spell implements CoreElemental.Cor
 			final ArrayList<Player> mPlayers = new ArrayList<>(PlayerUtils.playersInRange(mCenterLoc, 70, true));
 			double mRadius = RADIUS;
 			int mT = 0;
-			final double mCoefficient = (double) (RADIUS - MINIMUM_RADIUS)/(SHRINK_TIME + 0.03 * SHRINK_TIME * SHRINK_TIME);
+			final double mCoefficient = (double) (RADIUS - MINIMUM_RADIUS) / (SHRINK_TIME + 0.03 * SHRINK_TIME * SHRINK_TIME);
+
 			@Override
 			public void run() {
 				// Effects
@@ -146,7 +148,7 @@ public class SpellMagmaticConvergence extends Spell implements CoreElemental.Cor
 						direction.setY(Math.abs(direction.getY()));
 						Location finalLocation = mCenterLoc.clone().add(direction);
 						b.location(finalLocation);
-						mBoss.getWorld().playSound(finalLocation, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.6f, 0.5f + (float) (1 - mRadius/RADIUS)/2);
+						mBoss.getWorld().playSound(finalLocation, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.6f, 0.5f + (float) (1 - mRadius / RADIUS) / 2);
 					})
 						.count(15)
 						.spawnAsEntityActive(mBoss);

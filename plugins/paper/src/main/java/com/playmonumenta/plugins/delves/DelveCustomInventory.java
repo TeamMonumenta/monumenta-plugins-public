@@ -80,8 +80,8 @@ public class DelveCustomInventory extends CustomInventory {
 	private static final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(
 		Material.MAGENTA_GLAZED_TERRACOTTA,
 		Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD)
-				 .decoration(TextDecoration.ITALIC, false),
-		new String[] {
+			.decoration(TextDecoration.ITALIC, false),
+		new String[]{
 			"Some of these modifiers are randomly available each week.",
 			"Selecting at least one will result in 25% increased XP."
 		}
@@ -90,7 +90,7 @@ public class DelveCustomInventory extends CustomInventory {
 		Material.CYAN_GLAZED_TERRACOTTA,
 		Component.text("Experimental Modifier", NamedTextColor.AQUA, TextDecoration.BOLD)
 			.decoration(TextDecoration.ITALIC, false),
-		new String[] {
+		new String[]{
 			"This is a one-time event modifier that may or may not be coming back."
 		}
 	);
@@ -182,11 +182,11 @@ public class DelveCustomInventory extends CustomInventory {
 	/**
 	 * Configuration options for this DelveCustomInventory.
 	 *
-	 * @param editable    Whether the player should be allowed to change delve
-	 *                    points shown in this menu.
-	 * @param startable   Whether the player should be allowed to start
-	 *                    a delve using this menu.
-	 * @param preset      The delve preset shown in this menu, if any.
+	 * @param editable  Whether the player should be allowed to change delve
+	 *                  points shown in this menu.
+	 * @param startable Whether the player should be allowed to start
+	 *                  a delve using this menu.
+	 * @param preset    The delve preset shown in this menu, if any.
 	 */
 	public record Config(boolean editable, boolean startable, @Nullable DelvePreset preset) {
 		/**
@@ -238,12 +238,12 @@ public class DelveCustomInventory extends CustomInventory {
 			return new HashMap<>(mConfig.preset().mModifiers);
 		}
 		return Arrays.stream(DelvesModifier.values())
-					 .collect(Collectors.toMap(
-						mod -> mod,
-						mod -> DelvesUtils.getDelveModLevel(mOwner, mDungeonName, mod),
-						(a, b) -> b,
-						HashMap::new
-					 ));
+			.collect(Collectors.toMap(
+				mod -> mod,
+				mod -> DelvesUtils.getDelveModLevel(mOwner, mDungeonName, mod),
+				(a, b) -> b,
+				HashMap::new
+			));
 	}
 
 	public DelveCustomInventory(Player owner, String dungeon, Config config) {
@@ -287,14 +287,14 @@ public class DelveCustomInventory extends CustomInventory {
 	 */
 	private void updatePointTotal() {
 		mTotalPoint = mPointSelected.entrySet()
-									.stream()
-									.mapToInt(entry -> entry.getValue() * entry.getKey().getPointsPerLevel())
-									.sum();
+			.stream()
+			.mapToInt(entry -> entry.getValue() * entry.getKey().getPointsPerLevel())
+			.sum();
 
 		// Pre-existing entropy should only be single-counted!
 		int entropyExtraPoints =
 			Entropy.getDepthPointsAssigned(mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0)) -
-			Entropy.getDepthPointsAssigned(mAlreadyRolledEntropy);
+				Entropy.getDepthPointsAssigned(mAlreadyRolledEntropy);
 		// Let Entropy exceed the base limit
 		/*
 		int entropyMaxAssignable =
@@ -318,6 +318,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 	/**
 	 * Retrieves Bukkit numbered slot from row and column.
+	 *
 	 * @param row up to down
 	 * @param col left to right
 	 */
@@ -407,7 +408,7 @@ public class DelveCustomInventory extends CustomInventory {
 		// make sure to change the PRESET_SLOT and mPage condition.
 		if (mPage == 1 && mDungeonName.equals("ring") && mConfig.editable()) {
 			int presetId = ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD)
-										  .orElse(0);
+				.orElse(0);
 			DelvePreset delvePreset = DelvePreset.getDelvePreset(presetId);
 			if (delvePreset != null) {
 				ItemStack presetItem = GUIUtils.createBasicItem(
@@ -724,7 +725,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 		if (slot == PRESET_SLOT && mPage == 1 && mDungeonName.equals("ring") && mConfig.editable()) {
 			int presetId = ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD)
-										  .orElse(0);
+				.orElse(0);
 			DelvePreset delvePreset = DelvePreset.getDelvePreset(presetId);
 			if (delvePreset != null) {
 				mAlreadyRolledEntropy = 0;
@@ -737,7 +738,7 @@ public class DelveCustomInventory extends CustomInventory {
 				if (mPointSelected.containsKey(DelvesModifier.ENTROPY)) {
 					int entropyPoints =
 						Entropy.getDepthPointsAssigned(mPointSelected.get(DelvesModifier.ENTROPY)) -
-						Entropy.getDepthPointsAssigned(mAlreadyRolledEntropy);
+							Entropy.getDepthPointsAssigned(mAlreadyRolledEntropy);
 					List<DelvesModifier> entropyableMods = DelvesModifier.entropyAssignable();
 
 					while (entropyPoints > 0) {
@@ -749,7 +750,7 @@ public class DelveCustomInventory extends CustomInventory {
 				}
 
 				int presetId = 0;
-				if (mConfig.preset() != null &&  	// If the preset contains Entropy, it shouldn't be exact
+				if (mConfig.preset() != null &&    // If the preset contains Entropy, it shouldn't be exact
 					DelvePreset.validatePresetModifiers(mPointSelected, mConfig.preset(), !mConfig.preset().mModifiers.containsKey(DelvesModifier.ENTROPY))) {
 					presetId = mConfig.preset().getId();
 				}
@@ -764,12 +765,12 @@ public class DelveCustomInventory extends CustomInventory {
 						playerWhoClicked.sendMessage(Component.text("Unable to find dungeon transfer function, please report to TM!", NamedTextColor.RED));
 					} else {
 						Bukkit.getScheduler()
-							  .runTaskLater(
-									Plugin.getInstance(),
-									() -> NmsUtils.getVersionAdapter()
-												  .runConsoleCommandSilently("execute as " + mOwner.getName() + " at @s run " + dungeonFunc),
-									0
-							  );
+							.runTaskLater(
+								Plugin.getInstance(),
+								() -> NmsUtils.getVersionAdapter()
+									.runConsoleCommandSilently("execute as " + mOwner.getName() + " at @s run " + dungeonFunc),
+								0
+							);
 					}
 				}
 			} else {

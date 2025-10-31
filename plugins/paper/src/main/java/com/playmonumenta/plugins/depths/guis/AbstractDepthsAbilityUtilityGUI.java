@@ -125,8 +125,8 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 		GUIUtils.refreshOffhand(event);
 		ItemStack clickedItem = event.getCurrentItem();
 		if (event.getClickedInventory() != mInventory
-			    || clickedItem == null
-			    || clickedItem.getType() == FILLER) {
+			|| clickedItem == null
+			|| clickedItem.getType() == FILLER) {
 			return;
 		}
 		Player player = (Player) event.getWhoClicked();
@@ -148,7 +148,7 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 		} else {
 			for (DepthsAbilityInfo<?> ability : abilities) {
 				if (ability.getDisplayName() != null
-					    && ItemUtils.getPlainName(clickedItem).contains(ability.getDisplayName())) {
+					&& ItemUtils.getPlainName(clickedItem).contains(ability.getDisplayName())) {
 					setConfirmation(clickedItem);
 					return;
 				}

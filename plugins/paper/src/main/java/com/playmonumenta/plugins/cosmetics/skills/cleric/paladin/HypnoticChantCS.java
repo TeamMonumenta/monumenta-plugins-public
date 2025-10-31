@@ -88,7 +88,7 @@ public class HypnoticChantCS extends ChoirBellsCS {
 		Vector dir = LocationUtils.getDirectionTo(playerLoc, mobLoc);
 		double distance = mobLoc.distance(playerLoc);
 		mob.getWorld().playSound(mobLoc, Sound.ENTITY_ALLAY_ITEM_TAKEN, SoundCategory.PLAYERS, 1.3f, 0.5f);
-			ParticleUtils.drawParticleLineSlash(middleLoc, dir, 0, 0.5 * distance, 0.1, 6,
+		ParticleUtils.drawParticleLineSlash(middleLoc, dir, 0, 0.5 * distance, 0.1, 6,
 			(Location lineLoc, double middleProgress, double endProgress, boolean middle) ->
 				new PartialParticle(Particle.REDSTONE, lineLoc, 1, 0.05, 0.05, 0.05, 0.25).data(GREEN).spawnAsPlayerActive(player));
 	}

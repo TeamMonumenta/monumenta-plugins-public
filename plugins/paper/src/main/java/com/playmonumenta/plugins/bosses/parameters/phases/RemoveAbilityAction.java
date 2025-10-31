@@ -11,7 +11,8 @@ public class RemoveAbilityAction implements Action {
 		mAbility = ability;
 	}
 
-	@Override public void runAction(LivingEntity boss) {
+	@Override
+	public void runAction(LivingEntity boss) {
 		BossManager.getInstance().removeAbility(boss, mAbility);
 		boss.removeScoreboardTag(mAbility);
 	}

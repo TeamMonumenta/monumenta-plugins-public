@@ -58,17 +58,17 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 		player -> player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD);
 
 	public static final AbilityInfo<ShieldWall> INFO =
-			new AbilityInfo<>(ShieldWall.class, "Shield Wall", ShieldWall::new)
-					.linkedSpell(ClassAbility.SHIELD_WALL)
-					.scoreboardId("ShieldWall")
-					.shorthandName("SW")
-					.descriptions(getDescription1(), getDescription2())
-					.simpleDescription("Deploy a wall that can block projectiles and mobs from entering.")
-					.cooldown(SHIELD_WALL_1_COOLDOWN, SHIELD_WALL_2_COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", "Moves after being cast, recasting will make it stationary.", shieldWall -> shieldWall.cast(false, true), new AbilityTrigger(AbilityTrigger.Key.SWAP), RESTRICTION))
-					.addTrigger(new AbilityTriggerInfo<>("castmoving", "cast moving", "Moves after being cast, does nothing when recast.", shieldWall -> shieldWall.cast(false, false), new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false), RESTRICTION))
-					.addTrigger(new AbilityTriggerInfo<>("caststationary", "cast stationary", "Will never move when cast. If cast with a different trigger, using this trigger will make it stationary.", shieldWall -> shieldWall.cast(true, true), new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false), RESTRICTION))
-					.displayItem(Material.STONE_BRICK_WALL);
+		new AbilityInfo<>(ShieldWall.class, "Shield Wall", ShieldWall::new)
+			.linkedSpell(ClassAbility.SHIELD_WALL)
+			.scoreboardId("ShieldWall")
+			.shorthandName("SW")
+			.descriptions(getDescription1(), getDescription2())
+			.simpleDescription("Deploy a wall that can block projectiles and mobs from entering.")
+			.cooldown(SHIELD_WALL_1_COOLDOWN, SHIELD_WALL_2_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", "Moves after being cast, recasting will make it stationary.", shieldWall -> shieldWall.cast(false, true), new AbilityTrigger(AbilityTrigger.Key.SWAP), RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("castmoving", "cast moving", "Moves after being cast, does nothing when recast.", shieldWall -> shieldWall.cast(false, false), new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false), RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("caststationary", "cast stationary", "Will never move when cast. If cast with a different trigger, using this trigger will make it stationary.", shieldWall -> shieldWall.cast(true, true), new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false), RESTRICTION))
+			.displayItem(Material.STONE_BRICK_WALL);
 
 	private final int mDuration;
 	private final double mHeight;

@@ -36,7 +36,7 @@ public class Point {
 				sender.sendMessage(Component.text("Failed to parse string '" + str + "' as point - found " + strArray.length + " elements", NamedTextColor.RED));
 			}
 			throw new Exception("Failed to parse string '" + str +
-				                    "' as point - found " + strArray.length + " elements");
+				"' as point - found " + strArray.length + " elements");
 		}
 		return fromString(sender, strArray[0], strArray[1], strArray[2], false, null);
 	}
@@ -88,7 +88,7 @@ public class Point {
 
 	@Override
 	public String toString() {
-		return "(" + Double.toString(mX) + ", " +
-		       Double.toString(mY) + ", " + Double.toString(mZ) + ")";
+		return "(" + mX + ", " +
+			mY + ", " + mZ + ")";
 	}
 }

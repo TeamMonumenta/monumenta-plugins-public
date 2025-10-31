@@ -64,6 +64,7 @@ public class StringofThornsCS extends VoodooBondsCS {
 			int mTicks = 0;
 			final Location mLoc = startLoc.clone();
 			final Vector mDir = direction.clone();
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 8; i++) {
@@ -105,6 +106,7 @@ public class StringofThornsCS extends VoodooBondsCS {
 		startLoc.subtract(0, 2, 0);
 		new BukkitRunnable() {
 			double mD = 30;
+
 			@Override
 			public void run() {
 				Vector vec;

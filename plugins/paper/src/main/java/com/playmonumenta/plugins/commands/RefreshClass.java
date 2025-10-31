@@ -10,9 +10,9 @@ import org.bukkit.entity.Player;
 public class RefreshClass extends GenericCommand {
 	public static void register(Plugin plugin) {
 		registerPlayerCommand("refreshclass", "monumenta.command.refreshclass",
-		                      (sender, player) -> {
-		                          run(plugin, sender, player);
-		                      });
+			(sender, player) -> {
+				run(plugin, sender, player);
+			});
 	}
 
 	private static void run(Plugin plugin, CommandSender sender, Player player) {

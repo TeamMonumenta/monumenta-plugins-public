@@ -2,14 +2,13 @@ package com.playmonumenta.plugins.rush;
 
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.util.List;
-import java.util.NoSuchElementException;
 
 public class RushArenaUtils {
 

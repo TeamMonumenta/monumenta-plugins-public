@@ -57,21 +57,21 @@ public class FishingCombatManager implements Listener {
 	public static final int MUSIC_DURATION = 125;
 	private static final int PORTAL_DURATION = 200;
 	private static final int WAVE_COUNT = 3;
-	private static final int[][] WAVE_MOB_TYPES = new int[][] {
+	private static final int[][] WAVE_MOB_TYPES = new int[][]{
 		// Difficulty 0
-		{ 0, 0, 1, 1, 0, 0 },
-		{ 0, 1, 1, 1, 0, 0, 1, 0, 0 },
-		{ 0, 1, 1, 2, 1, 0, 1, 1, 0, 0 },
+		{0, 0, 1, 1, 0, 0},
+		{0, 1, 1, 1, 0, 0, 1, 0, 0},
+		{0, 1, 1, 2, 1, 0, 1, 1, 0, 0},
 		// Difficulty 1
-		{ 0, 1, 1, 1, 1, 0, 1, 0 },
-		{ 0, 1, 1, 2, 0, 0, 1, 1, 0, 1, 0},
-		{ 0, 1, 1, 1, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0},
+		{0, 1, 1, 1, 1, 0, 1, 0},
+		{0, 1, 1, 2, 0, 0, 1, 1, 0, 1, 0},
+		{0, 1, 1, 1, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0},
 		// Difficulty 2
-		{ 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 2 },
-		{ 0, 1, 1, 1, 2, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0},
-		{ 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 0, 0, 0 }
+		{0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 2},
+		{0, 1, 1, 1, 2, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0},
+		{2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 0, 0, 0}
 	};
-	private static final int[] MOB_SPAWN_DELAYS = new int[] { 25, 18, 18 };
+	private static final int[] MOB_SPAWN_DELAYS = new int[]{25, 18, 18};
 	private static final String FISH_TABLE = "epic:r3/world/fishing/ring_fish_full";
 	private final LoSPool POOL_COMMON = new LoSPool.LibraryPool("~FishingCommonMobs");
 	private final LoSPool POOL_UNCOMMON = new LoSPool.LibraryPool("~FishingUncommonMobs");
@@ -239,6 +239,7 @@ public class FishingCombatManager implements Listener {
 		launchPlayer(player, toLocation.clone().add(0, 2, 0), true);
 		new BukkitRunnable() {
 			int mLaunches = 1;
+
 			@Override
 			public void run() {
 				if (mLaunches >= 5 || arena.mActive) {
@@ -261,6 +262,7 @@ public class FishingCombatManager implements Listener {
 		Hitbox hitbox = new Hitbox.SphereHitbox(portalLocation, 2);
 		new BukkitRunnable() {
 			int mTicks;
+
 			@Override
 			public void run() {
 				if (mTicks >= PORTAL_DURATION) {
@@ -305,6 +307,7 @@ public class FishingCombatManager implements Listener {
 		arena.mSpawning = true;
 		new BukkitRunnable() {
 			int mMobsSpawned = 0;
+
 			@Override
 			public void run() {
 				if (mMobsSpawned > mobTypes.length - 1 || !arena.mOccupied) {
@@ -386,6 +389,7 @@ public class FishingCombatManager implements Listener {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 12; i++) {

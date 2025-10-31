@@ -67,7 +67,7 @@ public class HandOfLight extends Ability {
 			.simpleDescription("Heal all players in front of the Cleric, and damage all mobs based on the number of Heretics in the area.")
 			.cooldown(HEALING_1_COOLDOWN, HEALING_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HandOfLight::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
-				                                                                        .keyOptions(AbilityTrigger.KeyOptions.SNEAK_WITH_SHIELD).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS_EXCEPT_SHIELD)))
+				.keyOptions(AbilityTrigger.KeyOptions.SNEAK_WITH_SHIELD).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS_EXCEPT_SHIELD)))
 			.displayItem(Material.PINK_DYE);
 
 	private final double mRange;
@@ -103,7 +103,7 @@ public class HandOfLight extends Ability {
 		Hitbox hitbox;
 		if (!isEnhanced()) {
 			hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), mRange, Math.toRadians(HEALING_ANGLE))
-				         .union(new Hitbox.SphereHitbox(mPlayer.getLocation(), NEARBY_SPHERE_RANGE));
+				.union(new Hitbox.SphereHitbox(mPlayer.getLocation(), NEARBY_SPHERE_RANGE));
 		} else {
 			hitbox = new Hitbox.SphereHitbox(mPlayer.getEyeLocation(), mRange);
 		}

@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
-import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -15,13 +15,11 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.entity.Creeper;
@@ -88,7 +86,7 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 			|| damagedEntity.getScoreboardTags().contains(IDOLATRY_IMMUNE_TAG)
 			|| event.getAbility() == ClassAbility.COUP_DE_GRACE
 			|| event.getDamager() == damagedEntity) {
-				return;
+			return;
 		} // This event is called a LOT and has a LOT of if statements. someone very very experienced with the damage pipeline should optimise the order
 		// Note on the doubled proj and earrows damage: Projectile hits deal both a normal and a True damage pop, because of... iframes probably.
 		// Despite allegedly cancelling if the event is cancelled, Idolatry processes both.

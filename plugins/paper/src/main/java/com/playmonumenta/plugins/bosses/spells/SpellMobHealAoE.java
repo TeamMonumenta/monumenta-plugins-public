@@ -25,7 +25,7 @@ public class SpellMobHealAoE extends Spell {
 	private final Aesthetic mOutburstCircleAesthetic;
 	private final HealingAction mHealingAction;
 
-	public SpellMobHealAoE(Plugin plugin, LivingEntity boss, RejuvenationBoss.Parameters p){
+	public SpellMobHealAoE(Plugin plugin, LivingEntity boss, RejuvenationBoss.Parameters p) {
 		this(
 			plugin,
 			boss,

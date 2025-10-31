@@ -16,9 +16,9 @@ public class Pernicious {
 	public static final String AVOID_PERNICIOUS = "boss_perniciousimmune";
 
 	public static Component[] rankDescription(int level) {
-			return new Component[]{
-				Component.text("Enemies have a " + Math.round(BLOCK_BREAK_CHANCE_PER_LEVEL * level * 100) + "% chance to have Block Break.")
-			};
+		return new Component[]{
+			Component.text("Enemies have a " + Math.round(BLOCK_BREAK_CHANCE_PER_LEVEL * level * 100) + "% chance to have Block Break.")
+		};
 	}
 
 

@@ -72,13 +72,13 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void changePhase(SpellManager activeSpells,
-							List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction) {
+	                        List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction) {
 
 		changePhase(activeSpells, passiveSpells, phaseAction, 0);
 	}
 
 	public void changePhase(SpellManager activeSpells,
-							List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction, int spellDelay) {
+	                        List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction, int spellDelay) {
 		if (phaseAction != null) {
 			phaseAction.accept(mBoss);
 		}
@@ -110,42 +110,42 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange,
-							  @Nullable BossBarManager bossBar) {
+	                          @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpell, detectionRange, bossBar, 100);
 	}
 
 	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange,
-							  @Nullable BossBarManager bossBar, long spellDelay) {
+	                          @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(List.of(activeSpell), Collections.emptyList(), detectionRange, bossBar, spellDelay);
 	}
 
 	public void constructBoss(BossAbilityGroup this, List<Spell> activeSpells, List<Spell> passiveSpells,
-							  int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
+	                          int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(new SpellManager(activeSpells), passiveSpells, detectionRange, bossBar, spellDelay);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
-							  @Nullable BossBarManager bossBar) {
+	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+	                          @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 100);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
-							  @Nullable BossBarManager bossBar, long spellDelay) {
+	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+	                          @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, PASSIVE_RUN_INTERVAL_DEFAULT);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
-							  @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
+	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+	                          @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, passiveIntervalTicks, false);
 	}
 
 	/* If detectionRange <= 0, will always run regardless of whether players are nearby */
 	public void constructBoss(BossAbilityGroup this, SpellManager activeSpells, List<Spell> passiveSpells,
-							  int detectionRange, @Nullable BossBarManager bossBar, long spellDelay,
-							  long passiveIntervalTicks, boolean preventSameSpellTwiceInARow) {
+	                          int detectionRange, @Nullable BossBarManager bossBar, long spellDelay,
+	                          long passiveIntervalTicks, boolean preventSameSpellTwiceInARow) {
 		mDetectionRange = detectionRange;
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;

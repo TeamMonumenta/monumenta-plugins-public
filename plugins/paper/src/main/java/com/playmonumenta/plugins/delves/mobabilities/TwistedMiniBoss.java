@@ -38,6 +38,7 @@ public class TwistedMiniBoss extends BossAbilityGroup {
 
 		Spell spell = new Spell() {
 			int mTimer = 0;
+
 			@Override
 			public void run() {
 				mTimer += 5;

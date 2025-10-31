@@ -55,8 +55,8 @@ public class SpellColossalBruteForce extends SpellBaseSeekingAoE {
 	 * @param canMoveWhileCasting  If the boss can move in the period between the charge up is finished and the spell is triggered
 	 */
 	public SpellColossalBruteForce(Plugin plugin, LivingEntity caster, EntityTargets targets, int delay, int cooldown, int radius,
-								   int count, int incrementDelay, int damage, double damagePercentage, boolean blockable, EffectsList effects,
-								   boolean canMoveWhileCharging, boolean canMoveWhileCasting, SoundsList chargeSound) {
+	                               int count, int incrementDelay, int damage, double damagePercentage, boolean blockable, EffectsList effects,
+	                               boolean canMoveWhileCharging, boolean canMoveWhileCasting, SoundsList chargeSound) {
 
 		super(plugin, caster, (int) targets.getRange(), (int) targets.getRange(), delay, 0, cooldown, radius,
 			count, incrementDelay, canMoveWhileCharging, canMoveWhileCasting, false, false,

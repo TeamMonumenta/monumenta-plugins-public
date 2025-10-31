@@ -52,8 +52,8 @@ public abstract class PlayerClass {
 
 	public @Nullable PlayerSpec getSpecById(int specId) {
 		return mSpecOne.mSpecialization == specId ? mSpecOne
-			       : mSpecTwo.mSpecialization == specId ? mSpecTwo
-				         : null;
+			: mSpecTwo.mSpecialization == specId ? mSpecTwo
+			: null;
 	}
 
 }

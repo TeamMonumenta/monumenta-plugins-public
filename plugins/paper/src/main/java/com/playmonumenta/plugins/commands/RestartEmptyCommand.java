@@ -40,7 +40,7 @@ public class RestartEmptyCommand {
 				sender.sendMessage("Server is already pending restart");
 			}
 		} else if (cancel) {
-				sender.sendMessage("Nothing changed, server was not pending restart");
+			sender.sendMessage("Nothing changed, server was not pending restart");
 		} else {
 			TASK = new BukkitRunnable() {
 				@Override

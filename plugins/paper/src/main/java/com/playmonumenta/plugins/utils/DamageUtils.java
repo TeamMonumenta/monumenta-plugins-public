@@ -76,19 +76,20 @@ public class DamageUtils {
 	 * player invulnerability ticks (iframes) but this method does allow it to be blocked by a shield using the vanilla
 	 * checks for backwards compatibility with <code>BossUtils#bossDamagePercent</code>. Refer to the
 	 * <code>VersionAdapter</code> for more information
-	 * @param damager LivingEntity dealing damage, pass null if not applicable
-	 * @param damagee LivingEntity receiving damage
-	 * @param percentHealth How much of the entity's health should be damaged
+	 *
+	 * @param damager        LivingEntity dealing damage, pass null if not applicable
+	 * @param damagee        LivingEntity receiving damage
+	 * @param percentHealth  How much of the entity's health should be damaged
 	 * @param causeKnockback Whether the damage should cause knockback
-	 * @param blockable Whether the damage can be blocked with a shield
-	 * @param cause Used for player death messages
-	 * @param isBossAbility Whether this damage originated from a Boss. Only used by the Retaliation enchantment
-	 * @param effects Statuses applied to the player with this attack. Only used by the Retaliation enchantment
+	 * @param blockable      Whether the damage can be blocked with a shield
+	 * @param cause          Used for player death messages
+	 * @param isBossAbility  Whether this damage originated from a Boss. Only used by the Retaliation enchantment
+	 * @param effects        Statuses applied to the player with this attack. Only used by the Retaliation enchantment
 	 */
 	public static void damagePercentHealth(@Nullable final LivingEntity damager, final LivingEntity damagee,
-										   final double percentHealth, final boolean causeKnockback,
-										   final boolean blockable, final String cause, final boolean isBossAbility,
-										   final List<EffectsList.Effect> effects) {
+	                                       final double percentHealth, final boolean causeKnockback,
+	                                       final boolean blockable, final String cause, final boolean isBossAbility,
+	                                       final List<EffectsList.Effect> effects) {
 		final double damageToTake = percentHealth * EntityUtils.getMaxHealth(damagee);
 
 		// TODO: Retaliation should not be in this part of the damage pipeline. DamageUtils shouldn't need to know about
@@ -125,7 +126,7 @@ public class DamageUtils {
 	 * @param bypassIFrames whether the damage should bypass IFrames
 	 */
 	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount,
-							  @Nullable ClassAbility ability, boolean bypassIFrames) {
+	                          @Nullable ClassAbility ability, boolean bypassIFrames) {
 		damage(damager, damagee, type, amount, ability, bypassIFrames, false);
 	}
 
@@ -141,7 +142,7 @@ public class DamageUtils {
 	 * @param causeKnockback whether the damage should cause knockback
 	 */
 	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount,
-							  @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback) {
+	                          @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback) {
 		damage(damager, damagee, type, amount, ability, bypassIFrames, causeKnockback, null);
 	}
 
@@ -158,8 +159,8 @@ public class DamageUtils {
 	 * @param bossCause      string to pass for boss death messages
 	 */
 	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount,
-							  @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback,
-							  @Nullable String bossCause) {
+	                          @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback,
+	                          @Nullable String bossCause) {
 		damage(damager, damagee, new DamageEvent.Metadata(type, ability, null, bossCause), amount,
 			bypassIFrames, causeKnockback, false);
 	}
@@ -178,7 +179,7 @@ public class DamageUtils {
 	 * @param blockable      Whether the damage can be blocked with a shield
 	 */
 	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageEvent.Metadata metadata,
-							  double amount, boolean bypassIFrames, boolean causeKnockback, boolean blockable) {
+	                          double amount, boolean bypassIFrames, boolean causeKnockback, boolean blockable) {
 		if (!damagee.isValid() || isImmuneToDamage(damagee, metadata.getType())) {
 			return;
 		}

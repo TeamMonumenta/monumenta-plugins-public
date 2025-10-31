@@ -2,11 +2,10 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.Plugin;
-
-import java.util.Collections;
 
 public class AntiCrammingBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_anticramming";

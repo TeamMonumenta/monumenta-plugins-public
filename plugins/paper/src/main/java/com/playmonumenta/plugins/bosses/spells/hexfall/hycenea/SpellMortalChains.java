@@ -112,6 +112,7 @@ public class SpellMortalChains extends Spell {
 							int mT = 0;
 							final int mAnimationTime = 20 * 2;
 							double mCircleRadius = mRadius;
+
 							@Override
 							public void run() {
 								mCircleRadius = (mRadius * (1d - ((double) mT / (double) mAnimationTime)));
@@ -216,6 +217,7 @@ public class SpellMortalChains extends Spell {
 			int mTetherTimer = mTetherBreakTime;
 			final TextDisplay mTextDisplay = loc.getWorld().spawn(loc.clone().add(0, 2.5, 0), TextDisplay.class);
 			final int mMaxTickMarks = 60;
+
 			@Override
 			public void run() {
 

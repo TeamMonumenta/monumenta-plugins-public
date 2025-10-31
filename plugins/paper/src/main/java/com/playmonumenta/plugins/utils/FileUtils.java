@@ -175,6 +175,7 @@ public class FileUtils {
 	 * If the target path is a file or empty folder, delete it,
 	 * recursively delete parent folders if they are now empty,
 	 * and return true if anything was deleted at all, otherwise false.
+	 *
 	 * @param path The path to be deleted
 	 * @return Returns true if a file/folder was deleted, otherwise false
 	 * @throws Exception Any exceptions related to these action are to be handled by the caller.

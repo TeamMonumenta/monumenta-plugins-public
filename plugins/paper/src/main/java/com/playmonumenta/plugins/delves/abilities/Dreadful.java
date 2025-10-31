@@ -14,10 +14,10 @@ public class Dreadful {
 	public static final String AVOID_DREADFUL = "boss_dreadfulimmune";
 
 	public static Component[] rankDescription(int level) {
-			return new Component[]{
-				Component.text("Dying Elites have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance"),
-				Component.text("to spawn Dreadnaughts.")
-			};
+		return new Component[]{
+			Component.text("Dying Elites have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance"),
+			Component.text("to spawn Dreadnaughts.")
+		};
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {

@@ -9,7 +9,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class SpellChangeArrow extends Spell {
-	private LivingEntity mLauncher;
+	private final LivingEntity mLauncher;
 
 	public SpellChangeArrow(LivingEntity launcher) {
 		mLauncher = launcher;

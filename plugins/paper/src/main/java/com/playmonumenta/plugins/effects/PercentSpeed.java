@@ -66,7 +66,7 @@ public class PercentSpeed extends Effect {
 
 	@Override
 	public void entityTickEffect(final Entity entity, final boolean fourHertz, final boolean twoHertz,
-								 final boolean oneHertz) {
+	                             final boolean oneHertz) {
 		if (entity instanceof Player) {
 			final boolean isInNoMobilityZone = ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES);
 

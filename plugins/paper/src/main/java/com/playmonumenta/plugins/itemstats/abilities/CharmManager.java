@@ -1264,9 +1264,10 @@ public class CharmManager {
 		)).toList();
 	}
 
-	/** Returns the charms a player has equipped that are of type <code>charmType</code>
+	/**
+	 * Returns the charms a player has equipped that are of type <code>charmType</code>
 	 *
-	 * @param player The player
+	 * @param player    The player
 	 * @param charmType The type of charm to query
 	 * @return The charms of the given type that the player currently has equipped.
 	 */
@@ -1274,11 +1275,12 @@ public class CharmManager {
 		return charmType.mPlayerCharms.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>());
 	}
 
-	/** Add (equip) a charm onto a player.
+	/**
+	 * Add (equip) a charm onto a player.
 	 * Returns false if passed a null player or if the charm is not valid.
 	 *
-	 * @param p The player
-	 * @param charm The charm
+	 * @param p         The player
+	 * @param charm     The charm
 	 * @param charmType The type of said charm.
 	 * @return True if successful
 	 */
@@ -1470,9 +1472,10 @@ public class CharmManager {
 		return 0;
 	}
 
-	/** Summarize a player's charm attributes into a map, given the type of charm to summarize.
+	/**
+	 * Summarize a player's charm attributes into a map, given the type of charm to summarize.
 	 *
-	 * @param p The player
+	 * @param p         The player
 	 * @param charmType The type of the charm.
 	 * @return A TreeMap sorted on effect name, representing a summary of all the <code>charmType</code> charm attributes of this player
 	 * @see CharmManager#getSummaryOfAllAttributesAsComponents(Player, CharmType)
@@ -1504,13 +1507,14 @@ public class CharmManager {
 
 	private static final DecimalFormat valueFormatter = new DecimalFormat("#.###"); // i hate floats
 
-	/** Summarizes the charms of a given player that match the given CharmType.
+	/**
+	 * Summarizes the charms of a given player that match the given CharmType.
 	 * Used for rendering charm info into GUI components.
 	 *
-	 * @param p The player
+	 * @param p         The player
 	 * @param charmType The type of charms we want to summarize.
-	 * @see CharmsGUI#setup()
 	 * @return The summary of all the charm attributes of the given type as components.
+	 * @see CharmsGUI#setup()
 	 */
 	public List<Component> getSummaryOfAllAttributesAsComponents(Player p, CharmType charmType) {
 		List<Component> output = new ArrayList<>();
@@ -1569,9 +1573,10 @@ public class CharmManager {
 		return output;
 	}
 
-	/** Summarize the names of the charms a player has equipped of a given type, including the total charm power used.
+	/**
+	 * Summarize the names of the charms a player has equipped of a given type, including the total charm power used.
 	 *
-	 * @param p The player
+	 * @param p         The player
 	 * @param charmType The type of the charms.
 	 * @return A summary of charm names of a given type on a given player.
 	 */
@@ -1590,9 +1595,10 @@ public class CharmManager {
 		return Component.text("no charms", NamedTextColor.GRAY);
 	}
 
-	/** Returns the total amount of charm power the player is using by their charms of type <code>charmType</code>
+	/**
+	 * Returns the total amount of charm power the player is using by their charms of type <code>charmType</code>
 	 *
-	 * @param p The player
+	 * @param p         The player
 	 * @param charmType The type of the charms.
 	 * @return The total used charm power of all the charms the player is using of type <code>charmType</code>
 	 */
@@ -1649,7 +1655,7 @@ public class CharmManager {
 							ItemStack item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_ITEM).getAsString()));
 							if (item != null) {
 
-									ItemStatUtils.cleanIfNecessary(item);
+								ItemStatUtils.cleanIfNecessary(item);
 
 								playerCharms.add(item);
 							}
@@ -1670,9 +1676,10 @@ public class CharmManager {
 
 	/**
 	 * Get the scaled radius of a skill
-	 * @param player The player with the charm effect
+	 *
+	 * @param player          The player with the charm effect
 	 * @param charmEffectName Name of the charm effect
-	 * @param baseRadius Initial radius of the skill
+	 * @param baseRadius      Initial radius of the skill
 	 * @return The scaled radius or 0.1, whichever is greater
 	 */
 	public static double getRadius(Player player, String charmEffectName, double baseRadius) {
@@ -1718,9 +1725,10 @@ public class CharmManager {
 		return (baseValue + flatLevel) * ((percentLevel / 100.0) + 1);
 	}
 
-	/** Returns the given value, or the cap of the charm's effect if the value is over it
+	/**
+	 * Returns the given value, or the cap of the charm's effect if the value is over it
 	 *
-	 * @param value The value
+	 * @param value           The value
 	 * @param charmEffectName The effect name
 	 * @return Returns the passed value, or returns the max value for the stat.
 	 */

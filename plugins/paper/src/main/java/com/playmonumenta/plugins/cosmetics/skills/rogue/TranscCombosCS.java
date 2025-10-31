@@ -36,8 +36,8 @@ public class TranscCombosCS extends ViciousCombosCS {
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-				"The transcendent one",
-				"will be bested by none.");
+			"The transcendent one",
+			"will be bested by none.");
 	}
 
 	@Override
@@ -94,6 +94,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 			int mT = 0;
 			float mTridentPitch = 0.0f;
 			float mPufferPitch = 0.0f;
+
 			@Override
 			public void run() {
 				mT++;

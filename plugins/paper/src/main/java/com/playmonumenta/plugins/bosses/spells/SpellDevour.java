@@ -14,9 +14,9 @@ import org.bukkit.util.Vector;
 
 public class SpellDevour extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private DevourBoss.Parameters mParameters;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final DevourBoss.Parameters mParameters;
 
 	public SpellDevour(Plugin plugin, LivingEntity boss, DevourBoss.Parameters parameters) {
 		mPlugin = plugin;

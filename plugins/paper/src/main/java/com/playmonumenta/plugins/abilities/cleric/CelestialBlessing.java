@@ -97,7 +97,7 @@ public class CelestialBlessing extends Ability {
 				(entity, fourHertz, twoHertz, oneHertz) ->
 					mCosmetic.tickEffect(mPlayer, p, fourHertz, twoHertz, oneHertz),
 				(entity) -> mCosmetic.loseEffect(mPlayer, p))
-					.deleteOnAbilityUpdate(true)
+				.deleteOnAbilityUpdate(true)
 			);
 			mCosmetic.startEffectTargets(p);
 		}

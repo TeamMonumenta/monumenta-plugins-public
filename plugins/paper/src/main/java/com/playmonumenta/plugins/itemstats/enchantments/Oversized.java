@@ -79,7 +79,7 @@ public class Oversized implements Enchantment {
 		for (int i = 0; i < 9; i++) {
 			ItemStack item = player.getInventory().getItem(i);
 			if (item != null && ((disableOversized && ItemStatUtils.hasEnchantment(item, EnchantmentType.OVERSIZED))
-					|| (disableThrowingKnife && ItemStatUtils.hasEnchantment(item, EnchantmentType.THROWING_KNIFE)))) {
+				|| (disableThrowingKnife && ItemStatUtils.hasEnchantment(item, EnchantmentType.THROWING_KNIFE)))) {
 				if (player.getCooldown(item.getType()) < cooldown) {
 					player.setCooldown(item.getType(), cooldown);
 				}

@@ -43,6 +43,7 @@ public class VolcanicDemiseTowerAbility extends TowerAbility {
 
 					final World mWorld = mBoss.getWorld();
 					int mTicks = 0;
+
 					@Override
 					public void run() {
 						if (mBoss.isDead() || !mBoss.isValid() || mGame.isTurnEnded()) {
@@ -67,6 +68,7 @@ public class VolcanicDemiseTowerAbility extends TowerAbility {
 								int mI = 0;
 
 								int mMeteors = 0;
+
 								@Override
 								public void run() {
 									if (mBoss.isDead() || !mBoss.isValid() || mGame.isTurnEnded()) {
@@ -183,7 +185,6 @@ public class VolcanicDemiseTowerAbility extends TowerAbility {
 		};
 		runnable.runTaskTimer(mPlugin, 0, 1);
 	}
-
 
 
 }

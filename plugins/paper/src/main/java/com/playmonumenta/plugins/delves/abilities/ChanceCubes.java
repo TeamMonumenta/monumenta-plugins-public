@@ -153,6 +153,7 @@ public class ChanceCubes {
 				BukkitRunnable task = new BukkitRunnable() {
 					private static final int TIME_LIMIT_TICKS = 60 * 20;
 					private int mTicks = 0;
+
 					@Override
 					public void run() {
 						List<Entity> nearbyEntities = (List<Entity>) loc.getWorld().getNearbyEntities(loc, 8, 7, 8);
@@ -523,6 +524,7 @@ public class ChanceCubes {
 			case 9 -> {
 				BukkitRunnable task = new BukkitRunnable() {
 					private int mSpawnCount = 0;
+
 					@Override
 					public void run() {
 						if (mSpawnCount >= 15) {

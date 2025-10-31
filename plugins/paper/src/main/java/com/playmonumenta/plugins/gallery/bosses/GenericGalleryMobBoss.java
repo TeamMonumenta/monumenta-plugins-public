@@ -81,13 +81,15 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 				return 5;
 			}
 
-			@Override public void onHurtByEntity(DamageEvent event, Entity damager) {
+			@Override
+			public void onHurtByEntity(DamageEvent event, Entity damager) {
 				if ((mLastTarget == null || mob.getLocation().distanceSquared(mLastTarget.getLocation()) > mob.getLocation().distance(damager.getLocation())) && damager instanceof Player player && !AbilityUtils.isStealthed(player)) {
 					mLastTarget = player;
 				}
 			}
 
-			@Override public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+			@Override
+			public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 				if ((mLastTarget == null || mob.getLocation().distanceSquared(mLastTarget.getLocation()) > mob.getLocation().distance(source.getLocation())) && source instanceof Player player && !AbilityUtils.isStealthed(player)) {
 					mLastTarget = player;
 				}
@@ -97,7 +99,9 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 		//Spell that handle the despawn system
 		Spell despawnSpell = new Spell() {
 			int mTimer = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				mTimer += 10;
 
 				if (mTimer >= DESPAWN_TIMER && TARGET_DESPAWN.getTargetsList(mBoss).isEmpty()) {
@@ -105,27 +109,30 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 				}
 			}
 
-			@Override public int cooldownTicks() {
+			@Override
+			public int cooldownTicks() {
 				return 10;
 			}
 
-			@Override public void onDamage(DamageEvent event, LivingEntity damagee) {
+			@Override
+			public void onDamage(DamageEvent event, LivingEntity damagee) {
 				mTimer = 0;
 			}
 
-			@Override public void onHurtByEntity(DamageEvent event, Entity damager) {
+			@Override
+			public void onHurtByEntity(DamageEvent event, Entity damager) {
 				if (damager instanceof Player) {
 					mTimer = 0;
 				}
 			}
 
-			@Override public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+			@Override
+			public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 				if (source instanceof Player) {
 					mTimer = 0;
 				}
 			}
 		};
-
 
 
 		super.constructBoss(SpellManager.EMPTY, List.of(targetSpell, despawnSpell), 150, null, 5);

@@ -329,9 +329,9 @@ public class LuckPermsIntegration implements Listener {
 	/**
 	 * Sets a permission to either true or false for a player
 	 *
-	 * @param player The player that you want to set a permission for
+	 * @param player     The player that you want to set a permission for
 	 * @param permission The string of your permission to set
-	 * @param value The boolean that your permission is set to
+	 * @param value      The boolean that your permission is set to
 	 */
 	public static void setPermission(Player player, String permission, boolean value) {
 		UM.modifyUser(player.getUniqueId(), user -> {
@@ -343,7 +343,7 @@ public class LuckPermsIntegration implements Listener {
 	/**
 	 * Removes a permission from a player
 	 *
-	 * @param player The player that you want to remove a permission from
+	 * @param player     The player that you want to remove a permission from
 	 * @param permission The string of your permission to remove
 	 */
 	public static void unsetPermission(Player player, String permission) {
@@ -1083,10 +1083,10 @@ public class LuckPermsIntegration implements Listener {
 
 	// runSync: if true, run method on the thread it's called from
 	public static void setGuildBanner(@Nullable CommandSender sender,
-									  Group guild,
-									  Plugin plugin,
-									  ItemStack guildBanner,
-									  boolean runSync) {
+	                                  Group guild,
+	                                  Plugin plugin,
+	                                  ItemStack guildBanner,
+	                                  boolean runSync) {
 		if (sender == null) {
 			sender = Bukkit.getConsoleSender();
 		}

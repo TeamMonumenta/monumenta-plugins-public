@@ -61,6 +61,7 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 	/**
 	 * Builder method to set mDeleteOnAbilityUpdate when creating a new Effect. This should only be used with classes
 	 * that extend Ability since children of DepthsAbility are frequently updated during normal gameplay (e.g. ability upgrade)
+	 *
 	 * @param deleteOnAbilityUpdate Whether this effect instance should be cleared when the affected player changes class
 	 * @return Modified instance of the Effect
 	 */
@@ -150,7 +151,7 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	}
 
-	public void onAbilityCast(AbilityCastEvent event, Player player){
+	public void onAbilityCast(AbilityCastEvent event, Player player) {
 
 	}
 

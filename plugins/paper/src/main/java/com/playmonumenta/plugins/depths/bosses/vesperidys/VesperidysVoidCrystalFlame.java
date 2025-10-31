@@ -82,123 +82,123 @@ public class VesperidysVoidCrystalFlame extends BossAbilityGroup {
 
 		Spell spell = new Spell() {
 
-				@Override
-				public void run() {
+			@Override
+			public void run() {
 
-					open();
-					new PartialParticle(Particle.FLAME, LocationUtils.getEntityCenter(mBoss), 10, 0.5, 0.5, 0.5).spawnAsBoss();
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2, 1);
+				open();
+				new PartialParticle(Particle.FLAME, LocationUtils.getEntityCenter(mBoss), 10, 0.5, 0.5, 0.5).spawnAsBoss();
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2, 1);
 
-					BukkitRunnable shieldWallRunnable = new BukkitRunnable() {
-						int mT = -DELAY;
-						final Location mLoc = mBoss.getLocation().add(0, -3, 0);
-						final Hitbox mHitbox = Hitbox.approximateHollowCylinderSegment(mLoc, HEIGHT, RADIUS - 0.6, RADIUS + 0.6, Math.toRadians(ANGLE) / 2);
-						List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
+				BukkitRunnable shieldWallRunnable = new BukkitRunnable() {
+					int mT = -DELAY;
+					final Location mLoc = mBoss.getLocation().add(0, -3, 0);
+					final Hitbox mHitbox = Hitbox.approximateHollowCylinderSegment(mLoc, HEIGHT, RADIUS - 0.6, RADIUS + 0.6, Math.toRadians(ANGLE) / 2);
+					List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
 
-						@Override
-						public synchronized void cancel() {
-							super.cancel();
-							close();
+					@Override
+					public synchronized void cancel() {
+						super.cancel();
+						close();
+					}
+
+					@Override
+					public void run() {
+						mT++;
+						Vector vec;
+
+						if (mT == 0) {
+							mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ITEM_FIRECHARGE_USE, 2, 0.5f);
 						}
 
-						@Override
-						public void run() {
-							mT++;
-							Vector vec;
+						if (mT >= 0) {
+							if (mT % 4 == 0) {
+								for (double degree = 0; degree < ANGLE; degree += 10) {
+									double radian1 = Math.toRadians(degree);
+									vec = new Vector(FastUtils.cos(radian1) * RADIUS, 0, FastUtils.sin(radian1) * RADIUS);
+									vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
-							if (mT == 0) {
-								mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ITEM_FIRECHARGE_USE, 2, 0.5f);
-							}
-
-							if (mT >= 0) {
-								if (mT % 4 == 0) {
-									for (double degree = 0; degree < ANGLE; degree += 10) {
-										double radian1 = Math.toRadians(degree);
-										vec = new Vector(FastUtils.cos(radian1) * RADIUS, 0, FastUtils.sin(radian1) * RADIUS);
-										vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
-
-										Location l = mLoc.clone().add(vec);
-										for (int y = 0; y < HEIGHT; y++) {
-											l.add(0, 1, 0);
-											new PartialParticle(Particle.FLAME, l, 1, 0, 0, 0)
-												.spawnAsBoss();
-										}
-									}
-								}
-
-								List<? extends LivingEntity> targets = PlayerUtils.playersInRange(mVesperidys.mSpawnLoc, Vesperidys.detectionRange, true);
-
-								List<LivingEntity> entities = targets.stream().filter(e -> mHitbox.intersects(e.getBoundingBox())).collect(Collectors.toList());
-								for (LivingEntity le : entities) {
-									// This list does not update to the mobs hit this tick until after everything runs
-									if (!mMobsAlreadyHit.contains(le)) {
-										mMobsAlreadyHit.add(le);
-
-										Location shieldLocation = mLoc.clone();
-										shieldLocation.setY(le.getEyeLocation().getY());
-										if (le.getEyeLocation().distanceSquared(shieldLocation) < RADIUS * RADIUS) {
-											shieldLocation.add(LocationUtils.getDirectionTo(le.getEyeLocation(), shieldLocation).multiply(RADIUS));
-										}
-
-										BossUtils.blockableDamage(boss, le, DamageEvent.DamageType.MAGIC, DAMAGE, "Wall Of Fire", shieldLocation);
-
-										MovementUtils.knockAway(mLoc, le, 0.3f, true);
-
-
-										Location entityLoc = le.getLocation();
-										new PartialParticle(Particle.SMOKE_NORMAL, entityLoc, 20, 1, 1, 1)
+									Location l = mLoc.clone().add(vec);
+									for (int y = 0; y < HEIGHT; y++) {
+										l.add(0, 1, 0);
+										new PartialParticle(Particle.FLAME, l, 1, 0, 0, 0)
 											.spawnAsBoss();
-										mBoss.getWorld().playSound(entityLoc, Sound.BLOCK_FIRE_EXTINGUISH, 2, 1f);
 									}
 								}
+							}
 
-								/*
-								 * Compare the two lists of mobs and only remove from the
-								 * actual hit tracker if the mob isn't detected as hit this
-								 * tick, meaning it is no longer in the shield wall hitbox
-								 * and is thus eligible for another hit.
-								 */
-								List<LivingEntity> mobsAlreadyHitAdjusted = new ArrayList<>();
-								for (LivingEntity mob : mMobsAlreadyHit) {
-									if (entities.contains(mob)) {
-										mobsAlreadyHitAdjusted.add(mob);
+							List<? extends LivingEntity> targets = PlayerUtils.playersInRange(mVesperidys.mSpawnLoc, Vesperidys.detectionRange, true);
+
+							List<LivingEntity> entities = targets.stream().filter(e -> mHitbox.intersects(e.getBoundingBox())).collect(Collectors.toList());
+							for (LivingEntity le : entities) {
+								// This list does not update to the mobs hit this tick until after everything runs
+								if (!mMobsAlreadyHit.contains(le)) {
+									mMobsAlreadyHit.add(le);
+
+									Location shieldLocation = mLoc.clone();
+									shieldLocation.setY(le.getEyeLocation().getY());
+									if (le.getEyeLocation().distanceSquared(shieldLocation) < RADIUS * RADIUS) {
+										shieldLocation.add(LocationUtils.getDirectionTo(le.getEyeLocation(), shieldLocation).multiply(RADIUS));
 									}
-								}
 
-								mMobsAlreadyHit = mobsAlreadyHitAdjusted;
-								if (mT >= DURATION || EntityUtils.shouldCancelSpells(mBoss)) {
-									mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.5f);
-									this.cancel();
-								}
-							} else {
-								if (mT % 4 == 0) {
-									Vector forecastVec;
-									for (double degree = 0; degree < ANGLE; degree += 10) {
-										double radian1 = Math.toRadians(degree);
-										forecastVec = new Vector(FastUtils.cos(radian1) * RADIUS, 0, FastUtils.sin(radian1) * RADIUS);
+									BossUtils.blockableDamage(boss, le, DamageEvent.DamageType.MAGIC, DAMAGE, "Wall Of Fire", shieldLocation);
 
-										Location l = mLoc.clone().add(forecastVec);
-										for (int y = 0; y < HEIGHT; y++) {
-											l.add(0, 1, 0);
-											new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0)
-												.data(new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f))
-												.spawnAsBoss();
-										}
+									MovementUtils.knockAway(mLoc, le, 0.3f, true);
+
+
+									Location entityLoc = le.getLocation();
+									new PartialParticle(Particle.SMOKE_NORMAL, entityLoc, 20, 1, 1, 1)
+										.spawnAsBoss();
+									mBoss.getWorld().playSound(entityLoc, Sound.BLOCK_FIRE_EXTINGUISH, 2, 1f);
+								}
+							}
+
+							/*
+							 * Compare the two lists of mobs and only remove from the
+							 * actual hit tracker if the mob isn't detected as hit this
+							 * tick, meaning it is no longer in the shield wall hitbox
+							 * and is thus eligible for another hit.
+							 */
+							List<LivingEntity> mobsAlreadyHitAdjusted = new ArrayList<>();
+							for (LivingEntity mob : mMobsAlreadyHit) {
+								if (entities.contains(mob)) {
+									mobsAlreadyHitAdjusted.add(mob);
+								}
+							}
+
+							mMobsAlreadyHit = mobsAlreadyHitAdjusted;
+							if (mT >= DURATION || EntityUtils.shouldCancelSpells(mBoss)) {
+								mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.5f);
+								this.cancel();
+							}
+						} else {
+							if (mT % 4 == 0) {
+								Vector forecastVec;
+								for (double degree = 0; degree < ANGLE; degree += 10) {
+									double radian1 = Math.toRadians(degree);
+									forecastVec = new Vector(FastUtils.cos(radian1) * RADIUS, 0, FastUtils.sin(radian1) * RADIUS);
+
+									Location l = mLoc.clone().add(forecastVec);
+									for (int y = 0; y < HEIGHT; y++) {
+										l.add(0, 1, 0);
+										new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0)
+											.data(new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f))
+											.spawnAsBoss();
 									}
 								}
 							}
 						}
+					}
 
-					};
-					shieldWallRunnable.runTaskTimer(mPlugin, 0, 1);
-					mActiveRunnables.add(shieldWallRunnable);
-				}
+				};
+				shieldWallRunnable.runTaskTimer(mPlugin, 0, 1);
+				mActiveRunnables.add(shieldWallRunnable);
+			}
 
-				@Override
-				public int cooldownTicks() {
-					return COOLDOWN;
-				}
-			};
+			@Override
+			public int cooldownTicks() {
+				return COOLDOWN;
+			}
+		};
 
 		SpellManager activeSpells = new SpellManager(List.of(spell));
 
@@ -293,14 +293,14 @@ public class VesperidysVoidCrystalFlame extends BossAbilityGroup {
 						targetPlatform.destroy();
 
 						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-								if (mVesperidys.mPhase < 4 || (mVesperidys.mPhase >= 4 && Math.abs(targetPlatform.mX) <= 1 && Math.abs(targetPlatform.mY) <= 1)) {
-									if (mVesperidys.mFullPlatforms) {
-										targetPlatform.generateFull();
-									} else {
-										targetPlatform.generateInner();
-									}
+							if (mVesperidys.mPhase < 4 || (mVesperidys.mPhase >= 4 && Math.abs(targetPlatform.mX) <= 1 && Math.abs(targetPlatform.mY) <= 1)) {
+								if (mVesperidys.mFullPlatforms) {
+									targetPlatform.generateFull();
+								} else {
+									targetPlatform.generateInner();
 								}
-							}, 20*20);
+							}
+						}, 20 * 20);
 
 						this.cancel();
 						return;
@@ -333,7 +333,7 @@ public class VesperidysVoidCrystalFlame extends BossAbilityGroup {
 							.extra(0)
 							.spawnAsBoss();
 
-						pLoc.getWorld().playSound(pLoc, Sound.ENTITY_GENERIC_EXPLODE, 3, 1.4f - 0.4f*((float) mDeathTicks / telegraphTicks));
+						pLoc.getWorld().playSound(pLoc, Sound.ENTITY_GENERIC_EXPLODE, 3, 1.4f - 0.4f * ((float) mDeathTicks / telegraphTicks));
 					}
 
 					if (mDeathTicks % 5 == 0) {

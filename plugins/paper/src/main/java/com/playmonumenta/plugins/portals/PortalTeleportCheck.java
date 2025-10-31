@@ -222,11 +222,9 @@ public class PortalTeleportCheck extends BukkitRunnable {
 			double dy = (portal.getBoundingBox().getHeight() + player.getBoundingBox().getHeight()) / 2;
 			double dxz = (portal.getBoundingBox().getWidthX() + player.getBoundingBox().getWidthX()) / 2;
 			Vector delta = portalCenter.clone().subtract(portalPlaneIntersection);
-			if (Math.abs(delta.getY()) > dy || Math.abs(delta.getX() + delta.getZ()) > dxz) { // (NB: either x or z is 0, so can add them)
-				// Player will miss the portal if they keep their current direction
-				return false;
-			}
-			return true;
+			// (NB: either x or z is 0, so can add them)
+			// Player will miss the portal if they keep their current direction
+			return !(Math.abs(delta.getY()) > dy) && !(Math.abs(delta.getX() + delta.getZ()) > dxz);
 		}
 	}
 

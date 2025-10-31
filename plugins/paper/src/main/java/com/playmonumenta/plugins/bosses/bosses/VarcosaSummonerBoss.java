@@ -45,7 +45,7 @@ public final class VarcosaSummonerBoss extends SerializedLocationBossAbilityGrou
 
 		List<String> summonableMobs = List.of("SeaWolf", "PirateGunner", "DrownedCrewman");
 
-		String[] speak = new String[] {
+		String[] speak = new String[]{
 			"Yarr! It be you again? This shan't end the way it did before, matey!",
 			"Ye took me treasure, ye stole me fleece. Now I be takin' ye to the beyond!",
 			"Yarr! Me ghostly crew rides forth!"};

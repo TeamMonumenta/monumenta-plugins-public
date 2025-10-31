@@ -51,15 +51,15 @@ public class ChestUtils {
 	public static final boolean LOG_SCROLL_FRAGMENTS = false;
 
 	private static final double[] BONUS_ITEMS = {
-			0, // Dummy value, this is a player count indexed array
-			0.5,
-			1.7,
-			2.6,
-			3.3,
-			3.8,
-			4.2,
-			4.4,
-			4.5
+		0, // Dummy value, this is a player count indexed array
+		0.5,
+		1.7,
+		2.6,
+		3.3,
+		3.8,
+		4.2,
+		4.4,
+		4.5
 	};
 	private static final String CHEST_SOLO_LOOT_EFFECT_NAME = "LootboxSoloLootSlownessEffect";
 
@@ -132,7 +132,7 @@ public class ChestUtils {
 			MMLog.fine("Lootable seed: " + lootable.getSeed());
 			// Loot table seed set and use the seed for number of players
 			if (lootable.getSeed() > 0 && lootable.getSeed() < 50) {
-				otherPlayersMultiplier = (int)lootable.getSeed();
+				otherPlayersMultiplier = (int) lootable.getSeed();
 				MMLog.fine("Chest loot was already generated due to a spawner being broken with seed " + otherPlayersMultiplier);
 			}
 
@@ -230,8 +230,8 @@ public class ChestUtils {
 				noSharePlayerJoiner.add(noShare);
 			}
 			Component lootboxPlayers = Component.text(lootBoxPlayers.size()
-				+ " nearby player" + (lootBoxPlayers.size() == 1 ? "" : "s"),
-				NamedTextColor.GOLD)
+						+ " nearby player" + (lootBoxPlayers.size() == 1 ? "" : "s"),
+					NamedTextColor.GOLD)
 				.hoverEvent(Component.text(otherPlayersJoiner.toString()));
 
 			Component noSharePlayerComponent;
@@ -267,7 +267,7 @@ public class ChestUtils {
 			int fragmentCount = 0;
 			for (ItemStack thisItem : popLoot) {
 				if (testForScroll(thisItem)) {
-					AuditListener.logPlayer("[Scroll Logger] Player " + player.getName() + " found a SKR Scroll (" + ItemUtils.getPlainNameIfExists(thisItem) + ") in a placed chest with loot table " + lootTable.toString() + ".");
+					AuditListener.logPlayer("[Scroll Logger] Player " + player.getName() + " found a SKR Scroll (" + ItemUtils.getPlainNameIfExists(thisItem) + ") in a placed chest with loot table " + lootTable + ".");
 					break;
 				} else if (LOG_SCROLL_FRAGMENTS && InventoryUtils.testForItemWithName(thisItem, "Remnant", false) &&
 					thisItem.getType().name().contains("FLINT")) {
@@ -276,7 +276,7 @@ public class ChestUtils {
 			}
 			if (fragmentCount >= 1) {
 				// Temp log for scroll fragments
-				AuditListener.logPlayer("[Scroll Fragment Logger] Player " + player.getName() + " found " + fragmentCount + " SKR scroll fragments in a placed chest with loot table " + lootTable.toString() + ".");
+				AuditListener.logPlayer("[Scroll Fragment Logger] Player " + player.getName() + " found " + fragmentCount + " SKR scroll fragments in a placed chest with loot table " + lootTable + ".");
 			}
 		}
 
@@ -287,7 +287,7 @@ public class ChestUtils {
 		if (!Plugin.IS_PLAY_SERVER) {
 			player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.BLOCKS, 1, 1);
 			player.sendMessage(Component.text("Loot table rolled!", NamedTextColor.RED).decorate(TextDecoration.BOLD)
-				                   .append(Component.text(" (this message is only shown on the build server)", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+				.append(Component.text(" (this message is only shown on the build server)", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 		}
 	}
 
@@ -348,8 +348,8 @@ public class ChestUtils {
 
 			if (MMLog.isLevelEnabled(Level.FINER)) {
 				MMLog.finer("generateLootInventory: Splitting item type " + toSplitItem.getType() +
-				            " with count " + toSplitItem.getAmount() + " in slot " + splitSlot +
-							" into count " + amountRemaining + " and " + amountToSplit + " in slot " + slot);
+					" with count " + toSplitItem.getAmount() + " in slot " + splitSlot +
+					" into count " + amountRemaining + " and " + amountToSplit + " in slot " + slot);
 			}
 
 			toSplitItem.setAmount(amountRemaining);
@@ -359,7 +359,7 @@ public class ChestUtils {
 			if (amountToSplit > 1) {
 				MMLog.finer("generateLootInventory: Adding slot " + slot + " to multiple items list");
 				slotsWithMultipleItems.add(slot);
-		    }
+			}
 			if (amountRemaining > 1) {
 				MMLog.finer("generateLootInventory: Adding slot " + splitSlot + " to multiple items list");
 				slotsWithMultipleItems.add(splitSlot);
@@ -379,7 +379,7 @@ public class ChestUtils {
 
 	public static boolean isUnscaledChest(Block block) {
 		return block.getState() instanceof Chest chest && chest.getLootTable() != null &&
-			       chest.getSeed() == 0 && isChestBlockEmpty(chest);
+			chest.getSeed() == 0 && isChestBlockEmpty(chest);
 	}
 
 	public static boolean isAstrableChest(Chest chest) {
@@ -411,9 +411,9 @@ public class ChestUtils {
 	public static boolean isChestWithLootTable(Block block) {
 		Material type = block.getType();
 		return (type == Material.CHEST || type == Material.TRAPPED_CHEST)
-			       && block.getState() instanceof Chest chest
-			       && (chest.hasLootTable() || (chest.getInventory() instanceof DoubleChestInventory doubleChestInventory
-				                                    && (((Chest) doubleChestInventory.getLeftSide().getHolder()).hasLootTable() || ((Chest) doubleChestInventory.getRightSide().getHolder()).hasLootTable())));
+			&& block.getState() instanceof Chest chest
+			&& (chest.hasLootTable() || (chest.getInventory() instanceof DoubleChestInventory doubleChestInventory
+			&& (((Chest) doubleChestInventory.getLeftSide().getHolder()).hasLootTable() || ((Chest) doubleChestInventory.getRightSide().getHolder()).hasLootTable())));
 	}
 
 	public static ItemStack giveChestWithLootTable(String lootTable, String chestName, @Nullable String chestNameColor, List<Component> lore) {

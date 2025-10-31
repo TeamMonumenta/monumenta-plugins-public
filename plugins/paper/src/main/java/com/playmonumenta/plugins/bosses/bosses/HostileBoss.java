@@ -57,7 +57,7 @@ public class HostileBoss extends BossAbilityGroup {
 
 					if (p.DAMAGE_PERCENTAGE > 0) {
 						DamageUtils.damage(mBoss, target, new DamageEvent.Metadata(DamageEvent.DamageType.TRUE,
-							null, null, p.SPELL_NAME), p.DAMAGE_PERCENTAGE * EntityUtils.getMaxHealth(target),
+								null, null, p.SPELL_NAME), p.DAMAGE_PERCENTAGE * EntityUtils.getMaxHealth(target),
 							false, true, true);
 					}
 

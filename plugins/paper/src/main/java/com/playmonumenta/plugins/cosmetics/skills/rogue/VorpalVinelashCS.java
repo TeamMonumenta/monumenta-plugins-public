@@ -78,6 +78,7 @@ public class VorpalVinelashCS extends DaggerThrowCS {
 			double mRadius = 0;
 			double mSize = 1.2;
 			double mIter = 0;
+
 			@Override
 			public void run() {
 				mIter++;
@@ -103,7 +104,7 @@ public class VorpalVinelashCS extends DaggerThrowCS {
 					Location helixLoc = l.clone().add(vec);
 
 					new PartialParticle(Particle.REDSTONE, helixLoc, 2, 0, 0, 0, 0, new Particle.DustOptions(
-						ParticleUtils.getTransition(VINE_TIP, VINE_BASE, (l.distance(endLoc) / distance)), (float)mSize)).spawnAsPlayerActive(player);
+						ParticleUtils.getTransition(VINE_TIP, VINE_BASE, (l.distance(endLoc) / distance)), (float) mSize)).spawnAsPlayerActive(player);
 				}
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
@@ -124,12 +125,12 @@ public class VorpalVinelashCS extends DaggerThrowCS {
 			.count(32).directionalMode(true).rotateDelta(true).delta(0.8, 0.2, 0)
 			.extra(1.5).spawnAsPlayerActive(player);
 		new PPCircle(Particle.DUST_COLOR_TRANSITION, LocationUtils.getHalfHeightLocation(target).add(0, -0.33, 0),
-			target.getWidth()*1.25).data(new Particle.DustTransition(VINE_BASE, VINE_TIP, 1f))
+			target.getWidth() * 1.25).data(new Particle.DustTransition(VINE_BASE, VINE_TIP, 1f))
 			.countPerMeter(6).spawnAsPlayerActive(player);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () ->
-				new PPCircle(Particle.DUST_COLOR_TRANSITION, LocationUtils.getHalfHeightLocation(target).add(0, 0.33, 0),
-					target.getWidth()*1.25).data(new Particle.DustTransition(VINE_BASE, VINE_TIP, 1f))
-					.countPerMeter(6).spawnAsPlayerActive(player), 2);
+			new PPCircle(Particle.DUST_COLOR_TRANSITION, LocationUtils.getHalfHeightLocation(target).add(0, 0.33, 0),
+				target.getWidth() * 1.25).data(new Particle.DustTransition(VINE_BASE, VINE_TIP, 1f))
+				.countPerMeter(6).spawnAsPlayerActive(player), 2);
 		new PartialParticle(Particle.SPORE_BLOSSOM_AIR, LocationUtils.getHalfHeightLocation(target), 16).spawnAsPlayerActive(player);
 		world.playSound(target.getLocation(), Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, SoundCategory.PLAYERS, 1f, 1f);
 		world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 0.5f);

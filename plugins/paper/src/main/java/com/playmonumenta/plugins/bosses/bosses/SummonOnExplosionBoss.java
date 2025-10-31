@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
@@ -19,6 +18,8 @@ import org.bukkit.entity.Mob;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
 
 public class SummonOnExplosionBoss extends BossAbilityGroup {
 
@@ -74,7 +75,7 @@ public class SummonOnExplosionBoss extends BossAbilityGroup {
 			mParam.SOUNDS.play(mBoss.getLocation());
 			double health = mBoss.getHealth();
 			double maxHealth = Objects.requireNonNull(mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
-			double hpPercent = health/maxHealth;
+			double hpPercent = health / maxHealth;
 			for (int i = 0; i < mParam.MOB_COUNT; i++) {
 				Entity entity = mParam.POOL.spawn(mBoss.getLocation());
 
@@ -87,7 +88,7 @@ public class SummonOnExplosionBoss extends BossAbilityGroup {
 					//Decrease its percent hp by the percent health the spawner is missing times the transfer amount.
 					livingEntity.setHealth(
 						(1 - mParam.TRANSFER) * (livingEntity.getHealth() - hpPercent * livingEntity.getHealth())
-						+ hpPercent * livingEntity.getHealth());
+							+ hpPercent * livingEntity.getHealth());
 					livingEntity.setAI(false);
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						livingEntity.setAI(true);

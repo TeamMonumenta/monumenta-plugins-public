@@ -138,8 +138,9 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		if (mRondeStacks < mMaxStacks) {
 			mCosmetic.rondeGainStackEffect(mPlayer, mPlayer.getLocation());
 			mRondeStacks += mStackGain;
-			if (mRondeStacks > mMaxStacks)
+			if (mRondeStacks > mMaxStacks) {
 				mRondeStacks = mMaxStacks;
+			}
 
 			ClientModHandler.updateAbility(mPlayer, this);
 		}

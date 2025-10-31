@@ -158,7 +158,9 @@ public class ProjectileEntityBoss extends BossAbilityGroup {
 		public boolean COLLIDE_OTHER_PLAYERS = false;
 
 	}
+
 	Parameters mParameters = new Parameters();
+
 	public ProjectileEntityBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Parameters.getParameters(boss, identityTag, mParameters);

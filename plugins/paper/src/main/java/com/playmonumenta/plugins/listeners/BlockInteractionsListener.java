@@ -139,17 +139,17 @@ public final class BlockInteractionsListener implements Listener {
 
 	private static boolean checkEntityAction(@Nullable Entity entity, @Nullable ItemStack playerItem, Player player) {
 		return entity != null
-			       && playerItem != null // null/empty hand: takes an item from an armor stand and is allowed
-			       && !playerItem.getType().isAir()
-			       && ItemStatUtils.getTier(playerItem) != Tier.KEYTIER // allow placing key items in item frames and on armor stands
-			       && commonChecks(player);
+			&& playerItem != null // null/empty hand: takes an item from an armor stand and is allowed
+			&& !playerItem.getType().isAir()
+			&& ItemStatUtils.getTier(playerItem) != Tier.KEYTIER // allow placing key items in item frames and on armor stands
+			&& commonChecks(player);
 	}
 
 	private static boolean checkAction(Block block, Player player) {
 		return block != null
-			       && !player.isSneaking()
-			       && !player.getInventory().getItemInMainHand().getType().isAir() // allow interactions with an empty hand as an alternative to turning this feature off
-			       && commonChecks(player);
+			&& !player.isSneaking()
+			&& !player.getInventory().getItemInMainHand().getType().isAir() // allow interactions with an empty hand as an alternative to turning this feature off
+			&& commonChecks(player);
 	}
 
 	private static boolean commonChecks(Player player) {

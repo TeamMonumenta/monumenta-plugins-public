@@ -34,7 +34,7 @@ public class MonsterEggOverride extends BaseOverride {
 
 	@Override
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity,
-											   ItemStack itemInHand) {
+	                                           ItemStack itemInHand) {
 
 		// There's an item for the Fallen Lore-Um secret quest that is a spawn egg that must be placed in an item frame
 		if (clickedEntity instanceof ItemFrame) {

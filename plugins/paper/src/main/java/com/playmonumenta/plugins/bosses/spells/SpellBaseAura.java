@@ -32,8 +32,8 @@ public class SpellBaseAura extends Spell {
 	private int mEffectIter = 0; // Number of effect iterations - rolls around between 0 and 2
 
 	public SpellBaseAura(final Entity boss, final double radius, final double heightClamp,
-						 final @Nullable SummonParticles particlesSummoner, final @Nullable ApplyAuraEffect auraEffect,
-						 final boolean stunAffected) {
+	                     final @Nullable SummonParticles particlesSummoner, final @Nullable ApplyAuraEffect auraEffect,
+	                     final boolean stunAffected) {
 		mBoss = boss;
 		mRadius = radius;
 		mHeightClamp = heightClamp;

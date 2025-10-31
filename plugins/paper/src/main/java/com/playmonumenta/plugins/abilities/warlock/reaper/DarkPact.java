@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -23,7 +22,6 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import java.util.EnumSet;
 import java.util.NavigableSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -35,6 +33,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class DarkPact extends Ability {
 	public static final String PERCENT_HEAL_EFFECT_NAME = "DarkPactPercentHealEffect";
@@ -231,7 +231,7 @@ public class DarkPact extends Ability {
 			.append(Component.text(name != null ? name : "Error", !mActive ? NamedTextColor.GRAY : color))
 			.append(Component.text("]", NamedTextColor.YELLOW));
 
-			output = output.append(Component.text(": ", NamedTextColor.WHITE));
+		output = output.append(Component.text(": ", NamedTextColor.WHITE));
 
 		if (mActive && (CANCEL_WINDOW - (Bukkit.getServer().getCurrentTick() - mStartingTick)) > 0) {
 			output = output.append(Component.text(((int) Math.ceil(Math.max(0, 20 + CANCEL_WINDOW - (Bukkit.getServer().getCurrentTick() - mStartingTick))) / TICKS_PER_SECOND) + "s", NamedTextColor.DARK_RED));

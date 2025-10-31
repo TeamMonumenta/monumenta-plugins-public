@@ -521,7 +521,7 @@ public class DisplayEntityUtils {
 	 * @param duration duration of the interpolation
 	 */
 	public static void rotateToPointAtLoc(Display display, Vector vec, int duration) {
-		rotateToPointAtLoc(display, vec, duration, -3*Math.PI/4.0f);
+		rotateToPointAtLoc(display, vec, duration, -3 * Math.PI / 4.0f);
 	}
 
 

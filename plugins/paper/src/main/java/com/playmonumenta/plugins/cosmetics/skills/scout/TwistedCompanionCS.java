@@ -127,6 +127,7 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 
 			double mRadius = 0;
 			final double RADIUS = r;
+
 			@Override
 			public void run() {
 

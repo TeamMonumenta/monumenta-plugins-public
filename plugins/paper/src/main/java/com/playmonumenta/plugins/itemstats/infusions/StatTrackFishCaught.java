@@ -6,11 +6,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class StatTrackFishCaught implements Infusion {
-	@Override public InfusionType getInfusionType() {
+	@Override
+	public InfusionType getInfusionType() {
 		return InfusionType.STAT_TRACK_FISH_CAUGHT;
 	}
 
-	@Override public String getName() {
+	@Override
+	public String getName() {
 		return "Fish Caught";
 	}
 

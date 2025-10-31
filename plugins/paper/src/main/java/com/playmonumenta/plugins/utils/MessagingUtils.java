@@ -205,8 +205,8 @@ public class MessagingUtils {
 
 	public static void sendBoldTitle(Player player, @Nullable Component title, @Nullable Component subtitle) {
 		sendTitle(player,
-				  title == null ? Component.empty() : title.decorate(TextDecoration.BOLD),
-				  subtitle == null ? Component.empty() : subtitle.decorate(TextDecoration.BOLD));
+			title == null ? Component.empty() : title.decorate(TextDecoration.BOLD),
+			subtitle == null ? Component.empty() : subtitle.decorate(TextDecoration.BOLD));
 	}
 
 	public static void sendTitle(Player player, @Nullable String title, @Nullable String subtitle) {

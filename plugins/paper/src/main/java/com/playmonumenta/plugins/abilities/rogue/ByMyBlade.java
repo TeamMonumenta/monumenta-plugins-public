@@ -80,7 +80,7 @@ public final class ByMyBlade extends Ability {
 	@Override
 	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && !isOnCooldown() && PlayerUtils.isFallingAttack(mPlayer)
-			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+			&& InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MELEE_SKILL, mDamageBonus, mInfo.getLinkedSpell(), true);
 			// TODO: Remove Haste when we get to 1.20.5, buff Attack Speed to compensate
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionManager.PotionID.ABILITY_SELF,

@@ -97,7 +97,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 
 			activeSpells = new SpellManager(Arrays.asList(
 				new SuspendedBolt(mBoss, mPlugin, 25, 5, 50,
-					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5),
+					20 * 6, 20 * 2, 20, mSpawnLoc, 5),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 90),
 				new SundialSlash(mBoss, 7 * 20)
@@ -135,7 +135,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 150),
 				new SundialSlash(mBoss, 7 * 20),
 				new SuspendedBolt(mBoss, mPlugin, 25, 5, 80,
-					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
+					20 * 6, 20 * 2, 20, mSpawnLoc, 5)
 			));
 
 			passiveSpells = Arrays.asList(
@@ -152,10 +152,10 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 150),
 				new SundialSlash(mBoss, 7 * 20),
 				new SuspendedBolt(mBoss, mPlugin, 25, 4, 80,
-					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
+					20 * 6, 20 * 2, 20, mSpawnLoc, 5)
 			));
 
-			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
+			SpellManager activeRewindPhase = new SpellManager(List.of(
 				new Rewind(mBoss, mSpawnLoc, this, activeSpells, passiveSpells)
 			));
 
@@ -233,7 +233,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 80),
 				new SundialSlash(mBoss, 7 * 20),
 				new SuspendedBolt(mBoss, mPlugin, 25, 3, 50,
-					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
+					20 * 6, 20 * 2, 20, mSpawnLoc, 5)
 			));
 
 			passiveSpells = Arrays.asList(
@@ -245,7 +245,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
 
-			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
+			SpellManager activeRewindPhase = new SpellManager(List.of(
 				new Rewind(mBoss, mSpawnLoc, this, activeSpells, passiveSpells)
 			));
 

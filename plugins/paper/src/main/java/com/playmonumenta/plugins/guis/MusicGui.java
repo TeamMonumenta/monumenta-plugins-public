@@ -125,7 +125,7 @@ public class MusicGui extends Gui {
 				addMusicItem(2, 7, Material.MUSIC_DISC_CAT, "Heart of the Jungle", Location.KAUL, "Kaul", "Whitebeard_OP", "epic:music.kaul", 220, checkScore("KaulWins"));
 
 				addMusicItem(3, 1, Material.MUSIC_DISC_PIGSTEP, "Realm of Fate", Location.AMBER, "King's Valley", "Corpe_", "epic:music.valley", 174, true);
-				addMusicItem(3,2, Material.MUSIC_DISC_WARD, "Unfamiliar Wilds", Location.AMBER, "King's Valley", "Salamanderlonk", "epic:music.valleyjungle", 151, true);
+				addMusicItem(3, 2, Material.MUSIC_DISC_WARD, "Unfamiliar Wilds", Location.AMBER, "King's Valley", "Salamanderlonk", "epic:music.valleyjungle", 151, true);
 				addMusicItem(3, 3, Material.MUSIC_DISC_FAR, "Jovial Jaunt", Location.OVERWORLD1, "Racing Theme", "Whitebeard_OP", "epic:music.racegeneric", 113, true);
 				addMusicItem(3, 5, Material.MUSIC_DISC_MELLOHI, "Endless Tactics", Location.BLITZ, "Blitz", "Whitebeard_OP", "epic:music.blitz", 118, checkScore("Blitz", 10));
 
@@ -454,6 +454,7 @@ public class MusicGui extends Gui {
 		mPlaylistRunnable = new BukkitRunnable() {
 			double mTicks = 0;
 			final double mDuration = mPlaylistData.mPlaylistTracks.get(mPlaylistData.mCurrentTrackIndex).mDuration * 20;
+
 			@Override
 			public void run() {
 				mTicks++;

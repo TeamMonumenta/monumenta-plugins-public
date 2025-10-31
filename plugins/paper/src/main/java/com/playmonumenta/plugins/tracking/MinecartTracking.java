@@ -16,12 +16,12 @@ import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.inventory.ItemStack;
 
 public class MinecartTracking implements EntityTracking {
-	private Set<Minecart> mEntities = Collections.newSetFromMap(new WeakHashMap<>());
+	private final Set<Minecart> mEntities = Collections.newSetFromMap(new WeakHashMap<>());
 	private int mTicks = 0;
 
 	@Override
 	public void addEntity(Entity entity) {
-		mEntities.add((Minecart)entity);
+		mEntities.add((Minecart) entity);
 	}
 
 	@Override

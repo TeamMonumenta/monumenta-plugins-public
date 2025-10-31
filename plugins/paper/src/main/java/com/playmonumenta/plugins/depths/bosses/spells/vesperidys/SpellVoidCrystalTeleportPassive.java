@@ -35,7 +35,7 @@ public class SpellVoidCrystalTeleportPassive extends Spell {
 		// If its platform exploded.
 		Vesperidys.Platform platform = mVesperidys.mPlatformList.getPlatformNearestToEntity(mBoss);
 		if (platform != null && platform.getCenter().distance(mBoss.getLocation()) > 3) {
-				teleportRandomly();
+			teleportRandomly();
 		} else {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mBoss.getLocation(), 3, mBoss)) {
 				if (EntityUtils.isBoss(le)) {

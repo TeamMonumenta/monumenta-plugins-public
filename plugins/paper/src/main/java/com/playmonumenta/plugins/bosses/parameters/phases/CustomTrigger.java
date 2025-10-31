@@ -14,15 +14,18 @@ public class CustomTrigger extends Trigger {
 		mOneTime = oneTime;
 	}
 
-	@Override public boolean test(LivingEntity boss) {
+	@Override
+	public boolean test(LivingEntity boss) {
 		return mHasTriggedOnce;
 	}
 
-	@Override public void reset(LivingEntity boss) {
+	@Override
+	public void reset(LivingEntity boss) {
 		mHasTriggedOnce = false;
 	}
 
-	@Override public boolean custom(LivingEntity boss, String key) {
+	@Override
+	public boolean custom(LivingEntity boss, String key) {
 		if (key.equals(mKeyString)) {
 			if (!mOneTime) {
 				mHasTriggedOnce = true;

@@ -312,6 +312,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 
 		BukkitRunnable deathRunnable = new BukkitRunnable() {
 			float mPitch = 0;
+
 			@Override
 			public void run() {
 				if (mPitch > 2.0f) {

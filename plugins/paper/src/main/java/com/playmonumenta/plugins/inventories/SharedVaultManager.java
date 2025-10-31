@@ -292,8 +292,8 @@ public class SharedVaultManager implements Listener {
 		}
 
 		if (
-				GuildPlotUtils.guildPlotChangeVaultOwnerBlocked(player)
-						|| GuildPlotUtils.guildPlotUseVaultBlocked(player)
+			GuildPlotUtils.guildPlotChangeVaultOwnerBlocked(player)
+				|| GuildPlotUtils.guildPlotUseVaultBlocked(player)
 		) {
 			player.sendMessage(Component.text("You may not place this " + SHARED_VAULT_NAME + " here.", NamedTextColor.RED));
 			event.setCancelled(true);

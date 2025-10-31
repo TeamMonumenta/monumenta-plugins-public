@@ -142,14 +142,14 @@ public final class SpellSoulShackle extends Spell {
 					}
 
 					final List<Player> hitCheck = new Hitbox.UprightCylinderHitbox(centerLoc.clone()
-							.add(0, -2.5, 0), SHACKLE_HEIGHT, SHACKLE_RADIUS).getHitPlayers(true);
+						.add(0, -2.5, 0), SHACKLE_HEIGHT, SHACKLE_RADIUS).getHitPlayers(true);
 					if (!hitCheck.contains(p)) {
 						final Location shackleCenterGround = centerLoc.clone();
 						shackleCenterGround.setY(mCenter.getY());
 
 						DamageUtils.damage(mBoss, p, new DamageEvent.Metadata(DamageType.TRUE, null,
-										null, SPELL_NAME), 0.15 * EntityUtils.getMaxHealth(p),
-								false, false, true);
+								null, SPELL_NAME), 0.15 * EntityUtils.getMaxHealth(p),
+							false, false, true);
 						MovementUtils.knockAway(shackleCenterGround, p, -0.75f, false);
 						p.sendMessage(Component.text("I shouldn't leave this ring.", NamedTextColor.DARK_AQUA));
 						mWorld.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 2, 1);

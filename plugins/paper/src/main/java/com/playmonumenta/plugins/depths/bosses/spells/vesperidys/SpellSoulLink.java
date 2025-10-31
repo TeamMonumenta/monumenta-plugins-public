@@ -82,8 +82,8 @@ public class SpellSoulLink extends Spell {
 	public void soulLink(Player player1, Player player2) {
 		player1.playSound(player1.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1.45f);
 		player2.playSound(player2.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1.45f);
-		MessagingUtils.sendTitle(player1, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text(player2.getName(), NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5*20, 10);
-		MessagingUtils.sendTitle(player2, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text(player1.getName(), NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5*20, 10);
+		MessagingUtils.sendTitle(player1, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text(player2.getName(), NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5 * 20, 10);
+		MessagingUtils.sendTitle(player2, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text(player1.getName(), NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5 * 20, 10);
 
 		BukkitRunnable soulLinkRunnable = new BukkitRunnable() {
 			int mSoulLinkTicks = -FORECAST_TICKS;
@@ -243,7 +243,7 @@ public class SpellSoulLink extends Spell {
 
 	public void soulLinkWithBoss(Player player) {
 		player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1.45f);
-		MessagingUtils.sendTitle(player, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text("Vesperidys", NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5*20, 10);
+		MessagingUtils.sendTitle(player, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text("Vesperidys", NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5 * 20, 10);
 
 		BukkitRunnable soulLinkRunnable = new BukkitRunnable() {
 			int mSoulLinkTicks = -FORECAST_TICKS;
@@ -386,7 +386,8 @@ public class SpellSoulLink extends Spell {
 			.spawnAsBoss();
 	}
 
-	@Override public boolean canRun() {
+	@Override
+	public boolean canRun() {
 		return !mOnCooldown && !mVesperidys.mTeleportSpell.mTeleporting;
 	}
 

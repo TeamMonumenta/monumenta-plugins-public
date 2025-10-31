@@ -62,7 +62,7 @@ public class IronTincture extends Ability {
 			.simpleDescription("Throw a potion on the ground that you or other players can collect to gain absorption hearts.")
 			.cooldown(IRON_TINCTURE_USE_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IronTincture::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
-					.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(Material.SPLASH_POTION);
 
 	private final double mAbsorption;

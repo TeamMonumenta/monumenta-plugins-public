@@ -87,7 +87,7 @@ public class PassiveFissure extends Spell {
 		for (int i = 0; i < mFissureVector.length; i++) {
 			generateSegment(i, 0, 0, null);
 		}
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mIsCast = false, 20*3);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mIsCast = false, 20 * 3);
 	}
 
 	// Generate a 2D array of vectors
@@ -108,7 +108,7 @@ public class PassiveFissure extends Spell {
 	private Vector generateSegmentVector(int angle, double length, int segmentNumber) {
 		int range = segmentNumber == 0 ? 10 : 30;
 		return VectorUtils.rotationToVector(angle + FastUtils.randomIntInRange(-range, range), 0)
-			.multiply(length*FastUtils.randomDoubleInRange(0.75, 1));
+			.multiply(length * FastUtils.randomDoubleInRange(0.75, 1));
 	}
 
 	// Returns the starting point of a vector
@@ -126,8 +126,8 @@ public class PassiveFissure extends Spell {
 
 	private int getFissureWidth(int segmentNumber, double step) {
 		return (int) Math.max(
-			Math.round((((double) mPhase)/4d + 1)
-				*Math.pow(0.7, (double) segmentNumber + step)), 1);
+			Math.round((((double) mPhase) / 4d + 1)
+				* Math.pow(0.7, (double) segmentNumber + step)), 1);
 	}
 
 	// Actually generates part of the fissure (i.e. replacing blocks on ground)

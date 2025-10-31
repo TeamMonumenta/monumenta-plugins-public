@@ -43,7 +43,7 @@ public class SupernovaFinisher implements EliteFinisher {
 		Location lineBotMid = centered.clone().add(vectorBot);
 
 		Location[][] curve = new Location[4][9];
-		curve[0] = new Location[] {
+		curve[0] = new Location[]{
 			centered.clone().add(-0.7, 0, 1.067),
 			centered.clone().add(-1, 0, 0.97),
 			centered.clone().add(-1.3, 0, 0.8),
@@ -55,7 +55,7 @@ public class SupernovaFinisher implements EliteFinisher {
 			centered.clone().add(0, 0, -3.69)
 		};
 
-		curve[1] = new Location[] {
+		curve[1] = new Location[]{
 			centered.clone().add(0.7, 0, -1.067),
 			centered.clone().add(1, 0, -0.97),
 			centered.clone().add(1.3, 0, -0.8),
@@ -67,7 +67,7 @@ public class SupernovaFinisher implements EliteFinisher {
 			centered.clone().add(0, 0, 3.69)
 		};
 
-		curve[2] = new Location[] {
+		curve[2] = new Location[]{
 			centered.clone().add(1.067, 0, 0.7),
 			centered.clone().add(0.97, 0, 1),
 			centered.clone().add(0.8, 0, 1.3),
@@ -79,7 +79,7 @@ public class SupernovaFinisher implements EliteFinisher {
 			centered.clone().add(-3.69, 0, 0)
 		};
 
-		curve[3] = new Location[] {
+		curve[3] = new Location[]{
 			centered.clone().add(-1.067, 0, -0.7),
 			centered.clone().add(-0.97, 0, -1),
 			centered.clone().add(-0.8, 0, -1.3),
@@ -128,7 +128,7 @@ public class SupernovaFinisher implements EliteFinisher {
 		realCurrent[0] = current[0].clone();
 		realCurrent[1] = current[1].clone();
 
-			new BukkitRunnable() {
+		new BukkitRunnable() {
 			int mTicks = 0;
 			final int mRStep = (255 - 230) / 10;
 			final int mGStep = (255 - 48) / 10;

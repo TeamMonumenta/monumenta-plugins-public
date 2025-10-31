@@ -109,7 +109,7 @@ public class SpellVesperidysFeintParticleBeam extends Spell {
 
 		if (count < mMaxTargets) {
 			List<Vesperidys.Platform> platforms = mVesperidys.mPlatformList.getRandomPlatforms(null, mMaxTargets - count);
-			double angle = FastUtils.randomDoubleInRange(0, 2*Math.PI);
+			double angle = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
 
 			for (Vesperidys.Platform platform : platforms) {
 				Player player = EntityUtils.getNearestPlayer(platform.getCenter(), Vesperidys.detectionRange);
@@ -309,11 +309,13 @@ public class SpellVesperidysFeintParticleBeam extends Spell {
 		}
 	}
 
-	@Override public boolean canRun() {
+	@Override
+	public boolean canRun() {
 		return !mOnCooldown;
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return mVesperidys.mSpellCooldowns;
 	}
 }

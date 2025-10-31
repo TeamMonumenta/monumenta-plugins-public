@@ -47,7 +47,7 @@ public class DamageEvent extends Event implements Cancellable {
 			// List every cause for completeness
 			return switch (cause) {
 				case WORLD_BORDER, CONTACT, MELTING, DROWNING, STARVATION, LIGHTNING, FALLING_BLOCK, CUSTOM, DRYOUT,
-					 FREEZE, CRAMMING, SONIC_BOOM, SUFFOCATION -> OTHER;
+				     FREEZE, CRAMMING, SONIC_BOOM, SUFFOCATION -> OTHER;
 				case ENTITY_ATTACK -> MELEE;
 				case ENTITY_SWEEP_ATTACK -> MELEE_ENCH;
 				case PROJECTILE -> PROJECTILE;

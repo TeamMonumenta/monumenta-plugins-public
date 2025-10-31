@@ -22,9 +22,9 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellSwordCleave extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private PassiveStarBlightConversion mConverter;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final PassiveStarBlightConversion mConverter;
 	private boolean mOnCooldown;
 	private static final float SWINGRADIUS = 5;
 	private static final int COOLDOWN = 7 * 20;
@@ -44,9 +44,9 @@ public class SpellSwordCleave extends Spell {
 		Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> mOnCooldown = false, COOLDOWN + 20);
 		EntityUtils.selfRoot(mBoss, 26);
 		new BukkitRunnable() {
-			Vector mDirection = mBoss.getEyeLocation().getDirection().normalize();
+			final Vector mDirection = mBoss.getEyeLocation().getDirection().normalize();
 			int mTicks = 0;
-			float mAngle = (float) (-FastMath.atan2(mDirection.getX(), mDirection.getZ()) - FastMath.PI / 4.0f);
+			final float mAngle = (float) (-FastMath.atan2(mDirection.getX(), mDirection.getZ()) - FastMath.PI / 4.0f);
 
 			@Override
 			public void run() {

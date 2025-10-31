@@ -148,8 +148,10 @@ public class PlotAccessGui extends Gui {
 		if (mMainGuiMode == MainGuiMode.ACCESS_INFO_MODE) {
 			switch (mAccessInfoGuiMode) {
 				case INACTIVE -> setLayoutForAccessInfo();
-				case OTHER_ACCESS_TO_OWNER_PLOT -> setLayout(mOtherAccessToOwnerPlotList, "No one has access to " + (mIsSelf ? "your " : mOwnerName + "'s ") + "plot!", null, false, false);
-				case OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL -> setLayout(mOtherAccessToOwnerPlotList, "No one has access to " + (mIsSelf ? "your " : mOwnerName + "'s ") + "plot!", AccessInfoGuiMode.OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL_CONFIRMATION, true, false);
+				case OTHER_ACCESS_TO_OWNER_PLOT ->
+					setLayout(mOtherAccessToOwnerPlotList, "No one has access to " + (mIsSelf ? "your " : mOwnerName + "'s ") + "plot!", null, false, false);
+				case OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL ->
+					setLayout(mOtherAccessToOwnerPlotList, "No one has access to " + (mIsSelf ? "your " : mOwnerName + "'s ") + "plot!", AccessInfoGuiMode.OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL_CONFIRMATION, true, false);
 				case OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL_CONFIRMATION -> {
 					if (mSelectedPlotEntry == null) {
 						MMLog.severe("mSelectedPlotEntry was still null by the time it was called by OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL_CONFIRMATION in PlotAccessGui.java");
@@ -161,8 +163,10 @@ public class PlotAccessGui extends Gui {
 					setLayoutForOtherAccessToOwnerPlotRemovalConfirmation(mSelectedPlotEntry);
 				}
 
-				case OWNER_ACCESS_TO_OTHER_PLOTS -> setLayout(mOwnerAccessToOtherPlotsList, (mIsSelf ? "You don't " : mOwnerName + " doesn't ") + "have access to any plots!", null, false, false);
-				case OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL -> setLayout(mOwnerAccessToOtherPlotsList, (mIsSelf ? "You don't " : mOwnerName + " doesn't ") + "have access to any plots!", AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL_CONFIRMATION, true, false);
+				case OWNER_ACCESS_TO_OTHER_PLOTS ->
+					setLayout(mOwnerAccessToOtherPlotsList, (mIsSelf ? "You don't " : mOwnerName + " doesn't ") + "have access to any plots!", null, false, false);
+				case OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL ->
+					setLayout(mOwnerAccessToOtherPlotsList, (mIsSelf ? "You don't " : mOwnerName + " doesn't ") + "have access to any plots!", AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL_CONFIRMATION, true, false);
 				case OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL_CONFIRMATION -> {
 					if (mSelectedPlotEntry == null) {
 						MMLog.severe("mSelectedPlotEntry was still null by the time it was called by OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL_CONFIRMATION in PlotAccessGui.java");

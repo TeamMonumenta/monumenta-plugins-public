@@ -38,21 +38,21 @@ public abstract class SpellBaseBolt extends Spell {
 	private final @Nullable Predicate<Player> mPlayerFilter;
 
 	/**
-	 * @param plugin          The main plugin
-	 * @param caster          The mob casting the spell
-	 * @param delay           The chargeup timer;the time before the bolt is casted (in ticks)
-	 * @param duration        The duration of the bolt;how long it lasts (in ticks)
-	 * @param velocity        The velocity of the bolt
-	 * @param detectRange     The range in which a player has to be in in order for the spell to be charged and used
-	 * @param hitboxRadius    The radius of the hitbox
-	 * @param stopOnFirstHit  Whether to target a single player (Default is its current target, otherwise select at random)
-	 * @param shots           The amount of shots
-	 * @param rate            The rate of fire for shots
-	 * @param playerFilter    A function to evaluate whether a player is a valid target (true) or not (false)
+	 * @param plugin         The main plugin
+	 * @param caster         The mob casting the spell
+	 * @param delay          The chargeup timer;the time before the bolt is casted (in ticks)
+	 * @param duration       The duration of the bolt;how long it lasts (in ticks)
+	 * @param velocity       The velocity of the bolt
+	 * @param detectRange    The range in which a player has to be in in order for the spell to be charged and used
+	 * @param hitboxRadius   The radius of the hitbox
+	 * @param stopOnFirstHit Whether to target a single player (Default is its current target, otherwise select at random)
+	 * @param shots          The amount of shots
+	 * @param rate           The rate of fire for shots
+	 * @param playerFilter   A function to evaluate whether a player is a valid target (true) or not (false)
 	 */
 	public SpellBaseBolt(Plugin plugin, LivingEntity caster, int delay, int duration, double velocity,
 	                     double detectRange, double hitboxRadius, boolean singleTarget, boolean stopOnFirstHit, int shots, int rate,
-						 @Nullable Predicate<Player> playerFilter) {
+	                     @Nullable Predicate<Player> playerFilter) {
 		mPlugin = plugin;
 		mCaster = caster;
 		mDelay = delay;
@@ -141,7 +141,7 @@ public abstract class SpellBaseBolt extends Spell {
 				}
 
 				new BukkitRunnable() {
-					BoundingBox mBox = BoundingBox.of(mCaster.getEyeLocation(), mHitboxRadius, mHitboxRadius, mHitboxRadius);
+					final BoundingBox mBox = BoundingBox.of(mCaster.getEyeLocation(), mHitboxRadius, mHitboxRadius, mHitboxRadius);
 					int mInnerTicks = 0;
 
 					@Override

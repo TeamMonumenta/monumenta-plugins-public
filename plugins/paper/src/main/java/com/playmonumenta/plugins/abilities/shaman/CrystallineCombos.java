@@ -150,6 +150,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 				final int mGapBetweenParticleColors = 200 / mCrystalStackThreshold;
 				double mRotationAngle = 0;
 				final List<PPPeriodic> mParticles = new ArrayList<>();
+
 				{
 					for (int i = 0; i < 3; i++) {
 						mCosmetic.crystallineCombosSwirl(mParticles, mPlayer);
@@ -197,7 +198,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 
 					// Particles runner
 					if (!mPlayer.isOnline()
-					    || mPlayer.isDead()
+						|| mPlayer.isDead()
 						|| PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
 						this.cancel();
 						mSystemTask = null;

@@ -287,7 +287,7 @@ public class MarketManager {
 				MarketListing newListing = new MarketListing(oldListing);
 				newListing.setLocked(true);
 				if (oldListing.getEditLocked() == null
-					    && MarketRedisManager.atomicCompareAndSwapListing(oldListingRaw, newListing)) {
+					&& MarketRedisManager.atomicCompareAndSwapListing(oldListingRaw, newListing)) {
 					amountLocked++;
 				} else {
 					amountErrors++;
@@ -403,7 +403,7 @@ public class MarketManager {
 			(listingsClaimed > 0 ? " Claimed money from " + listingsClaimed + " listing" + (listingsClaimed > 1 ? "s" : "") : ""),
 			(listingsClaimed > 0 && listingsExpired > 0 ? " and " : ""),
 			(listingsExpired > 0 ? " Collected and deleted " + listingsExpired + " listing" + (listingsExpired > 1 ? "s" : "") : "")
-			));
+		));
 
 	}
 
@@ -521,7 +521,7 @@ public class MarketManager {
 			return;
 		}
 
-		if (!WalletUtils.tryToPayFromInventoryAndWallet(player, taxDebt.mItem.asQuantity(taxDebt.mTotalRequiredAmount), true, true)) {
+		if (!WalletUtils.tryToPayFromInventoryAndWallet(player, taxDebt.mItem().asQuantity(taxDebt.mTotalRequiredAmount()), true, true)) {
 			player.sendMessage("Something went wrong: you do not have enough money to pay the tax. listing creation cancelled");
 			return;
 		}
@@ -538,7 +538,7 @@ public class MarketManager {
 		if (createdListing == null) {
 			// creation failed on the redis side
 			player.sendMessage("Something went wrong: Server failed to create the listing. You need to contact a moderator for tax refund. amount is given in logs");
-			AuditListener.logMarket("!ERROR! Player " + player.getName() + "needs a " + taxDebt.mTotalRequiredAmount + "*" + ItemUtils.getPlainName(taxDebt.mItem) + "tax refund, because the listing failed to be created in redis");
+			AuditListener.logMarket("!ERROR! Player " + player.getName() + "needs a " + taxDebt.mTotalRequiredAmount() + "*" + ItemUtils.getPlainName(taxDebt.mItem()) + "tax refund, because the listing failed to be created in redis");
 			return;
 		}
 		getInstance().linkListingToPlayerData(player, createdListing.getId());
@@ -549,7 +549,7 @@ public class MarketManager {
 		ItemStack currency = listing.getCurrencyToBuy().clone();
 		currency.setAmount(listing.getAmountToBuy() * tradeMultAmount);
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currency, player, true);
-		if (!debt.mMeetsRequirement) {
+		if (!debt.mMeetsRequirement()) {
 			player.sendMessage(Component.text("You don't have enough currency to purchase this."));
 			return null;
 		}
@@ -602,7 +602,7 @@ public class MarketManager {
 
 				player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.7f);
 
-				MarketAudit.logBuyAction(player, lockedListing, amountToGive, debt.mTotalRequiredAmount, debt.mItem);
+				MarketAudit.logBuyAction(player, lockedListing, amountToGive, debt.mTotalRequiredAmount(), debt.mItem());
 
 				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 					// Finally, update and unlock the listing async
@@ -664,18 +664,18 @@ public class MarketManager {
 		famount = Math.ceil(famount * getConfig().mBazaarTaxRate);
 
 		// calculate the debt
-		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currencyItem.asQuantity((int)famount), player, true);
+		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currencyItem.asQuantity((int) famount), player, true);
 
 		if (famount <= 0) { //overflow security
 			player.sendMessage("The amount is too low. please increase it");
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1, 1);
-			debt = new WalletUtils.Debt(debt.mItem, debt.mTotalRequiredAmount, Integer.MAX_VALUE, Integer.MAX_VALUE, false, 0, 0);
+			debt = new WalletUtils.Debt(debt.mItem(), debt.mTotalRequiredAmount(), Integer.MAX_VALUE, Integer.MAX_VALUE, false, 0, 0);
 		}
 
-		if (famount >= (long)Integer.MAX_VALUE) { //overflow security
+		if (famount >= (long) Integer.MAX_VALUE) { //overflow security
 			player.sendMessage("The amount is too much. please reduce it");
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1, 1);
-			debt = new WalletUtils.Debt(debt.mItem, debt.mTotalRequiredAmount, Integer.MAX_VALUE, Integer.MAX_VALUE, false, 0, 0);
+			debt = new WalletUtils.Debt(debt.mItem(), debt.mTotalRequiredAmount(), Integer.MAX_VALUE, Integer.MAX_VALUE, false, 0, 0);
 		}
 
 		return debt;

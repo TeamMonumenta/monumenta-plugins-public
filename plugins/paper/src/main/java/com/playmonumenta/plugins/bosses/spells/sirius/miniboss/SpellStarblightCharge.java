@@ -25,10 +25,10 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellStarblightCharge extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private PassiveStarBlightConversion mConverter;
-	private Sirius mSirius;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final PassiveStarBlightConversion mConverter;
+	private final Sirius mSirius;
 	private boolean mOnCooldown;
 	private static final int COOLDOWN = 10 * 20;
 	private static final int CHARGERANGE = 15;

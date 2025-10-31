@@ -233,8 +233,8 @@ public class SpellFromTheStars extends Spell {
 													Location yAdjustedOrigin = mLoc.clone().set(mLoc.getX(), yAdjusted.getY(), mLoc.getZ());
 													double distance = yAdjusted.distance(yAdjustedOrigin);
 													if (distance <= mHitRadius + 0.5 && distance >= mHitRadius - 0.5
-														    && Math.abs(p.getLocation().getY() - yAdjusted.getY()) <= 0.6
-														    && p.getLocation().getX() < mSirius.mBoss.getLocation().getX()) {
+														&& Math.abs(p.getLocation().getY() - yAdjusted.getY()) <= 0.6
+														&& p.getLocation().getX() < mSirius.mBoss.getLocation().getX()) {
 														DamageUtils.damage(mSirius.mBoss, p, DamageEvent.DamageType.MELEE, mDamage, null, false, true, "From the Stars");
 													}
 												}

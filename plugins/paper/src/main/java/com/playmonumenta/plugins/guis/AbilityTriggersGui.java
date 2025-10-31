@@ -100,8 +100,8 @@ public class AbilityTriggersGui extends Gui {
 						lore.add(Component.text(trigger.getDescription(), NamedTextColor.GRAY));
 					}
 					lore.add(trigger.getTrigger().equals(info.getTrigger(trigger.getId()).getTrigger()) ?
-						         Component.text("Current Trigger (default):", NamedTextColor.GRAY) :
-						         Component.text("Custom Trigger:", NamedTextColor.AQUA));
+						Component.text("Current Trigger (default):", NamedTextColor.GRAY) :
+						Component.text("Custom Trigger:", NamedTextColor.AQUA));
 					lore.addAll(trigger.getTriggerDescription());
 					ItemStack item = GUIUtils.createBasicItem(info.getDisplayItem(), 1,
 						info.getDisplayName() + " - " + trigger.getDisplayName(), NamedTextColor.GOLD, false,
@@ -132,8 +132,8 @@ public class AbilityTriggersGui extends Gui {
 				setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_class_4_l", mGuiTextures));
 				setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_class_4_r", mGuiTextures));
 			} else {
-					setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_depth_4_l", mGuiTextures));
-					setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_depth_4_r", mGuiTextures));
+				setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_depth_4_l", mGuiTextures));
+				setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_depth_4_r", mGuiTextures));
 			}
 
 			// "revert all" button - top right to hopefully prevent accidental presses
@@ -163,13 +163,13 @@ public class AbilityTriggersGui extends Gui {
 				NamedTextColor.GRAY, false, "Return to the trigger selection page.", NamedTextColor.GRAY, 40);
 			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_back", mGuiTextures);
 			setItem(0, 0, tempItem)
-					.onLeftClick(() -> {
-						mSelectedAbility = null;
-						mKeyOptionsStartIndex = 0;
-						update();
+				.onLeftClick(() -> {
+					mSelectedAbility = null;
+					mKeyOptionsStartIndex = 0;
+					update();
 
-						playButtonSoundNormal(mPlayer);
-					});
+					playButtonSoundNormal(mPlayer);
+				});
 
 			Objects.requireNonNull(mNewTrigger);
 			Objects.requireNonNull(mSelectedTrigger);
@@ -241,18 +241,18 @@ public class AbilityTriggersGui extends Gui {
 			makeBinaryOptionIcon(1, 6, Material.ROOTED_DIRT, "on ground", mNewTrigger.getOnGround(), mNewTrigger::setOnGround);
 
 			String looking = "Looking " + (mNewTrigger.getLookDirections().size() == 3 ? "anywhere"
-					: mNewTrigger.getLookDirections().stream().map(d -> d.name().toLowerCase(Locale.ROOT)).collect(Collectors.joining(" or ")));
+				: mNewTrigger.getLookDirections().stream().map(d -> d.name().toLowerCase(Locale.ROOT)).collect(Collectors.joining(" or ")));
 			guiTag = "trigger_detail_look_" + (
 				switch (looking) {
-				case "Looking anywhere" -> "all";
-				case "Looking up" -> "up";
-				case "Looking level" -> "mid";
-				case "Looking down" -> "down";
-				case "Looking level or up" -> "up_mid";
-				case "Looking down or up" -> "up_down";
-				case "Looking down or level" -> "mid_down";
-				default -> "unsupported";
-			});
+					case "Looking anywhere" -> "all";
+					case "Looking up" -> "up";
+					case "Looking level" -> "mid";
+					case "Looking down" -> "down";
+					case "Looking level or up" -> "up_mid";
+					case "Looking down or up" -> "up_down";
+					case "Looking down or level" -> "mid_down";
+					default -> "unsupported";
+				});
 			tempItem = GUIUtils.createBasicItem(Material.HEART_OF_THE_SEA, looking, NamedTextColor.GRAY, false,
 				"Click to cycle through look directions", NamedTextColor.GRAY, 40);
 			GUIUtils.setGuiNbtTag(tempItem, "texture", guiTag, mGuiTextures);
@@ -423,8 +423,8 @@ public class AbilityTriggersGui extends Gui {
 
 	private void makeOptionIcons(int row, int column, ItemStack display, AbilityTrigger.BinaryOption value, Runnable onClick) {
 		Material indicatorMaterial = value == AbilityTrigger.BinaryOption.TRUE ? Material.GREEN_STAINED_GLASS_PANE
-				: value == AbilityTrigger.BinaryOption.FALSE ? Material.RED_STAINED_GLASS_PANE
-				: Material.GRAY_STAINED_GLASS_PANE;
+			: value == AbilityTrigger.BinaryOption.FALSE ? Material.RED_STAINED_GLASS_PANE
+			: Material.GRAY_STAINED_GLASS_PANE;
 		makeOptionIcons(row, column, display, indicatorMaterial, onClick);
 	}
 
@@ -439,11 +439,11 @@ public class AbilityTriggersGui extends Gui {
 	@SuppressWarnings("EnumOrdinal")
 	private void makeBinaryOptionIcon(int row, int column, Material material, String name, AbilityTrigger.BinaryOption value, Consumer<AbilityTrigger.BinaryOption> setter) {
 		String displayName = value == AbilityTrigger.BinaryOption.TRUE ? "Must be " + name
-				: value == AbilityTrigger.BinaryOption.FALSE ? "Not " + name
-				: capitalize(name) + " or not " + name;
+			: value == AbilityTrigger.BinaryOption.FALSE ? "Not " + name
+			: capitalize(name) + " or not " + name;
 		NamedTextColor color = value == AbilityTrigger.BinaryOption.TRUE ? NamedTextColor.GREEN
-				: value == AbilityTrigger.BinaryOption.FALSE ? NamedTextColor.RED
-				: NamedTextColor.GRAY;
+			: value == AbilityTrigger.BinaryOption.FALSE ? NamedTextColor.RED
+			: NamedTextColor.GRAY;
 
 		String guiTag = switch (name) {
 			case "sneaking" -> "sneak";

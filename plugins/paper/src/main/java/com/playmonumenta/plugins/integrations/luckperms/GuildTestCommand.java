@@ -32,7 +32,7 @@ public class GuildTestCommand {
 			.withSubcommand(new CommandAPICommand("mark_guild_mates")
 				.withArguments(PLAYERS_ARG, OBJECTIVE_ARG)
 				.executesNative(GuildTestCommand::markGuildMates))
-			;
+		;
 
 		for (GuildArgs guildArgs : GuildArgs.getArgVariants("", "")) {
 			for (GuildAccessLevel accessLevel : GuildAccessLevel.values()) {

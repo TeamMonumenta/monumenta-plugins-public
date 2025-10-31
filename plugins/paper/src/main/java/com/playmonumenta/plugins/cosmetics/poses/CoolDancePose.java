@@ -165,6 +165,7 @@ public class CoolDancePose implements GravePose {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				switch (mTicks) {

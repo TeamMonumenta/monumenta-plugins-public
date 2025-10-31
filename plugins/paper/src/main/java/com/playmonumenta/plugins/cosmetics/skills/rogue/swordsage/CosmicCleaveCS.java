@@ -95,6 +95,7 @@ public class CosmicCleaveCS extends DeadlyRondeCS {
 
 		new BukkitRunnable() {
 			double mAngle = -Math.PI / 5;
+
 			@Override
 			public void run() {
 				if (mAngle > Math.PI / 5) {

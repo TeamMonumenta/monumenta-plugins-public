@@ -27,16 +27,16 @@ public class SpellNova extends SpellBaseAoE {
 	protected final double DAMAGE_PERCENTAGE;
 
 	public SpellNova(Plugin plugin, LivingEntity launcher, int radius, String name, int duration, int cooldown, boolean canMoveWhileCasting, boolean needLineOfSight,
-					 Sound chargeSound, float soundVolume, int soundDensity, ParticlesList particleAir, ParticlesList particleLoad, ParticlesList particleExplode,
-					 EntityTargets entityTargets, SoundsList soundCast, int damageAmount) {
+	                 Sound chargeSound, float soundVolume, int soundDensity, ParticlesList particleAir, ParticlesList particleLoad, ParticlesList particleExplode,
+	                 EntityTargets entityTargets, SoundsList soundCast, int damageAmount) {
 		this(plugin, launcher, radius, name, duration, cooldown, canMoveWhileCasting, needLineOfSight,
 			chargeSound, soundVolume, soundDensity, particleAir, particleLoad, particleExplode,
 			entityTargets, soundCast, EffectsList.EMPTY, damageAmount, false, 0.0);
 	}
 
 	public SpellNova(Plugin plugin, LivingEntity launcher, int radius, String name, int duration, int cooldown, boolean canMoveWhileCasting, boolean needLineOfSight,
-					 Sound chargeSound, float soundVolume, int soundDensity, ParticlesList particleAir, ParticlesList particleLoad, ParticlesList particleExplode,
-					 EntityTargets entityTargets, SoundsList soundCast, EffectsList effectsList, int damageAmount, boolean canBlock, double damagePercentage) {
+	                 Sound chargeSound, float soundVolume, int soundDensity, ParticlesList particleAir, ParticlesList particleLoad, ParticlesList particleExplode,
+	                 EntityTargets entityTargets, SoundsList soundCast, EffectsList effectsList, int damageAmount, boolean canBlock, double damagePercentage) {
 		super(plugin, launcher, radius, duration, cooldown, canMoveWhileCasting, needLineOfSight, chargeSound, soundVolume, soundDensity);
 
 		mSpellName = name;
@@ -76,14 +76,14 @@ public class SpellNova extends SpellBaseAoE {
 		for (LivingEntity target : mTargets.getTargetsList(mLauncher)) {
 			if (DAMAGE > 0) {
 				if (CAN_BLOCK) {
-					BossUtils.blockableDamage(mLauncher, target, DamageEvent.DamageType.MAGIC, DAMAGE, mSpellName, mLauncher.getLocation(), mEffects.mEffectList);
+					BossUtils.blockableDamage(mLauncher, target, DamageEvent.DamageType.MAGIC, DAMAGE, mSpellName, mLauncher.getLocation(), mEffects.mEffectList());
 				} else {
 					DamageUtils.damage(mLauncher, target, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, mSpellName);
 				}
 			}
 
 			if (DAMAGE_PERCENTAGE > 0.0) {
-				BossUtils.bossDamagePercent(mLauncher, target, DAMAGE_PERCENTAGE, CAN_BLOCK ? mLauncher.getLocation() : null, mSpellName, mEffects.mEffectList);
+				BossUtils.bossDamagePercent(mLauncher, target, DAMAGE_PERCENTAGE, CAN_BLOCK ? mLauncher.getLocation() : null, mSpellName, mEffects.mEffectList());
 			}
 			mEffects.apply(target, mLauncher);
 		}

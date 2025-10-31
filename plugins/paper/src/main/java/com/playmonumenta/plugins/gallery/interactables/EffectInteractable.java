@@ -19,11 +19,13 @@ public class EffectInteractable extends BasePricedInteractable {
 		mType = type;
 	}
 
-	@Override public boolean canInteractWithObject(GalleryGame game, GalleryPlayer player) {
+	@Override
+	public boolean canInteractWithObject(GalleryGame game, GalleryPlayer player) {
 		return super.canInteractWithObject(game, player) && mType.canBuy(player);
 	}
 
-	@Override public boolean interactWithObjectAfterPay(GalleryPlayer player) {
+	@Override
+	public boolean interactWithObjectAfterPay(GalleryPlayer player) {
 		player.giveEffect(mType.newEffect());
 		return super.interactWithObjectAfterPay(player);
 	}

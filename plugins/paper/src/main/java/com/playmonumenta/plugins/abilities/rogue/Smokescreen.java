@@ -49,16 +49,16 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 	public static final String CHARM_DAMAGE = "Smokescreen Enhancement Damage";
 
 	public static final AbilityInfo<Smokescreen> INFO =
-			new AbilityInfo<>(Smokescreen.class, "Smokescreen", Smokescreen::new)
-					.linkedSpell(ClassAbility.SMOKESCREEN)
-					.scoreboardId("SmokeScreen")
-					.shorthandName("Smk")
-					.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-					.simpleDescription("Weaken and slow nearby mobs.")
-					.cooldown(SMOKESCREEN_COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Smokescreen::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
-							AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
-					.displayItem(Material.DEAD_TUBE_CORAL);
+		new AbilityInfo<>(Smokescreen.class, "Smokescreen", Smokescreen::new)
+			.linkedSpell(ClassAbility.SMOKESCREEN)
+			.scoreboardId("SmokeScreen")
+			.shorthandName("Smk")
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
+			.simpleDescription("Weaken and slow nearby mobs.")
+			.cooldown(SMOKESCREEN_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Smokescreen::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
+				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
+			.displayItem(Material.DEAD_TUBE_CORAL);
 
 	private final double mWeakenEffect;
 	private final double mSlownessEffect;
@@ -92,6 +92,7 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 		int cd = getModifiedCooldown();
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				if (mT > cd) {

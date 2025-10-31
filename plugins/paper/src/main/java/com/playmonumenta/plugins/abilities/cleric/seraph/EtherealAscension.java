@@ -180,6 +180,7 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 		mPlayer.setFlySpeed(0);
 		mAscendRunnable = new BukkitRunnable() {
 			int mLastDashTick = 0;
+
 			@Override
 			public void run() {
 				if (!mPlayer.isOnline() || mPlayer.isDead() || AbilityUtils.isSilenced(mPlayer) || ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
@@ -298,6 +299,7 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 		cancelOnDeath(new BukkitRunnable() {
 			final Location mLoc = startLoc.clone();
 			final Vector mIncrement = dir.multiply(mAscensionOrbTravelSpeed);
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 5; i++) {

@@ -111,6 +111,7 @@ public class MailMan implements Listener {
 
 	/**
 	 * Registers a mailbox, returning the already registered mailbox instead if it exists
+	 *
 	 * @param mailbox A mailbox to register
 	 * @return The stored mailbox, whether new or old
 	 */
@@ -287,6 +288,7 @@ public class MailMan implements Listener {
 
 	/**
 	 * Attempts to add a cooldown on mail interactions.
+	 *
 	 * @param player The player whose mail is put on cooldown
 	 * @return time until the next one expires is returned as a string if too many are active, otherwise null
 	 */

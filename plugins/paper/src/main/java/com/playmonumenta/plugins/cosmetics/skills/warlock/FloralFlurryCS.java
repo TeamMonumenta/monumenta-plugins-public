@@ -79,7 +79,8 @@ public class FloralFlurryCS extends CursedWoundCS {
 		Location loc7 = origin.clone().add(VectorUtils.rotateTargetDirection(up, 40, 0).multiply(1.8));
 
 		switch (cooldowns) {
-			case 0 -> { }
+			case 0 -> {
+			}
 			case 1 -> {
 				new PPLine(Particle.REDSTONE, origin, loc2).data(NEON_SMALL).countPerMeter(12).groupingDistance(0).spawnAsPlayerActive(player);
 				new PPLine(Particle.REDSTONE, origin, loc3).data(NEON_SMALL).countPerMeter(12).groupingDistance(0).spawnAsPlayerActive(player);

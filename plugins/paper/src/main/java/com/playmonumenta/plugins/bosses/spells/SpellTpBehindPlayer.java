@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -18,8 +19,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
-import java.util.List;
 
 public class SpellTpBehindPlayer extends Spell {
 
@@ -60,7 +59,7 @@ public class SpellTpBehindPlayer extends Spell {
 					targetEntity = target;
 				}
 			} // If the targetEntity is still null after prefer_target, have EntityTarget fallback
-			if(targetEntity == null){
+			if (targetEntity == null) {
 				List<? extends LivingEntity> targets = mParameters.TARGETS.getTargetsList(mLauncher);
 				targets.removeIf(target
 					-> ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)
@@ -172,19 +171,15 @@ public class SpellTpBehindPlayer extends Spell {
 		box.shift(loc.clone().subtract(mLauncher.getLocation()));
 
 		// Check the 8 corners of the bounding box and the location itself for blocks
-		if (isObstructed(loc, box)
-			|| isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMinZ()), box)
-			|| isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMaxZ()), box)
-			|| isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMinZ()), box)
-			|| isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMaxZ()), box)
-			|| isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMinZ()), box)
-			|| isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMaxZ()), box)
-			|| isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMinZ()), box)
-			|| isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMaxZ()), box)) {
-			return false;
-		}
-
-		return true;
+		return !isObstructed(loc, box)
+			&& !isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMinZ()), box)
+			&& !isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMaxZ()), box)
+			&& !isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMinZ()), box)
+			&& !isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMaxZ()), box)
+			&& !isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMinZ()), box)
+			&& !isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMaxZ()), box)
+			&& !isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMinZ()), box)
+			&& !isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMaxZ()), box);
 	}
 
 	private boolean isObstructed(Location loc, BoundingBox box) {

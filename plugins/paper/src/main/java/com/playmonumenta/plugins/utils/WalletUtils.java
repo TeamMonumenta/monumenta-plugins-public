@@ -16,31 +16,19 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.Nullable;
 
 public class WalletUtils {
-	public static class Debt {
-		// Item that is required
-		public final ItemStack mItem;
-		// Amount of items required
-		public final int mTotalRequiredAmount;
-		// Amount of items to take from the player's inventory
-		public final int mInventoryDebt;
-		// Amount of items to take from the player's wallet
-		public final int mWalletDebt;
-		// Whether the player has enough currency to meet the debt
-		public final boolean mMeetsRequirement;
-		// Amount of items of the required currency present in the player's wallet before the trade
-		public final long mNumInWallet;
-		// Amount of items of the required currency present in the player's inventory before the trade
-		public final long mNumInInventory;
-
-		public Debt(ItemStack item, int totalRequiredAmount, int inventoryDebt, int walletDebt, boolean meetsRequirement, long numInWallet, long numInInventory) {
-			mItem = item;
-			mTotalRequiredAmount = totalRequiredAmount;
-			mInventoryDebt = inventoryDebt;
-			mWalletDebt = walletDebt;
-			mMeetsRequirement = meetsRequirement;
-			mNumInWallet = numInWallet;
-			mNumInInventory = numInInventory;
-		}
+	/**
+	 * Details about an attempted payment, using a mix of money in inventory and in wallet
+	 *
+	 * @param mItem                Item that is required
+	 * @param mTotalRequiredAmount Amount of items required
+	 * @param mInventoryDebt       Amount of items to take from the player's inventory
+	 * @param mWalletDebt          Amount of items to take from the player's wallet
+	 * @param mMeetsRequirement    Whether the player has enough currency to meet the debt
+	 * @param mNumInWallet         Amount of items of the required currency present in the player's wallet before the trade
+	 * @param mNumInInventory      Amount of items of the required currency present in the player's inventory before the trade
+	 */
+	public record Debt(ItemStack mItem, int mTotalRequiredAmount, int mInventoryDebt, int mWalletDebt,
+	                   boolean mMeetsRequirement, long mNumInWallet, long mNumInInventory) {
 	}
 
 	/**
@@ -49,7 +37,7 @@ public class WalletUtils {
 	 *
 	 * @param requirement       the ItemStack to calculate debt for.
 	 * @param inventoryContents the contents of the player's inventory.
-	 * @param reqAmount The amount of the item required.
+	 * @param reqAmount         The amount of the item required.
 	 * @param wallet            the Wallet of the player.
 	 * @param prioritizeWallet  whether to take from the wallet first (true) or the inventory first (false)
 	 * @return a Debt object with the relevant information.

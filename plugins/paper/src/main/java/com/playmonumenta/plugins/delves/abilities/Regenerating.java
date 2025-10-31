@@ -22,13 +22,13 @@ public class Regenerating {
 	public static Component[] rankDescription(int level) {
 		return new Component[]{
 			Component.text("Enemies heal "
-			+ (PERCENT_HEALING_FLAT + PERCENT_HEALING_PER_LEVEL * level)
-			+ "% of their max health every "
-			+ TICKS_PER_HEAL / (double) TICKS_PER_SECOND
-			+" seconds."),
+				+ (PERCENT_HEALING_FLAT + PERCENT_HEALING_PER_LEVEL * level)
+				+ "% of their max health every "
+				+ TICKS_PER_HEAL / (double) TICKS_PER_SECOND
+				+ " seconds."),
 			Component.text("Dealing non-DoT damage to the mob cancels the healing for "
-			+ Math.round(INTERRUPTION_TICKS / (double) TICKS_PER_SECOND)
-			+ " seconds."),
+				+ Math.round(INTERRUPTION_TICKS / (double) TICKS_PER_SECOND)
+				+ " seconds."),
 			Component.text("Enemies only heal when within "
 				+ DETECTION
 				+ " blocks of a player.")

@@ -139,7 +139,7 @@ public class SpellFrigidBeam extends Spell {
 						builder.location(point);
 					})
 						.data(new Particle.DustTransition(Color.fromRGB(0, 180, 240), Color.fromRGB(0, 40, 240), 1.35f))
-						.count((int)(8 * BEAM_RANGE))
+						.count((int) (8 * BEAM_RANGE))
 						.extra(0)
 						.spawnAsBoss();
 					new PPLine(Particle.SNOWFLAKE, center, center.clone().add(direction.clone().multiply(BEAM_RANGE)))
@@ -185,7 +185,7 @@ public class SpellFrigidBeam extends Spell {
 	}
 
 	private int beamCount(int playerCount) {
-		return (int)((double)playerCount / 3.5 + 1);
+		return (int) ((double) playerCount / 3.5 + 1);
 	}
 
 	@Override

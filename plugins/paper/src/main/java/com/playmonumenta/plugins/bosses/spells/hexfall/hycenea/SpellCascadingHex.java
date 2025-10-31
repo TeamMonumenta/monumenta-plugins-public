@@ -116,6 +116,7 @@ public class SpellCascadingHex extends Spell {
 
 						BukkitRunnable fbRunnable = new BukkitRunnable() {
 							int mT = 0;
+
 							@Override
 							public void run() {
 								if (fallingBlock.getLocation().distance(endLoc) <= 0.25 || mT++ >= 20) {
@@ -149,6 +150,7 @@ public class SpellCascadingHex extends Spell {
 			int mT = 0;
 			int mCurrentFallTime = mFallTime;
 			final int mMaxTickMarks = 60;
+
 			@Override
 			public void run() {
 				if (mT == 0) {

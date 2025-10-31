@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 public class GalleryFallingWrathEffect extends GalleryConsumableEffect {
 	/**
 	 * - After damaging an enemy with a projectile weapon, a """trident""" will fall from the sky at that location,
-	 *  bypassing iframes and dealing 20% of that attack’s damage in a 3 block radius - last 3 wave
+	 * bypassing iframes and dealing 20% of that attack’s damage in a 3 block radius - last 3 wave
 	 */
 
 	private static final double EXPLOSION_RADIUS = 3;

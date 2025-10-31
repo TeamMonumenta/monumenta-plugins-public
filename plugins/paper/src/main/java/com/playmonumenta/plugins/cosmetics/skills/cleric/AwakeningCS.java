@@ -79,7 +79,7 @@ public class AwakeningCS extends CelestialBlessingCS {
 		Location loc2 = locPlayer.clone().add(left);
 		Location loc3 = locPlayer.clone().add(right);
 		for (int i = 0; i < 2; i++) {
-			double delta = 0.2*i;
+			double delta = 0.2 * i;
 			final Particle.DustOptions CYAN = new Particle.DustOptions(Color.fromRGB(0, 180 - 60 * i, 180 - 60 * i), 1.2f - i * 0.2f);
 			new PPLine(Particle.REDSTONE, loc1, loc2).data(CYAN).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			new PPLine(Particle.REDSTONE, loc1, loc3).data(CYAN).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
@@ -100,7 +100,7 @@ public class AwakeningCS extends CelestialBlessingCS {
 		arcLoc1.setPitch(0);
 		Location arcLoc2 = locCaster.clone().add(0, 2.5, 0);
 		arcLoc2.setPitch(0);
-		ParticleUtils.drawHalfArc(arcLoc1, 4 + Math.random(), -10 + 20*Math.random(), 0, 359, 5, 0.2,
+		ParticleUtils.drawHalfArc(arcLoc1, 4 + Math.random(), -10 + 20 * Math.random(), 0, 359, 5, 0.2,
 			(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 2, 0.05, 0.05, 0.05, 0,
 				new Particle.DustTransition(
 					ParticleUtils.getTransition(LIGHT_CYAN, CYAN, ring / 4D).getColor(),
@@ -108,7 +108,7 @@ public class AwakeningCS extends CelestialBlessingCS {
 					1.2f
 				))
 				.directionalMode(false).spawnAsPlayerActive(caster));
-		ParticleUtils.drawHalfArc(arcLoc2, 4 + Math.random(), 180 + 10 - 20*Math.random(), 0, 359, 5, 0.2,
+		ParticleUtils.drawHalfArc(arcLoc2, 4 + Math.random(), 180 + 10 - 20 * Math.random(), 0, 359, 5, 0.2,
 			(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 2, 0.05, 0.05, 0.05, 0,
 				new Particle.DustTransition(
 					ParticleUtils.getTransition(LIGHT_CYAN, CYAN, ring / 4D).getColor(),
@@ -120,6 +120,7 @@ public class AwakeningCS extends CelestialBlessingCS {
 			int mTicks = 0;
 			int mIter = 0;
 			double mDegree = 0;
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 10; i++) {

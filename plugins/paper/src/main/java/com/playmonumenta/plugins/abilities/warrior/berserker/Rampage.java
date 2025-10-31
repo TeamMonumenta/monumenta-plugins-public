@@ -64,7 +64,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Dealing damage grants rage stacks that give resistance, which can be consume to deal area damage and heal yourself.")
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Rampage::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).lookDirections(AbilityTrigger.LookDirection.DOWN)
-				                                                                    .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(Material.BLAZE_POWDER);
 
 	private final double mDamage;
@@ -138,7 +138,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if ((event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)
-				&& event.getAbility() != ClassAbility.RAMPAGE) {
+			&& event.getAbility() != ClassAbility.RAMPAGE) {
 			damageDealt(event.getFinalDamage(false));
 		}
 		return false; // does not deal damage, just tallies the damage dealt

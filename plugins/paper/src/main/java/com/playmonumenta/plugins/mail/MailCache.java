@@ -323,6 +323,7 @@ public class MailCache {
 
 	/**
 	 * Registers a mailbox, returning the already registered mailbox instead if it exists
+	 *
 	 * @param mailbox A mailbox to register
 	 * @return The stored mailbox, whether new or old
 	 */
@@ -359,6 +360,7 @@ public class MailCache {
 
 	/**
 	 * Get mail sent by this player
+	 *
 	 * @return a sorted list of sent mailboxes
 	 */
 	public List<Mailbox> sentMailboxes() {
@@ -377,6 +379,7 @@ public class MailCache {
 
 	/**
 	 * Get mail received by this player
+	 *
 	 * @return a sorted list of received mailboxes
 	 */
 	public List<Mailbox> receivedMailboxes() {

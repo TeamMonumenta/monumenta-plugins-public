@@ -100,6 +100,7 @@ public class SpellLegSweep extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			boolean mSwitchedDirection = false;
+
 			@Override
 			public void run() {
 				if (!mSwitchedDirection) {

@@ -45,10 +45,10 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 		GUIUtils.refreshOffhand(event);
 		ItemStack clickedItem = event.getCurrentItem();
 		if (event.getClickedInventory() != mInventory ||
-			    clickedItem == null ||
-			    clickedItem.getType() == FILLER ||
-			    clickedItem.getType() == PURCHASED_MAT ||
-			    event.isShiftClick()) {
+			clickedItem == null ||
+			clickedItem.getType() == FILLER ||
+			clickedItem.getType() == PURCHASED_MAT ||
+			event.isShiftClick()) {
 			return;
 		}
 		Player player = (Player) event.getWhoClicked();
@@ -121,17 +121,17 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 			chosenArray = paidLocations;
 			ItemMeta meta = paidFor.getItemMeta();
 			meta.displayName(Component.text("Upgrade successfully purchased!", NamedTextColor.YELLOW)
-					.decoration(TextDecoration.ITALIC, false));
+				.decoration(TextDecoration.ITALIC, false));
 			paidFor.setItemMeta(meta);
 			inventory.setItem(18, paidFor);
 		} else {
 			chosenArray = unpaidLocations;
 			ItemMeta meta = paidFor.getItemMeta();
 			meta.displayName(Component.text("Purchase Upgrade", NamedTextColor.YELLOW)
-					.decoration(TextDecoration.ITALIC, false));
+				.decoration(TextDecoration.ITALIC, false));
 			List<Component> loreLines = new ArrayList<>();
 			loreLines.add(Component.text("Choose from all aspects", NamedTextColor.GRAY)
-					.decoration(TextDecoration.ITALIC, false));
+				.decoration(TextDecoration.ITALIC, false));
 			if (DepthsUtils.getDepthsContent().equals(DepthsContent.DARKEST_DEPTHS)) {
 				loreLines.add(Component.text("for ", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false)

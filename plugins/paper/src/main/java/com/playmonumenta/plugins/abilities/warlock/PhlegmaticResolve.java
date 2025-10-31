@@ -178,8 +178,8 @@ public class PhlegmaticResolve extends Ability {
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (isEnhanced() && !DamageEvent.DamageType.getUnscalableDamageType().contains(event.getType())
-				&& event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK &&
-			    !event.isBlocked()) {
+			&& event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK &&
+			!event.isBlocked()) {
 
 			// Need to apply Voodoo Bonds + Resistance effects here since the damage event will be cancelled before
 			// they can apply, this is easier than rewriting whole effect manager.

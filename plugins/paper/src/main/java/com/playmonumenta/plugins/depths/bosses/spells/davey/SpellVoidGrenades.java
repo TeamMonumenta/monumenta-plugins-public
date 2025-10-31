@@ -58,6 +58,7 @@ public class SpellVoidGrenades extends Spell {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks++;
@@ -99,6 +100,7 @@ public class SpellVoidGrenades extends Spell {
 
 			new BukkitRunnable() {
 				final World mWorld = mBoss.getWorld();
+
 				@Override
 				public void run() {
 					// Particles while flying through the air
@@ -128,6 +130,7 @@ public class SpellVoidGrenades extends Spell {
 
 						new BukkitRunnable() {
 							int mTicks = 0;
+
 							@Override
 							public void run() {
 								mTicks += 2;

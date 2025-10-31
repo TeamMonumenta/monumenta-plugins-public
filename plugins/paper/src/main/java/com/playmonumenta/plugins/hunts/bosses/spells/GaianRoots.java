@@ -115,7 +115,7 @@ public class GaianRoots extends Spell {
 
 		List<Location> targetLocations = new ArrayList<>();
 		for (int i = 0; i < TOTAL_ROCKS; i++) {
-			double theta = FastUtils.randomDoubleInRange((Math.PI * 2) * ((double) i / TOTAL_ROCKS), (Math.PI * 2) * ((double)(i + 1) / TOTAL_ROCKS));
+			double theta = FastUtils.randomDoubleInRange((Math.PI * 2) * ((double) i / TOTAL_ROCKS), (Math.PI * 2) * ((double) (i + 1) / TOTAL_ROCKS));
 			double distance = FastUtils.randomDoubleInRange(MINIMUM_TARGET_RANGE, MAXIMUM_TARGET_RANGE);
 			targetLocations.add(mBoss.getLocation().clone().add(FastUtils.cos(theta) * distance, 0, FastUtils.sin(theta) * distance));
 		}

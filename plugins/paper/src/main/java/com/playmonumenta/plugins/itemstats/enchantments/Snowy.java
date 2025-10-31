@@ -33,7 +33,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class Snowy implements Enchantment {
-	private static final SnowballMode[] MODES = new SnowballMode[] {
+	private static final SnowballMode[] MODES = new SnowballMode[]{
 		new SnowballMode(0, "NORMAL", 0.75, 0.25, 1.5f, 6f),
 		new SnowballMode(1, "EMPOWERED", 3, 0.5, 1f, 2f)
 	};

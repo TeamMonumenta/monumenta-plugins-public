@@ -5,9 +5,9 @@ import org.bukkit.block.Block;
 
 public class InteractableBlockOverride extends BaseOverride {
 
-    @Override
-    public boolean blockExplodeInteraction(Plugin plugin, Block block) {
-        return false;
-    }
+	@Override
+	public boolean blockExplodeInteraction(Plugin plugin, Block block) {
+		return false;
+	}
 
 }

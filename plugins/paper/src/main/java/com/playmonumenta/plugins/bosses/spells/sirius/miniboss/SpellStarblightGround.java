@@ -6,8 +6,8 @@ import org.bukkit.entity.LivingEntity;
 
 public class SpellStarblightGround extends Spell {
 
-	private PassiveStarBlightConversion mConverter;
-	private LivingEntity mBoss;
+	private final PassiveStarBlightConversion mConverter;
+	private final LivingEntity mBoss;
 	private static final int RADIUS = 4;
 
 	public SpellStarblightGround(LivingEntity boss, PassiveStarBlightConversion converter) {

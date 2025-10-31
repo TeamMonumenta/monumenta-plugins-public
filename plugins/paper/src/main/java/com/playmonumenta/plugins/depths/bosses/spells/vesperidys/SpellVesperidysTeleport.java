@@ -70,7 +70,7 @@ public class SpellVesperidysTeleport extends Spell {
 		mTicks += 5;
 
 		if (((mTicks >= 25 * 20 && !mVesperidys.mAutoAttack.isRunning())
-			 || (mVesperidys.mSpawnLoc.getY() - mBoss.getLocation().getY() > 5))
+			|| (mVesperidys.mSpawnLoc.getY() - mBoss.getLocation().getY() > 5))
 			&& !mTeleporting
 			&& !mVesperidys.mInvincible
 			&& !mVesperidys.mDefeated) {
@@ -109,7 +109,7 @@ public class SpellVesperidysTeleport extends Spell {
 			newLoc = selectedPlatform.getCenter();
 		}
 
-			teleport(newLoc, true);
+		teleport(newLoc, true);
 	}
 
 	public void teleportPlatform(int x, int y) {

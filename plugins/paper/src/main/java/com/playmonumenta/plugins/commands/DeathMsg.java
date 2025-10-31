@@ -92,8 +92,8 @@ public class DeathMsg {
 		player.sendMessage(Component.text("When you die, your death message will be shown to:", NamedTextColor.AQUA));
 		player.sendMessage(Component.text("  " + newState.getDescription(), NamedTextColor.GREEN));
 		player.sendMessage(Component.text("Change this with ", NamedTextColor.AQUA)
-						   .append(Component.text("/deathmsg visible", NamedTextColor.GOLD))
-						   .append(Component.text(" or ", NamedTextColor.AQUA))
-						   .append(Component.text("/deathmsg hidden", NamedTextColor.GOLD)));
+			.append(Component.text("/deathmsg visible", NamedTextColor.GOLD))
+			.append(Component.text(" or ", NamedTextColor.AQUA))
+			.append(Component.text("/deathmsg hidden", NamedTextColor.GOLD)));
 	}
 }

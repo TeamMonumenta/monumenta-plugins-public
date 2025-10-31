@@ -444,20 +444,20 @@ public class GalleryCommands {
 			}).register();
 
 		new CommandAPICommand(COMMAND)
-				.withPermission(PERMISSION)
-				.withArguments(
-						util,
-						new LiteralArgument("set"),
-						new LiteralArgument("spawnlocation"),
-						new LocationArgument("location", LocationType.BLOCK_POSITION))
-				.executes((sender, args) -> {
-					GalleryGame game = getGameFromSender(sender);
-					if (game == null) {
-						throw CommandAPI.failWithString("Could not detect game");
-					}
-					game.setSpawnLocation(args.getUnchecked("location"));
-					return 1;
-				}).register();
+			.withPermission(PERMISSION)
+			.withArguments(
+				util,
+				new LiteralArgument("set"),
+				new LiteralArgument("spawnlocation"),
+				new LocationArgument("location", LocationType.BLOCK_POSITION))
+			.executes((sender, args) -> {
+				GalleryGame game = getGameFromSender(sender);
+				if (game == null) {
+					throw CommandAPI.failWithString("Could not detect game");
+				}
+				game.setSpawnLocation(args.getUnchecked("location"));
+				return 1;
+			}).register();
 	}
 
 	private static @Nullable GalleryGame getGameFromSender(CommandSender sender) {

@@ -222,6 +222,7 @@ public class IgneousRune extends DepthsAbility {
 			final Location mLoc = loc;
 			final World mWorld = loc.getWorld();
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				// cosmetics
@@ -357,6 +358,7 @@ public class IgneousRune extends DepthsAbility {
 			int mTicks = 0;
 			int mIter = 0;
 			double mDegree = 0;
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 8; i++) {

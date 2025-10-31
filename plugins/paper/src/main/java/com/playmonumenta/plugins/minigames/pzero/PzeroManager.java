@@ -536,8 +536,8 @@ public class PzeroManager implements Listener {
 	public void onEntityDismount(EntityDismountEvent event) {
 		if (
 			event.getEntity() instanceof Player player &&
-			mTrackedPlayers.containsKey(player.getUniqueId()) &&
-			event.getDismounted().getScoreboardTags().contains(PZERO_PIG_TAG)
+				mTrackedPlayers.containsKey(player.getUniqueId()) &&
+				event.getDismounted().getScoreboardTags().contains(PZERO_PIG_TAG)
 		) {
 			event.setCancelled(true);
 			// Car honk sound!

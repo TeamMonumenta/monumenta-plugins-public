@@ -27,8 +27,8 @@ public class PortableEnderListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (event.getClick() == ClickType.RIGHT &&
-				event.getAction() == InventoryAction.PICKUP_HALF &&
-				event.getWhoClicked() instanceof Player player) {
+			event.getAction() == InventoryAction.PICKUP_HALF &&
+			event.getWhoClicked() instanceof Player player) {
 			// An item was right-clicked
 			ItemStack item = event.getCurrentItem();
 			if (isPortableEnder(item)) {
@@ -59,10 +59,8 @@ public class PortableEnderListener implements Listener {
 
 	public static boolean isPortableEnder(@Nullable ItemStack item) {
 		if (item != null && ItemUtils.isShulkerBox(item.getType()) && item.hasItemMeta()) {
-			if (item.getItemMeta() instanceof BlockStateMeta) {
-				BlockStateMeta blockStateMeta = (BlockStateMeta) item.getItemMeta();
-				if (blockStateMeta.getBlockState() instanceof ShulkerBox) {
-					ShulkerBox shulkerBox = (ShulkerBox) blockStateMeta.getBlockState();
+			if (item.getItemMeta() instanceof BlockStateMeta blockStateMeta) {
+				if (blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
 					return shulkerBox.isLocked() && shulkerBox.getLock().equals(LOCK_STRING);
 				}
 			}

@@ -179,7 +179,7 @@ public class EmojiCustomInventory extends CustomInventory {
 		mInventory.clear();
 
 		mInventory.setItem(4, GUIUtils.createBasicItem(Material.ENCHANTING_TABLE, "Choose an emoji below!", NamedTextColor.AQUA,
-							true, "", NamedTextColor.GRAY));
+			true, "", NamedTextColor.GRAY));
 
 		int locationIndex = 0;
 		for (Emoji item : EMOJI_LIST) {

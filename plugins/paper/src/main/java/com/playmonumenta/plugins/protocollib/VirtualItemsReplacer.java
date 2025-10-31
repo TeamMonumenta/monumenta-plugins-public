@@ -153,7 +153,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			if (isHotbarOrOffhandSlot) {
 				// Virtual Firmament
 				if (ItemUtils.isShulkerBox(itemStack.getType())
-				    && VirtualFirmament.isEnabled(player)) {
+					&& VirtualFirmament.isEnabled(player)) {
 					String plainName = ItemUtils.getPlainNameIfExists(itemStack);
 					if ("Firmament".equals(plainName) || "Doorway from Eternity".equals(plainName)) {
 						int blockCountInsideFirm = NBT.get(itemStack, nbt -> {
@@ -212,9 +212,9 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			if (isArmorOrOffhandSlot) {
 				// Depth Strider disabled while holding or using a riptide trident
 				if (slot != 45
-					    && itemStack.containsEnchantment(Enchantment.DEPTH_STRIDER)
-					    && player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.RIPTIDE)
-					    && (!player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING) || player.isHandRaised() || player.isRiptiding())) {
+					&& itemStack.containsEnchantment(Enchantment.DEPTH_STRIDER)
+					&& player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.RIPTIDE)
+					&& (!player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING) || player.isHandRaised() || player.isRiptiding())) {
 					itemStack.removeEnchantment(Enchantment.DEPTH_STRIDER);
 					markVirtual(itemStack);
 				}

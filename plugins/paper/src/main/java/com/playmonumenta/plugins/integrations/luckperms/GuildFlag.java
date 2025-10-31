@@ -120,6 +120,7 @@ public enum GuildFlag {
 
 	/**
 	 * Gets the GuildFlag from a given permission node
+	 *
 	 * @param flagId The flag ID you wish to check
 	 * @return The GuildFlag from a given flag ID, or null if not a GuildFlag
 	 */

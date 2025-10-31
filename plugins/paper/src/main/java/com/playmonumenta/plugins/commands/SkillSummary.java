@@ -34,9 +34,9 @@ public class SkillSummary extends GenericCommand {
 		Player player = CommandUtils.getPlayerFromSender(sender);
 
 		Component component = Component.text("")
-		.append(Component.selector(player.getName())
-			.color(NamedTextColor.AQUA))
-		.append(Component.text("'s Skills:", NamedTextColor.GREEN));
+			.append(Component.selector(player.getName())
+				.color(NamedTextColor.AQUA))
+			.append(Component.text("'s Skills:", NamedTextColor.GREEN));
 
 		if (useShorthand) {
 			for (Ability ability : plugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence()) {
@@ -64,7 +64,7 @@ public class SkillSummary extends GenericCommand {
 			if (!ServerProperties.getClassSpecializationsEnabled(player)) {
 				for (AbilityInfo<?> disabledAbility : plugin.mAbilityManager.getDisabledSpecAbilities()) {
 					if (disabledAbility.testCanUse(player)
-						    && disabledAbility.getScoreboard() != null) {
+						&& disabledAbility.getScoreboard() != null) {
 						int score = ScoreboardUtils.getScoreboardValue(player, disabledAbility.getScoreboard()).orElse(0);
 						if (score > 0) {
 							Component abilityHover = disabledAbility.getLevelHover(player, score, useShorthand, false);

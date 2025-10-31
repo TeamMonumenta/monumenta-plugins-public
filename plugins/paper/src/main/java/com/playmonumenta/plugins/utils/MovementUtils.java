@@ -70,10 +70,12 @@ public class MovementUtils {
 			target.setVelocity(dir);
 		}
 	}
+
 	/**
 	 * Knocks an entity in a direction.
-	 * @param dir Vector to knock entity with speed of (entity will move at this speed, neglecting initial velocity)
-	 * @param target Entity that is being knocked back
+	 *
+	 * @param dir      Vector to knock entity with speed of (entity will move at this speed, neglecting initial velocity)
+	 * @param target   Entity that is being knocked back
 	 * @param transfer Coefficient of how much initial velocity carries over
 	 */
 	public static void knockAwayDirection(Vector dir, LivingEntity target, float transfer) {
@@ -82,10 +84,11 @@ public class MovementUtils {
 
 	/**
 	 * Knocks an entity in a direction.
-	 * @param dir Vector to knock entity with speed of (entity will move at this speed, neglecting initial velocity)
-	 * @param target Entity that is being knocked back
-	 * @param transfer Coefficient of how much initial velocity carries over
-	 * @param useKnockbackRes Whether to use knockback resistance
+	 *
+	 * @param dir                 Vector to knock entity with speed of (entity will move at this speed, neglecting initial velocity)
+	 * @param target              Entity that is being knocked back
+	 * @param transfer            Coefficient of how much initial velocity carries over
+	 * @param useKnockbackRes     Whether to use knockback resistance
 	 * @param useBossKnockbackRes Whether to halve KB on bosses
 	 */
 	public static void knockAwayDirection(Vector dir, LivingEntity target, float transfer, boolean useKnockbackRes, boolean useBossKnockbackRes) {

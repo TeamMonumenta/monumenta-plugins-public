@@ -98,8 +98,8 @@ public class WalletManager implements Listener {
 				"epic:r3/items/currency/hyperchromatic_archos_ring",
 				"epic:r3/items/currency/archos_ring"
 			).map(path -> InventoryUtils.getItemFromLootTableOrWarn(loc, NamespacedKeyUtils.fromString(path)))
-			                  .filter(Objects::nonNull) // for build shard
-			                  .collect(ImmutableList.toImmutableList());
+			.filter(Objects::nonNull) // for build shard
+			.collect(ImmutableList.toImmutableList());
 
 		MANUAL_SORT_ORDER = Stream.of(
 				// r1
@@ -134,8 +134,8 @@ public class WalletManager implements Listener {
 				"epic:r3/items/currency/pulsating_shard",
 				"epic:r3/transmog/pulsating_shard_fragment"
 			).map(path -> InventoryUtils.getItemFromLootTableOrWarn(loc, NamespacedKeyUtils.fromString(path)))
-			                    .filter(Objects::nonNull) // for build shard
-			                    .collect(ImmutableList.toImmutableList());
+			.filter(Objects::nonNull) // for build shard
+			.collect(ImmutableList.toImmutableList());
 
 		COMPRESSIBLE_CURRENCIES = Stream.of(
 			// r1
@@ -251,9 +251,9 @@ public class WalletManager implements Listener {
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		WalletSettings settings = getSettings(event.getCurrentItem());
 		if (settings != null
-			    && event.getCurrentItem().getAmount() == 1
-			    && event.getWhoClicked() instanceof Player player
-			    && player.hasPermission("monumenta.usewallet")) {
+			&& event.getCurrentItem().getAmount() == 1
+			&& event.getWhoClicked() instanceof Player player
+			&& player.hasPermission("monumenta.usewallet")) {
 
 			ItemStack walletItem = event.getCurrentItem();
 
@@ -313,10 +313,10 @@ public class WalletManager implements Listener {
 								}
 							});
 							undoTooltip = undoTooltip.append(Component.newline()).append(Component.text("This button only works once due to", TextColor.color(255, 127, 0)))
-								              .append(Component.newline()).append(Component.text("the large number of items deposited!", TextColor.color(255, 127, 0)));
+								.append(Component.newline()).append(Component.text("the large number of items deposited!", TextColor.color(255, 127, 0)));
 						}
 						String depositedHoverString = depositedItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
-							                              .collect(Collectors.joining("\n"));
+							.collect(Collectors.joining("\n"));
 						if (isSketchedBagOfHoarding) {
 							player.playSound(player.getLocation(), Sound.ITEM_BOTTLE_EMPTY, SoundCategory.PLAYERS, 1.0f, 0.75f);
 						} else {
@@ -377,8 +377,8 @@ public class WalletManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		if (!(event.getRightClicked() instanceof ItemFrame)
-			    && !(event.getRightClicked() instanceof ArmorStand)
-			    && isWallet(event.getPlayer().getEquipment().getItem(event.getHand()))) {
+			&& !(event.getRightClicked() instanceof ArmorStand)
+			&& isWallet(event.getPlayer().getEquipment().getItem(event.getHand()))) {
 			event.setCancelled(true);
 		}
 	}
@@ -389,7 +389,7 @@ public class WalletManager implements Listener {
 
 	private static boolean checkNotSoulbound(Player player, ItemStack item) {
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.SOULBOUND) > 0
-			    && !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
+			&& !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
 			player.sendMessage(Component.text("This " + ItemUtils.getPlainName(item) + " does not belong to you!", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			return true;
@@ -399,18 +399,18 @@ public class WalletManager implements Listener {
 
 	public static boolean canPutIntoWallet(ItemStack item, WalletSettings settings) {
 		return item != null
-			       && item.getAmount() > 0
-			       && isCurrency(item)
-			       && ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
-			       && ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) <= 0
-			       && (settings.allCurrencies || ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) < 0 || MAIN_CURRENCIES.stream().anyMatch(c -> c.isSimilar(item)));
+			&& item.getAmount() > 0
+			&& isCurrency(item)
+			&& ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
+			&& ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) <= 0
+			&& (settings.allCurrencies || ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) < 0 || MAIN_CURRENCIES.stream().anyMatch(c -> c.isSimilar(item)));
 	}
 
 	public static boolean isCurrency(ItemStack item) {
 		return !ItemUtils.isNullOrAir(item)
-			       && (ItemStatUtils.getTier(item) == Tier.CURRENCY
-				           || ItemStatUtils.getTier(item) == Tier.EVENT_CURRENCY
-				           || InventoryUtils.testForItemWithLore(item, "Can be put into a wallet."));
+			&& (ItemStatUtils.getTier(item) == Tier.CURRENCY
+			|| ItemStatUtils.getTier(item) == Tier.EVENT_CURRENCY
+			|| InventoryUtils.testForItemWithLore(item, "Can be put into a wallet."));
 	}
 
 	public static boolean isBase(ItemStack item) {
@@ -501,12 +501,12 @@ public class WalletManager implements Listener {
 	 * If the player has a wallet, add it to the wallet. If not, add it to the inventory.
 	 * If the inventory is full, we drop it on the ground.
 	 * If <code>notify</code> is <code>true</code>, the player will receive a message informing them of the addition.
-	 * @see InventoryUtils#playerHasWalletItem(Player)
-	 * @see InventoryUtils#giveItemWithStacksizeCheck(Player, ItemStack)
 	 *
 	 * @param player The player to give the currency to.
-	 * @param item The currency item.
+	 * @param item   The currency item.
 	 * @param notify Whether to send the player a message about it aswell.
+	 * @see InventoryUtils#playerHasWalletItem(Player)
+	 * @see InventoryUtils#giveItemWithStacksizeCheck(Player, ItemStack)
 	 */
 	public static void giveCurrencyToPlayer(final Player player, ItemStack item, boolean notify) {
 		if (!isCurrency(item)) {

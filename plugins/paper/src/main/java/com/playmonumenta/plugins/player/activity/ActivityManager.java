@@ -50,8 +50,7 @@ public class ActivityManager {
 				mDamageDealt.put(playerId, updatedDamage - THRESHOLD_R3);
 				addActivity(player);
 			}
-		} else
-		if (ServerProperties.getClassSpecializationsEnabled(player)) {
+		} else if (ServerProperties.getClassSpecializationsEnabled(player)) {
 			if (updatedDamage > THRESHOLD_R2) {
 				mDamageDealt.put(playerId, updatedDamage - THRESHOLD_R2);
 				addActivity(player);
@@ -73,8 +72,7 @@ public class ActivityManager {
 				mDamageDealt.put(playerId, 0.0);
 				addActivity(player);
 			}
-		} else
-		if (ServerProperties.getClassSpecializationsEnabled(player)) {
+		} else if (ServerProperties.getClassSpecializationsEnabled(player)) {
 			if (updatedHealing > THRESHOLD_R2 / 4 && damageDealt > 1) {
 				mHealingDealt.put(playerId, updatedHealing - THRESHOLD_R2 / 4);
 				mDamageDealt.put(playerId, 0.0);

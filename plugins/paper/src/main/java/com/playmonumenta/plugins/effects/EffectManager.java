@@ -299,14 +299,7 @@ public final class EffectManager implements Listener {
 	}
 
 	// Used for phylactery
-	public static class EffectPair {
-		public final String mSource;
-		public final Effect mEffect;
-
-		public EffectPair(String source, Effect effect) {
-			mSource = source;
-			mEffect = effect;
-		}
+	public record EffectPair(String mSource, Effect mEffect) {
 	}
 
 	@FunctionalInterface
@@ -1161,7 +1154,7 @@ public final class EffectManager implements Listener {
 		}
 	}
 
-	@EventHandler (priority = EventPriority.NORMAL, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void abilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
 		Effects effects = mEntities.get(player.getUniqueId());

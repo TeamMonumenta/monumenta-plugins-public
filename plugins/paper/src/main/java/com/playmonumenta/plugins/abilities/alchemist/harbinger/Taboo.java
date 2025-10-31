@@ -77,24 +77,24 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	}
 
 	public static final AbilityInfo<Taboo> INFO =
-			new AbilityInfo<>(Taboo.class, "Taboo", Taboo::new)
-					.linkedSpell(ClassAbility.TABOO)
-					.scoreboardId("Taboo")
-					.shorthandName("Tb")
-					.descriptions(getDescription1(), getDescription2())
-					.simpleDescription("Receive 50% less absorption and healing from every source, in exchange for increased magic damage and potion recharge rate.")
-					.cooldown(BURST_COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("burst", "burst", Taboo::burst, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true).lookDirections(AbilityTrigger.LookDirection.DOWN),
-							new AbilityTriggerInfo.TriggerRestriction("holding an Alchemist's Bag and Taboo is active",
-									player -> {
-										if (!ItemUtils.isAlchemistItem(player.getInventory().getItemInMainHand())) {
-											return false;
-										}
-										return isTabooUpgradedAndNonBurstActive(player);
-									})))
-					.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", Taboo::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
-							PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-					.displayItem(Material.HONEY_BOTTLE);
+		new AbilityInfo<>(Taboo.class, "Taboo", Taboo::new)
+			.linkedSpell(ClassAbility.TABOO)
+			.scoreboardId("Taboo")
+			.shorthandName("Tb")
+			.descriptions(getDescription1(), getDescription2())
+			.simpleDescription("Receive 50% less absorption and healing from every source, in exchange for increased magic damage and potion recharge rate.")
+			.cooldown(BURST_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("burst", "burst", Taboo::burst, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true).lookDirections(AbilityTrigger.LookDirection.DOWN),
+				new AbilityTriggerInfo.TriggerRestriction("holding an Alchemist's Bag and Taboo is active",
+					player -> {
+						if (!ItemUtils.isAlchemistItem(player.getInventory().getItemInMainHand())) {
+							return false;
+						}
+						return isTabooUpgradedAndNonBurstActive(player);
+					})))
+			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", Taboo::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
+				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.displayItem(Material.HONEY_BOTTLE);
 
 	private final double mMagicDamageIncrease;
 	private final int mRechargeRateDecrease;

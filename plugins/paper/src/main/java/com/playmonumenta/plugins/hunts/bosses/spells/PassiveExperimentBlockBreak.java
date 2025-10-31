@@ -55,10 +55,10 @@ public class PassiveExperimentBlockBreak extends Spell {
 
 					mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.BLOCKS, 0.2f, 1.1f);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation())
-							.count(3)
-							.delta(1)
-							.extra(0.03)
-							.spawnAsBoss();
+						.count(3)
+						.delta(1)
+						.extra(0.03)
+						.spawnAsBoss();
 				}
 			}
 		}

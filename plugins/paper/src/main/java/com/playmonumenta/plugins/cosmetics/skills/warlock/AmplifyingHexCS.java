@@ -63,17 +63,17 @@ public class AmplifyingHexCS implements CosmeticSkill {
 		if (angle >= 60) {
 			linesToSpawn.add(
 				List.of(new Vector(),
-				dir2,
-				direction,
-				vec1
+					dir2,
+					direction,
+					vec1
 
 				));
 			linesToSpawn.add(
 				List.of(new Vector(),
-				dir1,
-				direction,
-				vec2
-			));
+					dir1,
+					direction,
+					vec2
+				));
 		}
 
 		for (List<Vector> lines : linesToSpawn) {

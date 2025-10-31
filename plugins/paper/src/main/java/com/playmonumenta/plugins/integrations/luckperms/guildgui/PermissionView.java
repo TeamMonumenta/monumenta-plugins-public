@@ -41,9 +41,9 @@ public class PermissionView extends View {
 	protected ItemStack mTargetIcon;
 
 	public PermissionView(GuildGui gui,
-						  boolean isGuest,
+	                      boolean isGuest,
 	                      PermissionHolder target,
-						  ItemStack targetIcon,
+	                      ItemStack targetIcon,
 	                      Supplier<CompletableFuture<ItemStack>> refreshTargetIcon,
 	                      @Nullable Consumer<InventoryClickEvent> onTargetClick) {
 		super(gui);

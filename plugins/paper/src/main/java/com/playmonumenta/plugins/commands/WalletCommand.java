@@ -78,13 +78,13 @@ public class WalletCommand {
 			).withSubcommand(
 				new CommandAPICommand("withdraw")
 					.withArguments(new GreedyStringArgument("items")
-						               .replaceSuggestions((info, builder) -> {
-							               AtomicReference<SuggestionsBuilder> builderRef = new AtomicReference<>(builder);
-							               if (info.sender() instanceof Player player) {
-								               parseWalletCommandItems(player, info.currentArg(), info.currentInput().length() - info.currentArg().length(), builderRef);
-							               }
-							               return Objects.requireNonNull(builderRef.get()).buildFuture();
-						               }))
+						.replaceSuggestions((info, builder) -> {
+							AtomicReference<SuggestionsBuilder> builderRef = new AtomicReference<>(builder);
+							if (info.sender() instanceof Player player) {
+								parseWalletCommandItems(player, info.currentArg(), info.currentInput().length() - info.currentArg().length(), builderRef);
+							}
+							return Objects.requireNonNull(builderRef.get()).buildFuture();
+						}))
 					.executes((sender, args) -> {
 						Player player = CommandUtils.getPlayerFromSender(sender);
 						List<WalletCommandItem> items = parseWalletCommandItems(player, Objects.requireNonNull(args.getUnchecked("items")), 0, null);
@@ -217,7 +217,7 @@ public class WalletCommand {
 		}
 		if (!retrievedAll && items.size() > 1) {
 			player.sendMessage(Component.text("Could not retrieve all desired items!", NamedTextColor.RED)
-				                   .append(Component.text(" You may have to scroll up for more information.", NamedTextColor.WHITE)));
+				.append(Component.text(" You may have to scroll up for more information.", NamedTextColor.WHITE)));
 		}
 	}
 

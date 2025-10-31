@@ -56,10 +56,10 @@ public abstract class Mission {
 	}
 
 	protected Mission(CommandSender sender,
-	               String startDateStr,
-	               String passName,
-	               JsonObject missionObject,
-	               boolean showWarnings) {
+	                  String startDateStr,
+	                  String passName,
+	                  JsonObject missionObject,
+	                  boolean showWarnings) {
 		// Required fields
 		JsonElement missionTypeJson = missionObject.get("type");
 		if (missionTypeJson == null) {

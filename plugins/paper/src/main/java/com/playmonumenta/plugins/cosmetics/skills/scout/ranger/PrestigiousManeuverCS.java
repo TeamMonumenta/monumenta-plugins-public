@@ -24,7 +24,7 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 
 	private static final Particle.DustOptions GOLD_COLOR = new Particle.DustOptions(Color.fromRGB(255, 208, 40), 1.0f);
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.25f);
-	private static double START_EFFECT_RADIUS = 2.8;
+	private static final double START_EFFECT_RADIUS = 2.8;
 
 	@Override
 	public @Nullable List<String> getDescription() {

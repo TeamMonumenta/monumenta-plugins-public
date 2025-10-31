@@ -62,8 +62,8 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new GuildDisplayBoss.Parameters());
 		int period = (int) (p.WIDTH * 20) + 2;
 		for (Entity e : boss.getLocation().getWorld().getNearbyEntities(
-				new BoundingBox(p.X_OFFSET + p.WIDTH + EXTRA, p.Y_OFFSET - EXTRA, p.Z_OFFSET + p.WIDTH + EXTRA,
-						p.X_OFFSET - p.WIDTH - EXTRA, p.Y_OFFSET + p.HEIGHT + EXTRA, p.Z_OFFSET - p.WIDTH - EXTRA))) {
+			new BoundingBox(p.X_OFFSET + p.WIDTH + EXTRA, p.Y_OFFSET - EXTRA, p.Z_OFFSET + p.WIDTH + EXTRA,
+				p.X_OFFSET - p.WIDTH - EXTRA, p.Y_OFFSET + p.HEIGHT + EXTRA, p.Z_OFFSET - p.WIDTH - EXTRA))) {
 			if ((e instanceof ItemDisplay || e instanceof TextDisplay) && e.getScoreboardTags().contains(scoreboardTag)) {
 				e.remove();
 			}

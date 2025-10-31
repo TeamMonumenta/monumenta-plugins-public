@@ -57,7 +57,7 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 	@Override
 	public boolean isUnlocked(Player player) {
 		return ScoreboardUtils.getScoreboardValue(player, GALLERY_COMPLETE_SCB).orElse(0) >= 1
-			       || player.getGameMode() == GameMode.CREATIVE;
+			|| player.getGameMode() == GameMode.CREATIVE;
 	}
 
 	@Override
@@ -92,8 +92,8 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 		final double offsetU1 = FastUtils.RANDOM.nextDouble() - 0.5;
 		ParticleUtils.drawCurve(mCenter, -10, 6, mFront,
 			t -> 0.25 * t,
-				t -> offsetU1 * t / 5, t -> offsetR1 * t / 5,
-				(l, t) -> new BukkitRunnable() {
+			t -> offsetU1 * t / 5, t -> offsetR1 * t / 5,
+			(l, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, l, (10 - t) / 2, 0.05, 0.05, 0.05, 0.01, BLOODY_COLOR1).spawnAsPlayerActive(player);
@@ -103,8 +103,8 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 
 		ParticleUtils.drawCurve(mCenter, 0, 8, mFront,
 			t -> FastUtils.sin(t * 3.1416 / 16) - 0.75,
-				t -> 2.5 - 0.5 * t, t -> 0,
-				(l, t) -> new BukkitRunnable() {
+			t -> 2.5 - 0.5 * t, t -> 0,
+			(l, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, l, (10 - t) / 2, 0.05, 0.05, 0.05, 0.01, BLOODY_COLOR1).spawnAsPlayerActive(player);
@@ -151,8 +151,8 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 		final double offsetU1 = 1.33 * (FastUtils.RANDOM.nextDouble() - 0.5);
 		ParticleUtils.drawCurve(mCenter, -10, 6, mFront,
 			t -> 0.25 * t,
-				t -> offsetU1 * t / 5, t -> offsetR1 * t / 5,
-				(l, t) -> new BukkitRunnable() {
+			t -> offsetU1 * t / 5, t -> offsetR1 * t / 5,
+			(l, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, l, (10 - t) / 2, 0.05, 0.05, 0.05, 0.01, BLOODY_COLOR1).spawnAsPlayerActive(player);
@@ -164,8 +164,8 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 		final double offsetU2 = 2 * (FastUtils.RANDOM.nextDouble() - 0.5);
 		ParticleUtils.drawCurve(mCenter, -12, 8, mFront,
 			t -> 0.25 * t,
-				t -> offsetU2 * t / 5, t -> offsetR2 * t / 5,
-				(l, t) -> new BukkitRunnable() {
+			t -> offsetU2 * t / 5, t -> offsetR2 * t / 5,
+			(l, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, l, (14 - t) / 3, 0.05, 0.05, 0.05, 0.01, BLOODY_COLOR2).spawnAsPlayerActive(player);
@@ -175,8 +175,8 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 
 		ParticleUtils.drawCurve(mCenter, 0, 10, mFront,
 			t -> FastUtils.sin(t * 3.1416 / 16) - 0.75,
-				t -> 2.5 - 0.4 * t, t -> 0,
-				(l, t) -> new BukkitRunnable() {
+			t -> 2.5 - 0.4 * t, t -> 0,
+			(l, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, l, (14 - t) / 2, 0.05, 0.05, 0.05, 0.01, BLOODY_COLOR1).spawnAsPlayerActive(player);
@@ -199,8 +199,8 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 
 		ParticleUtils.drawCurve(mCenter, 0, units, mFront.normalize(),
 			t -> l * t / units,
-				t -> 0.5 * FastUtils.sin(t * 3.1416 / units) * FastUtils.cos(t * 3.1416 / 6), t -> 0.5 * FastUtils.sin(t * 3.1416 / units) * FastUtils.sin(t * 3.1416 / 6),
-				(loc, t) -> new BukkitRunnable() {
+			t -> 0.5 * FastUtils.sin(t * 3.1416 / units) * FastUtils.cos(t * 3.1416 / 6), t -> 0.5 * FastUtils.sin(t * 3.1416 / units) * FastUtils.sin(t * 3.1416 / 6),
+			(loc, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, BLOODY_COLOR1).spawnAsPlayerActive(player);
@@ -209,8 +209,8 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 		);
 		ParticleUtils.drawCurve(mCenter, 0, units, mFront.normalize(),
 			t -> l * t / units,
-				t -> -0.5 * FastUtils.sin(t * 3.1416 / units) * FastUtils.cos(t * 3.1416 / 6), t -> -0.5 * FastUtils.sin(t * 3.1416 / units) * FastUtils.sin(t * 3.1416 / 6),
-				(loc, t) -> new BukkitRunnable() {
+			t -> -0.5 * FastUtils.sin(t * 3.1416 / units) * FastUtils.cos(t * 3.1416 / 6), t -> -0.5 * FastUtils.sin(t * 3.1416 / units) * FastUtils.sin(t * 3.1416 / 6),
+			(loc, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, BLOODY_COLOR1).spawnAsPlayerActive(player);

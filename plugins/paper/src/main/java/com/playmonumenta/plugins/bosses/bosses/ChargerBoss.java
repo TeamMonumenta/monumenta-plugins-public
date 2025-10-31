@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
@@ -16,6 +15,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public final class ChargerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_charger";

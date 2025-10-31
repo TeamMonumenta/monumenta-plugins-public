@@ -16,15 +16,15 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 public class SpellAxtalMeleeMinions extends Spell {
-	private Plugin mPlugin;
-	private Entity mLauncher;
-	private int mCount;
-	private int mScope;
-	private int mRepeats;
-	private int mNearbyRadius;
-	private int mMaxNearby;
-	private String mSummonedMobs;
-	private boolean mPool;
+	private final Plugin mPlugin;
+	private final Entity mLauncher;
+	private final int mCount;
+	private final int mScope;
+	private final int mRepeats;
+	private final int mNearbyRadius;
+	private final int mMaxNearby;
+	private final String mSummonedMobs;
+	private final boolean mPool;
 
 	public SpellAxtalMeleeMinions(Plugin plugin, Entity launcher, int count, int scope,
 	                              int repeats, int nearbyRadius, int maxNearby, String summonedMobs, boolean isPool) {

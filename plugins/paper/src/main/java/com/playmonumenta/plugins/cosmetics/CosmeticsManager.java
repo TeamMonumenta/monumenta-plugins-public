@@ -207,20 +207,20 @@ public class CosmeticsManager implements Listener {
 	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type, @Nullable ClassAbility ability) {
 		if (type != CosmeticType.COSMETIC_SKILL) {
 			return getCosmetics(player).stream()
-				       .filter(c -> c.getType() == type)
-				       .sorted(Comparator.comparing(Cosmetic::getName))
-				       .toList();
+				.filter(c -> c.getType() == type)
+				.sorted(Comparator.comparing(Cosmetic::getName))
+				.toList();
 		} else if (ability != null) {
 			return getCosmetics(player).stream()
-				       .filter(c -> c.getType() == type)
-				       .filter(c -> c.getAbility() == ability)
-				       .sorted(Comparator.comparing(Cosmetic::getName))
-				       .toList();
+				.filter(c -> c.getType() == type)
+				.filter(c -> c.getAbility() == ability)
+				.sorted(Comparator.comparing(Cosmetic::getName))
+				.toList();
 		} else {
 			return getCosmetics(player).stream()
-				       .filter(c -> c.getType() == type)
-				       .sorted(Comparator.comparing(Cosmetic::getName))
-				       .toList();
+				.filter(c -> c.getType() == type)
+				.sorted(Comparator.comparing(Cosmetic::getName))
+				.toList();
 		}
 	}
 
@@ -235,7 +235,7 @@ public class CosmeticsManager implements Listener {
 	public @Nullable Cosmetic getCosmetic(Player player, CosmeticType type, String name) {
 		for (Cosmetic cosmetic : getCosmetics(player)) {
 			if (cosmetic.getType() == type
-				    && cosmetic.getName().equals(name)) {
+				&& cosmetic.getName().equals(name)) {
 				return cosmetic;
 			}
 		}
@@ -245,8 +245,8 @@ public class CosmeticsManager implements Listener {
 	public @Nullable Cosmetic getCosmetic(Player player, CosmeticType type, String name, @Nullable ClassAbility ability) {
 		for (Cosmetic cosmetic : getCosmetics(player)) {
 			if (cosmetic.getType() == type
-				    && cosmetic.getName().equals(name)
-				    && cosmetic.getAbility() == ability) {
+				&& cosmetic.getName().equals(name)
+				&& cosmetic.getAbility() == ability) {
 				return cosmetic;
 			}
 		}
@@ -450,8 +450,8 @@ public class CosmeticsManager implements Listener {
 		Player player = mob.getKiller();
 
 		if (player != null
-			    && EntityUtils.isElite(mob)
-			    && !mob.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
+			&& EntityUtils.isElite(mob)
+			&& !mob.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
 			PlayingFinisher playingFinisher = mPlayingFinishers.get(player.getUniqueId());
 			if (playingFinisher != null) {
 				playingFinisher.registerKill(mob, mob.getLocation());
@@ -513,7 +513,8 @@ public class CosmeticsManager implements Listener {
 		}
 	}
 
-	@Nullable private Player getVictimToBully(Player bully) {
+	@Nullable
+	private Player getVictimToBully(Player bully) {
 		// TODO: The logic to find a target isn't perfect and could use improvements but is currently sufficient
 		double maxDistance = 3.0;
 		double fovThreshold = 0.8; // 1 = looking directly, 0 = perpendicular, -1 = opposite

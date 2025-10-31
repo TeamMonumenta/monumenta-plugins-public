@@ -22,13 +22,13 @@ public class Bloodlust {
 	public static final String AVOID_BLOODLUST = "boss_bloodlustimmune";
 
 	public static Component[] rankDescription(int level) {
-		return new Component[] {
+		return new Component[]{
 			Component.text("On death of a normal enemy, there is a " + Math.round(100 * BLOODLUST_CHANCE_NORMAL * level)
 				+ "% chance"),
 			Component.text("for " + BLOODLUST_COUNT_NORMAL + " enemy to leap at you."),
 			Component.text("On death of an elite, there is a " + Math.round(100 * BLOODLUST_CHANCE_ELITE * level)
 				+ "% chance"),
-				Component.text("for " + BLOODLUST_COUNT_ELITE + " enemies to leap at you."),
+			Component.text("for " + BLOODLUST_COUNT_ELITE + " enemies to leap at you."),
 			Component.text("Mobs within " + Math.round(PLAYER_RADIUS) + " blocks of you will not leap.")
 		};
 	}

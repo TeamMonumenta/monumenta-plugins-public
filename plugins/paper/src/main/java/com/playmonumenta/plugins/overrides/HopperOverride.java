@@ -10,17 +10,11 @@ import org.bukkit.inventory.ItemStack;
 public class HopperOverride extends BaseOverride {
 	@Override
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
-		if (player != null && !player.getGameMode().equals(GameMode.CREATIVE)) {
-			return false;
-		}
-		return true;
+		return player == null || player.getGameMode().equals(GameMode.CREATIVE);
 	}
 
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block) {
-		if (player != null && !player.getGameMode().equals(GameMode.CREATIVE)) {
-			return false;
-		}
-		return true;
+		return player == null || player.getGameMode().equals(GameMode.CREATIVE);
 	}
 
 	@Override

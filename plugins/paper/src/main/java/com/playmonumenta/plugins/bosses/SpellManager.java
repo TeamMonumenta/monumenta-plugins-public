@@ -61,7 +61,7 @@ public class SpellManager {
 		}
 
 		mCooldownSpells = new ArrayDeque<>();
-		mCooldown = (int)Math.max(0, Math.floor((mReadySpells.size() - 1.0) / 2.0));
+		mCooldown = (int) Math.max(0, Math.floor((mReadySpells.size() - 1.0) / 2.0));
 	}
 
 	public int runNextSpell(boolean preventSameSpellTwiceInARow) {

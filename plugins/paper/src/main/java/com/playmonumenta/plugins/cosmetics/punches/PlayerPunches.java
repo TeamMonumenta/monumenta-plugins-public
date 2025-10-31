@@ -40,8 +40,8 @@ public class PlayerPunches {
 	public static boolean isOnWhitelistedShard() {
 		return
 			ServerProperties.getShardName().equals("guildplots") ||
-			ServerProperties.getShardName().equals("playerplots") ||
-			ServerProperties.getShardName().equals("plots");
+				ServerProperties.getShardName().equals("playerplots") ||
+				ServerProperties.getShardName().equals("plots");
 	}
 
 	public static boolean canAccess(Player bully) {

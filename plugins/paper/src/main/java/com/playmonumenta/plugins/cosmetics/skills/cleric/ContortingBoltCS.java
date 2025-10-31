@@ -73,6 +73,7 @@ public class ContortingBoltCS extends HandOfLightCS {
 		world.playSound(userLoc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1.2f, 2f);
 		new BukkitRunnable() {
 			int mInt = 0;
+
 			@Override
 			public void run() {
 				if (mInt < finalPlayers.size() - 1) {
@@ -113,6 +114,7 @@ public class ContortingBoltCS extends HandOfLightCS {
 		world.playSound(userLoc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1.2f, 2f);
 		new BukkitRunnable() {
 			int mInt = 0;
+
 			@Override
 			public void run() {
 				if (mInt < finalMobs.size() - 1) {

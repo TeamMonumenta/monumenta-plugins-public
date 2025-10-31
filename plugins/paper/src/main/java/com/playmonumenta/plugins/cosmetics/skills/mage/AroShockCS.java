@@ -68,8 +68,8 @@ public class AroShockCS extends SpellshockCS {
 
 	@Override
 	public void meleeClearStatic(Player player, LivingEntity enemy) {
-		Location loc  = enemy.getLocation().add(0, 1, 0);
-		Location pLoc =player.getLocation().add(0, 1, 0);
+		Location loc = enemy.getLocation().add(0, 1, 0);
+		Location pLoc = player.getLocation().add(0, 1, 0);
 		Vector dir = LocationUtils.getDirectionTo(loc, pLoc.clone().subtract(0, 0.5, 0)).multiply(3);
 		int random = FastUtils.randomIntInRange(0, 1);
 		loc.setDirection(VectorUtils.rotateYAxis(dir, ROTATIONS[random])).subtract(dir);

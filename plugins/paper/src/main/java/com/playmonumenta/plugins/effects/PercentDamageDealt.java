@@ -26,8 +26,8 @@ public class PercentDamageDealt extends Effect {
 	private @Nullable BiPredicate<LivingEntity, LivingEntity> mPredicate;
 
 	private PercentDamageDealt(final int duration, final double amount, final @Nullable EnumSet<DamageType> affectedDamageTypes,
-							   final int priority, final @Nullable BiPredicate<LivingEntity, LivingEntity> predicate,
-							   final String effectID, final boolean deleteOnAbilityRefresh) {
+	                           final int priority, final @Nullable BiPredicate<LivingEntity, LivingEntity> predicate,
+	                           final String effectID, final boolean deleteOnAbilityRefresh) {
 		super(duration, effectID, deleteOnAbilityRefresh);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
@@ -39,14 +39,15 @@ public class PercentDamageDealt extends Effect {
 	 * Special constructor to override mEffectID of the new Effect instance. Used by inheriting classes
 	 */
 	protected PercentDamageDealt(final int duration, final double amount, final @Nullable EnumSet<DamageType> affectedDamageTypes,
-								 final String effectID) {
+	                             final String effectID) {
 		this(duration, amount, affectedDamageTypes, 0, null, effectID, false);
 	}
 
 	/**
 	 * Create a new PercentDamageDealt Effect.
+	 *
 	 * @param duration Time in ticks the effect lasts
-	 * @param amount Potency of the effect where amount < 0 is a debuff and amount > 0 is a buff
+	 * @param amount   Potency of the effect where amount < 0 is a debuff and amount > 0 is a buff
 	 */
 	public PercentDamageDealt(final int duration, final double amount) {
 		this(duration, amount, null, 0, null, effectID, false);
@@ -54,6 +55,7 @@ public class PercentDamageDealt extends Effect {
 
 	/**
 	 * Restricts what DamageTypes an instance of PercentDamageDealt (or its inheritors) can apply to
+	 *
 	 * @param affectedDamageTypes Which DamageTypes the effect should modify
 	 * @return Modified PercentDamageDealt instance
 	 */
@@ -64,6 +66,7 @@ public class PercentDamageDealt extends Effect {
 
 	/**
 	 * Modifies the EffectPriority of an instance of PercentDamageDealt (or its inheritors). Default is 0 (early)
+	 *
 	 * @param priority Priority ordering of this effect
 	 * @return Modified PercentDamageDealt instance
 	 */
@@ -74,6 +77,7 @@ public class PercentDamageDealt extends Effect {
 
 	/**
 	 * Restricts what DamageTypes an instance of PercentDamageDealt (or its inheritors) can apply to
+	 *
 	 * @param predicate Determines what DamageEvents should be modified using damagee and damager
 	 * @return Modified PercentDamageDealt instance
 	 */
@@ -123,7 +127,7 @@ public class PercentDamageDealt extends Effect {
 		}
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
 			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL)
-				&& AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
+			&& AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
 			event.updateDamageWithMultiplier(Math.max(0, 1 + mAmount));
 		}
 	}

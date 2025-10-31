@@ -72,6 +72,7 @@ public class PlayerSocialCache {
 	}
 
 	//region <GETTERS>
+
 	/**
 	 * Gets the UUID of the player whose data this cache represents.
 	 *

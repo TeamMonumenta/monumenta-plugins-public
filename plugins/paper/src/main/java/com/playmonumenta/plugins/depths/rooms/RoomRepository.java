@@ -66,8 +66,9 @@ public abstract class RoomRepository {
 
 	/**
 	 * Spawns the next room in the physical world
+	 *
 	 * @param spawnPoint the coordinates to load the room
-	 * @param roomType the type of the room to select from
+	 * @param roomType   the type of the room to select from
 	 * @return the room information for the selected room.
 	 */
 	public DepthsRoom summonRoom(Location spawnPoint, DepthsRoomType roomType, DepthsParty party) {
@@ -104,7 +105,7 @@ public abstract class RoomRepository {
 		box.expand(BlockFace.DOWN, room.mSize.getY());
 		box.expand(BlockFace.NORTH, room.mSize.getZ());
 		box.expand(BlockFace.SOUTH, room.mSize.getZ());
-		for (Entity e: w.getNearbyEntities(box)) {
+		for (Entity e : w.getNearbyEntities(box)) {
 			if (!(e instanceof Player)) {
 				e.remove();
 			}
@@ -206,7 +207,8 @@ public abstract class RoomRepository {
 	/**
 	 * Spawns the lobby for the next floor for the given party, and teleports
 	 * players to it/sets them up to continue playing
-	 * @param party the party to send to the next floor
+	 *
+	 * @param party    the party to send to the next floor
 	 * @param treasure the treasure score given to the party
 	 */
 	public void goToNextFloor(DepthsParty party, int treasure) {

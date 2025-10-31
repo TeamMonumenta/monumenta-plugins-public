@@ -49,7 +49,7 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 
 	private static final double MOVEMENT_SPEED = 0.25;
 	private static final int MAXIMUM_BASE_HEALTH = 1024;
-	private static final int TIMER_INCREMENT = 20 * 1;
+	private static final int TIMER_INCREMENT = 20;
 	private static final int TIME_SPAWN = 0;
 	private static final int TIME_TITLE = 20 * 2;
 	private static final int TIME_BEGIN = 20 * 8;

@@ -32,7 +32,7 @@ public final class SpellChangeFloor extends Spell {
 	private final int mFloorDuration;
 
 	public SpellChangeFloor(final Plugin plugin, final LivingEntity launcher, final Location centerLoc, final int range,
-							final int radius, final Material material, final int floorDuration) {
+	                        final int radius, final Material material, final int floorDuration) {
 		mPlugin = plugin;
 		mBoss = launcher;
 		mCenterLoc = centerLoc;

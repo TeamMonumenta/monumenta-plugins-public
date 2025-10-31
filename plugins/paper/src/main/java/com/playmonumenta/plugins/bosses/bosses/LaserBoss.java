@@ -79,9 +79,9 @@ public class LaserBoss extends BossAbilityGroup {
 
 		//particle & sound used!
 		@BossParam(help = "Sound used each tick on each player")
-	  	public SoundsList SOUND_TICKS = SoundsList.builder()
-		.add(new SoundsList.CSound(Sound.ENTITY_SHULKER_BULLET_HIT, 1.0f, 1.0f))
-		.build();
+		public SoundsList SOUND_TICKS = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_SHULKER_BULLET_HIT, 1.0f, 1.0f))
+			.build();
 
 		@BossParam(help = "Particle used for the laser")
 		public ParticlesList PARTICLE_LASER = ParticlesList.builder()
@@ -159,11 +159,11 @@ public class LaserBoss extends BossAbilityGroup {
 
 				if (target != null) {
 					if (p.DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList);
+						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList());
 					}
 
 					if (p.DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME, p.EFFECTS.mEffectList);
+						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME, p.EFFECTS.mEffectList());
 					}
 
 					p.EFFECTS.apply(target, mBoss);

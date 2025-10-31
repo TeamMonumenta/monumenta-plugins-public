@@ -100,11 +100,11 @@ public class TeleportRemnant extends Spell {
 				}
 
 				if (mTicksToTelegraph <= 0 && mTicks < LIFESPAN - 20) {
-					mTicksToTelegraph = (int)(20 - 12 * ((double)mTicks / LIFESPAN));
+					mTicksToTelegraph = (int) (20 - 12 * ((double) mTicks / LIFESPAN));
 
 					movingOrb(remnant.getLocation().clone().add(0, 0.5, 0));
 
-					mWorld.playSound(remnant.getLocation(), Sound.ENTITY_WARDEN_TENDRIL_CLICKS, SoundCategory.HOSTILE, 2, (float)(0.5 + 1.5 * ((double)mTicks / LIFESPAN)));
+					mWorld.playSound(remnant.getLocation(), Sound.ENTITY_WARDEN_TENDRIL_CLICKS, SoundCategory.HOSTILE, 2, (float) (0.5 + 1.5 * ((double) mTicks / LIFESPAN)));
 				}
 
 				mTicksToTelegraph--;
@@ -142,7 +142,7 @@ public class TeleportRemnant extends Spell {
 				double remnantPercentHealth = remnant.getHealth() / EntityUtils.getMaxHealth(remnant);
 
 				mChargeUp.update();
-				mChargeUp.setProgress(1 - ((float)mTicks / LIFESPAN));
+				mChargeUp.setProgress(1 - ((float) mTicks / LIFESPAN));
 				mChargeUp.setTitle(Component.text(String.format("Decaying Remnant - %s%%", (int) (remnantPercentHealth * 100)), NamedTextColor.RED));
 
 				mTicks++;

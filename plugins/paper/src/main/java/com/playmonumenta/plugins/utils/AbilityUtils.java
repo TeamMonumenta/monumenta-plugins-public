@@ -410,7 +410,7 @@ public class AbilityUtils {
 	public static int getEffectiveTotalSkillPoints(Player player) {
 		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
 		if (ServerProperties.getAbilityEnhancementsEnabled(player)
-			    && PlayerUtils.hasUnlockedRing(player)) {
+			&& PlayerUtils.hasUnlockedRing(player)) {
 			return MAX_SKILL_POINTS;
 		}
 		return ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
@@ -419,7 +419,7 @@ public class AbilityUtils {
 	public static int getEffectiveTotalSpecPoints(Player player) {
 		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
 		if (ServerProperties.getAbilityEnhancementsEnabled(player)
-			    && PlayerUtils.hasUnlockedRing(player)) {
+			&& PlayerUtils.hasUnlockedRing(player)) {
 			return MAX_SPEC_POINTS;
 		}
 		return ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
@@ -500,7 +500,7 @@ public class AbilityUtils {
 
 		String errorMessage = null;
 		if (chosenClass != null &&
-			    (chosenClass.mQuestReq != null && (ScoreboardUtils.getScoreboardValue(player, chosenClass.mQuestReq).orElse(0) < chosenClass.mQuestReqMin && !getEffectiveSpecs(player)))) {
+			(chosenClass.mQuestReq != null && (ScoreboardUtils.getScoreboardValue(player, chosenClass.mQuestReq).orElse(0) < chosenClass.mQuestReqMin && !getEffectiveSpecs(player)))) {
 			errorMessage = "You have not unlocked this class yet.";
 		} else if (chosenClass != null && playerSpec == chosenClass.mSpecOne.mSpecialization && ScoreboardUtils.getScoreboardValue(player, Objects.requireNonNull(chosenClass.mSpecOne.mSpecQuestScoreboard)).orElse(0) < 100 && !getEffectiveSpecs(player)) {
 			errorMessage = "You have not unlocked this specialization yet.";

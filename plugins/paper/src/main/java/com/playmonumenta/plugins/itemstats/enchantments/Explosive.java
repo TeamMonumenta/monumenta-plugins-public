@@ -10,11 +10,13 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
-
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.EnumSet;
 import java.util.List;
-
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -126,11 +128,11 @@ public class Explosive implements Enchantment {
 				new PartialParticle(Particle.REDSTONE, location, 25, 1.5, 1.5, 1.5, BLEED_COLOR).spawnAsPlayerActive(player);
 			}
 			if (wind > 0) {
-				player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f * multiplier, 0.30f);
+				player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, multiplier, 0.30f);
 				new PartialParticle(Particle.CLOUD, location, 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (earth > 0) {
-				player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_BREAK, SoundCategory.PLAYERS, 1.0f * multiplier, 1.0f);
+				player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_BREAK, SoundCategory.PLAYERS, multiplier, 1.0f);
 				new PartialParticle(Particle.FALLING_DUST, location, 12, 1.5, 1.5, 1.5, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(player);
 				new PartialParticle(Particle.REDSTONE, location, 12, 1.5, 1.5, 1.5, new Particle.DustOptions(Color.fromRGB(120, 148, 82), 0.75f)).spawnAsPlayerActive(player);
 			}

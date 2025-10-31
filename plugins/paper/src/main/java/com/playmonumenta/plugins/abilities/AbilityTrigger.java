@@ -400,8 +400,8 @@ public class AbilityTrigger {
 			return false;
 		}
 		LookDirection lookDirection = player.getLocation().getPitch() < -LOOK_DIRECTION_CUTOFF_ANGLE ? LookDirection.UP
-			                              : player.getLocation().getPitch() > LOOK_DIRECTION_CUTOFF_ANGLE ? LookDirection.DOWN
-				                                : LookDirection.LEVEL;
+			: player.getLocation().getPitch() > LOOK_DIRECTION_CUTOFF_ANGLE ? LookDirection.DOWN
+			: LookDirection.LEVEL;
 		if (!mLookDirections.contains(lookDirection)) {
 			return false;
 		}
@@ -430,7 +430,7 @@ public class AbilityTrigger {
 			return false;
 		}
 		return mEnabled == that.mEnabled && mDoubleClick == that.mDoubleClick && mKey == that.mKey && mKeyOptions.equals(that.mKeyOptions) && mSneaking == that.mSneaking
-			       && mSprinting == that.mSprinting && mOnGround == that.mOnGround && mFallThrough == that.mFallThrough && mLookDirections.equals(that.mLookDirections);
+			&& mSprinting == that.mSprinting && mOnGround == that.mOnGround && mFallThrough == that.mFallThrough && mLookDirections.equals(that.mLookDirections);
 	}
 
 	@Override

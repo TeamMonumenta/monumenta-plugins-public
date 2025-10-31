@@ -113,7 +113,7 @@ public class ShellRupture extends Spell {
 						.data(new Particle.DustOptions(color, 0.7f))
 						.spawnAsBoss();
 					new PPBezier(Particle.REDSTONE, List.of(end1, baseLocation.clone().add(attackDirection), end2))
-						.count((int)(Math.toRadians(ATTACK_ANGLE) * ATTACK_RANGE * 7))
+						.count((int) (Math.toRadians(ATTACK_ANGLE) * ATTACK_RANGE * 7))
 						.data(new Particle.DustOptions(color, 0.7f))
 						.spawnAsBoss();
 				}

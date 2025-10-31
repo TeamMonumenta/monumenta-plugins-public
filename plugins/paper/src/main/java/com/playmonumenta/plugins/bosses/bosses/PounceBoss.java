@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
@@ -27,6 +26,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public final class PounceBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_pounce";
@@ -126,7 +127,7 @@ public final class PounceBoss extends BossAbilityGroup {
 				ParticleUtils.explodingRingEffect(mPlugin, loc, 4, 1, 4,
 					List.of(new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) ->
 						p.PARTICLE_RING.spawn(mBoss, loc, 0.1, 0.1, 0.1, 0.1))
-				));
+					));
 				p.SOUND_HIT.play(loc, 1, 1);
 				p.PARTICLE_HIT.spawn(mBoss, loc);
 
@@ -138,7 +139,7 @@ public final class PounceBoss extends BossAbilityGroup {
 
 					if (p.DAMAGE_PERCENT > 0.0) {
 						DamageUtils.damage(mBoss, playerInRange, new DamageEvent.Metadata(DamageType.TRUE, null,
-							null, p.SPELL_NAME), p.DAMAGE_PERCENT * EntityUtils.getMaxHealth(playerInRange),
+								null, p.SPELL_NAME), p.DAMAGE_PERCENT * EntityUtils.getMaxHealth(playerInRange),
 							true, true, true);
 					}
 					p.EFFECTS.apply(playerInRange, mBoss);

@@ -406,9 +406,9 @@ public class WorldshaperOverride {
 
 	public static boolean isWorldshaperItem(ItemStack item) {
 		return item != null &&
-			       InventoryUtils.testForItemWithName(item, ITEM_NAME, true) &&
-			       ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
-			       ItemUtils.isShulkerBox(item.getType());
+			InventoryUtils.testForItemWithName(item, ITEM_NAME, true) &&
+			ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
+			ItemUtils.isShulkerBox(item.getType());
 	}
 
 	public static Mode getMode(ItemStack item) {

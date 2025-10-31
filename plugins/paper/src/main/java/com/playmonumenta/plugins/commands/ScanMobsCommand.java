@@ -233,11 +233,7 @@ public class ScanMobsCommand {
 		}
 
 		List<Component> lore = item.lore();
-		if (lore != null && !lore.isEmpty()) {
-			return true;
-		}
-
-		return false;
+		return lore != null && !lore.isEmpty();
 	}
 
 	private static boolean isIdentity(AttributeModifier modifier) {

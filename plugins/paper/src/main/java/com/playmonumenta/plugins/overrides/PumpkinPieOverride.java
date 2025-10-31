@@ -27,16 +27,16 @@ public class PumpkinPieOverride extends BaseOverride {
 	@Override
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity, ItemStack item) {
 		if (player == null
-			    || !ServerProperties.getTrickyCreepersEnabled()
-			    || !(clickedEntity instanceof Creeper creeper)
-			    || EntityUtils.isTrainingDummy(clickedEntity)
-			    || !InventoryUtils.testForItemWithName(item, "Creeper's Delight", true)
-			    || "plots".equals(ServerProperties.getShardName())
-			    || "playerplots".equals(ServerProperties.getShardName())
-			    || "guildplots".equals(ServerProperties.getShardName())
-			    || ZoneUtils.hasZoneProperty(clickedEntity, ZoneProperty.NO_TRICKY_TRANSFORMATION)
-			    || clickedEntity.getScoreboardTags().contains("NoTrickyTransformation")
-			    || clickedEntity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+			|| !ServerProperties.getTrickyCreepersEnabled()
+			|| !(clickedEntity instanceof Creeper creeper)
+			|| EntityUtils.isTrainingDummy(clickedEntity)
+			|| !InventoryUtils.testForItemWithName(item, "Creeper's Delight", true)
+			|| "plots".equals(ServerProperties.getShardName())
+			|| "playerplots".equals(ServerProperties.getShardName())
+			|| "guildplots".equals(ServerProperties.getShardName())
+			|| ZoneUtils.hasZoneProperty(clickedEntity, ZoneProperty.NO_TRICKY_TRANSFORMATION)
+			|| clickedEntity.getScoreboardTags().contains("NoTrickyTransformation")
+			|| clickedEntity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			return true;
 		}
 

@@ -18,7 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 
-
 public class Frenzy extends Ability {
 
 	private static final int DURATION = 5 * 20;

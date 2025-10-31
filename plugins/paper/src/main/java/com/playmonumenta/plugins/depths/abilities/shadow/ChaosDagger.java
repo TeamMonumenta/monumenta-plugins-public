@@ -75,7 +75,7 @@ public class ChaosDagger extends DepthsAbility {
 
 	public boolean cast() {
 		if (isOnCooldown() ||
-			    EntityUtils.getNearestMob(mPlayer.getLocation(), 20.0) == null) {
+			EntityUtils.getNearestMob(mPlayer.getLocation(), 20.0) == null) {
 			return false;
 		}
 		putOnCooldown();

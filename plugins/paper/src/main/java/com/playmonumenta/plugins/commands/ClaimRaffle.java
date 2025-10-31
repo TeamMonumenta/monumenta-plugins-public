@@ -31,7 +31,7 @@ public class ClaimRaffle {
 			.withPermission(CommandPermission.fromString("monumenta.command.claimraffle"))
 			.executes((sender, args) -> {
 				if (sender instanceof Player) {
-					run(plugin, (Player)sender);
+					run(plugin, (Player) sender);
 				} else {
 					throw CommandAPI.failWithString("This command must be run by a player!");
 				}

@@ -380,7 +380,7 @@ public class ClientModHandler {
 	}
 
 	public record EffectInfo(String UUID, int displayPriority, String name, int duration, double power,
-							 boolean positive, boolean percentage) {
+	                         boolean positive, boolean percentage) {
 	}
 
 

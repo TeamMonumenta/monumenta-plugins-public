@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -19,7 +20,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
-import java.util.List;
 
 public class VigilantMothdragonCS extends KeeperVirtueCS {
 	// Ambient sounds are handled in the los entry
@@ -74,7 +74,8 @@ public class VigilantMothdragonCS extends KeeperVirtueCS {
 		ItemStack item;
 		switch (mode) {
 			case ACTIVE_GENERIC, ACTIVE_COMBAT -> item = DisplayEntityUtils.generateRPItem(Material.BOW, "Aleph");
-			case ACTIVE_SUPPORT -> item = DisplayEntityUtils.generateRPItem(Material.PINK_STAINED_GLASS, "Tesseract of Balance");
+			case ACTIVE_SUPPORT ->
+				item = DisplayEntityUtils.generateRPItem(Material.PINK_STAINED_GLASS, "Tesseract of Balance");
 			default -> item = DisplayEntityUtils.generateRPItem(Material.POTION, "Ocean's Gate");
 		}
 		return item;

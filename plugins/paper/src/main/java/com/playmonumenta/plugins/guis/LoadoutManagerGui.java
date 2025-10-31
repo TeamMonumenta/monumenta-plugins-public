@@ -76,10 +76,10 @@ public class LoadoutManagerGui extends Gui {
 
 			// previous page icon
 			if (mPage > 0) {
-			setItem(0, 0, GUIUtils.createBasicItem(Material.ARROW, "Previous Page", NamedTextColor.WHITE, true,
+				setItem(0, 0, GUIUtils.createBasicItem(Material.ARROW, "Previous Page", NamedTextColor.WHITE, true,
 					""))
 					.onLeftClick(() -> {
-					mPage--;
+						mPage--;
 						update();
 					});
 			}
@@ -134,9 +134,9 @@ public class LoadoutManagerGui extends Gui {
 					}
 					ItemStack cost1 = Arrays.stream(mPlayer.getInventory().getStorageContents()).filter(
 						item -> item != null
-							        && item.getType() == Material.RAW_IRON
-							        && "Armory Page Upgrader".equals(ItemUtils.getPlainNameIfExists(item))
-							        && ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
+							&& item.getType() == Material.RAW_IRON
+							&& "Armory Page Upgrader".equals(ItemUtils.getPlainNameIfExists(item))
+							&& ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
 					).findFirst().orElse(null);
 					if (cost1 == null) {
 						mPlayer.sendMessage(Component.text("You need an Armory Page Upgrader to purchase a page!", NamedTextColor.RED));
@@ -146,8 +146,8 @@ public class LoadoutManagerGui extends Gui {
 					cost1.subtract();
 					mLoadoutData.mMaxLoadoutPages++;
 					mPlayer.sendMessage(Component.text("Successfully bought a loadout page! Your new loadout page limit is ", NamedTextColor.AQUA)
-						                    .append(Component.text(mLoadoutData.mMaxLoadoutPages, NamedTextColor.GOLD, TextDecoration.BOLD))
-						                    .append(Component.text(" (out of a possible maximum of " + MAX_PAGES + ").", NamedTextColor.AQUA)));
+						.append(Component.text(mLoadoutData.mMaxLoadoutPages, NamedTextColor.GOLD, TextDecoration.BOLD))
+						.append(Component.text(" (out of a possible maximum of " + MAX_PAGES + ").", NamedTextColor.AQUA)));
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1, 2);
 					update();
 
@@ -175,9 +175,9 @@ public class LoadoutManagerGui extends Gui {
 					}
 					ItemStack cost1 = Arrays.stream(mPlayer.getInventory().getStorageContents()).filter(
 						item -> item != null
-							        && ItemUtils.isShulkerBox(item.getType())
-							        && "Loadout Lockbox".equals(ItemUtils.getPlainNameIfExists(item))
-							        && isUnmodifiedShulker(item)
+							&& ItemUtils.isShulkerBox(item.getType())
+							&& "Loadout Lockbox".equals(ItemUtils.getPlainNameIfExists(item))
+							&& isUnmodifiedShulker(item)
 					).findFirst().orElse(null);
 					if (cost1 == null) {
 						mPlayer.sendMessage(Component.text("You need an empty, unmodified Loadout Lockbox to buy a loadout slot!", NamedTextColor.RED));
@@ -186,9 +186,9 @@ public class LoadoutManagerGui extends Gui {
 					}
 					ItemStack cost2 = Arrays.stream(mPlayer.getInventory().getStorageContents()).filter(
 						item -> item != null
-							        && ItemUtils.isShulkerBox(item.getType())
-							        && "C.H.A.R.M. 2000".equals(ItemUtils.getPlainNameIfExists(item))
-							        && isUnmodifiedShulker(item)
+							&& ItemUtils.isShulkerBox(item.getType())
+							&& "C.H.A.R.M. 2000".equals(ItemUtils.getPlainNameIfExists(item))
+							&& isUnmodifiedShulker(item)
 					).findFirst().orElse(null);
 					if (cost2 == null) {
 						mPlayer.sendMessage(Component.text("You need an empty, unmodified C.H.A.R.M. 2000 to buy a loadout slot!", NamedTextColor.RED));
@@ -197,9 +197,9 @@ public class LoadoutManagerGui extends Gui {
 					}
 					ItemStack cost3 = Arrays.stream(mPlayer.getInventory().getStorageContents()).filter(
 						item -> item != null
-							        && item.getType() == Material.YELLOW_STAINED_GLASS
-							        && "Tesseract of the Elements".equals(ItemUtils.getPlainNameIfExists(item))
-							        && ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
+							&& item.getType() == Material.YELLOW_STAINED_GLASS
+							&& "Tesseract of the Elements".equals(ItemUtils.getPlainNameIfExists(item))
+							&& ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
 					).findFirst().orElse(null);
 					if (cost3 == null) {
 						mPlayer.sendMessage(Component.text("You need an empty, unmodified Tesseract of the Elements to buy a loadout slot!", NamedTextColor.RED));
@@ -211,8 +211,8 @@ public class LoadoutManagerGui extends Gui {
 					cost3.subtract();
 					mLoadoutData.mMaxLoadouts++;
 					mPlayer.sendMessage(Component.text("Successfully bought a loadout slot! Your new loadout limit is ", NamedTextColor.AQUA)
-						                    .append(Component.text(mLoadoutData.mMaxLoadouts, NamedTextColor.GOLD, TextDecoration.BOLD))
-						                    .append(Component.text(" (out of a possible maximum of " + MAX_LOADOUTS_PER_PAGE * mLoadoutData.mMaxLoadoutPages + ").", NamedTextColor.AQUA)));
+						.append(Component.text(mLoadoutData.mMaxLoadouts, NamedTextColor.GOLD, TextDecoration.BOLD))
+						.append(Component.text(" (out of a possible maximum of " + MAX_LOADOUTS_PER_PAGE * mLoadoutData.mMaxLoadoutPages + ").", NamedTextColor.AQUA)));
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1, 2);
 					update();
 				});
@@ -240,7 +240,7 @@ public class LoadoutManagerGui extends Gui {
 
 			// next page icon
 			if (mPage < mLoadoutData.mMaxLoadoutPages - 1) {
-			setItem(0, 8, GUIUtils.createBasicItem(Material.ARROW, "Next Page", NamedTextColor.WHITE, true,
+				setItem(0, 8, GUIUtils.createBasicItem(Material.ARROW, "Next Page", NamedTextColor.WHITE, true,
 					""))
 					.onLeftClick(() -> {
 						mPage++;
@@ -265,25 +265,25 @@ public class LoadoutManagerGui extends Gui {
 								PlayerClass playerClass = new MonumentaClasses().getClassById(loadout.mClass.mClassId);
 								lore.add(Component.text(playerClass == null ? "Classless" : playerClass.mClassName + " (" + AbilityUtils.getSpec(loadout.mClass.mSpecId) + ")",
 										playerClass == null ? NamedTextColor.YELLOW : playerClass.mClassColor, TextDecoration.BOLD)
-									         .decoration(TextDecoration.ITALIC, false));
+									.decoration(TextDecoration.ITALIC, false));
 							} else {
 								lore.add(Component.text("No class", NamedTextColor.GRAY, TextDecoration.ITALIC));
 							}
 							if (loadout.mIncludeEquipment && !loadout.mEquipment.isEmpty()) {
 								lore.add(Component.text("Has equipment", NamedTextColor.WHITE)
-									         .decoration(TextDecoration.ITALIC, false));
+									.decoration(TextDecoration.ITALIC, false));
 							} else {
 								lore.add(Component.text("No equipment", NamedTextColor.GRAY, TextDecoration.ITALIC));
 							}
 							if (loadout.mIncludeVanity) {
 								lore.add(Component.text("Has vanity", NamedTextColor.WHITE)
-									         .decoration(TextDecoration.ITALIC, false));
+									.decoration(TextDecoration.ITALIC, false));
 							} else {
 								lore.add(Component.text("No vanity", NamedTextColor.GRAY, TextDecoration.ITALIC));
 							}
 							if (loadout.mIncludeCharms) {
 								lore.add(Component.text("Has charms", NamedTextColor.WHITE)
-									         .decoration(TextDecoration.ITALIC, false));
+									.decoration(TextDecoration.ITALIC, false));
 							} else {
 								lore.add(Component.text("No charms", NamedTextColor.GRAY, TextDecoration.ITALIC));
 							}
@@ -479,24 +479,24 @@ public class LoadoutManagerGui extends Gui {
 					ItemStack icon = new ItemStack(loadoutItem.mIdentifier.mType);
 					ItemUtils.modifyMeta(icon, meta -> {
 						meta.displayName((loadoutItem.mIdentifier.mName != null ? Component.text(loadoutItem.mIdentifier.mName, NamedTextColor.WHITE, TextDecoration.BOLD)
-							                  : Component.translatable(loadoutItem.mIdentifier.mType.translationKey(), NamedTextColor.WHITE, TextDecoration.BOLD)).decoration(TextDecoration.ITALIC, false));
+							: Component.translatable(loadoutItem.mIdentifier.mType.translationKey(), NamedTextColor.WHITE, TextDecoration.BOLD)).decoration(TextDecoration.ITALIC, false));
 						List<Component> lore = new ArrayList<>();
 						if (loadoutItem.mIsExalted) {
 							lore.add(Component.text("Exalted version", NamedTextColor.GRAY, TextDecoration.ITALIC));
 						}
 						lore.add(Component.text("Preferred Infusion: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-							         .append(loadoutItem.mInfusionType != null ? Component.text(loadoutItem.mInfusionType.getName(), InfusionUtils.InfusionSelection.getByType(loadoutItem.mInfusionType).getColor()) : Component.text("any")));
+							.append(loadoutItem.mInfusionType != null ? Component.text(loadoutItem.mInfusionType.getName(), InfusionUtils.InfusionSelection.getByType(loadoutItem.mInfusionType).getColor()) : Component.text("any")));
 						if (loadoutItem.mInfusionType != null) {
 							lore.add(Component.text("  (right click to clear)", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 						}
 						lore.add(Component.text("Preferred Delve Infusion: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-							         .append(loadoutItem.mDelveInfusionType != null ? Component.text(loadoutItem.mDelveInfusionType.getName(), DelveInfusionUtils.DelveInfusionSelection.getByType(loadoutItem.mDelveInfusionType).getColor()) : Component.text("any")));
+							.append(loadoutItem.mDelveInfusionType != null ? Component.text(loadoutItem.mDelveInfusionType.getName(), DelveInfusionUtils.DelveInfusionSelection.getByType(loadoutItem.mDelveInfusionType).getColor()) : Component.text("any")));
 						if (loadoutItem.mDelveInfusionType != null) {
 							lore.add(Component.text("  (left click to clear)", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 						}
 						if (loadoutItem.mIchorInfusionType != null) {
 							lore.add(Component.text("Will swap Ichor Imbuement to: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-									 .append(IchorListener.getCorrespondingDepthsTree(loadoutItem.mIchorInfusionType).getNameComponent()));
+								.append(IchorListener.getCorrespondingDepthsTree(loadoutItem.mIchorInfusionType).getNameComponent()));
 							lore.add(Component.text("  (swap hands to clear)", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 						}
 						meta.lore(lore);
@@ -717,8 +717,8 @@ public class LoadoutManagerGui extends Gui {
 	private static boolean isUnmodifiedShulker(ItemStack item) {
 		// Must be empty
 		if (item.getItemMeta() instanceof BlockStateMeta meta
-			    && meta.getBlockState() instanceof ShulkerBox shulkerBox
-			    && !Arrays.stream(shulkerBox.getInventory().getContents()).allMatch(ItemUtils::isNullOrAir)) {
+			&& meta.getBlockState() instanceof ShulkerBox shulkerBox
+			&& !Arrays.stream(shulkerBox.getInventory().getContents()).allMatch(ItemUtils::isNullOrAir)) {
 			return false;
 		}
 		// Must not have any player modifications except for name, skin, or stored vanity

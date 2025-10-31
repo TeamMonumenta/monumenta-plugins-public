@@ -167,7 +167,7 @@ public class Illuminate extends Ability {
 					final Hitbox hitbox = new Hitbox.SphereHitbox(mLoc, ILLUMINATE_HITBOX_RADIUS);
 					if (!hitbox.getHitMobs().isEmpty() || !mLoc.isChunkLoaded() ||
 						LocationUtils.collidesWithBlocks(BoundingBox.of(mLoc.clone().add(ILLUMINATE_HITBOX_RADIUS / 2, ILLUMINATE_HITBOX_RADIUS / 2, ILLUMINATE_HITBOX_RADIUS / 2),
-							mLoc.clone().add(-ILLUMINATE_HITBOX_RADIUS / 2, -ILLUMINATE_HITBOX_RADIUS / 2, -ILLUMINATE_HITBOX_RADIUS / 2)),
+								mLoc.clone().add(-ILLUMINATE_HITBOX_RADIUS / 2, -ILLUMINATE_HITBOX_RADIUS / 2, -ILLUMINATE_HITBOX_RADIUS / 2)),
 							mLoc.getWorld(), false) || mLoc.distance(startLoc) > mMaxRange) {
 
 						doExplosion(mLoc, mDamage, mRadius, mKnockback);
@@ -188,6 +188,7 @@ public class Illuminate extends Ability {
 
 		mEffectsRunnable = new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				for (final Player player : mPlayersInZone) {
@@ -227,6 +228,7 @@ public class Illuminate extends Ability {
 			int mTrailTicks = 0;
 
 			final Location mTrailLoc = loc.clone().subtract(0, 1, 0);
+
 			@Override
 			public void run() {
 				mPlayersInZone.addAll(PlayerUtils.playersInRange(mTrailLoc, radius, true));
@@ -256,6 +258,7 @@ public class Illuminate extends Ability {
 		mSanctifiedZoneRunnable = new BukkitRunnable() {
 			int mZoneTicks = 0;
 			final Location mZoneLoc = loc.clone().subtract(0, 1, 0);
+
 			@Override
 			public void run() {
 				mPlayersInZone.addAll(PlayerUtils.playersInRange(mZoneLoc, radius, true));

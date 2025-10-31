@@ -262,7 +262,7 @@ public class TheImpenetrable extends Quarry {
 	// Check if a player is standing on the boss and repel them if so
 	private void checkStanding() {
 		Hitbox hitbox = new Hitbox.AABBHitbox(mWorld, new BoundingBox(Math.floor(mBoss.getLocation().clone().add(0, 2, 0).getX()), Math.floor(mBoss.getLocation().clone().add(0, 2, 0).getY()), Math.floor(mBoss.getLocation().clone().add(0, 2, 0).getZ()),
-																			Math.ceil(mBoss.getLocation().clone().add(0, 2, 0).getX()), Math.ceil(mBoss.getLocation().clone().add(0, 2, 0).getY()), Math.ceil(mBoss.getLocation().clone().add(0, 2, 0).getZ())));
+			Math.ceil(mBoss.getLocation().clone().add(0, 2, 0).getX()), Math.ceil(mBoss.getLocation().clone().add(0, 2, 0).getY()), Math.ceil(mBoss.getLocation().clone().add(0, 2, 0).getZ())));
 		for (Player player : hitbox.getHitPlayers(true)) {
 			MovementUtils.pullTowards(mBoss.getLocation().clone().add(FastUtils.randomIntInRange(-8, 8), 4, FastUtils.randomIntInRange(-8, 8)), player, 0.2f);
 			player.sendMessage(Component.text("The shell singes you!", NamedTextColor.LIGHT_PURPLE));

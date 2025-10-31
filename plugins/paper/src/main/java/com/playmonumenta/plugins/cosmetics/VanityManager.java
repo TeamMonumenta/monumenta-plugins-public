@@ -183,9 +183,9 @@ public class VanityManager implements Listener {
 		Player player = event.getPlayer();
 		ItemStack offHand = player.getInventory().getItemInOffHand();
 		if ((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)
-			    && event.getHand() == EquipmentSlot.OFF_HAND
-			    && !ItemUtils.isNullOrAir(offHand)
-			    && offHand.getMaxItemUseDuration() == 0) { // don't update items that have a use time (and the vanity is the same type anyway)
+			&& event.getHand() == EquipmentSlot.OFF_HAND
+			&& !ItemUtils.isNullOrAir(offHand)
+			&& offHand.getMaxItemUseDuration() == 0) { // don't update items that have a use time (and the vanity is the same type anyway)
 			VanityData data = getData(player);
 			ItemStack offhandVanity = data.getEquipped(EquipmentSlot.OFF_HAND);
 			if (data.mSelfVanityEnabled && offhandVanity != null && !ItemUtils.isNullOrAir(offhandVanity)) {
@@ -195,7 +195,8 @@ public class VanityManager implements Listener {
 				if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null) {
 					switch (offhandVanity.getType()) {
 						case PEONY, ROSE_BUSH, TALL_GRASS, TALL_SEAGRASS, LARGE_FERN, SUNFLOWER, LILAC,
-							     DARK_OAK_DOOR, ACACIA_DOOR, BIRCH_DOOR, CRIMSON_DOOR, IRON_DOOR, JUNGLE_DOOR, OAK_DOOR, SPRUCE_DOOR, WARPED_DOOR -> {
+						     DARK_OAK_DOOR, ACACIA_DOOR, BIRCH_DOOR, CRIMSON_DOOR, IRON_DOOR, JUNGLE_DOOR, OAK_DOOR,
+						     SPRUCE_DOOR, WARPED_DOOR -> {
 							Block block = event.getClickedBlock().getRelative(BlockFace.UP, 2);
 							player.sendBlockChange(block.getLocation(), block.getBlockData());
 						}
@@ -300,7 +301,7 @@ public class VanityManager implements Listener {
 			return true;
 		}
 		return ((slot == EquipmentSlot.OFF_HAND && isValidOffhandVanityItem(item)) || (hasFreeAccess(player) && slot == EquipmentSlot.HEAD) || ItemUtils.getEquipmentSlot(item) == slot)
-			       && hasVanityUnlocked(player, item);
+			&& hasVanityUnlocked(player, item);
 	}
 
 	public static boolean hasVanityUnlocked(Player player, ItemStack item) {
@@ -324,7 +325,8 @@ public class VanityManager implements Listener {
 		}
 		Material type = item.getType();
 		return switch (type) {
-			case AIR, WRITABLE_BOOK, BUCKET, WATER_BUCKET, COD_BUCKET, PUFFERFISH_BUCKET, SALMON_BUCKET, TROPICAL_FISH_BUCKET, LAVA_BUCKET -> false;
+			case AIR, WRITABLE_BOOK, BUCKET, WATER_BUCKET, COD_BUCKET, PUFFERFISH_BUCKET, SALMON_BUCKET,
+			     TROPICAL_FISH_BUCKET, LAVA_BUCKET -> false;
 			default -> true;
 		};
 	}
@@ -352,9 +354,9 @@ public class VanityManager implements Listener {
 	private static ItemStack doApplyVanity(ItemStack itemStack, @Nullable ItemStack vanityItem, EquipmentSlot equipmentSlot, boolean self) {
 		if (vanityItem != null && vanityItem.getType() != Material.AIR) {
 			if (self
-				    && equipmentSlot == EquipmentSlot.OFF_HAND
-				    && (itemStack.getMaxItemUseDuration() > 0 || vanityItem.getMaxItemUseDuration() > 0)
-				    && itemStack.getType() != vanityItem.getType()) {
+				&& equipmentSlot == EquipmentSlot.OFF_HAND
+				&& (itemStack.getMaxItemUseDuration() > 0 || vanityItem.getMaxItemUseDuration() > 0)
+				&& itemStack.getType() != vanityItem.getType()) {
 				// don't allow changing item type of useable items (e.g. food, shields) to prevent not being slowed down while using them or just messing with their use in general
 				return itemStack;
 			}
@@ -381,12 +383,12 @@ public class VanityManager implements Listener {
 			ItemMeta originalMeta = itemStack.getItemMeta();
 
 			if (vanityMeta instanceof Damageable vanityDamage
-				    && vanityItem.getType().getMaxDurability() > 0) {
+				&& vanityItem.getType().getMaxDurability() > 0) {
 				// Copy over durability, adjusted for potentially changed max durability,
 				// or remove any damage present if the original item is unbreakable
 				if (originalMeta instanceof Damageable originalDamage
-					    && itemStack.getType().getMaxDurability() > 0
-					    && !originalMeta.isUnbreakable()) {
+					&& itemStack.getType().getMaxDurability() > 0
+					&& !originalMeta.isUnbreakable()) {
 					vanityMeta.setUnbreakable(false);
 					vanityDamage.setDamage((int) Math.round(1.0 * vanityItem.getType().getMaxDurability() * originalDamage.getDamage() / itemStack.getType().getMaxDurability()));
 				} else if (!vanityMeta.isUnbreakable()) {
@@ -414,9 +416,9 @@ public class VanityManager implements Listener {
 			}
 			// add durability lore line if vanity item is unbreakable
 			if (originalMeta instanceof Damageable originalDamage
-				    && itemStack.getType().getMaxDurability() > 0
-				    && !originalMeta.isUnbreakable()
-				    && (!(vanityMeta instanceof Damageable) || vanityItem.getType().getMaxDurability() <= 0)) {
+				&& itemStack.getType().getMaxDurability() > 0
+				&& !originalMeta.isUnbreakable()
+				&& (!(vanityMeta instanceof Damageable) || vanityItem.getType().getMaxDurability() <= 0)) {
 				lore.add(Component.translatable("item.durability", NamedTextColor.WHITE,
 					Component.text(itemStack.getType().getMaxDurability() - originalDamage.getDamage()),
 					Component.text(itemStack.getType().getMaxDurability())

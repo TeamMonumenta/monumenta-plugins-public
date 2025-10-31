@@ -12,7 +12,7 @@ public class SpawnEffect {
 		Health,
 		Potion,
 		Armor,
-		Weapons;
+		Weapons
 	}
 
 	public EntityType mEntityType;

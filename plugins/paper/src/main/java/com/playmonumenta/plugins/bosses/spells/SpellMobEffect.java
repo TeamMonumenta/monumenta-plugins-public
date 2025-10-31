@@ -4,8 +4,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 
 public class SpellMobEffect extends Spell {
-	private LivingEntity mLauncher;
-	private PotionEffect mPotion;
+	private final LivingEntity mLauncher;
+	private final PotionEffect mPotion;
 
 	public SpellMobEffect(LivingEntity launcher, PotionEffect potion) {
 		mLauncher = launcher;

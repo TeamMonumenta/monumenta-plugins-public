@@ -120,7 +120,7 @@ public class MarketRedisManager {
 		String newJson = newListing.toJsonString();
 		String id = String.valueOf(newListing.getId());
 
-		return (Boolean) RedisAPI.getInstance().async().evalsha(mAtomicUpdateScriptHash, ScriptOutputType.BOOLEAN, new String[] {pathListingHashMap}, id, expectedListing, newJson).toCompletableFuture().join();
+		return (Boolean) RedisAPI.getInstance().async().evalsha(mAtomicUpdateScriptHash, ScriptOutputType.BOOLEAN, new String[]{pathListingHashMap}, id, expectedListing, newJson).toCompletableFuture().join();
 
 	}
 

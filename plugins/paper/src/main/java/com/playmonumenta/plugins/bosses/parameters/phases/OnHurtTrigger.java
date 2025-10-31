@@ -33,11 +33,13 @@ public class OnHurtTrigger extends Trigger {
 	}
 
 
-	@Override public boolean test(LivingEntity boss) {
+	@Override
+	public boolean test(LivingEntity boss) {
 		return mCurrentDamage >= mTotalDamage;
 	}
 
-	@Override public void reset(LivingEntity boss) {
+	@Override
+	public void reset(LivingEntity boss) {
 		mCurrentDamage = 0;
 	}
 

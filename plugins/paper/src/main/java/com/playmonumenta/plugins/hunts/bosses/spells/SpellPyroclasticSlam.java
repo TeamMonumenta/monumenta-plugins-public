@@ -120,13 +120,14 @@ public class SpellPyroclasticSlam extends Spell implements CoreElemental.CoreEle
 		// Earthquake
 		BukkitRunnable runnable = new BukkitRunnable() {
 			double mRadius = 1;
+
 			@Override
 			public void run() {
 				new PPParametric(Particle.REDSTONE, mStartLoc,
 					(t, builder) -> {
 						double r = mRadius - 1;
 						builder.location(
-						LocationUtils.fallToGround(mStartLoc.clone().add(r*FastUtils.cosDeg(t*360), 0, r*FastUtils.sinDeg(t*360)), mStartLoc.getY() - 5).add(0, 0.2, 0));
+							LocationUtils.fallToGround(mStartLoc.clone().add(r * FastUtils.cosDeg(t * 360), 0, r * FastUtils.sinDeg(t * 360)), mStartLoc.getY() - 5).add(0, 0.2, 0));
 					}).count(60).data(new Particle.DustOptions(Color.WHITE, 1.4F)).spawnAsEntityActive(mBoss);
 				new PPParametric(Particle.CRIT_MAGIC, mStartLoc,
 					(t, builder) -> builder.location(
@@ -139,7 +140,7 @@ public class SpellPyroclasticSlam extends Spell implements CoreElemental.CoreEle
 						mAffectedPlayers.add(player);
 					}
 				}
-				mRadius += (double) EARTHQUAKE_RADIUS/EARTHQUAKE_DURATION;
+				mRadius += (double) EARTHQUAKE_RADIUS / EARTHQUAKE_DURATION;
 				if (mRadius >= EARTHQUAKE_RADIUS) {
 					this.cancel();
 					mActiveRunnables.remove(this);

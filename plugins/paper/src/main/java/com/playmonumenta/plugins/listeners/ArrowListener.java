@@ -35,14 +35,13 @@ public class ArrowListener implements Listener {
 		//Has to be an arrow
 		Entity hitEntity = event.getHitEntity();
 		if (hitEntity == null
-				|| !(event.getEntity() instanceof AbstractArrow)
-				|| event.getEntity() instanceof Trident
-				|| !(event.getEntity().getShooter() instanceof LivingEntity)
-				|| !(event.getEntity().getShooter() instanceof Player)) {
+			|| !(event.getEntity() instanceof AbstractArrow arrow)
+			|| event.getEntity() instanceof Trident
+			|| !(event.getEntity().getShooter() instanceof LivingEntity)
+			|| !(event.getEntity().getShooter() instanceof Player)) {
 			return;
 		}
 
-		AbstractArrow arrow = (AbstractArrow) event.getEntity();
 		Entity hitBeforeEntity = mHitBefore.get(arrow);
 
 		if (hitBeforeEntity == null) {

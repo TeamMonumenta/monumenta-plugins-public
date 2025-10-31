@@ -682,7 +682,7 @@ public class DepthsParty {
 							Bukkit.getServer().sendMessage(Component.empty()
 								.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
 								.append(Component.text(" defeated the Darkest Depths! (Endless Room Reached: "
-									                       + roomReached + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
+									+ roomReached + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 						}
 					}
 				} else if (getContent() == DepthsContent.CELESTIAL_ZENITH) {
@@ -695,7 +695,7 @@ public class DepthsParty {
 						Bukkit.getServer().sendMessage(Component.empty()
 							.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
 							.append(Component.text(" defeated the Celestial Zenith! (Ascension Level: "
-								                       + getAscension() + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
+								+ getAscension() + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 					}
 				}
 
@@ -714,7 +714,7 @@ public class DepthsParty {
 							Bukkit.getServer().sendMessage(Component.empty()
 								.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
 								.append(Component.text(" defeated the Darkest Depths! (Endless Room Reached: "
-									                       + roomReached + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
+									+ roomReached + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 						}
 					}
 				} else if (getContent() == DepthsContent.CELESTIAL_ZENITH) {
@@ -727,7 +727,7 @@ public class DepthsParty {
 						Bukkit.getServer().sendMessage(Component.empty()
 							.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
 							.append(Component.text(" defeated the Celestial Zenith! (Ascension Level: "
-								                       + getAscension() + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
+								+ getAscension() + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 					}
 				}
 

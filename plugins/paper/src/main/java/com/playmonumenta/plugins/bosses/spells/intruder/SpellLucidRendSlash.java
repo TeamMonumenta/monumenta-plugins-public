@@ -123,8 +123,9 @@ public class SpellLucidRendSlash extends SpellSlashAttack {
 
 	/**
 	 * Rotate by Pitch
-	 * @param translation     transformation's *new* translation
-	 * @param pitch           pitch in *degrees*!
+	 *
+	 * @param translation transformation's *new* translation
+	 * @param pitch       pitch in *degrees*!
 	 */
 	private void transformSword(Vector3f translation, float pitch) {
 		mSword.setInterpolationDelay(-1);

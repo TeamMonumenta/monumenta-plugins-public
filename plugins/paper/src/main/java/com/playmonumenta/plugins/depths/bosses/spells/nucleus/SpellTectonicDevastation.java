@@ -149,7 +149,7 @@ public class SpellTectonicDevastation extends Spell {
 										}
 										//Once it leaves the arena, stop iterating
 										if ((l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
-											    || l.distance(mStartLoc) > 30) {
+											|| l.distance(mStartLoc) > 30) {
 											continue;
 										}
 										//Move up one block if on barrier or bedrock level

@@ -395,8 +395,8 @@ public enum DelvePreset {
 	 */
 	public static @Nullable DelvePreset getChall(String dungeonName) {
 		return Arrays.stream(values())
-					 .filter(preset -> dungeonName.startsWith(preset.mName))
-					 .findFirst()
-					 .orElse(null);
+			.filter(preset -> dungeonName.startsWith(preset.mName))
+			.findFirst()
+			.orElse(null);
 	}
 }

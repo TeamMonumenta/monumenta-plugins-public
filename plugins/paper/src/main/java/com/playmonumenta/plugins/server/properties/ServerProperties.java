@@ -67,7 +67,7 @@ public class ServerProperties {
 	private String mShardName = "default_settings";
 
 	private boolean mDisableEntityScoresInDefaultWorld = true;
-	private List<String> mDisableEntityScoresInWorlds = new ArrayList<>();
+	private final List<String> mDisableEntityScoresInWorlds = new ArrayList<>();
 
 	private final EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
 	private final EnumSet<Material> mPreciousBlocks = EnumSet.noneOf(Material.class);

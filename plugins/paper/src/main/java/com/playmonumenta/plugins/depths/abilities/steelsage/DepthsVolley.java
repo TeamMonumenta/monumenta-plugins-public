@@ -73,8 +73,8 @@ public class DepthsVolley extends DepthsAbility {
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (!mPlayer.isSneaking()
-			    || isOnCooldown()
-			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			|| isOnCooldown()
+			|| !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			return true;
 		}
 

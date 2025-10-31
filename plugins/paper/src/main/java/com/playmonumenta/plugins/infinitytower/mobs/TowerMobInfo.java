@@ -89,8 +89,6 @@ public class TowerMobInfo {
 	}
 
 
-
-
 	public JsonObject toJson() {
 		JsonObject obj = new JsonObject();
 

@@ -41,7 +41,6 @@ public class DepthsDebugGUI extends CustomInventory {
 	Plugin mPlugin;
 
 
-
 	public DepthsDebugGUI(Player requestingPlayer, Player targetPlayer, Plugin plugin) {
 		super(requestingPlayer, 27, "Depths Debug GUI");
 		mPlayerToDebug = targetPlayer;
@@ -63,9 +62,9 @@ public class DepthsDebugGUI extends CustomInventory {
 		event.setCancelled(true);
 		GUIUtils.refreshOffhand(event);
 		if (event.getClickedInventory() != mInventory ||
-			    event.getCurrentItem() == null ||
-			    event.getCurrentItem().getType() == FILLER ||
-			    event.isShiftClick()) {
+			event.getCurrentItem() == null ||
+			event.getCurrentItem().getType() == FILLER ||
+			event.isShiftClick()) {
 			return;
 		}
 		Player player = (Player) event.getWhoClicked();

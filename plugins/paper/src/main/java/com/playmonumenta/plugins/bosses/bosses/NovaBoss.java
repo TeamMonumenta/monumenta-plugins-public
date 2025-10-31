@@ -102,45 +102,45 @@ public final class NovaBoss extends BossAbilityGroup {
 		}
 
 		Spell spell = new SpellBaseAoE(plugin, boss, (int) p.TARGETS.getRange(), p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE, p.SOUND_CHARGE_VOLUME, p.SOUND_CHARGE_FREQUENCY) {
-				@Override
-				protected void chargeAuraAction(Location loc) {
-					p.PARTICLE_AIR.spawn(boss, loc, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, 0.05);
-				}
+			@Override
+			protected void chargeAuraAction(Location loc) {
+				p.PARTICLE_AIR.spawn(boss, loc, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, 0.05);
+			}
 
-				@Override
-				protected void chargeCircleAction(Location loc, double radius) {
-					p.PARTICLE_LOAD.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.25));
-				}
+			@Override
+			protected void chargeCircleAction(Location loc, double radius) {
+				p.PARTICLE_LOAD.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.25));
+			}
 
-				@Override
-				protected void outburstAction(Location loc) {
-					p.SOUND_CAST.play(loc, 1.5f, 0.65f);
-				}
+			@Override
+			protected void outburstAction(Location loc) {
+				p.SOUND_CAST.play(loc, 1.5f, 0.65f);
+			}
 
-				@Override
-				protected void circleOutburstAction(Location loc, double radius) {
-					p.PARTICLE_EXPLODE.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.2).extra(0.2));
-				}
+			@Override
+			protected void circleOutburstAction(Location loc, double radius) {
+				p.PARTICLE_EXPLODE.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.2).extra(0.2));
+			}
 
-				@Override
-				protected void dealDamageAction(Location loc) {
-					for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
-						if (p.DAMAGE > 0) {
-							if (p.CAN_BLOCK) {
-								BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList);
-							} else {
-								DamageUtils.damage(boss, target, DamageType.MAGIC, p.DAMAGE, null, false, true, p.SPELL_NAME);
-							}
+			@Override
+			protected void dealDamageAction(Location loc) {
+				for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
+					if (p.DAMAGE > 0) {
+						if (p.CAN_BLOCK) {
+							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList());
+						} else {
+							DamageUtils.damage(boss, target, DamageType.MAGIC, p.DAMAGE, null, false, true, p.SPELL_NAME);
 						}
-
-						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							DamageUtils.damagePercentHealth(mBoss, target, p.DAMAGE_PERCENTAGE, true,
-								p.CAN_BLOCK, p.SPELL_NAME, true, p.EFFECTS.mEffectList);
-						}
-						p.EFFECTS.apply(target, mBoss);
 					}
+
+					if (p.DAMAGE_PERCENTAGE > 0.0) {
+						DamageUtils.damagePercentHealth(mBoss, target, p.DAMAGE_PERCENTAGE, true,
+							p.CAN_BLOCK, p.SPELL_NAME, true, p.EFFECTS.mEffectList());
+					}
+					p.EFFECTS.apply(target, mBoss);
 				}
-			};
+			}
+		};
 
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}

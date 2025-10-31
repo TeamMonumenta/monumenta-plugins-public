@@ -48,8 +48,6 @@ public class DarkCombos extends DepthsCombosAbility {
 	}
 
 
-
-
 	@Override
 	public void activate(DamageEvent event, LivingEntity enemy) {
 		activate(enemy, mPlayer, mPlugin, mDuration, mVuln);

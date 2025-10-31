@@ -83,12 +83,12 @@ public class Rebirth extends DepthsAbility {
 		}
 		List<DepthsAbilityInfo<?>> eligibleAbilities = new ArrayList<>(
 			DepthsManager.getAbilities().stream()
-					.filter(info -> info.getDisplayName() != null
-							&& !info.getDisplayName().equals(ABILITY_NAME)
-							&& !info.getDepthsTrigger().equals(DepthsTrigger.WEAPON_ASPECT)
-							&& info.checkConditions(player, party)
-					)
-					.toList()
+				.filter(info -> info.getDisplayName() != null
+					&& !info.getDisplayName().equals(ABILITY_NAME)
+					&& !info.getDepthsTrigger().equals(DepthsTrigger.WEAPON_ASPECT)
+					&& info.checkConditions(player, party)
+				)
+				.toList()
 		);
 
 		playerAbilities.forEach(abilityInfo -> {

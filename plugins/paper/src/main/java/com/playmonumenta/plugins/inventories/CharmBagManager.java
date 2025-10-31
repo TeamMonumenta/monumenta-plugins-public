@@ -123,9 +123,9 @@ public class CharmBagManager implements Listener {
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		CharmBagSettings settings = getSettings(event.getCurrentItem());
 		if (settings != null
-				&& event.getCurrentItem().getAmount() == 1
-				&& event.getWhoClicked() instanceof Player player
-				&& player.hasPermission("monumenta.usecharmbag")) {
+			&& event.getCurrentItem().getAmount() == 1
+			&& event.getWhoClicked() instanceof Player player
+			&& player.hasPermission("monumenta.usecharmbag")) {
 
 			ItemStack charmBagItem = event.getCurrentItem();
 			CharmBag charmBag = getCharmBag(player);
@@ -169,7 +169,7 @@ public class CharmBagManager implements Listener {
 								}
 							});
 							undoTooltip = undoTooltip.append(Component.newline()).append(Component.text("This button only works once due to", TextColor.color(255, 127, 0)))
-									.append(Component.newline()).append(Component.text("the large number of items deposited!", TextColor.color(255, 127, 0)));
+								.append(Component.newline()).append(Component.text("the large number of items deposited!", TextColor.color(255, 127, 0)));
 						}
 						String depositedHoverString = depositedItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
 							.collect(Collectors.joining("\n"));
@@ -180,7 +180,7 @@ public class CharmBagManager implements Listener {
 							.append(Component.text("[undo]", NamedTextColor.GRAY)
 								.hoverEvent(HoverEvent.showText(undoTooltip))
 								.clickEvent(ClickEvent.runCommand(undoCommand)))
-							);
+						);
 					}
 				}
 			} else {
@@ -227,8 +227,8 @@ public class CharmBagManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		if (!(event.getRightClicked() instanceof ItemFrame)
-		&& !(event.getRightClicked() instanceof ArmorStand)
-		&& isCharmBag(event.getPlayer().getEquipment().getItem(event.getHand()))) {
+			&& !(event.getRightClicked() instanceof ArmorStand)
+			&& isCharmBag(event.getPlayer().getEquipment().getItem(event.getHand()))) {
 			event.setCancelled(true);
 		}
 	}
@@ -239,7 +239,7 @@ public class CharmBagManager implements Listener {
 
 	private static boolean checkNotSoulbound(Player player, ItemStack item) {
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.SOULBOUND) > 0
-				&& !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
+			&& !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
 			player.sendMessage(Component.text("This " + ItemUtils.getPlainName(item) + " does not belong to you!", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			return true;
@@ -263,8 +263,8 @@ public class CharmBagManager implements Listener {
 			&& item.getAmount() > 0
 			&& isCharm(item)
 			&& ItemStatUtils.getPlayerModified(new NBTItem(item)) == null;
-			//&& ItemStatUtils.getTier(item).compareTo(settings.mMaxTier) <= 0
-			//&& (settings.allCharms || ItemStatUtils.getTier(item).compareTo(settings.mMaxTier) < 0);
+		//&& ItemStatUtils.getTier(item).compareTo(settings.mMaxTier) <= 0
+		//&& (settings.allCharms || ItemStatUtils.getTier(item).compareTo(settings.mMaxTier) < 0);
 	}
 
 	public static boolean isCharm(ItemStack item) {

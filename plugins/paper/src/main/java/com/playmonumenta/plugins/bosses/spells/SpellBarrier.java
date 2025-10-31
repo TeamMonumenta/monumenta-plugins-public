@@ -63,14 +63,14 @@ public class SpellBarrier extends Spell {
 	private int mTimer = 0;
 
 	public SpellBarrier(final Plugin plugin, final LivingEntity boss, final int detectionRadius, final int rechargeTime,
-						final int hitsToBreak, final boolean isCarapace, final RefreshBarrierAction refreshAction,
-						final BarrierRunningAmbientAction ambientRunningAction, final BreakBarrierAction breakAction) {
+	                    final int hitsToBreak, final boolean isCarapace, final RefreshBarrierAction refreshAction,
+	                    final BarrierRunningAmbientAction ambientRunningAction, final BreakBarrierAction breakAction) {
 		this(plugin, boss, detectionRadius, rechargeTime, hitsToBreak, isCarapace, refreshAction, ambientRunningAction, breakAction, 1.3);
 	}
 
 	public SpellBarrier(final Plugin plugin, final LivingEntity boss, final int detectionRadius, final int rechargeTime,
-						final int hitsToBreak, final boolean isCarapace, final RefreshBarrierAction refreshAction,
-						final BarrierRunningAmbientAction ambientRunningAction, final BreakBarrierAction breakAction, final double carapaceDamageModifier) {
+	                    final int hitsToBreak, final boolean isCarapace, final RefreshBarrierAction refreshAction,
+	                    final BarrierRunningAmbientAction ambientRunningAction, final BreakBarrierAction breakAction, final double carapaceDamageModifier) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mActivationRadius = detectionRadius;

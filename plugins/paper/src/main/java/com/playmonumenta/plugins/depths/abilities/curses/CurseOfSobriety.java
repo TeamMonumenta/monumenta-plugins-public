@@ -29,8 +29,8 @@ public class CurseOfSobriety extends DepthsAbility {
 		if (pairs != null) {
 			for (EffectManager.EffectPair pair : pairs) {
 				// This theoretically might catch a few extra things but none are important enough to care
-				if (EffectType.isEffectTypeAppliedEffect(pair.mSource)) {
-					pair.mEffect.setDuration(0);
+				if (EffectType.isEffectTypeAppliedEffect(pair.mSource())) {
+					pair.mEffect().setDuration(0);
 				}
 			}
 		}

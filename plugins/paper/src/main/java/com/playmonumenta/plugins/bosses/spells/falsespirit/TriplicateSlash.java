@@ -25,8 +25,8 @@ import org.bukkit.util.Vector;
 
 public class TriplicateSlash extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 
 	//direction is 0 or 180
 	private int mDirection = 0;
@@ -76,7 +76,7 @@ public class TriplicateSlash extends Spell {
 					}
 
 					Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
-					for (Player player: hitbox.getHitPlayers(true)) {
+					for (Player player : hitbox.getHitPlayers(true)) {
 						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, true, "Triplicate Slash");
 					}
 

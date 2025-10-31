@@ -24,7 +24,7 @@ public class EntityGlowEvent extends EntityEvent implements Cancellable {
 	}
 
 	public int getGlowingPriority() {
-		return mGlowingInstance.mPriority;
+		return mGlowingInstance.mPriority();
 	}
 
 	@Override

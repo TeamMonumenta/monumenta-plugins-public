@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 public class ShieldBash extends Ability {
 
 	private static final int SHIELD_BASH_DAMAGE = 8;
-	private static final int SHIELD_BASH_STUN = 20 * 1;
+	private static final int SHIELD_BASH_STUN = 20;
 	private static final int SHIELD_BASH_COOLDOWN = 20 * 8;
 	private static final int SHIELD_BASH_2_RADIUS = 3;
 	private static final int SHIELD_BASH_RANGE = 4;

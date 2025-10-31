@@ -94,6 +94,7 @@ public class VolcanicMeteor extends DepthsAbility {
 		loc.add(0, 30, 0);
 		new BukkitRunnable() {
 			double mT = 0;
+
 			@Override
 			public void run() {
 				mT += 1;

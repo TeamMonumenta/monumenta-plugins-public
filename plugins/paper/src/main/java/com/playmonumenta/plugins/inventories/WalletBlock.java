@@ -91,8 +91,8 @@ public class WalletBlock extends BaseWallet {
 			name = Component.text("Unknown?", NamedTextColor.RED);
 		}
 		name = Component.text("Owned by ", NamedTextColor.GREEN)
-				.decoration(TextDecoration.ITALIC, false)
-					.append(name);
+			.decoration(TextDecoration.ITALIC, false)
+			.append(name);
 		meta.displayName(name);
 		result.setItemMeta(meta);
 		return result;

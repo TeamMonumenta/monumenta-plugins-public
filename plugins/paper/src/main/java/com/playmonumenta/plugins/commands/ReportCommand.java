@@ -15,8 +15,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-/** Command to handle reporting of players:
- *  - /report to report the player
+/**
+ * Command to handle reporting of players:
+ * - /report to report the player
+ *
  * @author Tristian
  */
 public class ReportCommand {

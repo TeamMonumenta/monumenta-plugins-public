@@ -122,7 +122,7 @@ public class Parser {
 				return EffectsList.CustomEffect.class;
 			} else if (EffectsList.Effect.CUSTOM_EFFECT_RUNNER.containsKey(value)) {
 				return EffectsList.CustomSingleArgumentEffect.class;
-			} else if (getRegistrySuggestions(Registry.POTION_EFFECT_TYPE).contains(value.toLowerCase(Locale.ROOT))){
+			} else if (getRegistrySuggestions(Registry.POTION_EFFECT_TYPE).contains(value.toLowerCase(Locale.ROOT))) {
 				return EffectsList.VanillaEffect.class;
 			}
 			throw new ParseError(String.format("Invalid Effect Type: %s", value), t1.getIndex() + 1, t1)
@@ -687,8 +687,8 @@ public class Parser {
 					suggestion.filter(x -> !values.contains(x)));
 
 				return Suggestion.combine(enumResult.suggestions, List.of(
-						Suggestion.of(tokens.getIndex(), ",", "Declare more parameters"),
-						Suggestion.of(tokens.getIndex(), "]", "Finish declaring enum set")));
+					Suggestion.of(tokens.getIndex(), ",", "Declare more parameters"),
+					Suggestion.of(tokens.getIndex(), "]", "Finish declaring enum set")));
 			});
 		}
 	}
@@ -1499,13 +1499,15 @@ public class Parser {
 	 * Record for performant suggestions
 	 *
 	 * @param until suggest will contain the raw message until this token (index of the token to be referenced in {@code asString()} *inclusive*
-	 * @param body the content to be suggested after {@code until}
+	 * @param body  the content to be suggested after {@code until}
 	 */
 	public record Suggestion(int until, Collection<String> body, String tooltip) {
 		public record Single(String body, String tooltip) {
 			@Override
 			public boolean equals(Object o) {
-				if (!(o instanceof Single single)) return false;
+				if (!(o instanceof Single single)) {
+					return false;
+				}
 				return Objects.equals(body, single.body);
 			}
 

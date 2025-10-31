@@ -10,11 +10,11 @@ import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 
 public class FishingHookTracking implements EntityTracking {
-	private Map<UUID, FishHook> mEntities = new WeakHashMap<>();
+	private final Map<UUID, FishHook> mEntities = new WeakHashMap<>();
 
 	// Note this is not from the base class
 	public void addEntity(Player player, Entity entity) {
-		mEntities.put(player.getUniqueId(), (FishHook)entity);
+		mEntities.put(player.getUniqueId(), (FishHook) entity);
 	}
 
 	// Note this is not from the base class

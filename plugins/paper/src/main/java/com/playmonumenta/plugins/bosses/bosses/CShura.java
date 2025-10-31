@@ -103,7 +103,7 @@ public final class CShura extends SerializedLocationBossAbilityGroup {
 		sendMessage(players, Component.text("Kaul!", NamedTextColor.RED));
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () ->
-			sendMessage(players, Component.text("Please...", NamedTextColor.GREEN)),
+				sendMessage(players, Component.text("Please...", NamedTextColor.GREEN)),
 			TICKS_PER_SECOND * 2
 		);
 
@@ -126,24 +126,24 @@ public final class CShura extends SerializedLocationBossAbilityGroup {
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () ->
 				sendMessage(players, Component.text("I'm giving you a chance to run ", NamedTextColor.GREEN)
-						.append(Component.text("before I cut you down.", NamedTextColor.RED))),
+					.append(Component.text("before I cut you down.", NamedTextColor.RED))),
 			TICKS_PER_SECOND * 11
 		);
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			mBoss.setAI(true);
-			mBoss.setInvulnerable(false);
-			mCutscene = false;
+				mBoss.setAI(true);
+				mBoss.setInvulnerable(false);
+				mCutscene = false;
 
-			players.forEach(player -> {
-				MessagingUtils.sendBoldTitle(player, Component.text("C'Shura", NamedTextColor.GREEN),
-					Component.text("The Soulbinder", NamedTextColor.DARK_GREEN));
-				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
-				player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, TICKS_PER_SECOND * 2, 0));
-			});
+				players.forEach(player -> {
+					MessagingUtils.sendBoldTitle(player, Component.text("C'Shura", NamedTextColor.GREEN),
+						Component.text("The Soulbinder", NamedTextColor.DARK_GREEN));
+					player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
+					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, TICKS_PER_SECOND * 2, 0));
+				});
 
-			final BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BossBar.Color.RED, BossBar.Overlay.PROGRESS, initializeHealthEvents());
-			constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
+				final BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BossBar.Color.RED, BossBar.Overlay.PROGRESS, initializeHealthEvents());
+				constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 			}, TICKS_PER_SECOND * 12
 		);
 	}
@@ -153,11 +153,11 @@ public final class CShura extends SerializedLocationBossAbilityGroup {
 		events.put(50, mBoss -> {
 			sendMessage(null,
 				Component.text("Enough! My ", NamedTextColor.GREEN)
-				.append(Component.text("purpose ", NamedTextColor.RED))
-				.append(Component.text("here is too great for you to interrupt!", NamedTextColor.GREEN)));
+					.append(Component.text("purpose ", NamedTextColor.RED))
+					.append(Component.text("here is too great for you to interrupt!", NamedTextColor.GREEN)));
 
 			Bukkit.getScheduler().runTaskLater(mPlugin, () ->
-				sendMessage(null, Component.text("You will die now, like your worthless king did!", NamedTextColor.GREEN)),
+					sendMessage(null, Component.text("You will die now, like your worthless king did!", NamedTextColor.GREEN)),
 				TICKS_PER_SECOND * 3
 			);
 		});
@@ -245,9 +245,10 @@ public final class CShura extends SerializedLocationBossAbilityGroup {
 
 	/**
 	 * Send a chat message to nearby players
+	 *
 	 * @param players Which players to send the message to. Useful for the start/end cutscenes so the plugin doesn't
 	 *                need to keep finding the same players multiple times
-	 * @param msg Message to send
+	 * @param msg     Message to send
 	 */
 	private void sendMessage(@Nullable final Collection<Player> players, final Component msg) {
 		if (players != null) {

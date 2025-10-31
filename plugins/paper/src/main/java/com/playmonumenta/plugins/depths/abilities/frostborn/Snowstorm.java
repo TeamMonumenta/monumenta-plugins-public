@@ -96,6 +96,7 @@ public class Snowstorm extends DepthsAbility {
 		new BukkitRunnable() {
 			double mCurrRadius = 0;
 			final Location mLoc = loc.clone();
+
 			@Override
 			public void run() {
 				mCurrRadius += 1.4;

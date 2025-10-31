@@ -36,12 +36,13 @@ public class HallowedBeamL2 extends Effect {
 	public void entityGainEffect(Entity entity) {
 		mSealExploded = false;
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-		if (!mSealExploded && (entity.isDead() || !entity.isValid())) {
-			LivingEntity transferMob = EntityUtils.getNearestMob(entity.getLocation(), 4);
-			if (transferMob != null) {
-				Plugin.getInstance().mEffectManager.addEffect(transferMob, "HallowedBeam" + mPlayer.getName(), new HallowedBeamL2(mSealDuration, mPlayer, mDamage, mRadius, mSeals, mCosmetic));
+			if (!mSealExploded && (entity.isDead() || !entity.isValid())) {
+				LivingEntity transferMob = EntityUtils.getNearestMob(entity.getLocation(), 4);
+				if (transferMob != null) {
+					Plugin.getInstance().mEffectManager.addEffect(transferMob, "HallowedBeam" + mPlayer.getName(), new HallowedBeamL2(mSealDuration, mPlayer, mDamage, mRadius, mSeals, mCosmetic));
+				}
 			}
-		}});
+		});
 		GlowingManager.startGlowing(entity, mCosmetic.beamGlowColor(), mDuration, GlowingManager.PLAYER_ABILITY_PRIORITY, null, "HallowedBeamGlowing" + mPlayer.getName());
 	}
 

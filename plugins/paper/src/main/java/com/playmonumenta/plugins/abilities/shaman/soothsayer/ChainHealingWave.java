@@ -38,7 +38,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 	public static final int BOUNCE_RANGE_2 = 15;
 	public static final double HEAL_PERCENT_1 = 0.3;
 	public static final double HEAL_PERCENT_2 = 0.4;
-	public static final int CDR_ON_KILL = 1 * 20;
+	public static final int CDR_ON_KILL = 20;
 	public static final int CHARGES = 2;
 
 	public static final String CHARM_COOLDOWN = "Chain Healing Wave Cooldown";

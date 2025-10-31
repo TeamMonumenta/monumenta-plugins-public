@@ -157,7 +157,7 @@ public class TemporaryBlockChangeManager implements Listener {
 	 * the current server tick. The old expiration will not have any effect on the new expiration. Will only increase if the
 	 * new expiration is later than the old.
 	 *
-	 * @param block The block's duration to change
+	 * @param block    The block's duration to change
 	 * @param duration The duration to add to the current server tick for the new expiration
 	 * @return True if the duration was increased, false if not
 	 */

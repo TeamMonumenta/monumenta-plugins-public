@@ -110,6 +110,7 @@ public class TotemicProjection extends Ability {
 		new BukkitRunnable() {
 			int mT = 0;
 			final Location mPlayerLocation = mPlayer.getLocation();
+
 			@Override
 			public void run() {
 				if (mProjectiles.get(proj) != playerItemStats) {

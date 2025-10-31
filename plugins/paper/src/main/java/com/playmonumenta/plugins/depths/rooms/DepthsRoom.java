@@ -28,7 +28,7 @@ public class DepthsRoom {
 	}
 
 	public enum RoomDirection {
-		UP, DOWN, EVEN;
+		UP, DOWN, EVEN
 	}
 
 }

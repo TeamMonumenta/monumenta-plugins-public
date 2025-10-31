@@ -223,26 +223,26 @@ public class ParticleUtilsCommand {
 				// Number
 				new CommandAPICommand("number")
 					.withPermission("monumenta.particleutils.number")
-						.withArguments(
-							new IntegerArgument("number"),
-							new LocationArgument("location"),
-							new DoubleArgument("scale"),
-							new DoubleArgument("spacing"),
-							new EntitySelectorArgument.OnePlayer("facing player"),
-							particleArgument,
-							extraDataArgument
-						)
-						.executes((sender, args) -> {
-							int number = args.getUnchecked("number");
-							Location location = args.getUnchecked("location");
-							double scale = args.getUnchecked("scale");
-							double spacing = args.getUnchecked("spacing");
-							Player player = args.getUnchecked("facing player");
-							Particle particle = Particle.valueOf(args.getUnchecked("particle"));
-							String extraData = args.getUnchecked("extra data");
+					.withArguments(
+						new IntegerArgument("number"),
+						new LocationArgument("location"),
+						new DoubleArgument("scale"),
+						new DoubleArgument("spacing"),
+						new EntitySelectorArgument.OnePlayer("facing player"),
+						particleArgument,
+						extraDataArgument
+					)
+					.executes((sender, args) -> {
+						int number = args.getUnchecked("number");
+						Location location = args.getUnchecked("location");
+						double scale = args.getUnchecked("scale");
+						double spacing = args.getUnchecked("spacing");
+						Player player = args.getUnchecked("facing player");
+						Particle particle = Particle.valueOf(args.getUnchecked("particle"));
+						String extraData = args.getUnchecked("extra data");
 
-							ParticleUtils.drawSevenSegmentNumber(number, location, player, scale, spacing, particle, parseExtraData(extraData, particle));
-						}),
+						ParticleUtils.drawSevenSegmentNumber(number, location, player, scale, spacing, particle, parseExtraData(extraData, particle));
+					}),
 				new CommandAPICommand("arc")
 					.withPermission("monumenta.particleutils.arc")
 					.withArguments(
@@ -451,7 +451,8 @@ public class ParticleUtilsCommand {
 			.register();
 	}
 
-	/** Returns null if distanceFalloff is 0 (or lower), which will be interpreted as
+	/**
+	 * Returns null if distanceFalloff is 0 (or lower), which will be interpreted as
 	 * wanting to spawn the full amount of particles, bypassing player/entity PEB settings.
 	 * Useful for puzzles!
 	 */
@@ -495,8 +496,8 @@ public class ParticleUtilsCommand {
 		try {
 			String[] parts = extraData.split(",");
 			return new Particle.DustOptions(
-					Color.fromRGB(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2])),
-					Float.parseFloat(parts[3])
+				Color.fromRGB(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2])),
+				Float.parseFloat(parts[3])
 			);
 		} catch (Exception e) {
 			MMLog.warning("Error parsing redstone extra data: " + extraData);
@@ -517,9 +518,9 @@ public class ParticleUtilsCommand {
 		try {
 			String[] parts = extraData.split(",");
 			return new Particle.DustTransition(
-					Color.fromRGB(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2])),
-					Color.fromRGB(Integer.parseInt(parts[3]), Integer.parseInt(parts[4]), Integer.parseInt(parts[5])),
-					Float.parseFloat(parts[6])
+				Color.fromRGB(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2])),
+				Color.fromRGB(Integer.parseInt(parts[3]), Integer.parseInt(parts[4]), Integer.parseInt(parts[5])),
+				Float.parseFloat(parts[6])
 			);
 		} catch (Exception e) {
 			MMLog.warning("Error parsing dust transition: " + extraData);
@@ -546,7 +547,7 @@ public class ParticleUtilsCommand {
 	}
 
 	private static void doLine(@Nullable CommandSender callee, int ticks, Location start, Location end, double countPerMeter, Particle particle,
-							   double distanceFalloff, @Nullable Object data, @Nullable Collection<Player> allowedViewers) {
+	                           double distanceFalloff, @Nullable Object data, @Nullable Collection<Player> allowedViewers) {
 		PPLine line = new PPLine(particle, start, end).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff);
 
 		if (ticks != 0) {
@@ -569,7 +570,7 @@ public class ParticleUtilsCommand {
 	}
 
 	private static void doRectangle(@Nullable CommandSender callee, Location start, double dx, double dz, double countPerMeter,
-									Particle particle, double distanceFalloff, @Nullable Object data, @Nullable Collection<Player> allowedViewers) {
+	                                Particle particle, double distanceFalloff, @Nullable Object data, @Nullable Collection<Player> allowedViewers) {
 		PPLine[] sides = {
 			new PPLine(particle, start, start.clone().add(dx, 0, 0)).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff),
 			new PPLine(particle, start.clone().add(dx, 0, 0), start.clone().add(dx, 0, dz)).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff),
@@ -589,8 +590,8 @@ public class ParticleUtilsCommand {
 	}
 
 	private static void doCircle(@Nullable CommandSender callee, boolean ringMode, Location center, double radius,
-								 double countPerMeter, Particle particle, double distanceFalloff, @Nullable Object data,
-								 @Nullable Collection<Player> allowedViewers, @Nullable Location normalLoc, int startAngle, int endAngle, int ticks) {
+	                             double countPerMeter, Particle particle, double distanceFalloff, @Nullable Object data,
+	                             @Nullable Collection<Player> allowedViewers, @Nullable Location normalLoc, int startAngle, int endAngle, int ticks) {
 		PPCircle circle = new PPCircle(particle, center, radius).countPerMeter(countPerMeter).distanceFalloff(distanceFalloff).ringMode(ringMode).arcDegree(startAngle, endAngle).ticks(ticks);
 
 		if (data != null) {
@@ -611,7 +612,7 @@ public class ParticleUtilsCommand {
 	}
 
 	private static void doSpiral(@Nullable CommandSender callee, Location center, double radius, int curves, double curveAngle,
-								 int countPerMeter, Particle particle, double distanceFalloff, @Nullable Object data, int ticks, @Nullable Collection<Player> allowedViewers) {
+	                             int countPerMeter, Particle particle, double distanceFalloff, @Nullable Object data, int ticks, @Nullable Collection<Player> allowedViewers) {
 
 		PPSpiral spiral = new PPSpiral(particle, center, radius).countPerBlockPerCurve(countPerMeter).curves(curves).curveAngle(curveAngle).distanceFalloff(distanceFalloff).ticks(ticks);
 
@@ -628,8 +629,8 @@ public class ParticleUtilsCommand {
 
 
 	private static void doCircleTelegraph(@Nullable CommandSender callee, Location center, double radius, int countPerMeter,
-										  Particle particle, double distanceFalloff, double particleSpeed, int pulses, int telegraphDuration,
-										  int pulseStartOffset, @Nullable Object data, @Nullable Collection<Player> allowedViewers) {
+	                                      Particle particle, double distanceFalloff, double particleSpeed, int pulses, int telegraphDuration,
+	                                      int pulseStartOffset, @Nullable Object data, @Nullable Collection<Player> allowedViewers) {
 		// Input Validation
 		int finalPulseStartOffset = Math.max(pulseStartOffset, 0);
 		int finalTelegraphDuration = Math.max(telegraphDuration, 1);

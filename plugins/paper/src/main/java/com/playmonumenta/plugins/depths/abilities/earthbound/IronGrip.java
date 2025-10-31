@@ -137,6 +137,7 @@ public class IronGrip extends DepthsAbility {
 				new BukkitRunnable() { // teleport multiple times so that it actually updates
 
 					int mTicks = 0;
+
 					@Override
 					public void run() {
 						EntityUtils.teleportStack(mob, finalDestination);

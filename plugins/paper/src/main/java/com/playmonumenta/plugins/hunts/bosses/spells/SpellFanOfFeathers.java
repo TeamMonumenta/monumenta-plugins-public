@@ -25,7 +25,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellFanOfFeathers extends Spell {
-	public static final int COOLDOWN = 1 * 20;
+	public static final int COOLDOWN = 20;
 	//speed of the bullet
 	private static final double SPEED = 1.75;
 	//Damage of the spell

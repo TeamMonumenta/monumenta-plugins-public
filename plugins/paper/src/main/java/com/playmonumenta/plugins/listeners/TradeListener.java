@@ -160,13 +160,13 @@ public class TradeListener implements Listener {
 
 			// only consider trades with "Monumenta items" - these should all have a region
 			if (ItemStatUtils.getRegion(source) == Region.NONE
-				    || ItemStatUtils.getRegion(result) == Region.NONE) {
+				|| ItemStatUtils.getRegion(result) == Region.NONE) {
 				return;
 			}
 			boolean carryOverVaryingCostInfusions = ItemStatUtils.getRegion(source) == ItemStatUtils.getRegion(result)
-				                                        && InfusionUtils.getCostMultiplier(source) > 0
-				                                        && InfusionUtils.getCostMultiplier(source) == InfusionUtils.getCostMultiplier(result)
-				                                        && haveSameStats(source, result);
+				&& InfusionUtils.getCostMultiplier(source) > 0
+				&& InfusionUtils.getCostMultiplier(source) == InfusionUtils.getCostMultiplier(result)
+				&& haveSameStats(source, result);
 
 			// Items for which we made trades already (for the current original trade).
 			// Used to not create duplicate trades if the player for some reason has multiple identical items.
@@ -177,9 +177,9 @@ public class TradeListener implements Listener {
 			for (ItemStack playerItem : player.getInventory().getContents()) {
 				// Skip over empty slots, and skip over items that already match an existing trade exactly
 				if (playerItem == null
-					    || playerItem.getType() == Material.AIR
-					    || playerItem.isSimilar(source)
-					    || createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
+					|| playerItem.getType() == Material.AIR
+					|| playerItem.isSimilar(source)
+					|| createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
 					continue;
 				}
 				// Check that the playerItem has the same base item as the trade's source:
@@ -187,8 +187,8 @@ public class TradeListener implements Listener {
 				// - same plain name (or both have no plain name)
 				// - same masterwork level
 				if (!(source.getType() == playerItem.getType() || (ItemUtils.isShulkerBox(source.getType()) && ItemUtils.isShulkerBox(playerItem.getType())))
-					    || !Objects.equals(ItemUtils.getPlainNameIfExists(source), ItemUtils.getPlainNameIfExists(playerItem))
-					    || !(ItemStatUtils.getMasterwork(source) == ItemStatUtils.getMasterwork(playerItem))) {
+					|| !Objects.equals(ItemUtils.getPlainNameIfExists(source), ItemUtils.getPlainNameIfExists(playerItem))
+					|| !(ItemStatUtils.getMasterwork(source) == ItemStatUtils.getMasterwork(playerItem))) {
 					continue;
 				}
 				// if not a re-skin trade, do not allow moving varying cost infusions
@@ -203,8 +203,8 @@ public class TradeListener implements Listener {
 				// Shulkers with contents are janky - the trades work, but the trades without contents work on them as well, clearing any content.
 				// Thus we don't allow trades with non-empty Shulkers
 				if (playerItem.getItemMeta() instanceof BlockStateMeta
-					    && ((BlockStateMeta) playerItem.getItemMeta()).getBlockState() instanceof ShulkerBox
-					    && !((ShulkerBox) ((BlockStateMeta) playerItem.getItemMeta()).getBlockState()).getInventory().isEmpty()) {
+					&& ((BlockStateMeta) playerItem.getItemMeta()).getBlockState() instanceof ShulkerBox
+					&& !((ShulkerBox) ((BlockStateMeta) playerItem.getItemMeta()).getBlockState()).getInventory().isEmpty()) {
 					continue;
 				}
 
@@ -231,7 +231,7 @@ public class TradeListener implements Listener {
 
 				// Carry over the current arrow of a crossbow if the player item has an arrow but the result item doesn't have one
 				if (newResult.getItemMeta() instanceof CrossbowMeta newResultMeta && playerItem.getItemMeta() instanceof CrossbowMeta playerItemMeta
-					    && !newResultMeta.hasChargedProjectiles() && playerItemMeta.hasChargedProjectiles()) {
+					&& !newResultMeta.hasChargedProjectiles() && playerItemMeta.hasChargedProjectiles()) {
 					newResultMeta.setChargedProjectiles(playerItemMeta.getChargedProjectiles());
 					newResult.setItemMeta(newResultMeta);
 				}
@@ -302,7 +302,7 @@ public class TradeListener implements Listener {
 					return result;
 				};
 			} else if (source.getItemMeta() instanceof LeatherArmorMeta
-				           && !ItemUtils.getPlainLoreIfExists(source).contains("Arena of Terth")) {
+				&& !ItemUtils.getPlainLoreIfExists(source).contains("Arena of Terth")) {
 				clearDye = itemStack -> {
 					ItemStack result = itemStack.clone();
 					LeatherArmorMeta meta = (LeatherArmorMeta) result.getItemMeta();
@@ -342,10 +342,10 @@ public class TradeListener implements Listener {
 
 			for (ItemStack playerItem : player.getInventory().getContents()) {
 				if (playerItem == null
-					    || playerItem.getType() == Material.AIR
-					    || !isSameType.test(playerItem.getType())
-					    || playerItem.isSimilar(source)
-					    || createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
+					|| playerItem.getType() == Material.AIR
+					|| !isSameType.test(playerItem.getType())
+					|| playerItem.isSimilar(source)
+					|| createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
 					continue;
 				}
 
@@ -465,6 +465,7 @@ public class TradeListener implements Listener {
 		// vanilla attributes
 		Multimap<Attribute, AttributeModifier> vanillaMods1 = i1.getItemMeta().getAttributeModifiers();
 		Multimap<Attribute, AttributeModifier> vanillaMods2 = i2.getItemMeta().getAttributeModifiers();
+		// one item has mods but the other doesn't, so they differ
 		if (vanillaMods1 != null && vanillaMods2 != null) {
 			for (Attribute attr : Attribute.values()) {
 				// We need to filter out modifiers that have no effect - these sometimes exist and mess up the comparison
@@ -477,12 +478,12 @@ public class TradeListener implements Listener {
 				}
 				BiPredicate<AttributeModifier, AttributeModifier> modsMatch = (mod1, mod2) -> mod1.getSlot() == mod2.getSlot() && mod1.getOperation() == mod2.getOperation() && mod1.getAmount() == mod2.getAmount();
 				if (mods1.stream().anyMatch(mod1 -> mods2.stream().noneMatch(mod2 -> modsMatch.test(mod1, mod2)))
-					    || mods2.stream().anyMatch(mod2 -> mods1.stream().noneMatch(mod1 -> modsMatch.test(mod1, mod2)))) {
+					|| mods2.stream().anyMatch(mod2 -> mods1.stream().noneMatch(mod1 -> modsMatch.test(mod1, mod2)))) {
 					return false;
 				}
 			}
-		} else if (vanillaMods1 != null || vanillaMods2 != null) { // one item has mods but the other doesn't, so they differ
-			return false;
+		} else {
+			return vanillaMods1 == null && vanillaMods2 == null;
 		}
 
 		// if we get here, the items have the same stats
@@ -549,8 +550,8 @@ public class TradeListener implements Listener {
 			return false;
 		}
 		if (!(item.getItemMeta() instanceof BlockStateMeta meta)
-			    || !(meta.getBlockState() instanceof ShulkerBox shulkerBox)
-			    || shulkerBox.getInventory().isEmpty()) {
+			|| !(meta.getBlockState() instanceof ShulkerBox shulkerBox)
+			|| shulkerBox.getInventory().isEmpty()) {
 			return false;
 		}
 		return !item.isSimilar(ingredient);

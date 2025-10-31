@@ -59,6 +59,7 @@ public class Encore extends DepthsAbility {
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				Location loc = mPlayer.getLocation().add(0, 0.1, 0);
@@ -145,6 +146,7 @@ public class Encore extends DepthsAbility {
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
 			Vector mRotation = VectorUtils.rotateYAxis(new Vector(1, 0, 0), mPlayer.getLocation().getYaw() + 90);
+
 			@Override
 			public void run() {
 				Location loc = mPlayer.getLocation().add(0, 0.25, 0);
@@ -157,10 +159,14 @@ public class Encore extends DepthsAbility {
 					mRotation = VectorUtils.rotateYAxis(mRotation, 18);
 				}
 				switch (mTicks) {
-					case 20 -> mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.CS7);
-					case 40 -> mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.F11);
-					case 60 -> mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.GS14);
-					case 80 -> mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.B17);
+					case 20 ->
+						mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.CS7);
+					case 40 ->
+						mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.F11);
+					case 60 ->
+						mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.GS14);
+					case 80 ->
+						mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.B17);
 
 					case DELAY -> {
 						new PPCircle(Particle.NOTE, loc, 1.5).countPerMeter(0.75).extra(1).spawnAsPlayerActive(mPlayer);

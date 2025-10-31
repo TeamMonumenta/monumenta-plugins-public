@@ -214,10 +214,10 @@ public class Multitool implements Enchantment {
 
 	public static boolean isValidMultitoolMaterial(Material mat) {
 		return Tag.ITEMS_PICKAXES.isTagged(mat)
-			       || Tag.ITEMS_AXES.isTagged(mat)
-			       || Tag.ITEMS_SHOVELS.isTagged(mat)
-			       || mat == Material.COMPASS
-			       || mat == Material.SHEARS;
+			|| Tag.ITEMS_AXES.isTagged(mat)
+			|| Tag.ITEMS_SHOVELS.isTagged(mat)
+			|| mat == Material.COMPASS
+			|| mat == Material.SHEARS;
 	}
 
 	public static List<Material> getMaterials(Material mat, int level) {

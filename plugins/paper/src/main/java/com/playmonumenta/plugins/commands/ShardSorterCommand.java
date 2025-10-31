@@ -76,7 +76,7 @@ public class ShardSorterCommand {
 
 	public static void sortToShard(Player player, String shard, @Nullable CommandSender sender) throws WrapperCommandSyntaxException {
 		if (shard == null || shard.isEmpty()
-			    || ServerProperties.getShardName().startsWith(shard)) {
+			|| ServerProperties.getShardName().startsWith(shard)) {
 			if (sender != null) {
 				sender.sendMessage("No shard specified or player is already on shard");
 			}
@@ -97,7 +97,7 @@ public class ShardSorterCommand {
 				possibleShards = NetworkRelayAPI.getOnlineShardNames().stream().filter(shardName -> shardName.startsWith(shard)).toList();
 			} catch (Exception e) {
 				MMLog.severe("Failed to get shard names from network relay for sort-to-shard command, user="
-					             + player.getName() + ", shard=" + shard + " error=" + e.getMessage());
+					+ player.getName() + ", shard=" + shard + " error=" + e.getMessage());
 				return;
 			}
 			int shardCount = possibleShards.size();

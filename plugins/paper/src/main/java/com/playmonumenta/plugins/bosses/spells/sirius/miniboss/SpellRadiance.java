@@ -17,8 +17,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class SpellRadiance extends Spell {
-	private PassiveStarBlightConversion mConverter;
-	private LivingEntity mBoss;
+	private final PassiveStarBlightConversion mConverter;
+	private final LivingEntity mBoss;
 	private static final int RADIUS = 5;
 	private static final int DAMAGE = 20;
 	private static final int IRRADIATECOUNT = 3;

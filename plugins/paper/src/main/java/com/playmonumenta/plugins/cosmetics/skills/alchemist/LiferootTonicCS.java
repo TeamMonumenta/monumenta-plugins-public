@@ -78,7 +78,7 @@ public class LiferootTonicCS extends EnergizingElixirCS {
 							.count(18).directionalMode(true).rotateDelta(true)
 							.delta(1, 0.1, 0).extra(0.2).spawnAsPlayerActive(player);
 					}
-				}.runTaskLater(Plugin.getInstance(), 3L*i);
+				}.runTaskLater(Plugin.getInstance(), 3L * i);
 			}
 
 			new PPCircle(Particle.SCRAPE, loc, 1f)

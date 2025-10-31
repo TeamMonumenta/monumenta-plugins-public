@@ -124,7 +124,8 @@ public class MelancholicLament extends Ability {
 			EntityUtils.applyTaunt(mob, mPlayer);
 			mPlugin.mEffectManager.addEffect(mob, "MelancholicLamentParticles", new Aesthetics(mWeakenDuration,
 				(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.debuffTick(mob),
-				(entity) -> { })
+				(entity) -> {
+				})
 			);
 
 			mCosmetic.onWeakenApply(mPlayer, mob);
@@ -136,6 +137,7 @@ public class MelancholicLament extends Ability {
 			}
 			mSilenceRunnable = new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					mCosmetic.silenceReadyTick(mPlayer);
@@ -173,7 +175,8 @@ public class MelancholicLament extends Ability {
 						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, mEnhanceDamage * numTargeting).damageTypes(AFFECTED_DAMAGE_TYPES).displaysTime(false).deleteOnAbilityUpdate(true));
 						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_PARTICLE_NAME, new Aesthetics(ENHANCE_EFFECT_DURATION,
 							(entity, fourHertz, twoHertz, oneHertz) -> mCosmetic.enhancementTick(player, mPlayer, fourHertz, twoHertz, oneHertz),
-							(entity) -> { }).deleteOnAbilityUpdate(true)
+							(entity) -> {
+							}).deleteOnAbilityUpdate(true)
 						);
 					}
 

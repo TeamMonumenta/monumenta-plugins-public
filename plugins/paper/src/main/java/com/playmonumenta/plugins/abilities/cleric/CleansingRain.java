@@ -179,10 +179,10 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 						}
 						if (mPlugin.mEffectManager.getEffects(player) != null) {
 							for (EffectManager.EffectPair pair : Objects.requireNonNull(mPlugin.mEffectManager.getEffectPairs(player))) {
-								Effect e = pair.mEffect;
+								Effect e = pair.mEffect();
 								if (e.isDebuff() && e.getDuration() < CLEANSING_MAX_DEBUFF_DURATION) {
 									e.clearEffect();
-									if (debuffs.add(pair.mSource) && debuffs.size() <= mRainHealingMaxDebuffs) {
+									if (debuffs.add(pair.mSource()) && debuffs.size() <= mRainHealingMaxDebuffs) {
 										PlayerUtils.healPlayer(mPlugin, player, EntityUtils.getMaxHealth(player) * mRainHealing);
 									}
 								}

@@ -29,6 +29,6 @@ public class DataCollectionCommand {
 						}
 					})
 			)
-		.register();
+			.register();
 	}
 }

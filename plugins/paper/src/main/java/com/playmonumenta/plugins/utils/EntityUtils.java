@@ -376,8 +376,8 @@ public class EntityUtils {
 	// Check for if a mob is CCImmune, meaning cannot be stunned, cannot be slowed, etc.
 	public static boolean isCCImmuneMob(Entity entity) {
 		return isBoss(entity)
-			       || ScoreboardUtils.checkTag(entity, CrowdControlImmunityBoss.identityTag)
-			       || EffectManager.getInstance().hasEffect(entity, CCImmuneEffect.class);
+			|| ScoreboardUtils.checkTag(entity, CrowdControlImmunityBoss.identityTag)
+			|| EffectManager.getInstance().hasEffect(entity, CCImmuneEffect.class);
 	}
 
 	public static boolean isTrainingDummy(Entity entity) {
@@ -412,15 +412,14 @@ public class EntityUtils {
 			return true;
 		} else if (mob.getScoreboardTags().contains("Hostile")) {
 			return true;
-		} else if (checkingOnSpawn && (mob.getScoreboardTags().contains(PlayerTargetBoss.identityTag) || mob.getScoreboardTags().contains(HostileBoss.identityTag))) {
-			return true;
+		} else {
+			return checkingOnSpawn && (mob.getScoreboardTags().contains(PlayerTargetBoss.identityTag) || mob.getScoreboardTags().contains(HostileBoss.identityTag));
 		}
-		return false;
 	}
 
 	public static boolean isFireResistant(LivingEntity mob) {
 		return mob instanceof Blaze || mob instanceof Ghast || mob instanceof MagmaCube || mob instanceof PigZombie || mob instanceof Wither
-			       || mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
+			|| mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
 	}
 
 	public static boolean isStillLoaded(Entity entity) {
@@ -477,10 +476,10 @@ public class EntityUtils {
 	/**
 	 * Get the nearest entity that the player is looking at
 	 *
-	 * @param player      player
-	 * @param range       range
-	 * @param filter      predicate to filter mobs
-	 * @param hitboxSize  the size of the ray traced
+	 * @param player     player
+	 * @param range      range
+	 * @param filter     predicate to filter mobs
+	 * @param hitboxSize the size of the ray traced
 	 * @return entity
 	 */
 	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, @Nullable Predicate<Entity> filter, double hitboxSize) {
@@ -763,9 +762,9 @@ public class EntityUtils {
 
 	public static @Nullable <T extends LivingEntity> T getNearestMob(Location loc, List<T> nearbyMobs) {
 		return nearbyMobs
-			       .stream()
-			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-			       .orElse(null);
+			.stream()
+			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			.orElse(null);
 	}
 
 	public static @Nullable Player getNearestPlayer(Location loc, double radius) {
@@ -811,10 +810,10 @@ public class EntityUtils {
 
 	public static @Nullable LivingEntity getNearestHostileTargetable(Location loc, double range) {
 		return loc.getNearbyEntitiesByType(LivingEntity.class, range, range, range)
-			       .stream()
-			       .filter(e -> e.isValid() && isHostileMob(e) && !e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))
-			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-			       .orElse(null);
+			.stream()
+			.filter(e -> e.isValid() && isHostileMob(e) && !e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))
+			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			.orElse(null);
 	}
 
 	public static final String VULNERABILITY_EFFECT_NAME = "VulnerabilityEffect";
@@ -829,10 +828,7 @@ public class EntityUtils {
 
 	public static boolean isVulnerable(Plugin plugin, LivingEntity mob) {
 		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(mob, VULNERABILITY_EFFECT_NAME);
-		if (vulns != null) {
-			return true;
-		}
-		return false;
+		return vulns != null;
 	}
 
 	public static final String BLEED_EFFECT_NAME = "BleedEffect";
@@ -1428,7 +1424,7 @@ public class EntityUtils {
 		} else if (proj instanceof Snowball) {
 			ItemStatManager.PlayerItemStats projectileItemStats = DamageListener.getProjectileItemStats(proj);
 			return projectileItemStats != null
-					   && projectileItemStats.getMainhandAddStats().get(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat()) > 0;
+				&& projectileItemStats.getMainhandAddStats().get(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat()) > 0;
 		}
 		return false;
 	}
@@ -1461,7 +1457,7 @@ public class EntityUtils {
 			for (int z = -radius; z < radius + 16; z += 16) {
 				Location offsetLocation = location.clone().add(x, 0, z);
 				if (offsetLocation.isChunkLoaded()
-					    && !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
+					&& !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
 					return true;
 				}
 			}

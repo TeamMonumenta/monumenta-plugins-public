@@ -181,7 +181,7 @@ public class PlayerUtils {
 	 * @return The players that fit the criteria
 	 */
 	public static List<Player> playersInRange(Iterable<Player> ps, Location loc, double range,
-											  boolean includeNonTargetable, boolean includeDead) {
+	                                          boolean includeNonTargetable, boolean includeDead) {
 		List<Player> players = new ArrayList<>();
 
 		double rangeSquared = range * range;
@@ -198,7 +198,7 @@ public class PlayerUtils {
 	}
 
 	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable,
-											  boolean includeDead) {
+	                                          boolean includeDead) {
 		return playersInRange(loc.getWorld().getPlayers(), loc, range, includeNonTargetable, includeDead);
 	}
 
@@ -207,7 +207,7 @@ public class PlayerUtils {
 	}
 
 	public static List<Player> playersInXZRange(Location loc, double range, boolean includeNonTargetable,
-												boolean includeDead) {
+	                                            boolean includeDead) {
 		List<Player> players = new ArrayList<>();
 
 		for (Player player : loc.getWorld().getPlayers()) {
@@ -643,7 +643,7 @@ public class PlayerUtils {
 	 * Invokes {@link Player#getShoulderEntityRight()} or {@link Player#getShoulderEntityLeft()}
 	 * Exists to suppress deprecations.
 	 *
-	 * @param player The player.
+	 * @param player   The player.
 	 * @param shoulder True for right, false for left.
 	 * @see Player#getShoulderEntityRight()
 	 * @see Player#getShoulderEntityLeft()
@@ -657,7 +657,7 @@ public class PlayerUtils {
 	 * Invokes {@link Player#setShoulderEntityRight(Entity)} or {@link Player#setShoulderEntityLeft(Entity)}
 	 * Exists to suppress deprecations.
 	 *
-	 * @param player The player.
+	 * @param player   The player.
 	 * @param shoulder True for right, false for left.
 	 * @see Player#setShoulderEntityRight(Entity)
 	 * @see Player#setShoulderEntityLeft(Entity)
@@ -717,7 +717,7 @@ public class PlayerUtils {
 	}
 
 	public static Location getRespawnLocationAndClear(Player player, World world,
-													  @Nullable Location originalRespawnLocation) {
+	                                                  @Nullable Location originalRespawnLocation) {
 		Location realRespawnLocation = player.getPotentialBedLocation();
 		boolean mightBeBedSpawn = false;
 		if (realRespawnLocation == null || realRespawnLocation.getWorld() != world) {
@@ -800,7 +800,7 @@ public class PlayerUtils {
 	 * @param bypassReincarn whether the kill should bypass the player's reincarnation effect
 	 */
 	public static void killPlayer(Player player, @Nullable LivingEntity damager, @Nullable String cause,
-								  boolean bypassStasis, boolean bypassInvuln, boolean bypassReincarn) {
+	                              boolean bypassStasis, boolean bypassInvuln, boolean bypassReincarn) {
 		if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 			Plugin monumentaPlugin = Plugin.getInstance();
 			monumentaPlugin.mEffectManager.clearEffects(player, VoodooBonds.PROTECTION_EFFECT);

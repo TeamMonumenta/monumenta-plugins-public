@@ -95,14 +95,14 @@ public class TowerMobAbility {
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob,
-							new BossAbilityGroup(Plugin.getInstance(), "Shellcracker", mob) {
+						new BossAbilityGroup(Plugin.getInstance(), "Shellcracker", mob) {
 
-								@Override
-								public void onDamage(DamageEvent event, LivingEntity damagee) {
-									if (EffectManager.getInstance() != null) {
-										EffectManager.getInstance().addEffect(damagee, "TIincreseDamage", new PercentDamageReceived(60, 0.15));
-									}
+							@Override
+							public void onDamage(DamageEvent event, LivingEntity damagee) {
+								if (EffectManager.getInstance() != null) {
+									EffectManager.getInstance().addEffect(damagee, "TIincreseDamage", new PercentDamageReceived(60, 0.15));
 								}
+							}
 
 						}
 					);
@@ -530,15 +530,6 @@ public class TowerMobAbility {
 	}
 
 
-	public static class Tuple {
-		public final String mName;
-		public final String mDescription;
-		public final @Nullable BuildMobAbility mBuilder;
-
-		public Tuple(String name, String description, @Nullable BuildMobAbility buildAbility) {
-			mName = name;
-			mDescription = description;
-			mBuilder = buildAbility;
-		}
+	public record Tuple(String mName, String mDescription, @Nullable BuildMobAbility mBuilder) {
 	}
 }

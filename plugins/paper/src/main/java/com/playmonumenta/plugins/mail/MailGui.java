@@ -186,9 +186,10 @@ public abstract class MailGui extends Gui implements Comparable<MailGui> {
 
 	/**
 	 * Checks if the GUI's viewer has access to the GUI and an optional mailbox
+	 *
 	 * @param mailbox The mailbox to check access for, if any
 	 * @throws NoMailAccessException with the reason the player does not have access to the mailbox,
-	 * as well as if the GUI should be closed.
+	 *                               as well as if the GUI should be closed.
 	 */
 	public void noAccessGuiCheck(@Nullable Mailbox mailbox) throws NoMailAccessException {
 		String shard = ServerProperties.getShardName();

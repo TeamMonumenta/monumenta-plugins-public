@@ -18,6 +18,8 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.List;
+import java.util.function.Predicate;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -26,8 +28,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-import java.util.List;
-import java.util.function.Predicate;
 
 public class TouchofRadiance extends Ability {
 	public static final String NAME = "Touch of Radiance";
@@ -121,6 +121,7 @@ public class TouchofRadiance extends Ability {
 					super.entityTickEffect(entity, fourHertz, twoHertz, oneHertz);
 					mCosmetic.tickEffect(targetPlayer);
 				}
+
 				@Override
 				public void entityLoseEffect(Entity entity) {
 					mCosmetic.loseEffect(targetPlayer);
@@ -172,6 +173,7 @@ public class TouchofRadiance extends Ability {
 				super.entityTickEffect(entity, fourHertz, twoHertz, oneHertz);
 				mCosmetic.tickEffect(mPlayer);
 			}
+
 			@Override
 			public void entityLoseEffect(Entity entity) {
 				mCosmetic.loseEffect(mPlayer);

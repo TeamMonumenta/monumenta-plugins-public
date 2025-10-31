@@ -43,7 +43,7 @@ public class PassiveHeatAttack extends Spell {
 			List<Block> fire = LocationUtils.getNearbyBlocks(mBoss.getLocation().getBlock(), FIRE_DETECT_RADIUS);
 			fire.removeIf(block -> block.getType() != Material.FIRE);
 			if (fire.size() >= FIRE_THRESHOLD) {
-				for (Block block: fire) {
+				for (Block block : fire) {
 					new PartialParticle(Particle.REDSTONE, block.getLocation())
 						.count(20)
 						.delta(0.5)
@@ -68,7 +68,7 @@ public class PassiveHeatAttack extends Spell {
 					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SOURCE,
 						new PercentSpeed(100, amount, SLOWNESS_SOURCE));
 					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, VULNERABILITY_SOURCE,
-						new PercentDamageReceived(100, -amount/2));
+						new PercentDamageReceived(100, -amount / 2));
 				}
 			});
 

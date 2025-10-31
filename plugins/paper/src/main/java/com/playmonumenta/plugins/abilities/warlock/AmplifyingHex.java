@@ -114,9 +114,9 @@ public class AmplifyingHex extends Ability {
 			int charmPower = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.CHARM_POWER).orElse(0);
 			charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
 			int totalLevel = AbilityUtils.getEffectiveTotalSkillPoints(player) +
-				                 AbilityUtils.getEffectiveTotalSpecPoints(player) +
-				                 ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
-				                 charmPower;
+				AbilityUtils.getEffectiveTotalSpecPoints(player) +
+				ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
+				charmPower;
 			mDamage = mFlatDamage + Math.min(mDamagePerPoint * totalLevel, mRegionCap);
 		});
 
@@ -156,7 +156,7 @@ public class AmplifyingHex extends Ability {
 			ArrayList<Integer> amplifierCounts = new ArrayList<>();
 
 			// Potion effect debuffs. We avoid stream for speed (hopefully)
-			for (PotionEffect e: mob.getActivePotionEffects()) {
+			for (PotionEffect e : mob.getActivePotionEffects()) {
 				if (AbilityUtils.DEBUFFS.contains(e.getType())) {
 					debuffCount++;
 					amplifierCounts.add(Math.min(mAmplifierCap, e.getAmplifier()));
@@ -170,9 +170,9 @@ public class AmplifyingHex extends Ability {
 
 			if (unfilteredEffectPairList != null) {
 				for (EffectManager.EffectPair e : unfilteredEffectPairList) {
-					effectPairList.put(e.mSource, e.mEffect.getMagnitude());
-					effectList.put(e.mEffect.mEffectID, Math.max(e.mEffect.getMagnitude(),
-						effectList.getOrDefault(e.mEffect.mEffectID, 0.0)));
+					effectPairList.put(e.mSource(), e.mEffect().getMagnitude());
+					effectList.put(e.mEffect().mEffectID, Math.max(e.mEffect().getMagnitude(),
+						effectList.getOrDefault(e.mEffect().mEffectID, 0.0)));
 				}
 			}
 

@@ -5,10 +5,9 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.Collection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import java.util.Collection;
 
 public class Celerity implements Infusion {
 
@@ -20,7 +19,9 @@ public class Celerity implements Infusion {
 	private static final String PERCENT_SPEED_EFFECT_NAME = "CelerityPercentSpeedEffect";
 
 	@Override
-	public String getName() { return "Celerity"; }
+	public String getName() {
+		return "Celerity";
+	}
 
 	@Override
 	public InfusionType getInfusionType() {
@@ -31,8 +32,7 @@ public class Celerity implements Infusion {
 	public void tick(Plugin plugin, Player player, double level, boolean twoHertz, boolean oneHertz) {
 		if (shouldActivate(player)) {
 			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(EFFECT_DURATION, level * SPEED_BONUS, PERCENT_SPEED_EFFECT_NAME).displaysTime(false));
-		}
-		else {
+		} else {
 			plugin.mEffectManager.clearEffects(player, PERCENT_SPEED_EFFECT_NAME);
 		}
 	}

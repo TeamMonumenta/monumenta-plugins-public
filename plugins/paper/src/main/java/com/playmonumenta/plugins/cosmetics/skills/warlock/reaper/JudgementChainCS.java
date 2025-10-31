@@ -68,7 +68,7 @@ public class JudgementChainCS implements CosmeticSkill {
 		new PartialParticle(Particle.REDSTONE, targetLoc, 15, target.getWidth() / 2, target.getWidth() / 2, target.getWidth() / 2, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, targetLoc, 15, target.getWidth() / 2, target.getWidth() / 2, target.getWidth() / 2, 0, DARK_COLOR).spawnAsPlayerActive(player);
 		new PPLine(Particle.BLOCK_CRACK, LocationUtils.getEntityCenter(player), LocationUtils.getEntityCenter(target))
-				.data(Material.CHAIN.createBlockData()).countPerMeter(10).delta(0.03).spawnAsPlayerActive(player);
+			.data(Material.CHAIN.createBlockData()).countPerMeter(10).delta(0.03).spawnAsPlayerActive(player);
 
 		world.playSound(targetLoc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 		world.playSound(targetLoc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.PLAYERS, 1.0f, 0.5f);

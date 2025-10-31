@@ -48,60 +48,60 @@ public class TransferLPPermissions {
 		//playerName <playerName|UUID|Player Selector>
 
 		root
-				.withArguments(FROM_ARG, TARGET_ARG)
-				.executes((sender, args) -> {
-					CommandUtils.checkPerm(sender, PERMISSION);
-					if (GuildCommand.senderCannotRunCommand(sender, true)) {
-						return;
-					}
+			.withArguments(FROM_ARG, TARGET_ARG)
+			.executes((sender, args) -> {
+				CommandUtils.checkPerm(sender, PERMISSION);
+				if (GuildCommand.senderCannotRunCommand(sender, true)) {
+					return;
+				}
 
-					String fromUser = args.getUnchecked("from");
-					Player targetPlayer = args.getUnchecked("target");
+				String fromUser = args.getUnchecked("from");
+				Player targetPlayer = args.getUnchecked("target");
 
-					UUID fromUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(fromUser);
-					if (fromUUID == null) {
-						throw CommandAPI.failWithString("Given target(from) for transfer does not exist in Redis.");
-					}
+				UUID fromUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(fromUser);
+				if (fromUUID == null) {
+					throw CommandAPI.failWithString("Given target(from) for transfer does not exist in Redis.");
+				}
 
-					runTransferPermissions(plugin, sender, fromUUID, targetPlayer);
-				}).register();
+				runTransferPermissions(plugin, sender, fromUUID, targetPlayer);
+			}).register();
 
 		new CommandAPICommand("confirmpermissiontransfer")
-				.withSubcommands(
-						new CommandAPICommand("confirm")
-								.withArguments(new UUIDArgument("uuid"))
-								.executes((sender, args) -> {
-									CommandUtils.checkPerm(sender, PERMISSION);
-									if (GuildCommand.senderCannotRunCommand(sender, true)) {
-										return;
-									}
+			.withSubcommands(
+				new CommandAPICommand("confirm")
+					.withArguments(new UUIDArgument("uuid"))
+					.executes((sender, args) -> {
+						CommandUtils.checkPerm(sender, PERMISSION);
+						if (GuildCommand.senderCannotRunCommand(sender, true)) {
+							return;
+						}
 
-									UUID confirmationUUID = args.getUnchecked("uuid");
+						UUID confirmationUUID = args.getUnchecked("uuid");
 
-									if (!awaitingConfirmations.containsKey(confirmationUUID)) {
-										throw CommandAPI.failWithString("Could not get context for given UUID");
-									}
+						if (!awaitingConfirmations.containsKey(confirmationUUID)) {
+							throw CommandAPI.failWithString("Could not get context for given UUID");
+						}
 
-									runConfirmTransfer(plugin, sender, confirmationUUID);
-								}),
-						new CommandAPICommand("cancel")
-								.withArguments(new UUIDArgument("uuid"))
-								.executes((sender, args) -> {
-									CommandUtils.checkPerm(sender, PERMISSION);
-									if (GuildCommand.senderCannotRunCommand(sender, true)) {
-										return;
-									}
+						runConfirmTransfer(plugin, sender, confirmationUUID);
+					}),
+				new CommandAPICommand("cancel")
+					.withArguments(new UUIDArgument("uuid"))
+					.executes((sender, args) -> {
+						CommandUtils.checkPerm(sender, PERMISSION);
+						if (GuildCommand.senderCannotRunCommand(sender, true)) {
+							return;
+						}
 
-									UUID confirmationUUID = args.getUnchecked("uuid");
+						UUID confirmationUUID = args.getUnchecked("uuid");
 
-									if (!awaitingConfirmations.containsKey(confirmationUUID)) {
-										throw CommandAPI.failWithString("Could not get context for given UUID");
-									}
+						if (!awaitingConfirmations.containsKey(confirmationUUID)) {
+							throw CommandAPI.failWithString("Could not get context for given UUID");
+						}
 
-									awaitingConfirmations.remove(confirmationUUID);
-									sender.sendMessage(Component.text("Cancelled request", NamedTextColor.RED));
-								})
-				).register();
+						awaitingConfirmations.remove(confirmationUUID);
+						sender.sendMessage(Component.text("Cancelled request", NamedTextColor.RED));
+					})
+			).register();
 
 		if (clearConfirmationsRunnable == null) {
 			//set up auto-clean.

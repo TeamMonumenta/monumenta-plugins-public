@@ -20,7 +20,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
-public class EffectsList {
+public record EffectsList(List<Effect> mEffectList) {
 	public abstract static class Effect {
 		public static final Map<String, EffectRunner> EFFECT_RUNNER;
 		public static final Map<String, CustomEffectRunner> CUSTOM_EFFECT_RUNNER;
@@ -64,8 +64,7 @@ public class EffectsList {
 							(target, boss, duration) ->
 								EffectType.applyEffect(effectType, target, (int) duration, 1, null, false)
 						);
-					}
-					else {// for some reason DamageIncrease is called 'damage' here?
+					} else {// for some reason DamageIncrease is called 'damage' here?
 						CUSTOM_EFFECT_RUNNER.put("Custom" + (type.equals("damage") ? "DamageIncrease" : type),
 							(target, boss, duration, strength, effectName) ->
 								EffectType.applyEffect(effectType, target, duration, strength, effectName, false)
@@ -128,7 +127,7 @@ public class EffectsList {
 
 		@Override
 		public String toString() {
-			return String.format("(%s,%d,%f,%s)", mName, mDuration, mAmplifier,mSource);
+			return String.format("(%s,%d,%f,%s)", mName, mDuration, mAmplifier, mSource);
 		}
 	}
 
@@ -179,12 +178,7 @@ public class EffectsList {
 	}
 
 
-	public final List<Effect> mEffectList;
 	public static final EffectsList EMPTY = fromString("[]");
-
-	public EffectsList(List<Effect> effects) {
-		mEffectList = effects;
-	}
 
 	public void apply(LivingEntity player, LivingEntity boss) {
 		//if the list is empty the for will be skipped

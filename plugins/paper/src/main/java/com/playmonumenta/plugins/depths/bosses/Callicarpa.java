@@ -373,8 +373,8 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 	public void onHurt(DamageEvent event) {
 		if (
 			mIsReflectingProjectiles &&
-			event.getDamager() instanceof Player damager &&
-			DamageEvent.DamageType.getAllProjectileTypes().contains(event.getType())
+				event.getDamager() instanceof Player damager &&
+				DamageEvent.DamageType.getAllProjectileTypes().contains(event.getType())
 		) {
 			FlowerPower.launchEnergyLaser(
 				damager,
@@ -400,7 +400,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 	public void bossHitByProjectile(ProjectileHitEvent event) {
 		if (
 			mIsReflectingProjectiles &&
-			event.getEntity().getShooter() instanceof Player shooter
+				event.getEntity().getShooter() instanceof Player shooter
 		) {
 			FlowerPower.launchEnergyLaser(
 				shooter,

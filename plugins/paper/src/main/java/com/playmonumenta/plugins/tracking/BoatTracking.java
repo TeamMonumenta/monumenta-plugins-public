@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 
 public class BoatTracking implements EntityTracking {
-	private Set<Boat> mEntities = Collections.newSetFromMap(new WeakHashMap<>());
+	private final Set<Boat> mEntities = Collections.newSetFromMap(new WeakHashMap<>());
 	private int mTicks = 0;
 
 	@Override

@@ -414,8 +414,10 @@ public class SocialManager implements Listener {
 			if (result != PlayerSocialCache.BlockCheckResult.OK) {
 				Component errorMessage = switch (result) {
 					case SELF -> Component.text("You cannot block yourself!", NamedTextColor.RED);
-					case ALREADY_BLOCKED -> Component.text("You already blocked " + resolveName(receiverUuid) + "!", NamedTextColor.RED);
-					default -> Component.text("You cannot block " + resolveName(receiverUuid) + "!", NamedTextColor.RED);
+					case ALREADY_BLOCKED ->
+						Component.text("You already blocked " + resolveName(receiverUuid) + "!", NamedTextColor.RED);
+					default ->
+						Component.text("You cannot block " + resolveName(receiverUuid) + "!", NamedTextColor.RED);
 				};
 
 				if (sender != null) {
@@ -1026,6 +1028,7 @@ public class SocialManager implements Listener {
 	//endregion
 
 	//region <GETTERS>
+
 	/**
 	 * Retrieves the in-memory {@code PlayerSocialCache} for the specified player if one has already been loaded.
 	 *

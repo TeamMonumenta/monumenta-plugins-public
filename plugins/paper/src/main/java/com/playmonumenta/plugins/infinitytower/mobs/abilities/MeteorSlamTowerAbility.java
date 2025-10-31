@@ -142,7 +142,6 @@ public class MeteorSlamTowerAbility extends TowerAbility {
 		};
 
 
-
 		SpellManager activeSpells = new SpellManager(List.of(spell));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), -1, null, (int) (FastUtils.RANDOM.nextDouble() * 100) + 20);

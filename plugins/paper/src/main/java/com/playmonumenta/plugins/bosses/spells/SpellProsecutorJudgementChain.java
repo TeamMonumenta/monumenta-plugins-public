@@ -22,7 +22,8 @@ public class SpellProsecutorJudgementChain extends Spell {
 	private final LivingEntity mBoss;
 	private final ProsecutorJudgementChainBoss.Parameters mParams;
 
-	private BiConsumer<LivingEntity, DamageEvent.DamageType> mAttackedByEntityAction = (entity, type) -> { };
+	private BiConsumer<LivingEntity, DamageEvent.DamageType> mAttackedByEntityAction = (entity, type) -> {
+	};
 
 	public SpellProsecutorJudgementChain(Plugin plugin, LivingEntity boss, ProsecutorJudgementChainBoss.Parameters parameters) {
 		mPlugin = plugin;

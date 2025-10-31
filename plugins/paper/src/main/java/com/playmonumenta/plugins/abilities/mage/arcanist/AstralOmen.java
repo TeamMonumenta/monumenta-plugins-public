@@ -178,10 +178,14 @@ public class AstralOmen extends Ability {
 				if (level > 0) {
 					Effect effect;
 					switch (type) {
-						case FIRE -> effect = new AstralOmenFireStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
-						case ICE -> effect = new AstralOmenIceStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
-						case THUNDER -> effect = new AstralOmenThunderStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
-						default -> effect = new AstralOmenArcaneStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
+						case FIRE ->
+							effect = new AstralOmenFireStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
+						case ICE ->
+							effect = new AstralOmenIceStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
+						case THUNDER ->
+							effect = new AstralOmenThunderStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
+						default ->
+							effect = new AstralOmenArcaneStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
 					}
 					mPlugin.mEffectManager.addEffect(enemy, type.mSource, effect);
 				}

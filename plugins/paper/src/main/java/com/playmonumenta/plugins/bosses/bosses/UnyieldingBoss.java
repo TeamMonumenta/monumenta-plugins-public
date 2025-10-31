@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
-
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -67,11 +66,11 @@ public class UnyieldingBoss extends BossAbilityGroup {
 				public void run() {
 					// Cancel upon knock away, knockup, silence, stun, frozen (hard cc)
 					if (!mBoss.isValid()
-						    || mBoss.hasPotionEffect(PotionEffectType.SLOW_FALLING)
-						    || mBoss.hasPotionEffect(PotionEffectType.LEVITATION)
-						    || EffectManager.getInstance().hasEffect(mBoss, Frozen.class)
-						    || EffectManager.getInstance().hasEffect(mBoss, DisableAI.class)
-						    || EffectManager.getInstance().hasEffect(mBoss, DisableGravity.class)) {
+						|| mBoss.hasPotionEffect(PotionEffectType.SLOW_FALLING)
+						|| mBoss.hasPotionEffect(PotionEffectType.LEVITATION)
+						|| EffectManager.getInstance().hasEffect(mBoss, Frozen.class)
+						|| EffectManager.getInstance().hasEffect(mBoss, DisableAI.class)
+						|| EffectManager.getInstance().hasEffect(mBoss, DisableGravity.class)) {
 						interrupt();
 						return;
 					}
@@ -115,7 +114,7 @@ public class UnyieldingBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossKnockedAway(float speed) {
-		if(speed >= 2f) {
+		if (speed >= 2f) {
 			interrupt();
 		}
 	}

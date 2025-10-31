@@ -2,7 +2,8 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.*;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.ZeroArgumentEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;

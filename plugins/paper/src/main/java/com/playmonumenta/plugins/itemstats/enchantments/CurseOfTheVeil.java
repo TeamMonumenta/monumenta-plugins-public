@@ -76,11 +76,11 @@ public class CurseOfTheVeil implements Enchantment {
 					|| player.getGameMode() == GameMode.SPECTATOR
 					|| (resistance != null && resistance.getAmplifier() >= 4)
 					|| (effectPairs != null && effectPairs.stream().anyMatch(pair ->
-						pair.mEffect.mEffectID.equals(RespawnStasis.effectID)
-						|| pair.mEffect.mEffectID.equals(Stasis.effectID)
-						|| (pair.mEffect.mEffectID.equals(PercentDamageReceived.effectID)
-							&& pair.mEffect.getMagnitude() >= 1
-							&& pair.mEffect.isBuff())))) {
+					pair.mEffect().mEffectID.equals(RespawnStasis.effectID)
+						|| pair.mEffect().mEffectID.equals(Stasis.effectID)
+						|| (pair.mEffect().mEffectID.equals(PercentDamageReceived.effectID)
+						&& pair.mEffect().getMagnitude() >= 1
+						&& pair.mEffect().isBuff())))) {
 					return;
 				}
 
@@ -148,8 +148,8 @@ public class CurseOfTheVeil implements Enchantment {
 		Collection<LivingEntity> nearbyEntities = player.getLocation().getNearbyLivingEntities(NEARBY_BOSS_RANGE);
 		for (LivingEntity entity : nearbyEntities) {
 			if ((!(entity instanceof Player) && entity.getScoreboardTags().contains("Boss"))
-					|| (EntityUtils.isHostileMob(entity)
-					&& entity.getLocation().distanceSquared(player.getLocation()) < NEARBY_NORMAL_RANGE * NEARBY_NORMAL_RANGE)) {
+				|| (EntityUtils.isHostileMob(entity)
+				&& entity.getLocation().distanceSquared(player.getLocation()) < NEARBY_NORMAL_RANGE * NEARBY_NORMAL_RANGE)) {
 				return true;
 			}
 		}

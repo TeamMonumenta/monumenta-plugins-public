@@ -15,17 +15,17 @@ import org.bukkit.util.BoundingBox;
 public class SpellBaseAbstractRectangleAttack extends SpellBaseAbstractAttack {
 
 	public SpellBaseAbstractRectangleAttack(RectangleInfo rectangleInfo, int particleAmount, int telegraphPulses,
-			int castDelay, double particleSpeed, Particle particle, DamageEvent.DamageType damageType, double damage,
-			boolean bypassIframes, boolean causeKnockback, String attackName, Particle attackParticle, Plugin plugin, LivingEntity boss,
-			AttackAesthetics attackAesthetics) {
+	                                        int castDelay, double particleSpeed, Particle particle, DamageEvent.DamageType damageType, double damage,
+	                                        boolean bypassIframes, boolean causeKnockback, String attackName, Particle attackParticle, Plugin plugin, LivingEntity boss,
+	                                        AttackAesthetics attackAesthetics) {
 		this(rectangleInfo, particleAmount, telegraphPulses, castDelay, 0, particleSpeed, particle, damageType, damage, bypassIframes,
 			causeKnockback, attackName, attackParticle, plugin, boss, attackAesthetics);
 	}
 
 	public SpellBaseAbstractRectangleAttack(RectangleInfo rectangleInfo, int particleAmount, int telegraphPulses,
-			int castDelay, int pulseStartDelay, double particleSpeed, Particle particle, DamageEvent.DamageType damageType, double damage,
-			boolean bypassIframes, boolean causeKnockback, String attackName, Particle attackParticle, Plugin plugin, LivingEntity boss,
-			AttackAesthetics attackAesthetics) {
+	                                        int castDelay, int pulseStartDelay, double particleSpeed, Particle particle, DamageEvent.DamageType damageType, double damage,
+	                                        boolean bypassIframes, boolean causeKnockback, String attackName, Particle attackParticle, Plugin plugin, LivingEntity boss,
+	                                        AttackAesthetics attackAesthetics) {
 		super(
 			() -> {
 				ParticleUtils.drawRectangleTelegraph(
@@ -61,24 +61,9 @@ public class SpellBaseAbstractRectangleAttack extends SpellBaseAbstractAttack {
 		return 0;
 	}
 
-	public static class RectangleInfo {
-		public final Location mStart;
-		public final double mDx;
-		public final double mDy;
-		public final double mDz;
-
+	public record RectangleInfo(Location mStart, double mDx, double mDz, double mDy) {
 		public RectangleInfo(Location start, double dx, double dz) {
-			mStart = start;
-			mDx = dx;
-			mDz = dz;
-			mDy = 30;
-		}
-
-		public RectangleInfo(Location start, double dx, double dz, double dy) {
-			mStart = start;
-			mDx = dx;
-			mDz = dz;
-			mDy = dy;
+			this(start, dx, dz, 30);
 		}
 
 		public Location getStart() {

@@ -17,18 +17,18 @@ public class JingleBells extends GenericCommand {
 	public static final String METADATA_TAG = "LastJinglingTime";
 	public static final int RESET_TIME = 20 * 5;
 	public static final List<Float> NOTES = Arrays.asList(
-			NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
-			NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
-			NotePitches.AS16, NotePitches.CS19, NotePitches.FS12, NotePitches.GS14, NotePitches.AS16,
-			NotePitches.B17, NotePitches.B17, NotePitches.B17, NotePitches.B17,
-			NotePitches.B17, NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
-			NotePitches.AS16, NotePitches.GS14, NotePitches.GS14, NotePitches.AS16, NotePitches.GS14, NotePitches.CS19,
-			NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
-			NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
-			NotePitches.AS16, NotePitches.CS19, NotePitches.FS12, NotePitches.GS14, NotePitches.AS16,
-			NotePitches.B17, NotePitches.B17, NotePitches.B17, NotePitches.B17,
-			NotePitches.B17, NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
-			NotePitches.CS19, NotePitches.CS19, NotePitches.B17, NotePitches.GS14, NotePitches.FS12);
+		NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
+		NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
+		NotePitches.AS16, NotePitches.CS19, NotePitches.FS12, NotePitches.GS14, NotePitches.AS16,
+		NotePitches.B17, NotePitches.B17, NotePitches.B17, NotePitches.B17,
+		NotePitches.B17, NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
+		NotePitches.AS16, NotePitches.GS14, NotePitches.GS14, NotePitches.AS16, NotePitches.GS14, NotePitches.CS19,
+		NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
+		NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
+		NotePitches.AS16, NotePitches.CS19, NotePitches.FS12, NotePitches.GS14, NotePitches.AS16,
+		NotePitches.B17, NotePitches.B17, NotePitches.B17, NotePitches.B17,
+		NotePitches.B17, NotePitches.AS16, NotePitches.AS16, NotePitches.AS16,
+		NotePitches.CS19, NotePitches.CS19, NotePitches.B17, NotePitches.GS14, NotePitches.FS12);
 
 	public static void register() {
 		registerPlayerCommand("jinglebells", "monumenta.command.jinglebells", JingleBells::run);

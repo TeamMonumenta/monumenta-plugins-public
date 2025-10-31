@@ -72,8 +72,8 @@ public class DelvesCommands {
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
 				DelveCustomInventory.Config config = new DelveCustomInventory.Config()
-																			 .editable(false)
-																			 .startable(true);
+					.editable(false)
+					.startable(true);
 				DelvePreset preset = DelvePreset.getChall(args.getUnchecked("dungeon"));
 				if (preset != null) {
 					config = config.preset(preset);
@@ -415,16 +415,16 @@ public class DelvesCommands {
 				if (total < 0) {
 					player.sendMessage(
 						Component.text("Failed to count total spawners. Please report this as a bug! (" + broken + " broken)")
-								 .color(NamedTextColor.RED)
+							.color(NamedTextColor.RED)
 					);
 					return;
 				}
 				String message = args.getUnchecked("message");
 				player.sendMessage(
 					Component.text(message)
-							 .color(NamedTextColor.RED)
-							 .appendSpace()
-							 .append(Component.text("(" + broken + " broken / " + required + " required)").color(NamedTextColor.YELLOW))
+						.color(NamedTextColor.RED)
+						.appendSpace()
+						.append(Component.text("(" + broken + " broken / " + required + " required)").color(NamedTextColor.YELLOW))
 				);
 			}).register();
 

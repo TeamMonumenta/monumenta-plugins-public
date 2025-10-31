@@ -89,6 +89,7 @@ public class Avalanche extends DepthsAbility {
 			int mPulses = 0;
 			final List<LivingEntity> mHitMobs = new ArrayList<>();
 			Set<Location> mIceToBreak = new HashSet<>();
+
 			@Override
 			public void run() {
 				// re-obtain nearby ice every pulse in case ice disappears in the middle of casting

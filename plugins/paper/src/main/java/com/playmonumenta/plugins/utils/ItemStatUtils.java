@@ -506,8 +506,8 @@ public class ItemStatUtils {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-				ReadWriteNBT monumenta = nbt.getOrCreateCompound(MONUMENTA_KEY);
-				monumenta.setInteger(FISH_QUALITY_KEY, level);
+			ReadWriteNBT monumenta = nbt.getOrCreateCompound(MONUMENTA_KEY);
+			monumenta.setInteger(FISH_QUALITY_KEY, level);
 		});
 	}
 
@@ -696,10 +696,7 @@ public class ItemStatUtils {
 
 		return NBT.get(item, nbt -> {
 			ReadableNBTList<ReadWriteNBT> effects = getEffects(nbt);
-			if (effects == null || effects.isEmpty()) {
-				return false;
-			}
-			return true;
+			return effects != null && !effects.isEmpty();
 		});
 	}
 
@@ -1054,7 +1051,9 @@ public class ItemStatUtils {
 			Long guildPlotId = Long.parseLong(infuserGuild.substring(6));
 			Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotId);
 			return guild == null || GuildPermission.GUILD_OWNED_INFUSION.hasAccess(guild, player);
-		} else return infuserPlayer != null && infuserPlayer.equals(player.getUniqueId()); // player case
+		} else {
+			return infuserPlayer != null && infuserPlayer.equals(player.getUniqueId()); // player case
+		}
 	}
 
 	public static boolean isOwnable(ItemStack item) {
@@ -1079,11 +1078,7 @@ public class ItemStatUtils {
 		}
 
 		Region region = getRegion(item);
-		if (region != Region.VALLEY && region != Region.ISLES && region != Region.RING) {
-			return false;
-		}
-
-		return true;
+		return region == Region.VALLEY || region == Region.ISLES || region == Region.RING;
 	}
 
 	public static @Nullable ReadWriteNBTCompoundList getAttributes(final ReadWriteNBT nbt) {
@@ -1325,6 +1320,7 @@ public class ItemStatUtils {
 		});
 	}
 
+	@SuppressWarnings("PointlessNullCheck")
 	public static void cleanIfNecessary(final @Nullable ItemStack item) {
 		if (item != null && isDirty(item)) {
 			ItemUpdateHelper.generateItemStats(item);
@@ -1387,7 +1383,7 @@ public class ItemStatUtils {
 
 	public static QuiverListener.ArrowTransformMode getArrowTransformMode(ItemStack item) {
 		return NBT.get(item, nbt -> {
-			return (QuiverListener.ArrowTransformMode) nbt.resolveOrDefault(MONUMENTA_KEY + "." + PLAYER_MODIFIED_KEY + "." + QUIVER_ARROW_TRANSFORM_MODE_KEY, QuiverListener.ArrowTransformMode.NONE);
+			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + PLAYER_MODIFIED_KEY + "." + QUIVER_ARROW_TRANSFORM_MODE_KEY, QuiverListener.ArrowTransformMode.NONE);
 		});
 	}
 

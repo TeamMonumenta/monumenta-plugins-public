@@ -26,7 +26,7 @@ public class RhythmFM extends FishingMinigame {
 	private static final int CLICKED_TIMING = 2;
 	private static final int LEFT_CLICKABLE_TIMING = 3;
 	private static final int RIGHT_CLICKABLE_TIMING = 4;
-	private static final Color[] COLORS = new Color[] {
+	private static final Color[] COLORS = new Color[]{
 		Color.fromRGB(200, 200, 200),
 		Color.fromRGB(100, 255, 50),
 		Color.fromRGB(255, 255, 255),
@@ -127,6 +127,7 @@ public class RhythmFM extends FishingMinigame {
 		new BukkitRunnable() {
 			int mTicks = -START_TIME;
 			int mLoop = 1;
+
 			@Override
 			public void run() {
 				mTicks++;

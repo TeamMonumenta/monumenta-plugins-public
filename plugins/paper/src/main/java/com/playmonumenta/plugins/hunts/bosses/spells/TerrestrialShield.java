@@ -95,7 +95,7 @@ public class TerrestrialShield extends Spell {
 		display.setTransformation(new Transformation(
 			new Vector3f(1.8f * cos + 0.5f * sin * scale, 1 - 0.75f * scale, 1.8f * sin - 0.5f * cos * scale),
 			new AxisAngle4f((float) -radians, 0, 1, 0),
-			new Vector3f(0.3f * scale, 1.5f * scale, 1f * scale),
+			new Vector3f(0.3f * scale, 1.5f * scale, scale),
 			new AxisAngle4f()
 		));
 	}
@@ -146,7 +146,7 @@ public class TerrestrialShield extends Spell {
 							for (BlockDisplay display : mDisplays) {
 								player.showEntity(mPlugin, display);
 							}
-							for (BlockDisplay display: mGrowingDisplays) {
+							for (BlockDisplay display : mGrowingDisplays) {
 								player.hideEntity(mPlugin, display);
 							}
 							player.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.3f, 1.2f);

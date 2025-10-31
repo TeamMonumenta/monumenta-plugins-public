@@ -205,19 +205,22 @@ public class ParticleUtils {
 			BoundingBoxEdge edge = edgeEntry.getValue();
 
 			double x = switch (edge) {
-				case X_YMIN_ZMIN, X_YMIN_ZMAX, X_YMAX_ZMIN, X_YMAX_ZMAX -> bb.getMinX() + bbSize.getX() * FastUtils.RANDOM.nextDouble();
+				case X_YMIN_ZMIN, X_YMIN_ZMAX, X_YMAX_ZMIN, X_YMAX_ZMAX ->
+					bb.getMinX() + bbSize.getX() * FastUtils.RANDOM.nextDouble();
 				case Y_XMIN_ZMIN, Y_XMIN_ZMAX, Z_XMIN_YMIN, Z_XMIN_YMAX -> bb.getMinX();
 				default -> bb.getMaxX();
 			};
 
 			double y = switch (edge) {
-				case Y_XMIN_ZMIN, Y_XMIN_ZMAX, Y_XMAX_ZMIN, Y_XMAX_ZMAX -> bb.getMinY() + bbSize.getY() * FastUtils.RANDOM.nextDouble();
+				case Y_XMIN_ZMIN, Y_XMIN_ZMAX, Y_XMAX_ZMIN, Y_XMAX_ZMAX ->
+					bb.getMinY() + bbSize.getY() * FastUtils.RANDOM.nextDouble();
 				case X_YMIN_ZMIN, X_YMIN_ZMAX, Z_XMIN_YMIN, Z_XMAX_YMIN -> bb.getMinY();
 				default -> bb.getMaxY();
 			};
 
 			double z = switch (edge) {
-				case Z_XMIN_YMIN, Z_XMIN_YMAX, Z_XMAX_YMIN, Z_XMAX_YMAX -> bb.getMinZ() + bbSize.getZ() * FastUtils.RANDOM.nextDouble();
+				case Z_XMIN_YMIN, Z_XMIN_YMAX, Z_XMAX_YMIN, Z_XMAX_YMAX ->
+					bb.getMinZ() + bbSize.getZ() * FastUtils.RANDOM.nextDouble();
 				case X_YMIN_ZMIN, X_YMAX_ZMIN, Y_XMIN_ZMIN, Y_XMAX_ZMIN -> bb.getMinZ();
 				default -> bb.getMaxZ();
 			};
@@ -227,17 +230,17 @@ public class ParticleUtils {
 	}
 
 	public static void drawHalfArc(Location loc, double radius, double angle, double startingDegrees, double endingDegrees,
-								   int rings, double spacing, CleaveAnimation cleaveAnim) {
+	                               int rings, double spacing, CleaveAnimation cleaveAnim) {
 		drawHalfArc(loc, radius, angle, startingDegrees, endingDegrees, rings, spacing, false, 40, cleaveAnim, 5);
 	}
 
 	public static void drawHalfArc(Location loc, double radius, double angle, double startingDegrees, double endingDegrees,
-								   int rings, double spacing, boolean reverse, int arcInc, CleaveAnimation cleaveAnim) {
+	                               int rings, double spacing, boolean reverse, int arcInc, CleaveAnimation cleaveAnim) {
 		drawHalfArc(loc, radius, angle, startingDegrees, endingDegrees, rings, spacing, reverse, arcInc, cleaveAnim, 5);
 	}
 
 	public static void drawHalfArc(Location loc, double radius, double angle, double startingDegrees, double endingDegrees,
-								   int rings, double spacing, boolean reverse, int arcInc, CleaveAnimation cleaveAnim, int degreeStep) {
+	                               int rings, double spacing, boolean reverse, int arcInc, CleaveAnimation cleaveAnim, int degreeStep) {
 		double radiusInc = (Math.PI / (endingDegrees - startingDegrees));
 
 		loc = loc.clone();
@@ -280,20 +283,20 @@ public class ParticleUtils {
 	}
 
 	public static void drawParticleCircleExplosion(LivingEntity entity, Location loc, double angle,
-												   double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd,
-												   Particle... effects) {
+	                                               double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd,
+	                                               Particle... effects) {
 		drawParticleCircleExplosion(entity, loc, angle, radius, yaw, pitch, points, speed, atOrigin, radianAdd, 0, effects);
 	}
 
 	public static void drawParticleCircleExplosion(LivingEntity entity, Location loc, double angle,
-												   double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
-												   Particle... effects) {
+	                                               double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
+	                                               Particle... effects) {
 		drawParticleCircleExplosion(entity, loc, angle, radius, yaw, pitch, points, speed, atOrigin, radianAdd, y, null, effects);
 	}
 
 	public static void drawParticleCircleExplosion(LivingEntity entity, Location loc, double angle,
-												   double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
-												   @Nullable Object data, Particle... effects) {
+	                                               double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
+	                                               @Nullable Object data, Particle... effects) {
 
 		Vector vec;
 		for (int i = 0; i < points; i++) {
@@ -385,16 +388,16 @@ public class ParticleUtils {
 	}
 
 	public static void drawCleaveArc(Location loc,
-									 final double radius, final double angle, double startingDegrees, double endingDegrees,
-									 final int rings, final double extraYaw,
-									 double extraPitch, double spacing, double arcInc, CleaveAnimation cleaveAnim) {
+	                                 final double radius, final double angle, double startingDegrees, double endingDegrees,
+	                                 final int rings, final double extraYaw,
+	                                 double extraPitch, double spacing, double arcInc, CleaveAnimation cleaveAnim) {
 		drawCleaveArc(loc, radius, angle, startingDegrees, endingDegrees, rings, extraYaw, extraPitch, spacing, arcInc, cleaveAnim, 5);
 	}
 
 	public static void drawCleaveArc(Location loc,
-									 final double radius, final double angle, double startingDegrees, double endingDegrees,
-									 final int rings, final double extraYaw,
-									 double extraPitch, double spacing, double arcInc, CleaveAnimation cleaveAnim, int degreeStep) {
+	                                 final double radius, final double angle, double startingDegrees, double endingDegrees,
+	                                 final int rings, final double extraYaw,
+	                                 double extraPitch, double spacing, double arcInc, CleaveAnimation cleaveAnim, int degreeStep) {
 		double radiusInc = (Math.PI / (endingDegrees - startingDegrees));
 
 		Location finalLoc = loc.clone();
@@ -468,9 +471,9 @@ public class ParticleUtils {
 	 * @author Yelon Yagi a.k.a ProjektRed
 	 */
 	public static void drawCurve(Location center, int paraMin, int paraMax,
-								 Vector e1, Vector e2, Vector e3,
-								 ParametricEquation eq1, ParametricEquation eq2, ParametricEquation eq3,
-								 ParametricParticle pp) {
+	                             Vector e1, Vector e2, Vector e3,
+	                             ParametricEquation eq1, ParametricEquation eq2, ParametricEquation eq3,
+	                             ParametricParticle pp) {
 		Location loc;
 		for (int t = paraMin; t <= paraMax; t++) {
 			loc = center.clone();
@@ -487,8 +490,8 @@ public class ParticleUtils {
 	 * and the vector space is generated by front direction vector.
 	 */
 	public static void drawCurve(Location center, int paraMin, int paraMax, Vector front,
-								 ParametricEquation f, ParametricEquation u, ParametricEquation r,
-								 ParametricParticle pp) {
+	                             ParametricEquation f, ParametricEquation u, ParametricEquation r,
+	                             ParametricParticle pp) {
 		Vector right = VectorUtils.rotateTargetDirection(front.clone(), 90, 0);
 		Vector up = VectorUtils.rotateTargetDirection(front.clone(), 0, -90);
 
@@ -501,8 +504,8 @@ public class ParticleUtils {
 	 * and the vector space is generated by yaw and pitch.
 	 */
 	public static void drawCurve(Location center, int paraMin, int paraMax, double yaw, double pitch,
-								 ParametricEquation f, ParametricEquation u, ParametricEquation r,
-								 ParametricParticle pp) {
+	                             ParametricEquation f, ParametricEquation u, ParametricEquation r,
+	                             ParametricParticle pp) {
 		Vector front = VectorUtils.rotationToVector(yaw, pitch);
 		Vector up = VectorUtils.rotationToVector(yaw, pitch - 90);
 		Vector right = front.getCrossProduct(up).normalize();
@@ -880,7 +883,7 @@ public class ParticleUtils {
 	}
 
 	public static BukkitRunnable drawFlowerPattern(Location center, double radius, int petals, int duration, double thetaOffset,
-												   double thetaIncrement, float baseSpeed, Particle particle, Entity spawnerEntity) {
+	                                               double thetaIncrement, float baseSpeed, Particle particle, Entity spawnerEntity) {
 		double pointOffset = Math.PI * 2 / petals;
 		BukkitRunnable flowerRunnable = new BukkitRunnable() {
 			int mTicks = 0;
@@ -981,9 +984,9 @@ public class ParticleUtils {
 	}
 
 	public static void drawPreciseCurve(Location center, double paraMin, double paraMax, double thetaStep,
-										Vector e1, Vector e2, Vector e3,
-										PreciseParametricEquation eq1, PreciseParametricEquation eq2, PreciseParametricEquation eq3,
-										PreciseParametricParticle pp) {
+	                                    Vector e1, Vector e2, Vector e3,
+	                                    PreciseParametricEquation eq1, PreciseParametricEquation eq2, PreciseParametricEquation eq3,
+	                                    PreciseParametricParticle pp) {
 		Location loc;
 		for (double t = paraMin; t <= paraMax; t += thetaStep) {
 			loc = center.clone();
@@ -995,8 +998,8 @@ public class ParticleUtils {
 	}
 
 	public static void drawPreciseCurve(Location center, double paraMin, double paraMax, double thetaStep, Vector front,
-										PreciseParametricEquation f, PreciseParametricEquation u, PreciseParametricEquation r,
-										PreciseParametricParticle pp) {
+	                                    PreciseParametricEquation f, PreciseParametricEquation u, PreciseParametricEquation r,
+	                                    PreciseParametricParticle pp) {
 		Vector right = VectorUtils.rotateTargetDirection(front.clone(), 90, 0);
 		Vector up = VectorUtils.rotateTargetDirection(front.clone(), 0, -90);
 
@@ -1007,7 +1010,7 @@ public class ParticleUtils {
 	 * Adaptation of Touch Of Entropy's code for orbs.
 	 */
 	public static void launchOrb(Vector initialDir, Location startLoc, LivingEntity launcher, LivingEntity target, int expireTime,
-								 @Nullable Location targetLoc, Particle.DustOptions dustOptions, Consumer<LivingEntity> hitAction) {
+	                             @Nullable Location targetLoc, Particle.DustOptions dustOptions, Consumer<LivingEntity> hitAction) {
 		new BukkitRunnable() {
 			final Location mCurrLoc = startLoc.clone();
 			int mTicks = 0;

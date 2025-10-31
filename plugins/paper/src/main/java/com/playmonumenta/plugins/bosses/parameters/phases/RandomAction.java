@@ -16,7 +16,8 @@ public class RandomAction implements Action {
 	}
 
 
-	@Override public void runAction(LivingEntity boss) {
+	@Override
+	public void runAction(LivingEntity boss) {
 		if (Math.random() < mChance) {
 			mAction1.runAction(boss);
 		} else {

@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+
 public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChargesOrStacks {
 
 	public static final String ABILITY_NAME = "Sharpshooter";
@@ -61,7 +62,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 			// Critical arrow and mob is actually going to take damage
 			if (event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)
-				    && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getFinalDamage(false))) {
+				&& (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getFinalDamage(false))) {
 				mTicksToStackDecay = mDecayTimerLength;
 
 				if (mStacks < mMaxStacks) {

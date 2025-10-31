@@ -69,7 +69,7 @@ public class SpellSalientOfDecay extends Spell {
 			targets = players;
 		} else {
 			Collections.shuffle(players);
-			targets = players.subList(0, (int) Math.min(players.size(), Math.max(2, Math.min(CAP, (players.size() + 2) / 3))));
+			targets = players.subList(0, Math.min(players.size(), Math.max(2, Math.min(CAP, (players.size() + 2) / 3))));
 		}
 
 		BukkitRunnable runA = new BukkitRunnable() {
@@ -95,7 +95,7 @@ public class SpellSalientOfDecay extends Spell {
 
 		for (Player player : targets) {
 			BukkitRunnable runB = new BukkitRunnable() {
-				Vector mDir = LocationUtils.getDirectionTo(player.getLocation().add(0, 1.25, 0), mBoss.getLocation().add(0, 1.25, 0));
+				final Vector mDir = LocationUtils.getDirectionTo(player.getLocation().add(0, 1.25, 0), mBoss.getLocation().add(0, 1.25, 0));
 				int mT = 0;
 
 				@Override

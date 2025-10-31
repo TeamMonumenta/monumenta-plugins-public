@@ -404,6 +404,7 @@ public class SwordRainFinisher implements EliteFinisher {
 				int mTicks = 0;
 				final ArmorStand mSwordStand = createSword(loc);
 				final double mFallSpeed = 0.8;
+
 				@Override
 				public void run() {
 					if (mTicks == 0) {

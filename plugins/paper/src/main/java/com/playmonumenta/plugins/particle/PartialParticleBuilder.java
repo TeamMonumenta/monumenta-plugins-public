@@ -65,8 +65,7 @@ public class PartialParticleBuilder extends ParticleBuilder {
 			throw new IllegalStateException("Please specify location for this particle");
 		}
 		final List<Player> players = this.receivers() != null ? this.receivers() : location.getWorld().getPlayers();
-		@Nullable
-		final Entity source = this.sourceEntity();
+		@Nullable final Entity source = this.sourceEntity();
 		for (Player player : players) {
 			if (player == null || !player.isOnline() || player.getWorld() != location.getWorld()) {
 				// this.receivers().remove(player);
@@ -84,7 +83,7 @@ public class PartialParticleBuilder extends ParticleBuilder {
 			}
 			*/
 			ParticleManager.addParticleToQueue(this.particle(), player, location.getX(), location.getY(), location.getZ(),
-					this.count(), this.offsetX(), this.offsetY(), this.offsetZ(), this.extra(), this.data(), this.force());
+				this.count(), this.offsetX(), this.offsetY(), this.offsetZ(), this.extra(), this.data(), this.force());
 		}
 		return this;
 	}

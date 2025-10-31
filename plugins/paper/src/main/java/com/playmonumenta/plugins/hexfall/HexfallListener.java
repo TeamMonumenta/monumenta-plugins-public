@@ -134,7 +134,7 @@ public class HexfallListener implements Listener {
 		event.getPlayer().getWorld().getEntities().stream().filter(entity -> entity.getScoreboardTags().contains("DHFFlawless")).forEach(entity -> entity.removeScoreboardTag("DHFFlawless"));
 	}
 
-	@EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void entityResurrectEvent(EntityResurrectEvent event) {
 		if (event.getEntity() instanceof Player player) {
 			event.setCancelled(true);

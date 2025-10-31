@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -26,7 +27,7 @@ public class PestilenceTesseract implements Enchantment {
 	private static final int MAX_LIFETIME_SECONDS = 60;
 	private static final double EFFECT_RADIUS = 5;
 	private static final double PARTICLE_RING_HEIGHT = 1.0;
-	private static final Collection<Map.Entry<Double, ParticleUtils.SpawnParticleAction>> PARTICLES = Arrays.asList(new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.4, (Location loc) -> new PartialParticle(Particle.CRIT, loc, 1, 0, 0, 0, 0).spawnFull()));
+	private static final Collection<Map.Entry<Double, ParticleUtils.SpawnParticleAction>> PARTICLES = List.of(new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.4, (Location loc) -> new PartialParticle(Particle.CRIT, loc, 1, 0, 0, 0, 0).spawnFull()));
 
 	@Override
 	public String getName() {

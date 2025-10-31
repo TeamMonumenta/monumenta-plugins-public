@@ -24,7 +24,8 @@ public class SerializationUtils {
 
 	@FunctionalInterface
 	public interface BossConstructor {
-		@Nullable BossAbilityGroup run(Location spawnLoc, Location endLoc);
+		@Nullable
+		BossAbilityGroup run(Location spawnLoc, Location endLoc);
 	}
 
 	public static @Nullable BossAbilityGroup statefulBossDeserializer(LivingEntity boss, String identityTag,
@@ -39,14 +40,14 @@ public class SerializationUtils {
 		JsonObject object = gson.fromJson(content, JsonObject.class);
 
 		if (!(object.has("spawnX") && object.has("spawnY") && object.has("spawnZ") &&
-		        object.has("endX") && object.has("endY") && object.has("endZ"))) {
+			object.has("endX") && object.has("endY") && object.has("endZ"))) {
 			throw new Exception("Failed to instantiate " + identityTag + ": missing required data element");
 		}
 
 		Location spawnLoc = new Location(boss.getWorld(), object.get("spawnX").getAsDouble(),
-		                                 object.get("spawnY").getAsDouble(), object.get("spawnZ").getAsDouble());
+			object.get("spawnY").getAsDouble(), object.get("spawnZ").getAsDouble());
 		Location endLoc = new Location(boss.getWorld(), object.get("endX").getAsDouble(),
-		                               object.get("endY").getAsDouble(), object.get("endZ").getAsDouble());
+			object.get("endY").getAsDouble(), object.get("endZ").getAsDouble());
 
 		return constructor.run(spawnLoc, endLoc);
 	}

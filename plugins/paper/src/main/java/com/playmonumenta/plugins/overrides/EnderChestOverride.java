@@ -16,11 +16,9 @@ public class EnderChestOverride extends BaseOverride {
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
 		if (player == null || player.getGameMode() == GameMode.CREATIVE) {
 			return true;
-		} else if (player.getGameMode() == GameMode.SURVIVAL && ZoneUtils.isInPlot(player)) {
-			return true;
+		} else {
+			return player.getGameMode() == GameMode.SURVIVAL && ZoneUtils.isInPlot(player);
 		}
-
-		return false;
 	}
 
 	@Override

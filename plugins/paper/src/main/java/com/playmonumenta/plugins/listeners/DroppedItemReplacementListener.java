@@ -63,7 +63,7 @@ public class DroppedItemReplacementListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void serverResourcesReloadedEvent (ServerResourcesReloadedEvent event) {
+	public void serverResourcesReloadedEvent(ServerResourcesReloadedEvent event) {
 		// Force items to reload on the next item drop
 		mReplacementItems = null;
 	}

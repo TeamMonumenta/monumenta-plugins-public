@@ -3,10 +3,9 @@ package com.playmonumenta.plugins.delves.abilities;
 import com.playmonumenta.plugins.bosses.bosses.BarrierBoss;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 

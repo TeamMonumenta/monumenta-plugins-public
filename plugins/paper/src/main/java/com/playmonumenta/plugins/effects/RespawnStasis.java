@@ -213,16 +213,16 @@ public class RespawnStasis extends Stasis {
 			// For the first 10 seconds, show hint on how to repair gear if shattered
 			if (mShatter == 1) {
 				player.sendActionBar(Component.text("You will take ", NamedTextColor.GOLD)
-						.append(Component.text(StringUtils.multiplierToPercentage(Shattered.getMultiplier(mShatterLevel)) + "% more damage", NamedTextColor.RED))
-						.append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
-						.append(Component.text("collecting your grave", NamedTextColor.AQUA))
-						.append(Component.text("!", NamedTextColor.GOLD)));
+					.append(Component.text(StringUtils.multiplierToPercentage(Shattered.getMultiplier(mShatterLevel)) + "% more damage", NamedTextColor.RED))
+					.append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
+					.append(Component.text("collecting your grave", NamedTextColor.AQUA))
+					.append(Component.text("!", NamedTextColor.GOLD)));
 			} else {
 				player.sendActionBar(Component.text("You will take ", NamedTextColor.GOLD)
-						.append(Component.text(StringUtils.multiplierToPercentage(Shattered.getMultiplier(mShatterLevel)) + "% more damage", NamedTextColor.RED))
-						.append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
-						.append(Component.text("using anvils on it", NamedTextColor.AQUA))
-						.append(Component.text("!", NamedTextColor.GOLD)));
+					.append(Component.text(StringUtils.multiplierToPercentage(Shattered.getMultiplier(mShatterLevel)) + "% more damage", NamedTextColor.RED))
+					.append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
+					.append(Component.text("using anvils on it", NamedTextColor.AQUA))
+					.append(Component.text("!", NamedTextColor.GOLD)));
 			}
 			mRemoveActionbar = false;
 		} else if (getDuration() >= DURATION / 2) {

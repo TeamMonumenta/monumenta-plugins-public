@@ -51,6 +51,7 @@ public class TranscendentPunch implements PlayerPunch {
 			int mT = 0;
 			float mTridentPitch = 0.0f;
 			float mPufferPitch = 0.0f;
+
 			@Override
 			public void run() {
 				mT++;

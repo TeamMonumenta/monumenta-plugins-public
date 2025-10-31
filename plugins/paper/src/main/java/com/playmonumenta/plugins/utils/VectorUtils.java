@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
  * of any particle design (lines, arcs, helixes, etc.) on the<br>
  * specified axis.<br>
  * Order of rotation (IMPORTANT): Z-axis, X-Axis, Y-axis
- *
+ * <p>
  * (Now also does other things.)
  *
  * @author NickNackGus

@@ -93,7 +93,7 @@ public class Skirmisher extends Ability {
 
 			if (event.getAbility() != mInfo.getLinkedSpell() && DamageType.getAllMeleeTypes().contains(event.getType())) {
 				if (EntityUtils.getNearbyMobs(loc, mFriendlyRadius, enemy).size() >= MOB_COUNT_CUTOFF
-					    || (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
+					|| (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
 					event.addUnmodifiableDamage(mGroupedFlatDamage);
 					event.updateDamageWithMultiplier(1 + mGroupedPercentDamage);
 					mCosmetic.aesthetics(mPlayer, loc, world, enemy);

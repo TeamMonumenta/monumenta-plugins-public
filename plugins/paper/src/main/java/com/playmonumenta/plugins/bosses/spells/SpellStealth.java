@@ -6,6 +6,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -13,10 +16,6 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class SpellStealth extends Spell {
 	private final Plugin mPlugin;
@@ -99,7 +98,7 @@ public class SpellStealth extends Spell {
 			// For performance reasons, we don't run this unless the parameter is enabled
 			mActiveTasks.add(new BukkitRunnable() {
 				@Override
-					public void run() {
+				public void run() {
 					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mParameters.PROXIMITY, true, false);
 					if (!players.isEmpty()) {
 						for (Player p : players) {

@@ -26,7 +26,7 @@ public class DropKeyPacketListener extends PacketAdapter {
 
 		PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle digType = packet.getDigType();
 		if (PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle.DROP_ITEM.equals(digType)
-			    || PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle.DROP_ALL_ITEMS.equals(digType)) {
+			|| PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle.DROP_ALL_ITEMS.equals(digType)) {
 			Player player = event.getPlayer();
 			if (player.getGameMode() == GameMode.CREATIVE) {
 				// Allow dropping in creative mode. Accessing the player's game mode should be reasonably thread-safe.

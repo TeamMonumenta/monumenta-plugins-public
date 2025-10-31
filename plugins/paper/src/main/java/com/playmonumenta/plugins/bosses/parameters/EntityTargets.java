@@ -22,47 +22,47 @@ import org.jetbrains.annotations.Nullable;
 public class EntityTargets implements Cloneable {
 
 	/**
-	 *          targetsParam=[   TARGETS
-	 *                                         where: TARGETS ∈ {PLAYER, MOB, ENTITY}
-	 *                             range
-	 *                                         where: range is a double that let you choose the range in where to search for targets
-	 *                                limit=?
-	 *                                         where: ? is in {(number,sorted), (enum,sorted)} &&
-	 *                                             where: sorted ∈ {RANDOM, CLOSER, FARTHER, LOWER_HP, HIGHER_HP, NONE(?)} &&
-	 *                                             where: enum ∈ {ALL, HALF, ONE_QUARTER, ONE_EIGHTH} &&
-	 *                                             where: number ∈ {1,..,TARGERS.size}
-	 *
-	 *                                         the limit will limit the output of entity this param will give, execute after all the filters.
-	 *                                         BY DEFAULT: (ALL,RANDOM)
-	 *
-	 *                                filters=?
-	 *                                         where: ? is a list of enumFilters &&
-	 *                                            where: {
-	 *                                                        if TARGETS == PLAYER :
-	 *                                                               enumFilters ∈ {isStealthed, isMage, isAlch, isRogue, .......}
-	 *                                                        if TARGETS == MOB :
-	 *                                                               enumFilters ∈ {isElite, isBoss, isZombie, notSelf, .....}
-	 *                                                        if TARGETS == ENTITY :
-	 *                                                               enumFilters ∈ {isArmorStand, isMob, isVillager,  ...........}
-	 *                                                   }
-	 *                                        the filters will filter the result of TARGETS so that:
-	 *                                            {for each entity in TARGETS.getTargets(), enitity ∈ filteredList if and only if
-	 *                                                ∀(entity, filter(entity) == true) for all filters ∈ allMatchFilters, allMatchFilters = {filter : filter.anyMatchMode() == false}} AND
-	 *                                                (∃(entity, filter(entity) == true) for all filters ∈ anyMatchFilters, anyMatchFilters = {filter : filter.anyMatchMode() == true} OR anyMatchFilters = Ø)
-	 *                                            (Basically if all the non-mutually exclusive filters pass AND any the mutually exclusive filters pass OR there are no mutually exclusive filters)
-	 *                                tags=?
-	 *                                         where: ? is a list of TagString && ----- work like filters, is considered a mutually exclusive filter BUT entities are only filtered AFTER filtering from `filters=[...], checks for lack of tag if tag starts with "!"
-	 *
-	 *         targetsParam=[TARGETS,range]
-	 *         targetsParam=[TARGETS,range,opt]
-	 *         targetsParam=[TARGETS,range,opt,limit=(..),filters=[..],tags=[..]]
-	 *           TARGETS: must be always the first element
-	 *           range: must be always the second element
-	 *           opt: when there are 3 or more element must always be the third
-	 *           limit=(), filters=[], tags=[]: can be any element 4th or later
-	 *
+	 * targetsParam=[   TARGETS
+	 * where: TARGETS ∈ {PLAYER, MOB, ENTITY}
+	 * range
+	 * where: range is a double that let you choose the range in where to search for targets
+	 * limit=?
+	 * where: ? is in {(number,sorted), (enum,sorted)} &&
+	 * where: sorted ∈ {RANDOM, CLOSER, FARTHER, LOWER_HP, HIGHER_HP, NONE(?)} &&
+	 * where: enum ∈ {ALL, HALF, ONE_QUARTER, ONE_EIGHTH} &&
+	 * where: number ∈ {1,..,TARGERS.size}
+	 * <p>
+	 * the limit will limit the output of entity this param will give, execute after all the filters.
+	 * BY DEFAULT: (ALL,RANDOM)
+	 * <p>
+	 * filters=?
+	 * where: ? is a list of enumFilters &&
+	 * where: {
+	 * if TARGETS == PLAYER :
+	 * enumFilters ∈ {isStealthed, isMage, isAlch, isRogue, .......}
+	 * if TARGETS == MOB :
+	 * enumFilters ∈ {isElite, isBoss, isZombie, notSelf, .....}
+	 * if TARGETS == ENTITY :
+	 * enumFilters ∈ {isArmorStand, isMob, isVillager,  ...........}
+	 * }
+	 * the filters will filter the result of TARGETS so that:
+	 * {for each entity in TARGETS.getTargets(), enitity ∈ filteredList if and only if
+	 * ∀(entity, filter(entity) == true) for all filters ∈ allMatchFilters, allMatchFilters = {filter : filter.anyMatchMode() == false}} AND
+	 * (∃(entity, filter(entity) == true) for all filters ∈ anyMatchFilters, anyMatchFilters = {filter : filter.anyMatchMode() == true} OR anyMatchFilters = Ø)
+	 * (Basically if all the non-mutually exclusive filters pass AND any the mutually exclusive filters pass OR there are no mutually exclusive filters)
+	 * tags=?
+	 * where: ? is a list of TagString && ----- work like filters, is considered a mutually exclusive filter BUT entities are only filtered AFTER filtering from `filters=[...], checks for lack of tag if tag starts with "!"
+	 * <p>
+	 * targetsParam=[TARGETS,range]
+	 * targetsParam=[TARGETS,range,opt]
+	 * targetsParam=[TARGETS,range,opt,limit=(..),filters=[..],tags=[..]]
+	 * TARGETS: must be always the first element
+	 * range: must be always the second element
+	 * opt: when there are 3 or more element must always be the third
+	 * limit=(), filters=[], tags=[]: can be any element 4th or later
+	 * <p>
 	 * DEFAULT TYPE:
-	 *         targetsParam=[TARGETS,range,TRUE,limit=(ALL,RANDOM),filters=[],tags=[]]
+	 * targetsParam=[TARGETS,range,TRUE,limit=(ALL,RANDOM),filters=[],tags=[]]
 	 *
 	 */
 
@@ -101,7 +101,7 @@ public class EntityTargets implements Cloneable {
 			public List<LivingEntity> getTargets(LivingEntity launcher, Location notUsed, double notUsed2) {
 				return List.of(launcher);
 			}
-		};
+		}
 	}
 
 	public interface EntityFilter {
@@ -153,7 +153,7 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return launcher.hasLineOfSight(entity);
 			}
-		};
+		}
 	}
 
 	//-----------------------------------------------------PLAYER FILTERS------------------------------------------------------------------------------------
@@ -263,7 +263,7 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return launcher instanceof Mob mob && entity.equals(mob.getTarget());
 			}
-		};
+		}
 
 	}
 
@@ -320,7 +320,7 @@ public class EntityTargets implements Cloneable {
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
 				return launcher instanceof Mob mob && entity.equals(mob.getTarget());
 			}
-		};
+		}
 
 	}
 
@@ -407,7 +407,7 @@ public class EntityTargets implements Cloneable {
 					}
 					return 0;
 				}
-			};
+			}
 		}
 
 		public enum SORTING implements SortingInterface {
@@ -467,7 +467,7 @@ public class EntityTargets implements Cloneable {
 						return Double.compare(e2Health, e1Health);
 					});
 				}
-			};
+			}
 		}
 
 		private final @Nullable LIMITSENUM mLimitEnum;
@@ -594,17 +594,22 @@ public class EntityTargets implements Cloneable {
 				for (EntityFilter filter : mFilters) {
 					if (filter.anyMatchType()) {
 						hasModeAny = true;
-						if (filter.filter(boss, entity)) modeAnyOnePassed = true;
+						if (filter.filter(boss, entity)) {
+							modeAnyOnePassed = true;
+						}
 					} else {
-						if (!filter.filter(boss, entity)) modeAllOneFailed = true;
+						if (!filter.filter(boss, entity)) {
+							modeAllOneFailed = true;
+						}
 					}
 				}
 
 				return modeAllOneFailed || (hasModeAny && !modeAnyOnePassed);
 			});
 		}
-		if (!mTagsFilter.mTags.isEmpty())
+		if (!mTagsFilter.mTags.isEmpty()) {
 			list.removeIf(entity -> !mTagsFilter.filter(boss, entity));
+		}
 
 		return mLimit.sort(loc, list);
 	}

@@ -58,7 +58,7 @@ public class BossPhasesList {
 		mPhases.removeIf(phase -> phase.onFlag(boss, key, state) && !phase.isReusable());
 	}
 
-	public void onShoot(LivingEntity boss){
+	public void onShoot(LivingEntity boss) {
 		mPhases.removeIf(phase -> phase.onShoot(boss) && !phase.isReusable());
 	}
 

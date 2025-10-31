@@ -85,6 +85,7 @@ public abstract class Spell implements Cloneable {
 
 	/**
 	 * Checks if the spell should persist after a phase change
+	 *
 	 * @return True if spell should not cancel on phase change
 	 */
 	public boolean persistOnPhaseChange() {

@@ -117,7 +117,8 @@ public class VesperidysBlockPlacerBoss extends BossAbilityGroup {
 									mVesperidys.mAnticheese.mIgnored.add(block);
 
 									new BukkitRunnable() {
-										@Override public void run() {
+										@Override
+										public void run() {
 											mVesperidys.mAnticheese.mIgnored.remove(block);
 										}
 									}.runTaskLater(mMonuPlugin, 5 * 20);

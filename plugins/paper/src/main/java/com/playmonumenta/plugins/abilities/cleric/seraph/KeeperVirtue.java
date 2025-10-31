@@ -30,6 +30,12 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -41,12 +47,6 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 
 public class KeeperVirtue extends Ability implements AbilityWithHealthBar, AbilityWithDuration {
 	private static final int VIRTUE_COOLDOWN = 20 * 20;
@@ -205,6 +205,7 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 				int mTicksElapsed = 0;
 				double mRadian = FastUtils.randomDoubleInRange(0, Math.PI);
 				int mHeals = 0;
+
 				@Override
 				public void run() {
 					if (mBoss == null || !mBoss.isValid() || !mPlayer.isValid() || !mPlayer.isOnline() || mBoss.getWorld() != mPlayer.getWorld()) {

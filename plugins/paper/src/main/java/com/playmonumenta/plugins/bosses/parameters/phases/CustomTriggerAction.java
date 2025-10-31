@@ -13,7 +13,8 @@ public class CustomTriggerAction implements Action {
 		mKeyTrigger = key;
 	}
 
-	@Override public void runAction(LivingEntity boss) {
+	@Override
+	public void runAction(LivingEntity boss) {
 		PhasesManagerBoss phaseManagerBoss = BossManager.getInstance().getBoss(boss, PhasesManagerBoss.class);
 		if (phaseManagerBoss != null) {
 			phaseManagerBoss.onCustomTrigger(mKeyTrigger);

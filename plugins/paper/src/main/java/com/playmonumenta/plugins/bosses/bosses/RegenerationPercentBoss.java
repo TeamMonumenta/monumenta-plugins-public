@@ -7,10 +7,9 @@ import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.List;
 
 public class RegenerationPercentBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_regeneration_percent";
@@ -35,6 +34,7 @@ public class RegenerationPercentBoss extends BossAbilityGroup {
 	}
 
 	int interruptionCycles = 0;
+
 	public void setInterruptionCycles(int cycles) {
 		if (cycles <= 0) {
 			// don't want it to be negative
@@ -47,7 +47,7 @@ public class RegenerationPercentBoss extends BossAbilityGroup {
 	public RegenerationPercentBoss(final Plugin plugin, final LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		final RegenerationPercentBoss.Parameters p = BossParameters.getParameters(mBoss, identityTag, new RegenerationPercentBoss.Parameters());
-			List<Spell> passiveSpells = List.of(
+		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				if (!mBoss.isDead()) {
 					if (interruptionCycles <= 0) {
@@ -83,8 +83,7 @@ public class RegenerationPercentBoss extends BossAbilityGroup {
 		final RegenerationPercentBoss.Parameters p = BossParameters.getParameters(mBoss, identityTag, new RegenerationPercentBoss.Parameters());
 		if (p.DOT_INTERRUPTS) {
 			setInterruptionCycles(p.INTERRUPTION_TICKS / p.TICKS_PER_HEAL);
-		}
-		else {
+		} else {
 			// Interrupt the healing for this many cycles if the damage is not DoT
 			if (event.getAbility() == null) {
 				// If it's not from an ability, check for thorns/fire/etc.

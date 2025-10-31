@@ -330,7 +330,7 @@ public class CreateGuildCommand {
 				}
 
 				Component announcementMessage = Component.text(
-					"A new guild has just been founded. Say hello to ",
+						"A new guild has just been founded. Say hello to ",
 						NamedTextColor.WHITE,
 						TextDecoration.BOLD)
 					.append(Component.text(guildName, guildColor)

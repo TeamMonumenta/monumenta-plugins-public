@@ -52,7 +52,9 @@ public final class SpellTitanicRupture extends Spell {
 	private final World mWorld;
 	private final List<Location> mTargetLocations = new ArrayList<>();
 	private final ChargeUpManager mChargeManager;
-	/** Stores references to growables that are in progress */
+	/**
+	 * Stores references to growables that are in progress
+	 */
 	private final List<GrowableProgress> mGrowables = new ArrayList<>();
 
 	private boolean mCooldown = false;

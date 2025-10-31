@@ -76,7 +76,7 @@ public class MuddyShriek extends Spell {
 
 	@Override
 	public void run() {
-		EntityUtils.selfRoot(mBoss, (int) (TELEGRAPH_DURATION + SPREAD_STEP_DELAY * CONE_RANGE));
+		EntityUtils.selfRoot(mBoss, TELEGRAPH_DURATION + SPREAD_STEP_DELAY * CONE_RANGE);
 
 		List<Player> possibleTargets = PlayerUtils.playersInRange(mBoss.getLocation(), 20, true);
 		if (possibleTargets.isEmpty()) {
@@ -105,13 +105,13 @@ public class MuddyShriek extends Spell {
 				Vector direction = VectorUtils.rotateYAxis(minAngle.clone().normalize(), parameter * CONE_ANGLE * 2).multiply(CONE_RANGE + 2);
 				builder.location(center.clone().add(direction));
 			})
-				.count((int)(CONE_ANGLE * 4))
+				.count(CONE_ANGLE * 4)
 				.spawnAsBoss();
 			new PPParametric(Particle.WAX_ON, center, (parameter, builder) -> {
 				Vector direction = VectorUtils.rotateYAxis(minAngle.clone().normalize(), parameter * CONE_ANGLE * 2).multiply(CONE_RANGE + 2);
 				builder.location(center.clone().add(direction));
 			})
-				.count((int)(CONE_ANGLE * 4))
+				.count(CONE_ANGLE * 4)
 				.spawnAsBoss();
 		}
 
@@ -201,6 +201,6 @@ public class MuddyShriek extends Spell {
 
 	@Override
 	public int cooldownTicks() {
-		return (int) (30 + TELEGRAPH_DURATION + SPREAD_STEP_DELAY * CONE_RANGE + mCooldownModifier);
+		return 30 + TELEGRAPH_DURATION + SPREAD_STEP_DELAY * CONE_RANGE + mCooldownModifier;
 	}
 }

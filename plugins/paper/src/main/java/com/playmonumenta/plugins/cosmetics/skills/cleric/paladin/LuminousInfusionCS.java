@@ -72,12 +72,12 @@ public class LuminousInfusionCS implements CosmeticSkill {
 		new PartialParticle(Particle.FIREWORKS_SPARK, loc, (int) (ratio * 100), 0.05f, 0.03f, 0.05f, 0.05 * radius).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.FLAME, loc, (int) (ratio * 75), 0.05f, 0.05f, 0.03f, 0.15).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.4f * volumeScaling, 1.1f);
-		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 1.0f * volumeScaling, 1.1f);
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, volumeScaling, 1.1f);
 		world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 2.0f * volumeScaling, 0.1f);
 		world.playSound(loc, Sound.BLOCK_GRINDSTONE_USE, SoundCategory.PLAYERS, 0.8f * volumeScaling, 0.1f);
 		world.playSound(loc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 0.8f * volumeScaling, 0.6f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 0.8f * volumeScaling, 0.1f);
-		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 1.0f * volumeScaling, 0.6f);
+		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, volumeScaling, 0.6f);
 		world.playSound(loc, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.1f * volumeScaling, 1.1f);
 
 		new BukkitRunnable() {

@@ -35,8 +35,8 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-				"These twin fireworks will make",
-				"a spectacle out of your target!");
+			"These twin fireworks will make",
+			"a spectacle out of your target!");
 	}
 
 	@Override

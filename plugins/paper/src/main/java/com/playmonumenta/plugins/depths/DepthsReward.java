@@ -2,13 +2,12 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 
-public class DepthsReward {
+/**
+ * A record of what kind of reward this room gives
+ *
+ * @param mRewardType What type of reward this room gives
+ * @param mForceLevel 0 for not forced
+ */
+public record DepthsReward(DepthsRewardType mRewardType, int mForceLevel) {
 
-	public final DepthsRewardType mRewardType;
-	public final int mForceLevel; // 0 for not forced
-
-	public DepthsReward(DepthsRewardType rewardType, int forceLevel) {
-		mRewardType = rewardType;
-		mForceLevel = forceLevel;
-	}
 }

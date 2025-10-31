@@ -87,6 +87,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		new BukkitRunnable() {
 			int mT = 0;
 			final Location mPlayerLocation = mPlayer.getLocation();
+
 			@Override
 			public void run() {
 				if (mProjectiles.get(proj) != playerItemStats) {
@@ -167,6 +168,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		ClientModHandler.updateAbility(mPlayer, this);
 		mTotemTickingRunnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				Location standLocation = stand.getLocation();

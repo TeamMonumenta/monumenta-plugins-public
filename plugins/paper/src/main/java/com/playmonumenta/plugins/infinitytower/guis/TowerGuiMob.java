@@ -95,7 +95,6 @@ public class TowerGuiMob extends CustomInventory {
 	}
 
 
-
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);

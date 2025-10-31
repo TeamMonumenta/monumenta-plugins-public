@@ -20,9 +20,9 @@ public class TablistCommand {
 				})
 			)
 			.withSubcommand(new CommandAPICommand("remove").withPermission(perms)
-			.executes((sender, args) -> {
-				TABIntegration.removeFakePlayers();
-			}))
+				.executes((sender, args) -> {
+					TABIntegration.removeFakePlayers();
+				}))
 			.register();
 	}
 }

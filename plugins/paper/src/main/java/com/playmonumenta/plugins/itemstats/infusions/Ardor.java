@@ -35,14 +35,14 @@ public class Ardor implements Infusion {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER) {
 			player.playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1, 0.8f);
-		    if (player.isInWaterOrBubbleColumn()) {
-		        int currAir = player.getRemainingAir();
-		        player.setRemainingAir(Math.min(300, currAir + (int) (AIR_INCREASE * value)));
-		    } else {
+			if (player.isInWaterOrBubbleColumn()) {
+				int currAir = player.getRemainingAir();
+				player.setRemainingAir(Math.min(300, currAir + (int) (AIR_INCREASE * value)));
+			} else {
 				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME,
 					new PercentSpeed(DURATION, getMovementSpeedBonus(value),
 						PERCENT_SPEED_EFFECT_NAME));
-		    }
+			}
 		}
 	}
 

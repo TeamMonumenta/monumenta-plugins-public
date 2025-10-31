@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.EnumSet;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
@@ -13,8 +14,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
-
-import java.util.EnumSet;
 
 public class Harpoon implements Enchantment {
 	private static final float KB_VEL_BASE = 0.6f;

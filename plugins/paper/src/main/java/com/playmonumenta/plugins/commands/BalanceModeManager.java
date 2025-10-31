@@ -4,7 +4,13 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.itemstats.enums.*;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.ItemType;
+import com.playmonumenta.plugins.itemstats.enums.Masterwork;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MasterworkUtils;
@@ -14,8 +20,9 @@ import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import dev.jorel.commandapi.CommandAPICommand;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -169,7 +176,7 @@ public class BalanceModeManager {
 						obOp("op6", oData.get("ppc" + regionString).getAsFloat(), sqrtOrZero(projProtScore)),
 						obOp("op7", oData.get("mapc" + regionString).getAsFloat(), sqrtOrZero(magicProtScore)),
 						obOp("op8", oData.get("bpc" + regionString).getAsFloat(), sqrtOrZero(blastProtScore))
-						),
+					),
 					oData.get("pc").getAsFloat())),
 			oData.get("fc1").getAsFloat() / oData.get("fc2").getAsFloat());
 
@@ -567,7 +574,7 @@ public class BalanceModeManager {
 	}
 
 	private float getBudget(ItemStack item, JsonObject oData) {
-		float[] r3MwBudgets = new float[] {
+		float[] r3MwBudgets = new float[]{
 			oData.get("budget0").getAsFloat(), oData.get("budget1").getAsFloat(),
 			oData.get("budget2").getAsFloat(), oData.get("budget3").getAsFloat(),
 			oData.get("budget4").getAsFloat(), oData.get("budget5").getAsFloat(),

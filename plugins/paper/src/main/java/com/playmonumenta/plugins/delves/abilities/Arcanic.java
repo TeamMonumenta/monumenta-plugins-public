@@ -7,9 +7,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-
 import java.util.Arrays;
-
 import net.kyori.adventure.text.Component;
 import org.bukkit.Particle;
 import org.bukkit.Sound;

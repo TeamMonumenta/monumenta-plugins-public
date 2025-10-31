@@ -5,9 +5,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 public class SpellConditionalTeleport extends Spell {
-	private Entity mLauncher;
-	private Location mDest;
-	private Predicate<Entity> mPredicate;
+	private final Entity mLauncher;
+	private final Location mDest;
+	private final Predicate<Entity> mPredicate;
 
 	public SpellConditionalTeleport(Entity launcher, Location dest, Predicate<Entity> predicate) {
 		mLauncher = launcher;

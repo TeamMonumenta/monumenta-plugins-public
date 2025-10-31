@@ -80,7 +80,8 @@ public class ZenithLoot {
 
 	/**
 	 * Generates loot at the loot room location for the given treasure score
-	 * @param loc loot room spawn location
+	 *
+	 * @param loc           loot room spawn location
 	 * @param treasureScore amount of loot to spawn
 	 */
 	public static void generateLoot(Location loc, int treasureScore, Player p, boolean trophy, int ascensionLevel, boolean victory) {

@@ -110,6 +110,7 @@ public class SteelWingHawk extends Quarry {
 
 			new BukkitRunnable() {
 				int mT = 0;
+
 				@Override
 				public void run() {
 					if (mT >= 60 * 20 || !mBoss.isValid()) {

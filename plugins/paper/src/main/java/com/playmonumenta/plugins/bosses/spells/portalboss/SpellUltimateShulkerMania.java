@@ -108,11 +108,10 @@ public class SpellUltimateShulkerMania extends Spell {
 
 	@Override
 	public void bossProjectileHit(ProjectileHitEvent event) {
-		if (event.getEntity() instanceof ShulkerBullet && event.getHitEntity() instanceof Player) {
+		if (event.getEntity() instanceof ShulkerBullet && event.getHitEntity() instanceof Player p) {
 			event.setCancelled(true);
 			event.getEntity().remove();
 
-			Player p = (Player) event.getHitEntity();
 			if (p == null) {
 				return;
 			}

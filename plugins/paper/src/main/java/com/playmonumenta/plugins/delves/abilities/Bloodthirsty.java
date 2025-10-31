@@ -14,9 +14,9 @@ public class Bloodthirsty {
 	public static final String AVOID_BLOODTHIRSTY = "boss_bloodthirstyimmune";
 
 	public static Component[] rankDescription(int level) {
-			return new Component[] {
-				Component.text("Enemies have a " + Math.round(100 * BLOODTHIRSTY_CHANCE_PER_LEVEL * level) + "% chance to be Bloodthirsty.")
-			};
+		return new Component[]{
+			Component.text("Enemies have a " + Math.round(100 * BLOODTHIRSTY_CHANCE_PER_LEVEL * level) + "% chance to be Bloodthirsty.")
+		};
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {

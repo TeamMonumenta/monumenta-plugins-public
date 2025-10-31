@@ -76,8 +76,6 @@ public class TowerManager implements Listener {
 	}
 
 
-
-
 	//------------------------EVENTS-----------------------------------
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public static void onPlayerQuit(PlayerQuitEvent event) {

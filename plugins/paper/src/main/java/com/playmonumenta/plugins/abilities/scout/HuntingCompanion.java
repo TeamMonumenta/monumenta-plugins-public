@@ -96,16 +96,16 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 	public static final String CHARM_EAGLES = "Hunting Companion Eagles";
 
 	public static final AbilityInfo<HuntingCompanion> INFO =
-			new AbilityInfo<>(HuntingCompanion.class, "Hunting Companion", HuntingCompanion::new)
-					.linkedSpell(ClassAbility.HUNTING_COMPANION)
-					.scoreboardId("HuntingCompanion")
-					.shorthandName("HC")
-					.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-					.simpleDescription("Summon a fox to help you fight and stun mobs.")
-					.cooldown(COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HuntingCompanion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
-							AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-					.displayItem(Material.SWEET_BERRIES);
+		new AbilityInfo<>(HuntingCompanion.class, "Hunting Companion", HuntingCompanion::new)
+			.linkedSpell(ClassAbility.HUNTING_COMPANION)
+			.scoreboardId("HuntingCompanion")
+			.shorthandName("HC")
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
+			.simpleDescription("Summon a fox to help you fight and stun mobs.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HuntingCompanion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
+				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.displayItem(Material.SWEET_BERRIES);
 
 	private final HashMap<Mob, LivingEntity> mSummons;
 	private final double mDamageFraction;
@@ -406,9 +406,7 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 				Block block1 = block.getRelative(BlockFace.UP);
 				if (!block1.isSolid()) {
 					Block block2 = block1.getRelative(BlockFace.UP);
-					if (!block2.isSolid()) {
-						return true;
-					}
+					return !block2.isSolid();
 				}
 			}
 		}

@@ -36,7 +36,7 @@ public class SpellRage extends SpellBaseAoE {
 	public ParticlesList mParticleFinish;
 
 	public SpellRage(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown, int buffDuration, double strengthAmount, double speedAmount, double kbrAmount, boolean ccImmune, boolean canMoveWhileCasting,
-					 SoundsList soundCharge, ParticlesList particleCharge, ParticlesList particleChargeCircle, SoundsList soundFinish, ParticlesList particleFinish, ParticlesList particleFinishCircle) {
+	                 SoundsList soundCharge, ParticlesList particleCharge, ParticlesList particleChargeCircle, SoundsList soundFinish, ParticlesList particleFinish, ParticlesList particleFinishCircle) {
 		super(plugin, launcher, radius, time, cooldown, canMoveWhileCasting, Sound.UI_TOAST_OUT);
 		mBuffDuration = buffDuration;
 		mSpeedAmount = speedAmount;

@@ -67,9 +67,9 @@ public class RendingRazor extends Ability {
 				"razor and damages enemies in its path.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RendingRazor::cast,
-					new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK)
-						.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
-						.lookDirections(AbilityTrigger.LookDirection.LEVEL)))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK)
+					.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
+					.lookDirections(AbilityTrigger.LookDirection.LEVEL)))
 			.displayItem(Material.SHEARS);
 
 	private final RendingRazorCS mCosmetic;
@@ -163,11 +163,12 @@ public class RendingRazor extends Ability {
 
 	/**
 	 * Note: The below is now a lie since straight mode was more fun during testing<br>
-     * Implementation of a <a href="https://mathworld.wolfram.com/TeardropCurve.html">teardrop curve</a> as a
+	 * Implementation of a <a href="https://mathworld.wolfram.com/TeardropCurve.html">teardrop curve</a> as a
 	 * parameterized function in the XZ plane
-     * @param t Current time the razor has been active in ticks
-     * @return Vector describing the razor's current position on the curve
-     */
+	 *
+	 * @param t Current time the razor has been active in ticks
+	 * @return Vector describing the razor's current position on the curve
+	 */
 	private Vector tearDropCalc(final int t, final double range, final double razorDuration) {
 		final double initLoc = 0 * Math.PI;
 		final double radians = -2 * Math.PI * t / razorDuration;

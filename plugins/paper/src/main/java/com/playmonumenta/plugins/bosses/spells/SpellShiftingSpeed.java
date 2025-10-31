@@ -11,7 +11,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class SpellShiftingSpeed extends Spell {
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 
 	public SpellShiftingSpeed(LivingEntity boss) {
 		mBoss = boss;

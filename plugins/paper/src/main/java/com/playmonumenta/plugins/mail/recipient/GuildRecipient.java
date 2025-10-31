@@ -140,6 +140,7 @@ public class GuildRecipient implements Recipient {
 
 	/**
 	 * Creates a guild recipient; this should only be used by the GuildArguments LuckPerms listener
+	 *
 	 * @param guildId The numeric guild plot ID for the guild
 	 * @param guild   The guild's root group
 	 */
@@ -186,6 +187,7 @@ public class GuildRecipient implements Recipient {
 
 	/**
 	 * This should only be used by the GuildArguments LuckPerms listener to update existing recipients it manages
+	 *
 	 * @param guildRoot The updated guild group, if it exists
 	 */
 	public void updateGuildRoot(@Nullable Group guildRoot) {

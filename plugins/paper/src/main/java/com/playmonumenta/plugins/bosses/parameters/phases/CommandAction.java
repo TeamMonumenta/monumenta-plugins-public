@@ -21,8 +21,8 @@ public class CommandAction implements Action {
 		if (boss.isDead()) {
 			// If a mob has died, can't execute a command as them. Instead, run this as the server but positioned where the mob was located
 			cmdStr = "execute in " + (boss.getWorld() == Bukkit.getWorlds().get(0) ? "minecraft:overworld" : boss.getWorld().getName()) +
-			         " positioned " + boss.getX() + " " + boss.getY() + " " + boss.getZ() +
-			         " run " + mCommand;
+				" positioned " + boss.getX() + " " + boss.getY() + " " + boss.getZ() +
+				" run " + mCommand;
 			Plugin.getInstance().getLogger().finer("Running command for dead boss as server '" + boss.getName() + "': " + cmdStr);
 			NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmdStr);
 		} else if (boss.getWorld().getEntity(boss.getUniqueId()) == null) {

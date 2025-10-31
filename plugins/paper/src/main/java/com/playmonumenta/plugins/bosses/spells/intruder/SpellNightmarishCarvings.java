@@ -217,22 +217,22 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 			extra -> new PercentDamageDealt(BUFF_DURATION, 0.15 + extra),
 			extra ->
 				MessagingUtils.fromMiniMessage("<color:gray>The carving strengthens both you and the <obfuscated>lxxxxxxx</obfuscated>.</color>\n").append(
-				Component.text(String.format("+%d%% Damage.", (int) (15 + extra * 100)), TextColor.color(0xb80217))
-			),
+					Component.text(String.format("+%d%% Damage.", (int) (15 + extra * 100)), TextColor.color(0xb80217))
+				),
 			TextColor.color(0xb80217)),
 		RESISTANCE(true, true,
 			extra -> new PercentDamageReceived(BUFF_DURATION, -0.15 - extra / 2),
 			extra ->
 				MessagingUtils.fromMiniMessage("<color:gray>The carving fortifies both you and the <obfuscated>lxxxxxxx</obfuscated>.</color>\n").append(
-				Component.text(String.format("+%d%% Resistance.", (int) (15 + extra * 50)), TextColor.color(0x7b0fff))
-			),
+					Component.text(String.format("+%d%% Resistance.", (int) (15 + extra * 50)), TextColor.color(0x7b0fff))
+				),
 			TextColor.color(0x7b0fff)),
 		SPEED(true, true,
 			extra -> new PercentSpeed(BUFF_DURATION, 0.15 + extra, "NightmarishCarvings"),
 			extra ->
 				MessagingUtils.fromMiniMessage("<color:gray>The carving accelerates both you and the <obfuscated>lxxxxxxx</obfuscated>.</color>\n").append(
-				Component.text(String.format("+%d%% Speed.", (int) (15 + extra * 100)), TextColor.color(0x0fefff))
-			),
+					Component.text(String.format("+%d%% Speed.", (int) (15 + extra * 100)), TextColor.color(0x0fefff))
+				),
 			TextColor.color(0x0fefff)),
 
 		// Last one
@@ -240,22 +240,22 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 			extra -> new PercentHeal(BUFF_DURATION, 0.25),
 			extra ->
 				Component.text("The carving revitalizes you.\n", NamedTextColor.GRAY).append(
-				Component.text(String.format("+%d%% Healing.", 25), TextColor.color(0xfd245e))
-			),
+					Component.text(String.format("+%d%% Healing.", 25), TextColor.color(0xfd245e))
+				),
 			TextColor.color(0xfd245e)),
 		ABILITY_COOLDOWN(false, true,
 			extra -> new AbilityCooldownDecrease(BUFF_DURATION, 0.25),
 			extra ->
 				Component.text("The carving hastens you.\n", NamedTextColor.GRAY).append(
-				Component.text(String.format("-%d%% Ability Cooldown.", 25), TextColor.color(0x8bfe3e))
-			),
+					Component.text(String.format("-%d%% Ability Cooldown.", 25), TextColor.color(0x8bfe3e))
+				),
 			TextColor.color(0x8bfe3e)),
 		REINCARNATION(false, true,
 			extra -> new Reincarnation(BUFF_DURATION, 1),
 			extra ->
 				Component.text("The carving reinforces you.\n", NamedTextColor.GRAY).append(
-				Component.text("You've gained Reincarnation against death...", TextColor.color(0xfe9e11))
-			),
+					Component.text("You've gained Reincarnation against death...", TextColor.color(0xfe9e11))
+				),
 			TextColor.color(0xfe9e11));
 
 		private final boolean mLauncherGetsBuff;

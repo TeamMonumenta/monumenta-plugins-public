@@ -66,7 +66,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	public static final String METADATA_KEY = "PlayerThrowAlchPotionEvent";
 	public static final int MAX_CHARGES = 8;
 	public static final int POTIONS_TIMER_BASE = 2 * 20;
-	private static final int POTIONS_TIMER_TOWN = 1 * 20;
+	private static final int POTIONS_TIMER_TOWN = 20;
 	private static final int IFRAME_BETWEEN_POT = 10;
 	private static final String POTION_SCOREBOARD = "StoredPotions";
 
@@ -84,11 +84,11 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public static final AbilityInfo<AlchemistPotions> INFO =
-			new AbilityInfo<>(AlchemistPotions.class, "Alchemist Potions", AlchemistPotions::new)
-				.hotbarName("A") // Have this as "A" to make it sorted in front of everything (alphabetically)
-				.linkedSpell(ClassAbility.ALCHEMIST_POTION)
-				.description(getDescription())
-				.canUse(player -> AbilityUtils.getClassNum(player) == Alchemist.CLASS_ID);
+		new AbilityInfo<>(AlchemistPotions.class, "Alchemist Potions", AlchemistPotions::new)
+			.hotbarName("A") // Have this as "A" to make it sorted in front of everything (alphabetically)
+			.linkedSpell(ClassAbility.ALCHEMIST_POTION)
+			.description(getDescription())
+			.canUse(player -> AbilityUtils.getClassNum(player) == Alchemist.CLASS_ID);
 
 	public final GruesomeAlchemyCS mCosmetic;
 	private boolean mHasGruesomeAlchemy = false;

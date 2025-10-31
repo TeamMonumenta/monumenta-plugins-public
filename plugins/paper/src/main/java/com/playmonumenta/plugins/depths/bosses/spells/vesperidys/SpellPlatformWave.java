@@ -76,7 +76,8 @@ public class SpellPlatformWave extends Spell {
 			int mTicks = 0;
 			int mWave = 0;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				if (mWave >= platformOrder.size()) {
 					this.cancel();
 					return;
@@ -155,11 +156,13 @@ public class SpellPlatformWave extends Spell {
 		}
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return mVesperidys.mSpellCooldowns;
 	}
 
-	@Override public boolean canRun() {
+	@Override
+	public boolean canRun() {
 		return !mOnCooldown && !mVesperidys.mTeleportSpell.mTeleporting;
 	}
 

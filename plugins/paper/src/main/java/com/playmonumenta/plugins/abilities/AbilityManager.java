@@ -652,7 +652,7 @@ public class AbilityManager {
 			if (event.isCancelled()) {
 				return;
 			}
-				abil.onHurt(event, damager, source);
+			abil.onHurt(event, damager, source);
 		}
 	}
 
@@ -686,12 +686,12 @@ public class AbilityManager {
 	}
 
 	public boolean playerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
-										   ThrownPotion potion, PotionSplashEvent event) {
+	                                       ThrownPotion potion, PotionSplashEvent event) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerSplashPotionEvent(affectedEntities, potion, event));
 	}
 
 	public boolean playerSplashedByPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
-											   ThrownPotion potion, PotionSplashEvent event) {
+	                                           ThrownPotion potion, PotionSplashEvent event) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerSplashedByPotionEvent(affectedEntities, potion, event));
 	}
 
@@ -876,9 +876,9 @@ public class AbilityManager {
 			// When blocking with an offhand shield, the client first sends a mainhand click, then an offhand click,
 			// thus we have to ignore the usual click limiter here.
 			if (event.getHand() != null
-				    && player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD
-				    && player.getCooldown(Material.SHIELD) == 0
-				    && MetadataUtils.checkOnceThisTick(mPlugin, player, "BlockTrigger")) {
+				&& player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD
+				&& player.getCooldown(Material.SHIELD) == 0
+				&& MetadataUtils.checkOnceThisTick(mPlugin, player, "BlockTrigger")) {
 				conditionalCast(player, Ability::blockWithShieldEvent);
 			}
 		}
@@ -913,8 +913,8 @@ public class AbilityManager {
 					player.getInventory().getItemInOffHand(),
 					mPlugin.mVanityManager.getData(player).getEquipped(EquipmentSlot.OFF_HAND));
 				if (potentiallyUseableItems.stream()
-					    .anyMatch(item -> item != null && (ItemUtils.isSomePotion(item) || ItemUtils.isProjectileWeapon(item) || item.getType().isBlock()
-						                                       || item.getType() == Material.ENDER_PEARL || item.getType() == Material.ENDER_EYE))) {
+					.anyMatch(item -> item != null && (ItemUtils.isSomePotion(item) || ItemUtils.isProjectileWeapon(item) || item.getType().isBlock()
+						|| item.getType() == Material.ENDER_PEARL || item.getType() == Material.ENDER_EYE))) {
 					MetadataUtils.setMetadata(player, RIGHT_CLICK_TICK_METAKEY, currentTick);
 					MetadataUtils.setMetadata(player, LEFT_CLICK_TICK_METAKEY, currentTick + 2);
 				} else {
@@ -931,8 +931,8 @@ public class AbilityManager {
 		// TODO would be nice if all SQ interactibles would prevent skill activation - but how to do that in general?
 		// Cancelling events cannot be used, as that is used to prevent vanilla actions from occurring. Some custom way to annotate an event as handled by SQ would be needed.
 		if (key == AbilityTrigger.Key.LEFT_CLICK
-			    && player.isSneaking()
-			    && ExperiencinatorUtils.getConfig(player.getLocation(), false).getExperiencinator(player.getInventory().getItemInMainHand()) != null) {
+			&& player.isSneaking()
+			&& ExperiencinatorUtils.getConfig(player.getLocation(), false).getExperiencinator(player.getInventory().getItemInMainHand()) != null) {
 			return false;
 		}
 
@@ -940,8 +940,8 @@ public class AbilityManager {
 		if (playerAbilities.isSilenced()) {
 			// if silenced, just return if any trigger matches (to cancel the swap event properly)
 			return playerAbilities.getAbilitiesIgnoringSilence().stream()
-				       .flatMap(a -> a.mCustomTriggers.stream())
-				       .anyMatch(t -> t.check(player, key));
+				.flatMap(a -> a.mCustomTriggers.stream())
+				.anyMatch(t -> t.check(player, key));
 		}
 
 		boolean foundTrigger = false;
@@ -988,7 +988,7 @@ public class AbilityManager {
 		NavigableSet<AbilitySilence> silence = mPlugin.mEffectManager.getEffects(player, AbilitySilence.class);
 		NavigableSet<Stasis> stasis = mPlugin.mEffectManager.getEffects(player, Stasis.class);
 		int silenceDuration = Stream.concat(silence.stream(), stasis.stream())
-			                      .mapToInt(Effect::getDuration).max().orElse(0);
+			.mapToInt(Effect::getDuration).max().orElse(0);
 		boolean silenced = silenceDuration > 0;
 		if (playerAbilities.isSilenced() != silenced || forceUpdateClientMod) {
 			ClientModHandler.silenced(player, silenceDuration);

@@ -67,6 +67,7 @@ public class SpellRumblingEmergence extends Spell implements CoreElemental.CoreE
 		// Digs underground
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTick = 0;
+
 			@Override
 			public void run() {
 				mBoss.setRotation(mTick * 15, 0);
@@ -135,6 +136,7 @@ public class SpellRumblingEmergence extends Spell implements CoreElemental.CoreE
 			double mDistanceSquared = mBoss.getEyeLocation().distanceSquared(targetLocation);
 			boolean mFirstTick = true;
 			Vector mDirection = LocationUtils.getDirectionTo(target.getLocation(), mBoss.getEyeLocation());
+
 			@Override
 			public void run() {
 				// Effects
@@ -160,7 +162,7 @@ public class SpellRumblingEmergence extends Spell implements CoreElemental.CoreE
 				// Damage player
 				if (mBoss.getBoundingBox().expand(1, 1, 1).overlaps(target.getBoundingBox())) {
 					// Spawn Fire
-					for (Block block: LocationUtils.getNearbyBlocks(mBoss.getLocation().getBlock(), 5)) {
+					for (Block block : LocationUtils.getNearbyBlocks(mBoss.getLocation().getBlock(), 5)) {
 						if (FastUtils.randomDoubleInRange(0, 1) <= 0.2 && block.isSolid()) {
 							Block up = block.getRelative(BlockFace.UP);
 							if (up.isEmpty()) {
@@ -183,7 +185,7 @@ public class SpellRumblingEmergence extends Spell implements CoreElemental.CoreE
 					mActiveRunnables.remove(this);
 				} else if (mBoss.isOnGround() || LocationUtils.collidesWithBlocks(mBoss.getBoundingBox().expand(0.5, 0, 0.5), mBoss.getWorld())) {
 					// Spawn Fire
-					for (Block block: LocationUtils.getNearbyBlocks(mBoss.getLocation().getBlock(), 4)) {
+					for (Block block : LocationUtils.getNearbyBlocks(mBoss.getLocation().getBlock(), 4)) {
 						if (FastUtils.randomDoubleInRange(0, 1) <= 0.15 && block.isSolid()) {
 							Block up = block.getRelative(BlockFace.UP);
 							if (up.isEmpty()) {
@@ -239,13 +241,13 @@ public class SpellRumblingEmergence extends Spell implements CoreElemental.CoreE
 		List<Block> centerBlocks = LocationUtils.getNearbyBlocks(mStartLoc.getBlock(), 5);
 		blocks.removeIf(block ->
 			!(block.getType() == FISSURE_MATERIAL || block.getType() == LAVA_MATERIAL)
-			|| !block.isSolid()
-			|| BlockUtils.isPathBlockingBlock(block.getRelative(BlockFace.UP).getType())
-			|| centerBlocks.contains(block));
+				|| !block.isSolid()
+				|| BlockUtils.isPathBlockingBlock(block.getRelative(BlockFace.UP).getType())
+				|| centerBlocks.contains(block));
 		centerBlocks.removeIf(block ->
 			!(block.getType() == FISSURE_MATERIAL || block.getType() == LAVA_MATERIAL)
-			|| !block.isSolid()
-			|| BlockUtils.isPathBlockingBlock(block.getRelative(BlockFace.UP).getType()));
+				|| !block.isSolid()
+				|| BlockUtils.isPathBlockingBlock(block.getRelative(BlockFace.UP).getType()));
 		if (blocks.isEmpty()) {
 			blocks = centerBlocks;
 		}

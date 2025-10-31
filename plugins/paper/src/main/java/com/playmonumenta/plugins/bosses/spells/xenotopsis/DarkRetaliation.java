@@ -75,10 +75,10 @@ public class DarkRetaliation extends Spell {
 
 		// check if requirements for retaliation are met
 		if (mTicks == 0 && event.getDamager() != null && event.getDamager() instanceof Player player
-				&& mBoss.getLocation().distance(player.getLocation()) > TRIGGER_DISTANCE
-				&& event.getType() != DamageEvent.DamageType.AILMENT
-				&& event.getAbility() != ClassAbility.BRUTAL_ALCHEMY
-				&& event.getType() != DamageEvent.DamageType.THORNS) {
+			&& mBoss.getLocation().distance(player.getLocation()) > TRIGGER_DISTANCE
+			&& event.getType() != DamageEvent.DamageType.AILMENT
+			&& event.getAbility() != ClassAbility.BRUTAL_ALCHEMY
+			&& event.getType() != DamageEvent.DamageType.THORNS) {
 			attackPlayer(player, event.getDamage() * DAMAGE_TRANSFER_PERCENT);
 			mTicks = COOLDOWN;
 		}

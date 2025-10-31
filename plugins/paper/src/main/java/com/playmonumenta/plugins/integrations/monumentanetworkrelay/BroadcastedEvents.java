@@ -506,14 +506,7 @@ public class BroadcastedEvents implements Listener {
 		}
 	}
 
-	public static class EventRequirement {
-		public final String mScoreboard;
-		public final int mStep;
-
-		public EventRequirement(String scoreboard, int step) {
-			mScoreboard = scoreboard;
-			mStep = step;
-		}
+	public record EventRequirement(String mScoreboard, int mStep) {
 	}
 
 	public enum KnownEvent {

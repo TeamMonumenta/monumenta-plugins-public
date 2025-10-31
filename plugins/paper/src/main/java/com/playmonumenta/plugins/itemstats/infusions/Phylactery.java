@@ -52,7 +52,7 @@ public class Phylactery implements Infusion {
 				if (!event.getKeepInventory() && GraveListener.gravesEnabled(player)) {
 					int previousStorage = Math.max(0, ScoreboardUtils.getScoreboardValue(player, GRAVE_XP_SCOREBOARD).orElse(0));
 					ScoreboardUtils.setScoreboardValue(player, GRAVE_XP_SCOREBOARD, previousStorage + savedXp);
-					player.sendMessage(Component.text("" + (int) (100 * value * XP_KEPT) + "% of your experience has been stored. Collect your grave to retrieve it.", NamedTextColor.GOLD));
+					player.sendMessage(Component.text((int) (100 * value * XP_KEPT) + "% of your experience has been stored. Collect your grave to retrieve it.", NamedTextColor.GOLD));
 				} else {
 					newTotalXp += savedXp;
 					int newLevel = ExperienceUtils.getLevel(newTotalXp);

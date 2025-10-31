@@ -21,7 +21,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-
 import java.util.List;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;

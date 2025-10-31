@@ -76,7 +76,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 	);
 	private static final Component bhairaviBackseating = Component.text("[Bhairavi]", NamedTextColor.GOLD)
 		.append(Component.text(" Quickly! Kill those creatures! They will charge the Spear with power and let you claim it!", NamedTextColor.WHITE));
-	private static final Component[] fightDialogue = new Component[] {
+	private static final Component[] fightDialogue = new Component[]{
 		Component.text("I am deeper than the power of Malkus... I shall take you into the nothingness from which you came.", NamedTextColor.DARK_RED),
 		Component.text("The Gates open! Come forth, nithlings!", NamedTextColor.DARK_RED),
 		Component.text("The Gates open once more! Come forth, nithlings!", NamedTextColor.DARK_RED),

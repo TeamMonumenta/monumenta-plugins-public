@@ -71,7 +71,7 @@ public class DeckTheHalls extends Spell {
 
 					//Final particle show
 					for (double r = 0; r < 7; r++) {
-						for (int dir = 0 + mDirection; dir <= 270 + mDirection; dir += 120) {
+						for (int dir = mDirection; dir <= 270 + mDirection; dir += 120) {
 							for (double degree = 60; degree < 120; degree += 5) {
 								double radian1 = Math.toRadians(degree);
 								vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
@@ -104,7 +104,7 @@ public class DeckTheHalls extends Spell {
 				} else {
 					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 2f);
 
-					for (int dir = 0 + mDirection; dir <= 270 + mDirection; dir += 120) {
+					for (int dir = mDirection; dir <= 270 + mDirection; dir += 120) {
 						Vector vec;
 						//The degree range is 60 degrees for 30 blocks radius
 						for (double degree = 60; degree < 120; degree += 5) {

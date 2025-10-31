@@ -101,9 +101,9 @@ public class SoulRend extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (!isOnCooldown()
-			    && event.getType() == DamageType.MELEE
-			    && PlayerUtils.isFallingAttack(mPlayer)
-			    && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
+			&& event.getType() == DamageType.MELEE
+			&& PlayerUtils.isFallingAttack(mPlayer)
+			&& ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();

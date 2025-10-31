@@ -6,8 +6,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 
 public class SpellDrawAggro extends Spell {
-	private LivingEntity mBoss;
-	private double mRadius;
+	private final LivingEntity mBoss;
+	private final double mRadius;
 
 	public SpellDrawAggro(LivingEntity boss, double radius) {
 		mBoss = boss;

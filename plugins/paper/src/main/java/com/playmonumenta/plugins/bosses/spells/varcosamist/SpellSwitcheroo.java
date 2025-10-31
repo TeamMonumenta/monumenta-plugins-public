@@ -102,7 +102,7 @@ public class SpellSwitcheroo extends Spell {
 					new BukkitRunnable() {
 
 						int mT = 0;
-						Location mLoc = mobLoc;
+						final Location mLoc = mobLoc;
 
 						@Override
 						public void run() {

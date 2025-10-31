@@ -366,7 +366,9 @@ public class TowerGame {
 			}
 			new BukkitRunnable() {
 				int mTimes = 0;
-				@Override public void run() {
+
+				@Override
+				public void run() {
 
 					if (mTimes >= 5) {
 						cancel();
@@ -541,7 +543,6 @@ public class TowerGame {
 		player.removeScoreboardTag(TowerConstants.TAG_BOOK);
 
 	}
-
 
 
 }

@@ -141,12 +141,9 @@ public abstract class ExperiencinatorUtils {
 		}
 		// check if the item is not at base masterwork level
 		Masterwork masterwork = ItemStatUtils.getMasterwork(item);
-		if (masterwork != Masterwork.ERROR && masterwork != Masterwork.NONE && ItemStatUtils.getRegion(item) == Region.RING
-			    && masterwork != ItemStatUtils.getMasterwork(MasterworkUtils.getBaseMasterwork(item, player))) {
-			return false;
-		}
+		return masterwork == Masterwork.ERROR || masterwork == Masterwork.NONE || ItemStatUtils.getRegion(item) != Region.RING
+			|| masterwork == ItemStatUtils.getMasterwork(MasterworkUtils.getBaseMasterwork(item, player));
 		// if we get here, the item has no player modifications or other reasons to prevent it from being converted
-		return true;
 	}
 
 	/**
@@ -325,7 +322,7 @@ public abstract class ExperiencinatorUtils {
 					continue;
 				}
 				if (settings.getConversion(region, tier) != conversion.getSettingsId()
-					    && conversion.getSettingsId() > 0) { // conversion not enabled
+					&& conversion.getSettingsId() > 0) { // conversion not enabled
 					continue;
 				}
 				String conversionRateName = conversionRateNames.get(region);
@@ -479,18 +476,18 @@ public abstract class ExperiencinatorUtils {
 		}
 
 		List<ItemStack> items = entities.stream()
-			                        .filter(Entity::isValid)
-			                        .map(e -> e instanceof Item i ? i.getItemStack() : null)
-			                        .filter(Objects::nonNull)
-			                        .toList();
+			.filter(Entity::isValid)
+			.map(e -> e instanceof Item i ? i.getItemStack() : null)
+			.filter(Objects::nonNull)
+			.toList();
 
 		ConversionValues conversionValues = calculateOrConvert(items, player, conversionName, conversionRateName, confirmed);
 
 		if (confirmed) {
 			for (Entity entity : entities) {
 				if (entity instanceof Item item
-					    && item.isValid()
-					    && item.getItemStack().getAmount() == 0) {
+					&& item.isValid()
+					&& item.getItemStack().getAmount() == 0) {
 					item.remove();
 				}
 			}
@@ -500,8 +497,8 @@ public abstract class ExperiencinatorUtils {
 
 			if (messages.isEmpty()) {
 				String message = ServerProperties.getRegion(player) != Region.RING
-					                 ? "No items! Place Tier I through Tier V or Uncommon items on the pedestal in front of you to sell them."
-					                 : "No items! Place Charms or Tier I through Tier III items on the pedestal in front of you to sell them.";
+					? "No items! Place Tier I through Tier V or Uncommon items on the pedestal in front of you to sell them."
+					: "No items! Place Charms or Tier I through Tier III items on the pedestal in front of you to sell them.";
 				player.sendMessage(Component.text(message, NamedTextColor.AQUA));
 				return;
 			}

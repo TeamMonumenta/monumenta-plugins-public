@@ -239,9 +239,9 @@ public class FishingManager implements Listener {
 			FishingParticleListener.suppressFishingParticles(player, fishHook.getLocation());
 			mPlayerMinigameMap.put(player, rollMinigame());
 		} else if (eventProbability < minigameOdds + combatOdds &&
-			           !ZoneUtils.hasZoneProperty(fishHook.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
-			           !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
-			           player.hasPermission(FISH_COMBAT_PERMISSION)) {
+			!ZoneUtils.hasZoneProperty(fishHook.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
+			!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
+			player.hasPermission(FISH_COMBAT_PERMISSION)) {
 			mPlayerPrepCombatList.add(player);
 		}
 	}
@@ -459,13 +459,6 @@ public class FishingManager implements Listener {
 		return Math.random() <= baitInfo.mBait.mReplacementChance;
 	}
 
-	private static class BaitInfo {
-		final Bait mBait;
-		final ItemStack mItemStack;
-
-		public BaitInfo(Bait bait, ItemStack itemStack) {
-			mBait = bait;
-			mItemStack = itemStack;
-		}
+	private record BaitInfo(Bait mBait, ItemStack mItemStack) {
 	}
 }

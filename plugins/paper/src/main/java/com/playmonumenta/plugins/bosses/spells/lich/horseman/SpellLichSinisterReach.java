@@ -172,7 +172,7 @@ public class SpellLichSinisterReach extends Spell {
 				if (mInc < 24 && mInc % 2 == 0) {
 					// Doesn't matter if the player is blocking, there are 12 hits and only one can be blocked
 					DamageUtils.damage(mBoss, p, new DamageEvent.Metadata(DamageEvent.DamageType.TRUE, null,
-							null, SPELL_NAME), 1, true, true, true);
+						null, SPELL_NAME), 1, true, true, true);
 					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SLOWNESS_SRC,
 						new PercentSpeed(TICKS_PER_SECOND, -1.0, SLOWNESS_SRC));
 					new PartialParticle(Particle.CRIT_MAGIC, p.getLocation()).count(15).delta(0.1).extra(0.75).spawnAsEntityActive(mBoss);

@@ -87,7 +87,7 @@ public final class RageOfTheKeter implements Enchantment {
 					.damageTypes(AFFECTED_DAMAGE_TYPES));
 			plugin.mEffectManager.addEffect(player, "KeterExtraSpeed", new PercentSpeed(duration, SPEED_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_SPEED), ATTR_NAME));
 			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()),
-					new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
+				new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
 
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0)).count(20).delta(0.25, 0.5, 0.25).extra(1).data(OLIVE_COLOR).spawnAsPlayerBuff(player);
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0)).count(25).delta(0.25, 0.45, 0.25).extra(1).data(GREEN_COLOR).spawnAsPlayerBuff(player);

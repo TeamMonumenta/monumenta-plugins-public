@@ -57,6 +57,7 @@ public class SpellEarthenCleave extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
 			int mRad = 0;
+
 			@Override
 			public void run() {
 				mT++;

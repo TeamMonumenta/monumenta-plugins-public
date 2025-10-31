@@ -14,14 +14,16 @@ public class HealthTrigger extends Trigger {
 		mHealthPercentage = health;
 	}
 
-	@Override public boolean test(LivingEntity boss) {
+	@Override
+	public boolean test(LivingEntity boss) {
 		double maxHealth = EntityUtils.getMaxHealth(boss);
 		double currentHealth = boss.getHealth();
 
 		return currentHealth / maxHealth <= mHealthPercentage;
 	}
 
-	@Override public void reset(LivingEntity boss) {
+	@Override
+	public void reset(LivingEntity boss) {
 
 	}
 

@@ -35,7 +35,7 @@ public class ScorchedEarthDamage extends Effect {
 	private int mLastDamageTick = 0;
 
 	public ScorchedEarthDamage(final int duration, final double damage, final Player player, final PlayerItemStats stats,
-							   final int fireDuration, final ScorchedEarthCS cosmetic) {
+	                           final int fireDuration, final ScorchedEarthCS cosmetic) {
 		super(duration, effectID);
 		mDamage = damage;
 		mAlchemist = player;
@@ -63,8 +63,8 @@ public class ScorchedEarthDamage extends Effect {
 		}
 
 		if ((type == DamageType.MELEE && event.getDamager() instanceof final Player player && player.getCooledAttackStrength(0.5f) > 0.9)
-				|| (type == DamageType.PROJECTILE && event.getDamager() instanceof final Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, false))
-				|| (type != DamageType.MELEE && type != DamageType.PROJECTILE && event.getDamager() instanceof Player)) {
+			|| (type == DamageType.PROJECTILE && event.getDamager() instanceof final Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, false))
+			|| (type != DamageType.MELEE && type != DamageType.PROJECTILE && event.getDamager() instanceof Player)) {
 			mLastDamageTick = Bukkit.getCurrentTick();
 			DamageUtils.damage(mAlchemist, entity, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.SCORCHED_EARTH, mStats),
 				mDamage, true, false, false);

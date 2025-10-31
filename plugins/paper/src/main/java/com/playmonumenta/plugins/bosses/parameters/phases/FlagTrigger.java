@@ -13,19 +13,23 @@ public class FlagTrigger extends Trigger {
 		mState = startingState;
 	}
 
-	@Override public boolean test(LivingEntity boss) {
+	@Override
+	public boolean test(LivingEntity boss) {
 		return mState;
 	}
 
-	@Override public void reset(LivingEntity boss) {
+	@Override
+	public void reset(LivingEntity boss) {
 
 	}
 
-	@Override public boolean tick(LivingEntity boss, int ticks) {
+	@Override
+	public boolean tick(LivingEntity boss, int ticks) {
 		return mState;
 	}
 
-	@Override public boolean flag(LivingEntity boss, String key, boolean state) {
+	@Override
+	public boolean flag(LivingEntity boss, String key, boolean state) {
 		if (key.equals(mKeyString)) {
 			mState = state;
 			return true;

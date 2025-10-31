@@ -78,6 +78,7 @@ public class ButterflyEffectCS extends TacticalManeuverCS {
 			int mAngleOne = 0;
 			int mAngleTwo = 180;
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if ((mTicks > 5 && PlayerUtils.isOnGroundOrMountIsOnGround(mPlayer)) || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded() || mTicks > 30 * 20) {
@@ -221,6 +222,7 @@ public class ButterflyEffectCS extends TacticalManeuverCS {
 		new BukkitRunnable() {
 			double mRadius = (le.getWidth() / 2) + 0.8;
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mRadius -= 0.2;

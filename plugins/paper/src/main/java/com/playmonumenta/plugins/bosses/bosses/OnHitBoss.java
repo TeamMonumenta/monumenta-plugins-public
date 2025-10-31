@@ -61,7 +61,7 @@ public class OnHitBoss extends BossAbilityGroup {
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (mParams.CAN_BLOCK && event.isBlockedByShield()) {
 			// Attack was blocked
-			event.setEffects(mParams.EFFECTS.mEffectList);
+			event.setEffects(mParams.EFFECTS.mEffectList());
 			return;
 		}
 

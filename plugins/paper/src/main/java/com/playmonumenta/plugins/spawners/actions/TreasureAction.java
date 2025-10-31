@@ -34,7 +34,7 @@ public class TreasureAction extends SpawnerBreakAction {
 		if (ServerProperties.getDepthsEnabled()) {
 			DepthsManager.getInstance().incrementTreasure(spawner.getLocation(), player, treasureCount);
 		} else {
-			MMLog.fine("Tried to give treasure score from invalid spawner! Location: " + spawner.getLocation().toString());
+			MMLog.fine("Tried to give treasure score from invalid spawner! Location: " + spawner.getLocation());
 		}
 	}
 

@@ -70,12 +70,12 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	public static final String CHARM_MARKS = "Sanguine Harvest Marks";
 
 	public static final AbilityInfo<SanguineHarvest> INFO =
-			new AbilityInfo<>(SanguineHarvest.class, "Sanguine Harvest", SanguineHarvest::new)
-					.linkedSpell(ClassAbility.SANGUINE_HARVEST)
-					.scoreboardId("SanguineHarvest")
-					.shorthandName("SH")
-					.actionBarColor(TextColor.color(179, 0, 0))
-					.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
+		new AbilityInfo<>(SanguineHarvest.class, "Sanguine Harvest", SanguineHarvest::new)
+			.linkedSpell(ClassAbility.SANGUINE_HARVEST)
+			.scoreboardId("SanguineHarvest")
+			.shorthandName("SH")
+			.actionBarColor(TextColor.color(179, 0, 0))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Passively apply Bleed with your abilities. Activate to mark mobs, healing whoever kills them.")
 			.quest216Message("-------s-------m-------")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)

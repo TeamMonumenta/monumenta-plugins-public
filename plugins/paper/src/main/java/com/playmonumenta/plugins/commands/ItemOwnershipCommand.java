@@ -27,81 +27,24 @@ public class ItemOwnershipCommand {
 			.withPermission("monumenta.command.itemownership")
 			.withSubcommand(
 				new CommandAPICommand("add")
-				.withSubcommand(
-					new CommandAPICommand("player")
-						.withArguments(playerArg)
-						.executes((sender, args) -> {
-							Player player = args.getByArgument(playerArg);
-							UUID uuid = player.getUniqueId();
-							ItemStack item = player.getInventory().getItemInMainHand();
-							if (!ItemStatUtils.isOwnable(item)) {
-								player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
-								player.sendMessage(Component.text("This item is not a valid item for infusing!", NamedTextColor.RED));
-							} else if (!ItemStatUtils.hasInfusion(item, InfusionType.OWNED)) {
-								int currentExp = ExperienceUtils.getTotalExperience(player);
-								if (currentExp >= ExperienceUtils.LEVEL_30) {
-									ExperienceUtils.setTotalExperience(player, currentExp - ExperienceUtils.LEVEL_30);
-									player.playSound(player, Sound.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1.0f, 1.0f);
-									EntityUtils.fireworkAnimation(player);
-									ItemStatUtils.addInfusion(item, InfusionType.OWNED, 1, uuid);
-									player.sendMessage(Component.text("You have added your Owned infusion on this item.", NamedTextColor.GREEN));
-								} else {
+					.withSubcommand(
+						new CommandAPICommand("player")
+							.withArguments(playerArg)
+							.executes((sender, args) -> {
+								Player player = args.getByArgument(playerArg);
+								UUID uuid = player.getUniqueId();
+								ItemStack item = player.getInventory().getItemInMainHand();
+								if (!ItemStatUtils.isOwnable(item)) {
 									player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
-									player.sendMessage(Component.text("You do not have enough experience points!", NamedTextColor.RED));
-								}
-							} else {
-								player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
-								player.sendMessage(Component.text("This item is already infused with Owned!", NamedTextColor.RED));
-							}
-						})
-				)
-				.withSubcommand(
-					new CommandAPICommand("guild")
-						.withArguments(new TextArgument("guild name").replaceSuggestions(GuildArguments.NAME_SUGGESTIONS))
-						.executes((sender, args) -> {
-							Player player = CommandUtils.getPlayerFromSender(sender);
-							ItemStack item = player.getInventory().getItemInMainHand();
-							String guildName = args.getUnchecked("guild name");
-							String guildId = GuildArguments.getIdFromName(guildName);
-							Group guild = LuckPermsIntegration.getGroup(guildId);
-							if (!ItemStatUtils.isOwnable(item) || guild == null) {
-								player.sendMessage(Component.text("The guild or the item held are not valid.", NamedTextColor.RED));
-							} else { // forceadd infusion based on specified guild#+guild plot id
-								Long guildPlotId = LuckPermsIntegration.getGuildPlotId(guild);
-								if (ItemStatUtils.hasInfusion(item, InfusionType.OWNED)) {
-									player.sendMessage(Component.text("Removed prior guild's Owned infusion.", NamedTextColor.YELLOW));
-									ItemStatUtils.removeInfusion(item, InfusionType.OWNED);
-								}
-								ItemStatUtils.addInfusion(item, InfusionType.OWNED, 1, "guild#"+guildPlotId, true);
-								player.sendMessage(Component.text("You have added the specified guild's Owned infusion on this item.", NamedTextColor.GREEN));
-							}
-						}))
-				.withSubcommand(
-					new CommandAPICommand("playerguild")
-						.withArguments(playerArg)
-						.executes((sender, args) -> {
-							Player player = args.getByArgument(playerArg);
-							ItemStack item = player.getInventory().getItemInMainHand();
-							Group playerGuild = LuckPermsIntegration.getGuild(player);
-							if (!ItemStatUtils.isOwnable(item)) {
-								player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
-								player.sendMessage(Component.text("This item is not a valid item for infusing!", NamedTextColor.RED));
-							} else if (playerGuild == null) { // player is guildless
-								player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
-								player.sendMessage(Component.text("You do not have a guild!", NamedTextColor.RED));
-							} else if (!GuildPermission.GUILD_OWNED_INFUSION.hasAccess(playerGuild, player)) { // permission check to add Owned
-								player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
-								player.sendMessage(Component.text("You do not have permission to add Owned for your guild!", NamedTextColor.RED));
-							} else { // add infusion based on guild#+guild plot id
-								Long guildPlotId = LuckPermsIntegration.getGuildPlotId(playerGuild);
-								if (!ItemStatUtils.hasInfusion(item, InfusionType.OWNED)) {
+									player.sendMessage(Component.text("This item is not a valid item for infusing!", NamedTextColor.RED));
+								} else if (!ItemStatUtils.hasInfusion(item, InfusionType.OWNED)) {
 									int currentExp = ExperienceUtils.getTotalExperience(player);
 									if (currentExp >= ExperienceUtils.LEVEL_30) {
 										ExperienceUtils.setTotalExperience(player, currentExp - ExperienceUtils.LEVEL_30);
 										player.playSound(player, Sound.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1.0f, 1.0f);
 										EntityUtils.fireworkAnimation(player);
-										ItemStatUtils.addInfusion(item, InfusionType.OWNED, 1, "guild#" + guildPlotId, true);
-										player.sendMessage(Component.text("You have added your guild's Owned infusion on this item.", NamedTextColor.GREEN));
+										ItemStatUtils.addInfusion(item, InfusionType.OWNED, 1, uuid);
+										player.sendMessage(Component.text("You have added your Owned infusion on this item.", NamedTextColor.GREEN));
 									} else {
 										player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
 										player.sendMessage(Component.text("You do not have enough experience points!", NamedTextColor.RED));
@@ -110,8 +53,65 @@ public class ItemOwnershipCommand {
 									player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
 									player.sendMessage(Component.text("This item is already infused with Owned!", NamedTextColor.RED));
 								}
-							}
-						})))
+							})
+					)
+					.withSubcommand(
+						new CommandAPICommand("guild")
+							.withArguments(new TextArgument("guild name").replaceSuggestions(GuildArguments.NAME_SUGGESTIONS))
+							.executes((sender, args) -> {
+								Player player = CommandUtils.getPlayerFromSender(sender);
+								ItemStack item = player.getInventory().getItemInMainHand();
+								String guildName = args.getUnchecked("guild name");
+								String guildId = GuildArguments.getIdFromName(guildName);
+								Group guild = LuckPermsIntegration.getGroup(guildId);
+								if (!ItemStatUtils.isOwnable(item) || guild == null) {
+									player.sendMessage(Component.text("The guild or the item held are not valid.", NamedTextColor.RED));
+								} else { // forceadd infusion based on specified guild#+guild plot id
+									Long guildPlotId = LuckPermsIntegration.getGuildPlotId(guild);
+									if (ItemStatUtils.hasInfusion(item, InfusionType.OWNED)) {
+										player.sendMessage(Component.text("Removed prior guild's Owned infusion.", NamedTextColor.YELLOW));
+										ItemStatUtils.removeInfusion(item, InfusionType.OWNED);
+									}
+									ItemStatUtils.addInfusion(item, InfusionType.OWNED, 1, "guild#" + guildPlotId, true);
+									player.sendMessage(Component.text("You have added the specified guild's Owned infusion on this item.", NamedTextColor.GREEN));
+								}
+							}))
+					.withSubcommand(
+						new CommandAPICommand("playerguild")
+							.withArguments(playerArg)
+							.executes((sender, args) -> {
+								Player player = args.getByArgument(playerArg);
+								ItemStack item = player.getInventory().getItemInMainHand();
+								Group playerGuild = LuckPermsIntegration.getGuild(player);
+								if (!ItemStatUtils.isOwnable(item)) {
+									player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
+									player.sendMessage(Component.text("This item is not a valid item for infusing!", NamedTextColor.RED));
+								} else if (playerGuild == null) { // player is guildless
+									player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
+									player.sendMessage(Component.text("You do not have a guild!", NamedTextColor.RED));
+								} else if (!GuildPermission.GUILD_OWNED_INFUSION.hasAccess(playerGuild, player)) { // permission check to add Owned
+									player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
+									player.sendMessage(Component.text("You do not have permission to add Owned for your guild!", NamedTextColor.RED));
+								} else { // add infusion based on guild#+guild plot id
+									Long guildPlotId = LuckPermsIntegration.getGuildPlotId(playerGuild);
+									if (!ItemStatUtils.hasInfusion(item, InfusionType.OWNED)) {
+										int currentExp = ExperienceUtils.getTotalExperience(player);
+										if (currentExp >= ExperienceUtils.LEVEL_30) {
+											ExperienceUtils.setTotalExperience(player, currentExp - ExperienceUtils.LEVEL_30);
+											player.playSound(player, Sound.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1.0f, 1.0f);
+											EntityUtils.fireworkAnimation(player);
+											ItemStatUtils.addInfusion(item, InfusionType.OWNED, 1, "guild#" + guildPlotId, true);
+											player.sendMessage(Component.text("You have added your guild's Owned infusion on this item.", NamedTextColor.GREEN));
+										} else {
+											player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
+											player.sendMessage(Component.text("You do not have enough experience points!", NamedTextColor.RED));
+										}
+									} else {
+										player.playSound(player, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1.0f, 1.0f);
+										player.sendMessage(Component.text("This item is already infused with Owned!", NamedTextColor.RED));
+									}
+								}
+							})))
 			.withSubcommand(
 				new CommandAPICommand("remove")
 					.withArguments(playerArg)

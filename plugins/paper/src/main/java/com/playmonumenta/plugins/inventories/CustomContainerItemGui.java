@@ -59,7 +59,7 @@ public class CustomContainerItemGui extends Gui {
 				return new ArrayList<>();
 			}
 			return list.toListCopy()
-				       .stream().map(NBT::itemStackFromNBT).toList();
+				.stream().map(NBT::itemStackFromNBT).toList();
 		});
 
 		// Fill GUI with items
@@ -85,7 +85,7 @@ public class CustomContainerItemGui extends Gui {
 				amountString = "" + amount;
 			}
 			itemMeta.displayName(Component.text(amountString + " ", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)
-				                     .append(ItemUtils.getDisplayName(item).colorIfAbsent(NamedTextColor.WHITE)));
+				.append(ItemUtils.getDisplayName(item).colorIfAbsent(NamedTextColor.WHITE)));
 			displayItem.setItemMeta(itemMeta);
 			if (showAmounts) {
 				displayItem.setAmount((int) Math.max(1, Math.min(64, showAmountsAsStacks ? amount / item.getMaxStackSize() : amount)));
@@ -319,7 +319,8 @@ public class CustomContainerItemGui extends Gui {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				}
 			}
-			case LEFT, RIGHT, CREATIVE, DROP, CONTROL_DROP, WINDOW_BORDER_LEFT, WINDOW_BORDER_RIGHT, MIDDLE, SWAP_OFFHAND, NUMBER_KEY -> {
+			case LEFT, RIGHT, CREATIVE, DROP, CONTROL_DROP, WINDOW_BORDER_LEFT, WINDOW_BORDER_RIGHT, MIDDLE,
+			     SWAP_OFFHAND, NUMBER_KEY -> {
 				// These clicks don't modify the container inventory, so allow them - as long as the click is not on the open container item itself
 				if (!NmsUtils.getVersionAdapter().isSameItem(event.getCurrentItem(), mContainer)) {
 					event.setCancelled(false);
@@ -345,8 +346,8 @@ public class CustomContainerItemGui extends Gui {
 		// Dragging an item over one slot in the GUI: handle like a left click
 		ItemStack cursor = event.getCursor();
 		if (cursor != null && cursor.getType() != Material.AIR
-			    && event.getRawSlots().size() == 1
-			    && event.getView().getInventory(event.getRawSlots().iterator().next()) != mPlayer.getInventory()) {
+			&& event.getRawSlots().size() == 1
+			&& event.getView().getInventory(event.getRawSlots().iterator().next()) != mPlayer.getInventory()) {
 			handleContainerClick(cursor, event.getRawSlots().iterator().next());
 		}
 	}

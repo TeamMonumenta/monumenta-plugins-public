@@ -64,7 +64,7 @@ public final class AuraEffectBoss extends BossAbilityGroup {
 					p.PARTICLE_ENTITY.spawn(mBoss, LocationUtils.getEntityCenter(entity));
 				},
 				// Apply effects to players in range
-				(p.EFFECTS == EffectsList.EMPTY ? null : (Player player) -> p.EFFECTS.apply(player, mBoss)),
+				(p.EFFECTS.equals(EffectsList.EMPTY) ? null : (Player player) -> p.EFFECTS.apply(player, mBoss)),
 				p.CANCELABLE
 			)
 		);

@@ -60,13 +60,13 @@ import org.bukkit.util.Vector;
 /**
  * Dark Hole:
  * Summons magus adds on field which begins the summon of a calamity. By default, 1 summoner every 2 players.
- *
+ * <p>
  * A spherical blob of squid ink appears in the centre of the arena. It periodically pulls players towards it and deals minor corruption damage.
  * The dark hole is unstable. Periodically it will shoot curvy projectiles that targets all players with a telegraph.
- *
+ * <p>
  * The dark hole slowly becomes smaller and eventually implodes. If the magus is not killed in time, the dark hole
  * will explode, dealing % damage to everyone based on the ascension level.
- *
+ * <p>
  * Anyways I swear I am never looking at these 600 lines of insanity ever again.
  */
 public class SpellVesperidysDarkHole extends Spell {
@@ -139,7 +139,7 @@ public class SpellVesperidysDarkHole extends Spell {
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), Vesperidys.detectionRange, true)) {
 			player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.HOSTILE, 0.5f, 1.3f);
 			player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1f, 1.5f);
-			MessagingUtils.sendTitle(player, Component.text("!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Defeat the Magus!", NamedTextColor.YELLOW), 0, 3*20, 20);
+			MessagingUtils.sendTitle(player, Component.text("!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Defeat the Magus!", NamedTextColor.YELLOW), 0, 3 * 20, 20);
 		}
 
 
@@ -339,8 +339,8 @@ public class SpellVesperidysDarkHole extends Spell {
 										new PartialParticle(Particle.SONIC_BOOM, mDarkHoleCenter)
 											.spawnAsBoss();
 
-										for (double i = 0; i <= Math.PI; i += Math.PI/8) {
-											for (double j = 0; j < 2*Math.PI; j += 2 * Math.PI / 3) {
+										for (double i = 0; i <= Math.PI; i += Math.PI / 8) {
+											for (double j = 0; j < 2 * Math.PI; j += 2 * Math.PI / 3) {
 												double r = blackHoleRadius;
 												double theta = ((mBlackHoleTicks + mDarkHoleTicks) / 40.0) * 2 * Math.PI + j;
 												double alpha = i;
@@ -500,7 +500,7 @@ public class SpellVesperidysDarkHole extends Spell {
 										double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
 
 										double x = r * FastUtils.sin(theta) * FastUtils.cos(alpha);
-										double y = - Math.abs(r * FastUtils.sin(theta) * FastUtils.sin(alpha));
+										double y = -Math.abs(r * FastUtils.sin(theta) * FastUtils.sin(alpha));
 										double z = r * FastUtils.cos(theta);
 
 										double projSpeed = 0.5;
@@ -508,7 +508,7 @@ public class SpellVesperidysDarkHole extends Spell {
 										mBoss.getWorld().playSound(mDarkHoleCenter, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 2f, 0.5f);
 
 										BukkitRunnable projRunnable = new BukkitRunnable() {
-											Location mProjLoc = mDarkHoleCenter.clone();
+											final Location mProjLoc = mDarkHoleCenter.clone();
 											int mProjTicks = 0;
 
 											@Override
@@ -569,8 +569,8 @@ public class SpellVesperidysDarkHole extends Spell {
 							double yOffset = 0.25 * Math.sin((double) mTicksDarkHoleCharge / 20.0);
 							core.teleport(mDarkHoleCenter.clone().add(0, yOffset + ARMOR_STAND_BLOCK_OFFSET, 0));
 							core.setRotation((float) (mTicksDarkHoleCharge * 5.0), 0);
-							for (double i = 0; i <= Math.PI; i += Math.PI/8) {
-								for (double j = 0; j < 2*Math.PI; j += 2 * Math.PI/3) {
+							for (double i = 0; i <= Math.PI; i += Math.PI / 8) {
+								for (double j = 0; j < 2 * Math.PI; j += 2 * Math.PI / 3) {
 									double r = blackHoleRadius;
 									double theta = (mTicksDarkHoleCharge / 40.0) * 2 * Math.PI + j;
 									double alpha = i;
@@ -589,7 +589,7 @@ public class SpellVesperidysDarkHole extends Spell {
 							}
 
 							// Summoner Animations
-							for (LivingEntity summoner: darkHoleSummoners) {
+							for (LivingEntity summoner : darkHoleSummoners) {
 								double rotation = mTicksDarkHoleCharge / 20.0 * Math.PI;
 								double x = 0.5 * FastUtils.sin(rotation);
 								double z = 0.5 * FastUtils.cos(rotation);
@@ -602,10 +602,10 @@ public class SpellVesperidysDarkHole extends Spell {
 							}
 
 							if (mTicksDarkHoleCharge % 10 == 0) {
-								for (LivingEntity summoner: darkHoleSummoners) {
+								for (LivingEntity summoner : darkHoleSummoners) {
 									// Summoner Projectile Animation
 									BukkitRunnable animation = new BukkitRunnable() {
-										Location mParticleLocCenter = summoner.getLocation().add(0, 1.5, 0);
+										final Location mParticleLocCenter = summoner.getLocation().add(0, 1.5, 0);
 										double mRotation = mTicksDarkHoleCharge / 20.0 * Math.PI;
 										double mRadius = 0.2 + 0.2 * FastUtils.sin(mRotation);
 										boolean mReversed = false;
@@ -688,7 +688,7 @@ public class SpellVesperidysDarkHole extends Spell {
 							.data(new Particle.DustOptions(Color.fromRGB(128, 0, 128), 0.75f))
 							.spawnAsBoss();
 
-						new PPCircle(Particle.SOUL_FIRE_FLAME, particleLoc.clone().add(0, -1.7, 0), Math.max(0.5, Math.min(2, -(1.0/100.0) * mTicksDarkHoleRunnable * (mTicksDarkHoleRunnable - 40))))
+						new PPCircle(Particle.SOUL_FIRE_FLAME, particleLoc.clone().add(0, -1.7, 0), Math.max(0.5, Math.min(2, -(1.0 / 100.0) * mTicksDarkHoleRunnable * (mTicksDarkHoleRunnable - 40))))
 							.extra(10000000)
 							.count(10)
 							.spawnAsBoss();

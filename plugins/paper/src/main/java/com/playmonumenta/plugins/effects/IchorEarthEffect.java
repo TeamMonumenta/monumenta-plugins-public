@@ -16,11 +16,11 @@ public class IchorEarthEffect extends Effect {
 	private static final String SOURCE_RESISTANCE = "IchorEarthResistance";
 	private static final String SOURCE_DAMAGE = "IchorEarthDamage";
 	private static final EnumSet<DamageType> VALID_HIT_DAMAGE_TYPES = EnumSet.of(
-			DamageType.MELEE,
-			DamageType.PROJECTILE,
-			DamageType.FIRE,
-			DamageType.BLAST,
-			DamageType.MAGIC
+		DamageType.MELEE,
+		DamageType.PROJECTILE,
+		DamageType.FIRE,
+		DamageType.BLAST,
+		DamageType.MAGIC
 	);
 	private static final EnumSet<DamageType> ALL_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 

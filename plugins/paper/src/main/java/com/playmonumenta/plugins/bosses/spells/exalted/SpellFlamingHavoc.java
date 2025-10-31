@@ -36,7 +36,8 @@ public class SpellFlamingHavoc extends Spell {
 		mRange = range;
 	}
 
-	@Override public void run() {
+	@Override
+	public void run() {
 		World world = mBoss.getWorld();
 		// get valid targets (totem mobs)
 		List<LivingEntity> mobList = EntityUtils.getNearbyMobs(mBoss.getLocation(), mRange);
@@ -52,7 +53,9 @@ public class SpellFlamingHavoc extends Spell {
 				final double mStepCount = mMaxActionLimit / mobList.size();
 				int mTotalAction = 0;
 				final BoundingBox mBox = BoundingBox.of(startLoc, 0.4, 0.4, 0.4);
-				@Override public void run() {
+
+				@Override
+				public void run() {
 					for (int action = 0; action < mStepCount; action++) {
 						mTotalAction++;
 						mBox.shift(dir.clone());
@@ -81,7 +84,8 @@ public class SpellFlamingHavoc extends Spell {
 		}
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return 1;
 	}
 }

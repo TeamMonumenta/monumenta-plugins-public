@@ -35,8 +35,8 @@ public class ColossalBruteCS extends BruteForceCS {
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-				"Brutalize your attacks even further",
-				"using a twisted, colossal force.");
+			"Brutalize your attacks even further",
+			"using a twisted, colossal force.");
 	}
 
 	@Override

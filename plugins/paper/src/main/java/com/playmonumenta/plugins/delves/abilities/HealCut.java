@@ -18,8 +18,7 @@ public class HealCut {
 		if (level == 0) {
 			return;
 		}
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+		if (event.getEntity() instanceof Player player) {
 			if (level > 1) {
 				event.setAmount(event.getAmount() * (1 - CUT_AMOUNT / 100.0));
 			}

@@ -44,9 +44,11 @@ public enum DepthsTree {
 	public String getDisplayName() {
 		return mDisplayName;
 	}
+
 	public String getSymbol() {
 		return mSymbol;
 	}
+
 	public Function<String, Component> getColor() {
 		return mColorer;
 	}

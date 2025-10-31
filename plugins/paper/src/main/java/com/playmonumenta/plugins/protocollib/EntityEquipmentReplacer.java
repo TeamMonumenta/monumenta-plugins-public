@@ -46,10 +46,10 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 		boolean shouldClear =
 			// we can only clear items for players
 			entity instanceof Player &&
-			// and for a player that is not the current player
-			!entity.getUniqueId().equals(event.getPlayer().getUniqueId()) &&
-			// and if the player that the packet is sent to has gear disabled
-			ScoreboardUtils.getScoreboardValue(event.getPlayer(), DISPLAY_GEAR_SCORE).orElse(1) == 0;
+				// and for a player that is not the current player
+				!entity.getUniqueId().equals(event.getPlayer().getUniqueId()) &&
+				// and if the player that the packet is sent to has gear disabled
+				ScoreboardUtils.getScoreboardValue(event.getPlayer(), DISPLAY_GEAR_SCORE).orElse(1) == 0;
 
 		List<Pair<EnumWrappers.ItemSlot, ItemStack>> items = packet.getSlotStackPairLists().read(0);
 		for (Pair<EnumWrappers.ItemSlot, ItemStack> pair : items) {
@@ -68,10 +68,10 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 					}
 				}
 				if (entity instanceof Player player
-					    && pair.getFirst() == EnumWrappers.ItemSlot.MAINHAND
-					    && itemStack != null
-					    && PlayerUtils.isAlchemist(player)
-					    && ItemUtils.isAlchemistItem(itemStack)) {
+					&& pair.getFirst() == EnumWrappers.ItemSlot.MAINHAND
+					&& itemStack != null
+					&& PlayerUtils.isAlchemist(player)
+					&& ItemUtils.isAlchemistItem(itemStack)) {
 					// Alchemical Utensils
 					itemStack = ItemUtils.clone(itemStack);
 					VirtualItemsReplacer.handleAlchemistPotion(player, itemStack);

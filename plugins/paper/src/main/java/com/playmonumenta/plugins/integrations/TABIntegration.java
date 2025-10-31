@@ -52,18 +52,7 @@ public class TABIntegration implements Listener {
 
 	String mGlobalFooter = "%monumenta_boss_details_1% | &7Total players:&f -1 | %monumenta_boss_details_2%";
 
-	public static class Slot {
-		public final int mId;
-		public final String mText;
-		public final @Nullable String mSkin;
-		public final @Nullable Integer mPing;
-
-		public Slot(int id, String text, @Nullable String skin, @Nullable Integer ping) {
-			mId = id;
-			mText = text;
-			mSkin = skin;
-			mPing = ping;
-		}
+	public record Slot(int mId, String mText, @Nullable String mSkin, @Nullable Integer mPing) {
 	}
 
 	public static class CachedLayout {
@@ -684,7 +673,7 @@ public class TABIntegration implements Listener {
 		PingListener.submitPingAction(player, (ping) -> {
 			MonumentaPlayer.setPing(player.getUniqueId(), ping);
 			promise.complete(null);
-		}, Constants.TICKS_PER_SECOND * 1, false, () -> {
+		}, Constants.TICKS_PER_SECOND, false, () -> {
 			MonumentaPlayer.setPing(player.getUniqueId(), 1000);
 			promise.complete(null);
 		});

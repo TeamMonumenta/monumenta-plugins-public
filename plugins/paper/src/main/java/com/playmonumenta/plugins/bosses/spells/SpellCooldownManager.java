@@ -20,19 +20,19 @@ public class SpellCooldownManager {
 	public static final int PERIOD = 2;
 
 	/**
-	 * @param cooldown                       cooldown in ticks
-	 * @param validRequirement               if this is false, the runnable cancels
-	 * @param cooldownTickDownRequirement    if this is true, the cooldown decreases
+	 * @param cooldown                    cooldown in ticks
+	 * @param validRequirement            if this is false, the runnable cancels
+	 * @param cooldownTickDownRequirement if this is true, the cooldown decreases
 	 */
 	public SpellCooldownManager(int cooldown, Supplier<Boolean> validRequirement, @Nullable Supplier<Boolean> cooldownTickDownRequirement) {
 		this(cooldown, 0, validRequirement, cooldownTickDownRequirement);
 	}
 
 	/**
-	 * @param cooldown                       cooldown in ticks
-	 * @param startingCooldown               initial cooldown on initialisation
-	 * @param validRequirement               if this is false, the runnable cancels
-	 * @param cooldownTickDownRequirement    if this is true, the cooldown decreases
+	 * @param cooldown                    cooldown in ticks
+	 * @param startingCooldown            initial cooldown on initialisation
+	 * @param validRequirement            if this is false, the runnable cancels
+	 * @param cooldownTickDownRequirement if this is true, the cooldown decreases
 	 */
 	public SpellCooldownManager(int cooldown, int startingCooldown, Supplier<Boolean> validRequirement, @Nullable Supplier<Boolean> cooldownTickDownRequirement) {
 		mCooldown = cooldown;

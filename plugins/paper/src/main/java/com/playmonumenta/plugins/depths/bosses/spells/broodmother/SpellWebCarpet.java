@@ -125,6 +125,7 @@ public class SpellWebCarpet extends SpellBaseGrenadeLauncher {
 							final Location mCastLoc = target.getLocation().clone();
 							final Location mUpperLoc = mCastLoc.clone().add(0, 1, 0);
 							int mTicks = 0;
+
 							@Override
 							public void run() {
 								if (!mSlime.isValid() || !boss.isValid() || mTicks > WEB_TRAP_MAX_TICKS) {

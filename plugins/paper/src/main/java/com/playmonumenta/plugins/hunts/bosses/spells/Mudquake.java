@@ -71,7 +71,7 @@ public class Mudquake extends Spell {
 			@Override
 			public void run() {
 				mChargeUp.update();
-				mChargeUp.setProgress((float)mTicks / WINDUP_DURATION);
+				mChargeUp.setProgress((float) mTicks / WINDUP_DURATION);
 
 				if (mTicks % 10 == 0 && mTicks < WINDUP_DURATION) {
 					List<Block> mudBlocks = getSurfaceMudBlocks();

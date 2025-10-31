@@ -450,7 +450,7 @@ public class DelvesUtils {
 					}
 
 					Collections.shuffle(locationsToTest);
-					for (Location l: locationsToTest) {
+					for (Location l : locationsToTest) {
 						if (l.getBlock().getType() == Material.AIR && l.clone().add(0, -1, 0).getBlock().isSolid()) {
 							loc = l;
 							break;

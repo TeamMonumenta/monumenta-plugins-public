@@ -129,11 +129,11 @@ public class LocationUtils {
 		for (int i = 0; i < 50; i++) {
 			Block block = loc.getBlock();
 			if (block.isLiquid()
-				    || BlockUtils.containsWater(block)
-				    || block.getType() == Material.ICE
-				    || block.getType() == Material.BLUE_ICE
-				    || block.getType() == Material.PACKED_ICE
-				    || block.getType() == Material.FROSTED_ICE) {
+				|| BlockUtils.containsWater(block)
+				|| block.getType() == Material.ICE
+				|| block.getType() == Material.BLUE_ICE
+				|| block.getType() == Material.PACKED_ICE
+				|| block.getType() == Material.FROSTED_ICE) {
 				return true;
 			} else if (i > 0 && !block.isEmpty()) {
 				return false;
@@ -148,15 +148,15 @@ public class LocationUtils {
 	}
 
 	public static boolean hasLineOfSight(Entity from, Entity to) {
-		return hasLineOfSight((from instanceof LivingEntity ? ((LivingEntity)from).getEyeLocation() : from.getLocation()),
-		                      (to instanceof LivingEntity ? ((LivingEntity)to).getEyeLocation() : to.getLocation()));
+		return hasLineOfSight((from instanceof LivingEntity ? ((LivingEntity) from).getEyeLocation() : from.getLocation()),
+			(to instanceof LivingEntity ? ((LivingEntity) to).getEyeLocation() : to.getLocation()));
 	}
 
 	public static boolean hasLineOfSight(Location fromLocation, Location toLocation) {
 		if (!fromLocation.getWorld().equals(toLocation.getWorld())) {
 			return false;
 		}
-		int range = (int)fromLocation.distance(toLocation) + 1;
+		int range = (int) fromLocation.distance(toLocation) + 1;
 		Vector direction = toLocation.toVector().subtract(fromLocation.toVector()).normalize();
 		if (!Double.isFinite(direction.getX())) {
 			return true;
@@ -343,11 +343,12 @@ public class LocationUtils {
 		Gson gson = new Gson();
 		JsonObject obj = gson.fromJson(locStr, JsonObject.class);
 		return new Location(world, obj.get("x").getAsDouble(), obj.get("y").getAsDouble(), obj.get("z").getAsDouble(),
-		                    obj.get("yaw").getAsFloat(), obj.get("pitch").getAsFloat());
+			obj.get("yaw").getAsFloat(), obj.get("pitch").getAsFloat());
 	}
 
 	/**
 	 * Determines if a location "loc" collides with the given Block "block"
+	 *
 	 * @param loc the given location
 	 * @return true if the location is inside the hitbox of the block, false if not
 	 */
@@ -615,7 +616,7 @@ public class LocationUtils {
 			return false;
 		}
 
-		double reverseDeltaDistance = 1.0/16.0;
+		double reverseDeltaDistance = 1.0 / 16.0;
 		Vector reverseDeltaPosition = requestedPositionDelta.clone().normalize().multiply(-reverseDeltaDistance);
 
 		VersionAdapter versionAdapter = NmsUtils.getVersionAdapter();
@@ -665,13 +666,13 @@ public class LocationUtils {
 		}
 		World world = pos1.getWorld();
 		Location min = new Location(world,
-									Math.min(pos1.getX(), pos2.getX()),
-									Math.min(pos1.getY(), pos2.getY()),
-									Math.min(pos1.getZ(), pos2.getZ()));
+			Math.min(pos1.getX(), pos2.getX()),
+			Math.min(pos1.getY(), pos2.getY()),
+			Math.min(pos1.getZ(), pos2.getZ()));
 		Location max = new Location(world,
-									Math.max(pos1.getX(), pos2.getX()),
-									Math.max(pos1.getY(), pos2.getY()),
-									Math.max(pos1.getZ(), pos2.getZ()));
+			Math.max(pos1.getX(), pos2.getX()),
+			Math.max(pos1.getY(), pos2.getY()),
+			Math.max(pos1.getZ(), pos2.getZ()));
 		Location temp = min.clone();
 		for (int dx = 0; dx <= (max.getBlockX() - min.getBlockX()); dx++) {
 			for (int dy = 0; dy <= (max.getBlockY() - min.getBlockY()); dy++) {
@@ -941,6 +942,7 @@ public class LocationUtils {
 
 	/**
 	 * Vary a location by some uniform +/- variance along all three axes.
+	 *
 	 * @param loc the starting location
 	 * @param var will vary the location by -var to +var in each axis
 	 * @return the new location
@@ -951,7 +953,8 @@ public class LocationUtils {
 
 	/**
 	 * Vary a location by some uniform +/- variance along all three axes.
-	 * @param loc the starting location
+	 *
+	 * @param loc  the starting location
 	 * @param xVar x-axis variance
 	 * @param yVar y-axis variance
 	 * @param zVar z-axis variance

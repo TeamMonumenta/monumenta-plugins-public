@@ -135,8 +135,8 @@ public class SpellLightningStrike extends Spell {
 
 		int electricRingMarkerCount = 8;
 		PPCircle electricRingMarker = new PPCircle(Particle.REDSTONE, strikeLocation, SHOCK_RADIUS)
-			                              .count(5 * electricRingMarkerCount).delta(0, 0.25, 0)
-			                              .data(DUST_YELLOW_LARGE);
+			.count(5 * electricRingMarkerCount).delta(0, 0.25, 0)
+			.data(DUST_YELLOW_LARGE);
 
 		BukkitRunnable lightningRunnable = new BukkitRunnable() {
 			int mCountdownTicks = SHOCK_DELAY_TICKS;
@@ -255,8 +255,8 @@ public class SpellLightningStrike extends Spell {
 		// /particle flame ~ ~ ~ 0.1 1 0.1 0.1 0
 		int risingFlamesCount = 5;
 		PPCircle risingFlames = new PPCircle(Particle.FLAME, fireLocation, FIRE_RADIUS).ringMode(false)
-			                        .count(3 * risingFlamesCount).delta(0.1, 1, 0.1)
-			                        .extraRange(0.05, 0.1).directionalMode(true);
+			.count(3 * risingFlamesCount).delta(0.1, 1, 0.1)
+			.extraRange(0.05, 0.1).directionalMode(true);
 		risingFlames.deltaVariance(true, false, true);
 		risingFlames.mVaryPositiveY = true;
 

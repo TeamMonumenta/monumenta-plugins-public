@@ -264,7 +264,7 @@ public class BanishCoreLevitation extends Spell implements CoreElemental.CoreEle
 		return 0;
 	}
 
-	@EventHandler (priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
 		Block block = event.getBlockPlaced();
 		if (mQuarry.getPlayers().contains(event.getPlayer()) && block.isSolid() && !BlockUtils.isMechanicalBlock(block.getType()) && !BlockUtils.isValuableBlock(block.getType())) {

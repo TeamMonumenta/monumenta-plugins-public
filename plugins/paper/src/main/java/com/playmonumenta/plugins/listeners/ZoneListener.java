@@ -53,18 +53,18 @@ public class ZoneListener implements Listener {
 
 		if (namespace.equals("default")) {
 			switch (property) {
-			case "Adventure Mode":
-				if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
-					player.setGameMode(GameMode.ADVENTURE);
-				}
-				break;
-			case "!Adventure Mode":
-				if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
-					player.setGameMode(GameMode.SURVIVAL);
-				}
-				break;
-			default:
-				// Do nothing
+				case "Adventure Mode":
+					if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
+						player.setGameMode(GameMode.ADVENTURE);
+					}
+					break;
+				case "!Adventure Mode":
+					if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
+						player.setGameMode(GameMode.SURVIVAL);
+					}
+					break;
+				default:
+					// Do nothing
 			}
 		}
 	}
@@ -75,7 +75,7 @@ public class ZoneListener implements Listener {
 			if (event.getEntityType() == EntityType.SNOWBALL && event.getEntity() instanceof Snowball snowball) {
 				// Only allow winter arena snowballs in the winter arena
 				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.WINTER_SNOWBALLS_ONLY)
-					    && !InventoryUtils.testForItemWithName(snowball.getItem(), "Arena Snowball", true)) {
+					&& !InventoryUtils.testForItemWithName(snowball.getItem(), "Arena Snowball", true)) {
 					event.setCancelled(true);
 				}
 			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {

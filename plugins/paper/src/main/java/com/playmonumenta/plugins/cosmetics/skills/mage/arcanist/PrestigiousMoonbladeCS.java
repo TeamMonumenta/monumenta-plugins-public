@@ -99,13 +99,13 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 		int uShort = (int) Math.ceil(1.6 * range);
 		ParticleUtils.drawCurve(mCenter, 0, uShort, mFront,
 			t -> 0.55 * t / uShort * FastUtils.cos(mShortAngle - (swings - 1) * mDShortAngle),
-				t -> 0, t -> 0.55 * t / uShort * FastUtils.sin(mShortAngle - (swings - 1) * mDShortAngle),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 4, 0.12, 0.12, 0.12, 0, GOLD_COLOR1).spawnAsPlayerActive(player)
+			t -> 0, t -> 0.55 * t / uShort * FastUtils.sin(mShortAngle - (swings - 1) * mDShortAngle),
+			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 4, 0.12, 0.12, 0.12, 0, GOLD_COLOR1).spawnAsPlayerActive(player)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, uLong, mFront,
 			t -> 0.95 * t / uLong * FastUtils.cos(mLongAngle - (swings - 1) * mDLongAngle),
-				t -> 0, t -> 0.95 * t / uLong * FastUtils.sin(mLongAngle - (swings - 1) * mDLongAngle),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 3, 0.05, 0.05, 0.05, 0, GOLD_COLOR2).spawnAsPlayerActive(player)
+			t -> 0, t -> 0.95 * t / uLong * FastUtils.sin(mLongAngle - (swings - 1) * mDLongAngle),
+			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 3, 0.05, 0.05, 0.05, 0, GOLD_COLOR2).spawnAsPlayerActive(player)
 		);
 
 		new BukkitRunnable() {
@@ -113,9 +113,9 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 			double mRoll;
 			double mD = 45;
 			boolean mInit = false;
-			PPPeriodic mParticle1 = new PPPeriodic(Particle.REDSTONE, origin).count(1).delta(0.1, 0.1, 0.1);
-			PPPeriodic mParticle2 = new PPPeriodic(Particle.REDSTONE, origin).count(1).delta(0.1, 0.1, 0.1);
-			PPPeriodic mParticle3 = new PPPeriodic(Particle.REDSTONE, origin).count(1).data(LIGHT_COLOR);
+			final PPPeriodic mParticle1 = new PPPeriodic(Particle.REDSTONE, origin).count(1).delta(0.1, 0.1, 0.1);
+			final PPPeriodic mParticle2 = new PPPeriodic(Particle.REDSTONE, origin).count(1).delta(0.1, 0.1, 0.1);
+			final PPPeriodic mParticle3 = new PPPeriodic(Particle.REDSTONE, origin).count(1).data(LIGHT_COLOR);
 
 			@Override
 			public void run() {

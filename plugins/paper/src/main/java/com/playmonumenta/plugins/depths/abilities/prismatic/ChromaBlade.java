@@ -202,6 +202,7 @@ public class ChromaBlade extends DepthsAbility {
 			final Location mLoc = getPlayerLocation(0);
 			double mRadiusIncrement = 0.5;
 			final List<Block> mIceAlreadyCreated = new ArrayList<>();
+
 			@Override
 			public void run() {
 				if (mRadiusIncrement == 0.5) {
@@ -460,7 +461,7 @@ public class ChromaBlade extends DepthsAbility {
 		// Perhaps all heights should be the same?
 		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
 		if (party != null) {
-			 damageMultiplier *= party.getPrismaticDamageMultiplier();
+			damageMultiplier *= party.getPrismaticDamageMultiplier();
 		}
 		double finalDamageMult = damageMultiplier;
 
@@ -481,14 +482,22 @@ public class ChromaBlade extends DepthsAbility {
 	private void doSlashParticle(Location loc, int ring, List<LivingEntity> hitMobs, boolean isFast, ItemStatManager.PlayerItemStats playerItemStats, @Nullable DepthsTree tree, double damageMultiplier) {
 		if (tree != null) {
 			switch (tree) {
-				case FLAMECALLER -> new PartialParticle(Particle.REDSTONE, loc, 1, FLAMECALLER_COLOR).spawnAsPlayerActive(mPlayer);
-				case FROSTBORN -> new PartialParticle(Particle.REDSTONE, loc, 1, FROSTBORN_COLOR).spawnAsPlayerActive(mPlayer);
-				case DAWNBRINGER -> new PartialParticle(Particle.REDSTONE, loc, 1, DAWNBRINGER_COLOR).spawnAsPlayerActive(mPlayer);
-				case EARTHBOUND -> new PartialParticle(Particle.REDSTONE, loc, 1, EARTHBOUND_COLOR).spawnAsPlayerActive(mPlayer);
-				case SHADOWDANCER -> new PartialParticle(Particle.REDSTONE, loc, 1, SHADOWDANCER_COLOR).spawnAsPlayerActive(mPlayer);
-				case STEELSAGE -> new PartialParticle(Particle.REDSTONE, loc, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer);
-				case WINDWALKER -> new PartialParticle(Particle.REDSTONE, loc, 1, WINDWALKER_COLOR).spawnAsPlayerActive(mPlayer);
-				case PRISMATIC -> new PartialParticle(Particle.REDSTONE, loc, 1, PRISMATIC_COLOR).spawnAsPlayerActive(mPlayer);
+				case FLAMECALLER ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, FLAMECALLER_COLOR).spawnAsPlayerActive(mPlayer);
+				case FROSTBORN ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, FROSTBORN_COLOR).spawnAsPlayerActive(mPlayer);
+				case DAWNBRINGER ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, DAWNBRINGER_COLOR).spawnAsPlayerActive(mPlayer);
+				case EARTHBOUND ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, EARTHBOUND_COLOR).spawnAsPlayerActive(mPlayer);
+				case SHADOWDANCER ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, SHADOWDANCER_COLOR).spawnAsPlayerActive(mPlayer);
+				case STEELSAGE ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer);
+				case WINDWALKER ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, WINDWALKER_COLOR).spawnAsPlayerActive(mPlayer);
+				case PRISMATIC ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, PRISMATIC_COLOR).spawnAsPlayerActive(mPlayer);
 				default -> {
 				}
 			}
@@ -530,7 +539,8 @@ public class ChromaBlade extends DepthsAbility {
 							reduceCooldowns();
 						}
 					}
-					default -> { }
+					default -> {
+					}
 				}
 			}
 		}
@@ -542,13 +552,18 @@ public class ChromaBlade extends DepthsAbility {
 		if (tree != null) {
 			switch (tree) {
 				case FROSTBORN -> world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0f, 1.2f);
-				case FLAMECALLER -> world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1.0f, 1.5f);
-				case DAWNBRINGER -> world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.5f);
+				case FLAMECALLER ->
+					world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1.0f, 1.5f);
+				case DAWNBRINGER ->
+					world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.5f);
 				case EARTHBOUND -> world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.PLAYERS, 1.0f, 0.7f);
-				case SHADOWDANCER -> world.playSound(loc, Sound.ENTITY_PHANTOM_AMBIENT, SoundCategory.PLAYERS, 1.0f, 0.7f);
+				case SHADOWDANCER ->
+					world.playSound(loc, Sound.ENTITY_PHANTOM_AMBIENT, SoundCategory.PLAYERS, 1.0f, 0.7f);
 				case STEELSAGE -> world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 1.0f, 2f);
-				case WINDWALKER -> world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.0f, 1.5f);
-				case PRISMATIC -> world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.0f, 0.8f);
+				case WINDWALKER ->
+					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.0f, 1.5f);
+				case PRISMATIC ->
+					world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.0f, 0.8f);
 				default -> {
 				}
 			}
@@ -573,6 +588,7 @@ public class ChromaBlade extends DepthsAbility {
 		new BukkitRunnable() {
 			int mT = 0;
 			final BlockData mFallingDustData = Material.YELLOW_GLAZED_TERRACOTTA.createBlockData();
+
 			@Override
 			public void run() {
 				mT++;

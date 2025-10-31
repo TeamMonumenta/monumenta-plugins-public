@@ -74,7 +74,7 @@ public class Rewind extends Spell {
 		Plugin plugin = Plugin.getInstance();
 
 		int maxDir = 270 + (45 * mToggle);
-		int minDir = 0 + (45 * mToggle);
+		int minDir = (45 * mToggle);
 
 		if (mToggle == 0) {
 			mToggle = 1;

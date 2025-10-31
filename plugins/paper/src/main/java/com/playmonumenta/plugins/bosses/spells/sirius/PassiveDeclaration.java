@@ -93,8 +93,8 @@ public class PassiveDeclaration extends Spell {
 				mLastSpell = mDeclarations.get(0);
 			}
 			while (mLastSpell.getClass().equals(declaration.getClass())
-					|| (declaration.getClass().equals(DeclarationDamage.class) && mSirius.mDamagePhase)
-					|| (mTpBlocked && declaration.getClass().equals(DeclarationTp.class))) {
+				|| (declaration.getClass().equals(DeclarationDamage.class) && mSirius.mDamagePhase)
+				|| (mTpBlocked && declaration.getClass().equals(DeclarationTp.class))) {
 				declaration = FastUtils.getRandomElement(mDeclarations);
 			}
 			if (declaration.getClass() == DeclarationTp.class) {

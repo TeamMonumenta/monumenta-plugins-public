@@ -210,13 +210,13 @@ public class SpellOmen extends Spell {
 					mP.SOUND_HIT.play(player.getLocation());
 				}
 				if (mP.RESPECT_IFRAMES && !hitPlayers.contains(player)) {
-					if (mP.DAMAGE > 0 ) {
-						BossUtils.blockableDamage(mBoss, player, mP.DAMAGE_TYPE, mP.DAMAGE, mP.SPELL_NAME, mBoss.getLocation(), mP.EFFECTS.mEffectList);
+					if (mP.DAMAGE > 0) {
+						BossUtils.blockableDamage(mBoss, player, mP.DAMAGE_TYPE, mP.DAMAGE, mP.SPELL_NAME, mBoss.getLocation(), mP.EFFECTS.mEffectList());
 						hitPlayers.add(player);
 					}
 					if (mP.DAMAGE_PERCENTAGE > 0) {
 						DamageUtils.damagePercentHealth(mBoss, player, mP.DAMAGE_PERCENTAGE, false,
-							true, mP.SPELL_NAME, true, mP.EFFECTS.mEffectList);
+							true, mP.SPELL_NAME, true, mP.EFFECTS.mEffectList());
 						hitPlayers.add(player);
 					}
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> hitPlayers.remove(player), 10);
@@ -225,10 +225,10 @@ public class SpellOmen extends Spell {
 				} else if (!mP.RESPECT_IFRAMES) {
 					if (mP.DAMAGE_PERCENTAGE > 0) {
 						DamageUtils.damagePercentHealth(mBoss, player, mP.DAMAGE_PERCENTAGE, false,
-							true, mP.SPELL_NAME, true, mP.EFFECTS.mEffectList);
+							true, mP.SPELL_NAME, true, mP.EFFECTS.mEffectList());
 					}
-					if (mP.DAMAGE > 0 ) {
-						BossUtils.blockableDamage(mBoss, player, mP.DAMAGE_TYPE, mP.DAMAGE, mP.SPELL_NAME, mBoss.getLocation(), mP.EFFECTS.mEffectList);
+					if (mP.DAMAGE > 0) {
+						BossUtils.blockableDamage(mBoss, player, mP.DAMAGE_TYPE, mP.DAMAGE, mP.SPELL_NAME, mBoss.getLocation(), mP.EFFECTS.mEffectList());
 					}
 					MovementUtils.knockAway(origin, player, mP.KB_X, mP.KB_Y);
 				}

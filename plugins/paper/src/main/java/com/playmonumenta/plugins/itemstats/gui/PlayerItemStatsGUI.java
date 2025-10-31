@@ -91,17 +91,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		}
 	}
 
-	private static class StatItem {
-		private final int mSlot;
-		private final Material mIcon;
-		private final Component mName;
-		private final List<PSGUIStat> mDisplayedStats;
-
-		private StatItem(int mSlot, Material mIcon, Component mName, PSGUIStat... displayedStats) {
-			this.mSlot = mSlot;
-			this.mIcon = mIcon;
-			this.mName = mName;
-			this.mDisplayedStats = List.of(displayedStats);
+	private record StatItem(int mSlot, Material mIcon, Component mName, List<PSGUIStat> mDisplayedStats) {
+		private StatItem(int mSlot, Material mIcon, Component mName, PSGUIStat... mDisplayedStats) {
+			this(mSlot, mIcon, mName, List.of(mDisplayedStats));
 		}
 
 		public ItemStack getDisplay(PSGUIStats stats, @Nullable PSGUIStats otherStats) {
@@ -197,8 +189,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			setEquipmentFromPlayer(true, otherPlayer);
 		}
 		Region region = Stream.of(mLeftStats.getMaximumRegion(false, ServerProperties.getRegion(player)), mRightStats.getMaximumRegion(false, ServerProperties.getRegion(player)))
-			                              .max(Comparator.naturalOrder())
-			                              .orElse(ServerProperties.getRegion(player));
+			.max(Comparator.naturalOrder())
+			.orElse(ServerProperties.getRegion(player));
 		mRegion = region;
 		mLeftStats.mPlayerItemStats.setRegion(region);
 		mRightStats.mPlayerItemStats.setRegion(region);
@@ -308,8 +300,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 			if (slot == REGION_SETTING_SLOT) {
 				Region region = mLeftStats.mPlayerItemStats.getRegion() == Region.VALLEY ? Region.ISLES
-					                              : mLeftStats.mPlayerItemStats.getRegion() == Region.ISLES ? Region.RING
-						                                : Region.VALLEY;
+					: mLeftStats.mPlayerItemStats.getRegion() == Region.ISLES ? Region.RING
+					: Region.VALLEY;
 				mRegion = region;
 				mLeftStats.mPlayerItemStats.setRegion(region);
 				mRightStats.mPlayerItemStats.setRegion(region);
@@ -417,7 +409,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				boolean targetRightSet = false;
 				if (event.getClick().isShiftClick()) {
 					targetRightSet = event.getClick().isLeftClick();
-					for (PSGUIEquipment equipment : new PSGUIEquipment[] {PSGUIEquipment.HEAD, PSGUIEquipment.CHEST, PSGUIEquipment.LEGS, PSGUIEquipment.FEET}) {
+					for (PSGUIEquipment equipment : new PSGUIEquipment[]{PSGUIEquipment.HEAD, PSGUIEquipment.CHEST, PSGUIEquipment.LEGS, PSGUIEquipment.FEET}) {
 						if (isValid(equipment, item.getType())) {
 							targetSlot = equipment;
 							break;
@@ -447,8 +439,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 
 	private boolean isValid(PSGUIEquipment equipment, Material material) {
 		return equipment == PSGUIEquipment.MAINHAND
-			       || equipment == PSGUIEquipment.OFFHAND
-			       || equipment.mEquipmentSlot == material.getEquipmentSlot();
+			|| equipment == PSGUIEquipment.OFFHAND
+			|| equipment.mEquipmentSlot == material.getEquipmentSlot();
 	}
 
 	private static ItemStack getCleanItem(ItemStack item) {
@@ -484,8 +476,8 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			warnings.add(Component.text("Build has more than one Curse of Corruption item.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
 		if (stats.get(EnchantmentType.TWO_HANDED) > 0
-			    && stats.getItem(PSGUIEquipment.OFFHAND) != null
-			    && ItemStatUtils.getEnchantmentLevel(stats.getItem(PSGUIEquipment.OFFHAND), EnchantmentType.WEIGHTLESS) == 0) {
+			&& stats.getItem(PSGUIEquipment.OFFHAND) != null
+			&& ItemStatUtils.getEnchantmentLevel(stats.getItem(PSGUIEquipment.OFFHAND), EnchantmentType.WEIGHTLESS) == 0) {
 			warnings.add(Component.text("Build has a Two Handed item, but a non-Weightless offhand.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
 		if (warnings.isEmpty()) {
@@ -501,11 +493,11 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	}
 
 	private void generateInventory() {
-		for (PSGUIStats stats : new PSGUIStats[] {mLeftStats, mRightStats}) {
+		for (PSGUIStats stats : new PSGUIStats[]{mLeftStats, mRightStats}) {
 			stats.mStatCache.clear();
 			stats.mPlayerItemStats.updateStats(stats.getItem(PSGUIEquipment.MAINHAND), stats.getItem(PSGUIEquipment.OFFHAND),
-					stats.getItem(PSGUIEquipment.HEAD), stats.getItem(PSGUIEquipment.CHEST), stats.getItem(PSGUIEquipment.LEGS), stats.getItem(PSGUIEquipment.FEET),
-					(Player) mInventory.getHolder(), true, mLeftStats.mPlayerItemStats.getRegion(), false);
+				stats.getItem(PSGUIEquipment.HEAD), stats.getItem(PSGUIEquipment.CHEST), stats.getItem(PSGUIEquipment.LEGS), stats.getItem(PSGUIEquipment.FEET),
+				(Player) mInventory.getHolder(), true, mLeftStats.mPlayerItemStats.getRegion(), false);
 		}
 
 		ItemStack swapItem = new ItemStack(Material.ARMOR_STAND, 1);
@@ -551,7 +543,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 				}
 				boolean selected = setting == selectedSetting;
 				lore.add(Component.text((selected ? "+ " : "- ") + line, selected ? NamedTextColor.GREEN : NamedTextColor.GRAY)
-					         .decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, selected));
+					.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, selected));
 			}
 			meta.lore(lore);
 			item.setItemMeta(meta);
@@ -573,11 +565,11 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		for (PSGUIEquipment equipment : PSGUIEquipment.values()) {
 			ItemStack leftItem = mLeftStats.mDisplayedEquipment.get(equipment);
 			mInventory.setItem(equipment.mLeftSlot, leftItem != null && leftItem.getType() != Material.AIR ? leftItem
-				                                        : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && !mSelectedRightEquipmentSet));
+				: makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && !mSelectedRightEquipmentSet));
 
 			ItemStack rightItem = mRightStats.mDisplayedEquipment.get(equipment);
 			mInventory.setItem(equipment.mRightSlot, rightItem != null && rightItem.getType() != Material.AIR ? rightItem
-				                                         : makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
+				: makePlaceholderItem(equipment, equipment == mSelectedEquipmentsSlot && mSelectedRightEquipmentSet));
 		}
 
 		if (mFromPDGui) {

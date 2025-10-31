@@ -20,10 +20,10 @@ public class Legionary {
 	public static final String AVOID_LEGIONARY = "boss_legionaryimmune";
 
 	public static Component[] rankDescription(int level) {
-			return new Component[]{
-				Component.text("Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance"),
-				Component.text("to spawn a copy of each enemy.")
-			};
+		return new Component[]{
+			Component.text("Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance"),
+			Component.text("to spawn a copy of each enemy.")
+		};
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {

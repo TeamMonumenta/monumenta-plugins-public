@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 // This class exists to work around weird behavior in 1.18 where picking up items doesn't update your inventory
 public class InventoryUpdateListener implements Listener {
-	private Map<UUID, BukkitRunnable> mUpdateRunnables = new HashMap<>();
+	private final Map<UUID, BukkitRunnable> mUpdateRunnables = new HashMap<>();
 
 	// An entity picked up an item, monitor status runs after everything else
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

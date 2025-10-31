@@ -194,7 +194,7 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 
 		//What an anime protagonist feels like
 		events.put(90, mBoss -> {
-			String[] dio = new String[] {
+			String[] dio = new String[]{
 				"OINK. OINK. OINK OINK.",
 				"OINK OINK. OINK OINK OINK. OINK OINK!",
 				"OINK OINK, OINK OINK OINK OINK. OOINKKKK!!"

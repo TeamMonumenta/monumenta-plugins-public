@@ -339,8 +339,8 @@ public class ParrotManager implements Listener {
 		// only one parrot of each type is allowed per plot, so remove any matching existing ones first
 		for (Parrot parrot : player.getWorld().getEntitiesByClass(Parrot.class)) {
 			if (parrot.getVariant() == variant.getVariant()
-				    && parrot.getScoreboardTags().contains(PLACED_PARROT_TAG)
-				    && variant.getName().equals(MessagingUtils.plainText(parrot.customName()))) {
+				&& parrot.getScoreboardTags().contains(PLACED_PARROT_TAG)
+				&& variant.getName().equals(MessagingUtils.plainText(parrot.customName()))) {
 				parrot.remove();
 			}
 		}
@@ -361,7 +361,7 @@ public class ParrotManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void entityDeathEvent(EntityDeathEvent event) {
 		if (event.getEntity() instanceof Parrot parrot
-			    && parrot.getScoreboardTags().contains(PLACED_PARROT_TAG)) {
+			&& parrot.getScoreboardTags().contains(PLACED_PARROT_TAG)) {
 			event.setDroppedExp(0);
 			event.getDrops().clear();
 		}

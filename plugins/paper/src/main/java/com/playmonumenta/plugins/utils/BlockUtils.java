@@ -505,6 +505,7 @@ public class BlockUtils {
 
 	/**
 	 * Special list of blocks that mobs either cannot jump or pathfind over
+	 *
 	 * @param blockData BlockData of a block to test
 	 * @return True if a mob cannot jump or pathfind over the block
 	 */
@@ -614,11 +615,11 @@ public class BlockUtils {
 
 	public static boolean isExposed(Block block) {
 		return !block.getRelative(BlockFace.UP).isSolid()
-				|| !block.getRelative(BlockFace.DOWN).isSolid()
-				|| !block.getRelative(BlockFace.NORTH).isSolid()
-				|| !block.getRelative(BlockFace.SOUTH).isSolid()
-				|| !block.getRelative(BlockFace.EAST).isSolid()
-				|| !block.getRelative(BlockFace.WEST).isSolid();
+			|| !block.getRelative(BlockFace.DOWN).isSolid()
+			|| !block.getRelative(BlockFace.NORTH).isSolid()
+			|| !block.getRelative(BlockFace.SOUTH).isSolid()
+			|| !block.getRelative(BlockFace.EAST).isSolid()
+			|| !block.getRelative(BlockFace.WEST).isSolid();
 	}
 
 	private static class Node {
@@ -730,7 +731,8 @@ public class BlockUtils {
 
 	/**
 	 * Gets blocks in a cube around a central block
-	 * @param loc Center of cube
+	 *
+	 * @param loc    Center of cube
 	 * @param radius Distance around center to check (it's not really a radius because cube but whatever)
 	 * @return List of blocks around center
 	 */

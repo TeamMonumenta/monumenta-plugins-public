@@ -15,7 +15,7 @@ public class Spectral {
 	public static Component[] rankDescription(int level) {
 		return new Component[]{
 			Component.text("Dying Enemies have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance"),
-				Component.text("to spawn Specters.")
+			Component.text("to spawn Specters.")
 		};
 	}
 

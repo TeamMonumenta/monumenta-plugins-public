@@ -49,8 +49,8 @@ public class CosmicMoonbladeCS implements CosmeticSkill {
 			double mRoll;
 			double mD = 45;
 			boolean mInit = false;
-			PPPeriodic mParticle1 = new PPPeriodic(Particle.DUST_COLOR_TRANSITION, player.getLocation()).count(1).delta(0.1, 0.1, 0.1);
-			PPPeriodic mParticle2 = new PPPeriodic(Particle.DUST_COLOR_TRANSITION, player.getLocation()).count(1).delta(0.1, 0.1, 0.1);
+			final PPPeriodic mParticle1 = new PPPeriodic(Particle.DUST_COLOR_TRANSITION, player.getLocation()).count(1).delta(0.1, 0.1, 0.1);
+			final PPPeriodic mParticle2 = new PPPeriodic(Particle.DUST_COLOR_TRANSITION, player.getLocation()).count(1).delta(0.1, 0.1, 0.1);
 
 			@Override
 			public void run() {

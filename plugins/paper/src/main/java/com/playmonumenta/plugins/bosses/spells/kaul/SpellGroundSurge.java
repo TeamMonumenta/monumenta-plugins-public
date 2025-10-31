@@ -102,7 +102,7 @@ public class SpellGroundSurge extends Spell {
 
 						BukkitRunnable runnable = new BukkitRunnable() {
 							int mInnerTicks = 0;
-							BoundingBox mBox = BoundingBox.of(nloc, 0.65, 0.65, 0.65);
+							final BoundingBox mBox = BoundingBox.of(nloc, 0.65, 0.65, 0.65);
 
 							@Override
 							public void run() {
@@ -159,10 +159,10 @@ public class SpellGroundSurge extends Spell {
 										Player tPlayer = rPlayer;
 										BukkitRunnable runnable = new BukkitRunnable() {
 											Player mTPlayer = tPlayer;
-											BoundingBox mBox = BoundingBox.of(bLoc, 0.4, 0.4, 0.4);
+											final BoundingBox mBox = BoundingBox.of(bLoc, 0.4, 0.4, 0.4);
 											int mTicks = 0;
 											int mHits = 0;
-											List<UUID> mHit = new ArrayList<>();
+											final List<UUID> mHit = new ArrayList<>();
 
 											@Override
 											public void run() {
@@ -196,8 +196,8 @@ public class SpellGroundSurge extends Spell {
 												new PartialParticle(Particle.LAVA, innerBoxLoc, 1, 0.2, 0.2, 0.2, 0.25).spawnAsEntityActive(mBoss);
 												for (Player surgePlayer : players) {
 													if (surgePlayer.getBoundingBox().overlaps(mBox)
-														    && !surgePlayer.getUniqueId().equals(player.getUniqueId())
-														    && !mHit.contains(surgePlayer.getUniqueId())) {
+														&& !surgePlayer.getUniqueId().equals(player.getUniqueId())
+														&& !mHit.contains(surgePlayer.getUniqueId())) {
 														mHit.add(surgePlayer.getUniqueId());
 														DamageUtils.damage(mBoss, surgePlayer, DamageType.BLAST, 40, null, false, true, SPELL_NAME);
 														com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player,

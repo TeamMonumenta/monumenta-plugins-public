@@ -55,7 +55,7 @@ public class CrystallineCombosCS implements CosmeticSkill {
 	public void crystallineCombosActiveSwirl(List<PPPeriodic> mParticles, Player player, double mRotationAngle, boolean mSpendingStacks, int colorAdjust, int i) {
 		PPPeriodic particle = mParticles.get(i);
 		particle.location(LocationUtils.getHalfHeightLocation(player)
-			.add(FastUtils.cos(Math.toRadians(mRotationAngle + (i * 120))), -0.1, FastUtils.sin(Math.toRadians(mRotationAngle + (i * 120)))))
+				.add(FastUtils.cos(Math.toRadians(mRotationAngle + (i * 120))), -0.1, FastUtils.sin(Math.toRadians(mRotationAngle + (i * 120)))))
 			.data(new Particle.DustOptions(Color.fromRGB(mSpendingStacks ? 255 : colorAdjust, mSpendingStacks ? 150 : colorAdjust, mSpendingStacks ? 150 : 255), 0.8f))
 			.spawnAsPlayerPassive(player);
 	}

@@ -26,7 +26,7 @@ public class EditAnchorGroupView extends AnchorGroupView {
 			.append(Component.text(mAnchorGroup.name(), NamedTextColor.BLACK)));
 
 		mGui.setItem(0, 0, GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY))
-				.onClick(event -> mGui.setView(new SelectAnchorGroupsView(mGui)));
+			.onClick(event -> mGui.setView(new SelectAnchorGroupsView(mGui)));
 
 		mGui.setAnchorGroupIcon(0, 4, mAnchorGroup);
 

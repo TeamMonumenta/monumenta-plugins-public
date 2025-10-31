@@ -36,7 +36,7 @@ import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class SpellFinalCrystal extends Spell {
 	private final Plugin mPlugin;
-	private double mT = 20 * 1;
+	private double mT = 20;
 	private final int mSoloCooldown = 20 * 20;
 	private double mCooldown;
 	private final double mMaxFactor = 2.0;
@@ -180,7 +180,7 @@ public class SpellFinalCrystal extends Spell {
 				BossUtils.hideBossBar(bar, world);
 			}
 		};
-		runA.runTaskTimer(mPlugin, 20 * 1, 1);
+		runA.runTaskTimer(mPlugin, 20, 1);
 		mActiveRunnables.add(runA);
 	}
 

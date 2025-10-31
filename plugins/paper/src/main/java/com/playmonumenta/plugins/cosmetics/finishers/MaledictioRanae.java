@@ -44,7 +44,7 @@ public class MaledictioRanae implements EliteFinisher {
 			Vector dir = VectorUtils.rotateTargetDirection(LocationUtils.getDirectionTo(p.getLocation(), frog.getLocation()).setY(0), 135 + 90 * Math.random(), 0).multiply(0.5);
 			frog.teleport(frog.getLocation().setDirection(dir));
 			frog.setVelocity(dir.setY(0.8));
-			}, 20);
+		}, 20);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(),
 			frog::remove, 35);
 	}

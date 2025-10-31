@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.rush;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
@@ -7,16 +8,14 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
-import com.playmonumenta.plugins.Plugin;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vindicator;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RushDownMobBoss extends BossAbilityGroup {
 	public static final String identityTag = "RushDownMob";

@@ -98,7 +98,7 @@ public final class Azacor extends SerializedLocationBossAbilityGroup {
 					new PartialParticle(Particle.EXPLOSION_LARGE, loc).count(30).minimumCount(1).delta(0).extra(0.3).spawnAsEntityActive(mBoss);
 					if (!blocked) {
 						DamageUtils.damage(mBoss, target, new DamageEvent.Metadata(DamageEvent.DamageType.TRUE, null,
-							null, LASER_SPELL_NAME), 0.75 * EntityUtils.getMaxHealth(target),
+								null, LASER_SPELL_NAME), 0.75 * EntityUtils.getMaxHealth(target),
 							true, true, true);
 						if (target instanceof Player player && BossUtils.bossDamageBlocked(player, mBoss.getLocation())) {
 							DamageUtils.damage(mBoss, target, new DamageEvent.Metadata(DamageEvent.DamageType.TRUE, null,
@@ -118,9 +118,9 @@ public final class Azacor extends SerializedLocationBossAbilityGroup {
 			// Teleport the boss to mSpawnLoc if he is too far away, in bedrock, or in lava
 			new SpellConditionalTeleport(mBoss, mSpawnLoc, b ->
 				mSpawnLoc.distanceSquared(b.getLocation()) > detectionRange * detectionRange
-				|| b.getLocation().getBlock().getType() == Material.BEDROCK
-				|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-				|| b.getLocation().getBlock().getType() == Material.LAVA),
+					|| b.getLocation().getBlock().getType() == Material.BEDROCK
+					|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+					|| b.getLocation().getBlock().getType() == Material.LAVA),
 			new SpellMinionResist(mBoss, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 30, 2),
 				detectionRange, 5, (entity) -> (entity.getType().equals(EntityType.WITHER_SKELETON)
 				|| entity.getType().equals(EntityType.SKELETON)) && entity.getScoreboardTags().contains("azacor_minion"))

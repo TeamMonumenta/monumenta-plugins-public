@@ -29,8 +29,8 @@ public class SpellDash extends Spell {
 	public final ParticlesList mParticlesLand;
 
 	public SpellDash(Plugin plugin, LivingEntity boss, int cooldown, double minRange, EntityTargets target, boolean preferTarget, double jumpVelocity, double velocity,
-					 SoundsList soundsStart, SoundsList soundsLand,
-					 ParticlesList particlesStart, ParticlesList particlesAir, ParticlesList particlesLand) {
+	                 SoundsList soundsStart, SoundsList soundsLand,
+	                 ParticlesList particlesStart, ParticlesList particlesAir, ParticlesList particlesLand) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mCooldown = cooldown;
@@ -92,9 +92,9 @@ public class SpellDash extends Spell {
 		mSoundsStart.play(mBoss.getLocation());
 		// Jump Particles
 		ParticleUtils.explodingRingEffect(mPlugin, mBoss.getLocation(), 2, 1, 4,
-				List.of(
-						new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) -> mParticlesStart.spawn(mBoss, location))
-				)
+			List.of(
+				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) -> mParticlesStart.spawn(mBoss, location))
+			)
 		);
 	}
 
@@ -108,9 +108,9 @@ public class SpellDash extends Spell {
 		mSoundsLand.play(mBoss.getLocation());
 		// Landing Particles
 		ParticleUtils.explodingRingEffect(mPlugin, mBoss.getLocation(), 2, 1, 4,
-				List.of(
-						new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) -> mParticlesLand.spawn(mBoss, location))
-				)
+			List.of(
+				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) -> mParticlesLand.spawn(mBoss, location))
+			)
 		);
 	}
 }

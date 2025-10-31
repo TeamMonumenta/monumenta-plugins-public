@@ -27,28 +27,28 @@ public class PartialParticleCommand {
 		new CommandAPICommand("partialparticle")
 			.withPermission("monumenta.command.partialparticle")
 			.withSubcommand(new CommandAPICommand("logging")
-				                .withArguments(new LiteralArgument("start"))
-				                .executes((sender, args) -> {
-					                start(sender, 20);
-				                }))
+				.withArguments(new LiteralArgument("start"))
+				.executes((sender, args) -> {
+					start(sender, 20);
+				}))
 			.withSubcommand(new CommandAPICommand("logging")
-				                .withArguments(new LiteralArgument("start"),
-					                new DoubleArgument("period in seconds", 0.05, 60))
-				                .executes((sender, args) -> {
-					                start(sender, Math.max(1, (int) (20 * (double) args.get("period in seconds"))));
-				                }))
+				.withArguments(new LiteralArgument("start"),
+					new DoubleArgument("period in seconds", 0.05, 60))
+				.executes((sender, args) -> {
+					start(sender, Math.max(1, (int) (20 * (double) args.get("period in seconds"))));
+				}))
 			.withSubcommand(new CommandAPICommand("logging")
-				                .withArguments(new LiteralArgument("stop"))
-				                .executes((sender, args) -> {
-					                UUID uuid = sender instanceof Player player ? player.getUniqueId() : CONSOLE_UUID;
-					                BukkitTask task = mPlayerLoggingTasks.remove(uuid);
-					                if (task != null) {
-						                task.cancel();
-						                sender.sendMessage(Component.text("PartialParticle logging stopped", NamedTextColor.YELLOW));
-					                } else {
-						                sender.sendMessage(Component.text("PartialParticle logging is not active", NamedTextColor.GRAY));
-					                }
-				                }))
+				.withArguments(new LiteralArgument("stop"))
+				.executes((sender, args) -> {
+					UUID uuid = sender instanceof Player player ? player.getUniqueId() : CONSOLE_UUID;
+					BukkitTask task = mPlayerLoggingTasks.remove(uuid);
+					if (task != null) {
+						task.cancel();
+						sender.sendMessage(Component.text("PartialParticle logging stopped", NamedTextColor.YELLOW));
+					} else {
+						sender.sendMessage(Component.text("PartialParticle logging is not active", NamedTextColor.GRAY));
+					}
+				}))
 			.register();
 
 	}
@@ -75,8 +75,8 @@ public class PartialParticleCommand {
 				long newCount = PartialParticle.getSpawnedParticles();
 				if (newCount > mLastCount) {
 					sender.sendMessage(Component.text("Spawned ", NamedTextColor.WHITE)
-						                   .append(Component.text(newCount - mLastCount, NamedTextColor.GOLD))
-						                   .append(Component.text(" particles in the last " + StringUtils.ticksToSeconds(period) + "s", NamedTextColor.WHITE)));
+						.append(Component.text(newCount - mLastCount, NamedTextColor.GOLD))
+						.append(Component.text(" particles in the last " + StringUtils.ticksToSeconds(period) + "s", NamedTextColor.WHITE)));
 				}
 				mLastCount = newCount;
 			}

@@ -56,6 +56,7 @@ public class Riftborn {
 			boss.addScoreboardTag(BlockLockBoss.identityTag + String.format("[x=%s,y=%s,z=%s]", block.getX(), block.getY(), block.getZ()));
 			new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					if (mTicks < 5) {

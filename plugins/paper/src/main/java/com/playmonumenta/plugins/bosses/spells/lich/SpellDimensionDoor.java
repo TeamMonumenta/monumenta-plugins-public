@@ -203,8 +203,8 @@ public class SpellDimensionDoor extends Spell {
 					//move portal center to ground, stop above bedrock so that it doesn't replace bedrock
 					Location locDown = mLoc.clone().subtract(0, 1, 0);
 					while ((mLoc.getBlock().isPassable() || mLoc.getBlock().isLiquid()
-								|| mLoc.getBlock().isEmpty()) && locDown.getBlock().getType() != Material.BEDROCK
-							   && mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
+						|| mLoc.getBlock().isEmpty()) && locDown.getBlock().getType() != Material.BEDROCK
+						&& mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
 						mLoc.setY(mLoc.getY() - 1);
 						locDown = mLoc.clone().subtract(0, 1, 0);
 					}

@@ -26,8 +26,8 @@ public class GearDamageIncrease extends Effect {
 	private @Nullable BiPredicate<LivingEntity, LivingEntity> mPredicate;
 
 	private GearDamageIncrease(final int duration, final double amount,
-							   final @Nullable EnumSet<DamageType> affectedDamageTypes, final int priority,
-							   final @Nullable BiPredicate<LivingEntity, LivingEntity> predicate, final String id) {
+	                           final @Nullable EnumSet<DamageType> affectedDamageTypes, final int priority,
+	                           final @Nullable BiPredicate<LivingEntity, LivingEntity> predicate, final String id) {
 		super(duration, id);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
@@ -37,8 +37,9 @@ public class GearDamageIncrease extends Effect {
 
 	/**
 	 * Create a new <code>GearDamageIncrease</code> Effect.
+	 *
 	 * @param duration Time in ticks the effect lasts
-	 * @param amount Potency of the effect where amount < 0 is a debuff and amount > 0 is a buff
+	 * @param amount   Potency of the effect where amount < 0 is a debuff and amount > 0 is a buff
 	 */
 	public GearDamageIncrease(final int duration, final double amount) {
 		this(duration, amount, null, 0, null, effectID);
@@ -46,6 +47,7 @@ public class GearDamageIncrease extends Effect {
 
 	/**
 	 * Restricts what DamageTypes an instance of GearDamageIncrease can apply to
+	 *
 	 * @param affectedDamageTypes Which DamageTypes the effect should modify
 	 * @return Modified GearDamageIncrease instance
 	 */
@@ -58,6 +60,7 @@ public class GearDamageIncrease extends Effect {
 	 * Modifies the EffectPriority of an instance of GearDamageIncrease. Default is 0 (early)<br>
 	 * Note: This is set to <code>protected</code> since this builder method isn't used outside of this class. Unless
 	 * you have a good reason to override an effect's priority, don't change this method to public
+	 *
 	 * @param priority Priority ordering of this effect
 	 * @return Modified GearDamageIncrease instance
 	 */
@@ -68,6 +71,7 @@ public class GearDamageIncrease extends Effect {
 
 	/**
 	 * Restricts what DamageTypes an instance of GearDamageIncrease can apply to
+	 *
 	 * @param predicate Determines what DamageEvents should be modified using damagee and damager
 	 * @return Modified GearDamageIncrease instance
 	 */
@@ -113,7 +117,7 @@ public class GearDamageIncrease extends Effect {
 		}
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
 			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL)
-				&& AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
+			&& AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
 			event.updateGearDamageWithMultiplier(Math.max(0, 1 + mAmount));
 		}
 	}

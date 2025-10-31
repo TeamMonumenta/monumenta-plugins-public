@@ -918,8 +918,9 @@ public class GuildGui extends MailGui {
 
 	/**
 	 * Sets an icon for a specified player. The player's UUID and/or name must be known.
-	 * @param y The zero-indexed row of the inventory
-	 * @param x The zero-indexed column of the inventory
+	 *
+	 * @param y               The zero-indexed row of the inventory
+	 * @param x               The zero-indexed column of the inventory
 	 * @param playerGuildInfo The player's information for a given guild
 	 */
 	protected void setPlayerIcon(int y, int x, PlayerGuildInfo playerGuildInfo) {

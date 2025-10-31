@@ -5,10 +5,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import java.util.EnumSet;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import java.util.EnumSet;
 
 public class Skyseeker implements Enchantment {
 	public static final double DAMAGE_BONUS_PER_LEVEL = 0.1;

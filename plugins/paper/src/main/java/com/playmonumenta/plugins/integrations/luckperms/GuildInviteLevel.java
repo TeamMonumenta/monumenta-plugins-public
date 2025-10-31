@@ -76,8 +76,9 @@ public enum GuildInviteLevel {
 
 	/**
 	 * Updates the invite level of a player for a guild
-	 * @param target The player whose invite level is being updated
-	 * @param guild The guild for which that player's invite level is being updated
+	 *
+	 * @param target      The player whose invite level is being updated
+	 * @param guild       The guild for which that player's invite level is being updated
 	 * @param targetLevel The desired invite level for that player in that guild
 	 * @return A future for the User object for the target user
 	 */

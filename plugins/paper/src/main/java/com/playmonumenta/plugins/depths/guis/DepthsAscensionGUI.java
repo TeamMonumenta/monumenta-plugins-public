@@ -116,9 +116,9 @@ public class DepthsAscensionGUI extends Gui {
 				NamedTextColor.GRAY, 30, true);
 			//Bonuses
 			GUIUtils.splitLoreLine(clickableItem, "+ Increases currency drops by "
-				+ StringUtils.multiplierToPercentage(ZenithLoot.CURRENCY_PER_ASC_LEVEL * details.mLevel)
-				+ "% and dungeon material drops by "
-				+ StringUtils.multiplierToPercentage(ZenithLoot.DUNGEON_PER_ASC_LEVEL * details.mLevel) + "%.",
+					+ StringUtils.multiplierToPercentage(ZenithLoot.CURRENCY_PER_ASC_LEVEL * details.mLevel)
+					+ "% and dungeon material drops by "
+					+ StringUtils.multiplierToPercentage(ZenithLoot.DUNGEON_PER_ASC_LEVEL * details.mLevel) + "%.",
 				NamedTextColor.GREEN, 40, false);
 			GUIUtils.splitLoreLine(clickableItem, "+ Zenith Charms drop at Level " + details.mLevel + " rates",
 				NamedTextColor.GREEN, 40, false);

@@ -19,14 +19,14 @@ public class PlayerSaturationTracker {
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				float newSaturation = player.getSaturation();
 				if ((float) player.getHealth() < (float) EntityUtils.getMaxHealth(player) // float comparison just like in vanilla (Player.isHurt())
-					    || player.getFoodLevel() < 20) {
+					|| player.getFoodLevel() < 20) {
 					// Health updates are sent automatically in these conditions, so just update the tracked value
 					saturationLevels.put(player.getUniqueId(), newSaturation);
 				} else {
 					Float oldSaturation = saturationLevels.get(player.getUniqueId());
 					// Full health and hunger: no saturation updates are sent. Manually send them whenever the saturation changes by 0.5 or more.
 					if (oldSaturation != null
-						    && Math.abs(oldSaturation - newSaturation) >= 0.5) {
+						&& Math.abs(oldSaturation - newSaturation) >= 0.5) {
 						player.sendHealthUpdate();
 						saturationLevels.put(player.getUniqueId(), newSaturation);
 					}

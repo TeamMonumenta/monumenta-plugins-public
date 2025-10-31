@@ -144,7 +144,6 @@ public enum CharmNounConcepts {
 	THE_WIND("the Wind", DepthsTree.WINDWALKER);
 
 
-
 	public final String mName;
 	public final @Nullable DepthsTree mTree;
 

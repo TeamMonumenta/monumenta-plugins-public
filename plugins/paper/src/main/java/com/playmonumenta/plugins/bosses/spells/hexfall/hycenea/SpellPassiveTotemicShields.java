@@ -30,7 +30,7 @@ public class SpellPassiveTotemicShields extends Spell {
 
 	public SpellPassiveTotemicShields(Plugin mMonumentaPlugin, Location mSpawnLoc, LivingEntity mBoss) {
 		this.mMonumentaPlugin = mMonumentaPlugin;
-		Collection<Entity> nearbyEntities = mSpawnLoc.getNearbyEntities(HyceneaRageOfTheWolf.detectionRange, HyceneaRageOfTheWolf.detectionRange, HyceneaRageOfTheWolf. detectionRange);
+		Collection<Entity> nearbyEntities = mSpawnLoc.getNearbyEntities(HyceneaRageOfTheWolf.detectionRange, HyceneaRageOfTheWolf.detectionRange, HyceneaRageOfTheWolf.detectionRange);
 		mLifeIslands = nearbyEntities.stream().filter(entity -> entity.getScoreboardTags().contains("Hycenea_Island_Life")).collect(Collectors.toList());
 		mDeathIslands = nearbyEntities.stream().filter(entity -> entity.getScoreboardTags().contains("Hycenea_Island_Death")).collect(Collectors.toList());
 		this.mSpawnLoc = mSpawnLoc;

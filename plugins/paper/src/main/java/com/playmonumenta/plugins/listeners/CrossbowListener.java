@@ -62,10 +62,10 @@ public class CrossbowListener implements Listener {
 		if (event.getEntity() instanceof Player player) {
 			//Infinity gives arrow to player if the arrow shot had no potion nor custom effects
 			if (crossbow.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0
-				    && arrow instanceof Arrow regularArrow
-				    && !regularArrow.hasCustomEffects()
-				    && regularArrow.getBasePotionType() == PotionType.UNCRAFTABLE // plain arrow
-				    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
+				&& arrow instanceof Arrow regularArrow
+				&& !regularArrow.hasCustomEffects()
+				&& regularArrow.getBasePotionType() == PotionType.UNCRAFTABLE // plain arrow
+				&& arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
 				arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 				if (player.getGameMode() != GameMode.CREATIVE) {
 					InventoryUtils.giveItem(player, new ItemStack(Material.ARROW), true);

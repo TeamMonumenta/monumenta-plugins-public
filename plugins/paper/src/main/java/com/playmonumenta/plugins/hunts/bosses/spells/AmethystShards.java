@@ -138,7 +138,7 @@ public class AmethystShards extends Spell {
 			public void run() {
 				if (mTicks < WINDUP_DURATION) {
 					if (mTicks % 3 == 0) {
-						mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.HOSTILE, 15, 0.4f + ((float)mTicks / WINDUP_DURATION * 0.5f));
+						mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.HOSTILE, 15, 0.4f + ((float) mTicks / WINDUP_DURATION * 0.5f));
 					}
 				} else {
 					// If bullets should be shot this tick
@@ -186,7 +186,7 @@ public class AmethystShards extends Spell {
 			public void run() {
 				double speedThisTick = (BULLET_SPEED + (BULLET_ACCELERATION / 20) * mTicks) / 20;
 				Vector change = direction.clone().multiply(speedThisTick);
-				bullet.setTransformation(new Transformation(new Vector3f((float)(mTotalChange.getX() + change.getX() * 2), (float)(mTotalChange.getY() + change.getY() * 2), (float)(mTotalChange.getZ() + change.getZ() * 2)), bullet.getTransformation().getLeftRotation(), bullet.getTransformation().getScale(), bullet.getTransformation().getRightRotation()));
+				bullet.setTransformation(new Transformation(new Vector3f((float) (mTotalChange.getX() + change.getX() * 2), (float) (mTotalChange.getY() + change.getY() * 2), (float) (mTotalChange.getZ() + change.getZ() * 2)), bullet.getTransformation().getLeftRotation(), bullet.getTransformation().getScale(), bullet.getTransformation().getRightRotation()));
 				bullet.setInterpolationDelay(-1);
 
 				mTotalChange.add(change);

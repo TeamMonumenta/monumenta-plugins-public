@@ -220,7 +220,9 @@ public class AlchemicalArtillery extends Ability {
 		double finalDamage = damage * mAftershockMult;
 		new BukkitRunnable() {
 			int mCount = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
 				List<LivingEntity> mobs = hitbox.getHitMobs();
 

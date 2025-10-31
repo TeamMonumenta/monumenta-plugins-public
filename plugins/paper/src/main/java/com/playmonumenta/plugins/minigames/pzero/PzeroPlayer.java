@@ -338,10 +338,10 @@ public class PzeroPlayer {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			giveBoostRod();
 			mBeingLaunched = false;
-				if (gracePeriodTicks > 0) {
-					mIsInGracePeriod = true;
-					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mIsInGracePeriod = false, gracePeriodTicks);
-				}
+			if (gracePeriodTicks > 0) {
+				mIsInGracePeriod = true;
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mIsInGracePeriod = false, gracePeriodTicks);
+			}
 		}, delay);
 	}
 
@@ -390,8 +390,8 @@ public class PzeroPlayer {
 	public void showEndingInfo(PzeroPlayerPlacement placement, boolean finished, boolean eliminated) {
 		Component title = Component.text(finished ? "FINISH!" : "CRASH OUT!", finished ? NamedTextColor.GREEN : NamedTextColor.RED, TextDecoration.BOLD);
 		Component subtitleTime = Component.text(StringUtils.intToOrdinal(placement.mPlacement), getPlacementColor(placement.mPlacement), TextDecoration.BOLD)
-				.append(Component.text(" - ", NamedTextColor.WHITE, TextDecoration.BOLD))
-				.append(Component.text(StringUtils.intToMinuteAndSeconds(mTimer / 20) + "." + StringUtils.ticksToMilliseconds(mTimer), OTHER_COLOR, TextDecoration.BOLD));
+			.append(Component.text(" - ", NamedTextColor.WHITE, TextDecoration.BOLD))
+			.append(Component.text(StringUtils.intToMinuteAndSeconds(mTimer / 20) + "." + StringUtils.ticksToMilliseconds(mTimer), OTHER_COLOR, TextDecoration.BOLD));
 
 		if (mLastHitBy != null && eliminated) {
 			Component subtitleEliminated = Component.text("❌ Eliminated", NamedTextColor.RED, TextDecoration.BOLD)

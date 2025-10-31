@@ -76,6 +76,7 @@ public class SpellRisingTides extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT += 5;
@@ -92,11 +93,11 @@ public class SpellRisingTides extends Spell {
 
 					Location loc = mStartLoc.clone().add(0, tide ? -.5 + (dPitch / 2) : 2.5 - (dPitch / 2), 0);
 					PPCircle particles = new PPCircle(Particle.REDSTONE, loc, 30)
-						                     .ringMode(false)
-						                     .count(1300)
-						                     .delta(0.1, 0.05, 0.1)
-						                     .data(tide ? UP_COLOR : DOWN_COLOR)
-						                     .distanceFalloff(20);
+						.ringMode(false)
+						.count(1300)
+						.delta(0.1, 0.05, 0.1)
+						.data(tide ? UP_COLOR : DOWN_COLOR)
+						.distanceFalloff(20);
 					particles.spawnAsEntityActive(mBoss);
 
 					// spawn a few particles also far away

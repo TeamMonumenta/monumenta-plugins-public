@@ -91,11 +91,11 @@ public class BuyPlotTypeView extends View {
 					.append(ItemUtils.getDisplayName(currency))
 					.append(Component.space())
 					.append(Component.text(
-						debt.mMeetsRequirement ? "✓" : "✗",
-						debt.mMeetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED
+						debt.mMeetsRequirement() ? "✓" : "✗",
+						debt.mMeetsRequirement() ? NamedTextColor.GREEN : NamedTextColor.RED
 					))
 					.append(Component.text(
-						debt.mWalletDebt > 0 ? " (" + debt.mNumInWallet + " in wallet)" : "",
+						debt.mWalletDebt() > 0 ? " (" + debt.mNumInWallet() + " in wallet)" : "",
 						NamedTextColor.GRAY
 					))
 				);
@@ -161,7 +161,7 @@ public class BuyPlotTypeView extends View {
 						WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(
 							currency, required, mGui.mPlayer.getInventory().getContents(), wallet, false);
 						debts.add(debt);
-						if (!debt.mMeetsRequirement) {
+						if (!debt.mMeetsRequirement()) {
 							notEnough.add(ItemUtils.getPlainName(currency));
 						}
 					}

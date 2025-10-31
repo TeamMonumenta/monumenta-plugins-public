@@ -28,11 +28,11 @@ public class MeteorSlamCS implements CosmeticSkill {
 		world.playSound(location, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
 		new PartialParticle(Particle.LAVA, location, 15, 1, 0f, 1, 0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, location)
-				.count(30)
-				.delta(3, 0, 3)
-				.deltaVariance(true, false, true)
-				.extra(0.2)
-				.extraVariance(0.1)
+			.count(30)
+			.delta(3, 0, 3)
+			.deltaVariance(true, false, true)
+			.extra(0.2)
+			.extraVariance(0.1)
 			.directionalMode(true)
 			.spawnAsPlayerActive(mPlayer);
 	}

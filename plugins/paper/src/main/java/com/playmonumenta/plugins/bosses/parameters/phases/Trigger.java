@@ -86,9 +86,8 @@ public abstract class Trigger {
 	}
 
 
-
 	public enum TriggerOperation {
-		AND, OR, XOR;
+		AND, OR, XOR
 	}
 
 	public static boolean isOperator(String identifier) {

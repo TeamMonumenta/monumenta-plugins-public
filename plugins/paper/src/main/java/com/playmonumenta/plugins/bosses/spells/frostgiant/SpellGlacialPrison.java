@@ -132,7 +132,7 @@ public final class SpellGlacialPrison extends Spell {
 			prisonerLocs.add(target.getLocation());
 
 			final Location center = target.getLocation();
-			final Location[] prisonBlockLocs = new Location[] {
+			final Location[] prisonBlockLocs = new Location[]{
 				//First Layer
 				center.clone().add(1, 0, 0),
 				center.clone().add(-1, 0, 0),

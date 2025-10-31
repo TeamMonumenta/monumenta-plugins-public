@@ -80,8 +80,9 @@ public enum GuildAccessLevel {
 
 	/**
 	 * Updates the access level of a player for a guild
-	 * @param target The player whose access level is being updated
-	 * @param guild The guild for which that player's access level is being updated
+	 *
+	 * @param target      The player whose access level is being updated
+	 * @param guild       The guild for which that player's access level is being updated
 	 * @param targetLevel The desired access level for that player in that guild
 	 * @return A future for the User object for the target user
 	 */

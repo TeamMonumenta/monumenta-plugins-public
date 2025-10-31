@@ -89,12 +89,12 @@ public class CragSplit extends Spell {
 		for (int i = 0; i < RIFT_COUNT; i++) {
 			double finalTheta = baseTheta + (Math.PI * 2 / RIFT_COUNT) * i;
 			new BukkitRunnable() {
-			    int mTicks = 0;
+				int mTicks = 0;
 				double mTheta = finalTheta % (Math.PI * 2);
 				Location mLocation = startLocation.clone().add(0, 0.5, 0);
 
-			    @Override
-			    public void run() {
+				@Override
+				public void run() {
 					for (int j = 0; j < STEPS_PER_TICK; j++) {
 						Vector direction = new Vector(FastUtils.cos(mTheta), 0, FastUtils.sin(mTheta));
 						mTheta = (mTheta + turnFactor) % (Math.PI * 2);
@@ -112,14 +112,14 @@ public class CragSplit extends Spell {
 					}
 
 					if (mTicks % 2 == 0) {
-						mBoss.getWorld().playSound(startLocation, Sound.BLOCK_BASALT_BREAK, SoundCategory.HOSTILE, 1f, 0.85f - 0.35f * ((float)mTicks / 16));
+						mBoss.getWorld().playSound(startLocation, Sound.BLOCK_BASALT_BREAK, SoundCategory.HOSTILE, 1f, 0.85f - 0.35f * ((float) mTicks / 16));
 					}
 
-			        this.mTicks++;
+					this.mTicks++;
 					if (mLocation.distance(startLocation) > RIFT_DISTANCE || mTicks > 150 || mBoss.isDead()) {
 						this.cancel();
 					}
-			    }
+				}
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
 	}
@@ -170,8 +170,8 @@ public class CragSplit extends Spell {
 					}
 
 					if (mTicks % 2 == 0) {
-						mBoss.getWorld().playSound(startLocation, Sound.BLOCK_BASALT_BREAK, SoundCategory.HOSTILE, 1f, 0.85f - 0.35f * ((float)mTicks / 16));
-						mBoss.getWorld().playSound(startLocation, Sound.BLOCK_AZALEA_BREAK, SoundCategory.HOSTILE, 1f, 0.85f - 0.35f * ((float)mTicks / 16));
+						mBoss.getWorld().playSound(startLocation, Sound.BLOCK_BASALT_BREAK, SoundCategory.HOSTILE, 1f, 0.85f - 0.35f * ((float) mTicks / 16));
+						mBoss.getWorld().playSound(startLocation, Sound.BLOCK_AZALEA_BREAK, SoundCategory.HOSTILE, 1f, 0.85f - 0.35f * ((float) mTicks / 16));
 					}
 
 					this.mTicks++;

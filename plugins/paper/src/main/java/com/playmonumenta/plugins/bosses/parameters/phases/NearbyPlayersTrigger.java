@@ -22,15 +22,18 @@ public class NearbyPlayersTrigger extends Trigger {
 	}
 
 
-	@Override public boolean test(LivingEntity boss) {
+	@Override
+	public boolean test(LivingEntity boss) {
 		return testPlayersInRange(boss.getLocation());
 	}
 
-	@Override public boolean tick(LivingEntity boss, int ticks) {
+	@Override
+	public boolean tick(LivingEntity boss, int ticks) {
 		return testPlayersInRangeWithNegation(boss.getLocation());
 	}
 
-	@Override public void reset(LivingEntity boss) {
+	@Override
+	public void reset(LivingEntity boss) {
 
 	}
 
@@ -49,14 +52,13 @@ public class NearbyPlayersTrigger extends Trigger {
 			return true;
 		} else if (players.size() > mNumberOfPlayers && (mOperation == CompareOperation.GREATER || mOperation == CompareOperation.GEQ)) {
 			return true;
-		} else if (players.size() < mNumberOfPlayers && (mOperation == CompareOperation.LOWER || mOperation == CompareOperation.LEQ)) {
-			return true;
+		} else {
+			return players.size() < mNumberOfPlayers && (mOperation == CompareOperation.LOWER || mOperation == CompareOperation.LEQ);
 		}
-		return false;
 	}
 
 	public enum CompareOperation {
-		EQUAL, GREATER, LOWER, LEQ, GEQ;
+		EQUAL, GREATER, LOWER, LEQ, GEQ
 	}
 
 }

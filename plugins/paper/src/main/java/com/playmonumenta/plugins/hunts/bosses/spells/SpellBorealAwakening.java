@@ -94,7 +94,7 @@ public class SpellBorealAwakening extends Spell {
 					.spawnAsBoss();
 
 				if (mTicks % 8 == 0) {
-					mWorld.playSound(summon.getLocation(), Sound.ENTITY_HORSE_STEP, SoundCategory.HOSTILE, 1f, 1 + 0.3f * (float)mTicks / SUMMON_TIME);
+					mWorld.playSound(summon.getLocation(), Sound.ENTITY_HORSE_STEP, SoundCategory.HOSTILE, 1f, 1 + 0.3f * (float) mTicks / SUMMON_TIME);
 				}
 
 				if (mTicks == SUMMON_TIME) {
@@ -125,7 +125,7 @@ public class SpellBorealAwakening extends Spell {
 
 	private int summonCount() {
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), AlocAcoc.OUTER_RADIUS, true).size();
-		return (int)((double)playerCount / 2.5 + 1);
+		return (int) ((double) playerCount / 2.5 + 1);
 	}
 
 	@Override

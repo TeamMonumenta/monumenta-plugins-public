@@ -240,6 +240,7 @@ public class GuildPlotUtils {
 
 	/**
 	 * Checks if the player should be in adventure mode or survival mode in a given plot
+	 *
 	 * @param player The player to be checked at their current location
 	 * @return null if the player is not in a guild plot,
 	 * survival if they have access to their current plot,
@@ -301,6 +302,7 @@ public class GuildPlotUtils {
 
 	/**
 	 * Check if the current guild plot prevents viewing inventory access
+	 *
 	 * @param player to check access for
 	 * @return True if not allowed to view inventories, otherwise false
 	 */
@@ -337,6 +339,7 @@ public class GuildPlotUtils {
 
 	/**
 	 * Check if the current guild plot prevents modifying inventory access
+	 *
 	 * @param player to check access for
 	 * @return True if not allowed to modify inventories, otherwise false
 	 */

@@ -45,11 +45,11 @@ public class ProjectileEffectTimers {
 			Location entityLoc = entity.getLocation();
 			// Launch particles in the direction of the projectile to prevent particles from blocking the view of the player
 			new PartialParticle(particle, entityLoc)
-			.directionalMode(true)
-			.delta(velocity.getX(), velocity.getY(), velocity.getZ())
-			.extra(0.5)
-			.distanceFalloff(48)
-			.spawnAsEntityActive(entity);
+				.directionalMode(true)
+				.delta(velocity.getX(), velocity.getY(), velocity.getZ())
+				.extra(0.5)
+				.distanceFalloff(48)
+				.spawnAsEntityActive(entity);
 		}
 	}
 }

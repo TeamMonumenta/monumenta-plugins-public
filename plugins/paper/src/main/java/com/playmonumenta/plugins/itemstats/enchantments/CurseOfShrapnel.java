@@ -1,15 +1,5 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
-import java.util.EnumSet;
-
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
-
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -22,6 +12,14 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.SpawnerUtils;
+import java.util.EnumSet;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 public class CurseOfShrapnel implements Enchantment {
 	private static final double PICKAXE_DAMAGE = 1;

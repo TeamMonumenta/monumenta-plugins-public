@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics.skills.cleric.seraph;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -10,7 +11,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import java.util.List;
 
 public class EtherealAscensionCS implements CosmeticSkill {
 

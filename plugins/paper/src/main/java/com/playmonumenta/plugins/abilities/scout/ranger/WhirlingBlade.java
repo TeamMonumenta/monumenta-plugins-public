@@ -66,7 +66,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 			.simpleDescription("Damage, weaken, and knock nearby mobs back.")
 			.cooldown(BLADE_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WhirlingBlade::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP)
-				                                                                          .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(Material.IRON_SWORD);
 
 	private final double mDamage;

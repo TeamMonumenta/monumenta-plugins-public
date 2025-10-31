@@ -23,7 +23,8 @@ public class DivineJusticeInvuln extends Effect {
 		return mAmount;
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 		return String.format("DivineJusticeInvuln duration:%d amount:%f", getDuration(), mAmount);
 	}
 }

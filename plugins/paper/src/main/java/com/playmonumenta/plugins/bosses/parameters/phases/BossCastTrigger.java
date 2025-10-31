@@ -13,15 +13,18 @@ public class BossCastTrigger extends Trigger {
 		mBossAbilityTag = tag;
 	}
 
-	@Override public boolean onBossCastAbility(LivingEntity boss, SpellCastEvent event) {
+	@Override
+	public boolean onBossCastAbility(LivingEntity boss, SpellCastEvent event) {
 		return event.getBossAbilityGroup().getIdentityTag().equals(mBossAbilityTag);
 	}
 
-	@Override public boolean test(LivingEntity boss) {
+	@Override
+	public boolean test(LivingEntity boss) {
 		return false;
 	}
 
-	@Override public void reset(LivingEntity boss) {
+	@Override
+	public void reset(LivingEntity boss) {
 		//no reset needed
 	}
 

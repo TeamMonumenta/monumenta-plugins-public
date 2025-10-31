@@ -42,8 +42,7 @@ public class CosmeticsCommand extends GenericCommand {
 					case GRAVE_POSE -> GravePoses.getNames();
 					case PLAYER_PUNCH -> PlayerPunches.getNames();
 					case PLOT_BORDER -> PlotBorderCustomInventory.getCosmeticNames();
-					case VANITY ->
-						Arrays.stream(Material.values())
+					case VANITY -> Arrays.stream(Material.values())
 						.filter(mat -> !mat.isLegacy())
 						.map(mat -> mat.name().toLowerCase(Locale.ROOT) + ":")
 						.toArray(String[]::new);

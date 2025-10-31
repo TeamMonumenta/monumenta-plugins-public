@@ -57,7 +57,7 @@ public class CloakAndDaggerCS implements StealthCosmeticSkill {
 				new PartialParticle(Particle.REDSTONE, location)
 					.data(new Particle.DustOptions(ParticleUtils.getTransition(Color.fromRGB(0x302133), Color.fromRGB(0xcf0e2a), Math.pow(angleProgress, 2)), 1.1f + (float) angleProgress * ring / 18.0f))
 					.spawnAsPlayerActive(mPlayer);
-		});
+			});
 
 		mCombo++;
 		mCombo %= 2;

@@ -27,7 +27,7 @@ public class CelestialBlessingDamageBuff extends PercentDamageDealt {
 	private boolean mExtended;
 
 	public CelestialBlessingDamageBuff(int duration, double amount, boolean enhanced, CelestialBlessingCS cosmetic,
-									   Player player, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes) {
+	                                   Player player, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes) {
 		super(duration, amount, affectedDamageTypes, effectID);
 		mEnhanced = enhanced;
 		mMelee = false;

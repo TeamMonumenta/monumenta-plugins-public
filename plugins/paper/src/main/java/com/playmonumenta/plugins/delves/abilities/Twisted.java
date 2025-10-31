@@ -61,11 +61,16 @@ public class Twisted {
 	public static Component[] rankDescription(int level) {
 		return new Component[]{
 			switch (level) {
-				case 1 -> Component.text("M").decorate(TextDecoration.OBFUSCATED).append(Component.text("or")).append(Component.text("tu").decorate(TextDecoration.OBFUSCATED)).append(Component.text("i non mo")).append(Component.text("rd").decorate(TextDecoration.OBFUSCATED)).append(Component.text("ent"));
-				case 2 -> Component.text("Mors").decorate(TextDecoration.OBFUSCATED).append(Component.text(" non a")).append(Component.text("ccip").decorate(TextDecoration.OBFUSCATED)).append(Component.text("it excusatio")).append(Component.text("nes").decorate(TextDecoration.OBFUSCATED));
-				case 3 -> Component.text("Quid").append(Component.text("quid in").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" altum ")).append(Component.text("for").decorate(TextDecoration.OBFUSCATED)).append(Component.text("tuna ")).append(Component.text("tulit").decorate(TextDecoration.OBFUSCATED)).append(Component.text(", ruitura ")).append(Component.text("levat.").decorate(TextDecoration.OBFUSCATED));
-				case 4 -> Component.text("Nec").decorate(TextDecoration.OBFUSCATED).append(Component.text(" vita ")).append(Component.text("nec").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" fortuna ")).append(Component.text("hominibus ").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" perpes ")).append(Component.text("est").decorate(TextDecoration.OBFUSCATED));
-				case 5 -> Component.text("For").append(Component.text("tu").decorate(TextDecoration.OBFUSCATED)).append(Component.text("na ")).append(Component.text("fav").decorate(TextDecoration.OBFUSCATED)).append(Component.text("et fo")).append(Component.text("rtib").decorate(TextDecoration.OBFUSCATED)).append(Component.text("u")).append(Component.text("s").decorate(TextDecoration.OBFUSCATED));
+				case 1 ->
+					Component.text("M").decorate(TextDecoration.OBFUSCATED).append(Component.text("or")).append(Component.text("tu").decorate(TextDecoration.OBFUSCATED)).append(Component.text("i non mo")).append(Component.text("rd").decorate(TextDecoration.OBFUSCATED)).append(Component.text("ent"));
+				case 2 ->
+					Component.text("Mors").decorate(TextDecoration.OBFUSCATED).append(Component.text(" non a")).append(Component.text("ccip").decorate(TextDecoration.OBFUSCATED)).append(Component.text("it excusatio")).append(Component.text("nes").decorate(TextDecoration.OBFUSCATED));
+				case 3 ->
+					Component.text("Quid").append(Component.text("quid in").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" altum ")).append(Component.text("for").decorate(TextDecoration.OBFUSCATED)).append(Component.text("tuna ")).append(Component.text("tulit").decorate(TextDecoration.OBFUSCATED)).append(Component.text(", ruitura ")).append(Component.text("levat.").decorate(TextDecoration.OBFUSCATED));
+				case 4 ->
+					Component.text("Nec").decorate(TextDecoration.OBFUSCATED).append(Component.text(" vita ")).append(Component.text("nec").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" fortuna ")).append(Component.text("hominibus ").decorate(TextDecoration.OBFUSCATED)).append(Component.text(" perpes ")).append(Component.text("est").decorate(TextDecoration.OBFUSCATED));
+				case 5 ->
+					Component.text("For").append(Component.text("tu").decorate(TextDecoration.OBFUSCATED)).append(Component.text("na ")).append(Component.text("fav").decorate(TextDecoration.OBFUSCATED)).append(Component.text("et fo")).append(Component.text("rtib").decorate(TextDecoration.OBFUSCATED)).append(Component.text("u")).append(Component.text("s").decorate(TextDecoration.OBFUSCATED));
 				default -> Component.text("Lorem ipsum dolor sit amet");
 			}
 		};
@@ -201,6 +206,7 @@ public class Twisted {
 				final double mHeightStep = 0.03;
 				double mRadiant = 2 * Math.atan(mZDiff / (mXDiff + Math.sqrt(mXDiff * mXDiff + mZDiff * mZDiff)));
 				double mCurrentHeight = mHeightStep;
+
 				@Override
 				public void run() {
 					if (mTimer <= ANIMATION_DURATION / 2.0) {

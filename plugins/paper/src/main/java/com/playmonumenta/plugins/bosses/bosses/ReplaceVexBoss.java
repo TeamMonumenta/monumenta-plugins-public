@@ -15,7 +15,7 @@ public class ReplaceVexBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_replace_vex";
 	public ReplaceVexBoss.Parameters mParams;
 
-	public static class Parameters extends BossParameters{
+	public static class Parameters extends BossParameters {
 		@BossParam(help = "Pool of mobs to summon")
 		public LoSPool POOL = LoSPool.LibraryPool.EMPTY;
 	}

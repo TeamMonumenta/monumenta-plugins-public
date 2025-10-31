@@ -29,12 +29,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class SpellPhantomOfTheOpera extends Spell {
 
 	private int mCooldown = 0;
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mCenter;
-	private double mRange;
-	private int mTimer;
-	private Set<UUID> mSummoned = new HashSet<>();
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mCenter;
+	private final double mRange;
+	private final int mTimer;
+	private final Set<UUID> mSummoned = new HashSet<>();
 
 	public SpellPhantomOfTheOpera(Plugin plugin, LivingEntity entity, Location center, int range, int timer) {
 		mPlugin = plugin;

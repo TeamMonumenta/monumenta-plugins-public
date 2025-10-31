@@ -146,8 +146,6 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 		}
 
 
-
-
 		//fill white hole
 
 		stack = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
@@ -174,9 +172,6 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 	}
 
 
-
-
-
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
@@ -196,7 +191,6 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 		}
 
 	}
-
 
 
 	@Override

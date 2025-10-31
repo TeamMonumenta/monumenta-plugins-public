@@ -53,8 +53,8 @@ public class ClassSelectionGui extends Gui {
 
 	protected boolean isClassLocked(PlayerClass testClass) {
 		return testClass.mQuestReq != null
-			       && !AbilityUtils.getEffectiveSpecs(mPlayer)
-			       && ScoreboardUtils.getScoreboardValue(mPlayer, testClass.mQuestReq).orElse(0) < testClass.mQuestReqMin;
+			&& !AbilityUtils.getEffectiveSpecs(mPlayer)
+			&& ScoreboardUtils.getScoreboardValue(mPlayer, testClass.mQuestReq).orElse(0) < testClass.mQuestReqMin;
 	}
 
 	protected int remainingSkillPoints() {
@@ -168,7 +168,7 @@ public class ClassSelectionGui extends Gui {
 		Component quest216Component;
 		if (
 			quest216Message != null
-			&& mPlayer.getScoreboardTags().contains("Q216Distortion4Active")
+				&& mPlayer.getScoreboardTags().contains("Q216Distortion4Active")
 		) {
 			quest216Component = Component.text(
 				quest216Message,
@@ -517,7 +517,7 @@ public class ClassSelectionGui extends Gui {
 	protected void updateYellowTessCooldown() {
 		if (
 			mFromYellowTess
-			&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.RESIST_5)
+				&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.RESIST_5)
 		) {
 			YellowTesseractOverride.setCooldown(mPlayer, 5);
 			if (mWasYellowTessOnCooldown) {

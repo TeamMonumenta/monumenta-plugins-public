@@ -270,7 +270,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	 * @param oldRarity         the rarity the player already has/had in this ability (0 to not include)
 	 * @param preIncreaseRarity the rarity before it was increased by abilities such as Enlightenment (0 to not include)
 	 * @param useAbility        whether to use current ability data in the description
-	 * @return                  the item to display
+	 * @return the item to display
 	 */
 	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player, int oldRarity, int preIncreaseRarity, boolean useAbility) {
 		if (rarity <= 0) {

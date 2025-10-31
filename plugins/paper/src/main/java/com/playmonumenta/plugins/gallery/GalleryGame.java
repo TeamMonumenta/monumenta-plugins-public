@@ -180,11 +180,11 @@ public class GalleryGame {
 	private int mLastTimeTicked = 0;
 
 	/**
-	 *           This is the hearth of the game, performed each tick.
-	 *           Handle the spawning of new mobs/elite/specters, the advancement of new rounds,
-	 *           showing text and player ticking
-	 *           if this function somehow fails, GalleryManager will unload the game and save the game state as a json
-	 *           inside /monumenta/gallery/crashed/. with file name as mUUIDGame.toString() + ".json"
+	 * This is the hearth of the game, performed each tick.
+	 * Handle the spawning of new mobs/elite/specters, the advancement of new rounds,
+	 * showing text and player ticking
+	 * if this function somehow fails, GalleryManager will unload the game and save the game state as a json
+	 * inside /monumenta/gallery/crashed/. with file name as mUUIDGame.toString() + ".json"
 	 */
 	protected void tick(boolean oneSecond, boolean twoHertz, int ticks) {
 		//two time in a sec will check if some players are online and if the game should tick
@@ -447,7 +447,7 @@ public class GalleryGame {
 		mCurrentRound++;
 		mMobsKilledThisRound = 0;
 		mMobsSpawnedThisRound = 0;
-		mMobsToSpawnThisRound = GalleryUtils.getMobsCountForRound(mCurrentRound, mPlayersMap.values().size());
+		mMobsToSpawnThisRound = GalleryUtils.getMobsCountForRound(mCurrentRound, mPlayersMap.size());
 		if (mCurrentRound >= ELITE_STARTING_ROUND) {
 			mEliteChance = mCurrentRound == ELITE_STARTING_ROUND ? 1.0 : (0.02 * (mCurrentRound - ELITE_STARTING_ROUND));
 		}
@@ -477,14 +477,17 @@ public class GalleryGame {
 
 		mRoundStartRunnable = new BukkitRunnable() {
 			int mTimer = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				mTimer++;
 				if (mTimer >= 20 * 3) {
 					cancel();
 				}
 			}
 
-			@Override public synchronized void cancel() throws IllegalStateException {
+			@Override
+			public synchronized void cancel() throws IllegalStateException {
 				super.cancel();
 				mRoundStartRunnable = null;
 			}
@@ -566,9 +569,9 @@ public class GalleryGame {
 
 	public void load(Entity entity) {
 		if (entity.getScoreboardTags().contains(BaseInteractable.TAG_STRING) ||
-			    entity.getScoreboardTags().contains(BasePricedInteractable.TAG_STRING) ||
-			    entity.getScoreboardTags().contains(MysteryBoxInteractable.TAG_STRING) ||
-			    entity.getScoreboardTags().contains(EffectInteractable.TAG_STRING)) {
+			entity.getScoreboardTags().contains(BasePricedInteractable.TAG_STRING) ||
+			entity.getScoreboardTags().contains(MysteryBoxInteractable.TAG_STRING) ||
+			entity.getScoreboardTags().contains(EffectInteractable.TAG_STRING)) {
 			try {
 				BaseInteractable interact = BaseInteractable.fromEntity(entity);
 				if (interact == null) {
@@ -1021,7 +1024,6 @@ public class GalleryGame {
 		moderator.sendMessage(Component.text("Spawners loaded: " + mSpawnerMap.size(), NamedTextColor.GRAY));
 		moderator.sendMessage(Component.text("Spawners activated: " + mActivatedSpawnerSet.size(), NamedTextColor.GRAY));
 		moderator.sendMessage(Component.text("Spawners active that spawn: " + mSpawningSpawnersList.size(), NamedTextColor.GRAY));
-
 
 
 	}

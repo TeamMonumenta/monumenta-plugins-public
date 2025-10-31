@@ -170,7 +170,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 		List<Component> desc = mTrigger.getDescription();
 		if (mRestriction != null && mTrigger.isEnabled()) {
 			desc.add(Component.text("- unchangeable: ", NamedTextColor.RED)
-				         .append(Component.text(mRestriction.getDisplay(), NamedTextColor.WHITE)));
+				.append(Component.text(mRestriction.getDisplay(), NamedTextColor.WHITE)));
 		}
 		return desc;
 	}

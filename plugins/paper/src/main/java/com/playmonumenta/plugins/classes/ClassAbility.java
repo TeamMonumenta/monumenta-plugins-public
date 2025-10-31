@@ -284,8 +284,7 @@ public enum ClassAbility {
 	INFERNO("Inferno", true),
 	REVERB("Reverb", true),
 	TRIVIUM("Trivium", true),
-	REFLECTION("Reflection", true)
-	;
+	REFLECTION("Reflection", true);
 
 	private final String mName;
 	private final boolean mFake;

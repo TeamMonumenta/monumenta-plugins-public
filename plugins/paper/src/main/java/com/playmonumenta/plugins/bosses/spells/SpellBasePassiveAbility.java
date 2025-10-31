@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.bosses.spells;
 
 public class SpellBasePassiveAbility extends Spell {
 
-	private int mCooldown;
-	private Spell mSpell;
+	private final int mCooldown;
+	private final Spell mSpell;
 	private int mT = 0;
 
 	public SpellBasePassiveAbility(int cooldown, Spell spell) {

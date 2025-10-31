@@ -81,9 +81,9 @@ public class SpellBaseLeapAttack extends Spell {
 	private final boolean mIgnoreWalls;
 
 	public SpellBaseLeapAttack(Plugin plugin, LivingEntity boss, int range, int minRange, int runDistance, int cooldown,
-							   double velocityMultiplier, AestheticAction initiateAesthetic, AestheticAction leapAesthetic,
-							   AestheticAction leapingAesthetic, HitAction hitAction, @Nullable JumpVelocityModifier velocityModifier,
-							   @Nullable MidLeapTickAction midLeapTick) {
+	                           double velocityMultiplier, AestheticAction initiateAesthetic, AestheticAction leapAesthetic,
+	                           AestheticAction leapingAesthetic, HitAction hitAction, @Nullable JumpVelocityModifier velocityModifier,
+	                           @Nullable MidLeapTickAction midLeapTick) {
 		this(plugin, boss, range, minRange, runDistance, cooldown, velocityMultiplier, initiateAesthetic, leapAesthetic,
 			leapingAesthetic, hitAction, velocityModifier, midLeapTick, true, false);
 	}

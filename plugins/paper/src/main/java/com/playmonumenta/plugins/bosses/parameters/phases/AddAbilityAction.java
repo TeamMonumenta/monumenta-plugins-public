@@ -13,7 +13,8 @@ public class AddAbilityAction implements Action {
 		mAbility = ability;
 	}
 
-	@Override public void runAction(LivingEntity boss) {
+	@Override
+	public void runAction(LivingEntity boss) {
 		try {
 			BossManager.createBoss(null, boss, mAbility);
 		} catch (Exception e) {

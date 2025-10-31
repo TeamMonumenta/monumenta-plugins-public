@@ -380,7 +380,6 @@ public class SmartFurnaceManager implements Listener {
 		}
 
 
-
 		return existingStack;
 	}
 

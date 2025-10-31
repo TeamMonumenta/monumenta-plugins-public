@@ -35,7 +35,7 @@ public class SpellPassiveGarden extends Spell {
 	public Location mResetLocation;
 
 	public SpellPassiveGarden(LivingEntity mBoss, List<Location> plantSpawns, Map<Location, LivingEntity> plants,
-			Map<Location, String> plantTypes, Location spawnPoint) {
+	                          Map<Location, String> plantTypes, Location spawnPoint) {
 		mLauncher = mBoss;
 		mPlantSpawns = plantSpawns;
 		mPlants = plants;

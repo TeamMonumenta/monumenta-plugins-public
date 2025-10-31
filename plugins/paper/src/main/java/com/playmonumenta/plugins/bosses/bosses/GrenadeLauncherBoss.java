@@ -67,26 +67,26 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		@BossParam(help = "Particles played when a bomb is thrown")
 		public ParticlesList PARTICLE_LAUNCH = ParticlesList.EMPTY;
 		@BossParam(help = "Particles that follow the bomb throw arc")
-                public ParticlesList PARTICLE_BOMB = ParticlesList.builder()
-	.add(new ParticlesList.CParticle(Particle.CRIT, 5, 0.0, 0.0, 0.0, 0.0))
-	.build();
+		public ParticlesList PARTICLE_BOMB = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 5, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particles summoned at the explosion")
-                public ParticlesList PARTICLE_EXPLOSION = ParticlesList.builder()
-	.add(new ParticlesList.CParticle(Particle.EXPLOSION_HUGE, 10, 2.0, 2.0, 2.0, 1.5))
-	.build();
+		public ParticlesList PARTICLE_EXPLOSION = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_HUGE, 10, 2.0, 2.0, 2.0, 1.5))
+			.build();
 
 		@BossParam(help = "Sounds played when a bomb is thrown")
 		public SoundsList SOUND_LAUNCH = SoundsList.EMPTY;
 		@BossParam(help = "Sounds played at the grenade location each tick")
-                public SoundsList SOUND_GRENADE = SoundsList.builder()
-	.add(new SoundsList.CSound(Sound.BLOCK_ANVIL_FALL, 3.0f, 0.5f))
-	.build();
+		public SoundsList SOUND_GRENADE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_ANVIL_FALL, 3.0f, 0.5f))
+			.build();
 
 		@BossParam(help = "Sounds played when the grenade explodes")
-                public SoundsList SOUND_EXPLOSION = SoundsList.builder()
-	.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_EXPLODE, 10.0f, 1.0f))
-	.build();
+		public SoundsList SOUND_EXPLOSION = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_EXPLODE, 10.0f, 1.0f))
+			.build();
 
 
 		//lingering stuff...
@@ -178,11 +178,11 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 				//hit actions
 
 				if (p.DAMAGE > 0) {
-					BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList);
+					BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList());
 				}
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {
-					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList);
+					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList());
 				}
 
 				p.EFFECTS.apply(target, boss);

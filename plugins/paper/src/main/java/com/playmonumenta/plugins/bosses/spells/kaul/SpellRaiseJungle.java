@@ -115,8 +115,8 @@ public class SpellRaiseJungle extends Spell {
 						ele.setAI(false);
 						new BukkitRunnable() {
 							int mTicks = 0;
-							Location mPLoc = scLoc;
-							double mYInc = 1.6 / mSummonTime;
+							final Location mPLoc = scLoc;
+							final double mYInc = 1.6 / mSummonTime;
 							boolean mRaised = false;
 
 							@Override

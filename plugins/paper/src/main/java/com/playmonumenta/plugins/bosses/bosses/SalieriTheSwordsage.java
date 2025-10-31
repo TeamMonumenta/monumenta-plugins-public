@@ -61,7 +61,7 @@ public class SalieriTheSwordsage extends SerializedLocationBossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new EvasiveBladeDance(plugin, boss, this, DAMAGE_BLADEDANCE),
 			mTaunt
-			)
+		)
 		);
 
 		List<Spell> passiveSpells = Arrays.asList(

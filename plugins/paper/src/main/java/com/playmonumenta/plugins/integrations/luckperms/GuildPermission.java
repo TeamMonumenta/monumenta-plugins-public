@@ -222,7 +222,8 @@ public enum GuildPermission {
 
 	/**
 	 * Checks if the specified permission holder was given explicit (non-inherited) access
-	 * @param guild The guild where the permission applies
+	 *
+	 * @param guild            The guild where the permission applies
 	 * @param permissionHolder The user or group whose access is being checked (usually a player or the owning guild)
 	 * @return True or false if explicitly set, otherwise null
 	 */
@@ -242,9 +243,10 @@ public enum GuildPermission {
 
 	/**
 	 * Sets or clears a user's or guild's permission within a guild
-	 * @param guild The guild where the permission applies
+	 *
+	 * @param guild            The guild where the permission applies
 	 * @param permissionHolder The user or group whose access is being modified (usually a player or the owning guild)
-	 * @param value Whether the permission is true, false, or falls through to the guild or default of false
+	 * @param value            Whether the permission is true, false, or falls through to the guild or default of false
 	 */
 	public CompletableFuture<Void> setExplicitPermission(Group guild, PermissionHolder permissionHolder, @Nullable Boolean value) {
 		CompletableFuture<Void> future = new CompletableFuture<>();
@@ -445,6 +447,7 @@ public enum GuildPermission {
 
 	/**
 	 * Gets the guild's root ID of a given GuildPermission node ID string
+	 *
 	 * @param permissionId The permission ID you wish to check
 	 * @return The guild's root ID of the GuildPermission node, or null if not a GuildPermission node
 	 */
@@ -458,6 +461,7 @@ public enum GuildPermission {
 
 	/**
 	 * Gets the GuildPermission from a given permission node
+	 *
 	 * @param permissionId The permission ID you wish to check
 	 * @return The GuildPermission from a given permission ID, or null if not a GuildPermission
 	 */

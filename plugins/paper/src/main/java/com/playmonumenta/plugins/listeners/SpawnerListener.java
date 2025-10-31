@@ -156,7 +156,7 @@ public class SpawnerListener implements Listener {
 					MobInfo info = mobInfoIter.next();
 					@Nullable LivingEntity mob = info.getMob();
 
-					MMLog.finer(() -> "SpawnerListener:    " + info.toString());
+					MMLog.finer(() -> "SpawnerListener:    " + info);
 
 					// If the mob has NOT despawned but is dead or was removed, remove this tracker
 					if (!info.checkUpdatePersistent() && !info.isDespawned() && (mob == null || mob.isDead() || !mob.isValid())) {
@@ -180,7 +180,7 @@ public class SpawnerListener implements Listener {
 						@Nullable LivingEntity mob = info.getMob();
 
 						Location loc = entry.getKey();
-						MMLog.finer(() -> "SpawnerListener:    " + loc.getWorld().getName() + "(" + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + ") " + info.toString());
+						MMLog.finer(() -> "SpawnerListener:    " + loc.getWorld().getName() + "(" + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + ") " + info);
 
 						if (!info.checkUpdatePersistent() && !info.isDespawned() && (mob == null || mob.isDead() || !mob.isValid())) {
 							MMLog.fine(() -> "SpawnerListener: Removing non-persistent, non-despawned dead mob from mSpawnerInfos: " + info.getUniqueId());
@@ -293,12 +293,12 @@ public class SpawnerListener implements Listener {
 				if (spawnedEntity instanceof LivingEntity livingEntity) {
 					MMLog.fine(() -> "SpawnerListener: Started tracking mob: " + mob.getUniqueId());
 					mMobInfos.put(livingEntity.getUniqueId(), new MobInfo(livingEntity));
-					MobInfo mobInfo = new MobInfo((LivingEntity) spawnedEntity);
+					MobInfo mobInfo = new MobInfo(livingEntity);
 					spawnerInfo.add(mobInfo);
 					if (SpawnerUtils.getSpawnerType(spawnerBlock, SpawnerUtils.GUARDED_ATTRIBUTE) > 0) {
 						if (!(spawnedEntity instanceof Player)) {
 							spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_CHAIN_FALL, SoundCategory.HOSTILE, 0.5f, 1f);
-							ParticleHaloTask haloTask = new ParticleHaloTask((LivingEntity) spawnedEntity, Particle.SCULK_SOUL);
+							ParticleHaloTask haloTask = new ParticleHaloTask(livingEntity, Particle.SCULK_SOUL);
 							haloTask.start();
 							PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, spawnerBlock.getLocation().clone().add(0.5, 0.5, 0.5), spawnedEntity.getLocation().clone().add(0, spawnedEntity.getHeight() / 2, 0));
 							line.countPerMeter(10).spawnAsEnemy();

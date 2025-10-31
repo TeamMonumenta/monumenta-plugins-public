@@ -47,6 +47,7 @@ public class AdvancedAudioMechanism implements EliteFinisher {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				switch (mTicks) {

@@ -84,11 +84,12 @@ public class TransgenderCombosCS extends ViciousCombosCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks > 6) {
 					ParticleUtils.drawParticleCircleExplosion(player, eLoc, 0, 0.5, 0, 0, 50, (float) range / 10, false, 0, Particle.SOUL_FIRE_FLAME);
-					ParticleUtils.drawFlag(player,  eLoc.clone().add(0, 2, 0), TRANS_COLORS, 2);
+					ParticleUtils.drawFlag(player, eLoc.clone().add(0, 2, 0), TRANS_COLORS, 2);
 
 					Location pLoc = player.getLocation();
 					loc.getWorld().playSound(pLoc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2f, 0.1f);

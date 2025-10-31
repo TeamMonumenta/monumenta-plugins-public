@@ -27,6 +27,8 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.tuple.Triple;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -45,9 +47,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class WindBomb extends Ability {
 	private static final int DURATION = Constants.TICKS_PER_SECOND * 4;

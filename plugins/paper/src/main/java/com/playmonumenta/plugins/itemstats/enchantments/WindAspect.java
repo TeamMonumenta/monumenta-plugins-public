@@ -62,11 +62,7 @@ public class WindAspect implements Enchantment {
 
 			DamageEvent.DamageType type = event.getType();
 
-			if (knockback > 0 || punch > 0 || harpoon > 0 || type == DamageEvent.DamageType.MAGIC) {
-				launch(plugin, player, enemy, level * (type == DamageEvent.DamageType.MELEE ? player.getCooledAttackStrength(0) : 1), type, false);
-			} else {
-				launch(plugin, player, enemy, level * (type == DamageEvent.DamageType.MELEE ? player.getCooledAttackStrength(0) : 1), type, true);
-			}
+			launch(plugin, player, enemy, level * (type == DamageEvent.DamageType.MELEE ? player.getCooledAttackStrength(0) : 1), type, knockback <= 0 && punch <= 0 && harpoon <= 0 && type != DamageEvent.DamageType.MAGIC);
 		}
 	}
 

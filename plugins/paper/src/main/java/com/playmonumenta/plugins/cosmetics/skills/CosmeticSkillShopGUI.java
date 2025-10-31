@@ -259,7 +259,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							ItemStack mStrand = InventoryUtils.getItemFromLootTable(player, STRAND_LOOTTABLE);
 							ItemStack mPigment = InventoryUtils.getItemFromLootTable(player, PIGMENT_LOOTTABLE);
 							if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
-									!player.getInventory().containsAtLeast(mStrand, STRAND_PER_DELVE_SKIN)) {
+								!player.getInventory().containsAtLeast(mStrand, STRAND_PER_DELVE_SKIN)) {
 								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
 								return;
@@ -525,7 +525,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private void loadDepthPage(Player player) {
 		// Intro item
 		ItemStack introItem = createPageIcon(Material.BLACKSTONE,
-				Component.text("Darkest Depths", DEPTH_COLOR), DEPTH_INTRO);
+			Component.text("Darkest Depths", DEPTH_COLOR), DEPTH_INTRO);
 		mInventory.setItem(INTRO_LOC, introItem);
 
 		// Skin items
@@ -568,7 +568,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private void loadDelvePage(Player player) {
 		// Intro item
 		ItemStack introItem = createPageIcon(Material.NETHERITE_BLOCK,
-				Component.text("Dungeon Delves", DELVE_COLOR), DELVE_INTRO);
+			Component.text("Dungeon Delves", DELVE_COLOR), DELVE_INTRO);
 		mInventory.setItem(INTRO_LOC, introItem);
 
 		// Skin items
@@ -576,8 +576,8 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		mPageNumber = Math.min(numPages, Math.max(1, mPageNumber));
 		// Paging
 		List<String> price = List.of(
-				PIGMENT_PER_SKIN + " Twisted Pigments and",
-				STRAND_PER_DELVE_SKIN + " Twisted Strands");
+			PIGMENT_PER_SKIN + " Twisted Pigments and",
+			STRAND_PER_DELVE_SKIN + " Twisted Strands");
 		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < DELVE_THEME.size(); ) {
 			int slot = ENTRY_START + ENTRY_COLUMNS[i % ENTRY_PER_LINE] + i / ENTRY_PER_LINE;
 			String skin = DELVE_THEME.get(i);
@@ -608,7 +608,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		int numPages = (PRESTIGE_THEME.size() - 1) / ENTRY_PER_PAGE + 1;
 		mPageNumber = Math.min(numPages, Math.max(1, mPageNumber));
 		// Paging
-		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < PRESTIGE_THEME.size();) {
+		for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < PRESTIGE_THEME.size(); ) {
 			int iMod = i % ENTRY_PER_PAGE;
 			int slot = ENTRY_START + iMod + (iMod + 4) / 8;
 			String skin = PRESTIGE_THEME.get(i);
@@ -775,16 +775,16 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 
 	private ItemStack createBasicItem(Material mat, Component name, List<String> desc, TextColor extraColor, String... extraLore) {
 		return createBasicItem(mat, name,
-				desc.stream().map(s -> Component.text(s, NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)).toList(),
-				Arrays.stream(extraLore).map(s -> Component.text(s, extraColor).decoration(TextDecoration.ITALIC, false)).toList().toArray(new TextComponent[0]));
+			desc.stream().map(s -> Component.text(s, NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)).toList(),
+			Arrays.stream(extraLore).map(s -> Component.text(s, extraColor).decoration(TextDecoration.ITALIC, false)).toList().toArray(new TextComponent[0]));
 	}
 
 	private ItemStack createBasicItem(Material mat, Component name, List<TextComponent> desc, Component... extraLore) {
 		ItemStack item = new ItemStack(mat, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(name
-				.decoration(TextDecoration.ITALIC, false)
-				.decoration(TextDecoration.BOLD, true));
+			.decoration(TextDecoration.ITALIC, false)
+			.decoration(TextDecoration.BOLD, true));
 		List<Component> lore = new ArrayList<>(desc);
 		lore.addAll(List.of(extraLore));
 		meta.lore(lore);
@@ -837,16 +837,16 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 
 	static {
 		DEPTH_INTRO = applyIntroStyle(
-				"Attuned with powers from",
-				"Darkest Depths trees."
+			"Attuned with powers from",
+			"Darkest Depths trees."
 		);
 		DELVE_INTRO = applyIntroStyle(
-				"Essences of the twisted contingency,",
-				"rewards for heroic adventurers."
+			"Essences of the twisted contingency,",
+			"rewards for heroic adventurers."
 		);
 		PRESTIGE_INTRO = applyIntroStyle(
-				"Every single step here is",
-				"a witness of your prestige and glory."
+			"Every single step here is",
+			"a witness of your prestige and glory."
 		);
 		GALLERY_INTRO = applyIntroStyle(
 			"The nightmare was never meant for life.",

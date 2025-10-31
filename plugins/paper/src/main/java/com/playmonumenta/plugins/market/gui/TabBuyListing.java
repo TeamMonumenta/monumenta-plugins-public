@@ -70,8 +70,8 @@ public class TabBuyListing implements MarketGuiTab {
 
 		WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(currency, mGui.mPlayer, true);
 
-		long amountAvailable = Math.min(debt.mNumInWallet + debt.mNumInInventory, (long)mGui.mFocusedListing.getAmountToSellRemaining() * mGui.mFocusedListing.getAmountToBuy());
-		int maxMultiplier = (int)(amountAvailable / mGui.mFocusedListing.getAmountToBuy());
+		long amountAvailable = Math.min(debt.mNumInWallet() + debt.mNumInInventory(), (long) mGui.mFocusedListing.getAmountToSellRemaining() * mGui.mFocusedListing.getAmountToBuy());
+		int maxMultiplier = (int) (amountAvailable / mGui.mFocusedListing.getAmountToBuy());
 
 		// currency display
 		mGui.setItem(2, 2, currency);
@@ -128,7 +128,7 @@ public class TabBuyListing implements MarketGuiTab {
 			errorLoreLines.add(Component.text("This listing ran out of stock!", NamedTextColor.DARK_RED));
 		}
 
-		if (!debt.mMeetsRequirement) {
+		if (!debt.mMeetsRequirement()) {
 			errorLoreLines.add(Component.text("Not enough Money to buy!", NamedTextColor.DARK_RED));
 		}
 		if (InventoryUtils.isFull(mGui.mPlayer.getInventory())) {

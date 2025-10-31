@@ -75,7 +75,7 @@ public final class TemporalBender implements Enchantment {
 			plugin.mEffectManager.addEffect(player, "TemporalBenderCooldownRechargeRate",
 				new AbilityCooldownRechargeRate(COOLDOWN_RECHARGE_RATE_DURATION, cooldownRechargeRate));
 			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()),
-					new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
+				new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
 
 			player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1, 2);
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0)).count(10).delta(0.5).data(BLUE1_COLOR).spawnAsPlayerBuff(player);

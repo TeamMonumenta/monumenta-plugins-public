@@ -76,18 +76,18 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 	public static final String CHARM_POTION_DAMAGE = "Unstable Amalgam Dropped Potion Damage Modifier";
 
 	public static final AbilityInfo<UnstableAmalgam> INFO =
-			new AbilityInfo<>(UnstableAmalgam.class, "Unstable Amalgam", UnstableAmalgam::new)
-					.linkedSpell(ClassAbility.UNSTABLE_AMALGAM)
-					.scoreboardId("UnstableAmalgam")
-					.shorthandName("UA")
-					.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-					.simpleDescription("Summon a ticking bomb that launches mobs (and players, if enabled) in the air, refunding you potions.")
-					.cooldown(UNSTABLE_AMALGAM_1_COOLDOWN, UNSTABLE_AMALGAM_2_COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", UnstableAmalgam::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
-							PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-					.addTrigger(new AbilityTriggerInfo<>("toggleRocketJump", "toggle rocket jump", "Toggles knockback from the Amalgam on or off, just like using the /rocketjump command.",
-							UnstableAmalgam::toggleRocketJump, new AbilityTrigger(AbilityTrigger.Key.DROP).enabled(false).lookDirections(AbilityTrigger.LookDirection.DOWN).sneaking(true), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-					.displayItem(Material.GUNPOWDER);
+		new AbilityInfo<>(UnstableAmalgam.class, "Unstable Amalgam", UnstableAmalgam::new)
+			.linkedSpell(ClassAbility.UNSTABLE_AMALGAM)
+			.scoreboardId("UnstableAmalgam")
+			.shorthandName("UA")
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
+			.simpleDescription("Summon a ticking bomb that launches mobs (and players, if enabled) in the air, refunding you potions.")
+			.cooldown(UNSTABLE_AMALGAM_1_COOLDOWN, UNSTABLE_AMALGAM_2_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", UnstableAmalgam::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
+				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("toggleRocketJump", "toggle rocket jump", "Toggles knockback from the Amalgam on or off, just like using the /rocketjump command.",
+				UnstableAmalgam::toggleRocketJump, new AbilityTrigger(AbilityTrigger.Key.DROP).enabled(false).lookDirections(AbilityTrigger.LookDirection.DOWN).sneaking(true), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.displayItem(Material.GUNPOWDER);
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private boolean mHasGruesome;
@@ -123,7 +123,7 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 	public boolean cast() {
 		// cast preconditions
 		if (mAlchemistPotions == null
-				|| mPlugin.mEffectManager.hasEffect(mPlayer, DISABLE_SOURCE)) {
+			|| mPlugin.mEffectManager.hasEffect(mPlayer, DISABLE_SOURCE)) {
 			return false;
 		}
 

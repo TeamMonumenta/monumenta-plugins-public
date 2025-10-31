@@ -37,9 +37,9 @@ public class HexfallRespawnBoss extends BossAbilityGroup {
 		@BossParam(help = "amount of time between death and respawn, in ticks")
 		public int RESPAWN_DELAY = 20;
 		@BossParam(help = "sound played when this ability triggers")
-         public SoundsList SOUND_TRIGGERED = SoundsList.builder()
-	.add(new SoundsList.CSound(Sound.ENTITY_WITHER_SKELETON_HURT, 1.0f, 0.75f))
-	.build();
+		public SoundsList SOUND_TRIGGERED = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WITHER_SKELETON_HURT, 1.0f, 0.75f))
+			.build();
 		@BossParam(help = "particles played when this ability triggers")
 		public ParticlesList PARTICLE_TRIGGERED = ParticlesList.EMPTY;
 		@BossParam(help = "particle line to the respawn location")
@@ -83,6 +83,7 @@ public class HexfallRespawnBoss extends BossAbilityGroup {
 			new BukkitRunnable() {
 				int mTicks = 0;
 				final Location mLoc = respawnLoc.clone();
+
 				@Override
 				public void run() {
 					mParams.PARTICLE_LOCATION.spawn(mBoss, mLoc);

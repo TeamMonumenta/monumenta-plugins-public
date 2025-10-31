@@ -192,7 +192,7 @@ public enum InfusionType {
 				if (guild == null) {
 					return Component.text(mName, color).decoration(TextDecoration.ITALIC, false);
 				}
-				return Component.text(mName, color).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by ", NamedTextColor.DARK_GRAY).append(Component.text("["+LuckPermsIntegration.getGuildPlainTag(guild)+"]", LuckPermsIntegration.getGuildColor(guild))).append(Component.text(")", NamedTextColor.DARK_GRAY)));
+				return Component.text(mName, color).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by ", NamedTextColor.DARK_GRAY).append(Component.text("[" + LuckPermsIntegration.getGuildPlainTag(guild) + "]", LuckPermsIntegration.getGuildColor(guild))).append(Component.text(")", NamedTextColor.DARK_GRAY)));
 			} else if (this == SOULBOUND) {
 				return Component.text(mName, color).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " to " + infuser + ")", NamedTextColor.DARK_GRAY));
 			} else {

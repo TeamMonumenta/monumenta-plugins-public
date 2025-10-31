@@ -183,7 +183,7 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 						.delta(1).data(Material.ANVIL.createBlockData()).spawnAsEntityActive(launcher),
 				// Effect to apply to each player
 				(final Player player) ->
-				player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 60, 0, true, true)),
+					player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 60, 0, true, true)),
 				false
 			)
 		);

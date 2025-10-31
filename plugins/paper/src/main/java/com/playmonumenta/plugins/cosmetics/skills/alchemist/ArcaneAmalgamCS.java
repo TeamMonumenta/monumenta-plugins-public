@@ -152,7 +152,7 @@ public class ArcaneAmalgamCS extends UnstableAmalgamCS {
 		double sparkLength = 0.9 * radius;
 		double splitSparkLength = 0.75 * radius;
 		int sparkTime = 2 * SPARK_PARTICLE_LIFETIME; // time before splitting, in ticks
-		int splitSparkTime = 1 * SPARK_PARTICLE_LIFETIME;
+		int splitSparkTime = SPARK_PARTICLE_LIFETIME;
 		new BukkitRunnable() {
 			int mT = 0;
 			List<Location> mStarts = new ArrayList<>(IntStream.range(0, numSparks).mapToObj(i -> loc).toList());

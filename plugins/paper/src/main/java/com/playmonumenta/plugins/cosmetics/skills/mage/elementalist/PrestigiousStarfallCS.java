@@ -27,7 +27,7 @@ public class PrestigiousStarfallCS extends StarfallCS implements PrestigeCS {
 	private static final Particle.DustOptions GOLD_COLOR = new Particle.DustOptions(Color.fromRGB(255, 224, 48), 1.25f);
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.0f);
 	private static final Particle.DustOptions BURN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 180, 0), 1.25f);
-	private static double CAST_EFFECT_RADIUS = 3.5;
+	private static final double CAST_EFFECT_RADIUS = 3.5;
 
 	@Override
 	public @Nullable List<String> getDescription() {

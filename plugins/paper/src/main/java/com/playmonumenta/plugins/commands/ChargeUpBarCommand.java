@@ -54,6 +54,7 @@ public class ChargeUpBarCommand {
 				new BukkitRunnable() {
 					final boolean mDescending = descending;
 					final ChargeUpManager mChargeUp = chargeUp;
+
 					@Override
 					public void run() {
 						if (mDescending) {

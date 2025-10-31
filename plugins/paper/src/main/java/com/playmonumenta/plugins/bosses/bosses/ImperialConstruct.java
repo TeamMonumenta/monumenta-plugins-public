@@ -97,11 +97,11 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 			Set<String> tags = e.getScoreboardTags();
 			for (String tag : tags) {
 				switch (tag) {
-					default -> {
-					}
 					case START_TAG -> mStart = e;
 					case PHASE_TWO_TAG -> mPhase2Loc = e.getLocation();
 					case PHASE_THREE_TAG -> mPhase3Loc = e.getLocation();
+					default -> {
+					}
 				}
 			}
 		}

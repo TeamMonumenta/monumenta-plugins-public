@@ -53,6 +53,7 @@ public class DirectionalFM extends FishingMinigame {
 			int mTicks = 0;
 			double mVelocity = 0;
 			double mPosition = 0;
+
 			@Override
 			public void run() {
 				mTicks++;

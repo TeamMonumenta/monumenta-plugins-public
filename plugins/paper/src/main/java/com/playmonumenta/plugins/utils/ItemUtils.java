@@ -90,7 +90,7 @@ public class ItemUtils {
 	private static final Pattern NON_PLAIN_REGEX = Pattern.compile("[^ -~]");
 
 	private static final String plainNamePath = PLAIN_KEY + "." + DISPLAY_KEY + "." + NAME_KEY;
-		// resolveOrDefault doesn't support NBTCompoundList or StringList
+	// resolveOrDefault doesn't support NBTCompoundList or StringList
 	private static final String plainDisplayPath = PLAIN_KEY + "." + DISPLAY_KEY;
 
 	// Hardcoded list of utilities for isUtilityItem lockbox check
@@ -558,7 +558,7 @@ public class ItemUtils {
 	// Returns the cost (in tier 2 currency (CXP/CCS/etc.)) to reforge an item.
 	public static Integer getReforgeCost(ItemStack item) {
 		return switch (ItemStatUtils.getTier(item)) {
-			case IV -> item.getAmount() * 1;
+			case IV -> item.getAmount();
 			case V -> item.getAmount() * 4;
 			case UNCOMMON, UNIQUE -> item.getAmount() * 16;
 			case EVENT -> item.getAmount() * 32;
@@ -582,14 +582,15 @@ public class ItemUtils {
 			return EquipmentSlot.HAND;
 		}
 		return switch (material) {
-			case LEATHER_HELMET, CHAINMAIL_HELMET, IRON_HELMET, GOLDEN_HELMET, DIAMOND_HELMET, NETHERITE_HELMET, TURTLE_HELMET, CARVED_PUMPKIN, CREEPER_HEAD, SKELETON_SKULL, WITHER_SKELETON_SKULL, ZOMBIE_HEAD, PLAYER_HEAD, DRAGON_HEAD ->
-					EquipmentSlot.HEAD;
-			case LEATHER_CHESTPLATE, CHAINMAIL_CHESTPLATE, IRON_CHESTPLATE, GOLDEN_CHESTPLATE, DIAMOND_CHESTPLATE, NETHERITE_CHESTPLATE ->
-					EquipmentSlot.CHEST;
-			case LEATHER_LEGGINGS, CHAINMAIL_LEGGINGS, IRON_LEGGINGS, GOLDEN_LEGGINGS, DIAMOND_LEGGINGS, NETHERITE_LEGGINGS ->
-					EquipmentSlot.LEGS;
+			case LEATHER_HELMET, CHAINMAIL_HELMET, IRON_HELMET, GOLDEN_HELMET, DIAMOND_HELMET, NETHERITE_HELMET,
+			     TURTLE_HELMET, CARVED_PUMPKIN, CREEPER_HEAD, SKELETON_SKULL, WITHER_SKELETON_SKULL, ZOMBIE_HEAD,
+			     PLAYER_HEAD, DRAGON_HEAD -> EquipmentSlot.HEAD;
+			case LEATHER_CHESTPLATE, CHAINMAIL_CHESTPLATE, IRON_CHESTPLATE, GOLDEN_CHESTPLATE, DIAMOND_CHESTPLATE,
+			     NETHERITE_CHESTPLATE -> EquipmentSlot.CHEST;
+			case LEATHER_LEGGINGS, CHAINMAIL_LEGGINGS, IRON_LEGGINGS, GOLDEN_LEGGINGS, DIAMOND_LEGGINGS,
+			     NETHERITE_LEGGINGS -> EquipmentSlot.LEGS;
 			case LEATHER_BOOTS, CHAINMAIL_BOOTS, IRON_BOOTS, GOLDEN_BOOTS, DIAMOND_BOOTS, NETHERITE_BOOTS ->
-					EquipmentSlot.FEET;
+				EquipmentSlot.FEET;
 			case SHIELD -> EquipmentSlot.OFF_HAND;
 			default -> EquipmentSlot.HAND;
 		};
@@ -599,14 +600,14 @@ public class ItemUtils {
 	public static Sound getArmorEquipSound(Material mat) {
 		return switch (mat) {
 			case CHAINMAIL_HELMET, CHAINMAIL_CHESTPLATE, CHAINMAIL_LEGGINGS, CHAINMAIL_BOOTS ->
-					Sound.ITEM_ARMOR_EQUIP_CHAIN;
+				Sound.ITEM_ARMOR_EQUIP_CHAIN;
 			case DIAMOND_HELMET, DIAMOND_CHESTPLATE, DIAMOND_LEGGINGS, DIAMOND_BOOTS -> Sound.ITEM_ARMOR_EQUIP_DIAMOND;
 			case ELYTRA -> Sound.ITEM_ARMOR_EQUIP_ELYTRA;
-			default -> Sound.ITEM_ARMOR_EQUIP_GENERIC;
 			case GOLDEN_HELMET, GOLDEN_CHESTPLATE, GOLDEN_LEGGINGS, GOLDEN_BOOTS -> Sound.ITEM_ARMOR_EQUIP_GOLD;
 			case IRON_HELMET, IRON_CHESTPLATE, IRON_LEGGINGS, IRON_BOOTS -> Sound.ITEM_ARMOR_EQUIP_IRON;
 			case LEATHER_HELMET, LEATHER_CHESTPLATE, LEATHER_LEGGINGS, LEATHER_BOOTS -> Sound.ITEM_ARMOR_EQUIP_LEATHER;
 			case TURTLE_HELMET -> Sound.ITEM_ARMOR_EQUIP_TURTLE;
+			default -> Sound.ITEM_ARMOR_EQUIP_GENERIC;
 		};
 	}
 
@@ -753,8 +754,8 @@ public class ItemUtils {
 		}
 		return switch (mat) {
 			case WHITE_WOOL, BLACK_WOOL, BLUE_WOOL, BROWN_WOOL, CYAN_WOOL, GRAY_WOOL, GREEN_WOOL,
-					 LIGHT_BLUE_WOOL, LIGHT_GRAY_WOOL, LIME_WOOL, MAGENTA_WOOL, ORANGE_WOOL,
-					 PINK_WOOL, PURPLE_WOOL, RED_WOOL, YELLOW_WOOL -> true;
+			     LIGHT_BLUE_WOOL, LIGHT_GRAY_WOOL, LIME_WOOL, MAGENTA_WOOL, ORANGE_WOOL,
+			     PINK_WOOL, PURPLE_WOOL, RED_WOOL, YELLOW_WOOL -> true;
 			default -> false;
 		};
 	}
@@ -1319,11 +1320,14 @@ public class ItemUtils {
 			return false;
 		}
 		return switch (material) {
-			case BLACK_BANNER, BLACK_WALL_BANNER, BLUE_BANNER, BLUE_WALL_BANNER, BROWN_BANNER, BROWN_WALL_BANNER, CYAN_BANNER, CYAN_WALL_BANNER,
-					 GRAY_BANNER, GRAY_WALL_BANNER, GREEN_BANNER, GREEN_WALL_BANNER, LIGHT_BLUE_BANNER, LIGHT_BLUE_WALL_BANNER,
-					 LIGHT_GRAY_BANNER, LIGHT_GRAY_WALL_BANNER, LIME_BANNER, LIME_WALL_BANNER, MAGENTA_BANNER, MAGENTA_WALL_BANNER,
-					 ORANGE_BANNER, ORANGE_WALL_BANNER, PINK_BANNER, PINK_WALL_BANNER, PURPLE_BANNER, PURPLE_WALL_BANNER,
-					 RED_BANNER, RED_WALL_BANNER, WHITE_BANNER, WHITE_WALL_BANNER, YELLOW_BANNER, YELLOW_WALL_BANNER ->
+			case BLACK_BANNER, BLACK_WALL_BANNER, BLUE_BANNER, BLUE_WALL_BANNER, BROWN_BANNER, BROWN_WALL_BANNER,
+			     CYAN_BANNER, CYAN_WALL_BANNER,
+			     GRAY_BANNER, GRAY_WALL_BANNER, GREEN_BANNER, GREEN_WALL_BANNER, LIGHT_BLUE_BANNER,
+			     LIGHT_BLUE_WALL_BANNER,
+			     LIGHT_GRAY_BANNER, LIGHT_GRAY_WALL_BANNER, LIME_BANNER, LIME_WALL_BANNER, MAGENTA_BANNER,
+			     MAGENTA_WALL_BANNER,
+			     ORANGE_BANNER, ORANGE_WALL_BANNER, PINK_BANNER, PINK_WALL_BANNER, PURPLE_BANNER, PURPLE_WALL_BANNER,
+			     RED_BANNER, RED_WALL_BANNER, WHITE_BANNER, WHITE_WALL_BANNER, YELLOW_BANNER, YELLOW_WALL_BANNER ->
 				true;
 			default -> false;
 		};
@@ -1343,16 +1347,16 @@ public class ItemUtils {
 
 	public static boolean isInteresting(ItemStack item) {
 		return ServerProperties.getAlwaysPickupMats().contains(item.getType())
-				   || (hasLore(item) && ItemStatUtils.getTier(item) != Tier.ZERO)
-				   || (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()));
+			|| (hasLore(item) && ItemStatUtils.getTier(item) != Tier.ZERO)
+			|| (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()));
 	}
 
 	public static boolean isUtilityItem(ItemStack item) {
 		return ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)
-					 || ItemStatUtils.hasEnchantment(item, EnchantmentType.RECOIL)
-					 || ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE)
-					 || ItemStatUtils.hasEnchantment(item, EnchantmentType.WORLDLY_PROTECTION)
-					 || utilityItemNames.contains(getPlainName(item));
+			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.RECOIL)
+			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE)
+			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.WORLDLY_PROTECTION)
+			|| utilityItemNames.contains(getPlainName(item));
 	}
 
 	/**
@@ -1787,9 +1791,6 @@ public class ItemUtils {
 		}
 
 		ReadableNBTList<String> pages = nbtTags.getStringList("pages");
-		if (pages == null) {
-			return null;
-		}
 
 		return pages;
 	}

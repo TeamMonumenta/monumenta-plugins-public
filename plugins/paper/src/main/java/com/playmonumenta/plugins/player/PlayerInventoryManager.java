@@ -66,7 +66,7 @@ public class PlayerInventoryManager {
 		// Updates different indexes for custom enchant depending on the event given, if null or not listed, rescan everything
 		if (event instanceof InventoryClickEvent invClickEvent) {
 			if (invClickEvent.getSlotType() == InventoryType.SlotType.CRAFTING
-				    || invClickEvent.isShiftClick() || invClickEvent.getSlot() == -1) {
+				|| invClickEvent.isShiftClick() || invClickEvent.getSlot() == -1) {
 				mNeedsUpdate = true;
 			} else if (invClickEvent.isRightClick() && ShulkerEquipmentListener.isEquipmentBox(invClickEvent.getCurrentItem())) {
 				for (int i = 0; i <= 8; i++) {

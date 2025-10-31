@@ -11,7 +11,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 
 public class Assassins {
-	private static List<List<String>> ABILITY_POOL;
+	private static final List<List<String>> ABILITY_POOL;
 
 	public static final String DESCRIPTION = "Enemies become stealthy assassins.";
 

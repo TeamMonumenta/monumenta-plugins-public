@@ -57,7 +57,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 	private static final int CAGE_RADIUS = 6;
 	private static final int CAGE_DURATION = 6 * 20;
 	private static final double HEAL_AMOUNT = 0.05;
-	private static final int CAGE_DELAY = 1 * 20;
+	private static final int CAGE_DELAY = 20;
 
 	public static final String CHARM_COOLDOWN = "Grasping Claws Cooldown";
 	public static final String CHARM_PROJ_SPEED = "Grasping Claws Projectile Speed";
@@ -74,16 +74,16 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 	public static final String CHARM_CAGE_DURATION = "Grasping Claws Cage Duration";
 
 	public static final AbilityInfo<GraspingClaws> INFO =
-			new AbilityInfo<>(GraspingClaws.class, "Grasping Claws", GraspingClaws::new)
-					.linkedSpell(ClassAbility.GRASPING_CLAWS)
-					.scoreboardId("GraspingClaws")
-					.shorthandName("GC")
-					.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-					.simpleDescription("Fire a projectile that damages, pulls, and slows mobs.")
-					.cooldown(COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GraspingClaws::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
-						new AbilityTriggerInfo.TriggerRestriction("holding a scythe or projectile weapon", player -> ItemUtils.isHoe(player.getInventory().getItemInMainHand()) || (ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()) && !Grappling.playerHoldingHook(player)))))
-					.displayItem(Material.BOW);
+		new AbilityInfo<>(GraspingClaws.class, "Grasping Claws", GraspingClaws::new)
+			.linkedSpell(ClassAbility.GRASPING_CLAWS)
+			.scoreboardId("GraspingClaws")
+			.shorthandName("GC")
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
+			.simpleDescription("Fire a projectile that damages, pulls, and slows mobs.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GraspingClaws::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
+				new AbilityTriggerInfo.TriggerRestriction("holding a scythe or projectile weapon", player -> ItemUtils.isHoe(player.getInventory().getItemInMainHand()) || (ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()) && !Grappling.playerHoldingHook(player)))))
+			.displayItem(Material.BOW);
 
 	private final double mAmplifier;
 	private final int mSlowDuration;
@@ -150,6 +150,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 				}
 				mCleaveRunnable = new BukkitRunnable() {
 					int mTicks = 0;
+
 					@Override
 					public void run() {
 						mCosmetic.cleaveReadyTick(mPlayer);

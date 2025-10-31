@@ -41,7 +41,7 @@ public class FrostNova extends Ability {
 	public static final int ENHANCED_FROZEN_DURATION = 2 * Constants.TICKS_PER_SECOND;
 	public static final int COOLDOWN_TICKS_1 = 18 * Constants.TICKS_PER_SECOND;
 	public static final int COOLDOWN_TICKS_2 = 16 * Constants.TICKS_PER_SECOND;
-	public static final int ENHANCED_COOLDOWN_TICKS = 1 * Constants.TICKS_PER_SECOND;
+	public static final int ENHANCED_COOLDOWN_TICKS = Constants.TICKS_PER_SECOND;
 	public static final String ANTIHEAL_EFFECT = "FrostNovaAntiHeal";
 
 	public static final String CHARM_DAMAGE = "Frost Nova Damage";

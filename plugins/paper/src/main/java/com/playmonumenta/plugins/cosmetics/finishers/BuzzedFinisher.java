@@ -152,6 +152,7 @@ public class BuzzedFinisher implements EliteFinisher {
 
 				new BukkitRunnable() {
 					int ticksTraveled = 0;
+
 					@Override
 					public void run() {
 						if (ticksTraveled >= travelTicks || bee.isDead()) {

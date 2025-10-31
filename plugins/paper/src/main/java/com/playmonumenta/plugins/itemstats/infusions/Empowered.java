@@ -37,7 +37,7 @@ public class Empowered implements Infusion {
 		boolean intuitionCheck = true;
 
 		PlayerInventory inv = player.getInventory();
-		int[] slotList = new int[] {inv.getHeldItemSlot(), 36, 37, 38, 39, 40};
+		int[] slotList = new int[]{inv.getHeldItemSlot(), 36, 37, 38, 39, 40};
 		for (int i : slotList) {
 			ItemStack item = inv.getItem(i);
 			int acumen = ItemStatUtils.getInfusionLevel(item, InfusionType.ACUMEN);
@@ -77,7 +77,7 @@ public class Empowered implements Infusion {
 					} else {
 						newDura = Math.ceil(newDura);
 					}
-					damageMeta.setDamage((short)newDura);
+					damageMeta.setDamage((short) newDura);
 					item.setItemMeta(damageMeta);
 				}
 			}

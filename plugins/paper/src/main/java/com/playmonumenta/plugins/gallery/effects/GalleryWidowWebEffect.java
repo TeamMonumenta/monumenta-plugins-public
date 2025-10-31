@@ -27,7 +27,8 @@ public class GalleryWidowWebEffect extends GalleryConsumableEffect {
 		super(GalleryEffectType.WIDOW_WEB);
 	}
 
-	@Override public void tick(GalleryPlayer player, boolean oneSecond, boolean twoHertz, int ticks) {
+	@Override
+	public void tick(GalleryPlayer player, boolean oneSecond, boolean twoHertz, int ticks) {
 		super.tick(player, oneSecond, twoHertz, ticks);
 		mTimer--;
 	}

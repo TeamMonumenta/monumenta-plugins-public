@@ -164,7 +164,7 @@ public enum DelvesModifier {
 	}
 
 	public static ItemStack createIcon(Material material, Component name, String description) {
-		return createIcon(material, name, new String[] {description});
+		return createIcon(material, name, new String[]{description});
 	}
 
 	public static ItemStack createIcon(Material material, Component name, String[] description) {

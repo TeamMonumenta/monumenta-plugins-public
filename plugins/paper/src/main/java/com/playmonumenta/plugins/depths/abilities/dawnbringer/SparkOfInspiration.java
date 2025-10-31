@@ -138,6 +138,7 @@ public class SparkOfInspiration extends DepthsAbility {
 			int mTicks = 0;
 			final Player mTarget = finalTargetPlayer;
 			final World mWorld = mTarget.getWorld();
+
 			@Override
 			public void run() {
 				Location targetLoc = mTarget.getLocation();

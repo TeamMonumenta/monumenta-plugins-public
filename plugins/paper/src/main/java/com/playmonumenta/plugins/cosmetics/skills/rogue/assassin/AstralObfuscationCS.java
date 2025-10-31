@@ -93,6 +93,7 @@ public class AstralObfuscationCS extends CloakAndDaggerCS {
 
 		new BukkitRunnable() {
 			double mAngle = Math.PI / 4;
+
 			@Override
 			public void run() {
 				new PPCircle(Particle.CRIT_MAGIC, enemyLocation.clone().add(0, 0.2, 0), 4 * (Math.PI - mAngle) * widthMultiplier / (3 * Math.PI)).delta(0.03).count(20).spawnAsPlayerActive(player);

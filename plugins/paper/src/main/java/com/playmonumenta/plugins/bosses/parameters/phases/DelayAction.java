@@ -16,7 +16,8 @@ public class DelayAction implements Action {
 	}
 
 
-	@Override public void runAction(LivingEntity boss) {
+	@Override
+	public void runAction(LivingEntity boss) {
 		Bukkit.getScheduler().runTaskLater(
 			Plugin.getInstance(),
 			() -> {

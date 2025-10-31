@@ -30,8 +30,8 @@ public class Dethroner extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (enemy != null
-			    && (event.getType() == DamageEvent.DamageType.MELEE || event.getType() == DamageEvent.DamageType.MELEE_ENCH || event.getType() == DamageEvent.DamageType.MELEE_SKILL)
-			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+			&& (event.getType() == DamageEvent.DamageType.MELEE || event.getType() == DamageEvent.DamageType.MELEE_ENCH || event.getType() == DamageEvent.DamageType.MELEE_SKILL)
+			&& InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			if (EntityUtils.isElite(enemy)) {
 				event.updateDamageWithMultiplier(PASSIVE_DAMAGE_ELITE_MODIFIER);
 			} else if (EntityUtils.isBoss(enemy)) {

@@ -105,7 +105,7 @@ public class DepthsWindWalk extends DepthsAbility {
 					return;
 				}
 
-				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7/Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7 / Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
 
 				Iterator<LivingEntity> iter = mMobsNotHit.iterator();
 				while (iter.hasNext()) {

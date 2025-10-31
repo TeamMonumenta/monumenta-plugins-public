@@ -6,12 +6,11 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.EnumSet;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import java.util.EnumSet;
 
 public class Knockback implements Enchantment {
 	public static final float KB_VEL_PER_LEVEL = 0.5f;
@@ -43,7 +42,7 @@ public class Knockback implements Enchantment {
 		if (event.getType() == DamageEvent.DamageType.MELEE) {
 			float speed = KB_VEL_PER_LEVEL * (float) level;
 			Vector vector = enemy.getLocation().clone().toVector().subtract(player.getLocation().toVector());
-				vector.setY(0);
+			vector.setY(0);
 			if (vector.length() < 0.001) {
 				vector = new Vector(0, VERTICAL_LAUNCH, 0);
 			} else {

@@ -141,7 +141,8 @@ public class GalleryManager implements Listener {
 		final var plugin = Plugin.getInstance();
 		if (mRunnable == null || mRunnable.isCancelled()) {
 			mRunnable = new BukkitRunnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					boolean oneHertz = ticks % 20 == 0;
 					boolean twoHertz = ticks % 10 == 0;
 					GalleryGame crashedGame = null;

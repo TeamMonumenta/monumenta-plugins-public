@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.itemstats.enchantments.Protection;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
-import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import com.playmonumenta.plugins.itemstats.enchantments.WorldlyProtection;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -83,7 +82,7 @@ class PSGUIStats {
 		PlayerItemStatsGUI.InfusionSetting setting = getInfusionSetting();
 		if (setting == PlayerItemStatsGUI.InfusionSetting.ENABLED || setting == PlayerItemStatsGUI.InfusionSetting.ENABLED_FULL) {
 			if (setting != PlayerItemStatsGUI.InfusionSetting.ENABLED_FULL
-				    && PlayerItemStatsGUI.InfusionSetting.CONDITIONAL_DELVE_INFUSIONS.contains(infusion)) {
+				&& PlayerItemStatsGUI.InfusionSetting.CONDITIONAL_DELVE_INFUSIONS.contains(infusion)) {
 				return 0;
 			}
 			double value = mPlayerItemStats.getItemStats().get(infusion.getItemStat());
@@ -128,22 +127,22 @@ class PSGUIStats {
 
 	Region getMaximumRegion(boolean mainhand, Region defaultRegion) {
 		return (mainhand ? Stream.of(PSGUIEquipment.MAINHAND) : Arrays.stream(PSGUIEquipment.values()).filter(slot -> slot != PSGUIEquipment.MAINHAND))
-			       .map(slot -> ItemStatUtils.getRegion(getItem(slot)))
-			       .filter(region -> region == Region.VALLEY || region == Region.ISLES || region == Region.RING)
-			       .max(Comparator.naturalOrder())
-			       .orElse(defaultRegion);
+			.map(slot -> ItemStatUtils.getRegion(getItem(slot)))
+			.filter(region -> region == Region.VALLEY || region == Region.ISLES || region == Region.RING)
+			.max(Comparator.naturalOrder())
+			.orElse(defaultRegion);
 	}
 
 	int getRegionScaling(Player player, boolean mainhand) {
 		return (mainhand ? Stream.of(PSGUIEquipment.MAINHAND) : Arrays.stream(PSGUIEquipment.values()).filter(slot -> slot != PSGUIEquipment.MAINHAND))
-				.mapToInt(slot -> (int) ItemStatManager.getEffectiveRegionScaling(player, getItem(slot), mPlayerItemStats.getRegion(), false, 0, 1, 2))
-				.max()
-				.orElse(0);
+			.mapToInt(slot -> (int) ItemStatManager.getEffectiveRegionScaling(player, getItem(slot), mPlayerItemStats.getRegion(), false, 0, 1, 2))
+			.max()
+			.orElse(0);
 	}
 
 	int getShatteredItemEquipped() {
 		int totalLevel = 0;
-		for (PSGUIEquipment slot: PSGUIEquipment.values()) {
+		for (PSGUIEquipment slot : PSGUIEquipment.values()) {
 			ItemStack item = getItem(slot);
 			if (item != null) {
 				totalLevel += Shattered.getShatterLevel(item);
@@ -193,7 +192,7 @@ class PSGUIStats {
 
 			boolean adaptability = get(EnchantmentType.ADAPTABILITY) > 0;
 			double epf = (protection.getEPF() * get(protection.getEnchantmentType()))
-				             + (inverseProtection.getEPF() * get(inverseProtection.getEnchantmentType()));
+				+ (inverseProtection.getEPF() * get(inverseProtection.getEnchantmentType()));
 
 			damageMultiplier = Armor.getDamageMultiplier(armor, armorBonus, agility, agilityBonus,
 				Armor.getSecondaryEnchantCap(ServerProperties.getRegion(mPlayer)), Armor.getSecondaryEHPMultiplier(mPlayer), adaptability, epf, protection.getType().isEnvironmental());

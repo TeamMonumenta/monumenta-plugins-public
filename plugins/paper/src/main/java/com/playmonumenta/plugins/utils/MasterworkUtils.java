@@ -95,7 +95,8 @@ public class MasterworkUtils {
 	private static final String WILLOWS_MAT = "epic:r1/delves/willows/auxiliary/echoes_of_the_veil";
 	private static final String REVERIE_MAT = "epic:r1/delves/reverie/auxiliary/delve_material";
 
-	public record MasterworkCostLevel(String item1, int amount1, String item2, int amount2, @Nullable String item3, int amount3) {
+	public record MasterworkCostLevel(String item1, int amount1, String item2, int amount2, @Nullable String item3,
+	                                  int amount3) {
 		public List<String> getCostStringList(Player p) {
 			String itemName;
 			String strA = amount1 + " ";
@@ -176,7 +177,7 @@ public class MasterworkUtils {
 			} else {
 				if (WalletUtils.tryToPayFromInventoryAndWallet(p, itemC == null ? List.of(itemA, itemB) : List.of(itemA, itemB, itemC))) {
 					String auditString = "[Masterwork] Purchase - player=" + p.getName() + " item='" + ItemUtils.getPlainName(item) + "' to level=" + masterwork.getName() + " stack size=" + item.getAmount()
-						                     + " material cost=" + ItemUtils.getPlainName(itemA) + ":" + itemA.getAmount() + "," + ItemUtils.getPlainName(itemB) + ":" + itemB.getAmount();
+						+ " material cost=" + ItemUtils.getPlainName(itemA) + ":" + itemA.getAmount() + "," + ItemUtils.getPlainName(itemB) + ":" + itemB.getAmount();
 					if (itemC != null) {
 						auditString += "," + ItemUtils.getPlainName(itemC) + ":" + itemC.getAmount();
 					}
@@ -438,8 +439,8 @@ public class MasterworkUtils {
 
 		//TODO: Replace with next max level
 		List<ItemStack> realItems = paths.stream().filter(s -> InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(s)) != null)
-			                            .filter(s -> s.substring(s.lastIndexOf('m') + 1).matches("[01234]"))
-			                            .map(s -> InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(s))).collect(Collectors.toList());
+			.filter(s -> s.substring(s.lastIndexOf('m') + 1).matches("[01234]"))
+			.map(s -> InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(s))).collect(Collectors.toList());
 		return realItems;
 	}
 
@@ -452,7 +453,7 @@ public class MasterworkUtils {
 		Masterwork nextM;
 		Masterwork m = ItemStatUtils.getMasterwork(item);
 		if (m == Masterwork.ERROR || m == Masterwork.NONE || ItemStatUtils.getRegion(item) != Region.RING
-			    || m == Masterwork.VIIA || m == Masterwork.VIIB || m == Masterwork.VIIC || m == Masterwork.VI) {
+			|| m == Masterwork.VIIA || m == Masterwork.VIIB || m == Masterwork.VIIC || m == Masterwork.VI) {
 			nextM = Masterwork.ERROR;
 		} else {
 			nextM = switch (Objects.requireNonNull(m)) {
@@ -493,7 +494,7 @@ public class MasterworkUtils {
 			return "epic:r3/masterwork/invalid_masterwork_selection";
 		}
 		return "epic:r3/masterwork" + "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/"
-			       + toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + masterwork.getName();
+			+ toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + masterwork.getName();
 	}
 
 	public static String getItemPath(ItemStack item) {
@@ -504,7 +505,7 @@ public class MasterworkUtils {
 			path += "/invalid_masterwork_selection";
 		} else {
 			path += "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/" +
-				        toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + m.getName();
+				toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + m.getName();
 		}
 
 		return path;
@@ -518,7 +519,7 @@ public class MasterworkUtils {
 			path += "/invalid_masterwork_selection";
 		} else {
 			path += "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/"
-				        + toCleanPathName(ItemUtils.getPlainName(item)) + "_m6";
+				+ toCleanPathName(ItemUtils.getPlainName(item)) + "_m6";
 		}
 
 		return path;
@@ -529,11 +530,11 @@ public class MasterworkUtils {
 
 		Masterwork m = ItemStatUtils.getMasterwork(item);
 		if (m == Masterwork.ERROR || m == Masterwork.NONE || ItemStatUtils.getRegion(item) != Region.RING
-			    || (sevenSelection != Masterwork.VIIA && sevenSelection != Masterwork.VIIB && sevenSelection != Masterwork.VIIC)) {
+			|| (sevenSelection != Masterwork.VIIA && sevenSelection != Masterwork.VIIB && sevenSelection != Masterwork.VIIC)) {
 			path += "/invalid_masterwork_selection";
 		} else {
 			path += "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/"
-				        + toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + sevenSelection.getName();
+				+ toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + sevenSelection.getName();
 		}
 
 		return path;
@@ -591,7 +592,7 @@ public class MasterworkUtils {
 
 		// Carry over the current arrow of a crossbow if the player item has an arrow but the result item doesn't have one
 		if (newUpgrade.getItemMeta() instanceof CrossbowMeta newResultMeta && base.getItemMeta() instanceof CrossbowMeta playerItemMeta
-			    && !newResultMeta.hasChargedProjectiles() && playerItemMeta.hasChargedProjectiles()) {
+			&& !newResultMeta.hasChargedProjectiles() && playerItemMeta.hasChargedProjectiles()) {
 			newResultMeta.setChargedProjectiles(playerItemMeta.getChargedProjectiles());
 			newUpgrade.setItemMeta(newResultMeta);
 		}
@@ -604,7 +605,7 @@ public class MasterworkUtils {
 
 		// Carry over shield pattern
 		if (base.getType() == Material.SHIELD && upgrade.getType() == Material.SHIELD
-			    && newUpgrade.getItemMeta() instanceof BlockStateMeta newResultMeta && base.getItemMeta() instanceof BlockStateMeta playerItemMeta) {
+			&& newUpgrade.getItemMeta() instanceof BlockStateMeta newResultMeta && base.getItemMeta() instanceof BlockStateMeta playerItemMeta) {
 			newResultMeta.setBlockState(playerItemMeta.getBlockState());
 			newUpgrade.setItemMeta(newResultMeta);
 		}

@@ -24,8 +24,8 @@ public class MonumentaClasses {
 		mClasses.add(new Warrior());
 
 		mTriggerOrder = mClasses.stream()
-			                .flatMap(c -> c.mTriggerOrder.stream())
-			                .collect(ImmutableList.toImmutableList());
+			.flatMap(c -> c.mTriggerOrder.stream())
+			.collect(ImmutableList.toImmutableList());
 		List<AbilityInfo<?>> missingInTriggerOrder =
 			mClasses.stream()
 				.flatMap(c -> Stream.concat(Stream.concat(c.mAbilities.stream(), c.mSpecOne.mAbilities.stream()), c.mSpecTwo.mAbilities.stream()))

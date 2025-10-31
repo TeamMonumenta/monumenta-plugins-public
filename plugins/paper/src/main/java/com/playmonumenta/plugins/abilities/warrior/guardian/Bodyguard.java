@@ -104,8 +104,8 @@ public class Bodyguard extends Ability {
 			giveAbsorption(targetPlayer);
 
 			if (userLoc.distance(targetLoc) > 1
-				    && !ZoneUtils.hasZoneProperty(userLoc, ZoneProperty.NO_MOBILITY_ABILITIES)
-				    && !ZoneUtils.hasZoneProperty(targetLoc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+				&& !ZoneUtils.hasZoneProperty(userLoc, ZoneProperty.NO_MOBILITY_ABILITIES)
+				&& !ZoneUtils.hasZoneProperty(targetLoc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 				PlayerUtils.playerTeleport(mPlayer, targetLoc);
 			}
 		} else if (!allowSelfCast) {

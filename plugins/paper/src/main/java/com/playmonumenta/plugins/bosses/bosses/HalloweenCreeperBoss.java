@@ -64,9 +64,9 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 						case 12 -> {
 							Block block = world.getBlockAt(loc);
 							if ((block.getType() == Material.AIR || block.isLiquid())
-								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)
-								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.RESTRICTED)
-								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
+								&& !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)
+								&& !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.RESTRICTED)
+								&& !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
 								block.setType(Material.CHEST);
 								ChestUtils.setNonLootLimitedChest(block, true);
 								if (block.getState() instanceof Chest chest) {

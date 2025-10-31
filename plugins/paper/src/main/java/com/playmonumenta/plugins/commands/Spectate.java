@@ -61,7 +61,7 @@ public class Spectate implements Listener {
 			.withPermission(CommandPermission.fromString("monumenta.command.spectate"))
 			.executes((sender, args) -> {
 				if (sender instanceof Player) {
-					run(plugin, (Player)sender);
+					run(plugin, (Player) sender);
 				} else {
 					throw CommandAPI.failWithString("This command must be run by a player!");
 				}
@@ -99,7 +99,7 @@ public class Spectate implements Listener {
 		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
 			if (player.hasMetadata(SPECTATE_METAKEY)) {
 				// Put player back where they were before when they log out
-				((SpectateContext)player.getMetadata(SPECTATE_METAKEY).get(0).value()).restore(player);
+				((SpectateContext) player.getMetadata(SPECTATE_METAKEY).get(0).value()).restore(player);
 			} else {
 				throw CommandAPI.failWithString("You can not use this command in spectator mode");
 			}
@@ -131,7 +131,7 @@ public class Spectate implements Listener {
 
 		// Put player back where they were before when they log out
 		if (player.hasMetadata(SPECTATE_METAKEY)) {
-			((SpectateContext)player.getMetadata(SPECTATE_METAKEY).get(0).value()).restore(player);
+			((SpectateContext) player.getMetadata(SPECTATE_METAKEY).get(0).value()).restore(player);
 		}
 	}
 }

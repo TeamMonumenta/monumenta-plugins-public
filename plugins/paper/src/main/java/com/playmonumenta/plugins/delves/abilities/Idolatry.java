@@ -32,11 +32,13 @@ public class Idolatry {
 			Component.text("Idols will slowly die without nearby mobs.")
 		};
 	}
+
 	// MetaData saves by location, so use PersistentData to handle PoI respawns and whatnot.
 	private static final String IDOLATRY_CHECK = "IdolatryCheck";
+
 	public static void applyModifiers(CreatureSpawner spawner, Entity spawnEntity, int level) {
 		NBTCompound persistentDataContainer = new NBTTileEntity(spawner).getPersistentDataContainer();
-		if(persistentDataContainer.hasTag(IDOLATRY_CHECK)) {
+		if (persistentDataContainer.hasTag(IDOLATRY_CHECK)) {
 			return;
 		}
 		persistentDataContainer.setBoolean(IDOLATRY_CHECK, true);

@@ -155,9 +155,9 @@ public class LoadoutManager implements Listener {
 		SHIELD("shield", "shields?", 2, item -> item.getType() == Material.SHIELD),
 
 		OFFHAND("offhand", "offhands?", 2,
-				item -> ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)
-						// weightless items are offhands even without stats, except for the tesseract of light
-						|| (ItemStatUtils.hasEnchantment(item, EnchantmentType.WEIGHTLESS) && item.getType() != Material.LIGHT_GRAY_STAINED_GLASS)),
+			item -> ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)
+				// weightless items are offhands even without stats, except for the tesseract of light
+				|| (ItemStatUtils.hasEnchantment(item, EnchantmentType.WEIGHTLESS) && item.getType() != Material.LIGHT_GRAY_STAINED_GLASS)),
 		HELMET("helmet", "helmets?|hats?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.HEAD),
 		CHEST("chestplate", "chest(?:plate)?s?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.CHEST),
 		LEGS("legs", "leg(?:ging)?s?", 2, item -> ItemUtils.getEquipmentSlot(item) == EquipmentSlot.LEGS),
@@ -166,18 +166,18 @@ public class LoadoutManager implements Listener {
 		// higher priority than region + weapon
 		TOOL("tool", "tools?|util(?:s?|it(?:ys?|ies))", 104,
 			item -> (
-				         // special case to exclude Alcyoneus, which is a shovel with spell power
-							(ItemUtils.isShovel(item) && !ItemStatUtils.hasEnchantment(item, EnchantmentType.MAGIC_WAND))
-				         || ItemUtils.isPickaxe(item)
-				         // assume silk touch axes are considered tools, as are axes with no damage added
-				         || (ItemUtils.isAxe(item) && (ItemStatUtils.hasEnchantment(item, EnchantmentType.SILK_TOUCH) || ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 1))
-				         // similarly, non-offhand swords with no attack damage are tools
-				         || (ItemUtils.isSword(item) && ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 1 && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND))
-				         || item.getType() == Material.SHEARS
-				         || item.getType() == Material.COMPASS
-				         || ItemUtils.isShulkerBox(item.getType())
-				         || ItemUtils.isUtilityItem(item))
-				        && !ItemStatUtils.isCharm(item)),
+				// special case to exclude Alcyoneus, which is a shovel with spell power
+				(ItemUtils.isShovel(item) && !ItemStatUtils.hasEnchantment(item, EnchantmentType.MAGIC_WAND))
+					|| ItemUtils.isPickaxe(item)
+					// assume silk touch axes are considered tools, as are axes with no damage added
+					|| (ItemUtils.isAxe(item) && (ItemStatUtils.hasEnchantment(item, EnchantmentType.SILK_TOUCH) || ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 1))
+					// similarly, non-offhand swords with no attack damage are tools
+					|| (ItemUtils.isSword(item) && ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 1 && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND))
+					|| item.getType() == Material.SHEARS
+					|| item.getType() == Material.COMPASS
+					|| ItemUtils.isShulkerBox(item.getType())
+					|| ItemUtils.isUtilityItem(item))
+				&& !ItemStatUtils.isCharm(item)),
 
 		// Consumables are (mostly) region-independent, and charms always R3, so their priority includes the priority a region tag would add
 		// this for example makes 'consumables' higher priority than 'r2 weapons', thus sorting Fruit of Life into 'consumables' rather than 'weapons'
@@ -185,9 +185,9 @@ public class LoadoutManager implements Listener {
 		ZENITH("zenith", "zenith", 105, item -> ItemStatUtils.isZenithCharm(item)),
 		CONSUMABLE("consumable", "consumables?|foods?|potions?", 104,
 			item -> ItemStatUtils.isConsumable(item)
-				        || (item.getType().isEdible() && !ItemStatUtils.isCharm(item))
-				        || (ItemUtils.isSomePotion(item) && !ItemUtils.isAlchemistItem(item))
-				        || ShulkerEquipmentListener.isPotionInjectorItem(item)),
+				|| (item.getType().isEdible() && !ItemStatUtils.isCharm(item))
+				|| (ItemUtils.isSomePotion(item) && !ItemUtils.isAlchemistItem(item))
+				|| ShulkerEquipmentListener.isPotionInjectorItem(item)),
 		;
 
 		private final String mName;
@@ -225,8 +225,8 @@ public class LoadoutManager implements Listener {
 				return Set.of();
 			}
 			return Arrays.stream(values())
-				       .filter(tag -> tag.mTagPattern.matcher(caseName).find())
-				       .collect(Collectors.toSet());
+				.filter(tag -> tag.mTagPattern.matcher(caseName).find())
+				.collect(Collectors.toSet());
 		}
 	}
 
@@ -301,10 +301,9 @@ public class LoadoutManager implements Listener {
 			List<ItemInventory> inventories = new ArrayList<>();
 			Consumer<Inventory> findStorageShulkers = inventory -> {
 				for (ItemStack item : inventory.getContents()) {
-					if (item != null
-						    && isEquipmentStorageBox(item)
-						    && item.getItemMeta() instanceof BlockStateMeta blockStateMeta
-						    && blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+					if (isEquipmentStorageBox(item)
+						&& item.getItemMeta() instanceof BlockStateMeta blockStateMeta
+						&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
 						inventories.add(new ItemInventory(shulkerBox.getInventory(), () -> {
 							blockStateMeta.setBlockState(shulkerBox);
 							item.setItemMeta(blockStateMeta);
@@ -357,7 +356,7 @@ public class LoadoutManager implements Listener {
 									continue;
 								}
 								ItemStack newItem = inventory.mInventory.getItem(i);
-								if (newItem != null && isLoadoutItem(loadoutItem, matchInfusion, newItem)) {
+								if (isLoadoutItem(loadoutItem, matchInfusion, newItem)) {
 									swappedEquipment.set(true);
 									EffectManager.getInstance().addEffect(player, GearChanged.effectID, new GearChanged(GearChanged.DURATION));
 
@@ -397,7 +396,7 @@ public class LoadoutManager implements Listener {
 					}
 					if (!itemsNotFound.isEmpty()) {
 						player.sendMessage(Component.text("Could not find all equipment items for this loadout! Hover this message to see missing items.", NamedTextColor.RED)
-							                   .hoverEvent(itemListHover(itemsNotFound)));
+							.hoverEvent(itemListHover(itemsNotFound)));
 					}
 
 					if (loadout.mClearEmpty) {
@@ -502,12 +501,12 @@ public class LoadoutManager implements Listener {
 					}
 					if (!itemsNotFound.isEmpty()) {
 						player.sendMessage(Component.text("Could not find all charms for this loadout! Hover this message to see missing charms.", NamedTextColor.RED)
-							                   .hoverEvent(itemListHover(itemsNotFound)));
+							.hoverEvent(itemListHover(itemsNotFound)));
 					}
 					if (!failedItems.isEmpty()) {
 						player.sendMessage(Component.text("Some charms could not be equipped, their charm power has likely changed since the loadout was created." +
-							                                  " Hover this message to see affected charms.", NamedTextColor.RED)
-							                   .hoverEvent(itemListHover(failedItems)));
+								" Hover this message to see affected charms.", NamedTextColor.RED)
+							.hoverEvent(itemListHover(failedItems)));
 					}
 
 				}
@@ -535,7 +534,7 @@ public class LoadoutManager implements Listener {
 			swappedVanity = !prevEquipped.equals(vanityData.getEquipped());
 
 			if (ScoreboardUtils.getScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_LEFT).orElse(0) != loadout.mLeftParrot
-				    || ScoreboardUtils.getScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_RIGHT).orElse(0) != loadout.mRightParrot) {
+				|| ScoreboardUtils.getScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_RIGHT).orElse(0) != loadout.mRightParrot) {
 				swappedVanity = true;
 				ScoreboardUtils.setScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_LEFT, loadout.mLeftParrot);
 				ScoreboardUtils.setScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_RIGHT, loadout.mRightParrot);
@@ -554,14 +553,14 @@ public class LoadoutManager implements Listener {
 			Loadout testLoadout = new Loadout(-1, "test");
 			testLoadout.setClassFromPlayer(player);
 			if (testLoadout.mClass.mClassId != loadout.mClass.mClassId
-				    || testLoadout.mClass.mSpecId != loadout.mClass.mSpecId
-				    || !testLoadout.mClass.mAbilityScores.equals(loadout.mClass.mAbilityScores)) {
+				|| testLoadout.mClass.mSpecId != loadout.mClass.mSpecId
+				|| !testLoadout.mClass.mAbilityScores.equals(loadout.mClass.mAbilityScores)) {
 				boolean success = YellowTesseractOverride.loadClass(player, loadout.mClass.mClassId, loadout.mClass.mSpecId, loadout.mClass.mAbilityScores, false);
 				swappedClass = true;
 				if (success) {
 					if (yellowCooldown != 0) {
 						player.sendMessage(Component.text("Swapping skills is still on cooldown. You have been silenced for 30s.", NamedTextColor.RED)
-							                   .append(Component.text(" (Swap CD: ", NamedTextColor.AQUA)).append(Component.text(yellowCooldown, NamedTextColor.YELLOW)).append(Component.text(" mins)", NamedTextColor.AQUA)));
+							.append(Component.text(" (Swap CD: ", NamedTextColor.AQUA)).append(Component.text(yellowCooldown, NamedTextColor.YELLOW)).append(Component.text(" mins)", NamedTextColor.AQUA)));
 						Plugin.getInstance().mEffectManager.addEffect(player, "YellowTessSilence", new AbilitySilence(30 * 20));
 					} else if (!safeZone) {
 						YellowTesseractOverride.setCooldown(player, 3);
@@ -603,9 +602,9 @@ public class LoadoutManager implements Listener {
 			return false;
 		}
 		return loadoutItem.mIdentifier.isIdentifierFor(item, !matchInfusion)
-			       && (!EXALTED_LOCATIONS.contains(ItemStatUtils.getLocation(item)) || loadoutItem.mIsExalted == (ItemStatUtils.getRegion(item) == Region.RING))
-			       && (!matchInfusion || loadoutItem.mInfusionType == null || ItemStatUtils.hasInfusion(item, loadoutItem.mInfusionType))
-			       && (!matchInfusion || loadoutItem.mDelveInfusionType == null || ItemStatUtils.hasInfusion(item, loadoutItem.mDelveInfusionType));
+			&& (!EXALTED_LOCATIONS.contains(ItemStatUtils.getLocation(item)) || loadoutItem.mIsExalted == (ItemStatUtils.getRegion(item) == Region.RING))
+			&& (!matchInfusion || loadoutItem.mInfusionType == null || ItemStatUtils.hasInfusion(item, loadoutItem.mInfusionType))
+			&& (!matchInfusion || loadoutItem.mDelveInfusionType == null || ItemStatUtils.hasInfusion(item, loadoutItem.mDelveInfusionType));
 	}
 
 	private static boolean canPutMoreShulkersIntoEquipmentBox(Inventory inventory) {
@@ -614,9 +613,9 @@ public class LoadoutManager implements Listener {
 
 	private static HoverEvent<?> itemListHover(Collection<ItemUtils.ItemIdentifier> items) {
 		return HoverEvent.showText(items.stream()
-			                           .map(ItemUtils.ItemIdentifier::getDisplayName)
-			                           .reduce((c1, c2) -> c1.append(Component.newline()).append(c2))
-			                           .orElse(Component.empty()));
+			.map(ItemUtils.ItemIdentifier::getDisplayName)
+			.reduce((c1, c2) -> c1.append(Component.newline()).append(c2))
+			.orElse(Component.empty()));
 	}
 
 	private static void giveItem(Player player, List<ItemInventory> inventories, ItemStack item, List<ItemInventory> preferredInventories, int preferredSlot) {
@@ -634,8 +633,8 @@ public class LoadoutManager implements Listener {
 		int bestSlot = -1;
 
 		Set<EquipmentCaseTag> itemTags = Arrays.stream(EquipmentCaseTag.values())
-			                                 .filter(tag -> tag.mPredicate.test(item))
-			                                 .collect(Collectors.toSet());
+			.filter(tag -> tag.mPredicate.test(item))
+			.collect(Collectors.toSet());
 		boolean isShulker = ItemUtils.isShulkerBox(item.getType());
 		boolean isSwappableShulker = isShulker && ShulkerEquipmentListener.canSwapItem(item);
 
@@ -645,9 +644,9 @@ public class LoadoutManager implements Listener {
 			if (inv.tags.isEmpty()) {
 				priority += 10;
 			} else if (EquipmentCaseTag.TAG_GROUPS.stream()
-				           // groupings for case tag matching - for each group, either none of the tags must be on the case,
-				           // or at least one tag must apply to an item for it to go into that case
-				           .allMatch(tagGroup -> tagGroup.stream().noneMatch(inv.tags::contains) || itemTags.stream().anyMatch(t -> inv.tags.contains(t) && tagGroup.contains(t)))) {
+				// groupings for case tag matching - for each group, either none of the tags must be on the case,
+				// or at least one tag must apply to an item for it to go into that case
+				.allMatch(tagGroup -> tagGroup.stream().noneMatch(inv.tags::contains) || itemTags.stream().anyMatch(t -> inv.tags.contains(t) && tagGroup.contains(t)))) {
 				priority += inv.tags.stream().mapToInt(tag -> 1000 + 10 * tag.mPriority).sum();
 			}
 			if (preferredInventories.contains(inv)) {
@@ -656,12 +655,12 @@ public class LoadoutManager implements Listener {
 			}
 			// if best inventory so far, and there's space, set as new best inventory
 			if (priority > bestPriority
-				    && (isShulker
-					        ? (InventoryUtils.numEmptySlots(inv.mInventory) > 0
-						           && (inv.mInventory.equals(player.getEnderChest())
-							               || inv.mInventory.equals(player.getInventory())
-							               || (isSwappableShulker && canPutMoreShulkersIntoEquipmentBox(inv.mInventory))))
-					        : InventoryUtils.canFitInInventory(item, inv.mInventory))) {
+				&& (isShulker
+				? (InventoryUtils.numEmptySlots(inv.mInventory) > 0
+				&& (inv.mInventory.equals(player.getEnderChest())
+				|| inv.mInventory.equals(player.getInventory())
+				|| (isSwappableShulker && canPutMoreShulkersIntoEquipmentBox(inv.mInventory))))
+				: InventoryUtils.canFitInInventory(item, inv.mInventory))) {
 				bestInventory = inv;
 				bestPriority = priority;
 				bestSlot = slot;
@@ -707,7 +706,7 @@ public class LoadoutManager implements Listener {
 		}
 		if (loadout.mIncludeClass) {
 			if (loadout.mClass.mClassId != AbilityUtils.getClassNum(player)
-				    || loadout.mClass.mSpecId != AbilityUtils.getSpecNum(player)) {
+				|| loadout.mClass.mSpecId != AbilityUtils.getSpecNum(player)) {
 				return false;
 			}
 			for (Map.Entry<String, Integer> entry : loadout.mClass.mAbilityScores.entrySet()) {
@@ -748,8 +747,8 @@ public class LoadoutManager implements Listener {
 		int yellowCooldown = YellowTesseractOverride.getCooldown(player);
 		if (yellowCooldown > 0) {
 			player.sendMessage(Component.text("Warning: Swapping skills is on cooldown! You will be silenced if you perform any changes to your class or abilities in the next ", NamedTextColor.YELLOW)
-				                   .append(Component.text("" + yellowCooldown, NamedTextColor.RED, TextDecoration.BOLD))
-				                   .append(Component.text(yellowCooldown == 1 ? " minute." : " minutes.", NamedTextColor.YELLOW)));
+				.append(Component.text("" + yellowCooldown, NamedTextColor.RED, TextDecoration.BOLD))
+				.append(Component.text(yellowCooldown == 1 ? " minute." : " minutes.", NamedTextColor.YELLOW)));
 		}
 
 		new LoadoutManagerGui(player).open();
@@ -824,20 +823,19 @@ public class LoadoutManager implements Listener {
 			LoadoutData data = getData(player);
 			inventoryLoop:
 			for (Inventory inventory : ItemUtils.hasPortableEnderOrIsNearEnderChest(player)
-				                           ? new Inventory[] {player.getEnderChest(), player.getInventory()}
-				                           : new Inventory[] {player.getInventory()}) {
+				? new Inventory[]{player.getEnderChest(), player.getInventory()}
+				: new Inventory[]{player.getInventory()}) {
 				for (ItemStack shulkerItem : inventory.getContents()) {
-					if (shulkerItem != null
-						    && isEquipmentStorageBox(shulkerItem)
-						    && shulkerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
-						    && blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+					if (isEquipmentStorageBox(shulkerItem)
+						&& shulkerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
+						&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
 						boolean changed = false;
 						for (ItemStack item : shulkerBox.getInventory()) {
 							if (!ItemUtils.isNullOrAir(item)
-								    && data.mLoadouts.stream()
-									       .noneMatch(loadout -> loadout.mEquipment.stream().anyMatch(loadoutItem -> isLoadoutItem(loadoutItem, false, item))
-										                             || loadout.mCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false))
-										                             || loadout.mZenithCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false)))) {
+								&& data.mLoadouts.stream()
+								.noneMatch(loadout -> loadout.mEquipment.stream().anyMatch(loadoutItem -> isLoadoutItem(loadoutItem, false, item))
+									|| loadout.mCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false))
+									|| loadout.mZenithCharms.stream().anyMatch(charm -> charm.isIdentifierFor(item, false)))) {
 								if (InventoryUtils.canFitInInventory(item, player.getInventory())) {
 									player.getInventory().addItem(ItemUtils.clone(item));
 									item.setAmount(0);
@@ -940,6 +938,7 @@ public class LoadoutManager implements Listener {
 
 		public int mMaxLoadouts = 3;
 		public int mMaxLoadoutPages = 1;
+
 		private JsonObject toJson() {
 			JsonObject json = new JsonObject();
 			JsonArray loadoutsJson = new JsonArray();
@@ -1231,9 +1230,9 @@ public class LoadoutManager implements Listener {
 				return null;
 			}
 			return Component.text("Quick-Swap Loadout for ", NamedTextColor.GOLD, TextDecoration.ITALIC)
-				       .append(MessagingUtils.concatenateComponentsWithAnd(mQuickSwaps.stream()
-					                                                           .map(Component::keybind)
-					                                                           .collect(Collectors.toUnmodifiableList())));
+				.append(MessagingUtils.concatenateComponentsWithAnd(mQuickSwaps.stream()
+					.map(Component::keybind)
+					.collect(Collectors.toUnmodifiableList())));
 		}
 	}
 
@@ -1321,8 +1320,8 @@ public class LoadoutManager implements Listener {
 			for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("abilityScores").entrySet()) {
 				// Only load ability score if the scoreboard name is still valid
 				if (playerClass != null
-					    && (playerClass.mAbilities.stream().anyMatch(info -> entry.getKey().equals(info.getScoreboard()))
-						        || (playerSpec != null && playerSpec.mAbilities.stream().anyMatch(info -> entry.getKey().equals(info.getScoreboard()))))) {
+					&& (playerClass.mAbilities.stream().anyMatch(info -> entry.getKey().equals(info.getScoreboard()))
+					|| (playerSpec != null && playerSpec.mAbilities.stream().anyMatch(info -> entry.getKey().equals(info.getScoreboard()))))) {
 					result.mAbilityScores.put(entry.getKey(), entry.getValue().getAsInt());
 				}
 			}

@@ -74,7 +74,7 @@ public class SpellSummonConstantly extends Spell {
 			Collections.shuffle(mLocationOffsets);
 			for (ArmorStand armorStand : stands) {
 				if (!armorStand.getScoreboardTags().contains("summon_constantly_stand")
-					    && !armorStand.getScoreboardTags().contains("varcosa_center")) {
+					&& !armorStand.getScoreboardTags().contains("varcosa_center")) {
 					continue;
 				}
 				int numSummoned = 0;
@@ -88,7 +88,7 @@ public class SpellSummonConstantly extends Spell {
 
 					// Blocks above summon-on block must be not solid
 					if (loc.getBlock().isSolid()
-						    || loc.clone().add(0, 1, 0).getBlock().isSolid()) {
+						|| loc.clone().add(0, 1, 0).getBlock().isSolid()) {
 						continue;
 					}
 

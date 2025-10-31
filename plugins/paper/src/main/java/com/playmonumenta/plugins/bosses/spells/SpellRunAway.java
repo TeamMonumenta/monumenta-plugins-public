@@ -40,11 +40,11 @@ public class SpellRunAway extends Spell {
 
 	// Precondition: triggerRadiusMeters <= stopRadiusMeters
 	public SpellRunAway(
-			LivingEntity boss,
-			double triggerRadiusMeters,
-			double stopRadiusMeters,
-			double runSpeedIncrease,
-			Predicate<Player> shouldRunFrom) {
+		LivingEntity boss,
+		double triggerRadiusMeters,
+		double stopRadiusMeters,
+		double runSpeedIncrease,
+		Predicate<Player> shouldRunFrom) {
 		mBoss = boss;
 		mWorld = boss.getWorld();
 		mTriggerRadiusMeters = triggerRadiusMeters;
@@ -62,26 +62,26 @@ public class SpellRunAway extends Spell {
 	private Optional<Vector> getRunDirection() {
 		Location bossLocation = mBoss.getLocation();
 		List<Player> playersToRunFrom = PlayerUtils.playersInRange(bossLocation, mStopRadiusMeters, false).stream()
-				.filter(mShouldRunFrom)
-				.toList();
+			.filter(mShouldRunFrom)
+			.toList();
 
 		if (playersToRunFrom.isEmpty()) {
 			return Optional.empty();
 		}
 
 		Vector runDirection = playersToRunFrom.stream()
-				.map(player -> {
-					Vector playerToBoss = bossLocation.subtract(player.getLocation()).toVector();
+			.map(player -> {
+				Vector playerToBoss = bossLocation.subtract(player.getLocation()).toVector();
 
-					if (playerToBoss.lengthSquared() < EPSILON) {
-						return new Vector();
-					}
+				if (playerToBoss.lengthSquared() < EPSILON) {
+					return new Vector();
+				}
 
-					// Change length to 1/length. Closer players weighted higher
-					return playerToBoss.multiply(1 / playerToBoss.lengthSquared());
-				})
-				.reduce(new Vector(), (Vector a, Vector b) -> a.add(b))
-				.setY(0);
+				// Change length to 1/length. Closer players weighted higher
+				return playerToBoss.multiply(1 / playerToBoss.lengthSquared());
+			})
+			.reduce(new Vector(), (Vector a, Vector b) -> a.add(b))
+			.setY(0);
 
 		if (runDirection.lengthSquared() < EPSILON) {
 			return Optional.empty();
@@ -96,9 +96,9 @@ public class SpellRunAway extends Spell {
 	// State Transition graph: All -> Running -> Cowering -> Aggressive
 	public void run() {
 		Collection<Player> playersTriggering = PlayerUtils
-				.playersInRange(mBoss.getLocation(), mTriggerRadiusMeters, false).stream()
-				.filter(mShouldRunFrom)
-				.toList();
+			.playersInRange(mBoss.getLocation(), mTriggerRadiusMeters, false).stream()
+			.filter(mShouldRunFrom)
+			.toList();
 		Optional<Vector> runDirection = getRunDirection();
 		if (mState != State.RUNNING && !playersTriggering.isEmpty() && runDirection.isPresent()) {
 			// All -> Running state transition
@@ -126,7 +126,7 @@ public class SpellRunAway extends Spell {
 
 				// Grant speed bonus while running away
 				Plugin.getInstance().mEffectManager
-						.addEffect(mBoss, "Running Away", new BaseMovementSpeedModifyEffect(1, mRunSpeedIncrease));
+					.addEffect(mBoss, "Running Away", new BaseMovementSpeedModifyEffect(1, mRunSpeedIncrease));
 			}
 		}
 

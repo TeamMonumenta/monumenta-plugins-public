@@ -128,9 +128,9 @@ public class HallowedBeamCS implements CosmeticSkill {
 			.spawnAsPlayerActive(player);
 		// Are you here because someone complained about the totem particles getting in the way? Just spawn them for everyone but the target player! :3
 		new PPParametric(Particle.TOTEM, ringLoc, (parameter, builder) -> {
-				double theta = parameter * Math.PI * 2;
-				builder.offset(FastUtils.cos(theta), builder.offsetY(), FastUtils.sin(theta));
-			})
+			double theta = parameter * Math.PI * 2;
+			builder.offset(FastUtils.cos(theta), builder.offsetY(), FastUtils.sin(theta));
+		})
 			.delta(0, 1.4, 0)
 			.directionalMode(true)
 			.extra(0.4)

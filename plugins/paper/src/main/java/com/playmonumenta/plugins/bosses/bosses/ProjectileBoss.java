@@ -135,40 +135,40 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		//particle & sound used!
 		@BossParam(help = "Sound played at the start")
-            public SoundsList SOUND_START = SoundsList.builder()
-	.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_AMBIENT, 1.5f, 1.0f))
-	.build();
+		public SoundsList SOUND_START = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_AMBIENT, 1.5f, 1.0f))
+			.build();
 
 		@BossParam(help = "Particle used when launching the projectile")
-            public ParticlesList PARTICLE_LAUNCH = ParticlesList.builder()
-	.add(new ParticlesList.CParticle(Particle.EXPLOSION_LARGE, 1, 0.0, 0.0, 0.0, 0.0))
-	.build();
+		public ParticlesList PARTICLE_LAUNCH = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_LARGE, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound used when launching the projectile")
-            public SoundsList SOUND_LAUNCH = SoundsList.builder()
-	.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f))
-	.build();
+		public SoundsList SOUND_LAUNCH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f))
+			.build();
 
 		@BossParam(help = "Particle used for the projectile")
-            public ParticlesList PARTICLE_PROJECTILE = ParticlesList.builder()
-	.add(new ParticlesList.CParticle(Particle.FLAME, 4, 0.05, 0.05, 0.05, 0.1))
-	.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 3, 0.25, 0.25, 0.25, 0.0))
-	.build();
+		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 4, 0.05, 0.05, 0.05, 0.1))
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 3, 0.25, 0.25, 0.25, 0.0))
+			.build();
 
 		@BossParam(help = "Sound summoned every 2 sec on the projectile location")
-            public SoundsList SOUND_PROJECTILE = SoundsList.builder()
-	.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_BURN, 0.5f, 0.2f))
-	.build();
+		public SoundsList SOUND_PROJECTILE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_BURN, 0.5f, 0.2f))
+			.build();
 
 		@BossParam(help = "Particle used when the projectile hit something")
-            public ParticlesList PARTICLE_HIT = ParticlesList.builder()
-	.add(new ParticlesList.CParticle(Particle.CLOUD, 50, 0.0, 0.0, 0.0, 0.25))
-	.build();
+		public ParticlesList PARTICLE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 50, 0.0, 0.0, 0.0, 0.25))
+			.build();
 
 		@BossParam(help = "Sound used when the projectile hit something")
-            public SoundsList SOUND_HIT = SoundsList.builder()
-	.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_DEATH, 0.5f, 0.5f))
-	.build();
+		public SoundsList SOUND_HIT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_DEATH, 0.5f, 0.5f))
+			.build();
 
 		@BossParam(help = "Entities summoned on hit")
 		public LoSPool HIT_SUMMONS = LoSPool.LibraryPool.EMPTY;
@@ -204,11 +204,11 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 	public static void onHitActions(final Parameters p, final LivingEntity launcher, final LivingEntity affected, final @Nullable Location prevLoc) {
 		if (p.DAMAGE > 0) {
-			BossUtils.blockableDamage(launcher, affected, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc, p.EFFECTS.mEffectList);
+			BossUtils.blockableDamage(launcher, affected, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc, p.EFFECTS.mEffectList());
 		}
 
 		if (p.DAMAGE_PERCENTAGE > 0.0) {
-			BossUtils.bossDamagePercent(launcher, affected, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME, p.EFFECTS.mEffectList);
+			BossUtils.bossDamagePercent(launcher, affected, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME, p.EFFECTS.mEffectList());
 		}
 
 		if (p.HEAL_AMOUNT > 0) {

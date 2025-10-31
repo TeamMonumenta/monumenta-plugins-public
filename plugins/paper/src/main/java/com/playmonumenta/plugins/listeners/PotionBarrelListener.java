@@ -413,16 +413,7 @@ public class PotionBarrelListener implements Listener {
 		}
 	}
 
-	private static class BarrelInstance {
-		private final Block mBlock;
-		private final Inventory mInventory;
-		private final ItemStack mPotion;
-
-		private BarrelInstance(Block block, Inventory inventory, ItemStack potion) {
-			mBlock = block;
-			mInventory = inventory;
-			mPotion = potion;
-		}
+	private record BarrelInstance(Block mBlock, Inventory mInventory, ItemStack mPotion) {
 
 		private Block getBlock() {
 			return mBlock;
@@ -736,7 +727,7 @@ public class PotionBarrelListener implements Listener {
 			if (
 				!isValidShard() ||
 					GuildPlotUtils.guildPlotInventoryModificationBlocked(event.getPlayer()
-				)
+					)
 			) {
 				event.setCancelled(true);
 			} else {

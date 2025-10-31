@@ -27,7 +27,7 @@ public final class PercentDamageDealtSingle extends PercentDamageDealt {
 	}
 
 	public PercentDamageDealtSingle(final int duration, final double amount,
-									final @Nullable EnumSet<DamageType> affectedDamageTypes, final boolean multiplicative) {
+	                                final @Nullable EnumSet<DamageType> affectedDamageTypes, final boolean multiplicative) {
 		this(duration, amount, affectedDamageTypes, multiplicative, null);
 	}
 

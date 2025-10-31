@@ -18,11 +18,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class Enlightening implements Infusion {
 	private static final List<BlockFace> ORDERED_CARTESIAN_BLOCK_FACES = List.of(
-			BlockFace.DOWN,
-			BlockFace.NORTH,
-			BlockFace.EAST,
-			BlockFace.SOUTH,
-			BlockFace.WEST
+		BlockFace.DOWN,
+		BlockFace.NORTH,
+		BlockFace.EAST,
+		BlockFace.SOUTH,
+		BlockFace.WEST
 	);
 
 	@Override
@@ -120,7 +120,8 @@ public class Enlightening implements Infusion {
 
 	/**
 	 * Handle the logic for breaking torches
-	 * @param event  The block break event (which might need to be cancelled)
+	 *
+	 * @param event The block break event (which might need to be cancelled)
 	 * @return true if the entire logic is handled, false if the original logic should continue
 	 */
 	private boolean onTorchBreak(BlockBreakEvent event) {
@@ -153,7 +154,7 @@ public class Enlightening implements Infusion {
 		int maxHeight = testLocation.getWorld().getMaxHeight();
 
 		// There might be a falling block inside the torch, so check this before starting the loop
-		if (!testLocation.getNearbyEntitiesByType(FallingBlock.class, 1.0, 1.0 , 1.0).isEmpty()) {
+		if (!testLocation.getNearbyEntitiesByType(FallingBlock.class, 1.0, 1.0, 1.0).isEmpty()) {
 			return true;
 		}
 
@@ -162,7 +163,7 @@ public class Enlightening implements Infusion {
 			testLocation.add(0.0, 1.0, 0.0);
 
 			// Check for a falling block entity
-			if (!testLocation.getNearbyEntitiesByType(FallingBlock.class, 1.0, 1.0 , 1.0).isEmpty()) {
+			if (!testLocation.getNearbyEntitiesByType(FallingBlock.class, 1.0, 1.0, 1.0).isEmpty()) {
 				return true;
 			}
 

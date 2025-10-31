@@ -278,7 +278,7 @@ public enum EffectType {
 		(duration, strength, source) -> new FishQualityIncrease(duration, -strength)
 	)),
 
-	BLEED("Bleed", "Bleed", false, false, false,pluginApplicator(
+	BLEED("Bleed", "Bleed", false, false, false, pluginApplicator(
 		(duration, strength, source) -> new Bleed(duration, strength, Plugin.getInstance()))),
 
 	STASIS("Stasis", "Stasis", true, false, true, pluginApplicator(

@@ -69,7 +69,7 @@ public class SpawnerCountCommand {
 					})
 			)
 			.withSubcommand(
-					new CommandAPICommand("countAndUpdate")
+				new CommandAPICommand("countAndUpdate")
 					.withArguments(new StringArgument("world")
 						.replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
 					.withOptionalArguments(new IntegerArgument("chunk radius"))
@@ -174,15 +174,15 @@ public class SpawnerCountCommand {
 								for (Map.Entry<String, BranchSet> e : branchSets.entrySet()) {
 									BranchSet set = e.getValue();
 									int spawnersInSet = set.mSpawnersPerBranch.values().stream()
-										                    .mapToInt(v -> v)
-										                    .sorted()
-										                    .limit(set.mNumBranchesRequired)
-										                    .sum();
+										.mapToInt(v -> v)
+										.sorted()
+										.limit(set.mNumBranchesRequired)
+										.sum();
 									String branches = set.mSpawnersPerBranch.entrySet().stream()
-										                  .sorted(Map.Entry.comparingByValue())
-										                  .limit(set.mNumBranchesRequired)
-										                  .map(Map.Entry::getKey)
-										                  .collect(Collectors.joining(", "));
+										.sorted(Map.Entry.comparingByValue())
+										.limit(set.mNumBranchesRequired)
+										.map(Map.Entry::getKey)
+										.collect(Collectors.joining(", "));
 									if (sender != null) {
 										sender.sendMessage(Component.text("Found " + spawnersInSet + " minimal spawners in set " + e.getKey() + " (using branch(es): " + branches + ")."));
 									}

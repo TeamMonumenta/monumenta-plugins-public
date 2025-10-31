@@ -104,7 +104,7 @@ public class MMQuest {
 				mmQuestOutput = mmQuestOutput.append(blockOne);
 				if (quest.checkQuestCompletion(target)) {
 					mmQuestOutput = mmQuestOutput.append(blockOnep2);
-				 //adds "Complete" if quest is complete.
+					//adds "Complete" if quest is complete.
 				} else {
 					mmQuestOutput = mmQuestOutput.append(blockOnep3);
 				} //otherwise adds "Incomplete".
@@ -229,7 +229,7 @@ public class MMQuest {
 				stringQuestHashMap.put(questString, quest);
 			}
 		} catch (Exception e) {
-			MMLog.fine("MMQuest Error: " + e.toString());
+			MMLog.fine("MMQuest Error: " + e);
 		}
 		int size = stringQuestHashMap.size();
 		if (size > 0) {
@@ -271,9 +271,9 @@ public class MMQuest {
 			// If the quest is complete, show its name with color green. Else, color red.
 			if (isQuestComplete) {
 				Component requiredQuest = Component.text("  " + questReqs + "  ")
-					                          .hoverEvent(Component.text("Complete"))
-					                          .clickEvent(ClickEvent.runCommand("/mmquest " + player.getName() + " " + questString))
-					                          .color(TextColor.color(0x00ff00));
+					.hoverEvent(Component.text("Complete"))
+					.clickEvent(ClickEvent.runCommand("/mmquest " + player.getName() + " " + questString))
+					.color(TextColor.color(0x00ff00));
 				blockTwo = blockTwo.append(requiredQuest);
 			} else {
 				Component requiredQuest = Component.text("  " + questReqs + "  ")

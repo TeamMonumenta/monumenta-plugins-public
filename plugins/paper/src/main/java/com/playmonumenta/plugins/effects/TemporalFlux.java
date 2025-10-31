@@ -64,7 +64,7 @@ public class TemporalFlux extends ZeroArgumentEffect {
 				entity.sendMessage(Component.text("Paradox has ", NamedTextColor.RED).append(Component.text(getDuration() / 20, NamedTextColor.RED, TextDecoration.BOLD)).append(Component.text(" seconds remaining!")));
 			}
 			new PPCircle(Particle.SOUL_FIRE_FLAME, entity.getLocation(), 1)
-					.count(20).delta(0.25, 0.1, 0.25).spawnAsBoss();
+				.count(20).delta(0.25, 0.1, 0.25).spawnAsBoss();
 		}
 	}
 

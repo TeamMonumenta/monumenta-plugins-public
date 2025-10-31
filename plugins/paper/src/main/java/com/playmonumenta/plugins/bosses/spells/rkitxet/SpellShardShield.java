@@ -21,7 +21,7 @@ public class SpellShardShield extends Spell {
 	public static final int MIN_TIME_UNTIL_SHIELD_1 = 15 * 20;
 	public static final int MIN_TIME_UNTIL_SHIELD_2 = 10 * 20;
 
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 	private int mTicks;
 
 	private boolean mShielded;

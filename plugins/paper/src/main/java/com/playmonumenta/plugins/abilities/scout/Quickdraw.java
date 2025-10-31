@@ -114,8 +114,10 @@ public class Quickdraw extends Ability {
 		final Location eyeLoc = mPlayer.getEyeLocation();
 		final Projectile proj;
 		switch (inMainHand.getType()) {
-			case BOW, CROSSBOW -> proj = world.spawnArrow(eyeLoc, direction, ItemUtils.getVanillaProjectileSpeed(inMainHand), 0, Arrow.class);
-			case TRIDENT -> proj = world.spawnArrow(eyeLoc, direction, ItemUtils.getVanillaProjectileSpeed(inMainHand), 0, Trident.class);
+			case BOW, CROSSBOW ->
+				proj = world.spawnArrow(eyeLoc, direction, ItemUtils.getVanillaProjectileSpeed(inMainHand), 0, Arrow.class);
+			case TRIDENT ->
+				proj = world.spawnArrow(eyeLoc, direction, ItemUtils.getVanillaProjectileSpeed(inMainHand), 0, Trident.class);
 			case SNOWBALL -> {
 				final Snowball snowball = world.spawn(eyeLoc, Snowball.class);
 				ItemUtils.setSnowballItem(snowball, inMainHand);

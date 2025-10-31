@@ -117,7 +117,9 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 				//summoning each should be delayed by 2 tick to prevent creepers targetting the same enemy?
 				new BukkitRunnable() {
 					int mCount = 0;
-					@Override public void run() {
+
+					@Override
+					public void run() {
 						summonAberration(summonLoc, playerItemStats);
 						mCount++;
 						if (mCount >= num) {
@@ -161,6 +163,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 			new BukkitRunnable() {
 				int mTicks = 0;
 				@Nullable LivingEntity mTarget = null;
+
 				@Override
 				public void run() {
 					if (mTicks >= ABERRATION_LIFETIME || !mPlayer.isOnline() || mPlayer.isDead() || !aberration.isValid()) {
@@ -177,7 +180,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 						 * target validation checking needs to be empty list for all living mobs nearby
 						 */
 						if (!(mTarget != null && mTarget.getHealth() > 0) &&
-							    !isValidTarget(aberration, mTarget, true, new ArrayList<>())) {
+							!isValidTarget(aberration, mTarget, true, new ArrayList<>())) {
 							LivingEntity newTarget = findTarget(aberration, mTargets);
 							if (newTarget != null) {
 								mTarget = newTarget;
@@ -224,13 +227,13 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 		}
 
 		return mob != null
-			       && mob.isValid()
-			       && mob.getLocation().distance(aberration.getLocation()) <= 1.5 * ABERRATION_TARGET_RADIUS
-			       && Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= 1.5 * MAX_TARGET_Y
-			       && !DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC)
-			       && !mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)
-			       && (!withPathfinding || canPathfind(aberration, mob))
-				   && !nearbyTargeted.contains(mob);
+			&& mob.isValid()
+			&& mob.getLocation().distance(aberration.getLocation()) <= 1.5 * ABERRATION_TARGET_RADIUS
+			&& Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= 1.5 * MAX_TARGET_Y
+			&& !DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC)
+			&& !mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)
+			&& (!withPathfinding || canPathfind(aberration, mob))
+			&& !nearbyTargeted.contains(mob);
 	}
 
 	private boolean canPathfind(Creeper aberration, LivingEntity mob) {
@@ -245,18 +248,18 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	private @Nullable LivingEntity findTarget(Creeper aberration, List<LivingEntity> targets) {
 
 		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(aberration.getLocation(), ABERRATION_TARGET_RADIUS, aberration).stream()
-			                                .filter(mob -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= MAX_TARGET_Y)
-			                                .filter(mob -> isValidTarget(aberration, mob, false, targets))
-			                                .sorted(Comparator.comparingDouble(Damageable::getHealth).reversed())
-			                                .toList();
+			.filter(mob -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= MAX_TARGET_Y)
+			.filter(mob -> isValidTarget(aberration, mob, false, targets))
+			.sorted(Comparator.comparingDouble(Damageable::getHealth).reversed())
+			.toList();
 
 		List<LivingEntity> lineOfSightNearbyMobs = nearbyMobs.stream().filter(mob -> mob.hasLineOfSight(aberration)).toList();
 
 		LivingEntity fallback = (lineOfSightNearbyMobs.isEmpty() ? nearbyMobs : lineOfSightNearbyMobs).stream().findFirst().orElse(null);
 
 		return (lineOfSightNearbyMobs.isEmpty() ? nearbyMobs : lineOfSightNearbyMobs).stream()
-			       .filter(le -> canPathfind(aberration, le))
-			       .findFirst().orElse(fallback);
+			.filter(le -> canPathfind(aberration, le))
+			.findFirst().orElse(fallback);
 	}
 
 	private static Description<EsotericEnhancements> getDescription1() {

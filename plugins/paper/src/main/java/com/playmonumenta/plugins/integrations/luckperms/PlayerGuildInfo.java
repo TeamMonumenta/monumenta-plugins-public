@@ -30,7 +30,7 @@ public class PlayerGuildInfo {
 	                        GuildAccessLevel accessLevel,
 	                        GuildInviteLevel inviteLevel,
 	                        EnumSet<GuildPermission> guildPermissions,
-							EnumSet<GuildFlag> guildFlags) {
+	                        EnumSet<GuildFlag> guildFlags) {
 		mUser = user;
 		mPlayerName = MonumentaRedisSyncIntegration.cachedUuidToName(user.getUniqueId());
 		mGuild = guild;

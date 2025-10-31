@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.apache.logging.log4j.util.BiConsumer;
@@ -116,7 +115,7 @@ public class ItemDiscovery {
 				continue;
 			}
 
-			slotsNeeded = (int)(slotsNeeded + Math.ceil((double)amountNeeded / item.getMaxStackSize()));
+			slotsNeeded = (int) (slotsNeeded + Math.ceil((double) amountNeeded / item.getMaxStackSize()));
 		}
 		int openSlots = InventoryUtils.numEmptySlots(player.getInventory());
 		if (slotsNeeded > openSlots) {
@@ -241,7 +240,7 @@ public class ItemDiscovery {
 					.data(new Particle.DustOptions(Color.fromRGB(192, 120, 191), 0.75f))
 					.spawnForPlayers(ParticleCategory.FULL, players);
 			}
-			double theta = Math.PI * 2 * (((double)ticks % 40) / 40);
+			double theta = Math.PI * 2 * (((double) ticks % 40) / 40);
 			Vector delta = new Vector(FastUtils.cos(theta) * 0.4, 0, FastUtils.sin(theta) * 0.4);
 			new PartialParticle(Particle.ENCHANTMENT_TABLE, location.clone().add(delta))
 				.count(1)
@@ -275,8 +274,8 @@ public class ItemDiscovery {
 					.data(new Particle.DustTransition(Color.fromRGB(240, 156, 41), Color.fromRGB(242, 181, 92), 0.8f))
 					.spawnForPlayers(ParticleCategory.FULL, players);
 			}
-			double theta1 = Math.PI * 2 * (((double)ticks % 50) / 50);
-			double theta2 = Math.PI * 2 * (((double)ticks % 30) / 30);
+			double theta1 = Math.PI * 2 * (((double) ticks % 50) / 50);
+			double theta2 = Math.PI * 2 * (((double) ticks % 30) / 30);
 			Vector delta = new Vector(FastUtils.cos(theta2) * 0.45, FastUtils.cos(theta1) * 0.45, FastUtils.sin(theta2) * 0.45);
 			new PartialParticle(Particle.ELECTRIC_SPARK, location.clone().add(delta))
 				.directionalMode(true)

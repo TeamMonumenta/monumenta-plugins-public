@@ -91,7 +91,7 @@ public class StrawEffigyCS extends JudgementChainCS {
 		new PartialParticle(Particle.SWEEP_ATTACK, target.getEyeLocation(), 1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, targetLoc, 30, 0.75, 0.75, 0.75, 0.125).spawnAsPlayerActive(player);
 		new PPLine(Particle.BLOCK_CRACK, LocationUtils.getEntityCenter(player), LocationUtils.getEntityCenter(target))
-				.data(Material.HAY_BLOCK.createBlockData()).countPerMeter(8).delta(0.03).spawnAsPlayerActive(player);
+			.data(Material.HAY_BLOCK.createBlockData()).countPerMeter(8).delta(0.03).spawnAsPlayerActive(player);
 
 		world.playSound(playerLoc, Sound.ENTITY_GUARDIAN_DEATH, SoundCategory.PLAYERS, 1.0f, 0.6f);
 		world.playSound(playerLoc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.6f, 0.6f);

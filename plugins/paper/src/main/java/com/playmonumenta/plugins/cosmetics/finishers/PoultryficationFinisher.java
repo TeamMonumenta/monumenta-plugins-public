@@ -471,7 +471,8 @@ public class PoultryficationFinisher implements EliteFinisher {
 		}
 	}
 
-	@Override public Material getDisplayItem() {
+	@Override
+	public Material getDisplayItem() {
 		return Material.CHICKEN;
 	}
 }

@@ -70,8 +70,8 @@ public class FlameTotem extends TotemAbility {
 			.simpleDescription("Summon a totem that deals damage and sets mobs on fire within its range.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FlameTotem::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
-				                                                                       .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
-				                                                                       .keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.MAGMA_BLOCK);
 
 	private final FlameTotemCS mCosmetic;

@@ -41,7 +41,7 @@ public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
 	private static final String SUMMON_SLOWNESS_SRC = "SummonOldLabsBossSlowness";
 	private static final int SUMMON_SLOWNESS_DURATION = 20 * 2;
 	private static final double SUMMON_SLOWNESS_POTENCY = -0.75;
-	private static final String[] mDialog = new String[] {
+	private static final String[] mDialog = new String[]{
 		"Well, this is very peculiar...",
 		"The rats causing a ruckus down here are mere commoners? How feeble are those bandits?",
 		"The aristocratic code of ethics demands I take pity on you, but why shouldn't I prune you here where no one will know?",

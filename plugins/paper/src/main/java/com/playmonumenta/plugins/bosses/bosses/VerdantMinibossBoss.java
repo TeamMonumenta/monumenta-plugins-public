@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -183,7 +184,7 @@ public class VerdantMinibossBoss extends SerializedLocationBossAbilityGroup {
 					@Override
 					public void run() {
 						if (mFuryTarget == null || !mFuryTarget.isOnline() || mFuryTarget.isDead() || !mFuryTarget.getWorld().equals(mBoss.getWorld())
-							    || mFuryTarget.getLocation().distance(mBoss.getLocation()) > detectionRange) {
+							|| mFuryTarget.getLocation().distance(mBoss.getLocation()) > detectionRange) {
 							mFuryTarget = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
 							if (mFuryTarget == null) {
 								return;
@@ -243,7 +244,7 @@ public class VerdantMinibossBoss extends SerializedLocationBossAbilityGroup {
 							world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1);
 
 							ParticleUtils.explodingRingEffect(mPlugin, mLocation, RADIUS, 1, 4,
-								Arrays.asList(
+								List.of(
 									new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
 										new PartialParticle(Particle.FLAME, location, 1, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
 										new PartialParticle(Particle.SMOKE_LARGE, location, 1, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
@@ -321,7 +322,7 @@ public class VerdantMinibossBoss extends SerializedLocationBossAbilityGroup {
 
 	private SpellManager getTeccatlSpellManager() {
 		World world = mBoss.getWorld();
-		return new SpellManager(Arrays.asList(
+		return new SpellManager(List.of(
 			new SpellBaseCharge(mPlugin, mBoss, 32, 80, 25, false,
 				0, 0, 0,
 				true,
@@ -359,7 +360,7 @@ public class VerdantMinibossBoss extends SerializedLocationBossAbilityGroup {
 	}
 
 	private SpellManager getTlorixSpellManager() {
-		return new SpellManager(Arrays.asList(
+		return new SpellManager(List.of(
 			new SpellBombToss(mPlugin, mBoss, detectionRange, 2, 50, 160,
 				(World world, TNTPrimed tnt, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 1f);

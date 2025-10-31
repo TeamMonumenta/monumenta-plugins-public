@@ -13,11 +13,13 @@ public class Decapitation implements Infusion {
 
 	public static final double DAMAGE_MLT_PER_LVL = 0.0125;
 
-	@Override public String getName() {
+	@Override
+	public String getName() {
 		return "Decapitation";
 	}
 
-	@Override public InfusionType getInfusionType() {
+	@Override
+	public InfusionType getInfusionType() {
 		return InfusionType.DECAPITATION;
 	}
 

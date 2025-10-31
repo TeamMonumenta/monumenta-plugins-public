@@ -22,9 +22,9 @@ public class BrokenEquipmentListener implements Listener {
 
 	private static boolean isBroken(ItemStack item) {
 		return item != null
-			       && item.getType().getMaxDurability() > 0
-			       && item.getItemMeta() instanceof Damageable damageable
-			       && damageable.getDamage() >= item.getType().getMaxDurability();
+			&& item.getType().getMaxDurability() > 0
+			&& item.getItemMeta() instanceof Damageable damageable
+			&& damageable.getDamage() >= item.getType().getMaxDurability();
 	}
 
 	// Player interacts with a block in the world
@@ -34,7 +34,7 @@ public class BrokenEquipmentListener implements Listener {
 		if (event.useItemInHand() != Event.Result.DENY) {
 			Player player = event.getPlayer();
 			ItemStack item = event.getItem();
-			if (item != null && isBroken(item) && !item.containsEnchantment(Enchantment.RIPTIDE)) {
+			if (isBroken(item) && !item.containsEnchantment(Enchantment.RIPTIDE)) {
 				MessagingUtils.sendActionBarMessage(player, ERROR_MESSAGE);
 				event.setUseItemInHand(Event.Result.DENY);
 				event.setCancelled(true);

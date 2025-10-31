@@ -92,9 +92,9 @@ public class ArcaneStrike extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE
-			    && !isOnCooldown()
-			    && mPlayer.getCooledAttackStrength(0) == 1
-				&& mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.MAGIC_WAND) > 0) {
+			&& !isOnCooldown()
+			&& mPlayer.getCooledAttackStrength(0) == 1
+			&& mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.MAGIC_WAND) > 0) {
 			putOnCooldown();
 
 			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), mRadius);
@@ -103,9 +103,9 @@ public class ArcaneStrike extends Ability {
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
 				if (EntityUtils.isSlowed(mPlugin, mob) || (mob.hasPotionEffect(PotionEffectType.SLOW)
-					                                           && !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
-					    || (mob.getFireTicks() > 0
-						        && !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
+					&& !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
+					|| (mob.getFireTicks() > 0
+					&& !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
 					preSpellPowerDamage += mDamageBonusAffected;
 				}
 

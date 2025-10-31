@@ -90,6 +90,7 @@ public class PrestigiousTotemCS extends WhirlwindTotemCS implements PrestigeCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				new PPCircle(Particle.CLOUD, standLocation.clone().add(0, 0.2, 0), radius / 4).countPerMeter(0.8).delta(1, 0, -4).extra(0.01 * radius).directionalMode(true).rotateDelta(true).spawnAsPlayerActive(player);

@@ -26,7 +26,7 @@ public class SoulRendLifeSteal extends Effect {
 	private boolean mIsFirstCrit;
 
 	public SoulRendLifeSteal(Player player, int duration, int marks, double healPercent, double healCap,
-							 double remainingHeal, SoulRend soulRend, SoulRendCS cosmetic) {
+	                         double remainingHeal, SoulRend soulRend, SoulRendCS cosmetic) {
 		super(duration, effectID);
 		mPlayer = player;
 		mMarks = marks;

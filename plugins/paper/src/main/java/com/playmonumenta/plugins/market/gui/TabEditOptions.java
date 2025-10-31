@@ -17,7 +17,7 @@ public class TabEditOptions implements MarketGuiTab {
 	MarketGui mGui;
 
 	static final Component TAB_TITLE = Component.text("Market Options Editor");
-	static final int TAB_SIZE = 1 * 9;
+	static final int TAB_SIZE = 9;
 	MarketPlayerOptions mOptions;
 
 	public TabEditOptions(MarketGui marketGUI) {

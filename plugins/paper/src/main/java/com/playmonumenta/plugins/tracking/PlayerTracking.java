@@ -47,7 +47,7 @@ public class PlayerTracking implements EntityTracking {
 			GameMode expectedGameMode = ZoneUtils.expectedGameMode(player);
 			if (
 				GameMode.SURVIVAL.equals(currentGameMode)
-				&& GameMode.ADVENTURE.equals(expectedGameMode)
+					&& GameMode.ADVENTURE.equals(expectedGameMode)
 			) {
 				player.setGameMode(GameMode.ADVENTURE);
 			} else if (

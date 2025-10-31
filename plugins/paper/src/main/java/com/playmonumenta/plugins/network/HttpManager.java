@@ -15,7 +15,7 @@ public class HttpManager {
 	/* Must process a tick within this many milliseconds to be considered alive */
 	private static final int ALIVE_TICK_THRESHOLD = 15000;
 
-	private HttpServer mServer;
+	private final HttpServer mServer;
 	private static long mLastTickTime = 0;
 	private final Plugin mPlugin;
 

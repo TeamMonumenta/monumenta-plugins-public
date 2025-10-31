@@ -59,6 +59,7 @@ public class DruidicHexCS extends AmplifyingHexCS {
 		new BukkitRunnable() {
 			final Location mLoc = player.getLocation();
 			double mRadiusIncrement = 2;
+
 			@Override
 			public void run() {
 				if (mRadiusIncrement == 2) {
@@ -224,7 +225,8 @@ public class DruidicHexCS extends AmplifyingHexCS {
 							drawFernLine(0.6, 0, 0.7, 7 + offset, 6);
 							drawFernLine(0.6, 0, -1.5, 9.2 + offset, 10);
 						}
-						default -> { }
+						default -> {
+						}
 					}
 				}
 
@@ -298,7 +300,8 @@ public class DruidicHexCS extends AmplifyingHexCS {
 							drawAuxLeafLine(o, dir, 6.5 + offset, 35, 1.25);
 							drawAuxLeafLine(o, dir, 6.5 + offset, -35, 1.25);
 						}
-						default -> { }
+						default -> {
+						}
 					}
 				}
 

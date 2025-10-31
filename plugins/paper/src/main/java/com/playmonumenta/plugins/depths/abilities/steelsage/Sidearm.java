@@ -124,7 +124,6 @@ public class Sidearm extends DepthsAbility implements AbilityWithChargesOrStacks
 		}
 
 
-
 		Location endLoc = result.getHitPosition().toLocation(world);
 		hitEffect(endLoc);
 

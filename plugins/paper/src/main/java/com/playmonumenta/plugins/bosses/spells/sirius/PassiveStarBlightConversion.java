@@ -187,11 +187,11 @@ public class PassiveStarBlightConversion extends Spell {
 				for (int i = 0; i < 4; i++) {
 					int dxSign = (i < 2) ? 1 : -1;
 					int dzSign = (i % 2 == 0) ? 1 : -1;
-					double mRealX = mCornerOne.x() - (center.x() + x*dxSign);
-					double mRealZ = mCornerOne.z() - (center.z() + z*dzSign);
+					double mRealX = mCornerOne.x() - (center.x() + x * dxSign);
+					double mRealZ = mCornerOne.z() - (center.z() + z * dzSign);
 					List<BlockData> blockData = mRestore.get("x" + mRealX + "z" + mRealZ);
 					if (blockData != null && mBlighted[(int) mRealX][(int) mRealZ]) {
-						restoreColumn(center, x*dxSign, z*dzSign, blockData);
+						restoreColumn(center, x * dxSign, z * dzSign, blockData);
 						mBlighted[(int) mRealX][(int) mRealZ] = false;
 					}
 				}

@@ -350,8 +350,8 @@ public interface ItemStat {
 	 *
 	 * @param plugin monumenta plguin
 	 * @param player the Player gaining the custom effect
-	 * @param value the value of ItemStat possessed by the Player
-	 * @param event the associated CustomEffectApplyEvent
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated CustomEffectApplyEvent
 	 */
 	default void onCustomEffectApply(Plugin plugin, Player player, double value, CustomEffectApplyEvent event) {
 

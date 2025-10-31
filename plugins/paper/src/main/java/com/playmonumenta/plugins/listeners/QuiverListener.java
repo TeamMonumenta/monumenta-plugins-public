@@ -104,10 +104,10 @@ public class QuiverListener implements Listener {
 			@Override
 			public boolean canPutIntoContainer(ItemStack item) {
 				return ItemUtils.isArrow(item)
-					       && !ItemStatUtils.hasPlayerModified(item)
-					       && !ItemStatUtils.isQuiver(item)
-					       && !InventoryUtils.containsSpecialLore(item)
-						   && !ItemUtils.isQuestItem(item);
+					&& !ItemStatUtils.hasPlayerModified(item)
+					&& !ItemStatUtils.isQuiver(item)
+					&& !InventoryUtils.containsSpecialLore(item)
+					&& !ItemUtils.isQuestItem(item);
 			}
 
 			@Override
@@ -143,8 +143,8 @@ public class QuiverListener implements Listener {
 					amount += playerModified.getLong(CustomContainerItemManager.AMOUNT_KEY);
 				}
 				addLore.accept(Component.text("Contains ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-					               .append(Component.text(amount + (mTotalItemsLimit > 0 ? "/" + mTotalItemsLimit : ""), NamedTextColor.WHITE))
-					               .append(Component.text(" arrows", NamedTextColor.GRAY)));
+					.append(Component.text(amount + (mTotalItemsLimit > 0 ? "/" + mTotalItemsLimit : ""), NamedTextColor.WHITE))
+					.append(Component.text(" arrows", NamedTextColor.GRAY)));
 			}
 
 			@Override
@@ -156,11 +156,11 @@ public class QuiverListener implements Listener {
 						meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 						if (mode == ArrowTransformMode.NONE) {
 							meta.displayName(Component.text("Arrow transformation disabled", NamedTextColor.WHITE)
-								                 .decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+								.decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 						} else {
 							meta.displayName(Component.text("Transform arrows to ", NamedTextColor.WHITE)
-								                 .decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false)
-								                 .append(Component.text(mode.getArrowName(), NamedTextColor.GOLD)));
+								.decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false)
+								.append(Component.text(mode.getArrowName(), NamedTextColor.GOLD)));
 						}
 						meta.lore(List.of(
 							Component.text("Click to cycle through arrow transform modes.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
@@ -190,7 +190,7 @@ public class QuiverListener implements Listener {
 								NBT.modify(quiver, nbt -> {
 									ReadWriteNBTCompoundList itemsList = ItemStatUtils.getItemList(nbt);
 									ReadWriteNBT firstArrowPlayerModified = null;
-									for (Iterator<ReadWriteNBT> it = itemsList.iterator(); it.hasNext();) {
+									for (Iterator<ReadWriteNBT> it = itemsList.iterator(); it.hasNext(); ) {
 										ReadWriteNBT compound = it.next();
 										ItemStack containedItem = NBT.itemStackFromNBT(compound);
 										if (containedItem == null) {
@@ -222,7 +222,7 @@ public class QuiverListener implements Listener {
 											}
 										}
 									}
-                                    // why is this needed
+									// why is this needed
 								});
 								gui.mPlayer.playSound(gui.mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.BLOCKS, 1, 1);
 								gui.update();
@@ -239,7 +239,7 @@ public class QuiverListener implements Listener {
 	public void entityShootBowEvent(EntityShootBowEvent event) {
 		mCallProjectileLaunchEvent = false;
 		if (event.getEntity() instanceof Player player
-			    && ItemStatUtils.isQuiver(event.getConsumable())) {
+			&& ItemStatUtils.isQuiver(event.getConsumable())) {
 			ItemStack quiver = event.getConsumable();
 			boolean hasInfinity = ItemStatUtils.hasEnchantment(event.getBow(), EnchantmentType.INFINITY);
 			Pair<ItemStack, Boolean> projectile = takeFromQuiver(player, quiver, 1, item -> {
@@ -273,7 +273,7 @@ public class QuiverListener implements Listener {
 				newArrow.setPierceLevel(oldArrow.getPierceLevel());
 
 				if (newArrow instanceof Arrow newPotionArrow
-					    && projectileItem.getItemMeta() instanceof PotionMeta itemMeta) {
+					&& projectileItem.getItemMeta() instanceof PotionMeta itemMeta) {
 					newPotionArrow.setBasePotionType(itemMeta.getBasePotionType());
 					newPotionArrow.setColor(itemMeta.getColor());
 					for (PotionEffect customEffect : itemMeta.getCustomEffects()) {
@@ -433,13 +433,13 @@ public class QuiverListener implements Listener {
 
 	public static boolean attemptPickup(Player player, ItemStack itemStack) {
 		if (player.getGameMode() == GameMode.CREATIVE
-			    || !ItemUtils.isArrow(itemStack)
-			    || ItemStatUtils.getEnchantmentLevel(itemStack, EnchantmentType.THROWING_KNIFE) > 0) {
+			|| !ItemUtils.isArrow(itemStack)
+			|| ItemStatUtils.getEnchantmentLevel(itemStack, EnchantmentType.THROWING_KNIFE) > 0) {
 			return false;
 		}
 		for (ItemStack quiver : player.getInventory()) {
-			if (quiver == null || !ItemStatUtils.isQuiver(quiver) || quiver.getAmount() != 1
-				    || (ItemStatUtils.isArrowTransformingQuiver(quiver) && !canUseArrowTransformingQuiver(player))) {
+			if (!ItemStatUtils.isQuiver(quiver) || quiver.getAmount() != 1
+				|| (ItemStatUtils.isArrowTransformingQuiver(quiver) && !canUseArrowTransformingQuiver(player))) {
 				continue;
 			}
 			CustomContainerItemManager.CustomContainerItemConfiguration config = getQuiverConfig(quiver);

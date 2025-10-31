@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
@@ -19,6 +18,8 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
 
 public class DeathSummonBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_death_summon";

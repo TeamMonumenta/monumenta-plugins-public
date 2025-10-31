@@ -163,14 +163,7 @@ public class PPImage extends AbstractPartialParticle<PPImage> {
 		}
 	}
 
-	private static class BlendInfo {
-		private final BlendMode mBlendMode;
-		private final Color mColor;
-
-		public BlendInfo(BlendMode blendMode, Color color) {
-			mBlendMode = blendMode;
-			mColor = color;
-		}
+	private record BlendInfo(BlendMode mBlendMode, Color mColor) {
 
 		public BlendMode getBlendMode() {
 			return mBlendMode;

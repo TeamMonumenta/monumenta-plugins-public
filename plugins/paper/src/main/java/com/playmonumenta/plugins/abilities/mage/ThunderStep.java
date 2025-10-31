@@ -157,13 +157,13 @@ public class ThunderStep extends Ability {
 			null, -1, -1
 		);
 		Location playerEndLocation = movingPlayerBox
-			 .getCenter()
-			 .setY(movingPlayerBox.getMinY())
-			 .toLocation(world)
-			 .setDirection(vector);
+			.getCenter()
+			.setY(movingPlayerBox.getMinY())
+			.toLocation(world)
+			.setDirection(vector);
 
 		if (!playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)
-			    || ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			|| ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return true;
 		}
 		PlayerUtils.playerTeleport(mPlayer, playerEndLocation);

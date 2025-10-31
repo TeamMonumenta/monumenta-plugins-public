@@ -145,8 +145,8 @@ public class ZoneUtils {
 		GameMode currentGamemode = player.getGameMode();
 		if (
 			onlyFromSurvivalAdventure &&
-			!GameMode.ADVENTURE.equals(currentGamemode)
-			&& !GameMode.SURVIVAL.equals(currentGamemode)
+				!GameMode.ADVENTURE.equals(currentGamemode)
+				&& !GameMode.SURVIVAL.equals(currentGamemode)
 		) {
 			return;
 		}

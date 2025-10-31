@@ -13,6 +13,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -29,13 +35,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
 
 import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
 
@@ -102,7 +101,7 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 
 	@Override
 	public <V extends LivingEntity> void launch(V initialTarget, Location targetLoc, boolean fixed, double fYaw, double fPitch,
-												double offsetX, double offsetY, double offsetZ, double offsetYaw, double offsetPitch) {
+	                                            double offsetX, double offsetY, double offsetZ, double offsetYaw, double offsetPitch) {
 		if (!targetLoc.getWorld().equals(mBoss.getWorld())
 			|| ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.NO_SUMMONS)
 			|| mProjectileEntities.contains(mBossUUID)) { // In case it tries to cast again
@@ -301,10 +300,10 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 	public void projectileHit(@Nullable LivingEntity target, Location loc, Location prevLoc) {
 		mParameters.SOUND_HIT.play(loc, 0.5f, 0.5f);
 		mParameters.PARTICLE_HIT.spawn(mBoss, loc, 0d, 0d, 0d, 0.25d);
-		if(target != null) {
+		if (target != null) {
 			if (mParameters.DAMAGE > 0) {
 				BossUtils.blockableDamage(mBoss, target, mParameters.DAMAGE_TYPE, mParameters.DAMAGE,
-					mParameters.SPELL_NAME, prevLoc, mParameters.EFFECTS.mEffectList);
+					mParameters.SPELL_NAME, prevLoc, mParameters.EFFECTS.mEffectList());
 				mParameters.EFFECTS.apply(target, mBoss);
 			}
 			if (mParameters.TRUE_DAMAGE_PERCENTAGE > 0) {

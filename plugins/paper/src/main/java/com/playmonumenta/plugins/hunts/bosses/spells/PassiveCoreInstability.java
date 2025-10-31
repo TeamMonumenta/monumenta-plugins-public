@@ -53,7 +53,7 @@ public class PassiveCoreInstability extends Spell {
 	public void onHurt(DamageEvent event) {
 		if (
 			mUnstable > 0 && event.getSource() instanceof Player player
-			&& !AbilityUtils.isIndirectDamage(event)
+				&& !AbilityUtils.isIndirectDamage(event)
 		) {
 			// The player has spoiled the loot
 			player.playSound(mBoss, Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 1f, 1.5f);
@@ -98,6 +98,7 @@ public class PassiveCoreInstability extends Spell {
 		// Particles
 		BukkitRunnable particleRunnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;

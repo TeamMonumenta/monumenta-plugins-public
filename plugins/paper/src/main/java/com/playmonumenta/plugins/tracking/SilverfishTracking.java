@@ -13,12 +13,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Silverfish;
 
 public class SilverfishTracking implements EntityTracking {
-	private Set<Silverfish> mEntities = Collections.newSetFromMap(new WeakHashMap<>());
+	private final Set<Silverfish> mEntities = Collections.newSetFromMap(new WeakHashMap<>());
 	private int mTicks = 0;
 
 	@Override
 	public void addEntity(Entity entity) {
-		mEntities.add((Silverfish)entity);
+		mEntities.add((Silverfish) entity);
 	}
 
 	@Override

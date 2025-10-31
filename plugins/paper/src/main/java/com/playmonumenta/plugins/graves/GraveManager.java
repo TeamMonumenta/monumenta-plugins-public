@@ -240,19 +240,19 @@ public class GraveManager {
 		String shard = ServerProperties.getShardName();
 
 		if (equipment.entrySet().stream().filter(e -> e.getKey() != EquipmentSlot.HAND)
-			    .map(Map.Entry::getValue)
-			    .allMatch(item -> ItemUtils.isNullOrAir(item)
-				                      || ItemStatUtils.getTier(item) == Tier.NONE
-				                      || ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
+			.map(Map.Entry::getValue)
+			.allMatch(item -> ItemUtils.isNullOrAir(item)
+				|| ItemStatUtils.getTier(item) == Tier.NONE
+				|| ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
 			// Check Lich infusion
 			if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.PHYLACTERY) == 0
-				    || ScoreboardUtils.getScoreboardValue(player, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) == 0) {
+				|| ScoreboardUtils.getScoreboardValue(player, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) == 0) {
 				player.sendMessage(Component.text("You died but had nothing equipped that could shatter, so no grave was created nor were equipped items shattered further. ", NamedTextColor.GRAY)
-					                   .append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
+					.append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
 			} else if (manager.mGraves.stream().noneMatch(grave -> grave.mGhostGrave && shard.equals(grave.mShardName))) {
 				manager.mGraves.add(new Grave(manager, player, equipment));
 				player.sendMessage(Component.text("You died but had nothing equipped that could shatter, nevertheless you left a grave to store your experience! ", NamedTextColor.GRAY)
-					                   .append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
+					.append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
 			}
 		} else if (manager.mGraves.stream().noneMatch(grave -> grave.mGhostGrave && shard.equals(grave.mShardName))) {
 			manager.mGraves.add(new Grave(manager, player, equipment));
@@ -425,17 +425,17 @@ public class GraveManager {
 			.append(Component.text(grave.mShardName, NamedTextColor.WHITE))
 			.append(Component.text(") Loc: (", NamedTextColor.GRAY))
 			.append(Component.text(grave.mLocation.getBlockX() + "," + grave.mLocation.getBlockY() + "," + grave.mLocation.getBlockZ(), NamedTextColor.WHITE))
-				.append(Component.text(") ", NamedTextColor.GRAY))
-				.append(Component.text("Items: (", NamedTextColor.GRAY)
-						.hoverEvent(HoverEvent.showText(itemList)))
-				.append(Component.text(grave.mItems.size(), NamedTextColor.WHITE)
-						.hoverEvent(HoverEvent.showText(itemList)))
-				.append(Component.text(")", NamedTextColor.GRAY)
-						.hoverEvent(HoverEvent.showText(itemList)))
-				.append(Component.text(" "))
-				.append(Component.text("[X]", NamedTextColor.DARK_RED)
-						.hoverEvent(HoverEvent.showText(Component.text("Click to delete", NamedTextColor.RED)))
-						.clickEvent(ClickEvent.runCommand("/grave delete " + grave.mUuid)));
+			.append(Component.text(") ", NamedTextColor.GRAY))
+			.append(Component.text("Items: (", NamedTextColor.GRAY)
+				.hoverEvent(HoverEvent.showText(itemList)))
+			.append(Component.text(grave.mItems.size(), NamedTextColor.WHITE)
+				.hoverEvent(HoverEvent.showText(itemList)))
+			.append(Component.text(")", NamedTextColor.GRAY)
+				.hoverEvent(HoverEvent.showText(itemList)))
+			.append(Component.text(" "))
+			.append(Component.text("[X]", NamedTextColor.DARK_RED)
+				.hoverEvent(HoverEvent.showText(Component.text("Click to delete", NamedTextColor.RED)))
+				.clickEvent(ClickEvent.runCommand("/grave delete " + grave.mUuid)));
 	}
 
 	public List<Grave> getGraves() {

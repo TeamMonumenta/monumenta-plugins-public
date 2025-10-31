@@ -89,8 +89,8 @@ public final class Varcosa extends SerializedLocationBossAbilityGroup {
 			new SpellShieldStun(TICKS_PER_SECOND * 6),
 			// Teleport the boss to spawnLoc if he is stuck in bedrock
 			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
-				                                                  b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
-				                                                  b.getLocation().getBlock().getType() == Material.LAVA)
+				b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
+				b.getLocation().getBlock().getType() == Material.LAVA)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();

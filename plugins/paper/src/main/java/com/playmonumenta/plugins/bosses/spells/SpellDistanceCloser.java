@@ -14,7 +14,7 @@ public class SpellDistanceCloser extends Spell {
 	private final double mDistanceSquared;
 	private final double mSpeed;
 
-	private Mob mBoss;
+	private final Mob mBoss;
 
 	public SpellDistanceCloser(Mob boss, double distance, double speed) {
 		mDistanceSquared = distance * distance;

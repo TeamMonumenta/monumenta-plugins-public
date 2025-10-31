@@ -22,10 +22,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellFluffingDeath extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private int mRange;
-	private Location mStartLoc;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final int mRange;
+	private final Location mStartLoc;
 
 	public SpellFluffingDeath(Plugin plugin, LivingEntity boss, int range, Location startLoc) {
 		mPlugin = plugin;

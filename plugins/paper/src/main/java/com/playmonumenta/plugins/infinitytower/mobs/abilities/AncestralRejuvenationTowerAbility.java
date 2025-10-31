@@ -20,6 +20,7 @@ public class AncestralRejuvenationTowerAbility extends TowerAbility {
 
 		Spell spell = new Spell() {
 			final double mHealAmount = amount;
+
 			@Override
 			public void run() {
 				List<LivingEntity> list = !mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs();

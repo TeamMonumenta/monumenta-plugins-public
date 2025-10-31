@@ -64,7 +64,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ItemUpdateHelper {
 	// Keys allowed to be empty
-	private static final List<String> whitelistedKeys = Arrays.asList("AttributeModifiers");
+	private static final List<String> whitelistedKeys = List.of("AttributeModifiers");
 	private static final List<Component> loreToRemove = Collections.singletonList(ItemStatUtils.DUMMY_LORE_TO_REMOVE);
 	private static final UUID cachedDummyUUID = new UUID(0, 0);
 	private static final AttributeModifier cachedDummyAttributeModifier = new AttributeModifier(cachedDummyUUID, ItemStatUtils.MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME, 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
@@ -78,9 +78,12 @@ public class ItemUpdateHelper {
 		Map.entry("InstantHealth", "InstantHealthPercent")
 	);
 
-	public record VanillaEnchantmentType(Enchantment enchant, int level) {}
+	public record VanillaEnchantmentType(Enchantment enchant, int level) {
+	}
 
-	public record VanillaAttributeType(Attribute type, double amount, AttributeModifier.Operation operation, @Nullable EquipmentSlot slot) {}
+	public record VanillaAttributeType(Attribute type, double amount, AttributeModifier.Operation operation,
+	                                   @Nullable EquipmentSlot slot) {
+	}
 
 	public static List<String> getEmptyKeys(ReadableNBT nbt, List<String> paths, String baseKey) {
 		Set<String> keys = nbt.getKeys();
@@ -398,10 +401,10 @@ public class ItemUpdateHelper {
 				QuiverListener.ArrowTransformMode transformMode = ItemStatUtils.getArrowTransformMode(item);
 				if (transformMode == QuiverListener.ArrowTransformMode.NONE) {
 					lore.add(Component.text("Arrow transformation ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-						         .append(Component.text("disabled", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+						.append(Component.text("disabled", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 				} else {
 					lore.add(Component.text("Transforms arrows to ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-						         .append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+						.append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 				}
 			}
 
@@ -409,7 +412,7 @@ public class ItemUpdateHelper {
 
 			if (ItemStatUtils.isUpgradedLimeTesseract(item)) {
 				lore.add(Component.text("Stored anvils: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-					         .append(Component.text(ItemStatUtils.getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+					.append(Component.text(ItemStatUtils.getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
 			}
 
 			// Add/update firmament lore
@@ -685,7 +688,7 @@ public class ItemUpdateHelper {
 			// readd placeholder attribute if needed
 			if (ItemUtils.hasDefaultAttributes(item)) {
 				nbt.modifyMeta((nbtr, meta) -> {
-						meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
+					meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
 				});
 			}
 		});
@@ -700,7 +703,7 @@ public class ItemUpdateHelper {
 			// readd placeholder attribute if needed
 			if (ItemUtils.hasDefaultAttributes(item)) {
 				nbt.modifyMeta((nbtr, meta) -> {
-						meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
+					meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
 				});
 			}
 			GUIUtils.setPlaceholder(nbt);

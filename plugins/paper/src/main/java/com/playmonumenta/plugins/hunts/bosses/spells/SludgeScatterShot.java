@@ -146,7 +146,7 @@ public class SludgeScatterShot extends Spell {
 						Location finalLocation = LocationUtils.fallToGround(location.clone().add(0, 3, 0), 6).add(0, 0.25, 0);
 						builder.location(finalLocation);
 					})
-						.count((int)(Math.PI * 2 * RADIUS))
+						.count((int) (Math.PI * 2 * RADIUS))
 						.data(new Particle.DustOptions(Color.fromRGB(161, 79, 43), 2.25f))
 						.spawnAsBoss();
 
@@ -172,7 +172,7 @@ public class SludgeScatterShot extends Spell {
 						builder.location(finalLocation);
 						builder.offset(0, FastUtils.randomDoubleInRange(0.7, 1.3), 0);
 					})
-						.count((int)(Math.PI * 2 * RADIUS))
+						.count((int) (Math.PI * 2 * RADIUS))
 						.extra(0.2)
 						.directionalMode(true)
 						.spawnAsBoss();

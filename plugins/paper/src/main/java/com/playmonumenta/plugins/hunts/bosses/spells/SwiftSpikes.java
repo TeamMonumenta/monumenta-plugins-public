@@ -158,9 +158,9 @@ public class SwiftSpikes extends Spell {
 				if (mTicks < WINDUP_DURATION) {
 					if (mTicks % 2 == 0) {
 						for (Location loc : chosenLocs) {
-							Color color = Color.fromRGB((int)(START_COLOR.getRed() + (END_COLOR.getRed() - START_COLOR.getRed()) * ((double)mTicks / WINDUP_DURATION)),
-								(int)(START_COLOR.getGreen() + (END_COLOR.getGreen() - START_COLOR.getGreen()) * ((double)mTicks / WINDUP_DURATION)),
-								(int)(START_COLOR.getBlue() + (END_COLOR.getBlue() - START_COLOR.getBlue()) * ((double)mTicks / WINDUP_DURATION)));
+							Color color = Color.fromRGB((int) (START_COLOR.getRed() + (END_COLOR.getRed() - START_COLOR.getRed()) * ((double) mTicks / WINDUP_DURATION)),
+								(int) (START_COLOR.getGreen() + (END_COLOR.getGreen() - START_COLOR.getGreen()) * ((double) mTicks / WINDUP_DURATION)),
+								(int) (START_COLOR.getBlue() + (END_COLOR.getBlue() - START_COLOR.getBlue()) * ((double) mTicks / WINDUP_DURATION)));
 							new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.2, 0), ATTACK_RADIUS)
 								.data(new Particle.DustOptions(color, 1))
 								.countPerMeter(7)
@@ -187,7 +187,7 @@ public class SwiftSpikes extends Spell {
 						for (int t = 0; t < 3; t++) {
 							int finalT = t;
 							Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-								int start = (int)(((double) mCrystalData.length / 3) * (2 - finalT));
+								int start = (int) (((double) mCrystalData.length / 3) * (2 - finalT));
 
 								for (int i = 0; i < mCrystalData[0][0].length; i++) {
 									for (int j = 0; j < mCrystalData[0].length; j++) {

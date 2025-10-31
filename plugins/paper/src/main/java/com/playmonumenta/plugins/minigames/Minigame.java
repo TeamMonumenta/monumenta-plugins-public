@@ -24,41 +24,41 @@ public abstract class Minigame implements Listener {
 		}
 
 		public double get(String key, double defaultValue) {
-				@Nullable
-				Double v = map.get(key);
-				if (v == null) {
-					return defaultValue;
-				}
-				return v;
+			@Nullable
+			Double v = map.get(key);
+			if (v == null) {
+				return defaultValue;
 			}
-
-			public double get(String key, Supplier<Double> defaultGetter) {
-				@Nullable
-				Double v = map.get(key);
-				if (v == null) {
-					return defaultGetter.get();
-				}
-				return v;
-			}
-
-			public int getInt(String key, int defaultValue) {
-				@Nullable
-				Double v = map.get(key);
-				if (v == null) {
-					return defaultValue;
-				}
-				return v.intValue();
-			}
-
-			public int getInt(String key, Supplier<Integer> defaultGetter) {
-				@Nullable
-				Double v = map.get(key);
-				if (v == null) {
-					return defaultGetter.get();
-				}
-				return v.intValue();
-			}
+			return v;
 		}
+
+		public double get(String key, Supplier<Double> defaultGetter) {
+			@Nullable
+			Double v = map.get(key);
+			if (v == null) {
+				return defaultGetter.get();
+			}
+			return v;
+		}
+
+		public int getInt(String key, int defaultValue) {
+			@Nullable
+			Double v = map.get(key);
+			if (v == null) {
+				return defaultValue;
+			}
+			return v.intValue();
+		}
+
+		public int getInt(String key, Supplier<Integer> defaultGetter) {
+			@Nullable
+			Double v = map.get(key);
+			if (v == null) {
+				return defaultGetter.get();
+			}
+			return v.intValue();
+		}
+	}
 
 	private static final Plugin PLUGIN = Plugin.getInstance();
 

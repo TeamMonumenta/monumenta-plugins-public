@@ -52,8 +52,8 @@ public class SpellFireball extends Spell {
 	 * @param launchEffect Function to run on boss and targeted player(s)
 	 */
 	public SpellFireball(Plugin plugin, LivingEntity boss, int range, int delay, int count, int duration,
-						 float yield, boolean isIncendiary, boolean singleTarget,
-						 LaunchFireballEffect launchEffect) {
+	                     float yield, boolean isIncendiary, boolean singleTarget,
+	                     LaunchFireballEffect launchEffect) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;

@@ -68,7 +68,7 @@ public class WindStepCS extends AdvancingShadowsCS implements DepthsCS {
 				(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 					new PartialParticle(Particle.ELECTRIC_SPARK, lineLoc, 1, 0, 0, 0, 0.05)
 						.spawnAsPlayerActive(mPlayer);
-			});
+				});
 		}
 
 		for (int j = 0; j < 3; j++) {

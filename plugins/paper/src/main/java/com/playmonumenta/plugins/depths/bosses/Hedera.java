@@ -95,6 +95,7 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 
 		new BukkitRunnable() {
 			final Mob mWitch = (Mob) mBoss;
+
 			@Override
 			public void run() {
 				if (!mBoss.isValid() || mBoss.isDead()) {
@@ -139,11 +140,11 @@ public class Hedera extends SerializedLocationBossAbilityGroup {
 		//Extra summon ability if fighting on f4 or higher
 		if (floor != 1) {
 			activeSpells = new SpellManager(Arrays.asList(
-					//new SpellEarthshake(plugin, mBoss, 5, 80),
-					new SpellLeafNova(plugin, mBoss, cooldownTicks),
-					new SpellIvyGarden(plugin, cooldownTicks, mPlants),
-					new SpellEvolutionSeeds(plugin, cooldownTicks, mPlants, mPlantTypes),
-					new SpellEndlessHederaSummons(mBoss, cooldownTicks, ((floor - 1) / 3) + 1)
+				//new SpellEarthshake(plugin, mBoss, 5, 80),
+				new SpellLeafNova(plugin, mBoss, cooldownTicks),
+				new SpellIvyGarden(plugin, cooldownTicks, mPlants),
+				new SpellEvolutionSeeds(plugin, cooldownTicks, mPlants, mPlantTypes),
+				new SpellEndlessHederaSummons(mBoss, cooldownTicks, ((floor - 1) / 3) + 1)
 			));
 		}
 

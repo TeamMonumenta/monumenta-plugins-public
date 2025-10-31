@@ -60,7 +60,7 @@ public final class SpellGreatswordSlam extends Spell {
 	private final List<Block> mChangedBlocks = new ArrayList<>();
 
 	public SpellGreatswordSlam(final Plugin plugin, final FrostGiant frostGiant, final int iceDuration, final double deg,
-							   final Location startLoc) {
+	                           final Location startLoc) {
 		mPlugin = plugin;
 		mFrostGiant = frostGiant;
 		mBoss = mFrostGiant.mBoss;
@@ -173,7 +173,7 @@ public final class SpellGreatswordSlam extends Spell {
 									}
 									//Once it leaves the arena, stop iterating
 									if ((l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
-										    || l.distance(mStartLoc) > FrostGiant.ARENA_RADIUS) {
+										|| l.distance(mStartLoc) > FrostGiant.ARENA_RADIUS) {
 										continue;
 									}
 									//If on bedrock or barriers, move up one to not replace that
@@ -185,7 +185,7 @@ public final class SpellGreatswordSlam extends Spell {
 									if (degree % 10 == 0) {
 										final Block block = l.getBlock();
 										if (block.getType() != SpellFrostRift.RIFT_BLOCK_TYPE
-											    && TemporaryBlockChangeManager.INSTANCE.changeBlock(block, FrostGiant.ICE_TYPE,
+											&& TemporaryBlockChangeManager.INSTANCE.changeBlock(block, FrostGiant.ICE_TYPE,
 											Constants.TICKS_PER_SECOND * mIceDuration - mRadius + FastUtils.randomIntInRange(0, 10))) {
 											mChangedBlocks.add(block);
 											final Ageable age = (Ageable) block.getBlockData();

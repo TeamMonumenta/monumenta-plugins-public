@@ -166,6 +166,7 @@ public class EscapeArtist extends DepthsAbility {
 		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;
 			final Location mPlayerLocation = mPlayer.getLocation();
+
 			@Override
 			public void run() {
 				if (mPlayerItemStatsMap.get(proj) != playerItemStats) {

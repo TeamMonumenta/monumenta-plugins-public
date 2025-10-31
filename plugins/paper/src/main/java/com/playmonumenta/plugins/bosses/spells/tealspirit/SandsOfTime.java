@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 public class SandsOfTime extends Spell {
 	private static final double RADIUS = 21;
 	private static final double HEIGHT = 4;
-	private static final int BLUE_ROOT = 1 * 20;
+	private static final int BLUE_ROOT = 20;
 	private static final double DIST = 25;
 	private static final int SPREAD = 4;
 	private static final int BLUE_DELAY = 4 * 20;
@@ -270,8 +270,8 @@ public class SandsOfTime extends Spell {
 	private enum SandsColor {
 		RED(Color.RED, NamedTextColor.RED, BossBar.Color.RED, NamedTextColor.DARK_RED,
 			SoundsList.builder()
-			.add(new SoundsList.CSound(Sound.BLOCK_BELL_USE, 1.0f, 0.5f))
-			.build(),
+				.add(new SoundsList.CSound(Sound.BLOCK_BELL_USE, 1.0f, 0.5f))
+				.build(),
 			0, null),
 		BLUE(Color.BLUE, NamedTextColor.BLUE, BossBar.Color.BLUE, NamedTextColor.BLUE,
 			SoundsList.builder()

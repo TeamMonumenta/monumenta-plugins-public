@@ -397,8 +397,8 @@ public class AbilityInfo<T extends Ability> {
 		}
 
 		return Component.text("")
-			       .append(Component.text(skillHeader, coloured ? NamedTextColor.GREEN : NamedTextColor.GRAY, TextDecoration.BOLD))
-			       .append(description.color(coloured ? NamedTextColor.YELLOW : NamedTextColor.GRAY));
+			.append(Component.text(skillHeader, coloured ? NamedTextColor.GREEN : NamedTextColor.GRAY, TextDecoration.BOLD))
+			.append(description.color(coloured ? NamedTextColor.YELLOW : NamedTextColor.GRAY));
 	}
 
 	public Component getFormattedDescriptions(Player player) {
@@ -454,7 +454,7 @@ public class AbilityInfo<T extends Ability> {
 			hoverableString += "*";
 		}
 		return Component.text(hoverableString, NamedTextColor.YELLOW)
-			       .hoverEvent(getFormattedDescriptions(player, level, isEnhanced, enabled, ServerProperties.getAbilityEnhancementsEnabled(player)));
+			.hoverEvent(getFormattedDescriptions(player, level, isEnhanced, enabled, ServerProperties.getAbilityEnhancementsEnabled(player)));
 	}
 
 	public TextColor getActionBarColor() {
@@ -520,7 +520,7 @@ public class AbilityInfo<T extends Ability> {
 	@Override
 	public String toString() {
 		return "AbilityInfo{" +
-			       "mAbilityClass=" + mAbilityClass +
-			       '}';
+			"mAbilityClass=" + mAbilityClass +
+			'}';
 	}
 }

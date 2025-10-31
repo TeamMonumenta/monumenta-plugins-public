@@ -144,11 +144,13 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 
 		// For one-liner dialogue.
 		default void dialogue(String message) {
-			dialogue(0, List.of(message), 36, () -> { }, 0);
+			dialogue(0, List.of(message), 36, () -> {
+			}, 0);
 		}
 
 		default void dialogue(int delay, List<String> messages) {
-			dialogue(delay, messages, 36, () -> { }, 0);
+			dialogue(delay, messages, 36, () -> {
+			}, 0);
 		}
 
 		default void dialogue(int delay, List<String> messages, Runnable runAfterDialogue, int runnableDelay) {
@@ -490,10 +492,10 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		if (effectPairs != null) {
 			effectPairs.stream()
 				.filter(effect ->
-					effect.mSource.startsWith("NightmarishCarvings") ||
-						DEBUFFS_TO_CLEANSE.contains(effect.mSource)
+					effect.mSource().startsWith("NightmarishCarvings") ||
+						DEBUFFS_TO_CLEANSE.contains(effect.mSource())
 				)
-				.forEach(effectPair -> effectPair.mEffect.clearEffect());
+				.forEach(effectPair -> effectPair.mEffect().clearEffect());
 		}
 	}
 
@@ -809,11 +811,13 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 	}
 
 	public void dialogue(int delay, List<String> messages, long seed) {
-		dialogue(delay, messages, seed, () -> { }, 0);
+		dialogue(delay, messages, seed, () -> {
+		}, 0);
 	}
 
 	public void dialogue(int delay, List<String> messages) {
-		dialogue(delay, messages, 36, () -> { }, 0);
+		dialogue(delay, messages, 36, () -> {
+		}, 0);
 	}
 
 	public void dialogue(int delay, List<String> messages, Runnable runAfterDialogue) {

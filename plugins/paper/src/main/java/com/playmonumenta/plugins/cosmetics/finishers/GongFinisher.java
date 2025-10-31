@@ -220,4 +220,4 @@ public class GongFinisher implements EliteFinisher {
 	public Material getDisplayItem() {
 		return Material.BELL;
 	}
-	}
+}

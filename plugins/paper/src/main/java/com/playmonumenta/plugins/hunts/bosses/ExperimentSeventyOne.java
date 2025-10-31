@@ -271,11 +271,11 @@ public class ExperimentSeventyOne extends Quarry {
 	}
 
 	private int getMaxWorms() {
-		return Math.min((int)(2 * Math.pow(mPlayers.size(), 0.617)), 8);
+		return Math.min((int) (2 * Math.pow(mPlayers.size(), 0.617)), 8);
 	}
 
 	private int getWormSpawnDelay() {
-		return Math.max((int)(20 * (15 - 2.25 * Math.sqrt(mPlayers.size()))), 4 * 20);
+		return Math.max((int) (20 * (15 - 2.25 * Math.sqrt(mPlayers.size()))), 4 * 20);
 	}
 
 	private void manageMudEffects() {
@@ -349,10 +349,10 @@ public class ExperimentSeventyOne extends Quarry {
 	public void placeWormSpawner(Block block) {
 		// never place a spawner on top of another worm spawner or in an invalid location or not in spots easily visible
 		if (block.getType().getHardness() == -1
-				|| ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)
-				|| isWormSpawner(block)
-				|| INVALID_MUD_BLOCKS.contains(block.getType())
-				|| isHiddenSpot(block)) {
+			|| ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)
+			|| isWormSpawner(block)
+			|| INVALID_MUD_BLOCKS.contains(block.getType())
+			|| isHiddenSpot(block)) {
 			return;
 		}
 
@@ -386,10 +386,10 @@ public class ExperimentSeventyOne extends Quarry {
 	public void placeMudBlock(Block block, int time) {
 		// never place mud on top of a worm spawner or in an invalid location
 		if (block.getType().getHardness() == -1
-				|| ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)
-				|| isWormSpawner(block)
-				|| INVALID_MUD_BLOCKS.contains(block.getType())
-				|| block.getRelative(BlockFace.UP).isSolid()) {
+			|| ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)
+			|| isWormSpawner(block)
+			|| INVALID_MUD_BLOCKS.contains(block.getType())
+			|| block.getRelative(BlockFace.UP).isSolid()) {
 			return;
 		}
 

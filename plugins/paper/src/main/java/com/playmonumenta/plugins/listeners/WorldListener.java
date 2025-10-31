@@ -114,33 +114,33 @@ public class WorldListener implements Listener {
 
 	// Convenience list of offsets to get adjacent blocks
 	private static final List<Vector> ADJACENT_OFFSETS = Arrays.asList(
-	                                                         new Vector(0, 0, 1),
-	                                                         new Vector(0, 0, -1),
-	                                                         new Vector(0, 1, 0),
-	                                                         new Vector(0, 1, 1),
-	                                                         new Vector(0, 1, -1),
-	                                                         new Vector(0, -1, 0),
-	                                                         new Vector(0, -1, 1),
-	                                                         new Vector(0, -1, -1),
-	                                                         new Vector(1, 0, 0),
-	                                                         new Vector(1, 0, 1),
-	                                                         new Vector(1, 0, -1),
-	                                                         new Vector(1, 1, 0),
-	                                                         new Vector(1, 1, 1),
-	                                                         new Vector(1, 1, -1),
-	                                                         new Vector(1, -1, 0),
-	                                                         new Vector(1, -1, 1),
-	                                                         new Vector(1, -1, -1),
-	                                                         new Vector(-1, 0, 0),
-	                                                         new Vector(-1, 0, 1),
-	                                                         new Vector(-1, 0, -1),
-	                                                         new Vector(-1, 1, 0),
-	                                                         new Vector(-1, 1, 1),
-	                                                         new Vector(-1, 1, -1),
-	                                                         new Vector(-1, -1, 0),
-	                                                         new Vector(-1, -1, 1),
-	                                                         new Vector(-1, -1, -1)
-	                                                     );
+		new Vector(0, 0, 1),
+		new Vector(0, 0, -1),
+		new Vector(0, 1, 0),
+		new Vector(0, 1, 1),
+		new Vector(0, 1, -1),
+		new Vector(0, -1, 0),
+		new Vector(0, -1, 1),
+		new Vector(0, -1, -1),
+		new Vector(1, 0, 0),
+		new Vector(1, 0, 1),
+		new Vector(1, 0, -1),
+		new Vector(1, 1, 0),
+		new Vector(1, 1, 1),
+		new Vector(1, 1, -1),
+		new Vector(1, -1, 0),
+		new Vector(1, -1, 1),
+		new Vector(1, -1, -1),
+		new Vector(-1, 0, 0),
+		new Vector(-1, 0, 1),
+		new Vector(-1, 0, -1),
+		new Vector(-1, 1, 0),
+		new Vector(-1, 1, 1),
+		new Vector(-1, 1, -1),
+		new Vector(-1, -1, 0),
+		new Vector(-1, -1, 1),
+		new Vector(-1, -1, -1)
+	);
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onEntitiesLoadEvent(EntitiesLoadEvent event) {
@@ -509,10 +509,10 @@ public class WorldListener implements Listener {
 	public void cauldronLevelChangeEvent(CauldronLevelChangeEvent event) {
 		CauldronLevelChangeEvent.ChangeReason reason = event.getReason();
 		if (event.getNewState().getBlockData() instanceof Levelled cauldron
-			    && (reason == CauldronLevelChangeEvent.ChangeReason.BANNER_WASH
-				        || reason == CauldronLevelChangeEvent.ChangeReason.ARMOR_WASH
-				        || reason == CauldronLevelChangeEvent.ChangeReason.SHULKER_WASH)
-			    && ServerProperties.getShardName().endsWith("plots")) {
+			&& (reason == CauldronLevelChangeEvent.ChangeReason.BANNER_WASH
+			|| reason == CauldronLevelChangeEvent.ChangeReason.ARMOR_WASH
+			|| reason == CauldronLevelChangeEvent.ChangeReason.SHULKER_WASH)
+			&& ServerProperties.getShardName().endsWith("plots")) {
 			// Cannot cancel the event, as that prevents cleaning items, so increase the level by one instead.
 			cauldron.setLevel(Math.min(cauldron.getLevel() + 1, cauldron.getMaximumLevel()));
 			event.getNewState().setBlockData(cauldron);

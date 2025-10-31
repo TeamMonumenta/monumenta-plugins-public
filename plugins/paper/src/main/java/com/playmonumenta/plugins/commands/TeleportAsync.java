@@ -201,7 +201,7 @@ public class TeleportAsync extends GenericCommand {
 			return false;
 		});
 
-		sender.sendMessage("Teleporting " + entity.getName() + " to " + adjustedDst.getX() + " " + adjustedDst.getY() + " " + adjustedDst.getZ() + ", yaw/pitch " + Float.toString(adjustedDst.getYaw()) + " " + Float.toString(adjustedDst.getPitch()));
+		sender.sendMessage("Teleporting " + entity.getName() + " to " + adjustedDst.getX() + " " + adjustedDst.getY() + " " + adjustedDst.getZ() + ", yaw/pitch " + adjustedDst.getYaw() + " " + adjustedDst.getPitch());
 		return 1;
 	}
 

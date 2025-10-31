@@ -103,6 +103,7 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 			final double mXMult = FastUtils.randomDoubleInRange(-1, 1);
 			final double mZMult = FastUtils.randomDoubleInRange(-1, 1);
 			double mJ = 0;
+
 			@Override
 			public void run() {
 				mT++;

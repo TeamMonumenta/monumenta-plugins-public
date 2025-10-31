@@ -18,12 +18,12 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 public class ElfSummon extends Spell {
-	private Plugin mPlugin;
-	private Entity mLauncher;
-	private int mCount;
-	private int mRepeats;
-	private int mNearbyRadius;
-	private int mMaxNearby;
+	private final Plugin mPlugin;
+	private final Entity mLauncher;
+	private final int mCount;
+	private final int mRepeats;
+	private final int mNearbyRadius;
+	private final int mMaxNearby;
 
 	public ElfSummon(Plugin plugin, Entity launcher, int count,
 	                 int repeats, int nearbyRadius, int maxNearby) {

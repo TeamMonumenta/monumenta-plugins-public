@@ -504,12 +504,12 @@ public class DepthsManager {
 	/**
 	 * Sets the player level in a specific ability
 	 *
-	 * @param name              the name of the ability's ABILITY_NAME attribute. Needs to be exact!
-	 * @param p                 the player to give it to
-	 * @param dp                the player's DepthsPlayer
-	 * @param level             the rarity level of the ability
-	 * @param announceToTeam    if the team should be notified in chat
-	 * @param announceToSelf    if the player should notified in chat
+	 * @param name           the name of the ability's ABILITY_NAME attribute. Needs to be exact!
+	 * @param p              the player to give it to
+	 * @param dp             the player's DepthsPlayer
+	 * @param level          the rarity level of the ability
+	 * @param announceToTeam if the team should be notified in chat
+	 * @param announceToSelf if the player should notified in chat
 	 */
 	public void setPlayerLevelInAbility(@Nullable String name, Player p, DepthsPlayer dp, int level, boolean announceToTeam, boolean announceToSelf) {
 		if (name == null) {
@@ -921,14 +921,14 @@ public class DepthsManager {
 
 		//Filter the item offerings by the player's eligible trees for that run
 		DepthsReward reward = dp.peekReward();
-		DepthsRewardType rewardType = reward.mRewardType;
+		DepthsRewardType rewardType = reward.mRewardType();
 		if (rewardType == DepthsRewardType.PRISMATIC) {
 			List<DepthsTree> prismaticFilter = new ArrayList<>();
 			prismaticFilter.add(DepthsTree.PRISMATIC);
 			Function<Integer, Integer> rarityFunction;
 			List<DepthsAbilityInfo<?>> excludedAbilities;
-			if (reward.mForceLevel > 0) {
-				rarityFunction = roll -> reward.mForceLevel;
+			if (reward.mForceLevel() > 0) {
+				rarityFunction = roll -> reward.mForceLevel();
 				excludedAbilities = List.of(Abnormality.INFO);
 			} else {
 				rarityFunction = roll -> getRarity(roll, false);
@@ -1130,7 +1130,7 @@ public class DepthsManager {
 	 *
 	 * @param p  the player to look up
 	 * @param dp the player's DepthsPlayer
-	 * @return   ability items for all their active abilities (rarity > 0)
+	 * @return ability items for all their active abilities (rarity > 0)
 	 */
 	public List<DepthsAbilityItem> getPlayerAbilitySummary(Player p, DepthsPlayer dp) {
 		List<DepthsAbilityItem> abilities = new ArrayList<>();
@@ -1675,7 +1675,7 @@ public class DepthsManager {
 	 * This method takes a player and, if they are in the system, removes one of their abilities at random
 	 * and rolls them two random new abilities at the replaced ability's rarity
 	 *
-	 * @param p Player to roll for
+	 * @param p         Player to roll for
 	 * @param fromCurse if true, don't use up the chaos room for this floor and don't be stopped by it
 	 */
 	public void chaos(Player p, boolean fromCurse) {
@@ -1921,7 +1921,7 @@ public class DepthsManager {
 	 * The level 2 denotes that it is being transformed rather than selected (the aspects are not leveled)
 	 *
 	 * @param player the player to transform the ability of
-	 * @param dp the player's DepthsPlayer
+	 * @param dp     the player's DepthsPlayer
 	 */
 	private void transformMysteryBox(Player player, DepthsPlayer dp) {
 		setPlayerLevelInAbility(RandomAspect.ABILITY_NAME, player, dp, 0, false, false);

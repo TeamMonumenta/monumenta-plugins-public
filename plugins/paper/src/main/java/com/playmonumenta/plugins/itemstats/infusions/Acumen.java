@@ -23,7 +23,7 @@ public class Acumen implements Infusion {
 	@Override
 	public void onExpChange(Plugin plugin, Player player, double value, PlayerExpChangeEvent event) {
 		double expBuffPct = ACUMEN_MULTIPLIER * value;
-		event.setAmount((int)(event.getAmount() * (1.0 + expBuffPct)));
+		event.setAmount((int) (event.getAmount() * (1.0 + expBuffPct)));
 	}
 
 }

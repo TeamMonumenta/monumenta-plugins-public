@@ -23,13 +23,13 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class MinesweeperFM extends FishingMinigame {
-	private final Color[] PROGRESS_BAR_COLORS = new Color[] {
+	private final Color[] PROGRESS_BAR_COLORS = new Color[]{
 		Color.fromRGB(100, 255, 50),
 		Color.fromRGB(255, 200, 50),
 		Color.fromRGB(255, 100, 0),
 		Color.fromRGB(200, 0, 20)
 	};
-	private final Color[] DIGIT_COLORS = new Color[] {
+	private final Color[] DIGIT_COLORS = new Color[]{
 		Color.WHITE, Color.BLUE, Color.GREEN, Color.ORANGE, Color.NAVY, Color.MAROON, Color.AQUA, Color.BLACK, Color.GRAY
 	};
 	private final Color UI_COLOR = Color.fromRGB(200, 200, 200);
@@ -83,7 +83,7 @@ public class MinesweeperFM extends FishingMinigame {
 		for (int i = 0; i < mGameBoard.length; i++) {
 			for (int j = 0; j < mGameBoard[0].length; j++) {
 				Location location = adjustedBottomCorner.clone().add(planeVectorX.clone().multiply(i)).add(planeVectorY.clone().multiply(j));
-				gridButtons.put(location.toVector(), new int[] {
+				gridButtons.put(location.toVector(), new int[]{
 					i, j
 				});
 			}

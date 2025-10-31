@@ -32,7 +32,8 @@ public class ComponentConfig {
 	public static final Map<String, ComponentConfigObject> TYPE_CONFIG;
 	public static final Map<String, ComponentConfigObject> TIER_CONFIG;
 
-	@Nullable public static Map<String, ComponentConfigObject> mSelectedMap;
+	@Nullable
+	public static Map<String, ComponentConfigObject> mSelectedMap;
 
 	private static int mOrderIncrement;
 

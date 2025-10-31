@@ -67,8 +67,10 @@ public class MoneyRainFinisher implements EliteFinisher {
 				int dice = FastUtils.randomIntInRange(1, 3);
 				switch (dice) {
 					case 1 -> money = DisplayEntityUtils.generateRPItem(Material.SUNFLOWER, "Hyperexperience");
-					case 2 -> money = DisplayEntityUtils.generateRPItem(Material.NETHER_STAR, "Hyper Crystalline Shard");
-					case 3 -> money = DisplayEntityUtils.generateRPItem(Material.FIREWORK_STAR, "Hyperchromatic Archos Ring");
+					case 2 ->
+						money = DisplayEntityUtils.generateRPItem(Material.NETHER_STAR, "Hyper Crystalline Shard");
+					case 3 ->
+						money = DisplayEntityUtils.generateRPItem(Material.FIREWORK_STAR, "Hyperchromatic Archos Ring");
 					default -> {
 					}
 				}

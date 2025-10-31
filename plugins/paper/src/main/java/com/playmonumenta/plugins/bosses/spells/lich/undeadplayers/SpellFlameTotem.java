@@ -46,6 +46,7 @@ public class SpellFlameTotem extends Spell {
 
 		BukkitRunnable manageTotem = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;

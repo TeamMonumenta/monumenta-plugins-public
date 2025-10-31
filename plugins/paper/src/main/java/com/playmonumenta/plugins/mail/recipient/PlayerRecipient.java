@@ -64,7 +64,7 @@ public class PlayerRecipient implements Recipient {
 				case ARG -> {
 					if (mPlayerNameArg == null) {
 						future.completeExceptionally(new Exception(
-								mLabel + " argument interpreter was not initialized correctly and cannot continue."));
+							mLabel + " argument interpreter was not initialized correctly and cannot continue."));
 					} else {
 						String targetName = args.getByArgument(mPlayerNameArg);
 						try {

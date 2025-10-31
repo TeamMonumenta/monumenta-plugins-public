@@ -38,6 +38,7 @@ public class TotemicProjectionCS implements CosmeticSkill {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (!proj.isValid() || mTicks >= 100) {

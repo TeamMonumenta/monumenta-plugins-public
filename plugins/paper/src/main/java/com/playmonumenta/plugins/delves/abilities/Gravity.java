@@ -30,9 +30,9 @@ public class Gravity {
 	private static final Set<BlockFace> PLANAR_CARTESIAN_BLOCK_FACES = Set.of(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST);
 
 	public static Component[] rankDescription(int level) {
-			return new Component[] {
-				Component.text("Blocks players place down fall if they are not supported in a + pattern below,"),
-				Component.text("fall damage increases by 150%, and recoil velocity is decreased by 34%")
+		return new Component[]{
+			Component.text("Blocks players place down fall if they are not supported in a + pattern below,"),
+			Component.text("fall damage increases by 150%, and recoil velocity is decreased by 34%")
 		};
 	}
 

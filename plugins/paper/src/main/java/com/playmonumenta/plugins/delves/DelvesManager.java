@@ -509,7 +509,7 @@ public class DelvesManager implements Listener {
 				expBuffPct = .25;
 			}
 		}
-		event.setAmount((int)(event.getAmount() * (1.0 + expBuffPct)));
+		event.setAmount((int) (event.getAmount() * (1.0 + expBuffPct)));
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -719,10 +719,10 @@ public class DelvesManager implements Listener {
 		@Override
 		public String toString() {
 			return "DungeonDelveInfo{" +
-				       "TotalPoint=" + mTotalPoint +
-				       ",ModifierPoint=" + mModifierPoint +
-				       ",PresetId=" + mPresetId +
-				       '}';
+				"TotalPoint=" + mTotalPoint +
+				",ModifierPoint=" + mModifierPoint +
+				",PresetId=" + mPresetId +
+				'}';
 		}
 
 		protected DungeonDelveInfo cloneDelveInfo() {

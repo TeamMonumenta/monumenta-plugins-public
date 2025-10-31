@@ -166,7 +166,7 @@ public class SpellPutridPlague extends Spell {
 						if (!safe.contains(player)) {
 							PotionEffect resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 							if ((resistance == null || resistance.getAmplifier() < 4)
-									&& !StasisListener.isInStasis(player)) {
+								&& !StasisListener.isInStasis(player)) {
 								player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 2);
 								new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
@@ -189,9 +189,9 @@ public class SpellPutridPlague extends Spell {
 							} else {
 								for (PotionEffect effect : player.getActivePotionEffects()) {
 									if (effect.getType().equals(PotionEffectType.WITHER)
-											|| effect.getType().equals(PotionEffectType.SLOW)
-											|| effect.getType().equals(PotionEffectType.POISON)
-											|| effect.getType().equals(PotionEffectType.WEAKNESS)) {
+										|| effect.getType().equals(PotionEffectType.SLOW)
+										|| effect.getType().equals(PotionEffectType.POISON)
+										|| effect.getType().equals(PotionEffectType.WEAKNESS)) {
 										int duration = effect.getDuration() - (20 * 80);
 										if (duration <= 0) {
 											continue;

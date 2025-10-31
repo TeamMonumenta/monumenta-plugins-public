@@ -4,10 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import java.util.EnumSet;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.EnumSet;
 
 public class Aptitude implements Enchantment {
 	public static final double COOLDOWN_REDUCTION_PER_LEVEL = 0.05;

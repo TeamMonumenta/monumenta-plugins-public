@@ -96,6 +96,7 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 		//Davey and vex target swap
 		new BukkitRunnable() {
 			final Mob mDavey = (Mob) mBoss;
+
 			@Override
 			public void run() {
 				if (!mBoss.isValid() || mBoss.isDead()) {

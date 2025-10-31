@@ -50,9 +50,9 @@ public class AbilityHotbar {
 				}
 
 				mBossBarHashMap.entrySet().removeIf(entry -> {
-						Player player = Bukkit.getPlayer(entry.getKey());
-						return player == null || !player.isOnline();
-					});
+					Player player = Bukkit.getPlayer(entry.getKey());
+					return player == null || !player.isOnline();
+				});
 
 				for (UUID uuid : mBossBarHashMap.keySet()) {
 					Player player = Bukkit.getPlayer(uuid);

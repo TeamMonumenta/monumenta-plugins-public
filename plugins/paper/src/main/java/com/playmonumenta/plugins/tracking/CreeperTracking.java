@@ -11,12 +11,12 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 
 public class CreeperTracking implements EntityTracking {
-	private Set<Creeper> mEntities = Collections.newSetFromMap(new WeakHashMap<>());
+	private final Set<Creeper> mEntities = Collections.newSetFromMap(new WeakHashMap<>());
 	private int mTicks = 0;
 
 	@Override
 	public void addEntity(Entity entity) {
-		mEntities.add((Creeper)entity);
+		mEntities.add((Creeper) entity);
 	}
 
 	@Override

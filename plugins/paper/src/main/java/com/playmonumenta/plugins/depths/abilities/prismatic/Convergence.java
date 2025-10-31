@@ -86,6 +86,6 @@ public class Convergence extends DepthsAbility {
 					.toList();
 				Component namesComp = MessagingUtils.concatenateComponents(names, Component.text(", "));
 				return Component.text("\n\nCurrent abilities: ").append(namesComp);
-			 });
+			});
 	}
 }

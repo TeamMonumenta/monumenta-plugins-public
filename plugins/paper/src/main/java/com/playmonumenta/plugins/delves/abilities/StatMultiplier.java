@@ -212,7 +212,7 @@ public class StatMultiplier {
 		Set<String> tags = mob.getScoreboardTags();
 		if (!tags.contains(CrowdControlImmunityBoss.identityTag)) {
 			EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
-					new AttributeModifier(SPEED_MODIFIER_NAME, getSpeedMultiplier(level) - 1, Operation.MULTIPLY_SCALAR_1));
+				new AttributeModifier(SPEED_MODIFIER_NAME, getSpeedMultiplier(level) - 1, Operation.MULTIPLY_SCALAR_1));
 		}
 
 		mob.addScoreboardTag(StatMultiplierBoss.identityTag);

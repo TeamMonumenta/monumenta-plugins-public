@@ -77,13 +77,13 @@ public class SpellSlashAttack extends Spell {
 	public static final int KNOCKBACK_IFRAMES = 5;
 
 	public SpellSlashAttack(Plugin plugin, LivingEntity boss, int cooldown, double damage, int telegraphDuration,
-							double radius, double minAngle, double maxAngle, String attackName, int rings, double startAngle,
-							double endAngle, double spacing, Color startColor, Color midColor, Color endColor,
-							boolean xSlash, boolean mirroredSlash, boolean fullArc, boolean horizontalColor, Vector knockback, boolean knockAway, double kbrEffectiveness,
-							boolean followCaster, boolean followTelegraphRotation, double hitboxSize, double forcedParticleSize, DamageEvent.DamageType damageType,
-							SoundsList soundsTelegraph, SoundsList soundsSlashStart, SoundsList soundsSlashTick, SoundsList soundsSlashEnd,
-							boolean flipSlash, int slashes, int slashinterval, boolean reselectSlashAngle,
-							boolean multiHit, int multihitInterval, boolean respectIframes) {
+	                        double radius, double minAngle, double maxAngle, String attackName, int rings, double startAngle,
+	                        double endAngle, double spacing, Color startColor, Color midColor, Color endColor,
+	                        boolean xSlash, boolean mirroredSlash, boolean fullArc, boolean horizontalColor, Vector knockback, boolean knockAway, double kbrEffectiveness,
+	                        boolean followCaster, boolean followTelegraphRotation, double hitboxSize, double forcedParticleSize, DamageEvent.DamageType damageType,
+	                        SoundsList soundsTelegraph, SoundsList soundsSlashStart, SoundsList soundsSlashTick, SoundsList soundsSlashEnd,
+	                        boolean flipSlash, int slashes, int slashinterval, boolean reselectSlashAngle,
+	                        boolean multiHit, int multihitInterval, boolean respectIframes) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mCooldown = cooldown;

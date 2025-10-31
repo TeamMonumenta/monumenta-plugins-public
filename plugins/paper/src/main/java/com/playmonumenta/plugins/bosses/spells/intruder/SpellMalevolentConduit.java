@@ -153,8 +153,8 @@ public class SpellMalevolentConduit extends SpellNova {
 				if (pairs != null) {
 					for (EffectManager.EffectPair pair : pairs) {
 						// Delete (hopefully) all positive effects;
-						if (pair.mEffect.isBuff() && !pair.mSource.startsWith("PatronShrine")) {
-							pair.mEffect.setDuration(0);
+						if (pair.mEffect().isBuff() && !pair.mSource().startsWith("PatronShrine")) {
+							pair.mEffect().setDuration(0);
 						}
 					}
 				}

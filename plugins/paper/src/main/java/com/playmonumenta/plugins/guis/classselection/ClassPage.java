@@ -206,10 +206,10 @@ public class ClassPage extends Page {
 		}
 
 		mGui.setItem(
-			row,
-			column,
-			classItem
-		)
+				row,
+				column,
+				classItem
+			)
 			.onClick(event -> {
 				if (event.isShiftClick()) {
 					return;

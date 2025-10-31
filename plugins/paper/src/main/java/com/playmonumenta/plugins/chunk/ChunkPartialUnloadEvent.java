@@ -11,8 +11,8 @@ import org.jetbrains.annotations.NotNull;
 public class ChunkPartialUnloadEvent extends ChunkEvent {
 	private static final HandlerList handlers = new HandlerList();
 	private boolean mNeedsSave;
-	private boolean mUnloadingWorld;
-	private List<Entity> mEntityList;
+	private final boolean mUnloadingWorld;
+	private final List<Entity> mEntityList;
 
 	public ChunkPartialUnloadEvent(@NotNull Chunk chunk, boolean needsSave) {
 		this(chunk, needsSave, false, Collections.emptyList());

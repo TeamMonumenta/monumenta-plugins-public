@@ -22,8 +22,8 @@ import org.bukkit.scoreboard.Team;
 public class SpellGhostWalk extends Spell {
 
 	private boolean mGhost;
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 	private boolean mOnCooldown;
 	private static final int COOLDOWN = 10 * 20;
 	private static final int DURATION = 3 * 20;

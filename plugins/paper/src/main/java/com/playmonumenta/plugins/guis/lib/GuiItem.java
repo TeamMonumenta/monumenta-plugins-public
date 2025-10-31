@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,8 +16,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import javax.annotation.concurrent.Immutable;
-
-import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;

@@ -43,8 +43,9 @@ public class Tokenizer {
 		TRANSITION_TABLE.put(State.SPACE, character -> new TokenizeResult(getFirstState(character), false));
 		TRANSITION_TABLE.put(State.CLOSE_SQUARE, character -> new TokenizeResult(getFirstState(character), true));
 		TRANSITION_TABLE.put(State.INTEGER, character -> {
-			if (Character.isDigit(character) || character == 'f' || character == 'd')
+			if (Character.isDigit(character) || character == 'f' || character == 'd') {
 				return new TokenizeResult(State.INTEGER, false);
+			}
 			return switch (character) {
 				case '.' -> new TokenizeResult(State.FRACTION, false);
 				case ',' -> new TokenizeResult(State.COMMA, true);
@@ -58,8 +59,9 @@ public class Tokenizer {
 			};
 		});
 		TRANSITION_TABLE.put(State.FRACTION, character -> {
-			if (Character.isDigit(character) || character == 'f' || character == 'd')
+			if (Character.isDigit(character) || character == 'f' || character == 'd') {
 				return new TokenizeResult(State.FRACTION, false);
+			}
 			return switch (character) {
 				case ',' -> new TokenizeResult(State.COMMA, true);
 				case ']' -> new TokenizeResult(State.CLOSE_SQUARE, true);
@@ -70,8 +72,9 @@ public class Tokenizer {
 			};
 		});
 		TRANSITION_TABLE.put(State.HEX_PREF, character -> {
-			if (isHexCharacter(character))
+			if (isHexCharacter(character)) {
 				return new TokenizeResult(State.HEX, false);
+			}
 			return switch (character) {
 				case ',' -> new TokenizeResult(State.COMMA, true);
 				case ']' -> new TokenizeResult(State.CLOSE_SQUARE, true);
@@ -82,8 +85,9 @@ public class Tokenizer {
 			};
 		});
 		TRANSITION_TABLE.put(State.HEX, character -> {
-			if (isHexCharacter(character))
+			if (isHexCharacter(character)) {
 				return new TokenizeResult(State.HEX, false);
+			}
 			return switch (character) {
 				case ',' -> new TokenizeResult(State.COMMA, true);
 				case ']' -> new TokenizeResult(State.CLOSE_SQUARE, true);
@@ -108,15 +112,17 @@ public class Tokenizer {
 			}
 		);
 		TRANSITION_TABLE.put(State.QUOTE_START, character -> {
-			if (character == '"')
+			if (character == '"') {
 				return new TokenizeResult(State.QUOTE_END, true);
+			}
 			return new TokenizeResult(State.QUOTED_STRING, true);
 		});
 		TRANSITION_TABLE.put(State.QUOTED_STRING, character -> {
 			if (character == '\\') {
 				return new TokenizeResult(State.ESCAPE_CHARACTER, false, false);
-			} else if (character == '"')
+			} else if (character == '"') {
 				return new TokenizeResult(State.QUOTE_END, true);
+			}
 			return new TokenizeResult(State.QUOTED_STRING, false);
 		});
 		TRANSITION_TABLE.put(State.ESCAPE_CHARACTER, character -> new TokenizeResult(State.QUOTED_STRING, false));

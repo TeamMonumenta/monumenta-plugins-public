@@ -49,6 +49,7 @@ public class BruteForceCS implements CosmeticSkill {
 
 		new BukkitRunnable() {
 			double mRadius = 0.5;
+
 			@Override
 			public void run() {
 				new PPCircle(Particle.BLOCK_CRACK, loc.clone().subtract(0, 0.5, 0), mRadius)

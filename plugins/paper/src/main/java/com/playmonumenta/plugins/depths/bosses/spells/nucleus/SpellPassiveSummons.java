@@ -108,6 +108,7 @@ public class SpellPassiveSummons extends Spell {
 							final Location mPLoc = scLoc;
 							final double mYInc = 1.6 / mSummonTime;
 							boolean mRaised = false;
+
 							@Override
 							public void run() {
 								mT++;
@@ -147,6 +148,7 @@ public class SpellPassiveSummons extends Spell {
 				}
 				new BukkitRunnable() {
 					int mTicks = 0;
+
 					@Override
 					public void run() {
 						if (mTicks % 10 == 0) {
@@ -182,10 +184,7 @@ public class SpellPassiveSummons extends Spell {
 	public boolean isEliteSummon() {
 		Random r = new Random();
 		int roll = r.nextInt(100);
-		if (roll < (Math.sqrt(mFightNumber) - 1) * ELITE_CHANCE_PER_FLOOR) {
-			return true;
-		}
-		return false;
+		return roll < (Math.sqrt(mFightNumber) - 1) * ELITE_CHANCE_PER_FLOOR;
 	}
 
 

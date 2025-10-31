@@ -29,7 +29,7 @@ public class ChunkManager implements Listener {
 		BLOCK_CHUNK,
 		BLOCK_CHUNK_LOAD_DELAY,
 		ENTITY_CHUNK,
-		ENTITY_CHUNK_LOAD_DELAY;
+		ENTITY_CHUNK_LOAD_DELAY
 	}
 
 	private static final Map<UUID, Map<Long, EnumSet<ChunkType>>> mLoadedChunks = new HashMap<>();

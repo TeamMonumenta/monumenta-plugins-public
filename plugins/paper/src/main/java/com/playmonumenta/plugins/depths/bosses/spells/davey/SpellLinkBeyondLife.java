@@ -125,10 +125,7 @@ public class SpellLinkBeyondLife extends Spell {
 	public boolean isEliteSummon() {
 		Random r = new Random();
 		int roll = r.nextInt(100);
-		if (roll < (Math.sqrt(mFightNumber) - 1) * ELITE_CHANCE_PER_FLOOR) {
-			return true;
-		}
-		return false;
+		return roll < (Math.sqrt(mFightNumber) - 1) * ELITE_CHANCE_PER_FLOOR;
 	}
 
 	@Override

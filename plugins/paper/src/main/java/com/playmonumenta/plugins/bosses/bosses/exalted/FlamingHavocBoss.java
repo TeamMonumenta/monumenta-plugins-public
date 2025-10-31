@@ -17,7 +17,7 @@ public class FlamingHavocBoss extends BossAbilityGroup {
 	public FlamingHavocBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		List<Spell> passives = Arrays.asList(
+		List<Spell> passives = List.of(
 			new SpellFlamingHavoc(mPlugin, mBoss, detectionRange)
 		);
 

@@ -1,17 +1,16 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
 public class SpellMulti extends Spell {
-	private List<Spell> mSpells;
+	private final List<Spell> mSpells;
 
 	public SpellMulti(Spell... spells) {
 		mSpells = new ArrayList<>(spells.length);
-		for (Spell spell : spells) {
-			mSpells.add(spell);
-		}
+		Collections.addAll(mSpells, spells);
 	}
 
 	/*

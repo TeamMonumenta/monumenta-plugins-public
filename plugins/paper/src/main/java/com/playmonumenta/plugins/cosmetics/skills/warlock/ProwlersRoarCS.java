@@ -80,6 +80,7 @@ public class ProwlersRoarCS extends MelancholicLamentCS {
 			int mTicks = 0;
 			final Location mLoc = loc.clone().add(0, 0.1, 0);
 			double mRadius = radius * 0.85;
+
 			@Override
 			public void run() {
 				new PPCircle(Particle.REDSTONE, mLoc, mRadius).data(OFF_WHITE)
@@ -143,6 +144,6 @@ public class ProwlersRoarCS extends MelancholicLamentCS {
 		ParticleUtils.drawParticleCircleExplosion(player, loc.clone().add(0, 0.1, 0), 0, radius / 2, -loc.getYaw(), -loc.getPitch(),
 			50, 0.65f, true, 0, 0, Particle.EXPLOSION_NORMAL);
 		ParticleUtils.drawParticleCircleExplosion(player, loc.clone().add(0, 0.1, 0), 0, radius / 2, -loc.getYaw(), -loc.getPitch(),
-				30, 0.5f, true, 0, 0, Particle.EXPLOSION_NORMAL);
+			30, 0.5f, true, 0, 0, Particle.EXPLOSION_NORMAL);
 	}
 }

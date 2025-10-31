@@ -24,7 +24,8 @@ public class OnDamageTrigger extends Trigger {
 		mCustomAbilityName = null;
 	}
 
-	@Override public boolean onDamage(LivingEntity boss, LivingEntity damagee, DamageEvent event) {
+	@Override
+	public boolean onDamage(LivingEntity boss, LivingEntity damagee, DamageEvent event) {
 		if (mDamageType == event.getType()) {
 			mCurrentDamage += event.getDamage();
 		} else if ((event.getBossSpellName() != null && event.getBossSpellName().equals(mCustomAbilityName)) || "ALL".equals(mCustomAbilityName)) {
@@ -34,11 +35,13 @@ public class OnDamageTrigger extends Trigger {
 		return mCurrentDamage >= mTotalDamage;
 	}
 
-	@Override public boolean test(LivingEntity boss) {
+	@Override
+	public boolean test(LivingEntity boss) {
 		return mCurrentDamage >= mTotalDamage;
 	}
 
-	@Override public void reset(LivingEntity boss) {
+	@Override
+	public void reset(LivingEntity boss) {
 		mCurrentDamage = 0;
 	}
 

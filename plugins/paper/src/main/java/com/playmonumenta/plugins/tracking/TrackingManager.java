@@ -72,7 +72,7 @@ public final class TrackingManager {
 		if (Constants.TRACKING_MANAGER_ENABLED) {
 			// Check whether this entity should be pushable
 			if ((entity instanceof Villager && !entity.getScoreboardTags().contains(PUSHABLE_TAG))
-			    || entity.getScoreboardTags().contains(UNPUSHABLE_TAG)) {
+				|| entity.getScoreboardTags().contains(UNPUSHABLE_TAG)) {
 
 				// This entity should not be pushable - join to the unpushable team
 				mUnpushableTeam.addEntry(entity.getUniqueId().toString());
@@ -95,7 +95,7 @@ public final class TrackingManager {
 	public void removeEntity(Entity entity) {
 		if (entity instanceof Player) {
 			mPlayers.removeEntity(entity);
-			mFishingHook.removeEntity((Player)entity);
+			mFishingHook.removeEntity((Player) entity);
 		} else if (entity instanceof Creeper) {
 			mCreepers.removeEntity(entity);
 		} else if (entity instanceof Boat) {

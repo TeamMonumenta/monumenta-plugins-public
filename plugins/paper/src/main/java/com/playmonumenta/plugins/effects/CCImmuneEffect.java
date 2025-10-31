@@ -24,7 +24,8 @@ public class CCImmuneEffect extends ZeroArgumentEffect {
 		return new CCImmuneEffect(duration);
 	}
 
-	@Override public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
+	@Override
+	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (entity instanceof LivingEntity le) {
 			le.removePotionEffect(PotionEffectType.SLOW);
 			le.removePotionEffect(PotionEffectType.LEVITATION);

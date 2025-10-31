@@ -146,8 +146,8 @@ public class Riposte extends Ability implements AbilityWithDuration {
 	@Override
 	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
 		if ((event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH)
-				&& ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())
-				&& mCurrDuration != -1) {
+			&& ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())
+			&& mCurrDuration != -1) {
 			event.updateDamageWithMultiplier(1 + mSwordDamage);
 			if (mRunnable != null && !mRunnable.isCancelled() && !mHasTriggeredSwordL2) {
 				// Disable next tick, buff only for this tick

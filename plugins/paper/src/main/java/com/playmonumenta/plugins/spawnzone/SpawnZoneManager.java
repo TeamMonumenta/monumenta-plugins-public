@@ -28,7 +28,7 @@ public class SpawnZoneManager {
 			if (zone.withinZone(entity.getLocation())) {
 				for (SpawnEffect effect : zone.getSpawnEffects()) {
 					if (entity.getType() == effect.getEntityType()) {
-						LivingEntity creature = (LivingEntity)entity;
+						LivingEntity creature = (LivingEntity) entity;
 						String name = creature.name().toString();
 						String goalName = effect.getName();
 

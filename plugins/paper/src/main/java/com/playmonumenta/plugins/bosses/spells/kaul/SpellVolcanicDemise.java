@@ -95,7 +95,7 @@ public class SpellVolcanicDemise extends Spell {
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 1, 0.7f);
 
 				mChargeUp.setTitle(Component.text("Unleashing ", NamedTextColor.GREEN)
-						 .append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_RED, TextDecoration.BOLD)));
+					.append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_RED, TextDecoration.BOLD)));
 
 				BukkitRunnable castRunnable = new CastRunnable();
 				castRunnable.runTaskTimer(mPlugin, 0, 1);
@@ -112,7 +112,7 @@ public class SpellVolcanicDemise extends Spell {
 
 			mChargeUp.reset();
 			mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.GREEN)
-					 .append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_RED, TextDecoration.BOLD)));
+				.append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_RED, TextDecoration.BOLD)));
 		}
 
 		int mTickCount = 0;
@@ -130,11 +130,11 @@ public class SpellVolcanicDemise extends Spell {
 
 				// Punish players on outer edges/in water; 10tick meteors
 				players.stream().map(player -> player.getLocation())
-					   .filter(loc -> loc.getBlock().isLiquid() || loc.distanceSquared(mCenter) > 42 * 42)
-					   .forEach((loc) -> {
-							loc.setY(mCenter.getY());
-							rainMeteor(loc, 10);
-					   });
+					.filter(loc -> loc.getBlock().isLiquid() || loc.distanceSquared(mCenter) > 42 * 42)
+					.forEach((loc) -> {
+						loc.setY(mCenter.getY());
+						rainMeteor(loc, 10);
+					});
 
 
 				for (int j = 0; j < 4; j++) {

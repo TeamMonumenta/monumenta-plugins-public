@@ -23,7 +23,8 @@ public class ProjectileIframe extends Effect {
 		return mAmount;
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 		return String.format("ProjectileIframe duration:%d amount:%f", getDuration(), mAmount);
 	}
 }

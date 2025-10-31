@@ -101,7 +101,7 @@ public class SpellSummonBlueStrikeTargets extends Spell {
 		for (LivingEntity e : livingEntities) {
 			Set<String> tags = e.getScoreboardTags();
 			if (tags.contains(BlueStrikeTargetNPCBoss.identityTag)
-				    || tags.contains(BlueStrikeTurretBoss.identityTag)) {
+				|| tags.contains(BlueStrikeTurretBoss.identityTag)) {
 				return true;
 			}
 		}

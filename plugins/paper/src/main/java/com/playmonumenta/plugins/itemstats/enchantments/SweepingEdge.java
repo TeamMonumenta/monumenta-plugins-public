@@ -8,14 +8,23 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
-import org.bukkit.*;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
-
-import java.util.*;
 
 import static com.playmonumenta.plugins.itemstats.enchantments.Knockback.KB_VEL_PER_LEVEL;
 
@@ -120,7 +129,7 @@ public class SweepingEdge implements Enchantment {
 					}
 				}
 				// Get the player location, to play sounds later
-				Location playerLoc = player.getLocation().add(0,1,0);
+				Location playerLoc = player.getLocation().add(0, 1, 0);
 				Vector playerToEnemy = bLoc.toVector();
 				playerToEnemy.subtract(playerLoc.toVector());
 				// Always show the sweep particle. Strictly this isn't the vanilla behaviour but I find it looks better.

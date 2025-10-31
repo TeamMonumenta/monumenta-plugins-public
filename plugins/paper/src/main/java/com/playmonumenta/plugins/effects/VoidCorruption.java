@@ -70,7 +70,7 @@ public class VoidCorruption extends Effect {
 			.append(Component.text((int) Math.floor(mCorruption) + "%", NamedTextColor.LIGHT_PURPLE))
 			.append(Component.text(" - ", NamedTextColor.YELLOW))
 			.append(Component.text(getHealingReduction() + "% Heal Reduc. ", NamedTextColor.DARK_RED));
-		mBossBar = BossBar.bossBar(title, (float) (corruption/100.0), BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_10);
+		mBossBar = BossBar.bossBar(title, (float) (corruption / 100.0), BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_10);
 
 		mPCursed = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 2, 0.2, 0.3, 0.2, 0.1);
 		mPSmoke = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 2, 0.25, 0.25, 0.25, 0.1);
@@ -273,7 +273,7 @@ public class VoidCorruption extends Effect {
 	}
 
 	public int getHealingReduction() {
-		return (int) (100* (1 - 100.0 / (100.0 + mCorruption)));
+		return (int) (100 * (1 - 100.0 / (100.0 + mCorruption)));
 	}
 
 	@Override

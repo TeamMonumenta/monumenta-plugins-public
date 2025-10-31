@@ -68,9 +68,9 @@ public class BanishCrystallizingGaze extends Spell {
 			public void run() {
 				if (mTicks < BANISH_DURATION) {
 					// Fancy particles
-					Location particleLoc1 = mBoss.getLocation().add(FastUtils.cos((double) mTicks / 10) * 2, FastUtils.cos((double)mTicks / 15) / 1.3 + 1, FastUtils.sin((double)mTicks / 10) * 2);
-					Location particleLoc2 = mBoss.getLocation().add(FastUtils.cos((double) (mTicks + 20) / 10) * 2, FastUtils.cos((double)(mTicks + 20) / 15) / 1.3 + 1, FastUtils.sin((double)(mTicks + 20) / 10) * 2);
-					Location particleLoc3 = mBoss.getLocation().add(FastUtils.cos((double) (mTicks + 40) / 10) * 2, FastUtils.cos((double)(mTicks + 40) / 15) / 1.3 + 1, FastUtils.sin((double)(mTicks + 40) / 10) * 2);
+					Location particleLoc1 = mBoss.getLocation().add(FastUtils.cos((double) mTicks / 10) * 2, FastUtils.cos((double) mTicks / 15) / 1.3 + 1, FastUtils.sin((double) mTicks / 10) * 2);
+					Location particleLoc2 = mBoss.getLocation().add(FastUtils.cos((double) (mTicks + 20) / 10) * 2, FastUtils.cos((double) (mTicks + 20) / 15) / 1.3 + 1, FastUtils.sin((double) (mTicks + 20) / 10) * 2);
+					Location particleLoc3 = mBoss.getLocation().add(FastUtils.cos((double) (mTicks + 40) / 10) * 2, FastUtils.cos((double) (mTicks + 40) / 15) / 1.3 + 1, FastUtils.sin((double) (mTicks + 40) / 10) * 2);
 					new PartialParticle(Particle.WAX_OFF, particleLoc1).spawnAsBoss();
 					new PartialParticle(Particle.SNOWFLAKE, particleLoc1).extra(0).spawnAsBoss();
 					new PartialParticle(Particle.WAX_OFF, particleLoc2).spawnAsBoss();
@@ -93,7 +93,7 @@ public class BanishCrystallizingGaze extends Spell {
 							.spawnAsBoss();
 					}
 
-					mChargeUp.setProgress((float)mTicks / BANISH_DURATION);
+					mChargeUp.setProgress((float) mTicks / BANISH_DURATION);
 
 					if (mTicks % 10 == 0) {
 						mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_MEDIUM_AMETHYST_BUD_PLACE, SoundCategory.HOSTILE, 2.0f, ((float) mTicks / BANISH_DURATION) * 1.1f + 0.5f);

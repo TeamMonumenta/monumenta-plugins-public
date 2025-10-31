@@ -101,7 +101,7 @@ public class SpellBullet extends Spell {
 	private static final double PLAYER_HITBOX_HEIGHT = 1.8;
 
 	public SpellBullet(Plugin plugin, LivingEntity caster, Vector offset, int duration, int delay, int emissionSpeed, double velocity, double detectRange, double hitboxRadius, int cooldown, int bulletDuration, String pattern,
-					   double accel, int accelStart, int accelEnd, boolean passThrough, double rotationSpeed, TickAction tickAction, CastAction castAction, Material bulletMaterial, IntersectAction intersectAction) {
+	                   double accel, int accelStart, int accelEnd, boolean passThrough, double rotationSpeed, TickAction tickAction, CastAction castAction, Material bulletMaterial, IntersectAction intersectAction) {
 		mPlugin = plugin;
 		mEmissionSpeed = emissionSpeed;
 		mCaster = caster;
@@ -343,7 +343,7 @@ public class SpellBullet extends Spell {
 					launchAcceleratingBullet(players, detLoc, mBulletDuration, new Vector(0, 0, -1).rotateAroundY(rotationAngle - Math.PI / (4.0 * (granularity - mI + 1))), 0, 0, 0, small);
 				}
 			}
-			.runTaskLater(mPlugin, 10 + i);
+				.runTaskLater(mPlugin, 10 + i);
 		}
 	}
 

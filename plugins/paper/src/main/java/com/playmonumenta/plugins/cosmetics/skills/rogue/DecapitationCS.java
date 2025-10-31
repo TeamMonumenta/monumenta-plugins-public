@@ -61,7 +61,7 @@ public class DecapitationCS extends ByMyBladeCS implements GalleryCS {
 	@Override
 	public boolean isUnlocked(Player player) {
 		return ScoreboardUtils.getScoreboardValue(player, GALLERY_COMPLETE_SCB).orElse(0) >= 1
-			       || player.getGameMode() == GameMode.CREATIVE;
+			|| player.getGameMode() == GameMode.CREATIVE;
 	}
 
 	@Override
@@ -120,6 +120,7 @@ public class DecapitationCS extends ByMyBladeCS implements GalleryCS {
 		Location l = player.getLocation().clone().add(0, 0.1, 0);
 		new BukkitRunnable() {
 			double mRadius = 1.5;
+
 			@Override
 			public void run() {
 

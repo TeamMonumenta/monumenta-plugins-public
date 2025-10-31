@@ -97,6 +97,7 @@ public class SpellSurgingDeath extends Spell {
 									int mExTicks = 0;
 									double mRingCount = DEATH_RING_COUNT;
 									double mPrevRing = Ruten.arenaRadius;
+
 									@Override
 									public void run() {
 										if (mBoss.isDead() || !mBoss.isValid()) {

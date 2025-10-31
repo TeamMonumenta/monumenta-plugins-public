@@ -7,8 +7,7 @@ public interface GalleryCS extends LockableCS {
 	String GALLERY_COMPLETE_SCB = "GallerySanguineHallsEasterEgg";
 
 	enum GalleryMap {
-		SANGUINE("Sanguine Halls", TextColor.fromHexString("#AB0000"))
-		;
+		SANGUINE("Sanguine Halls", TextColor.fromHexString("#AB0000"));
 
 		public final String mName;
 		public final TextColor mColor;

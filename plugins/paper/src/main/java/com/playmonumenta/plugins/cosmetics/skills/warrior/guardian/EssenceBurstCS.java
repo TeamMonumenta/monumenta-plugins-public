@@ -52,6 +52,7 @@ public class EssenceBurstCS extends ChallengeCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				final Location loc = player.getLocation().add(0, 1, 0);

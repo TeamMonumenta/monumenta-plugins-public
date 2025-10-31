@@ -51,6 +51,7 @@ public class PlayerTitleManager implements Listener {
 		public final TextDisplay nametag;
 		public Component text = Component.empty();
 		public boolean dirty = false;
+
 		public NameTagData(Interaction interaction, TextDisplay nametag) {
 			this.interaction = interaction;
 			this.nametag = nametag;
@@ -129,6 +130,7 @@ public class PlayerTitleManager implements Listener {
 				return existing;
 			});
 		}
+
 		public static Component getNameDisplay(Player player) {
 			return Component.text(player.getName(), NamedTextColor.WHITE);
 		}
@@ -180,12 +182,12 @@ public class PlayerTitleManager implements Listener {
 		}
 
 		private void updatePlayers(Player targetPlayer) {
-				for (UUID viewer : viewers) {
-					updatePlayer(Bukkit.getPlayer(viewer), targetPlayer);
-				}
-				for (NameTagData data : entities.values()) {
-					data.dirty = false;
-				}
+			for (UUID viewer : viewers) {
+				updatePlayer(Bukkit.getPlayer(viewer), targetPlayer);
+			}
+			for (NameTagData data : entities.values()) {
+				data.dirty = false;
+			}
 		}
 
 		/*

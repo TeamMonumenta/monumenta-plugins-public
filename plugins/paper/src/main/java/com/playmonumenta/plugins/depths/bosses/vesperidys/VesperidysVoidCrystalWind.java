@@ -149,7 +149,7 @@ public class VesperidysVoidCrystalWind extends BossAbilityGroup {
 
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					close();
-				}, COOLDOWN/2);
+				}, COOLDOWN / 2);
 
 				forceSpell.run();
 

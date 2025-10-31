@@ -41,7 +41,7 @@ public class Cloaked {
 
 
 	public static Component[] rankDescription(int level) {
-		return new Component[] {
+		return new Component[]{
 			Component.text("When mobs spawn, they have a " + Math.round(100 * CLOAKED_CHANCE) + "% chance to spawn Cloaked."),
 			Component.text("Cloaked mobs are invisible and do not render armour."),
 			Component.text("Mobs will uncloak when within " + (PLAYER_RADIUS_BASE - PLAYER_RADIUS_DECREASE_PER_LEVEL * level) + " blocks of a player."),

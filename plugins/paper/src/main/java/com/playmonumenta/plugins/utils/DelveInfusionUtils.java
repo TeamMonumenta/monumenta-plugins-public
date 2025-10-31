@@ -32,7 +32,9 @@ public class DelveInfusionUtils {
 	public static final int[] MAT_COST_PER_INFUSION = {3, 6, 12, 24};
 	public static final int[] XP_COST_PER_LEVEL = {ExperienceUtils.LEVEL_40, ExperienceUtils.LEVEL_50, ExperienceUtils.LEVEL_60, ExperienceUtils.LEVEL_70};
 
-	/**When set to true the refund function will return all the XP used for the infusion, when false only the 75% */
+	/**
+	 * When set to true the refund function will return all the XP used for the infusion, when false only the 75%
+	 */
 	public static final boolean FULL_REFUND = true;
 	public static final double REFUND_PERCENT = 0.75;
 
@@ -65,7 +67,7 @@ public class DelveInfusionUtils {
 		DECAPITATION("decapitation", InfusionType.DECAPITATION, Location.BLUESTRIKE, Material.WITHER_SKELETON_SKULL, "Shattered Masks", NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
 		CELESTIAL("celestial", InfusionType.CELESTIAL, Location.STARPOINT, Material.DEEPSLATE_BRICKS, "Dust of the Herald", NamespacedKeyUtils.fromString("epic:r3/items/currency/dust_of_the_herald"), PlayerUtils.SCOREBOARD_RING_UNLOCK),
 		FERVOR("fervor", InfusionType.FERVOR, Location.HEXFALL, Material.DRAGON_BREATH, "Fragrant Branch of Fen", NamespacedKeyUtils.fromString("epic:r3/items/currency/fragrant_branch_of_fen"), "Ruten"),
-		ORBITAL("orbital" , InfusionType.ORBITAL, Location.INDIGO, Material.PURPLE_CONCRETE_POWDER, "Crumbled Setiroetem", NamespacedKeyUtils.fromString("epic:r3/items/currency/crumbled_etiroetem"), "Indigo"),
+		ORBITAL("orbital", InfusionType.ORBITAL, Location.INDIGO, Material.PURPLE_CONCRETE_POWDER, "Crumbled Setiroetem", NamespacedKeyUtils.fromString("epic:r3/items/currency/crumbled_etiroetem"), "Indigo"),
 
 		STURDY("sturdy", InfusionType.STURDY, Location.HUNTS, Material.SHIELD, "Hyperchromatic Archos Rings", NamespacedKeyUtils.fromString("epic:r3/items/currency/hyperchromatic_archos_ring"), "HuntsUnspoiledWins"),
 		CELERITY("celerity", InfusionType.CELERITY, Location.SKR, Material.FEATHER, "Hyperchromatic Archos Rings", NamespacedKeyUtils.fromString("epic:r3/items/currency/hyperchromatic_archos_ring"), "SKRRoomsCompleted"),
@@ -188,10 +190,14 @@ public class DelveInfusionUtils {
 
 		public Component getIcon() {
 			return switch (this) {
-				case VOIDSTAINED_GEODE -> Component.text(" ⚓", Location.DEPTHS.getColor()).decoration(TextDecoration.ITALIC, false);
-				case INDIGO_BLIGHTDUST -> Component.text(" ✵", Location.ZENITH.getColor()).decoration(TextDecoration.ITALIC, false);
-				case MEMORY_FRAGMENTS -> Component.text(" \uD83E\uDEB6", TextColor.fromHexString("#8bb7c3")).decoration(TextDecoration.ITALIC, false);
-				case RUCKS -> Component.text(" ⌘", TextColor.fromHexString("#4C8F4D")).decoration(TextDecoration.ITALIC, false);
+				case VOIDSTAINED_GEODE ->
+					Component.text(" ⚓", Location.DEPTHS.getColor()).decoration(TextDecoration.ITALIC, false);
+				case INDIGO_BLIGHTDUST ->
+					Component.text(" ✵", Location.ZENITH.getColor()).decoration(TextDecoration.ITALIC, false);
+				case MEMORY_FRAGMENTS ->
+					Component.text(" \uD83E\uDEB6", TextColor.fromHexString("#8bb7c3")).decoration(TextDecoration.ITALIC, false);
+				case RUCKS ->
+					Component.text(" ⌘", TextColor.fromHexString("#4C8F4D")).decoration(TextDecoration.ITALIC, false);
 			};
 		}
 	}
@@ -272,7 +278,7 @@ public class DelveInfusionUtils {
 		ExperienceUtils.setTotalExperience(player, ExperienceUtils.getTotalExperience(player) + xp);
 
 		AuditListener.logPlayer("[Delve Infusion] Refund - player=" + player.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + infusionType
-			                        + "', from level=" + auditLevel + ", stack size=" + item.getAmount() + ", refunded materials=" + matStr + ", refunded XP=" + xp);
+			+ "', from level=" + auditLevel + ", stack size=" + item.getAmount() + ", refunded materials=" + matStr + ", refunded XP=" + xp);
 		if (!ItemStatUtils.checkOwnership(player, item)) {
 			AuditListener.logPlayer("[Ownership Tracker] Player " + player.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
 		}
@@ -298,15 +304,15 @@ public class DelveInfusionUtils {
 		List<ItemStack> mats = getCurrenciesCost(item, selection, targetLevel, p, delveInfusionMaterial);
 
 		String matStr = mats.stream().filter(it -> it != null && it.getAmount() > 0)
-			                .map(it -> "'" + ItemUtils.getPlainName(it) + ":" + it.getAmount() + "'")
-			                .collect(Collectors.joining(","));
+			.map(it -> "'" + ItemUtils.getPlainName(it) + ":" + it.getAmount() + "'")
+			.collect(Collectors.joining(","));
 
 		int xpCost = XP_COST_PER_LEVEL[targetLevel];
 
 		//if the player is in creative -> free infusion
 		if (selection == DelveInfusionSelection.REFUND || p.getGameMode() == GameMode.CREATIVE) {
 			AuditListener.log("[Delve Infusion] Player " + p.getName() + " infused an item while in creative mode! item='" + ItemUtils.getPlainName(item) + "', infusion type=" + selection.mInfusionType
-				                  + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", normal material cost=" + matStr + ", normal XP cost=" + xpCost);
+				+ "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", normal material cost=" + matStr + ", normal XP cost=" + xpCost);
 			if (!ItemStatUtils.checkOwnership(p, item)) {
 				AuditListener.logPlayer("[Ownership Tracker] Player " + p.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
 			}
@@ -325,7 +331,7 @@ public class DelveInfusionUtils {
 		ExperienceUtils.setTotalExperience(p, playerXP - xpCost);
 
 		AuditListener.logPlayer("[Delve Infusion] Item infused - player=" + p.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + selection.mInfusionType
-			                        + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", material cost=" + matStr + ", XP cost=" + xpCost);
+			+ "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", material cost=" + matStr + ", XP cost=" + xpCost);
 		if (!ItemStatUtils.checkOwnership(p, item)) {
 			AuditListener.logPlayer("[Ownership Tracker] Player " + p.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
 		}

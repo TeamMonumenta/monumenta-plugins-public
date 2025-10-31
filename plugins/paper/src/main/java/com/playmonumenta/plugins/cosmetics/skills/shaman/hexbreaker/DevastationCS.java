@@ -22,7 +22,7 @@ public class DevastationCS implements CosmeticSkill {
 
 	@Override
 	public Material getDisplayItem() {
-	return Material.COAL_BLOCK;
+		return Material.COAL_BLOCK;
 	}
 
 	public void devastationCast(Plugin plugin, Location targetLoc, Player player, double radius) {

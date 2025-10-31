@@ -42,7 +42,7 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 	private static final double VULN = 0.1;
 	private static final double HEAL_PERCENT = 0.025;
 	private static final double EFFECT_LEVEL = 0.1;
-	private static final int EFFECT_DURATION = 20 * 1;
+	private static final int EFFECT_DURATION = 20;
 	private static final int RANGE = 10;
 	private static final int AOE_RANGE = 6;
 	private static final double HITBOX_LENGTH = 0.55;
@@ -55,16 +55,16 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 	public static final String CHARM_DAMAGE = "Haunting Shades Damage Modifier";
 
 	public static final AbilityInfo<HauntingShades> INFO =
-			new AbilityInfo<>(HauntingShades.class, "Haunting Shades", HauntingShades::new)
-					.linkedSpell(ClassAbility.HAUNTING_SHADES)
-					.scoreboardId("HauntingShades")
-					.shorthandName("HS")
-					.descriptions(getDescription1(), getDescription2())
-					.simpleDescription("Place a Shade that debuffs nearby enemies with Vulnerability.")
-					.cooldown(COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HauntingShades::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
-							AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-					.displayItem(Material.SKELETON_SKULL);
+		new AbilityInfo<>(HauntingShades.class, "Haunting Shades", HauntingShades::new)
+			.linkedSpell(ClassAbility.HAUNTING_SHADES)
+			.scoreboardId("HauntingShades")
+			.shorthandName("HS")
+			.descriptions(getDescription1(), getDescription2())
+			.simpleDescription("Place a Shade that debuffs nearby enemies with Vulnerability.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HauntingShades::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
+				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+			.displayItem(Material.SKELETON_SKULL);
 
 
 	private final int mMaxDuration;

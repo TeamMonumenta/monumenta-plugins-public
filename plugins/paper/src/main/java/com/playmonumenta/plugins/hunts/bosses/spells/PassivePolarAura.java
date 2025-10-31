@@ -119,7 +119,7 @@ public class PassivePolarAura extends Spell {
 
 			@Override
 			public void run() {
-				double progress = (double)mSwapTicks / SWAP_DURATION;
+				double progress = (double) mSwapTicks / SWAP_DURATION;
 				mCurrentRadius = start + (end - start) * progress; // lerp between start and end
 
 				mSwapTicks++;
@@ -166,7 +166,7 @@ public class PassivePolarAura extends Spell {
 		float newAmount = Math.max(-1, Math.min(1, mFrostbiteValues.get(player) + amount));
 		mFrostbiteValues.put(player, newAmount);
 
-		player.setFreezeTicks((int)(player.getMaxFreezeTicks() * Math.max(newAmount, 0) * 0.5));
+		player.setFreezeTicks((int) (player.getMaxFreezeTicks() * Math.max(newAmount, 0) * 0.5));
 		BossBar bar = mFrostbiteBossBars.get(player);
 		bar.progress(0.5f * (1 + newAmount)); // -1 -> 0, 0 -> 1/2, 1 -> 1
 		bar.name(newAmount <= -0.75 ? HOT_BOSSBAR : (newAmount >= 0.75 ? FROZEN_BOSSBAR : NORMAL_BOSSBAR));

@@ -64,6 +64,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
+
 import static com.playmonumenta.plugins.listeners.SpawnerListener.spawnerCatMap;
 import static com.playmonumenta.plugins.spawners.types.RallySpawner.getRally;
 import static com.playmonumenta.plugins.spawners.types.RallySpawner.triggerRallyEffect;
@@ -940,6 +941,7 @@ public class SpawnerUtils {
 		BukkitRunnable task = new BukkitRunnable() {
 			private static final int TIME_LIMIT_TICKS = 5 * 60 * 20;
 			private int mTicks = 0;
+
 			@Override
 			public void run() {
 				boolean hasNearbyMobs = ensnareableMobsWithin(spawnerLocation, ensnareRadius - 2);

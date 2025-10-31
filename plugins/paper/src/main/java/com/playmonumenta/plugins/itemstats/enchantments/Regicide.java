@@ -42,7 +42,7 @@ public final class Regicide implements Enchantment {
 
 	@Override
 	public void onDamage(final Plugin plugin, final Player player, final double level, final DamageEvent event,
-						 final LivingEntity target) {
+	                     final LivingEntity target) {
 		final DamageType type = event.getType();
 		if (type != DamageType.AILMENT && type != DamageType.POISON && type != DamageType.FALL
 			&& type != DamageType.OTHER && type != DamageType.TRUE) {
@@ -56,7 +56,7 @@ public final class Regicide implements Enchantment {
 
 	@Override
 	public void onProjectileLaunch(final Plugin plugin, final Player player, final double value,
-								   final ProjectileLaunchEvent event, final Projectile projectile) {
+	                               final ProjectileLaunchEvent event, final Projectile projectile) {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !AbilityUtils.isVolley(player, projectile)) {
 			final Location loc = player.getLocation();
 			AbilityUtils.playPassiveAbilitySound(loc, Sound.ITEM_AXE_SCRAPE, 1.5f, 0.8f);

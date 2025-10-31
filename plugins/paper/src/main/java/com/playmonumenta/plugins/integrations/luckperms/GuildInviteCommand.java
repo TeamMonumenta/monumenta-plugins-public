@@ -161,14 +161,17 @@ public class GuildInviteCommand {
 				Bukkit.getScheduler().runTask(plugin, () -> {
 					Component guildComponent = LuckPermsIntegration.getGuildFullComponent(guildRoot);
 					switch (inviteLevel) {
-						case MEMBER_INVITE -> inviter.sendMessage(Component.text("Invited " + invitedName + " to ", NamedTextColor.GOLD)
-							.append(guildComponent)
-							.append(Component.text(" as a member.")));
-						case GUEST_INVITE -> inviter.sendMessage(Component.text("Invited " + invitedName + " to ", NamedTextColor.GOLD)
-							.append(guildComponent)
-							.append(Component.text(" as a guest.")));
-						default -> inviter.sendMessage(Component.text("Uninvited " + invitedName + " from ", NamedTextColor.GOLD)
-							.append(guildComponent));
+						case MEMBER_INVITE ->
+							inviter.sendMessage(Component.text("Invited " + invitedName + " to ", NamedTextColor.GOLD)
+								.append(guildComponent)
+								.append(Component.text(" as a member.")));
+						case GUEST_INVITE ->
+							inviter.sendMessage(Component.text("Invited " + invitedName + " to ", NamedTextColor.GOLD)
+								.append(guildComponent)
+								.append(Component.text(" as a guest.")));
+						default ->
+							inviter.sendMessage(Component.text("Uninvited " + invitedName + " from ", NamedTextColor.GOLD)
+								.append(guildComponent));
 					}
 					AuditListener.logPlayer(
 						"[Guild] Sent invite - inviter=" + inviter.getName()
@@ -181,14 +184,17 @@ public class GuildInviteCommand {
 				Bukkit.getScheduler().runTask(plugin, () -> {
 					Component guildComponent = LuckPermsIntegration.getGuildFullComponent(guildRoot);
 					switch (inviteLevel) {
-						case MEMBER_INVITE -> inviter.sendMessage(Component.text("Failed to invite " + invitedName + " to ", NamedTextColor.GOLD)
-							.append(guildComponent)
-							.append(Component.text(" as a member.")));
-						case GUEST_INVITE -> inviter.sendMessage(Component.text("Failed to invite " + invitedName + " to ", NamedTextColor.GOLD)
-							.append(guildComponent)
-							.append(Component.text(" as a guest.")));
-						default -> inviter.sendMessage(Component.text("Failed to uninvite " + invitedName + " from ", NamedTextColor.GOLD)
-							.append(guildComponent));
+						case MEMBER_INVITE ->
+							inviter.sendMessage(Component.text("Failed to invite " + invitedName + " to ", NamedTextColor.GOLD)
+								.append(guildComponent)
+								.append(Component.text(" as a member.")));
+						case GUEST_INVITE ->
+							inviter.sendMessage(Component.text("Failed to invite " + invitedName + " to ", NamedTextColor.GOLD)
+								.append(guildComponent)
+								.append(Component.text(" as a guest.")));
+						default ->
+							inviter.sendMessage(Component.text("Failed to uninvite " + invitedName + " from ", NamedTextColor.GOLD)
+								.append(guildComponent));
 					}
 					MessagingUtils.sendStackTrace(inviter, ex);
 				});

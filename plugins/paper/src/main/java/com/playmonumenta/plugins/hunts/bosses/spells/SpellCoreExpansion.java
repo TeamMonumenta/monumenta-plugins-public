@@ -51,6 +51,7 @@ public class SpellCoreExpansion extends Spell implements CoreElemental.CoreEleme
 		BukkitRunnable runnable = new BukkitRunnable() {
 			double mRadius = 5;
 			int mT = 0;
+
 			@Override
 			public void run() {
 				// Telegraph
@@ -58,8 +59,8 @@ public class SpellCoreExpansion extends Spell implements CoreElemental.CoreEleme
 					.count(30)
 					.delta(0.25)
 					.spawnAsEntityActive(mBoss);
-				mRadius -= (double) 5/CHARGE_TIME;
-				mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, SoundCategory.HOSTILE, 0.7f, 0.5f + (float) mT++/CHARGE_TIME);
+				mRadius -= (double) 5 / CHARGE_TIME;
+				mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, SoundCategory.HOSTILE, 0.7f, 0.5f + (float) mT++ / CHARGE_TIME);
 				if (mRadius <= 0) {
 					this.cancel();
 					mActiveRunnables.remove(this);

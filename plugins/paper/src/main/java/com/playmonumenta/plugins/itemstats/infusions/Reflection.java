@@ -40,8 +40,7 @@ public class Reflection implements Infusion {
 		DamageType type = event.getType();
 		if ((type == DamageType.MAGIC || type == DamageType.BLAST)
 			&& !event.isBlocked()
-			&& (player.getNoDamageTicks() == 0 || player.getLastDamage() < event.getFinalDamage(false)))
-		{
+			&& (player.getNoDamageTicks() == 0 || player.getLastDamage() < event.getFinalDamage(false))) {
 			double reflectedDamage = value * REFLECT_PCT_PER_LEVEL * event.getOriginalDamage();
 			World world = player.getWorld();
 			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.6f);

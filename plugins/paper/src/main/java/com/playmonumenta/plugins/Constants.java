@@ -17,8 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class Constants {
 	public static final int TICKS_PER_SECOND = 20;
-	public static final int HALF_TICKS_PER_SECOND = (int)(TICKS_PER_SECOND / 2.0);
-	public static final int QUARTER_TICKS_PER_SECOND = (int)(HALF_TICKS_PER_SECOND / 2.0);
+	public static final int HALF_TICKS_PER_SECOND = (int) (TICKS_PER_SECOND / 2.0);
+	public static final int QUARTER_TICKS_PER_SECOND = (int) (HALF_TICKS_PER_SECOND / 2.0);
 	public static final int TICKS_PER_MINUTE = TICKS_PER_SECOND * 60;
 
 	public static final int TWO_MINUTES = TICKS_PER_MINUTE * 2;
@@ -167,7 +167,7 @@ public class Constants {
 		public static final float FS24 = calculatePitch(24);
 
 		public static float calculatePitch(int clicks) {
-			return 0.5f * (float)Math.pow(2, (clicks / 12d));
+			return 0.5f * (float) Math.pow(2, (clicks / 12d));
 		}
 	}
 
@@ -219,7 +219,7 @@ public class Constants {
 			mClicks = clicks;
 			mName = name;
 			mNoteParticleValue = clicks / 24.0;
-			mPitch = (float)Math.pow(2.0F, (clicks - 12) / 12.0F);
+			mPitch = (float) Math.pow(2.0F, (clicks - 12) / 12.0F);
 		}
 	}
 

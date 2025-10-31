@@ -21,16 +21,16 @@ import org.bukkit.util.Vector;
 public class ChoirBellsCS implements CosmeticSkill {
 
 	private static final SoundsList.CSound[][] SOUNDS = {
-		new SoundsList.CSound[] {
+		new SoundsList.CSound[]{
 			new SoundsList.CSound(Sound.BLOCK_NOTE_BLOCK_CHIME, 1.0f, 0.6f),
 			new SoundsList.CSound(Sound.ENTITY_ALLAY_AMBIENT_WITH_ITEM, 0.7f, 0.4f),
 			new SoundsList.CSound(Sound.BLOCK_BELL_USE, 0.1f, 2.0f)
 		},
-		new SoundsList.CSound[] {
+		new SoundsList.CSound[]{
 			new SoundsList.CSound(Sound.BLOCK_NOTE_BLOCK_CHIME, 1.0f, 0.8f),
 			new SoundsList.CSound(Sound.ITEM_TRIDENT_RETURN, 0.6f, 0.8f)
 		},
-		new SoundsList.CSound[] {
+		new SoundsList.CSound[]{
 			new SoundsList.CSound(Sound.BLOCK_NOTE_BLOCK_CHIME, 1.0f, 1.0f),
 			new SoundsList.CSound(Sound.ITEM_TRIDENT_RETURN, 0.6f, 1.0f)
 		}

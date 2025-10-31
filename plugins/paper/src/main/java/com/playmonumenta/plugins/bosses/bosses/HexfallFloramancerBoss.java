@@ -142,6 +142,7 @@ public class HexfallFloramancerBoss extends BossAbilityGroup {
 			int mTicks = 0;
 			final Location mLoc = respawnLoc.clone();
 			final Material mFlower = flower.getType();
+
 			@Override
 			public void run() {
 				new PartialParticle(Particle.TOTEM, mLoc, 1, 0, 0, 0, 0.5).spawnAsBoss();

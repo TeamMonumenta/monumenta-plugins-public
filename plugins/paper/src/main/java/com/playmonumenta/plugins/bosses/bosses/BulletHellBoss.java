@@ -136,7 +136,7 @@ public final class BulletHellBoss extends BossAbilityGroup {
 					if (player != null && !blocked && !mRecentlyHitPlayers.contains(player.getUniqueId())) {
 						if (p.DAMAGE_PERCENTAGE > 0) {
 							DamageUtils.damage(mBoss, player, new DamageEvent.Metadata(DamageEvent.DamageType.TRUE,
-								null, null, p.SPELL_NAME), p.DAMAGE_PERCENTAGE * EntityUtils.getMaxHealth(player) / 100.0,
+									null, null, p.SPELL_NAME), p.DAMAGE_PERCENTAGE * EntityUtils.getMaxHealth(player) / 100.0,
 								true, true, false);
 						}
 						if (p.DAMAGE > 0) {
@@ -151,6 +151,6 @@ public final class BulletHellBoss extends BossAbilityGroup {
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc).count(5).extra(0.175).spawnAsEntityActive(mBoss);
 				}
 			),
-		p.DETECTION, null, 0);
+			p.DETECTION, null, 0);
 	}
 }

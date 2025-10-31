@@ -126,6 +126,7 @@ public class Bezoar extends Ability {
 
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;
@@ -192,6 +193,7 @@ public class Bezoar extends Ability {
 
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;

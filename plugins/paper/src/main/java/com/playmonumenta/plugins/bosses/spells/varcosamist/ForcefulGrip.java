@@ -25,7 +25,7 @@ public class ForcefulGrip extends SpellBaseSeekingProjectile {
 
 	private static final boolean SINGLE_TARGET = false;
 	private static final boolean LAUNCH_TRACKING = true;
-	private static final int DELAY = 20 * 1;
+	private static final int DELAY = 20;
 	private static final double SPEED = 0.8;
 	private static final double TURN_RADIUS = Math.PI / 90;
 	private static final int LIFETIME_TICKS = 20 * 8;

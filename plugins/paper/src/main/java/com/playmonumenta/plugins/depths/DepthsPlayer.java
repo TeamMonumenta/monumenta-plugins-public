@@ -361,7 +361,7 @@ public class DepthsPlayer {
 	}
 
 	public DepthsRewardType peekRewardType() {
-		return peekReward().mRewardType;
+		return peekReward().mRewardType();
 	}
 
 	public List<String> getSolarRayUniqueMobNames() {

@@ -80,7 +80,7 @@ public class VindictiveBoss extends BossAbilityGroup {
 			mParams.SOUND.play(loc);
 			mParams.PARTICLES.spawn(mBoss, loc);
 
-			if (mParams.ADDITIONAL_EFFECTS != EffectsList.EMPTY) {
+			if (mParams.ADDITIONAL_EFFECTS.equals(EffectsList.EMPTY)) {
 				mParams.ADDITIONAL_EFFECTS.apply(mob, mBoss);
 			}
 

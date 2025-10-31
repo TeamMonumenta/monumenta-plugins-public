@@ -245,8 +245,7 @@ public class ArcanicBoss extends BossAbilityGroup {
 				spell = new SpellBaseSeekingProjectile(plugin, mBoss, ARROW_PARAMETERS.get(mParameters.REGION));
 			case MISSILE ->
 				spell = new SpellBaseSeekingProjectile(plugin, mBoss, MISSILE_PARAMETERS.get(mParameters.REGION));
-			case CHARGE ->
-				spell = new SpellBaseCharge(plugin, mBoss, CHARGE_PARAMETERS.get(mParameters.REGION));
+			case CHARGE -> spell = new SpellBaseCharge(plugin, mBoss, CHARGE_PARAMETERS.get(mParameters.REGION));
 			case REJUVENATION ->
 				spell = new SpellMobHealAoE(rejuvPlugin, mBoss, REJUVENATION_PARAMETERS.get(mParameters.REGION));
 			default -> spell = new SpellBaseCharge(plugin, mBoss, CHARGE_PARAMETERS.get(mParameters.REGION));
@@ -299,7 +298,9 @@ public class ArcanicBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		if (mArcaneRune != null) mArcaneRune.remove();
+		if (mArcaneRune != null) {
+			mArcaneRune.remove();
+		}
 	}
 
 	// Might not be necessary?

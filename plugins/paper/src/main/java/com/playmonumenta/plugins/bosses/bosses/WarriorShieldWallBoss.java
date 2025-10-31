@@ -151,12 +151,12 @@ public final class WarriorShieldWallBoss extends BossAbilityGroup {
 								}
 
 								if (p.DAMAGE > 0) {
-									BossUtils.blockableDamage(boss, le, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, shieldLocation, p.EFFECTS.mEffectList);
+									BossUtils.blockableDamage(boss, le, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, shieldLocation, p.EFFECTS.mEffectList());
 								}
 
 								if (p.DAMAGE_PERCENTAGE > 0) {
 									DamageUtils.damagePercentHealth(mBoss, le, p.DAMAGE_PERCENTAGE, true,
-										true, p.SPELL_NAME, true, p.EFFECTS.mEffectList);
+										true, p.SPELL_NAME, true, p.EFFECTS.mEffectList());
 								}
 
 								p.EFFECTS.apply(le, boss);

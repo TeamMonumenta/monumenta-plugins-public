@@ -93,7 +93,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 	public boolean cast() {
 		if (mTeleporting
-			    || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			|| ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return false;
 		}
 

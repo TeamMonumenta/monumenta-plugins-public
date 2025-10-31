@@ -47,6 +47,6 @@ public class ShowMarkerTimer {
 	}
 
 	private static float floatFloorMod(float x, float y) {
-		return x - ((float) Math.floor(x/y) * y);
+		return x - ((float) Math.floor(x / y) * y);
 	}
 }

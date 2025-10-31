@@ -57,9 +57,11 @@ public class KeeperVirtueCS implements CosmeticSkill {
 	public ItemStack getHeldItem(KeeperVirtue.VirtueMode mode) {
 		ItemStack item;
 		switch (mode) {
-			case ACTIVE_GENERIC, ACTIVE_COMBAT -> item = DisplayEntityUtils.generateRPItem(Material.STICK, "Staff of the Soulseeker");
-			case ACTIVE_SUPPORT -> item = DisplayEntityUtils.generateRPItem(Material.SPLASH_POTION, "Potion of Redemption");
-			default -> item =DisplayEntityUtils.generateRPItem(Material.POTION, "Salazar's Breath");
+			case ACTIVE_GENERIC, ACTIVE_COMBAT ->
+				item = DisplayEntityUtils.generateRPItem(Material.STICK, "Staff of the Soulseeker");
+			case ACTIVE_SUPPORT ->
+				item = DisplayEntityUtils.generateRPItem(Material.SPLASH_POTION, "Potion of Redemption");
+			default -> item = DisplayEntityUtils.generateRPItem(Material.POTION, "Salazar's Breath");
 		}
 		return item;
 	}

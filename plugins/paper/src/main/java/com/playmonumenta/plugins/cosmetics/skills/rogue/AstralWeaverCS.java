@@ -45,6 +45,7 @@ public class AstralWeaverCS extends DodgingCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				for (Vector v : fullStar) {

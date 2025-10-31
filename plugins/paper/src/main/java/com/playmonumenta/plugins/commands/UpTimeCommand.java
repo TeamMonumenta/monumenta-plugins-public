@@ -17,11 +17,11 @@ public class UpTimeCommand {
 
 	public static void register() {
 		new CommandAPICommand("uptime")
-		.withPermission(CommandPermission.fromString("monumenta.command.uptime"))
-		.executes((sender, args) -> {
-			return run(sender);
-		})
-		.register();
+			.withPermission(CommandPermission.fromString("monumenta.command.uptime"))
+			.executes((sender, args) -> {
+				return run(sender);
+			})
+			.register();
 	}
 
 	private static int run(CommandSender sender) {

@@ -14,11 +14,11 @@ import org.bukkit.util.Vector;
 public class SpellCraftDaggerAnimation extends Spell {
 
 	private final Location mDaggerLoc;
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 
 	private final Particle PARTICLE = Particle.FIREWORKS_SPARK;
 
-	private List<Location> mParticleLocationList;
+	private final List<Location> mParticleLocationList;
 
 	private int mTicks; // Animation Ticks.
 

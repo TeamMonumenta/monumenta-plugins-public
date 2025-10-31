@@ -2,7 +2,8 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.WormBoss;
-import com.playmonumenta.plugins.effects.*;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.ZeroArgumentEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;

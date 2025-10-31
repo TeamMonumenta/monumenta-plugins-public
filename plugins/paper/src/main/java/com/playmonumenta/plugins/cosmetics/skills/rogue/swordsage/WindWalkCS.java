@@ -38,7 +38,7 @@ public class WindWalkCS implements CosmeticSkill {
 	}
 
 	public void trailEffect(Player mPlayer, int mTicks) {
-		new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7/Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7 / Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
 	}
 
 	public void enemyStunEffect(Player mPlayer, LivingEntity mob, World world) {

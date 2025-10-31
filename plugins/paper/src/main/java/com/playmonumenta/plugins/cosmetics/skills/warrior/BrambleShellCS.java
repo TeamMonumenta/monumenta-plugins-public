@@ -29,9 +29,9 @@ public class BrambleShellCS extends CounterStrikeCS implements DepthsCS {
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-				"Earthen thorns envelop your body,",
-				"ready to thrash out at anything that",
-				"threatens them.");
+			"Earthen thorns envelop your body,",
+			"ready to thrash out at anything that",
+			"threatens them.");
 	}
 
 	@Override
@@ -92,6 +92,7 @@ public class BrambleShellCS extends CounterStrikeCS implements DepthsCS {
 			int mSizeCounter = 0;
 			final int DURATION = 4;
 			final int ITERATIONS = 4;
+
 			@Override
 			public void run() {
 				mT++;

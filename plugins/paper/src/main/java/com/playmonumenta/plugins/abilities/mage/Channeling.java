@@ -43,8 +43,8 @@ public class Channeling extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE
-			    && mCast
-			    && mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.MAGIC_WAND) > 0) {
+			&& mCast
+			&& mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.MAGIC_WAND) > 0) {
 			event.updateDamageWithMultiplier(1 + mDamage);
 			mCast = false;
 		}

@@ -11,8 +11,8 @@ public final class BluePercentDamageDealt extends PercentDamageDealt {
 	public static final String effectID = "BluePercentDamageDealt";
 
 	public BluePercentDamageDealt(final int duration, final double amount,
-								  final @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes,
-								  final String effectID) {
+	                              final @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes,
+	                              final String effectID) {
 		super(duration, amount, affectedDamageTypes, effectID);
 	}
 

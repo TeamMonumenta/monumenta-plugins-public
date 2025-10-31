@@ -51,8 +51,8 @@ public final class ExperiencinatorSettings {
 		}
 
 		int newPacked = packed
-				- ((packed % (10 * digit)) / digit) * digit // remove existing setting
-				+ digit * conversionId; // add new setting
+			- ((packed % (10 * digit)) / digit) * digit // remove existing setting
+			+ digit * conversionId; // add new setting
 
 		mPacked.put(region, newPacked);
 

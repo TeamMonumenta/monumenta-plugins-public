@@ -26,6 +26,15 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
@@ -48,16 +57,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.stream.Collectors;
 
 
 public class DiscoBall extends DepthsAbility {
@@ -359,7 +358,7 @@ public class DiscoBall extends DepthsAbility {
 		return getDecoratedString(treeNames, currComponent);
 	}
 
-	private static Component getDecoratedString(List<DepthsTree> trees, Component currComponent){
+	private static Component getDecoratedString(List<DepthsTree> trees, Component currComponent) {
 		for (DepthsTree tree : trees) {
 			String display = tree.getDisplayName() + " (" + tree.getSymbol() + ")  ";
 			Component decorated = tree.getColor().apply(display);
@@ -367,6 +366,7 @@ public class DiscoBall extends DepthsAbility {
 		}
 		return currComponent;
 	}
+
 	private static Set<DepthsTree> getActiveDepthTreesFromParty(DepthsParty party) {
 		Set<DepthsTree> activeTrees = new HashSet<>();
 		party.mPlayersInParty.forEach(dPlayer -> {

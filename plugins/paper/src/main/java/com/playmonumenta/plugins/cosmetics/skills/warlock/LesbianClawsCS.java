@@ -158,7 +158,8 @@ public class LesbianClawsCS extends GraspingClawsCS {
 		loc.setPitch(0);
 		for (Color color : LESBIAN_COLORS) {
 			ParticleUtils.launchOrb(new Vector(0, 0.25, 0), loc.clone().add(VectorUtils.randomUnitVector().multiply(radius)),
-				player, mob, 5 * 20, loc, new Particle.DustOptions(color, 1.84f), entity -> { });
+				player, mob, 5 * 20, loc, new Particle.DustOptions(color, 1.84f), entity -> {
+				});
 		}
 		World world = player.getWorld();
 		world.playSound(loc, Sound.BLOCK_TRIAL_SPAWNER_BREAK, SoundCategory.PLAYERS, 1.0f, 0.0f);

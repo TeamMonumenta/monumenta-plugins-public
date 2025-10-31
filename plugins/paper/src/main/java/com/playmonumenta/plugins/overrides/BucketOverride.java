@@ -37,7 +37,7 @@ public class BucketOverride extends BaseOverride {
 			if (realBlock != null) {
 				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
 					// Also send blocks nearby because the client doesn't send the proper direction that is uses to remove the block, but one delayed by a tick, so it can update the wrong block
-					for (BlockFace face : new BlockFace[] {BlockFace.SELF, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN}) {
+					for (BlockFace face : new BlockFace[]{BlockFace.SELF, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN}) {
 						Block b = realBlock.getRelative(face);
 						player.sendBlockChange(b.getLocation(), b.getBlockData());
 					}
@@ -54,11 +54,9 @@ public class BucketOverride extends BaseOverride {
 			return true;
 		} else if (clickedEntity instanceof Cow || clickedEntity instanceof Goat) {
 			return false;
-		} else if ((clickedEntity instanceof Fish || clickedEntity instanceof Axolotl) && (clickedEntity.isInvulnerable() || !ZoneUtils.isInPlot(clickedEntity))) {
-			return false;
+		} else {
+			return (!(clickedEntity instanceof Fish) && !(clickedEntity instanceof Axolotl)) || (!clickedEntity.isInvulnerable() && ZoneUtils.isInPlot(clickedEntity));
 		}
-
-		return true;
 	}
 
 	@Override
@@ -68,10 +66,8 @@ public class BucketOverride extends BaseOverride {
 			return false;
 		} else if (blockType.equals(Material.DISPENSER)) {
 			return ZoneUtils.isInPlot(block.getLocation());
-		} else if (blockType.equals(Material.DROPPER)) {
-			return true;
+		} else {
+			return blockType.equals(Material.DROPPER);
 		}
-
-		return false;
 	}
 }

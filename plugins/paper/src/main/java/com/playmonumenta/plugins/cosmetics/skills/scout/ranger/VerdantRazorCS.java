@@ -104,6 +104,7 @@ public class VerdantRazorCS extends WhirlingBladeCS {
 			final Particle.DustTransition GREEN = new Particle.DustTransition(Color.fromRGB(140, 210, 45), Color.fromRGB(70, 105, 27), 1.2f);
 			new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					if (mTicks >= 4) {

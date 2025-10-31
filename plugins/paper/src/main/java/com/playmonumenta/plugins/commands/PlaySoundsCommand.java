@@ -38,48 +38,48 @@ public class PlaySoundsCommand {
 	@SuppressWarnings("PMD.EmptyCatchBlock")
 	public static void register() {
 		MultiLiteralArgument soundCategoryArgument = new MultiLiteralArgument("category",
-				Arrays.stream(Sound.Source.values()).map(c -> c.name().toLowerCase(Locale.ROOT)).toArray(String[]::new));
+			Arrays.stream(Sound.Source.values()).map(c -> c.name().toLowerCase(Locale.ROOT)).toArray(String[]::new));
 		Argument<?> soundsArgument = new GreedyStringArgument("sounds")
-				.replaceSuggestions((info, builder) -> {
-					AtomicReference<SuggestionsBuilder> builderRef = new AtomicReference<>(builder);
-					try {
-						parseSoundEvents(info.currentArg(), info.currentInput().length() - info.currentArg().length(), Sound.Source.MASTER, builderRef);
-					} catch (CommandUtils.ParseFailedException ignore) {
-						// ignore
-					}
-					return Objects.requireNonNull(builderRef.get()).buildFuture();
-				});
+			.replaceSuggestions((info, builder) -> {
+				AtomicReference<SuggestionsBuilder> builderRef = new AtomicReference<>(builder);
+				try {
+					parseSoundEvents(info.currentArg(), info.currentInput().length() - info.currentArg().length(), Sound.Source.MASTER, builderRef);
+				} catch (CommandUtils.ParseFailedException ignore) {
+					// ignore
+				}
+				return Objects.requireNonNull(builderRef.get()).buildFuture();
+			});
 
 		new CommandAPICommand("playsounds")
-				.withPermission("monumenta.command.playsounds")
-				.withArguments(
-						new EntitySelectorArgument.ManyPlayers("players"),
-						new LocationArgument("location"),
-						soundCategoryArgument,
-						soundsArgument
-				).executes((sender, args) -> {
-					Location location = Objects.requireNonNull(args.getUnchecked("location"));
-					execute(args.getUnchecked("players"),
-							(audience, sound) -> audience.playSound(sound, location.getX(), location.getY(), location.getZ()),
-							Objects.requireNonNull(args.getUnchecked("category")),
-							args.getUnchecked("sounds"));
-				}).register();
+			.withPermission("monumenta.command.playsounds")
+			.withArguments(
+				new EntitySelectorArgument.ManyPlayers("players"),
+				new LocationArgument("location"),
+				soundCategoryArgument,
+				soundsArgument
+			).executes((sender, args) -> {
+				Location location = Objects.requireNonNull(args.getUnchecked("location"));
+				execute(args.getUnchecked("players"),
+					(audience, sound) -> audience.playSound(sound, location.getX(), location.getY(), location.getZ()),
+					Objects.requireNonNull(args.getUnchecked("category")),
+					args.getUnchecked("sounds"));
+			}).register();
 
 		new CommandAPICommand("playsounds")
-				.withPermission("monumenta.command.playsounds")
-				.withArguments(
-						new EntitySelectorArgument.ManyPlayers("players"),
-						new EntitySelectorArgument.OneEntity("entity"),
-						soundCategoryArgument,
-						soundsArgument
-				).executes((sender, args) -> {
-					Entity entity = Objects.requireNonNull(args.getUnchecked("entity"));
-					execute(args.getUnchecked("players"),
-							(audience, sound) -> audience.playSound(sound, entity),
-							Objects.requireNonNull(args.getUnchecked("category")),
-							args.getUnchecked("sounds"));
-				})
-				.register();
+			.withPermission("monumenta.command.playsounds")
+			.withArguments(
+				new EntitySelectorArgument.ManyPlayers("players"),
+				new EntitySelectorArgument.OneEntity("entity"),
+				soundCategoryArgument,
+				soundsArgument
+			).executes((sender, args) -> {
+				Entity entity = Objects.requireNonNull(args.getUnchecked("entity"));
+				execute(args.getUnchecked("players"),
+					(audience, sound) -> audience.playSound(sound, entity),
+					Objects.requireNonNull(args.getUnchecked("category")),
+					args.getUnchecked("sounds"));
+			})
+			.register();
 	}
 
 	private static void execute(Collection<Player> players, BiConsumer<Audience, Sound> playSoundFunction, String source, String sounds) throws WrapperCommandSyntaxException {
@@ -102,7 +102,8 @@ public class PlaySoundsCommand {
 	}
 
 	private abstract static class Event {
-		@MonotonicNonNull Event mNextEvent;
+		@MonotonicNonNull
+		Event mNextEvent;
 
 		abstract void run(Consumer<Sound> playSound, Runnable onFinish);
 	}
@@ -207,13 +208,13 @@ public class PlaySoundsCommand {
 					do {
 						Sound.Builder soundBuilder = Sound.sound();
 						soundBuilder.type(scanner.<Key>scanToken(prefix -> Arrays.stream(org.bukkit.Sound.values()).map(s -> s.key().toString()).filter(key -> key.contains(prefix)).toList(),
-								s -> {
-									try {
-										return Key.key(s);
-									} catch (InvalidKeyException e) {
-										return null;
-									}
-								}));
+							s -> {
+								try {
+									return Key.key(s);
+								} catch (InvalidKeyException e) {
+									return null;
+								}
+							}));
 						scanner.next(' ');
 						soundBuilder.volume(scanner.scanFloat(0, Float.MAX_VALUE, 1));
 						if (scanner.tryNext(' ')) {

@@ -20,9 +20,9 @@ public class ParticlesCommand {
 		new CommandAPICommand("particles")
 			.withArguments(
 				new MultiLiteralArgument("category", Arrays.stream(ParticleCategory.values())
-					                         .filter(cat -> cat.mObjectiveName != null)
-					                         .map(cat -> cat.name().toLowerCase(Locale.ROOT))
-					                         .toArray(String[]::new)),
+					.filter(cat -> cat.mObjectiveName != null)
+					.map(cat -> cat.name().toLowerCase(Locale.ROOT))
+					.toArray(String[]::new)),
 				new IntegerArgument("multiplier")
 			)
 			.executesPlayer((player, args) -> {
@@ -42,9 +42,9 @@ public class ParticlesCommand {
 				ScoreboardUtils.setScoreboardValue(player, category.mObjectiveName, multiplier);
 				ParticleManager.updateParticleSettings(player);
 				player.sendMessage(Component.text("Your particle multiplier for ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-					                   .append(Component.text(category.mDisplayName, NamedTextColor.WHITE))
-					                   .append(Component.text(" is now ", NamedTextColor.GRAY))
-					                   .append(Component.text(multiplier, NamedTextColor.WHITE)));
+					.append(Component.text(category.mDisplayName, NamedTextColor.WHITE))
+					.append(Component.text(" is now ", NamedTextColor.GRAY))
+					.append(Component.text(multiplier, NamedTextColor.WHITE)));
 
 			})
 			.register();

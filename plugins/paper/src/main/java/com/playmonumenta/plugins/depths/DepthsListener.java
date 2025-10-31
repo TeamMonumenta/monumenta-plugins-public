@@ -662,7 +662,7 @@ public class DepthsListener implements Listener {
 		}
 		dp.mLastLogoutTime = System.currentTimeMillis();
 		if (
-				!Plugin.getInstance().mPlayerListener.isPlayerTransferring(player) &&
+			!Plugin.getInstance().mPlayerListener.isPlayerTransferring(player) &&
 				event.getReason() == PlayerQuitEvent.QuitReason.DISCONNECTED
 		) {
 			if (dp.getContent() == DepthsContent.DARKEST_DEPTHS) {

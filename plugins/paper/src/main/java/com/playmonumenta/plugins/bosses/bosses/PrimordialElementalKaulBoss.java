@@ -65,9 +65,9 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 					0.4, 0.35, Material.BROWN_CONCRETE.createBlockData()).spawnAsEntityActive(boss)
 			),
 			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-				                                                   || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-				                                                   || b.getLocation().getBlock().getType() == Material.LAVA
-				                                                   || b.getLocation().getBlock().getType() == Material.WATER),
+				|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+				|| b.getLocation().getBlock().getType() == Material.LAVA
+				|| b.getLocation().getBlock().getType() == Material.WATER),
 			new SpellShieldStun(30 * 20)
 		);
 

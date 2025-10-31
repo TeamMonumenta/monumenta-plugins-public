@@ -46,34 +46,34 @@ public class CloseTheDistance extends Spell {
 				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 2f);
 				new PartialParticle(Particle.CLOUD, loc, 15).delta(1, 0, 1).spawnAsBoss();
 			}, (World world, Location loc) -> {
-				world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
-				new PartialParticle(Particle.CLOUD, loc, 15).delta(1, 0, 1).spawnAsBoss();
-			}, (World world, Location loc) -> {
-				new PartialParticle(Particle.REDSTONE, loc, 4).delta(0.5, 0.5, 0.5).data(new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsBoss();
-			}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
-				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
-					List.of(
-						new SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
-							new PartialParticle(Particle.SWEEP_ATTACK, loc, 1).spawnAsBoss();
+			world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
+			new PartialParticle(Particle.CLOUD, loc, 15).delta(1, 0, 1).spawnAsBoss();
+		}, (World world, Location loc) -> {
+			new PartialParticle(Particle.REDSTONE, loc, 4).delta(0.5, 0.5, 0.5).data(new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsBoss();
+		}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
+			ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
+				List.of(
+					new SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
+						new PartialParticle(Particle.SWEEP_ATTACK, loc, 1).spawnAsBoss();
 
-						})
-					));
+					})
+				));
 
-				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 1.25F);
-				world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.HOSTILE, 2, 0);
+			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 1.25F);
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.HOSTILE, 2, 0);
 
-				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 2f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 2f);
 
-				new PartialParticle(Particle.SMOKE_LARGE, loc, 60).extra(0.3).spawnAsBoss();
+			new PartialParticle(Particle.SMOKE_LARGE, loc, 60).extra(0.3).spawnAsBoss();
 
-				if (player != null) {
-					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MELEE_SKILL, mDamage);
-					return;
-				}
-				for (Player p : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
-					BossUtils.blockableDamage(boss, p, DamageEvent.DamageType.MELEE_SKILL, mDamage);
-				}
+			if (player != null) {
+				BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MELEE_SKILL, mDamage);
+				return;
 			}
+			for (Player p : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
+				BossUtils.blockableDamage(boss, p, DamageEvent.DamageType.MELEE_SKILL, mDamage);
+			}
+		}
 		);
 	}
 

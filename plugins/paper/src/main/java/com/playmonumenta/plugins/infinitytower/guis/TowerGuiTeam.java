@@ -100,7 +100,6 @@ public class TowerGuiTeam extends CustomInventory {
 	}
 
 
-
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
@@ -134,10 +133,7 @@ public class TowerGuiTeam extends CustomInventory {
 		}
 
 
-
-
 	}
-
 
 
 }

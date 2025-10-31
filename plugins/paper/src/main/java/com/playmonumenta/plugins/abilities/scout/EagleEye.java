@@ -67,7 +67,7 @@ public class EagleEye extends Ability {
 			.simpleDescription("Reveal nearby mobs, making them more vulnerable to attacks.")
 			.cooldown(EAGLE_EYE_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EagleEye::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).fallThrough()
-				                                                                     .keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.ENDER_EYE);
 
 	private final double mVulnLevel;

@@ -39,7 +39,7 @@ public class Blizzard extends Ability {
 	public static final int SIZE_2 = 10;
 	public static final double SLOW_MULTIPLIER_1 = 0.25;
 	public static final double SLOW_MULTIPLIER_2 = 0.3;
-	public static final int DAMAGE_INTERVAL = 1 * Constants.TICKS_PER_SECOND;
+	public static final int DAMAGE_INTERVAL = Constants.TICKS_PER_SECOND;
 	public static final int SLOW_INTERVAL = (int) (0.5 * Constants.TICKS_PER_SECOND);
 	public static final int DURATION_TICKS = 10 * Constants.TICKS_PER_SECOND;
 	public static final int SLOW_TICKS = 5 * Constants.TICKS_PER_SECOND;

@@ -89,7 +89,7 @@ public class SpellDuelist extends Spell {
 			}
 
 			BukkitRunnable attack = new BukkitRunnable() {
-				List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4, true);
+				final List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4, true);
 				int mTime = 0;
 
 				@Override
@@ -144,9 +144,9 @@ public class SpellDuelist extends Spell {
 			}
 
 			BukkitRunnable attack = new BukkitRunnable() {
-				List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4, true);
+				final List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4, true);
 				int mTime = 0;
-				Vector mDirection = direction;
+				final Vector mDirection = direction;
 
 				@Override
 				public void run() {
@@ -191,7 +191,7 @@ public class SpellDuelist extends Spell {
 			}
 
 			BukkitRunnable attack = new BukkitRunnable() {
-				List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4, true);
+				final List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), RANGE * 4, true);
 				int mTime = 0;
 
 				@Override

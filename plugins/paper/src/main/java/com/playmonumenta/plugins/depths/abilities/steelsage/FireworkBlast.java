@@ -102,6 +102,7 @@ public class FireworkBlast extends DepthsAbility {
 			final Vector mDir = dir.clone();
 			Vector mSpiral1 = VectorUtils.rotateTargetDirection(mDir, 0, -90).multiply(0.5);
 			Vector mSpiral2 = VectorUtils.rotateTargetDirection(mDir, 0, -90).multiply(0.8);
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 4; i++) {

@@ -201,14 +201,10 @@ public class PurpleTessOverride extends BaseOverride {
 			player.sendMessage(Component.text("You must finish Primeval Creations 013-2 Wools before you can use this tesseract.", NamedTextColor.RED));
 			return false;
 		}
-		if (ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.DISABLE_PURPLE_TESS) ||
-			DISALLOWED_GAMEMODES.contains(player.getGameMode()) ||
-			ItemStatUtils.hasInfusion(item, InfusionType.SHATTERED) ||
-			!player.hasPermission("monumenta.tesseract.purple") ||
-			player.getScoreboardTags().contains("DungeonRace")
-		) {
-			return false;
-		}
-		return true;
+		return !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.DISABLE_PURPLE_TESS) &&
+			!DISALLOWED_GAMEMODES.contains(player.getGameMode()) &&
+			!ItemStatUtils.hasInfusion(item, InfusionType.SHATTERED) &&
+			player.hasPermission("monumenta.tesseract.purple") &&
+			!player.getScoreboardTags().contains("DungeonRace");
 	}
 }

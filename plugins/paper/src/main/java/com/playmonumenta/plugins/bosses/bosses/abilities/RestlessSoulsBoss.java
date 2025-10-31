@@ -67,7 +67,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 			Bukkit.getScheduler().runTask(mMonPlugin, () -> {
 				mAbilities = Stream.of(CholericFlames.class, GraspingClaws.class,
 						MelancholicLament.class, HauntingShades.class, WitheringGaze.class)
-					             .map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
+					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
 			});
 		}
 		cosmetic.createTeam().addEntity(mBoss);

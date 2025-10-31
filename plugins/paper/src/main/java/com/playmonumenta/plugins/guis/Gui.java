@@ -71,8 +71,8 @@ public abstract class Gui {
 
 		List<HumanEntity> oldViewers = Collections.emptyList();
 		if (mSize != mCustomInventory.getInventory().getSize()
-			    || mTitleDirty
-			    || mCustomInventory.mDiscarded) {
+			|| mTitleDirty
+			|| mCustomInventory.mDiscarded) {
 			oldViewers = new ArrayList<>(mCustomInventory.getInventory().getViewers());
 			mCustomInventory.discard();
 			mCustomInventory = new GuiCustomInventory(mSize, mTitle);

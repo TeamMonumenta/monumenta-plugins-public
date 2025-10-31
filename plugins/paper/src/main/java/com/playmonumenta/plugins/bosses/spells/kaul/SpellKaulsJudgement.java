@@ -130,7 +130,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		world.playSound(mBossLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 2);
 		new PartialParticle(Particle.SMOKE_LARGE, mBossLoc, 50, 0.5, 0.25, 0.5, 0).spawnAsBoss();
 
-		int amount = Math.max(2, (players.size() + 1)/2);
+		int amount = Math.max(2, (players.size() + 1) / 2);
 		Collections.shuffle(players);
 		while (players.size() > amount) {
 			players.remove(0);

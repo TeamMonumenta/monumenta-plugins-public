@@ -12,6 +12,10 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,11 +28,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
@@ -54,6 +53,7 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 	private Location mLastLocation = mMob.getLocation();
 	private int mNoTargetTicks = 0;
 	private int mLowMovementTicks = 0;
+
 	public BlockPlacerBoss(final Plugin plugin, final LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParameters = BossParameters.getParameters(boss, identityTag, new BlockPlacerBoss.Parameters());

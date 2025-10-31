@@ -46,13 +46,13 @@ public class Armor implements Attribute {
 	/**
 	 * Calculates the amount to multiply incoming damage with for the given values of armor, agility, etc.
 	 *
-	 * @param armor         Total armor value
-	 * @param armorEnchantLevel     Total secondary armor enchantment level, see {@link #getSecondaryEnchantsMod(DamageEvent, Plugin, Player)}
-	 * @param agility       Total agility value
-	 * @param agilityEnchantLevel   Total secondary agility enchantment level, see {@link Agility#getSecondaryEnchantsLevel(DamageEvent, Plugin, Player)}
-	 * @param adaptability  Whether the {@link Adaptability} enchantment is present
-	 * @param epf           EPF from protection enchantments
-	 * @param environmental Whether the damage is environmental
+	 * @param armor               Total armor value
+	 * @param armorEnchantLevel   Total secondary armor enchantment level, see {@link #getSecondaryEnchantsMod(DamageEvent, Plugin, Player)}
+	 * @param agility             Total agility value
+	 * @param agilityEnchantLevel Total secondary agility enchantment level, see {@link Agility#getSecondaryEnchantsLevel(DamageEvent, Plugin, Player)}
+	 * @param adaptability        Whether the {@link Adaptability} enchantment is present
+	 * @param epf                 EPF from protection enchantments
+	 * @param environmental       Whether the damage is environmental
 	 * @return Damage multiplier
 	 */
 	public static double getDamageMultiplier(double armor, double armorEnchantLevel, double agility, double agilityEnchantLevel, double secondaryEnchantsCap, double secondaryEHPMultiplierPerLevel, boolean adaptability, double epf, boolean environmental) {
@@ -104,10 +104,10 @@ public class Armor implements Attribute {
 	 */
 	public static double getSecondaryEnchantsMod(DamageEvent event, Plugin plugin, Player player) {
 		return Shielding.applyShielding(event, plugin, player)
-			       + Inure.applyInure(event, plugin, player)
-			       + Steadfast.applySteadfast(event, plugin, player)
-			       + Poise.applyPoise(event, plugin, player)
-			       + Guard.applyGuard(event, plugin, player);
+			+ Inure.applyInure(event, plugin, player)
+			+ Steadfast.applySteadfast(event, plugin, player)
+			+ Poise.applyPoise(event, plugin, player)
+			+ Guard.applyGuard(event, plugin, player);
 	}
 
 }

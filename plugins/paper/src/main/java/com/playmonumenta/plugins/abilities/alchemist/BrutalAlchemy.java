@@ -18,7 +18,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BrutalAlchemy extends Ability implements PotionAbility {
 	private static final int BRUTAL_ALCHEMY_DURATION = 8 * 20;
-	private static final int BRUTAL_ALCHEMY_PERIOD = 1 * 20;
+	private static final int BRUTAL_ALCHEMY_PERIOD = 20;
 	private static final double BRUTAL_ALCHEMY_1_DOT_MULTIPLIER = 0.20;
 	private static final double BRUTAL_ALCHEMY_2_DOT_MULTIPLIER = 0.35;
 	private static final double BRUTAL_ALCHEMY_ENHANCED_DOT_MULTIPLIER = 0.20;

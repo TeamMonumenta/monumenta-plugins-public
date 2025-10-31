@@ -99,7 +99,7 @@ public class SeasonalEventListener implements Listener {
 
 	public static void playerRushRound(Player p) {
 		for (Mission mission : SeasonalEventManager.getActiveMissions()) {
-			if(mission.mType == MissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.RUSH_WAVE)) {
+			if (mission.mType == MissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.RUSH_WAVE)) {
 				SeasonalEventManager.addMissionProgress(p, mission, 1);
 			}
 		}

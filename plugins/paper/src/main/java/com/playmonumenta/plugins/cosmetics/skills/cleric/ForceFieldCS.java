@@ -66,6 +66,7 @@ public class ForceFieldCS extends SanctifiedArmorCS {
 		world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.PLAYERS, 0.8f, 0.8f);
 		new BukkitRunnable() {
 			int mInt = 0;
+
 			@Override
 			public void run() {
 				new PPCircle(Particle.REDSTONE, l.clone().add(0, 0.5 * mInt, 0), 1.2 - 0.04 * mInt * mInt).arcDegree(d[0] + 22.5 - 7.5 * mInt, d[0] + 157.5 + 7.5 * mInt).countPerMeter(6).delta(0.03, 0.03, 0.03).data(CYAN).spawnAsPlayerActive(player);

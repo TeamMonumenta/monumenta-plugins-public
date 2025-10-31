@@ -155,7 +155,7 @@ public class DungeonAccessCommand extends GenericCommand {
 			-> Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> { // must run on main server thread
 			// Neither delvePreset nor shardName are null if useDelvePreset is true, but nullaway won't let me remove this
 			// When starting a challenge delve, this runs twice. Entropy rolls gets overriden as a result.
-			if (useDelvePreset && delvePreset != null && shardName != null && !delvePreset.mModifiers.containsKey((DelvesModifier.ENTROPY))) {
+			if (useDelvePreset && delvePreset != null && shardName != null && !delvePreset.mModifiers.containsKey(DelvesModifier.ENTROPY)) {
 				DelvesManager.savePlayerData(keyPlayer, shardName, delvePreset.mModifiers, delvePreset.mId);
 			}
 			if (mapping.getFinishedName() != null) {

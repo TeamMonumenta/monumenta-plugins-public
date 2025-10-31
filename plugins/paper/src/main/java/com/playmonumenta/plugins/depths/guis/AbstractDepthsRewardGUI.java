@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class AbstractDepthsRewardGUI extends Gui {
 
 	public static final List<List<Integer>> SLOT_MAP = Arrays.asList(
-		Arrays.asList(13),
+		List.of(13),
 		Arrays.asList(11, 15),
 		Arrays.asList(10, 13, 16),
 		Arrays.asList(10, 12, 14, 16),

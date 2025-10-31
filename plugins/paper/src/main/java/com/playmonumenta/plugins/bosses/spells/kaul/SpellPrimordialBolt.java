@@ -44,7 +44,7 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 		Material.NETHERRACK,
 		Material.MAGMA_BLOCK
 	);
-	private ChargeUpManager mChargeUpManager;
+	private final ChargeUpManager mChargeUpManager;
 
 	public SpellPrimordialBolt(Plugin plugin, LivingEntity boss) {
 		super(plugin, boss, 20 * 2, 20 * 5, 1.1, PrimordialElementalKaulBoss.detectionRange, 0.5, false, true, 1, 1,

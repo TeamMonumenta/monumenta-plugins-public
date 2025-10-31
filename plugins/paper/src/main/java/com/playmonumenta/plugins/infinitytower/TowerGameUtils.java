@@ -304,7 +304,6 @@ public class TowerGameUtils {
 	}
 
 
-
 	//---------------------------Game utils - giveLoot and msg-------------------------------------
 
 	public static void giveLoot(TowerGame game) {

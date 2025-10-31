@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.utils;
 
-import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
@@ -34,15 +33,18 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class BossUtils {
 	/**
 	 * Returns boss health scaling coefficient.
 	 * Multiply base health to get final health.
 	 * Inverse the coefficient to get damage reduction.
 	 * Formula: coefficient = X ^ ((playerCount - 1) ^ Y)
+	 *
 	 * @param playerCount Player amount for health scaling
-	 * @param x Base exponent, increase X to increase health scaling. range = [0 < X < 1]
-	 * @param y Player count exponent, decrease Y to increase health scaling. range = [0 < Y < 1]
+	 * @param x           Base exponent, increase X to increase health scaling. range = [0 < X < 1]
+	 * @param y           Player count exponent, decrease Y to increase health scaling. range = [0 < Y < 1]
 	 */
 	public static double healthScalingCoef(int playerCount, double x, double y) {
 		if (playerCount < 1) {
@@ -74,7 +76,7 @@ public class BossUtils {
 		return false;
 	}
 
-	public static int calculateShieldStun(double damage, LivingEntity damagee){
+	public static int calculateShieldStun(double damage, LivingEntity damagee) {
 		int stunTicks = (int) (20 * damage / 2.5);
 
 		// adjust stun time based on region
@@ -187,7 +189,7 @@ public class BossUtils {
 	 * Returns whether the player survived (true) or was killed (false)
 	 */
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth,
-											@Nullable Location location, boolean raw, @Nullable String cause, boolean knockback, List<EffectsList.Effect> effects) {
+	                                        @Nullable Location location, boolean raw, @Nullable String cause, boolean knockback, List<EffectsList.Effect> effects) {
 		if (percentHealth <= 0) {
 			return true;
 		}
@@ -214,7 +216,7 @@ public class BossUtils {
 				int finalStunTicks = Sturdy.updateStunCooldown((int) (20 * percentHealth * 20), Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.STURDY));
 				NmsUtils.getVersionAdapter().stunShield(player, finalStunTicks);
 				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				ItemUtils.damageShield(player, (int)(percentHealth * 20 / 2.5));
+				ItemUtils.damageShield(player, (int) (percentHealth * 20 / 2.5));
 			}
 			if (ItemStatUtils.hasEnchantment(player.getInventory().getItemInOffHand(), EnchantmentType.RETALIATION)) {
 				new Retaliation().startEffect(player, effects, boss, true);
@@ -276,6 +278,7 @@ public class BossUtils {
 
 	/**
 	 * Adds modifiers to the existing map from the string
+	 *
 	 * @param s   a string like "[damage=10, cooldown=60, detectionrange=80, singletarget=true....]
 	 * @param map the map where the values will be added
 	 */
@@ -339,7 +342,7 @@ public class BossUtils {
 			} else if (c >= 'A' && c <= 'Z') {
 				stringBuilder.append(Character.toLowerCase(c));
 			}
- 		}
+		}
 		return stringBuilder.toString();
 	}
 
@@ -415,22 +418,23 @@ public class BossUtils {
 	}
 
 	public static void endBossFightEffects(final @Nullable LivingEntity boss, final Collection<Player> players,
-										   final int winEffectDuration) {
+	                                       final int winEffectDuration) {
 		endBossFightEffects(boss, players, winEffectDuration, false, false);
 	}
 
 	/**
 	 * Handles generic end of boss fight tasks for stateful bosses.
 	 * This should only be called by the overridden death method for each boss that uses it.
-	 * @param boss Boss to apply effects to. Defaults to null
-	 * @param players List of Players to apply effects to
+	 *
+	 * @param boss              Boss to apply effects to. Defaults to null
+	 * @param players           List of Players to apply effects to
 	 * @param winEffectDuration Duration of win effects to apply to players in ticks. Defaults to 10 seconds
-	 * @param keepBossAlive If true, make boss invulnerable, remove its AI, remove gravity, etc. Defaults to false
-	 * @param removeGlowing If true, remove glowing effect from boss. Defaults to false
+	 * @param keepBossAlive     If true, make boss invulnerable, remove its AI, remove gravity, etc. Defaults to false
+	 * @param removeGlowing     If true, remove glowing effect from boss. Defaults to false
 	 */
 	public static void endBossFightEffects(final @Nullable LivingEntity boss, final Collection<Player> players,
-										   final int winEffectDuration, final boolean keepBossAlive,
-										   final boolean removeGlowing) {
+	                                       final int winEffectDuration, final boolean keepBossAlive,
+	                                       final boolean removeGlowing) {
 		final String BOSS_WIN_RESISTANCE = "BossWinResistance";
 		final String BOSS_WIN_REGENERATION = "BossWinRegeneration";
 		final int REGENERATION_INTERVAL = 12;

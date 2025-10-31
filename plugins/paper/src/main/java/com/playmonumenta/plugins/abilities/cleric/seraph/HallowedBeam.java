@@ -189,11 +189,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 		}
 
 		mPlayerFilter = e -> ((e instanceof Player p && p != mPlayer && p.getGameMode() != GameMode.SPECTATOR) || (e instanceof Allay a && KeeperVirtue.allayBelongsTo(a, player)))
-		&& !e.isDead() && e.isValid()
-		// Do not heal if health is full
-		&& getPercentHealth((LivingEntity) e) <= mHealingThreshold
-		// Do not heal if there is a custom effect preventing heal
-		&& Plugin.getInstance().mEffectManager.getEffects(e, PercentHeal.class).stream()
+			&& !e.isDead() && e.isValid()
+			// Do not heal if health is full
+			&& getPercentHealth((LivingEntity) e) <= mHealingThreshold
+			// Do not heal if there is a custom effect preventing heal
+			&& Plugin.getInstance().mEffectManager.getEffects(e, PercentHeal.class).stream()
 			.filter(percentHeal -> percentHeal.getValue() < -0.995).findAny().isEmpty();
 		mHostileFilter = e -> e instanceof LivingEntity le && EntityUtils.isHostileMob(le) && !ScoreboardUtils.checkTag(le, AbilityUtils.IGNORE_TAG) && !le.isDead() && le.isValid();
 

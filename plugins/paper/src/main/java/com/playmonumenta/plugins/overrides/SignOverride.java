@@ -253,7 +253,7 @@ public class SignOverride extends BaseOverride {
 								signSideItem.line(lineNum, line);
 								Component loreLine = loreHeader.append(loreBase.append(line));
 								tempLoreLines.add(loreLine);
-								if(!MessagingUtils.plainText(line).isBlank()) {
+								if (!MessagingUtils.plainText(line).isBlank()) {
 									sideHasText = true;
 								}
 							}
@@ -266,7 +266,7 @@ public class SignOverride extends BaseOverride {
 
 							tempLoreLines.add(Component.text(COPIED_SIGN_DIVIDER, NamedTextColor.GOLD));
 
-							if(side != Side.BACK || sideHasText) {
+							if (side != Side.BACK || sideHasText) {
 								// back of sign shouldn't show in lore if there's no text on it
 								loreLines.addAll(tempLoreLines);
 							}

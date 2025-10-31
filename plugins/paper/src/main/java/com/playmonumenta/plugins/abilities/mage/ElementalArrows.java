@@ -54,7 +54,7 @@ public class ElementalArrows extends Ability {
 	public static final double ELEMENTAL_ARROWS_RADIUS = 3.0;
 	public static final double SLOW_AMPLIFIER = 0.2;
 	public static final int ENHANCED_ARROW_COOLDOWN = 8 * Constants.TICKS_PER_SECOND;
-	public static final int ENHANCED_ARROW_STUN_DURATION = 1 * Constants.TICKS_PER_SECOND;
+	public static final int ENHANCED_ARROW_STUN_DURATION = Constants.TICKS_PER_SECOND;
 	public static final String FIRE_ARROW_METAKEY = "ElementalArrowsFireArrow";
 	public static final String ICE_ARROW_METAKEY = "ElementalArrowsIceArrow";
 	public static final String THUNDER_ARROW_METAKEY = "ElementalArrowsThunderArrow";

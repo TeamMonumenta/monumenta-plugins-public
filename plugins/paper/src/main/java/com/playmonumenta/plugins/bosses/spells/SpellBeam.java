@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.List;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -25,8 +26,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
-
-import java.util.List;
 
 public class SpellBeam extends Spell {
 	protected final Plugin mPlugin;
@@ -113,7 +112,7 @@ public class SpellBeam extends Spell {
 		if (EntityUtils.shouldCancelSpells(mBoss)) {
 			return;
 		}
-		double yawRotation[] = new double[mParameters.SPLIT];
+		double[] yawRotation = new double[mParameters.SPLIT];
 		for (int i = 0; i < mParameters.SPLIT; i++) {
 			yawRotation[i] = Math.toRadians(mParameters.SPLIT_ANGLE * (i - (mParameters.SPLIT - 1) / 2.0));
 			int j = i;
@@ -176,16 +175,16 @@ public class SpellBeam extends Spell {
 		Vector beamRangeVector = direction.clone().normalize().multiply(beamRange);
 
 		final List<Player> struckPlayers =
-		Hitbox.approximateCylinder(center, center.clone().add(beamRangeVector), mParameters.HITBOX_SIZE, false)
-			.getHitPlayers(true);
+			Hitbox.approximateCylinder(center, center.clone().add(beamRangeVector), mParameters.HITBOX_SIZE, false)
+				.getHitPlayers(true);
 
-		for(Player player : struckPlayers) {
+		for (Player player : struckPlayers) {
 			mParameters.SOUND_HIT.play(player.getLocation());
 			if (mParameters.DAMAGE > 0) {
-				BossUtils.blockableDamage(mBoss, player, mParameters.DAMAGE_TYPE, mParameters.DAMAGE, !mParameters.RESPECT_IFRAMES, false, mParameters.NAME, mBoss.getLocation(), mParameters.EFFECTS.mEffectList);
+				BossUtils.blockableDamage(mBoss, player, mParameters.DAMAGE_TYPE, mParameters.DAMAGE, !mParameters.RESPECT_IFRAMES, false, mParameters.NAME, mBoss.getLocation(), mParameters.EFFECTS.mEffectList());
 			}
-			if(mParameters.TRUE_DAMAGE_PERCENTAGE > 0) {
-				DamageUtils.damagePercentHealth(mBoss, player, mParameters.TRUE_DAMAGE_PERCENTAGE, false, false, mParameters.NAME, true, mParameters.EFFECTS.mEffectList);
+			if (mParameters.TRUE_DAMAGE_PERCENTAGE > 0) {
+				DamageUtils.damagePercentHealth(mBoss, player, mParameters.TRUE_DAMAGE_PERCENTAGE, false, false, mParameters.NAME, true, mParameters.EFFECTS.mEffectList());
 			}
 			if (mParameters.KB_Y != 0 && mParameters.KB_XZ != 0) {
 				MovementUtils.knockAway(mBoss.getLocation(), player, mParameters.KB_XZ, mParameters.KB_Y, true);
@@ -250,10 +249,10 @@ public class SpellBeam extends Spell {
 	}
 
 	private boolean isValidTracking(LivingEntity target) {
-		if(target == null) {
+		if (target == null) {
 			return false;
 		}
-		return target.isValid() && !target.isDead()	&& target.getWorld().equals(mBoss.getWorld())
+		return target.isValid() && !target.isDead() && target.getWorld().equals(mBoss.getWorld())
 			&& !(target instanceof Player player && player.getGameMode().equals(GameMode.SPECTATOR));
 	}
 

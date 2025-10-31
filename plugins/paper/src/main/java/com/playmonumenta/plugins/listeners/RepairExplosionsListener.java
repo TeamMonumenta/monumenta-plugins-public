@@ -420,7 +420,7 @@ public class RepairExplosionsListener implements Listener {
 	private static boolean isEnabled(World world) {
 		Pattern repairExplosionsWorldPattern = ServerProperties.getRepairExplosionsWorldPattern();
 		return ServerProperties.getRepairExplosions()
-			       && (repairExplosionsWorldPattern == null || repairExplosionsWorldPattern.matcher(world.getName()).matches());
+			&& (repairExplosionsWorldPattern == null || repairExplosionsWorldPattern.matcher(world.getName()).matches());
 	}
 
 }

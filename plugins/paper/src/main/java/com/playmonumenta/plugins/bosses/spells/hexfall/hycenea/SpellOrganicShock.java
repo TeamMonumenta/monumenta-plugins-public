@@ -53,6 +53,7 @@ public class SpellOrganicShock extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 

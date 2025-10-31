@@ -40,10 +40,10 @@ public class CosmeticsGUI extends CustomInventory {
 	private static final int PREV_PAGE_LOC = 45;
 	private static final int NEXT_PAGE_LOC = 53;
 	static final int BACK_LOC = 49;
-	private static final int TITLE_LOC = 1 * 9 + 1;
-	private static final int ELITE_FINISHER_LOC = 1 * 9 + 3;
-	private static final int COSMETIC_SKILL_LOC = 1 * 9 + 5;
-	private static final int GRAVE_POSE_LOC = 1 * 9 + 7;
+	private static final int TITLE_LOC = 9 + 1;
+	private static final int ELITE_FINISHER_LOC = 9 + 3;
+	private static final int COSMETIC_SKILL_LOC = 9 + 5;
+	private static final int GRAVE_POSE_LOC = 9 + 7;
 	private static final int PLAYER_PUNCH_LOC = 3 * 9 + 2;
 	private static final int VANITY_LOC = 3 * 9 + 4;
 	private static final int UNLOCKED_VANITY_LOC = 3 * 9 + 6;
@@ -125,11 +125,11 @@ public class CosmeticsGUI extends CustomInventory {
 				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.PLAYERS, 1, 1);
 				player.sendMessage(
 					Component.text("Player Punches are only accessible to ", NamedTextColor.RED)
-					.append(Component.text("patrons", NamedTextColor.GOLD))
-					.append(Component.text(", ", NamedTextColor.RED))
-					.append(Component.text("moderators, and ", NamedTextColor.RED))
-					.append(Component.text("developers", NamedTextColor.DARK_GREEN))
-					.append(Component.text("!", NamedTextColor.RED))
+						.append(Component.text("patrons", NamedTextColor.GOLD))
+						.append(Component.text(", ", NamedTextColor.RED))
+						.append(Component.text("moderators, and ", NamedTextColor.RED))
+						.append(Component.text("developers", NamedTextColor.DARK_GREEN))
+						.append(Component.text("!", NamedTextColor.RED))
 				);
 			}
 			return;
@@ -309,7 +309,7 @@ public class CosmeticsGUI extends CustomInventory {
 
 		// Get list of cosmetics
 		List<Cosmetic> playerCosmetics = mCurrentAbility != null && mCurrentAbility.getLinkedSpell() == null ? List.of()
-			                                 : CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(targetPlayer, mDisplayPage, mCurrentAbility);
+			: CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(targetPlayer, mDisplayPage, mCurrentAbility);
 		if (playerCosmetics == null) {
 			mDisplayPage = null;
 			setUpCosmetics(targetPlayer);

@@ -7,14 +7,13 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-import net.kyori.adventure.text.Component;
-import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
+import net.kyori.adventure.text.Component;
+import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 public final class PercentDamageDealtSingleTick extends PercentDamageDealt {
 	public static final String effectID = "PercentDamageDealtSingleTick";
@@ -29,13 +28,13 @@ public final class PercentDamageDealtSingleTick extends PercentDamageDealt {
 	}
 
 	public PercentDamageDealtSingleTick(final int duration, final double amount,
-                                        final @Nullable EnumSet<DamageType> affectedDamageTypes, final boolean multiplicative) {
+	                                    final @Nullable EnumSet<DamageType> affectedDamageTypes, final boolean multiplicative) {
 		this(duration, amount, affectedDamageTypes, multiplicative, null);
 	}
 
 	public PercentDamageDealtSingleTick(final int duration, final double amount,
-                                        final @Nullable EnumSet<DamageType> affectedDamageTypes, final boolean multiplicative,
-                                        final @Nullable Consumer<DamageEvent> onUse) {
+	                                    final @Nullable EnumSet<DamageType> affectedDamageTypes, final boolean multiplicative,
+	                                    final @Nullable Consumer<DamageEvent> onUse) {
 		super(duration, amount, affectedDamageTypes, effectID);
 		mHasDoneDamage = false;
 		mDurationRemainingWhenTriggered = -2;

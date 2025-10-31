@@ -29,24 +29,9 @@ public class GlowingManager {
 	public static int PLAYER_ABILITY_PRIORITY = 100;
 	public static int BOSS_SPELL_PRIORITY = 1000;
 
-	public static class GlowingInstance {
-		public final boolean mGlowing;
-		public final NamedTextColor mTeamColor;
-		public final Color mDisplayColor;
-		public final int mUntilTick;
-		public final @Nullable Predicate<Player> mVisibleToPlayers;
-		public final int mPriority;
-		public final @Nullable String mReference;
-
-		public GlowingInstance(boolean glowing, NamedTextColor teamColor, Color displayColor, int untilTick, @Nullable Predicate<Player> visibleToPlayers, int priority, @Nullable String reference) {
-			mGlowing = glowing;
-			mTeamColor = teamColor;
-			mDisplayColor = displayColor;
-			mUntilTick = untilTick;
-			mVisibleToPlayers = visibleToPlayers;
-			mPriority = priority;
-			mReference = reference;
-		}
+	public record GlowingInstance(boolean mGlowing, NamedTextColor mTeamColor, Color mDisplayColor, int mUntilTick,
+	                              @Nullable Predicate<Player> mVisibleToPlayers, int mPriority,
+	                              @Nullable String mReference) {
 	}
 
 	private static class GlowingEntityData {
@@ -97,7 +82,7 @@ public class GlowingManager {
 
 	public static @Nullable ActiveGlowingEffect makeGlowImmune(Entity entity, int duration, int priority, @Nullable Predicate<Player> visibleToPlayers, @Nullable String reference) {
 		return startGlowing(entity, new GlowingInstance(false, NamedTextColor.WHITE, Color.WHITE,
-				duration < 0 ? Integer.MAX_VALUE : Bukkit.getCurrentTick() + duration, visibleToPlayers, priority, reference));
+			duration < 0 ? Integer.MAX_VALUE : Bukkit.getCurrentTick() + duration, visibleToPlayers, priority, reference));
 	}
 
 	public static @Nullable ActiveGlowingEffect startGlowing(Entity entity, NamedTextColor color, int duration, int priority) {
@@ -193,7 +178,7 @@ public class GlowingManager {
 			NamedTextColor sentColor = data.mSentPlayerData.get(player.getUniqueId());
 			boolean sentGlowing = sentColor != null;
 			if ((sentColor == null || activeInstance == null || !activeGlowing || !sentColor.equals(activeInstance.mTeamColor))
-				    && (sentGlowing || activeGlowing)) {
+				&& (sentGlowing || activeGlowing)) {
 				// glowing state or colour has changed, send update packets
 				if (activeInstance == null || !activeGlowing) {
 					data.mSentPlayerData.remove(player.getUniqueId());
@@ -207,7 +192,7 @@ public class GlowingManager {
 					}
 				} else {
 					GlowingReplacer.sendTeamUpdate(entity, player,
-							sentColor != null ? GlowingReplacer.getColoredGlowingTeamName(sentColor, entity) : null,
+						sentColor != null ? GlowingReplacer.getColoredGlowingTeamName(sentColor, entity) : null,
 						activeInstance != null && activeGlowing ? activeInstance.mTeamColor : null);
 				}
 

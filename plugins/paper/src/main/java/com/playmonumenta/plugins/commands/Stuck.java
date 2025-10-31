@@ -77,7 +77,7 @@ public class Stuck {
 						}
 						mTime--;
 					}
-				}.runTaskTimer(Plugin.getInstance(), 20 * 1, 20 * 1);
+				}.runTaskTimer(Plugin.getInstance(), 20, 20);
 			})
 			.register();
 	}

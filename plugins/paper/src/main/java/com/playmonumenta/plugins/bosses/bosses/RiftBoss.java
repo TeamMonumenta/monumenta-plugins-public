@@ -141,7 +141,7 @@ public class RiftBoss extends BossAbilityGroup {
 						Vector vector = loc.clone().toVector().subtract(mStartLoc.clone().toVector());
 						for (int i = 0; i < p.LINES; i++) {
 							double angleOffset = (p.SPLIT_ANGLE * Math.PI / 180) * (i - ((p.LINES - 1) / 2.0));
-							extraLocs.add(mStartLoc.clone().add(vector.clone().rotateAroundY(angleOffset % (2*Math.PI))));
+							extraLocs.add(mStartLoc.clone().add(vector.clone().rotateAroundY(angleOffset % (2 * Math.PI))));
 						}
 					}
 					locs.clear();
@@ -301,11 +301,11 @@ public class RiftBoss extends BossAbilityGroup {
 			private void directHit(LivingEntity target, Location loc) {
 				if (target != null) {
 					if (p.DIRECT_DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.DIRECT_DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList);
+						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.DIRECT_DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList());
 					}
 
 					if (p.DIRECT_DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DIRECT_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList);
+						BossUtils.bossDamagePercent(mBoss, target, p.DIRECT_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList());
 					}
 					p.EFFECTS.apply(target, boss);
 				}
@@ -314,11 +314,11 @@ public class RiftBoss extends BossAbilityGroup {
 			private void lingeringHit(LivingEntity target, Location loc) {
 				if (target != null) {
 					if (p.LINGERING_DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.LINGERING_DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList);
+						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.LINGERING_DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList());
 					}
 
 					if (p.LINGERING_DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.LINGERING_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList);
+						BossUtils.bossDamagePercent(mBoss, target, p.LINGERING_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList());
 					}
 					p.EFFECTS.apply(target, boss);
 				}

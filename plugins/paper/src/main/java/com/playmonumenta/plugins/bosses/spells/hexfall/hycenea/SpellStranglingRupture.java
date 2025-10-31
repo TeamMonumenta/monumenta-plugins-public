@@ -115,6 +115,7 @@ public class SpellStranglingRupture extends Spell {
 					mChargeUp.setTitle(Component.text("Casting ", NamedTextColor.YELLOW).append(Component.text(ABILITY_NAME, NamedTextColor.GOLD)));
 					BukkitRunnable bossBarRunnable = new BukkitRunnable() {
 						int mT = 0;
+
 						@Override
 						public void run() {
 							mChargeUp.setProgress((double) mT / mRuptureDelay);
@@ -145,6 +146,7 @@ public class SpellStranglingRupture extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				if (mT % 2 == 0) {

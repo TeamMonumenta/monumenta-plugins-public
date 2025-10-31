@@ -10,9 +10,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellConditionalTpBehindPlayer extends Spell {
 
-	private LivingEntity mLauncher;
-	private Plugin mPlugin;
-	private Predicate<Entity> mPredicate;
+	private final LivingEntity mLauncher;
+	private final Plugin mPlugin;
+	private final Predicate<Entity> mPredicate;
 	private boolean mCooldown = false;
 
 	public SpellConditionalTpBehindPlayer(Plugin plugin, LivingEntity launcher, Predicate<Entity> predicate) {
@@ -26,7 +26,8 @@ public class SpellConditionalTpBehindPlayer extends Spell {
 		if (mPredicate.test(mLauncher) && !mCooldown) {
 			mCooldown = true;
 			new BukkitRunnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					mCooldown = false;
 				}
 			}.runTaskLater(mPlugin, 20 * 10);

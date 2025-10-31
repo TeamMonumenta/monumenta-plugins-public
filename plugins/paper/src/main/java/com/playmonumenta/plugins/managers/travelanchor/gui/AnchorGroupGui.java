@@ -29,7 +29,7 @@ public class AnchorGroupGui extends Gui {
 	protected AnchorGroupView mView;
 
 	public AnchorGroupGui(Player player, EntityTravelAnchor entityTravelAnchor) {
-		super(player, 6*9, Component.text("Anchor Groups"));
+		super(player, 6 * 9, Component.text("Anchor Groups"));
 		mTravelAnchorEntity = entityTravelAnchor;
 		mWorldAnchorGroups = TravelAnchorManager.getInstance()
 			.anchorsInWorld(player.getWorld())

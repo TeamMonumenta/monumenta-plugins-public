@@ -102,7 +102,7 @@ public final class ExperiencinatorMainGui extends CustomInventory {
 			return;
 		}
 		if (event.getClick() != ClickType.RIGHT
-			    && event.getClick() != ClickType.LEFT) {
+			&& event.getClick() != ClickType.LEFT) {
 			return;
 		}
 		if (event.getSlot() == 11) {

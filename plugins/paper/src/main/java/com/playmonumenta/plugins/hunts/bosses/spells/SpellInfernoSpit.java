@@ -39,7 +39,7 @@ public class SpellInfernoSpit extends Spell implements CoreElemental.CoreElement
 	// Radius of the area after the projectile lands
 	private static final double AOE_RADIUS = 2.8;
 	// For how long the areas will last for
-	private static final int AOE_LINGER = 5*20;
+	private static final int AOE_LINGER = 5 * 20;
 	// Projectile damage
 	private static final int DAMAGE = 60;
 	// Area damage
@@ -66,6 +66,7 @@ public class SpellInfernoSpit extends Spell implements CoreElemental.CoreElement
 		BukkitRunnable runnable = new BukkitRunnable() {
 			double mRadius = 5;
 			int mT = 0;
+
 			@Override
 			public void run() {
 				// Telegraph
@@ -74,8 +75,8 @@ public class SpellInfernoSpit extends Spell implements CoreElemental.CoreElement
 					.delta(0.25)
 					.data(ORANGE_PARTICLE)
 					.spawnAsEntityActive(mBoss);
-				mRadius -= (double) 5/CHARGE_TIME;
-				mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_BURN, SoundCategory.HOSTILE, 1f, 0.5f + (float) mT++/CHARGE_TIME);
+				mRadius -= (double) 5 / CHARGE_TIME;
+				mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_BURN, SoundCategory.HOSTILE, 1f, 0.5f + (float) mT++ / CHARGE_TIME);
 				if (mRadius <= 0) {
 					this.cancel();
 					mActiveRunnables.remove(this);
@@ -99,9 +100,10 @@ public class SpellInfernoSpit extends Spell implements CoreElemental.CoreElement
 		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_MAGMA_CUBE_JUMP, SoundCategory.HOSTILE, 2f, 0.5f);
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTick = 0;
+
 			@Override
 			public void run() {
-				mBoss.setRotation(mTick*15, 0);
+				mBoss.setRotation(mTick * 15, 0);
 				if (mTick++ == 20) {
 					for (int i = 0; i < Math.min(NUMBER_OF_TARGETS, players.size()); i++) {
 						// Effects
@@ -161,7 +163,7 @@ public class SpellInfernoSpit extends Spell implements CoreElemental.CoreElement
 		Location pendingLocation = LocationUtils.fallToGround(location.add(0, 3, 0), mStartLoc.getY() - 5);
 
 		// Spawn Fire
-		for (Block block: LocationUtils.getNearbyBlocks(location.getBlock(), 3)) {
+		for (Block block : LocationUtils.getNearbyBlocks(location.getBlock(), 3)) {
 			if (FastUtils.randomDoubleInRange(0, 1) <= 0.1 && block.isSolid()) {
 				Block up = block.getRelative(BlockFace.UP);
 				if (up.isEmpty()) {
@@ -174,11 +176,12 @@ public class SpellInfernoSpit extends Spell implements CoreElemental.CoreElement
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				// Effects
 				if (mT % 3 == 0) {
-					for (double r = 0; r < AOE_RADIUS; r += AOE_RADIUS /5d) {
+					for (double r = 0; r < AOE_RADIUS; r += AOE_RADIUS / 5d) {
 						double radius = r;
 						new PPParametric(Particle.FLAME, pendingLocation, (t, builder) -> {
 							Location finalLocation = LocationUtils.fallToGround(pendingLocation.clone().add(radius * FastUtils.cosDeg(t * 360), 15, radius * FastUtils.sinDeg(t * 360)), mStartLoc.getY() - 5);
@@ -194,7 +197,7 @@ public class SpellInfernoSpit extends Spell implements CoreElemental.CoreElement
 					mWorld.playSound(location, Sound.ENTITY_MAGMA_CUBE_SQUISH, SoundCategory.HOSTILE, 1f, 0.5f);
 				}
 				new PPParametric(Particle.REDSTONE, pendingLocation, (t, builder) -> {
-					Location finalLocation = LocationUtils.fallToGround(pendingLocation.clone().add(AOE_RADIUS*FastUtils.cosDeg(t*360), 15, AOE_RADIUS*FastUtils.sinDeg(t*360)), mStartLoc.getY() - 5);
+					Location finalLocation = LocationUtils.fallToGround(pendingLocation.clone().add(AOE_RADIUS * FastUtils.cosDeg(t * 360), 15, AOE_RADIUS * FastUtils.sinDeg(t * 360)), mStartLoc.getY() - 5);
 					Vector finalVector = LocationUtils.getDirectionTo(pendingLocation, finalLocation);
 					builder.location(finalLocation);
 					builder.offset(finalVector.getX(), 0.5, finalVector.getZ());
@@ -209,7 +212,7 @@ public class SpellInfernoSpit extends Spell implements CoreElemental.CoreElement
 					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, AOE_DAMAGE, null, false, false, getSpellName());
 					EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 40, player, mBoss);
 				}
-				if (mT++*5 > AOE_LINGER) {
+				if (mT++ * 5 > AOE_LINGER) {
 					this.cancel();
 					mActiveRunnables.remove(this);
 				}

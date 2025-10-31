@@ -76,9 +76,9 @@ public class LootChestsInInventory implements Listener {
 		ItemStack item2 = nbti.getItem();
 
 		//Classic turning an item into a blockstate
-		BlockStateMeta meta = (BlockStateMeta)item2.getItemMeta();
+		BlockStateMeta meta = (BlockStateMeta) item2.getItemMeta();
 		BlockState state = meta.getBlockState();
-		Chest chest = (Chest)state;
+		Chest chest = (Chest) state;
 		//Loot tables are fun. Make sure the loot table exists
 		LootTable table = chest.getLootTable();
 		if (table == null) {
@@ -110,7 +110,7 @@ public class LootChestsInInventory implements Listener {
 			int fragmentCount = 0;
 			for (ItemStack thisItem : loot) {
 				if (ChestUtils.testForScroll(thisItem)) {
-					AuditListener.logPlayer("[Scroll Logger] Player " + player.getName() + " found a SKR Scroll (" + ItemUtils.getPlainNameIfExists(thisItem) + ") in an inventory chest with loot table " + table.toString() + ".");
+					AuditListener.logPlayer("[Scroll Logger] Player " + player.getName() + " found a SKR Scroll (" + ItemUtils.getPlainNameIfExists(thisItem) + ") in an inventory chest with loot table " + table + ".");
 					break;
 				} else if (ChestUtils.LOG_SCROLL_FRAGMENTS && InventoryUtils.testForItemWithName(thisItem, "Remnant", false) &&
 					thisItem.getType().name().contains("FLINT")) {
@@ -119,7 +119,7 @@ public class LootChestsInInventory implements Listener {
 			}
 			if (fragmentCount >= 1) {
 				// Temp log for scroll fragments
-				AuditListener.logPlayer("[Scroll Fragment Logger] Player " + player.getName() + " found " + fragmentCount + " SKR scroll fragments in an inventory chest with loot table " + table.toString() + ".");
+				AuditListener.logPlayer("[Scroll Fragment Logger] Player " + player.getName() + " found " + fragmentCount + " SKR scroll fragments in an inventory chest with loot table " + table + ".");
 			}
 		}
 		ChestUtils.generateLootInventory(loot, inventory, player, true);

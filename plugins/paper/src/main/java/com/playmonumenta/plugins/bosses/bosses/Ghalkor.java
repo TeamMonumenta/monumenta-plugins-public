@@ -151,9 +151,9 @@ public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 				//If player too far from arena center or below 4 blocks or too high and is on a block, damage them
 				for (Player p : getPlayers()) {
 					if ((mMiddleLoc.distance(p.getLocation()) > 22
-						     || mMiddleLoc.getY() - p.getLocation().getY() >= 3
-						     || (mMiddleLoc.getY() - p.getLocation().getY() <= -2 && PlayerUtils.isOnGround(p)))
-						    && p.getGameMode() != GameMode.CREATIVE) {
+						|| mMiddleLoc.getY() - p.getLocation().getY() >= 3
+						|| (mMiddleLoc.getY() - p.getLocation().getY() <= -2 && PlayerUtils.isOnGround(p)))
+						&& p.getGameMode() != GameMode.CREATIVE) {
 						Vector vel = p.getVelocity();
 						BossUtils.bossDamagePercent(mBoss, p, 0.1);
 						p.setVelocity(vel);

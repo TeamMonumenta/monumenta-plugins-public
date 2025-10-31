@@ -218,7 +218,7 @@ public class ItemUpdateManager implements Listener {
 	public static void updateCharms(Player p, CharmManager.CharmType charmType, List<ItemStack> equippedCharms) {
 		List<String> path = new ArrayList<>();
 		path.add("Player " + p.getName()
-		+ " updating charms (" + charmType + ")");
+			+ " updating charms (" + charmType + ")");
 
 		List<String> subPath;
 		int i = 0;

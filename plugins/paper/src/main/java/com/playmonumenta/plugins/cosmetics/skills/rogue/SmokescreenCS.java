@@ -29,6 +29,7 @@ public class SmokescreenCS implements CosmeticSkill {
 	public void smokescreenEffects(Player mPlayer, World world, Location loc, double radius) {
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				new PPCircle(Particle.SMOKE_LARGE, loc, radius * mTicks / 4)

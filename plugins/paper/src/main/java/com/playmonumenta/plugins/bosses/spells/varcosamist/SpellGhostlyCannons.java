@@ -115,8 +115,8 @@ public class SpellGhostlyCannons extends Spell {
 		}
 
 		BukkitRunnable runnable = new BukkitRunnable() {
-			Location mLoc = locInput.clone();
-			World mWorld = locInput.getWorld();
+			final Location mLoc = locInput.clone();
+			final World mWorld = locInput.getWorld();
 			int mTicks = 60;
 
 			@Override

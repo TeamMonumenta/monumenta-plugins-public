@@ -243,10 +243,10 @@ public class GuildPermissions implements Listener {
 	) {
 		MMLog.fine(
 			"[Guild Permissions Listener/Permission Change] " + player.getName()
-			+ " had their " + guildPermission.mLabel
-			+ " permission " + (isEnabled ? "granted" : "revoked")
-			+ " in guild ID " + guildId
-			+ "; updating relevant code"
+				+ " had their " + guildPermission.mLabel
+				+ " permission " + (isEnabled ? "granted" : "revoked")
+				+ " in guild ID " + guildId
+				+ "; updating relevant code"
 		);
 		Gui openGui = Gui.getOpenGui(player);
 		if (openGui instanceof GuildGui guildGui) {

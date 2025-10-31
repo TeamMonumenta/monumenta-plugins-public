@@ -66,8 +66,8 @@ public class PiercingCold extends DepthsAbility {
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (!mPlayer.isSneaking()
-			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)
-			    || isOnCooldown()) {
+			|| !EntityUtils.isAbilityTriggeringProjectile(projectile, false)
+			|| isOnCooldown()) {
 			return true;
 		}
 		projectile.remove();

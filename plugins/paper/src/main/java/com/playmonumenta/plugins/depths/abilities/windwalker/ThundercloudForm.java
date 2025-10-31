@@ -195,6 +195,7 @@ public class ThundercloudForm extends DepthsAbility implements AbilityWithDurati
 			int mTicks = 0;
 			final Location mLoc = mPlayer.getEyeLocation();
 			final Vector mDir = mPlayer.getEyeLocation().getDirection();
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 4; i++) {

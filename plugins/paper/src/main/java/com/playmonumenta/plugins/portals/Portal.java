@@ -106,31 +106,31 @@ public class Portal {
 	private void fixInsideWall(Entity entity, Location location) {
 		double entityHalfWidth = entity.getWidth() / 2.0;
 		switch (mFacing) {
-		case UP:
-			// y+
-			location.setY(Math.max(location.getY(), mLocation1.getY()));
-			break;
-		case DOWN:
-			// y-
-			location.setY(Math.min(location.getY(), mLocation1.getY() + 1.0 - entity.getHeight()));
-			break;
-		case SOUTH:
-			// z+
-			location.setZ(Math.max(location.getZ(), mLocation1.getZ() + entityHalfWidth));
-			break;
-		case NORTH:
-			// z-
-			location.setZ(Math.min(location.getZ(), mLocation1.getZ() + 1.0 - entityHalfWidth));
-			break;
-		case EAST:
-			// x+
-			location.setX(Math.max(location.getX(), mLocation1.getX() + entityHalfWidth));
-			break;
-		case WEST:
-		default:
-			// x-
-			location.setX(Math.min(location.getX(), mLocation1.getX() + 1.0 - entityHalfWidth));
-			break;
+			case UP:
+				// y+
+				location.setY(Math.max(location.getY(), mLocation1.getY()));
+				break;
+			case DOWN:
+				// y-
+				location.setY(Math.min(location.getY(), mLocation1.getY() + 1.0 - entity.getHeight()));
+				break;
+			case SOUTH:
+				// z+
+				location.setZ(Math.max(location.getZ(), mLocation1.getZ() + entityHalfWidth));
+				break;
+			case NORTH:
+				// z-
+				location.setZ(Math.min(location.getZ(), mLocation1.getZ() + 1.0 - entityHalfWidth));
+				break;
+			case EAST:
+				// x+
+				location.setX(Math.max(location.getX(), mLocation1.getX() + entityHalfWidth));
+				break;
+			case WEST:
+			default:
+				// x-
+				location.setX(Math.min(location.getX(), mLocation1.getX() + 1.0 - entityHalfWidth));
+				break;
 		}
 	}
 
@@ -139,41 +139,41 @@ public class Portal {
 		double entityHalfWidth = entity.getWidth() / 2.0;
 		Location location;
 		switch (mFacing) {
-		case UP:
-			// y+
-			location = centerLoc.clone();
-			location.setY(mLocation1.getY());
-			break;
-		case DOWN:
-			// y-
-			location = centerLoc.clone();
-			location.setY(mLocation1.getY() + 1.0 - entity.getHeight());
-			break;
-		case SOUTH:
-			// z+
-			location = mLocation1.clone();
-			location.setX(location.getX() + 0.5);
-			location.setZ(location.getZ() + entityHalfWidth);
-			break;
-		case NORTH:
-			// z-
-			location = mLocation1.clone();
-			location.setX(location.getX() + 0.5);
-			location.setZ(location.getZ() + 1.0 - entityHalfWidth);
-			break;
-		case EAST:
-			// x+
-			location = mLocation1.clone();
-			location.setZ(location.getZ() + 0.5);
-			location.setX(location.getX() + entityHalfWidth);
-			break;
-		case WEST:
-		default:
-			// x-
-			location = mLocation1.clone();
-			location.setZ(location.getZ() + 0.5);
-			location.setX(location.getX() + 1.0 - entityHalfWidth);
-			break;
+			case UP:
+				// y+
+				location = centerLoc.clone();
+				location.setY(mLocation1.getY());
+				break;
+			case DOWN:
+				// y-
+				location = centerLoc.clone();
+				location.setY(mLocation1.getY() + 1.0 - entity.getHeight());
+				break;
+			case SOUTH:
+				// z+
+				location = mLocation1.clone();
+				location.setX(location.getX() + 0.5);
+				location.setZ(location.getZ() + entityHalfWidth);
+				break;
+			case NORTH:
+				// z-
+				location = mLocation1.clone();
+				location.setX(location.getX() + 0.5);
+				location.setZ(location.getZ() + 1.0 - entityHalfWidth);
+				break;
+			case EAST:
+				// x+
+				location = mLocation1.clone();
+				location.setZ(location.getZ() + 0.5);
+				location.setX(location.getX() + entityHalfWidth);
+				break;
+			case WEST:
+			default:
+				// x-
+				location = mLocation1.clone();
+				location.setZ(location.getZ() + 0.5);
+				location.setX(location.getX() + 1.0 - entityHalfWidth);
+				break;
 		}
 		return location;
 	}

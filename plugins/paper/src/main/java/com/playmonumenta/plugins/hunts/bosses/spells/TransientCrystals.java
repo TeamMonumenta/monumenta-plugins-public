@@ -93,8 +93,8 @@ public class TransientCrystals extends Spell {
 						.spawnForPlayer(ParticleCategory.BOSS, player);
 
 					if (mTicks % 4 == 0) {
-						player.playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.HOSTILE, 0.3f, 0.5f + (float)mTicks / FOLLOW_DURATION);
-						player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.HOSTILE, 0.5f, 1.2f + (float)mTicks / FOLLOW_DURATION);
+						player.playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.HOSTILE, 0.3f, 0.5f + (float) mTicks / FOLLOW_DURATION);
+						player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.HOSTILE, 0.5f, 1.2f + (float) mTicks / FOLLOW_DURATION);
 					}
 				} else if (mTicks < FOLLOW_DURATION + WINDUP_DURATION) {
 					if (mFinalLocation == null) {
@@ -122,7 +122,7 @@ public class TransientCrystals extends Spell {
 						Vector step = direction.clone().normalize().multiply(LINE_HITBOX_SIZE);
 						for (double i = 0; i < 1; i += LINE_HITBOX_SIZE / LINE_LENGTH / 2) {
 							Hitbox hitbox = new Hitbox.AABBHitbox(mWorld, new BoundingBox(start.clone().getX() - LINE_HITBOX_SIZE, start.clone().getY() - 10, start.clone().getZ() - LINE_HITBOX_SIZE,
-																								start.clone().getX() + LINE_HITBOX_SIZE, start.clone().getY() + 10, start.clone().getZ() + LINE_HITBOX_SIZE));
+								start.clone().getX() + LINE_HITBOX_SIZE, start.clone().getY() + 10, start.clone().getZ() + LINE_HITBOX_SIZE));
 							if (hitbox.getHitPlayers(true).contains(player)) {
 								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, ATTACK_DAMAGE, null, true, true, "Transient Crystals");
 								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.HOSTILE, 1, 0.7f);

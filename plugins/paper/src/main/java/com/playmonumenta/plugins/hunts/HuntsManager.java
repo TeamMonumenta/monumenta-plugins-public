@@ -342,10 +342,10 @@ public class HuntsManager implements Listener {
 			BroadcastedEvents.clearEvent(mNextQuarry.name(), "ring");
 		}
 		CompletableFuture.allOf(
-			setRandomTime(),
-			setBaited(false),
-			setRandomQuarry()
-		)
+				setRandomTime(),
+				setBaited(false),
+				setRandomQuarry()
+			)
 			.thenRun(this::refreshOthers)
 			.thenRun(() -> {
 				mTriggeredThirty = false;
@@ -629,8 +629,8 @@ public class HuntsManager implements Listener {
 	 */
 	public boolean checkPreSpawnProtection(Player player, Block block) {
 		if (getRemainingTime() < WARNING_15 && mNextQuarry != null
-			    && block.getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius
-			    && mWorld == player.getWorld()) {
+			&& block.getLocation().toVector().distanceSquared(mNextQuarry.mSpawnLoc) < mNextQuarry.mInnerRadius * mNextQuarry.mInnerRadius
+			&& mWorld == player.getWorld()) {
 			player.sendMessage(Component.text("The quarry will appear soon, it is best to leave the ground undisturbed.", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 1, 0.63f);
 			return true;
@@ -773,7 +773,7 @@ public class HuntsManager implements Listener {
 		}
 
 		// Move players from underpopulated shards into the pool
-		while (instanceMap.keySet().size() > totalInstances) {
+		while (instanceMap.size() > totalInstances) {
 			Map.Entry<String, List<PlayerGuildInfo>> lowestShard = instanceMap.entrySet().stream()
 				.min(Comparator.comparingInt((Map.Entry<String, List<PlayerGuildInfo>> entry) -> entry.getValue().size()))
 				.orElse(null);
@@ -787,14 +787,14 @@ public class HuntsManager implements Listener {
 		}
 
 		// If we don't have enough instances, add the healthiest ones
-		if (instanceMap.keySet().size() < totalInstances) {
+		if (instanceMap.size() < totalInstances) {
 			Set<String> possibleShards = getRingShards();
 			possibleShards.removeAll(instanceMap.keySet());
 			Comparator<String> comparator = Comparator.comparingDouble(shard -> MonumentaNetworkRelayIntegration.remoteShardHealth(shard).healthScore());
 			List<String> sortedShards = possibleShards.stream()
 				.sorted(comparator.reversed())
 				.toList();
-			for (int i = 0; i < totalInstances - instanceMap.keySet().size(); i++) {
+			for (int i = 0; i < totalInstances - instanceMap.size(); i++) {
 				instanceMap.put(sortedShards.get(i), new ArrayList<>());
 			}
 		}

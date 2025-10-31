@@ -260,11 +260,11 @@ public class GuildAccessCommand {
 				Bukkit.getScheduler().runTask(plugin, () ->
 					sender.sendMessage(
 						Component.text("If you want to invite someone to your guild use ", NamedTextColor.RED)
-						.append(
-							Component.text("/guild invite", NamedTextColor.GOLD)
-								.hoverEvent(Component.text("Click to put command in chat bar", NamedTextColor.GOLD))
-								.clickEvent(ClickEvent.suggestCommand("/guild invite " + targetName + " member"))
-						)
+							.append(
+								Component.text("/guild invite", NamedTextColor.GOLD)
+									.hoverEvent(Component.text("Click to put command in chat bar", NamedTextColor.GOLD))
+									.clickEvent(ClickEvent.suggestCommand("/guild invite " + targetName + " member"))
+							)
 					)
 				);
 				return;

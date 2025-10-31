@@ -27,30 +27,30 @@ public class GetScoreCommand {
 	@SuppressWarnings("unchecked")
 	public static void register() {
 		new CommandAPICommand("getscore")
-		.withPermission(CommandPermission.fromString("monumenta.command.getscore"))
-		.withArguments(new ScoreHolderArgument.Multiple("targets").replaceSuggestions(ArgumentSuggestions.strings((info) -> {
-			// If ScoreHolderArgument's default suggestions get fixed, remove this override.
-			List<String> suggestions = new ArrayList<>(SELECTORS);
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				suggestions.add(player.getName());
-			}
-			CommandSender sender = info.sender();
-			if (sender instanceof LivingEntity senderEntity) {
-				@Nullable Entity target = senderEntity.getTargetEntity(5);
-				if (target != null) {
-					suggestions.add(target.getUniqueId().toString());
+			.withPermission(CommandPermission.fromString("monumenta.command.getscore"))
+			.withArguments(new ScoreHolderArgument.Multiple("targets").replaceSuggestions(ArgumentSuggestions.strings((info) -> {
+				// If ScoreHolderArgument's default suggestions get fixed, remove this override.
+				List<String> suggestions = new ArrayList<>(SELECTORS);
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					suggestions.add(player.getName());
 				}
-			}
-			return suggestions.toArray(new String[0]);
-		})))
-		.withArguments(new ObjectiveArgument("objective"))
-		.executes((sender, args) -> {
-			Objective objective = args.getUnchecked("objective");
-			for (String scoreHolder : (Collection<String>) args.get("targets")) {
-				run(sender, scoreHolder, objective);
-			}
-		})
-		.register();
+				CommandSender sender = info.sender();
+				if (sender instanceof LivingEntity senderEntity) {
+					@Nullable Entity target = senderEntity.getTargetEntity(5);
+					if (target != null) {
+						suggestions.add(target.getUniqueId().toString());
+					}
+				}
+				return suggestions.toArray(new String[0]);
+			})))
+			.withArguments(new ObjectiveArgument("objective"))
+			.executes((sender, args) -> {
+				Objective objective = args.getUnchecked("objective");
+				for (String scoreHolder : (Collection<String>) args.get("targets")) {
+					run(sender, scoreHolder, objective);
+				}
+			})
+			.register();
 	}
 
 	private static void run(CommandSender sender, String name, Objective objective) {

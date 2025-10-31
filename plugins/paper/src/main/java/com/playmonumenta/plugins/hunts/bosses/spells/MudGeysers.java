@@ -40,7 +40,7 @@ public class MudGeysers extends Spell {
 	private static final double GEYSER_DURATION = 5 * 20;
 	private static final double RADIUS = 3.25;
 	private static final double DAMAGE = 60;
-	private static final Material[] GEYSER_BLOCKS = new Material[] {
+	private static final Material[] GEYSER_BLOCKS = new Material[]{
 		Material.MUD, Material.SOUL_SAND
 	};
 
@@ -83,6 +83,7 @@ public class MudGeysers extends Spell {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks < WINDUP_DURATION) {

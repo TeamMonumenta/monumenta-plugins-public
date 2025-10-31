@@ -140,12 +140,12 @@ public class CharmBagCommand {
 		CharmBag charmBag = CharmBagManager.getCharmBag(player);
 		for (CharmBagCommandItem item : items) {
 			ItemStack removed = null;
-				Optional<CharmBag.CharmBagItem> charmBagItemOpt = charmBag.mItems.stream().filter(wi -> ItemUtils.getPlainNameOrDefault(wi.mItem).equalsIgnoreCase(item.mName)).findFirst();
-				if (charmBagItemOpt.isPresent()) {
-					CharmBag.CharmBagItem charmBagItem = charmBagItemOpt.get();
-					removed = ItemUtils.clone(charmBagItem.mItem);
-					removed.setAmount((int) Math.min(charmBagItem.mAmount, item.mCount));
-				}
+			Optional<CharmBag.CharmBagItem> charmBagItemOpt = charmBag.mItems.stream().filter(wi -> ItemUtils.getPlainNameOrDefault(wi.mItem).equalsIgnoreCase(item.mName)).findFirst();
+			if (charmBagItemOpt.isPresent()) {
+				CharmBag.CharmBagItem charmBagItem = charmBagItemOpt.get();
+				removed = ItemUtils.clone(charmBagItem.mItem);
+				removed.setAmount((int) Math.min(charmBagItem.mAmount, item.mCount));
+			}
 			if (removed != null && removed.getAmount() > 0) {
 				if (removed.getAmount() < item.mCount) {
 					player.sendMessage(Component.text("Not enough '" + item.mName + "' in your " + charmBagName + ", will only retrieve " + removed.getAmount(), TextColor.color(255, 128, 0)));

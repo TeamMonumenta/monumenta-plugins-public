@@ -53,7 +53,8 @@ public class ItemCooldown extends Effect {
 			player.sendActionBar(Component.text(mItemName + " is now off cooldown!", NamedTextColor.YELLOW));
 
 			new BukkitRunnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					player.updateInventory();
 				}
 			}.runTaskLater(mPlugin, 1);

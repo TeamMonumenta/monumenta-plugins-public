@@ -13,11 +13,13 @@ public class OnShootTrigger extends Trigger {
 		return true;
 	}
 
-	@Override public boolean test(LivingEntity boss) {
+	@Override
+	public boolean test(LivingEntity boss) {
 		return false;
 	}
 
-	@Override public void reset(LivingEntity boss) {
+	@Override
+	public void reset(LivingEntity boss) {
 
 	}
 

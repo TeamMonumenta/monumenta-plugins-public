@@ -41,7 +41,7 @@ public class CosmicMoonblade extends Ability {
 	public static final double REDUCTION_MULTIPLIER_2 = 0.1;
 	public static final double REDUCTION_MULTIPLIER_KILL = 0.075;
 	public static final int CAP_TICKS_1 = (int) (0.5 * Constants.TICKS_PER_SECOND);
-	public static final int CAP_TICKS_2 = 1 * Constants.TICKS_PER_SECOND;
+	public static final int CAP_TICKS_2 = Constants.TICKS_PER_SECOND;
 	public static final int CAP_TICKS_KILL = (int) (0.75 * Constants.TICKS_PER_SECOND);
 
 	public static final String CHARM_DAMAGE = "Cosmic Moonblade Damage";
@@ -132,7 +132,7 @@ public class CosmicMoonblade extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getAbility() == mInfo.getLinkedSpell() &&
-		    event.getFinalDamage(true) > enemy.getHealth() &&
+			event.getFinalDamage(true) > enemy.getHealth() &&
 			event.getDamager() == mPlayer && !mTriggered) {
 			mTriggered = true;
 			// update all abil cd, 1 tick delay to make sure moon blade is also reduced

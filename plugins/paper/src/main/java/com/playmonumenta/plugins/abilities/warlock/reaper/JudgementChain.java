@@ -165,6 +165,7 @@ public class JudgementChain extends MultipleChargeAbility {
 			new BukkitRunnable() { // teleport multiple times so that it actually updates
 
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					EntityUtils.teleportStack(entity, finalDestination);

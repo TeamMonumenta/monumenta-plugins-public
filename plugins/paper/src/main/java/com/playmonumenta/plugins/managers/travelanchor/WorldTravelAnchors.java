@@ -37,8 +37,8 @@ public class WorldTravelAnchors {
 		UUID entityId = entity.getUniqueId();
 		if (
 			!entity.getWorld().getUID().equals(mWorldId)
-			|| mTravelAnchors.containsKey(entityId)
-			|| EntityTravelAnchor.isTravelAnchor(entity)
+				|| mTravelAnchors.containsKey(entityId)
+				|| EntityTravelAnchor.isTravelAnchor(entity)
 		) {
 			return null;
 		}

@@ -53,20 +53,20 @@ public class CrystallineBlessing extends ZeroArgumentEffect {
 			Plugin.getInstance().mEffectManager.addEffect(entity, ATTR_NAME,
 				new PercentDamageDealt(DUR, DAMAGE_PERCENT).damageTypes(AFFECTED_DAMAGE_TYPES));
 			Plugin.getInstance().mEffectManager.addEffect(entity, "CrystalParticles", new Aesthetics(DUR,
-							(e, fourHertz, twoHertz, oneHertz) -> {
-								// Tick effect
-								Location loc = entity.getLocation().add(0, 1, 0);
-								new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
-								new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
-								new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, DARK_COLOR).spawnAsPlayerBuff((Player) entity);
-							}, (e) -> {
-						// Lose effect
-						Location loc = entity.getLocation();
-						entity.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1f, 0.85f);
+					(e, fourHertz, twoHertz, oneHertz) -> {
+						// Tick effect
+						Location loc = entity.getLocation().add(0, 1, 0);
 						new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
 						new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
 						new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, DARK_COLOR).spawnAsPlayerBuff((Player) entity);
-					})
+					}, (e) -> {
+					// Lose effect
+					Location loc = entity.getLocation();
+					entity.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1f, 0.85f);
+					new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
+					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
+					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, DARK_COLOR).spawnAsPlayerBuff((Player) entity);
+				})
 			);
 
 			// Aesthetics

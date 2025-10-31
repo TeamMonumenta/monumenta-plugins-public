@@ -275,7 +275,7 @@ public class VesperidysVoidCrystalDawn extends BossAbilityGroup {
 			new BukkitRunnable() {
 				int mTicks = 0;
 				final Location mCenter = startCenter;
-				final double mFallAmount = (double) mFallDistance / (double) FALL_TIME_TICKS;
+				final double mFallAmount = mFallDistance / (double) FALL_TIME_TICKS;
 
 				@Override
 				public void run() {

@@ -71,19 +71,19 @@ public class OrinCustomInventory extends CustomInventory {
 		@Nullable Function<Player, ItemStack> mCustomItem;
 
 		public TeleportEntry(TeleporterPage page, InvLocation slot, String name, String lore,
-							 Material type, @Nullable String scoreboard, int scoreRequired, @Nullable String left) {
+		                     Material type, @Nullable String scoreboard, int scoreRequired, @Nullable String left) {
 			this(page, slot, name, lore, type, scoreboard, scoreRequired, left, null, 1);
 		}
 
 		public TeleportEntry(TeleporterPage page, InvLocation slot, String name, String lore,
-							 Material type, @Nullable String scoreboard, int scoreRequired,
-							 @Nullable String left, @Nullable String right) {
+		                     Material type, @Nullable String scoreboard, int scoreRequired,
+		                     @Nullable String left, @Nullable String right) {
 			this(page, slot, name, lore, type, scoreboard, scoreRequired, left, right, 1);
 		}
 
 		public TeleportEntry(TeleporterPage page, InvLocation slot, String name, String lore,
-							 Material type, @Nullable String scoreboard, int scoreRequired,
-							 @Nullable String left, @Nullable String right, int count) {
+		                     Material type, @Nullable String scoreboard, int scoreRequired,
+		                     @Nullable String left, @Nullable String right, int count) {
 			this(page, slot, name, lore, type, scoreboard, scoreRequired,
 				StringUtils.isBlank(left) ? null : (gui, player) -> gui.completeCommand(player, left),
 				StringUtils.isBlank(right) ? null : (gui, player) -> gui.completeCommand(player, right),
@@ -91,8 +91,8 @@ public class OrinCustomInventory extends CustomInventory {
 		}
 
 		public TeleportEntry(TeleporterPage page, InvLocation slot, String name, String lore,
-							 Material type, @Nullable String scoreboard, int scoreRequired,
-							 @Nullable String left, @Nullable String right, int count, @Nullable Function<Player, ItemStack> customItem) {
+		                     Material type, @Nullable String scoreboard, int scoreRequired,
+		                     @Nullable String left, @Nullable String right, int count, @Nullable Function<Player, ItemStack> customItem) {
 			this(page, slot, name, lore, type, scoreboard, scoreRequired,
 				StringUtils.isBlank(left) ? null : (gui, player) -> gui.completeCommand(player, left),
 				StringUtils.isBlank(right) ? null : (gui, player) -> gui.completeCommand(player, right),
@@ -100,10 +100,10 @@ public class OrinCustomInventory extends CustomInventory {
 		}
 
 		public TeleportEntry(TeleporterPage page, InvLocation slot, String name, String lore,
-							 Material type, @Nullable String scoreboard, int scoreRequired,
-							 @Nullable BiConsumer<OrinCustomInventory, Player> left,
-							 @Nullable BiConsumer<OrinCustomInventory, Player> right,
-							 int count, @Nullable Function<Player, ItemStack> customItem) {
+		                     Material type, @Nullable String scoreboard, int scoreRequired,
+		                     @Nullable BiConsumer<OrinCustomInventory, Player> left,
+		                     @Nullable BiConsumer<OrinCustomInventory, Player> right,
+		                     int count, @Nullable Function<Player, ItemStack> customItem) {
 			mPage = page;
 			mSlot = slot.getInvLoc();
 			mName = name;
@@ -427,7 +427,7 @@ public class OrinCustomInventory extends CustomInventory {
 			Material.PRISMARINE_BRICKS, "DRL2Access", 1, sendToDungeonAction(DungeonCommandMapping.SHIFTINGCITY), null, 1, null));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(6, 5), "The Fallen Forum", "Click to teleport!",
 			Material.BOOKSHELF, "DFFAccess", 1, sendToDungeonAction(DungeonCommandMapping.FORUM), null, 1, null));
-		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(4,6), "Rush of Dissonance", "Click to teleport!",
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(4, 6), "Rush of Dissonance", "Click to teleport!",
 			Material.FIRE_CORAL_BLOCK, "DRDAccess", 1, sendToDungeonAction(DungeonCommandMapping.RUSH), null, 1, null));
 
 		//Group: R3 Dungeons

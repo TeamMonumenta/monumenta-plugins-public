@@ -45,16 +45,16 @@ public class PointToLocCommand {
 			.executes((sender, args) -> {
 				Player player = (Player) CommandUtils.getCallee(sender);
 				Location startpoint = ((Location) args.getUnchecked("start")).clone();
-				Location endpoint = (Location) args.getUnchecked("end");
-				int count = (int) args.getUnchecked("count");
+				Location endpoint = args.getUnchecked("end");
+				int count = args.getUnchecked("count");
 				Vector direction = endpoint.toVector().subtract(startpoint.toVector());
 				Vector endNormalized = direction.normalize().multiply((float) args.getUnchecked("distanceBetween"));
 				int timer = args.getUnchecked("ticksBetween");
-				float acceleration = (float) args.getUnchecked("acceleration");
-				ParticleData<?> midParticleData = (ParticleData<?>) args.getUnchecked("midParticle");
-				ParticleData<?> helixParticleData = (ParticleData<?>) args.getUnchecked("helixParticle");
-				float radius = (float) args.getUnchecked("radius");
-				boolean skr = (boolean) args.getUnchecked("skrUsage");
+				float acceleration = args.getUnchecked("acceleration");
+				ParticleData<?> midParticleData = args.getUnchecked("midParticle");
+				ParticleData<?> helixParticleData = args.getUnchecked("helixParticle");
+				float radius = args.getUnchecked("radius");
+				boolean skr = args.getUnchecked("skrUsage");
 				Collection<Player> allowedViewers = (Collection<Player>) args.get("allowed viewers");
 
 				Vector right;
