@@ -42,13 +42,14 @@ public class RushDownMobBoss extends BossAbilityGroup {
 
 		// Summoned mob not directly spawned by the waves
 		if (ScoreboardUtils.checkTag(boss, SCALING_TAG)) {
-			List<Player> players = (List<Player>) boss.getLocation().getNearbyPlayers(30);
-			RushArena arena = RushManager.mPlayerArenaMap.get(players.get(0));
-			if (arena != null) {
-				RushManager.scaleMobHealthMultiplayer(boss, arena.mRound);
-				RushManager.scaleMobPastRound(boss, arena.mRound);
+			List<Player> players = (List<Player>) boss.getLocation().getNearbyPlayers(90);
+			if (!players.isEmpty()) {
+				RushArena arena = RushManager.mPlayerArenaMap.get(players.get(0));
+				if (arena != null) {
+					RushManager.scaleMobHealthMultiplayer(boss, arena.mRound);
+					RushManager.scaleMobPastRound(boss, arena.mRound);
+				}
 			}
-
 		}
 
 		new BukkitRunnable() {
