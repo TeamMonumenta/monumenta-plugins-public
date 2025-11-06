@@ -45,6 +45,7 @@ public abstract class PlayerClass {
 		JsonObject info = new JsonObject();
 		info.addProperty("classId", mClass);
 		info.addProperty("className", mClassName);
+		info.add("classPassive", mPassive.toJson());
 		info.add("skills", abilities);
 		info.add("specs", specs);
 		return info;

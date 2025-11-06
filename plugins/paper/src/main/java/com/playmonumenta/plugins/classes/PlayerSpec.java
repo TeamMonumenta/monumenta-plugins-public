@@ -33,6 +33,9 @@ public class PlayerSpec {
 		if (mSpecName != null) {
 			info.addProperty("specName", mSpecName);
 		}
+		if (mPassive != null) {
+			info.add("specPassive", mPassive.toJson());
+		}
 		if (mSpecQuestScoreboard != null) {
 			info.addProperty("specQuestScore", mSpecQuestScoreboard);
 		}

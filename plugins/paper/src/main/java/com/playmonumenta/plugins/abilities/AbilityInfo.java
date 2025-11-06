@@ -491,6 +491,9 @@ public class AbilityInfo<T extends Ability> {
 		if (mShorthandName != null) {
 			info.addProperty("shortName", mShorthandName);
 		}
+		if (mSimpleDescription != null) {
+			info.addProperty("simpleDescription", mSimpleDescription);
+		}
 		List<Component> descriptionList = getDescriptions();
 		if (!descriptionList.isEmpty()) {
 			JsonArray descriptions = new JsonArray();
