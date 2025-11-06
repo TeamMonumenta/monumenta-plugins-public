@@ -4,11 +4,16 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EvokerFangs;
@@ -277,7 +282,7 @@ public class DamageEvent extends Event implements Cancellable {
 		// Update flat damage, since we're setting a new base
 		// In case something goes horribly wrong, log the stack trace when set to finest
 		mFlatDamage = damage;
-		MMLog.finest(Arrays.toString(Thread.currentThread().getStackTrace()));
+		MMLog.finest(() -> Arrays.toString(Thread.currentThread().getStackTrace()));
 
 		recalculateDamage();
 	}
@@ -286,7 +291,6 @@ public class DamageEvent extends Event implements Cancellable {
 		if (damageMultiplier < 0) {
 			Plugin.getInstance().getLogger().log(Level.FINE, "Negative damage multiplier: " + damageMultiplier, new Exception());
 		}
-
 		if (damageMultiplier > 1) {
 			// Accumulate damage multiplier (Additively)
 			mDamageMultiplier += (damageMultiplier - 1);
@@ -294,7 +298,6 @@ public class DamageEvent extends Event implements Cancellable {
 			// Accumulate weakness / reduction multiplier (Multiplicatively)
 			mDamageReductionMultiplier *= Math.max(0, damageMultiplier);
 		}
-
 		recalculateDamage();
 	}
 
@@ -302,27 +305,92 @@ public class DamageEvent extends Event implements Cancellable {
 		if (damageGearMultiplier < 0) {
 			Plugin.getInstance().getLogger().log(Level.FINE, "Negative damage multiplier: " + damageGearMultiplier, new Exception());
 		}
-
 		// Accumulate damage multiplier
 		mGearDamageMultiplier += (damageGearMultiplier - 1);
-
 		recalculateDamage();
 	}
 
+	static final int DAMAGE_CAP = 1000000;
+	static final int DAMAGE_WARN = 10000;
+	private boolean mHasBeenWarned = false;
+	private final UUID mEventIdentifier = UUID.randomUUID();
+
 	private void recalculateDamage() {
 		// Never set damage above 1000000 (arbitrary high amount) so that it doesn't go over the limit of what can actually be dealt
-		double damage = Math.max(Math.min(mFlatDamage * mGearDamageMultiplier * mDamageMultiplier * mDamageReductionMultiplier * critModifier() + mUnmodifiableDamage, 1000000), 0);
-
+		double damage = Math.max(Math.min(mFlatDamage * mGearDamageMultiplier * mDamageMultiplier * mDamageReductionMultiplier * critModifier() + mUnmodifiableDamage, DAMAGE_CAP), 0);
 		if (mDamageCap != null) {
 			damage = Math.min(damage, mDamageCap);
 		}
-
+		// Log big warning because damage is too high
+		if (damage >= DAMAGE_WARN) {
+			damageCapWarn(damage);
+		}
 		if (mMetadata.mType == DamageType.POISON && mDamagee instanceof Player && mDamagee.getHealth() - damage <= 0) {
 			mEvent.setDamage(Math.max(mDamagee.getHealth() - 1, 0));
 			return;
 		}
-
 		mEvent.setDamage(damage);
+	}
+
+	private void damageCapWarn(double damage) {
+		if (!(mSource instanceof Player player)) {
+			return;
+		}
+		if (!mHasBeenWarned) {
+			final var inventory = player.getInventory();
+			// grab current charms
+			final var charms = CharmManager.getInstance().getCharms(player, CharmManager.getInstance().mEnabledCharmType);
+			final var charmNames = new ArrayList<>();
+			if (charms != null && !charms.isEmpty()) {
+				for (final var charm : charms) {
+					charmNames.add(ItemUtils.getPlainName(charm));
+				}
+			}
+			final var charmString = charmNames.isEmpty() ? "" : String.join(",", charmNames.toArray(new String[0]));
+			String equipment;
+			try {
+				equipment = String.join(",", "mainhand=" + ItemUtils.getPlainName(inventory.getItemInMainHand()), "offhand=" + ItemUtils.getPlainName(inventory.getItemInOffHand()), "helmet=" + ItemUtils.getPlainName(inventory.getHelmet()), "chestplate=" + ItemUtils.getPlainName(inventory.getChestplate()), "leggings=" + ItemUtils.getPlainName(inventory.getLeggings()), "boots=" + ItemUtils.getPlainName(inventory.getBoots()), "charms=[" + charmString + "]");
+			} catch (Exception ex) {
+				equipment = "error";
+			}
+			final String string = String.join(" ", "Player dealt damage higher than " + DAMAGE_WARN, "[" + String.join(",", "player=" + player.getName(), "damage=" + damage, "originalDamage=" + mOriginalDamage, "flatDamage=" + mFlatDamage, "damageEventId=" + mEventIdentifier, "equipment=[" + equipment + "]") + "]");
+			// now craft the stacktrace
+			MMLog.severe(() -> string + parseStackTracesFromMonumentaPlugin());
+			AuditListener.logPlayer(string);
+			return;
+		}
+		MMLog.severe(() -> "Player: " + player.getName() + " excceded damage cap! [damageEventId=" + mEventIdentifier + ",damage=" + damage + "]");
+	}
+
+	private static final Set<String> IGNORED_CLAZZ = Set.of(
+		"DamageEvent",
+		"DamageListener",
+		"DamageUtils"
+	);
+
+	private static String parseStackTracesFromMonumentaPlugin() {
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		var s = "\n";
+		for (StackTraceElement stackTraceElement : stackTrace) {
+			String className = stackTraceElement.getClassName();
+			if (!className.contains("com.playmonumenta")) {
+				continue;
+			}
+
+			var founcIgnored = false;
+			for (var ignoredClass : IGNORED_CLAZZ) {
+				if (className.contains(ignoredClass)) {
+					founcIgnored = true;
+					break;
+				}
+			}
+			if (founcIgnored) {
+				continue;
+			}
+
+			s = s + stackTraceElement.toString() + "\n";
+		}
+		return s;
 	}
 
 	public double getFlatDamage() {
@@ -471,5 +539,4 @@ public class DamageEvent extends Event implements Cancellable {
 	public static HandlerList getHandlerList() {
 		return HANDLERS;
 	}
-
 }
