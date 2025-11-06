@@ -385,6 +385,7 @@ public class Plugin extends JavaPlugin {
 		PlaySoundsCommand.register();
 		CloseInventoryCommand.register();
 		HuntsCommand.register(this);
+		FunctionCooldownCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
