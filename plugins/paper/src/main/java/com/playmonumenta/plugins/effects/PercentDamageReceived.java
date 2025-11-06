@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -53,7 +54,7 @@ public class PercentDamageReceived extends Effect {
 
 	@Override
 	public void onHurt(final LivingEntity entity, final DamageEvent event) {
-		if (event.getType() != DamageType.TRUE && (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType()))) {
+		if (event.getType() != DamageType.TRUE && (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) && event.getAbility() != ClassAbility.REVERB) {
 			double amount = mAmount;
 			if (EntityUtils.isBoss(entity) && isDebuff()) {
 				amount /= 2;
