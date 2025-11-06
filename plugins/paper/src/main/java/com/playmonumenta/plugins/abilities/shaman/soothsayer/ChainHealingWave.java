@@ -129,7 +129,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 		if (!consumeCharge()) {
 			return;
 		}
-		PlayerUtils.healPlayer(mPlugin, mPlayer, mHealPercent * EntityUtils.getMaxHealth(mPlayer), mPlayer);
+		PlayerUtils.healPlayer(mPlugin, mPlayer, mHealPercent * EntityUtils.getMaxHealth(mPlayer) / 2, mPlayer);
 
 		for (int i = 0; i < mHitTargets.size() - 1; i++) {
 			LivingEntity target = mHitTargets.get(i + 1);
@@ -204,7 +204,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 			.addDuration(a -> a.mCooldownReduction, CDR_ON_KILL)
 			.add(" second without consuming a heal. Charges: ")
 			.add(a -> a.mMaxCharges, CHARGES)
-			.add(".")
+			.add(". Any healing to yourself is half as effective.")
 			.addCooldown(COOLDOWN);
 	}
 
