@@ -52,7 +52,7 @@ public class Reverb implements Enchantment {
 
 	@Override
 	public EnumSet<Slot> getSlots() {
-		return EnumSet.of(Slot.MAINHAND, Slot.OFFHAND, Slot.HEAD, Slot.CHEST, Slot.LEGS, Slot.FEET, Slot.PROJECTILE);
+		return EnumSet.of(Slot.MAINHAND, Slot.PROJECTILE);
 	}
 
 	// Event occurs before the actual damages are applied to the mob, on the same tick.
