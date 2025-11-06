@@ -55,6 +55,7 @@ public class RushArenaUtils {
 	protected static int retrievePlayerCount(ArmorStand stand, Player fallbackPlayer) {
 		PersistentDataContainer data = stand.getPersistentDataContainer();
 		Integer playerCount = data.get(RushManager.RUSH_PLAYER_COUNT_KEY, PersistentDataType.INTEGER);
+		Boolean isMultiplayer = data.get(RushManager.RUSH_IS_MULTIPLAYER, PersistentDataType.BOOLEAN);
 		// Retrieve player count & store it onto the marker stand
 		if (playerCount == null) {
 			int count = ScoreboardUtils.getScoreboardValue(fallbackPlayer, "RushPlayercount")
@@ -62,6 +63,11 @@ public class RushArenaUtils {
 			data.set(RushManager.RUSH_PLAYER_COUNT_KEY, PersistentDataType.INTEGER, count);
 			playerCount = count;
 		}
+		if(isMultiplayer == null) {
+			isMultiplayer = playerCount > 1;
+			data.set(RushManager.RUSH_IS_MULTIPLAYER, PersistentDataType.BOOLEAN, isMultiplayer);
+		}
+
 		return playerCount;
 	}
 
@@ -71,7 +77,7 @@ public class RushArenaUtils {
 		if (count == null) {
 			return stand.getWorld().getPlayerCount() - 1;
 		}
-		int newCount = Math.min(1, count - 1);
+		int newCount = Math.max(1, count - 1);
 		data.set(RushManager.RUSH_PLAYER_COUNT_KEY, PersistentDataType.INTEGER, newCount);
 		return newCount;
 	}

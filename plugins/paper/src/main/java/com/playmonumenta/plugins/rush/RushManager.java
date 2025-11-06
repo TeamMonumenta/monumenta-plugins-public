@@ -77,6 +77,7 @@ public class RushManager implements Listener {
 
 	protected static final NamespacedKey RUSH_WAVE_KEY = NamespacedKeyUtils.fromString("monumenta:rush-wave");
 	protected static final NamespacedKey RUSH_PLAYER_COUNT_KEY = NamespacedKeyUtils.fromString("monumenta:rush-player-count");
+	protected static final NamespacedKey RUSH_IS_MULTIPLAYER = NamespacedKeyUtils.fromString("monumenta:rush-is-multiplayer");
 	protected static final NamespacedKey RUSH_PLAYER_COMBAT_LOG = NamespacedKeyUtils.fromString("monumenta:rush-combat-log");
 	protected static final String RUSH_FINISHED_SCOREBOARD = "DRDFinished";
 
@@ -119,8 +120,12 @@ public class RushManager implements Listener {
 		if (arena != null && arena.mPlayers.remove(player)) {
 			int round = arena.mRound;
 			arena.mPlayerCount = RushArenaUtils.updatePlayerCount(arena.mSpawnStand);
+			Boolean isMultiplayer = arena.mSpawnStand
+				.getPersistentDataContainer()
+				.getOrDefault(RUSH_IS_MULTIPLAYER, PersistentDataType.BOOLEAN, true);
+
 			Location lootLoc = teleportPlayerToLootroom(player);
-			updatePlayerStats(player, round, arena.mPlayerCount);
+			updatePlayerStats(player, round, isMultiplayer);
 			if (lootLoc != null) {
 				lootLoc.add(RUSH_LOOT_ROOM_OFFSET);
 				if (death) {
@@ -154,9 +159,8 @@ public class RushManager implements Listener {
 
 	// Updates highest round leaderboard, and omit DRD access
 
-	public static void updatePlayerStats(Player player, int round, int playerCount) {
-		boolean multiplayer = playerCount > 1;
-		String rushType = playerCount > 1 ? RUSH_HIGHEST_ROUND_MULTIPLAYER : RUSH_HIGHEST_ROUND_SOLO;
+	public static void updatePlayerStats(Player player, int round, boolean isMultiplayer) {
+		String rushType = isMultiplayer ? RUSH_HIGHEST_ROUND_MULTIPLAYER : RUSH_HIGHEST_ROUND_SOLO;
 
 		int highestRound = ScoreboardUtils.getScoreboardValue(player, rushType).orElse(0);
 		boolean isHighestRound = round > highestRound;
@@ -167,7 +171,7 @@ public class RushManager implements Listener {
 		}
 		if (isHighestRound && round >= 8) {
 			MonumentaNetworkRelayIntegration.broadcastCommand("tellmini msg @a[all_worlds=true] <italic><gold>" + player.getName() + "</gold> has succumbed to the Rush of Dissonance with a new personal best! (" +
-				(multiplayer ? "" : "Solo ")
+				(isMultiplayer ? "" : "Solo ")
 				+ "Highest Round Reached: " + round + ")");
 		} else {
 			Bukkit.getServer().sendMessage(Component.empty()
@@ -175,7 +179,7 @@ public class RushManager implements Listener {
 				.append(Component.text(" has succumbed to the Rush of Dissonance! " +
 					(isHighestRound ? "with a new personal best! " : "") +
 					"(" +
-					(multiplayer ? "" : "Solo ")
+					(isMultiplayer ? "" : "Solo ")
 					+ "Round Reached: " + round + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 		}
 	}

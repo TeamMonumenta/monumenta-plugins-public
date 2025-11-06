@@ -54,8 +54,8 @@ public class RushCommands {
 					if (player != null && isRushShard()) {
 						PersistentDataContainer spawnData = RushArenaUtils.getStandOrThrow(player, RushArenaUtils.RUSH_SPAWN_TAG).getPersistentDataContainer();
 						int round = spawnData.getOrDefault(RushManager.RUSH_WAVE_KEY, PersistentDataType.INTEGER, 1);
-						int count = spawnData.getOrDefault(RushManager.RUSH_PLAYER_COUNT_KEY, PersistentDataType.INTEGER, 1);
-						RushManager.updatePlayerStats(player, round, count);
+						boolean isMultiplayer = spawnData.getOrDefault(RushManager.RUSH_IS_MULTIPLAYER, PersistentDataType.BOOLEAN, true);
+						RushManager.updatePlayerStats(player, round, isMultiplayer);
 						Location lootLoc = RushManager.teleportPlayerToLootroom(player);
 						if (lootLoc == null) {
 							return -1;
