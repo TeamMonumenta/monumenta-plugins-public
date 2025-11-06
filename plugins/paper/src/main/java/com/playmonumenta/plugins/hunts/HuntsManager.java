@@ -204,6 +204,7 @@ public class HuntsManager implements Listener {
 				return quarry;
 			} else {
 				MMLog.severe("[Hunts] Failed to get quarry " + mLos + " from Library of Souls!");
+				BroadcastedEvents.clearEvent(name(), "ring");
 				return null;
 			}
 		}
@@ -231,7 +232,7 @@ public class HuntsManager implements Listener {
 	private boolean mTriggeredFifteen = false;
 	private boolean mTriggeredFive = false;
 	private final Map<String, Set<UUID>> mPlayersInRange = new TreeMap<>();
-	private boolean mSpawningBoss = false; // True if this shard is in the 15 second waiting time before spawning a boss
+	private boolean mSpawningBoss = false; // True if this shard is in the 15-second waiting time before spawning a boss
 
 	public final Plugin mPlugin;
 	public final @Nullable World mWorld;
@@ -744,13 +745,13 @@ public class HuntsManager implements Listener {
 
 				// Biggest guilds first
 				List<Map.Entry<String, List<PlayerGuildInfo>>> sortedGuilds = guildMap.entrySet().stream()
-					.sorted(Comparator.comparingInt((Map.Entry<String, List<PlayerGuildInfo>> entry) -> entry.getKey().equals("") ? -1 : entry.getValue().size()).reversed())
+					.sorted(Comparator.comparingInt((Map.Entry<String, List<PlayerGuildInfo>> entry) -> entry.getKey().isEmpty() ? -1 : entry.getValue().size()).reversed())
 					.toList();
 
 				for (Map.Entry<String, List<PlayerGuildInfo>> entry : sortedGuilds) {
 					List<PlayerGuildInfo> guildPlayers = entry.getValue();
 					if (lockedPlayers + guildPlayers.size() > maxPlayersPer) {
-						if (entry.getKey().equals("")) {
+						if (entry.getKey().isEmpty()) {
 							Collections.shuffle(guildPlayers);
 							// Lock in individual players
 							while (lockedPlayers <= maxPlayersPer) {
@@ -870,7 +871,7 @@ public class HuntsManager implements Listener {
 		startRandomHunt();
 	}
 
-	// Puts unguilded players into the empty string
+	// Puts guildless players into the empty string
 	private Map<String, List<PlayerGuildInfo>> sortGuildList(List<PlayerGuildInfo> guildList) {
 		Map<String, List<PlayerGuildInfo>> map = new HashMap<>();
 		for (PlayerGuildInfo player : guildList) {
@@ -903,31 +904,32 @@ public class HuntsManager implements Listener {
 			return;
 		}
 
+		QuarryType quarry = mNextQuarry;
+		if (quarry == null) {
+			return;
+		}
 
 		// If this shard is one of the target shards, summon the boss locally after a delay
-		for (JsonElement targetElement : data.asMap().values()) {
-			if (!(targetElement instanceof JsonPrimitive targetPrimitive && targetPrimitive.isString())) {
-				continue;
+		if (data.asMap().values().stream().anyMatch(e -> {
+			if (!(e instanceof JsonPrimitive targetPrimitive && targetPrimitive.isString())) {
+				return false;
 			}
-
-			String targetShard = targetPrimitive.getAsString();
-			if (!thisShard.equals(targetShard)) {
-				continue;
-			}
-
+			return thisShard.equals(targetPrimitive.getAsString());
+		})) {
 			// Found a match, summon the boss; just make sure to
 			// give players time to switch their instance before spawning
-			QuarryType quarry = mNextQuarry;
-			if (quarry == null || mWorld == null) {
+			if (mWorld == null) {
 				// No quarry to spawn?
-				break;
+				return;
 			}
 			mSpawningBoss = true;
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				quarry.summon(mWorld);
 				mSpawningBoss = false;
 			}, 15 * 20);
-			break;
+		} else if (thisShard.equals("ring")) {
+			// Not a match - but this is the shard responsible for updating the tab list!
+			BroadcastedEvents.clearEvent(quarry.name());
 		}
 	}
 
