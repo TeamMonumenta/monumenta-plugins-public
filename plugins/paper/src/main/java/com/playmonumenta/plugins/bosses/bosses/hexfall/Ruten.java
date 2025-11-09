@@ -191,7 +191,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 	}
 
 	@Override
-	public double maxEntityDeathRange() {
+	public double nearbyEntityDeathMaxRange() {
 		return detectionRange * 2;
 	}
 

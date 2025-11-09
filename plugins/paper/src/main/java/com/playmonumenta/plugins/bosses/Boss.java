@@ -282,7 +282,7 @@ public class Boss {
 	public void nearbyEntityDeath(EntityDeathEvent event) {
 		Location location = event.getEntity().getLocation();
 		for (BossAbilityGroup ability : mAbilities) {
-			if (ability.deadEntityWithinRange(location)) {
+			if (ability.nearbyEntityDeathWithinRange(location)) {
 				ability.nearbyEntityDeath(event);
 			}
 		}

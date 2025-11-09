@@ -1166,8 +1166,8 @@ public class BossManager implements Listener {
 			mNearbyPlayerDeathEnabled = true;
 		}
 
-		if (ability.maxEntityDeathRange() > mMaximumEntityDeathRange) {
-			mMaximumEntityDeathRange = ability.maxEntityDeathRange();
+		if (ability.nearbyEntityDeathMaxRange() > mMaximumEntityDeathRange) {
+			mMaximumEntityDeathRange = ability.nearbyEntityDeathMaxRange();
 		}
 
 		if (ability.maxPlayerDeathRange() > mMaximumPlayerDeathRange) {
@@ -1195,7 +1195,7 @@ public class BossManager implements Listener {
 			}
 			mMaximumEntityDeathRange = mBosses.values().stream()
 				.map(b -> b.getAbilities().stream()
-					.map(BossAbilityGroup::maxEntityDeathRange)
+					.map(BossAbilityGroup::nearbyEntityDeathMaxRange)
 					.max(java.util.Comparator.naturalOrder())
 					.orElse(DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE))
 				.max(java.util.Comparator.naturalOrder())

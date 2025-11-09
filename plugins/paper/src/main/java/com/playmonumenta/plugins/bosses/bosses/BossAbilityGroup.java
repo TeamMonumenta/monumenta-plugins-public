@@ -466,12 +466,12 @@ public abstract class BossAbilityGroup {
 		return false;
 	}
 
-	public double maxEntityDeathRange() {
-		return 0;
+	public double nearbyEntityDeathMaxRange() {
+		return 12;
 	}
 
-	public boolean deadEntityWithinRange(Location location) {
-		return location.distanceSquared(mBoss.getLocation()) <= maxEntityDeathRange() * maxEntityDeathRange();
+	public boolean nearbyEntityDeathWithinRange(Location location) {
+		return location.distanceSquared(mBoss.getLocation()) <= nearbyEntityDeathMaxRange() * nearbyEntityDeathMaxRange();
 	}
 
 	/*

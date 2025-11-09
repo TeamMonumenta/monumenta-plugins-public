@@ -101,6 +101,11 @@ public final class AvengerBoss extends BossAbilityGroup {
 	}
 
 	@Override
+	public double nearbyEntityDeathMaxRange() {
+		return mParam.RADIUS;
+	}
+
+	@Override
 	public void nearbyEntityDeath(final EntityDeathEvent event) {
 		if (event.isCancelled() || !mBoss.isValid() || mBoss.isDead() || mStacks >= mParam.MAX_STACKS) {
 			return;

@@ -522,7 +522,7 @@ public class ExperimentSeventyOne extends Quarry {
 	}
 
 	@Override
-	public double maxEntityDeathRange() {
+	public double nearbyEntityDeathMaxRange() {
 		return OUTER_RADIUS;
 	}
 

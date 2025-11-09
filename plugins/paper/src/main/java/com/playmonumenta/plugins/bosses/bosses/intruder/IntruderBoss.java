@@ -541,7 +541,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 	}
 
 	@Override
-	public double maxEntityDeathRange() {
+	public double nearbyEntityDeathMaxRange() {
 		return DETECTION_RANGE;
 	}
 

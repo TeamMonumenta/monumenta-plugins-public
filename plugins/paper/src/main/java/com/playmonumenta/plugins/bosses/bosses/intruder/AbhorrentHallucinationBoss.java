@@ -73,16 +73,4 @@ public class AbhorrentHallucinationBoss extends BossAbilityGroup {
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.AMBIENT_CAVE, SoundCategory.HOSTILE, 2.0f, 1.4f, 4);
 		}
 	}
-
-	@Override
-	public void nearbyEntityDeath(EntityDeathEvent event) {
-		if (event.getEntity().getScoreboardTags().contains(SUMMON_TAG)) {
-			mBoss.damage(DAMAGE_PER_MOB);
-		}
-	}
-
-	@Override
-	public boolean hasNearbyEntityDeathTrigger() {
-		return true;
-	}
 }

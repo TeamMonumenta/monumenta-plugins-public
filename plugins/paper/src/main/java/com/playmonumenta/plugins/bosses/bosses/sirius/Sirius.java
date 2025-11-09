@@ -569,6 +569,11 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	}
 
 	@Override
+	public double nearbyEntityDeathMaxRange() {
+		return 32;
+	}
+
+	@Override
 	public void nearbyEntityDeath(EntityDeathEvent event) {
 		if (!(event.getEntity() instanceof Player) && event.getEntity().getScoreboardTags().contains(MOB_TAG)) {
 			if (event.getEntity().getScoreboardTags().contains("Elite")) {
