@@ -152,9 +152,7 @@ public class ThunderStep extends Ability {
 			movingPlayerBox,
 			mLevelDistance,
 			vector,
-			CHECK_INCREMENT,
-			true,
-			null, -1, -1
+			CHECK_INCREMENT
 		);
 		Location playerEndLocation = movingPlayerBox
 			.getCenter()
