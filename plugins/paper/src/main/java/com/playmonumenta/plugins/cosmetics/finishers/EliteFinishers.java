@@ -44,6 +44,7 @@ public class EliteFinishers {
 			.put(FalseLichFinisher.NAME, new FalseLichFinisher())
 			.put(FishedUpFinisher.NAME, new FishedUpFinisher())
 			.put(FrozenSolidFinisher.NAME, new FrozenSolidFinisher())
+			.put(GatekeeperFinisher.NAME, new GatekeeperFinisher())
 			.put(GongFinisher.NAME, new GongFinisher())
 			.put(GrindsMyGearsFinisher.NAME, new GrindsMyGearsFinisher())
 			.put(HarmonicDissonanceFinisher.NAME, new HarmonicDissonanceFinisher())

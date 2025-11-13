@@ -111,7 +111,7 @@ public class TransfiguredSpikeCS extends ManaLanceCS {
 		loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_HURT, SoundCategory.PLAYERS, 0.7f, 0.7f);
 	}
 
-	private void spawnTendril(Location loc, Location to, Player mPlayer, Color color1, Color color2) {
+	public static void spawnTendril(Location loc, Location to, Player mPlayer, Color color1, Color color2) {
 		double distance = loc.distance(to);
 
 		new BukkitRunnable() {
