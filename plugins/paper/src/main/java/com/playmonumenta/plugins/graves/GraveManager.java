@@ -20,6 +20,7 @@ import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,6 +60,8 @@ public class GraveManager {
 	private static final HashMap<UUID, ThrownItem> THROWN_ITEMS = new HashMap<>();
 	private static final HashMap<Long, HashSet<Grave>> UNLOADED_GRAVES = new HashMap<>();
 	private static final HashMap<Long, HashSet<ThrownItem>> UNLOADED_THROWN_ITEMS = new HashMap<>();
+	private static final int MAX_ITEM_GRAVES = 10;
+	private static final int GRAVE_WARNING_THRESHOLD = 7;
 	private final ArrayList<ThrownItem> mThrownItems = new ArrayList<>();
 	private final ArrayList<Grave> mGraves = new ArrayList<>();
 	private final Player mPlayer;
@@ -303,6 +306,8 @@ public class GraveManager {
 					Shattered.shatter(item.mItem, Shattered.DROPPED_ITEM_DESTROYED);
 				}
 				if (item.mItem.getAmount() > 0) {
+					// Enforce grave cap before adding new item grave
+					item.mManager.enforceGraveCap();
 					item.mManager.mGraves.add(new Grave(item));
 					item.mManager.mPlayer.sendMessage(Component.text("", NamedTextColor.RED)
 						.append(Component.text("An item").hoverEvent(item.mItem.asHoverEvent()))
@@ -312,6 +317,8 @@ public class GraveManager {
 						.append(Component.text("(/help death for more info)")
 							.clickEvent(ClickEvent.runCommand("/help death")))
 					);
+					// Send warning if approaching grave cap
+					item.mManager.sendGraveCapWarning();
 				}
 			}
 			item.mManager.mThrownItems.remove(item);
@@ -471,5 +478,41 @@ public class GraveManager {
 		}
 		mDeleteAttemptUUID = null;
 		return true;
+	}
+
+	private int getItemGravesCount() {
+		return (int) mGraves.stream().filter(grave -> !grave.mGhostGrave && !grave.isEmpty()).count();
+	}
+
+	private void enforceGraveCap() {
+		int itemGraveCount = getItemGravesCount();
+		if (itemGraveCount >= MAX_ITEM_GRAVES) {
+			// Find and remove the oldest non-ghost grave
+			Grave oldestGrave = mGraves.stream()
+				.filter(grave -> !grave.mGhostGrave && !grave.isEmpty())
+				.min(Comparator.comparing(Grave::getDeathTime))
+				.orElse(null);
+			if (oldestGrave != null) {
+				// Get the item list before deleting the grave
+				Component itemList = oldestGrave.getItemList(true);
+				oldestGrave.delete();
+				mGraves.remove(oldestGrave);
+				mPlayer.sendMessage(Component.text("Your ", NamedTextColor.RED)
+					.append(Component.text("oldest item grave", NamedTextColor.GOLD)
+						.hoverEvent(HoverEvent.showText(itemList)))
+					.append(Component.text(" has been removed because you reached the maximum of " + MAX_ITEM_GRAVES + " item graves.", NamedTextColor.RED)));
+			}
+		}
+	}
+
+	private void sendGraveCapWarning() {
+		int itemGraveCount = getItemGravesCount();
+		if (itemGraveCount >= GRAVE_WARNING_THRESHOLD) {
+			mPlayer.sendMessage(Component.text("Warning: You have ", NamedTextColor.GOLD)
+				.append(Component.text(itemGraveCount, NamedTextColor.YELLOW))
+				.append(Component.text(" out of ", NamedTextColor.GOLD))
+				.append(Component.text(MAX_ITEM_GRAVES, NamedTextColor.YELLOW))
+				.append(Component.text(" item graves. Your oldest grave will be deleted when you reach the limit!", NamedTextColor.GOLD)));
+		}
 	}
 }
