@@ -900,8 +900,21 @@ public class Parser {
 
 		switch (peek.getType()) {
 			case STRING -> {
-				// Los Pool
-				return parseAnyOf(tokens, LibraryOfSoulsIntegration.getPoolNames(), "Los Pool").map(LoSPool.LibraryPool::new);
+				String value = peek.getValue();
+				Set<String> poolNames = LibraryOfSoulsIntegration.getPoolNames();
+				Set<String> partyNames = LibraryOfSoulsIntegration.getPartyNames();
+				
+				if (poolNames.contains(value)) {
+					return parseAnyOf(tokens, poolNames, "Los Pool").map(LoSPool.LibraryPool::new);
+				} else if (partyNames.contains(value)) {
+					return parseAnyOf(tokens, partyNames, "Los Party").map(LoSPool.LibraryPool::new);
+				} else {
+					// Not in either list, throw error with combined suggestions
+					Set<String> allNames = new HashSet<>(poolNames);
+					allNames.addAll(partyNames);
+					throw ParseError.of("Invalid Los Pool/Party name: '" + value + "'", tokens.getIndex() + 1, tokens)
+						.suggests(allNames.stream().sorted().toList(), "Los Pool/Party");
+				}
 			}
 			case OPEN_SQUARE -> {
 				// Inline Pool
