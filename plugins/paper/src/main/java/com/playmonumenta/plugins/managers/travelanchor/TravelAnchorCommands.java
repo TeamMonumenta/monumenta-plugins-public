@@ -14,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
 public class TravelAnchorCommands {
@@ -148,6 +149,14 @@ public class TravelAnchorCommands {
 
 				if (GuildPlotUtils.guildPlotUseTravelAnchorBlocked(player)) {
 					player.sendMessage(GuildPlotUtils.NO_TRAVEL_ANCHOR_ACCESS_COMPONENT);
+					return;
+				}
+
+				if (
+					player.getVehicle() instanceof Interaction interaction &&
+						interaction.getScoreboardTags().contains(TravelUi.TRAVEL_ANCHOR_UI_SEAT_TAG)
+				) {
+					// Already teleporting
 					return;
 				}
 

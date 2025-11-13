@@ -18,6 +18,8 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class TravelUi extends BukkitRunnable {
+	public static final String TRAVEL_ANCHOR_UI_SEAT_TAG = "TravelAnchorUiSeat";
+
 	protected final Player mPlayer;
 	private final Interaction mSeat;
 	private int mWarmupDelay = 20;
@@ -32,10 +34,11 @@ public class TravelUi extends BukkitRunnable {
 		mStartingAnchor = travelAnchor;
 
 		Location loc = player.getLocation();
+		loc.add(0.0, 0.6, 0.0); // For some reason this can teleport players down by 0.6 blocks
 		World world = loc.getWorld();
 		mSeat = world.spawn(loc, Interaction.class, interaction -> {
 			interaction.customName(Component.text("TravelAnchorUiSeat"));
-			interaction.addScoreboardTag("TravelAnchorUiSeat");
+			interaction.addScoreboardTag(TRAVEL_ANCHOR_UI_SEAT_TAG);
 			interaction.addScoreboardTag(Tags.REMOVE_ON_UNLOAD);
 			interaction.setInteractionWidth(0.0f);
 			interaction.setInteractionHeight(0.0f);
