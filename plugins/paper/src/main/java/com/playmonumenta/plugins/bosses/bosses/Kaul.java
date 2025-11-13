@@ -1185,7 +1185,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			@Override
 			void onTick() {
 				mTick++;
-				if (mTick % 10 == 0 && getArenaParticipantsY(ARENA_MAX_Y, 256).size() >= 15) {
+				if (mTick % 10 == 0 && getArenaParticipantsY(ARENA_MAX_Y, 256).size() >= 10) {
 					getArenaParticipants().forEach(p -> AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/celebrity"));
 				}
 			}
