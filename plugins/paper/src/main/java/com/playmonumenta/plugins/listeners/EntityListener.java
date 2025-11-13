@@ -60,6 +60,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
+import org.bukkit.Color;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -726,10 +727,21 @@ public class EntityListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void lingeringPotionSplashEvent(LingeringPotionSplashEvent event) {
-		MetadataUtils.setMetadata(event.getAreaEffectCloud(), AREA_EFFECT_CLOUD_POTION_METAKEY, event.getEntity().getItem());
-		if (!event.getAreaEffectCloud().hasCustomEffects()) {
-			// Area effect clouds without potion effects do not call AreaEffectCloudApplyEvent, so add a dummy effect
-			event.getAreaEffectCloud().addCustomEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 0, 0, true, false, false), false);
+		AreaEffectCloud cloud = event.getAreaEffectCloud();
+		ThrownPotion thrownPotion = event.getEntity();
+		ItemStack potionItem = thrownPotion.getItem();
+		
+		MetadataUtils.setMetadata(cloud, AREA_EFFECT_CLOUD_POTION_METAKEY, potionItem);
+		
+		if (!cloud.hasCustomEffects()) {
+			cloud.addCustomEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 0, 0, true, false, false), false);
+		}
+		
+		if (potionItem.getItemMeta() instanceof PotionMeta potionMeta) {
+			Color color = potionMeta.getColor();
+			if (color != null) {
+				cloud.setColor(color);
+			}
 		}
 	}
 
