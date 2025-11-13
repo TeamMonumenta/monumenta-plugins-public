@@ -39,7 +39,7 @@ public class WitheringGaze extends Ability {
 	public static final String CHARM_COOLDOWN = "Withering Gaze Cooldown";
 	public static final String CHARM_RANGE = "Withering Gaze Range";
 	public static final String CHARM_CONE = "Withering Gaze Cone";
-	public static final String CHARM_DOT = "Withering Gaze Dot Duration";
+	public static final String CHARM_DOT = "Withering Gaze Damage Over Time Duration";
 	public static final String CHARM_DAMAGE = "Withering Gaze Damage";
 
 	public static final AbilityInfo<WitheringGaze> INFO =
@@ -94,7 +94,7 @@ public class WitheringGaze extends Ability {
 							EntityUtils.applyStun(mPlugin, mStunDuration, e);
 						}
 						mPlugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(mDOTDuration, mDOTDamage,
-							WITHERING_GAZE_DOT_PERIOD, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageEvent.DamageType.AILMENT));
+							WITHERING_GAZE_DOT_PERIOD, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC));
 					}
 				}
 
@@ -118,7 +118,7 @@ public class WitheringGaze extends Ability {
 			.addDuration(a -> a.mStunDuration, WITHERING_GAZE_STUN_DURATION)
 			.add(" seconds (elites and bosses are rooted instead) and dealt ")
 			.add(a -> a.mDOTDamage, WITHERING_GAZE_DOT_DAMAGE)
-			.add(" every ")
+			.add(" magic damage every ")
 			.addDuration(WITHERING_GAZE_DOT_PERIOD)
 			.add(" seconds for ")
 			.addDuration(a -> a.mDOTDuration, WITHERING_GAZE_DOT_DURATION_1, false, Ability::isLevelOne)

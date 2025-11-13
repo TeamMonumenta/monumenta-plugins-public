@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -23,7 +24,9 @@ public class ImmortalPassengerBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_immortalpassenger";
 
-	private static final ImmutableList<Class<? extends Effect>> COPIED_EFFECTS = ImmutableList.of(InfernoDamage.class, CustomDamageOverTime.class);
+	private static final ImmutableList<Class<? extends Effect>> COPIED_EFFECTS = ImmutableList.of(
+		InfernoDamage.class,
+		CustomDamageOverTime.class);
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Whether or not damage taken by this mount is redirected to its passenger")
@@ -100,4 +103,25 @@ public class ImmortalPassengerBoss extends BossAbilityGroup {
 		}
 	}
 
+	public boolean isTransferringDamage() {
+		return mTransferDamage;
+	}
+
+	public static boolean isDamageTransferringImmortalPassenger(LivingEntity boss) {
+		ImmortalPassengerBoss instance = BossManager.getInstance().getBoss(boss, ImmortalPassengerBoss.class);
+		if (instance == null) {
+			return false;
+		} else {
+			return instance.isTransferringDamage();
+		}
+	}
+
+	public static LivingEntity getMortalMount(LivingEntity boss) {
+		if (isDamageTransferringImmortalPassenger(boss) && boss.getVehicle() instanceof LivingEntity vehicle) {
+			// Technically misses the case of an immortal damage-transferring passenger riding an immortal non-damage-transferring passenger riding something else, but there is no reason for that to ever exist
+			return getMortalMount(vehicle);
+		} else {
+			return boss;
+		}
+	}
 }

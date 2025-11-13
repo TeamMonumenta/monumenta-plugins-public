@@ -144,7 +144,7 @@ public class AlchemicalArtillery extends Ability {
 			physicsItem.setCanMobPickup(false);
 			physicsItem.setVelocity(vel);
 			physicsItem.addPassenger(grenade);
-			EntityUtils.makeItemInvulnereable(physicsItem);
+			EntityUtils.makeItemInvulnerable(physicsItem);
 
 			new BukkitRunnable() {
 				int mTicks = 0;
@@ -229,7 +229,7 @@ public class AlchemicalArtillery extends Ability {
 				mCosmetic.aftershockEffect(mPlayer, loc, radius, mobs);
 
 				for (LivingEntity mob : mobs) {
-					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), finalDamage, true, false, false);
+					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, ClassAbility.ALCHEMICAL_ARTILLERY_AFTERSHOCK, playerItemStats), finalDamage, true, false, false);
 					applyEffects(mob, playerItemStats, isGruesome, true);
 				}
 

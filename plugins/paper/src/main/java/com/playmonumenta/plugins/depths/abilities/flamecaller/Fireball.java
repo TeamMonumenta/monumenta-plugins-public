@@ -104,7 +104,7 @@ public class Fireball extends DepthsAbility {
 		physicsItem.setCanPlayerPickup(false);
 		physicsItem.setCanMobPickup(false);
 		physicsItem.setVelocity(vel);
-		EntityUtils.makeItemInvulnereable(physicsItem);
+		EntityUtils.makeItemInvulnerable(physicsItem);
 
 		new BukkitRunnable() {
 			int mTicks = 0;

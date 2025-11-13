@@ -421,6 +421,15 @@ public class CustomContainerItemManager implements Listener {
 		item.setAmount(0);
 	}
 
+	/**
+	 * Removes the first ItemStack matching the input predicates.
+	 *
+	 * @param container The container to select items from.
+	 * @param maxAmount The maximum number of items to select.
+	 * @param testPredicate Predicate (yes/no statement) that determines which item to select.
+	 * @param consumePredicate Predicate (yes/no statement) that determines whether the item should actually be removed from the container.
+	 * @return The ItemStack that was selected from the container, as well as whether it was actually removed or not.
+	 */
 	public static @Nullable Pair<ItemStack, Boolean> removeFirstFromContainer(ItemStack container, int maxAmount, Predicate<ItemStack> testPredicate, Predicate<ItemStack> consumePredicate) {
 		if (container.getAmount() != 1) { // don't perform most validity checks - this is called from outside of GUIs etc.
 			throw new IllegalStateException("Container not valid in removeFirstFromContainer");

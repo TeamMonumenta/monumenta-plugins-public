@@ -245,7 +245,7 @@ public class AbilityUtils {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, POTION_REFUNDED_METAKEY)) {
 			ItemStack item = potion.getItem();
-			if (mainHand != null && mainHand.isSimilar(item) && !mainHand.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+			if (mainHand.isSimilar(item) && !mainHand.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 				mainHand.setAmount(mainHand.getAmount() + 1);
 				return true;
 			}
@@ -571,7 +571,7 @@ public class AbilityUtils {
 		ClassAbility.ARCANE_STRIKE_ENHANCED,
 		ClassAbility.PREDATOR_STRIKE,
 		ClassAbility.ALCHEMIST_POTION,
-		ClassAbility.ALCHEMICAL_ARTILLERY,
+		ClassAbility.ALCHEMICAL_ARTILLERY, // NOT its enhancement
 		ClassAbility.UNSTABLE_AMALGAM,
 		ClassAbility.ETHEREAL_ASCENSION,
 		ClassAbility.HALLOWED_BEAM
@@ -592,6 +592,7 @@ public class AbilityUtils {
 
 	public static boolean isChargedAspectTriggeringEvent(DamageEvent event, Player player) {
 		DamageEvent.DamageType type = event.getType();
+		ClassAbility ability = event.getAbility();
 
 		if (isAspectTriggeringEvent(event, player)) {
 			switch (type) {
@@ -606,11 +607,27 @@ public class AbilityUtils {
 					}
 				}
 				default -> {
-					return true;
+					if (ability == null) {
+						// Avoids a warning
+						return true;
+					}
+					switch (ability) {
+						case ETHEREAL_ASCENSION -> {
+							if (event.getBossSpellName() != null) {
+								// Ethereal Ascension orbs are marked as "non-critical" with the "boss spell name".
+								// Non-critical EA orbs cannot be allowed to transfer Bleed.
+								return false;
+							}
+						}
+						case ALCHEMICAL_ARTILLERY -> {
+							return false;
+						}
+					}
 				}
 			}
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	public static void produceDurationString(LivingEntity totem, ArmorStand target, int totalDuration, int currentDuration, double whirlwindBuffed, boolean decayBuffed) {
@@ -731,7 +748,7 @@ public class AbilityUtils {
 		droppedItem.setPickupDelay(Integer.MAX_VALUE);
 		droppedItem.setGlowing(glow);
 		if (invulnerable) {
-			EntityUtils.makeItemInvulnereable(droppedItem);
+			EntityUtils.makeItemInvulnerable(droppedItem);
 		}
 		EntityUtils.setRemoveEntityOnUnload(droppedItem);
 		return droppedItem;

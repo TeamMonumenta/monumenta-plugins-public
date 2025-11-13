@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.AmplifyingHexCS;
+import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -196,7 +197,7 @@ public class AmplifyingHex extends Ability {
 				debuffCount++;
 			}
 
-			Double bleed = effectPairList.get(EntityUtils.BLEED_EFFECT_NAME);
+			Double bleed = effectPairList.get(Bleed.BLEED_EFFECT_NAME);
 			if (bleed != null) {
 				debuffCount++;
 				amplifierCounts.add(Math.min(mAmplifierCap, bleed.intValue() - 1));

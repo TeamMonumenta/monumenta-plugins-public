@@ -55,7 +55,7 @@ public class CharmFactory {
 	public static final double WILDCARD_BUDGET_MODIFIER = 1.8;
 	public static final int[] WILDCARD_TREE_CAP_CHANCES = {0, 50, 30, 12, 5, 2, 1};
 
-	public static final Map<String, String> charmConversionMap = Map.ofEntries(
+	public static final Map<String, String> charmConversionMap = Map.<String, String>ofEntries(
 		Map.entry("Precision Strike Range", "Precision Strike Range Requirement"),
 		Map.entry("Fireball Range", "Fireball Velocity"),
 		Map.entry("Ring of Flames Cooldown", "Igneous Rune Cooldown"),
@@ -122,7 +122,10 @@ public class CharmFactory {
 		Map.entry("Crushing Earth Damage", "Beast's Claw Damage"),
 		Map.entry("Crushing Earth Cooldown", "Beast's Claw Cooldown"),
 		Map.entry("Crushing Earth Range", "Beast's Claw Velocity"),
-		Map.entry("Crushing Earth Stun Duration", "Beast's Claw Stun Duration")
+		Map.entry("Crushing Earth Stun Duration", "Beast's Claw Stun Duration"),
+
+		Map.entry("Focused Combos Bleed Amplifier", "Focused Combos Damage Multiplier"),
+		Map.entry("Focused Combos Bleed Duration", "Focused Combos Damage Multiplier")
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {

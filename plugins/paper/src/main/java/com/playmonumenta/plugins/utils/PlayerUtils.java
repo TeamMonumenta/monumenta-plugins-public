@@ -23,8 +23,10 @@ import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.effects.hexfall.Reincarnation;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.HemorrhageEvent;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enchantments.ThrowingKnife;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
@@ -62,6 +64,7 @@ import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -82,6 +85,12 @@ public class PlayerUtils {
 	public static void callAbilityCastEvent(Player player, Ability ability, ClassAbility spell) {
 		AbilityCastEvent event = new AbilityCastEvent(player, ability, spell);
 		Bukkit.getPluginManager().callEvent(event);
+	}
+
+	public static HemorrhageEvent callHemorrhageEvent(Player player, LivingEntity mob) {
+		HemorrhageEvent event = new HemorrhageEvent(player, mob);
+		Bukkit.getPluginManager().callEvent(event);
+		return event;
 	}
 
 	public static void awardStrike(Plugin plugin, Player player, String reason) {
@@ -181,7 +190,7 @@ public class PlayerUtils {
 	 * @return The players that fit the criteria
 	 */
 	public static List<Player> playersInRange(Iterable<Player> ps, Location loc, double range,
-	                                          boolean includeNonTargetable, boolean includeDead) {
+											  boolean includeNonTargetable, boolean includeDead) {
 		List<Player> players = new ArrayList<>();
 
 		double rangeSquared = range * range;
@@ -198,7 +207,7 @@ public class PlayerUtils {
 	}
 
 	public static List<Player> playersInRange(Location loc, double range, boolean includeNonTargetable,
-	                                          boolean includeDead) {
+											  boolean includeDead) {
 		return playersInRange(loc.getWorld().getPlayers(), loc, range, includeNonTargetable, includeDead);
 	}
 
@@ -207,7 +216,7 @@ public class PlayerUtils {
 	}
 
 	public static List<Player> playersInXZRange(Location loc, double range, boolean includeNonTargetable,
-	                                            boolean includeDead) {
+												boolean includeDead) {
 		List<Player> players = new ArrayList<>();
 
 		for (Player player : loc.getWorld().getPlayers()) {
@@ -333,13 +342,23 @@ public class PlayerUtils {
 		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + player.getUniqueId() + " at @s run " + command);
 	}
 
-	// How far back the player drew their bow,
-	// vs what its max launch speed would be.
-	// Launch velocity used to calculate is specifically for PLAYERS shooting BOWS!
-	// Returns from 0.0 to 1.0, with 1.0 being full draw
+	/**
+	 * Computes the percentage "drawn" a projectile is, if shot from a bow.
+	 * Arrows not shot from bows (crossbows, throwing knives, and tridents)
+	 * are always critical (1.0).
+	 *
+	 * @param arrowlike The AbstractArrow to investigate.
+	 * @return Bow draw, clamped between 0.0 and 1.0.
+	 */
 	public static double calculateBowDraw(AbstractArrow arrowlike) {
 		if (arrowlike == null) {
 			return 0;
+		}
+		if (arrowlike.isShotFromCrossbow()
+			|| ThrowingKnife.isThrowingKnife(arrowlike)
+			|| arrowlike instanceof Trident) {
+			// These are always critical.
+			return 1;
 		}
 		double currentSpeed = arrowlike.getVelocity().length();
 		ItemStatManager.PlayerItemStats itemStats = DamageListener.getProjectileItemStats(arrowlike);
@@ -353,7 +372,7 @@ public class PlayerUtils {
 				percentage *= -1;
 			}
 			// Often small deviations when fully charged
-			if (percentage >= 0.98) {
+			if (percentage >= 0.96) {
 				percentage = 1;
 			}
 			return percentage;
@@ -717,7 +736,7 @@ public class PlayerUtils {
 	}
 
 	public static Location getRespawnLocationAndClear(Player player, World world,
-	                                                  @Nullable Location originalRespawnLocation) {
+													  @Nullable Location originalRespawnLocation) {
 		Location realRespawnLocation = player.getPotentialBedLocation();
 		boolean mightBeBedSpawn = false;
 		if (realRespawnLocation == null || realRespawnLocation.getWorld() != world) {
@@ -800,7 +819,7 @@ public class PlayerUtils {
 	 * @param bypassReincarn whether the kill should bypass the player's reincarnation effect
 	 */
 	public static void killPlayer(Player player, @Nullable LivingEntity damager, @Nullable String cause,
-	                              boolean bypassStasis, boolean bypassInvuln, boolean bypassReincarn) {
+								  boolean bypassStasis, boolean bypassInvuln, boolean bypassReincarn) {
 		if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
 			Plugin monumentaPlugin = Plugin.getInstance();
 			monumentaPlugin.mEffectManager.clearEffects(player, VoodooBonds.PROTECTION_EFFECT);

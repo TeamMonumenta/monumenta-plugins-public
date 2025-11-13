@@ -278,7 +278,8 @@ public class ItemUpdateManager implements Listener {
 			logNestedException(path, e);
 		}
 
-		/* Updating containers nested in items disabled for now to improve performance.
+		/* Updating containers nested in items disabled for now to improve performance. */
+		/*
 		if (item.hasItemMeta()) {
 			ItemMeta itemMeta = item.getItemMeta();
 			if (itemMeta instanceof BlockStateMeta) {

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -26,7 +27,9 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_immortalmount";
 
-	private static final ImmutableList<Class<? extends Effect>> COPIED_EFFECTS = ImmutableList.of(InfernoDamage.class, CustomDamageOverTime.class);
+	private static final ImmutableList<Class<? extends Effect>> COPIED_EFFECTS = ImmutableList.of(
+		InfernoDamage.class,
+		CustomDamageOverTime.class);
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Whether or not damage taken by this mount is redirected to its passenger")
@@ -114,6 +117,7 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 		if (mTransferDamage && mPassenger != null && COPIED_EFFECTS.contains(event.getEffect().getClass())) {
 			event.setEntity(mPassenger);
 		}
+		// Jade (catgirljade_) says that this is a bad method and the transference of DoT / Inferno should happen further up in the pipeline.
 	}
 
 	@Override
@@ -126,4 +130,34 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 		}
 	}
 
+	public boolean isTransferDamage() {
+		return mTransferDamage;
+	}
+
+	public static boolean isDamageTransferringImmortalMount(LivingEntity boss) {
+		ImmortalMountBoss instance = BossManager.getInstance().getBoss(boss, ImmortalMountBoss.class);
+		if (instance == null) {
+			return false;
+		} else {
+			return instance.isTransferDamage();
+		}
+	}
+
+	public static List<LivingEntity> getMortalPassengers(LivingEntity boss) {
+		if (isDamageTransferringImmortalMount(boss)) {
+			List<LivingEntity> passengers = new java.util.ArrayList<>();
+			for (Entity entity : boss.getPassengers()) {
+				if (entity instanceof LivingEntity livingEntity) {
+					passengers.addAll(getMortalPassengers(livingEntity));
+				}
+			}
+			if (passengers.isEmpty()) {
+				return List.of(boss);
+			} else {
+				return passengers;
+			}
+		} else {
+			return List.of(boss);
+		}
+	}
 }

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -15,7 +16,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
 
 public class PointBlank implements Enchantment {
 	public static final int DISTANCE = 8;
@@ -44,11 +44,13 @@ public class PointBlank implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity target) {
 		if (event.getType() == DamageType.PROJECTILE && !event.isCancelled()) {
-			if (event.getDamager() instanceof AbstractArrow arrow && !(arrow instanceof Trident) && !arrow.isCritical()) {
-				return;
+			double effectiveness = 1.0;
+			if (event.getDamager() instanceof AbstractArrow arrow) {
+				// calculateBowDraw handles TK, crossbows and tridents automatically
+				effectiveness = PlayerUtils.calculateBowDraw(arrow);
 			}
 
-			event.setFlatDamage(event.getFlatDamage() + apply(player, target, level));
+			event.setFlatDamage(event.getFlatDamage() + effectiveness * apply(player, target, level));
 		}
 	}
 

@@ -200,7 +200,7 @@ public class ItemUpdateHelper {
 		}
 
 		if (wasDirty && ItemStatUtils.isZenithCharm(item)) {
-			// Update Depths charms once a week (when not clean) to catch balance changes
+			// Update Zenith charms once a week (when not clean) to catch balance changes
 			// This calls generateItemStats again once updated. Mark clean to prevent infinite recursion
 			ItemStack newCharm = CharmFactory.updateCharm(item);
 			if (newCharm != null) {

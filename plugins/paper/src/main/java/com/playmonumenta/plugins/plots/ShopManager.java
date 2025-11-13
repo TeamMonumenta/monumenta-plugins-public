@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -108,7 +109,7 @@ public class ShopManager implements Listener {
 				shop = Shop.fromShopEntity(damagee);
 			} catch (WrapperCommandSyntaxException ex) {
 				// Not a shop after all?
-				Plugin.getInstance().getLogger().warning("Tried to damage a shulker that seemed like a shop but wasn't: " + ex.getMessage());
+				MMLog.warning("Tried to damage a shulker that seemed like a shop but wasn't: " + ex.getMessage());
 				return;
 			}
 

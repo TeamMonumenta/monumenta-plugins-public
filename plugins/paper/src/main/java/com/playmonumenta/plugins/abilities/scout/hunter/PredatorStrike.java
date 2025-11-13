@@ -79,6 +79,9 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	public static final String CHARM_RANGE = "Predator Strike Range";
 	public static final String CHARM_KNOCKBACK = "Predator Strike Knockback";
 	public static final String CHARM_PIERCING = "Predator Strike Enemies Pierced";
+	public static final String CHARM_DAMAGE_RANGE = "Predator Strike Damage Scaling Range";
+	public static final String CHARM_DISTANCE_SCALE = "Predator Strike Damage Per Block";
+	public static final String CHARM_BASE_DAMAGE = "Predator Strike Base Damage Multiplier";
 
 	public static final AbilityInfo<PredatorStrike> INFO =
 		new AbilityInfo<>(PredatorStrike.class, "Predator Strike", PredatorStrike::new)
@@ -103,6 +106,8 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	private @Nullable BukkitRunnable mDeactivationRunnable = null;
 	private final double mRange;
 	private final double mDistanceScale;
+	private final double mDamageRange;
+	private final double mBaseDamage;
 	private final double mExplodeRadius;
 	private @Nullable SwiftCuts mSwiftCuts;
 	private int mCurrDuration = -1;
@@ -113,9 +118,11 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	public PredatorStrike(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, MAX_RANGE);
-		mDistanceScale = isLevelOne() ? DISTANCE_SCALE_1 : DISTANCE_SCALE_2;
+		mDistanceScale = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DISTANCE_SCALE, isLevelOne() ? DISTANCE_SCALE_1 : DISTANCE_SCALE_2);
 		mExplodeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EXPLODE_RADIUS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new PredatorStrikeCS());
+		mDamageRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE_RANGE, MAX_DAMAGE_RANGE);
+		mBaseDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_BASE_DAMAGE, DAMAGE_MULTIPLIER);
 
 		Bukkit.getScheduler().runTask(plugin, () ->
 			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, SwiftCuts.class));
@@ -241,7 +248,7 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 			damage += PointBlank.apply(mPlayer, piercedMob.getLocation(), ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.POINT_BLANK));
 			damage += Sniper.apply(mPlayer, piercedMob.getLocation(), ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SNIPER));
 			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-			damage *= DAMAGE_MULTIPLIER + mDistanceScale * Math.min(mPlayer.getLocation().distance(piercedMob.getLocation()), MAX_DAMAGE_RANGE);
+			damage *= mBaseDamage + mDistanceScale * Math.min(mPlayer.getLocation().distance(piercedMob.getLocation()), mDamageRange);
 
 			float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, EXPLODE_KNOCKBACK);
 
@@ -260,7 +267,7 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 			damage += PointBlank.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.POINT_BLANK));
 			damage += Sniper.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SNIPER));
 			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-			damage *= DAMAGE_MULTIPLIER + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE);
+			damage *= mBaseDamage + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), mDamageRange);
 
 			float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, EXPLODE_KNOCKBACK);
 
@@ -349,11 +356,11 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 			.add(" blocks in a straight line until it collides with an enemy or block. Enemies within ")
 			.add(a -> a.mExplodeRadius, EXPLODE_RADIUS)
 			.add(" blocks of the impact receive ")
-			.addPercent(DAMAGE_MULTIPLIER)
+			.addPercent(a -> a.mBaseDamage, DAMAGE_MULTIPLIER, false)
 			.add(" of your Projectile damage increased by ")
 			.addPercent(a -> a.mDistanceScale, DISTANCE_SCALE_1, false, Ability::isLevelOne)
 			.add(" for every block of distance between you and the hit enemy (up to ")
-			.add(a -> MAX_DAMAGE_RANGE, MAX_DAMAGE_RANGE)
+			.add(a -> a.mDamageRange, MAX_DAMAGE_RANGE)
 			.add(" blocks). The final damage an enemy receives is capped at ")
 			.add(a -> R2_CAP, R2_CAP)
 			.add(" in Region 2 and ")

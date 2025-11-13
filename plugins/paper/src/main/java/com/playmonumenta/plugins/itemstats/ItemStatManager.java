@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.HemorrhageEvent;
 import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
 import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
@@ -237,7 +238,7 @@ public class ItemStatManager implements Listener {
 		}
 
 		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet,
-		                        Player player, boolean updateAll, @Nullable Region region, boolean withShardSpecificRegion) {
+								Player player, boolean updateAll, @Nullable Region region, boolean withShardSpecificRegion) {
 			mMainhand = mainhand;
 			mRegion = region != null ? region : ServerProperties.getRegion(player);
 
@@ -868,6 +869,14 @@ public class ItemStatManager implements Listener {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onAbilityCast(plugin, player, entry.getValue(), event);
+			}
+		}
+	}
+
+	public void onHemorrhage(Plugin plugin, Player player, HemorrhageEvent event) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onHemorrhage(plugin, player, entry.getValue(), event);
 			}
 		}
 	}

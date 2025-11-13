@@ -58,6 +58,9 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 		return mDuration;
 	}
 
+	public String getEffectID() {
+		return mEffectID;
+	}
 	/**
 	 * Builder method to set mDeleteOnAbilityUpdate when creating a new Effect. This should only be used with classes
 	 * that extend Ability since children of DepthsAbility are frequently updated during normal gameplay (e.g. ability upgrade)

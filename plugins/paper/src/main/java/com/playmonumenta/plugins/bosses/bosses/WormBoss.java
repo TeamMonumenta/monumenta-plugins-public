@@ -1,12 +1,17 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.delves.DelvesManager;
+import com.playmonumenta.plugins.effects.ProjectileIframe;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.events.HemorrhageEvent;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -18,15 +23,17 @@ import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class WormBoss extends BossAbilityGroup {
+public class WormBoss extends BossAbilityGroup implements Listener {
 	public static final String identityTag = "boss_worm";
-	public static final String IGNORE_WORM_TAG = "boss_ignore_worm_segment";
+	public static final String IGNORE_WORM_TAG = WormSegmentBoss.identityTag;
 
 	public static class Parameters extends BossParameters {
 		public int DETECTION = 64;
@@ -122,7 +129,12 @@ public class WormBoss extends BossAbilityGroup {
 		part.addScoreboardTag(DelvesManager.AVOID_MODIFIERS);
 		part.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
 		part.addScoreboardTag(EntityUtils.DONT_ENTER_BOATS_TAG);
-		part.addScoreboardTag(IGNORE_WORM_TAG);
+		try {
+			BossManager.getInstance().manuallyRegisterBoss(part, new WormSegmentBoss(mPlugin, part, mBoss));
+		} catch (Exception e) {
+			MMLog.warning("Failed to create boss WormSegmentBoss: " + e.getMessage());
+			e.printStackTrace();
+		}
 		int size = tail ? params.TAIL_SIZE : params.BODY_SIZE;
 		if (size >= 0) {
 			EntityUtils.setSize(part, size);
@@ -131,12 +143,20 @@ public class WormBoss extends BossAbilityGroup {
 		part.customName(Component.text(name + (tail ? " Tail" : " Body")));
 
 		part.setSilent(true);
-		part.getPassengers().forEach(p -> {
-			p.setSilent(true);
-			p.addScoreboardTag(DelvesManager.AVOID_MODIFIERS);
-			p.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
-			p.addScoreboardTag(EntityUtils.DONT_ENTER_BOATS_TAG);
-			p.addScoreboardTag(IGNORE_WORM_TAG);
+		part.getPassengers().forEach(passenger -> {
+			passenger.setSilent(true);
+			passenger.addScoreboardTag(DelvesManager.AVOID_MODIFIERS);
+			passenger.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
+			passenger.addScoreboardTag(EntityUtils.DONT_ENTER_BOATS_TAG);
+			if (passenger instanceof LivingEntity livingEntity) {
+				try {
+					BossManager.getInstance().manuallyRegisterBoss(livingEntity, new WormSegmentBoss(mPlugin, livingEntity, null));
+					// We still want the bosstag so that it doesn't proc Cloaked or UA or whatever, but we don't want damage transference, so set the head to null
+				} catch (Exception e) {
+					MMLog.warning("Failed to create boss WormSegmentBoss: " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
 		});
 		mParts.add(part);
 
@@ -164,6 +184,32 @@ public class WormBoss extends BossAbilityGroup {
 		for (LivingEntity part : mParts) {
 			part.setInvulnerable(false);
 			part.setHealth(0);
+		}
+	}
+
+	@EventHandler
+	public void onHemorrhage(HemorrhageEvent event) {
+		if (event.getMob() == mBoss) {
+			for (LivingEntity livingEntity : mParts) {
+				if (!livingEntity.isDead()) {
+					EntityUtils.applyHemorrhageCooldown(
+						com.playmonumenta.plugins.Plugin.getInstance(),
+						livingEntity, true);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
+		if (event.getEffect() instanceof ProjectileIframe projectileIframe) {
+			// Has to be hardcoded for proj iframes...
+			for (LivingEntity part : mParts) {
+				if (!part.isDead()) {
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.
+						addEffect(part, ProjectileIframe.SOURCE, projectileIframe.cleanCopy());
+				}
+			}
 		}
 	}
 

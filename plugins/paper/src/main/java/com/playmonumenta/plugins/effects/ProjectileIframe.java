@@ -18,6 +18,12 @@ public class ProjectileIframe extends Effect {
 		mAmount = amount;
 	}
 
+	public ProjectileIframe cleanCopy() {
+		ProjectileIframe copy = new ProjectileIframe(mDuration, mAmount);
+		copy.mUsed = false;
+		return copy;
+	}
+
 	@Override
 	public double getMagnitude() {
 		return mAmount;

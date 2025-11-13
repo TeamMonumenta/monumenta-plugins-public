@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 public class Earthseeker implements Enchantment {
 	public static final double DAMAGE_BONUS_PER_LEVEL = 0.1;
 
+	// NOTE: Enchantment is deprecated / unused as of 14th Oct 2025
+
 	@Override
 	public EnchantmentType getEnchantmentType() {
 		return EnchantmentType.EARTHSEEKER;

@@ -51,19 +51,19 @@ public class Stamina implements Enchantment {
 	}
 
 	private void applyStamina(Plugin plugin, Player player, double level) {
-		NavigableSet<Effect> s = plugin.mEffectManager.getEffects(player, STAMINA_EFFECT);
-		if (s != null && s.last().getDuration() > DURATION - 20) {
+		NavigableSet<Effect> effectNavigableSet = plugin.mEffectManager.getEffects(player, STAMINA_EFFECT);
+		if (effectNavigableSet != null && effectNavigableSet.last().getDuration() > DURATION - 20) {
 			// attacked within 1s, do not run anything/refresh effect
 			return;
 		}
 		double currStamina = 0;
-		if (s != null) {
-			currStamina = s.last().getMagnitude();
+		if (effectNavigableSet != null) {
+			currStamina = effectNavigableSet.last().getMagnitude();
 			// Reset the duration of the previous stacks so that
 			// they don't decay in the background, and instead
 			// reappear once the greater magnitude stack effect runs out.
-			int durationMultiplier = (int) Math.min(DAMAGE_CAP / DAMAGE_BONUS, s.size() + 1);
-			for (Effect effect : s) {
+			int durationMultiplier = (int) Math.min(DAMAGE_CAP / DAMAGE_BONUS, effectNavigableSet.size() + 1);
+			for (Effect effect : effectNavigableSet) {
 				effect.setDuration(durationMultiplier * DURATION);
 				durationMultiplier--;
 			}

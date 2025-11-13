@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.CursedWoundCS;
+import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
@@ -152,7 +153,7 @@ public class CursedWound extends Ability {
 					mCosmetic.onEffectApplication(mPlayer, mob);
 					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME,
 						new CustomDamageOverTime(CURSED_WOUND_DURATION, mDOTDamage,
-							CURSED_WOUND_DOT_PERIOD, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageType.AILMENT));
+							CURSED_WOUND_DOT_PERIOD, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageType.MAGIC));
 				}
 			}
 			return true;
@@ -179,10 +180,14 @@ public class CursedWound extends Ability {
 
 			mStoredCustomEffects = new HashMap<>();
 			Map<String, Effect> customEffects = mPlugin.mEffectManager.getPriorityEffects(entity);
-			for (Map.Entry<String, Effect> e : customEffects.entrySet()) {
-				String source = e.getKey();
-				Effect effect = e.getValue();
+			for (Map.Entry<String, Effect> entry : customEffects.entrySet()) {
+				String source = entry.getKey();
+				Effect effect = entry.getValue();
 				if (effect.isDebuff()) {
+					if (effect instanceof Bleed bleedEffect && bleedEffect.hasHemorrhaged()) {
+						// Prevent it from transferring a Bleed effect that has already hemorrhaged, as that is used to mark the mob and prevent it from receiving bleed stacks
+						continue;
+					}
 					mStoredCustomEffects.put(source, effect);
 				}
 			}
@@ -199,7 +204,7 @@ public class CursedWound extends Ability {
 			.add(a -> a.mRadius, CURSED_WOUND_RADIUS)
 			.add(" blocks around it with ")
 			.add(a -> a.mDOTDamage, CURSED_WOUND_DOT_DAMAGE)
-			.add(" damage every second for ")
+			.add(" magic damage every second for ")
 			.addDuration(CURSED_WOUND_DURATION)
 			.add(" seconds. Your melee scythe attacks passively deal ")
 			.addPercent(a -> a.mCursedWoundDamage, CURSED_WOUND_DAMAGE_1, false, Ability::isLevelOne)

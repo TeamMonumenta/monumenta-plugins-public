@@ -76,8 +76,8 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 	private static final double DAMAGE_FRACTION_2 = 0.3;
 	private static final int STUN_TIME_1 = 2 * 20;
 	private static final int STUN_TIME_2 = 3 * 20;
-	private static final int BLEED_DURATION = 5 * 20;
-	private static final double BLEED_AMOUNT = 0.2;
+	private static final int WEAKEN_DURATION = 5 * 20;
+	private static final double WEAKEN_AMOUNT = 0.2;
 	private static final double VELOCITY = 0.9;
 	private static final double JUMP_HEIGHT = 0.8;
 	private static final double MAX_TARGET_Y = 4;
@@ -87,8 +87,8 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 	public static final String CHARM_COOLDOWN = "Hunting Companion Cooldown";
 	public static final String CHARM_DURATION = "Hunting Companion Duration";
 	public static final String CHARM_STUN_DURATION = "Hunting Companion Stun Duration";
-	public static final String CHARM_BLEED_DURATION = "Hunting Companion Bleed Duration";
-	public static final String CHARM_BLEED_AMPLIFIER = "Hunting Companion Bleed Amplifier";
+	public static final String CHARM_WEAKEN_DURATION = "Hunting Companion Weaken Duration";
+	public static final String CHARM_WEAKEN_AMPLIFIER = "Hunting Companion Weaken Amplifier";
 	public static final String CHARM_DAMAGE = "Hunting Companion Damage";
 	public static final String CHARM_HEALING = "Hunting Companion Healing";
 	public static final String CHARM_SPEED = "Hunting Companion Speed";
@@ -110,8 +110,8 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 	private final HashMap<Mob, LivingEntity> mSummons;
 	private final double mDamageFraction;
 	private final int mStunDuration;
-	private final int mBleedDuration;
-	private final double mBleedAmount;
+	private final int mWeakenDuration;
+	private final double mWeakenAmount;
 	private final double mHealingPercent;
 	private @Nullable BukkitRunnable mRunnable;
 
@@ -124,8 +124,8 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 		super(plugin, player, INFO);
 		mDamageFraction = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2);
 		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, (isLevelOne() ? STUN_TIME_1 : STUN_TIME_2));
-		mBleedDuration = CharmManager.getDuration(mPlayer, CHARM_BLEED_DURATION, BLEED_DURATION);
-		mBleedAmount = BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER);
+		mWeakenDuration = CharmManager.getDuration(mPlayer, CHARM_WEAKEN_DURATION, WEAKEN_DURATION);
+		mWeakenAmount = WEAKEN_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN_AMPLIFIER);
 		mHealingPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEALING_PERCENT);
 		mSummons = new HashMap<>();
 		mRunnable = null;
@@ -356,7 +356,7 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 					}
 
 					if (eagle) {
-						EntityUtils.applyBleed(mPlugin, mBleedDuration, mBleedAmount, target);
+						EntityUtils.applyWeaken(mPlugin, mWeakenDuration, mWeakenAmount, target);
 					}
 
 					mPlugin.mEffectManager.addEffect(target, HEAL_EFFECT, new HealPlayerOnDeath(60 * 20, EntityUtils.getMaxHealth(mPlayer) * mHealingPercent, mPlayer));
@@ -500,9 +500,9 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 	private static Description<HuntingCompanion> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Also summon an invulnerable eagle companion (parrot). The eagle deals the same damage as the fox and targets similarly, although the two will always avoid targeting the same mob at once. The eagle can swoop towards its target. The eagle applies ")
-			.addPercent(a -> a.mBleedAmount, BLEED_AMOUNT)
-			.add(" bleed for ")
-			.addDuration(a -> a.mBleedDuration, BLEED_DURATION)
+			.addPercent(a -> a.mWeakenAmount, WEAKEN_AMOUNT)
+			.add(" weaken for ")
+			.addDuration(a -> a.mWeakenDuration, WEAKEN_DURATION)
 			.add(" seconds instead of stunning, which can be reapplied on a mob. If used in water, a dolphin is spawned instead.");
 	}
 }

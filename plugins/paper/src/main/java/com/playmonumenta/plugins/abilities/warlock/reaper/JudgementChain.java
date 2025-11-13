@@ -40,8 +40,8 @@ public class JudgementChain extends MultipleChargeAbility {
 	private static final int CHAIN_DURATION = Constants.TICKS_PER_SECOND * 8;
 	private static final double SLOWNESS_AMOUNT = 0.4;
 	private static final double WEAKNESS_AMOUNT = 0.4;
-	private static final double DMG_BOOST_1 = 0.15;
-	private static final double DMG_BOOST_2 = 0.3;
+	private static final double DMG_BOOST_1 = 0.25;
+	private static final double DMG_BOOST_2 = 0.5;
 	private static final int DEBUFF_DURATION = Constants.TICKS_PER_SECOND * 3;
 	private static final int EXTRA_TARGETS = 2;
 	private static final double EXTRA_TARGET_RADIUS = 3;
@@ -206,7 +206,13 @@ public class JudgementChain extends MultipleChargeAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlugin.mEffectManager.hasEffect(enemy, EFFECT_NAME)) {
-			event.setFlatDamage(event.getFlatDamage() * (1 + mChainDmgBonus));
+			DamageEvent.DamageType type = event.getType();
+			if (type == DamageEvent.DamageType.TRUE || type == DamageEvent.DamageType.OTHER || type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.FIRE || type == DamageEvent.DamageType.POISON ) {
+				return false;
+			}
+			event.updateDamageWithMultiplier(1 + mChainDmgBonus);
+			// This is badly written. JudgementChainMobEffect should instead extend SelfishVulnerability or PercentDamageDealt.
+			// I don't really care, because Warlock rework is coming up in a few months or less. This is a bandaid patch.
 		}
 		return false;
 	}

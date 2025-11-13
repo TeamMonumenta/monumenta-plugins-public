@@ -27,8 +27,8 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 	private @Nullable Player mPlayer;
 	private double mDamage = 0;
 	private double mRadius = 0;
-	private int mBleedDuration = 0;
-	private double mBleedAmount = 0;
+	private int mSlowDuration = 0;
+	private double mSlowAmount = 0;
 	private double mKnockbackMultiplier = 1;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 	private EsotericEnhancementsCS mCosmetic = new EsotericEnhancementsCS();
@@ -41,12 +41,12 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
-	public void spawn(Player player, double damage, double radius, int bleedDuration, double bleedAmount, double knockbackMultiplier, ItemStatManager.PlayerItemStats playerItemStats, EsotericEnhancementsCS cosmetic) {
+	public void spawn(Player player, double damage, double radius, int slowDuration, double slowAmount, double knockbackMultiplier, ItemStatManager.PlayerItemStats playerItemStats, EsotericEnhancementsCS cosmetic) {
 		mPlayer = player;
 		mDamage = damage;
 		mRadius = radius;
-		mBleedDuration = bleedDuration;
-		mBleedAmount = bleedAmount;
+		mSlowDuration = slowDuration;
+		mSlowAmount = slowAmount;
 		mKnockbackMultiplier = knockbackMultiplier;
 		mPlayerItemStats = playerItemStats;
 		mCosmetic = cosmetic;
@@ -56,7 +56,7 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 	public void bossExploded(EntityExplodeEvent event) {
 		for (LivingEntity entity : EntityUtils.getNearbyMobs(mBoss.getLocation(), mRadius, mBoss)) {
 			DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, ClassAbility.ESOTERIC_ENHANCEMENTS, mPlayerItemStats), mDamage, true, false, false);
-			EntityUtils.applyBleed(com.playmonumenta.plugins.Plugin.getInstance(), mBleedDuration, mBleedAmount, entity);
+			EntityUtils.applySlow(com.playmonumenta.plugins.Plugin.getInstance(), mSlowDuration, mSlowAmount, entity);
 			if (mPlayer != null) {
 				mCosmetic.explosionEffects(mPlayer, mBoss, mRadius);
 			}

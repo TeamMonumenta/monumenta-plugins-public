@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
+import com.playmonumenta.plugins.events.HemorrhageEvent;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
@@ -1687,6 +1688,13 @@ public class PlayerListener implements Listener {
 		Player player = event.getCaster();
 		mPlugin.mAbilityManager.abilityCastEvent(player, event);
 		mPlugin.mItemStatManager.onAbilityCast(mPlugin, player, event);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void hemorrhageEvent(HemorrhageEvent event) {
+		Player player = event.getCaster();
+		// Insert Ability Manager code here, if you want it
+		mPlugin.mItemStatManager.onHemorrhage(mPlugin, player, event);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

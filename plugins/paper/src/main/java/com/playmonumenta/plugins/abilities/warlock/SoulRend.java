@@ -88,8 +88,8 @@ public class SoulRend extends Ability {
 		mHealCap = MARK_HEAL_CAP;
 		mRemainingHeal = REMAINING_MARK_HEAL;
 		mRadius = CharmManager.getRadius(player, CHARM_RADIUS, RADIUS);
-		mAbsorptionCap = ABSORPTION_CAP;
-		mAbsorptionDuration = ABSORPTION_DURATION;
+		mAbsorptionCap = CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION_CAP, ABSORPTION_CAP);
+		mAbsorptionDuration = CharmManager.getDuration(player, CHARM_ABSORPTION_DURATION, ABSORPTION_DURATION);
 		mAllyHealMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, 1);
 
 		mDarkPactHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_PACT_HEAL, isLevelOne() ? DARK_PACT_HEAL_1 : DARK_PACT_HEAL_2);

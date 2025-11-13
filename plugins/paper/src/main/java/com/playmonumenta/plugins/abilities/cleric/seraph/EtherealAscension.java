@@ -95,6 +95,8 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 	public static final String CHARM_DURATION = "Ethereal Ascension Duration";
 	public static final String CHARM_COOLDOWN = "Ethereal Ascension Cooldown";
 
+	public static final String NOT_FULLY_CHARGED_MARKER = "Non-critical Ethereal Ascension Orb";
+
 	public static final AbilityInfo<EtherealAscension> INFO =
 		new AbilityInfo<>(EtherealAscension.class, "Ethereal Ascension", EtherealAscension::new)
 			.linkedSpell(ClassAbility.ETHEREAL_ASCENSION)
@@ -327,7 +329,26 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 								damage += Chaotic.calculateChaoticDamage(true, mPlayer, itemStatsMap.get(EnchantmentType.CHAOTIC), mob);
 								damage *= itemStatsMap.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
 
-								DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damageMultiplier * (mAscensionOrbDamageFlat + mAscensionOrbDamagePercent * damage), true, false, false);
+								if (damageMultiplier == 1) {
+									// "Critical" Ethereal Ascension orb, transfers aspects
+									DamageUtils.damage(mPlayer, mob,
+										new DamageEvent.Metadata(
+											DamageEvent.DamageType.MAGIC,
+											mInfo.getLinkedSpell(),
+											playerItemStats),
+										mAscensionOrbDamageFlat + mAscensionOrbDamagePercent * damage,
+										true, false, false);
+								} else {
+									// "Non-critical" Ethereal Ascension orb, does not transfer aspects
+									DamageUtils.damage(mPlayer, mob,
+										new DamageEvent.Metadata(
+											DamageEvent.DamageType.MAGIC,
+											mInfo.getLinkedSpell(),
+											playerItemStats,
+											NOT_FULLY_CHARGED_MARKER),
+										damageMultiplier * (mAscensionOrbDamageFlat + mAscensionOrbDamagePercent * damage),
+										true, false, false);
+								}
 								MovementUtils.knockAway(mLoc, mob, 0.2f * mAscensionOrbKnockback, 0.2f * mAscensionOrbKnockback, true);
 							}
 						});

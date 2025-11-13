@@ -39,8 +39,7 @@ import org.bukkit.util.Vector;
 
 public class SanguineHarvest extends Ability implements AbilityWithDuration {
 
-	private static final int BLEED_DURATION = 10 * 20;
-	private static final double BLEED_LEVEL = 0.2;
+	private static final int BLEED_LEVEL = 1;
 	private static final int RANGE = 8;
 	private static final int RADIUS = 4;
 	private static final double HEAL_PERCENT_1 = 0.05;
@@ -62,8 +61,6 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	public static final String CHARM_COOLDOWN = "Sanguine Harvest Cooldown";
 	public static final String CHARM_HEAL = "Sanguine Harvest Healing";
 	public static final String CHARM_KNOCKBACK = "Sanguine Harvest Knockback";
-	public static final String CHARM_BLEED = "Sanguine Harvest Bleed Amplifier";
-	public static final String CHARM_BLEED_DURATION = "Sanguine Harvest Bleed Duration";
 	public static final String CHARM_DAMAGE_BOOST = "Sanguine Harvest Damage Boost Amplifier";
 	public static final String CHARM_BLIGHT_DURATION = "Sanguine Harvest Blight Duration";
 	public static final String CHARM_BLIGHT_VULN_PER_DEBUFF = "Sanguine Harvest Blight Vulnerability Per Debuff";
@@ -86,8 +83,6 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	private final double mRadius;
 	private final double mHealPercent;
 	private final double mDamageBoost;
-	private final double mBleedLevel;
-	private final int mBleedDuration;
 	private final double mRange;
 	private final int mBlightDuration;
 	private final double mBlightVulnPerDebuff;
@@ -104,8 +99,6 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 		mRadius = CharmManager.getRadius(player, CHARM_RADIUS, RADIUS);
 		mHealPercent = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
 		mDamageBoost = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE_BOOST) + DAMAGE_BOOST;
-		mBleedLevel = CharmManager.getLevelPercentDecimal(player, CHARM_BLEED) + BLEED_LEVEL;
-		mBleedDuration = CharmManager.getDuration(mPlayer, CHARM_BLEED_DURATION, BLEED_DURATION);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 		mBlightDuration = CharmManager.getDuration(mPlayer, CHARM_BLIGHT_DURATION, ENHANCEMENT_BLIGHT_DURATION);
 		mBlightVulnPerDebuff = ENHANCEMENT_DMG_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLIGHT_VULN_PER_DEBUFF);
@@ -201,10 +194,14 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getAbility() == null || event.getAbility().isFake()) {
+		if (event.getAbility() == null
+			|| event.getAbility().isFake()
+			|| event.getAbility() == ClassAbility.CURSED_WOUND
+			|| event.getAbility() == ClassAbility.WITHERING_GAZE
+			|| event.getAbility() == ClassAbility.PHLEGMATIC_RESOLVE) {
 			return false;
 		}
-		EntityUtils.applyBleed(mPlugin, mBleedDuration, mBleedLevel, enemy);
+		EntityUtils.applyBleed(mPlugin, mPlayer, enemy, BLEED_LEVEL);
 		return false; // applies bleed on damage to all mobs hit, causes no recursion
 	}
 
@@ -264,11 +261,9 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 
 	private static Description<SanguineHarvest> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Mobs you damage with an ability are afflicted with ")
-			.addPercent(a -> a.mBleedLevel, BLEED_LEVEL)
-			.add(" Bleed for ")
-			.addDuration(a -> a.mBleedDuration, BLEED_DURATION)
-			.add(" seconds. ")
+			.add("Mobs you damage with a non-DoT ability are afflicted with ")
+			.add(a -> BLEED_LEVEL, BLEED_LEVEL)
+			.add(" stack of Bleed. ")
 			.addTrigger()
 			.add(" to fire a burst of darkness which travels up to ")
 			.add(a -> a.mRange, RANGE)

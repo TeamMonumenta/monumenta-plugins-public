@@ -7,8 +7,11 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.bosses.bosses.GenericTargetBoss;
 import com.playmonumenta.plugins.bosses.bosses.HostileBoss;
+import com.playmonumenta.plugins.bosses.bosses.ImmortalMountBoss;
+import com.playmonumenta.plugins.bosses.bosses.ImmortalPassengerBoss;
 import com.playmonumenta.plugins.bosses.bosses.PlayerTargetBoss;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
+import com.playmonumenta.plugins.bosses.bosses.WormSegmentBoss;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.effects.Bleed;
@@ -831,18 +834,55 @@ public class EntityUtils {
 		return vulns != null;
 	}
 
-	public static final String BLEED_EFFECT_NAME = "BleedEffect";
+	public static void applyBleed(Plugin plugin, Player player, LivingEntity mob, int stacks) {
+		if (ImmortalPassengerBoss.isDamageTransferringImmortalPassenger(mob)) {
+			actuallyApplyBleed(plugin, player, ImmortalPassengerBoss.getMortalMount(mob), stacks);
+		} else if (ImmortalMountBoss.isDamageTransferringImmortalMount(mob)) {
+			for (LivingEntity victim : ImmortalMountBoss.getMortalPassengers(mob)) {
+				actuallyApplyBleed(plugin, player, victim, stacks);
+			}
+		} else {
+			WormSegmentBoss wormSegmentBoss = BossManager.getInstance().getBoss(mob, WormSegmentBoss.class);
+			if (wormSegmentBoss != null) {
+				actuallyApplyBleed(plugin, player, wormSegmentBoss.getHead(), stacks);
+			} else {
+				actuallyApplyBleed(plugin, player, mob, stacks);
+			}
+		}
+	}
 
-	public static void applyBleed(Plugin plugin, int ticks, double amount, LivingEntity mob) {
-		plugin.mEffectManager.addEffect(mob, BLEED_EFFECT_NAME, new Bleed(ticks, amount, plugin));
+	private static void actuallyApplyBleed(Plugin plugin, Player player, LivingEntity mob, int stacks) {
+		if (mob == null) {
+			return;
+		}
+		Bleed bleedEffect = plugin.mEffectManager.getActiveEffect(mob, Bleed.class);
+		if (bleedEffect == null) {
+			bleedEffect = new Bleed();
+			plugin.mEffectManager.addEffect(mob, Bleed.BLEED_EFFECT_NAME, bleedEffect);
+		}
+		bleedEffect.incrementStacks(player, mob, stacks);
+	}
+
+	public static void applyHemorrhageCooldown(Plugin plugin, LivingEntity mob, boolean applyWeakness) {
+		Bleed bleedEffect = plugin.mEffectManager.getActiveEffect(mob, Bleed.class);
+		if (bleedEffect == null) {
+			plugin.mEffectManager.addEffect(mob, Bleed.BLEED_EFFECT_NAME, new Bleed());
+			bleedEffect = plugin.mEffectManager.getActiveEffect(mob, Bleed.class);
+		}
+		if (bleedEffect != null) {
+			bleedEffect.actuallyApplyHemorrhageCooldown(mob, applyWeakness);
+		} else {
+			// Should never happen
+			MMLog.finer("Bleeding attempted to hemorrhage to a mob which somehow did not have any Bleed effect, despite it being added previously.");
+		}
 	}
 
 	public static boolean isBleeding(Plugin plugin, LivingEntity mob) {
-		return plugin.mEffectManager.hasEffect(mob, BLEED_EFFECT_NAME);
+		return plugin.mEffectManager.hasEffect(mob, Bleed.BLEED_EFFECT_NAME);
 	}
 
 	public static void setBleedTicks(Plugin plugin, LivingEntity mob, int ticks) {
-		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
+		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, Bleed.BLEED_EFFECT_NAME);
 		if (bleeds != null) {
 			Effect bleed = bleeds.last();
 			bleed.setDuration(ticks);
@@ -1474,12 +1514,12 @@ public class EntityUtils {
 		EntityEquipment equipment = entity.getEquipment();
 		EntityEquipment newEquipment = newSpawn.getEquipment();
 		if (equipment != null && newEquipment != null) {
-			newSpawn.getEquipment().setBoots(entity.getEquipment().getBoots());
-			newSpawn.getEquipment().setLeggings(entity.getEquipment().getLeggings());
-			newSpawn.getEquipment().setChestplate(entity.getEquipment().getChestplate());
-			newSpawn.getEquipment().setHelmet(entity.getEquipment().getHelmet());
-			newSpawn.getEquipment().setItemInMainHand(entity.getEquipment().getItemInMainHand());
-			newSpawn.getEquipment().setItemInOffHand(entity.getEquipment().getItemInOffHand());
+			newEquipment.setBoots(equipment.getBoots());
+			newEquipment.setLeggings(equipment.getLeggings());
+			newEquipment.setChestplate(equipment.getChestplate());
+			newEquipment.setHelmet(equipment.getHelmet());
+			newEquipment.setItemInMainHand(equipment.getItemInMainHand());
+			newEquipment.setItemInOffHand(equipment.getItemInOffHand());
 		}
 		newSpawn.customName(entity.customName());
 		newSpawn.setInvisible(entity.isInvisible());
@@ -1566,7 +1606,7 @@ public class EntityUtils {
 	 * Makes an item entity invulnerable by adding the appropriate tag,
 	 * so that EntityListener can cancel the appropriate hurt events.
 	 */
-	public static void makeItemInvulnereable(Item item) {
+	public static void makeItemInvulnerable(Item item) {
 		item.addScoreboardTag(EntityListener.INVULNERABLE_ITEM_TAG);
 	}
 
@@ -1602,7 +1642,7 @@ public class EntityUtils {
 			item.setItemStack(new ItemStack(material));
 			item.setCanMobPickup(false);
 			item.setCanPlayerPickup(false);
-			makeItemInvulnereable(item);
+			makeItemInvulnerable(item);
 
 			return item;
 		}

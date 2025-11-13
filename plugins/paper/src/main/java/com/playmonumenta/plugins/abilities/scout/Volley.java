@@ -40,16 +40,12 @@ public class Volley extends Ability {
 	private static final int VOLLEY_2_ARROW_COUNT = 11;
 	private static final double VOLLEY_1_DAMAGE_MULTIPLIER = 1.3;
 	private static final double VOLLEY_2_DAMAGE_MULTIPLIER = 1.5;
-	private static final double ENHANCEMENT_BLEED_POTENCY = 0.1;
-	private static final int ENHANCEMENT_BLEED_DURATION = 4 * 20;
 	public Set<Projectile> mVolley;
 	private final Map<LivingEntity, Integer> mVolleyHitMap;
 
 	public static final String CHARM_COOLDOWN = "Volley Cooldown";
 	public static final String CHARM_ARROWS = "Volley Arrows";
 	public static final String CHARM_DAMAGE = "Volley Damage";
-	public static final String CHARM_BLEED_AMPLIFIER = "Volley Bleed Amplifier";
-	public static final String CHARM_BLEED_DURATION = "Volley Bleed Duration";
 	public static final String CHARM_PIERCING = "Volley Piercing";
 
 	public static final AbilityInfo<Volley> INFO =
@@ -147,10 +143,6 @@ public class Volley extends Ability {
 			if (notBeenHit(enemy)) {
 				event.updateDamageWithMultiplier(mMultiplier);
 				mCosmetic.volleyHit(mPlayer, enemy);
-				if (isEnhanced()) {
-					EntityUtils.applyBleed(mPlugin, ENHANCEMENT_BLEED_DURATION, ENHANCEMENT_BLEED_POTENCY, enemy);
-					mCosmetic.volleyBleed(mPlayer, enemy);
-				}
 			} else {
 				// Only let one Volley arrow hit a given mob
 				event.setCancelled(true);
@@ -189,10 +181,6 @@ public class Volley extends Ability {
 
 	private static Description<Volley> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Volley now fires in a 360 degree arc. The projectiles inflict ")
-			.addPercent(ENHANCEMENT_BLEED_POTENCY)
-			.add(" bleed for ")
-			.addDuration(ENHANCEMENT_BLEED_DURATION)
-			.add(" seconds.");
+			.add("Volley now fires in a 360 degree arc.");
 	}
 }

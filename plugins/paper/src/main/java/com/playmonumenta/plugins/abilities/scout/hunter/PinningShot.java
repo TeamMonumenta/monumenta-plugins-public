@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PinningShotCS;
+import com.playmonumenta.plugins.effects.ProjectileIframe;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -61,6 +62,11 @@ public class PinningShot extends Ability {
 		if (event.getType() != DamageType.PROJECTILE || !(event.getDamager() instanceof Projectile proj) ||
 			!EntityUtils.isAbilityTriggeringProjectile(proj, false) ||
 			proj.getScoreboardTags().contains("SourceQuickDrawVolley")) {
+			return false;
+		}
+
+		ProjectileIframe projectileIframe = mPlugin.mEffectManager.getActiveEffect(enemy, ProjectileIframe.class);
+		if (projectileIframe != null) {
 			return false;
 		}
 

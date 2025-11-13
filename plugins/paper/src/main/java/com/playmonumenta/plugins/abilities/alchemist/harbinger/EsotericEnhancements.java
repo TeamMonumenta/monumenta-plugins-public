@@ -45,8 +45,8 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	private static final double ABERRATION_POTION_DAMAGE_RAW_2 = 8;
 	private static final double ABERRATION_DAMAGE_RADIUS = 3;
 	private static final int ABERRATION_SUMMON_DURATION = 30;
-	private static final double ABERRATION_BLEED_AMOUNT = 0.2;
-	private static final int ABERRATION_BLEED_DURATION = 4 * 20;
+	private static final double ABERRATION_SLOW_AMOUNT = 0.35;
+	private static final int ABERRATION_SLOW_DURATION = 4 * 20;
 	private static final int ABERRATION_COOLDOWN = 5 * 20;
 	private static final double ABERRATION_TARGET_RADIUS = 8;
 	private static final double MAX_TARGET_Y = 6;
@@ -56,8 +56,8 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 
 	public static final String CHARM_DAMAGE = "Esoteric Enhancements Damage";
 	public static final String CHARM_RADIUS = "Esoteric Enhancements Radius";
-	public static final String CHARM_BLEED = "Esoteric Enhancements Bleed Amplifier";
-	public static final String CHARM_DURATION = "Esoteric Enhancements Bleed Duration";
+	public static final String CHARM_SLOWNESS = "Esoteric Enhancements Slowness Amplifier";
+	public static final String CHARM_DURATION = "Esoteric Enhancements Slowness Duration";
 	public static final String CHARM_COOLDOWN = "Esoteric Enhancements Cooldown";
 	public static final String CHARM_CREEPER = "Esoteric Enhancements Creeper";
 	public static final String CHARM_REACTION_TIME = "Esoteric Enhancements Reaction Time";
@@ -79,8 +79,8 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	private final double mDamageRaw;
 	private final int mReactionTime;
 	private final double mRadius;
-	private final int mBleedDuration;
-	private final double mBleed;
+	private final int mSlowDuration;
+	private final double mSlow;
 	private final double mKnockbackMultiplier;
 	private final Map<LivingEntity, Integer> mAppliedMobs = new HashMap<>();
 	private final EsotericEnhancementsCS mCosmetic;
@@ -93,8 +93,8 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 		mDamageRaw = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? ABERRATION_POTION_DAMAGE_RAW_1 : ABERRATION_POTION_DAMAGE_RAW_2);
 		mReactionTime = CharmManager.getDuration(mPlayer, CHARM_REACTION_TIME, ABERRATION_SUMMON_DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ABERRATION_DAMAGE_RADIUS);
-		mBleedDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_BLEED_DURATION);
-		mBleed = ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED);
+		mSlowDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_SLOW_DURATION);
+		mSlow = ABERRATION_SLOW_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
 		mKnockbackMultiplier = 1 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_KNOCKBACK);
 		mTargets = new ArrayList<>();
 
@@ -114,7 +114,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 				mTargets.clear();
 				int num = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CREEPER);
 				Location summonLoc = mob.getLocation();
-				//summoning each should be delayed by 2 tick to prevent creepers targetting the same enemy?
+				// summoning each should be delayed by 2 ticks, to prevent creepers targeting the same enemy.
 				new BukkitRunnable() {
 					int mCount = 0;
 
@@ -149,7 +149,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 			}
 
 			double damage = mDamageRaw + mDamageMultiplier * playerItemStats.getItemStats().get(AttributeType.POTION_DAMAGE.getItemStat());
-			alchemicalAberrationBoss.spawn(mPlayer, damage, mRadius, mBleedDuration, mBleed, mKnockbackMultiplier, playerItemStats, mCosmetic);
+			alchemicalAberrationBoss.spawn(mPlayer, damage, mRadius, mSlowDuration, mSlow, mKnockbackMultiplier, playerItemStats, mCosmetic);
 
 			aberration.setMaxFuseTicks(CharmManager.getDuration(mPlayer, CHARM_FUSE, aberration.getMaxFuseTicks()));
 			aberration.setExplosionRadius((int) mRadius);
@@ -273,9 +273,9 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 			.add(" + ")
 			.addPercent(a -> a.mDamageMultiplier, ABERRATION_POTION_DAMAGE_MULTIPLIER_1, false, Ability::isLevelOne)
 			.add(" of your potion damage and applying ")
-			.addPercent(a -> a.mBleed, ABERRATION_BLEED_AMOUNT)
-			.add(" Bleed for ")
-			.addDuration(a -> a.mBleedDuration, ABERRATION_BLEED_DURATION)
+			.addPercent(a -> a.mSlow, ABERRATION_SLOW_AMOUNT)
+			.add(" Slowness for ")
+			.addDuration(a -> a.mSlowDuration, ABERRATION_SLOW_DURATION)
 			.add(" seconds to all mobs within ")
 			.add(a -> a.mRadius, ABERRATION_DAMAGE_RADIUS)
 			.add(" blocks.")

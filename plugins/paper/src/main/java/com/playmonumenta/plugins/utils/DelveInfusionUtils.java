@@ -124,6 +124,10 @@ public class DelveInfusionUtils {
 			return mInfusionType;
 		}
 
+		public @Nullable Location getLocation() {
+			return mLocation;
+		}
+
 		public Material getMaterial() {
 			return mMaterial;
 		}

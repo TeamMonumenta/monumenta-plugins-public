@@ -10,10 +10,9 @@ import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.EnumSet;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
+import java.util.EnumSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -94,11 +93,9 @@ public class KineticLoading implements Enchantment {
 				|| ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.THROWING_KNIFE)) {
 				player.setCooldown(mainhand.getType(), 0);
 			} else if (ItemUtils.isAlchemistItem(mainhand) && AbilityUtils.getClassNum(player) == Alchemist.CLASS_ID) {
-				// Unused
-				try {
-					plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class).incrementCharge();
-				} catch (NullPointerException nullPointerException) {
-					MMLog.finer("Kinetic Loading on " + player.getName() + " attempted to grant Alchemist Potions, but they were null");
+				AlchemistPotions alchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+				if (alchemistPotions != null) {
+					alchemistPotions.incrementCharge();
 				}
 			}
 		}

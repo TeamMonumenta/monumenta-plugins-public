@@ -29,6 +29,7 @@ public enum InfusionType {
 	ANTIGRAV(new AntiGrav(), "", true, false, false, false, true, true, true, false),
 	ARDOR(new Ardor(), "", true, false, false, false, true, true, true, false),
 	AURA(new Aura(), "", true, false, false, false, true, true, true, false),
+	BLOODLUST(new Bloodlust(), "", true, false, false, false, true, true, true, false),
 	CARAPACE(new Carapace(), "", true, false, false, false, true, true, true, false),
 	CELERITY(new Celerity(), "", true, false, false, false, true, true, true, false),
 	CELESTIAL(new Celestial(), "", true, false, false, false, true, true, true, false),

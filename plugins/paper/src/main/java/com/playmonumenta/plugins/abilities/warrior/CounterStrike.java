@@ -34,17 +34,12 @@ public class CounterStrike extends Ability {
 	private static final double ABSORPTION_RESISTANCE = 0.125;
 	private static final double KBR = 0.5;
 	private static final String KBR_EFFECT = "CounterStrikeKBREffect";
-	private static final double BLEED_AMPLIFIER = 0.1;
-	private static final int BLEED_DURATION = 8 * 20;
-	private static final int RADIUS = 2;
 
 	public static final String CHARM_DURATION = "Counter Strike Duration";
 	public static final String CHARM_DAMAGE = "Counter Strike Damage";
 	public static final String CHARM_DAMAGE_REDUCTION = "Counter Strike Damage Reduction";
 	public static final String CHARM_ABSORPTION_DAMAGE_REDUCTION = "Counter Strike Absorption Damage Reduction";
 	public static final String CHARM_KBR = "Counter Strike Knockback Resistance";
-	public static final String CHARM_BLEED = "Counter Strike Bleed Amplifier";
-	public static final String CHARM_BLEED_DURATION = "Counter Strike Bleed Duration";
 	public static final String CHARM_RADIUS = "Counter Strike Radius";
 
 	public static final AbilityInfo<CounterStrike> INFO =
@@ -62,9 +57,6 @@ public class CounterStrike extends Ability {
 	private final int mDuration;
 	private final double mDamage;
 	private final double mKBR;
-	private final double mBleed;
-	private final int mBleedDuration;
-	private final double mRadius;
 	private final double mResistance;
 	private final double mAbsorptionResistance;
 
@@ -79,9 +71,6 @@ public class CounterStrike extends Ability {
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		mDamage = (isLevelOne() ? DAMAGE_1 : DAMAGE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mKBR = KBR + CharmManager.getLevel(mPlayer, CHARM_KBR) / 10;
-		mBleed = BLEED_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED);
-		mBleedDuration = CharmManager.getDuration(mPlayer, CHARM_BLEED_DURATION, BLEED_DURATION);
-		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 		mResistance = RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_REDUCTION);
 		mAbsorptionResistance = ABSORPTION_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_REDUCTION) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ABSORPTION_DAMAGE_REDUCTION);
 
@@ -105,12 +94,6 @@ public class CounterStrike extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageEvent.DamageType.MELEE && mLastHurtTicks.remove(enemy) != null) {
-			if (isEnhanced()) {
-				Hitbox hitbox = new Hitbox.SphereHitbox(enemy.getLocation().add(0, 0.75, 0), mRadius);
-				for (LivingEntity entity : hitbox.getHitMobs()) {
-					EntityUtils.applyBleed(mPlugin, mBleedDuration, mBleed, entity);
-				}
-			}
 
 			event.updateDamageWithMultiplier(1 + mDamage);
 
@@ -191,12 +174,6 @@ public class CounterStrike extends Ability {
 			.addPercent(a -> a.mAbsorptionResistance, ABSORPTION_RESISTANCE)
 			.add(" less damage instead, and gain ")
 			.addPercent(a -> a.mKBR, KBR)
-			.add(" Knockback Resistance while the Counter Strike is active. Also, when dealing a Counter Strike, apply ")
-			.addPercent(a -> a.mBleed, BLEED_AMPLIFIER)
-			.add(" Bleed for ")
-			.addDuration(a -> a.mBleedDuration, BLEED_DURATION)
-			.add(" seconds to mobs in a ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" block radius.");
+			.add(" Knockback Resistance while the Counter Strike is active.");
 	}
 }

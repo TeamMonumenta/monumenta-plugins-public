@@ -155,6 +155,7 @@ public enum ClassAbility {
 	// [Alchemist]
 	ALCHEMIST_POTION("Alchemist Potion"),
 	ALCHEMICAL_ARTILLERY("Alchemical Artillery"),
+	ALCHEMICAL_ARTILLERY_AFTERSHOCK("Alchemical Artillery Aftershock"),
 	BEZOAR("Bezoar"),
 	BRUTAL_ALCHEMY("Brutal Alchemy"),
 	ENERGIZING_ELIXIR("Energizing Elixir"),
@@ -284,7 +285,8 @@ public enum ClassAbility {
 	INFERNO("Inferno", true),
 	REVERB("Reverb", true),
 	TRIVIUM("Trivium", true),
-	REFLECTION("Reflection", true);
+	REFLECTION("Reflection", true),
+	BLEEDING("Bleeding", true);
 
 	private final String mName;
 	private final boolean mFake;

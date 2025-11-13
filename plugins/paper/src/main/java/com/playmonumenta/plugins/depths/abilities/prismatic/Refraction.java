@@ -260,7 +260,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 							EntityUtils.applyVulnerability(mPlugin, EFFECT_DURATION, 0.1, mob);
 						}
 						if (depthsPlayer.mEligibleTrees.contains(DepthsTree.STEELSAGE)) {
-							EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, 0.1, mob);
+							EntityUtils.applyBleed(mPlugin, mPlayer, mob, 1);
 						}
 					}
 
@@ -385,9 +385,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	private static Description<Refraction> getSteelsageDescription(TextColor color) {
 		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nSteelsage").color(TextColor.color(DepthsUtils.STEELSAGE)))
-			.add(" - Apply 10% Bleed for ")
-			.addDuration(EFFECT_DURATION)
-			.add(" seconds to mobs hit by the beam.");
+			.add(" - Apply 1 stack of Bleed to mobs hit by the beam.");
 	}
 
 	private static Description<Refraction> getWindwalkerDescription(TextColor color) {

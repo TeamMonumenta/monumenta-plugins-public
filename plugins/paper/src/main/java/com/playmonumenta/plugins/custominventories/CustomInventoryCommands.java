@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.guis.classselection.ClassSelectionGui;
 import com.playmonumenta.plugins.guis.peb.PebGui;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.listeners.IchorListener;
+import com.playmonumenta.plugins.listeners.QuiverListener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -466,6 +467,16 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
 				new SpiritArcheryGUI(player).open();
+			})
+			.register();
+		new CommandAPICommand("refunddelvearrows")
+			.withPermission("monumenta.command.refunddelvearrows")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.withArguments(new BooleanArgument("refundStack"))
+			.executes((sender, args) -> {
+				QuiverListener.refundDelveMaterials(
+					args.getUnchecked("player"),
+					args.getOrDefaultUnchecked("refundStack", false));
 			})
 			.register();
 	}

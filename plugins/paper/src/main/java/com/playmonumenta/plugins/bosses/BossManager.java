@@ -1003,6 +1003,7 @@ public class BossManager implements Listener {
 	/********************************************************************************
 	 * Static public methods
 	 *******************************************************************************/
+
 	public static BossManager getInstance() {
 		if (INSTANCE == null) {
 			throw new RuntimeException("BossManager used before it was loaded");
