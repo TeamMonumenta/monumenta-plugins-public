@@ -60,6 +60,7 @@ public enum Location {
 	SANCTUM("sanctum", "Forsworn Sanctum", TextColor.fromHexString("#52AA00")),
 	VERDANT("verdant", "Verdant Remnants", TextColor.fromHexString("#158315")),
 	VERDANTSKIN("verdantskin", "Threadwarped Skin", TextColor.fromHexString("#704C8A")),
+	KOAL("koal", "Coalrupted Sierhaven", TextColor.fromHexString("#A1C4E0"), true),
 	// bosses
 	AZACOR("azacor", "Azacor's Malice", TextColor.fromHexString("#FF6F55")),
 	KAUL("kaul", "Kaul's Judgment", TextColor.fromHexString("#00AA00")),
@@ -88,7 +89,9 @@ public enum Location {
 	REMORSEFULSKIN("remorsefulskin", "Remorseful Skin", TextColor.fromHexString("#EEE6D6")),
 	VIGIL("vigil", "The Eternal Vigil", TextColor.fromHexString("#72999C")),
 	DEPTHS("depths", "Darkest Depths", TextColor.fromHexString("#5D2D87")),
+	DEPTHS_SKIN("abyssalskin", "Abyssal Skin", TextColor.fromHexString("#5D2D87")),
 	RUSH("rush", "Rush of Dissonance", TextColor.fromHexString("#C21E56")),
+	RUSH_SKIN("rushskin", "Dissonant Skin", TextColor.fromHexString("#C21E56"), true),
 	// bosses
 	HORSEMAN("horseman", "The Headless Horseman", TextColor.fromHexString("#8E3418")),
 	HALLOWEENSKIN("halloweenskin", "Halloween Skin", TextColor.fromHexString("#FFAA00")),
