@@ -284,18 +284,6 @@ public class Plugin extends JavaPlugin {
 		GlowingCommand.register();
 		GraveCommand.register();
 		HasBadWordCommand.register();
-		ItemStatCommands.registerAttrCommand();
-		ItemStatCommands.registerCharmCommand();
-		ItemStatCommands.registerColorCommand();
-		ItemStatCommands.registerConsumeCommand();
-		ItemStatCommands.registerDelveInfusionTypeCommand();
-		ItemStatCommands.registerEnchCommand();
-		ItemStatCommands.registerFishCommand();
-		ItemStatCommands.registerInfoCommand();
-		ItemStatCommands.registerLoreCommand();
-		ItemStatCommands.registerNameCommand();
-		ItemStatCommands.registerRemoveCommand();
-		ItemStatCommands.registerCopyCommand();
 		JingleBells.register();
 		Launch.register();
 		LoadoutManagerCommand.register();
@@ -406,6 +394,21 @@ public class Plugin extends JavaPlugin {
 
 		/* Plot commands are valid on all shards */
 		PlotCommand.register();
+
+		// Some of these commands need ServerProperties to be loaded
+		// in order to know whether this is build shard
+		ItemStatCommands.registerAttrCommand();
+		ItemStatCommands.registerCharmCommand();
+		ItemStatCommands.registerColorCommand();
+		ItemStatCommands.registerConsumeCommand();
+		ItemStatCommands.registerDelveInfusionTypeCommand();
+		ItemStatCommands.registerEnchCommand();
+		ItemStatCommands.registerFishCommand();
+		ItemStatCommands.registerInfoCommand();
+		ItemStatCommands.registerLoreCommand();
+		ItemStatCommands.registerNameCommand();
+		ItemStatCommands.registerRemoveCommand();
+		ItemStatCommands.registerCopyCommand();
 
 		mJunkItemsListener = new JunkItemListener();
 		mItemDropListener = new ItemDropListener();
