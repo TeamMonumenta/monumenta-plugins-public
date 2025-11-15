@@ -150,7 +150,10 @@ public class HarmonicDissonanceFinisher implements EliteFinisher {
 					prevPitchBend = currPitchBend;
 				}
 				sound = Sound.sound(Objects.requireNonNull(instrument), Sound.Source.PLAYER, volume, notePitch);
-				world.playSound(sound, mPlayer);
+				// Attempt to play louder than 100%
+				for (int playTimes = 0; playTimes < 3; playTimes++) {
+					world.playSound(sound, mPlayer);
+				}
 				world.spawnParticle(particle, particleLoc, 1);
 				noteNum++;
 				if (noteNum >= maxNotes) {
