@@ -94,7 +94,7 @@ public class ExperimentSeventyOne extends Quarry {
 	public static final TextColor TEXT_COLOR = TextColor.color(179, 118, 48);
 
 	public static final Material MUD_TRAIL = Material.MUD;
-	public static final Material WORM_SPAWNER = Material.MANGROVE_ROOTS;
+	public static final Material WORM_SPAWNER = Material.SOUL_SOIL;
 	public static final List<Material> MUD_TRAIL_BLOCKS = List.of(MUD_TRAIL, WORM_SPAWNER);
 	public static final List<Material> INVALID_MUD_BLOCKS = List.of(Material.SPRUCE_WOOD, Material.DARK_OAK_LEAVES, Material.JUNGLE_LEAVES, Material.OAK_LEAVES);
 
