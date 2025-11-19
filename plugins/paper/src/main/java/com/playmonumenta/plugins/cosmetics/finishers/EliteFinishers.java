@@ -34,6 +34,7 @@ public class EliteFinishers {
 			.put(BuzzedFinisher.NAME, new BuzzedFinisher())
 			.put(CakeifyFinisher.NAME, new CakeifyFinisher())
 			.put(ChainedFinisher.NAME, new ChainedFinisher())
+			.put(CookiefyFinisher.NAME, new CookiefyFinisher())
 			.put(CoolFireworkFinisher.NAME, new CoolFireworkFinisher())
 			.put(CornucopiaFinisher.NAME, new CornucopiaFinisher())
 			.put(DefaultDanceFinisher.NAME, new DefaultDanceFinisher())
