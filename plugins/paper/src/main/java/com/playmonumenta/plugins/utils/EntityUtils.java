@@ -771,7 +771,11 @@ public class EntityUtils {
 	}
 
 	public static @Nullable Player getNearestPlayer(Location loc, double radius) {
-		return getNearestPlayer(loc, PlayerUtils.playersInRange(loc, radius, true));
+		return getNearestPlayer(loc, radius, true);
+	}
+
+	public static @Nullable Player getNearestPlayer(Location loc, double radius, boolean includeNonTargetable) {
+		return getNearestPlayer(loc, PlayerUtils.playersInRange(loc, radius, includeNonTargetable));
 	}
 
 	public static @Nullable Player getNearestPlayer(Location loc, List<Player> players) {
