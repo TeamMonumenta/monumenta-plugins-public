@@ -19,6 +19,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 public final class Regicide implements Enchantment {
 	private static final double DAMAGE_BONUS_PER_LEVEL = 0.1;
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	@Override
 	public String getName() {
@@ -44,8 +45,7 @@ public final class Regicide implements Enchantment {
 	public void onDamage(final Plugin plugin, final Player player, final double level, final DamageEvent event,
 	                     final LivingEntity target) {
 		final DamageType type = event.getType();
-		if (type != DamageType.AILMENT && type != DamageType.POISON && type != DamageType.FALL
-			&& type != DamageType.OTHER && type != DamageType.TRUE) {
+		if (AFFECTED_DAMAGE_TYPES.contains(type)) {
 			final double mult = (EntityUtils.isElite(target) || EntityUtils.isBoss(target)) ? (1 + DAMAGE_BONUS_PER_LEVEL * level) : 1;
 			event.updateGearDamageWithMultiplier(mult);
 			if (mult > 1 && type == DamageType.MELEE) {

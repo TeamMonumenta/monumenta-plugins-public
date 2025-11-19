@@ -6,12 +6,13 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.EnumSet;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 public class Choler implements Infusion {
-
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 	public static final double DAMAGE_MLT_PER_LVL = 0.01;
 
 	@Override
@@ -31,7 +32,7 @@ public class Choler implements Infusion {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageEvent.DamageType.TRUE) {
+		if (!AFFECTED_DAMAGE_TYPES.contains(event.getType())) {
 			return;
 		}
 		if (EntityUtils.isStunned(enemy) || EntityUtils.isSlowed(plugin, enemy) || enemy.hasPotionEffect(PotionEffectType.SLOW)

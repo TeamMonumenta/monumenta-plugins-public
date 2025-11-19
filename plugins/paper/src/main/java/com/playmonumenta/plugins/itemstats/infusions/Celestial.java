@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import java.util.EnumSet;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 
 public class Celestial implements Infusion {
 	public static final double DAMAGE_BONUS_PER_LEVEL = 0.015;
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	@Override
 	public InfusionType getInfusionType() {
@@ -24,7 +26,7 @@ public class Celestial implements Infusion {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (enemy.getLocation().getY() > player.getLocation().getY()) {
+		if (enemy.getLocation().getY() > player.getLocation().getY() && AFFECTED_DAMAGE_TYPES.contains(event.getType())) {
 			event.updateGearDamageWithMultiplier(1 + DAMAGE_BONUS_PER_LEVEL * level);
 
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, SoundCategory.PLAYERS, 0.4f, 2f);
