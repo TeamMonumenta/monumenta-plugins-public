@@ -266,7 +266,7 @@ public class ChestUtils {
 		if (player.hasPermission(LOG_SCROLLS_PERMISSION)) {
 			int fragmentCount = 0;
 			for (ItemStack thisItem : popLoot) {
-				if (testForScroll(thisItem)) {
+				if (testForItem(thisItem, "Remnant Scroll", "SMITHING_TEMPLATE")) {
 					AuditListener.logPlayer("[Scroll Logger] Player " + player.getName() + " found a SKR Scroll (" + ItemUtils.getPlainNameIfExists(thisItem) + ") in a placed chest with loot table " + lootTable + ".");
 					break;
 				} else if (LOG_SCROLL_FRAGMENTS && InventoryUtils.testForItemWithName(thisItem, "Remnant", false) &&
@@ -312,6 +312,7 @@ public class ChestUtils {
 		MMLog.finer("generateLootInventory: Started with " + lootList.size() + " items and randomlyDistribute=" + randomlyDistribute);
 		ArrayDeque<Integer> slotsWithMultipleItems = new ArrayDeque<>();
 		boolean skrScrolls = false;
+		boolean winterItem = false;
 		for (ItemStack lootItem : lootList) {
 			if (freeSlots.isEmpty()) {
 				Plugin.getInstance().getLogger().severe("Tried to overfill container for player " + player.getName() + " at inventory " + inventory.getType() + " at location " + player.getLocation());
@@ -320,9 +321,11 @@ public class ChestUtils {
 			}
 			int slot = freeSlots.remove(0);
 			inventory.setItem(slot, lootItem);
-			if (!skrScrolls) {
-				if (testForScroll(lootItem)) {
+			if (!skrScrolls && !winterItem) {
+				if (testForItem(lootItem, "Remnant Scroll", "SMITHING_TEMPLATE")) {
 					skrScrolls = true; // SKR Scroll found, alert the player later!
+				} else if (testForItem(lootItem, "Charcoal Key", "CHARCOAL") || testForItem(lootItem, "Bucket of Cryospheres", "PLAYER_HEAD")) {
+					winterItem = true; // Winter item found, alert the player later!
 				}
 			}
 			if (MMLog.isLevelEnabled(Level.FINER)) { // Performance optimization to avoid calling lootItem.toString() when this log level is disabled
@@ -365,16 +368,20 @@ public class ChestUtils {
 				slotsWithMultipleItems.add(splitSlot);
 			}
 		}
-		// Alert the player if a SKR scroll was detected.
+		// Alert the player if a SKR scroll or Charcoal Key/Bucket of Cryospheres was detected.
+		// Only notify for one item at a time (if these items are somehow ever in the same loot table)
 		if (skrScrolls) {
 			NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute at %1$s as %1$s run function monumenta:skr/scroll_drop".formatted(player.getName()));
+		} else if (winterItem) {
+			NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute at %1$s as %1$s run function monumenta:winter_event/item_drop_sounds".formatted(player.getName()));
 		}
 	}
 
-	// Test for an SKR Scroll
-	public static boolean testForScroll(ItemStack item) {
-		return (InventoryUtils.testForItemWithName(item, "Remnant Scroll", false) &&
-			item.getType().name().contains("SMITHING_TEMPLATE"));
+
+	// Test if an item has a specified name and item type.
+	// Used for: SKR Scrolls, certain Winter Event items
+	public static boolean testForItem(ItemStack item, String name, String type) {
+		return (item.getType().name().contains(type)) && InventoryUtils.testForItemWithName(item, name, false);
 	}
 
 	public static boolean isUnscaledChest(Block block) {
