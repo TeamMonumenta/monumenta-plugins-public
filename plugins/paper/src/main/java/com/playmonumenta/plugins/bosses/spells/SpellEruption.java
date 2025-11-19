@@ -104,7 +104,7 @@ public class SpellEruption extends Spell {
 			int mDegreeRand = FastUtils.randomIntInRange(-15, 30);
 			Item proj = launch((360 / mParameters.PROJECTILE_COUNT) * i + mDegreeRand, loc, new ItemStack(mParameters.MATERIAL), mParameters.XZ_VELOCITY, mParameters.Y_VELOCITY);
 			proj.setFireTicks(80);
-			EntityUtils.makeItemInvulnereable(proj);
+			EntityUtils.makeItemInvulnerable(proj);
 
 			new BukkitRunnable() {
 				int mTicks = 0;
