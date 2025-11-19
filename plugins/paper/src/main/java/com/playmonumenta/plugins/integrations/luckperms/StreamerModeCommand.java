@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
-import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -52,16 +51,7 @@ public class StreamerModeCommand extends TogglePermCommand {
 
 	@Override
 	public void setPerm(Player player, boolean setEnabled) { // Enabled = streamer mode
-		if (setEnabled) {
-			MonumentaNetworkChatIntegration.setPauseChat(player, true);
-		}
-
 		super.setPerm(player, setEnabled);
-
-		if (!setEnabled) {
-			MonumentaNetworkChatIntegration.setPauseChat(player, false);
-		}
-
 		NetworkRelayAPI.refreshPlayer(player.getUniqueId());
 	}
 }
