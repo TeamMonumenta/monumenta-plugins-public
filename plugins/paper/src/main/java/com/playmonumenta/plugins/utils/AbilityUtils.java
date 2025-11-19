@@ -785,7 +785,10 @@ public class AbilityUtils {
 		ClassAbility.DECAYED_TOTEM,
 		ClassAbility.ILLUMINATE_DOT,
 		ClassAbility.KEEPER_VIRTUE,
-		ClassAbility.REFLECTION
+		ClassAbility.CURSED_WOUND,
+		ClassAbility.WITHERING_GAZE,
+		ClassAbility.REFLECTION,
+		ClassAbility.BLEEDING
 	);
 
 	// Intended for the purpose of damage that shouldn't be considered when spoiling some hunts quarries
@@ -795,7 +798,10 @@ public class AbilityUtils {
 			return true;
 		}
 		DamageEvent.DamageType type = event.getType();
-		if (type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.THORNS || type == DamageEvent.DamageType.POISON || type == DamageEvent.DamageType.FIRE) {
+		if (type == DamageEvent.DamageType.AILMENT
+			|| type == DamageEvent.DamageType.THORNS
+			|| type == DamageEvent.DamageType.POISON
+			|| type == DamageEvent.DamageType.FIRE) {
 			return true;
 		}
 		ClassAbility ca = event.getAbility();

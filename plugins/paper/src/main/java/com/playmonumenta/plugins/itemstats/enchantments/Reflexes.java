@@ -38,6 +38,7 @@ public class Reflexes implements Enchantment {
 		ClassAbility.CURSED_WOUND,
 		ClassAbility.VOODOO_BONDS, // VOODOO_BONDS_PIN is allowed
 		ClassAbility.RESTLESS_SOULS,
+		ClassAbility.WITHERING_GAZE,
 		ClassAbility.BRAMBLE_SHELL,
 		ClassAbility.SNOWSTORM,
 		ClassAbility.REFRACTION,
