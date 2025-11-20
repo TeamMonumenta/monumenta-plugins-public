@@ -630,6 +630,13 @@ public class PotionBarrelListener implements Listener {
 			ItemStack item = barrelInventory.getItem(i);
 			if (!ItemUtils.isNullOrAir(item)) {
 				while (item.getAmount() > 0) {
+					if (i == 0 && item.getAmount() == 1) {
+						// Leave last potion when otherwise taking all
+						if (barrelInventory.getHolder() instanceof Barrel barrel) {
+							updateDisplay(barrel.getBlock().getState());
+						}
+						return removed;
+					}
 					ItemStack clone = ItemUtils.clone(item);
 					clone.setAmount(1);
 					item.setAmount(item.getAmount() - 1);
