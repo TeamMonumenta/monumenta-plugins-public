@@ -129,6 +129,7 @@ public enum EnchantmentType {
 	TECHNIQUE(new Technique(), true, false, false, true),
 	TEMPORAL_BENDER(new TemporalBender(), false, false, false, false),
 	THROWING_KNIFE(new ThrowingKnife(), false, false, false, false),
+	TRANSPOSING(new Transposing(), false, false, false, false),
 	TRIAGE(new Triage(), true, false, false, true),
 	TRIVIUM(new Trivium(), true, false, false, true),
 	VERSATILITY(new Versatility(), true, false, false, true),
