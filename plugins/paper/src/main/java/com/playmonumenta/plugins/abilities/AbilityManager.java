@@ -25,14 +25,16 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
-import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
+import com.playmonumenta.plugins.abilities.cleric.TouchofRadiance;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
+import com.playmonumenta.plugins.abilities.cleric.paladin.Unwavering;
+import com.playmonumenta.plugins.abilities.cleric.seraph.EtherealAscension;
+import com.playmonumenta.plugins.abilities.cleric.seraph.HallowedBeam;
+import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtue;
+import com.playmonumenta.plugins.abilities.cleric.seraph.Rejuvenation;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
@@ -64,6 +66,7 @@ import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
 import com.playmonumenta.plugins.abilities.rogue.Dethroner;
 import com.playmonumenta.plugins.abilities.rogue.Dodging;
 import com.playmonumenta.plugins.abilities.rogue.EscapeDeath;
+import com.playmonumenta.plugins.abilities.rogue.MagicDodging;
 import com.playmonumenta.plugins.abilities.rogue.Skirmisher;
 import com.playmonumenta.plugins.abilities.rogue.Smokescreen;
 import com.playmonumenta.plugins.abilities.rogue.ViciousCombos;
@@ -73,9 +76,9 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
-import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
+import com.playmonumenta.plugins.abilities.scout.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
@@ -85,7 +88,7 @@ import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.PredatorStrike;
 import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
-import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
+import com.playmonumenta.plugins.abilities.scout.ranger.RendingRazor;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
@@ -170,7 +173,6 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -271,13 +273,13 @@ public class AbilityManager {
 			DaggerThrow.INFO,
 			Dodging.INFO,
 			Dethroner.INFO,
+			MagicDodging.INFO,
 			Smokescreen.INFO,
 			ViciousCombos.INFO,
 			Skirmisher.INFO,
 			EscapeDeath.INFO,
 
 			//********** SCOUT **********//
-			Agility.INFO,
 			HuntingCompanion.INFO,
 			Volley.INFO,
 			Swiftness.INFO,
@@ -286,6 +288,7 @@ public class AbilityManager {
 			SwiftCuts.INFO,
 			Sharpshooter.INFO,
 			WindBomb.INFO,
+			Quickdraw.INFO,
 
 			//********** WARRIOR **********//
 			CounterStrike.INFO,
@@ -302,7 +305,7 @@ public class AbilityManager {
 			CelestialBlessing.INFO,
 			CleansingRain.INFO,
 			HandOfLight.INFO,
-			Rejuvenation.INFO,
+			TouchofRadiance.INFO,
 			DivineJustice.INFO,
 			HeavenlyBoon.INFO,
 			Crusade.INFO,
@@ -369,9 +372,9 @@ public class AbilityManager {
 
 			//********** SCOUT **********//
 			// RANGER
+			RendingRazor.INFO,
 			TacticalManeuver.INFO,
 			WhirlingBlade.INFO,
-			Quickdraw.INFO,
 
 			// HUNTER
 			PinningShot.INFO,
@@ -391,18 +394,16 @@ public class AbilityManager {
 
 			//********** CLERIC **********//
 			// PALADIN
-			// LI needs to run first to process its passive melee damage
+			Unwavering.INFO,
 			LuminousInfusion.INFO,
-			// HJ runs afterwards and can use that value in the same event,
-			// sharing it to its Javelin AoE
 			HolyJavelin.INFO,
-
 			ChoirBells.INFO,
 
-			// HIEROPHANT
-			EnchantedPrayer.INFO,
+			// SERAPH
+			Rejuvenation.INFO,
+			EtherealAscension.INFO,
 			HallowedBeam.INFO,
-			ThuribleProcession.INFO,
+			KeeperVirtue.INFO,
 
 			//********** WARLOCK **********//
 			// REAPER
@@ -469,6 +470,13 @@ public class AbilityManager {
 
 		// Clear self-given potions
 		mPlugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
+
+		// Clear effects on the player that should be removed when switching classes/abilities
+		mPlugin.mEffectManager.getAllEffects(player).forEach(effect -> {
+			if (effect.shouldDeleteOnAbilityUpdate()) {
+				effect.clearEffect();
+			}
+		});
 
 		player.setWalkSpeed(DEFAULT_WALK_SPEED);
 		player.setInvulnerable(false);
@@ -644,7 +652,7 @@ public class AbilityManager {
 			if (event.isCancelled()) {
 				return;
 			}
-				abil.onHurt(event, damager, source);
+			abil.onHurt(event, damager, source);
 		}
 	}
 
@@ -678,12 +686,12 @@ public class AbilityManager {
 	}
 
 	public boolean playerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
-										   ThrownPotion potion, PotionSplashEvent event) {
+	                                       ThrownPotion potion, PotionSplashEvent event) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerSplashPotionEvent(affectedEntities, potion, event));
 	}
 
 	public boolean playerSplashedByPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
-											   ThrownPotion potion, PotionSplashEvent event) {
+	                                           ThrownPotion potion, PotionSplashEvent event) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerSplashedByPotionEvent(affectedEntities, potion, event));
 	}
 
@@ -868,9 +876,9 @@ public class AbilityManager {
 			// When blocking with an offhand shield, the client first sends a mainhand click, then an offhand click,
 			// thus we have to ignore the usual click limiter here.
 			if (event.getHand() != null
-				    && player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD
-				    && player.getCooldown(Material.SHIELD) == 0
-				    && MetadataUtils.checkOnceThisTick(mPlugin, player, "BlockTrigger")) {
+				&& player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD
+				&& player.getCooldown(Material.SHIELD) == 0
+				&& MetadataUtils.checkOnceThisTick(mPlugin, player, "BlockTrigger")) {
 				conditionalCast(player, Ability::blockWithShieldEvent);
 			}
 		}
@@ -905,8 +913,8 @@ public class AbilityManager {
 					player.getInventory().getItemInOffHand(),
 					mPlugin.mVanityManager.getData(player).getEquipped(EquipmentSlot.OFF_HAND));
 				if (potentiallyUseableItems.stream()
-					    .anyMatch(item -> item != null && (ItemUtils.isSomePotion(item) || ItemUtils.isProjectileWeapon(item) || item.getType().isBlock()
-						                                       || item.getType() == Material.ENDER_PEARL || item.getType() == Material.ENDER_EYE))) {
+					.anyMatch(item -> item != null && (ItemUtils.isSomePotion(item) || ItemUtils.isProjectileWeapon(item) || item.getType().isBlock()
+						|| item.getType() == Material.ENDER_PEARL || item.getType() == Material.ENDER_EYE))) {
 					MetadataUtils.setMetadata(player, RIGHT_CLICK_TICK_METAKEY, currentTick);
 					MetadataUtils.setMetadata(player, LEFT_CLICK_TICK_METAKEY, currentTick + 2);
 				} else {
@@ -923,8 +931,8 @@ public class AbilityManager {
 		// TODO would be nice if all SQ interactibles would prevent skill activation - but how to do that in general?
 		// Cancelling events cannot be used, as that is used to prevent vanilla actions from occurring. Some custom way to annotate an event as handled by SQ would be needed.
 		if (key == AbilityTrigger.Key.LEFT_CLICK
-			    && player.isSneaking()
-			    && ExperiencinatorUtils.getConfig(player.getLocation(), false).getExperiencinator(player.getInventory().getItemInMainHand()) != null) {
+			&& player.isSneaking()
+			&& ExperiencinatorUtils.getConfig(player.getLocation(), false).getExperiencinator(player.getInventory().getItemInMainHand()) != null) {
 			return false;
 		}
 
@@ -932,8 +940,8 @@ public class AbilityManager {
 		if (playerAbilities.isSilenced()) {
 			// if silenced, just return if any trigger matches (to cancel the swap event properly)
 			return playerAbilities.getAbilitiesIgnoringSilence().stream()
-				       .flatMap(a -> a.mCustomTriggers.stream())
-				       .anyMatch(t -> t.check(player, key));
+				.flatMap(a -> a.mCustomTriggers.stream())
+				.anyMatch(t -> t.check(player, key));
 		}
 
 		boolean foundTrigger = false;
@@ -942,7 +950,7 @@ public class AbilityManager {
 				if (triggerInfo.check(player, key)) {
 					foundTrigger = true;
 					// the cast here is fine, as we're calling the action with the ability we got the action from
-					boolean succeeded = ((Predicate<Ability>) triggerInfo.getAction()).test(ability);
+					boolean succeeded = ((AbilityTriggerInfo.TriggerAction<Ability>) triggerInfo.getAction()).run(ability);
 					if (succeeded || !triggerInfo.getTrigger().isFallThrough()) {
 						return true;
 					}
@@ -980,7 +988,7 @@ public class AbilityManager {
 		NavigableSet<AbilitySilence> silence = mPlugin.mEffectManager.getEffects(player, AbilitySilence.class);
 		NavigableSet<Stasis> stasis = mPlugin.mEffectManager.getEffects(player, Stasis.class);
 		int silenceDuration = Stream.concat(silence.stream(), stasis.stream())
-			                      .mapToInt(Effect::getDuration).max().orElse(0);
+			.mapToInt(Effect::getDuration).max().orElse(0);
 		boolean silenced = silenceDuration > 0;
 		if (playerAbilities.isSilenced() != silenced || forceUpdateClientMod) {
 			ClientModHandler.silenced(player, silenceDuration);

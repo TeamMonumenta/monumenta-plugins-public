@@ -20,6 +20,7 @@ import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,6 +60,8 @@ public class GraveManager {
 	private static final HashMap<UUID, ThrownItem> THROWN_ITEMS = new HashMap<>();
 	private static final HashMap<Long, HashSet<Grave>> UNLOADED_GRAVES = new HashMap<>();
 	private static final HashMap<Long, HashSet<ThrownItem>> UNLOADED_THROWN_ITEMS = new HashMap<>();
+	private static final int MAX_ITEM_GRAVES = 10;
+	private static final int GRAVE_WARNING_THRESHOLD = 7;
 	private final ArrayList<ThrownItem> mThrownItems = new ArrayList<>();
 	private final ArrayList<Grave> mGraves = new ArrayList<>();
 	private final Player mPlayer;
@@ -125,7 +128,6 @@ public class GraveManager {
 			manager.mLoggedOut = true;
 
 			/* If the player's INSTANCE map hasn't been cleared in 1s and they're still logged out, clear it
-			 * There's some memory leak here where sometimes players don't get removed from this map
 			 */
 			UUID playerUUID = player.getUniqueId();
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
@@ -240,19 +242,19 @@ public class GraveManager {
 		String shard = ServerProperties.getShardName();
 
 		if (equipment.entrySet().stream().filter(e -> e.getKey() != EquipmentSlot.HAND)
-			    .map(Map.Entry::getValue)
-			    .allMatch(item -> ItemUtils.isNullOrAir(item)
-				                      || ItemStatUtils.getTier(item) == Tier.NONE
-				                      || ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
+			.map(Map.Entry::getValue)
+			.allMatch(item -> ItemUtils.isNullOrAir(item)
+				|| ItemStatUtils.getTier(item) == Tier.NONE
+				|| ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
 			// Check Lich infusion
 			if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.PHYLACTERY) == 0
-				    || ScoreboardUtils.getScoreboardValue(player, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) == 0) {
+				|| ScoreboardUtils.getScoreboardValue(player, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) == 0) {
 				player.sendMessage(Component.text("You died but had nothing equipped that could shatter, so no grave was created nor were equipped items shattered further. ", NamedTextColor.GRAY)
-					                   .append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
+					.append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
 			} else if (manager.mGraves.stream().noneMatch(grave -> grave.mGhostGrave && shard.equals(grave.mShardName))) {
 				manager.mGraves.add(new Grave(manager, player, equipment));
 				player.sendMessage(Component.text("You died but had nothing equipped that could shatter, nevertheless you left a grave to store your experience! ", NamedTextColor.GRAY)
-					                   .append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
+					.append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
 			}
 		} else if (manager.mGraves.stream().noneMatch(grave -> grave.mGhostGrave && shard.equals(grave.mShardName))) {
 			manager.mGraves.add(new Grave(manager, player, equipment));
@@ -303,6 +305,8 @@ public class GraveManager {
 					Shattered.shatter(item.mItem, Shattered.DROPPED_ITEM_DESTROYED);
 				}
 				if (item.mItem.getAmount() > 0) {
+					// Enforce grave cap before adding new item grave
+					item.mManager.enforceGraveCap();
 					item.mManager.mGraves.add(new Grave(item));
 					item.mManager.mPlayer.sendMessage(Component.text("", NamedTextColor.RED)
 						.append(Component.text("An item").hoverEvent(item.mItem.asHoverEvent()))
@@ -312,6 +316,8 @@ public class GraveManager {
 						.append(Component.text("(/help death for more info)")
 							.clickEvent(ClickEvent.runCommand("/help death")))
 					);
+					// Send warning if approaching grave cap
+					item.mManager.sendGraveCapWarning();
 				}
 			}
 			item.mManager.mThrownItems.remove(item);
@@ -425,17 +431,17 @@ public class GraveManager {
 			.append(Component.text(grave.mShardName, NamedTextColor.WHITE))
 			.append(Component.text(") Loc: (", NamedTextColor.GRAY))
 			.append(Component.text(grave.mLocation.getBlockX() + "," + grave.mLocation.getBlockY() + "," + grave.mLocation.getBlockZ(), NamedTextColor.WHITE))
-				.append(Component.text(") ", NamedTextColor.GRAY))
-				.append(Component.text("Items: (", NamedTextColor.GRAY)
-						.hoverEvent(HoverEvent.showText(itemList)))
-				.append(Component.text(grave.mItems.size(), NamedTextColor.WHITE)
-						.hoverEvent(HoverEvent.showText(itemList)))
-				.append(Component.text(")", NamedTextColor.GRAY)
-						.hoverEvent(HoverEvent.showText(itemList)))
-				.append(Component.text(" "))
-				.append(Component.text("[X]", NamedTextColor.DARK_RED)
-						.hoverEvent(HoverEvent.showText(Component.text("Click to delete", NamedTextColor.RED)))
-						.clickEvent(ClickEvent.runCommand("/grave delete " + grave.mUuid)));
+			.append(Component.text(") ", NamedTextColor.GRAY))
+			.append(Component.text("Items: (", NamedTextColor.GRAY)
+				.hoverEvent(HoverEvent.showText(itemList)))
+			.append(Component.text(grave.mItems.size(), NamedTextColor.WHITE)
+				.hoverEvent(HoverEvent.showText(itemList)))
+			.append(Component.text(")", NamedTextColor.GRAY)
+				.hoverEvent(HoverEvent.showText(itemList)))
+			.append(Component.text(" "))
+			.append(Component.text("[X]", NamedTextColor.DARK_RED)
+				.hoverEvent(HoverEvent.showText(Component.text("Click to delete", NamedTextColor.RED)))
+				.clickEvent(ClickEvent.runCommand("/grave delete " + grave.mUuid)));
 	}
 
 	public List<Grave> getGraves() {
@@ -471,5 +477,41 @@ public class GraveManager {
 		}
 		mDeleteAttemptUUID = null;
 		return true;
+	}
+
+	private int getItemGravesCount() {
+		return (int) mGraves.stream().filter(grave -> !grave.mGhostGrave && !grave.isEmpty()).count();
+	}
+
+	private void enforceGraveCap() {
+		int itemGraveCount = getItemGravesCount();
+		if (itemGraveCount >= MAX_ITEM_GRAVES) {
+			// Find and remove the oldest non-ghost grave
+			Grave oldestGrave = mGraves.stream()
+				.filter(grave -> !grave.mGhostGrave && !grave.isEmpty())
+				.min(Comparator.comparing(Grave::getDeathTime))
+				.orElse(null);
+			if (oldestGrave != null) {
+				// Get the item list before deleting the grave
+				Component itemList = oldestGrave.getItemList(true);
+				oldestGrave.delete();
+				mGraves.remove(oldestGrave);
+				mPlayer.sendMessage(Component.text("Your ", NamedTextColor.RED)
+					.append(Component.text("oldest item grave", NamedTextColor.GOLD)
+						.hoverEvent(HoverEvent.showText(itemList)))
+					.append(Component.text(" has been removed because you reached the maximum of " + MAX_ITEM_GRAVES + " item graves.", NamedTextColor.RED)));
+			}
+		}
+	}
+
+	private void sendGraveCapWarning() {
+		int itemGraveCount = getItemGravesCount();
+		if (itemGraveCount >= GRAVE_WARNING_THRESHOLD) {
+			mPlayer.sendMessage(Component.text("Warning: You have ", NamedTextColor.GOLD)
+				.append(Component.text(itemGraveCount, NamedTextColor.YELLOW))
+				.append(Component.text(" out of ", NamedTextColor.GOLD))
+				.append(Component.text(MAX_ITEM_GRAVES, NamedTextColor.YELLOW))
+				.append(Component.text(" item graves. Your oldest grave will be deleted when you reach the limit!", NamedTextColor.GOLD)));
+		}
 	}
 }

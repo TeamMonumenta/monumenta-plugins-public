@@ -7,9 +7,9 @@ import org.bukkit.entity.LivingEntity;
 
 public class SpellLandSlow extends Spell {
 
-	private LivingEntity mLauncher;
-	private double mSlownessPercent;
-	private Plugin mPlugin;
+	private final LivingEntity mLauncher;
+	private final double mSlownessPercent;
+	private final Plugin mPlugin;
 
 	public SpellLandSlow(Plugin plugin, LivingEntity launcher, double slownesspercent) {
 		mLauncher = launcher;

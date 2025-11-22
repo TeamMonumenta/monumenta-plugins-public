@@ -1,6 +1,9 @@
 package com.playmonumenta.plugins.delves;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -12,6 +15,7 @@ import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.NamespacedKeyArgument;
 import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import dev.jorel.commandapi.arguments.ScoreHolderArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
@@ -21,9 +25,13 @@ import java.util.Collection;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.command.ProxiedCommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Objective;
 
 public class DelvesCommands {
@@ -64,8 +72,8 @@ public class DelvesCommands {
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
 				DelveCustomInventory.Config config = new DelveCustomInventory.Config()
-																			 .editable(false)
-																			 .startable(true);
+					.editable(false)
+					.startable(true);
 				DelvePreset preset = DelvePreset.getChall(args.getUnchecked("dungeon"));
 				if (preset != null) {
 					config = config.preset(preset);
@@ -276,6 +284,65 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
+				new LiteralArgument("store"),
+				new LiteralArgument("mods"),
+				new EntitySelectorArgument.OnePlayer("from player"),
+				dungeonArg,
+				new EntitySelectorArgument.ManyEntities("on entity"),
+				new NamespacedKeyArgument("at key")
+			).executes((commandSender, args) -> {
+				Player fromPlayer = args.getUnchecked("from player");
+				String dungeon = args.getByArgument(dungeonArg);
+				NamespacedKey atKey = args.getUnchecked("at key");
+				for (Entity target : (Collection<Entity>) args.get("on entity")) {
+					JsonObject dungeonDelveModifiers = DelvesUtils.convertPlayerDungeonData(fromPlayer, dungeon);
+					PersistentDataContainer pdc = target.getPersistentDataContainer();
+					pdc.set(atKey, PersistentDataType.STRING, dungeonDelveModifiers.toString());
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
+				new LiteralArgument("load"),
+				new LiteralArgument("mods"),
+				new EntitySelectorArgument.ManyPlayers("to player"),
+				dungeonArg,
+				new EntitySelectorArgument.OneEntity("from entity"),
+				new NamespacedKeyArgument("at key")
+			).executes((commandSender, args) -> {
+				Entity fromEntity = args.getUnchecked("from entity");
+				String dungeon = args.getByArgument(dungeonArg);
+				NamespacedKey atKey = args.getUnchecked("at key");
+
+				PersistentDataContainer pdc = fromEntity.getPersistentDataContainer();
+				String dungeonDelveModJsonStr = pdc.get(atKey, PersistentDataType.STRING);
+
+				if (dungeonDelveModJsonStr == null || dungeonDelveModJsonStr.isBlank()) {
+					throw CommandAPI.failWithString("There is no data at " + atKey);
+				}
+
+				JsonObject dungeonDelveModJson;
+				try {
+					dungeonDelveModJson = new Gson().fromJson(dungeonDelveModJsonStr, JsonObject.class);
+				} catch (RuntimeException ex) {
+					MessagingUtils.sendStackTrace(commandSender, ex);
+					throw CommandAPI.failWithString("Could not parse json data at " + atKey);
+				}
+
+				try {
+					for (Player target : (Collection<Player>) args.get("to player")) {
+						DelvesUtils.loadPlayerDungeonData(target, dungeon, dungeonDelveModJson);
+					}
+				} catch (RuntimeException ex) {
+					MessagingUtils.sendStackTrace(commandSender, ex);
+					throw CommandAPI.failWithString("Could not load json data at " + atKey + " as delve modifier data");
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
 				new LiteralArgument("validate"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg
@@ -348,16 +415,16 @@ public class DelvesCommands {
 				if (total < 0) {
 					player.sendMessage(
 						Component.text("Failed to count total spawners. Please report this as a bug! (" + broken + " broken)")
-								 .color(NamedTextColor.RED)
+							.color(NamedTextColor.RED)
 					);
 					return;
 				}
 				String message = args.getUnchecked("message");
 				player.sendMessage(
 					Component.text(message)
-							 .color(NamedTextColor.RED)
-							 .appendSpace()
-							 .append(Component.text("(" + broken + " broken / " + required + " required)").color(NamedTextColor.YELLOW))
+						.color(NamedTextColor.RED)
+						.appendSpace()
+						.append(Component.text("(" + broken + " broken / " + required + " required)").color(NamedTextColor.YELLOW))
 				);
 			}).register();
 

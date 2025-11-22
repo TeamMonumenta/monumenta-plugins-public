@@ -15,11 +15,13 @@ public class GalleryReviveTimeEffect extends GalleryStackableEffect {
 		super(GalleryEffectType.REVIVE_TIME);
 	}
 
-	@Override public void clear(GalleryPlayer player) {
+	@Override
+	public void clear(GalleryPlayer player) {
 
 	}
 
-	@Override public int getMaxStacks() {
+	@Override
+	public int getMaxStacks() {
 		return REVIVE_TIME_EFFECT_MAX_STACK;
 	}
 }

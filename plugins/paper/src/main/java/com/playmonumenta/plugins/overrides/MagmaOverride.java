@@ -17,7 +17,7 @@ public class MagmaOverride extends BaseOverride {
 		}
 
 		if (InventoryUtils.testForItemWithName(item, "Crystallized Lava", true)
-			    && player.getGameMode() == GameMode.SURVIVAL) {
+			&& player.getGameMode() == GameMode.SURVIVAL) {
 			if (ZoneUtils.isInPlot(player)) {
 				event.getBlockPlaced().setType(Material.LAVA);
 			} else {

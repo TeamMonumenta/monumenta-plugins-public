@@ -33,7 +33,7 @@ public class Charity extends DepthsAbility {
 	}
 
 	private static Description<Charity> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Charity>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("You revive players ")
 			.addPercent(a -> REVIVE_POWER[rarity - 1] - 1, REVIVE_POWER[rarity - 1] - 1, false, true)
 			.add(" faster. After you help revive a player, both you and the revived player gain ")

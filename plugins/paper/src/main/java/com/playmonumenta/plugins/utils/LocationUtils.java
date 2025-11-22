@@ -12,6 +12,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import org.apache.commons.math3.util.Pair;
 import org.bukkit.Chunk;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -128,11 +130,11 @@ public class LocationUtils {
 		for (int i = 0; i < 50; i++) {
 			Block block = loc.getBlock();
 			if (block.isLiquid()
-				    || BlockUtils.containsWater(block)
-				    || block.getType() == Material.ICE
-				    || block.getType() == Material.BLUE_ICE
-				    || block.getType() == Material.PACKED_ICE
-				    || block.getType() == Material.FROSTED_ICE) {
+				|| BlockUtils.containsWater(block)
+				|| block.getType() == Material.ICE
+				|| block.getType() == Material.BLUE_ICE
+				|| block.getType() == Material.PACKED_ICE
+				|| block.getType() == Material.FROSTED_ICE) {
 				return true;
 			} else if (i > 0 && !block.isEmpty()) {
 				return false;
@@ -147,15 +149,15 @@ public class LocationUtils {
 	}
 
 	public static boolean hasLineOfSight(Entity from, Entity to) {
-		return hasLineOfSight((from instanceof LivingEntity ? ((LivingEntity)from).getEyeLocation() : from.getLocation()),
-		                      (to instanceof LivingEntity ? ((LivingEntity)to).getEyeLocation() : to.getLocation()));
+		return hasLineOfSight((from instanceof LivingEntity ? ((LivingEntity) from).getEyeLocation() : from.getLocation()),
+			(to instanceof LivingEntity ? ((LivingEntity) to).getEyeLocation() : to.getLocation()));
 	}
 
 	public static boolean hasLineOfSight(Location fromLocation, Location toLocation) {
 		if (!fromLocation.getWorld().equals(toLocation.getWorld())) {
 			return false;
 		}
-		int range = (int)fromLocation.distance(toLocation) + 1;
+		int range = (int) fromLocation.distance(toLocation) + 1;
 		Vector direction = toLocation.toVector().subtract(fromLocation.toVector()).normalize();
 		if (!Double.isFinite(direction.getX())) {
 			return true;
@@ -182,6 +184,10 @@ public class LocationUtils {
 	}
 
 	public static boolean hasNearbyBlock(Location center, int radius, Material material) {
+		return hasNearbyBlock(center, radius, List.of(material));
+	}
+
+	public static boolean hasNearbyBlock(Location center, int radius, List<Material> materials) {
 		int cx = center.getBlockX();
 		int cy = center.getBlockY();
 		int cz = center.getBlockZ();
@@ -190,7 +196,7 @@ public class LocationUtils {
 		for (int x = cx - radius; x <= cx + radius; x++) {
 			for (int z = cz - radius; z <= cz + radius; z++) {
 				for (int y = (cy - radius); y <= (cy + radius); y++) {
-					if (world.getType(x, y, z) == material) {
+					if (materials.contains(world.getType(x, y, z))) {
 						return true;
 					}
 				}
@@ -199,7 +205,10 @@ public class LocationUtils {
 		return false;
 	}
 
-	// Search a cuboid around a Location and return the first Location found with a block matching one of the given Materials
+	/**
+	 * Search a cuboid around a Location and return the first Location found with a block matching one of the given Materials
+	 * Currently unused. If you wish to use this, upgrade the search to the more efficient version in getNearestDryBlock.
+	 */
 	public static @Nullable Location getNearestBlock(Location center, int radius, Material... materials) {
 		int cx = center.getBlockX();
 		int cy = center.getBlockY();
@@ -227,6 +236,93 @@ public class LocationUtils {
 		}
 		return nearest;
 	}
+
+	/**
+	 * Helper method for getNearestDryBlock.
+	 */
+	private static @Nullable Pair<Location, Double> checkNearestDryBlock(World world, double x, double y, double z, double cx, double cy, double cz, double nearestDistanceSquared, boolean needLoS) {
+		Location loc = new Location(world, x, y, z);
+		Location centerLoc = new Location(world, cx, cy, cz);
+		double distanceSquared = ((cx - x) * (cx - x)) + ((cz - z) * (cz - z)) + ((cy - y) * (cy - y));
+		Block block = loc.getBlock();
+		if (distanceSquared < nearestDistanceSquared
+			&& !BlockUtils.containsWater(block)
+			&& !BlockUtils.isWaterlogged(block)
+			&& !block.getType().equals(Material.LAVA)
+			&& loc.getBlock().isPassable()
+			&& (!needLoS || hasLineOfSight(centerLoc, loc))) {
+			return new Pair<>(loc, distanceSquared);
+		} else {
+			return null;
+		}
+	}
+
+	public static @Nullable Location getNearestDryBlock(Location center, int maxRadius) {
+		return getNearestDryBlock(center, maxRadius, false);
+	}
+
+	/**
+	 * Search a cuboid around a Location and return the first Location which is not submerged. If there is no unsubmerged Location, returns null.
+	 *
+	 * @return Nearest unsubmerged Location. <code>null</code> if no nearby Locations are unsubmerged.
+	 */
+	public static @Nullable Location getNearestDryBlock(Location center, int maxRadius, boolean needLoS) {
+		int cx = center.getBlockX();
+		int cy = center.getBlockY();
+		int cz = center.getBlockZ();
+		World world = center.getWorld();
+		Location nearest = null;
+		double nearestDistanceSquared = Double.MAX_VALUE;
+		@Nullable Pair<Location, Double> nearestDryLocationAndDistancePair;
+
+
+		// The code here is very aesthetically displeasing.
+		// It checks every block around, in an iterative process, going from the smallest radius to the largest.
+		// At each radius, it checks a "shell", which is the surface of a cube.
+		// If it is possible to make the check into a function instead of just copy-pasting the code 3 times, that would be nice.
+		// Hello from the future; I've made it into a function, but is that really any better?
+		for (int radius = 1; radius <= maxRadius; radius++) {
+			for (double x = cx - radius; x <= cx + radius; x = x + 2 * radius) {
+				for (double z = cz - radius; z <= cz + radius; z++) {
+					for (double y = (cy - radius); y <= (cy + radius); y++) {
+						nearestDryLocationAndDistancePair = checkNearestDryBlock(world, x, y, z, cx, cy, cz, nearestDistanceSquared, needLoS);
+						if (nearestDryLocationAndDistancePair != null) {
+							nearest = nearestDryLocationAndDistancePair.getKey();
+							nearestDistanceSquared = nearestDryLocationAndDistancePair.getValue();
+						}
+					}
+				}
+			}
+			for (double z = cz - radius; z <= cz + radius; z = z + 2 * radius) {
+				for (double x = cx - (radius - 1); x <= cx + (radius - 1); x++) {
+					for (double y = (cy - radius); y <= (cy + radius); y++) {
+						nearestDryLocationAndDistancePair = checkNearestDryBlock(world, x, y, z, cx, cy, cz, nearestDistanceSquared, needLoS);
+						if (nearestDryLocationAndDistancePair != null) {
+							nearest = nearestDryLocationAndDistancePair.getKey();
+							nearestDistanceSquared = nearestDryLocationAndDistancePair.getValue();
+						}
+					}
+				}
+			}
+			for (double y = cy - radius; y <= cy + radius; y = y + 2 * radius) {
+				for (double x = cx - (radius - 1); x <= cx + (radius - 1); x++) {
+					for (double z = cz - (radius - 1); z <= cz + (radius - 1); z++) {
+						nearestDryLocationAndDistancePair = checkNearestDryBlock(world, x, y, z, cx, cy, cz, nearestDistanceSquared, needLoS);
+						if (nearestDryLocationAndDistancePair != null) {
+							nearest = nearestDryLocationAndDistancePair.getKey();
+							nearestDistanceSquared = nearestDryLocationAndDistancePair.getValue();
+						}
+					}
+				}
+			}
+			if (nearest != null) {
+				// If you found a location, cap the radius early
+				maxRadius = Math.min(maxRadius, (int) Math.ceil(nearestDistanceSquared));
+			}
+		}
+		return nearest;
+	}
+
 
 	// Search a cuboid around a Location and return a List of all Chests inside the area
 	public static List<Chest> getNearbyChests(Location center, int radius) {
@@ -263,11 +359,12 @@ public class LocationUtils {
 		Gson gson = new Gson();
 		JsonObject obj = gson.fromJson(locStr, JsonObject.class);
 		return new Location(world, obj.get("x").getAsDouble(), obj.get("y").getAsDouble(), obj.get("z").getAsDouble(),
-		                    obj.get("yaw").getAsFloat(), obj.get("pitch").getAsFloat());
+			obj.get("yaw").getAsFloat(), obj.get("pitch").getAsFloat());
 	}
 
 	/**
 	 * Determines if a location "loc" collides with the given Block "block"
+	 *
 	 * @param loc the given location
 	 * @return true if the location is inside the hitbox of the block, false if not
 	 */
@@ -275,19 +372,15 @@ public class LocationUtils {
 		return collidesWithBlocks(BoundingBox.of(loc, 0.001, 0.001, 0.001), loc.getWorld());
 	}
 
-	/* Note:
-	 * loc1 must be the location with a lesser x, y, and z coordinate than loc2.
-	 * loc2 must be the location with a greater x, y, and z coordinate than loc1.
-	 */
 	public static List<Block> getEdge(Location loc1, Location loc2) {
 		List<Block> blocks = new ArrayList<>();
-		int x1 = loc1.getBlockX();
-		int y1 = loc1.getBlockY();
-		int z1 = loc1.getBlockZ();
+		int x1 = Math.min(loc1.getBlockX(), loc2.getBlockX());
+		int y1 = Math.min(loc1.getBlockY(), loc2.getBlockY());
+		int z1 = Math.min(loc1.getBlockZ(), loc2.getBlockZ());
 
-		int x2 = loc2.getBlockX();
-		int y2 = loc2.getBlockY();
-		int z2 = loc2.getBlockZ();
+		int x2 = Math.max(loc1.getBlockX(), loc2.getBlockX());
+		int y2 = Math.max(loc1.getBlockY(), loc2.getBlockY());
+		int z2 = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
 
 		World world = loc1.getWorld();
 		for (int xPoint = x1; xPoint <= x2; xPoint++) {
@@ -375,7 +468,7 @@ public class LocationUtils {
 		Vector vector,
 		double increment
 	) {
-		return travelTillObstructed(world, movingBoundingBox, maxDistance, vector, increment, false, null, -1, -1);
+		return travelTillObstructed(world, movingBoundingBox, maxDistance, vector, increment, true, null, -1, -1);
 	}
 
 	/**
@@ -535,7 +628,7 @@ public class LocationUtils {
 			return false;
 		}
 
-		double reverseDeltaDistance = 1.0/16.0;
+		double reverseDeltaDistance = 1.0 / 16.0;
 		Vector reverseDeltaPosition = requestedPositionDelta.clone().normalize().multiply(-reverseDeltaDistance);
 
 		VersionAdapter versionAdapter = NmsUtils.getVersionAdapter();
@@ -585,13 +678,13 @@ public class LocationUtils {
 		}
 		World world = pos1.getWorld();
 		Location min = new Location(world,
-									Math.min(pos1.getX(), pos2.getX()),
-									Math.min(pos1.getY(), pos2.getY()),
-									Math.min(pos1.getZ(), pos2.getZ()));
+			Math.min(pos1.getX(), pos2.getX()),
+			Math.min(pos1.getY(), pos2.getY()),
+			Math.min(pos1.getZ(), pos2.getZ()));
 		Location max = new Location(world,
-									Math.max(pos1.getX(), pos2.getX()),
-									Math.max(pos1.getY(), pos2.getY()),
-									Math.max(pos1.getZ(), pos2.getZ()));
+			Math.max(pos1.getX(), pos2.getX()),
+			Math.max(pos1.getY(), pos2.getY()),
+			Math.max(pos1.getZ(), pos2.getZ()));
 		Location temp = min.clone();
 		for (int dx = 0; dx <= (max.getBlockX() - min.getBlockX()); dx++) {
 			for (int dy = 0; dy <= (max.getBlockY() - min.getBlockY()); dy++) {
@@ -665,9 +758,7 @@ public class LocationUtils {
 
 	public static Location randomLocationInDonut(Location center, double minRadius, double maxRadius) {
 		double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
-		double diff = Math.abs(maxRadius - minRadius);
-		double ratio = diff / maxRadius;
-		double r = Math.sqrt(FastUtils.randomDoubleInRange(ratio * ratio, 1)) * maxRadius;
+		double r = Math.sqrt(FastUtils.randomDoubleInRange(minRadius / maxRadius, 1)) * maxRadius;
 		return center.clone().add(r * FastUtils.cos(theta), 0, r * FastUtils.sin(theta));
 	}
 
@@ -676,6 +767,73 @@ public class LocationUtils {
 		double r = Math.sqrt(FastUtils.RANDOM.nextDouble()) * radius;
 		return center.clone().add(r * FastUtils.cos(theta), 0, r * FastUtils.sin(theta));
 	}
+
+	public static Location randomSafeLocationInCircle(Location center, double radius, Predicate<Location> safePredicate) {
+		Location loc = randomLocationInCircle(center, radius);
+		if (safePredicate.test(loc)) {
+			return loc;
+		}
+		for (int safety = 0; safety < 20; safety++) {
+			Location possibleLoc = getNearbySafeLocation(loc, location ->
+				safePredicate.test(location) && location.distance(center) <= radius);
+			if (safePredicate.test(possibleLoc)) {
+				return possibleLoc;
+			}
+			loc = randomLocationInCircle(center, radius);
+		}
+		return loc;
+	}
+
+	public static Location randomSafeLocationInDonut(Location center, double minRadius, double maxRadius, Predicate<Location> safePredicate) {
+		Location loc = randomLocationInDonut(center, minRadius, maxRadius);
+		if (safePredicate.test(loc)) {
+			return loc;
+		}
+		for (int safety = 0; safety < 20; safety++) {
+			Location possibleLoc = getNearbySafeLocation(loc, location -> {
+				double distance = location.distance(center);
+				return safePredicate.test(location) && distance <= maxRadius && distance >= minRadius;
+			});
+			if (safePredicate.test(possibleLoc)) {
+				return possibleLoc;
+			}
+			loc = randomLocationInDonut(center, minRadius, maxRadius);
+		}
+		return loc;
+	}
+
+	/*
+	 * This is probably really inefficient
+	 * If there are no safe blocks within 10 blocks, fallbacks to original location
+	 */
+	public static Location getNearbySafeLocation(Location loc, Predicate<Location> safePredicate) {
+		for (int safety = 1; safety < 5; safety++) {
+			Location testLoc1 = loc.clone().add(-safety - 1, 0, 0);
+			Location testLoc2 = loc.clone().add(-safety - 1, 0, safety * 2);
+			for (int x = 0; x <= safety * 2; x += 2) {
+				if (safePredicate.test(testLoc1.add(1, 0, 0))) {
+					return testLoc1;
+				}
+				if (safePredicate.test(testLoc2.add(1, 0, 0))) {
+					return testLoc2;
+				}
+			}
+			testLoc1 = loc.clone().add(0, 0, -safety);
+			testLoc2 = loc.clone().add(safety * 2, 0, -safety);
+
+			for (int z = 1; z < safety * 2; z += 2) {
+				if (safePredicate.test(testLoc1.add(0, 0, 1))) {
+					return testLoc1;
+				}
+				if (safePredicate.test(testLoc2.add(0, 0, 1))) {
+					return testLoc2;
+				}
+			}
+		}
+		// Fallback
+		return loc;
+	}
+
 
 	public static Location fallToGround(Location loc, double minHeight) {
 		Location clone = loc.clone();
@@ -699,9 +857,47 @@ public class LocationUtils {
 		}
 	}
 
+	public static Location emergeFromGround(Location loc, double maxHeight) {
+		Location clone = loc.clone();
+		Block block = clone.getBlock();
+		if (!block.isSolid()) {
+			return clone;
+		}
+		double newY = block.getBoundingBox().getMaxY();
+		if (newY < clone.getY()) {
+			return clone;
+		}
+		if (newY >= maxHeight) {
+			clone.setY(maxHeight + 0.01);
+			return clone;
+		}
+		clone.setY(newY + 0.5);
+		return emergeFromGround(clone, maxHeight);
+	}
+
+	public static Location mapToGround(Location startLocation, int maxVerticalRange) {
+		// Start at the bottom and move up
+		for (int i = 0; i < maxVerticalRange * 2; i++) {
+			Location testLocation = startLocation.clone().add(0, i, 0);
+			if (!testLocation.getBlock().isSolid()) {
+				return testLocation;
+			}
+		}
+		return startLocation;
+	}
+
 	public static double distanceToGround(Location loc, double minHeight, double maxDistance) {
 		Vector toGround = getVectorTo(loc, fallToGround(loc, minHeight));
 		if (toGround.getY() > maxDistance || toGround.getY() < 0) {
+			return 0;
+		} else {
+			return toGround.getY();
+		}
+	}
+
+	public static double distanceToGround(Location loc, double minHeight) {
+		Vector toGround = getVectorTo(loc, fallToGround(loc, minHeight));
+		if (toGround.getY() < 0) {
 			return 0;
 		} else {
 			return toGround.getY();
@@ -758,6 +954,7 @@ public class LocationUtils {
 
 	/**
 	 * Vary a location by some uniform +/- variance along all three axes.
+	 *
 	 * @param loc the starting location
 	 * @param var will vary the location by -var to +var in each axis
 	 * @return the new location
@@ -768,7 +965,8 @@ public class LocationUtils {
 
 	/**
 	 * Vary a location by some uniform +/- variance along all three axes.
-	 * @param loc the starting location
+	 *
+	 * @param loc  the starting location
 	 * @param xVar x-axis variance
 	 * @param yVar y-axis variance
 	 * @param zVar z-axis variance

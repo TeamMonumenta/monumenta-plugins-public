@@ -68,7 +68,7 @@ public class CurseOfRedundancy extends DepthsAbility {
 	}
 
 	private static Description<CurseOfRedundancy> getDescription() {
-		return new DescriptionBuilder<CurseOfRedundancy>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("After casting 2 abilities from the same tree in a row, all of your abilities' cooldowns recharge ")
 			.addPercent(RECHARGE_REDUCTION)
 			.add(" slower for ")

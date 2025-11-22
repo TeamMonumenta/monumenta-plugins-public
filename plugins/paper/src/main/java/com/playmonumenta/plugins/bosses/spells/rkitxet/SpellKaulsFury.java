@@ -30,14 +30,14 @@ public class SpellKaulsFury extends Spell {
 	public static final int HEIGHT = 8;
 	public static final double DAMAGE = 28;
 
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 	private int mTicks;
-	private Plugin mPlugin;
-	private RKitxet mRKitxet;
+	private final Plugin mPlugin;
+	private final RKitxet mRKitxet;
 
-	private int mTriggerInterval;
-	private int mChargeTime;
-	private int mImpactTime;
+	private final int mTriggerInterval;
+	private final int mChargeTime;
+	private final int mImpactTime;
 
 	public SpellKaulsFury(Plugin plugin, LivingEntity boss, RKitxet rKitxet, int triggerInterval, int chargeTime, int impactTime, int initialDelay) {
 		mPlugin = plugin;
@@ -58,7 +58,7 @@ public class SpellKaulsFury extends Spell {
 		if (mTicks % mTriggerInterval == 0) {
 			mTicks = 0;
 			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), RKitxet.detectionRange, false);
-			if (players.size() == 0) {
+			if (players.isEmpty()) {
 				return;
 			}
 			if (players.size() > 1 && mRKitxet.getFuryTarget() != null) {
@@ -136,7 +136,7 @@ public class SpellKaulsFury extends Spell {
 						world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1);
 
 						ParticleUtils.explodingRingEffect(mPlugin, mLocation, RADIUS, 1, 4,
-							Arrays.asList(
+							List.of(
 								new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
 									new PartialParticle(Particle.FLAME, location, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);
 									new PartialParticle(Particle.SMOKE_LARGE, location, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);

@@ -23,7 +23,8 @@ package it.unimi.dsi.util;
 import java.util.Random;
 import java.util.SplittableRandom;
 
-/** A fast, high-quality {@linkplain Random pseudorandom number generator} for floating-point generation.
+/**
+ * A fast, high-quality {@linkplain Random pseudorandom number generator} for floating-point generation.
  * It has excellent speed,
  * but its state space (128 bits) is large enough for
  * mild parallelism only. It passes all tests we are aware of except for the four
@@ -62,7 +63,9 @@ import java.util.SplittableRandom;
 
 public class XoRoShiRo128PlusRandom extends Random {
 	private static final long serialVersionUID = 1L;
-	/** The internal state of the algorithm. */
+	/**
+	 * The internal state of the algorithm.
+	 */
 	private long mS0;
 	private long mS1;
 
@@ -71,13 +74,16 @@ public class XoRoShiRo128PlusRandom extends Random {
 		this.mS1 = s1;
 	}
 
-	/** Creates a new generator seeded using {@link Util#randomSeed()}. */
+	/**
+	 * Creates a new generator seeded using {@link Util#randomSeed()}.
+	 */
 	/* Monumenta NOTE: Seed with time instead, which lacks uniqueness properties */
 	public XoRoShiRo128PlusRandom() {
 		this(System.nanoTime());
 	}
 
-	/** Creates a new generator using a given seed.
+	/**
+	 * Creates a new generator using a given seed.
 	 *
 	 * @param seed a seed for the generator.
 	 */
@@ -86,7 +92,8 @@ public class XoRoShiRo128PlusRandom extends Random {
 	}
 
 
-	/** Returns a copy of this generator. The sequences produced by this generator and by the returned generator will be identical.
+	/**
+	 * Returns a copy of this generator. The sequences produced by this generator and by the returned generator will be identical.
 	 *
 	 * <p>This method is particularly useful in conjunction with the {@link #jump()} (or {@link #longJump()}) method: by calling repeatedly
 	 * {@link #jump() jump().copy()} over a generator it is possible to create several generators producing non-overlapping sequences.
@@ -99,12 +106,12 @@ public class XoRoShiRo128PlusRandom extends Random {
 
 	@Override
 	public int nextInt() {
-		return (int)(nextLong() >>> 32);
+		return (int) (nextLong() >>> 32);
 	}
 
 	@Override
 	public int nextInt(final int n) {
-		return (int)nextLong(n);
+		return (int) nextLong(n);
 	}
 
 	@Override
@@ -118,7 +125,8 @@ public class XoRoShiRo128PlusRandom extends Random {
 		return result;
 	}
 
-	/** Returns a pseudorandom uniformly distributed {@code long} value
+	/**
+	 * Returns a pseudorandom uniformly distributed {@code long} value
 	 * between 0 (inclusive) and the specified value (exclusive), drawn from
 	 * this random number generator's sequence. The algorithm used to generate
 	 * the value guarantees that the result is uniform, provided that the
@@ -139,8 +147,10 @@ public class XoRoShiRo128PlusRandom extends Random {
 			return (t >>> Long.numberOfLeadingZeros(nMinus1)) & nMinus1;
 		}
 		// Rejection-based algorithm to get uniform integers in the general case
-		for (long u = t >>> 1; u + nMinus1 - (t = u % n) < 0; u = nextLong() >>> 1) {
+		long u = t >>> 1;
+		while (u + nMinus1 - (t = u % n) < 0) {
 			// Loop
+			u = nextLong() >>> 1;
 		}
 		return t;
 	}
@@ -166,7 +176,6 @@ public class XoRoShiRo128PlusRandom extends Random {
 	 * @return the next pseudorandom, uniformly distributed {@code double}
 	 * value between {@code 0.0} and {@code 1.0} from this
 	 * random number generator's sequence, using 52 significant bits only.
-	 *
 	 * @since 2.4.1
 	 */
 	/* Monumenta NOTE: Renamed to nextDouble(), which was removed */
@@ -192,12 +201,12 @@ public class XoRoShiRo128PlusRandom extends Random {
 		while (i != 0) {
 			n = Math.min(i, 8);
 			for (long bits = nextLong(); n-- != 0; bits >>= 8) {
-				bytes[--i] = (byte)bits;
+				bytes[--i] = (byte) bits;
 			}
 		}
 	}
 
-	private static final long[] JUMP = { 0xdf900294d8f554a5L, 0x170865df4b3201fcL };
+	private static final long[] JUMP = {0xdf900294d8f554a5L, 0x170865df4b3201fcL};
 
 	protected XoRoShiRo128PlusRandom jump(final long[] jump) {
 		long s0 = 0;
@@ -218,7 +227,8 @@ public class XoRoShiRo128PlusRandom extends Random {
 	}
 
 
-	/** The jump function for this generator. It is equivalent to 2<sup>64</sup>
+	/**
+	 * The jump function for this generator. It is equivalent to 2<sup>64</sup>
 	 * calls to {@link #nextLong()}; it can be used to generate 2<sup>64</sup>
 	 * non-overlapping subsequences for parallel computations.
 	 *
@@ -230,9 +240,10 @@ public class XoRoShiRo128PlusRandom extends Random {
 		return jump(JUMP);
 	}
 
-	private static final long[] LONG_JUMP = { 0xd2a98b26625eee7bL, 0xdddf9b1090aa7ac1L };
+	private static final long[] LONG_JUMP = {0xd2a98b26625eee7bL, 0xdddf9b1090aa7ac1L};
 
-	/** The long-jump function for this generator. It is equivalent to 2<sup>96</sup>
+	/**
+	 * The long-jump function for this generator. It is equivalent to 2<sup>96</sup>
 	 * calls to {@link #nextLong()}; it can be used to generate 2<sup>32</sup> starting points,
 	 * from each of which {@link #jump()} will generate 2<sup>32</sup> non-overlapping
 	 * subsequences for parallel distributed computations.
@@ -314,7 +325,8 @@ public class XoRoShiRo128PlusRandom extends Random {
 		return split;
 	}
 
-	/** Sets the seed of this generator.
+	/**
+	 * Sets the seed of this generator.
 	 *
 	 * <p>The argument will be used to seed a {@link SplitMix64RandomGenerator}, whose output
 	 * will in turn be used to seed this generator. This approach makes &ldquo;warmup&rdquo; unnecessary,
@@ -332,7 +344,8 @@ public class XoRoShiRo128PlusRandom extends Random {
 	}
 
 
-	/** Sets the state of this generator.
+	/**
+	 * Sets the state of this generator.
 	 *
 	 * <p>The internal state of the generator will be reset, and the state array filled with the provided array.
 	 *

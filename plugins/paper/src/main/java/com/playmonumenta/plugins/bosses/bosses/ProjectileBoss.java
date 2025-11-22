@@ -6,24 +6,21 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit.LIMITSENUM;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.List;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 
 public class ProjectileBoss extends BossAbilityGroup {
@@ -138,38 +135,57 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		//particle & sound used!
 		@BossParam(help = "Sound played at the start")
-		public SoundsList SOUND_START = SoundsList.fromString("[(ENTITY_BLAZE_AMBIENT,1.5,1)]");
+		public SoundsList SOUND_START = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_AMBIENT, 1.5f, 1.0f))
+			.build();
 
 		@BossParam(help = "Particle used when launching the projectile")
-		public ParticlesList PARTICLE_LAUNCH = ParticlesList.fromString("[(EXPLOSION_LARGE,1)]");
+		public ParticlesList PARTICLE_LAUNCH = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_LARGE, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound used when launching the projectile")
-		public SoundsList SOUND_LAUNCH = SoundsList.fromString("[(ENTITY_BLAZE_SHOOT,0.5,0.5)]");
+		public SoundsList SOUND_LAUNCH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f))
+			.build();
 
 		@BossParam(help = "Particle used for the projectile")
-		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.fromString("[(FLAME, 4, 0.05, 0.05, 0.05, 0.1),(SMOKE_LARGE, 3, 0.25, 0.25, 0.25)]");
+		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 4, 0.05, 0.05, 0.05, 0.1))
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 3, 0.25, 0.25, 0.25, 0.0))
+			.build();
 
 		@BossParam(help = "Sound summoned every 2 sec on the projectile location")
-		public SoundsList SOUND_PROJECTILE = SoundsList.fromString("[(ENTITY_BLAZE_BURN,0.5,0.2)]");
+		public SoundsList SOUND_PROJECTILE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_BURN, 0.5f, 0.2f))
+			.build();
 
 		@BossParam(help = "Particle used when the projectile hit something")
-		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(CLOUD,50,0,0,0,0.25)]");
+		public ParticlesList PARTICLE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 50, 0.0, 0.0, 0.0, 0.25))
+			.build();
 
 		@BossParam(help = "Sound used when the projectile hit something")
-		public SoundsList SOUND_HIT = SoundsList.fromString("[(ENTITY_GENERIC_DEATH,0.5,0.5)]");
+		public SoundsList SOUND_HIT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_DEATH, 0.5f, 0.5f))
+			.build();
+
+		@BossParam(help = "Entities summoned on hit")
+		public LoSPool HIT_SUMMONS = LoSPool.LibraryPool.EMPTY;
+
+		@BossParam(help = "If hit summons should spawn on collision with a wall")
+		public boolean SUMMON_ON_COLLISION = true;
 	}
 
 	public ProjectileBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		final Parameters p = BossParameters.getParameters(mBoss, identityTag, new Parameters());
-		final int lifetimeTicks = (int) (p.DISTANCE / p.SPEED);
-
 		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT) {
 			//same object
 			//probably an older mob version?
 			//build a new target from others config
-			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL), List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 			//by default ProjectileBoss doesn't take player in stealth and need line of sight.
 		}
 
@@ -181,62 +197,18 @@ public class ProjectileBoss extends BossAbilityGroup {
 			p.MIRROR = 0;
 		}
 
-		final Spell spell = new SpellBaseSeekingProjectile(mPlugin, mBoss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL,
-			p.COOLDOWN, p.SPELL_DELAY, p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH,
-			p.SPLIT, p.SPLIT_ANGLE, p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS,
-			p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
-			//spell targets
-			() -> p.TARGETS.getTargetsList(mBoss),
-			// Initiate Aesthetic
-			(World world, Location loc, int ticks) -> {
-				if (p.SPELL_DELAY > 0) {
-					GlowingManager.startGlowing(mBoss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
-				}
-				p.SOUND_START.play(loc);
-			},
-			// Launch Aesthetic
-			(World world, Location loc, int ticks) -> {
-				p.PARTICLE_LAUNCH.spawn(mBoss, loc);
-				p.SOUND_LAUNCH.play(loc);
-			},
-			// Projectile Aesthetic
-			(World world, Location loc, int ticks) -> {
-				p.PARTICLE_PROJECTILE.spawn(mBoss, loc, 0.1, 0.1, 0.1, 0.1);
-				if (ticks % 40 == 0) {
-					p.SOUND_PROJECTILE.play(loc);
-				}
-			},
-			// Hit Action
-			(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
-				if (!p.DAMAGE_PLAYER_ONLY || target instanceof Player) {
-					p.SOUND_HIT.play(loc, 0.5f, 0.5f);
-					p.PARTICLE_HIT.spawn(mBoss, loc, 0d, 0d, 0d, 0.25d);
-
-					if (target != null) {
-						onHitActions(p, mBoss, target, prevLoc);
-					}
-
-					if (p.AOE_RADIUS > 0) {
-						/* TODO: This could be generalized to work with all LivingEntities with some effort. I only
-						 *  made it work with players since I'm strictly importing functionality from KineticProjectileBoss */
-						final List<Player> hitPlayers = new Hitbox.AABBHitbox(world,
-							new BoundingBox().shift(loc).expand(p.AOE_RADIUS)).getHitPlayers(true);
-						hitPlayers.removeIf(player -> player == target);
-						hitPlayers.forEach(player -> onHitActions(p, mBoss, player, prevLoc));
-					}
-				}
-			});
+		final Spell spell = new SpellBaseSeekingProjectile(plugin, mBoss, p);
 
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 
-	private void onHitActions(final Parameters p, final LivingEntity launcher, final LivingEntity affected, final @Nullable Location prevLoc) {
+	public static void onHitActions(final Parameters p, final LivingEntity launcher, final LivingEntity affected, final @Nullable Location prevLoc) {
 		if (p.DAMAGE > 0) {
-			BossUtils.blockableDamage(launcher, affected, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc);
+			BossUtils.blockableDamage(launcher, affected, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc, p.EFFECTS.mEffectList());
 		}
 
 		if (p.DAMAGE_PERCENTAGE > 0.0) {
-			BossUtils.bossDamagePercent(mBoss, affected, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME);
+			BossUtils.bossDamagePercent(launcher, affected, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME, p.EFFECTS.mEffectList());
 		}
 
 		if (p.HEAL_AMOUNT > 0) {

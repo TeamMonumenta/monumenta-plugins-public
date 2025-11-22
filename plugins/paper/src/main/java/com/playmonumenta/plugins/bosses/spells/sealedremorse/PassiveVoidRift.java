@@ -23,11 +23,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class PassiveVoidRift extends Spell {
 	private int mCooldown = 0;
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
-	private int mTimer;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final int mTimer;
 
-	private int mRadius = 3;
+	private final int mRadius = 3;
 
 	public PassiveVoidRift(LivingEntity boss, Plugin plugin, int timer) {
 		mBoss = boss;

@@ -44,6 +44,7 @@ public class AutoAttackTowerAbility extends TowerAbility {
 		Spell spell = new Spell() {
 
 			private double mInc = 0;
+
 			@Override
 			public void run() {
 				mInc += 5;
@@ -207,7 +208,6 @@ public class AutoAttackTowerAbility extends TowerAbility {
 		super.constructBoss(manager, Collections.emptyList(), -1, null, (int) (FastUtils.RANDOM.nextDouble() * 20) + 20);
 
 	}
-
 
 
 }

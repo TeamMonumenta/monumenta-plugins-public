@@ -7,8 +7,11 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.bosses.bosses.GenericTargetBoss;
 import com.playmonumenta.plugins.bosses.bosses.HostileBoss;
+import com.playmonumenta.plugins.bosses.bosses.ImmortalMountBoss;
+import com.playmonumenta.plugins.bosses.bosses.ImmortalPassengerBoss;
 import com.playmonumenta.plugins.bosses.bosses.PlayerTargetBoss;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
+import com.playmonumenta.plugins.bosses.bosses.WormSegmentBoss;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.effects.Bleed;
@@ -24,6 +27,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.RecoilDisable;
+import com.playmonumenta.plugins.effects.SelfishVulnerability;
 import com.playmonumenta.plugins.effects.SplitArrowIframesEffect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -77,6 +81,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -211,6 +216,7 @@ public class EntityUtils {
 	public static final String DONT_ENTER_BOATS_TAG = "boss_no_boat_riding";
 	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<>();
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<>();
+	private static final Map<LivingEntity, Integer> FROZEN_MOBS = new HashMap<>(); // Frozen is just stun but without the visuals
 	private static final Map<LivingEntity, Integer> SILENCED_MOBS = new HashMap<>();
 	private static @Nullable BukkitRunnable mobsTracker = null;
 
@@ -228,6 +234,7 @@ public class EntityUtils {
 
 				Iterator<Map.Entry<LivingEntity, Integer>> coolingIter = COOLING_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> stunnedIter = STUNNED_MOBS.entrySet().iterator();
+				Iterator<Map.Entry<LivingEntity, Integer>> frozenIter = FROZEN_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> silencedIter = SILENCED_MOBS.entrySet().iterator();
 
 				while (coolingIter.hasNext()) {
@@ -263,6 +270,21 @@ public class EntityUtils {
 					if (stunned.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
 						removeAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, STUN_ATTR_NAME);
 						stunnedIter.remove();
+					}
+				}
+
+				while (frozenIter.hasNext()) {
+					Map.Entry<LivingEntity, Integer> frozen = frozenIter.next();
+					LivingEntity mob = frozen.getKey();
+					frozen.setValue(frozen.getValue() - 1);
+
+					if (mob instanceof Vex || mob instanceof Flying) {
+						mob.setVelocity(new Vector(0, 0, 0));
+					}
+
+					if (frozen.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
+						removeAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, STUN_ATTR_NAME);
+						frozenIter.remove();
 					}
 				}
 
@@ -357,8 +379,8 @@ public class EntityUtils {
 	// Check for if a mob is CCImmune, meaning cannot be stunned, cannot be slowed, etc.
 	public static boolean isCCImmuneMob(Entity entity) {
 		return isBoss(entity)
-			       || ScoreboardUtils.checkTag(entity, CrowdControlImmunityBoss.identityTag)
-			       || EffectManager.getInstance().hasEffect(entity, CCImmuneEffect.class);
+			|| ScoreboardUtils.checkTag(entity, CrowdControlImmunityBoss.identityTag)
+			|| EffectManager.getInstance().hasEffect(entity, CCImmuneEffect.class);
 	}
 
 	public static boolean isTrainingDummy(Entity entity) {
@@ -393,15 +415,14 @@ public class EntityUtils {
 			return true;
 		} else if (mob.getScoreboardTags().contains("Hostile")) {
 			return true;
-		} else if (checkingOnSpawn && (mob.getScoreboardTags().contains(PlayerTargetBoss.identityTag) || mob.getScoreboardTags().contains(HostileBoss.identityTag))) {
-			return true;
+		} else {
+			return checkingOnSpawn && (mob.getScoreboardTags().contains(PlayerTargetBoss.identityTag) || mob.getScoreboardTags().contains(HostileBoss.identityTag));
 		}
-		return false;
 	}
 
 	public static boolean isFireResistant(LivingEntity mob) {
 		return mob instanceof Blaze || mob instanceof Ghast || mob instanceof MagmaCube || mob instanceof PigZombie || mob instanceof Wither
-			       || mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
+			|| mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
 	}
 
 	public static boolean isStillLoaded(Entity entity) {
@@ -417,10 +438,6 @@ public class EntityUtils {
 		}
 
 		return false;
-	}
-
-	public static @Nullable Player getPlayerAtCursor(Player player, double range) {
-		return getPlayerAtCursor(player, range, null);
 	}
 
 	public static @Nullable Player getPlayerAtCursor(Player player, double range, double hitboxSize) {
@@ -462,10 +479,10 @@ public class EntityUtils {
 	/**
 	 * Get the nearest entity that the player is looking at
 	 *
-	 * @param player      player
-	 * @param range       range
-	 * @param filter      predicate to filter mobs
-	 * @param hitboxSize  the size of the ray traced
+	 * @param player     player
+	 * @param range      range
+	 * @param filter     predicate to filter mobs
+	 * @param hitboxSize the size of the ray traced
 	 * @return entity
 	 */
 	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, @Nullable Predicate<Entity> filter, double hitboxSize) {
@@ -748,16 +765,20 @@ public class EntityUtils {
 
 	public static @Nullable <T extends LivingEntity> T getNearestMob(Location loc, List<T> nearbyMobs) {
 		return nearbyMobs
-			       .stream()
-			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-			       .orElse(null);
+			.stream()
+			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			.orElse(null);
 	}
 
 	public static @Nullable Player getNearestPlayer(Location loc, double radius) {
-		return PlayerUtils.playersInRange(loc, radius, true)
-			       .stream()
-			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-			       .orElse(null);
+		return getNearestPlayer(loc, PlayerUtils.playersInRange(loc, radius, true));
+	}
+
+	public static @Nullable Player getNearestPlayer(Location loc, List<Player> players) {
+		return players
+			.stream()
+			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			.orElse(null);
 	}
 
 	/**
@@ -792,10 +813,10 @@ public class EntityUtils {
 
 	public static @Nullable LivingEntity getNearestHostileTargetable(Location loc, double range) {
 		return loc.getNearbyEntitiesByType(LivingEntity.class, range, range, range)
-			       .stream()
-			       .filter(e -> e.isValid() && isHostileMob(e) && !e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))
-			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-			       .orElse(null);
+			.stream()
+			.filter(e -> e.isValid() && isHostileMob(e) && !e.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))
+			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			.orElse(null);
 	}
 
 	public static final String VULNERABILITY_EFFECT_NAME = "VulnerabilityEffect";
@@ -804,99 +825,67 @@ public class EntityUtils {
 		plugin.mEffectManager.addEffect(mob, VULNERABILITY_EFFECT_NAME, new PercentDamageReceived(ticks, amount));
 	}
 
+	public static void applySelfishVulnerability(Plugin plugin, int ticks, double amount, LivingEntity mob, Player target) {
+		plugin.mEffectManager.addEffect(mob, VULNERABILITY_EFFECT_NAME, new SelfishVulnerability(ticks, amount, target));
+	}
+
 	public static boolean isVulnerable(Plugin plugin, LivingEntity mob) {
 		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(mob, VULNERABILITY_EFFECT_NAME);
-		if (vulns != null) {
-			return true;
-		}
-		return false;
+		return vulns != null;
 	}
 
-	public static double getVulnAmount(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(mob, VULNERABILITY_EFFECT_NAME);
-		if (vulns != null) {
-			Effect vuln = vulns.last();
-			return vuln.getMagnitude();
-		} else {
-			return 0;
-		}
-	}
-
-	public static int getVulnTicks(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> vulns = plugin.mEffectManager.getEffects(mob, VULNERABILITY_EFFECT_NAME);
-		if (vulns != null) {
-			Effect vuln = vulns.last();
-			return vuln.getDuration();
-		} else {
-			return 0;
-		}
-	}
-
-	public static void amplifyVuln(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
-		if (isVulnerable(plugin, en)) {
-			int ampLvl = (int) Math.floor(getVulnAmount(plugin, en) * 10) + ampAmount;
-			if (ampLvl > ampCap) {
-				ampLvl = (int) Math.max(ampCap, Math.floor(getVulnAmount(plugin, en) * 10));
+	public static void applyBleed(Plugin plugin, Player player, LivingEntity mob, int stacks) {
+		if (ImmortalPassengerBoss.isDamageTransferringImmortalPassenger(mob)) {
+			actuallyApplyBleed(plugin, player, ImmortalPassengerBoss.getMortalMount(mob), stacks);
+		} else if (ImmortalMountBoss.isDamageTransferringImmortalMount(mob)) {
+			for (LivingEntity victim : ImmortalMountBoss.getMortalPassengers(mob)) {
+				actuallyApplyBleed(plugin, player, victim, stacks);
 			}
-			applyVulnerability(plugin, getVulnTicks(plugin, en), ampLvl * 0.1, en);
+		} else {
+			WormSegmentBoss wormSegmentBoss = BossManager.getInstance().getBoss(mob, WormSegmentBoss.class);
+			if (wormSegmentBoss != null) {
+				actuallyApplyBleed(plugin, player, wormSegmentBoss.getHead(), stacks);
+			} else {
+				actuallyApplyBleed(plugin, player, mob, stacks);
+			}
 		}
 	}
 
-	private static final String BLIGHT_EFFECT_NAME = "SanguineHarvestBlightEffect";
-
-	public static boolean isBlighted(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> blight = plugin.mEffectManager.getEffects(mob, BLIGHT_EFFECT_NAME);
-		if (blight != null) {
-			return true;
+	private static void actuallyApplyBleed(Plugin plugin, Player player, LivingEntity mob, int stacks) {
+		if (mob == null) {
+			return;
 		}
-		return false;
+		Bleed bleedEffect = plugin.mEffectManager.getActiveEffect(mob, Bleed.class);
+		if (bleedEffect == null) {
+			bleedEffect = new Bleed();
+			plugin.mEffectManager.addEffect(mob, Bleed.BLEED_EFFECT_NAME, bleedEffect);
+		}
+		bleedEffect.incrementStacks(player, mob, stacks);
 	}
 
-	public static final String BLEED_EFFECT_NAME = "BleedEffect";
-
-	public static void applyBleed(Plugin plugin, int ticks, double amount, LivingEntity mob) {
-		plugin.mEffectManager.addEffect(mob, BLEED_EFFECT_NAME, new Bleed(ticks, amount, plugin));
+	public static void applyHemorrhageCooldown(Plugin plugin, LivingEntity mob, boolean applyWeakness) {
+		Bleed bleedEffect = plugin.mEffectManager.getActiveEffect(mob, Bleed.class);
+		if (bleedEffect == null) {
+			plugin.mEffectManager.addEffect(mob, Bleed.BLEED_EFFECT_NAME, new Bleed());
+			bleedEffect = plugin.mEffectManager.getActiveEffect(mob, Bleed.class);
+		}
+		if (bleedEffect != null) {
+			bleedEffect.actuallyApplyHemorrhageCooldown(mob, applyWeakness);
+		} else {
+			// Should never happen
+			MMLog.finer("Bleeding attempted to hemorrhage to a mob which somehow did not have any Bleed effect, despite it being added previously.");
+		}
 	}
 
 	public static boolean isBleeding(Plugin plugin, LivingEntity mob) {
-		return plugin.mEffectManager.hasEffect(mob, BLEED_EFFECT_NAME);
-	}
-
-	public static int getBleedLevel(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
-		if (bleeds != null) {
-			Effect bleed = bleeds.last();
-			return (int) bleed.getMagnitude();
-		} else {
-			return 0;
-		}
-	}
-
-	public static int getBleedTicks(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
-		if (bleeds != null) {
-			Effect bleed = bleeds.last();
-			return bleed.getDuration();
-		} else {
-			return 0;
-		}
+		return plugin.mEffectManager.hasEffect(mob, Bleed.BLEED_EFFECT_NAME);
 	}
 
 	public static void setBleedTicks(Plugin plugin, LivingEntity mob, int ticks) {
-		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, BLEED_EFFECT_NAME);
+		NavigableSet<Effect> bleeds = plugin.mEffectManager.getEffects(mob, Bleed.BLEED_EFFECT_NAME);
 		if (bleeds != null) {
 			Effect bleed = bleeds.last();
 			bleed.setDuration(ticks);
-		}
-	}
-
-	public static void amplifyBleed(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
-		if (isBleeding(plugin, en)) {
-			int ampLvl = getBleedLevel(plugin, en) + ampAmount;
-			if (ampLvl > ampCap) {
-				ampLvl = Math.max(ampCap, getBleedLevel(plugin, en));
-			}
-			applyBleed(plugin, getBleedTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 
@@ -916,16 +905,6 @@ public class EntityUtils {
 
 	public static boolean isSlowed(Plugin plugin, LivingEntity mob) {
 		return plugin.mEffectManager.hasEffect(mob, SLOW_EFFECT_NAME);
-	}
-
-	public static double getSlowAmount(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(mob, SLOW_EFFECT_NAME);
-		if (slows != null) {
-			Effect slow = slows.last();
-			return slow.getMagnitude();
-		} else {
-			return 0;
-		}
 	}
 
 	public static int getSlowTicks(Plugin plugin, LivingEntity mob) {
@@ -948,16 +927,6 @@ public class EntityUtils {
 		if (slows != null) {
 			Effect slow = slows.last();
 			slow.setDuration(ticks);
-		}
-	}
-
-	public static void amplifySlow(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
-		if (isSlowed(plugin, en)) {
-			int ampLvl = (int) Math.floor(getSlowAmount(plugin, en) * 10) + ampAmount;
-			if (ampLvl > ampCap) {
-				ampLvl = (int) Math.max(ampCap, Math.floor(getSlowAmount(plugin, en) * 10));
-			}
-			applySlow(plugin, getSlowTicks(plugin, en), ampLvl * 0.1, en);
 		}
 	}
 
@@ -991,7 +960,7 @@ public class EntityUtils {
 	}
 
 	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob, @Nullable EnumSet<DamageType> affectedDamageTypes, String effectString) {
-		plugin.mEffectManager.addEffect(mob, effectString, new PercentDamageDealt(ticks, -amount, affectedDamageTypes));
+		plugin.mEffectManager.addEffect(mob, effectString, new PercentDamageDealt(ticks, -amount).damageTypes(affectedDamageTypes));
 		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_AESTHETICS_NAME, new Aesthetics(ticks,
 			(entity, fourHertz, twoHertz, oneHertz) -> {
 				if (fourHertz) {
@@ -1011,16 +980,6 @@ public class EntityUtils {
 
 	public static boolean isWeakened(Plugin plugin, LivingEntity mob) {
 		return plugin.mEffectManager.hasEffect(mob, WEAKEN_EFFECT_NAME);
-	}
-
-	public static double getWeakenAmount(Plugin plugin, LivingEntity mob) {
-		NavigableSet<Effect> weaks = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_NAME);
-		if (weaks != null) {
-			Effect weak = weaks.last();
-			return weak.getMagnitude();
-		} else {
-			return 0;
-		}
 	}
 
 	public static int getWeakenTicks(Plugin plugin, LivingEntity mob) {
@@ -1050,16 +1009,6 @@ public class EntityUtils {
 		}
 	}
 
-	public static void amplifyWeaken(Plugin plugin, LivingEntity en, int ampAmount, int ampCap) {
-		if (isWeakened(plugin, en)) {
-			int ampLvl = (int) Math.floor(getWeakenAmount(plugin, en) * 10) + ampAmount;
-			if (ampLvl > ampCap) {
-				ampLvl = (int) Math.max(ampCap, Math.floor(getWeakenAmount(plugin, en) * 10));
-			}
-			applyWeaken(plugin, getWeakenTicks(plugin, en), ampLvl * 0.1, en);
-		}
-	}
-
 	public static boolean hasDamageOverTime(Plugin plugin, LivingEntity mob) {
 		return plugin.mEffectManager.hasEffect(mob, CustomDamageOverTime.class);
 	}
@@ -1076,23 +1025,27 @@ public class EntityUtils {
 		return highest;
 	}
 
-	public static void setFireTicksIfLower(int fireTicks, LivingEntity target) {
+	public static void setFireTicksIfLower(int fireTicks, LivingEntity target, @Nullable Entity applier) {
 		if (target.getFireTicks() < fireTicks && !isFireResistant(target)) {
 			target.setFireTicks(fireTicks);
 			if (!(target instanceof Player)) {
-				BossManager.getInstance().bossIgnited(target, fireTicks);
+				BossManager.getInstance().bossIgnited(target, fireTicks, applier);
 			}
 		}
 	}
 
 	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, @Nullable LivingEntity applier) {
-		if (applier instanceof Player player) {
+		applyFire(plugin, fireTicks, target, applier, true);
+	}
+
+	public static void applyFire(Plugin plugin, int fireTicks, LivingEntity target, @Nullable LivingEntity applier, boolean applyInferno) {
+		if (applier instanceof Player player && applyInferno) {
 			applyFire(plugin, fireTicks, target, player, plugin.mItemStatManager.getPlayerItemStats(player));
 		} else if (target instanceof Player player) {
 			fireTicks = FireProtection.getFireDuration(fireTicks, plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.FIRE_PROTECTION));
-			setFireTicksIfLower(fireTicks, player);
+			setFireTicksIfLower(fireTicks, player, null);
 		} else {
-			setFireTicksIfLower(fireTicks, target);
+			setFireTicksIfLower(fireTicks, target, applier);
 		}
 	}
 
@@ -1109,8 +1062,7 @@ public class EntityUtils {
 		if (inferno > 0) {
 			Inferno.apply(plugin, player, playerItemStats, (int) Math.floor(inferno * infernoScale), target, fireTicks);
 		}
-
-		setFireTicksIfLower(fireTicks, target);
+		setFireTicksIfLower(fireTicks, target, player);
 	}
 
 	public static void applyTaunt(LivingEntity tauntedEntity, Player targetedPlayer) {
@@ -1177,15 +1129,20 @@ public class EntityUtils {
 	}
 
 	public static boolean isStunned(Entity mob) {
-		return STUNNED_MOBS.containsKey(mob);
+		return STUNNED_MOBS.containsKey(mob) || FROZEN_MOBS.containsKey(mob);
 	}
 
 	public static void removeStun(LivingEntity mob) {
 		STUNNED_MOBS.put(mob, 0);
+		FROZEN_MOBS.put(mob, 0);
 	}
 
 	public static void applyStun(Plugin plugin, int ticks, LivingEntity mob) {
-		if (isCCImmuneMob(mob) || !mob.hasAI()) {
+		applyStun(plugin, ticks, mob, true);
+	}
+
+	public static void applyStun(Plugin plugin, int ticks, LivingEntity mob, boolean stunVisuals) {
+		if (isCCImmuneMob(mob)) {
 			return;
 		}
 
@@ -1203,7 +1160,8 @@ public class EntityUtils {
 		}
 
 		// Only reduce speed if mob is not already in map
-		Integer t = STUNNED_MOBS.get(mob);
+		Map<LivingEntity, Integer> mobMap = stunVisuals ? STUNNED_MOBS : FROZEN_MOBS;
+		Integer t = mobMap.get(mob);
 		if (t == null) {
 			addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(STUN_ATTR_NAME, -1, Operation.MULTIPLY_SCALAR_1));
 			if (mob instanceof Mob m) {
@@ -1211,7 +1169,7 @@ public class EntityUtils {
 			}
 		}
 		if (t == null || t < ticks) {
-			STUNNED_MOBS.put(mob, ticks);
+			mobMap.put(mob, ticks);
 		}
 	}
 
@@ -1295,6 +1253,7 @@ public class EntityUtils {
 			return;
 		}
 
+		applyStun(plugin, ticks, mob, false); // Freeze should apply a stun effect to cancel mob spells
 		plugin.mEffectManager.addEffect(mob, "Frozen", new Frozen(ticks));
 	}
 
@@ -1306,6 +1265,7 @@ public class EntityUtils {
 		plugin.mEffectManager.clearEffects(mob, "Frozen");
 	}
 
+	@Contract("null -> true")
 	public static boolean shouldCancelSpells(@Nullable LivingEntity entity) {
 		return entity == null || !entity.isValid() || entity.isDead() || isSilenced(entity) || isStunned(entity) || isFrozen(entity);
 	}
@@ -1504,7 +1464,7 @@ public class EntityUtils {
 		} else if (proj instanceof Snowball) {
 			ItemStatManager.PlayerItemStats projectileItemStats = DamageListener.getProjectileItemStats(proj);
 			return projectileItemStats != null
-					   && projectileItemStats.getMainhandAddStats().get(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat()) > 0;
+				&& projectileItemStats.getMainhandAddStats().get(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat()) > 0;
 		}
 		return false;
 	}
@@ -1537,7 +1497,7 @@ public class EntityUtils {
 			for (int z = -radius; z < radius + 16; z += 16) {
 				Location offsetLocation = location.clone().add(x, 0, z);
 				if (offsetLocation.isChunkLoaded()
-					    && !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
+					&& !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
 					return true;
 				}
 			}
@@ -1554,12 +1514,12 @@ public class EntityUtils {
 		EntityEquipment equipment = entity.getEquipment();
 		EntityEquipment newEquipment = newSpawn.getEquipment();
 		if (equipment != null && newEquipment != null) {
-			newSpawn.getEquipment().setBoots(entity.getEquipment().getBoots());
-			newSpawn.getEquipment().setLeggings(entity.getEquipment().getLeggings());
-			newSpawn.getEquipment().setChestplate(entity.getEquipment().getChestplate());
-			newSpawn.getEquipment().setHelmet(entity.getEquipment().getHelmet());
-			newSpawn.getEquipment().setItemInMainHand(entity.getEquipment().getItemInMainHand());
-			newSpawn.getEquipment().setItemInOffHand(entity.getEquipment().getItemInOffHand());
+			newEquipment.setBoots(equipment.getBoots());
+			newEquipment.setLeggings(equipment.getLeggings());
+			newEquipment.setChestplate(equipment.getChestplate());
+			newEquipment.setHelmet(equipment.getHelmet());
+			newEquipment.setItemInMainHand(equipment.getItemInMainHand());
+			newEquipment.setItemInOffHand(equipment.getItemInOffHand());
 		}
 		newSpawn.customName(entity.customName());
 		newSpawn.setInvisible(entity.isInvisible());
@@ -1646,7 +1606,7 @@ public class EntityUtils {
 	 * Makes an item entity invulnerable by adding the appropriate tag,
 	 * so that EntityListener can cancel the appropriate hurt events.
 	 */
-	public static void makeItemInvulnereable(Item item) {
+	public static void makeItemInvulnerable(Item item) {
 		item.addScoreboardTag(EntityListener.INVULNERABLE_ITEM_TAG);
 	}
 
@@ -1682,7 +1642,7 @@ public class EntityUtils {
 			item.setItemStack(new ItemStack(material));
 			item.setCanMobPickup(false);
 			item.setCanPlayerPickup(false);
-			makeItemInvulnereable(item);
+			makeItemInvulnerable(item);
 
 			return item;
 		}
@@ -1702,6 +1662,26 @@ public class EntityUtils {
 			return 0;
 		}
 
+		EntityRegainHealthEvent event = new EntityRegainHealthEvent(mob, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
+		Bukkit.getPluginManager().callEvent(event);
+		if (!event.isCancelled()) {
+			double oldHealth = mob.getHealth();
+			double newHealth = Math.min(oldHealth + event.getAmount(), getMaxHealth(mob));
+			mob.setHealth(newHealth);
+
+			return newHealth - oldHealth;
+		}
+
+		return 0;
+	}
+
+	// returns change in mob's health
+	public static double healMobPercent(LivingEntity mob, double healPercentage) {
+		// note that healPercentage is a percentage - 100 is a full heal, 50 is a half heal, etc.
+		if (healPercentage <= 0 || mob.isDead()) {
+			return 0;
+		}
+		double healAmount = getMaxHealth(mob) * healPercentage / 100;
 		EntityRegainHealthEvent event = new EntityRegainHealthEvent(mob, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
 		Bukkit.getPluginManager().callEvent(event);
 		if (!event.isCancelled()) {

@@ -115,7 +115,7 @@ public class SpellBeeBombs extends Spell {
 		new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 20, 0.4, .4, .4, 0.1).spawnAsEntityActive(mBoss);
 		new BukkitRunnable() {
 			int mTicks = 0;
-			Location mLoc = mBoss.getLocation().add(0, 1, 0);
+			final Location mLoc = mBoss.getLocation().add(0, 1, 0);
 
 			@Override
 			public void run() {

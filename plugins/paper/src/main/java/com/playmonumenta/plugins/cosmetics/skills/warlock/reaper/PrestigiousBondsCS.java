@@ -108,6 +108,7 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 		startLoc.subtract(0, 2, 0);
 		new BukkitRunnable() {
 			double mD = 30;
+
 			@Override
 			public void run() {
 				Vector vec;
@@ -179,8 +180,8 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 		Vector mFront = mLoc.toVector().subtract(eLoc.toVector());
 		ParticleUtils.drawCurve(eLoc.clone().add(0, 0.75, 0), 1, 36, mFront,
 			t -> 0.5 + 0.5 * FastUtils.sinDeg(t * 10),
-				t -> 0, t -> 0.125 * FastUtils.cosDeg(t * 10),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(player)
+			t -> 0, t -> 0.125 * FastUtils.cosDeg(t * 10),
+			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(player)
 		);
 	}
 }

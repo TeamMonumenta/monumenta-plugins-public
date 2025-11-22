@@ -34,9 +34,9 @@ public class StarCommunion extends ZeroArgumentEffect {
 				Plugin plugin = Plugin.getInstance();
 				EntityUtils.applySlow(plugin, ON_HIT_DURATION, SLOW_AMOUNT, enemy);
 				Location loc = enemy.getLocation().add(0, enemy.getHeight() / 2, 0);
-				new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
-				new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, LIGHT_COLOR).spawnAsPlayerBuff((Player) entity);
-				new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, DARK_COLOR).spawnAsPlayerBuff((Player) entity);
+				new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, LIGHT_COLOR).spawnAsPlayerBuff(player);
+				new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, LIGHT_COLOR).spawnAsPlayerBuff(player);
+				new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, DARK_COLOR).spawnAsPlayerBuff(player);
 			}
 		}
 	}

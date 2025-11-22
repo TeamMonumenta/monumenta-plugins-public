@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellForce;
 import com.playmonumenta.plugins.particle.PPCircle;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -39,30 +41,54 @@ public class ForceBoss extends BossAbilityGroup {
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
 
 		@BossParam(help = "Effects applied to the player if he is near the boss (< RADIUS /3) when cast is over")
-		public EffectsList EFFECTS_NEAR = EffectsList.fromString("[(pushforce,3),(CustomSlow,100,0.5)]");
+		public EffectsList EFFECTS_NEAR = EffectsList.builder()
+			.add(new EffectsList.CustomEffect("pushforce", 3.0f))
+			.add(new EffectsList.CustomSingleArgumentEffect("CustomSlow", 100, 0.5f, null))
+			.build();
 		@BossParam(help = "Effects applied to the player if he is near the boss (< Radius * 2/3) when cast is over")
-		public EffectsList EFFECTS_MIDDLE = EffectsList.fromString("[(pushforce,2.1),(CustomSlow,100,0.3)]");
+		public EffectsList EFFECTS_MIDDLE = EffectsList.builder()
+			.add(new EffectsList.CustomEffect("pushforce", 2.1f))
+			.add(new EffectsList.CustomSingleArgumentEffect("CustomSlow", 100, 0.3f, null))
+			.build();
 		@BossParam(help = "Effects applied to the player if he is at limit distance to the boss (< Radius) when cast is over")
-		public EffectsList EFFECTS_LIMIT = EffectsList.fromString("[(pushforce,1.2),(CustomSlow,100,0.1)]");
+		public EffectsList EFFECTS_LIMIT = EffectsList.builder()
+			.add(new EffectsList.CustomEffect("pushforce", 1.2f))
+			.add(new EffectsList.CustomSingleArgumentEffect("CustomSlow", 100, 0.1f, null))
+			.build();
 
 		//Particles & Sounds!
 		@BossParam(help = "Particle summon in the air while the ability is charging")
-		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(SMOKE_LARGE,1)]");
+		public ParticlesList PARTICLE_AIR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particle summon in the ground while the ability is charging")
-		public ParticlesList PARTICLE_CIRCLE = ParticlesList.fromString("[(CRIT_MAGIC,12)]");
+		public ParticlesList PARTICLE_CIRCLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 12, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particle when the ability explode")
-		public ParticlesList PARTICLE_EXPLODE = ParticlesList.fromString("[(SMOKE_LARGE,100)]");
+		public ParticlesList PARTICLE_EXPLODE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 100, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound played when the ability explode")
-		public SoundsList SOUND_EXPLODE = SoundsList.fromString("[(ENTITY_WITHER_SHOOT,1.5,0.65),(ENTITY_GHAST_SHOOT,1.0,0.5),(ENTITY_GUARDIAN_HURT,1,0.8)]");
+		public SoundsList SOUND_EXPLODE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WITHER_SHOOT, 1.5f, 0.65f))
+			.add(new SoundsList.CSound(Sound.ENTITY_GHAST_SHOOT, 1.0f, 0.5f))
+			.add(new SoundsList.CSound(Sound.ENTITY_GUARDIAN_HURT, 1.0f, 0.8f))
+			.build();
 
 		@BossParam(help = "Particle when the ability explode")
-		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.fromString("[(SMOKE_LARGE,24,0.1,0.1,0.1,0.3),(SMOKE_NORMAL,48,0.25,0.25,0.25,0.1)]");
+		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 24, 0.1, 0.1, 0.1, 0.3))
+			.add(new ParticlesList.CParticle(Particle.SMOKE_NORMAL, 48, 0.25, 0.25, 0.25, 0.1))
+			.build();
 
 		@BossParam(help = "Particle summon at player position when he got hit by the ability")
-		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(VILLAGER_ANGRY,4,0.25,0.5,0.25)]");
+		public ParticlesList PARTICLE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.VILLAGER_ANGRY, 4, 0.25, 0.5, 0.25, 0.0))
+			.build();
 
 	}
 
@@ -72,7 +98,7 @@ public class ForceBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET) {
-			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RADIUS, true, EntityTargets.Limit.DEFAULT);
+			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RADIUS, EntityTargets.Limit.DEFAULT);
 			//by default Force boss hit all the player in range even the players in stealth
 		}
 		final double currentRadius = p.TARGETS.getRange();

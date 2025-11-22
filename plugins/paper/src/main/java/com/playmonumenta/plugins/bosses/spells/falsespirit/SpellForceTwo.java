@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.falsespirit;
 
 import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -18,6 +19,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class SpellForceTwo extends SpellBaseAoE {
+
+	public EffectsList EFFECTS_ON_HIT = EffectsList.builder()
+		.add(new EffectsList.CustomSingleArgumentEffect("CustomSlow", 100, 0.8f, null))
+		.build();
 
 	public SpellForceTwo(Plugin plugin, LivingEntity launcher, int radius, int time) {
 		super(plugin, launcher, radius, time, 0, true, Sound.ENTITY_IRON_GOLEM_ATTACK);
@@ -54,7 +59,7 @@ public class SpellForceTwo extends SpellBaseAoE {
 
 			double distance = player.getLocation().distance(loc);
 			if (distance < mRadius) {
-				player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 8));
+				EFFECTS_ON_HIT.apply(player, mLauncher);
 				player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -4));
 				MovementUtils.knockAway(mLauncher, player, 1.2f, false);
 			}

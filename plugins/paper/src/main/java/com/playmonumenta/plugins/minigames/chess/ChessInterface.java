@@ -34,7 +34,7 @@ public class ChessInterface {
 	public enum InterfaceType {
 		WHITEPLAYER,
 		BLACKPLAYER,
-		SPECTATOR;
+		SPECTATOR
 	}
 
 	public enum FacingPosition {
@@ -79,7 +79,9 @@ public class ChessInterface {
 	private static final int[][] MAP_ID_QUEEN = {{34, 35, 36}, {37, 38, 39}};
 	private static final int[][] MAP_ID_ROOKS = {{10, 11, 12}, {13, 14, 15}};
 
-	/**Offset since on R1 the first 482 map are used*/
+	/**
+	 * Offset since on R1 the first 482 map are used
+	 */
 	private static final int MAP_ID_OFFSET = 482;
 
 	private static final int MAX_TICK_ALIVE_RUNNABLE = 30 * 20;
@@ -202,7 +204,7 @@ public class ChessInterface {
 		World world = startingPoint.getWorld();
 		for (int y = 0; y < 8; y++) {
 			for (int x = 8 * y; x < 8 * (y + 1); x++) {
-				ItemFrame itemFrame = (ItemFrame) world.spawn(startingPoint.clone().add((7 * facing.mX) + (x % 8) * facing.mX2, y, 0 * facing.mZ), ItemFrame.class);
+				ItemFrame itemFrame = world.spawn(startingPoint.clone().add((7 * facing.mX) + (x % 8) * facing.mX2, y, 0 * facing.mZ), ItemFrame.class);
 				itemFrame.addScoreboardTag(mBoard.getName());
 				itemFrame.addScoreboardTag(ITEM_FRAME_TAG);
 				itemFrame.addScoreboardTag(mType.name());

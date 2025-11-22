@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.gallery;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffectType;
 import com.playmonumenta.plugins.gallery.interactables.BaseInteractable;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -29,11 +31,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("unchecked")
 public class GalleryCommands {
 	private static final String COMMAND = "gallery";
 	private static final String PERMISSION = "monumenta.r3.gallery";
 
-	@SuppressWarnings("unchecked")
 	public static void register() {
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
@@ -63,7 +65,7 @@ public class GalleryCommands {
 				Player target = args.getUnchecked("players");
 				GalleryGame game = GalleryManager.GAMES.get(target.getWorld().getUID());
 
-				if (!MetadataUtils.checkOnceThisTick(GalleryManager.mPlugin, target, "GalleryCommandOneTick")) {
+				if (!MetadataUtils.checkOnceThisTick(Plugin.getInstance(), target, "GalleryCommandOneTick")) {
 					return 1;
 				}
 
@@ -115,8 +117,6 @@ public class GalleryCommands {
 		registerUtils();
 	}
 
-
-	@SuppressWarnings("unchecked")
 	private static void registerUtils() {
 		Argument<?> util = new LiteralArgument("utils");
 
@@ -187,7 +187,7 @@ public class GalleryCommands {
 					throw CommandAPI.failWithString("Invalid gallery effect type");
 				}
 				for (Player entity : (Collection<Player>) args.get("players")) {
-					game.getGalleryPlayer(entity.getUniqueId()).giveEffect(type.newEffect());
+					Objects.requireNonNull(game.getGalleryPlayer(entity.getUniqueId())).giveEffect(type.newEffect());
 				}
 
 				return 1;
@@ -241,7 +241,7 @@ public class GalleryCommands {
 					sender.sendMessage("loc " + location.toVector());
 				}
 				sender.sendMessage("----------------------------------------------");
-				sender.sendMessage("Active box at: " + game.getBoxLocation().toVector());
+				sender.sendMessage("Active box at: " + Objects.requireNonNull(game.getBoxLocation()).toVector());
 
 			}).register();
 
@@ -444,20 +444,20 @@ public class GalleryCommands {
 			}).register();
 
 		new CommandAPICommand(COMMAND)
-				.withPermission(PERMISSION)
-				.withArguments(
-						util,
-						new LiteralArgument("set"),
-						new LiteralArgument("spawnlocation"),
-						new LocationArgument("location", LocationType.BLOCK_POSITION))
-				.executes((sender, args) -> {
-					GalleryGame game = getGameFromSender(sender);
-					if (game == null) {
-						throw CommandAPI.failWithString("Could not detect game");
-					}
-					game.setSpawnLocation(args.getUnchecked("location"));
-					return 1;
-				}).register();
+			.withPermission(PERMISSION)
+			.withArguments(
+				util,
+				new LiteralArgument("set"),
+				new LiteralArgument("spawnlocation"),
+				new LocationArgument("location", LocationType.BLOCK_POSITION))
+			.executes((sender, args) -> {
+				GalleryGame game = getGameFromSender(sender);
+				if (game == null) {
+					throw CommandAPI.failWithString("Could not detect game");
+				}
+				game.setSpawnLocation(args.getUnchecked("location"));
+				return 1;
+			}).register();
 	}
 
 	private static @Nullable GalleryGame getGameFromSender(CommandSender sender) {

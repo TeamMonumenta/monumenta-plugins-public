@@ -2,9 +2,8 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
-import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Set;
 import net.kyori.adventure.bossbar.BossBar;
@@ -15,7 +14,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +33,7 @@ public class TemporalFlux extends ZeroArgumentEffect {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (oneHertz) {
 			entity.getWorld().playSound(entity.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_HIT, SoundCategory.HOSTILE, 30, 1);
@@ -45,12 +44,13 @@ public class TemporalFlux extends ZeroArgumentEffect {
 			mBossBar.progress(progress);
 			mBossBar.name(Component.text("Paradox expires in " + (getDuration() / 20) + " seconds!", NamedTextColor.BLUE));
 			if (progress <= 0.01) {
-				Plugin.getInstance().mEffectManager.clearEffects(entity, Stasis.GENERIC_NAME);
-				if (entity instanceof Player) {
-					entity.setInvulnerable(false);
-				}
-				DamageUtils.damage(null, (LivingEntity) entity, DamageEvent.DamageType.TRUE, 999999999, null, true, false, "Temporal Flux");
 				entity.hideBossBar(mBossBar);
+				if (entity instanceof Player) {
+					PlayerUtils.killPlayer((Player) entity, null, GENERIC_NAME, true, true, true);
+				} else {
+					MMLog.warning(() -> "[TemporalFlux] Warning: Instance of Paradox applied to non-player entity " + entity);
+				}
+
 				return;
 			}
 			if (progress <= 0.25) {
@@ -64,7 +64,7 @@ public class TemporalFlux extends ZeroArgumentEffect {
 				entity.sendMessage(Component.text("Paradox has ", NamedTextColor.RED).append(Component.text(getDuration() / 20, NamedTextColor.RED, TextDecoration.BOLD)).append(Component.text(" seconds remaining!")));
 			}
 			new PPCircle(Particle.SOUL_FIRE_FLAME, entity.getLocation(), 1)
-					.count(20).delta(0.25, 0.1, 0.25).spawnAsBoss();
+				.count(20).delta(0.25, 0.1, 0.25).spawnAsBoss();
 		}
 	}
 

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 import net.kyori.adventure.text.KeybindComponent.KeybindLike;
@@ -16,8 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class Constants {
 	public static final int TICKS_PER_SECOND = 20;
-	public static final int HALF_TICKS_PER_SECOND = (int)(TICKS_PER_SECOND / 2.0);
-	public static final int QUARTER_TICKS_PER_SECOND = (int)(HALF_TICKS_PER_SECOND / 2.0);
+	public static final int HALF_TICKS_PER_SECOND = (int) (TICKS_PER_SECOND / 2.0);
+	public static final int QUARTER_TICKS_PER_SECOND = (int) (HALF_TICKS_PER_SECOND / 2.0);
 	public static final int TICKS_PER_MINUTE = TICKS_PER_SECOND * 60;
 
 	public static final int TWO_MINUTES = TICKS_PER_MINUTE * 2;
@@ -133,6 +134,10 @@ public class Constants {
 		public static final String DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING = "DepthStriderRiptideDisable";
 	}
 
+	public static class Permissions {
+		public static final String CAN_PLACE_SHULKER = "monumenta.canplaceshulker";
+	}
+
 	// Note blocks
 	public static class NotePitches {
 		public static final float FS0 = calculatePitch(0);
@@ -162,7 +167,7 @@ public class Constants {
 		public static final float FS24 = calculatePitch(24);
 
 		public static float calculatePitch(int clicks) {
-			return 0.5f * (float)Math.pow(2, (clicks / 12d));
+			return 0.5f * (float) Math.pow(2, (clicks / 12d));
 		}
 	}
 
@@ -214,7 +219,7 @@ public class Constants {
 			mClicks = clicks;
 			mName = name;
 			mNoteParticleValue = clicks / 24.0;
-			mPitch = (float)Math.pow(2.0F, (clicks - 12) / 12.0F);
+			mPitch = (float) Math.pow(2.0F, (clicks - 12) / 12.0F);
 		}
 	}
 
@@ -260,6 +265,8 @@ public class Constants {
 		HOTBAR_9("key.hotbar.9"),
 		OPTIFINE_ZOOM("of.key.zoom");
 
+		private static final List<Keybind> HOTBAR = List.of(HOTBAR_1, HOTBAR_2, HOTBAR_3, HOTBAR_4, HOTBAR_5, HOTBAR_6, HOTBAR_7, HOTBAR_8, HOTBAR_9);
+
 		private final String mValue;
 
 		Keybind(String value) {
@@ -267,14 +274,12 @@ public class Constants {
 		}
 
 		// 0-indexed to match inventories; index 0 is hotbar slot 1
-		@SuppressWarnings("EnumOrdinal")
 		public static Keybind hotbar(int index) {
 			if (index < 0 || index > 8) {
 				throw new RuntimeException("Invalid hotbar keybind index " + index);
 			}
 
-			Keybind[] values = values();
-			return values[index + HOTBAR_1.ordinal()];
+			return HOTBAR.get(index);
 		}
 
 		public static @Nullable Keybind of(String keybindId) {
@@ -340,48 +345,9 @@ public class Constants {
 			Material.CARVED_PUMPKIN
 		);
 
-		public static final EnumSet<Material> SWORDS = EnumSet.of(
-			Material.WOODEN_SWORD,
-			Material.STONE_SWORD,
-			Material.GOLDEN_SWORD,
-			Material.IRON_SWORD,
-			Material.DIAMOND_SWORD,
-			Material.NETHERITE_SWORD
-		);
 		public static final EnumSet<Material> BOWS = EnumSet.of(
 			Material.BOW,
 			Material.CROSSBOW
-		);
-		public static final EnumSet<Material> HOES = EnumSet.of(
-			Material.WOODEN_HOE,
-			Material.STONE_HOE,
-			Material.GOLDEN_HOE,
-			Material.IRON_HOE,
-			Material.DIAMOND_HOE,
-			Material.NETHERITE_HOE
-		);
-		public static final EnumSet<Material> PICKAXES = EnumSet.of(
-			Material.WOODEN_PICKAXE,
-			Material.STONE_PICKAXE,
-			Material.GOLDEN_PICKAXE,
-			Material.IRON_PICKAXE,
-			Material.DIAMOND_PICKAXE,
-			Material.NETHERITE_PICKAXE
-		);
-		public static final EnumSet<Material> AXES = EnumSet.of(
-			Material.WOODEN_AXE,
-			Material.STONE_AXE,
-			Material.GOLDEN_AXE,
-			Material.IRON_AXE,
-			Material.DIAMOND_AXE,
-			Material.NETHERITE_AXE
-		);
-		public static final EnumSet<Material> SHOVELS = EnumSet.of(
-			Material.WOODEN_SHOVEL,
-			Material.STONE_SHOVEL,
-			Material.GOLDEN_SHOVEL,
-			Material.IRON_SHOVEL,
-			Material.NETHERITE_SHOVEL
 		);
 
 		public static final EnumSet<Material> POTIONS = EnumSet.of(

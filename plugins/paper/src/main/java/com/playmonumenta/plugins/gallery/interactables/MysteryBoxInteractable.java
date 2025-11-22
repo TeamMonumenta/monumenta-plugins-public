@@ -59,7 +59,8 @@ public class MysteryBoxInteractable extends BasePricedInteractable {
 		summonSlime();
 	}
 
-	@Override public boolean isInteractable() {
+	@Override
+	public boolean isInteractable() {
 		return mValidBox && super.isInteractable();
 	}
 

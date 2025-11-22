@@ -1,10 +1,13 @@
 package com.playmonumenta.plugins.utils;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
+import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
+import com.playmonumenta.plugins.itemstats.enchantments.ThrowingKnife;
+import com.playmonumenta.plugins.itemstats.enchantments.Undroppable;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
@@ -45,6 +48,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -57,6 +61,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -85,8 +90,14 @@ public class ItemUtils {
 	private static final Pattern NON_PLAIN_REGEX = Pattern.compile("[^ -~]");
 
 	private static final String plainNamePath = PLAIN_KEY + "." + DISPLAY_KEY + "." + NAME_KEY;
-		// resolveOrDefault doesn't support NBTCompoundList or StringList
+	// resolveOrDefault doesn't support NBTCompoundList or StringList
 	private static final String plainDisplayPath = PLAIN_KEY + "." + DISPLAY_KEY;
+
+	// Hardcoded list of utilities for isUtilityItem lockbox check
+	public static final Set<String> utilityItemNames = Set.of(
+		"Necronomicon",
+		"Annilys"
+	);
 
 	// List of materials that trees can't replace when they grow
 	public static final Set<Material> notAllowedTreeReplace = EnumSet.of(
@@ -295,26 +306,6 @@ public class ItemUtils {
 		Material.MANGROVE_BUTTON
 	);
 
-	public static final Set<Material> shulkerBoxes = EnumSet.of(
-		Material.SHULKER_BOX,
-		Material.WHITE_SHULKER_BOX,
-		Material.ORANGE_SHULKER_BOX,
-		Material.MAGENTA_SHULKER_BOX,
-		Material.LIGHT_BLUE_SHULKER_BOX,
-		Material.YELLOW_SHULKER_BOX,
-		Material.LIME_SHULKER_BOX,
-		Material.PINK_SHULKER_BOX,
-		Material.GRAY_SHULKER_BOX,
-		Material.LIGHT_GRAY_SHULKER_BOX,
-		Material.CYAN_SHULKER_BOX,
-		Material.PURPLE_SHULKER_BOX,
-		Material.BLUE_SHULKER_BOX,
-		Material.BROWN_SHULKER_BOX,
-		Material.GREEN_SHULKER_BOX,
-		Material.RED_SHULKER_BOX,
-		Material.BLACK_SHULKER_BOX
-	);
-
 	public static final Set<Material> ranged = EnumSet.of(
 		Material.BOW,
 		Material.CROSSBOW,
@@ -474,6 +465,14 @@ public class ItemUtils {
 		Material.BEDROCK
 	);
 
+	private static final Map<Material, Float> VANILLA_PROJECTILE_SPEEDS = ImmutableMap.<Material, Float>builder()
+		.put(Material.SNOWBALL, 1.5f)
+		.put(Material.TRIDENT, 2.5f)
+		.put(Material.BOW, 3.0f)
+		.put(Material.DIAMOND_SWORD, ThrowingKnife.getBaseVelocity())
+		.put(Material.CROSSBOW, 3.15f)
+		.build();
+
 	private static final EnumSet<Material> DEFAULT_ATTRIBUTE_MATERIALS = EnumSet.of(Material.TRIDENT); // tridents also count since they have melee attack damage
 
 	private static final Map<Material, Material> BANNER_TO_FLOOR_BANNER = new HashMap<>();
@@ -481,12 +480,12 @@ public class ItemUtils {
 
 	static {
 		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.ARMOR);
-		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.AXES);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Tag.ITEMS_AXES.getValues());
 		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.BOWS); // technically doesn't apply to bows since it's melee attack damage
-		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.HOES);
-		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.PICKAXES);
-		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SHOVELS);
-		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Materials.SWORDS);
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Tag.ITEMS_HOES.getValues());
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Tag.ITEMS_PICKAXES.getValues());
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Tag.ITEMS_SHOVELS.getValues());
+		DEFAULT_ATTRIBUTE_MATERIALS.addAll(Tag.ITEMS_SWORDS.getValues());
 		// ! for future minecraft versions: add more items with base vanilla attributes
 
 		registerBannerType(Material.WHITE_BANNER, Material.WHITE_WALL_BANNER);
@@ -559,7 +558,7 @@ public class ItemUtils {
 	// Returns the cost (in tier 2 currency (CXP/CCS/etc.)) to reforge an item.
 	public static Integer getReforgeCost(ItemStack item) {
 		return switch (ItemStatUtils.getTier(item)) {
-			case IV -> item.getAmount() * 1;
+			case IV -> item.getAmount();
 			case V -> item.getAmount() * 4;
 			case UNCOMMON, UNIQUE -> item.getAmount() * 16;
 			case EVENT -> item.getAmount() * 32;
@@ -583,14 +582,15 @@ public class ItemUtils {
 			return EquipmentSlot.HAND;
 		}
 		return switch (material) {
-			case LEATHER_HELMET, CHAINMAIL_HELMET, IRON_HELMET, GOLDEN_HELMET, DIAMOND_HELMET, NETHERITE_HELMET, TURTLE_HELMET, CARVED_PUMPKIN, CREEPER_HEAD, SKELETON_SKULL, WITHER_SKELETON_SKULL, ZOMBIE_HEAD, PLAYER_HEAD, DRAGON_HEAD ->
-					EquipmentSlot.HEAD;
-			case LEATHER_CHESTPLATE, CHAINMAIL_CHESTPLATE, IRON_CHESTPLATE, GOLDEN_CHESTPLATE, DIAMOND_CHESTPLATE, NETHERITE_CHESTPLATE ->
-					EquipmentSlot.CHEST;
-			case LEATHER_LEGGINGS, CHAINMAIL_LEGGINGS, IRON_LEGGINGS, GOLDEN_LEGGINGS, DIAMOND_LEGGINGS, NETHERITE_LEGGINGS ->
-					EquipmentSlot.LEGS;
+			case LEATHER_HELMET, CHAINMAIL_HELMET, IRON_HELMET, GOLDEN_HELMET, DIAMOND_HELMET, NETHERITE_HELMET,
+			     TURTLE_HELMET, CARVED_PUMPKIN, CREEPER_HEAD, SKELETON_SKULL, WITHER_SKELETON_SKULL, ZOMBIE_HEAD,
+			     PLAYER_HEAD, DRAGON_HEAD -> EquipmentSlot.HEAD;
+			case LEATHER_CHESTPLATE, CHAINMAIL_CHESTPLATE, IRON_CHESTPLATE, GOLDEN_CHESTPLATE, DIAMOND_CHESTPLATE,
+			     NETHERITE_CHESTPLATE -> EquipmentSlot.CHEST;
+			case LEATHER_LEGGINGS, CHAINMAIL_LEGGINGS, IRON_LEGGINGS, GOLDEN_LEGGINGS, DIAMOND_LEGGINGS,
+			     NETHERITE_LEGGINGS -> EquipmentSlot.LEGS;
 			case LEATHER_BOOTS, CHAINMAIL_BOOTS, IRON_BOOTS, GOLDEN_BOOTS, DIAMOND_BOOTS, NETHERITE_BOOTS ->
-					EquipmentSlot.FEET;
+				EquipmentSlot.FEET;
 			case SHIELD -> EquipmentSlot.OFF_HAND;
 			default -> EquipmentSlot.HAND;
 		};
@@ -600,14 +600,14 @@ public class ItemUtils {
 	public static Sound getArmorEquipSound(Material mat) {
 		return switch (mat) {
 			case CHAINMAIL_HELMET, CHAINMAIL_CHESTPLATE, CHAINMAIL_LEGGINGS, CHAINMAIL_BOOTS ->
-					Sound.ITEM_ARMOR_EQUIP_CHAIN;
+				Sound.ITEM_ARMOR_EQUIP_CHAIN;
 			case DIAMOND_HELMET, DIAMOND_CHESTPLATE, DIAMOND_LEGGINGS, DIAMOND_BOOTS -> Sound.ITEM_ARMOR_EQUIP_DIAMOND;
 			case ELYTRA -> Sound.ITEM_ARMOR_EQUIP_ELYTRA;
-			default -> Sound.ITEM_ARMOR_EQUIP_GENERIC;
 			case GOLDEN_HELMET, GOLDEN_CHESTPLATE, GOLDEN_LEGGINGS, GOLDEN_BOOTS -> Sound.ITEM_ARMOR_EQUIP_GOLD;
 			case IRON_HELMET, IRON_CHESTPLATE, IRON_LEGGINGS, IRON_BOOTS -> Sound.ITEM_ARMOR_EQUIP_IRON;
 			case LEATHER_HELMET, LEATHER_CHESTPLATE, LEATHER_LEGGINGS, LEATHER_BOOTS -> Sound.ITEM_ARMOR_EQUIP_LEATHER;
 			case TURTLE_HELMET -> Sound.ITEM_ARMOR_EQUIP_TURTLE;
+			default -> Sound.ITEM_ARMOR_EQUIP_GENERIC;
 		};
 	}
 
@@ -628,7 +628,19 @@ public class ItemUtils {
 	}
 
 	public static boolean shouldDropEquipment(@Nullable ItemStack item) {
-		return item != null && item.hasItemMeta() && item.getItemMeta().hasLore() && !InventoryUtils.testForItemWithLore(item, "$$");
+		if (item == null) {
+			return false;
+		}
+
+		if (new ItemStack(Material.NETHER_STAR).isSimilar(item)) {
+			return false;
+		}
+
+		if (Undroppable.isUndroppable(item)) {
+			return false;
+		}
+
+		return item.hasItemMeta() && item.getItemMeta().hasLore() && !InventoryUtils.testForItemWithLore(item, "$$");
 	}
 
 	public static @Nullable String getBookTitle(@Nullable ItemStack book) {
@@ -691,7 +703,31 @@ public class ItemUtils {
 	}
 
 	public static boolean isShulkerBox(@Nullable Material mat) {
-		return mat != null && shulkerBoxes.contains(mat);
+		return mat != null && Tag.SHULKER_BOXES.isTagged(mat);
+	}
+
+	public static Material shulkerBoxOfDyeColor(@Nullable DyeColor dyeColor) {
+		if (dyeColor == null) {
+			return Material.SHULKER_BOX;
+		}
+		return switch (dyeColor) {
+			case WHITE -> Material.WHITE_SHULKER_BOX;
+			case ORANGE -> Material.ORANGE_SHULKER_BOX;
+			case MAGENTA -> Material.MAGENTA_SHULKER_BOX;
+			case LIGHT_BLUE -> Material.LIGHT_BLUE_SHULKER_BOX;
+			case YELLOW -> Material.YELLOW_SHULKER_BOX;
+			case LIME -> Material.LIME_SHULKER_BOX;
+			case PINK -> Material.PINK_SHULKER_BOX;
+			case GRAY -> Material.GRAY_SHULKER_BOX;
+			case LIGHT_GRAY -> Material.LIGHT_GRAY_SHULKER_BOX;
+			case CYAN -> Material.CYAN_SHULKER_BOX;
+			case PURPLE -> Material.PURPLE_SHULKER_BOX;
+			case BLUE -> Material.BLUE_SHULKER_BOX;
+			case BROWN -> Material.BROWN_SHULKER_BOX;
+			case GREEN -> Material.GREEN_SHULKER_BOX;
+			case RED -> Material.RED_SHULKER_BOX;
+			case BLACK -> Material.BLACK_SHULKER_BOX;
+		};
 	}
 
 	//Returns true if the item material is something a player can launch an AbstractArrow/Projectile from
@@ -718,8 +754,8 @@ public class ItemUtils {
 		}
 		return switch (mat) {
 			case WHITE_WOOL, BLACK_WOOL, BLUE_WOOL, BROWN_WOOL, CYAN_WOOL, GRAY_WOOL, GREEN_WOOL,
-					 LIGHT_BLUE_WOOL, LIGHT_GRAY_WOOL, LIME_WOOL, MAGENTA_WOOL, ORANGE_WOOL,
-					 PINK_WOOL, PURPLE_WOOL, RED_WOOL, YELLOW_WOOL -> true;
+			     LIGHT_BLUE_WOOL, LIGHT_GRAY_WOOL, LIME_WOOL, MAGENTA_WOOL, ORANGE_WOOL,
+			     PINK_WOOL, PURPLE_WOOL, RED_WOOL, YELLOW_WOOL -> true;
 			default -> false;
 		};
 	}
@@ -1034,7 +1070,7 @@ public class ItemUtils {
 	}
 
 	public static void setPlainLore(ReadWriteNBT nbt, @Nullable List<String> plainLore) {
-		if (plainLore != null && plainLore.size() > 0) {
+		if (plainLore != null && !plainLore.isEmpty()) {
 			// addComponent effectively runs:
 			// if (key exists) { return tag(key) } else { return new tag(key) }
 			ReadWriteNBTList<String> loreList = nbt.getOrCreateCompound(PLAIN_KEY).getOrCreateCompound(DISPLAY_KEY).getStringList(LORE_KEY);
@@ -1159,7 +1195,7 @@ public class ItemUtils {
 
 	public static boolean isSword(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			return Materials.SWORDS.contains(itemStack.getType());
+			return Tag.ITEMS_SWORDS.isTagged(itemStack.getType());
 		} else {
 			return false;
 		}
@@ -1192,12 +1228,16 @@ public class ItemUtils {
 		}
 	}
 
+	public static float getVanillaProjectileSpeed(ItemStack mainhandItem) {
+		return VANILLA_PROJECTILE_SPEEDS.getOrDefault(mainhandItem.getType(), 3.0f);
+	}
+
 	/*
 	 * Does not count shattered hoes.
 	 */
 	public static boolean isHoe(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			return Materials.HOES.contains(itemStack.getType());
+			return Tag.ITEMS_HOES.isTagged(itemStack.getType());
 		} else {
 			return false;
 		}
@@ -1213,18 +1253,18 @@ public class ItemUtils {
 
 	public static boolean isPickaxe(@Nullable ItemStack itemStack) {
 		if (itemStack != null) {
-			return Materials.PICKAXES.contains(itemStack.getType());
+			return Tag.ITEMS_PICKAXES.isTagged(itemStack.getType());
 		} else {
 			return false;
 		}
 	}
 
 	public static boolean isAxe(@Nullable ItemStack itemStack) {
-		return itemStack != null && Materials.AXES.contains(itemStack.getType());
+		return itemStack != null && Tag.ITEMS_AXES.isTagged(itemStack.getType());
 	}
 
 	public static boolean isShovel(@Nullable ItemStack itemStack) {
-		return itemStack != null && Materials.SHOVELS.contains(itemStack.getType());
+		return itemStack != null && Tag.ITEMS_SHOVELS.isTagged(itemStack.getType());
 	}
 
 	public static boolean isSomePotion(@Nullable ItemStack itemStack) {
@@ -1272,12 +1312,22 @@ public class ItemUtils {
 		if (itemStack == null) {
 			return false;
 		}
-		return switch (itemStack.getType()) {
-			case BLACK_BANNER, BLACK_WALL_BANNER, BLUE_BANNER, BLUE_WALL_BANNER, BROWN_BANNER, BROWN_WALL_BANNER, CYAN_BANNER, CYAN_WALL_BANNER,
-					 GRAY_BANNER, GRAY_WALL_BANNER, GREEN_BANNER, GREEN_WALL_BANNER, LIGHT_BLUE_BANNER, LIGHT_BLUE_WALL_BANNER,
-					 LIGHT_GRAY_BANNER, LIGHT_GRAY_WALL_BANNER, LIME_BANNER, LIME_WALL_BANNER, MAGENTA_BANNER, MAGENTA_WALL_BANNER,
-					 ORANGE_BANNER, ORANGE_WALL_BANNER, PINK_BANNER, PINK_WALL_BANNER, PURPLE_BANNER, PURPLE_WALL_BANNER,
-					 RED_BANNER, RED_WALL_BANNER, WHITE_BANNER, WHITE_WALL_BANNER, YELLOW_BANNER, YELLOW_WALL_BANNER ->
+		return isBanner(itemStack.getType());
+	}
+
+	public static boolean isBanner(@Nullable Material material) {
+		if (material == null) {
+			return false;
+		}
+		return switch (material) {
+			case BLACK_BANNER, BLACK_WALL_BANNER, BLUE_BANNER, BLUE_WALL_BANNER, BROWN_BANNER, BROWN_WALL_BANNER,
+			     CYAN_BANNER, CYAN_WALL_BANNER,
+			     GRAY_BANNER, GRAY_WALL_BANNER, GREEN_BANNER, GREEN_WALL_BANNER, LIGHT_BLUE_BANNER,
+			     LIGHT_BLUE_WALL_BANNER,
+			     LIGHT_GRAY_BANNER, LIGHT_GRAY_WALL_BANNER, LIME_BANNER, LIME_WALL_BANNER, MAGENTA_BANNER,
+			     MAGENTA_WALL_BANNER,
+			     ORANGE_BANNER, ORANGE_WALL_BANNER, PINK_BANNER, PINK_WALL_BANNER, PURPLE_BANNER, PURPLE_WALL_BANNER,
+			     RED_BANNER, RED_WALL_BANNER, WHITE_BANNER, WHITE_WALL_BANNER, YELLOW_BANNER, YELLOW_WALL_BANNER ->
 				true;
 			default -> false;
 		};
@@ -1297,8 +1347,16 @@ public class ItemUtils {
 
 	public static boolean isInteresting(ItemStack item) {
 		return ServerProperties.getAlwaysPickupMats().contains(item.getType())
-				   || (hasLore(item) && ItemStatUtils.getTier(item) != Tier.ZERO)
-				   || (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()));
+			|| (hasLore(item) && ItemStatUtils.getTier(item) != Tier.ZERO)
+			|| (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()));
+	}
+
+	public static boolean isUtilityItem(ItemStack item) {
+		return ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)
+			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.RECOIL)
+			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE)
+			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.WORLDLY_PROTECTION)
+			|| utilityItemNames.contains(getPlainName(item));
 	}
 
 	/**
@@ -1733,9 +1791,6 @@ public class ItemUtils {
 		}
 
 		ReadableNBTList<String> pages = nbtTags.getStringList("pages");
-		if (pages == null) {
-			return null;
-		}
 
 		return pages;
 	}
@@ -1798,4 +1853,63 @@ public class ItemUtils {
 		return new ArrayList<>(lore);
 	}
 
+	public static EquipmentItems getEquipmentItems(EntityEquipment equipment) {
+		return new EquipmentItems(equipment);
+	}
+
+	public static void setEquipmentItems(EntityEquipment equipment, EquipmentItems items) {
+		equipment.setArmorContents(items.getArmor());
+		equipment.setItemInMainHand(items.getMainhand());
+		equipment.setItemInOffHand(items.getOffhand());
+	}
+
+	public static class EquipmentItems {
+		private final ItemStack mHelmet;
+		private final ItemStack mChestplate;
+		private final ItemStack mLeggings;
+		private final ItemStack mBoots;
+		private final ItemStack mMainhand;
+		private final ItemStack mOffhand;
+
+		private final ItemStack[] mArmor;
+
+		public EquipmentItems(EntityEquipment equipment) {
+			mHelmet = equipment.getHelmet();
+			mChestplate = equipment.getChestplate();
+			mLeggings = equipment.getLeggings();
+			mBoots = equipment.getBoots();
+			mMainhand = equipment.getItemInMainHand();
+			mOffhand = equipment.getItemInOffHand();
+
+			mArmor = equipment.getArmorContents();
+		}
+
+		public ItemStack[] getArmor() {
+			return mArmor;
+		}
+
+		public ItemStack getOffhand() {
+			return mOffhand;
+		}
+
+		public ItemStack getMainhand() {
+			return mMainhand;
+		}
+
+		public ItemStack getBoots() {
+			return mBoots;
+		}
+
+		public ItemStack getLeggings() {
+			return mLeggings;
+		}
+
+		public ItemStack getChestplate() {
+			return mChestplate;
+		}
+
+		public ItemStack getHelmet() {
+			return mHelmet;
+		}
+	}
 }

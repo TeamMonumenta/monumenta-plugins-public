@@ -40,6 +40,7 @@ public class RandomTeleportTowerAbility extends TowerAbility {
 						new BukkitRunnable() {
 							int mTimer = 0;
 							final Location mLoc = loc;
+
 							@Override
 							public void run() {
 								if (mGame.isTurnEnded() || mGame.isGameEnded() || mBoss.isDead() || !mBoss.isValid()) {

@@ -133,9 +133,9 @@ public class LootTableManager implements Listener {
 										JsonElement max = numberProvider.get("max");
 										// If any of these is true, then assume bonus_rolls are nonzero
 										if (min == null || max == null ||
-												!min.isJsonPrimitive() || !max.isJsonPrimitive() ||
-												!min.getAsJsonPrimitive().isNumber() || !max.getAsJsonPrimitive().isNumber() ||
-												Math.abs(min.getAsJsonPrimitive().getAsNumber().doubleValue()) >= 0.001 || Math.abs(max.getAsJsonPrimitive().getAsNumber().doubleValue()) >= 0.001) {
+											!min.isJsonPrimitive() || !max.isJsonPrimitive() ||
+											!min.getAsJsonPrimitive().isNumber() || !max.getAsJsonPrimitive().isNumber() ||
+											Math.abs(min.getAsJsonPrimitive().getAsNumber().doubleValue()) >= 0.001 || Math.abs(max.getAsJsonPrimitive().getAsNumber().doubleValue()) >= 0.001) {
 											mHasBonusRolls = true;
 										} // Otherwise has min/max but they are both zero, don't count that as bonus rolls
 									} else {
@@ -209,7 +209,7 @@ public class LootTableManager implements Listener {
 		mTables.clear();
 
 		Map<NamespacedKey, Path> datapackFiles = FileUtils.getEnabledDatapackFiles("loot_tables", ".json");
-		if (datapackFiles.size() == 0) {
+		if (datapackFiles.isEmpty()) {
 			MMLog.severe("Failed to find any matching loot tables from datapacks - this may be a critical problem");
 		}
 

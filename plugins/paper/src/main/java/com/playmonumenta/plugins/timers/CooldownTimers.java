@@ -37,15 +37,11 @@ public class CooldownTimers {
 		if (player != null) {
 			//  Next check if the ability is in our HashMap, if not we're not on cooldown.
 			Integer ability = player.get(spell);
-			if (ability == null) {
-				return false;
-			}
+			return ability != null;
 		} else {
 			// No player, means no cooldown.
 			return false;
 		}
-
-		return true;
 	}
 
 	public void setCooldown(Player player, ClassAbility spell, Integer cooldownTime) {
@@ -155,9 +151,8 @@ public class CooldownTimers {
 	/**
 	 * Reduces the players ticks on all of their cooldowns.
 	 *
-	 * @param player The player whose cooldown ticks will be updated
-	 * @param modifier  The cooldown reduction % to apply, e.g. 0.05 will be a 5% reduction.
-	 *
+	 * @param player   The player whose cooldown ticks will be updated
+	 * @param modifier The cooldown reduction % to apply, e.g. 0.05 will be a 5% reduction.
 	 * @return Number of abilities that had their cooldowns reduced.
 	 */
 	public int updateCooldownsPercent(Player player, double modifier) {

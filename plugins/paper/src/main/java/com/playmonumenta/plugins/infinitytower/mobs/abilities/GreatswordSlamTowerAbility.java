@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -90,7 +91,7 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 						}
 
 						for (int r = 0; r < 30; r += 2) {
-							for (double degree = 90 - DEG/2; degree <= 90 + DEG/2; degree += 5) {
+							for (double degree = 90 - DEG / 2; degree <= 90 + DEG / 2; degree += 5) {
 								double radian1 = Math.toRadians(degree);
 								Vector vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 								vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
@@ -116,6 +117,7 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 				BukkitRunnable runnable2 = new BukkitRunnable() {
 					int mT = 0;
 					final List<LivingEntity> mHitPlayers = new ArrayList<>();
+
 					@Override
 					public void run() {
 						mT += 2;
@@ -132,6 +134,7 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 								world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0);
 								BukkitRunnable runnable = new BukkitRunnable() {
 									int mRadius = 0;
+
 									@Override
 									public void run() {
 
@@ -146,7 +149,7 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 										//If player is in trajectory (in bounding box), damage them and knock back
 										Vector vec;
 										List<BoundingBox> boxes = new ArrayList<>();
-										for (double degree = 90 - DEG/2; degree <= 90 + DEG/2; degree += 5) {
+										for (double degree = 90 - DEG / 2; degree <= 90 + DEG / 2; degree += 5) {
 
 											double radian1 = Math.toRadians(degree);
 											vec = new Vector(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
@@ -208,15 +211,12 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 												world.playSound(l, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0);
 											}
 										}
-										for (LivingEntity target : mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs()) {
-
-											for (BoundingBox box : boxes) {
-												if (target.getBoundingBox().overlaps(box) && !mHitPlayers.contains(target)) {
-													DamageUtils.damage(mBoss, target, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false);
-													MovementUtils.knockAway(loc, target, 0f, 1.5f, false);
-													mHitPlayers.add(target);
-													break;
-												}
+										Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+										for (LivingEntity target : hitbox.getHitEntitiesByClass(LivingEntity.class)) {
+											if ((mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs()).contains(target) && !mHitPlayers.contains(target)) {
+												DamageUtils.damage(mBoss, target, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false);
+												MovementUtils.knockAway(loc, target, 0f, 1.5f, false);
+												mHitPlayers.add(target);
 											}
 										}
 										mRadius++;
@@ -248,7 +248,7 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 						}
 						for (LivingEntity target : new ArrayList<>(mIsPlayerMob ? mGame.mFloorMobs : mGame.mPlayerMobs)) {
 							if ((target.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || target.getLocation().getBlock().getType() != Material.AIR)
-								    && (target.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == ICE_TYPE || target.getLocation().getBlock().getType() == ICE_TYPE)) {
+								&& (target.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == ICE_TYPE || target.getLocation().getBlock().getType() == ICE_TYPE)) {
 
 								plugin.mEffectManager.addEffect(target, "ITPercentSpeedModifyGreatsword",
 									new PercentSpeed(20, -0.3, "ITPercentSpeedModifyGreatsword"));

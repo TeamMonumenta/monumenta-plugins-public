@@ -37,7 +37,8 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 
 	/**
 	 * An n-point Bézier curve, with an upper bound of {@value MAX_CONTROL_POINTS}
-	 * @param particle A particle.
+	 *
+	 * @param particle      A particle.
 	 * @param controlPoints A list of locations beginning with a starting location (t = 0.0) and ending with an ending location (t = 1.0)
 	 *                      The list can contain one element, such that the starting and ending points are the same, but not zero elements.
 	 *                      If the list size is >= {@value MAX_CONTROL_POINTS}, the list will be sliced at the 10th element.
@@ -49,11 +50,11 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 			controlPoints.add(controlPoints.get(0).clone());
 		}
 
-		 if (controlPoints.size() > MAX_CONTROL_POINTS) {
-			 mControlPoints = controlPoints.subList(0, MAX_CONTROL_POINTS - 1);
-		 } else {
-			 mControlPoints = controlPoints;
-		 }
+		if (controlPoints.size() > MAX_CONTROL_POINTS) {
+			mControlPoints = controlPoints.subList(0, MAX_CONTROL_POINTS - 1);
+		} else {
+			mControlPoints = controlPoints;
+		}
 
 		mLocation = controlPoints.get(0);
 	}
@@ -99,6 +100,7 @@ public class PPBezier extends AbstractPartialParticle<PPBezier> {
 	@Override
 	protected void doSpawn(PartialParticleBuilder packagedValues) {
 		int count = packagedValues.count();
+		packagedValues.count(1);
 		int n = mControlPoints.size() - 1;
 
 		if (mAnimationTicks > 1) {

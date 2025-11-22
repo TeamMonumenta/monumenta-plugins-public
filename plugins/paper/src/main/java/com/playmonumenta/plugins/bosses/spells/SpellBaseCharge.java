@@ -1,5 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.bosses.ChargerBoss;
+import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -29,16 +34,6 @@ public class SpellBaseCharge extends Spell {
 		 * @param target Targeted LivingEntity
 		 */
 		void run(LivingEntity target);
-	}
-
-	@FunctionalInterface
-	public interface WarningParticles {
-		/**
-		 * Particles to indicate the path of the boss's charge
-		 *
-		 * @param loc Location to spawn a particle
-		 */
-		void run(Location loc);
 	}
 
 	@FunctionalInterface
@@ -106,16 +101,65 @@ public class SpellBaseCharge extends Spell {
 	private final boolean mTargetFurthest;
 	private final @Nullable GetSpellTargets<? extends LivingEntity> mTargets;
 
+	public SpellBaseCharge(Plugin mPlugin, LivingEntity mBoss, ChargerBoss.Parameters p) {
+		this(mPlugin, mBoss, p.COOLDOWN, p.DURATION, p.STOP_ON_HIT,
+			0, 0, 0,
+			() -> {
+				List<? extends LivingEntity> targetList = p.TARGETS.getTargetsList(mBoss);
+				if (p.MIN_DISTANCE > 0) {
+					targetList.removeIf(target -> target.getLocation()
+						.distanceSquared(mBoss.getLocation()) < p.MIN_DISTANCE * p.MIN_DISTANCE);
+				}
+				return targetList;
+			},
+			// Warning sound/particles at boss location and slow boss
+			(LivingEntity player) -> {
+				p.PARTICLE_WARNING.spawn(mBoss, mBoss.getLocation(), 2d, 2d, 2d);
+				p.SOUND_WARNING.play(mBoss.getLocation(), 1f, 1.5f);
+				mBoss.setAI(false);
+			},
+			// Warning particles
+			(Location loc) -> p.PARTICLE_TELL.spawn(mBoss, loc, 0.65d, 0.65d, 0.65d),
+			// Charge attack sound/particles at boss location
+			(LivingEntity player) -> {
+				p.PARTICLE_ROAR.spawn(mBoss, mBoss.getLocation(), 0.3d, 0.3d, 0.3d, 0.15d);
+				p.SOUND_ROAR.play(mBoss.getLocation(), 1f, 1.5f);
+			},
+			// Attack hit a player
+			(LivingEntity target) -> {
+				p.PARTICLE_HIT.spawn(mBoss, target.getEyeLocation(), 0.4d, 0.4d, 0.4d, 0.4d);
+				if (p.DAMAGE > 0) {
+					BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList());
+				}
+
+				if (p.DAMAGE_PERCENTAGE > 0.0) {
+					DamageUtils.damage(mBoss, target, new DamageEvent.Metadata(DamageEvent.DamageType.TRUE, null, null, p.SPELL_NAME),
+						EntityUtils.getMaxHealth(target) * p.DAMAGE_PERCENTAGE, true, true, true);
+				}
+
+				if (p.CHANGE_TARGET && mBoss instanceof Mob mobAI && !(target instanceof Player player && AbilityUtils.isStealthed(player))) {
+					mobAI.setTarget(target);
+				}
+
+				p.EFFECTS.apply(target, mBoss);
+			},
+			// Attack particles
+			(Location loc) -> p.PARTICLE_ATTACK.spawn(mBoss, loc),
+			// Ending particles on boss
+			() -> {
+				p.PARTICLE_ROAR.spawn(mBoss, mBoss.getLocation(), 0.3, 0.3, 0.3, 0.15);
+				p.SOUND_ROAR.play(mBoss.getLocation(), 1f, 1.5f);
+				mBoss.setAI(true);
+				if (mBoss instanceof Mob mobAI && mobAI.getTarget() instanceof Player player && AbilityUtils.isStealthed(player)) {
+					mobAI.setTarget(null);
+				}
+			});
+	}
+
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int chargeTicks,
 	                       @Nullable WarningAction warning, @Nullable ParticleAction warnParticles, @Nullable StartAction start,
 	                       @Nullable HitPlayerAction hitPlayer, @Nullable ParticleAction particle, EndAction end) {
 		this(plugin, boss, range, 160, chargeTicks, false, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
-	}
-
-	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks,
-	                       @Nullable WarningAction warning, @Nullable ParticleAction warnParticles, @Nullable StartAction start,
-	                       @Nullable HitPlayerAction hitPlayer, @Nullable ParticleAction particle, @Nullable EndAction end) {
-		this(plugin, boss, range, cooldown, chargeTicks, false, 0, 0, 0, warning, warnParticles, start, hitPlayer, particle, end);
 	}
 
 	public SpellBaseCharge(Plugin plugin, LivingEntity boss, int range, int cooldown, int chargeTicks, boolean stopOnFirstHit,
@@ -233,10 +277,11 @@ public class SpellBaseCharge extends Spell {
 	/**
 	 * Helper function for doCharge which checks if the charge is allowed to
 	 * pass through a block. Needed because block.isSolid includes carpets
+	 *
 	 * @param block The block being checked
 	 */
-	public static boolean passable(Block block) {
-		return block.isPassable() || !block.isSolid();
+	private static boolean notPassable(Block block) {
+		return !block.isPassable() && block.isSolid();
 	}
 
 	/**
@@ -245,7 +290,7 @@ public class SpellBaseCharge extends Spell {
 	 *
 	 * @param target         The intended target of the attack
 	 * @param charger        The living entity charging the player
-	 * @param validTargets   Other targets (including the target!) who might be indicentally hit by the charge
+	 * @param validTargets   Other targets (including the target!) who might be incidentally hit by the charge
 	 * @param start          Action to run on boss at start location (may be null)
 	 * @param particle       Action to spawn particle at locations along path (may be null)
 	 * @param hitPlayer      Action to run if a player is hit (may be null)
@@ -253,8 +298,8 @@ public class SpellBaseCharge extends Spell {
 	 * @param teleBoss       Boolean indicating whether the boss should actually be teleported to the end
 	 * @param stopOnFirstHit Boolean indicating whether the boss should damage only one player at a time
 	 */
-	public static boolean doCharge(LivingEntity target, Entity charger, Location targetLoc, List<? extends LivingEntity> validTargets, @Nullable StartAction start,
-	                               @Nullable ParticleAction particle, @Nullable HitPlayerAction hitPlayer, @Nullable EndAction end, boolean teleBoss, boolean stopOnFirstHit, double yStartAdd) {
+	public static void doCharge(LivingEntity target, Entity charger, Location targetLoc, List<? extends LivingEntity> validTargets, @Nullable StartAction start,
+	                            @Nullable ParticleAction particle, @Nullable HitPlayerAction hitPlayer, @Nullable EndAction end, boolean teleBoss, boolean stopOnFirstHit, double yStartAdd) {
 		final Location launLoc;
 		if (charger instanceof LivingEntity le) {
 			launLoc = le.getEyeLocation().add(0, yStartAdd, 0);
@@ -274,7 +319,6 @@ public class SpellBaseCharge extends Spell {
 		}
 
 		LivingEntity switchAggro = target;
-		boolean chargeHitsPlayer = false;
 		boolean cancel = false;
 		BoundingBox box = charger.getBoundingBox();
 		List<LivingEntity> hitEntities = new ArrayList<>();
@@ -302,7 +346,7 @@ public class SpellBaseCharge extends Spell {
 				}
 			}
 
-			if (!cancel && (!passable(endLoc.getBlock()) || !passable(endLoc1.getBlock()))) {
+			if (!cancel && (notPassable(endLoc.getBlock()) || notPassable(endLoc1.getBlock()))) {
 				// No longer air - need to go back a bit so we don't tele the boss into a block
 				endLoc.subtract(baseVect.multiply(1));
 				// Charge terminated at a block
@@ -316,9 +360,8 @@ public class SpellBaseCharge extends Spell {
 				if (hitEntities.contains(player)) {
 					continue;
 				}
-				if (player.getWorld() == charger.getWorld() && player.getLocation().distance(endLoc) < 1.8F) {
+				if (player.getWorld() == charger.getWorld() && player.getBoundingBox().overlaps(box)) {
 					// Hit player - mark this and continue
-					chargeHitsPlayer = true;
 					switchAggro = player;
 
 					if (hitPlayer != null) {
@@ -349,7 +392,6 @@ public class SpellBaseCharge extends Spell {
 			end.run();
 		}
 
-		return chargeHitsPlayer;
 	}
 
 	private void launch(LivingEntity target, List<? extends LivingEntity> targets) {
@@ -380,6 +422,12 @@ public class SpellBaseCharge extends Spell {
 
 				mTicks += 2;
 			}
+
+			@Override
+			public synchronized void cancel() throws IllegalStateException {
+				mBoss.setAI(true);
+				super.cancel();
+			}
 		};
 		runnable.runTaskTimer(mPlugin, 0, 2);
 		mActiveRunnables.add(runnable);
@@ -396,9 +444,6 @@ public class SpellBaseCharge extends Spell {
 			@Override
 			public void run() {
 				if (EntityUtils.shouldCancelSpells(mBoss)) {
-					if (mBoss != null) {
-						mBoss.setAI(true);
-					}
 					this.cancel();
 					return;
 				}
@@ -435,6 +480,12 @@ public class SpellBaseCharge extends Spell {
 				}
 
 				mTicks += 2;
+			}
+
+			@Override
+			public synchronized void cancel() throws IllegalStateException {
+				mBoss.setAI(true);
+				super.cancel();
 			}
 		};
 		runnable.runTaskTimer(mPlugin, 0, 2);

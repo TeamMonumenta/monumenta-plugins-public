@@ -173,8 +173,8 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 
 	public boolean isDeltaVaried() {
 		return mVaryNegativeX || mVaryPositiveX
-			       || mVaryNegativeY || mVaryPositiveY
-			       || mVaryNegativeZ || mVaryPositiveZ;
+			|| mVaryNegativeY || mVaryPositiveY
+			|| mVaryNegativeZ || mVaryPositiveZ;
 	}
 
 	// methods for builder-style usage of PartialParticle
@@ -374,7 +374,7 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 	 * Spawns particles for each nearby player,
 	 * with no partial multiplier applied
 	 * (always spawns the full mCount amount).
-	 *
+	 * <p>
 	 * Please use {@link #spawnAsPlayerFull(Player)} if this is attributed to a player
 	 * so that this works properly with player visibility settings
 	 */
@@ -485,6 +485,7 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 	 * based on individual particle multiplier settings.
 	 * Specify a sourcePlayer to respect player visiblitity settings.
 	 * Consider using {@link #spawnAsPlayerFull(Player)} if specific players aren't needed.
+	 *
 	 * @see #spawnAsPlayerFull(Player)
 	 */
 	public SelfT spawnForPlayers(ParticleCategory source, @Nullable Collection<Player> players, @Nullable Player sourcePlayer) {
@@ -512,7 +513,7 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 		List<Player> players = new ArrayList<>();
 		for (Player player : mLocation.getWorld().getPlayers()) {
 			if (player.getLocation().distanceSquared(mLocation) < capDistance
-				    && (mPlayerCondition == null || mPlayerCondition.test(player))) {
+				&& (mPlayerCondition == null || mPlayerCondition.test(player))) {
 				players.add(player);
 			}
 		}
@@ -520,8 +521,8 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 	}
 
 	private void spawnForPlayersInternal(ParticleCategory source, ParticleCategory otherSource, Collection<Player> players, @Nullable Player sourcePlayer) {
+		this.prepareSpawn();
 		ParticleManager.runOffMainThread((final AbstractPartialParticle<?> self) -> {
-			self.prepareSpawn();
 			players.forEach(player -> {
 				spawnForPlayerInternal(self, player, player == sourcePlayer ? source : otherSource, sourcePlayer);
 			});

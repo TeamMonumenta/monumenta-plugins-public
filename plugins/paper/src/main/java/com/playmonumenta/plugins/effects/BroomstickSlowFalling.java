@@ -43,15 +43,15 @@ public class BroomstickSlowFalling extends ZeroArgumentEffect {
 				@Override
 				public void run() {
 					if (player.isDead()
-							|| !player.isOnline()
-						    || player.getHealth() <= 0
-						    || getDuration() <= 0) {
+						|| !player.isOnline()
+						|| player.getHealth() <= 0
+						|| getDuration() <= 0) {
 						cancel();
 					}
 					if (!player.isRiptiding()
-						    && (player.isInWater()
-							        || PlayerUtils.isOnGround(player)
-							        || NmsUtils.getVersionAdapter().hasCollision(player.getWorld(), player.getBoundingBox().shift(0, -0.1, 0)))) {
+						&& (player.isInWater()
+						|| PlayerUtils.isOnGround(player)
+						|| NmsUtils.getVersionAdapter().hasCollision(player.getWorld(), player.getBoundingBox().shift(0, -0.1, 0)))) {
 						setDuration(0);
 						cancel();
 					}

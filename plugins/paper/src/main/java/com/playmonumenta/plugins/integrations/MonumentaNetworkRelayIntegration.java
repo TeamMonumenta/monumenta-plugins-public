@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.integrations;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.playmonumenta.networkrelay.GatherHeartbeatDataEvent;
 import com.playmonumenta.networkrelay.GatherRemotePlayerDataEvent;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.RemotePlayerAPI;
@@ -12,11 +11,11 @@ import com.playmonumenta.networkrelay.RemotePlayerLoadedEvent;
 import com.playmonumenta.networkrelay.RemotePlayerProxy;
 import com.playmonumenta.networkrelay.RemotePlayerUnloadedEvent;
 import com.playmonumenta.networkrelay.RemotePlayerUpdatedEvent;
+import com.playmonumenta.networkrelay.shardhealth.LowMemoryEvent;
+import com.playmonumenta.networkrelay.shardhealth.ShardHealth;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.ShardHealthUtils.ShardHealth;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -131,7 +130,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 			JsonObject data = new JsonObject();
 			data.addProperty("message", message);
 			try {
-				NetworkRelayAPI.sendMessage("automation-bot", channel, data);
+				NetworkRelayAPI.sendMessage("*", channel, data);
 			} catch (Exception ex) {
 				instance.mLogger.severe("Failed to send audit log message: " + ex.getMessage());
 				MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
@@ -185,7 +184,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 			JsonObject data = new JsonObject();
 			data.addProperty("message", message);
 			try {
-				NetworkRelayAPI.sendMessage("automation-bot", ADMIN_ALERT_CHANNEL, data);
+				NetworkRelayAPI.sendMessage("*", ADMIN_ALERT_CHANNEL, data);
 			} catch (Exception ex) {
 				instance.mLogger.severe("Failed to send admin alert message: " + ex.getMessage());
 				MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
@@ -197,43 +196,21 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 		sendAuditLogMessage(message, AUDIT_LOG_REPORT_CHANNEL);
 	}
 
-	// Heartbeat stuff
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
-	public void gatherHeartbeatData(GatherHeartbeatDataEvent event) {
-		JsonObject data = new JsonObject();
-		data.add("shard_health", ShardHealth.currentHealth().toJson());
-		event.setPluginData(MAIN_PLUGIN_HEARTBEAT_IDENTIFIER, data);
-	}
-
 	public static ShardHealth remoteShardHealth(String shardName) {
-		if (shardName.equals(ServerProperties.getShardName())) {
-			return ShardHealth.currentHealth();
-		}
-
 		MonumentaNetworkRelayIntegration instance = INSTANCE;
 		if (instance == null) {
-			return ShardHealth.unacceptableTargetHealth();
+			return ShardHealth.zeroHealth();
 		}
 
-		JsonObject remoteMainPluginHeartbeatData
-			= NetworkRelayAPI.getHeartbeatPluginData(shardName, MAIN_PLUGIN_HEARTBEAT_IDENTIFIER);
-		if (
-			remoteMainPluginHeartbeatData != null
-				&& remoteMainPluginHeartbeatData.get("shard_health") instanceof JsonObject shardHealthJson
-		) {
-			return ShardHealth.fromJson(shardHealthJson);
-		}
-
-		return ShardHealth.unacceptableTargetHealth();
+		return NetworkRelayAPI.remoteShardHealth(shardName);
 	}
 
 	// TAB stuff
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
-	public void gatherPluginDataEvent(GatherRemotePlayerDataEvent event) {
-		JsonObject data = LuckPermsIntegration.getPluginData(event.mRemotePlayer.getUuid());
-		if (data != null) {
-			event.setPluginData("monumenta", data);
-		}
+	public void gatherRemoteDataEvent(GatherRemotePlayerDataEvent event) {
+		JsonObject data = new JsonObject();
+		LuckPermsIntegration.getPluginData(data, event.mRemotePlayer.getUuid());
+		event.setPluginData(MAIN_PLUGIN_HEARTBEAT_IDENTIFIER, data);
 	}
 
 	// Updates RemotePlayer information for other shards
@@ -265,7 +242,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 		if (minecraftData == null) {
 			return null;
 		}
-		JsonObject monumentaData = minecraftData.getPluginData("monumenta");
+		JsonObject monumentaData = minecraftData.getPluginData(MAIN_PLUGIN_HEARTBEAT_IDENTIFIER);
 		if (monumentaData == null) {
 			return null;
 		}
@@ -311,5 +288,16 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void remotePlayerUpdated(RemotePlayerUpdatedEvent event) {
 		TABIntegration.loadRemotePlayer(event.mRemotePlayer);
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void lowMemory(LowMemoryEvent event) {
+		Bukkit.getServer().dispatchCommand(
+			Bukkit.getServer().getConsoleSender(),
+			"spark heapdump"
+		);
+		sendAdminMessage("<" + NetworkRelayAPI.getShardName() + "> Automatic heap dump due to low memory");
+
+		// TODO Consider automatic restart?
 	}
 }

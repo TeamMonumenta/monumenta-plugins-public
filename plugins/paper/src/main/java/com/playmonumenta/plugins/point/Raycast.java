@@ -56,6 +56,7 @@ public class Raycast {
 
 	/**
 	 * Fires the raycast with the given properties
+	 *
 	 * @return All entities hit by the raycast
 	 */
 	public RaycastData shootRaycast() {
@@ -102,9 +103,9 @@ public class Raycast {
 				// Much higher precision is needed when going through semi-solid blocks.
 				// When the unprecise ray reaches a semisolid block without colliding, the ray will retrace
 				// both the previous and the next two steps with pixel precision to verify the result.
-				if (mPrecision == false && (block.getType().isSolid()
-				                           || block.getBlockData() instanceof Snow
-				                           || block.getBlockData() instanceof Bed)) {
+				if (!mPrecision && (block.getType().isSolid()
+					|| block.getBlockData() instanceof Snow
+					|| block.getBlockData() instanceof Bed)) {
 					mStart.subtract(mDir.clone().multiply(mDirMultiplier));
 					mPrecision = true;
 					mPrecisionTicks = 49;
@@ -123,7 +124,7 @@ public class Raycast {
 					//  Make sure we should be targeting this entity.
 					if ((mTargetPlayers && (e instanceof Player)) || (mTargetNonPlayers && !(e instanceof Player))) {
 						if (!entities.contains(e)) {
-							data.getEntities().add((LivingEntity)e);
+							data.getEntities().add((LivingEntity) e);
 						}
 					}
 				}

@@ -51,7 +51,7 @@ public class MegaHammer extends DepthsAbility {
 	}
 
 	private static Description<MegaHammer> getDescription() {
-		return new DescriptionBuilder<MegaHammer>().add("Any ")
+		return new DescriptionBuilder<>(() -> INFO).add("Any ")
 			.add(DepthsRarity.COMMON.getDisplay())
 			.add(" or ")
 			.add(DepthsRarity.UNCOMMON.getDisplay())

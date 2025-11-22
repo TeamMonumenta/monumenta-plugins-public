@@ -73,7 +73,7 @@ public class PotionManager {
 
 	public void addPotion(Player player, PotionID id, PotionEffect effect, double intensity) {
 		addPotion(player, id, new PotionInfo(effect.getType(), (int) (effect.getDuration() * intensity),
-		                                     effect.getAmplifier(), effect.isAmbient(), effect.hasParticles(), effect.hasIcon()));
+			effect.getAmplifier(), effect.isAmbient(), effect.hasParticles(), effect.hasIcon()));
 	}
 
 	public void addPotion(Player player, PotionID id, PotionEffect effect) {
@@ -91,8 +91,8 @@ public class PotionManager {
 			// addPotion is called before Bukkit gets to process an EntityPotionEffectEvent, so we do that ourselves
 			// (we need the potion item, thus use the potion splash and area cloud apply events for potion handling)
 			EntityPotionEffectEvent event = new EntityPotionEffectEvent(player, null,
-					new PotionEffect(info.mType, info.mDuration, info.mAmplifier, info.mAmbient, info.mShowParticles, info.mShowIcon),
-					EntityPotionEffectEvent.Cause.UNKNOWN, EntityPotionEffectEvent.Action.ADDED, false);
+				new PotionEffect(info.mType, info.mDuration, info.mAmplifier, info.mAmbient, info.mShowParticles, info.mShowIcon),
+				EntityPotionEffectEvent.Cause.UNKNOWN, EntityPotionEffectEvent.Action.ADDED, false);
 			Bukkit.getPluginManager().callEvent(event);
 			if (event.isCancelled()) {
 				return;

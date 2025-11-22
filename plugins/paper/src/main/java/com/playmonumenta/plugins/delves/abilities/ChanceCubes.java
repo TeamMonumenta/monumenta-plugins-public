@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PPRectPrism;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -152,6 +153,7 @@ public class ChanceCubes {
 				BukkitRunnable task = new BukkitRunnable() {
 					private static final int TIME_LIMIT_TICKS = 60 * 20;
 					private int mTicks = 0;
+
 					@Override
 					public void run() {
 						List<Entity> nearbyEntities = (List<Entity>) loc.getWorld().getNearbyEntities(loc, 8, 7, 8);
@@ -439,7 +441,7 @@ public class ChanceCubes {
 											blockLocation.setY(playerY - dy);
 											BlockState state = blockLocation.getBlock().getState();
 											if (!ignoredMats.contains(state.getType()) &&
-												!state.getType().isInteractable() &&
+												!BlockUtils.INTERACTABLE.contains(state.getType()) &&
 												FastUtils.RANDOM.nextInt(100) < 37) {
 												mBlocksToRestore.add(state);
 											}
@@ -522,6 +524,7 @@ public class ChanceCubes {
 			case 9 -> {
 				BukkitRunnable task = new BukkitRunnable() {
 					private int mSpawnCount = 0;
+
 					@Override
 					public void run() {
 						if (mSpawnCount >= 15) {

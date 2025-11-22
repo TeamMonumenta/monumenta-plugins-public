@@ -61,15 +61,32 @@ public class VesperidysVoidCrystalDawn extends BossAbilityGroup {
 	private static final int PARTICLE_RADIUS = 10;
 	private static final boolean CAN_MOVE = false;
 	private static final boolean OVERHEAL = true;
-	private final EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.clone().setOptional(false);
-	private static final ParticlesList PARTICLE_CHARGE_AIR = ParticlesList.fromString("[(SPELL_INSTANT,3)]");
-	private static final ParticlesList PARTICLE_CHARGE_CIRCLE = ParticlesList.fromString("[(SPELL_INSTANT,3)]");
-	private static final SoundsList SOUND_CHARGE = SoundsList.fromString("[(ITEM_TRIDENT_RETURN,0.8)]");
-	private static final SoundsList SOUND_OUTBURST_CIRCLE = SoundsList.fromString("[(ENTITY_ILLUSIONER_CAST_SPELL,3,1.25),(ENTITY_ZOMBIE_VILLAGER_CONVERTED,3,2)]");
-	private static final ParticlesList PARTICLE_OUTBURST_AIR = ParticlesList.fromString("[(FIREWORKS_SPARK,3),(VILLAGER_HAPPY,3,3.5,3.5,3.5,0.5)]");
-	private static final ParticlesList PARTICLE_OUTBURST_CIRCLE = ParticlesList.fromString("[(CRIT_MAGIC,3,0.25,0.25,0.25,0.35),(FIREWORKS_SPARK,2,0.25,0.25,0.25,0.15)]");
-	private static final ParticlesList PARTICLE_HEAL = ParticlesList.fromString("[(FIREWORKS_SPARK,3,0.25,0.5,0.25,0.3),(HEART,3,0.4,0.5,0.4)]");
-
+	private final EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.clone();
+	private static final ParticlesList PARTICLE_CHARGE_AIR = ParticlesList.builder()
+		.add(new ParticlesList.CParticle(Particle.SPELL_INSTANT, 3))
+		.build();
+	private static final ParticlesList PARTICLE_CHARGE_CIRCLE = ParticlesList.builder()
+		.add(new ParticlesList.CParticle(Particle.SPELL_INSTANT, 3))
+		.build();
+	private static final SoundsList SOUND_CHARGE = SoundsList.builder()
+		.add(new SoundsList.CSound(Sound.ITEM_TRIDENT_RETURN, 0.8f))
+		.build();
+	private static final SoundsList SOUND_OUTBURST_CIRCLE = SoundsList.builder()
+		.add(new SoundsList.CSound(Sound.ENTITY_ILLUSIONER_CAST_SPELL, 3.0f, 1.25f))
+		.add(new SoundsList.CSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 3.0f, 2.0f))
+		.build();
+	private static final ParticlesList PARTICLE_OUTBURST_AIR = ParticlesList.builder()
+		.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 3))
+		.add(new ParticlesList.CParticle(Particle.VILLAGER_HAPPY, 3, 3.5, 3.5, 3.5, 0.5))
+		.build();
+	private static final ParticlesList PARTICLE_OUTBURST_CIRCLE = ParticlesList.builder()
+		.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 3, 0.25, 0.25, 0.25, 0.35))
+		.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 2, 0.25, 0.25, 0.25, 0.15))
+		.build();
+	private static final ParticlesList PARTICLE_HEAL = ParticlesList.builder()
+		.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 3, 0.25, 0.5, 0.25, 0.3))
+		.add(new ParticlesList.CParticle(Particle.HEART, 3, 0.4, 0.5, 0.4))
+		.build();
 
 	public static final Vector[] MODEL_OFFSETS = {
 		new Vector(2, 0, 0),
@@ -258,7 +275,7 @@ public class VesperidysVoidCrystalDawn extends BossAbilityGroup {
 			new BukkitRunnable() {
 				int mTicks = 0;
 				final Location mCenter = startCenter;
-				final double mFallAmount = (double) mFallDistance / (double) FALL_TIME_TICKS;
+				final double mFallAmount = mFallDistance / (double) FALL_TIME_TICKS;
 
 				@Override
 				public void run() {

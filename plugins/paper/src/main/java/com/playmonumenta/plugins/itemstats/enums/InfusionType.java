@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemstats.enums;
 
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.enchantments.Hexed;
 import com.playmonumenta.plugins.itemstats.infusions.*;
@@ -12,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.luckperms.api.model.group.Group;
 import org.jetbrains.annotations.Nullable;
 
 public enum InfusionType {
@@ -28,6 +30,7 @@ public enum InfusionType {
 	ARDOR(new Ardor(), "", true, false, false, false, true, true, true, false),
 	AURA(new Aura(), "", true, false, false, false, true, true, true, false),
 	CARAPACE(new Carapace(), "", true, false, false, false, true, true, true, false),
+	CELERITY(new Celerity(), "", true, false, false, false, true, true, true, false),
 	CELESTIAL(new Celestial(), "", true, false, false, false, true, true, true, false),
 	CHOLER(new Choler(), "", true, false, false, false, true, true, true, false),
 	DECAPITATION(new Decapitation(), "", true, false, false, false, true, true, true, false),
@@ -43,17 +46,21 @@ public enum InfusionType {
 	MITOSIS(new Mitosis(), "", true, false, false, false, true, true, true, false),
 	NATANT(new Natant(), "", true, false, false, false, true, true, true, false),
 	NUTRIMENT(new Nutriment(), "", true, false, false, false, true, true, true, false),
+	ORBITAL(new Orbital(), "", true, false, false, false, true, true, true, false),
 	PENNATE(new Pennate(), "", true, false, false, false, true, true, true, false),
 	QUENCH(new Quench(), "", true, false, false, false, true, true, true, false),
 	REFLECTION(new Reflection(), "", true, false, false, false, true, true, true, false),
 	REFRESH(new Refresh(), "", true, false, false, false, true, true, true, false),
 	SOOTHING(new Soothing(), "", true, false, false, false, true, true, true, false),
+	STURDY(new Sturdy(), "", true, false, false, false, true, true, true, false),
 	UNDERSTANDING(new Understanding(), "", true, false, false, false, true, true, true, false),
 	UNYIELDING(new Unyielding(), "", true, false, false, false, true, true, true, false),
 	USURPER(new Usurper(), "", true, false, false, false, true, true, true, false),
 	VENGEFUL(new Vengeful(), "", true, false, false, false, true, true, true, false),
+
 	// Other Added Tags
 	LOCKED(new Locked(), "", false, false, false, false, false, false, false, false),
+	ENLIGHTENING(new Enlightening(), "", false, false, false, false, true, false, false, false),
 	BARKING(new Barking(), "", true, false, true, false, false, false, false, false),
 	DEBARKING(new Debarking(), "", false, false, false, false, false, false, false, false),
 	RUSTWORTHY(new Rustworthy(), "", true, true, false, false, false, false, false, false),
@@ -77,8 +84,10 @@ public enum InfusionType {
 	SOULBOUND(new Soulbound(), "Soulbound", false, false, false, false, false, false, false, false),
 	FESTIVE(new Festive(), "Decorated", false, false, true, false, false, false, false, false),
 	GILDED(new Gilded(), "Gilded", false, false, true, false, false, false, false, false),
+	OWNED(new Owned(), "Owned", false, false, false, false, false, false, false, false),
 	SHATTERED(new Shattered(), "", true, false, false, false, false, false, false, false),
 	HEXED(new Hexed(), "", false, false, false, false, false, false, false, false),
+	HUNT_TRACK(new HuntTrack(), "", false, false, false, false, false, false, false, false),
 	// Stat tracking stuff
 	STAT_TRACK(new StatTrack(), "Tracked", false, false, false, false, false, false, false, false),
 	STAT_TRACK_KILLS(new StatTrackKills(), "", true, false, false, true, false, false, false, false),
@@ -177,6 +186,13 @@ public enum InfusionType {
 		if (!mHasLevels) {
 			if (mMessage.isEmpty() || infuser == null) {
 				return Component.text(mName, color).decoration(TextDecoration.ITALIC, false);
+			} else if (this == OWNED && infuser.contains("guild#")) {
+				Long guildPlotId = Long.parseLong(infuser.substring(6));
+				Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotId);
+				if (guild == null) {
+					return Component.text(mName, color).decoration(TextDecoration.ITALIC, false);
+				}
+				return Component.text(mName, color).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by ", NamedTextColor.DARK_GRAY).append(Component.text("[" + LuckPermsIntegration.getGuildPlainTag(guild) + "]", LuckPermsIntegration.getGuildColor(guild))).append(Component.text(")", NamedTextColor.DARK_GRAY)));
 			} else if (this == SOULBOUND) {
 				return Component.text(mName, color).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " to " + infuser + ")", NamedTextColor.DARK_GRAY));
 			} else {

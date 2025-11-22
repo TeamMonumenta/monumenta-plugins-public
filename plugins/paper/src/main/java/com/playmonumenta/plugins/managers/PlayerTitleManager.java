@@ -1,205 +1,273 @@
 package com.playmonumenta.plugins.managers;
 
+import com.destroystokyo.paper.event.server.ServerTickStartEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.effects.PercentHeal;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
+import io.papermc.paper.event.player.PlayerTrackEntityEvent;
+import io.papermc.paper.event.player.PlayerUntrackEntityEvent;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.BlockDisplay;
+import org.bukkit.Color;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
-import org.joml.Matrix4f;
+import org.bukkit.entity.Pose;
+import org.bukkit.entity.TextDisplay;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
-public class PlayerTitleManager {
-
-	private static class LineMetadata {
-		private final Entity mEntity;
-		private final double mHeight;
-
-		public LineMetadata(Entity entity, double height) {
-			mEntity = entity;
-			mHeight = height;
-		}
-	}
-
-	private static class PlayerMetadata {
-		private final List<LineMetadata> mLines;
-		private final List<Component> mDisplay;
-
-		public PlayerMetadata(List<LineMetadata> lines, List<Component> display) {
-			mLines = lines;
-			mDisplay = display;
-		}
-	}
-
-	private static final int UPDATE_INTERVAL = 2;
-
-	private static final Map<UUID, PlayerMetadata> METADATA = new HashMap<>();
-
-	private int mTick = 0;
-
+public class PlayerTitleManager implements Listener {
 	public static void start() {
-		PlayerTitleManager playerTitleManager = new PlayerTitleManager();
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(Plugin.getInstance(), playerTitleManager::tick, UPDATE_INTERVAL, UPDATE_INTERVAL);
+		Plugin.getInstance().getServer().getPluginManager().registerEvents(new PlayerTitleManager(), Plugin.getInstance());
 	}
 
-	// called every UPDATE_INTERVAL ticks
-	public void tick() {
-		mTick++;
-		Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
-		for (Player player : onlinePlayers) {
-			PlayerMetadata metadata = METADATA.get(player.getUniqueId());
+	public PlayerTitleManager() {
+	}
 
-			// If the player became invalid (died, maybe more), logged out (despite being online?), or became spectator/vanished remove all titles
-			if (player.isDead() || !player.isOnline() || PremiumVanishIntegration.isInvisibleOrSpectator(player)) {
-				if (metadata != null) {
-					METADATA.remove(player.getUniqueId());
-					destroyEntities(metadata);
+	private static final float MAGIC_HEIGHT_START = 0.0f;
+	private static final float MAGIC_HEIGHT_STEP = 0.25f;
+
+	public static class NameTagData {
+		public final Interaction interaction;
+		public final TextDisplay nametag;
+		public Component text = Component.empty();
+		public boolean dirty = false;
+
+		public NameTagData(Interaction interaction, TextDisplay nametag) {
+			this.interaction = interaction;
+			this.nametag = nametag;
+		}
+	}
+
+	public static class NameTag {
+		public final UUID uuid; // player UUID this nametag is for
+		public final Map<String, NameTagData> entities = new WeakHashMap<>(); // all entities used for this nameta
+		public final Set<UUID> viewers = Collections.newSetFromMap(new WeakHashMap<>());
+		public float height = MAGIC_HEIGHT_START;
+
+		public NameTag(Player player) {
+			this.uuid = player.getUniqueId();
+
+
+			update(player, true);
+		}
+
+		public void update(Player player) {
+			update(player, false);
+		}
+
+		private void update(Player player, final boolean first) {
+			if (!player.getUniqueId().equals(uuid)) {
+				// updating for wrong player?
+				return;
+			}
+			height = MAGIC_HEIGHT_START;
+
+			setup(player, "title", getTitleDisplay(player));
+			setup(player, "health", getHealthDisplay(player));
+			setup(player, "name", getNameDisplay(player));
+
+			if (!first) {
+				updatePlayers(player);
+			}
+		}
+
+		private void setup(Player player, String name, Component text) {
+			entities.compute(name, (key, existing) -> {
+				if (text == null || text.equals(Component.empty())) {
+					// TODO: implement a recreation system
+					return existing;
 				}
-				continue;
+				if (existing == null) {
+					Interaction interaction = (Interaction) NmsUtils.getVersionAdapter().spawnWorldlessEntity(EntityType.INTERACTION, player.getWorld());
+					TextDisplay nametag = (TextDisplay) NmsUtils.getVersionAdapter().spawnWorldlessEntity(EntityType.TEXT_DISPLAY, player.getWorld());
+					existing = new NameTagData(interaction, nametag);
+
+					// nametag prep
+					existing.nametag.setPersistent(false);
+					existing.nametag.setCustomNameVisible(true);
+					existing.nametag.setViewRange(256f);
+					existing.nametag.setInvisible(true);
+					existing.nametag.setDefaultBackground(false);
+					existing.nametag.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
+
+					// interaction prep
+					existing.interaction.setPersistent(false);
+					existing.interaction.setInteractionHeight(height);
+					existing.interaction.setInteractionWidth(0f);
+					existing.interaction.setInvisible(true);
+					existing.interaction.setPose(Pose.SNIFFING);
+				}
+
+				if (text.equals(existing.text)) {
+					return existing;
+				}
+				existing.text = text;
+				existing.dirty = true;
+
+				existing.nametag.customName(text);
+
+				height += MAGIC_HEIGHT_STEP;
+				return existing;
+			});
+		}
+
+		public static Component getNameDisplay(Player player) {
+			return Component.text(player.getName(), NamedTextColor.WHITE);
+		}
+
+		public static Component getHealthDisplay(Player player) {
+			// Track if player cannot heal
+			boolean hasAntiHeal = false;
+			ItemStatManager.PlayerItemStats.ItemStatsMap playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(player).getItemStats();
+			double antiHealFromEnchants = Sustenance.getHealingMultiplier(playerItemStats.get(EnchantmentType.SUSTENANCE), playerItemStats.get(EnchantmentType.CURSE_OF_ANEMIA));
+
+			PercentHeal antiHeal = Plugin.getInstance().mEffectManager.getActiveEffect(player, PercentHeal.class);
+			if ((antiHeal != null && antiHeal.getValue() <= -1) || antiHealFromEnchants <= 0) {
+				hasAntiHeal = true;
 			}
 
-			// Force new entities to be created when the player switches worlds
-			if (metadata != null && !metadata.mLines.isEmpty() && !player.getWorld().equals(metadata.mLines.get(0).mEntity.getLocation().getWorld())) {
-				METADATA.remove(player.getUniqueId());
-				destroyEntities(metadata);
-				metadata = null;
+			// middle: health
+			int health = (int) Math.round(player.getHealth());
+			int maxHealth = (int) Math.round(EntityUtils.getMaxHealth(player));
+			float redFactor = Math.max(0, Math.min(1, 1.25f * health / maxHealth - 0.25f)); // 100% red at 20% HP or below, white at full HP
+			Component healthLine = Component.text(health + "/" + maxHealth + " \u2665", hasAntiHeal ? TextColor.fromHexString("#5D2D87") : TextColor.color(1f, redFactor, redFactor)); // if you have anitheal, set color to purple
+			int absorption = (int) Math.round(AbsorptionUtils.getAbsorption(player));
+			if (absorption > 0) {
+				healthLine = healthLine.append(Component.text(" +" + absorption, NamedTextColor.YELLOW));
 			}
+			return healthLine;
+		}
 
-			// Create new entities if necessary
-			if (metadata == null) {
-				metadata = createLines(player, getDisplay(player));
-				METADATA.put(player.getUniqueId(), metadata);
+		public static Component getTitleDisplay(Player player) {
+			// lowest: optional title
+			Cosmetic title = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.TITLE);
+			if (title != null) {
+				return Component.text(title.mName, NamedTextColor.GRAY);
 			}
+			return Component.empty();
+		}
 
-			if (mTick % 2 == 0) {
-				// Check if display has changed and update if so
-				List<Component> display = getDisplay(player);
-				if (!metadata.mDisplay.equals(display)) {
+		public void addPlayer(Player clientPlayer, Player targetPlayer) {
+			if (!targetPlayer.getUniqueId().equals(uuid)) {
+				// adding for wrong player?
+				return;
+			}
+			viewers.add(clientPlayer.getUniqueId());
+			Set<Map.Entry<Entity, Entity>> entities2 = Collections.newSetFromMap(new WeakHashMap<>());
+			for (Map.Entry<String, NameTagData> entry : entities.entrySet()) {
+				NameTagData data = entry.getValue();
+				entities2.add(Map.entry(data.interaction, data.nametag));
+			}
+			NmsUtils.getVersionAdapter().spawnPlayerNametag(clientPlayer, targetPlayer, entities2);
+		}
 
-					// create new lines
-					int existingSize = metadata.mLines.size();
-					if (display.size() > existingSize) {
-						while (display.size() > metadata.mLines.size()) {
-							metadata.mLines.add(createLine(player, display.get(metadata.mLines.size()), metadata.mLines.size()));
-						}
+		private void updatePlayers(Player targetPlayer) {
+			for (UUID viewer : viewers) {
+				updatePlayer(Bukkit.getPlayer(viewer), targetPlayer);
+			}
+			for (NameTagData data : entities.values()) {
+				data.dirty = false;
+			}
+		}
+
+		/*
+		 * This only updates the nametag text, not anything else
+		 */
+		private void updatePlayer(Player clientPlayer, Player targetPlayer) {
+			if (!targetPlayer.getUniqueId().equals(uuid)) {
+				// updating for wrong player?
+				return;
+			}
+			List<Entity> entities2 = new ArrayList<>();
+			for (NameTagData data : entities.values()) {
+				if (!data.dirty) {
+					continue;
+				}
+				entities2.add(data.nametag);
+			}
+			NmsUtils.getVersionAdapter().updatePlayerNametag(clientPlayer, entities2.toArray(new Entity[0]));
+		}
+
+		public void removePlayer(Player clientPlayer, Player targetPlayer) {
+			if (!targetPlayer.getUniqueId().equals(uuid)) {
+				// removing for wrong player?
+				return;
+			}
+			viewers.remove(clientPlayer.getUniqueId());
+			List<Entity> entities2 = new ArrayList<>();
+			for (NameTagData data : entities.values()) {
+				entities2.add(data.interaction);
+				entities2.add(data.nametag);
+			}
+			NmsUtils.getVersionAdapter().removePlayerNametag(clientPlayer, targetPlayer, entities2.toArray(new Entity[0]));
+		}
+	}
+
+	private final Map<UUID, NameTag> trackedEntities = new WeakHashMap<>();
+
+	@EventHandler(ignoreCancelled = false)
+	public void playerTrackEvent(PlayerTrackEntityEvent event) {
+		Player player = event.getPlayer();
+		Entity entity = event.getEntity();
+		if (entity instanceof Player targetPlayer) {
+			// need to delay by a tick to ensure packet order
+			targetPlayer.getScheduler().run(Plugin.getInstance(), (task) -> {
+				trackedEntities.compute(targetPlayer.getUniqueId(), (uuid, existing) -> {
+					if (existing == null) {
+						existing = new NameTag(targetPlayer);
 					}
+					existing.addPlayer(player, targetPlayer);
+					return existing;
+				});
+			}, null);
+		}
+	}
 
-					// delete removed lines
-					for (int i = metadata.mLines.size() - 1; i >= display.size(); i--) {
-						metadata.mLines.remove(i).mEntity.remove();
-					}
+	@EventHandler(ignoreCancelled = false)
+	public void playerUntrackEvent(PlayerUntrackEntityEvent event) {
+		Player player = event.getPlayer();
+		Entity entity = event.getEntity();
+		if (entity instanceof Player targetPlayer) {
+			trackedEntities.computeIfPresent(targetPlayer.getUniqueId(), (uuid, existing) -> {
+				existing.removePlayer(player, targetPlayer);
+				if (existing.viewers.isEmpty()) {
+					return null;
+				}
+				return existing;
+			});
+		}
+	}
 
-					// update changed lines
-					int updatedSize = Math.min(existingSize, display.size());
-					for (int i = 0; i < updatedSize; i++) {
-						metadata.mLines.get(i).mEntity.customName(display.get(i));
-					}
-
-					metadata.mDisplay.clear();
-					metadata.mDisplay.addAll(display);
+	@EventHandler(ignoreCancelled = false)
+	public void playerHealthChangeEvent(ServerTickStartEvent event) {
+		final int tick = event.getTickNumber();
+		if (tick % 4 == 0) {
+			for (Player player : Bukkit.getOnlinePlayers()) {
+				NameTag nameTag = trackedEntities.get(player.getUniqueId());
+				if (nameTag != null) {
+					nameTag.update(player);
 				}
 			}
-
-			// Move titles
-			for (LineMetadata line : metadata.mLines) {
-				line.mEntity.teleport(player.getEyeLocation().add(0, line.mHeight, 0));
-			}
-		}
-
-		// When a player logs off, destroy the titles
-		for (Iterator<Map.Entry<UUID, PlayerMetadata>> iterator = METADATA.entrySet().iterator(); iterator.hasNext(); ) {
-			Map.Entry<UUID, PlayerMetadata> entry = iterator.next();
-			if (Bukkit.getPlayer(entry.getKey()) == null) {
-				iterator.remove();
-				PlayerMetadata metadata = entry.getValue();
-				destroyEntities(metadata);
-			}
-		}
-
-	}
-
-	private static PlayerMetadata createLines(Player targetPlayer, List<Component> display) {
-		List<LineMetadata> lines = new ArrayList<>();
-		for (int i = 0; i < display.size(); i++) {
-			lines.add(createLine(targetPlayer, display.get(i), i));
-		}
-		return new PlayerMetadata(lines, display);
-	}
-
-	private static LineMetadata createLine(Player targetPlayer, Component text, int index) {
-
-		double height = 0.15 + index * 0.25;
-
-		Entity line = targetPlayer.getWorld().spawn(targetPlayer.getEyeLocation().add(0, height, 0), BlockDisplay.class, entity -> {
-			EntityUtils.setRemoveEntityOnUnload(entity);
-			entity.customName(text);
-			entity.setCustomNameVisible(true);
-			entity.setTransformationMatrix(new Matrix4f().scale(0));
-			entity.setTeleportDuration(UPDATE_INTERVAL + 1);
-			targetPlayer.hideEntity(Plugin.getInstance(), entity);
-		});
-
-		return new LineMetadata(line, height);
-	}
-
-	private static List<Component> getDisplay(Player player) {
-		List<Component> result = new ArrayList<>();
-
-		// lowest: optional title
-		Cosmetic title = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.TITLE);
-		if (title != null) {
-			result.add(Component.text(title.mName, NamedTextColor.GRAY));
-		}
-
-		// Track if player cannot heal
-		boolean hasAntiHeal = false;
-		ItemStatManager.PlayerItemStats.ItemStatsMap playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(player).getItemStats();
-		double antiHealFromEnchants = Sustenance.getHealingMultiplier(playerItemStats.get(EnchantmentType.SUSTENANCE), playerItemStats.get(EnchantmentType.CURSE_OF_ANEMIA));
-
-		PercentHeal antiHeal = Plugin.getInstance().mEffectManager.getActiveEffect(player, PercentHeal.class);
-		if ((antiHeal != null && antiHeal.getValue() <= -1) || antiHealFromEnchants <= 0) {
-			hasAntiHeal = true;
-		}
-
-		// middle: health
-		int health = (int) Math.round(player.getHealth());
-		int maxHealth = (int) Math.round(EntityUtils.getMaxHealth(player));
-		float redFactor = Math.max(0, Math.min(1, 1.25f * health / maxHealth - 0.25f)); // 100% red at 20% HP or below, white at full HP
-		Component healthLine = Component.text(health + "/" + maxHealth + " \u2665", hasAntiHeal ? TextColor.fromHexString("#5D2D87") : TextColor.color(1f, redFactor, redFactor)); // if you have anitheal, set color to purple
-		int absorption = (int) Math.round(AbsorptionUtils.getAbsorption(player));
-		if (absorption > 0) {
-			healthLine = healthLine.append(Component.text(" +" + absorption, NamedTextColor.YELLOW));
-		}
-		result.add(healthLine);
-
-		// top: name
-		result.add(Component.text(player.getName(), NamedTextColor.WHITE));
-
-		return result;
-	}
-
-	private void destroyEntities(PlayerMetadata metadata) {
-		for (LineMetadata line : metadata.mLines) {
-			line.mEntity.remove();
 		}
 	}
-
 }

@@ -200,7 +200,7 @@ public final class ParrotCustomInventory extends Gui {
 		ItemStack spawnParrot = buildItem(Material.ARMOR_STAND, "Place Parrots", List.of(), false);
 		GUI_ITEMS.add(new ParrotGuiItem(this, ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 3, spawnParrot,
 			(player, inv) -> ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.PLOT)
-				                 && ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.CURRENT_PLOT).orElse(-1) == ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(-2),
+				&& ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.CURRENT_PLOT).orElse(-1) == ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(-2),
 			(player, inv) -> {
 				mSelectedAction = ParrotAction.PLACE;
 				return true;
@@ -326,7 +326,7 @@ public final class ParrotCustomInventory extends Gui {
 
 		int corridorsScore = ScoreboardUtils.getScoreboardValue(mPlayer, "RogEndless").orElse(0);
 		createParrotItems(ParrotVariant.CORRIDORS, ParrotGUIPage.R1, 19,
-			List.of("Requires clearing floor 12 from Ephemeral Corridors", "You have cleared floor " + corridorsScore),
+			List.of("Requires clearing floor 12 from Ephemeral Corridors", "You have cleared floor " + (corridorsScore - 1)),
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(mPlayer, "RogEndless").orElse(0) > 12,
 			ImmutableMap.of(persistentParchment, 24));
 
@@ -430,10 +430,10 @@ public final class ParrotCustomInventory extends Gui {
 		createParrotItemsFinal(ParrotVariant.RAINBOW, ParrotGUIPage.SPECIAL, 11,
 			rainbowCost,
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "ParrotBought1").orElse(0) > 0 &&
-				                 ScoreboardUtils.getScoreboardValue(player, "ParrotBought2").orElse(0) > 0 &&
-				                 ScoreboardUtils.getScoreboardValue(player, "ParrotBought3").orElse(0) > 0 &&
-				                 ScoreboardUtils.getScoreboardValue(player, "ParrotBought4").orElse(0) > 0 &&
-				                 ScoreboardUtils.getScoreboardValue(player, "ParrotBought5").orElse(0) > 0,
+				ScoreboardUtils.getScoreboardValue(player, "ParrotBought2").orElse(0) > 0 &&
+				ScoreboardUtils.getScoreboardValue(player, "ParrotBought3").orElse(0) > 0 &&
+				ScoreboardUtils.getScoreboardValue(player, "ParrotBought4").orElse(0) > 0 &&
+				ScoreboardUtils.getScoreboardValue(player, "ParrotBought5").orElse(0) > 0,
 			ImmutableMap.of(
 				hcs, 32,
 				hxp, 32,
@@ -495,8 +495,8 @@ public final class ParrotCustomInventory extends Gui {
 			ItemStack hiddenDisplayItem = buildItem(variant.getDisplayitem(), variant.getName(), hiddenUnlockLore, variant == ParrotVariant.DEPTHS_UPGRADE);
 			GUI_ITEMS.add(new ParrotGuiItem(this, page.mNum, slot, hiddenDisplayItem,
 				(player, inv) -> mSelectedAction == ParrotAction.NONE
-					                 && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
-					                 && !showUnlockRequirements.test(player, inv)));
+					&& ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
+					&& !showUnlockRequirements.test(player, inv)));
 		}
 
 		// locked parrot (cannot be bought yet)
@@ -504,9 +504,9 @@ public final class ParrotCustomInventory extends Gui {
 			ItemStack lockedDisplayItem = buildItemComponents(variant.getDisplayitem(), variant.getName(), requirementsLore, variant == ParrotVariant.DEPTHS_UPGRADE);
 			GUI_ITEMS.add(new ParrotGuiItem(this, page.mNum, slot, lockedDisplayItem,
 				(player, inv) -> mSelectedAction == ParrotAction.NONE
-					                 && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
-					                 && !requirements.test(player, inv)
-					                 && (showUnlockRequirements == null || showUnlockRequirements.test(player, inv))));
+					&& ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
+					&& !requirements.test(player, inv)
+					&& (showUnlockRequirements == null || showUnlockRequirements.test(player, inv))));
 		}
 
 		// buyable parrot
@@ -518,9 +518,9 @@ public final class ParrotCustomInventory extends Gui {
 		ItemStack buyDisplayItem = buildItem(variant.getDisplayitem(), "Buy " + variant.getName(), costLore, variant == ParrotVariant.DEPTHS_UPGRADE);
 		GUI_ITEMS.add(new ParrotGuiItem(this, page.mNum, slot, buyDisplayItem, cost,
 			(player, inv) -> mSelectedAction == ParrotAction.NONE
-				                 && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
-				                 && (requirements == null || requirements.test(player, inv))
-				                 && (showUnlockRequirements == null || showUnlockRequirements.test(player, inv)),
+				&& ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
+				&& (requirements == null || requirements.test(player, inv))
+				&& (showUnlockRequirements == null || showUnlockRequirements.test(player, inv)),
 			(player, inv) -> {
 				ScoreboardUtils.setScoreboardValue(player, scoreboard, (int) Instant.now().getEpochSecond());
 				return true;
@@ -562,29 +562,30 @@ public final class ParrotCustomInventory extends Gui {
 		return GUIUtils.createBasicItem(mat, 1, cName, finalLore, true);
 	}
 
-/**------------Parrot GUI layout-------------
- *
- * ==================== R1 - R2 - Special ==============================
- * |   X  |   X  |   X  |   X  |   X  |   X  |   X  |   X  |   X  |
- * |   X  |   p  |   p  |   p  |   p  |   p  |   p  |   p  |   X  |
- * |   X  |   p  |   p  |   p  |   p  |   p  |   p  |   p  |   X  |
- * |   X  |   p  |   p  |   p  |   p  |   p  |   p  |   p  |   X  |
- * |   X  |   p  |   p  |   p  |   p  |   p  |   p  |   p  |   X  |
- * |  <-  |Remove|   X  |  SL  |double|  SR  |   X  |   V  |  ->  |
- * =====================================================================
- *
- * Where:
- *  X -> black stained glass pane (Junk border item)
- *  p -> parrot
- *  SL -> Shoulder Left
- *  SR -> Shoulder Right
- *  Double -> make you buy the option to have 2 different parrot
- *  remove -> clear currents parrot
- *  V -> SetParrotVisible true or false
- *  arrow to swap pages
- *
- * Parrots slots = {10-16, 19-25, 28-34, 37-43}
- */
+	/**
+	 * ------------Parrot GUI layout-------------
+	 * <p>
+	 * ==================== R1 - R2 - Special ==============================
+	 * |   X  |   X  |   X  |   X  |   X  |   X  |   X  |   X  |   X  |
+	 * |   X  |   p  |   p  |   p  |   p  |   p  |   p  |   p  |   X  |
+	 * |   X  |   p  |   p  |   p  |   p  |   p  |   p  |   p  |   X  |
+	 * |   X  |   p  |   p  |   p  |   p  |   p  |   p  |   p  |   X  |
+	 * |   X  |   p  |   p  |   p  |   p  |   p  |   p  |   p  |   X  |
+	 * |  <-  |Remove|   X  |  SL  |double|  SR  |   X  |   V  |  ->  |
+	 * =====================================================================
+	 * <p>
+	 * Where:
+	 * X -> black stained glass pane (Junk border item)
+	 * p -> parrot
+	 * SL -> Shoulder Left
+	 * SR -> Shoulder Right
+	 * Double -> make you buy the option to have 2 different parrot
+	 * remove -> clear currents parrot
+	 * V -> SetParrotVisible true or false
+	 * arrow to swap pages
+	 * <p>
+	 * Parrots slots = {10-16, 19-25, 28-34, 37-43}
+	 */
 	public ParrotCustomInventory(Player owner) throws Exception {
 		super(owner, ROWS * COLUMNS, "Parrots");
 		loadItems();

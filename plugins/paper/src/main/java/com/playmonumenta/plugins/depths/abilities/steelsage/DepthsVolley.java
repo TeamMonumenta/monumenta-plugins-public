@@ -73,8 +73,8 @@ public class DepthsVolley extends DepthsAbility {
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (!mPlayer.isSneaking()
-			    || isOnCooldown()
-			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			|| isOnCooldown()
+			|| !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			return true;
 		}
 
@@ -87,7 +87,7 @@ public class DepthsVolley extends DepthsAbility {
 		mDepthsVolley.clear();
 		mDepthsVolleyHitMap.clear();
 
-		float projSpeed = (float) projectile.getVelocity().length();
+		float projSpeed = ItemUtils.getVanillaProjectileSpeed(mPlayer.getInventory().getItemInMainHand());
 		// Give time for other skills to set data
 		new BukkitRunnable() {
 			@Override
@@ -154,7 +154,7 @@ public class DepthsVolley extends DepthsAbility {
 	}
 
 	private static Description<DepthsVolley> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsVolley>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Shooting a projectile while sneaking shoots a volley consisting of ")
 			.add(a -> a.mArrows, ARROWS[rarity - 1], false, null, true)
 			.add(" projectiles instead. Only one arrow is consumed, and each projectile deals ")

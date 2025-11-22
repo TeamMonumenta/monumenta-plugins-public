@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.itemstats.enums;
 
-import com.playmonumenta.plugins.listeners.JunkItemListener;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -9,6 +8,7 @@ import de.tr7zw.nbtapi.NBTType;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.List;
+import java.util.Set;
 import org.bukkit.inventory.ItemStack;
 
 public enum PickupFilterResult {
@@ -26,6 +26,9 @@ public enum PickupFilterResult {
 	public static final String PICKUP_TAG = "Pickup";
 	public static final String PICKUP_FILTER_TAG = "FilterResult";
 	public static final String PICKUP_COUNT_TAG = "PickupCount";
+
+	public static final Set<Tier> IGNORED_TIERS = Set.of(Tier.NONE, Tier.ZERO);
+
 
 	public final String mId;
 	public final List<String> mTags;
@@ -71,7 +74,7 @@ public enum PickupFilterResult {
 
 		// Rules for every other item
 		Tier tier = ItemStatUtils.getTier(item);
-		if (!JunkItemListener.IGNORED_TIERS.contains(tier) || ItemUtils.isQuestItem(item) || InventoryUtils.containsSpecialLore(item)) {
+		if (!IGNORED_TIERS.contains(tier) || ItemUtils.isQuestItem(item) || InventoryUtils.containsSpecialLore(item)) {
 			return TIERED;
 		}
 

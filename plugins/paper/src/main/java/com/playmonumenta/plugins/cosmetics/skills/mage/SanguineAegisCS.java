@@ -88,23 +88,23 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -units, units, front,
 			t -> 0.96 * t / units,
-				t -> 0, t -> 0.32 * FastUtils.cos(t * Math.PI / 2 / units) + 0.04,
-				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
+			t -> 0, t -> 0.32 * FastUtils.cos(t * Math.PI / 2 / units) + 0.04,
+			(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
 		);
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -units, units, front,
 			t -> 0.96 * t / units,
-				t -> 0, t -> -0.32 * FastUtils.cos(t * Math.PI / 2 / units) + 0.04,
-				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
+			t -> 0, t -> -0.32 * FastUtils.cos(t * Math.PI / 2 / units) + 0.04,
+			(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
 		);
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -units, units, front,
 			t -> 0.32 * FastUtils.cos(t * Math.PI / 2 / units) + 0.04,
-				t -> 0, t -> 0.96 * t / units,
-				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
+			t -> 0, t -> 0.96 * t / units,
+			(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
 		);
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -units, units, front,
 			t -> -0.32 * FastUtils.cos(t * Math.PI / 2 / units) + 0.04,
-				t -> 0, t -> 0.96 * t / units,
-				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
+			t -> 0, t -> 0.96 * t / units,
+			(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
 		);
 
 	}
@@ -113,6 +113,7 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 	public void prismaOnStun(LivingEntity mob, int stunTime, Player player) {
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks++ >= stunTime) {
@@ -124,15 +125,15 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 	}
 
 	@Override
-	public void prismaOnHeal(Player player) {
+	public void prismaOnHeal(Player player, LivingEntity enemy) {
 		Location location = player.getLocation();
 		player.getWorld().playSound(location.clone(), Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_INSIDE, SoundCategory.PLAYERS, 3f, 0.6f);
 
 		Vector front = VectorUtils.rotateYAxis(new Vector(0, 0, 2), location.clone().getYaw());
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -HEAL_UNIT, HEAL_UNIT, front,
 			t -> 0.25 * FastUtils.sin(t * Math.PI / HEAL_UNIT),
-				t -> 0, t -> 1.0 * t / HEAL_UNIT,
-				(loc, t) -> new BukkitRunnable() {
+			t -> 0, t -> 1.0 * t / HEAL_UNIT,
+			(loc, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(player);
@@ -141,8 +142,8 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 		);
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -HEAL_UNIT, HEAL_UNIT, front,
 			t -> -0.25 * FastUtils.sin(t * Math.PI / HEAL_UNIT),
-				t -> 0, t -> 1.0 * t / HEAL_UNIT,
-				(loc, t) -> new BukkitRunnable() {
+			t -> 0, t -> 1.0 * t / HEAL_UNIT,
+			(loc, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(player);
@@ -152,8 +153,8 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -HEAL_UNIT, HEAL_UNIT, front,
 			t -> 1.0 * t / HEAL_UNIT,
-				t -> 0, t -> 0.25 * FastUtils.sin(t * Math.PI / HEAL_UNIT),
-				(loc, t) -> new BukkitRunnable() {
+			t -> 0, t -> 0.25 * FastUtils.sin(t * Math.PI / HEAL_UNIT),
+			(loc, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(player);
@@ -162,8 +163,8 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 		);
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -HEAL_UNIT, HEAL_UNIT, front,
 			t -> 1.0 * t / HEAL_UNIT,
-				t -> 0, t -> -0.25 * FastUtils.sin(t * Math.PI / HEAL_UNIT),
-				(loc, t) -> new BukkitRunnable() {
+			t -> 0, t -> -0.25 * FastUtils.sin(t * Math.PI / HEAL_UNIT),
+			(loc, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(player);

@@ -277,18 +277,18 @@ public final class Grave {
 			if (!mAlertedSpawned) {
 				mAlertedSpawned = true;
 				Component message = Component.text("You have a grave at ", NamedTextColor.AQUA)
-					                    .append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ()));
+					.append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ()));
 				if (!mGhostGrave) {
 					message = message.append(Component.text(" with "))
-						          .append(Component.text(mItems.size() == 1 ? "1 item." : mItems.size() + " items.")
-							                  .hoverEvent(HoverEvent.showText(getItemList(false))));
+						.append(Component.text(mItems.size() == 1 ? "1 item." : mItems.size() + " items.")
+							.hoverEvent(HoverEvent.showText(getItemList(false))));
 				}
 				message = message.append(Component.text(" (/help death for more info)")
-					                         .clickEvent(ClickEvent.runCommand("/help death")))
-					          .append(Component.text(" "))
-					          .append(Component.text("Click to delete this grave permanently.", NamedTextColor.RED)
-						                  .hoverEvent(HoverEvent.showText(Component.text("Delete grave", NamedTextColor.RED)))
-						                  .clickEvent(ClickEvent.runCommand("/grave delete " + mUuid)));
+						.clickEvent(ClickEvent.runCommand("/help death")))
+					.append(Component.text(" "))
+					.append(Component.text("Click to delete this grave permanently.", NamedTextColor.RED)
+						.hoverEvent(HoverEvent.showText(Component.text("Delete grave", NamedTextColor.RED)))
+						.clickEvent(ClickEvent.runCommand("/grave delete " + mUuid)));
 				mPlayer.sendMessage(message);
 			}
 		}
@@ -430,12 +430,12 @@ public final class Grave {
 
 			if (collected > 0) {
 				player.sendMessage(Component.text("You collected ", NamedTextColor.AQUA)
-					                   .append(Component.text(collected == 1 ? "1 item from the grave" : collected + " items from the grave."))
+					.append(Component.text(collected == 1 ? "1 item from the grave" : collected + " items from the grave."))
 				);
 			}
 			if (remaining > 0) {
 				player.sendMessage(Component.text("There ", NamedTextColor.AQUA)
-					                   .append(Component.text(remaining == 1 ? "is 1 item remaining in the grave" : "are " + remaining + " items remaining in the grave."))
+					.append(Component.text(remaining == 1 ? "is 1 item remaining in the grave" : "are " + remaining + " items remaining in the grave."))
 				);
 			}
 			if (mItems.isEmpty()) {
@@ -451,14 +451,14 @@ public final class Grave {
 							continue;
 						}
 						ItemUtils.ItemIdentifier identifier = ItemUtils.getIdentifier(graveEquipment, true);
-						for (Inventory inv : hasEnderChest ? new Inventory[] {player.getInventory(), player.getEnderChest()} : new Inventory[] {player.getInventory()}) {
+						for (Inventory inv : hasEnderChest ? new Inventory[]{player.getInventory(), player.getEnderChest()} : new Inventory[]{player.getInventory()}) {
 							ItemStack[] contents = inv.getContents();
 							for (int i = contents.length - 1; i >= 0; i--) { // loop from high to low to check equipment first
 								ItemStack playerItem = contents[i];
 								if (playerItem != null
-									    && playerItem.getAmount() == 1
-									    && identifier.isIdentifierFor(playerItem, true)
-									    && Shattered.unshatterOneLevel(playerItem)) {
+									&& playerItem.getAmount() == 1
+									&& identifier.isIdentifierFor(playerItem, true)
+									&& Shattered.unshatterOneLevel(playerItem)) {
 									unshattered++;
 									continue equipmentLoop;
 								}
@@ -466,14 +466,14 @@ public final class Grave {
 							// if the item is not in the player's inventory, try Shulker boxes in the inventory (e.g. Loadout Lockboxes)
 							for (ItemStack item : contents) {
 								if (item != null
-									    && ItemUtils.isShulkerBox(item.getType())
-									    && item.getItemMeta() instanceof BlockStateMeta meta
-									    && meta.getBlockState() instanceof ShulkerBox shulkerBox) {
+									&& ItemUtils.isShulkerBox(item.getType())
+									&& item.getItemMeta() instanceof BlockStateMeta meta
+									&& meta.getBlockState() instanceof ShulkerBox shulkerBox) {
 									for (ItemStack shulkerItem : shulkerBox.getInventory().getContents()) {
 										if (shulkerItem != null
-											    && shulkerItem.getAmount() == 1
-											    && identifier.isIdentifierFor(shulkerItem, true)
-											    && Shattered.unshatterOneLevel(shulkerItem)) {
+											&& shulkerItem.getAmount() == 1
+											&& identifier.isIdentifierFor(shulkerItem, true)
+											&& Shattered.unshatterOneLevel(shulkerItem)) {
 											unshattered++;
 											meta.setBlockState(shulkerBox);
 											item.setItemMeta(meta);
@@ -493,9 +493,9 @@ public final class Grave {
 							}, 60);
 						}
 						player.sendMessage(Component.text("You do not have any items on you that this grave could unshatter. ", NamedTextColor.AQUA)
-							                   .append(Component.text("Click here to delete this grave.", NamedTextColor.RED)
-								                           .hoverEvent(HoverEvent.showText(Component.text("Delete grave", NamedTextColor.RED)))
-								                           .clickEvent(ClickEvent.runCommand("/grave delete " + mUuid))));
+							.append(Component.text("Click here to delete this grave.", NamedTextColor.RED)
+								.hoverEvent(HoverEvent.showText(Component.text("Delete grave", NamedTextColor.RED)))
+								.clickEvent(ClickEvent.runCommand("/grave delete " + mUuid))));
 						Phylactery.giveStoredXP(mPlayer);
 						return; // don't delete
 					}
@@ -516,21 +516,21 @@ public final class Grave {
 		} else {
 			// Clicked by non-owner
 			player.sendMessage(Component.text("This grave belongs to ", NamedTextColor.AQUA)
-				                   .append(mPlayer.displayName().hoverEvent(mPlayer))
-				                   .append(Component.text("."))
+				.append(mPlayer.displayName().hoverEvent(mPlayer))
+				.append(Component.text("."))
 			);
 			if (!mGraveMessageCooldown.contains(mUuid)) {
 				Component message = Component.text("Your grave at ", NamedTextColor.AQUA)
-					                    .append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ(), NamedTextColor.AQUA));
-				if (mItems.size() > 0) {
+					.append(Component.text(mLocation.getBlockX() + "," + mLocation.getBlockY() + "," + mLocation.getBlockZ(), NamedTextColor.AQUA));
+				if (!mItems.isEmpty()) {
 					message = message.append(Component.text(" with ", NamedTextColor.AQUA))
-						          .append(Component.text(getItems().size() + " item" + (getItems().size() > 1 ? "s" : ""), NamedTextColor.AQUA)
-							                  .hoverEvent(HoverEvent.showText(getItemList(false))));
+						.append(Component.text(getItems().size() + " item" + (getItems().size() > 1 ? "s" : ""), NamedTextColor.AQUA)
+							.hoverEvent(HoverEvent.showText(getItemList(false))));
 				}
 				message = message.append(Component.text(" has been located by another player! ", NamedTextColor.AQUA))
-					          .append(Component.text("Click here to delete this grave permanently.", NamedTextColor.RED)
-						                  .hoverEvent(HoverEvent.showText(Component.text("Delete grave", NamedTextColor.RED)))
-						                  .clickEvent(ClickEvent.runCommand("/grave delete " + mUuid)));
+					.append(Component.text("Click here to delete this grave permanently.", NamedTextColor.RED)
+						.hoverEvent(HoverEvent.showText(Component.text("Delete grave", NamedTextColor.RED)))
+						.clickEvent(ClickEvent.runCommand("/grave delete " + mUuid)));
 				if (mEntity != null) {
 					GravePoses.getEquippedGravePose(mPlayer).playAnimation(mEntity, player);
 				}

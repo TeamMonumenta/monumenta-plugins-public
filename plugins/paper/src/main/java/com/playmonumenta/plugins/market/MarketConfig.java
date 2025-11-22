@@ -10,10 +10,10 @@ public class MarketConfig {
 	public boolean mIsMarketOpen;
 
 	/*
-	*
-	*   BAZAAR
-	*
-	*/
+	 *
+	 *   BAZAAR
+	 *
+	 */
 
 	// represents the tax rate of bazaar listings. paid by the seller. 0.00 = 0%, 1.00 = 100%
 	public double mBazaarTaxRate;

@@ -195,7 +195,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 				//No more than 15 mobs from one portal can be out at a time
 				//Custom spawn rate for delves, 50% faster for normal portals and 25% faster for the ceiling portal
 				if (((!mDelve && mTicks % (100 / mPlayerCount) == 0) || (mDelve && mCeilingGate != null && mTicks % (80 / mPlayerCount) == 0) || (mDelve && mCeilingGate == null && mTicks % (67 / mPlayerCount) == 0))
-					    && mMobs.size() <= 15) {
+					&& mMobs.size() <= 15) {
 					ArmorStand as = mGates.get(FastUtils.RANDOM.nextInt(mGates.size()));
 					String mobName;
 
@@ -255,7 +255,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 					for (Player player : PlayerUtils.playersInRange(item.getLocation(), FalseSpirit.detectionRange, true)) {
 						MessagingUtils.sendNPCMessage(player, "Bhairavi", "Quickly! On the hanging bookshelves! The Spear has formed! Take it and throw it at the gate!");
-						}
+					}
 
 					Location beaconLoc = tridentLoc.clone().add(0, 3, 0);
 

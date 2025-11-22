@@ -31,7 +31,7 @@ public class Vigor implements Infusion {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		DamageEvent.DamageType type = event.getType();
-		if (type.equals(DamageType.MELEE) || type.equals(DamageType.MELEE_SKILL)) {
+		if (DamageType.getAllMeleeTypes().contains(type)) {
 			double damageBuffPct = value * getDamageForRegion(player);
 			event.updateGearDamageWithMultiplier(1.0 + damageBuffPct);
 		}

@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import java.util.function.Predicate;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -60,6 +59,7 @@ public class Encore extends DepthsAbility {
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				Location loc = mPlayer.getLocation().add(0, 0.1, 0);
@@ -99,7 +99,7 @@ public class Encore extends DepthsAbility {
 		}
 
 		ClassAbility spell = event.getSpell();
-		if (spell == ClassAbility.ICE_BARRIER || spell == ClassAbility.ENCORE) {
+		if (spell == ClassAbility.ICE_BARRIER || spell == ClassAbility.ENCORE || spell == ClassAbility.ESCAPE_ARTIST) {
 			return true;
 		}
 
@@ -111,13 +111,13 @@ public class Encore extends DepthsAbility {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T extends DepthsAbility> void abilityCastEventInner(DepthsAbility a, DepthsAbilityInfo<T> info, ClassAbility spell) {
 		Class<T> clazz = info.getAbilityClass();
 		if (a.getClass() != clazz) {
 			// Should never happen
 			return;
 		}
-		@SuppressWarnings("unchecked")
 		T ability = (T) a;
 
 		Runnable action;
@@ -138,14 +138,15 @@ public class Encore extends DepthsAbility {
 			if (triggers.isEmpty()) {
 				return;
 			}
-			Predicate<T> method = triggers.get(0).getAction();
-			action = () -> method.test(ability);
+			AbilityTriggerInfo.TriggerAction<T> method = triggers.get(0).getAction();
+			action = () -> method.run(ability);
 		}
 
 		// start the countdown!
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
 			Vector mRotation = VectorUtils.rotateYAxis(new Vector(1, 0, 0), mPlayer.getLocation().getYaw() + 90);
+
 			@Override
 			public void run() {
 				Location loc = mPlayer.getLocation().add(0, 0.25, 0);
@@ -158,10 +159,14 @@ public class Encore extends DepthsAbility {
 					mRotation = VectorUtils.rotateYAxis(mRotation, 18);
 				}
 				switch (mTicks) {
-					case 20 -> mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.CS7);
-					case 40 -> mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.F11);
-					case 60 -> mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.GS14);
-					case 80 -> mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.B17);
+					case 20 ->
+						mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.CS7);
+					case 40 ->
+						mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.F11);
+					case 60 ->
+						mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.GS14);
+					case 80 ->
+						mPlayer.playSound(loc, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.PLAYERS, 0.75f, Constants.NotePitches.B17);
 
 					case DELAY -> {
 						new PPCircle(Particle.NOTE, loc, 1.5).countPerMeter(0.75).extra(1).spawnAsPlayerActive(mPlayer);
@@ -203,8 +208,9 @@ public class Encore extends DepthsAbility {
 	}
 
 	private static Description<Encore> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Encore>(color)
-			.add("Left click while sneaking to cause the next active ability you cast to be recast at no cooldown cost ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to cause the next active ability you cast to be recast at no cooldown cost ")
 			.addDuration(DELAY)
 			.add(" seconds later.")
 			.addCooldown(COOLDOWN[rarity - 1], true);

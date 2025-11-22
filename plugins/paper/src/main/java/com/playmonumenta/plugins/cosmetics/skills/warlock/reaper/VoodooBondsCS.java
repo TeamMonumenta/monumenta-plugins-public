@@ -68,6 +68,7 @@ public class VoodooBondsCS implements CosmeticSkill {
 		startLoc.subtract(0, 2, 0);
 		new BukkitRunnable() {
 			double mD = 30;
+
 			@Override
 			public void run() {
 				Vector vec;

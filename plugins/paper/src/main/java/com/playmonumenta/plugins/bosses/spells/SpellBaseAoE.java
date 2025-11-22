@@ -85,7 +85,7 @@ public abstract class SpellBaseAoE extends Spell {
 			EntityUtils.selfRoot(mLauncher, mDuration);
 		}
 
-		new BukkitRunnable() {
+		mActiveTasks.add(new BukkitRunnable() {
 			float mTicks = 0;
 			double mCurrentRadius = mRadius;
 			final World mWorld = mLauncher.getWorld();
@@ -132,7 +132,7 @@ public abstract class SpellBaseAoE extends Spell {
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 
 	}
 

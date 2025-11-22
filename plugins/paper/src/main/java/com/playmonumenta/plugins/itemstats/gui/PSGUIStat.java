@@ -51,10 +51,10 @@ enum PSGUIStat {
 	// health and healing
 	HEALTH("Max Health", Formatting.NUMBER, stats -> Math.max(1, stats.getAttributeAmount(AttributeType.MAX_HEALTH, 20)) * (1 + Vitality.HEALTH_MOD_PER_LEVEL * stats.getInfusion(InfusionType.VITALITY))),
 	HEALING_RATE("Healing Rate", Formatting.PERCENT, stats -> Sustenance.getHealingMultiplier(stats.get(EnchantmentType.SUSTENANCE), stats.get(EnchantmentType.CURSE_OF_ANEMIA))
-		                                                          * Nutriment.getHealingMultiplier(stats.getInfusion(InfusionType.NUTRIMENT))),
+		* Nutriment.getHealingMultiplier(stats.getInfusion(InfusionType.NUTRIMENT))),
 	EFFECTIVE_HEALING_RATE("Effective Healing Rate", Formatting.PERCENT, stats -> HEALING_RATE.get(stats) * 20.0 / HEALTH.get(stats)),
 	REGENERATION("Regeneration per second", Formatting.NUMBER, stats -> ((4 * Regeneration.healPer5Ticks(stats.get(EnchantmentType.REGENERATION)))
-		                                                                     + (stats.getInfusion(InfusionType.SOOTHING) * Soothing.HEAL_PER_LEVEL)) * HEALING_RATE.get(stats)),
+		+ (stats.getInfusion(InfusionType.SOOTHING) * Soothing.HEAL_PER_LEVEL)) * HEALING_RATE.get(stats)),
 	EFFECTIVE_REGENERATION("Regeneration in %HP/s", Formatting.PERCENT, stats -> REGENERATION.get(stats) / HEALTH.get(stats)),
 	LIFE_DRAIN("Life Drain on crit", Formatting.NUMBER, stats -> LifeDrain.LIFE_DRAIN_CRIT_HEAL * Math.sqrt(stats.get(EnchantmentType.LIFE_DRAIN)) * HEALING_RATE.get(stats)),
 	EFFECTIVE_LIFE_DRAIN("Life Drain on crit in %HP", Formatting.PERCENT, stats -> LIFE_DRAIN.get(stats) / HEALTH.get(stats)),
@@ -66,7 +66,7 @@ enum PSGUIStat {
 	BLAST_DAMAGE_TAKEN("Blast", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(new BlastProtection(), new BlastFragility()), false, Formatting.DR_CHANGE_FORMAT),
 	FIRE_DAMAGE_TAKEN("Fire", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(new FireProtection(), new FireFragility()), false, Formatting.DR_CHANGE_FORMAT),
 	FALL_DAMAGE_TAKEN("Fall", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(new FeatherFalling(), new FallFragility())
-		                                                                 * Pennate.getFallDamageResistance(stats.getInfusion(InfusionType.PENNATE)), false, Formatting.DR_CHANGE_FORMAT),
+		* Pennate.getFallDamageResistance(stats.getInfusion(InfusionType.PENNATE)), false, Formatting.DR_CHANGE_FORMAT),
 	AILMENT_DAMAGE_TAKEN("Ailment", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(null, null), false, Formatting.DR_CHANGE_FORMAT),
 
 	// These stats are effective damage taken, but get displayed as effective damage reduction
@@ -101,19 +101,19 @@ enum PSGUIStat {
 	// melee
 	ATTACK_DAMAGE_ADD("+flat Attack Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.ATTACK_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD)),
 	ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", Formatting.PERCENT_MODIFIER,
-			stats -> (stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY)
-					+ stats.getAdditiveDamageDealtMultiplier() - 1
-					+ Vigor.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.VIGOR)) * stats.getMultiplicativeDamageDealtMultiplier()),
+		stats -> (stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY)
+			+ stats.getAdditiveDamageDealtMultiplier() - 1
+			+ Vigor.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.VIGOR)) * stats.getMultiplicativeDamageDealtMultiplier()),
 	TOTAL_ATTACK_DAMAGE("Total Attack Damage", Formatting.NUMBER, stats -> (1 + stats.get(AttributeType.ATTACK_DAMAGE_ADD)) * ATTACK_DAMAGE_MULTIPLY.get(stats)),
 	ATTACK_SPEED("Attack Speed", Formatting.NUMBER, stats -> stats.getAttributeAmount(AttributeType.ATTACK_SPEED, 4)
-		                                                         * (1 + (Grace.ATKS_BONUS * stats.getInfusion(InfusionType.GRACE)))),
+		* (1 + (Grace.ATKS_BONUS * stats.getInfusion(InfusionType.GRACE)))),
 
 	// projectile
 	PROJECTILE_DAMAGE_ADD("+flat Projectile Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD)),
 	PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", Formatting.PERCENT_MODIFIER,
-			stats -> (stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY)
-					+ stats.getAdditiveDamageDealtMultiplier() - 1
-					+ Focus.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.FOCUS)) * stats.getMultiplicativeDamageDealtMultiplier()),
+		stats -> (stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY)
+			+ stats.getAdditiveDamageDealtMultiplier() - 1
+			+ Focus.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.FOCUS)) * stats.getMultiplicativeDamageDealtMultiplier()),
 	TOTAL_PROJECTILE_DAMAGE("Total Projectile Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) * PROJECTILE_DAMAGE_MULTIPLY.get(stats)),
 	PROJECTILE_SPEED("Projectile Speed", Formatting.NUMBER, stats -> stats.get(AttributeType.PROJECTILE_SPEED)),
 	PROJECTILE_RATE("Shoot/Throw Rate", Formatting.NUMBER, stats -> {
@@ -137,13 +137,13 @@ enum PSGUIStat {
 	SPELL_POWER("Spell Power", Formatting.PERCENT, stats -> stats.get(AttributeType.SPELL_DAMAGE)),
 	MAGIC_DAMAGE_ADD("+flat Magic Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_ADD)),
 	MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", Formatting.PERCENT_MODIFIER,
-			stats -> (stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY)
-					+ stats.getAdditiveDamageDealtMultiplier() - 1
-					+ Perspicacity.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.PERSPICACITY)) * stats.getMultiplicativeDamageDealtMultiplier()),
+		stats -> (stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY)
+			+ stats.getAdditiveDamageDealtMultiplier() - 1
+			+ Perspicacity.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.PERSPICACITY)) * stats.getMultiplicativeDamageDealtMultiplier()),
 	TOTAL_SPELL_DAMAGE("Total Spell Damage %", Formatting.PERCENT, stats -> SPELL_POWER.get(stats) * MAGIC_DAMAGE_MULTIPLY.get(stats)),
 	COOLDOWN_MULTIPLIER("Cooldown Multiplier", Formatting.PERCENT, stats -> (1 + Aptitude.getCooldownPercentage(stats.get(EnchantmentType.APTITUDE)))
-		                                                                        * (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE)))
-		                                                                        * (1 + Epoch.getCooldownPercentage(stats.getInfusion(InfusionType.EPOCH))), false),
+		* (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE)))
+		* (1 + Epoch.getCooldownPercentage(stats.getInfusion(InfusionType.EPOCH))), false),
 	// misc
 	ARMOR("Total Armor", Formatting.NUMBER, stats -> stats.get(AttributeType.ARMOR)),
 	AGILITY("Total Agility", Formatting.NUMBER, stats -> stats.get(AttributeType.AGILITY)),
@@ -153,13 +153,14 @@ enum PSGUIStat {
 				+ Ardor.getMovementSpeedBonus(stats.getInfusion(InfusionType.ARDOR))
 				+ Expedite.getMovementSpeedBonus(stats.getInfusion(InfusionType.EXPEDITE), Expedite.MAX_STACKS)) / 0.1),
 	KNOCKBACK_RESISTANCE("Knockback Resistance", Formatting.PERCENT, stats -> Math.min(1, stats.getAttributeAmount(AttributeType.KNOCKBACK_RESISTANCE, 0)
-		                                                                                      + Unyielding.getKnockbackResistance(stats.getInfusion(InfusionType.UNYIELDING)))),
+		+ Unyielding.getKnockbackResistance(stats.getInfusion(InfusionType.UNYIELDING)))),
 	THORNS_DAMAGE("Thorns Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.THORNS) * stats.getAdditiveDamageDealtMultiplier() * stats.getMultiplicativeDamageDealtMultiplier()),
 	MINING_SPEED("Mining Speed", Formatting.NUMBER, stats -> ItemUtils.getMiningSpeed(stats.getItem(PSGUIEquipment.MAINHAND)) * (stats.getRegionScaling(stats.mPlayer, true) > 0 ? 0.3 : 1)),
 
 	;
 
 	// Has to be an inner class as static fields cannot be declared before enum constants
+	@SuppressWarnings("UnnecessaryLambda")
 	private static final class Formatting {
 
 		private static final DecimalFormat NUMBER_FORMATTER = new DecimalFormat("0.##");
@@ -167,12 +168,9 @@ enum PSGUIStat {
 		private static final DecimalFormat PERCENT_CHANGE_FORMATTER = new DecimalFormat("+0.##%;-0.##%");
 
 		private static final DoubleFunction<String> PERCENT = PERCENT_FORMATTER::format;
-		@SuppressWarnings("UnnecessaryLambda")
 		private static final DoubleFunction<String> ONE_MINUS_PERCENT = d -> PERCENT_FORMATTER.format(1 - d);
-		@SuppressWarnings("UnnecessaryLambda")
 		private static final DoubleFunction<String> PERCENT_MODIFIER = d -> PERCENT_FORMATTER.format(d - 1);
 		private static final DoubleFunction<String> NUMBER = NUMBER_FORMATTER::format;
-		@SuppressWarnings("UnnecessaryLambda")
 		private static final DoubleFunction<String> DR_CHANGE_FORMAT = d -> PERCENT_CHANGE_FORMATTER.format(d) + " damage taken";
 
 	}
@@ -206,7 +204,7 @@ enum PSGUIStat {
 	public Component getDisplay(PSGUIStats stats, @Nullable PSGUIStats otherStats) {
 		double value = get(stats);
 		Component comp = Component.text(mName + ": ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-			                 .append(Component.text(mFormat.apply(value), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+			.append(Component.text(mFormat.apply(value), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 		if (otherStats != null) {
 			double otherValue = get(otherStats);
 			NamedTextColor color;

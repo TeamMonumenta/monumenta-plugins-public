@@ -137,6 +137,7 @@ public class IronGrip extends DepthsAbility {
 				new BukkitRunnable() { // teleport multiple times so that it actually updates
 
 					int mTicks = 0;
+
 					@Override
 					public void run() {
 						EntityUtils.teleportStack(mob, finalDestination);
@@ -161,8 +162,9 @@ public class IronGrip extends DepthsAbility {
 	}
 
 	private static Description<IronGrip> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<IronGrip>(color)
-			.add("Right click while sneaking to rupture a ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to rupture a ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" block area up to ")
 			.add(a -> a.mRange, RANGE)

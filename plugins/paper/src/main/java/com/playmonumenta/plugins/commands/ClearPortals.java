@@ -6,8 +6,8 @@ public class ClearPortals extends GenericCommand {
 	public static void register() {
 
 		registerPlayerCommand("clearportals", "monumenta.command.clearportals",
-		                      (sender, player) -> {
-		                          PortalManager.clearAllPortals(player);
-		                      });
+			(sender, player) -> {
+				PortalManager.clearAllPortals(player);
+			});
 	}
 }

@@ -3,18 +3,20 @@ package com.playmonumenta.plugins.abilities.shaman.hexbreaker;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.DesecratingShotCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.NavigableSet;
@@ -44,18 +46,7 @@ public class DesecratingShot extends Ability {
 			.linkedSpell(ClassAbility.DESECRATING_SHOT)
 			.scoreboardId("DesecratingShot")
 			.shorthandName("DS")
-			.descriptions(
-				String.format("Upon hitting a mob with a fully charged projectile, apply %s%% weakness for %ss and deal %s%% magic damage of the projectile's damage in a %s block radius. %ss cooldown.",
-					StringUtils.multiplierToPercentage(WEAKNESS_1),
-					StringUtils.ticksToSeconds(WEAKNESS_DURATION),
-					StringUtils.multiplierToPercentage(DAMAGE_1),
-					RADIUS,
-					StringUtils.ticksToSeconds(COOLDOWN)
-				),
-				String.format("Damage is increased to %s%% of your bow shot and weaken increased to %s%%.",
-					StringUtils.multiplierToPercentage(DAMAGE_2),
-					StringUtils.multiplierToPercentage(WEAKNESS_2))
-			)
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Deal extra magic damage to mobs hit with your projectiles and apply a weakness debuff to mobs within a short range.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.TNT);
@@ -68,9 +59,6 @@ public class DesecratingShot extends Ability {
 
 	public DesecratingShot(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
 		mDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mWeaknessPercent = (isLevelOne() ? WEAKNESS_1 : WEAKNESS_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, WEAKNESS_DURATION);
@@ -87,8 +75,15 @@ public class DesecratingShot extends Ability {
 			Location loc = enemy.getLocation();
 
 			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(loc, mRadius);
+
+			ItemStatManager.PlayerItemStats projectileItemStats = DamageListener.getProjectileItemStats(projectile);
+			if (projectileItemStats == null) { // should hopefully never be null but just avoid the null check error :)
+				return false;
+			}
+			double projDamageAdd = projectileItemStats.getMainhandAddStats().get(AttributeType.PROJECTILE_DAMAGE_ADD);
+
 			for (LivingEntity mob : affectedMobs) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, event.getDamage() * mDamagePercent, ClassAbility.DESECRATING_SHOT, false, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, projDamageAdd * mDamagePercent, ClassAbility.DESECRATING_SHOT, false, true);
 				EntityUtils.applyWeaken(mPlugin, mDuration, mWeaknessPercent, mob);
 				mCosmetic.desecratingShotEffect(mPlayer, mob, mPlugin);
 			}
@@ -105,5 +100,28 @@ public class DesecratingShot extends Ability {
 			}
 		}
 		return false;
+	}
+
+	private static Description<DesecratingShot> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Shooting a mob with a critical projectile deals ")
+			.addPercent(a -> a.mDamagePercent, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" of the projectile damage as magic damage to mobs within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks and applies ")
+			.addPercent(a -> a.mWeaknessPercent, WEAKNESS_1, false, Ability::isLevelOne)
+			.add(" weaken for ")
+			.addDuration(a -> a.mDuration, WEAKNESS_DURATION)
+			.add(" seconds to them.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<DesecratingShot> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.addPercent(a -> a.mDamagePercent, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" of the projectile damage and weaken is increased to ")
+			.addPercent(a -> a.mWeaknessPercent, WEAKNESS_2, false, Ability::isLevelTwo)
+			.add(".");
 	}
 }

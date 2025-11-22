@@ -49,7 +49,7 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 
 	private static final double MOVEMENT_SPEED = 0.25;
 	private static final int MAXIMUM_BASE_HEALTH = 1024;
-	private static final int TIMER_INCREMENT = 20 * 1;
+	private static final int TIMER_INCREMENT = 20;
 	private static final int TIME_SPAWN = 0;
 	private static final int TIME_TITLE = 20 * 2;
 	private static final int TIME_BEGIN = 20 * 8;
@@ -115,7 +115,7 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void init() {
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, DETECTION_RANGE);
+		final int playerCount = PlayerUtils.playersInRange(mSpawnLoc, DETECTION_RANGE, true).size();
 		int health = (int) ((1 - Math.pow(0.5, playerCount)) * MAXIMUM_BASE_HEALTH);
 
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, health);
@@ -184,7 +184,7 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 			})
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 
 		events.put(50, mBoss -> {
 			changePhase(activeSpells2, passiveSpells2, null);

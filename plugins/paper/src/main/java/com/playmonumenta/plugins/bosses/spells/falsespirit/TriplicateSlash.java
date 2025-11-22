@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -24,8 +25,8 @@ import org.bukkit.util.Vector;
 
 public class TriplicateSlash extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 
 	//direction is 0 or 180
 	private int mDirection = 0;
@@ -74,12 +75,9 @@ public class TriplicateSlash extends Spell {
 						}
 					}
 
-					for (Player player : PlayerUtils.playersInRange(loc, 10, true)) {
-						for (BoundingBox box : boxes) {
-							if (player.getBoundingBox().overlaps(box)) {
-								DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, true, "Triplicate Slash");
-							}
-						}
+					Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+					for (Player player : hitbox.getHitPlayers(true)) {
+						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, true, "Triplicate Slash");
 					}
 
 					if (mTicks >= 90) {

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -16,7 +17,7 @@ public class FishingRodOverride extends BaseOverride {
 
 		if (action == Action.RIGHT_CLICK_BLOCK) {
 			//  If this is an interactable block it means they didn't really want to be fishing! :D
-			if (block.getType().isInteractable()) {
+			if (BlockUtils.INTERACTABLE.contains(block.getType())) {
 				if (plugin.mTrackingManager.mFishingHook.containsEntity(player)) {
 					plugin.mTrackingManager.mFishingHook.removeEntity(player);
 				}

@@ -12,8 +12,8 @@ import org.bukkit.potion.PotionEffectType;
 
 public class Darksight implements Enchantment {
 
-	private static HashSet<UUID> mDarksightPlayers = new HashSet<>();
-	private static final String DARKSIGHT_DISABLED_TAG = "DarksightDisabled";
+	private static final HashSet<UUID> mDarksightPlayers = new HashSet<>();
+	public static final String DARKSIGHT_DISABLED_TAG = "DarksightDisabled";
 
 	@Override
 	public String getName() {

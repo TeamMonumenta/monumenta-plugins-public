@@ -15,7 +15,7 @@ public class SpellLichKeyGlow extends Spell {
 
 	@Override
 	public void run() {
-		if (SpellDimensionDoor.getShadowed().size() > 0) {
+		if (!SpellDimensionDoor.getShadowed().isEmpty()) {
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20, 0, false));
 		}
 	}

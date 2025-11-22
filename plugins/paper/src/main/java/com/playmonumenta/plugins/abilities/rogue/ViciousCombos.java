@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.ViciousCombosCS;
@@ -31,7 +33,7 @@ public class ViciousCombos extends Ability {
 	private static final int VICIOUS_COMBOS_CRIPPLE_DURATION = 5 * 20;
 	private static final double VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL = 0.15;
 	private static final double VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL = 0.15;
-	private static final int ENHANCEMENT_COOLDOWN_REDUCTION = 1 * 20;
+	private static final int ENHANCEMENT_COOLDOWN_REDUCTION = 20;
 	private static final int ENHANCEMENT_CHARGE_LIFETIME = 3 * 20;
 	private static final double ENHANCEMENT_DAMAGE_INCREASE = 0.2;
 
@@ -47,22 +49,17 @@ public class ViciousCombos extends Ability {
 			.linkedSpell(ClassAbility.VICIOUS_COMBOS)
 			.scoreboardId("ViciousCombos")
 			.shorthandName("VC")
-			.descriptions(
-				String.format("Passively, killing an enemy refreshes the cooldown of your abilities by %s second. Killing an Elite or Boss enemy instead resets the cooldown of your abilities.",
-					VICIOUS_COMBOS_COOL_1 / 20),
-				String.format("Killing an enemy now refreshes your ability cooldowns by %s seconds. Killing an Elite or Boss enemy inflicts nearby enemies within %s blocks with %s%% weaken and %s%% Vulnerability for %s seconds.",
-					VICIOUS_COMBOS_COOL_2 / 20,
-					VICIOUS_COMBOS_RANGE,
-					(int) (VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL * 100),
-					(int) (VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL * 100),
-					VICIOUS_COMBOS_CRIPPLE_DURATION / 20),
-				String.format("When an ability goes on cooldown, your next melee attack in %ss deals %s%% more melee damage and that ability's cooldown is refreshed by %ss, prioritizing the last ability.",
-					ENHANCEMENT_CHARGE_LIFETIME / 20,
-					(int) (ENHANCEMENT_DAMAGE_INCREASE * 100),
-					ENHANCEMENT_COOLDOWN_REDUCTION / 20))
-			.simpleDescription("Killing mobs reduces cooldowns, and killing elite mobs completely refresh them.")
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
+			.simpleDescription("Killing mobs reduces cooldowns, and killing Elite mobs completely refreshes them.")
 			.quest216Message("-------n-------u-------")
 			.displayItem(Material.ZOMBIE_HEAD);
+
+	private final int mCDR;
+	private final double mRadius;
+	private final int mDuration;
+	private final double mVuln;
+	private final double mWeaken;
+	private final double mEnhancementDamage;
 
 	private @Nullable ClassAbility mLastAbility = null;
 	private int mAbilityCastTime = 0;
@@ -71,6 +68,12 @@ public class ViciousCombos extends Ability {
 
 	public ViciousCombos(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mCDR = CharmManager.getDuration(mPlayer, CHARM_CDR, isLevelOne() ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, VICIOUS_COMBOS_RANGE);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, VICIOUS_COMBOS_CRIPPLE_DURATION);
+		mVuln = VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
+		mWeaken = VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
+		mEnhancementDamage = ENHANCEMENT_DAMAGE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ViciousCombosCS());
 	}
 
@@ -83,28 +86,22 @@ public class ViciousCombos extends Ability {
 			loc = loc.add(0, 0.5, 0);
 			World world = mPlayer.getWorld();
 
-			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, VICIOUS_COMBOS_RANGE);
 			if (EntityUtils.isElite(killedEntity) || EntityUtils.isBoss(killedEntity)) {
 				mPlugin.mTimers.removeAllCooldowns(mPlayer);
 				MessagingUtils.sendActionBarMessage(mPlayer, "All your cooldowns have been reset");
 
 				if (isLevelTwo()) {
-					int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, VICIOUS_COMBOS_CRIPPLE_DURATION);
-					double vuln = VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
-					double weaken = VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
-					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, radius, mPlayer)) {
+					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, mRadius, mPlayer)) {
 						new PartialParticle(Particle.SPELL_MOB, mob.getLocation().clone().add(0, 1, 0), 10, 0.35, 0.5, 0.35, 0).spawnAsPlayerActive(mPlayer);
-						EntityUtils.applyVulnerability(mPlugin, duration, vuln, mob);
-						EntityUtils.applyWeaken(mPlugin, duration, weaken, mob);
+						EntityUtils.applyVulnerability(mPlugin, mDuration, mVuln, mob);
+						EntityUtils.applyWeaken(mPlugin, mDuration, mWeaken, mob);
 					}
 				}
-				mCosmetic.comboOnElite(world, loc, mPlayer, radius, killedEntity);
+				mCosmetic.comboOnElite(world, loc, mPlayer, mRadius, killedEntity);
 
 			} else if (EntityUtils.isHostileMob(killedEntity)) {
-				int timeReduction = (isLevelOne() ? VICIOUS_COMBOS_COOL_1 : VICIOUS_COMBOS_COOL_2) + (int) (CharmManager.getLevel(mPlayer, CHARM_CDR) * 20);
-
-				mPlugin.mTimers.updateCooldowns(mPlayer, timeReduction);
-				mCosmetic.comboOnKill(world, loc, mPlayer, radius, killedEntity);
+				mPlugin.mTimers.updateCooldowns(mPlayer, mCDR);
+				mCosmetic.comboOnKill(world, loc, mPlayer, mRadius, killedEntity);
 			}
 		}, 1);
 	}
@@ -120,11 +117,9 @@ public class ViciousCombos extends Ability {
 			&& event.getType() == DamageEvent.DamageType.MELEE
 			&& mLastAbility != null
 			&& Bukkit.getServer().getCurrentTick() < mAbilityCastTime + ENHANCEMENT_CHARGE_LIFETIME) {
-			double enhancementDamageMulti = ENHANCEMENT_DAMAGE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
-			event.updateDamageWithMultiplier(1 + enhancementDamageMulti);
+			event.updateDamageWithMultiplier(1 + mEnhancementDamage);
 			mPlugin.mTimers.updateCooldown(mPlayer, mLastAbility, ENHANCEMENT_COOLDOWN_REDUCTION);
-
-			// mPlayer.sendMessage(mLastAbility.getName() + " has been reduced!");
+			mCosmetic.enhancedCombo(enemy.getWorld(), mPlayer, enemy);
 
 			clearState();
 		}
@@ -141,7 +136,6 @@ public class ViciousCombos extends Ability {
 					// Get the index of the ability in mAbilities, add to the order.
 					mLastAbility = event.getSpell();
 					mAbilityCastTime = Bukkit.getServer().getCurrentTick();
-					// mPlayer.sendMessage(mLastAbility.getName() + " is Selected");
 				}
 			}.runTaskLater(mPlugin, 1);
 		}
@@ -152,6 +146,38 @@ public class ViciousCombos extends Ability {
 	public void clearState() {
 		mLastAbility = null;
 		mAbilityCastTime = 0;
-		// mPlayer.sendMessage("Cleared");
+	}
+
+	private static Description<ViciousCombos> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Passively, killing a mob refreshes the cooldown of your abilities by ")
+			.addDuration(a -> a.mCDR, VICIOUS_COMBOS_COOL_1, false, Ability::isLevelOne)
+			.add(" second. Killing an Elite or Boss mob instead resets the cooldown of your abilities.");
+	}
+
+	private static Description<ViciousCombos> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Killing a mob now refreshes your ability cooldowns by ")
+			.addDuration(a -> a.mCDR, VICIOUS_COMBOS_COOL_2, false, Ability::isLevelTwo)
+			.add(" seconds. Killing an Elite or Boss mob inflicts nearby mobs within ")
+			.add(a -> a.mRadius, VICIOUS_COMBOS_RANGE)
+			.add(" blocks with ")
+			.addPercent(a -> a.mWeaken, VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL)
+			.add(" weaken and ")
+			.addPercent(a -> a.mVuln, VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL)
+			.add(" vulnerability for ")
+			.addDuration(a -> a.mDuration, VICIOUS_COMBOS_CRIPPLE_DURATION)
+			.add(" seconds.");
+	}
+
+	private static Description<ViciousCombos> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When an ability goes on cooldown, your next melee attack within ")
+			.addDuration(ENHANCEMENT_CHARGE_LIFETIME)
+			.add(" seconds deals ")
+			.addPercent(a -> a.mEnhancementDamage, ENHANCEMENT_DAMAGE_INCREASE)
+			.add(" more melee damage and that ability's cooldown is refreshed by ")
+			.addDuration(ENHANCEMENT_COOLDOWN_REDUCTION)
+			.add(" second, prioritizing the last ability.");
 	}
 }

@@ -26,10 +26,10 @@ public class LimitedLifespanBoss extends BossAbilityGroup {
 		public boolean DELETE = false;
 
 		@BossParam(help = "Particles summoned when the boss dies due to running out of time")
-		public ParticlesList PARTICLES = ParticlesList.fromString("[]");
+		public ParticlesList PARTICLES = ParticlesList.EMPTY;
 
 		@BossParam(help = "Sounds played when the boss dies due to running out of time")
-		public SoundsList SOUNDS = SoundsList.fromString("[]");
+		public SoundsList SOUNDS = SoundsList.EMPTY;
 
 	}
 

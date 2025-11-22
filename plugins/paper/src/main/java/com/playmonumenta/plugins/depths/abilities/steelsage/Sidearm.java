@@ -43,7 +43,7 @@ public class Sidearm extends DepthsAbility implements AbilityWithChargesOrStacks
 	public static final int MAX_CHARGES = 3;
 	private static final int COOLDOWN = 14 * 20;
 	private static final int KILL_COOLDOWN_REDUCTION = 3 * 20;
-	private static final int[] DAMAGE = {12, 15, 18, 21, 24, 30};
+	private static final int[] DAMAGE = {15, 18, 21, 24, 27, 33};
 	private static final int RANGE = 14;
 
 	private static final Particle.DustOptions SIDEARM_COLOR = new Particle.DustOptions(Color.fromRGB(130, 130, 130), 1.0f);
@@ -124,7 +124,6 @@ public class Sidearm extends DepthsAbility implements AbilityWithChargesOrStacks
 		}
 
 
-
 		Location endLoc = result.getHitPosition().toLocation(world);
 		hitEffect(endLoc);
 
@@ -196,8 +195,9 @@ public class Sidearm extends DepthsAbility implements AbilityWithChargesOrStacks
 	}
 
 	private static Description<Sidearm> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Sidearm>(color)
-			.add("Right click to fire a flintlock shot, dealing ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to fire a flintlock shot, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" projectile damage to the first mob hit and having a range of ")
 			.add(a -> a.mRange, RANGE)

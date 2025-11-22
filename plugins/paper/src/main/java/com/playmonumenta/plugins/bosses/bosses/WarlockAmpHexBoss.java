@@ -6,14 +6,20 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -55,13 +61,24 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 
 		public EntityTargets TARGETS = EntityTargets.GENERIC_ONE_PLAYER_TARGET.clone().setRange(8).setLimit(EntityTargets.Limit.DEFAULT_CLOSER);
 
-		public ParticlesList PARTICLE_CONE_WARNING = ParticlesList.fromString("[(REDSTONE,2,0.1,0.1,0.1,0.1,RED,1)]");
-		public ParticlesList PARTICLE_CONE_HIT = ParticlesList.fromString("[(SPELL_WITCH,1,0.1,0.1,0.1,0.1),(CRIT_MAGIC,2,0.1,0.1,0.1,0.1)]");
-		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(CRIT_MAGIC,20,0.25,0.25,0.25,0.25)]");
+		public ParticlesList PARTICLE_CONE_WARNING = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 2, 0.1, 0.1, 0.1, 0.1, new Particle.DustOptions(Color.RED, 1.0f)))
+			.build();
+		public ParticlesList PARTICLE_CONE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_WITCH, 1, 0.1, 0.1, 0.1, 0.1))
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 2, 0.1, 0.1, 0.1, 0.1))
+			.build();
+		public ParticlesList PARTICLE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 20, 0.25, 0.25, 0.25, 0.25))
+			.build();
 		@BossParam(help = "The ticks between one spawn of the particles and the next")
 		public int PARTICLE_CONE_WARNING_FREQUENCY = 2;
 
-		public SoundsList SOUND_CAST = SoundsList.fromString("[(ENTITY_ZOMBIE_BREAK_WOODEN_DOOR,1,1),(ENTITY_BLAZE_SHOOT,3,1),(BLOCK_END_PORTAL_FRAME_FILL,3,0.5)]");
+		public SoundsList SOUND_CAST = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0f, 1.0f))
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_SHOOT, 3.0f, 1.0f))
+			.add(new SoundsList.CSound(Sound.BLOCK_END_PORTAL_FRAME_FILL, 3.0f, 0.5f))
+			.build();
 	}
 
 	public WarlockAmpHexBoss(Plugin plugin, LivingEntity boss) {
@@ -76,6 +93,7 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 				mBoss.setGlowing(true);
 
 				List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
+				List<LivingEntity> hitTargets = new ArrayList<>();
 				Vector dir = LocationUtils.getDirectionTo(targets.get(0).getLocation(), mBoss.getLocation());
 				Location tloc = mBoss.getLocation().setDirection(dir);
 
@@ -118,22 +136,29 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 									BoundingBox box = BoundingBox.of(l, 0.4, 2, 0.4);
 
 									for (LivingEntity target : targets) {
-										if (target.getBoundingBox().overlaps(box)) {
+										if (target.getBoundingBox().overlaps(box) && !hitTargets.contains(target)) {
+											hitTargets.add(target);
 											int debuffCount = 0;
+
+											// Count vanilla effects
 											for (PotionEffectType effectType : BAD_EFFECTS) {
 												PotionEffect effect = target.getPotionEffect(effectType);
 												if (effect != null) {
 													debuffCount++;
 												}
 											}
+
+											// Count custom debuffs
+											debuffCount += (int) EffectManager.getInstance().getPriorityEffects(target).values().stream().filter(Effect::isDebuff).count();
+
 											double damage = p.BASE_DAMAGE + p.DAMAGE_PER_DEBUFF * debuffCount;
 
 											if (damage > 0) {
-												BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, damage, p.SPELL_NAME, mBoss.getLocation());
+												BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, damage, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList());
 											}
 
 											if (p.DAMAGE_PERCENTAGE > 0.0) {
-												BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME);
+												BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME, p.EFFECTS.mEffectList());
 											}
 											p.EFFECTS.apply(target, mBoss);
 

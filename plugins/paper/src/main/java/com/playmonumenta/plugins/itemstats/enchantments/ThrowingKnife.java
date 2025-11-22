@@ -103,4 +103,7 @@ public class ThrowingKnife implements Enchantment {
 		return arrow.hasMetadata(METADATA_KEY);
 	}
 
+	public static float getBaseVelocity() {
+		return ARROW_VELOCITY;
+	}
 }

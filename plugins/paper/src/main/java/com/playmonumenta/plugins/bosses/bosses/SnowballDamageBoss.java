@@ -18,6 +18,7 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 	public static class Parameters extends BossParameters {
 		public int DETECTION = 50;
 		public int DAMAGE = 8;
+		public int STUN_DURATION = -1;
 	}
 
 	private final Parameters mParams;
@@ -26,7 +27,7 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		if (!(boss instanceof Snowman)) {
-			throw new Exception("boss_snowballdamage only works on snowmen!");
+			throw new Exception(identityTag + " only works on snowmen! Entity name='" + boss.getName() + "', tags=[" + String.join(",", boss.getScoreboardTags()) + "]");
 		}
 
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
@@ -39,7 +40,11 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		if (event.getHitEntity() instanceof Player player) {
 			if ((player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) && !player.isDead() && player.getHealth() > 0) {
-				BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, mParams.DAMAGE, event.getEntity().getLocation());
+				if (mParams.STUN_DURATION < 0) {
+					BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, mParams.DAMAGE, event.getEntity().getLocation());
+				} else {
+					BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, mParams.DAMAGE, null, event.getEntity().getLocation(), mParams.STUN_DURATION);
+				}
 			}
 		}
 	}

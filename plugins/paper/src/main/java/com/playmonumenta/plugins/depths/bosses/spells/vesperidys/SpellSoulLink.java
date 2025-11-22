@@ -41,7 +41,7 @@ public class SpellSoulLink extends Spell {
 	private final Vesperidys mVesperidys;
 	private final double mTooFarThreshold;
 
-	private static final List<Player> mWarnedPlayers = new ArrayList<>();
+	private final List<Player> mWarnedPlayers = new ArrayList<>();
 
 	private boolean mOnCooldown = false;
 
@@ -82,8 +82,8 @@ public class SpellSoulLink extends Spell {
 	public void soulLink(Player player1, Player player2) {
 		player1.playSound(player1.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1.45f);
 		player2.playSound(player2.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1.45f);
-		MessagingUtils.sendTitle(player1, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text(player2.getName(), NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5*20, 10);
-		MessagingUtils.sendTitle(player2, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text(player1.getName(), NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5*20, 10);
+		MessagingUtils.sendTitle(player1, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text(player2.getName(), NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5 * 20, 10);
+		MessagingUtils.sendTitle(player2, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text(player1.getName(), NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5 * 20, 10);
 
 		BukkitRunnable soulLinkRunnable = new BukkitRunnable() {
 			int mSoulLinkTicks = -FORECAST_TICKS;
@@ -155,29 +155,22 @@ public class SpellSoulLink extends Spell {
 					if (distance > DISTANCE_THRESHOLD) {
 						mPlugin.mEffectManager.addEffect(player1, "SoulLinkWeaken", new PercentDamageDealt(20, -0.5));
 						mPlugin.mEffectManager.addEffect(player2, "SoulLinkWeaken", new PercentDamageDealt(20, -0.5));
-
-						if (!mWarnedPlayers.contains(player1)) {
-							player1.sendMessage(Component.text("You are getting too far from the soul link! You feel your soul being stretched thinly.", NamedTextColor.AQUA));
-							mWarnedPlayers.add(player1);
-						}
-						if (!mWarnedPlayers.contains(player2)) {
-							player2.sendMessage(Component.text("You are getting too far from the soul link! You feel your soul being stretched thinly.", NamedTextColor.AQUA));
-							mWarnedPlayers.add(player2);
-						}
+						warnPlayer(player1);
+						warnPlayer(player2);
 
 						mTooFarCombo++;
 
 						MessagingUtils.sendTitle(player1, Component.text(""), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text(player2.getName(), NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)).append(Component.text(" (" + new DecimalFormat("#.#").format(Math.max(0.0, (mTooFarThreshold - mTooFarCombo) / 20.0)) + ")", NamedTextColor.RED, TextDecoration.BOLD)), 0, 20, 10);
 						MessagingUtils.sendTitle(player2, Component.text(""), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text(player1.getName(), NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)).append(Component.text(" (" + new DecimalFormat("#.#").format(Math.max(0.0, (mTooFarThreshold - mTooFarCombo) / 20.0)) + ")", NamedTextColor.RED, TextDecoration.BOLD)), 0, 20, 10);
 
-						if (mTooFarCombo > mTooFarThreshold) {
-							if (mTooFarCombo % 5 == 0) {
+						if (mTooFarCombo % 5 == 0) {
+							if (mTooFarCombo > mTooFarThreshold) {
 								damage(player1);
 								damage(player2);
+							} else {
+								player1.playSound(player1.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2f);
+								player2.playSound(player2.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2f);
 							}
-						} else if (mTooFarCombo % 5 == 0) {
-							player1.playSound(player1.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2f);
-							player2.playSound(player2.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2f);
 						}
 					} else {
 						mTooFarCombo = 0;
@@ -249,10 +242,8 @@ public class SpellSoulLink extends Spell {
 	}
 
 	public void soulLinkWithBoss(Player player) {
-		double tooFarThreshold = mTooFarThreshold;
-
 		player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1.45f);
-		MessagingUtils.sendTitle(player, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text("Vesperidys", NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5*20, 10);
+		MessagingUtils.sendTitle(player, Component.text("Stay Close!", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text("Vesperidys", NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)), 0, 5 * 20, 10);
 
 		BukkitRunnable soulLinkRunnable = new BukkitRunnable() {
 			int mSoulLinkTicks = -FORECAST_TICKS;
@@ -312,22 +303,18 @@ public class SpellSoulLink extends Spell {
 
 					if (distance > DISTANCE_THRESHOLD) {
 						mPlugin.mEffectManager.addEffect(player, "SoulLinkWeaken", new PercentDamageDealt(20, -0.5));
-
-						if (!mWarnedPlayers.contains(player)) {
-							player.sendMessage(Component.text("You are getting too far from the soul link! You feel your soul being stretched thinly.", NamedTextColor.AQUA));
-							mWarnedPlayers.add(player);
-						}
+						warnPlayer(player);
 
 						mTooFarCombo++;
 
-						MessagingUtils.sendTitle(player, Component.text(""), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text("Vesperidys", NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)).append(Component.text(" (" + new DecimalFormat("#.#").format(Math.max(0.0, (tooFarThreshold - mTooFarCombo) / 20.0)) + ")", NamedTextColor.RED, TextDecoration.BOLD)), 0, 20, 10);
+						MessagingUtils.sendTitle(player, Component.text(""), Component.text("Soul Linked with ", NamedTextColor.YELLOW).append(Component.text("Vesperidys", NamedTextColor.LIGHT_PURPLE, TextDecoration.UNDERLINED)).append(Component.text(" (" + new DecimalFormat("#.#").format(Math.max(0.0, (mTooFarThreshold - mTooFarCombo) / 20.0)) + ")", NamedTextColor.RED, TextDecoration.BOLD)), 0, 20, 10);
 
-						if (mTooFarCombo > tooFarThreshold) {
-							if (mTooFarCombo % 5 == 0) {
+						if (mTooFarCombo % 5 == 0) {
+							if (mTooFarCombo > mTooFarThreshold) {
 								damage(player);
+							} else {
+								player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2f);
 							}
-						} else if (mTooFarCombo % 5 == 0) {
-							player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2f);
 						}
 					} else {
 						mTooFarCombo = 0;
@@ -351,7 +338,7 @@ public class SpellSoulLink extends Spell {
 								.extra(9999999)
 								.spawnForPlayer(ParticleCategory.BOSS, player);
 						} else {
-							if (mTooFarCombo < tooFarThreshold) {
+							if (mTooFarCombo < mTooFarThreshold) {
 								new PartialParticle(Particle.FLAME, pLoc, 1, 0, 0, 0)
 									.extra(9999999)
 									.spawnForPlayer(ParticleCategory.BOSS, player);
@@ -383,6 +370,13 @@ public class SpellSoulLink extends Spell {
 		mActiveRunnables.add(soulLinkRunnable);
 	}
 
+	private void warnPlayer(Player player) {
+		if (!mWarnedPlayers.contains(player)) {
+			player.sendMessage(Component.text("You are getting too far from the soul link! You feel your soul being stretched thinly.", NamedTextColor.AQUA));
+			mWarnedPlayers.add(player);
+		}
+	}
+
 	public void damage(Player player) {
 		player.playSound(player.getLocation(), Sound.BLOCK_CHAIN_BREAK, 1, 1f);
 		player.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 1, 1f);
@@ -392,7 +386,8 @@ public class SpellSoulLink extends Spell {
 			.spawnAsBoss();
 	}
 
-	@Override public boolean canRun() {
+	@Override
+	public boolean canRun() {
 		return !mOnCooldown && !mVesperidys.mTeleportSpell.mTeleporting;
 	}
 

@@ -108,7 +108,8 @@ public class SpellBreakPlatform extends Spell {
 
 						BukkitRunnable runnableB = new BukkitRunnable() {
 
-							@Override public void run() {
+							@Override
+							public void run() {
 								if (currentPhase < 4 && (currentPhase != mVesperidys.mPhase)) {
 									this.cancel();
 									return;
@@ -155,11 +156,13 @@ public class SpellBreakPlatform extends Spell {
 		MovementUtils.knockAway(location, player, 0.5f, 0.75f, false);
 	}
 
-	@Override public boolean canRun() {
+	@Override
+	public boolean canRun() {
 		return !mOnCooldown && !mVesperidys.mTeleportSpell.mTeleporting;
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return 5 * 20;
 	}
 }

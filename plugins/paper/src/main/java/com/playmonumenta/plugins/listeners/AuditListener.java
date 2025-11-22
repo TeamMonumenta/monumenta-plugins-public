@@ -88,9 +88,11 @@ public class AuditListener implements Listener {
 			JunkItemListener.COMMAND,
 			JunkItemListener.ALIAS
 		)),
+		exactOptionalArguments("(minecraft:)?block (add|remove|list|list_raw)"),
 		exactOptionalArguments("(minecraft:)?(blockinteractions|bi)"),
 		exactOptionalArguments("(minecraft:)?claimraffle"),
 		exactOptionalArguments("(minecraft:)?(disabledrop|dd)"),
+		exactOptionalArguments("(minecraft:)?(friend|f) (add|remove|list|list_raw)"),
 		exactNoArguments("(minecraft:)?gg"),
 		exactOptionalArguments("(minecraft:)?glowing"),
 		exactNoArguments("(minecraft:)?grave list"),
@@ -100,21 +102,25 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("peb"),
 		exactOptionalArguments("(minecraft:)?player"),
 		exactOptionalArguments("(playerstats|ps)"),
-		exactOptionalArguments("(minecraft:)?plot (access|region)"),
+		exactOptionalArguments("(minecraft:)?plot (help|add|remove|info|info_raw|region)"),
 		exactOptionalArguments("(minecraft:)?race leaderboard"),
 		exactOptionalArguments("(minecraft:)?(rocketjump|rj)"),
+		exactNoArguments("(minecraft:)?rushpause"),
 		exactOptionalArguments("(minecraft:)?toggleswap"),
 		exactOptionalArguments("(minecraft:)?toggleworldnames"),
 		exactOptionalArguments("(minecraft:)?(virtualfirmament|vf)"),
 		exactOptionalArguments("(minecraft:)?(viewcharms|vc|viewzenithcharms|vzc)"),
 		exactOptionalArguments("(minecraft:)?wallet withdraw"),
+		exactOptionalArguments("(minecraft:)?punch"),
 		exactOptionalArguments("(spark:)?tps")
 	);
 
 	private static final List<Pattern> NEVER_IGNORED_COMMAND_REGEX = Arrays.asList(
+		exactOptionalArguments("(minecraft:)?block [^ ]+_other"),
+		exactOptionalArguments("(minecraft:)?(friend|f) [^ ]+_other"),
 		exactOptionalArguments("(minecraft:)?guild mod"),
 		exactOptionalArguments("(minecraft:)?mail mod"),
-		exactOptionalArguments("(minecraft:)?plot access [^ ]+_other")
+		exactOptionalArguments("(minecraft:)?plot [^ ]+_other")
 	);
 
 	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<>();

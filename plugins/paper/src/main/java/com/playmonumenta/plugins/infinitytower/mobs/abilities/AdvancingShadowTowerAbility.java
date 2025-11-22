@@ -38,7 +38,7 @@ public class AdvancingShadowTowerAbility extends TowerAbility {
 				List<LivingEntity> list = (mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs());
 				list.removeIf(le -> le.getScoreboardTags().contains(TowerConstants.MOB_TAG_UNTARGETABLE));
 				list.sort((a, b) -> (int) (a.getHealth() - b.getHealth()));
-				return list.size() > 0 ? list.get(0) : null;
+				return !list.isEmpty() ? list.get(0) : null;
 			}
 
 

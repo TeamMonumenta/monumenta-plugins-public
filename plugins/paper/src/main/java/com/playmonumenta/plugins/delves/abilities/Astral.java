@@ -65,7 +65,7 @@ public class Astral {
 		if (isLocationValidSpawnLoc(currentBlockLocation)) {
 			validSpawnLocs.add(currentBlockLocation);
 		}
-		if (validSpawnLocs.size() > 0) {
+		if (!validSpawnLocs.isEmpty()) {
 			Location loc = validSpawnLocs.get(FastUtils.RANDOM.nextInt(validSpawnLocs.size()));
 			List<String> mobPool = MOB_POOL;
 			if (FastUtils.RANDOM.nextDouble() < 0.0133) {
@@ -100,12 +100,9 @@ public class Astral {
 		Block block1Above = testLocation.clone().add(0, 1, 0).getBlock();
 		Block block2Above = testLocation.clone().add(0, 2, 0).getBlock();
 		Block block3Above = testLocation.clone().add(0, 3, 0).getBlock();
-		if (blockCurrent.isSolid() && !block1Above.isSolid() && !block2Above.isSolid() && !block3Above.isSolid()
-			    && !block1Above.getType().equals(Material.LAVA) && !block2Above.getType().equals(Material.LAVA)
-			    && !block3Above.getType().equals(Material.LAVA)) {
-			return true;
-		}
-		return false;
+		return blockCurrent.isSolid() && !block1Above.isSolid() && !block2Above.isSolid() && !block3Above.isSolid()
+			&& !block1Above.getType().equals(Material.LAVA) && !block2Above.getType().equals(Material.LAVA)
+			&& !block3Above.getType().equals(Material.LAVA);
 	}
 
 	public static void applyModifiers(Chest chest, int level) {

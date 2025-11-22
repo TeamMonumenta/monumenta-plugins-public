@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells.shura;
 
+import com.playmonumenta.plugins.bosses.bosses.CShura;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -26,59 +27,59 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-public class SpellShuraJump extends Spell {
+import static com.playmonumenta.plugins.Constants.HALF_TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
+public final class SpellShuraJump extends Spell {
+	private static final String SPELL_NAME = "Corrupted Strike";
+	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
-	private final double mRange;
+	private final World mWorld;
 	private boolean mTrigger = true;
-	private final double mVelocityMultiplier = 0.7;
-	private final int mCooldown = 8 * 20;
-	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 
-	public SpellShuraJump(Plugin plugin, LivingEntity boss, double range) {
+	public SpellShuraJump(final Plugin plugin, final LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
-		mRange = range;
+		mWorld = mBoss.getWorld();
 	}
 
 	@Override
 	public void run() {
 
-		BukkitRunnable a = new BukkitRunnable() {
+		final BukkitRunnable a = new BukkitRunnable() {
 			final List<Player> mTargeted = new ArrayList<>();
 
 			@Override
 			public void run() {
 				//List is the farthest players in the beginning, and nearest players at the end
-				List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), mRange);
+				List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), CShura.detectionRange);
 				players.removeAll(mTargeted);
-				// Remove farthest player until list is 4 or less
 				while (players.size() > 4) {
 					players.remove(0);
 				}
-				if (mTrigger && players.size() > 0) {
+				if (mTrigger && !players.isEmpty()) {
 					mTrigger = false;
 					jump(players.get(0));
 					mTargeted.add(players.get(0));
 				}
-				if (players.size() == 0) {
+				if (players.isEmpty()) {
 					this.cancel();
 				}
 			}
 		};
-		a.runTaskTimer(mPlugin, 0, 10);
+		a.runTaskTimer(mPlugin, 0, HALF_TICKS_PER_SECOND);
 		mActiveRunnables.add(a);
 	}
 
-	private void jump(Player targetPlayer) {
-		World world = mBoss.getWorld();
-		Location loc = mBoss.getLocation();
-		Location locTarget = targetPlayer.getLocation();
-		world.playSound(loc, Sound.ENTITY_PILLAGER_CELEBRATE, SoundCategory.PLAYERS, 1f, 1.1f);
-		new PartialParticle(Particle.CLOUD, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(mBoss);
+	private void jump(final Player targetPlayer) {
+		final Location loc = mBoss.getLocation();
+		final Location locTarget = targetPlayer.getLocation();
+		mWorld.playSound(loc, Sound.ENTITY_PILLAGER_CELEBRATE, SoundCategory.PLAYERS, 1f, 1.1f);
+		new PartialParticle(Particle.CLOUD, loc, 15, 1, 0, 1).spawnAsEntityActive(mBoss);
 
-		Location moveTo = loc.clone();
+		final Location moveTo = loc.clone();
 		int i;
 		for (i = 0; i < 3; i++) {
 			if (!moveTo.getBlock().isPassable()) {
@@ -94,16 +95,11 @@ public class SpellShuraJump extends Spell {
 		}
 
 		((Mob) mBoss).getPathfinder().moveTo(moveTo);
-
-
-		Vector velocity = locTarget.subtract(moveTo).toVector().normalize().multiply(mVelocityMultiplier);
+		final Vector velocity = locTarget.subtract(moveTo).toVector().normalize().multiply(0.7);
 		velocity.setY(1.1);
 
-		final Vector finalVelocity = velocity;
-
-		BukkitRunnable leap = new BukkitRunnable() {
+		final BukkitRunnable leap = new BukkitRunnable() {
 			final Location mLeapLocation = moveTo;
-			final Vector mDirection = finalVelocity;
 			boolean mLeaping = false;
 			boolean mHasBeenOneTick = false;
 
@@ -112,17 +108,17 @@ public class SpellShuraJump extends Spell {
 				if (!mLeaping) {
 					// start leaping
 					if (mBoss.getLocation().distance(mLeapLocation) < 1) {
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
+						mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 15, 1, 0f, 1, 0).spawnAsEntityActive(mBoss);
 						((Mob) mBoss).getPathfinder().stopPathfinding();
-						mBoss.setVelocity(finalVelocity);
+						mBoss.setVelocity(velocity);
 						mLeaping = true;
 					}
 				} else {
 					new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(mBoss);
 					mBoss.setFallDistance(0);
 					if (mBoss.isOnGround() && mHasBeenOneTick) {
-						land(mDirection, world);
+						land(velocity);
 						this.cancel();
 						return;
 					}
@@ -131,14 +127,14 @@ public class SpellShuraJump extends Spell {
 					for (Player player : mBoss.getWorld().getPlayers()) {
 						if (player.getBoundingBox().overlaps(hitbox) && mHasBeenOneTick) {
 							((Mob) mBoss).setTarget(player);
-							land(mDirection, world);
+							land(velocity);
 							this.cancel();
 							return;
 						}
 					}
 
 					// Give the caller a chance to run extra effects or manipulate the boss's leap velocity
-					if (targetPlayer.isOnline() && targetPlayer.getWorld().equals(mBoss.getWorld())) {
+					if (targetPlayer.isOnline() && targetPlayer.getWorld().equals(mWorld)) {
 						Vector towardsPlayer = targetPlayer.getLocation().subtract(mBoss.getLocation()).toVector().setY(0).normalize();
 						Vector originalVelocity = mBoss.getVelocity();
 						double scale = 0.5;
@@ -160,18 +156,17 @@ public class SpellShuraJump extends Spell {
 		mActiveRunnables.add(leap);
 	}
 
-	private void land(Vector v, World world) {
+	private void land(final Vector v) {
 		ParticleUtils.explodingRingEffect(mPlugin, mBoss.getLocation(), 4, 1, 4,
 			List.of(
-				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) -> {
-					new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);
-				})
+				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) ->
+					new PartialParticle(Particle.CLOUD, mBoss.getLocation()).count(1).delta(0.1).extra(0.1).spawnAsEntityActive(mBoss))
 			));
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
-		Location tloc = mBoss.getLocation().setDirection(v);
-		BukkitRunnable runB = new BukkitRunnable() {
+		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
+		final Location tloc = mBoss.getLocation().setDirection(v);
+		final BukkitRunnable runB = new BukkitRunnable() {
 			int mT = 0;
-			final PartialParticle mPRed = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 2, 0.1, 0.1, 0.1, 0.1, RED);
+			final PartialParticle mPRed = new PartialParticle(Particle.REDSTONE, mBoss.getLocation()).count(2).delta(0.1).extra(0.1).data(RED);
 
 			@Override
 			public void run() {
@@ -184,8 +179,7 @@ public class SpellShuraJump extends Spell {
 						v = VectorUtils.rotateXAxis(v, 0);
 						v = VectorUtils.rotateYAxis(v, tloc.getYaw() + 90);
 
-						Location loc = mBoss.getLocation().clone().add(v);
-						mPRed.location(loc).spawnAsBoss();
+						mPRed.location(mBoss.getLocation().clone().add(v)).spawnAsEntityActive(mBoss);
 					}
 				}
 				if (mT >= 5) {
@@ -199,18 +193,19 @@ public class SpellShuraJump extends Spell {
 							vec = VectorUtils.rotateYAxis(vec, tloc.getYaw() + 90);
 
 							Location l = mBoss.getLocation().clone().add(vec);
-							new PartialParticle(Particle.SWEEP_ATTACK, l, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.SWEEP_ATTACK, l).count(1).spawnAsEntityActive(mBoss);
 							BoundingBox box = BoundingBox.of(l, 0.4, 10, 0.4);
 
 							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 7, true)) {
 								if (player.getBoundingBox().overlaps(box)) {
+									DamageUtils.damage(mBoss, player, new DamageEvent.Metadata(DamageEvent.DamageType.MELEE,
+										null, null, SPELL_NAME), 25, false, false, true);
 									MovementUtils.knockAway(mBoss.getLocation(), player, 0.75f, 0.5f);
-									BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MELEE, 25, "Corrupted Strike", mBoss.getLocation());
 								}
 							}
 						}
 					}
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 0.3f, 1f);
+					mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 0.3f, 1f);
 					this.cancel();
 				}
 			}
@@ -220,7 +215,12 @@ public class SpellShuraJump extends Spell {
 	}
 
 	@Override
+	public boolean canRun() {
+		return mActiveRunnables.isEmpty(); // Don't try to jump again if C'Shura is currently jumping
+	}
+
+	@Override
 	public int cooldownTicks() {
-		return mCooldown;
+		return TICKS_PER_SECOND * 8;
 	}
 }

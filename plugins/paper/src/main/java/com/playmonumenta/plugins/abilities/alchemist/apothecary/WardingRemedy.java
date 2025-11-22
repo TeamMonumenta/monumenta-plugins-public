@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.WardingRemedyCS;
@@ -14,7 +16,6 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -48,36 +49,32 @@ public class WardingRemedy extends Ability implements AbilityWithDuration {
 			.linkedSpell(ClassAbility.WARDING_REMEDY)
 			.scoreboardId("WardingRemedy")
 			.shorthandName("WR")
-			.descriptions(
-				("Swap hands while sneaking to give players (including yourself) " +
-				"within a %s block radius %s absorption health every %ss for %ss, lasting %ss, " +
-				"up to %s absorption health. Cooldown: %ss.")
-					.formatted(
-							StringUtils.to2DP(WARDING_REMEDY_ACTIVE_RADIUS),
-							WARDING_REMEDY_ABSORPTION,
-							StringUtils.ticksToSeconds(WARDING_REMEDY_PULSE_DELAY),
-							StringUtils.ticksToSeconds(WARDING_REMEDY_PULSES * WARDING_REMEDY_PULSE_DELAY),
-							StringUtils.ticksToSeconds(WARDING_REMEDY_ABSORPTION_DURATION),
-							WARDING_REMEDY_MAX_ABSORPTION,
-							StringUtils.ticksToSeconds(WARDING_REMEDY_1_COOLDOWN)
-					),
-				("You and allies in a %s block radius passively gain %s%% increased healing while having " +
-				"absorption health, and cooldown decreased to %ss.")
-					.formatted(
-							StringUtils.to2DP(WARDING_REMEDY_RANGE),
-							StringUtils.multiplierToPercentage(WARDING_REMEDY_HEAL_MULTIPLIER),
-							StringUtils.ticksToSeconds(WARDING_REMEDY_2_COOLDOWN)
-					)
-			)
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Periodically grant absorption to you and nearby allies, for a short period of time.")
 			.cooldown(WARDING_REMEDY_1_COOLDOWN, WARDING_REMEDY_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WardingRemedy::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
 			.displayItem(Material.GOLDEN_CARROT);
 
+	private final int mDelay;
+	private final int mTotalPulses;
+	private final double mActiveRadius;
+	private final double mAbsorption;
+	private final double mMaxAbsorption;
+	private final int mAbsorptionDuration;
+	private final double mHealing;
+	private final double mRange;
 	private final WardingRemedyCS mCosmetic;
 
 	public WardingRemedy(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDelay = CharmManager.getDuration(mPlayer, CHARM_DELAY, WARDING_REMEDY_PULSE_DELAY);
+		mTotalPulses = WARDING_REMEDY_PULSES + (int) CharmManager.getLevel(mPlayer, CHARM_PULSES);
+		mActiveRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, WARDING_REMEDY_ACTIVE_RADIUS);
+		mAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, WARDING_REMEDY_ABSORPTION);
+		mMaxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MAX_ABSORPTION, WARDING_REMEDY_MAX_ABSORPTION);
+		mAbsorptionDuration = CharmManager.getDuration(mPlayer, CHARM_ABSORPTION_DURATION, WARDING_REMEDY_ABSORPTION_DURATION);
+		mHealing = WARDING_REMEDY_HEAL_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALING);
+		mRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, WARDING_REMEDY_RANGE);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WardingRemedyCS());
 	}
 
@@ -93,38 +90,31 @@ public class WardingRemedy extends Ability implements AbilityWithDuration {
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
 
-		int delay = CharmManager.getDuration(mPlayer, CHARM_DELAY, WARDING_REMEDY_PULSE_DELAY);
-		int pulses = WARDING_REMEDY_PULSES + (int) CharmManager.getLevel(mPlayer, CHARM_PULSES);
-		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, WARDING_REMEDY_ACTIVE_RADIUS);
-		double absorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, WARDING_REMEDY_ABSORPTION);
-		double maxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MAX_ABSORPTION, WARDING_REMEDY_MAX_ABSORPTION);
-		int absorptionDuration = CharmManager.getDuration(mPlayer, CHARM_ABSORPTION_DURATION, WARDING_REMEDY_ABSORPTION_DURATION);
-
-		mCosmetic.remedyStartEffect(world, loc, mPlayer, radius);
+		mCosmetic.remedyStartEffect(world, loc, mPlayer, mActiveRadius);
 
 		mCurrDuration = 0;
 		ClientModHandler.updateAbility(mPlayer, this);
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mPulses = 0;
-			int mTick = delay;
+			int mTick = mDelay;
 
 			@Override
 			public void run() {
 				Location playerLoc = mPlayer.getLocation();
 
-				mCosmetic.remedyPeriodicEffect(playerLoc.clone().add(0, 0.5, 0), mPlayer, mTick + mPulses * delay);
+				mCosmetic.remedyPeriodicEffect(playerLoc.clone().add(0, 0.5, 0), mPlayer, mTick + mPulses * mDelay);
 
-				if (mTick >= delay) {
-					mCosmetic.remedyPulseEffect(world, playerLoc, mPlayer, mPulses, pulses, radius);
+				if (mTick >= mDelay) {
+					mCosmetic.remedyPulseEffect(world, playerLoc, mPlayer, mPulses, mTotalPulses, mActiveRadius);
 
-					for (Player p : PlayerUtils.playersInRange(playerLoc, radius, true)) {
-						AbsorptionUtils.addAbsorption(p, absorption, maxAbsorption, absorptionDuration);
+					for (Player p : PlayerUtils.playersInRange(playerLoc, mActiveRadius, true)) {
+						AbsorptionUtils.addAbsorption(p, mAbsorption, mMaxAbsorption, mAbsorptionDuration);
 						mCosmetic.remedyApplyEffect(mPlayer, p);
 					}
 					mTick = 0;
 					mPulses++;
-					if (mPulses >= pulses) {
+					if (mPulses >= mTotalPulses) {
 						this.cancel();
 					}
 				}
@@ -154,10 +144,10 @@ public class WardingRemedy extends Ability implements AbilityWithDuration {
 			return;
 		}
 
-		double healing = WARDING_REMEDY_HEAL_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALING);
-		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, WARDING_REMEDY_RANGE), true)) {
+		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), mRange, true)) {
 			if (AbsorptionUtils.getAbsorption(p) > 0) {
-				mPlugin.mEffectManager.addEffect(p, "WardingRemedyBonusHealing", new PercentHeal(20, healing).displaysTime(false));
+				mPlugin.mEffectManager.addEffect(p, "WardingRemedyBonusHealing", new PercentHeal(20, mHealing)
+					.displaysTime(false).deleteOnAbilityUpdate(true));
 				mCosmetic.remedyHealBuffEffect(mPlayer, p);
 			}
 		}
@@ -165,11 +155,40 @@ public class WardingRemedy extends Ability implements AbilityWithDuration {
 
 	@Override
 	public int getInitialAbilityDuration() {
-		return (WARDING_REMEDY_PULSES + (int) CharmManager.getLevel(mPlayer, CHARM_PULSES)) * CharmManager.getDuration(mPlayer, CHARM_DELAY, WARDING_REMEDY_PULSE_DELAY); //pulses * delay
+		return mTotalPulses * mDelay;
 	}
 
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
+
+	private static Description<WardingRemedy> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to give players (including yourself) within ")
+			.add(a -> a.mActiveRadius, WARDING_REMEDY_ACTIVE_RADIUS)
+			.add(" blocks ")
+			.add(a -> a.mAbsorption, WARDING_REMEDY_ABSORPTION)
+			.add(" absorption health every ")
+			.addDuration(a -> a.mDelay, WARDING_REMEDY_PULSE_DELAY)
+			.add(" seconds for ")
+			.addDuration(WardingRemedy::getInitialAbilityDuration, WARDING_REMEDY_PULSES * WARDING_REMEDY_PULSE_DELAY)
+			.add(" seconds, lasting ")
+			.addDuration(a -> a.mAbsorptionDuration, WARDING_REMEDY_ABSORPTION_DURATION)
+			.add(" seconds, up to ")
+			.add(a -> a.mMaxAbsorption, WARDING_REMEDY_MAX_ABSORPTION)
+			.add(" absorption health.")
+			.addCooldown(WARDING_REMEDY_1_COOLDOWN, Ability::isLevelOne);
+	}
+
+	private static Description<WardingRemedy> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("You and allies within ")
+			.add(a -> a.mRange, WARDING_REMEDY_RANGE)
+			.add(" blocks passively gain ")
+			.addPercent(a -> a.mHealing, WARDING_REMEDY_HEAL_MULTIPLIER)
+			.add(" increased healing while having absorption health.")
+			.addCooldown(WARDING_REMEDY_2_COOLDOWN, Ability::isLevelTwo);
 	}
 }

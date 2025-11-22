@@ -9,10 +9,7 @@ import org.bukkit.inventory.ItemStack;
 public class FireChargeOverride extends BaseOverride {
 	@Override
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity, ItemStack itemInHand) {
-		if (clickedEntity instanceof Creeper) {
-			return false;
-		}
-		return true;
+		return !(clickedEntity instanceof Creeper);
 	}
 }
 

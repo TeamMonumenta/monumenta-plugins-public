@@ -193,7 +193,7 @@ public class FlowerPower extends Spell {
 							targets.forEach(target -> launchEnergyLaser(target, mAccumulationPoint, mBoss, mLaserOptions, mFloorY, getLaserTravelSpeed(mParty), mActiveRunnables, false));
 							// Keep the accumulated energy ball showing.
 							new PartialParticle(Particle.REDSTONE, mAccumulationPoint, 30).data(mEnergyOptions)
-									.extra(0).delta(1.2 - (double) mLasersShot / Math.max(laserCount, 1)).spawnAsBoss();
+								.extra(0).delta(1.2 - (double) mLasersShot / Math.max(laserCount, 1)).spawnAsBoss();
 							mBoss.getWorld().playSound(mAccumulationPoint, Sound.BLOCK_CHAIN_HIT, SoundCategory.HOSTILE, 10f, 0.9f);
 							mBoss.getWorld().playSound(mAccumulationPoint, Sound.BLOCK_CHAIN_HIT, SoundCategory.HOSTILE, 10f, 0.9f);
 							mBoss.getWorld().playSound(mAccumulationPoint, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.HOSTILE, 10f, 0.2f);
@@ -224,7 +224,7 @@ public class FlowerPower extends Spell {
 	}
 
 	public static void launchEnergyLaser(Player target, Location accumulationPoint, LivingEntity boss, Particle.DustOptions laserOptions,
-			 int floorY, double laserSpeed, @Nullable Set<BukkitRunnable> activeRunnables, boolean onlyShowToThatPlayer) {
+	                                     int floorY, double laserSpeed, @Nullable Set<BukkitRunnable> activeRunnables, boolean onlyShowToThatPlayer) {
 
 		BukkitRunnable energyLaserRunnable = new BukkitRunnable() {
 			final Vector mDirection = LocationUtils.getDirectionTo(target.getLocation().clone().add(0, 1, 0), accumulationPoint).normalize();

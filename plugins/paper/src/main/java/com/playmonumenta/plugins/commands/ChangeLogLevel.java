@@ -27,6 +27,6 @@ public class ChangeLogLevel {
 						.executes((sender, args) -> {
 							MMLog.setLevel(Level.FINEST);
 						}))
-			)).register();
+				)).register();
 	}
 }

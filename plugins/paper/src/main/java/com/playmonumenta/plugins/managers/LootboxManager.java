@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.managers;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.inventories.ClickLimiter;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -77,6 +79,10 @@ public class LootboxManager implements Listener {
 	public static final String LOOTBOX_MAX_SHARES_KEY = "ShareMax";
 	public static final String LOOTSHARE_ITEM_KEY = "item";
 	public static final String LOOTSHARE_AMOUNT_KEY = "amount";
+	public static final List<Tier> VALUABLE_TIERS = Arrays.asList(
+		Tier.RARE, Tier.EPIC, Tier.LEGENDARY,
+		Tier.RARE_CHARM, Tier.EPIC_CHARM, Tier.ARTIFACT,
+		Tier.EVENT_CURRENCY);
 
 	public static final EnumSet<InventoryType> ALLOWED_CONTAINERS = EnumSet.of(
 		InventoryType.CHEST,
@@ -92,17 +98,17 @@ public class LootboxManager implements Listener {
 
 	/**
 	 * Distribute a collection of items into a number of distinct buckets.
-	 *
+	 * <p>
 	 * Biggest challenge here is to get things sort of evenly distributed. A lot of
 	 * different tuning is possible here.
-	 *
+	 * <p>
 	 * TODO: Someday it would be nice to have many invocations of this function
 	 * somehow spread out rares evenly among players
 	 * This would require some state keeping about who has gotten what. Maybe just
 	 * counters based on tiers? Tricky...
-	 *
+	 * <p>
 	 * This is right now the most fair shuffle I can come up with
-	 *
+	 * <p>
 	 * Caller should take care not to actually change the returned lists, they are
 	 * sublists of the original input list
 	 */
@@ -191,7 +197,7 @@ public class LootboxManager implements Listener {
 	/**
 	 * Puts a player's fractional split of loot in a LOOTBOX in their inventory if
 	 * present.
-	 *
+	 * <p>
 	 * Returns whether this was possible. If false the loot should be shared back
 	 * into the generating chest.
 	 */
@@ -207,6 +213,7 @@ public class LootboxManager implements Listener {
 		List<ItemStack> filteredLoot = new ArrayList<>();
 		// list of items that don't pass pickup filters
 		List<ItemStack> rejectedLoot = new ArrayList<>();
+		List<ItemStack> valuableLoot = new ArrayList<>();
 		for (ItemStack item : loot) {
 			if (ItemUtils.isNullOrAir(item)) {
 				continue;
@@ -215,6 +222,11 @@ public class LootboxManager implements Listener {
 				rejectedLoot.add(item);
 				continue;
 			}
+			if (VALUABLE_TIERS.contains(ItemStatUtils.getTier(item))) {
+				valuableLoot.add(item);
+				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS,
+					SoundCategory.PLAYERS, 0.2f, 1.6f);
+			}
 			filteredLoot.add(item);
 		}
 		createLootshare(player, lootbox, filteredLoot);
@@ -222,15 +234,28 @@ public class LootboxManager implements Listener {
 		// update the lootbox after a delay
 		updateLootboxLoreDelay(player, lootbox, LOOTBOX_UPDATE_LORE_DELAY);
 
+		if (!valuableLoot.isEmpty()) {
+			StringJoiner itemJoiner = new StringJoiner("\r\n");
+			for (ItemStack item : valuableLoot) {
+				if (item.getItemMeta().displayName() != null) {
+					itemJoiner.add(ItemUtils.getPlainName(item) + " x" + item.getAmount());
+				}
+			}
+			player.sendMessage(Component.text("You received valuable loot!")
+				.color(NamedTextColor.GOLD)
+				.decoration(TextDecoration.BOLD, true)
+				.hoverEvent(Component.text(itemJoiner.toString())));
+		}
+
 		return rejectedLoot;
 	}
 
 	/**
 	 * Creates a lootshare inside the lootbox
 	 *
-	 * @param player - the player that "owns" this lootbox
+	 * @param player  - the player that "owns" this lootbox
 	 * @param lootbox - the lootbox
-	 * @param items - the list of items that are in the share
+	 * @param items   - the list of items that are in the share
 	 */
 	public static void createLootshare(Player player, ItemStack lootbox, List<ItemStack> items) {
 		NBTItem nbt = new NBTItem(lootbox);
@@ -249,9 +274,9 @@ public class LootboxManager implements Listener {
 	/**
 	 * Gets the first lootshare from inside the lootbox
 	 *
-	 * @param player - the player that "owns" this lootbox
+	 * @param player  - the player that "owns" this lootbox
 	 * @param lootbox - the lootbox
-	 * @param remove - True if lootshare should be removed, false if not
+	 * @param remove  - True if lootshare should be removed, false if not
 	 * @return - List of items in the lootshare
 	 */
 	public static @Nullable List<ItemStack> getLootshare(Player player, ItemStack lootbox, boolean remove) {
@@ -278,7 +303,7 @@ public class LootboxManager implements Listener {
 	/**
 	 * Removes the first lootshare from the lootbox
 	 *
-	 * @param player - the player that "owns" this lootbox
+	 * @param player  - the player that "owns" this lootbox
 	 * @param lootbox - the lootbox
 	 */
 	public void removeLootshare(Player player, ItemStack lootbox) {
@@ -355,7 +380,7 @@ public class LootboxManager implements Listener {
 	 * @param count  - Number of shares to get
 	 */
 	public static @Nullable List<ItemStack> getLootshareData(NBTCompound index, @Nullable NBTCompoundList shares,
-			int count) {
+	                                                         int count) {
 		if (shares == null || shares.isEmpty()) {
 			return null;
 		}
@@ -599,7 +624,7 @@ public class LootboxManager implements Listener {
 
 		ItemStatUtils.removeLore(lootbox, loreIndex);
 		ItemStatUtils.addLore(lootbox, loreIndex, Component.text(amount + "/" + max + " shares")
-				.decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE));
+			.decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE));
 		ItemUpdateHelper.generateItemStats(lootbox); // this is major performance killer
 	}
 
@@ -652,7 +677,7 @@ public class LootboxManager implements Listener {
 				// Only a few spaces left
 				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.PLAYERS, 0.5f, 1.5f);
 				MessagingUtils.sendActionBarMessage(player, "LOOTBOX chest added, " + (numAvailSpaces - 1) + " spaces left",
-						NamedTextColor.YELLOW);
+					NamedTextColor.YELLOW);
 			} else {
 				// No space left
 				player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1.8f);
@@ -666,6 +691,7 @@ public class LootboxManager implements Listener {
 	/**
 	 * Updates an old lootbox to the new format.
 	 * Ignores lootboxes with the new format.
+	 *
 	 * @param lootbox - the lootbox
 	 * @return True if it was an old lootbox, false if not
 	 */
@@ -689,10 +715,10 @@ public class LootboxManager implements Listener {
 					}
 
 					if (lootShare.getItemMeta() instanceof BlockStateMeta shareBlockMeta
-							&& shareBlockMeta.getBlockState() instanceof Chest chestMeta) {
+						&& shareBlockMeta.getBlockState() instanceof Chest chestMeta) {
 						List<ItemStack> lootShareItems = Arrays.stream(chestMeta.getInventory().getContents())
-								.filter((item) -> item != null && !item.getType().isAir())
-								.collect(Collectors.toList());
+							.filter((item) -> item != null && !item.getType().isAir())
+							.collect(Collectors.toList());
 						// since we are working directly with nbt, use underlying function instead
 						createLootshareData(index, shares, lootShareItems);
 					}
@@ -700,7 +726,7 @@ public class LootboxManager implements Listener {
 				playerModified.removeKey(ItemStatUtils.ITEMS_KEY);
 			}
 		} else if (lootbox.getItemMeta() instanceof BlockStateMeta blockMeta
-				&& blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta && !shulkerMeta.getInventory().isEmpty()) {
+			&& blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta && !shulkerMeta.getInventory().isEmpty()) {
 			// Clear the lootbox's inventory
 			ItemStack[] items = shulkerMeta.getInventory().getContents();
 			for (@Nullable ItemStack share : items) {
@@ -708,10 +734,10 @@ public class LootboxManager implements Listener {
 					continue;
 				}
 				if (share.getItemMeta() instanceof BlockStateMeta shareBlockMeta
-						&& shareBlockMeta.getBlockState() instanceof Chest chestMeta) {
+					&& shareBlockMeta.getBlockState() instanceof Chest chestMeta) {
 					List<ItemStack> lootShareItems = Arrays.stream(chestMeta.getInventory().getContents())
-							.filter((item) -> item != null && !item.getType().isAir())
-							.collect(Collectors.toList());
+						.filter((item) -> item != null && !item.getType().isAir())
+						.collect(Collectors.toList());
 					// since we are working directly with nbt, use underlying function instead
 					createLootshareData(index, shares, lootShareItems);
 				}
@@ -722,7 +748,7 @@ public class LootboxManager implements Listener {
 		lootbox.setItemMeta(nbt.getItem().getItemMeta());
 		// clear the shulker afterwards
 		if (lootbox.getItemMeta() instanceof BlockStateMeta blockMeta
-				&& blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
+			&& blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
 			shulkerMeta.getInventory().clear();
 			blockMeta.setBlockState(shulkerMeta);
 			lootbox.setItemMeta(blockMeta);
@@ -739,6 +765,15 @@ public class LootboxManager implements Listener {
 		return null;
 	}
 
+	public static Boolean hasEpicLootbox(Inventory inventory) {
+		for (ItemStack item : inventory.getContents()) {
+			if (isEpicLootbox(item)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static boolean isLootbox(ItemStack item) {
 		if (item == null || !ItemUtils.isShulkerBox(item.getType()) || !item.hasItemMeta()) {
 			return false;
@@ -746,12 +781,12 @@ public class LootboxManager implements Listener {
 
 		String plainName = ItemUtils.getPlainNameIfExists(item);
 		return plainName.equals("LOOTBOX") || plainName.equals("Box of Endless Echoes")
-				|| plainName.equals("Mouth of the Mimic");
+			|| plainName.equals("Mouth of the Mimic");
 	}
 
 	public static boolean isEpicLootbox(ItemStack item) {
 		if (item == null || !ItemUtils.isShulkerBox(item.getType()) || !item.hasItemMeta()
-				|| !item.getItemMeta().hasDisplayName()) {
+			|| !item.getItemMeta().hasDisplayName()) {
 			return false;
 		}
 
@@ -761,7 +796,7 @@ public class LootboxManager implements Listener {
 
 	public static boolean isNormalLootbox(ItemStack item) {
 		if (item == null || !ItemUtils.isShulkerBox(item.getType()) || !item.hasItemMeta()
-				|| !item.getItemMeta().hasDisplayName()) {
+			|| !item.getItemMeta().hasDisplayName()) {
 			return false;
 		}
 
@@ -805,8 +840,8 @@ public class LootboxManager implements Listener {
 		ItemStack itemClicked = event.getCurrentItem();
 
 		if (!(event.getWhoClicked() instanceof Player player) || // we want a player
-				inventory == null || // with valid inventory
-				!isLootbox(itemClicked) // and they clicked a lootbox
+			inventory == null || // with valid inventory
+			!isLootbox(itemClicked) // and they clicked a lootbox
 		) {
 			return;
 		}
@@ -930,7 +965,7 @@ public class LootboxManager implements Listener {
 				successSound(player);
 
 				CoreProtectIntegration.logPlacement(player, chest.getLocation(), chest.getBlockData().getMaterial(),
-						chest.getBlockData());
+					chest.getBlockData());
 			}
 		});
 	}
@@ -941,9 +976,9 @@ public class LootboxManager implements Listener {
 		ItemStack itemHeld = event.getItem();
 		Player player = event.getPlayer();
 		if (event.getAction() != Action.LEFT_CLICK_BLOCK || // left clicking a chest
-				!isLootbox(itemHeld) ||
-				clickedBlock == null ||
-				ChestUtils.isChestWithLootTable(clickedBlock) // without a loottable
+			!isLootbox(itemHeld) ||
+			clickedBlock == null ||
+			ChestUtils.isChestWithLootTable(clickedBlock) // without a loottable
 		) {
 			return;
 		}
@@ -970,7 +1005,7 @@ public class LootboxManager implements Listener {
 		// make sure to only be acting on chests
 		Inventory inventory = ((InventoryHolder) state).getInventory();
 		if (inventory instanceof DoubleChestInventory chest) {
-			inventory = (DoubleChestInventory) chest;
+			inventory = chest;
 		} else {
 			if (!ALLOWED_CONTAINERS.contains(inventory.getType())) {
 				// return if not a chest?

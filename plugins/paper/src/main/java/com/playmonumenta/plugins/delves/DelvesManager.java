@@ -15,7 +15,10 @@ import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Chronology;
 import com.playmonumenta.plugins.delves.abilities.Colossal;
 import com.playmonumenta.plugins.delves.abilities.Fragile;
+import com.playmonumenta.plugins.delves.abilities.Gravity;
 import com.playmonumenta.plugins.delves.abilities.Haunted;
+import com.playmonumenta.plugins.delves.abilities.HealCut;
+import com.playmonumenta.plugins.delves.abilities.Idolatry;
 import com.playmonumenta.plugins.delves.abilities.Infernal;
 import com.playmonumenta.plugins.delves.abilities.Riftborn;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
@@ -54,6 +57,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -61,8 +65,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
@@ -71,12 +78,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerVelocityEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
-
 
 public class DelvesManager implements Listener {
 	public static final String KEY_DELVES_PLUGIN_DATA = "MonumentaDelves";
@@ -124,6 +133,7 @@ public class DelvesManager implements Listener {
 		"portal",
 		"blue",
 		"brown",
+		"indigo",
 		"zenith",
 		"futurama"
 	);
@@ -178,7 +188,7 @@ public class DelvesManager implements Listener {
 		}
 
 		JsonArray dungeonArr = obj.getAsJsonArray("dungeons");
-		if (dungeonArr == null || dungeonArr.size() == 0) {
+		if (dungeonArr == null || dungeonArr.isEmpty()) {
 			return;
 		}
 
@@ -187,47 +197,52 @@ public class DelvesManager implements Listener {
 			try {
 				String name = dungeonObj.get("dungeonName").getAsString();
 
-				DungeonDelveInfo info = new DungeonDelveInfo();
-
-				JsonElement presetId = dungeonObj.get("presetId");
-				if (presetId != null) {
-					info.mPresetId = presetId.getAsInt();
-				}
-
-				DelvePreset preset = DelvePreset.getDelvePreset(info.mPresetId);
-				if (preset != null) {
-					// if a preset is saved, ignore the saved modifiers and update to the preset instead
-					info.mModifierPoint.putAll(preset.mModifiers);
-					info.recalculateTotalPoint();
-				} else {
-					JsonArray delveModArr = dungeonObj.getAsJsonArray("delveMods");
-					if (delveModArr == null) {
-						continue;
-					}
-					for (int delveIterator = 0; delveIterator < delveModArr.size(); delveIterator++) {
-						JsonObject delveObj = delveModArr.get(delveIterator).getAsJsonObject();
-						DelvesModifier delveMod = DelvesModifier.fromName(delveObj.getAsJsonPrimitive("delveModName").getAsString());
-						if (delveMod == null) {
-							continue;
-						}
-
-						int lvl = delveObj.getAsJsonPrimitive("delveModLvl").getAsInt();
-
-						if (lvl > 0) {
-							info.put(delveMod, lvl);
-						}
-
-					}
-				}
-
-				DelvesUtils.getOrAddDelveInfoMap(player).putIfAbsent(name, info);
-				DelvesUtils.updateDelveScoreBoard(player);
+				loadPlayerDungeonData(player, name, dungeonObj);
 			} catch (Exception e) {
 				MMLog.warning("[DelveManager] error while loading player info. Reason: " + e.getMessage());
 				e.printStackTrace();
 				player.sendMessage(Component.text("Some of your delve data have not loaded correctly, try reloading!", NamedTextColor.RED).hoverEvent(HoverEvent.showText(Component.text(e.toString()))));
 			}
 		}
+	}
+
+	protected static void loadPlayerDungeonData(Player player, String dungeonName, JsonObject dungeonObj) throws RuntimeException {
+		DungeonDelveInfo info = new DungeonDelveInfo();
+
+		JsonElement presetId = dungeonObj.get("presetId");
+		if (presetId != null) {
+			info.mPresetId = presetId.getAsInt();
+		}
+
+		DelvePreset preset = DelvePreset.getDelvePreset(info.mPresetId);
+		// Exempt entropy presets as they have rolled modifiers.
+		if (preset != null && !preset.mModifiers.containsKey(DelvesModifier.ENTROPY)) {
+			// if a preset is saved, ignore the saved modifiers and update to the preset instead
+			info.mModifierPoint.putAll(preset.mModifiers);
+			info.recalculateTotalPoint();
+		} else {
+			JsonArray delveModArr = dungeonObj.getAsJsonArray("delveMods");
+			if (delveModArr == null) {
+				return;
+			}
+			for (int delveIterator = 0; delveIterator < delveModArr.size(); delveIterator++) {
+				JsonObject delveObj = delveModArr.get(delveIterator).getAsJsonObject();
+				DelvesModifier delveMod = DelvesModifier.fromName(delveObj.getAsJsonPrimitive("delveModName").getAsString());
+				if (delveMod == null) {
+					continue;
+				}
+
+				int lvl = delveObj.getAsJsonPrimitive("delveModLvl").getAsInt();
+
+				if (lvl > 0) {
+					info.put(delveMod, lvl);
+				}
+
+			}
+		}
+
+		DelvesUtils.getOrAddDelveInfoMap(player).putIfAbsent(dungeonName, info);
+		DelvesUtils.updateDelveScoreBoard(player);
 	}
 
 	public static void savePlayerData(Player player, String dungeon, Map<DelvesModifier, Integer> mods, int presetId) {
@@ -272,23 +287,27 @@ public class DelvesManager implements Listener {
 		obj.add("dungeons", dungeons);
 
 		for (Map.Entry<String, DungeonDelveInfo> playerDungeonInfo : delveInfoMap.entrySet()) {
-			JsonObject dungeonObj = new JsonObject();
-			dungeonObj.addProperty("dungeonName", playerDungeonInfo.getKey());
-
-			JsonArray delveModArr = new JsonArray();
-			dungeonObj.add("delveMods", delveModArr);
-			for (Map.Entry<DelvesModifier, Integer> modLevelEntry : playerDungeonInfo.getValue().mModifierPoint.entrySet()) {
-				JsonObject dungeonMod = new JsonObject();
-				dungeonMod.addProperty("delveModName", modLevelEntry.getKey().name());
-				dungeonMod.addProperty("delveModLvl", modLevelEntry.getValue());
-				delveModArr.add(dungeonMod);
-			}
-			dungeonObj.addProperty("presetId", playerDungeonInfo.getValue().mPresetId);
-			dungeons.add(dungeonObj);
-
+			dungeons.add(convertPlayerDungeonData(playerDungeonInfo.getKey(), playerDungeonInfo.getValue()));
 		}
 
 		return obj;
+	}
+
+	protected static JsonObject convertPlayerDungeonData(String dungeonName, DungeonDelveInfo playerDungeonInfo) {
+		JsonObject dungeonObj = new JsonObject();
+		dungeonObj.addProperty("dungeonName", dungeonName);
+
+		JsonArray delveModArr = new JsonArray();
+		dungeonObj.add("delveMods", delveModArr);
+		for (Map.Entry<DelvesModifier, Integer> modLevelEntry : playerDungeonInfo.mModifierPoint.entrySet()) {
+			JsonObject dungeonMod = new JsonObject();
+			dungeonMod.addProperty("delveModName", modLevelEntry.getKey().name());
+			dungeonMod.addProperty("delveModLvl", modLevelEntry.getValue());
+			delveModArr.add(dungeonMod);
+		}
+		dungeonObj.addProperty("presetId", playerDungeonInfo.mPresetId);
+
+		return dungeonObj;
 	}
 
 	public static int getSpawnersBroken(World world) {
@@ -355,11 +374,15 @@ public class DelvesManager implements Listener {
 					CreatureSpawner temp = NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE;
 					delvesApplied.forEach((mod, level) -> mod.applyDelve(livingEntity, level));
 					Riftborn.applyModifiers(temp.getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
+					Idolatry.applyModifiers(temp, entity, delvesApplied.getOrDefault(DelvesModifier.IDOLATRY, 0));
 					Chronology.applyModifiers(temp, delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
-				} else if (event instanceof SpawnerSpawnEvent spawnerSpawnEvent) {
+					Infernal.applyModifiers(temp.getBlock(), entity, delvesApplied.getOrDefault(DelvesModifier.INFERNAL, 0));
+				} else if (event instanceof SpawnerSpawnEvent spawnerSpawnEvent && spawnerSpawnEvent.getSpawner() != null) {
 					// normal spawn - handle all the mods
 					Riftborn.applyModifiers(spawnerSpawnEvent.getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
+					Idolatry.applyModifiers(spawnerSpawnEvent.getSpawner(), entity, delvesApplied.getOrDefault(DelvesModifier.IDOLATRY, 0));
 					Chronology.applyModifiers(spawnerSpawnEvent.getSpawner(), delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
+					Infernal.applyModifiers(spawnerSpawnEvent.getSpawner().getBlock(), entity, delvesApplied.getOrDefault(DelvesModifier.INFERNAL, 0));
 
 					delvesApplied.forEach((mod, level) -> mod.applyDelve(livingEntity, level));
 				} else {
@@ -386,6 +409,13 @@ public class DelvesManager implements Listener {
 		}
 
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> setForcedReferenceToSpawner(null));
+	}
+
+	public void onEntityRegainHealthEvent(EntityRegainHealthEvent event) {
+		if (!DelvesUtils.isInDelvableWorld(event.getEntity().getWorld()) || !Plugin.IS_PLAY_SERVER) {
+			return;
+		}
+		HealCut.applyHealcut(event, DelvesUtils.getModifierLevel(event.getEntity().getLocation(), DelvesModifier.HEALCUT));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -439,11 +469,11 @@ public class DelvesManager implements Listener {
 		if (resistanceLevel < 5) {
 			List<Chunk> chunkList = LocationUtils.getSurroundingChunks(event.getTo().getBlock(), 32);
 			for (Chunk chunk : chunkList) {
-				for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST, false)) {
+				for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST || b.getType() == Material.TRAPPED_CHEST, false)) {
 					if (interestingBlock instanceof Chest chest
-						    && LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32)
-						    && ChestUtils.isAstrableChest(chest)
-						    && PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
+						&& LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32)
+						&& ChestUtils.isAstrableChest(chest)
+						&& PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
 						Astral.applyModifiers(chest, getRank(player, DelvesModifier.ASTRAL));
 					}
 				}
@@ -473,13 +503,13 @@ public class DelvesManager implements Listener {
 			return;
 		}
 		Player player = event.getPlayer();
+		double expBuffPct = 0;
 		for (DelvesModifier mod : DelvesModifier.rotatingDelveModifiers()) {
 			if (getRank(player, mod) > 0) {
-				double expBuffPct = .25;
-				event.setAmount((int)(event.getAmount() * (1.0 + expBuffPct)));
-				return;
+				expBuffPct = .25;
 			}
 		}
+		event.setAmount((int) (event.getAmount() * (1.0 + expBuffPct)));
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -490,6 +520,7 @@ public class DelvesManager implements Listener {
 			}
 
 			Infernal.applyDamageModifiers(event, DelvesUtils.getModifierLevel(player, DelvesModifier.INFERNAL));
+			Gravity.applyDamageModifiers(event, DelvesUtils.getModifierLevel(player, DelvesModifier.GRAVITY));
 
 			//hard coded since magma cubes from Chivalrous should not do damage to player
 			if (event.getDamager() != null && Chivalrous.MOUNT_NAMES[1].equals(event.getDamager().getName())) {
@@ -515,8 +546,75 @@ public class DelvesManager implements Listener {
 			|| !Plugin.IS_PLAY_SERVER) {
 			return;
 		}
-
+		Gravity.gravityBlockBreakHandler(event.getBlock(), DelvesUtils.getModifierLevel(event.getBlock().getLocation(), DelvesModifier.GRAVITY));
 		spawnerBreakEventHandler(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerVelocityChange(PlayerVelocityEvent event) {
+		if (!DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
+			|| !Plugin.IS_PLAY_SERVER) {
+			return;
+		}
+		if (DelvesUtils.getModifierLevel(event.getPlayer(), DelvesModifier.GRAVITY) == 0) {
+			return;
+		}
+		Vector velocity = event.getVelocity();
+		event.setVelocity(velocity.multiply(0.66));
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onFallBlock(final EntityChangeBlockEvent event) {
+		if (!DelvesUtils.isInDelvableWorld(event.getBlock().getWorld())
+			|| !Plugin.IS_PLAY_SERVER) {
+			return;
+		}
+		if (event.getEntity() instanceof FallingBlock fallingBlock) {
+			Location loc = event.getEntity().getLocation();
+			if (event.getTo() == fallingBlock.getBlockData().getMaterial() && fallingBlock.hasMetadata(Gravity.PLAYER_PLACED_METADATA_KEY)) {
+				if (Gravity.checkForSupport(loc, fallingBlock.getBlockData(), DelvesUtils.getModifierLevel(loc, DelvesModifier.GRAVITY))) {
+					event.setCancelled(true);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onLoom(final StructureGrowEvent event) {
+		if (event.getPlayer() == null
+			|| !DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
+			|| !Plugin.IS_PLAY_SERVER) {
+			return;
+		}
+		Location loc = event.getLocation();
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				Block block = loc.getBlock();
+				Block blockUnder = loc.clone().add(0, -1, 0).getBlock();
+				Gravity.applyModifiers(block, blockUnder, DelvesUtils.getModifierLevel(block.getLocation(), DelvesModifier.GRAVITY));
+			}
+		}.runTaskLater(Plugin.getInstance(), 2);
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onBlockPlaceEvent(BlockPlaceEvent event) {
+		Location loc = event.getBlock().getLocation();
+		if (!DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
+			|| !Plugin.IS_PLAY_SERVER) {
+			return;
+		}
+		new BukkitRunnable() { // Need to delay gravity check to allow for firmament to switch the block out first
+
+			@Override
+			public void run() {
+				Block block = loc.getBlock();
+				Block blockUnder = loc.clone().add(0, -1, 0).getBlock();
+				Gravity.applyModifiers(block, blockUnder, DelvesUtils.getModifierLevel(block.getLocation(), DelvesModifier.GRAVITY));
+			}
+
+		}.runTaskLater(Plugin.getInstance(), 2);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -525,7 +623,7 @@ public class DelvesManager implements Listener {
 			|| !Plugin.IS_PLAY_SERVER) {
 			return;
 		}
-
+		Gravity.handleExplosion(event.blockList(), DelvesUtils.getModifierLevel(event.getBlock().getLocation(), DelvesModifier.GRAVITY));
 		for (Block block : event.blockList()) {
 			spawnerBreakEventHandler(block);
 		}
@@ -537,7 +635,7 @@ public class DelvesManager implements Listener {
 			|| !Plugin.IS_PLAY_SERVER) {
 			return;
 		}
-
+		Gravity.handleExplosion(event.blockList(), DelvesUtils.getModifierLevel(event.getLocation(), DelvesModifier.GRAVITY));
 		for (Block block : event.blockList()) {
 			spawnerBreakEventHandler(block);
 		}
@@ -621,10 +719,10 @@ public class DelvesManager implements Listener {
 		@Override
 		public String toString() {
 			return "DungeonDelveInfo{" +
-				       "TotalPoint=" + mTotalPoint +
-				       ",ModifierPoint=" + mModifierPoint +
-				       ",PresetId=" + mPresetId +
-				       '}';
+				"TotalPoint=" + mTotalPoint +
+				",ModifierPoint=" + mModifierPoint +
+				",PresetId=" + mPresetId +
+				'}';
 		}
 
 		protected DungeonDelveInfo cloneDelveInfo() {

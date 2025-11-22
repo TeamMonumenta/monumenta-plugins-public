@@ -23,8 +23,10 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -87,7 +89,7 @@ public class VesperidysVoidCrystalWind extends BossAbilityGroup {
 		p.NEED_PLAYERS = false;
 
 		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET) {
-			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RADIUS, true, EntityTargets.Limit.DEFAULT);
+			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RADIUS, EntityTargets.Limit.DEFAULT, List.of());
 			//by default Force boss hit all the player in range even the players in stealth
 		}
 
@@ -147,12 +149,13 @@ public class VesperidysVoidCrystalWind extends BossAbilityGroup {
 
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					close();
-				}, COOLDOWN/2);
+				}, COOLDOWN / 2);
 
 				forceSpell.run();
 
 				BukkitRunnable runnable = new BukkitRunnable() {
 					int mWrathTicks = 0;
+					final List<UUID> mHitPlayers = new ArrayList<>();
 
 					@Override
 					public void run() {
@@ -198,7 +201,8 @@ public class VesperidysVoidCrystalWind extends BossAbilityGroup {
 										new PartialParticle(Particle.CRIT_MAGIC, bLoc, 1, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 
 										for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40, true)) {
-											if (player.getBoundingBox().overlaps(mBox)) {
+											if (player.getBoundingBox().overlaps(mBox) && !mHitPlayers.contains(player.getUniqueId())) {
+												mHitPlayers.add(player.getUniqueId());
 												DamageUtils.damage(mBoss, player, DamageEvent.DamageType.PROJECTILE_SKILL, DAMAGE, null, false, true, "Slipstream");
 												MovementUtils.knockAway(centerLoc, player, -0.6f, 0.8f);
 											}

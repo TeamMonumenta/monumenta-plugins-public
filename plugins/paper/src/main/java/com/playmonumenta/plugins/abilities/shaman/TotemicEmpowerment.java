@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.shaman;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -34,16 +36,21 @@ public class TotemicEmpowerment extends Ability {
 	public static final String CHARM_RADIUS = "Totemic Empowerment Radius";
 
 	public static final AbilityInfo<TotemicEmpowerment> INFO =
-		new AbilityInfo<>(TotemicEmpowerment.class, null, TotemicEmpowerment::new)
+		new AbilityInfo<>(TotemicEmpowerment.class, "Totemic Empowerment", TotemicEmpowerment::new)
+			.description(getDescription())
 			.canUse(player -> AbilityUtils.getClassNum(player) == Shaman.CLASS_ID);
+
+	private final double mRadius;
+	private final double mSpeed;
+	private final double mResistance;
 
 	private @Nullable SupportExpertise mSupportExpertise;
 
 	public TotemicEmpowerment(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+		mSpeed = SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
+		mResistance = RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
 		Bukkit.getScheduler().runTask(plugin, () -> mSupportExpertise = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SupportExpertise.class));
 	}
 
@@ -54,26 +61,21 @@ public class TotemicEmpowerment extends Ability {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (oneSecond && mPlayer != null && !mPlayer.isDead()) {
-			if (!mPlayer.hasPermission(Shaman.PERMISSION_STRING)) {
-				AbilityUtils.resetClass(mPlayer);
-			}
 			List<LivingEntity> activeList = TOTEM_LIST.get(mPlayer.getUniqueId());
 			if (activeList == null || activeList.isEmpty()) {
 				return;
 			}
 
-			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 			for (LivingEntity totem : activeList) {
-				if (mPlayer.getWorld().equals(totem.getWorld()) && mPlayer.getLocation().distance(totem.getLocation()) <= radius) {
-					double selfSpeed = SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
-					double selfResist = RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
+				if (mPlayer.getWorld().equals(totem.getWorld()) && mPlayer.getLocation().distanceSquared(totem.getLocation()) <= mRadius * mRadius) {
+					double selfSpeed = mSpeed;
+					double selfResist = mResistance;
 					if (mSupportExpertise != null) {
-						double soothRadius = CharmManager.getRadius(mPlayer, SupportExpertise.CHARM_RADIUS, SupportExpertise.RADIUS);
 						selfSpeed += SupportExpertise.SELF_BOOST;
 						selfResist += SupportExpertise.SELF_BOOST;
 
-						List<Player> affectedPlayers = PlayerUtils.otherPlayersInRange(mPlayer, soothRadius, true);
-						affectedPlayers.forEach(p -> applyEffects(p, SPEED, RESISTANCE));
+						List<Player> affectedPlayers = PlayerUtils.otherPlayersInRange(mPlayer, mSupportExpertise.mRadius, true);
+						affectedPlayers.forEach(p -> applyEffects(p, mSpeed, mResistance));
 					}
 					applyEffects(mPlayer, selfSpeed, selfResist);
 					break;
@@ -83,8 +85,8 @@ public class TotemicEmpowerment extends Ability {
 	}
 
 	private void applyEffects(Player player, double speed, double resist) {
-		mPlugin.mEffectManager.addEffect(player, "ShamanPassiveSpeed", new PercentSpeed(40, speed, "ShamanPassiveSpeed"));
-		mPlugin.mEffectManager.addEffect(player, "ShamanPassiveResistance", new PercentDamageReceived(40, -resist));
+		mPlugin.mEffectManager.addEffect(player, "ShamanPassiveSpeed", new PercentSpeed(40, speed, "ShamanPassiveSpeed").displaysTime(false).deleteOnAbilityUpdate(true));
+		mPlugin.mEffectManager.addEffect(player, "ShamanPassiveResistance", new PercentDamageReceived(40, -resist).displaysTime(false).deleteOnAbilityUpdate(true));
 	}
 
 	public static void addTotem(Player player, LivingEntity stand) {
@@ -117,5 +119,16 @@ public class TotemicEmpowerment extends Ability {
 			totemList.remove(stand);
 		}
 		stand.remove();
+	}
+
+	private static Description<TotemicEmpowerment> getDescription() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("While standing within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks of any of your totems, gain ")
+			.addPercent(a -> a.mSpeed, SPEED)
+			.add(" speed and ")
+			.addPercent(a -> a.mResistance, RESISTANCE)
+			.add(" resistance.");
 	}
 }

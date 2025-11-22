@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 public class GalleryExecutionerRageEffect extends GalleryConsumableEffect {
 	/**
 	 * - Your melee attacks deal 30% more damage to targets not at full health,
-	 *  killing an enemy with a melee attack grants you 20% Resistance for 3s  lasting 3 waves
+	 * killing an enemy with a melee attack grants you 20% Resistance for 3s  lasting 3 waves
 	 */
 
 	private static final double MELEE_DAMAGE_INCREASE = 1.3;

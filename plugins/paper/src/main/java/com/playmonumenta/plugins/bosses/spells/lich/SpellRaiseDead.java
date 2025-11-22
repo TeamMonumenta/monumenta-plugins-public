@@ -64,7 +64,7 @@ public class SpellRaiseDead extends Spell {
 				if (players.size() <= 10) {
 					amount = Math.log10(players.size()) * 15 + 5;
 				} else {
-					amount = 10 + players.size() * 1;
+					amount = 10 + players.size();
 				}
 				double a = amount;
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, SoundCategory.HOSTILE, 10, 0.75f);

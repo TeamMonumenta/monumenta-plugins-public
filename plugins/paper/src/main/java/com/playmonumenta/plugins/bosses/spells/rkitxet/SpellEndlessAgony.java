@@ -55,7 +55,7 @@ public class SpellEndlessAgony extends Spell {
 		World world = mCenter.getWorld();
 
 		List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, false);
-		if (players.size() == 0) {
+		if (players.isEmpty()) {
 			return;
 		}
 		if (players.size() > 1 && mRKitxet.getFuryTarget() != null) {
@@ -87,7 +87,7 @@ public class SpellEndlessAgony extends Spell {
 				Location targetLoc = target.getLocation();
 				//If they die, stop
 				if (!targetLoc.getWorld().equals(mRKitxet.getBossLocation().getWorld())
-					    || targetLoc.distance(mRKitxet.getBossLocation()) > RKitxet.detectionRange) {
+					|| targetLoc.distance(mRKitxet.getBossLocation()) > RKitxet.detectionRange) {
 					mChargeUp.reset();
 					this.cancel();
 					return;
@@ -122,7 +122,7 @@ public class SpellEndlessAgony extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return mCount < MAX_COUNT && PlayerUtils.playersInRange(mCenter, mRange, false).size() > 0 && mRKitxet.canUseSpell(SPELL_NAME);
+		return mCount < MAX_COUNT && !PlayerUtils.playersInRange(mCenter, mRange, false).isEmpty() && mRKitxet.canUseSpell(SPELL_NAME);
 	}
 
 	@Override

@@ -186,7 +186,7 @@ public class Haunted {
 						return;
 					}
 					pMovedTick = mPLoc.clone().subtract(p.getLocation()).toVector() // Delta between last location and current location
-					.divide(playerYDivider).length(); // Decrease movement based on vertical player movement
+						.divide(playerYDivider).length(); // Decrease movement based on vertical player movement
 					if (pMovedTick < 0.005) {
 						return;
 					} else if (pMovedTick > 1) {
@@ -302,7 +302,8 @@ public class Haunted {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
-			List<Entity> mHiddenEntities = new ArrayList<>();
+			final List<Entity> mHiddenEntities = new ArrayList<>();
+
 			@Override
 			public void run() {
 				if (mTicks == 1) {

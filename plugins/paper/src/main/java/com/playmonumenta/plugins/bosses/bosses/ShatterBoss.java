@@ -14,6 +14,8 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 
 public class ShatterBoss extends BossAbilityGroup {
@@ -62,12 +64,20 @@ public class ShatterBoss extends BossAbilityGroup {
 		public Material INDICATOR_MATERIAL = Material.CRIMSON_HYPHAE;
 
 		@BossParam(help = "Particle when player gets hit Spawns")
-		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(CRIT_MAGIC,30,2,2,2,1.5)]");
+		public ParticlesList PARTICLE_HIT = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 30, 2.0, 2.0, 2.0, 1.5))
+			.build();
 
 		@BossParam(help = "Sound summoned at boss location when starting the ability. Goes up in Pitch.")
-		public SoundsList SOUND_WARNING = SoundsList.fromString("[(ENTITY_IRON_GOLEM_HURT,10,1)]");
+		public SoundsList SOUND_WARNING = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_IRON_GOLEM_HURT, 10.0f, 1.0f))
+			.build();
 		@BossParam(help = "Sound summoned at boss location when ability is launched.")
-		public SoundsList SOUND_LAUNCH = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,10,0),(ENTITY_GENERIC_EXPLODE, 10,0.5),(ENTITY_ZOMBIE_BREAK_WOODEN_DOOR,10,0.5)]");
+		public SoundsList SOUND_LAUNCH = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_GROWL, 10.0f, 0.0f))
+			.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_EXPLODE, 10.0f, 0.5f))
+			.add(new SoundsList.CSound(Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 10.0f, 0.5f))
+			.build();
 	}
 
 	public ShatterBoss(Plugin plugin, LivingEntity boss) {
@@ -103,7 +113,7 @@ public class ShatterBoss extends BossAbilityGroup {
 				}
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {
-					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME, p.EFFECTS.mEffectList());
 				}
 
 				p.EFFECTS.apply(target, boss);

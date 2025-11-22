@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -19,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class ScorchingSigilCS extends CholericFlamesCS {
 	private static final Particle.DustOptions RED_1 = new Particle.DustOptions(Color.fromRGB(180, 70, 40), 1.1f);
@@ -66,6 +66,7 @@ public class ScorchingSigilCS extends CholericFlamesCS {
 			int mTicks = 0;
 			int mIter = 0;
 			double mDegree = 0;
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 10; i++) {
@@ -110,21 +111,21 @@ public class ScorchingSigilCS extends CholericFlamesCS {
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 					runeLoc.add(0, 1, 0);
 					new PPLine(Particle.REDSTONE, runeLoc, VectorUtils.rotateYAxis(new Vector(0, 2, 1), angle).normalize(), 1.6).data(RED_2)
-							.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
+						.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
 					new PPLine(Particle.REDSTONE, runeLoc, VectorUtils.rotateYAxis(new Vector(0, 2, -1), angle).normalize(), 1.6).data(RED_2)
-							.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
+						.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
 
 					runeLoc.add(0, 1, 0);
 					new PPLine(Particle.REDSTONE, runeLoc, VectorUtils.rotateYAxis(new Vector(0, 2.5, 1), angle).normalize(), 2.0).data(RED_2)
-							.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
+						.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
 					new PPLine(Particle.REDSTONE, runeLoc, VectorUtils.rotateYAxis(new Vector(0, 2.5, -1), angle).normalize(), 2.0).data(RED_2)
-							.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
+						.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
 
 					runeLoc.add(0, 1, 0);
 					new PPLine(Particle.REDSTONE, runeLoc, VectorUtils.rotateYAxis(new Vector(0, 3, 1), angle).normalize(), 1.3).data(RED_3)
-							.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
+						.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
 					new PPLine(Particle.REDSTONE, runeLoc, VectorUtils.rotateYAxis(new Vector(0, 3, -1), angle).normalize(), 1.3).data(RED_3)
-							.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
+						.countPerMeter(7).groupingDistance(0).spawnAsPlayerActive(player);
 				}, 1);
 
 			}

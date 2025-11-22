@@ -47,6 +47,7 @@ import java.util.Map;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -140,6 +141,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 			mPlayersStartingFight.add(player);
 			plugin.mEffectManager.addEffect(player, InfusedLife.GENERIC_NAME, new InfusedLife(20 * 6000));
 			plugin.mEffectManager.addEffect(player, Reincarnation.GENERIC_NAME, new Reincarnation(20 * 6000, 1));
+			player.sendMessage(Component.text("You've gained Reincarnation against death...", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 		}
 	}
 
@@ -189,7 +191,7 @@ public class Ruten extends SerializedLocationBossAbilityGroup {
 	}
 
 	@Override
-	public double maxEntityDeathRange() {
+	public double nearbyEntityDeathMaxRange() {
 		return detectionRange * 2;
 	}
 

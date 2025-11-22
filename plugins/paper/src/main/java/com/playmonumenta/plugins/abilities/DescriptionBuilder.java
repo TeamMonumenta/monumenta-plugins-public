@@ -9,21 +9,27 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class DescriptionBuilder<T extends Ability> implements Description<T> {
+	private static final TextColor TRIGGER_COLOR = NamedTextColor.YELLOW;
 
+	private final Supplier<AbilityInfo<T>> mInfo;
 	private final @Nullable TextColor mBaseColor;
 	private final List<Description<T>> mDescriptions;
 
-	public DescriptionBuilder() {
-		this(null);
+	public DescriptionBuilder(Supplier<AbilityInfo<T>> info) {
+		this(info, null);
 	}
 
-	public DescriptionBuilder(@Nullable TextColor baseColor) {
+	public DescriptionBuilder(Supplier<AbilityInfo<T>> info, @Nullable TextColor baseColor) {
+		mInfo = info;
 		mBaseColor = baseColor;
 		mDescriptions = new ArrayList<>();
 	}
@@ -53,7 +59,7 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 			}
 			Component output = Component.empty().append(base);
 			double diff = getter.apply(a).doubleValue() - baseValue;
-			if (Math.abs(diff) > 0.01) {
+			if (Math.abs(diff) >= 0.01 || getHighestDigit(diff) >= getHighestDigit(baseValue) - 1) {
 				boolean positive = diff >= 0;
 				String sign = positive ? "+" : "";
 				TextColor color = CharmManager.getCharmEffectColor(positive, invertColor);
@@ -68,7 +74,11 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 	}
 
 	public DescriptionBuilder<T> add(Function<T, ? extends Number> getter, double baseValue, boolean invertColor) {
-		return add(getter, baseValue, invertColor, null);
+		return add(getter, baseValue, invertColor, (Function<Double, String>) null);
+	}
+
+	public DescriptionBuilder<T> add(Function<T, ? extends Number> getter, double baseValue, boolean invertColor, Predicate<Ability> levelCondition) {
+		return add(a -> levelCondition.test(a) ? getter.apply(a) : baseValue, baseValue, invertColor);
 	}
 
 	public DescriptionBuilder<T> add(Function<T, ? extends Number> getter, double baseValue) {
@@ -87,6 +97,10 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 		return addDuration(getter, baseDuration, invertColor, false);
 	}
 
+	public DescriptionBuilder<T> addDuration(Function<T, Integer> getter, int baseDuration, boolean invertColor, Predicate<Ability> levelCondition) {
+		return addDuration(a -> levelCondition.test(a) ? getter.apply(a) : baseDuration, baseDuration, invertColor);
+	}
+
 	public DescriptionBuilder<T> addDuration(Function<T, Integer> getter, int baseDuration) {
 		return addDuration(getter, baseDuration, false);
 	}
@@ -97,10 +111,18 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 
 	// Adds the ENTIRE cooldown string, including a space in front.
 	// If this is the last thing (which it should be), finish the previous sentence as if it is the last.
-	public DescriptionBuilder<T> addCooldown(int baseCooldown, boolean useBaseColor) {
+	public DescriptionBuilder<T> addCooldown(int baseCooldown, boolean useBaseColor, Predicate<Ability> levelCondition) {
 		return add(" Cooldown: ")
-			.addDuration(a -> a.getCharmCooldown(baseCooldown), baseCooldown, true, useBaseColor)
+			.addDuration(a -> levelCondition.test(a) ? a.getCharmCooldown(baseCooldown) : baseCooldown, baseCooldown, true, useBaseColor)
 			.add("s.");
+	}
+
+	public DescriptionBuilder<T> addCooldown(int baseCooldown, boolean useBaseColor) {
+		return addCooldown(baseCooldown, useBaseColor, a -> true);
+	}
+
+	public DescriptionBuilder<T> addCooldown(int baseCooldown, Predicate<Ability> levelCondition) {
+		return addCooldown(baseCooldown, false, levelCondition);
 	}
 
 	public DescriptionBuilder<T> addCooldown(int baseCooldown) {
@@ -115,12 +137,29 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 		return addPercent(getter, basePercent, invertColor, false);
 	}
 
+	public DescriptionBuilder<T> addPercent(Function<T, Double> getter, double basePercent, boolean invertColor, Predicate<Ability> levelCondition) {
+		return addPercent(a -> levelCondition.test(a) ? getter.apply(a) : basePercent, basePercent, invertColor);
+	}
+
 	public DescriptionBuilder<T> addPercent(Function<T, Double> getter, double basePercent) {
 		return addPercent(getter, basePercent, false);
 	}
 
 	public DescriptionBuilder<T> addPercent(double basePercent) {
 		return addPercent(a -> basePercent, basePercent);
+	}
+
+	public DescriptionBuilder<T> addPotionAmplifier(int baseAmplifier) {
+		return add(a -> baseAmplifier, baseAmplifier);
+	}
+
+	// Adds 1 because potion amplifiers are lies
+	public DescriptionBuilder<T> addPotionAmplifier(Function<T, Integer> getter, int baseAmplifier) {
+		return add(a -> getter.apply(a) + 1, baseAmplifier + 1, false, d -> StringUtils.toRoman(d.intValue()), false);
+	}
+
+	public DescriptionBuilder<T> addPotionAmplifier(Function<T, Integer> getter, int baseAmplifier, Predicate<Ability> levelCondition) {
+		return addPotionAmplifier(a -> levelCondition.test(a) ? getter.apply(a) : baseAmplifier, baseAmplifier);
 	}
 
 	public DescriptionBuilder<T> addDepthsDamage(Function<T, Double> getter, double baseDamage, boolean useBaseColor) {
@@ -152,6 +191,40 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 		return add((a, p) -> DepthsUtils.getDepthsContent() == content ? Component.text(s) : Component.empty());
 	}
 
+	public DescriptionBuilder<T> addTrigger() {
+		return addTrigger(0);
+	}
+
+	public DescriptionBuilder<T> addTrigger(@Nullable String extraCondition) {
+		return addTrigger(0, extraCondition);
+	}
+
+	public DescriptionBuilder<T> addTrigger(int index) {
+		return addTrigger(index, null);
+	}
+
+	public DescriptionBuilder<T> addTrigger(int index, @Nullable String extraCondition) {
+		return add((a, p) -> {
+			AbilityInfo<T> info = mInfo.get();
+			if (info == null) {
+				//TODO eventually remove null check
+				return Component.empty();
+			}
+			List<AbilityTriggerInfo<T>> triggers = info.getTriggers();
+			if (index > triggers.size()) {
+				return Component.empty();
+			}
+			AbilityTriggerInfo<T> triggerInfo = triggers.get(index);
+			AbilityTriggerInfo<T> customTrigger;
+			if (p == null) {
+				customTrigger = triggerInfo;
+			} else {
+				customTrigger = triggerInfo.withCustomTrigger(info, p);
+			}
+			return customTrigger.getAsNaturalLanguage(extraCondition).color(TRIGGER_COLOR);
+		});
+	}
+
 	@Override
 	public Component get(@Nullable T ability, @Nullable Player player) {
 		Component output = Component.empty();
@@ -159,5 +232,9 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 			output = output.append(desc.get(ability, player));
 		}
 		return output;
+	}
+
+	private static int getHighestDigit(double d) {
+		return (int) Math.floor(Math.log10(d));
 	}
 }

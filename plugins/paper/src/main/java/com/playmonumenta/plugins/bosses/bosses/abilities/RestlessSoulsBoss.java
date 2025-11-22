@@ -67,7 +67,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 			Bukkit.getScheduler().runTask(mMonPlugin, () -> {
 				mAbilities = Stream.of(CholericFlames.class, GraspingClaws.class,
 						MelancholicLament.class, HauntingShades.class, WitheringGaze.class)
-					             .map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
+					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
 			});
 		}
 		cosmetic.createTeam().addEntity(mBoss);
@@ -115,7 +115,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.HAUNTING_SHADES) {
 							EntityUtils.applyVulnerability(mMonPlugin, mDuration, 0.1, e);
 						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.WITHERING_GAZE) {
-							mMonPlugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(mDuration, 1, 40, mPlayer, mPlayerItemStats, ClassAbility.RESTLESS_SOULS, DamageType.AILMENT));
+							mMonPlugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(mDuration, 2, 40, mPlayer, mPlayerItemStats, ClassAbility.RESTLESS_SOULS, DamageType.AILMENT));
 						}
 					}
 				}

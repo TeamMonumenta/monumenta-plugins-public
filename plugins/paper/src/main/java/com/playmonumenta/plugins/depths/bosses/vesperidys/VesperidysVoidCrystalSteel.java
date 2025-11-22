@@ -105,7 +105,10 @@ public class VesperidysVoidCrystalSteel extends BossAbilityGroup {
 		p.RADIUS_INCREMENT = 1;
 		p.Y_OFFSET = -ARMOR_STAND_BLOCK_OFFSET;
 		p.INDICATOR_DELAY = 5;
-		p.SOUND_INITIAL = SoundsList.fromString("[(ENTITY_ARROW_HIT, 3.0, 0.5),(ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 3.0, 0.5)]");
+		p.SOUND_INITIAL = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ARROW_HIT, 3.0f, 0.5f))
+			.add(new SoundsList.CSound(Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 3.0f, 0.5f))
+			.build();
 
 		Spell spell = new Spell() {
 

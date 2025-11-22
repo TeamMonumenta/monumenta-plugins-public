@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class AbstractDepthsRewardGUI extends Gui {
 
 	public static final List<List<Integer>> SLOT_MAP = Arrays.asList(
-		Arrays.asList(13),
+		List.of(13),
 		Arrays.asList(11, 15),
 		Arrays.asList(10, 13, 16),
 		Arrays.asList(10, 12, 14, 16),
@@ -112,7 +112,7 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 			}
 
 			if ((depthsPlayer.hasAbility(BottomlessBowl.ABILITY_NAME) || depthsPlayer.hasAbility(RainbowGeode.ABILITY_NAME))
-				&& !depthsPlayer.mEarnedRewards.isEmpty() && depthsPlayer.mEarnedRewards.peek() != DepthsRoomType.DepthsRewardType.CURSE) {
+				&& !depthsPlayer.mEarnedRewards.isEmpty() && depthsPlayer.peekRewardType() != DepthsRoomType.DepthsRewardType.CURSE) {
 				ItemStack item = GUIUtils.createBasicItem(Material.BARRIER, 1, "Skip", NamedTextColor.RED, true, Component.text("Click to skip these options.", NamedTextColor.GRAY), 30, true);
 				setItem(2, 8, new GuiItem(item).onLeftClick(() -> {
 					close();
@@ -121,7 +121,7 @@ public abstract class AbstractDepthsRewardGUI extends Gui {
 					depthsPlayer.mEarnedRewards.poll();
 					depthsPlayer.mRewardSkips++;
 					if (depthsPlayer.mRewardSkips % 3 == 0 && depthsPlayer.hasAbility(RainbowGeode.ABILITY_NAME)) {
-						depthsPlayer.mEarnedRewards.offer(DepthsRoomType.DepthsRewardType.PRISMATIC);
+						depthsPlayer.addReward(DepthsRoomType.DepthsRewardType.PRISMATIC);
 						mPlayer.playSound(mPlayer, Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.6f);
 					}
 					mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1.0f, 2.0f);

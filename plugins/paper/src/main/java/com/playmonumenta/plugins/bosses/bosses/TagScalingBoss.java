@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import java.util.Collections;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -39,6 +40,9 @@ public class TagScalingBoss extends BossAbilityGroup {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (event.getType() == DamageType.TRUE) {
+			return;
+		}
 		if (damagee instanceof Player && damagee.getScoreboardTags().contains(mParams.TAG)) {
 			event.setFlatDamage((event.getFlatDamage() * (1d + mParams.DAMAGE_INCREASE)));
 		}

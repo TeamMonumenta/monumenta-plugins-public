@@ -139,7 +139,7 @@ public class MailView extends View {
 	}
 
 	@Override
-	protected int entriesPerPage() {
+	protected int rowsPerPage() {
 		return PAGE_HEIGHT;
 	}
 

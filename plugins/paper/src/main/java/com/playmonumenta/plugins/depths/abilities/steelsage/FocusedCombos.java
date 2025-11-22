@@ -25,8 +25,7 @@ public class FocusedCombos extends DepthsCombosAbility {
 
 	public static final String ABILITY_NAME = "Focused Combos";
 	public static final double[] DAMAGE = {0.30, 0.35, 0.40, 0.45, 0.50, 0.80};
-	public static final double BLEED_AMOUNT = 0.2;
-	public static final int BLEED_DURATION = 20 * 3;
+	public static final int BLEED_LEVEL = 1;
 	public static final int HIT_REQUIREMENT = 3;
 
 	public static final DepthsAbilityInfo<FocusedCombos> INFO =
@@ -35,14 +34,10 @@ public class FocusedCombos extends DepthsCombosAbility {
 			.descriptions(FocusedCombos::getDescription)
 			.singleCharm(false);
 
-	private final int mBleedDuration;
-	private final double mBleedAmount;
 	private final double mDamage;
 
 	public FocusedCombos(Plugin plugin, Player player) {
 		super(plugin, player, INFO, HIT_REQUIREMENT, CharmEffects.FOCUSED_COMBOS_HIT_REQUIREMENT.mEffectName);
-		mBleedDuration = CharmManager.getDuration(mPlayer, CharmEffects.FOCUSED_COMBOS_BLEED_DURATION.mEffectName, BLEED_DURATION);
-		mBleedAmount = BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.FOCUSED_COMBOS_BLEED_AMPLIFIER.mEffectName);
 		mDamage = DAMAGE[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.FOCUSED_COMBOS_DAMAGE_MULTIPLIER.mEffectName);
 	}
 
@@ -53,7 +48,7 @@ public class FocusedCombos extends DepthsCombosAbility {
 
 	@Override
 	public void activate(DamageEvent event, LivingEntity enemy) {
-		EntityUtils.applyBleed(mPlugin, mBleedDuration, mBleedAmount, enemy);
+		EntityUtils.applyBleed(mPlugin, mPlayer, enemy, BLEED_LEVEL);
 		event.updateDamageWithMultiplier(1 + mDamage);
 
 		Location playerLoc = mPlayer.getLocation();
@@ -62,16 +57,14 @@ public class FocusedCombos extends DepthsCombosAbility {
 	}
 
 	private static Description<FocusedCombos> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<FocusedCombos>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Every ")
 			.add(a -> a.mHitRequirement, HIT_REQUIREMENT, true)
 			.add(" critical projectile shots, deal ")
 			.addPercent(a -> a.mDamage, DAMAGE[rarity - 1], false, true)
 			.add(" more damage and apply ")
-			.addPercent(a -> a.mBleedAmount, BLEED_AMOUNT)
-			.add(" Bleed for ")
-			.addDuration(a -> a.mBleedDuration, BLEED_DURATION)
-			.add(" seconds.");
+			.add(a -> BLEED_LEVEL, BLEED_LEVEL)
+			.add(" stack of Bleed.");
 	}
 
 }

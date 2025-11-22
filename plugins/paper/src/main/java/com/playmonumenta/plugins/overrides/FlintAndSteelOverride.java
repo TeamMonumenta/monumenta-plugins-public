@@ -11,9 +11,6 @@ import org.jetbrains.annotations.Nullable;
 public class FlintAndSteelOverride extends BaseOverride {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
-		if (player.getGameMode() == GameMode.ADVENTURE) {
-			return false;
-		}
-		return true;
+		return player.getGameMode() != GameMode.ADVENTURE;
 	}
 }

@@ -31,7 +31,7 @@ public class SpellPortalSummons extends Spell {
 
 	private final LivingEntity mBoss;
 	private final Location mStartLoc;
-	private int mCooldownTicks;
+	private final int mCooldownTicks;
 	private final PortalBoss mPortalBoss;
 
 	public SpellPortalSummons(LivingEntity boss, int cooldown, Location startLoc, PortalBoss portalBoss) {

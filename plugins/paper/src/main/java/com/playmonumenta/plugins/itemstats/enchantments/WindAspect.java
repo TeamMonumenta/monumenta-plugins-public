@@ -45,14 +45,28 @@ public class WindAspect implements Enchantment {
 	}
 
 	@Override
+	public double getPriorityAmount() {
+		return 50;
+	}
+
+	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (AbilityUtils.isAspectTriggeringEvent(event, player) && !EntityUtils.isCCImmuneMob(enemy) && EntityUtils.isHostileMob(enemy)) {
+		if (AbilityUtils.isAspectTriggeringEvent(event, player)
+			&& !EntityUtils.isCCImmuneMob(enemy)
+			&& EntityUtils.isHostileMob(enemy)) {
+
+			//Get enchant levels on weapon
+			int knockback = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.KNOCKBACK);
+			int punch = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.PUNCH);
+			int harpoon = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.HARPOON);
+
 			DamageEvent.DamageType type = event.getType();
-			launch(plugin, player, enemy, level * (type == DamageEvent.DamageType.MELEE ? player.getCooledAttackStrength(0) : 1), type);
+
+			launch(plugin, player, enemy, level * (type == DamageEvent.DamageType.MELEE ? player.getCooledAttackStrength(0) : 1), type, knockback <= 0 && punch <= 0 && harpoon <= 0 && type != DamageEvent.DamageType.MAGIC);
 		}
 	}
 
-	public static void launch(Plugin plugin, Player player, LivingEntity e, double level, @Nullable DamageEvent.DamageType type) {
+	public static void launch(Plugin plugin, Player player, LivingEntity e, double level, @Nullable DamageEvent.DamageType type, boolean forceHorizontal) {
 		PotionUtils.applyPotion(player, e, new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0));
 		double kbr = EntityUtils.getAttributeOrDefault(e, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
 
@@ -62,6 +76,8 @@ public class WindAspect implements Enchantment {
 
 		World world = e.getWorld();
 		Location loc = e.getLocation();
+
+		// SFX on-hit
 		if (type == DamageEvent.DamageType.MELEE) {
 			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 1.2f);
 			world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 0.5f, 0.4f);
@@ -70,6 +86,7 @@ public class WindAspect implements Enchantment {
 			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.30f);
 		}
 
+		// VFX
 		double widthDelta = PartialParticle.getWidthDelta(e);
 		double doubleWidthDelta = widthDelta * 2;
 		double heightDelta = PartialParticle.getHeightDelta(e);
@@ -86,7 +103,13 @@ public class WindAspect implements Enchantment {
 		double mult = Math.sqrt(level * (1 - kbr));
 
 		// Run at the end of the tick to override knockback
-		Bukkit.getScheduler().runTask(plugin, () -> e.setVelocity(new Vector(0.f, 0.5 * mult, 0.f)));
+		if (forceHorizontal) {
+			// Force-set the entity's motion for most attacks
+			Bukkit.getScheduler().runTask(plugin, () -> e.setVelocity(new Vector(0.f, 0.5 * mult, 0.f)));
+		} else {
+			// Only force-set the y-velocity of the entity for knockback, punch and alchemists, better CC
+			Bukkit.getScheduler().runTask(plugin, () -> e.setVelocity(e.getVelocity().clone().setY(0.5 * mult)));
+		}
 	}
 
 	@Override

@@ -119,7 +119,7 @@ public class StatTrackManager implements Listener {
 					}
 				}
 				MMLog.warning("Could not update stat track for player " + player.getName() + ": item='" + ItemUtils.getPlainName(data.mOriginalItemStackClone)
-					              + "', infusion='" + data.mInfusion.getName() + "', lost stat track amount=" + data.mUncommittedAmount);
+					+ "', infusion='" + data.mInfusion.getName() + "', lost stat track amount=" + data.mUncommittedAmount);
 			}
 		}
 	}
@@ -191,9 +191,9 @@ public class StatTrackManager implements Listener {
 	public static void incrementStat(ItemStack item, Player player, InfusionType enchant, int amount) {
 		// Check that the player is a patron and the item has their name on it and that it has the right enchant type
 		if (amount != 0
-			    && PlayerData.getPatreonDollars(player) >= PATRON_TIER
-			    && isPlayersItem(item, player)
-			    && ItemStatUtils.getInfusionLevel(item, enchant) > 0) {
+			&& PlayerData.getPatreonDollars(player) >= PATRON_TIER
+			&& isPlayersItem(item, player)
+			&& ItemStatUtils.getInfusionLevel(item, enchant) > 0) {
 			// Call the manager to update the stat when the player is done using the item
 			INSTANCE.scheduleDelayedStatUpdate(item, player, enchant, amount);
 		}

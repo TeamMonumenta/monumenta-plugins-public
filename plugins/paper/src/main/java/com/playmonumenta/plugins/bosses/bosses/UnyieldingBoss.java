@@ -66,11 +66,11 @@ public class UnyieldingBoss extends BossAbilityGroup {
 				public void run() {
 					// Cancel upon knock away, knockup, silence, stun, frozen (hard cc)
 					if (!mBoss.isValid()
-						    || mBoss.hasPotionEffect(PotionEffectType.SLOW_FALLING)
-						    || mBoss.hasPotionEffect(PotionEffectType.LEVITATION)
-						    || EffectManager.getInstance().hasEffect(mBoss, Frozen.class)
-						    || EffectManager.getInstance().hasEffect(mBoss, DisableAI.class)
-						    || EffectManager.getInstance().hasEffect(mBoss, DisableGravity.class)) {
+						|| mBoss.hasPotionEffect(PotionEffectType.SLOW_FALLING)
+						|| mBoss.hasPotionEffect(PotionEffectType.LEVITATION)
+						|| EffectManager.getInstance().hasEffect(mBoss, Frozen.class)
+						|| EffectManager.getInstance().hasEffect(mBoss, DisableAI.class)
+						|| EffectManager.getInstance().hasEffect(mBoss, DisableGravity.class)) {
 						interrupt();
 						return;
 					}
@@ -114,7 +114,9 @@ public class UnyieldingBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossKnockedAway(float speed) {
-		interrupt();
+		if (speed >= 2f) {
+			interrupt();
+		}
 	}
 }
 

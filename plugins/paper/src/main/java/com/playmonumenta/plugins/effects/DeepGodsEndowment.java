@@ -36,7 +36,7 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 
 			if (mComboCount >= HIT_REQUIREMENT) {
 				mComboCount = 0;
-				Plugin.getInstance().mEffectManager.addEffect(player, COOLDOWN_EFFECT, new OnHitTimerEffect(DepthsCombosAbility.COOLDOWN_DURATION, 1));
+				Plugin.getInstance().mEffectManager.addEffect(player, COOLDOWN_EFFECT, new OnHitTimerEffect(DepthsCombosAbility.COOLDOWN_DURATION));
 
 				int randInt = FastUtils.RANDOM.nextInt(0, 6);
 				switch (randInt) {

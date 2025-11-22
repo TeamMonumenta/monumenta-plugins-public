@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -25,6 +26,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
+import org.bukkit.entity.ThrowableProjectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -38,7 +41,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	private static final double TIME_TO_DROP = 75;
 	private static final double XZ_DISTANCE_TO_DROP = 14;
 
-	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
+	private final Map<ThrowableProjectile, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 	private final String mProjectileName;
 	private final String mTotemName;
 	public final String mDisplayName;
@@ -69,7 +72,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		mIsCharging = mChargeUpTicks > 0;
 
 		World world = mPlayer.getWorld();
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, mProjectileName, null);
+		ThrowableProjectile proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, mProjectileName, null, LocationUtils.isLocationInWater(mPlayer.getLocation()));
 		mCosmetic.totemCast(mPlayer, proj, mTotemName);
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
@@ -84,6 +87,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		new BukkitRunnable() {
 			int mT = 0;
 			final Location mPlayerLocation = mPlayer.getLocation();
+
 			@Override
 			public void run() {
 				if (mProjectiles.get(proj) != playerItemStats) {
@@ -118,7 +122,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (proj instanceof Snowball && proj.getTicksLived() <= 160) {
+		if ((proj instanceof Snowball || proj instanceof Trident) && proj.getTicksLived() <= 160) {
 			ItemStatManager.PlayerItemStats stats = mProjectiles.remove(proj);
 			if (!mPlayer.getWorld().equals(proj.getWorld()) || mPlayer.getLocation().distance(proj.getLocation()) >= 50) {
 				return;
@@ -128,6 +132,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 				onTotemHitEntity(hitMob);
 				placeTotem(proj.getLocation(), stats);
 			}
+			proj.remove();
 		}
 	}
 
@@ -163,6 +168,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		ClientModHandler.updateAbility(mPlayer, this);
 		mTotemTickingRunnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				Location standLocation = stand.getLocation();

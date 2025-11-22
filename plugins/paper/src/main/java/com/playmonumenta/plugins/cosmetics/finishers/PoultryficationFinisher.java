@@ -57,7 +57,7 @@ public class PoultryficationFinisher implements EliteFinisher {
 			mPlayer = p;
 			registerKill(killedMob, loc);
 			CosmeticsManager.getInstance().registerPlayingFinisher(this);
-			this.runTaskTimer(Plugin.getInstance(), 0, 1);
+			runTaskTimer(Plugin.getInstance(), 0, 1);
 		}
 
 		@Override
@@ -77,6 +77,7 @@ public class PoultryficationFinisher implements EliteFinisher {
 		@Override
 		public void run() {
 			if (mChickens.isEmpty()) {
+				// Intentionally *don't* cancel so that this can be resumed
 				return;
 			}
 			if (mTicks % TICKS_PER_HALF_BEAT == 0) {
@@ -400,7 +401,7 @@ public class PoultryficationFinisher implements EliteFinisher {
 
 			if (mTicks % (TICKS_PER_BAR * BARS_PER_KILL) == 0) {
 				pause();
-				if (mTicks == TICKS_PER_BAR * BARS_PER_KILL * KILLS_TO_RESTART) {
+				if (mTicks >= TICKS_PER_BAR * BARS_PER_KILL * KILLS_TO_RESTART) {
 					CosmeticsManager.getInstance().cancelPlayingFinisher(mPlayer);
 				}
 			}
@@ -470,7 +471,8 @@ public class PoultryficationFinisher implements EliteFinisher {
 		}
 	}
 
-	@Override public Material getDisplayItem() {
+	@Override
+	public Material getDisplayItem() {
 		return Material.CHICKEN;
 	}
 }

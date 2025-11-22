@@ -16,7 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class Colossal {
 
-	private static final double SPAWN_CHANCE_PER_LEVEL = 0.05;
+	private static final double SPAWN_CHANCE_PER_LEVEL = 0.03;
 	private static final LoSPool COLOSSAL_LAND_POOL = new LoSPool.LibraryPool("~DelveColossalLand");
 	private static final LoSPool COLOSSAL_WATER_POOL = new LoSPool.LibraryPool("~DelveColossalWater");
 
@@ -60,8 +60,8 @@ public class Colossal {
 		loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.HOSTILE, 0.6f, 0.1f);
 		loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.HOSTILE, 0.4f, 0.1f);
 		new PPRectPrism(Particle.REDSTONE, loc.clone().add(-0.5, -0.5, -0.5), loc.clone().add(0.5, 0.5, 0.5))
-				.countPerMeter(20).edgeMode(true).gradientColor(Color.fromRGB(247, 188, 37), Color.fromRGB(235, 69, 28), 0.75f)
-				.data(new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1f)).spawnAsEnemy();
+			.countPerMeter(20).edgeMode(true).gradientColor(Color.fromRGB(247, 188, 37), Color.fromRGB(235, 69, 28), 0.75f)
+			.data(new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1f)).spawnAsEnemy();
 
 		final int mAir = airBlocks;
 		final int mWater = waterBlocks;

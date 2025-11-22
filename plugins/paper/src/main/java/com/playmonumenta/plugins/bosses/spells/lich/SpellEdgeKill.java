@@ -20,7 +20,7 @@ public class SpellEdgeKill extends Spell {
 	private final LivingEntity mBoss;
 	private final Location mCenter;
 	private boolean mTrigger = false;
-	private List<Player> mWarned = new ArrayList<>();
+	private final List<Player> mWarned = new ArrayList<>();
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
 		Material.AIR,
@@ -54,7 +54,7 @@ public class SpellEdgeKill extends Spell {
 				Location standLoc = p.getLocation();
 				standLoc.subtract(0, 1, 0);
 				if (pLoc.distance(mCenter) > mMaxDistance &&
-					    (!mIgnoredMats.contains(p.getLocation().getBlock().getType()) || !mIgnoredMats.contains(standLoc.getBlock().getType()))) {
+					(!mIgnoredMats.contains(p.getLocation().getBlock().getType()) || !mIgnoredMats.contains(standLoc.getBlock().getType()))) {
 					//players are on the outer ring of the arena, do damage + massive knock back into arena
 					BossUtils.bossDamagePercent(mBoss, p, 0.4);
 					MovementUtils.knockAway(mCenter, p, -5, false);

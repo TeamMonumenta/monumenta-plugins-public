@@ -229,7 +229,7 @@ public class DeathlyBombs extends Spell {
 				// move the bullet
 				double speedThisTick = (speed + (acceleration / 20) * mTicks) / 20;
 				Vector change = direction.clone().multiply(speedThisTick);
-				bullet.setTransformation(new Transformation(new Vector3f((float)(mTotalChange.getX() + change.getX() * 2), (float)(mTotalChange.getY() + change.getY() * 2), (float)(mTotalChange.getZ() + change.getZ() * 2)), bullet.getTransformation().getLeftRotation(), bullet.getTransformation().getScale(), bullet.getTransformation().getRightRotation()));
+				bullet.setTransformation(new Transformation(new Vector3f((float) (mTotalChange.getX() + change.getX() * 2), (float) (mTotalChange.getY() + change.getY() * 2), (float) (mTotalChange.getZ() + change.getZ() * 2)), bullet.getTransformation().getLeftRotation(), bullet.getTransformation().getScale(), bullet.getTransformation().getRightRotation()));
 				bullet.setInterpolationDelay(-1);
 
 				mTotalChange.add(change);

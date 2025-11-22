@@ -45,7 +45,6 @@ public class TowerMob {
 	}
 
 
-
 	public ItemStack buildTeamItem(TowerGame game) {
 		ItemStack stack = new ItemStack(mInfo.mBaseItem);
 		ItemMeta meta = stack.getItemMeta();
@@ -94,16 +93,16 @@ public class TowerMob {
 		meta.displayName(TowerGameUtils.getLevelComponent(mMobLevel));
 
 		List<Component> list = new ArrayList<>();
-		int damageMult = (int) ((mInfo.mMobRarity.getDamageMult() * (mMobLevel - 1) * 100)/ 100 * 100);
+		int damageMult = (int) ((mInfo.mMobRarity.getDamageMult() * (mMobLevel - 1) * 100) / 100 * 100);
 		int lvlDamageMult = (int) (mInfo.mMobRarity.getDamageMult() * 100);
 
 		if (mMobLevel < 5) {
 			list.add(Component.text("This mob receives " + damageMult + "% ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
-				         .append(Component.text("(+" + lvlDamageMult + "%)", NamedTextColor.DARK_PURPLE))
-				         .append(Component.text(" less damage", NamedTextColor.DARK_GRAY)));
+				.append(Component.text("(+" + lvlDamageMult + "%)", NamedTextColor.DARK_PURPLE))
+				.append(Component.text(" less damage", NamedTextColor.DARK_GRAY)));
 			list.add(Component.text("This mob does " + damageMult + "% ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
-						.append(Component.text("(+" + lvlDamageMult + "%)", NamedTextColor.DARK_PURPLE))
-						.append(Component.text(" more damage", NamedTextColor.DARK_GRAY)));
+				.append(Component.text("(+" + lvlDamageMult + "%)", NamedTextColor.DARK_PURPLE))
+				.append(Component.text(" more damage", NamedTextColor.DARK_GRAY)));
 			list.add(Component.empty());
 			int nextLvlCost = TowerGameUtils.getNextLevelCost(this);
 			list.add(Component.text("Pay " + nextLvlCost + " to buy an upgrade!", NamedTextColor.DARK_PURPLE).decoration(TextDecoration.ITALIC, false));

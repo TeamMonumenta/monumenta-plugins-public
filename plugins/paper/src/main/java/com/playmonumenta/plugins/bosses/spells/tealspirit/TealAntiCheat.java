@@ -18,9 +18,9 @@ public class TealAntiCheat extends Spell {
 	private static final double HEIGHT_DOWN = 3;
 	private static final int RANGE = 50;
 
-	private LivingEntity mBoss;
-	private int mDuration;
-	private Location mSpawnLoc;
+	private final LivingEntity mBoss;
+	private final int mDuration;
+	private final Location mSpawnLoc;
 	private int mTimer = 0;
 
 	public TealAntiCheat(LivingEntity boss, int duration, Location spawnLoc) {

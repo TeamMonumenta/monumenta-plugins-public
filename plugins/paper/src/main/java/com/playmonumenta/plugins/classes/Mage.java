@@ -40,8 +40,7 @@ public class Mage extends PlayerClass {
 		mClassGlassFiller = Material.PURPLE_STAINED_GLASS_PANE;
 		mDisplayItem = Material.BLAZE_ROD;
 		mClassDescription = "Mages are masters of area control, freezing, wounding, and igniting enemies with their strikes.";
-		mClassPassiveDescription = String.format("Your spell damage is increased by your wand's Spell Power stat. After casting a spell, your next melee attack with a wand deals %s%% more damage.", (int) (Channeling.PERCENT_MELEE_INCREASE * 100));
-		mClassPassiveName = "Channeling";
+		mPassive = Channeling.INFO;
 
 		mSpecOne.mAbilities.add(AstralOmen.INFO);
 		mSpecOne.mAbilities.add(CosmicMoonblade.INFO);

@@ -48,8 +48,6 @@ public class DarkCombos extends DepthsCombosAbility {
 	}
 
 
-
-
 	@Override
 	public void activate(DamageEvent event, LivingEntity enemy) {
 		activate(enemy, mPlayer, mPlugin, mDuration, mVuln);
@@ -76,7 +74,7 @@ public class DarkCombos extends DepthsCombosAbility {
 	}
 
 	private static Description<DarkCombos> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DarkCombos>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Every ")
 			.add(a -> a.mHitRequirement, HIT_REQUIREMENT, true)
 			.add(" melee attacks, apply ")

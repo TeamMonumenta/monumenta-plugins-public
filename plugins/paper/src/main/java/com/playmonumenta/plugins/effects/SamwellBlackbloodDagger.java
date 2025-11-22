@@ -28,7 +28,8 @@ public class SamwellBlackbloodDagger extends ZeroArgumentEffect {
 		}
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 		return String.format("SamwellBlackbloodDagger duration:%d", this.getDuration());
 	}
 }

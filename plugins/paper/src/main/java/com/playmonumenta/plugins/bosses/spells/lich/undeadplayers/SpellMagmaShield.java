@@ -111,7 +111,7 @@ public class SpellMagmaShield extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return PlayerUtils.playersInRange(mBoss.getLocation(), 9, true).size() > 0;
+		return !PlayerUtils.playersInRange(mBoss.getLocation(), 9, true).isEmpty();
 	}
 
 	@Override

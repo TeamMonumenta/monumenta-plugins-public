@@ -19,8 +19,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SpellBladeDance extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mCaster;
+	private final Plugin mPlugin;
+	private final LivingEntity mCaster;
 
 	public SpellBladeDance(Plugin plugin, LivingEntity caster) {
 		mPlugin = plugin;
@@ -60,9 +60,9 @@ public class SpellBladeDance extends Spell {
 				double z2 = FastUtils.randomDoubleInRange(loc2.getZ(), loc1.getZ());
 
 				new BukkitRunnable() {
-					Location mLoc1 = new Location(world, x1, y1, z1);
-					Location mLoc2 = new Location(world, x2, y2, z2);
-					Vector mDir = LocationUtils.getDirectionTo(mLoc2, mLoc1);
+					final Location mLoc1 = new Location(world, x1, y1, z1);
+					final Location mLoc2 = new Location(world, x2, y2, z2);
+					final Vector mDir = LocationUtils.getDirectionTo(mLoc2, mLoc1);
 					int mTicks = 0;
 
 					@Override
@@ -86,7 +86,7 @@ public class SpellBladeDance extends Spell {
 					//Ultra flash
 					new BukkitRunnable() {
 						double mRotation = 0;
-						Location mLoc = mCaster.getLocation();
+						final Location mLoc = mCaster.getLocation();
 						double mRadius = 0;
 						double mY = 2.5;
 						double mYminus = 0.35;

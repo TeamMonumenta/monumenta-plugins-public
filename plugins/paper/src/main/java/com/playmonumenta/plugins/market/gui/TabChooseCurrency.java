@@ -28,7 +28,7 @@ public class TabChooseCurrency implements MarketGuiTab {
 	public void setup() {
 		for (int region = 0; region < CURRENCY_LOOTTABLE.length; region++) {
 			if ((region == 1 && ScoreboardUtils.getScoreboardValue(mGui.mPlayer, "Quest101").orElse(0) < 13)
-			|| (region == 2 && !PlayerUtils.hasUnlockedRing(mGui.mPlayer))) {
+				|| (region == 2 && !PlayerUtils.hasUnlockedRing(mGui.mPlayer))) {
 				continue;
 			}
 			for (int compression = 0; compression < CURRENCY_LOOTTABLE[region].length; compression++) {
@@ -39,7 +39,7 @@ public class TabChooseCurrency implements MarketGuiTab {
 
 				mGui.setItem(1 + region, 3 + compression, MarketGuiIcons.buildChooseCurrencyIcon(currency))
 					.onLeftClick(() -> {
-						((TabAddListing)mGui.TAB_ADD_LISTING).setCurrency(currency);
+						((TabAddListing) mGui.TAB_ADD_LISTING).setCurrency(currency);
 						mGui.switchToTab(mGui.TAB_ADD_LISTING);
 					});
 			}

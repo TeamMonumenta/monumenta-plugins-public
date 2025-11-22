@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,12 +27,18 @@ public class WindWalkCS implements CosmeticSkill {
 	public void initialEffects(Player mPlayer, Location loc, World world) {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 1.75f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1, 1f);
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
+		new PPCircle(Particle.SMOKE_NORMAL, loc, 2.5)
+			.rotateDelta(true)
+			.directionalMode(true)
+			.delta(0.2, 0, 0)
+			.extra(1)
+			.count(20)
+			.spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CLOUD, loc, 20, 0.25, 0.45, 0.25, 0.15).spawnAsPlayerActive(mPlayer);
 	}
 
 	public void trailEffect(Player mPlayer, int mTicks) {
-		new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7/Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7 / Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
 	}
 
 	public void enemyStunEffect(Player mPlayer, LivingEntity mob, World world) {

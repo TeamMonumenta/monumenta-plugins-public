@@ -39,14 +39,10 @@ public class GalleryManager implements Listener {
 	public static final String TAG_SPAWNING_LOC = "GalleryUtilSpawn";
 	public static final String TAG_DEAD_BOX_LOC = "GalleryUtilDeadBox";
 	protected static final Map<UUID, GalleryGame> GAMES = new HashMap<>();
-	@SuppressWarnings("NullAway.Init")
-	public static Plugin mPlugin;
 
 	private static @Nullable BukkitRunnable mRunnable = null;
 
-	public GalleryManager(Plugin plugin) {
-		mPlugin = plugin;
-
+	public GalleryManager() {
 		loadOldGames();
 		ensureRunnable();
 	}
@@ -142,9 +138,11 @@ public class GalleryManager implements Listener {
 	protected static int ticks = 0;
 
 	private static void ensureRunnable() {
+		final var plugin = Plugin.getInstance();
 		if (mRunnable == null || mRunnable.isCancelled()) {
 			mRunnable = new BukkitRunnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					boolean oneHertz = ticks % 20 == 0;
 					boolean twoHertz = ticks % 10 == 0;
 					GalleryGame crashedGame = null;
@@ -163,7 +161,7 @@ public class GalleryManager implements Listener {
 							e.printStackTrace();
 							removeGame(crashedGame);
 							try {
-								FileUtils.writeJson(mPlugin.getDataFolder() + "/Gallery/Crashed/" + crashedGame.mUUIDGame + ".json", crashedGame.toJson());
+								FileUtils.writeJson(plugin.getDataFolder() + "/Gallery/Crashed/" + crashedGame.mUUIDGame + ".json", crashedGame.toJson());
 							} catch (IOException ex) {
 								ex.printStackTrace();
 							}
@@ -173,7 +171,7 @@ public class GalleryManager implements Listener {
 					ticks++;
 				}
 			};
-			mRunnable.runTaskTimer(mPlugin, 0, 1);
+			mRunnable.runTaskTimer(plugin, 0, 1);
 		}
 	}
 
@@ -223,7 +221,7 @@ public class GalleryManager implements Listener {
 			gameArr.add(game.toJson());
 		}
 		try {
-			FileUtils.writeJson(mPlugin.getDataFolder() + "/Gallery/GalleryGames.json", games);
+			FileUtils.writeJson(Plugin.getInstance().getDataFolder() + "/Gallery/GalleryGames.json", games);
 		} catch (Exception e) {
 			GalleryUtils.printDebugMessage("Error while saving files - This is a serious bug! Reason: " + e.getMessage());
 			e.printStackTrace();
@@ -233,7 +231,7 @@ public class GalleryManager implements Listener {
 	private void loadOldGames() {
 		JsonObject obj = null;
 		try {
-			obj = FileUtils.readJson(mPlugin.getDataFolder() + "/Gallery/GalleryGames.json");
+			obj = FileUtils.readJson(Plugin.getInstance().getDataFolder() + "/Gallery/GalleryGames.json");
 		} catch (Exception e) {
 			GalleryUtils.printDebugMessage("Exception while reading the file with old games! if this happen on weekly update is not a bug! reason: " + e.getMessage());
 		}

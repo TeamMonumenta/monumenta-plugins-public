@@ -1,12 +1,17 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.delves.DelvesManager;
+import com.playmonumenta.plugins.effects.ProjectileIframe;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
+import com.playmonumenta.plugins.events.HemorrhageEvent;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -18,14 +23,17 @@ import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class WormBoss extends BossAbilityGroup {
+public class WormBoss extends BossAbilityGroup implements Listener {
 	public static final String identityTag = "boss_worm";
+	public static final String IGNORE_WORM_TAG = WormSegmentBoss.identityTag;
 
 	public static class Parameters extends BossParameters {
 		public int DETECTION = 64;
@@ -40,19 +48,19 @@ public class WormBoss extends BossAbilityGroup {
 		public double SEGMENT_DISTANCE = 0.8;
 
 		@BossParam(help = "Pool from which to take body segments. If not set, will use a copy of the main mob without passengers. These should probably have the delve immune tag.")
-		public LoSPool BODY_POOL = LoSPool.EMPTY;
+		public LoSPool BODY_POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "Pool from which to take the tail segment. If not set, will use a copy of the main mob without passengers. These should probably have the delve immune tag.")
-		public LoSPool TAIL_POOL = LoSPool.EMPTY;
+		public LoSPool TAIL_POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "Pool from which to take body passengers.")
-		public LoSPool BODY_PASSENGER_POOL = LoSPool.EMPTY;
+		public LoSPool BODY_PASSENGER_POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "How often to place a body passenger (e.g. 3 = every third segment). The first is placed after this many body segments.")
 		public int BODY_PASSENGER_INTERVAL = 1;
 
 		@BossParam(help = "Pool from which to take the tail passenger.")
-		public LoSPool TAIL_PASSENGER_POOL = LoSPool.EMPTY;
+		public LoSPool TAIL_PASSENGER_POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "Size of the body entities (for slimes etc.). -1 to use the head's size. Does not affect body segments if a mob pool is used for body segments.")
 		public int BODY_SIZE = -1;
@@ -81,11 +89,6 @@ public class WormBoss extends BossAbilityGroup {
 			@Override
 			public void run() {
 				if (!mBoss.isValid()) {
-					if (!mBoss.isDead()) {
-						for (LivingEntity part : mParts) {
-							part.remove();
-						}
-					}
 					cancel();
 					return;
 				}
@@ -113,7 +116,6 @@ public class WormBoss extends BossAbilityGroup {
 	}
 
 	private void summonPart(Parameters params, int index, boolean tail) {
-
 		double logIndex = Math.log(1 + index / 6.0);
 		Location spawnLocation = mBoss.getLocation().add(VectorUtils.rotateYAxis(new Vector(mBoss.getWidth() * (0.8 + logIndex), 0, 0), 500 * logIndex));
 		LivingEntity part = null;
@@ -123,20 +125,39 @@ public class WormBoss extends BossAbilityGroup {
 		}
 		if (part == null) {
 			part = EntityUtils.copyMob(mBoss, spawnLocation);
-			part.addScoreboardTag(DelvesManager.AVOID_MODIFIERS);
-			part.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
-			part.addScoreboardTag(EntityUtils.DONT_ENTER_BOATS_TAG);
-			int size = tail ? params.TAIL_SIZE : params.BODY_SIZE;
-			if (size >= 0) {
-				EntityUtils.setSize(part, size);
-			}
-			Component customName = mBoss.customName();
-			if (customName != null) {
-				part.customName(customName.append(Component.text(tail ? " Tail" : " Body")));
-			}
 		}
+		part.addScoreboardTag(DelvesManager.AVOID_MODIFIERS);
+		part.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
+		part.addScoreboardTag(EntityUtils.DONT_ENTER_BOATS_TAG);
+		try {
+			BossManager.getInstance().manuallyRegisterBoss(part, new WormSegmentBoss(mPlugin, part, mBoss));
+		} catch (Exception e) {
+			MMLog.warning("Failed to create boss WormSegmentBoss: " + e.getMessage());
+			e.printStackTrace();
+		}
+		int size = tail ? params.TAIL_SIZE : params.BODY_SIZE;
+		if (size >= 0) {
+			EntityUtils.setSize(part, size);
+		}
+		String name = mBoss.getName();
+		part.customName(Component.text(name + (tail ? " Tail" : " Body")));
+
 		part.setSilent(true);
-		part.getPassengers().forEach(p -> p.setSilent(true));
+		part.getPassengers().forEach(passenger -> {
+			passenger.setSilent(true);
+			passenger.addScoreboardTag(DelvesManager.AVOID_MODIFIERS);
+			passenger.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
+			passenger.addScoreboardTag(EntityUtils.DONT_ENTER_BOATS_TAG);
+			if (passenger instanceof LivingEntity livingEntity) {
+				try {
+					BossManager.getInstance().manuallyRegisterBoss(livingEntity, new WormSegmentBoss(mPlugin, livingEntity, null));
+					// We still want the bosstag so that it doesn't proc Cloaked or UA or whatever, but we don't want damage transference, so set the head to null
+				} catch (Exception e) {
+					MMLog.warning("Failed to create boss WormSegmentBoss: " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		});
 		mParts.add(part);
 
 		if (tail || index % params.BODY_PASSENGER_INTERVAL == 0) {
@@ -166,13 +187,39 @@ public class WormBoss extends BossAbilityGroup {
 		}
 	}
 
+	@EventHandler
+	public void onHemorrhage(HemorrhageEvent event) {
+		if (event.getMob() == mBoss) {
+			for (LivingEntity livingEntity : mParts) {
+				if (!livingEntity.isDead()) {
+					EntityUtils.applyHemorrhageCooldown(
+						com.playmonumenta.plugins.Plugin.getInstance(),
+						livingEntity, true);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
+		if (event.getEffect() instanceof ProjectileIframe projectileIframe) {
+			// Has to be hardcoded for proj iframes...
+			for (LivingEntity part : mParts) {
+				if (!part.isDead()) {
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.
+						addEffect(part, ProjectileIframe.SOURCE, projectileIframe.cleanCopy());
+				}
+			}
+		}
+	}
+
 	@Override
 	public void unload() {
 		super.unload();
 		if (!mBoss.isDead()) {
-			for (LivingEntity part : mParts) {
-				part.remove();
-			}
+			// Would really like to remove the entities here, but removal isn't allowed during chunk unloading
+			// Instead just clear the list, the entities have REMOVE_ON_UNLOAD tag so they'll be removed when the chunk loads next
+			mParts.clear();
 		}
 	}
 

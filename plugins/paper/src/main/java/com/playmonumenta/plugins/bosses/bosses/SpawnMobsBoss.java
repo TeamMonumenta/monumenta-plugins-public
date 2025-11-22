@@ -20,6 +20,8 @@ public class SpawnMobsBoss extends BossAbilityGroup {
 		public int DETECTION = 20;
 		@BossParam(help = "not written")
 		public int COOLDOWN = 160;
+		@BossParam(help = "Whether it needs to have line of sight or not")
+		public boolean LINEOFSIGHT = false;
 		@BossParam(help = "not written")
 		public String SPAWNEDMOB = "";
 		@BossParam(help = "not written")
@@ -39,7 +41,7 @@ public class SpawnMobsBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		Spell spell = new SpellSpawnMobs(boss, p.SPAWNCOUNT, p.SPAWNEDMOB, p.COOLDOWN, p.RANGE, p.MIN_RANGE, p.MOB_CAP, p.MOB_CAP_RANGE, p.CAP_MOBS_BY_NAME, p.MOB_CAP_NAME);
+		Spell spell = new SpellSpawnMobs(boss, p.SPAWNCOUNT, p.SPAWNEDMOB, p.COOLDOWN, p.RANGE, p.MIN_RANGE, p.LINEOFSIGHT, p.DETECTION, p.MOB_CAP, p.MOB_CAP_RANGE, p.CAP_MOBS_BY_NAME, p.MOB_CAP_NAME);
 
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}

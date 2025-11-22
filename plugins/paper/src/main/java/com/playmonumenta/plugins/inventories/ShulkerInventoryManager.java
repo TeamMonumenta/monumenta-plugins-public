@@ -45,9 +45,9 @@ public class ShulkerInventoryManager {
 	/**
 	 * Opens a shulker box directly from an inventory and gives the player access.
 	 *
-	 * @param player The Player who is trying to open the Shulker Box.
+	 * @param player          The Player who is trying to open the Shulker Box.
 	 * @param parentInventory The inventory the Shulker Box item is in.
-	 * @param parentSlot The slot the Shulker Box is in.
+	 * @param parentSlot      The slot the Shulker Box is in.
 	 * @return True if the Shulker Box was successfully opened.
 	 */
 	public boolean openShulker(Player player, Inventory parentInventory, int parentSlot) {
@@ -66,8 +66,8 @@ public class ShulkerInventoryManager {
 		ItemStack shulkerItem = parentInventory.getItem(parentSlot);
 		if (shulkerItem != null && ItemUtils.isShulkerBox(shulkerItem.getType())) {
 			// Get metadata from shulker box. If it doesn't have metadata, this will generate blank data.
-			BlockStateMeta shulkerMeta = (BlockStateMeta)shulkerItem.getItemMeta();
-			ShulkerBox shulkerBox = (ShulkerBox)shulkerMeta.getBlockState();
+			BlockStateMeta shulkerMeta = (BlockStateMeta) shulkerItem.getItemMeta();
+			ShulkerBox shulkerBox = (ShulkerBox) shulkerMeta.getBlockState();
 			// If any of the metadata was missing and needed to be generated, update the item with the generated data.
 			if (!shulkerItem.hasItemMeta() || !shulkerMeta.hasBlockState()) {
 				shulkerMeta.setBlockState(shulkerBox);
@@ -79,7 +79,7 @@ public class ShulkerInventoryManager {
 				if (lock.startsWith("ShulkerShortcut:")) {
 					UUID lockUUID = UUID.fromString(lock.substring(16));
 					if (mInventories.containsKey(lockUUID)) {
-						if (mInventories.get(lockUUID).getViewers().size() != 0) {
+						if (!mInventories.get(lockUUID).getViewers().isEmpty()) {
 							// Someone has this shulker open already
 							player.sendMessage(ERROR_SHULKER_ALREADY_OPEN);
 							return false;
@@ -132,10 +132,10 @@ public class ShulkerInventoryManager {
 	 * Temporarily opens a Shulker Box without giving access to a player.
 	 * This open shulker will have one ItemStack inserted, then be closed.
 	 *
-	 * @param player Player who is depositing the item.
+	 * @param player          Player who is depositing the item.
 	 * @param parentInventory The inventory the shulker is in.
-	 * @param parentSlot The slot the Shulker Box is in.
-	 * @param item The item(s) to be inserted in the form of an ItemStack.
+	 * @param parentSlot      The slot the Shulker Box is in.
+	 * @param item            The item(s) to be inserted in the form of an ItemStack.
 	 * @return The amount of items from the stack that were not able to fit in the Shulker Box.
 	 */
 	public int addItemToShulker(Player player, Inventory parentInventory, int parentSlot, ItemStack item) {
@@ -166,7 +166,7 @@ public class ShulkerInventoryManager {
 				if (lock.startsWith("ShulkerShortcut:")) {
 					UUID lockUUID = UUID.fromString(lock.substring(16));
 					if (mInventories.containsKey(lockUUID)) {
-						if (mInventories.get(lockUUID).getViewers().size() != 0) {
+						if (!mInventories.get(lockUUID).getViewers().isEmpty()) {
 							// Someone has this shulker open already.
 							player.sendMessage(ERROR_SHULKER_ALREADY_OPEN);
 							return -1;
@@ -221,11 +221,10 @@ public class ShulkerInventoryManager {
 	 * @param player Player whose Shulker Box should be updated.
 	 * @return True if the player has a valid Shulker open.
 	 */
-	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public boolean updateShulker(Player player) {
 		if (mInventories.containsKey(player.getUniqueId())) {
 			ShulkerInventory inv = mInventories.get(player.getUniqueId());
-			if (inv.getViewers().size() == 0) {
+			if (inv.getViewers().isEmpty()) {
 				// Shulker is no longer actually open, close it.
 				return closeShulker(player);
 			}
@@ -257,12 +256,11 @@ public class ShulkerInventoryManager {
 	 * Closes a Shulker Box opened via a player.
 	 * This does not force the player to close their inventory.
 	 *
-	 * @param player Player whose Shulker Box should be closed.
+	 * @param player  Player whose Shulker Box should be closed.
 	 * @param instant If the Shulker Box should be saved on the same tick. Only used if the parent inventory will not
 	 *                exist on the next tick. For example: When a player is logging out.
 	 * @return True if the player had a valid open Shulker Box.
 	 */
-	@SuppressWarnings("UnusedReturnValue")
 	public boolean closeShulker(Player player, boolean instant) {
 		return closeShulker(player.getUniqueId(), instant);
 	}
@@ -274,7 +272,6 @@ public class ShulkerInventoryManager {
 	 * @param uuid UUID of the player whose Shulker Box should be closed.
 	 * @return True if the player had a valid open Shulker Box
 	 */
-	@SuppressWarnings("UnusedReturnValue")
 	private boolean closeShulker(UUID uuid) {
 		return closeShulker(uuid, false);
 	}
@@ -283,7 +280,7 @@ public class ShulkerInventoryManager {
 	 * Closes a Shulker Box opened via a player.
 	 * This does not force the player to close their inventory.
 	 *
-	 * @param uuid UUID of the player whose Shulker Box should be closed.
+	 * @param uuid    UUID of the player whose Shulker Box should be closed.
 	 * @param instant If the Shulker Box should be saved on the same tick. Only used if the parent inventory will not
 	 *                exist on the next tick. For example: When a player is logging out.
 	 * @return True if the player had a valid open Shulker Box
@@ -337,7 +334,7 @@ public class ShulkerInventoryManager {
 					// Shulker Box was opened via shortcut
 					UUID lockUUID = UUID.fromString(shulkerBox.getLock().substring(16));
 					if (INSTANCE.mInventories.containsKey(lockUUID) &&
-						INSTANCE.mInventories.get(lockUUID).getViewers().size() > 0) {
+						!INSTANCE.mInventories.get(lockUUID).getViewers().isEmpty()) {
 						// Someone is currently using the shulker.
 						return true;
 					}
@@ -382,7 +379,7 @@ public class ShulkerInventoryManager {
 					// Shulker Box was opened via shortcut
 					UUID lockUUID = UUID.fromString(shulkerBox.getLock().substring(16));
 					if (INSTANCE.mInventories.containsKey(lockUUID) &&
-						INSTANCE.mInventories.get(lockUUID).getViewers().size() > 0) {
+						!INSTANCE.mInventories.get(lockUUID).getViewers().isEmpty()) {
 						// Someone is currently using the shulker.
 						return true;
 					}

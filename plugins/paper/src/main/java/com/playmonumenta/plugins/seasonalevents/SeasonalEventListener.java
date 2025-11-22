@@ -5,10 +5,8 @@ import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.redissync.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -95,6 +93,19 @@ public class SeasonalEventListener implements Listener {
 	}
 
 	/**
+	 * Called from RushManager.
+	 * Run through any potential rush mission and give credit.
+	 */
+
+	public static void playerRushRound(Player p) {
+		for (Mission mission : SeasonalEventManager.getActiveMissions()) {
+			if (mission.mType == MissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.RUSH_WAVE)) {
+				SeasonalEventManager.addMissionProgress(p, mission, 1);
+			}
+		}
+	}
+
+	/**
 	 * Main event handler for tracking Monumenta content completion.
 	 * Runs through most mission types and checks for if
 	 * credit should be awarded.
@@ -155,18 +166,6 @@ public class SeasonalEventListener implements Listener {
 				} else if (mission.mType == MissionType.REGIONAL_CONTENT && content.getRegion() == mission.mRegion) {
 					// Region matches up - award points
 					SeasonalEventManager.addMissionProgress(p, mission, 1);
-				} else if (mission.mType == MissionType.ROD_WAVES && content == MonumentaContent.RUSH) {
-					// Cleared rod - add number of waves cleared
-					int waves = ScoreboardUtils.getScoreboardValue(p.getName(), ROD_WAVE_SCOREBOARD);
-					// Subtract the 20 wave checkpoint if player has certain tags
-					Set<String> tags = p.getScoreboardTags();
-					if (tags.contains("rod_checkpoint_start") || tags.contains("Primary") || tags.contains("Partner")) {
-						waves -= 20;
-					}
-
-					if (waves > 0) {
-						SeasonalEventManager.addMissionProgress(p, mission, waves);
-					}
 				} else if (mission.mType == MissionType.DAILY_BOUNTY && (content == MonumentaContent.KINGS_BOUNTY || content == MonumentaContent.CELSIAN_BOUNTY || content == MonumentaContent.RING_BOUNTY)) {
 					SeasonalEventManager.addMissionProgress(p, mission, 1);
 				} else if (mission.mType == MissionType.DELVE_BOUNTY && content == MonumentaContent.DELVE_BOUNTY) {

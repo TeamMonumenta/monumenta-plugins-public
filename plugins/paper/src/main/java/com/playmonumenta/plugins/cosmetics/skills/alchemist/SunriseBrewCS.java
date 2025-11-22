@@ -35,8 +35,8 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-				"The purest drops of sunlight.",
-				"Radiant, shining, replenishing.");
+			"The purest drops of sunlight.",
+			"Radiant, shining, replenishing.");
 	}
 
 	@Override

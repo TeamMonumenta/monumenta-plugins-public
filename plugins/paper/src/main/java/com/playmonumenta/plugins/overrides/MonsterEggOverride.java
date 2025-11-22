@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.plots.AnimalLimits;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -22,11 +23,11 @@ public class MonsterEggOverride extends BaseOverride {
 		if ((player.getGameMode() == GameMode.CREATIVE)) {
 			return true;
 		}
+		if (GuildPlotUtils.guildPlotUseEggsBlocked(player)) {
+			return false;
+		}
 		if (ZoneUtils.isInPlot(player)) {
-			if (!AnimalLimits.PLOT_ANIMAL_EGGS.contains(item.getType())) {
-				return true;
-			}
-			return AnimalLimits.maySummonPlotAnimal(player.getLocation());
+			return AnimalLimits.mayUsePossibleSpawnEgg(player.getLocation(), item);
 		}
 		return false;
 	}
@@ -45,6 +46,10 @@ public class MonsterEggOverride extends BaseOverride {
 			return true;
 		}
 
+		if (GuildPlotUtils.guildPlotUseEggsBlocked(player)) {
+			return false;
+		}
+
 		return false;
 	}
 
@@ -55,13 +60,7 @@ public class MonsterEggOverride extends BaseOverride {
 				return false;
 			}
 
-			if (!AnimalLimits.PLOT_ANIMAL_EGGS.contains(dispensed.getType())) {
-				return true;
-			}
-
-			if (ZoneUtils.isInPlot(block.getLocation())) {
-				return AnimalLimits.maySummonPlotAnimal(block.getLocation());
-			}
+			return AnimalLimits.mayUsePossibleSpawnEgg(block.getLocation(), dispensed);
 		}
 
 		return true;

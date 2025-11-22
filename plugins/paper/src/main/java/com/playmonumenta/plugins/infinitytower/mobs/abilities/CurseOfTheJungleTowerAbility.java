@@ -42,12 +42,12 @@ public class CurseOfTheJungleTowerAbility extends TowerAbility {
 				if (mTimer % 5 == 0) {
 					List<LivingEntity> targets = (mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs());
 					for (LivingEntity target : targets) {
-						 if (target.getLocation().distance(mBoss.getLocation()) <= 8) {
-							 if (EffectManager.getInstance() != null) {
-								 EffectManager.getInstance().addEffect(target, "ITCurseOfTheSpeed", new PercentSpeed(20, -0.2, "ITCurseOfTheSpeed"));
-							 }
-							 EntityUtils.applyWeaken(Plugin.getInstance(), 20, 0.2, target);
-						 }
+						if (target.getLocation().distance(mBoss.getLocation()) <= 8) {
+							if (EffectManager.getInstance() != null) {
+								EffectManager.getInstance().addEffect(target, "ITCurseOfTheSpeed", new PercentSpeed(20, -0.2, "ITCurseOfTheSpeed"));
+							}
+							EntityUtils.applyWeaken(Plugin.getInstance(), 20, 0.2, target);
+						}
 
 					}
 					if (mTimer % 20 == 0) {

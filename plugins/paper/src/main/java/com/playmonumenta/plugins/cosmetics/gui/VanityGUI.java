@@ -35,11 +35,11 @@ public class VanityGUI extends Gui {
 	static final int STRAND_COST_PER_VANITY_UNLOCK = 16;
 
 	private static final ImmutableMap<EquipmentSlot, Integer> VANITY_EQUIPMENT_TITLE_SLOTS = ImmutableMap.of(
-		EquipmentSlot.HEAD, 1 * 9 + 2,
-		EquipmentSlot.CHEST, 1 * 9 + 3,
-		EquipmentSlot.LEGS, 1 * 9 + 4,
-		EquipmentSlot.FEET, 1 * 9 + 5,
-		EquipmentSlot.OFF_HAND, 1 * 9 + 6
+		EquipmentSlot.HEAD, 9 + 2,
+		EquipmentSlot.CHEST, 9 + 3,
+		EquipmentSlot.LEGS, 9 + 4,
+		EquipmentSlot.FEET, 9 + 5,
+		EquipmentSlot.OFF_HAND, 9 + 6
 	);
 	private static final ImmutableMap<EquipmentSlot, Integer> VANITY_EQUIPMENT_ITEM_SLOTS = ImmutableMap.of(
 		EquipmentSlot.HEAD, 2 * 9 + 2,
@@ -162,7 +162,7 @@ public class VanityGUI extends Gui {
 			ItemMeta meta = selfVanityToggle.getItemMeta();
 			((SkullMeta) meta).setOwningPlayer(mPlayer);
 			meta.displayName(Component.text("Self Vanity " + (vanityData.mSelfVanityEnabled ? "Enabled" : "Disabled"), vanityData.mSelfVanityEnabled ? NamedTextColor.GREEN : NamedTextColor.RED)
-				                 .decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			meta.lore(List.of(Component.text("Click to toggle whether your own", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("vanity is visible to yourself as well.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			selfVanityToggle.setItemMeta(meta);
@@ -175,7 +175,7 @@ public class VanityGUI extends Gui {
 			ItemStack otherVanityToggle = new ItemStack(Material.PLAYER_HEAD, 1);
 			ItemMeta meta = otherVanityToggle.getItemMeta();
 			meta.displayName(Component.text("Others' Vanity " + (vanityData.mOtherVanityEnabled ? "Enabled" : "Disabled"), vanityData.mOtherVanityEnabled ? NamedTextColor.GREEN : NamedTextColor.RED)
-				                 .decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			meta.lore(List.of(Component.text("Click to toggle whether you see", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("other people's vanity equipment.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			otherVanityToggle.setItemMeta(meta);
@@ -188,7 +188,7 @@ public class VanityGUI extends Gui {
 			ItemStack lockboxVanityToggle = new ItemStack(Material.GRAY_SHULKER_BOX, 1);
 			ItemMeta meta = lockboxVanityToggle.getItemMeta();
 			meta.displayName(Component.text("Lockbox Vanity Swap " + (vanityData.mLockboxSwapEnabled ? "Enabled" : "Disabled"), vanityData.mLockboxSwapEnabled ? NamedTextColor.GREEN : NamedTextColor.RED)
-				                 .decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			meta.lore(List.of(Component.text("Click to toggle whether Lockboxes", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("swap vanity along with equipment.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			lockboxVanityToggle.setItemMeta(meta);
@@ -206,7 +206,7 @@ public class VanityGUI extends Gui {
 			ItemStack guiVanityToggle = new ItemStack(vanityData.mGuiVanityEnabled ? Material.GLOW_ITEM_FRAME : Material.ITEM_FRAME, 1);
 			ItemMeta meta = guiVanityToggle.getItemMeta();
 			meta.displayName(Component.text("GUI Vanity " + (vanityData.mGuiVanityEnabled ? "Enabled" : "Disabled"), vanityData.mGuiVanityEnabled ? NamedTextColor.GREEN : NamedTextColor.RED)
-				                 .decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			meta.lore(List.of(Component.text("Click to toggle whether you see", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("vanity equipment in GUIs.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("(e.g. in the Player Stats GUI)", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
@@ -263,7 +263,7 @@ public class VanityGUI extends Gui {
 		}
 		// equip vanity equipment from inventory
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.SOULBOUND) > 0
-			    && !mPlayer.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
+			&& !mPlayer.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
 			mPlayer.sendMessage(Component.text("This item is soulbound to another player!", NamedTextColor.RED));
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 			return;

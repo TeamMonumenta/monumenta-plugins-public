@@ -32,9 +32,9 @@ public class ThornsDamage implements Attribute {
 		//Only deal damage if damager is alive and damage is not from an ability.
 		//Damage will be 0.0 if used in the wrong slot, but attribute will still be called. Cancel the damage effect if this is the case as well.
 		if (value > 0
-			    && source != null
-			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)
-			    && !event.isBlocked()) {
+			&& source != null
+			&& (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)
+			&& !event.isBlocked()) {
 			DamageUtils.damage(player, source, DamageType.THORNS, value, null, false, true);
 		}
 	}

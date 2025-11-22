@@ -133,7 +133,7 @@ public class Cryobox extends DepthsAbility {
 		}
 		if (!ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
 			//Ripped this straight from frost giant, epic
-			Location[] locs = new Location[] {
+			Location[] locs = new Location[]{
 				//First Layer
 				center.clone().add(1, 0, 0),
 				center.clone().add(-1, 0, 0),
@@ -166,7 +166,7 @@ public class Cryobox extends DepthsAbility {
 				center.clone().add(-1, -1, 0),
 				center.clone().add(0, -1, 1),
 				center.clone().add(0, -1, -1),
-				};
+			};
 
 			for (Location loc : locs) {
 				DepthsUtils.spawnIceTerrain(loc.getBlock(), mIceDuration, mPlayer);
@@ -176,6 +176,7 @@ public class Cryobox extends DepthsAbility {
 		// restore 8 absorption/sec while standing on ice
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (DepthsUtils.isOnIce(mPlayer)) {
@@ -196,7 +197,7 @@ public class Cryobox extends DepthsAbility {
 	}
 
 	private static Description<Cryobox> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Cryobox>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When your health drops below ")
 			.addPercent(TRIGGER_HEALTH)
 			.add(", gain ")

@@ -1,6 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +15,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
@@ -140,6 +144,12 @@ public class StringUtils {
 	}
 
 	public static String toRoman(int number) {
+		if (number == 0) {
+			return "0";
+		}
+		if (number < 0) {
+			return "-" + toRoman(-number);
+		}
 		Map.Entry<Integer, String> entry = TO_ROMAN_MAP.floorEntry(number);
 		Integer l = entry.getKey();
 		if (l == null) {
@@ -203,6 +213,14 @@ public class StringUtils {
 		long hours = minutes / 60;
 		minutes %= 60;
 		return String.format("%d:%02d:%02d", hours, minutes, seconds);
+	}
+
+	public static String longToOptionalHoursMinuteAndSeconds(long i) {
+		if (i >= 3600) {
+			return longToHoursMinuteAndSeconds(i);
+		} else {
+			return intToMinuteAndSeconds((int) i);
+		}
 	}
 
 	public static String ticksToTime(int ticks) {
@@ -278,6 +296,10 @@ public class StringUtils {
 		return ticksToSeconds((int) ticks);
 	}
 
+	public static String ticksToMinutes(double ticks) {
+		return to2DP(ticks / 1200d);
+	}
+
 	// Converts to 2dp with no trailing zeros, for display purposes
 	public static String to2DP(double value) {
 		return new DecimalFormat("#.##").format(value);
@@ -312,7 +334,7 @@ public class StringUtils {
 				String typeString;
 				switch (type) {
 					case MELEE, MELEE_ENCH, MELEE_SKILL -> typeString = "Melee";
-					case PROJECTILE, PROJECTILE_SKILL -> typeString = "Projectile";
+					case PROJECTILE, PROJECTILE_ENCH, PROJECTILE_SKILL -> typeString = "Projectile";
 					case MAGIC -> typeString = "Magic";
 					case BLAST -> typeString = "Blast";
 					case FALL -> typeString = "Fall";
@@ -459,5 +481,18 @@ public class StringUtils {
 		}
 		// We only get to this point if every character is an integer
 		return Integer.parseInt(s);
+	}
+
+	// Returns the UUID from the input or throws an exception at the player if the input is invalid
+	public static UUID getUuidFromInput(String input) throws WrapperCommandSyntaxException {
+		try {
+			return UUID.fromString(input);
+		} catch (IllegalArgumentException e) {
+			UUID uuid = MonumentaRedisSyncIntegration.cachedNameToUuid(input);
+			if (uuid == null) {
+				throw CommandAPI.failWithString("The player name '" + input + "' couldn't be found. Please check your spelling and ensure proper capitalization.");
+			}
+			return uuid;
+		}
 	}
 }

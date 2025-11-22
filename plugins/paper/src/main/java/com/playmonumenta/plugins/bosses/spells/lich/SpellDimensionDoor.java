@@ -5,12 +5,12 @@ import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.bosses.ShieldSwitchBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -51,6 +51,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public class SpellDimensionDoor extends Spell {
 	private static final String SPELL_NAME = "Dimension Door";
@@ -201,8 +203,8 @@ public class SpellDimensionDoor extends Spell {
 					//move portal center to ground, stop above bedrock so that it doesn't replace bedrock
 					Location locDown = mLoc.clone().subtract(0, 1, 0);
 					while ((mLoc.getBlock().isPassable() || mLoc.getBlock().isLiquid()
-								|| mLoc.getBlock().isEmpty()) && locDown.getBlock().getType() != Material.BEDROCK
-							   && mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
+						|| mLoc.getBlock().isEmpty()) && locDown.getBlock().getType() != Material.BEDROCK
+						&& mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
 						mLoc.setY(mLoc.getY() - 1);
 						locDown = mLoc.clone().subtract(0, 1, 0);
 					}
@@ -356,9 +358,11 @@ public class SpellDimensionDoor extends Spell {
 		} else {
 			t = 20 * 10;
 			DamageUtils.damage(mBoss, p, DamageType.OTHER, 1);
-			p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, 1);
-			AbilityUtils.increaseDamageDealtPlayer(p, 20 * 30, -0.2, "Lich");
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "LichDimensionDoorWeakness",
+				new PercentDamageDealt(TICKS_PER_SECOND * 30, -0.2));
 			Lich.cursePlayer(p);
+
+			p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, 1);
 		}
 		int tick = t;
 
@@ -420,7 +424,7 @@ public class SpellDimensionDoor extends Spell {
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, PercentDamageReceived.GENERIC_NAME,
 							new PercentDamageReceived(20 * 5, -1.0));
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, CustomRegeneration.effectID,
-							new CustomRegeneration(20 * 5, 1.0, 25, null, com.playmonumenta.plugins.Plugin.getInstance()));
+							new CustomRegeneration(20 * 5, 1.0, 25, null, false, com.playmonumenta.plugins.Plugin.getInstance()));
 
 						p.sendMessage(Component.text("Something feels different. The shadows aren't clinging to me anymore.", NamedTextColor.AQUA));
 					} else {

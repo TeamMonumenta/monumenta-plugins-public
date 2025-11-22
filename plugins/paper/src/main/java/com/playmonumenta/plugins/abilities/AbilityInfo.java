@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -146,8 +147,21 @@ public class AbilityInfo<T extends Ability> {
 		return this;
 	}
 
+	public AbilityInfo<T> cooldown(int cooldown1, int cooldown2, String charmCooldown, String charmCooldown2) {
+		mCooldowns = List.of(cooldown1, cooldown2, cooldown1, cooldown2);
+		mCharmCooldown = charmCooldown;
+		mCharmCooldown2 = charmCooldown2;
+		return this;
+	}
+
 	public AbilityInfo<T> cooldown(int cooldown1, int cooldown2, int cooldownEnhanced, String charmCooldown) {
 		mCooldowns = List.of(cooldown1, cooldown2, cooldownEnhanced, cooldownEnhanced);
+		mCharmCooldown = charmCooldown;
+		return this;
+	}
+
+	public AbilityInfo<T> cooldown(int cooldown1, int cooldown2, int cooldownEnhanced1, int cooldownEnhanced2, String charmCooldown) {
+		mCooldowns = List.of(cooldown1, cooldown2, cooldownEnhanced1, cooldownEnhanced2);
 		mCharmCooldown = charmCooldown;
 		return this;
 	}
@@ -170,6 +184,16 @@ public class AbilityInfo<T extends Ability> {
 
 	public AbilityInfo<T> descriptions(String level1, String level2, String enhancement) {
 		mDescriptions = Stream.of(level1, level2, enhancement).map(Component::text).map(c -> (Description<T>) (a, p) -> c).toList();
+		return this;
+	}
+
+	public AbilityInfo<T> descriptions(Description<T> level1, Description<T> level2) {
+		mDescriptions = Arrays.asList(level1, level2);
+		return this;
+	}
+
+	public AbilityInfo<T> descriptions(Description<T> level1, Description<T> level2, Description<T> enhancement) {
+		mDescriptions = Arrays.asList(level1, level2, enhancement);
 		return this;
 	}
 
@@ -346,10 +370,6 @@ public class AbilityInfo<T extends Ability> {
 		return mDescriptions.stream().map(d -> d.get(ability, player)).toList();
 	}
 
-	public Component getDescription(int level) {
-		return getDescription(level, null, false);
-	}
-
 	public Component getDescription(int level, @Nullable Player player, boolean useAbility) {
 		return getDescription(level, player, useAbility ? getPlayerAbility(Plugin.getInstance(), player) : null);
 	}
@@ -359,7 +379,7 @@ public class AbilityInfo<T extends Ability> {
 	}
 
 	public Component getFormattedDescription(@Nullable Player player, int skillLevel, boolean enabled) throws IndexOutOfBoundsException {
-		Component description = getDescription(skillLevel);
+		Component description = getDescription(skillLevel, player, true);
 
 		String displayName = mDisplayName;
 		if (displayName == null) {
@@ -377,8 +397,8 @@ public class AbilityInfo<T extends Ability> {
 		}
 
 		return Component.text("")
-			       .append(Component.text(skillHeader, coloured ? NamedTextColor.GREEN : NamedTextColor.GRAY, TextDecoration.BOLD))
-			       .append(description.color(coloured ? NamedTextColor.YELLOW : NamedTextColor.GRAY));
+			.append(Component.text(skillHeader, coloured ? NamedTextColor.GREEN : NamedTextColor.GRAY, TextDecoration.BOLD))
+			.append(description.color(coloured ? NamedTextColor.YELLOW : NamedTextColor.GRAY));
 	}
 
 	public Component getFormattedDescriptions(Player player) {
@@ -434,7 +454,7 @@ public class AbilityInfo<T extends Ability> {
 			hoverableString += "*";
 		}
 		return Component.text(hoverableString, NamedTextColor.YELLOW)
-			       .hoverEvent(getFormattedDescriptions(player, level, isEnhanced, enabled, ServerProperties.getAbilityEnhancementsEnabled(player)));
+			.hoverEvent(getFormattedDescriptions(player, level, isEnhanced, enabled, ServerProperties.getAbilityEnhancementsEnabled(player)));
 	}
 
 	public TextColor getActionBarColor() {
@@ -471,6 +491,9 @@ public class AbilityInfo<T extends Ability> {
 		if (mShorthandName != null) {
 			info.addProperty("shortName", mShorthandName);
 		}
+		if (mSimpleDescription != null) {
+			info.addProperty("simpleDescription", mSimpleDescription);
+		}
 		List<Component> descriptionList = getDescriptions();
 		if (!descriptionList.isEmpty()) {
 			JsonArray descriptions = new JsonArray();
@@ -500,7 +523,7 @@ public class AbilityInfo<T extends Ability> {
 	@Override
 	public String toString() {
 		return "AbilityInfo{" +
-			       "mAbilityClass=" + mAbilityClass +
-			       '}';
+			"mAbilityClass=" + mAbilityClass +
+			'}';
 	}
 }

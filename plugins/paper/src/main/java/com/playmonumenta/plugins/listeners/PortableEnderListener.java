@@ -27,8 +27,8 @@ public class PortableEnderListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (event.getClick() == ClickType.RIGHT &&
-				event.getAction() == InventoryAction.PICKUP_HALF &&
-				event.getWhoClicked() instanceof Player player) {
+			event.getAction() == InventoryAction.PICKUP_HALF &&
+			event.getWhoClicked() instanceof Player player) {
 			// An item was right-clicked
 			ItemStack item = event.getCurrentItem();
 			if (isPortableEnder(item)) {
@@ -37,9 +37,8 @@ public class PortableEnderListener implements Listener {
 				if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
 					player.sendMessage(Component.text("The void here is too thick to part", NamedTextColor.RED));
 					player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
-				} else if (ScoreboardUtils.getScoreboardValue(player, "RushDown").orElse(0) < 40 &&
-					           ScoreboardUtils.getScoreboardValue(player, "RushDuo").orElse(0) < 80) {
-					player.sendMessage(Component.text("You must conquer Wave 40 of Rush of Dissonance solo or Wave 80 as a duo before you can part the void.", NamedTextColor.RED));
+				} else if (ScoreboardUtils.getScoreboardValue(player, "RemnantUnlocked").orElse(0) < 1) {
+					player.sendMessage(Component.text("You must conquer Round 20 of Rush of Dissonance before you can part the void.", NamedTextColor.RED));
 					player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
 				} else {
 					player.closeInventory(InventoryCloseEvent.Reason.OPEN_NEW);
@@ -60,10 +59,8 @@ public class PortableEnderListener implements Listener {
 
 	public static boolean isPortableEnder(@Nullable ItemStack item) {
 		if (item != null && ItemUtils.isShulkerBox(item.getType()) && item.hasItemMeta()) {
-			if (item.getItemMeta() instanceof BlockStateMeta) {
-				BlockStateMeta blockStateMeta = (BlockStateMeta) item.getItemMeta();
-				if (blockStateMeta.getBlockState() instanceof ShulkerBox) {
-					ShulkerBox shulkerBox = (ShulkerBox) blockStateMeta.getBlockState();
+			if (item.getItemMeta() instanceof BlockStateMeta blockStateMeta) {
+				if (blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
 					return shulkerBox.isLocked() && shulkerBox.getLock().equals(LOCK_STRING);
 				}
 			}

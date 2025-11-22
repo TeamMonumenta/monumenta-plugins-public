@@ -88,7 +88,8 @@ public class Multiplicity extends DepthsAbility {
 					mPlugin.mTimers.updateCooldown(mPlayer, spell, (int) (CDR[mRarity - 1] * a.getInfo().getModifiedCooldown(mPlayer, a.getAbilityScore())));
 				}
 			});
-			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_EFFECT, new PercentDamageDealt(DURATION, DAMAGE[mRarity - 1], DamageEvent.DamageType.getAllMeleeTypes()));
+			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_EFFECT,
+				new PercentDamageDealt(DURATION, DAMAGE[mRarity - 1]).damageTypes(DamageEvent.DamageType.getAllMeleeTypes()));
 			mLastAbilities.clear();
 
 			// Activation Effects
@@ -104,7 +105,7 @@ public class Multiplicity extends DepthsAbility {
 	}
 
 	private static Description<Multiplicity> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Multiplicity>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("After casting 3 abilities from different trees in a row, refund ")
 			.addPercent(a -> CDR[rarity - 1], CDR[rarity - 1], false, true)
 			.add(" of those abilities' cooldowns and gain ")

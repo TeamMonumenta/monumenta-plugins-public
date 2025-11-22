@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
  * of any particle design (lines, arcs, helixes, etc.) on the<br>
  * specified axis.<br>
  * Order of rotation (IMPORTANT): Z-axis, X-Axis, Y-axis
- *
+ * <p>
  * (Now also does other things.)
  *
  * @author NickNackGus
@@ -151,6 +151,11 @@ public class VectorUtils {
 			return new Vector(1, 0, 0);
 		}
 		return v;
+	}
+
+	public static Vector randomHorizontalUnitVector() {
+		double angle = FastUtils.randomDoubleInRange(0, Math.PI * 2);
+		return new Vector(FastUtils.sin(angle), 0, FastUtils.cos(angle));
 	}
 
 	/**

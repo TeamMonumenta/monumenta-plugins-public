@@ -13,10 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- *           Base class of Interactable Object.
- *           The player can interact with this object by press the swap key
- *           while having the Gallery Brochure on main hand,
- *           then if canInteractWithObject(...) return true interactWithObject(...) will run.
+ * Base class of Interactable Object.
+ * The player can interact with this object by press the swap key
+ * while having the Gallery Brochure on main hand,
+ * then if canInteractWithObject(...) return true interactWithObject(...) will run.
  *
  */
 public class BaseInteractable {

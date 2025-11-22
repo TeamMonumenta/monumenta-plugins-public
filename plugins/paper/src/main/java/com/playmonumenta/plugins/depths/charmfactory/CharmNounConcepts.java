@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.depths.charmfactory;
 
 import com.playmonumenta.plugins.depths.DepthsTree;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public enum CharmNounConcepts {
 
@@ -142,7 +142,6 @@ public enum CharmNounConcepts {
 	NIGHT("Night", DepthsTree.SHADOWDANCER),
 	ARTILLERY("Artillery", DepthsTree.STEELSAGE),
 	THE_WIND("the Wind", DepthsTree.WINDWALKER);
-
 
 
 	public final String mName;

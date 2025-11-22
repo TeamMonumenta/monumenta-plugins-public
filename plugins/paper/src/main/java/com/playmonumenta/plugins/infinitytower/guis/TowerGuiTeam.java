@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.infinitytower.guis;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.infinitytower.TowerFileUtils;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerGameUtils;
-import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
@@ -100,7 +100,6 @@ public class TowerGuiTeam extends CustomInventory {
 	}
 
 
-
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
@@ -118,7 +117,7 @@ public class TowerGuiTeam extends CustomInventory {
 		if (mTowerMobMap.get(slot) != null) {
 			mInventory.clear();
 			player.closeInventory();
-			new TowerGuiMob(player, mGame, mTowerMobMap.get(slot)).openInventory(player, TowerManager.mPlugin);
+			new TowerGuiMob(player, mGame, mTowerMobMap.get(slot)).openInventory(player, Plugin.getInstance());
 			return;
 		}
 
@@ -134,10 +133,7 @@ public class TowerGuiTeam extends CustomInventory {
 		}
 
 
-
-
 	}
-
 
 
 }

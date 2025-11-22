@@ -107,8 +107,8 @@ public class Pyroblast extends DepthsAbility {
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (isOnCooldown()
-			    || !mPlayer.isSneaking()
-			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			|| !mPlayer.isSneaking()
+			|| !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			return true;
 		}
 		putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
@@ -150,7 +150,7 @@ public class Pyroblast extends DepthsAbility {
 	}
 
 	private static Description<Pyroblast> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Pyroblast>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Shooting a projectile while sneaking fires an exploding projectile, which deals ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage to mobs within ")

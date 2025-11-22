@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -18,6 +17,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class StrawEffigyCS extends JudgementChainCS {
 	private static final Particle.DustOptions STRAW = new Particle.DustOptions(Color.fromRGB(250, 230, 80), 1f);
@@ -91,7 +91,7 @@ public class StrawEffigyCS extends JudgementChainCS {
 		new PartialParticle(Particle.SWEEP_ATTACK, target.getEyeLocation(), 1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, targetLoc, 30, 0.75, 0.75, 0.75, 0.125).spawnAsPlayerActive(player);
 		new PPLine(Particle.BLOCK_CRACK, LocationUtils.getEntityCenter(player), LocationUtils.getEntityCenter(target))
-				.data(Material.HAY_BLOCK.createBlockData()).countPerMeter(8).delta(0.03).spawnAsPlayerActive(player);
+			.data(Material.HAY_BLOCK.createBlockData()).countPerMeter(8).delta(0.03).spawnAsPlayerActive(player);
 
 		world.playSound(playerLoc, Sound.ENTITY_GUARDIAN_DEATH, SoundCategory.PLAYERS, 1.0f, 0.6f);
 		world.playSound(playerLoc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.6f, 0.6f);

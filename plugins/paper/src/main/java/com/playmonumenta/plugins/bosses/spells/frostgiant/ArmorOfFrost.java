@@ -111,7 +111,8 @@ public final class ArmorOfFrost extends Spell {
 
 			switch (mLevel) {
 				case 2 -> mFrostGiant.sendDialogue("The armor cracks from the icicle.", NamedTextColor.AQUA, false);
-				case 1 -> mFrostGiant.sendDialogue("The armor begins to falter from the icicle barrage.", NamedTextColor.AQUA, false);
+				case 1 ->
+					mFrostGiant.sendDialogue("The armor begins to falter from the icicle barrage.", NamedTextColor.AQUA, false);
 				default -> {
 					new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation().add(0, 4, 0), 50, 0.5, 0.5, 0.5, 0.3).spawnAsEntityActive(mBoss);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.HOSTILE, 3, 2);

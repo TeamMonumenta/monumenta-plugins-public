@@ -64,8 +64,8 @@ public abstract class Ability {
 		mPlayer = player;
 		mInfo = info;
 		mCustomTriggers = info.getTriggers().stream()
-			                  .map(ti -> ti.withCustomTrigger(info, player))
-			                  .toList();
+			.map(ti -> ti.withCustomTrigger(info, player))
+			.toList();
 	}
 
 	/**
@@ -228,13 +228,13 @@ public abstract class Ability {
 	}
 
 	public boolean playerSplashedByPotionEvent(Collection<LivingEntity> affectedEntities,
-											   ThrownPotion potion, PotionSplashEvent event) {
+	                                           ThrownPotion potion, PotionSplashEvent event) {
 		return true;
 	}
 
 	// Called when entities are hit by a potion a player threw
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities,
-										   ThrownPotion potion, PotionSplashEvent event) {
+	                                       ThrownPotion potion, PotionSplashEvent event) {
 		return true;
 	}
 

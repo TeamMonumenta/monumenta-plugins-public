@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.scriptedquests.Plugin;
 import com.playmonumenta.scriptedquests.zones.Zone;
-import java.util.List;
 import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -24,16 +24,24 @@ public class ZoneUtils {
 		BLOCKBREAK_DISABLED("Blockbreak Disabled"),
 		BONE_MEAL_DISABLED("Bone Meal Disabled"),
 		BROOMSTICK_ENABLED("Broomstick Enabled"),
+		CAN_DEPOSIT_INTO_POTS("Can Deposit Into Pots"),
+		CAN_SHOOT_POTS("Can Shoot Pots"),
+		CONDUIT_POWER_WATER("Conduit Power Water"),
+		DISABLE_CUSTOM_TRADE_GUI("Disable Custom Trade GUI"),
 		DISABLE_GRAVES("Disable Graves"),
 		DISABLE_MAGIC_TESS("DisableMagicTess"),
+		DISABLE_PURPLE_TESS("DisablePurpleTesseract"),
 		DISABLE_REDSTONE_INTERACTIONS("Disable Redstone Interactions"),
+		EXPLOSION_PROOF_CHESTS("Explosion Proof Chests"),
 		FESTIVE_TESSERACT_DISABLED("Festive Tesseract Disabled"),
+		FORCE_ENABLE_GRAPPLING_HOOK("Force Enable Grappling Hook"),
 		ITEM_FRAMES_EDITABLE("Item Frames Editable"),
 		LAND_BOAT_POSSIBLE("Land Boat Possible"),
 		LOOTING_LIMITER_DISABLED("Looting Limiter Disabled"),
 		LOOTROOM("Lootroom"),
 		MASK_JUMP_BOOST("Mask Jump Boost"),
 		MASK_SPEED("Mask Speed"),
+		MASK_GEAR_PROJECTILE_SPEED("Mask Gear Projectile Speed"),
 		MECHANICAL_ARMORY_DISABLED("MechanicalArmoryDisabled"),
 		MONUMENT("Monument"),
 		NO_BERRY_BUSH_CLICKS("No Berry Bush Clicks"),
@@ -42,6 +50,7 @@ public class ZoneUtils {
 		NO_EQUIPMENT_DAMAGE("No Equipment Damage"),
 		NO_EXPLOSIONS("No Explosions"),
 		NO_FALL_DAMAGE("No Fall Damage"),
+		NO_GETTING_BOOK_FROM_LECTERN("No Getting Book From Lectern"),
 		NO_MOBILITY_ABILITIES("No Mobility Abilities"),
 		NO_NATURAL_SPAWNS("No Natural Spawns"),
 		NO_PLACING_BOATS("No Placing Boats"),
@@ -55,11 +64,11 @@ public class ZoneUtils {
 		NO_SPECTATOR_ON_DEATH("No Spectator On Death"),
 		NO_SPECTATOR_ON_RESPAWN("No Spectator On Respawn"),
 		NO_TRAPDOOR_CLICKS("No Trapdoor Clicks"),
+		NO_TRICKY_TRANSFORMATION("NoTrickyTransformation"),
 		NO_VEHICLES("No Vehicles"),
 		NO_VIRTUAL_INVENTORIES("No Virtual Inventories"),
 		OVERWORLD_BLOCK_RESET("OverworldBlockReset"),
 		PLOT("Plot"),
-		PLOTS_POSSIBLE("Plots Possible"),
 		PORTAL_GUN_ENABLED("Portal Gun Enabled"),
 		PRECIOUS_BLOCK_DROPS_DISABLED("Precious Block Drops Disabled"),
 		RAISE_GRAVE_ABOVE_ZONE("Raise Grave Above Zone"),
@@ -83,10 +92,13 @@ public class ZoneUtils {
 		}
 	}
 
-	public static List<Material> PRECIOUS_BLOCKS = List.of(Material.IRON_BLOCK, Material.GOLD_BLOCK, Material.DIAMOND_BLOCK, Material.NETHERITE_BLOCK);
-
 	// Returns if the player is expected to be in Survival Mode or Adventure Mode for their given circumstances
 	public static GameMode expectedGameMode(Player player) {
+		GameMode guildPlotGameMode = GuildPlotUtils.guildPlotGameMode(player);
+		if (guildPlotGameMode != null) {
+			return guildPlotGameMode;
+		}
+
 		GameMode currentGameMode = player.getGameMode();
 		Location location = player.getLocation();
 
@@ -95,7 +107,7 @@ public class ZoneUtils {
 		 * This depends on the presence of sponge at y=10 and meeting the requirements to own a plot.
 		 * There's also an exception to allow building just outside a plot.
 		 */
-		if (hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
+		if (hasZoneProperty(player, ZoneProperty.SHOPS_POSSIBLE)) {
 			boolean isInPlot = inPlot(location, ServerProperties.getIsTownWorld());
 			if (!isInPlot) {
 				return GameMode.ADVENTURE;
@@ -126,6 +138,18 @@ public class ZoneUtils {
 	}
 
 	public static void setExpectedGameMode(Player player) {
+		setExpectedGameMode(player, false);
+	}
+
+	public static void setExpectedGameMode(Player player, boolean onlyFromSurvivalAdventure) {
+		GameMode currentGamemode = player.getGameMode();
+		if (
+			onlyFromSurvivalAdventure &&
+				!GameMode.ADVENTURE.equals(currentGamemode)
+				&& !GameMode.SURVIVAL.equals(currentGamemode)
+		) {
+			return;
+		}
 		player.setGameMode(expectedGameMode(player));
 	}
 
@@ -142,11 +166,14 @@ public class ZoneUtils {
 	}
 
 	public static boolean inPlot(Location loc, boolean isTownWorld) {
+		if (GuildPlotUtils.isGuildPlot(loc)) {
+			return true;
+		}
 		if (hasZoneProperty(loc, ZoneProperty.PLOT)) {
 			return true;
 		}
 		if (!isTownWorld &&
-			!hasZoneProperty(loc, ZoneProperty.PLOTS_POSSIBLE)) {
+			!hasZoneProperty(loc, ZoneProperty.SHOPS_POSSIBLE)) {
 			return false;
 		}
 

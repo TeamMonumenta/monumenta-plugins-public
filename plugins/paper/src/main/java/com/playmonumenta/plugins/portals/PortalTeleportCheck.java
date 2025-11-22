@@ -194,7 +194,8 @@ public class PortalTeleportCheck extends BukkitRunnable {
 			return recentVelocity.getY() > 0.01;
 		} else if (portal.mFacing == BlockFace.UP) {
 			// Floor portals must be entered going downwards or level to the ground, not upwards
-			return recentVelocity.getY() < 0.01;
+			// Additionally, prevent player from teleporting if sneaking, to prevent being looped between two floor portals
+			return recentVelocity.getY() < 0.01 && !player.isSneaking();
 		} else {
 			// Wall portals must be entered by going in their direction
 			// To test this, check if the player would hit the portal if they kept going in the current direction
@@ -221,11 +222,9 @@ public class PortalTeleportCheck extends BukkitRunnable {
 			double dy = (portal.getBoundingBox().getHeight() + player.getBoundingBox().getHeight()) / 2;
 			double dxz = (portal.getBoundingBox().getWidthX() + player.getBoundingBox().getWidthX()) / 2;
 			Vector delta = portalCenter.clone().subtract(portalPlaneIntersection);
-			if (Math.abs(delta.getY()) > dy || Math.abs(delta.getX() + delta.getZ()) > dxz) { // (NB: either x or z is 0, so can add them)
-				// Player will miss the portal if they keep their current direction
-				return false;
-			}
-			return true;
+			// (NB: either x or z is 0, so can add them)
+			// Player will miss the portal if they keep their current direction
+			return !(Math.abs(delta.getY()) > dy) && !(Math.abs(delta.getX() + delta.getZ()) > dxz);
 		}
 	}
 
@@ -234,7 +233,7 @@ public class PortalTeleportCheck extends BukkitRunnable {
 		UUID playerUuid = player.getUniqueId();
 
 		@Nullable Vector locNow = null;
-		if (mPastPlayerLocs.size() > 0) {
+		if (!mPastPlayerLocs.isEmpty()) {
 			locNow = mPastPlayerLocs.get(0).get(playerUuid);
 		}
 		@Nullable Vector locPrevious1 = null;

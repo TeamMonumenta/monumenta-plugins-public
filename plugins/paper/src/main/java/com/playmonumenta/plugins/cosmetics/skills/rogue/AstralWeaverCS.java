@@ -45,6 +45,7 @@ public class AstralWeaverCS extends DodgingCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				for (Vector v : fullStar) {
@@ -66,11 +67,6 @@ public class AstralWeaverCS extends DodgingCS {
 	@Override
 	public void dodgeEffectLv2(Player player, World world, Location loc) {
 		new PartialParticle(Particle.VILLAGER_HAPPY, loc, 3, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(player);
-	}
-
-	@Override
-	public void deflectTrailEffect(Player player, Location particleLocation) {
-		drawParticle(player, particleLocation, 4);
 	}
 
 	private void drawParticle(Player player, Location loc, int countMultiplier) {

@@ -46,4 +46,21 @@ public enum Region {
 
 		return NONE;
 	}
+
+	public static int getRegionNumber(String name) {
+		return getRegionNumber(getRegion(name));
+	}
+
+	public static int getRegionNumber(Region region) {
+		switch (region) {
+			case VALLEY:
+				return 1;
+			case ISLES:
+				return 2;
+			case RING:
+				return 3;
+			default:
+				return 0;
+		}
+	}
 }

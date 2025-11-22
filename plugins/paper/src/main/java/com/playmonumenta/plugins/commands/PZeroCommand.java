@@ -80,6 +80,6 @@ public class PZeroCommand {
 						}
 					})
 			)
-		.register();
+			.register();
 	}
 }

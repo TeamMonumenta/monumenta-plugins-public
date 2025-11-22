@@ -33,25 +33,6 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-/*
- * Summons a powerful Primordial Elemental that is invulnerable and immovable until out of the ground.
- * Players will have 15 seconds to prepare for the elemental’s arrival. Kaul will not be attacking or
- * casting any abilities (except for his passives) during this time. (512 health)
-
-Elemental’s Abilities:
-Normal Block break passive
-Raise Jungle (Kaul’s ability), however the timer for raising them will be 30 seconds instead of 40.
-
-Earthen Rupture: After charging for 2 seconds, the Elemental will cause a large rupture that
-spans out 5 blocks, knocking back all players, dealing 18 damage, and applying Slowness II for 10 seconds.
-
-Stone Blast: After 1 second, fires at all players a powerful block breaking bolt. Intersecting with
-a player causes 15 damage and applies Weakness II and Slowness II. Intersecting with a block causes
-a TNT explosion to happen instead. The bolt will stop traveling if it hits a player or a block.
-
-Once the elemental is dead, Kaul returns to the fight. The elemental will meld into the ground for later return in Phase 3.5
-
- */
 public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kaulprimordial";
 	public static final int detectionRange = 100;
@@ -59,14 +40,15 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 	public PrimordialElementalKaulBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mBoss.setRemoveWhenFarAway(false);
-		Location spawnLoc = mBoss.getLocation();
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hpDelta = 768;
-		double bossTargetHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp * 1.1);
+		final Location spawnLoc = mBoss.getLocation();
+
+		final int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		final int hpDelta = 768;
+		final double bossTargetHp = 1.1 * hpDelta * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
+
+		EntityUtils.setMaxHealthAndHealth(mBoss, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(bossTargetHp * 1.1);
 
 		GlowingManager.startGlowing(mBoss, NamedTextColor.GOLD, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1);
 
@@ -79,23 +61,18 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBlockBreak(mBoss, 1, 3, 1, 8, false, true, false),
 			new SpellBaseParticleAura(boss, 1,
-				(LivingEntity mBoss) -> {
-					new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
-						0.4, 0.35, Material.BROWN_CONCRETE.createBlockData()).spawnAsEntityActive(boss);
-				}
+				(LivingEntity mBoss) -> new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
+					0.4, 0.35, Material.BROWN_CONCRETE.createBlockData()).spawnAsEntityActive(boss)
 			),
 			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-				                                                   || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-				                                                   || b.getLocation().getBlock().getType() == Material.LAVA
-				                                                   || b.getLocation().getBlock().getType() == Material.WATER),
+				|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+				|| b.getLocation().getBlock().getType() == Material.LAVA
+				|| b.getLocation().getBlock().getType() == Material.WATER),
 			new SpellShieldStun(30 * 20)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
-		events.put(50, mBoss -> {
-			super.forceCastSpell(SpellRaiseJungle.class);
-		});
-
+		events.put(50, mBoss -> forceCastSpell(SpellRaiseJungle.class));
 
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange, BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, events);
 
@@ -105,7 +82,7 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		if (players.size() > 0 && mBoss instanceof Mob mob) {
+		if (!players.isEmpty() && mBoss instanceof Mob mob) {
 			Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
 			mob.setTarget(newTarget);
 		}

@@ -24,11 +24,8 @@ public enum EnchantmentType {
 	SKT_DAMAGE_TAKEN(new SKTQuestDamageTaken(), false, false, false, false),
 
 	// Vanilla
-	SWEEPING_EDGE(Enchantment.SWEEPING_EDGE, "Sweeping Edge", true, false, false, false),
-	KNOCKBACK(Enchantment.KNOCKBACK, "Knockback", true, false, false, false),
 	LOOTING(Enchantment.LOOT_BONUS_MOBS, "Looting", true, false, false, false),
 	RIPTIDE(Enchantment.RIPTIDE, "Riptide", true, false, false, false),
-	PUNCH(Enchantment.ARROW_KNOCKBACK, "Punch", true, false, false, false),
 	QUICK_CHARGE(Enchantment.QUICK_CHARGE, "Quick Charge", true, false, false, false),
 	MULTISHOT(Enchantment.MULTISHOT, "Multishot", false, false, false, false),
 	INFINITY(Enchantment.ARROW_INFINITE, "Infinity", false, false, false, false),
@@ -64,6 +61,7 @@ public enum EnchantmentType {
 	ADAPTABILITY(new Adaptability(), false, false, false, true),
 
 	// Custom Enchants
+	KINETICLOADING(new KineticLoading(), false, false, false, false),
 	ABYSSAL(new Abyssal(), true, false, false, true),
 	ADRENALINE(new Adrenaline(), true, false, false, true),
 	APTITUDE(new Aptitude(), true, false, false, true),
@@ -89,12 +87,15 @@ public enum EnchantmentType {
 	FRACTAL(new Fractal(), true, false, false, true),
 	GILLS(new Gills(), false, false, false, false),
 	GRAPPLING(new Grappling(), true, false, false, false),
+	HARPOON(new Harpoon(), true, false, false, true),
 	HEX_EATER(new HexEater(), true, false, false, true),
+	IMPACT(new Impact(), true, false, false, false),
 	INFERNO(new Inferno(), true, false, false, true),
 	INTOXICATING_WARMTH(new IntoxicatingWarmth(), false, false, false, false),
 	INSTANT_DRINK(new InstantDrink(), false, false, false, false),
 	INTUITION(new Intuition(), false, false, false, true),
 	JUNGLES_NOURISHMENT(new JunglesNourishment(), false, false, false, false),
+	KNOCKBACK(new Knockback(), true, false, false, true),
 	LIFE_DRAIN(new LifeDrain(), true, false, false, true),
 	LIQUID_COURAGE(new LiquidCourage(), false, false, false, false),
 	MULTILOAD(new Multiload(), true, false, false, false),
@@ -103,6 +104,7 @@ public enum EnchantmentType {
 	REGENERATION(new Regeneration(), true, false, false, true),
 	POINT_BLANK(new PointBlank(), true, false, false, true),
 	PIERCING(new Piercing(), true, false, false, true),
+	PUNCH(new Punch(), true, false, false, true),
 	WORLDLY_PROTECTION(new WorldlyProtection(), true, false, false, false),
 	QUAKE(new Quake(), true, false, false, true),
 	RAGE_OF_THE_KETER(new RageOfTheKeter(), false, false, false, false),
@@ -115,9 +117,13 @@ public enum EnchantmentType {
 	SLAYER(new Slayer(), true, false, false, true),
 	SMITE(new Smite(), true, false, false, true),
 	SNIPER(new Sniper(), true, false, false, true),
+	SKYSEEKER(new Skyseeker(), true, false, false, true),
+	EARTHSEEKER(new Earthseeker(), true, false, false, true),
+	SWEEPING_EDGE(new SweepingEdge(), true, false, false, false),
+	SPIRITSHOT(new Spiritshot(), false, false, false, false),
 	REVERB(new Reverb(), true, false, false, true),
 	STAMINA(new Stamina(), true, false, false, true),
-	STARVATION(new Starvation(), false, true, false, false),
+	STARVATION(new Starvation(), true, true, false, false),
 	SUSTENANCE(new Sustenance(), true, false, false, true),
 	WEIGHTLESS(new Weightless(), false, false, false, false),
 	TECHNIQUE(new Technique(), true, false, false, true),
@@ -127,6 +133,8 @@ public enum EnchantmentType {
 	TRIVIUM(new Trivium(), true, false, false, true),
 	VERSATILITY(new Versatility(), true, false, false, true),
 	RELIC(new Relic(), false, false, false, false),
+	OUTRAGE(new Outrage(), true, false, false, false),
+	RETALIATION(new Retaliation(), false, false, false, false),
 
 	// Curses
 	CURSE_OF_ANEMIA(new CurseOfAnemia(), true, true, false, false),
@@ -136,10 +144,11 @@ public enum EnchantmentType {
 	CURSE_OF_IRREPARIBILITY(new CurseOfIrreparability(), false, true, false, false),
 	CURSE_OF_CRIPPLING(new CurseOfCrippling(), true, true, false, false),
 	CURSE_OF_CORRUPTION(new CurseOfCorruption(), false, true, false, false),
-	CURSE_OF_EPHEMERALITY(new CurseOfEphemerality(), false, true, true, false),
+	CURSE_OF_EPHEMERALITY(new CurseOfEphemerality(), true, true, true, false),
 	CURSE_OF_SHRAPNEL(new CurseOfShrapnel(), true, true, false, false),
 	CURSE_OF_THE_VEIL(new CurseOfTheVeil(), true, true, false, false),
 	TWO_HANDED(new TwoHanded(), false, true, false, false),
+	UNDROPPABLE(new Undroppable(), false, true, false, false),
 	INEPTITUDE(new Ineptitude(), true, true, false, false),
 	MELEE_FRAGILITY(new MeleeFragility(), true, true, false, false),
 	BLAST_FRAGILITY(new BlastFragility(), true, true, false, false),
@@ -226,6 +235,10 @@ public enum EnchantmentType {
 		mIsRegionScaled = isRegionScaled;
 	}
 
+	public static @Nullable EnchantmentType getEnchantmentType(String name) {
+		return REVERSE_MAPPINGS.get(name.replace(" ", ""));
+	}
+
 	public @Nullable Enchantment getEnchantment() {
 		return mEnchantment;
 	}
@@ -270,9 +283,5 @@ public enum EnchantmentType {
 				return Component.text(mName + " " + StringUtils.toRoman(level), color).decoration(TextDecoration.ITALIC, false);
 			}
 		}
-	}
-
-	public static @Nullable EnchantmentType getEnchantmentType(String name) {
-		return REVERSE_MAPPINGS.get(name.replace(" ", ""));
 	}
 }

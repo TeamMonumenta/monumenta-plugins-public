@@ -132,15 +132,15 @@ public class RKitxet extends SerializedLocationBossAbilityGroup {
 		//Only change between phase 1 and 2 is the cooldowns of the spells
 		SpellManager phase1Actives = new SpellManager(Arrays.asList(
 			new SpellEndlessAgony(mPlugin, this, mSpawnLoc, detectionRange, COOLDOWN_TICKS_1),
-			new SpellForsakenLeap(mPlugin, mBoss, COOLDOWN_TICKS_1 - 1 * 20, this),
-			new SpellVerdantProtection(mPlugin, mBoss, COOLDOWN_TICKS_1 - 1 * 20, this),
+			new SpellForsakenLeap(mPlugin, mBoss, COOLDOWN_TICKS_1 - 20, this),
+			new SpellVerdantProtection(mPlugin, mBoss, COOLDOWN_TICKS_1 - 20, this),
 			new SpellRKitxetSummon(mPlugin, this, boss, COOLDOWN_TICKS_1 - 2 * 20)
 		));
 		SpellManager phase2Actives = new SpellManager(Arrays.asList(
 			new SpellEndlessAgony(mPlugin, this, mSpawnLoc, detectionRange, COOLDOWN_TICKS_2),
 			new SpellForsakenLeap(mPlugin, mBoss, COOLDOWN_TICKS_2, this),
-			new SpellVerdantProtection(mPlugin, mBoss, COOLDOWN_TICKS_2 - 1 * 20, this),
-			new SpellRKitxetSummon(mPlugin, this, boss, COOLDOWN_TICKS_2 - 1 * 20)
+			new SpellVerdantProtection(mPlugin, mBoss, COOLDOWN_TICKS_2 - 20, this),
+			new SpellRKitxetSummon(mPlugin, this, boss, COOLDOWN_TICKS_2 - 20)
 		));
 
 		List<Spell> phase1Passives = Arrays.asList(

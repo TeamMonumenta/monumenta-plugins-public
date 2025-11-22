@@ -61,7 +61,7 @@ public class SpellManager {
 		}
 
 		mCooldownSpells = new ArrayDeque<>();
-		mCooldown = (int)Math.max(0, Math.floor((mReadySpells.size() - 1.0) / 2.0));
+		mCooldown = (int) Math.max(0, Math.floor((mReadySpells.size() - 1.0) / 2.0));
 	}
 
 	public int runNextSpell(boolean preventSameSpellTwiceInARow) {
@@ -87,7 +87,7 @@ public class SpellManager {
 		/*
 		 * Try the ready spells in random order until can be run or none remain
 		 */
-		List<Spell> spells = new ArrayList<Spell>(mReadySpells.values());
+		List<Spell> spells = new ArrayList<>(mReadySpells.values());
 		Collections.shuffle(spells);
 		Spell previousSpell = mLastCasted;
 		mLastCasted = null;
@@ -137,13 +137,18 @@ public class SpellManager {
 	}
 
 	public void cancelAll() {
+		cancelAll(false);
+	}
+
+	public void cancelAll(boolean onPhaseChange) {
 		if (!mIsEmpty) {
-			for (Spell spell : mReadySpells.values()) {
-				spell.cancel();
+			List<Spell> spells = new ArrayList<>();
+			spells.addAll(mReadySpells.values());
+			spells.addAll(mCooldownSpells);
+			if (onPhaseChange) {
+				spells.removeIf(Spell::persistOnPhaseChange);
 			}
-			for (Spell spell : mCooldownSpells) {
-				spell.cancel();
-			}
+			spells.forEach(Spell::cancel);
 		}
 	}
 

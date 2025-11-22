@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DungeonUtils;
+import com.playmonumenta.plugins.utils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.structures.StructuresPlugin;
@@ -34,7 +34,8 @@ public class StatMultiplier {
 
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R1 = 0.4;
 	public static final double DELVE_MOB_STAT_MULTIPLIER_R2 = 1;
-	public static final double DELVE_MOB_STAT_MULTIPLIER_R3 = 1.7;
+	public static final double DELVE_MOB_STAT_MULTIPLIER_R3_HEALTH = 1.7;
+	public static final double DELVE_MOB_STAT_MULTIPLIER_R3_DAMAGE = 1.2;
 
 	static {
 		//r1 shards
@@ -99,6 +100,10 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Chittering Gutters", STAR_POINT);
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("The Nadir", STAR_POINT);
 
+		// Overworld
+		final double OVERWORLD = 1.1;
+		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Fathom's Reach", OVERWORLD);
+
 		// Exalted
 		STAT_COMPENSATION_MAPPINGS.put("whiteexalted", 1.05);
 		STAT_COMPENSATION_MAPPINGS.put("orangeexalted", 1.05);
@@ -142,7 +147,7 @@ public class StatMultiplier {
 		} else {
 			Player player = EntityUtils.getNearestPlayer(loc, 64);
 			if (player != null) {
-				DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(shardType);
+				DungeonCommandMapping mapping = DungeonCommandMapping.getByShard(shardType);
 				if (mapping != null) {
 					String typeName = mapping.getTypeName();
 					boolean exaltedDungeon = false;
@@ -198,7 +203,7 @@ public class StatMultiplier {
 
 		//stat
 		double healthMulti = DelvesUtils.isDelveMob(mob) ?
-			getHealthMultiplier(level) * (ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? DELVE_MOB_STAT_MULTIPLIER_R3 : DELVE_MOB_STAT_MULTIPLIER_R2) : DELVE_MOB_STAT_MULTIPLIER_R1) :
+			getHealthMultiplier(level) * (ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? DELVE_MOB_STAT_MULTIPLIER_R3_HEALTH : DELVE_MOB_STAT_MULTIPLIER_R2) : DELVE_MOB_STAT_MULTIPLIER_R1) :
 			getHealthMultiplier(level) * statCompensation;
 
 
@@ -207,7 +212,7 @@ public class StatMultiplier {
 		Set<String> tags = mob.getScoreboardTags();
 		if (!tags.contains(CrowdControlImmunityBoss.identityTag)) {
 			EntityUtils.addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED,
-					new AttributeModifier(SPEED_MODIFIER_NAME, getSpeedMultiplier(level) - 1, Operation.MULTIPLY_SCALAR_1));
+				new AttributeModifier(SPEED_MODIFIER_NAME, getSpeedMultiplier(level) - 1, Operation.MULTIPLY_SCALAR_1));
 		}
 
 		mob.addScoreboardTag(StatMultiplierBoss.identityTag);

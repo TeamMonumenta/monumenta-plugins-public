@@ -129,12 +129,12 @@ public class TabAddListing implements MarketGuiTab {
 		}
 		// exclude exhorbitant prices
 		// a bazaar listing should not be worth more than 200 stacks of HXX
-		boolean priceCorrect = mPricePerTradeAmount * mAmountOfTrades < 200*/*stacks*/64*/*of HXP*/64*8;
+		boolean priceCorrect = mPricePerTradeAmount * mAmountOfTrades < 200 */*stacks*/64 */*of HXP*/64 * 8;
 		// tax calculation
 		WalletUtils.Debt taxDebt = MarketManager.getInstance().calculateTaxDebt(mPlayer, mCurrencyItem, mPricePerTradeAmount * mAmountOfTrades);
 
 		GuiItem guiItem = mGui.setItem(1, 7, new GuiItem(buildAddListingConfirmWithTaxStatusIcon(enoughItemsInInventory, priceCorrect, taxDebt), false));
-		if (enoughItemsInInventory && priceCorrect && taxDebt.mMeetsRequirement) {
+		if (enoughItemsInInventory && priceCorrect && taxDebt.mMeetsRequirement()) {
 			guiItem.onClick((clickEvent) -> {
 				if (MarketGui.initiatePlayerAction(mGui.mPlayer)) {
 					return;
@@ -166,11 +166,11 @@ public class TabAddListing implements MarketGuiTab {
 			}
 
 			lore.add(Component.text("You will need to pay a tax of:", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text(taxDebt.mTotalRequiredAmount + " " + ItemUtils.getPlainName(taxDebt.mItem) + " ", NamedTextColor.WHITE)
-				.append(MarketGuiIcons.getCheckboxOrXmark(taxDebt.mMeetsRequirement))
-				.append(Component.text(taxDebt.mWalletDebt > 0 ? " (" + taxDebt.mNumInWallet + " in wallet)" : "", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(taxDebt.mTotalRequiredAmount() + " " + ItemUtils.getPlainName(taxDebt.mItem()) + " ", NamedTextColor.WHITE)
+				.append(MarketGuiIcons.getCheckboxOrXmark(taxDebt.mMeetsRequirement()))
+				.append(Component.text(taxDebt.mWalletDebt() > 0 ? " (" + taxDebt.mNumInWallet() + " in wallet)" : "", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
 			lore.add(Component.text(String.format("Tax Rate: %.1f%%", MarketManager.getConfig().mBazaarTaxRate * 100), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-			if (!taxDebt.mMeetsRequirement) {
+			if (!taxDebt.mMeetsRequirement()) {
 				lore.add(Component.text("There is not enough money", NamedTextColor.RED));
 				lore.add(Component.text("in your inventory or wallet", NamedTextColor.RED));
 				lore.add(Component.text("to pay the tax.", NamedTextColor.RED));
@@ -306,7 +306,7 @@ public class TabAddListing implements MarketGuiTab {
 			Component.keybind("key.swapOffhand", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false).append(Component.text(" to specify the amount", NamedTextColor.WHITE)),
 			Component.text("The amount is required to be a power of 2,", NamedTextColor.WHITE),
 			Component.text("with a maximum value of 64", NamedTextColor.WHITE)
-			));
+		));
 
 		icon.setItemMeta(meta);
 

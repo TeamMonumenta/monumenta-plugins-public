@@ -41,7 +41,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class DataCollectionManager {
 
-	public static final List<String> EXCLUDED_SHARDS = List.of("build", "plots", "playerplots", "tutorial", "purgatory");
+	public static final List<String> EXCLUDED_SHARDS = List.of("build", "guildplots", "plots", "playerplots", "tutorial", "purgatory");
 	public static final List<InfusionType> INTERESTING_INFUSIONS = Arrays.stream(InfusionType.values()).filter(InfusionType::isDataCollected).toList();
 	private static final int RUN_INTERVAL = Constants.ONE_HOUR;
 	private static final String EXPORT_PATH = ServerProperties.getGameplayDataExportPath();

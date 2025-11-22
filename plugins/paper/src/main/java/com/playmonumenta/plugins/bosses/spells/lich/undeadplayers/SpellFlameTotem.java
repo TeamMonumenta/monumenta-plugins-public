@@ -46,6 +46,7 @@ public class SpellFlameTotem extends Spell {
 
 		BukkitRunnable manageTotem = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;
@@ -63,7 +64,7 @@ public class SpellFlameTotem extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return PlayerUtils.playersInRange(mBoss.getLocation(), 9, true).size() > 0;
+		return !PlayerUtils.playersInRange(mBoss.getLocation(), 9, true).isEmpty();
 	}
 
 	@Override

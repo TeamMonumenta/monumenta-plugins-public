@@ -79,14 +79,14 @@ public class BladeFlurry extends DepthsAbility {
 			MovementUtils.knockAway(mPlayer, mob, 0.8f, true);
 		}
 		ParticleUtils.drawCleaveArc(loc, mRadius * 0.7, 160, -80, 260, 6, 0, 0, 0.2, 60,
-			(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+			(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 				new Particle.DustOptions(
 					ParticleUtils.getTransition(SLASH_COLOR_BASE, SLASH_COLOR_TIP, ring / 8D),
 					0.6f + (ring * 0.1f)
 				)).spawnAsPlayerActive(mPlayer));
 
 		ParticleUtils.drawCleaveArc(loc, mRadius * 0.7, 20, -80, 260, 6, 0, 0, 0.2, 60,
-			(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+			(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 				new Particle.DustOptions(
 					ParticleUtils.getTransition(SLASH_COLOR_BASE, SLASH_COLOR_TIP, ring / 8D),
 					0.6f + (ring * 0.1f)
@@ -149,8 +149,9 @@ public class BladeFlurry extends DepthsAbility {
 	}
 
 	private static Description<BladeFlurry> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<BladeFlurry>(color)
-			.add("Right click while sneaking to deal ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to deal ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" melee damage in a ")
 			.add(a -> a.mRadius, RADIUS)

@@ -121,7 +121,7 @@ public class GalleryGrave {
 			}
 		};
 
-		mRunnable.runTaskTimer(GalleryManager.mPlugin, 0, 10);
+		mRunnable.runTaskTimer(Plugin.getInstance(), 0, 10);
 	}
 
 	public GalleryPlayer getPlayer() {

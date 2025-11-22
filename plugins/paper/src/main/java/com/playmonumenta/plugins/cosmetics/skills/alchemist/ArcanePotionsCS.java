@@ -199,7 +199,7 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 
 	private static void drawLine(Particle particle, Player player, Transform transform, Location l1, Location l2, boolean includeStart, boolean includeEnd) {
 		drawParticle(new PPLine(particle, l1, l2).countPerMeter(SYMBOL_PARTICLES_PER_METER).minParticlesPerMeter(SYMBOL_PARTICLES_PER_METER / 3)
-			             .groupingDistance(0).includeStart(includeStart).includeEnd(includeEnd), transform, player);
+			.groupingDistance(0).includeStart(includeStart).includeEnd(includeEnd), transform, player);
 	}
 
 	private static void drawLine(Particle particle, Player player, Transform transform, Location l1, Location l2) {
@@ -228,11 +228,11 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 
 	private static void drawArc(Particle particle, Player player, Transform transform, double x, double y, double radius, double arcStartDeg, double arcEndDeg, boolean includeStart) {
 		drawParticle(new PPCircle(particle, transform.apply(x, y), radius * transform.mScale)
-			             .arcDegree(transform.mRotation - arcStartDeg, transform.mRotation - arcEndDeg)
-			             .countPerMeter(SYMBOL_PARTICLES_PER_METER)
-			             .directionalMode(true)
-			             .includeStart(includeStart)
-			             .includeEnd(true), transform, player);
+			.arcDegree(transform.mRotation - arcStartDeg, transform.mRotation - arcEndDeg)
+			.countPerMeter(SYMBOL_PARTICLES_PER_METER)
+			.directionalMode(true)
+			.includeStart(includeStart)
+			.includeEnd(true), transform, player);
 	}
 
 	private static final double SQRT_2 = Math.sqrt(2);

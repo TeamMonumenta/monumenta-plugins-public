@@ -105,7 +105,7 @@ public class DepthsWindWalk extends DepthsAbility {
 					return;
 				}
 
-				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7/Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7 / Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
 
 				Iterator<LivingEntity> iter = mMobsNotHit.iterator();
 				while (iter.hasNext()) {
@@ -156,8 +156,9 @@ public class DepthsWindWalk extends DepthsAbility {
 
 
 	private static Description<DepthsWindWalk> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsWindWalk>(color)
-			.add("Right click to dash in the target direction, applying ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to dash in the target direction, applying ")
 			.addPercent(a -> a.mVuln, VULNERABILITY[rarity - 1], false, true)
 			.add(" vulnerability for ")
 			.addDuration(a -> a.mDuration, VULN_DURATION)

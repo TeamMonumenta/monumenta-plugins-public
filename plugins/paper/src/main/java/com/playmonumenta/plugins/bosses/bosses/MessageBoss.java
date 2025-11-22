@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -15,6 +14,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class MessageBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_message";

@@ -4,11 +4,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.hexfall.HexfallUtils;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -59,6 +57,7 @@ public class SpellEarthenCleave extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
 			int mRad = 0;
+
 			@Override
 			public void run() {
 				mT++;
@@ -133,23 +132,14 @@ public class SpellEarthenCleave extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.5f);
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_SOUL_SOIL_BREAK, SoundCategory.HOSTILE, 0.3f, 1f);
 
-					for (Player p : HexfallUtils.getPlayersInHycenea(mSpawnLoc)) {
-						for (BoundingBox box : boxes) {
-							if (p.getBoundingBox().overlaps(box)) {
-								DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MELEE, mDamage, null, false, true, ABILITY_NAME);
-								MovementUtils.knockAway(mBoss.getLocation(), p, 0f, 1f, false);
-							}
-						}
+					Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+					for (Player p : hitbox.getHitPlayers(true)) {
+						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MELEE, mDamage, null, false, true, ABILITY_NAME);
+						MovementUtils.knockAway(mBoss.getLocation(), p, 0f, 1f, false);
 					}
 
-					for (Entity e : mSpawnLoc.getNearbyEntities(mRadius, mRadius, mRadius)) {
-						if (EntityUtils.isHostileMob(e) && e instanceof LivingEntity le) {
-							for (BoundingBox box : boxes) {
-								if (le.getBoundingBox().overlaps(box)) {
-									MovementUtils.knockAway(mBoss.getLocation(), le, 0f, 1f, false);
-								}
-							}
-						}
+					for (LivingEntity le : hitbox.getHitMobs()) {
+						MovementUtils.knockAway(mBoss.getLocation(), le, 0f, 1f, false);
 					}
 
 					this.cancel();

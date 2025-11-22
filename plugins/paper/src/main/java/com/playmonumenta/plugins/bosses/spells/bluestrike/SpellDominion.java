@@ -24,8 +24,8 @@ public class SpellDominion extends Spell {
 	Plugin mPlugin;
 	LivingEntity mBoss;
 	Location mSpawnLoc;
-	private List<Player> mWarnedPlayers = new ArrayList<Player>();
-	private boolean mFightActive;
+	private final List<Player> mWarnedPlayers = new ArrayList<>();
+	private final boolean mFightActive;
 
 	public SpellDominion(Plugin plugin, LivingEntity boss, Location spawnLoc, boolean fightActive) {
 		mPlugin = plugin;
@@ -44,9 +44,9 @@ public class SpellDominion extends Spell {
 
 			for (Player player : players) {
 				if (player.getGameMode() == GameMode.ADVENTURE
-					    && (Math.abs(player.getLocation().getY() - mSpawnLoc.getY()) > 4
-						        || player.getLocation().distance(mSpawnLoc) > 30)
-					    && player.getLocation().add(0, -1, 0).getBlock().getType() != Material.AIR) {
+					&& (Math.abs(player.getLocation().getY() - mSpawnLoc.getY()) > 4
+					|| player.getLocation().distance(mSpawnLoc) > 30)
+					&& player.getLocation().add(0, -1, 0).getBlock().getType() != Material.AIR) {
 
 					if (mFightActive) {
 						Location l = player.getEyeLocation();

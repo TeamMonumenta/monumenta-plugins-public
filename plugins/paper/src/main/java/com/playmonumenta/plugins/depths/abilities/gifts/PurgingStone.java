@@ -58,6 +58,6 @@ public class PurgingStone extends DepthsAbility {
 	}
 
 	private static Description<PurgingStone> getDescription() {
-		return new DescriptionBuilder<PurgingStone>().add("Downgrade all abilities by one level and remove a random curse.");
+		return new DescriptionBuilder<>(() -> INFO).add("Downgrade all abilities by one level and remove a random curse.");
 	}
 }

@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.spawners.SpawnerActionManager;
 import com.playmonumenta.plugins.spawners.actions.ParticleHaloTask;
+import com.playmonumenta.plugins.spawners.actions.ParticleLineTask;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -64,6 +65,7 @@ import static com.playmonumenta.plugins.spawners.types.RallySpawner.setRally;
 public class SpawnerListener implements Listener {
 	private static final int PLAYER_LOGOUT_MOB_PERSIST_RADIUS = 20;
 	private static final int PLAYER_LOGOUT_MOB_PERSIST_TICKS = Constants.TEN_MINUTES;
+	public static final String SPAWNER_ADVANCEMENT_PATH = "monumenta:handbook/spawners_/";
 	public static final Map<Location, UUID> spawnerCatMap = new HashMap<>();
 
 
@@ -128,6 +130,7 @@ public class SpawnerListener implements Listener {
 	private static final int PLAYER_CHECK_RADIUS_SQUARED = 5 * 5;
 	private static final int INACTIVITY_TIMER = 20 * 45;
 	private static final int CLEANER_INTERVAL = 20 * 30;
+	private static final double PROTECTOR_MAX_DISTANCE_SQUARED = 50 * 50;
 	private static final Map<UUID, MobInfo> mMobInfos = new HashMap<>();
 	/*
 	 * Need to use the full spawner Location, not just x/y/z, to ensure that only this
@@ -153,7 +156,7 @@ public class SpawnerListener implements Listener {
 					MobInfo info = mobInfoIter.next();
 					@Nullable LivingEntity mob = info.getMob();
 
-					MMLog.finer(() -> "SpawnerListener:    " + info.toString());
+					MMLog.finer(() -> "SpawnerListener:    " + info);
 
 					// If the mob has NOT despawned but is dead or was removed, remove this tracker
 					if (!info.checkUpdatePersistent() && !info.isDespawned() && (mob == null || mob.isDead() || !mob.isValid())) {
@@ -177,7 +180,7 @@ public class SpawnerListener implements Listener {
 						@Nullable LivingEntity mob = info.getMob();
 
 						Location loc = entry.getKey();
-						MMLog.finer(() -> "SpawnerListener:    " + loc.getWorld().getName() + "(" + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + ") " + info.toString());
+						MMLog.finer(() -> "SpawnerListener:    " + loc.getWorld().getName() + "(" + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + ") " + info);
 
 						if (!info.checkUpdatePersistent() && !info.isDespawned() && (mob == null || mob.isDead() || !mob.isValid())) {
 							MMLog.fine(() -> "SpawnerListener: Removing non-persistent, non-despawned dead mob from mSpawnerInfos: " + info.getUniqueId());
@@ -189,6 +192,35 @@ public class SpawnerListener implements Listener {
 						spawnerInfoIter.remove();
 					}
 				}
+
+				// check protected mob distances from their spawners
+				Iterator<Map.Entry<Location, List<MobInfo>>> it = mSpawnerInfos.entrySet().iterator();
+				while (it.hasNext()) {
+					Map.Entry<Location, List<MobInfo>> entry = it.next();
+					Location spawnerLoc = entry.getKey();
+					if (!spawnerLoc.isWorldLoaded() || !spawnerLoc.isChunkLoaded()) {
+						it.remove();
+						continue;
+					}
+					Block spawnerBlock = spawnerLoc.getBlock();
+					if (!getProtector(spawnerBlock)) {
+						continue;
+					}
+					List<MobInfo> spawnerInfo = entry.getValue();
+					for (MobInfo info : spawnerInfo) {
+						LivingEntity mob = info.getMob();
+						if (mob != null && !mob.isDead() && mob.isValid() && mob.isInvulnerable()) {
+							double distanceSquared = mob.getLocation().distanceSquared(spawnerLoc);
+							if (distanceSquared > PROTECTOR_MAX_DISTANCE_SQUARED) {
+
+								MMLog.fine(() -> "SpawnerListener: Removed protection from mob due to distance from spawner: " + mob.getUniqueId() +
+									" (distance: " + Math.sqrt(distanceSquared) + " blocks)");
+								mob.setInvulnerable(false);
+								GlowingManager.clear(mob, "protectedMob");
+							}
+						}
+					}
+				}
 			}
 		};
 
@@ -198,13 +230,16 @@ public class SpawnerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public static void spawnerSpawnEvent(SpawnerSpawnEvent event) {
 		CreatureSpawner spawner = event.getSpawner();
+		if (spawner == null) {
+			return;
+		}
 		Block spawnerBlock = spawner.getBlock();
 
 		if (event.getEntity() instanceof LivingEntity mob) {
 			List<MobInfo> spawnerInfo = mSpawnerInfos.computeIfAbsent(event.getSpawner().getLocation(), k -> new ArrayList<>());
 
 			// Generate list of player locations a single time
-			List<Location> playerLocations = new ArrayList<Location>();
+			List<Location> playerLocations = new ArrayList<>();
 			for (Player player : mob.getWorld().getPlayers()) {
 				playerLocations.add(player.getLocation());
 			}
@@ -212,7 +247,7 @@ public class SpawnerListener implements Listener {
 			// Check the list of mobs from the spawner to see if any should be disposed of
 			// or, if the spawner has a LoS Pool attached, replace it with a mob from the pool first
 			String poolName = SpawnerUtils.getLosPool(event.getSpawner().getBlock());
-			LoSPool losPool = LoSPool.EMPTY;
+			LoSPool losPool = LoSPool.LibraryPool.EMPTY;
 			boolean hasPool = false;
 			if (poolName != null) {
 				hasPool = true;
@@ -258,20 +293,19 @@ public class SpawnerListener implements Listener {
 				if (spawnedEntity instanceof LivingEntity livingEntity) {
 					MMLog.fine(() -> "SpawnerListener: Started tracking mob: " + mob.getUniqueId());
 					mMobInfos.put(livingEntity.getUniqueId(), new MobInfo(livingEntity));
-					MobInfo mobInfo = new MobInfo((LivingEntity) spawnedEntity);
+					MobInfo mobInfo = new MobInfo(livingEntity);
 					spawnerInfo.add(mobInfo);
 					if (SpawnerUtils.getSpawnerType(spawnerBlock, SpawnerUtils.GUARDED_ATTRIBUTE) > 0) {
 						if (!(spawnedEntity instanceof Player)) {
 							spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_CHAIN_FALL, SoundCategory.HOSTILE, 0.5f, 1f);
-							ParticleHaloTask haloTask = new ParticleHaloTask((LivingEntity) spawnedEntity, Particle.SCULK_SOUL);
+							ParticleHaloTask haloTask = new ParticleHaloTask(livingEntity, Particle.SCULK_SOUL);
 							haloTask.start();
 							PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, spawnerBlock.getLocation().clone().add(0.5, 0.5, 0.5), spawnedEntity.getLocation().clone().add(0, spawnedEntity.getHeight() / 2, 0));
 							line.countPerMeter(10).spawnAsEnemy();
 						}
 					}
-					if (getProtector(spawnerBlock) && !(spawnedEntity instanceof Player)) {
-						GlowingManager.startGlowing(spawnedEntity, NamedTextColor.AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "protectedMob");
-						spawnedEntity.setInvulnerable(true);
+					if (getProtector(spawnerBlock)) {
+						applyProtectorEffect(spawnedEntity, spawnerBlock);
 						if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), spawnerBlock, "protectedMobSummon")) {
 							spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
 							spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
@@ -299,9 +333,8 @@ public class SpawnerListener implements Listener {
 			}
 
 			// make mob invulnerable if the spawner is protected
-			if (getProtector(spawnerBlock) && !(mob instanceof Player)) {
-				GlowingManager.startGlowing(mob, NamedTextColor.AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "protectedMob");
-				mob.setInvulnerable(true);
+			if (getProtector(spawnerBlock)) {
+				applyProtectorEffect(mob, spawnerBlock);
 				if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), spawnerBlock, "protectedMobSummon")) {
 					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
 					spawnerBlock.getLocation().getWorld().playSound(spawnerBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.85f, 2f);
@@ -459,8 +492,8 @@ public class SpawnerListener implements Listener {
 		Player thisPlayer = event.getPlayer();
 		if (SpawnerUtils.hasShieldsAttribute(block)) {
 			// This is a shielded spawner - grant the shield spawner advancement, if not had already
-			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner")) {
-				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/shielded_spawner");
+			if (!AdvancementUtils.checkAdvancement(thisPlayer, SPAWNER_ADVANCEMENT_PATH + "shielded_spawner")) {
+				AdvancementUtils.grantAdvancement(thisPlayer, SPAWNER_ADVANCEMENT_PATH + "shielded_spawner");
 			}
 			if (shieldsBefore != 0 && shieldsAfter == 0) {
 				doShieldFullBreakAnimation(blockLoc);
@@ -469,26 +502,15 @@ public class SpawnerListener implements Listener {
 			}
 		}
 
-		if (SpawnerUtils.getSpawnerType(block, SpawnerUtils.GUARDED_ATTRIBUTE) > 0) {
-			// This is a guarded spawner - grant the guarded spawner advancement, if not had already
-			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/guarded_spawner")) {
-				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/guarded_spawner");
-			}
-		}
+		// Advancement grants for some other spawner types
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.GUARDED_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "guarded_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.CAT_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "cat_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.ENSNARED_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "ensnared_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.PROTECTOR_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "protector_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.DECAYING_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "decaying_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.SEQUENCE_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "sequence_spawner");
+		manageSpawnerAdvancement(thisPlayer, block, SpawnerUtils.RALLY_ATTRIBUTE, SPAWNER_ADVANCEMENT_PATH + "rally_spawner");
 
-		if (SpawnerUtils.getSpawnerType(block, SpawnerUtils.CAT_ATTRIBUTE) > 0) {
-			// This is a cat spawner - grant the cat spawner advancement, if not had already
-			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/cat_spawner")) {
-				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/cat_spawner");
-			}
-		}
-
-		if (SpawnerUtils.getSpawnerType(block, SpawnerUtils.ENSNARED_ATTRIBUTE) > 0) {
-			// This is an ensnared spawner - grant the ensnared spawner advancement, if not had already
-			if (!AdvancementUtils.checkAdvancement(thisPlayer, "monumenta:handbook/spawners_/ensnared_spawner")) {
-				AdvancementUtils.grantAdvancement(thisPlayer, "monumenta:handbook/spawners_/ensnared_spawner");
-			}
-		}
 	}
 
 	// Only fires if the event has not been cancelled by anything else prior.
@@ -504,11 +526,20 @@ public class SpawnerListener implements Listener {
 			SpawnerUtils.removeEffectsDisplayMarker(block);
 			return;
 		}
-		if (SpawnerUtils.getLosPool(block) != null && !AdvancementUtils.checkAdvancement(event.getPlayer(), "monumenta:handbook/spawners_/random_spawner")) {
-			AdvancementUtils.grantAdvancement(event.getPlayer(), "monumenta:handbook/spawners_/random_spawner");
+		if (SpawnerUtils.getLosPool(block) != null && !AdvancementUtils.checkAdvancement(event.getPlayer(), SPAWNER_ADVANCEMENT_PATH + "random_spawner")) {
+			AdvancementUtils.grantAdvancement(event.getPlayer(), SPAWNER_ADVANCEMENT_PATH + "random_spawner");
 		}
 		SpawnerUtils.removeEffectsDisplayMarker(block);
 		SpawnerActionManager.triggerActions(SpawnerUtils.getBreakActionIdentifiers(block), event.getPlayer(), block, mRecentlyBrokenSpawnerLosPool);
+	}
+
+	public static void manageSpawnerAdvancement(Player player, Block block, String type, String path) {
+		if (SpawnerUtils.getSpawnerType(block, type) > 0) {
+			// This is a spawner of the designated type - grant the advancement if not had already!
+			if (!AdvancementUtils.checkAdvancement(player, path)) {
+				AdvancementUtils.grantAdvancement(player, path);
+			}
+		}
 	}
 
 	public static void doShieldBreakAnimation(Location blockLoc, int shields) {
@@ -542,8 +573,7 @@ public class SpawnerListener implements Listener {
 				for (MobInfo mobInfo : spawnerInfo) {
 					LivingEntity mob = mobInfo.getMob();
 					if (mob != null) {
-						mob.setInvulnerable(false);
-						GlowingManager.clear(mob, "protectedMob");
+						removeProtectorEffect(mob);
 					}
 				}
 			}
@@ -630,6 +660,38 @@ public class SpawnerListener implements Listener {
 
 		if (shields > 0 || losPool != null || decaying > 0 || protector || !breakActions.isEmpty()) {
 			SpawnerUtils.addEffectsDisplayMarker(block);
+		}
+	}
+
+	private static List<Entity> getEntityStack(Entity baseEntity) {
+		List<Entity> entityStack = new ArrayList<>();
+		entityStack.add(baseEntity);
+		int i = 0;
+		while (i < entityStack.size()) {
+			entityStack.addAll(entityStack.get(i).getPassengers());
+			i++;
+		}
+		return entityStack;
+	}
+
+	private static void applyProtectorEffect(Entity baseEntity, Block spawnerBlock) {
+		for (Entity entityInStack : getEntityStack(baseEntity)) {
+			if (entityInStack instanceof LivingEntity livingEntityInStack && !(entityInStack instanceof Player)) {
+				GlowingManager.startGlowing(livingEntityInStack, NamedTextColor.AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "protectedMob");
+				livingEntityInStack.setInvulnerable(true);
+				if (baseEntity.equals(entityInStack)) { // only draw line from base entity to avoid clutter
+					new ParticleLineTask(livingEntityInStack, Particle.SOUL_FIRE_FLAME, spawnerBlock).start();
+				}
+			}
+		}
+	}
+
+	private static void removeProtectorEffect(Entity baseEntity) {
+		for (Entity entityInStack : getEntityStack(baseEntity)) {
+			if (entityInStack instanceof LivingEntity livingEntityInStack && !(entityInStack instanceof Player)) {
+				livingEntityInStack.setInvulnerable(false);
+				GlowingManager.clear(livingEntityInStack, "protectedMob");
+			}
 		}
 	}
 }

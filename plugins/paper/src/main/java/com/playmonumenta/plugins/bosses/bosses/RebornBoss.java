@@ -8,6 +8,8 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -33,10 +35,14 @@ public class RebornBoss extends BossAbilityGroup {
 		public int INVULN_DURATION = 60;
 
 		@BossParam(help = "sound played on reborn")
-		public SoundsList SOUND_REBORN = SoundsList.fromString("[(ITEM_TOTEM_USE, 1.0, 1.0)]");
+		public SoundsList SOUND_REBORN = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_TOTEM_USE, 1.0f, 1.0f))
+			.build();
 
 		@BossParam(help = "particles displayed on reborn")
-		public ParticlesList PARTICLE_REBORN = ParticlesList.fromString("[(TOTEM, 4, 0, 0, 0, 0.35)]");
+		public ParticlesList PARTICLE_REBORN = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.TOTEM, 4, 0.0, 0.0, 0.0, 0.35))
+			.build();
 	}
 
 	private final Parameters mParams;
@@ -53,11 +59,10 @@ public class RebornBoss extends BossAbilityGroup {
 	public void onHurt(DamageEvent event) {
 		if (mParams.REBORN_TIMES > mTimesReborn && mBoss.getHealth() - event.getFinalDamage(true) <= 0) {
 			mTimesReborn++;
-			event.setCancelled(true);
+			event.setFlatDamage(0.001);
 			if (mParams.IS_INVULNERABLE) {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, "REBORN_INVULN", new PercentDamageReceived(mParams.INVULN_DURATION, -4));
 			}
-			event.setFlatDamage(0);
 			mParams.SOUND_REBORN.play(mBoss.getLocation());
 			mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * mParams.REBORN_PERCENT_HEALTH);
 			mBoss.setFireTicks(-1);
@@ -92,4 +97,3 @@ public class RebornBoss extends BossAbilityGroup {
 		}
 	}
 }
-

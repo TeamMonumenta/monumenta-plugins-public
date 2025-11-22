@@ -166,7 +166,7 @@ public class VesperidysVoidCrystalFrost extends BossAbilityGroup {
 							List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), Vesperidys.detectionRange, true);
 							Collections.shuffle(players);
 
-							if (players.size() > 0) {
+							if (!players.isEmpty()) {
 								Player selectedPlayer = players.get(0);
 
 								Runnable runnable = () -> mMissile.launch(selectedPlayer, selectedPlayer.getEyeLocation());
@@ -276,7 +276,7 @@ public class VesperidysVoidCrystalFrost extends BossAbilityGroup {
 									targetPlatform.generateInner();
 								}
 							}
-						}, 20*20);
+						}, 20 * 20);
 
 						for (Block block : mAvalancheBlocks) {
 							if (TemporaryBlockChangeManager.INSTANCE.revertChangedBlock(block, Material.BLUE_ICE)) {
@@ -299,21 +299,21 @@ public class VesperidysVoidCrystalFrost extends BossAbilityGroup {
 
 						boolean newBlock = false;
 						for (int x = -radius; x < radius; x++) {
-								for (int z = -radius; z < radius; z++) {
-									Location bLoc = centre.clone().add(x, -1, z);
-									Block block = bLoc.getBlock();
+							for (int z = -radius; z < radius; z++) {
+								Location bLoc = centre.clone().add(x, -1, z);
+								Block block = bLoc.getBlock();
 
-									if (targetPlatform.mBlocks.contains(block)) {
-										for (int y = -radius; y < radius; y++) {
-											Block blockRelative = block.getRelative(0, y, 0);
-											if (blockRelative.getType() != Material.BLUE_ICE && blockRelative.isSolid()) {
-												spawnIceTerrain(blockRelative);
-												newBlock = true;
-											}
+								if (targetPlatform.mBlocks.contains(block)) {
+									for (int y = -radius; y < radius; y++) {
+										Block blockRelative = block.getRelative(0, y, 0);
+										if (blockRelative.getType() != Material.BLUE_ICE && blockRelative.isSolid()) {
+											spawnIceTerrain(blockRelative);
+											newBlock = true;
 										}
 									}
 								}
 							}
+						}
 
 						if (newBlock) {
 							centre.getWorld().playSound(centre, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 1f);

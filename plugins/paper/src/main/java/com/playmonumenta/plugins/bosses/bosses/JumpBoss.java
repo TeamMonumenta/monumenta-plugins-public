@@ -10,7 +10,10 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import java.util.AbstractMap;
 import java.util.List;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -39,26 +42,44 @@ public class JumpBoss extends BossAbilityGroup {
 
 
 		@BossParam(help = "Jumping Sound")
-		public SoundsList SOUND_JUMP = SoundsList.fromString("[(ENTITY_PILLAGER_CELEBRATE,1,1.1)]");
+		public SoundsList SOUND_JUMP = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_PILLAGER_CELEBRATE, 1.0f, 1.1f))
+			.build();
 		@BossParam(help = "Jump Start Sound")
-		public SoundsList SOUND_JUMP_START = SoundsList.fromString("[(ENTITY_HORSE_JUMP,1,1)]");
+		public SoundsList SOUND_JUMP_START = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_HORSE_JUMP, 1.0f, 1.0f))
+			.build();
 		@BossParam(help = "Jump Landing Sound")
-		public SoundsList SOUND_LANDING = SoundsList.fromString("[(ENTITY_HORSE_GALLOP,1.3,0),(ENTITY_HORSE_GALLOP,2,1.25)]");
+		public SoundsList SOUND_LANDING = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_HORSE_GALLOP, 1.3f, 0.0f))
+			.add(new SoundsList.CSound(Sound.ENTITY_HORSE_GALLOP, 2.0f, 1.25f))
+			.build();
 
 
 		@BossParam(help = "Starting Particles")
-		public ParticlesList PARTICLE_START = ParticlesList.fromString("[(CLOUD,15,1,0,1,0)]");
+		public ParticlesList PARTICLE_START = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 15, 1.0, 0.0, 1.0, 0.0))
+			.build();
 		@BossParam(help = "Starting Particles on the Ground")
-		public ParticlesList PARTICLE_START_GROUND = ParticlesList.fromString("[(CLOUD,15,1,0,1,0)]");
+		public ParticlesList PARTICLE_START_GROUND = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 15, 1.0, 0.0, 1.0, 0.0))
+			.build();
 		@BossParam(help = "Air Particles")
-		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(REDSTONE,4,0.5,0.5,0.5,1,#FFFFFF,1)]");
+		public ParticlesList PARTICLE_AIR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 4, 0.5, 0.5, 0.5, 1.0, new Particle.DustOptions(Color.WHITE, 1.0f)))
+			.build();
 		@BossParam(help = "Landing Particles")
-		public ParticlesList PARTICLE_LAND = ParticlesList.fromString("[(CLOUD,60,0,0,0,0.2),(EXPLOSION_NORMAL,20,0,0,0,0.3)]");
+		public ParticlesList PARTICLE_LAND = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 60, 0.0, 0.0, 0.0, 0.2))
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_NORMAL, 20, 0.0, 0.0, 0.0, 0.3))
+			.build();
 		@BossParam(help = "Landing Particles on the ground")
-		public ParticlesList PARTICLE_LAND_GROUND = ParticlesList.fromString("[(CLOUD,1,0.1,0.1,0.1,0.1)]");
+		public ParticlesList PARTICLE_LAND_GROUND = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 1, 0.1, 0.1, 0.1, 0.1))
+			.build();
 		public boolean PREFER_TARGET = true;
 		public boolean IGNORE_WALLS = false;
-		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
+		public LoSPool SPAWNED_MOB_POOL = LoSPool.LibraryPool.EMPTY;
 	}
 
 	public JumpBoss(Plugin plugin, LivingEntity boss) {

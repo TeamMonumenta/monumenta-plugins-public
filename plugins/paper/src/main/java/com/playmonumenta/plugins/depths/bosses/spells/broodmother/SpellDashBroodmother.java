@@ -84,7 +84,7 @@ public class SpellDashBroodmother extends Spell {
 			true, true, SPELL_NAME, Particle.SQUID_INK,
 			mPlugin, mBoss, (b) -> {
 
-			}
+		}
 		);
 
 		mSweepAttack2 = new SpellBaseAbstractRectangleAttack(
@@ -92,7 +92,7 @@ public class SpellDashBroodmother extends Spell {
 			true, true, SPELL_NAME, Particle.SQUID_INK,
 			mPlugin, mBoss, (b) -> {
 
-			}
+		}
 		);
 
 		mSweepAttack3 = new SpellBaseAbstractRectangleAttack(
@@ -100,7 +100,7 @@ public class SpellDashBroodmother extends Spell {
 			true, true, SPELL_NAME, Particle.SQUID_INK,
 			mPlugin, mBoss, (b) -> {
 
-			}
+		}
 		);
 
 		mSweepAttack4 = new SpellBaseAbstractRectangleAttack(
@@ -108,7 +108,7 @@ public class SpellDashBroodmother extends Spell {
 			true, true, SPELL_NAME, Particle.SQUID_INK,
 			mPlugin, mBoss, (b) -> {
 
-			}
+		}
 		);
 
 		mChargeUp = new ChargeUpManager(mBoss, mFinalCastTime, Component.text("Charging ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)),
@@ -122,6 +122,7 @@ public class SpellDashBroodmother extends Spell {
 		doSweepSequence();
 		BukkitRunnable runnable = new BukkitRunnable() {
 			float mPitchIncrease = 0;
+
 			@Override
 			public void run() {
 				if (mChargeUp.nextTick()) {

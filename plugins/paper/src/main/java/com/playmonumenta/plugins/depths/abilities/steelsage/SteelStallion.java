@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
@@ -51,7 +49,6 @@ public class SteelStallion extends DepthsAbility implements AbilityWithDuration 
 		new DepthsAbilityInfo<>(SteelStallion.class, ABILITY_NAME, SteelStallion::new, DepthsTree.STEELSAGE, DepthsTrigger.LIFELINE)
 			.linkedSpell(ClassAbility.STEEL_STALLION)
 			.cooldown(CHARM_COOLDOWN, COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("dismount", "dismount", SteelStallion::dismount, new AbilityTrigger(AbilityTrigger.Key.DROP)))
 			.displayItem(Material.IRON_HORSE_ARMOR)
 			.descriptions(SteelStallion::getDescription)
 			.priorityAmount(10000);
@@ -192,9 +189,7 @@ public class SteelStallion extends DepthsAbility implements AbilityWithDuration 
 
 	@Override
 	public void playerDismountEvent(EntityDismountEvent event) {
-		if (mHorse != null && mHorse.getHealth() > 0) {
-			event.setCancelled(true);
-		}
+		dismount();
 	}
 
 	public static boolean isSteelStallion(Entity entity) {
@@ -202,7 +197,7 @@ public class SteelStallion extends DepthsAbility implements AbilityWithDuration 
 	}
 
 	private static Description<SteelStallion> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<SteelStallion>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When your health drops below ")
 			.addPercent(TRIGGER_HEALTH)
 			.add(", summon and ride a horse with ")
@@ -213,7 +208,7 @@ public class SteelStallion extends DepthsAbility implements AbilityWithDuration 
 			.add(a -> a.mSpeed, SPEED[rarity - 1], false, null, true)
 			.add(" and a jump strength of ")
 			.add(a -> a.mJumpStrength, JUMP_STRENGTH[rarity - 1], false, null, true)
-			.add(". Press drop to dismount the horse.")
+			.add(".")
 			.addCooldown(COOLDOWN);
 	}
 

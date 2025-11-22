@@ -50,20 +50,22 @@ public class CrossbowListener implements Listener {
 			arrow.setFireTicks(100);
 		}
 
-		// Handle Punch on crossbows (for both players and mobs)
-		int punch = crossbow.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK);
-		if (punch > 0) {
-			arrow.setKnockbackStrength(punch);
+		// Only handle Punch on crossbows for entities - otherwise the punch on player crossbows will be too high
+		if (!(event.getEntity() instanceof Player)) {
+			int punch = crossbow.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK);
+			if (punch > 0) {
+				arrow.setKnockbackStrength(punch);
+			}
 		}
 
 		// For players: Handle Infinity on crossbows
 		if (event.getEntity() instanceof Player player) {
 			//Infinity gives arrow to player if the arrow shot had no potion nor custom effects
 			if (crossbow.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0
-				    && arrow instanceof Arrow regularArrow
-				    && !regularArrow.hasCustomEffects()
-				    && regularArrow.getBasePotionType() == PotionType.UNCRAFTABLE // plain arrow
-				    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
+				&& arrow instanceof Arrow regularArrow
+				&& !regularArrow.hasCustomEffects()
+				&& regularArrow.getBasePotionType() == PotionType.UNCRAFTABLE // plain arrow
+				&& arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
 				arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
 				if (player.getGameMode() != GameMode.CREATIVE) {
 					InventoryUtils.giveItem(player, new ItemStack(Material.ARROW), true);

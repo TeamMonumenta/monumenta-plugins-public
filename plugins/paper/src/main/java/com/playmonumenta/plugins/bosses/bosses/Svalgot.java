@@ -176,7 +176,7 @@ public final class Svalgot extends SerializedLocationBossAbilityGroup {
 
 			sendMessage("With mine Laastasem...  My lifeblood fuels the ritual... Come forth o Beast!");
 
-			Entity beast = LibraryOfSoulsIntegration.summon(mSpawnLoc.add(2, -3, 0), BeastOfTheBlackFlame.losName);
+			Entity beast = LibraryOfSoulsIntegration.summon(mSpawnLoc.clone().add(2, -3, 0), BeastOfTheBlackFlame.losName);
 			if (beast instanceof LivingEntity leBeast) {
 				try {
 					BossManager.createBoss(null, leBeast, BeastOfTheBlackFlame.identityTag, mEndLoc);

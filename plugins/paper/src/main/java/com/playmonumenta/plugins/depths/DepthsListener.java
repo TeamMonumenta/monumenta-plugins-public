@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.bosses.bosses.abilities.PhantomForceBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.cosmetics.poses.GravePose;
@@ -31,6 +32,7 @@ import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -46,6 +48,7 @@ import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +77,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.Vex;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -268,6 +272,16 @@ public class DepthsListener implements Listener {
 				event.updateGearDamageWithMultiplier(adaptiveMultiplier);
 			}
 		}
+
+		// phantom force trigger
+		if (type == DamageEvent.DamageType.MELEE && event.getDamager() instanceof Player) {
+			EntityUtils.getNearbyMobs(damagee.getLocation(), 3, 3, 3, e -> e instanceof Vex).stream()
+				.sorted(Comparator.comparingDouble(mob -> mob.getLocation().distanceSquared(damagee.getLocation())))
+				.map(mob -> BossUtils.getBossOfClass(mob, PhantomForceBoss.class))
+				.filter(Objects::nonNull)
+				.findFirst()
+				.ifPresent(PhantomForceBoss::explode);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -281,16 +295,12 @@ public class DepthsListener implements Listener {
 		}
 	}
 
-	public static int getGraveDuration(DepthsParty party, DepthsPlayer dp, Player player, boolean allowPermadeath) {
+	public static int getGraveDuration(DepthsParty party, DepthsPlayer dp, Player player) {
 		int baseGraveDuration = party.getAscension() < DepthsEndlessDifficulty.ASCENSION_REVIVE_TIME ? GRAVE_DURATION : GRAVE_DURATION - ASCENSION_GRAVE_DURATION_DECREASE;
 		int duration = baseGraveDuration - (int) (Math.sqrt(dp.mNumDeaths) * 7 * 20);
 
 		if (AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, CurseOfDeath.class) != null) {
 			duration = baseGraveDuration - (int) (Math.sqrt(dp.mNumDeaths + 2) * 7 * 20);
-		}
-
-		if (allowPermadeath) {
-			return Math.max(1, duration);
 		}
 
 		return Math.max(61, duration);
@@ -363,7 +373,7 @@ public class DepthsListener implements Listener {
 
 			Location deathLocation = player.getLocation();
 			MMLog.finer(player.getName() + " died. mNumDeaths = " + dp.mNumDeaths);
-			int graveDuration = getGraveDuration(party, dp, player, false);
+			int graveDuration = getGraveDuration(party, dp, player);
 			dp.mNumDeaths++;
 
 			if (graveDuration > GRAVE_REVIVE_DURATION) {
@@ -652,7 +662,7 @@ public class DepthsListener implements Listener {
 		}
 		dp.mLastLogoutTime = System.currentTimeMillis();
 		if (
-				!Plugin.getInstance().mPlayerListener.isPlayerTransferring(player) &&
+			!Plugin.getInstance().mPlayerListener.isPlayerTransferring(player) &&
 				event.getReason() == PlayerQuitEvent.QuitReason.DISCONNECTED
 		) {
 			if (dp.getContent() == DepthsContent.DARKEST_DEPTHS) {
@@ -781,10 +791,10 @@ public class DepthsListener implements Listener {
 		DepthsPlayer dp = manager.getDepthsPlayer(player);
 		MMLog.finer("Player " + player.getName() + " logged in. has_depths_player=" + (dp != null));
 		if (dp != null) {
-			boolean shouldOfflineTeleport = true;
+			boolean stillInGame = true;
 
 			if (dp.mDead) {
-				shouldOfflineTeleport = false;
+				stillInGame = false;
 				sendPlayerToLootRoom(player, true);
 				MMLog.info(player.getName() + " was sent to the loot room because they logged in while awaiting respawn.");
 			}
@@ -803,31 +813,34 @@ public class DepthsListener implements Listener {
 				if (player.getScoreboardTags().contains(DISCONNECT_ANTICHEESE_MOB_TAG)) {
 					disconnectAnticheese = true;
 					dp.mNumDeaths++;
-					MMLog.finer(player.getName() + " logged in with anticheese mob tag. mNumDeaths = " + dp.mNumDeaths);
+					dp.mDisconnects++;
+					MMLog.finer(player.getName() + " logged in with anticheese mob tag. mDisconnects = " + dp.mDisconnects);
 				}
 				if (player.getScoreboardTags().contains(DISCONNECT_ANTICHEESE_BOSS_TAG)) {
 					disconnectAnticheese = true;
 					dp.mNumDeaths += 2;
-					MMLog.finer(player.getName() + " logged in with anticheese boss tag. mNumDeaths = " + dp.mNumDeaths);
+					dp.mDisconnects += 2;
+					MMLog.finer(player.getName() + " logged in with anticheese boss tag. mDisconnects = " + dp.mDisconnects);
 				}
 				if (dp.mZenithAbandonedByParty) {
 					MMLog.finer(player.getName() + " logged in with zenith sacrificed tag (send to lootroom on login due to being abandoned by their party while logged out). ");
 					sendPlayerToLootRoom(player, false); // Assumes that treasure score was successfully set.
-					shouldOfflineTeleport = false;
+					stillInGame = false;
 					player.sendMessage(Component.text("Your party has abandoned you...", NamedTextColor.DARK_AQUA));
 					AuditListener.logDeath(player.getName() + " logged in with zenith sacrificed tag (send to lootroom on login due to being abandoned by their party while logged out). ");
 				}
 
-				if (disconnectAnticheese && getGraveDuration(party, dp, player, true) < GRAVE_REVIVE_DURATION) {
+				if (disconnectAnticheese && dp.mDisconnects >= 2) {
 					player.sendMessage(Component.text("You have been punished for your hubris.", NamedTextColor.DARK_AQUA));
 					sendPlayerToLootRoom(player, true);
-					shouldOfflineTeleport = false;
+					stillInGame = false;
 					MMLog.info(player.getName() + " was punished for their hubris (send to lootroom on login due to anticheese) in Zenith. They \"died\" " + dp.mNumDeaths + " times, including artificial deaths from anticheese.");
 					AuditListener.logDeath(player.getName() + " was punished for their hubris (send to lootroom on login due to anticheese) in Zenith. They \"died\" " + dp.mNumDeaths + " times, including artificial deaths from anticheese.");
 				}
 			}
-			if (shouldOfflineTeleport) {
+			if (stillInGame) {
 				dp.doOfflineTeleport();
+				dp.triggerQueuedAbilities(player);
 			}
 		}
 

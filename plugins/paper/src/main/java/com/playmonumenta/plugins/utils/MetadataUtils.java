@@ -44,7 +44,7 @@ public class MetadataUtils {
 	 */
 	public static boolean happenedThisTick(Metadatable entity, String metakey, int tickOffset) {
 		return entity.hasMetadata(metakey)
-			       && entity.getMetadata(metakey).get(0).asInt() == Bukkit.getServer().getCurrentTick() + tickOffset;
+			&& entity.getMetadata(metakey).get(0).asInt() == Bukkit.getServer().getCurrentTick() + tickOffset;
 	}
 
 	public static boolean happenedThisTick(Metadatable entity, String metakey) {

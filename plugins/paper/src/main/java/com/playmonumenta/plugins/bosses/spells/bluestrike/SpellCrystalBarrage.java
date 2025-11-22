@@ -182,7 +182,7 @@ public class SpellCrystalBarrage extends Spell {
 		bullet.addScoreboardTag(BULLET_TAG);
 
 		BukkitRunnable bulletRun = new BukkitRunnable() {
-			BoundingBox mBox = BoundingBox.of(detLoc, HITBOX, HITBOX, HITBOX);
+			final BoundingBox mBox = BoundingBox.of(detLoc, HITBOX, HITBOX, HITBOX);
 			int mTicks = 0;
 			double mInnerVelocity = 0;
 

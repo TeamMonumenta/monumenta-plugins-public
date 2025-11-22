@@ -3,8 +3,9 @@ package com.playmonumenta.plugins.bosses.spells.lich.horseman;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -21,6 +22,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 /*
  * Sinister Reach - The horseman pauses momentarily for 0.8 seconds, afterwards the swing forward
@@ -61,7 +64,7 @@ public class SpellLichSinisterReach extends Spell {
 		if (target == null) {
 			List<Player> players = Lich.playersInRange(mLoc, mRange, true);
 			Collections.shuffle(players);
-			if (players.size() > 0) {
+			if (!players.isEmpty()) {
 				target = players.get(0);
 			}
 		}
@@ -167,12 +170,12 @@ public class SpellLichSinisterReach extends Spell {
 				mInc++;
 
 				if (mInc < 24 && mInc % 2 == 0) {
-					p.setNoDamageTicks(0);
-					new PartialParticle(Particle.CRIT_MAGIC, p.getLocation(), 15, 0.1, 0.1, 0.1, 0.75).spawnAsEntityActive(mBoss);
-					BossUtils.bossDamagePercent(mBoss, p, 1.0, mBoss.getLocation(), true, SPELL_NAME);
 					// Doesn't matter if the player is blocking, there are 12 hits and only one can be blocked
+					DamageUtils.damage(mBoss, p, new DamageEvent.Metadata(DamageEvent.DamageType.TRUE, null,
+						null, SPELL_NAME), 1, true, true, true);
 					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SLOWNESS_SRC,
-						new PercentSpeed(20, -1.0, SLOWNESS_SRC));
+						new PercentSpeed(TICKS_PER_SECOND, -1.0, SLOWNESS_SRC));
+					new PartialParticle(Particle.CRIT_MAGIC, p.getLocation()).count(15).delta(0.1).extra(0.75).spawnAsEntityActive(mBoss);
 				}
 				if (mInc >= 24) {
 					mBoss.setAI(true);

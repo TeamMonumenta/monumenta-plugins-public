@@ -38,13 +38,21 @@ public class Duelist implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (EntityUtils.isHumanlike(enemy)) {
+		boolean isProjectile = event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident;
+		if (isProjectile || event.getType() == DamageType.MELEE) {
+			event.setFlatDamage(event.getFlatDamage() + calculateDuelistDamage(isProjectile, player, level, enemy));
+		}
+	}
+
+	public static double calculateDuelistDamage(boolean isProjectile, Player player, double level, LivingEntity target) {
+		if (EntityUtils.isHumanlike(target) && level > 0) {
 			double damage = level * DAMAGE_PER_LEVEL;
-			if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
-				event.setFlatDamage(event.getFlatDamage() + damage);
-			} else if (event.getType() == DamageType.MELEE) {
-				event.setFlatDamage(event.getFlatDamage() + damage * player.getCooledAttackStrength(0));
+			if (isProjectile) {
+				return damage;
+			} else {
+				return damage * player.getCooledAttackStrength(0);
 			}
 		}
+		return 0;
 	}
 }

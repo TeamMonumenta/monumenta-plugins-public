@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.alchemist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.BezoarCS;
@@ -15,7 +17,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -63,54 +64,43 @@ public class Bezoar extends Ability {
 			.linkedSpell(ClassAbility.BEZOAR)
 			.scoreboardId("Bezoar")
 			.shorthandName("BZ")
-			.descriptions(
-				("Every %sth mob killed within %s blocks of the Alchemist spawns a Bezoar that lingers for %ss. " +
-				"Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, " +
-				"and will grant both the player who picks it up and the Alchemist a custom healing effect that " +
-				"regenerates %s%% of max health every second for %ss and reduces the duration of all current " +
-				"potion debuffs by %ss.")
-					.formatted(
-						FREQUENCY,
-						StringUtils.to2DP(RADIUS),
-						StringUtils.ticksToSeconds(LINGER_TIME),
-						StringUtils.multiplierToPercentage(HEAL_PERCENT),
-						StringUtils.ticksToSeconds(HEAL_DURATION),
-						StringUtils.ticksToSeconds(DEBUFF_REDUCTION)
-					),
-				"The Bezoar now additionally grants +%s%% damage from all sources for %ss."
-					.formatted(
-						StringUtils.multiplierToPercentage(DAMAGE_PERCENT),
-						StringUtils.ticksToSeconds(DAMAGE_DURATION)
-					),
-				("Every %s bezoars spawned, summon a Philosopher's Stone instead. " +
-				"A Philosopher's Stone grants the Alchemist %s potions, and gives the same effects as bezoars, while also " +
-				"granting %s absorption for %ss.")
-					.formatted(
-						StringUtils.to2DP(PHILOSOPHER_STONE_BEZOAR_COUNT),
-						PHILOSOPHER_STONE_POTIONS,
-						PHILOSOPHER_STONE_ABSORPTION_AMOUNT,
-						StringUtils.ticksToSeconds(PHILOSOPHER_STONE_ABSORPTION_DURATION)
-					)
-			)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Every few mobs that are killed nearby, spawn an item that can be picked up for damage and healing buffs.")
 			.displayItem(Material.LIME_CONCRETE);
+
+	private final int mLingerTime;
+	private final int mPotions;
+	private final int mPhilosophersStonePotions;
+	private final int mDebuffReduction;
+	private final int mHealDuration;
+	private final double mHealPercent;
+	private final int mDamageDuration;
+	private final double mDamagePercent;
+	private final int mFrequency;
+	private final double mRadius;
+	private final BezoarCS mCosmetic;
 
 	private int mKills = 0;
 	private int mBezoarsSpawned = 0;
 	private @Nullable AlchemistPotions mAlchemistPotions;
-	private final int mLingerTime;
-
-	private final BezoarCS mCosmetic;
 
 	public Bezoar(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mLingerTime = CharmManager.getDuration(mPlayer, CHARM_LINGER_TIME, LINGER_TIME);
+		mPotions = POTIONS + (int) CharmManager.getLevel(mPlayer, CHARM_POTIONS);
+		mPhilosophersStonePotions = PHILOSOPHER_STONE_POTIONS + (int) CharmManager.getLevel(mPlayer, CHARM_PHILOSOPHER_STONE_POTIONS);
+		mDebuffReduction = CharmManager.getDuration(mPlayer, CHARM_DEBUFF_REDUCTION, DEBUFF_REDUCTION);
+		mHealDuration = CharmManager.getDuration(mPlayer, CHARM_HEAL_DURATION, HEAL_DURATION);
+		mHealPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT);
+		mDamageDuration = CharmManager.getDuration(mPlayer, CHARM_DAMAGE_DURATION, DAMAGE_DURATION);
+		mDamagePercent = DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mFrequency = FREQUENCY + (int) CharmManager.getLevel(mPlayer, CHARM_REQUIREMENT);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BezoarCS());
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-		});
+		Bukkit.getScheduler().runTask(plugin, () ->
+			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class));
 	}
 
 	public void dropBezoar(EntityDeathEvent event) {
@@ -136,6 +126,7 @@ public class Bezoar extends Ability {
 
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;
@@ -150,7 +141,7 @@ public class Bezoar extends Ability {
 					mCosmetic.targetEffects(mPlayer, itemLoc, false);
 
 					if (mAlchemistPotions != null) {
-						mAlchemistPotions.incrementCharges(POTIONS + (int) CharmManager.getLevel(mPlayer, CHARM_POTIONS));
+						mAlchemistPotions.incrementCharges(mPotions);
 					}
 
 					item.remove();
@@ -172,24 +163,23 @@ public class Bezoar extends Ability {
 
 
 	private void applyEffects(Player player, boolean isPhilosopherStone) {
-		int debuffReduction = CharmManager.getDuration(mPlayer, CHARM_DEBUFF_REDUCTION, DEBUFF_REDUCTION);
 		for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {
 			PotionEffect effect = player.getPotionEffect(effectType);
 			if (effect != null) {
 				player.removePotionEffect(effectType);
 				// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
-				player.addPotionEffect(new PotionEffect(effectType, Math.max(effect.getDuration() - debuffReduction, 0), effect.getAmplifier()));
+				player.addPotionEffect(new PotionEffect(effectType, Math.max(effect.getDuration() - mDebuffReduction, 0), effect.getAmplifier()));
 			}
 		}
 
 		// If the effects are from a philosopher stone, it should give them with triple the duration.
 		double maxHealth = EntityUtils.getMaxHealth(player);
-		int healDuration = CharmManager.getDuration(mPlayer, CHARM_HEAL_DURATION, HEAL_DURATION);
-		mPlugin.mEffectManager.addEffect(player, "BezoarHealing", new CustomRegeneration(healDuration, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, maxHealth * HEAL_PERCENT), mPlayer, mPlugin));
+		mPlugin.mEffectManager.addEffect(player, "BezoarHealing",
+			new CustomRegeneration(mHealDuration,
+				maxHealth * mHealPercent, mPlayer, mPlugin).deleteOnAbilityUpdate(true));
 
 		if (isLevelTwo()) {
-			int damageDuration = CharmManager.getDuration(mPlayer, CHARM_DAMAGE_DURATION, DAMAGE_DURATION);
-			mPlugin.mEffectManager.addEffect(player, "BezoarPercentDamageDealtEffect", new PercentDamageDealt(damageDuration, DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
+			mPlugin.mEffectManager.addEffect(player, "BezoarPercentDamageDealtEffect", new PercentDamageDealt(mDamageDuration, mDamagePercent).deleteOnAbilityUpdate(true));
 		}
 
 		if (isPhilosopherStone) {
@@ -203,6 +193,7 @@ public class Bezoar extends Ability {
 
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;
@@ -217,7 +208,7 @@ public class Bezoar extends Ability {
 					mCosmetic.targetEffects(mPlayer, itemLoc, true);
 
 					if (mAlchemistPotions != null) {
-						mAlchemistPotions.incrementCharges(PHILOSOPHER_STONE_POTIONS + (int) CharmManager.getLevel(mPlayer, CHARM_PHILOSOPHER_STONE_POTIONS));
+						mAlchemistPotions.incrementCharges(mPhilosophersStonePotions);
 					}
 
 					item.remove();
@@ -246,7 +237,7 @@ public class Bezoar extends Ability {
 	}
 
 	public boolean shouldDrop() {
-		return mKills >= FREQUENCY + (int) CharmManager.getLevel(mPlayer, CHARM_REQUIREMENT);
+		return mKills >= mFrequency;
 	}
 
 	@Override
@@ -259,7 +250,45 @@ public class Bezoar extends Ability {
 
 	@Override
 	public double entityDeathRadius() {
-		return CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+		return mRadius;
 	}
 
+	private static Description<Bezoar> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Every ")
+			.add(a -> a.mFrequency, FREQUENCY, true)
+			.add(" mobs killed within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks of the Alchemist spawns a Bezoar that lingers for ")
+			.addDuration(a -> a.mLingerTime, LINGER_TIME)
+			.add(" seconds. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates ")
+			.addPercent(a -> a.mHealPercent, HEAL_PERCENT)
+			.add(" of max health every second for ")
+			.addDuration(a -> a.mHealDuration, HEAL_DURATION)
+			.add(" seconds and reduces the duration of all current potion debuffs by ")
+			.addDuration(a -> a.mDebuffReduction, DEBUFF_REDUCTION)
+			.add(" seconds.");
+	}
+
+	private static Description<Bezoar> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The Bezoar now additionally grants ")
+			.addPercent(a -> a.mDamagePercent, DAMAGE_PERCENT)
+			.add(" damage from all sources for ")
+			.addDuration(a -> a.mDamageDuration, DAMAGE_DURATION)
+			.add(" seconds.");
+	}
+
+	private static Description<Bezoar> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Every ")
+			.add(a -> PHILOSOPHER_STONE_BEZOAR_COUNT, PHILOSOPHER_STONE_BEZOAR_COUNT, true)
+			.add(" bezoars spawned, summon a Philosopher's Stone instead. A Philosopher's Stone grants the Alchemist ")
+			.add(a -> a.mPhilosophersStonePotions, PHILOSOPHER_STONE_POTIONS)
+			.add(" potions, and gives the same effects as bezoars, while also granting ")
+			.add(a -> PHILOSOPHER_STONE_ABSORPTION_AMOUNT, PHILOSOPHER_STONE_ABSORPTION_AMOUNT)
+			.add(" absorption for ")
+			.addDuration(PHILOSOPHER_STONE_ABSORPTION_DURATION)
+			.add(" seconds.");
+	}
 }

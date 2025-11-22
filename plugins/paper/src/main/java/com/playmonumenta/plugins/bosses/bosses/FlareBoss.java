@@ -6,8 +6,9 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellFlare;
-import java.util.Collections;
 import java.util.List;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -56,32 +57,56 @@ public class FlareBoss extends BossAbilityGroup {
 		@BossParam(help = "target of this spell (maybe keept this set to 1 if you plan to do multiple splits)")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT;
 		@BossParam(help = "Sound played at the targeted player when the boss starts charging the ability ability")
-		public SoundsList SOUND_WARNING = SoundsList.fromString("[(BLOCK_ENCHANTMENT_TABLE_USE,4,0.75)]");
+		public SoundsList SOUND_WARNING = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 4.0f, 0.75f))
+			.build();
 		@BossParam(help = "Sound played once a second at the spell's target while the spell is charging")
-		public SoundsList SOUND_CHARGE_TARGET = SoundsList.fromString("[(ENTITY_EVOKER_CAST_SPELL,3,0.9)]");
+		public SoundsList SOUND_CHARGE_TARGET = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_EVOKER_CAST_SPELL, 3.0f, 0.9f))
+			.build();
 		@BossParam(help = "Sound played every tick at the caster while the spell is charging. Pitch is automatically increased by 0.01 every tick")
-		public SoundsList SOUND_CHARGE_BOSS = SoundsList.fromString("[(UI_TOAST_IN,1,0.5)]");
+		public SoundsList SOUND_CHARGE_BOSS = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.UI_TOAST_IN, 1.0f, 0.5f))
+			.build();
 		@BossParam(help = "Sound played when the explosion happens")
-		public SoundsList SOUND_EXPLOSION = SoundsList.fromString("[(ENTITY_LIGHTNING_BOLT_IMPACT,2,1.35),(ENTITY_FIREWORK_ROCKET_LAUNCH,2,1.0),(ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,3,1.0)]");
+		public SoundsList SOUND_EXPLOSION = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 2.0f, 1.35f))
+			.add(new SoundsList.CSound(Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 2.0f, 1.0f))
+			.add(new SoundsList.CSound(Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, 3.0f, 1.0f))
+			.build();
 		@BossParam(help = "Sound played when the explosion hits a player")
-		public SoundsList SOUND_EXPLOSION_PLAYER = SoundsList.fromString("[(ENTITY_ZOMBIE_VILLAGER_CURE,1,2.0)]");
+		public SoundsList SOUND_EXPLOSION_PLAYER = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0f, 2.0f))
+			.build();
 		@BossParam(help = "Particles for the pillar visual effect")
-		public ParticlesList PARTICLES_PILLAR = ParticlesList.fromString("[(END_ROD,5,0.15,0.15,0.15,0.05),(FIREWORKS_SPARK,10,0.2,0.2,0.2,0.05)]");
+		public ParticlesList PARTICLES_PILLAR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.END_ROD, 5, 0.15, 0.15, 0.15, 0.05))
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 10, 0.2, 0.2, 0.2, 0.05))
+			.build();
 		@BossParam(help = "Particles to spawn on the ground in a ring for the explosion.")
-		public ParticlesList PARTICLES_EXPLOSION_RINGS = ParticlesList.fromString("[(CRIT_MAGIC,5,0.1,0.1,0.1,0.05),(ELECTRIC_SPARK,1,0.5,0.1,0.5,0.0)]");
+		public ParticlesList PARTICLES_EXPLOSION_RINGS = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 5, 0.1, 0.1, 0.1, 0.05))
+			.add(new ParticlesList.CParticle(Particle.ELECTRIC_SPARK, 1, 0.5, 0.1, 0.5, 0.0))
+			.build();
 		@BossParam(help = "Particles to spawn at the boss while the spell is charging.")
-		public ParticlesList PARTICLES_CHARGE_BOSS = ParticlesList.fromString("[(ELECTRIC_SPARK,1,0.25,0.45,0.25,1)]");
+		public ParticlesList PARTICLES_CHARGE_BOSS = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.ELECTRIC_SPARK, 1, 0.25, 0.45, 0.25, 1.0))
+			.build();
 		@BossParam(help = "particles for the directional indicator for the flares")
-		public ParticlesList PARTICLES_FLARE_TEL = ParticlesList.fromString("[(WAX_OFF,3,0.25,0.25,0.25,1)]");
+		public ParticlesList PARTICLES_FLARE_TEL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.WAX_OFF, 3, 0.25, 0.25, 0.25, 1.0))
+			.build();
 		@BossParam(help = "Particles to spawn every 20 ticks at the circular border of the spell's area of effect.")
-		public ParticlesList PARTICLES_CHARGE_TWENTY_TICKS_BORDER = ParticlesList.fromString("[(END_ROD,1,0.1,0.0,0.1,0.05)]");
+		public ParticlesList PARTICLES_CHARGE_TWENTY_TICKS_BORDER = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.END_ROD, 1, 0.1, 0.0, 0.1, 0.05))
+			.build();
 	}
 
 	public FlareBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT) {
-			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RANGE, false, EntityTargets.Limit.DEFAULT_ONE, p.LINE_OF_SIGHT ? List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT) : Collections.emptyList());
+			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RANGE, EntityTargets.Limit.DEFAULT_ONE, p.LINE_OF_SIGHT ? List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED) : List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 		}
 
 		Spell spell = new SpellFlare(plugin, boss, p);

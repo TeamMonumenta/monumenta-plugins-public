@@ -43,7 +43,7 @@ public class IceBarrier extends DepthsAbility {
 	public static final String ABILITY_NAME = "Ice Barrier";
 	public static final double[] DAMAGE = {15, 18, 21, 24, 27, 33};
 	public static final int ICE_TICKS = 12 * 20;
-	public static final int COOLDOWN = 12 * 20;
+	public static final int[] COOLDOWN = {14 * 20, 13 * 20, 12 * 20, 11 * 20, 10 * 20, 8 * 20};
 	public static final int CAST_RANGE = 30;
 	public static final int[] MAX_LENGTH = {20, 25, 30, 35, 40, 50};
 	public static final int CAST_TIME = 5 * 20;
@@ -182,8 +182,9 @@ public class IceBarrier extends DepthsAbility {
 	}
 
 	private static Description<IceBarrier> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<IceBarrier>(color)
-			.add("Right click while sneaking to place an ice marker up to ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to place an ice marker up to ")
 			.add(a -> a.mRange, CAST_RANGE)
 			.add(" blocks away. Placing a second marker within ")
 			.addDuration(CAST_TIME)
@@ -194,7 +195,7 @@ public class IceBarrier extends DepthsAbility {
 			.add(" seconds. If there is a height difference of 4 or more blocks between the two markers, an ice staircase is placed instead. Deal ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage to mobs near the ice when placed. Enemies that break the barrier are stunned for 2s. Cooldown is refunded if no second marker is placed.")
-			.addCooldown(COOLDOWN);
+			.addCooldown(COOLDOWN[rarity - 1], true);
 	}
 
 

@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -15,6 +17,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -50,22 +53,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			.linkedSpell(ClassAbility.CLOAK_AND_DAGGER)
 			.scoreboardId("CloakAndDagger")
 			.shorthandName("CnD")
-			.descriptions(
-				String.format("Killing an enemy grants a stack of cloak. Elite kills and Boss \"kills\" give you %s stacks " +
-					          "(every %s damage to them in R2; every %s damage to them in R3 excluding damage from this skill). Stack cap: %s. " +
-					          "Pressing the drop key while dual wielding swords removes all cloak stacks for %s seconds of Stealth " +
-					          "and (%s * X) melee damage on your next Stealthed melee attack, where X is the number of stacks you had at activation. " +
-					          "Performing a successful melee attack or switching from your held swords ends Stealth. You must have at least %s stacks for activation.",
-					CLOAK_STACKS_ON_ELITE_KILL,
-					BOSS_DAMAGE_THRESHOLD_R2,
-					BOSS_DAMAGE_THRESHOLD_R3,
-					CLOAK_1_MAX_STACKS,
-					STEALTH_DURATION / 20.0,
-					(int) CLOAK_1_DAMAGE_MULTIPLIER,
-					CLOAK_MIN_STACKS),
-				String.format("The Cloak stack cap is now %s and the melee damage is increased to (%s * X).",
-					CLOAK_2_MAX_STACKS,
-					(int) CLOAK_2_DAMAGE_MULTIPLIER))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Killing mobs grants cloak stacks, which can be consumed to enter Stealth and buff your next melee attack.")
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakAndDagger::cast, new AbilityTrigger(AbilityTrigger.Key.DROP),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
@@ -74,7 +62,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	private final KillTriggeredAbilityTracker mTracker;
 
 	private final double mDamageMultiplier;
+	private final int mStacksOnKill;
+	private final int mStacksOnEliteKill;
 	private final int mMaxStacks;
+	private final int mStealthDuration;
 	private final CloakAndDaggerCS mCosmetic;
 	private int mCloak = 0;
 	private int mCloakOnActivation = 0;
@@ -83,7 +74,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	public CloakAndDagger(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamageMultiplier = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER);
+		mStacksOnKill = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS_GAIN);
+		mStacksOnEliteKill = CLOAK_STACKS_ON_ELITE_KILL + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS_GAIN);
 		mMaxStacks = (isLevelOne() ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS) + (int) CharmManager.getLevel(player, CHARM_STACKS);
+		mStealthDuration = CharmManager.getDuration(mPlayer, CHARM_STEALTH, STEALTH_DURATION);
 		mTracker = new KillTriggeredAbilityTracker(player, this, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CloakAndDaggerCS());
 	}
@@ -93,7 +87,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			mCloakOnActivation = mCloak;
 			mCloak = 0;
 			mActive = true;
-			AbilityUtils.applyStealth(mPlugin, mPlayer, CharmManager.getDuration(mPlayer, CHARM_STEALTH, STEALTH_DURATION), mCosmetic);
+			AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration, mCosmetic);
 			mCosmetic.castEffects(mPlayer);
 
 			ClientModHandler.updateAbility(mPlayer, this);
@@ -133,11 +127,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
 		if (mCloak < mMaxStacks) {
-			int extraStacks = (int) CharmManager.getLevel(mPlayer, CHARM_STACKS_GAIN);
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
-				mCloak = Math.min(mMaxStacks, mCloak + CLOAK_STACKS_ON_ELITE_KILL + extraStacks);
+				mCloak = Math.min(mMaxStacks, mCloak + mStacksOnEliteKill);
 			} else {
-				mCloak = Math.min(mMaxStacks, mCloak + 1 + extraStacks);
+				mCloak = Math.min(mMaxStacks, mCloak + mStacksOnKill);
 			}
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
@@ -177,5 +170,52 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
 
 		return output;
+	}
+
+	private static Description<CloakAndDagger> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Killing a mob grants ")
+			.add(a -> a.mStacksOnKill, 1)
+			.add(" stack of cloak, up to ")
+			.add(a -> a.mMaxStacks, CLOAK_1_MAX_STACKS, false, Ability::isLevelOne)
+			.add(" stacks. Elite kills and Boss \"kills\" grant ")
+			.add(a -> a.mStacksOnEliteKill, CLOAK_STACKS_ON_ELITE_KILL)
+			.add(" stacks (")
+			.add((a, p) -> {
+				Description<CloakAndDagger> subDescription;
+				if (p == null) {
+					subDescription = new DescriptionBuilder<>(() -> INFO)
+						.add("every ")
+						.add(aa -> BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R2)
+						.add(" damage to them in R2; every ")
+						.add(aa -> BOSS_DAMAGE_THRESHOLD_R3, BOSS_DAMAGE_THRESHOLD_R3)
+						.add(" damage to them in R3");
+				} else {
+					int threshold = ServerProperties.getAbilityEnhancementsEnabled(p) ? BOSS_DAMAGE_THRESHOLD_R3 : BOSS_DAMAGE_THRESHOLD_R2;
+					subDescription = new DescriptionBuilder<>(() -> INFO)
+						.add("every ")
+						.add(aa -> threshold, threshold)
+						.add(" damage to them");
+				}
+				return subDescription.get(a, p);
+			})
+			.add(" excluding damage from this skill). ")
+			.addTrigger()
+			.add(" to spend all cloak stacks to gain ")
+			.addDuration(a -> a.mStealthDuration, STEALTH_DURATION)
+			.add(" seconds of Stealth and (")
+			.addPercent(a -> a.mDamageMultiplier, CLOAK_1_DAMAGE_MULTIPLIER, false, Ability::isLevelOne)
+			.add(" * X) melee damage on your next melee attack while in Stealth, where X is the number of stacks you had at activation. Performing a successful melee attack or switching from your held swords ends Stealth. You must have at least ")
+			.add(a -> CLOAK_MIN_STACKS, CLOAK_MIN_STACKS)
+			.add(" stacks for activation.");
+	}
+
+	private static Description<CloakAndDagger> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The stack cap is increased to ")
+			.add(a -> a.mMaxStacks, CLOAK_2_MAX_STACKS, false, Ability::isLevelTwo)
+			.add(" and the melee damage is increased to (")
+			.addPercent(a -> a.mDamageMultiplier, CLOAK_2_DAMAGE_MULTIPLIER, false, Ability::isLevelTwo)
+			.add(" * X).");
 	}
 }

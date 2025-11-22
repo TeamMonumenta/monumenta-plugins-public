@@ -61,7 +61,7 @@ public class Aeromancy extends DepthsAbility {
 	}
 
 	private static Description<Aeromancy> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Aeromancy>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("You deal ")
 			.addPercent(a -> a.mPlayerDamage, PLAYER_DAMAGE[rarity - 1], false, true)
 			.add(" more damage while airborne and ")

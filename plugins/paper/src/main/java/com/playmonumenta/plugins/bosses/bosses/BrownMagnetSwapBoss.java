@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -28,17 +29,25 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.Plugin;
 
-public class BrownMagnetSwapBoss extends BossAbilityGroup {
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
+public final class BrownMagnetSwapBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_brown_magnetswap";
 
 	public static class Parameters extends BossParameters {
-		@BossParam(help = "Number of Ticks between each swap (default 200 [10s])")
-		public int SWAP_TICKS = 200;
-		@BossParam(help = "Initial Charge of Magnet Swap Boss (Either 'PLUS' or 'MINUS')")
+		@BossParam(help = "Range in blocks that players must be in before this passive spell will run")
+		public int DETECTION = 100;
+
+		@BossParam(help = "Time in ticks between each polarity swap")
+		public int SWAP_TICKS = TICKS_PER_SECOND * 10;
+
+		@BossParam(help = "Initial polarity of the launcher (either 'PLUS' or 'MINUS')")
 		public String INITIAL_CHARGE = "PLUS";
-		@BossParam(help = "If player is of opposite charge, Boss' damage is multiplied by this (default 0.8)")
+
+		@BossParam(help = "If a player has opposite charge, multiply the launcher's damage against the player by this")
 		public double PLAYER_DAMAGE_RESIST = 0.8;
-		@BossParam(help = "If player is of opposite charge, Player's damage is multiplied by this (default 1.2)")
+
+		@BossParam(help = "If a player has opposite charge, multiply the player's damage against the launcher by this")
 		public double ENEMY_DAMAGE_VULN = 1.2;
 	}
 
@@ -49,15 +58,17 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 		Material.LEATHER_BOOTS
 	);
 
-	private boolean mIsPositive;
-	private int mTicks;
+	private final World mWorld;
 	private final double mBossVuln;
 	private final double mPlayerResist;
+	private boolean mIsPositive;
+	private int mTicks;
 	private double mLastDamageTick;
 
-	public BrownMagnetSwapBoss(Plugin plugin, LivingEntity boss) {
+	public BrownMagnetSwapBoss(final Plugin plugin, final LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		BrownMagnetSwapBoss.Parameters p = BossParameters.getParameters(boss, identityTag, new BrownMagnetSwapBoss.Parameters());
+		final Parameters p = BossParameters.getParameters(mBoss, identityTag, new Parameters());
+		mWorld = mBoss.getWorld();
 		mTicks = p.SWAP_TICKS;
 		mPlayerResist = p.PLAYER_DAMAGE_RESIST;
 		mBossVuln = p.ENEMY_DAMAGE_VULN;
@@ -66,11 +77,13 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 		mIsPositive = !p.INITIAL_CHARGE.equalsIgnoreCase("minus");
 
 		// glow with low priority (so that player abilities can override)
-		GlowingManager.startGlowing(mBoss, mIsPositive ? NamedTextColor.RED : NamedTextColor.BLUE, -1, 0, null, "magnet");
+		GlowingManager.startGlowing(mBoss, mIsPositive ? NamedTextColor.RED : NamedTextColor.BLUE, -1, 0,
+			null, "magnet");
 
-		BossBarManager bossBar = new BossBarManager(boss, 40, mIsPositive ? BossBar.Color.RED : BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_20, null);
+		final BossBarManager bossBar = new BossBarManager(mBoss, p.DETECTION, mIsPositive ? BossBar.Color.RED :
+			BossBar.Color.BLUE, BossBar.Overlay.NOTCHED_20, null);
 
-		List<Spell> passives = List.of(
+		final List<Spell> passives = List.of(
 			new SpellRunAction(() -> {
 				// Every SWAP TICKS duration, swap charges.
 				if (mTicks <= 0) {
@@ -79,10 +92,10 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 
 					// If boss is wearing leather anything, change color of armor.
 					if (mBoss.getEquipment() != null) {
-						for (EquipmentSlot slot : EquipmentSlot.values()) {
-							ItemStack item = mBoss.getEquipment().getItem(slot);
+						for (final EquipmentSlot slot : EquipmentSlot.values()) {
+							final ItemStack item = mBoss.getEquipment().getItem(slot);
 							if (LEATHER_ARMOR_TYPES.contains(item.getType())) {
-								LeatherArmorMeta armorMeta = (LeatherArmorMeta) item.getItemMeta();
+								final LeatherArmorMeta armorMeta = (LeatherArmorMeta) item.getItemMeta();
 								if (mIsPositive) {
 									armorMeta.setColor(Color.RED);
 								} else {
@@ -95,7 +108,7 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 					}
 
 					String name = mBoss.getName();
-					int length = name.length();
+					final int length = name.length();
 
 					if (name.charAt(0) == '+' && !mIsPositive) {
 						name = "-" + name.substring(1, length - 1) + "-";
@@ -108,19 +121,22 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 					} else {
 						bossBar.setColor(BossBar.Color.BLUE);
 					}
-					GlowingManager.startGlowing(mBoss, mIsPositive ? NamedTextColor.RED : NamedTextColor.BLUE, -1, 0, null, "magnet");
+					GlowingManager.startGlowing(mBoss, mIsPositive ? NamedTextColor.RED : NamedTextColor.BLUE,
+						-1, 0, null, "magnet");
 
 					mBoss.customName(Component.text(name));
 
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1, 2);
-					new PartialParticle(Particle.VILLAGER_HAPPY, mBoss.getLocation().add(0, 1, 0), 10, 0.5, 1).spawnAsEnemy();
+					mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE,
+						1, 2);
+					new PartialParticle(Particle.VILLAGER_HAPPY, mBoss.getLocation().add(0, 1, 0)).count(10)
+						.delta(0.5).extra(1).spawnAsEnemy();
 				}
 
 				mTicks -= PASSIVE_RUN_INTERVAL_DEFAULT;
 			}, 1, true)
 		);
 
-		super.constructBoss(SpellManager.EMPTY, passives, 100, bossBar);
+		super.constructBoss(SpellManager.EMPTY, passives, p.DETECTION, bossBar);
 	}
 
 	@Override
@@ -142,16 +158,8 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 
 
 	@Override
-	public void onHurtByEntity(DamageEvent event, Entity damager) {
-		Player player = null;
-
-		if (damager instanceof Player p) {
-			player = p;
-		} else if (event.getSource() instanceof Player p) {
-			player = p;
-		}
-
-		if (player != null) {
+	public void onHurtByEntityWithSource(final DamageEvent event, final Entity damager, final LivingEntity source) {
+		if (source instanceof final Player player) {
 			if (mIsPositive) {
 				// Positively charged, dealt more damage when player negative
 				if (ScoreboardUtils.checkTag(player, BrownPolarityDisplay.NEGATIVE_TAG)) {
@@ -170,8 +178,9 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 
 	private void playAesthetic() {
 		if (mLastDamageTick < mBoss.getTicksLived() - 10) {
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
-			new PartialParticle(Particle.CRIT_MAGIC, mBoss.getLocation().add(0, 1, 0), 10, 0.5, 1).spawnAsEnemy();
+			mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
+			new PartialParticle(Particle.CRIT_MAGIC, mBoss.getLocation().add(0, 1, 0)).count(10).delta(0.5)
+				.extra(1).spawnAsEnemy();
 			mLastDamageTick = mBoss.getTicksLived();
 		}
 	}

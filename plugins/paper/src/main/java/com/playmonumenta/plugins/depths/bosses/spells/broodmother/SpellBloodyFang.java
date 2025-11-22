@@ -94,6 +94,7 @@ public class SpellBloodyFang extends Spell {
 		new BukkitRunnable() {
 			int mTicks = 0;
 			float mCurrentPitch = TELEGRAPH_SOUND_PITCH;
+
 			@Override
 			public void run() {
 				mChargeUp.nextTick();
@@ -159,6 +160,7 @@ public class SpellBloodyFang extends Spell {
 				int mTicks = 0;
 				final Location mCenter = startCenter;
 				final double mFallAmount = (double) FALL_DISTANCE / (double) FALL_TIME_TICKS;
+
 				@Override
 				public void run() {
 					drawFang(mCenter);
@@ -171,7 +173,7 @@ public class SpellBloodyFang extends Spell {
 						mBoss.getWorld().playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 0.7f);
 						new PartialParticle(Particle.CLOUD, mCenter, 125).delta(0.5).extra(0.5).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.BLOCK_CRACK, mCenter, 125).delta((DAMAGE_RADIUS - 1) / 2, 0, (DAMAGE_RADIUS - 1) / 2)
-								.data(Material.DIRT.createBlockData()).extra(0.5).spawnAsEntityActive(mBoss);
+							.data(Material.DIRT.createBlockData()).extra(0.5).spawnAsEntityActive(mBoss);
 						// Circle on the ground again
 						new PPCircle(Particle.REDSTONE, mCenter, DAMAGE_RADIUS).data(END_DUST_OPTIONS).countPerMeter(1).spawnAsBoss();
 						// Block quake, making sure it spawns at the correct height of the floor

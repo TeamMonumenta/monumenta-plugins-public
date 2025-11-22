@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.particle;
 
+import com.google.common.base.Preconditions;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -173,23 +174,32 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 
 			@Override
 			public void run() {
-				// Frame of animation this run, starting at 1
-				mAnimationProgress++;
-				int targetIndex = (int) Math.round(mAnimationProgress * particlesPerTick) - 1;
+				try {
+					// Frame of animation this run, starting at 1
+					mAnimationProgress++;
+					int targetIndex = (int) Math.round(mAnimationProgress * particlesPerTick) - 1;
+					Preconditions.checkArgument(mAnimationProgress > 0, "Animation progress must be greater than 0");
+					Preconditions.checkArgument(mIndexPointer >= 0, "Index pointer must be greater than or equal to 0");
 
-				for (int index = mIndexPointer; index <= targetIndex; index++) {
-					packagedValues.location(
-						hopParticleLocations.get(index)
-					);
-					spawnUsingSettings(packagedValues);
-				}
+					for (int index = mIndexPointer; index <= targetIndex; index++) {
+						packagedValues.location(
+							hopParticleLocations.get(index)
+						);
+						spawnUsingSettings(packagedValues);
+					}
 
-				// If this was the last frame of animation
-				if (mAnimationProgress >= mDuration) {
+					// If this was the last frame of animation
+					if (mAnimationProgress >= mDuration) {
+						cancel();
+						mRunnable = null;
+					} else {
+						mIndexPointer = targetIndex;
+					}
+				} catch (Exception e) {
+					// Ensure the task is cancelled if an exception is thrown
 					cancel();
 					mRunnable = null;
-				} else {
-					mIndexPointer = targetIndex;
+					throw e;
 				}
 			}
 		};

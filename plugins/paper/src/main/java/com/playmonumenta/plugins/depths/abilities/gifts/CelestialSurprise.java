@@ -39,6 +39,6 @@ public class CelestialSurprise extends DepthsAbility {
 	}
 
 	private static Description<CelestialSurprise> getDescription() {
-		return new DescriptionBuilder<CelestialSurprise>().add("Gain two celestial gifts at random.");
+		return new DescriptionBuilder<>(() -> INFO).add("Gain two celestial gifts at random.");
 	}
 }

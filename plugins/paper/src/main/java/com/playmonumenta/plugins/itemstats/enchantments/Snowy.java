@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import de.tr7zw.nbtapi.NBT;
@@ -34,11 +33,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class Snowy implements Enchantment {
-	private static final SnowballMode[] MODES = new SnowballMode[] {
-		new SnowballMode(0, "NORMAL", "Snowballs", "Essence of Winter",
-			32, 0.75, 0.25, 1.5f, 6f),
-		new SnowballMode(1, "EMPOWERED", "EmpoweredSnowballs", "Cryosphere",
-			16, 3, 0.5, 1f, 2f)
+	private static final SnowballMode[] MODES = new SnowballMode[]{
+		new SnowballMode(0, "NORMAL", 0.75, 0.25, 1.5f, 6f),
+		new SnowballMode(1, "EMPOWERED", 3, 0.5, 1f, 2f)
 	};
 	private static final String SNOWBALL_MODE = "SnowballMode";
 	private static final int SWAP_COOLDOWN = 20;
@@ -141,11 +138,6 @@ public class Snowy implements Enchantment {
 		}
 	}
 
-	public static int getSnowballAmmo(ItemStack snowball) {
-		SnowballMode mode = getMode(snowball);
-		return mode.getAmmo(snowball);
-	}
-
 	private static SnowballMode getMode(ItemStack snowball) {
 		int index = NBT.get(snowball, nbt -> {
 			return nbt.getOrDefault(SNOWBALL_MODE, 0);
@@ -176,67 +168,25 @@ public class Snowy implements Enchantment {
 			player.sendActionBar(Component.text("Cannot shoot! Unstack the snowballs!", NamedTextColor.RED));
 			return false;
 		}
-		SnowballMode mode = getMode(snowball);
-		int ammo = mode.getAmmo(snowball);
-		if (ammo == 0) {
-			if (mode.refillAmmo(snowball, player)) {
-				ammo = mode.mAmmoGain;
-			} else {
-				player.sendActionBar(Component.text("Out of ammo!", NamedTextColor.RED));
-				player.sendMessage(Component.text("Put " + mode.mAmmoName + "s in your inventory and use the launcher to regain "
-					+ mode.mAmmoGain + " snowballs of this mode.", NamedTextColor.RED));
-				return false;
-			}
-		}
-		mode.setAmmo(snowball, ammo - 1);
-		player.sendActionBar(Component.text("Ammo: " + (ammo - 1), NamedTextColor.BLUE));
+		// With no ammo system, the only check needed is for stacked items.
 		return true;
 	}
 
 	public static class SnowballMode {
 		private final int mIndex;
 		private final String mName;
-		private final String mKey;
-		private final String mAmmoName;
-		private final int mAmmoGain;
 		private final double mPower;
 		private final double mYPower;
 		private final float mPitch;
 		private final double mThrowRate;
 
-		SnowballMode(int index, String name, String key, String ammoName, int ammoGain, double power, double yPower, float pitch, double throwRate) {
+		SnowballMode(int index, String name, double power, double yPower, float pitch, double throwRate) {
 			mIndex = index;
 			mName = name;
-			mKey = key;
-			mAmmoName = ammoName;
-			mAmmoGain = ammoGain;
 			mPower = power;
 			mYPower = yPower;
 			mPitch = pitch;
 			mThrowRate = throwRate;
-		}
-
-		private int getAmmo(ItemStack snowball) {
-			return NBT.get(snowball, nbt -> {
-				return nbt.getOrDefault(mKey, 0);
-			});
-		}
-
-		private void setAmmo(ItemStack snowball, int amount) {
-			NBT.modify(snowball, nbt -> {
-				nbt.setInteger(mKey, Math.max(0, amount));
-			});
-		}
-
-		private boolean refillAmmo(ItemStack snowball, Player player) {
-			for (ItemStack is : player.getInventory()) {
-				if (is != null && ItemUtils.getPlainName(is).equals(mAmmoName)) {
-					is.setAmount(is.getAmount() - 1);
-					setAmmo(snowball, mAmmoGain);
-					return true;
-				}
-			}
-			return false;
 		}
 
 		public void applyVelocity(Player target, Vector originalVelocity) {

@@ -37,7 +37,7 @@ import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
 public final class CrownbearerBoss extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_crownbearer";
-	public static final int detectionRange = 60;
+	public static final int detectionRange = 35;
 
 	private static final int SUMMON_RADIUS = 5;
 

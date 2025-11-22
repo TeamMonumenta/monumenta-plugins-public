@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.skills.warlock;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -40,17 +41,17 @@ public class SanguineHarvestCS implements CosmeticSkill {
 	}
 
 	public void projectileParticle(Player player, Location startLoc, Location endLoc) {
-		new PPLine(Particle.SMOKE_NORMAL, startLoc, endLoc).countPerMeter(18).delta(0.15).extra(0.075).spawnAsPlayerActive(player);
-		new PPLine(Particle.REDSTONE, startLoc, endLoc).countPerMeter(30).delta(0.2).extra(0.1).data(COLOR).spawnAsPlayerActive(player);
+		new PPLine(Particle.SMOKE_NORMAL, startLoc.clone().subtract(0, 0.3, 0), endLoc).countPerMeter(8).delta(0.15).extra(0.075).spawnAsPlayerActive(player);
+		new PPLine(Particle.REDSTONE, startLoc.clone().subtract(0, 0.3, 0), endLoc).countPerMeter(10).delta(0.1).extra(0.1).data(COLOR).spawnAsPlayerActive(player);
 	}
 
 	public void onExplode(Player player, World world, Location loc, double radius) {
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 25, 0, 0, 0, 0.125).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, loc, 10, 0, 0, 0, 0.1, COLOR).spawnAsPlayerActive(player);
 
-		new PartialParticle(Particle.REDSTONE, loc, 75, radius, radius, radius, 0.25, COLOR).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.FALLING_DUST, loc, 75, radius, radius, radius, Material.RED_CONCRETE.createBlockData()).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 55, radius, radius, radius, 0.25).spawnAsPlayerActive(player);
+		new PPCircle(Particle.REDSTONE, loc, radius).count(75).data(COLOR).delta(0.4).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FALLING_DUST, loc, 75, radius / 2, radius / 2, radius / 2, Material.RED_CONCRETE.createBlockData()).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 55, 0, 0, 0, radius * 0.08).spawnAsPlayerActive(player);
 
 		world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 0.4f, 0.4f);
 	}

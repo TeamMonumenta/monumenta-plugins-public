@@ -5,6 +5,9 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellDevour;
+import org.bukkit.Color;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -52,20 +55,26 @@ public class DevourBoss extends BossAbilityGroup {
 
 		// Visual and Sound Tells Parameters
 		@BossParam(help = "Sound played at the beginning of Cast.")
-		public SoundsList SOUND_INITIAL = SoundsList.fromString("[(ENTITY_EVOKER_PREPARE_WOLOLO,3,1)]");
+		public SoundsList SOUND_INITIAL = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_EVOKER_PREPARE_WOLOLO, 3.0f, 1.0f))
+			.build();
 		@BossParam(help = "Sound played at the beginning of indicators.")
 		public SoundsList SOUND_INDICATOR = SoundsList.EMPTY;
 		@BossParam(help = "Particles spawn at beginning of Cast.")
-		public ParticlesList PARTICLES_INITIAL = ParticlesList.fromString("[(SPELL_WITCH,20)]");
+		public ParticlesList PARTICLES_INITIAL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_WITCH, 20, 0.0, 0.0, 0.0, 0.0))
+			.build();
 		@BossParam(help = "Particles spawn at beginning of indicators at every fang spot.")
-		public ParticlesList PARTICLES_INDICATOR = ParticlesList.fromString("[(REDSTONE,2,0,0.5,0,0.5,BLACK,1)]");
+		public ParticlesList PARTICLES_INDICATOR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 2, 0.0, 0.5, 0.0, 0.5, new Particle.DustOptions(Color.BLACK, 1.0f)))
+			.build();
 		@BossParam(help = "Offset for Particles that spawn at beginning of indicators at every fang spot.")
 		public double PARTICLES_INDICATOR_Y_OFFSET = 0;
 		@BossParam(help = "If false, evoker fangs are silenced and don't do the chomping sound.")
 		public boolean SOUNDS_EVOKER_FANGS = true;
 	}
 
-	private SpellDevour mSpell;
+	private final SpellDevour mSpell;
 
 	public DevourBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);

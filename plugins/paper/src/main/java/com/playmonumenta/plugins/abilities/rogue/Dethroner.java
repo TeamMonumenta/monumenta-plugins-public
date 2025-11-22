@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.Rogue;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -17,7 +19,8 @@ public class Dethroner extends Ability {
 	public static final double PASSIVE_DAMAGE_BOSS_MODIFIER = 1.15;
 
 	public static final AbilityInfo<Dethroner> INFO =
-		new AbilityInfo<>(Dethroner.class, null, Dethroner::new)
+		new AbilityInfo<>(Dethroner.class, "Dethroner", Dethroner::new)
+			.description(getDescription())
 			.canUse(player -> AbilityUtils.getClassNum(player) == Rogue.CLASS_ID);
 
 	public Dethroner(Plugin plugin, Player player) {
@@ -27,8 +30,8 @@ public class Dethroner extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (enemy != null
-			    && (event.getType() == DamageEvent.DamageType.MELEE || event.getType() == DamageEvent.DamageType.MELEE_ENCH || event.getType() == DamageEvent.DamageType.MELEE_SKILL)
-			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+			&& (event.getType() == DamageEvent.DamageType.MELEE || event.getType() == DamageEvent.DamageType.MELEE_ENCH || event.getType() == DamageEvent.DamageType.MELEE_SKILL)
+			&& InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
 			if (EntityUtils.isElite(enemy)) {
 				event.updateDamageWithMultiplier(PASSIVE_DAMAGE_ELITE_MODIFIER);
 			} else if (EntityUtils.isBoss(enemy)) {
@@ -36,5 +39,14 @@ public class Dethroner extends Ability {
 			}
 		}
 		return false; // increases event damage and does not cause another damage instance, so no recursion
+	}
+
+	private static Description<Dethroner> getDescription() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("While holding two swords, you deal ")
+			.addPercent(PASSIVE_DAMAGE_ELITE_MODIFIER - 1)
+			.add(" more melee damage to Elites and ")
+			.addPercent(PASSIVE_DAMAGE_BOSS_MODIFIER - 1)
+			.add(" more melee damage to Bosses.");
 	}
 }

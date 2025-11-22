@@ -48,12 +48,12 @@ public class DepthsRejuvenation extends DepthsAbility {
 		for (Player player : players) {
 			double maxHealth = EntityUtils.getMaxHealth(player);
 			double healing = mHealPercent * maxHealth;
-			mPlugin.mEffectManager.addEffect(player, REGENERATION_EFFECT, new CustomRegeneration(10, healing, mHealInterval, mPlayer, mPlugin).displaysTime(false));
+			mPlugin.mEffectManager.addEffect(player, REGENERATION_EFFECT, new CustomRegeneration(10, healing, mHealInterval, mPlayer, false, mPlugin).displaysTime(false));
 		}
 	}
 
 	private static Description<DepthsRejuvenation> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsRejuvenation>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("All players within ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks of you (including yourself) heal ")

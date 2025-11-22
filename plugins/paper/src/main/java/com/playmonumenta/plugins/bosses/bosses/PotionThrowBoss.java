@@ -13,6 +13,8 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -56,13 +58,21 @@ public class PotionThrowBoss extends BossAbilityGroup {
 
 		//Particle & Sounds!
 		@BossParam(help = "Particle that follow the potion")
-		public ParticlesList PARTICLE_TRAIL = ParticlesList.fromString("[(FIREWORKS_SPARK,1)]");
+		public ParticlesList PARTICLE_TRAIL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
-		public ParticlesList PARTICLE_ENEMY = ParticlesList.fromString("[(SPELL,1)]");
-		public ParticlesList PARTICLE_ALLY = ParticlesList.fromString("[(SPELL,1)]");
+		public ParticlesList PARTICLE_ENEMY = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
+		public ParticlesList PARTICLE_ALLY = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound played when the boss launch a potion")
-		public SoundsList SOUND = SoundsList.fromString("[(ENTITY_SPLASH_POTION_THROW,3,0.7)]");
+		public SoundsList SOUND = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_SPLASH_POTION_THROW, 3.0f, 0.7f))
+			.build();
 
 	}
 
@@ -174,7 +184,7 @@ public class PotionThrowBoss extends BossAbilityGroup {
 				}
 
 				if (mParams.DAMAGE_PERCENTAGE > 0.0) {
-					BossUtils.bossDamagePercent(mBoss, enemy, mParams.DAMAGE_PERCENTAGE, mParams.SPELL_NAME);
+					BossUtils.bossDamagePercent(mBoss, enemy, mParams.DAMAGE_PERCENTAGE, mParams.SPELL_NAME, mParams.EFFECTS_ENEMY.mEffectList());
 				}
 				mParams.EFFECTS_ENEMY.apply(enemy, mBoss);
 			}

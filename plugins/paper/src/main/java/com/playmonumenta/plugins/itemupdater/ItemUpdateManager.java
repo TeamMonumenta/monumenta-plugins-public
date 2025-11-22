@@ -218,7 +218,7 @@ public class ItemUpdateManager implements Listener {
 	public static void updateCharms(Player p, CharmManager.CharmType charmType, List<ItemStack> equippedCharms) {
 		List<String> path = new ArrayList<>();
 		path.add("Player " + p.getName()
-		+ " updating charms (" + charmType + ")");
+			+ " updating charms (" + charmType + ")");
 
 		List<String> subPath;
 		int i = 0;
@@ -278,7 +278,8 @@ public class ItemUpdateManager implements Listener {
 			logNestedException(path, e);
 		}
 
-		/* Updating containers nested in items disabled for now to improve performance.
+		/* Updating containers nested in items disabled for now to improve performance. */
+		/*
 		if (item.hasItemMeta()) {
 			ItemMeta itemMeta = item.getItemMeta();
 			if (itemMeta instanceof BlockStateMeta) {

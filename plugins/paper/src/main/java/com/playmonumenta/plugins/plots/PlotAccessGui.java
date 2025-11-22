@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.plots;
 
 import com.playmonumenta.plugins.Constants;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
@@ -10,6 +9,7 @@ import com.playmonumenta.plugins.plots.PlotManager.PlotInfo;
 import com.playmonumenta.plugins.plots.PlotManager.PlotInfo.OtherAccessToOwnerPlotRecord;
 import com.playmonumenta.plugins.plots.PlotManager.PlotInfo.OwnerAccessToOtherPlotsRecord;
 import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -28,25 +28,21 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
-import static com.playmonumenta.plugins.plots.PlotManager.getPlotInfo;
-import static com.playmonumenta.plugins.plots.PlotManager.plotAccessRemove;
-
 public class PlotAccessGui extends Gui {
-	private static final Component PLOT_ACCESS_INFO_TITLE = Component.text("Plot Access Information");
-	private static final Component OTHER_ACCESS_TO_OWNER_PLOT_TITLE = Component.text("Access to Your Plot");
-	private static final Component OWNER_ACCESS_TO_OTHER_PLOTS_TITLE = Component.text("Access to Other Plots");
 	private static final ArrayList<Integer> GUI_LOCATIONS = new ArrayList<>(Arrays.asList(19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43));
+	private AccessInfoGuiMode mAccessInfoGuiMode = AccessInfoGuiMode.INACTIVE;
+	private int mTotalPages;
+	private int mCurrentPage = 1;
+	private @Nullable PlotEntry mSelectedPlotEntry = null;
 
+	private final MainGuiMode mMainGuiMode;
+	private final Player mViewer;
+	private final boolean mIsSelf;
+	private final String mOwnerName;
+	private final UUID mOwnerUuid;
+	private final PlotInfo mOwnerPlotInfo;
 	private final ArrayList<PlotEntry> mOtherAccessToOwnerPlotList = new ArrayList<>();
 	private final ArrayList<PlotEntry> mOwnerAccessToOtherPlotsList = new ArrayList<>();
-	private final String mOwnerUsername;
-	private final UUID mOwnerUuid;
-	private final PlotInfo mPlotInfo;
-	private final MainGuiMode mMainGuiMode;
-	private AccessInfoGuiMode mAccessInfoGuiMode = AccessInfoGuiMode.INACTIVE;
-	private @Nullable PlotEntry mSelectedPlotEntry = null;
-	private int mNumPages;
-	private int mCurrentPage = 1;
 
 	public enum MainGuiMode {
 		ACCESS_INFO_MODE,
@@ -90,53 +86,17 @@ public class PlotAccessGui extends Gui {
 		}
 	}
 
-	private void populateOtherAccessToOwnerPlotList() {
-		mPlotInfo.mOtherAccessToOwnerPlot.values().stream()
-			.sorted(Comparator.comparing((OtherAccessToOwnerPlotRecord access) -> access.mName == null ? "" : access.mName))
-			.forEach(access -> mOtherAccessToOwnerPlotList.add(new PlotEntry(access)));
-	}
-
-	private void populateOwnerAccessToOtherPlotsList() {
-		mPlotInfo.mOwnerAccessToOtherPlots.values().stream()
-			.sorted(Comparator.comparing((OwnerAccessToOtherPlotsRecord access) -> access.mName == null ? "" : access.mName)
-				.thenComparingInt(access -> access.mPlotId))
-			.forEach(access -> mOwnerAccessToOtherPlotsList.add(new PlotEntry(access)));
-	}
-
-	private void refreshData() {
-		getPlotInfo(mOwnerUuid).thenCompose(PlotInfo::populateNamesAndHeads).whenComplete((info, ex) -> {
-			if (ex != null) {
-				Plugin.getInstance().getLogger().severe("Caught exception while refreshing plot access for " + mOwnerUsername + ": " + ex.getMessage());
-				mPlayer.sendMessage(Component.text("An error occurred while refreshing the plot access information. Please report this: " + ex.getMessage(), NamedTextColor.RED));
-				MessagingUtils.sendStackTrace(mPlayer, ex);
-				close();
-			} else {
-				mPlotInfo.mOtherAccessToOwnerPlot.keySet().retainAll(info.mOtherAccessToOwnerPlot.keySet());
-				mPlotInfo.mOtherAccessToOwnerPlot.putAll(info.mOtherAccessToOwnerPlot);
-
-				mPlotInfo.mOwnerAccessToOtherPlots.keySet().retainAll(info.mOwnerAccessToOtherPlots.keySet());
-				mPlotInfo.mOwnerAccessToOtherPlots.putAll(info.mOwnerAccessToOtherPlots);
-
-				mOtherAccessToOwnerPlotList.clear();
-				populateOtherAccessToOwnerPlotList();
-
-				mOwnerAccessToOtherPlotsList.clear();
-				populateOwnerAccessToOtherPlotsList();
-
-				update();
-			}
-		});
-	}
-
-	public PlotAccessGui(Player player, String ownerUsername, UUID ownerUuid, PlotInfo plotInfo, MainGuiMode mainGuiMode, Component title) {
-		super(player, 6 * 9, title);
-		mOwnerUsername = ownerUsername;
-		mOwnerUuid = ownerUuid;
-		mPlotInfo = plotInfo;
+	public PlotAccessGui(Player viewer, String ownerUsername, UUID ownerUuid, PlotInfo ownerPlotInfo, MainGuiMode mainGuiMode, Component title) {
+		super(viewer, 6 * 9, title);
 		mMainGuiMode = mainGuiMode;
+		mViewer = viewer;
+		mIsSelf = mViewer.getUniqueId().equals(ownerUuid);
+		mOwnerName = ownerUsername;
+		mOwnerUuid = ownerUuid;
+		mOwnerPlotInfo = ownerPlotInfo;
 
 		// Only parse the player's own plot for TELEPORT_MODE and not ACCESS_INFO_MODE
-		if (mPlotInfo.mOwnedPlotId > 0 && mMainGuiMode == MainGuiMode.TELEPORT_MODE) {
+		if (mOwnerPlotInfo.mOwnedPlotId > 0 && mMainGuiMode == MainGuiMode.TELEPORT_MODE) {
 			mOwnerAccessToOtherPlotsList.add(new PlotEntry());
 		}
 
@@ -144,167 +104,111 @@ public class PlotAccessGui extends Gui {
 		populateOwnerAccessToOtherPlotsList();
 	}
 
+	private void refreshData() {
+		PlotManager.getPlotInfo(mOwnerUuid).thenCompose(PlotInfo::populateNamesAndHeads).whenComplete((info, ex) -> {
+			if (ex != null) {
+				MMLog.severe("Caught exception while refreshing plot access for " + mOwnerName + ": " + ex.getMessage());
+				mViewer.sendMessage(Component.text("An error occurred while refreshing the plot access information. Please report this: " + ex.getMessage(), NamedTextColor.RED));
+				MessagingUtils.sendStackTrace(mViewer, ex);
+				close();
+				return;
+			}
+
+			mOwnerPlotInfo.mOtherAccessToOwnerPlot.keySet().retainAll(info.mOtherAccessToOwnerPlot.keySet());
+			mOwnerPlotInfo.mOtherAccessToOwnerPlot.putAll(info.mOtherAccessToOwnerPlot);
+
+			mOwnerPlotInfo.mOwnerAccessToOtherPlots.keySet().retainAll(info.mOwnerAccessToOtherPlots.keySet());
+			mOwnerPlotInfo.mOwnerAccessToOtherPlots.putAll(info.mOwnerAccessToOtherPlots);
+
+			mOtherAccessToOwnerPlotList.clear();
+			populateOtherAccessToOwnerPlotList();
+
+			mOwnerAccessToOtherPlotsList.clear();
+			populateOwnerAccessToOtherPlotsList();
+
+			update();
+		});
+	}
+
+	private void populateOtherAccessToOwnerPlotList() {
+		mOwnerPlotInfo.mOtherAccessToOwnerPlot.values().stream()
+			.sorted(Comparator.comparing((OtherAccessToOwnerPlotRecord access) -> access.mName == null ? "" : access.mName))
+			.forEach(access -> mOtherAccessToOwnerPlotList.add(new PlotEntry(access)));
+	}
+
+	private void populateOwnerAccessToOtherPlotsList() {
+		mOwnerPlotInfo.mOwnerAccessToOtherPlots.values().stream()
+			.sorted(Comparator.comparing((OwnerAccessToOtherPlotsRecord access) -> access.mName == null ? "" : access.mName)
+				.thenComparingInt(access -> access.mPlotId))
+			.forEach(access -> mOwnerAccessToOtherPlotsList.add(new PlotEntry(access)));
+	}
+
 	@Override
 	protected void setup() {
 		if (mMainGuiMode == MainGuiMode.ACCESS_INFO_MODE) {
 			switch (mAccessInfoGuiMode) {
 				case INACTIVE -> setLayoutForAccessInfo();
-				case OTHER_ACCESS_TO_OWNER_PLOT -> setLayoutForOtherAccessToOwnerPlot();
-				case OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL -> setLayoutForOtherAccessToOwnerPlotRemoval();
+				case OTHER_ACCESS_TO_OWNER_PLOT ->
+					setLayout(mOtherAccessToOwnerPlotList, "No one has access to " + (mIsSelf ? "your " : mOwnerName + "'s ") + "plot!", null, false, false);
+				case OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL ->
+					setLayout(mOtherAccessToOwnerPlotList, "No one has access to " + (mIsSelf ? "your " : mOwnerName + "'s ") + "plot!", AccessInfoGuiMode.OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL_CONFIRMATION, true, false);
 				case OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL_CONFIRMATION -> {
-					if (mSelectedPlotEntry != null) {
-						setLayoutForOtherAccessToOwnerPlotRemovalConfirmation(mSelectedPlotEntry);
-					} else {
-						Plugin.getInstance().getLogger().severe("mSelectedPlotEntry was still null by the time it was called by OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL_CONFIRMATION");
-						mPlayer.sendMessage(Component.text("An error occurred while preparing a player for plot access removal because their associated entry couldn't be found. Please report this as a bug.", NamedTextColor.RED));
+					if (mSelectedPlotEntry == null) {
+						MMLog.severe("mSelectedPlotEntry was still null by the time it was called by OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL_CONFIRMATION in PlotAccessGui.java");
+						mViewer.sendMessage(Component.text("An error occurred while preparing a player for plot access removal because their associated entry couldn't be found. Please report this as a bug.", NamedTextColor.RED));
 						close();
+						return;
 					}
+
+					setLayoutForOtherAccessToOwnerPlotRemovalConfirmation(mSelectedPlotEntry);
 				}
 
-				case OWNER_ACCESS_TO_OTHER_PLOTS -> setLayoutForOwnerAccessToOtherPlots();
-				case OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL -> setLayoutForOwnerAccessToOtherPlotsRemoval();
+				case OWNER_ACCESS_TO_OTHER_PLOTS ->
+					setLayout(mOwnerAccessToOtherPlotsList, (mIsSelf ? "You don't " : mOwnerName + " doesn't ") + "have access to any plots!", null, false, false);
+				case OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL ->
+					setLayout(mOwnerAccessToOtherPlotsList, (mIsSelf ? "You don't " : mOwnerName + " doesn't ") + "have access to any plots!", AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL_CONFIRMATION, true, false);
 				case OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL_CONFIRMATION -> {
-					if (mSelectedPlotEntry != null) {
-						setLayoutForOwnerAccessToOtherPlotsRemovalConfirmation(mSelectedPlotEntry);
-					} else {
-						Plugin.getInstance().getLogger().severe("mSelectedPlotEntry was still null by the time it was called by OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL_CONFIRMATION");
-						mPlayer.sendMessage(Component.text("An error occurred while preparing a player for plot access removal because their associated entry couldn't be found. Please report this as a bug.", NamedTextColor.RED));
+					if (mSelectedPlotEntry == null) {
+						MMLog.severe("mSelectedPlotEntry was still null by the time it was called by OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL_CONFIRMATION in PlotAccessGui.java");
+						mViewer.sendMessage(Component.text("An error occurred while preparing a player for plot access removal because their associated entry couldn't be found. Please report this as a bug.", NamedTextColor.RED));
 						close();
+						return;
 					}
+
+					setLayoutForOwnerAccessToOtherPlotsRemovalConfirmation(mSelectedPlotEntry);
 				}
 
 				default -> {
-					Plugin.getInstance().getLogger().severe("Couldn't find a matching switch case to open '/plot access info' for player");
-					mPlayer.sendMessage(Component.text("An error occurred while setting the layout of the GUI. Please report this as a bug.", NamedTextColor.RED));
+					MMLog.severe("Couldn't find a matching switch case to open '/plot access info' for player in PlotAccessGui.java");
+					mViewer.sendMessage(Component.text("An error occurred while setting the layout of the GUI. Please report this as a bug.", NamedTextColor.RED));
 					close();
 				}
 			}
 		} else if (mMainGuiMode == MainGuiMode.TELEPORT_MODE) {
-			setLayoutForTeleport();
+			setLayout(mOwnerAccessToOtherPlotsList, "", null, false, true);
 		}
 	}
 
 	private void setLayoutForAccessInfo() {
 		createInfoHead();
 
-		setItem(30, new GuiItem(GUIUtils.createBasicItem(Material.GRASS_BLOCK, "Access to Your Plot", NamedTextColor.WHITE, false, "Click here to see who has access to your plot!", NamedTextColor.LIGHT_PURPLE)))
+		setItem(30, new GuiItem(GUIUtils.createBasicItem(Material.GRASS_BLOCK, "Access to " + (mIsSelf ? "Your " : mOwnerName + "'s ") + "Plot", NamedTextColor.WHITE, false, "Click here to see who has access to " + (mIsSelf ? "your " : mOwnerName + "'s ") + "plot!", NamedTextColor.LIGHT_PURPLE)))
 			.onClick(event -> {
 				mAccessInfoGuiMode = AccessInfoGuiMode.OTHER_ACCESS_TO_OWNER_PLOT;
-				setTitle(OTHER_ACCESS_TO_OWNER_PLOT_TITLE);
+				setTitle(Component.text("Access to " + (mIsSelf ? "Your " : mOwnerName + "'s ") + "Plot"));
 				update();
 			});
 
-		setItem(32, new GuiItem(GUIUtils.createBasicItem(Material.ENDER_PEARL, "Access to Other Plots", NamedTextColor.WHITE, false, "Click here to see which plots you have access to!", NamedTextColor.LIGHT_PURPLE)))
+		setItem(32, new GuiItem(GUIUtils.createBasicItem(Material.ENDER_PEARL, "Access to Other Plots", NamedTextColor.WHITE, false, "Click here to see which plots " + (mIsSelf ? "you have " : mOwnerName + " has ") + "access to!", NamedTextColor.LIGHT_PURPLE)))
 			.onClick(event -> {
 				mAccessInfoGuiMode = AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS;
-				setTitle(OWNER_ACCESS_TO_OTHER_PLOTS_TITLE);
+				setTitle(Component.text("Access to Other Plots"));
 				update();
 			});
-	}
-
-	private void setLayoutForTeleport() {
-		setLayout(mOwnerAccessToOtherPlotsList, "", null, false, true);
-	}
-
-	private void setLayoutForOtherAccessToOwnerPlot() {
-		setLayout(mOtherAccessToOwnerPlotList, "No one has access to your plot!", null, false, false);
-	}
-
-	private void setLayoutForOwnerAccessToOtherPlots() {
-		setLayout(mOwnerAccessToOtherPlotsList, "You don't have access to any plots!", null, false, false);
-	}
-
-	private void setLayoutForOtherAccessToOwnerPlotRemoval() {
-		setLayout(mOtherAccessToOwnerPlotList, "No one has access to your plot!", AccessInfoGuiMode.OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL_CONFIRMATION, true, false);
-	}
-
-	private void setLayoutForOwnerAccessToOtherPlotsRemoval() {
-		setLayout(mOwnerAccessToOtherPlotsList, "You don't have access to any plots!", AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL_CONFIRMATION, true, false);
-	}
-
-	private void setLayoutForOtherAccessToOwnerPlotRemovalConfirmation(PlotEntry record) {
-		if (record.mOtherAccessToOwnerPlotEntry != null && record.mOtherAccessToOwnerPlotEntry.mName != null) {
-			String recordName = record.mOtherAccessToOwnerPlotEntry.mName;
-			@Nullable UUID recordUuid = MonumentaRedisSyncIntegration.cachedNameToUuid(record.mOtherAccessToOwnerPlotEntry.mName);
-
-			if (recordUuid != null) {
-				setItem(4, new GuiItem(createHead(record)));
-
-				setItem(30, new GuiItem(GUIUtils.createBasicItem(Material.RED_CONCRETE, "Cancel Removal", NamedTextColor.WHITE, false, "Click here to return to the access management screen.", NamedTextColor.LIGHT_PURPLE)))
-					.onClick(event -> {
-						mAccessInfoGuiMode = AccessInfoGuiMode.OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL;
-						mSelectedPlotEntry = null;
-						update();
-					});
-
-				setItem(32, new GuiItem(GUIUtils.createBasicItem(Material.GREEN_CONCRETE, "Confirm Removal", NamedTextColor.WHITE, false, "Click here to revoke access from " + recordName + ".", NamedTextColor.LIGHT_PURPLE)))
-					.onClick(event -> {
-						if (mPlayer != Bukkit.getPlayer(mOwnerUuid)) {
-							AuditListener.log("[Plot Manager] " + mPlayer.getName() + " removed " + recordName + " from " + mOwnerUsername + "'s plot");
-						}
-
-						plotAccessRemove(mPlayer, mOwnerUuid, recordUuid);
-						refreshData();
-
-						mAccessInfoGuiMode = AccessInfoGuiMode.OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL;
-						mSelectedPlotEntry = null;
-						update();
-					});
-			} else {
-				// This condition should never be reached because of existing null checks in setup()
-				Plugin.getInstance().getLogger().severe("recordUuid was somehow null despite mSelectedPlotEntry NOT being null when it was called by setLayoutForOtherAccessToOwnerPlotRemovalConfirmation()");
-				mPlayer.sendMessage(Component.text("An error occurred while preparing a player for plot access removal because their associated entry couldn't be found. Please report this as a bug.", NamedTextColor.RED));
-				close();
-			}
-		} else {
-			// This condition should never be reached because of existing null checks in setup()
-			Plugin.getInstance().getLogger().severe("mSelectedPlotEntry was still null by the time it was called by setLayoutForOtherAccessToOwnerPlotRemovalConfirmation()");
-			mPlayer.sendMessage(Component.text("An error occurred while preparing a player for plot access removal because their associated entry couldn't be found. Please report this as a bug.", NamedTextColor.RED));
-			close();
-		}
-	}
-
-	private void setLayoutForOwnerAccessToOtherPlotsRemovalConfirmation(PlotEntry record) {
-		if (record.mOwnerAccessToOtherPlotsEntry != null && record.mOwnerAccessToOtherPlotsEntry.mName != null) {
-			String recordName = record.mOwnerAccessToOtherPlotsEntry.mName;
-			@Nullable UUID recordUuid = MonumentaRedisSyncIntegration.cachedNameToUuid(record.mOwnerAccessToOtherPlotsEntry.mName);
-
-			if (recordUuid != null) {
-				setItem(4, new GuiItem(createHead(record)));
-
-				setItem(30, new GuiItem(GUIUtils.createBasicItem(Material.RED_CONCRETE, "Cancel Removal", NamedTextColor.WHITE, false, "Click here to return to the access management screen.", NamedTextColor.LIGHT_PURPLE)))
-					.onClick(event -> {
-						mAccessInfoGuiMode = AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL;
-						mSelectedPlotEntry = null;
-						update();
-					});
-
-				setItem(32, new GuiItem(GUIUtils.createBasicItem(Material.GREEN_CONCRETE, "Confirm Removal", NamedTextColor.WHITE, false, "Click here to remove your access to " + recordName + "'s plot.", NamedTextColor.LIGHT_PURPLE)))
-					.onClick(event -> {
-						AuditListener.log("[Plot Manager] " + mPlayer.getName() + " removed " + mOwnerUsername + " from " + recordName + "'s plot");
-						plotAccessRemove(mPlayer, recordUuid, mOwnerUuid);
-						refreshData();
-
-						mAccessInfoGuiMode = AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL;
-						mSelectedPlotEntry = null;
-						update();
-					});
-			} else {
-				// This condition should never be reached because of existing null checks in setup()
-				Plugin.getInstance().getLogger().severe("recordUuid was somehow null despite mSelectedPlotEntry NOT being null when it was called by setLayoutForOwnerAccessToOtherPlotsRemovalConfirmation()");
-				mPlayer.sendMessage(Component.text("An error occurred while preparing a player for plot access removal because their associated entry couldn't be found. Please report this as a bug.", NamedTextColor.RED));
-				close();
-			}
-		} else {
-			// This condition should never be reached because of existing null checks in setup()
-			Plugin.getInstance().getLogger().severe("mSelectedPlotEntry was still null by the time it was called by setLayoutForOwnerAccessToOtherPlotsRemovalConfirmation()");
-			mPlayer.sendMessage(Component.text("An error occurred while preparing a player for plot access removal because their associated entry couldn't be found. Please report this as a bug.", NamedTextColor.RED));
-			close();
-		}
 	}
 
 	private void setLayout(List<PlotEntry> plotList, String emptyMessage, @Nullable AccessInfoGuiMode removalConfirmationMode, boolean isRemovalMode, boolean isTeleportMode) {
-		mNumPages = (int) Math.ceil((double) plotList.size() / (double) GUI_LOCATIONS.size());
+		mTotalPages = (int) Math.ceil((double) plotList.size() / (double) GUI_LOCATIONS.size());
 		int pageOffset = (mCurrentPage - 1) * GUI_LOCATIONS.size();
 
 		if (isTeleportMode) {
@@ -323,26 +227,27 @@ public class PlotAccessGui extends Gui {
 					GuiItem guiItem = new GuiItem(createHead(plotEntry));
 
 					if (isRemovalMode) {
-						if (removalConfirmationMode != null) {
-							guiItem.onClick(event -> {
-								mAccessInfoGuiMode = removalConfirmationMode;
-								mSelectedPlotEntry = plotEntry;
-								update();
-							});
-						} else {
-							Plugin.getInstance().getLogger().severe("Argument removalConfirmationMode was still null despite isRemovalMode being true");
-							mPlayer.sendMessage(Component.text("An error occurred while setting the layout of the GUI. Please report this as a bug.", NamedTextColor.RED));
+						if (removalConfirmationMode == null) {
+							MMLog.severe("Argument removalConfirmationMode was still null despite isRemovalMode being true");
+							mViewer.sendMessage(Component.text("An error occurred while setting the layout of the GUI. Please report this as a bug.", NamedTextColor.RED));
 							close();
+							return;
 						}
+
+						guiItem.onClick(event -> {
+							mAccessInfoGuiMode = removalConfirmationMode;
+							mSelectedPlotEntry = plotEntry;
+							update();
+						});
 					} else if (isTeleportMode) {
 						guiItem.onClick(event -> {
 							if (plotEntry.mSelf) {
-								ScoreboardUtils.setScoreboardValue(mPlayer, Constants.Objectives.CURRENT_PLOT, mPlotInfo.mOwnedPlotId);
+								ScoreboardUtils.setScoreboardValue(mViewer, Constants.Objectives.CURRENT_PLOT, mOwnerPlotInfo.mOwnedPlotId);
 							} else if (plotEntry.mOwnerAccessToOtherPlotsEntry != null) {
-								ScoreboardUtils.setScoreboardValue(mPlayer, Constants.Objectives.CURRENT_PLOT, plotEntry.mOwnerAccessToOtherPlotsEntry.mPlotId);
+								ScoreboardUtils.setScoreboardValue(mViewer, Constants.Objectives.CURRENT_PLOT, plotEntry.mOwnerAccessToOtherPlotsEntry.mPlotId);
 							}
 
-							PlotManager.sendPlayerToPlot(mPlayer);
+							PlotManager.sendPlayerToPlot(mViewer);
 							close();
 						});
 					}
@@ -351,6 +256,99 @@ public class PlotAccessGui extends Gui {
 				}
 			}
 		}
+	}
+
+	private void setLayoutForOtherAccessToOwnerPlotRemovalConfirmation(PlotEntry record) {
+		// This condition should never be reached because of existing null checks in setup()
+		if (record.mOtherAccessToOwnerPlotEntry == null || record.mOtherAccessToOwnerPlotEntry.mName == null) {
+			MMLog.severe("mSelectedPlotEntry was still null by the time it was called by setLayoutForOtherAccessToOwnerPlotRemovalConfirmation()");
+			mViewer.sendMessage(Component.text("An error occurred while preparing a player for plot access removal because their associated entry couldn't be found. Please report this as a bug.", NamedTextColor.RED));
+			close();
+			return;
+		}
+
+		String recordName = record.mOtherAccessToOwnerPlotEntry.mName;
+		UUID recordUuid = record.mOtherAccessToOwnerPlotEntry.mUUID;
+
+		setItem(4, new GuiItem(createHead(record)));
+
+		setItem(30, new GuiItem(GUIUtils.createBasicItem(Material.RED_CONCRETE, "Cancel Removal", NamedTextColor.WHITE, false, "Click here to return to the access management screen.", NamedTextColor.LIGHT_PURPLE)))
+			.onClick(event -> {
+				mAccessInfoGuiMode = AccessInfoGuiMode.OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL;
+				mSelectedPlotEntry = null;
+				update();
+			});
+
+		setItem(32, new GuiItem(GUIUtils.createBasicItem(Material.GREEN_CONCRETE, "Confirm Removal", NamedTextColor.WHITE, false, "Click here to revoke access from " + recordName + ".", NamedTextColor.LIGHT_PURPLE)))
+			.onClick(event -> {
+				if (!mIsSelf) {
+					AuditListener.log("[Plot Manager] " + mViewer.getName() + " removed " + recordName + "'s access to " + mOwnerName + "'s plot.");
+				}
+
+				PlotManager.plotAccessRemove(mViewer, mOwnerUuid, recordUuid);
+				refreshData();
+
+				mAccessInfoGuiMode = AccessInfoGuiMode.OTHER_ACCESS_TO_OWNER_PLOT_REMOVAL;
+				mSelectedPlotEntry = null;
+				update();
+			});
+	}
+
+	private void setLayoutForOwnerAccessToOtherPlotsRemovalConfirmation(PlotEntry record) {
+		// This condition should never be reached because of existing null checks in setup()
+		if (record.mOwnerAccessToOtherPlotsEntry == null || record.mOwnerAccessToOtherPlotsEntry.mName == null) {
+			MMLog.severe("mSelectedPlotEntry was still null by the time it was called by setLayoutForOwnerAccessToOtherPlotsRemovalConfirmation()");
+			mViewer.sendMessage(Component.text("An error occurred while preparing a player for plot access removal because their associated entry couldn't be found. Please report this as a bug.", NamedTextColor.RED));
+			close();
+			return;
+		}
+
+		String recordName = record.mOwnerAccessToOtherPlotsEntry.mName;
+		UUID recordUuid = MonumentaRedisSyncIntegration.cachedNameToUuid(record.mOwnerAccessToOtherPlotsEntry.mName);
+
+		// This condition should never be reached because of existing null checks in setup()
+		if (recordUuid == null) {
+			MMLog.severe("recordUuid was somehow null despite mSelectedPlotEntry NOT being null when it was called by setLayoutForOwnerAccessToOtherPlotsRemovalConfirmation()");
+			mViewer.sendMessage(Component.text("An error occurred while preparing a player for plot access removal because their associated entry couldn't be found. Please report this as a bug.", NamedTextColor.RED));
+			close();
+			return;
+		}
+
+		setItem(4, new GuiItem(createHead(record)));
+
+		setItem(30, new GuiItem(GUIUtils.createBasicItem(Material.RED_CONCRETE, "Cancel Removal", NamedTextColor.WHITE, false, "Click here to return to the access management screen.", NamedTextColor.LIGHT_PURPLE)))
+			.onClick(event -> {
+				mAccessInfoGuiMode = AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL;
+				mSelectedPlotEntry = null;
+				update();
+			});
+
+		setItem(32, new GuiItem(GUIUtils.createBasicItem(Material.GREEN_CONCRETE, "Confirm Removal", NamedTextColor.WHITE, false, "Click here to remove " + (mIsSelf ? "your " : mOwnerName + "'s ") + "access to " + recordName + "'s plot.", NamedTextColor.LIGHT_PURPLE)))
+			.onClick(event -> {
+				AuditListener.log("[Plot Manager] " + mViewer.getName() + " removed " + mOwnerName + "'s access to " + recordName + "'s plot.");
+				PlotManager.plotAccessRemove(mViewer, recordUuid, mOwnerUuid);
+				refreshData();
+
+				mAccessInfoGuiMode = AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL;
+				mSelectedPlotEntry = null;
+				update();
+			});
+	}
+
+	private void createInfoHead() {
+		ItemStack ownerSkull = new ItemStack(Material.PLAYER_HEAD, 1);
+		SkullMeta meta = (SkullMeta) ownerSkull.getItemMeta();
+		List<Component> lore = new ArrayList<>();
+
+		meta.setPlayerProfile(Bukkit.createProfile(mOwnerUuid, mOwnerName));
+		meta.displayName(Component.text(mOwnerName + "'s Plot", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text((mIsSelf ? "Your " : "This player's ") + "plot number is: ", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false).append(Component.text("#" + mOwnerPlotInfo.mOwnedPlotId, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+		lore.add(Component.text((mIsSelf ? "Your " : "This player's ") + "selected plot is: ", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false).append(Component.text("#" + mOwnerPlotInfo.mCurrentPlotId, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+		meta.lore(lore);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		ownerSkull.setItemMeta(meta);
+
+		setItem(4, new GuiItem(ownerSkull));
 	}
 
 	private void createControlButtons() {
@@ -362,7 +360,7 @@ public class PlotAccessGui extends Gui {
 				});
 		}
 
-		if (mCurrentPage < mNumPages) {
+		if (mCurrentPage < mTotalPages) {
 			setItem(8, new GuiItem(GUIUtils.createBasicItem(Material.ARROW, "Next", NamedTextColor.WHITE, false, "Click to go to page " + (mCurrentPage + 1) + ".", NamedTextColor.LIGHT_PURPLE)))
 				.onClick(event -> {
 					mCurrentPage += 1;
@@ -375,7 +373,7 @@ public class PlotAccessGui extends Gui {
 				.onClick(event -> {
 					mCurrentPage = 1;
 					mAccessInfoGuiMode = AccessInfoGuiMode.INACTIVE;
-					setTitle(PLOT_ACCESS_INFO_TITLE);
+					setTitle(Component.text("Plot Access Information"));
 					update();
 				});
 		}
@@ -388,8 +386,9 @@ public class PlotAccessGui extends Gui {
 				});
 		}
 
-		if (mAccessInfoGuiMode == AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS && mPlayer.hasPermission("monumenta.command.plot.remove.others")) {
-			setItem(6, new GuiItem(GUIUtils.createBasicItem(Material.FLINT_AND_STEEL, "Enter Revoke Access Mode", NamedTextColor.WHITE, false, "Click here to enter revoke access mode where you can remove your access to other players' plots on this screen.", NamedTextColor.LIGHT_PURPLE)))
+		// TODO: redo permission handling
+		if (mAccessInfoGuiMode == AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS && mViewer.hasPermission("monumenta.command.plot.remove.others")) {
+			setItem(6, new GuiItem(GUIUtils.createBasicItem(Material.FLINT_AND_STEEL, "Enter Revoke Access Mode", NamedTextColor.WHITE, false, "Click here to enter revoke access mode where you can remove " + (mIsSelf ? "your " : mOwnerName + "'s ") + "access to other players' plots on this screen.", NamedTextColor.LIGHT_PURPLE)))
 				.onClick(event -> {
 					mAccessInfoGuiMode = AccessInfoGuiMode.OWNER_ACCESS_TO_OTHER_PLOTS_REMOVAL;
 					update();
@@ -413,28 +412,12 @@ public class PlotAccessGui extends Gui {
 		}
 	}
 
-	private void createInfoHead() {
-		ItemStack ownerSkull = new ItemStack(Material.PLAYER_HEAD, 1);
-		SkullMeta meta = (SkullMeta) ownerSkull.getItemMeta();
-		List<Component> lore = new ArrayList<>();
-
-		meta.setPlayerProfile(Bukkit.createProfile(mOwnerUuid, mOwnerUsername));
-		meta.displayName(Component.text(mOwnerUsername + "'s Plot", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text("Your plot number is: ", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false).append(Component.text("#" + mPlotInfo.mOwnedPlotId, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
-		lore.add(Component.text("Your selected plot is: ", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false).append(Component.text("#" + mPlotInfo.mCurrentPlotId, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
-		meta.lore(lore);
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		ownerSkull.setItemMeta(meta);
-
-		setItem(4, new GuiItem(ownerSkull));
-	}
-
 	private ItemStack createHead(PlotEntry record) {
 		if (record.mSelf) {
 			ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
 			SkullMeta meta = (SkullMeta) head.getItemMeta();
 
-			meta.setOwningPlayer(mPlayer);
+			meta.setOwningPlayer(mViewer);
 			meta.displayName(Component.text("Your Plot", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			head.setItemMeta(meta);

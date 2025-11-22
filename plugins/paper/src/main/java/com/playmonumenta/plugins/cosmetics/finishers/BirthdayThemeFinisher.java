@@ -81,7 +81,7 @@ public class BirthdayThemeFinisher implements EliteFinisher {
 							world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
 							new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						}
-							break;
+						break;
 					case 36:
 						if (mobsKilled == 1 || mobsKilled == 3) {
 							world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.E10);

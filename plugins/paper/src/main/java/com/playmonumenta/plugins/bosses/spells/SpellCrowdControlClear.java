@@ -7,8 +7,8 @@ import org.bukkit.potion.PotionEffectType;
 
 public class SpellCrowdControlClear extends Spell {
 	//Super simple spell to clear crowd control for variable times
-	private LivingEntity mBoss;
-	private int mTimer;
+	private final LivingEntity mBoss;
+	private final int mTimer;
 
 	public SpellCrowdControlClear(LivingEntity boss, int timer) {
 		mBoss = boss;

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.prismatic.Convergence;
 import com.playmonumenta.plugins.guis.AbilityTriggersGui;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
@@ -51,7 +52,7 @@ public class DepthsSummaryGUI extends Gui {
 		TRIGGER_MAP.put(11, DepthsTrigger.RIGHT_CLICK);
 		TRIGGER_MAP.put(12, DepthsTrigger.SHIFT_LEFT_CLICK);
 		TRIGGER_MAP.put(13, DepthsTrigger.SHIFT_RIGHT_CLICK);
-		TRIGGER_MAP.put(14, DepthsTrigger.SPAWNER);
+		TRIGGER_MAP.put(14, DepthsTrigger.WILDCARD);
 		TRIGGER_MAP.put(15, DepthsTrigger.SHIFT_BOW);
 		TRIGGER_MAP.put(16, DepthsTrigger.SWAP);
 		TRIGGER_MAP.put(17, DepthsTrigger.LIFELINE);
@@ -96,7 +97,15 @@ public class DepthsSummaryGUI extends Gui {
 
 		//Set actives, save passives for future
 		List<DepthsAbilityItem> passiveItems = new ArrayList<>();
+		boolean hasConvergence = mTargetPlayer.hasAbility(Convergence.ABILITY_NAME);
 		for (DepthsAbilityItem item : items) {
+			// if ability is wildcard and not convergence, add to passive list for display if player has convergence
+			if (item.mTrigger == DepthsTrigger.WILDCARD
+				&& hasConvergence
+				&& !Convergence.ABILITY_NAME.equals(item.mAbility)) {
+				passiveItems.add(item);
+				continue;
+			}
 			if (item.mTrigger == DepthsTrigger.PASSIVE) {
 				passiveItems.add(item);
 			} else {
@@ -141,7 +150,7 @@ public class DepthsSummaryGUI extends Gui {
 			if (getItem(i) == null) {
 				DepthsTrigger trigger = TRIGGER_MAP.get(i);
 				if (trigger != null) {
-					setItem(i, trigger.getNoAbilityItem());
+					setItem(i, trigger.getNoAbilityItem(mTargetPlayer));
 				}
 			}
 		}

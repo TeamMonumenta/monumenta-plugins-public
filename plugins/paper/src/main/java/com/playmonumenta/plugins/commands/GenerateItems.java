@@ -275,366 +275,366 @@ public class GenerateItems extends GenericCommand {
 			for (int i = 0; i < 4; i++) {
 				String line = loreText[i];
 				if (line != null && !line.equals("") && !line.equals("-")) {
-					player.chat("/editlore" + " add " + Integer.toString(i) + " " + line);
+					player.chat("/editlore" + " add " + i + " " + line);
 				}
 			}
 			// Defense
 			if (armorStat != 0) {
-				player.chat("/editattr" + " Armor " + Double.toString(armorStat) + " add " + slot);
+				player.chat("/editattr" + " Armor " + armorStat + " add " + slot);
 			}
 			if (agilStat != 0) {
-				player.chat("/editattr" + " Agility " + Double.toString(agilStat) + " add " + slot);
+				player.chat("/editattr" + " Agility " + agilStat + " add " + slot);
 			}
 			// Attributes
 			if (healthAttr != 0) {
-				player.chat("/editattr" + " MaxHealth " + Double.toString(healthAttr) + " add " + slot);
+				player.chat("/editattr" + " MaxHealth " + healthAttr + " add " + slot);
 			}
 			if (pHealthAttr != 0) {
-				player.chat("/editattr" + " MaxHealth " + Double.toString(pHealthAttr) + " multiply " + slot);
+				player.chat("/editattr" + " MaxHealth " + pHealthAttr + " multiply " + slot);
 			}
 			if (speedAttr != 0) {
-				player.chat("/editattr" + " Speed " + Double.toString(speedAttr) + " add " + slot);
+				player.chat("/editattr" + " Speed " + speedAttr + " add " + slot);
 			}
 			if (pSpeedAttr != 0) {
-				player.chat("/editattr" + " Speed " + Double.toString(pSpeedAttr) + " multiply " + slot);
+				player.chat("/editattr" + " Speed " + pSpeedAttr + " multiply " + slot);
 			}
 			if (atksAttr != 0) {
-				player.chat("/editattr" + " AttackSpeed " + Double.toString(atksAttr) + " add " + slot);
+				player.chat("/editattr" + " AttackSpeed " + atksAttr + " add " + slot);
 			}
 			if (pAtksAttr != 0) {
-				player.chat("/editattr" + " AttackSpeed " + Double.toString(pAtksAttr) + " multiply " + slot);
+				player.chat("/editattr" + " AttackSpeed " + pAtksAttr + " multiply " + slot);
 			}
 			if (meleeAttr != 0) {
-				player.chat("/editattr" + " AttackDamageAdd " + Double.toString(meleeAttr) + " add " + slot);
+				player.chat("/editattr" + " AttackDamageAdd " + meleeAttr + " add " + slot);
 			}
 			if (pMeleeAttr != 0) {
-				player.chat("/editattr" + " AttackDamageMultiply " + Double.toString(pMeleeAttr) + " multiply " + slot);
+				player.chat("/editattr" + " AttackDamageMultiply " + pMeleeAttr + " multiply " + slot);
 			}
 			if (magicAttr != 0) {
-				player.chat("/editattr" + " MagicDamageAdd " + Double.toString(magicAttr) + " add " + slot);
+				player.chat("/editattr" + " MagicDamageAdd " + magicAttr + " add " + slot);
 			}
 			if (pMagicAttr != 0) {
-				player.chat("/editattr" + " MagicDamageMultiply " + Double.toString(pMagicAttr) + " multiply " + slot);
+				player.chat("/editattr" + " MagicDamageMultiply " + pMagicAttr + " multiply " + slot);
 			}
 			if (pProjAttr != 0) {
-				player.chat("/editattr" + " ProjectileDamageMultiply " + Double.toString(pProjAttr) + " multiply " + slot);
+				player.chat("/editattr" + " ProjectileDamageMultiply " + pProjAttr + " multiply " + slot);
 			}
 			if (pPrjsAttr != 0) {
-				player.chat("/editattr" + " ProjectileSpeed " + Double.toString(pPrjsAttr) + " multiply " + slot);
+				player.chat("/editattr" + " ProjectileSpeed " + pPrjsAttr + " multiply " + slot);
 			}
 			if (thornsAttr != 0) {
-				player.chat("/editattr" + " ThornsDamage " + Double.toString(thornsAttr) + " add " + slot);
+				player.chat("/editattr" + " ThornsDamage " + thornsAttr + " add " + slot);
 			}
 			if (kbrAttr != 0) {
-				player.chat("/editattr" + " KnockbackResistance " + Double.toString(kbrAttr) + " add " + slot);
+				player.chat("/editattr" + " KnockbackResistance " + kbrAttr + " add " + slot);
 			}
 			// Enchants
 			if (meleeProt > 0) {
-				player.chat("/editench" + " MeleeProtection " + Integer.toString(meleeProt));
+				player.chat("/editench" + " MeleeProtection " + meleeProt);
 			} else if (meleeProt < 0) {
-				player.chat("/editench" + " MeleeFragility " + Integer.toString(meleeProt));
+				player.chat("/editench" + " MeleeFragility " + meleeProt);
 			}
 			if (projProt > 0) {
-				player.chat("/editench" + " ProjectileProtection " + Integer.toString(projProt));
+				player.chat("/editench" + " ProjectileProtection " + projProt);
 			} else if (projProt < 0) {
-				player.chat("/editench" + " ProjectileFragility " + Integer.toString(projProt));
+				player.chat("/editench" + " ProjectileFragility " + projProt);
 			}
 			if (magicProt > 0) {
-				player.chat("/editench" + " MagicProtection " + Integer.toString(magicProt));
+				player.chat("/editench" + " MagicProtection " + magicProt);
 			} else if (magicProt < 0) {
-				player.chat("/editench" + " MagicFragility " + Integer.toString(magicProt));
+				player.chat("/editench" + " MagicFragility " + magicProt);
 			}
 			if (blastProt > 0) {
-				player.chat("/editench" + " BlastProtection " + Integer.toString(blastProt));
+				player.chat("/editench" + " BlastProtection " + blastProt);
 			} else if (blastProt < 0) {
-				player.chat("/editench" + " BlastFragility " + Integer.toString(blastProt));
+				player.chat("/editench" + " BlastFragility " + blastProt);
 			}
 			if (fireProt > 0) {
-				player.chat("/editench" + " FireProtection " + Integer.toString(fireProt));
+				player.chat("/editench" + " FireProtection " + fireProt);
 			} else if (fireProt < 0) {
-				player.chat("/editench" + " FireFragility " + Integer.toString(fireProt));
+				player.chat("/editench" + " FireFragility " + fireProt);
 			}
 			if (featherProt > 0) {
-				player.chat("/editench" + " FeatherFalling " + Integer.toString(featherProt));
+				player.chat("/editench" + " FeatherFalling " + featherProt);
 			} else if (featherProt < 0) {
-				player.chat("/editench" + " FallFragility " + Integer.toString(featherProt));
+				player.chat("/editench" + " FallFragility " + featherProt);
 			}
 			if (aquaAffinity != 0) {
-				player.chat("/editench" + " AquaAffinity " + Integer.toString(aquaAffinity));
+				player.chat("/editench" + " AquaAffinity " + aquaAffinity);
 			}
 			if (respiration != 0) {
-				player.chat("/editench" + " Respiration " + Integer.toString(respiration));
+				player.chat("/editench" + " Respiration " + respiration);
 			}
 			if (depthStrider != 0) {
-				player.chat("/editench" + " DepthStrider " + Integer.toString(depthStrider));
+				player.chat("/editench" + " DepthStrider " + depthStrider);
 			}
 			if (gills != 0) {
-				player.chat("/editench" + " Gills " + Integer.toString(gills));
+				player.chat("/editench" + " Gills " + gills);
 			}
 			if (regen != 0) {
-				player.chat("/editench" + " Regeneration " + Integer.toString(regen));
+				player.chat("/editench" + " Regeneration " + regen);
 			}
 			if (lifeDrain != 0) {
-				player.chat("/editench" + " LifeDrain " + Integer.toString(lifeDrain));
+				player.chat("/editench" + " LifeDrain " + lifeDrain);
 			}
 			if (sapper != 0) {
-				player.chat("/editench" + " Sapper " + Integer.toString(sapper));
+				player.chat("/editench" + " Sapper " + sapper);
 			}
 			if (sustenance > 0) {
-				player.chat("/editench" + " Sustenance " + Integer.toString(Math.abs(sustenance)));
+				player.chat("/editench" + " Sustenance " + Math.abs(sustenance));
 			} else if (sustenance < 0) {
-				player.chat("/editench" + " CurseofAnemia " + Integer.toString(Math.abs(sustenance)));
+				player.chat("/editench" + " CurseofAnemia " + Math.abs(sustenance));
 			}
 			if (inferno > 0) {
-				player.chat("/editench" + " Inferno " + Integer.toString(inferno));
+				player.chat("/editench" + " Inferno " + inferno);
 			}
 			if (adrenaline > 0) {
-				player.chat("/editench" + " Adrenaline " + Integer.toString(adrenaline));
+				player.chat("/editench" + " Adrenaline " + adrenaline);
 			}
 			if (regicide > 0) {
-				player.chat("/editench" + " Regicide " + Integer.toString(regicide));
+				player.chat("/editench" + " Regicide " + regicide);
 			}
 			if (abyssal != 0) {
-				player.chat("/editench" + " Abyssal " + Integer.toString(abyssal));
+				player.chat("/editench" + " Abyssal " + abyssal);
 			}
 			if (retrieval > 0) {
-				player.chat("/editench" + " Retrieval " + Integer.toString(retrieval));
+				player.chat("/editench" + " Retrieval " + retrieval);
 			}
 			if (weightless > 0) {
-				player.chat("/editench" + " Weightless " + Integer.toString(weightless));
+				player.chat("/editench" + " Weightless " + weightless);
 			}
 			if (crippling > 0) {
-				player.chat("/editench" + " CurseofCrippling " + Integer.toString(crippling));
+				player.chat("/editench" + " CurseofCrippling " + crippling);
 			}
 			if (secondWind > 0) {
-				player.chat("/editench" + " SecondWind " + Integer.toString(secondWind));
+				player.chat("/editench" + " SecondWind " + secondWind);
 			}
 			if (triage > 0) {
-				player.chat("/editench" + " Triage " + Integer.toString(triage));
+				player.chat("/editench" + " Triage " + triage);
 			}
 			if (aptitude > 0) {
-				player.chat("/editench" + " Aptitude " + Integer.toString(aptitude));
+				player.chat("/editench" + " Aptitude " + aptitude);
 			}
 			if (ineptitude > 0) {
-				player.chat("/editench" + " Ineptitude " + Integer.toString(ineptitude));
+				player.chat("/editench" + " Ineptitude " + ineptitude);
 			}
 			if (intuition > 0) {
-				player.chat("/editench" + " Intuition " + Integer.toString(intuition));
+				player.chat("/editench" + " Intuition " + intuition);
 			}
 			if (firstStrike > 0) {
-				player.chat("/editench" + " FirstStrike " + Integer.toString(firstStrike));
+				player.chat("/editench" + " FirstStrike " + firstStrike);
 			}
 			if (stamina > 0) {
-				player.chat("/editench" + " Stamina " + Integer.toString(stamina));
+				player.chat("/editench" + " Stamina " + stamina);
 			}
 			if (trivium > 0) {
-				player.chat("/editench" + " Trivium " + Integer.toString(trivium));
+				player.chat("/editench" + " Trivium " + trivium);
 			}
 			if (divineAura > 0) {
-				player.chat("/editench" + " DivineAura " + Integer.toString(divineAura));
+				player.chat("/editench" + " DivineAura " + divineAura);
 			}
 			if (vanishing > 0) {
-				player.chat("/editench" + " CurseofVanishing " + Integer.toString(vanishing));
+				player.chat("/editench" + " CurseofVanishing " + vanishing);
 			}
 			if (corruption > 0) {
-				player.chat("/editench" + " CurseofCorruption " + Integer.toString(corruption));
+				player.chat("/editench" + " CurseofCorruption " + corruption);
 			}
 			if (ephemerality > 0) {
-				player.chat("/editench" + " CurseofEphemerality " + Integer.toString(ephemerality));
+				player.chat("/editench" + " CurseofEphemerality " + ephemerality);
 			}
 			if (voidTether > 0) {
-				player.chat("/editench" + " VoidTether " + Integer.toString(voidTether));
+				player.chat("/editench" + " VoidTether " + voidTether);
 			}
 			if (resurrection > 0) {
-				player.chat("/editench" + " Resurrection " + Integer.toString(resurrection));
+				player.chat("/editench" + " Resurrection " + resurrection);
 			}
 			if (irrepairibiliy > 0) {
-				player.chat("/editench" + " CurseofIrreparability " + Integer.toString(irrepairibiliy));
+				player.chat("/editench" + " CurseofIrreparability " + irrepairibiliy);
 			}
 			if (adaptability > 0) {
-				player.chat("/editench" + " Adaptability " + Integer.toString(adaptability));
+				player.chat("/editench" + " Adaptability " + adaptability);
 			}
 			if (shielding > 0) {
-				player.chat("/editench" + " Shielding " + Integer.toString(shielding));
+				player.chat("/editench" + " Shielding " + shielding);
 			}
 			if (inure > 0) {
-				player.chat("/editench" + " Inure " + Integer.toString(inure));
+				player.chat("/editench" + " Inure " + inure);
 			}
 			if (steadfast > 0) {
-				player.chat("/editench" + " Steadfast " + Integer.toString(steadfast));
+				player.chat("/editench" + " Steadfast " + steadfast);
 			}
 			if (poise > 0) {
-				player.chat("/editench" + " Poise " + Integer.toString(poise));
+				player.chat("/editench" + " Poise " + poise);
 			}
 			if (guard > 0) {
-				player.chat("/editench" + " Guard " + Integer.toString(guard));
+				player.chat("/editench" + " Guard " + guard);
 			}
 			if (tempo > 0) {
-				player.chat("/editench" + " Tempo " + Integer.toString(tempo));
+				player.chat("/editench" + " Tempo " + tempo);
 			}
 			if (reflexes > 0) {
-				player.chat("/editench" + " Reflexes " + Integer.toString(reflexes));
+				player.chat("/editench" + " Reflexes " + reflexes);
 			}
 			if (evasion > 0) {
-				player.chat("/editench" + " Evasion " + Integer.toString(evasion));
+				player.chat("/editench" + " Evasion " + evasion);
 			}
 			if (ethereal > 0) {
-				player.chat("/editench" + " Ethereal " + Integer.toString(ethereal));
+				player.chat("/editench" + " Ethereal " + ethereal);
 			}
 			if (cloaked > 0) {
-				player.chat("/editench" + " Cloaked " + Integer.toString(cloaked));
+				player.chat("/editench" + " Cloaked " + cloaked);
 			}
 			if (material > 0) {
-				player.chat("/editench" + " Material " + Integer.toString(material));
+				player.chat("/editench" + " Material " + material);
 			}
 			if (unbreaking > 0) {
-				player.chat("/editench" + " Unbreaking " + Integer.toString(unbreaking));
+				player.chat("/editench" + " Unbreaking " + unbreaking);
 			}
 			if (mending > 0) {
-				player.chat("/editench" + " Mending " + Integer.toString(mending));
+				player.chat("/editench" + " Mending " + mending);
 			}
 			if (unbreakable > 0) {
-				player.chat("/editench" + " Unbreakable " + Integer.toString(unbreakable));
+				player.chat("/editench" + " Unbreakable " + unbreakable);
 			}
 
 			if (isMainhand) {
 				// Mainhand Stats
 				if (mainhandAttackDamage > 0) {
-					player.chat("/editattr " + " AttackDamageAdd " + Double.toString(mainhandAttackDamage - 1) + " add mainhand");
+					player.chat("/editattr " + " AttackDamageAdd " + (mainhandAttackDamage - 1) + " add mainhand");
 				}
 				if (mainhandAttackSpeed > 0) {
-					player.chat("/editattr " + " AttackSpeed " + Double.toString(mainhandAttackSpeed - 4) + " add mainhand");
+					player.chat("/editattr " + " AttackSpeed " + (mainhandAttackSpeed - 4) + " add mainhand");
 				}
 				if (mainhandProjDamage > 0) {
-					player.chat("/editattr " + " ProjectileDamageAdd " + Double.toString(mainhandProjDamage) + " add mainhand");
+					player.chat("/editattr " + " ProjectileDamageAdd " + mainhandProjDamage + " add mainhand");
 				}
 				if (mainhandProjSpeed > 0) {
-					player.chat("/editattr " + " ProjectileSpeed " + Double.toString(mainhandProjSpeed) + " multiply mainhand");
+					player.chat("/editattr " + " ProjectileSpeed " + mainhandProjSpeed + " multiply mainhand");
 				}
 				if (throwRate > 0) {
-					player.chat("/editattr " + " ThrowRate " + Double.toString(throwRate) + " add mainhand");
+					player.chat("/editattr " + " ThrowRate " + throwRate + " add mainhand");
 				}
 				if (spellPower > 0) {
-					player.chat("/editattr " + " SpellPower " + Double.toString(spellPower) + " multiply mainhand");
+					player.chat("/editattr " + " SpellPower " + spellPower + " multiply mainhand");
 					player.chat("/editench" + " MagicWand 1");
 				}
 				// Enchants
 				if (sweepingEdge != 0) {
-					player.chat("/editench" + " SweepingEdge " + Integer.toString(sweepingEdge));
+					player.chat("/editench" + " SweepingEdge " + sweepingEdge);
 				}
 				if (arcaneThrust != 0) {
-					player.chat("/editench" + " ArcaneThrust " + Integer.toString(arcaneThrust));
+					player.chat("/editench" + " ArcaneThrust " + arcaneThrust);
 				}
 				if (knockback != 0) {
-					player.chat("/editench" + " Knockback " + Integer.toString(knockback));
+					player.chat("/editench" + " Knockback " + knockback);
 				}
 				if (looting != 0) {
-					player.chat("/editench" + " Looting " + Integer.toString(looting));
+					player.chat("/editench" + " Looting " + looting);
 				}
 				if (fireAspect != 0) {
-					player.chat("/editench" + " FireAspect " + Integer.toString(fireAspect));
+					player.chat("/editench" + " FireAspect " + fireAspect);
 				}
 				if (iceAspect != 0) {
-					player.chat("/editench" + " IceAspect " + Integer.toString(iceAspect));
+					player.chat("/editench" + " IceAspect " + iceAspect);
 				}
 				if (thunderAspect != 0) {
-					player.chat("/editench" + " ThunderAspect " + Integer.toString(thunderAspect));
+					player.chat("/editench" + " ThunderAspect " + thunderAspect);
 				}
 				if (windAspect != 0) {
-					player.chat("/editench" + " WindAspect " + Integer.toString(windAspect));
+					player.chat("/editench" + " WindAspect " + windAspect);
 				}
 				if (earthAspect != 0) {
-					player.chat("/editench" + " EarthAspect " + Integer.toString(earthAspect));
+					player.chat("/editench" + " EarthAspect " + earthAspect);
 				}
 				if (decay != 0) {
-					player.chat("/editench" + " Decay " + Integer.toString(decay));
+					player.chat("/editench" + " Decay " + decay);
 				}
 				if (bleeding != 0) {
-					player.chat("/editench" + " Bleeding " + Integer.toString(bleeding));
+					player.chat("/editench" + " Bleeding " + bleeding);
 				}
 				if (smite != 0) {
-					player.chat("/editench" + " Smite " + Integer.toString(smite));
+					player.chat("/editench" + " Smite " + smite);
 				}
 				if (slayer != 0) {
-					player.chat("/editench" + " Slayer " + Integer.toString(slayer));
+					player.chat("/editench" + " Slayer " + slayer);
 				}
 				if (duelist != 0) {
-					player.chat("/editench" + " Duelist " + Integer.toString(duelist));
+					player.chat("/editench" + " Duelist " + duelist);
 				}
 				if (hexEater > 0) {
-					player.chat("/editench" + " HexEater " + Integer.toString(hexEater));
+					player.chat("/editench" + " HexEater " + hexEater);
 				}
 				if (chaotic > 0) {
-					player.chat("/editench" + " Chaotic " + Integer.toString(chaotic));
+					player.chat("/editench" + " Chaotic " + chaotic);
 				}
 				if (twoHanded > 0) {
-					player.chat("/editench" + " TwoHanded " + Integer.toString(twoHanded));
+					player.chat("/editench" + " TwoHanded " + twoHanded);
 				}
 				if (quake > 0) {
-					player.chat("/editench" + " Quake " + Integer.toString(quake));
+					player.chat("/editench" + " Quake " + quake);
 				}
 				if (pointBlank > 0) {
-					player.chat("/editench" + " PointBlank " + Integer.toString(pointBlank));
+					player.chat("/editench" + " PointBlank " + pointBlank);
 				}
 				if (sniper > 0) {
-					player.chat("/editench" + " Sniper " + Integer.toString(sniper));
+					player.chat("/editench" + " Sniper " + sniper);
 				}
 				if (punch > 0) {
-					player.chat("/editench" + " Punch" + Integer.toString(punch));
+					player.chat("/editench" + " Punch" + punch);
 				}
 				if (recoil > 0) {
-					player.chat("/editench" + " Recoil " + Integer.toString(recoil));
+					player.chat("/editench" + " Recoil " + recoil);
 				}
 				if (quickCharge > 0) {
-					player.chat("/editench" + " QuickCharge " + Integer.toString(quickCharge));
+					player.chat("/editench" + " QuickCharge " + quickCharge);
 				}
 				if (multishot > 0) {
-					player.chat("/editench" + " Multishot " + Integer.toString(multishot));
+					player.chat("/editench" + " Multishot " + multishot);
 				}
 				if (piercing > 0) {
-					player.chat("/editench" + " Piercing " + Integer.toString(piercing));
+					player.chat("/editench" + " Piercing " + piercing);
 				}
 				if (infinity > 0) {
-					player.chat("/editench" + " Infinity " + Integer.toString(infinity));
+					player.chat("/editench" + " Infinity " + infinity);
 				}
 				if (riptide > 0) {
-					player.chat("/editench" + " Riptide " + Integer.toString(riptide));
+					player.chat("/editench" + " Riptide " + riptide);
 				}
 				if (efficiency > 0) {
-					player.chat("/editench" + " Efficiency " + Integer.toString(efficiency));
+					player.chat("/editench" + " Efficiency " + efficiency);
 				}
 				if (fortune > 0) {
-					player.chat("/editench" + " Fortune " + Integer.toString(fortune));
+					player.chat("/editench" + " Fortune " + fortune);
 				}
 				if (silkTouch > 0) {
-					player.chat("/editench" + " SilkTouch" + Integer.toString(silkTouch));
+					player.chat("/editench" + " SilkTouch" + silkTouch);
 				}
 				if (eruption > 0) {
-					player.chat("/editench" + " Eruption " + Integer.toString(eruption));
+					player.chat("/editench" + " Eruption " + eruption);
 				}
 				if (shrapnel > 0) {
-					player.chat("/editench" + " CurseofShrapnel " + Integer.toString(shrapnel));
+					player.chat("/editench" + " CurseofShrapnel " + shrapnel);
 				}
 				if (multitool > 0) {
-					player.chat("/editench" + " Multitool " + Integer.toString(multitool));
+					player.chat("/editench" + " Multitool " + multitool);
 				}
 				if (luckOfTheSea > 0) {
-					player.chat("/editench" + " LuckOfTheSea " + Integer.toString(luckOfTheSea));
+					player.chat("/editench" + " LuckOfTheSea " + luckOfTheSea);
 				}
 				if (lure > 0) {
-					player.chat("/editench" + " Lure " + Integer.toString(lure));
+					player.chat("/editench" + " Lure " + lure);
 				}
 				if (ashes > 0) {
-					player.chat("/editench" + " AshesofEternity " + Integer.toString(ashes));
+					player.chat("/editench" + " AshesofEternity " + ashes);
 				}
 				if (jungles > 0) {
-					player.chat("/editench" + " JunglesNourishment " + Integer.toString(jungles));
+					player.chat("/editench" + " JunglesNourishment " + jungles);
 				}
 				if (depths > 0) {
-					player.chat("/editench" + " ProtectionoftheDepths " + Integer.toString(depths));
+					player.chat("/editench" + " ProtectionoftheDepths " + depths);
 				}
 				if (rageKeter > 0) {
-					player.chat("/editench" + " RageoftheKeter " + Integer.toString(rageKeter));
+					player.chat("/editench" + " RageoftheKeter " + rageKeter);
 				}
 				if (wand > 0) {
 					player.chat("/editench" + " MagicWand 1");

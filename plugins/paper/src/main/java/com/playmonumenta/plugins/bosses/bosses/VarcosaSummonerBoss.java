@@ -45,7 +45,7 @@ public final class VarcosaSummonerBoss extends SerializedLocationBossAbilityGrou
 
 		List<String> summonableMobs = List.of("SeaWolf", "PirateGunner", "DrownedCrewman");
 
-		String[] speak = new String[] {
+		String[] speak = new String[]{
 			"Yarr! It be you again? This shan't end the way it did before, matey!",
 			"Ye took me treasure, ye stole me fleece. Now I be takin' ye to the beyond!",
 			"Yarr! Me ghostly crew rides forth!"};
@@ -90,7 +90,7 @@ public final class VarcosaSummonerBoss extends SerializedLocationBossAbilityGrou
 		mActive = false;
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 
-		List<Player> players = getPlayers();
+		final List<Player> players = PlayerUtils.playersInRange(mCenter, detectionRange, true);
 		for (Player player : players) {
 			player.sendMessage(Component.text("Fine! Ye make me do this meself!", NamedTextColor.RED));
 		}
@@ -108,35 +108,24 @@ public final class VarcosaSummonerBoss extends SerializedLocationBossAbilityGrou
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
-		int hpDelta = 650;
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2 + 75;
-			playerCount--;
-		}
+		final List<Player> players = PlayerUtils.playersInRange(mCenter, detectionRange, true);
+		final int baseHealth = 650;
+		final double scaledHealth = baseHealth * BossUtils.healthScalingCoef(players.size(), 0.5, 0.5);
 
 		mBoss.setInvulnerable(true);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99, 9999));
 		mBoss.setAI(false);
 
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setMaxHealthAndHealth(mBoss, scaledHealth);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 
-		mBoss.setHealth(bossTargetHp);
-
-		for (Player player : getPlayers()) {
-			MessagingUtils.sendBoldTitle(player, Component.text("Varcosa", NamedTextColor.RED), Component.text("Mighty Pirate Captain", NamedTextColor.DARK_RED));
+		for (Player player : players) {
+			MessagingUtils.sendBoldTitle(player, Component.text("Varcosa", NamedTextColor.RED),
+				Component.text("Mighty Pirate Captain", NamedTextColor.DARK_RED));
 		}
 
 		mActive = true;
-	}
-
-	private List<Player> getPlayers() {
-		// Use mCenter instead of mSpawnLoc because Varcosa (the summoner version) is outside the arena
-		return PlayerUtils.playersInRange(mCenter, detectionRange, true);
 	}
 
 	public void onSummonKilled() {

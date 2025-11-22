@@ -81,7 +81,7 @@ public abstract class Hitbox {
 		@Override
 		public boolean contains(Vector vector) {
 			return vector.getY() >= mBaseCenter.getY() && vector.getY() <= mBaseCenter.getY() + mHeight
-				       && vector.clone().setY(0).distanceSquared(mBaseCenter.toVector().setY(0)) <= mRadiusSquared;
+				&& vector.clone().setY(0).distanceSquared(mBaseCenter.toVector().setY(0)) <= mRadiusSquared;
 		}
 
 		@Override
@@ -99,11 +99,11 @@ public abstract class Hitbox {
 			double minZ = bbox.getMinZ() - mBaseCenter.getZ();
 			double maxZ = bbox.getMaxZ() - mBaseCenter.getZ();
 			return minX * maxX < 0
-				       || minZ * maxZ < 0
-				       || minX * minX + minZ * minZ <= mRadiusSquared
-				       || minX * minX + maxZ * maxZ <= mRadiusSquared
-				       || maxX * maxX + minZ * minZ <= mRadiusSquared
-				       || maxX * maxX + maxZ * maxZ <= mRadiusSquared;
+				|| minZ * maxZ < 0
+				|| minX * minX + minZ * minZ <= mRadiusSquared
+				|| minX * minX + maxZ * maxZ <= mRadiusSquared
+				|| maxX * maxX + minZ * minZ <= mRadiusSquared
+				|| maxX * maxX + maxZ * maxZ <= mRadiusSquared;
 		}
 
 		@Override
@@ -277,7 +277,7 @@ public abstract class Hitbox {
 			new BoundingBox(start.getX() - radius, start.getY() - radius, start.getZ() - radius,
 				start.getX() + radius, start.getY() + radius, start.getZ() + radius),
 			test -> test.distanceSquared(startVector) <= radiusSquared
-				        && test.clone().subtract(startVector).normalize().dot(direction) >= cosAngle
+				&& test.clone().subtract(startVector).normalize().dot(direction) >= cosAngle
 		);
 	}
 
@@ -297,9 +297,9 @@ public abstract class Hitbox {
 			new BoundingBox(baseCenter.getX() - radius, baseCenter.getY(), baseCenter.getZ() - radius,
 				baseCenter.getX() + radius, baseCenter.getY() + height, baseCenter.getZ() + radius),
 			test -> test.getY() >= baseCenterVector.getY()
-				        && test.getY() <= baseCenterVector.getY() + height
-				        && test.clone().setY(baseCenterVector.getY()).distanceSquared(baseCenterVector) <= radiusSquared
-				        && Math.abs(MathUtils.normalizeAngle(Math.atan2(test.getZ() - baseCenterVector.getZ(), test.getX() - baseCenterVector.getX()) - baseYaw, 0)) <= halfAngleRad
+				&& test.getY() <= baseCenterVector.getY() + height
+				&& test.clone().setY(baseCenterVector.getY()).distanceSquared(baseCenterVector) <= radiusSquared
+				&& Math.abs(MathUtils.normalizeAngle(Math.atan2(test.getZ() - baseCenterVector.getZ(), test.getX() - baseCenterVector.getX()) - baseYaw, 0)) <= halfAngleRad
 		);
 	}
 
@@ -321,10 +321,10 @@ public abstract class Hitbox {
 			new BoundingBox(baseCenter.getX() - radiusOuter, baseCenter.getY(), baseCenter.getZ() - radiusOuter,
 				baseCenter.getX() + radiusOuter, baseCenter.getY() + height, baseCenter.getZ() + radiusOuter),
 			test -> test.getY() >= baseCenterVector.getY()
-				        && test.getY() <= baseCenterVector.getY() + height
-				        && test.clone().setY(baseCenterVector.getY()).distanceSquared(baseCenterVector) <= radiusOuterSquared
-				        && test.clone().setY(baseCenterVector.getY()).distanceSquared(baseCenterVector) >= radiusInnerSquared
-				        && Math.abs(MathUtils.normalizeAngle(Math.atan2(test.getZ() - baseCenterVector.getZ(), test.getX() - baseCenterVector.getX()) - baseYaw, 0)) <= halfAngleRad
+				&& test.getY() <= baseCenterVector.getY() + height
+				&& test.clone().setY(baseCenterVector.getY()).distanceSquared(baseCenterVector) <= radiusOuterSquared
+				&& test.clone().setY(baseCenterVector.getY()).distanceSquared(baseCenterVector) >= radiusInnerSquared
+				&& Math.abs(MathUtils.normalizeAngle(Math.atan2(test.getZ() - baseCenterVector.getZ(), test.getX() - baseCenterVector.getX()) - baseYaw, 0)) <= halfAngleRad
 		);
 	}
 
@@ -367,6 +367,26 @@ public abstract class Hitbox {
 				return distance <= radius;
 			}
 		);
+	}
+
+	/**
+	 * Creates the union of a list of hitboxes, see Hitbox#union for details
+	 *
+	 * @param hitboxes A non-empty list of hitboxes
+	 */
+	public static Hitbox unionOf(List<? extends Hitbox> hitboxes) {
+		if (hitboxes.isEmpty()) {
+			throw new IllegalArgumentException("Tried to find the union of an empty list of hitboxes!");
+		}
+		Hitbox result = new EmptyHitbox(hitboxes.get(0).getBoundingBox(), hitboxes.get(0).getWorld());
+		for (Hitbox other : hitboxes) {
+			result = result.union(other);
+		}
+		return result;
+	}
+
+	public static Hitbox unionOfAABB(List<BoundingBox> boundingBoxes, World world) {
+		return unionOf(boundingBoxes.stream().map(bb -> new AABBHitbox(world, bb)).toList());
 	}
 
 	/**
@@ -417,6 +437,10 @@ public abstract class Hitbox {
 
 	public abstract boolean contains(Vector vector);
 
+	public boolean contains(Location location) {
+		return (contains(location.toVector()) && location.getWorld() == this.getWorld());
+	}
+
 	public abstract boolean intersects(BoundingBox bbox);
 
 	/**
@@ -454,14 +478,14 @@ public abstract class Hitbox {
 	 */
 	public List<Player> getHitPlayers(@Nullable Player exclude, boolean includeNonTargetable) {
 		return getWorld().getPlayers().stream()
-			       .filter(player -> player.getGameMode() != GameMode.SPECTATOR
-				                         && player != exclude
-				                         && player.getHealth() > 0
-										 && !player.isDead()
-				                         && player.isOnline()
-				                         && (includeNonTargetable || !AbilityUtils.isStealthed(player))
-				                         && intersects(player.getBoundingBox()))
-			       .collect(Collectors.toCollection(ArrayList::new));
+			.filter(player -> player.getGameMode() != GameMode.SPECTATOR
+				&& player != exclude
+				&& player.getHealth() > 0
+				&& !player.isDead()
+				&& player.isOnline()
+				&& (includeNonTargetable || !AbilityUtils.isStealthed(player))
+				&& intersects(player.getBoundingBox()))
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	/**
@@ -469,8 +493,8 @@ public abstract class Hitbox {
 	 */
 	public <U extends Entity> List<U> getHitEntitiesByClass(Class<U> entityClass) {
 		return getWorld().getEntitiesByClass(entityClass).stream()
-			       .filter(e -> intersects(e.getBoundingBox()))
-			       .collect(Collectors.toCollection(ArrayList::new));
+			.filter(e -> intersects(e.getBoundingBox()))
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	/**
@@ -478,9 +502,9 @@ public abstract class Hitbox {
 	 */
 	public List<Entity> getHitEntities(@Nullable Predicate<Entity> filter) {
 		return getWorld().getEntities().stream()
-			       .filter(filter == null ? e -> true : filter)
-			       .filter(e -> intersects(e.getBoundingBox()))
-			       .collect(Collectors.toCollection(ArrayList::new));
+			.filter(filter == null ? e -> true : filter)
+			.filter(e -> intersects(e.getBoundingBox()))
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	public void visualize(double distance, int duration) {

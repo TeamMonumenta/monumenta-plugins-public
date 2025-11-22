@@ -3,13 +3,13 @@ package com.playmonumenta.plugins.abilities.scout;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.SharpshooterCS;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -23,11 +23,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
-	private static final double PERCENT_BASE_DAMAGE = 0.25;
-	private static final int SHARPSHOOTER_DECAY_TIMER = 20 * 5;
-	private static final int MAX_STACKS = 8;
-	private static final double PERCENT_DAMAGE_PER_STACK = 0.04;
+	private static final double PERCENT_BASE_DAMAGE = 0.15;
+	private static final double PERCENT_BASE_DAMAGE_L2 = 0.2;
+	private static final int SHARPSHOOTER_DECAY_TIMER = TICKS_PER_SECOND * 5;
+	private static final int MAX_STACKS = 4;
+	private static final int MAX_STACKS_2 = 8;
+	private static final double PERCENT_DAMAGE_PER_STACK = 0.03;
 	private static final double DAMAGE_PER_BLOCK = 0.015;
 	private static final double MAX_DISTANCE = 16;
 	private static final double ARROW_SAVE_CHANCE = 0.2;
@@ -42,50 +46,54 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		new AbilityInfo<>(Sharpshooter.class, "Sharpshooter", Sharpshooter::new)
 			.scoreboardId("Sharpshooter")
 			.shorthandName("Ss")
-			.descriptions(
-				String.format("Your projectiles deal %d%% more damage.", (int) (PERCENT_BASE_DAMAGE * 100)),
-				String.format("Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to %d. Stacks decay after %d seconds of not gaining a stack. Each stack increases the damage bonus by an additional +%d%%. Additionally, passively gain a %d%% chance to not consume arrows when shot.",
-					MAX_STACKS, SHARPSHOOTER_DECAY_TIMER / 20, (int) (PERCENT_DAMAGE_PER_STACK * 100), (int) (ARROW_SAVE_CHANCE * 100)),
-				String.format("The damage bonus is further increased by %s%% per block of distance between you and the target, up to %s blocks.", DAMAGE_PER_BLOCK * 100, (int) MAX_DISTANCE))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Gain increased projectile damage. Landing shots further increases damage.")
 			.displayItem(Material.TARGET);
 
 	private final int mMaxStacks;
 	private final int mDecayTime;
+	private final double mDamagePerStack;
+	private final double mArrowSaveChance;
+	private final double mMaxDistance;
 	private final SharpshooterCS mCosmetic;
-
-	public Sharpshooter(Plugin plugin, Player player) {
-		super(plugin, player, INFO);
-		mMaxStacks = MAX_STACKS + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
-		mDecayTime = CharmManager.getDuration(mPlayer, CHARM_DECAY, SHARPSHOOTER_DECAY_TIMER);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SharpshooterCS());
-	}
 
 	private int mStacks = 0;
 	private int mTicksToStackDecay = 0;
 
+	public Sharpshooter(final Plugin plugin, final Player player) {
+		super(plugin, player, INFO);
+		mMaxStacks = (isLevelTwo() ? MAX_STACKS_2 : MAX_STACKS) + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
+		mDecayTime = CharmManager.getDuration(mPlayer, CHARM_DECAY, SHARPSHOOTER_DECAY_TIMER);
+		mDamagePerStack = PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE);
+		mArrowSaveChance = ARROW_SAVE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RETRIEVAL);
+		mMaxDistance = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DISTANCE, MAX_DISTANCE);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new SharpshooterCS());
+	}
+
 	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		DamageType type = event.getType();
+	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
+		final boolean huntingCompanion = event.getAbility() == ClassAbility.HUNTING_COMPANION;
+		final DamageEvent.DamageType type = event.getType();
+
 		mCosmetic.hitEffect(mPlayer, enemy);
-		boolean huntingCompanion = event.getAbility() == ClassAbility.HUNTING_COMPANION;
-		if (huntingCompanion || type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
-			double multiplier = 1 + PERCENT_BASE_DAMAGE;
+		if (huntingCompanion || DamageEvent.DamageType.getAllProjectileTypes().contains(type)) {
+			double multiplier = 1 + (isLevelTwo() ? PERCENT_BASE_DAMAGE_L2 : PERCENT_BASE_DAMAGE);
 			if (!huntingCompanion) {
-				if (isLevelTwo()) {
-					multiplier += mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE));
-				}
+				multiplier += mStacks * mDamagePerStack;
 				if (isEnhanced()) {
-					multiplier += Math.min(enemy.getLocation().distance(mPlayer.getLocation()), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DISTANCE, MAX_DISTANCE)) * DAMAGE_PER_BLOCK;
+					multiplier += Math.min(enemy.getLocation().distance(mPlayer.getLocation()), mMaxDistance) * DAMAGE_PER_BLOCK;
 				}
 			} else {
 				// half stack bonus for hunting companion
-				multiplier += mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE)) / 2;
+				multiplier += mStacks * mDamagePerStack / 2;
 			}
 
 			event.updateDamageWithMultiplier(multiplier);
 
-			if (!huntingCompanion && isLevelTwo() && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage()) && (type != DamageType.PROJECTILE || (event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)))) {
+			if (!huntingCompanion
+				&& ((event.getDamager() instanceof final Projectile projectile
+				&& EntityUtils.isAbilityTriggeringProjectile(projectile, true))
+				|| type == DamageEvent.DamageType.PROJECTILE_SKILL)) {
 				mTicksToStackDecay = mDecayTime;
 
 				if (mStacks < mMaxStacks) {
@@ -100,7 +108,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	}
 
 	@Override
-	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicTrigger(final boolean twoHertz, final boolean oneSecond, final int ticks) {
 		if (mStacks > 0) {
 			mTicksToStackDecay -= 5;
 
@@ -115,26 +123,11 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public boolean playerConsumeArrowEvent() {
-		if (isLevelTwo() && FastUtils.RANDOM.nextDouble() < ARROW_SAVE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RETRIEVAL)) {
+		if (isLevelTwo() && FastUtils.RANDOM.nextDouble() < mArrowSaveChance) {
 			mCosmetic.arrowSave(mPlayer);
 			return false;
 		}
 		return true;
-	}
-
-	public void addStacks(Player player, int stacks) {
-		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
-		if (ss != null) {
-			ss.mStacks = Math.min(MAX_STACKS + (int) CharmManager.getLevel(player, CHARM_STACKS), ss.mStacks + stacks);
-			ss.showChargesMessage();
-			mCosmetic.stackCount(player, mStacks);
-			ClientModHandler.updateAbility(player, ss);
-		}
-	}
-
-	public static double getDamageMultiplier(Player player) {
-		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
-		return ss == null ? 1 : (1 + PERCENT_BASE_DAMAGE + ss.mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(player, CHARM_STACK_DAMAGE)));
 	}
 
 	@Override
@@ -154,24 +147,53 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 	@Override
 	public @Nullable Component getHotbarMessage() {
-		if (isLevelTwo()) {
-			TextColor color = INFO.getActionBarColor();
-			String name = INFO.getHotbarName();
+		final TextColor color = INFO.getActionBarColor();
+		final String name = INFO.getHotbarName();
+		final int charges = getCharges();
+		final int maxCharges = getMaxCharges();
 
-			int charges = getCharges();
-			int maxCharges = getMaxCharges();
+		// String output.
+		Component output = Component.text("[", NamedTextColor.YELLOW)
+			.append(Component.text(name != null ? name : "Error", color))
+			.append(Component.text("]", NamedTextColor.YELLOW))
+			.append(Component.text(": ", NamedTextColor.WHITE));
 
-			// String output.
-			Component output = Component.text("[", NamedTextColor.YELLOW)
-				.append(Component.text(name != null ? name : "Error", color))
-				.append(Component.text("]", NamedTextColor.YELLOW))
-				.append(Component.text(": ", NamedTextColor.WHITE));
+		output = output.append(Component.text(charges + "/" + maxCharges,
+			(charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
 
-			output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+		return output;
+	}
 
-			return output;
-		} else {
-			return Component.text("");
-		}
+	private static Description<Sharpshooter> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Your projectiles deal ")
+			.addPercent(PERCENT_BASE_DAMAGE)
+			.add(" more damage. Additionally, each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to ")
+			.add(a -> a.mMaxStacks, MAX_STACKS)
+			.add(". Stacks decay after ")
+			.addDuration(a -> a.mDecayTime, SHARPSHOOTER_DECAY_TIMER)
+			.add(" seconds of not gaining a stack. Each stack increases the damage bonus by an additional ")
+			.addPercent(a -> a.mDamagePerStack, PERCENT_DAMAGE_PER_STACK)
+			.add(".");
+	}
+
+	private static Description<Sharpshooter> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Your Sharpshooter's Max Stacks is increased to ")
+			.add(a -> a.mMaxStacks, MAX_STACKS_2)
+			.add(". The base projectile damage bonus is increased to ")
+			.addPercent(PERCENT_BASE_DAMAGE_L2)
+			.add(". Additionally, gain a ")
+			.addPercent(a -> a.mArrowSaveChance, ARROW_SAVE_CHANCE)
+			.add(" chance to not consume arrows.");
+	}
+
+	private static Description<Sharpshooter> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage bonus is further increased by ")
+			.addPercent(DAMAGE_PER_BLOCK)
+			.add(" per block of distance between you and the target, up to ")
+			.add(a -> a.mMaxDistance, MAX_DISTANCE)
+			.add(" blocks.");
 	}
 }

@@ -72,17 +72,17 @@ public class Effect {
 		arguments.add(new LiteralArgument("clear"));
 		arguments.add(new EntitySelectorArgument.ManyEntities("entity"));
 		new CommandAPICommand(COMMAND)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.withOptionalArguments(new PotionEffectArgument("effect"))
-				.executes((sender, args) -> {
-					clearEffect(plugin, sender, (Collection<Entity>) args.get("entity"), args.getUnchecked("effect"));
-				})
-				.register();
+			.withPermission(perms)
+			.withArguments(arguments)
+			.withOptionalArguments(new PotionEffectArgument("effect"))
+			.executes((sender, args) -> {
+				clearEffect(plugin, sender, (Collection<Entity>) args.get("entity"), args.getUnchecked("effect"));
+			})
+			.register();
 	}
 
 	private static void giveEffect(Plugin plugin, CommandSender sender, Collection<Entity> entities,
-								   PotionEffectType type, int seconds, int amplifier, boolean hideParticles) {
+	                               PotionEffectType type, int seconds, int amplifier, boolean hideParticles) {
 		PotionManager manager = plugin.mPotionManager;
 		World world = null;
 
@@ -95,7 +95,7 @@ public class Effect {
 
 				/* Apply potion via potion manager */
 				manager.addPotion(player, PotionID.APPLIED_POTION,
-						new PotionEffect(type, durationTicks, amplifier, true, !hideParticles));
+					new PotionEffect(type, durationTicks, amplifier, true, !hideParticles));
 			} else if (e instanceof LivingEntity entity) {
 				// Not a player - apply the effect directly
 				entity.addPotionEffect(new PotionEffect(type, durationTicks, amplifier, false, !hideParticles));
@@ -103,12 +103,12 @@ public class Effect {
 		}
 		if (world != null && Boolean.TRUE.equals(world.getGameRuleValue(GameRule.SEND_COMMAND_FEEDBACK))) {
 			sender.sendMessage("Applied " + type + ":" + (amplifier + 1) +
-					" to entities " + (seconds != PotionEffect.INFINITE_DURATION ? "for " + seconds + "s." : "infinitely."));
+				" to entities " + (seconds != PotionEffect.INFINITE_DURATION ? "for " + seconds + "s." : "infinitely."));
 		}
 	}
 
 	private static void clearEffect(Plugin plugin, CommandSender sender, Collection<Entity> entities,
-									@Nullable PotionEffectType type) {
+	                                @Nullable PotionEffectType type) {
 		PotionManager manager = plugin.mPotionManager;
 
 		World world = null;
@@ -129,7 +129,7 @@ public class Effect {
 				if (type == null) {
 					// Clear all effects
 					// Copy the list to prevent ConcurrentModificationException's
-					for (PotionEffect effect : new ArrayList<PotionEffect>(entity.getActivePotionEffects())) {
+					for (PotionEffect effect : new ArrayList<>(entity.getActivePotionEffects())) {
 						entity.removePotionEffect(effect.getType());
 					}
 				} else {
@@ -143,7 +143,7 @@ public class Effect {
 			if (type == null) {
 				sender.sendMessage("Cleared all effects from entities");
 			} else {
-				sender.sendMessage("Cleared " + type.toString() + " effect from entities");
+				sender.sendMessage("Cleared " + type + " effect from entities");
 			}
 		}
 	}

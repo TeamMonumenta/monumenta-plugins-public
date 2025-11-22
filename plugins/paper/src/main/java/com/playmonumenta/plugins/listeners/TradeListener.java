@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTCompound;
@@ -19,15 +20,16 @@ import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
+import io.papermc.paper.event.player.PlayerPurchaseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -60,6 +62,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 public class TradeListener implements Listener {
 
 	private static final UUID NULL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+	private static final String DISREGARD_INFUSIONS = "DisregardInfusions";
 
 	// Ignore stat checks for trades between items in these sets
 	private static final ImmutableSet<ImmutableSet<String>> SKIP_STAT_CHECK_TRADES = ImmutableSet.of(
@@ -80,16 +83,31 @@ public class TradeListener implements Listener {
 		InfusionType.SOULBOUND
 	};
 
-	// Items for which to completely disable reskin/dye trades
-	private static final ImmutableSet<String> DISABLED_ITEMS = ImmutableSet.of("Soulsinger");
-
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void tradeWindowOpenEvent(TradeWindowOpenEvent event) {
 
 		// For "re-skin" trades, add trades matching a player's existing items that preserve added infusions etc.
 
+		final ItemStack emerald = new ItemStack(Material.EMERALD);
+
 		Player player = event.getPlayer();
 		List<TradeWindowOpenEvent.Trade> trades = event.getTrades();
+
+		// Remove any trades with vanilla emeralds
+		trades.removeIf(trade -> {
+			MerchantRecipe recipe = trade.getRecipe();
+			if (emerald.isSimilar(recipe.getResult())) {
+				return true;
+			}
+
+			for (ItemStack ingredient : recipe.getIngredients()) {
+				if (emerald.isSimilar(ingredient)) {
+					return true;
+				}
+			}
+
+			return false;
+		});
 		int numTrades = trades.size();
 		for (int i = 0; i < numTrades; i++) {
 			TradeWindowOpenEvent.Trade trade = trades.get(i);
@@ -99,12 +117,18 @@ public class TradeListener implements Listener {
 				continue;
 			}
 			MerchantRecipe recipe = trade.getRecipe();
-			handleReskinTrades(player, trades, trade, recipe);
-			handleDyedTrades(player, trades, trade, recipe);
-			handleSoulboundTradess(player, trade, recipe);
+
+			// Only handle the consideration of dyes/infusions if the trader does NOT have this tag
+			// Use case examples: Halid for Soulsinger, Record-Keeper for SKR Scrolls
+			if (event.getVillager() != null && !event.getVillager().getScoreboardTags().contains(DISREGARD_INFUSIONS)) {
+				handleReskinTrades(player, trades, trade, recipe);
+				handleDyedTrades(player, trades, trade, recipe);
+				handleSoulboundTradess(player, trade, recipe);
+			}
 		}
 		// Custom GUI:
-		if (ScoreboardUtils.getScoreboardValue(player, CustomTradeGui.MAIN).orElse(1) == 1) {
+		if (ScoreboardUtils.getScoreboardValue(player, CustomTradeGui.MAIN).orElse(1) == 1
+			&& !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.DISABLE_CUSTOM_TRADE_GUI)) {
 			if (!player.hasPermission(CustomTradeGui.PERMISSION)) {
 				player.sendMessage("The custom trade GUI has been temporarily disabled, opening the vanilla GUI. ");
 				return;
@@ -133,19 +157,16 @@ public class TradeListener implements Listener {
 			if (source.getAmount() != 1 || result.getAmount() != 1) {
 				continue;
 			}
-			if (DISABLED_ITEMS.contains(ItemUtils.getPlainNameIfExists(source))
-				    || DISABLED_ITEMS.contains(ItemUtils.getPlainNameIfExists(result))) {
-				continue;
-			}
+
 			// only consider trades with "Monumenta items" - these should all have a region
 			if (ItemStatUtils.getRegion(source) == Region.NONE
-				    || ItemStatUtils.getRegion(result) == Region.NONE) {
+				|| ItemStatUtils.getRegion(result) == Region.NONE) {
 				return;
 			}
 			boolean carryOverVaryingCostInfusions = ItemStatUtils.getRegion(source) == ItemStatUtils.getRegion(result)
-				                                        && InfusionUtils.getCostMultiplier(source) > 0
-				                                        && InfusionUtils.getCostMultiplier(source) == InfusionUtils.getCostMultiplier(result)
-				                                        && haveSameStats(source, result);
+				&& InfusionUtils.getCostMultiplier(source) > 0
+				&& InfusionUtils.getCostMultiplier(source) == InfusionUtils.getCostMultiplier(result)
+				&& haveSameStats(source, result);
 
 			// Items for which we made trades already (for the current original trade).
 			// Used to not create duplicate trades if the player for some reason has multiple identical items.
@@ -156,9 +177,9 @@ public class TradeListener implements Listener {
 			for (ItemStack playerItem : player.getInventory().getContents()) {
 				// Skip over empty slots, and skip over items that already match an existing trade exactly
 				if (playerItem == null
-					    || playerItem.getType() == Material.AIR
-					    || playerItem.isSimilar(source)
-					    || createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
+					|| playerItem.getType() == Material.AIR
+					|| playerItem.isSimilar(source)
+					|| createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
 					continue;
 				}
 				// Check that the playerItem has the same base item as the trade's source:
@@ -166,8 +187,8 @@ public class TradeListener implements Listener {
 				// - same plain name (or both have no plain name)
 				// - same masterwork level
 				if (!(source.getType() == playerItem.getType() || (ItemUtils.isShulkerBox(source.getType()) && ItemUtils.isShulkerBox(playerItem.getType())))
-					    || !Objects.equals(ItemUtils.getPlainNameIfExists(source), ItemUtils.getPlainNameIfExists(playerItem))
-					    || !(ItemStatUtils.getMasterwork(source) == ItemStatUtils.getMasterwork(playerItem))) {
+					|| !Objects.equals(ItemUtils.getPlainNameIfExists(source), ItemUtils.getPlainNameIfExists(playerItem))
+					|| !(ItemStatUtils.getMasterwork(source) == ItemStatUtils.getMasterwork(playerItem))) {
 					continue;
 				}
 				// if not a re-skin trade, do not allow moving varying cost infusions
@@ -182,8 +203,8 @@ public class TradeListener implements Listener {
 				// Shulkers with contents are janky - the trades work, but the trades without contents work on them as well, clearing any content.
 				// Thus we don't allow trades with non-empty Shulkers
 				if (playerItem.getItemMeta() instanceof BlockStateMeta
-					    && ((BlockStateMeta) playerItem.getItemMeta()).getBlockState() instanceof ShulkerBox
-					    && !((ShulkerBox) ((BlockStateMeta) playerItem.getItemMeta()).getBlockState()).getInventory().isEmpty()) {
+					&& ((BlockStateMeta) playerItem.getItemMeta()).getBlockState() instanceof ShulkerBox
+					&& !((ShulkerBox) ((BlockStateMeta) playerItem.getItemMeta()).getBlockState()).getInventory().isEmpty()) {
 					continue;
 				}
 
@@ -210,7 +231,7 @@ public class TradeListener implements Listener {
 
 				// Carry over the current arrow of a crossbow if the player item has an arrow but the result item doesn't have one
 				if (newResult.getItemMeta() instanceof CrossbowMeta newResultMeta && playerItem.getItemMeta() instanceof CrossbowMeta playerItemMeta
-					    && !newResultMeta.hasChargedProjectiles() && playerItemMeta.hasChargedProjectiles()) {
+					&& !newResultMeta.hasChargedProjectiles() && playerItemMeta.hasChargedProjectiles()) {
 					newResultMeta.setChargedProjectiles(playerItemMeta.getChargedProjectiles());
 					newResult.setItemMeta(newResultMeta);
 				}
@@ -257,46 +278,53 @@ public class TradeListener implements Listener {
 			}
 
 			Predicate<Material> isSameType = type -> type == source.getType();
-			Consumer<ItemStack> clearDye;
-			BiConsumer<ItemStack, ItemStack> copyDye;
+			Function<ItemStack, ItemStack> clearDye;
+			BiFunction<ItemStack, ItemStack, ItemStack> copyDye;
 			if (ItemUtils.isShulkerBox(source.getType())) {
 				isSameType = ItemUtils::isShulkerBox;
 				clearDye = itemStack -> {
-					itemStack = itemStack.withType(Material.SHULKER_BOX);
+					ItemStack result = itemStack.withType(Material.SHULKER_BOX);
 					// Adds the default Bukkit block state tags if absent
-					BlockStateMeta bsm = (BlockStateMeta) itemStack.getItemMeta();
+					BlockStateMeta bsm = (BlockStateMeta) result.getItemMeta();
 					bsm.setBlockState(bsm.getBlockState());
-					itemStack.setItemMeta(bsm);
+					result.setItemMeta(bsm);
+					return result;
 				};
 				copyDye = (from, to) -> {
-					to = to.withType(from.getType());
-					NBT.modify(to, nbt -> {
+					ItemStack result = to.withType(from.getType());
+					NBT.modify(result, nbt -> {
 						nbt.removeKey("BlockEntityTag");
 						NBTCompound fromShulker = new NBTItem(from).getCompound("BlockEntityTag");
 						if (fromShulker != null) {
 							nbt.getOrCreateCompound("BlockEntityTag").mergeCompound(fromShulker);
 						}
 					});
+					return result;
 				};
 			} else if (source.getItemMeta() instanceof LeatherArmorMeta
-				           && !ItemUtils.getPlainLoreIfExists(source).contains("Arena of Terth")) {
+				&& !ItemUtils.getPlainLoreIfExists(source).contains("Arena of Terth")) {
 				clearDye = itemStack -> {
-					LeatherArmorMeta meta = (LeatherArmorMeta) itemStack.getItemMeta();
+					ItemStack result = itemStack.clone();
+					LeatherArmorMeta meta = (LeatherArmorMeta) result.getItemMeta();
 					meta.setColor(Color.WHITE);
-					itemStack.setItemMeta(meta);
+					result.setItemMeta(meta);
+					return result;
 				};
 				copyDye = (from, to) -> {
 					LeatherArmorMeta fromMeta = (LeatherArmorMeta) from.getItemMeta();
-					LeatherArmorMeta toMeta = (LeatherArmorMeta) from.getItemMeta();
+					LeatherArmorMeta toMeta = (LeatherArmorMeta) to.getItemMeta();
 					toMeta.setColor(fromMeta.getColor());
 					to.setItemMeta(toMeta);
+					return to;
 				};
 			} else if (source.getType() == Material.SHIELD) {
 				// Using Bukkit's shield API doesn't work properly and doesn't support shields without banners), so edit NBT directly
 				clearDye = itemStack -> {
-					NBT.modify(itemStack, nbt -> {
+					ItemStack result = itemStack.clone();
+					NBT.modify(result, nbt -> {
 						nbt.removeKey("BlockEntityTag");
 					});
+					return result;
 				};
 				copyDye = (from, to) -> {
 					NBT.modify(to, nbt -> {
@@ -306,6 +334,7 @@ public class TradeListener implements Listener {
 							nbt.getOrCreateCompound("BlockEntityTag").mergeCompound(fromBanner);
 						}
 					});
+					return to;
 				};
 			} else {
 				continue;
@@ -313,24 +342,22 @@ public class TradeListener implements Listener {
 
 			for (ItemStack playerItem : player.getInventory().getContents()) {
 				if (playerItem == null
-					    || playerItem.getType() == Material.AIR
-					    || !isSameType.test(playerItem.getType())
-					    || playerItem.isSimilar(source)
-					    || createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
+					|| playerItem.getType() == Material.AIR
+					|| !isSameType.test(playerItem.getType())
+					|| playerItem.isSimilar(source)
+					|| createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))) {
 					continue;
 				}
 
 				// check that the items are similar ignoring dye
-				ItemStack clearedPlayerItem = ItemUtils.clone(playerItem);
-				clearDye.accept(clearedPlayerItem);
-				ItemStack clearedSourceItem = ItemUtils.clone(source);
-				clearDye.accept(clearedSourceItem);
+				ItemStack clearedPlayerItem = clearDye.apply(ItemUtils.clone(playerItem));
+				ItemStack clearedSourceItem = clearDye.apply(ItemUtils.clone(source));
 				if (!clearedPlayerItem.isSimilar(clearedSourceItem)) {
 					continue;
 				}
 
 				ItemStack newSource = ItemUtils.clone(source);
-				copyDye.accept(playerItem, newSource);
+				newSource = copyDye.apply(playerItem, newSource);
 
 				// create the new trade
 				MerchantRecipe newRecipe = new MerchantRecipe(recipe.getResult(), recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(),
@@ -438,6 +465,7 @@ public class TradeListener implements Listener {
 		// vanilla attributes
 		Multimap<Attribute, AttributeModifier> vanillaMods1 = i1.getItemMeta().getAttributeModifiers();
 		Multimap<Attribute, AttributeModifier> vanillaMods2 = i2.getItemMeta().getAttributeModifiers();
+		// one item has mods but the other doesn't, so they differ
 		if (vanillaMods1 != null && vanillaMods2 != null) {
 			for (Attribute attr : Attribute.values()) {
 				// We need to filter out modifiers that have no effect - these sometimes exist and mess up the comparison
@@ -450,12 +478,12 @@ public class TradeListener implements Listener {
 				}
 				BiPredicate<AttributeModifier, AttributeModifier> modsMatch = (mod1, mod2) -> mod1.getSlot() == mod2.getSlot() && mod1.getOperation() == mod2.getOperation() && mod1.getAmount() == mod2.getAmount();
 				if (mods1.stream().anyMatch(mod1 -> mods2.stream().noneMatch(mod2 -> modsMatch.test(mod1, mod2)))
-					    || mods2.stream().anyMatch(mod2 -> mods1.stream().noneMatch(mod1 -> modsMatch.test(mod1, mod2)))) {
+					|| mods2.stream().anyMatch(mod2 -> mods1.stream().noneMatch(mod1 -> modsMatch.test(mod1, mod2)))) {
 					return false;
 				}
 			}
-		} else if (vanillaMods1 != null || vanillaMods2 != null) { // one item has mods but the other doesn't, so they differ
-			return false;
+		} else {
+			return vanillaMods1 == null && vanillaMods2 == null;
 		}
 
 		// if we get here, the items have the same stats
@@ -473,22 +501,46 @@ public class TradeListener implements Listener {
 		}
 	}
 
+	// Prevent trading with vanilla emeralds in case they bypass hiding the trade
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerPurchaseEvent(PlayerPurchaseEvent event) {
+		final ItemStack emerald = new ItemStack(Material.EMERALD);
+
+		MerchantRecipe recipe = event.getTrade();
+
+		if (emerald.isSimilar(recipe.getResult())) {
+			event.setCancelled(true);
+			return;
+		}
+
+		for (ItemStack ingredient : recipe.getIngredients()) {
+			if (emerald.isSimilar(ingredient)) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+	}
+
 	private static boolean isInvalidItem(MerchantInventory merchantInventory, int slot) {
 		if (slot >= merchantInventory.getSize()) {
 			return false;
 		}
+
 		ItemStack item = merchantInventory.getItem(slot);
 		if (item == null) {
 			return false;
 		}
+
 		MerchantRecipe merchantRecipe = merchantInventory.getSelectedRecipe();
 		if (merchantRecipe == null) {
 			return true;
 		}
+
 		List<ItemStack> ingredients = merchantRecipe.getIngredients();
 		if (slot >= ingredients.size()) {
 			return true;
 		}
+
 		ItemStack ingredient = ingredients.get(slot);
 		return isShulkerBoxWithContents(item, ingredient) || isNotVanillaItem(item, ingredient);
 	}
@@ -498,8 +550,8 @@ public class TradeListener implements Listener {
 			return false;
 		}
 		if (!(item.getItemMeta() instanceof BlockStateMeta meta)
-			    || !(meta.getBlockState() instanceof ShulkerBox shulkerBox)
-			    || shulkerBox.getInventory().isEmpty()) {
+			|| !(meta.getBlockState() instanceof ShulkerBox shulkerBox)
+			|| shulkerBox.getInventory().isEmpty()) {
 			return false;
 		}
 		return !item.isSimilar(ingredient);

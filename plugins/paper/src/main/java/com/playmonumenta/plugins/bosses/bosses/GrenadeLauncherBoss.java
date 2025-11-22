@@ -13,10 +13,12 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 
 
@@ -60,23 +62,31 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		public EntityTargets BOMB_TARGET = EntityTargets.GENERIC_ONE_PLAYER_TARGET.clone().setFilters(List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
 
 		@BossParam(help = "Determines which nearby players should be hit by the explosion and the radius of the lingering")
-		public EntityTargets EXPLOSION_TARGET = new EntityTargets(EntityTargets.TARGETS.PLAYER, 3, true, EntityTargets.Limit.DEFAULT, new ArrayList<>(), EntityTargets.TagsListFiter.DEFAULT);
+		public EntityTargets EXPLOSION_TARGET = new EntityTargets(EntityTargets.TARGETS.PLAYER, 3, EntityTargets.Limit.DEFAULT, List.of(), EntityTargets.TagsListFiter.DEFAULT);
 
 		@BossParam(help = "Particles played when a bomb is thrown")
 		public ParticlesList PARTICLE_LAUNCH = ParticlesList.EMPTY;
 		@BossParam(help = "Particles that follow the bomb throw arc")
-		public ParticlesList PARTICLE_BOMB = ParticlesList.fromString("[(CRIT,5)]");
+		public ParticlesList PARTICLE_BOMB = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 5, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particles summoned at the explosion")
-		public ParticlesList PARTICLE_EXPLOSION = ParticlesList.fromString("[(EXPLOSION_HUGE,10,2,2,2,1.5)]");
+		public ParticlesList PARTICLE_EXPLOSION = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_HUGE, 10, 2.0, 2.0, 2.0, 1.5))
+			.build();
 
 		@BossParam(help = "Sounds played when a bomb is thrown")
 		public SoundsList SOUND_LAUNCH = SoundsList.EMPTY;
 		@BossParam(help = "Sounds played at the grenade location each tick")
-		public SoundsList SOUND_GRENADE = SoundsList.fromString("[(BLOCK_ANVIL_FALL,3,0.5)]");
+		public SoundsList SOUND_GRENADE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_ANVIL_FALL, 3.0f, 0.5f))
+			.build();
 
 		@BossParam(help = "Sounds played when the grenade explodes")
-		public SoundsList SOUND_EXPLOSION = SoundsList.fromString("[(ENTITY_GENERIC_EXPLODE,10)]");
+		public SoundsList SOUND_EXPLOSION = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_EXPLODE, 10.0f, 1.0f))
+			.build();
 
 
 		//lingering stuff...
@@ -94,16 +104,22 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		public EffectsList LINGERING_EFFECTS = EffectsList.EMPTY;
 
 		@BossParam(help = "Particles used for the lingering pool ring border")
-		public ParticlesList PARTICLE_LINGERING_RING = ParticlesList.fromString("[(REDSTONE,5,0.15,0.3,0.15,0.2,GRAY,1.5)]");
+		public ParticlesList PARTICLE_LINGERING_RING = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 5, 0.15, 0.3, 0.15, 0.2, new Particle.DustOptions(Color.GRAY, 1.5f)))
+			.build();
 
 		@BossParam(help = "Particles used for the lingering pool center")
-		public ParticlesList PARTICLE_LINGERING_CENTER = ParticlesList.fromString("[(LAVA,2,0,0,0,1.5)]");
+		public ParticlesList PARTICLE_LINGERING_CENTER = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.LAVA, 2, 0.0, 0.0, 0.0, 1.5))
+			.build();
 
 		@BossParam(help = "Sound played at the center of the lingering pool every 20 ticks")
-		public SoundsList SOUND_LINGERING = SoundsList.fromString("[(ENTITY_BLAZE_BURN,4,1.5)]");
+		public SoundsList SOUND_LINGERING = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_BURN, 4.0f, 1.5f))
+			.build();
 
 		@BossParam(help = "LibraryOfSouls name of the mob spawned when the grenade explodes")
-		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
+		public LoSPool SPAWNED_MOB_POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "y-velocity of the thrown grenade")
 		public float Y_VELOCITY = 0.7f;
@@ -162,11 +178,11 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 				//hit actions
 
 				if (p.DAMAGE > 0) {
-					BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.DAMAGE, p.SPELL_NAME, loc);
+					BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList());
 				}
 
 				if (p.DAMAGE_PERCENTAGE > 0.0) {
-					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, loc, p.SPELL_NAME);
+					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList());
 				}
 
 				p.EFFECTS.apply(target, boss);

@@ -18,13 +18,17 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class SpellPortalBullet extends SpellBullet {
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
+public class SpellPortalBullet extends SpellBullet {
+	private static final String SPELL_NAME = "Thunderstorm";
 	private final PortalBoss mPortalBoss;
 
 	public SpellPortalBullet(Plugin plugin, LivingEntity boss, int cooldownTicks, PortalBoss portalBoss) {
-
-		super(plugin, boss, new Vector(0, -2.8125, 0), 150, 40, 3, 0.4, 30, 0.3125, cooldownTicks, 120, "BORDER_1", 0, 0, 0, false, 0, (Entity entity, int tick) -> {
+		super(plugin, boss, new Vector(0, -2.8125, 0), (int) (TICKS_PER_SECOND * 7.5),
+			TICKS_PER_SECOND * 2, 3, 0.4, 30, 0.3125, cooldownTicks,
+			TICKS_PER_SECOND * 6, "BORDER_1", 0, 0, 0, false, 0,
+			(Entity entity, int tick) -> {
 				float t = tick / 10f;
 				if (tick % 5 == 0) {
 					boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.HOSTILE, 2, t);
@@ -38,11 +42,11 @@ public class SpellPortalBullet extends SpellBullet {
 			},
 			Material.GOLD_BLOCK,
 			(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
-				if (player != null && !blocked && player != null) {
-					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.PROJECTILE, 35, "Thunderstorm", prevLoc);
+				if (player != null && !blocked) {
+					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.PROJECTILE, 35, SPELL_NAME, prevLoc);
 					boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.HOSTILE, 0.5f, 0);
 				}
-				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, loc).count(15).extra(0.175).spawnAsEntityActive(boss);
 			});
 
 		mPortalBoss = portalBoss;

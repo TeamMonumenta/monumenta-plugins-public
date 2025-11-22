@@ -14,9 +14,9 @@ import org.bukkit.plugin.Plugin;
 public class SpellBaseAbstractCircleAttack extends SpellBaseAbstractAttack {
 
 	public SpellBaseAbstractCircleAttack(CircleInfo circleInfo, int particleAmount, int telegraphPulses,
-			 int castDelay, double particleSpeed, Particle particle, DamageEvent.DamageType damageType, double damage,
-			 boolean bypassIframes, boolean causeKnockback, String attackName, Particle attackParticle, Plugin plugin, LivingEntity boss,
-			 AttackAesthetics attackAesthetics) {
+	                                     int castDelay, double particleSpeed, Particle particle, DamageEvent.DamageType damageType, double damage,
+	                                     boolean bypassIframes, boolean causeKnockback, String attackName, Particle attackParticle, Plugin plugin, LivingEntity boss,
+	                                     AttackAesthetics attackAesthetics) {
 		super(
 			() -> {
 				ParticleUtils.drawCircleTelegraph(
@@ -51,21 +51,9 @@ public class SpellBaseAbstractCircleAttack extends SpellBaseAbstractAttack {
 		return 0;
 	}
 
-	public static class CircleInfo {
-		public final Location mCenter;
-		public final double mRadius;
-		public final double mHeight;
-
+	public record CircleInfo(Location mCenter, double mRadius, double mHeight) {
 		public CircleInfo(Location center, double radius) {
-			mCenter = center;
-			mRadius = radius;
-			mHeight = 30;
-		}
-
-		public CircleInfo(Location center, double radius, double height) {
-			mCenter = center;
-			mRadius = radius;
-			mHeight = height;
+			this(center, radius, 30);
 		}
 
 		public Location getCenter() {

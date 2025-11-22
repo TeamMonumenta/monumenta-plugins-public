@@ -18,10 +18,10 @@ import org.bukkit.entity.Player;
 
 public class Fractal implements Enchantment {
 	private static final int DURATION = 2 * 20;
-	private static final double DAMAGE_PER_LEVEL = 0.05;
+	private static final double DAMAGE_PER_LEVEL = 0.1;
 	private static final String SOURCE = "FractalVuln";
 	private static final String SOURCE_DISABLE = "FractalDisable";
-	private static final int DISABLE_DURATION = 10000 * 20;
+	private static final int DISABLE_DURATION = 6 * 20;
 
 	@Override
 	public EnchantmentType getEnchantmentType() {
@@ -40,10 +40,14 @@ public class Fractal implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
+		if (event.getType() != DamageEvent.DamageType.MAGIC) {
+			return;
+		}
+
 		if (plugin.mEffectManager.getEffects(enemy, SOURCE_DISABLE + player.getName()) == null) {
 			plugin.mEffectManager.addEffect(enemy, SOURCE_DISABLE + player.getName(), new FractalCooldown(DISABLE_DURATION));
 			plugin.mEffectManager.addEffect(enemy, SOURCE + player.getName(), new FractalVuln(DURATION));
-		} else if (plugin.mEffectManager.getEffects(enemy, SOURCE + player.getName()) != null && event.getType() == DamageEvent.DamageType.MAGIC) {
+		} else if (plugin.mEffectManager.getEffects(enemy, SOURCE + player.getName()) != null) {
 			double bonus = DAMAGE_PER_LEVEL * level;
 			event.updateGearDamageWithMultiplier(1 + bonus);
 

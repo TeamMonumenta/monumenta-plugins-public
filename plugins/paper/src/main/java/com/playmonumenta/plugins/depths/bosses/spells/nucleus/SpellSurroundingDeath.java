@@ -58,6 +58,7 @@ public class SpellSurroundingDeath extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT += 5;

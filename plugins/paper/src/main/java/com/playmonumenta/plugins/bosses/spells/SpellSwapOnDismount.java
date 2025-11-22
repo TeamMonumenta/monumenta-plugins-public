@@ -5,7 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class SpellSwapOnDismount extends Spell {
 
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 	private boolean mSwapped;
 
 	public SpellSwapOnDismount(LivingEntity boss) {

@@ -61,9 +61,10 @@ public class Woolerman implements EliteFinisher {
 					armorStand.setMarker(true);
 					armorStand.setSmall(true);
 					armorStand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
-			});
+				});
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				mTicks++;
 				if (mTicks == 19) {
 					// Disable poof animation, but keep the keeling over part

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BlockUtils;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -145,6 +147,15 @@ public class RepairExplosionsListener implements Listener {
 	 * on chunk unload
 	 */
 	private void commonExplosionHandlerStates(List<BlockState> blocks) {
+		/* Replaced any temporary blocks with their original block states */
+		blocks = blocks.stream().map(state -> {
+			TemporaryBlockChangeManager.ChangedBlock changedBlock = TemporaryBlockChangeManager.INSTANCE.getChangedBlock(state.getBlock(), state.getType());
+			if (changedBlock != null) {
+				return changedBlock.mOldState;
+			}
+			return state;
+		}).collect(Collectors.toList());
+
 		/* Create a copy of the blocks list, so we don't modify the original */
 		blocks = new ArrayList<>(blocks);
 
@@ -409,7 +420,7 @@ public class RepairExplosionsListener implements Listener {
 	private static boolean isEnabled(World world) {
 		Pattern repairExplosionsWorldPattern = ServerProperties.getRepairExplosionsWorldPattern();
 		return ServerProperties.getRepairExplosions()
-			       && (repairExplosionsWorldPattern == null || repairExplosionsWorldPattern.matcher(world.getName()).matches());
+			&& (repairExplosionsWorldPattern == null || repairExplosionsWorldPattern.matcher(world.getName()).matches());
 	}
 
 }

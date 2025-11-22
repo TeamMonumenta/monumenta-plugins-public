@@ -53,7 +53,8 @@ public class RecoilDisable extends Effect {
 			mTask.cancel();
 		}
 		mTask = new BukkitRunnable() {
-			WeakReference<Entity> mRefEntity = new WeakReference<Entity>(entity);
+			final WeakReference<Entity> mRefEntity = new WeakReference<>(entity);
+
 			@Override
 			public void run() {
 				Entity realEntity = mRefEntity.get();

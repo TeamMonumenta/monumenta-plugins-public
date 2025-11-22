@@ -23,22 +23,22 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class BlackflameGolemNecromancy extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mSummonRange;
-	private double mDetectRange;
-	private int mSummonTime;
-	private double mY;
-	private List<UUID> mSummoned = new ArrayList<UUID>();
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mSummonRange;
+	private final double mDetectRange;
+	private final int mSummonTime;
+	private final double mY;
+	private final List<UUID> mSummoned = new ArrayList<>();
 
-	private Location mSpawnLoc;
+	private final Location mSpawnLoc;
 
-	private int mCooldown;
+	private final int mCooldown;
 	private boolean mOnCooldown = false;
 
 	private static final List<String> CONSTRUCTS = Arrays.asList("BlackflameConstruct", "DragonConstruct");
 
-	private BeastOfTheBlackFlame mBossClass;
+	private final BeastOfTheBlackFlame mBossClass;
 
 	public BlackflameGolemNecromancy(Plugin plugin, LivingEntity boss, double summonRange, double detectRange, int summonTime, int cooldown, double y, Location spawnLoc, BeastOfTheBlackFlame bossClass) {
 		mPlugin = plugin;
@@ -66,9 +66,9 @@ public class BlackflameGolemNecromancy extends Spell {
 		} else if (players.size() < 5) {
 			num += 3 * players.size();
 		} else if (players.size() < 11) {
-			num += 12 + (2 * (players.size() - 4));
+			num += 12 + 2 * (players.size() - 4);
 		} else if (players.size() >= 11) {
-			num += 24 + (1 * (players.size() - 10));
+			num += 24 + players.size() - 10;
 		}
 		int amt = num;
 		new BukkitRunnable() {
@@ -93,8 +93,8 @@ public class BlackflameGolemNecromancy extends Spell {
 
 						new BukkitRunnable() {
 							int mT = 0;
-							Location mPLoc = scLoc;
-							double mYInc = 1.6 / mSummonTime;
+							final Location mPLoc = scLoc;
+							final double mYInc = 1.6 / mSummonTime;
 							boolean mRaised = false;
 
 							@Override
@@ -129,7 +129,7 @@ public class BlackflameGolemNecromancy extends Spell {
 								if (ele == null || ele.isDead() || !ele.isValid()) {
 									this.cancel();
 									mSummoned.remove(ele.getUniqueId());
-									if (mSummoned.size() <= 0) {
+									if (mSummoned.isEmpty()) {
 										new BukkitRunnable() {
 
 											@Override

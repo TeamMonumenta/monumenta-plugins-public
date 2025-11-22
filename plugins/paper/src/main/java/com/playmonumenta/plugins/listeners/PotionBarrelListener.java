@@ -1,14 +1,16 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.chunk.ChunkFullLoadEvent;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBT;
 import java.util.ArrayList;
@@ -21,22 +23,27 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -52,13 +59,28 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.permissions.Permission;
+import org.bukkit.util.Transformation;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 public class PotionBarrelListener implements Listener {
 
 	public static final String POTION_BARREL_NAME = "Potion Barrel";
-	public static final NamespacedKey POTION_BARREL_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/potion_barrel");
 	public static final Permission PERMISSION_PURPLE_TESSERACT = new Permission("monumenta.tesseract.purple");
+	public static final String DISPLAY_TAG = "PotionBarrelDisplay";
+	public static final String POTION_DISPLAY_TAG = "PotionDisplay";
+
+	public PotionBarrelListener() {
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			for (World world : Bukkit.getWorlds()) {
+				for (Chunk chunk : world.getLoadedChunks()) {
+					loadChunk(chunk);
+				}
+			}
+		}, 1L);
+	}
 
 	// inventory handling
 
@@ -66,17 +88,24 @@ public class PotionBarrelListener implements Listener {
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		Inventory barrelInventory = event.getInventory();
 		if (!(barrelInventory.getType() == InventoryType.BARREL
-				&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
-				&& isPotionBarrel(blockInventoryHolder.getBlock())
-				&& event.getWhoClicked() instanceof Player player)) {
+			&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
+			&& isPotionBarrel(blockInventoryHolder.getBlock())
+			&& event.getWhoClicked() instanceof Player player)) {
 			return;
 		}
+
+		if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (event.getClick() == ClickType.UNKNOWN) {
 			// disable all unknown/modded clicks
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 			return;
 		}
+
 		ItemStack cursorItem = event.getCursor();
 		ItemStack clickedItem = event.getCurrentItem();
 		if (event.getClickedInventory() != barrelInventory) {
@@ -138,7 +167,7 @@ public class PotionBarrelListener implements Listener {
 				case LEFT, RIGHT -> {
 					// Take a potion onto the cursor, or deposit one from the cursor
 					event.setCancelled(true);
-					if (cursorItem != null && cursorItem.getType() != Material.AIR) {
+					if (cursorItem.getType() != Material.AIR) {
 						if (ItemUtils.isSomePotion(cursorItem)) {
 							ItemStack barrelPotion = getBarrelPotion(barrelInventory);
 							if (barrelPotion == null || barrelPotion.isSimilar(cursorItem)) {
@@ -230,15 +259,22 @@ public class PotionBarrelListener implements Listener {
 	public void inventoryDragEvent(InventoryDragEvent event) {
 		Inventory barrelInventory = event.getInventory();
 		if (!(barrelInventory.getType() == InventoryType.BARREL
-				&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
-				&& isPotionBarrel(blockInventoryHolder.getBlock())
-				&& event.getWhoClicked() instanceof Player player)) {
+			&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
+			&& isPotionBarrel(blockInventoryHolder.getBlock())
+			&& event.getWhoClicked() instanceof Player player)) {
 			return;
 		}
+
+		if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (event.getRawSlots().stream().allMatch(slot -> event.getView().getInventory(slot) == player.getInventory())) {
 			// Dragging around the player inventory only is allowed.
 			return;
 		}
+
 		if (event.getRawSlots().stream().allMatch(slot -> event.getView().getInventory(slot) == barrelInventory)) {
 			// If dragging only over the barrel inventory, just deposit all dragged potions.
 			// This can happen when a click turns into a tiny drag for example.
@@ -267,20 +303,31 @@ public class PotionBarrelListener implements Listener {
 		event.setCancelled(true);
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		Block clickedBlock = event.getClickedBlock();
-		if (event.getAction() == Action.LEFT_CLICK_BLOCK
-				&& clickedBlock != null
-				&& isPotionBarrel(clickedBlock)) {
+		Player player = event.getPlayer();
+		if (!(
+			clickedBlock != null
+				&& clickedBlock.getType().equals(Material.BARREL)
+				&& isPotionBarrel(clickedBlock)
+		)) {
+			return;
+		}
+
+		if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
+			event.setCancelled(true);
+			return;
+		}
+
+		if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
 			Barrel barrel = (Barrel) clickedBlock.getState(false);
-			Player player = event.getPlayer();
 			PlayerInventory playerInventory = player.getInventory();
 			Inventory barrelInventory = barrel.getInventory();
 			if (ShulkerShortcutListener.isPurpleTesseract(playerInventory.getItemInMainHand())) {
 				if (!player.hasPermission(PERMISSION_PURPLE_TESSERACT)) {
 					player.sendMessage(ItemUtils.getDisplayName(playerInventory.getItemInMainHand())
-							.append(Component.text(" has been disabled due to a bug", NamedTextColor.RED)));
+						.append(Component.text(" has been disabled due to a bug", NamedTextColor.RED)));
 					errorSound(player);
 					event.setCancelled(true);
 					return;
@@ -289,10 +336,12 @@ public class PotionBarrelListener implements Listener {
 				int numChests = InventoryUtils.numInInventory(playerInventory, new ItemStack(Material.CHEST));
 				if (numChests == 0) {
 					player.sendMessage(Component.text("You need chests in your inventory to make Carriers!", NamedTextColor.RED));
+					event.setCancelled(true);
 					return;
 				}
 				int remainingSpace = InventoryUtils.numEmptySlots(playerInventory);
 				if (remainingSpace == 0 && numChests != 1) {
+					event.setCancelled(true);
 					return;
 				}
 				boolean festive = ShulkerShortcutListener.isFestivePurpleTesseract(playerInventory.getItemInMainHand());
@@ -317,9 +366,11 @@ public class PotionBarrelListener implements Listener {
 							item.setAmount(item.getAmount() - 27 + carryOver);
 							carryOver = 0;
 							if (makeOne) {
+								event.setCancelled(true);
 								return;
 							}
 							if (numChests <= 0 || remainingSpace < 0 || (remainingSpace == 0 && numChests != 1)) {
+								event.setCancelled(true);
 								return;
 							}
 						}
@@ -347,6 +398,7 @@ public class PotionBarrelListener implements Listener {
 				} else {
 					player.sendMessage(Component.text("This Potion barrel is currently empty!", NamedTextColor.RED));
 				}
+				event.setCancelled(true);
 				return;
 			}
 			if (player.isSneaking()) {
@@ -361,16 +413,7 @@ public class PotionBarrelListener implements Listener {
 		}
 	}
 
-	private static class BarrelInstance {
-		private final Block mBlock;
-		private final Inventory mInventory;
-		private final ItemStack mPotion;
-
-		private BarrelInstance(Block block, Inventory inventory, ItemStack potion) {
-			mBlock = block;
-			mInventory = inventory;
-			mPotion = potion;
-		}
+	private record BarrelInstance(Block mBlock, Inventory mInventory, ItemStack mPotion) {
 
 		private Block getBlock() {
 			return mBlock;
@@ -465,10 +508,10 @@ public class PotionBarrelListener implements Listener {
 					int added = addToBarrel(barrelInventory, playerItem);
 					totalAdded += added;
 				} else if (ShulkerEquipmentListener.isPotionInjectorItem(playerItem)
-						&& playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
-						&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+					&& playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
+					&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
 					if (InventoryUtils.numEmptySlots(shulkerBox.getInventory()) > 0
-							&& Arrays.stream(shulkerBox.getInventory().getContents()).anyMatch(barrelPotion::isSimilar)) {
+						&& Arrays.stream(shulkerBox.getInventory().getContents()).anyMatch(barrelPotion::isSimilar)) {
 						injectorRefilled += takeAll(barrelInventory, shulkerBox.getInventory());
 						blockStateMeta.setBlockState(shulkerBox);
 						playerItem.setItemMeta(blockStateMeta);
@@ -479,9 +522,9 @@ public class PotionBarrelListener implements Listener {
 						}
 					}
 				} else if ((ShulkerShortcutListener.isPurpleTesseractContainer(playerItem)
-						|| (ItemUtils.isShulkerBox(playerItem.getType()) && !ShulkerShortcutListener.isRestrictedShulker(playerItem)))
-						&& playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
-						&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+					|| (ItemUtils.isShulkerBox(playerItem.getType()) && !ShulkerShortcutListener.isRestrictedShulker(playerItem)))
+					&& playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
+					&& blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
 					boolean changed = false;
 					for (ItemStack shulkerItem : shulkerBox.getInventory()) {
 						if (shulkerItem != null && shulkerItem.isSimilar(barrelPotion)) {
@@ -526,11 +569,14 @@ public class PotionBarrelListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void inventoryMoveItemEvent(InventoryMoveItemEvent event) {
 		Inventory barrelInventory = event.getDestination();
-		if (!(barrelInventory.getType() == InventoryType.BARREL
+		if (!(
+			barrelInventory.getType() == InventoryType.BARREL
 				&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
-				&& isPotionBarrel(blockInventoryHolder.getBlock()))) {
+				&& isPotionBarrel(blockInventoryHolder.getBlock())
+		)) {
 			return;
 		}
+
 		// Cancel dropper item transfer events
 		event.setCancelled(true);
 	}
@@ -568,6 +614,9 @@ public class PotionBarrelListener implements Listener {
 				}
 			}
 		}
+		if (barrelInventory.getHolder() instanceof Barrel barrel) {
+			updateDisplay(barrel.getBlock().getState());
+		}
 		return originalAmount - potion.getAmount();
 	}
 
@@ -588,10 +637,17 @@ public class PotionBarrelListener implements Listener {
 					remainingSpace--;
 					removed++;
 					if (remainingSpace == 0) {
+						if (barrelInventory.getHolder() instanceof Barrel barrel) {
+							updateDisplay(barrel.getBlock().getState());
+						}
 						return removed;
 					}
 				}
 			}
+		}
+
+		if (barrelInventory.getHolder() instanceof Barrel barrel) {
+			updateDisplay(barrel.getBlock().getState());
 		}
 		return removed;
 	}
@@ -601,6 +657,11 @@ public class PotionBarrelListener implements Listener {
 			ItemStack barrelItem = barrelInventory.getItem(i);
 			if (barrelItem != null && barrelItem.isSimilar(item)) {
 				barrelItem.setAmount(barrelItem.getAmount() - 1);
+
+				if (barrelInventory.getHolder() instanceof Barrel barrel) {
+					updateDisplay(barrel.getBlock().getState());
+				}
+
 				return;
 			}
 		}
@@ -614,7 +675,7 @@ public class PotionBarrelListener implements Listener {
 		ItemStack carrier = new ItemStack(festive ? Material.GREEN_SHULKER_BOX : Material.PURPLE_SHULKER_BOX);
 		BlockStateMeta meta = (BlockStateMeta) carrier.getItemMeta();
 		meta.displayName(Component.text(festive ? "Carrier of Festivity" : "Carrier of Emotion", festive ? NamedTextColor.RED : NamedTextColor.DARK_PURPLE)
-				.decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			.decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 		ShulkerBox shulkerBox = (ShulkerBox) meta.getBlockState();
 		for (int i = 0; i < num; i++) {
 			ItemStack singlePotion = ItemUtils.clone(potion);
@@ -641,53 +702,133 @@ public class PotionBarrelListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
-		if (isPotionBarrel(event.getBlock())
-				&& !((Barrel) event.getBlock().getState()).getInventory().isEmpty()) {
-			event.setCancelled(true);
-			event.getPlayer().sendMessage(Component.text("You cannot break a filled " + POTION_BARREL_NAME + "! Empty it first.", NamedTextColor.RED));
-		}
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void plockPlaceEvent(BlockPlaceEvent event) {
-		if (isPotionBarrel(event.getBlock())
-				&& !isValidShard()) {
-			event.setCancelled(true);
-		}
-	}
-
-	// Replace drop on breaking the barrel with the item from the loot table (with description text)
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void blockDropItemEvent(BlockDropItemEvent event) {
-		if (isPotionBarrel(event.getBlockState())) {
-			ItemStack potionBarrel = InventoryUtils.getItemFromLootTable(event.getBlock().getLocation(), POTION_BARREL_LOOT_TABLE);
-			if (potionBarrel != null) {
-				event.getItems().removeIf(item -> item.getItemStack().getType() == Material.BARREL);
-				event.getItems().add(event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation().add(0.5, 0, 0.5), potionBarrel));
+		BlockState blockState = event.getBlock().getState();
+		if (isPotionBarrel(blockState)) {
+			if (((Barrel) blockState).getInventory().isEmpty()) {
+				Location centerLoc = blockState.getLocation().toCenterLocation();
+				for (Entity entity : new ArrayList<>(centerLoc.getNearbyEntities(0.1, 0.1, 0.1))) {
+					if (entity.getScoreboardTags().contains(DISPLAY_TAG)) {
+						entity.remove();
+					}
+				}
+			} else {
+				event.setCancelled(true);
+				event.getPlayer().sendMessage(Component.text("You cannot break a filled " + POTION_BARREL_NAME + "! Empty it first.", NamedTextColor.RED));
 			}
 		}
 	}
 
-	private static boolean isPotionBarrel(Block block) {
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void blockPlaceEvent(BlockPlaceEvent event) {
+		BlockState blockState = event.getBlock().getState();
+		if (
+			isPotionBarrel(blockState)
+		) {
+			if (
+				!isValidShard() ||
+					GuildPlotUtils.guildPlotInventoryModificationBlocked(event.getPlayer()
+					)
+			) {
+				event.setCancelled(true);
+			} else {
+				addDisplay(blockState);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void chunkFullLoadEvent(ChunkFullLoadEvent event) {
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(),
+			() -> loadChunk(event.getChunk()), 1L);
+	}
+
+	public void loadChunk(Chunk chunk) {
+		for (BlockState blockState : chunk.getTileEntities()) {
+			addDisplay(blockState);
+		}
+	}
+
+	public static boolean isPotionBarrel(Block block) {
 		return block.getType() == Material.BARREL
-				&& isPotionBarrel(block.getState());
+			&& isPotionBarrel(block.getState());
 	}
 
 	private static boolean isPotionBarrel(BlockState blockState) {
 		return blockState instanceof Barrel barrel
-				&& barrel.customName() != null
-				&& POTION_BARREL_NAME.equals(MessagingUtils.plainText(barrel.customName()));
+			&& barrel.customName() != null
+			&& POTION_BARREL_NAME.equals(MessagingUtils.plainText(barrel.customName()));
 	}
 
 	private static boolean isValidShard() {
 		return ServerProperties.getShardName().equals("playerplots")
-				|| ServerProperties.getShardName().startsWith("dev")
-				|| ServerProperties.getShardName().equals("plots");
+			|| ServerProperties.getShardName().equals("guildplots")
+			|| ServerProperties.getShardName().startsWith("dev")
+			|| ServerProperties.getShardName().equals("plots");
 	}
 
 	private static boolean isShopLocation(Location location) {
 		return ServerProperties.getShardName().equals("plots")
-				&& ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE);
+			&& ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE);
 	}
 
+	public static void addDisplay(BlockState blockState) {
+		BlockData blockData = blockState.getBlockData();
+		if (
+			blockData instanceof Directional directional &&
+				isPotionBarrel(blockState)
+		) {
+			Vector dir = directional.getFacing().getDirection();
+			Location centerLoc = blockState.getLocation().toCenterLocation();
+			centerLoc.setDirection(dir);
+
+			// Check for existing entity
+			for (Entity entity : centerLoc.getNearbyEntities(0.1, 0.1, 0.1)) {
+				if (entity.getScoreboardTags().contains(DISPLAY_TAG)) {
+					return;
+				}
+			}
+
+			// Spawn a display entity (cleared when unloaded)
+			World world = centerLoc.getWorld();
+			world.spawn(centerLoc, ItemDisplay.class, display -> {
+				display.customName(Component.text("Potion Barrel", NamedTextColor.GOLD));
+				display.setTransformation(new Transformation(
+					new Vector3f(0.0f, 0.0f, 0.5f),
+					new AxisAngle4f((float) Math.PI, 0.0f, 1.0f, 0.0f),
+					new Vector3f(0.5f),
+					new AxisAngle4f()
+				));
+				if (dir.getY() != 0.0) {
+					display.setBillboard(Display.Billboard.VERTICAL);
+				}
+				display.setBrightness(new Display.Brightness(15, 15));
+				Set<String> tags = display.getScoreboardTags();
+				tags.add(DISPLAY_TAG);
+				tags.add(POTION_DISPLAY_TAG);
+				tags.add(Constants.Tags.REMOVE_ON_UNLOAD);
+			});
+			updateDisplay(blockState);
+		}
+	}
+
+	public static void updateDisplay(BlockState blockState) {
+		if (
+			blockState instanceof Barrel barrel &&
+				isPotionBarrel(blockState)
+		) {
+			Inventory inv = barrel.getInventory();
+			ItemStack potion = getBarrelPotion(inv);
+
+			Location centerLoc = blockState.getLocation().toCenterLocation();
+			for (Entity entity : centerLoc.getNearbyEntities(0.1, 0.1, 0.1)) {
+				if (
+					entity instanceof ItemDisplay display &&
+						entity.getScoreboardTags().contains(POTION_DISPLAY_TAG)
+				) {
+					display.setItemStack(potion);
+					return;
+				}
+			}
+		}
+	}
 }

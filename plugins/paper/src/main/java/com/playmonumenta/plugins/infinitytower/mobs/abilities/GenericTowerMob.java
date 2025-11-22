@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerFileUtils;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerGameUtils;
-import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import java.util.Collection;
 import java.util.Collections;
@@ -91,7 +90,7 @@ public class GenericTowerMob extends TowerAbility {
 					Location loc = boss.getLocation();
 					targets.sort((a, b) -> (int) (loc.distance(a.getLocation()) - loc.distance(b.getLocation())));
 
-					if (targets.size() > 0) {
+					if (!targets.isEmpty()) {
 						boss.setTarget(targets.get(0));
 						mLastTarget = targets.get(0);
 					} else {
@@ -102,7 +101,7 @@ public class GenericTowerMob extends TowerAbility {
 				}
 			}
 
-		}.runTaskTimer(TowerManager.mPlugin, 10, 5);
+		}.runTaskTimer(Plugin.getInstance(), 10, 5);
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), -1, null);
 

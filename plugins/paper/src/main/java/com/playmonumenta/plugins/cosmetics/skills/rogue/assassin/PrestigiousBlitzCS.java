@@ -95,6 +95,7 @@ public class PrestigiousBlitzCS extends BodkinBlitzCS implements PrestigeCS {
 			final double mDRadius = 0.04;
 			final double mDTheta = 3.1416 / 12;
 			final double mDHeight = 2.0 / 40;
+
 			@Override
 			public void run() {
 				do {

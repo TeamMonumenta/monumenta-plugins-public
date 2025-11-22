@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.IndependentIframeTracker;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
@@ -23,10 +25,8 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -66,7 +66,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	public static final String METADATA_KEY = "PlayerThrowAlchPotionEvent";
 	public static final int MAX_CHARGES = 8;
 	public static final int POTIONS_TIMER_BASE = 2 * 20;
-	private static final int POTIONS_TIMER_TOWN = 1 * 20;
+	private static final int POTIONS_TIMER_TOWN = 20;
 	private static final int IFRAME_BETWEEN_POT = 10;
 	private static final String POTION_SCOREBOARD = "StoredPotions";
 
@@ -83,14 +83,12 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private final IndependentIframeTracker mIframeTracker;
 	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
-	private static @Nullable ItemStack GRUESOME_POTION = null;
-	private static @Nullable ItemStack BRUTAL_POTION = null;
-
 	public static final AbilityInfo<AlchemistPotions> INFO =
-			new AbilityInfo<>(AlchemistPotions.class, null, AlchemistPotions::new)
-				.hotbarName("A") // Have this as "A" to make it sorted in front of everything (alphabetically)
-				.linkedSpell(ClassAbility.ALCHEMIST_POTION)
-				.canUse(player -> AbilityUtils.getClassNum(player) == Alchemist.CLASS_ID);
+		new AbilityInfo<>(AlchemistPotions.class, "Alchemist Potions", AlchemistPotions::new)
+			.hotbarName("A") // Have this as "A" to make it sorted in front of everything (alphabetically)
+			.linkedSpell(ClassAbility.ALCHEMIST_POTION)
+			.description(getDescription())
+			.canUse(player -> AbilityUtils.getClassNum(player) == Alchemist.CLASS_ID);
 
 	public final GruesomeAlchemyCS mCosmetic;
 	private boolean mHasGruesomeAlchemy = false;
@@ -156,6 +154,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	public void throwPotion(boolean gruesome) {
 		if (decrementCharge()) {
 			ThrownPotion thrownPotion = mPlayer.launchProjectile(ThrownPotion.class);
+			thrownPotion.setItem(mPlayer.getEquipment().getItemInMainHand());
 			setPotionToAlchemistPotion(thrownPotion, gruesome);
 		}
 	}
@@ -176,23 +175,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	 * This function will set the given ThrownPotion potion to an Alchemist Potion, ONLY to an aesthetic level
 	 */
 	public void setPotionAlchemistPotionAesthetic(ThrownPotion potion, boolean gruesome) {
-		if (BRUTAL_POTION == null || GRUESOME_POTION == null) {
-			ItemStack basePotion = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKeyUtils.fromString("epic:r1/items/alchemists_potion"));
-			if (basePotion == null) {
-				mPlugin.getLogger().severe("Failed to get alchemist's potion from loot table!");
-				return;
-			}
-
-			BRUTAL_POTION = basePotion.clone();
-			GRUESOME_POTION = basePotion.clone();
-		}
-
-		ItemStack item;
-		if (gruesome) {
-			item = GRUESOME_POTION.clone();
-		} else {
-			item = BRUTAL_POTION.clone();
-		}
+		ItemStack item = potion.getItem();
 		item.editMeta(m -> {
 			((PotionMeta) m).setColor(mCosmetic.splashColor(gruesome));
 		});
@@ -255,7 +238,9 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, getDamage(playerItemStats));
 
 			if (isGruesome) {
-				damage *= GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_DAMAGE);
+				damage *= GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_DAMAGE_MULTIPLIER);
+			} else {
+				damage *= 1 + CharmManager.getLevelPercentDecimal(mPlayer, BrutalAlchemy.CHARM_DAMAGE_MULTIPLIER);
 			}
 
 			double finalDamage = damage;
@@ -472,10 +457,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		return isGruesomeMode() ? "gruesome" : null;
 	}
 
-	public boolean isAlchemistPotion(ThrownPotion potion) {
-		return BRUTAL_POTION != null && ItemUtils.getPlainNameIfExists(BRUTAL_POTION).equals(ItemUtils.getPlainNameIfExists(potion.getItem()));
-	}
-
 	@Override
 	public @Nullable Component getHotbarMessage() {
 		int charges = getCharges();
@@ -490,5 +471,14 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
 
 		return output;
+	}
+
+	private static Description<AlchemistPotions> getDescription() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Allows using Alchemical Utensils. You gain 1 potion every ")
+			.addDuration(POTIONS_TIMER_BASE)
+			.add(" seconds, up to a maximum of ")
+			.add(a -> a.mMaxCharges, MAX_CHARGES)
+			.add(".");
 	}
 }

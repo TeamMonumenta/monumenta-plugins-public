@@ -8,8 +8,8 @@ import org.bukkit.potion.PotionEffectType;
 public class SpellPurgeGlowing extends Spell {
 
 	private int mCooldown = 0;
-	private LivingEntity mBoss;
-	private int mTimer;
+	private final LivingEntity mBoss;
+	private final int mTimer;
 
 	public SpellPurgeGlowing(LivingEntity boss, int timer) {
 		mBoss = boss;

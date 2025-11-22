@@ -93,13 +93,13 @@ public class FearfulSouls extends Spell {
 
 							// particle effect for each skull summon
 							new PartialParticle(Particle.SPELL_MOB, skull.getLocation().clone().add(0, 0.9, 0))
-									.count(10)
-									.delta(0.12)
-									.spawnAsBoss();
+								.count(10)
+								.delta(0.12)
+								.spawnAsBoss();
 							new PartialParticle(Particle.SPELL, skull.getLocation().clone().add(0, 0.9, 0))
-									.count(10)
-									.delta(0.15)
-									.spawnAsBoss();
+								.count(10)
+								.delta(0.15)
+								.spawnAsBoss();
 
 							// set the rotation of each skull to be the same as the boss
 							skull.setRotation(mBoss.getLocation().getYaw(), 0);
@@ -122,10 +122,10 @@ public class FearfulSouls extends Spell {
 				}
 
 				if (mTicks < 20) {
-					new PPCircle(Particle.SPELL, mBoss.getLocation().clone().add(0, 0.2, 0), 3 * ((double)(20 - mTicks) / 20))
-							.count(30)
-							.ringMode(true)
-							.spawnAsBoss();
+					new PPCircle(Particle.SPELL, mBoss.getLocation().clone().add(0, 0.2, 0), 3 * ((double) (20 - mTicks) / 20))
+						.count(30)
+						.ringMode(true)
+						.spawnAsBoss();
 				}
 
 				if (mTicks == 40) {
@@ -187,13 +187,13 @@ public class FearfulSouls extends Spell {
 
 						// particle effect for each skull summon
 						new PartialParticle(Particle.SPELL_MOB, skull.getLocation().clone().add(0, 0.9, 0))
-								.count(10)
-								.delta(0.12)
-								.spawnAsBoss();
+							.count(10)
+							.delta(0.12)
+							.spawnAsBoss();
 						new PartialParticle(Particle.SPELL, skull.getLocation().clone().add(0, 0.9, 0))
-								.count(10)
-								.delta(0.15)
-								.spawnAsBoss();
+							.count(10)
+							.delta(0.15)
+							.spawnAsBoss();
 
 						mWorld.playSound(skull.getLocation(), Sound.ENTITY_PHANTOM_HURT, SoundCategory.HOSTILE, 0.7f, 1.7f);
 					}));
@@ -207,9 +207,9 @@ public class FearfulSouls extends Spell {
 
 						// particle effect
 						new PartialParticle(Particle.REDSTONE, skull.getLocation().clone().add(0, 0.8, 0).subtract(skull.getLocation().getDirection().clone().multiply(0.3)))
-								.count(1)
-								.data(new Particle.DustOptions(Color.fromRGB(224, 224, 224), 1.9f))
-								.spawnAsBoss();
+							.count(1)
+							.data(new Particle.DustOptions(Color.fromRGB(224, 224, 224), 1.9f))
+							.spawnAsBoss();
 
 						// check if a skull has a passenger with a tag - meaning it has been successfully hit by a player
 						List<LivingEntity> skullPassengers = new ArrayList<>();
@@ -220,13 +220,13 @@ public class FearfulSouls extends Spell {
 								toRemove.add(skull);
 
 								new PartialParticle(Particle.SPELL, skull.getLocation().clone().add(0, 0.4, 0))
-										.count(20)
-										.delta(0.2, 0.5, 0.2)
-										.spawnAsBoss();
+									.count(20)
+									.delta(0.2, 0.5, 0.2)
+									.spawnAsBoss();
 								new PartialParticle(Particle.SPELL_MOB, skull.getLocation().clone().add(0, 0.4, 0))
-										.count(20)
-										.delta(0.2, 0.5, 0.2)
-										.spawnAsBoss();
+									.count(20)
+									.delta(0.2, 0.5, 0.2)
+									.spawnAsBoss();
 
 								mWorld.playSound(skull.getLocation(), Sound.ENTITY_ALLAY_ITEM_THROWN, SoundCategory.HOSTILE, 1.5f, 0.65f);
 							}
@@ -246,13 +246,13 @@ public class FearfulSouls extends Spell {
 								despawnSkullStack(skull);
 								toRemove.put(target, skull);
 								new PartialParticle(Particle.SPELL, target.getLocation().clone().add(0, 0.4, 0))
-										.count(20)
-										.delta(0.2, 0.5, 0.2)
-										.spawnAsBoss();
+									.count(20)
+									.delta(0.2, 0.5, 0.2)
+									.spawnAsBoss();
 								new PartialParticle(Particle.SPELL_MOB, target.getLocation().clone().add(0, 0.4, 0))
-										.count(20)
-										.delta(0.2, 0.5, 0.2)
-										.spawnAsBoss();
+									.count(20)
+									.delta(0.2, 0.5, 0.2)
+									.spawnAsBoss();
 
 								BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, mXenotopsis.scaleDamage(ATTACK_DAMAGE), "Fearful Souls", skull.getLocation(), Xenotopsis.SHIELD_STUN_TIME);
 								mXenotopsis.changePlayerDeathValue(player, DEATH_DAMAGE, false);
@@ -307,6 +307,6 @@ public class FearfulSouls extends Spell {
 	}
 
 	// record class usage without constructor creates unused variable warnings despite not having issues
-	@SuppressWarnings("UnusedVariable")
-	private record FearfulSoulData(ArmorStand skull, double speed, double height) {}
+	private record FearfulSoulData(ArmorStand skull, double speed, double height) {
+	}
 }

@@ -13,14 +13,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class RingsFM extends FishingMinigame {
-	private final Color[] RING_COLORS = new Color[] {
+	private final Color[] RING_COLORS = new Color[]{
 		Color.fromRGB(255, 220, 20),
 		Color.fromRGB(255, 200, 20),
 		Color.fromRGB(255, 180, 20),
 		Color.fromRGB(255, 160, 20),
 		Color.fromRGB(255, 140, 20)
 	};
-	private final int[] RING_TIMINGS = new int[] {
+	private final int[] RING_TIMINGS = new int[]{
 		FastUtils.randomIntInRange(30, 50),
 		FastUtils.randomIntInRange(60, 75),
 		FastUtils.randomIntInRange(85, 100),

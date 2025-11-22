@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.skills.rogue;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
+import com.playmonumenta.plugins.particle.PPPillar;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,6 +38,7 @@ public class ByMyBladeCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.PLAYERS, 0.9f, 0.6f);
 		new PartialParticle(Particle.SPELL_MOB, loc, level * 15, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
+		new PPPillar(Particle.CRIT_MAGIC, loc, 3).count(15).extra(0.1).spawnAsPlayerActive(player);
 	}
 
 	public void bmbDamageLv2(Player player, LivingEntity enemy) {

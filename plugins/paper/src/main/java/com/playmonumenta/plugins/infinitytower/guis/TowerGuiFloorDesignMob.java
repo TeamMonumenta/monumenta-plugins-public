@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.infinitytower.guis;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.infinitytower.TowerFileUtils;
-import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.infinitytower.TowerTeam;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
@@ -57,7 +57,7 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 				floorDesignMob.mTeam.addMob(new TowerMob(item, x, 0, z));
 				TowerFileUtils.saveDefaultTeam(floorDesignMob.mTeam, floorDesignMob.mFloor);
 				p.closeInventory();
-				new TowerGuiFloorDesign(p, floorDesignMob.mFloor).openInventory(p, TowerManager.mPlugin);
+				new TowerGuiFloorDesign(p, floorDesignMob.mFloor).openInventory(p, Plugin.getInstance());
 				return true;
 			}));
 		}
@@ -146,8 +146,6 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 		}
 
 
-
-
 		//fill white hole
 
 		stack = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
@@ -174,9 +172,6 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 	}
 
 
-
-
-
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
@@ -198,10 +193,9 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 	}
 
 
-
 	@Override
 	protected void inventoryClose(InventoryCloseEvent event) {
-		Bukkit.getScheduler().runTaskLater(TowerManager.mPlugin, () -> {
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			mInstances.remove(event.getPlayer());
 		}, 20 * 2);
 		super.inventoryClose(event);

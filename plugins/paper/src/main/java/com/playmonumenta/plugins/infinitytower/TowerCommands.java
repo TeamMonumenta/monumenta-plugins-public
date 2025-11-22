@@ -266,7 +266,7 @@ public class TowerCommands {
 					jb.addProperty("Tw", weight);
 					jb.addProperty("Tl", lvl);
 					jb.addProperty("Thp", totalHP);
-					jb.addProperty("Tatk", (int)totalATK);
+					jb.addProperty("Tatk", (int) totalATK);
 					jb.addProperty("Tm", totalMob);
 					jb.addProperty("Tab", totalAbility);
 					jb.addProperty("PTg", totalGold);
@@ -464,7 +464,7 @@ public class TowerCommands {
 					String[] abilities = new String[TowerMobAbility.ABILITIES.size()];
 					int i = 0;
 					for (TowerMobAbility.Tuple tuple : TowerMobAbility.ABILITIES) {
-						abilities[i++] = tuple.mName;
+						abilities[i++] = tuple.mName();
 					}
 					return abilities;
 				}))
@@ -499,7 +499,7 @@ public class TowerCommands {
 					String[] abilities = new String[TowerMobAbility.ABILITIES.size()];
 					int i = 0;
 					for (TowerMobAbility.Tuple tuple : TowerMobAbility.ABILITIES) {
-						abilities[i++] = tuple.mName;
+						abilities[i++] = tuple.mName();
 					}
 					return abilities;
 				}))

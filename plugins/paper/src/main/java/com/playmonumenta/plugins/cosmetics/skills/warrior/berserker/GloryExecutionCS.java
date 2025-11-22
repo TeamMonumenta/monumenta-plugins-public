@@ -101,20 +101,20 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 
 		ParticleUtils.drawCurve(loc, tick, tick + 2, mFront,
 			t -> 0.5 * (t - tick - 1),
-				t -> 1.25 * FastUtils.sin(t * 3.1416 / 12), t -> 1.25 * FastUtils.cos(t * 3.1416 / 12),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(player)
+			t -> 1.25 * FastUtils.sin(t * 3.1416 / 12), t -> 1.25 * FastUtils.cos(t * 3.1416 / 12),
+			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(player)
 		);
 
 		ParticleUtils.drawCurve(loc, tick, tick + 2, mFront,
 			t -> 0.5 * (t - tick - 1),
-				t -> 1.25 * FastUtils.sin((t + 8) * 3.1416 / 12), t -> 1.25 * FastUtils.cos((t + 8) * 3.1416 / 12),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(player)
+			t -> 1.25 * FastUtils.sin((t + 8) * 3.1416 / 12), t -> 1.25 * FastUtils.cos((t + 8) * 3.1416 / 12),
+			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(player)
 		);
 
 		ParticleUtils.drawCurve(loc, tick, tick + 2, mFront,
 			t -> 0.5 * (t - tick - 1),
-				t -> 1.25 * FastUtils.sin((t - 8) * 3.1416 / 12), t -> 1.25 * FastUtils.cos((t - 8) * 3.1416 / 12),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(player)
+			t -> 1.25 * FastUtils.sin((t - 8) * 3.1416 / 12), t -> 1.25 * FastUtils.cos((t - 8) * 3.1416 / 12),
+			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(player)
 		);
 	}
 
@@ -136,18 +136,18 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 			Vector dir = mFront.clone().normalize();
 			ParticleUtils.drawCurve(loc3, -8, 8, dir,
 				t -> 0,
-					t -> 0.16 * t, t -> 0.24 * t,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, BLOODY_COLOR2).spawnAsPlayerActive(player)
+				t -> 0.16 * t, t -> 0.24 * t,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, BLOODY_COLOR2).spawnAsPlayerActive(player)
 			);
 			ParticleUtils.drawCurve(loc3, -8, 8, dir,
 				t -> 0,
-					t -> -0.16 * t, t -> 0.24 * t,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, BLOODY_COLOR2).spawnAsPlayerActive(player)
+				t -> -0.16 * t, t -> 0.24 * t,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, BLOODY_COLOR2).spawnAsPlayerActive(player)
 			);
 			ParticleUtils.drawCurve(loc3, -8, 4, dir,
 				t -> 0.25 * t,
-					t -> 0, t -> 0,
-					(l, t) -> new BukkitRunnable() {
+				t -> 0, t -> 0,
+				(l, t) -> new BukkitRunnable() {
 					@Override
 					public void run() {
 						new PartialParticle(Particle.REDSTONE, l, (6 - t) * 2, (4 - t) * 0.025, (4 - t) * 0.025, (4 - t) * 0.025, 0,
@@ -162,8 +162,8 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 			Vector delta = mFront.clone().normalize().multiply(-0.8);
 			ParticleUtils.drawCurve(loc1, 4, 24, dir,
 				t -> 1.2 * FastUtils.sin(t * 3.1416 / 36),
-					t -> 1.2 * FastUtils.cos(t * 3.1416 / 36), t -> 0,
-					(l, t) -> new BukkitRunnable() {
+				t -> 1.2 * FastUtils.cos(t * 3.1416 / 36), t -> 0,
+				(l, t) -> new BukkitRunnable() {
 					@Override
 					public void run() {
 						new PPLine(Particle.REDSTONE, l, l.clone().add(delta))
@@ -184,14 +184,14 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 						if (tick != 0) {
 							ParticleUtils.drawCurve(l, 0, 15, mFront.clone().normalize(),
 								t -> 0,
-									t -> tick * 0.3 * FastUtils.sin(t * 3.1416 * 2 / 16), t -> tick * 0.3 * FastUtils.cos(t * 3.1416 * 2 / 16),
-									(loc, t) -> new PartialParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(player)
+								t -> tick * 0.3 * FastUtils.sin(t * 3.1416 * 2 / 16), t -> tick * 0.3 * FastUtils.cos(t * 3.1416 * 2 / 16),
+								(loc, t) -> new PartialParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(player)
 							);
 						} else {
 							ParticleUtils.drawCurve(l, -8, 8, mFront.clone().normalize(),
 								t -> 0.25 * t,
-									t -> 0, t -> 0,
-									(loc, t) -> new PartialParticle(Particle.CLOUD, loc, 3, 0.01, 0.01, 0.01, 0.2).spawnAsPlayerActive(player)
+								t -> 0, t -> 0,
+								(loc, t) -> new PartialParticle(Particle.CLOUD, loc, 3, 0.01, 0.01, 0.01, 0.2).spawnAsPlayerActive(player)
 							);
 						}
 					}
@@ -215,13 +215,13 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 			new PartialParticle(Particle.DRIP_LAVA, loc3, 80, 0.75, 0.75, 0.75, 0.5).spawnAsPlayerActive(player);
 			ParticleUtils.drawCurve(loc3, -12, 12, mFront.clone().normalize(),
 				t -> 0,
-					t -> t * 0.15, t -> t * 0.075,
-					(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.1).spawnAsPlayerActive(player)
+				t -> t * 0.15, t -> t * 0.075,
+				(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.1).spawnAsPlayerActive(player)
 			);
 			ParticleUtils.drawCurve(loc3, -12, 12, mFront.clone().normalize(),
 				t -> 0,
-					t -> t * -0.15, t -> t * 0.075,
-					(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.1).spawnAsPlayerActive(player)
+				t -> t * -0.15, t -> t * 0.075,
+				(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.1).spawnAsPlayerActive(player)
 			);
 
 		}
@@ -237,33 +237,33 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 		final int units = (int) Math.ceil(LAND_ANIM_FRAMES * radius * 3);
 		ParticleUtils.drawCurve(loc.clone().add(0, 0.5, 0), 0, units, mFront,
 			t -> FastUtils.cos(t * 3.1416 / 13) * t / units,
-				t -> 0, t -> FastUtils.sin(t * 3.1416 / 13) * t / units,
-				(l, t) -> new BukkitRunnable() {
+			t -> 0, t -> FastUtils.sin(t * 3.1416 / 13) * t / units,
+			(l, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, BLOODY_COLOR1).spawnAsPlayerActive(player);
 				}
-			}.runTaskLater(Plugin.getInstance(), LAND_ANIM_FRAMES * t / units)
+			}.runTaskLater(Plugin.getInstance(), (long) LAND_ANIM_FRAMES * t / units)
 		);
 		ParticleUtils.drawCurve(loc.clone().add(0, 0.5, 0), 0, units, mFront,
 			t -> FastUtils.cos(t * 3.1416 / 13 - 3.1416 * 1.33) * t / units,
-				t -> 0, t -> FastUtils.sin(t * 3.1416 / 13 - 3.1416 * 1.33) * t / units,
-				(l, t) -> new BukkitRunnable() {
+			t -> 0, t -> FastUtils.sin(t * 3.1416 / 13 - 3.1416 * 1.33) * t / units,
+			(l, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, BLOODY_COLOR1).spawnAsPlayerActive(player);
 				}
-			}.runTaskLater(Plugin.getInstance(), LAND_ANIM_FRAMES * t / units)
+			}.runTaskLater(Plugin.getInstance(), (long) LAND_ANIM_FRAMES * t / units)
 		);
 		ParticleUtils.drawCurve(loc.clone().add(0, 0.5, 0), 0, units, mFront,
 			t -> FastUtils.cos(t * 3.1416 / 13 + 3.1416 * 1.33) * t / units,
-				t -> 0, t -> FastUtils.sin(t * 3.1416 / 13 + 3.1416 * 1.33) * t / units,
-				(l, t) -> new BukkitRunnable() {
+			t -> 0, t -> FastUtils.sin(t * 3.1416 / 13 + 3.1416 * 1.33) * t / units,
+			(l, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
 					new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, BLOODY_COLOR1).spawnAsPlayerActive(player);
 				}
-			}.runTaskLater(Plugin.getInstance(), LAND_ANIM_FRAMES * t / units)
+			}.runTaskLater(Plugin.getInstance(), (long) LAND_ANIM_FRAMES * t / units)
 		);
 
 		new BukkitRunnable() {

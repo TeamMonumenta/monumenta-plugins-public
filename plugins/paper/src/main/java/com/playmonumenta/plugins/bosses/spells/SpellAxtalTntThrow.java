@@ -17,10 +17,10 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 public class SpellAxtalTntThrow extends Spell {
-	private Plugin mPlugin;
-	private Entity mLauncher;
-	private int mCount;
-	private int mCooldown;
+	private final Plugin mPlugin;
+	private final Entity mLauncher;
+	private final int mCount;
+	private final int mCooldown;
 
 	public SpellAxtalTntThrow(Plugin plugin, Entity launcher, int count, int cooldown) {
 		mPlugin = plugin;
@@ -62,7 +62,7 @@ public class SpellAxtalTntThrow extends Spell {
 			scheduler.scheduleSyncDelayedTask(mPlugin, particles1, i);
 		}
 		for (int i = 0; i < mCount; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, particles2, 40 + i * mCooldown);
+			scheduler.scheduleSyncDelayedTask(mPlugin, particles2, 40 + (long) i * mCooldown);
 		}
 	}
 
@@ -72,7 +72,7 @@ public class SpellAxtalTntThrow extends Spell {
 			@Override
 			public void run() {
 				List<Player> plist = PlayerUtils.playersInRange(mLauncher.getLocation(), 100, true);
-				if (plist.size() >= 1) {
+				if (!plist.isEmpty()) {
 					Player target = plist.get(FastUtils.RANDOM.nextInt(plist.size()));
 					Location sLoc = mLauncher.getLocation().add(0, 1.7, 0);
 					final var tnt = sLoc.getWorld().spawn(sLoc, TNTPrimed.class, tntPrimed -> {
@@ -87,7 +87,7 @@ public class SpellAxtalTntThrow extends Spell {
 			}
 		};
 		for (int i = 0; i < mCount; i++) {
-			scheduler.scheduleSyncDelayedTask(mPlugin, singleLaunch, 40 + i * mCooldown);
+			scheduler.scheduleSyncDelayedTask(mPlugin, singleLaunch, 40 + (long) i * mCooldown);
 		}
 	}
 }

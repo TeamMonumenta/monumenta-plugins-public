@@ -13,6 +13,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +24,7 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 
 	private static final Particle.DustOptions GOLD_COLOR = new Particle.DustOptions(Color.fromRGB(255, 208, 40), 1.0f);
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.25f);
-	private static double START_EFFECT_RADIUS = 2.8;
+	private static final double START_EFFECT_RADIUS = 2.8;
 
 	@Override
 	public @Nullable List<String> getDescription() {
@@ -151,7 +152,7 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 	}
 
 	@Override
-	public void maneuverHitEffect(World world, Player mPlayer) {
+	public void maneuverHitEffect(World world, Player mPlayer, LivingEntity le) {
 		Location loc = mPlayer.getLocation();
 		new PartialParticle(Particle.SPELL_INSTANT, loc, 100, 0.65, 0.35, 0.65, 0.3).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CLOUD, loc, 15, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);

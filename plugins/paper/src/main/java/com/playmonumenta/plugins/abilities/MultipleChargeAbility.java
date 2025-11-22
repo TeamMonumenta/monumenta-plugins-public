@@ -37,6 +37,21 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 		return false;
 	}
 
+	// Tries to consume all charges; returns the number of charges consumed.
+	protected int consumeAllCharge() {
+		if (mCharges > 0) {
+			int charges = mCharges;
+			mCharges = 0;
+			mPlugin.mTimers.setCooldown(mPlayer, mLinkedSpell, getModifiedCooldown());
+			PlayerUtils.callAbilityCastEvent(mPlayer, this, mLinkedSpell);
+			ClientModHandler.updateAbility(mPlayer, this);
+			AbilityManager.getManager().trackCharges(mPlayer, mLinkedSpell, mCharges);
+			return charges;
+		}
+
+		return 0;
+	}
+
 	public boolean incrementCharge() {
 		if (mCharges < mMaxCharges) {
 			mCharges++;

@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.IronTinctureCS;
@@ -15,7 +17,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -49,48 +50,40 @@ public class IronTincture extends Ability {
 	public static final String CHARM_RESISTANCE = "Iron Tincture Enhancement Resistance Amplifier";
 	public static final String CHARM_REFILL = "Iron Tincture Potion Refill";
 	public static final String CHARM_ALLY_REFILL = "Iron Tincture Ally Potion Refill";
+	public static final String CHARM_STUN_RADIUS = "Iron Tincture Stun Radius";
+	public static final String CHARM_STUN_DURATION = "Iron Tincture Stun Duration";
 
 	public static final AbilityInfo<IronTincture> INFO =
 		new AbilityInfo<>(IronTincture.class, "Iron Tincture", IronTincture::new)
 			.linkedSpell(ClassAbility.IRON_TINCTURE)
 			.scoreboardId("IronTincture")
 			.shorthandName("IT")
-			.descriptions(
-				("Crouch and right-click to throw a tincture. If you walk over the tincture, gain %s absorption health " +
-				"for %ss, up to %s absorption health. If an ally walks over it, or is hit by it, you both gain the effect. " +
-				"If it isn't grabbed before it disappears, it will quickly come off cooldown. " +
-				"When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, " +
-				"you gain 1 Alchemist's Potion. Cooldown: %ss.")
-					.formatted(
-							IRON_TINCTURE_1_ABSORPTION,
-							StringUtils.ticksToSeconds(IRON_TINCTURE_ABSORPTION_DURATION),
-							IRON_TINCTURE_1_ABSORPTION,
-							StringUtils.ticksToSeconds(IRON_TINCTURE_USE_COOLDOWN)
-					),
-				"Effect and effect cap increased to %s absorption health."
-					.formatted(IRON_TINCTURE_2_ABSORPTION),
-				("The tincture now grants %s%% damage resistance when absorption is present, for the duration of the absorption. " +
-				"Additionally, mobs within a %s block radius of the player who picks it up will be stunned for %ss.")
-					.formatted(
-						StringUtils.multiplierToPercentage(IRON_TINCTURE_ENHANCEMENT_RESISTANCE),
-						IRON_TINCTURE_ENHANCEMENT_STUN_RADIUS,
-						StringUtils.ticksToSeconds(IRON_TINCTURE_ENHANCEMENT_STUN_DURATION)
-					)
-			)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Throw a potion on the ground that you or other players can collect to gain absorption hearts.")
 			.cooldown(IRON_TINCTURE_USE_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IronTincture::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
-					.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(Material.SPLASH_POTION);
 
-	private @Nullable AlchemistPotions mAlchemistPotions;
 	private final double mAbsorption;
+	private final int mRefill;
+	private final int mAllyRefill;
+	private final int mDuration;
+	private final double mResistance;
+	private final double mStunRadius;
+	private final int mStunDuration;
 	private final IronTinctureCS mCosmetic;
+	private @Nullable AlchemistPotions mAlchemistPotions;
 
 	public IronTincture(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-
 		mAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? IRON_TINCTURE_1_ABSORPTION : IRON_TINCTURE_2_ABSORPTION);
+		mRefill = IRON_TINCTURE_POTION_REFILL + (int) CharmManager.getLevel(mPlayer, CHARM_REFILL);
+		mAllyRefill = IRON_TINCTURE_ALLY_POTION_REFILL + (int) CharmManager.getLevel(mPlayer, CHARM_ALLY_REFILL);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, IRON_TINCTURE_ABSORPTION_DURATION);
+		mResistance = IRON_TINCTURE_ENHANCEMENT_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
+		mStunRadius = CharmManager.getRadius(mPlayer, CHARM_STUN_RADIUS, IRON_TINCTURE_ENHANCEMENT_STUN_RADIUS);
+		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, IRON_TINCTURE_ENHANCEMENT_STUN_DURATION);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new IronTinctureCS());
 
@@ -135,11 +128,11 @@ public class IronTincture extends Ability {
 					if (p != mPlayer) {
 						execute(p, l);
 						if (mAlchemistPotions != null) {
-							mAlchemistPotions.incrementCharges(IRON_TINCTURE_ALLY_POTION_REFILL + (int) CharmManager.getLevel(mPlayer, CHARM_ALLY_REFILL));
+							mAlchemistPotions.incrementCharges(mAllyRefill);
 						}
 					} else {
 						if (mAlchemistPotions != null) {
-							mAlchemistPotions.incrementCharges(IRON_TINCTURE_POTION_REFILL + (int) CharmManager.getLevel(mPlayer, CHARM_REFILL));
+							mAlchemistPotions.incrementCharges(mRefill);
 						}
 					}
 
@@ -167,15 +160,13 @@ public class IronTincture extends Ability {
 	}
 
 	private void execute(Player player, Location tinctureLocation) {
-		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, IRON_TINCTURE_ABSORPTION_DURATION);
-		AbsorptionUtils.addAbsorption(player, mAbsorption, mAbsorption, duration);
+		AbsorptionUtils.addAbsorption(player, mAbsorption, mAbsorption, mDuration);
 
 		if (isEnhanced()) {
-			Hitbox hitbox = new Hitbox.SphereHitbox(player.getLocation(), IRON_TINCTURE_ENHANCEMENT_STUN_RADIUS);
-			hitbox.getHitMobs().forEach(mob -> EntityUtils.applyStun(mPlugin, IRON_TINCTURE_ENHANCEMENT_STUN_DURATION, mob));
+			Hitbox hitbox = new Hitbox.SphereHitbox(tinctureLocation, mStunRadius);
+			hitbox.getHitMobs().forEach(mob -> EntityUtils.applyStun(mPlugin, mStunDuration, mob));
 
-			double resistance = IRON_TINCTURE_ENHANCEMENT_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
-			mPlugin.mEffectManager.addEffect(player, "IronTinctureEnhancementResistanceEffect", new PercentDamageReceived(duration, -resistance) {
+			mPlugin.mEffectManager.addEffect(player, "IronTinctureEnhancementResistanceEffect", new PercentDamageReceived(mDuration, -mResistance) {
 				@Override
 				public void onHurt(LivingEntity entity, DamageEvent event) {
 					if (event.getType() == DamageEvent.DamageType.TRUE) {
@@ -183,14 +174,42 @@ public class IronTincture extends Ability {
 					}
 					if (entity instanceof Player player) {
 						if (AbsorptionUtils.getAbsorption(player) > 0) {
-							event.setFlatDamage(event.getDamage() * (1 - resistance));
+							event.setFlatDamage(event.getDamage() * (1 - mResistance));
 						}
 					}
 				}
-			});
+			}.deleteOnAbilityUpdate(true));
 		}
 
 		mCosmetic.pickupEffectsForPlayer(player, tinctureLocation);
+	}
 
+	private static Description<IronTincture> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to throw a tincture. If you walk over the tincture, gain ")
+			.add(a -> a.mAbsorption, IRON_TINCTURE_1_ABSORPTION, false, Ability::isLevelOne)
+			.add(" absorption health for ")
+			.addDuration(a -> a.mDuration, IRON_TINCTURE_ABSORPTION_DURATION)
+			.add(" seconds. If an ally walks over it, you both gain the effect. If it isn't grabbed before it disappears, it will quickly come off cooldown. When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, you gain 1 Alchemist's Potion.")
+			.addCooldown(IRON_TINCTURE_USE_COOLDOWN);
+	}
+
+	private static Description<IronTincture> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Absorption is increased to ")
+			.add(a -> a.mAbsorption, IRON_TINCTURE_2_ABSORPTION, false, Ability::isLevelTwo)
+			.add(".");
+	}
+
+	private static Description<IronTincture> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The tincture now grants ")
+			.addPercent(a -> a.mResistance, IRON_TINCTURE_ENHANCEMENT_RESISTANCE)
+			.add(" damage resistance when absorption is present, for the duration of the absorption. Additionally, mobs within ")
+			.add(a -> a.mStunRadius, IRON_TINCTURE_ENHANCEMENT_STUN_RADIUS)
+			.add(" blocks of the player who picks it up will be stunned for ")
+			.addDuration(a -> a.mStunDuration, IRON_TINCTURE_ENHANCEMENT_STUN_DURATION)
+			.add(" seconds.");
 	}
 }

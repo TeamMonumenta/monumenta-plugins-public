@@ -23,90 +23,36 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author FirelordWeaponry
  */
-public class SpellBaseBolt extends Spell {
-	@FunctionalInterface
-	public interface TickAction {
-		/**
-		 * User function called once every two ticks while bolt is charging
-		 *
-		 * @param entity The entity charging the bolt
-		 * @param tick   Number of ticks since start of attack
-		 *               NOTE - Only even numbers are returned here!
-		 */
-		void run(Entity entity, int tick);
-	}
-
-	@FunctionalInterface
-	public interface CastAction {
-		/**
-		 * User function called once the bolt is fired
-		 *
-		 * @param entity The entity firing the bolt
-		 */
-		void run(Entity entity);
-	}
-
-	@FunctionalInterface
-	public interface ParticleAction {
-		/**
-		 * User function called many times per tick with the location where
-		 * a bolt particle should be spawned
-		 *
-		 * @param loc Location to spawn a particle
-		 */
-		void run(Location loc);
-	}
-
-	@FunctionalInterface
-	public interface IntersectAction {
-		/**
-		 * User function called when the bolt hits/intersects with a player
-		 *
-		 * @param player  Player being targeted
-		 * @param loc     Location where the bolt ends (either at player or occluding block)
-		 * @param blocked Whether the laser is obstructed (true) or hits the player (false)
-		 * @param prevLoc Last Location the bolt was in (use to determine direction the player must be facing to shield)
-		 */
-		void run(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc);
-	}
-
-	private final Plugin mPlugin;
-	private final LivingEntity mCaster;
-	private final int mDelay;
-	private final int mDuration;
-	private final double mVelocity;
-	private final double mDetectRange;
-	private final double mHitboxRadius;
-	private final boolean mSingleTarget;
-	private final boolean mStopOnFirstHit;
-	private final int mShots;
-	private final int mRate;
-	private final TickAction mTickAction;
-	private final CastAction mCastAction;
-	private final ParticleAction mParticleAction;
-	private final IntersectAction mIntersectAction;
+public abstract class SpellBaseBolt extends Spell {
+	protected final Plugin mPlugin;
+	protected final LivingEntity mCaster;
+	protected final int mDelay;
+	protected final int mDuration;
+	protected final double mVelocity;
+	protected final double mDetectRange;
+	protected final double mHitboxRadius;
+	protected final boolean mSingleTarget;
+	protected final boolean mStopOnFirstHit;
+	protected final int mShots;
+	protected final int mRate;
 	private final @Nullable Predicate<Player> mPlayerFilter;
 
 	/**
-	 * @param plugin          The main plugin
-	 * @param caster          The mob casting the spell
-	 * @param delay           The chargeup timer;the time before the bolt is casted (in ticks)
-	 * @param duration        The duration of the bolt;how long it lasts (in ticks)
-	 * @param velocity        The velocity of the bolt
-	 * @param detectRange     The range in which a player has to be in in order for the spell to be charged and used
-	 * @param hitboxRadius    The radius of the hitbox
-	 * @param stopOnFirstHit  Whether to target a single player (Default is its current target, otherwise select at random)
-	 * @param shots           The amount of shots
-	 * @param rate            The rate of fire for shots
-	 * @param tickAction      The action to perform while charging the bolt
-	 * @param castAction      The action to perform when the bolt is casted
-	 * @param particleAction  The action the bolt performs while it travels
-	 * @param intersectAction The action the bolt performs when it intersects a block or player
-	 * @param playerFilter    A function to evaluate whether a player is a valid target (true) or not (false)
+	 * @param plugin         The main plugin
+	 * @param caster         The mob casting the spell
+	 * @param delay          The chargeup timer;the time before the bolt is casted (in ticks)
+	 * @param duration       The duration of the bolt;how long it lasts (in ticks)
+	 * @param velocity       The velocity of the bolt
+	 * @param detectRange    The range in which a player has to be in in order for the spell to be charged and used
+	 * @param hitboxRadius   The radius of the hitbox
+	 * @param stopOnFirstHit Whether to target a single player (Default is its current target, otherwise select at random)
+	 * @param shots          The amount of shots
+	 * @param rate           The rate of fire for shots
+	 * @param playerFilter   A function to evaluate whether a player is a valid target (true) or not (false)
 	 */
 	public SpellBaseBolt(Plugin plugin, LivingEntity caster, int delay, int duration, double velocity,
 	                     double detectRange, double hitboxRadius, boolean singleTarget, boolean stopOnFirstHit, int shots, int rate,
-	                     TickAction tickAction, CastAction castAction, ParticleAction particleAction, IntersectAction intersectAction, @Nullable Predicate<Player> playerFilter) {
+	                     @Nullable Predicate<Player> playerFilter) {
 		mPlugin = plugin;
 		mCaster = caster;
 		mDelay = delay;
@@ -118,23 +64,32 @@ public class SpellBaseBolt extends Spell {
 		mStopOnFirstHit = stopOnFirstHit;
 		mShots = shots;
 		mRate = rate;
-		mTickAction = tickAction;
-		mCastAction = castAction;
-		mParticleAction = particleAction;
-		mIntersectAction = intersectAction;
 		mPlayerFilter = playerFilter;
 	}
 
+	// The action to perform while charging the bolt
+	protected abstract void tickAction(Entity entity, int tick);
+
+	// The action to perform when the bolt is casted
+	protected abstract void castAction(Entity entity);
+
+	// The action the bolt performs while it travels
+	protected abstract void particleAction(Location loc);
+
+	// The action the bolt performs when it intersects a block or player
+	protected abstract void intersectAction(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc);
+
+
 	@Override
 	public void run() {
-		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, false).size() > 0) {
+		if (!PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, false).isEmpty()) {
 			new BukkitRunnable() {
 				int mTicks = 0;
 
 				@Override
 				public void run() {
 					mTicks++;
-					mTickAction.run(mCaster, mTicks);
+					tickAction(mCaster, mTicks);
 
 					if (mCaster.isDead() || EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster)) {
 						this.cancel();
@@ -171,7 +126,7 @@ public class SpellBaseBolt extends Spell {
 	}
 
 	private void launchBolt(Player player) {
-		mCastAction.run(mCaster);
+		castAction(mCaster);
 		new BukkitRunnable() {
 			int mTicks = 0;
 
@@ -186,7 +141,7 @@ public class SpellBaseBolt extends Spell {
 				}
 
 				new BukkitRunnable() {
-					BoundingBox mBox = BoundingBox.of(mCaster.getEyeLocation(), mHitboxRadius, mHitboxRadius, mHitboxRadius);
+					final BoundingBox mBox = BoundingBox.of(mCaster.getEyeLocation(), mHitboxRadius, mHitboxRadius, mHitboxRadius);
 					int mInnerTicks = 0;
 
 					@Override
@@ -198,7 +153,7 @@ public class SpellBaseBolt extends Spell {
 							Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
 							for (Player player : players) {
 								if (player.getBoundingBox().overlaps(mBox)) {
-									mIntersectAction.run(player, loc, false, prevLoc);
+									intersectAction(player, loc, false, prevLoc);
 									if (mStopOnFirstHit) {
 										this.cancel();
 										return;
@@ -208,12 +163,12 @@ public class SpellBaseBolt extends Spell {
 
 							if (loc.getBlock().getType().isSolid()) {
 								this.cancel();
-								mIntersectAction.run(null, loc, true, prevLoc);
+								intersectAction(null, loc, true, prevLoc);
 							}
 						}
 						Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
 						mInnerTicks++;
-						mParticleAction.run(loc);
+						particleAction(loc);
 
 						if (mInnerTicks >= mDuration || mCaster.isDead()) {
 							this.cancel();
@@ -232,7 +187,7 @@ public class SpellBaseBolt extends Spell {
 	/* If there are players in range of the attack, put it on cooldown. Otherwise, skip and move on*/
 	@Override
 	public int cooldownTicks() {
-		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, true).size() > 0) {
+		if (!PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, true).isEmpty()) {
 			return mDelay + (20 * 5);
 		} else {
 			return 1;

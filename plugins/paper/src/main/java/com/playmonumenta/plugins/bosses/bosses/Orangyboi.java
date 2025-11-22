@@ -5,10 +5,10 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellGenericCharge;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -33,16 +33,10 @@ public class Orangyboi extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		int hpDelta = 125;
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2;
-			playerCount--;
-		}
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
-		mBoss.setHealth(bossTargetHp);
+		final int baseHealth = 125;
+		final int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		final double bossHealth = baseHealth * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
+		EntityUtils.setMaxHealthAndHealth(mBoss, bossHealth);
 	}
 
 	@Override

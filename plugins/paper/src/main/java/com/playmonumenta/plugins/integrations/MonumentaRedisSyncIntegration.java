@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.LeaderboardAPI;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
@@ -20,6 +21,7 @@ import com.playmonumenta.redissync.event.PlayerTransferFailEvent;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
@@ -43,12 +45,42 @@ public class MonumentaRedisSyncIntegration implements Listener {
 	public static final ArgumentSuggestions<CommandSender> ALL_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings((info)
 		-> {
 		if (!mEnabled) {
-			return Bukkit.getOnlinePlayers().stream().map(Player::getName).toArray(String[]::new);
+			return Bukkit
+				.getOnlinePlayers()
+				.stream()
+				.filter((player)
+					-> !PremiumVanishIntegration.isInvisibleOrSpectator(player))
+				.map(Player::getName)
+				.toArray(String[]::new);
 		}
 		if (info.sender().hasPermission("monumenta.listoffline")) {
 			return MonumentaRedisSyncAPI.getAllCachedPlayerNames().toArray(String[]::new);
 		}
 		return RemotePlayerAPI.getVisiblePlayerNames().toArray(String[]::new);
+	});
+
+	public static final ArgumentSuggestions<CommandSender> ALL_OTHER_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings((info)
+		-> {
+		if (!mEnabled) {
+			return Bukkit.getOnlinePlayers()
+				.stream()
+				.filter((player)
+					-> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
+				.map(Player::getName)
+				.toArray(String[]::new);
+		}
+		if (info.sender().hasPermission("monumenta.listoffline")) {
+			return MonumentaRedisSyncAPI.getAllCachedPlayerNames()
+				.stream()
+				.filter((player)
+					-> !Objects.equals(player, info.sender().getName()))
+				.toArray(String[]::new);
+		}
+		return RemotePlayerAPI.getVisiblePlayerNames()
+			.stream()
+			.filter((player)
+				-> !Objects.equals(player, info.sender().getName()))
+			.toArray(String[]::new);
 	});
 
 	private final Plugin mPlugin;
@@ -60,6 +92,13 @@ public class MonumentaRedisSyncIntegration implements Listener {
 
 		mLogger.info("Enabling MonumentaRedisSync integration");
 		mEnabled = true;
+	}
+
+	public static String getServerDomain() {
+		if (mEnabled) {
+			return ConfigAPI.getServerDomain();
+		}
+		return "unknown";
 	}
 
 	public static boolean isPlayerTransferring(Player player) {

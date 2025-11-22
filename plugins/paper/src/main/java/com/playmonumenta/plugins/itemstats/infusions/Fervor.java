@@ -14,20 +14,14 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
-public class Fervor implements Infusion {
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
-	private static final int DURATION = 3 * 20;
-	private static final int BUFF_DURATION_THRESHOLD = 5 * 20;
+public class Fervor implements Infusion {
+	private static final int DURATION = TICKS_PER_SECOND * 3;
+	private static final int BUFF_DURATION_THRESHOLD = TICKS_PER_SECOND * 5;
 	public static final double PERCENT_DAMAGE_PER_LEVEL = 0.015;
 	private static final String PERCENT_DAMAGE_EFFECT_NAME = "FervorPercentDamageEffect";
-	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageEvent.DamageType.MELEE,
-		DamageEvent.DamageType.MELEE_ENCH,
-		DamageEvent.DamageType.MELEE_SKILL,
-		DamageEvent.DamageType.PROJECTILE,
-		DamageEvent.DamageType.PROJECTILE_SKILL,
-		DamageEvent.DamageType.MAGIC
-	);
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	@Override
 	public String getName() {
@@ -42,7 +36,7 @@ public class Fervor implements Infusion {
 	@Override
 	public void onCustomEffectApply(Plugin plugin, Player player, double value, CustomEffectApplyEvent event) {
 		Effect effect = event.getEffect();
-		if (effect.isBuff() && effect.getDuration() >= BUFF_DURATION_THRESHOLD) {
+		if (effect.isBuff() && effect.getDuration() >= BUFF_DURATION_THRESHOLD && !event.getSource().startsWith("PatronShrine")) {
 			Location playerLoc = player.getLocation().clone();
 			new PPLine(Particle.REDSTONE, playerLoc.clone().add(0, 1, 0).add(1, 1, 1), playerLoc.clone().add(0, 1, 0).add(-1, -1, -1))
 				.count(8)
@@ -62,7 +56,8 @@ public class Fervor implements Infusion {
 				.spawnAsPlayerActive(player);
 
 			double percentDamage = getDamageDealtMultiplier(value) - 1;
-			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new GearDamageIncrease(DURATION, percentDamage, AFFECTED_DAMAGE_TYPES));
+			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME,
+				new GearDamageIncrease(DURATION, percentDamage).damageTypes(AFFECTED_DAMAGE_TYPES));
 		}
 	}
 

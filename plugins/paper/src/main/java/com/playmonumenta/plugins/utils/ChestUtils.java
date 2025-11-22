@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelveLootTableGroup;
+import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.LootTableManager;
 import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -16,7 +18,6 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.TreeSet;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -40,21 +41,27 @@ import org.bukkit.loot.Lootable;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class ChestUtils {
 	public static final NamespacedKey NON_LOOT_LIMITED
 		= Objects.requireNonNull(NamespacedKey.fromString("monumenta:non_looting_limited"));
+	public static final String LOG_SCROLLS_PERMISSION = "monumenta.log.skrscrolls"; // dictates if SKR scrolls are logged or not when obtained
+	public static final boolean LOG_SCROLL_FRAGMENTS = false;
+
 	private static final double[] BONUS_ITEMS = {
-			0, // Dummy value, this is a player count indexed array
-			0.5,
-			1.7,
-			2.6,
-			3.3,
-			3.8,
-			4.2,
-			4.4,
-			4.5
+		0, // Dummy value, this is a player count indexed array
+		0.5,
+		1.7,
+		2.6,
+		3.3,
+		3.8,
+		4.2,
+		4.4,
+		4.5
 	};
+	private static final String CHEST_SOLO_LOOT_EFFECT_NAME = "LootboxSoloLootSlownessEffect";
 
 	private static boolean lootTableInventoryHasBonusRolls(Inventory inventory) {
 		if (!(inventory.getHolder() instanceof Lootable lootable)) {
@@ -68,24 +75,24 @@ public class ChestUtils {
 		return lootEntry != null && lootEntry.hasBonusRolls();
 	}
 
-	public static void generateContainerLootWithScaling(Player player, Block block) {
+	public static void generateContainerLootWithScaling(Player player, Block block, Plugin plugin) {
 		if (block.getState() instanceof Container container) {
 			Inventory inventory = container.getInventory();
 			if (inventory instanceof DoubleChestInventory doubleChest) {
 				boolean forceLootShare = lootTableInventoryHasBonusRolls(doubleChest.getLeftSide());
-				generateContainerLootWithScaling(player, doubleChest.getLeftSide());
-				generateContainerLootWithScaling(player, doubleChest.getRightSide(), forceLootShare);
+				generateContainerLootWithScaling(player, doubleChest.getLeftSide(), plugin);
+				generateContainerLootWithScaling(player, doubleChest.getRightSide(), forceLootShare, plugin);
 			} else {
-				generateContainerLootWithScaling(player, inventory);
+				generateContainerLootWithScaling(player, inventory, plugin);
 			}
 		}
 	}
 
-	private static void generateContainerLootWithScaling(Player player, Inventory inventory) {
-		generateContainerLootWithScaling(player, inventory, false);
+	private static void generateContainerLootWithScaling(Player player, Inventory inventory, Plugin plugin) {
+		generateContainerLootWithScaling(player, inventory, false, plugin);
 	}
 
-	private static void generateContainerLootWithScaling(Player player, Inventory inventory, boolean forceLootshare) {
+	private static void generateContainerLootWithScaling(Player player, Inventory inventory, boolean forceLootshare, Plugin plugin) {
 		if (!(inventory.getHolder() instanceof Lootable lootable)) {
 			return;
 		}
@@ -125,7 +132,7 @@ public class ChestUtils {
 			MMLog.fine("Lootable seed: " + lootable.getSeed());
 			// Loot table seed set and use the seed for number of players
 			if (lootable.getSeed() > 0 && lootable.getSeed() < 50) {
-				otherPlayersMultiplier = (int)lootable.getSeed();
+				otherPlayersMultiplier = (int) lootable.getSeed();
 				MMLog.fine("Chest loot was already generated due to a spawner being broken with seed " + otherPlayersMultiplier);
 			}
 
@@ -162,17 +169,31 @@ public class ChestUtils {
 		Set<String> noSharePlayers = new TreeSet<>();
 		// if lootbox isn't enabled for this shard or
 		// if the opener is the only player, don't bother trying to give them a lootshare
-		if (ServerProperties.getLootBoxEnabled() && !(nearbyPlayers.size() == 1 && nearbyPlayers.contains(player))) {
+		boolean useLootboxOnSelf = player.getScoreboardTags().contains("UseLootboxOnSelf")
+			&& LootboxManager.hasEpicLootbox(player.getInventory());
+		if (ServerProperties.getLootBoxEnabled() &&
+			!(nearbyPlayers.size() == 1 && nearbyPlayers.contains(player))) {
 			int bucketIdx = 0; // Start at 0
 			for (Player other : nearbyPlayers) {
-				if (other.getUniqueId().equals(player.getUniqueId())) {
-					// Don't give lootshare to self
+				//if not tagged, don't give lootshare to the opener
+				if (other.getUniqueId().equals(player.getUniqueId()) && !useLootboxOnSelf) {
 					itemsForOrigContainer.addAll(itemBuckets.get(bucketIdx));
 					bucketIdx++;
 					continue;
 				}
-				// otherwise give lootshare to other players
+				// otherwise give lootshare to players
 				@Nullable List<ItemStack> rejectedItems = LootboxManager.giveShareToPlayer(new ArrayList<>(itemBuckets.get(bucketIdx)), other);
+				// if tagged, close the chest
+				if (other.getUniqueId().equals(player.getUniqueId()) && useLootboxOnSelf) {
+					plugin.mEffectManager.addEffect(other, CHEST_SOLO_LOOT_EFFECT_NAME,
+						new PercentSpeed(30, -0.8, CHEST_SOLO_LOOT_EFFECT_NAME).displays(false));
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							player.closeInventory();
+						}
+					}.runTaskLater(Plugin.getInstance(), 1);
+				}
 				// rejectedItems will be null if player has no lootbox
 				// if rejectedItems is empty or has items, that means player has a lootbox
 				if (rejectedItems == null) {
@@ -209,8 +230,8 @@ public class ChestUtils {
 				noSharePlayerJoiner.add(noShare);
 			}
 			Component lootboxPlayers = Component.text(lootBoxPlayers.size()
-				+ " nearby player" + (lootBoxPlayers.size() == 1 ? "" : "s"),
-				NamedTextColor.GOLD)
+						+ " nearby player" + (lootBoxPlayers.size() == 1 ? "" : "s"),
+					NamedTextColor.GOLD)
 				.hoverEvent(Component.text(otherPlayersJoiner.toString()));
 
 			Component noSharePlayerComponent;
@@ -241,6 +262,24 @@ public class ChestUtils {
 			}
 		}
 
+		// Logger for SKR Scrolls
+		if (player.hasPermission(LOG_SCROLLS_PERMISSION)) {
+			int fragmentCount = 0;
+			for (ItemStack thisItem : popLoot) {
+				if (testForScroll(thisItem)) {
+					AuditListener.logPlayer("[Scroll Logger] Player " + player.getName() + " found a SKR Scroll (" + ItemUtils.getPlainNameIfExists(thisItem) + ") in a placed chest with loot table " + lootTable + ".");
+					break;
+				} else if (LOG_SCROLL_FRAGMENTS && InventoryUtils.testForItemWithName(thisItem, "Remnant", false) &&
+					thisItem.getType().name().contains("FLINT")) {
+					fragmentCount++;
+				}
+			}
+			if (fragmentCount >= 1) {
+				// Temp log for scroll fragments
+				AuditListener.logPlayer("[Scroll Fragment Logger] Player " + player.getName() + " found " + fragmentCount + " SKR scroll fragments in a placed chest with loot table " + lootTable + ".");
+			}
+		}
+
 		// Put the remainder of the loot in the original container
 		generateLootInventory(itemsForOrigContainer, inventory, player, true);
 
@@ -248,13 +287,19 @@ public class ChestUtils {
 		if (!Plugin.IS_PLAY_SERVER) {
 			player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.BLOCKS, 1, 1);
 			player.sendMessage(Component.text("Loot table rolled!", NamedTextColor.RED).decorate(TextDecoration.BOLD)
-				                   .append(Component.text(" (this message is only shown on the build server)", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+				.append(Component.text(" (this message is only shown on the build server)", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 		}
 	}
 
 	public static void generateLootInventory(Collection<ItemStack> populatedLoot, Inventory inventory, Player player, boolean randomlyDistribute) {
-		List<ItemStack> lootList = populatedLoot.stream()
+		// consolidation
+		Inventory tempFakeInventory = Bukkit.createInventory(null, 27);
+		for (ItemStack lootItem : populatedLoot) {
+			tempFakeInventory.addItem(lootItem);
+		}
+		List<ItemStack> lootList = Arrays.stream(tempFakeInventory.getContents())
 			.filter((item) -> item != null && !item.getType().isAir()).toList();
+		tempFakeInventory.clear();
 
 		List<Integer> freeSlots = new ArrayList<>(27);
 		for (int i = 0; i < 27; i++) {
@@ -268,7 +313,7 @@ public class ChestUtils {
 		ArrayDeque<Integer> slotsWithMultipleItems = new ArrayDeque<>();
 		boolean skrScrolls = false;
 		for (ItemStack lootItem : lootList) {
-			if (freeSlots.size() == 0) {
+			if (freeSlots.isEmpty()) {
 				Plugin.getInstance().getLogger().severe("Tried to overfill container for player " + player.getName() + " at inventory " + inventory.getType() + " at location " + player.getLocation());
 				player.sendMessage("Tried to overfill this container! Please report this");
 				break;
@@ -276,8 +321,7 @@ public class ChestUtils {
 			int slot = freeSlots.remove(0);
 			inventory.setItem(slot, lootItem);
 			if (!skrScrolls) {
-				if ((InventoryUtils.testForItemWithName(lootItem, "Remnant Scroll -=- Combat", false) && lootItem.getType().equals(Material.WARD_ARMOR_TRIM_SMITHING_TEMPLATE))
-					|| (InventoryUtils.testForItemWithName(lootItem, "Remnant Scroll -=- Puzzle", false) && lootItem.getType().equals(Material.VEX_ARMOR_TRIM_SMITHING_TEMPLATE))) {
+				if (testForScroll(lootItem)) {
 					skrScrolls = true; // SKR Scroll found, alert the player later!
 				}
 			}
@@ -290,7 +334,7 @@ public class ChestUtils {
 			}
 		}
 
-		while (randomlyDistribute && freeSlots.size() > 1 && slotsWithMultipleItems.size() > 0) {
+		while (randomlyDistribute && freeSlots.size() > 1 && !slotsWithMultipleItems.isEmpty()) {
 			int splitSlot = slotsWithMultipleItems.remove();
 			int slot = freeSlots.remove(0);
 
@@ -304,8 +348,8 @@ public class ChestUtils {
 
 			if (MMLog.isLevelEnabled(Level.FINER)) {
 				MMLog.finer("generateLootInventory: Splitting item type " + toSplitItem.getType() +
-				            " with count " + toSplitItem.getAmount() + " in slot " + splitSlot +
-							" into count " + amountRemaining + " and " + amountToSplit + " in slot " + slot);
+					" with count " + toSplitItem.getAmount() + " in slot " + splitSlot +
+					" into count " + amountRemaining + " and " + amountToSplit + " in slot " + slot);
 			}
 
 			toSplitItem.setAmount(amountRemaining);
@@ -315,7 +359,7 @@ public class ChestUtils {
 			if (amountToSplit > 1) {
 				MMLog.finer("generateLootInventory: Adding slot " + slot + " to multiple items list");
 				slotsWithMultipleItems.add(slot);
-		    }
+			}
 			if (amountRemaining > 1) {
 				MMLog.finer("generateLootInventory: Adding slot " + splitSlot + " to multiple items list");
 				slotsWithMultipleItems.add(splitSlot);
@@ -327,9 +371,15 @@ public class ChestUtils {
 		}
 	}
 
+	// Test for an SKR Scroll
+	public static boolean testForScroll(ItemStack item) {
+		return (InventoryUtils.testForItemWithName(item, "Remnant Scroll", false) &&
+			item.getType().name().contains("SMITHING_TEMPLATE"));
+	}
+
 	public static boolean isUnscaledChest(Block block) {
 		return block.getState() instanceof Chest chest && chest.getLootTable() != null &&
-			       chest.getSeed() == 0 && isChestBlockEmpty(chest);
+			chest.getSeed() == 0 && isChestBlockEmpty(chest);
 	}
 
 	public static boolean isAstrableChest(Chest chest) {
@@ -361,15 +411,19 @@ public class ChestUtils {
 	public static boolean isChestWithLootTable(Block block) {
 		Material type = block.getType();
 		return (type == Material.CHEST || type == Material.TRAPPED_CHEST)
-			       && block.getState() instanceof Chest chest
-			       && (chest.hasLootTable() || (chest.getInventory() instanceof DoubleChestInventory doubleChestInventory
-				                                    && (((Chest) doubleChestInventory.getLeftSide().getHolder()).hasLootTable() || ((Chest) doubleChestInventory.getRightSide().getHolder()).hasLootTable())));
+			&& block.getState() instanceof Chest chest
+			&& (chest.hasLootTable() || (chest.getInventory() instanceof DoubleChestInventory doubleChestInventory
+			&& (((Chest) doubleChestInventory.getLeftSide().getHolder()).hasLootTable() || ((Chest) doubleChestInventory.getRightSide().getHolder()).hasLootTable())));
 	}
 
-	public static ItemStack giveChestWithLootTable(String lootTable, String chestName, String chestNameColor, List<Component> lore) {
+	public static ItemStack giveChestWithLootTable(String lootTable, String chestName, @Nullable String chestNameColor, List<Component> lore) {
 		ItemStack chest = new ItemStack(Material.CHEST);
 		if (chest.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof Chest chestMeta) {
-			blockMeta.displayName(Component.text(chestName).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true).color(TextColor.fromHexString(chestNameColor)));
+			Component name = Component.text(chestName).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true);
+			if (chestNameColor != null) {
+				name = name.color(TextColor.fromHexString(chestNameColor));
+			}
+			blockMeta.displayName(name);
 			chestMeta.setLootTable(Bukkit.getLootTable(NamespacedKey.fromString(lootTable)));
 			blockMeta.setBlockState(chestMeta);
 			blockMeta.lore(lore);

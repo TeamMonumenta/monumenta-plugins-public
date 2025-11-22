@@ -29,10 +29,11 @@ public enum ItemType {
 		if (ItemStatUtils.isCharm(item)) {
 			return CHARM;
 		} else if (item.getType() == Material.SHIELD) {
-				return SHIELD;
+			return SHIELD;
 		} else if (ItemUtils.isArmorOrWearable(item)) {
 			return switch (ItemUtils.getEquipmentSlot(item)) {
-				case HEAD -> (ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND) || ItemStatUtils.hasEnchantments(item) ? HELMET : MISC);
+				case HEAD ->
+					(ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND) || ItemStatUtils.hasEnchantments(item) ? HELMET : MISC);
 				case CHEST -> CHESTPLATE;
 				case LEGS -> LEGGINGS;
 				case FEET -> BOOTS;

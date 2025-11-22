@@ -142,6 +142,7 @@ public class Excavator implements Enchantment {
 		Material.CHEST,
 		Material.TRAPPED_CHEST,
 		Material.BARREL,
+		Material.ENCHANTING_TABLE,
 		Material.WATER,
 		Material.LAVA
 	);
@@ -169,10 +170,6 @@ public class Excavator implements Enchantment {
 			return false;
 		}
 
-		if (!ZoneUtils.playerCanMineBlock(player, block)) {
-			return false;
-		}
-
-		return true;
+		return ZoneUtils.playerCanMineBlock(player, block);
 	}
 }

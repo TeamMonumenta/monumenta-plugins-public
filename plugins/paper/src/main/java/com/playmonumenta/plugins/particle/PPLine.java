@@ -204,6 +204,7 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 				int mT = 1;
 				int mI = 1;
 				int mSafety = 0;
+
 				@Override
 				public void run() {
 					try {

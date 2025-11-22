@@ -2,12 +2,15 @@ package com.playmonumenta.plugins.utils;
 
 import com.destroystokyo.paper.MaterialSetTag;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,7 +31,11 @@ import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockUtils {
-	private static final Set<Material> ALT_WATER_SOURCES = Set.of(
+	private static Set<Material> of(Material first, Material... materials) {
+		return Collections.unmodifiableSet(EnumSet.of(first, materials));
+	}
+
+	private static final Set<Material> ALT_WATER_SOURCES = of(
 		Material.BUBBLE_COLUMN,
 		Material.KELP,
 		Material.KELP_PLANT,
@@ -36,7 +43,7 @@ public class BlockUtils {
 		Material.TALL_SEAGRASS
 	);
 
-	private static final EnumSet<Material> MECHANICAL_BLOCKS = EnumSet.of(
+	private static final Set<Material> MECHANICAL_BLOCKS = of(
 		Material.AIR,
 		Material.CAVE_AIR,
 		Material.VOID_AIR,
@@ -53,7 +60,7 @@ public class BlockUtils {
 		Material.END_PORTAL
 	);
 
-	private static final EnumSet<Material> ENV_HAZARDS_FOR_MOBS = EnumSet.of(
+	private static final Set<Material> ENV_HAZARDS_FOR_MOBS = of(
 		Material.COBWEB,
 		Material.SLIME_BLOCK,
 		Material.HONEY_BLOCK,
@@ -66,7 +73,7 @@ public class BlockUtils {
 		Material.END_ROD
 	);
 
-	public static final EnumSet<Material> VALUABLES = EnumSet.of(
+	public static final Set<Material> VALUABLES = of(
 		Material.SHULKER_BOX,
 		Material.BLACK_SHULKER_BOX,
 		Material.BLUE_SHULKER_BOX,
@@ -127,7 +134,7 @@ public class BlockUtils {
 		Material.DAMAGED_ANVIL
 	);
 
-	public static final EnumSet<Material> CONTAINERS = EnumSet.of(
+	public static final Set<Material> CONTAINERS = of(
 		Material.SHULKER_BOX,
 		Material.BLACK_SHULKER_BOX,
 		Material.BLUE_SHULKER_BOX,
@@ -163,10 +170,306 @@ public class BlockUtils {
 		Material.LECTERN
 	);
 
-	public static final EnumSet<Material> TORCHES = EnumSet.of(
+	public static final Set<Material> TORCHES = of(
 		Material.TORCH,
 		Material.WALL_TORCH
 	);
+
+	/**
+	 * Replaces {@link Material#isInteractable()} as it is deprecated.
+	 * <p>
+	 * TODO: maybe replace these with tags.
+	 *
+	 * @see Material#isInteractable()
+	 */
+	@SuppressWarnings({"deprecation", "UnstableApiUsage"})
+	public static final Set<Material> INTERACTABLE = of(
+		Material.ACACIA_BUTTON,
+		Material.ACACIA_DOOR,
+		Material.ACACIA_FENCE,
+		Material.ACACIA_FENCE_GATE,
+		Material.ACACIA_HANGING_SIGN,
+		Material.ACACIA_SIGN,
+		Material.ACACIA_TRAPDOOR,
+		Material.ACACIA_WALL_HANGING_SIGN,
+		Material.ACACIA_WALL_SIGN,
+		Material.ANVIL,
+		Material.BAMBOO_BUTTON,
+		Material.BAMBOO_DOOR,
+		Material.BAMBOO_FENCE,
+		Material.BAMBOO_FENCE_GATE,
+		Material.BAMBOO_HANGING_SIGN,
+		Material.BAMBOO_SIGN,
+		Material.BAMBOO_TRAPDOOR,
+		Material.BAMBOO_WALL_HANGING_SIGN,
+		Material.BAMBOO_WALL_SIGN,
+		Material.BARREL,
+		Material.BEACON,
+		Material.BEEHIVE,
+		Material.BEE_NEST,
+		Material.BELL,
+		Material.BIRCH_BUTTON,
+		Material.BIRCH_DOOR,
+		Material.BIRCH_FENCE,
+		Material.BIRCH_FENCE_GATE,
+		Material.BIRCH_HANGING_SIGN,
+		Material.BIRCH_SIGN,
+		Material.BIRCH_TRAPDOOR,
+		Material.BIRCH_WALL_HANGING_SIGN,
+		Material.BIRCH_WALL_SIGN,
+		Material.BLACK_BED,
+		Material.BLACK_CANDLE,
+		Material.BLACK_CANDLE_CAKE,
+		Material.BLACK_SHULKER_BOX,
+		Material.BLAST_FURNACE,
+		Material.BLUE_BED,
+		Material.BLUE_CANDLE,
+		Material.BLUE_CANDLE_CAKE,
+		Material.BLUE_SHULKER_BOX,
+		Material.BREWING_STAND,
+		Material.BROWN_BED,
+		Material.BROWN_CANDLE,
+		Material.BROWN_CANDLE_CAKE,
+		Material.BROWN_SHULKER_BOX,
+		Material.CAKE,
+		Material.CAMPFIRE,
+		Material.CANDLE,
+		Material.CANDLE_CAKE,
+		Material.CARTOGRAPHY_TABLE,
+		Material.CAULDRON,
+		Material.CAVE_VINES,
+		Material.CAVE_VINES_PLANT,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.CHERRY_BUTTON,
+		Material.CHERRY_DOOR,
+		Material.CHERRY_FENCE,
+		Material.CHERRY_FENCE_GATE,
+		Material.CHERRY_HANGING_SIGN,
+		Material.CHERRY_SIGN,
+		Material.CHERRY_TRAPDOOR,
+		Material.CHERRY_WALL_HANGING_SIGN,
+		Material.CHERRY_WALL_SIGN,
+		Material.CHEST,
+		Material.CHIPPED_ANVIL,
+		Material.CHISELED_BOOKSHELF,
+		Material.COMMAND_BLOCK,
+		Material.COMPARATOR,
+		Material.COMPOSTER,
+		Material.COPPER_DOOR,
+		Material.COPPER_TRAPDOOR,
+		Material.CRAFTER,
+		Material.CRAFTING_TABLE,
+		Material.CRIMSON_BUTTON,
+		Material.CRIMSON_DOOR,
+		Material.CRIMSON_FENCE,
+		Material.CRIMSON_FENCE_GATE,
+		Material.CRIMSON_HANGING_SIGN,
+		Material.CRIMSON_SIGN,
+		Material.CRIMSON_TRAPDOOR,
+		Material.CRIMSON_WALL_HANGING_SIGN,
+		Material.CRIMSON_WALL_SIGN,
+		Material.CYAN_BED,
+		Material.CYAN_CANDLE,
+		Material.CYAN_CANDLE_CAKE,
+		Material.CYAN_SHULKER_BOX,
+		Material.DAMAGED_ANVIL,
+		Material.DARK_OAK_BUTTON,
+		Material.DARK_OAK_DOOR,
+		Material.DARK_OAK_FENCE,
+		Material.DARK_OAK_FENCE_GATE,
+		Material.DARK_OAK_HANGING_SIGN,
+		Material.DARK_OAK_SIGN,
+		Material.DARK_OAK_TRAPDOOR,
+		Material.DARK_OAK_WALL_HANGING_SIGN,
+		Material.DARK_OAK_WALL_SIGN,
+		Material.DAYLIGHT_DETECTOR,
+		Material.DECORATED_POT,
+		Material.DEEPSLATE_REDSTONE_ORE,
+		Material.DISPENSER,
+		Material.DRAGON_EGG,
+		Material.DROPPER,
+		Material.ENCHANTING_TABLE,
+		Material.ENDER_CHEST,
+		Material.EXPOSED_COPPER_DOOR,
+		Material.EXPOSED_COPPER_TRAPDOOR,
+		Material.FLETCHING_TABLE,
+		Material.FLOWER_POT,
+		Material.FURNACE,
+		Material.GRAY_BED,
+		Material.GRAY_CANDLE,
+		Material.GRAY_CANDLE_CAKE,
+		Material.GRAY_SHULKER_BOX,
+		Material.GREEN_BED,
+		Material.GREEN_CANDLE,
+		Material.GREEN_CANDLE_CAKE,
+		Material.GREEN_SHULKER_BOX,
+		Material.GRINDSTONE,
+		Material.HOPPER,
+		Material.IRON_DOOR,
+		Material.IRON_TRAPDOOR,
+		Material.JIGSAW,
+		Material.JUKEBOX,
+		Material.JUNGLE_BUTTON,
+		Material.JUNGLE_DOOR,
+		Material.JUNGLE_FENCE,
+		Material.JUNGLE_FENCE_GATE,
+		Material.JUNGLE_HANGING_SIGN,
+		Material.JUNGLE_SIGN,
+		Material.JUNGLE_TRAPDOOR,
+		Material.JUNGLE_WALL_HANGING_SIGN,
+		Material.JUNGLE_WALL_SIGN,
+		Material.LAVA_CAULDRON,
+		Material.LECTERN,
+		Material.LEVER,
+		Material.LIGHT,
+		Material.LIGHT_BLUE_BED,
+		Material.LIGHT_BLUE_CANDLE,
+		Material.LIGHT_BLUE_CANDLE_CAKE,
+		Material.LIGHT_BLUE_SHULKER_BOX,
+		Material.LIGHT_GRAY_BED,
+		Material.LIGHT_GRAY_CANDLE,
+		Material.LIGHT_GRAY_CANDLE_CAKE,
+		Material.LIGHT_GRAY_SHULKER_BOX,
+		Material.LIME_BED,
+		Material.LIME_CANDLE,
+		Material.LIME_CANDLE_CAKE,
+		Material.LIME_SHULKER_BOX,
+		Material.LOOM,
+		Material.MAGENTA_BED,
+		Material.MAGENTA_CANDLE,
+		Material.MAGENTA_CANDLE_CAKE,
+		Material.MAGENTA_SHULKER_BOX,
+		Material.MANGROVE_BUTTON,
+		Material.MANGROVE_DOOR,
+		Material.MANGROVE_FENCE,
+		Material.MANGROVE_FENCE_GATE,
+		Material.MANGROVE_HANGING_SIGN,
+		Material.MANGROVE_SIGN,
+		Material.MANGROVE_TRAPDOOR,
+		Material.MANGROVE_WALL_HANGING_SIGN,
+		Material.MANGROVE_WALL_SIGN,
+		Material.MOVING_PISTON,
+		Material.NETHER_BRICK_FENCE,
+		Material.NOTE_BLOCK,
+		Material.OAK_BUTTON,
+		Material.OAK_DOOR,
+		Material.OAK_FENCE,
+		Material.OAK_FENCE_GATE,
+		Material.OAK_HANGING_SIGN,
+		Material.OAK_SIGN,
+		Material.OAK_TRAPDOOR,
+		Material.OAK_WALL_HANGING_SIGN,
+		Material.OAK_WALL_SIGN,
+		Material.ORANGE_BED,
+		Material.ORANGE_CANDLE,
+		Material.ORANGE_CANDLE_CAKE,
+		Material.ORANGE_SHULKER_BOX,
+		Material.OXIDIZED_COPPER_DOOR,
+		Material.OXIDIZED_COPPER_TRAPDOOR,
+		Material.PINK_BED,
+		Material.PINK_CANDLE,
+		Material.PINK_CANDLE_CAKE,
+		Material.PINK_SHULKER_BOX,
+		Material.POLISHED_BLACKSTONE_BUTTON,
+		Material.POTTED_ACACIA_SAPLING,
+		Material.POTTED_ALLIUM,
+		Material.POTTED_AZALEA_BUSH,
+		Material.POTTED_AZURE_BLUET,
+		Material.POTTED_BAMBOO,
+		Material.POTTED_BIRCH_SAPLING,
+		Material.POTTED_BLUE_ORCHID,
+		Material.POTTED_BROWN_MUSHROOM,
+		Material.POTTED_CACTUS,
+		Material.POTTED_CHERRY_SAPLING,
+		Material.POTTED_CORNFLOWER,
+		Material.POTTED_CRIMSON_FUNGUS,
+		Material.POTTED_CRIMSON_ROOTS,
+		Material.POTTED_DANDELION,
+		Material.POTTED_DARK_OAK_SAPLING,
+		Material.POTTED_DEAD_BUSH,
+		Material.POTTED_FERN,
+		Material.POTTED_FLOWERING_AZALEA_BUSH,
+		Material.POTTED_JUNGLE_SAPLING,
+		Material.POTTED_LILY_OF_THE_VALLEY,
+		Material.POTTED_MANGROVE_PROPAGULE,
+		Material.POTTED_OAK_SAPLING,
+		Material.POTTED_ORANGE_TULIP,
+		Material.POTTED_OXEYE_DAISY,
+		Material.POTTED_PINK_TULIP,
+		Material.POTTED_POPPY,
+		Material.POTTED_RED_MUSHROOM,
+		Material.POTTED_RED_TULIP,
+		Material.POTTED_SPRUCE_SAPLING,
+		Material.POTTED_TORCHFLOWER,
+		Material.POTTED_WARPED_FUNGUS,
+		Material.POTTED_WARPED_ROOTS,
+		Material.POTTED_WHITE_TULIP,
+		Material.POTTED_WITHER_ROSE,
+		Material.POWDER_SNOW_CAULDRON,
+		Material.PUMPKIN,
+		Material.PURPLE_BED,
+		Material.PURPLE_CANDLE,
+		Material.PURPLE_CANDLE_CAKE,
+		Material.PURPLE_SHULKER_BOX,
+		Material.REDSTONE_ORE,
+		Material.REDSTONE_WIRE,
+		Material.RED_BED,
+		Material.RED_CANDLE,
+		Material.RED_CANDLE_CAKE,
+		Material.RED_SHULKER_BOX,
+		Material.REPEATER,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.RESPAWN_ANCHOR,
+		Material.SHULKER_BOX,
+		Material.SMITHING_TABLE,
+		Material.SMOKER,
+		Material.SOUL_CAMPFIRE,
+		Material.SPRUCE_BUTTON,
+		Material.SPRUCE_DOOR,
+		Material.SPRUCE_FENCE,
+		Material.SPRUCE_FENCE_GATE,
+		Material.SPRUCE_HANGING_SIGN,
+		Material.SPRUCE_SIGN,
+		Material.SPRUCE_TRAPDOOR,
+		Material.SPRUCE_WALL_HANGING_SIGN,
+		Material.SPRUCE_WALL_SIGN,
+		Material.STONECUTTER,
+		Material.STONE_BUTTON,
+		Material.STRUCTURE_BLOCK,
+		Material.SWEET_BERRY_BUSH,
+		Material.TNT,
+		Material.TRAPPED_CHEST,
+		Material.WARPED_BUTTON,
+		Material.WARPED_DOOR,
+		Material.WARPED_FENCE,
+		Material.WARPED_FENCE_GATE,
+		Material.WARPED_HANGING_SIGN,
+		Material.WARPED_SIGN,
+		Material.WARPED_TRAPDOOR,
+		Material.WARPED_WALL_HANGING_SIGN,
+		Material.WARPED_WALL_SIGN,
+		Material.WATER_CAULDRON,
+		Material.WAXED_COPPER_DOOR,
+		Material.WAXED_COPPER_TRAPDOOR,
+		Material.WAXED_EXPOSED_COPPER_DOOR,
+		Material.WAXED_EXPOSED_COPPER_TRAPDOOR,
+		Material.WAXED_OXIDIZED_COPPER_DOOR,
+		Material.WAXED_OXIDIZED_COPPER_TRAPDOOR,
+		Material.WAXED_WEATHERED_COPPER_DOOR,
+		Material.WAXED_WEATHERED_COPPER_TRAPDOOR,
+		Material.WEATHERED_COPPER_DOOR,
+		Material.WEATHERED_COPPER_TRAPDOOR,
+		Material.WHITE_BED,
+		Material.WHITE_CANDLE,
+		Material.WHITE_CANDLE_CAKE,
+		Material.WHITE_SHULKER_BOX,
+		Material.YELLOW_BED,
+		Material.YELLOW_CANDLE,
+		Material.YELLOW_CANDLE_CAKE,
+		Material.YELLOW_SHULKER_BOX
+	);
+
+	public static final Set<BlockFace> CARTESIAN_BLOCK_FACES = Arrays.stream(BlockFace.values()).filter(BlockFace::isCartesian).collect(Collectors.toSet());
 
 	public static boolean isLosBlockingBlock(Block block) {
 		return isLosBlockingBlock(block.getType());
@@ -186,8 +489,8 @@ public class BlockUtils {
 
 	public static boolean isWaterlogged(BlockState block) {
 		BlockData data = block.getBlockData();
-		if (data instanceof Waterlogged) {
-			return ((Waterlogged) data).isWaterlogged();
+		if (data instanceof Waterlogged waterlogged) {
+			return waterlogged.isWaterlogged();
 		}
 		return false;
 	}
@@ -202,6 +505,7 @@ public class BlockUtils {
 
 	/**
 	 * Special list of blocks that mobs either cannot jump or pathfind over
+	 *
 	 * @param blockData BlockData of a block to test
 	 * @return True if a mob cannot jump or pathfind over the block
 	 */
@@ -271,6 +575,10 @@ public class BlockUtils {
 		return MaterialSetTag.CLIMBABLE.isTagged(material);
 	}
 
+	public static boolean isBouncy(Material material) {
+		return MaterialSetTag.BEDS.isTagged(material) || Material.SLIME_BLOCK.equals(material);
+	}
+
 	public static boolean canBeBroken(Block block) {
 		if (block.getType().getHardness() == -1.0F) {
 			return false;
@@ -303,6 +611,15 @@ public class BlockUtils {
 
 	public static int taxiCabDistance(Block block1, Block block2) {
 		return Math.abs(block2.getX() - block1.getX()) + Math.abs(block2.getY() - block1.getY()) + Math.abs(block2.getZ() - block1.getZ());
+	}
+
+	public static boolean isExposed(Block block) {
+		return !block.getRelative(BlockFace.UP).isSolid()
+			|| !block.getRelative(BlockFace.DOWN).isSolid()
+			|| !block.getRelative(BlockFace.NORTH).isSolid()
+			|| !block.getRelative(BlockFace.SOUTH).isSolid()
+			|| !block.getRelative(BlockFace.EAST).isSolid()
+			|| !block.getRelative(BlockFace.WEST).isSolid();
 	}
 
 	private static class Node {
@@ -374,7 +691,7 @@ public class BlockUtils {
 		return -1;
 	}
 
-	public static List<Block> getBlocksInCylinder(Location loc, double radius) {
+	public static List<Block> getBlocksInSphere(Location loc, double radius) {
 		World world = loc.getWorld();
 		double bx = loc.getX();
 		double by = loc.getY();
@@ -383,7 +700,7 @@ public class BlockUtils {
 		for (double x = bx - radius; x <= bx + radius; x++) {
 			for (double y = by - radius; y <= by + radius; y++) {
 				for (double z = bz - radius; z <= bz + radius; z++) {
-					Location check = new Location(world, x, by, z);
+					Location check = new Location(world, x, y, z);
 					if (check.distance(loc) <= radius) {
 						blocks.add(check.getBlock());
 					}
@@ -393,9 +710,29 @@ public class BlockUtils {
 		return blocks;
 	}
 
+	public static List<Block> getBlocksInCylinder(Location loc, double radius, double height) {
+		World world = loc.getWorld();
+		double bx = loc.getX();
+		double by = loc.getY();
+		double bz = loc.getZ();
+		List<Block> blocks = new ArrayList<>();
+		for (double x = bx - radius; x <= bx + radius; x++) {
+			for (double z = bz - height; z <= bz + radius; z++) {
+				Vector check = new Vector(x, by, z);
+				if (check.distance(loc.toVector()) <= radius) {
+					for (double y = by - height / 2; y <= by + height / 2; y++) {
+						blocks.add(new Location(world, x, y, z).getBlock());
+					}
+				}
+			}
+		}
+		return blocks;
+	}
+
 	/**
 	 * Gets blocks in a cube around a central block
-	 * @param loc Center of cube
+	 *
+	 * @param loc    Center of cube
 	 * @param radius Distance around center to check (it's not really a radius because cube but whatever)
 	 * @return List of blocks around center
 	 */

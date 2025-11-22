@@ -31,6 +31,7 @@ public class LootingLimiter implements Listener {
 
 	public static final String SPAWNERS_SCORE = "LootingLimiterSpawners";
 	public static final String KILLS_SCORE = "LootingLimiterKills";
+	public static final String DEBUG_PERMISSION = "monumenta.lootlimiter.debug";
 
 	private static final int MAX_BANKED_CHESTS = 4;
 
@@ -69,8 +70,21 @@ public class LootingLimiter implements Listener {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			return;
 		}
+		if (player.hasPermission(DEBUG_PERMISSION)) {
+			player.sendMessage("LootingLimiter spawnerBreak");
+			player.sendMessage("    beforeSpawnerScore="
+				+ ScoreboardUtils.getScoreboardValue(player, SPAWNERS_SCORE).orElse(0));
+		}
 		ScoreboardUtils.setScoreboardValue(player, SPAWNERS_SCORE,
 			Math.min(ScoreboardUtils.getScoreboardValue(player, SPAWNERS_SCORE).orElse(0) + 1, MAX_BANKED_CHESTS * ServerProperties.getLootingLimiterSpawners()));
+		if (player.hasPermission(DEBUG_PERMISSION)) {
+			player.sendMessage("    spawnerScore="
+				+ ScoreboardUtils.getScoreboardValue(player, SPAWNERS_SCORE).orElse(0));
+			if (ScoreboardUtils.getScoreboardValue(player, SPAWNERS_SCORE).orElse(0)
+				== MAX_BANKED_CHESTS * ServerProperties.getLootingLimiterSpawners()) {
+				player.sendMessage("    player has hit limit for spawnerBreak");
+			}
+		}
 	}
 
 	// mob kills
@@ -82,7 +96,7 @@ public class LootingLimiter implements Listener {
 		}
 		LivingEntity entity = event.getEntity();
 		if (!EntityUtils.isHostileMob(entity)
-			    || entity.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
+			|| entity.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
 			return;
 		}
 		Player player = entity.getKiller();
@@ -90,8 +104,22 @@ public class LootingLimiter implements Listener {
 			return;
 		}
 		int score = EntityUtils.isBoss(entity) ? 5 : EntityUtils.isElite(entity) ? 3 : 1;
+		if (player.hasPermission(DEBUG_PERMISSION)) {
+			player.sendMessage("LootingLimiter mobKill");
+			player.sendMessage("    beforeKillScore="
+				+ ScoreboardUtils.getScoreboardValue(player, KILLS_SCORE).orElse(0));
+		}
 		ScoreboardUtils.setScoreboardValue(player, KILLS_SCORE,
 			Math.min(ScoreboardUtils.getScoreboardValue(player, KILLS_SCORE).orElse(0) + score, MAX_BANKED_CHESTS * ServerProperties.getLootingLimiterMobKills()));
+		if (player.hasPermission(DEBUG_PERMISSION)) {
+			player.sendMessage("    scoreForKill=" + score);
+			player.sendMessage("    killScore="
+				+ ScoreboardUtils.getScoreboardValue(player, KILLS_SCORE).orElse(0));
+			if (ScoreboardUtils.getScoreboardValue(player, KILLS_SCORE).orElse(0)
+				== MAX_BANKED_CHESTS * ServerProperties.getLootingLimiterMobKills()) {
+				player.sendMessage("    player has hit limit for mobKills");
+			}
+		}
 	}
 
 	// Chest place event (ignore loot chests the player places, ie from boss loot)
@@ -122,7 +150,7 @@ public class LootingLimiter implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockBreakEventEarly(BlockBreakEvent event) {
 		if ((ServerProperties.getLootingLimiterSpawners() <= 0 && ServerProperties.getLootingLimiterMobKills() <= 0)
-			    || ServerProperties.getLootingLimiterIgnoreBreakingChests()) {
+			|| ServerProperties.getLootingLimiterIgnoreBreakingChests()) {
 			return;
 		}
 		if (!checkChest(event.getBlock(), event.getPlayer())) {
@@ -133,8 +161,8 @@ public class LootingLimiter implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (event.useInteractedBlock() == Event.Result.DENY
-			    || event.getAction() != Action.RIGHT_CLICK_BLOCK
-			    || (ServerProperties.getLootingLimiterSpawners() <= 0 && ServerProperties.getLootingLimiterMobKills() <= 0)) {
+			|| event.getAction() != Action.RIGHT_CLICK_BLOCK
+			|| (ServerProperties.getLootingLimiterSpawners() <= 0 && ServerProperties.getLootingLimiterMobKills() <= 0)) {
 			return;
 		}
 		Block block = event.getClickedBlock();
@@ -166,16 +194,37 @@ public class LootingLimiter implements Listener {
 				players.add(0, player);
 			}
 			boolean hasMobs = !EntityUtils.getNearbyMobs(block.getLocation(), MOB_AND_SPAWNER_SEARCH_RADIUS).isEmpty();
-			boolean hasSpawners = EntityUtils.hasTileEntityInRange(block.getLocation(), MOB_AND_SPAWNER_SEARCH_RADIUS, b -> b.getType() == Material.SPAWNER);
+			boolean hasSpawners = EntityUtils.hasTileEntityInRange(block.getLocation(), MOB_AND_SPAWNER_SEARCH_RADIUS, b -> b.getType() == Material.SPAWNER
+				&& b.getLocation().add(0, -1, 0).getBlock().getType() != Material.BEDROCK);
 			if (hasMobs && players.stream().mapToInt(p -> ScoreboardUtils.getScoreboardValue(p, KILLS_SCORE).orElse(0)).sum() < ServerProperties.getLootingLimiterMobKills()) {
 				if (player != null) {
 					player.sendActionBar(Component.text("The enemies protecting the chest won't let you open it.", NamedTextColor.RED));
+					if (player.hasPermission(DEBUG_PERMISSION)) {
+						player.sendMessage("LL blockedByKills: kills sum="
+							+ players.stream().mapToInt(p -> ScoreboardUtils.getScoreboardValue(p, KILLS_SCORE)
+							.orElse(0)).sum());
+						player.sendMessage("    requiredKills=" + ServerProperties.getLootingLimiterMobKills());
+						for (Player p : players) {
+							player.sendMessage("    " + p.getName() + " kills="
+								+ ScoreboardUtils.getScoreboardValue(p, KILLS_SCORE).orElse(0));
+						}
+					}
 				}
 				return false;
 			}
 			if (hasSpawners && players.stream().mapToInt(p -> ScoreboardUtils.getScoreboardValue(p, SPAWNERS_SCORE).orElse(0)).sum() < ServerProperties.getLootingLimiterSpawners()) {
 				if (player != null) {
 					player.sendActionBar(Component.text("Nearby spawners should be broken before searching this chest.", NamedTextColor.RED));
+					if (player.hasPermission(DEBUG_PERMISSION)) {
+						player.sendMessage("LL: blockedBySpawners spawnerBreaks sum="
+							+ players.stream().mapToInt(p -> ScoreboardUtils.getScoreboardValue(p, SPAWNERS_SCORE)
+							.orElse(0)).sum());
+						player.sendMessage("    requiredSpawners=" + ServerProperties.getLootingLimiterSpawners());
+						for (Player p : players) {
+							player.sendMessage("    " + p.getName() + " spawners="
+								+ ScoreboardUtils.getScoreboardValue(p, SPAWNERS_SCORE).orElse(0));
+						}
+					}
 				}
 				return false;
 			}
@@ -203,6 +252,15 @@ public class LootingLimiter implements Listener {
 						remaining -= playerScore;
 						ScoreboardUtils.setScoreboardValue(p, SPAWNERS_SCORE, 0);
 					}
+				}
+			}
+			if (player != null && player.hasPermission(DEBUG_PERMISSION)) {
+				player.sendMessage("LL: chestOpened");
+				for (Player p : players) {
+					player.sendMessage("    " + p.getName() + " spawners="
+						+ ScoreboardUtils.getScoreboardValue(p, SPAWNERS_SCORE).orElse(0));
+					player.sendMessage("    " + p.getName() + " kills="
+						+ ScoreboardUtils.getScoreboardValue(p, KILLS_SCORE).orElse(0));
 				}
 			}
 		}

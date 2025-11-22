@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import com.goncalomb.bukkit.nbteditor.nbt.EntityNBT;
 import com.goncalomb.bukkit.nbteditor.nbt.SpawnerNBTWrapper;
+import com.google.gson.Gson;
 import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -22,6 +23,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTTileEntity;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
+import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,14 +51,12 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Cat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Marker;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -116,6 +116,7 @@ public class SpawnerUtils {
 	private static final NamespacedKey X = NamespacedKeyUtils.fromString("x");
 	private static final NamespacedKey Y = NamespacedKeyUtils.fromString("y");
 	private static final NamespacedKey Z = NamespacedKeyUtils.fromString("z");
+	private static final Gson GSON = new Gson();
 	private static final int MAX_TORCH_TAXICAB_DISTANCE = 8;
 	private static final double SPAWNER_DELAY_MULTIPLIER_CAP = 10;
 	public static final Set<Location> spawnersWithCat = new HashSet<>();
@@ -129,12 +130,11 @@ public class SpawnerUtils {
 	 * @param damage the damage dealt by the pickaxe.
 	 */
 	public static boolean tryBreakSpawner(Block block, int damage, boolean tryBreak) {
+		Location spawnerCenter = block.getLocation().clone().add(0.5, 0.5, 0.5);
 		// start ensnare if needed
-		if (getSpawnerType(block, ENSNARED_ATTRIBUTE) > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
-			List<Entity> nearbyEntities = (List<Entity>) block.getWorld().getNearbyEntities(block.getLocation().clone().add(0.5, 0.5, 0.5), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE));
-			boolean hasNearbyMobs = nearbyEntities.stream()
-				.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && entity.isValid());
-			if (hasNearbyMobs) {
+		int ensnared = getSpawnerType(block, ENSNARED_ATTRIBUTE);
+		if (ensnared > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
+			if (ensnareableMobsWithin(spawnerCenter, ensnared)) {
 				block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.75f, 2f);
 				startEnsnarementCheck(block);
 			}
@@ -159,7 +159,7 @@ public class SpawnerUtils {
 					Plugin.getInstance().mEffectManager.addEffect(cat, "spawnerCatVuln", new PercentDamageReceived(30, -1.0));
 					Plugin.getInstance().mEffectManager.addEffect(cat, "spawnerCatSpeed", new PercentSpeed(20, 1, "PercentSpeed"));
 				}
-				PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, block.getLocation().clone().add(0.5, 0.5, 0.5), cat.getLocation().clone().add(0, cat.getHeight() / 2, 0));
+				PPLine line = new PPLine(Particle.ENCHANTMENT_TABLE, spawnerCenter, cat.getLocation().clone().add(0, cat.getHeight() / 2, 0));
 				line.countPerMeter(10).spawnAsEnemy();
 				block.getLocation().getWorld().playSound(block.getLocation(), Sound.ENTITY_CAT_HURT, SoundCategory.HOSTILE, 1f, 1f);
 				return false;
@@ -189,11 +189,8 @@ public class SpawnerUtils {
 				block.getLocation().getWorld().playSound(block.getLocation(), Sound.ENTITY_CAT_AMBIENT, SoundCategory.HOSTILE, 1f, 1f);
 
 				// ensure ensnared is checked when a cat spawns
-				if (getSpawnerType(block, ENSNARED_ATTRIBUTE) > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
-					List<Entity> nearbyEntities = (List<Entity>) block.getWorld().getNearbyEntities(block.getLocation().clone().add(0.5, 0.5, 0.5), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE), getSpawnerType(block, ENSNARED_ATTRIBUTE));
-					boolean hasNearbyMobs = nearbyEntities.stream()
-						.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && entity.isValid());
-					if (hasNearbyMobs) {
+				if (ensnared > 0 && !ensnarementTasks.containsKey(block.getLocation())) {
+					if (ensnareableMobsWithin(spawnerCenter, ensnared)) {
 						block.getLocation().getWorld().playSound(block.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.75f, 2f);
 						startEnsnarementCheck(block);
 					}
@@ -260,18 +257,21 @@ public class SpawnerUtils {
 		}
 
 		new BukkitRunnable() {
-			final Marker mMarker = marker;
-			final PPCircle mHealthyShield = new PPCircle(Particle.SOUL_FIRE_FLAME, mMarker.getLocation(), 1)
+			final WeakReference<Marker> mMarker = new WeakReference<>(marker);
+			final PPCircle mHealthyShield = new PPCircle(Particle.SOUL_FIRE_FLAME, marker.getLocation(), 1)
 				.countPerMeter(2).distanceFalloff(20).ringMode(true);
 			final boolean mHasLosPool = getLosPool(marker.getLocation().getBlock()) != null;
 
 			@Override
 			public void run() {
-				if (PlayerUtils.playersInRange(marker.getLocation(), 20, false).isEmpty()) {
+				Marker markerRef = mMarker.get();
+				// If the marker despawned, got removed, or was garbage collected somehow, cancel the runnable.
+				if (markerRef == null || !markerRef.isValid()) {
+					cancel();
 					return;
 				}
-				// If the marker despawned or got removed, cancel the runnable.
-				if (!mMarker.isValid()) {
+
+				if (markerRef.getLocation().getWorld().getPlayers().isEmpty()) {
 					cancel();
 					return;
 				}
@@ -280,6 +280,11 @@ public class SpawnerUtils {
 				if (!isSpawner(spawnerBlock)) {
 					// The spawner was destroyed and the marker somehow is still lingering around.
 					cancel();
+					return;
+				}
+
+				// if no one within 20 blocks, don't play effects
+				if (PlayerUtils.playersInRange(markerRef.getLocation(), 20, false).isEmpty()) {
 					return;
 				}
 
@@ -384,7 +389,7 @@ public class SpawnerUtils {
 		NBTItem item = new NBTItem(spawnerItem);
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() == 0) {
+		if (wantedAction.isEmpty()) {
 			// Create a new container for the action, add the identifier,
 			// and add the compound containing the parameters and their default values.
 			NBTContainer container = new NBTContainer();
@@ -404,7 +409,7 @@ public class SpawnerUtils {
 		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() == 0) {
+		if (wantedAction.isEmpty()) {
 			// Create a new container for the action, add the identifier,
 			// and add the compound containing the parameters and their default values.
 			NBTContainer container = new NBTContainer();
@@ -424,7 +429,7 @@ public class SpawnerUtils {
 	}
 
 	public static void addParametersToCompound(Map<String, Object> parameters, NBTCompound compound) {
-		parameters.forEach(compound::setObject);
+		parameters.forEach((k, v) -> compound.setString(k, GSON.toJson(v)));
 	}
 
 	public static void removeBreakAction(ItemStack spawnerItem, String actionIdentifier) {
@@ -435,7 +440,7 @@ public class SpawnerUtils {
 		NBTItem item = new NBTItem(spawnerItem);
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			// Remove the action
 			breakActions.remove(wantedAction.get(0));
 			spawnerItem.setItemMeta(item.getItem().getItemMeta());
@@ -451,7 +456,7 @@ public class SpawnerUtils {
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			// Set the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
@@ -469,7 +474,7 @@ public class SpawnerUtils {
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			// Set the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
@@ -486,7 +491,7 @@ public class SpawnerUtils {
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			// Try to find the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
@@ -515,7 +520,7 @@ public class SpawnerUtils {
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			// Try to find the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
@@ -543,7 +548,7 @@ public class SpawnerUtils {
 		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.size() > 0) {
+		if (!wantedAction.isEmpty()) {
 			HashMap<String, Object> parameterMap = new HashMap<>(SpawnerActionManager.getActionParameters(actionIdentifier));
 			ReadWriteNBT actionCompound = wantedAction.get(0);
 			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
@@ -743,8 +748,9 @@ public class SpawnerUtils {
 				if (!chunk.isLoaded()) {
 					continue;
 				}
-				chunk.getTileEntities();
-				spawners.addAll(chunk.getTileEntities(b -> BlockUtils.taxiCabDistance(block, b) <= MAX_TORCH_TAXICAB_DISTANCE, true).stream().filter(b -> b instanceof CreatureSpawner).map(b -> (CreatureSpawner) b).toList());
+				final var spawners2 = chunk.getTileEntities(b -> b.getType() == Material.SPAWNER && BlockUtils.taxiCabDistance(block, b) <= MAX_TORCH_TAXICAB_DISTANCE, false);
+				final var spawners3 = spawners2.stream().map(b -> (CreatureSpawner) b).toList();
+				spawners.addAll(spawners3);
 			}
 		}
 		return spawners;
@@ -777,10 +783,14 @@ public class SpawnerUtils {
 		return new ArrayList<>(Arrays.stream(containers).map(c -> getBlockFromContainer(c, world)).toList());
 	}
 
+	// Need to use TAG_CONTAINER_ARRAY for backwards compatibility
+	@SuppressWarnings("deprecation")
 	private static PersistentDataContainer[] getTorchContainers(CreatureSpawner spawner) {
 		return spawner.getPersistentDataContainer().getOrDefault(TORCH_LOCATIONS, PersistentDataType.TAG_CONTAINER_ARRAY, new PersistentDataContainer[]{});
 	}
 
+	// Need to use TAG_CONTAINER_ARRAY for backwards compatibility
+	@SuppressWarnings("deprecation")
 	private static void setTorches(CreatureSpawner spawner, List<Block> torches) {
 		PersistentDataContainer persistentDataContainer = spawner.getPersistentDataContainer();
 		PersistentDataAdapterContext context = persistentDataContainer.getAdapterContext();
@@ -844,10 +854,14 @@ public class SpawnerUtils {
 		double multiplierRatio = multiplier / lastMultiplier;
 		persistentDataContainer.set(LAST_MULTIPLIER, PersistentDataType.DOUBLE, multiplier);
 
+		int newMaxDelay = (int) (originalMaxDelay * multiplier);
+		// Never set the min delay > the max delay
+		int newMinDelay = (int) Math.min(newMaxDelay, (originalMinDelay * multiplier));
+
 		// Need to do them in the right order or else it sometimes throws an IllegalArgumentException
 		spawner.setMinSpawnDelay(0);
-		spawner.setMaxSpawnDelay((int) (originalMaxDelay * multiplier));
-		spawner.setMinSpawnDelay((int) (originalMinDelay * multiplier));
+		spawner.setMaxSpawnDelay(newMaxDelay);
+		spawner.setMinSpawnDelay(newMinDelay);
 		spawner.setDelay((int) (spawner.getDelay() * multiplierRatio));
 		spawner.update(false, false);
 	}
@@ -927,11 +941,10 @@ public class SpawnerUtils {
 		BukkitRunnable task = new BukkitRunnable() {
 			private static final int TIME_LIMIT_TICKS = 5 * 60 * 20;
 			private int mTicks = 0;
+
 			@Override
 			public void run() {
-				List<Entity> nearbyEntities = (List<Entity>) spawnerLocation.getWorld().getNearbyEntities(spawnerLocation, ensnareRadius - 2, ensnareRadius - 2, ensnareRadius - 2);
-				boolean hasNearbyMobs = nearbyEntities.stream()
-					.anyMatch(entity -> entity instanceof LivingEntity && !(entity instanceof Player) && !(entity instanceof Villager) && !(entity instanceof ArmorStand) && entity.isValid());
+				boolean hasNearbyMobs = ensnareableMobsWithin(spawnerLocation, ensnareRadius - 2);
 				boolean hasPlayersInRange = spawnerLocation.getWorld().getPlayers().stream()
 					.anyMatch(player -> player.getLocation().distance(spawnerLocation) <= 10 + 5);
 
@@ -969,6 +982,11 @@ public class SpawnerUtils {
 		ensnarementTasks.put(block.getLocation(), task);
 	}
 
+	private static boolean ensnareableMobsWithin(Location location, double radius) {
+		List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(location, radius);
+		return nearbyEntities.stream().anyMatch(entity -> !entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+	}
+
 	public static Location findValidCatSpawn(Location location, int catRadius) {
 		// breadth first search algorithm to find the closest valid spot lol
 		World world = location.getWorld();
@@ -980,9 +998,9 @@ public class SpawnerUtils {
 			Location currentLocation = queue.poll();
 			if (world.getBlockAt(currentLocation).getType() == Material.AIR) {
 				int airCount = 0;
-				for (BlockFace face : BlockFace.values()) {
+				for (BlockFace face : BlockUtils.CARTESIAN_BLOCK_FACES) {
 					// check only horizontal faces
-					if (face != BlockFace.UP && face != BlockFace.DOWN && face.isCartesian()) {
+					if (face != BlockFace.UP && face != BlockFace.DOWN) {
 						if (world.getBlockAt(currentLocation.getBlock().getRelative(face).getLocation()).getType() == Material.AIR) {
 							airCount++;
 						}

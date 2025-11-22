@@ -56,6 +56,7 @@ public class GuildArguments {
 			return CommandUtils.alwaysQuote(guildTags);
 		});
 
+	@SuppressWarnings("resource")
 	public static void registerLuckPermsEvents(Plugin plugin, EventBus eventBus) {
 		eventBus.subscribe(plugin, NodeAddEvent.class, GuildArguments::nodeAddEvent);
 		eventBus.subscribe(plugin, NodeRemoveEvent.class, GuildArguments::nodeRemoveEvent);

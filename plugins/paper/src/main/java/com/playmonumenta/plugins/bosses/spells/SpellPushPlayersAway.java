@@ -18,20 +18,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public class SpellPushPlayersAway extends Spell {
-	private Entity mLauncher;
-	private int mRadius;
-	private int mMaxNearTime;
+	private final Entity mLauncher;
+	private final int mRadius;
+	private final int mMaxNearTime;
 
-	private int mHorizontalOffset;
-	private PPCircle mParticles;
-	private PPLine mOuterLine;
-	private PPLine mInnerLine;
+	private final int mHorizontalOffset;
+	private final PPCircle mParticles;
+	private final PPLine mOuterLine;
+	private final PPLine mInnerLine;
 
 	/* Tracks how long players have been too close */
-	Map<UUID, Integer> mPlayerNearTimes = new HashMap<UUID, Integer>();
+	Map<UUID, Integer> mPlayerNearTimes = new HashMap<>();
 
 	// Tracks if player has been a given hint about this spell
-	Map<UUID, Boolean> mPlayerHintsGiven = new HashMap<UUID, Boolean>();
+	Map<UUID, Boolean> mPlayerHintsGiven = new HashMap<>();
 
 	/* Push players away that have been too close for too long */
 	public SpellPushPlayersAway(Entity launcher, int radius, int maxNearTime, int horizontalOffset) {
@@ -40,14 +40,14 @@ public class SpellPushPlayersAway extends Spell {
 		mMaxNearTime = maxNearTime;
 		mHorizontalOffset = horizontalOffset;
 		mParticles = new PPCircle(Particle.SMOKE_NORMAL, mLauncher.getLocation().add(0, mHorizontalOffset, 0), mRadius)
-			             .ringMode(true)
-			             .countPerMeter(3);
+			.ringMode(true)
+			.countPerMeter(3);
 		mOuterLine = new PPLine(Particle.REDSTONE, mLauncher.getLocation(), mLauncher.getLocation())
-			             .countPerMeter(2.25)
-			             .data(new Particle.DustOptions(Color.fromRGB(125, 125, 125), 2.0f)); // 125 125 125 -> 200 0 0
+			.countPerMeter(2.25)
+			.data(new Particle.DustOptions(Color.fromRGB(125, 125, 125), 2.0f)); // 125 125 125 -> 200 0 0
 		mInnerLine = new PPLine(Particle.REDSTONE, mLauncher.getLocation(), mLauncher.getLocation())
-			             .countPerMeter(5)
-			             .data(new Particle.DustOptions(Color.fromRGB(0, 0, 0), 0.5f));
+			.countPerMeter(5)
+			.data(new Particle.DustOptions(Color.fromRGB(0, 0, 0), 0.5f));
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class SpellPushPlayersAway extends Spell {
 				mInnerLine.location(mLauncher.getLocation().add(0, -3, 0), pLoc)
 					.spawnAsBoss();
 				// Sound effects
-				player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 2.0f - timePercent * 1.0f);
+				player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 2.0f - timePercent);
 
 				if (nearTime >= mMaxNearTime) {
 					Location lLoc = mLauncher.getLocation();

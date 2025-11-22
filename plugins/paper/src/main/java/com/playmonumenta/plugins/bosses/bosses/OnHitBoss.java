@@ -9,11 +9,11 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import java.util.Collections;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class OnHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_onhit";
@@ -61,6 +61,7 @@ public class OnHitBoss extends BossAbilityGroup {
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (mParams.CAN_BLOCK && event.isBlockedByShield()) {
 			// Attack was blocked
+			event.setEffects(mParams.EFFECTS.mEffectList());
 			return;
 		}
 

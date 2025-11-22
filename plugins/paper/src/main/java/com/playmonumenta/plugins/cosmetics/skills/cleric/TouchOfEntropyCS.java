@@ -32,8 +32,8 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-				"Cleanse your allies with harmony.",
-				"Drain your enemies with dissonance.");
+			"Cleanse your allies with harmony.",
+			"Drain your enemies with dissonance.");
 
 	}
 
@@ -72,7 +72,7 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 			.spawnAsPlayerActive(player);
 		player.getWorld().playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 0.8f, 0f);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-1, 1), FastUtils.randomDoubleInRange(-0.5, 0.5),
-			FastUtils.randomDoubleInRange(-1, 1)), LocationUtils.getHalfHeightLocation(target),
+				FastUtils.randomDoubleInRange(-1, 1)), LocationUtils.getHalfHeightLocation(target),
 			player, target, target.getLocation().add(
 				FastUtils.randomDoubleInRange(-2, 2), FastUtils.randomDoubleInRange(5, 7),
 				FastUtils.randomDoubleInRange(-2, 2)
@@ -97,6 +97,7 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 		new BukkitRunnable() {
 
 			double mRadius = damage ? range : 0;
+
 			@Override
 			public void run() {
 

@@ -20,6 +20,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
+
 public class SpellThrowSummon extends Spell {
 
 	private final int mMobCapRange;
@@ -46,10 +48,10 @@ public class SpellThrowSummon extends Spell {
 	private final List<UUID> mSummonedEntities = new ArrayList<>();
 
 	public SpellThrowSummon(Plugin plugin, LivingEntity boss, EntityTargets targets, int lobs, int cooldownTicks,
-							String summonName, boolean fromPool, int lobDelay, double heightOffset, float yVelocity,
-							double variance, double yVariance, double distanceScalar,
-							int mobCapRange, int mobCap, boolean capMobByName, String mobCapName, boolean removeOnDeath,
-							ParticlesList particles, SoundsList sounds) {
+	                        String summonName, boolean fromPool, int lobDelay, double heightOffset, float yVelocity,
+	                        double variance, double yVariance, double distanceScalar,
+	                        int mobCapRange, int mobCap, boolean capMobByName, String mobCapName, boolean removeOnDeath,
+	                        ParticlesList particles, SoundsList sounds) {
 		mPlugin = plugin;
 		mBoss = boss;
 
@@ -129,6 +131,11 @@ public class SpellThrowSummon extends Spell {
 				return;
 			}
 
+			// Include the original mob's metadata for spawner counting to prevent mob farming
+			if (mBoss.hasMetadata(SPAWNER_COUNT_METAKEY)) {
+				e.setMetadata(SPAWNER_COUNT_METAKEY, mBoss.getMetadata(SPAWNER_COUNT_METAKEY).get(0));
+			}
+
 			if (mRemoveOnDeath) {
 				mSummonedEntities.add(e.getUniqueId());
 			}
@@ -189,15 +196,10 @@ public class SpellThrowSummon extends Spell {
 		}
 
 		if (mCapMobsByName) {
-			if (mobCount >= mMobCap
-				|| mTargets.getTargetsList(mBoss).isEmpty()) {
-				return false;
-			}
+			return mobCount < mMobCap
+				&& !mTargets.getTargetsList(mBoss).isEmpty();
 		} else {
-			if (EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() > mMobCap || mTargets.getTargetsList(mBoss).isEmpty()) {
-				return false;
-			}
+			return EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() <= mMobCap && !mTargets.getTargetsList(mBoss).isEmpty();
 		}
-		return true;
 	}
 }

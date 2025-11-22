@@ -51,13 +51,13 @@ public class PotionMap {
 			// Make sure the last effect has had a chance to trigger before refreshing it
 			PotionEffectType newPotionType = newPotionInfo.mType;
 			if (bestEffect == null
-					|| bestEffect.mAmplifier < newPotionInfo.mAmplifier
-					|| (bestEffect.mAmplifier == newPotionInfo.mAmplifier
-					&& bestEffect.mDuration < newPotionInfo.mDuration
-					&& (!PotionEffectType.POISON.equals(newPotionType)
-					|| newPotionInfo.mDuration - bestEffect.mDuration >= 25 / (bestEffect.mAmplifier + 1) + 1)
-					&& (!PotionEffectType.WITHER.equals(newPotionType)
-					|| newPotionInfo.mDuration - bestEffect.mDuration >= 40 / (bestEffect.mAmplifier + 1) + 1))) {
+				|| bestEffect.mAmplifier < newPotionInfo.mAmplifier
+				|| (bestEffect.mAmplifier == newPotionInfo.mAmplifier
+				&& bestEffect.mDuration < newPotionInfo.mDuration
+				&& (!PotionEffectType.POISON.equals(newPotionType)
+				|| newPotionInfo.mDuration - bestEffect.mDuration >= 25 / (bestEffect.mAmplifier + 1) + 1)
+				&& (!PotionEffectType.WITHER.equals(newPotionType)
+				|| newPotionInfo.mDuration - bestEffect.mDuration >= 40 / (bestEffect.mAmplifier + 1) + 1))) {
 
 				// remove any other (lower level/duration) effects
 				if (newPotionType != null) {
@@ -72,9 +72,9 @@ public class PotionMap {
 			// Only add the new effect if it is longer for the same effect amplifier
 			PotionInfo currentInfo = trackedPotionInfo.get(amplifier);
 			if (currentInfo == null
-					|| (PotionUtils.compareDurations(newPotionInfo.mDuration, currentInfo.mDuration)
-					&& (!PotionEffectType.REGENERATION.equals(currentInfo.mType)
-					|| newPotionInfo.mDuration - currentInfo.mDuration >= 50 / (currentInfo.mAmplifier + 1) + 1))) {
+				|| (PotionUtils.compareDurations(newPotionInfo.mDuration, currentInfo.mDuration)
+				&& (!PotionEffectType.REGENERATION.equals(currentInfo.mType)
+				|| newPotionInfo.mDuration - currentInfo.mDuration >= 50 / (currentInfo.mAmplifier + 1) + 1))) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}
 		}
@@ -165,7 +165,7 @@ public class PotionMap {
 					}
 				}
 
-				if (potionInfo.size() == 0) {
+				if (potionInfo.isEmpty()) {
 					potionIter.remove();
 				}
 			}
@@ -189,7 +189,7 @@ public class PotionMap {
 				} else if (info.mAmplifier > bestEffect.mAmplifier) {
 					bestEffect = info;
 				} else if (info.mAmplifier == bestEffect.mAmplifier &&
-						PotionUtils.compareDurations(info.mDuration, bestEffect.mDuration)) {
+					PotionUtils.compareDurations(info.mDuration, bestEffect.mDuration)) {
 					bestEffect = info;
 				}
 			}
@@ -204,9 +204,9 @@ public class PotionMap {
 		PotionEffect currentVanillaEffect = player.getPotionEffect(mType);
 		if (currentVanillaEffect != null) {
 			if (bestEffect == null
-					|| (currentVanillaEffect.getDuration() > (bestEffect.mDuration + 20) && bestEffect.mDuration != -1)
-					|| (currentVanillaEffect.getDuration() < (bestEffect.mDuration - 20) && currentVanillaEffect.getDuration() != -1)
-					|| bestEffect.mAmplifier != currentVanillaEffect.getAmplifier()) {
+				|| (currentVanillaEffect.getDuration() > (bestEffect.mDuration + 20) && bestEffect.mDuration != -1)
+				|| (currentVanillaEffect.getDuration() < (bestEffect.mDuration - 20) && currentVanillaEffect.getDuration() != -1)
+				|| bestEffect.mAmplifier != currentVanillaEffect.getAmplifier()) {
 
 				// The current effect must be removed because the "best" effect is either less than it
 				// OR the same strength but less duration
@@ -228,8 +228,8 @@ public class PotionMap {
 
 		for (Entry<PotionID, TreeMap<Integer, PotionInfo>> potionMapping : mPotionMap.entrySet()) {
 			if (!includeAll && (potionMapping.getKey().equals(PotionID.ITEM)
-					|| potionMapping.getKey().equals(PotionID.ABILITY_SELF)
-					|| potionMapping.getKey().equals(PotionID.SAFE_ZONE))) {
+				|| potionMapping.getKey().equals(PotionID.ABILITY_SELF)
+				|| potionMapping.getKey().equals(PotionID.SAFE_ZONE))) {
 				/*
 				 * Don't save ITEM, ABILITY_SELF, or SAFE_ZONE potions
 				 * These will be re-applied elsewhere when the player rejoins
@@ -243,7 +243,7 @@ public class PotionMap {
 				effectListArray.add(entry.getValue().getAsJsonObject());
 			}
 
-			if (effectListArray.size() > 0) {
+			if (!effectListArray.isEmpty()) {
 				if (potionMapObject == null) {
 					potionMapObject = new JsonObject();
 				}

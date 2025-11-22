@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.mage;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.PrismaticShieldCS;
@@ -54,35 +56,14 @@ public class PrismaticShield extends Ability {
 	public static final String CHARM_ENHANCE_DURATION = "Prismatic Shield Enhancement Duration";
 	public static final String CHARM_ENHANCE_DAMAGE = "Prismatic Shield Enhancement Damage";
 	public static final String CHARM_ENHANCE_HEALING = "Prismatic Shield Enhancement Healing";
+	public static final String CHARM_ENHANCE_CDR = "Prismatic Shield Enhancement Cooldown Reduction";
 
 	public static final AbilityInfo<PrismaticShield> INFO =
 		new AbilityInfo<>(PrismaticShield.class, "Prismatic Shield", PrismaticShield::new)
 			.linkedSpell(ClassAbility.PRISMATIC_SHIELD)
 			.scoreboardId("Prismatic")
 			.shorthandName("PS")
-			.descriptions(
-				String.format("When your health drops below %s hearts you receive %s absorption health which lasts up to %ss." +
-						" If damage taken would kill you but could have been prevented by up to %s times this skill's absorption, it will save you from death." +
-						" In addition enemies within %s blocks are knocked back. Cooldown: %ss.",
-					TRIGGER_HEALTH / 2,
-					ABSORPTION_HEALTH_1,
-					DURATION / 20,
-					OVERKILL_PROTECTION_MULTIPLIER,
-					(int) RADIUS,
-					COOLDOWN / 20
-				),
-				String.format("The shield is improved to %s absorption health. Enemies within %s blocks are knocked back and stunned for %ss.",
-					ABSORPTION_HEALTH_2,
-					(int) RADIUS,
-					STUN_DURATION / 20),
-				String.format("After Prismatic Shield is activated, in the next %ss, you deal %s%% more damage and every spell that deals damage to at least one enemy will heal you for %s%% of your max health." +
-						" Additionally, %ss will be reduced from your abilities' cooldowns.",
-					ENHANCEMENT_DURATION / 20,
-					(int) (DAMAGE_BUFF_PERCENT * 100),
-					(int) (HEAL_PERCENT * 100),
-					ENHANCEMENT_COOLDOWN_REDUCTION_TICKS / 20
-				)
-			)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("When health drops below a threshold, gain absorption.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.SHIELD)
@@ -91,7 +72,12 @@ public class PrismaticShield extends Ability {
 	private final double mAbsorptionHealth;
 	private final double mRadius;
 	private final int mEnhancementDuration;
-
+	private final double mTriggerHealth;
+	private final int mStunDuration;
+	private final int mAbsorptionDuration;
+	private final double mDamageBuff;
+	private final double mPercentHeal;
+	private final int mCDR;
 
 	private int mLastActivation = -1;
 	private final Set<ClassAbility> mHealedFromAbilitiesThisTick = new HashSet<>();
@@ -104,6 +90,12 @@ public class PrismaticShield extends Ability {
 		mAbsorptionHealth = CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
 		mRadius = CharmManager.getRadius(player, CHARM_RADIUS, RADIUS);
 		mEnhancementDuration = CharmManager.getDuration(player, CHARM_ENHANCE_DURATION, ENHANCEMENT_DURATION);
+		mTriggerHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TRIGGER, TRIGGER_HEALTH);
+		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN, STUN_DURATION);
+		mAbsorptionDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
+		mDamageBuff = DAMAGE_BUFF_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE);
+		mPercentHeal = HEAL_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_HEALING);
+		mCDR = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_CDR, ENHANCEMENT_COOLDOWN_REDUCTION_TICKS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PrismaticShieldCS());
 	}
 
@@ -115,9 +107,9 @@ public class PrismaticShield extends Ability {
 			double healthRemaining = mPlayer.getHealth() - event.getFinalDamage(true);
 
 			// Health is less than 0 but does not penetrate the absorption shield
-			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -OVERKILL_PROTECTION_MULTIPLIER * (mAbsorptionHealth + 1);
+			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -OVERKILL_PROTECTION_MULTIPLIER * mAbsorptionHealth;
 
-			if (healthRemaining <= CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TRIGGER, TRIGGER_HEALTH)) {
+			if (healthRemaining <= mTriggerHealth) {
 				mPlugin.mEffectManager.damageEvent(event);
 				event.setLifelineCancel(true);
 				if (event.isCancelled() || event.isBlocked()) {
@@ -140,12 +132,12 @@ public class PrismaticShield extends Ability {
 					float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK_SPEED);
 					MovementUtils.knockAway(mPlayer, mob, knockback, true);
 					if (isLevelTwo()) {
-						EntityUtils.applyStun(mPlugin, CharmManager.getDuration(mPlayer, CHARM_STUN, STUN_DURATION), mob);
-						mCosmetic.prismaOnStun(mob, STUN_DURATION, mPlayer);
+						EntityUtils.applyStun(mPlugin, mStunDuration, mob);
+						mCosmetic.prismaOnStun(mob, mStunDuration, mPlayer);
 					}
 				}
 
-				AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION));
+				AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, mAbsorptionDuration);
 				World world = mPlayer.getWorld();
 				mCosmetic.prismaEffect(world, mPlayer, mPlayer.getLocation(), mRadius);
 				sendActionBarMessage("Prismatic Shield has been activated");
@@ -156,8 +148,9 @@ public class PrismaticShield extends Ability {
 						if (linkedSpell == null || linkedSpell == ClassAbility.PRISMATIC_SHIELD) {
 							continue;
 						}
-						mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, ENHANCEMENT_COOLDOWN_REDUCTION_TICKS);
+						mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, mCDR);
 					}
+					mCosmetic.prismaBuff(mPlayer, mEnhancementDuration);
 				}
 
 				if (dealDamageLater) {
@@ -197,10 +190,49 @@ public class PrismaticShield extends Ability {
 				}
 				mHealedFromBlizzard = true;
 			}
-			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_BUFF_NAME, new PercentDamageDealt(mEnhancementDuration, DAMAGE_BUFF_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_DAMAGE)));
-			PlayerUtils.healPlayer(mPlugin, mPlayer, (HEAL_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_HEALING)) * EntityUtils.getMaxHealth(mPlayer));
-			mCosmetic.prismaOnHeal(mPlayer);
+			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_BUFF_NAME, new PercentDamageDealt(mEnhancementDuration, mDamageBuff).deleteOnAbilityUpdate(true));
+			PlayerUtils.healPlayer(mPlugin, mPlayer, mPercentHeal * EntityUtils.getMaxHealth(mPlayer));
+			mCosmetic.prismaOnHeal(mPlayer, enemy);
 		}
 		return false; // there may be multiple spells cast in the same tick, need to check them all. No recursion possible as this doesn't deal damage.
 	}
+
+	private static Description<PrismaticShield> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When you drop below ")
+			.add(a -> a.mTriggerHealth, TRIGGER_HEALTH)
+			.add(" health, you receive ")
+			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_1, false, Ability::isLevelOne)
+			.add(" absorption health which lasts up to ")
+			.addDuration(a -> a.mAbsorptionDuration, DURATION)
+			.add(" seconds. If damage taken would kill you but could have been prevented by up to ")
+			.add(a -> OVERKILL_PROTECTION_MULTIPLIER, OVERKILL_PROTECTION_MULTIPLIER)
+			.add(" times this skill's absorption, it will save you from death. In addition, enemies within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks are knocked back.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<PrismaticShield> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The shield is improved to ")
+			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_2, false, Ability::isLevelTwo)
+			.add(" absorption health. Knocked back enemies are stunned for ")
+			.addDuration(a -> a.mStunDuration, STUN_DURATION)
+			.add(" second.");
+	}
+
+	private static Description<PrismaticShield> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("After Prismatic Shield is activated, in the next ")
+			.addDuration(a -> a.mEnhancementDuration, ENHANCEMENT_DURATION)
+			.add(" seconds, you deal ")
+			.addPercent(a -> a.mDamageBuff, DAMAGE_BUFF_PERCENT)
+			.add(" more damage and every spell that deals damage to at least one enemy will heal you for ")
+			.addPercent(a -> a.mPercentHeal, HEAL_PERCENT)
+			.add(" of your max health. Additionally, your abilities' cooldowns are reduced by ")
+			.addDuration(a -> a.mCDR, ENHANCEMENT_COOLDOWN_REDUCTION_TICKS)
+			.add(" seconds.");
+	}
+
 }

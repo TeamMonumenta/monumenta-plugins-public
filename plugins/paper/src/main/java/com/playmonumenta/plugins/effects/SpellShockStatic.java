@@ -23,6 +23,11 @@ public class SpellShockStatic extends Effect {
 	}
 
 	@Override
+	public double getMagnitude() {
+		return mTriggered ? 0 : 1;
+	}
+
+	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		mCosmetic.tickEffect(entity);
 	}

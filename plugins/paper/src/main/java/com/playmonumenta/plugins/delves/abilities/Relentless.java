@@ -9,27 +9,27 @@ public class Relentless {
 	private static final int DISTANCE_CLOSER_DISTANCE = 8;
 
 	private static final int[] DISTANCE_CLOSER_SPEED_RAW_PERCENT = {
-			10,
-			20,
-			30,
-			40,
-			50
+		10,
+		20,
+		30,
+		40,
+		50
 	};
 
 	public static final String DESCRIPTION = "Enemies are harder to stop.";
 
 	public static final String[][] RANK_DESCRIPTIONS = {
-			{
-				"Enemies are " + DISTANCE_CLOSER_SPEED_RAW_PERCENT[0] + "% faster when more than " + DISTANCE_CLOSER_DISTANCE + " blocks away."
-			}, {
-				"Enemies are " + DISTANCE_CLOSER_SPEED_RAW_PERCENT[1] + "% faster when more than " + DISTANCE_CLOSER_DISTANCE + " blocks away."
-			}, {
-				"Enemies are " + DISTANCE_CLOSER_SPEED_RAW_PERCENT[2] + "% faster when more than " + DISTANCE_CLOSER_DISTANCE + " blocks away."
-			}, {
-				"Enemies are " + DISTANCE_CLOSER_SPEED_RAW_PERCENT[3] + "% faster when more than " + DISTANCE_CLOSER_DISTANCE + " blocks away."
-			}, {
-				"Enemies are " + DISTANCE_CLOSER_SPEED_RAW_PERCENT[4] + "% faster when more than " + DISTANCE_CLOSER_DISTANCE + " blocks away."
-			}
+		{
+			"Enemies are " + DISTANCE_CLOSER_SPEED_RAW_PERCENT[0] + "% faster when more than " + DISTANCE_CLOSER_DISTANCE + " blocks away."
+		}, {
+		"Enemies are " + DISTANCE_CLOSER_SPEED_RAW_PERCENT[1] + "% faster when more than " + DISTANCE_CLOSER_DISTANCE + " blocks away."
+	}, {
+		"Enemies are " + DISTANCE_CLOSER_SPEED_RAW_PERCENT[2] + "% faster when more than " + DISTANCE_CLOSER_DISTANCE + " blocks away."
+	}, {
+		"Enemies are " + DISTANCE_CLOSER_SPEED_RAW_PERCENT[3] + "% faster when more than " + DISTANCE_CLOSER_DISTANCE + " blocks away."
+	}, {
+		"Enemies are " + DISTANCE_CLOSER_SPEED_RAW_PERCENT[4] + "% faster when more than " + DISTANCE_CLOSER_DISTANCE + " blocks away."
+	}
 	};
 
 

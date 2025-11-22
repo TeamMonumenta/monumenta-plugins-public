@@ -104,7 +104,7 @@ public class Fireball extends DepthsAbility {
 		physicsItem.setCanPlayerPickup(false);
 		physicsItem.setCanMobPickup(false);
 		physicsItem.setVelocity(vel);
-		EntityUtils.makeItemInvulnereable(physicsItem);
+		EntityUtils.makeItemInvulnerable(physicsItem);
 
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -155,7 +155,7 @@ public class Fireball extends DepthsAbility {
 
 	private boolean hasCollidedWithEnemy(Item physicsItem) {
 		Hitbox hitbox = new Hitbox.AABBHitbox(physicsItem.getWorld(), BoundingBox.of(physicsItem.getLocation(), 1.025, 1.025, 1.025));
-		return hitbox.getHitMobs().size() > 0;
+		return !hitbox.getHitMobs().isEmpty();
 	}
 
 	private void explode(Location loc) {
@@ -185,8 +185,9 @@ public class Fireball extends DepthsAbility {
 	}
 
 	private static Description<Fireball> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Fireball>(color)
-			.add("Right click to throw a fireball in the direction you are facing. When the fireball collides with a surface or enemy, it explodes, dealing ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to throw a fireball in the direction you are facing. When the fireball collides with a surface or enemy, it explodes, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage and sets enemies ablaze for ")
 			.addDuration(a -> a.mFireDuration, FIRE_TICKS)

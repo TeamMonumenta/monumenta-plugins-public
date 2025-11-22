@@ -246,19 +246,20 @@ public final class SignUtils {
 		 * functionality. false by default.
 		 *
 		 * @param player the player
-		 * @param force decides whether it will reopen if reopen is enabled
+		 * @param force  decides whether it will reopen if reopen is enabled
 		 */
 		public void close(Player player, boolean force) {
 			mForceClose = force;
 			if (player.isOnline()) {
 				player.closeInventory();
-		    }
+			}
 		}
 
 		public void close(Player player) {
 			close(player, false);
 		}
 
+		@SuppressWarnings("deprecation")
 		private String color(String input) {
 			return ChatColor.translateAlternateColorCodes('&', input);
 		}

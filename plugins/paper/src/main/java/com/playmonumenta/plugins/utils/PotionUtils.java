@@ -37,44 +37,44 @@ import org.jetbrains.annotations.Nullable;
 public class PotionUtils {
 
 	public static final ImmutableSet<PotionEffectType> POSITIVE_EFFECTS = ImmutableSet.of(
-			PotionEffectType.ABSORPTION,
-			PotionEffectType.DAMAGE_RESISTANCE,
-			PotionEffectType.FAST_DIGGING,
-			PotionEffectType.FIRE_RESISTANCE,
-			PotionEffectType.HEAL,
-			PotionEffectType.HEALTH_BOOST,
-			PotionEffectType.INCREASE_DAMAGE,
-			PotionEffectType.INVISIBILITY,
-			PotionEffectType.JUMP,
-			PotionEffectType.NIGHT_VISION,
-			PotionEffectType.REGENERATION,
-			PotionEffectType.SATURATION,
-			PotionEffectType.SPEED,
-			PotionEffectType.LUCK,
-			PotionEffectType.WATER_BREATHING,
-			PotionEffectType.CONDUIT_POWER
+		PotionEffectType.ABSORPTION,
+		PotionEffectType.DAMAGE_RESISTANCE,
+		PotionEffectType.FAST_DIGGING,
+		PotionEffectType.FIRE_RESISTANCE,
+		PotionEffectType.HEAL,
+		PotionEffectType.HEALTH_BOOST,
+		PotionEffectType.INCREASE_DAMAGE,
+		PotionEffectType.INVISIBILITY,
+		PotionEffectType.JUMP,
+		PotionEffectType.NIGHT_VISION,
+		PotionEffectType.REGENERATION,
+		PotionEffectType.SATURATION,
+		PotionEffectType.SPEED,
+		PotionEffectType.LUCK,
+		PotionEffectType.WATER_BREATHING,
+		PotionEffectType.CONDUIT_POWER
 	);
 
 	private static final ImmutableSet<PotionEffectType> NEGATIVE_EFFECTS = ImmutableSet.of(
-			PotionEffectType.BLINDNESS,
-			PotionEffectType.POISON,
-			PotionEffectType.CONFUSION,
-			PotionEffectType.SLOW,
-			PotionEffectType.SLOW_DIGGING,
-			PotionEffectType.SLOW_FALLING,
-			PotionEffectType.WITHER,
-			PotionEffectType.WEAKNESS,
-			PotionEffectType.HARM,
-			PotionEffectType.HUNGER,
-			PotionEffectType.LEVITATION,
-			PotionEffectType.UNLUCK,
-			PotionEffectType.DARKNESS
+		PotionEffectType.BLINDNESS,
+		PotionEffectType.POISON,
+		PotionEffectType.CONFUSION,
+		PotionEffectType.SLOW,
+		PotionEffectType.SLOW_DIGGING,
+		PotionEffectType.SLOW_FALLING,
+		PotionEffectType.WITHER,
+		PotionEffectType.WEAKNESS,
+		PotionEffectType.HARM,
+		PotionEffectType.HUNGER,
+		PotionEffectType.LEVITATION,
+		PotionEffectType.UNLUCK,
+		PotionEffectType.DARKNESS
 	);
 
 	public static final ImmutableSet<PotionType> BASE_POTION_ITEM_TYPES = ImmutableSet.of(PotionType.AWKWARD, PotionType.THICK, PotionType.MUNDANE, PotionType.WATER);
 
 	// This map only notes any "useful" effect pairs, i.e. effects that would be non-annoying and balanced to invert
-	private static final Map<PotionEffectType, PotionEffectType> OPPOSITE_EFFECTS = new HashMap<PotionEffectType, PotionEffectType>();
+	private static final Map<PotionEffectType, PotionEffectType> OPPOSITE_EFFECTS = new HashMap<>();
 
 	static {
 		OPPOSITE_EFFECTS.put(PotionEffectType.SPEED, PotionEffectType.SLOW);
@@ -120,7 +120,7 @@ public class PotionUtils {
 		}
 
 		public PotionInfo(@Nullable PotionEffectType type, int duration, int amplifier, boolean ambient,
-						  boolean showParticles, boolean showIcon) {
+		                  boolean showParticles, boolean showIcon) {
 			mType = type;
 			mDuration = duration;
 			mAmplifier = amplifier;
@@ -227,7 +227,20 @@ public class PotionUtils {
 		return NEGATIVE_EFFECTS.contains(type);
 	}
 
+	public static void clearPositives(Plugin plugin, Player player) {
+		for (PotionEffectType type : POSITIVE_EFFECTS) {
+			if (Objects.equals(type, PotionEffectType.GLOWING)) {
+				continue;
+			}
+			plugin.mPotionManager.clearPotionEffectType(player, type);
+		}
+	}
+
 	public static void clearNegatives(Plugin plugin, Player player) {
+		clearNegatives(plugin, player, Constants.THIRTY_MINUTES);
+	}
+
+	public static void clearNegatives(Plugin plugin, Player player, int maxDuration) {
 		boolean dolphin = player.hasPotionEffect(PotionEffectType.DOLPHINS_GRACE);
 		for (PotionEffectType type : NEGATIVE_EFFECTS) {
 			if (player.hasPotionEffect(type)) {
@@ -297,7 +310,7 @@ public class PotionUtils {
 			}
 			if (targetPotionEffect.getAmplifier() < effect.getAmplifier()
 				|| (targetPotionEffect.getAmplifier() == effect.getAmplifier()
-					&& compareDurations(effect, targetPotionEffect))
+				&& compareDurations(effect, targetPotionEffect))
 			) {
 				PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
 				Bukkit.getPluginManager().callEvent(event);
@@ -410,14 +423,11 @@ public class PotionUtils {
 		// add the player to the list of affected entities otherwise the player who splashed the potion won't get any effects
 		affectedEntites.put(player, 1.0d);
 
-		PotionSplashEvent potionEvent = new PotionSplashEvent(potion, affectedEntites);
+		PotionSplashEvent potionEvent = new PotionSplashEvent(potion, null, null, null, affectedEntites);
 		Bukkit.getPluginManager().callEvent(potionEvent);
 
 		// ignore if splash event if cancelled
-		if (potionEvent.isCancelled()) {
-			return false;
-		}
-		return true;
+		return !potionEvent.isCancelled();
 	}
 
 	/**
@@ -445,7 +455,7 @@ public class PotionUtils {
 			for (int i = 0; i < 30; i++) {
 				double y = FastUtils.randomDoubleInRange(0.25, 1.75);
 				new PartialParticle(Particle.SPELL_MOB, player.getLocation().add(0, y, 0), 1, red, green, blue, 1)
-						.directionalMode(true).spawnAsPlayerActive(player);
+					.directionalMode(true).spawnAsPlayerActive(player);
 			}
 		} else {
 			new PartialParticle(Particle.SPELL, player.getLocation().add(0, 0.75, 0), 30, 0, 0.45, 0, 1).spawnAsPlayerActive(player);
@@ -467,6 +477,7 @@ public class PotionUtils {
 		}
 	}
 
+	// Need to handle legacy effects that we have stored.
 	@SuppressWarnings("deprecation")
 	public static @Nullable PotionEffectType getTypeByKey(String key) {
 		return PotionEffectType.getByName(key);

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.sirius;
 
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -30,6 +28,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class PassiveStarBlightConversion extends Spell {
 	private boolean mOnCooldown;
@@ -188,11 +187,11 @@ public class PassiveStarBlightConversion extends Spell {
 				for (int i = 0; i < 4; i++) {
 					int dxSign = (i < 2) ? 1 : -1;
 					int dzSign = (i % 2 == 0) ? 1 : -1;
-					double mRealX = mCornerOne.x() - (center.x() + x*dxSign);
-					double mRealZ = mCornerOne.z() - (center.z() + z*dzSign);
+					double mRealX = mCornerOne.x() - (center.x() + x * dxSign);
+					double mRealZ = mCornerOne.z() - (center.z() + z * dzSign);
 					List<BlockData> blockData = mRestore.get("x" + mRealX + "z" + mRealZ);
 					if (blockData != null && mBlighted[(int) mRealX][(int) mRealZ]) {
-						restoreColumn(center, x*dxSign, z*dzSign, blockData);
+						restoreColumn(center, x * dxSign, z * dzSign, blockData);
 						mBlighted[(int) mRealX][(int) mRealZ] = false;
 					}
 				}
@@ -381,13 +380,12 @@ public class PassiveStarBlightConversion extends Spell {
 
 	//loads from a file
 	private void createmBlight() {
-		Bukkit.getScheduler().runTaskAsynchronously(com.playmonumenta.plugins.Plugin.getInstance(), () -> {
+		final var plugin = com.playmonumenta.plugins.Plugin.getInstance();
+
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			mBlight = new HashMap<>();
-			String blight = null;
 			try {
-				blight = FileUtils.readFile(com.playmonumenta.plugins.Plugin.getInstance().getDataFolder().getPath() + "/SiriusBlightArena.json");
-				Gson gson = new Gson();
-				JsonObject data = gson.fromJson(blight, JsonObject.class);
+				JsonObject data = FileUtils.readJson(plugin.getDataFolder() + "/SiriusBlightArena.json");
 				JsonArray blockstateparse = data.get("blight").getAsJsonArray();
 				for (JsonElement list : blockstateparse) {
 					JsonObject toParse = list.getAsJsonObject();

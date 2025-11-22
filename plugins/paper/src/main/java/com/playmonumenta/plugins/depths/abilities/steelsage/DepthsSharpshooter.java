@@ -1,16 +1,17 @@
 package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -31,6 +32,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 	public static final DepthsAbilityInfo<DepthsSharpshooter> INFO =
 		new DepthsAbilityInfo<>(DepthsSharpshooter.class, ABILITY_NAME, DepthsSharpshooter::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
+			.linkedSpell(ClassAbility.SHARPSHOOTER_DEPTHS)
 			.displayItem(Material.TARGET)
 			.descriptions(DepthsSharpshooter::getDescription)
 			.singleCharm(false);
@@ -40,7 +42,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 	private final double mPassiveDamage;
 	private final double mStackDamage;
 
-	private int mStacks = 0;
+	private int mStacks;
 	private int mTicksToStackDecay = 0;
 
 	public DepthsSharpshooter(Plugin plugin, Player player) {
@@ -49,22 +51,24 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 		mDecayTimerLength = CharmManager.getDuration(mPlayer, CharmEffects.SHARPSHOOTER_DECAY_TIMER.mEffectName, mRarity >= 6 ? TWISTED_SHARPSHOOTER_DECAY_TIMER : SHARPSHOOTER_DECAY_TIMER);
 		mPassiveDamage = PASSIVE_DAMAGE[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SHARPSHOOTER_PASSIVE_DAMAGE.mEffectName);
 		mStackDamage = DAMAGE_PER_STACK[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SHARPSHOOTER_DAMAGE_PER_STACK.mEffectName);
+		mStacks = Math.min(AbilityManager.getManager().getTrackedCharges(mPlayer, ClassAbility.SHARPSHOOTER_DEPTHS), mMaxStacks);
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.PROJECTILE_SKILL) {
+		if (event.getType() == DamageEvent.DamageType.PROJECTILE || event.getType() == DamageEvent.DamageType.PROJECTILE_SKILL || event.getType() == DamageEvent.DamageType.PROJECTILE_ENCH) {
 			double mult = 1 + mPassiveDamage + mStacks * mStackDamage;
 			event.updateDamageWithMultiplier(mult);
 
 			// Critical arrow and mob is actually going to take damage
 			if (event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)
-				    && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getFinalDamage(false))) {
+				&& (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getFinalDamage(false))) {
 				mTicksToStackDecay = mDecayTimerLength;
 
 				if (mStacks < mMaxStacks) {
 					mStacks++;
 					showChargesMessage();
+					AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.SHARPSHOOTER_DEPTHS, mStacks);
 					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			}
@@ -81,13 +85,14 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 				mTicksToStackDecay = mDecayTimerLength;
 				mStacks--;
 				showChargesMessage();
+				AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.SHARPSHOOTER_DEPTHS, mStacks);
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 	}
 
 	private static Description<DepthsSharpshooter> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsSharpshooter>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("You deal ")
 			.addPercent(a -> a.mPassiveDamage, PASSIVE_DAMAGE[rarity - 1], false, true)
 			.add(" more projectile damage. ")

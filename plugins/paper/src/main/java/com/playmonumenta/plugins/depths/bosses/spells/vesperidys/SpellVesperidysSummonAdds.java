@@ -123,7 +123,7 @@ public class SpellVesperidysSummonAdds extends Spell {
 		// Prioritizes platforms which doesn't have adds on it (including boss itself).
 		for (Vesperidys.Platform platform : platforms) {
 			selectedPlatform = platform;
-			if (platform.getMobsOnPlatform().size() <= 0 && platform.getPlayersOnPlatform().size() <= 0) {
+			if (platform.getMobsOnPlatform().isEmpty() && platform.getPlayersOnPlatform().isEmpty()) {
 				break;
 			}
 		}
@@ -152,81 +152,82 @@ public class SpellVesperidysSummonAdds extends Spell {
 	}
 
 	public void summonCrystals() {
-			List<Vesperidys.Platform> bossPlatform = List.of(Objects.requireNonNull(mVesperidys.mPlatformList.getPlatformNearestToEntity(mBoss)));
+		List<Vesperidys.Platform> bossPlatform = List.of(Objects.requireNonNull(mVesperidys.mPlatformList.getPlatformNearestToEntity(mBoss)));
 
-			List<Vesperidys.Platform> summonerPlatforms = mVesperidys.mPlatformList.getRandomPlatforms(bossPlatform, mNumElite);
+		List<Vesperidys.Platform> summonerPlatforms = mVesperidys.mPlatformList.getRandomPlatforms(bossPlatform, mNumElite);
 
-			for (Player player : PlayerUtils.playersInRange(mVesperidys.mSpawnLoc, Vesperidys.detectionRange, true)) {
-				if (!mWarnedPlayers.contains(player)) {
-					mWarnedPlayers.add(player);
-					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						player.sendMessage(Component.text("The Vesperidys is channeling its power through the crystals! Each existing crystals applies ", NamedTextColor.YELLOW)
-							.append(Component.text("damage ", NamedTextColor.RED))
-							.append(Component.text("and ", NamedTextColor.YELLOW))
-							.append(Component.text("resistance ", NamedTextColor.GRAY))
-							.append(Component.text("buffs to the Vesperidys!", NamedTextColor.YELLOW))
-						);
-					}, 3 * 20);
+		for (Player player : PlayerUtils.playersInRange(mVesperidys.mSpawnLoc, Vesperidys.detectionRange, true)) {
+			if (!mWarnedPlayers.contains(player)) {
+				mWarnedPlayers.add(player);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					player.sendMessage(Component.text("The Vesperidys is channeling its power through the crystals! Each existing crystals applies ", NamedTextColor.YELLOW)
+						.append(Component.text("damage ", NamedTextColor.RED))
+						.append(Component.text("and ", NamedTextColor.YELLOW))
+						.append(Component.text("resistance ", NamedTextColor.GRAY))
+						.append(Component.text("buffs to the Vesperidys!", NamedTextColor.YELLOW))
+					);
+				}, 3 * 20);
+			}
+		}
+
+
+		BukkitRunnable crystalRunnable = new BukkitRunnable() {
+			int mCrystalTicks = 0;
+			final Location mStartLoc = mBoss.getLocation().add(0, 1.5, 0);
+
+			@Override
+			public void run() {
+				if (mVesperidys.mDefeated) {
+					this.cancel();
+					return;
+				}
+
+				if (mCrystalTicks >= 40) {
+					for (Vesperidys.Platform platform : summonerPlatforms) {
+						LivingEntity e = (LivingEntity) mElitePool.spawn(platform.getCenter().clone().add(0, 1, 0));
+
+						if (e != null) {
+							EntityUtils.setMaxHealthAndHealth(e, DepthsParty.getAscensionScaledHealth(CRYSTAL_HEALTH, mVesperidys.mParty));
+							e.addScoreboardTag("DD2BossFight3");
+							e.addScoreboardTag("VoidCrystal");
+						}
+					}
+
+					this.cancel();
+					return;
+				}
+
+				mCrystalTicks++;
+				// Particles that slowly reach summoners.
+				for (Vesperidys.Platform platform : summonerPlatforms) {
+					Location endLoc = platform.getCenter().add(0, 2.5, 0);
+					Vector dir = LocationUtils.getDirectionTo(endLoc, mStartLoc).normalize();
+					double distance = mStartLoc.distance(endLoc);
+					double particleDistance = Math.min(distance, ((double) mCrystalTicks / 35) * distance);
+
+					Location particleLoc = mStartLoc.clone().add(dir.multiply(particleDistance));
+
+					new PartialParticle(Particle.END_ROD, particleLoc, 1)
+						.extra(10000000)
+						.spawnAsBoss();
+					new PartialParticle(Particle.REDSTONE, particleLoc, 1)
+						.data(new Particle.DustOptions(Color.fromRGB(128, 128, 128), 0.75f))
+						.spawnAsBoss();
+
+					new PPCircle(Particle.END_ROD, particleLoc.clone().add(0, -1.7, 0), Math.max(0.5, Math.min(2, -(1.0 / 100.0) * mCrystalTicks * (mCrystalTicks - 40))))
+						.extra(10000000)
+						.count(10)
+						.spawnAsBoss();
 				}
 			}
+		};
 
-
-			BukkitRunnable crystalRunnable = new BukkitRunnable() {
-				int mCrystalTicks = 0;
-				final Location mStartLoc = mBoss.getLocation().add(0, 1.5, 0);
-
-				@Override
-				public void run() {
-					if (mVesperidys.mDefeated) {
-						this.cancel();
-						return;
-					}
-
-					if (mCrystalTicks >= 40) {
-						for (Vesperidys.Platform platform : summonerPlatforms) {
-							LivingEntity e = (LivingEntity) mElitePool.spawn(platform.getCenter().clone().add(0, 1, 0));
-
-							if (e != null) {
-								EntityUtils.setMaxHealthAndHealth(e, DepthsParty.getAscensionScaledHealth(CRYSTAL_HEALTH, mVesperidys.mParty));
-								e.addScoreboardTag("DD2BossFight3");
-								e.addScoreboardTag("VoidCrystal");
-							}
-						}
-
-						this.cancel();
-						return;
-					}
-
-					mCrystalTicks++;
-					// Particles that slowly reach summoners.
-					for (Vesperidys.Platform platform : summonerPlatforms) {
-						Location endLoc = platform.getCenter().add(0, 2.5, 0);
-						Vector dir = LocationUtils.getDirectionTo(endLoc, mStartLoc).normalize();
-						double distance = mStartLoc.distance(endLoc);
-						double particleDistance = Math.min(distance, ((double) mCrystalTicks / 35) * distance);
-
-						Location particleLoc = mStartLoc.clone().add(dir.multiply(particleDistance));
-
-						new PartialParticle(Particle.END_ROD, particleLoc, 1)
-							.extra(10000000)
-							.spawnAsBoss();
-						new PartialParticle(Particle.REDSTONE, particleLoc, 1)
-							.data(new Particle.DustOptions(Color.fromRGB(128, 128, 128), 0.75f))
-							.spawnAsBoss();
-
-						new PPCircle(Particle.END_ROD, particleLoc.clone().add(0, -1.7, 0), Math.max(0.5, Math.min(2, -(1.0 / 100.0) * mCrystalTicks * (mCrystalTicks - 40))))
-							.extra(10000000)
-							.count(10)
-							.spawnAsBoss();
-					}
-				}
-			};
-
-			crystalRunnable.runTaskTimer(mPlugin, 0, 1);
-			mActiveRunnables.add(crystalRunnable);
+		crystalRunnable.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(crystalRunnable);
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return 0;
 	}
 

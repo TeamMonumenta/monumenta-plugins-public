@@ -3,15 +3,17 @@ package com.playmonumenta.plugins.custominventories;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.RemotePlayerAPI;
 import com.playmonumenta.networkrelay.RemotePlayerData;
+import com.playmonumenta.networkrelay.shardhealth.ShardHealth;
 import com.playmonumenta.plugins.commands.DungeonAccessCommand;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DungeonUtils.DungeonCommandMapping;
+import com.playmonumenta.plugins.utils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ShardHealthUtils.ShardHealth;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
@@ -30,8 +32,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
-
-import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.getGuildBanner;
 
 public class OrinCustomInventory extends CustomInventory {
 	private static final Material FILLER = GUIUtils.FILLER_MATERIAL;
@@ -71,19 +71,19 @@ public class OrinCustomInventory extends CustomInventory {
 		@Nullable Function<Player, ItemStack> mCustomItem;
 
 		public TeleportEntry(TeleporterPage page, InvLocation slot, String name, String lore,
-							 Material type, @Nullable String scoreboard, int scoreRequired, @Nullable String left) {
+		                     Material type, @Nullable String scoreboard, int scoreRequired, @Nullable String left) {
 			this(page, slot, name, lore, type, scoreboard, scoreRequired, left, null, 1);
 		}
 
 		public TeleportEntry(TeleporterPage page, InvLocation slot, String name, String lore,
-							 Material type, @Nullable String scoreboard, int scoreRequired,
-							 @Nullable String left, @Nullable String right) {
+		                     Material type, @Nullable String scoreboard, int scoreRequired,
+		                     @Nullable String left, @Nullable String right) {
 			this(page, slot, name, lore, type, scoreboard, scoreRequired, left, right, 1);
 		}
 
 		public TeleportEntry(TeleporterPage page, InvLocation slot, String name, String lore,
-							 Material type, @Nullable String scoreboard, int scoreRequired,
-							 @Nullable String left, @Nullable String right, int count) {
+		                     Material type, @Nullable String scoreboard, int scoreRequired,
+		                     @Nullable String left, @Nullable String right, int count) {
 			this(page, slot, name, lore, type, scoreboard, scoreRequired,
 				StringUtils.isBlank(left) ? null : (gui, player) -> gui.completeCommand(player, left),
 				StringUtils.isBlank(right) ? null : (gui, player) -> gui.completeCommand(player, right),
@@ -91,8 +91,8 @@ public class OrinCustomInventory extends CustomInventory {
 		}
 
 		public TeleportEntry(TeleporterPage page, InvLocation slot, String name, String lore,
-							 Material type, @Nullable String scoreboard, int scoreRequired,
-							 @Nullable String left, @Nullable String right, int count, @Nullable Function<Player, ItemStack> customItem) {
+		                     Material type, @Nullable String scoreboard, int scoreRequired,
+		                     @Nullable String left, @Nullable String right, int count, @Nullable Function<Player, ItemStack> customItem) {
 			this(page, slot, name, lore, type, scoreboard, scoreRequired,
 				StringUtils.isBlank(left) ? null : (gui, player) -> gui.completeCommand(player, left),
 				StringUtils.isBlank(right) ? null : (gui, player) -> gui.completeCommand(player, right),
@@ -100,10 +100,10 @@ public class OrinCustomInventory extends CustomInventory {
 		}
 
 		public TeleportEntry(TeleporterPage page, InvLocation slot, String name, String lore,
-							 Material type, @Nullable String scoreboard, int scoreRequired,
-							 @Nullable BiConsumer<OrinCustomInventory, Player> left,
-							 @Nullable BiConsumer<OrinCustomInventory, Player> right,
-							 int count, @Nullable Function<Player, ItemStack> customItem) {
+		                     Material type, @Nullable String scoreboard, int scoreRequired,
+		                     @Nullable BiConsumer<OrinCustomInventory, Player> left,
+		                     @Nullable BiConsumer<OrinCustomInventory, Player> right,
+		                     int count, @Nullable Function<Player, ItemStack> customItem) {
 			mPage = page;
 			mSlot = slot.getInvLoc();
 			mName = name;
@@ -140,7 +140,8 @@ public class OrinCustomInventory extends CustomInventory {
 		REGION_3(3),
 		PLOTS(4),
 		PLAYER_PLOTS(5),
-		DEFAULT_SHARD(6),
+		GUILD_PLOTS(6),
+		DEFAULT_SHARD(7),
 		COMMON_INSTANCE_BOT_PAGES(10),
 		REGION_1_INSTANCE_BOT(11),
 		REGION_2_INSTANCE_BOT(12),
@@ -176,14 +177,21 @@ public class OrinCustomInventory extends CustomInventory {
 
 	static {
 		String sortedDesc = "Left Click to be sorted to a shard, right click to choose the shard.";
+		String plotDesc = "Left Click to the last plot you visited, right click to choose the plot.";
 		Function<Player, ItemStack> getBanner = player -> {
-			ItemStack banner = getGuildBanner(player);
-			if (banner == null) {
-				banner = new ItemStack(Material.YELLOW_BANNER);
-			}
+			ItemStack banner = LuckPermsIntegration.getGuildPlotsBanner(player);
 			ArrayList<Component> lore = new ArrayList<>();
-			lore.add(Component.text("Click to teleport!", NamedTextColor.DARK_PURPLE));
-			return GUIUtils.createBasicItem(banner, 1, Component.text("Guild Plot", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false),
+
+			if (GuildPlotUtils.SHARD_NAME.equals(ServerProperties.getShardName())) {
+				lore.add(Component.text("Click to select guild plot to visit", NamedTextColor.DARK_PURPLE));
+			} else {
+				lore.add(Component.text("Left click to visit ", NamedTextColor.DARK_PURPLE)
+					.append(LuckPermsIntegration.getSelectedGuildPlotName(player)));
+				lore.add(Component.text("Right click to select guild plot to visit", NamedTextColor.DARK_PURPLE));
+			}
+
+			return GUIUtils.createBasicItem(banner, 1,
+				Component.text("Guild Plot", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false),
 				lore, true);
 		};
 
@@ -194,9 +202,12 @@ public class OrinCustomInventory extends CustomInventory {
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_1, new InvLocation(1, 2), "Plots", "Click to teleport!",
 			Material.LIGHT_BLUE_CONCRETE, null, 0,
 			"execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_plots"));
-		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_1, new InvLocation(1, 4), "Player Plot", "Click to teleport!",
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_1, new InvLocation(1, 4), "Player Plot", plotDesc,
 			Material.GRASS_BLOCK, "CurrentPlot", 1,
 			"plot send @S", "plot gui @S"));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_1, new InvLocation(1, 5), "Guild Plot", plotDesc,
+			Material.YELLOW_BANNER, null, 0,
+			"transferserver guildplots", "guild teleportgui @S", 1, getBanner));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_1, new InvLocation(4, 2), "Sierhaven", sortedDesc,
 			Material.GREEN_CONCRETE, null, 0,
 			"tp @S -765.5 107.0625 70.5 180 0", "instancebot valley"));
@@ -214,9 +225,12 @@ public class OrinCustomInventory extends CustomInventory {
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_2, new InvLocation(1, 2), "Plots", "Click to teleport!",
 			Material.LIGHT_BLUE_CONCRETE, null, 0,
 			"execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_plots"));
-		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_2, new InvLocation(1, 4), "Player Plot", "Click to teleport!",
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_2, new InvLocation(1, 4), "Player Plot", plotDesc,
 			Material.GRASS_BLOCK, "CurrentPlot", 1,
 			"plot send @S", "plot gui @S"));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_2, new InvLocation(1, 5), "Guild Plot", plotDesc,
+			Material.YELLOW_BANNER, null, 0,
+			"transferserver guildplots", "guild teleportgui @S", 1, getBanner));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_2, new InvLocation(4, 2), "Sierhaven", sortedDesc,
 			Material.GREEN_CONCRETE, null, 0,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
@@ -234,9 +248,12 @@ public class OrinCustomInventory extends CustomInventory {
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_3, new InvLocation(1, 2), "Plots", "Click to teleport!",
 			Material.LIGHT_BLUE_CONCRETE, null, 0,
 			"execute as @S run function monumenta:mechanisms/teleporters/tp/galengarde_to_plots"));
-		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_3, new InvLocation(1, 4), "Player Plot", "Click to teleport!",
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_3, new InvLocation(1, 4), "Player Plot", plotDesc,
 			Material.GRASS_BLOCK, "CurrentPlot", 1,
 			"plot send @S", "plot gui @S"));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_3, new InvLocation(1, 5), "Guild Plot", plotDesc,
+			Material.YELLOW_BANNER, null, 0,
+			"transferserver guildplots", "guild teleportgui @S", 1, getBanner));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.REGION_3, new InvLocation(4, 2), "Sierhaven", sortedDesc,
 			Material.GREEN_CONCRETE, null, 0,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
@@ -257,12 +274,12 @@ public class OrinCustomInventory extends CustomInventory {
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLOTS, new InvLocation(1, 3), "Market", "Click to teleport!",
 			Material.BARREL, null, 0,
 			"execute as @S run function monumenta:mechanisms/teleporters/enter_new_market"));
-		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLOTS, new InvLocation(1, 4), "Player Plot", "Click to teleport!",
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLOTS, new InvLocation(1, 4), "Player Plot", plotDesc,
 			Material.GRASS_BLOCK, "CurrentPlot", 1,
 			"plot send @S", "plot gui @S"));
-		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLOTS, new InvLocation(1, 5), "Guild Plot", "Click to teleport!",
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLOTS, new InvLocation(1, 5), "Guild Plot", plotDesc,
 			Material.YELLOW_BANNER, null, 0,
-			"teleportguild @S", "guild teleportgui @S", 1, getBanner));
+			"transferserver guildplots", "guild teleportgui @S", 1, getBanner));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLOTS, new InvLocation(4, 2), "Sierhaven", sortedDesc,
 			Material.GREEN_CONCRETE, null, 0,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
@@ -280,9 +297,12 @@ public class OrinCustomInventory extends CustomInventory {
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLAYER_PLOTS, new InvLocation(1, 2), "Plots", "Click to teleport!",
 			Material.LIGHT_BLUE_CONCRETE, null, 0,
 			"transferserver plots"));
-		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLAYER_PLOTS, new InvLocation(1, 4), "Player Plot", "Click to teleport!",
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLAYER_PLOTS, new InvLocation(1, 4), "Player Plot", plotDesc,
 			Material.GRASS_BLOCK, "CurrentPlot", 1,
 			"plot gui @S", "plot gui @S"));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLAYER_PLOTS, new InvLocation(1, 5), "Guild Plot", plotDesc,
+			Material.YELLOW_BANNER, null, 0,
+			"transferserver guildplots", "guild teleportgui @S", 1, getBanner));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.PLAYER_PLOTS, new InvLocation(4, 2), "Sierhaven", sortedDesc,
 			Material.GREEN_CONCRETE, null, 0,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
@@ -296,12 +316,39 @@ public class OrinCustomInventory extends CustomInventory {
 			Material.SPAWNER, null, 0,
 			"page 21"));
 
+		// Guildplots Page
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.GUILD_PLOTS, new InvLocation(1, 2), "Plots", "Click to teleport!",
+			Material.LIGHT_BLUE_CONCRETE, null, 0,
+			"transferserver plots"));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.GUILD_PLOTS, new InvLocation(1, 4), "Player Plot", plotDesc,
+			Material.GRASS_BLOCK, "CurrentPlot", 1,
+			"plot send @S", "plot gui @S"));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.GUILD_PLOTS, new InvLocation(1, 5), "Guild Plot", plotDesc,
+			Material.YELLOW_BANNER, null, 0,
+			"guild teleportgui @S", "guild teleportgui @S", 1, getBanner));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.GUILD_PLOTS, new InvLocation(4, 2), "Sierhaven", sortedDesc,
+			Material.GREEN_CONCRETE, null, 0,
+			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.GUILD_PLOTS, new InvLocation(7, 2), "Mistport", sortedDesc,
+			Material.SAND, "Quest101", 13,
+			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.GUILD_PLOTS, new InvLocation(4, 5), "Galengarde", sortedDesc,
+			Material.RED_MUSHROOM_BLOCK, "R3Access", 1,
+			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/ring", "instancebot ring"));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.GUILD_PLOTS, new InvLocation(7, 5), "Dungeon Instances", "Click to view all open dungeon instances.",
+			Material.SPAWNER, null, 0,
+			"page 21"));
+
+		// Default Page
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DEFAULT_SHARD, new InvLocation(1, 2), "Plots", "Click to teleport!",
 			Material.LIGHT_BLUE_CONCRETE, null, 0,
 			"transferserver plots"));
-		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DEFAULT_SHARD, new InvLocation(1, 4), "Player Plot", "Click to teleport!",
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DEFAULT_SHARD, new InvLocation(1, 4), "Player Plot", plotDesc,
 			Material.GRASS_BLOCK, "CurrentPlot", 1,
 			"plot send @S", "plot gui @S"));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DEFAULT_SHARD, new InvLocation(1, 5), "Guild Plot", plotDesc,
+			Material.YELLOW_BANNER, null, 0,
+			"transferserver guildplots", "guild teleportgui @S", 1, getBanner));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DEFAULT_SHARD, new InvLocation(4, 2), "Sierhaven", sortedDesc,
 			Material.GREEN_CONCRETE, null, 0,
 			"execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
@@ -380,6 +427,8 @@ public class OrinCustomInventory extends CustomInventory {
 			Material.PRISMARINE_BRICKS, "DRL2Access", 1, sendToDungeonAction(DungeonCommandMapping.SHIFTINGCITY), null, 1, null));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(6, 5), "The Fallen Forum", "Click to teleport!",
 			Material.BOOKSHELF, "DFFAccess", 1, sendToDungeonAction(DungeonCommandMapping.FORUM), null, 1, null));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(4, 6), "Rush of Dissonance", "Click to teleport!",
+			Material.FIRE_CORAL_BLOCK, "DRDAccess", 1, sendToDungeonAction(DungeonCommandMapping.RUSH), null, 1, null));
 
 		//Group: R3 Dungeons
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(7, 3), "Silver Knight's Tomb", "Click to teleport!",
@@ -390,6 +439,8 @@ public class OrinCustomInventory extends CustomInventory {
 			"D13Access", 1, sendToDungeonAction(DungeonCommandMapping.BROWN), null, 1, null));
 		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(7, 4), "Hexfall", "Click to teleport!", Material.MOSSY_STONE_BRICKS,
 			"DHFAccess", 1, sendToDungeonAction(DungeonCommandMapping.HEXFALL), null, 1, null));
+		ORIN_ITEMS.add(new TeleportEntry(TeleporterPage.DUNGEON_INSTANCES, new InvLocation(8, 4), "Indigo", "Click to teleport!", Material.PURPLE_CONCRETE_POWDER,
+			"DIAccess", 1, sendToDungeonAction(DungeonCommandMapping.INDIGO), null, 1, null));
 	}
 
 	private TeleporterPage mCurrentPage;
@@ -410,6 +461,8 @@ public class OrinCustomInventory extends CustomInventory {
 				mCurrentPage = TeleporterPage.PLOTS;
 			} else if (mCurrentShard.equals("playerplots")) {
 				mCurrentPage = TeleporterPage.PLAYER_PLOTS;
+			} else if (mCurrentShard.equals(GuildPlotUtils.SHARD_NAME)) {
+				mCurrentPage = TeleporterPage.GUILD_PLOTS;
 			} else {
 				mCurrentPage = TeleporterPage.DEFAULT_SHARD;
 			}
@@ -510,6 +563,8 @@ public class OrinCustomInventory extends CustomInventory {
 				mCurrentPage = TeleporterPage.PLOTS;
 			} else if (mCurrentShard.equals("playerplots")) {
 				mCurrentPage = TeleporterPage.PLAYER_PLOTS;
+			} else if (mCurrentShard.equals(GuildPlotUtils.SHARD_NAME)) {
+				mCurrentPage = TeleporterPage.GUILD_PLOTS;
 			} else {
 				mCurrentPage = TeleporterPage.DEFAULT_SHARD;
 			}
@@ -659,7 +714,9 @@ public class OrinCustomInventory extends CustomInventory {
 
 			if (player.hasPermission("group.dev")) {
 				ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shardName);
-				shardLore.add((int) (100 * shardHealth.healthScore()) + "% Shard Health (lags/crashes at 0, only devs see this)");
+				shardLore.add(String.format("%5.1f%% Shard Health (lags/crashes at 0, only devs see this)", 100 * shardHealth.healthScore()));
+				shardLore.add(String.format("- %5.1f%% Memory Available", 100 * shardHealth.memoryHealth()));
+				shardLore.add(String.format("- %5.1f%% Tick Spent Idle", 100 * shardHealth.tickHealth()));
 			}
 
 

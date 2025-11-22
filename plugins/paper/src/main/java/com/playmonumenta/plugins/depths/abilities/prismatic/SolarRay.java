@@ -247,8 +247,9 @@ public class SolarRay extends DepthsAbility implements AbilityWithChargesOrStack
 	}
 
 	private static Description<SolarRay> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<SolarRay>(color)
-			.add("Right click to summon a beam of radiant energy which travels in a straight line for ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to summon a beam of radiant energy which travels in a straight line for ")
 			.addDuration(MAX_LIFETIME)
 			.add(" seconds, and bounces off of surfaces. The beam deals ")
 			.addDepthsDamage(a -> BASE_DAMAGE[rarity - 1], BASE_DAMAGE[rarity - 1], true)

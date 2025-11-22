@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.managers;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.EntityGlowEvent;
 import com.playmonumenta.plugins.protocollib.GlowingReplacer;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -28,24 +29,9 @@ public class GlowingManager {
 	public static int PLAYER_ABILITY_PRIORITY = 100;
 	public static int BOSS_SPELL_PRIORITY = 1000;
 
-	private static class GlowingInstance {
-		final boolean mGlowing;
-		final NamedTextColor mTeamColor;
-		final Color mDisplayColor;
-		final int mUntilTick;
-		final @Nullable Predicate<Player> mVisibleToPlayers;
-		final int mPriority;
-		final @Nullable String mReference;
-
-		public GlowingInstance(boolean glowing, NamedTextColor teamColor, Color displayColor, int untilTick, @Nullable Predicate<Player> visibleToPlayers, int priority, @Nullable String reference) {
-			mGlowing = glowing;
-			mTeamColor = teamColor;
-			mDisplayColor = displayColor;
-			mUntilTick = untilTick;
-			mVisibleToPlayers = visibleToPlayers;
-			mPriority = priority;
-			mReference = reference;
-		}
+	public record GlowingInstance(boolean mGlowing, NamedTextColor mTeamColor, Color mDisplayColor, int mUntilTick,
+	                              @Nullable Predicate<Player> mVisibleToPlayers, int mPriority,
+	                              @Nullable String mReference) {
 	}
 
 	private static class GlowingEntityData {
@@ -90,20 +76,20 @@ public class GlowingManager {
 
 	private static @Nullable BukkitRunnable mTask;
 
-	public static ActiveGlowingEffect makeGlowImmune(Entity entity, int duration, int priority) {
+	public static @Nullable ActiveGlowingEffect makeGlowImmune(Entity entity, int duration, int priority) {
 		return makeGlowImmune(entity, duration, priority, null, null);
 	}
 
-	public static ActiveGlowingEffect makeGlowImmune(Entity entity, int duration, int priority, @Nullable Predicate<Player> visibleToPlayers, @Nullable String reference) {
+	public static @Nullable ActiveGlowingEffect makeGlowImmune(Entity entity, int duration, int priority, @Nullable Predicate<Player> visibleToPlayers, @Nullable String reference) {
 		return startGlowing(entity, new GlowingInstance(false, NamedTextColor.WHITE, Color.WHITE,
-				duration < 0 ? Integer.MAX_VALUE : Bukkit.getCurrentTick() + duration, visibleToPlayers, priority, reference));
+			duration < 0 ? Integer.MAX_VALUE : Bukkit.getCurrentTick() + duration, visibleToPlayers, priority, reference));
 	}
 
-	public static ActiveGlowingEffect startGlowing(Entity entity, NamedTextColor color, int duration, int priority) {
+	public static @Nullable ActiveGlowingEffect startGlowing(Entity entity, NamedTextColor color, int duration, int priority) {
 		return startGlowing(entity, color, duration, priority, null, null);
 	}
 
-	public static ActiveGlowingEffect startGlowing(Entity entity, NamedTextColor color, int duration, int priority, @Nullable Predicate<Player> visibleToPlayers, @Nullable String reference) {
+	public static @Nullable ActiveGlowingEffect startGlowing(Entity entity, NamedTextColor color, int duration, int priority, @Nullable Predicate<Player> visibleToPlayers, @Nullable String reference) {
 		return startGlowing(entity, new GlowingInstance(true, color, Color.fromRGB(color.red(), color.green(), color.blue()),
 			duration < 0 ? Integer.MAX_VALUE : Bukkit.getCurrentTick() + duration, visibleToPlayers, priority, reference));
 	}
@@ -112,12 +98,18 @@ public class GlowingManager {
 	 * Same as the other startGlowing, but for displays. Note that currently all players will see the same colour unlike for other entities.
 	 * The duration and visibility check will still apply.
 	 */
-	public static ActiveGlowingEffect startGlowing(Display display, Color color, int duration, int priority, @Nullable Predicate<Player> visibleToPlayers) {
+	public static @Nullable ActiveGlowingEffect startGlowing(Display display, Color color, int duration, int priority, @Nullable Predicate<Player> visibleToPlayers) {
 		return startGlowing(display, new GlowingInstance(true, NamedTextColor.WHITE, color,
 			duration < 0 ? Integer.MAX_VALUE : Bukkit.getCurrentTick() + duration, visibleToPlayers, priority, null));
 	}
 
-	private static ActiveGlowingEffect startGlowing(Entity entity, GlowingInstance instance) {
+	private static @Nullable ActiveGlowingEffect startGlowing(Entity entity, GlowingInstance instance) {
+		EntityGlowEvent event = new EntityGlowEvent(entity, instance);
+		Bukkit.getServer().getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			return null;
+		}
+
 		if (instance.mReference != null) {
 			clear(entity, instance.mReference);
 		}
@@ -186,7 +178,7 @@ public class GlowingManager {
 			NamedTextColor sentColor = data.mSentPlayerData.get(player.getUniqueId());
 			boolean sentGlowing = sentColor != null;
 			if ((sentColor == null || activeInstance == null || !activeGlowing || !sentColor.equals(activeInstance.mTeamColor))
-				    && (sentGlowing || activeGlowing)) {
+				&& (sentGlowing || activeGlowing)) {
 				// glowing state or colour has changed, send update packets
 				if (activeInstance == null || !activeGlowing) {
 					data.mSentPlayerData.remove(player.getUniqueId());
@@ -200,7 +192,7 @@ public class GlowingManager {
 					}
 				} else {
 					GlowingReplacer.sendTeamUpdate(entity, player,
-							sentColor != null ? GlowingReplacer.getColoredGlowingTeamName(sentColor, entity) : null,
+						sentColor != null ? GlowingReplacer.getColoredGlowingTeamName(sentColor, entity) : null,
 						activeInstance != null && activeGlowing ? activeInstance.mTeamColor : null);
 				}
 

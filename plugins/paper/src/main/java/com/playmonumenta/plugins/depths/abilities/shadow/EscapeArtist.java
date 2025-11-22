@@ -43,6 +43,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
+import org.bukkit.entity.ThrowableProjectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -73,7 +75,7 @@ public class EscapeArtist extends DepthsAbility {
 			.descriptions(EscapeArtist::getDescription)
 			.priorityAmount(10000);
 
-	private final Map<Snowball, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
+	private final Map<ThrowableProjectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
 	private final int mStealthDuration;
 	private final double mMaxTPDistance;
 	private final double mProjectileSpeed;
@@ -157,13 +159,14 @@ public class EscapeArtist extends DepthsAbility {
 
 		new PartialParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 20, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
 
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, mProjectileSpeed, "Escape Artist Projectile", Particle.SMOKE_NORMAL);
+		ThrowableProjectile proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, mProjectileSpeed, "Escape Artist Projectile", Particle.SMOKE_NORMAL, LocationUtils.isLocationInWater(mPlayer.getLocation()));
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		mPlayerItemStatsMap.put(proj, playerItemStats);
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;
 			final Location mPlayerLocation = mPlayer.getLocation();
+
 			@Override
 			public void run() {
 				if (mPlayerItemStatsMap.get(proj) != playerItemStats) {
@@ -207,7 +210,7 @@ public class EscapeArtist extends DepthsAbility {
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (proj instanceof Snowball && proj.getTicksLived() <= 100) {
+		if ((proj instanceof Snowball || proj instanceof Trident) && proj.getTicksLived() <= 100) {
 			ItemStatManager.PlayerItemStats stats = mPlayerItemStatsMap.remove(proj);
 			if (!mPlayer.getWorld().equals(proj.getWorld())) {
 				return;
@@ -217,6 +220,7 @@ public class EscapeArtist extends DepthsAbility {
 				executeTeleport(proj.getLocation().add(0, 1, 0).setDirection(mPlayer.getEyeLocation().getDirection()));
 			}
 		}
+		proj.remove();
 	}
 
 	public void executeTeleport(Location destination) {
@@ -267,14 +271,16 @@ public class EscapeArtist extends DepthsAbility {
 	}
 
 	private static Description<EscapeArtist> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<EscapeArtist>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When your health drops below ")
 			.addPercent(TRIGGER_HEALTH)
 			.add(", ignore the hit and gain 50% resistance and stealth for ")
 			.addDuration(a -> a.mStealthDuration, STEALTH_DURATION[rarity - 1], false, true)
-			.add(" seconds. Hitting the drop key within the next ")
+			.add(" seconds. ")
+			.addTrigger()
+			.add(" within the next ")
 			.addDuration(a -> TP_WINDOW, TP_WINDOW)
-			.add(" seconds throws a projectile that travels up to ")
+			.add(" seconds to throw a projectile that travels up to ")
 			.add(a -> a.mMaxTPDistance, MAX_TP_DISTANCE)
 			.add(" blocks away. Upon hitting a mob, block, or reaching its max distance, you teleport to its location and leave behind a smoke bomb that stuns all mobs in a ")
 			.add(a -> a.mStunRadius, STUN_RADIUS)

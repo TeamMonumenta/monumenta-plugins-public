@@ -139,7 +139,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			mInventory.setItem((row * 9), mRefundItem);
 			mMapFunction.put((row * 9), (p, inventory, slot) -> {
 				try {
-					InfusionUtils.refundInfusion(player.getEquipment().getItem(equipmentSlot), p);
+					InfusionUtils.refundInfusion(item, p);
 				} catch (WrapperCommandSyntaxException e) {
 					p.sendMessage(Component.text("Error refunding infusion. Please contact a mod: " + e.getMessage()));
 				}
@@ -183,7 +183,7 @@ public class InfusionCustomInventory extends CustomInventory {
 
 
 				mMapFunction.put(slot, (p, inventory, itemSlot) -> {
-					attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion);
+					attemptInfusion(p, item, infusion);
 				});
 			} else {
 				mInventory.setItem(slot, mMaxLevelReachedItem);
@@ -193,12 +193,11 @@ public class InfusionCustomInventory extends CustomInventory {
 			mInventory.setItem((row * 9), infuseItem);
 
 			//set the function when the item is clicked
-
 			mPanelList.forEach((inf, it) -> {
 				int loc = (row * 9) + 2 + inf.ordinal();
 				mInventory.setItem(loc, it);
 				mMapFunction.put(loc, (p, inventory, slot) -> {
-					attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), inf);
+					attemptInfusion(p, item, inf);
 				});
 			});
 		}

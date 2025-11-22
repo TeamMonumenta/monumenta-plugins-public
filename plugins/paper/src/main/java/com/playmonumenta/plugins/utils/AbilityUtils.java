@@ -21,8 +21,6 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.steelsage.DepthsVolley;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.Effect;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -48,6 +46,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -55,7 +54,9 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
+import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -186,7 +187,7 @@ public class AbilityUtils {
 		Location loc = player.getLocation();
 		World world = player.getWorld();
 
-		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 8, 0.25, 0.3, 0.25, 0.1f).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.5f, 2f);
@@ -196,7 +197,7 @@ public class AbilityUtils {
 		Location loc = player.getLocation();
 		World world = player.getWorld();
 
-		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 8, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 0.6f, 0.5f);
@@ -240,32 +241,11 @@ public class AbilityUtils {
 		}
 	}
 
-	// the unluck potion effect does not increase nor decrease luck attribute
-	public static void increaseDamageReceivedPlayer(Player player, int duration, double damageBoost, String cause) {
-		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentDamageReceived(duration, damageBoost));
-		if (damageBoost > 0) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, duration, -1));
-		} else if (damageBoost < 0) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, -1));
-		}
-	}
-
-	// the weakness potion effect does not increase nor decrease melee damage
-	public static void increaseDamageDealtPlayer(Player player, int duration, double damageBoost, String cause) {
-		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentDamageDealt(duration, damageBoost));
-		if (damageBoost < 0) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, -1));
-		} else if (damageBoost > 0) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, duration, -1));
-		}
-
-	}
-
 	public static boolean refundPotion(Player player, ThrownPotion potion) {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, POTION_REFUNDED_METAKEY)) {
 			ItemStack item = potion.getItem();
-			if (mainHand != null && mainHand.isSimilar(item) && !mainHand.containsEnchantment(Enchantment.ARROW_INFINITE)) {
+			if (mainHand.isSimilar(item) && !mainHand.containsEnchantment(Enchantment.ARROW_INFINITE)) {
 				mainHand.setAmount(mainHand.getAmount() + 1);
 				return true;
 			}
@@ -328,7 +308,7 @@ public class AbilityUtils {
 			case Warrior.BERSERKER_SPEC_ID -> "Berserker";
 			case Warrior.GUARDIAN_SPEC_ID -> "Guardian";
 			case Cleric.PALADIN_SPEC_ID -> "Paladin";
-			case Cleric.HIEROPHANT_SPEC_ID -> "Hierophant";
+			case Cleric.SERAPH_SPEC_ID -> "Seraph";
 			case Rogue.SWORDSAGE_SPEC_ID -> "Swordsage";
 			case Rogue.ASSASSIN_SPEC_ID -> "Assassin";
 			case Alchemist.HARBINGER_SPEC_ID -> "Harbinger";
@@ -350,7 +330,7 @@ public class AbilityUtils {
 			case "Berserker" -> Warrior.BERSERKER_SPEC_ID;
 			case "Guardian" -> Warrior.GUARDIAN_SPEC_ID;
 			case "Paladin" -> Cleric.PALADIN_SPEC_ID;
-			case "Hierophant" -> Cleric.HIEROPHANT_SPEC_ID;
+			case "Seraph" -> Cleric.SERAPH_SPEC_ID;
 			case "Swordsage" -> Rogue.SWORDSAGE_SPEC_ID;
 			case "Assassin" -> Rogue.ASSASSIN_SPEC_ID;
 			case "Harbinger" -> Alchemist.HARBINGER_SPEC_ID;
@@ -360,7 +340,6 @@ public class AbilityUtils {
 			case "Reaper" -> Warlock.REAPER_SPEC_ID;
 			case "Tenebrist" -> Warlock.TENEBRIST_SPEC_ID;
 			case "Soothsayer" -> Shaman.SOOTHSAYER_ID;
-			case "Soulbreaker" -> Shaman.HEXBREAKER_ID;
 			case "Hexbreaker" -> Shaman.HEXBREAKER_ID;
 			default -> 0;
 		};
@@ -431,7 +410,7 @@ public class AbilityUtils {
 	public static int getEffectiveTotalSkillPoints(Player player) {
 		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
 		if (ServerProperties.getAbilityEnhancementsEnabled(player)
-			    && PlayerUtils.hasUnlockedRing(player)) {
+			&& PlayerUtils.hasUnlockedRing(player)) {
 			return MAX_SKILL_POINTS;
 		}
 		return ScoreboardUtils.getScoreboardValue(player, TOTAL_LEVEL).orElse(0);
@@ -440,7 +419,7 @@ public class AbilityUtils {
 	public static int getEffectiveTotalSpecPoints(Player player) {
 		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
 		if (ServerProperties.getAbilityEnhancementsEnabled(player)
-			    && PlayerUtils.hasUnlockedRing(player)) {
+			&& PlayerUtils.hasUnlockedRing(player)) {
 			return MAX_SPEC_POINTS;
 		}
 		return ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
@@ -460,7 +439,7 @@ public class AbilityUtils {
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_SPEC_NAME, 0);
 		AbilityManager.getManager().resetPlayerAbilities(player);
 		updateAbilityScores(player);
-		player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 0.7f);
+		player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 0.75f, 1.35f);
 		player.sendMessage(Component.text("Your skill points have been reset. You can pick a new class now.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
 		refreshClass(player);
 	}
@@ -472,7 +451,7 @@ public class AbilityUtils {
 		}
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_SPEC_NAME, 0);
 		updateAbilityScores(player);
-		player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 0.7f);
+		player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 0.75f, 1.35f);
 		player.sendMessage(Component.text("Your specialization points have been reset. You can pick a new specialization now.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
 		refreshClass(player);
 	}
@@ -521,8 +500,7 @@ public class AbilityUtils {
 
 		String errorMessage = null;
 		if (chosenClass != null &&
-			    (chosenClass.mQuestReq != null && (ScoreboardUtils.getScoreboardValue(player, chosenClass.mQuestReq).orElse(0) < chosenClass.mQuestReqMin && !getEffectiveSpecs(player))) &&
-			    (chosenClass.mPermissionString != null && !player.hasPermission(chosenClass.mPermissionString))) {
+			(chosenClass.mQuestReq != null && (ScoreboardUtils.getScoreboardValue(player, chosenClass.mQuestReq).orElse(0) < chosenClass.mQuestReqMin && !getEffectiveSpecs(player)))) {
 			errorMessage = "You have not unlocked this class yet.";
 		} else if (chosenClass != null && playerSpec == chosenClass.mSpecOne.mSpecialization && ScoreboardUtils.getScoreboardValue(player, Objects.requireNonNull(chosenClass.mSpecOne.mSpecQuestScoreboard)).orElse(0) < 100 && !getEffectiveSpecs(player)) {
 			errorMessage = "You have not unlocked this specialization yet.";
@@ -587,12 +565,16 @@ public class AbilityUtils {
 	private static final EnumSet<ClassAbility> TRIGGERS_ASPECTS = EnumSet.of(
 		ClassAbility.ERUPTION,
 		ClassAbility.QUAKE,
+		ClassAbility.SWEEPING_EDGE,
+		ClassAbility.ARCANE_THRUST,
 		ClassAbility.EXPLOSIVE,
 		ClassAbility.ARCANE_STRIKE_ENHANCED,
 		ClassAbility.PREDATOR_STRIKE,
 		ClassAbility.ALCHEMIST_POTION,
-		ClassAbility.ALCHEMICAL_ARTILLERY,
-		ClassAbility.UNSTABLE_AMALGAM
+		ClassAbility.ALCHEMICAL_ARTILLERY, // NOT its enhancement
+		ClassAbility.UNSTABLE_AMALGAM,
+		ClassAbility.ETHEREAL_ASCENSION,
+		ClassAbility.HALLOWED_BEAM
 	);
 
 	public static boolean isAspectTriggeringEvent(DamageEvent event, Player player) {
@@ -600,9 +582,52 @@ public class AbilityUtils {
 
 		// Is:
 		// Melee from a weapon that is not only a projectile weapon
+		// Melee Enchantment damage (Sweeping Edge and Arcane Thrust)
 		// Projectile
 		// One of a few "class abilities" that trigger aspects (i.e. Eruption, Quake)
-		return (type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE || TRIGGERS_ASPECTS.contains(event.getAbility());
+		return (type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand()))
+			|| type == DamageEvent.DamageType.PROJECTILE
+			|| TRIGGERS_ASPECTS.contains(event.getAbility());
+	}
+
+	public static boolean isChargedAspectTriggeringEvent(DamageEvent event, Player player) {
+		DamageEvent.DamageType type = event.getType();
+		ClassAbility ability = event.getAbility();
+
+		if (isAspectTriggeringEvent(event, player)) {
+			switch (type) {
+				case MELEE, MELEE_ENCH -> {
+					if (player.getCooledAttackStrength(0) < 0.9) {
+						return false;
+					}
+				}
+				case PROJECTILE -> {
+					if (event.getDamager() instanceof Projectile proj && !EntityUtils.isAbilityTriggeringProjectile(proj, true)) {
+						return false;
+					}
+				}
+				default -> {
+					if (ability == null) {
+						// Avoids a warning
+						return true;
+					}
+					switch (ability) {
+						case ETHEREAL_ASCENSION -> {
+							if (event.getBossSpellName() != null) {
+								// Ethereal Ascension orbs are marked as "non-critical" with the "boss spell name".
+								// Non-critical EA orbs cannot be allowed to transfer Bleed.
+								return false;
+							}
+						}
+						case ALCHEMICAL_ARTILLERY -> {
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public static void produceDurationString(LivingEntity totem, ArmorStand target, int totalDuration, int currentDuration, double whirlwindBuffed, boolean decayBuffed) {
@@ -656,9 +681,20 @@ public class AbilityUtils {
 		target.teleport(totem.getEyeLocation().add(0, 0.5, 0));
 	}
 
-	public static Snowball spawnAbilitySnowball(Plugin plugin, Player player, World world, double velocity, String name, @Nullable Particle particle) {
+	public static ThrowableProjectile spawnAbilitySnowball(Plugin plugin, Player player, World world, double velocity, String name, @Nullable Particle particle) {
+		return spawnAbilitySnowball(plugin, player, world, velocity, name, particle, false);
+	}
+
+	public static ThrowableProjectile spawnAbilitySnowball(Plugin plugin, Player player, World world, double velocity, String name, @Nullable Particle particle, boolean inWater) {
 		Location loc = player.getEyeLocation();
-		Snowball proj = world.spawn(loc, Snowball.class);
+		ThrowableProjectile proj;
+		if (inWater) {
+			Trident trident = world.spawn(loc, Trident.class);
+			trident.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+			proj = trident;
+		} else {
+			proj = world.spawn(loc, Snowball.class);
+		}
 		proj.setVelocity(loc.getDirection().normalize().multiply(velocity));
 		proj.setShooter(player);
 		if (particle != null) {
@@ -712,14 +748,14 @@ public class AbilityUtils {
 		droppedItem.setPickupDelay(Integer.MAX_VALUE);
 		droppedItem.setGlowing(glow);
 		if (invulnerable) {
-			EntityUtils.makeItemInvulnereable(droppedItem);
+			EntityUtils.makeItemInvulnerable(droppedItem);
 		}
 		EntityUtils.setRemoveEntityOnUnload(droppedItem);
 		return droppedItem;
 	}
 
 	public static boolean hasSpecialProjSkillScaling(@Nullable ClassAbility classAbility) {
-		return classAbility == ClassAbility.HUNTING_COMPANION || classAbility == ClassAbility.HALLOWED_BEAM;
+		return classAbility == ClassAbility.HUNTING_COMPANION;
 	}
 
 	public static boolean isVolley(Player player, Projectile proj) {
@@ -730,5 +766,39 @@ public class AbilityUtils {
 			Volley volley = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Volley.class);
 			return volley != null && volley.mVolley.contains(proj);
 		}
+	}
+
+	private static final EnumSet<ClassAbility> INDIRECT_ABILITIES = EnumSet.of(
+		ClassAbility.HUNTING_COMPANION,
+		ClassAbility.RESTLESS_SOULS,
+		ClassAbility.BRUTE_FORCE_AOE,
+		ClassAbility.METEOR_SLAM,
+		ClassAbility.SCORCHED_EARTH,
+		ClassAbility.BRUTAL_ALCHEMY,
+		ClassAbility.PANACEA,
+		ClassAbility.ESOTERIC_ENHANCEMENTS,
+		ClassAbility.ELEMENTAL_SPIRIT_ICE,
+		ClassAbility.FLAME_TOTEM,
+		ClassAbility.LIGHTNING_TOTEM,
+		ClassAbility.INTERCONNECTED_HAVOC,
+		ClassAbility.CRYSTALLINE_COMBOS,
+		ClassAbility.DECAYED_TOTEM,
+		ClassAbility.ILLUMINATE_DOT,
+		ClassAbility.KEEPER_VIRTUE,
+		ClassAbility.REFLECTION
+	);
+
+	// Intended for the purpose of damage that shouldn't be considered when spoiling some hunts quarries
+	// Might be useful elsewhere but make sure it is actually the right set of conditions there too
+	public static boolean isIndirectDamage(DamageEvent event) {
+		if (event.getDamage() < 0.01) {
+			return true;
+		}
+		DamageEvent.DamageType type = event.getType();
+		if (type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.THORNS || type == DamageEvent.DamageType.POISON || type == DamageEvent.DamageType.FIRE) {
+			return true;
+		}
+		ClassAbility ca = event.getAbility();
+		return INDIRECT_ABILITIES.contains(ca);
 	}
 }

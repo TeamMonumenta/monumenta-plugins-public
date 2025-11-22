@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
-import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 
@@ -42,10 +41,7 @@ public class Alchemist extends PlayerClass {
 		mClassGlassFiller = Material.LIME_STAINED_GLASS_PANE;
 		mDisplayItem = Material.POTION;
 		mClassDescription = "Alchemists employ magic potions to weaken and destroy their enemies.";
-		mClassPassiveDescription = ("Allows using Alchemical Utensils. " +
-			"You gain 1 potion every %s seconds, up to a maximum of %s.")
-		   .formatted(StringUtils.ticksToSeconds(AlchemistPotions.POTIONS_TIMER_BASE), AlchemistPotions.MAX_CHARGES);
-		mClassPassiveName = "Alchemist Potions";
+		mPassive = AlchemistPotions.INFO;
 
 		mSpecOne.mAbilities.add(Taboo.INFO);
 		mSpecOne.mAbilities.add(ScorchedEarth.INFO);

@@ -34,15 +34,16 @@ public class Sundrops extends DepthsAbility {
 	public static final double[] DROP_CHANCE = {0.2, 0.25, 0.3, 0.35, 0.4, 0.6};
 	private static final int LINGER_TIME = 10 * 20;
 	private static final int DURATION = 8 * 20;
-	private static final double PERCENT_SPEED = .2;
-	private static final double PERCENT_DAMAGE_RECEIVED = 0.25;
+	private static final double PERCENT_SPEED = 0.2;
+	private static final double PERCENT_DAMAGE_RECEIVED = 0.15;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "SundropsPercentSpeedEffect";
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "SundropsPercentDamageReceivedEffect";
 
 	public static final DepthsAbilityInfo<Sundrops> INFO =
-		new DepthsAbilityInfo<>(Sundrops.class, ABILITY_NAME, Sundrops::new, DepthsTree.DAWNBRINGER, DepthsTrigger.SPAWNER)
+		new DepthsAbilityInfo<>(Sundrops.class, ABILITY_NAME, Sundrops::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
 			.displayItem(Material.HONEYCOMB_BLOCK)
-			.descriptions(Sundrops::getDescription);
+			.descriptions(Sundrops::getDescription)
+			.singleCharm(false);
 
 	private final double mDropChance;
 	private final int mLingerTime;
@@ -66,6 +67,7 @@ public class Sundrops extends DepthsAbility {
 		new BukkitRunnable() {
 			int mT = 0;
 			final BlockData mFallingDustData = Material.HONEYCOMB_BLOCK.createBlockData();
+
 			@Override
 			public void run() {
 				mT++;
@@ -102,7 +104,7 @@ public class Sundrops extends DepthsAbility {
 	}
 
 	private static Description<Sundrops> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Sundrops>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Whenever a player in your party breaks a spawner, there is a ")
 			.addPercent(a -> a.mDropChance, DROP_CHANCE[rarity - 1], false, true)
 			.add(" chance of spawning a sundrop that lasts ")

@@ -5,8 +5,9 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.TotemicProjectionCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -15,7 +16,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.EnumSet;
 import java.util.List;
@@ -28,6 +29,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
+import org.bukkit.entity.ThrowableProjectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -60,28 +63,14 @@ public class TotemicProjection extends Ability {
 			.linkedSpell(ClassAbility.TOTEMIC_PROJECTION)
 			.scoreboardId("TotemicProjection")
 			.shorthandName("TP")
-			.descriptions(
-				String.format("Press swap with a projectile weapon to fire a projectile that, on landing, moves all active totems to within %s blocks of it. %ss cooldown.",
-					DISTRIBUTION_RADIUS,
-					StringUtils.ticksToSeconds(COOLDOWN_1)
-				),
-				String.format("Slow mobs near the projectile landing spot by %s%% for %ss within a %s block radius on hit. %ss cooldown.",
-					StringUtils.multiplierToPercentage(SLOWNESS_PERCENT),
-					StringUtils.ticksToSeconds(SLOWNESS_DURATION),
-					RADIUS,
-					StringUtils.ticksToSeconds(COOLDOWN_2)),
-				String.format("For every totem affected by this ability, " +
-					"the Shaman gets +%s%% Attack/Projectile damage for %ss.",
-					StringUtils.multiplierToPercentage(ENHANCE_DAMAGE_PERCENT_PER),
-					StringUtils.ticksToSeconds(ENHANCE_DAMAGE_PERCENT_DURATION))
-			)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Fires a projectile that summons all of your active totems around the landing location.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", TotemicProjection::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)
 				.keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
 			.displayItem(Material.ENDER_PEARL);
 
-	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
+	private final Map<ThrowableProjectile, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 	private final double mSlownessPercent;
 	private final int mSlownessDuration;
 	private final double mEnhanceDamagePercent;
@@ -92,10 +81,7 @@ public class TotemicProjection extends Ability {
 
 	public TotemicProjection(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
-		mSlownessPercent = isLevelTwo() ? SLOWNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS_PERCENT) : 0;
+		mSlownessPercent = SLOWNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS_PERCENT);
 		mSlownessDuration = CharmManager.getDuration(mPlayer, CHARM_SLOWNESS_DURATION, SLOWNESS_DURATION);
 		mEnhanceDamageDuration = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_DAMAGE_DURATION, ENHANCE_DAMAGE_PERCENT_DURATION);
 		mEnhanceDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE_PERCENT_PER, ENHANCE_DAMAGE_PERCENT_PER);
@@ -110,7 +96,7 @@ public class TotemicProjection extends Ability {
 		}
 
 		World world = mPlayer.getWorld();
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, "Totemic Projection Projectile", null);
+		ThrowableProjectile proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, "Totemic Projection Projectile", null, LocationUtils.isLocationInWater(mPlayer.getLocation()));
 		List<LivingEntity> totems = TotemicEmpowerment.getTotemList(mPlayer);
 		mCosmetic.projectionCast(mPlayer, proj, totems);
 
@@ -124,6 +110,7 @@ public class TotemicProjection extends Ability {
 		new BukkitRunnable() {
 			int mT = 0;
 			final Location mPlayerLocation = mPlayer.getLocation();
+
 			@Override
 			public void run() {
 				if (mProjectiles.get(proj) != playerItemStats) {
@@ -150,7 +137,7 @@ public class TotemicProjection extends Ability {
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (!(proj instanceof Snowball) || event.isCancelled()) {
+		if (!(proj instanceof Snowball || proj instanceof Trident) || event.isCancelled()) {
 			return;
 		}
 		ItemStatManager.PlayerItemStats stats = mProjectiles.remove(proj);
@@ -194,9 +181,9 @@ public class TotemicProjection extends Ability {
 
 			if (isEnhanced()) {
 				mPlugin.mEffectManager.addEffect(mPlayer, "ShamanProjectionEnhancement",
-					new PercentDamageDealt(mEnhanceDamageDuration,
-						mEnhanceDamagePercent * totems.size(),
-						EnumSet.of(DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.MELEE)));
+					new PercentDamageDealt(mEnhanceDamageDuration, mEnhanceDamagePercent * totems.size())
+						.damageTypes(EnumSet.of(DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.MELEE))
+						.deleteOnAbilityUpdate(true));
 			}
 
 			if (isLevelTwo()) {
@@ -206,6 +193,37 @@ public class TotemicProjection extends Ability {
 					EntityUtils.applySlow(mPlugin, mSlownessDuration, mSlownessPercent, mob);
 				}
 			}
+			proj.remove();
 		}
+	}
+
+	private static Description<TotemicProjection> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to fire a projectile that, on landing, moves all active totems to within ")
+			.add(a -> a.mDistributionRadius, DISTRIBUTION_RADIUS)
+			.add(" blocks of it.")
+			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+	}
+
+	private static Description<TotemicProjection> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Mobs within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks of the landing location are slowed by ")
+			.addPercent(a -> a.mSlownessPercent, SLOWNESS_PERCENT)
+			.add(" for ")
+			.addDuration(a -> a.mSlownessDuration, SLOWNESS_DURATION)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+	}
+
+	private static Description<TotemicProjection> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("For every totem affected by this ability, gain ")
+			.addPercent(a -> a.mEnhanceDamagePercent, ENHANCE_DAMAGE_PERCENT_PER)
+			.add(" melee and projectile damage for ")
+			.addDuration(a -> a.mEnhanceDamageDuration, ENHANCE_DAMAGE_PERCENT_DURATION)
+			.add(" seconds.");
 	}
 }

@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -87,8 +86,8 @@ public final class SpectateBot extends GenericCommand implements Listener {
 
 	private static Location computeLoc(double distance, double yaw, double pitch, Location targetLoc) {
 		Vector vec = new Vector(FastUtils.cos(Math.toRadians(yaw)),
-		                        FastUtils.sin(Math.toRadians(pitch)),
-								FastUtils.sin(Math.toRadians(yaw)));
+			FastUtils.sin(Math.toRadians(pitch)),
+			FastUtils.sin(Math.toRadians(yaw)));
 
 		Location cameraLoc = targetLoc.clone();
 		cameraLoc = cameraLoc.add(vec.normalize().multiply(distance));

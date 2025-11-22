@@ -31,7 +31,7 @@ public class CommandUtils {
 
 	public static CommandSender getCallee(CommandSender sender) {
 		if (sender instanceof ProxiedCommandSender) {
-			return ((ProxiedCommandSender)sender).getCallee();
+			return ((ProxiedCommandSender) sender).getCallee();
 		}
 		return sender;
 	}
@@ -57,7 +57,7 @@ public class CommandUtils {
 		} else if (sender instanceof BlockCommandSender) {
 			return ((BlockCommandSender) sender).getBlock().getLocation();
 		} else if (sender instanceof ProxiedCommandSender) {
-			return getLocation(((ProxiedCommandSender)sender).getCallee(), doSubtractEntityOffset);
+			return getLocation(((ProxiedCommandSender) sender).getCallee(), doSubtractEntityOffset);
 		} else {
 			throw CommandAPI.failWithString("Failed to get required command sender coordinates");
 		}
@@ -98,7 +98,7 @@ public class CommandUtils {
 
 	public static void error(CommandSender sender, String msg) {
 		if ((sender instanceof Player)
-			|| ((sender instanceof ProxiedCommandSender) && (((ProxiedCommandSender)sender).getCaller() instanceof Player))) {
+			|| ((sender instanceof ProxiedCommandSender) && (((ProxiedCommandSender) sender).getCaller() instanceof Player))) {
 			sender.sendMessage(Component.text(msg, NamedTextColor.RED));
 		} else {
 			sender.sendMessage(msg);
@@ -141,7 +141,7 @@ public class CommandUtils {
 
 	public static List<String> quoteIfNeeded(Collection<String> args) {
 		List<String> result = new ArrayList<>();
-		for (String arg :args) {
+		for (String arg : args) {
 			result.add(quoteIfNeeded(arg));
 		}
 		return result;
@@ -149,7 +149,7 @@ public class CommandUtils {
 
 	public static List<String> alwaysQuote(Collection<String> args) {
 		List<String> result = new ArrayList<>();
-		for (String arg :args) {
+		for (String arg : args) {
 			result.add(alwaysQuote(arg));
 		}
 		return result;

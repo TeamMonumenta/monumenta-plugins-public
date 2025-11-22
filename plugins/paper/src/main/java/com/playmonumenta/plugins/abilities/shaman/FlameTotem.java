@@ -1,20 +1,20 @@
 package com.playmonumenta.plugins.abilities.shaman;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.FlameTotemCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -66,26 +66,7 @@ public class FlameTotem extends TotemAbility {
 			.linkedSpell(ClassAbility.FLAME_TOTEM)
 			.scoreboardId("FlameTotem")
 			.shorthandName("FT")
-			.descriptions(
-				String.format("Right click while holding a melee weapon and sneaking to fire a projectile that summons a flame totem. The totem throws explosive fireballs "
-						+ "at a target within range, dealing %s damage in a %s block radius and sets mobs on fire"
-						+ ", without inferno damage, for %s seconds every second. Charge up time: %ss. Duration: %ss. Cooldown: %ss.",
-					DAMAGE_1,
-					AOE_RANGE_1,
-					StringUtils.ticksToSeconds(FIRE_DURATION),
-					StringUtils.ticksToSeconds(PULSE_DELAY),
-					StringUtils.ticksToSeconds(DURATION_1),
-					StringUtils.ticksToSeconds(COOLDOWN)
-				),
-				String.format("The totem deals %s magic damage per hit, radius is increased to %s, " +
-						"and duration is extended to %ss.",
-					DAMAGE_2,
-					AOE_RANGE_2,
-					StringUtils.ticksToSeconds(DURATION_2)),
-				String.format("Gains %s extra bomb per pulse and applies inferno at %s%% efficiency.",
-					ENHANCE_BOMB_BONUS,
-					StringUtils.multiplierToPercentage(ENHANCE_INFERNO_SCALE))
-			)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Summon a totem that deals damage and sets mobs on fire within its range.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FlameTotem::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
@@ -97,18 +78,12 @@ public class FlameTotem extends TotemAbility {
 
 	public FlameTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Flame Totem Projectile", "FlameTotem", "Flame Totem");
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
-			(isLevelOne() ? DAMAGE_1 : DAMAGE_2));
-
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelTwo() ? AOE_RANGE_2 : AOE_RANGE_1);
 		mFireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, FIRE_DURATION);
 		mBombRadius = CharmManager.getRadius(mPlayer, CHARM_BOMB_RADIUS, BOMB_RADIUS);
-		mBombCount = BOMB_COUNT + (int) CharmManager.getLevel(mPlayer, CHARM_BOMB_COUNT)
-			+ (isEnhanced() ? ENHANCE_BOMB_BONUS : 0);
+		mBombCount = BOMB_COUNT + (int) CharmManager.getLevel(mPlayer, CHARM_BOMB_COUNT) + (isEnhanced() ? ENHANCE_BOMB_BONUS : 0);
 		mEnhanceInfernoScale = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_INFERNO_SCALE, ENHANCE_INFERNO_SCALE);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new FlameTotemCS());
@@ -136,7 +111,7 @@ public class FlameTotem extends TotemAbility {
 	public void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean bonusAction) {
 		List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null);
 		double damageApplied = (mDamage + mDecayedTotemBuff)
-			* (bonusAction ? ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY : 1);
+			* (bonusAction ? (ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_NEGATIVE_TOTEM_EFFICIENCY)) : 1);
 		Collections.shuffle(affectedMobs);
 		List<LivingEntity> impactedMobs = new ArrayList<>();
 		List<LivingEntity> targetMobs = new ArrayList<>();
@@ -178,5 +153,44 @@ public class FlameTotem extends TotemAbility {
 	public void onTotemExpire(World world, Location standLocation) {
 		mDecayedTotemBuff = 0;
 		mCosmetic.flameTotemExpire(world, mPlayer, standLocation);
+	}
+
+	private static Description<FlameTotem> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to fire a projectile that summons a Flame Totem. The totem throws an explosive fireball at a mob within ")
+			.add(a -> a.mRadius, AOE_RANGE_1, false, Ability::isLevelOne)
+			.add(" blocks every second. The fireball deals ")
+			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" damage to mobs within ")
+			.add(a -> a.mBombRadius, BOMB_RADIUS)
+			.add(" blocks and sets them on fire, without inferno damage, for ")
+			.addDuration(a -> a.mFireDuration, FIRE_DURATION)
+			.add(" seconds. Charge up time: ")
+			.addDuration(PULSE_DELAY)
+			.add("s. Duration: ")
+			.addDuration(a -> a.mDuration, DURATION_1, false, Ability::isLevelOne)
+			.add("s.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<FlameTotem> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(". Radius is increased to ")
+			.add(a -> a.mRadius, AOE_RANGE_2, false, Ability::isLevelTwo)
+			.add(". Duration is incrased to ")
+			.addDuration(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
+			.add(" seconds.");
+	}
+
+	private static Description<FlameTotem> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Now throws ")
+			.add(a -> ENHANCE_BOMB_BONUS, ENHANCE_BOMB_BONUS)
+			.add(" extra fireball each second and applies inferno at ")
+			.addPercent(a -> a.mEnhanceInfernoScale, ENHANCE_INFERNO_SCALE)
+			.add(" efficiency.");
 	}
 }

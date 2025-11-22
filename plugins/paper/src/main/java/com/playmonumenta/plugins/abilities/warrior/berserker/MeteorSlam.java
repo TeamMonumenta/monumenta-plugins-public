@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.MeteorSlamCS;
@@ -18,7 +20,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Location;
@@ -46,19 +47,15 @@ public final class MeteorSlam extends Ability {
 	public static final int SIZE_1 = 2;
 	public static final int SIZE_2 = 3;
 	public static final int JUMP_AMPLIFIER_1 = 3;
-	public static final int JUMP_LEVEL_1 = JUMP_AMPLIFIER_1 + 1;
 	public static final int JUMP_AMPLIFIER_2 = 4;
-	public static final int JUMP_LEVEL_2 = JUMP_AMPLIFIER_2 + 1;
 	public static final int DURATION_SECONDS = 2;
 	public static final int DURATION_TICKS = DURATION_SECONDS * 20;
 	public static final int AUTOMATIC_THRESHOLD = 3; // Minimum fall distance for landing to automatically trigger slam attack
 	public static final int SCALING_THRESHOLD = 4; // Blocks fallen after which damage per block fallen increment does not increase
 	public static final double REDUCED_THRESHOLD_1 = 5; // Fall distance past which damage transitions from starting to ending damage
 	public static final double REDUCED_THRESHOLD_2 = 5.5;
-	public static final int COOLDOWN_SECONDS_1 = 8;
-	public static final int COOLDOWN_TICKS_1 = COOLDOWN_SECONDS_1 * 20;
-	public static final int COOLDOWN_SECONDS_2 = 6;
-	public static final int COOLDOWN_TICKS_2 = COOLDOWN_SECONDS_2 * 20;
+	public static final int COOLDOWN_TICKS_1 = 8 * 20;
+	public static final int COOLDOWN_TICKS_2 = 6 * 20;
 
 	public static final String CHARM_DAMAGE = "Meteor Slam Damage";
 	public static final String CHARM_RADIUS = "Meteor Slam Radius";
@@ -74,46 +71,7 @@ public final class MeteorSlam extends Ability {
 			.linkedSpell(ABILITY)
 			.scoreboardId("MeteorSlam")
 			.shorthandName("MS")
-			.descriptions(
-				String.format(
-					"Pressing the swap key grants you Jump Boost %s for %ss. Cooldown: %ss. " +
-						"Falling more than %s blocks passively generates a slam when you land, " +
-						"dealing melee damage to all enemies in a %s block radius around you. " +
-						"Falling increases the damage scaling per block fallen by +%s melee damage linearly, " +
-						"starting at +%s damage for the first block fallen and capping at +%s melee damage per block fallen. " +
-						"The damage scaling per block fallen is reduced by %s%% after the initial %s blocks. " +
-						"If any enemies are damaged by a slam, you take no fall damage from that fall.",
-					JUMP_LEVEL_1,
-					DURATION_SECONDS,
-					COOLDOWN_SECONDS_1,
-					AUTOMATIC_THRESHOLD,
-					SIZE_1,
-					SCALING_DAMAGE_1,
-					SCALING_DAMAGE_1,
-					DAMAGE_CAP_1,
-					StringUtils.multiplierToPercentage(1 - REDUCTION_MULTIPLIER),
-					REDUCED_THRESHOLD_1
-				),
-				String.format(
-					"Jump Boost level is increased from %s to %s. Cooldown is reduced from %ss to %ss. " +
-						"Damage size is increased from %s to %s blocks. " +
-						"Reduction threshold is increased from %s to %s blocks. " +
-						"Damage scaling per block fallen is increased from +%s to +%s, " +
-						"starting at +%s for the first block fallen and capping at +%s melee damage per block fallen instead. ",
-					JUMP_LEVEL_1,
-					JUMP_LEVEL_2,
-					COOLDOWN_SECONDS_1,
-					COOLDOWN_SECONDS_2,
-					SIZE_1,
-					SIZE_2,
-					REDUCED_THRESHOLD_1,
-					REDUCED_THRESHOLD_2,
-					SCALING_DAMAGE_1,
-					SCALING_DAMAGE_2,
-					SCALING_DAMAGE_2,
-					DAMAGE_CAP_2
-				)
-			)
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Gain jump boost, and deal area damage when you fall from heights.")
 			.cooldown(COOLDOWN_TICKS_1, COOLDOWN_TICKS_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", MeteorSlam::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP)))
@@ -123,7 +81,10 @@ public final class MeteorSlam extends Ability {
 	private final double mLevelDamageCap;
 	private final double mLevelSize;
 	private final int mLevelJumpAmplifier;
+	private final int mDuration;
+	private final double mThreshold;
 	private final double mReducedThreshold;
+	private final double mScalingThreshold;
 	private final BukkitRunnable mSlamAttackRunner;
 	private double mFallFromY = -7050;
 	private final MeteorSlamCS mCosmetic;
@@ -134,7 +95,10 @@ public final class MeteorSlam extends Ability {
 		mLevelDamageCap = isLevelOne() ? DAMAGE_CAP_1 : DAMAGE_CAP_2;
 		mLevelSize = CharmManager.getRadius(mPlayer, CHARM_RADIUS, (isLevelOne() ? SIZE_1 : SIZE_2));
 		mLevelJumpAmplifier = (isLevelOne() ? JUMP_AMPLIFIER_1 : JUMP_AMPLIFIER_2) + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
-		mReducedThreshold = isLevelOne() ? REDUCED_THRESHOLD_1 : REDUCED_THRESHOLD_2;
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS);
+		mThreshold = AUTOMATIC_THRESHOLD + CharmManager.getLevel(mPlayer, CHARM_THRESHOLD);
+		mReducedThreshold = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_REDUCED, isLevelOne() ? REDUCED_THRESHOLD_1 : REDUCED_THRESHOLD_2);
+		mScalingThreshold = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SCALING, SCALING_THRESHOLD);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MeteorSlamCS());
 
@@ -165,7 +129,7 @@ public final class MeteorSlam extends Ability {
 
 					// If first tick landing, should still have old mFallFromY to calculate using
 					// Therefore can damage if eligible
-					if (calculateFallDistance() > (AUTOMATIC_THRESHOLD + CharmManager.getLevel(mPlayer, CHARM_THRESHOLD))) {
+					if (calculateFallDistance() > mThreshold) {
 						// Only for checking in LivingEntityDamagedByPlayerEvent below,
 						// so doesn't slam twice, since this doesn't yet set fall distance to 0
 						MetadataUtils.checkOnceThisTick(plugin, player, SLAM_ONCE_THIS_TICK_METAKEY);
@@ -183,12 +147,12 @@ public final class MeteorSlam extends Ability {
 
 	public boolean cast() {
 		if (isOnCooldown()
-			    || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			|| ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return false;
 		}
 		putOnCooldown();
 
-		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS), mLevelJumpAmplifier, true, false));
+		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, mDuration, mLevelJumpAmplifier, true, false));
 
 		World world = mPlayer.getWorld();
 		Location location = mPlayer.getLocation().add(0, 0.15, 0);
@@ -224,24 +188,22 @@ public final class MeteorSlam extends Ability {
 		double fallDistance = calculateFallDistance();
 		double linearFallDist = 0;
 		double extraFallDist = 0;
-		double reducedThreshold = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_REDUCED, mReducedThreshold);
-		double scalingThreshold = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SCALING, SCALING_THRESHOLD);
 
-		if (fallDistance > reducedThreshold) {
-			extraFallDist = fallDistance - reducedThreshold;
-			linearFallDist = reducedThreshold - scalingThreshold;
-			fallDistance = scalingThreshold;
-		} else if (fallDistance > scalingThreshold) {
-			linearFallDist = fallDistance - scalingThreshold;
-			fallDistance = scalingThreshold;
+		if (fallDistance > mReducedThreshold) {
+			extraFallDist = fallDistance - mReducedThreshold;
+			linearFallDist = mReducedThreshold - mScalingThreshold;
+			fallDistance = mScalingThreshold;
+		} else if (fallDistance > mScalingThreshold) {
+			linearFallDist = fallDistance - mScalingThreshold;
+			fallDistance = mScalingThreshold;
 		}
 		/* simplified total damage = ax^2 + bx + 0 until cap where both a and b = scaling / 2 for each respective level.
 		 * afterwards linear increment for cap damage between reduced threshold and scaling threshold
 		 * and reduced cap damage for remainder fall distance
 		 */
 		double slamDamage = (mLevelDamage / 2) * Math.pow(fallDistance, 2) + (mLevelDamage / 2) * fallDistance // quadratic scaling
-			                    + linearFallDist * mLevelDamageCap // linear scaling
-			                    + extraFallDist * mLevelDamageCap * REDUCTION_MULTIPLIER; // reduced scaling
+			+ linearFallDist * mLevelDamageCap // linear scaling
+			+ extraFallDist * mLevelDamageCap * REDUCTION_MULTIPLIER; // reduced scaling
 
 		slamDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, slamDamage);
 
@@ -259,6 +221,51 @@ public final class MeteorSlam extends Ability {
 		if (event.getType() == DamageType.FALL && !new Hitbox.SphereHitbox(mPlayer.getLocation(), mLevelSize).getHitMobs().isEmpty()) {
 			event.setCancelled(true);
 		}
+	}
+
+	private static Description<MeteorSlam> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to gain Jump Boost ")
+			.add(a -> a.mLevelJumpAmplifier, JUMP_AMPLIFIER_1, false, Ability::isLevelOne)
+			.add(" for ")
+			.addDuration(a -> a.mDuration, DURATION_TICKS)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN_TICKS_1, Ability::isLevelOne)
+			.add(" Falling more than ")
+			.add(a -> a.mThreshold, AUTOMATIC_THRESHOLD, true)
+			.add(" blocks generates a slam when you land, dealing melee damage to all enemies in a ")
+			.add(a -> a.mLevelSize, SIZE_1, false, Ability::isLevelOne)
+			.add(" block radius around you. Falling increases the damage scaling per block fallen by +")
+			.add(a -> CharmManager.calculateFlatAndPercentValue(a.getPlayer(), CHARM_DAMAGE, SCALING_DAMAGE_1), SCALING_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" damage linearly, starting at +")
+			.add(a -> SCALING_DAMAGE_1, SCALING_DAMAGE_1)
+			.add(" damage for the first block fallen and capping at +")
+			.add(a -> DAMAGE_CAP_1, DAMAGE_CAP_1)
+			.add(" damage per block fallen. The damage scaling per block fallen is reduced by ")
+			.addPercent(a -> (1 - REDUCTION_MULTIPLIER), 1 - REDUCTION_MULTIPLIER)
+			.add(" after the initial ")
+			.add(a -> a.mReducedThreshold, REDUCED_THRESHOLD_1, false, Ability::isLevelOne)
+			.add(" blocks. If any enemies are damaged by a slam, you take no fall damage from that fall.");
+	}
+
+	private static Description<MeteorSlam> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Jump Boost level is increased to ")
+			.add(a -> a.mLevelJumpAmplifier, JUMP_AMPLIFIER_2, false, Ability::isLevelTwo)
+			.add(".")
+			.addCooldown(COOLDOWN_TICKS_2, Ability::isLevelTwo)
+			.add(" Radius is increased to ")
+			.add(a -> a.mLevelSize, SIZE_2, false, Ability::isLevelTwo)
+			.add(" blocks.  Reduction threshold is increased to ")
+			.add(a -> a.mReducedThreshold, REDUCED_THRESHOLD_2, false, Ability::isLevelTwo)
+			.add(" blocks. Damage scaling per block fallen is increased to +")
+			.add(a -> CharmManager.calculateFlatAndPercentValue(a.getPlayer(), CHARM_DAMAGE, SCALING_DAMAGE_2), SCALING_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" starting at ")
+			.add(a -> SCALING_DAMAGE_2, SCALING_DAMAGE_2)
+			.add(" for the first block fallen and capping at ")
+			.add(a -> DAMAGE_CAP_2, DAMAGE_CAP_2)
+			.add(" damage per block fallen instead.");
 	}
 
 	@Override

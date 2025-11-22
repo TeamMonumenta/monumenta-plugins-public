@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -23,13 +22,14 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.jetbrains.annotations.Nullable;
 
 public class ChunkManager implements Listener {
 	private enum ChunkType {
 		BLOCK_CHUNK,
 		BLOCK_CHUNK_LOAD_DELAY,
 		ENTITY_CHUNK,
-		ENTITY_CHUNK_LOAD_DELAY;
+		ENTITY_CHUNK_LOAD_DELAY
 	}
 
 	private static final Map<UUID, Map<Long, EnumSet<ChunkType>>> mLoadedChunks = new HashMap<>();

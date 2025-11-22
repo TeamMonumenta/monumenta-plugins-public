@@ -84,7 +84,7 @@ public class DeclarationTp extends Spell {
 						}
 					}.runTaskTimer(mPlugin, 0, 2);
 					mTuulenSword.setItemStack(DisplayEntityUtils.generateRPItem(Material.IRON_SWORD, "Silver Knight's Failure"));
-					DisplayEntityUtils.rotateToPointAtLoc(mTuulenSword, LocationUtils.getVectorTo(mMidPoint, mSirius.mTuulenLocation.clone().add(0, 1.25, 0)), 0, -3*Math.PI/4.0f, new Vector3f(2f));
+					DisplayEntityUtils.rotateToPointAtLoc(mTuulenSword, LocationUtils.getVectorTo(mMidPoint, mSirius.mTuulenLocation.clone().add(0, 1.25, 0)), 0, -3 * Math.PI / 4.0f, new Vector3f(2f));
 					mTuulenSword.addScoreboardTag("SiriusDisplay");
 					for (Player p : mSirius.getPlayers()) {
 						MessagingUtils.sendNPCMessage(p, "Sirius", Component.text("You... come join our power...", NamedTextColor.AQUA, TextDecoration.BOLD));
@@ -111,7 +111,7 @@ public class DeclarationTp extends Spell {
 						Vector vec = LocationUtils.getVectorTo(mMidPointClone, mTuulenSword.getLocation());
 						mTuulenSword.setInterpolationDelay(-1);
 						mTuulenSword.setInterpolationDuration(1);
-						mTuulenSword.setTransformation(DisplayEntityUtils.rotateToPointAtLoc(mTuulenSword, vec, -3*Math.PI/4.0f));
+						mTuulenSword.setTransformation(DisplayEntityUtils.rotateToPointAtLoc(mTuulenSword, vec, -3 * Math.PI / 4.0f));
 						world.playSound(mMidPointClone, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.HOSTILE, 1, 0.7f);
 						world.playSound(mMidPointClone, Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 1, 2);
 						world.playSound(mMidPointClone, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 0.9f, 0.8f);
@@ -167,12 +167,10 @@ public class DeclarationTp extends Spell {
 					createBeam(mSirius.mAuroraLocation.clone().add(0, 0.5, 0), mMidPoint.clone().add(0, 0.60, 0), mMaxDistance);
 				}
 				if (mTicks >= DURATION) {
-					int passers = 0;
 					//cleanse all people in radius
 					List<Player> pList = mSirius.getValidDeclarationPlayersInArena();
-					for (Player p : PlayerUtils.playersInRange(pList, mMidPoint, RADIUS, true, true)) {
-						passers++;
-					}
+					int passers = PlayerUtils.playersInRange(pList, mMidPoint, RADIUS, true, true).size();
+
 					//make sure everyone is tagged with participation if they tried also
 					for (Player p : PlayerUtils.playersInRange(mSirius.getPlayers(), mMidPoint, RADIUS + 3, true, true)) {
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, Sirius.PARTICIPATION_TAG, new CustomTimerEffect(DURATION, "Participated").displays(false));

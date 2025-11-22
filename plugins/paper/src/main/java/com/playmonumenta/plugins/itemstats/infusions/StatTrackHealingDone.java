@@ -7,11 +7,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 public class StatTrackHealingDone implements Infusion {
-	@Override public InfusionType getInfusionType() {
+	@Override
+	public InfusionType getInfusionType() {
 		return InfusionType.STAT_TRACK_HEALING_DONE;
 	}
 
-	@Override public String getName() {
+	@Override
+	public String getName() {
 		return "Healing Done";
 	}
 

@@ -42,12 +42,12 @@ public class LifeDrain implements Enchantment {
 			PlayerUtils.healPlayer(
 				plugin,
 				player, LIFE_DRAIN_NONCRIT_HEAL_MULTIPLIER
-					        * Math.sqrt(level)
-					        // This is * √(attack rate seconds)
-					        // The same as / √(1 / attack rate seconds)
-					        // Advancement simply says / √(attack speed)
-					        * Math.sqrt(player.getCooldownPeriod() / Constants.TICKS_PER_SECOND)
-					        * player.getCooledAttackStrength(0)
+					* Math.sqrt(level)
+					// This is * √(attack rate seconds)
+					// The same as / √(1 / attack rate seconds)
+					// Advancement simply says / √(attack speed)
+					* Math.sqrt(player.getCooldownPeriod() / Constants.TICKS_PER_SECOND)
+					* player.getCooledAttackStrength(0)
 
 			);
 			new PartialParticle(Particle.HEART, target.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0.001).spawnAsPlayerActive(player);

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.skills.warrior.berserker;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,9 +29,19 @@ public class RampageCS implements CosmeticSkill {
 		new PartialParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1).spawnAsPlayerActive(player);
 	}
 
-	public void onCast(Player player, Location loc, World world) {
-		new PartialParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.2, 0.2, 0.2, 0).minimumCount(1).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.SWEEP_ATTACK, loc.clone().add(0, 1, 0), 50, 3, 1, 3, 0).spawnAsPlayerActive(player);
+	public void onCast(Player player, Location loc, World world, double radius) {
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 60)
+			.extra(radius * 0.07)
+			.spawnAsPlayerActive(player);
+		new PartialParticle(Particle.EXPLOSION_LARGE, loc).minimumCount(1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SWEEP_ATTACK, loc.clone().add(0, 1, 0), 25, radius / 2, radius / 3, radius / 2, 0).spawnAsPlayerActive(player);
+		new PPCircle(Particle.FLAME, loc.clone().add(0, 0.1, 0), 0.5)
+			.count(50)
+			.delta(0.07, 0, 0)
+			.directionalMode(true).rotateDelta(true)
+			.extra(radius - 1).extraVariance(0.5)
+			.spawnAsPlayerActive(player);
+
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1.4f, 0.6f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.4f, 0.6f);
 		world.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.PLAYERS, 0.6f, 0.7f);

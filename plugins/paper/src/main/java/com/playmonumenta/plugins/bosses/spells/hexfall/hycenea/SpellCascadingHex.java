@@ -116,6 +116,7 @@ public class SpellCascadingHex extends Spell {
 
 						BukkitRunnable fbRunnable = new BukkitRunnable() {
 							int mT = 0;
+
 							@Override
 							public void run() {
 								if (fallingBlock.getLocation().distance(endLoc) <= 0.25 || mT++ >= 20) {
@@ -149,6 +150,7 @@ public class SpellCascadingHex extends Spell {
 			int mT = 0;
 			int mCurrentFallTime = mFallTime;
 			final int mMaxTickMarks = 60;
+
 			@Override
 			public void run() {
 				if (mT == 0) {
@@ -179,7 +181,7 @@ public class SpellCascadingHex extends Spell {
 				mCascadeDisplay.setTransformation(new Transformation(new Vector3f(0, (float) currentHeight, 0), mCascadeDisplay.getTransformation().getLeftRotation(), mCascadeDisplay.getTransformation().getScale(), mCascadeDisplay.getTransformation().getRightRotation()));
 				mCascadeDisplay.setInterpolationDelay(-1);
 
-				if (HexfallUtils.playersInBossInXZRange(loc, mRadius, true).size() > 0) {
+				if (!HexfallUtils.playersInBossInXZRange(loc, mRadius, true).isEmpty()) {
 					if (mT % 2 == 0) {
 						new PPPillar(Particle.REDSTONE, loc, 5)
 							.data(new Particle.DustOptions(Color.fromRGB(0, 255, 0), 1.65f))

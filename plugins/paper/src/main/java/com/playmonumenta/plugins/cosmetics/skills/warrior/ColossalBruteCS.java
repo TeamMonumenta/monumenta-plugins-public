@@ -35,8 +35,8 @@ public class ColossalBruteCS extends BruteForceCS {
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-				"Brutalize your attacks even further",
-				"using a twisted, colossal force.");
+			"Brutalize your attacks even further",
+			"using a twisted, colossal force.");
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class ColossalBruteCS extends BruteForceCS {
 		Vector dir = LocationUtils.getDirectionTo(loc, pLoc).multiply(2.15);
 		loc.setDirection(dir);
 		ParticleUtils.drawHalfArc(loc.clone().subtract(dir), 2.15, ANGLE[combo], -40, 140, 8, 0.2,
-			(Location l, int ring) -> {
+			(Location l, int ring, double angleProgress) -> {
 				new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 					new Particle.DustOptions(
 						ParticleUtils.getTransition(COLO_COLOR_BASE, COLO_COLOR_TIP, ring / 8D),

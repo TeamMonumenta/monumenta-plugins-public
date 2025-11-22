@@ -22,7 +22,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -47,7 +46,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 public enum EffectType {
-	//when ever a new EffectType get added here remember to add it also in the switch inside applyEffect(...)
 
 	// type: is the unique key save inside the nbt of the item
 	// name: is the name that the player will see on the item -> format:  +/-dd% name (x:yy)
@@ -74,124 +72,346 @@ public enum EffectType {
 	VANILLA_HUNGER("Hunger", "Hunger", false, false, PotionEffectType.HUNGER),
 	VANILLA_NAUSEA("Nausea", "Nausea", false, true, PotionEffectType.CONFUSION),
 	VANILLA_BADLUCK("BadLuck", "Bad Luck", false, false, PotionEffectType.UNLUCK),
+	VANILLA_DARKNESS("Darkness", "Darkness", false, true, PotionEffectType.DARKNESS),
+	VANILLA_LEVITATION("Levitation", "Levitation", false, false, PotionEffectType.LEVITATION),
+	VANILLA_DOLPHINS_GRACE("DolphinsGrace", "Dolphin's Grace", true, true, PotionEffectType.DOLPHINS_GRACE),
 
-	SPEED("Speed", "Speed", true, false, false),
-	SLOW("Slow", "Speed", false, false, false),
+	SPEED("Speed", "Speed", true, false, false, pluginApplicator(PercentSpeed::new)),
+	SLOW("Slow", "Speed", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentSpeed(duration, -strength, source)
+	)),
 
-	ATTACK_SPEED("AttackSpeed", "Attack Speed", true, false, false),
-	NEGATIVE_ATTACK_SPEED("NegativeAttackSpeed", "Attack Speed", false, false, false),
+	ATTACK_SPEED("AttackSpeed", "Attack Speed", true, false, false, pluginApplicator(PercentAttackSpeed::new)),
+	NEGATIVE_ATTACK_SPEED("NegativeAttackSpeed", "Attack Speed", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentAttackSpeed(duration, -strength, source)
+	)),
 
-	KNOCKBACK_RESIST("KnockbackResist", "Knockback Resistance", true, false, false),
-	NEGATIVE_KNOCKBACK_RESIST("NegativeKnockbackResist", "Knockback Resistance", false, false, false),
+	KNOCKBACK_RESIST("KnockbackResist", "Knockback Resistance", true, false, false, pluginApplicator(PercentKnockbackResist::new)),
+	NEGATIVE_KNOCKBACK_RESIST("NegativeKnockbackResist", "Knockback Resistance", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentKnockbackResist(duration, -strength, source)
+	)),
 
-	MAX_HEALTH_INCREASE("MaxHealthIncrease", "Max Health", true, false, false),
-	MAX_HEALTH_DECREASE("MaxHealthDecrease", "Max Health", false, false, false),
+	MAX_HEALTH_INCREASE("MaxHealthIncrease", "Max Health", true, false, false, pluginApplicator(PercentHealthBoost::new)),
+	MAX_HEALTH_DECREASE("MaxHealthDecrease", "Max Health", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentHealthBoost(duration, -strength, source)
+	)),
 
-	ABSORPTION("Absorption", "Absorption Health", true, false, false),
-	SATURATION("Saturation", "Saturation", true, true, false),
-	STARVATION("Starvation", "Starvation", false, true, false),
+	ABSORPTION("Absorption", "Absorption Health", true, false, false,
+		(effectType, entity, duration, strength, source, applySickness) -> {
+			double amount = strength * EntityUtils.getMaxHealth(entity);
+			AbsorptionUtils.addAbsorption(entity, amount, amount, duration);
+			applyAbsorptionSickness(entity, applySickness, Plugin.getInstance());
+		}),
+	SATURATION("Saturation", "Saturation", true, true, PotionEffectType.SATURATION),
+	STARVATION("Starvation", "Starvation", false, true, false,
+		(effectType, entity, duration, strength, source, applySickness) -> {
+			if (entity instanceof Player player) {
+				Starvation.apply(player, (int) strength);
+			}
+		}),
 
 	//Resistance type of effects
-	RESISTANCE("Resistance", "Resistance", true, false, false),
-	MELEE_RESISTANCE("MeleeResistance", "Melee Resistance", true, false, false),
-	PROJECTILE_RESISTANCE("ProjectileResistance", "Projectile Resistance", true, false, false),
-	MAGIC_RESISTANCE("MagicResistance", "Magic Resistance", true, false, false),
-	BLAST_RESISTANCE("BlastResistance", "Blast Resistance", true, false, false),
-	FIRE_RESISTANCE("FireResistance", "Fire Resistance", true, false, false),
-	FALL_RESISTANCE("FallResistance", "Fall Resistance", true, false, false),
+	RESISTANCE("Resistance", "Resistance", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, -strength)
+	)),
+	MELEE_RESISTANCE("MeleeResistance", "Melee Resistance", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, -strength, DamageEvent.DamageType.getAllMeleeTypes())
+	)),
+	PROJECTILE_RESISTANCE("ProjectileResistance", "Projectile Resistance", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, -strength, DamageEvent.DamageType.getAllProjectileTypes())
+	)),
+	MAGIC_RESISTANCE("MagicResistance", "Magic Resistance", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.MAGIC))
+	)),
+	BLAST_RESISTANCE("BlastResistance", "Blast Resistance", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.BLAST))
+	)),
+	FIRE_RESISTANCE("FireResistance", "Fire Resistance", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.FIRE))
+	)),
+	FALL_RESISTANCE("FallResistance", "Fall Resistance", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.FALL))
+	)),
 
 	//Damage Negation
-	DAMAGE_NEGATE("DamageNegate", "Hits Blocked", true, true, false),
-	MELEE_DAMAGE_NEGATE("MeleeDamageNegate", "Melee Hits Blocked", true, true, false),
-	PROJECTILE_DAMAGE_NEGATE("ProjectileDamageNegate", "Projectile Hits Blocked", true, true, false),
-	MAGIC_DAMAGE_NEGATE("MagicDamageNegate", "Magic Hits Blocked", true, true, false),
-	BLAST_DAMAGE_NEGATE("BlastDamageNegate", "Blast Hits Blocked", true, true, false),
-	FIRE_DAMAGE_NEGATE("FireDamageNegate", "Fire Hits Blocked", true, true, false),
-	FALL_DAMAGE_NEGATE("FallDamageNegate", "Falling Hits Blocked", true, true, false),
+	DAMAGE_NEGATE("DamageNegate", "Hits Blocked", true, true, false, pluginApplicator(
+		(duration, strength, source) -> new NegateDamage(duration, (int) strength)
+	)),
+	MELEE_DAMAGE_NEGATE("MeleeDamageNegate", "Melee Hits Blocked", true, true, false, pluginApplicator(
+		(duration, strength, source) -> new NegateDamage(duration, (int) strength, DamageEvent.DamageType.getAllMeleeTypes())
+	)),
+	PROJECTILE_DAMAGE_NEGATE("ProjectileDamageNegate", "Projectile Hits Blocked", true, true, false, pluginApplicator(
+		(duration, strength, source) -> new NegateDamage(duration, (int) strength, DamageEvent.DamageType.getAllProjectileTypes())
+	)),
+	MAGIC_DAMAGE_NEGATE("MagicDamageNegate", "Magic Hits Blocked", true, true, false, pluginApplicator(
+		(duration, strength, source) -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.MAGIC))
+	)),
+	BLAST_DAMAGE_NEGATE("BlastDamageNegate", "Blast Hits Blocked", true, true, false, pluginApplicator(
+		(duration, strength, source) -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.BLAST))
+	)),
+	FIRE_DAMAGE_NEGATE("FireDamageNegate", "Fire Hits Blocked", true, true, false, pluginApplicator(
+		(duration, strength, source) -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.FIRE))
+	)),
+	FALL_DAMAGE_NEGATE("FallDamageNegate", "Falling Hits Blocked", true, true, false, pluginApplicator(
+		(duration, strength, source) -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.FALL))
+	)),
 
 	//Vulnerability type of effects
-	VULNERABILITY("Vulnerability", "Resistance", false, false, false),
-	MELEE_VULNERABILITY("MeleeVulnerability", "Melee Resistance", false, false, false),
-	PROJECTILE_VULNERABILITY("ProjectileVulnerability", "Projectile Resistance", false, false, false),
-	MAGIC_VULNERABILITY("MagicVulnerability", "Magic Resistance", false, false, false),
-	BLAST_VULNERABILITY("BlastVulnerability", "Blast Resistance", false, false, false),
-	FIRE_VULNERABILITY("FireVulnerability", "Fire Resistance", false, false, false),
-	FALL_VULNERABILITY("FallVulnerability", "Fall Resistance", false, false, false),
+	VULNERABILITY("Vulnerability", "Resistance", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, strength)
+	)),
+	MELEE_VULNERABILITY("MeleeVulnerability", "Melee Resistance", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, strength, DamageEvent.DamageType.getAllMeleeTypes())
+	)),
+	PROJECTILE_VULNERABILITY("ProjectileVulnerability", "Projectile Resistance", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, strength, DamageEvent.DamageType.getAllProjectileTypes())
+	)),
+	MAGIC_VULNERABILITY("MagicVulnerability", "Magic Resistance", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.MAGIC))
+	)),
+	BLAST_VULNERABILITY("BlastVulnerability", "Blast Resistance", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.BLAST))
+	)),
+	FIRE_VULNERABILITY("FireVulnerability", "Fire Resistance", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FIRE))
+	)),
+	FALL_VULNERABILITY("FallVulnerability", "Fall Resistance", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FALL))
+	)),
 
 	//Damage type of effects
-	DAMAGE("damage", "Strength", true, false, false),
-	MELEE_DAMAGE("MeleeDamage", "Melee Damage", true, false, false),
-	PROJECTILE_DAMAGE("ProjectileDamage", "Projectile Damage", true, false, false),
-	MAGIC_DAMAGE("MagicDamage", "Magic Damage", true, false, false),
+	DAMAGE("damage", "Strength", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageDealt(duration, strength).damageTypes(DamageEvent.DamageType.getScalableDamageType())
+	)),
+	MELEE_DAMAGE("MeleeDamage", "Melee Damage", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageDealt(duration, strength).damageTypes(DamageEvent.DamageType.getAllMeleeTypes())
+	)),
+	PROJECTILE_DAMAGE("ProjectileDamage", "Projectile Damage", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageDealt(duration, strength).damageTypes(DamageEvent.DamageType.getAllProjectileTypes())
+	)),
+	MAGIC_DAMAGE("MagicDamage", "Magic Damage", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageDealt(duration, strength).damageTypes(EnumSet.of(DamageEvent.DamageType.MAGIC))
+	)),
 
 	//Weakness type of effects
-	WEAKNESS("Weakness", "Strength", false, false, false),
-	MELEE_WEAKNESS("MeleeWeakness", "Melee Damage", false, false, false),
-	PROJECTILE_WEAKNESS("ProjectileWeakness", "Projectile Damage", false, false, false),
-	MAGIC_WEAKNESS("MagicWeakness", "Magic Damage", false, false, false),
+	WEAKNESS("Weakness", "Strength", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageDealt(duration, -strength)
+	)),
+	MELEE_WEAKNESS("MeleeWeakness", "Melee Damage", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageDealt(duration, -strength).damageTypes(DamageEvent.DamageType.getAllMeleeTypes())
+	)),
+	PROJECTILE_WEAKNESS("ProjectileWeakness", "Projectile Damage", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageDealt(duration, -strength).damageTypes(DamageEvent.DamageType.getAllProjectileTypes())
+	)),
+	MAGIC_WEAKNESS("MagicWeakness", "Magic Damage", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageDealt(duration, -strength).damageTypes(EnumSet.of(DamageEvent.DamageType.MAGIC))
+	)),
 
-	INSTANT_HEALTH("InstantHealthPercent", "Instant Health", true, false, false),
-	INSTANT_DAMAGE("InstantDamagePercent", "Instant Damage", false, false, false),
+	INSTANT_HEALTH("InstantHealthPercent", "Instant Health", true, false, false,
+		(effectType, entity, duration, strength, source, applySickness) -> {
+			Plugin plugin = Plugin.getInstance();
+			double maxHealth = EntityUtils.getMaxHealth(entity);
+			if (entity instanceof Player player) {
+				PlayerUtils.healPlayer(plugin, player, maxHealth * strength);
+				applyHealingSickness(entity, applySickness, plugin);
+			} else {
+				EntityUtils.healMob(entity, maxHealth * strength);
+			}
+		}),
+	INSTANT_DAMAGE("InstantDamagePercent", "Instant Damage", false, false, false,
+		(effectType, entity, duration, strength, source, applySickness) -> {
+			if (strength >= 1) {
+				entity.setHealth(0);
+				return;
+			}
+			if (!ZoneUtils.hasZoneProperty(entity, ZoneProperty.RESIST_5)) {
+				DamageUtils.damage(null, entity, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(entity) * strength);
+			}
+		}),
 
-	HEAL("Heal", "Healing Rate", true, false, false),
-	ANTI_HEAL("AntiHeal", "Healing Rate", false, false, false),
+	HEAL("Heal", "Healing Rate", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentHeal(duration, strength)
+	)),
+	ANTI_HEAL("AntiHeal", "Healing Rate", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentHeal(duration, -strength)
+	)),
 
-	ARROW_SAVING("ArrowSaving", "Arrow Save Chance", true, false, false),
-	ARROW_LOSS("ArrowSaving", "Arrow Save Chance", false, false, false),
+	ARROW_SAVING("ArrowSaving", "Arrow Save Chance", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new ArrowSaving(duration, strength)
+	)),
+	ARROW_LOSS("ArrowSaving", "Arrow Save Chance", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new ArrowSaving(duration, -strength)
+	)),
 
-	SOUL_THREAD_BONUS("SoulThreadBonus", "Soul Thread Chance", true, false, false),
-	SOUL_THREAD_REDUCTION("SoulThreadReduction", "Soul Thread Chance", false, false, false),
+	SOUL_THREAD_BONUS("SoulThreadBonus", "Soul Thread Chance", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new BonusSoulThreads(duration, strength)
+	)),
+	SOUL_THREAD_REDUCTION("SoulThreadReduction", "Soul Thread Chance", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new BonusSoulThreads(duration, -strength)
+	)),
 
-	DURABILITY_SAVE("DurabilitySave", "Durability", true, false, false),
-	DURABILITY_LOSS("DurabilityLoss", "Durability", false, false, false),
+	DURABILITY_SAVE("DurabilitySave", "Durability", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new DurabilitySaving(duration, strength)
+	)),
+	DURABILITY_LOSS("DurabilityLoss", "Durability", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new DurabilitySaving(duration, -strength)
+	)),
 
-	EXP_BONUS("ExpBonus", "Experience", true, false, false),
-	EXP_LOSS("ExpLoss", "Experience", false, false, false),
+	EXP_BONUS("ExpBonus", "Experience", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentExperience(duration, strength)
+	)),
+	EXP_LOSS("ExpLoss", "Experience", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new PercentExperience(duration, -strength)
+	)),
 
-	COOLDOWN_DECREASE("AbilityCooldownDecrease", "Ability Cooldowns", true, false, false),
-	COOLDOWN_INCREASE("AbilityCooldownIncrease", "Ability Cooldowns", false, false, false),
+	COOLDOWN_DECREASE("AbilityCooldownDecrease", "Ability Cooldowns", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new AbilityCooldownDecrease(duration, strength)
+	)),
+	COOLDOWN_INCREASE("AbilityCooldownIncrease", "Ability Cooldowns", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new AbilityCooldownIncrease(duration, strength)
+	)),
 
-	FISH_QUALITY_INCREASE("FishQualityIncrease", "Fish Quality", true, false, false),
-	FISH_QUALITY_DECREASE("FishQualityDecrease", "FishQuality", false, false, false),
+	FISH_QUALITY_INCREASE("FishQualityIncrease", "Fish Quality", true, false, false, pluginApplicator(
+		(duration, strength, source) -> new FishQualityIncrease(duration, strength)
+	)),
+	FISH_QUALITY_DECREASE("FishQualityDecrease", "FishQuality", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new FishQualityIncrease(duration, -strength)
+	)),
 
-	BLEED("Bleed", "Bleed", false, false, false),
+	STASIS("Stasis", "Stasis", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new Stasis(duration))),
+	SILENCE("Silence", "Silence", false, false, true,
+		(effectType, entity, duration, strength, source, applySickness) -> {
+			if (entity instanceof Player player) {
+				AbilityUtils.silencePlayer(player, duration);
+			} else {
+				EntityUtils.applySilence(Plugin.getInstance(), duration, entity);
+			}
+		}),
+	PARADOX("Paradox", "Paradox", false, true, true, pluginApplicator(
+		(duration, strength, source) -> new TemporalFlux(duration)
+	)),
+	INFUSED_LIFE("InfusedLife", "Infusion of Life", false, true, true, pluginApplicator(
+		(duration, strength, source) -> new InfusedLife(duration)
+	)),
+	REINCARNATION("Reincarnation", "Reincarnation", false, false, true, pluginApplicator(
+		(duration, strength, source) -> new Reincarnation(duration, strength)
+	)),
+	VOODOO_BINDINGS("VooodooBindings", "Voodoo Bindings", false, false, true, pluginApplicator(
+		(duration, strength, source) -> new VoodooBindings(duration)
+	)),
+	LIFE_VULNERABILITY("LifeVulnerability", "Life Vulnerability", false, false, true, pluginApplicator(
+		(duration, strength, source) -> new LifeVulnerability(duration)
+	)),
+	DEATH_VULNERABILITY("DeathVulnerability", "Death Vulnerability", false, false, true, pluginApplicator(
+		(duration, strength, source) -> new DeathVulnerability(duration)
+	)),
+	CREEPING_DEATH("CreepingDeath", "Creeping Death", false, false, true, pluginApplicator(
+		(duration, strength, source) -> new CreepingDeath(duration, Plugin.getInstance())
+	)),
+	LIFE_IMMUNITY("LifeImmortality", "Life Immortality", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new LifeImmunity(duration)
+	)),
+	DEATH_IMMUNITY("DeathImmortality", "Death Immortality", false, false, false, pluginApplicator(
+		(duration, strength, source) -> new DeathImmunity(duration)
+	)),
+	PARASITES("Parasites", "Parasites", false, false, true, pluginApplicator(
+		(duration, strength, source) -> new Parasites(duration)
+	)),
 
-	STASIS("Stasis", "Stasis", true, false, true),
-	SILENCE("Silence", "Silence", false, false, true),
-	PARADOX("Paradox", "Paradox", false, false, true),
-	INFUSED_LIFE("InfusedLife", "Infusion of Life", false, false, true),
-	REINCARNATION("Reincarnation", "Reincarnation", false, false, true),
-	VOODOO_BINDINGS("VooodooBindings", "Voodoo Bindings", false, false, true),
-	LIFE_VULNERABILITY("LifeVulnerability", "Life Vulnerability", false, false, true),
-	DEATH_VULNERABILITY("DeathVulnerability", "Death Vulnerability", false, false, true),
-	CREEPING_DEATH("CreepingDeath", "Creeping Death", false, false, true),
-	LIFE_SEED("LifeSeed", "Life Seed", false, false, false),
-	DEATH_SEED("DeathSeed", "Death Seed", false, false, false),
-	SEED_EXHAUSTION("SeedExhaustion", "Seed Exhaustion", false, false, false),
-	LIFE_IMMUNITY("LifeImmortality", "Life Immortality", false, false, false),
-	DEATH_IMMUNITY("DeathImmortality", "Death Immortality", false, false, false),
+	BOON_OF_THE_PIT("BoonOfThePit", "Boon of the Pit", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new BoonOfThePit(duration)
+	)),
+	BOON_OF_SILVER_SCALES("BoonOfSilverScales", "Boon of Silver Scales", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new AbilityCooldownDecrease(duration, 0.05)
+	)),
+	BOON_OF_KNIGHTLY_PRAYER("BoonOfKnightlyPrayer", "Boon of Knightly Prayer", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new BoonOfKnightlyPrayer(duration)
+	)),
+	CRYSTALLINE_BLESSING("CrystallineBlessing", "Crystalline Blessing", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new CrystallineBlessing(duration)
+	)),
+	CURSE_OF_THE_DARK_SOUL("DarkSoul", "Curse of the Dark Soul", false, false, true, pluginApplicator(
+		(duration, strength, source) -> new PercentDamageReceived(duration, 1)
+	)),
+	DEEP_GODS_ENDOWMENT("DeepGodsEndowment", "Deep God's Endowment", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new DeepGodsEndowment(duration)
+	)),
+	HARRAKFARS_BLESSING("HarrakfarsBlessing", "Harrakfar's Blessing", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new PercentHeal(duration, 0.1)
+	)),
+	SILVER_PRAYER("SilverPrayer", "Silver Prayer", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new SilverPrayer(duration)
+	)),
+	STAR_COMMUNION("StarCommunion", "Star Communion", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new StarCommunion(duration)
+	)),
+	TUATHAN_BLESSING("TuathanBlessing", "Tuathan Blessing", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new TuathanBlessing(duration)
+	)),
+	GIFT_OF_THE_STARS("GiftOfTheStars", "Gift of the Stars", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new GiftOfTheStars(duration)
+	)),
+	BOON_OF_THE_FRACTURED_TREE("BoonOfTheFracturedTree", "Boon of the Fractured Tree", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new BoonOfTheFracturedTree(duration)
+	)),
+	SKY_SEEKERS_GRACE("SkySeekersGrace", "Sky Seeker's Grace", true, false, true, pluginApplicator(
+		(duration, strength, source) -> new SkySeekersGrace(duration)
+	)),
 
-	BOON_OF_THE_PIT("BoonOfThePit", "Boon of the Pit", true, false, true),
-	BOON_OF_SILVER_SCALES("BoonOfSilverScales", "Boon of Silver Scales", true, false, true),
-	BOON_OF_KNIGHTLY_PRAYER("BoonOfKnightlyPrayer", "Boon of Knightly Prayer", true, false, true),
-	CRYSTALLINE_BLESSING("CrystallineBlessing", "Crystalline Blessing", true, false, true),
-	CURSE_OF_THE_DARK_SOUL("DarkSoul", "Curse of the Dark Soul", false, false, true),
-	DEEP_GODS_ENDOWMENT("DeepGodsEndowment", "Deep God's Endowment", true, false, true),
-	HARRAKFARS_BLESSING("HarrakfarsBlessing", "Harrakfar's Blessing", true, false, true),
-	SILVER_PRAYER("SilverPrayer", "Silver Prayer", true, false, true),
-	STAR_COMMUNION("StarCommunion", "Star Communion", true, false, true),
-	TUATHAN_BLESSING("TuathanBlessing", "Tuathan Blessing", true, false, true),
-	GIFT_OF_THE_STARS("GiftOfTheStars", "Gift of the Stars", true, false, true),
-	BOON_OF_THE_FRACTURED_TREE("BoonOfTheFracturedTree", "Boon of the Fractured Tree", true, false, true),
-	SKY_SEEKERS_GRACE("SkySeekersGrace", "Sky Seeker's Grace", true, false, true),
+	POISON_IMMUNITY("PoisonImmunity", "Poison Immunity", true, true, false,
+		(effectType, entity, duration, strength, source, applySickness) -> {
+			if (entity instanceof Player player) {
+				Plugin.getInstance().mPotionManager.removeLowerPotions(player, PotionManager.PotionID.APPLIED_POTION, PotionEffectType.POISON, (int) strength);
+				PotionEffect potionEffect = player.getPotionEffect(PotionEffectType.POISON);
+				if (potionEffect != null && potionEffect.getAmplifier() < strength) {
+					player.removePotionEffect(PotionEffectType.POISON);
+				}
+				addEffect(player, source, new PoisonImmunity(duration, strength));
+			}
+		}),
 
-	POISON_IMMUNITY("PoisonImmunity", "Poison Immunity", true, true, false),
+	CLUCKING("Clucking", "Clucking", false, true, true,
+		(effectType, entity, duration, strength, source, applySickness) -> {
+			Plugin plugin = Plugin.getInstance();
+			if (entity instanceof Player player) {
+				if (plugin.mItemStatManager.getPlayerItemStats(player).getItemStats().get(EnchantmentType.CLUCKING) > 0) {
+					return;
+				}
+				List<ItemStack> cluckingCandidates = new ArrayList<>(Arrays.asList(player.getInventory().getArmorContents()));
+				cluckingCandidates.add(player.getInventory().getItemInOffHand());
+				cluckingCandidates.removeIf(item -> item == null || item.getType() == Material.AIR || ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CLUCKING) > 0);
+				if (!cluckingCandidates.isEmpty()) {
+					ItemStack item = cluckingCandidates.get(FastUtils.RANDOM.nextInt(cluckingCandidates.size()));
+					ItemStatUtils.addEnchantment(item, EnchantmentType.CLUCKING, 1);
+					ItemUpdateHelper.generateItemStats(item);
+					plugin.mItemStatManager.updateStats(player);
+					new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0).minimumCount(1).spawnAsPlayerActive(player);
+				}
+			}
+		}),
 
-	CLUCKING("Clucking", "Clucking", false, true, true),
-
-	STEALTH("Stealth", "Stealth", true, true, false),
+	STEALTH("Stealth", "Stealth", true, true, false,
+		(effectType, entity, duration, strength, source, applySickness) -> {
+			if (entity instanceof Player player) {
+				AbilityUtils.applyStealth(Plugin.getInstance(), player, duration);
+			}
+		}),
 	;
 
+	public EffectApplicator getEffectApplicator() {
+		return mEffectApplicator;
+	}
+
+	@FunctionalInterface
+	public interface EffectApplicator {
+		void apply(EffectType effectType, LivingEntity entity, int duration, double strength, String source, boolean applySickness);
+	}
+
+	@FunctionalInterface
+	interface PluginEffectConstructor {
+		Effect construct(int duration, double strength, String source);
+	}
 
 	public static final String KEY = "Effects";
 
@@ -201,22 +421,43 @@ public enum EffectType {
 	private final boolean mIsFlat;
 	private final boolean mIsConstant;
 	private final @Nullable PotionEffectType mVanillaPotionEffectType;
+	private final EffectApplicator mEffectApplicator;
 
-	EffectType(String type, String name, boolean isPositive, boolean isFlat, boolean isConstant) {
-		this(type, name, isPositive, isFlat, isConstant, null);
+	EffectType(String type, String name, boolean isPositive, boolean isFlat, boolean isConstant, EffectApplicator effectApplicator) {
+		this(type, name, isPositive, isFlat, isConstant, null, effectApplicator);
 	}
 
 	EffectType(String type, String name, boolean isPositive, boolean isConstant, PotionEffectType vanillaPotionEffectType) {
-		this(type, name, isPositive, true, isConstant, vanillaPotionEffectType);
+		this(type, name, isPositive, true, isConstant, vanillaPotionEffectType,
+			(effectType, entity, duration, strength, source, applySickness) -> {
+				PotionEffect potionEffect = new PotionEffect(vanillaPotionEffectType, duration, (int) strength - 1, true);
+				if (entity instanceof Player player) {
+					PotionUtils.applyPotion(Plugin.getInstance(), player, potionEffect);
+				} else {
+					entity.addPotionEffect(potionEffect);
+				}
+			});
 	}
 
-	EffectType(String type, String name, boolean isPositive, boolean isFlat, boolean isConstant, @Nullable PotionEffectType vanillaPotionEffectType) {
+	/**
+	 * Effect Type enum, for consumables and EffectsList.
+	 *
+	 * @param type                    : is the unique key save inside the nbt of the item
+	 * @param name                    : is the name that the player will see on the item -> format:  +/-dd% name (x:yy)
+	 * @param isPositive              : if the display should be blue (positive) or red (negative)
+	 * @param isFlat                  : not a percentage (true) or percentage (false)
+	 * @param isConstant              : does it have a number associated?
+	 * @param vanillaPotionEffectType : the vanilla potion effect applied by this effect type
+	 * @param effectApplicator        : the function for granting the effect to the target
+	 */
+	EffectType(String type, String name, boolean isPositive, boolean isFlat, boolean isConstant, @Nullable PotionEffectType vanillaPotionEffectType, EffectApplicator effectApplicator) {
 		mType = type;
 		mName = name;
 		mIsPositive = isPositive;
 		mIsFlat = isFlat;
 		mIsConstant = isConstant;
 		mVanillaPotionEffectType = vanillaPotionEffectType;
+		mEffectApplicator = effectApplicator;
 	}
 
 	public String getType() {
@@ -241,6 +482,19 @@ public enum EffectType {
 
 	public @Nullable PotionEffectType getPotionEffectType() {
 		return mVanillaPotionEffectType;
+	}
+
+	private static void addEffect(Entity target, String source, Effect effect) {
+		EffectManager.getInstance().addEffect(target, source, effect);
+	}
+
+	private static EffectApplicator pluginApplicator(PluginEffectConstructor effect) {
+		return (effectType, entity, duration, strength, source, applySickness) ->
+			addEffect(entity, source, effect.construct(duration, strength, source));
+	}
+
+	private static String notNullString(EffectType effectType, @Nullable String source) {
+		return source != null ? source : effectType.mType;
 	}
 
 	public static boolean isEffectTypeAppliedEffect(@Nullable String source) {
@@ -339,196 +593,7 @@ public enum EffectType {
 			return;
 		}
 
-		Plugin plugin = Plugin.getInstance();
-
-		PotionEffectType potionEffectType = effectType.getPotionEffectType();
-		if (potionEffectType != null) {
-			PotionEffect potionEffect = new PotionEffect(potionEffectType, duration, (int) strength - 1, true);
-			if (entity instanceof Player player) {
-				PotionUtils.applyPotion(plugin, player, potionEffect);
-			} else {
-				entity.addPotionEffect(potionEffect);
-			}
-			return;
-		}
-
-		// Special cases, does not correspond to vanilla or monumenta effect
-		if (effectType == ABSORPTION) {
-			double amount = strength * EntityUtils.getMaxHealth(entity);
-			AbsorptionUtils.addAbsorption(entity, amount, amount, duration);
-			applyAbsorptionSickness(entity, applySickness, plugin);
-			return;
-		} else if (effectType == STARVATION) {
-			if (entity instanceof Player player) {
-				Starvation.apply(player, (int) strength);
-			}
-			return;
-		} else if (effectType == INSTANT_HEALTH) {
-			double maxHealth = EntityUtils.getMaxHealth(entity);
-			if (entity instanceof Player player) {
-				PlayerUtils.healPlayer(plugin, player, maxHealth * strength);
-				applyHealingSickness(entity, applySickness, plugin);
-			} else {
-				entity.setHealth(Math.min(maxHealth, entity.getHealth() + maxHealth * strength));
-			}
-			return;
-		} else if (effectType == INSTANT_DAMAGE) {
-			if (strength >= 1) {
-				entity.setHealth(0);
-				return;
-			}
-			if (!ZoneUtils.hasZoneProperty(entity, ZoneProperty.RESIST_5)) {
-				DamageUtils.damage(null, entity, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(entity) * strength);
-			}
-			return;
-		} else if (effectType == CLUCKING) {
-			if (entity instanceof Player player) {
-				if (plugin.mItemStatManager.getPlayerItemStats(player).getItemStats().get(EnchantmentType.CLUCKING) > 0) {
-					return;
-				}
-				List<ItemStack> cluckingCandidates = new ArrayList<>(Arrays.asList(player.getInventory().getArmorContents()));
-				cluckingCandidates.add(player.getInventory().getItemInOffHand());
-				cluckingCandidates.removeIf(item -> item == null || item.getType() == Material.AIR || ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CLUCKING) > 0);
-				if (!cluckingCandidates.isEmpty()) {
-					ItemStack item = cluckingCandidates.get(FastUtils.RANDOM.nextInt(cluckingCandidates.size()));
-					ItemStatUtils.addEnchantment(item, EnchantmentType.CLUCKING, 1);
-					ItemUpdateHelper.generateItemStats(item);
-					plugin.mItemStatManager.updateStats(player);
-					new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0).minimumCount(1).spawnAsPlayerActive(player);
-				}
-			}
-			return;
-		} else if (effectType == POISON_IMMUNITY) {
-			if (entity instanceof Player player) {
-				plugin.mPotionManager.removeLowerPotions(player, PotionManager.PotionID.APPLIED_POTION, PotionEffectType.POISON, (int) strength);
-				PotionEffect potionEffect = player.getPotionEffect(PotionEffectType.POISON);
-				if (potionEffect != null && potionEffect.getAmplifier() < strength) {
-					player.removePotionEffect(PotionEffectType.POISON);
-				}
-			}
-			// don't return yet, this also has an effect
-		} else if (effectType == STEALTH) {
-			if (entity instanceof Player player) {
-				AbilityUtils.applyStealth(plugin, player, duration);
-			}
-			return;
-		} else if (effectType == SILENCE) {
-			if (entity instanceof Player player) {
-				AbilityUtils.silencePlayer(player, duration);
-			} else {
-				EntityUtils.applySilence(plugin, duration, entity);
-			}
-		}
-
-		String sourceString = source != null ? source : effectType.mType;
-
-		// This could be refactored to include a Supplier<Effect> as an option in the EffectType constructor and make this method much simpler
-		Effect effect = switch (effectType) {
-			case SPEED -> new PercentSpeed(duration, strength, sourceString);
-			case SLOW -> new PercentSpeed(duration, -strength, sourceString);
-
-			case ATTACK_SPEED -> new PercentAttackSpeed(duration, strength, sourceString);
-			case NEGATIVE_ATTACK_SPEED -> new PercentAttackSpeed(duration, -strength, sourceString);
-
-			case KNOCKBACK_RESIST -> new PercentKnockbackResist(duration, strength, sourceString);
-			case NEGATIVE_KNOCKBACK_RESIST -> new PercentKnockbackResist(duration, -strength, sourceString);
-
-			case MAX_HEALTH_INCREASE -> new PercentHealthBoost(duration, strength, sourceString);
-			case MAX_HEALTH_DECREASE -> new PercentHealthBoost(duration, -strength, sourceString);
-
-			case RESISTANCE -> new PercentDamageReceived(duration, -strength);
-			case MELEE_RESISTANCE -> new PercentDamageReceived(duration, -strength, DamageEvent.DamageType.getAllMeleeTypes());
-			case PROJECTILE_RESISTANCE -> new PercentDamageReceived(duration, -strength, DamageEvent.DamageType.getAllProjectileTypes());
-			case MAGIC_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
-			case BLAST_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.BLAST));
-			case FIRE_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.FIRE));
-			case FALL_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.FALL));
-
-			case DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength);
-			case MELEE_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, DamageEvent.DamageType.getAllMeleeTypes());
-			case PROJECTILE_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, DamageEvent.DamageType.getAllProjectileTypes());
-			case MAGIC_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
-			case BLAST_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.BLAST));
-			case FIRE_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.FIRE));
-			case FALL_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.FALL));
-
-			case VULNERABILITY -> new PercentDamageReceived(duration, strength);
-			case MELEE_VULNERABILITY -> new PercentDamageReceived(duration, strength, DamageEvent.DamageType.getAllMeleeTypes());
-			case PROJECTILE_VULNERABILITY -> new PercentDamageReceived(duration, strength, DamageEvent.DamageType.getAllProjectileTypes());
-			case MAGIC_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
-			case BLAST_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.BLAST));
-			case FIRE_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FIRE));
-			case FALL_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FALL));
-
-			case DAMAGE -> new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getScalableDamageType());
-			case MELEE_DAMAGE -> new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getAllMeleeTypes());
-			case PROJECTILE_DAMAGE -> new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getAllProjectileTypes());
-			case MAGIC_DAMAGE -> new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
-
-			case WEAKNESS -> new PercentDamageDealt(duration, -strength);
-			case MELEE_WEAKNESS -> new PercentDamageDealt(duration, -strength, DamageEvent.DamageType.getAllMeleeTypes());
-			case PROJECTILE_WEAKNESS -> new PercentDamageDealt(duration, -strength, DamageEvent.DamageType.getAllProjectileTypes());
-			case MAGIC_WEAKNESS -> new PercentDamageDealt(duration, -strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
-
-			case HEAL -> new PercentHeal(duration, strength);
-			case ANTI_HEAL -> new PercentHeal(duration, -strength);
-
-			case ARROW_SAVING -> new ArrowSaving(duration, strength);
-			case ARROW_LOSS -> new ArrowSaving(duration, -strength);
-
-			case SOUL_THREAD_BONUS -> new BonusSoulThreads(duration, strength);
-			case SOUL_THREAD_REDUCTION -> new BonusSoulThreads(duration, -strength);
-
-			case DURABILITY_SAVE -> new DurabilitySaving(duration, strength);
-			case DURABILITY_LOSS -> new DurabilitySaving(duration, -strength);
-
-			case COOLDOWN_DECREASE -> new AbilityCooldownDecrease(duration, strength);
-			case COOLDOWN_INCREASE -> new AbilityCooldownIncrease(duration, strength);
-
-			case EXP_BONUS -> new PercentExperience(duration, strength);
-			case EXP_LOSS -> new PercentExperience(duration, -strength);
-
-			case FISH_QUALITY_INCREASE -> new FishQualityIncrease(duration, strength);
-			case FISH_QUALITY_DECREASE -> new FishQualityIncrease(duration, -strength);
-
-			case BLEED -> new Bleed(duration, strength, plugin);
-
-			case STASIS -> new Stasis(duration);
-			case PARADOX -> new TemporalFlux(duration);
-			case INFUSED_LIFE -> new InfusedLife(duration);
-			case REINCARNATION -> new Reincarnation(duration, strength);
-			case VOODOO_BINDINGS -> new VoodooBindings(duration);
-			case LIFE_VULNERABILITY -> new LifeVulnerability(duration);
-			case DEATH_VULNERABILITY -> new DeathVulnerability(duration);
-			case CREEPING_DEATH -> new CreepingDeath(duration, plugin);
-			case LIFE_IMMUNITY -> new LifeImmunity(duration);
-			case DEATH_IMMUNITY -> new DeathImmunity(duration);
-
-			case BOON_OF_THE_PIT -> new BoonOfThePit(duration);
-			case BOON_OF_SILVER_SCALES -> new AbilityCooldownDecrease(duration, 0.05);
-			case BOON_OF_KNIGHTLY_PRAYER -> new BoonOfKnightlyPrayer(duration);
-			case CRYSTALLINE_BLESSING -> new CrystallineBlessing(duration);
-			case CURSE_OF_THE_DARK_SOUL -> new PercentDamageReceived(duration, 1);
-			case DEEP_GODS_ENDOWMENT -> new DeepGodsEndowment(duration);
-			case HARRAKFARS_BLESSING -> new PercentHeal(duration, 0.1);
-			case SILVER_PRAYER -> new SilverPrayer(duration);
-			case STAR_COMMUNION -> new StarCommunion(duration);
-			case TUATHAN_BLESSING -> new TuathanBlessing(duration);
-			case GIFT_OF_THE_STARS -> new GiftOfTheStars(duration);
-			case BOON_OF_THE_FRACTURED_TREE -> new BoonOfTheFracturedTree(duration);
-			case SKY_SEEKERS_GRACE -> new SkySeekersGrace(duration);
-
-			case POISON_IMMUNITY -> new PoisonImmunity(duration, strength);
-
-			default -> null;
-		};
-
-		if (effect == null) {
-			MMLog.warning("No EffectType implemented in applyEffect(..) for: " + effectType.mType);
-			return;
-		}
-
-		plugin.mEffectManager.addEffect(entity, sourceString, effect);
+		effectType.getEffectApplicator().apply(effectType, entity, duration, strength, notNullString(effectType, source), applySickness);
 	}
 
 	private static void applyHealingSickness(Entity entity, boolean applySickness, Plugin plugin) {

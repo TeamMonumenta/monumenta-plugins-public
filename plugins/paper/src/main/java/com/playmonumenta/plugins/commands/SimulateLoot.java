@@ -115,10 +115,10 @@ public class SimulateLoot {
 	}
 
 	public static void run(final Plugin plugin,
-	                final NativeProxyCommandSender sender,
-	                final int numRolls,
-	                final LootTable lootTable,
-	                final LootContext lootContext) {
+	                       final NativeProxyCommandSender sender,
+	                       final int numRolls,
+	                       final LootTable lootTable,
+	                       final LootContext lootContext) {
 		CommandSender caller = sender.getCaller();
 		CommandSender callee = sender.getCallee();
 		final Audience audience;
@@ -197,8 +197,8 @@ public class SimulateLoot {
 								.hoverEvent(item))
 							.append(Component.text(
 								String.format(" in %d rolls; average count %4.2f",
-								itemOdds.mRolled,
-								(float) itemOdds.mTotalRolled / (float) itemOdds.mRolled)
+									itemOdds.mRolled,
+									(float) itemOdds.mTotalRolled / (float) itemOdds.mRolled)
 							)));
 						itemParity = !itemParity;
 

@@ -5,13 +5,11 @@ import org.jetbrains.annotations.Nullable;
 
 public class CustomTimerEffect extends Effect {
 	public static final String effectID = "customtimer";
-	private String mCustomDisplay;
-	private int mAmount;
+	private final String mCustomDisplay;
+	private final int mAmount;
 
 	public CustomTimerEffect(int duration, String customDisplay) {
-		super(duration, effectID);
-		mCustomDisplay = customDisplay;
-		mAmount = 0;
+		this(duration, 0, customDisplay);
 	}
 
 	public CustomTimerEffect(int duration, int magntitude, String customDisplay) {
@@ -25,12 +23,10 @@ public class CustomTimerEffect extends Effect {
 		return mCustomDisplay;
 	}
 
-
 	@Override
 	public String toString() {
 		return String.format("Custom Timer %d", this.getDuration());
 	}
-
 
 	@Override
 	public JsonObject serialize() {

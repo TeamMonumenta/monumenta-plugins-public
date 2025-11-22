@@ -57,7 +57,7 @@ import org.jetbrains.annotations.Nullable;
 public class PotionConsumeListener implements Listener {
 	private static final int DRINK_TICK_DELAY = 4; //How many ticks between each slurp sound
 	private static final int DRINK_DURATION = 24; //Ticks of total drinking
-	private static final String INVENTORY_DRINK_TAG = "InventoryDrinkTag"; //Tag to enable this feature (drink from inventory right click)
+	public static final String INVENTORY_DRINK_TAG = "InventoryDrinkTag"; //Tag to enable this feature (drink from inventory right click)
 	private static final String INVENTORY_DRINK_SLOW_EFFECT_NAME = "InventoryDrinkSlowEffect";
 	private static final ImmutableMap<EffectType, Double> COOLDOWN_EFFECTS = ImmutableMap.<EffectType, Double>builder()
 		.put(EffectType.INSTANT_HEALTH, 0d)
@@ -100,8 +100,8 @@ public class PotionConsumeListener implements Listener {
 
 		Inventory clickedInventory = event.getClickedInventory();
 		if (clickedInventory == null ||
-			    ((clickedInventory.getHolder() == null || clickedInventory.getHolder() instanceof Villager) &&
-						clickedInventory.getType() != InventoryType.ENDER_CHEST)) {
+			((clickedInventory.getHolder() == null || clickedInventory.getHolder() instanceof Villager) &&
+				clickedInventory.getType() != InventoryType.ENDER_CHEST)) {
 			return;
 		}
 
@@ -199,6 +199,7 @@ public class PotionConsumeListener implements Listener {
 			mPotionsSlot.put(uuid, slot);
 			BukkitRunnable runnable = new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					//If time to drink is finished, add effects. Otherwise, play sound of slurping every 0.5 seconds for 3.5 seconds total
@@ -234,8 +235,9 @@ public class PotionConsumeListener implements Listener {
 
 	/**
 	 * This is called after the potion drink runnable has finished and when InventoryCloseEvent is called
-	 * @param player - player that drank the potion
-	 * @param inventory - inventory to check and refund potion
+	 *
+	 * @param player         - player that drank the potion
+	 * @param inventory      - inventory to check and refund potion
 	 * @param inventoryClose - if this is an InventoryClose event
 	 */
 	private void postPotionDrink(Player player, Inventory inventory, boolean inventoryClose) {

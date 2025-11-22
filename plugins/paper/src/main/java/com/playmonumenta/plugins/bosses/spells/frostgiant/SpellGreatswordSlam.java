@@ -6,17 +6,19 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -58,7 +60,7 @@ public final class SpellGreatswordSlam extends Spell {
 	private final List<Block> mChangedBlocks = new ArrayList<>();
 
 	public SpellGreatswordSlam(final Plugin plugin, final FrostGiant frostGiant, final int iceDuration, final double deg,
-							   final Location startLoc) {
+	                           final Location startLoc) {
 		mPlugin = plugin;
 		mFrostGiant = frostGiant;
 		mBoss = mFrostGiant.mBoss;
@@ -127,7 +129,7 @@ public final class SpellGreatswordSlam extends Spell {
 		/* TODO: This runnable should probably get a rewrite so it's not a mess of nested code but it is brittle and I don't want to deal with it */
 		final BukkitRunnable jumpRunnable = new BukkitRunnable() {
 			int mT = 0;
-			final List<Player> mHitPlayers = new ArrayList<>();
+			final List<UUID> mHitPlayers = new ArrayList<>();
 
 			@Override
 			public void run() {
@@ -171,7 +173,7 @@ public final class SpellGreatswordSlam extends Spell {
 									}
 									//Once it leaves the arena, stop iterating
 									if ((l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
-										    || l.distance(mStartLoc) > FrostGiant.ARENA_RADIUS) {
+										|| l.distance(mStartLoc) > FrostGiant.ARENA_RADIUS) {
 										continue;
 									}
 									//If on bedrock or barriers, move up one to not replace that
@@ -183,7 +185,7 @@ public final class SpellGreatswordSlam extends Spell {
 									if (degree % 10 == 0) {
 										final Block block = l.getBlock();
 										if (block.getType() != SpellFrostRift.RIFT_BLOCK_TYPE
-											    && TemporaryBlockChangeManager.INSTANCE.changeBlock(block, FrostGiant.ICE_TYPE,
+											&& TemporaryBlockChangeManager.INSTANCE.changeBlock(block, FrostGiant.ICE_TYPE,
 											Constants.TICKS_PER_SECOND * mIceDuration - mRadius + FastUtils.randomIntInRange(0, 10))) {
 											mChangedBlocks.add(block);
 											final Ageable age = (Ageable) block.getBlockData();
@@ -192,7 +194,7 @@ public final class SpellGreatswordSlam extends Spell {
 										}
 									}
 
-									final BoundingBox box = BoundingBox.of(l, 1, 3.65, 1);
+									final BoundingBox box = BoundingBox.of(l, 1, 5, 1);
 									boxes.add(box);
 									final FallingBlock fallBlock = mWorld.spawn(l.add(0, 0.4, 0), FallingBlock.class,
 										CreatureSpawnEvent.SpawnReason.CUSTOM, (final FallingBlock ice) -> {
@@ -216,15 +218,14 @@ public final class SpellGreatswordSlam extends Spell {
 										mWorld.playSound(l, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0.5f);
 									}
 								}
-								for (final Player player : mFrostGiant.getArenaParticipants()) {
-									for (final BoundingBox box : boxes) {
-										if (player.getBoundingBox().overlaps(box) && !mHitPlayers.contains(player)) {
-											DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, SPELL_NAME);
-											AbilityUtils.silencePlayer(player, Constants.TICKS_PER_SECOND * 5);
-											MovementUtils.knockAway(bossLoc, player, 0f, 1.5f, false);
-											mHitPlayers.add(player);
-											break;
-										}
+
+								Hitbox hitbox = Hitbox.unionOfAABB(boxes, mWorld);
+								for (final Player player : hitbox.getHitPlayers(true)) {
+									if (!mHitPlayers.contains(player.getUniqueId())) {
+										DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, 36, null, false, false, SPELL_NAME);
+										AbilityUtils.silencePlayer(player, Constants.TICKS_PER_SECOND * 5);
+										MovementUtils.knockAway(bossLoc, player, 0f, 1.5f, false);
+										mHitPlayers.add(player.getUniqueId());
 									}
 								}
 								mRadius++;

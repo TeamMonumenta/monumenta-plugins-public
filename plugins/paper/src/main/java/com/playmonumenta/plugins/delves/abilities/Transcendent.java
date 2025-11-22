@@ -53,21 +53,21 @@ public class Transcendent {
 
 		List<String> seekingProjectileBoss = new ArrayList<>();
 		seekingProjectileBoss.add(ProjectileBoss.identityTag);
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=8,distance=32,speed=0.5,delay=30,cooldown=100,turnradius=0.02,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=8,distance=32,speed=0.5,delay=30,cooldown=100,turnradius=0.02,charge=3,chargeinterval=10,effects=[(push,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5),(ENTITY_FIREWORK_ROCKET_LAUNCH,1,0.8)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FIREWORKS_SPARK,3,0,0,0,0.1),(SPELL_WITCH,10,0.2,0.2,0.2,0),(END_ROD,2,0.2,0.2,0.2,0)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.3)]]");
 		ABILITY_POOL_MELEE_R1.add(seekingProjectileBoss);
 		ABILITY_POOL_R1.add(seekingProjectileBoss);
 		seekingProjectileBoss = new ArrayList<>();
 		seekingProjectileBoss.add(ProjectileBoss.identityTag);
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=16,distance=32,speed=0.7,delay=30,cooldown=90,turnradius=0.03,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=16,distance=32,speed=0.7,delay=30,cooldown=90,turnradius=0.03,charge=3,chargeinterval=10,effects=[(push,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5),(ENTITY_FIREWORK_ROCKET_LAUNCH,1,0.8)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FIREWORKS_SPARK,3,0,0,0,0.1),(SPELL_WITCH,10,0.2,0.2,0.2,0),(END_ROD,2,0.2,0.2,0.2,0)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.3)]]");
 		ABILITY_POOL_MELEE_R2.add(seekingProjectileBoss);
 		ABILITY_POOL_R2.add(seekingProjectileBoss);
 		seekingProjectileBoss = new ArrayList<>();
 		seekingProjectileBoss.add(ProjectileBoss.identityTag);
-		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=24,distance=32,speed=0.7,delay=30,cooldown=90,turnradius=0.03,charge=3,chargeinterval=10,effects=[(pushforce,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
+		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[damage=24,distance=32,speed=0.7,delay=30,cooldown=90,turnradius=0.03,charge=3,chargeinterval=10,effects=[(push,0.5)],spellname=\"" + TRACKING_SPELL_NAME + "\"]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[soundstart=[],soundlaunch=[(ENTITY_ILLUSIONER_CAST_SPELL,1,0.5),(ENTITY_FIREWORK_ROCKET_LAUNCH,1,0.8)],soundprojectile=[],soundhit=[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,0.5)]]");
 		seekingProjectileBoss.add(ProjectileBoss.identityTag + "[particlelaunch=[(EXPLOSION_LARGE,1)],particleprojectile=[(FIREWORKS_SPARK,3,0,0,0,0.1),(SPELL_WITCH,10,0.2,0.2,0.2,0),(END_ROD,2,0.2,0.2,0.2,0)],particlehit=[(FIREWORKS_SPARK,30,0,0,0,0.3)]]");
 		ABILITY_POOL_MELEE_R3.add(seekingProjectileBoss);
@@ -104,6 +104,7 @@ public class Transcendent {
 	}
 
 	public static final String DESCRIPTION = "Elites become greatly empowered.";
+	public static final String AVOID_TRANSCENDENT = "boss_transcendentimmune";
 
 	public static Component[] rankDescription(int level) {
 		return new Component[]{
@@ -112,7 +113,7 @@ public class Transcendent {
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob) && FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level) {
+		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob) && FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level && !mob.getScoreboardTags().contains(AVOID_TRANSCENDENT)) {
 			EntityEquipment equipment = mob.getEquipment();
 			ItemStack mainhand = equipment == null ? null : equipment.getItemInMainHand();
 			Material material = mainhand == null ? null : mainhand.getType();

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.itemstats.enchantments.Snowy;
-import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Optional;
@@ -50,8 +49,5 @@ public class WinterListener implements Listener {
 		player.playSound(player, Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.75f, 1.25f);
 		target.playSound(target, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.PLAYERS, 0.75f, 2f);
 		ScoreboardUtils.addScore(player, SNOWBALLS_HIT_SCORE, 1);
-		if (ScoreboardUtils.getScoreboardValue(player, SNOWBALLS_HIT_SCORE).orElse(0) == 25) {
-			AdvancementUtils.grantAdvancement(player, "monumenta:trophies/events/2024/snowball_launcher_25");
-		}
 	}
 }

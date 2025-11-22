@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -32,9 +31,8 @@ public final class ParticleManager {
 	private static final AtomicLong mLastTick = new AtomicLong(0);
 	public static final int MAX_PARTIAL_PARTICLE_VALUE = 200;
 
-	private static final ThreadFactory mThreadFactory = new ThreadFactoryBuilder().setNameFormat("PartialParticle Thread").setDaemon(true).build();
-	public static final ExecutorService mParticleExecutor = Executors.newSingleThreadScheduledExecutor(mThreadFactory);
-	private static final ScheduledExecutorService mFlushingExecutor = Executors.newSingleThreadScheduledExecutor(mThreadFactory);
+	public static final ExecutorService mParticleExecutor = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("PartialParticle Thread").setDaemon(true).build());
+	private static final ScheduledExecutorService mFlushingExecutor = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("PartialParticle Flushing Thread").setDaemon(true).build());
 
 	// Use this to force tasks to run off the main thread
 	public static void runOffMainThread(Runnable runnable) {
@@ -108,11 +106,12 @@ public final class ParticleManager {
 		public final double mOffsetY;
 		public final double mOffsetZ;
 		public final double mExtra;
-		@Nullable public final Object mData;
+		@Nullable
+		public final Object mData;
 		public final boolean mForce;
 
 		public ParticlePacket(Particle particle, Player player, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, @Nullable Object data, boolean force) {
-			mPlayer = new WeakReference<Player>(player);
+			mPlayer = new WeakReference<>(player);
 			mPlayerUUID = player.getUniqueId();
 			mParticle = particle;
 			mX = x;
@@ -245,7 +244,7 @@ public final class ParticleManager {
 			}
 		} catch (Exception ex) {
 			if (particle != null) {
-				MMLog.severe("Error flushing particles (potentially malformed particle?): \n" + particle.toString(), ex);
+				MMLog.severe("Error flushing particles (potentially malformed particle?): \n" + particle, ex);
 			} else {
 				MMLog.severe("Error flushing particles: ", ex);
 			}

@@ -305,7 +305,7 @@ public class MarketListing {
 			newLore.add(Component.text("Expires in ", NamedTextColor.GRAY).append(Component.text(getTimeUntilExpirationAsDisplayableString(), NamedTextColor.RED)).decoration(TextDecoration.ITALIC, false));
 		}
 
-	    // stock
+		// stock
 		newLore.add(Component.empty());
 		newLore.add(Component.text("Remaining in stock: ", NamedTextColor.GRAY).append(Component.text(this.getAmountToSellRemaining(), (this.getAmountToSellRemaining() > 0 ? NamedTextColor.GREEN : NamedTextColor.RED))).decoration(TextDecoration.ITALIC, false));
 		// price
@@ -355,8 +355,8 @@ public class MarketListing {
 
 		List<Component> out = new ArrayList<>();
 
-		out.add(Component.text("Price:", NamedTextColor.YELLOW).append(shortenedDisplayComp).append(Component.text(debt.mMeetsRequirement ? " ✓" : " ✗", (debt.mMeetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED))).decoration(TextDecoration.ITALIC, false));
-		out.add(Component.text("(" + uncompressedAmount + " " + ItemUtils.getPlainName(baseCurrency) + (debt.mWalletDebt > 0 ? ", " + debt.mNumInWallet + " in wallet)" : ")"), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+		out.add(Component.text("Price:", NamedTextColor.YELLOW).append(shortenedDisplayComp).append(Component.text(debt.mMeetsRequirement() ? " ✓" : " ✗", (debt.mMeetsRequirement() ? NamedTextColor.GREEN : NamedTextColor.RED))).decoration(TextDecoration.ITALIC, false));
+		out.add(Component.text("(" + uncompressedAmount + " " + ItemUtils.getPlainName(baseCurrency) + (debt.mWalletDebt() > 0 ? ", " + debt.mNumInWallet() + " in wallet)" : ")"), NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 
 		return out;
 	}
@@ -540,7 +540,7 @@ public class MarketListing {
 
 	public static Component getVisibilityAsDisplayableComponent(boolean locked) {
 		return (locked ? Component.text("Invisible", NamedTextColor.RED) : Component.text("Visible", NamedTextColor.GREEN))
-			       .decoration(TextDecoration.ITALIC, false);
+			.decoration(TextDecoration.ITALIC, false);
 	}
 
 	public LocalDateTime getExpirationDateTime() {

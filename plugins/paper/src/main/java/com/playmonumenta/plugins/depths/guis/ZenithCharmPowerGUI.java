@@ -55,10 +55,10 @@ public final class ZenithCharmPowerGUI extends CustomInventory {
 		GUIUtils.refreshOffhand(event);
 		ItemStack clickedItem = event.getCurrentItem();
 		if (event.getClickedInventory() != mInventory ||
-			    clickedItem == null ||
-			    clickedItem.getType() == FILLER ||
-			    clickedItem.getType() == PURCHASED_MAT ||
-			    event.isShiftClick()) {
+			clickedItem == null ||
+			clickedItem.getType() == FILLER ||
+			clickedItem.getType() == PURCHASED_MAT ||
+			event.isShiftClick()) {
 			return;
 		}
 		Player player = (Player) event.getWhoClicked();

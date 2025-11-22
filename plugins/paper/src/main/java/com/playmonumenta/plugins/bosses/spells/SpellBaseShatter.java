@@ -38,17 +38,18 @@ public class SpellBaseShatter extends Spell {
 	private final List<Block> mChangedBlocks = new ArrayList<>();
 
 	public SpellBaseShatter(final Plugin plugin, final LivingEntity boss, final double radius, final int cooldown,
-		final int delay, final int numLines, final double height, final Material indicator,
-		final GetSpellTargets<LivingEntity> spellTargets, final WarningAesthetics warningAesthetics,
-		final LaunchAesthetics launchAesthetics, final HitAction hitAction) {
+	                        final int delay, final int numLines, final double height, final Material indicator,
+	                        final GetSpellTargets<LivingEntity> spellTargets, final WarningAesthetics warningAesthetics,
+	                        final LaunchAesthetics launchAesthetics, final HitAction hitAction) {
 		this(plugin, boss, radius, cooldown, delay, numLines, height, -65, indicator, spellTargets,
-			(final LivingEntity launcher) -> { }, warningAesthetics, launchAesthetics, hitAction);
+			(final LivingEntity launcher) -> {
+			}, warningAesthetics, launchAesthetics, hitAction);
 	}
 
 	public SpellBaseShatter(final Plugin plugin, final LivingEntity boss, final double radius, final int cooldown,
-		final int delay, final int numLines, final double height, final double forcedYHeightIndicator, final Material indicator,
-		final GetSpellTargets<LivingEntity> spellTargets, final StartAesthetics startAesthetics,
-		final WarningAesthetics warningAesthetics, final LaunchAesthetics launchAesthetics, final HitAction hitAction) {
+	                        final int delay, final int numLines, final double height, final double forcedYHeightIndicator, final Material indicator,
+	                        final GetSpellTargets<LivingEntity> spellTargets, final StartAesthetics startAesthetics,
+	                        final WarningAesthetics warningAesthetics, final LaunchAesthetics launchAesthetics, final HitAction hitAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRadius = radius;

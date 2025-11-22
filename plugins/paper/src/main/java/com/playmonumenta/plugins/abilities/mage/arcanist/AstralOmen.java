@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.AstralOmenCS;
@@ -22,7 +24,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
@@ -56,38 +57,14 @@ public class AstralOmen extends Ability {
 	public static final String CHARM_RANGE = "Astral Omen Range";
 	public static final String CHARM_PULL = "Astral Omen Pull Speed";
 
-	private final double mLevelBonusMultiplier;
-	private final double mDamage;
-
 	private static final Map<ClassAbility, Type> mElementClassification;
-
-	private final AstralOmenCS mCosmetic;
 
 	public static final AbilityInfo<AstralOmen> INFO =
 		new AbilityInfo<>(AstralOmen.class, NAME, AstralOmen::new)
 			.linkedSpell(ABILITY)
 			.scoreboardId("AstralOmen")
 			.shorthandName("AO")
-			.descriptions(
-				String.format(
-					"Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). " +
-						"If an enemy hits %s omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, " +
-						"dealing %s magic damage to it and all enemies within %s blocks. " +
-						"An enemy loses all its omens after %ss of it not gaining another omen. " +
-						"That implosion's damage ignores iframes and itself cannot apply omens. " +
-						"Omens cannot be applied or sealed by Elemental Arrows.",
-					STACK_THRESHOLD,
-					DAMAGE_1,
-					RADIUS,
-					StringUtils.ticksToSeconds(STACK_TICKS)
-				),
-				String.format(
-					"The implosion now pulls all enemies inwards and deals %s damage. Enemies hit by the implosion now take %s%% more damage from you for %ss.",
-					DAMAGE_2,
-					StringUtils.multiplierToPercentage(BONUS_MULTIPLIER),
-					StringUtils.ticksToSeconds(BONUS_TICKS)
-				)
-			)
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Upon damaging a mob with multiple types of magic, deal damage to nearby mobs.")
 			.displayItem(Material.NETHER_STAR);
 
@@ -122,11 +99,20 @@ public class AstralOmen extends Ability {
 		}
 	}
 
+	private final double mLevelBonusMultiplier;
+	private final double mDamage;
+	private final int mStackThreshold;
+	private final double mRadius;
+
+	private final AstralOmenCS mCosmetic;
+
 	public AstralOmen(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mLevelBonusMultiplier = (isLevelTwo() ? BONUS_MULTIPLIER + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER) : 0);
+		mLevelBonusMultiplier = BONUS_MULTIPLIER + CharmManager.getLevelPercentDecimal(player, CHARM_MODIFIER);
+		mStackThreshold = STACK_THRESHOLD + (int) CharmManager.getLevel(mPlayer, CHARM_STACK);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelTwo() ? DAMAGE_2 : DAMAGE_1);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, RADIUS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AstralOmenCS());
-		mDamage = isLevelTwo() ? DAMAGE_2 : DAMAGE_1;
 	}
 
 	@Override
@@ -158,11 +144,9 @@ public class AstralOmen extends Ability {
 			}
 		}
 
-		int stacksThreshold = STACK_THRESHOLD + (int) CharmManager.getLevel(mPlayer, CHARM_STACK);
-		if (combo >= stacksThreshold) { // Adding 1 more stack would hit threshold, which removes all stacks anyway, so don't bother adding then removing
-			float baseDamage = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage);
-			float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, baseDamage);
-			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS));
+		if (combo >= mStackThreshold) { // Adding 1 more stack would hit threshold, which removes all stacks anyway, so don't bother adding then removing
+			float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, (float) mDamage);
+			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), mRadius);
 			for (LivingEntity mob : hitbox.getHitMobs()) {
 				if (MetadataUtils.checkOnceThisTick(mPlugin, mob, DAMAGED_THIS_TICK_METAKEY)) {
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, spellDamage, mInfo.getLinkedSpell(), true);
@@ -171,14 +155,14 @@ public class AstralOmen extends Ability {
 					}
 					for (Map.Entry<Type, Integer> entry : levels.entrySet()) {
 						if (entry.getValue() > 0) {
-							mCosmetic.clearEffect(mPlayer, enemy, entry);
+							mCosmetic.clearEffect(mPlayer, enemy, entry, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RADIUS));
 						}
 					}
 				}
 			}
 
-			if (mLevelBonusMultiplier > 0) {
-				mPlugin.mEffectManager.addEffect(enemy, BONUS_DAMAGE_SOURCE, new AstralOmenBonusDamage(BONUS_TICKS, mLevelBonusMultiplier, mPlayer, mCosmetic));
+			if (isLevelTwo()) {
+				mPlugin.mEffectManager.addEffect(enemy, BONUS_DAMAGE_SOURCE, new AstralOmenBonusDamage(BONUS_TICKS, mLevelBonusMultiplier, mPlayer, mCosmetic).deleteOnAbilityUpdate(true));
 			}
 
 		} else {
@@ -194,10 +178,14 @@ public class AstralOmen extends Ability {
 				if (level > 0) {
 					Effect effect;
 					switch (type) {
-						case FIRE -> effect = new AstralOmenFireStacks(STACK_TICKS, level, mPlayer, mCosmetic);
-						case ICE -> effect = new AstralOmenIceStacks(STACK_TICKS, level, mPlayer, mCosmetic);
-						case THUNDER -> effect = new AstralOmenThunderStacks(STACK_TICKS, level, mPlayer, mCosmetic);
-						default -> effect = new AstralOmenArcaneStacks(STACK_TICKS, level, mPlayer, mCosmetic);
+						case FIRE ->
+							effect = new AstralOmenFireStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
+						case ICE ->
+							effect = new AstralOmenIceStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
+						case THUNDER ->
+							effect = new AstralOmenThunderStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
+						default ->
+							effect = new AstralOmenArcaneStacks(STACK_TICKS, level, mPlayer, mCosmetic).deleteOnAbilityUpdate(true);
 					}
 					mPlugin.mEffectManager.addEffect(enemy, type.mSource, effect);
 				}
@@ -205,5 +193,29 @@ public class AstralOmen extends Ability {
 		}
 
 		return false; // Needs to apply to all damaged mobs. Uses an internal check to prevent recursion on dealing damage.
+	}
+
+	private static Description<AstralOmen> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). If an enemy hits ")
+			.add(a -> a.mStackThreshold, STACK_THRESHOLD)
+			.add(" omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, dealing ")
+			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage to it and all enemies within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks. An enemy loses all its omens after ")
+			.addDuration(STACK_TICKS)
+			.add(" seconds of it not gaining another omen. That implosion's damage cannot apply omens. Omens cannot be applied or sealed by Elemental Arrows.");
+	}
+
+	private static Description<AstralOmen> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The implosion now pulls all enemies inwards and deals ")
+			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" damage. Enemies hit by the implosion now take ")
+			.addPercent(a -> a.mLevelBonusMultiplier, BONUS_MULTIPLIER)
+			.add(" more damage from you for ")
+			.addDuration(BONUS_TICKS)
+			.add(" seconds.");
 	}
 }

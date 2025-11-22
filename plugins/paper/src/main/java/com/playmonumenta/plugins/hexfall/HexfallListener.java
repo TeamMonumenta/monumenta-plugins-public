@@ -97,6 +97,7 @@ public class HexfallListener implements Listener {
 				Player otherPlayer = playersWithReincarnInBoss.get(0);
 				plugin.mEffectManager.clearEffects(otherPlayer, Reincarnation.GENERIC_NAME);
 				plugin.mEffectManager.addEffect(player, Reincarnation.GENERIC_NAME, new Reincarnation(20 * 6000, 1));
+				player.sendMessage(Component.text("You've gained Reincarnation against death...", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 
 				for (Player p : PlayerUtils.playersInRange(player.getLocation(), 80, true)) {
 					p.sendMessage(Component.text(player.getName(), NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true)
@@ -133,7 +134,7 @@ public class HexfallListener implements Listener {
 		event.getPlayer().getWorld().getEntities().stream().filter(entity -> entity.getScoreboardTags().contains("DHFFlawless")).forEach(entity -> entity.removeScoreboardTag("DHFFlawless"));
 	}
 
-	@EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void entityResurrectEvent(EntityResurrectEvent event) {
 		if (event.getEntity() instanceof Player player) {
 			event.setCancelled(true);

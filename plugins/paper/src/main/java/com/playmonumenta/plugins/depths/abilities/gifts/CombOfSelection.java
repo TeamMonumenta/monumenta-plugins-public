@@ -34,6 +34,6 @@ public class CombOfSelection extends DepthsAbility {
 	}
 
 	private static Description<CombOfSelection> getDescription() {
-		return new DescriptionBuilder<CombOfSelection>().add("Each time you spend a reroll on an ability selection, the new set of abilities is upgraded by one level. Gain two rerolls.");
+		return new DescriptionBuilder<>(() -> INFO).add("Each time you spend a reroll on an ability selection, the new set of abilities is upgraded by one level. Gain two rerolls.");
 	}
 }

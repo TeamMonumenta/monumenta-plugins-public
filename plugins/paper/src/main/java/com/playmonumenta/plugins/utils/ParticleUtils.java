@@ -47,7 +47,7 @@ public class ParticleUtils {
 	@FunctionalInterface
 	public interface CleaveAnimation {
 
-		void cleaveAnimation(Location loc, int rings);
+		void cleaveAnimation(Location loc, int rings, double angleProgress);
 
 	}
 
@@ -207,24 +207,21 @@ public class ParticleUtils {
 			double x = switch (edge) {
 				case X_YMIN_ZMIN, X_YMIN_ZMAX, X_YMAX_ZMIN, X_YMAX_ZMAX ->
 					bb.getMinX() + bbSize.getX() * FastUtils.RANDOM.nextDouble();
-				case Y_XMIN_ZMIN, Y_XMIN_ZMAX, Z_XMIN_YMIN, Z_XMIN_YMAX ->
-					bb.getMinX();
+				case Y_XMIN_ZMIN, Y_XMIN_ZMAX, Z_XMIN_YMIN, Z_XMIN_YMAX -> bb.getMinX();
 				default -> bb.getMaxX();
 			};
 
 			double y = switch (edge) {
 				case Y_XMIN_ZMIN, Y_XMIN_ZMAX, Y_XMAX_ZMIN, Y_XMAX_ZMAX ->
 					bb.getMinY() + bbSize.getY() * FastUtils.RANDOM.nextDouble();
-				case X_YMIN_ZMIN, X_YMIN_ZMAX, Z_XMIN_YMIN, Z_XMAX_YMIN ->
-					bb.getMinY();
+				case X_YMIN_ZMIN, X_YMIN_ZMAX, Z_XMIN_YMIN, Z_XMAX_YMIN -> bb.getMinY();
 				default -> bb.getMaxY();
 			};
 
 			double z = switch (edge) {
 				case Z_XMIN_YMIN, Z_XMIN_YMAX, Z_XMAX_YMIN, Z_XMAX_YMAX ->
 					bb.getMinZ() + bbSize.getZ() * FastUtils.RANDOM.nextDouble();
-				case X_YMIN_ZMIN, X_YMAX_ZMIN, Y_XMIN_ZMIN, Y_XMAX_ZMIN ->
-					bb.getMinZ();
+				case X_YMIN_ZMIN, X_YMAX_ZMIN, Y_XMIN_ZMIN, Y_XMAX_ZMIN -> bb.getMinZ();
 				default -> bb.getMaxZ();
 			};
 
@@ -233,12 +230,17 @@ public class ParticleUtils {
 	}
 
 	public static void drawHalfArc(Location loc, double radius, double angle, double startingDegrees, double endingDegrees,
-								   int rings, double spacing, CleaveAnimation cleaveAnim) {
-		drawHalfArc(loc, radius, angle, startingDegrees, endingDegrees, rings, spacing, false, 40, cleaveAnim);
+	                               int rings, double spacing, CleaveAnimation cleaveAnim) {
+		drawHalfArc(loc, radius, angle, startingDegrees, endingDegrees, rings, spacing, false, 40, cleaveAnim, 5);
 	}
 
 	public static void drawHalfArc(Location loc, double radius, double angle, double startingDegrees, double endingDegrees,
-								   int rings, double spacing, boolean reverse, int arcInc, CleaveAnimation cleaveAnim) {
+	                               int rings, double spacing, boolean reverse, int arcInc, CleaveAnimation cleaveAnim) {
+		drawHalfArc(loc, radius, angle, startingDegrees, endingDegrees, rings, spacing, reverse, arcInc, cleaveAnim, 5);
+	}
+
+	public static void drawHalfArc(Location loc, double radius, double angle, double startingDegrees, double endingDegrees,
+	                               int rings, double spacing, boolean reverse, int arcInc, CleaveAnimation cleaveAnim, int degreeStep) {
 		double radiusInc = (Math.PI / (endingDegrees - startingDegrees));
 
 		loc = loc.clone();
@@ -247,11 +249,12 @@ public class ParticleUtils {
 		new BukkitRunnable() {
 			double mDegrees = startingDegrees;
 			double mPI = 0;
+
 			@Override
 			public void run() {
 				Vector vec;
 
-				for (double d = mDegrees; d < mDegrees + arcInc; d += 5) {
+				for (double d = mDegrees; d < mDegrees + arcInc; d += degreeStep) {
 					double radian1 = FastMath.toRadians(d);
 
 					for (int i = 0; i < rings; i++) {
@@ -263,10 +266,10 @@ public class ParticleUtils {
 						vec = VectorUtils.rotateYAxis(vec, finalLoc.getYaw());
 
 						Location l = finalLoc.clone().add(vec);
-						cleaveAnim.cleaveAnimation(l, i + 1);
+						cleaveAnim.cleaveAnimation(l, i + 1, (d - startingDegrees) / (endingDegrees - startingDegrees));
 					}
 
-					mPI += radiusInc * 2.5;
+					mPI += radiusInc * (degreeStep / 2.0);
 					if (d >= endingDegrees) {
 						this.cancel();
 						return;
@@ -280,8 +283,8 @@ public class ParticleUtils {
 	}
 
 	public static void drawParticleCircleExplosion(LivingEntity entity, Location loc, double angle,
-												   double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd,
-												   Particle... effects) {
+	                                               double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd,
+	                                               Particle... effects) {
 		drawParticleCircleExplosion(entity, loc, angle, radius, yaw, pitch, points, speed, atOrigin, radianAdd, 0, effects);
 	}
 
@@ -313,12 +316,12 @@ public class ParticleUtils {
 				nonYVec = VectorUtils.rotateYAxis(nonYVec, loc.getYaw() + yaw);
 				l = l.add(nonYVec);
 			}
-		if (entity instanceof Player player) {
-			for (Particle effect : effects) {
-				new PartialParticle(effect, atOrigin ? loc : l, 1, vec.getX(), vec.getY(), vec.getZ(), speed, data, true, 0)
-					.spawnAsPlayerActive(player);
-			}
-		} else {
+			if (entity instanceof Player player) {
+				for (Particle effect : effects) {
+					new PartialParticle(effect, atOrigin ? loc : l, 1, vec.getX(), vec.getY(), vec.getZ(), speed, data, true, 0)
+						.spawnAsPlayerActive(player);
+				}
+			} else {
 				for (Particle effect : effects) {
 					new PartialParticle(effect, atOrigin ? loc : l, 1, vec.getX(), vec.getY(), vec.getZ(), speed, data, true, 0)
 						.spawnAsEntityActive(entity);
@@ -359,6 +362,7 @@ public class ParticleUtils {
 				final int mPointsPerTick = (int) (points.size() * (1D / duration));
 				int mT = 0;
 				boolean mMidReached = false;
+
 				@Override
 				public void run() {
 
@@ -384,20 +388,28 @@ public class ParticleUtils {
 	}
 
 	public static void drawCleaveArc(Location loc,
-									 final double radius, final double angle, double startingDegrees, double endingDegrees,
-									 final int rings, final double extraYaw,
-									 double extraPitch, double spacing, double arcInc, CleaveAnimation cleaveAnim) {
+	                                 final double radius, final double angle, double startingDegrees, double endingDegrees,
+	                                 final int rings, final double extraYaw,
+	                                 double extraPitch, double spacing, double arcInc, CleaveAnimation cleaveAnim) {
+		drawCleaveArc(loc, radius, angle, startingDegrees, endingDegrees, rings, extraYaw, extraPitch, spacing, arcInc, cleaveAnim, 5);
+	}
+
+	public static void drawCleaveArc(Location loc,
+	                                 final double radius, final double angle, double startingDegrees, double endingDegrees,
+	                                 final int rings, final double extraYaw,
+	                                 double extraPitch, double spacing, double arcInc, CleaveAnimation cleaveAnim, int degreeStep) {
 		double radiusInc = (Math.PI / (endingDegrees - startingDegrees));
 
 		Location finalLoc = loc.clone();
 		new BukkitRunnable() {
 			double mDegrees = startingDegrees;
 			double mPI = 0;
+
 			@Override
 			public void run() {
 				Vector vec;
 
-				for (double d = mDegrees; d < mDegrees + arcInc; d += 5) {
+				for (double d = mDegrees; d < mDegrees + arcInc; d += degreeStep) {
 					double radian1 = FastMath.toRadians(d);
 
 					for (int i = 0; i < rings; i++) {
@@ -409,10 +421,10 @@ public class ParticleUtils {
 						vec = VectorUtils.rotateYAxis(vec, finalLoc.getYaw() + extraYaw);
 
 						Location l = finalLoc.clone().add(vec);
-						cleaveAnim.cleaveAnimation(l, i + 1);
+						cleaveAnim.cleaveAnimation(l, i + 1, (d - startingDegrees) / endingDegrees);
 					}
 
-					mPI += radiusInc * 5;
+					mPI += radiusInc * degreeStep;
 					if (d >= endingDegrees) {
 						this.cancel();
 						return;
@@ -426,18 +438,18 @@ public class ParticleUtils {
 	}
 
 	public static Color getTransition(Color color, Color toColor, double percent) {
-		int red = (int)Math.abs((percent * toColor.getRed()) + ((1 - percent) * color.getRed()));
-		int green = (int)Math.abs((percent * toColor.getGreen()) + ((1 - percent) * color.getGreen()));
-		int blue = (int)Math.abs((percent * toColor.getBlue()) + ((1 - percent) * color.getBlue()));
+		int red = (int) Math.abs((percent * toColor.getRed()) + ((1 - percent) * color.getRed()));
+		int green = (int) Math.abs((percent * toColor.getGreen()) + ((1 - percent) * color.getGreen()));
+		int blue = (int) Math.abs((percent * toColor.getBlue()) + ((1 - percent) * color.getBlue()));
 
 		return Color.fromRGB(Math.min(red, 255), Math.min(green, 255), Math.min(blue, 255));
 	}
 
 	public static Particle.DustOptions getTransition(Particle.DustOptions color, Particle.DustOptions toColor, double percent) {
-		int red = (int)Math.abs((percent * toColor.getColor().getRed()) + ((1 - percent) * color.getColor().getRed()));
-		int green = (int)Math.abs((percent * toColor.getColor().getGreen()) + ((1 - percent) * color.getColor().getGreen()));
-		int blue = (int)Math.abs((percent * toColor.getColor().getBlue()) + ((1 - percent) * color.getColor().getBlue()));
-		int size = (int)Math.abs((percent * toColor.getSize()) + ((1 - percent) * color.getSize()));
+		int red = (int) Math.abs((percent * toColor.getColor().getRed()) + ((1 - percent) * color.getColor().getRed()));
+		int green = (int) Math.abs((percent * toColor.getColor().getGreen()) + ((1 - percent) * color.getColor().getGreen()));
+		int blue = (int) Math.abs((percent * toColor.getColor().getBlue()) + ((1 - percent) * color.getColor().getBlue()));
+		int size = (int) Math.abs((percent * toColor.getSize()) + ((1 - percent) * color.getSize()));
 
 		return new Particle.DustOptions(Color.fromRGB(Math.min(red, 255), Math.min(green, 255), Math.min(blue, 255)), size);
 	}
@@ -445,22 +457,23 @@ public class ParticleUtils {
 
 	/**
 	 * Use {@link com.playmonumenta.plugins.particle.PPParametric} if possible. Draw a particle curve in a vector space with parametric equations.
-	 * @author Yelon Yagi a.k.a ProjektRed
-	 * @param center Center (0, 0, 0) location of the vector space
+	 *
+	 * @param center  Center (0, 0, 0) location of the vector space
 	 * @param paraMin Minimum value of parameter
 	 * @param paraMax Maximum value of parameter
-	 * @param e1 Base vector 1
-	 * @param e2 Base vector 2
-	 * @param e3 Base vector 3
-	 * @param eq1 Parameter equation 1
-	 * @param eq2 Parameter equation 2
-	 * @param eq3 Parameter equation 3
-	 * @param pp What to do at every location generated by P.E.
+	 * @param e1      Base vector 1
+	 * @param e2      Base vector 2
+	 * @param e3      Base vector 3
+	 * @param eq1     Parameter equation 1
+	 * @param eq2     Parameter equation 2
+	 * @param eq3     Parameter equation 3
+	 * @param pp      What to do at every location generated by P.E.
+	 * @author Yelon Yagi a.k.a ProjektRed
 	 */
 	public static void drawCurve(Location center, int paraMin, int paraMax,
-								 Vector e1, Vector e2, Vector e3,
-								 ParametricEquation eq1, ParametricEquation eq2, ParametricEquation eq3,
-								 ParametricParticle pp) {
+	                             Vector e1, Vector e2, Vector e3,
+	                             ParametricEquation eq1, ParametricEquation eq2, ParametricEquation eq3,
+	                             ParametricParticle pp) {
 		Location loc;
 		for (int t = paraMin; t <= paraMax; t++) {
 			loc = center.clone();
@@ -477,8 +490,8 @@ public class ParticleUtils {
 	 * and the vector space is generated by front direction vector.
 	 */
 	public static void drawCurve(Location center, int paraMin, int paraMax, Vector front,
-								 ParametricEquation f, ParametricEquation u, ParametricEquation r,
-								 ParametricParticle pp) {
+	                             ParametricEquation f, ParametricEquation u, ParametricEquation r,
+	                             ParametricParticle pp) {
 		Vector right = VectorUtils.rotateTargetDirection(front.clone(), 90, 0);
 		Vector up = VectorUtils.rotateTargetDirection(front.clone(), 0, -90);
 
@@ -491,8 +504,8 @@ public class ParticleUtils {
 	 * and the vector space is generated by yaw and pitch.
 	 */
 	public static void drawCurve(Location center, int paraMin, int paraMax, double yaw, double pitch,
-								 ParametricEquation f, ParametricEquation u, ParametricEquation r,
-								 ParametricParticle pp) {
+	                             ParametricEquation f, ParametricEquation u, ParametricEquation r,
+	                             ParametricParticle pp) {
 		Vector front = VectorUtils.rotationToVector(yaw, pitch);
 		Vector up = VectorUtils.rotationToVector(yaw, pitch - 90);
 		Vector right = front.getCrossProduct(up).normalize();
@@ -511,11 +524,13 @@ public class ParticleUtils {
 	 * @param pp     Particle action at each unit
 	 */
 	public static void drawRing(Location center, int units, Vector normal, double radius, ParametricParticle pp) {
+
 		drawCurve(center, 1, units, normal.clone().normalize(),
-				t -> 0,
-				t -> FastUtils.sin(Math.PI * 2 * t / units) * radius,
-				t -> FastUtils.cos(Math.PI * 2 * t / units) * radius,
-				pp
+			t -> 0,
+			t -> FastUtils.sin(Math.PI * 2 * t / units) * radius,
+			t -> FastUtils.cos(Math.PI * 2 * t / units) * radius,
+			pp
+
 		);
 	}
 
@@ -524,11 +539,13 @@ public class ParticleUtils {
 		Vector normal = new Vector(0, 1, 0);
 		for (int i = 0; i < units; i++) {
 			double theta = i * thetaStep;
+
 			drawCurve(center, 1, units, normal.clone().normalize(),
-					t -> radius * FastUtils.cos(theta) * FastUtils.sin(Math.PI * 2 * t / units),
-					t -> radius * FastUtils.cos(Math.PI * 2 * t / units),
-					t -> radius * FastUtils.sin(theta) * FastUtils.sin(Math.PI * 2 * t / units),
-					pp
+				t -> radius * FastUtils.cos(theta) * FastUtils.sin(Math.PI * 2 * t / units),
+				t -> radius * FastUtils.cos(Math.PI * 2 * t / units),
+				t -> radius * FastUtils.sin(theta) * FastUtils.sin(Math.PI * 2 * t / units),
+				pp
+
 			);
 		}
 	}
@@ -541,11 +558,13 @@ public class ParticleUtils {
 
 		for (int i = 0; i < units; i++) {
 			double theta = i * thetaStep;
+
 			drawCurve(center, 0, units, rotation[0], rotation[1] + 90,
-					t -> radius * FastUtils.cos(theta) * FastUtils.sin(Math.PI * t / units / 2),
-					t -> radius * FastUtils.cos(Math.PI * t / units / 2),
-					t -> radius * FastUtils.sin(theta) * FastUtils.sin(Math.PI * t / units / 2),
-					pp
+				t -> radius * FastUtils.cos(theta) * FastUtils.sin(Math.PI * t / units / 2),
+				t -> radius * FastUtils.cos(Math.PI * t / units / 2),
+				t -> radius * FastUtils.sin(theta) * FastUtils.sin(Math.PI * t / units / 2),
+				pp
+
 			);
 		}
 	}
@@ -703,6 +722,7 @@ public class ParticleUtils {
 
 		new BukkitRunnable() {
 			int mTimesRun = 0;
+
 			@Override
 			public void run() {
 				// Pulses, starting after startDelay
@@ -755,6 +775,7 @@ public class ParticleUtils {
 		new BukkitRunnable() {
 
 			int mTimesAnimated = 0;
+
 			@Override
 			public void run() {
 				Location[] innerCorners = {
@@ -765,6 +786,7 @@ public class ParticleUtils {
 				};
 				new BukkitRunnable() {
 					int mTimesRun = 0;
+
 					@Override
 					public void run() {
 						// Outline always visible
@@ -824,6 +846,7 @@ public class ParticleUtils {
 
 		new BukkitRunnable() {
 			int mTimesRun = 0;
+
 			@Override
 			public void run() {
 				if (!hideMiddleCircle) {
@@ -860,7 +883,7 @@ public class ParticleUtils {
 	}
 
 	public static BukkitRunnable drawFlowerPattern(Location center, double radius, int petals, int duration, double thetaOffset,
-												   double thetaIncrement, float baseSpeed, Particle particle, Entity spawnerEntity) {
+	                                               double thetaIncrement, float baseSpeed, Particle particle, Entity spawnerEntity) {
 		double pointOffset = Math.PI * 2 / petals;
 		BukkitRunnable flowerRunnable = new BukkitRunnable() {
 			int mTicks = 0;
@@ -961,9 +984,9 @@ public class ParticleUtils {
 	}
 
 	public static void drawPreciseCurve(Location center, double paraMin, double paraMax, double thetaStep,
-										Vector e1, Vector e2, Vector e3,
-										PreciseParametricEquation eq1, PreciseParametricEquation eq2, PreciseParametricEquation eq3,
-										PreciseParametricParticle pp) {
+	                                    Vector e1, Vector e2, Vector e3,
+	                                    PreciseParametricEquation eq1, PreciseParametricEquation eq2, PreciseParametricEquation eq3,
+	                                    PreciseParametricParticle pp) {
 		Location loc;
 		for (double t = paraMin; t <= paraMax; t += thetaStep) {
 			loc = center.clone();
@@ -975,8 +998,8 @@ public class ParticleUtils {
 	}
 
 	public static void drawPreciseCurve(Location center, double paraMin, double paraMax, double thetaStep, Vector front,
-										PreciseParametricEquation f, PreciseParametricEquation u, PreciseParametricEquation r,
-										PreciseParametricParticle pp) {
+	                                    PreciseParametricEquation f, PreciseParametricEquation u, PreciseParametricEquation r,
+	                                    PreciseParametricParticle pp) {
 		Vector right = VectorUtils.rotateTargetDirection(front.clone(), 90, 0);
 		Vector up = VectorUtils.rotateTargetDirection(front.clone(), 0, -90);
 
@@ -985,9 +1008,9 @@ public class ParticleUtils {
 
 	/**
 	 * Adaptation of Touch Of Entropy's code for orbs.
-	*/
+	 */
 	public static void launchOrb(Vector initialDir, Location startLoc, LivingEntity launcher, LivingEntity target, int expireTime,
-								 @Nullable Location targetLoc, Particle.DustOptions dustOptions, Consumer<LivingEntity> hitAction) {
+	                             @Nullable Location targetLoc, Particle.DustOptions dustOptions, Consumer<LivingEntity> hitAction) {
 		new BukkitRunnable() {
 			final Location mCurrLoc = startLoc.clone();
 			int mTicks = 0;
@@ -1028,6 +1051,22 @@ public class ParticleUtils {
 			}
 
 		}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
+	}
+
+	public static void drawFlag(Player player, Location loc, List<Color> colors, float size) {
+		Location eLoc = loc.clone();
+		eLoc.setPitch(0);
+		eLoc.setYaw(player.getLocation().getYaw() - 90);
+
+		Vector horizontal = eLoc.getDirection();
+
+		for (Color color : colors) {
+			new PPLine(Particle.REDSTONE, eLoc.clone().subtract(horizontal), eLoc.clone().add(horizontal))
+				.countPerMeter(8)
+				.data(new Particle.DustOptions(color, size))
+				.spawnAsPlayerActive(player);
+			eLoc.subtract(0, size / 8, 0);
+		}
 	}
 
 	public static void spawnParticleAsLivingEntity(PartialParticle pp, LivingEntity living) {

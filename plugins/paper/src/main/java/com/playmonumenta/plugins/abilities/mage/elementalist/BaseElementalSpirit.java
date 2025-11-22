@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class BaseElementalSpirit extends Ability {
 
-	protected final float mLevelDamage;
+	protected double mLevelDamage;
 	protected final double mLevelBowMultiplier;
 	protected final EnumSet<ClassAbility> mAffectedAbilities;
 	protected final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
@@ -42,7 +42,7 @@ public abstract class BaseElementalSpirit extends Ability {
 
 	public BaseElementalSpirit(Plugin plugin, Player player, AbilityInfo<?> info, EnumSet<ClassAbility> affectedAbilities, double damage1, double damage2, double bowMultiplier1, double bowMultiplier2) {
 		super(plugin, player, info);
-		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, ElementalSpiritFire.CHARM_DAMAGE, isLevelOne() ? damage1 : damage2);
+		mLevelDamage = CharmManager.calculateFlatAndPercentValue(player, ElementalSpiritFire.CHARM_DAMAGE, isLevelOne() ? damage1 : damage2);
 		mLevelBowMultiplier = isLevelOne() ? bowMultiplier1 : bowMultiplier2;
 		mAffectedAbilities = affectedAbilities;
 
@@ -61,7 +61,7 @@ public abstract class BaseElementalSpirit extends Ability {
 			if (mEnemiesAffectedProcessor == null) {
 
 				boolean isElementalArrows = ability == ClassAbility.ELEMENTAL_ARROWS_FIRE || ability == ClassAbility.ELEMENTAL_ARROWS_ICE;
-				float spellDamage = isElementalArrows ? mLevelDamage : SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+				float spellDamage = isElementalArrows ? (float) mLevelDamage : SpellPower.getSpellDamage(mPlugin, mPlayer, (float) mLevelDamage);
 				ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 				mEnemiesAffectedProcessor = new BukkitRunnable() {
@@ -102,9 +102,9 @@ public abstract class BaseElementalSpirit extends Ability {
 				@Override
 				public void run() {
 					if (isOnCooldown()
-						    || !mPlayer.isOnline()
-							|| mPlayer.isDead()
-						    || PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
+						|| !mPlayer.isOnline()
+						|| mPlayer.isDead()
+						|| PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
 						this.cancel();
 						mPlayerParticlesGenerator = null;
 					}

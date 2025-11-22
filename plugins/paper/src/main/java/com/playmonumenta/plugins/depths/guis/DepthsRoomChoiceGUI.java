@@ -94,7 +94,7 @@ public class DepthsRoomChoiceGUI extends Gui {
 
 					DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
 					if (party != null) {
-						for (Player p: party.getPlayers()) {
+						for (Player p : party.getPlayers()) {
 							if (getOpenGui(p) instanceof DepthsRoomChoiceGUI gui) {
 								gui.close();
 							}

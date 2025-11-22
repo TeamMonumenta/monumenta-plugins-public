@@ -75,7 +75,7 @@ public class ChaosDagger extends DepthsAbility {
 
 	public boolean cast() {
 		if (isOnCooldown() ||
-			    EntityUtils.getNearestMob(mPlayer.getLocation(), 20.0) == null) {
+			EntityUtils.getNearestMob(mPlayer.getLocation(), 20.0) == null) {
 			return false;
 		}
 		putOnCooldown();
@@ -205,8 +205,9 @@ public class ChaosDagger extends DepthsAbility {
 	}
 
 	private static Description<ChaosDagger> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ChaosDagger>(color)
-			.add("Swap hands to throw a cursed dagger that stuns an enemy for ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to throw a cursed dagger that stuns an enemy for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION)
 			.add(" seconds (rooting bosses instead). The next time you deal non-ability melee or projectile damage within ")
 			.addDuration(DAMAGE_DURATION)

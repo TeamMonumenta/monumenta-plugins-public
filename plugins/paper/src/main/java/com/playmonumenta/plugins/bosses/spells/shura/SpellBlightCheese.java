@@ -17,15 +17,15 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-public class SpellBlightCheese extends Spell {
+public final class SpellBlightCheese extends Spell {
 	int mT = 0;
 	LivingEntity mBoss;
 	Location mCenter;
 	double mRange;
 	List<Player> mWarned = new ArrayList<>();
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
-	private PartialParticle mPRed;
-	private PartialParticle mPWitch;
+	private final PartialParticle mPRed;
+	private final PartialParticle mPWitch;
 
 	public SpellBlightCheese(LivingEntity boss, double range, Location center) {
 		mBoss = boss;

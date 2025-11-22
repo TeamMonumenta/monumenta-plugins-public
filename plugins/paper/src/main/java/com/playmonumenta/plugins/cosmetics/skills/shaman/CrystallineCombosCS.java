@@ -55,16 +55,16 @@ public class CrystallineCombosCS implements CosmeticSkill {
 	public void crystallineCombosActiveSwirl(List<PPPeriodic> mParticles, Player player, double mRotationAngle, boolean mSpendingStacks, int colorAdjust, int i) {
 		PPPeriodic particle = mParticles.get(i);
 		particle.location(LocationUtils.getHalfHeightLocation(player)
-			.add(FastUtils.cos(Math.toRadians(mRotationAngle + (i * 120))), -0.1, FastUtils.sin(Math.toRadians(mRotationAngle + (i * 120)))))
+				.add(FastUtils.cos(Math.toRadians(mRotationAngle + (i * 120))), -0.1, FastUtils.sin(Math.toRadians(mRotationAngle + (i * 120)))))
 			.data(new Particle.DustOptions(Color.fromRGB(mSpendingStacks ? 255 : colorAdjust, mSpendingStacks ? 150 : colorAdjust, mSpendingStacks ? 150 : 255), 0.8f))
 			.spawnAsPlayerPassive(player);
 	}
 
 	public void crystallineCombosHit(Player player, LivingEntity target, Particle.DustOptions particleColor) {
 		player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT,
-			SoundCategory.PLAYERS, 1.2f, 1.0f);
+			SoundCategory.PLAYERS, 0.6f, 1.0f);
 		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK,
-			SoundCategory.PLAYERS, 2f, 1.4f);
+			SoundCategory.PLAYERS, 1f, 1.4f);
 		new PPLine(Particle.REDSTONE,
 			LocationUtils.getHalfHeightLocation(player).add(0, -0.1, 0),
 			LocationUtils.getHalfHeightLocation(target)).data(particleColor)

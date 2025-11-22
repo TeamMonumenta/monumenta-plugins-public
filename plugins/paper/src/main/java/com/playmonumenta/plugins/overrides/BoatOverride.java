@@ -28,7 +28,7 @@ public class BoatOverride extends BaseOverride {
 
 		Location loc = block.getLocation();
 		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PLACING_BOATS)
-				|| ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.NO_PLACING_BOATS)) {
+			|| ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.NO_PLACING_BOATS)) {
 			return false;
 		}
 

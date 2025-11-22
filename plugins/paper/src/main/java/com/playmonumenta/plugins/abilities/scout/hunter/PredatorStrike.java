@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -14,6 +16,7 @@ import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PredatorStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
@@ -30,7 +33,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -52,11 +54,12 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 
 public class PredatorStrike extends Ability implements AbilityWithDuration {
-
-	private static final int COOLDOWN_1 = 20 * 18;
-	private static final int COOLDOWN_2 = 20 * 14;
+	private static final int COOLDOWN_1 = TICKS_PER_SECOND * 18;
+	private static final int COOLDOWN_2 = TICKS_PER_SECOND * 14;
 	private static final double DAMAGE_MULTIPLIER = 2.0;
 	private static final double DISTANCE_SCALE_1 = 0.1;
 	private static final double DISTANCE_SCALE_2 = 0.15;
@@ -68,8 +71,7 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	private static final int R2_CAP = 400;
 	private static final int R3_CAP = 750;
 	private static final int CAP_LEVEL_TWO_MULTIPLIER = 2;
-
-	private static final int DURATION = 20 * 5;
+	private static final int DURATION = TICKS_PER_SECOND * 5;
 
 	public static final String CHARM_COOLDOWN = "Predator Strike Cooldown";
 	public static final String CHARM_DAMAGE = "Predator Strike Damage";
@@ -77,54 +79,53 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	public static final String CHARM_RANGE = "Predator Strike Range";
 	public static final String CHARM_KNOCKBACK = "Predator Strike Knockback";
 	public static final String CHARM_PIERCING = "Predator Strike Enemies Pierced";
-
+	public static final String CHARM_DAMAGE_RANGE = "Predator Strike Damage Scaling Range";
+	public static final String CHARM_DISTANCE_SCALE = "Predator Strike Damage Per Block";
+	public static final String CHARM_BASE_DAMAGE = "Predator Strike Base Damage Multiplier";
 
 	public static final AbilityInfo<PredatorStrike> INFO =
-			new AbilityInfo<>(PredatorStrike.class, "Predator Strike", PredatorStrike::new)
-					.linkedSpell(ClassAbility.PREDATOR_STRIKE)
-					.scoreboardId("PredatorStrike")
-					.shorthandName("PrS")
-					.descriptions(
-							String.format("Left-clicking with a projectile weapon while not sneaking will prime a Predator Strike that unprimes after 5s. " +
-											"When you fire a critical projectile, it will instantaneously travel in a straight line " +
-											"for up to %d blocks or until it hits an enemy or block and damages enemies in a %s block radius. " +
-											"This ability deals %s%% of your projectile damage increased by %s%% for every block of distance from you and the target " +
-											"(up to %d blocks, or %s%% total). Final damage cannot go above %d in Region 2 and %d in Region 3. Cooldown: %ds.",
-									MAX_RANGE, EXPLODE_RADIUS, StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER), StringUtils.multiplierToPercentage(DISTANCE_SCALE_1), MAX_DAMAGE_RANGE,
-									StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_1 + DAMAGE_MULTIPLIER), R2_CAP, R3_CAP, COOLDOWN_1 / 20),
-							String.format("Damage now increases by %s%% for each block of distance (up to %s%% in total). " +
-								              "Final damage cap is increased to %d in Region 2 and %d in Region 3. Cooldown: %ds.",
-									StringUtils.multiplierToPercentage(DISTANCE_SCALE_2), StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_2 + DAMAGE_MULTIPLIER),
-									R2_CAP * CAP_LEVEL_TWO_MULTIPLIER, R3_CAP * CAP_LEVEL_TWO_MULTIPLIER, COOLDOWN_2 / 20))
-					.simpleDescription("Upon activation, your next shot will travel instantly and deal more damage the further it travels.")
-					.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
-					// Put this trigger first so that they can be made the same for convenience
-					.addTrigger(new AbilityTriggerInfo<>("unprime", "unprime", PredatorStrike::unprime, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).enabled(false).sneaking(false),
-							new AbilityTriggerInfo.TriggerRestriction("Predator Strike is primed", player -> {
-								PredatorStrike predatorStrike = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, PredatorStrike.class);
-								return predatorStrike != null && predatorStrike.mDeactivationRunnable != null;
-							})))
-					.addTrigger(new AbilityTriggerInfo<>("cast", "prime", PredatorStrike::prime, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false),
-							AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-					.displayItem(Material.SPECTRAL_ARROW);
+		new AbilityInfo<>(PredatorStrike.class, "Predator Strike", PredatorStrike::new)
+			.linkedSpell(ClassAbility.PREDATOR_STRIKE)
+			.scoreboardId("PredatorStrike")
+			.shorthandName("PrS")
+			.descriptions(getDescription1(), getDescription2())
+			.simpleDescription("Upon activation, your next shot will travel instantly and deal more damage the further it travels.")
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
+			// Put this trigger first so that they can be made the same for convenience
+			.addTrigger(new AbilityTriggerInfo<>("unprime", "unprime", PredatorStrike::unprime,
+				new AbilityTrigger(AbilityTrigger.Key.DROP).enabled(false).sneaking(true),
+				new AbilityTriggerInfo.TriggerRestriction("Predator Strike is primed", player -> {
+					PredatorStrike predatorStrike = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, PredatorStrike.class);
+					return predatorStrike != null && predatorStrike.mDeactivationRunnable != null;
+				})))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "prime", PredatorStrike::prime,
+				new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
+				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.displayItem(Material.SPECTRAL_ARROW);
 
 	private @Nullable BukkitRunnable mDeactivationRunnable = null;
+	private final double mRange;
 	private final double mDistanceScale;
+	private final double mDamageRange;
+	private final double mBaseDamage;
 	private final double mExplodeRadius;
 	private @Nullable SwiftCuts mSwiftCuts;
 	private int mCurrDuration = -1;
+	private int mLastPrimeTick = 0;
 
 	private final PredatorStrikeCS mCosmetic;
 
-	public PredatorStrike(Plugin plugin, Player player) {
+	public PredatorStrike(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
-		mDistanceScale = isLevelOne() ? DISTANCE_SCALE_1 : DISTANCE_SCALE_2;
-		mExplodeRadius = CharmManager.getRadius(player, CHARM_RADIUS, EXPLODE_RADIUS);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PredatorStrikeCS());
+		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, MAX_RANGE);
+		mDistanceScale = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DISTANCE_SCALE, isLevelOne() ? DISTANCE_SCALE_1 : DISTANCE_SCALE_2);
+		mExplodeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EXPLODE_RADIUS);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new PredatorStrikeCS());
+		mDamageRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE_RANGE, MAX_DAMAGE_RANGE);
+		mBaseDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_BASE_DAMAGE, DAMAGE_MULTIPLIER);
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SwiftCuts.class);
-		});
+		Bukkit.getScheduler().runTask(plugin, () ->
+			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, SwiftCuts.class));
 	}
 
 	public boolean prime() {
@@ -133,11 +134,14 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		}
 
 		if (mDeactivationRunnable == null) {
-			mCosmetic.strikeSoundReady(mPlayer.getWorld(), mPlayer);
+			if (Bukkit.getCurrentTick() - mLastPrimeTick > 10) {
+				mCosmetic.strikeSoundReady(mPlayer.getWorld(), mPlayer);
+			}
 		} else {
 			mDeactivationRunnable.cancel();
 		}
 		mCurrDuration = 0;
+		mLastPrimeTick = Bukkit.getCurrentTick();
 
 		mDeactivationRunnable = new BukkitRunnable() {
 			int mTicks = 0;
@@ -180,6 +184,9 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		if (mDeactivationRunnable == null || !EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
 			return true;
 		}
+		if (Grappling.playerHoldingHook(mPlayer)) {
+			return true;
+		}
 		mDeactivationRunnable.cancel();
 
 		int cooldown = getModifiedCooldown();
@@ -196,11 +203,10 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		World world = loc.getWorld();
 		mCosmetic.strikeLaunch(world, mPlayer);
 
-		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, MAX_RANGE);
 		int piercing = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PIERCING, PIERCING);
 		List<LivingEntity> piercedMobs = new ArrayList<>();
 
-		RayTraceResult result = world.rayTrace(loc, direction, range, FluidCollisionMode.NEVER, true, 0.425,
+		RayTraceResult result = world.rayTrace(loc, direction, mRange, FluidCollisionMode.NEVER, true, 0.425,
 			e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
 
 		while (piercing > 0) {
@@ -215,13 +221,13 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 				piercing--;
 			}
 
-			result = world.rayTrace(loc, direction, range, FluidCollisionMode.NEVER, true, 0.425,
+			result = world.rayTrace(loc, direction, mRange, FluidCollisionMode.NEVER, true, 0.425,
 				e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid() && !piercedMobs.contains((LivingEntity) e));
 		}
 
 		Location endLoc;
 		if (result == null) {
-			endLoc = loc.clone().add(direction.multiply(range));
+			endLoc = loc.clone().add(direction.multiply(mRange));
 		} else {
 			endLoc = result.getHitPosition().toLocation(world);
 		}
@@ -242,7 +248,7 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 			damage += PointBlank.apply(mPlayer, piercedMob.getLocation(), ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.POINT_BLANK));
 			damage += Sniper.apply(mPlayer, piercedMob.getLocation(), ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SNIPER));
 			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-			damage *= DAMAGE_MULTIPLIER + mDistanceScale * Math.min(mPlayer.getLocation().distance(piercedMob.getLocation()), MAX_DAMAGE_RANGE);
+			damage *= mBaseDamage + mDistanceScale * Math.min(mPlayer.getLocation().distance(piercedMob.getLocation()), mDamageRange);
 
 			float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, EXPLODE_KNOCKBACK);
 
@@ -261,7 +267,7 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 			damage += PointBlank.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.POINT_BLANK));
 			damage += Sniper.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SNIPER));
 			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-			damage *= DAMAGE_MULTIPLIER + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE);
+			damage *= mBaseDamage + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), mDamageRange);
 
 			float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, EXPLODE_KNOCKBACK);
 
@@ -337,5 +343,37 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
+
+	// Annoying to do the damage correctly here because of sniper/pb
+	private static Description<PredatorStrike> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger(1)
+			.add(" to prime a Predator Strike that unprimes after ")
+			.addDuration(DURATION)
+			.add(" seconds. When you fire a critical projectile with a strike primed, it instantly travels up to ")
+			.add(a -> a.mRange, MAX_RANGE)
+			.add(" blocks in a straight line until it collides with an enemy or block. Enemies within ")
+			.add(a -> a.mExplodeRadius, EXPLODE_RADIUS)
+			.add(" blocks of the impact receive ")
+			.addPercent(a -> a.mBaseDamage, DAMAGE_MULTIPLIER, false)
+			.add(" of your Projectile damage increased by ")
+			.addPercent(a -> a.mDistanceScale, DISTANCE_SCALE_1, false, Ability::isLevelOne)
+			.add(" for every block of distance between you and the hit enemy (up to ")
+			.add(a -> a.mDamageRange, MAX_DAMAGE_RANGE)
+			.add(" blocks). The final damage an enemy receives is capped at ")
+			.add(a -> R2_CAP, R2_CAP)
+			.add(" in Region 2 and ")
+			.add(a -> R3_CAP, R3_CAP)
+			.add(" in Region 3.")
+			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+	}
+
+	private static Description<PredatorStrike> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage now increases by ")
+			.addPercent(a -> a.mDistanceScale, DISTANCE_SCALE_2, false, Ability::isLevelTwo)
+			.add(" for each block of distance (up to the same cap), and the final damage cap is doubled.")
+			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
 	}
 }

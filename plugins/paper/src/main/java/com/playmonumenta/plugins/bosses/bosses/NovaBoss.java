@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -40,7 +41,7 @@ public final class NovaBoss extends BossAbilityGroup {
 		@BossParam(help = "You should not use this. use TARGETS instead.", deprecated = true)
 		public boolean NEED_LINE_OF_SIGHT = true;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Percent health True damage to deal to hit targets")
 		public double DAMAGE_PERCENTAGE = 0.0;
 
 		@BossParam(help = "Effect applied to players hit by the nova")
@@ -53,7 +54,9 @@ public final class NovaBoss extends BossAbilityGroup {
 
 		//particle & sound used!
 		@BossParam(help = "Particle summon on the air")
-		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(CLOUD,5)]");
+		public ParticlesList PARTICLE_AIR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 5, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound used when charging the ability")
 		public Sound SOUND_CHARGE = Sound.ENTITY_WITCH_CELEBRATE;
@@ -65,13 +68,21 @@ public final class NovaBoss extends BossAbilityGroup {
 		public int SOUND_CHARGE_FREQUENCY = 1;
 
 		@BossParam(help = "Particle summon around the boss when loading the spell")
-		public ParticlesList PARTICLE_LOAD = ParticlesList.fromString("[(CRIT,12)]");
+		public ParticlesList PARTICLE_LOAD = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 12, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound used when the spell is casted (when explode)")
-		public SoundsList SOUND_CAST = SoundsList.fromString("[(ENTITY_WITCH_DRINK,1.5,0.65),(ENTITY_WITCH_DRINK,1.5,0.55)]");
+		public SoundsList SOUND_CAST = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WITCH_DRINK, 1.5f, 0.65f))
+			.add(new SoundsList.CSound(Sound.ENTITY_WITCH_DRINK, 1.5f, 0.55f))
+			.build();
 
 		@BossParam(help = "Particle summoned when the spell explode")
-		public ParticlesList PARTICLE_EXPLODE = ParticlesList.fromString("[(CRIT,24,0.1,0.1,0.1,0.3),(CRIT_MAGIC,24,0.25,0.25,0.25,0.1)]");
+		public ParticlesList PARTICLE_EXPLODE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 24, 0.1, 0.1, 0.1, 0.3))
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 24, 0.25, 0.25, 0.25, 0.1))
+			.build();
 
 	}
 
@@ -84,51 +95,52 @@ public final class NovaBoss extends BossAbilityGroup {
 			//same object
 			//probably an older mob version?
 			//build a new target from others config
-			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.RADIUS, true);
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.RADIUS, EntityTargets.Limit.DEFAULT);
 			//by default LaserBoss take player in stealth.
 		} else {
 			p.NEED_LINE_OF_SIGHT = false;
 		}
 
 		Spell spell = new SpellBaseAoE(plugin, boss, (int) p.TARGETS.getRange(), p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE, p.SOUND_CHARGE_VOLUME, p.SOUND_CHARGE_FREQUENCY) {
-				@Override
-				protected void chargeAuraAction(Location loc) {
-					p.PARTICLE_AIR.spawn(boss, loc, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, 0.05);
-				}
+			@Override
+			protected void chargeAuraAction(Location loc) {
+				p.PARTICLE_AIR.spawn(boss, loc, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, 0.05);
+			}
 
-				@Override
-				protected void chargeCircleAction(Location loc, double radius) {
-					p.PARTICLE_LOAD.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.25));
-				}
+			@Override
+			protected void chargeCircleAction(Location loc, double radius) {
+				p.PARTICLE_LOAD.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.25));
+			}
 
-				@Override
-				protected void outburstAction(Location loc) {
-					p.SOUND_CAST.play(loc, 1.5f, 0.65f);
-				}
+			@Override
+			protected void outburstAction(Location loc) {
+				p.SOUND_CAST.play(loc, 1.5f, 0.65f);
+			}
 
-				@Override
-				protected void circleOutburstAction(Location loc, double radius) {
-					p.PARTICLE_EXPLODE.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.2).extra(0.2));
-				}
+			@Override
+			protected void circleOutburstAction(Location loc, double radius) {
+				p.PARTICLE_EXPLODE.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.2).extra(0.2));
+			}
 
-				@Override
-				protected void dealDamageAction(Location loc) {
-					for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
-						if (p.DAMAGE > 0) {
-							if (p.CAN_BLOCK) {
-								BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
-							} else {
-								DamageUtils.damage(boss, target, DamageType.MAGIC, p.DAMAGE, null, false, true, p.SPELL_NAME);
-							}
+			@Override
+			protected void dealDamageAction(Location loc) {
+				for (LivingEntity target : p.TARGETS.getTargetsList(mBoss)) {
+					if (p.DAMAGE > 0) {
+						if (p.CAN_BLOCK) {
+							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList());
+						} else {
+							DamageUtils.damage(boss, target, DamageType.MAGIC, p.DAMAGE, null, false, true, p.SPELL_NAME);
 						}
-
-						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.CAN_BLOCK ? mBoss.getLocation() : null, p.SPELL_NAME);
-						}
-						p.EFFECTS.apply(target, mBoss);
 					}
+
+					if (p.DAMAGE_PERCENTAGE > 0.0) {
+						DamageUtils.damagePercentHealth(mBoss, target, p.DAMAGE_PERCENTAGE, true,
+							p.CAN_BLOCK, p.SPELL_NAME, true, p.EFFECTS.mEffectList());
+					}
+					p.EFFECTS.apply(target, mBoss);
 				}
-			};
+			}
+		};
 
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}

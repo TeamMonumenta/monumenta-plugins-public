@@ -16,13 +16,13 @@ import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class SpellShuraPassiveSummon extends Spell {
-	private Plugin mPlugin;
-	private Location mCenter;
-	private int mRadius = 16;
+public final class SpellShuraPassiveSummon extends Spell {
+	private final Plugin mPlugin;
+	private final Location mCenter;
+	private final int mRadius = 16;
 	private final int mCDTicks = 12 * 20;
 	private int mT = 0;
-	private PartialParticle mSmoke;
+	private final PartialParticle mSmoke;
 	public List<String> mSummons;
 
 
@@ -61,7 +61,7 @@ public class SpellShuraPassiveSummon extends Spell {
 			int inc = 0;
 			Location spawnLoc = mCenter.clone().add(r * FastUtils.cos(theta), 5, r * FastUtils.sin(theta));
 			while ((spawnLoc.getBlock().isPassable() || spawnLoc.getBlock().isEmpty()) &&
-				       !spawnLoc.getBlock().isLiquid() && inc < terminate) {
+				!spawnLoc.getBlock().isLiquid() && inc < terminate) {
 				spawnLoc.add(0, -1, 0);
 				inc++;
 			}

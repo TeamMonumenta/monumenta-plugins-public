@@ -202,6 +202,7 @@ public class ChromaBlade extends DepthsAbility {
 			final Location mLoc = getPlayerLocation(0);
 			double mRadiusIncrement = 0.5;
 			final List<Block> mIceAlreadyCreated = new ArrayList<>();
+
 			@Override
 			public void run() {
 				if (mRadiusIncrement == 0.5) {
@@ -384,9 +385,6 @@ public class ChromaBlade extends DepthsAbility {
 
 		Consumer<Double> action = angle -> {
 			slash(isFast, playerItemStats, DepthsTree.WINDWALKER, hitMobs, angle, startingDegrees, endingDegrees, rings);
-			if (!hitMobs.isEmpty()) {
-				reduceCooldowns();
-			}
 		};
 
 		action.accept(angle1);
@@ -463,12 +461,12 @@ public class ChromaBlade extends DepthsAbility {
 		// Perhaps all heights should be the same?
 		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
 		if (party != null) {
-			 damageMultiplier *= party.getPrismaticDamageMultiplier();
+			damageMultiplier *= party.getPrismaticDamageMultiplier();
 		}
 		double finalDamageMult = damageMultiplier;
 
 		ParticleUtils.drawHalfArc(getPlayerLocation(0.5), 1.5, angle, startingDegrees, endingDegrees, rings, 0.32, false, isFast ? 50 : 25,
-			(Location l, int ring) -> doSlashParticle(l, ring, hitMobs, isFast, playerItemStats, tree, finalDamageMult)
+			(Location l, int ring, double angleProgress) -> doSlashParticle(l, ring, hitMobs, isFast, playerItemStats, tree, finalDamageMult)
 		);
 		playSlashSound(isFast, tree);
 	}
@@ -484,14 +482,22 @@ public class ChromaBlade extends DepthsAbility {
 	private void doSlashParticle(Location loc, int ring, List<LivingEntity> hitMobs, boolean isFast, ItemStatManager.PlayerItemStats playerItemStats, @Nullable DepthsTree tree, double damageMultiplier) {
 		if (tree != null) {
 			switch (tree) {
-				case FLAMECALLER -> new PartialParticle(Particle.REDSTONE, loc, 1, FLAMECALLER_COLOR).spawnAsPlayerActive(mPlayer);
-				case FROSTBORN -> new PartialParticle(Particle.REDSTONE, loc, 1, FROSTBORN_COLOR).spawnAsPlayerActive(mPlayer);
-				case DAWNBRINGER -> new PartialParticle(Particle.REDSTONE, loc, 1, DAWNBRINGER_COLOR).spawnAsPlayerActive(mPlayer);
-				case EARTHBOUND -> new PartialParticle(Particle.REDSTONE, loc, 1, EARTHBOUND_COLOR).spawnAsPlayerActive(mPlayer);
-				case SHADOWDANCER -> new PartialParticle(Particle.REDSTONE, loc, 1, SHADOWDANCER_COLOR).spawnAsPlayerActive(mPlayer);
-				case STEELSAGE -> new PartialParticle(Particle.REDSTONE, loc, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer);
-				case WINDWALKER -> new PartialParticle(Particle.REDSTONE, loc, 1, WINDWALKER_COLOR).spawnAsPlayerActive(mPlayer);
-				case PRISMATIC -> new PartialParticle(Particle.REDSTONE, loc, 1, PRISMATIC_COLOR).spawnAsPlayerActive(mPlayer);
+				case FLAMECALLER ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, FLAMECALLER_COLOR).spawnAsPlayerActive(mPlayer);
+				case FROSTBORN ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, FROSTBORN_COLOR).spawnAsPlayerActive(mPlayer);
+				case DAWNBRINGER ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, DAWNBRINGER_COLOR).spawnAsPlayerActive(mPlayer);
+				case EARTHBOUND ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, EARTHBOUND_COLOR).spawnAsPlayerActive(mPlayer);
+				case SHADOWDANCER ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, SHADOWDANCER_COLOR).spawnAsPlayerActive(mPlayer);
+				case STEELSAGE ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer);
+				case WINDWALKER ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, WINDWALKER_COLOR).spawnAsPlayerActive(mPlayer);
+				case PRISMATIC ->
+					new PartialParticle(Particle.REDSTONE, loc, 1, PRISMATIC_COLOR).spawnAsPlayerActive(mPlayer);
 				default -> {
 				}
 			}
@@ -526,7 +532,15 @@ public class ChromaBlade extends DepthsAbility {
 							doExecute(target);
 						}
 					}
-					default -> { }
+					case WINDWALKER -> {
+						// Reduce cooldowns when we've hit the first mob of each slash
+						// Previously didn't work probably because the slashes are delayed
+						if (hitMobs.size() == 1) {
+							reduceCooldowns();
+						}
+					}
+					default -> {
+					}
 				}
 			}
 		}
@@ -538,13 +552,18 @@ public class ChromaBlade extends DepthsAbility {
 		if (tree != null) {
 			switch (tree) {
 				case FROSTBORN -> world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0f, 1.2f);
-				case FLAMECALLER -> world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1.0f, 1.5f);
-				case DAWNBRINGER -> world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.5f);
+				case FLAMECALLER ->
+					world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1.0f, 1.5f);
+				case DAWNBRINGER ->
+					world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.5f);
 				case EARTHBOUND -> world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.PLAYERS, 1.0f, 0.7f);
-				case SHADOWDANCER -> world.playSound(loc, Sound.ENTITY_PHANTOM_AMBIENT, SoundCategory.PLAYERS, 1.0f, 0.7f);
+				case SHADOWDANCER ->
+					world.playSound(loc, Sound.ENTITY_PHANTOM_AMBIENT, SoundCategory.PLAYERS, 1.0f, 0.7f);
 				case STEELSAGE -> world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 1.0f, 2f);
-				case WINDWALKER -> world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.0f, 1.5f);
-				case PRISMATIC -> world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.0f, 0.8f);
+				case WINDWALKER ->
+					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.0f, 1.5f);
+				case PRISMATIC ->
+					world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.0f, 0.8f);
 				default -> {
 				}
 			}
@@ -569,6 +588,7 @@ public class ChromaBlade extends DepthsAbility {
 		new BukkitRunnable() {
 			int mT = 0;
 			final BlockData mFallingDustData = Material.YELLOW_GLAZED_TERRACOTTA.createBlockData();
+
 			@Override
 			public void run() {
 				mT++;
@@ -619,10 +639,10 @@ public class ChromaBlade extends DepthsAbility {
 			@Override
 			public void run() {
 				ParticleUtils.drawHalfArc(mLoc, mSize, mAngle, 30, 150, 1, 0, false, 180,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer)
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 				ParticleUtils.drawHalfArc(mLoc.subtract(mDir.clone().multiply(0.15)), mSize, mAngle, 30, 150, 1, 0, false, 180,
-					(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer)
+					(Location l, int ring, double angleProgress) -> new PartialParticle(Particle.REDSTONE, l, 1, STEELSAGE_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 
 				List<LivingEntity> collision = new Hitbox.SphereHitbox(mLoc, mSize).getHitMobs();
@@ -701,8 +721,9 @@ public class ChromaBlade extends DepthsAbility {
 	}
 
 	private static Description<ChromaBlade> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
-			.add("Right click while sneaking to unleash two slashes that each deal ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to unleash two slashes that each deal ")
 			.addDepthsDamage(a -> DAMAGE[rarity - 1], DAMAGE[rarity - 1], true)
 			.add(" melee damage. If your weapon's attack speed is below 1.3, perform slower, wider slashes with 25% increased cooldown instead.")
 			.add(" Additionally, gain a bonus effect depending on the tree of the last ability you used.")
@@ -728,49 +749,49 @@ public class ChromaBlade extends DepthsAbility {
 	}
 
 	private static Description<ChromaBlade> getFrostbornDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nFrostborn").color(TextColor.color(DepthsUtils.FROSTBORN)))
 			.add(" - Replace the second slash with a shockwave that creates ice and applies 20% Slow for 8s.");
 	}
 
 	private static Description<ChromaBlade> getFlamecallerDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nFlamecaller").color(TextColor.color(DepthsUtils.FLAMECALLER)))
 			.add(" - Increase the size of both slashes by 75% and ignite mobs hit for 8s.");
 	}
 
 	private static Description<ChromaBlade> getDawnbringerDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nDawnbringer").color(TextColor.color(DepthsUtils.DAWNBRINGER)))
 			.add(" - Mobs hit by a slash drop a piece of Chroma that when picked up, grants 1 absorption health, up to 6, for 10s.");
 	}
 
 	private static Description<ChromaBlade> getEarthboundDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nEarthbound").color(TextColor.color(DepthsUtils.EARTHBOUND)))
 			.add(" - Replace the second slash with an earthquake that pulls, taunts, and applies 20% Weaken to mobs for 8s.");
 	}
 
 	private static Description<ChromaBlade> getShadowdancerDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nShadowdancer").color(TextColor.color(DepthsUtils.SHADOWDANCER)))
 			.add(" - Silence mobs hit for 1s. If the slash brings a non-Boss mob under 20% HP, they die instantly.");
 	}
 
 	private static Description<ChromaBlade> getSteelsageDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nSteelsage").color(TextColor.color(DepthsUtils.STEELSAGE)))
 			.add(" - If a slash doesn't hit any mobs, it continues forward as a projectile.");
 	}
 
 	private static Description<ChromaBlade> getWindwalkerDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nWindwalker").color(TextColor.color(DepthsUtils.WINDWALKER)))
 			.add(" - Additionally dash forwards while slashing. Each slash reduces your skill cooldowns by 1.5s if it hits a mob.");
 	}
 
 	private static Description<ChromaBlade> getPrismaticDescription(TextColor color) {
-		return new DescriptionBuilder<ChromaBlade>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\n").append(DepthsTree.PRISMATIC.color("Prismatic")))
 			.add(" - Add a third cross-slash that is 50% larger and deals 65% more damage.");
 	}

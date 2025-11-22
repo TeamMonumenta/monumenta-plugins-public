@@ -133,9 +133,9 @@ public final class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 			new SpellShieldStun(TICKS_PER_SECOND * 6),
 			// Teleport the boss to targetted player if he is stuck in bedrock
 			new SpellConditionalTpBehindPlayer(mPlugin, mBoss,
-					b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
-					     b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
-					     b.getLocation().getBlock().getType() == Material.LAVA)
+				b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
+					b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
+					b.getLocation().getBlock().getType() == Material.LAVA)
 		);
 
 		final SpellManager phaseChangeActive = new SpellManager(Collections.singletonList(
@@ -221,7 +221,7 @@ public final class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 	}
 
 	private void phaseTransition(final int radius, final double initKBSpeed, final SpellManager phaseChangeActive,
-								 final SpellManager activeSpells, final List<Spell> passiveSpells) {
+	                             final SpellManager activeSpells, final List<Spell> passiveSpells) {
 		final String SLOWNESS_SRC = "EXCAxtalKnockAwaySlowness";
 
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
@@ -243,7 +243,9 @@ public final class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 		setBlocksCircle(bossLoc, radius, Material.MAGMA_BLOCK);
 		new BukkitRunnable() {
 			int mInc = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				world.playSound(bossLoc, Sound.ITEM_FIRECHARGE_USE, SoundCategory.HOSTILE, 1f, 0.7f);
 				for (final Player p : PlayerUtils.playersInRange(bossLoc, radius, true)) {
 					p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.HOSTILE, 0.8f, 0.8f);
@@ -271,7 +273,9 @@ public final class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 	private void setBlocksCircle(final Location bossLoc, final int radius, final Material mat) {
 		new BukkitRunnable() {
 			double mRadius = 0.0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				final List<Block> blocks = new ArrayList<>();
 				// take max for preventing div by 0
 				// max radius = 32, 360 / (32 * 8)) > 1

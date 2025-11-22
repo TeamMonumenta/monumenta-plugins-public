@@ -43,18 +43,18 @@ public class CharmsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("charm")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = args.getUnchecked("player");
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
 
-			if (CharmManager.getInstance().addCharm(player, player.getInventory().getItemInMainHand(), CharmManager.CharmType.NORMAL)) {
-				player.sendMessage("Charm added successfully");
-			} else {
-				player.sendMessage("Charm failed to add");
-			}
-		})
-		.register();
+				if (CharmManager.getInstance().addCharm(player, player.getInventory().getItemInMainHand(), CharmManager.CharmType.NORMAL)) {
+					player.sendMessage("Charm added successfully");
+				} else {
+					player.sendMessage("Charm failed to add");
+				}
+			})
+			.register();
 
 		//REMOVE COMMAND
 
@@ -63,17 +63,17 @@ public class CharmsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("charm")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = args.getUnchecked("player");
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
 
-			if (CharmManager.getInstance().removeCharm(player, player.getInventory().getItemInMainHand(), CharmManager.CharmType.NORMAL)) {
-				player.sendMessage("Charm removed successfully");
-			} else {
-				player.sendMessage("No charm was removed");
-			}
-		}).register();
+				if (CharmManager.getInstance().removeCharm(player, player.getInventory().getItemInMainHand(), CharmManager.CharmType.NORMAL)) {
+					player.sendMessage("Charm removed successfully");
+				} else {
+					player.sendMessage("No charm was removed");
+				}
+			}).register();
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("remove"));
@@ -116,15 +116,15 @@ public class CharmsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("charm")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = args.getUnchecked("player");
-			List<Component> effects = CharmManager.getInstance().getSummaryOfAllAttributesAsComponents(player, CharmManager.CharmType.NORMAL);
-			for (Component c : effects) {
-				player.sendMessage(c);
-			}
-		}).register();
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
+				List<Component> effects = CharmManager.getInstance().getSummaryOfAllAttributesAsComponents(player, CharmManager.CharmType.NORMAL);
+				for (Component c : effects) {
+					player.sendMessage(c);
+				}
+			}).register();
 
 		//CHARM SUMMARY COMMAND
 
@@ -133,12 +133,12 @@ public class CharmsCommand extends GenericCommand {
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("charm")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = args.getUnchecked("player");
-			player.sendMessage(CharmManager.getInstance().getSummaryOfCharmNames(player, CharmManager.CharmType.NORMAL));
-		}).register();
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
+				player.sendMessage(CharmManager.getInstance().getSummaryOfCharmNames(player, CharmManager.CharmType.NORMAL));
+			}).register();
 
 		// DEPTHS CHARM MOG COMMAND
 

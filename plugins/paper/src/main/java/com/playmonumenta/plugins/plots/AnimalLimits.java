@@ -1,94 +1,34 @@
 package com.playmonumenta.plugins.plots;
 
 import com.destroystokyo.paper.event.entity.ThrownEggHatchEvent;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.scriptedquests.zones.Zone;
-import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.Nullable;
 
 public class AnimalLimits implements Listener {
-	public static final int MAX_ANIMALS_IN_PLAYER_PLOT = 80;
-
-	public static final EnumSet<EntityType> PLOT_ANIMALS = EnumSet.of(
-		EntityType.AXOLOTL,
-		EntityType.BEE,
-		EntityType.CAT,
-		EntityType.CHICKEN,
-		EntityType.COW,
-		EntityType.DONKEY,
-		EntityType.FOX,
-		EntityType.GOAT,
-		EntityType.HOGLIN,
-		EntityType.HORSE,
-		EntityType.LLAMA,
-		EntityType.MULE,
-		EntityType.MUSHROOM_COW,
-		EntityType.OCELOT,
-		EntityType.PANDA,
-		EntityType.PARROT,
-		EntityType.PIG,
-		EntityType.POLAR_BEAR,
-		EntityType.RABBIT,
-		EntityType.RAVAGER,
-		EntityType.SHEEP,
-		EntityType.SHULKER,
-		EntityType.SKELETON_HORSE,
-		EntityType.SLIME,
-		EntityType.STRIDER,
-		EntityType.TRADER_LLAMA,
-		EntityType.TURTLE,
-		EntityType.WOLF,
-		EntityType.ZOMBIE_HORSE
-	);
-
-	public static final EnumSet<Material> PLOT_ANIMAL_EGGS = EnumSet.of(
-		Material.AXOLOTL_SPAWN_EGG,
-		Material.CAT_SPAWN_EGG,
-		Material.CHICKEN_SPAWN_EGG,
-		Material.COW_SPAWN_EGG,
-		Material.DONKEY_SPAWN_EGG,
-		Material.FOX_SPAWN_EGG,
-		Material.GOAT_SPAWN_EGG,
-		Material.HOGLIN_SPAWN_EGG,
-		Material.HORSE_SPAWN_EGG,
-		Material.LLAMA_SPAWN_EGG,
-		Material.MULE_SPAWN_EGG,
-		Material.MOOSHROOM_SPAWN_EGG,
-		Material.OCELOT_SPAWN_EGG,
-		Material.PANDA_SPAWN_EGG,
-		Material.PARROT_SPAWN_EGG,
-		Material.PIG_SPAWN_EGG,
-		Material.POLAR_BEAR_SPAWN_EGG,
-		Material.RABBIT_SPAWN_EGG,
-		Material.SHEEP_SPAWN_EGG,
-		Material.SHULKER_SPAWN_EGG,
-		Material.SKELETON_HORSE_SPAWN_EGG,
-		Material.SLIME_SPAWN_EGG,
-		Material.STRIDER_SPAWN_EGG,
-		Material.TRADER_LLAMA_SPAWN_EGG,
-		Material.TURTLE_SPAWN_EGG,
-		Material.WOLF_SPAWN_EGG,
-		Material.ZOMBIE_HORSE_SPAWN_EGG
-	);
+	public static final int MAX_ANIMALS_PER_NEARBY_PLOT_CHUNK = 20;
+	public static final int MAX_NEARBY_DISTANCE = 1;
 
 	private static final Map<UUID, Integer> mLastPlotAnimalWarning = new HashMap<>();
 
@@ -96,9 +36,6 @@ public class AnimalLimits implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityBreedEvent(EntityBreedEvent event) {
 		Entity entity = event.getEntity();
-		if (!PLOT_ANIMALS.contains(entity.getType())) {
-			return;
-		}
 		if (!maySummonPlotAnimal(entity.getLocation())) {
 			event.setCancelled(true);
 		}
@@ -111,7 +48,8 @@ public class AnimalLimits implements Listener {
 			// Nothing was going to spawn anyway
 			return;
 		}
-		if (!PLOT_ANIMALS.contains(event.getHatchingType())) {
+		Class<? extends Entity> entityClass = event.getHatchingType().getEntityClass();
+		if (entityClass == null || !LivingEntity.class.isAssignableFrom(entityClass)) {
 			return;
 		}
 		Location location = event.getEgg().getLocation();
@@ -125,58 +63,96 @@ public class AnimalLimits implements Listener {
 		mLastPlotAnimalWarning.remove(event.getWorld().getUID());
 	}
 
+	public static boolean mayUsePossibleSpawnEgg(Location loc, @Nullable ItemStack possibleEgg) {
+		if (possibleEgg == null) {
+			return true;
+		}
+
+		Class<? extends Entity> entityType = ItemUtils.getSpawnEggType(possibleEgg).getEntityClass();
+		if (entityType == null || !LivingEntity.class.isAssignableFrom(entityType)) {
+			return true;
+		}
+
+		return maySummonPlotAnimal(loc);
+	}
+
 	// Also used in MonsterEggOverride
 	public static boolean maySummonPlotAnimal(Location loc) {
 		return maySummonPlotAnimals(loc, 1) > 0;
 	}
 
-	public static int maySummonPlotAnimals(Location loc, int amount) {
+	public static int maySummonPlotAnimals(Location loc, int summonAttemptAmount) {
 		if (!ZoneUtils.isInPlot(loc)) {
-			return amount;
+			return summonAttemptAmount;
 		}
 
 		Optional<Zone> optionalZone = ZoneUtils.getZone(loc);
 		if (optionalZone.isEmpty()) {
 			// Fall back on killinator functions for plots world
-			return amount;
+			return summonAttemptAmount;
 		}
 		Zone zone = optionalZone.get();
 		if (!zone.hasProperty(ZoneUtils.ZoneProperty.PLOT.getPropertyName())) {
 			// Fall back on killinator functions for plots world
-			return amount;
+			return summonAttemptAmount;
 		}
 
-		int animalsRemaining = MAX_ANIMALS_IN_PLAYER_PLOT;
-		World world = loc.getWorld();
+		Audience audience = Audience.empty();
 		BoundingBox bb = BoundingBox.of(zone.minCorner(), zone.maxCornerExclusive());
-		Set<Player> players = new HashSet<>();
-		for (Entity entity : world.getNearbyEntities(bb)) {
-			if (entity instanceof Player) {
-				players.add((Player) entity);
-			}
-			if (PLOT_ANIMALS.contains(entity.getType())) {
-				--animalsRemaining;
+		World world = loc.getWorld();
+		int animalsSeen = 0;
+		int animalsLimit = 0;
+
+		Chunk locChunk = loc.getChunk();
+		int maxCx = locChunk.getX() + MAX_NEARBY_DISTANCE;
+		int maxCz = locChunk.getZ() + MAX_NEARBY_DISTANCE;
+		for (int cx = locChunk.getX() - MAX_NEARBY_DISTANCE; cx <= maxCx; cx++) {
+			for (int cz = locChunk.getZ() - MAX_NEARBY_DISTANCE; cz <= maxCz; cz++) {
+				if (!world.isChunkLoaded(cx, cz)) {
+					continue;
+				}
+				BoundingBox chunkBb = new BoundingBox(
+					16 * cx, world.getMinHeight(), 16 * cz,
+					16 * cx + 15, world.getMaxHeight(), 16 * cz + 15
+				);
+				if (!chunkBb.overlaps(bb)) {
+					continue;
+				}
+				Chunk chunk = world.getChunkAt(cx, cz);
+				animalsLimit += MAX_ANIMALS_PER_NEARBY_PLOT_CHUNK;
+
+				for (Entity entity : chunk.getEntities()) {
+					if (!bb.contains(entity.getLocation().toVector())) {
+						continue;
+					}
+					if (entity instanceof Player) {
+						audience = Audience.audience(audience, entity);
+						continue;
+					}
+					if (entity instanceof LivingEntity) {
+						animalsSeen++;
+					}
+				}
 			}
 		}
 
-		int maySummonAmount = Math.min(amount, animalsRemaining);
+		int animalsRemaining = animalsLimit - animalsSeen;
+		int maySummonAmount = Math.min(summonAttemptAmount, animalsRemaining);
 		animalsRemaining -= maySummonAmount;
-		Integer lastWarningCount = mLastPlotAnimalWarning.getOrDefault(world.getUID(), MAX_ANIMALS_IN_PLAYER_PLOT);
+		Integer lastWarningCount = mLastPlotAnimalWarning.getOrDefault(world.getUID(), animalsLimit);
 		mLastPlotAnimalWarning.put(world.getUID(), animalsRemaining);
 		if (animalsRemaining != lastWarningCount && animalsRemaining <= 5) {
 			String msg;
 			if (animalsRemaining >= 2) {
-				msg = "You may have " + animalsRemaining + " more animals on your plot.";
+				msg = "You may have " + animalsRemaining + " more mobs nearby.";
 			} else if (animalsRemaining == 1) {
-				msg = "You may have 1 more animal on your plot.";
+				msg = "You may have 1 more mobs nearby.";
 			} else if (animalsRemaining == 0) {
-				msg = "You may have no more animals on your plot.";
+				msg = "You may have no more mobs nearby.";
 			} else {
-				msg = "Spawn attempt cancelled, you have too many mobs.";
+				msg = "Spawn attempt cancelled, you have too many mobs nearby.";
 			}
-			for (Player player : players) {
-				player.sendMessage(Component.text(msg, NamedTextColor.RED));
-			}
+			audience.sendMessage(Component.text(msg, NamedTextColor.RED));
 		}
 
 		return maySummonAmount;

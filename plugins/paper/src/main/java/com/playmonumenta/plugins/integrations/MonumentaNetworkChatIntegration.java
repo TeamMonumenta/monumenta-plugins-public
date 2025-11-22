@@ -396,9 +396,7 @@ public class MonumentaNetworkChatIntegration {
 			PlayerProfile playerProfile = skullMeta.getPlayerProfile();
 			if (playerProfile != null) {
 				String playerName = playerProfile.getName();
-				if (hasBadWord(sender, playerName)) {
-					return true;
-				}
+				return hasBadWord(sender, playerName);
 			}
 		}
 

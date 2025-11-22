@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -41,12 +40,13 @@ import org.bukkit.entity.Wolf;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_hycenea";
 	public static final int detectionRange = 52;
 	public static final double centerArenaRadius = 17.5;
-	public static final int mHealth = 275000;
+	public static final int mHealth = 250000;
 	public boolean mSteelAdvancement;
 	public boolean mSpellAdvancement;
 	public final List<Player> mPlayersStartingFight;
@@ -73,9 +73,10 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 		super.constructBoss(mSpellQueue, getPassiveSpellsByPhase(mPhase), detectionRange * 2, bossBar, 0, 1);
 
 		PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).stream().filter(p -> p.getScoreboardTags().contains("HyceneaFighter")).forEach(p -> {
-				plugin.mEffectManager.clearEffects(p, BluePercentDamageDealt.GENERIC_NAME);
+				plugin.mEffectManager.clearEffects(p, BluePercentDamageDealt.effectID);
 				plugin.mEffectManager.addEffect(p, Reincarnation.GENERIC_NAME, new Reincarnation(20 * 6000, 1));
 				mPlayersStartingFight.add(p);
+				p.sendMessage(Component.text("You've gained Reincarnation against death...", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 			}
 		);
 	}
@@ -561,7 +562,7 @@ public class HyceneaRageOfTheWolf extends SerializedLocationBossAbilityGroup {
 					@Override
 					public void run() {
 						for (Player player : HexfallUtils.getPlayersInHycenea(mSpawnLoc)) {
-							mMonumentaPlugin.mEffectManager.clearEffects(player, BluePercentDamageDealt.GENERIC_NAME);
+							mMonumentaPlugin.mEffectManager.clearEffects(player, BluePercentDamageDealt.effectID);
 						}
 					}
 

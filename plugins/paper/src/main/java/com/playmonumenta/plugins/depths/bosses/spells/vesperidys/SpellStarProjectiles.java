@@ -73,7 +73,9 @@ public class SpellStarProjectiles extends Spell {
 			@Override
 			public synchronized void cancel() throws IllegalStateException {
 				super.cancel();
-				glowingEffect.clear();
+				if (glowingEffect != null) {
+					glowingEffect.clear();
+				}
 			}
 
 			@Override

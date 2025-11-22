@@ -3,11 +3,10 @@ package com.playmonumenta.plugins.cosmetics.skills.cleric;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -40,33 +39,7 @@ public class DivineJusticeCS implements CosmeticSkill {
 		return HEAL_PITCH_OTHER;
 	}
 
-	public Material justiceAsh() {
-		return Material.SUGAR;
-	}
-
-	public NamedTextColor justiceAshColor() {
-		return NamedTextColor.WHITE;
-	}
-
-	public String justiceAshName() {
-		return "Purified Ash";
-	}
-
-	public void justiceAshPickUp(Player player, Location loc) {
-		player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_STEP, SoundCategory.PLAYERS, 0.75f, 0.5f);
-		player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.2f, 0.2f);
-
-		Location particleLocation = loc.add(0, 0.2, 0);
-		new PartialParticle(Particle.ASH, particleLocation, 50)
-			.delta(0.15, 0.1, 0.15)
-			.spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, particleLocation, 7)
-			.delta(0.1, 0.1, 0.1)
-			.data(new Particle.DustOptions(Color.fromBGR(100, 100, 100), 1))
-			.spawnAsPlayerActive(player);
-	}
-
-	public void justiceOnDamage(Player player, LivingEntity enemy, World world, Location enemyLoc, double widerWidthDelta, int combo) {
+	public void justiceOnDamage(Player player, LivingEntity enemy, World world, Location enemyLoc, double widerWidthDelta, int combo, boolean enhanced) {
 		PartialParticle partialParticle = new PartialParticle(
 			Particle.END_ROD,
 			LocationUtils.getHalfHeightLocation(enemy),
@@ -74,19 +47,32 @@ public class DivineJusticeCS implements CosmeticSkill {
 			widerWidthDelta,
 			PartialParticle.getHeightDelta(enemy),
 			widerWidthDelta,
-			0.05
+			0.08
 		).spawnAsPlayerActive(player);
 		partialParticle.mParticle = Particle.FLAME;
 		partialParticle.spawnAsPlayerActive(player);
 
-		world.playSound(enemyLoc, Sound.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 0.2f, 1.5f);
+		world.playSound(enemyLoc, Sound.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 0.15f, 1.5f);
 		world.playSound(enemyLoc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.5f, 2.0f);
 		world.playSound(enemyLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.0f, 0.8f);
 		world.playSound(enemyLoc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 0.5f, 1.2f);
+		if (combo == 2) {
+			world.playSound(enemyLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, enhanced ? 1.0f : 0.8f, 1.2f);
+			if (enhanced) {
+				world.playSound(enemyLoc, Sound.BLOCK_AMETHYST_CLUSTER_STEP, SoundCategory.PLAYERS, 1.3f, 1f);
+			}
+		}
 	}
 
 	public void justiceKill(Player player, Location loc) {
-
+		new PPCircle(Particle.TOTEM, loc.clone().add(0, 0.2, 0), 0.5)
+			.rotateDelta(true)
+			.directionalMode(true)
+			.delta(0.5, 0, 0)
+			.count(20)
+			.extra(1)
+			.spawnAsPlayerActive(player);
+		new PartialParticle(Particle.HEART, loc.clone().add(0, 1, 0), 2, 0.1, 0.1, 0.1, 0.001).spawnAsPlayerActive(player);
 	}
 
 	public void justiceHealSound(List<Player> players, float pitch) {
@@ -95,7 +81,7 @@ public class DivineJusticeCS implements CosmeticSkill {
 				healedPlayer.getLocation(),
 				Sound.BLOCK_NOTE_BLOCK_CHIME,
 				SoundCategory.PLAYERS,
-				0.5f,
+				1f,
 				pitch
 			);
 		}

@@ -3,14 +3,13 @@ package com.playmonumenta.plugins.abilities.shaman.soothsayer;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.SanctuaryCS;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -30,16 +29,7 @@ public class Sanctuary extends Ability {
 			.linkedSpell(ClassAbility.SANCTUARY)
 			.scoreboardId("Sanctuary")
 			.shorthandName("SCT")
-			.descriptions(
-				String.format(
-					"Mobs within the range of one of your totems receive %s%% slowness and %s%% weakness debuffs while within range.",
-					StringUtils.multiplierToPercentage(SLOWNESS_PERCENT),
-					StringUtils.multiplierToPercentage(WEAKNESS_PERCENT)
-				),
-				String.format(
-					"Additionally inflicts %s%% vulnerability while within range.",
-					StringUtils.multiplierToPercentage(VULNERABILITY_PERCENT)
-				))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Totems now provide additional debuffs when mobs are within range of them.")
 			.displayItem(Material.AMETHYST_SHARD);
 
@@ -50,9 +40,6 @@ public class Sanctuary extends Ability {
 
 	public Sanctuary(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
 		mSlownessPercent = SLOWNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS_PERCENT);
 		mWeaknessPercent = WEAKNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS_PERCENT);
 		mVulnerabilityPercent = VULNERABILITY_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULNERABILITY_PERCENT);
@@ -70,5 +57,21 @@ public class Sanctuary extends Ability {
 				mCosmetic.sanctuaryLevelOne(target);
 			}
 		}
+	}
+
+	private static Description<Sanctuary> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When mobs are within the range of your totems, they receive ")
+			.addPercent(a -> a.mSlownessPercent, SLOWNESS_PERCENT)
+			.add(" slowness and ")
+			.addPercent(a -> a.mWeaknessPercent, WEAKNESS_PERCENT)
+			.add(" weakness.");
+	}
+
+	private static Description<Sanctuary> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Additionally inflicts ")
+			.addPercent(a -> a.mVulnerabilityPercent, VULNERABILITY_PERCENT)
+			.add(" vulnerability to mobs within range.");
 	}
 }

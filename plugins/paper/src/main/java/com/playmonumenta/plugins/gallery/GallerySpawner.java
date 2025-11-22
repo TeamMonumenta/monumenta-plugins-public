@@ -101,7 +101,7 @@ public class GallerySpawner {
 					finalMobSpawned.setAI(true);
 					finalMobSpawned.setInvulnerable(false);
 					try {
-						BossManager.getInstance().createBossInternal(finalMobSpawned, new GenericGalleryMobBoss(GalleryManager.mPlugin, finalMobSpawned));
+						BossManager.getInstance().createBossInternal(finalMobSpawned, new GenericGalleryMobBoss(Plugin.getInstance(), finalMobSpawned));
 					} catch (Exception e) {
 						//this SHOULD NEVER happen
 						GalleryUtils.printDebugMessage("Catch an exception while creating GenericGalleryMobBoss. Reason: " + e.getMessage());

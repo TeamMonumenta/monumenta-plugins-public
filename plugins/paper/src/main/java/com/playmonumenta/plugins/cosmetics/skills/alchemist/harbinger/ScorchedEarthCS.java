@@ -44,7 +44,7 @@ public class ScorchedEarthCS implements CosmeticSkill {
 		new PartialParticle(Particle.REDSTONE, loc, 20, delta, 0.5, delta, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 2.0f)).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.FLAME, loc, 30, delta, 0.5, delta, 0.1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.LAVA, loc, 25, delta, 0.5, delta, 0).spawnAsPlayerActive(player);
-		new PPCircle(Particle.FLAME, loc, radius).count(20).spawnAsPlayerActive(player);
+		new PPCircle(Particle.FLAME, loc, radius).count(30).spawnAsPlayerActive(player);
 
 		world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.5f);
@@ -60,7 +60,7 @@ public class ScorchedEarthCS implements CosmeticSkill {
 		new PartialParticle(Particle.REDSTONE, loc, 5, delta, 0.3, delta, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.5f))
 			.spawnAsPlayerActive(player);
 		new PartialParticle(Particle.LAVA, loc, 1, delta, 0.1, delta, 0).spawnAsPlayerActive(player);
-		new PPCircle(Particle.FLAME, loc, radius).count(5).spawnAsPlayerActive(player);
+		new PPCircle(Particle.FLAME, loc, radius).count(15).spawnAsPlayerActive(player);
 
 		new PartialParticle(Particle.REDSTONE,
 			loc.clone().add(5 * FastUtils.sin((timeRemaining % 40 / 20.0 - 1) * Math.PI), 0, 5 * FastUtils.cos((timeRemaining % 40 / 20.0 - 1) * Math.PI)))
@@ -76,7 +76,7 @@ public class ScorchedEarthCS implements CosmeticSkill {
 		Location loc = entity.getLocation().clone().add(0, 1, 0);
 		new PartialParticle(Particle.FLAME, loc, 5, 0.25, 0.5, 0.25, 0.05).spawnAsPlayerActive(alchemist);
 		new PartialParticle(Particle.REDSTONE, loc, 15, 0.35, 0.5, 0.35,
-				new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.0f)).spawnAsPlayerActive(alchemist);
+			new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.0f)).spawnAsPlayerActive(alchemist);
 		new PartialParticle(Particle.LAVA, loc, 3, 0.25, 0.5, 0.25, 0).spawnAsPlayerActive(alchemist);
 	}
 

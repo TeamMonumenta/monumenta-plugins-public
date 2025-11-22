@@ -103,7 +103,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 	}
 
 	private static Description<DepthsSplitArrow> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsSplitArrow>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When you shoot an enemy with a projectile, the nearest enemy within ")
 			.add(a -> a.mRange, SPLIT_ARROW_CHAIN_RANGE)
 			.add(" blocks takes ")

@@ -108,8 +108,9 @@ public class RadiantBlessing extends DepthsAbility {
 	}
 
 	private static Description<RadiantBlessing> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<RadiantBlessing>(color)
-			.add("Left click while sneaking to enchant players within ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to enchant players within ")
 			.add(a -> a.mRadius, HEALING_RADIUS)
 			.add(" blocks, including yourself, with ")
 			.addPercent(a -> a.mDamageReduction, PERCENT_DAMAGE_RECEIVED)

@@ -1,13 +1,16 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -15,19 +18,25 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Stuck {
 	public static String COMMAND = "stuck";
 
+	public static final Set<String> ALLOWED_SHARDS = Set.of(
+		"dev1",
+		"plots",
+		"guildplots"
+	);
+
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.stuck");
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.executesPlayer((player, args) -> {
-				if (!ServerProperties.getShardName().equals("plots") && !ServerProperties.getShardName().equals("dev1")) {
+				if (!ALLOWED_SHARDS.contains(ServerProperties.getShardName())) {
 					player.sendMessage(Component.text("Stuck is not available on this shard, contact a moderator to be unstuck.", NamedTextColor.RED)
-						                   .decoration(TextDecoration.ITALIC, false));
+						.decoration(TextDecoration.ITALIC, false));
 					return;
 				}
 				player.sendMessage(Component.text("Teleporting in 10 seconds, please stand still!", NamedTextColor.RED)
-						.decoration(TextDecoration.ITALIC, false));
+					.decoration(TextDecoration.ITALIC, false));
 				new BukkitRunnable() {
 					int mTime = 10;
 					final Player mTarget = player;
@@ -41,20 +50,26 @@ public class Stuck {
 						}
 						if (mTarget.getLocation().distance(mStartLoc) > 2) {
 							mTarget.sendMessage(Component.text("You've moved too far from your original location! Please try again.", NamedTextColor.RED)
-									.decoration(TextDecoration.ITALIC, false));
+								.decoration(TextDecoration.ITALIC, false));
 							this.cancel();
 							return;
 						}
 						switch (mTime) {
-						case 5:
-						case 3:
-						case 2:
-						case 1:
-							mTarget.sendMessage(Component.text("Teleporting in " + mTime + " seconds, please stand still!", NamedTextColor.RED)
+							case 5:
+							case 3:
+							case 2:
+							case 1:
+								mTarget.sendMessage(Component.text("Teleporting in " + mTime + " seconds, please stand still!", NamedTextColor.RED)
 									.decoration(TextDecoration.ITALIC, false));
-							break;
+								break;
 							case 0:
-								mTarget.teleport(player.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+								World world = mTarget.getWorld();
+								if (GuildPlotUtils.isGuildPlot(world)) {
+									mTarget.teleport(world.getSpawnLocation());
+									GuildPlotUtils.sendGuildPlotHub(mTarget, false);
+								} else {
+									mTarget.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+								}
 								this.cancel();
 								return;
 							default:
@@ -62,7 +77,7 @@ public class Stuck {
 						}
 						mTime--;
 					}
-				}.runTaskTimer(Plugin.getInstance(), 20 * 1, 20 * 1);
+				}.runTaskTimer(Plugin.getInstance(), 20, 20);
 			})
 			.register();
 	}

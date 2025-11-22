@@ -31,7 +31,7 @@ public class DepthsDamageRunnable extends BukkitRunnable {
 		//Get players in depths system
 		Set<UUID> playersOnShard = DepthsManager.getInstance().mPlayers.keySet();
 
-		if (playersOnShard.size() == 0) {
+		if (playersOnShard.isEmpty()) {
 			return;
 		}
 

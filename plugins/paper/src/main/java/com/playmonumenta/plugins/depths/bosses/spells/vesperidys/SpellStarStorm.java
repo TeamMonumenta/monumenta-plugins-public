@@ -253,123 +253,123 @@ public class SpellStarStorm extends Spell {
 		BukkitRunnable runnableDelay = new BukkitRunnable() {
 			@Override
 			public void run() {
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 5, 1);
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 5, 1.4f);
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 5, 1);
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 5, 1.4f);
 
-			BukkitRunnable runnableA = new BukkitRunnable() {
+				BukkitRunnable runnableA = new BukkitRunnable() {
 
-				@Override
-				public void run() {
-					if (mChargeUp.nextTick(2)) {
-						this.cancel();
+					@Override
+					public void run() {
+						if (mChargeUp.nextTick(2)) {
+							this.cancel();
 
-						mChargeUp.setTitle(Component.text("Unleashing ", NamedTextColor.GREEN).append(Component.text("Star Storm...", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD)));
-						BukkitRunnable runnableB = new BukkitRunnable() {
-							int mT = 0;
+							mChargeUp.setTitle(Component.text("Unleashing ", NamedTextColor.GREEN).append(Component.text("Star Storm...", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD)));
+							BukkitRunnable runnableB = new BukkitRunnable() {
+								int mT = 0;
 
-							@Override
-							public synchronized void cancel() {
-								super.cancel();
-								mChargeUp.reset();
-								mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.GREEN).append(Component.text("Star Storm...", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD)));
-							}
-
-							@Override
-							public void run() {
-								mChargeUp.setProgress(1 - ((double) mT / PATTERN2_BULLET_DURATION));
-								if (mT > PATTERN2_BULLET_DURATION) {
-									this.cancel();
+								@Override
+								public synchronized void cancel() {
+									super.cancel();
+									mChargeUp.reset();
+									mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.GREEN).append(Component.text("Star Storm...", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD)));
 								}
-								mT++;
-							}
-						};
-						runnableB.runTaskTimer(mPlugin, 0, 1);
-						mActiveRunnables.add(runnableB);
-					}
-				}
-			};
-			runnableA.runTaskTimer(mPlugin, 0, 2);
-			mActiveRunnables.add(runnableA);
 
-			BukkitRunnable runnableD = new BukkitRunnable() {
-				int mCount = 0;
-
-				@Override
-				public void run() {
-					if (mCount > 3) {
-						this.cancel();
-						return;
-					}
-					mCount++;
-
-					ArrayList<Integer> directions = new ArrayList<>(List.of(0, 1, 2, 3));
-					Collections.shuffle(directions);
-					int numBarrage = ((mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 15) ? PATTERN2_BARRAGES_ASCENSION : PATTERN2_BARRAGES);
-
-					for (int i = 0; i < numBarrage; i++) {
-						int direction = directions.get(i);
-
-						Vector dirProj;
-						Vector dirLine;
-
-						Location startLoc = mVesperidys.mSpawnLoc.clone();
-						switch (direction) {
-							case 0 -> {
-								startLoc.add(-18, 0, -18);
-								dirLine = new Vector(1, 0, 0);
-								dirProj = new Vector(0, 0, 1);
-							}
-							case 1 -> {
-								startLoc.add(18, 0, -18);
-								dirLine = new Vector(0, 0, 1);
-								dirProj = new Vector(-1, 0, 0);
-							}
-							case 2 -> {
-								startLoc.add(18, 0, 18);
-								dirLine = new Vector(-1, 0, 0);
-								dirProj = new Vector(0, 0, -1);
-							}
-							default -> {
-								startLoc.add(-18, 0, 18);
-								dirLine = new Vector(0, 0, -1);
-								dirProj = new Vector(1, 0, 0);
-							}
+								@Override
+								public void run() {
+									mChargeUp.setProgress(1 - ((double) mT / PATTERN2_BULLET_DURATION));
+									if (mT > PATTERN2_BULLET_DURATION) {
+										this.cancel();
+									}
+									mT++;
+								}
+							};
+							runnableB.runTaskTimer(mPlugin, 0, 1);
+							mActiveRunnables.add(runnableB);
 						}
-
-						BukkitRunnable runnableC = new BukkitRunnable() {
-							int mT = 0;
-							int mBullets = 0;
-							final Location mLocation = startLoc;
-
-							@Override
-							public void run() {
-								Location loc = mLocation.add(dirLine);
-								loc.setY(Math.floor(mVesperidys.mSpawnLoc.getY()) + 0.1875);
-
-								int timeStart = PATTERN2_CHARGE_TIME - mT;
-								launchPattern2Bullet(loc, dirProj, timeStart);
-								mBullets += 1;
-
-								if (mT % 2 == 0) {
-									mLocation.getWorld().playSound(mLocation, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.HOSTILE, 5, 1);
-									mLocation.getWorld().playSound(mLocation, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.HOSTILE, 5, 0.5f + 1.5f * mT / PATTERN2_CHARGE_TIME);
-								}
-
-								if (mBullets >= 35) {
-									this.cancel();
-								}
-
-								mT += 1;
-							}
-						};
-						runnableC.runTaskTimer(mPlugin, 0, 1);
-						mActiveRunnables.add(runnableC);
 					}
-				}
-			};
+				};
+				runnableA.runTaskTimer(mPlugin, 0, 2);
+				mActiveRunnables.add(runnableA);
 
-			runnableD.runTaskTimer(mPlugin, 0, PATTERN2_CHARGE_TIME);
-			mActiveRunnables.add(runnableD);
+				BukkitRunnable runnableD = new BukkitRunnable() {
+					int mCount = 0;
+
+					@Override
+					public void run() {
+						if (mCount > 3) {
+							this.cancel();
+							return;
+						}
+						mCount++;
+
+						ArrayList<Integer> directions = new ArrayList<>(List.of(0, 1, 2, 3));
+						Collections.shuffle(directions);
+						int numBarrage = ((mVesperidys.mParty != null && mVesperidys.mParty.getAscension() >= 15) ? PATTERN2_BARRAGES_ASCENSION : PATTERN2_BARRAGES);
+
+						for (int i = 0; i < numBarrage; i++) {
+							int direction = directions.get(i);
+
+							Vector dirProj;
+							Vector dirLine;
+
+							Location startLoc = mVesperidys.mSpawnLoc.clone();
+							switch (direction) {
+								case 0 -> {
+									startLoc.add(-18, 0, -18);
+									dirLine = new Vector(1, 0, 0);
+									dirProj = new Vector(0, 0, 1);
+								}
+								case 1 -> {
+									startLoc.add(18, 0, -18);
+									dirLine = new Vector(0, 0, 1);
+									dirProj = new Vector(-1, 0, 0);
+								}
+								case 2 -> {
+									startLoc.add(18, 0, 18);
+									dirLine = new Vector(-1, 0, 0);
+									dirProj = new Vector(0, 0, -1);
+								}
+								default -> {
+									startLoc.add(-18, 0, 18);
+									dirLine = new Vector(0, 0, -1);
+									dirProj = new Vector(1, 0, 0);
+								}
+							}
+
+							BukkitRunnable runnableC = new BukkitRunnable() {
+								int mT = 0;
+								int mBullets = 0;
+								final Location mLocation = startLoc;
+
+								@Override
+								public void run() {
+									Location loc = mLocation.add(dirLine);
+									loc.setY(Math.floor(mVesperidys.mSpawnLoc.getY()) + 0.1875);
+
+									int timeStart = PATTERN2_CHARGE_TIME - mT;
+									launchPattern2Bullet(loc, dirProj, timeStart);
+									mBullets += 1;
+
+									if (mT % 2 == 0) {
+										mLocation.getWorld().playSound(mLocation, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.HOSTILE, 5, 1);
+										mLocation.getWorld().playSound(mLocation, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.HOSTILE, 5, 0.5f + 1.5f * mT / PATTERN2_CHARGE_TIME);
+									}
+
+									if (mBullets >= 35) {
+										this.cancel();
+									}
+
+									mT += 1;
+								}
+							};
+							runnableC.runTaskTimer(mPlugin, 0, 1);
+							mActiveRunnables.add(runnableC);
+						}
+					}
+				};
+
+				runnableD.runTaskTimer(mPlugin, 0, PATTERN2_CHARGE_TIME);
+				mActiveRunnables.add(runnableD);
 			}
 		};
 
@@ -392,7 +392,7 @@ public class SpellStarStorm extends Spell {
 			int mTicks = 0;
 			double mR = r;
 			double mTheta = theta;
-			double MIN_R = 1;
+			final double MIN_R = 1;
 			double mInnerVelocity = 0;
 
 			@Override

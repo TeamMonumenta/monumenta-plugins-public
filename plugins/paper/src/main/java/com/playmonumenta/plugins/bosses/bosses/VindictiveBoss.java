@@ -12,6 +12,8 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -42,10 +44,14 @@ public class VindictiveBoss extends BossAbilityGroup {
 		public double PERCENT_DAMAGE_DEALT_EFFECT = 0.8;
 
 		@BossParam(help = "Sound played for each affected mob")
-		public SoundsList SOUND = SoundsList.fromString("[(ENTITY_BLAZE_AMBIENT,0.5,0.5)]");
+		public SoundsList SOUND = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_AMBIENT, 0.5f, 0.5f))
+			.build();
 
 		@BossParam(help = "Particles spawned at affected mobs")
-		public ParticlesList PARTICLES = ParticlesList.fromString("[(FLAME,20,0,0,0,0.1)]");
+		public ParticlesList PARTICLES = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FLAME, 20, 0.0, 0.0, 0.0, 0.1))
+			.build();
 
 		@BossParam(help = "Additional effects applied to the affected mobs")
 		public EffectsList ADDITIONAL_EFFECTS = EffectsList.EMPTY;
@@ -74,7 +80,7 @@ public class VindictiveBoss extends BossAbilityGroup {
 			mParams.SOUND.play(loc);
 			mParams.PARTICLES.spawn(mBoss, loc);
 
-			if (mParams.ADDITIONAL_EFFECTS != EffectsList.EMPTY) {
+			if (mParams.ADDITIONAL_EFFECTS.equals(EffectsList.EMPTY)) {
 				mParams.ADDITIONAL_EFFECTS.apply(mob, mBoss);
 			}
 

@@ -62,8 +62,8 @@ public class RegionScalingDamageDealt implements Enchantment {
 			List<PotionUtils.PotionInfo> potionInfos = plugin.mPotionManager.getAllPotionInfos(player).getOrDefault(PotionManager.PotionID.ITEM, Collections.emptyList());
 			for (PotionUtils.PotionInfo potionInfo : potionInfos) {
 				if (PotionEffectType.SLOW_DIGGING.equals(potionInfo.mType)
-						&& potionInfo.mAmplifier == MINING_FATIGUE_AMPLIFIER
-						&& (potionInfo.mDuration <= 21 && !potionInfo.mInfinite)) {
+					&& potionInfo.mAmplifier == MINING_FATIGUE_AMPLIFIER
+					&& (potionInfo.mDuration <= 21 && !potionInfo.mInfinite)) {
 					potionInfo.mDuration = 0;
 					plugin.mPotionManager.updatePotionStatus(player, 0);
 					return;

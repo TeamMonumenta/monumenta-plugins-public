@@ -14,6 +14,7 @@ import de.tr7zw.nbtapi.NBTEntity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.apache.logging.log4j.util.BiConsumer;
@@ -26,6 +27,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Marker;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -35,14 +37,18 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemDiscovery {
-	public Marker mMarkerEntity;
+	public UUID mMarkerUUID;
+	public String mWorldName;
+	public Location mLocation;
 	public int mId;
 	public ItemDiscoveryTier mTier;
 	public NamespacedKey mLootTablePath;
 	public @Nullable NamespacedKey mOptionalFunctionPath;
 
 	public ItemDiscovery(Marker markerEntity, int id, ItemDiscoveryTier tier, NamespacedKey lootTablePath, @Nullable NamespacedKey optionalFunctionPath) {
-		mMarkerEntity = markerEntity;
+		mMarkerUUID = markerEntity.getUniqueId();
+		mWorldName = markerEntity.getWorld().getKey().asString();
+		mLocation = markerEntity.getLocation();
 		mId = id;
 		mTier = tier;
 		mLootTablePath = lootTablePath;
@@ -51,12 +57,17 @@ public class ItemDiscovery {
 
 	// manager for the visual effects shown by discoveries
 	public void runEffect(List<Player> players, boolean collected) {
+		Entity markerEntity = Bukkit.getEntity(mMarkerUUID);
+		if (markerEntity == null) {
+			return;
+		}
+
 		int tick = Bukkit.getCurrentTick();
 		if (!collected) {
-			mTier.mPeriodicEffect.accept(tick, mMarkerEntity.getLocation().clone(), players);
+			mTier.mPeriodicEffect.accept(tick, markerEntity.getLocation().clone(), players);
 		} else {
 			if (tick % 5 == 0) {
-				new PartialParticle(Particle.FALLING_DUST, mMarkerEntity.getLocation())
+				new PartialParticle(Particle.FALLING_DUST, markerEntity.getLocation())
 					.delta(0.05f, 0.05f, 0.05f)
 					.count(2)
 					.data(Material.DEEPSLATE.createBlockData())
@@ -104,7 +115,7 @@ public class ItemDiscovery {
 				continue;
 			}
 
-			slotsNeeded = (int)(slotsNeeded + Math.ceil((double)amountNeeded / item.getMaxStackSize()));
+			slotsNeeded = (int) (slotsNeeded + Math.ceil((double) amountNeeded / item.getMaxStackSize()));
 		}
 		int openSlots = InventoryUtils.numEmptySlots(player.getInventory());
 		if (slotsNeeded > openSlots) {
@@ -133,13 +144,34 @@ public class ItemDiscovery {
 		for (ItemStack item : items) {
 			InventoryUtils.giveItemWithStacksizeCheck(player, item);
 		}
-		mTier.mCollectSound.accept(player, mMarkerEntity.getLocation());
+		Entity markerEntity = Bukkit.getEntity(mMarkerUUID);
+		if (markerEntity != null) {
+			mTier.mCollectSound.accept(player, markerEntity.getLocation());
+		}
 		return true;
+	}
+
+	public @Nullable Marker getMarker() {
+		return (Marker) Bukkit.getEntity(mMarkerUUID);
+	}
+
+	public void teleport(Location location) {
+		Entity entity = getMarker();
+		if (entity == null) {
+			throw new RuntimeException("Discovery marker entity is not loaded");
+		}
+		entity.teleport(location);
+		mLocation = location;
 	}
 
 	// transfer data onto the marker entity
 	public void writeDataOnMarker() {
-		NBTEntity entity = new NBTEntity(mMarkerEntity);
+		Entity markerEntity = Bukkit.getEntity(mMarkerUUID);
+		if (markerEntity == null) {
+			throw new IllegalArgumentException("No marker entity was found");
+		}
+
+		NBTEntity entity = new NBTEntity(markerEntity);
 		NBTCompound container = entity.getPersistentDataContainer().getOrCreateCompound("discovery");
 		container.setInteger("id", mId);
 		container.setString("tier", mTier.name());
@@ -153,14 +185,14 @@ public class ItemDiscovery {
 		object.addProperty("tier", mTier.name());
 		object.addProperty("loot", mLootTablePath.getNamespace() + ":" + mLootTablePath.getKey());
 		object.addProperty("function", mOptionalFunctionPath == null ? "" : (mOptionalFunctionPath.getNamespace() + ":" + mOptionalFunctionPath.getKey()));
-		object.addProperty("marker_uuid", mMarkerEntity.getUniqueId().toString());
+		object.addProperty("marker_uuid", mMarkerUUID.toString());
 
 		JsonObject location = new JsonObject();
 		location.addProperty("shard", ServerProperties.getShardName());
-		location.addProperty("world", mMarkerEntity.getWorld().getKey().asString());
-		location.addProperty("x", mMarkerEntity.getLocation().getX());
-		location.addProperty("y", mMarkerEntity.getLocation().getY());
-		location.addProperty("z", mMarkerEntity.getLocation().getZ());
+		location.addProperty("world", mWorldName);
+		location.addProperty("x", mLocation.getX());
+		location.addProperty("y", mLocation.getY());
+		location.addProperty("z", mLocation.getZ());
 		object.add("location", location);
 
 		return object;
@@ -208,7 +240,7 @@ public class ItemDiscovery {
 					.data(new Particle.DustOptions(Color.fromRGB(192, 120, 191), 0.75f))
 					.spawnForPlayers(ParticleCategory.FULL, players);
 			}
-			double theta = Math.PI * 2 * (((double)ticks % 40) / 40);
+			double theta = Math.PI * 2 * (((double) ticks % 40) / 40);
 			Vector delta = new Vector(FastUtils.cos(theta) * 0.4, 0, FastUtils.sin(theta) * 0.4);
 			new PartialParticle(Particle.ENCHANTMENT_TABLE, location.clone().add(delta))
 				.count(1)
@@ -242,8 +274,8 @@ public class ItemDiscovery {
 					.data(new Particle.DustTransition(Color.fromRGB(240, 156, 41), Color.fromRGB(242, 181, 92), 0.8f))
 					.spawnForPlayers(ParticleCategory.FULL, players);
 			}
-			double theta1 = Math.PI * 2 * (((double)ticks % 50) / 50);
-			double theta2 = Math.PI * 2 * (((double)ticks % 30) / 30);
+			double theta1 = Math.PI * 2 * (((double) ticks % 50) / 50);
+			double theta2 = Math.PI * 2 * (((double) ticks % 30) / 30);
 			Vector delta = new Vector(FastUtils.cos(theta2) * 0.45, FastUtils.cos(theta1) * 0.45, FastUtils.sin(theta2) * 0.45);
 			new PartialParticle(Particle.ELECTRIC_SPARK, location.clone().add(delta))
 				.directionalMode(true)

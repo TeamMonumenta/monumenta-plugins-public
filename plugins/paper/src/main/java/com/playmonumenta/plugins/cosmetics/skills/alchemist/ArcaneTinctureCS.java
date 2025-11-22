@@ -83,8 +83,8 @@ public class ArcaneTinctureCS extends IronTinctureCS {
 	public void tinctureExpireEffects(Location location, Player caster) {
 		location.getWorld().playSound(location, Sound.BLOCK_MEDIUM_AMETHYST_BUD_BREAK, SoundCategory.PLAYERS, 1, 0.5f);
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, location.clone().add(0, 0.3, 0))
-				.count(20).delta(0.05, 0.1, 0.05)
-				.spawnAsPlayerActive(caster);
+			.count(20).delta(0.05, 0.1, 0.05)
+			.spawnAsPlayerActive(caster);
 	}
 
 	@Override
@@ -96,8 +96,8 @@ public class ArcaneTinctureCS extends IronTinctureCS {
 		world.playSound(location, Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 0.6f, 1.0f);
 		new PartialParticle(Particle.BLOCK_CRACK, location, 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(p);
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, location.clone().add(0, 0.3, 0))
-				.count(20).delta(0.05, 0.1, 0.05)
-				.spawnAsPlayerActive(p);
+			.count(20).delta(0.05, 0.1, 0.05)
+			.spawnAsPlayerActive(p);
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class ArcaneTinctureCS extends IronTinctureCS {
 		double radius = 1.15;
 		new PPCircle(Particle.ENCHANTMENT_TABLE, player.getLocation().add(0, 0.2, 0), radius)
 			.countPerMeter(8)
-				.spawnAsPlayerActive(player);
+			.spawnAsPlayerActive(player);
 		new BukkitRunnable() {
 			int mT = 0;
 

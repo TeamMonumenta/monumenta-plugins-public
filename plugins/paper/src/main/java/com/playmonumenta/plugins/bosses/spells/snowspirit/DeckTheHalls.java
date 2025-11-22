@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class DeckTheHalls extends Spell {
 
 					//Final particle show
 					for (double r = 0; r < 7; r++) {
-						for (int dir = 0 + mDirection; dir <= 270 + mDirection; dir += 120) {
+						for (int dir = mDirection; dir <= 270 + mDirection; dir += 120) {
 							for (double degree = 60; degree < 120; degree += 5) {
 								double radian1 = Math.toRadians(degree);
 								vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
@@ -86,13 +87,9 @@ public class DeckTheHalls extends Spell {
 						}
 					}
 
-					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
-						for (BoundingBox box : boxes) {
-							if (player.getBoundingBox().overlaps(box)) {
-								DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Deck the Halls");
-								break;
-							}
-						}
+					Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+					for (Player player : hitbox.getHitPlayers(true)) {
+						DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Deck the Halls");
 					}
 
 
@@ -107,7 +104,7 @@ public class DeckTheHalls extends Spell {
 				} else {
 					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 2f);
 
-					for (int dir = 0 + mDirection; dir <= 270 + mDirection; dir += 120) {
+					for (int dir = mDirection; dir <= 270 + mDirection; dir += 120) {
 						Vector vec;
 						//The degree range is 60 degrees for 30 blocks radius
 						for (double degree = 60; degree < 120; degree += 5) {

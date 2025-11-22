@@ -53,7 +53,7 @@ public class CurseOfSloth extends DepthsAbility {
 	}
 
 	public static Description<CurseOfSloth> getDescription() {
-		return new DescriptionBuilder<CurseOfSloth>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Lose ")
 			.addPercent(SLOWNESS)
 			.add(" speed. You cannot gain any positive speed effects.");

@@ -45,7 +45,7 @@ import org.bukkit.util.Vector;
 public class FireworkBlast extends DepthsAbility {
 	public static final String ABILITY_NAME = "Firework Blast";
 	private static final int COOLDOWN = 12 * 20;
-	private static final int[] DAMAGE = {12, 16, 20, 24, 28, 36};
+	private static final int[] DAMAGE = {13, 18, 22, 26, 31, 40};
 	private static final int[] DAMAGE_CAP = {24, 32, 40, 48, 56, 72};
 	private static final double DAMAGE_INCREASE_PER_BLOCK = 0.05;
 	private static final double RADIUS = 5;
@@ -102,6 +102,7 @@ public class FireworkBlast extends DepthsAbility {
 			final Vector mDir = dir.clone();
 			Vector mSpiral1 = VectorUtils.rotateTargetDirection(mDir, 0, -90).multiply(0.5);
 			Vector mSpiral2 = VectorUtils.rotateTargetDirection(mDir, 0, -90).multiply(0.8);
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 4; i++) {
@@ -214,11 +215,12 @@ public class FireworkBlast extends DepthsAbility {
 	}
 
 	private static Description<FireworkBlast> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<FireworkBlast>(color)
-			.add("Right click while sneaking to shoot a firework that deals ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to shoot a firework that deals ")
 			.addDepthsDamage(a -> a.mBaseDamage, DAMAGE[rarity - 1], true)
 			.add(" projectile damage to enemies within ")
-			.add(RADIUS)
+			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks of its explosion. The damage is increased by ")
 			.addPercent(a -> a.mDamagePerBlock, DAMAGE_INCREASE_PER_BLOCK)
 			.add(" for every block the firework travels past 6 blocks, up to ")

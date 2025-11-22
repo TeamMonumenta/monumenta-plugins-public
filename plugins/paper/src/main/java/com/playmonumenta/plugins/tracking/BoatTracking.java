@@ -2,9 +2,10 @@ package com.playmonumenta.plugins.tracking;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.WeakHashMap;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Boat;
@@ -13,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 
 public class BoatTracking implements EntityTracking {
-	private Set<Boat> mEntities = new HashSet<Boat>();
+	private final Set<Boat> mEntities = Collections.newSetFromMap(new WeakHashMap<>());
 	private int mTicks = 0;
 
 	@Override

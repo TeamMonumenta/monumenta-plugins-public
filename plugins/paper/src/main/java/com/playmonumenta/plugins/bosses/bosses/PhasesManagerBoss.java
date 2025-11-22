@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,6 +62,11 @@ public class PhasesManagerBoss extends BossAbilityGroup {
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
 		mParam.PHASES.onBossCastAbility(mBoss, event);
+	}
+
+	@Override
+	public void bossLaunchedProjectile(ProjectileLaunchEvent event) {
+		mParam.PHASES.onShoot(mBoss);
 	}
 
 	public void onCustomTrigger(String key) {

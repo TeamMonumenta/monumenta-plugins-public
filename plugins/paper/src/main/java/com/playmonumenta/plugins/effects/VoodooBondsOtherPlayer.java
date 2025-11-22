@@ -103,12 +103,12 @@ public class VoodooBondsOtherPlayer extends Effect {
 			//replace with halo effect
 			double angle = Math.toRadians(mRotation);
 			loc.add(FastUtils.cos(angle) * 0.5, le.getHeight(), FastUtils.sin(angle) * 0.5);
-			new PartialParticle(Particle.REDSTONE, loc, 5, 0, 0, 0, COLOR).spawnAsEnemy();
+			new PartialParticle(Particle.REDSTONE, loc, 5, 0, 0, 0, COLOR).spawnAsPlayerActive(mReaper);
 			if (mTriggerTickParticle) {
 				setDuration(0);
 				mTriggerTickParticle = false;
 				//replace with better particles
-				new PartialParticle(Particle.REDSTONE, loc, 60, 3, 3, 3, 0.075, COLOR).spawnAsEnemy();
+				new PartialParticle(Particle.REDSTONE, loc, 60, 3, 3, 3, 0.075, COLOR).spawnAsPlayerActive(mReaper);
 				world.playSound(loc, Sound.BLOCK_ANVIL_FALL, SoundCategory.PLAYERS, 2f, 1.0f);
 			}
 		}

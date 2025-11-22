@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -78,41 +79,17 @@ public class DoomsdayClock extends Spell {
 				}
 
 				List<BoundingBox> blackBoxes = createHand(mBlackDeg, length, BLACK_COLOR);
-				//List<BoundingBox> redBoxes = createHand(mRedDeg, length, RED_COLOR);
-
-				/*
-				for (int deg = 0; deg < 360; deg += 15) {
-					Location base = mCenter.clone().add(FastUtils.cosDeg(deg) * RADIUS, 0.5, FastUtils.sinDeg(deg) * RADIUS);
-					for (int y = 0; y < wallHeight; y++) {
-						new PartialParticle(Particle.CRIT, base.clone().add(0, y, 0), 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
-					}
-				}
-				 */
 
 				if (mT == 0) {
 					world.playSound(mCenter, Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 1.5f, 1.4f);
 				}
 
 				if (mT > 0 && mT % 10 == 0) {
+					Hitbox hitbox = Hitbox.unionOfAABB(blackBoxes, world);
+					for (Player player : hitbox.getHitPlayers(true)) {
+						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, BLACK_DAMAGE, null, false, false, "Doomsday Clock");
+					}
 					for (Player player : players) {
-						for (BoundingBox box : blackBoxes) {
-							if (box.overlaps(player.getBoundingBox())) {
-								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, BLACK_DAMAGE, null, false, false, "Doomsday Clock");
-							}
-						}
-						/*
-						for (BoundingBox box : redBoxes) {
-							if (box.overlaps(player.getBoundingBox()) && PlayerUtils.isOnGround(player)) {
-								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, RED_DAMAGE, null, false, false, "Doomsday Clock");
-							}
-						}
-						 */
-				/*
-				if (LocationUtils.xzDistance(player.getLocation(), mCenter) > RADIUS) {
-					BossUtils.bossDamagePercent(mBoss, player, mT > 5 * 20 ? 0.2 : 0.1, null, true, "Doomsday Clock");
-				}
-
-				 */
 						player.playSound(player.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, SoundCategory.HOSTILE, 0.1f, 0.4f);
 					}
 				}

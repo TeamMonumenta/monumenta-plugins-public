@@ -21,14 +21,13 @@ public class ExceptionListener implements Listener {
 	public void serverExceptionEvent(ServerExceptionEvent event) {
 		ServerException exception = event.getException();
 
-		if (exception instanceof ServerSchedulerException) {
-			ServerSchedulerException schedException = (ServerSchedulerException)exception;
+		if (exception instanceof ServerSchedulerException schedException) {
 
 			BukkitTask task = schedException.getTask();
 			mPlugin.getLogger().warning("Caught exception in " + (task.isSync() ? "sync" : "async") +
-			                            " task from " + task.getOwner().getName() +
-										" in class " + task.getClass().getName() +
-										" - killing it");
+				" task from " + task.getOwner().getName() +
+				" in class " + task.getClass().getName() +
+				" - killing it");
 			if (!task.isCancelled()) {
 				task.cancel();
 			}

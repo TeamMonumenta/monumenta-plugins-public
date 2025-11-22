@@ -1,9 +1,11 @@
 package com.playmonumenta.plugins.itemstats;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.HemorrhageEvent;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -349,10 +351,26 @@ public interface ItemStat {
 	 *
 	 * @param plugin monumenta plguin
 	 * @param player the Player gaining the custom effect
-	 * @param value the value of ItemStat possessed by the Player
-	 * @param event the associated CustomEffectApplyEvent
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated CustomEffectApplyEvent
 	 */
 	default void onCustomEffectApply(Plugin plugin, Player player, double value, CustomEffectApplyEvent event) {
+
+	}
+
+	default void onAbilityCast(Plugin plugin, Player player, double value, AbilityCastEvent event) {
+
+	}
+
+	/**
+	 * Hemorrhage (from Bleed) occurs
+	 *
+	 * @param plugin monumenta plugin
+	 * @param player the Player affected (may be different from the one causing the Hemorrhage)
+	 * @param value value of ItemStat possessed by the Player
+	 * @param event Hemorrhage Event
+	 */
+	default void onHemorrhage(Plugin plugin, Player player, double value, HemorrhageEvent event) {
 
 	}
 }

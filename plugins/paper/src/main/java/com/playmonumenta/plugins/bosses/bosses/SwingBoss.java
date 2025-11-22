@@ -10,7 +10,9 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,20 +25,20 @@ public class SwingBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_swing";
 
 	public static class Parameters extends BossParameters {
-		@BossParam(help = "not written")
+		@BossParam(help = "Range in blocks that the launcher searches for players to target with this spell")
 		public int DETECTION = 30;
-		@BossParam(help = "not written")
+		@BossParam(help = "Radius in blocks in which players are damaged when the launcher completes casting")
 		public int RADIUS = 3;
-		@BossParam(help = "not written")
+		@BossParam(help = "Time in ticks between the launcher spawning and the first attempt to cast this spell")
 		public int DELAY = 5 * 20;
-		@BossParam(help = "not written")
+		@BossParam(help = "Time in ticks it takes for this spell to complete its cast")
 		public int DURATION = 15;
-		@BossParam(help = "not written")
+		@BossParam(help = "Time in ticks the launcher waits before casting any other spell when this spell is cast")
 		public int COOLDOWN = 20 * 14;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "Melee damage dealt")
 		public int DAMAGE = 30;
-		@BossParam(help = "not written")
+		@BossParam(help = "Percent health True damage dealt")
 		public double DAMAGE_PERCENT = 0.0;
 		@BossParam(help = "Effects applied to players hit by the swing")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
@@ -46,16 +48,25 @@ public class SwingBoss extends BossAbilityGroup {
 		public Sound SOUND = Sound.ENTITY_PLAYER_ATTACK_SWEEP;
 
 		@BossParam(help = "Particle summon around the boss in the air ")
-		public ParticlesList PARTICLE_CHARGE = ParticlesList.fromString("[(SWEEP_ATTACK,1)]");
+		public ParticlesList PARTICLE_CHARGE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SWEEP_ATTACK, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particle summon around the boss on the terrain")
-		public ParticlesList PARTICLE_CIRCLE = ParticlesList.fromString("[(CRIT,12)]");
+		public ParticlesList PARTICLE_CIRCLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 12, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound played when the ability explode")
-		public SoundsList SOUND_EXPLODE = SoundsList.fromString("[(ENTITY_PLAYER_ATTACK_STRONG,1.5,0.65)]");
+		public SoundsList SOUND_EXPLODE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_PLAYER_ATTACK_STRONG, 1.5f, 0.65f))
+			.build();
 
 		@BossParam(help = "Particle summon when the ability explode")
-		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.fromString("[(SWEEP_ATTACK,24,0.1,0.1,0.1,0.3),(REDSTONE,48,0.25,0.25,0.25,0,#ffffff,2)]");
+		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SWEEP_ATTACK, 24, 0.1, 0.1, 0.1, 0.3))
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 48, 0.25, 0.25, 0.25, 0.0, new Particle.DustOptions(Color.WHITE, 2.0f)))
+			.build();
 
 	}
 
@@ -97,11 +108,11 @@ public class SwingBoss extends BossAbilityGroup {
 					}
 
 					if (p.DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, player, DamageType.MELEE, p.DAMAGE);
+						BossUtils.blockableDamage(boss, player, DamageType.MELEE, p.DAMAGE, p.EFFECTS.mEffectList());
 					}
 
 					if (p.DAMAGE_PERCENT > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENT, mBoss.getLocation());
+						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE_PERCENT, mBoss.getLocation(), p.EFFECTS.mEffectList());
 					}
 
 					p.EFFECTS.apply(player, mBoss);

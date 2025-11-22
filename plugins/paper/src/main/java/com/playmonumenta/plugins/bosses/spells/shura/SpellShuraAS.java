@@ -26,7 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class SpellShuraAS extends Spell {
+public final class SpellShuraAS extends Spell {
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;

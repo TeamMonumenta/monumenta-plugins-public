@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.delves;
 
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.custominventories.BountyGui;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
@@ -63,6 +64,7 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.VENGEANCE, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ENTROPY, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.TWISTED, 5);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.TWISTED_TORMENTED, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.FRAGILE, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ASSASSINS, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.UNYIELDING, 1);
@@ -72,6 +74,13 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.HAUNTED, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.CHANCECUBES, 1);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.BERSERK, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.HEALCUT, 2);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.GRAVITY, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.IDOLATRY, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.REGENERATING, 3);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.BLOODLUST, 4);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.BOUNTIFUL, 1);
+		MODIFIER_RANK_CAPS.put(DelvesModifier.CLOAKED, 3);
 
 		// Depths endless changes- use dev2 for testing
 		if (ServerProperties.getShardName().startsWith("depths")
@@ -121,16 +130,7 @@ public class DelvesUtils {
 		long week = DateUtils.getWeeklyVersion() + nextWeek;
 		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(week / nWeekRotation.size()));
 		List<DelvesModifier> selectedModifiers = nWeekRotation.get((int) (DateUtils.getWeeklyVersion() % nWeekRotation.size()));
-		if (DateUtils.getWeeklyVersion() == 2859) {
-			DelvesModifier hauntedModifier = DelvesModifier.HAUNTED;
-			if (!selectedModifiers.contains(hauntedModifier)) {
-				selectedModifiers = new ArrayList<>(selectedModifiers);
-				selectedModifiers.add(hauntedModifier);
-			}
-			MODIFIER_RANK_CAPS.put(DelvesModifier.HAUNTED, 2);
-		} else {
-			MODIFIER_RANK_CAPS.put(DelvesModifier.HAUNTED, 1);
-		}
+		MODIFIER_RANK_CAPS.put(DelvesModifier.HAUNTED, 1);
 
 		return selectedModifiers;
 	}
@@ -138,10 +138,10 @@ public class DelvesUtils {
 	public static List<DelvesModifier> getExperimentalDelveModifier() {
 		List<DelvesModifier> experimentalMods = DelvesModifier.experimentalDelveModifiers();
 		return switch ((int) DateUtils.getWeeklyVersion()) {
-			// week starting friday august 30, 2024
-			case 2853 -> List.of(experimentalMods.get(0));
-			// week starting friday january 24, 2025
-			case 2874, 2875 -> List.of(experimentalMods.get(0), experimentalMods.get(1));
+			// week starting Friday, August 8, 2025
+			case 2902, 2903, 2904, 2905, 2906 -> List.of(experimentalMods.get(6), experimentalMods.get(7));
+			// week starting Friday, October 10, 2025
+			case 2911, 2912, 2913, 2914 -> List.of(experimentalMods.get(5));
 			default -> Collections.emptyList();
 		};
 	}
@@ -235,10 +235,13 @@ public class DelvesUtils {
 					Collections.shuffle(mods);
 					DelvesModifier mod = mods.get(0);
 					int oldValue = info.get(mod);
+					// Let Entropy exceed the limit
+					/*
 					if (oldValue == getMaxPointAssignable(mod, oldValue + 1)) {
 						mods.remove(mod);
 						continue;
 					}
+					*/
 					info.put(mod, oldValue + 1);
 					pointsToAssign--;
 				}
@@ -330,6 +333,7 @@ public class DelvesUtils {
 			mods.remove(DelvesModifier.TWISTED);
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
 			mods.removeAll(DelvesModifier.experimentalDelveModifiers());
+			mods.removeAll(DelvesModifier.variantDelveModifiers());
 
 			while (pointsToAssign > 0) {
 				if (mods.isEmpty()) {
@@ -381,6 +385,7 @@ public class DelvesUtils {
 
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("blue", "D12Delve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("brown", "D13Delve");
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("indigo", "DIDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("green", "D14Delve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("red", "D15Delve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("black", "D16Delve");
@@ -445,7 +450,7 @@ public class DelvesUtils {
 					}
 
 					Collections.shuffle(locationsToTest);
-					for (Location l: locationsToTest) {
+					for (Location l : locationsToTest) {
 						if (l.getBlock().getType() == Material.AIR && l.clone().add(0, -1, 0).getBlock().isSolid()) {
 							loc = l;
 							break;
@@ -691,6 +696,15 @@ public class DelvesUtils {
 
 	public static Map<String, DelvesManager.DungeonDelveInfo> getOrAddDelveInfoMap(Player player) {
 		return DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>());
+	}
+
+	// Note: This can load one content's delve points into another, should you want to...
+	public static void loadPlayerDungeonData(Player player, String dungeonName, JsonObject dungeonObj) throws RuntimeException {
+		DelvesManager.loadPlayerDungeonData(player, dungeonName, dungeonObj);
+	}
+
+	public static JsonObject convertPlayerDungeonData(Player player, String dungeonName) {
+		return DelvesManager.convertPlayerDungeonData(dungeonName, getDelveInfo(player, dungeonName));
 	}
 
 	// Only use this method if there is no already known player

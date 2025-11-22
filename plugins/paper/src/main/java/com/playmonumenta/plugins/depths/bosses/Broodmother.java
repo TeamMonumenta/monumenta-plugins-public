@@ -73,7 +73,8 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 	public static final int GROUND_Y_LEVEL = 129;
 	public static final double HEALTH = 5000;
 	public static final double LIMB_HEALTH = 600;
-	public static final String LIMB_NAME = "BroodmotherLimb";
+	public static final String LIMB_LOS = "BroodmotherLimb";
+	public static final String LIMB_PLAIN_NAME = "Broodmother Limb";
 	public static final double VULNERABILITY_A4_INCREASE = 0.15;
 	public static final double VULNERABILITY_A8_INCREASE = 0.15;
 	public static final double VULNERABILITY_A15_INCREASE = 0.2;
@@ -298,8 +299,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 			mLaserCores.removeAllCores();
 		}
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		BossUtils.endBossFightEffects(players);
+		BossUtils.endBossFightEffects(PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true, true));
 
 		mLegSweep.stopLegTasks();
 		mTantrum.stopTantrumTasks();
@@ -312,6 +312,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 
 		BukkitRunnable deathRunnable = new BukkitRunnable() {
 			float mPitch = 0;
+
 			@Override
 			public void run() {
 				if (mPitch > 2.0f) {
@@ -412,7 +413,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 			mIsRespawningLimbs = false;
 
 			for (int i = 0; i < 4; i++) {
-				Entity e = LibraryOfSoulsIntegration.summon(mLimbLocs[i], LIMB_NAME);
+				Entity e = LibraryOfSoulsIntegration.summon(mLimbLocs[i], LIMB_LOS);
 				if (e instanceof Slime slime) {
 					mLimbs[i] = slime;
 					EntityUtils.setMaxHealthAndHealth(slime, DepthsParty.getAscensionScaledHealth(LIMB_HEALTH, mParty));

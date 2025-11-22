@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -41,7 +42,9 @@ public class CreipergeuseBoss extends BossAbilityGroup {
 		public int MIDRANGE_RADIUS = 15;
 
 		@BossParam(help = "Sounds to play to the boss's target within CLOSE_RADIUS")
-		public SoundsList HEARTBEAT_SOUNDS = SoundsList.fromString("[(ENTITY_WARDEN_HEARTBEAT,1.0,1.0)]");
+		public SoundsList HEARTBEAT_SOUNDS = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WARDEN_HEARTBEAT, 1.0f, 1.0f))
+			.build();
 	}
 
 	private static final String SPEED_SRC = "CreipergeuseSpeedBuff";

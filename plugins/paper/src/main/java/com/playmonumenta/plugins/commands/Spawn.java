@@ -7,6 +7,8 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -23,16 +25,17 @@ public class Spawn {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
-			.executes((sender, args) -> {
+			.executesNative((sender, args) -> {
 				Collection<Entity> targets = (Collection<Entity>) args.get("Targets");
-				run(targets);
+				run(sender.getWorld(), targets);
 			})
 			.register();
 	}
 
-	public static void run(Collection<Entity> targets) {
+	public static void run(World world, Collection<Entity> targets) {
+		Location spawnLocation = world.getSpawnLocation();
 		for (Entity target : targets) {
-			target.teleport(target.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+			target.teleport(spawnLocation, PlayerTeleportEvent.TeleportCause.COMMAND);
 		}
 	}
 }

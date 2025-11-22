@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.infinitytower.guis;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerFileUtils;
-import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.infinitytower.TowerTeam;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -39,8 +39,8 @@ public class TowerGuiFloorDesign extends CustomInventory {
 
 
 	private static final int[] VALID_FLOOR_SLOT = {
-		 0, 1, 2, 3, 4,     // 5,  6,  7,  8,
-		 9, 10, 11, 12, 13, //14, 15, 16, 17,
+		0, 1, 2, 3, 4,     // 5,  6,  7,  8,
+		9, 10, 11, 12, 13, //14, 15, 16, 17,
 		18, 19, 20, 21, 22, //23, 24, 25, 26,
 		27, 28, 29, 30, 31, //32, 33, 34, 35,
 		36, 37, 38, 39, 40, //41, 42, 43  44,
@@ -54,9 +54,7 @@ public class TowerGuiFloorDesign extends CustomInventory {
 	private static final int MOB_REMOVE_SLOT = 16;
 
 
-
-
-	private TowerTeam mTeam;
+	private final TowerTeam mTeam;
 	private final int mFloor;
 	private final Map<Integer, TowerMob> mFloorMap = new LinkedHashMap<>();
 	private final Map<Integer, ItemStack> mItemMap = new LinkedHashMap<>();
@@ -257,12 +255,11 @@ public class TowerGuiFloorDesign extends CustomInventory {
 					int z = mod + mDz;
 					Vector vec = new Vector(x, 0, z);
 					player.closeInventory();
-					new TowerGuiFloorDesignMob(player, mTeam, mFloor, vec).openInventory(player, TowerManager.mPlugin);
+					new TowerGuiFloorDesignMob(player, mTeam, mFloor, vec).openInventory(player, Plugin.getInstance());
 					return;
 				}
 			}
 		}
-
 
 
 		loadInv();

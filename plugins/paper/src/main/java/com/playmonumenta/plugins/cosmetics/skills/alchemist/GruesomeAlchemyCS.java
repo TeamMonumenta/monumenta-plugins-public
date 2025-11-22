@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.AbstractMap;
-import java.util.Arrays;
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,6 +18,9 @@ import org.bukkit.entity.Player;
 
 
 public class GruesomeAlchemyCS implements CosmeticSkill {
+	public static Color BRUTAL_COLOR = Color.fromRGB(235, 200, 255);
+	public static Color GRUESOME_COLOR = Color.fromRGB(150, 245, 32);
+
 
 	@Override
 	public ClassAbility getAbility() {
@@ -41,12 +44,11 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 	public void effectsOnSplash(Player mPlayer, Location loc, boolean isGruesome, double radius, boolean isSpecialPot) {
 		// Select color of the particle, based off of mojank
 		// (to color the SPELL_MOB particle, you have to use the delta values)
-		double deltaX = isGruesome ? 1 : 0;
-		double deltaY = isGruesome ? 0 : 1;
+		Color color = isGruesome ? GRUESOME_COLOR : BRUTAL_COLOR;
 		ParticleUtils.explodingRingEffect(Plugin.getInstance(), loc, radius, 1, 3,
-			Arrays.asList(
+			List.of(
 				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(1.0, (Location location) -> {
-					new PartialParticle(Particle.SPELL_MOB, location, 1, deltaX, deltaY, 0, 1).directionalMode(true).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_MOB, location, 1, color.getRed() / 255.0, color.getGreen() / 255.0, color.getBlue() / 255.0, 1).directionalMode(true).spawnAsPlayerActive(mPlayer);
 				})
 			)
 		);
@@ -54,9 +56,9 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 
 	public Color splashColor(boolean isGruesome) {
 		if (isGruesome) {
-			return Color.RED;
+			return GRUESOME_COLOR;
 		} else {
-			return Color.fromRGB(0x00FF00);
+			return BRUTAL_COLOR;
 		}
 	}
 

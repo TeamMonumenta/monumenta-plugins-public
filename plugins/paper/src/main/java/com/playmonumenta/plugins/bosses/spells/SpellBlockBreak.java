@@ -29,12 +29,14 @@ import org.bukkit.loot.Lootable;
 public class SpellBlockBreak extends Spell {
 	public static final int DEFAULT_REQUIRED_SCORE = 6;
 	public boolean mIsActive = true;
+
 	private static final int HEIGHT_BELOW_WORLD = 100;
 	private final Entity mLauncher;
 	private final List<Material> mNoBreak;
 	private final int mXRad;
 	private final int mYRad;
 	private final int mZRad;
+	private final int mYOffset;
 	private final int mArenaFloorY;
 	private final boolean mBreakBossArena;
 	private final boolean mFlattenArena;
@@ -58,42 +60,51 @@ public class SpellBlockBreak extends Spell {
 	}
 
 	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int arenaFloorY,
-						   final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean breakFootLevel) {
-		this(launcher, xRad, yRad, zRad, arenaFloorY, adaptToBoundingBox, breakBossArena, false,
+	                       final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean breakFootLevel) {
+		this(launcher, xRad, yRad, zRad, 0, arenaFloorY, adaptToBoundingBox, breakBossArena, breakFootLevel);
+	}
+
+	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int yOffset, final int arenaFloorY,
+	                       final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean breakFootLevel) {
+		this(launcher, xRad, yRad, zRad, yOffset, arenaFloorY, adaptToBoundingBox, breakBossArena, false,
 			breakFootLevel, true, false, Material.AIR);
 	}
 
+
 	public SpellBlockBreak(final Entity launcher, final boolean adaptToBoundingBox, final boolean breakFootLevel,
-						   final boolean onlyForcecast) {
-		this(launcher, 1, 3, 1, launcher.getWorld().getMinHeight() - HEIGHT_BELOW_WORLD,
+	                       final boolean onlyForcecast) {
+		this(launcher, 1, 3, 1, 0, launcher.getWorld().getMinHeight() - HEIGHT_BELOW_WORLD,
 			adaptToBoundingBox, true, false, breakFootLevel, true,
 			onlyForcecast, Material.AIR);
 	}
 
 	/**
 	 * Spell for all bosses that break blocks in the world.
-	 * @param launcher The entity using the spell
-	 * @param xRad X radius to check for blocks
-	 * @param yRad Y radius to check for blocks
-	 * @param zRad Z radius to check for blocks
-	 * @param arenaFloorY For bosses with a dedicated arena. Only used if breakBossArena is set to false
-	 * @param adaptToBoundingBox Whether the launcher should check for blocks to break depending on the radii or its bounding box
-	 * @param breakBossArena If the launcher should be able to break the arena floor
-	 * @param flattenArena If the launcher should consistently break blocks above {@code arenaFloorY}
-	 * @param breakFootLevel If the launcher should break blocks at "foot" level. If set to true, the launcher won't attempt to "stair" from low to high elevation
+	 *
+	 * @param launcher            The entity using the spell
+	 * @param xRad                X radius to check for blocks
+	 * @param yRad                Y radius to check for blocks
+	 * @param zRad                Z radius to check for blocks
+	 * @param yOffset             Vertical offset for block break volume
+	 * @param arenaFloorY         For bosses with a dedicated arena. Only used if breakBossArena is set to false
+	 * @param adaptToBoundingBox  Whether the launcher should check for blocks to break depending on the radii or its bounding box
+	 * @param breakBossArena      If the launcher should be able to break the arena floor
+	 * @param flattenArena        If the launcher should consistently break blocks above {@code arenaFloorY}
+	 * @param breakFootLevel      If the launcher should break blocks at "foot" level. If set to true, the launcher won't attempt to "stair" from low to high elevation
 	 * @param breakOverheadBlocks Only used with Eldrask for now. Defaults to true
-	 * @param onlyForcecast Whether to run this spell manually. Used during the launcher's pathfinding calculations. Defaults to false
-	 * @param noBreak List of block materials the launcher should not break
+	 * @param onlyForcecast       Whether to run this spell manually. Used during the launcher's pathfinding calculations. Defaults to false
+	 * @param noBreak             List of block materials the launcher should not break
 	 */
-	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int arenaFloorY,
-						   final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean flattenArena,
-						   final boolean breakFootLevel, final boolean breakOverheadBlocks, final boolean onlyForcecast,
-						   final Material... noBreak) {
+	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int yOffset, final int arenaFloorY,
+	                       final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean flattenArena,
+	                       final boolean breakFootLevel, final boolean breakOverheadBlocks, final boolean onlyForcecast,
+	                       final Material... noBreak) {
 		mLauncher = launcher;
 		mAdaptToBoundingBox = adaptToBoundingBox;
 		mXRad = xRad;
 		mYRad = yRad;
 		mZRad = zRad;
+		mYOffset = yOffset;
 		mArenaFloorY = arenaFloorY;
 		mBreakBossArena = breakBossArena;
 		mFlattenArena = flattenArena;
@@ -105,11 +116,16 @@ public class SpellBlockBreak extends Spell {
 
 	@Override
 	public void run() {
+		if (!canRun()) {
+			// The canRun() method doesn't normally do anything for passives but might as well just use it here if bosses want to add some check
+			return;
+		}
 		tryToBreakBlocks(DEFAULT_REQUIRED_SCORE);
 	}
 
 	/**
 	 * Attempt to break blocks in the launcher's world. Uses location of the launcher
+	 *
 	 * @param initialRequiredScore Threshold score that must be met before block breaking happens. Defaults to 6
 	 * @return True if blocks were broken
 	 */
@@ -120,7 +136,8 @@ public class SpellBlockBreak extends Spell {
 	/**
 	 * Attempt to break blocks in the launcher's world.<br>
 	 * Warning: Do not move this code outside of this method! Attempting to put this in run() causes race conditions!
-	 * @param loc Location where block breaking should happen. I had to add this param to this dang spell to get it to work with the LaserBoss code
+	 *
+	 * @param loc                  Location where block breaking should happen. I had to add this param to this dang spell to get it to work with the LaserBoss code
 	 * @param initialRequiredScore Threshold score that must be met before block breaking happens. Defaults to 6
 	 * @return True if blocks were broken
 	 */
@@ -134,7 +151,7 @@ public class SpellBlockBreak extends Spell {
 		final int yRad = (int) (mAdaptToBoundingBox ? Math.ceil(mLauncher.getBoundingBox().getHeight()) : mYRad);
 		final int zRad = (int) (mAdaptToBoundingBox ? Math.round(mLauncher.getBoundingBox().getWidthZ()) : mZRad);
 		final double testLocX = loc.getX();
-		double testLocY = loc.getY() - 1.0;
+		double testLocY = loc.getY() - 1.0 + mYOffset;
 		final double testLocZ = loc.getZ();
 		final Location testLoc = new Location(loc.getWorld(), 0, 0, 0);
 		Block testBlock;
@@ -152,7 +169,7 @@ public class SpellBlockBreak extends Spell {
 
 		// If the launcher is a mob with a valid player target with a GEQ 2 block height difference, reduce threshold
 		if (mLauncher instanceof final Mob mob && mob.getTarget() instanceof final Player target
-			    && target.getLocation().getY() >= loc.getY() + 2 && PlayerUtils.isOnGround(target)) {
+			&& target.getLocation().getY() >= loc.getY() + 2 && PlayerUtils.isOnGround(target)) {
 			requiredScore /= 2;
 		}
 
@@ -187,13 +204,13 @@ public class SpellBlockBreak extends Spell {
 					if (BlockUtils.isEnvHazardForMobs(testMat) || BlockUtils.mobCannotPathfindOver(testBlock.getBlockData()) || evilTrapdoor) {
 						requiredScore = 0;
 						breakBlockList.add(testBlock);
-					/* If the block is not a mech block and is not in mNoBreak
-					 * and the block has collision with entities
-					 * and (the block is not a Lootable or (is a Lootable without a loot table and the block below it is not bedrock)) */
+						/* If the block is not a mech block and is not in mNoBreak
+						 * and the block has collision with entities
+						 * and (the block is not a Lootable or (is a Lootable without a loot table and the block below it is not bedrock)) */
 					} else if (!BlockUtils.isMechanicalBlock(testMat) && !mNoBreak.contains(testMat)
-						       && blockMaterialHasCollision(testMat)
-						       && (!(testBlock.getState() instanceof Lootable) || (!((Lootable) testBlock.getState()).hasLootTable()
-						       && !testBlock.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
+						&& blockMaterialHasCollision(testMat)
+						&& (!(testBlock.getState() instanceof Lootable) || (!((Lootable) testBlock.getState()).hasLootTable()
+						&& !testBlock.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
 						// Threshold for badScore is usually 6 (A "fully bad block" is 2)
 						// Example:
 						// 3 Bad blocks Top level (3 * 2) = 6 (Break)
@@ -232,6 +249,7 @@ public class SpellBlockBreak extends Spell {
 
 	/**
 	 * Helper method to handle destruction of blocks in world
+	 *
 	 * @param blockList List of blocks to break
 	 * @return True if blocks were destroyed
 	 */
@@ -279,15 +297,16 @@ public class SpellBlockBreak extends Spell {
 
 	/**
 	 * Helper method to check for block material collision with entities
+	 *
 	 * @param material Material of the block to be tested
 	 * @return True if an entity's hitbox can collide with the block material
 	 */
 	private boolean blockMaterialHasCollision(final Material material) {
 		return (material.isSolid()
-				|| ItemUtils.HEADS.contains(material)
-				|| ItemUtils.CARPETS.contains(material)
-				|| ItemUtils.CANDLES.contains(material)
-				|| ItemUtils.FLOWER_POTS.contains(material));
+			|| ItemUtils.HEADS.contains(material)
+			|| ItemUtils.CARPETS.contains(material)
+			|| ItemUtils.CANDLES.contains(material)
+			|| ItemUtils.FLOWER_POTS.contains(material));
 	}
 
 	private boolean shouldBreakSlab(final Block block) {

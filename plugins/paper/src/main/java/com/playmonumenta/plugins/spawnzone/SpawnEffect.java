@@ -12,14 +12,14 @@ public class SpawnEffect {
 		Health,
 		Potion,
 		Armor,
-		Weapons;
+		Weapons
 	}
 
 	public EntityType mEntityType;
 	public String mName;
 	public SpawnEffectType mType;
-	public List<PotionEffect> mPotionList = new ArrayList<PotionEffect>();
-	public List<ItemStack> mArmorList = new ArrayList<ItemStack>();
+	public List<PotionEffect> mPotionList = new ArrayList<>();
+	public List<ItemStack> mArmorList = new ArrayList<>();
 	public double mValue;
 
 	public SpawnEffect(EntityType entityType, String name, SpawnEffectType type, List<PotionEffect> potionList) {

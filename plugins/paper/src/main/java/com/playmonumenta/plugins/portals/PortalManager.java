@@ -104,6 +104,7 @@ public class PortalManager implements Listener {
 	public static final String MAP_TAG = "PortalMap";
 
 	private static @Nullable PortalManager INSTANCE = null;
+	private static boolean mActivated = false;
 	public static final Map<Player, Portal> mPlayerPortal1 = new HashMap<>();
 	public static final Map<Player, Portal> mPlayerPortal2 = new HashMap<>();
 	public static final Map<Player, PortalTeleportCheck> mPortalTeleportChecks = new HashMap<>();
@@ -135,6 +136,7 @@ public class PortalManager implements Listener {
 
 		World world = player.getWorld();
 		if (success) {
+			mActivated = true;
 			for (int i = 0; i < 6; i++) {
 				world.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 0.4f, 1f);
 			}
@@ -345,9 +347,7 @@ public class PortalManager implements Listener {
 		Location location1 = portalBlock1.getLocation();
 		Location location2 = portalBlock2.getLocation();
 		ItemStack mapItem = new ItemStack(Material.FILLED_MAP, 1);
-		mapItem.editMeta(MapMeta.class, mapMeta -> {
-			ItemUtils.setMapId(mapMeta, mapNum);
-		});
+		mapItem.editMeta(MapMeta.class, mapMeta -> ItemUtils.setMapId(mapMeta, mapNum));
 		Entity map1 = world.spawn(location1, GlowItemFrame.class, itemFrame -> {
 			itemFrame.setFacingDirection(targetFace);
 			itemFrame.setRotation(rotation1);
@@ -424,11 +424,15 @@ public class PortalManager implements Listener {
 	public static void clearAllPortals(Player player) {
 		clearPortal(player, 1);
 		clearPortal(player, 2);
+		PortalAFKCheck runnable = mPortalAFKChecks.remove(player);
+		if (runnable != null && !runnable.isCancelled()) {
+			runnable.cancel();
+		}
 	}
 
 	public static void clearPortal(Player player, int portalNum) {
 		//Don't do anything if the manager isn't loaded
-		if (mPlayerPortal1 == null || mPlayerPortal2 == null) {
+		if (!mActivated) {
 			return;
 		}
 		portalLog("enter clearPortal(" + player.getName() + ", " + portalNum + ");");
@@ -687,7 +691,7 @@ public class PortalManager implements Listener {
 
 	private static void portalLog(String message) {
 		Plugin plugin = Plugin.getInstance();
-		if (plugin == null) {
+		if (plugin == null || !mActivated) {
 			return;
 		}
 		File logFile = new File(plugin.getDataFolder(), "portals.log");

@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
+import com.playmonumenta.plugins.cosmetics.punches.PlayerPunches;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkillGUIConfig;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkillShopGUI;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -34,16 +35,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
-
 public class CosmeticsGUI extends CustomInventory {
 
 	private static final int PREV_PAGE_LOC = 45;
 	private static final int NEXT_PAGE_LOC = 53;
 	static final int BACK_LOC = 49;
-	private static final int TITLE_LOC = 1 * 9 + 2;
-	private static final int ELITE_FINISHER_LOC = 1 * 9 + 4;
-	private static final int COSMETIC_SKILL_LOC = 1 * 9 + 6;
-	private static final int GRAVE_POSE_LOC = 3 * 9 + 2;
+	private static final int TITLE_LOC = 9 + 1;
+	private static final int ELITE_FINISHER_LOC = 9 + 3;
+	private static final int COSMETIC_SKILL_LOC = 9 + 5;
+	private static final int GRAVE_POSE_LOC = 9 + 7;
+	private static final int PLAYER_PUNCH_LOC = 3 * 9 + 2;
 	private static final int VANITY_LOC = 3 * 9 + 4;
 	private static final int UNLOCKED_VANITY_LOC = 3 * 9 + 6;
 	private static final int SUMMARY_LOC = 0;
@@ -107,7 +108,29 @@ public class CosmeticsGUI extends CustomInventory {
 			} else {
 				close();
 				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.PLAYERS, 1, 1);
-				player.sendMessage(Component.text("Grave Poses are only accessible to ", NamedTextColor.RED).append(Component.text("Patrons", NamedTextColor.GOLD)).append(Component.text("!", NamedTextColor.RED)));
+				player.sendMessage(Component.text("Grave Poses are only accessible to ", NamedTextColor.RED).append(Component.text("patrons", NamedTextColor.GOLD)).append(Component.text("!", NamedTextColor.RED)));
+			}
+			return;
+		} else if (mDisplayPage == null && slot == PLAYER_PUNCH_LOC) {
+			if (PlayerPunches.canAccess(player)) {
+				mDisplayPage = CosmeticType.PLAYER_PUNCH;
+				playBookSound(player);
+				setUpCosmetics(player);
+			} else if (player.hasPermission("monumenta.cosmetics.punchoptout")) {
+				close();
+				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.PLAYERS, 1, 1);
+				player.sendMessage(Component.text("You are currently opted out of Player Punches!", NamedTextColor.RED));
+			} else {
+				close();
+				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.PLAYERS, 1, 1);
+				player.sendMessage(
+					Component.text("Player Punches are only accessible to ", NamedTextColor.RED)
+						.append(Component.text("patrons", NamedTextColor.GOLD))
+						.append(Component.text(", ", NamedTextColor.RED))
+						.append(Component.text("moderators, and ", NamedTextColor.RED))
+						.append(Component.text("developers", NamedTextColor.DARK_GREEN))
+						.append(Component.text("!", NamedTextColor.RED))
+				);
 			}
 			return;
 		} else if (mDisplayPage == null && slot == VANITY_LOC) {
@@ -286,7 +309,7 @@ public class CosmeticsGUI extends CustomInventory {
 
 		// Get list of cosmetics
 		List<Cosmetic> playerCosmetics = mCurrentAbility != null && mCurrentAbility.getLinkedSpell() == null ? List.of()
-			                                 : CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(targetPlayer, mDisplayPage, mCurrentAbility);
+			: CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(targetPlayer, mDisplayPage, mCurrentAbility);
 		if (playerCosmetics == null) {
 			mDisplayPage = null;
 			setUpCosmetics(targetPlayer);
@@ -298,7 +321,7 @@ public class CosmeticsGUI extends CustomInventory {
 		{
 			ItemStack passSummary = new ItemStack(Material.BOOK, 1);
 			ItemMeta meta = passSummary.getItemMeta();
-			meta.displayName(Component.text("Displaying Unlocked " + mDisplayPage.getDisplayName() + "s", TextColor.color(DepthsUtils.FROSTBORN)).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			meta.displayName(Component.text("Displaying Unlocked " + mDisplayPage.getDisplayNamePlural(), TextColor.color(DepthsUtils.FROSTBORN)).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 
 			if (mDisplayPage.isEquippable()) {
@@ -371,7 +394,7 @@ public class CosmeticsGUI extends CustomInventory {
 		mCurrentSpec = null;
 		mCurrentAbility = null;
 
-		ItemStack titleItem = GUIUtils.createBasicItem(CosmeticType.TITLE.getDisplayItem(null), "Titles", NamedTextColor.GOLD, true, "Select a title to be displayed above your head for other players", NamedTextColor.GRAY);
+		ItemStack titleItem = GUIUtils.createBasicItem(CosmeticType.TITLE.getDisplayItem(null), "Titles", NamedTextColor.GOLD, true, "Select a title to be displayed above your head for other players.", NamedTextColor.GRAY);
 		mInventory.setItem(TITLE_LOC, titleItem);
 
 		ItemStack eliteItem = GUIUtils.createBasicItem(CosmeticType.ELITE_FINISHER.getDisplayItem(null), "Elite Finishers", NamedTextColor.GOLD, true, "Select an effect to play when you kill an elite mob.", NamedTextColor.GRAY);
@@ -380,13 +403,16 @@ public class CosmeticsGUI extends CustomInventory {
 		ItemStack cosmeticSkillItem = GUIUtils.createBasicItem(CosmeticType.COSMETIC_SKILL.getDisplayItem(null), "Cosmetic Skills", NamedTextColor.GOLD, true, "Select cosmetic effects for ability casts.", NamedTextColor.GRAY);
 		mInventory.setItem(COSMETIC_SKILL_LOC, cosmeticSkillItem);
 
-		ItemStack gravePoseItem = GUIUtils.createBasicItem(CosmeticType.GRAVE_POSE.getDisplayItem(null), "Grave Poses", NamedTextColor.GOLD, true, "Select a pose for your graves to take on. Only accessible to Patrons.", NamedTextColor.GRAY);
+		ItemStack gravePoseItem = GUIUtils.createBasicItem(CosmeticType.GRAVE_POSE.getDisplayItem(null), "Grave Poses", NamedTextColor.GOLD, true, "Select a pose for your graves to take on. Only accessible to patrons.", NamedTextColor.GRAY);
 		mInventory.setItem(GRAVE_POSE_LOC, gravePoseItem);
 
-		ItemStack vanityItem = GUIUtils.createBasicItem(CosmeticType.VANITY.getDisplayItem(null), "Vanity Manager", NamedTextColor.GOLD, true, "Control your equipped vanity items.", NamedTextColor.GRAY);
+		ItemStack playerPunchItem = GUIUtils.createBasicItem(CosmeticType.PLAYER_PUNCH.getDisplayItem(null), "Player Punches", NamedTextColor.GOLD, true, "Select a style for your punch ability. Only accessible to patrons, moderators, and developers on guildplots, playerplots, and plots.", NamedTextColor.GRAY);
+		mInventory.setItem(PLAYER_PUNCH_LOC, playerPunchItem);
+
+		ItemStack vanityItem = GUIUtils.createBasicItem(CosmeticType.VANITY.getDisplayItem(null), "Vanity Manager", NamedTextColor.GOLD, true, "Manage your equipped vanity items.", NamedTextColor.GRAY);
 		mInventory.setItem(VANITY_LOC, vanityItem);
 
-		ItemStack unlockedVanityItem = GUIUtils.createBasicItem(Material.LEATHER_CHESTPLATE, "Show Unlocked Vanity", NamedTextColor.GOLD, true, "Shows all unlocked vanity items.", NamedTextColor.GRAY);
+		ItemStack unlockedVanityItem = GUIUtils.createBasicItem(Material.LEATHER_CHESTPLATE, "Show Unlocked Vanity", NamedTextColor.GOLD, true, "View all of your unlocked vanity items.", NamedTextColor.GRAY);
 		mInventory.setItem(UNLOCKED_VANITY_LOC, unlockedVanityItem);
 	}
 

@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.rogue.assassin;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.assassin.CoupDeGraceCS;
@@ -31,10 +33,6 @@ public class CoupDeGrace extends Ability {
 	private static final double COUP_1_ELITE_THRESHOLD = 0.2;
 	private static final double COUP_2_ELITE_THRESHOLD = 0.3;
 
-	private final double mNormalThreshold;
-	private final double mEliteThreshold;
-	private final CoupDeGraceCS mCosmetic;
-
 	public static final String CHARM_THRESHOLD = "Coup de Grace Threshold";
 	public static final String CHARM_NORMAL = "Coup de Grace Normal Enemy Threshold";
 	public static final String CHARM_ELITE = "Coup de Grace Elite Threshold";
@@ -44,16 +42,14 @@ public class CoupDeGrace extends Ability {
 			.linkedSpell(ClassAbility.COUP_DE_GRACE)
 			.scoreboardId("CoupDeGrace")
 			.shorthandName("CdG")
-			.descriptions(
-				String.format("If melee damage you deal brings a normal mob under %s%% health, they die instantly. The threshold for elites is %s%% health.",
-					(int) (COUP_1_NORMAL_THRESHOLD * 100),
-					(int) (COUP_1_ELITE_THRESHOLD * 100)),
-				String.format("The health threshold is increased to %s%% for normal enemies and %s%% for elites.",
-					(int) (COUP_2_NORMAL_THRESHOLD * 100),
-					(int) (COUP_2_ELITE_THRESHOLD * 100)))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Instantly kill mobs brought below a health threshold.")
 			.displayItem(Material.WITHER_SKELETON_SKULL)
 			.priorityAmount(5000); // after all damage modifiers to get the proper final damage
+
+	private final double mNormalThreshold;
+	private final double mEliteThreshold;
+	private final CoupDeGraceCS mCosmetic;
 
 	public CoupDeGrace(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -66,10 +62,10 @@ public class CoupDeGrace extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)
-			    && !EntityUtils.isBoss(enemy)
-			    && !DamageUtils.isImmuneToDamage(enemy, DamageType.MELEE)
-			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH
-				        || event.getAbility() == ClassAbility.QUAKE || event.getAbility() == ClassAbility.SKIRMISHER)) {
+			&& !EntityUtils.isBoss(enemy)
+			&& !DamageUtils.isImmuneToDamage(enemy, DamageType.MELEE)
+			&& (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH
+			|| event.getAbility() == ClassAbility.QUAKE || event.getAbility() == ClassAbility.SKIRMISHER)) {
 			// Cannot currently get the real final damage, as some effects like vulnerability will modify it later.
 			// Thus, just check the mob's health a tick later.
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
@@ -89,4 +85,21 @@ public class CoupDeGrace extends Ability {
 		}
 	}
 
+	private static Description<CoupDeGrace> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("If melee damage you deal brings a normal mob below ")
+			.addPercent(a -> a.mNormalThreshold, COUP_1_NORMAL_THRESHOLD, false, Ability::isLevelOne)
+			.add(" health or an Elite mob below ")
+			.addPercent(a -> a.mEliteThreshold, COUP_1_ELITE_THRESHOLD, false, Ability::isLevelOne)
+			.add(" health, they die instantly.");
+	}
+
+	private static Description<CoupDeGrace> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The health threshold is increased to ")
+			.addPercent(a -> a.mNormalThreshold, COUP_2_NORMAL_THRESHOLD, false, Ability::isLevelTwo)
+			.add(" for normal enemies and ")
+			.addPercent(a -> a.mEliteThreshold, COUP_2_ELITE_THRESHOLD, false, Ability::isLevelTwo)
+			.add(" for Elites.");
+	}
 }

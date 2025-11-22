@@ -8,10 +8,6 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 public class PufferfishOverride extends BaseOverride {
 	@Override
 	public boolean playerItemConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event) {
-		if (player == null || InventoryUtils.testForItemWithName(event.getItem(), "Magic Fish", true)) {
-			return false;
-		}
-
-		return true;
+		return player != null && !InventoryUtils.testForItemWithName(event.getItem(), "Magic Fish", true);
 	}
 }

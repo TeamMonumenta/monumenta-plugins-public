@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.BladeDanceCS;
@@ -52,37 +54,27 @@ public class BladeDance extends Ability {
 			.scoreboardId("BladeDance")
 			.shorthandName("BD")
 			.actionBarColor(TextColor.color(150, 0, 0))
-			.descriptions(
-				String.format("When holding two swords, press the drop key to enter a defensive stance, " +
-					              "parrying all attacks and becoming invulnerable for 0.75 seconds. " +
-					              "Afterwards, unleash a powerful attack that deals %s melee damage to enemies in a %s block radius. " +
-					              "Damaged enemies are rooted for %s seconds. Cooldown: %ss.",
-					DANCE_1_DAMAGE,
-					DANCE_RADIUS,
-					SLOW_DURATION_1 / 20,
-					COOLDOWN_1 / 20
-				),
-				String.format("The area attack now deals %s damage and roots for %ss. Cooldown: %ss.",
-					DANCE_2_DAMAGE,
-					SLOW_DURATION_2 / 20.0,
-					COOLDOWN_2 / 20))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Damage nearby mobs and become immune to damage for a short time.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BladeDance::cast, new AbilityTrigger(AbilityTrigger.Key.DROP),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
 			.displayItem(Material.STRING);
 
-
+	private final double mRadius;
 	private final double mDamage;
 	private final int mSlowDuration;
+	private final int mInvulnDuration;
 	private boolean mIsActive = false;
 
 	private final BladeDanceCS mCosmetic;
 
 	public BladeDance(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, DANCE_RADIUS);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DANCE_1_DAMAGE : DANCE_2_DAMAGE);
 		mSlowDuration = CharmManager.getDuration(player, CHARM_ROOT, (isLevelOne() ? SLOW_DURATION_1 : SLOW_DURATION_2));
+		mInvulnDuration = CharmManager.getDuration(mPlayer, CHARM_RESIST, INVULN_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BladeDanceCS());
 	}
 
@@ -90,7 +82,6 @@ public class BladeDance extends Ability {
 		if (isOnCooldown()) {
 			return false;
 		}
-		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, DANCE_RADIUS);
 
 		World world = mPlayer.getWorld();
 		mCosmetic.danceStart(mPlayer, world, mPlayer.getLocation());
@@ -98,19 +89,20 @@ public class BladeDance extends Ability {
 		mIsActive = true;
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
+			final int mDuration = CharmManager.getDuration(mPlayer, CHARM_RESIST, INVULN_DURATION);
 
 			@Override
 			public void run() {
 				mTicks += 1;
 				Location loc = mPlayer.getLocation();
-				mCosmetic.danceTick(mPlayer, world, loc, mTicks, radius);
+				mCosmetic.danceTick(mPlayer, world, loc, mTicks, mInvulnDuration, mRadius);
 
-				if (mTicks >= CharmManager.getDuration(mPlayer, CHARM_RESIST, INVULN_DURATION)) {
+				if (mTicks >= mInvulnDuration) {
 					mIsActive = false;
 
-					mCosmetic.danceEnd(mPlayer, world, loc, radius);
+					mCosmetic.danceEnd(mPlayer, world, loc, mRadius);
 
-					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius);
+					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), mRadius);
 					for (LivingEntity mob : hitbox.getHitMobs()) {
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
 						MovementUtils.knockAway(mPlayer, mob, DANCE_KNOCKBACK_SPEED, true);
@@ -137,5 +129,30 @@ public class BladeDance extends Ability {
 			event.setFlatDamage(0);
 			event.setCancelled(true);
 		}
+	}
+
+	private static Description<BladeDance> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to enter a defensive stance, parrying all attacks and becoming invulnerable for ")
+			.addDuration(a -> a.mInvulnDuration, INVULN_DURATION)
+			.add(" seconds. Afterwards, unleash a powerful attack that deals ")
+			.add(a -> a.mDamage, DANCE_1_DAMAGE, false, Ability::isLevelOne)
+			.add(" melee damage to mobs within ")
+			.add(a -> a.mRadius, DANCE_RADIUS)
+			.add(" blocks and roots them for ")
+			.addDuration(a -> a.mSlowDuration, SLOW_DURATION_1, false, Ability::isLevelOne)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+	}
+
+	private static Description<BladeDance> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mDamage, DANCE_2_DAMAGE, false, Ability::isLevelTwo)
+			.add(" and root duration is increased to ")
+			.addDuration(a -> a.mSlowDuration, SLOW_DURATION_2, false, Ability::isLevelTwo)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
 	}
 }

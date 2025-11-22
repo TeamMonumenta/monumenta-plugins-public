@@ -70,7 +70,7 @@ public class SpellVesperidysTeleport extends Spell {
 		mTicks += 5;
 
 		if (((mTicks >= 25 * 20 && !mVesperidys.mAutoAttack.isRunning())
-			 || (mVesperidys.mSpawnLoc.getY() - mBoss.getLocation().getY() > 5))
+			|| (mVesperidys.mSpawnLoc.getY() - mBoss.getLocation().getY() > 5))
 			&& !mTeleporting
 			&& !mVesperidys.mInvincible
 			&& !mVesperidys.mDefeated) {
@@ -96,7 +96,7 @@ public class SpellVesperidysTeleport extends Spell {
 		// Prioritizes platforms which doesn't have adds on it.
 		for (Vesperidys.Platform platform : platforms) {
 			selectedPlatform = platform;
-			if (platform.getMobsOnPlatform().size() <= 0 && platform.getPlayersOnPlatform().size() <= 0) {
+			if (platform.getMobsOnPlatform().isEmpty() && platform.getPlayersOnPlatform().isEmpty()) {
 				break;
 			}
 		}
@@ -109,7 +109,7 @@ public class SpellVesperidysTeleport extends Spell {
 			newLoc = selectedPlatform.getCenter();
 		}
 
-			teleport(newLoc, true);
+		teleport(newLoc, true);
 	}
 
 	public void teleportPlatform(int x, int y) {

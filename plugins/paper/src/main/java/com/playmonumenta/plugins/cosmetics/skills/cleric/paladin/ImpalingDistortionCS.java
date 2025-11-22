@@ -60,7 +60,6 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 
 	@Override
 	public void infusionStartEffect(World world, Player player, Location loc, int stacks) {
-		MessagingUtils.sendActionBarMessage(player, "An intense pressure emerges in the air... (" + stacks + ")", TextColor.color(50, 180, 200));
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1.6f, 0.6f);
 		ParticleUtils.explodingRingEffect(Plugin.getInstance(), loc.subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0), 2, 0, 4,
 			List.of(
@@ -109,10 +108,11 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 		new PPLightning(Particle.REDSTONE, loc).maxWidth(2).hopXZ(2).hopY(0).height(6 + 6 * ratio).duration(3).count(12).data(CYAN).spawnAsPlayerActive(player);
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				for (int i = 0; i < Math.max(1, ratio * 4); i++) {
-					Particle.DustOptions colorTransition = new Particle.DustOptions(Color.fromRGB(30 * mTicks, 200 - 20*mTicks, 200), 1.1f);
+					Particle.DustOptions colorTransition = new Particle.DustOptions(Color.fromRGB(30 * mTicks, 200 - 20 * mTicks, 200), 1.1f);
 					Location loc = damagee.getLocation().add(FastUtils.randomDoubleInRange(-mTicks - 2, mTicks + 2), 0.5 * damagee.getHeight() + FastUtils.randomDoubleInRange(-mTicks + 2, mTicks + 2), FastUtils.randomDoubleInRange(-mTicks - 2, mTicks + 2));
 					Vector dir = LocationUtils.getDirectionTo(damagee.getLocation(), loc);
 					ParticleUtils.drawParticleLineSlash(loc, dir, 0, 3, 0.1, 3,
@@ -143,7 +143,7 @@ public class ImpalingDistortionCS extends LuminousInfusionCS {
 		Location loc4 = loc.clone().add(bottomLeft150);
 		Location loc5 = loc.clone().add(bottomRight150);
 		for (int i = 0; i < 2; i++) {
-			double delta = 0.2*i;
+			double delta = 0.2 * i;
 			final Particle.DustOptions PURPLE = new Particle.DustOptions(Color.fromRGB(140 - 40 * i, 100 - 30 * i, 220 - 50 * i), 1.2f - i * 0.2f);
 			new PPLine(Particle.REDSTONE, loc1, loc2).data(PURPLE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			new PPLine(Particle.REDSTONE, loc1, loc3).data(PURPLE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);

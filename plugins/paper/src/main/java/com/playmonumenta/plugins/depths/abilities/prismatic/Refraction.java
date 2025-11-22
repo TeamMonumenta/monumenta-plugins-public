@@ -260,7 +260,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 							EntityUtils.applyVulnerability(mPlugin, EFFECT_DURATION, 0.1, mob);
 						}
 						if (depthsPlayer.mEligibleTrees.contains(DepthsTree.STEELSAGE)) {
-							EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, 0.1, mob);
+							EntityUtils.applyBleed(mPlugin, mPlayer, mob, 1);
 						}
 					}
 
@@ -317,8 +317,9 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	}
 
 	private static Description<Refraction> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Refraction>(color)
-			.add("Swap hands to begin charging a powerful beam in the direction you face. After a 1 second windup, it releases a beam of prismatic energy that deals ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to begin charging a powerful beam in the direction you face. After a 1 second windup, it releases a beam of prismatic energy that deals ")
 			.addDepthsDamage(a -> DAMAGE[rarity - 1] * 4, DAMAGE[rarity - 1] * 4, true)
 			.add(" magic damage per second for ")
 			.addDuration(a -> DURATION, DURATION)
@@ -344,7 +345,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	}
 
 	private static Description<Refraction> getFrostbornDescription(TextColor color) {
-		return new DescriptionBuilder<Refraction>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nFrostborn").color(TextColor.color(DepthsUtils.FROSTBORN)))
 			.add(" - Apply 10% Slow for ")
 			.addDuration(EFFECT_DURATION)
@@ -352,7 +353,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	}
 
 	private static Description<Refraction> getFlamecallerDescription(TextColor color) {
-		return new DescriptionBuilder<Refraction>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nFlamecaller").color(TextColor.color(DepthsUtils.FLAMECALLER)))
 			.add(" - Apply Fire for ")
 			.addDuration(EFFECT_DURATION)
@@ -360,13 +361,13 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	}
 
 	private static Description<Refraction> getDawnbringerDescription(TextColor color) {
-		return new DescriptionBuilder<Refraction>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nDawnbringer").color(TextColor.color(DepthsUtils.DAWNBRINGER)))
 			.add(" - Apply a 5% Max HP Heal to players hit by the beam.");
 	}
 
 	private static Description<Refraction> getEarthboundDescription(TextColor color) {
-		return new DescriptionBuilder<Refraction>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nEarthbound").color(TextColor.color(DepthsUtils.EARTHBOUND)))
 			.add(" - Apply 10% Resistance for ")
 			.addDuration(BUFF_DURATION)
@@ -374,7 +375,7 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	}
 
 	private static Description<Refraction> getShadowdancerDescription(TextColor color) {
-		return new DescriptionBuilder<Refraction>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nShadowdancer").color(TextColor.color(DepthsUtils.SHADOWDANCER)))
 			.add(" - Apply 10% Vulnerability for ")
 			.addDuration(EFFECT_DURATION)
@@ -382,15 +383,13 @@ public class Refraction extends DepthsAbility implements AbilityWithDuration {
 	}
 
 	private static Description<Refraction> getSteelsageDescription(TextColor color) {
-		return new DescriptionBuilder<Refraction>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nSteelsage").color(TextColor.color(DepthsUtils.STEELSAGE)))
-			.add(" - Apply 10% Bleed for ")
-			.addDuration(EFFECT_DURATION)
-			.add(" seconds to mobs hit by the beam.");
+			.add(" - Apply 1 stack of Bleed to mobs hit by the beam.");
 	}
 
 	private static Description<Refraction> getWindwalkerDescription(TextColor color) {
-		return new DescriptionBuilder<Refraction>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nWindwalker").color(TextColor.color(DepthsUtils.WINDWALKER)))
 			.add(" - Apply 10% Speed for ")
 			.addDuration(BUFF_DURATION)

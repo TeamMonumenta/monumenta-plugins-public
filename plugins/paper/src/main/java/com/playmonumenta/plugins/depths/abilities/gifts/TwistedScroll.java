@@ -32,12 +32,12 @@ public class TwistedScroll extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.TWISTED);
+		dp.addReward(DepthsRoomType.DepthsRewardType.TWISTED);
 		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
 	}
 
 	private static Description<TwistedScroll> getDescription() {
-		return new DescriptionBuilder<TwistedScroll>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Select an ability to upgrade to ")
 			.add(DepthsRarity.TWISTED.getDisplay())
 			.add(" level.");

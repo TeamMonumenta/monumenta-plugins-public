@@ -35,14 +35,14 @@ public class PersistentDataCommand {
 						new CommandAPICommand("get")
 							.withArguments(new LiteralArgument("current-world"))
 							.withArguments(new NamespacedKeyArgument("key")
-								               .replaceSuggestions(ArgumentSuggestions.stringCollection(
-									               info -> {
-										               if (info.sender() instanceof Player player) {
-											               return suggestions(player.getWorld());
-										               } else {
-											               return Collections.emptyList();
-										               }
-									               })))
+								.replaceSuggestions(ArgumentSuggestions.stringCollection(
+									info -> {
+										if (info.sender() instanceof Player player) {
+											return suggestions(player.getWorld());
+										} else {
+											return Collections.emptyList();
+										}
+									})))
 							.executesPlayer((player, args) -> {
 								NamespacedKey key = args.getUnchecked("key");
 								get(player, player.getWorld(), key);
@@ -50,10 +50,10 @@ public class PersistentDataCommand {
 					.withSubcommand(
 						new CommandAPICommand("get")
 							.withArguments(new StringArgument("world")
-								               .replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
+								.replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
 							.withArguments(new NamespacedKeyArgument("key")
-								               .replaceSuggestions(ArgumentSuggestions.stringCollection(
-									               info -> suggestions(Bukkit.getWorld((String) info.previousArgs().getUnchecked("world"))))))
+								.replaceSuggestions(ArgumentSuggestions.stringCollection(
+									info -> suggestions(Bukkit.getWorld((String) info.previousArgs().getUnchecked("world"))))))
 							.executes((sender, args) -> {
 								String worldName = args.getUnchecked("world");
 								World world = Bukkit.getWorld(worldName);
@@ -88,10 +88,10 @@ public class PersistentDataCommand {
 					.withSubcommand(
 						new CommandAPICommand("set")
 							.withArguments(new StringArgument("world")
-								               .replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
+								.replaceSuggestions(ArgumentSuggestions.stringCollection(info -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList())))
 							.withArguments(new NamespacedKeyArgument("key")
-								               .replaceSuggestions(ArgumentSuggestions.stringCollection(
-									               info -> suggestions(Bukkit.getWorld((String) info.previousArgs().getUnchecked("world"))))))
+								.replaceSuggestions(ArgumentSuggestions.stringCollection(
+									info -> suggestions(Bukkit.getWorld((String) info.previousArgs().getUnchecked("world"))))))
 							.withArguments(new MultiLiteralArgument("type", Constants.SupportedPersistentDataType.getLowerCaseNames()))
 							.withArguments(new GreedyStringArgument("value"))
 							.executes((sender, args) -> {
@@ -133,7 +133,7 @@ public class PersistentDataCommand {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static void set(CommandSender sender, World world, NamespacedKey key, String dataType, String valueString) throws WrapperCommandSyntaxException {
 		Constants.SupportedPersistentDataType type;
 		try {

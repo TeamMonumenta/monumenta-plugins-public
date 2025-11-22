@@ -1,10 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -27,61 +24,22 @@ public class SpellBaseAura extends Spell {
 
 	private final Entity mBoss;
 	private final boolean mCancelable;
-	private final double mDX;
-	private final double mDY;
-	private final double mDZ;
-	private final double mParticleDX;
-	private final double mParticleDY;
-	private final double mParticleDZ;
-	private final int mNumParticles;
-	private final @Nullable Particle mParticle;
-	private final @Nullable Object mParticleArg;
+	private final double mHeightClamp;
 	private final @Nullable ApplyAuraEffect mAuraEffect;
 	private final @Nullable SummonParticles mParticlesSummoner;
+	private final double mRadius;
 
+	private int mEffectIter = 0; // Number of effect iterations - rolls around between 0 and 2
 
-	private final int mRadius; // Computed maximum of mDX, mDY, mDZ
-	private int mEffectIter; // Number of effect iterations - rolls around between 0 and 2
-
-	public SpellBaseAura(Entity boss, double dx, double dy, double dz, int numParticles,
-	                     Particle particle, Object particleArg, ApplyAuraEffect auraEffect) {
+	public SpellBaseAura(final Entity boss, final double radius, final double heightClamp,
+	                     final @Nullable SummonParticles particlesSummoner, final @Nullable ApplyAuraEffect auraEffect,
+	                     final boolean stunAffected) {
 		mBoss = boss;
-		// The "radius" thing is just... a mystery. Dividing by 2 is slightly better?
-		mDX = dx;
-		mDY = dy;
-		mDZ = dz;
-		mParticleDX = dx / 2 - 1;
-		mParticleDY = dy / 2 - 1;
-		mParticleDZ = dz / 2 - 1;
-		mNumParticles = numParticles;
-		mParticle = particle;
-		mParticleArg = particleArg;
-		mAuraEffect = auraEffect;
-		mParticlesSummoner = null;
-		mCancelable = false;
-
-		mRadius = (int) Math.max(mDX, Math.max(mDY, mDZ));
-		mEffectIter = 0;
-	}
-
-	public SpellBaseAura(Entity boss, double dx, double dy, double dz, SummonParticles particlesSummoner, @Nullable ApplyAuraEffect auraEffect, boolean stunAffected) {
-		mBoss = boss;
-		// The "radius" thing is just... a mystery. Dividing by 2 is slightly better?
-		mDX = dx;
-		mDY = dy;
-		mDZ = dz;
-		mParticleDX = dx / 2 - 1;
-		mParticleDY = dy / 2 - 1;
-		mParticleDZ = dz / 2 - 1;
-		mNumParticles = 0;
-		mParticle = null;
-		mParticleArg = null;
+		mRadius = radius;
+		mHeightClamp = heightClamp;
 		mAuraEffect = auraEffect;
 		mParticlesSummoner = particlesSummoner;
 		mCancelable = stunAffected;
-
-		mRadius = (int) Math.max(mDX, Math.max(mDY, mDZ));
-		mEffectIter = 0;
 	}
 
 	/*
@@ -92,26 +50,7 @@ public class SpellBaseAura extends Spell {
 	@Override
 	public void run() {
 		if (!mCancelable || (!EntityUtils.isSilenced(mBoss) && !EntityUtils.isStunned(mBoss))) {
-			Location bossLoc = mBoss.getLocation();
-
-			if (mParticle != null) {
-				if (mParticleArg != null) {
-					// Generate particles in area
-					new PartialParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ, mParticleArg)
-						.conditional(p -> !p.getScoreboardTags().contains("noAuraParticles"))
-						.spawnAsEntityActive(mBoss);
-					// Generate particles immediately around boss
-					new PartialParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1, mParticleArg).spawnAsEntityActive(mBoss);
-				} else {
-					// Generate particles in area
-					new PartialParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ)
-						.conditional(p -> !p.getScoreboardTags().contains("noAuraParticles"))
-						.spawnAsEntityActive(mBoss);
-					// Generate particles immediately around boss
-					new PartialParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1).spawnAsEntityActive(mBoss);
-				}
-			} else if (mParticlesSummoner != null) {
-				//new version using particlesSummoner
+			if (mParticlesSummoner != null) {
 				mParticlesSummoner.run(mBoss);
 			}
 
@@ -121,15 +60,12 @@ public class SpellBaseAura extends Spell {
 				if (mEffectIter >= 2) {
 					mEffectIter = 0;
 
-					for (Player player : PlayerUtils.playersInRange(bossLoc, mRadius, true)) {
-						Location playerLoc = player.getLocation();
-						if (Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
-							    Math.abs(playerLoc.getY() - bossLoc.getY()) < mDY &&
-							    Math.abs(playerLoc.getZ() - bossLoc.getZ()) < mDZ) {
-							// Player is within range
+					PlayerUtils.playersInRange(mBoss.getLocation(), mRadius, true).forEach(player -> {
+						if (Math.abs(player.getLocation().getY() - mBoss.getLocation().getY()) < mHeightClamp) {
+							// Player is within height clamp and radius
 							mAuraEffect.run(player);
 						}
-					}
+					});
 				}
 			}
 		}

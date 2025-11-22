@@ -115,7 +115,7 @@ public class MarketGui extends Gui {
 	@Override
 	protected void onPlayerInventoryClick(InventoryClickEvent event) {
 		if (mCurrentTab == TAB_ADD_LISTING) {
-			((TabAddListing)this.TAB_ADD_LISTING).onPlayerInventoryClickEvt(event);
+			((TabAddListing) this.TAB_ADD_LISTING).onPlayerInventoryClickEvt(event);
 		}
 	}
 

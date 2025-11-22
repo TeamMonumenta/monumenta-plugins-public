@@ -40,12 +40,12 @@ public class RestartEmptyCommand {
 				sender.sendMessage("Server is already pending restart");
 			}
 		} else if (cancel) {
-				sender.sendMessage("Nothing changed, server was not pending restart");
+			sender.sendMessage("Nothing changed, server was not pending restart");
 		} else {
 			TASK = new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (Bukkit.getOnlinePlayers().size() == 0) {
+					if (Bukkit.getOnlinePlayers().isEmpty()) {
 						this.cancel();
 						TASK = null;
 						plugin.getLogger().info("restart-empty: Restarting server now that it is empty");

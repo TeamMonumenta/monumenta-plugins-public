@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -16,9 +19,9 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -64,20 +67,7 @@ public class VoodooBonds extends MultipleChargeAbility {
 			.linkedSpell(ClassAbility.VOODOO_BONDS)
 			.scoreboardId("VoodooBonds")
 			.shorthandName("VB")
-			.descriptions(
-				("Left click while sprinting and holding a scythe to slash in a small arc and fire a pin that travels for %s blocks. " +
-					"Mobs hit take %s melee damage and are cursed for %ss. When a cursed mob takes melee, projectile, or magic damage (except from this ability), all other cursed mobs within %s blocks take %s%% of the suffered damage. " +
-					"Critical melee hits against cursed mobs will spread it to %s other un-cursed mob within %s blocks. " +
-					"Players hit are bonded to you instead; the next hit they take within the next %ss will be redirected to you based on the percentage of health that player would have lost, but cannot reduce your health below 1. " +
-					"Charges: %s. Charge Cooldown: %ss.")
-				.formatted(StringUtils.to2DP(RANGE), StringUtils.to2DP(PIN_DAMAGE), StringUtils.ticksToSeconds(CURSE_DURATION),
-					StringUtils.to2DP(CURSE_RADIUS), StringUtils.multiplierToPercentage(CURSE_DAMAGE_1),
-					StringUtils.to2DP(CURSE_SPREAD_COUNT_1), StringUtils.to2DP(CURSE_SPREAD_RADIUS),
-					StringUtils.ticksToSeconds(PROTECTION_DURATION), MAX_CHARGES, StringUtils.ticksToSeconds(COOLDOWN)),
-				("The curse now deals %s%% of taken damage, and it spreads to %s other mobs on critical strikes. " +
-					"The slash and pin deal %s additional damage to already-cursed mobs. " +
-					"Take %s%% less damage when redirecting damage from other players.")
-					.formatted(StringUtils.multiplierToPercentage(CURSE_DAMAGE_2), CURSE_SPREAD_COUNT_2, StringUtils.to2DP(PIN_ADDITIONAL_DAMAGE), StringUtils.multiplierToPercentage(PROTECTION_RESIST)))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Slash and fire a pin that curses mobs and protects players.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", VoodooBonds::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sprinting(true), AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
@@ -133,11 +123,11 @@ public class VoodooBonds extends MultipleChargeAbility {
 
 	public void launchPin(Location startLoc, Vector direction) {
 		Location endLoc = LocationUtils.rayTraceToBlock(startLoc, direction, mRange, null);
-		HashSet<LivingEntity> hitMobs = new HashSet<>(EntityUtils.getMobsInLine(startLoc, endLoc, 0.4)); // Set, as to not double-count mobs
+		Set<LivingEntity> hitMobs = new HashSet<>(EntityUtils.getMobsInLine(startLoc, endLoc, 0.4)); // Set, as to not double-count mobs
 		hitMobs.addAll(Hitbox.approximateCone(mPlayer.getEyeLocation(), 5, Math.toRadians(45)).getHitMobs());
 		for (LivingEntity mob : hitMobs) {
 			mCosmetic.hitMob(mPlayer, mob);
-			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MELEE_SKILL, mPinDamage, ClassAbility.VOODOO_BONDS, true, true);
+			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MELEE_SKILL, mPinDamage, ClassAbility.VOODOO_BONDS_PIN, true, true);
 
 			if (isLevelTwo() && mPlugin.mEffectManager.hasEffect(mob, CURSE_EFFECT)) {
 				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MELEE_SKILL, mPinAdditionalDamage, ClassAbility.VOODOO_BONDS, true, false);
@@ -154,5 +144,43 @@ public class VoodooBonds extends MultipleChargeAbility {
 		}
 
 		mCosmetic.launchPin(mPlayer, startLoc, endLoc);
+	}
+
+	private static Description<VoodooBonds> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to slash in a small arc and fire a pin that travels ")
+			.add(a -> a.mRange, RANGE)
+			.add(" blocks. Mobs hit take ")
+			.add(a -> a.mPinDamage, PIN_DAMAGE)
+			.add(" melee damage and are cursed for ")
+			.addDuration(a -> a.mCurseDuration, CURSE_DURATION)
+			.add(" seconds. When a cursed mob takes melee, projectile, or magic damage (except from this ability), all other cursed mobs within ")
+			.add(a -> a.mCurseRadius, CURSE_RADIUS)
+			.add(" blocks take ")
+			.addPercent(a -> a.mCurseDamage, CURSE_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" of the suffered damage. Critical melee hits against cursed mobs will spread it to ")
+			.add(a -> a.mCurseSpreadCount, CURSE_SPREAD_COUNT_1, false, Ability::isLevelOne)
+			.add(" other un-cursed mob within ")
+			.add(a -> a.mCurseSpreadRadius, CURSE_SPREAD_RADIUS)
+			.add(" blocks. Players hit are bonded to you instead; the next hit they take within ")
+			.addDuration(a -> a.mProtectionDuration, PROTECTION_DURATION)
+			.add(" seconds will be redirected to you based on the percentage of health that player would have lost, but cannot reduce your health below 1. Charges: ")
+			.add(a -> a.mMaxCharges, MAX_CHARGES)
+			.add(".")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<VoodooBonds> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The curse now deals ")
+			.addPercent(a -> a.mCurseDamage, CURSE_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" of taken damage, and it spreads to ")
+			.add(a -> a.mCurseSpreadCount, CURSE_SPREAD_COUNT_2, false, Ability::isLevelTwo)
+			.add(" other mobs on critical strikes. The slash and pin deal ")
+			.add(a -> a.mPinAdditionalDamage, PIN_ADDITIONAL_DAMAGE)
+			.add(" additional damage to already-cursed mobs. Take ")
+			.addPercent(a -> a.mProtectionResist, PROTECTION_RESIST)
+			.add(" less damage when redirecting damage from other players.");
 	}
 }

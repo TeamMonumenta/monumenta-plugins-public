@@ -14,6 +14,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -36,17 +37,26 @@ public class HexfallRespawnBoss extends BossAbilityGroup {
 		@BossParam(help = "amount of time between death and respawn, in ticks")
 		public int RESPAWN_DELAY = 20;
 		@BossParam(help = "sound played when this ability triggers")
-		public SoundsList SOUND_TRIGGERED = SoundsList.fromString("[(ENTITY_WITHER_SKELETON_HURT,1,0.75)]");
+		public SoundsList SOUND_TRIGGERED = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WITHER_SKELETON_HURT, 1.0f, 0.75f))
+			.build();
 		@BossParam(help = "particles played when this ability triggers")
-		public ParticlesList PARTICLE_TRIGGERED = ParticlesList.fromString("[]");
+		public ParticlesList PARTICLE_TRIGGERED = ParticlesList.EMPTY;
 		@BossParam(help = "particle line to the respawn location")
 		public Particle PARTICLE_LINE = Particle.TOTEM;
 		@BossParam(help = "particles played at the location the mob will respawn at")
-		public ParticlesList PARTICLE_LOCATION = ParticlesList.fromString("[(TOTEM,1,0,0,0,0.4)]");
+		public ParticlesList PARTICLE_LOCATION = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.TOTEM, 1, 0.0, 0.0, 0.0, 0.4))
+			.build();
 		@BossParam(help = "sound played at the mob when it respawns")
-		public SoundsList SOUND_RESPAWNED = SoundsList.fromString("[(ITEM_TOTEM_USE,0.8,1.5)]");
+		public SoundsList SOUND_RESPAWNED = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_TOTEM_USE, 0.8f, 1.5f))
+			.build();
 		@BossParam(help = "particles played at the mob when it respawns")
-		public ParticlesList PARTICLE_RESPAWNED = ParticlesList.fromString("[(TOTEM,30,0,0,0,0.8),(BLOCK_CRACK,15,0.2,0.2,0.2,0,BLUE_ORCHID)]");
+		public ParticlesList PARTICLE_RESPAWNED = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.TOTEM, 30, 0.0, 0.0, 0.0, 0.8))
+			.add(new ParticlesList.CParticle(Particle.BLOCK_CRACK, 15, 0.2, 0.2, 0.2, 0.0, Material.BLUE_ORCHID.createBlockData()))
+			.build();
 	}
 
 	private final Parameters mParams;
@@ -60,7 +70,7 @@ public class HexfallRespawnBoss extends BossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		Location loc = mBoss.getLocation();
-		List<Block> blocks = BlockUtils.getBlocksInCylinder(loc, mParams.RESPAWN_LOCATION_RADIUS);
+		List<Block> blocks = BlockUtils.getBlocksInSphere(loc, mParams.RESPAWN_LOCATION_RADIUS);
 		blocks.removeIf(block -> !block.getType().equals(mParams.RESPAWN_LOCATION_MATERIAL));
 		Collections.shuffle(blocks);
 		if (!blocks.isEmpty()) {
@@ -73,6 +83,7 @@ public class HexfallRespawnBoss extends BossAbilityGroup {
 			new BukkitRunnable() {
 				int mTicks = 0;
 				final Location mLoc = respawnLoc.clone();
+
 				@Override
 				public void run() {
 					mParams.PARTICLE_LOCATION.spawn(mBoss, mLoc);

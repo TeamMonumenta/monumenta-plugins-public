@@ -36,12 +36,12 @@ public class SpellDelayedAction extends Spell {
 		void run(Location loc);
 	}
 
-	private Plugin mPlugin;
-	private Location mLoc;
-	private int mDelayTicks;
-	private StartAction mStartAction;
-	private WarningAction mWarningAction;
-	private EndAction mEndAction;
+	private final Plugin mPlugin;
+	private final Location mLoc;
+	private final int mDelayTicks;
+	private final StartAction mStartAction;
+	private final WarningAction mWarningAction;
+	private final EndAction mEndAction;
 
 	public SpellDelayedAction(Plugin plugin, Location loc, int delayTicks,
 	                          StartAction start, WarningAction warning, EndAction end) {

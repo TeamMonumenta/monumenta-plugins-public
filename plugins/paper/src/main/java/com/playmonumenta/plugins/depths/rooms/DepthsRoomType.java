@@ -44,9 +44,9 @@ public enum DepthsRoomType {
 
 	public enum DepthsRewardType {
 		ABILITY, ABILITY_ELITE, UPGRADE, UPGRADE_ELITE, TWISTED, PRISMATIC, CURSE, GENEROSITY, GIFT,
-		WEBBING, POINTED, GRIMOIRE, POETS, STATUE;
+		WEBBING, POINTED, GRIMOIRE, POETS, STATUE, CUBE;
 
-		public static final List<DepthsRewardType> GIFT_REWARDS = List.of(WEBBING, POINTED, GRIMOIRE, POETS, STATUE);
+		public static final List<DepthsRewardType> GIFT_REWARDS = List.of(WEBBING, POINTED, GRIMOIRE, POETS, STATUE, CUBE);
 	}
 }
 

@@ -3,17 +3,16 @@ package com.playmonumenta.plugins.abilities.shaman;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.InterconnectedHavocCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
@@ -47,18 +46,7 @@ public class InterconnectedHavoc extends Ability {
 			.linkedSpell(ClassAbility.INTERCONNECTED_HAVOC)
 			.scoreboardId("InterHavoc")
 			.shorthandName("IH")
-			.descriptions(
-				String.format("Totems form a line between them with a maximum distance of %s, and mobs that cross those lines are dealt %s magic damage per second within that line.",
-					RANGE_1,
-					DAMAGE_1
-				),
-				String.format("Magic damage is increased to %s, and the maximum distance is now %s.",
-					DAMAGE_2,
-					RANGE_2),
-				String.format("Mobs are now knocked back from the player when coming in contact " +
-						"with the line for the first time and are stunned for %ss.",
-					StringUtils.ticksToSeconds(STUN_TIME))
-			)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Forms lines between your active totems, dealing damage to mobs crossing those lines.")
 			.quest216Message("-------e-------r-------")
 			.displayItem(Material.CHAIN);
@@ -67,12 +55,9 @@ public class InterconnectedHavoc extends Ability {
 
 	public InterconnectedHavoc(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, isLevelOne() ? RANGE_1 : RANGE_2);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mKnockback = (float) CharmManager.getExtraPercent(mPlayer, CHARM_ENHANCEMENT_KNOCKBACK, KNOCKBACK);
+		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCEMENT_KNOCKBACK, KNOCKBACK);
 		mStunTime = CharmManager.getDuration(mPlayer, CHARM_ENHANCEMENT_STUN, STUN_TIME);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new InterconnectedHavocCS());
 	}
@@ -120,5 +105,30 @@ public class InterconnectedHavoc extends Ability {
 				mClearTimer = 0;
 			}
 		}
+	}
+
+	private static Description<InterconnectedHavoc> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Totems form a line between them with a maximum distance of ")
+			.add(a -> a.mRange, RANGE_1, false, Ability::isLevelOne)
+			.add(". Mobs take ")
+			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage each second while intersecting a line.");
+	}
+
+	private static Description<InterconnectedHavoc> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(". Maximum distance is increased to ")
+			.add(a -> a.mRange, RANGE_2, false, Ability::isLevelTwo)
+			.add(" blocks.");
+	}
+
+	private static Description<InterconnectedHavoc> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Mobs are now knocked back from the player and stunned for ")
+			.addDuration(a -> a.mStunTime, STUN_TIME)
+			.add(" seconds when coming in contact with a line for the first time.");
 	}
 }

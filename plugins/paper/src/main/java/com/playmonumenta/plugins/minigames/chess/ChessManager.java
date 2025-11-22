@@ -87,16 +87,16 @@ public class ChessManager implements Listener {
 			arguments.add(new StringArgument("Board Name"));
 			arguments.add(new LiteralArgument("create"));
 			arguments.add(new MultiLiteralArgument("type",
-					ChessBoardType.PVP.name(),
-					ChessBoardType.PVAI.name()));
+				ChessBoardType.PVP.name(),
+				ChessBoardType.PVAI.name()));
 
 			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
+				.withPermission(perms)
+				.withArguments(arguments)
 				.withOptionalArguments(new GreedyStringArgument("fen String"))
-					.executes((sender, args) -> {
-						createBoard(args.getUnchecked("Board Name"), ChessBoardType.valueOf(args.getUnchecked("type")), args.getOrDefaultUnchecked("fen String", FEN_DEFAULT_BOARD_STRING));
-					}).register();
+				.executes((sender, args) -> {
+					createBoard(args.getUnchecked("Board Name"), ChessBoardType.valueOf(args.getUnchecked("type")), args.getOrDefaultUnchecked("fen String", FEN_DEFAULT_BOARD_STRING));
+				}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
@@ -104,22 +104,22 @@ public class ChessManager implements Listener {
 			arguments.add(new LiteralArgument("get"));
 			arguments.add(new LiteralArgument("fen"));
 			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						printCurrentChessBoardFenString(sender, args.getUnchecked("Board Name"));
-					}).register();
+				.withPermission(perms)
+				.withArguments(arguments)
+				.executes((sender, args) -> {
+					printCurrentChessBoardFenString(sender, args.getUnchecked("Board Name"));
+				}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
 				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new LiteralArgument("restart"));
 			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						restartBoard(args.getUnchecked("Board Name"));
-					}).register();
+				.withPermission(perms)
+				.withArguments(arguments)
+				.executes((sender, args) -> {
+					restartBoard(args.getUnchecked("Board Name"));
+				}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
@@ -128,42 +128,42 @@ public class ChessManager implements Listener {
 			arguments.add(new LiteralArgument("fen"));
 			arguments.add(new GreedyStringArgument("fen String"));
 			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						String boardName = args.getUnchecked("Board Name");
-						ChessBoard board = mBoards.get(boardName);
-						if (board == null) {
-							throw CommandAPI.failWithString("Invalid name, Board: " + boardName + " doesn't exists");
-						}
-						board.buildBoardFromString(args.getUnchecked("fen String"));
+				.withPermission(perms)
+				.withArguments(arguments)
+				.executes((sender, args) -> {
+					String boardName = args.getUnchecked("Board Name");
+					ChessBoard board = mBoards.get(boardName);
+					if (board == null) {
+						throw CommandAPI.failWithString("Invalid name, Board: " + boardName + " doesn't exists");
+					}
+					board.buildBoardFromString(args.getUnchecked("fen String"));
 
-						for (ChessInterface chessInterface : mBoardsInterfaces.get(board)) {
-							chessInterface.refresh();
-						}
-					}).register();
+					for (ChessInterface chessInterface : mBoardsInterfaces.get(board)) {
+						chessInterface.refresh();
+					}
+				}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
 				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new LiteralArgument("delete"));
 			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						deleteBoard(args.getUnchecked("Board Name"));
-					}).register();
+				.withPermission(perms)
+				.withArguments(arguments)
+				.executes((sender, args) -> {
+					deleteBoard(args.getUnchecked("Board Name"));
+				}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
 				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new LiteralArgument("refresh"));
 			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						refreshGuis(args.getUnchecked("Board Name"));
-					}).register();
+				.withPermission(perms)
+				.withArguments(arguments)
+				.executes((sender, args) -> {
+					refreshGuis(args.getUnchecked("Board Name"));
+				}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
@@ -171,24 +171,24 @@ public class ChessManager implements Listener {
 			arguments.add(new LiteralArgument("set"));
 			arguments.add(new LiteralArgument("piece"));
 			arguments.add(new MultiLiteralArgument("piecetype",
-					ChessPieceType.BISHOPS.name(),
-					ChessPieceType.KING.name(),
-					ChessPieceType.KNIGHTS.name(),
-					ChessPieceType.PAWNS.name(),
-					ChessPieceType.QUEEN.name(),
-					ChessPieceType.ROOKS.name()));
+				ChessPieceType.BISHOPS.name(),
+				ChessPieceType.KING.name(),
+				ChessPieceType.KNIGHTS.name(),
+				ChessPieceType.PAWNS.name(),
+				ChessPieceType.QUEEN.name(),
+				ChessPieceType.ROOKS.name()));
 
 			arguments.add(new MultiLiteralArgument("team",
-					ChessTeam.BLACK.name(),
-					ChessTeam.WHITE.name()));
+				ChessTeam.BLACK.name(),
+				ChessTeam.WHITE.name()));
 			arguments.add(new IntegerArgument("Position", 0, 63));
 
 			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						setPiece(args.getUnchecked("Board Name"), args.getUnchecked("piecetype"), args.getUnchecked("team"), args.getUnchecked("Position"));
-					}).register();
+				.withPermission(perms)
+				.withArguments(arguments)
+				.executes((sender, args) -> {
+					setPiece(args.getUnchecked("Board Name"), args.getUnchecked("piecetype"), args.getUnchecked("team"), args.getUnchecked("Position"));
+				}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
@@ -198,11 +198,11 @@ public class ChessManager implements Listener {
 			arguments.add(new MultiLiteralArgument("team", "white", "black"));
 			arguments.add(new PlayerArgument("player"));
 			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						setPlayer(args.getUnchecked("Board Name"), args.getUnchecked("player"), args.getUnchecked("team"));
-					}).register();
+				.withPermission(perms)
+				.withArguments(arguments)
+				.executes((sender, args) -> {
+					setPlayer(args.getUnchecked("Board Name"), args.getUnchecked("player"), args.getUnchecked("team"));
+				}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
@@ -210,19 +210,19 @@ public class ChessManager implements Listener {
 			arguments.add(new LiteralArgument("set"));
 			arguments.add(new LiteralArgument("gui"));
 			arguments.add(new MultiLiteralArgument("interfacetype",
-					ChessInterface.InterfaceType.WHITEPLAYER.name().toLowerCase(Locale.getDefault()),
-					ChessInterface.InterfaceType.BLACKPLAYER.name().toLowerCase(Locale.getDefault()),
-					ChessInterface.InterfaceType.SPECTATOR.name().toLowerCase(Locale.getDefault())));
+				ChessInterface.InterfaceType.WHITEPLAYER.name().toLowerCase(Locale.getDefault()),
+				ChessInterface.InterfaceType.BLACKPLAYER.name().toLowerCase(Locale.getDefault()),
+				ChessInterface.InterfaceType.SPECTATOR.name().toLowerCase(Locale.getDefault())));
 			arguments.add(new LocationArgument("starting positions", LocationType.BLOCK_POSITION));
 			arguments.add(new MultiLiteralArgument("facing",
-					ChessInterface.FacingPosition.NORTH.getLabel(),
-					ChessInterface.FacingPosition.SOUTH.getLabel()));
+				ChessInterface.FacingPosition.NORTH.getLabel(),
+				ChessInterface.FacingPosition.SOUTH.getLabel()));
 			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						createGui(args.getUnchecked("Board Name"), args.getUnchecked("interfacetype"), args.getUnchecked("starting positions"), args.getUnchecked("facing"));
-					}).register();
+				.withPermission(perms)
+				.withArguments(arguments)
+				.executes((sender, args) -> {
+					createGui(args.getUnchecked("Board Name"), args.getUnchecked("interfacetype"), args.getUnchecked("starting positions"), args.getUnchecked("facing"));
+				}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
@@ -230,11 +230,11 @@ public class ChessManager implements Listener {
 			arguments.add(new LiteralArgument("surrend"));
 			arguments.add(new PlayerArgument("Surrender"));
 			new CommandAPICommand(command)
-					.withPermission(perms)
-					.withArguments(arguments)
-					.executes((sender, args) -> {
-						surrender(args.getUnchecked("Board Name"), args.getUnchecked("Surrender"));
-					}).register();
+				.withPermission(perms)
+				.withArguments(arguments)
+				.executes((sender, args) -> {
+					surrender(args.getUnchecked("Board Name"), args.getUnchecked("Surrender"));
+				}).register();
 		}
 	}
 
@@ -290,7 +290,7 @@ public class ChessManager implements Listener {
 		ChessBoard board = mBoards.get(name);
 		List<ChessInterface> chessInterfaces = mBoardsInterfaces.get(board);
 		if (chessInterfaces != null) {
-			for (ChessInterface ci: chessInterfaces) {
+			for (ChessInterface ci : chessInterfaces) {
 				ci.destroy();
 			}
 			chessInterfaces.clear();
@@ -306,7 +306,7 @@ public class ChessManager implements Listener {
 		ChessBoard board = mBoards.get(name);
 		board.restart();
 		List<ChessInterface> chessInterfaces = mBoardsInterfaces.get(board);
-		for (ChessInterface ci: chessInterfaces) {
+		for (ChessInterface ci : chessInterfaces) {
 			ci.removeRunnable();
 			ci.refresh();
 		}
@@ -325,9 +325,9 @@ public class ChessManager implements Listener {
 		EndGameChessEvent event = new EndGameChessEvent(board, whitePlayer, blackPlayer);
 
 
-		if (whitePlayer != null && whitePlayer.mPlayer.equals(loser)) {
+		if (whitePlayer != null && whitePlayer.mPlayer().equals(loser)) {
 			event.setEndGameScore(1);
-		} else if (blackPlayer != null && blackPlayer.mPlayer.equals(loser)) {
+		} else if (blackPlayer != null && blackPlayer.mPlayer().equals(loser)) {
 			event.setEndGameScore(0);
 		}
 
@@ -340,7 +340,7 @@ public class ChessManager implements Listener {
 		}
 
 		ChessBoard board = mBoards.get(name);
-		for (ChessInterface ci: mBoardsInterfaces.get(board)) {
+		for (ChessInterface ci : mBoardsInterfaces.get(board)) {
 			ci.refresh();
 		}
 	}
@@ -425,7 +425,7 @@ public class ChessManager implements Listener {
 				}
 
 				for (ChessInterface chessInterface : mBoardsInterfaces.get(board)) {
-					if (chessInterface.playerInteract((ItemFrame)entity, (Player)player)) {
+					if (chessInterface.playerInteract((ItemFrame) entity, player)) {
 						break;
 					}
 				}
@@ -452,8 +452,8 @@ public class ChessManager implements Listener {
 				ChessTeam teamPlaying = board.getChessPiece(to).getPieceTeam();
 				ChessPlayer nextPlayer = teamPlaying == ChessTeam.WHITE ? event.getBlackPlayer() : event.getWhitePlayer();
 
-				if (nextPlayer != null && nextPlayer.mPlayer != null) {
-					nextPlayer.mPlayer.playSound(nextPlayer.mPlayer.getLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.PLAYERS, 10f, 0.6f);
+				if (nextPlayer != null && nextPlayer.mPlayer() != null) {
+					nextPlayer.mPlayer().playSound(nextPlayer.mPlayer().getLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.PLAYERS, 10f, 0.6f);
 				}
 
 				board.updateState(teamPlaying == ChessTeam.WHITE ? BoardState.BLACK_TURN : BoardState.WHITE_TURN);
@@ -471,25 +471,25 @@ public class ChessManager implements Listener {
 				ChessPlayer loserPlayer = ((EndGameChessEvent) event).getLoser();
 				float result = ((EndGameChessEvent) event).getEndGameScore();
 
-				msg += " | EndGameEvent Players-> W: " + (winnerPlayer != null ? winnerPlayer.mPlayer.getName() : "null") + " L: " + (loserPlayer != null ? loserPlayer.mPlayer.getName() : "null") + " Result: " + result;
+				msg += " | EndGameEvent Players-> W: " + (winnerPlayer != null ? winnerPlayer.mPlayer().getName() : "null") + " L: " + (loserPlayer != null ? loserPlayer.mPlayer().getName() : "null") + " Result: " + result;
 
 				if (DEBUG) {
 					Plugin.getInstance().getLogger().warning(msg);
 				}
 
-				if (winnerPlayer != null && winnerPlayer.mPlayer != null) {
-					animationWin(winnerPlayer.mPlayer);
+				if (winnerPlayer != null && winnerPlayer.mPlayer() != null) {
+					animationWin(winnerPlayer.mPlayer());
 				}
 
 				ChessPlayer.removeChessPlayer(winnerPlayer);
 				ChessPlayer.removeChessPlayer(loserPlayer);
 
 			} else if (event instanceof PromotingChessEvent) {
-				ChessPlayer promotingPlayer = ((PromotingChessEvent)event).getPlayer();
-				ChessPiece promotingPiece = ((PromotingChessEvent)event).getPiece();
-				if (promotingPlayer != null && promotingPlayer.mPlayer != null) {
-					new ChessPromotingCustomInventory(promotingPlayer.mPlayer, board, promotingPiece).openInventory(promotingPlayer.mPlayer, mPlugin);
-					msg += " | PromotingEvent Player: " + promotingPlayer.mPlayer.getName() + " (" + promotingPiece + ")";
+				ChessPlayer promotingPlayer = ((PromotingChessEvent) event).getPlayer();
+				ChessPiece promotingPiece = ((PromotingChessEvent) event).getPiece();
+				if (promotingPlayer != null && promotingPlayer.mPlayer() != null) {
+					new ChessPromotingCustomInventory(promotingPlayer.mPlayer(), board, promotingPiece).openInventory(promotingPlayer.mPlayer(), mPlugin);
+					msg += " | PromotingEvent Player: " + promotingPlayer.mPlayer().getName() + " (" + promotingPiece + ")";
 
 				} else {
 					board.changePieceType(promotingPiece, ChessPieceType.QUEEN);

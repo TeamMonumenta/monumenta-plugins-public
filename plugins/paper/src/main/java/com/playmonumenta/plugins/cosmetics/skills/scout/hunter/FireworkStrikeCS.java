@@ -35,8 +35,8 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-				"These twin fireworks will make",
-				"a spectacle out of your target!");
+			"These twin fireworks will make",
+			"a spectacle out of your target!");
 	}
 
 	@Override
@@ -86,10 +86,10 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 			true, 0, Particle.END_ROD);
 		ParticleUtils.drawParticleCircleExplosion(player, loc, 0, 1, 0, 0, 55, 1.75f,
 			true, 0, 0.35, Particle.CRIT_MAGIC);
-		world.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, SoundCategory.PLAYERS, 1, 1.25f);
-		world.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1, 1.25f);
-		world.playSound(player.getLocation(), Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.PLAYERS, 1, 1.5f);
-		world.playSound(player.getLocation(), Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.PLAYERS, 1, 2f);
+		world.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, SoundCategory.PLAYERS, 0.8f, 1.25f);
+		world.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 0.8f, 1.25f);
+		world.playSound(player.getLocation(), Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.PLAYERS, 0.8f, 1.5f);
+		world.playSound(player.getLocation(), Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.PLAYERS, 0.8f, 2f);
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 75, 0, 0, 0, 0.75)
 			.spawnAsPlayerActive(player);
 

@@ -161,7 +161,7 @@ public class RenameItemCommand {
 				player.sendMessage(Component.text("No tags recognized in the name of this " + LoadoutManager.STORAGE_SHULKER_NAME + ".", NamedTextColor.GRAY));
 			} else {
 				player.sendMessage(Component.text(LoadoutManager.STORAGE_SHULKER_NAME + " tags recognized in name: ", NamedTextColor.GOLD)
-					                   .append(Component.text(tags.stream().sorted().map(LoadoutManager.EquipmentCaseTag::getName).collect(Collectors.joining(", ")), NamedTextColor.WHITE)));
+					.append(Component.text(tags.stream().sorted().map(LoadoutManager.EquipmentCaseTag::getName).collect(Collectors.joining(", ")), NamedTextColor.WHITE)));
 			}
 		}
 	}

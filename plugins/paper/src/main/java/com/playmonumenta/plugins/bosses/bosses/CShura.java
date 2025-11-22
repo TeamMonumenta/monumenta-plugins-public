@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -42,28 +42,36 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class CShura extends SerializedLocationBossAbilityGroup {
+import static com.playmonumenta.plugins.Constants.HALF_TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
+public final class CShura extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_cshura";
 	public static final int detectionRange = 50;
+
+	private static final int ARENA_RADIUS = 35;
 	private static final String START_TAG = "shuraCenter";
-	private static final int DODGE_CD = 20 * 5;
-	private static final Component CSHURA_PREFIX = Component.text("[", NamedTextColor.GOLD).append(Component.text("C'Shura", NamedTextColor.DARK_RED, TextDecoration.BOLD)).append(Component.text("] ", NamedTextColor.GOLD));
+	private static final int DODGE_CD = TICKS_PER_SECOND * 5;
+	private static final Component CSHURA_PREFIX = Component.text("[", NamedTextColor.GOLD)
+		.append(Component.text("C'Shura", NamedTextColor.DARK_RED, TextDecoration.BOLD))
+		.append(Component.text("] ", NamedTextColor.GOLD));
 
 	private LivingEntity mStart;
 	private boolean mDodge = false;
-	private boolean mCutscene = false;
+	private boolean mCutscene;
 
-	public CShura(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
+	public CShura(final Plugin plugin, final LivingEntity boss, final Location spawnLoc, final Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBoss.setRemoveWhenFarAway(false);
-
 		mBoss.addScoreboardTag("Boss");
+		mBoss.setAI(false);
+		mBoss.setInvulnerable(true);
+		mCutscene = true; // Assume the boss always begins in cutscene mode
 
-		for (Entity e : mBoss.getNearbyEntities(detectionRange, detectionRange, detectionRange)) {
+		for (final Entity e : mBoss.getNearbyEntities(detectionRange, detectionRange, detectionRange)) {
 			if (e.getScoreboardTags().contains(START_TAG) && e instanceof LivingEntity) {
 				mStart = (LivingEntity) e;
 				break;
@@ -73,101 +81,105 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 			return;
 		}
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
+		final SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellShuraDagger(mBoss, mPlugin),
-			new SpellShuraJump(mPlugin, mBoss, detectionRange),
+			new SpellShuraJump(mPlugin, mBoss),
 			new SpellShuraAS(mPlugin, mBoss, detectionRange, mStart.getLocation()),
 			new SpellShuraSmoke(mPlugin, mBoss, mStart.getLocation(), detectionRange)
 		));
-		List<Spell> passiveSpells = Arrays.asList(
+
+		final List<Spell> passiveSpells = Arrays.asList(
 			new SpellBlockBreak(mBoss),
-			new SpellConditionalTeleport(mBoss, spawnLoc, b -> mStart.getLocation().distance(b.getLocation()) > 35),
+			new SpellConditionalTeleport(mBoss, mSpawnLoc,
+				b -> mStart.getLocation().distanceSquared(b.getLocation()) > ARENA_RADIUS * ARENA_RADIUS),
 			new SpellShuraPassiveSummon(mPlugin, mStart.getLocation()),
-			new SpellShieldStun(6 * 20),
+			new SpellShieldStun(TICKS_PER_SECOND * 6),
 			new SpellBlightCheese(mBoss, detectionRange, mStart.getLocation())
 		);
 
-		Map<Integer, BossBarManager.BossHealthAction> events = new HashMap<>();
+		// Beginning of fight dialogue and boss title
+		final Collection<Player> players = PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true);
+		sendMessage(players, Component.text("Kaul!", NamedTextColor.RED));
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () ->
+				sendMessage(players, Component.text("Please...", NamedTextColor.GREEN)),
+			TICKS_PER_SECOND * 2
+		);
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () ->
+				sendMessage(players, Component.text("It was the ", NamedTextColor.GREEN)
+					.append(Component.text("Soulspeaker! He wanted to save us!", NamedTextColor.RED))),
+			TICKS_PER_SECOND * 3
+		);
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () ->
+				sendMessage(players, Component.text("You there. How did you get in here? ", NamedTextColor.GREEN)),
+			TICKS_PER_SECOND * 6
+		);
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () ->
+				sendMessage(players, Component.text("I'm glad you have... your sacrifice will draw Kaul back " +
+					"to me. He will speak to me.", NamedTextColor.RED)),
+			TICKS_PER_SECOND * 8
+		);
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () ->
+				sendMessage(players, Component.text("I'm giving you a chance to run ", NamedTextColor.GREEN)
+					.append(Component.text("before I cut you down.", NamedTextColor.RED))),
+			TICKS_PER_SECOND * 11
+		);
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				mBoss.setAI(true);
+				mBoss.setInvulnerable(false);
+				mCutscene = false;
+
+				players.forEach(player -> {
+					MessagingUtils.sendBoldTitle(player, Component.text("C'Shura", NamedTextColor.GREEN),
+						Component.text("The Soulbinder", NamedTextColor.DARK_GREEN));
+					player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
+					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, TICKS_PER_SECOND * 2, 0));
+				});
+
+				final BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BossBar.Color.RED, BossBar.Overlay.PROGRESS, initializeHealthEvents());
+				constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
+			}, TICKS_PER_SECOND * 12
+		);
+	}
+
+	private Map<Integer, BossBarManager.BossHealthAction> initializeHealthEvents() {
+		final HashMap<Integer, BossBarManager.BossHealthAction> events = new HashMap<>();
 		events.put(50, mBoss -> {
-			Component[] dio1 = new Component[] {
-				Component.text("Enough! My ", NamedTextColor.GREEN).append(Component.text("purpose ", NamedTextColor.RED)).append(Component.text("here is too great for you to interrupt!", NamedTextColor.GREEN)),
-				Component.text("You will die now, like your worthless king did!", NamedTextColor.GREEN),
-			};
-			new BukkitRunnable() {
-				int mT = 0;
+			sendMessage(null,
+				Component.text("Enough! My ", NamedTextColor.GREEN)
+					.append(Component.text("purpose ", NamedTextColor.RED))
+					.append(Component.text("here is too great for you to interrupt!", NamedTextColor.GREEN)));
 
-				@Override
-				public void run() {
-					if (mT < dio1.length) {
-						for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
-							p.sendMessage(CSHURA_PREFIX.append(dio1[mT]));
-						}
-						mT++;
-					} else {
-						this.cancel();
-					}
-				}
-			}.runTaskTimer(mPlugin, 0, 20 * 4);
-
+			Bukkit.getScheduler().runTaskLater(mPlugin, () ->
+					sendMessage(null, Component.text("You will die now, like your worthless king did!", NamedTextColor.GREEN)),
+				TICKS_PER_SECOND * 3
+			);
 		});
 
 		events.put(25, mBoss -> {
 			// cshurawool.gif
-			Component dio2 = Component.text("CUN! DIE ALREADY!", NamedTextColor.RED);
-			for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
-				p.sendMessage(CSHURA_PREFIX.append(dio2));
-			}
+			sendMessage(null, Component.text("CUN! DIE ALREADY!", NamedTextColor.RED));
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, FlatDamageDealt.effectID,
 				new FlatDamageDealt(12000, 3));
 		});
 
-		Component[] dio = new Component[] {
-			Component.text("Kaul!", NamedTextColor.RED),
-			Component.text("Please...", NamedTextColor.GREEN),
-			Component.text("It was the ", NamedTextColor.GREEN).append(Component.text("Soulspeaker! He wanted to save us!", NamedTextColor.RED)),
-			Component.text("You there. How did you get in here? ", NamedTextColor.GREEN).append(Component.text("I'm glad you have... your sacrifice will draw Kaul back to me. He will speak to me.", NamedTextColor.RED)),
-			Component.text("I'm giving you a chance to run ", NamedTextColor.GREEN).append(Component.text("before I cut you down.", NamedTextColor.RED)),
-			};
-		mBoss.setAI(false);
-		mBoss.setInvulnerable(true);
-		mCutscene = true;
-		new BukkitRunnable() {
-			int mT = 0;
-
-			@Override
-			public void run() {
-				if (mT < dio.length) {
-					for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
-						p.sendMessage(CSHURA_PREFIX.append(dio[mT]));
-					}
-					mT++;
-				} else {
-					this.cancel();
-					for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
-						MessagingUtils.sendBoldTitle(p, Component.text("C'Shura", NamedTextColor.GREEN), Component.text("The Soulbinder", NamedTextColor.DARK_GREEN));
-						p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
-						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
-					}
-					mBoss.setAI(true);
-					mBoss.setInvulnerable(false);
-					mCutscene = false;
-					BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BossBar.Color.RED, BossBar.Overlay.PROGRESS, events);
-					constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
-				}
-			}
-		}.runTaskTimer(mPlugin, 0, 20 * 4);
-
+		return events;
 	}
 
 	@Override
 	public void init() {
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		double hp = EntityUtils.getMaxHealth(mBoss) * BossUtils.healthScalingCoef(playerCount, 0.5, 0.35);
+		final int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		final double hp = EntityUtils.getMaxHealth(mBoss) * BossUtils.healthScalingCoef(playerCount, 0.5, 0.35);
 		EntityUtils.setMaxHealthAndHealth(mBoss, hp);
 	}
 
 	@Override
-	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+	public void onHurtByEntityWithSource(final DamageEvent event, final Entity damager, final LivingEntity source) {
 		if (!mDodge && !mCutscene) {
 			mDodge = true;
 			dodge(event);
@@ -175,25 +187,24 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 		}
 	}
 
-	private void dodge(DamageEvent event) {
+	private void dodge(final DamageEvent event) {
 		event.setCancelled(true);
-		World world = mBoss.getWorld();
-		Location loc = mBoss.getLocation().add(0, 1, 0);
-		Entity damager = event.getDamager();
+		final Location loc = mBoss.getLocation().add(0, 1, 0);
+		final Entity damager = event.getDamager();
 		if (damager != null) {
-			Vector direction = damager.getLocation().subtract(loc).toVector().setY(0).normalize();
-			Vector sideways = new Vector(direction.getZ(), 0, -direction.getX());
+			final Vector direction = damager.getLocation().subtract(loc).toVector().setY(0).normalize();
+			final Vector sideways = new Vector(direction.getZ(), 0, -direction.getX());
 			sideways.subtract(direction.multiply(0.25));
 			if (FastUtils.RANDOM.nextBoolean()) {
 				sideways.multiply(-1);
 			}
 
 			loc.add(sideways.multiply(3));
+			// Try 3 times to teleport to a suitable location
 			for (int i = 0; i < 3; i++) {
 				if (loc.getBlock().isPassable()) {
-					new PartialParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.5).spawnAsEntityActive(mBoss);
-					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 0.5f, 0.5f);
-
+					new PartialParticle(Particle.SMOKE_LARGE, loc).count(10).extra(0.5).spawnAsEntityActive(mBoss);
+					mBoss.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 0.5f, 0.5f);
 					mBoss.teleport(loc);
 					break;
 				} else {
@@ -204,42 +215,51 @@ public class CShura extends SerializedLocationBossAbilityGroup {
 	}
 
 	@Override
-	public void death(@Nullable EntityDeathEvent event) {
-		List<Player> players = PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true);
-
+	public void death(@Nullable final EntityDeathEvent event) {
+		final List<Player> players = PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true);
 		BossUtils.endBossFightEffects(players);
 
-		// win mob kill
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mStart.getLocation(), detectionRange)) {
-			mob.setHealth(0);
-		}
-
+		EntityUtils.getNearbyMobs(mStart.getLocation(), detectionRange).forEach(Entity::remove);
 		mBoss.teleport(mBoss.getLocation().add(0, -300, 0));
-		Component[] ded = new Component[] {
-			Component.text("I feel... different. This place is a blight. it nearly took me. It could take you too.", NamedTextColor.GREEN),
-			Component.text("This place has magic even I could not handle. I must find my people. They need to know I am still here.", NamedTextColor.GREEN),
-		};
-		new BukkitRunnable() {
-			int mT = 0;
 
-			@Override
-			public void run() {
-				if (mT < ded.length) {
-					for (Player p : players) {
-						p.sendMessage(CSHURA_PREFIX.append(ded[mT]));
-					}
-					mT++;
-				} else {
-					this.cancel();
-					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-					for (Player p : players) {
-						p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100f, 0.8f);
-						MessagingUtils.sendTitle(p, Component.text("VICTORY", NamedTextColor.GREEN, TextDecoration.BOLD),
-							Component.text("C'Shura, The Soulbinder", NamedTextColor.DARK_GREEN, TextDecoration.BOLD),
-							10, 80, 10);
-					}
+		sendMessage(players, Component.text("I feel... different. This place is a blight. It nearly took me. It could take you too.", NamedTextColor.GREEN));
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () ->
+				sendMessage(players, Component.text("It has magic even I could not handle. I must find my people. They need to know I am still here.", NamedTextColor.GREEN)),
+			TICKS_PER_SECOND * 4
+		);
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+				players.forEach(player -> {
+					player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 5f, 0.8f);
+					MessagingUtils.sendTitle(player, Component.text("VICTORY", NamedTextColor.GREEN, TextDecoration.BOLD),
+						Component.text("C'Shura, The Soulbinder", NamedTextColor.DARK_GREEN, TextDecoration.BOLD),
+						HALF_TICKS_PER_SECOND, TICKS_PER_SECOND * 4, HALF_TICKS_PER_SECOND);
+				});
+			},
+			TICKS_PER_SECOND * 8
+		);
+	}
+
+	/**
+	 * Send a chat message to nearby players
+	 *
+	 * @param players Which players to send the message to. Useful for the start/end cutscenes so the plugin doesn't
+	 *                need to keep finding the same players multiple times
+	 * @param msg     Message to send
+	 */
+	private void sendMessage(@Nullable final Collection<Player> players, final Component msg) {
+		if (players != null) {
+			players.forEach(player -> {
+				// In case someone dies during a cutscene (catastrophic skill issue)
+				if (!player.isDead() && player.getWorld().equals(mBoss.getWorld())) {
+					player.sendMessage(CSHURA_PREFIX.append(msg));
 				}
-			}
-		}.runTaskTimer(mPlugin, 0, 20 * 4);
+			});
+		} else {
+			PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)
+				.forEach(player -> player.sendMessage(CSHURA_PREFIX.append(msg)));
+		}
 	}
 }

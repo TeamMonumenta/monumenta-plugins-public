@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.math3.util.FastMath;
@@ -22,9 +22,9 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellSwordCleave extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private PassiveStarBlightConversion mConverter;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final PassiveStarBlightConversion mConverter;
 	private boolean mOnCooldown;
 	private static final float SWINGRADIUS = 5;
 	private static final int COOLDOWN = 7 * 20;
@@ -44,9 +44,9 @@ public class SpellSwordCleave extends Spell {
 		Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> mOnCooldown = false, COOLDOWN + 20);
 		EntityUtils.selfRoot(mBoss, 26);
 		new BukkitRunnable() {
-			Vector mDirection = mBoss.getEyeLocation().getDirection().normalize();
+			final Vector mDirection = mBoss.getEyeLocation().getDirection().normalize();
 			int mTicks = 0;
-			float mAngle = (float) (-FastMath.atan2(mDirection.getX(), mDirection.getZ()) - FastMath.PI / 4.0f);
+			final float mAngle = (float) (-FastMath.atan2(mDirection.getX(), mDirection.getZ()) - FastMath.PI / 4.0f);
 
 			@Override
 			public void run() {
@@ -57,20 +57,18 @@ public class SpellSwordCleave extends Spell {
 						for (int r = 0; r <= SWINGRADIUS; r++) {
 							Location loc = mBoss.getLocation().add(-r * FastMath.sin(theta), 0.25, r * FastMath.cos(theta));
 							mConverter.convertColumn(loc.getX(), loc.getZ());
-							BoundingBox mHitBox = BoundingBox.of(loc, 0.5, 1.0, 0.5);
-							boxes.add(mHitBox);
+							BoundingBox box = BoundingBox.of(loc, 0.5, 1.0, 0.5);
+							boxes.add(box);
 							new PPExplosion(Particle.SWEEP_ATTACK, loc).count(2).delta(0.1).spawnAsBoss();
+							new PPExplosion(Particle.SCRAPE, box.getCenter().toLocation(mBoss.getWorld())).count(2).delta(0.25).spawnAsBoss();
 						}
 					}
-					List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), SWINGRADIUS + 1, true, true);
-					for (BoundingBox box : boxes) {
-						for (Player p : mPlayers) {
-							if (p.getBoundingBox().overlaps(box)) {
-								DamageUtils.damage(null, p, DamageEvent.DamageType.MELEE, DAMAGE, null, false, true, "Blighted Slash");
-							}
-						}
-						new PPExplosion(Particle.SCRAPE, box.getCenter().toLocation(mBoss.getWorld())).count(2).delta(0.25).spawnAsBoss();
+
+					Hitbox hitbox = Hitbox.unionOfAABB(boxes, mBoss.getWorld());
+					for (Player p : hitbox.getHitPlayers(true)) {
+						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MELEE, DAMAGE, null, false, true, "Blighted Slash");
 					}
+
 					this.cancel();
 				} else {
 					for (double theta = mAngle; theta < mAngle + FastMath.PI / 2.0; theta = (theta + (FastMath.PI / 2.0) / 10)) {

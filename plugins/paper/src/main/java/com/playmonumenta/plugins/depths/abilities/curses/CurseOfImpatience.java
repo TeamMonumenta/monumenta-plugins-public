@@ -53,7 +53,7 @@ public class CurseOfImpatience extends DepthsAbility {
 	}
 
 	private static Description<CurseOfImpatience> getDescription() {
-		return new DescriptionBuilder<CurseOfImpatience>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("After casting an ability, all other abilities' cooldowns are increased by 1s.");
 	}
 }

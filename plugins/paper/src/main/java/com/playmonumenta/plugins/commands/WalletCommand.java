@@ -2,7 +2,10 @@ package com.playmonumenta.plugins.commands;
 
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.playmonumenta.plugins.guis.WalletGui;
+import com.playmonumenta.plugins.inventories.BaseWallet;
+import com.playmonumenta.plugins.inventories.SharedVaultManager;
 import com.playmonumenta.plugins.inventories.Wallet;
+import com.playmonumenta.plugins.inventories.WalletBlock;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -11,6 +14,8 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
+import dev.jorel.commandapi.arguments.LocationArgument;
+import dev.jorel.commandapi.arguments.LocationType;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +28,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Location;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -32,25 +39,52 @@ public class WalletCommand {
 	public static void register() {
 		new CommandAPICommand("wallet")
 			.withSubcommand(
+				new CommandAPICommand("openvault")
+					.withPermission("monumenta.command.openwallet")
+					.withArguments(new LocationArgument("vault location", LocationType.BLOCK_POSITION))
+					.executes((sender, args) -> {
+						Player viewer = CommandUtils.getPlayerFromSender(sender);
+						Location loc = Objects.requireNonNull(args.getUnchecked("vault location"));
+						BlockState blockState = loc.getBlock().getState();
+						WalletBlock walletBlock = SharedVaultManager.getOrRegisterWallet(blockState);
+						if (walletBlock == null) {
+							viewer.sendMessage(Component.text("Could not find a vault at that location", NamedTextColor.RED));
+							return;
+						}
+						new WalletGui(
+							viewer,
+							walletBlock,
+							WalletManager.MAX_SETTINGS,
+							Component.text("Wallet of ", NamedTextColor.GOLD).append(Component.text(SharedVaultManager.SHARED_VAULT_NAME, NamedTextColor.DARK_GREEN)),
+							true
+						).open();
+					})
+			)
+			.withSubcommand(
 				new CommandAPICommand("open")
 					.withPermission("monumenta.command.openwallet")
 					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
 						Player viewer = CommandUtils.getPlayerFromSender(sender);
 						Player viewee = Objects.requireNonNull(args.getUnchecked("player"));
-						new WalletGui(viewer, WalletManager.getWallet(viewee), WalletManager.MAX_SETTINGS,
-							Component.text("Wallet of ", NamedTextColor.GOLD).append(viewee.displayName())).open();
+						new WalletGui(
+							viewer,
+							WalletManager.getWallet(viewee),
+							WalletManager.MAX_SETTINGS,
+							Component.text("Wallet of ", NamedTextColor.GOLD).append(viewee.displayName()),
+							true
+						).open();
 					})
 			).withSubcommand(
 				new CommandAPICommand("withdraw")
 					.withArguments(new GreedyStringArgument("items")
-						               .replaceSuggestions((info, builder) -> {
-							               AtomicReference<SuggestionsBuilder> builderRef = new AtomicReference<>(builder);
-							               if (info.sender() instanceof Player player) {
-								               parseWalletCommandItems(player, info.currentArg(), info.currentInput().length() - info.currentArg().length(), builderRef);
-							               }
-							               return Objects.requireNonNull(builderRef.get()).buildFuture();
-						               }))
+						.replaceSuggestions((info, builder) -> {
+							AtomicReference<SuggestionsBuilder> builderRef = new AtomicReference<>(builder);
+							if (info.sender() instanceof Player player) {
+								parseWalletCommandItems(player, info.currentArg(), info.currentInput().length() - info.currentArg().length(), builderRef);
+							}
+							return Objects.requireNonNull(builderRef.get()).buildFuture();
+						}))
 					.executes((sender, args) -> {
 						Player player = CommandUtils.getPlayerFromSender(sender);
 						List<WalletCommandItem> items = parseWalletCommandItems(player, Objects.requireNonNull(args.getUnchecked("items")), 0, null);
@@ -153,9 +187,9 @@ public class WalletCommand {
 					removed.setAmount((int) Math.min(baseItemCount / compressionInfo.get().mAmount, item.mCount));
 				}
 			} else {
-				Optional<Wallet.WalletItem> walletItemOpt = wallet.mItems.stream().filter(wi -> ItemUtils.getPlainNameOrDefault(wi.mItem).equalsIgnoreCase(item.mName)).findFirst();
+				Optional<BaseWallet.WalletItem> walletItemOpt = wallet.mItems.stream().filter(wi -> ItemUtils.getPlainNameOrDefault(wi.mItem).equalsIgnoreCase(item.mName)).findFirst();
 				if (walletItemOpt.isPresent()) {
-					Wallet.WalletItem walletItem = walletItemOpt.get();
+					BaseWallet.WalletItem walletItem = walletItemOpt.get();
 					removed = ItemUtils.clone(walletItem.mItem);
 					removed.setAmount((int) Math.min(walletItem.mAmount, item.mCount));
 				}
@@ -168,10 +202,11 @@ public class WalletCommand {
 
 				wallet.remove(player, ItemUtils.clone(removed));
 				long remaining = wallet.count(removed);
+				int withdrawnAmount = removed.getAmount(); // Capture the correct amount of items being withdrawn to display to the player; the line below somehow modifies it and shows a wrong number
 				InventoryUtils.giveItem(player, removed);
 
 				player.sendMessage(Component.text("Withdrew ", NamedTextColor.GREEN).append(
-					Component.text(removed.getAmount() + " " + ItemUtils.getPlainNameOrDefault(removed), NamedTextColor.WHITE).append(
+					Component.text(withdrawnAmount + " " + ItemUtils.getPlainNameOrDefault(removed), NamedTextColor.WHITE).append(
 						Component.text(" from your wallet. ", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)).append(
 						Component.text("(Remaining in wallet: " + remaining + ")", NamedTextColor.GRAY)
 					)));
@@ -182,7 +217,7 @@ public class WalletCommand {
 		}
 		if (!retrievedAll && items.size() > 1) {
 			player.sendMessage(Component.text("Could not retrieve all desired items!", NamedTextColor.RED)
-				                   .append(Component.text(" You may have to scroll up for more information.", NamedTextColor.WHITE)));
+				.append(Component.text(" You may have to scroll up for more information.", NamedTextColor.WHITE)));
 		}
 	}
 

@@ -22,7 +22,7 @@ public class JoinLeaveHandler {
 	final MonumentaVelocity mPlugin;
 
 	/* Keeps track of players that have had their join message sent */
-	private final Set<UUID> mOnlinePlayers = new ConcurrentSkipListSet<UUID>();
+	private final Set<UUID> mOnlinePlayers = new ConcurrentSkipListSet<>();
 
 	public JoinLeaveHandler(MonumentaVelocity main) {
 		mPlugin = main;
@@ -54,7 +54,7 @@ public class JoinLeaveHandler {
 			 */
 			int useLevel = 0;
 			for (int i = 5; i > 0; i--) {
-				if (player.hasPermission("pv.use.level" + Integer.toString(i))) {
+				if (player.hasPermission("pv.use.level" + i)) {
 					useLevel = i;
 					break;
 				}
@@ -65,7 +65,7 @@ public class JoinLeaveHandler {
 			for (Player p : players) {
 				int seeLevel = -1;
 				for (int i = 5; i > 0; i--) {
-					if (p.hasPermission("pv.see.level" + Integer.toString(i))) {
+					if (p.hasPermission("pv.see.level" + i)) {
 						seeLevel = i;
 						break;
 					}

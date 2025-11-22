@@ -27,6 +27,7 @@ import org.bukkit.scheduler.BukkitRunnable;
  * A warning to future readers: This spell is prone to breaking because it handles every Seismic Ruin direction in one
  * method instead of the original implementation which used four methods and it has to handle casting twice at the same
  * time for Eldrask's final phase. Exercise caution lest you run into race conditions and weird off by one errors.
+ *
  * @author Spy
  */
 public final class UltimateSeismicRuin extends Spell {
@@ -64,7 +65,7 @@ public final class UltimateSeismicRuin extends Spell {
 	}
 
 	public UltimateSeismicRuin(final Plugin plugin, final LivingEntity boss, final Location originLoc, final Location northCardinal,
-							   final Location southCardinal, final Location eastCardinal, final Location westCardinal) {
+	                           final Location southCardinal, final Location eastCardinal, final Location westCardinal) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();

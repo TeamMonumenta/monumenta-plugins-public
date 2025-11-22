@@ -24,7 +24,6 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -48,11 +47,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class CreateGuildCommand {
 	private static final String[] SUGGESTIONS = {"@a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13,gamemode=!spectator]"};
 
-	@SuppressWarnings({"DataFlowIssue"})
 	public static void register(Plugin plugin) {
 		// guild mod create <guild name> <guild color> <guild tag> <founders>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.guild.mod.create");
@@ -151,6 +150,8 @@ public class CreateGuildCommand {
 
 		// Guild name sanitization for command usage
 		String guildRootGroupId = LuckPermsIntegration.getGuildId(guildTag);
+		String guildBlockedGroupId = GuildAccessLevel.BLOCKED.groupNameFromRoot(guildRootGroupId);
+		String guildNoneGroupId = GuildAccessLevel.NONE.groupNameFromRoot(guildRootGroupId);
 		String guildGuestGroupId = GuildAccessLevel.GUEST.groupNameFromRoot(guildRootGroupId);
 		String guildMemberGroupId = GuildAccessLevel.MEMBER.groupNameFromRoot(guildRootGroupId);
 		String guildManagerGroupId = GuildAccessLevel.MANAGER.groupNameFromRoot(guildRootGroupId);
@@ -160,13 +161,17 @@ public class CreateGuildCommand {
 		String guildMemberInviteGroupId = GuildInviteLevel.MEMBER_INVITE.groupNameFromRoot(guildRootGroupId);
 
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			for (String groupId : List.of(guildRootGroupId,
+			for (String groupId : List.of(
+				guildRootGroupId,
+				guildBlockedGroupId,
+				guildNoneGroupId,
 				guildGuestGroupId,
 				guildMemberGroupId,
 				guildManagerGroupId,
 				guildFounderGroupId,
 				guildGuestInviteGroupId,
-				guildMemberInviteGroupId)) {
+				guildMemberInviteGroupId
+			)) {
 				try {
 					if (LuckPermsIntegration.GM.loadGroup(groupId).join().isPresent()) {
 						Bukkit.getScheduler().runTask(plugin, () -> sender.sendMessage(Component.text(
@@ -212,6 +217,14 @@ public class CreateGuildCommand {
 			guildMemberInviteGroupData.add(InheritanceNode.builder(guildGuestInviteGroup).build());
 			LuckPermsIntegration.GM.saveGroup(guildMemberInviteGroup).join();
 
+			Group guildBlockedGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildBlockedGroupId).join();
+			NodeMap guildBlockedGroupData = guildBlockedGroup.data();
+			guildBlockedGroupData.add(InheritanceNode.builder(guildRootGroup).build());
+
+			Group guildNoneGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildNoneGroupId).join();
+			NodeMap guildNoneGroupData = guildNoneGroup.data();
+			guildNoneGroupData.add(InheritanceNode.builder(guildRootGroup).build());
+
 			Group guildGuestGroup = LuckPermsIntegration.GM.createAndLoadGroup(guildGuestGroupId).join();
 			NodeMap guildGuestGroupData = guildGuestGroup.data();
 			guildGuestGroupData.add(InheritanceNode.builder(guildRootGroup).build());
@@ -243,8 +256,11 @@ public class CreateGuildCommand {
 				if (GuildAccessLevel.MEMBER.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
 					guildPermission.setExplicitPermission(guildRootGroup, guildMemberGroup, true).join();
 				}
+				guildPermission.setExplicitPermission(guildRootGroup, guildBlockedGroup, false).join();
 			}
 
+			LuckPermsIntegration.GM.saveGroup(guildBlockedGroup).join();
+			LuckPermsIntegration.GM.saveGroup(guildNoneGroup).join();
 			LuckPermsIntegration.GM.saveGroup(guildGuestGroup).join();
 			LuckPermsIntegration.GM.saveGroup(guildMemberGroup).join();
 			LuckPermsIntegration.GM.saveGroup(guildManagerGroup).join();
@@ -314,11 +330,11 @@ public class CreateGuildCommand {
 				}
 
 				Component announcementMessage = Component.text(
-					"A new guild has just been founded. Say hello to ",
+						"A new guild has just been founded. Say hello to ",
 						NamedTextColor.WHITE,
 						TextDecoration.BOLD)
 					.append(Component.text(guildName, guildColor)
-						.hoverEvent(guildBanner))
+						.hoverEvent(LuckPermsIntegration.getGuildFullComponent(guildRootGroup)))
 					.append(Component.text("!!"));
 
 				MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] "

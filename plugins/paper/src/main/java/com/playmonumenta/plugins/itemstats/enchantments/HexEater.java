@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
@@ -53,72 +54,75 @@ public class HexEater implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		int level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.HEX_EATER);
-		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE) {
-			applyHexDamage(plugin, event.getDamager() instanceof Projectile, player, level, enemy, event);
+		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE || event.getAbility() == ClassAbility.ALCHEMIST_POTION) {
+			event.setFlatDamage(event.getFlatDamage() + calculateHexDamage(plugin, event.getDamager() instanceof Projectile, player, level, enemy));
 		}
 	}
 
-	public static void applyHexDamage(Plugin plugin, boolean isProjectile, Player player, int level, LivingEntity target, DamageEvent event) {
-		List<PotionEffectType> e = PotionUtils.getNegativeEffects(plugin, target);
-		int effects = e.size();
+	public static double calculateHexDamage(Plugin plugin, boolean isProjectile, Player player, int level, LivingEntity target) {
+		if (level > 0) {
+			List<PotionEffectType> e = PotionUtils.getNegativeEffects(plugin, target);
+			int effects = e.size();
 
-		if (EntityUtils.isStunned(target)) {
-			effects++;
-		}
-
-		if (EntityUtils.isParalyzed(plugin, target)) {
-			effects++;
-		}
-
-		if (EntityUtils.isSilenced(target)) {
-			effects++;
-		}
-
-		if (EntityUtils.isBleeding(plugin, target)) {
-			effects++;
-		}
-
-		if (EntityUtils.isSlowed(plugin, target) && !e.contains(PotionEffectType.SLOW)) {
-			effects++;
-		}
-
-		if (EntityUtils.isWeakened(plugin, target) && !e.contains(PotionEffectType.WEAKNESS)) {
-			effects++;
-		}
-
-		if (EntityUtils.isVulnerable(plugin, target)) {
-			effects++;
-		}
-
-		if (target.getFireTicks() > 0 || Inferno.hasInferno(plugin, target)) {
-			effects++;
-		}
-
-		if (EntityUtils.hasDamageOverTime(plugin, target)) {
-			effects++;
-		}
-
-		// interaction with choleric flames 2
-		if (Plugin.getInstance().mEffectManager.hasEffect(target, CholericFlames.ANTIHEAL_EFFECT)) {
-			effects++;
-		}
-
-		if (effects > 0) {
-			//Projectiles do not rely on player attack strength
-			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * effects * DAMAGE);
-			if (isProjectile) {
-				event.setFlatDamage(event.getFlatDamage() + damage);
-			} else {
-				event.setFlatDamage(event.getFlatDamage() + damage * player.getCooledAttackStrength(0));
+			if (EntityUtils.isStunned(target)) {
+				effects++;
 			}
-			new PartialParticle(Particle.SPELL_WITCH, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
 
-			World world = target.getWorld();
-			Location loc = target.getLocation();
-			if (!isProjectile) {
-				world.playSound(loc, Sound.BLOCK_SCULK_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			if (EntityUtils.isParalyzed(plugin, target)) {
+				effects++;
+			}
+
+			if (EntityUtils.isSilenced(target)) {
+				effects++;
+			}
+
+			if (EntityUtils.isBleeding(plugin, target)) {
+				effects++;
+			}
+
+			if (EntityUtils.isSlowed(plugin, target) && !e.contains(PotionEffectType.SLOW)) {
+				effects++;
+			}
+
+			if (EntityUtils.isWeakened(plugin, target) && !e.contains(PotionEffectType.WEAKNESS)) {
+				effects++;
+			}
+
+			if (EntityUtils.isVulnerable(plugin, target)) {
+				effects++;
+			}
+
+			if (target.getFireTicks() > 0 || Inferno.hasInferno(plugin, target)) {
+				effects++;
+			}
+
+			if (EntityUtils.hasDamageOverTime(plugin, target)) {
+				effects++;
+			}
+
+			// interaction with choleric flames 2
+			if (Plugin.getInstance().mEffectManager.hasEffect(target, CholericFlames.ANTIHEAL_EFFECT)) {
+				effects++;
+			}
+
+			if (effects > 0) {
+				World world = target.getWorld();
+				Location loc = target.getLocation();
+				if (!isProjectile) {
+					world.playSound(loc, Sound.BLOCK_SCULK_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				}
+				new PartialParticle(Particle.SPELL_WITCH, target.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
+
+				//Projectiles do not rely on player attack strength
+				double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * effects * DAMAGE);
+				if (isProjectile) {
+					return damage;
+				} else {
+					return damage * player.getCooledAttackStrength(0);
+				}
 			}
 		}
+		return 0;
 	}
 
 	@Override

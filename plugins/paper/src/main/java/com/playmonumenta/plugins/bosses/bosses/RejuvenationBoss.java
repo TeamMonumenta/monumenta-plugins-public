@@ -7,9 +7,9 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellMobHealAoE;
-import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import org.bukkit.Location;
+import java.util.List;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 
 /* TODO: Merge this with NovaBoss */
@@ -38,22 +38,40 @@ public class RejuvenationBoss extends BossAbilityGroup {
 		public boolean OVERHEAL = true;
 
 		@BossParam(help = "Targets of this spell")
-		public EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.clone().setOptional(false);
+		public EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.clone().setFilters(List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 
 
-		public ParticlesList PARTICLE_CHARGE_AIR = ParticlesList.fromString("[(SPELL_INSTANT,3)]");
+		public ParticlesList PARTICLE_CHARGE_AIR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_INSTANT, 3, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
-		public ParticlesList PARTICLE_CHARGE_CIRCLE = ParticlesList.fromString("[(SPELL_INSTANT,3)]");
+		public ParticlesList PARTICLE_CHARGE_CIRCLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_INSTANT, 3, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
-		public SoundsList SOUND_CHARGE = SoundsList.fromString("[(ITEM_TRIDENT_RETURN,0.8)]");
+		public SoundsList SOUND_CHARGE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_TRIDENT_RETURN, 0.8f, 1.0f))
+			.build();
 
-		public SoundsList SOUND_OUTBURST_CIRCLE = SoundsList.fromString("[(ENTITY_ILLUSIONER_CAST_SPELL,3,1.25),(ENTITY_ZOMBIE_VILLAGER_CONVERTED,3,2)]");
+		public SoundsList SOUND_OUTBURST_CIRCLE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ILLUSIONER_CAST_SPELL, 3.0f, 1.25f))
+			.add(new SoundsList.CSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 3.0f, 2.0f))
+			.build();
 
-		public ParticlesList PARTICLE_OUTBURST_AIR = ParticlesList.fromString("[(FIREWORKS_SPARK,3),(VILLAGER_HAPPY,3,3.5,3.5,3.5,0.5)]");
+		public ParticlesList PARTICLE_OUTBURST_AIR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 3, 0.0, 0.0, 0.0, 0.0))
+			.add(new ParticlesList.CParticle(Particle.VILLAGER_HAPPY, 3, 3.5, 3.5, 3.5, 0.5))
+			.build();
 
-		public ParticlesList PARTICLE_OUTBURST_CIRCLE = ParticlesList.fromString("[(CRIT_MAGIC,3,0.25,0.25,0.25,0.35),(FIREWORKS_SPARK,2,0.25,0.25,0.25,0.15)]");
+		public ParticlesList PARTICLE_OUTBURST_CIRCLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 3, 0.25, 0.25, 0.25, 0.35))
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 2, 0.25, 0.25, 0.25, 0.15))
+			.build();
 
-		public ParticlesList PARTICLE_HEAL = ParticlesList.fromString("[(FIREWORKS_SPARK,3,0.25,0.5,0.25,0.3),(HEART,3,0.4,0.5,0.4)]");
+		public ParticlesList PARTICLE_HEAL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 3, 0.25, 0.5, 0.25, 0.3))
+			.add(new ParticlesList.CParticle(Particle.HEART, 3, 0.4, 0.5, 0.4, 0.0))
+			.build();
 
 	}
 
@@ -64,48 +82,11 @@ public class RejuvenationBoss extends BossAbilityGroup {
 
 		if (p.TARGETS == EntityTargets.GENERIC_MOB_TARGET) {
 			//probably a mob from an older version.
-			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.MOB, p.RANGE, false);
+			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.MOB, p.RANGE);
 			p.PARTICLE_RADIUS = p.RANGE;
 		}
 
-		Spell spell = new SpellMobHealAoE(
-			plugin,
-			boss,
-			p.COOLDOWN,
-			p.DURATION,
-			p.PARTICLE_RADIUS,
-			p.CAN_MOVE,
-			() -> {
-				return p.TARGETS.getTargetsList(mBoss);
-			},
-			(Location loc, int ticks) -> {
-				p.PARTICLE_CHARGE_AIR.spawn(boss, loc, 3.5, 3.5, 3.5, 0.25);
-				if (ticks <= (p.DURATION - 5) && ticks % 2 == 0) {
-					p.SOUND_CHARGE.play(mBoss.getLocation(), 0.8f, 0.25f + ((float) ticks / (float) 100));
-				}
-			},
-			(Location loc, int ticks) -> {
-				p.PARTICLE_CHARGE_CIRCLE.spawn(boss, loc, 0.25, 0.25, 0.25);
-			},
-			(Location loc, int ticks) -> {
-				p.PARTICLE_OUTBURST_AIR.spawn(boss, loc, 3.5, 3.5, 3.5, 0.25);
-				p.SOUND_OUTBURST_CIRCLE.play(loc);
-			},
-			(Location loc, int ticks) -> {
-				p.PARTICLE_OUTBURST_CIRCLE.spawn(boss, loc);
-			},
-			(LivingEntity target) -> {
-				double healed = EntityUtils.healMob(target, p.HEAL);
-				if (p.OVERHEAL && healed < p.HEAL) {
-					double missing = p.HEAL - healed;
-					AbsorptionUtils.addAbsorption(target, missing, p.HEAL, -1);
-				}
-
-				if (healed > 0) {
-					p.PARTICLE_HEAL.spawn(boss, target.getEyeLocation());
-				}
-			}
-		);
+		Spell spell = new SpellMobHealAoE(plugin, boss, p);
 
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}

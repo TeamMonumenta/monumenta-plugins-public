@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.skills.warrior;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
+import com.playmonumenta.plugins.particle.PPPillar;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import org.bukkit.Color;
@@ -52,6 +53,7 @@ public class CounterStrikeCS implements CosmeticSkill {
 	}
 
 	private void passiveParticles(Player player, Location enemyLoc, Color color) {
-		new PartialParticle(Particle.REDSTONE, enemyLoc.add(0, 1, 0), 4, 0.25, 0.4, 0.25, new Particle.DustOptions(color, 0.5f)).spawnForPlayer(ParticleCategory.OWN_PASSIVE, player);
+		new PartialParticle(Particle.REDSTONE, enemyLoc.add(0, 1, 0), 4, 0.35, 0.4, 0.35, new Particle.DustOptions(color, 0.5f)).spawnForPlayer(ParticleCategory.OWN_PASSIVE, player);
+		new PPPillar(Particle.REDSTONE, enemyLoc, 2).data(new Particle.DustOptions(color, 0.82f)).count(6).spawnForPlayer(ParticleCategory.OWN_PASSIVE, player);
 	}
 }

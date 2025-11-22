@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
-import com.playmonumenta.plugins.Plugin;
-import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -88,21 +86,14 @@ public class SoundsList {
 
 	private final List<CSound> mSoundsList;
 
-	private SoundsList(List<CSound> sounds) {
+	public SoundsList(List<CSound> sounds) {
 		mSoundsList = sounds;
 	}
 
-	public static final SoundsList EMPTY = new SoundsList(new ArrayList<>());
+	public static final SoundsList EMPTY = new SoundsList(List.of());
 
 	public static SoundsList fromString(String string) {
-		ParseResult<SoundsList> result = fromReader(new StringReader(string), "");
-		if (result.getResult() == null) {
-			Plugin.getInstance().getLogger().warning("Failed to parse '" + string + "' as SoundsList");
-			Thread.dumpStack();
-			return new SoundsList(new ArrayList<>(0));
-		}
-
-		return result.getResult();
+		return Parser.parseOrDefault(Parser.getParserMethod(SoundsList.class), string, EMPTY);
 	}
 
 	public void play(Location loc) {
@@ -156,105 +147,25 @@ public class SoundsList {
 		return msg + "]";
 	}
 
-	/*
-	 * Parses a SoundsList at the next position in the StringReader.
-	 * If this item parses successfully:
-	 *   The returned ParseResult will contain a non-null getResult() and a null getTooltip()
-	 *   The reader will be advanced to the next character past this SoundsList value.
-	 * Else:
-	 *   The returned ParseResult will contain a null getResult() and a non-null getTooltip()
-	 *   The reader will not be advanced
-	 */
-	public static ParseResult<SoundsList> fromReader(StringReader reader, String hoverDescription) {
-		if (!reader.advance("[")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "[", hoverDescription)));
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+		private Builder() {
+
 		}
 
-		List<CSound> soundsList = new ArrayList<>(2);
+		List<CSound> mSounds = new ArrayList<>();
 
-		boolean atLeastOneSoundIter = false;
-		while (true) {
-			// Start trying to parse the next individual sound entry in the list
-
-			if (reader.advance("]")) {
-				// Got closing bracket and parsed rest successfully - complete sound list, break this loop
-				break;
-			}
-
-			if (atLeastOneSoundIter) {
-				if (!reader.advance(",")) {
-					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
-						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)
-					));
-				}
-				if (!reader.advance("(")) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", hoverDescription)));
-				}
-			} else {
-				if (!reader.advance("(")) {
-					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.ofString(reader.readSoFar() + "(", hoverDescription),
-						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)
-					));
-				}
-			}
-
-			atLeastOneSoundIter = true;
-
-			Sound sound = reader.readSound();
-			if (sound == null) {
-				// Entry not valid, offer all entries as completions
-				List<Tooltip<String>> suggArgs = new ArrayList<>(Sound.values().length);
-				String soFar = reader.readSoFar();
-				for (Sound valid : Sound.values()) {
-					suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
-				}
-				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
-			}
-
-			if (!reader.advance(",")) {
-				if (!reader.advance(")")) {
-					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.ofString(reader.readSoFar() + ",", "Specify volume and optionally pitch"),
-						Tooltip.ofString(reader.readSoFar() + ")", "Use 1.0 as default volume and pitch")
-					));
-				}
-				// End of this sound, loop to next
-				soundsList.add(new CSound(sound));
-				continue;
-			}
-
-			Double volume = reader.readDouble();
-			if (volume == null || volume <= 0) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Sound volume > 0")));
-			}
-
-			if (!reader.advance(",")) {
-				if (!reader.advance(")")) {
-					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.ofString(reader.readSoFar() + ",", "Specify pitch"),
-						Tooltip.ofString(reader.readSoFar() + ")", "Use 1.0 as default pitch")
-					));
-				}
-				// End of this sound, loop to next
-				soundsList.add(new CSound(sound, volume.floatValue()));
-				continue;
-			}
-
-			Double pitch = reader.readDouble();
-			if (pitch == null || pitch < 0) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Sound pitch >= 0")));
-			}
-
-			if (!reader.advance(")")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
-			}
-
-			// End of this sound, loop to next
-			soundsList.add(new CSound(sound, volume.floatValue(), pitch.floatValue()));
+		public Builder add(CSound sound) {
+			mSounds.add(sound);
+			return this;
 		}
 
-		return ParseResult.of(new SoundsList(soundsList));
+		public SoundsList build() {
+			return new SoundsList(mSounds);
+		}
 	}
 }

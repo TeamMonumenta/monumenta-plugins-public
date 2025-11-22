@@ -137,7 +137,7 @@ public class LastBreath extends DepthsAbility {
 	}
 
 	private static Description<LastBreath> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<LastBreath>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When your health drops below ")
 			.addPercent(TRIGGER_HEALTH)
 			.add(", all your other Windwalker abilities' cooldowns are reset, and abilities from other trees have their cooldowns reduced by ")

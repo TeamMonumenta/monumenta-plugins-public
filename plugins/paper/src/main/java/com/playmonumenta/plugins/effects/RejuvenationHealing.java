@@ -2,12 +2,10 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.NavigableSet;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -52,14 +50,9 @@ public class RejuvenationHealing extends Effect {
 			double maxHealth = EntityUtils.getMaxHealth(player);
 			double hp = player.getHealth() / maxHealth;
 			if (hp <= mThreshold) {
-				double healPercent = mHealPercent;
-				NavigableSet<Effect> effectGroup = mPlugin.mEffectManager.getEffects(player, ThuribleProcession.PERCENT_HEAL_EFFECT_NAME);
-				if (effectGroup != null && effectGroup.last() instanceof ThuribleBonusHealing effect) {
-					healPercent = mHealPercent * (1 + effect.getMagnitude());
-				}
-				double healAmount = maxHealth * healPercent;
+				double healAmount = maxHealth * mHealPercent;
 				PlayerUtils.healPlayer(mPlugin, player, healAmount, mSourcePlayer);
-				int numHearts = (int) (healPercent * 20);
+				int numHearts = (int) (mHealPercent * 20);
 				new PartialParticle(Particle.HEART, player.getLocation().add(0, 2, 0), numHearts, 0.07, 0.07, 0.07, 0.001).spawnAsPlayerBuff(mSourcePlayer);
 			}
 			mTicks -= mInterval;
@@ -110,5 +103,4 @@ public class RejuvenationHealing extends Effect {
 	public String toString() {
 		return String.format("RejuvenationHealing duration:%d amount:%f interval:%d", this.getDuration(), mHealPercent, mInterval);
 	}
-
 }

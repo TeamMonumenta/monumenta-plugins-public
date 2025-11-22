@@ -141,8 +141,8 @@ public class TealQuestBoss extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void init() {
-		int players = BossUtils.getPlayersInRangeForHealthScaling(mBoss, 35);
-		double targetHealth = 1000 * (Math.log1p(players) / Math.log(2));
+		final double targetHealth = 1000 * BossUtils.healthScalingCoef(PlayerUtils.playersInRange(mBoss.getLocation(),
+			detectionRange, true).size(), 0.5, 0.5);
 		EntityUtils.setMaxHealthAndHealth(mBoss, targetHealth);
 	}
 

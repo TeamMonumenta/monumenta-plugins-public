@@ -9,9 +9,6 @@ import org.bukkit.inventory.ItemStack;
 public class EndCrystalOverride extends BaseOverride {
 	@Override
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item, BlockPlaceEvent event) {
-		if (player != null && !player.getGameMode().equals(GameMode.CREATIVE)) {
-			return false;
-		}
-		return true;
+		return player == null || player.getGameMode().equals(GameMode.CREATIVE);
 	}
 }

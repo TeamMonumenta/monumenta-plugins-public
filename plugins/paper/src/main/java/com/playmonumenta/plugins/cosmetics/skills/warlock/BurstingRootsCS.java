@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,6 +23,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class BurstingRootsCS extends GraspingClawsCS {
 	private static final Particle.DustOptions BROWN = new Particle.DustOptions(Color.fromRGB(115, 65, 15), 1f);
@@ -98,7 +98,7 @@ public class BurstingRootsCS extends GraspingClawsCS {
 	public void cageTick(Player player, Location loc, double radius, int ticks) {
 		new PartialParticle(Particle.FALLING_SPORE_BLOSSOM, loc.clone().add(0, 5, 0), 4).delta(radius / 2).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.FALLING_DUST, loc.clone().add(0, 5, 0), 4).data(GREEN_BLOCK)
-				.delta(radius / 2).spawnAsPlayerActive(player);
+			.delta(radius / 2).spawnAsPlayerActive(player);
 
 		if (ticks % 5 == 0) {
 			new PPCircle(Particle.FALLING_DUST, loc.clone().add(0, 5, 0), radius).data(BROWN_CONCRETE)
@@ -179,17 +179,18 @@ public class BurstingRootsCS extends GraspingClawsCS {
 			int mTicks = 0;
 			int mIter = 0;
 			final Location mLoc = origin.clone();
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 6; i++) {
 					Vector dir = LocationUtils.getDirectionTo(target, mLoc);
 
 					new PartialParticle(Particle.REDSTONE, mLoc, 2).data(BROWN)
-							.delta(0.03).spawnAsPlayerActive(player);
+						.delta(0.03).spawnAsPlayerActive(player);
 					new PartialParticle(Particle.BLOCK_CRACK, mLoc, 2).data(Material.JUNGLE_WOOD.createBlockData())
-							.delta(0.03).spawnAsPlayerActive(player);
+						.delta(0.03).spawnAsPlayerActive(player);
 					new PartialParticle(Particle.CRIT, mLoc, 1)
-							.directionalMode(true).delta(dir.getX(), dir.getY(), dir.getZ()).extra(1).spawnAsPlayerActive(player);
+						.directionalMode(true).delta(dir.getX(), dir.getY(), dir.getZ()).extra(1).spawnAsPlayerActive(player);
 
 
 					mLoc.add(dir.clone().multiply(velocity));

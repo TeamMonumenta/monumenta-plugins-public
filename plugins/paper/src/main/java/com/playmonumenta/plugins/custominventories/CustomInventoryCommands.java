@@ -4,11 +4,16 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.depths.guis.DepthsAscensionGUI;
 import com.playmonumenta.plugins.depths.guis.ZenithCharmPowerGUI;
 import com.playmonumenta.plugins.guis.FishingDifficultyGui;
+import com.playmonumenta.plugins.guis.HuntsInfusionGUI;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
 import com.playmonumenta.plugins.guis.MusicGui;
+import com.playmonumenta.plugins.guis.SKRInfusionGUI;
+import com.playmonumenta.plugins.guis.SpiritArcheryGUI;
 import com.playmonumenta.plugins.guis.classselection.ClassSelectionGui;
+import com.playmonumenta.plugins.guis.peb.PebGui;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.listeners.IchorListener;
+import com.playmonumenta.plugins.listeners.QuiverListener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -81,7 +86,7 @@ public class CustomInventoryCommands {
 		new CommandAPICommand("openpeb")
 			.withPermission("monumenta.command.openpeb")
 			.executesPlayer((player, args) -> {
-				new PEBCustomInventory(player).openInventory(player, plugin);
+				new PebGui(player).open();
 			})
 			.register();
 
@@ -90,7 +95,7 @@ public class CustomInventoryCommands {
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
-				new PEBCustomInventory(player).openInventory(player, plugin);
+				new PebGui(player).open();
 			})
 			.register();
 
@@ -420,6 +425,48 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
 				new EnchantopediaGui(player).open();
+			})
+			.register();
+		new CommandAPICommand("openhuntsinfusiongui")
+			.withPermission("monumenta.command.openhuntsinfusiongui")
+			.executesPlayer((player, args) -> {
+				new HuntsInfusionGUI(player).open();
+			})
+			.register();
+		new CommandAPICommand("openhuntsinfusiongui")
+			.withPermission("monumenta.command.openhuntsinfusiongui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
+				new HuntsInfusionGUI(player).open();
+			})
+			.register();
+		new CommandAPICommand("openskrinfusiongui")
+			.withPermission("monumenta.command.openskrinfusiongui")
+			.executesPlayer((player, args) -> {
+				new SKRInfusionGUI(player).open();
+			})
+			.register();
+		new CommandAPICommand("openskrinfusiongui")
+			.withPermission("monumenta.command.openskrinfusiongui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
+				new SKRInfusionGUI(player).open();
+			})
+			.register();
+		new CommandAPICommand("openspiritarcherygui")
+			.withPermission("monumenta.command.openspiritarcherygui")
+			.executesPlayer((player, args) -> {
+				new SpiritArcheryGUI(player).open();
+			})
+			.register();
+		new CommandAPICommand("openspiritarcherygui")
+			.withPermission("monumenta.command.openspiritarcherygui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
+				new SpiritArcheryGUI(player).open();
 			})
 			.register();
 	}

@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PassiveGardenTwo extends Spell {
 
-	public static final int BASE_COOLDOWN = 400;
+	public static final int BASE_COOLDOWN = 533;
 	public static final int SPAWN_DELAY = 1;
 	public static final double SPAWN_ANIMATION_SPIN_SPEED = Math.PI / 10;
 	public static final double SPAWN_ANIMATION_HELIX_RADIUS = 1.5;
@@ -56,7 +56,6 @@ public class PassiveGardenTwo extends Spell {
 
 	private int mSpellTicks = 0;
 	private int mPlayerScaledCooldown = 100;
-	private boolean mSpawnedMobsLastActivation = false;
 
 	public PassiveGardenTwo(LivingEntity boss, @Nullable DepthsParty party) {
 		mBoss = boss;
@@ -95,16 +94,6 @@ public class PassiveGardenTwo extends Spell {
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), 200, true).size();
 		mPlayerScaledCooldown = BASE_COOLDOWN / playerCount;
 		spawnFlowers(1);
-
-		// Spawn mobs only half the time
-		if (mSpawnedMobsLastActivation) {
-			mSpawnedMobsLastActivation = false;
-		} else {
-			if (mParty != null && mParty.getAscension() >= 4) {
-				spawnMobs((int) Math.ceil((double) playerCount / 2));
-			}
-		}
-
 		mSpellTicks = 0;
 	}
 
@@ -127,7 +116,7 @@ public class PassiveGardenTwo extends Spell {
 		for (int i = 0; i < count; i++) {
 			List<Location> temp = new ArrayList<>(mFlowerSpawns);
 			boolean spawned = false;
-			while (!spawned && temp.size() > 0) {
+			while (!spawned && !temp.isEmpty()) {
 				int random = FastUtils.randomIntInRange(0, temp.size() - 1);
 				Location randomLoc = temp.get(random);
 				if (isFlowerAtLocation(randomLoc) || aboutToSpawn.stream().anyMatch(loc -> loc.equals(randomLoc))) {
@@ -184,7 +173,7 @@ public class PassiveGardenTwo extends Spell {
 
 		for (int i = 0; i < count; i++) {
 			// If there are no more flowers available for evolving, break out of the loop.
-			if (evolutionCandidates.size() == 0) {
+			if (evolutionCandidates.isEmpty()) {
 				break;
 			}
 
@@ -239,7 +228,7 @@ public class PassiveGardenTwo extends Spell {
 		return loc.getNearbyEntities(1, 1, 1).stream().anyMatch(e -> e.getScoreboardTags().contains(Callicarpa.FLOWER_TAG));
 	}
 
-	private void spawnMobs(int count) {
+	public void spawnMobs(int count) {
 		int spawnSpotCount = mAddsSpawns.size();
 		int nearbyMobsCount = EntityUtils.getNearbyMobs(mBoss.getLocation(), Callicarpa.detectionRange).size();
 		// Only summon up to the mob cap. Note: nearbyMobsCount counts eventual flowers and Callicarpa.

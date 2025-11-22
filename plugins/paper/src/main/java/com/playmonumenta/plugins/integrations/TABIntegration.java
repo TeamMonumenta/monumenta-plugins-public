@@ -12,7 +12,8 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.TablistCommand;
 import com.playmonumenta.plugins.protocollib.PingListener;
-import com.playmonumenta.plugins.schedule.ExecutorWrapper;
+import com.playmonumenta.plugins.social.PlayerSocialCache;
+import com.playmonumenta.plugins.social.SocialManager;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
@@ -52,18 +52,7 @@ public class TABIntegration implements Listener {
 
 	String mGlobalFooter = "%monumenta_boss_details_1% | &7Total players:&f -1 | %monumenta_boss_details_2%";
 
-	public static class Slot {
-		public final int mId;
-		public final String mText;
-		public final @Nullable String mSkin;
-		public final @Nullable Integer mPing;
-
-		public Slot(int id, String text, @Nullable String skin, @Nullable Integer ping) {
-			mId = id;
-			mText = text;
-			mSkin = skin;
-			mPing = ping;
-		}
+	public record Slot(int mId, String mText, @Nullable String mSkin, @Nullable Integer mPing) {
 	}
 
 	public static class CachedLayout {
@@ -222,8 +211,7 @@ public class TABIntegration implements Listener {
 		}
 	}
 
-	private static final Map<UUID, MonumentaPlayer> mPlayers = new ConcurrentHashMap<>();
-	private static final ExecutorWrapper mExecutor = new ExecutorWrapper("TABIntegration");
+	public static final Map<UUID, MonumentaPlayer> mPlayers = new ConcurrentHashMap<>();
 
 	public TABIntegration() {
 		INSTANCE = this;
@@ -231,7 +219,8 @@ public class TABIntegration implements Listener {
 		mTab = TabAPI.getInstance();
 		Objects.requireNonNull(mTab.getEventBus()).register(PlayerLoadEvent.class, this::playerLoadEvent);
 		// Refresh for latency
-		mExecutor.scheduleRepeatingTask(() -> onRefreshRequest(true), 0L, 30L, TimeUnit.SECONDS);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(Plugin.getInstance(),
+			() -> onRefreshRequest(true), 0, 600);
 	}
 
 	public static TABIntegration getInstance() {
@@ -242,7 +231,7 @@ public class TABIntegration implements Listener {
 	}
 
 	public void playerLoadEvent(PlayerLoadEvent event) {
-		mExecutor.schedule(() -> refreshOnlinePlayer(event.getPlayer().getUniqueId(), true));
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> refreshOnlinePlayer(event.getPlayer().getUniqueId(), true));
 	}
 
 	public static void loadRemotePlayer(RemotePlayerAbstraction player) {
@@ -254,7 +243,7 @@ public class TABIntegration implements Listener {
 			return oldValue;
 		});
 		if (monuPlayer.mShardPlayer != null && monuPlayer.mProxyPlayer != null) {
-			getInstance().onRefreshRequest(false);
+			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getInstance().onRefreshRequest(true));
 		}
 	}
 
@@ -272,7 +261,7 @@ public class TABIntegration implements Listener {
 			}
 			if (oldValue.mShardPlayer == null && oldValue.mProxyPlayer == null) {
 				oldValue = null;
-				getInstance().onRefreshRequest(false);
+				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getInstance().onRefreshRequest(false));
 			}
 			return oldValue;
 		});
@@ -295,12 +284,13 @@ public class TABIntegration implements Listener {
 		fakePlayers.clear();
 	}
 
+	@SuppressWarnings("PMD.EmptyCatchBlock")
 	public void refreshOnlinePlayer(UUID uuid, boolean latency) {
+		Player bukkitPlayer = Bukkit.getPlayer(uuid);
+		if (bukkitPlayer == null) {
+			return;
+		}
 		if (latency) {
-			Player bukkitPlayer = Bukkit.getPlayer(uuid);
-			if (bukkitPlayer == null) {
-				return;
-			}
 			refreshPing(bukkitPlayer).join();
 		}
 		TabPlayer viewer = mTab.getPlayer(uuid);
@@ -311,8 +301,9 @@ public class TABIntegration implements Listener {
 		if (monuPlayer == null) {
 			return;
 		}
+		Boolean swapFriendsAndGuild = bukkitPlayer.hasPermission("monumenta.tablist.swapfriendsandguild");
 		CachedLayout layout = createBaseLayout();
-		layout = calculateLayout(layout, monuPlayer);
+		layout = calculateLayout(layout, monuPlayer, swapFriendsAndGuild);
 		if (layout.isSameLayout(monuPlayer.mLastLayout)) {
 			return;
 		}
@@ -327,13 +318,32 @@ public class TABIntegration implements Listener {
 
 	private long mNextRefreshLatencyTime = 0L;
 	private long mNextRefreshTime = 0L;
-	private static boolean mNeedsRefresh = false;
-	private static boolean mRefreshLatency = false;
-	private static boolean mScheduled = false;
+	private @Nullable BukkitTask mRefreshTimer = null;
 
+	// this should be run async
 	private void onRefreshRequest(boolean latency) {
-		mNeedsRefresh = true;
-		mRefreshLatency = mRefreshLatency || latency;
+		long now = System.currentTimeMillis();
+		if (now >= mNextRefreshTime) {
+			if (latency && now >= mNextRefreshLatencyTime) {
+				mNextRefreshLatencyTime = now + 15000;
+			} else {
+				latency = false;
+			}
+			mNextRefreshTime = now + 1000;
+			if (mRefreshTimer != null) {
+				mRefreshTimer.cancel();
+			}
+			mRefreshTimer = null;
+			final boolean finalLatency = latency;
+			refresh(finalLatency);
+		} else {
+			if (mRefreshTimer != null) {
+				return;
+			}
+			final boolean finalLatency = latency;
+
+			mRefreshTimer = Bukkit.getScheduler().runTaskLaterAsynchronously(Plugin.getInstance(), () -> onRefreshRequest(finalLatency), 20L);
+		}
 	}
 
 	// this should be run async
@@ -358,36 +368,10 @@ public class TABIntegration implements Listener {
 		}
 	}
 
-	private void attemptRefresh() {
-		final long now = System.currentTimeMillis();
-		if (mNeedsRefresh && !mScheduled && now >= mNextRefreshTime && (!mRefreshLatency || now >= mNextRefreshLatencyTime)) {
-			final boolean refreshLatency = mRefreshLatency;
-			mRefreshLatency = false;
-			mNeedsRefresh = false;
-			mScheduled = true;
-			mExecutor.schedule(() -> {
-				refresh(refreshLatency);
-				mScheduled = false;
-			});
-			if (refreshLatency) {
-				mNextRefreshLatencyTime = System.currentTimeMillis() + 5000L;
-			}
-			mNextRefreshTime = System.currentTimeMillis() + 1000L;
-		}
-	}
-
-
-	public static void tick() {
-		if (INSTANCE == null) {
-			return;
-		}
-		getInstance().attemptRefresh();
-	}
-
 
 	private CachedLayout createBaseLayout() {
 		CachedLayout layout = new CachedLayout();
-		layout.addFixedSlot(1, " &6Patreon Shrine", "%monumenta_patron_shrine%");
+		layout.addFixedSlot(1, "&6Patreon Shrine", "%monumenta_patron_shrine%");
 		String[] shrines = {"Speed", "Resistance", "Strength", "Intuitive", "Thrift", "Harvester"};
 		int shrineIndex = 2;
 		for (String shrine : shrines) {
@@ -459,7 +443,7 @@ public class TABIntegration implements Listener {
 		}
 	}
 
-	private CachedLayout calculateLayout(CachedLayout layout, MonumentaPlayer monuPlayer) {
+	private CachedLayout calculateLayout(CachedLayout layout, MonumentaPlayer monuPlayer, Boolean swapFriendsAndGuild) {
 		// not optimized at all, store permission/meta somewhere when initially fetching the player
 		int layoutIndex = 21;
 
@@ -491,19 +475,20 @@ public class TABIntegration implements Listener {
 			}
 		}
 
-		// guild
+		boolean friendsHasHeader = false;
 		boolean guildHasHeader = false;
-		if (monuPlayer.mGuild != null) {
-			for (MonumentaPlayer guildPlayer : players) {
+		if (!swapFriendsAndGuild) {
+			// friends
+			for (MonumentaPlayer friendPlayer : players) {
 				// hide check
-				if (!isAdminOrMod && guildPlayer.mIsHidden) {
+				if ((!isAdminOrMod && friendPlayer.mIsHidden) || friendPlayer.mIsMod) {
 					continue;
 				}
-				if (guildPlayer.mGuild == null || !guildPlayer.mGuild.equals(monuPlayer.mGuild)) {
+				if (!isFriend(monuPlayer.mUuid, friendPlayer.mUuid).join()) {
 					continue;
 				}
-				if (!guildHasHeader) {
-					guildHasHeader = true;
+				if (!friendsHasHeader) {
+					friendsHasHeader = true;
 					if (modHasHeader) {
 						layout.addFixedSlot(layoutIndex, "");
 						layoutIndex++;
@@ -511,13 +496,113 @@ public class TABIntegration implements Listener {
 							return layout;
 						}
 					}
-					layout.addFixedSlot(layoutIndex, "&a&lGuild", "mineskin:224445819");
+					layout.addFixedSlot(layoutIndex, "&b&lFriends", "mineskin:1749359849");
 					layoutIndex++;
 					if (layoutIndex >= 81) {
 						return layout;
 					}
 				}
-				layout.addFixedSlot(layoutIndex, formatPlayer(guildPlayer, isAdminOrMod), guildPlayer.mSkin, guildPlayer.mPing);
+				layout.addFixedSlot(layoutIndex, formatPlayer(friendPlayer, isAdminOrMod), friendPlayer.mSkin, friendPlayer.mPing);
+				layoutIndex++;
+				if (layoutIndex >= 81) {
+					return layout;
+				}
+			}
+
+			// guild
+			if (monuPlayer.mGuild != null) {
+				for (MonumentaPlayer guildPlayer : players) {
+					// hide check
+					if ((!isAdminOrMod && guildPlayer.mIsHidden) || guildPlayer.mIsMod || isFriend(monuPlayer.mUuid, guildPlayer.mUuid).join()) {
+						continue;
+					}
+					if (guildPlayer.mGuild == null || !guildPlayer.mGuild.equals(monuPlayer.mGuild)) {
+						continue;
+					}
+					if (!guildHasHeader) {
+						guildHasHeader = true;
+						if (modHasHeader || friendsHasHeader) {
+							layout.addFixedSlot(layoutIndex, "");
+							layoutIndex++;
+							if (layoutIndex >= 81) {
+								return layout;
+							}
+						}
+						layout.addFixedSlot(layoutIndex, "&a&lGuild", "mineskin:224445819");
+						layoutIndex++;
+						if (layoutIndex >= 81) {
+							return layout;
+						}
+					}
+					layout.addFixedSlot(layoutIndex, formatPlayer(guildPlayer, isAdminOrMod), guildPlayer.mSkin, guildPlayer.mPing);
+					layoutIndex++;
+					if (layoutIndex >= 81) {
+						return layout;
+					}
+				}
+			}
+		} else {
+			// guild
+			if (monuPlayer.mGuild != null) {
+				for (MonumentaPlayer guildPlayer : players) {
+					// hide check
+					if ((!isAdminOrMod && guildPlayer.mIsHidden) || guildPlayer.mIsMod) {
+						continue;
+					}
+					if (guildPlayer.mGuild == null || !guildPlayer.mGuild.equals(monuPlayer.mGuild)) {
+						continue;
+					}
+					if (!guildHasHeader) {
+						guildHasHeader = true;
+						if (modHasHeader) {
+							layout.addFixedSlot(layoutIndex, "");
+							layoutIndex++;
+							if (layoutIndex >= 81) {
+								return layout;
+							}
+						}
+						layout.addFixedSlot(layoutIndex, "&a&lGuild", "mineskin:224445819");
+						layoutIndex++;
+						if (layoutIndex >= 81) {
+							return layout;
+						}
+					}
+					layout.addFixedSlot(layoutIndex, formatPlayer(guildPlayer, isAdminOrMod), guildPlayer.mSkin, guildPlayer.mPing);
+					layoutIndex++;
+					if (layoutIndex >= 81) {
+						return layout;
+					}
+				}
+			}
+
+			// friends
+			for (MonumentaPlayer friendPlayer : players) {
+				// hide check
+				if ((!isAdminOrMod && friendPlayer.mIsHidden) || friendPlayer.mIsMod) {
+					continue;
+				}
+				if (!isFriend(monuPlayer.mUuid, friendPlayer.mUuid).join()) {
+					continue;
+				}
+				if (friendPlayer.mGuild != null && friendPlayer.mGuild.equals(monuPlayer.mGuild)) {
+					continue;
+				}
+				if (!friendsHasHeader) {
+					friendsHasHeader = true;
+					if (modHasHeader || guildHasHeader) {
+						layout.addFixedSlot(layoutIndex, "");
+						layoutIndex++;
+						if (layoutIndex >= 81) {
+							return layout;
+						}
+					}
+					layout.addFixedSlot(layoutIndex, "&b&lFriends", "mineskin:1749359849");
+					layoutIndex++;
+					if (layoutIndex >= 81) {
+						return layout;
+					}
+				}
+				layout.addFixedSlot(layoutIndex, formatPlayer(friendPlayer, isAdminOrMod), friendPlayer.mSkin, friendPlayer.mPing);
 				layoutIndex++;
 				if (layoutIndex >= 81) {
 					return layout;
@@ -529,15 +614,12 @@ public class TABIntegration implements Listener {
 		boolean regularHasHeader = false;
 		for (MonumentaPlayer regularPlayer : players) {
 			// hide check
-			if (!isAdminOrMod && regularPlayer.mIsHidden) {
-				continue;
-			}
-			if (regularPlayer.mIsMod || (regularPlayer.mGuild != null && regularPlayer.mGuild.equals(monuPlayer.mGuild))) {
+			if ((!isAdminOrMod && regularPlayer.mIsHidden) || regularPlayer.mIsMod || isFriend(monuPlayer.mUuid, regularPlayer.mUuid).join() || (regularPlayer.mGuild != null && regularPlayer.mGuild.equals(monuPlayer.mGuild))) {
 				continue;
 			}
 			if (!regularHasHeader) {
 				regularHasHeader = true;
-				if (modHasHeader || guildHasHeader) {
+				if (modHasHeader || friendsHasHeader || guildHasHeader) {
 					layout.addFixedSlot(layoutIndex, "");
 					layoutIndex++;
 					if (layoutIndex >= 81) {
@@ -558,6 +640,14 @@ public class TABIntegration implements Listener {
 		}
 
 		return layout;
+	}
+
+	public static CompletableFuture<Boolean> isFriend(UUID playerOne, UUID playerTwo) {
+		PlayerSocialCache playerOneData = SocialManager.getSocialCache(playerOne);
+		if (playerOneData != null) {
+			return CompletableFuture.completedFuture(playerOneData.getFriends().contains(playerTwo));
+		}
+		return CompletableFuture.completedFuture(false);
 	}
 
 	private void setHeaderAndFooter(TabPlayer viewer, MonumentaPlayer player) {
@@ -583,7 +673,7 @@ public class TABIntegration implements Listener {
 		PingListener.submitPingAction(player, (ping) -> {
 			MonumentaPlayer.setPing(player.getUniqueId(), ping);
 			promise.complete(null);
-		}, Constants.TICKS_PER_SECOND * 1, false, () -> {
+		}, Constants.TICKS_PER_SECOND, false, () -> {
 			MonumentaPlayer.setPing(player.getUniqueId(), 1000);
 			promise.complete(null);
 		});
@@ -619,7 +709,7 @@ public class TABIntegration implements Listener {
 				} catch (Exception eex) {
 					MMLog.warning("Failed to send global ping message: ", eex);
 				}
-				getInstance().onRefreshRequest(false);
+				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getInstance().onRefreshRequest(false));
 			});
 		});
 	}
@@ -639,7 +729,7 @@ public class TABIntegration implements Listener {
 						MMLog.warning("Failed to process global ping message: ", ex);
 					}
 				}
-				getInstance().onRefreshRequest(false);
+				Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getInstance().onRefreshRequest(false));
 			}
 		}
 	}

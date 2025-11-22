@@ -51,7 +51,7 @@ public class VoteManager {
 		List<String> alternateNames = config.mVoting.mAlternateNames;
 		List<Integer> times = config.mVoting.mCooldownMinutes;
 
-		if (urls.size() < 1 || times.size() < 1 || urls.size() != times.size()) {
+		if (urls.isEmpty() || times.isEmpty() || urls.size() != times.size()) {
 			throw new IllegalArgumentException("Voting config sites / cooldown_minutes length mismatch (or they are empty)");
 		}
 

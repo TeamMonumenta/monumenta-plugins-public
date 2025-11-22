@@ -96,6 +96,7 @@ public class Snowstorm extends DepthsAbility {
 		new BukkitRunnable() {
 			double mCurrRadius = 0;
 			final Location mLoc = loc.clone();
+
 			@Override
 			public void run() {
 				mCurrRadius += 1.4;
@@ -206,8 +207,9 @@ public class Snowstorm extends DepthsAbility {
 	}
 
 	private static Description<Snowstorm> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Snowstorm>(color)
-			.add("Left click while sneaking to summon a ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to summon a ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" block radius snowstorm that lasts for ")
 			.addDuration(a -> a.mDuration, DURATION)

@@ -3,11 +3,12 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvePreset;
 import com.playmonumenta.plugins.delves.DelvesManager;
+import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
-import com.playmonumenta.plugins.utils.DungeonUtils;
+import com.playmonumenta.plugins.utils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -47,9 +48,21 @@ public class DungeonAccessCommand extends GenericCommand {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.dungeonaccess");
 
-		String[] dungeons = Arrays.stream(DungeonUtils.DungeonCommandMapping.values())
+		String[] dungeons = Arrays.stream(DungeonCommandMapping.values())
 			.map(m -> m.name().toLowerCase(Locale.ROOT))
 			.toArray(String[]::new);
+
+		new CommandAPICommand("dungeonaccess")
+			.withPermission(perms)
+			.withArguments(
+				new LiteralArgument("headsup"),
+				new EntitySelectorArgument.ManyPlayers("players"),
+				new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons))
+			)
+			.executes((sender, args) -> {
+				getMapping(args.getUnchecked("dungeon")).showHeadsUpMessage((Collection<Player>) args.get("players"));
+			})
+			.register();
 
 		new CommandAPICommand("dungeonaccess")
 			.withPermission(perms)
@@ -115,9 +128,9 @@ public class DungeonAccessCommand extends GenericCommand {
 			.register();
 	}
 
-	public static DungeonUtils.DungeonCommandMapping getMapping(String dungeon) throws WrapperCommandSyntaxException {
+	public static DungeonCommandMapping getMapping(String dungeon) throws WrapperCommandSyntaxException {
 		try {
-			return DungeonUtils.DungeonCommandMapping.valueOf(dungeon.toUpperCase(Locale.ROOT));
+			return DungeonCommandMapping.valueOf(dungeon.toUpperCase(Locale.ROOT));
 		} catch (IllegalArgumentException e) {
 			throw CommandAPI.failWithString("Invalid dungeon '" + dungeon + "'");
 		}
@@ -126,7 +139,7 @@ public class DungeonAccessCommand extends GenericCommand {
 	/**
 	 * Opens a new instance of a dungeon for the key player (if they don't already have an instance), and then invites the other players into the new instance.
 	 */
-	public static void startNew(Player keyPlayer, Collection<Player> otherPlayersRaw, DungeonUtils.DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch, int type, final boolean useDelvePreset) throws WrapperCommandSyntaxException {
+	public static void startNew(Player keyPlayer, Collection<Player> otherPlayersRaw, DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch, int type, final boolean useDelvePreset) throws WrapperCommandSyntaxException {
 
 		if (ScoreboardUtils.getScoreboardValue(keyPlayer, mapping.getAccessName()).orElse(0) != 0) {
 			throw CommandAPI.failWithString("You already have an open instance!");
@@ -141,7 +154,8 @@ public class DungeonAccessCommand extends GenericCommand {
 		RBoardAPI.add("$Last", mapping.getAccessName(), 1).thenAccept(accessScore
 			-> Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> { // must run on main server thread
 			// Neither delvePreset nor shardName are null if useDelvePreset is true, but nullaway won't let me remove this
-			if (useDelvePreset && delvePreset != null && shardName != null) {
+			// When starting a challenge delve, this runs twice. Entropy rolls gets overriden as a result.
+			if (useDelvePreset && delvePreset != null && shardName != null && !delvePreset.mModifiers.containsKey(DelvesModifier.ENTROPY)) {
 				DelvesManager.savePlayerData(keyPlayer, shardName, delvePreset.mModifiers, delvePreset.mId);
 			}
 			if (mapping.getFinishedName() != null) {
@@ -169,7 +183,7 @@ public class DungeonAccessCommand extends GenericCommand {
 	 * Invites players to the dungeon instance of the inviting player, if they don't already have an instance. Copies delve mods, start date, dungeon type, etc. to the invited players.
 	 * Does not perform a date check to see if invites are allowed.
 	 */
-	private static void invite(Player invitingPlayer, Collection<Player> otherPlayersRaw, DungeonUtils.DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch) {
+	private static void invite(Player invitingPlayer, Collection<Player> otherPlayersRaw, DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch) {
 
 		Set<Player> allPlayers = new HashSet<>(otherPlayersRaw);
 		allPlayers.add(invitingPlayer);
@@ -237,7 +251,7 @@ public class DungeonAccessCommand extends GenericCommand {
 	/**
 	 * Sends players to their existing instance for the given dungeon, if they have an instance.
 	 */
-	private static void send(Collection<Player> players, @Nullable DungeonUtils.DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch) {
+	private static void send(Collection<Player> players, @Nullable DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch) {
 		if (mapping == null) {
 			MMLog.warning("Invalid dungeon mapping");
 			return;
@@ -284,12 +298,12 @@ public class DungeonAccessCommand extends GenericCommand {
 		}
 	}
 
-	public static void send(Player player, @Nullable DungeonUtils.DungeonCommandMapping mapping, Location returnLocation) {
+	public static void send(Player player, @Nullable DungeonCommandMapping mapping, Location returnLocation) {
 		send(List.of(player), mapping, returnLocation, returnLocation.getYaw(), returnLocation.getPitch());
 	}
 
 	public static void send(Player player, String dungeonName) throws WrapperCommandSyntaxException {
-		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(dungeonName);
+		DungeonCommandMapping mapping = DungeonCommandMapping.getByShard(dungeonName);
 		if (mapping == null) {
 			throw CommandAPI.failWithString("No such dungeon " + dungeonName);
 		}

@@ -10,18 +10,18 @@ public class ChallengeMobEffect extends Effect {
 
 	private final Challenge mChallenge;
 
-	public ChallengeMobEffect(int duration, Challenge challenge) {
+	public ChallengeMobEffect(final int duration, final Challenge challenge) {
 		super(duration, effectId);
 		mChallenge = challenge;
 	}
 
 	@Override
-	public void onDeath(EntityDeathEvent event) {
+	public void onDeath(final EntityDeathEvent event) {
 		mChallenge.incrementKills(event.getEntity());
 	}
 
 	@Override
-	public void onExplode(EntityExplodeEvent event) {
+	public void onExplode(final EntityExplodeEvent event) {
 		mChallenge.incrementKills((LivingEntity) event.getEntity());
 	}
 

@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.AdvancingShadowsCS;
@@ -18,7 +20,6 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -37,44 +38,35 @@ public class AdvancingShadows extends Ability {
 
 	private static final int ADVANCING_SHADOWS_RANGE_1 = 11;
 	private static final int ADVANCING_SHADOWS_RANGE_2 = 16;
-	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED = 0.5f;
-	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE = 4;
+	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACK_SPEED = 0.5f;
+	private static final float ADVANCING_SHADOWS_AOE_KNOCKBACK_RANGE = 4;
 	private static final double ADVANCING_SHADOWS_OFFSET = 2.7;
 	private static final int DURATION = 5 * 20;
 	private static final double DAMAGE_BONUS_1 = 0.3;
 	private static final double DAMAGE_BONUS_2 = 0.4;
+	private static final double ENHANCEMENT_MULTIPLIER = 0.5;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
 	private static final int ENHANCEMENT_KILL_REQUIREMENT_TIME = 20;
 	private static final int ENHANCEMENT_CHAIN_DURATION = 20 * 4;
 
 	public static final String CHARM_DAMAGE = "Advancing Shadows Damage Multiplier";
+	public static final String CHARM_DURATION = "Advancing Shadows Duration";
 	public static final String CHARM_COOLDOWN = "Advancing Shadows Cooldown";
 	public static final String CHARM_RANGE = "Advancing Shadows Range";
 	public static final String CHARM_KNOCKBACK = "Advancing Shadows Knockback";
-	public static final String CHARM_ENHANCE_TIMER = "Advancing Shadows Recast Timer";
+	public static final String CHARM_KNOCKBACK_RADIUS = "Advancing Shadows Knockback Radius";
+	public static final String CHARM_ENHANCEMENT_TIMER = "Advancing Shadows Recast Timer";
+	public static final String CHARM_KILL_TIMER = "Advancing Shadows Kill Timer";
+	public static final String CHARM_ENHANCEMENT_MULTIPLIER = "Advancing Shadows Recast Multiplier";
 
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "AdvancingShadowsPercentDamageDealtEffect";
-	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeTypes();
 
 	public static final AbilityInfo<AdvancingShadows> INFO =
 		new AbilityInfo<>(AdvancingShadows.class, "Advancing Shadows", AdvancingShadows::new)
 			.linkedSpell(ClassAbility.ADVANCING_SHADOWS)
 			.scoreboardId("AdvancingShadows")
 			.shorthandName("AS")
-			.descriptions(
-				String.format("While holding two swords and not sneaking, right click to teleport to the target hostile enemy within %s blocks and gain +%s%% Melee Damage for %s seconds. Cooldown: %ss.",
-					ADVANCING_SHADOWS_RANGE_1 - 1,
-					(int) (DAMAGE_BONUS_1 * 100),
-					DURATION / 20,
-					ADVANCING_SHADOWS_COOLDOWN / 20),
-				String.format("Damage increased to +%s%% Melee Damage for %ss, teleport range is increased to %s blocks and all hostile non-target mobs within %s blocks are knocked away from the target.",
-					(int) (DAMAGE_BONUS_2 * 100),
-					DURATION / 20,
-					ADVANCING_SHADOWS_RANGE_2 - 1,
-					(int) ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE),
-				String.format("If the mob you teleported to dies within %ss, you can recast Advancing Shadows again in the next %ss. Recasts provide 50%% of the damage bonus and do not provide Deadly Ronde stacks.",
-					ENHANCEMENT_KILL_REQUIREMENT_TIME / 20,
-					ENHANCEMENT_CHAIN_DURATION / 20))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Teleport to a mob and gain a damage bonus.")
 			.cooldown(ADVANCING_SHADOWS_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AdvancingShadows::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
@@ -82,9 +74,13 @@ public class AdvancingShadows extends Ability {
 			.displayItem(Material.ENDER_EYE);
 
 	private final double mPercentDamageDealt;
+	private final int mDuration;
 	private final double mActivationRange;
 	private final int mRecastTimer;
+	private final double mKnockbackRadius;
 	private final float mKnockback;
+	private final double mEnhancementMultiplier;
+	private final int mEnhancementKillTimer;
 
 	private int mEnhancementKillTick = -999;
 	private int mEnhancementChain;
@@ -95,9 +91,13 @@ public class AdvancingShadows extends Ability {
 	public AdvancingShadows(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mPercentDamageDealt = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? DAMAGE_BONUS_1 : DAMAGE_BONUS_2);
+		mDuration = CharmManager.getDuration(player, CHARM_DURATION, DURATION);
 		mActivationRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, (isLevelOne() ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2));
-		mRecastTimer = CharmManager.getDuration(player, CHARM_ENHANCE_TIMER, ENHANCEMENT_KILL_REQUIREMENT_TIME);
-		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, ADVANCING_SHADOWS_AOE_KNOCKBACKS_SPEED);
+		mRecastTimer = CharmManager.getDuration(player, CHARM_ENHANCEMENT_TIMER, ENHANCEMENT_CHAIN_DURATION);
+		mEnhancementKillTimer = CharmManager.getDuration(player, CHARM_KILL_TIMER, ENHANCEMENT_KILL_REQUIREMENT_TIME);
+		mKnockbackRadius = CharmManager.getRadius(player, CHARM_KNOCKBACK_RADIUS, ADVANCING_SHADOWS_AOE_KNOCKBACK_RANGE);
+		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, ADVANCING_SHADOWS_AOE_KNOCKBACK_SPEED);
+		mEnhancementMultiplier = CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCEMENT_MULTIPLIER) + ENHANCEMENT_MULTIPLIER;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AdvancingShadowsCS());
 		mEnhancementChain = 0;
@@ -105,7 +105,7 @@ public class AdvancingShadows extends Ability {
 
 	public boolean cast() {
 		// Enhancement: If mCanRecast is true (which shows that targeted mob died in 1s), allow recast of AS for next 3 seconds.
-		if (isOnCooldown() && !(isEnhanced() && mCanRecast && mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION >= Bukkit.getCurrentTick())) {
+		if (isOnCooldown() && !(isEnhanced() && mCanRecast && mEnhancementKillTick + mRecastTimer >= Bukkit.getCurrentTick())) {
 			return false;
 		}
 
@@ -115,7 +115,7 @@ public class AdvancingShadows extends Ability {
 			return false;
 		}
 
-		if (isEnhanced() && (mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION < Bukkit.getCurrentTick())) {
+		if (isEnhanced() && (mEnhancementKillTick + mRecastTimer < Bukkit.getCurrentTick())) {
 			// Lose Kill chain if last kill tick was over 80 ticks ago.
 			mEnhancementChain = 0;
 		}
@@ -192,13 +192,17 @@ public class AdvancingShadows extends Ability {
 		}
 
 		if (mEnhancementChain == 0) {
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt, AFFECTED_DAMAGE_TYPES));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
+				new PercentDamageDealt(mDuration, mPercentDamageDealt).damageTypes(DamageEvent.DamageType.getAllMeleeTypes())
+					.deleteOnAbilityUpdate(true));
 		} else {
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(DURATION, mPercentDamageDealt / 2.0, AFFECTED_DAMAGE_TYPES));
+			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
+				new PercentDamageDealt(mDuration, mPercentDamageDealt * mEnhancementMultiplier)
+					.damageTypes(DamageEvent.DamageType.getAllMeleeTypes()).deleteOnAbilityUpdate(true));
 		}
 		if (isLevelTwo()) {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(),
-				ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE, mPlayer)) {
+				mKnockbackRadius, mPlayer)) {
 				if (mob != entity) {
 					MovementUtils.knockAway(entity, mob, mKnockback, true);
 				}
@@ -206,16 +210,18 @@ public class AdvancingShadows extends Ability {
 		}
 
 		if (isEnhanced()) {
-			GlowingManager.ActiveGlowingEffect glowingEffect = GlowingManager.startGlowing(entity, NamedTextColor.BLACK, mRecastTimer, GlowingManager.PLAYER_ABILITY_PRIORITY);
+			GlowingManager.ActiveGlowingEffect glowingEffect = GlowingManager.startGlowing(entity, NamedTextColor.BLACK, mEnhancementKillTimer, GlowingManager.PLAYER_ABILITY_PRIORITY);
 
 			cancelOnDeath(new BukkitRunnable() {
 				int mT = 0;
 
 				@Override
 				public void run() {
-					if (mT > mRecastTimer) {
+					if (mT > mEnhancementKillTimer) {
 						mEnhancementChain = 0;
-						glowingEffect.clear();
+						if (glowingEffect != null) {
+							glowingEffect.clear();
+						}
 
 						cancel();
 						return;
@@ -258,7 +264,7 @@ public class AdvancingShadows extends Ability {
 			.append(Component.text("]", NamedTextColor.YELLOW))
 			.append(Component.text(": ", NamedTextColor.WHITE));
 
-		if (isEnhanced() && mCanRecast && mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION >= Bukkit.getCurrentTick()) {
+		if (isEnhanced() && mCanRecast && mEnhancementKillTick + mRecastTimer >= Bukkit.getCurrentTick()) {
 			output = output.append(Component.text("✓", NamedTextColor.GOLD, TextDecoration.BOLD));
 		} else if (remainingCooldown > 0) {
 			output = output.append(Component.text(((int) Math.ceil(remainingCooldown / 20.0)) + "s", NamedTextColor.GRAY));
@@ -266,5 +272,40 @@ public class AdvancingShadows extends Ability {
 			output = output.append(Component.text("✓", NamedTextColor.GREEN, TextDecoration.BOLD));
 		}
 		return output;
+	}
+
+	private static Description<AdvancingShadows> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to teleport to the target hostile enemy within ")
+			.add(a -> a.mActivationRange, ADVANCING_SHADOWS_RANGE_1, false, Ability::isLevelOne)
+			.add(" blocks and gain ")
+			.addPercent(a -> a.mPercentDamageDealt, DAMAGE_BONUS_1, false, Ability::isLevelOne)
+			.add(" melee damage for ")
+			.addDuration(a -> a.mDuration, DURATION)
+			.add(" seconds.")
+			.addCooldown(ADVANCING_SHADOWS_COOLDOWN);
+	}
+
+	private static Description<AdvancingShadows> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage increased to ")
+			.addPercent(a -> a.mPercentDamageDealt, DAMAGE_BONUS_2, false, Ability::isLevelTwo)
+			.add(" melee damage, teleport range is increased to ")
+			.add(a -> a.mActivationRange, ADVANCING_SHADOWS_RANGE_2, false, Ability::isLevelTwo)
+			.add(" blocks, and all hostile non-target mobs within ")
+			.add(a -> a.mKnockbackRadius, ADVANCING_SHADOWS_AOE_KNOCKBACK_RANGE)
+			.add(" blocks are knocked away from the target.");
+	}
+
+	private static Description<AdvancingShadows> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("If the mob you teleported to dies within ")
+			.addDuration(a -> a.mEnhancementKillTimer, ENHANCEMENT_KILL_REQUIREMENT_TIME)
+			.add(" second, you can recast Advancing Shadows again in the next ")
+			.addDuration(a -> a.mRecastTimer, ENHANCEMENT_CHAIN_DURATION)
+			.add(" seconds. Recasts provide ")
+			.addPercent(a -> a.mEnhancementMultiplier, 0.5)
+			.add(" of the damage bonus and do not provide Deadly Ronde stacks.");
 	}
 }

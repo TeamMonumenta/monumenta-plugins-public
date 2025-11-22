@@ -15,8 +15,8 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 public class SpellShadowRealm extends Spell {
 
 	private int mT = 0;
-	private int mRange;
-	private Location mCenter;
+	private final int mRange;
+	private final Location mCenter;
 
 	public SpellShadowRealm(Location loc, int r) {
 		mCenter = loc;
@@ -49,11 +49,11 @@ public class SpellShadowRealm extends Spell {
 			}
 			List<Player> shadowedplayers = Lich.playersInRange(shadowloc, mRange, true);
 			shadowedplayers.removeIf(pl -> pl.getLocation().getY() > Lich.getLichSpawn().getY() - 10);
-			if (shadowedplayers.size() == 0) {
+			if (shadowedplayers.isEmpty()) {
 				SpellDimensionDoor.clearShadowed();
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(shadowloc, 55);
 				mobs.removeIf(e -> e.getType() == EntityType.MAGMA_CUBE || e.getType() == EntityType.ARMOR_STAND ||
-					                   e.getScoreboardTags().contains("Boss") || e.getLocation().getY() >= mCenter.getY() - 8);
+					e.getScoreboardTags().contains("Boss") || e.getLocation().getY() >= mCenter.getY() - 8);
 				for (LivingEntity m : mobs) {
 					m.setHealth(0);
 				}

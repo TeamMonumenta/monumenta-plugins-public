@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.bosses.spells.SpellSlashAttack;
 import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.Collections;
 import java.util.List;
+import org.bukkit.Color;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
@@ -48,9 +50,13 @@ public class SlashAttackBoss extends BossAbilityGroup {
 		@BossParam(help = "The ending color of the color transition. Default: 20bd35")
 		public String END_HEX_COLOR = "20bd35";
 		@BossParam(help = "Whether there should or not be a second, perpendicular slash, forming an X. Default: false")
-		public String X_SLASH = "false";
+		public boolean X_SLASH = false;
+		@BossParam(help = "Mirrors the second slash on X-SLASH")
+		public boolean MIRROR_SLASH = false;
+		@BossParam(help = "Whether the slash is drawn using a Full Arc (true) or Half Arc (false).")
+		public boolean FULL_ARC = false;
 		@BossParam(help = "Whether to transition color horizontally or not. Default: false")
-		public String HORIZONTAL_COLOR = "false";
+		public boolean HORIZONTAL_COLOR = false;
 		@BossParam(help = "The x component of the knockback. Default: 0")
 		public double KB_X = 0;
 		@BossParam(help = "The y component of the knockback. Default: 0")
@@ -58,11 +64,13 @@ public class SlashAttackBoss extends BossAbilityGroup {
 		@BossParam(help = "The z component of the knockback. Default: 0")
 		public double KB_Z = 0;
 		@BossParam(help = "Whether or not to apply the knockback away from the boss. Will use the x component for horizontal, and y for vertical. Default: false")
-		public String KNOCK_AWAY = "false";
+		public boolean KNOCK_AWAY = false;
 		@BossParam(help = "The effectiveness of KBR. Default: 1.0")
 		public double KBR_EFFECTIVENESS = 1;
 		@BossParam(help = "Whether or not the attack should be repositioned at the caster. Default: false")
-		public String FOLLOW_CASTER = "false";
+		public boolean FOLLOW_CASTER = false;
+		@BossParam(help = "Whether or not the attack should be corresponding to the telegraph rotation. Default: false")
+		public boolean FOLLOW_TELEGRAPH_ROTATION = false;
 		@BossParam(help = "The size of each particle's hitbox, in all three directions. Default: 0.2")
 		public double HITBOX_SIZE = 0.2;
 		@BossParam(help = "Force the size of each dust particle to this one, if a positive value. Default: -1")
@@ -73,16 +81,26 @@ public class SlashAttackBoss extends BossAbilityGroup {
 		public boolean MULTI_HIT = false;
 		@BossParam(help = "Minimum interval to when slashattack can hit again")
 		public int MULTIHIT_INTERVAL = 8;
+		@BossParam(help = "Flips the slash (rotates it 180 degrees) every subsequent slash")
+		public boolean FLIP_SLASH = false;
+		@BossParam(help = "How many slashes")
+		public int SLASHES = 1;
+		@BossParam(help = "How many ticks in between each slash")
+		public int SLASH_INTERVAL = 10;
+		@BossParam(help = "Whether the random angle is reselected after the first slash (only applies if there is more than 1 slash)")
+		public boolean RESELECT_SLASH_ANGLE = true;
 		@BossParam(help = "The type of the damage dealt by the attack. Default: MELEE")
 		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MELEE;
 		@BossParam(help = "The sound at the start of telegraph. Default: EMPTY")
-		public SoundsList SOUND_TELEGRAPH = SoundsList.fromString("[]");
+		public SoundsList SOUND_TELEGRAPH = SoundsList.EMPTY;
 		@BossParam(help = "The sound at the start of the slash. Default: ENTITY_PLAYER_ATTACK_SWEEP")
-		public SoundsList SOUND_SLASH_START = SoundsList.fromString("[(ENTITY_PLAYER_ATTACK_SWEEP,1,1)]");
+		public SoundsList SOUND_SLASH_START = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 1.0f))
+			.build();
 		@BossParam(help = "The sound at every tick of the slash. Default: EMPTY")
-		public SoundsList SOUND_SLASH_TICK = SoundsList.fromString("[]");
+		public SoundsList SOUND_SLASH_TICK = SoundsList.EMPTY;
 		@BossParam(help = "The sound at the end of the slash. Default: EMPTY")
-		public SoundsList SOUND_SLASH_END = SoundsList.fromString("[]");
+		public SoundsList SOUND_SLASH_END = SoundsList.EMPTY;
 	}
 
 	public final Parameters mParams;
@@ -96,10 +114,12 @@ public class SlashAttackBoss extends BossAbilityGroup {
 			new SpellSlashAttack(plugin, boss,
 				mParams.COOLDOWN, mParams.DAMAGE, mParams.TELEGRAPH_DURATION, mParams.RADIUS, mParams.MIN_ANGLE,
 				mParams.MAX_ANGLE, mParams.ATTACK_NAME, mParams.RINGS, mParams.START_ANGLE, mParams.END_ANGLE,
-				mParams.SPACING, mParams.START_HEX_COLOR, mParams.MID_HEX_COLOR, mParams.END_HEX_COLOR,
-				mParams.X_SLASH, mParams.HORIZONTAL_COLOR, new Vector(mParams.KB_X, mParams.KB_Y, mParams.KB_Z),
-				mParams.KNOCK_AWAY, mParams.KBR_EFFECTIVENESS, mParams.FOLLOW_CASTER, mParams.HITBOX_SIZE,
-				mParams.FORCED_PARTICLE_SIZE, mParams.DAMAGE_TYPE, mParams.SOUND_TELEGRAPH, mParams.SOUND_SLASH_START, mParams.SOUND_SLASH_TICK, mParams.SOUND_SLASH_END, mParams.MULTI_HIT, mParams.MULTIHIT_INTERVAL, mParams.RESPECT_IFRAMES
+				mParams.SPACING, Color.fromRGB(Integer.parseInt(mParams.START_HEX_COLOR, 16)), Color.fromRGB(Integer.parseInt(mParams.MID_HEX_COLOR, 16)), Color.fromRGB(Integer.parseInt(mParams.END_HEX_COLOR, 16)),
+				mParams.X_SLASH, mParams.MIRROR_SLASH, mParams.FULL_ARC, mParams.HORIZONTAL_COLOR, new Vector(mParams.KB_X, mParams.KB_Y, mParams.KB_Z),
+				mParams.KNOCK_AWAY, mParams.KBR_EFFECTIVENESS, mParams.FOLLOW_CASTER, mParams.FOLLOW_TELEGRAPH_ROTATION, mParams.HITBOX_SIZE,
+				mParams.FORCED_PARTICLE_SIZE, mParams.DAMAGE_TYPE, mParams.SOUND_TELEGRAPH, mParams.SOUND_SLASH_START, mParams.SOUND_SLASH_TICK, mParams.SOUND_SLASH_END,
+				mParams.FLIP_SLASH, mParams.SLASHES, mParams.SLASH_INTERVAL, mParams.RESELECT_SLASH_ANGLE,
+				mParams.MULTI_HIT, mParams.MULTIHIT_INTERVAL, mParams.RESPECT_IFRAMES
 			)
 		));
 

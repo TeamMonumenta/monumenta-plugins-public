@@ -3,7 +3,9 @@ package com.playmonumenta.plugins.cosmetics.skills.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -13,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class AdvancingShadowsCS implements CosmeticSkill {
 
@@ -29,8 +32,27 @@ public class AdvancingShadowsCS implements CosmeticSkill {
 	}
 
 	public void tpParticle(Player mPlayer, LivingEntity target) {
-		new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);
+		Vector vecFromEntity = mPlayer.getLocation().subtract(target.getLocation()).toVector().normalize();
+		Location pLoc = mPlayer.getEyeLocation();
+		pLoc.setPitch(pLoc.getPitch() + 90);
+		Vector pVec = pLoc.getDirection().normalize();
+
+		Vector[] axes = {pVec, pVec.clone().crossProduct(mPlayer.getLocation().getDirection())};
+
+		for (int i = 0; i < 12; i++) {
+			Vector dir = vecFromEntity.clone().rotateAroundAxis(axes[0], FastUtils.randomDoubleInRange(-Math.PI / 2, Math.PI / 2))
+				.rotateAroundAxis(axes[1], FastUtils.randomDoubleInRange(-Math.PI / 2, Math.PI / 2));
+			new PartialParticle(Particle.SMOKE_LARGE, mPlayer.getLocation().clone().add(0, 1, 0))
+				.delta(dir.getX(), dir.getY() + FastUtils.randomDoubleInRange(-1, 1), dir.getZ())
+				.directionalMode(true)
+				.extra(0.35)
+				.spawnAsPlayerActive(mPlayer);
+		}
+		new PPCircle(Particle.SPELL_WITCH, mPlayer.getLocation().clone().add(0, 1, 0), 1.5)
+			.axes(axes[0], axes[1])
+			.count(35)
+			.delta(0.1)
+			.spawnAsPlayerActive(mPlayer);
 	}
 
 	public void tpTrail(Player mPlayer, Location loc, int i) {

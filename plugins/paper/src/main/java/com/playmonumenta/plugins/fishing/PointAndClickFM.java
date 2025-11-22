@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class PointAndClickFM extends FishingMinigame {
-	private final Color[] PROGRESS_BAR_COLORS = new Color[] {
+	private final Color[] PROGRESS_BAR_COLORS = new Color[]{
 		Color.fromRGB(100, 255, 50),
 		Color.fromRGB(255, 200, 50),
 		Color.fromRGB(255, 100, 0),
@@ -76,6 +76,7 @@ public class PointAndClickFM extends FishingMinigame {
 		CIRCLE_LOCATIONS.forEach((circleLocation) -> adjustedCircleLocations.add(bottomCorner.clone().add(planeVectorX.clone().multiply(circleLocation.getX())).add(planeVectorY.clone().multiply(circleLocation.getY()))));
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks++;

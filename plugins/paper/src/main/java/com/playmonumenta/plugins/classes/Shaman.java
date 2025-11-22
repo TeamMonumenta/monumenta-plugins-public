@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.abilities.shaman.soothsayer.ChainHealingWave;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.Sanctuary;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
-import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 
@@ -29,7 +28,6 @@ public class Shaman extends PlayerClass {
 	public static final int CLASS_ID = 8;
 	public static final int SOOTHSAYER_ID = 15;
 	public static final int HEXBREAKER_ID = 16;
-	public static final String PERMISSION_STRING = "monumenta.class.shaman";
 
 	public Shaman() {
 		mAbilities.add(CleansingTotem.INFO);
@@ -42,12 +40,9 @@ public class Shaman extends PlayerClass {
 		mAbilities.add(CrystallineCombos.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Shaman";
-		mPermissionString = PERMISSION_STRING;
 		mDisplayItem = Material.TOTEM_OF_UNDYING;
 		mClassDescription = "Shamans excel in strategic positioning and location defense, using their stationary totems to control the battle.";
-		mClassPassiveDescription = String.format("Gain %s%% speed and take %s%% less damage while standing within %s blocks of your totems.",
-			StringUtils.multiplierToPercentage(TotemicEmpowerment.SPEED), StringUtils.multiplierToPercentage(TotemicEmpowerment.RESISTANCE), TotemicEmpowerment.RADIUS);
-		mClassPassiveName = "Totemic Empowerment";
+		mPassive = TotemicEmpowerment.INFO;
 
 		mSpecOne.mAbilities.add(Sanctuary.INFO);
 		mSpecOne.mAbilities.add(WhirlwindTotem.INFO);
@@ -59,9 +54,7 @@ public class Shaman extends PlayerClass {
 		mSpecOne.mSpecName = "Soothsayer";
 		mSpecOne.mDisplayItem = Material.OAK_SAPLING;
 		mSpecOne.mDescription = "Focuses on using your tools to support your team and turn the tide of battle.";
-		mSpecOne.mPassiveName = "Support Expertise";
-		mSpecOne.mPassiveDescription = String.format("Boosts the magic damage done by your class skills by %s%% per specialization point and the power of Totemic Empowerment's buffs by %s%%, as well as providing the base values to players within %s blocks.",
-			StringUtils.multiplierToPercentage(SupportExpertise.DAMAGE_BOOST), StringUtils.multiplierToPercentage(SupportExpertise.SELF_BOOST), SupportExpertise.RADIUS);
+		mSpecOne.mPassive = SupportExpertise.INFO;
 
 		mSpecTwo.mAbilities.add(DesecratingShot.INFO);
 		mSpecTwo.mAbilities.add(DecayedTotem.INFO);
@@ -71,8 +64,7 @@ public class Shaman extends PlayerClass {
 		mSpecTwo.mSpecName = "Hexbreaker";
 		mSpecTwo.mDisplayItem = Material.MAGMA_BLOCK;
 		mSpecTwo.mDescription = "Deals in dark magics, focusing on harming enemies at the cost of totems.";
-		mSpecTwo.mPassiveName = "Destructive Expertise";
-		mSpecTwo.mPassiveDescription = String.format("Increases the magic damage done by your class skills by %s%% per specialization point.", StringUtils.multiplierToPercentage(DestructiveExpertise.DAMAGE_BOOST));
+		mSpecTwo.mPassive = DestructiveExpertise.INFO;
 
 		mTriggerOrder = ImmutableList.of(
 			InterconnectedHavoc.INFO,

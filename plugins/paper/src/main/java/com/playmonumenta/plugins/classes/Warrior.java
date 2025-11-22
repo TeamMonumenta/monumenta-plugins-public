@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.abilities.warrior.BruteForce;
 import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
 import com.playmonumenta.plugins.abilities.warrior.DefensiveLine;
+import com.playmonumenta.plugins.abilities.warrior.Formidable;
 import com.playmonumenta.plugins.abilities.warrior.Frenzy;
 import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
@@ -40,8 +41,7 @@ public class Warrior extends PlayerClass {
 		mClassGlassFiller = Material.RED_STAINED_GLASS_PANE;
 		mDisplayItem = Material.STONE_AXE;
 		mClassDescription = "Warriors specialize in melee combat, being able to both deal and survive heavy damage.";
-		mClassPassiveDescription = "Gain a base of 20% Knockback Resistance. This stacks with other skills and items.";
-		mClassPassiveName = "Formidable";
+		mPassive = Formidable.INFO;
 
 		mSpecOne.mAbilities.add(GloriousBattle.INFO);
 		mSpecOne.mAbilities.add(MeteorSlam.INFO);

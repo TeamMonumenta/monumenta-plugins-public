@@ -46,6 +46,7 @@ public class SupernovaShieldCS extends EscapeDeathCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 12; i++) {

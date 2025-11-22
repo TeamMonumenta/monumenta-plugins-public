@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 public class VirtualFirmament {
 
-	private static final String TAG = "VirtualFirmament";
+	public static final String TAG = "VirtualFirmament";
 
 	public static void register() {
 

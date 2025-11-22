@@ -32,11 +32,11 @@ public class DamageBlocker extends Spell {
 
 	private static final double MAX_DEFLECT_VELOCITY = 3.0;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private List<Player> mWarned = new ArrayList<Player>();
-	private GatesOfHell mHell;
-	private GatesOfHell mCeilingHell;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final List<Player> mWarned = new ArrayList<>();
+	private final GatesOfHell mHell;
+	private final GatesOfHell mCeilingHell;
 
 	public DamageBlocker(Plugin plugin, LivingEntity boss, GatesOfHell hell, GatesOfHell ceilingHell) {
 		mPlugin = plugin;

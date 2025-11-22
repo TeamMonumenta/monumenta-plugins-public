@@ -68,6 +68,13 @@ public class FastUtils {
 	}
 
 	/**
+	 * Generates a random boolean.
+	 */
+	public static boolean randomBoolean() {
+		return RANDOM.nextInt(2) == 0;
+	}
+
+	/**
 	 * Fast, reduced-accuracy sin implementation
 	 *
 	 * @param rad Angle measure in radians

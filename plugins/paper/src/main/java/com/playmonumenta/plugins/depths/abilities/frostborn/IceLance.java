@@ -171,8 +171,9 @@ public class IceLance extends DepthsAbility {
 	}
 
 	private static Description<IceLance> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<IceLance>(color)
-			.add("Right click to shoot an ice lance that travels for ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to shoot an ice lance that travels for ")
 			.add(a -> a.mRange, RANGE)
 			.add(" blocks and pierces through mobs, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)

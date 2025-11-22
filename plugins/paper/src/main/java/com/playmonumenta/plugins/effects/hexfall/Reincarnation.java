@@ -10,7 +10,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.EntityEffect;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
@@ -52,13 +51,6 @@ public class Reincarnation extends Effect {
 	}
 
 	@Override
-	public void entityGainEffect(Entity entity) {
-		if (entity instanceof Player player) {
-			player.sendMessage(Component.text("You've gained Reincarnation against death...", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-		}
-	}
-
-	@Override
 	public boolean isBuff() {
 		return true;
 	}
@@ -66,6 +58,11 @@ public class Reincarnation extends Effect {
 	@Override
 	public boolean shouldDeleteOnLogout() {
 		return true;
+	}
+
+	@Override
+	public @Nullable String getDisplayedName() {
+		return "Reincarnation";
 	}
 
 	@Override

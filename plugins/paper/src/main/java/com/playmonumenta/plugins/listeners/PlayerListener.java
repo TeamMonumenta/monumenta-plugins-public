@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.destroystokyo.paper.event.server.ServerTickEndEvent;
 import com.playmonumenta.plugins.Constants;
@@ -15,17 +16,19 @@ import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
+import com.playmonumenta.plugins.events.HemorrhageEvent;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
-import com.playmonumenta.plugins.integrations.TABIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.managers.DungeonAccessManager;
@@ -43,6 +46,7 @@ import com.playmonumenta.plugins.protocollib.VirtualItemsReplacer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -98,8 +102,9 @@ import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.Light;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Allay;
 import org.bukkit.entity.Animals;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -266,10 +271,11 @@ public class PlayerListener implements Listener {
 		// can be removed after a while
 		if (ScoreboardUtils.checkTag(player, Constants.Tags.NO_SELF_PARTICLES)) {
 			player.removeScoreboardTag(Constants.Tags.NO_SELF_PARTICLES);
-			ScoreboardUtils.setScoreboardValue(player, Objects.requireNonNull(ParticleCategory.OWN_PASSIVE.mObjectiveName), 0);
+			ScoreboardUtils.setScoreboardValue(
+				player, Objects.requireNonNull(ParticleCategory.OWN_PASSIVE.mObjectiveName), 0);
 		}
 
-		//TODO: Remove this when custom effects logout handling is better dealt with
+		// TODO: Remove this when custom effects logout handling is better dealt with
 		EntityUtils.applyRecoilDisable(mPlugin, 9999, 99, player);
 
 
@@ -331,7 +337,12 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void playerChangeWorldEvent(PlayerChangedWorldEvent event) {
-		InventoryUtils.removeSpecialItems(event.getPlayer(), false, true, false);
+		Player player = event.getPlayer();
+
+		InventoryUtils.removeSpecialItems(player, false, true, false);
+
+		/* Remove portals from player */
+		PortalManager.clearAllPortals(player);
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
@@ -345,12 +356,6 @@ public class PlayerListener implements Listener {
 		Block block = event.getClickedBlock();
 		Material mat = (block != null) ? block.getType() : Material.AIR;
 
-		// Plot Security: If block is in a plot but the player is in adventure, cancel.
-		if (block != null && player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(block.getLocation())) {
-			event.setCancelled(true);
-			return;
-		}
-
 		BlockData blockData;
 		if (block == null) {
 			blockData = null;
@@ -358,13 +363,43 @@ public class PlayerListener implements Listener {
 			blockData = block.getBlockData();
 		}
 
-		if (player.getGameMode() != GameMode.CREATIVE && block != null && !(blockData instanceof Powerable) && ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.RESTRICTED)) {
+		if (
+			player.getGameMode() != GameMode.CREATIVE
+				&& block != null
+				&& block.getType().equals(Material.DRAGON_EGG)
+		) {
+			GameMode guildPlotGameMode = GuildPlotUtils.guildPlotGameMode(player);
+			if (
+				player.getGameMode() == GameMode.ADVENTURE
+					|| ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.RESTRICTED)
+					|| (
+					guildPlotGameMode != null
+						&& guildPlotGameMode != GameMode.SURVIVAL
+				)
+			) {
+				event.setCancelled(true);
+				event.setUseInteractedBlock(Event.Result.DENY);
+				return;
+			}
+		}
+
+		if (
+			player.getGameMode() != GameMode.CREATIVE
+				&& block != null
+				&& !(blockData instanceof Powerable)
+				&& ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.RESTRICTED)
+		) {
 			event.setCancelled(true);
 			event.setUseInteractedBlock(Event.Result.DENY);
 			return;
 		}
 
-		if (player.getGameMode() != GameMode.CREATIVE && block != null && blockData instanceof Powerable && ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.DISABLE_REDSTONE_INTERACTIONS)) {
+		if (
+			player.getGameMode() != GameMode.CREATIVE
+				&& block != null
+				&& blockData instanceof Powerable
+				&& ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.DISABLE_REDSTONE_INTERACTIONS)
+		) {
 			event.setCancelled(true);
 			event.setUseInteractedBlock(Event.Result.DENY);
 			return;
@@ -388,7 +423,7 @@ public class PlayerListener implements Listener {
 			}
 		} else if (action == Action.PHYSICAL) {
 			mPlugin.mItemOverrides.physicalBlockInteraction(mPlugin, player, action, block, event);
-				if (event.useInteractedBlock() == Event.Result.DENY) {
+			if (event.useInteractedBlock() == Event.Result.DENY) {
 				return;
 			}
 		}
@@ -400,20 +435,11 @@ public class PlayerListener implements Listener {
 			}
 		}
 
-		// Block Interactions
-		if (event.useInteractedBlock() != Event.Result.DENY) {
-			if (block != null) {
-				if ((player.getGameMode() == GameMode.ADVENTURE
-					&& ZoneUtils.isInPlot(block.getLocation()))) {
-					event.setUseInteractedBlock(Event.Result.DENY);
-					return;
-				}
-			}
-		}
-
-		// Immediately load crossbows when the right mouse button is held down for long enough instead of only when released.
+		// Immediately load crossbows when the right mouse button is
+		// held down for long enough instead of only when released.
 		// Also send an inventory update when a crossbow is released.
-		// This prevents "ghost" loading crossbows, where the client thinks the button was held for long enough, but the server disagrees.
+		// This prevents "ghost" loading crossbows, where the client thinks
+		// the button was held for long enough, but the server disagrees.
 		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
 			&& event.useItemInHand() != Event.Result.DENY
 			&& item != null
@@ -455,15 +481,16 @@ public class PlayerListener implements Listener {
 			&& item.containsEnchantment(Enchantment.RIPTIDE)
 			&& playerHasDepthStrider(player)) {
 
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				PlayerUtils.resendItems(player,
-					Stream.of(EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD)
-						.filter(slot -> player.getEquipment().getItem(slot).containsEnchantment(Enchantment.DEPTH_STRIDER))
-						.toArray(EquipmentSlot[]::new));
-			});
+			Bukkit.getScheduler().runTask(mPlugin, () -> PlayerUtils.resendItems(player,
+				Stream.of(EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD)
+					.filter(slot -> player.getEquipment().getItem(slot).containsEnchantment(Enchantment.DEPTH_STRIDER))
+					.toArray(EquipmentSlot[]::new)));
 
 			// Update inventory again after riptiding (or aborting) to re-add the removed depth strider
-			if (player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING) && playerHasDepthStrider(player)) {
+			if (
+				player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING)
+					&& playerHasDepthStrider(player)
+			) {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
@@ -473,8 +500,16 @@ public class PlayerListener implements Listener {
 						}
 						if (!player.isHandRaised() && !player.isRiptiding()) {
 							PlayerUtils.resendItems(player,
-								Stream.of(EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD)
-									.filter(slot -> player.getEquipment().getItem(slot).containsEnchantment(Enchantment.DEPTH_STRIDER))
+								Stream.of(
+										EquipmentSlot.FEET,
+										EquipmentSlot.LEGS,
+										EquipmentSlot.CHEST,
+										EquipmentSlot.HEAD
+									)
+									.filter(slot -> player
+										.getEquipment()
+										.getItem(slot)
+										.containsEnchantment(Enchantment.DEPTH_STRIDER))
 									.toArray(EquipmentSlot[]::new));
 							cancel();
 						}
@@ -503,14 +538,25 @@ public class PlayerListener implements Listener {
 		}
 
 		// Only allow placing monument wools on Monuments
-		if (player.getGameMode() == GameMode.ADVENTURE && ItemUtils.isWool(block.getType()) && !ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.MONUMENT)) {
+		if (ItemUtils.isWool(block.getType())
+			&& ItemStatUtils.getTier(item) == Tier.TROPHY
+			&& !ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.MONUMENT)
+		) {
 			event.setCancelled(true);
 			return;
 		}
 
 		if (ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.NO_PLACING_CONTAINERS)) {
 			Material material = block.getType();
-			if (material == Material.CHEST || material == Material.BARREL || (ItemUtils.isShulkerBox(material) && !FirmamentOverride.isFirmamentItem(item) && !WorldshaperOverride.isWorldshaperItem(item))) {
+			if (
+				material == Material.CHEST
+					|| material == Material.BARREL
+					|| (
+					ItemUtils.isShulkerBox(material)
+						&& !FirmamentOverride.isFirmamentItem(item)
+						&& !WorldshaperOverride.isWorldshaperItem(item)
+				)
+			) {
 				event.setCancelled(true);
 			}
 		}
@@ -572,19 +618,26 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void playerInteractEntityEventWithCancelled(PlayerInteractEntityEvent event) {
-
+		if (event.getRightClicked() instanceof Allay) {
+			event.setCancelled(true);
+			return;
+		}
 		// Need to ignore the left click that follows this right click, thus handle cancelled events too
 		mPlugin.mAbilityManager.playerInteractEntityEvent(event);
 
 	}
 
-	// Player interacts with an entity (not triggered on armor stands, as those only trigger a PlayerInteractAtEntityEvent)
+	// Player interacts with an entity
+	// (not triggered on armor stands, as those only trigger a playerArmorStandManipulateEvent)
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
 
 		/* Don't let the player do this when in a restricted zone */
-		if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
+		if (
+			ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
+				&& player.getGameMode() != GameMode.CREATIVE
+		) {
 			event.setCancelled(true);
 			return;
 		}
@@ -595,14 +648,14 @@ public class PlayerListener implements Listener {
 			itemInHand = player.getEquipment().getItemInOffHand();
 		}
 
-		//Prevent feeding special item lore items to animals (specifically horses)
+		// Prevent feeding special item lore items to animals (specifically horses)
 		if (clickedEntity instanceof Animals && itemInHand.hasItemMeta() && itemInHand.getItemMeta().hasLore()) {
 			event.setCancelled(true);
 			return;
 		} else if (clickedEntity instanceof ItemFrame frame) {
 
-			// Plot Security: If item frame is in a plot but the player is in adventure, cancel.
-			if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(frame)) {
+			// Guild plot inventory modification permission
+			if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -658,16 +711,15 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
 		Player player = event.getPlayer();
-		ArmorStand armorStand = event.getRightClicked();
 
 		/* Don't let the player do this in a restricted zone */
-		if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
-			event.setCancelled(true);
-			return;
-		}
-
-		// Plot Security: If armor stand is in a plot but the player is in adventure, cancel.
-		if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(armorStand)) {
+		if (
+			(
+				ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
+					|| GuildPlotUtils.guildPlotInventoryModificationBlocked(player)
+			)
+				&& player.getGameMode() != GameMode.CREATIVE
+		) {
 			event.setCancelled(true);
 		}
 	}
@@ -678,7 +730,8 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 
-		// Update inventory if switching to or from a riptide trident while having depth strider to virtually remove that depth strider
+		// Update inventory if switching to or from a riptide trident while
+		// having depth strider to virtually remove that depth strider
 		ItemStack previousItem = player.getInventory().getItem(event.getPreviousSlot());
 		ItemStack newItem = player.getInventory().getItem(event.getNewSlot());
 		if (((previousItem != null && previousItem.containsEnchantment(Enchantment.RIPTIDE)) || (newItem != null && newItem.containsEnchantment(Enchantment.RIPTIDE)))
@@ -698,7 +751,10 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 
 		/* Don't let the player do this when in a restricted zone */
-		if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
+		if (
+			ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
+				&& player.getGameMode() != GameMode.CREATIVE
+		) {
 			event.setCancelled(true);
 			return;
 		}
@@ -711,7 +767,10 @@ public class PlayerListener implements Listener {
 		if (event.getEntity() instanceof Player player) {
 
 			/* Don't let the player do this when in a restricted zone */
-			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
+			if (
+				ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
+					&& player.getGameMode() != GameMode.CREATIVE
+			) {
 				event.setCancelled(true);
 				return;
 			}
@@ -748,6 +807,13 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
+		ClickType clickType = event.getClick();
+		Inventory topInventory = event.getView().getTopInventory();
+		if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player, topInventory)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		ItemStack item = event.getCurrentItem();
 
 		// If item contains curse of ephemerality, prevent from putting in other inventories
@@ -756,29 +822,29 @@ public class PlayerListener implements Listener {
 			(
 				// Prevent shift-clicking an ephemeral item from your inventory to something else
 				(
-					(event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT)
+					(clickType == ClickType.SHIFT_LEFT || clickType == ClickType.SHIFT_RIGHT)
 						&& item != null
 						&& CurseOfEphemerality.isEphemeral(item)
-						&& event.getView().getTopInventory().getType() != InventoryType.CRAFTING // Allow shift-click between inventory and hotbar
+						// Allow shift-click between inventory and hotbar
+						&& topInventory.getType() != InventoryType.CRAFTING
 						&& event.getClickedInventory() instanceof PlayerInventory
 				)
 					// Prevent clicking an ephemeral item from your cursor down into something else
 					|| (
-					event.getClick() != ClickType.SHIFT_LEFT
-						&& event.getClick() != ClickType.SHIFT_RIGHT
-						&& event.getCursor() != null
+					clickType != ClickType.SHIFT_LEFT
+						&& clickType != ClickType.SHIFT_RIGHT
 						&& CurseOfEphemerality.isEphemeral(event.getCursor())
 						&& !(event.getClickedInventory() instanceof PlayerInventory)
 				)
 					// Prevent moving ephemeral item using number keys
 					|| (
-					event.getClick() == ClickType.NUMBER_KEY
+					clickType == ClickType.NUMBER_KEY
 						&& CurseOfEphemerality.isEphemeral(player.getInventory().getItem(event.getHotbarButton()))
 						&& !(event.getClickedInventory() instanceof PlayerInventory)
 				)
 					// Prevent moving ephemeral item using swap offhand keys
 					|| (
-					event.getClick() == ClickType.SWAP_OFFHAND
+					clickType == ClickType.SWAP_OFFHAND
 						&& CurseOfEphemerality.isEphemeral(player.getInventory().getItemInOffHand())
 						&& !(event.getClickedInventory() instanceof PlayerInventory)
 				)
@@ -794,30 +860,46 @@ public class PlayerListener implements Listener {
 			EffectManager.getInstance().addEffect(player, GearChanged.effectID, new GearChanged(GearChanged.DURATION));
 		}
 
-		if (player.getGameMode() != GameMode.CREATIVE
-			&& event.getClickedInventory() == player.getInventory()
-			&& 36 <= event.getSlot() && event.getSlot() <= 40
-			&& (ItemUtils.isNullOrAir(event.getCursor())
-			|| event.getClick().isShiftClick()
-			|| event.getClick() == ClickType.UNKNOWN
-			|| (event.getClick() == ClickType.NUMBER_KEY && ItemUtils.isNullOrAir(player.getInventory().getItem(event.getHotbarButton()))))
-			&& (player.getLocation().getY() < player.getWorld().getMinHeight() || EntityUtils.touchesLava(player))) {
+		if (
+			player.getGameMode() != GameMode.CREATIVE &&
+				event.getClickedInventory() == player.getInventory() &&
+				36 <= event.getSlot() && event.getSlot() <= 40 &&
+				(
+					ItemUtils.isNullOrAir(event.getCursor()) ||
+						clickType.isShiftClick() ||
+						clickType == ClickType.UNKNOWN ||
+						(
+							clickType == ClickType.NUMBER_KEY
+								&& ItemUtils.isNullOrAir(player.getInventory().getItem(event.getHotbarButton())
+							)
+						)
+				) &&
+				(
+					player.getLocation().getY() < player.getWorld().getMinHeight() ||
+						EntityUtils.touchesLava(player)
+				)
+		) {
 			player.sendMessage(Component.text("Unequipping gear in lava or void is not allowed!", NamedTextColor.RED));
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 			return;
 		}
 
-		if (!mPlugin.mItemOverrides.inventoryClickInteraction(mPlugin, player, event) || !mPlugin.mItemOverrides.inventoryClickEvent(mPlugin, player, event)) {
+		if (
+			!mPlugin.mItemOverrides.inventoryClickInteraction(mPlugin, player, event) ||
+				!mPlugin.mItemOverrides.inventoryClickEvent(mPlugin, player, event)
+		) {
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 		}
 
 		// If right-clicking charm, open GUI
-		if (event.getClick() == ClickType.RIGHT
-			&& item != null
-			&& item.getAmount() == 1
-			&& ItemUtils.isNullOrAir(event.getCursor())) {
+		if (
+			clickType == ClickType.RIGHT &&
+				item != null &&
+				item.getAmount() == 1 &&
+				ItemUtils.isNullOrAir(event.getCursor())
+		) {
 			for (CharmManager.CharmType charmType : CharmManager.CharmType.values()) {
 				if (charmType.isCharm(item)) {
 					new CharmsGUI(player, charmType).open();
@@ -826,16 +908,23 @@ public class PlayerListener implements Listener {
 			}
 		}
 
-		if (event.getClick() == ClickType.SWAP_OFFHAND
-			&& event.getClickedInventory() == player.getInventory()
-			&& ItemUtils.isNullOrAir(event.getCursor())
-			&& ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)) {
-			event.setCurrentItem(Multitool.swap(mPlugin, (Player) event.getWhoClicked(), item));
-			event.setCancelled(true);
-			GUIUtils.refreshOffhand(event);
+		if (
+			clickType == ClickType.SWAP_OFFHAND &&
+				event.getClickedInventory() == player.getInventory() &&
+				ItemUtils.isNullOrAir(event.getCursor()) &&
+				item != null &&
+				ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)
+		) {
+			Multitool.onSwapInInventory(event, player, item);
 		}
 
-		if (item != null && item.getType() == Material.WRITTEN_BOOK && item.getAmount() == 1 && ItemUtils.isNullOrAir(event.getCursor()) && event.getClick() == ClickType.RIGHT) {
+		if (
+			item != null &&
+				item.getType() == Material.WRITTEN_BOOK &&
+				item.getAmount() == 1 &&
+				ItemUtils.isNullOrAir(event.getCursor()) &&
+				clickType == ClickType.RIGHT
+		) {
 			player.openBook(item);
 			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1, 1);
 			event.setCancelled(true);
@@ -858,7 +947,7 @@ public class PlayerListener implements Listener {
 		if (event.getWhoClicked() instanceof Player player) {
 			InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 
-			//If item contains curse of ephemerality, prevent from putting in other inventories
+			// If item contains curse of ephemerality, prevent from putting in other inventories
 			if (player.getGameMode() != GameMode.CREATIVE && !(event.getInventory() instanceof PlayerInventory)) {
 				if (event.getCursor() != null && CurseOfEphemerality.isEphemeral(event.getCursor())) {
 					event.setCancelled(true);
@@ -877,10 +966,11 @@ public class PlayerListener implements Listener {
 	// The player opened an inventory
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryOpenEvent(InventoryOpenEvent event) {
+		Inventory inventory = event.getInventory();
 		if (event.getPlayer() instanceof Player player) {
 
 			/* Don't let the player do this when in a restricted zone */
-			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
+			if ((ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) || GuildPlotUtils.guildPlotInventoryViewBlocked(player, inventory))
 				&& player.getGameMode() != GameMode.CREATIVE
 				&& player.getGameMode() != GameMode.SPECTATOR) {
 				event.setCancelled(true);
@@ -896,7 +986,11 @@ public class PlayerListener implements Listener {
 		InventoryHolder holder = inventory.getHolder();
 		if (holder instanceof Chest chest) {
 			// Break Halloween creeper chests in safe zones automatically when closed
-			if (ChestUtils.isEmpty(chest) && (chest.customName() != null && MessagingUtils.plainText(chest.customName()).contains("Creeperween Chest"))) {
+			if (
+				ChestUtils.isEmpty(chest)
+					&& (chest.customName() != null
+					&& MessagingUtils.plainText(chest.customName()).contains("Creeperween Chest"))
+			) {
 				chest.getBlock().breakNaturally();
 			}
 		}
@@ -915,7 +1009,7 @@ public class PlayerListener implements Listener {
 		if (event.getWhoClicked() instanceof Player player) {
 
 			/* Don't let the player do this when in a restricted zone */
-			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
+			if ((ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) || GuildPlotUtils.guildPlotInventoryModificationBlocked(player))
 				&& player.getGameMode() != GameMode.CREATIVE
 				&& player.getGameMode() != GameMode.SPECTATOR) {
 				event.setCancelled(true);
@@ -1025,7 +1119,10 @@ public class PlayerListener implements Listener {
 		InventoryUtils.removeSpecialItems(player, true, false);
 
 		// Debuff mobs around player in dungeon if running solo
-		if (Plugin.IS_PLAY_SERVER && ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
+		if (
+			Plugin.IS_PLAY_SERVER
+				&& ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1
+		) {
 			if (PlayerUtils.otherPlayersInRange(player, 64, true).isEmpty()) {
 				// Delay by a tick to allow the entity that killed the player (if any) to still be valid until all damage/death events resolve
 				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
@@ -1049,17 +1146,36 @@ public class PlayerListener implements Listener {
 		mPlugin.mAbilityManager.playerDeathEvent(player, event);
 		mPlugin.mItemStatManager.onDeath(mPlugin, player, event);
 
+		// Clear any enderpearls related to this player
+		for (World world : Bukkit.getWorlds()) {
+			// Copy list to prevent concurrent modification exception
+			for (Entity entity : new ArrayList<>(world.getEntitiesByClasses(EnderPearl.class))) {
+				if (
+					entity instanceof EnderPearl enderPearl
+						&& enderPearl.getShooter() instanceof Player thrower
+						// Avoid comparison with stale player object; go by player UUID instead
+						&& player.getUniqueId().equals(thrower.getUniqueId())
+				) {
+					enderPearl.remove();
+				}
+			}
+		}
+
 		// Give the player a NewDeath score of 1 so the city guides will give items again
 		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
 
 		Component deathMessage = event.deathMessage();
-		if (deathMessage != null && ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0) != 0) {
+		if (
+			deathMessage != null
+				&& ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0) != 0
+		) {
 			player.sendMessage(deathMessage);
 			if (mPlugin.mAuditListener != null) {
 				// The audit won't work later if the death message is null
 				mPlugin.mAuditListener.death(event);
 			}
-			player.sendMessage(Component.text("Only you saw this message. Change this with /deathmsg", NamedTextColor.AQUA));
+			player.sendMessage(Component.text(
+				"Only you saw this message. Change this with /deathmsg", NamedTextColor.AQUA));
 			event.deathMessage(null);
 		}
 		// Don't repeat if they died in the last 5 ticks
@@ -1099,7 +1215,8 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void playerPostRespawnEvent(PlayerPostRespawnEvent event) {
-		// Teleport the player to the respawn location as vanilla might have moved the player again after the respawn event
+		// Teleport the player to the respawn location as
+		// vanilla might have moved the player again after the respawn event
 		// (e.g. due to intersecting unbreakable blocks or solid entities like boats).
 		event.getPlayer().teleport(event.getRespawnedLocation());
 	}
@@ -1112,7 +1229,7 @@ public class PlayerListener implements Listener {
 		} else if (event.getState() == State.CAUGHT_ENTITY || event.getState() == State.CAUGHT_FISH) {
 			mPlugin.mTrackingManager.mFishingHook.removeEntity(player);
 
-			if (event.getState() == State.CAUGHT_ENTITY && !EntityUtils.isHostileMob(event.getCaught())) {
+			if (event.getState() == State.CAUGHT_ENTITY && (!EntityUtils.isHostileMob(event.getCaught()) || EntityUtils.isCCImmuneMob(event.getCaught()))) {
 				event.setCancelled(true);
 			}
 		}
@@ -1123,7 +1240,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 
-		if (ItemStatUtils.isCharm(item)) {
+		if (ItemStatUtils.isCharm(item) || ItemStatUtils.getTier(item) == Tier.CURRENCY) {
 			event.setCancelled(true);
 			return;
 		}
@@ -1162,7 +1279,8 @@ public class PlayerListener implements Listener {
 			ItemStack activeItem = player.getActiveItem();
 			StatTrackManager.getInstance().incrementStatImmediately(activeItem, player, InfusionType.STAT_TRACK_CONSUMED, 1);
 
-			// Set replacement to a copy of the original, so it is not consumed (must be a copy as the internal code checks for reference equality)
+			// Set replacement to a copy of the original, so it is
+			// not consumed (must be a copy as the internal code checks for reference equality)
 			event.setReplacement(ItemUtils.clone(activeItem));
 		}
 
@@ -1173,9 +1291,16 @@ public class PlayerListener implements Listener {
 
 				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, () -> player.setHealth(0), 0);
 			} else if (effectType.equals(PotionEffectType.SLOW_FALLING)) {
-				//Remove Slow Falling effects
-				player.sendMessage(Component.text("You cannot apply slow falling potion effects, other effects were still applied.", NamedTextColor.RED));
-				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, () -> player.removePotionEffect(PotionEffectType.SLOW_FALLING), 1);
+				// Remove Slow Falling effects
+				player.sendMessage(Component.text(
+					"You cannot apply slow falling potion effects, other effects were still applied.",
+					NamedTextColor.RED
+				));
+				player.getServer().getScheduler().scheduleSyncDelayedTask(
+					mPlugin,
+					() -> player.removePotionEffect(PotionEffectType.SLOW_FALLING),
+					1
+				);
 			}
 		}
 	}
@@ -1225,7 +1350,9 @@ public class PlayerListener implements Listener {
 					1.1, 0.6, 1.1, fallingDustData).spawnAsPlayerActive(player);
 				Component itemName = ItemUtils.getDisplayName(item).decoration(TextDecoration.UNDERLINED, false);
 				String translatedMessage = TranslationsManager.translate(player, "Your %s is about to break!");
-				Component message = Component.text(translatedMessage).color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
+				Component message = Component.text(translatedMessage)
+					.color(NamedTextColor.RED)
+					.decoration(TextDecoration.ITALIC, false)
 					.replaceText(TextReplacementConfig.builder().matchLiteral("%s").replacement(itemName).build());
 				player.sendMessage(message);
 			}
@@ -1237,7 +1364,8 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		Location loc = player.getLocation();
 
-		//Manually forces the player in place during the riptide if they use it out of water (in rain) or have the riptide disable effect
+		// Manually forces the player in place during the riptide if they
+		// use it out of water (in rain) or have the riptide disable effect
 		if (StasisListener.isInStasis(player) || !mPlugin.mItemOverrides.playerRiptide(mPlugin, player, event)) {
 			player.teleport(loc);
 			player.setCooldown(Material.TRIDENT, 15 * 20);
@@ -1344,11 +1472,14 @@ public class PlayerListener implements Listener {
 		}
 
 		// If moving a lot, check collision with unbreakable blocks on the way.
-		// Only check a small bounding box of 0.2x0.2x0.2 for collision to reduce false positives (e.g. from moving around a corner).
+		// Only check a small bounding box of 0.2x0.2x0.2 for collision to
+		// reduce false positives (e.g. from moving around a corner).
 		// This still prevents moving through solid walls/floors.
 		if (event.getFrom().distanceSquared(event.getTo()) > 1) {
 			double height = player.isSwimming() ? 0.2 : 0.6;
-			BoundingBox movingBox = BoundingBox.of(event.getFrom().clone().add(-0.1, height, -0.1), event.getFrom().clone().add(0.1, height + 0.2, 0.1));
+			BoundingBox movingBox = BoundingBox.of(
+				event.getFrom().clone().add(-0.1, height, -0.1),
+				event.getFrom().clone().add(0.1, height + 0.2, 0.1));
 			// check collision twice per meter
 			int steps = (int) Math.floor(event.getTo().distance(event.getFrom()) * 2) - 1;
 			if (steps > 100) {
@@ -1383,7 +1514,11 @@ public class PlayerListener implements Listener {
 
 		/* Prevent entering beds designed to glitch through blocks */
 		Material aboveMat = loc.add(0, 1, 0).getBlock().getType();
-		if (aboveMat.equals(Material.BEDROCK) || aboveMat.equals(Material.BARRIER) || aboveMat.equals(Material.OBSIDIAN)) {
+		if (
+			aboveMat.equals(Material.BEDROCK)
+				|| aboveMat.equals(Material.BARRIER)
+				|| aboveMat.equals(Material.OBSIDIAN)
+		) {
 			new BukkitRunnable() {
 				float mFreq = 0;
 
@@ -1421,14 +1556,17 @@ public class PlayerListener implements Listener {
 
 				String[] split = str.split(" ");
 				if (split.length != 5) {
-					player.sendMessage(Component.text("Command block should be of the format 'x y z pitch yaw'", NamedTextColor.RED));
-					player.sendMessage(Component.text("Relative and absolute coordinates accepted", NamedTextColor.RED));
+					player.sendMessage(Component.text(
+						"Command block should be of the format 'x y z pitch yaw'", NamedTextColor.RED));
+					player.sendMessage(Component.text(
+						"Relative and absolute coordinates accepted", NamedTextColor.RED));
 					continue;
 				}
 
 				try {
 					// Coordinates are relative to the head of the bed
-					Point pt = Point.fromString(player, split[0], split[1], split[2], false, bed.getLocation());
+					Point pt = Point.fromString(player, split[0], split[1], split[2],
+						false, bed.getLocation());
 
 					float yaw = (float) CommandUtils.parseDoubleFromString(player, split[3]);
 					float pitch = (float) CommandUtils.parseDoubleFromString(player, split[4]);
@@ -1448,7 +1586,7 @@ public class PlayerListener implements Listener {
 							GameMode mode;
 
 							if (mTicks == 0) {
-								//Set player's spawn point back to whatever it was
+								// Set player's spawn point back to whatever it was
 								player.setRespawnLocation(oldPlayerSpawn, true);
 							}
 
@@ -1469,7 +1607,13 @@ public class PlayerListener implements Listener {
 							} else if (mTicks >= BED_TELE_TIME + 1) {
 								player.teleport(teleLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 
-								world.playSound(teleLoc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.PLAYERS, 1.0f, 1.3f);
+								world.playSound(
+									teleLoc,
+									Sound.ENTITY_ELDER_GUARDIAN_DEATH,
+									SoundCategory.PLAYERS,
+									1.0f,
+									1.3f
+								);
 
 								this.cancel();
 							} else if (!player.isSleeping() || !player.isOnline() || player.isDead()) {
@@ -1543,6 +1687,14 @@ public class PlayerListener implements Listener {
 	public void abilityCastEvent(AbilityCastEvent event) {
 		Player player = event.getCaster();
 		mPlugin.mAbilityManager.abilityCastEvent(player, event);
+		mPlugin.mItemStatManager.onAbilityCast(mPlugin, player, event);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void hemorrhageEvent(HemorrhageEvent event) {
+		Player player = event.getCaster();
+		// Insert Ability Manager code here, if you want it
+		mPlugin.mItemStatManager.onHemorrhage(mPlugin, player, event);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -1555,7 +1707,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		//Prevent players in survival mode breaking blocks in adventure mode zones not including plots
+		// Prevent players in survival mode breaking blocks in adventure mode zones not including plots
 		if (player.getGameMode() == GameMode.SURVIVAL && !ZoneUtils.playerCanMineBlock(player, block)) {
 			event.setCancelled(true);
 			return;
@@ -1572,7 +1724,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	//Player is healed.
+	// Player is healed.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onRegain(EntityRegainHealthEvent event) {
 		if (event.getEntity() instanceof Player player) {
@@ -1598,7 +1750,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		GameMode expectedGameMode = ZoneUtils.expectedGameMode(player);
 
-		//NOTE Once we update Paper version more,
+		// NOTE Once we update Paper version more,
 		// replace the event's generic failure message via
 		// event.cancelMessage(),
 		// instead of doing player.sendMessage() separately
@@ -1653,7 +1805,8 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void gamemodeChangeEvent(PlayerGameModeChangeEvent event) {
-		// When switching to creative, update the inventory to update any virtual items back into normal forms to prevent breaking them.
+		// When switching to creative, update the inventory to
+		// update any virtual items back into normal forms to prevent breaking them.
 		// Also update when switching away from creative or spectator to show virtual items again.
 		if (event.getNewGameMode() == GameMode.CREATIVE
 			|| (event.getPlayer().getGameMode() == GameMode.CREATIVE && event.getNewGameMode() != GameMode.SPECTATOR)
@@ -1664,7 +1817,8 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void inventoryCreativeEvent(InventoryCreativeEvent event) {
-		// The inventory update initiated above takes a while, during which the virtual items can become broken anyway, so need to watch for these events as well
+		// The inventory update initiated above takes a while,
+		// during which the virtual items can become broken anyway, so need to watch for these events as well
 		if ((event.getCurrentItem() != null && VirtualItemsReplacer.isVirtualItem(event.getCurrentItem()))
 			|| VirtualItemsReplacer.isVirtualItem(event.getCursor())) {
 			event.setCancelled(true);
@@ -1687,7 +1841,8 @@ public class PlayerListener implements Listener {
 		) {
 			Plugin plugin = Plugin.getInstance();
 			if (plugin != null) {
-				Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.mAbilityManager.updatePlayerAbilities(player, true), 0);
+				Bukkit.getScheduler().runTaskLater(plugin,
+					() -> plugin.mAbilityManager.updatePlayerAbilities(player, true), 0);
 			}
 		}
 	}
@@ -1721,7 +1876,11 @@ public class PlayerListener implements Listener {
 				String matStr = mat.getKey().toString();
 
 				ItemMeta meta = item.getItemMeta();
-				if (meta != null && meta.hasLore() && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.MATERIAL) == 0) {
+				if (
+					meta != null
+						&& meta.hasLore()
+						&& ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.MATERIAL) == 0
+				) {
 					cancel = true;
 				} else {
 					if (matStr.endsWith("_dye")) {
@@ -1750,7 +1909,8 @@ public class PlayerListener implements Listener {
 
 		// Easter egg: Times Dyed for shulker boxes
 		if (!cancel && ItemUtils.isShulkerBox(resultMat) && event.getWhoClicked() instanceof Player player) {
-			StatTrackManager.getInstance().incrementStatImmediately(result, player, InfusionType.STAT_TRACK_DEATH, 1);
+			StatTrackManager.getInstance()
+				.incrementStatImmediately(result, player, InfusionType.STAT_TRACK_DEATH, 1);
 		}
 	}
 
@@ -1776,48 +1936,14 @@ public class PlayerListener implements Listener {
 		event.setCancelled(cancel);
 	}
 
-	private static final Set<DamageCause> DISABLE_KNOCKBACK_DAMAGE_CAUSES = Set.of(
-		DamageCause.CONTACT,
-		DamageCause.FALL,
-		DamageCause.FIRE,
-		DamageCause.FIRE_TICK,
-		DamageCause.LAVA,
-		DamageCause.VOID,
-		DamageCause.STARVATION,
-		DamageCause.POISON,
-		DamageCause.WITHER,
-		DamageCause.HOT_FLOOR);
 
 	private static final Set<DamageCause> SCALABLE_REGION_DAMAGE_CAUSES = Set.of(
 		DamageCause.FIRE_TICK,
 		DamageCause.LAVA
 	);
 
-	private final Set<UUID> mIgnoreKnockbackThisTick = new HashSet<>();
-	private final Set<UUID> mIgnoreKnockbackNextTick = new HashSet<>();
-	private int mKnockbackTaskId = -1;
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	public void entityDamageEvent(EntityDamageEvent event) {
-		if (event.getEntity() instanceof Player player
-			&& player.getNoDamageTicks() <= player.getMaximumNoDamageTicks() / 2.0f // can only take knockback again after half the iframes are over
-			&& DISABLE_KNOCKBACK_DAMAGE_CAUSES.contains(event.getCause())) {
-			mIgnoreKnockbackNextTick.add(player.getUniqueId());
-
-			// NB: The two sets are required because this task runs after the damage event, but before the velocity change event.
-			if (mKnockbackTaskId < 0 || !Bukkit.getScheduler().isQueued(mKnockbackTaskId)) {
-				mKnockbackTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(mPlugin, () -> {
-					mIgnoreKnockbackThisTick.clear();
-					mIgnoreKnockbackThisTick.addAll(mIgnoreKnockbackNextTick);
-					mIgnoreKnockbackNextTick.clear();
-					if (mIgnoreKnockbackThisTick.isEmpty()) {
-						Bukkit.getScheduler().cancelTask(mKnockbackTaskId);
-						mKnockbackTaskId = -1;
-					}
-				}, 0, 1);
-			}
-		}
-
 		// For Fire / Fall damage in R2 and R3, take more damage.
 		if (event.getEntity() instanceof Player player
 			&& SCALABLE_REGION_DAMAGE_CAUSES.contains(event.getCause())) {
@@ -1831,17 +1957,27 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	// Handles cancelled events to properly remove the player from the mIgnoreNextKnockback set even if the event has already been cancelled by another listener
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
-	public void playerVelocityEvent(PlayerVelocityEvent event) {
-		if (mIgnoreKnockbackThisTick.remove(event.getPlayer().getUniqueId())) {
-			event.setCancelled(true);
+	// Workaround to apply Y velocity after a jump due to stupid mojank (mainly for recoil) - usb
+	// See LivingEntity.jumpFromGround (this.setDeltaMovement) - https://discord.com/channels/313066655494438922/320923526133579776/1280335416905699422
+	// TODO: revisit when Paper has PlayerInputEvent to check if jump key was pressed
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void playerJumpEvent(PlayerJumpEvent event) {
+		final Player player = event.getPlayer();
+		final Vector oldVelocity = player.getVelocity();
+		// Only reapply velocity in the same direction if it is greater than a normal player's jump
+		if (oldVelocity.getY() > NmsUtils.getVersionAdapter().getJumpVelocity(player) && !BlockUtils.isBouncy(event.getFrom().clone().add(0, -1, 0).getBlock().getType())) {
+			player.getScheduler().run(mPlugin, (task) -> {
+				Vector velocityNow = player.getVelocity();
+				velocityNow.setY(oldVelocity.getY());
+				player.setVelocity(velocityNow);
+			}, null);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerTakeLecternBookEvent(PlayerTakeLecternBookEvent event) {
-		if (event.getPlayer().getGameMode() == GameMode.ADVENTURE) {
+		if (event.getPlayer().getGameMode() == GameMode.ADVENTURE
+			|| (ZoneUtils.hasZoneProperty(event.getLectern().getLocation(), ZoneProperty.NO_GETTING_BOOK_FROM_LECTERN) && event.getPlayer().getGameMode() != GameMode.CREATIVE)) {
 			event.setCancelled(true);
 		}
 	}
@@ -1863,7 +1999,8 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	// Crossbows: cannot set 'consume item', must give back an arrow. Thus use MONITOR to make sure that the arrow is actually shot.
+	// Crossbows: cannot set 'consume item', must give back an arrow.
+	// Thus use MONITOR to make sure that the arrow is actually shot.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityShootBowEventMonitor(EntityShootBowEvent event) {
 		if (event.getEntity() instanceof Player player
@@ -1893,7 +2030,11 @@ public class PlayerListener implements Listener {
 	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
 		if (event.getEntity() instanceof Player player) {
 			// If Player pops a totem of undying, replace absorption event with absorption utils.
-			if (event.getCause() == EntityPotionEffectEvent.Cause.TOTEM && event.getNewEffect() != null && event.getNewEffect().getType().equals(PotionEffectType.ABSORPTION)) {
+			if (
+				event.getCause() == EntityPotionEffectEvent.Cause.TOTEM
+					&& event.getNewEffect() != null
+					&& event.getNewEffect().getType().equals(PotionEffectType.ABSORPTION)
+			) {
 				event.setCancelled(true);
 				AbsorptionUtils.addAbsorption(player, 8, 8, 5 * 20);
 			}
@@ -1923,6 +2064,7 @@ public class PlayerListener implements Listener {
 	public void customEffectApplyEvent(CustomEffectApplyEvent event) {
 		if (event.getEntity() instanceof Player player) {
 			mPlugin.mAbilityManager.customEffectApplyEvent(player, event);
+			mPlugin.mItemStatManager.onCustomEffectApply(mPlugin, player, event);
 		}
 	}
 
@@ -1936,6 +2078,5 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void serverTickEndEvent(ServerTickEndEvent event) {
 		ParticleManager.tick();
-		TABIntegration.tick();
 	}
 }

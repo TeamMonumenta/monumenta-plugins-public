@@ -45,7 +45,7 @@ public class Enlightenment extends DepthsAbility {
 	}
 
 	private static Description<Enlightenment> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Enlightenment>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("All players in your party gain ")
 			.addPercent(a -> a.mXPMultiplier, XP_MULTIPLIER[rarity - 1], false, true)
 			.add(" more experience. Does not stack if multiple players in the party have the skill. Additionally, your chances of finding higher rarity abilities are increased by ")

@@ -42,17 +42,17 @@ public abstract class SpellBaseAbstractAttack extends Spell {
 	public final AttackAesthetics mAttackAesthetics;
 
 	public SpellBaseAbstractAttack(AestheticsImplementation aestheticsImplementation, DamageImplementation damageImplementation,
-		    int particleAmount, int telegraphPulses, int castDelay, double particleSpeed, Particle particle, DamageEvent.DamageType damageType,
-		    double damage, boolean bypassIframes, boolean causeKnockback, String attackName, Particle attackParticle, Plugin plugin,
-		    LivingEntity boss, AttackAesthetics attackAesthetics) {
+	                               int particleAmount, int telegraphPulses, int castDelay, double particleSpeed, Particle particle, DamageEvent.DamageType damageType,
+	                               double damage, boolean bypassIframes, boolean causeKnockback, String attackName, Particle attackParticle, Plugin plugin,
+	                               LivingEntity boss, AttackAesthetics attackAesthetics) {
 		this(aestheticsImplementation, damageImplementation, particleAmount, telegraphPulses, castDelay, 0, particleSpeed,
 			particle, damageType, damage, bypassIframes, causeKnockback, attackName, attackParticle, plugin, boss, attackAesthetics);
 	}
 
 	public SpellBaseAbstractAttack(AestheticsImplementation aestheticsImplementation, DamageImplementation damageImplementation,
-		   int particleAmount, int telegraphPulses, int castDelay, int pulseStartDelay, double particleSpeed, Particle particle, DamageEvent.DamageType damageType,
-		   double damage, boolean bypassIframes, boolean causeKnockback, String attackName, Particle attackParticle, Plugin plugin,
-		   LivingEntity boss, AttackAesthetics attackAesthetics) {
+	                               int particleAmount, int telegraphPulses, int castDelay, int pulseStartDelay, double particleSpeed, Particle particle, DamageEvent.DamageType damageType,
+	                               double damage, boolean bypassIframes, boolean causeKnockback, String attackName, Particle attackParticle, Plugin plugin,
+	                               LivingEntity boss, AttackAesthetics attackAesthetics) {
 		mAestheticsImplementation = aestheticsImplementation;
 		mDamageImplementation = damageImplementation;
 		mParticleAmount = particleAmount;

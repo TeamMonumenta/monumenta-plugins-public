@@ -12,7 +12,7 @@ public class PercentAbilityDamageReceived extends Effect {
 	private final double mAmount;
 	private final EnumSet<ClassAbility> mAffectedAbilities;
 
-	public PercentAbilityDamageReceived(int duration, double amount, EnumSet<ClassAbility> affectedAbilities) {
+	public PercentAbilityDamageReceived(final int duration, final double amount, final EnumSet<ClassAbility> affectedAbilities) {
 		super(duration, effectID);
 		mAmount = amount;
 		mAffectedAbilities = affectedAbilities;
@@ -34,14 +34,14 @@ public class PercentAbilityDamageReceived extends Effect {
 	}
 
 	@Override
-	public void onHurt(LivingEntity entity, DamageEvent event) {
+	public void onHurt(final LivingEntity entity, final DamageEvent event) {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
 		if (event.getAbility() != null && mAffectedAbilities.contains(event.getAbility())) {
 			double amount = mAmount;
-			if (EntityUtils.isBoss(entity) && amount > 0) {
-				amount = amount / 2;
+			if (EntityUtils.isBoss(entity) && isDebuff()) {
+				amount /= 2;
 			}
 			event.updateDamageWithMultiplier(1 + amount);
 		}

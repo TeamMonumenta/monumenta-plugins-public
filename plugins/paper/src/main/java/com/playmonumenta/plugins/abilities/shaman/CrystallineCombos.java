@@ -6,8 +6,9 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.CrystallineCombosCS;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -16,12 +17,10 @@ import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PPPeriodic;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,9 +47,9 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 	public static double MAX_SPEED = .9;
 	public static int SPEED_DURATION = 6 * 20;
 	public static int COOLDOWN = 4 * 20;
-	public static int STACK_DECAY_TIME_1 = 8;
-	public static int STACK_DECAY_TIME_2 = 12;
-	public static int STACK_DECAY_TIME_ENHANCE = 16;
+	public static int STACK_DECAY_TIME_1 = 8 * 20;
+	public static int STACK_DECAY_TIME_2 = 12 * 20;
+	public static int STACK_DECAY_TIME_ENHANCE = 16 * 20;
 	public static int SHOT_DELAY = 12;
 
 	public static String CHARM_CRYSTAL_DAMAGE = "Crystalline Combos Damage";
@@ -69,27 +68,14 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 			.linkedSpell(ClassAbility.CRYSTALLINE_COMBOS)
 			.scoreboardId("CrystalCombos")
 			.shorthandName("CC")
-			.descriptions(
-				String.format("Gain a stack of crystals each time you kill a mob not with this ability. When you get %s stacks, " +
-					"they reset, and the crystals lash out at mobs within %s blocks. Every %ss, a random mob is shot, dealing %s magic damage, up to a total of %s shots. " +
-					" The first shot will wait to be fired if there are no mobs in range, but subsequent shots will do nothing if there are no mobs to shoot. Stacks decay at a rate of 1 stack per %ss.",
-					CRYSTAL_STACK_THRESHOLD, CRYSTAL_RANGE,
-					StringUtils.ticksToSeconds(SHOT_DELAY), CRYSTAL_DAMAGE_1,
-					SHOT_COUNT_1, STACK_DECAY_TIME_1),
-				String.format("Damage is increased to %s, number of shots increased to %s, " +
-					"stack decay rate is reduced to 1 stack per %ss.",
-					CRYSTAL_DAMAGE_2, SHOT_COUNT_2, STACK_DECAY_TIME_2),
-				String.format("Swap hands while sneaking and holding a projectile weapon " +
-					"will use all existing crystal stacks to provide %s%% speed per stack (max %s%%) to the Shaman " +
-					"for %ss. Decay rate reduced to 1 stack per %ss. Can now target outside of line of sight. Cooldown %ss.",
-					StringUtils.multiplierToPercentage(SPEED_PER_STACK),
-					StringUtils.multiplierToPercentage(MAX_SPEED),
-					StringUtils.ticksToSeconds(SPEED_DURATION),
-					STACK_DECAY_TIME_ENHANCE,
-					StringUtils.ticksToSeconds(COOLDOWN)))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.cooldown(COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CrystallineCombos::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
-				.keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", null, CrystallineCombos::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
+				.keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON), null,
+				player -> {
+					CrystallineCombos cc = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(player, CrystallineCombos.class);
+					return cc != null && cc.isEnhanced();
+				}))
 			.simpleDescription("Stack up crystals by killing mobs to deal damage to nearby enemies.")
 			.displayItem(Material.AMETHYST_CLUSTER);
 
@@ -113,22 +99,16 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 
 	public CrystallineCombos(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
-		mCrystalDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_CRYSTAL_DAMAGE,
-			isLevelTwo() ? CRYSTAL_DAMAGE_2 : CRYSTAL_DAMAGE_1);
+		mCrystalDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_CRYSTAL_DAMAGE, isLevelTwo() ? CRYSTAL_DAMAGE_2 : CRYSTAL_DAMAGE_1);
 		mCrystalRange = CharmManager.getRadius(player, CHARM_CRYSTAL_RANGE, CRYSTAL_RANGE);
-		mCrystalStackThreshold = (int) (CRYSTAL_STACK_THRESHOLD
-			+ CharmManager.getLevel(player, CHARM_CRYSTAL_STACK_THRESHOLD));
-		mSpeedPerStack = CharmManager.calculateFlatAndPercentValue(player, CHARM_SPEED_PER_STACK, SPEED_PER_STACK);
-		mMaxSpeed = CharmManager.calculateFlatAndPercentValue(player, CHARM_MAX_SPEED, MAX_SPEED);
+		mCrystalStackThreshold = CRYSTAL_STACK_THRESHOLD + (int) CharmManager.getLevel(player, CHARM_CRYSTAL_STACK_THRESHOLD);
+		mSpeedPerStack = SPEED_PER_STACK + CharmManager.getLevelPercentDecimal(player, CHARM_SPEED_PER_STACK);
+		mMaxSpeed = MAX_SPEED + CharmManager.getLevelPercentDecimal(player, CHARM_MAX_SPEED);
 		mSpeedDuration = CharmManager.getDuration(player, CHARM_SPEED_DURATION, SPEED_DURATION);
-		mStackDecayTime = (int) ((isEnhanced() ? STACK_DECAY_TIME_ENHANCE :
-			isLevelTwo() ? STACK_DECAY_TIME_2 : STACK_DECAY_TIME_1) +
-					CharmManager.getLevel(player, CHARM_STACK_DECAY_TIME));
-		mTotalShots = (int) ((isLevelTwo() ? SHOT_COUNT_2 : SHOT_COUNT_1) + CharmManager.getLevel(player, CHARM_SHOT_COUNT));
-		mShotDelay = CharmManager.getCooldown(player, CHARM_SHOT_DELAY, SHOT_DELAY);
+		mStackDecayTime = CharmManager.getDuration(mPlayer, CHARM_STACK_DECAY_TIME, isEnhanced() ? STACK_DECAY_TIME_ENHANCE :
+			isLevelTwo() ? STACK_DECAY_TIME_2 : STACK_DECAY_TIME_1);
+		mTotalShots = (isLevelTwo() ? SHOT_COUNT_2 : SHOT_COUNT_1) + (int) CharmManager.getLevel(player, CHARM_SHOT_COUNT);
+		mShotDelay = CharmManager.getDuration(player, CHARM_SHOT_DELAY, SHOT_DELAY);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CrystallineCombosCS());
 	}
 
@@ -143,7 +123,8 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		mCrystalStacks = 0;
 		updateNotify();
 		mPlugin.mEffectManager.addEffect(mPlayer, "CrystalCombosSpeed", new PercentSpeed(mSpeedDuration,
-			Math.min(mMaxSpeed, savedStacks * mSpeedPerStack), "CrystalCombosSpeed"));
+			Math.min(mMaxSpeed, savedStacks * mSpeedPerStack), "CrystalCombosSpeed")
+			.deleteOnAbilityUpdate(true));
 		return true;
 	}
 
@@ -169,6 +150,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 				final int mGapBetweenParticleColors = 200 / mCrystalStackThreshold;
 				double mRotationAngle = 0;
 				final List<PPPeriodic> mParticles = new ArrayList<>();
+
 				{
 					for (int i = 0; i < 3; i++) {
 						mCosmetic.crystallineCombosSwirl(mParticles, mPlayer);
@@ -204,7 +186,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 					if (mT % 20 == 0 && mCrystalStacks > 0) {
 						mT = 0;
 						if (!mSpendingStacks) {
-							mDecayTimer++;
+							mDecayTimer += 20;
 							if (mDecayTimer >= mStackDecayTime) {
 								mCrystalStacks--;
 								mDecayTimer = 0;
@@ -216,7 +198,7 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 
 					// Particles runner
 					if (!mPlayer.isOnline()
-					    || mPlayer.isDead()
+						|| mPlayer.isDead()
 						|| PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
 						this.cancel();
 						mSystemTask = null;
@@ -310,5 +292,48 @@ public class CrystallineCombos extends Ability implements AbilityWithChargesOrSt
 		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
 
 		return output;
+	}
+
+	private static Description<CrystallineCombos> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Gain a stack of crystals each time you kill a mob not with this ability. When you get ")
+			.add(a -> a.mCrystalStackThreshold, CRYSTAL_STACK_THRESHOLD)
+			.add(" stacks, they reset, and the crystals lash out at mobs within ")
+			.add(a -> a.mCrystalRange, CRYSTAL_RANGE)
+			.add(" blocks. Every ")
+			.addDuration(a -> a.mShotDelay, SHOT_DELAY)
+			.add(" seconds, a random mob is shot, dealing ")
+			.add(a -> a.mCrystalDamage, CRYSTAL_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage, up to a total of ")
+			.add(a -> a.mTotalShots, SHOT_COUNT_1, false, Ability::isLevelOne)
+			.add(" shots. The first shot will wait to be fired if there are no mobs in range, but subsequent shots will do nothing if there are no mobs to shoot. Stacks decay at a rate of 1 stack per ")
+			.addDuration(a -> a.mStackDecayTime, STACK_DECAY_TIME_1, false, a -> a.isLevelOne() && !a.isEnhanced())
+			.add(" seconds.");
+	}
+
+	private static Description<CrystallineCombos> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mCrystalDamage, CRYSTAL_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(". The number of shots is increased to ")
+			.add(a -> a.mTotalShots, SHOT_COUNT_2, false, Ability::isLevelTwo)
+			.add(". Stack decay rate is reduced to 1 stack per ")
+			.addDuration(a -> a.mStackDecayTime, STACK_DECAY_TIME_2, false, a -> a.isLevelTwo() && !a.isEnhanced())
+			.add(" seconds.");
+	}
+
+	private static Description<CrystallineCombos> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to spend all existing crystal stacks to gain ")
+			.addPercent(a -> a.mSpeedPerStack, SPEED_PER_STACK)
+			.add(" speed per stack (up to ")
+			.addPercent(a -> a.mMaxSpeed, MAX_SPEED)
+			.add(") for ")
+			.addDuration(a -> a.mSpeedDuration, SPEED_DURATION)
+			.add(" seconds. Decay rate is reduced to 1 stack per ")
+			.addDuration(a -> a.mStackDecayTime, STACK_DECAY_TIME_ENHANCE, false, Ability::isEnhanced)
+			.add(" seconds. Can now target outside of line of sight.")
+			.addCooldown(COOLDOWN);
 	}
 }

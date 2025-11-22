@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.guis.HuntsInfusionGUI;
+import com.playmonumenta.plugins.guis.SKRInfusionGUI;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
@@ -30,7 +32,9 @@ public class DelveInfusionUtils {
 	public static final int[] MAT_COST_PER_INFUSION = {3, 6, 12, 24};
 	public static final int[] XP_COST_PER_LEVEL = {ExperienceUtils.LEVEL_40, ExperienceUtils.LEVEL_50, ExperienceUtils.LEVEL_60, ExperienceUtils.LEVEL_70};
 
-	/**When set to true the refund function will return all the XP used for the infusion, when false only the 75% */
+	/**
+	 * When set to true the refund function will return all the XP used for the infusion, when false only the 75%
+	 */
 	public static final boolean FULL_REFUND = true;
 	public static final double REFUND_PERCENT = 0.75;
 
@@ -51,7 +55,7 @@ public class DelveInfusionUtils {
 		MITOSIS("mitosis", InfusionType.MITOSIS, Location.CYAN, Material.CYAN_WOOL, "Feverish Flesh", NamespacedKeyUtils.fromString("epic:r2/delves/cyan/auxiliary/delve_material"), "Cyan"),
 		ARDOR("ardor", InfusionType.ARDOR, Location.PURPLE, Material.PURPLE_WOOL, "Despondent Doubloons", NamespacedKeyUtils.fromString("epic:r2/delves/purple/auxiliary/delve_material"), "Purple"),
 		EPOCH("epoch", InfusionType.EPOCH, Location.TEAL, Material.CYAN_CONCRETE_POWDER, "Weathered Runes", NamespacedKeyUtils.fromString("epic:r2/delves/teal/auxiliary/delve_material"), "Teal"),
-		NATANT("natant", InfusionType.NATANT, Location.SHIFTING, Material.BLUE_CONCRETE, "Primordial Clay", NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material"), "Fred"),
+		NATANT("natant", InfusionType.NATANT, Location.SHIFTING, Material.PRISMARINE_BRICKS, "Primordial Clay", NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material"), "Fred"),
 		UNDERSTANDING("understanding", InfusionType.UNDERSTANDING, Location.FORUM, Material.BOOKSHELF, "Binah Leaves", NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material"), "Forum"),
 
 		SOOTHING("soothing", InfusionType.SOOTHING, Location.BLUE, Material.BLUE_WOOL, "Sorceress' Staves", NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave"), "Blue"),
@@ -63,7 +67,10 @@ public class DelveInfusionUtils {
 		DECAPITATION("decapitation", InfusionType.DECAPITATION, Location.BLUESTRIKE, Material.WITHER_SKELETON_SKULL, "Shattered Masks", NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
 		CELESTIAL("celestial", InfusionType.CELESTIAL, Location.STARPOINT, Material.DEEPSLATE_BRICKS, "Dust of the Herald", NamespacedKeyUtils.fromString("epic:r3/items/currency/dust_of_the_herald"), PlayerUtils.SCOREBOARD_RING_UNLOCK),
 		FERVOR("fervor", InfusionType.FERVOR, Location.HEXFALL, Material.DRAGON_BREATH, "Fragrant Branch of Fen", NamespacedKeyUtils.fromString("epic:r3/items/currency/fragrant_branch_of_fen"), "Ruten"),
+		ORBITAL("orbital", InfusionType.ORBITAL, Location.INDIGO, Material.PURPLE_CONCRETE_POWDER, "Crumbled Setiroetem", NamespacedKeyUtils.fromString("epic:r3/items/currency/crumbled_etiroetem"), "Indigo"),
 
+		STURDY("sturdy", InfusionType.STURDY, Location.HUNTS, Material.SHIELD, "Hyperchromatic Archos Rings", NamespacedKeyUtils.fromString("epic:r3/items/currency/hyperchromatic_archos_ring"), "HuntsUnspoiledWins"),
+		CELERITY("celerity", InfusionType.CELERITY, Location.SKR, Material.FEATHER, "Hyperchromatic Archos Rings", NamespacedKeyUtils.fromString("epic:r3/items/currency/hyperchromatic_archos_ring"), "SKRRoomsCompleted"),
 		REFUND("refund", null, null, Material.GRINDSTONE, null, null, (String[]) null);
 
 		private final String mLabel;
@@ -117,6 +124,10 @@ public class DelveInfusionUtils {
 			return mInfusionType;
 		}
 
+		public @Nullable Location getLocation() {
+			return mLocation;
+		}
+
 		public Material getMaterial() {
 			return mMaterial;
 		}
@@ -139,11 +150,17 @@ public class DelveInfusionUtils {
 			}
 			return mLocation.getColor();
 		}
+
+		public boolean isViewOnly() {
+			return this == STURDY || this == CELERITY;
+		}
 	}
 
 	public enum DelveInfusionMaterial {
 		VOIDSTAINED_GEODE("geode", "Voidstained Geodes", "epic:r2/depths/loot/voidstained_geode"),
-		INDIGO_BLIGHTDUST("blightdust", "Indigo Blightdust", "epic:r3/items/currency/indigo_blightdust");
+		INDIGO_BLIGHTDUST("blightdust", "Indigo Blightdust", "epic:r3/items/currency/indigo_blightdust"),
+		MEMORY_FRAGMENTS("memfrags", "Memory Fragments", "epic:r3/dungeons/skr/silver_memory_fragment"),
+		RUCKS("rucks", "Rucks", "epic:r3/hunts/currency/ruck");
 
 		public static final String KEY = "DelveInfusionMaterial";
 
@@ -170,13 +187,21 @@ public class DelveInfusionUtils {
 			return switch (this) {
 				case VOIDSTAINED_GEODE -> INDIGO_BLIGHTDUST;
 				case INDIGO_BLIGHTDUST -> VOIDSTAINED_GEODE;
+				case MEMORY_FRAGMENTS -> MEMORY_FRAGMENTS;
+				case RUCKS -> RUCKS;
 			};
 		}
 
 		public Component getIcon() {
 			return switch (this) {
-				case VOIDSTAINED_GEODE -> Component.text(" ⚓", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false);
-				case INDIGO_BLIGHTDUST -> Component.text(" ✵", TextColor.fromHexString("#FF9CF0")).decoration(TextDecoration.ITALIC, false);
+				case VOIDSTAINED_GEODE ->
+					Component.text(" ⚓", Location.DEPTHS.getColor()).decoration(TextDecoration.ITALIC, false);
+				case INDIGO_BLIGHTDUST ->
+					Component.text(" ✵", Location.ZENITH.getColor()).decoration(TextDecoration.ITALIC, false);
+				case MEMORY_FRAGMENTS ->
+					Component.text(" \uD83E\uDEB6", TextColor.fromHexString("#8bb7c3")).decoration(TextDecoration.ITALIC, false);
+				case RUCKS ->
+					Component.text(" ⌘", TextColor.fromHexString("#4C8F4D")).decoration(TextDecoration.ITALIC, false);
 			};
 		}
 	}
@@ -207,11 +232,20 @@ public class DelveInfusionUtils {
 		DelveInfusionSelection infusion = getCurrentInfusion(item);
 		if (infusion == null) {
 			return;
+		} else if (infusion == DelveInfusionSelection.STURDY) {
+			// redirect to the HuntsInfusionGUI, as it uses different items
+			HuntsInfusionGUI.refundSturdy(item, player);
+			return;
+		} else if (infusion == DelveInfusionSelection.CELERITY) {
+			// redirect to the SKRInfusionGUI, as it uses different items
+			SKRInfusionGUI.refundCelerity(item, player);
+			return;
 		}
 		InfusionType infusionType = infusion.getInfusionType();
 		if (infusionType == null) {
 			return;
 		}
+
 		DelveInfusionMaterial delveInfusionMaterial = getDelveInfusionMaterial(item);
 
 		int level = getInfuseLevel(item) - 1;
@@ -248,7 +282,10 @@ public class DelveInfusionUtils {
 		ExperienceUtils.setTotalExperience(player, ExperienceUtils.getTotalExperience(player) + xp);
 
 		AuditListener.logPlayer("[Delve Infusion] Refund - player=" + player.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + infusionType
-			                        + "', from level=" + auditLevel + ", stack size=" + item.getAmount() + ", refunded materials=" + matStr + ", refunded XP=" + xp);
+			+ "', from level=" + auditLevel + ", stack size=" + item.getAmount() + ", refunded materials=" + matStr + ", refunded XP=" + xp);
+		if (!ItemStatUtils.checkOwnership(player, item)) {
+			AuditListener.logPlayer("[Ownership Tracker] Player " + player.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+		}
 
 	}
 
@@ -258,7 +295,7 @@ public class DelveInfusionUtils {
 		}
 	}
 
-	private static int getInfuseLevel(ItemStack item) {
+	public static int getInfuseLevel(ItemStack item) {
 		int level = 0;
 		for (DelveInfusionSelection d : DelveInfusionSelection.values()) {
 			level += ItemStatUtils.getInfusionLevel(item, d.getInfusionType());
@@ -271,15 +308,18 @@ public class DelveInfusionUtils {
 		List<ItemStack> mats = getCurrenciesCost(item, selection, targetLevel, p, delveInfusionMaterial);
 
 		String matStr = mats.stream().filter(it -> it != null && it.getAmount() > 0)
-			                .map(it -> "'" + ItemUtils.getPlainName(it) + ":" + it.getAmount() + "'")
-			                .collect(Collectors.joining(","));
+			.map(it -> "'" + ItemUtils.getPlainName(it) + ":" + it.getAmount() + "'")
+			.collect(Collectors.joining(","));
 
 		int xpCost = XP_COST_PER_LEVEL[targetLevel];
 
 		//if the player is in creative -> free infusion
 		if (selection == DelveInfusionSelection.REFUND || p.getGameMode() == GameMode.CREATIVE) {
 			AuditListener.log("[Delve Infusion] Player " + p.getName() + " infused an item while in creative mode! item='" + ItemUtils.getPlainName(item) + "', infusion type=" + selection.mInfusionType
-				                  + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", normal material cost=" + matStr + ", normal XP cost=" + xpCost);
+				+ "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", normal material cost=" + matStr + ", normal XP cost=" + xpCost);
+			if (!ItemStatUtils.checkOwnership(p, item)) {
+				AuditListener.logPlayer("[Ownership Tracker] Player " + p.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+			}
 			return true;
 		}
 
@@ -295,7 +335,10 @@ public class DelveInfusionUtils {
 		ExperienceUtils.setTotalExperience(p, playerXP - xpCost);
 
 		AuditListener.logPlayer("[Delve Infusion] Item infused - player=" + p.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + selection.mInfusionType
-			                        + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", material cost=" + matStr + ", XP cost=" + xpCost);
+			+ "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", material cost=" + matStr + ", XP cost=" + xpCost);
+		if (!ItemStatUtils.checkOwnership(p, item)) {
+			AuditListener.logPlayer("[Ownership Tracker] Player " + p.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+		}
 
 		return true;
 	}

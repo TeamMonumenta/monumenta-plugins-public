@@ -99,7 +99,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 				rand -= rarity.getWeight(currentLvl - 1);
 				if (rand <= 0) {
 					TowerMobInfo info = Objects.requireNonNull(TowerFileUtils.getMobsByRarity(rarity))
-						                    .get(FastUtils.RANDOM.nextInt(TowerFileUtils.getMobsByRarity(rarity).size()));
+						.get(FastUtils.RANDOM.nextInt(TowerFileUtils.getMobsByRarity(rarity).size()));
 					if (mGame.mCurrentFloor == 0 && info.mLosName.equals("ITBabyMimic")) {
 						info = TowerFileUtils.getMobsByRarity(TowerMobRarity.COMMON).get(0);
 						//at the first round don't take any BabyMimic
@@ -158,7 +158,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 			return;
 		}
 
-		Player player = ((Player)event.getWhoClicked());
+		Player player = ((Player) event.getWhoClicked());
 		int slot = event.getSlot();
 		TowerMobInfo info = mMapItem.get(slot);
 
@@ -178,14 +178,14 @@ public class TowerGuiBuyMob extends CustomInventory {
 					}
 				} else {
 					player.sendMessage(Component.text("[Plunderer's Blitz]", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(
-											Component.text(" You don't have enough space inside the team", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)
+						Component.text(" You don't have enough space inside the team", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)
 					));
 					//no space
 				}
 			} else {
 				player.sendMessage(Component.text("[Plunderer's Blitz]", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(
-											Component.text(" You don't have enough money to buy this item", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)
-					));
+					Component.text(" You don't have enough money to buy this item", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)
+				));
 				//no money
 			}
 		} else {

@@ -31,7 +31,7 @@ public class Berserk {
 	public static final String DESCRIPTION = "Go berserk by building up a combo.";
 	private static final int MAX_KILL_TIME = 7 * 20;
 	private static final int MIN_KILL_TIME = 3 * 20;
-	private static final double COMBO_MULTI = 0.01;
+	private static final double COMBO_MULTI = 0.03;
 	private static final Map<Player, Integer> berserkCombo = new HashMap<>();
 	private static final Map<Player, BukkitTask> activeBerserk = new HashMap<>();
 	private static final String sourceName = "berserkEffect";
@@ -66,6 +66,7 @@ public class Berserk {
 			}
 			BukkitTask task = new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					if (mTicks > duration) {
@@ -87,14 +88,14 @@ public class Berserk {
 		Location particleLoc = p.getLocation().add(0, 2, 0).add(direction.clone().multiply(2)).add(right.clone().multiply(2));
 		// this is all math from drawing the digit so i can know what location to put the x
 		double leftMost;
-		if (Integer.toString(berserkCombo.get(p)).toCharArray().length % 2 == 0) {
-			leftMost = (0.5 + Math.floor(Integer.toString(berserkCombo.get(p)).toCharArray().length / 2.0)) * 0.8;
+		if (Integer.toString(berserkCombo.get(p)).length() % 2 == 0) {
+			leftMost = (0.5 + Math.floor(Integer.toString(berserkCombo.get(p)).length() / 2.0)) * 0.8;
 		} else {
-			leftMost = (Math.floor(Integer.toString(berserkCombo.get(p)).toCharArray().length / 2.0) + 1) * 0.8;
+			leftMost = (Math.floor(Integer.toString(berserkCombo.get(p)).length() / 2.0) + 1) * 0.8;
 		}
 		Vector right2 = VectorUtils.crossProd(new Vector(0, 1, 0), LocationUtils.getDirectionTo(p.getLocation(), particleLoc.clone()).setY(0).normalize());
 		Location xLoc = particleLoc.clone().subtract(right2.clone().multiply(leftMost)).add(0, -0.3, 0);
-		xLoc.add(right2.clone().multiply(0.8).multiply(Integer.toString(berserkCombo.get(p)).toCharArray().length + 1));
+		xLoc.add(right2.clone().multiply(0.8).multiply(Integer.toString(berserkCombo.get(p)).length() + 1));
 		Location xLoc2 = xLoc.clone().add(right2.clone().multiply(0.4)).add(new Vector(0, 0.4, 0));
 		for (int i = 0; i < 4; i++) {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
@@ -115,7 +116,7 @@ public class Berserk {
 			case 0 -> Color.WHITE;
 			case 1 -> Color.ORANGE;
 			case 2 -> Color.FUCHSIA;
-			case 3 -> Color. AQUA;
+			case 3 -> Color.AQUA;
 			case 4 -> Color.YELLOW;
 			case 5 -> Color.LIME;
 			case 6 -> Color.fromRGB(254, 127, 156);

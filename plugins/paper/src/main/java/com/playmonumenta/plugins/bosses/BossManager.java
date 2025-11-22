@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
+import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
@@ -8,6 +9,7 @@ import com.playmonumenta.plugins.bosses.bosses.*;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AbilityMarkerEntityBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.KeeperVirtueBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.PhantomForceBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
@@ -29,6 +31,9 @@ import com.playmonumenta.plugins.bosses.bosses.hexfall.HyceneaRageOfTheWolf;
 import com.playmonumenta.plugins.bosses.bosses.hexfall.Ruten;
 import com.playmonumenta.plugins.bosses.bosses.hexfall.TotemPlatformBoss;
 import com.playmonumenta.plugins.bosses.bosses.hexfall.VoodooTotemBoss;
+import com.playmonumenta.plugins.bosses.bosses.intruder.FacelessOneBoss;
+import com.playmonumenta.plugins.bosses.bosses.intruder.IntruderBoss;
+import com.playmonumenta.plugins.bosses.bosses.intruder.SourcelessGazeBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichAlchBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichClericBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichConquestBoss;
@@ -54,6 +59,7 @@ import com.playmonumenta.plugins.bosses.bosses.sirius.SiriusNPCBoss;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.chunk.ChunkFullLoadEvent;
 import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
+import com.playmonumenta.plugins.delves.mobabilities.ArcanicBoss;
 import com.playmonumenta.plugins.delves.mobabilities.DreadfulSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.SpectralSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
@@ -74,9 +80,18 @@ import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalS
 import com.playmonumenta.plugins.depths.bosses.vesperidys.VesperidysVoidCrystalWind;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.EntityGlowEvent;
 import com.playmonumenta.plugins.gallery.bosses.GalleryMobRisingBoss;
 import com.playmonumenta.plugins.gallery.bosses.GallerySummonMobBoss;
+import com.playmonumenta.plugins.hunts.bosses.AlocAcoc;
+import com.playmonumenta.plugins.hunts.bosses.CoreElemental;
+import com.playmonumenta.plugins.hunts.bosses.ExperimentSeventyOne;
+import com.playmonumenta.plugins.hunts.bosses.SteelWingHawk;
+import com.playmonumenta.plugins.hunts.bosses.TheImpenetrable;
+import com.playmonumenta.plugins.hunts.bosses.Uamiel;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
+import com.playmonumenta.plugins.rush.RushDownMobBoss;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -91,7 +106,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -108,10 +122,12 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.Vex;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -130,8 +146,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.Nullable;
 
-//@SuppressWarnings("deprecation") // we have to use deprecated boss tags here still
 public class BossManager implements Listener {
 
 	/********************************************************************************
@@ -178,7 +194,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(ToughBoss.identityTag, ToughBoss::new, new ToughBoss.Parameters());
 		registerStatelessBoss(UnseenBoss.identityTag, UnseenBoss::new, new UnseenBoss.Parameters());
 		registerStatelessBoss(GenericBoss.identityTag, GenericBoss::new, new GenericBoss.Parameters());
-		registerStatelessBoss(HiddenBoss.identityTag, HiddenBoss::new);
+		registerStatelessBoss(HiddenBoss.identityTag, HiddenBoss::new, new HiddenBoss.Parameters());
 		registerStatelessBoss(InvisibleBoss.identityTag, InvisibleBoss::new);
 		registerStatelessBoss(FireResistantBoss.identityTag, FireResistantBoss::new);
 		registerStatelessBoss(HungerCloudBoss.identityTag, HungerCloudBoss::new);
@@ -203,9 +219,10 @@ public class BossManager implements Listener {
 		registerStatelessBoss(BombTossBoss.identityTag, BombTossBoss::new);
 		registerStatelessBoss(BombTossNoBlockBreakBoss.identityTag, BombTossNoBlockBreakBoss::new);
 		registerStatelessBoss(RejuvenationBoss.identityTag, RejuvenationBoss::new, new RejuvenationBoss.Parameters());
-		registerStatelessBoss(HandSwapBoss.identityTag, HandSwapBoss::new);
+		registerStatelessBoss(HandSwapBoss.identityTag, HandSwapBoss::new, new HandSwapBoss.Parameters());
 		registerStatelessBoss(UnstableBoss.identityTag, UnstableBoss::new, new UnstableBoss.Parameters());
 		registerStatelessBoss(BerserkerBoss.identityTag, BerserkerBoss::new);
+		registerStatelessBoss(NoProjectileLaunchBoss.identityTag, NoProjectileLaunchBoss::new);
 		registerStatelessBoss(SnowballDamageBoss.identityTag, SnowballDamageBoss::new, new SnowballDamageBoss.Parameters());
 		registerStatelessBoss(CorruptInfestedBoss.identityTag, CorruptInfestedBoss::new);
 		registerStatelessBoss(SpecterParticleBoss.identityTag, SpecterParticleBoss::new);
@@ -237,7 +254,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(LeapBoss.identityTag, LeapBoss::new);
 		registerStatelessBoss(BarrierBoss.identityTag, BarrierBoss::new, new BarrierBoss.Parameters());
 		registerStatelessBoss(CrowdControlResistanceBoss.identityTag, CrowdControlResistanceBoss::new, new CrowdControlResistanceBoss.Parameters());
-		registerStatelessBoss(MeteorSlamBoss.identityTag, MeteorSlamBoss::new, new MeteorSlamBoss.Parameters());
 		registerStatelessBoss(SwingBoss.identityTag, SwingBoss::new, new SwingBoss.Parameters());
 		registerStatelessBoss(MistMob.identityTag, MistMob::new);
 		registerStatelessBoss(FrostGiantIcicle.identityTag, FrostGiantIcicle::new);
@@ -249,14 +265,15 @@ public class BossManager implements Listener {
 		registerStatelessBoss(CommanderBoss.identityTag, CommanderBoss::new, new CommanderBoss.Parameters());
 		registerStatelessBoss(ShadePossessedBoss.identityTag, ShadePossessedBoss::new);
 		registerStatelessBoss(CoordinatedAttackBoss.identityTag, CoordinatedAttackBoss::new, new CoordinatedAttackBoss.Parameters());
+		registerStatelessBoss(CoordinatedAttackOnDeathBoss.identityTag, CoordinatedAttackOnDeathBoss::new, new CoordinatedAttackOnDeathBoss.Parameters());
 		registerStatelessBoss(ShiftingBoss.identityTag, ShiftingBoss::new);
 		registerStatelessBoss(BulletHellBoss.identityTag, BulletHellBoss::new, new BulletHellBoss.Parameters());
-		registerStatelessBoss(CarapaceBoss.identityTag, CarapaceBoss::new);
-		registerStatelessBoss(KamikazeBoss.identityTag, KamikazeBoss::new);
+		registerStatelessBoss(KamikazeBoss.identityTag, KamikazeBoss::new, new KamikazeBoss.Parameters());
 		registerStatelessBoss(TinyBombTossBoss.identityTag, TinyBombTossBoss::new);
 		registerStatelessBoss(AntiRangeBoss.identityTag, AntiRangeBoss::new, new AntiRangeBoss.Parameters());
 		registerStatelessBoss(AntiMeleeBoss.identityTag, AntiMeleeBoss::new, new AntiMeleeBoss.Parameters());
 		registerStatelessBoss(AntiSuffocationBoss.identityTag, AntiSuffocationBoss::new);
+		registerStatelessBoss(AntiCrammingBoss.identityTag, AntiCrammingBoss::new);
 		registerStatelessBoss(DamageCapBoss.identityTag, DamageCapBoss::new, new DamageCapBoss.Parameters());
 		registerStatelessBoss(ImmortalMountBoss.identityTag, ImmortalMountBoss::new, new ImmortalMountBoss.Parameters());
 		registerStatelessBoss(FalseSpiritPortal.identityTag, FalseSpiritPortal::new);
@@ -264,6 +281,8 @@ public class BossManager implements Listener {
 		registerStatelessBoss(JumpBoss.identityTag, JumpBoss::new, new JumpBoss.Parameters());
 		registerStatelessBoss(RebornBoss.identityTag, RebornBoss::new, new RebornBoss.Parameters());
 		registerStatelessBoss(DistanceCloserBoss.identityTag, DistanceCloserBoss::new);
+		registerStatelessBoss(DieIfAloneBoss.identityTag, DieIfAloneBoss::new, new DieIfAloneBoss.Parameters());
+		registerStatelessBoss(DieSlowlyBoss.identityTag, DieSlowlyBoss::new, new DieSlowlyBoss.Parameters());
 		registerStatelessBoss(AuraEffectBoss.identityTag, AuraEffectBoss::new, new AuraEffectBoss.Parameters());
 		registerStatelessBoss(DummyDecoyBoss.identityTag, DummyDecoyBoss::new);
 		registerStatelessBoss(LaserBoss.identityTag, LaserBoss::new, new LaserBoss.Parameters());
@@ -290,11 +309,12 @@ public class BossManager implements Listener {
 		registerStatelessBoss(StatMultiplierBoss.identityTag, StatMultiplierBoss::new, new StatMultiplierBoss.Parameters());
 		registerStatelessBoss(SpectralSummonBoss.identityTag, SpectralSummonBoss::new, new SpectralSummonBoss.Parameters());
 		registerStatelessBoss(DreadfulSummonBoss.identityTag, DreadfulSummonBoss::new, new DreadfulSummonBoss.Parameters());
+		registerStatelessBoss(ArcanicBoss.identityTag, ArcanicBoss::new, new ArcanicBoss.Parameters());
 		registerStatelessBoss(FriendlyBoss.identityTag, FriendlyBoss::new, new FriendlyBoss.Parameters());
 		registerStatelessBoss(MageCosmicMoonbladeBoss.identityTag, MageCosmicMoonbladeBoss::new, new MageCosmicMoonbladeBoss.Parameters());
 		registerStatelessBoss(WarriorShieldWallBoss.identityTag, WarriorShieldWallBoss::new, new WarriorShieldWallBoss.Parameters());
 		registerStatelessBoss(DodgeBoss.identityTag, DodgeBoss::new, new DodgeBoss.Parameters());
-		registerStatelessBoss(BlockPlacerBoss.identityTag, BlockPlacerBoss::new);
+		registerStatelessBoss(BlockPlacerBoss.identityTag, BlockPlacerBoss::new, new BlockPlacerBoss.Parameters());
 		registerStatelessBoss(ScoutVolleyBoss.identityTag, ScoutVolleyBoss::new, new ScoutVolleyBoss.Parameters());
 		registerStatelessBoss(WarlockAmpHexBoss.identityTag, WarlockAmpHexBoss::new, new WarlockAmpHexBoss.Parameters());
 		registerStatelessBoss(LimitedLifespanBoss.identityTag, LimitedLifespanBoss::new, new LimitedLifespanBoss.Parameters());
@@ -332,6 +352,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(LichKeyGlowBoss.identityTag, LichKeyGlowBoss::new);
 		registerStatelessBoss(FestiveTessUpgradeSnowmenBoss.identityTag, FestiveTessUpgradeSnowmenBoss::new, new FestiveTessUpgradeSnowmenBoss.Parameters());
 		registerStatelessBoss(RestlessSoulsBoss.identityTag, RestlessSoulsBoss::new);
+		registerStatelessBoss(KeeperVirtueBoss.identityTag, KeeperVirtueBoss::new);
 		registerStatelessBoss(AlchemicalAberrationBoss.identityTag, AlchemicalAberrationBoss::new);
 		registerStatelessBoss(AbilityMarkerEntityBoss.identityTag, AbilityMarkerEntityBoss::new);
 		registerStatelessBoss(ThrowSummonBoss.identityTag, ThrowSummonBoss::new, new ThrowSummonBoss.Parameters());
@@ -345,6 +366,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(GalleryMobRisingBoss.identityTag, GalleryMobRisingBoss::new, new GalleryMobRisingBoss.Parameters());
 		registerStatelessBoss(GallerySummonMobBoss.identityTag, GallerySummonMobBoss::new, new GallerySummonMobBoss.Parameters());
 		registerStatelessBoss(TagScalingBoss.identityTag, TagScalingBoss::new, new TagScalingBoss.Parameters());
+		registerStatelessBoss(RushDownMobBoss.identityTag, RushDownMobBoss::new);
 		registerStatelessBoss(CancelDamageBoss.identityTag, CancelDamageBoss::new);
 		registerStatelessBoss(ParticleRingBoss.identityTag, ParticleRingBoss::new, new ParticleRingBoss.Parameters());
 		registerStatelessBoss(ShieldStunBoss.identityTag, ShieldStunBoss::new, new ShieldStunBoss.Parameters());
@@ -359,6 +381,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(VesperidysVoidCrystalWind.identityTag, VesperidysVoidCrystalWind::construct);
 		registerStatelessBoss(LacerateBoss.identityTag, LacerateBoss::new, new LacerateBoss.Parameters());
 		registerStatelessBoss(DamageTransferBoss.identityTag, DamageTransferBoss::new, new DamageTransferBoss.Parameters());
+		registerStatelessBoss(IdolatryBoss.identityTag, IdolatryBoss::new, new IdolatryBoss.Parameters());
 		registerStatelessBoss(ShockwaveBoss.identityTag, ShockwaveBoss::new, new ShockwaveBoss.Parameters());
 		registerStatelessBoss(OmenBoss.identityTag, OmenBoss::new, new OmenBoss.Parameters());
 		registerStatelessBoss(FlareBoss.identityTag, FlareBoss::new, new FlareBoss.Parameters());
@@ -372,6 +395,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(SiriusMeleeBoss.identityTag, SiriusMeleeBoss::new);
 		registerStatelessBoss(SiriusNPCBoss.identityTag, SiriusNPCBoss::construct);
 		registerStatelessBoss(SiriusMob.identityTag, SiriusMob::new);
+		registerStatelessBoss(SystemMonitorDisplayBoss.identityTag, SystemMonitorDisplayBoss::new);
 		registerStatelessBoss(GuildDisplayBoss.identityTag, GuildDisplayBoss::new, new GuildDisplayBoss.Parameters());
 		registerStatelessBoss(GroundSeekerBoss.identityTag, GroundSeekerBoss::new, new GroundSeekerBoss.Parameters());
 		registerStatelessBoss(TotemPlatformBoss.identityTag, TotemPlatformBoss::new, new TotemPlatformBoss.Parameters());
@@ -387,6 +411,22 @@ public class BossManager implements Listener {
 		registerStatelessBoss(RunAwayBoss.identityTag, RunAwayBoss::new);
 		registerStatelessBoss(CreipergeuseBoss.identityTag, CreipergeuseBoss::new, new CreipergeuseBoss.Parameters());
 		registerStatelessBoss(SlamAttackBoss.identityTag, SlamAttackBoss::new, new SlamAttackBoss.Parameters());
+		registerStatelessBoss(LucidRendBoss.identityTag, LucidRendBoss::new, new LucidRendBoss.Parameters());
+		registerStatelessBoss(ProsecutorJudgementChainBoss.identityTag, ProsecutorJudgementChainBoss::new, new ProsecutorJudgementChainBoss.Parameters());
+		registerStatelessBoss(VanguardChallengeBoss.identityTag, VanguardChallengeBoss::new, new VanguardChallengeBoss.Parameters());
+		registerStatelessBoss(FacelessOneBoss.identityTag, FacelessOneBoss::new);
+		registerStatelessBoss(SourcelessGazeBoss.identityTag, SourcelessGazeBoss::new, new SourcelessGazeBoss.Parameters());
+		registerStatelessBoss(PassiveBoss.identityTag, PassiveBoss::new);
+		registerStatelessBoss(StealthBoss.identityTag, StealthBoss::new, new StealthBoss.Parameters());
+		registerStatelessBoss(RamBoss.identityTag, RamBoss::new, new RamBoss.Parameters());
+		registerStatelessBoss(BeamBoss.identityTag, BeamBoss::new, new BeamBoss.Parameters());
+		registerStatelessBoss(PlayerScalingBoss.identityTag, PlayerScalingBoss::new, new PlayerScalingBoss.Parameters());
+		registerStatelessBoss(ProjectileEntityBoss.identityTag, ProjectileEntityBoss::new, new ProjectileEntityBoss.Parameters());
+		registerStatelessBoss(BefuddleBoss.identityTag, BefuddleBoss::new, new BefuddleBoss.Parameters());
+		registerStatelessBoss(ChargeManagerBoss.identityTag, ChargeManagerBoss::new, new ChargeManagerBoss.Parameters());
+		registerStatelessBoss(RegenerationPercentBoss.identityTag, RegenerationPercentBoss::new, new RegenerationPercentBoss.Parameters());
+		registerStatelessBoss(ReplaceVexBoss.identityTag, ReplaceVexBoss::new, new ReplaceVexBoss.Parameters());
+		registerStatelessBoss(SpiritArcheryTargetBoss.identityTag, SpiritArcheryTargetBoss::new);
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);
@@ -433,6 +473,13 @@ public class BossManager implements Listener {
 		registerStatefulBoss(Xenotopsis.identityTag, Xenotopsis::new);
 		registerStatefulBoss(ExaltedCAxtal.identityTag, ExaltedCAxtal::new);
 		registerStatefulBoss(Sirius.identityTag, Sirius::new);
+		registerStatefulBoss(AlocAcoc.identityTag, AlocAcoc::new);
+		registerStatefulBoss(CoreElemental.identityTag, CoreElemental::new);
+		registerStatefulBoss(SteelWingHawk.identityTag, SteelWingHawk::new);
+		registerStatefulBoss(TheImpenetrable.identityTag, TheImpenetrable::new);
+		registerStatefulBoss(Uamiel.identityTag, Uamiel::new);
+		registerStatefulBoss(ExperimentSeventyOne.identityTag, ExperimentSeventyOne::new);
+		registerStatefulBoss(IntruderBoss.identityTag, IntruderBoss::new);
 	}
 
 	private static void registerStatelessBoss(String identityTag, StatelessBossConstructor constructor) {
@@ -471,8 +518,12 @@ public class BossManager implements Listener {
 	private final Map<UUID, Boss> mBosses;
 	private boolean mNearbyEntityDeathEnabled = false;
 	private boolean mNearbyBlockBreakEnabled = false;
+	private boolean mNearbyBlockPlaceEnabled = false;
 	private boolean mNearbyPlayerDeathEnabled = false;
-	private double mMaximumEntityDeathRange = 12.0;
+	private static final double DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE = 12.0;
+	private static final double DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE = 75.0;
+	private double mMaximumEntityDeathRange = DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE;
+	private double mMaximumPlayerDeathRange = DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE;
 
 	public BossManager(Plugin plugin) {
 		INSTANCE = this;
@@ -582,6 +633,21 @@ public class BossManager implements Listener {
 				Boss boss = mBosses.get(m.getUniqueId());
 				if (boss != null) {
 					boss.nearbyBlockBreak(event);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void blockPlaceEvent(BlockPlaceEvent event) {
+		if (mNearbyBlockPlaceEnabled) {
+			/* For performance reasons this check is only enabled when there is a loaded
+			 * boss that is using this feature
+			 */
+			for (LivingEntity m : EntityUtils.getNearbyMobs(event.getBlock().getLocation(), 62.0)) {
+				Boss boss = mBosses.get(m.getUniqueId());
+				if (boss != null) {
+					boss.nearbyBlockPlace(event);
 				}
 			}
 		}
@@ -724,19 +790,22 @@ public class BossManager implements Listener {
 			}
 		}
 
-		if (boss != null && event.getType() != DamageEvent.DamageType.TRUE && event.getFinalDamage(true) >= damagee.getHealth()) {
+		if (boss != null && event.getType() != DamageEvent.DamageType.TRUE) {
 			for (BossAbilityGroup ability : boss.getAbilities()) {
 				BossBarManager bossBar = ability.getBossBar();
-				if (bossBar != null && bossBar.capsDamage()) {
-					int nextEventHealthPercent = bossBar.getNextHealthThreshold();
-					if (nextEventHealthPercent > 0) {
-						double setHealth = nextEventHealthPercent * EntityUtils.getMaxHealth(damagee) / 100;
-						// Adding 1 makes sure we actually go below the threshold but don't kill the boss
-						double newDamage = damagee.getHealth() < setHealth ? 0 : damagee.getHealth() - setHealth + 1;
-						event.setDamageCap(newDamage); // Since we are on HIGHEST, hopefully this will affect nothing other than the actual damage done
-						MMLog.fine("Because of remaining BossHealthAction at " + nextEventHealthPercent + "% health on entity " + MessagingUtils.plainText(damagee.name()) + ", reduced damage to " + newDamage + ".");
-					}
+				if (bossBar == null || !bossBar.capsDamage()) {
+					continue;
 				}
+				bossBar.getNextHealthThreshold().ifPresent(nextHpPercent -> {
+					// Min 1 to make sure we actually go below the threshold but don't kill the boss
+					double setHealth = Math.max(nextHpPercent * EntityUtils.getMaxHealth(damagee) / 100, 1);
+					double health = damagee.getHealth();
+					if (health - event.getFinalDamage(false) >= setHealth) {
+						return;
+					}
+					event.setDamageCap(health - setHealth + 1); // Since we are on HIGHEST, hopefully this will affect nothing other than the actual damage done
+					MMLog.fine("Because of remaining BossHealthAction at " + nextHpPercent + "% health on entity " + MessagingUtils.plainText(damagee.name()) + ", reduced damage to " + (health - setHealth + 1) + ".");
+				});
 			}
 		}
 	}
@@ -822,8 +891,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	/* Kind of a weird one - not hooked to bosses but used for snowman killer */
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		if (player.hasMetadata(WinterSnowmanEventBoss.deathMetakey)) {
@@ -841,7 +909,7 @@ public class BossManager implements Listener {
 			/* For performance reasons this check is only enabled when there is a loaded
 			 * boss that is using this feature
 			 */
-			for (LivingEntity m : EntityUtils.getNearbyMobs(player.getLocation(), 75.0)) {
+			for (LivingEntity m : EntityUtils.getNearbyMobs(player.getLocation(), mMaximumPlayerDeathRange)) {
 				Boss boss = mBosses.get(m.getUniqueId());
 				if (boss != null) {
 					boss.nearbyPlayerDeath(event);
@@ -885,7 +953,15 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler(ignoreCancelled = true)
+	public void bossGlowed(EntityGlowEvent event) {
+		Boss boss = mBosses.get(event.getEntity().getUniqueId());
+		if (boss != null) {
+			boss.bossGlowed(event);
+		}
+	}
+
+	@EventHandler
 	public void bossExploded(EntityExplodeEvent event) {
 		Boss boss = mBosses.get(event.getEntity().getUniqueId());
 
@@ -894,18 +970,40 @@ public class BossManager implements Listener {
 		}
 	}
 
+	@EventHandler(ignoreCancelled = true)
+	public void bossKnockedBackEntity(EntityKnockbackByEntityEvent event) {
+		Boss boss = mBosses.get(event.getHitBy().getUniqueId());
+		if (boss != null) {
+			boss.bossKnockedBackEntity(event);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void vexSummoned(CreatureSpawnEvent event) {
+		if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPELL && event.getEntity() instanceof Vex vex) {
+			Mob summoner = vex.getSummoner();
+			if (summoner != null) {
+				Boss boss = mBosses.get(summoner.getUniqueId());
+				if (boss != null) {
+					boss.bossSummonedVex(event, vex);
+				}
+			}
+		}
+	}
+
 	// Only acts on fire applied by the plugin, called in EntityUtils
-	public void bossIgnited(Entity entity, int ticks) {
+	public void bossIgnited(Entity entity, int ticks, @Nullable Entity applier) {
 		Boss boss = mBosses.get(entity.getUniqueId());
 
 		if (boss != null) {
-			boss.bossIgnited(ticks);
+			boss.bossIgnited(ticks, applier);
 		}
 	}
 
 	/********************************************************************************
 	 * Static public methods
 	 *******************************************************************************/
+
 	public static BossManager getInstance() {
 		if (INSTANCE == null) {
 			throw new RuntimeException("BossManager used before it was loaded");
@@ -1033,15 +1131,15 @@ public class BossManager implements Listener {
 	}
 
 	/* Machine-readable list */
-	public String[] listBosses() {
+	public static Set<String> listBosses() {
 		Set<String> allBossTags = new HashSet<>(mStatelessBosses.keySet());
 		allBossTags.addAll(mStatefulBosses.keySet());
-		return allBossTags.toArray(String[]::new);
+		return allBossTags;
 	}
 
 	/* Machine-readable list */
-	public String[] listStatelessBosses() {
-		return mStatelessBosses.keySet().toArray(String[]::new);
+	public static Set<String> getStatelessBossNames() {
+		return mStatelessBosses.keySet();
 	}
 
 	/********************************************************************************
@@ -1061,12 +1159,20 @@ public class BossManager implements Listener {
 			mNearbyBlockBreakEnabled = true;
 		}
 
+		if (ability.hasNearbyBlockPlaceTrigger()) {
+			mNearbyBlockPlaceEnabled = true;
+		}
+
 		if (ability.hasNearbyPlayerDeathTrigger()) {
 			mNearbyPlayerDeathEnabled = true;
 		}
 
-		if (ability.maxEntityDeathRange() > 0) {
-			mMaximumEntityDeathRange = ability.maxEntityDeathRange();
+		if (ability.nearbyEntityDeathMaxRange() > mMaximumEntityDeathRange) {
+			mMaximumEntityDeathRange = ability.nearbyEntityDeathMaxRange();
+		}
+
+		if (ability.maxPlayerDeathRange() > mMaximumPlayerDeathRange) {
+			mMaximumPlayerDeathRange = ability.maxPlayerDeathRange();
 		}
 	}
 
@@ -1088,6 +1194,13 @@ public class BossManager implements Listener {
 			if (mBosses.values().stream().noneMatch(Boss::hasNearbyEntityDeathTrigger)) {
 				mNearbyEntityDeathEnabled = false;
 			}
+			mMaximumEntityDeathRange = mBosses.values().stream()
+				.map(b -> b.getAbilities().stream()
+					.map(BossAbilityGroup::nearbyEntityDeathMaxRange)
+					.max(java.util.Comparator.naturalOrder())
+					.orElse(DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE))
+				.max(java.util.Comparator.naturalOrder())
+				.orElse(DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE);
 		}
 
 		if (boss.hasNearbyBlockBreakTrigger()) {
@@ -1105,6 +1218,21 @@ public class BossManager implements Listener {
 			}
 		}
 
+		if (boss.hasNearbyBlockPlaceTrigger()) {
+			if (!mNearbyBlockPlaceEnabled) {
+				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyBlockPlaceTrigger but feature was not enabled. Definitely a bug!");
+			}
+
+			/*
+			 * This boss was at least contributing to keeping this feature enabled
+			 *
+			 * Need to check all other loaded bosses to see if it still needs to be enabled
+			 */
+			if (mBosses.values().stream().noneMatch(Boss::hasNearbyBlockPlaceTrigger)) {
+				mNearbyBlockPlaceEnabled = false;
+			}
+		}
+
 		if (boss.hasNearbyPlayerDeathTrigger()) {
 			if (!mNearbyPlayerDeathEnabled) {
 				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyPlayerDeathTrigger but feature was not enabled. Definitely a bug!");
@@ -1118,6 +1246,13 @@ public class BossManager implements Listener {
 			if (mBosses.values().stream().noneMatch(Boss::hasNearbyPlayerDeathTrigger)) {
 				mNearbyPlayerDeathEnabled = false;
 			}
+			mMaximumPlayerDeathRange = mBosses.values().stream()
+				.map(b -> b.getAbilities().stream()
+					.map(BossAbilityGroup::maxPlayerDeathRange)
+					.max(java.util.Comparator.naturalOrder())
+					.orElse(DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE))
+				.max(java.util.Comparator.naturalOrder())
+				.orElse(DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE);
 		}
 	}
 
@@ -1140,12 +1275,18 @@ public class BossManager implements Listener {
 	}
 
 	private void processEntity(LivingEntity entity) {
+		if (ServerProperties.isBossProcessingDisabled()) {
+			// Crash recovery property
+			return;
+		}
+
 		if (mBosses.containsKey(entity.getUniqueId())) {
 			// already loaded
 			return;
 		}
 
 		Set<String> tags = entity.getScoreboardTags();
+
 		if (!tags.isEmpty()) {
 			Boss boss = null;
 			/*
@@ -1184,6 +1325,7 @@ public class BossManager implements Listener {
 		sender.sendMessage("Total number of loaded bosses: " + mBosses.size());
 		sender.sendMessage("mNearbyEntityDeathEnabled: " + mNearbyEntityDeathEnabled);
 		sender.sendMessage("mNearbyBlockBreakEnabled: " + mNearbyBlockBreakEnabled);
+		sender.sendMessage("mNearbyBlockPlaceEnabled: " + mNearbyBlockPlaceEnabled);
 		sender.sendMessage("mNearbyPlayerDeathEnabled: " + mNearbyPlayerDeathEnabled);
 
 		Map<String, Integer> bossCounts = new HashMap<>();

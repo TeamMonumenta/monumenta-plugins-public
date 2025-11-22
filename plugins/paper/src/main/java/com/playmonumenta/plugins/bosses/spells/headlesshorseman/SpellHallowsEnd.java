@@ -31,12 +31,12 @@ it are also blinded for 5 seconds.)
 
 public class SpellHallowsEnd extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 	private boolean mHit;
 	private boolean mCooldown;
-	private int mCooldownTicks;
-	private HeadlessHorsemanBoss mHorseman;
+	private final int mCooldownTicks;
+	private final HeadlessHorsemanBoss mHorseman;
 
 	public SpellHallowsEnd(Plugin plugin, LivingEntity entity, int cooldown, HeadlessHorsemanBoss horseman) {
 		mPlugin = plugin;

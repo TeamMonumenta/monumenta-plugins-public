@@ -11,8 +11,10 @@ import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkillShopGUI;
 import com.playmonumenta.plugins.depths.DepthsTree;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import java.util.Arrays;
 import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -86,6 +88,7 @@ public enum Location {
 	REMORSEFULSKIN("remorsefulskin", "Remorseful Skin", TextColor.fromHexString("#EEE6D6")),
 	VIGIL("vigil", "The Eternal Vigil", TextColor.fromHexString("#72999C")),
 	DEPTHS("depths", "Darkest Depths", TextColor.fromHexString("#5D2D87")),
+	DEPTHS_SKIN("abyssalskin", "Abyssal Skin", TextColor.fromHexString("#5D2D87")),
 	RUSH("rush", "Rush of Dissonance", TextColor.fromHexString("#C21E56")),
 	// bosses
 	HORSEMAN("horseman", "The Headless Horseman", TextColor.fromHexString("#8E3418")),
@@ -106,6 +109,7 @@ public enum Location {
 	HEXFALL("hexfall", "Hexfall", TextColor.fromHexString("#A930DA")),
 	BLUE("blue", "Coven's Gambit", TextColor.fromHexString("#0C2CA2")),
 	BROWN("brown", "Cradle of the Broken God", TextColor.fromHexString("#703608")),
+	INDIGO("indigo", "Phyrrys, City of Fallen Stars", TextColor.fromHexString("#6F00FF")),
 	GREEN("green", "Green Dungeon", TextColor.fromHexString("#4D6E23")),
 	RED("red", "Red Dungeon", TextColor.fromHexString("#D02E28")),
 	BLACK("black", "Black Dungeon", TextColor.fromHexString("#454040")),
@@ -115,22 +119,17 @@ public enum Location {
 	GALLERYOFFEAR("gallerybase", "Gallery of Fear", TextColor.fromHexString("#39B14E")),
 	SANGUINEHALLS("gallery1", "Sanguine Halls", TextColor.fromHexString("#AB0000")),
 	MARINANOIR("gallery2", "Marina Noir", TextColor.fromHexString("#324150")),
-	FALLENSTAR("fallenstar", "Shadow of a Fallen Star", TextColor.fromHexString("#00C0A3")),
-	PERIWINKLE("periwinkle", "Voidrun Warrens", TextColor.fromHexString("#BE93E4")),
-	CHARTREUSE("chartreuse", "Investigator's Gambade", TextColor.fromHexString("#60B476")),
-	SOLARIUM("solarium", "Solarium of the Silent", TextColor.fromHexString("#E6CC25")),
-	PROMENADE("promenade", "Mecha-Pelias' Mecha-Promenade", TextColor.fromHexString("#B87333")),
 	AMBER("amber", "item name color", TextColor.fromHexString("#FFBF00")),
 	GOLD("gold", "item name color", TextColor.fromHexString("#FFD700")),
 	DARKBLUE("darkblue", "itemnamecolor", TextColor.fromHexString("#FFFFAA")),
-	INDIGO("indigo", "item name color", TextColor.fromHexString("#6F00FF")),
 	MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8")),
 	ZENITH("zenith", "The Celestial Zenith", TextColor.fromHexString("#FF9CF0")),
 	FISHING("fishing", "Architect's Ring Fishing", TextColor.fromHexString("#A9D1D0")),
 	SKR("skr", "Silver Knight's Remnants", TextColor.fromHexString("#E8C392")),
 	// bosses
 	SIRIUS("sirius", "The Final Blight", TextColor.fromHexString("#34CFBC")),
-
+	HUNTS("hunts", "Diamenean Hunts", TextColor.fromHexString("#414e18")),
+	TWISTED_INTRUDER("twisted", Component.text("Twisted ", TextColor.fromHexString("#6b0000")).decoration(TextDecoration.ITALIC, false).append(Component.text("lxxxxxxx", TextColor.fromHexString("#6b0000")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true))),
 	// events, legacy
 	VALENTINE("valentine", "Valentine Event", TextColor.fromHexString("#FF7F7F")),
 	VALENTINESKIN("valentineskin", "Valentine Skin", TextColor.fromHexString("#FF7F7F")),
@@ -178,12 +177,14 @@ public enum Location {
 		mColor = color;
 	}
 
+
 	Location(String name, Component display) {
 		mName = name;
 		mDisplayName = MessagingUtils.plainText(display);
 		mDisplay = display;
 		mColor = display.color();
 	}
+
 
 	Location(PlayerClass cls) {
 		this(cls.mClassName.toLowerCase(Locale.getDefault()), cls.mClassName, cls.mClassColor);
@@ -209,8 +210,13 @@ public enum Location {
 		return mColor;
 	}
 
+	public static Location[] availableLocations() {
+		boolean build = ServerProperties.isBuildShard();
+		return Arrays.stream(values()).toArray(Location[]::new);
+	}
+
 	public static Location getLocation(String name) {
-		for (Location location : values()) {
+		for (Location location : availableLocations()) {
 			if (location.getName().replace(" ", "").equals(name.replace(" ", ""))) {
 				return location;
 			}

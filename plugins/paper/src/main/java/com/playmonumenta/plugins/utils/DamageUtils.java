@@ -1,17 +1,22 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Retaliation;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.listeners.StasisListener;
 import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -58,12 +63,44 @@ public class DamageUtils {
 		if (damageType != DamageType.TRUE) {
 			List<Effect> effects = Plugin.getInstance().mEffectManager.getEffects(entity);
 			if (effects != null && effects.stream().anyMatch(effect -> effect instanceof PercentDamageReceived dre
-				                                                           && dre.getMagnitude() <= -1
-				                                                           && (dre.getAffectedDamageTypes() == null || dre.getAffectedDamageTypes().contains(damageType)))) {
+				&& dre.getMagnitude() <= -1 && (dre.getAffectedDamageTypes() == null || dre.getAffectedDamageTypes().contains(damageType)))) {
 				return true;
 			}
 		}
 		return StasisListener.isInStasis(entity);
+	}
+
+	/**
+	 * Deal True damage to a LivingEntity based on its maximum health as determined by
+	 * <code>EntityUtils#getMaxHealth</code>. True damage cannot be negated by damage resistances or blocked by
+	 * player invulnerability ticks (iframes) but this method does allow it to be blocked by a shield using the vanilla
+	 * checks for backwards compatibility with <code>BossUtils#bossDamagePercent</code>. Refer to the
+	 * <code>VersionAdapter</code> for more information
+	 *
+	 * @param damager        LivingEntity dealing damage, pass null if not applicable
+	 * @param damagee        LivingEntity receiving damage
+	 * @param percentHealth  How much of the entity's health should be damaged
+	 * @param causeKnockback Whether the damage should cause knockback
+	 * @param blockable      Whether the damage can be blocked with a shield
+	 * @param cause          Used for player death messages
+	 * @param isBossAbility  Whether this damage originated from a Boss. Only used by the Retaliation enchantment
+	 * @param effects        Statuses applied to the player with this attack. Only used by the Retaliation enchantment
+	 */
+	public static void damagePercentHealth(@Nullable final LivingEntity damager, final LivingEntity damagee,
+	                                       final double percentHealth, final boolean causeKnockback,
+	                                       final boolean blockable, final String cause, final boolean isBossAbility,
+	                                       final List<EffectsList.Effect> effects) {
+		final double damageToTake = percentHealth * EntityUtils.getMaxHealth(damagee);
+
+		// TODO: Retaliation should not be in this part of the damage pipeline. DamageUtils shouldn't need to know about
+		//  effects as this reduces the modularity/separation of concerns for the two systems. Move to DamageListener
+		if (damagee instanceof final Player player &&
+			ItemStatUtils.hasEnchantment(player.getInventory().getItemInOffHand(), EnchantmentType.RETALIATION)) {
+			new Retaliation().startEffect(player, effects, damager, isBossAbility);
+		}
+
+		damage(damager, damagee, new DamageEvent.Metadata(DamageType.TRUE, null, null, cause),
+			damageToTake, true, causeKnockback, blockable);
 	}
 
 	/**
@@ -88,7 +125,8 @@ public class DamageUtils {
 	 * @param ability       ClassAbility causing the damage, pass null if not applicable
 	 * @param bypassIFrames whether the damage should bypass IFrames
 	 */
-	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount, @Nullable ClassAbility ability, boolean bypassIFrames) {
+	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount,
+	                          @Nullable ClassAbility ability, boolean bypassIFrames) {
 		damage(damager, damagee, type, amount, ability, bypassIFrames, false);
 	}
 
@@ -103,7 +141,8 @@ public class DamageUtils {
 	 * @param bypassIFrames  whether the damage should bypass IFrames
 	 * @param causeKnockback whether the damage should cause knockback
 	 */
-	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount, @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback) {
+	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount,
+	                          @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback) {
 		damage(damager, damagee, type, amount, ability, bypassIFrames, causeKnockback, null);
 	}
 
@@ -119,8 +158,11 @@ public class DamageUtils {
 	 * @param causeKnockback whether the damage should cause knockback
 	 * @param bossCause      string to pass for boss death messages
 	 */
-	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount, @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback, @Nullable String bossCause) {
-		damage(damager, damagee, new DamageEvent.Metadata(type, ability, null, bossCause), amount, bypassIFrames, causeKnockback, false);
+	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double amount,
+	                          @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback,
+	                          @Nullable String bossCause) {
+		damage(damager, damagee, new DamageEvent.Metadata(type, ability, null, bossCause), amount,
+			bypassIFrames, causeKnockback, false);
 	}
 
 	/**
@@ -136,9 +178,15 @@ public class DamageUtils {
 	 * @param causeKnockback whether the damage should cause knockback
 	 * @param blockable      Whether the damage can be blocked with a shield
 	 */
-	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageEvent.Metadata metadata, double amount, boolean bypassIFrames, boolean causeKnockback, boolean blockable) {
+	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageEvent.Metadata metadata,
+	                          double amount, boolean bypassIFrames, boolean causeKnockback, boolean blockable) {
+		if (!damagee.isValid() || isImmuneToDamage(damagee, metadata.getType())) {
+			return;
+		}
 
-		if (!damagee.isValid() || damagee.isInvulnerable()) {
+		if (amount <= 0.0) {
+			MMLog.severe(() -> "[DamageUtils] Something tried to apply negative damage! No damage will be applied." +
+				"damagee: " + damagee.getName() + " metadata: " + metadata);
 			return;
 		}
 
@@ -181,16 +229,16 @@ public class DamageUtils {
 		}
 	}
 
-	/*
-	TODO - fix dualTypeDamage not working
-	public static void dualTypeDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double amount, double percentType1) {
-		dualTypeDamage(damager, damagee, type1, type2, amount, percentType1, null, false, true, null);
+	public static @Nullable ItemStatManager.PlayerItemStats getDamagingPlayerItemStats(DamageEvent event) {
+		if (event.getDamager() instanceof Projectile projectile) {
+			ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(projectile);
+			if (playerItemStats != null) {
+				return playerItemStats;
+			}
+		}
+		if (event.getSource() instanceof Player player) {
+			return Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
+		}
+		return null;
 	}
-
-	public static void dualTypeDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double amount, double percentType1, @Nullable ClassAbility ability, boolean bypassIFrames, boolean causeKnockback, @Nullable String bossCause) {
-		int originalIFrames = damagee.getNoDamageTicks();
-		damage(damager, damagee, type1, amount * percentType1, ability, bypassIFrames, causeKnockback, bossCause);
-		damagee.setNoDamageTicks(originalIFrames);
-		damage(damager, damagee, type2, amount * (1 - percentType1), ability, bypassIFrames, causeKnockback, bossCause);
-	}*/
 }

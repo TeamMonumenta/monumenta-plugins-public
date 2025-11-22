@@ -55,7 +55,7 @@ public class CharmFactory {
 	public static final double WILDCARD_BUDGET_MODIFIER = 1.8;
 	public static final int[] WILDCARD_TREE_CAP_CHANCES = {0, 50, 30, 12, 5, 2, 1};
 
-	public static final Map<String, String> charmConversionMap = Map.ofEntries(
+	public static final Map<String, String> charmConversionMap = Map.<String, String>ofEntries(
 		Map.entry("Precision Strike Range", "Precision Strike Range Requirement"),
 		Map.entry("Fireball Range", "Fireball Velocity"),
 		Map.entry("Ring of Flames Cooldown", "Igneous Rune Cooldown"),
@@ -106,7 +106,26 @@ public class CharmFactory {
 		Map.entry("Frost Nova Radius", "Snowstorm Radius"),
 		Map.entry("Frost Nova Slowness Amplifier", "Snowstorm Slowness per Stack"),
 		Map.entry("Frost Nova Slow Duration", "Snowstorm Slowness Duration"),
-		Map.entry("Frost Nova Ice Duration", "Snowstorm Ice Duration")
+		Map.entry("Frost Nova Ice Duration", "Snowstorm Ice Duration"),
+
+		Map.entry("Permafrost Ice Bonus Duration", "Permafrost Debuff Duration"),
+		Map.entry("Permafrost Trail Duration", "Permafrost Slowness Amplifier"),
+		Map.entry("Permafrost Trail Ice Duration", "Permafrost Vulnerability Amplifier"),
+		Map.entry("Whirlwind Radius", "Whirlwind Cooldown"),
+		Map.entry("Whirlwind Knockback", "Whirlwind Cooldown Reduction"),
+		Map.entry("Precision Strike Damage", "Rapid Fire Damage"),
+		Map.entry("Precision Strike Range Requirement", "Split Arrow Range"),
+		Map.entry("Precision Strike Max Stacks", "Sharpshooter Max Stacks"),
+		Map.entry("Phantom Force Weaken Amplifier", "Phantom Force Vulnerability Amplifier"),
+		Map.entry("Phantom Force Weaken Duration", "Phantom Force Vulnerability Duration"),
+
+		Map.entry("Crushing Earth Damage", "Beast's Claw Damage"),
+		Map.entry("Crushing Earth Cooldown", "Beast's Claw Cooldown"),
+		Map.entry("Crushing Earth Range", "Beast's Claw Velocity"),
+		Map.entry("Crushing Earth Stun Duration", "Beast's Claw Stun Duration"),
+
+		Map.entry("Focused Combos Bleed Amplifier", "Focused Combos Damage Multiplier"),
+		Map.entry("Focused Combos Bleed Duration", "Focused Combos Damage Multiplier")
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {
@@ -214,6 +233,7 @@ public class CharmFactory {
 		boolean isTreeLocked = false;
 		int budget = 0;
 		boolean hasNegative = false;
+		boolean isPreloaded = false;
 
 		//Initialize the random generator- in the case this is reloading a generated charm, use the UUID seed in the nbt data
 
@@ -363,26 +383,19 @@ public class CharmFactory {
 			ItemUtils.setPlainName(item, generatedName);
 		}
 
-		// now apply additional effects depending on remaining budget
-		while (budget > 0) {
-			MMLog.fine("budget is " + budget);
-
-			boolean success = false;
-			List<CharmEffectActions> potentialActions = Arrays.asList(CharmEffectActions.values());
-			Collections.shuffle(potentialActions, r);
-
-			// frozen: if loading an existing charm
-			if (actionOrder != null && actionOrder.size() >= activeEffects.size()) {
-				String actionName = actionOrder.get(activeEffects.size() - 1);
+		// load existing effects into the charm first
+		if (actionOrder != null) {
+			isPreloaded = true;
+			for (String actionName : actionOrder) {
 				CharmEffectActions action = CharmEffectActions.getEffect(actionName);
+
 				if (action != null) {
-					DepthsTree lockedTree = isTreeLocked ? chosenTree : null;
-					CharmEffects effect = applyRandomCharmEffect(chosenAbility, lockedTree, action.mRarity, item, r, activeEffects, action.mIsNegative, false, effectOrder, rollsOrder, charmTextLines);
+					CharmEffects effect = applyRandomCharmEffect(chosenAbility, isTreeLocked ? chosenTree : null, action.mRarity, item, r, activeEffects, action.mIsNegative, false, effectOrder, rollsOrder, charmTextLines);
+
 					if (effect == null) {
-						MMLog.fine("action failed- " + action.mAction);
+						MMLog.fine("load failed - " + action.mAction);
 					} else {
 						budget += action.mBudget;
-						success = true;
 						NBT.modify(item, nbt -> {
 							ItemStatUtils.addPlayerModified(nbt).setString(CHARM_ACTIONS_KEY + (activeEffects.size() - 1), action.mAction);
 						});
@@ -395,15 +408,17 @@ public class CharmFactory {
 					}
 				}
 			}
+		}
 
-			// only for Celestial Gem upgraded charms: if we've run out of pre-loaded effects
-			// skip adding new ones and just go straight to budget upgrading
-			if (isUpgrade && effectOrder != null && activeEffects.size() >= effectOrder.size()) {
-				break;
-			}
+		// skip the process of adding new effects if this is just a Celestial Gem upgrade
+		if (!isUpgrade) {
+			// after existing effects have been loaded, add additional effects depending on remaining budget
+			while (budget > 0) {
+				MMLog.fine("budget is " + budget);
 
-			// frozen: if creating a new charm
-			if (!success) {
+				boolean success = false;
+				List<CharmEffectActions> potentialActions = Arrays.asList(CharmEffectActions.values());
+				Collections.shuffle(potentialActions, r);
 
 				// old charms with 10+ effects can keep them. if we're adding new effects or making a new charm, don't go above 10
 				if (activeEffects.size() >= 10) {
@@ -419,8 +434,10 @@ public class CharmFactory {
 
 						continue;
 					}
-					// Skip action if it's negative and we aren't doing an ability only charm
-					if ((action.mIsNegative && chosenAbility == null) || (action.mIsNegative && hasNegative)) {
+					// Skip negative if we're doing a tree or wildcard charm (only single-ability charms can have negatives)
+					// Skip negative if the charm already has a negative (1 max)
+					// Skip negative if we're preloading a charm (never add new negative effects onto existing charms)
+					if ((action.mIsNegative && chosenAbility == null) || (action.mIsNegative && hasNegative) || isPreloaded) {
 						MMLog.fine("action skipped 2- " + action.mAction);
 
 						continue;
@@ -438,7 +455,6 @@ public class CharmFactory {
 					CharmEffects effect = applyRandomCharmEffect(chosenAbility, lockedTree, action.mRarity, item, r, activeEffects, action.mIsNegative, false, effectOrder, rollsOrder, charmTextLines);
 					if (effect == null) {
 						MMLog.fine("action failed- " + action.mAction);
-						continue;
 					} else {
 						budget += action.mBudget;
 						success = true;
@@ -455,11 +471,11 @@ public class CharmFactory {
 						break;
 					}
 				}
-			}
 
-			//End loop if we couldn't give a new effect
-			if (!success) {
-				break;
+				//End loop if we couldn't give a new effect
+				if (!success) {
+					break;
+				}
 			}
 		}
 

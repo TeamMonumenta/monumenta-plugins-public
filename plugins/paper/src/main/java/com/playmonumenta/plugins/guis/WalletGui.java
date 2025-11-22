@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.guis;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.inventories.BaseWallet;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
-import com.playmonumenta.plugins.inventories.Wallet;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -29,13 +30,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class WalletGui extends Gui {
-	private final Wallet mWallet;
+	private final boolean mOpenedAsModerator;
+	private final BaseWallet mWallet;
 	private final WalletManager.WalletSettings mSettings;
 	private final String mPlainName;
 	private int mPage;
 
-	public WalletGui(Player player, Wallet wallet, WalletManager.WalletSettings settings, Component displayName) {
+	public WalletGui(Player player, BaseWallet wallet, WalletManager.WalletSettings settings, Component displayName, boolean openedAsModerator) {
 		super(player, 6 * 9, displayName);
+		mOpenedAsModerator = openedAsModerator;
 		mWallet = wallet;
 		mSettings = settings;
 		mPlainName = MessagingUtils.plainText(displayName);
@@ -46,22 +49,29 @@ public class WalletGui extends Gui {
 	@SuppressWarnings("ModifyCollectionInEnhancedForLoop")
 	protected void setup() {
 
-		List<Wallet.WalletItem> walletItemsCopy = new ArrayList<>(
+		if (!mOpenedAsModerator && mWallet.canNotAccess(mPlayer)) {
+			mPlayer.sendMessage(Component.text("You no longer have access to this wallet", NamedTextColor.RED));
+			mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mPlayer.closeInventory(), 1L);
+			return;
+		}
+
+		List<BaseWallet.WalletItem> walletItemsCopy = new ArrayList<>(
 			mWallet.mItems.stream()
-				.map(item -> new Wallet.WalletItem(ItemUtils.clone(item.mItem), item.mAmount))
+				.map(item -> new BaseWallet.WalletItem(ItemUtils.clone(item.mItem), item.mAmount))
 				.toList());
 
 		// Add compressed currencies as fake items to be able to retrieve them
 		ItemStack lastUsedBase = null;
 		ciLoop:
 		for (WalletManager.CompressionInfo ci : WalletManager.COMPRESSIBLE_CURRENCIES) {
-			for (Wallet.WalletItem baseWalletItem : walletItemsCopy) {
+			for (BaseWallet.WalletItem baseWalletItem : walletItemsCopy) {
 				if (baseWalletItem.mItem.isSimilar(ci.mBase)) {
 					long baseAmount = baseWalletItem.mAmount;
 					if (baseAmount >= ci.mAmount || (lastUsedBase != null && lastUsedBase.isSimilar(ci.mBase))) {
 						baseWalletItem.mAmount = baseAmount % ci.mAmount;
 						lastUsedBase = ci.mBase;
-						walletItemsCopy.add(new Wallet.WalletItem(ItemUtils.clone(ci.mCompressed), baseAmount / ci.mAmount));
+						walletItemsCopy.add(new BaseWallet.WalletItem(ItemUtils.clone(ci.mCompressed), baseAmount / ci.mAmount));
 						continue ciLoop;
 					}
 				}
@@ -69,23 +79,23 @@ public class WalletGui extends Gui {
 		}
 
 		// Items grouped by region, and sorted within each region
-		Map<Region, List<Wallet.WalletItem>> items =
+		Map<Region, List<BaseWallet.WalletItem>> items =
 			walletItemsCopy.stream()
 				.sorted(
 					// sort main currencies to the very front
-					Comparator.comparing((Wallet.WalletItem item) -> {
+					Comparator.comparing((BaseWallet.WalletItem item) -> {
 							int index = WalletManager.MAIN_CURRENCIES.indexOf(item.mItem);
 							return index < 0 ? Integer.MAX_VALUE : index;
 						})
 						// then sort by location
-						.thenComparing((Wallet.WalletItem item) -> ItemStatUtils.getLocation(item.mItem))
+						.thenComparing((BaseWallet.WalletItem item) -> ItemStatUtils.getLocation(item.mItem))
 						// then by manual sort order (and manually sorted items are the first in their location)
-						.thenComparing((Wallet.WalletItem item) -> {
+						.thenComparing((BaseWallet.WalletItem item) -> {
 							int index = WalletManager.MANUAL_SORT_ORDER.indexOf(item.mItem);
 							return index < 0 ? Integer.MAX_VALUE : index;
 						})
 						// sort compressible currencies from most valuable to least valuable
-						.thenComparing((Wallet.WalletItem item) -> {
+						.thenComparing((BaseWallet.WalletItem item) -> {
 							WalletManager.CompressionInfo compressionInfo = WalletManager.getCompressionInfo(item.mItem);
 							if (compressionInfo != null) {
 								return -compressionInfo.mAmount;
@@ -93,9 +103,9 @@ public class WalletGui extends Gui {
 							return WalletManager.COMPRESSIBLE_CURRENCIES.stream().anyMatch(ci -> ci.mBase.isSimilar(item.mItem)) ? 0 : 1;
 						})
 						// finally, sort by name
-						.thenComparing((Wallet.WalletItem item) -> ItemUtils.getPlainNameIfExists(item.mItem)))
+						.thenComparing((BaseWallet.WalletItem item) -> ItemUtils.getPlainNameIfExists(item.mItem)))
 				// group everything by region
-				.collect(Collectors.groupingBy((Wallet.WalletItem item) -> WalletManager.MAIN_CURRENCIES.contains(item.mItem) ? Region.NONE : ItemStatUtils.getRegion(item.mItem)));
+				.collect(Collectors.groupingBy((BaseWallet.WalletItem item) -> WalletManager.MAIN_CURRENCIES.contains(item.mItem) ? Region.NONE : ItemStatUtils.getRegion(item.mItem)));
 
 		// Fill GUI with items
 		boolean showAmounts = mPlayer.getScoreboardTags().contains(CustomContainerItemManager.SHOW_AMOUNTS_TAG);
@@ -103,13 +113,13 @@ public class WalletGui extends Gui {
 		int pos = 0;
 		int itemsPerPage = 5 * 8; // top row and left column reserved
 		for (Region region : Region.values()) {
-			List<Wallet.WalletItem> regionItems = items.get(region);
+			List<BaseWallet.WalletItem> regionItems = items.get(region);
 			if (regionItems == null) {
 				continue;
 			}
 			boolean firstOfRegion = true;
 			pos = pos % 8 == 0 ? pos : pos + 8 - (pos % 8); // start new region on new line
-			for (Wallet.WalletItem item : regionItems) {
+			for (BaseWallet.WalletItem item : regionItems) {
 				int posInPage = pos - itemsPerPage * mPage;
 				if (posInPage < 0 || posInPage >= itemsPerPage) {
 					pos++;
@@ -131,7 +141,7 @@ public class WalletGui extends Gui {
 						amount = "" + item.mAmount;
 					}
 					Component name = Component.text(amount + " ", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)
-						                 .append(ItemUtils.getDisplayName(item.mItem));
+						.append(ItemUtils.getDisplayName(item.mItem));
 					for (WalletManager.CompressionInfo compressionInfo : WalletManager.COMPRESSIBLE_CURRENCIES) {
 						if (compressionInfo.mBase.isSimilar(item.mItem) || compressionInfo.mCompressed.isSimilar(item.mItem)) {
 							long count = mWallet.count(item.mItem);
@@ -149,6 +159,13 @@ public class WalletGui extends Gui {
 				}
 				setItem(10 + posInPage + posInPage / 8, new GuiItem(displayItem, false))
 					.onClick(event -> {
+						if (!mOpenedAsModerator && mWallet.canNotAccess(mPlayer)) {
+							mPlayer.sendMessage(Component.text("You no longer have access to this wallet", NamedTextColor.RED));
+							mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+							mPlayer.closeInventory();
+							return;
+						}
+
 						ItemStack movedItem = ItemUtils.clone(item.mItem);
 						switch (event.getClick()) {
 							case LEFT, SHIFT_LEFT -> {
@@ -158,14 +175,12 @@ public class WalletGui extends Gui {
 									mWallet.remove(mPlayer, movedItem);
 									mPlayer.getInventory().addItem(movedItem);
 								}
-								update();
 							}
 							case RIGHT, SHIFT_RIGHT -> {
 								movedItem.setAmount(1);
 								if (InventoryUtils.canFitInInventory(movedItem, mPlayer.getInventory())) {
 									mWallet.remove(mPlayer, movedItem);
 									mPlayer.getInventory().addItem(movedItem);
-									update();
 								}
 							}
 							case SWAP_OFFHAND -> {
@@ -269,6 +284,26 @@ public class WalletGui extends Gui {
 					update();
 				});
 		}
+		if (mOpenedAsModerator || !mWallet.canNotChangeOwner(mPlayer)) {
+			ItemStack ownerIcon = mWallet.ownerIcon();
+			ItemMeta meta = ownerIcon.getItemMeta();
+			meta.lore(List.of(
+				Component.text("Left click here to change the owner of this " + mPlainName + ".", NamedTextColor.WHITE)
+					.decoration(TextDecoration.ITALIC, false)
+			));
+			ownerIcon.setItemMeta(meta);
+			setItem(0, 2, ownerIcon)
+				.onLeftClick(() -> {
+					if (!mOpenedAsModerator && mWallet.canNotChangeOwner(mPlayer)) {
+						mPlayer.sendMessage(Component.text("You no longer have access to this wallet", NamedTextColor.RED));
+						mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						mPlayer.closeInventory();
+						return;
+					}
+					Component changeOwnerTitle = Component.text("Set owner for " + mPlainName, NamedTextColor.DARK_GREEN);
+					new WalletOwnerGui(this, mPlayer, mWallet, changeOwnerTitle, mOpenedAsModerator).open();
+				});
+		}
 		{
 			ItemStack infoIcon = new ItemStack(Material.DARK_OAK_SIGN);
 			ItemMeta itemMeta = infoIcon.getItemMeta();
@@ -324,28 +359,43 @@ public class WalletGui extends Gui {
 
 	@Override
 	protected boolean onGuiClick(InventoryClickEvent event) {
-		if (Bukkit.getPlayer(mWallet.mOwner) == null) {
-			mPlayer.sendMessage(Component.text("Player has logged off!", NamedTextColor.RED));
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+		if (!mWallet.isLoaded()) {
+			mPlayer.sendMessage(Component.text("Wallet is not loaded!", NamedTextColor.RED));
+			mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			mPlayer.closeInventory();
 			return false;
 		}
+
+		if (!mOpenedAsModerator && mWallet.canNotAccess(mPlayer)) {
+			mPlayer.sendMessage(Component.text("You no longer have access to this wallet", NamedTextColor.RED));
+			mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			mPlayer.closeInventory();
+			return false;
+		}
+
 		return true;
 	}
 
 	@Override
 	protected void onPlayerInventoryClick(InventoryClickEvent event) {
-		if (Bukkit.getPlayer(mWallet.mOwner) == null) {
-			mPlayer.sendMessage(Component.text("Player has logged off!", NamedTextColor.RED));
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+		if (!mWallet.isLoaded()) {
+			mPlayer.sendMessage(Component.text("Wallet is not loaded!", NamedTextColor.RED));
+			mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			mPlayer.closeInventory();
 			return;
 		}
+
+		if (!mOpenedAsModerator && mWallet.canNotAccess(mPlayer)) {
+			mPlayer.sendMessage(Component.text("You no longer have access to this wallet", NamedTextColor.RED));
+			mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			mPlayer.closeInventory();
+			return;
+		}
+
 		ItemStack currentItem = event.getCurrentItem();
 		if (event.getClick() == ClickType.LEFT
-			    && WalletManager.canPutIntoWallet(currentItem, mSettings)) {
+			&& WalletManager.canPutIntoWallet(currentItem, mSettings)) {
 			mWallet.add(mPlayer, currentItem);
-			update();
 		} else if (event.getClick() == ClickType.SHIFT_LEFT && WalletManager.canPutIntoWallet(currentItem, mSettings)) {
 			ItemStack combinedItems = ItemUtils.clone(currentItem);
 			currentItem.setAmount(0);
@@ -356,12 +406,16 @@ public class WalletGui extends Gui {
 				}
 			}
 			mWallet.add(mPlayer, combinedItems);
-			update();
 		} else if ((event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SHIFT_RIGHT) && WalletManager.canPutIntoWallet(currentItem, mSettings)) {
 			ItemStack oneItem = ItemUtils.clone(currentItem);
 			currentItem.setAmount(currentItem.getAmount() - 1);
 			oneItem.setAmount(1);
 			mWallet.add(mPlayer, oneItem);
+		}
+	}
+
+	public void updateIfWalletMatches(BaseWallet wallet) {
+		if (mWallet.equals(wallet)) {
 			update();
 		}
 	}

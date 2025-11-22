@@ -11,9 +11,11 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import io.papermc.paper.entity.TeleportFlag;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +74,7 @@ public class Rewind extends Spell {
 		Plugin plugin = Plugin.getInstance();
 
 		int maxDir = 270 + (45 * mToggle);
-		int minDir = 0 + (45 * mToggle);
+		int minDir = (45 * mToggle);
 
 		if (mToggle == 0) {
 			mToggle = 1;
@@ -137,16 +139,10 @@ public class Rewind extends Spell {
 					}
 
 					//Damage player by 35 in cone after warning is over (2 seconds) and knock player away
-					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
-
-						List<Player> hitPlayers = new ArrayList<>();
-						for (BoundingBox box : boxes) {
-							if (player.getBoundingBox().overlaps(box) && !hitPlayers.contains(player)) {
-								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.BLAST, DAMAGE, null, true, true, "Shatter");
-								MovementUtils.knockAway(mCenter, player, 0, .75f, false);
-								hitPlayers.add(player);
-							}
-						}
+					Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+					for (Player player : hitbox.getHitPlayers(true)) {
+						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.BLAST, DAMAGE, null, true, true, "Shatter");
+						MovementUtils.knockAway(mCenter, player, 0, .75f, false);
 					}
 
 					BukkitRunnable inner = new BukkitRunnable() {
@@ -177,7 +173,7 @@ public class Rewind extends Spell {
 											LivingEntity mob = entry.getKey();
 											if (mob.getType() != EntityType.SHULKER || !mob.getScoreboardTags().contains("NoMove")) {
 												Location destination = origin.clone().add(entry.getValue());
-												mob.teleport(destination);
+												mob.teleport(destination, TeleportFlag.EntityState.RETAIN_PASSENGERS, TeleportFlag.EntityState.RETAIN_VEHICLE);
 												new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, destination.clone().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
 											}
 										}

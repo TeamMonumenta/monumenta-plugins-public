@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemupdater;
 
 import com.google.common.collect.Multimap;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
+import com.playmonumenta.plugins.hunts.HuntsManager.QuarryType;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.itemstats.EffectType;
@@ -17,12 +18,15 @@ import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.QuiverListener;
+import com.playmonumenta.plugins.overrides.FirmamentOverride;
+import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTType;
@@ -60,7 +64,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ItemUpdateHelper {
 	// Keys allowed to be empty
-	private static final List<String> whitelistedKeys = Arrays.asList("AttributeModifiers");
+	private static final List<String> whitelistedKeys = List.of("AttributeModifiers");
 	private static final List<Component> loreToRemove = Collections.singletonList(ItemStatUtils.DUMMY_LORE_TO_REMOVE);
 	private static final UUID cachedDummyUUID = new UUID(0, 0);
 	private static final AttributeModifier cachedDummyAttributeModifier = new AttributeModifier(cachedDummyUUID, ItemStatUtils.MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME, 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
@@ -74,9 +78,12 @@ public class ItemUpdateHelper {
 		Map.entry("InstantHealth", "InstantHealthPercent")
 	);
 
-	public record VanillaEnchantmentType(Enchantment enchant, int level) {}
+	public record VanillaEnchantmentType(Enchantment enchant, int level) {
+	}
 
-	public record VanillaAttributeType(Attribute type, double amount, AttributeModifier.Operation operation, @Nullable EquipmentSlot slot) {}
+	public record VanillaAttributeType(Attribute type, double amount, AttributeModifier.Operation operation,
+	                                   @Nullable EquipmentSlot slot) {
+	}
 
 	public static List<String> getEmptyKeys(ReadableNBT nbt, List<String> paths, String baseKey) {
 		Set<String> keys = nbt.getKeys();
@@ -150,7 +157,7 @@ public class ItemUpdateHelper {
 				}
 			}
 		}
-		if (nbt.getKeys().size() == 0) {
+		if (nbt.getKeys().isEmpty()) {
 			parent.removeKey(checkTag);
 		}
 	}
@@ -193,7 +200,7 @@ public class ItemUpdateHelper {
 		}
 
 		if (wasDirty && ItemStatUtils.isZenithCharm(item)) {
-			// Update Depths charms once a week (when not clean) to catch balance changes
+			// Update Zenith charms once a week (when not clean) to catch balance changes
 			// This calls generateItemStats again once updated. Mark clean to prevent infinite recursion
 			ItemStack newCharm = CharmFactory.updateCharm(item);
 			if (newCharm != null) {
@@ -217,6 +224,8 @@ public class ItemUpdateHelper {
 				return;
 			}
 
+			ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+
 			// Checks for PI + Totem of Transposing
 			String plainName = ItemUtils.getPlainNameIfExists(nbt);
 			if (plainName.equals("Potion Injector") && ItemUtils.isShulkerBox(item.getType())) {
@@ -224,9 +233,9 @@ public class ItemUpdateHelper {
 				Component potionName = Objects.requireNonNull(item.lore()).get(1);
 				lore.add(Component.text(plainLore.get(0), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 				lore.add(potionName);
-			} else if (plainName.equals("Totem of Transposing")) {
-				int transposingId = nbt.getOrDefault("TransposingID", -1);
-				String transposingChannel = transposingId == -1 ? "MISSING CHANNEL" : transposingId + "";
+			} else if (plainName.equals("Totem of Transposing") && playerModified != null) {
+				int transposingId = playerModified.getOrDefault("TransposingID", -1);
+				String transposingChannel = transposingId == -1 ? "MISSING CHANNEL" : String.valueOf(transposingId);
 				lore.add(Component.text("Transposing Channel: " + transposingChannel, NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 			}
 
@@ -294,6 +303,13 @@ public class ItemUpdateHelper {
 							name = MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(playerUuid);
 						}
 						infusionMap.put(type, type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY), name));
+						continue;
+					}
+					if (type == InfusionType.HUNT_TRACK) {
+						QuarryType quarry = QuarryType.values()[infusion.getInteger(ItemStatUtils.LEVEL_KEY) - 1];
+						String name = MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(UUID.fromString(infusion.getString(ItemStatUtils.INFUSER_KEY)));
+						Component display = Component.text("Hunted " + quarry.getName() + " " + ScoreboardUtils.getScoreboardValue(name, quarry.getLos() + "WinsUnspoiled").orElse(0) + " times.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+						infusionMap.put(type, display);
 						continue;
 					}
 					Component display = type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY));
@@ -385,10 +401,10 @@ public class ItemUpdateHelper {
 				QuiverListener.ArrowTransformMode transformMode = ItemStatUtils.getArrowTransformMode(item);
 				if (transformMode == QuiverListener.ArrowTransformMode.NONE) {
 					lore.add(Component.text("Arrow transformation ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-						         .append(Component.text("disabled", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+						.append(Component.text("disabled", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 				} else {
 					lore.add(Component.text("Transforms arrows to ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-						         .append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+						.append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 				}
 			}
 
@@ -396,7 +412,19 @@ public class ItemUpdateHelper {
 
 			if (ItemStatUtils.isUpgradedLimeTesseract(item)) {
 				lore.add(Component.text("Stored anvils: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-					         .append(Component.text(ItemStatUtils.getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+					.append(Component.text(ItemStatUtils.getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+			}
+
+			// Add/update firmament lore
+			FirmamentOverride.FirmamentType firmamentType = FirmamentOverride.getFirmamentType(item);
+			if (firmamentType != null) {
+				lore.add(firmamentType.getMessage(FirmamentOverride.isDisabled(playerModified)));
+			}
+
+			// Add/update worldshaper's loom lore
+			if (WorldshaperOverride.isWorldshaperItem(item)) {
+				int modeIndex = WorldshaperOverride.getModeIndex(playerModified);
+				lore.add(WorldshaperOverride.Mode.values()[modeIndex].mMessage);
 			}
 
 			int shatterLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);
@@ -660,7 +688,7 @@ public class ItemUpdateHelper {
 			// readd placeholder attribute if needed
 			if (ItemUtils.hasDefaultAttributes(item)) {
 				nbt.modifyMeta((nbtr, meta) -> {
-						meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
+					meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
 				});
 			}
 		});
@@ -675,7 +703,7 @@ public class ItemUpdateHelper {
 			// readd placeholder attribute if needed
 			if (ItemUtils.hasDefaultAttributes(item)) {
 				nbt.modifyMeta((nbtr, meta) -> {
-						meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
+					meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
 				});
 			}
 			GUIUtils.setPlaceholder(nbt);
@@ -683,7 +711,7 @@ public class ItemUpdateHelper {
 	}
 
 	public static @Nullable String regenerateStats(ItemStack item) {
-		List<String> errors = new ArrayList<String>(5);
+		List<String> errors = new ArrayList<>(5);
 		NBT.modify(item, nbt -> {
 			ReadableNBT monumenta = nbt.getCompound("Monumenta");
 			if (nbt.hasTag("CustomPotionEffects") && monumenta != null && monumenta.hasTag(ItemStatUtils.STOCK_KEY)) {

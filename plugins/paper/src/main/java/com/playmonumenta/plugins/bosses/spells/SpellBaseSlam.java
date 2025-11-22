@@ -7,8 +7,8 @@ import org.bukkit.util.Vector;
 public class SpellBaseSlam extends SpellBaseLeapAttack {
 
 	public SpellBaseSlam(Plugin plugin, LivingEntity boss, double jumpHeight, int range, int minRange, int runDistance,
-						 int cooldown, double velocityMultiplier, AestheticAction initiateAesthetic,
-						 AestheticAction leapAesthetic, AestheticAction leapingAesthetic, HitAction hitAction) {
+	                     int cooldown, double velocityMultiplier, AestheticAction initiateAesthetic,
+	                     AestheticAction leapAesthetic, AestheticAction leapingAesthetic, HitAction hitAction) {
 		this(plugin, boss, jumpHeight, range, minRange, runDistance, cooldown, velocityMultiplier, initiateAesthetic,
 			leapAesthetic, leapingAesthetic, hitAction, true, false);
 	}
@@ -30,7 +30,7 @@ public class SpellBaseSlam extends SpellBaseLeapAttack {
 	public SpellBaseSlam(Plugin plugin, LivingEntity boss, double jumpHeight, int range, int minRange, int runDistance,
 	                     int cooldown, double velocityMultiplier, AestheticAction initiateAesthetic,
 	                     AestheticAction leapAesthetic, AestheticAction leapingAesthetic, HitAction hitAction,
-						 boolean preferTarget, boolean ignoreWalls) {
+	                     boolean preferTarget, boolean ignoreWalls) {
 		super(plugin, boss, range, minRange, runDistance, cooldown,
 			velocityMultiplier, initiateAesthetic, leapAesthetic,
 			leapingAesthetic, hitAction,

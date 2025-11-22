@@ -24,6 +24,7 @@ public class LPArguments {
 	public static final ArgumentSuggestions<CommandSender> GROUP_SUGGESTIONS = ArgumentSuggestions
 		.stringCollection(suggestionInfo -> CommandUtils.quoteIfNeeded(new ArrayList<>(mGroupIds)));
 
+	@SuppressWarnings("resource")
 	public static void registerLuckPermsEvents(Plugin plugin, EventBus eventBus) {
 		eventBus.subscribe(plugin, PostSyncEvent.class, LPArguments::postSyncEvent);
 

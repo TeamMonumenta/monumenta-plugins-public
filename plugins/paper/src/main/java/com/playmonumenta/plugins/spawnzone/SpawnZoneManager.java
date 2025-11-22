@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class SpawnZoneManager {
 	Plugin mPlugin;
-	List<SpawnZone> mZones = new ArrayList<SpawnZone>();
+	List<SpawnZone> mZones = new ArrayList<>();
 
 	public SpawnZoneManager(Plugin plugin) {
 		mPlugin = plugin;
@@ -28,7 +28,7 @@ public class SpawnZoneManager {
 			if (zone.withinZone(entity.getLocation())) {
 				for (SpawnEffect effect : zone.getSpawnEffects()) {
 					if (entity.getType() == effect.getEntityType()) {
-						LivingEntity creature = (LivingEntity)entity;
+						LivingEntity creature = (LivingEntity) entity;
 						String name = creature.name().toString();
 						String goalName = effect.getName();
 
@@ -46,7 +46,7 @@ public class SpawnZoneManager {
 								}
 							} else if (type == SpawnEffectType.Potion) {
 								List<PotionEffect> potionList = effect.getPotionEffects();
-								if (potionList != null && potionList.size() > 0) {
+								if (potionList != null && !potionList.isEmpty()) {
 									for (PotionEffect currentPot : potionList) {
 										creature.addPotionEffect(currentPot);
 									}
@@ -77,8 +77,8 @@ public class SpawnZoneManager {
 		*/
 
 		// Swamp Nerfs
-		List<SpawnEffect> seL1 = new ArrayList<SpawnEffect>();
-		List<PotionEffect> slownessEffect = new ArrayList<PotionEffect>();
+		List<SpawnEffect> seL1 = new ArrayList<>();
+		List<PotionEffect> slownessEffect = new ArrayList<>();
 		slownessEffect.add(new PotionEffect(PotionEffectType.SLOW, Constants.THREE_HOURS, 0));
 
 		seL1.add(new SpawnEffect(EntityType.CREEPER, "DEFAULT", SpawnEffectType.Health, -8.0));

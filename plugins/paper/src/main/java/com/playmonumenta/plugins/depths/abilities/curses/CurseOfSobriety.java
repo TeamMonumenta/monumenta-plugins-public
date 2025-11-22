@@ -12,10 +12,8 @@ import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
-import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 
 public class CurseOfSobriety extends DepthsAbility {
 	public static final String ABILITY_NAME = "Curse of Sobriety";
@@ -31,17 +29,12 @@ public class CurseOfSobriety extends DepthsAbility {
 		if (pairs != null) {
 			for (EffectManager.EffectPair pair : pairs) {
 				// This theoretically might catch a few extra things but none are important enough to care
-				if (EffectType.isEffectTypeAppliedEffect(pair.mSource)) {
-					pair.mEffect.setDuration(0);
+				if (EffectType.isEffectTypeAppliedEffect(pair.mSource())) {
+					pair.mEffect().setDuration(0);
 				}
 			}
 		}
-		for (PotionEffectType type : PotionUtils.POSITIVE_EFFECTS) {
-			if (Objects.equals(type, PotionEffectType.GLOWING)) {
-				continue;
-			}
-			mPlugin.mPotionManager.clearPotionEffectType(mPlayer, type);
-		}
+		PotionUtils.clearPositives(plugin, player);
 	}
 
 	@Override
@@ -52,7 +45,7 @@ public class CurseOfSobriety extends DepthsAbility {
 	}
 
 	public static Description<CurseOfSobriety> getDescription() {
-		return new DescriptionBuilder<CurseOfSobriety>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("All positive potion effects are nullified.");
 	}
 }

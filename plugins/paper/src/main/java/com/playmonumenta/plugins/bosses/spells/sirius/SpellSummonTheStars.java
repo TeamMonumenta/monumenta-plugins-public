@@ -99,9 +99,9 @@ public class SpellSummonTheStars extends Spell {
 
 	private Location findSpawnLocation(int attempts, boolean inBlight) {
 		if (attempts > 20) {
-
 			return mSirius.mBoss.getLocation();
 		}
+
 		Location loc;
 		if (inBlight) {
 			//just in blight.
@@ -124,7 +124,7 @@ public class SpellSummonTheStars extends Spell {
 
 		loc = LocationUtils.fallToGround(loc, mSirius.mBoss.getLocation().getY() - 10);
 
-		if (loc.getBlock().isSolid() || (loc.getY() == mSirius.mBoss.getLocation().getY() - 10 || loc.clone().subtract(0, 1, 0).getBlock().getType().equals(Material.BARRIER))) {
+		if ((!loc.getBlock().getType().equals(Material.AIR) && !loc.getBlock().getType().equals(Material.LIGHT)) || (loc.getY() == mSirius.mBoss.getLocation().getY() - 10 || loc.clone().subtract(0, 1, 0).getBlock().getType().equals(Material.BARRIER))) {
 			return findSpawnLocation(attempts + 1, inBlight);
 		} else {
 			return loc;

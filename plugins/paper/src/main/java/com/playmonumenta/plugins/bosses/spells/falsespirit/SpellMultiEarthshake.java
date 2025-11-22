@@ -150,7 +150,7 @@ public class SpellMultiEarthshake extends Spell {
 						this.cancel();
 
 						if (mDelve) {
-							ArrayList<Block> blocks = new ArrayList<Block>();
+							ArrayList<Block> blocks = new ArrayList<>();
 
 							//Populate the blocks array with nearby blocks- logic here to get the topmost block with air above it
 							for (int x = mRadius * -1; x <= mRadius; x++) {

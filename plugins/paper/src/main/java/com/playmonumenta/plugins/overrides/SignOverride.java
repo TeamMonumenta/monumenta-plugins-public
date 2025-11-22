@@ -87,6 +87,13 @@ public class SignOverride extends BaseOverride {
 							return false;
 						}
 
+						// Prevent placing signs with clickable text outside creative mode (because players have these due to a bug)
+						for (Component nestedComponent : MessagingUtils.recursiveComponents(allSignLines)) {
+							if (nestedComponent.clickEvent() != null) {
+								return false;
+							}
+						}
+
 						new BukkitRunnable() {
 							@Override
 							public void run() {
@@ -160,8 +167,10 @@ public class SignOverride extends BaseOverride {
 			boolean hasText = false;
 			List<Component> displayedLines = new ArrayList<>();
 			for (Component component : facingSide.lines()) {
-				if (component.clickEvent() != null) {
-					return output;
+				for (Component nestedComponent : MessagingUtils.recursiveComponents(component)) {
+					if (nestedComponent.clickEvent() != null) {
+						return output;
+					}
 				}
 				String line = MessagingUtils.PLAIN_SERIALIZER.serialize(component).trim();
 				if (line.matches("^[-=+~]*$")) {
@@ -219,6 +228,7 @@ public class SignOverride extends BaseOverride {
 						for (Side side : Side.values()) {
 							SignSide signSideBlock = sign.getSide(side);
 							SignSide signSideItem = signItem.getSide(side);
+							List<Component> tempLoreLines = new ArrayList<>();
 
 							DyeColor dyeColor = signSideBlock.getColor();
 
@@ -236,21 +246,30 @@ public class SignOverride extends BaseOverride {
 							));
 
 							List<Component> signLines = signSideBlock.lines();
+							boolean sideHasText = false;
 							for (int lineNum = 0; lineNum < signLines.size(); ++lineNum) {
 								Component line = signLines.get(lineNum);
 								chatFilterLines.add(line);
 								signSideItem.line(lineNum, line);
 								Component loreLine = loreHeader.append(loreBase.append(line));
-								loreLines.add(loreLine);
+								tempLoreLines.add(loreLine);
+								if (!MessagingUtils.plainText(line).isBlank()) {
+									sideHasText = true;
+								}
 							}
 
 							boolean sideGlowing = signSideBlock.isGlowingText();
 							signSideItem.setGlowingText(sideGlowing);
 							if (sideGlowing) {
-								loreLines.add(Component.text(SIGN_IS_GLOWING, NamedTextColor.WHITE));
+								tempLoreLines.add(Component.text(SIGN_IS_GLOWING, NamedTextColor.WHITE));
 							}
 
-							loreLines.add(Component.text(COPIED_SIGN_DIVIDER, NamedTextColor.GOLD));
+							tempLoreLines.add(Component.text(COPIED_SIGN_DIVIDER, NamedTextColor.GOLD));
+
+							if (side != Side.BACK || sideHasText) {
+								// back of sign shouldn't show in lore if there's no text on it
+								loreLines.addAll(tempLoreLines);
+							}
 						}
 						// Remove last divider
 						loreLines.remove(loreLines.size() - 1);

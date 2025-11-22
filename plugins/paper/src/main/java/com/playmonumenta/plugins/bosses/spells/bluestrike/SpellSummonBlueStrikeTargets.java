@@ -64,7 +64,7 @@ public class SpellSummonBlueStrikeTargets extends Spell {
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GHAST_SCREAM, SoundCategory.HOSTILE, 1.0f, 0.8f);
 			int spawns = mMobsPer * PlayerUtils.playersInRange(mCenter, 100, true).size() + BASE_SPAWNS;
 
-			if (EntityUtils.getNearbyMobs(mCenter, 100, EnumSet.of(EntityType.SHULKER)).size() == 0) {
+			if (EntityUtils.getNearbyMobs(mCenter, 100, EnumSet.of(EntityType.SHULKER)).isEmpty()) {
 				double rand = FastUtils.randomDoubleInRange(0, 1.0);
 				if (rand > 0.5) {
 					spawns -= 1;
@@ -101,7 +101,7 @@ public class SpellSummonBlueStrikeTargets extends Spell {
 		for (LivingEntity e : livingEntities) {
 			Set<String> tags = e.getScoreboardTags();
 			if (tags.contains(BlueStrikeTargetNPCBoss.identityTag)
-				    || tags.contains(BlueStrikeTurretBoss.identityTag)) {
+				|| tags.contains(BlueStrikeTurretBoss.identityTag)) {
 				return true;
 			}
 		}

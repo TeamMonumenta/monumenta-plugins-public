@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -48,18 +50,18 @@ public class SplitArrow extends Ability {
 			.linkedSpell(ClassAbility.SPLIT_ARROW)
 			.scoreboardId("SplitArrow")
 			.shorthandName("SA")
-			.descriptions(
-				"When you hit an enemy with an arrow, the next nearest enemy within " + (int) SPLIT_ARROW_CHAIN_RANGE + " blocks takes " + (int) (100 * SPLIT_ARROW_1_DAMAGE_PERCENT) + "% of the original arrow damage (ignores invulnerability frames).",
-				"Damage to the second target is increased to " + (int) (100 * SPLIT_ARROW_2_DAMAGE_PERCENT) + "% of the original arrow damage.")
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Hitting a mob with a projectile deals part of the damage to a nearby mob.")
 			.displayItem(Material.BLAZE_ROD);
 
+	private final double mRange;
 	private final double mDamagePercent;
 	private @Nullable SwiftCuts mSwiftCuts;
 	private final SplitArrowCS mCosmetic;
 
 	public SplitArrow(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, SPLIT_ARROW_CHAIN_RANGE);
 		mDamagePercent = isLevelOne() ? SPLIT_ARROW_1_DAMAGE_PERCENT : SPLIT_ARROW_2_DAMAGE_PERCENT;
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SwiftCuts.class);
@@ -70,17 +72,21 @@ public class SplitArrow extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && EntityUtils.isHostileMob(enemy)) {
+			if (proj.getScoreboardTags().contains("SourceQuickDrawVolley")) {
+				return false;
+			}
+
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getDamage() * mDamagePercent);
 			int count = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_BOUNCES);
 			if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
-				count++;
+				count += SwiftCuts.SPLIT_ARROW_BUFF;
 			}
-			double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, SPLIT_ARROW_CHAIN_RANGE);
+
 			LivingEntity sourceEnemy = enemy;
 			List<LivingEntity> chainedMobs = new ArrayList<>();
 			for (int i = 0; i < count; i++) {
 				chainedMobs.add(sourceEnemy);
-				List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(sourceEnemy.getLocation(), range);
+				List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(sourceEnemy.getLocation(), mRange);
 				nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 				nearbyMobs.removeAll(chainedMobs);
 				LivingEntity nearestMob = EntityUtils.getNearestMob(sourceEnemy.getLocation(), nearbyMobs);
@@ -115,4 +121,19 @@ public class SplitArrow extends Ability {
 		return false; // applies damage of type OTHER for damage of type PROJECTILE, which should not cause recursion with any other ability (or itself)
 	}
 
+	private static Description<SplitArrow> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When you hit an enemy with an arrow, the next nearest enemy within ")
+			.add(a -> a.mRange, SPLIT_ARROW_CHAIN_RANGE)
+			.add(" blocks takes ")
+			.addPercent(a -> a.mDamagePercent, SPLIT_ARROW_1_DAMAGE_PERCENT, false, Ability::isLevelOne)
+			.add(" of the original arrow damage. This ability cannot be triggered by Volleys initiated by Quickdraw.");
+	}
+
+	private static Description<SplitArrow> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage to the second target is increased to ")
+			.addPercent(a -> a.mDamagePercent, SPLIT_ARROW_2_DAMAGE_PERCENT, false, Ability::isLevelTwo)
+			.add(" of the original arrow damage.");
+	}
 }

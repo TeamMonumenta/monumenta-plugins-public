@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -68,7 +69,7 @@ public class CustomDamageOverTime extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (fourHertz && entity instanceof LivingEntity le && !(entity instanceof ArmorStand)) {
-			mTicks += 5; //Activates 4 times a second
+			mTicks += Constants.QUARTER_TICKS_PER_SECOND; //Activates 4 times a second
 			if (mTicks >= mPeriod) {
 				mTicks %= mPeriod;
 				DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(mDamageType, mSpell, mPlayerItemStats), mDamage, true, false, false);

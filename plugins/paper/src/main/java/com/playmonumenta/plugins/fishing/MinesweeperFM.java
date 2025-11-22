@@ -23,14 +23,14 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class MinesweeperFM extends FishingMinigame {
-	private final Color[] PROGRESS_BAR_COLORS = new Color[] {
+	private final Color[] PROGRESS_BAR_COLORS = new Color[]{
 		Color.fromRGB(100, 255, 50),
 		Color.fromRGB(255, 200, 50),
 		Color.fromRGB(255, 100, 0),
 		Color.fromRGB(200, 0, 20)
 	};
-	private final Color[] DIGIT_COLORS = new Color[] {
-		Color.BLUE, Color.GREEN, Color.ORANGE, Color.NAVY, Color.MAROON, Color.AQUA, Color.BLACK, Color.GRAY
+	private final Color[] DIGIT_COLORS = new Color[]{
+		Color.WHITE, Color.BLUE, Color.GREEN, Color.ORANGE, Color.NAVY, Color.MAROON, Color.AQUA, Color.BLACK, Color.GRAY
 	};
 	private final Color UI_COLOR = Color.fromRGB(200, 200, 200);
 	private final double PROGRESS_WIDTH = 4.0;
@@ -83,7 +83,7 @@ public class MinesweeperFM extends FishingMinigame {
 		for (int i = 0; i < mGameBoard.length; i++) {
 			for (int j = 0; j < mGameBoard[0].length; j++) {
 				Location location = adjustedBottomCorner.clone().add(planeVectorX.clone().multiply(i)).add(planeVectorY.clone().multiply(j));
-				gridButtons.put(location.toVector(), new int[] {
+				gridButtons.put(location.toVector(), new int[]{
 					i, j
 				});
 			}
@@ -135,6 +135,10 @@ public class MinesweeperFM extends FishingMinigame {
 										this.cancel();
 										return;
 									}
+
+									// Flag a mine that was just clicked automatically
+									mVisibleBoard[coords[0]][coords[1]] = -1;
+									mFlags--;
 								} else {
 									// User clicked a 0-8
 									mVisibleBoard[coords[0]][coords[1]] = 1;
@@ -181,8 +185,6 @@ public class MinesweeperFM extends FishingMinigame {
 							Location centre = adjustedBottomCorner.add(planeVectorX.clone().multiply(i)).add(planeVectorY.clone().multiply(j));
 							if (mVisibleBoard[i][j] == -1) {
 								drawRedX(centre, planeVectorX, planeVectorY, player);
-							} else if (mGameBoard[i][j] == 0 && mVisibleBoard[i][j] == 1) {
-								drawParticle(centre, player, Color.WHITE);
 							} else if (mVisibleBoard[i][j] == 1) {
 								drawNumberOnGrid(centre, mGameBoard[i][j], player);
 							}
@@ -253,7 +255,7 @@ public class MinesweeperFM extends FishingMinigame {
 	}
 
 	private void drawNumberOnGrid(Location centre, int digit, Player player) {
-		ParticleUtils.drawSevenSegmentDigit(digit, centre, player, 0.32, Particle.REDSTONE, new Particle.DustOptions(DIGIT_COLORS[digit - 1], 0.6f));
+		ParticleUtils.drawSevenSegmentDigit(digit, centre, player, 0.32, Particle.REDSTONE, new Particle.DustOptions(DIGIT_COLORS[digit], 0.6f));
 	}
 
 	private void drawRedX(Location centre, Vector planeVectorX, Vector planeVectorY, Player player) {

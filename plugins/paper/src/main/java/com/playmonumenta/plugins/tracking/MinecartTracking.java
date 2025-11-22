@@ -2,9 +2,10 @@ package com.playmonumenta.plugins.tracking;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.WeakHashMap;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
@@ -15,12 +16,12 @@ import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.inventory.ItemStack;
 
 public class MinecartTracking implements EntityTracking {
-	private Set<Minecart> mEntities = new HashSet<Minecart>();
+	private final Set<Minecart> mEntities = Collections.newSetFromMap(new WeakHashMap<>());
 	private int mTicks = 0;
 
 	@Override
 	public void addEntity(Entity entity) {
-		mEntities.add((Minecart)entity);
+		mEntities.add((Minecart) entity);
 	}
 
 	@Override

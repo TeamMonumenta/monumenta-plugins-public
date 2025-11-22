@@ -107,7 +107,7 @@ public final class ExperiencinatorConfig {
 		}
 		for (Experiencinator experiencinator : mExperiencinators) {
 			if (experiencinator.mMaterial == material
-					&& experiencinator.mName.equals(plainName)) {
+				&& experiencinator.mName.equals(plainName)) {
 				return experiencinator;
 			}
 		}
@@ -136,7 +136,7 @@ public final class ExperiencinatorConfig {
 		}
 		for (Conversion conversion : mConversions.values()) {
 			if (conversion.getSettingsId() == conversionSettingsId
-				    && conversion.getConversionRates(region) != null) {
+				&& conversion.getConversionRates(region) != null) {
 				return conversion;
 			}
 		}
@@ -398,7 +398,7 @@ public final class ExperiencinatorConfig {
 			QuestPrerequisites regionPrerequisites = mRegionPrerequisites.get(region);
 			QuestPrerequisites tierPrerequisites = mTierPrerequisites.get(tier);
 			return (regionPrerequisites == null || new QuestContext(Plugin.getInstance(), player, null, false, regionPrerequisites, experiencinatorItem).prerequisitesMet())
-				       && (tierPrerequisites == null || new QuestContext(Plugin.getInstance(), player, null, false, tierPrerequisites, experiencinatorItem).prerequisitesMet());
+				&& (tierPrerequisites == null || new QuestContext(Plugin.getInstance(), player, null, false, tierPrerequisites, experiencinatorItem).prerequisitesMet());
 		}
 
 		/**
@@ -416,8 +416,8 @@ public final class ExperiencinatorConfig {
 				throw new Exception("settingsId must be a single-digit number greater than zero, or -1!");
 			}
 			if (mSettingsId > 0 && config.getConversions().stream().anyMatch(c -> c != this
-				                                                   && c.mSettingsId == mSettingsId
-				                                                   && c.mRates.keySet().stream().anyMatch(mRates::containsKey))) {
+				&& c.mSettingsId == mSettingsId
+				&& c.mRates.keySet().stream().anyMatch(mRates::containsKey))) {
 				throw new Exception("settingsId must be unique per region!");
 			}
 			if (mResults.values().stream().anyMatch(results -> results.values().stream().anyMatch(r -> r.stream().noneMatch(result -> result.mValue == 1)))) {

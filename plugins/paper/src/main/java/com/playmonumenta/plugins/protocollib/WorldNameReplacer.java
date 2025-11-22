@@ -31,8 +31,8 @@ public class WorldNameReplacer extends PacketAdapter {
 		}
 
 		if (event.getPlayer() instanceof TemporaryPlayer
-			    || !ScoreboardUtils.checkTag(event.getPlayer(), WorldNameCommand.TAG)
-			    || !event.getPlayer().hasPermission(WorldNameCommand.PERMISSION)) {
+			|| !ScoreboardUtils.checkTag(event.getPlayer(), WorldNameCommand.TAG)
+			|| !event.getPlayer().hasPermission(WorldNameCommand.PERMISSION)) {
 			return;
 		}
 

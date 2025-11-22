@@ -36,7 +36,7 @@ public class CurseOfEnvy extends DepthsAbility {
 	}
 
 	private static Description<CurseOfEnvy> getDescription() {
-		return new DescriptionBuilder<CurseOfEnvy>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Your trees are inverted.");
 	}
 }

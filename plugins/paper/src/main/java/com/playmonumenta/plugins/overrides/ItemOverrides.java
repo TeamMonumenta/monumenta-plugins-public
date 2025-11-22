@@ -1,10 +1,9 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import de.tr7zw.nbtapi.NBTItem;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -97,9 +96,13 @@ public final class ItemOverrides {
 		mItems.put(Material.CHEST, chestOverride);
 		mItems.put(Material.TRAPPED_CHEST, chestOverride);
 
+		mItems.put(Material.DECORATED_POT, new DecoratedPotOverride());
+
 		mItems.put(Material.YELLOW_STAINED_GLASS, new YellowTesseractOverride());
 		mItems.put(Material.LIME_STAINED_GLASS, new LimeTesseractOverride());
 		mItems.put(Material.ICE, new FestiveTesseractOverride());
+		mItems.put(Material.PURPLE_STAINED_GLASS, new PurpleTessOverride(false));
+		mItems.put(Material.RED_DYE, new PurpleTessOverride(true));
 
 		mItems.put(InflationOverride.itemMaterial, new InflationOverride());
 
@@ -122,6 +125,7 @@ public final class ItemOverrides {
 		mItems.put(Material.FIREWORK_ROCKET, new FireworkOverride());
 		mItems.put(Material.HOPPER, new HopperOverride());
 		mItems.put(Material.MAGMA_BLOCK, new MagmaOverride());
+		mItems.put(Material.MOVING_PISTON, new MovingPistonOverride());
 		mItems.put(Material.BEACON, new BeaconOverride());
 		mItems.put(Material.TRIDENT, new TridentOverride());
 		mItems.put(Material.BONE, new BoneOverride());
@@ -135,7 +139,6 @@ public final class ItemOverrides {
 		mItems.put(Material.FLINT_AND_STEEL, new FlintAndSteelOverride());
 		mItems.put(Material.PUFFERFISH, new PufferfishOverride());
 		mItems.put(Material.END_CRYSTAL, new EndCrystalOverride());
-		mItems.put(Material.QUARTZ, new QuartzOverride());
 		mItems.put(Material.FIRE_CHARGE, new FireChargeOverride());
 
 		BaseOverride sculkOverride = new SculkOverride();
@@ -219,6 +222,15 @@ public final class ItemOverrides {
 
 		BaseOverride snowballOverride = new SnowballOverride();
 		mItems.put(Material.SNOWBALL, snowballOverride);
+
+		BaseOverride interactableBlockOverride = new InteractableBlockOverride();
+		for (Material button : Tag.BUTTONS.getValues()) {
+			mItems.put(button, interactableBlockOverride);
+		}
+		for (Material plate : Tag.PRESSURE_PLATES.getValues()) {
+			mItems.put(plate, interactableBlockOverride);
+		}
+		mItems.put(Material.LEVER, interactableBlockOverride);
 	}
 
 	public void rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {
@@ -241,7 +253,7 @@ public final class ItemOverrides {
 	}
 
 	public void leftClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item,
-									 @Nullable Block block, PlayerInteractEvent event) {
+	                                 @Nullable Block block, PlayerInteractEvent event) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		BaseOverride itemOverride = mItems.get(itemType);
@@ -261,7 +273,7 @@ public final class ItemOverrides {
 	}
 
 	public void physicalBlockInteraction(Plugin plugin, Player player, Action action,
-									   Block block, PlayerInteractEvent event) {
+	                                     Block block, PlayerInteractEvent event) {
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		BaseOverride blockOverride = mItems.get(blockType);
 
@@ -273,7 +285,7 @@ public final class ItemOverrides {
 	}
 
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity,
-											   ItemStack itemInHand) {
+	                                           ItemStack itemInHand) {
 		Material itemType = (itemInHand != null) ? itemInHand.getType() : Material.AIR;
 		BaseOverride override = mItems.get(itemType);
 
@@ -310,28 +322,10 @@ public final class ItemOverrides {
 		return override != null && override.swapHandsInteraction(plugin, player, item);
 	}
 
-	// Returns eventCancelled = true if disallowed, otherwise false
-	@SuppressWarnings({"unused"})
-	private boolean safezoneDisallowsBlockChange(Plugin plugin, Player player, Block block) {
-		boolean eventCancelled = false;
-
-		// Prevent players from breaking blocks in safezones from outside of them
-		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
-			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE) &&
-				!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
-				// Allow breaking if the player would be in survival mode at that spot
-				if (!ZoneUtils.isInPlot(block.getLocation())) {
-					eventCancelled = true;
-				}
-			}
-		}
-
-		return eventCancelled;
-	}
-
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item,
-										 BlockPlaceEvent event) {
+	                                     BlockPlaceEvent event) {
 		boolean eventCancelled = false;
+		Block block = event.getBlockPlaced();
 
 		//  If it's not a certain lore item go ahead and run the normal override place interaction.
 		BaseOverride override = mItems.get(item.getType());
@@ -349,15 +343,27 @@ public final class ItemOverrides {
 			eventCancelled = true;
 		}
 
+		// Don't allow placing unbreakable blocks
+		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE &&
+			ServerProperties.getUnbreakableBlocks().contains(block.getType())) {
+			eventCancelled = true;
+		}
+
 		// Don't allow placing blocks on top of barriers for plots
-		if (event.getBlockPlaced().getLocation().getBlockY() > 0 && !player.getGameMode().equals(GameMode.CREATIVE)) {
-			Material belowMat = event.getBlockPlaced().getRelative(BlockFace.DOWN).getType();
+		if (
+			// The top of guildplots is outside the world;
+			// no need to check there, and we want to allow placing on the barrier floor
+			!GuildPlotUtils.isGuildPlot(block.getLocation())
+				&& block.getLocation().getBlockY() > 0
+				&& !player.getGameMode().equals(GameMode.CREATIVE)
+		) {
+			Material belowMat = block.getRelative(BlockFace.DOWN).getType();
 			if (belowMat.equals(Material.BARRIER)) {
 				eventCancelled = true;
 			}
 
 			// Don't allow players to place rail on bedrock because of a dumb mojang bug
-			Material blockPlacedMat = event.getBlockPlaced().getType();
+			Material blockPlacedMat = block.getType();
 			if (belowMat.equals(Material.BEDROCK) &&
 				(blockPlacedMat.equals(Material.RAIL) ||
 					blockPlacedMat.equals(Material.POWERED_RAIL) ||

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -19,8 +20,8 @@ import org.bukkit.util.Vector;
 
 public class CosmicMoonbladeCS implements CosmeticSkill {
 
-	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
-	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);
+	private static final Color COLOR1 = Color.fromRGB(100, 190, 255);
+	private static final Color COLOR2 = Color.fromRGB(160, 220, 230);
 
 	@Override
 	public ClassAbility getAbility() {
@@ -48,8 +49,8 @@ public class CosmicMoonbladeCS implements CosmeticSkill {
 			double mRoll;
 			double mD = 45;
 			boolean mInit = false;
-			PPPeriodic mParticle1 = new PPPeriodic(Particle.REDSTONE, player.getLocation()).count(1).delta(0.1, 0.1, 0.1).data(FSWORD_COLOR1);
-			PPPeriodic mParticle2 = new PPPeriodic(Particle.REDSTONE, player.getLocation()).count(1).delta(0.1, 0.1, 0.1).data(FSWORD_COLOR2);
+			final PPPeriodic mParticle1 = new PPPeriodic(Particle.DUST_COLOR_TRANSITION, player.getLocation()).count(1).delta(0.1, 0.1, 0.1);
+			final PPPeriodic mParticle2 = new PPPeriodic(Particle.DUST_COLOR_TRANSITION, player.getLocation()).count(1).delta(0.1, 0.1, 0.1);
 
 			@Override
 			public void run() {
@@ -65,7 +66,10 @@ public class CosmicMoonbladeCS implements CosmeticSkill {
 				}
 				if (mI % 2 == 0) {
 					for (double r = 1; r < range; r += 0.5) {
+						double transistion = Math.pow(FastUtils.sin(Math.pow(r * 2 * Math.PI / range, 5)), 2);
 						for (double degree = mD; degree < mD + 30; degree += 5) {
+							mParticle1.data(new Particle.DustTransition(ParticleUtils.getTransition(COLOR1, Color.WHITE, transistion), COLOR1, 1.0f));
+							mParticle2.data(new Particle.DustTransition(ParticleUtils.getTransition(COLOR2, Color.WHITE, transistion), COLOR2, 1.0f));
 							Location l = origin.clone().add(0, 1.25, 0).add(moonbladeOffset(r, degree, mRoll, origin));
 							mParticle1.location(l).spawnAsPlayerActive(player);
 							mParticle2.location(l).spawnAsPlayerActive(player);
@@ -75,7 +79,10 @@ public class CosmicMoonbladeCS implements CosmeticSkill {
 					mD += 30;
 				} else {
 					for (double r = 1; r < range; r += 0.5) {
+						double transistion = Math.pow(FastUtils.sin(Math.pow(r * 2 * Math.PI / range, 5)), 2);
 						for (double degree = mD; degree > mD - 30; degree -= 5) {
+							mParticle1.data(new Particle.DustTransition(ParticleUtils.getTransition(COLOR1, Color.WHITE, transistion), COLOR1, 1.0f));
+							mParticle2.data(new Particle.DustTransition(ParticleUtils.getTransition(COLOR2, Color.WHITE, transistion), COLOR2, 1.0f));
 							Location l = origin.clone().add(0, 1.25, 0).add(moonbladeOffset(r, degree, mRoll, origin));
 							l.setPitch(-l.getPitch());
 							mParticle1.location(l).spawnAsPlayerActive(player);

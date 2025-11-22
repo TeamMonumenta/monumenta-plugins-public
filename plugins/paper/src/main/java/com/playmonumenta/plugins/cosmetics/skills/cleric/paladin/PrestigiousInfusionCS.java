@@ -74,7 +74,6 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 
 	@Override
 	public void infusionStartEffect(World world, Player player, Location loc, int stacks) {
-		MessagingUtils.sendActionBarMessage(player, "Holy energy radiates from prestige... (" + stacks + ")", TextColor.color(255, 168, 16));
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 0.6f, 1.2f);
 		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.95f, 1.4f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.25f, 0.75f);
@@ -160,21 +159,21 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 		Vector mFront = player.getLocation().getDirection().clone().setY(0).normalize();
 		ParticleUtils.drawCurve(mCenter, 1, 31, mFront,
 			t -> 0,
-				t -> 0.26 * t, t -> 0,
-				(l, t) -> {
+			t -> 0.26 * t, t -> 0,
+			(l, t) -> {
 				if (t <= 6) {
 					int units = (int) Math.ceil(t * 0.18 * 3.2);
 					ParticleUtils.drawCurve(l, -units, units, mFront,
 						u -> 0,
-							u -> 0, u -> 0.17 * t * u / units,
-							(l2, u) -> new PartialParticle(Particle.REDSTONE, l2, 1, 0.15, 0.15, 0.15, 0, BURN_COLOR).spawnAsPlayerActive(player)
+						u -> 0, u -> 0.17 * t * u / units,
+						(l2, u) -> new PartialParticle(Particle.REDSTONE, l2, 1, 0.15, 0.15, 0.15, 0, BURN_COLOR).spawnAsPlayerActive(player)
 					);
 				} else if (t <= 20) {
 					new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0.05, 0.05, 0, GOLD_COLOR).spawnAsPlayerActive(player);
 					ParticleUtils.drawCurve(l, -6, 6, mFront,
 						u -> 0,
-							u -> 0, u -> 0.17 * u,
-							(l2, u) -> new PartialParticle(Particle.REDSTONE, l2, 1, 0.15, 0.15, 0.15, 0, BURN_COLOR).spawnAsPlayerActive(player)
+						u -> 0, u -> 0.17 * u,
+						(l2, u) -> new PartialParticle(Particle.REDSTONE, l2, 1, 0.15, 0.15, 0.15, 0, BURN_COLOR).spawnAsPlayerActive(player)
 					);
 				} else {
 					new PartialParticle(Particle.REDSTONE, l, 4, 0.15, 0.15, 0.15, 0, GOLD_COLOR).spawnAsPlayerActive(player);
@@ -183,8 +182,8 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 		);
 		ParticleUtils.drawCurve(mCenter, -9, 9, mFront,
 			t -> 0,
-				t -> 5.2, t -> 0.21 * t,
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 3, 0.15, 0.15, 0.15, 0, GOLD_COLOR).spawnAsPlayerActive(player)
+			t -> 5.2, t -> 0.21 * t,
+			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 3, 0.15, 0.15, 0.15, 0, GOLD_COLOR).spawnAsPlayerActive(player)
 		);
 	}
 

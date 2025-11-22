@@ -38,11 +38,13 @@ public final class DebuffHitBoss extends BossAbilityGroup {
 		int rand = FastUtils.RANDOM.nextInt(4);
 		switch (rand) {
 			case 0 -> com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(damagee, SLOWNESS_TAG,
-					new PercentSpeed(mDebuffDuration, mSlownessPotency, SLOWNESS_TAG));
+				new PercentSpeed(mDebuffDuration, mSlownessPotency, SLOWNESS_TAG));
 			case 1 -> com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(damagee, WEAKNESS_TAG,
-				new PercentDamageDealt(mDebuffDuration, mWeaknessPotency, DamageType.getScalableDamageType()));
-			case 2 -> damagee.addPotionEffect(new PotionEffect(PotionEffectType.POISON, mDebuffDuration, 0, false, true));
-			default -> damagee.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, mDebuffDuration, 0, false, true));
+				new PercentDamageDealt(mDebuffDuration, mWeaknessPotency).damageTypes(DamageType.getScalableDamageType()));
+			case 2 ->
+				damagee.addPotionEffect(new PotionEffect(PotionEffectType.POISON, mDebuffDuration, 0, false, true));
+			default ->
+				damagee.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, mDebuffDuration, 0, false, true));
 		}
 	}
 }

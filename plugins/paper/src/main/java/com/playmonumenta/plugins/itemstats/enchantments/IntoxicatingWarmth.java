@@ -27,14 +27,15 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class IntoxicatingWarmth implements Enchantment {
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 
+public final class IntoxicatingWarmth implements Enchantment {
 	private static final String WARMTH_EFFECT_SOURCE = "IntoxicatingWarmthEffect";
 	public static final String CHARM_COOLDOWN = "Intoxicating Warmth Cooldown";
 	public static final String CHARM_DURATION = "Intoxicating Warmth Duration";
 	public static final String CHARM_SATURATION = "Intoxicating Warmth Food And Saturation";
-	private static final int DURATION = 20 * 15;
-	private static final int COOLDOWN = 20 * 30;
+	private static final int DURATION = TICKS_PER_SECOND * 12;
+	private static final int COOLDOWN = TICKS_PER_SECOND * 30;
 	public static final Material COOLDOWN_ITEM = Material.CLAY_BALL;
 
 	private static final Particle.DustOptions PEACH_COLOR = new Particle.DustOptions(Color.fromRGB(255, 158, 97), 1.0f);
@@ -56,18 +57,18 @@ public class IntoxicatingWarmth implements Enchantment {
 	}
 
 	@Override
-	public void onConsume(Plugin plugin, Player player, double level, PlayerItemConsumeEvent event) {
+	public void onConsume(final Plugin plugin, final Player player, final double level, final PlayerItemConsumeEvent event) {
 		if (ItemStatUtils.getEnchantmentLevel(event.getItem(), EnchantmentType.INTOXICATING_WARMTH) > 0) {
-			ItemStack item = event.getItem();
-			String source = ItemCooldown.toSource(getEnchantmentType());
+			final ItemStack item = event.getItem();
+			final String source = ItemCooldown.toSource(getEnchantmentType());
 			if (plugin.mEffectManager.hasEffect(player, source)) {
 				player.sendMessage(Component.text("Your " + ItemUtils.getPlainName(item) + " is still on cooldown!", TextColor.fromHexString("#D02E28")));
 				event.setCancelled(true);
 				return;
 			}
 
-			int duration = (int) (CharmManager.getDuration(player, CHARM_DURATION, DURATION) * Quench.getDurationScaling(plugin, player));
-			double amount = CharmManager.calculateFlatAndPercentValue(player, CHARM_SATURATION, 1);
+			final int duration = (int) (CharmManager.getDuration(player, CHARM_DURATION, DURATION) * Quench.getDurationScaling(plugin, player));
+			final double amount = CharmManager.calculateFlatAndPercentValue(player, CHARM_SATURATION, 1);
 
 			plugin.mEffectManager.addEffect(player, WARMTH_EFFECT_SOURCE, new WarmthEffect(duration, (float) amount));
 			event.setCancelled(true);
@@ -95,25 +96,28 @@ public class IntoxicatingWarmth implements Enchantment {
 
 			// Particles
 			plugin.mEffectManager.addEffect(player, "IntoxicatingWarmthParticles", new Aesthetics(duration,
+					// Tick effect
 					(entity, fourHertz, twoHertz, oneHertz) -> {
-						// Tick effect
-						Location loc = player.getLocation().add(0, 1, 0);
-						new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, YELLOW_COLOR).spawnAsPlayerBuff(player);
-						new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, YELLOW_COLOR).spawnAsPlayerBuff(player);
-						new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, PEACH_COLOR).spawnAsPlayerBuff(player);
-					}, (entity) -> {
+						final Location loc = player.getLocation().add(0, 1, 0);
+						new PartialParticle(Particle.REDSTONE, loc).count(2).delta(0.25).extra(0.1).data(PEACH_COLOR).spawnAsPlayerBuff(player);
+						new PartialParticle(Particle.REDSTONE, loc).count(2).delta(0.5).data(YELLOW_COLOR).spawnAsPlayerBuff(player);
+						new PartialParticle(Particle.REDSTONE, loc).count(2).delta(0.5).extra(0.1).data(PEACH_COLOR).spawnAsPlayerBuff(player);
+					},
 					// Lose effect
-					Location loc = player.getLocation();
-					player.playSound(loc, Sound.ENTITY_LLAMA_EAT, SoundCategory.PLAYERS, 1f, 0.5f);
-					new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, PEACH_COLOR).spawnAsPlayerBuff(player);
-					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, YELLOW_COLOR).spawnAsPlayerBuff(player);
-					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, PEACH_COLOR).spawnAsPlayerBuff(player);
-				})
+					(entity) -> {
+						final Location loc = player.getLocation().add(0, 1, 0);
+						player.playSound(loc, Sound.ENTITY_LLAMA_EAT, SoundCategory.PLAYERS, 1f, 0.5f);
+						new PartialParticle(Particle.REDSTONE, loc).count(2).delta(0.25).extra(0.1).data(PEACH_COLOR).spawnAsPlayerBuff(player);
+						new PartialParticle(Particle.REDSTONE, loc).count(2).delta(0.5).data(YELLOW_COLOR).spawnAsPlayerBuff(player);
+						new PartialParticle(Particle.REDSTONE, loc).count(2).delta(0.5).extra(0.1).data(PEACH_COLOR).spawnAsPlayerBuff(player);
+					}
+				)
 			);
 
 			// Set Cooldown
-			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, Refresh.reduceCooldown(plugin, player, COOLDOWN));
-			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()), new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
+			final int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, Refresh.reduceCooldown(plugin, player, COOLDOWN));
+			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()),
+				new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
 		}
 	}
 }

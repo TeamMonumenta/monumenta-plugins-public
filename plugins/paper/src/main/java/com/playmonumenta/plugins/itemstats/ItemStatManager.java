@@ -3,9 +3,11 @@ package com.playmonumenta.plugins.itemstats;
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.HemorrhageEvent;
 import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
 import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
@@ -214,7 +216,7 @@ public class ItemStatManager implements Listener {
 			double priorHealth = EntityUtils.getMaxHealth(player);
 			PlayerInventory inventory = player.getInventory();
 			updateStats(inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(),
-					player, updateAll, null, true);
+				player, updateAll, null, true);
 			// Tell the ItemStats that there has been an update
 			Plugin plugin = Plugin.getInstance();
 			for (ItemStat stat : ITEM_STATS) {
@@ -236,7 +238,7 @@ public class ItemStatManager implements Listener {
 		}
 
 		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet,
-		                        Player player, boolean updateAll, @Nullable Region region, boolean withShardSpecificRegion) {
+								Player player, boolean updateAll, @Nullable Region region, boolean withShardSpecificRegion) {
 			mMainhand = mainhand;
 			mRegion = region != null ? region : ServerProperties.getRegion(player);
 
@@ -251,7 +253,7 @@ public class ItemStatManager implements Listener {
 
 			if (!updateAll && mMainhandAddStats.get(InfusionType.UNDERSTANDING.getItemStat()) != ItemStatUtils.getInfusionLevel(mainhand, InfusionType.UNDERSTANDING)) {
 				updateStats(mainhand, player.getInventory().getItemInOffHand(), player.getInventory().getHelmet(), player.getInventory().getChestplate(), player.getInventory().getLeggings(), player.getInventory().getBoots(),
-						player, true, region, withShardSpecificRegion);
+					player, true, region, withShardSpecificRegion);
 				return;
 			}
 
@@ -342,14 +344,14 @@ public class ItemStatManager implements Listener {
 					boolean appliedUnderstanding = false;
 
 					if (!ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) ||
-							(ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) && PlayerUtils.isAlchemist(player))) {
+						(ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) && PlayerUtils.isAlchemist(player))) {
 						for (ItemStat stat : ITEM_STATS) {
 							if (stat instanceof Attribute attribute) {
 								double multiplier = attribute.getAttributeType().isMainhandRegionScaled() ? regionScaling : 1.0;
 								if (attribute instanceof ProjectileSpeed) {
 									// Hack for mainhands using projectile speed multiply instead of add
 									newMainhandAddStats.add(stat, (ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND)
-																		+ ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND)) * multiplier);
+										+ ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND)) * multiplier);
 								} else {
 									newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND) * multiplier);
 									newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND) * multiplier);
@@ -410,11 +412,11 @@ public class ItemStatManager implements Listener {
 					newStats.set(stat, newAdd * (1 + newMultiply));
 				}
 				if (stat instanceof CritScaling || stat instanceof AntiCritScaling ||
-					    stat instanceof StrengthApply || stat instanceof StrengthCancel) {
+					stat instanceof StrengthApply || stat instanceof StrengthCancel) {
 					newStats.set(stat, 1);
 				}
 				if ((stat instanceof SKTQuestDamageDealt || stat instanceof SKTQuestDamageTaken)
-					    && ServerProperties.getShardName().startsWith("skt")) {
+					&& ServerProperties.getShardName().startsWith("skt")) {
 					newStats.set(stat, 1);
 				}
 			}
@@ -863,6 +865,22 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
+	public void onAbilityCast(Plugin plugin, Player player, AbilityCastEvent event) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onAbilityCast(plugin, player, entry.getValue(), event);
+			}
+		}
+	}
+
+	public void onHemorrhage(Plugin plugin, Player player, HemorrhageEvent event) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onHemorrhage(plugin, player, entry.getValue(), event);
+			}
+		}
+	}
+
 	/*
 	 * Watch for spawned or loaded items
 	 */
@@ -925,16 +943,16 @@ public class ItemStatManager implements Listener {
 	public static double getRegionScaling(Player player, Region itemRegion, Region serverRegion, boolean withShardSpecific, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
 		if (itemRegion == Region.RING) {
 			return serverRegion == Region.VALLEY ? twoRegionScaling
-				       : serverRegion == Region.ISLES ? oneRegionScaling
-					         : baseScaling;
+				: serverRegion == Region.ISLES ? oneRegionScaling
+				: baseScaling;
 		} else if (itemRegion == Region.ISLES) {
 			// TODO Remove this if-statement after we get rid of R2 in R3 penalty
 			if (serverRegion == Region.RING) {
 				String shardName = ServerProperties.getShardName();
 				if (withShardSpecific
-						&& ((player.getScoreboardTags().contains("SKTQuest") && shardName.startsWith("skt"))
-						|| ((shardName.startsWith("dev") || shardName.equals("mobs") || shardName.contains("plots")) && PlotManager.getPlotRegion(player) == 0)
-						|| player.getGameMode() == GameMode.CREATIVE)) {
+					&& ((player.getScoreboardTags().contains("SKTQuest") && shardName.startsWith("skt"))
+					|| ((shardName.startsWith("dev") || shardName.equals("mobs") || shardName.contains("plots")) && PlotManager.getPlotRegion(player) == 0)
+					|| player.getGameMode() == GameMode.CREATIVE)) {
 					return baseScaling;
 				}
 				return oneRegionScaling;
@@ -960,6 +978,7 @@ public class ItemStatManager implements Listener {
 	 * have put on or removed speed gear.
 	 * The recalculation is done only if the player is still in an Anti Speed zone.
 	 * PlayerTracking already handles applying and removing the speed penalty when entering/leaving the zone.
+	 *
 	 * @param player the affected player.
 	 */
 	private static void recalculateAntiSpeed(Player player) {

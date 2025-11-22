@@ -394,10 +394,10 @@ public class GraveCommand {
 				player.sendMessage(Component.text("You will have to use anvils to unshatter your items.", NamedTextColor.AQUA));
 			} else {
 				player.sendMessage(Component.text("Item" + (grave.getItems().size() > 1 ? "s" : "") + " in the grave: ", NamedTextColor.AQUA)
-						.append(grave.getItemList(true)));
+					.append(grave.getItemList(true)));
 			}
 			player.sendMessage(Component.text()
-					.append(Component.text("[DELETE]", NamedTextColor.RED)
+				.append(Component.text("[DELETE]", NamedTextColor.RED)
 					.hoverEvent(HoverEvent.showText(Component.text("Delete the grave. Cannot be undone!", NamedTextColor.RED)))
 					.clickEvent(ClickEvent.runCommand("/grave delete " + uuid)))
 				.append(Component.text("   "))
@@ -476,7 +476,8 @@ public class GraveCommand {
 				deleteAll(player);
 			}
 			case -1 -> player.sendMessage(Component.text("Mass grave deletion cancelled.", NamedTextColor.RED));
-			default -> throw CommandAPI.failWithString("Mass grave deletion process failed due to an unexpected error.");
+			default ->
+				throw CommandAPI.failWithString("Mass grave deletion process failed due to an unexpected error.");
 		}
 
 

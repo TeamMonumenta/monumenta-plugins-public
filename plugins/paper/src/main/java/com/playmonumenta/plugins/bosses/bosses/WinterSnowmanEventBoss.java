@@ -31,7 +31,7 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 		mBoss.setRemoveWhenFarAway(false);
 
 		if (!(boss instanceof Snowman)) {
-			throw new Exception("boss_winter_snowman only works on snowmen!");
+			throw new Exception(identityTag + " only works on snowmen! Entity name='" + boss.getName() + "', tags=[" + String.join(",", boss.getScoreboardTags()) + "]");
 		}
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);

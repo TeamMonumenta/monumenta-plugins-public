@@ -5,8 +5,6 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.FastUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -36,30 +34,37 @@ public class WindBombCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 2.0f, 0.8f);
 	}
 
-	public void onLand(Plugin plugin, Player player, World world, Location loc, double radius) {
+	public void onLand(Player player, World world, Location loc, double radius) {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 2.0f, 1.4f);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.4f, 1.1f);
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 2.0f, 0.8f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.7f, 0.1f);
-		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			for (double j = 0; j < 360; j += 6) {
-				double radian = Math.toRadians(j);
-				Location angleLoc = loc.clone().add(FastUtils.cos(radian) * radius, 0.15, FastUtils.sin(radian) * radius);
-				new PartialParticle(Particle.CLOUD, angleLoc, 3, 0, 0, 0, 0.125).spawnAsPlayerActive(player);
-			}
-		}, 1);
+		new PPCircle(Particle.CLOUD, loc, radius)
+			.extra(0.125)
+			.count(150)
+			.spawnAsPlayerActive(player);
 	}
 
-	public void onVortexSpawn(Player player, World world, Location loc) {
+	public void onVortexSpawn(Player player, World world, Location loc, double enhancePullDuration) {
 		new PartialParticle(Particle.CLOUD, loc, 35, 4, 4, 4, 0.125).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 25, 2, 2, 2, 0.125).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.8f, 1f);
-		world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.8f, 1);
+		new BukkitRunnable() {
+			int mTicks = 0;
+
+			@Override
+			public void run() {
+				world.playSound(loc, Sound.ENTITY_BREEZE_IDLE_GROUND, SoundCategory.PLAYERS, 1.6f, 0.5f);
+				mTicks += 10;
+				if (mTicks >= enhancePullDuration) {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(Plugin.getInstance(), 0, 10);
 	}
 
 	public void onVortexTick(Player player, Location loc, double radius, int tick) {
-		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 6, radius * 0.3, radius * 0.3, radius * 0.3, 0.1).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CLOUD, loc, 3, 1, 2, 1).spawnAsPlayerActive(player);
 
 		if (tick % 10 == 0) {
 			new BukkitRunnable() {
@@ -67,12 +72,17 @@ public class WindBombCS implements CosmeticSkill {
 
 				@Override
 				public void run() {
-					new PPCircle(Particle.CLOUD, loc.clone().subtract(new Vector(0, mTicks / 2.0, 0)), radius * (5 - mTicks) / 4)
-							.countPerMeter(1)
-							.delta((5 - mTicks) * 0.15)
-							.spawnAsPlayerActive(player);
+					double multiplier = Math.pow((4 - mTicks) / 3.0, 1.6);
+
+					new PPCircle(Particle.FIREWORKS_SPARK, loc.clone().subtract(new Vector(0, mTicks / 2.0, 0)), radius * multiplier)
+						.count(30)
+						.directionalMode(true).rotateDelta(true)
+						.delta(-multiplier, 0, 0.15)
+						.extra(0.75)
+						.extraVariance(0.1)
+						.spawnAsPlayerActive(player);
 					mTicks++;
-					if (mTicks > 4) {
+					if (mTicks > 3) {
 						this.cancel();
 					}
 				}

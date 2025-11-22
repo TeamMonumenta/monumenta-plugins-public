@@ -35,12 +35,12 @@ public class KaleidoscopicLens extends DepthsAbility {
 			return;
 		}
 		dp.mEligibleTrees = Arrays.stream(DepthsTree.OWNABLE_TREES).filter(tree -> !dp.mEligibleTrees.contains(tree)).collect(Collectors.toList());
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.PRISMATIC);
+		dp.addReward(DepthsRoomType.DepthsRewardType.PRISMATIC);
 		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
 	}
 
 	private static Description<KaleidoscopicLens> getDescription() {
-		return new DescriptionBuilder<KaleidoscopicLens>().add("Lose your current trees. Gain the trees you didn't have previously, and a ")
+		return new DescriptionBuilder<>(() -> INFO).add("Lose your current trees. Gain the trees you didn't have previously, and a ")
 			.add(DepthsTree.PRISMATIC.getNameComponent())
 			.add(" ability selection.");
 	}

@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -22,7 +24,6 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -36,15 +37,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class Taboo extends Ability implements AbilityWithDuration {
 	private static final int CHARGE_TIME_REDUCTION = 10;
-	private static final double PERCENT_HEALTH_DAMAGE = 0.07;
+	private static final double PERCENT_HEALTH_DAMAGE = 0.05;
 	private static final double PERCENT_HEALING_PENALTY = 0.5;
 	private static final double PERCENT_ABSORPTION_PENALTY = 0.5;
 	private static final double PERCENT_KNOCKBACK_RESIST = 0.5;
 	private static final String KNOCKBACK_RESIST_EFFECT_NAME = "TabooKnockbackResistanceEffect";
-	private static final double MAGIC_DAMAGE_INCREASE_1 = 0.2;
-	private static final double MAGIC_DAMAGE_INCREASE_2 = 0.3;
+	private static final double MAGIC_DAMAGE_INCREASE = 0.2;
 	private static final double MAGIC_DAMAGE_INCREASE_BURST = 0.5;
-	private static final int BURST_SECONDS = 5;
+	private static final int BURST_DURATION = 5 * 20;
 	private static final int BURST_COOLDOWN = 20 * 20;
 	private static final String TABOO_HEALING_SICKNESS = "TabooHealingSickness";
 	private static final String TABOO_ABSORPTION_SICKNESS = "TabooAbsorptionSickness";
@@ -53,6 +53,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	public static final String CHARM_SELF_DAMAGE = "Taboo Self Damage";
 	public static final String CHARM_KNOCKBACK_RESISTANCE = "Taboo Knockback Resistance";
 	public static final String CHARM_DAMAGE = "Taboo Damage Modifier";
+	public static final String CHARM_DAMAGE_BURST = "Taboo Burst Mode Damage Modifier";
 	public static final String CHARM_BURST_DURATION = "Taboo Burst Mode Duration";
 	public static final String CHARM_HEALING_PENALTY = "Taboo Healing Penalty";
 	public static final String CHARM_ABSORPTION_PENALTY = "Taboo Absorption Penalty";
@@ -75,67 +76,54 @@ public class Taboo extends Ability implements AbilityWithDuration {
 		}
 	}
 
-	private TabooState mCurrentState;
-
 	public static final AbilityInfo<Taboo> INFO =
-			new AbilityInfo<>(Taboo.class, "Taboo", Taboo::new)
-					.linkedSpell(ClassAbility.TABOO)
-					.scoreboardId("Taboo")
-					.shorthandName("Tb")
-					.descriptions(
-							("Swap hands while sneaking and holding an Alchemist's Bag to consume a potion and undergo a taboo transformation. " +
-									"While transformed, you recharge potions %ss faster, deal +%s%% magic damage, and gain %s%% knockback resistance. " +
-									"However, you also lose %s%% of your current absorption, and receive %s%% less absorption and %s%% less healing from every source.")
-									.formatted(
-											StringUtils.ticksToSeconds(CHARGE_TIME_REDUCTION),
-											StringUtils.multiplierToPercentage(MAGIC_DAMAGE_INCREASE_1),
-											StringUtils.multiplierToPercentage(PERCENT_KNOCKBACK_RESIST),
-											StringUtils.multiplierToPercentage(PERCENT_ABSORPTION_PENALTY),
-											StringUtils.multiplierToPercentage(PERCENT_ABSORPTION_PENALTY),
-											StringUtils.multiplierToPercentage(PERCENT_HEALING_PENALTY)
-									),
-							("The effect now grants you +%s%% magic damage. Additionally, while it is active, activate it again while " +
-									"looking down to consume another potion and enter burst mode, which gives you an additional +%s%% magic damage, " +
-									"but makes you lose %s%% of your health per second, which bypasses resistances and absorption, but cannot kill you. " +
-									"This empowered effect lasts for %ss, and you cannot deactivate Taboo during it. Burst Cooldown: %ss")
-									.formatted(
-											StringUtils.multiplierToPercentage(MAGIC_DAMAGE_INCREASE_2),
-											StringUtils.multiplierToPercentage(MAGIC_DAMAGE_INCREASE_BURST),
-											StringUtils.multiplierToPercentage(PERCENT_HEALTH_DAMAGE),
-											BURST_SECONDS,
-											StringUtils.ticksToSeconds(BURST_COOLDOWN)
-									)
-					)
-					.simpleDescription("Receive 50% less absorption and healing from every source, in exchange for increased magic damage and potion recharge rate.")
-					.cooldown(BURST_COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("burst", "burst", Taboo::burst, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true).lookDirections(AbilityTrigger.LookDirection.DOWN),
-							new AbilityTriggerInfo.TriggerRestriction("holding an Alchemist's Bag and Taboo is active",
-									player -> {
-										if (!ItemUtils.isAlchemistItem(player.getInventory().getItemInMainHand())) {
-											return false;
-										}
-										return isTabooUpgradedAndNonBurstActive(player);
-									})))
-					.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", Taboo::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
-							PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-					.displayItem(Material.HONEY_BOTTLE);
+		new AbilityInfo<>(Taboo.class, "Taboo", Taboo::new)
+			.linkedSpell(ClassAbility.TABOO)
+			.scoreboardId("Taboo")
+			.shorthandName("Tb")
+			.descriptions(getDescription1(), getDescription2())
+			.simpleDescription("Receive 50% less absorption and healing from every source, in exchange for increased magic damage and potion recharge rate.")
+			.cooldown(BURST_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("burst", "burst", Taboo::burst, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true).lookDirections(AbilityTrigger.LookDirection.DOWN),
+				new AbilityTriggerInfo.TriggerRestriction("holding an Alchemist's Bag and Taboo is active",
+					player -> {
+						if (!ItemUtils.isAlchemistItem(player.getInventory().getItemInMainHand())) {
+							return false;
+						}
+						return isTabooUpgradedAndNonBurstActive(player);
+					})))
+			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", Taboo::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
+				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.displayItem(Material.HONEY_BOTTLE);
 
 	private final double mMagicDamageIncrease;
 	private final int mRechargeRateDecrease;
+	private final double mHealthDamagePercent;
+	private final double mKBR;
+	private final double mHealing;
+	private final double mAbsorption;
+	private final double mMagicDamageIncreaseBurst;
+	private final int mBurstDuration;
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
 
+
+	private TabooState mCurrentState = TabooState.INACTIVE;
 	private int mBurstTimer = 0;
 	private final TabooCS mCosmetic;
 
 	public Taboo(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
-		mMagicDamageIncrease = (isLevelOne() ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mMagicDamageIncrease = MAGIC_DAMAGE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mRechargeRateDecrease = CharmManager.getDuration(mPlayer, CHARM_RECHARGE, CHARGE_TIME_REDUCTION);
+		mHealthDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF_DAMAGE, PERCENT_HEALTH_DAMAGE);
+		mKBR = PERCENT_KNOCKBACK_RESIST + CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK_RESISTANCE) / 10;
+		mHealing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING_PENALTY, PERCENT_HEALING_PENALTY);
+		mAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_PENALTY, PERCENT_ABSORPTION_PENALTY);
+		mMagicDamageIncreaseBurst = MAGIC_DAMAGE_INCREASE_BURST + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_BURST);
+		mBurstDuration = CharmManager.getDuration(mPlayer, CHARM_BURST_DURATION, BURST_DURATION);
 
-		mCurrentState = TabooState.INACTIVE;
-		mBurstTimer = 0;
 		clearSicknessEffects();
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TabooCS());
@@ -168,8 +156,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 		mAlchemistPotions.reduceChargeTime(mRechargeRateDecrease);
 		clearSicknessEffects();
 		applySicknessEffects();
-		double absorptionLostMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_PENALTY, PERCENT_ABSORPTION_PENALTY);
-		AbsorptionUtils.subtractAbsorption(mPlayer, AbsorptionUtils.getAbsorption(mPlayer) * absorptionLostMultiplier);
+		AbsorptionUtils.subtractAbsorption(mPlayer, AbsorptionUtils.getAbsorption(mPlayer) * mAbsorption);
 		mCosmetic.toggle(mPlayer, true);
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
@@ -189,7 +176,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 
 	public boolean burst() {
 		if (!isOnCooldown() && mCurrentState == TabooState.ACTIVE && mAlchemistPotions != null && mAlchemistPotions.decrementCharges(1)) {
-			mBurstTimer = CharmManager.getDuration(mPlayer, CHARM_BURST_DURATION, 20 * BURST_SECONDS);
+			mBurstTimer = mBurstDuration;
 			mCurrentState = TabooState.BURST;
 			mCosmetic.burstEffects(mPlayer);
 			ClientModHandler.updateAbility(mPlayer, this);
@@ -216,7 +203,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 			mBurstTimer -= 5;
 			if (mBurstTimer % 20 == 0) {
 				double maxHealth = EntityUtils.getMaxHealth(mPlayer);
-				double selfDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF_DAMAGE, maxHealth * PERCENT_HEALTH_DAMAGE);
+				double selfDamage = mHealthDamagePercent * maxHealth;
 				if (mPlayer.getHealth() > selfDamage) {
 					mPlayer.setHealth(Math.min(mPlayer.getHealth(), maxHealth) - selfDamage); // Health is sometimes higher than max for whatever reason, raising an exception
 					mPlayer.damage(0);
@@ -229,7 +216,9 @@ public class Taboo extends Ability implements AbilityWithDuration {
 		}
 
 		if (oneSecond && mCurrentState != TabooState.INACTIVE) {
-			mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, PERCENT_KNOCKBACK_RESIST + CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK_RESISTANCE) / 10, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
+			mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME,
+				new PercentKnockbackResist(20, mKBR, KNOCKBACK_RESIST_EFFECT_NAME)
+					.displaysTime(false).deleteOnAbilityUpdate(true));
 			applySicknessEffects();
 		}
 	}
@@ -237,7 +226,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity damgee) {
 		if (mCurrentState != TabooState.INACTIVE && event.getType() == DamageType.MAGIC) {
-			double actualIncrease = mMagicDamageIncrease + ((mCurrentState == TabooState.BURST) ? MAGIC_DAMAGE_INCREASE_BURST : 0);
+			double actualIncrease = mMagicDamageIncrease + ((mCurrentState == TabooState.BURST) ? mMagicDamageIncreaseBurst : 0);
 			event.updateDamageWithMultiplier(1 + actualIncrease);
 		}
 		return false;
@@ -254,10 +243,10 @@ public class Taboo extends Ability implements AbilityWithDuration {
 	}
 
 	private void applySicknessEffects() {
-		double healing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING_PENALTY, PERCENT_HEALING_PENALTY);
-		double absorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_PENALTY, PERCENT_ABSORPTION_PENALTY);
-		mPlugin.mEffectManager.addEffect(mPlayer, TABOO_HEALING_SICKNESS, new PercentHeal(20, -healing).displaysTime(false));
-		mPlugin.mEffectManager.addEffect(mPlayer, TABOO_ABSORPTION_SICKNESS, new PercentAbsorption(20, -absorption).displaysTime(false));
+		mPlugin.mEffectManager.addEffect(mPlayer, TABOO_HEALING_SICKNESS,
+			new PercentHeal(20, -mHealing).displaysTime(false).deleteOnAbilityUpdate(true));
+		mPlugin.mEffectManager.addEffect(mPlayer, TABOO_ABSORPTION_SICKNESS,
+			new PercentAbsorption(20, -mAbsorption).displaysTime(false).deleteOnAbilityUpdate(true));
 	}
 
 	private void clearSicknessEffects() {
@@ -267,7 +256,7 @@ public class Taboo extends Ability implements AbilityWithDuration {
 
 	@Override
 	public int getInitialAbilityDuration() {
-		return mCurrentState == TabooState.BURST ? BURST_SECONDS * 20 : 0;
+		return mCurrentState == TabooState.BURST ? mBurstDuration : 0;
 	}
 
 	@Override
@@ -300,5 +289,35 @@ public class Taboo extends Ability implements AbilityWithDuration {
 		}
 
 		return output;
+	}
+
+	private static Description<Taboo> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger(1)
+			.add(" to consume a potion and undergo a taboo transformation. While transformed, you recharge potions ")
+			.addDuration(a -> a.mRechargeRateDecrease, CHARGE_TIME_REDUCTION)
+			.add(" seconds faster, deal ")
+			.addPercent(a -> a.mMagicDamageIncrease, MAGIC_DAMAGE_INCREASE, false, Ability::isLevelOne)
+			.add(" more magic damage, and gain ")
+			.addPercent(a -> a.mKBR, PERCENT_KNOCKBACK_RESIST)
+			.add(" knockback resistance. However, you also lose ")
+			.addPercent(a -> a.mAbsorption, PERCENT_ABSORPTION_PENALTY)
+			.add(" of your current absorption, and receive ")
+			.addPercent(a -> a.mAbsorption, PERCENT_ABSORPTION_PENALTY)
+			.add(" less absorption and ")
+			.addPercent(a -> a.mHealing, PERCENT_HEALING_PENALTY)
+			.add(" less healing from every source.");
+	}
+
+	private static Description<Taboo> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("While Taboo is active, activate it again while looking down to consume another potion and enter burst mode, which gives you an additional ")
+			.addPercent(a -> a.mMagicDamageIncreaseBurst, MAGIC_DAMAGE_INCREASE_BURST)
+			.add(" magic damage, but makes you lose ")
+			.addPercent(a -> a.mHealthDamagePercent, PERCENT_HEALTH_DAMAGE)
+			.add(" of your health per second, which bypasses resistances and absorption, but cannot kill you. This empowered effect lasts for ")
+			.addDuration(a -> a.mBurstDuration, BURST_DURATION)
+			.add(" seconds, and you cannot deactivate Taboo during it.")
+			.addCooldown(BURST_COOLDOWN);
 	}
 }

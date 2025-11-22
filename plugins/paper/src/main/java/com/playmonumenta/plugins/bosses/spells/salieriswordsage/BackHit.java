@@ -53,7 +53,7 @@ public class BackHit extends Spell {
 	//If the player is facing away from the boss when hit, take more damage and play effect
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		if (damagee instanceof Player player && entityBehindPlayer(mBoss, (Player) damagee) && event.getType() == DamageEvent.DamageType.MELEE_SKILL) {
+		if (damagee instanceof Player player && entityBehindPlayer(mBoss, player) && event.getType() == DamageEvent.DamageType.MELEE_SKILL) {
 			World world = mBoss.getWorld();
 
 			event.setFlatDamage(event.getDamage() * mDamageMultiplier);

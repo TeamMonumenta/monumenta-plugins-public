@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.SkirmisherCS;
@@ -23,7 +25,7 @@ import org.bukkit.entity.Player;
 
 public class Skirmisher extends Ability {
 
-	private static final double GROUPED_FLAT_DAMAGE = 1;
+	private static final double GROUPED_FLAT_DAMAGE_1 = 1;
 	private static final double GROUPED_FLAT_DAMAGE_2 = 2;
 	private static final double GROUPED_PERCENT_DAMAGE_1 = 0.1;
 	private static final double GROUPED_PERCENT_DAMAGE_2 = 0.15;
@@ -43,22 +45,12 @@ public class Skirmisher extends Ability {
 			.linkedSpell(ClassAbility.SKIRMISHER)
 			.scoreboardId("Skirmisher")
 			.shorthandName("Sk")
-			.descriptions(
-				String.format("When dealing melee damage to a mob that has at least one other mob within %s blocks, deal + %s + %s%% final damage.",
-					SKIRMISHER_FRIENDLY_RADIUS,
-					(int) GROUPED_FLAT_DAMAGE,
-					(int) (GROUPED_PERCENT_DAMAGE_1 * 100)),
-				String.format("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to %s + %s%% final damage done.",
-					(int) GROUPED_FLAT_DAMAGE_2,
-					(int) (GROUPED_PERCENT_DAMAGE_2 * 100)),
-				String.format("When you hit an enemy with a sword, the nearest enemy within %s blocks takes %s%% of the original attack's damage.",
-					(int) ENHANCEMENT_SPLASH_RADIUS,
-					(int) (ENHANCEMENT_SPLASH_PERCENT_DAMAGE * 100)))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Deal more damage if other mobs are nearby.")
 			.displayItem(Material.BONE);
 
-	private final double mIsolatedPercentDamage;
-	private final double mIsolatedFlatDamage;
+	private final double mGroupedPercentDamage;
+	private final double mGroupedFlatDamage;
 	private final double mFriendlyRadius;
 	private final double mSplashRadius;
 	private final double mSplashDamage;
@@ -71,8 +63,8 @@ public class Skirmisher extends Ability {
 		mSplashRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_SPLASH_RADIUS);
 		mSplashDamage = CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCEMENT_DAMAGE) + ENHANCEMENT_SPLASH_PERCENT_DAMAGE;
 		mSplashTargets = (int) CharmManager.getLevel(mPlayer, CHARM_TARGETS) + ENHANCEMENT_SPLASH_TARGETS;
-		mIsolatedPercentDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2);
-		mIsolatedFlatDamage = isLevelOne() ? GROUPED_FLAT_DAMAGE : GROUPED_FLAT_DAMAGE_2;
+		mGroupedPercentDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? GROUPED_PERCENT_DAMAGE_1 : GROUPED_PERCENT_DAMAGE_2);
+		mGroupedFlatDamage = isLevelOne() ? GROUPED_FLAT_DAMAGE_1 : GROUPED_FLAT_DAMAGE_2;
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SkirmisherCS());
 	}
 
@@ -83,7 +75,7 @@ public class Skirmisher extends Ability {
 			World world = mPlayer.getWorld();
 
 			// If Enhanced and triggers on a melee strike,
-			if (isEnhanced() && event.getType() == DamageType.MELEE) {
+			if (isEnhanced() && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH)) {
 				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(loc, mSplashRadius, enemy);
 				for (int i = 0; i < mSplashTargets; i++) {
 					nearbyEntities.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
@@ -99,16 +91,45 @@ public class Skirmisher extends Ability {
 				}
 			}
 
-			if (event.getAbility() != mInfo.getLinkedSpell() && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH)) {
+			if (event.getAbility() != mInfo.getLinkedSpell() && DamageType.getAllMeleeTypes().contains(event.getType())) {
 				if (EntityUtils.getNearbyMobs(loc, mFriendlyRadius, enemy).size() >= MOB_COUNT_CUTOFF
-					    || (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
-					event.addUnmodifiableDamage(mIsolatedFlatDamage);
-					event.updateDamageWithMultiplier(1 + mIsolatedPercentDamage);
+					|| (isLevelTwo() && enemy instanceof Mob mob && !mPlayer.equals(mob.getTarget()))) {
+					event.addUnmodifiableDamage(mGroupedFlatDamage);
+					event.updateDamageWithMultiplier(1 + mGroupedPercentDamage);
 					mCosmetic.aesthetics(mPlayer, loc, world, enemy);
 				}
 			}
 		}
 		return false; // only changes event damage
+	}
+
+	private static Description<Skirmisher> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When dealing melee damage to a mob that is targeting you and has at least one other mob within ")
+			.add(a -> a.mFriendlyRadius, SKIRMISHER_FRIENDLY_RADIUS)
+			.add(" blocks while holding two swords, deal + ")
+			.add(a -> a.mGroupedFlatDamage, GROUPED_FLAT_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" + ")
+			.addPercent(a -> a.mGroupedPercentDamage, GROUPED_PERCENT_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" final damage.");
+	}
+
+	private static Description<Skirmisher> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to ")
+			.add(a -> a.mGroupedFlatDamage, GROUPED_FLAT_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" + ")
+			.addPercent(a -> a.mGroupedPercentDamage, GROUPED_PERCENT_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" final damage done.");
+	}
+
+	private static Description<Skirmisher> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When you hit a mob while holding two swords, the nearest mob within ")
+			.add(a -> a.mSplashRadius, ENHANCEMENT_SPLASH_RADIUS)
+			.add(" blocks takes ")
+			.addPercent(a -> a.mSplashDamage, ENHANCEMENT_SPLASH_PERCENT_DAMAGE)
+			.add(" of the original attack's damage.");
 	}
 }
 

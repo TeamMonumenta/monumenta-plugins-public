@@ -52,7 +52,7 @@ public class GravityBomb extends DepthsAbility {
 	public static final String BOMB_NAME = "GravityBomb";
 	public static final int COOLDOWN = 22 * 20;
 	public static final int DURATION = 8 * 20;
-	public static final double[] DAMAGE = {20, 25, 30, 35, 40, 50};
+	public static final double[] DAMAGE = {18, 22, 26, 30, 34, 42};
 	public static final int RADIUS = 7;
 
 	public static final String CHARM_COOLDOWN = "Gravity Bomb Cooldown";
@@ -89,8 +89,8 @@ public class GravityBomb extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 1.0f, 1.8f);
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 1.0f, 1.8f), 2);
 
-		launchBomb(VectorUtils.rotateYAxis(mPlayer.getEyeLocation().getDirection().normalize().multiply(0.87), 25.5));
-		launchBomb(VectorUtils.rotateYAxis(mPlayer.getEyeLocation().getDirection().normalize().multiply(0.87), -25.5));
+		launchBomb(VectorUtils.rotateYAxis(new Vector(0, 0.045, 0.65), loc.getYaw() + 22.5));
+		launchBomb(VectorUtils.rotateYAxis(new Vector(0, 0.045, 0.65), loc.getYaw() - 22.5));
 
 		return true;
 	}
@@ -109,9 +109,6 @@ public class GravityBomb extends DepthsAbility {
 		}
 		EntityUtils.selfRoot(bomb, 9999 * 20);
 		bomb.setVelocity(direction);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			bomb.setVelocity(new Vector(0, 0, 0));
-		}, 20L);
 
 		EnumSet<DamageType> allButProj = DamageType.getEnumSet();
 		allButProj.remove(DamageType.PROJECTILE);
@@ -240,8 +237,9 @@ public class GravityBomb extends DepthsAbility {
 	}
 
 	private static Description<GravityBomb> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<GravityBomb>(color)
-			.add("Swap hands to launch two flying bombs that arm after 0.75 seconds and explode after ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to launch two flying bombs that arm after 0.75 seconds and explode after ")
 			.addDuration(DURATION)
 			.add(" seconds. Enemies near a bomb are afflicted with Slow Falling. Hitting a bomb with a projectile detonates it early, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)

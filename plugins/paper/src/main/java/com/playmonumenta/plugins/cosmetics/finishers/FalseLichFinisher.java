@@ -269,7 +269,7 @@ public class FalseLichFinisher implements EliteFinisher {
 						case 8 -> {
 							switch (quarterNote) {
 								case 0 -> {
-									mMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.LIGHT_PURPLE);
+									mMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.LIGHT_PURPLE, false, false, true);
 									if (mMob instanceof Lootable lootable) {
 										lootable.setLootTable(Bukkit.getLootTable(EMPTY_LOOTTABLE));
 									}

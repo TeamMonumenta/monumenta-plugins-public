@@ -52,11 +52,12 @@ public class FishedUpFinisher implements EliteFinisher {
 			final Location mHookLocation = mFishingRodTopLocation.clone();
 			@Nullable LivingEntity mClonedKilledMob;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				if (mTicks == 0) {
 					mFishingRodTopLocation.getWorld().playSound(mFishingRodTopLocation, Sound.ENTITY_FISHING_BOBBER_THROW, 2, 1);
 					killedMob.remove();
-					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.DARK_BLUE);
+					mClonedKilledMob = EliteFinishers.createClonedMob(le, p, NamedTextColor.DARK_BLUE, false, false, true);
 				}
 				new PPLine(Particle.REDSTONE, mFishingRodTopLocation, mHookLocation).data(LINE_COLOR).count(15).spawnAsPlayerActive(p);
 				if (mTicks < 20) {
@@ -96,7 +97,8 @@ public class FishedUpFinisher implements EliteFinisher {
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
-	@Override public Material getDisplayItem() {
+	@Override
+	public Material getDisplayItem() {
 		return Material.FISHING_ROD;
 	}
 }

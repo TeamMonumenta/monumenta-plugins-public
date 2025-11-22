@@ -54,7 +54,6 @@ import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -295,7 +294,7 @@ public class ColorSplash extends DepthsAbility {
 					});
 
 					// Hit sounds for mobs (so that it only plays once)
-					if (nearbyMobsOnIce.size() > 0) {
+					if (!nearbyMobsOnIce.isEmpty()) {
 						mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 2, 1.3f);
 					}
 
@@ -323,6 +322,7 @@ public class ColorSplash extends DepthsAbility {
 		cancelOnDeath(new BukkitRunnable() {
 			Location mCurrLoc = LocationUtils.rayTraceToBlock(mPlayer, 200);
 			int mTicks = 1;
+
 			@Override
 			public void run() {
 				Location eyeLoc = mPlayer.getEyeLocation();
@@ -397,6 +397,7 @@ public class ColorSplash extends DepthsAbility {
 		mDawnbringerActive = true;
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks % DAWNBRINGER_HEAL_INTERVAL == 0) {
@@ -494,6 +495,7 @@ public class ColorSplash extends DepthsAbility {
 		mShadowdancerActive = true;
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks % SHADOWDANCER_STEALTH_INTERVAL == 0) {
@@ -597,6 +599,7 @@ public class ColorSplash extends DepthsAbility {
 		cancelOnDeath(new BukkitRunnable() {
 			final ArrayList<UUID> mHitMobs = new ArrayList<>();
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
@@ -611,7 +614,7 @@ public class ColorSplash extends DepthsAbility {
 					return;
 				}
 
-				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7/Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 0.5, 0), (int) (7 / Math.pow(1.1, mTicks)), 0.15, 0.45, 0.15, 0).spawnAsPlayerPassive(mPlayer);
 
 				new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), WINDWALKER_RADIUS).getHitMobs()
 					.stream().filter(mob -> !mHitMobs.contains(mob.getUniqueId()) && !EntityUtils.isBoss(mob)).forEach(mob -> {
@@ -678,20 +681,14 @@ public class ColorSplash extends DepthsAbility {
 		}
 	}
 
-	@Override
-	public void playerDismountEvent(EntityDismountEvent event) {
-		if (mSteelsageRunnable != null) {
-			event.setCancelled(true);
-		}
-	}
-
 	public boolean hasIncreasedReviveRadius() {
 		return mDawnbringerActive;
 	}
 
 	private static Description<ColorSplash> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
-			.add("Swap hands to cast a unique ability after ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to cast a unique ability after ")
 			.addDuration(ACTIVATION_DELAY)
 			.add("s. This ability cycles through your available trees in the order you have them.")
 			.addCooldown(COOLDOWN)
@@ -705,7 +702,7 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getFrostbornDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nFrostborn").color(TextColor.color(DepthsUtils.FROSTBORN)))
 			.add(" - For ")
 			.addDuration(FROSTBORN_DURATION)
@@ -719,7 +716,7 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getFlamecallerDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nFlamecaller").color(TextColor.color(DepthsUtils.FLAMECALLER)))
 			.add(" - For ")
 			.addDuration(FLAMECALLER_DURATION)
@@ -731,7 +728,7 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getDawnbringerDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nDawnbringer").color(TextColor.color(DepthsUtils.DAWNBRINGER)))
 			.add(" - For ")
 			.addDuration(DAWNBRINGER_DURATION)
@@ -749,7 +746,7 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getEarthboundDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nEarthbound").color(TextColor.color(DepthsUtils.EARTHBOUND)))
 			.add(" - For ")
 			.addDuration(EARTHBOUND_DURATION)
@@ -768,7 +765,7 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getShadowdancerDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nShadowdancer").color(TextColor.color(DepthsUtils.SHADOWDANCER)))
 			.add(" - For ")
 			.addDuration(SHADOWDANCER_DURATION)
@@ -780,23 +777,23 @@ public class ColorSplash extends DepthsAbility {
 	}
 
 	private static Description<ColorSplash> getSteelsageDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nSteelsage").color(TextColor.color(DepthsUtils.STEELSAGE)))
 			.add(" - For ")
 			.addDuration(STEELSAGE_DURATION)
 			.add("s, ride an invincible horse. While on the horse, any melee damage you would take is negated, and you deal ")
 			.addPercent(a -> STEELSAGE_PROJ_DAMAGE_MULTIPLIER[rarity - 1], STEELSAGE_PROJ_DAMAGE_MULTIPLIER[rarity - 1], false, true)
-			.add(" more projectile damage. Swap hands again while active to dismount.");
+			.add(" more projectile damage. Trigger again while active to dismount.");
 	}
 
 	private static Description<ColorSplash> getWindwalkerDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ColorSplash>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add(Component.text("\nWindwalker").color(TextColor.color(DepthsUtils.WINDWALKER)))
 			.add(" - For ")
 			.addDuration(WINDWALKER_DURATION)
 			.add("s, gain ")
 			.addPercent(a -> WINDWALKER_SPEED[rarity - 1], WINDWALKER_SPEED[rarity - 1], false, true)
-			.add(" speed. Additionally, every time you swap hands, you initiate a Wind Walk, gaining ")
+			.add(" speed. Additionally, every time you trigger again, you initiate a Wind Walk, gaining ")
 			.addDuration(WINDWALKER_IFRAMES)
 			.add("s of Invincibility Frames, launching yourself, applying levitation and ")
 			.addPercent(WINDWALKER_VULNERABILITY)

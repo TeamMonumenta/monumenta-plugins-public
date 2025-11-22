@@ -3,12 +3,12 @@ package com.playmonumenta.plugins.particle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PPFlower extends AbstractPartialParticle<PPFlower> {
 
@@ -28,6 +28,7 @@ public class PPFlower extends AbstractPartialParticle<PPFlower> {
 	public PPFlower(Particle particle, Location centerLocation, double radius) {
 		super(particle, centerLocation);
 		mRadius = radius;
+		mCount = -1;
 	}
 
 	@Override
@@ -107,6 +108,9 @@ public class PPFlower extends AbstractPartialParticle<PPFlower> {
 
 	@Override
 	protected int getPartialCount(double multiplier, Player player, ParticleCategory source) {
+		if (mCount > 0) {
+			return mCount;
+		}
 		int finalPetals = mSharp ? (mPetals % 2 == 0 ? mPetals * 2 : mPetals) : mPetals;
 		double endAngle = mSharp ? Math.PI * 4 : Math.PI * (finalPetals - 2);
 		double finalAngleStep = mSharp ? mAngleStep / 4.0 : mAngleStep;

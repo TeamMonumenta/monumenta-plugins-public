@@ -47,7 +47,14 @@ public class ForceFieldCS extends SanctifiedArmorCS {
 	private static final Particle.DustOptions CYAN = new Particle.DustOptions(Color.fromRGB(0, 220, 220), 1.1f);
 
 	@Override
-	public void sanctOnTrigger1(World world, Player player, Location loc, LivingEntity source) {
+	public void sanctOnTrigger(World world, Player player, Location loc) {
+		world.playSound(loc, Sound.ITEM_ARMOR_EQUIP_NETHERITE, SoundCategory.PLAYERS, 1.3f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.1f);
+		new PartialParticle(Particle.CRIT_MAGIC, loc.add(0, player.getHeight() / 2, 0), 15, 0.35, 0.35, 0.35, 0.125).spawnAsPlayerPassive(player);
+	}
+
+	@Override
+	public void sanctApply1(World world, Player player, Location loc, LivingEntity source) {
 		Vector v = LocationUtils.getDirectionTo(source.getLocation(), player.getLocation());
 		Location l = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)) - 1.5, 0);
 		double[] d = VectorUtils.vectorToRotation(v);
@@ -59,6 +66,7 @@ public class ForceFieldCS extends SanctifiedArmorCS {
 		world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.PLAYERS, 0.8f, 0.8f);
 		new BukkitRunnable() {
 			int mInt = 0;
+
 			@Override
 			public void run() {
 				new PPCircle(Particle.REDSTONE, l.clone().add(0, 0.5 * mInt, 0), 1.2 - 0.04 * mInt * mInt).arcDegree(d[0] + 22.5 - 7.5 * mInt, d[0] + 157.5 + 7.5 * mInt).countPerMeter(6).delta(0.03, 0.03, 0.03).data(CYAN).spawnAsPlayerActive(player);
@@ -74,8 +82,8 @@ public class ForceFieldCS extends SanctifiedArmorCS {
 	}
 
 	@Override
-	public void sanctOnTrigger2(World world, Player player, Location loc, LivingEntity source) {
-		sanctOnTrigger1(world, player, loc, source);
+	public void sanctApply2(World world, Player player, Location loc, LivingEntity source) {
+		sanctApply1(world, player, loc, source);
 	}
 
 	@Override

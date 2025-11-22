@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -144,8 +145,13 @@ public class InventoryUtils {
 			dropped += removeSpecialItemsFromInventory(player.getEnderChest(), loc, ephemeralOnly, true, dropItems);
 		}
 
+		// Item on cursor
+		@Nullable ItemStack[] items = {player.getItemOnCursor()};
+		dropped += removeSpecialItemsFromInventory(items, loc, ephemeralOnly, false, dropItems);
+		player.setItemOnCursor(items[0]);
+
 		// Armor slots
-		@Nullable ItemStack[] items = player.getInventory().getArmorContents();
+		items = player.getInventory().getArmorContents();
 		dropped += removeSpecialItemsFromInventory(items, loc, ephemeralOnly, false, dropItems);
 		player.getInventory().setArmorContents(items);
 
@@ -422,6 +428,11 @@ public class InventoryUtils {
 		}
 	}
 
+	public static void giveItemWithWarningAfterDelay(Player player, ItemStack item) {
+		player.sendMessage(Component.text("Make at least one space available in your inventory!", NamedTextColor.DARK_RED, TextDecoration.BOLD));
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> giveItem(player, item), 5 * 20);
+	}
+
 	public static void giveItemFromLootTable(Player player, NamespacedKey key, int amount) {
 		LootTable lt = Bukkit.getLootTable(key);
 		if (lt != null) {
@@ -677,6 +688,18 @@ public class InventoryUtils {
 					numItems -= currentAmount;
 				}
 			}
+		}
+	}
+
+	public static void swapTwoInventoryItems(Player player, int slot1, int slot2) {
+		if (player.hasPermission("monumenta.bosstag.canbefuddle")) {
+			Inventory inv = player.getInventory();
+			@Nullable ItemStack[] items = inv.getContents();
+			ItemStack firstItem = items[slot1];
+			ItemStack secondItem = items[slot2];
+			items[slot1] = secondItem;
+			items[slot2] = firstItem;
+			inv.setContents(items);
 		}
 	}
 }

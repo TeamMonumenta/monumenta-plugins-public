@@ -55,7 +55,7 @@ public class GalacticRainCS extends CoupDeGraceCS {
 		Vector approachVector = new Vector(FastUtils.cos(approachAngle), 0, FastUtils.sin(approachAngle));
 
 		Vector[] pentagramStarVertices = StarCosmeticsFunctions.generateStarVertices(5, 3, 0.5, true, true);
-		List<Vector> pentagramPentagon = StarCosmeticsFunctions.interpolatePolygon(new Vector[] { pentagramStarVertices[1], pentagramStarVertices[3], pentagramStarVertices[5], pentagramStarVertices[7], pentagramStarVertices[9] }, 3);
+		List<Vector> pentagramPentagon = StarCosmeticsFunctions.interpolatePolygon(new Vector[]{pentagramStarVertices[1], pentagramStarVertices[3], pentagramStarVertices[5], pentagramStarVertices[7], pentagramStarVertices[9]}, 3);
 		List<Vector> pentagramStar = StarCosmeticsFunctions.interpolatePolygon(pentagramStarVertices, 4);
 		pentagramStar.addAll(pentagramPentagon);
 
@@ -65,6 +65,7 @@ public class GalacticRainCS extends CoupDeGraceCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks < 7) {

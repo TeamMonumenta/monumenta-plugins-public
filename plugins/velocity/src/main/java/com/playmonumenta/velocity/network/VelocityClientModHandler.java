@@ -2,7 +2,6 @@ package com.playmonumenta.velocity.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.playmonumenta.velocity.MonumentaVelocity;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.PlayerChannelRegisterEvent;
@@ -25,9 +24,9 @@ public class VelocityClientModHandler {
 	public static boolean mAllowPublicizeContent;
 
 	/* Keeps track of players that have registered the client packet channel (added in PlayerChannelRegisterEvent and removed following DisconnectEvent)*/
-	private static final Set<UUID> mOnlinePlayersWithClientChannel = new ConcurrentSkipListSet<UUID>();
+	private static final Set<UUID> mOnlinePlayersWithClientChannel = new ConcurrentSkipListSet<>();
 
-	public VelocityClientModHandler(MonumentaVelocity plugin, boolean allowPublicizeContent) {
+	public VelocityClientModHandler(boolean allowPublicizeContent) {
 		mAllowPublicizeContent = allowPublicizeContent;
 		mGson = new GsonBuilder().create();
 		INSTANCE = this;
@@ -41,9 +40,8 @@ public class VelocityClientModHandler {
 
 		Player player = event.getPlayer();
 		if (!mOnlinePlayersWithClientChannel.contains(player.getUniqueId())) {
-			sendServerInfoPacket(player);
-
 			mOnlinePlayersWithClientChannel.add(player.getUniqueId());
+			sendServerInfoPacket(player);
 		}
 	}
 
@@ -52,6 +50,10 @@ public class VelocityClientModHandler {
 	}
 
 	public static void sendServerInfoPacket(Player player) {
+		if (INSTANCE == null || !playerHasClientMod(player)) {
+			return;
+		}
+
 		VelocityClientModHandler.ServerInfoPacket serverInfoPacket = new VelocityClientModHandler.ServerInfoPacket();
 		serverInfoPacket.allowPublicizeContent = mAllowPublicizeContent;
 		INSTANCE.sendPacket(player, serverInfoPacket);
@@ -64,7 +66,7 @@ public class VelocityClientModHandler {
 	/**
 	 * sent on login, gives information that the client should know first and foremost.
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings("checkstyle:MemberName")
 	public static class ServerInfoPacket implements Packet {
 		String _type = "ServerInfoPacket";
 

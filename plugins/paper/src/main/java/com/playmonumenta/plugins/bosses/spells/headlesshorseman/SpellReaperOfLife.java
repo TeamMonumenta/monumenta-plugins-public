@@ -63,7 +63,6 @@ public class SpellReaperOfLife extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		int range = (int) Math.ceil(mRange);
 		Location sLoc = mBoss.getLocation();
 		sLoc.setY(sLoc.getY() + 1.7f);
 
@@ -107,7 +106,7 @@ public class SpellReaperOfLife extends Spell {
 						fallingBlock.remove();
 
 						List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
-						if (players.size() == 0) {
+						if (players.isEmpty()) {
 							return;
 						}
 

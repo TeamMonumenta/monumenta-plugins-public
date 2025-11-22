@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.poi;
 
+import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -11,8 +13,12 @@ import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class POICommands {
+
+	private static final int UNIQUE_POIS_NEEDED_SKR = 12;
+
 	public static void register() {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.weeklypoi");
@@ -35,6 +41,25 @@ public class POICommands {
 				boolean added = POIManager.getInstance().completePOI(player, poi);
 				if (added) {
 					player.sendMessage(Component.text("You've conquered " + poi.getCleanName() + " for the first time this week, earning you bonus loot!", NamedTextColor.GOLD));
+				}
+				if (!player.getScoreboardTags().contains("AllPoisConquered") && player.hasPermission("allowskrweeklyscroll")) {
+					int conqueredCount = 0;
+					Set<POI> pois = POIManager.getInstance().mPlayerPOI.get(player.getUniqueId());
+					for (POI poiCheck : POI.values()) {
+						if (poiCheck == POI.NONE) {
+							continue;
+						}
+						boolean conquered = pois != null && pois.contains(poiCheck);
+						if (conquered) {
+							conqueredCount++;
+						}
+					}
+					if (conqueredCount >= UNIQUE_POIS_NEEDED_SKR) {
+						player.sendMessage(Component.text("You find a scroll from ancient times after clearing " + UNIQUE_POIS_NEEDED_SKR + " POI's this week.", NamedTextColor.GREEN));
+						player.addScoreboardTag("AllPoisConquered");
+						ItemStack item = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r3/dungeons/skr/standard_scroll"));
+						InventoryUtils.giveItem(player, item);
+					}
 				}
 			})
 			.register();

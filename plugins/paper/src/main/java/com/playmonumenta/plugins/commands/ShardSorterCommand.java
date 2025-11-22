@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
+import com.playmonumenta.networkrelay.RemotePlayerData;
+import com.playmonumenta.networkrelay.shardhealth.ShardHealth;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
-import com.playmonumenta.plugins.utils.DungeonUtils;
+import com.playmonumenta.plugins.utils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -14,8 +17,9 @@ import dev.jorel.commandapi.arguments.PlayerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.math3.util.Pair;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -55,7 +59,7 @@ public class ShardSorterCommand {
 						for (ShardSorterData shardSorterData : SHARD_SORTER_DATA) {
 							shards.add(shardSorterData.mShardName);
 						}
-						for (DungeonUtils.DungeonCommandMapping mapping : DungeonUtils.DungeonCommandMapping.values()) {
+						for (DungeonCommandMapping mapping : DungeonCommandMapping.values()) {
 							String shardName = mapping.getShardName();
 							if (shardName != null) {
 								shards.add(shardName);
@@ -72,7 +76,7 @@ public class ShardSorterCommand {
 
 	public static void sortToShard(Player player, String shard, @Nullable CommandSender sender) throws WrapperCommandSyntaxException {
 		if (shard == null || shard.isEmpty()
-			    || ServerProperties.getShardName().startsWith(shard)) {
+			|| ServerProperties.getShardName().startsWith(shard)) {
 			if (sender != null) {
 				sender.sendMessage("No shard specified or player is already on shard");
 			}
@@ -93,7 +97,7 @@ public class ShardSorterCommand {
 				possibleShards = NetworkRelayAPI.getOnlineShardNames().stream().filter(shardName -> shardName.startsWith(shard)).toList();
 			} catch (Exception e) {
 				MMLog.severe("Failed to get shard names from network relay for sort-to-shard command, user="
-					             + player.getName() + ", shard=" + shard + " error=" + e.getMessage());
+					+ player.getName() + ", shard=" + shard + " error=" + e.getMessage());
 				return;
 			}
 			int shardCount = possibleShards.size();
@@ -103,7 +107,8 @@ public class ShardSorterCommand {
 				}
 				return;
 			}
-			possibleShards = sortShardNames(possibleShards, shard);
+			possibleShards = pickOverworldShard(possibleShards, player);
+			shardCount = possibleShards.size();
 			String worldName = player.getWorld().getName();
 			int instanceNumber;
 			if (!worldName.contains("plot")) {
@@ -131,27 +136,37 @@ public class ShardSorterCommand {
 		}
 	}
 
-	public static List<String> sortShardNames(List<String> shardNames, String baseShardName) {
-		ArrayList<Integer> resultSortedList = new ArrayList<>();
-		for (String shard : shardNames) {
-			if (shard.equalsIgnoreCase(baseShardName)) {
-				resultSortedList.add(0);
-			} else {
-				resultSortedList.add(Integer.parseInt(shard.split("-")[1]));
-			}
-		}
-		Collections.sort(resultSortedList);
+	private static List<String> pickOverworldShard(List<String> possibleShards, Player player) {
+		List<Pair<String, Double>> shardPriorityValues = new ArrayList<>();
 
-		String shardName;
-		List<String> result = new ArrayList<>();
-		for (Integer shard : resultSortedList) {
-			if (shard == 0) {
-				shardName = baseShardName;
+		RemotePlayerData selfRemoteData = MonumentaNetworkRelayIntegration.getRemotePlayer(player.getUniqueId());
+		if (selfRemoteData != null) {
+			String selfGuild = MonumentaNetworkRelayIntegration.remotePlayerGuild(selfRemoteData);
+			if (selfGuild != null) {
+				shardPriorityValues = possibleShards.stream()
+					.map(shardName -> {
+						double guildMemberCount = MonumentaNetworkRelayIntegration.guildMembersOnShard(selfGuild, shardName).size();
+						ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shardName);
+						double guildPortion = Math.min((guildMemberCount / 5) * 25, 25);
+						double healthPortion = 75 * shardHealth.healthScore();
+						return new Pair<>(shardName, guildPortion + healthPortion);
+					})
+					.sorted((a, b) -> (int) (b.getValue() - a.getValue()))
+					.toList();
 			} else {
-				shardName = baseShardName + "-" + shard;
+				shardPriorityValues = possibleShards.stream()
+					.map(shardName -> {
+						ShardHealth shardHealth = MonumentaNetworkRelayIntegration.remoteShardHealth(shardName);
+						return new Pair<>(shardName, 100 * shardHealth.healthScore());
+					})
+					.sorted((a, b) -> (int) (b.getValue() - a.getValue()))
+					.toList();
 			}
-			result.add(shardName);
 		}
-		return result;
+		double maxValue = shardPriorityValues.get(0).getValue();
+		return shardPriorityValues.stream()
+			.filter(pair -> Math.abs(pair.getValue() - maxValue) < 3)
+			.map(Pair::getKey)
+			.collect(Collectors.toList());
 	}
 }

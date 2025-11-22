@@ -24,7 +24,7 @@ public class JollyBall extends SpellBaseSeekingProjectile {
 	private static final boolean SINGLE_TARGET = true;
 	private static final boolean LAUNCH_TRACKING = false;
 	private static final int COOLDOWN = 20 * 6;
-	private static final int DELAY = 20 * 1;
+	private static final int DELAY = 20;
 	private static final double TURN_RADIUS = Math.PI / 90;
 	private static final int LIFETIME_TICKS = 20 * 8;
 	private static final double HITBOX_LENGTH = 0.3;

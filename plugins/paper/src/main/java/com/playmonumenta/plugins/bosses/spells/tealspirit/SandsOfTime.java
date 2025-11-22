@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.tealspirit;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.TealSpirit;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -36,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 public class SandsOfTime extends Spell {
 	private static final double RADIUS = 21;
 	private static final double HEIGHT = 4;
-	private static final int BLUE_ROOT = 1 * 20;
+	private static final int BLUE_ROOT = 20;
 	private static final double DIST = 25;
 	private static final int SPREAD = 4;
 	private static final int BLUE_DELAY = 4 * 20;
@@ -103,8 +104,7 @@ public class SandsOfTime extends Spell {
 					for (Player player : PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true)) {
 						Location playerLoc = player.getLocation();
 						Location soundLoc = playerLoc.clone().add(LocationUtils.getDirectionTo(loc, playerLoc).normalize().multiply(3));
-						player.playSound(soundLoc, Sound.BLOCK_BELL_USE, SoundCategory.HOSTILE, 1, sandsColor.mPitch);
-						player.playSound(soundLoc, Sound.BLOCK_BELL_USE, SoundCategory.HOSTILE, 0.75f, sandsColor.mPitch * 0.334f);
+						sandsColor.mSoundsList.play(soundLoc);
 					}
 				}
 
@@ -268,23 +268,31 @@ public class SandsOfTime extends Spell {
 	}
 
 	private enum SandsColor {
-		RED(Color.RED, NamedTextColor.RED, BossBar.Color.RED, NamedTextColor.DARK_RED, 0.5f, 0, null),
-		BLUE(Color.BLUE, NamedTextColor.BLUE, BossBar.Color.BLUE, NamedTextColor.BLUE, 0.354f, BLUE_DELAY, p -> Plugin.getInstance().mEffectManager.addEffect(p, ROOT_EFFECT, new PercentSpeed(BLUE_ROOT, -1, ROOT_EFFECT)));
-
+		RED(Color.RED, NamedTextColor.RED, BossBar.Color.RED, NamedTextColor.DARK_RED,
+			SoundsList.builder()
+				.add(new SoundsList.CSound(Sound.BLOCK_BELL_USE, 1.0f, 0.5f))
+				.build(),
+			0, null),
+		BLUE(Color.BLUE, NamedTextColor.BLUE, BossBar.Color.BLUE, NamedTextColor.BLUE,
+			SoundsList.builder()
+				.add(new SoundsList.CSound(Sound.BLOCK_BELL_USE, 1.0f, 0.75f))
+				.add(new SoundsList.CSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.5f, 0.5f))
+				.build(),
+			BLUE_DELAY, p -> Plugin.getInstance().mEffectManager.addEffect(p, ROOT_EFFECT, new PercentSpeed(BLUE_ROOT, -1, ROOT_EFFECT)));
 		private final Color mColor;
 		private final TextColor mTextColor;
 		private final BossBar.Color mBarColor;
 		private final NamedTextColor mGlowColor;
-		private final float mPitch;
+		private final SoundsList mSoundsList;
 		private final int mDelay;
 		private final @Nullable Consumer<Player> mOnHitEffect;
 
-		SandsColor(Color color, TextColor chatColor, BossBar.Color barColor, NamedTextColor glowColor, float pitch, int delay, @Nullable Consumer<Player> onHitEffect) {
+		SandsColor(Color color, TextColor chatColor, BossBar.Color barColor, NamedTextColor glowColor, SoundsList soundsList, int delay, @Nullable Consumer<Player> onHitEffect) {
 			mColor = color;
 			mTextColor = chatColor;
 			mBarColor = barColor;
 			mGlowColor = glowColor;
-			mPitch = pitch;
+			mSoundsList = soundsList;
 			mDelay = delay;
 			mOnHitEffect = onHitEffect;
 		}

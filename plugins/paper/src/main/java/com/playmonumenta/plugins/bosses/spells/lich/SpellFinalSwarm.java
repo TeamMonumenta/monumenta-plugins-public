@@ -13,17 +13,17 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellFinalSwarm extends Spell {
-	private Plugin mPlugin;
+	private final Plugin mPlugin;
 	private double mT;
 	private double mCount;
-	private int mSoloCooldown = 20 * 9;
-	private int mMinSpawnCount = 2;
-	private double mMaxFactor = 2;
+	private final int mSoloCooldown = 20 * 9;
+	private final int mMinSpawnCount = 2;
+	private final double mMaxFactor = 2;
 	private double mCooldown;
-	private Location mCenter;
-	private double mRange;
+	private final Location mCenter;
+	private final double mRange;
 	private boolean mTrigger;
-	private List<Player> mPlayers = new ArrayList<Player>();
+	private List<Player> mPlayers = new ArrayList<>();
 
 	public SpellFinalSwarm(Plugin plugin, Location loc, double range) {
 		mPlugin = plugin;

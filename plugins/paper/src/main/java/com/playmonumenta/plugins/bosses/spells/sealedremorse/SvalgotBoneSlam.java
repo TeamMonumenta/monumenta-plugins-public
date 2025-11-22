@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -38,7 +39,7 @@ public class SvalgotBoneSlam extends SpellBaseSlam {
 
 	public static final String ATTACK_MODIFIER_NAME = "AttackRemoveDamageModifier";
 
-	private Svalgot mBossClass;
+	private final Svalgot mBossClass;
 
 	public SvalgotBoneSlam(Plugin plugin, LivingEntity boss, Svalgot bossClass) {
 		super(plugin, boss, JUMP_HEIGHT, Ghalkor.detectionRange, MIN_RANGE, RUN_DISTANCE, COOLDOWN, VELOCITY_MULTIPLIER,
@@ -55,7 +56,7 @@ public class SvalgotBoneSlam extends SpellBaseSlam {
 				new PartialParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(boss);
 			}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
 				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
-					Arrays.asList(
+					List.of(
 						new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
 							new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
 							new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);

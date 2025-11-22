@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
@@ -37,7 +39,7 @@ public class RiftBoss extends BossAbilityGroup {
 		@BossParam(help = "name of this spell")
 		public String SPELL_NAME = "";
 		@BossParam(help = "who will the mob create rifts towrads")
-		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.setOptional(false);
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.clone().setFilters(List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 		@BossParam(help = "duration the mob will charge the rift for")
 		public int DURATION = 2 * 20;
 		@BossParam(help = "whether the mob can move while charging up or not")
@@ -73,20 +75,38 @@ public class RiftBoss extends BossAbilityGroup {
 		public Material MATERIAL = Material.CRYING_OBSIDIAN;
 
 		@BossParam(help = "particles around the boss while it telegraphs")
-		public ParticlesList PARTICLE_BOSS_CHARGE = ParticlesList.fromString("[(CLOUD,8,1,0.1,1,0.25),(SMOKE_LARGE,5,1,0.1,1,0.25)]");
+		public ParticlesList PARTICLE_BOSS_CHARGE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 8, 1.0, 0.1, 1.0, 0.25))
+			.add(new ParticlesList.CParticle(Particle.SMOKE_LARGE, 5, 1.0, 0.1, 1.0, 0.25))
+			.build();
 		@BossParam(help = "particles created in the telegraphed line")
-		public ParticlesList PARTICLE_RIFT_CHARGE = ParticlesList.fromString("[(SQUID_INK,1,0.25,0.25,0.25,0)]");
+		public ParticlesList PARTICLE_RIFT_CHARGE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SQUID_INK, 1, 0.25, 0.25, 0.25, 0.0))
+			.build();
 		@BossParam(help = "particles spawned as the rift is created")
-		public ParticlesList PARTICLE_RIFT_GROW = ParticlesList.fromString("[(CLOUD,3,0.5,0.5,0.5,0.25),(EXPLOSION_NORMAL,3,0.5,0.5,0.5,0.125)]");
+		public ParticlesList PARTICLE_RIFT_GROW = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 3, 0.5, 0.5, 0.5, 0.25))
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_NORMAL, 3, 0.5, 0.5, 0.5, 0.125))
+			.build();
 		@BossParam(help = "particle above rift while it lingers")
-		public ParticlesList PARTICLE_RIFT_LINGER = ParticlesList.fromString("[(EXPLOSION_NORMAL,1,0.5,0.5,0.5,0.1),(DAMAGE_INDICATOR,1,0.5,0.5,0.5,0.1)]");
+		public ParticlesList PARTICLE_RIFT_LINGER = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_NORMAL, 1, 0.5, 0.5, 0.5, 0.1))
+			.add(new ParticlesList.CParticle(Particle.DAMAGE_INDICATOR, 1, 0.5, 0.5, 0.5, 0.1))
+			.build();
 
 		@BossParam(help = "sound played when the mob starts telegraphing")
-		public SoundsList SOUND_WARN = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,3,0.5)]");
+		public SoundsList SOUND_WARN = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_GROWL, 3.0f, 0.5f))
+			.build();
 		@BossParam(help = "sound played while the lines are telegraphed")
-		public SoundsList SOUND_CHARGE = SoundsList.fromString("[(BLOCK_END_PORTAL_FRAME_FILL,1.25,1),(ENTITY_ENDER_DRAGON_HURT,1.25,1)]");
+		public SoundsList SOUND_CHARGE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.25f, 1.0f))
+			.add(new SoundsList.CSound(Sound.ENTITY_ENDER_DRAGON_HURT, 1.25f, 1.0f))
+			.build();
 		@BossParam(help = "sound played as the rift is created")
-		public SoundsList SOUND_RIFT = SoundsList.fromString("[(BLOCK_CHAIN_BREAK,1,0.85)]");
+		public SoundsList SOUND_RIFT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_CHAIN_BREAK, 1.0f, 0.85f))
+			.build();
 
 	}
 
@@ -121,7 +141,7 @@ public class RiftBoss extends BossAbilityGroup {
 						Vector vector = loc.clone().toVector().subtract(mStartLoc.clone().toVector());
 						for (int i = 0; i < p.LINES; i++) {
 							double angleOffset = (p.SPLIT_ANGLE * Math.PI / 180) * (i - ((p.LINES - 1) / 2.0));
-							extraLocs.add(mStartLoc.clone().add(vector.clone().rotateAroundY(angleOffset % (2*Math.PI))));
+							extraLocs.add(mStartLoc.clone().add(vector.clone().rotateAroundY(angleOffset % (2 * Math.PI))));
 						}
 					}
 					locs.clear();
@@ -281,11 +301,11 @@ public class RiftBoss extends BossAbilityGroup {
 			private void directHit(LivingEntity target, Location loc) {
 				if (target != null) {
 					if (p.DIRECT_DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.DIRECT_DAMAGE, p.SPELL_NAME, loc);
+						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.DIRECT_DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList());
 					}
 
 					if (p.DIRECT_DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DIRECT_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME);
+						BossUtils.bossDamagePercent(mBoss, target, p.DIRECT_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList());
 					}
 					p.EFFECTS.apply(target, boss);
 				}
@@ -294,11 +314,11 @@ public class RiftBoss extends BossAbilityGroup {
 			private void lingeringHit(LivingEntity target, Location loc) {
 				if (target != null) {
 					if (p.LINGERING_DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.LINGERING_DAMAGE, p.SPELL_NAME, loc);
+						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.LINGERING_DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList());
 					}
 
 					if (p.LINGERING_DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.LINGERING_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME);
+						BossUtils.bossDamagePercent(mBoss, target, p.LINGERING_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList());
 					}
 					p.EFFECTS.apply(target, boss);
 				}

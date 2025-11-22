@@ -100,7 +100,8 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 	private final com.playmonumenta.plugins.Plugin mMonumentaPlugin;
 	private final World mWorld;
 
-	@Nullable private Spell mLastCastedSpell = null;
+	@Nullable
+	private Spell mLastCastedSpell = null;
 
 	private final double mMaxHealthPart1;
 	private final double mMaxHealthPart2;
@@ -118,7 +119,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 		// load gallery game based on players nearby
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE, true);
-		if (players.size() == 0) {
+		if (players.isEmpty()) {
 			MMLog.severe("[Xenotopsis] Boss started with zero detected players nearby, proceeding without gallery game.");
 
 			mMaxHealthPart1 = BASE_HEALTH_PART1;
@@ -246,8 +247,8 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 							// check if death should be decreased this tick
 							if ((range <= 6 && ticks % 8 == 0)
-									|| (range > 6 && range <= 16 && ticks % 16 == 0)
-									|| (range > 16 && ticks % 36 == 0)) {
+								|| (range > 6 && range <= 16 && ticks % 16 == 0)
+								|| (range > 16 && ticks % 36 == 0)) {
 								changePlayerDeathValue(player, -1, true);
 							}
 						}
@@ -271,7 +272,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 				}
 
 				// check if every player has died and fight should cancel
-				if (PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE, true).size() == 0) {
+				if (PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE, true).isEmpty()) {
 					sendWorldDialogueMessage("DEATH'S HAND HAS ENSNARED YOU IN ITS GRASP. SINK BELOW THE WAVES, LIKE ALL THOSE WHO CAME BEFORE YOU THAT DARE ATTEMPT TO DEFY IT");
 					mBoss.remove();
 					this.cancel();
@@ -435,11 +436,11 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 	private void openingAnimation() {
 		new BukkitRunnable() {
-		    int mTicks = 0;
+			int mTicks = 0;
 
-		    @Override
-		    public void run() {
-		        if (mTicks == 0) {
+			@Override
+			public void run() {
+				if (mTicks == 0) {
 					mBoss.setAI(false);
 					mBoss.setInvulnerable(true);
 
@@ -482,9 +483,9 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 				}
 
 				Vector v1 = new Vector(0, 0, 1);
-				Vector v1F = VectorUtils.rotateXAxis(VectorUtils.rotateYAxis(VectorUtils.rotateZAxis(v1, 360 * (double)(mTicks % 60) / 60), 360 * (double)(mTicks % 50) / 50), 360 * (double)(mTicks % 70) / 70).normalize().multiply(2);
+				Vector v1F = VectorUtils.rotateXAxis(VectorUtils.rotateYAxis(VectorUtils.rotateZAxis(v1, 360 * (double) (mTicks % 60) / 60), 360 * (double) (mTicks % 50) / 50), 360 * (double) (mTicks % 70) / 70).normalize().multiply(2);
 				Vector v2 = new Vector(1, 0, 0);
-				Vector v2F = VectorUtils.rotateXAxis(VectorUtils.rotateYAxis(VectorUtils.rotateZAxis(v2, 360 * (double)(mTicks % 50) / 50), 360 * (double)(mTicks % 70) / 70), 360 * (double)(mTicks % 60) / 60).normalize().multiply(2);
+				Vector v2F = VectorUtils.rotateXAxis(VectorUtils.rotateYAxis(VectorUtils.rotateZAxis(v2, 360 * (double) (mTicks % 50) / 50), 360 * (double) (mTicks % 70) / 70), 360 * (double) (mTicks % 60) / 60).normalize().multiply(2);
 				new PartialParticle(Particle.END_ROD, mBoss.getLocation().clone().add(0, 1.5, 0).add(v1F), 1).spawnAsBoss();
 				new PartialParticle(Particle.END_ROD, mBoss.getLocation().clone().add(0, 1.5, 0).add(v2F), 1).spawnAsBoss();
 
@@ -495,21 +496,21 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 						.spawnAsBoss();
 				}
 
-		        mTicks++;
+				mTicks++;
 				if (mTicks > 60) {
 					this.cancel();
 				}
-		    }
+			}
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	private void partTwoTransition() {
 		new BukkitRunnable() {
-		    int mTicks = 0;
+			int mTicks = 0;
 
-		    @Override
-		    public void run() {
-		        if (mTicks == 0) {
+			@Override
+			public void run() {
+				if (mTicks == 0) {
 					mBoss.setInvulnerable(true);
 					mBoss.setGravity(false);
 					mBoss.setAI(false);
@@ -562,7 +563,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 					mWorld.playSound(mBoss.getLocation(), Sound.ITEM_TRIDENT_THUNDER, 4f, 0.53f);
 				}
 				if (mTicks > 100 && mTicks < 140) {
-					double progress = (double)(mTicks - 100) / 40;
+					double progress = (double) (mTicks - 100) / 40;
 
 					new PartialParticle(Particle.END_ROD,
 						mSpawnLoc.clone().add(0, -0.5 + (mBoss.getLocation().getY() + 3 - mSpawnLoc.getY()) * progress, 0),
@@ -624,11 +625,11 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 					mBoss.teleport(mSpawnLoc);
 				}
 
-		        mTicks++;
+				mTicks++;
 				if (mTicks > 180 || mBoss.isDead()) {
 					this.cancel();
 				}
-		    }
+			}
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 }

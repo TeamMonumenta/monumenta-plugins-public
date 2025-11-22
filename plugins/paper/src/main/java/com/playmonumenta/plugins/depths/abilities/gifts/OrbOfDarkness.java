@@ -40,15 +40,15 @@ public class OrbOfDarkness extends DepthsAbility {
 			String name = dai.getDisplayName();
 			if (dp.hasAbility(name)) {
 				dm.setPlayerLevelInAbility(name, player, dp, 0, true, true);
-				dp.mEarnedRewards.offer(DepthsRoomType.DepthsRewardType.TWISTED);
-				dp.mEarnedRewards.offer(DepthsRoomType.DepthsRewardType.TWISTED);
+				dp.addReward(DepthsRoomType.DepthsRewardType.TWISTED);
+				dp.addReward(DepthsRoomType.DepthsRewardType.TWISTED);
 			}
 		}
 		player.playSound(player, Sound.BLOCK_PORTAL_TRIGGER, 0.7f, 1.7f);
 	}
 
 	private static Description<OrbOfDarkness> getDescription() {
-		return new DescriptionBuilder<OrbOfDarkness>().add("Lose all of your ")
+		return new DescriptionBuilder<>(() -> INFO).add("Lose all of your ")
 			.add(DepthsTree.PRISMATIC.getNameComponent())
 			.add(" abilities. For every ability lost, gain two ")
 			.add(DepthsRarity.TWISTED.getDisplay())

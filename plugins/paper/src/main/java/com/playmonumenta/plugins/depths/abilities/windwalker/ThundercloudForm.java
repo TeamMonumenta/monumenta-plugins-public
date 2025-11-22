@@ -28,7 +28,6 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -44,6 +43,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class ThundercloudForm extends DepthsAbility implements AbilityWithDuration {
 
@@ -195,6 +195,7 @@ public class ThundercloudForm extends DepthsAbility implements AbilityWithDurati
 			int mTicks = 0;
 			final Location mLoc = mPlayer.getEyeLocation();
 			final Vector mDir = mPlayer.getEyeLocation().getDirection();
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 4; i++) {
@@ -269,14 +270,15 @@ public class ThundercloudForm extends DepthsAbility implements AbilityWithDurati
 	}
 
 	private static Description<ThundercloudForm> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<ThundercloudForm>(color)
-			.add("Swap hands to launch upwards, dealing ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to launch upwards, dealing ")
 			.addDepthsDamage(a -> a.mLaunchDamage, LAUNCH_DAMAGE[rarity - 1], true)
 			.add(" magic damage to mobs within ")
 			.add(a -> a.mLaunchRadius, LAUNCH_RADIUS)
 			.add(" blocks and knocking them away, and enter flight for ")
 			.addDuration(a -> a.mFlightDuration, FLIGHT_DURATION)
-			.add(" seconds. While in flight, swap hands again to throw a bolt of lightning that deals ")
+			.add(" seconds. While in flight, trigger again to throw a bolt of lightning that deals ")
 			.addDepthsDamage(a -> a.mLightningDamage, LIGHTNING_DAMAGE[rarity - 1], true)
 			.add(" magic damage to the first enemy it strikes and ")
 			.addDepthsDamage(a -> a.mAOEDamage, AOE_DAMAGE[rarity - 1], true)

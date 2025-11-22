@@ -22,6 +22,8 @@ import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellSteelboreS
 import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellStonemason;
 import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.infusions.Sturdy;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -56,7 +58,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("NullAway") // so many...
+// so many...
+@SuppressWarnings("NullAway")
 public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 
 	public static final String identityTag = "boss_imperialconstruct";
@@ -94,11 +97,11 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 			Set<String> tags = e.getScoreboardTags();
 			for (String tag : tags) {
 				switch (tag) {
-					default -> {
-					}
 					case START_TAG -> mStart = e;
 					case PHASE_TWO_TAG -> mPhase2Loc = e.getLocation();
 					case PHASE_THREE_TAG -> mPhase3Loc = e.getLocation();
+					default -> {
+					}
 				}
 			}
 		}
@@ -621,7 +624,8 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 		if (event.getEvent().getEntity() instanceof Player player && event.getCause().equals(DamageCause.ENTITY_ATTACK)) {
 			if (player.isBlocking()) {
 				// set shield cooldown if boss hits player
-				NmsUtils.getVersionAdapter().stunShield(player, 20 * 6);
+				int finalStunTicks = Sturdy.updateStunCooldown(20 * 6, Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.STURDY));
+				NmsUtils.getVersionAdapter().stunShield(player, finalStunTicks);
 			}
 		}
 	}

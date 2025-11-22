@@ -18,8 +18,8 @@ import org.bukkit.entity.LivingEntity;
 public class SpellIceBreak extends Spell {
 	private final Entity mLauncher;
 	private List<Block> mIceBlocks = new ArrayList<>();
-	private List<Block> mFrostedBlocks = new ArrayList<>();
-	private List<Block> mBrokenBlocks = new ArrayList<>();
+	private final List<Block> mFrostedBlocks = new ArrayList<>();
+	private final List<Block> mBrokenBlocks = new ArrayList<>();
 
 	public SpellIceBreak(Entity launcher) {
 		mLauncher = launcher;

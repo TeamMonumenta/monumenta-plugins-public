@@ -12,6 +12,7 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 public class SpawnerEntityReplacer extends PacketAdapter {
+	public static final String TAG = "displaySpawnerEquipment";
 
 	private @Nullable NbtCompound mSpawnDataReplacement = null;
 
@@ -21,7 +22,7 @@ public class SpawnerEntityReplacer extends PacketAdapter {
 
 	@Override
 	public void onPacketSending(PacketEvent event) {
-		if (event.getPlayer().getScoreboardTags().contains("displaySpawnerEquipment")) {
+		if (event.getPlayer().getScoreboardTags().contains(TAG)) {
 			return;
 		}
 		if (event.getPacketType().equals(PacketType.Play.Server.TILE_ENTITY_DATA)) {

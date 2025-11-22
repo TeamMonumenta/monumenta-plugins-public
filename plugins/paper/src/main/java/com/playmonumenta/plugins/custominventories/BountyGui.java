@@ -9,10 +9,10 @@ import com.playmonumenta.plugins.delves.DelveCustomInventory;
 import com.playmonumenta.plugins.delves.DelvePreset;
 import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.guis.Gui;
-import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -93,8 +93,8 @@ public class BountyGui extends Gui {
 		setSize(4 * 9);
 		setTitle(Component.text("Choose your bounty!"));
 		if (getBountyChoice(mPlayer, mRegion, 0) != 0 ||
-			    getBountyChoice(mPlayer, mRegion, 1) != 0 ||
-			    getBountyChoice(mPlayer, mRegion, 2) != 0) {
+			getBountyChoice(mPlayer, mRegion, 1) != 0 ||
+			getBountyChoice(mPlayer, mRegion, 2) != 0) {
 			loadFromExisting(mPlayer);
 		} else {
 			if (mPresetLevel == -1 && mRegion == 3) {
@@ -116,7 +116,7 @@ public class BountyGui extends Gui {
 			}
 			for (BountyData bounty : mBounties) {
 				if (bounty.mScoreboardReq == null ||
-					    (ScoreboardUtils.getScoreboardValue(player, bounty.mScoreboardReq).orElse(0) >= bounty.mReqMin)) {
+					(ScoreboardUtils.getScoreboardValue(player, bounty.mScoreboardReq).orElse(0) >= bounty.mReqMin)) {
 					mBountyChoices.add(bounty);
 					usedLocations++;
 					if (usedLocations >= BOUNTY_L1_LOCATIONS.size()) {
@@ -142,14 +142,14 @@ public class BountyGui extends Gui {
 			for (int i = 1; i < PRESET_L1_LOCATIONS.size(); i++) {
 				final int level = i;
 				Supplier<IntStream> presetPoints = () -> Arrays.stream(DelvePreset.values())
-					                                         .filter(preset -> preset.mLevel == level)
-					                                         .mapToInt(preset -> preset.mModifiers.entrySet().stream().mapToInt(e -> e.getKey().getPointsPerLevel() * e.getValue()).sum());
+					.filter(preset -> preset.mLevel == level)
+					.mapToInt(preset -> preset.mModifiers.entrySet().stream().mapToInt(e -> e.getKey().getPointsPerLevel() * e.getValue()).sum());
 				int minPoints = presetPoints.get().min().orElse(0);
 				int maxPoints = presetPoints.get().max().orElse(0);
 				setItem(PRESET_L1_LOCATIONS.get(i), GUIUtils.createBasicItem(
 					Material.SOUL_LANTERN, i, "Level " + i, NamedTextColor.AQUA,
 					false, "Delve presets will be rolled from level " + i + ".\n" +
-						       "Presets of this level will assign " + (minPoints == maxPoints ? minPoints : minPoints + " to " + maxPoints) + " Delve Points.", NamedTextColor.WHITE, 30, true))
+						"Presets of this level will assign " + (minPoints == maxPoints ? minPoints : minPoints + " to " + maxPoints) + " Delve Points.", NamedTextColor.WHITE, 30, true))
 					.onLeftClick(() -> {
 						mPresetLevel = level;
 						update();
@@ -170,7 +170,7 @@ public class BountyGui extends Gui {
 			}
 			for (Player target : playersInRange) {
 				if (getBountyChoice(target, mRegion, i) == 0
-					    && ScoreboardUtils.getScoreboardValue(target, BOUNTY_SCOREBOARDS.get(mRegion - 1)).orElse(0) == 0) {
+					&& ScoreboardUtils.getScoreboardValue(target, BOUNTY_SCOREBOARDS.get(mRegion - 1)).orElse(0) == 0) {
 					ScoreboardUtils.setScoreboardValue(target, getBountyChoiceObjective(mRegion, i), bountyTag);
 					if (target != player && i == 0) {
 						target.sendMessage("Your bounty options for today have been rolled by " + player.getName() + "!");
@@ -205,7 +205,7 @@ public class BountyGui extends Gui {
 					setItem(BOUNTY_L1_LOCATIONS.get(i), GUIUtils.createBasicItem(
 						bounty.mMaterial, bounty.mName, NamedTextColor.AQUA,
 						false, ((bounty.mLevel != 0) ? "Tier " + bounty.mLevel : "")
-							       + (i < mPresetChoices.size() && mPresetChoices.get(i) != null ? (bounty.mLevel != 0 ? "\n" : "") + "This bounty will be a delve, using the delve preset shown below." : ""), NamedTextColor.WHITE))
+							+ (i < mPresetChoices.size() && mPresetChoices.get(i) != null ? (bounty.mLevel != 0 ? "\n" : "") + "This bounty will be a delve, using the delve preset shown below." : ""), NamedTextColor.WHITE))
 						.onLeftClick(() -> {
 							setBounty(mPlayer, mBountyChoices.get(finalI), finalI < mPresetChoices.size() ? mPresetChoices.get(finalI) : null);
 							close();
@@ -243,10 +243,10 @@ public class BountyGui extends Gui {
 		// Grab all players to apply the bounty to: must be nearby, not have an active bounty or outstanding reward, and must have the same bounty choices as the selecting player.
 		// The result is stored in a list and *then* iterated, as the iteration changes scoreboard values, which would make the confirmMatchingBounties check unsound.
 		List<Player> nearbyPlayers = PlayerUtils.playersInRange(player.getLocation(), RANGE, true).stream()
-			                             .filter(target -> ScoreboardUtils.getScoreboardValue(target, BOUNTY_SCOREBOARDS.get(mRegion - 1)).orElse(0) == 0
-				                                               && ScoreboardUtils.getScoreboardValue(target, BOUNTY_REWARD_BOARDS.get(mRegion - 1)).orElse(0) == 0
-				                                               && confirmMatchingBounties(player, target))
-			                             .toList();
+			.filter(target -> ScoreboardUtils.getScoreboardValue(target, BOUNTY_SCOREBOARDS.get(mRegion - 1)).orElse(0) == 0
+				&& ScoreboardUtils.getScoreboardValue(target, BOUNTY_REWARD_BOARDS.get(mRegion - 1)).orElse(0) == 0
+				&& confirmMatchingBounties(player, target))
+			.toList();
 		for (Player target : nearbyPlayers) {
 			if (preset != null) {
 				ScoreboardUtils.setScoreboardValue(target, DelvePreset.PRESET_SCOREBOARD, preset.mId);
@@ -260,12 +260,12 @@ public class BountyGui extends Gui {
 
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "interactnpc " + target.getName() + " \"" + BOUNTY_NPCS.get(mRegion - 1) + "\"");
 			target.sendMessage(Component.text("Your bounty for today is ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)
-				                   .append(Component.text(bounty.mName, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true))
-				                   .append(Component.text("!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)));
+				.append(Component.text(bounty.mName, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true))
+				.append(Component.text("!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)));
 			if (preset != null) {
 				target.sendMessage(Component.text("Your delve preset ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)
-					                   .append(Component.text(preset.mName, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true))
-					                   .append(Component.text(" has been automatically selected!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)));
+					.append(Component.text(preset.mName, NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true))
+					.append(Component.text(" has been automatically selected!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, true)));
 			}
 
 			com.playmonumenta.scriptedquests.Plugin.getInstance().mQuestCompassManager.invalidateCache(player);
@@ -274,7 +274,7 @@ public class BountyGui extends Gui {
 
 	public static List<BountyData> parseData(int region) throws Exception {
 		List<BountyData> bounties = new ArrayList<>();
-		String bountyContent = FileUtils.readFile(Plugin.getInstance().getDataFolder().getPath() + "/bounties/region" + region + ".json");
+		String bountyContent = Files.readString(Plugin.getInstance().getDataFolder().toPath().resolve("bounties/region" + region + ".json"));
 		Gson gson = new Gson();
 		JsonObject data = gson.fromJson(bountyContent, JsonObject.class);
 		JsonArray bountyParse = data.get("pois").getAsJsonArray();

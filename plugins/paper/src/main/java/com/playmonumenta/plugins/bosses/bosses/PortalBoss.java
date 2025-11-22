@@ -13,7 +13,12 @@ import com.playmonumenta.plugins.bosses.spells.portalboss.SpellUltimateShulkerMa
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.portals.PortalManager;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,35 +77,35 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 
 		//Spell setup
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
-				new SpellKnockup(mBoss, plugin, mCooldownTicks - 30),
-				new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc, this),
-				new SpellPortalBullet(plugin, mBoss, mCooldownTicks, this),
-				new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
+			new SpellKnockup(mBoss, plugin, mCooldownTicks - 30),
+			new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc, this),
+			new SpellPortalBullet(plugin, mBoss, mCooldownTicks, this),
+			new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
 		));
-		List<Spell> phase1Passives = Arrays.asList(
-				new SpellPortalPassiveLava(mBoss, mSpawnLoc, this)
+		List<Spell> phase1Passives = List.of(
+			new SpellPortalPassiveLava(mBoss, mSpawnLoc, this)
 		);
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-				new SpellUltimateShulkerMania(plugin, mBoss, mSpawnLoc, mCooldownTicks),
-				new SpellKnockup(mBoss, plugin, mCooldownTicks - 30),
-				new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc, this),
-				new SpellPortalBullet(plugin, mBoss, mCooldownTicks, this),
-				new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
+			new SpellUltimateShulkerMania(plugin, mBoss, mSpawnLoc, mCooldownTicks),
+			new SpellKnockup(mBoss, plugin, mCooldownTicks - 30),
+			new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc, this),
+			new SpellPortalBullet(plugin, mBoss, mCooldownTicks, this),
+			new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
 		));
-		List<Spell> phase2Passives = Arrays.asList(
-				new SpellPortalPassiveLava(mBoss, mSpawnLoc, this)
+		List<Spell> phase2Passives = List.of(
+			new SpellPortalPassiveLava(mBoss, mSpawnLoc, this)
 		);
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
-				new SpellUltimateShulkerMania(plugin, mBoss, mSpawnLoc, mCooldownTicks),
-				new SpellKnockup(mBoss, plugin, mCooldownTicks - 30),
-				new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc, this),
-				new SpellPortalBullet(plugin, mBoss, mCooldownTicks, this),
-				new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
+			new SpellUltimateShulkerMania(plugin, mBoss, mSpawnLoc, mCooldownTicks),
+			new SpellKnockup(mBoss, plugin, mCooldownTicks - 30),
+			new SpellPortalSummons(mBoss, mCooldownTicks, mSpawnLoc, this),
+			new SpellPortalBullet(plugin, mBoss, mCooldownTicks, this),
+			new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
 		));
-		List<Spell> phase3Passives = Arrays.asList(
-				new SpellPortalPassiveLava(mBoss, mSpawnLoc, this)
+		List<Spell> phase3Passives = List.of(
+			new SpellPortalPassiveLava(mBoss, mSpawnLoc, this)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -109,21 +114,21 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 			mCooldownTicks -= 30;
 			changePhase(phase2Spells, phase2Passives, null);
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
-					.sendMessage(Component.text("", NamedTextColor.RED)
-							.append(Component.text("[Iota]", NamedTextColor.GOLD))
-							.append(Component.text(" DAMAGE SUSTAINED. OVERCLOCKING... POWER LEVEL RAISED. INTRUDER - DESTRUCTION IS ASSURED.")));
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Iota]", NamedTextColor.GOLD))
+					.append(Component.text(" DAMAGE SUSTAINED. OVERCLOCKING... POWER LEVEL RAISED. INTRUDER - DESTRUCTION IS ASSURED.")));
 			mPhase = 2;
 			hide();
 		});
 		events.put(50, (mBoss) -> {
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
-					.sendMessage(Component.text("", NamedTextColor.RED)
-							.append(Component.text("[Iota]", NamedTextColor.GOLD))
-							.append(Component.text(" THIS MACHINE FAILS. NO MATTER. THIS LAB IS VAST. I AM...INF"))
-							.append(Component.text("69").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text("IN"))
-							.append(Component.text("  8").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text("ITE.")));
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Iota]", NamedTextColor.GOLD))
+					.append(Component.text(" THIS MACHINE FAILS. NO MATTER. THIS LAB IS VAST. I AM...INF"))
+					.append(Component.text("69").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("IN"))
+					.append(Component.text("  8").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("ITE.")));
 			LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(10, 1, 10), ELITE_LOS);
 			LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(-10, 1, -10), ELITE_LOS);
 
@@ -132,16 +137,16 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 			mCooldownTicks -= 30;
 			changePhase(phase3Spells, phase3Passives, null);
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
-					.sendMessage(Component.text("", NamedTextColor.RED)
-							.append(Component.text("[Iota]", NamedTextColor.GOLD))
-							.append(Component.text(" DAMA"))
-							.append(Component.text("94").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text(" SUSTA"))
-							.append(Component.text("  32").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text("ED..."))
-							.append(Component.text(" Bermuda? Wher9... am I? The rift...", NamedTextColor.BLUE))
-							.append(Component.text(" 43267").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text("THOUGHT PROTOCOL OVERRIDDEN. RIFT PROTECTION RESUMED. INTRUDERS WILL BE EXPUNGED.")));
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Iota]", NamedTextColor.GOLD))
+					.append(Component.text(" DAMA"))
+					.append(Component.text("94").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text(" SUSTA"))
+					.append(Component.text("  32").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("ED..."))
+					.append(Component.text(" Bermuda? Wher9... am I? The rift...", NamedTextColor.BLUE))
+					.append(Component.text(" 43267").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("THOUGHT PROTOCOL OVERRIDDEN. RIFT PROTECTION RESUMED. INTRUDERS WILL BE EXPUNGED.")));
 			mPhase = 3;
 			//Clear portals
 			for (Player p : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
@@ -236,25 +241,25 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 		if ((mCubesDropped >= 1 && mPhase == 1) || (mCubesDropped >= 2 && mPhase >= 2)) {
 			//Expose the boss
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
-					.sendMessage(Component.text("", NamedTextColor.RED)
-							.append(Component.text("[Iota]", NamedTextColor.GOLD))
-							.append(Component.text(" I AM INDESTRUCT"))
-							.append(Component.text("698765").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text("  The core... destroy it... ", NamedTextColor.BLUE))
-							.append(Component.text("  44546").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text("MY DEMISE IS IMPOSSIBLE")));
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Iota]", NamedTextColor.GOLD))
+					.append(Component.text(" I AM INDESTRUCT"))
+					.append(Component.text("698765").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("  The core... destroy it... ", NamedTextColor.BLUE))
+					.append(Component.text("  44546").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("MY DEMISE IS IMPOSSIBLE")));
 			expose();
 		} else {
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
-					.sendMessage(Component.text("", NamedTextColor.RED)
-							.append(Component.text("[Iota]", NamedTextColor.GOLD))
-							.append(Component.text(" NO..."))
-							.append(Component.text("945").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text("  YOU CANN"))
-							.append(Component.text("  32...").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text(" It's working.. keep going... ", NamedTextColor.BLUE))
-							.append(Component.text("945").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text(" I AM IMMORTAL").decoration(TextDecoration.BOLD, true)));
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Iota]", NamedTextColor.GOLD))
+					.append(Component.text(" NO..."))
+					.append(Component.text("945").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("  YOU CANN"))
+					.append(Component.text("  32...").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text(" It's working.. keep going... ", NamedTextColor.BLUE))
+					.append(Component.text("945").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text(" I AM IMMORTAL").decoration(TextDecoration.BOLD, true)));
 		}
 	}
 
@@ -333,14 +338,14 @@ public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 		for (Player player : players) {
 			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
 			player.sendMessage(Component.text("", NamedTextColor.RED)
-					.append(Component.text("[Iota]", NamedTextColor.GOLD))
-					.append(Component.text(" DESTR"))
-					.append(Component.text("6")).decoration(TextDecoration.OBFUSCATED, true)
-					.append(Component.text("Y... INTRU"))
-					.append(Component.text("4").decoration(TextDecoration.OBFUSCATED, true))
-					.append(Component.text("DER..."))
-					.append(Component.text("65789").decoration(TextDecoration.OBFUSCATED, true))
-					.append(Component.text(" Thank... you... tell Bermuda... that thing... it broke me... I didn't mean to...", NamedTextColor.BLUE)));
+				.append(Component.text("[Iota]", NamedTextColor.GOLD))
+				.append(Component.text(" DESTR"))
+				.append(Component.text("6")).decoration(TextDecoration.OBFUSCATED, true)
+				.append(Component.text("Y... INTRU"))
+				.append(Component.text("4").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text("DER..."))
+				.append(Component.text("65789").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text(" Thank... you... tell Bermuda... that thing... it broke me... I didn't mean to...", NamedTextColor.BLUE)));
 		}
 
 		// Fix misplaced blocks

@@ -10,7 +10,9 @@ import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import com.playmonumenta.plugins.cosmetics.finishers.PlayingFinisher;
 import com.playmonumenta.plugins.cosmetics.gui.CosmeticsGUI;
 import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
+import com.playmonumenta.plugins.cosmetics.punches.PlayerPunches;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -23,26 +25,42 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class CosmeticsManager implements Listener {
 
 	public static final String KEY_PLUGIN_DATA = "Cosmetics";
 	public static final String KEY_COSMETICS = "cosmetics";
+	public static final String KEY_BULLY_PUNCH_COOLDOWN = "bully_punch_cosmetic_cooldown";
+	public static final String KEY_VICTIM_PUNCH_COOLDOWN = "victim_punch_cosmetic_cooldown";
+	public static final String KEY_OPT_OUT_PUNCH_COOLDOWN = "opt_out_punch_cosmetic_cooldown";
+
+	private static final long BULLY_PUNCH_COOLDOWN = 30000; // 30 seconds
+	private static final long VICTIM_PUNCH_COOLDOWN = 60000; // 60 seconds
+	public static final long OPT_OUT_PUNCH_COOLDOWN = 60000; // 60 seconds
 
 	public static final CosmeticsManager INSTANCE = new CosmeticsManager();
 
 	public final Map<UUID, List<Cosmetic>> mPlayerCosmetics = new HashMap<>();
 	public final Map<UUID, PlayingFinisher> mPlayingFinishers = new HashMap<>();
+
+	private final Map<UUID, Long> mBullyPunchCooldowns = new HashMap<>();
+	private final Map<UUID, Long> mVictimPunchCooldowns = new HashMap<>();
+	public final Map<UUID, Long> mOptOutPunchCooldowns = new HashMap<>();
 
 	private CosmeticsManager() {
 	}
@@ -189,20 +207,20 @@ public class CosmeticsManager implements Listener {
 	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type, @Nullable ClassAbility ability) {
 		if (type != CosmeticType.COSMETIC_SKILL) {
 			return getCosmetics(player).stream()
-				       .filter(c -> c.getType() == type)
-				       .sorted(Comparator.comparing(Cosmetic::getName))
-				       .toList();
+				.filter(c -> c.getType() == type)
+				.sorted(Comparator.comparing(Cosmetic::getName))
+				.toList();
 		} else if (ability != null) {
 			return getCosmetics(player).stream()
-				       .filter(c -> c.getType() == type)
-				       .filter(c -> c.getAbility() == ability)
-				       .sorted(Comparator.comparing(Cosmetic::getName))
-				       .toList();
+				.filter(c -> c.getType() == type)
+				.filter(c -> c.getAbility() == ability)
+				.sorted(Comparator.comparing(Cosmetic::getName))
+				.toList();
 		} else {
 			return getCosmetics(player).stream()
-				       .filter(c -> c.getType() == type)
-				       .sorted(Comparator.comparing(Cosmetic::getName))
-				       .toList();
+				.filter(c -> c.getType() == type)
+				.sorted(Comparator.comparing(Cosmetic::getName))
+				.toList();
 		}
 	}
 
@@ -217,7 +235,7 @@ public class CosmeticsManager implements Listener {
 	public @Nullable Cosmetic getCosmetic(Player player, CosmeticType type, String name) {
 		for (Cosmetic cosmetic : getCosmetics(player)) {
 			if (cosmetic.getType() == type
-				    && cosmetic.getName().equals(name)) {
+				&& cosmetic.getName().equals(name)) {
 				return cosmetic;
 			}
 		}
@@ -227,8 +245,8 @@ public class CosmeticsManager implements Listener {
 	public @Nullable Cosmetic getCosmetic(Player player, CosmeticType type, String name, @Nullable ClassAbility ability) {
 		for (Cosmetic cosmetic : getCosmetics(player)) {
 			if (cosmetic.getType() == type
-				    && cosmetic.getName().equals(name)
-				    && cosmetic.getAbility() == ability) {
+				&& cosmetic.getName().equals(name)
+				&& cosmetic.getAbility() == ability) {
 				return cosmetic;
 			}
 		}
@@ -237,8 +255,6 @@ public class CosmeticsManager implements Listener {
 
 	/**
 	 * Gets the currently equipped cosmetic of given type for the player
-	 * NOTE: If we add new types in the future with multiple equippable cosmetics,
-	 * we will need to add additional functionality
 	 */
 	public @Nullable Cosmetic getActiveCosmetic(Player player, CosmeticType type) {
 		List<Cosmetic> cosmetics = mPlayerCosmetics.get(player.getUniqueId());
@@ -309,17 +325,21 @@ public class CosmeticsManager implements Listener {
 
 	//Handlers for player lifecycle events
 
-	//Discard cosmetic data a few ticks after player leaves shard
+	//Discard cosmetic and punch cooldown data a few ticks after player leaves shard
 	//(give time for save event to register)
 	@EventHandler(ignoreCancelled = true)
 	public void onQuit(PlayerQuitEvent event) {
-		Player p = event.getPlayer();
+		Player player = event.getPlayer();
+		UUID playerUuid = player.getUniqueId();
 
-		cancelPlayingFinisher(p);
+		cancelPlayingFinisher(player);
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			if (!p.isOnline()) {
-				mPlayerCosmetics.remove(p.getUniqueId());
+			if (!player.isOnline()) {
+				mPlayerCosmetics.remove(playerUuid);
+				mBullyPunchCooldowns.remove(playerUuid);
+				mVictimPunchCooldowns.remove(playerUuid);
+				mOptOutPunchCooldowns.remove(playerUuid);
 			}
 		}, 100);
 	}
@@ -328,11 +348,14 @@ public class CosmeticsManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onSave(PlayerSaveEvent event) {
 		Player player = event.getPlayer();
-		List<Cosmetic> cosmetics = mPlayerCosmetics.get(player.getUniqueId());
+		UUID playerUuid = player.getUniqueId();
+
+		List<Cosmetic> cosmetics = mPlayerCosmetics.get(playerUuid);
 		if (cosmetics != null) {
 			JsonObject data = new JsonObject();
 			JsonArray cosmeticArray = new JsonArray();
 			data.add(KEY_COSMETICS, cosmeticArray);
+
 			for (Cosmetic cosmetic : cosmetics) {
 				JsonObject cosmeticObj = new JsonObject();
 				cosmeticObj.addProperty("name", cosmetic.getName());
@@ -343,14 +366,29 @@ public class CosmeticsManager implements Listener {
 				}
 				cosmeticArray.add(cosmeticObj);
 			}
+
+			if (mBullyPunchCooldowns.containsKey(playerUuid)) {
+				data.addProperty(KEY_BULLY_PUNCH_COOLDOWN, mBullyPunchCooldowns.get(playerUuid));
+			}
+
+			if (mVictimPunchCooldowns.containsKey(playerUuid)) {
+				data.addProperty(KEY_VICTIM_PUNCH_COOLDOWN, mVictimPunchCooldowns.get(playerUuid));
+			}
+
+			if (mOptOutPunchCooldowns.containsKey(playerUuid)) {
+				data.addProperty(KEY_OPT_OUT_PUNCH_COOLDOWN, mOptOutPunchCooldowns.get(playerUuid));
+			}
+
 			event.setPluginData(KEY_PLUGIN_DATA, data);
 		}
 	}
 
 	//Load plugin data into local cosmetic data
 	public void playerJoinEvent(PlayerJoinEvent event) {
-		Player p = event.getPlayer();
-		JsonObject cosmeticData = MonumentaRedisSyncAPI.getPlayerPluginData(p.getUniqueId(), KEY_PLUGIN_DATA);
+		Player player = event.getPlayer();
+		UUID playerUuid = player.getUniqueId();
+
+		JsonObject cosmeticData = MonumentaRedisSyncAPI.getPlayerPluginData(playerUuid, KEY_PLUGIN_DATA);
 		if (cosmeticData != null) {
 			if (cosmeticData.has(KEY_COSMETICS)) {
 				JsonArray cosmeticArray = cosmeticData.getAsJsonArray(KEY_COSMETICS);
@@ -380,15 +418,29 @@ public class CosmeticsManager implements Listener {
 				}
 				//Check if we actually loaded any cosmetics
 				if (!playerCosmetics.isEmpty()) {
-					mPlayerCosmetics.put(p.getUniqueId(), playerCosmetics);
+					mPlayerCosmetics.put(playerUuid, playerCosmetics);
 				}
+			}
+
+			// Load punch cooldowns
+			if (cosmeticData.has(KEY_BULLY_PUNCH_COOLDOWN)) {
+				mBullyPunchCooldowns.put(playerUuid, cosmeticData.get(KEY_BULLY_PUNCH_COOLDOWN).getAsLong());
+			}
+
+			if (cosmeticData.has(KEY_VICTIM_PUNCH_COOLDOWN)) {
+				mVictimPunchCooldowns.put(playerUuid, cosmeticData.get(KEY_VICTIM_PUNCH_COOLDOWN).getAsLong());
+			}
+
+			if (cosmeticData.has(KEY_OPT_OUT_PUNCH_COOLDOWN)) {
+				mOptOutPunchCooldowns.put(playerUuid, cosmeticData.get(KEY_OPT_OUT_PUNCH_COOLDOWN).getAsLong());
 			}
 		}
 		// call the "event listener" of the vanity manager after the cosmetics manager loaded cosmetics
 		Plugin.getInstance().mVanityManager.playerJoinEvent(event);
 
-		GravePoses.handleLogin(p);
-		EliteFinishers.handleLogin(p);
+		EliteFinishers.handleLogin(player);
+		GravePoses.handleLogin(player);
+		PlayerPunches.handleLogin(player);
 	}
 
 	// Elite Finisher handler
@@ -398,8 +450,8 @@ public class CosmeticsManager implements Listener {
 		Player player = mob.getKiller();
 
 		if (player != null
-			    && EntityUtils.isElite(mob)
-			    && !mob.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
+			&& EntityUtils.isElite(mob)
+			&& !mob.getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
 			PlayingFinisher playingFinisher = mPlayingFinishers.get(player.getUniqueId());
 			if (playingFinisher != null) {
 				playingFinisher.registerKill(mob, mob.getLocation());
@@ -411,5 +463,86 @@ public class CosmeticsManager implements Listener {
 				EliteFinishers.activateFinisher(player, mob, mob.getLocation(), activeCosmetic.getName());
 			}
 		}
+	}
+
+	// Player Punch handler
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
+	public void onPlayerPunch(PlayerAnimationEvent event) {
+		if (PlayerPunches.isOnWhitelistedShard()) {
+			Player bully = event.getPlayer();
+			Cosmetic activeCosmetic = getInstance().getRandomActiveCosmetic(bully, CosmeticType.PLAYER_PUNCH);
+
+			/* The bully cannot:
+			- (be less than a tier 1 patron, be a non-moderator, or be a non-developer) and (be opted out of player punches)
+			- have an unequipped punch cosmetic
+			- be vanished or in spectator mode
+			- be holding anything in their mainhand
+			 */
+			if (!PlayerPunches.canAccess(bully) ||
+				activeCosmetic == null ||
+				PremiumVanishIntegration.isInvisibleOrSpectator(bully) ||
+				!bully.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
+				return;
+			}
+
+			@Nullable Player victim = getVictimToBully(bully);
+			if (victim == null) {
+				return;
+			}
+
+			UUID bullyUuid = bully.getUniqueId();
+			UUID victimUuid = victim.getUniqueId();
+			long currentTime = System.currentTimeMillis();
+
+			long lastBullyPunch = mBullyPunchCooldowns.getOrDefault(bullyUuid, 0L);
+			if (currentTime - lastBullyPunch < BULLY_PUNCH_COOLDOWN) {
+				bully.sendMessage(Component.text("Your punch ability is on cooldown!", NamedTextColor.RED));
+				return;
+			}
+
+			long lastVictimLaunch = mVictimPunchCooldowns.getOrDefault(victimUuid, 0L);
+			if (currentTime - lastVictimLaunch < VICTIM_PUNCH_COOLDOWN) {
+				bully.sendMessage(Component.text("This person was recently punched and cannot be punched yet!", NamedTextColor.RED));
+				return;
+			}
+
+			PlayerPunches.activatePunch(bully, victim, activeCosmetic.getName(), false);
+			mBullyPunchCooldowns.put(bullyUuid, currentTime);
+			mVictimPunchCooldowns.put(victimUuid, currentTime);
+			mOptOutPunchCooldowns.put(bullyUuid, currentTime);
+		}
+	}
+
+	@Nullable
+	private Player getVictimToBully(Player bully) {
+		// TODO: The logic to find a target isn't perfect and could use improvements but is currently sufficient
+		double maxDistance = 3.0;
+		double fovThreshold = 0.8; // 1 = looking directly, 0 = perpendicular, -1 = opposite
+
+		Vector playerDirection = bully.getLocation().getDirection();
+
+		for (Player target : bully.getWorld().getPlayers()) {
+			/* The target:
+			- cannot be the bully themselves
+			- (must be friends with the bully OR be a developer/moderator) and (must not have the bully blocked and vice versa) and (must not be opted out of Player Punches)
+			- cannot be vanished or in spectator mode
+			 */
+			if (target == bully ||
+				!PlayerPunches.canBePunched(bully, target) ||
+				PremiumVanishIntegration.isInvisibleOrSpectator(target)) {
+				continue;
+			}
+
+			Vector toTarget = target.getLocation().toVector().subtract(bully.getEyeLocation().toVector()).normalize();
+
+			// Dot product to check if target is in front
+			if (playerDirection.dot(toTarget) > fovThreshold &&
+				bully.hasLineOfSight(target) &&
+				target.getLocation().distance(bully.getEyeLocation()) <= maxDistance) {
+				return target;
+			}
+		}
+
+		return null;
 	}
 }

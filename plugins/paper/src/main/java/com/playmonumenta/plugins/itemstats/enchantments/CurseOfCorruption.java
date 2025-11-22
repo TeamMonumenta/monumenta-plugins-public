@@ -34,7 +34,7 @@ public class CurseOfCorruption implements Enchantment {
 	@Override
 	public void onEquipmentUpdate(Plugin plugin, Player player) {
 		int level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.CURSE_OF_CORRUPTION);
-		boolean plots = ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE);
+		boolean plots = ZoneUtils.hasZoneProperty(player, ZoneProperty.SHOPS_POSSIBLE);
 		if (level > 1 && !plots) {
 			mCorruptionPlayers.add(player);
 			if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {

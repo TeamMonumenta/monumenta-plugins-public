@@ -22,10 +22,10 @@ public class SpellRisingCircles extends Spell {
 
 	public static final double DAMAGE = 0.7;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 	public int mCooldownTicks;
-	private Location mStartLoc;
+	private final Location mStartLoc;
 
 	public SpellRisingCircles(Plugin plugin, LivingEntity boss, Location startLoc, int cooldownTicks) {
 		mPlugin = plugin;

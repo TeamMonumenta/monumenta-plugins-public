@@ -99,48 +99,48 @@ public class ItemStatCommands {
 			.withArguments(arguments)
 			.withOptionalArguments(masterworkArg)
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
-			Region region = Region.getRegion(args.getByArgument(regionArg));
-			Tier tier = Tier.getTier(args.getByArgument(tierArg));
-			Location location = Location.getLocation(args.getByArgument(locationArg));
-			Masterwork m = Masterwork.getMasterwork(args.getByArgument(masterworkArg));
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
+				Region region = Region.getRegion(args.getByArgument(regionArg));
+				Tier tier = Tier.getTier(args.getByArgument(tierArg));
+				Location location = Location.getLocation(args.getByArgument(locationArg));
+				Masterwork m = Masterwork.getMasterwork(args.getByArgument(masterworkArg));
 
-			// For R3 items, set tier to match masterwork level
-			if (region == Region.RING) {
-				if (m != Masterwork.ERROR && m != Masterwork.NONE) {
-					switch (Objects.requireNonNull(m)) {
-						case ZERO:
-						case I:
-						case II:
-						case III:
-							tier = Tier.RARE;
-							break;
-						case IV:
-						case V:
-							tier = Tier.ARTIFACT;
-							break;
-						case VI:
-							tier = Tier.EPIC;
-							break;
-						case VIIA:
-						case VIIB:
-						case VIIC:
-							tier = Tier.LEGENDARY;
-							break;
-						default:
-							break;
+				// For R3 items, set tier to match masterwork level
+				if (region == Region.RING) {
+					if (m != Masterwork.ERROR && m != Masterwork.NONE) {
+						switch (Objects.requireNonNull(m)) {
+							case ZERO:
+							case I:
+							case II:
+							case III:
+								tier = Tier.RARE;
+								break;
+							case IV:
+							case V:
+								tier = Tier.ARTIFACT;
+								break;
+							case VI:
+								tier = Tier.EPIC;
+								break;
+							case VIIA:
+							case VIIB:
+							case VIIC:
+								tier = Tier.LEGENDARY;
+								break;
+							default:
+								break;
+						}
 					}
 				}
-			}
 
-			ItemStatUtils.editItemInfo(item, region, tier, m, location);
+				ItemStatUtils.editItemInfo(item, region, tier, m, location);
 
-			ItemUpdateHelper.generateItemStats(item);
-			Plugin.getInstance().mItemStatManager.updateStats(player);
-		}).register();
+				ItemUpdateHelper.generateItemStats(item);
+				Plugin.getInstance().mItemStatManager.updateStats(player);
+			}).register();
 	}
 
 	public static void registerLoreCommand() {
@@ -154,100 +154,100 @@ public class ItemStatCommands {
 			.withArguments(indexArg)
 			.withOptionalArguments(loreArgOptional)
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
-			int index = args.getByArgument(indexArg);
-			String lore = args.getByArgument(loreArgOptional);
-			Component comp = Component.empty();
-			if (lore != null) {
-				comp = MessagingUtils.fromMiniMessage(lore);
-			}
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
+				int index = args.getByArgument(indexArg);
+				String lore = args.getByArgument(loreArgOptional);
+				Component comp = Component.empty();
+				if (lore != null) {
+					comp = MessagingUtils.fromMiniMessage(lore);
+				}
 
-			ItemUpdateHelper.regenerateStats(item);
+				ItemUpdateHelper.regenerateStats(item);
 
-			ItemStatUtils.addLore(item, index, comp);
+				ItemStatUtils.addLore(item, index, comp);
 
-			ItemUpdateHelper.generateItemStats(item);
-		}).register();
+				ItemUpdateHelper.generateItemStats(item);
+			}).register();
 
 		new CommandAPICommand("editlore").withPermission(perms)
 			.withArguments(new LiteralArgument("del"))
 			.withArguments(indexArg)
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
-			int index = args.getByArgument(indexArg);
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
+				int index = args.getByArgument(indexArg);
 
-			ItemUpdateHelper.regenerateStats(item);
+				ItemUpdateHelper.regenerateStats(item);
 
-			ItemStatUtils.removeLore(item, index);
+				ItemStatUtils.removeLore(item, index);
 
-			ItemUpdateHelper.generateItemStats(item);
-		}).register();
+				ItemUpdateHelper.generateItemStats(item);
+			}).register();
 
 		new CommandAPICommand("editlore").withPermission(perms)
 			.withArguments(new LiteralArgument("replace"))
 			.withArguments(indexArg)
 			.withArguments(loreArg)
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
-			int index = args.getByArgument(indexArg);
-			String lore = args.getByArgument(loreArg);
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
+				int index = args.getByArgument(indexArg);
+				String lore = args.getByArgument(loreArg);
 
-			ItemUpdateHelper.regenerateStats(item);
+				ItemUpdateHelper.regenerateStats(item);
 
-			ItemStatUtils.removeLore(item, index);
-			ItemStatUtils.addLore(item, index, MessagingUtils.fromMiniMessage(lore));
+				ItemStatUtils.removeLore(item, index);
+				ItemStatUtils.addLore(item, index, MessagingUtils.fromMiniMessage(lore));
 
-			ItemUpdateHelper.generateItemStats(item);
-		}).register();
+				ItemUpdateHelper.generateItemStats(item);
+			}).register();
 
 		new CommandAPICommand("editlore").withPermission(perms)
 			.withArguments(new LiteralArgument("list"))
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
 
-			List<Component> lore = ItemStatUtils.getLore(item);
-			for (int i = 0; i < lore.size(); i++) {
-				Component line = lore.get(i);
-				player.sendMessage(line.clickEvent(ClickEvent.suggestCommand("/editlore replace " + i + " " + MessagingUtils.toMiniMessage(line))));
-			}
-		}).register();
+				List<Component> lore = ItemStatUtils.getLore(item);
+				for (int i = 0; i < lore.size(); i++) {
+					Component line = lore.get(i);
+					player.sendMessage(line.clickEvent(ClickEvent.suggestCommand("/editlore replace " + i + " " + MessagingUtils.toMiniMessage(line))));
+				}
+			}).register();
 
 		new CommandAPICommand("editlore").withPermission(perms)
 			.withArguments(new LiteralArgument("register"))
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
 
-			List<Component> oldLore = item.lore();
-			if (oldLore == null || oldLore.isEmpty()) {
-				player.sendMessage(Component.text("Item has no lore!", NamedTextColor.RED));
-				return;
-			}
+				List<Component> oldLore = item.lore();
+				if (oldLore == null || oldLore.isEmpty()) {
+					player.sendMessage(Component.text("Item has no lore!", NamedTextColor.RED));
+					return;
+				}
 
-			ItemUpdateHelper.regenerateStats(item);
+				ItemUpdateHelper.regenerateStats(item);
 
-			int loreIdx = 0;
-			for (Component c : oldLore) {
-				ItemStatUtils.addLore(item, loreIdx, c);
-				loreIdx++;
-			}
+				int loreIdx = 0;
+				for (Component c : oldLore) {
+					ItemStatUtils.addLore(item, loreIdx, c);
+					loreIdx++;
+				}
 
-			ItemUpdateHelper.generateItemStats(item);
-		}).register();
+				ItemUpdateHelper.generateItemStats(item);
+			}).register();
 	}
 
 	public static void registerCharmCommand() {
@@ -262,9 +262,9 @@ public class ItemStatCommands {
 						return Collections.emptyList();
 					}
 					return Plugin.getInstance().mCharmManager.mCharmEffectList.stream()
-						       .filter(e -> e.startsWith(split[1]))
-						       .map(e -> split[0] + " " + e)
-						       .toList();
+						.filter(e -> e.startsWith(split[1]))
+						.map(e -> split[0] + " " + e)
+						.toList();
 				}));
 
 		IntegerArgument powerArg = new IntegerArgument("amount", 0);
@@ -281,11 +281,11 @@ public class ItemStatCommands {
 							return;
 						}
 						int index = args.getByArgument(indexArg);
-						String lore = args.getByArgument(charmEffectArgument);
+						String lore = args.getByArgument(charmEffectArgument).replace("#", "# ");
 
 						CharmManager.CharmParsedInfo parsedInfo = CharmManager.readCharmLine(lore);
 						if (parsedInfo == null) {
-							player.sendMessage(Component.text("Invalid charm effect! Make sure it starts with a number, optionally a percent sign, then a space, then an effect name.", NamedTextColor.RED));
+							player.sendMessage(Component.text("Invalid charm effect! Make sure it starts with a number, optionally a percent sign and asterisk for locked, then a space, then an effect name.", NamedTextColor.RED));
 							return;
 						}
 						if (!Plugin.getInstance().mCharmManager.mCharmEffectList.contains(parsedInfo.mEffect)) {
@@ -345,7 +345,7 @@ public class ItemStatCommands {
 							return;
 						}
 						int index = args.getByArgument(indexArg);
-						String lore = args.getByArgument(charmEffectArgument);
+						String lore = args.getByArgument(charmEffectArgument).replace("#", "# ");
 
 						CharmManager.CharmParsedInfo parsedInfo = CharmManager.readCharmLine(lore);
 						if (parsedInfo == null) {
@@ -392,7 +392,7 @@ public class ItemStatCommands {
 						ItemUpdateHelper.generateItemStats(item);
 					})
 			)
-		.register();
+			.register();
 	}
 
 	public static void registerNameCommand() {
@@ -408,74 +408,74 @@ public class ItemStatCommands {
 			.withOptionalArguments(underlineArg)
 			.withOptionalArguments(nameArg)
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
-			Location location = Location.getLocation(args.getByArgument(locationArg));
-			Boolean bold = args.getByArgument(boldArg);
-			Boolean underline = args.getByArgument(underlineArg);
-			String name = args.getByArgument(nameArg);
-
-			ItemMeta itemMeta = item.getItemMeta();
-
-			Component displayName;
-			if (name != null) {
-				displayName = Component.text(name).decoration(TextDecoration.ITALIC, false);
-			} else {
-				displayName = itemMeta.displayName();
-				if (displayName == null) {
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
 					return;
 				}
-			}
+				Location location = Location.getLocation(args.getByArgument(locationArg));
+				Boolean bold = args.getByArgument(boldArg);
+				Boolean underline = args.getByArgument(underlineArg);
+				String name = args.getByArgument(nameArg);
 
-			displayName = displayName.color(location.getColor());
-			if (bold != null) {
-				displayName = displayName.decoration(TextDecoration.BOLD, bold);
-			}
-			if (underline != null) {
-				displayName = displayName.decoration(TextDecoration.UNDERLINED, underline);
-			}
-			ItemUtils.setDisplayName(item, displayName);
+				ItemMeta itemMeta = item.getItemMeta();
 
-			ItemUpdateHelper.generateItemStats(item);
-		}).register();
+				Component displayName;
+				if (name != null) {
+					displayName = Component.text(name).decoration(TextDecoration.ITALIC, false);
+				} else {
+					displayName = itemMeta.displayName();
+					if (displayName == null) {
+						return;
+					}
+				}
+
+				displayName = displayName.color(location.getColor());
+				if (bold != null) {
+					displayName = displayName.decoration(TextDecoration.BOLD, bold);
+				}
+				if (underline != null) {
+					displayName = displayName.decoration(TextDecoration.UNDERLINED, underline);
+				}
+				ItemUtils.setDisplayName(item, displayName);
+
+				ItemUpdateHelper.generateItemStats(item);
+			}).register();
 
 		new CommandAPICommand("editname").withPermission(perms)
 			.withArguments(new LiteralArgument("replace"))
 			.withArguments(nameArg)
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
 
-			String name = args.getByArgument(nameArg);
+				String name = args.getByArgument(nameArg);
 
-			ItemMeta itemMeta = item.getItemMeta();
-			Component displayName = itemMeta.displayName();
-			Component resultName = displayName != null ? Component.text(name, displayName.color()).decorations(displayName.decorations()) : Component.text(name, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
-			ItemUtils.setDisplayName(item, resultName);
+				ItemMeta itemMeta = item.getItemMeta();
+				Component displayName = itemMeta.displayName();
+				Component resultName = displayName != null ? Component.text(name, displayName.color()).decorations(displayName.decorations()) : Component.text(name, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
+				ItemUtils.setDisplayName(item, resultName);
 
-			ItemUpdateHelper.generateItemStats(item);
-		}).register();
+				ItemUpdateHelper.generateItemStats(item);
+			}).register();
 
 		new CommandAPICommand("editname").withPermission(perms)
-		.withArguments(new LiteralArgument("minimessage"))
-		.withArguments(nameArg)
-		.executesPlayer((player, args) -> {
-		ItemStack item = getHeldItemAndSendErrors(player);
-		if (item == null) {
-			return;
-		}
+			.withArguments(new LiteralArgument("minimessage"))
+			.withArguments(nameArg)
+			.executesPlayer((player, args) -> {
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
 
-		String name = args.getByArgument(nameArg);
+				String name = args.getByArgument(nameArg);
 
-		Component resultName = MessagingUtils.fromMiniMessage(name);
-		ItemUtils.setDisplayName(item, resultName);
+				Component resultName = MessagingUtils.fromMiniMessage(name);
+				ItemUtils.setDisplayName(item, resultName);
 
-		ItemUpdateHelper.generateItemStats(item);
-	}).register();
+				ItemUpdateHelper.generateItemStats(item);
+			}).register();
 	}
 
 	public static void registerConsumeCommand() {
@@ -496,20 +496,20 @@ public class ItemStatCommands {
 			.withArguments(durationArg)
 			.withArguments(strengthArg)
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
-			String effectString = args.getByArgument(effectArg);
-			EffectType type = EffectType.fromType(effectString);
-			if (type == null) {
-				throw CommandAPI.failWithString("Invalid effect type " + effectString);
-			}
-			int duration = args.getByArgument(durationArg);
-			double strength = args.getByArgument(strengthArg);
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
+				String effectString = args.getByArgument(effectArg);
+				EffectType type = EffectType.fromType(effectString);
+				if (type == null) {
+					throw CommandAPI.failWithString("Invalid effect type " + effectString);
+				}
+				int duration = args.getByArgument(durationArg);
+				double strength = args.getByArgument(strengthArg);
 
-			ItemStatUtils.addConsumeEffect(item, type, strength, duration);
-		}).register();
+				ItemStatUtils.addConsumeEffect(item, type, strength, duration);
+			}).register();
 
 		new CommandAPICommand("editconsume").withPermission(perms)
 			.withArguments(effectArg)
@@ -536,17 +536,17 @@ public class ItemStatCommands {
 			.withArguments(new LiteralArgument("del"))
 			.withArguments(indexArg)
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
 
-			int index = args.getByArgument(indexArg);
+				int index = args.getByArgument(indexArg);
 
-			ItemStatUtils.removeConsumeEffect(item, index);
+				ItemStatUtils.removeConsumeEffect(item, index);
 
-			ItemUpdateHelper.generateItemStats(item);
-		}).register();
+				ItemUpdateHelper.generateItemStats(item);
+			}).register();
 	}
 
 	public static void registerEnchCommand() {
@@ -578,20 +578,20 @@ public class ItemStatCommands {
 			.withOptionalArguments(levelArg)
 			.withOptionalArguments(npcNameArg)
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
-			String enchantment = args.getByArgument(enchantmentArgument);
-			int level = args.getByArgumentOrDefault(levelArg, 1);
-			String npcName = args.getByArgument(npcNameArg);
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
+				}
+				String enchantment = args.getByArgument(enchantmentArgument);
+				int level = args.getByArgumentOrDefault(levelArg, 1);
+				String npcName = args.getByArgument(npcNameArg);
 
-			if (npcName == null || npcName.isEmpty()) {
-				addEnchantmentOrInfusion(item, player, enchantment, level);
-			} else {
-				addNpcInfusion(item, player, enchantment, level, npcName);
-			}
-		}).register();
+				if (npcName == null || npcName.isEmpty()) {
+					addEnchantmentOrInfusion(item, player, enchantment, level);
+				} else {
+					addNpcInfusion(item, player, enchantment, level, npcName);
+				}
+			}).register();
 
 		EntitySelectorArgument.OnePlayer playerArg = new EntitySelectorArgument.OnePlayer("player");
 		MultiLiteralArgument infuserTypeArg = new MultiLiteralArgument("infusertype", "player", "npc");
@@ -604,35 +604,35 @@ public class ItemStatCommands {
 			.withOptionalArguments(infuserTypeArg)
 			.withOptionalArguments(npcOrPlayerNameArg)
 			.executes((sender, args) -> {
-			Player player = args.getByArgument(playerArg);
-			String enchantment = args.getByArgument(enchantmentArgument);
-			int level = args.getByArgumentOrDefault(levelArg, 1);
+				Player player = args.getByArgument(playerArg);
+				String enchantment = args.getByArgument(enchantmentArgument);
+				int level = args.getByArgumentOrDefault(levelArg, 1);
 
-			ItemStack item = getHeldItemAndSendErrors(player, false);
+				ItemStack item = getHeldItemAndSendErrors(player, false);
 
-			String infuserType = args.getByArgument(infuserTypeArg);
-			String name = args.getByArgument(npcOrPlayerNameArg);
-			if (infuserType == null || name == null || name.isEmpty()) {
-				addEnchantmentOrInfusion(item, player, enchantment, level);
-			} else {
-				if (infuserType.toLowerCase(Locale.ROOT).contains("player")) {
-					@Nullable UUID uuid;
-					try {
-						// first attempt to parse it as a valid uuid
-						uuid = UUID.fromString(name);
-					} catch (IllegalArgumentException ex) {
-						// if invalid, parse it as a player name
-						uuid = MonumentaRedisSyncIntegration.cachedNameToUuid(name);
-					}
-					if (uuid == null) {
-						throw CommandAPI.failWithString("Could not find a valid player from username in redis");
-					}
-					addUuidInfusion(item, player, enchantment, level, uuid);
+				String infuserType = args.getByArgument(infuserTypeArg);
+				String name = args.getByArgument(npcOrPlayerNameArg);
+				if (infuserType == null || name == null || name.isEmpty()) {
+					addEnchantmentOrInfusion(item, player, enchantment, level);
 				} else {
-					addNpcInfusion(item, player, enchantment, level, name);
+					if (infuserType.toLowerCase(Locale.ROOT).contains("player")) {
+						@Nullable UUID uuid;
+						try {
+							// first attempt to parse it as a valid uuid
+							uuid = UUID.fromString(name);
+						} catch (IllegalArgumentException ex) {
+							// if invalid, parse it as a player name
+							uuid = MonumentaRedisSyncIntegration.cachedNameToUuid(name);
+						}
+						if (uuid == null) {
+							throw CommandAPI.failWithString("Could not find a valid player from username in redis");
+						}
+						addUuidInfusion(item, player, enchantment, level, uuid);
+					} else {
+						addNpcInfusion(item, player, enchantment, level, name);
+					}
 				}
-			}
-		}).register();
+			}).register();
 	}
 
 	private static void addEnchantmentOrInfusion(@Nullable ItemStack item, Player player, String enchantment, int level) {
@@ -721,44 +721,49 @@ public class ItemStatCommands {
 			.withArguments(operationArg)
 			.withArguments(slotArg)
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
-			String attribute = args.getByArgument(attributeArg);
-			double amount = args.getByArgument(amountArg);
-			String operationString = args.getByArgument(operationArg);
-			Operation operation = Operation.getOperation(operationString);
-			if (operation == null) {
-				throw CommandAPI.failWithString("Invalid operation " + operationString);
-			}
-			String slotString = args.getByArgument(slotArg);
-			Slot slot = Slot.getSlot(slotString);
-			if (slot == null) {
-				throw CommandAPI.failWithString("Invalid slot " + slotString);
-			}
-
-			if ((operationString.equals("add") && attribute.contains("Multiply")) || (operationString.equals("multiply") && attribute.contains("Add"))) {
-				return;
-			}
-
-			if (operationString.equals("add") && attribute.contains("ProjectileSpeed")) {
-				player.sendMessage("You are using the wrong type of Proj Speed, do multiply");
-				return;
-			}
-
-			AttributeType type = AttributeType.getAttributeType(attribute);
-			if (type != null) {
-				if (amount != 0) {
-					ItemStatUtils.addAttribute(item, type, amount, operation, slot);
-				} else {
-					ItemStatUtils.removeAttribute(item, type, operation, slot);
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
+					return;
 				}
-			}
+				String attribute = args.getByArgument(attributeArg);
+				double amount = args.getByArgument(amountArg);
+				String operationString = args.getByArgument(operationArg);
+				Operation operation = Operation.getOperation(operationString);
+				if (operation == null) {
+					throw CommandAPI.failWithString("Invalid operation " + operationString);
+				}
+				String slotString = args.getByArgument(slotArg);
+				Slot slot = Slot.getSlot(slotString);
+				if (slot == null) {
+					throw CommandAPI.failWithString("Invalid slot " + slotString);
+				}
 
-			ItemUpdateHelper.generateItemStats(item);
+				if ((operationString.equals("add") && attribute.contains("Multiply")) || (operationString.equals("multiply") && attribute.contains("Add"))) {
+					return;
+				}
+
+				if (operationString.equals("add") && attribute.contains("ProjectileSpeed")) {
+					player.sendMessage("You are using the wrong type of Projectile Speed, do multiply");
+					return;
+				}
+
+				if (operationString.equals("multiply") && attribute.contains("KnockbackResistance")) {
+					player.sendMessage("You are using the wrong type of KBR, do add");
+					return;
+				}
+
+				AttributeType type = AttributeType.getAttributeType(attribute);
+				if (type != null) {
+					if (amount != 0) {
+						ItemStatUtils.addAttribute(item, type, amount, operation, slot);
+					} else {
+						ItemStatUtils.removeAttribute(item, type, operation, slot);
+					}
+				}
+
+				ItemUpdateHelper.generateItemStats(item);
 				Plugin.getInstance().mItemStatManager.updateStats(player);
-		}).register();
+			}).register();
 	}
 
 	public static void registerRemoveCommand() {
@@ -841,14 +846,14 @@ public class ItemStatCommands {
 		new CommandAPICommand("color").withPermission(perms)
 			.withArguments(locationArg)
 			.executes((sender, args) -> {
-			Location location = Location.getLocation(args.getByArgument(locationArg));
-			Component message = Component.empty().append(location.getDisplay()).append(Component.text(" (" + location.getColor().asHexString() + ")")).hoverEvent(HoverEvent.showText(Component.text("Click to copy hex code to clipboard"))).clickEvent(ClickEvent.copyToClipboard(location.getColor().asHexString()));
-			sender.sendMessage(message);
-		}).register();
+				Location location = Location.getLocation(args.getByArgument(locationArg));
+				Component message = Component.empty().append(location.getDisplay()).append(Component.text(" (" + location.getColor().asHexString() + ")")).hoverEvent(HoverEvent.showText(Component.text("Click to copy hex code to clipboard"))).clickEvent(ClickEvent.copyToClipboard(location.getColor().asHexString()));
+				sender.sendMessage(message);
+			}).register();
 
 		new CommandAPICommand("color").withPermission(perms).withArguments(new LiteralArgument("list")).executes((sender, args) -> {
 			Component message = Component.empty();
-			for (Location location : Location.values()) {
+			for (Location location : Location.availableLocations()) {
 				message = message.append(Component.text(location.getName(), location.getColor()).hoverEvent(HoverEvent.showText(Component.text("Click to copy hex code to clipboard"))).clickEvent(ClickEvent.copyToClipboard(location.getColor().asHexString())));
 				message = message.append(Component.text(" "));
 			}
@@ -873,19 +878,19 @@ public class ItemStatCommands {
 		new CommandAPICommand("delveinfusiontype").withPermission(perms)
 			.withArguments(new LiteralArgument("set"), typeArg)
 			.executesPlayer((player, args) -> {
-			ItemStack item = getHeldItemAndSendErrors(player);
-			if (item == null) {
-				return;
-			}
-			String label = args.getByArgument(typeArg);
-			for (DelveInfusionUtils.DelveInfusionMaterial m : DelveInfusionUtils.DelveInfusionMaterial.values()) {
-				if (m.mLabel.equals(label)) {
-					DelveInfusionUtils.setDelveInfusionMaterial(item, m);
+				ItemStack item = getHeldItemAndSendErrors(player);
+				if (item == null) {
 					return;
 				}
-			}
-			player.sendMessage(Component.text("Failed to find Delve Infusion Material " + label, NamedTextColor.RED));
-		}).register();
+				String label = args.getByArgument(typeArg);
+				for (DelveInfusionUtils.DelveInfusionMaterial m : DelveInfusionUtils.DelveInfusionMaterial.values()) {
+					if (m.mLabel.equals(label)) {
+						DelveInfusionUtils.setDelveInfusionMaterial(item, m);
+						return;
+					}
+				}
+				player.sendMessage(Component.text("Failed to find Delve Infusion Material " + label, NamedTextColor.RED));
+			}).register();
 	}
 
 	private static @Nullable ItemStack getHeldItemAndSendErrors(Player player) {
@@ -906,7 +911,7 @@ public class ItemStatCommands {
 	}
 
 	private static Argument<String> getLocationArgument() {
-		Location[] locationsRaw = Location.values();
+		Location[] locationsRaw = Location.availableLocations();
 		String[] locations = new String[locationsRaw.length];
 		for (int i = 0; i < locations.length; i++) {
 			locations[i] = locationsRaw[i].getName();

@@ -33,7 +33,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -109,14 +108,8 @@ public class FrigidCombos extends DepthsAbility {
 			HashSet<Location> iceToBreak = new HashSet<>(DepthsUtils.iceActive.keySet());
 			iceToBreak.removeIf(l -> !l.isWorldLoaded() || l.getWorld() != targetLoc.getWorld() || l.clone().add(0.5, 0.5, 0.5).distance(targetLoc) > 1.5 || !DepthsUtils.isIce(l.getBlock().getType()));
 			for (Location l : iceToBreak) {
-				Block b = l.getBlock();
-				if (b.getType() == Permafrost.PERMAFROST_ICE_MATERIAL) {
-					//If special permafrost ice, set to normal ice instead of destroying
-					b.setType(DepthsUtils.ICE_MATERIAL);
-				} else {
-					b.setBlockData(DepthsUtils.iceActive.get(l));
-					DepthsUtils.iceActive.remove(l);
-				}
+				l.getBlock().setBlockData(DepthsUtils.iceActive.get(l));
+				DepthsUtils.iceActive.remove(l);
 				Location aboveLoc = l.clone().add(0.5, 1, 0.5);
 				new PartialParticle(Particle.CLOUD, aboveLoc.clone().add(0, 0.25, 0), 8, 0.3, 0.3, 0.3, 0).spawnAsPlayerActive(player);
 				new PartialParticle(Particle.BLOCK_CRACK, aboveLoc.clone().add(0, 0.25, 0), 8, 0.3, 0.3, 0.3, 0, Material.ICE.createBlockData()).spawnAsPlayerActive(player);
@@ -230,7 +223,7 @@ public class FrigidCombos extends DepthsAbility {
 	}
 
 	private static Description<FrigidCombos> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<FrigidCombos>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When you melee attack an enemy, deal ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage to mobs within ")

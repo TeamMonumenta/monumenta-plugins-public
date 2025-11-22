@@ -19,7 +19,9 @@ public class ParticleRingBoss extends BossAbilityGroup {
 		public double RADIUS = 3;
 
 		@BossParam(help = "Particle list. Count is multiplied by density (useful if there are multiple particles).")
-		public ParticlesList PARTICLE = new ParticlesList(List.of(new ParticlesList.CParticle(Particle.END_ROD)));
+		public ParticlesList PARTICLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.END_ROD))
+			.build();
 
 		@BossParam(help = "Frequency at which the ring is displayed, in ticks.")
 		public int FREQUENCY = 5;

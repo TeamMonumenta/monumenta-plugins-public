@@ -39,18 +39,26 @@ public class MovementUtils {
 	//useKnockbackRes determines if max knockback resistance should be taken into account in the knock away
 	//If true, knockback res is factored, if false, not used at all
 	public static void knockAway(Location loc, LivingEntity target, float speed, float y, boolean useKnockbackRes) {
+		knockAway(loc, target, speed, y, useKnockbackRes, false);
+	}
+
+	//ignoreYComponent is for cases like Knockback and Punch where we only want the horizontal component of the direction of launching.
+	public static void knockAway(Location loc, LivingEntity target, float speed, float y, boolean useKnockbackRes, boolean ignoreYComponentOfLocation) {
 		if (EntityUtils.isBoss(target)) {
 			speed /= 2;
 		}
 		BossManager.getInstance().entityKnockedAway(target, speed);
 		Vector dir = target.getLocation().subtract(loc.toVector()).toVector();
-
-		if (dir.length() < 0.001) {
-			/* If the direction magnitude is too small, escape, rather than divide by zero / infinity */
-			return;
+		if (ignoreYComponentOfLocation) {
+			dir.setY(0);
 		}
 
-		dir = dir.normalize().multiply(speed);
+		if (dir.length() < 0.001) {
+			dir = new Vector(0, 0, 0);
+		} else {
+			dir = dir.normalize().multiply(speed);
+		}
+
 		dir.setY(y);
 		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
 		if (mult > 0 || !useKnockbackRes) {
@@ -59,6 +67,48 @@ public class MovementUtils {
 			}
 			dir.multiply(mult);
 
+			target.setVelocity(dir);
+		}
+	}
+
+	/**
+	 * Knocks an entity in a direction.
+	 *
+	 * @param dir      Vector to knock entity with speed of (entity will move at this speed, neglecting initial velocity)
+	 * @param target   Entity that is being knocked back
+	 * @param transfer Coefficient of how much initial velocity carries over
+	 */
+	public static void knockAwayDirection(Vector dir, LivingEntity target, float transfer) {
+		knockAwayDirection(dir, target, transfer, true, true);
+	}
+
+	/**
+	 * Knocks an entity in a direction.
+	 *
+	 * @param dir                 Vector to knock entity with speed of (entity will move at this speed, neglecting initial velocity)
+	 * @param target              Entity that is being knocked back
+	 * @param transfer            Coefficient of how much initial velocity carries over
+	 * @param useKnockbackRes     Whether to use knockback resistance
+	 * @param useBossKnockbackRes Whether to halve KB on bosses
+	 */
+	public static void knockAwayDirection(Vector dir, LivingEntity target, float transfer, boolean useKnockbackRes, boolean useBossKnockbackRes) {
+		if (useBossKnockbackRes && EntityUtils.isBoss(target)) {
+			dir.multiply(0.5);
+		}
+		BossManager.getInstance().entityKnockedAway(target, (float) dir.length());
+		Vector initVel = target.getVelocity();
+
+		if (dir.length() < 0.001) {
+			dir = new Vector(0, 0, 0);
+		}
+
+		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
+		if (mult > 0 || !useKnockbackRes) {
+			if (!useKnockbackRes) {
+				mult = 1;
+			}
+			dir.multiply(mult);
+			dir.add(initVel.multiply(transfer));
 			target.setVelocity(dir);
 		}
 	}
@@ -86,20 +136,7 @@ public class MovementUtils {
 	}
 
 	public static void pullTowards(Entity towardsEntity, LivingEntity target, float speed) {
-		if (EntityUtils.isBoss(target)) {
-			return;
-		}
-		BossManager.getInstance().entityKnockedAway(target, speed);
-		Vector dir = target.getLocation().subtract(towardsEntity.getLocation().toVector()).toVector().multiply(-speed);
-		if (dir.getY() < 0) {
-			dir.setY(0.5f);
-		}
-		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
-		if (mult > 0) {
-			dir.multiply(mult);
-
-			target.setVelocity(dir);
-		}
+		pullTowards(towardsEntity.getLocation(), target, speed);
 	}
 
 	public static void pullTowards(Location location, LivingEntity target, float speed) {
@@ -108,7 +145,7 @@ public class MovementUtils {
 		}
 		BossManager.getInstance().entityKnockedAway(target, speed);
 		Vector dir = target.getLocation().subtract(location.toVector()).toVector().multiply(-speed);
-		if (dir.getY() < 0) {
+		if (dir.getY() < 0 && target.isOnGround()) {
 			dir.setY(0.5f);
 		}
 		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
@@ -152,7 +189,7 @@ public class MovementUtils {
 			return;
 		}
 		dir = dir.normalize().multiply(-speed);
-		if (dir.getY() < 0) {
+		if (dir.getY() < 0 && target.isOnGround()) {
 			dir.setY(0.5f);
 		}
 		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);

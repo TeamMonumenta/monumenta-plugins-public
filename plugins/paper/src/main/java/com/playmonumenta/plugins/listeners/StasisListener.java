@@ -66,18 +66,18 @@ public class StasisListener implements Listener {
 		if (isInStasis(player)) {
 			// allow falling in respawn stasis
 			if (Math.abs(event.getTo().getX() - event.getFrom().getX()) < 0.00001
-				    && Math.abs(event.getTo().getZ() - event.getFrom().getZ()) < 0.00001
-				    && event.getTo().getY() < event.getFrom().getY()
-				    && isInRespawnStasis(player)
-				    && player.getGameMode() != GameMode.SPECTATOR) {
+				&& Math.abs(event.getTo().getZ() - event.getFrom().getZ()) < 0.00001
+				&& event.getTo().getY() < event.getFrom().getY()
+				&& isInRespawnStasis(player)
+				&& player.getGameMode() != GameMode.SPECTATOR) {
 				return;
 			}
 
 			RespawnStasis rs = Plugin.getInstance().mEffectManager.getActiveEffect(player, RespawnStasis.class);
 			if (rs != null
-				    && rs.getDuration() < RespawnStasis.DURATION - RespawnStasis.SPECTATE_DURATION
-				    && MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, "RespawnStasisNearbyMobsCheck", 5)
-				    && EntityUtils.getNearbyMobs(player.getLocation(), 8).isEmpty()
+				&& rs.getDuration() < RespawnStasis.DURATION - RespawnStasis.SPECTATE_DURATION
+				&& MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, "RespawnStasisNearbyMobsCheck", 5)
+				&& EntityUtils.getNearbyMobs(player.getLocation(), 8).isEmpty()
 			) {
 				endRespawnStasis(player);
 				return;
@@ -92,7 +92,7 @@ public class StasisListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void damageEvent(DamageEvent event) {
-		if (event.getType() == DamageEvent.DamageType.TRUE) {
+		if (event.isUnblockable()) {
 			return;
 		}
 		if (isInStasis(event.getDamager()) || isInStasis(event.getDamagee())) {

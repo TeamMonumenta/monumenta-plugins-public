@@ -1,13 +1,16 @@
 package com.playmonumenta.plugins.effects;
 
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.hexfall.Reincarnation;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
@@ -28,6 +31,7 @@ import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -76,10 +80,10 @@ public final class EffectManager implements Listener {
 		 * longer lasting weaker Effects are still active and will be applied.
 		 */
 		public final Map<EffectPriority, Map<String, NavigableSet<Effect>>> mPriorityMap = new EnumMap<>(EffectPriority.class);
-		public final Entity mEntity;
+		public final UUID mEntityUuid;
 
-		public Effects(Entity entity) {
-			mEntity = entity;
+		public Effects(UUID uuid) {
+			mEntityUuid = uuid;
 			// NB: concurrent maps and sets are used as the tab list reads effects from a different thread
 			// mPriorityMap is not concurrent, as it is never updated after this constructor
 			// (and we rely on its iteration order being the order of enum constants)
@@ -88,12 +92,17 @@ public final class EffectManager implements Listener {
 			mPriorityMap.put(EffectPriority.LATE, new ConcurrentHashMap<>());
 		}
 
-		public boolean addEffect(String source, Effect effect) {
+		public @Nullable Entity getEntity() {
+			Entity e = Bukkit.getEntity(mEntityUuid);
+			return e == null ? Bukkit.getPlayer(mEntityUuid) : e;
+		}
+
+		public boolean addEffect(String source, Entity entity, Effect effect) {
 			boolean wasUpdated = false;
 			if (effect.mUsed) {
 				// Each entity must have their own instance of an effect, they cannot be shared
 				MMLog.severe("Attempted to add an effect multiple times or to multiple entities! source="
-					+ source + ", effectID=" + effect.mEffectID + ", entity=" + mEntity, new IllegalArgumentException());
+					+ source + ", effectID=" + effect.mEffectID + ", entity=" + entity, new IllegalArgumentException());
 				return false;
 			}
 			effect.mUsed = true;
@@ -109,8 +118,8 @@ public final class EffectManager implements Listener {
 				for (Effect effectIter : effectGroup) {
 					if (effectIter.compareTo(effect) == 0 && effectIter.getDuration() < effect.getDuration()) {
 						if (effectIter == currentEffect) {
-							effectIter.entityLoseEffect(mEntity);
-							effectIter.entityGainEffect(mEntity);
+							effectIter.entityLoseEffect(entity);
+							effectIter.entityGainEffect(entity);
 							wasUpdated = true;
 						}
 						effectIter.setDuration(effect.getDuration());
@@ -125,13 +134,13 @@ public final class EffectManager implements Listener {
 				}
 
 				if (effectGroup.last() == effect) {
-					currentEffect.entityLoseEffect(mEntity);
-					effect.entityGainEffect(mEntity);
+					currentEffect.entityLoseEffect(entity);
+					effect.entityGainEffect(entity);
 					wasUpdated = true;
 				}
 			} else {
 				effectGroup.add(effect);
-				effect.entityGainEffect(mEntity);
+				effect.entityGainEffect(entity);
 				wasUpdated = true;
 			}
 			return wasUpdated;
@@ -222,11 +231,11 @@ public final class EffectManager implements Listener {
 			return false;
 		}
 
-		public @Nullable NavigableSet<Effect> clearEffects(String source) {
+		public @Nullable NavigableSet<Effect> clearEffects(String source, Entity entity) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
 				NavigableSet<Effect> removedEffectGroup = priorityEffects.remove(source);
 				if (removedEffectGroup != null) {
-					removedEffectGroup.last().entityLoseEffect(mEntity);
+					removedEffectGroup.last().entityLoseEffect(entity);
 					return removedEffectGroup;
 				}
 			}
@@ -234,10 +243,10 @@ public final class EffectManager implements Listener {
 			return null;
 		}
 
-		public void clearEffects() {
+		public void clearEffects(Entity entity) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : mPriorityMap.values()) {
 				for (NavigableSet<Effect> removedEffect : priorityEffects.values()) {
-					removedEffect.last().entityLoseEffect(mEntity);
+					removedEffect.last().entityLoseEffect(entity);
 				}
 
 				priorityEffects.clear();
@@ -290,14 +299,7 @@ public final class EffectManager implements Listener {
 	}
 
 	// Used for phylactery
-	public static class EffectPair {
-		public final String mSource;
-		public final Effect mEffect;
-
-		public EffectPair(String source, Effect effect) {
-			mSource = source;
-			mEffect = effect;
-		}
+	public record EffectPair(String mSource, Effect mEffect) {
 	}
 
 	@FunctionalInterface
@@ -331,7 +333,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(CustomRegeneration.effectID, CustomRegeneration::deserialize);
 		mEffectDeserializer.put(DeepGodsEndowment.effectID, DeepGodsEndowment::deserialize);
 		mEffectDeserializer.put(DurabilitySaving.effectID, DurabilitySaving::deserialize);
-		mEffectDeserializer.put(EnchantedPrayerAoE.effectID, EnchantedPrayerAoE::deserialize);
 		mEffectDeserializer.put(EnergizingElixirStacks.effectID, EnergizingElixirStacks::deserialize);
 		mEffectDeserializer.put(FirstStrikeCooldown.effectID, FirstStrikeCooldown::deserialize);
 		mEffectDeserializer.put(FlatDamageDealt.effectID, FlatDamageDealt::deserialize);
@@ -371,8 +372,8 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(StarCommunion.effectID, StarCommunion::deserialize);
 		mEffectDeserializer.put(Stasis.effectID, Stasis::deserialize);
 		mEffectDeserializer.put(RespawnStasis.effectID, RespawnStasis::deserialize);
-		mEffectDeserializer.put(ThuribleBonusHealing.effectID, ThuribleBonusHealing::deserialize);
 		mEffectDeserializer.put(TuathanBlessing.effectID, TuathanBlessing::deserialize);
+		mEffectDeserializer.put(UamielPetrification.effectID, UamielPetrification::deserialize);
 		mEffectDeserializer.put(UnstableAmalgamDisable.effectID, UnstableAmalgamDisable::deserialize);
 		mEffectDeserializer.put(VengefulTag.effectID, VengefulTag::deserialize);
 		mEffectDeserializer.put(VoodooBondsCurse.effectID, VoodooBondsCurse::deserialize);
@@ -404,21 +405,27 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(PoisonImmunity.effectID, PoisonImmunity::deserialize);
 		mEffectDeserializer.put(RejuvenationHealing.effectID, RejuvenationHealing::deserialize);
 		mEffectDeserializer.put(DamageImmunity.effectID, DamageImmunity::deserialize);
+		mEffectDeserializer.put(ImpactVulnerability.effectID, ImpactVulnerability::deserialize);
+		mEffectDeserializer.put(Parasites.effectID, Parasites::deserialize);
+		mEffectDeserializer.put(RetaliationEffect.effectID, RetaliationEffect::deserialize);
+		mEffectDeserializer.put(DepthsWinded.effectID, DepthsWinded::deserialize);
+		mEffectDeserializer.put(DepthsBrittle.effectID, DepthsBrittle::deserialize);
+		mEffectDeserializer.put(SelfishVulnerability.effectID, SelfishVulnerability::deserialize);
 	}
 
 	private static final int PERIOD = 5;
 
-	private final Map<Entity, Effects> mEntities = new WeakHashMap<Entity, Effects>();
+	private final Map<UUID, Effects> mEntities = new WeakHashMap<>();
 	private final BukkitRunnable mTimer;
 	private static @Nullable EffectManager INSTANCE = null;
 	private static final String PLAYER_EFFECT_DEATH_KEY = "player_effect_death_key";
 
-	@SuppressWarnings("unchecked")
 	public EffectManager(Plugin plugin) {
 		INSTANCE = this;
 		/*
-		 * This timer also ticks down for offline players. Keeping it like this for now since most custom effects we
-		 * want to apply are short (no more than 30 seconds, e.g. class abilities) and already function this way.
+		 * This timer runs every PERIOD ticks on all Entities that are alive in mEntities. If the Entity is a player,
+		 * that player must also be logged in for the timer to run on them. Offline players are removed and their
+		 * effects do not tick down until they log in again
 		 */
 		mTimer = new BukkitRunnable() {
 			int mTicks = 0;
@@ -431,16 +438,21 @@ public final class EffectManager implements Listener {
 				boolean oneHertz = mTicks % 20 == 0;
 
 				// Periodic trigger for Effects in case they need stuff like particles
-				Map<Entity, Effects> clone = new WeakHashMap<>(mEntities);
+				Map<UUID, Effects> clone = new WeakHashMap<>(mEntities);
 				try {
-					for (Map.Entry<Entity, Effects> entry : clone.entrySet()) {
-						for (Map<String, NavigableSet<Effect>> priorityEffects : entry.getValue().mPriorityMap.values()) {
+					for (Map.Entry<UUID, Effects> entry : clone.entrySet()) {
+						Effects effects = entry.getValue();
+						final Entity entity = effects.getEntity();
+						if (entity == null) {
+							continue;
+						}
+						for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 							// Have to make a copy of the effects to prevent concurrent modification exceptions in case ticking changes the effects :(
 							for (NavigableSet<Effect> effectGroup : new ArrayList<>(priorityEffects.values())) {
 								try {
 									// Only tick when entity is not dead.
-									if (!entry.getKey().isDead()) {
-										effectGroup.last().entityTickEffect(entry.getKey(), fourHertz, twoHertz, oneHertz);
+									if (!entity.isDead()) {
+										effectGroup.last().entityTickEffect(entity, fourHertz, twoHertz, oneHertz);
 									}
 								} catch (Exception ex) {
 									MMLog.severe("Error in effect manager entityTickEffect: " + ex.getMessage());
@@ -454,9 +466,12 @@ public final class EffectManager implements Listener {
 					Iterator<Effects> entityIter = mEntities.values().iterator();
 					while (entityIter.hasNext()) {
 						Effects effects = entityIter.next();
-						Entity entity = effects.mEntity;
+						final Entity entity = effects.getEntity();
 						boolean spectator = false;
-						if (entity instanceof Player player) {
+						if (entity == null) {
+							entityIter.remove();
+							continue;
+						} else if (entity instanceof Player player) {
 							// Remove effects from players who are no longer logged in here - those effects will be re-added when they return
 							if (!player.isOnline()) {
 								entityIter.remove();
@@ -566,8 +581,8 @@ public final class EffectManager implements Listener {
 			source = event.getSource();
 			effect = event.getEffect();
 
-			Effects effects = mEntities.computeIfAbsent(entity, Effects::new);
-			if (effects.addEffect(source, effect)) {
+			Effects effects = mEntities.computeIfAbsent(entity.getUniqueId(), Effects::new);
+			if (effects.addEffect(source, entity, effect)) {
 				ClientModHandler.updateEffect(entity, effect, source, false);
 			}
 		}
@@ -581,7 +596,7 @@ public final class EffectManager implements Listener {
 	 * @return the set of effects if they exist, null otherwise
 	 */
 	public @Nullable NavigableSet<Effect> getEffects(Entity entity, String source) {
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			return effects.getEffects(source);
 		}
@@ -597,7 +612,7 @@ public final class EffectManager implements Listener {
 	 * @return the set of effects if they exist, an empty set otherwise
 	 */
 	public <T extends Effect> NavigableSet<T> getEffects(Entity entity, Class<T> type) {
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			return effects.getEffects(type);
 		}
@@ -605,7 +620,7 @@ public final class EffectManager implements Listener {
 	}
 
 	public @Nullable List<Effect> getEffects(Entity entity) {
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			return effects.getEffects();
 		} else {
@@ -614,7 +629,7 @@ public final class EffectManager implements Listener {
 	}
 
 	public @Nullable List<EffectPair> getEffectPairs(Entity entity) {
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			return effects.getEffectPairs();
 		} else {
@@ -625,7 +640,7 @@ public final class EffectManager implements Listener {
 	// Gets ALL Effects of entity, including hidden non-active ones.
 	// I.E. The effects with lesser magnitude.
 	public @Nullable List<EffectPair> getAllEffectPairs(Entity entity) {
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			return effects.getAllEffectPairs();
 		} else {
@@ -668,7 +683,7 @@ public final class EffectManager implements Listener {
 	 * @return whether the entity has the effect or not
 	 */
 	public boolean hasEffect(Entity entity, String source) {
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			return effects.hasEffect(source);
 		}
@@ -683,7 +698,7 @@ public final class EffectManager implements Listener {
 	 * @return whether the entity has the effect or not
 	 */
 	public boolean hasEffect(Entity entity, Class<? extends Effect> type) {
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			return effects.hasEffect(type);
 		}
@@ -700,7 +715,7 @@ public final class EffectManager implements Listener {
 
 	@SuppressWarnings("PMD.EmptyCatchBlock")
 	public Map<String, Effect> getPriorityEffects(Entity entity) {
-		EffectManager.Effects effects = mEntities.get(entity);
+		EffectManager.Effects effects = mEntities.get(entity.getUniqueId());
 		HashMap<String, Effect> output = new HashMap<>();
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
@@ -728,9 +743,9 @@ public final class EffectManager implements Listener {
 	 * @return the set of effects if effects were removed, null otherwise
 	 */
 	public @Nullable NavigableSet<Effect> clearEffects(Entity entity, String source) {
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
-			NavigableSet<Effect> removedEffects = effects.clearEffects(source);
+			NavigableSet<Effect> removedEffects = effects.clearEffects(source, entity);
 			if (entity instanceof Player player
 				&& removedEffects != null) {
 				for (Effect effect : removedEffects) {
@@ -749,18 +764,18 @@ public final class EffectManager implements Listener {
 	 * @param entity the entity to clear effects from
 	 */
 	public void clearEffects(Entity entity) {
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
-			effects.clearEffects();
+			effects.clearEffects(entity);
 			if (entity instanceof Player player) {
 				ClientModHandler.updateEffects(player);
 			}
-			mEntities.remove(entity);
+			mEntities.remove(entity.getUniqueId());
 		}
 	}
 
 	public @Nullable String getSource(Entity entity, Effect effect) {
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			return effects.getSource(effect);
 		}
@@ -773,7 +788,7 @@ public final class EffectManager implements Listener {
 	 * @param entity the entity to get effects for
 	 */
 	public JsonObject getAsJsonObject(Entity entity) {
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			return effects.getAsJsonObject();
 		}
@@ -845,7 +860,7 @@ public final class EffectManager implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void entityRegainHealthEvent(EntityRegainHealthEvent event) {
-		Effects effects = mEntities.get(event.getEntity());
+		Effects effects = mEntities.get(event.getEntity().getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -860,7 +875,7 @@ public final class EffectManager implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void entityGainAbsorptionEvent(EntityGainAbsorptionEvent event) {
-		Effects effects = mEntities.get(event.getEntity());
+		Effects effects = mEntities.get(event.getEntity().getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -872,7 +887,7 @@ public final class EffectManager implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void customEffectAppliedEvent(CustomEffectApplyEvent event) {
-		Effects effects = mEntities.get(event.getEntity());
+		Effects effects = mEntities.get(event.getEntity().getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -885,7 +900,7 @@ public final class EffectManager implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void entityDeathEvent(EntityDeathEvent event) {
 		LivingEntity killed = event.getEntity();
-		Effects killedEffects = mEntities.get(killed);
+		Effects killedEffects = mEntities.get(killed.getUniqueId());
 		if (killedEffects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : killedEffects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -896,7 +911,7 @@ public final class EffectManager implements Listener {
 
 		Player killer = killed.getKiller();
 		if (killer != null) {
-			Effects killerEffects = mEntities.get(killer);
+			Effects killerEffects = mEntities.get(killer.getUniqueId());
 			if (killerEffects != null) {
 				for (Map<String, NavigableSet<Effect>> priorityEffects : killerEffects.mPriorityMap.values()) {
 					for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -924,7 +939,9 @@ public final class EffectManager implements Listener {
 					if (source.startsWith("DeathPersistent")) {
 						// Don't alter duration for these effects.
 						continue;
-					} else if (effect.isBuff() && !source.startsWith("PatronShrine")) {
+					}
+
+					if (effect.isBuff() && !source.startsWith("PatronShrine")) {
 						// Effect is Buff, set duration based on Phylactery value.
 						effect.setDuration((int) (effect.getDuration() * phylactery * Phylactery.DURATION_KEPT));
 						effect.entityLoseEffect(player);
@@ -949,7 +966,7 @@ public final class EffectManager implements Listener {
 		LivingEntity source = event.getSource();
 
 		if (source != null) {
-			Effects sourceEffects = mEntities.get(source);
+			Effects sourceEffects = mEntities.get(source.getUniqueId());
 			if (sourceEffects != null) {
 				for (Map<String, NavigableSet<Effect>> priorityEffects : sourceEffects.mPriorityMap.values()) {
 					for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -962,7 +979,7 @@ public final class EffectManager implements Listener {
 			}
 		}
 
-		Effects effects = mEntities.get(damagee);
+		Effects effects = mEntities.get(damagee.getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -985,7 +1002,7 @@ public final class EffectManager implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void expChangeEvent(PlayerExpChangeEvent event) {
 		Player player = event.getPlayer();
-		Effects effects = mEntities.get(player);
+		Effects effects = mEntities.get(player.getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -998,7 +1015,7 @@ public final class EffectManager implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		if (event.getEntity() instanceof AbstractArrow arrow && arrow.getShooter() instanceof Player player) {
-			Effects effects = mEntities.get(player);
+			Effects effects = mEntities.get(player.getUniqueId());
 			if (effects != null) {
 				for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 					for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -1011,14 +1028,11 @@ public final class EffectManager implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void arrowConsumeEvent(ArrowConsumeEvent event) {
-		Effects effects = mEntities.get(event.getPlayer());
+		Effects effects = mEntities.get(event.getPlayer().getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
 					effectGroup.last().onConsumeArrow(event.getPlayer(), event);
-					if (event.isCancelled()) {
-						return;
-					}
 				}
 			}
 		}
@@ -1027,7 +1041,7 @@ public final class EffectManager implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
 		Player player = event.getPlayer();
-		Effects effects = mEntities.get(player);
+		Effects effects = mEntities.get(player.getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -1039,7 +1053,7 @@ public final class EffectManager implements Listener {
 
 	public double getFishQualityIncrease(Player player) {
 		double chance = 1;
-		Effects effects = mEntities.get(player);
+		Effects effects = mEntities.get(player.getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -1053,7 +1067,7 @@ public final class EffectManager implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		Entity entity = event.getEntity();
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -1066,7 +1080,7 @@ public final class EffectManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		Effects effects = mEntities.get(player);
+		Effects effects = mEntities.get(player.getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -1082,14 +1096,16 @@ public final class EffectManager implements Listener {
 		// If the player happens to log back in immediately, still remove them - they will get a new entity object which will be tracked again
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			// NOTE: If the Entity map is ever changed to keyed by Entity UUID, this will need a guard to check that the player didn't log back in
-			mEntities.remove(player);
+			if (Bukkit.getPlayer(player.getUniqueId()) == null) {
+				mEntities.remove(player.getUniqueId());
+			}
 		}, 20);
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void entitySwapTarget(EntityTargetEvent event) {
 		Entity entity = event.getEntity();
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -1100,9 +1116,22 @@ public final class EffectManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void entityApplyEffectTypeFromPotion(EffectTypeApplyFromPotionEvent event) {
+		Entity entity = event.getEntity();
+		Effects effects = mEntities.get(entity.getUniqueId());
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().entityApplyEffectTypeFromPotion(entity, event);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void potionEffectApplyEvent(PotionEffectApplyEvent event) {
 		LivingEntity entity = event.getApplied();
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
@@ -1115,11 +1144,24 @@ public final class EffectManager implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
 		Entity entity = event.getEntity();
-		Effects effects = mEntities.get(entity);
+		Effects effects = mEntities.get(entity.getUniqueId());
 		if (effects != null) {
 			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
 					effectGroup.last().onPotionEffectModify(entity, event);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	public void abilityCastEvent(AbilityCastEvent event) {
+		Player player = event.getCaster();
+		Effects effects = mEntities.get(player.getUniqueId());
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().onAbilityCast(event, player);
 				}
 			}
 		}
@@ -1153,5 +1195,13 @@ public final class EffectManager implements Listener {
 				}
 			}
 		}, 1);
+	}
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	public void entityRemoveFromWorld(EntityRemoveFromWorldEvent event) {
+		Entity entity = event.getEntity();
+		// ignore players, that should be handled by PlayerQuitEvent
+		if (!(entity instanceof Player)) {
+			clearEffects(entity);
+		}
 	}
 }

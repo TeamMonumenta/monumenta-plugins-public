@@ -44,11 +44,11 @@ public class SpawnerVisualisation implements Listener {
 
 	// particles used to show different spawners' ranges
 	private static final Particle[] PARTICLES = {
-			Particle.END_ROD,
-			Particle.FLAME,
-			Particle.SOUL_FIRE_FLAME,
-			Particle.DRAGON_BREATH,
-			};
+		Particle.END_ROD,
+		Particle.FLAME,
+		Particle.SOUL_FIRE_FLAME,
+		Particle.DRAGON_BREATH,
+	};
 
 	private final Map<Player, BukkitRunnable> mRunnables = new HashMap<>();
 
@@ -57,57 +57,57 @@ public class SpawnerVisualisation implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, Plugin.getInstance());
 
 		new CommandAPICommand("spawnervisualisation")
-				.withPermission("monumenta.command.spawnervisualisation")
-				.withSubcommand(new CommandAPICommand("show")
-						.withArguments(new MultiLiteralArgument("action", "activation_ranges", "spawn_ranges"))
-						.executes((sender, args) -> {
-							Player player = CommandUtils.getPlayerFromSender(sender);
-							String action = Objects.requireNonNull(args.getUnchecked("action"));
-							player.sendMessage(Component.text("Spawner range visualisation enabled for " + action.replace('_', ' ')
-									+ ". Note that you can change the number of particles by adjusting the 'own emoji' category in the PEB."));
-							startRunnable(player, null, action.equals("activation_ranges"), -1);
-						})
-				)
-				.withSubcommand(new CommandAPICommand("placed_spawner_ranges")
-						.withArguments(new IntegerArgument("duration_in_seconds"))
-						.executes((sender, args) -> {
-							Player player = CommandUtils.getPlayerFromSender(sender);
-							int duration = Objects.requireNonNull(args.getUnchecked("duration_in_seconds"));
-							ScoreboardUtils.setScoreboardValue(player, PLACED_SPAWNER_PARTICLE_DURATION_SCOREBOARD, duration);
-							if (duration == 0) {
-								player.sendMessage(Component.text("Will not show ranges for placed spawners."));
-							} else {
-								player.sendMessage(Component.text("Showing ranges for placed spawners " + (duration > 0 ? "for " + duration + " seconds" : "until unloaded or a new spawner is placed")
-										+ ". Note that you can change the number of particles by adjusting the 'own emoji' category in the PEB."));
-							}
-						})
-				)
-				.withSubcommand(new CommandAPICommand("disable")
-						.executes((sender, args) -> {
-							Player player = CommandUtils.getPlayerFromSender(sender);
-							BukkitRunnable runnable = mRunnables.remove(player);
-							if (runnable != null) {
-								runnable.cancel();
-								player.sendMessage(Component.text("Active spawner range visualisation disabled"));
-							} else {
-								player.sendMessage(Component.text("There's no active spawner range visualisation to disable"));
-							}
-						})
-				)
-				.register();
+			.withPermission("monumenta.command.spawnervisualisation")
+			.withSubcommand(new CommandAPICommand("show")
+				.withArguments(new MultiLiteralArgument("action", "activation_ranges", "spawn_ranges"))
+				.executes((sender, args) -> {
+					Player player = CommandUtils.getPlayerFromSender(sender);
+					String action = Objects.requireNonNull(args.getUnchecked("action"));
+					player.sendMessage(Component.text("Spawner range visualisation enabled for " + action.replace('_', ' ')
+						+ ". Note that you can change the number of particles by adjusting the 'own emoji' category in the PEB."));
+					startRunnable(player, null, action.equals("activation_ranges"), -1);
+				})
+			)
+			.withSubcommand(new CommandAPICommand("placed_spawner_ranges")
+				.withArguments(new IntegerArgument("duration_in_seconds"))
+				.executes((sender, args) -> {
+					Player player = CommandUtils.getPlayerFromSender(sender);
+					int duration = Objects.requireNonNull(args.getUnchecked("duration_in_seconds"));
+					ScoreboardUtils.setScoreboardValue(player, PLACED_SPAWNER_PARTICLE_DURATION_SCOREBOARD, duration);
+					if (duration == 0) {
+						player.sendMessage(Component.text("Will not show ranges for placed spawners."));
+					} else {
+						player.sendMessage(Component.text("Showing ranges for placed spawners " + (duration > 0 ? "for " + duration + " seconds" : "until unloaded or a new spawner is placed")
+							+ ". Note that you can change the number of particles by adjusting the 'own emoji' category in the PEB."));
+					}
+				})
+			)
+			.withSubcommand(new CommandAPICommand("disable")
+				.executes((sender, args) -> {
+					Player player = CommandUtils.getPlayerFromSender(sender);
+					BukkitRunnable runnable = mRunnables.remove(player);
+					if (runnable != null) {
+						runnable.cancel();
+						player.sendMessage(Component.text("Active spawner range visualisation disabled"));
+					} else {
+						player.sendMessage(Component.text("There's no active spawner range visualisation to disable"));
+					}
+				})
+			)
+			.register();
 
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
 		if (event.getBlockPlaced().getType() == Material.SPAWNER
-				&& event.getPlayer().getGameMode() == GameMode.CREATIVE
-				&& !Plugin.IS_PLAY_SERVER) {
+			&& event.getPlayer().getGameMode() == GameMode.CREATIVE
+			&& !Plugin.IS_PLAY_SERVER) {
 			Player player = event.getPlayer();
 			int duration = ScoreboardUtils.getScoreboardValue(player, PLACED_SPAWNER_PARTICLE_DURATION_SCOREBOARD).orElse(60);
 			if (duration != 0) {
 				player.sendMessage(Component.text("Showing activation range (white) and spawn range (flames) for the placed spawner " + (duration > 0 ? "for " + duration + " seconds " : ""))
-						.append(Component.text("[change]", NamedTextColor.GRAY).clickEvent(ClickEvent.suggestCommand("/spawnervisualisation placed_spawner_ranges "))));
+					.append(Component.text("[change]", NamedTextColor.GRAY).clickEvent(ClickEvent.suggestCommand("/spawnervisualisation placed_spawner_ranges "))));
 				startRunnable(player, event.getBlockPlaced().getLocation(), true, duration);
 			}
 		}
@@ -131,8 +131,8 @@ public class SpawnerVisualisation implements Listener {
 
 				if (spawnerLocation != null) {
 					if (!spawnerLocation.getChunk().isLoaded()
-							|| spawnerLocation.getWorld().getBlockAt(spawnerLocation).getType() != Material.SPAWNER
-							|| !(spawnerLocation.getWorld().getBlockState(spawnerLocation) instanceof CreatureSpawner spawner)) {
+						|| spawnerLocation.getWorld().getBlockAt(spawnerLocation).getType() != Material.SPAWNER
+						|| !(spawnerLocation.getWorld().getBlockState(spawnerLocation) instanceof CreatureSpawner spawner)) {
 						cancel();
 						return;
 					}
@@ -153,9 +153,9 @@ public class SpawnerVisualisation implements Listener {
 						}
 					}
 					List<CreatureSpawner> limitedSpawners = spawners.stream()
-							.sorted(Comparator.comparing(spawner -> spawner.getLocation().distance(player.getLocation()) - spawner.getRequiredPlayerRange()))
-							.limit(PARTICLES.length)
-							.toList();
+						.sorted(Comparator.comparing(spawner -> spawner.getLocation().distance(player.getLocation()) - spawner.getRequiredPlayerRange()))
+						.limit(PARTICLES.length)
+						.toList();
 					mUsedParticles.keySet().removeIf(loc -> limitedSpawners.stream().noneMatch(s -> s.getLocation().equals(loc)));
 					List<Particle> availableParticles = new ArrayList<>(Arrays.asList(PARTICLES));
 					availableParticles.removeAll(mUsedParticles.values());
@@ -196,9 +196,9 @@ public class SpawnerVisualisation implements Listener {
 				Location corner1 = center.clone().add(offset);
 				Location corner2 = center.clone().add(offset.clone().subtract(dir.clone().multiply(radiusVector).multiply(2)));
 				new PPLine(particle, corner1, corner2)
-						.countPerMeter(3)
-						.distanceFalloff(200)
-						.spawnForPlayer(ParticleCategory.OWN_EMOJI, player);
+					.countPerMeter(3)
+					.distanceFalloff(200)
+					.spawnForPlayer(ParticleCategory.OWN_EMOJI, player);
 			}
 		}
 	}
@@ -207,17 +207,17 @@ public class SpawnerVisualisation implements Listener {
 		Vector[] axes = {new Vector(1, 0, 0), new Vector(0, 1, 0), new Vector(0, 0, 1)};
 		for (int a = 0; a < 3; a++) {
 			new PPCircle(particle, center, radius)
-					.axes(axes[a], axes[(a + 1) % 3])
-					.countPerMeter(2)
-					.distanceFalloff(200)
-					.spawnForPlayer(ParticleCategory.OWN_EMOJI, player);
+				.axes(axes[a], axes[(a + 1) % 3])
+				.countPerMeter(2)
+				.distanceFalloff(200)
+				.spawnForPlayer(ParticleCategory.OWN_EMOJI, player);
 			new PPParametric(particle, center,
-					(t, builder) -> {
-						builder.location(center.clone().add(new Vector(FastUtils.RANDOM.nextGaussian(), FastUtils.RANDOM.nextGaussian(), FastUtils.RANDOM.nextGaussian()).normalize().multiply(radius)));
-					})
-					.count(Math.min(500, (int) (radius * radius)))
-					.distanceFalloff(200)
-					.spawnForPlayer(ParticleCategory.OWN_EMOJI, player);
+				(t, builder) -> {
+					builder.location(center.clone().add(new Vector(FastUtils.RANDOM.nextGaussian(), FastUtils.RANDOM.nextGaussian(), FastUtils.RANDOM.nextGaussian()).normalize().multiply(radius)));
+				})
+				.count(Math.min(500, (int) (radius * radius)))
+				.distanceFalloff(200)
+				.spawnForPlayer(ParticleCategory.OWN_EMOJI, player);
 		}
 	}
 

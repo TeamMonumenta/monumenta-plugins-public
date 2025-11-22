@@ -125,9 +125,9 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 				//If player too far from arena center or below 4 blocks or too high and is on a block, damage them
 				for (Player p : getPlayers()) {
 					if ((mSpawnLoc.distance(p.getLocation()) > 22
-						     || mSpawnLoc.getY() - p.getLocation().getY() >= 3
-						     || (mSpawnLoc.getY() - p.getLocation().getY() <= -2 && PlayerUtils.isOnGround(p)))
-						    && p.getGameMode() != GameMode.CREATIVE) {
+						|| mSpawnLoc.getY() - p.getLocation().getY() >= 3
+						|| (mSpawnLoc.getY() - p.getLocation().getY() <= -2 && PlayerUtils.isOnGround(p)))
+						&& p.getGameMode() != GameMode.CREATIVE) {
 						Vector vel = p.getVelocity();
 						BossUtils.bossDamagePercent(mBoss, p, 0.1);
 						p.setVelocity(vel);

@@ -26,7 +26,7 @@ public class UnlockEnchantmentListener implements Listener {
 			p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			// The advancement's displayName component includes the enchantment description as a hover-over
 			p.sendMessage(Component.text("You've discovered a new enchantment: ", NamedTextColor.AQUA)
-				.append(adv.displayName().replaceText(TextReplacementConfig.builder().match("\s{2,}").replacement("").build()))
+				.append(adv.displayName().replaceText(TextReplacementConfig.builder().match(" {2,}").replacement("").build()))
 			);
 			p.sendMessage(Component.text("(Tip: Hover over the enchantment for more information)", NamedTextColor.GRAY));
 		}

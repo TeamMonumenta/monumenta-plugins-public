@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
@@ -65,31 +66,31 @@ public class ShulkerEquipmentListener implements Listener {
 	public static final String PORTAL_EPIC_STRING = "PortalEpicBox";
 
 	private static final ImmutableMap<Integer, Integer> SWAP_SLOTS = ImmutableMap.<Integer, Integer>builder()
-			.put(0, 0)
-			.put(1, 1)
-			.put(2, 2)
-			.put(3, 3)
-			.put(4, 4)
-			.put(5, 5)
-			.put(6, 6)
-			.put(7, 7)
-			.put(8, 8)
-			.put(36, 9)
-			.put(37, 10)
-			.put(38, 11)
-			.put(39, 12)
-			.put(40, 13)
-			.build();
+		.put(0, 0)
+		.put(1, 1)
+		.put(2, 2)
+		.put(3, 3)
+		.put(4, 4)
+		.put(5, 5)
+		.put(6, 6)
+		.put(7, 7)
+		.put(8, 8)
+		.put(36, 9)
+		.put(37, 10)
+		.put(38, 11)
+		.put(39, 12)
+		.put(40, 13)
+		.build();
 
 	private static final ImmutableMap<Integer, Integer> CHARM_SLOTS = ImmutableMap.<Integer, Integer>builder()
-			.put(0, 18)
-			.put(1, 19)
-			.put(2, 20)
-			.put(3, 21)
-			.put(4, 22)
-			.put(5, 23)
-			.put(6, 24)
-			.build();
+		.put(0, 18)
+		.put(1, 19)
+		.put(2, 20)
+		.put(3, 21)
+		.put(4, 22)
+		.put(5, 23)
+		.put(6, 24)
+		.build();
 
 
 	private final Plugin mPlugin;
@@ -126,23 +127,23 @@ public class ShulkerEquipmentListener implements Listener {
 	public void inventoryClickEvent(InventoryClickEvent event) {
 		if (
 			// Must be a right click
-				!event.getClick().equals(ClickType.RIGHT) ||
-						// Must be placing a single block
-						!event.getAction().equals(InventoryAction.PICKUP_HALF) ||
-						// Must be a player interacting with their main inventory
-						!(event.getWhoClicked() instanceof Player player) ||
-						event.getClickedInventory() == null ||
-						// If it's a player inventory, must be in main inventory
-						// https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
-						(event.getClickedInventory() instanceof PlayerInventory && (event.getSlot() < 9 || event.getSlot() > 35)) ||
-						// Must be a player inventory, ender chest, or regular chest
-						!(event.getClickedInventory() instanceof PlayerInventory ||
-								event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST) ||
-								event.getClickedInventory().getType().equals(InventoryType.CHEST)) ||
-						// Must be a click on a shulker box with an empty hand
-						(event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
-						event.getCurrentItem() == null ||
-						!ItemUtils.isShulkerBox(event.getCurrentItem().getType())
+			!event.getClick().equals(ClickType.RIGHT) ||
+				// Must be placing a single block
+				!event.getAction().equals(InventoryAction.PICKUP_HALF) ||
+				// Must be a player interacting with their main inventory
+				!(event.getWhoClicked() instanceof Player player) ||
+				event.getClickedInventory() == null ||
+				// If it's a player inventory, must be in main inventory
+				// https://minecraft.gamepedia.com/Player.dat_format#Inventory_slot_numbers
+				(event.getClickedInventory() instanceof PlayerInventory && (event.getSlot() < 9 || event.getSlot() > 35)) ||
+				// Must be a player inventory, ender chest, or regular chest
+				!(event.getClickedInventory() instanceof PlayerInventory ||
+					event.getClickedInventory().getType().equals(InventoryType.ENDER_CHEST) ||
+					event.getClickedInventory().getType().equals(InventoryType.CHEST)) ||
+				// Must be a click on a shulker box with an empty hand
+				(event.getCursor() != null && !event.getCursor().getType().equals(Material.AIR)) ||
+				event.getCurrentItem() == null ||
+				!ItemUtils.isShulkerBox(event.getCurrentItem().getType())
 		) {
 			// Nope!
 			return;
@@ -230,9 +231,9 @@ public class ShulkerEquipmentListener implements Listener {
 					// If the CD hasn't hit 0, tell the player and silence them.
 					if (yellowCooldown != 0) {
 						player.sendMessage(Component.text("Swapping skills is still on cooldown. You have been silenced for 30s.", NamedTextColor.RED)
-								.append(Component.text(" (Skill CD: ", NamedTextColor.AQUA))
-								.append(Component.text(yellowCooldown, NamedTextColor.YELLOW))
-								.append(Component.text(" mins)", NamedTextColor.AQUA)));
+							.append(Component.text(" (Skill CD: ", NamedTextColor.AQUA))
+							.append(Component.text(yellowCooldown, NamedTextColor.YELLOW))
+							.append(Component.text(" mins)", NamedTextColor.AQUA)));
 						mPlugin.mEffectManager.addEffect(player, "YellowTessSilence", new AbilitySilence(30 * 20));
 					} else if (!safeZone) {
 						YellowTesseractOverride.setCooldown(player, 3);
@@ -293,11 +294,16 @@ public class ShulkerEquipmentListener implements Listener {
 	}
 
 	/**
-	 * Checks if an item can be put into a loadout lockbox. Non-shulker items aare always allowed.
+	 * Checks if an item can be put into a loadout lockbox. Non-Ephemeral, non-shulker items are allowed.
 	 * For Shulkers, only Firmament, Worldshaper's Loom, and Potion Injector (and skins/upgrades of each) are allowed.
 	 */
 	public static boolean canSwapItem(@Nullable ItemStack item) {
-		return item == null || !ItemUtils.isShulkerBox(item.getType()) || FirmamentOverride.isFirmamentItem(item) || WorldshaperOverride.isWorldshaperItem(item) || isPotionInjectorItem(item);
+		return item == null
+			|| !(CurseOfEphemerality.isEphemeral(item)
+			&& ItemUtils.isShulkerBox(item.getType()))
+			|| FirmamentOverride.isFirmamentItem(item)
+			|| WorldshaperOverride.isWorldshaperItem(item)
+			|| isPotionInjectorItem(item);
 	}
 
 	private boolean swapEquipment(Player player, PlayerInventory pInv, ShulkerBox sbox) {
@@ -321,9 +327,9 @@ public class ShulkerEquipmentListener implements Listener {
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
 			ItemStack item = pInv.getItem(slot.getKey());
 			if (item != null && (
-					(slot.getKey() >= 36 && slot.getKey() <= 39 && ItemStatUtils.hasEnchantment(item, EnchantmentType.CURSE_OF_BINDING)) ||
-							ItemStatUtils.hasEnchantment(item, EnchantmentType.CURSE_OF_EPHEMERALITY) ||
-							ItemStatUtils.hasInfusion(item, InfusionType.LOCKED))) {
+				(slot.getKey() >= 36 && slot.getKey() <= 39 && ItemStatUtils.hasEnchantment(item, EnchantmentType.CURSE_OF_BINDING)) ||
+					ItemStatUtils.hasEnchantment(item, EnchantmentType.CURSE_OF_EPHEMERALITY) ||
+					ItemStatUtils.hasInfusion(item, InfusionType.LOCKED))) {
 				continue;
 			}
 			swapItem(pInv, sInv, slot.getKey(), slot.getValue());
@@ -492,7 +498,8 @@ public class ShulkerEquipmentListener implements Listener {
 		mLockBoxCooldowns.put(player.getUniqueId(), runnable);
 	}
 
-	/** Returns whether the lockbox is on cooldown or not.
+	/**
+	 * Returns whether the lockbox is on cooldown or not.
 	 *
 	 * @param player The player to check for.
 	 * @return <code>true</code> if the lockbox is not on cooldown; otherwise <code>false</code>.
@@ -503,9 +510,9 @@ public class ShulkerEquipmentListener implements Listener {
 
 	public static boolean isPotionInjectorItem(ItemStack item) {
 		return item != null &&
-				ItemUtils.isShulkerBox(item.getType()) &&
-				item.hasItemMeta() &&
-				item.getItemMeta().hasLore() &&
-				(InventoryUtils.testForItemWithName(item, "Potion Injector", true) || InventoryUtils.testForItemWithName(item, "Iridium Injector", true));
+			ItemUtils.isShulkerBox(item.getType()) &&
+			item.hasItemMeta() &&
+			item.getItemMeta().hasLore() &&
+			(InventoryUtils.testForItemWithName(item, "Potion Injector", true) || InventoryUtils.testForItemWithName(item, "Iridium Injector", true));
 	}
 }

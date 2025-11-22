@@ -66,8 +66,8 @@ public class PiercingCold extends DepthsAbility {
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (!mPlayer.isSneaking()
-			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)
-			    || isOnCooldown()) {
+			|| !EntityUtils.isAbilityTriggeringProjectile(projectile, false)
+			|| isOnCooldown()) {
 			return true;
 		}
 		projectile.remove();
@@ -174,7 +174,7 @@ public class PiercingCold extends DepthsAbility {
 	}
 
 	private static Description<PiercingCold> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<PiercingCold>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Shooting a projectile while sneaking instead shoots an enchanted beam of frost that deals ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage and leaves a trail of ice below it that lasts for ")

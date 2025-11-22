@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.custominventories.BountyGui;
 import com.playmonumenta.plugins.delves.abilities.Entropy;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.DungeonUtils;
+import com.playmonumenta.plugins.utils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -80,8 +80,8 @@ public class DelveCustomInventory extends CustomInventory {
 	private static final ItemStack ROTATING_DELVE_MODIFIER_INFO = DelvesModifier.createIcon(
 		Material.MAGENTA_GLAZED_TERRACOTTA,
 		Component.text("Rotating Modifier", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD)
-				 .decoration(TextDecoration.ITALIC, false),
-		new String[] {
+			.decoration(TextDecoration.ITALIC, false),
+		new String[]{
 			"Some of these modifiers are randomly available each week.",
 			"Selecting at least one will result in 25% increased XP."
 		}
@@ -90,8 +90,8 @@ public class DelveCustomInventory extends CustomInventory {
 		Material.CYAN_GLAZED_TERRACOTTA,
 		Component.text("Experimental Modifier", NamedTextColor.AQUA, TextDecoration.BOLD)
 			.decoration(TextDecoration.ITALIC, false),
-		new String[] {
-			"This is a one-time event modifier that will not be coming back."
+		new String[]{
+			"This is a one-time event modifier that may or may not be coming back."
 		}
 	);
 	private static final ItemStack LEFT_ARROW_ITEM = GUIUtils.createBasicItem(
@@ -133,6 +133,7 @@ public class DelveCustomInventory extends CustomInventory {
 		DUNGEON_FUNCTION_MAPPINGS.put("portal", "function monumenta:lobbies/dps/new");
 		DUNGEON_FUNCTION_MAPPINGS.put("blue", "function monumenta:lobbies/d12/new");
 		DUNGEON_FUNCTION_MAPPINGS.put("brown", "function monumenta:lobbies/d13/new");
+		DUNGEON_FUNCTION_MAPPINGS.put("indigo", "function monumenta:lobbies/di/new");
 
 		CHALL_FUNCTION_MAPPINGS.put("white", "function monumenta:lobbies/d1/new_challenge");
 		CHALL_FUNCTION_MAPPINGS.put("orange", "function monumenta:lobbies/d2/new_challenge");
@@ -152,6 +153,7 @@ public class DelveCustomInventory extends CustomInventory {
 		CHALL_FUNCTION_MAPPINGS.put("shiftingcity", "function monumenta:lobbies/drl2/new_challenge");
 		CHALL_FUNCTION_MAPPINGS.put("blue", "function monumenta:lobbies/d12/new_challenge");
 		CHALL_FUNCTION_MAPPINGS.put("brown", "function monumenta:lobbies/d13/new_challenge");
+		CHALL_FUNCTION_MAPPINGS.put("indigo", "function monumenta:lobbies/di/new_challenge");
 	}
 
 	private static final int MODS_ROW = 5;
@@ -175,14 +177,16 @@ public class DelveCustomInventory extends CustomInventory {
 	private int mTotalPoint;
 	private int mAlreadyRolledEntropy;
 
+	private final Map<DelvesModifier, DelvesModifier> mSelectedVariants = new HashMap<>();
+
 	/**
 	 * Configuration options for this DelveCustomInventory.
 	 *
-	 * @param editable    Whether the player should be allowed to change delve
-	 *                    points shown in this menu.
-	 * @param startable   Whether the player should be allowed to start
-	 *                    a delve using this menu.
-	 * @param preset      The delve preset shown in this menu, if any.
+	 * @param editable  Whether the player should be allowed to change delve
+	 *                  points shown in this menu.
+	 * @param startable Whether the player should be allowed to start
+	 *                  a delve using this menu.
+	 * @param preset    The delve preset shown in this menu, if any.
 	 */
 	public record Config(boolean editable, boolean startable, @Nullable DelvePreset preset) {
 		/**
@@ -225,10 +229,8 @@ public class DelveCustomInventory extends CustomInventory {
 	/**
 	 * Returns a mapping of the points initially selected when
 	 * this menu is shown to the player.
-	 *
 	 * With no delve preset, the player will be shown
 	 * the delve modifiers in their current dungeon.
-	 *
 	 * Precondition: mOwner, mDungeonName, mConfig are initialized.
 	 */
 	private Map<DelvesModifier, Integer> getInitialPoints() {
@@ -236,12 +238,12 @@ public class DelveCustomInventory extends CustomInventory {
 			return new HashMap<>(mConfig.preset().mModifiers);
 		}
 		return Arrays.stream(DelvesModifier.values())
-					 .collect(Collectors.toMap(
-						mod -> mod,
-						mod -> DelvesUtils.getDelveModLevel(mOwner, mDungeonName, mod),
-						(a, b) -> b,
-						HashMap::new
-					 ));
+			.collect(Collectors.toMap(
+				mod -> mod,
+				mod -> DelvesUtils.getDelveModLevel(mOwner, mDungeonName, mod),
+				(a, b) -> b,
+				HashMap::new
+			));
 	}
 
 	public DelveCustomInventory(Player owner, String dungeon, Config config) {
@@ -285,20 +287,25 @@ public class DelveCustomInventory extends CustomInventory {
 	 */
 	private void updatePointTotal() {
 		mTotalPoint = mPointSelected.entrySet()
-									.stream()
-									.mapToInt(entry -> entry.getValue() * entry.getKey().getPointsPerLevel())
-									.sum();
+			.stream()
+			.mapToInt(entry -> entry.getValue() * entry.getKey().getPointsPerLevel())
+			.sum();
 
 		// Pre-existing entropy should only be single-counted!
 		int entropyExtraPoints =
 			Entropy.getDepthPointsAssigned(mPointSelected.getOrDefault(DelvesModifier.ENTROPY, 0)) -
-			Entropy.getDepthPointsAssigned(mAlreadyRolledEntropy);
+				Entropy.getDepthPointsAssigned(mAlreadyRolledEntropy);
+		// Let Entropy exceed the base limit
+		/*
 		int entropyMaxAssignable =
 			DelvesModifier.entropyAssignable()
 						  .stream()
 						  .mapToInt(mod -> DelvesUtils.getMaxPointAssignable(mod, 1000) - mPointSelected.getOrDefault(mod, 0))
 						  .sum();
 		mTotalPoint += Math.min(entropyExtraPoints, entropyMaxAssignable);
+		*/
+
+		mTotalPoint += entropyExtraPoints;
 
 		if (mTotalPoint > DelvesUtils.MAX_DEPTH_POINTS) {
 			mTotalPoint = DelvesUtils.MAX_DEPTH_POINTS;
@@ -311,6 +318,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 	/**
 	 * Retrieves Bukkit numbered slot from row and column.
+	 *
 	 * @param row up to down
 	 * @param col left to right
 	 */
@@ -400,7 +408,7 @@ public class DelveCustomInventory extends CustomInventory {
 		// make sure to change the PRESET_SLOT and mPage condition.
 		if (mPage == 1 && mDungeonName.equals("ring") && mConfig.editable()) {
 			int presetId = ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD)
-										  .orElse(0);
+				.orElse(0);
 			DelvePreset delvePreset = DelvePreset.getDelvePreset(presetId);
 			if (delvePreset != null) {
 				ItemStack presetItem = GUIUtils.createBasicItem(
@@ -431,9 +439,12 @@ public class DelveCustomInventory extends CustomInventory {
 				mods.remove(experimental);
 			}
 		}
+		mods.removeAll(DelvesModifier.variantDelveModifiers());
+		mods.replaceAll(this::updateToVariant);
 
 		if (mDungeonName.startsWith("ring")) {
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
+			mods.remove(DelvesModifier.BOUNTIFUL);
 			mods.remove(DelvesModifier.ENTROPY);
 			return mods;
 		}
@@ -469,6 +480,29 @@ public class DelveCustomInventory extends CustomInventory {
 		}
 
 		return mods;
+	}
+
+	private DelvesModifier updateToVariant(DelvesModifier modifier) {
+		// Twisted -> Tormented
+		if (modifier.equals(DelvesModifier.TWISTED) && ((mPointSelected.get(DelvesModifier.TWISTED_TORMENTED) != null && mPointSelected.get(DelvesModifier.TWISTED_TORMENTED) > 0) || mSelectedVariants.get(DelvesModifier.TWISTED) == DelvesModifier.TWISTED_TORMENTED)) {
+			modifier = DelvesModifier.TWISTED_TORMENTED;
+			mSelectedVariants.put(DelvesModifier.TWISTED, DelvesModifier.TWISTED_TORMENTED);
+		}
+		return modifier;
+	}
+
+	private DelvesModifier clickChangeBetweenVariant(DelvesModifier modifier, Player playerWhoClicked) {
+		// Twisted <-> Tormented
+		if (modifier.equals(DelvesModifier.TWISTED)) {
+			modifier = DelvesModifier.TWISTED_TORMENTED;
+			mSelectedVariants.put(DelvesModifier.TWISTED, DelvesModifier.TWISTED_TORMENTED);
+			playerWhoClicked.playSound(playerWhoClicked.getLocation(), "block.vault.activate", SoundCategory.PLAYERS, 1f, 1f);
+		} else if (modifier.equals(DelvesModifier.TWISTED_TORMENTED)) {
+			modifier = DelvesModifier.TWISTED;
+			mSelectedVariants.remove(DelvesModifier.TWISTED);
+			playerWhoClicked.playSound(playerWhoClicked.getLocation(), "block.vault.deactivate", SoundCategory.PLAYERS, 1f, 1f);
+		}
+		return modifier;
 	}
 
 	/**
@@ -510,7 +544,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 		lore.add(Component.text(""));
 
-		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(mDungeonName);
+		DungeonCommandMapping mapping = DungeonCommandMapping.getByShard(mDungeonName);
 		boolean exalted = mapping != null && mapping.getTypeName() != null && ScoreboardUtils.getScoreboardValue(mOwner, mapping.getTypeName()).orElse(0) == 1;
 		double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeonName, exalted);
 		lore.add(Component.text("Stat Multipliers from Base Dungeon:", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
@@ -602,7 +636,13 @@ public class DelveCustomInventory extends CustomInventory {
 				DelvesModifier mod = mods.get(index);
 
 				if (row == MODS_ROW) {
-					mPointSelected.put(mod, 0);
+					if (event.isShiftClick()) {
+						mPointSelected.put(mod, 0);
+						mod = clickChangeBetweenVariant(mod, playerWhoClicked);
+						mInventory.setItem(event.getSlot(), mod.getIcon());
+					} else {
+						mPointSelected.put(mod, 0);
+					}
 				} else {
 					int finalPoint = DelvesUtils.getMaxPointAssignable(mod, 5 - row);
 					mPointSelected.put(mod, finalPoint);
@@ -635,7 +675,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 				// Editing the entropy mod at all should mean
 				// that existing already rolled mods are left
-				// on purposefully and you want more random rolls
+				// on purposefully, and you want more random rolls
 				if (mod == DelvesModifier.ENTROPY) {
 					mAlreadyRolledEntropy = 0;
 				}
@@ -685,7 +725,7 @@ public class DelveCustomInventory extends CustomInventory {
 
 		if (slot == PRESET_SLOT && mPage == 1 && mDungeonName.equals("ring") && mConfig.editable()) {
 			int presetId = ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD)
-										  .orElse(0);
+				.orElse(0);
 			DelvePreset delvePreset = DelvePreset.getDelvePreset(presetId);
 			if (delvePreset != null) {
 				mAlreadyRolledEntropy = 0;
@@ -698,26 +738,20 @@ public class DelveCustomInventory extends CustomInventory {
 				if (mPointSelected.containsKey(DelvesModifier.ENTROPY)) {
 					int entropyPoints =
 						Entropy.getDepthPointsAssigned(mPointSelected.get(DelvesModifier.ENTROPY)) -
-						Entropy.getDepthPointsAssigned(mAlreadyRolledEntropy);
+							Entropy.getDepthPointsAssigned(mAlreadyRolledEntropy);
 					List<DelvesModifier> entropyableMods = DelvesModifier.entropyAssignable();
 
 					while (entropyPoints > 0) {
-						if (entropyableMods.isEmpty()) {
-							break;
-						}
 						DelvesModifier mod = entropyableMods.get(FastUtils.RANDOM.nextInt(entropyableMods.size()));
 						int oldValue = mPointSelected.getOrDefault(mod, 0);
-						if (oldValue == DelvesUtils.getMaxPointAssignable(mod, oldValue + 1)) {
-							entropyableMods.remove(mod);
-							continue;
-						}
 						mPointSelected.put(mod, oldValue + 1);
 						entropyPoints--;
 					}
 				}
 
 				int presetId = 0;
-				if (mConfig.preset() != null && DelvePreset.validatePresetModifiers(mPointSelected, mConfig.preset(), true)) {
+				if (mConfig.preset() != null &&    // If the preset contains Entropy, it shouldn't be exact
+					DelvePreset.validatePresetModifiers(mPointSelected, mConfig.preset(), !mConfig.preset().mModifiers.containsKey(DelvesModifier.ENTROPY))) {
 					presetId = mConfig.preset().getId();
 				}
 
@@ -731,12 +765,12 @@ public class DelveCustomInventory extends CustomInventory {
 						playerWhoClicked.sendMessage(Component.text("Unable to find dungeon transfer function, please report to TM!", NamedTextColor.RED));
 					} else {
 						Bukkit.getScheduler()
-							  .runTaskLater(
-									Plugin.getInstance(),
-									() -> NmsUtils.getVersionAdapter()
-												  .runConsoleCommandSilently("execute as " + mOwner.getName() + " at @s run " + dungeonFunc),
-									0
-							  );
+							.runTaskLater(
+								Plugin.getInstance(),
+								() -> NmsUtils.getVersionAdapter()
+									.runConsoleCommandSilently("execute as " + mOwner.getName() + " at @s run " + dungeonFunc),
+								0
+							);
 					}
 				}
 			} else {

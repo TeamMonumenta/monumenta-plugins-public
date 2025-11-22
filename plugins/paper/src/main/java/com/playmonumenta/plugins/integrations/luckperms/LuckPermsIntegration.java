@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
+import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildFlags;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildPermissions;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.InviteNotification;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.LPArguments;
@@ -18,6 +19,8 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +45,7 @@ import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.cacheddata.CachedPermissionData;
 import net.luckperms.api.event.EventBus;
 import net.luckperms.api.messaging.MessagingService;
+import net.luckperms.api.model.PermissionHolder;
 import net.luckperms.api.model.data.NodeMap;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
@@ -52,6 +56,7 @@ import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.matcher.NodeMatcher;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.MetaNode;
+import net.luckperms.api.node.types.PermissionNode;
 import net.luckperms.api.node.types.PrefixNode;
 import net.luckperms.api.platform.PlayerAdapter;
 import net.luckperms.api.query.Flag;
@@ -90,6 +95,7 @@ public class LuckPermsIntegration implements Listener {
 	public static final String GUILD_ROOT_ID_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "id";
 	public static final String GUILD_ROOT_LOCKDOWN_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "lockdown";
 	public static final String GUILD_ROOT_PLOT_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "plot";
+	public static final String GUILD_ROOT_PLOT_TYPE_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "plot_type";
 	public static final String GUILD_ROOT_COLOR_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "color";
 	public static final String GUILD_ROOT_PLAIN_TAG_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "plain_tag";
 	public static final String GUILD_ROOT_TAG_MK = GUILD_ROOT_MK + META_KEY_NODE_SEPARATOR + "tag";
@@ -119,8 +125,8 @@ public class LuckPermsIntegration implements Listener {
 
 		URL skinUrl;
 		try {
-			skinUrl = new URL("http://textures.minecraft.net/texture/4091640da9e8fe0bf259919ecce7ddef87aaf8ba6eabfbaacf2df1d2a24d80d9");
-		} catch (MalformedURLException e) {
+			skinUrl = new URI("http://textures.minecraft.net/texture/4091640da9e8fe0bf259919ecce7ddef87aaf8ba6eabfbaacf2df1d2a24d80d9").toURL();
+		} catch (MalformedURLException | URISyntaxException ignored) {
 			skinUrl = null;
 		}
 
@@ -170,7 +176,6 @@ public class LuckPermsIntegration implements Listener {
 		OffDutyCommand.register();
 		SetGuildTeleport.register(plugin);
 		StreamerModeCommand.register();
-		TeleportGuild.register();
 		TeleportGuildGui.register(plugin);
 		TestGuild.register();
 		TransferLPPermissions.register(plugin);
@@ -178,6 +183,7 @@ public class LuckPermsIntegration implements Listener {
 
 		EventBus eventBus = LP.getEventBus();
 		GuildArguments.registerLuckPermsEvents(plugin, eventBus);
+		GuildFlags.registerLuckPermsEvents(plugin, eventBus);
 		GuildPermissions.registerLuckPermsEvents(plugin, eventBus);
 		InviteNotification.registerLuckPermsEvents(plugin, eventBus);
 		Lockdown.registerLuckPermsEvents(plugin, eventBus);
@@ -265,8 +271,12 @@ public class LuckPermsIntegration implements Listener {
 		return result;
 	}
 
-	public static CompletableFuture<@Nullable Group> getGuildByPlotId(long guildPlot) {
+	public static CompletableFuture<@Nullable Group> getGuildByPlotId(@Nullable Long guildPlot) {
 		CompletableFuture<Group> future = new CompletableFuture<>();
+		if (guildPlot == null) {
+			future.complete(null);
+			return future;
+		}
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
 				MetaNode desiredPlotMetaKey = MetaNode.builder(GUILD_ROOT_PLOT_MK, String.valueOf(guildPlot)).build();
@@ -289,15 +299,67 @@ public class LuckPermsIntegration implements Listener {
 		return future;
 	}
 
+	public static @Nullable Group getLoadedGuildByPlotId(@Nullable Long guildPlot) {
+		if (guildPlot == null) {
+			return null;
+		}
+		String guildPlotIdStr = String.valueOf(guildPlot);
+
+		for (Group group : getLoadedGroups()) {
+			for (MetaNode metaNode : group.getNodes(NodeType.META)) {
+				if (!GUILD_ROOT_PLOT_MK.equals(metaNode.getMetaKey())) {
+					continue;
+				}
+
+				if (!guildPlotIdStr.equals(metaNode.getMetaValue())) {
+					continue;
+				}
+
+				return group;
+			}
+		}
+
+		return null;
+	}
+
 	public static User getUser(Player player) {
 		return UM.getUser(player.getUniqueId());
 	}
 
+	/**
+	 * Sets a permission to either true or false for a player
+	 *
+	 * @param player     The player that you want to set a permission for
+	 * @param permission The string of your permission to set
+	 * @param value      The boolean that your permission is set to
+	 */
 	public static void setPermission(Player player, String permission, boolean value) {
 		UM.modifyUser(player.getUniqueId(), user -> {
 			// Add the permission
 			user.data().add(Node.builder(permission).value(value).build());
 		});
+	}
+
+	/**
+	 * Removes a permission from a player
+	 *
+	 * @param player     The player that you want to remove a permission from
+	 * @param permission The string of your permission to remove
+	 */
+	public static void unsetPermission(Player player, String permission) {
+		UM.modifyUser(player.getUniqueId(), user -> {
+			// Remove the permission
+			user.data().remove(Node.builder(permission).build());
+		});
+	}
+
+	public static Optional<Boolean> hasPermission(PermissionHolder permissionHolder, String permission) {
+		for (PermissionNode node : permissionHolder.resolveInheritedNodes(NodeType.PERMISSION, QueryOptions.nonContextual())) {
+			if (node.getKey().equals(permission)) {
+				return Optional.of(node.getValue());
+			}
+		}
+		return Optional.empty();
 	}
 
 	/**
@@ -425,7 +487,7 @@ public class LuckPermsIntegration implements Listener {
 	public static GuildAccessLevel getAccessLevel(Group guildRoot, User user) {
 		QueryOptions options = QueryOptions.builder(QueryMode.CONTEXTUAL).flag(Flag.RESOLVE_INHERITANCE, true).build();
 
-		GuildAccessLevel level = GuildAccessLevel.NONE;
+		GuildAccessLevel level = null;
 		for (Group group : user.getInheritedGroups(options)) {
 			if (!group.getName().startsWith(guildRoot.getName()) || group.getName().equals(guildRoot.getName())) {
 				continue;
@@ -437,9 +499,12 @@ public class LuckPermsIntegration implements Listener {
 				continue;
 			}
 
-			if (level.compareTo(groupAccessLevel) > 0) {
+			if (level == null || level.compareTo(groupAccessLevel) > 0) {
 				level = groupAccessLevel;
 			}
+		}
+		if (level == null) {
+			level = GuildAccessLevel.NONE;
 		}
 
 		return level;
@@ -711,6 +776,65 @@ public class LuckPermsIntegration implements Listener {
 		return null;
 	}
 
+	public static int getPlotTypeId(Group group) {
+		try {
+			Group root = getGuildRoot(group);
+			if (root == null) {
+				return 0;
+			}
+
+			for (MetaNode node : root.getNodes(NodeType.META)) {
+				if (node.getMetaKey().equals(GUILD_ROOT_PLOT_TYPE_MK)) {
+					return Integer.parseInt(node.getMetaValue());
+				}
+			}
+		} catch (Exception ex) {
+			MMLog.warning("An error occurred getting the guild plot type ID:");
+			MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
+			return 0;
+		}
+
+		return 0;
+	}
+
+	public static GuildPlotType getPlotType(Group group) {
+		return GuildPlotType.byScore(getPlotTypeId(group));
+	}
+
+	public static CompletableFuture<Void> setPlotType(Group group, GuildPlotType plotType) {
+		CompletableFuture<Void> future = new CompletableFuture<>();
+
+		Group root = getGuildRoot(group);
+		if (root == null) {
+			future.completeExceptionally(new NullPointerException("Guild has no root node"));
+			return future;
+		}
+
+		List<MetaNode> toDelete = new ArrayList<>();
+		for (MetaNode node : root.getNodes(NodeType.META)) {
+			if (node.getMetaKey().equals(GUILD_ROOT_PLOT_TYPE_MK)) {
+				toDelete.add(node);
+			}
+		}
+		for (MetaNode node : toDelete) {
+			root.data().remove(node);
+		}
+
+		root.data().add(MetaNode.builder(GUILD_ROOT_PLOT_TYPE_MK, Integer.toString(plotType.mScore)).build());
+
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			try {
+				GM.saveGroup(root).join();
+				pushUpdate();
+				future.complete(null);
+			} catch (Exception ex) {
+				future.completeExceptionally(ex);
+			}
+		});
+
+		return future;
+	}
+
 	public static CompletableFuture<User> loadUser(UUID playerId) {
 		return UM.loadUser(playerId);
 	}
@@ -849,12 +973,22 @@ public class LuckPermsIntegration implements Listener {
 		return result;
 	}
 
+	public static Audience onlineDevOpAudience() {
+		Set<Player> devOps = new HashSet<>();
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (player.hasPermission("group.devops")) {
+				devOps.add(player);
+			}
+		}
+		return Audience.audience(devOps);
+	}
+
 	public static Set<Player> getOnlineGuildInvites(Group guildRoot) {
 		Set<Player> result = new HashSet<>();
 
-		String inheritencePerm = "group." + GuildInviteLevel.GUEST_INVITE.groupNameFromRoot(guildRoot);
+		String inheritancePerm = "group." + GuildInviteLevel.GUEST_INVITE.groupNameFromRoot(guildRoot);
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.hasPermission(inheritencePerm)) {
+			if (player.hasPermission(inheritancePerm)) {
 				result.add(player);
 			}
 		}
@@ -874,9 +1008,9 @@ public class LuckPermsIntegration implements Listener {
 				}
 			}
 		} else {
-			String inheritencePerm = "group." + GuildAccessLevel.GUEST.groupNameFromRoot(guildRoot);
+			String inheritancePerm = "group." + GuildAccessLevel.GUEST.groupNameFromRoot(guildRoot);
 			for (Player player : Bukkit.getOnlinePlayers()) {
-				if (player.hasPermission(inheritencePerm)) {
+				if (player.hasPermission(inheritancePerm)) {
 					result.add(player);
 				}
 			}
@@ -1125,23 +1259,58 @@ public class LuckPermsIntegration implements Listener {
 	}
 
 	public static ItemStack getNonNullGuildBanner(Player player) {
-		Group guild = getGuild(player);
-		if (guild == null) {
-			ItemStack item = new ItemStack(Material.BLUE_BANNER);
-			ItemMeta meta = item.getItemMeta();
-			if (meta instanceof BannerMeta bannerMeta) {
-				// https://www.planetminecraft.com/banner/the-earth-408589/
-				bannerMeta.addPattern(new Pattern(DyeColor.LIME, PatternType.GLOBE));
-				bannerMeta.addPattern(new Pattern(DyeColor.GREEN, PatternType.GLOBE));
-				bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.CURLY_BORDER));
-				bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.BORDER));
-				bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_BOTTOM));
-				bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_TOP));
-			}
-			item.setItemMeta(meta);
-			return item;
+		ItemStack guildBanner = getGuildBanner(player);
+		if (guildBanner == null) {
+			return defaultGuildBanner();
 		}
-		return getGuildBanner(guild);
+		return guildBanner;
+	}
+
+	public static @Nullable Group getSelectedGuildPlotGuild(Player player) {
+		return getLoadedGuildByPlotId(GuildPlotUtils.getLastGuildPlotScore(player));
+	}
+
+	public static @Nullable ItemStack getSelectedGuildPlotBanner(Player player) {
+		Group selectedGuild = getSelectedGuildPlotGuild(player);
+		if (selectedGuild == null) {
+			return null;
+		}
+		return getGuildBanner(selectedGuild);
+	}
+
+	public static ItemStack getGuildPlotsBanner(Player player) {
+		ItemStack selectedBanner = getSelectedGuildPlotBanner(player);
+		if (selectedBanner == null) {
+			return defaultGuildBanner();
+		}
+		return selectedBanner;
+	}
+
+	public static Component getSelectedGuildPlotName(Player player) {
+		Group selectedGuild = getSelectedGuildPlotGuild(player);
+		if (selectedGuild == null) {
+			return GuildPlotUtils.FALLBACK_WORLD_COMPONENT;
+		}
+		return Component.empty()
+			.append(Component.text("", NamedTextColor.GOLD)
+				.append(getGuildFullComponent(selectedGuild)))
+			.append(Component.text(" Guild Plot"));
+	}
+
+	public static ItemStack defaultGuildBanner() {
+		ItemStack item = new ItemStack(Material.BLUE_BANNER);
+		ItemMeta meta = item.getItemMeta();
+		if (meta instanceof BannerMeta bannerMeta) {
+			// https://www.planetminecraft.com/banner/the-earth-408589/
+			bannerMeta.addPattern(new Pattern(DyeColor.LIME, PatternType.GLOBE));
+			bannerMeta.addPattern(new Pattern(DyeColor.GREEN, PatternType.GLOBE));
+			bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.CURLY_BORDER));
+			bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.BORDER));
+			bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_BOTTOM));
+			bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_TOP));
+		}
+		item.setItemMeta(meta);
+		return item;
 	}
 
 	// This method is not to change the color/plain tag but to re-create and set the colored version.
@@ -1558,15 +1727,14 @@ public class LuckPermsIntegration implements Listener {
 		}, 1L);
 	}
 
-	public static @Nullable JsonObject getPluginData(UUID uuid) {
+	public static void getPluginData(JsonObject pluginData, UUID uuid) {
 		if (UM == null) {
-			return null;
+			return;
 		}
 		@Nullable User user = UM.getUser(uuid);
 		if (user == null) {
-			return null;
+			return;
 		}
-		JsonObject pluginData = new JsonObject();
 		CachedPermissionData permissionData = user.getCachedData().getPermissionData();
 		CachedMetaData metaData = user.getCachedData().getMetaData();
 
@@ -1590,6 +1758,5 @@ public class LuckPermsIntegration implements Listener {
 			.ifPresent(skin ->
 				pluginData.addProperty("signed_texture", skin.getValue() + ";" + skin.getSignature())
 			);
-		return pluginData;
 	}
 }

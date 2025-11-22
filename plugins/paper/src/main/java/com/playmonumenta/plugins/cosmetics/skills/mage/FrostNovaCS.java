@@ -11,6 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -35,8 +36,14 @@ public class FrostNovaCS implements CosmeticSkill {
 			public void run() {
 				mRadius += 1.25;
 
-				new PPCircle(Particle.CLOUD, mLoc, mRadius).count(20).extra(0.1).spawnAsPlayerActive(player);
-				new PPCircle(Particle.CRIT_MAGIC, mLoc, mRadius).count(160).extra(0.65).spawnAsPlayerActive(player);
+				new PPCircle(Particle.SNOWFLAKE, mLoc, mRadius).count(40).extra(0.1).spawnAsPlayerActive(player);
+				new PPCircle(Particle.FALLING_DUST, mLoc.clone().add(0, 0.5, 0), mRadius)
+					.count(40).extra(0.65).delta(0.25)
+					.data(Material.LIGHT_BLUE_WOOL.createBlockData())
+					.spawnAsPlayerActive(player);
+				new PPCircle(Particle.CRIT_MAGIC, mLoc.clone().add(0, 0.5, 0), mRadius)
+					.count(20).extra(1).delta(0.25)
+					.spawnAsPlayerActive(player);
 
 				if (mRadius >= size + 1) {
 					this.cancel();
@@ -51,5 +58,9 @@ public class FrostNovaCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1.1f, 0.7f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1.2f, 2.0f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.4f, 2.0f);
+	}
+
+	public void enemyEffect(Plugin plugin, Player player, LivingEntity enemy) {
+		//none here!
 	}
 }

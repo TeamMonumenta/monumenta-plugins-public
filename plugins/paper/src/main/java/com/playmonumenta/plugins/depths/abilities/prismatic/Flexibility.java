@@ -52,7 +52,7 @@ public class Flexibility extends DepthsAbility {
 	}
 
 	private static Description<Flexibility> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Flexibility>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Gain ")
 			.addPercent(a -> DAMAGE[rarity - 1], DAMAGE[rarity - 1], false, true)
 			.add(" damage for each unique tree featured in your active ability slots.")

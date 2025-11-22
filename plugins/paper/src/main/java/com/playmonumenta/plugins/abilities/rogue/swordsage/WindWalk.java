@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -44,36 +47,30 @@ public class WindWalk extends MultipleChargeAbility {
 	public static final String CHARM_COOLDOWN = "Wind Walk Cooldown";
 	public static final String CHARM_CHARGE = "Wind Walk Charge";
 	public static final String CHARM_COOLDOWN_REDUCTION = "Wind Walk Cooldown Reduction";
+	public static final String CHARM_DURATION = "Wind Walk Debuff Duration";
 
 	public static final AbilityInfo<WindWalk> INFO =
 		new AbilityInfo<>(WindWalk.class, "Wind Walk", WindWalk::new)
 			.linkedSpell(ClassAbility.WIND_WALK)
 			.scoreboardId("WindWalk")
 			.shorthandName("WW")
-			.descriptions(
-				String.format("Press the swap key while holding two swords to dash in the target direction, stunning and levitating enemies for %s seconds. " +
-					              "Elites are not levitated. Cooldown: %ss. Charges: %s.",
-					WIND_WALK_DURATION / 20,
-					WIND_WALK_1_COOLDOWN / 20,
-					WIND_WALK_MAX_CHARGES
-				),
-				String.format("Casting this ability reduces the cooldown of all other abilities by %s seconds. Cooldown: %ss.",
-					WIND_WALK_CDR / 20,
-					WIND_WALK_2_COOLDOWN / 20))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Dash forwards, stunning and levitating mobs along the path.")
 			.cooldown(WIND_WALK_1_COOLDOWN, WIND_WALK_2_COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WindWalk::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WindWalk::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
 			.displayItem(Material.QUARTZ);
 
 	private final int mDuration;
+	private final int mCDR;
 	private final WindWalkCS mCosmetic;
 
 	private int mLastCastTicks = 0;
 
 	public WindWalk(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDuration = WIND_WALK_DURATION;
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, WIND_WALK_DURATION);
+		mCDR = CharmManager.getDuration(mPlayer, CHARM_COOLDOWN_REDUCTION, WIND_WALK_CDR);
 		mMaxCharges = WIND_WALK_MAX_CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGE);
 		mCharges = getTrackedCharges();
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WindWalkCS());
@@ -95,7 +92,7 @@ public class WindWalk extends MultipleChargeAbility {
 		walk();
 
 		if (isLevelTwo()) {
-			mPlugin.mTimers.updateCooldownsExcept(mPlayer, ClassAbility.WIND_WALK, CharmManager.getDuration(mPlayer, CHARM_COOLDOWN_REDUCTION, WIND_WALK_CDR));
+			mPlugin.mTimers.updateCooldownsExcept(mPlayer, ClassAbility.WIND_WALK, mCDR);
 		}
 		return true;
 	}
@@ -156,4 +153,22 @@ public class WindWalk extends MultipleChargeAbility {
 		}.runTaskTimer(mPlugin, 0, 1));
 	}
 
+	private static Description<WindWalk> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to dash in the direction you are facing, stunning and levitating enemies for ")
+			.addDuration(a -> a.mDuration, WIND_WALK_DURATION)
+			.add(" seconds. Elites are not levitated. Charges: ")
+			.add(a -> a.mMaxCharges, WIND_WALK_MAX_CHARGES)
+			.add(".")
+			.addCooldown(WIND_WALK_1_COOLDOWN, Ability::isLevelOne);
+	}
+
+	private static Description<WindWalk> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Casting this ability reduces the cooldown of all other abilities by ")
+			.addDuration(a -> a.mCDR, WIND_WALK_CDR)
+			.add(" seconds.")
+			.addCooldown(WIND_WALK_2_COOLDOWN, Ability::isLevelTwo);
+	}
 }

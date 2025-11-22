@@ -39,7 +39,6 @@ public class RenameGuild {
 
 	private static final CommandPermission PERMISSION = CommandPermission.fromString("monumenta.command.guild.mod.renameguild");
 
-	@SuppressWarnings("DataFlowIssue")
 	public static CommandAPICommand attach(Plugin plugin, CommandAPICommand rootCommand) {
 		CommandAPICommand tagSubCommand = new CommandAPICommand("tag")
 			.withArguments(List.of(
@@ -170,10 +169,6 @@ public class RenameGuild {
 			}
 
 			for (GuildAccessLevel accessLevel : GuildAccessLevel.values()) {
-				if (GuildAccessLevel.NONE.equals(accessLevel)) {
-					continue;
-				}
-
 				Group accessGroup = accessLevel.loadGroupFromRoot(currentRoot).join().orElse(null);
 				if (accessGroup == null) {
 					future.complete(Component.text("Unable to load '"
@@ -266,10 +261,6 @@ public class RenameGuild {
 			}
 
 			for (GuildAccessLevel accessLevel : GuildAccessLevel.values()) {
-				if (accessLevel.equals(GuildAccessLevel.NONE)) {
-					continue;
-				}
-
 				String oldChildId = accessLevel.groupNameFromRoot(oldRootId);
 				String newChildId = accessLevel.groupNameFromRoot(newRootId);
 				try {
@@ -370,10 +361,6 @@ public class RenameGuild {
 
 
 			for (GuildAccessLevel accessLevel : GuildAccessLevel.values()) {
-				if (accessLevel.equals(GuildAccessLevel.NONE)) {
-					continue;
-				}
-
 				Group accessGroup = accessLevel.loadGroupFromRoot(newRoot).join().orElse(null);
 				if (accessGroup == null) {
 					future.complete(Component.text("Unable to load access level "

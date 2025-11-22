@@ -13,6 +13,8 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -64,13 +66,22 @@ public class ShockwaveBoss extends BossAbilityGroup {
 		@BossParam(help = "effects applied on hit")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 		@BossParam(help = "particles around the boss while it telegraphs")
-		public ParticlesList PARTICLE_BOSS_CHARGE = ParticlesList.fromString("[(ELECTRIC_SPARK,8,1,0.1,1,0.01)]");
+		public ParticlesList PARTICLE_BOSS_CHARGE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.ELECTRIC_SPARK, 8, 1.0, 0.1, 1.0, 0.01))
+			.build();
 		@BossParam(help = "particle of the shockwave")
-		public ParticlesList PARTICLE_RELEASE = ParticlesList.fromString("[(CRIT,1,0.0,0.0,0.0,0)]");
+		public ParticlesList PARTICLE_RELEASE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 		@BossParam(help = "sound played while the boss charges up")
-		public SoundsList SOUND_CHARGE = SoundsList.fromString("[(ENTITY_FIREWORK_ROCKET_TWINKLE,0.5,1.7)]");
+		public SoundsList SOUND_CHARGE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.7f))
+			.build();
 		@BossParam(help = "sound played when the shockwave is released")
-		public SoundsList SOUND_RELEASE = SoundsList.fromString("[(ENTITY_WITHER_SHOOT,1,0.85),(ENTITY_FIREWORK_ROCKET_TWINKLE,1,2.5)]");
+		public SoundsList SOUND_RELEASE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_WITHER_SHOOT, 1.0f, 0.85f))
+			.add(new SoundsList.CSound(Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1.0f, 2.5f))
+			.build();
 
 	}
 

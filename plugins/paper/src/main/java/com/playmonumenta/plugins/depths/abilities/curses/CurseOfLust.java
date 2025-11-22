@@ -52,7 +52,7 @@ public class CurseOfLust extends DepthsAbility {
 	}
 
 	private static Description<CurseOfLust> getDescription() {
-		return new DescriptionBuilder<CurseOfLust>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Deal ")
 			.addPercent(DAMAGE_REDUCTION_PER_BLOCK)
 			.add(" less damage for each block above " + MIN_BLOCKS + " blocks away your closest teammate is, up to ")

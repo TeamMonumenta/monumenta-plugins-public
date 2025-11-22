@@ -156,6 +156,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 		));
 
 		// Health Events
+		// NOTE: if adding more events with breakpoints 60, 40, or 20, ensure the garden spawn mobs does not override
 		Map<Integer, BossBarManager.BossHealthAction> events = new HashMap<>();
 		events.put(90, mBoss -> {
 			// Change to Phase 2.
@@ -171,6 +172,9 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 					Component.text("[Callicarpa] ", NamedTextColor.GOLD)
 						.append(Component.text("Ah, foe indeed; yet I am caged. Defend the blight or face their rage...", NamedTextColor.DARK_GREEN))
 				);
+			}
+			if (mParty != null && mParty.getAscension() >= 4) {
+				garden.spawnMobs(3);
 			}
 		});
 		events.put(50, mBoss -> {
@@ -227,6 +231,12 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 				}, MENACE_MOUNT_DELAY);
 			}, MENACE_MOUNT_START_DELAY);
 		});
+
+		if (mParty != null && mParty.getAscension() >= 4) {
+			events.put(60, mBoss -> garden.spawnMobs(4));
+			events.put(40, mBoss -> garden.spawnMobs(5));
+			events.put(20, mBoss -> garden.spawnMobs(6));
+		}
 
 		// Boss Bar and Construct
 		BossBarManager bossBar = new BossBarManager(mBoss, detectionRange, BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_10, events);
@@ -303,7 +313,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		Location loc = mBoss.getLocation();
-		List<Player> players = PlayerUtils.playersInRange(loc, detectionRange, true);
+		List<Player> players = PlayerUtils.playersInRange(loc, detectionRange, true, true);
 
 		BossUtils.endBossFightEffects(players);
 
@@ -363,8 +373,8 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 	public void onHurt(DamageEvent event) {
 		if (
 			mIsReflectingProjectiles &&
-			event.getDamager() instanceof Player damager &&
-			DamageEvent.DamageType.getAllProjectileTypes().contains(event.getType())
+				event.getDamager() instanceof Player damager &&
+				DamageEvent.DamageType.getAllProjectileTypes().contains(event.getType())
 		) {
 			FlowerPower.launchEnergyLaser(
 				damager,
@@ -390,7 +400,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 	public void bossHitByProjectile(ProjectileHitEvent event) {
 		if (
 			mIsReflectingProjectiles &&
-			event.getEntity().getShooter() instanceof Player shooter
+				event.getEntity().getShooter() instanceof Player shooter
 		) {
 			FlowerPower.launchEnergyLaser(
 				shooter,

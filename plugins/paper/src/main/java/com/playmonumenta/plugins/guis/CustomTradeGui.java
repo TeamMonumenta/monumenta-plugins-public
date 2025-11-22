@@ -78,11 +78,11 @@ public class CustomTradeGui extends Gui {
 	private final int mPebTradeGUITheme = ScoreboardUtils.getScoreboardValue(mPlayer, THEME).orElse(0);
 	// SPACING: 0: auto. 1: force 16. 2: force 28.
 	private final int mPebTradeGUISpacing = ScoreboardUtils.getScoreboardValue(mPlayer, SPACING).orElse(0);
-	// PREVIEWDISPLAY: 0: display price on preview. 1: dont.
+	// PREVIEWDISPLAY: 0: display price on preview. 1: don't.
 	private final int mPebTradeGUIPreviewDisplay = ScoreboardUtils.getScoreboardValue(mPlayer, PREVIEWDISPLAY).orElse(0);
-	// TRADEORG: 0: split trades by type. 1: dont.
+	// TRADEORG: 0: split trades by type. 1: don't.
 	private final int mPebTradeGUITradeOrg = ScoreboardUtils.getScoreboardValue(mPlayer, TRADEORG).orElse(0);
-	// CONFIRM: 0: bring up confirm menu. 1: dont.
+	// CONFIRM: 0: bring up confirm menu. 1: don't.
 	private final int mPebTradeGUIConfirm = ScoreboardUtils.getScoreboardValue(mPlayer, CONFIRM).orElse(0);
 	// QUICKBUY: 0: shift click on preview trade to buy 1. 1: disabled.
 	private final int mPebTradeGUIQuickBuy = ScoreboardUtils.getScoreboardValue(mPlayer, QUICKBUY).orElse(0);
@@ -200,10 +200,10 @@ public class CustomTradeGui extends Gui {
 			for (ItemStack requirement : mRequirements) {
 				// Calculate amount to remove:
 				WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(requirement, inventoryShallowClone, walletClone, mPebTradeGUIWallet != 0);
-				int inventoryDebt = debt.mInventoryDebt;
-				int walletDebt = debt.mWalletDebt;
-				long numInWallet = debt.mNumInWallet;
-				boolean meetsRequirement = debt.mMeetsRequirement;
+				int inventoryDebt = debt.mInventoryDebt();
+				int walletDebt = debt.mWalletDebt();
+				long numInWallet = debt.mNumInWallet();
+				boolean meetsRequirement = debt.mMeetsRequirement();
 				// Remove from inventory and wallet clones:
 				if (meetsRequirement && inventoryDebt > 0) {
 					InventoryUtils.removeItemFromArray(inventoryShallowClone, requirement.asQuantity(inventoryDebt));
@@ -278,9 +278,9 @@ public class CustomTradeGui extends Gui {
 			for (ItemStack requirement : requirements()) {
 				// Calculate amount to remove:
 				WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(requirement, inventory.getStorageContents(), wallet, mPebTradeGUIWallet != 0);
-				int inventoryDebt = debt.mInventoryDebt;
-				int walletDebt = debt.mWalletDebt;
-				boolean meetsRequirement = debt.mMeetsRequirement;
+				int inventoryDebt = debt.mInventoryDebt();
+				int walletDebt = debt.mWalletDebt();
+				boolean meetsRequirement = debt.mMeetsRequirement();
 
 				// Remove from inventory and wallet:
 				if (meetsRequirement && inventoryDebt > 0) {
@@ -295,8 +295,8 @@ public class CustomTradeGui extends Gui {
 				// Check for errors:
 				if (!meetsRequirement) {
 					mPlayer.sendMessage("We're sorry - there was a problem verifying a requirement: '" +
-						                    ItemUtils.getPlainNameOrDefault(requirement) +
-						                    "'. Please contact a moderator if a refund is needed.");
+						ItemUtils.getPlainNameOrDefault(requirement) +
+						"'. Please contact a moderator if a refund is needed.");
 					MMLog.warning("Custom Trade GUI: requirement - removal mismatch @buyNow: " + mTitle);
 					close();
 					return;
@@ -317,15 +317,7 @@ public class CustomTradeGui extends Gui {
 		}
 	}
 
-	private static class TradeStatusWrapper {
-		private final boolean mHasRequirements;
-		private final List<Component> mLore;
-
-
-		public TradeStatusWrapper(boolean hasRequirements, List<Component> lore) {
-			this.mHasRequirements = hasRequirements;
-			this.mLore = lore;
-		}
+	private record TradeStatusWrapper(boolean mHasRequirements, List<Component> mLore) {
 
 
 		public boolean status() {
@@ -436,13 +428,13 @@ public class CustomTradeGui extends Gui {
 						name, NamedTextColor.YELLOW, false, "", NamedTextColor.GRAY, 0), "texture", tag, mGuiTagsActive))
 				.onLeftClick(() -> {
 					// Select Tab:
-				if (mCurrentTab != tradeType) {
-					mCurrentTab = tradeType;
-					mCurrentPage = 1;
-					playSound(mPlayer.getLocation(), SoundType.TAB_SELECT);
-					update();
-				}
-			});
+					if (mCurrentTab != tradeType) {
+						mCurrentTab = tradeType;
+						mCurrentPage = 1;
+						playSound(mPlayer.getLocation(), SoundType.TAB_SELECT);
+						update();
+					}
+				});
 			guiCol++;
 		}
 		// Display page icons:
@@ -455,7 +447,7 @@ public class CustomTradeGui extends Gui {
 			setItem(5, 7,
 				GUIUtils.setGuiNbtTag(GUIUtils.createBasicItem(Material.ARROW, "Next Page (" + (mCurrentPage + 1) + ")", NamedTextColor.YELLOW, false,
 					"", NamedTextColor.GRAY, 0), "texture", "trade_menu_next_page", mGuiTagsActive)
-				).onLeftClick(() -> {
+			).onLeftClick(() -> {
 				// Page Flip:
 				mCurrentPage++;
 				playSound(mPlayer.getLocation(), SoundType.PAGE_FLIP);
@@ -467,7 +459,7 @@ public class CustomTradeGui extends Gui {
 			setItem(5, 6,
 				GUIUtils.setGuiNbtTag(GUIUtils.createBasicItem(Material.ARROW, "Previous Page (" + (mCurrentPage - 1) + ")", NamedTextColor.YELLOW, false,
 					"", NamedTextColor.GRAY, 0), "texture", "trade_menu_prev_page", mGuiTagsActive)
-				).onLeftClick(() -> {
+			).onLeftClick(() -> {
 				// Page Flip:
 				mCurrentPage--;
 				playSound(mPlayer.getLocation(), SoundType.PAGE_FLIP);
@@ -483,12 +475,12 @@ public class CustomTradeGui extends Gui {
 				GUIUtils.createBasicItem(material, name, NamedTextColor.YELLOW, true,
 					"Click to toggle. ", NamedTextColor.GRAY, 20), "texture", tag, mGuiTagsActive))
 			.onLeftClick(() -> {
-			// Page Flip:
-			mShowAllTrades = !mShowAllTrades;
-			mCurrentPage = 1;
-			playSound(mPlayer.getLocation(), SoundType.PAGE_FLIP);
-			update();
-		});
+				// Page Flip:
+				mShowAllTrades = !mShowAllTrades;
+				mCurrentPage = 1;
+				playSound(mPlayer.getLocation(), SoundType.PAGE_FLIP);
+				update();
+			});
 		// RP Support: gui identifiers.
 		setGuiIdentifiers();
 	}
@@ -570,9 +562,8 @@ public class CustomTradeGui extends Gui {
 		setItem(4, 3, backButton).onLeftClick(this::navToGeneralView);
 		// Confirm/Deny Button:
 		if (tradeReq.status() || tradeReq.isCreative()) {
-			setItem(4, 5, createConfirmButton(mSelectedTrade, recipe, tradeReq)).onLeftClick(() -> {
-				buyNow(mSelectedTrade, mSelectedTradeMultiplier);
-			});
+			setItem(4, 5, createConfirmButton(mSelectedTrade, recipe, tradeReq))
+				.onLeftClick(() -> buyNow(mSelectedTrade, mSelectedTradeMultiplier));
 		} else {
 			setItem(4, 5, createConfirmButton(mSelectedTrade, recipe, tradeReq));
 		}
@@ -583,8 +574,8 @@ public class CustomTradeGui extends Gui {
 
 	//region <NAVIGATION>
 	/*
-	* Overview: logic bundles for transferring between each state (see TABS overview).
-	* */
+	 * Overview: logic bundles for transferring between each state (see TABS overview).
+	 * */
 
 	private void navToConfirmView(TradeWindowOpenEvent.Trade trade) {
 		mSelectedTrade = trade;
@@ -602,8 +593,8 @@ public class CustomTradeGui extends Gui {
 
 	//region <ACTIONS>
 	/*
-	* Overview: logic bundles for common actions:
-	* */
+	 * Overview: logic bundles for common actions:
+	 * */
 	private void buyNow(@Nullable TradeWindowOpenEvent.Trade trade, int multiplier) {
 		if (trade == null) {
 			mPlayer.sendMessage("Something went wrong - if this keeps happening, please report it!");
@@ -805,8 +796,8 @@ public class CustomTradeGui extends Gui {
 
 	//region <SETUP_UTILS>
 	/*
-	* Overview: functions called during GUI setup.
-	* */
+	 * Overview: functions called during GUI setup.
+	 * */
 	private void organizeTrades() {
 		// Decide to display trades together or to organize into categories.
 		// Store the results in mDisplayTradeTypes and the contents of each mTrade List.
@@ -848,7 +839,7 @@ public class CustomTradeGui extends Gui {
 			// Priority for tab order is: WEAPON, ARMOR, OFFHAND, CHARM, MISC, according to the enum.
 			TradeType type = tradeTypes[i];
 			List<TradeWindowOpenEvent.Trade> tradeList = tradeTypeToMemberList(type);
-			if (tradeList.size() > 0) {
+			if (!tradeList.isEmpty()) {
 				mDisplayTradeTypes.add(type);
 			}
 		}
@@ -960,10 +951,10 @@ public class CustomTradeGui extends Gui {
 		tradeItemList.add(trade.getRecipe().getResult());
 		for (ItemStack tradeReq : tradeItemList) {
 			int itemAmount = tradeReq.getAmount();
-			int itemTradeMultipler = 64 / itemAmount;
-			if (itemTradeMultipler < maxTradeMultiplier) {
+			int itemTradeMultiplier = 64 / itemAmount;
+			if (itemTradeMultiplier < maxTradeMultiplier) {
 				// Take the min of all the itemTradeMultipliers.
-				maxTradeMultiplier = itemTradeMultipler;
+				maxTradeMultiplier = itemTradeMultiplier;
 			}
 		}
 		return maxTradeMultiplier;
@@ -1158,8 +1149,8 @@ public class CustomTradeGui extends Gui {
 
 	//region <OTHER_UTILS>
 	/*
-	* Overview: commonly used functions.
-	* */
+	 * Overview: commonly used functions.
+	 * */
 	private TradeType getTradeType(TradeWindowOpenEvent.Trade trade) {
 		// Grab recipe and output:
 		MerchantRecipe recipe = trade.getRecipe();

@@ -4,10 +4,10 @@ import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.effects.PercentHeal;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -149,7 +149,7 @@ public class SpellTectonicDevastation extends Spell {
 										}
 										//Once it leaves the arena, stop iterating
 										if ((l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
-											    || l.distance(mStartLoc) > 30) {
+											|| l.distance(mStartLoc) > 30) {
 											continue;
 										}
 										//Move up one block if on barrier or bedrock level
@@ -204,35 +204,20 @@ public class SpellTectonicDevastation extends Spell {
 					}
 
 					//Damage player by 40% hp in cone after warning is over (2 seconds) and knock player away
-					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
-						if (player.getLocation().distance(mStartLoc) > 30) {
-							continue;
-						}
-						player.removeScoreboardTag(TAG);
-
-						for (BoundingBox box : boxes) {
-							if (player.getBoundingBox().overlaps(box)) {
-								if (player.getScoreboardTags().contains(TAG)) {
-									continue;
-								} else {
-									DamageUtils.damage(mBoss, player, DamageType.MAGIC, 30, null, false, false, "Tectonic Devastation");
-									player.addScoreboardTag(TAG);
-									Bukkit.getScheduler().runTaskLater(mPlugin, () -> player.removeScoreboardTag(TAG), 100);
-								}
-								player.setVelocity(player.getVelocity().setY(1.0f));
-								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "Tectonic", new PercentHeal(6 * 20, -1.00));
-								player.sendActionBar(Component.text("You cannot heal for 6s", NamedTextColor.RED));
-								PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
-							}
-						}
+					Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+					for (Player player : hitbox.getHitPlayers(true)) {
+						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, 30, null, false, false, "Tectonic Devastation");
+						player.addScoreboardTag(TAG);
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> player.removeScoreboardTag(TAG), 100);
+						player.setVelocity(player.getVelocity().setY(1.0f));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "Tectonic", new PercentHeal(6 * 20, -1.00));
+						player.sendActionBar(Component.text("You cannot heal for 6s", NamedTextColor.RED));
+						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
 					}
-					for (LivingEntity le : EntityUtils.getNearbyMobs(mStartLoc, 40)) {
-						for (BoundingBox box : boxes) {
-							if (le.getBoundingBox().overlaps(box) && !EntityUtils.isBoss(le)) {
-								le.damage(12);
-								le.setVelocity(le.getVelocity().setY(1.0f));
-							}
-						}
+
+					for (LivingEntity le : hitbox.getHitMobs(mBoss)) {
+						le.damage(12);
+						le.setVelocity(le.getVelocity().setY(1.0f));
 					}
 				}
 			}

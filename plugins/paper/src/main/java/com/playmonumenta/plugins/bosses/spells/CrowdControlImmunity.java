@@ -5,7 +5,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class CrowdControlImmunity extends Spell {
 
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 
 	public CrowdControlImmunity(LivingEntity boss) {
 		this.mBoss = boss;

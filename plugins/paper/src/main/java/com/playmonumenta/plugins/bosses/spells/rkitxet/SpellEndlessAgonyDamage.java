@@ -15,12 +15,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class SpellEndlessAgonyDamage extends Spell {
-	private double RADIUS = SpellEndlessAgony.RADIUS;
+	private final double RADIUS = SpellEndlessAgony.RADIUS;
 	private static final double DAMAGE = 5;
 
-	private ThreadLocalRandom mRand = ThreadLocalRandom.current();
-	private RKitxet mRKitxet;
-	private LivingEntity mBoss;
+	private final ThreadLocalRandom mRand = ThreadLocalRandom.current();
+	private final RKitxet mRKitxet;
+	private final LivingEntity mBoss;
 	private int mTicks;
 
 	public SpellEndlessAgonyDamage(LivingEntity boss, RKitxet rKitxet) {
@@ -34,7 +34,7 @@ public class SpellEndlessAgonyDamage extends Spell {
 		//This function runs every 5 ticks
 		mTicks += 5;
 
-		List<Player> hitPlayers = new ArrayList<Player>();
+		List<Player> hitPlayers = new ArrayList<>();
 		for (Location loc : mRKitxet.mAgonyLocations) {
 			if (mTicks % 10 == 0) {
 				for (Player p : PlayerUtils.playersInCylinder(loc, RADIUS, RADIUS)) {

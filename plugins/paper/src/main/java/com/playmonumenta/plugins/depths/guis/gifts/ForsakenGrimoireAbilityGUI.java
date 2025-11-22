@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.gifts.ForsakenGrimoire;
+import com.playmonumenta.plugins.depths.abilities.prismatic.Convergence;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -35,8 +36,10 @@ public class ForsakenGrimoireAbilityGUI extends AbstractDepthsSelectionGUI<Depth
 		if (dp == null) {
 			return Collections.emptyList();
 		}
+		boolean convergence = dp.hasAbility(Convergence.ABILITY_NAME);
 		List<DepthsTrigger> usedTriggers = dp.mAbilities.keySet().stream()
 			.map(dm::getAbility).filter(Objects::nonNull)
+			.filter(info -> !(convergence && info.getDepthsTrigger() == DepthsTrigger.WILDCARD && info.getDepthsTree() != tree)) // If we have convergence, don't check wildcards from other trees
 			.map(DepthsAbilityInfo::getDepthsTrigger).filter(Objects::nonNull)
 			.toList();
 		return DepthsManager.getFilteredAbilities(List.of(tree)).stream()

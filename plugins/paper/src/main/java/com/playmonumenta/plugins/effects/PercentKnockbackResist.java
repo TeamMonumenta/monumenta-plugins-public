@@ -74,7 +74,7 @@ public class PercentKnockbackResist extends Effect {
 
 	@Override
 	public @Nullable Component getSpecificDisplay() {
-		return Component.text(StringUtils.to2DP(mAmount * 10) + " " + getDisplayedName());
+		return Component.text("+" + StringUtils.to2DP(mAmount * 10) + " " + getDisplayedName());
 	}
 
 	@Override

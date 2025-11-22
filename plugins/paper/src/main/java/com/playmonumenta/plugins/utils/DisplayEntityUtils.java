@@ -52,7 +52,7 @@ public class DisplayEntityUtils {
 						int appearDelay = FastUtils.randomIntInRange(0, 3) * 2 + currRadius;
 						double theta = FastUtils.randomDoubleInRange(0, Math.PI * 2);
 						double finalRadius = currRadius + FastUtils.randomDoubleInRange(-0.5, 0.5);
-						Location finalBlockLocation = center.clone().add(FastUtils.cos(theta) * finalRadius, 0, FastUtils.sin(theta) * finalRadius).toCenterLocation().add(0, -1.4, 0);
+						Location finalBlockLocation = center.clone().add(FastUtils.cos(theta) * finalRadius, 0, FastUtils.sin(theta) * finalRadius).toCenterLocation().add(0, -1.4, 0).setDirection(new Vector(1, 0, 0));
 						ArrayList<Location> blocksThisTick = mLocationDelays.computeIfAbsent(appearDelay, key -> new ArrayList<>());
 						if (!blocksThisTick.contains(finalBlockLocation)) {
 							blocksThisTick.add(finalBlockLocation);
@@ -62,13 +62,14 @@ public class DisplayEntityUtils {
 
 				if (mLocationDelays.containsKey(mTicks)) {
 					mLocationDelays.get(mTicks).forEach(l -> {
-						BlockDisplay blockDisplay = center.getWorld().spawn(l.clone().add(-0.5, -0.3, -0.5), BlockDisplay.class);
+						BlockDisplay blockDisplay = center.getWorld().spawn(l.clone().add(-0.5, -0.3, 0.5), BlockDisplay.class);
 						blockDisplay.setBlock(possibleMaterials.get(FastUtils.randomIntInRange(0, possibleMaterials.size() - 1)).createBlockData());
 						if (brightness != null) {
 							blockDisplay.setBrightness(new Display.Brightness(15, 15));
 						}
 						blockDisplay.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), new Vector3f(1.0f, 1.0f, 1.0f), new Quaternionf()));
 						blockDisplay.setInterpolationDuration(2);
+						EntityUtils.setRemoveEntityOnUnload(blockDisplay);
 						mAllDisplays.add(blockDisplay);
 
 						BukkitRunnable runnable = new BukkitRunnable() {
@@ -520,7 +521,7 @@ public class DisplayEntityUtils {
 	 * @param duration duration of the interpolation
 	 */
 	public static void rotateToPointAtLoc(Display display, Vector vec, int duration) {
-		rotateToPointAtLoc(display, vec, duration, -3*Math.PI/4.0f);
+		rotateToPointAtLoc(display, vec, duration, -3 * Math.PI / 4.0f);
 	}
 
 
@@ -559,7 +560,6 @@ public class DisplayEntityUtils {
 
 	// Ignore deprecation; API subject to change, but no replacement is provided at this time
 	// This is the only way I could silence IntelliJ and the reviewdog about Bukkit's decisions
-	@SuppressWarnings("deprecation")
 	public static void setTextDisplayBackgroundColor(TextDisplay textDisplay, Color backgroundColor) {
 		textDisplay.setBackgroundColor(backgroundColor);
 	}

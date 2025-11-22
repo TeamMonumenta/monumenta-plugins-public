@@ -30,14 +30,7 @@ public class IchorFlamecaller implements Infusion {
 	private static final double SPEED = 0.1;
 	private static final String EFFECT = "IchorFlameDamageEffect";
 	private static final String SPEED_EFFECT = "IchorFlameSpeedEffect";
-	private static final EnumSet<DamageEvent.DamageType> AFFECTED_PRISMATIC_DAMAGE_TYPES = EnumSet.of(
-		DamageEvent.DamageType.MELEE,
-		DamageEvent.DamageType.MELEE_ENCH,
-		DamageEvent.DamageType.MELEE_SKILL,
-		DamageEvent.DamageType.PROJECTILE,
-		DamageEvent.DamageType.PROJECTILE_SKILL,
-		DamageEvent.DamageType.MAGIC
-	);
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_PRISMATIC_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 	public static final String DESCRIPTION = String.format("Gain %s%% magic damage per mob on fire within %s blocks (%s%% cap) for %s seconds. Gain %s%% speed for %s seconds instead if there are none. Cooldown: %s seconds.",
 		StringUtils.multiplierToPercentage(MAGIC_DAMAGE_PER),
 		RANGE,
@@ -80,7 +73,9 @@ public class IchorFlamecaller implements Infusion {
 		if (fireCount > 0) {
 			int cappedFireCount = FastMath.min(fireCount, MOB_CAP);
 			double buffMultiplier = cappedFireCount * multiplier;
-			plugin.mEffectManager.addEffect(player, EFFECT, new PercentDamageDealt(adjustedDuration, MAGIC_DAMAGE_PER * buffMultiplier, isPrismatic ? AFFECTED_PRISMATIC_DAMAGE_TYPES : EnumSet.of(DamageEvent.DamageType.MAGIC)));
+			plugin.mEffectManager.addEffect(player, EFFECT,
+				new PercentDamageDealt(adjustedDuration, MAGIC_DAMAGE_PER * buffMultiplier)
+					.damageTypes(isPrismatic ? AFFECTED_PRISMATIC_DAMAGE_TYPES : EnumSet.of(DamageEvent.DamageType.MAGIC)));
 
 			player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.9f + 0.05f * cappedFireCount);
 			player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.65f + 0.04f * cappedFireCount);

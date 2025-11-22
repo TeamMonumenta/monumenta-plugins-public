@@ -27,7 +27,8 @@ public class Starvation implements Enchantment {
 		return EnchantmentType.STARVATION;
 	}
 
-	@Override public EnumSet<Slot> getSlots() {
+	@Override
+	public EnumSet<Slot> getSlots() {
 		return EnumSet.of(Slot.MAINHAND, Slot.OFFHAND);
 	}
 

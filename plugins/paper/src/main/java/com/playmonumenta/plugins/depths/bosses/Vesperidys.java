@@ -28,6 +28,7 @@ import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -46,7 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -68,11 +68,13 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.Nullable;
 
 public class Vesperidys extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_vesperidys";
@@ -81,7 +83,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 	public static final String bossName = "Vesperidys";
 
 	public static final String MUSIC_TITLE_AMBIENT = "epic:music.vesperidys_ambient";
-	public static final int MUSIC_DURATION_AMBIENT = 1 * 60 + 27;
+	public static final int MUSIC_DURATION_AMBIENT = 60 + 27;
 	public static final String MUSIC_TITLE = "epic:music.vesperidys_phase1";
 	public static final int MUSIC_DURATION = 6 * 60 + 4; // seconds
 	public static final String MUSIC_TITLE_2 = "epic:music.vesperidys_phase2";
@@ -313,12 +315,12 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 				new SpellPlatformWave(plugin, boss, this, 2, 40),
 				new SpellBreakPlatform(mMonuPlugin, boss, this, 5 * 20, 4),
 				new SpellVesperidysFeintParticleBeam(plugin, boss, this, 5, 30, 2)
-				));
+			));
 			phase2ActivesList.addAll(List.of(
 				new SpellPlatformWave(plugin, boss, this, 2, 40),
 				new SpellBreakPlatform(mMonuPlugin, boss, this, 5 * 20, 4),
 				new SpellVesperidysFeintParticleBeam(plugin, boss, this, 5, 30, 2)
-				));
+			));
 			phase3ActivesList.addAll(List.of(
 				new SpellPlatformWave(plugin, boss, this, 2, 40),
 				new SpellBreakPlatform(mMonuPlugin, boss, this, 5 * 20, 6),
@@ -369,10 +371,10 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			forceCastSpell(SpellVesperidysDarkHole.class);
 
 			TextComponent[] dio = new TextComponent[]{
-				obfuscate("You have no place among the stars.", 0, NamedTextColor.DARK_AQUA),
-				obfuscate("You have no place upon the dirt.", 0, NamedTextColor.DARK_AQUA),
-				obfuscate("How DARE you separate us from the Ventricles!", 0, NamedTextColor.DARK_AQUA),
-				obfuscate("HOW DARE YOU SEPARATE US!!", 0, NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD)
+				Component.text("You have no place among the stars.", NamedTextColor.DARK_AQUA),
+				Component.text("You have no place upon the dirt.", NamedTextColor.DARK_AQUA),
+				Component.text("How DARE you separate us from the Ventricles!", NamedTextColor.DARK_AQUA),
+				Component.text("HOW DARE YOU SEPARATE US!!", NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD)
 			};
 			int[] dioDelay = {0, 3 * 20, 6 * 20, 9 * 20};
 			int[] sounds = {2, 3, 5, 6};
@@ -396,10 +398,10 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			realityDistortion(false);
 
 			TextComponent[] dio = new TextComponent[]{
-				obfuscate("Still you try. Oh how foolish.", 0, NamedTextColor.DARK_AQUA),
-				obfuscate("We are beyond reckoning. You should know this truth.", 0, NamedTextColor.DARK_AQUA),
-				obfuscate("There is so much of us you still cannot hope to defeat.", 0, NamedTextColor.DARK_AQUA),
-				};
+				Component.text("Still you try. Oh how foolish.", NamedTextColor.DARK_AQUA),
+				Component.text("We are beyond reckoning. You should know this truth.", NamedTextColor.DARK_AQUA),
+				Component.text("There is so much of us you still cannot hope to defeat.", NamedTextColor.DARK_AQUA),
+			};
 			int[] dioDelay = {0, 3 * 20, 6 * 20};
 			int[] sounds = {0, 4, 5};
 			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
@@ -427,9 +429,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			forceCastSpell(SpellVesperidysDarkHole.class);
 
 			TextComponent[] dio = new TextComponent[]{
-				obfuscate("When we are done with you we shall feast upon the bones of this world!", 0, NamedTextColor.DARK_AQUA),
-				obfuscate("There is no hope left!", 0, NamedTextColor.DARK_AQUA),
-				obfuscate("THERE. IS. NO. HOPE!!", 0, NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD)
+				Component.text("When we are done with you we shall feast upon the bones of this world!", NamedTextColor.DARK_AQUA),
+				Component.text("There is no hope left!", NamedTextColor.DARK_AQUA),
+				Component.text("THERE. IS. NO. HOPE!!", NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD)
 			};
 			int[] dioDelay = {0, 3 * 20, 6 * 20};
 			int[] sounds = {1, 3, 6};
@@ -453,11 +455,11 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			mSpellCooldowns -= 10;
 			mPhase = 4;
 
-			TextComponent[] dio = new TextComponent[] {
-				obfuscate("Our blood will soil your prison for all eternity foolish dirtspawn.", 0, NamedTextColor.DARK_AQUA),
-				obfuscate("My death will unleash the monster your silverspawn has trapped here.", 0, NamedTextColor.DARK_AQUA),
-				obfuscate("No one will leave this prison the same.", 0, NamedTextColor.DARK_AQUA),
-				};
+			TextComponent[] dio = new TextComponent[]{
+				Component.text("Our blood will soil your prison for all eternity foolish dirtspawn.", NamedTextColor.DARK_AQUA),
+				Component.text("My death will unleash the monster your silverspawn has trapped here.", NamedTextColor.DARK_AQUA),
+				Component.text("No one will leave this prison the same.", NamedTextColor.DARK_AQUA),
+			};
 			int[] dioDelay = {0, 3 * 20, 6 * 20};
 			int[] sounds = {2, 5, 1};
 			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
@@ -474,10 +476,10 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			changePhase(mDarkHoleActive, mPhase4Passives, null);
 		});
 		events.put(10, (mBoss) -> {
-			TextComponent[] dio = new TextComponent[] {
-				obfuscate("My blood will leave you a servant of the others above!", 0, NamedTextColor.DARK_AQUA),
-				obfuscate("You will be ours!", 0, NamedTextColor.DARK_AQUA),
-				obfuscate("YOU. WILL. BE. OURS!!", 0, NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD)
+			TextComponent[] dio = new TextComponent[]{
+				Component.text("My blood will leave you a servant of the others above!", NamedTextColor.DARK_AQUA),
+				Component.text("You will be ours!", NamedTextColor.DARK_AQUA),
+				Component.text("YOU. WILL. BE. OURS!!", NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD)
 			};
 			int[] dioDelay = {0, 3 * 20, 6 * 20};
 			int[] sounds = {3, 0, 6};
@@ -511,7 +513,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		mBoss.setCollidable(false);
 		mBoss.setGlowing(false);
 		mBoss.setAI(false);
-		mBoss.getEquipment().clear();
+		Objects.requireNonNull(mBoss.getEquipment()).clear();
 		mBoss.setGravity(false);
 
 		mBoss.teleport(mSpawnLoc.clone().add(0, 4, 0));
@@ -521,9 +523,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		}
 
 		TextComponent[] dio = new TextComponent[]{
-			obfuscate("Yet still does the filthy dirtspawn limps in.", 0, NamedTextColor.DARK_AQUA),
-			obfuscate("We are The Vesperidys.", 0, NamedTextColor.DARK_AQUA),
-			obfuscate("We shall punish your insolence.", 0, NamedTextColor.DARK_AQUA),
+			Component.text("Yet still does the filthy dirtspawn limps in.", NamedTextColor.DARK_AQUA),
+			Component.text("We are The Vesperidys.", NamedTextColor.DARK_AQUA),
+			Component.text("We shall punish your insolence.", NamedTextColor.DARK_AQUA),
 		};
 		int[] dioDelay = {20, 4 * 20, 7 * 20};
 		int[] sounds = {0, 1, 6};
@@ -538,12 +540,13 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 				//launch event related spawn commands
 				if (mTicks >= 5 * 20 + 10) {
 					mBoss.setInvisible(false);
-					mBoss.getEquipment().setHelmet(mTeleportSpell.mHelmet, true);
-					mBoss.getEquipment().setChestplate(mTeleportSpell.mChestplate, true);
-					mBoss.getEquipment().setLeggings(mTeleportSpell.mLeggings, true);
-					mBoss.getEquipment().setBoots(mTeleportSpell.mBoots, true);
-					mBoss.getEquipment().setItemInMainHand(mTeleportSpell.mMainhand, true);
-					mBoss.getEquipment().setItemInOffHand(mTeleportSpell.mOffhand, true);
+					final EntityEquipment equips = Objects.requireNonNull(mBoss.getEquipment());
+					equips.setHelmet(mTeleportSpell.mHelmet, true);
+					equips.setChestplate(mTeleportSpell.mChestplate, true);
+					equips.setLeggings(mTeleportSpell.mLeggings, true);
+					equips.setBoots(mTeleportSpell.mBoots, true);
+					equips.setItemInMainHand(mTeleportSpell.mMainhand, true);
+					equips.setItemInOffHand(mTeleportSpell.mOffhand, true);
 
 					new PartialParticle(Particle.FLASH, mBoss.getLocation().add(0, 1.5, 0))
 						.spawnAsBoss();
@@ -593,7 +596,8 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 							MessagingUtils.sendBoldTitle(player, Component.text("The " + bossName, NamedTextColor.DARK_RED), Component.text("The Abyssal Overmind", NamedTextColor.DARK_RED));
 							player.playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 2f, 1f);
-							mMonuPlugin.mEffectManager.addEffect(player, "VesperidysVoidCorruption", new VoidCorruption(Integer.MAX_VALUE, mMonuPlugin, Vesperidys.this, mBoss, Math.min(50, corruptionEqulibrium())));
+							mMonuPlugin.mEffectManager.addEffect(player, "VesperidysVoidCorruption",
+								new VoidCorruption(Integer.MAX_VALUE, mMonuPlugin, Vesperidys.this, mBoss, Math.min(50, corruptionEqulibrium())));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0));
 						}
 					}, dioDelay[2]);
@@ -622,13 +626,13 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 						Location pLoc = LocationUtils.getEntityCenter(mBoss).clone().add(x, y, z);
 
 						if (FastUtils.randomIntInRange(0, 2) == 0 && mTicks > 3 * 20) {
-							new PartialParticle(Particle.SOUL_FIRE_FLAME, pLoc, 1, -x/r, -y/r, -z/r)
+							new PartialParticle(Particle.SOUL_FIRE_FLAME, pLoc, 1, -x / r, -y / r, -z / r)
 								.directionalMode(true)
 								.extra(0.1)
 								.spawnAsBoss();
 						} else {
 							int shade = FastUtils.randomIntInRange(150, 255);
-							new PartialParticle(Particle.REDSTONE, pLoc, 1, -x/r, -y/r, -z/r, new Particle.DustOptions(Color.fromRGB(shade, shade, shade), 1.0f))
+							new PartialParticle(Particle.REDSTONE, pLoc, 1, -x / r, -y / r, -z / r, new Particle.DustOptions(Color.fromRGB(shade, shade, shade), 1.0f))
 								.directionalMode(true)
 								.extra(0.1)
 								.spawnAsBoss();
@@ -650,8 +654,6 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 		}.runTaskTimer(mMonuPlugin, 0, 1);
 	}
-
-
 
 	@Override
 	public void onHurt(DamageEvent event) {
@@ -729,8 +731,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 								break;
 							}
 						} catch (Exception e) {
-							MMLog.warning("Exception for depths on Vesperidys Earthbound Check", e);
-							e.printStackTrace();
+							MMLog.warning("[Vesperidys] Ran into an exception in onHurt Earth Crystal check: ", e);
 						}
 					}
 				}
@@ -745,20 +746,20 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		}
 		mDefeated = true;
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		if (players.size() == 0) {
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true, true);
+		if (players.isEmpty()) {
 			return;
 		}
 
 		BossUtils.endBossFightEffects(mBoss, players, 20 * 40, true, true);
 
-		TextComponent[] dio = new TextComponent[] {
-			obfuscate("You will be devoured by the vessels still above.", 0, NamedTextColor.DARK_AQUA),
-			obfuscate("Pikkxys will feast on the core of the earth. Hypollotye will drink the seas from their basins!", 0, NamedTextColor.DARK_AQUA),
-			obfuscate("Together, they all will leave this vile place a shell for others to graze upon!", 0, NamedTextColor.DARK_AQUA),
-			obfuscate("I will NOT be scattered for nothing!", 0, NamedTextColor.DARK_AQUA),
-			obfuscate("I WILL... ", 0, NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD),
-			obfuscate("NOT... ", 0, NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD)
+		TextComponent[] dio = new TextComponent[]{
+			Component.text("You will be devoured by the vessels still above.", NamedTextColor.DARK_AQUA),
+			Component.text("Pikkxys will feast on the core of the earth. Hypollotye will drink the seas from their basins!", NamedTextColor.DARK_AQUA),
+			Component.text("Together, they all will leave this vile place a shell for others to graze upon!", NamedTextColor.DARK_AQUA),
+			Component.text("I will NOT be scattered for nothing!", NamedTextColor.DARK_AQUA),
+			Component.text("I WILL... ", NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD),
+			Component.text("NOT... ", NamedTextColor.DARK_AQUA).decorate(TextDecoration.BOLD)
 		};
 		int[] sounds = {0, 1, 2, 3, 6, 7};
 
@@ -948,7 +949,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 	}
 
 	public void realityDistortion(boolean finalPhase) {
-		ChargeUpManager chargeUp = new ChargeUpManager(mBoss, REALITY_DISTORTION_TICKS, Component.text("Casting", NamedTextColor.GREEN).append(Component.text(" Reality Distortion...", NamedTextColor.DARK_RED, TextDecoration.BOLD)), BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 100);
+		ChargeUpManager chargeUp = new ChargeUpManager(mBoss, REALITY_DISTORTION_TICKS, Component.text("Casting", NamedTextColor.GREEN)
+			.append(Component.text(" Reality Distortion...", NamedTextColor.DARK_RED, TextDecoration.BOLD)),
+			BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 100);
 		mTeleportSpell.teleportPlatform(0, 0);
 
 		List<Player> hitPlayers = new ArrayList<>();
@@ -1028,7 +1031,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			@Override
 			public void run() {
 				if (chargeUp.nextTick(1)) {
-					for (Platform platform: platformHit) {
+					for (Platform platform : platformHit) {
 						for (Player player : platform.getPlayersOnPlatform()) {
 							if (!hitPlayers.contains(player)) {
 								hitPlayers.add(player);
@@ -1384,7 +1387,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		}
 
 		public @Nullable List<Platform> getPlatformColumn(int y) {
-			if (mPlatformHashMap.size() > 0) {
+			if (!mPlatformHashMap.isEmpty()) {
 				List<Platform> platformList = new ArrayList<>();
 				for (HashMap<Integer, Platform> innerMap : mPlatformHashMap.values()) {
 					if (innerMap.containsKey(y)) {
@@ -1401,7 +1404,7 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		public @Nullable Platform getPlatformNearestToEntity(LivingEntity livingEntity) {
 			double minDistance = Double.POSITIVE_INFINITY;
 			Platform closestPlatform = null;
-			if (mPlatformHashMap.size() > 0) {
+			if (!mPlatformHashMap.isEmpty()) {
 				for (HashMap<Integer, Platform> innerMap : mPlatformHashMap.values()) {
 					for (Platform platform : innerMap.values()) {
 						if (platform.getCenter().distance(livingEntity.getLocation()) < minDistance && !platform.mBroken) {
@@ -1461,35 +1464,14 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 		}
 	}
 
-	public void dealPercentageAndCorruptionDamage(Player player, double percentDamage, String cause) {
-		BossUtils.bossDamagePercent(mBoss, player, DepthsParty.getAscensionScaledDamage(percentDamage * crystalDamageMultiplier(), mParty), cause, false);
+	public void dealPercentageAndCorruptionDamage(final Player player, final double percentDamage, final String cause) {
+		// Ascension scaling and the crystal mult are added by the onDamage method
+		final double damageAmount = EntityUtils.getMaxHealth(player) * percentDamage;
+		DamageUtils.damage(mBoss, player, new DamageEvent.Metadata(DamageEvent.DamageType.TRUE, null,
+			null, cause), damageAmount, true, false, false);
 		if (mMonuPlugin.mEffectManager.hasEffect(player, VoidCorruption.class)) {
 			mMonuPlugin.mEffectManager.getEffects(player, VoidCorruption.class).last().addCorruption(Math.max(1, (int) Math.round(percentDamage * 10 * 5)));
 		}
-	}
-
-	public void dealCorruptionDamage(Player player, int corruptionAmount) {
-		if (mMonuPlugin.mEffectManager.hasEffect(player, VoidCorruption.class)) {
-			mMonuPlugin.mEffectManager.getEffects(player, VoidCorruption.class).last().addCorruption(Math.max(1, corruptionAmount));
-		}
-	}
-
-	private TextComponent obfuscate(String s, int num, NamedTextColor color) {
-		TextComponent result = Component.text("");
-		char[] chars = s.toCharArray();
-		int length = chars.length;
-		List<Integer> places = new ArrayList<>();
-		for (int i = 0; i < num; i++) {
-			places.add(FastUtils.RANDOM.nextInt(length));
-		}
-		for (int i = 0; i < length; i++) {
-			if (chars[i] != ' ' && places.contains(i)) {
-				result = result.append(Component.text(chars[i], color, TextDecoration.OBFUSCATED));
-			} else {
-				result = result.append(Component.text(chars[i], color));
-			}
-		}
-		return result;
 	}
 
 	public int corruptionEqulibrium() {

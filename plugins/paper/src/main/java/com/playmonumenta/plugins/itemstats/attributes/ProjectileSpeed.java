@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemstats.attributes;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Attribute;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -24,7 +25,7 @@ public class ProjectileSpeed implements Attribute {
 
 	@Override
 	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile proj) {
-		if (value != 1) {
+		if (value != 1 && !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.MASK_GEAR_PROJECTILE_SPEED)) {
 			proj.setMetadata(SPEED_METAKEY, new FixedMetadataValue(plugin, value));
 			proj.setVelocity(proj.getVelocity().multiply(value));
 		}

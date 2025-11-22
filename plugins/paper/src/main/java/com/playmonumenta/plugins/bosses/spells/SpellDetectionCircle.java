@@ -73,7 +73,7 @@ public class SpellDetectionCircle extends Spell {
 
 				for (Player player : mCenter.getWorld().getPlayers()) {
 					if (player.getLocation().distance(mCenter) < mRadius &&
-						    (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE)) {
+						(player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE)) {
 						mTarget.getBlock().setType(Material.REDSTONE_BLOCK);
 						this.cancel();
 						break;

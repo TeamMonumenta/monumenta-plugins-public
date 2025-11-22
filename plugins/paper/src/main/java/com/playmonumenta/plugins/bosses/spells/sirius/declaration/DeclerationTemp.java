@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 
 public class DeclerationTemp extends Spell {
-	private Sirius mSirius;
+	private final Sirius mSirius;
 
 	public DeclerationTemp(Sirius sirius) {
 		mSirius = sirius;

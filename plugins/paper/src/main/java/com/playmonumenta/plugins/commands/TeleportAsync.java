@@ -94,7 +94,7 @@ public class TeleportAsync extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				return teleportFacing(sender, args.getUnchecked("function"), (Collection<Entity>) args.get("targets"), args.getUnchecked("location"), (Entity) args.getUnchecked("facingEntity"));
+				return teleportFacing(sender, args.getUnchecked("function"), args.getUnchecked("targets"), args.getUnchecked("location"), (Entity) args.getUnchecked("facingEntity"));
 			})
 			.register();
 		// TODO facing anchors not currently supported by CommandAPI, no support here.
@@ -109,7 +109,7 @@ public class TeleportAsync extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				return teleportFacing(sender, args.getUnchecked("function"), (Collection<Entity>) args.get("targets"), args.getUnchecked("location"), (Location) args.getUnchecked("facingLocation"));
+				return teleportFacing(sender, args.getUnchecked("function"), args.getUnchecked("targets"), args.getUnchecked("location"), (Location) args.getUnchecked("facingLocation"));
 			})
 			.register();
 
@@ -201,7 +201,7 @@ public class TeleportAsync extends GenericCommand {
 			return false;
 		});
 
-		sender.sendMessage("Teleporting " + entity.getName() + " to " + adjustedDst.getX() + " " + adjustedDst.getY() + " " + adjustedDst.getZ() + ", yaw/pitch " + Float.toString(adjustedDst.getYaw()) + " " + Float.toString(adjustedDst.getPitch()));
+		sender.sendMessage("Teleporting " + entity.getName() + " to " + adjustedDst.getX() + " " + adjustedDst.getY() + " " + adjustedDst.getZ() + ", yaw/pitch " + adjustedDst.getYaw() + " " + adjustedDst.getPitch());
 		return 1;
 	}
 

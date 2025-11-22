@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
+import com.playmonumenta.plugins.depths.abilities.prismatic.Convergence;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -228,7 +229,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		}
 
 		// Make sure player doesn't already have an ability with the same trigger
-		if (mDepthsTrigger != DepthsTrigger.PASSIVE) {
+		if (mDepthsTrigger != DepthsTrigger.PASSIVE && (mDepthsTrigger != DepthsTrigger.WILDCARD || !Convergence.canGainWildcards(player))) {
 			for (DepthsAbilityInfo<?> ability : DepthsManager.getAbilities()) {
 				// Iterate over abilities and return false if the player has an ability with the same trigger already
 				if (ability.getDepthsTrigger() == mDepthsTrigger && dp.hasAbility(ability.getDisplayName())) {
@@ -238,7 +239,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		}
 
 		//Skip passive abilities if they have wand aspect charges
-		if (dp.mWandAspectCharges > 0 && mDepthsTrigger == DepthsTrigger.PASSIVE && mDepthsTree != DepthsTree.PRISMATIC && mDepthsTree != DepthsTree.CURSE) {
+		if (dp.mActiveSelectionsRemaining > 0 && mDepthsTrigger == DepthsTrigger.PASSIVE && mDepthsTree != DepthsTree.PRISMATIC && mDepthsTree != DepthsTree.CURSE) {
 			return false;
 		}
 
@@ -269,7 +270,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	 * @param oldRarity         the rarity the player already has/had in this ability (0 to not include)
 	 * @param preIncreaseRarity the rarity before it was increased by abilities such as Enlightenment (0 to not include)
 	 * @param useAbility        whether to use current ability data in the description
-	 * @return                  the item to display
+	 * @return the item to display
 	 */
 	public @Nullable DepthsAbilityItem getAbilityItem(int rarity, @Nullable Player player, int oldRarity, int preIncreaseRarity, boolean useAbility) {
 		if (rarity <= 0) {
@@ -309,6 +310,9 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 				lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity, oldRarity, preIncreaseRarity));
 			} else {
 				lore.add(mDepthsTree.getNameComponent());
+			}
+			if (mDepthsTrigger != DepthsTrigger.PASSIVE) {
+				lore.add(Component.text(mDepthsTrigger.mName + " Slot", NamedTextColor.DARK_GRAY));
 			}
 			meta.lore(lore);
 		}

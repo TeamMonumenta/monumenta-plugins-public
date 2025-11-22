@@ -31,8 +31,8 @@ public class Quake implements Enchantment {
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
-	private static final String MELEE_DAMAGE_DEALT_METADATA = "QuakeMeleeDamageDealt";
-	private static final String MELEED_THIS_TICK_METADATA = "QuakeMeleeThisTick";
+	private static final String DAMAGE_DEALT_METADATA = "QuakeDamageDealt";
+	private static final String DAMAGED_THIS_TICK_METADATA = "QuakeThisTick";
 
 	@Override
 	public String getName() {
@@ -41,7 +41,7 @@ public class Quake implements Enchantment {
 
 	@Override
 	public EnumSet<Slot> getSlots() {
-		return EnumSet.of(Slot.MAINHAND);
+		return EnumSet.of(Slot.MAINHAND, Slot.PROJECTILE);
 	}
 
 	// After all damage multipliers for the onDamage() storage portion. onKill() should not have any ordering issues
@@ -62,13 +62,13 @@ public class Quake implements Enchantment {
 			double damage;
 			if (e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
 				damage = e.getDamage();
-			} else if (MetadataUtils.happenedThisTick(target, MELEED_THIS_TICK_METADATA) && target.hasMetadata(MELEE_DAMAGE_DEALT_METADATA)) {
-				damage = target.getMetadata(MELEE_DAMAGE_DEALT_METADATA).get(0).asDouble();
+			} else if (MetadataUtils.happenedThisTick(target, DAMAGED_THIS_TICK_METADATA) && target.hasMetadata(DAMAGE_DEALT_METADATA)) {
+				damage = target.getMetadata(DAMAGE_DEALT_METADATA).get(0).asDouble();
 			} else {
 				return;
 			}
 
-			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(target.getLocation(), RADIUS);
+			List<LivingEntity> mobs = EntityUtils.getNearbyMobsInSphere(target.getLocation(), RADIUS, player);
 
 			//Get enchant levels on weapon
 			int fire = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.FIRE_ASPECT);
@@ -116,13 +116,13 @@ public class Quake implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
-			//Store the highest melee damage dealt with a quake weapon this tick
+		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE) {
+			//Store the highest damage dealt with a quake weapon this tick
 			double damage = event.getDamage();
-			if (MetadataUtils.checkOnceThisTick(plugin, enemy, MELEED_THIS_TICK_METADATA) && enemy.hasMetadata(MELEE_DAMAGE_DEALT_METADATA) && enemy.getMetadata(MELEE_DAMAGE_DEALT_METADATA).get(0).asDouble() > damage) {
+			if (MetadataUtils.checkOnceThisTick(plugin, enemy, DAMAGED_THIS_TICK_METADATA) && enemy.hasMetadata(DAMAGE_DEALT_METADATA) && enemy.getMetadata(DAMAGE_DEALT_METADATA).get(0).asDouble() > damage) {
 				return;
 			}
-			enemy.setMetadata(MELEE_DAMAGE_DEALT_METADATA, new FixedMetadataValue(plugin, damage));
+			enemy.setMetadata(DAMAGE_DEALT_METADATA, new FixedMetadataValue(plugin, damage));
 		}
 	}
 }

@@ -465,9 +465,9 @@ public class Samwell extends BossAbilityGroup {
 		FireworkMeta fm = firework.getFireworkMeta();
 
 		fm.addEffect(FireworkEffect.builder()
-			             .with(FireworkEffect.Type.BALL_LARGE)
-			             .withColor(Color.RED)
-			             .build());
+			.with(FireworkEffect.Type.BALL_LARGE)
+			.withColor(Color.RED)
+			.build());
 
 		fm.setPower(0);
 		firework.setFireworkMeta(fm);
@@ -536,7 +536,7 @@ public class Samwell extends BossAbilityGroup {
 
 		BossUtils.endBossFightEffects(mBoss, players, 20 * 25, true, true);
 
-		String[] dio = new String[] {
+		String[] dio = new String[]{
 			"I... I shouldn't have ever left the Valley...",
 			"None of this was worth it... None of it...",
 			"Listening to you... was the biggest mistake... I ever...",
@@ -633,7 +633,7 @@ public class Samwell extends BossAbilityGroup {
 		for (LivingEntity e : livingEntities) {
 			Set<String> tags = e.getScoreboardTags();
 			if (tags.contains(BlueStrikeTargetNPCBoss.identityTag)
-				    || tags.contains(BlueStrikeTurretBoss.identityTag)) {
+				|| tags.contains(BlueStrikeTurretBoss.identityTag)) {
 				e.setHealth(0);
 			}
 		}

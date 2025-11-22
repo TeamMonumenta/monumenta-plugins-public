@@ -33,7 +33,7 @@ public class GalleryMobRisingBoss extends BossAbilityGroup {
 		public int MOB_NUMBER = 0;
 		public float DEPTH = 2.5f;
 
-		public LoSPool MOB_POOL = LoSPool.EMPTY;
+		public LoSPool MOB_POOL = LoSPool.LibraryPool.EMPTY;
 
 		public EntityTargets TARGETS = EntityTargets.GENERIC_SELF_TARGET;
 
@@ -46,7 +46,7 @@ public class GalleryMobRisingBoss extends BossAbilityGroup {
 		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		GalleryGame game = GalleryUtils.getGame(boss.getLocation());
-		if (p.MOB_POOL != LoSPool.EMPTY && game != null) {
+		if (p.MOB_POOL != LoSPool.LibraryPool.EMPTY && game != null) {
 			Spell spell = new SpellBaseSummon(
 				plugin,
 				boss,

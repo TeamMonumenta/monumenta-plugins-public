@@ -36,7 +36,7 @@ public class ShiningStar extends Spell {
 	private static final boolean SINGLE_TARGET = true;
 	private static final boolean LAUNCH_TRACKING = false;
 	private static final int COOLDOWN = 20 * 8;
-	private static final int DELAY = 20 * 1;
+	private static final int DELAY = 20;
 	private static final double SPEED = 0.8;
 	private static final double TURN_RADIUS = 0;
 	private static final int DISTANCE = 32;
@@ -52,31 +52,31 @@ public class ShiningStar extends Spell {
 		mPlugin = plugin;
 
 		mMissile = new SpellBaseSeekingProjectile(plugin, boss, SnowSpirit.detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
-				// Initiate Aesthetic
-				(World world, Location loc, int ticks) -> {
-					GlowingManager.startGlowing(mBoss, COLOR, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
-				},
-				// Launch Aesthetic
-				(World world, Location loc, int ticks) -> {
-					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1f, 0.5f);
-					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 0f);
-				},
-				// Projectile Aesthetic
-				(World world, Location loc, int ticks) -> {
-					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.05, 0.05, 0.05, 0.025).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.CRIT_MAGIC, loc, 5, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.DOLPHIN, loc, 3, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
-				},
-				// Hit Action
-				(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
-					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 0.5f, 1.5f);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
-					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
-					if (player != null) {
-						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Shining Star", prevLoc);
-					}
-				});
+			SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
+			// Initiate Aesthetic
+			(World world, Location loc, int ticks) -> {
+				GlowingManager.startGlowing(mBoss, COLOR, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
+			},
+			// Launch Aesthetic
+			(World world, Location loc, int ticks) -> {
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 0f);
+			},
+			// Projectile Aesthetic
+			(World world, Location loc, int ticks) -> {
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.05, 0.05, 0.05, 0.025).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.CRIT_MAGIC, loc, 5, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.DOLPHIN, loc, 3, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
+			},
+			// Hit Action
+			(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 0.5f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
+				if (player != null) {
+					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Shining Star", prevLoc);
+				}
+			});
 	}
 
 	@Override

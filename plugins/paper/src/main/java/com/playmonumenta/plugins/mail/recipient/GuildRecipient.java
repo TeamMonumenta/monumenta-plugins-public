@@ -140,6 +140,7 @@ public class GuildRecipient implements Recipient {
 
 	/**
 	 * Creates a guild recipient; this should only be used by the GuildArguments LuckPerms listener
+	 *
 	 * @param guildId The numeric guild plot ID for the guild
 	 * @param guild   The guild's root group
 	 */
@@ -186,6 +187,7 @@ public class GuildRecipient implements Recipient {
 
 	/**
 	 * This should only be used by the GuildArguments LuckPerms listener to update existing recipients it manages
+	 *
 	 * @param guildRoot The updated guild group, if it exists
 	 */
 	public void updateGuildRoot(@Nullable Group guildRoot) {
@@ -193,6 +195,9 @@ public class GuildRecipient implements Recipient {
 	}
 
 	public @Nullable Group getGuildRoot() {
+		if (mGuildRoot == null) {
+			mGuildRoot = LuckPermsIntegration.getLoadedGuildByPlotId(mGuildId);
+		}
 		return mGuildRoot;
 	}
 
@@ -226,7 +231,9 @@ public class GuildRecipient implements Recipient {
 
 	@Override
 	public String friendlyStr(MailDirection mailDirection) {
-		if (mGuildRoot == null) {
+		Group guildRoot = getGuildRoot();
+
+		if (guildRoot == null) {
 			if (mGuildId == DUMMY_ID_NOT_LOADED) {
 				return mailDirection.title() + "Guild Not Loaded";
 			} else if (mGuildId == DUMMY_ID_NO_GUILD) {
@@ -240,25 +247,28 @@ public class GuildRecipient implements Recipient {
 			return mailDirection.title() + "Guild #" + mGuildId;
 		}
 
-		return mailDirection.title() + LuckPermsIntegration.getNonNullGuildName(mGuildRoot);
+		return mailDirection.title() + LuckPermsIntegration.getNonNullGuildName(guildRoot);
 	}
 
 	@Override
 	public Component friendlyComponent(MailDirection mailDirection) {
+		Group guildRoot = getGuildRoot();
+
 		Component root = Component.text(mailDirection.title())
 			.decoration(TextDecoration.ITALIC, false);
-		if (mGuildRoot == null) {
+
+		if (guildRoot == null) {
 			return root
 				.append(Component.text(friendlyStr(MailDirection.DEFAULT), NamedTextColor.GOLD, TextDecoration.BOLD));
 		}
 
 		return root
-			.append(LuckPermsIntegration.getGuildFullComponent(mGuildRoot));
+			.append(LuckPermsIntegration.getGuildFullComponent(guildRoot));
 	}
 
 	@Override
 	public ItemStack icon(MailDirection mailDirection) {
-		ItemStack item = LuckPermsIntegration.getGuildBanner(mGuildRoot);
+		ItemStack item = LuckPermsIntegration.getGuildBanner(getGuildRoot());
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(friendlyComponent(mailDirection));
 		meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
@@ -267,22 +277,26 @@ public class GuildRecipient implements Recipient {
 	}
 
 	@Override
-	public boolean nonMemberCheck(Player viewer) {
-		if (mGuildRoot == null) {
+	public boolean nonMemberCheck(Player viewer, GuildPermission guildPermission) {
+		Group guildRoot = getGuildRoot();
+
+		if (guildRoot == null) {
 			return true;
 		}
 
 		User user = LuckPermsIntegration.getUser(viewer);
-		return !GuildPermission.MAIL.hasAccess(mGuildRoot, user);
+		return !guildPermission.hasAccess(guildRoot, user);
 	}
 
 	@Override
 	public void lockedCheck(Player viewer) throws NoMailAccessException {
-		if (mGuildRoot == null) {
+		Group guildRoot = getGuildRoot();
+
+		if (guildRoot == null) {
 			return;
 		}
 
-		if (LuckPermsIntegration.isLocked(mGuildRoot)) {
+		if (LuckPermsIntegration.isLocked(guildRoot)) {
 			NoMailAccessException ex = new NoMailAccessException(friendlyStr(MailDirection.DEFAULT) + " is currently on lockdown");
 			ex.closeGui(false);
 			throw ex;

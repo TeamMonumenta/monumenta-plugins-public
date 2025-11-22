@@ -12,6 +12,7 @@ public class Vengeance {
 	private static final int PERCENT_CHANCE_PER_LEVEL = 3;
 
 	public static final String DESCRIPTION = "Non elite/boss mobs become avengers.";
+	public static final String AVOID_VENGEANCE = "boss_vengeanceimmune";
 
 	public static Component[] rankDescription(int level) {
 		return new Component[]{
@@ -22,9 +23,9 @@ public class Vengeance {
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (!DelvesUtils.isDelveMob(mob) && !EntityUtils.isElite(mob) && !EntityUtils.isBoss(mob) && !mob.getScoreboardTags().contains("boss_immortalmount") && FastUtils.RANDOM.nextDouble() < PERCENT_CHANCE_PER_LEVEL * level / 100.0) {
+		if (!DelvesUtils.isDelveMob(mob) && !EntityUtils.isElite(mob) && !EntityUtils.isBoss(mob) && !mob.getScoreboardTags().contains("boss_immortalmount") && FastUtils.RANDOM.nextDouble() < PERCENT_CHANCE_PER_LEVEL * level / 100.0 && !mob.getScoreboardTags().contains(AVOID_VENGEANCE)) {
 			mob.addScoreboardTag(AvengerBoss.identityTag);
-			mob.addScoreboardTag(AvengerBoss.identityTag + "[maxstacks=12,damagepercentincrement=0.075,speedpercentincrement=0]");
+			mob.addScoreboardTag(AvengerBoss.identityTag + "[maxstacks=5,healpercent=0.1,damagepercentincrement=0.05,speedpercentincrement=0]");
 			mob.addScoreboardTag(ToughBoss.identityTag);
 		}
 	}

@@ -22,8 +22,8 @@ import org.bukkit.loot.LootTable;
  * This most likely means @NickNackGus or @Combustible
  * If this does not happen, your changes will NOT persist across weekly updates!
  */
+@SuppressWarnings("unchecked")
 public class GiveSoulbound extends GenericCommand {
-	@SuppressWarnings("unchecked")
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.givesoulbound");
 

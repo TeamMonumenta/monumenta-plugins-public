@@ -29,7 +29,7 @@ public class CurseOfDeath extends DepthsAbility {
 	}
 
 	private static Description<CurseOfDeath> getDescription() {
-		return new DescriptionBuilder<CurseOfDeath>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Your grave revive timer is reduced by 2 deaths' worth.")
 			.add((a, p) -> {
 				if (a == null || p == null) {
@@ -38,7 +38,7 @@ public class CurseOfDeath extends DepthsAbility {
 				DepthsPlayer player = DepthsManager.getInstance().getDepthsPlayer(p);
 				DepthsParty party = DepthsManager.getInstance().getDepthsParty(p);
 				if (party != null && player != null) {
-					int timer = DepthsListener.getGraveDuration(party, player, p, false);
+					int timer = DepthsListener.getGraveDuration(party, player, p);
 					return Component.text("\nCurrent grave timer: " + StringUtils.ticksToSeconds(timer) + " seconds.");
 				}
 				return Component.empty();

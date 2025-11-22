@@ -93,15 +93,22 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_frostgiant";
 	public static final int detectionRange = 80;
 	public static final int frostedIceDuration = 30;
-	/** Includes the whole arena platform and much of the surrounding air */
+	/**
+	 * Includes the whole arena platform and much of the surrounding air
+	 */
 	public static final int ARENA_RADIUS = 40;
 	public static final int ARENA_FLOOR_Y = 74;
-	/** The arena is roughly a squircle and this is the "length" of one side for use with spells that travel distances */
+	/**
+	 * The arena is roughly a squircle and this is the "length" of one side for use with spells that travel distances
+	 */
 	public static final int ARENA_LENGTH = 56;
-	/** Depth of arena platform (including unplayable area) for use with Seismic Ruin */
+	/**
+	 * Depth of arena platform (including unplayable area) for use with Seismic Ruin
+	 */
 	public static final int ARENA_DEPTH = 10;
 	public static final Material ICE_TYPE = Material.FROSTED_ICE;
-	public @Nullable static FrostGiant mInstance;
+	public @Nullable
+	static FrostGiant mInstance;
 	public boolean mCastStomp = true;
 	public boolean mFrostArmorActive = true;
 	public boolean mPreventTargetting = false;
@@ -311,7 +318,7 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 			new SpellFrostbite(mPlugin, this),
 			new SpellHailstorm(mPlugin, mBoss, HAILSTORM_RADIUS, mStartLoc),
 			new GiantStomp(mPlugin, this),
-			new SpellBlockBreak(mBoss, 3, 15, 3, 75, false, true,
+			new SpellBlockBreak(mBoss, 3, 15, 3, 0, 75, false, true,
 				true, false, false, false, Material.AIR),
 			new SpellRemoveLevitation(mBoss),
 			conditionalTeleport
@@ -528,7 +535,7 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 		}
 
 		mFightOver = true;
-		BossUtils.endBossFightEffects(mBoss, (List<Player>) players, Constants.TICKS_PER_SECOND * 40, true, false);
+		BossUtils.endBossFightEffects(mBoss, players, Constants.TICKS_PER_SECOND * 40, true, false);
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		teleport(mStartLoc);
 		sendDialogue("THIS EARTH... WAS OURS ONCE... WE SHAPED IT...", NamedTextColor.DARK_AQUA, true);
@@ -692,7 +699,8 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 				sendDialogue("The permafrost shield reforms a final time.", NamedTextColor.AQUA, false);
 				changeMainhandItem(new ItemStack(Material.IRON_HOE), "Frost Giant's Crescent");
 			}
-			default -> MMLog.warning(() -> "[FrostGiant] mPhase is somehow " + mPhase + ". The boss is still working but he didn't do his dialogue or weapon correctly");
+			default ->
+				MMLog.warning(() -> "[FrostGiant] mPhase is somehow " + mPhase + ". The boss is still working but he didn't do his dialogue or weapon correctly");
 		}
 	}
 

@@ -87,6 +87,7 @@ public class SpellSlam extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mChargeUp.nextTick()) {

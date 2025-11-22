@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.infinitytower.mobs;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.AvengerBoss;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
@@ -15,7 +16,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerFileUtils;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
-import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.AdvancingShadowTowerAbility;
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.AncestralRejuvenationTowerAbility;
@@ -69,7 +69,7 @@ public class TowerMobAbility {
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob,
-						new BossAbilityGroup(TowerManager.mPlugin, "Taunt", mob) {
+						new BossAbilityGroup(Plugin.getInstance(), "Taunt", mob) {
 
 							@Override
 							public void onDamage(DamageEvent event, LivingEntity damagee) {
@@ -95,14 +95,14 @@ public class TowerMobAbility {
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob,
-							new BossAbilityGroup(TowerManager.mPlugin, "Shellcracker", mob) {
+						new BossAbilityGroup(Plugin.getInstance(), "Shellcracker", mob) {
 
-								@Override
-								public void onDamage(DamageEvent event, LivingEntity damagee) {
-									if (EffectManager.getInstance() != null) {
-										EffectManager.getInstance().addEffect(damagee, "TIincreseDamage", new PercentDamageReceived(60, 0.15));
-									}
+							@Override
+							public void onDamage(DamageEvent event, LivingEntity damagee) {
+								if (EffectManager.getInstance() != null) {
+									EffectManager.getInstance().addEffect(damagee, "TIincreseDamage", new PercentDamageReceived(60, 0.15));
 								}
+							}
 
 						}
 					);
@@ -117,9 +117,9 @@ public class TowerMobAbility {
 				//On death summmon
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob,
-						new TowerAbility(TowerManager.mPlugin, "Jungle's Vengenance", mob, game, towerMob, playerMob) {
+						new TowerAbility(Plugin.getInstance(), "Jungle's Vengenance", mob, game, towerMob, playerMob) {
 
-							final EntityTargets mTargets = new EntityTargets(EntityTargets.TARGETS.MOB, 5, false, EntityTargets.Limit.DEFAULT, List.of(), new EntityTargets.TagsListFiter(Set.of(mIsPlayerMob ? TowerConstants.MOB_TAG_FLOOR_TEAM : TowerConstants.MOB_TAG_PLAYER_TEAM)));
+							final EntityTargets mTargets = new EntityTargets(EntityTargets.TARGETS.MOB, 5, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED), new EntityTargets.TagsListFiter(Set.of(mIsPlayerMob ? TowerConstants.MOB_TAG_FLOOR_TEAM : TowerConstants.MOB_TAG_PLAYER_TEAM)));
 
 							@Override
 							public void death(@Nullable EntityDeathEvent event) {
@@ -153,7 +153,7 @@ public class TowerMobAbility {
 
 										mTimer++;
 									}
-								}.runTaskTimer(TowerManager.mPlugin, 0, 1);
+								}.runTaskTimer(Plugin.getInstance(), 0, 1);
 
 								super.death(event);
 							}
@@ -203,7 +203,7 @@ public class TowerMobAbility {
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//Meteor Slam
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new MeteorSlamTowerAbility(TowerManager.mPlugin, "Meteor Slam", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new MeteorSlamTowerAbility(Plugin.getInstance(), "Meteor Slam", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -265,7 +265,7 @@ public class TowerMobAbility {
 			"At the end of the round, remove this unit from play and gain 2 gold.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new GoldCacheTowerAbility(TowerManager.mPlugin, "Gold Cache", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new GoldCacheTowerAbility(Plugin.getInstance(), "Gold Cache", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -275,7 +275,7 @@ public class TowerMobAbility {
 			"At the end of the round, gain 1 extra gold.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new FoolsGoldTowerAbility(TowerManager.mPlugin, "Fool's Gold I", mob, game, towerMob, playerMob, 1));
+					BossManager.getInstance().createBossInternal(mob, new FoolsGoldTowerAbility(Plugin.getInstance(), "Fool's Gold I", mob, game, towerMob, playerMob, 1));
 				}
 			}
 		));
@@ -286,7 +286,7 @@ public class TowerMobAbility {
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//Meteor Slam
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new FoolsGoldTowerAbility(TowerManager.mPlugin, "Fool's Gold II\"", mob, game, towerMob, playerMob, 2));
+					BossManager.getInstance().createBossInternal(mob, new FoolsGoldTowerAbility(Plugin.getInstance(), "Fool's Gold II\"", mob, game, towerMob, playerMob, 2));
 				}
 			}
 		));
@@ -297,7 +297,7 @@ public class TowerMobAbility {
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//Meteor Slam
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new FoolsGoldTowerAbility(TowerManager.mPlugin, "Fool's Gold IV", mob, game, towerMob, playerMob, 4));
+					BossManager.getInstance().createBossInternal(mob, new FoolsGoldTowerAbility(Plugin.getInstance(), "Fool's Gold IV", mob, game, towerMob, playerMob, 4));
 				}
 			}
 		));
@@ -308,7 +308,7 @@ public class TowerMobAbility {
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//Frost nova ability
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new ForcefulGridTowerAbility(TowerManager.mPlugin, "Forceful Grip", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new ForcefulGridTowerAbility(Plugin.getInstance(), "Forceful Grip", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -319,7 +319,7 @@ public class TowerMobAbility {
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//Frost nova ability
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new AdvancingShadowTowerAbility(TowerManager.mPlugin, "Advancing Shadows", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new AdvancingShadowTowerAbility(Plugin.getInstance(), "Advancing Shadows", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -339,7 +339,7 @@ public class TowerMobAbility {
 			"Heals every friendly mob for 6 HP every 4s",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new AncestralRejuvenationTowerAbility(TowerManager.mPlugin, "Ancestral Rejuvenation", mob, game, towerMob, playerMob, 6.0));
+					BossManager.getInstance().createBossInternal(mob, new AncestralRejuvenationTowerAbility(Plugin.getInstance(), "Ancestral Rejuvenation", mob, game, towerMob, playerMob, 6.0));
 				}
 			}
 		));
@@ -350,7 +350,7 @@ public class TowerMobAbility {
 			"Applies a constant AoE of 20% slowness, 20% weaken and 1 damage every second to all enemies",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new CurseOfTheJungleTowerAbility(TowerManager.mPlugin, "Curse of The Jungle", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new CurseOfTheJungleTowerAbility(Plugin.getInstance(), "Curse of The Jungle", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -376,7 +376,7 @@ public class TowerMobAbility {
 			"Summons a demon that attacks the same target(s) as this unit. 6s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new DarkSummonerTowerAbility(TowerManager.mPlugin, "Dark Summoner", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new DarkSummonerTowerAbility(Plugin.getInstance(), "Dark Summoner", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -386,7 +386,7 @@ public class TowerMobAbility {
 			"This unit cannot die unless all its allies die. (Other Immortals do not count as units for this ability.)",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new ImmortalTowerAbility(TowerManager.mPlugin, "Immortal", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new ImmortalTowerAbility(Plugin.getInstance(), "Immortal", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -396,7 +396,7 @@ public class TowerMobAbility {
 			"Summons earthquakes under enemies that deal 16 AoE damage. 5s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new EarthquakeTowerAbility(TowerManager.mPlugin, "Earthquake", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new EarthquakeTowerAbility(Plugin.getInstance(), "Earthquake", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -406,7 +406,7 @@ public class TowerMobAbility {
 			"At the start of a turn, summon Svalgot and Ghalkor",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new SvalgotGhalkorTowerAbility(TowerManager.mPlugin, "Svalgot & Ghalkor", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new SvalgotGhalkorTowerAbility(Plugin.getInstance(), "Svalgot & Ghalkor", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -430,7 +430,7 @@ public class TowerMobAbility {
 			"Eldrask jumps and slams the ground with his greatsword, generating a wave that knocks up enemies in a cone in front of him that leaves ice on the ground which slows enemies by 30%",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new GreatswordSlamTowerAbility(TowerManager.mPlugin, "Great Sword Slam", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new GreatswordSlamTowerAbility(Plugin.getInstance(), "Great Sword Slam", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -440,7 +440,7 @@ public class TowerMobAbility {
 			"Hekawt teleports around instead of moving. He deals 20 damage if he teleports to the location of an enemy.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new RandomTeleportTowerAbility(TowerManager.mPlugin, "Void Gazer", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new RandomTeleportTowerAbility(Plugin.getInstance(), "Void Gazer", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -450,7 +450,7 @@ public class TowerMobAbility {
 			"Hekawt, instead of using normal attacks, has 2 unique attacks depending on the distance to his target. Ranged attack: Shoots a projectile that deals 13 damage and applies 10% Vulnerability on the target permanently. Hitting the same target again increases the Vulnerability further. Melee attack: Charges a cone attack in front of him that deals 15 damage and pushes enemies away. 2.5s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new AutoAttackTowerAbility(TowerManager.mPlugin, "Ancestral Sorcery", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new AutoAttackTowerAbility(Plugin.getInstance(), "Ancestral Sorcery", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -460,7 +460,7 @@ public class TowerMobAbility {
 			"When Hekawt dies, he revives after 6s.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new PhylacteryTowerAbility(TowerManager.mPlugin, "Pylacetry", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new PhylacteryTowerAbility(Plugin.getInstance(), "Pylacetry", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -471,7 +471,7 @@ public class TowerMobAbility {
 			"Generates an AoE attack in every direction that deals 20 damage and roots every mob that touches it for 3s.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new EarthsWrathTowerAbility(TowerManager.mPlugin, "Earth's Wrath", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new EarthsWrathTowerAbility(Plugin.getInstance(), "Earth's Wrath", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -481,7 +481,7 @@ public class TowerMobAbility {
 			"Summons meteor strikes that target the entire arena and deal 20 damage. Kaul doesn't attack or move during this attack. Cooldown 8s.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
-					BossManager.getInstance().createBossInternal(mob, new VolcanicDemiseTowerAbility(TowerManager.mPlugin, "Volcanic Demise", mob, game, towerMob, playerMob));
+					BossManager.getInstance().createBossInternal(mob, new VolcanicDemiseTowerAbility(Plugin.getInstance(), "Volcanic Demise", mob, game, towerMob, playerMob));
 				}
 			}
 		));
@@ -530,15 +530,6 @@ public class TowerMobAbility {
 	}
 
 
-	public static class Tuple {
-		public final String mName;
-		public final String mDescription;
-		public final @Nullable BuildMobAbility mBuilder;
-
-		public Tuple(String name, String description, @Nullable BuildMobAbility buildAbility) {
-			mName = name;
-			mDescription = description;
-			mBuilder = buildAbility;
-		}
+	public record Tuple(String mName, String mDescription, @Nullable BuildMobAbility mBuilder) {
 	}
 }

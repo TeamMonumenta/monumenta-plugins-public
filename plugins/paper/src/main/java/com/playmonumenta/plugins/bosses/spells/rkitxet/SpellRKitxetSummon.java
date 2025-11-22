@@ -23,10 +23,10 @@ public class SpellRKitxetSummon extends Spell {
 	private static final int MAX_SUMMONS = 25;
 	private static final int SUMMON_TIME = 3 * 20;
 
-	private Plugin mPlugin;
-	private RKitxet mRKitxet;
-	private LivingEntity mBoss;
-	private int mCooldown;
+	private final Plugin mPlugin;
+	private final RKitxet mRKitxet;
+	private final LivingEntity mBoss;
+	private final int mCooldown;
 	public List<String> mSummonOptions;
 
 	public SpellRKitxetSummon(Plugin plugin, RKitxet rKitxet, LivingEntity boss, int cooldown) {
@@ -64,13 +64,12 @@ public class SpellRKitxetSummon extends Spell {
 			new PartialParticle(Particle.BLOCK_CRACK, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.LIME_WOOL.createBlockData()).spawnAsEntityActive(mBoss);
 			Collections.shuffle(mSummonOptions);
 			Entity summon = LibraryOfSoulsIntegration.summon(loweredLoc, mSummonOptions.get(0));
-			if (summon != null && summon instanceof LivingEntity) {
-				LivingEntity summonedMob = (LivingEntity) summon;
+			if (summon != null && summon instanceof LivingEntity summonedMob) {
 				summonedMob.setAI(false);
 				summonedMob.setPersistent(true);
 				BukkitRunnable summonRunnable = new BukkitRunnable() {
 					int mTicks = 0;
-					double mYInc = 1.6 / SUMMON_TIME;
+					final double mYInc = 1.6 / SUMMON_TIME;
 					boolean mRaised = false;
 
 					@Override

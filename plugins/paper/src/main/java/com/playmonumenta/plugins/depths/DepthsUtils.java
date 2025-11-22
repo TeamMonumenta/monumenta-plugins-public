@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -20,6 +19,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.io.File;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -173,19 +173,8 @@ public class DepthsUtils {
 			return false; // return whether we placed ice or not
 		}
 
-		Material iceMaterial = ICE_MATERIAL;
-
-		//Check for permafrost to increase ice duration
-		Permafrost permafrost = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(p, Permafrost.class);
-		if (permafrost != null) {
-			ticks += permafrost.getBonusIceDuration();
-			if (permafrost.getAbilityScore() == 6) {
-				iceMaterial = Permafrost.PERMAFROST_ICE_MATERIAL;
-			}
-		}
-
 		BlockData bd = l.getWorld().getBlockAt(l).getBlockData();
-		l.getBlock().setType(iceMaterial);
+		l.getBlock().setType(ICE_MATERIAL);
 		iceActive.put(l, bd);
 		iceBarrier.put(l, isBarrier);
 
@@ -209,11 +198,12 @@ public class DepthsUtils {
 	}
 
 	public static boolean isIce(Material material) {
-		return material == ICE_MATERIAL || material == Permafrost.PERMAFROST_ICE_MATERIAL;
+		return material == ICE_MATERIAL;
 	}
 
 	/**
 	 * Used for ability run checks for casting, rough estimate at whether they are holding a viable weapon
+	 *
 	 * @param item Item to check for
 	 * @return if the item is an axe, sword, scythe, wand, or trident
 	 */
@@ -299,17 +289,22 @@ public class DepthsUtils {
 		}
 		return switch (mat) {
 			case // carpets
-				RED_CARPET, BLACK_CARPET, BLUE_CARPET, BROWN_CARPET, CYAN_CARPET, GRAY_CARPET, GREEN_CARPET, LIGHT_BLUE_CARPET,
-					LIGHT_GRAY_CARPET, LIME_CARPET, MAGENTA_CARPET, ORANGE_CARPET, PINK_CARPET, PURPLE_CARPET, WHITE_CARPET, YELLOW_CARPET,
-					MOSS_CARPET,
-					// trapdoors
-					BIRCH_TRAPDOOR, ACACIA_TRAPDOOR, CRIMSON_TRAPDOOR, DARK_OAK_TRAPDOOR, IRON_TRAPDOOR, JUNGLE_TRAPDOOR, MANGROVE_TRAPDOOR,
-					OAK_TRAPDOOR, SPRUCE_TRAPDOOR, WARPED_TRAPDOOR, BAMBOO_TRAPDOOR, CHERRY_TRAPDOOR,
-					// candles
-					CANDLE, CYAN_CANDLE, BLACK_CANDLE, BLUE_CANDLE, BROWN_CANDLE, GRAY_CANDLE, GREEN_CANDLE, LIME_CANDLE, MAGENTA_CANDLE,
-					ORANGE_CANDLE, PINK_CANDLE, PURPLE_CANDLE, RED_CANDLE, WHITE_CANDLE, YELLOW_CANDLE, LIGHT_BLUE_CANDLE, LIGHT_GRAY_CANDLE,
-					// rails
-					RAIL, ACTIVATOR_RAIL, DETECTOR_RAIL, POWERED_RAIL -> false;
+				RED_CARPET, BLACK_CARPET, BLUE_CARPET, BROWN_CARPET, CYAN_CARPET, GRAY_CARPET, GREEN_CARPET,
+				LIGHT_BLUE_CARPET,
+				LIGHT_GRAY_CARPET, LIME_CARPET, MAGENTA_CARPET, ORANGE_CARPET, PINK_CARPET, PURPLE_CARPET, WHITE_CARPET,
+				YELLOW_CARPET,
+				MOSS_CARPET,
+				// trapdoors
+				BIRCH_TRAPDOOR, ACACIA_TRAPDOOR, CRIMSON_TRAPDOOR, DARK_OAK_TRAPDOOR, IRON_TRAPDOOR, JUNGLE_TRAPDOOR,
+				MANGROVE_TRAPDOOR,
+				OAK_TRAPDOOR, SPRUCE_TRAPDOOR, WARPED_TRAPDOOR, BAMBOO_TRAPDOOR, CHERRY_TRAPDOOR,
+				// candles
+				CANDLE, CYAN_CANDLE, BLACK_CANDLE, BLUE_CANDLE, BROWN_CANDLE, GRAY_CANDLE, GREEN_CANDLE, LIME_CANDLE,
+				MAGENTA_CANDLE,
+				ORANGE_CANDLE, PINK_CANDLE, PURPLE_CANDLE, RED_CANDLE, WHITE_CANDLE, YELLOW_CANDLE, LIGHT_BLUE_CANDLE,
+				LIGHT_GRAY_CANDLE,
+				// rails
+				RAIL, ACTIVATOR_RAIL, DETECTOR_RAIL, POWERED_RAIL -> false;
 			default -> true;
 		};
 	}
@@ -433,6 +428,10 @@ public class DepthsUtils {
 		json.addProperty("treasure_score", depthsParty.mTreasureScore);
 		json.addProperty("content_type", dp.getContent().name());
 		json.addProperty("victory", victory);
+		json.addProperty("start_timestamp", depthsParty.mStartTimestamp);
+		json.addProperty("f1_timestamp", depthsParty.mFloor1Timestamp);
+		json.addProperty("f2_timestamp", depthsParty.mFloor2Timestamp);
+		json.addProperty("f3_timestamp", depthsParty.mFloor3Timestamp);
 		json.add("abilities", abilityObjectInJson);
 		json.add("removed_abilities", removedAbilitiesJsonArray);
 		json.add("initial_players", initialPlayersJsonArray);
@@ -449,7 +448,7 @@ public class DepthsUtils {
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
-				FileUtils.writeFile(fileName, json.toString());
+				FileUtils.writeFile(Path.of(fileName), json.toString());
 			} catch (Exception e) {
 				MMLog.severe("Caught exception saving file '" + fileName + "': " + e);
 				e.printStackTrace();

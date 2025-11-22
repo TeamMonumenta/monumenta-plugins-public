@@ -7,6 +7,7 @@ import com.google.gson.JsonPrimitive;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEvent;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.mail.recipient.GuildRecipient;
 import com.playmonumenta.plugins.mail.recipient.MailDirection;
@@ -110,6 +111,7 @@ public class MailMan implements Listener {
 
 	/**
 	 * Registers a mailbox, returning the already registered mailbox instead if it exists
+	 *
 	 * @param mailbox A mailbox to register
 	 * @return The stored mailbox, whether new or old
 	 */
@@ -150,6 +152,7 @@ public class MailMan implements Listener {
 		}
 
 		JsonObject changeJson = new JsonObject();
+		changeJson.addProperty("domain", MonumentaRedisSyncIntegration.getServerDomain());
 		changeJson.add("mailbox", mailbox.toJson());
 		changeJson.addProperty("slot", slot);
 		try {
@@ -184,6 +187,14 @@ public class MailMan implements Listener {
 	public void handleRemoteMailSlotChange(JsonObject data) {
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			try {
+				if (data.get("domain") instanceof JsonPrimitive domainPrimitive && domainPrimitive.isString()) {
+					String fromDomain = domainPrimitive.getAsString();
+					if (!MonumentaRedisSyncIntegration.getServerDomain().equals(fromDomain)) {
+						// Not from the same domain (ie build shard/tutorial, which has a separate inventory)
+						return;
+					}
+				}
+
 				Mailbox remoteMailbox = Mailbox.fromJson(data.getAsJsonObject("mailbox")).join();
 				MMLog.finer(() -> "[Mailbox] Got remote mail slot update message for mailbox: "
 					+ MessagingUtils.plainText(remoteMailbox.friendlyName()));
@@ -277,6 +288,7 @@ public class MailMan implements Listener {
 
 	/**
 	 * Attempts to add a cooldown on mail interactions.
+	 *
 	 * @param player The player whose mail is put on cooldown
 	 * @return time until the next one expires is returned as a string if too many are active, otherwise null
 	 */

@@ -14,7 +14,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 
-
 public class Sapper implements Enchantment {
 
 	@Override

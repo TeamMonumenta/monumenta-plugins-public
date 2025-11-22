@@ -35,12 +35,12 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	public static @Nullable DamageEvent.DamageType mNextTrueDamageReplacement = null;
 
 	private final Component HOLOGRAM_DEFAULT_NAME = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-		                                                .append(Component.text("???", NamedTextColor.DARK_AQUA))
-		                                                .append(Component.text(" (", NamedTextColor.YELLOW))
-		                                                .append(Component.text("???", NamedTextColor.DARK_AQUA))
-		                                                .append(Component.text("/", NamedTextColor.YELLOW))
-		                                                .append(Component.text("???", NamedTextColor.DARK_AQUA))
-		                                                .append(Component.text(")", NamedTextColor.YELLOW));
+		.append(Component.text("???", NamedTextColor.DARK_AQUA))
+		.append(Component.text(" (", NamedTextColor.YELLOW))
+		.append(Component.text("???", NamedTextColor.DARK_AQUA))
+		.append(Component.text("/", NamedTextColor.YELLOW))
+		.append(Component.text("???", NamedTextColor.DARK_AQUA))
+		.append(Component.text(")", NamedTextColor.YELLOW));
 
 	private @Nullable ArmorStand mHologram = null;
 
@@ -138,8 +138,8 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 				Component hover = hoverDamage.append(hoverType).append(hoverAbility).append(hoverMob).append(hoverTimestamp);
 
 				player.sendMessage(Component.text("Damage: ", NamedTextColor.GOLD)
-						.append(Component.text(damageString + " " + getTypeSymbol(type), NamedTextColor.RED))
-						.hoverEvent(HoverEvent.showText(hover)));
+					.append(Component.text(damageString + " " + getTypeSymbol(type), NamedTextColor.RED))
+					.hoverEvent(HoverEvent.showText(hover)));
 
 				mDamageInstances.add(new DamageInstance(currentTick, damage));
 				mTotalDamage += damage;
@@ -150,9 +150,9 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 				double damage10s = mDamageInstances.stream().mapToDouble(di -> di.mDamage).sum();
 				if (mHologram != null) {
 					mHologram.customName(Component.text("Damage 10s / Total: ", NamedTextColor.YELLOW)
-							.append(Component.text(damageToString(damage10s, true), NamedTextColor.RED))
-							.append(Component.text(" / ", NamedTextColor.YELLOW))
-							.append(Component.text(damageToString(mTotalDamage, true), NamedTextColor.GOLD)));
+						.append(Component.text(damageToString(damage10s, true), NamedTextColor.RED))
+						.append(Component.text(" / ", NamedTextColor.YELLOW))
+						.append(Component.text(damageToString(mTotalDamage, true), NamedTextColor.GOLD)));
 				}
 			} else {
 				double dps10s = mDamageInstances.stream().mapToDouble(di -> di.mDamage).sum() / 10;
@@ -163,12 +163,12 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 				}
 				if (mHologram != null) {
 					mHologram.customName(Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-							.append(Component.text(damageToString(dps, true), NamedTextColor.RED))
-							.append(Component.text(" (", NamedTextColor.YELLOW))
-							.append(Component.text(damageToString(dps10s, true), NamedTextColor.GREEN))
-							.append(Component.text("/", NamedTextColor.YELLOW))
-							.append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
-							.append(Component.text(")", NamedTextColor.YELLOW)));
+						.append(Component.text(damageToString(dps, true), NamedTextColor.RED))
+						.append(Component.text(" (", NamedTextColor.YELLOW))
+						.append(Component.text(damageToString(dps10s, true), NamedTextColor.GREEN))
+						.append(Component.text("/", NamedTextColor.YELLOW))
+						.append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
+						.append(Component.text(")", NamedTextColor.YELLOW)));
 				}
 			}
 
@@ -196,7 +196,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	private static String getTypeSymbol(DamageEvent.DamageType type) {
 		return switch (type) {
 			case MELEE, MELEE_SKILL, MELEE_ENCH -> "🗡";
-			case PROJECTILE, PROJECTILE_SKILL -> "🏹";
+			case PROJECTILE, PROJECTILE_SKILL, PROJECTILE_ENCH -> "🏹";
 			case MAGIC -> "⭐";
 			case AILMENT -> "☠";
 			default -> "";

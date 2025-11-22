@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.TOVUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -38,12 +39,12 @@ import org.jetbrains.annotations.Nullable;
 public class ChestOverride extends BaseOverride {
 	// Convenience list of offsets to get adjacent blocks
 	private static final List<Vector> ADJACENT_OFFSETS = Arrays.asList(
-	                                                         new Vector(1, 0, 0),
-	                                                         new Vector(-1, 0, 0),
-	                                                         new Vector(0, -1, 0),
-	                                                         new Vector(0, 0, 1),
-	                                                         new Vector(0, 0, -1)
-	                                                     );
+		new Vector(1, 0, 0),
+		new Vector(-1, 0, 0),
+		new Vector(0, -1, 0),
+		new Vector(0, 0, 1),
+		new Vector(0, 0, -1)
+	);
 	// Convenience list of offsets to get adjacent blocks
 	private static final EnumSet<Material> GRAVITY_BLOCKS = EnumSet.of(
 		Material.SAND,
@@ -91,11 +92,11 @@ public class ChestOverride extends BaseOverride {
 		}
 
 		if (block.getState() instanceof Chest chest
-			    && !chest.getLock().isEmpty()) {
+			&& !chest.getLock().isEmpty()) {
 			ItemMeta itemMeta = player.getInventory().getItemInMainHand().getItemMeta();
 			if (itemMeta == null
-				    || itemMeta.displayName() == null
-				    || !chest.getLock().equals(MessagingUtils.plainText(itemMeta.displayName()))) {
+				|| itemMeta.displayName() == null
+				|| !chest.getLock().equals(MessagingUtils.plainText(itemMeta.displayName()))) {
 				// Cancel clicks on locked chests. This prevents any custom code from running on it, e.g. purple tesseract.
 				// Since the event is cancelled, we need to manually send the locked message and sound though.
 				Component name = chest.customName();
@@ -138,7 +139,7 @@ public class ChestOverride extends BaseOverride {
 
 		// This will be allowed, should just generate the loot directly before the player actually finishes opening
 		DelveLootTableGroup.setDelveLootTable(player, block);
-		ChestUtils.generateContainerLootWithScaling(player, block);
+		ChestUtils.generateContainerLootWithScaling(player, block, plugin);
 
 		return true;
 	}
@@ -156,18 +157,20 @@ public class ChestOverride extends BaseOverride {
 		}
 
 		DelveLootTableGroup.setDelveLootTable(player, block);
-		ChestUtils.generateContainerLootWithScaling(player, block);
+		ChestUtils.generateContainerLootWithScaling(player, block, plugin);
 		return TOVUtils.canBreak(plugin, player, block, event);
 	}
 
 	@Override
 	public boolean blockExplodeInteraction(Plugin plugin, Block block) {
-		if (commandChest(block)) {
+		if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.EXPLOSION_PROOF_CHESTS)) {
+			return false;
+		} else if (commandChest(block)) {
 			return false;
 		} else if (!breakable(block)) {
 			return false;
 		} else if (!ServerProperties.getLootingLimiterIgnoreBreakingChests()
-			           && !LootingLimiter.checkChest(block, null)) { // must be the last check, as this subtracts from players' activity scores if successful
+			&& !LootingLimiter.checkChest(block, null)) { // must be the last check, as this subtracts from players' activity scores if successful
 			return false;
 		}
 
@@ -181,7 +184,7 @@ public class ChestOverride extends BaseOverride {
 		if (!players.isEmpty()) {
 			Player player = players.get(0);
 			DelveLootTableGroup.setDelveLootTable(player, block);
-			ChestUtils.generateContainerLootWithScaling(player, block);
+			ChestUtils.generateContainerLootWithScaling(player, block, plugin);
 		}
 
 		return true;
@@ -195,10 +198,9 @@ public class ChestOverride extends BaseOverride {
 		Material type = blockUnder.getType();
 		if (type == Material.BARRIER) {
 			return false;
-		} else if (type == Material.BEDROCK && block.getState() instanceof Chest chest && chest.hasLootTable()) {
-			return false;
+		} else {
+			return type != Material.BEDROCK || !(block.getState() instanceof Chest chest) || !chest.hasLootTable();
 		}
-		return true;
 	}
 
 	// If this returns true, the caller should return false and stop processing the chest
@@ -218,12 +220,12 @@ public class ChestOverride extends BaseOverride {
 					Block testBlock = loc.getBlock();
 
 					if (testBlock.getType().equals(Material.COMMAND_BLOCK)
-							&& testBlock.getState() instanceof CommandBlock commandBlock) {
+						&& testBlock.getState() instanceof CommandBlock commandBlock) {
 						Location blockLoc = block.getLocation();
 						// Run an execute command in the block's world at the block's position
 						String command = "execute in " + blockLoc.getWorld().getKey().asString() +
-						" positioned " + blockLoc.blockX() + " " + blockLoc.blockY() + " " + blockLoc.blockZ() +
-						" run " + commandBlock.getCommand();
+							" positioned " + blockLoc.blockX() + " " + blockLoc.blockY() + " " + blockLoc.blockZ() +
+							" run " + commandBlock.getCommand();
 						NmsUtils.getVersionAdapter().runConsoleCommandSilently(command);
 						break;
 					}

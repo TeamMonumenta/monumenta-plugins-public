@@ -5,20 +5,19 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.WhirlwindTotemCS;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.ShamanCooldownDecreasePerSecond;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -53,24 +52,7 @@ public class WhirlwindTotem extends TotemAbility {
 			.linkedSpell(ClassAbility.WHIRLWIND_TOTEM)
 			.scoreboardId("WhirlwindTotem")
 			.shorthandName("WWT")
-			.descriptions(
-				String.format("Press the swap key while holding a melee weapon and not sneaking to fire a projectile that summons a Whirlwind Totem. Every %ss, all players in a %s block radius " +
-					"have their class cooldowns reduced by %s%% (maximum %ss). Cannot decrease the cooldown on any player's whirlwind totem, and does not stack " +
-					"with other whirlwind totems. Additionally, apply a %s%% duration boost to other totems existing at any point " +
-					"in this totem's duration. Charge up time: %ss. Duration: %ss. Cooldown: %ss.",
-					StringUtils.ticksToSeconds(INTERVAL),
-					AOE_RANGE,
-					StringUtils.multiplierToPercentage(CDR_PERCENT),
-					StringUtils.ticksToSeconds(CDR_MAX_PER_SECOND),
-					StringUtils.multiplierToPercentage(DURATION_BOOST),
-					StringUtils.ticksToSeconds(PULSE_DELAY),
-					StringUtils.ticksToSeconds(DURATION_1),
-					StringUtils.ticksToSeconds(COOLDOWN)
-				),
-				String.format("Totem duration increased to %ss, and now gives %s%% speed to players within range.",
-					StringUtils.ticksToSeconds(DURATION_2),
-					StringUtils.multiplierToPercentage(SPEED_PERCENT))
-			)
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Summon a totem that provides cooldown reduction to players within its radius.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WhirlwindTotem::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)
@@ -88,14 +70,11 @@ public class WhirlwindTotem extends TotemAbility {
 
 	public WhirlwindTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Whirlwind Totem Projectile", "WhirlwindTotem", "Whirlwind Totem");
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 		mCDRPerSecond = CDR_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CDR);
 		mCDRMax = CharmManager.getDuration(mPlayer, CHARM_MAX_CDR, CDR_MAX_PER_SECOND);
-		mSpeed = isLevelOne() ? 0 : (SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED));
+		mSpeed = SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 		mDurationBoost = DURATION_BOOST + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DURATION_BOOST);
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WhirlwindTotemCS());
@@ -119,9 +98,11 @@ public class WhirlwindTotem extends TotemAbility {
 		List<Player> affectedPlayers = PlayerUtils.playersInRange(standLocation, mRadius, true);
 
 		for (Player p : affectedPlayers) {
-			mPlugin.mEffectManager.addEffect(p, "WhirlwindTotemCDR", new ShamanCooldownDecreasePerSecond(50, mCDRPerSecond, mCDRMax, mPlugin));
+			mPlugin.mEffectManager.addEffect(p, "WhirlwindTotemCDR",
+				new ShamanCooldownDecreasePerSecond(50, mCDRPerSecond, mCDRMax, mPlugin).deleteOnAbilityUpdate(true));
 			if (isLevelTwo()) {
-				mPlugin.mEffectManager.addEffect(p, WHIRLWIND_SPEED_EFFECT_NAME, new PercentSpeed(50, mSpeed, WHIRLWIND_SPEED_EFFECT_NAME));
+				mPlugin.mEffectManager.addEffect(p, WHIRLWIND_SPEED_EFFECT_NAME,
+					new PercentSpeed(50, mSpeed, WHIRLWIND_SPEED_EFFECT_NAME).deleteOnAbilityUpdate(true));
 			}
 			if (bonusAction) {
 				for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(p).getAbilities()) {
@@ -131,7 +112,7 @@ public class WhirlwindTotem extends TotemAbility {
 					}
 					int totalCD = abil.getModifiedCooldown();
 					int reducedCD = Math.min((int) (totalCD * mCDRPerSecond
-						* ChainLightning.ENHANCE_POSITIVE_EFFICIENCY), mCDRMax);
+						* (ChainLightning.ENHANCE_POSITIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_POSITIVE_TOTEM_EFFICIENCY))), mCDRMax);
 					mPlugin.mTimers.updateCooldown(p, linkedSpell, reducedCD);
 					mPlugin.mTimers.updateCooldown(p, linkedSpell, reducedCD);
 				}
@@ -154,5 +135,35 @@ public class WhirlwindTotem extends TotemAbility {
 				totemAbility.mWhirlwindBuffPercent = 1 + mDurationBoost;
 			}
 		}
+	}
+
+	private static Description<WhirlwindTotem> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to fire a projectile that summons a Whirlwind Totem. Every ")
+			.addDuration(a -> a.mInterval, INTERVAL, true)
+			.add(" seconds, players within ")
+			.add(a -> a.mRadius, AOE_RANGE)
+			.add(" blocks of the totem have their cooldowns reduced by ")
+			.addPercent(a -> a.mCDRPerSecond, CDR_PERCENT)
+			.add(" (maximum ")
+			.addDuration(a -> a.mCDRMax, CDR_MAX_PER_SECOND)
+			.add(" seconds). Cannot decrease the cooldown of this ability. Additionally, other totems existing during this totem's duration gain ")
+			.addPercent(a -> a.mDurationBoost, DURATION_BOOST)
+			.add(" duration. Charge up time: ")
+			.addDuration(PULSE_DELAY)
+			.add("s. Duration: ")
+			.addDuration(a -> a.mDuration, DURATION_1, false, Ability::isLevelOne)
+			.add("s.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<WhirlwindTotem> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Duration is increased to ")
+			.addDuration(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
+			.add(" seconds. Now additionally gives ")
+			.addPercent(a -> a.mSpeed, SPEED_PERCENT)
+			.add(" speed to players within range.");
 	}
 }

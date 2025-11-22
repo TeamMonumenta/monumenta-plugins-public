@@ -176,6 +176,7 @@ public class SpellFlare extends Spell {
 		new BukkitRunnable() {
 			final Location mLoc = locLauncher;
 			double mStep = 0;
+
 			@Override
 			public void run() {
 

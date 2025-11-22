@@ -32,10 +32,10 @@ public class StatueOfRegret extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.STATUE);
+		dp.addReward(DepthsRoomType.DepthsRewardType.STATUE);
 	}
 
 	private static Description<StatueOfRegret> getDescription() {
-		return new DescriptionBuilder<StatueOfRegret>().add("Choose one of your current curses to replace with a selection of five other curses.");
+		return new DescriptionBuilder<>(() -> INFO).add("Choose one of your current curses to replace with a selection of five other curses.");
 	}
 }

@@ -12,12 +12,14 @@ import dev.jorel.commandapi.wrappers.FunctionWrapper;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Objective;
 
 public class NameMCVerify extends GenericCommand {
 	public static void register(Plugin plugin) {
@@ -29,8 +31,9 @@ public class NameMCVerify extends GenericCommand {
 			.executes((sender, args) -> {
 				Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 					Player player = args.getUnchecked("player");
+					Objective objective = args.getUnchecked("objective");
 					try {
-						URL url = new URL("https://api.namemc.com/server/server.playmonumenta.com/likes?profile=" + player.getUniqueId());
+						URL url = new URI("https://api.namemc.com/server/server.playmonumenta.com/likes?profile=" + player.getUniqueId()).toURL();
 
 						HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 						conn.setRequestMethod("GET");
@@ -51,7 +54,7 @@ public class NameMCVerify extends GenericCommand {
 
 								Bukkit.getScheduler().runTask(plugin, () -> {
 									int val = response.toString().equals("true") ? 1 : 0;
-									ScoreboardUtils.setScoreboardValue(player, args.getUnchecked("objective"), val);
+									ScoreboardUtils.setScoreboardValue(player, objective.getName(), val);
 									FunctionWrapper[] functions = args.getUnchecked("function");
 									for (FunctionWrapper func : functions) {
 										func.run();

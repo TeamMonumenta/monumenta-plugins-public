@@ -12,11 +12,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class Tempo implements Enchantment {
-
-	private static final double AGIL_BONUS_PER_LEVEL_1 = 0.1;
-	private static final double AGIL_BONUS_PER_LEVEL_2 = 0.2;
+	private static final double TEMPO_HALVED_MULTIPLIER = 0.5;
 	public static final int PAST_HIT_DURATION_TIME = 20 * 4;
-	public static final int PAST_HIT_DURATION_TIME_HALF = 20 * 2;
+	public static final int PAST_HIT_DURATION_TIME_HALF = 50; // 50 ticks = 2.5 seconds
 	private static final String TEMPO_EFFECT_NAME = "TempoEffect";
 
 	@Override
@@ -32,22 +30,22 @@ public class Tempo implements Enchantment {
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.isBlocked()
-			    || !event.getType().isDefendable()
-			    || event.getType() == DamageEvent.DamageType.FIRE
-			    || event.getType() == DamageEvent.DamageType.FALL) {
+			|| !event.getType().isDefendable()
+			|| event.getType() == DamageEvent.DamageType.FIRE
+			|| event.getType() == DamageEvent.DamageType.FALL) {
 			return;
 		}
 		plugin.mEffectManager.clearEffects(player, TEMPO_EFFECT_NAME);
-		// dummy amount (only used for inure)
-		plugin.mEffectManager.addEffect(player, TEMPO_EFFECT_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME, 1));
+		plugin.mEffectManager.addEffect(player, TEMPO_EFFECT_NAME, new OnHitTimerEffect(PAST_HIT_DURATION_TIME));
 	}
 
 	public static double applyTempo(DamageEvent event, Plugin plugin, Player player) {
 		Effect tempo = plugin.mEffectManager.getActiveEffect(player, TEMPO_EFFECT_NAME);
 		if (tempo == null) {
-			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TEMPO) * AGIL_BONUS_PER_LEVEL_2;
-		} else if (tempo.getDuration() <= PAST_HIT_DURATION_TIME_HALF) {
-			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TEMPO) * AGIL_BONUS_PER_LEVEL_1;
+			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TEMPO);
+		} else if (tempo.getDuration() <= PAST_HIT_DURATION_TIME - PAST_HIT_DURATION_TIME_HALF) {
+			// Only if tempo has 0-20 ticks remaining (80 - 60)
+			return plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TEMPO) * TEMPO_HALVED_MULTIPLIER;
 		} else {
 			return 0;
 		}

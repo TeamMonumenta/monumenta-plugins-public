@@ -12,16 +12,13 @@ import java.util.EnumSet;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
-public class Regicide implements Enchantment {
-
+public final class Regicide implements Enchantment {
 	private static final double DAMAGE_BONUS_PER_LEVEL = 0.1;
-	private static final double BOSS_BONUS_PER_LEVEL = 0.05;
 
 	@Override
 	public String getName() {
@@ -43,41 +40,25 @@ public class Regicide implements Enchantment {
 		return 28;
 	}
 
-	public static double calculateDamageMultiplier(double level, Player player, LivingEntity target) {
-		if (EntityUtils.isElite(target)) {
-			return (1 + DAMAGE_BONUS_PER_LEVEL * level);
-		} else if (EntityUtils.isBoss(target)) {
-			return (1 + BOSS_BONUS_PER_LEVEL * level);
-		} else {
-			return 1;
-		}
-	}
-
 	@Override
-	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity target) {
-		DamageType type = event.getType();
-		if (type != DamageType.AILMENT
-			    && type != DamageType.POISON
-			    && type != DamageType.FALL
-			    && type != DamageType.OTHER
-			    && type != DamageType.TRUE
-		) {
-			double mult = calculateDamageMultiplier(level, player, target);
+	public void onDamage(final Plugin plugin, final Player player, final double level, final DamageEvent event,
+	                     final LivingEntity target) {
+		final DamageType type = event.getType();
+		if (type != DamageType.AILMENT && type != DamageType.POISON && type != DamageType.FALL
+			&& type != DamageType.OTHER && type != DamageType.TRUE) {
+			final double mult = (EntityUtils.isElite(target) || EntityUtils.isBoss(target)) ? (1 + DAMAGE_BONUS_PER_LEVEL * level) : 1;
 			event.updateGearDamageWithMultiplier(mult);
-			if (mult > 1) {
-				World world = target.getWorld();
-				Location loc = target.getLocation();
-				if (type == DamageType.MELEE) {
-					world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 0.8f, 0.7f);
-				}
+			if (mult > 1 && type == DamageType.MELEE) {
+				target.getWorld().playSound(target.getLocation(), Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 0.8f, 0.7f);
 			}
 		}
 	}
 
 	@Override
-	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
+	public void onProjectileLaunch(final Plugin plugin, final Player player, final double value,
+	                               final ProjectileLaunchEvent event, final Projectile projectile) {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, false) && !AbilityUtils.isVolley(player, projectile)) {
-			Location loc = player.getLocation();
+			final Location loc = player.getLocation();
 			AbilityUtils.playPassiveAbilitySound(loc, Sound.ITEM_AXE_SCRAPE, 1.5f, 0.8f);
 			AbilityUtils.playPassiveAbilitySound(loc, Sound.ITEM_TRIDENT_RETURN, 0.7f, 0.8f);
 		}

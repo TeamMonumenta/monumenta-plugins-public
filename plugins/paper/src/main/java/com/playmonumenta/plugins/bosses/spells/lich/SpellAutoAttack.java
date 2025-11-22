@@ -2,10 +2,11 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -27,9 +28,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class SpellAutoAttack extends Spell {
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 	private static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.0f);
+	private static final String VULNERABILITY_SRC = "LichDeathBoltVulnerability";
+	private static final String WEAKNESS_SRC = "LichDeathBoltWeakness";
 
 	private final Plugin mPlugin;
 	private final Lich mLich;
@@ -93,12 +98,12 @@ public class SpellAutoAttack extends Spell {
 		World world = mBoss.getWorld();
 		List<Player> tooClose = Lich.playersInRange(mBoss.getLocation(), 6, true);
 
-		if (tooClose.size() > 0 && mBoss.getLocation().getY() < mCenter.getY() + 3) {
+		if (!tooClose.isEmpty() && mBoss.getLocation().getY() < mCenter.getY() + 3) {
 			Collections.shuffle(tooClose);
 			Player target = tooClose.get(FastUtils.RANDOM.nextInt(tooClose.size()));
 			attack(target, world);
 		} else {
-			if (Lich.playersInRange(mBoss.getLocation(), mRange, true).size() > 0) {
+			if (!Lich.playersInRange(mBoss.getLocation(), mRange, true).isEmpty()) {
 				BukkitRunnable runA = new BukkitRunnable() {
 					int mTicks = 0;
 
@@ -114,7 +119,7 @@ public class SpellAutoAttack extends Spell {
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentSpeed.GENERIC_NAME,
 							new PercentSpeed(20, 0.3, PercentSpeed.GENERIC_NAME));
 
-						if (mBoss == null || mBoss.isDead()) {
+						if (!mBoss.isValid() || mBoss.isDead()) {
 							this.cancel();
 							return;
 						}
@@ -122,7 +127,7 @@ public class SpellAutoAttack extends Spell {
 						if (mTicks >= 30) {
 							List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 							players.removeIf(p -> SpellDimensionDoor.getShadowed().contains(p) || p.getLocation().getY() >= mCenter.getY() + mCeiling);
-							if (players.size() > 0) {
+							if (!players.isEmpty()) {
 								if (mBoss.getLocation().getY() >= mCenter.getY() + 3) {
 									Collections.shuffle(players);
 									List<Player> targets = players.subList(0, (int) Math.min(players.size(), Math.max(2, Math.ceil(players.size() / 5.0))));
@@ -213,7 +218,7 @@ public class SpellAutoAttack extends Spell {
 
 	private void launchBolt(Player player) {
 		BukkitRunnable runC = new BukkitRunnable() {
-			BoundingBox mBox = BoundingBox.of(mBoss.getEyeLocation(), 0.3, 0.3, 0.3);
+			final BoundingBox mBox = BoundingBox.of(mBoss.getEyeLocation(), 0.3, 0.3, 0.3);
 			int mInnerTicks = 0;
 
 			@Override
@@ -249,7 +254,7 @@ public class SpellAutoAttack extends Spell {
 				mPYellow2.location(loc).spawnAsBoss();
 
 				mInnerTicks++;
-				if (mInnerTicks >= 20 * 5 || mBoss == null || !mBoss.isValid()) {
+				if (mInnerTicks >= 20 * 5 || mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 				}
 			}
@@ -259,35 +264,39 @@ public class SpellAutoAttack extends Spell {
 	}
 
 	private void damage(Player player, boolean melee) {
-		String cause = "Death Bolt";
-		if (melee) {
-			cause = "Death Sweep";
+		final String cause = melee ? "Death Sweep" : "Death Bolt";
+		final double damage = 3 * mPhase + 18;
+		final double damageReceived;
+		final double damageDealt;
+
+		switch (mPhase) {
+			case 1 -> {
+				damageDealt = 0;
+				damageReceived = 0;
+			}
+			case 2 -> {
+				damageDealt = 0;
+				damageReceived = 0.2;
+			}
+			default -> {
+				damageReceived = 0.2;
+				damageDealt = -0.2;
+			}
 		}
-		double damage;
-		double damageReceived = 0;
-		double damageDealt = 0;
-		if (mPhase == 1) {
-			damage = 21;
-		} else if (mPhase == 2) {
-			damage = 24;
-			damageReceived = 0.2;
-		} else if (mPhase == 3) {
-			damage = 27;
-			damageReceived = 0.2;
-			damageDealt = -0.2;
-		} else {
-			damage = 30;
-			damageReceived = 0.2;
-			damageDealt = -0.2;
-		}
+
 		BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, damage, cause, mBoss.getLocation());
-		AbilityUtils.increaseDamageReceivedPlayer(player, 20 * 5, damageReceived, "Lich");
-		AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, damageDealt, "Lich");
+		if (damageReceived != 0) {
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, VULNERABILITY_SRC,
+				new PercentDamageReceived(TICKS_PER_SECOND * 5, damageReceived));
+		}
+		if (damageDealt != 0) {
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
+				new PercentDamageDealt(TICKS_PER_SECOND * 5, damageDealt));
+		}
 	}
 
 	@Override
 	public int cooldownTicks() {
 		return 1;
 	}
-
 }

@@ -55,8 +55,8 @@ import org.jetbrains.annotations.Nullable;
 public class TealSpirit extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_tealspirit";
 	public static final int detectionRange = 70;
-	public static final String MUSIC_TITLE = "epic:music.orasomn1";
-	public static final int MUSIC_DURATION = 145;
+	public static final String MUSIC_TITLE_1 = "epic:music.orasomn1";
+	public static final int MUSIC_DURATION_1 = 146;
 	public static final String MUSIC_TITLE_2 = "epic:music.orasomn2";
 	public static final int MUSIC_DURATION_2 = 181;
 
@@ -73,6 +73,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 		GlowingManager.startGlowing(mBoss, NamedTextColor.AQUA, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1);
 
 		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE_1, SoundCategory.RECORDS, MUSIC_DURATION_1, true, 1, 1, true), true, mBoss, true, 0, 5);
 		mEncounterType = "Normal";
 		for (Player p : players) {
 			if (p.getScoreboardTags().contains("SKTQuest")) {
@@ -96,7 +97,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 
 			activeSpells = new SpellManager(Arrays.asList(
 				new SuspendedBolt(mBoss, mPlugin, 25, 5, 50,
-					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5),
+					20 * 6, 20 * 2, 20, mSpawnLoc, 5),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 90),
 				new SundialSlash(mBoss, 7 * 20)
@@ -134,7 +135,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 150),
 				new SundialSlash(mBoss, 7 * 20),
 				new SuspendedBolt(mBoss, mPlugin, 25, 5, 80,
-					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
+					20 * 6, 20 * 2, 20, mSpawnLoc, 5)
 			));
 
 			passiveSpells = Arrays.asList(
@@ -151,10 +152,10 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 150),
 				new SundialSlash(mBoss, 7 * 20),
 				new SuspendedBolt(mBoss, mPlugin, 25, 4, 80,
-					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
+					20 * 6, 20 * 2, 20, mSpawnLoc, 5)
 			));
 
-			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
+			SpellManager activeRewindPhase = new SpellManager(List.of(
 				new Rewind(mBoss, mSpawnLoc, this, activeSpells, passiveSpells)
 			));
 
@@ -232,7 +233,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 80),
 				new SundialSlash(mBoss, 7 * 20),
 				new SuspendedBolt(mBoss, mPlugin, 25, 3, 50,
-					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
+					20 * 6, 20 * 2, 20, mSpawnLoc, 5)
 			));
 
 			passiveSpells = Arrays.asList(
@@ -244,7 +245,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
 
-			SpellManager activeRewindPhase = new SpellManager(Arrays.asList(
+			SpellManager activeRewindPhase = new SpellManager(List.of(
 				new Rewind(mBoss, mSpawnLoc, this, activeSpells, passiveSpells)
 			));
 
@@ -296,8 +297,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 	}
 
 	private BossBarManager.BossHealthAction getSummonEchoAction() {
-		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE_2, SoundCategory.RECORDS, MUSIC_DURATION_2, true, 1, 1, true), true, mBoss, true, 0, 5);
+
 		return mBoss -> {
 			Location loc = mSpawnLoc.clone().add(0, 2, 0);
 			LibraryOfSoulsIntegration.summon(loc, "EchoesOfOblivion");
@@ -306,7 +306,9 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 			world.playSound(loc, Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 0.8f, 2.0f);
 			new PartialParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(mBoss);
 			new PartialParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(mBoss);
-			PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(Component.text("i call forth the echoes radiating from the edges of oblivion itself. rise, emperor!", NamedTextColor.DARK_AQUA)));
+			List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+			SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE_2, SoundCategory.RECORDS, MUSIC_DURATION_2, true, 1, 1, true), true, mBoss, true, 0, 5);
+			players.forEach(player -> player.sendMessage(Component.text("i call forth the echoes radiating from the edges of oblivion itself. rise, emperor!", NamedTextColor.DARK_AQUA)));
 		};
 	}
 

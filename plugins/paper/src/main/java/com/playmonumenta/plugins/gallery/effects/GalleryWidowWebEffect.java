@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.gallery.effects;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -27,7 +27,8 @@ public class GalleryWidowWebEffect extends GalleryConsumableEffect {
 		super(GalleryEffectType.WIDOW_WEB);
 	}
 
-	@Override public void tick(GalleryPlayer player, boolean oneSecond, boolean twoHertz, int ticks) {
+	@Override
+	public void tick(GalleryPlayer player, boolean oneSecond, boolean twoHertz, int ticks) {
 		super.tick(player, oneSecond, twoHertz, ticks);
 		mTimer--;
 	}
@@ -41,7 +42,7 @@ public class GalleryWidowWebEffect extends GalleryConsumableEffect {
 			player.playSound(player.getEyeLocation(), Sound.ENTITY_SPIDER_DEATH, SoundCategory.HOSTILE, 2, 0.5f);
 			mTimer = EFFECT_COOLDOWN;
 			for (LivingEntity le : EntityUtils.getNearbyMobs(player.getLocation(), EFFECT_STUN_RADIUS)) {
-				EntityUtils.applyStun(GalleryManager.mPlugin, EFFECT_STUN_DURATION, le);
+				EntityUtils.applyStun(Plugin.getInstance(), EFFECT_STUN_DURATION, le);
 			}
 		}
 	}

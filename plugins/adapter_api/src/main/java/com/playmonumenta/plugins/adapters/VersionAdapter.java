@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.adapters;
 
 import com.google.gson.JsonObject;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -13,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
@@ -71,14 +73,15 @@ public interface VersionAdapter {
 	/**
 	 * Make this entity lose all desire to attack any Entity and make this only attack entities accepted by the predicate
 	 *
-	 * @param entity        The entity
-	 * @param action        The damage action that will cat when this entity hit someone
-	 * @param predicate     Predicate used for check which entity attack and which not
-	 * @param attackRange   Attack range of this entity
+	 * @param entity      The entity
+	 * @param action      The damage action that will cat when this entity hit someone
+	 * @param predicate   Predicate used for check which entity attack and which not
+	 * @param attackRange Attack range of this entity
 	 */
 	void setFriendly(Creature entity, DamageAction action, Predicate<LivingEntity> predicate, double attackRange);
 
 	void setHuntingCompanion(Creature entity, DamageAction action, double attackRange);
+
 
 	interface DamageAction {
 		void damage(LivingEntity entity);
@@ -130,6 +133,8 @@ public interface VersionAdapter {
 	Object toVanillaChatComponent(Component component);
 
 	/**
+	 * Check if two ItemStack instances refer to the same vanilla stack.
+	 *
 	 * @return Whether the given item stacks refer to the same vanilla stack. Can e.g. be used to test if an item is still in an inventory, and not just an exact copy.
 	 */
 	boolean isSameItem(@Nullable ItemStack item1, @Nullable ItemStack item2);
@@ -195,4 +200,16 @@ public interface VersionAdapter {
 	Object replaceWorldNames(Object packet, Consumer<WorldNameReplacementToken> handler);
 
 	void sendOpenSignPacket(Player player, int blockX, int blockY, int blockZ, boolean b);
+
+	void setHeadRotation(Entity bukkitEntity, float yaw, float pitch);
+
+	Entity spawnWorldlessEntity(EntityType type, World world);
+
+	void spawnPlayerNametag(Player clientPlayer, Player targetPlayer, Set<Map.Entry<Entity, Entity>> entities);
+
+	void removePlayerNametag(Player clientPlayer, Player targetPlayer, Entity...entities);
+
+	void updatePlayerNametag(Player clientPlayer, Entity...entities);
+
+  double getJumpVelocity(LivingEntity entity);
 }

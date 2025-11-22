@@ -48,7 +48,7 @@ public class HexfallFloramancerBoss extends BossAbilityGroup {
 					return;
 				}
 
-				List<Block> flowers = BlockUtils.getBlocksInCylinder(mBoss.getLocation(), 20);
+				List<Block> flowers = BlockUtils.getBlocksInSphere(mBoss.getLocation(), 20);
 				flowers.removeIf(block -> !FLOWER_BLOCKS.contains(block.getType()));
 				for (int i = 0; i < p.FLOWERS_SPAWNED; i++) {
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -67,7 +67,7 @@ public class HexfallFloramancerBoss extends BossAbilityGroup {
 
 			@Override
 			public boolean canRun() {
-				List<Block> flowers = BlockUtils.getBlocksInCylinder(mBoss.getLocation(), 20);
+				List<Block> flowers = BlockUtils.getBlocksInSphere(mBoss.getLocation(), 20);
 				flowers.removeIf(block -> !FLOWER_BLOCKS.contains(block.getType()));
 				return !flowers.isEmpty();
 			}
@@ -142,6 +142,7 @@ public class HexfallFloramancerBoss extends BossAbilityGroup {
 			int mTicks = 0;
 			final Location mLoc = respawnLoc.clone();
 			final Material mFlower = flower.getType();
+
 			@Override
 			public void run() {
 				new PartialParticle(Particle.TOTEM, mLoc, 1, 0, 0, 0, 0.5).spawnAsBoss();

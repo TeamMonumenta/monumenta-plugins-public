@@ -57,7 +57,7 @@ public class SoothingCombos extends DepthsCombosAbility {
 		mHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.SOOTHING_COMBOS_HEALING.mEffectName, HEAL[mRarity - 1]);
 		mDuration = CharmManager.getDuration(mPlayer, CharmEffects.SOOTHING_COMBOS_DURATION.mEffectName, DURATION);
 		mSpeed = SPEED_PERCENT[mRarity - 1] + CharmManager.getLevelPercentDecimal(mPlayer, CharmEffects.SOOTHING_COMBOS_SPEED_AMPLIFIER.mEffectName);
-		mHaste = (int) CharmManager.getLevel(mPlayer, CharmEffects.SOOTHING_COMBOS_HASTE_LEVEL.mEffectName) + mRarity == 6 ? 1 : 0;
+		mHaste = (int) CharmManager.getLevel(mPlayer, CharmEffects.SOOTHING_COMBOS_HASTE_LEVEL.mEffectName) + (mRarity == 6 ? 1 : 0);
 		mRange = CharmManager.getRadius(mPlayer, CharmEffects.SOOTHING_COMBOS_RANGE.mEffectName, RANGE);
 	}
 
@@ -104,7 +104,7 @@ public class SoothingCombos extends DepthsCombosAbility {
 
 	private static Description<SoothingCombos> getDescription(int rarity, TextColor color) {
 		TextComponent haste = rarity == 6 ? Component.text("II", color) : Component.text("I");
-		return new DescriptionBuilder<SoothingCombos>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Every ")
 			.add(a -> a.mHitRequirement, HIT_REQ, true)
 			.add(" melee strikes, heal all players within ")

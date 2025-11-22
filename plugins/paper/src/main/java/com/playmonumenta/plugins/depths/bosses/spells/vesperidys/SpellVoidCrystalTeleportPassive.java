@@ -35,7 +35,7 @@ public class SpellVoidCrystalTeleportPassive extends Spell {
 		// If its platform exploded.
 		Vesperidys.Platform platform = mVesperidys.mPlatformList.getPlatformNearestToEntity(mBoss);
 		if (platform != null && platform.getCenter().distance(mBoss.getLocation()) > 3) {
-				teleportRandomly();
+			teleportRandomly();
 		} else {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mBoss.getLocation(), 3, mBoss)) {
 				if (EntityUtils.isBoss(le)) {
@@ -55,7 +55,7 @@ public class SpellVoidCrystalTeleportPassive extends Spell {
 		// Prioritizes platforms which doesn't have Boss mobs (Void Magus, Void Crystal and Vesperidys) on it.
 		for (Vesperidys.Platform platform : platforms) {
 			selectedPlatform = platform;
-			if (platform.getMechsOnPlatform().size() <= 0 && platform.getPlayersOnPlatform().size() <= 0) {
+			if (platform.getMechsOnPlatform().isEmpty() && platform.getPlayersOnPlatform().isEmpty()) {
 				break;
 			}
 		}

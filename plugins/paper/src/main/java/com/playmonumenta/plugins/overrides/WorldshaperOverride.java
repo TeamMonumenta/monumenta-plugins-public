@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.overrides;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
@@ -7,17 +8,20 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
+import com.playmonumenta.plugins.listeners.IndigoListener;
 import com.playmonumenta.plugins.listeners.RepairExplosionsListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -53,18 +57,18 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 public class WorldshaperOverride {
-	private static final String CAN_PLACE_SHULKER_PERM = "monumenta.canplaceshulker";
 	private static final String WORLDSHAPER_PERM = "monumenta.worldshaper";
 	public static final String COOLDOWN_SOURCE = "CDWorldshaperLoom";
 	public static final Material COOLDOWN_ITEM = Material.LOOM;
 
 	private static final String ITEM_NAME = "Worldshaper's Loom";
+	private static final String MODE_KEY = "WorldshapersLoomSelectedMode";
 
 	public static boolean placeBlock(Plugin plugin, Player player, ItemStack item) {
 		if (!isWorldshaperItem(item)) {
 			// Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe - hopefully other shulkers with lore won't get placed
 			// Check permission to enable placing shulkers, just so this can be turned off via perms if needed
-			return player.hasPermission(CAN_PLACE_SHULKER_PERM);
+			return player.hasPermission(Constants.Permissions.CAN_PLACE_SHULKER);
 		}
 		if (!player.hasPermission(WORLDSHAPER_PERM)) {
 			player.sendMessage(Component.text("You don't have permission to use this item. Please ask a moderator to fix this.", NamedTextColor.RED));
@@ -85,12 +89,34 @@ public class WorldshaperOverride {
 			return false;
 		}
 
+		if (Plugin.getInstance().mHuntsManager.checkPreSpawnProtection(player, player.getLocation().getBlock())) {
+			return false;
+		}
+
+		if (ServerProperties.getShardName().contains("indigo")
+			|| ServerProperties.getShardName().startsWith("dev")) {
+			IndigoListener.revokeBlocklessEligibility(player, "Worldshaper's loom used");
+		}
+
 		// A list of locations we want to place the block in the world.
-		ArrayList<Location> blockPlacePattern = new ArrayList<>();
+		List<Location> blockPlacePattern = new ArrayList<>();
 		int cooldown = 0;
 
 		Mode mode = getMode(item);
 		Predicate<Material> occludingException = null;
+
+		if (mode == Mode.DYNAMIC) {
+			float pitch = player.getLocation().getPitch();
+			boolean onSolidBlock = player.getLocation().clone().add(0, -1, 0).getBlock().isSolid();
+
+			if (pitch >= 45 && pitch <= 90) {
+				mode = onSolidBlock ? Mode.BRIDGE : Mode.FLOOR;
+			} else if (pitch >= -45 && pitch <= 45) {
+				mode = Mode.WALL;
+			} else if (pitch >= -90 && pitch <= -45) {
+				mode = onSolidBlock ? Mode.STAIRS : Mode.FLOOR;
+			}
+		}
 		if (mode == Mode.BRIDGE) {
 			cooldown = 2 * 20;
 
@@ -258,7 +284,7 @@ public class WorldshaperOverride {
 				continue;
 			}
 
-			ArrayList<BlockState> blockList = new ArrayList<>(List.of(location.getBlock().getState()));
+			List<BlockState> blockList = new ArrayList<>(List.of(location.getBlock().getState()));
 			StructureGrowEvent event = new StructureGrowEvent(location, TreeType.TREE, true, player, blockList);
 			Bukkit.getPluginManager().callEvent(event);
 			if (!event.isCancelled() && !blockList.isEmpty()) {
@@ -364,80 +390,55 @@ public class WorldshaperOverride {
 			return false;
 		}
 
-		NBTItem nbt = new NBTItem(item);
-		List<String> lore = ItemStatUtils.getPlainLore(nbt);
+		NBT.modify(item, nbt -> {
+			ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(nbt);
+			int currentMode = getModeIndex(playerModified);
+			int newMode = Math.floorMod(currentMode + (reverse ? -1 : 1), Mode.values().length);
+			playerModified.setInteger(MODE_KEY, newMode);
+			Mode mode = Mode.values()[newMode];
+			player.sendMessage(mode.mMessage);
+			player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, mode.mPitch);
+		});
 
-		boolean foundLine = false;
-		loreLoop: for (int i = 0; i < lore.size(); ++i) {
-			String line = lore.get(i);
-			for (Mode mode : Mode.values()) {
-				if (line.equals(mode.mPlainMessage)) {
-					Mode newMode = mode.next(reverse);
-					ItemStatUtils.removeLore(item, i);
-					ItemStatUtils.addLore(item, i, newMode.mMessage);
-					player.sendMessage(newMode.mMessage);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, newMode.mPitch);
-					foundLine = true;
-					break loreLoop;
-				}
-			}
-		}
-		if (!foundLine) {
-			Mode newMode = reverse ? Mode.FLOOR : Mode.STAIRS;
-			ItemStatUtils.addLore(item, lore.size(), newMode.mMessage);
-			player.sendMessage(newMode.mMessage);
-			player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, newMode.mPitch);
-		}
 		ItemUpdateHelper.generateItemStats(item);
 		return true;
 	}
 
 	public static boolean isWorldshaperItem(ItemStack item) {
 		return item != null &&
-			       InventoryUtils.testForItemWithName(item, ITEM_NAME, true) &&
-			       ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
-			       ItemUtils.isShulkerBox(item.getType());
+			InventoryUtils.testForItemWithName(item, ITEM_NAME, true) &&
+			ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
+			ItemUtils.isShulkerBox(item.getType());
 	}
 
 	public static Mode getMode(ItemStack item) {
-		if (!isWorldshaperItem(item)) {
-			return Mode.BRIDGE;
-		}
-
-		NBTItem nbt = new NBTItem(item);
-		List<String> lore = ItemStatUtils.getPlainLore(nbt);
-
-		for (String line : lore) {
-			for (Mode mode : Mode.values()) {
-				if (line.equals(mode.mPlainMessage)) {
-					return mode;
-				}
-			}
-		}
-
-		return Mode.BRIDGE;
+		return Mode.values()[getModeIndex(item)];
 	}
 
-	enum Mode {
+	public static int getModeIndex(ItemStack itemStack) {
+		return NBT.get(itemStack, nbt -> {
+			return getModeIndex(ItemStatUtils.getPlayerModified(nbt));
+		});
+	}
+
+	public static int getModeIndex(@Nullable ReadableNBT playerModified) {
+		return playerModified != null ? playerModified.getOrDefault(MODE_KEY, 0) : 0;
+	}
+
+	public enum Mode {
 		BRIDGE("Bridge", NamedTextColor.GREEN, 1.0f),
 		STAIRS("Stairs", NamedTextColor.LIGHT_PURPLE, 0.9f),
 		WALL("Wall", NamedTextColor.AQUA, 1.1f),
-		FLOOR("Floor", NamedTextColor.GOLD, 1.2f);
+		FLOOR("Floor", NamedTextColor.GOLD, 1.2f),
+		DYNAMIC("Dynamic", NamedTextColor.DARK_PURPLE, 1.3f);
 
-		private final Component mMessage;
-		private final String mPlainMessage;
+		public final Component mMessage;
 		private final float mPitch;
 
 		Mode(String name, TextColor color, float pitch) {
 			mMessage = Component.text("Selected Mode: ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 				.append(Component.text(name, color).decoration(TextDecoration.ITALIC, false));
-			mPlainMessage = MessagingUtils.plainText(mMessage);
 			mPitch = pitch;
-		}
-
-		@SuppressWarnings("EnumOrdinal")
-		Mode next(boolean reverse) {
-			return values()[Math.floorMod(ordinal() + (reverse ? -1 : 1), values().length)];
 		}
 	}
 }

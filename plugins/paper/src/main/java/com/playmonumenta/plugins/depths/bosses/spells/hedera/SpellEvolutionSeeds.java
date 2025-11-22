@@ -38,7 +38,7 @@ public class SpellEvolutionSeeds extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return mPlants.values().size() > 0;
+		return !mPlants.isEmpty();
 	}
 
 	@Override

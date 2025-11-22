@@ -23,7 +23,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class SpellShuraSmoke extends Spell {
+public final class SpellShuraSmoke extends Spell {
 	private static final String SLOWNESS_SRC = "ShuraSmokeSlowness";
 	private static final String WEAKNESS_SRC = "ShuraSmokeWeakness";
 	private static final int DEBUFF_DURATION = 20 * 3;

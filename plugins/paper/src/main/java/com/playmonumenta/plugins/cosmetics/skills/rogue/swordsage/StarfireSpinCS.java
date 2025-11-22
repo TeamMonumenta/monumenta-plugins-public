@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 public class StarfireSpinCS extends BladeDanceCS {
 	private static final Particle.DustOptions FIRE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 150, 20), 1.5f);
 	private static final Particle.DustOptions FIRE_COLOR_SMALL = new Particle.DustOptions(Color.fromRGB(255, 150, 20), 1.0f);
-	private static final Vector[] TRI_UNIT_VECTORS = new Vector[] {
+	private static final Vector[] TRI_UNIT_VECTORS = new Vector[]{
 		new Vector(1, 0, 0),
 		new Vector(-0.5, 0, 0.866),
 		new Vector(-0.5, 0, -0.866)
@@ -52,22 +52,22 @@ public class StarfireSpinCS extends BladeDanceCS {
 	}
 
 	@Override
-	public void danceTick(Player player, World world, Location centre, int tick, double radius) {
+	public void danceTick(Player player, World world, Location centre, int tick, int duration, double radius) {
 		for (Vector v : TRI_UNIT_VECTORS) {
 			for (double i = 1; i <= PARTICLES_PER_LINE; i++) {
 				Location location = centre.clone()
 					.add(v.clone().rotateAroundY(velocityFunction(tick, i / PARTICLES_PER_LINE))
-					.multiply(0.9 * i * radius / PARTICLES_PER_LINE).add(new Vector(0, 0.1, 0)));
+						.multiply(0.9 * i * radius / PARTICLES_PER_LINE).add(new Vector(0, 0.1, 0)));
 				Vector direction = centre.clone()
 					.add(v.clone().rotateAroundY(velocityFunction(tick + 1, i / PARTICLES_PER_LINE))
-					.multiply(0.9 * i * radius / PARTICLES_PER_LINE).add(new Vector(0, 0.1, 0)))
+						.multiply(0.9 * i * radius / PARTICLES_PER_LINE).add(new Vector(0, 0.1, 0)))
 					.subtract(location).toVector();
 				drawFlame(location, player, direction.multiply(4));
 				if (tick >= 2 && i % 2 == 0) {
 					drawTrail(
 						centre.clone()
-						.add(v.clone().rotateAroundY(velocityFunction(tick - 2, i / PARTICLES_PER_LINE))
-						.multiply(0.9 * i * radius / PARTICLES_PER_LINE).add(new Vector(0, 0.1, 0))),
+							.add(v.clone().rotateAroundY(velocityFunction(tick - 2, i / PARTICLES_PER_LINE))
+								.multiply(0.9 * i * radius / PARTICLES_PER_LINE).add(new Vector(0, 0.1, 0))),
 						player);
 				}
 			}

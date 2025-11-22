@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -14,14 +15,18 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class ImmortalPassengerBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_immortalpassenger";
 
-	private static final ImmutableList<Class<? extends Effect>> COPIED_EFFECTS = ImmutableList.of(InfernoDamage.class, CustomDamageOverTime.class);
+	private static final ImmutableList<Class<? extends Effect>> COPIED_EFFECTS = ImmutableList.of(
+		InfernoDamage.class,
+		CustomDamageOverTime.class);
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Whether or not damage taken by this mount is redirected to its passenger")
@@ -44,6 +49,7 @@ public class ImmortalPassengerBoss extends BossAbilityGroup {
 		// these bosses break when reloaded (won't be passengers to the correct boss)
 		EntityUtils.setRemoveEntityOnUnload(boss);
 		boss.setRemoveWhenFarAway(true);
+		boss.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
 
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
@@ -88,13 +94,34 @@ public class ImmortalPassengerBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void bossIgnited(int ticks) {
+	public void bossIgnited(int ticks, @Nullable Entity applier) {
 		if (mTransferDamage) {
 			if (mBoss.getVehicle() instanceof LivingEntity vehicle) {
-				EntityUtils.setFireTicksIfLower(ticks, vehicle);
+				EntityUtils.setFireTicksIfLower(ticks, vehicle, applier);
 			}
 			mBoss.setFireTicks(0);
 		}
 	}
 
+	public boolean isTransferringDamage() {
+		return mTransferDamage;
+	}
+
+	public static boolean isDamageTransferringImmortalPassenger(LivingEntity boss) {
+		ImmortalPassengerBoss instance = BossManager.getInstance().getBoss(boss, ImmortalPassengerBoss.class);
+		if (instance == null) {
+			return false;
+		} else {
+			return instance.isTransferringDamage();
+		}
+	}
+
+	public static LivingEntity getMortalMount(LivingEntity boss) {
+		if (isDamageTransferringImmortalPassenger(boss) && boss.getVehicle() instanceof LivingEntity vehicle) {
+			// Technically misses the case of an immortal damage-transferring passenger riding an immortal non-damage-transferring passenger riding something else, but there is no reason for that to ever exist
+			return getMortalMount(vehicle);
+		} else {
+			return boss;
+		}
+	}
 }

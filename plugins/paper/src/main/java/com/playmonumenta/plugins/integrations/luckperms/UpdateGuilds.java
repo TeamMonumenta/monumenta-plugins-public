@@ -18,6 +18,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 public class UpdateGuilds {
+	private static final List<GuildPermission> mNewPermissions = List.of(
+		GuildPermission.GUILD_OWNED_INFUSION
+	);
+
 	public static void register(Plugin plugin) {
 		// guild mod update
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.guild.mod.update");
@@ -40,6 +44,11 @@ public class UpdateGuilds {
 	}
 
 	public static void run(Plugin plugin, CommandSender sender) {
+		if (!ServerProperties.getShardName().equals("guildplots")) {
+			sender.sendMessage(Component.text("This needs to be run on the guildplots shard", NamedTextColor.RED));
+			return;
+		}
+
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			List<Group> guilds;
 			try {
@@ -51,34 +60,43 @@ public class UpdateGuilds {
 			}
 
 			for (Group memberGroup : guilds) {
-				Group guildRoot = LuckPermsIntegration.getGuildRoot(memberGroup);
-				if (guildRoot == null) {
+				Group guildRootGroup = LuckPermsIntegration.getGuildRoot(memberGroup);
+				if (guildRootGroup == null) {
 					sender.sendMessage(Component.text("Failed to identify root of " + memberGroup.getFriendlyName(), NamedTextColor.RED));
 					continue;
 				}
-				String guildId = guildRoot.getName();
+				String guildRootGroupId = guildRootGroup.getName();
 				try {
 					for (GuildAccessLevel accessLevel : List.of(
 						GuildAccessLevel.FOUNDER,
 						GuildAccessLevel.MANAGER,
 						GuildAccessLevel.MEMBER
 					)) {
-						Group accessGroup = accessLevel.loadGroupFromRoot(guildRoot).join().orElse(null);
+						Group accessGroup = accessLevel.loadGroupFromRoot(guildRootGroup).join().orElse(null);
 						if (accessGroup == null) {
-							sender.sendMessage(Component.text("- Could not find " + accessLevel.mId + " group for " + guildId));
+							sender.sendMessage(Component.text("- Could not find " + accessLevel.mId + " group for " + guildRootGroupId));
 							continue;
 						}
 
-						for (GuildPermission guildPermission : GuildPermission.values()) {
+						for (GuildPermission guildPermission : mNewPermissions) {
 							if (accessLevel.compareTo(guildPermission.mDefaultAccessLevel) <= 0) {
-								guildPermission.setExplicitPermission(guildRoot, accessGroup, true).join();
+								guildPermission.setExplicitPermission(guildRootGroup, accessGroup, true).join();
 							}
 						}
 					}
 
-					sender.sendMessage(Component.text("Updated " + guildId, NamedTextColor.GREEN));
+					Group blockedGroup = GuildAccessLevel.BLOCKED.loadGroupFromRoot(guildRootGroup).join().orElse(null);
+					if (blockedGroup == null) {
+						sender.sendMessage(Component.text("- Could not find blocked group for " + guildRootGroupId));
+					} else {
+						for (GuildPermission guildPermission : mNewPermissions) {
+							guildPermission.setExplicitPermission(guildRootGroup, blockedGroup, false).join();
+						}
+					}
+
+					sender.sendMessage(Component.text("Updated " + guildRootGroupId, NamedTextColor.GREEN));
 				} catch (Exception ex) {
-					sender.sendMessage(Component.text("Failed to update " + guildId + ":", NamedTextColor.RED));
+					sender.sendMessage(Component.text("Failed to update " + guildRootGroupId + ":", NamedTextColor.RED));
 					MessagingUtils.sendStackTrace(sender, ex);
 				}
 			}

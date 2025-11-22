@@ -104,9 +104,9 @@ public final class CAxtal extends SerializedLocationBossAbilityGroup {
 			// Teleport the boss to mSpawnLoc if he is too far away, is stuck in bedrock, or is in lava
 			new SpellConditionalTeleport(mBoss, mSpawnLoc,
 				b -> mSpawnLoc.distanceSquared(b.getLocation()) > detectionRange * detectionRange
-				|| b.getLocation().getBlock().getType() == Material.BEDROCK
-				|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-				|| b.getLocation().getBlock().getType() == Material.LAVA)
+					|| b.getLocation().getBlock().getType() == Material.BEDROCK
+					|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+					|| b.getLocation().getBlock().getType() == Material.LAVA)
 		);
 
 		final Map<Integer, BossHealthAction> events = new HashMap<>();

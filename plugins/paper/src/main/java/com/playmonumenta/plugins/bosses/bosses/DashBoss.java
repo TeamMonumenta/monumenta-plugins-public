@@ -8,6 +8,9 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellDash;
 import java.util.Collections;
 import java.util.List;
+import org.bukkit.Color;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -32,15 +35,26 @@ public class DashBoss extends BossAbilityGroup {
 		@BossParam(help = "prefers aggro target")
 		public boolean PREFER_TARGET = true;
 		@BossParam(help = "The sound of the jump. Default: Pillager Celebrate")
-		public SoundsList SOUND_START = SoundsList.fromString("[(ENTITY_PILLAGER_CELEBRATE,1,1.1)]");
+		public SoundsList SOUND_START = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_PILLAGER_CELEBRATE, 1.0f, 1.1f))
+			.build();
 		@BossParam(help = "The sound played during the flight. Default: Pillager Celebrate")
-		public SoundsList SOUND_LAND = SoundsList.fromString("[(ENTITY_HORSE_GALLOP,1.3,0),(ENTITY_HORSE_GALLOP,2,1.25)]");
+		public SoundsList SOUND_LAND = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_HORSE_GALLOP, 1.3f, 0.0f))
+			.add(new SoundsList.CSound(Sound.ENTITY_HORSE_GALLOP, 2.0f, 1.25f))
+			.build();
 		@BossParam(help = "The particles displayed at the start of the jump. Default: Cloud")
-		public ParticlesList PARTICLE_START = ParticlesList.fromString("[(CLOUD,15,1,0,1,0)]");
+		public ParticlesList PARTICLE_START = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 15, 1.0, 0.0, 1.0, 0.0))
+			.build();
 		@BossParam(help = "The particles displayed in the air, during the jump. Default: White Redstone")
-		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(REDSTONE,4,0.5,0.5,0.5,1,#FFFFFF,1)]");
+		public ParticlesList PARTICLE_AIR = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 4, 0.5, 0.5, 0.5, 1.0, new Particle.DustOptions(Color.WHITE, 1.0f)))
+			.build();
 		@BossParam(help = "The particles displayed upon landing. Default: Cloud")
-		public ParticlesList PARTICLE_LAND = ParticlesList.fromString("[(CLOUD,1,0.1,0.1,0.1,0.1)]");
+		public ParticlesList PARTICLE_LAND = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CLOUD, 1, 0.1, 0.1, 0.1, 0.1))
+			.build();
 	}
 
 	public final Parameters mParams;
@@ -50,10 +64,10 @@ public class DashBoss extends BossAbilityGroup {
 
 		mParams = Parameters.getParameters(boss, identityTag, new Parameters());
 		if (mParams.TARGET == EntityTargets.GENERIC_PLAYER_TARGET) {
-			mParams.TARGET = new EntityTargets(EntityTargets.TARGETS.PLAYER, mParams.MIN_RANGE, false, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
+			mParams.TARGET = new EntityTargets(EntityTargets.TARGETS.PLAYER, mParams.MIN_RANGE, EntityTargets.Limit.DEFAULT, List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 		}
 		SpellManager activeSpells = new SpellManager(List.of(
-				new SpellDash(plugin, boss, mParams.COOLDOWN, mParams.MIN_RANGE, mParams.TARGET, mParams.PREFER_TARGET, mParams.JUMP_VELOCITY, mParams.VELOCITY, mParams.SOUND_START, mParams.SOUND_LAND, mParams.PARTICLE_START, mParams.PARTICLE_AIR, mParams.PARTICLE_LAND)
+			new SpellDash(plugin, boss, mParams.COOLDOWN, mParams.MIN_RANGE, mParams.TARGET, mParams.PREFER_TARGET, mParams.JUMP_VELOCITY, mParams.VELOCITY, mParams.SOUND_START, mParams.SOUND_LAND, mParams.PARTICLE_START, mParams.PARTICLE_AIR, mParams.PARTICLE_LAND)
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), mParams.DETECTION, null, mParams.DELAY);

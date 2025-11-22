@@ -7,8 +7,8 @@ import com.playmonumenta.plugins.bosses.bosses.VarcosaSummonedMob;
 import com.playmonumenta.plugins.bosses.bosses.VarcosaSummonerBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,8 +63,9 @@ public class SpellSummonConstantly extends Spell {
 				player.playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 1, 1);
 			}
 
-			//Hopefully shouldn't break - the idea is that it will refresh how many mobs per player after each death, but it will be based upon a final, unchanging number mBaseSpawns. Also it only changes it when the spell is cast
-			int spawnsPerArmorStand = BossUtils.getPlayersInRangeForHealthScaling(mCenter, 50) - 1 + mBaseSpawns;
+			// Hopefully shouldn't break - the idea is that it will refresh how many mobs per player after each death,
+			// but it will be based upon a final, unchanging number mBaseSpawns. Also it only changes it when the spell is cast
+			final int spawnsPerArmorStand = PlayerUtils.playersInRange(mCenter, 50, true).size() - 1 + mBaseSpawns;
 
 			mTimer = mDuration;
 			Collection<ArmorStand> stands = mCenter.getNearbyEntitiesByType(ArmorStand.class, mRadius);
@@ -73,7 +74,7 @@ public class SpellSummonConstantly extends Spell {
 			Collections.shuffle(mLocationOffsets);
 			for (ArmorStand armorStand : stands) {
 				if (!armorStand.getScoreboardTags().contains("summon_constantly_stand")
-					    && !armorStand.getScoreboardTags().contains("varcosa_center")) {
+					&& !armorStand.getScoreboardTags().contains("varcosa_center")) {
 					continue;
 				}
 				int numSummoned = 0;
@@ -87,7 +88,7 @@ public class SpellSummonConstantly extends Spell {
 
 					// Blocks above summon-on block must be not solid
 					if (loc.getBlock().isSolid()
-						    || loc.clone().add(0, 1, 0).getBlock().isSolid()) {
+						|| loc.clone().add(0, 1, 0).getBlock().isSolid()) {
 						continue;
 					}
 
@@ -105,7 +106,8 @@ public class SpellSummonConstantly extends Spell {
 							BossManager.getInstance().manuallyRegisterBoss(summoned, new VarcosaSummonedMob(Plugin.getInstance(), summoned, (VarcosaSummonerBoss) mSummoner));
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						MMLog.warning(() -> "[SpellSummonConstantly] Failed to summon one or more mobs for " +
+							mSummoner.mBoss.getName() + "! Is the Library of Souls empty or not loaded?");
 					}
 
 					// Stop once the right number of mobs have been summoned for this armor stand

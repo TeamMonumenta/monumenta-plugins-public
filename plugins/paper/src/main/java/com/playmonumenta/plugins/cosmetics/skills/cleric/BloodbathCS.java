@@ -60,7 +60,7 @@ public class BloodbathCS extends IlluminateCS {
 
 	@Override
 	public void projectileEffects(Player player, Location loc) {
-		Particle.DustOptions color = new Particle.DustOptions(Color.fromRGB(10 * mProjectileTransition, 240 - 10 * mProjectileTransition, 240 - 10 * mProjectileTransition), 1.2f);
+		Particle.DustOptions color = new Particle.DustOptions(Color.fromRGB(Math.min(255, 10 * mProjectileTransition), Math.max(0, 240 - 10 * mProjectileTransition), Math.max(0, 240 - 10 * mProjectileTransition)), 1.2f);
 		Vector front = loc.getDirection().normalize().multiply(0.75);
 		Vector right = VectorUtils.rotateTargetDirection(front, -90, -90);
 		Vector left = VectorUtils.rotateTargetDirection(front, -90, 90);
@@ -158,7 +158,7 @@ public class BloodbathCS extends IlluminateCS {
 			display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GROUND);
 			display.setItemStack(DisplayEntityUtils.generateRPItem(Material.CYAN_DYE, "Insanity's Edge"));
 			EntityUtils.setRemoveEntityOnUnload(display);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), display::remove, (int)maxDuration);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), display::remove, (int) maxDuration);
 			// Hieroglyph for "Fight"
 			Vector front = player.getEyeLocation().getDirection().setY(0).normalize().multiply(0.66 * radius);
 			Vector left = VectorUtils.rotateTargetDirection(front, -90, 0);
@@ -169,7 +169,7 @@ public class BloodbathCS extends IlluminateCS {
 			Location loc3 = loc.clone().add(right);
 			for (int i = 0; i < 2; i++) {
 				double delta = 0.2 * i;
-				final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(160 - 40 * i, 0, 40 - 10 * i), 1.2f - i*0.2f);
+				final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(160 - 40 * i, 0, 40 - 10 * i), 1.2f - i * 0.2f);
 				new PPLine(Particle.REDSTONE, loc, loc2).data(RED).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 				new PPLine(Particle.REDSTONE, loc2.clone().add(front), loc2.clone().subtract(front)).data(RED).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 				new PPLine(Particle.REDSTONE, loc, loc1.clone().add(right.clone().multiply(0.5))).data(RED).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);

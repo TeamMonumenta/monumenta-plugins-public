@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -111,28 +112,45 @@ public class LacerateBoss extends BossAbilityGroup {
 		public Color END_LINE_COLOR = Color.fromRGB(245, 233, 233);
 
 		@BossParam(help = "Sound played at the targeted player when the boss starts charging the ability ability")
-		public SoundsList SOUND_WARNING = SoundsList.fromString("[(ITEM_TRIDENT_RETURN,5,0.75)]");
+		public SoundsList SOUND_WARNING = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_TRIDENT_RETURN, 5.0f, 0.75f))
+			.build();
 
 		@BossParam(help = "Sound played every tick at the caster while the spell is charging. Pitch is automatically increased by 0.01 every tick")
-		public SoundsList SOUND_CHARGE_BOSS = SoundsList.fromString("[]");
+		public SoundsList SOUND_CHARGE_BOSS = SoundsList.EMPTY;
 
 		@BossParam(help = "Sound played at the start of when the flurry happens.")
-		public SoundsList SOUND_EXPLOSION = SoundsList.fromString("[(BLOCK_BEACON_POWER_SELECT,1,1.65)]");
+		public SoundsList SOUND_EXPLOSION = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_BEACON_POWER_SELECT, 1.0f, 1.65f))
+			.build();
 
 		@BossParam(help = "Sound played at the start of when the flurry happens.")
-		public SoundsList SOUND_FINISHER = SoundsList.fromString("[(ITEM_TRIDENT_RIPTIDE_3, 1.25, 1),(BLOCK_RESPAWN_ANCHOR_DEPLETE, 1.25, 0.8)]");
+		public SoundsList SOUND_FINISHER = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_TRIDENT_RIPTIDE_3, 1.25f, 1.0f))
+			.add(new SoundsList.CSound(Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, 1.25f, 0.8f))
+			.build();
 
 		@BossParam(help = "Sound of the flurries. increases by 0.125 every time")
-		public SoundsList SOUND_FLURRY_INCREMENT = SoundsList.fromString("[(ITEM_TRIDENT_THROW, 1.25, 0.85),(ENTITY_PUFFER_FISH_BLOW_OUT, 1.25, 0.75)]");
+		public SoundsList SOUND_FLURRY_INCREMENT = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_TRIDENT_THROW, 1.25f, 0.85f))
+			.add(new SoundsList.CSound(Sound.ENTITY_PUFFER_FISH_BLOW_OUT, 1.25f, 0.75f))
+			.build();
 
 		@BossParam(help = "background sound of the flurries. does not increment")
-		public SoundsList SOUND_FLURRY_BACKGROUND = SoundsList.fromString("[(ITEM_TRIDENT_HIT, 1.1, 0.75),(ITEM_TRIDENT_RETURN, 1.1, 1.25)]");
+		public SoundsList SOUND_FLURRY_BACKGROUND = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ITEM_TRIDENT_HIT, 1.1f, 0.75f))
+			.add(new SoundsList.CSound(Sound.ITEM_TRIDENT_RETURN, 1.1f, 1.25f))
+			.build();
 
 		@BossParam(help = "Particles used in telegraph beam")
-		public ParticlesList TELEGRAPH_BEAM = ParticlesList.fromString("[(ELECTRIC_SPARK)]");
+		public ParticlesList TELEGRAPH_BEAM = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.ELECTRIC_SPARK, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particles used in telegraph circle")
-		public ParticlesList TELEGRAPH_CIRCLE = ParticlesList.fromString("[(ELECTRIC_SPARK)]");
+		public ParticlesList TELEGRAPH_CIRCLE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.ELECTRIC_SPARK, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particles used when hit")
 		public Particle ON_HIT_PARTICLE = Particle.WAX_OFF;
@@ -153,7 +171,7 @@ public class LacerateBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT) {
-			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RANGE, false, EntityTargets.Limit.DEFAULT_ONE, p.LINE_OF_SIGHT ? List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT) : Collections.emptyList());
+			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RANGE, EntityTargets.Limit.DEFAULT_ONE, p.LINE_OF_SIGHT ? List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED) : Collections.emptyList());
 		}
 
 		Spell spell = new SpellLacerate(plugin, boss, p);

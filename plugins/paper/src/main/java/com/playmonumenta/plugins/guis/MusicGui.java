@@ -41,7 +41,7 @@ public class MusicGui extends Gui {
 		VALLEY("valley", 36, "Monumenta Soundtrack: King's Valley"),
 		ISLES("isles", 54, "Monumenta Soundtrack: Celsian Isles"),
 		RING("ring", 54, "Monumenta Soundtrack: Architect's Ring"),
-		DUNGEONS("dungeons", 27, "Monumenta Soundtrack: Dungeons"),
+		DUNGEONS("dungeons", 54, "Monumenta Soundtrack: Dungeons"),
 		PLAYLIST("playlist", 54, "Music Playlist"),
 		LABS("labs", 27, "Monumenta Soundtrack: Alchemy Labs"),
 		WHITE("white", 27, "Monumenta Soundtrack: Halls of Wind and Blood"),
@@ -51,6 +51,8 @@ public class MusicGui extends Gui {
 		YELLOW("yellow", 27, "Monumenta Soundtrack: Vernal Nightmare"),
 		WILLOWS("willows", 27, "Monumenta Soundtrack: Black Willows"),
 		REVERIE("reverie", 27, "Monumenta Soundtrack: Malevolent Reverie"),
+		LIME("lime", 27, "Monumenta Soundtrack: Salazar's Folly"),
+		GRAY("gray", 27, "Monumenta Soundtrack: Valley of the Forgotten Pharaohs"),
 		BLUE("blue", 27, "Monumenta Soundtrack: Coven's Gambit"),
 		BROWN("brown", 27, "Monumenta Soundtrack: Cradle of the Broken God"),
 		PLOTS("plots", 27, "Monumenta Soundtrack: Miscellaneous");
@@ -116,23 +118,26 @@ public class MusicGui extends Gui {
 
 				addMusicItem(2, 1, Material.MUSIC_DISC_WARD, "Brothers of the Jungle", Location.VERDANT, "Verdant Remnants", "CmdrGod", "epic:music.vrsanctum", 366, checkScore("Quest21", 20));
 				addMusicItem(2, 2, Material.MUSIC_DISC_WARD, "Cry of the Remnants", Location.VERDANT, "R'Kitxet", "CmdrGod", "epic:music.vrboss", 239, checkScore("Verdant"));
-				addMusicItem(2, 3, Material.MUSIC_DISC_FAR, "Soulbinder", Location.SANCTUM, "C'Shura", "Whitebeard_OP", "epic:music.cshura", 230, checkScore("Sanctum"));
+				addMusicItem(2, 3, Material.MUSIC_DISC_FAR, "Forsworn Sanctum", Location.SANCTUM, "Forsworn Sanctum", "YaKo", "epic:music.forsworn", 132, checkScore("Sanctum"));
+				addMusicItem(2, 4, Material.MUSIC_DISC_FAR, "Soulbinder", Location.SANCTUM, "C'Shura", "Whitebeard_OP", "epic:music.cshura", 230, checkScore("Sanctum"));
 				addMusicItem(2, 5, Material.MUSIC_DISC_CHIRP, "Soulspeaker", Location.REVERIE, "C'Axtal", "Whitebeard_OP", "epic:music.caxtal", 151, checkScore("Corrupted"));
 				addMusicItem(2, 6, Material.MUSIC_DISC_BLOCKS, "Tenebrae", Location.AZACOR, "Azacor", "Whitebeard_OP", "epic:music.azacor", 251, checkScore("AzacorNormalWin") || checkScore("AzacorHardWin"));
 				addMusicItem(2, 7, Material.MUSIC_DISC_CAT, "Heart of the Jungle", Location.KAUL, "Kaul", "Whitebeard_OP", "epic:music.kaul", 220, checkScore("KaulWins"));
 
 				addMusicItem(3, 1, Material.MUSIC_DISC_PIGSTEP, "Realm of Fate", Location.AMBER, "King's Valley", "Corpe_", "epic:music.valley", 174, true);
-				addMusicItem(3, 2, Material.MUSIC_DISC_FAR, "Jovial Jaunt", Location.OVERWORLD1, "Racing Theme", "Whitebeard_OP", "epic:music.racegeneric", 113, true);
-				addMusicItem(3, 3, Material.MUSIC_DISC_MELLOHI, "Endless Tactics", Location.BLITZ, "Blitz", "Whitebeard_OP", "epic:music.blitz", 118, checkScore("Blitz", 10));
+				addMusicItem(3, 2, Material.MUSIC_DISC_WARD, "Unfamiliar Wilds", Location.AMBER, "King's Valley", "Salamanderlonk", "epic:music.valleyjungle", 151, true);
+				addMusicItem(3, 3, Material.MUSIC_DISC_FAR, "Jovial Jaunt", Location.OVERWORLD1, "Racing Theme", "Whitebeard_OP", "epic:music.racegeneric", 113, true);
+				addMusicItem(3, 5, Material.MUSIC_DISC_MELLOHI, "Endless Tactics", Location.BLITZ, "Blitz", "Whitebeard_OP", "epic:music.blitz", 118, checkScore("Blitz", 10));
 
-				addMusicItem(3, 5, Material.MUSIC_DISC_13, "Sacred Temple", Location.AMBER, "The Monument", "Whitebeard_OP", "epic:music.monument", 244, checkAdvance("monumenta:handbook/important_sites/r1/monument"));
-				addMusicItem(3, 6, Material.MUSIC_DISC_5, "Unknown Anomaly", Location.STARPOINT, "All That Remains", "CmdrGod", "epic:music.unknownatr", 180, checkScore("Quest54", 36));
+				addMusicItem(3, 6, Material.MUSIC_DISC_13, "Sacred Temple", Location.AMBER, "The Monument", "Whitebeard_OP", "epic:music.monument", 244, checkAdvance("monumenta:handbook/important_sites/r1/monument"));
+				addMusicItem(3, 7, Material.MUSIC_DISC_5, "Unknown Anomaly", Location.STARPOINT, "All That Remains", "CmdrGod", "epic:music.unknownatr", 180, checkScore("Quest54", 36));
 			}
 
 			case ISLES -> {
 				addMusicItem(1, 1, Material.MUSIC_DISC_WAIT, "For Queen and Country", Location.FROSTGIANT, "Frostgate", "BobbyJonesSr", "epic:music.frostgate", 243, checkAdvance("monumenta:quests/r2/frostgate"));
 				addMusicItem(1, 2, Material.MUSIC_DISC_MALL, "Frigid and Forlorn", Location.FROSTGIANT, "Nightroost", "BobbyJonesSr", "epic:music.nightroost", 215, checkAdvance("monumenta:quests/r2/nightroost"));
 				addMusicItem(1, 3, Material.MUSIC_DISC_WAIT, "Snowflake's Refuge", Location.FROSTGIANT, "Wispervale", "Casiel368", "epic:music.wispervale", 223, checkAdvance("monumenta:quests/r2/wispervale"));
+				addMusicItem(1, 4, Material.MUSIC_DISC_STRAD, "Frozen Aspiration", Location.FROSTGIANT, "Chillwind", "Salamanderlonk", "epic:music.chillwind", 143, checkAdvance("monumenta:quests/r2/frostgate"));
 
 				addMusicItem(1, 5, Material.MUSIC_DISC_13, "For Gold and Glory", Location.AMBER, "Alnera", "BobbyJonesSr", "epic:music.alnera", 265, checkAdvance("monumenta:quests/r2/alnera"));
 				addMusicItem(1, 6, Material.MUSIC_DISC_BLOCKS, "Arid and Adrift", Location.RUSH, "Rahkeri", "BobbyJonesSr", "epic:music.rahkeri", 222, checkAdvance("monumenta:quests/r2/rahkeri"));
@@ -187,8 +192,12 @@ public class MusicGui extends Gui {
 				addMusicItem(3, 7, Material.MUSIC_DISC_5, "Supernova Slayer", Location.ZENITH, "Vesperidys", "CmdrGod", Vesperidys.MUSIC_TITLE_2, Broodmother.MUSIC_DURATION_2, checkScore("Zenith"));
 
 				addMusicItem(4, 1, Material.MUSIC_DISC_STRAD, "Ancient Automation", Location.SILVER, "Silver Construct", "Salamanderlonk", ImperialConstruct.MUSIC_TITLE, ImperialConstruct.MUSIC_DURATION, checkScore("SKT"));
-				addMusicItem(4, 2, Material.MUSIC_DISC_OTHERSIDE, "The Fate of Time", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE, TealSpirit.MUSIC_DURATION, checkScore("SKT"));
+				addMusicItem(4, 2, Material.MUSIC_DISC_OTHERSIDE, "The Fate of Time", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE_1, TealSpirit.MUSIC_DURATION_1, checkScore("SKT"));
 				addMusicItem(4, 3, Material.MUSIC_DISC_OTHERSIDE, "The Hour of Oblivion", Location.SILVER, "Orasomn", "Salamanderlonk", TealSpirit.MUSIC_TITLE_2, TealSpirit.MUSIC_DURATION_2, checkScore("SKT"));
+
+				addMusicItem(4, 5, Material.MUSIC_DISC_BLOCKS, "Usurpation I: They Can Hear You Breathe", Location.TWISTED_INTRUDER, "Twisted Intruder", "Xernial", "epic:music.intruder_phase1", 244.8, checkScore("TwistedXWins"));
+				addMusicItem(4, 6, Material.MUSIC_DISC_BLOCKS, "Usurpation II: Waking Shadows", Location.TWISTED_INTRUDER, "Twisted Intruder", "Xernial", "epic:music.intruder_phase2", 328.3, checkScore("TwistedXWins"));
+				addMusicItem(4, 7, Material.MUSIC_DISC_BLOCKS, "Usurpation III: The Staring Eclipse", Location.TWISTED_INTRUDER, "Twisted Intruder", "Xernial", "epic:music.intruder_phase3", 53, checkScore("TwistedXWins"));
 			}
 
 			case DUNGEONS -> {
@@ -202,8 +211,12 @@ public class MusicGui extends Gui {
 				addDungeonItem(2, 2, Material.GLASS_BOTTLE, Location.LABS, MusicPage.LABS, "OldLab");
 				addDungeonItem(2, 3, Material.JUNGLE_LEAVES, Location.WILLOWS, MusicPage.WILLOWS, "R1Bonus");
 				addDungeonItem(2, 4, Material.FIRE_CORAL, Location.REVERIE, MusicPage.REVERIE, "Corrupted");
-				addDungeonItem(2, 5, Material.BLUE_WOOL, Location.BLUE, MusicPage.BLUE, "Blue");
-				addDungeonItem(2, 6, Material.BROWN_WOOL, Location.BROWN, MusicPage.BROWN, "Brown");
+				//R2
+				addDungeonItem(3, 2, Material.LIME_WOOL, Location.LIME, MusicPage.LIME, "Lime");
+				addDungeonItem(3, 3, Material.GRAY_WOOL, Location.GRAY, MusicPage.GRAY, "Gray");
+				//R3
+				addDungeonItem(4, 2, Material.BLUE_WOOL, Location.BLUE, MusicPage.BLUE, "Blue");
+				addDungeonItem(4, 3, Material.BROWN_WOOL, Location.BROWN, MusicPage.BROWN, "Brown");
 			}
 
 			case PLAYLIST -> {
@@ -285,6 +298,19 @@ public class MusicGui extends Gui {
 			case REVERIE -> {
 				addMusicItem(1, 3, Material.MUSIC_DISC_CHIRP, "He is Awake 1", Location.REVERIE, "Okaye", "epic:music.reverie1", 103);
 				addMusicItem(1, 5, Material.MUSIC_DISC_CHIRP, "He is Awake 2", Location.REVERIE, "Okaye", "epic:music.reverie2", 97);
+			}
+
+			case LIME -> {
+				addMusicItem(1, 2, Material.MUSIC_DISC_STAL, "Echos of an Empire", Location.LIME, "Salamanderlonk", "epic:music.limecave", 67);
+				addMusicItem(1, 5, Material.MUSIC_DISC_STAL, "Forgotten Viridia", Location.LIME, "Salamanderlonk", "epic:music.limecity", 138);
+				addMusicItem(1, 7, Material.MUSIC_DISC_STAL, "Unfound Knowledge", Location.LIME, "Salamanderlonk", "epic:music.limeend", 79);
+			}
+
+			case GRAY -> {
+				addMusicItem(1, 2, Material.MUSIC_DISC_STAL, "Desolate Valley 1", Location.GRAY, "Salamanderlonk", "epic:music.gray1", 90);
+				addMusicItem(1, 3, Material.MUSIC_DISC_STAL, "Desolate Valley 2", Location.GRAY, "Salamanderlonk", "epic:music.gray2", 69);
+				addMusicItem(1, 5, Material.MUSIC_DISC_STAL, "Lost Kingdom", Location.GRAY, "Salamanderlonk", "epic:music.gray3", 69);
+				addMusicItem(1, 6, Material.MUSIC_DISC_STAL, "Dark Secrets", Location.GRAY, "Salamanderlonk", "epic:music.grayend", 78);
 			}
 
 			case BLUE -> {
@@ -428,6 +454,7 @@ public class MusicGui extends Gui {
 		mPlaylistRunnable = new BukkitRunnable() {
 			double mTicks = 0;
 			final double mDuration = mPlaylistData.mPlaylistTracks.get(mPlaylistData.mCurrentTrackIndex).mDuration * 20;
+
 			@Override
 			public void run() {
 				mTicks++;

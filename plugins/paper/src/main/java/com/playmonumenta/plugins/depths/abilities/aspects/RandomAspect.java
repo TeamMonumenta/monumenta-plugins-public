@@ -26,12 +26,12 @@ public class RandomAspect extends WeaponAspectDepthsAbility {
 
 	private static Description<RandomAspect> getDescription() {
 		if (ServerProperties.getShardName().contains("zenith")) {
-			return new DescriptionBuilder<RandomAspect>()
+			return new DescriptionBuilder<>(() -> INFO)
 				.add("Obtain a random ability at ")
 				.add(DepthsRarity.TWISTED.getDisplay())
 				.add(" level.");
 		} else {
-			return new DescriptionBuilder<RandomAspect>()
+			return new DescriptionBuilder<>(() -> INFO)
 				.add("Obtain a random ability. Transforms into a random other aspect after defeating floor 3.");
 		}
 	}

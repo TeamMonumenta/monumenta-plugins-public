@@ -133,8 +133,8 @@ public class Shattered implements Infusion {
 
 	public static int getHighestShatterLevelEquipped(Player player) {
 		return Arrays.stream(EquipmentSlot.values())
-				.mapToInt(slot -> ItemStatUtils.getInfusionLevel(player.getEquipment().getItem(slot), InfusionType.SHATTERED))
-				.max().orElse(0);
+			.mapToInt(slot -> ItemStatUtils.getInfusionLevel(player.getEquipment().getItem(slot), InfusionType.SHATTERED))
+			.max().orElse(0);
 	}
 
 	public static int getShatterLevel(ItemStack item) {

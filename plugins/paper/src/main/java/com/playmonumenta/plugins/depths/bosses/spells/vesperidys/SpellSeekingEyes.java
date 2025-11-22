@@ -30,7 +30,7 @@ public class SpellSeekingEyes extends Spell {
 	private final LivingEntity mBoss;
 	private final Vesperidys mVesperidys;
 
-	private static final int INITIAL_DELAY = 1 * 20;
+	private static final int INITIAL_DELAY = 20;
 	private static final int EYE_DURATION_A0 = 15 * 20;
 	private static final int EYE_DURATION_A8 = 10 * 20;
 	private static final int PLAYERS_COUNT = 2;
@@ -90,7 +90,7 @@ public class SpellSeekingEyes extends Spell {
 					Location spawnLoc = player.getLocation().clone().add(FastUtils.randomDoubleInRange(-10, 10), 0, FastUtils.randomDoubleInRange(-10, 10));
 					spawnLoc.setY(mVesperidys.mSpawnLoc.getY() + FastUtils.randomDoubleInRange(6, 10));
 					summonEyes(spawnLoc, player);
-				}, INITIAL_DELAY + num * 20);
+				}, INITIAL_DELAY + num * 20L);
 			}
 		}
 	}
@@ -206,7 +206,8 @@ public class SpellSeekingEyes extends Spell {
 		mActiveRunnables.add(eyesRunnable);
 	}
 
-	@Override public boolean canRun() {
+	@Override
+	public boolean canRun() {
 		return !mOnCooldown && !mVesperidys.mTeleportSpell.mTeleporting;
 	}
 

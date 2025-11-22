@@ -213,7 +213,7 @@ public class DeclerationTuulen extends Spell {
 					vec2.normalize();
 					Vector vecToBoss = LocationUtils.getVectorTo(mSirius.mBoss.getLocation(), SILVERKNIGHTLOCATIONS.get(mThrown));
 					Location fallVec = LocationUtils.fallToGround(SILVERKNIGHTLOCATIONS.get(mThrown), 0).subtract(SILVERKNIGHTLOCATIONS.get(mThrown));
-					Transformation rotation = DisplayEntityUtils.rotateToPointAtLoc(display, vec2, -3*Math.PI/4.0f);
+					Transformation rotation = DisplayEntityUtils.rotateToPointAtLoc(display, vec2, -3 * Math.PI / 4.0f);
 					animation = animation.addKeyframe(rotation, 10);
 					animation = animation.addDelay(DURATION - mTicks);
 					animation.addKeyframe(new Transformation(new Vector3f((float) vecToBoss.getX(), (float) vecToBoss.getY(), (float) vecToBoss.getZ()), new AxisAngle4f(), new Vector3f(2f), new AxisAngle4f()), 5);

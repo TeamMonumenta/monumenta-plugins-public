@@ -105,8 +105,8 @@ public class CustomContainerItemManager implements Listener {
 				amount += tempAmount;
 			}
 			addLore.accept(Component.text("Contains ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-				               .append(Component.text(amount, NamedTextColor.WHITE))
-				               .append(Component.text(" items", NamedTextColor.GRAY)));
+				.append(Component.text(amount, NamedTextColor.WHITE))
+				.append(Component.text(" items", NamedTextColor.GRAY)));
 		}
 	}
 
@@ -122,10 +122,10 @@ public class CustomContainerItemManager implements Listener {
 		ItemStack container = event.getCurrentItem();
 		CustomContainerItemConfiguration config = getConfiguration(container);
 		if (event.getClickedInventory() instanceof PlayerInventory // to prevent issues, only allow using from player inventory
-			    && container != null
-			    && config != null
-			    && container.getAmount() == 1
-			    && event.getWhoClicked() instanceof Player player) {
+			&& container != null
+			&& config != null
+			&& container.getAmount() == 1
+			&& event.getWhoClicked() instanceof Player player) {
 			ItemStack cursor = event.getCursor();
 			if (cursor == null || cursor.getType() == Material.AIR) {
 				if (event.getClick() == ClickType.RIGHT) {
@@ -162,9 +162,9 @@ public class CustomContainerItemManager implements Listener {
 					if (deposited > 0) {
 						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						player.sendMessage(Component.text(deposited + " item" + (deposited == 1 ? "" : "s") + " deposited into " + ItemUtils.getPlainName(container), NamedTextColor.GOLD)
-							                   .hoverEvent(HoverEvent.showText(Component.text(
-								                   depositedItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
-									                   .collect(Collectors.joining("\n")), NamedTextColor.GRAY))));
+							.hoverEvent(HoverEvent.showText(Component.text(
+								depositedItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
+									.collect(Collectors.joining("\n")), NamedTextColor.GRAY))));
 						ItemUpdateHelper.generateItemStats(container);
 					} else {
 						player.sendMessage(Component.text("Cannot store any more items in this " + ItemUtils.getPlainName(container) + ".", NamedTextColor.RED));
@@ -196,7 +196,7 @@ public class CustomContainerItemManager implements Listener {
 
 	private static boolean checkSoulbound(Player player, ItemStack item) {
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.SOULBOUND) > 0
-			    && !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
+			&& !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
 			player.sendMessage(Component.text("This " + ItemUtils.getPlainName(item) + " does not belong to you!", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			return false;
@@ -421,6 +421,15 @@ public class CustomContainerItemManager implements Listener {
 		item.setAmount(0);
 	}
 
+	/**
+	 * Removes the first ItemStack matching the input predicates.
+	 *
+	 * @param container The container to select items from.
+	 * @param maxAmount The maximum number of items to select.
+	 * @param testPredicate Predicate (yes/no statement) that determines which item to select.
+	 * @param consumePredicate Predicate (yes/no statement) that determines whether the item should actually be removed from the container.
+	 * @return The ItemStack that was selected from the container, as well as whether it was actually removed or not.
+	 */
 	public static @Nullable Pair<ItemStack, Boolean> removeFirstFromContainer(ItemStack container, int maxAmount, Predicate<ItemStack> testPredicate, Predicate<ItemStack> consumePredicate) {
 		if (container.getAmount() != 1) { // don't perform most validity checks - this is called from outside of GUIs etc.
 			throw new IllegalStateException("Container not valid in removeFirstFromContainer");

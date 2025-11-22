@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -20,12 +21,15 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Snowball;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ImmortalMountBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_immortalmount";
 
-	private static final ImmutableList<Class<? extends Effect>> COPIED_EFFECTS = ImmutableList.of(InfernoDamage.class, CustomDamageOverTime.class);
+	private static final ImmutableList<Class<? extends Effect>> COPIED_EFFECTS = ImmutableList.of(
+		InfernoDamage.class,
+		CustomDamageOverTime.class);
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Whether or not damage taken by this mount is redirected to its passenger")
@@ -49,12 +53,13 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		mTransferDamage = p.TRANSFER_DAMAGE;
 		mKillMountOnNoPassenger = p.KILL_MOUNT_ON_NO_PASSENGER;
+		boss.addScoreboardTag(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG);
 
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				List<Entity> passengers = boss.getPassengers();
 				passengers.removeIf(e -> e.getScoreboardTags().contains("boss_immortalpassenger")
-					                         || e.getType() == EntityType.ARMOR_STAND);
+					|| e.getType() == EntityType.ARMOR_STAND);
 
 				// exception for snowball passengers
 				if (!passengers.isEmpty() && passengers.get(0) instanceof Snowball snowball && snowball.getPassengers().isEmpty()) {
@@ -62,7 +67,7 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 					boss.remove();
 				}
 
-				if (mKillMountOnNoPassenger && passengers.size() == 0) {
+				if (mKillMountOnNoPassenger && passengers.isEmpty()) {
 					boss.setHealth(0);
 					boss.remove();
 				} else {
@@ -112,16 +117,47 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 		if (mTransferDamage && mPassenger != null && COPIED_EFFECTS.contains(event.getEffect().getClass())) {
 			event.setEntity(mPassenger);
 		}
+		// Jade (catgirljade_) says that this is a bad method and the transference of DoT / Inferno should happen further up in the pipeline.
 	}
 
 	@Override
-	public void bossIgnited(int ticks) {
+	public void bossIgnited(int ticks, @Nullable Entity applier) {
 		if (mTransferDamage) {
 			if (mPassenger != null) {
-				EntityUtils.setFireTicksIfLower(ticks, mPassenger);
+				EntityUtils.setFireTicksIfLower(ticks, mPassenger, applier);
 			}
 			mBoss.setFireTicks(0);
 		}
 	}
 
+	public boolean isTransferDamage() {
+		return mTransferDamage;
+	}
+
+	public static boolean isDamageTransferringImmortalMount(LivingEntity boss) {
+		ImmortalMountBoss instance = BossManager.getInstance().getBoss(boss, ImmortalMountBoss.class);
+		if (instance == null) {
+			return false;
+		} else {
+			return instance.isTransferDamage();
+		}
+	}
+
+	public static List<LivingEntity> getMortalPassengers(LivingEntity boss) {
+		if (isDamageTransferringImmortalMount(boss)) {
+			List<LivingEntity> passengers = new java.util.ArrayList<>();
+			for (Entity entity : boss.getPassengers()) {
+				if (entity instanceof LivingEntity livingEntity) {
+					passengers.addAll(getMortalPassengers(livingEntity));
+				}
+			}
+			if (passengers.isEmpty()) {
+				return List.of(boss);
+			} else {
+				return passengers;
+			}
+		} else {
+			return List.of(boss);
+		}
+	}
 }

@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.warrior;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.ShieldBashCS;
@@ -13,6 +15,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 public class ShieldBash extends Ability {
 
 	private static final int SHIELD_BASH_DAMAGE = 8;
-	private static final int SHIELD_BASH_STUN = 20 * 1;
+	private static final int SHIELD_BASH_STUN = 20;
 	private static final int SHIELD_BASH_COOLDOWN = 20 * 8;
 	private static final int SHIELD_BASH_2_RADIUS = 3;
 	private static final int SHIELD_BASH_RANGE = 4;
@@ -38,6 +41,7 @@ public class ShieldBash extends Ability {
 	public static final String CHARM_DAMAGE = "Shield Bash Damage";
 	public static final String CHARM_DURATION = "Shield Bash Duration";
 	public static final String CHARM_COOLDOWN = "Shield Bash Cooldown";
+	public static final String CHARM_KNOCKBACK = "Shield Bash Knockback";
 	public static final String CHARM_RADIUS = "Shield Bash Radius";
 	public static final String CHARM_RANGE = "Shield Bash Range";
 	public static final String CHARM_PARRY_DURATION = "Shield Bash Parry Duration";
@@ -48,14 +52,18 @@ public class ShieldBash extends Ability {
 			.linkedSpell(ClassAbility.SHIELD_BASH)
 			.scoreboardId("ShieldBash")
 			.shorthandName("SB")
-			.descriptions(
-				"Block while looking at an enemy within 4 blocks and not sneaking to deal 8 melee damage, stun for 1 second, and taunt the targeted enemy. " +
-					"Elites and bosses are rooted instead of stunned. Cooldown: 8s.",
-				"Additionally, apply damage, stun, and taunt to all enemies in a 3 block radius from the enemy you are looking at.",
-				"Blocking damage with a shield within 1s of beginning to block refreshes 50% of this skill's cooldown.")
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Bash mobs with your shield, stunning and taunting them.")
 			.cooldown(SHIELD_BASH_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.IRON_DOOR);
+
+	private final double mRange;
+	private final double mRadius;
+	private final double mDamage;
+	private final double mKnockback;
+	private final int mStunDuration;
+	private final int mParryDuration;
+	private final double mCDR;
 
 	private boolean mIsEnhancementUsed = true;
 	private @Nullable CounterStrike mCounterStrike;
@@ -64,6 +72,13 @@ public class ShieldBash extends Ability {
 
 	public ShieldBash(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, SHIELD_BASH_RANGE);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, SHIELD_BASH_2_RADIUS);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_BASH_DAMAGE);
+		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SHIELD_BASH_STUN);
+		mParryDuration = CharmManager.getDuration(mPlayer, CHARM_PARRY_DURATION, ENHANCEMENT_BLOCKING_DURATION);
+		mCDR = ENHANCEMENT_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CDR);
+		mKnockback = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, 0.35f);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldBashCS());
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mCounterStrike = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, CounterStrike.class);
@@ -76,9 +91,7 @@ public class ShieldBash extends Ability {
 			return;
 		}
 
-		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, SHIELD_BASH_RANGE);
-		LivingEntity mob = EntityUtils.getHostileEntityAtCursor(mPlayer, range);
-
+		LivingEntity mob = EntityUtils.getHostileEntityAtCursor(mPlayer, mRange);
 		if (mob == null) {
 			return;
 		}
@@ -90,8 +103,9 @@ public class ShieldBash extends Ability {
 
 		bash(mob, ClassAbility.SHIELD_BASH);
 		if (isLevelTwo()) {
-			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mob), CharmManager.getRadius(mPlayer, CHARM_RADIUS, SHIELD_BASH_2_RADIUS));
+			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mob), mRadius);
 			for (LivingEntity le : hitbox.getHitMobs(mob)) {
+				mCosmetic.onHitSurroundingMobs(mPlayer, world, eyeLoc, le.getEyeLocation());
 				bash(le, ClassAbility.SHIELD_BASH_AOE);
 			}
 		}
@@ -109,8 +123,8 @@ public class ShieldBash extends Ability {
 		// Player has blocked within the parry
 		// Event has been successfully blockedbyshield
 		// And ShieldBash is on CD...
-		if (isEnhanced() && !mIsEnhancementUsed && event.isBlockedByShield() && isOnCooldown() && mPlayer.getHandRaisedTime() < CharmManager.getDuration(mPlayer, CHARM_PARRY_DURATION, ENHANCEMENT_BLOCKING_DURATION)) {
-			int newCooldown = (int) (getModifiedCooldown() * (ENHANCEMENT_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CDR)));
+		if (isEnhanced() && !mIsEnhancementUsed && event.isBlockedByShield() && isOnCooldown() && mPlayer.getHandRaisedTime() < mParryDuration) {
+			int newCooldown = (int) (getModifiedCooldown() * mCDR);
 			mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.SHIELD_BASH, newCooldown);
 			mCosmetic.onParry(mPlayer.getWorld(), mPlayer.getLocation());
 
@@ -119,12 +133,14 @@ public class ShieldBash extends Ability {
 	}
 
 	private void bash(LivingEntity le, ClassAbility ca) {
-		DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_BASH_DAMAGE), ca, true, true);
-		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SHIELD_BASH_STUN);
+		DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, mDamage, ca, true, false);
+		if (mKnockback != 0) {
+			MovementUtils.knockAway(mPlayer, le, (float) mKnockback);
+		}
 		if (EntityUtils.isBoss(le) || EntityUtils.isElite(le)) {
-			EntityUtils.applySlow(mPlugin, duration, .99, le);
+			EntityUtils.applySlow(mPlugin, mStunDuration, .99, le);
 		} else {
-			EntityUtils.applyStun(mPlugin, duration, le);
+			EntityUtils.applyStun(mPlugin, mStunDuration, le);
 		}
 		if (le instanceof Mob mob) {
 			if (mCounterStrike != null) {
@@ -136,7 +152,7 @@ public class ShieldBash extends Ability {
 
 				@Override
 				public void run() {
-					if (mob.isDead() || !mob.isValid() || mT > duration * 2) {
+					if (mob.isDead() || !mob.isValid() || mT > mStunDuration * 2) {
 						this.cancel();
 					} else if (!EntityUtils.isStunned(mob)) {
 						EntityUtils.applyTaunt(mob, mPlayer, false);
@@ -149,4 +165,31 @@ public class ShieldBash extends Ability {
 		}
 	}
 
+	private static Description<ShieldBash> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Block while looking at a mob within ")
+			.add(a -> a.mRange, SHIELD_BASH_RANGE)
+			.add(" blocks and not sneaking to deal ")
+			.add(a -> a.mDamage, SHIELD_BASH_DAMAGE)
+			.add(" melee damage, stun for ")
+			.addDuration(a -> a.mStunDuration, SHIELD_BASH_STUN)
+			.add(" second, and taunt the targeted enemy. Elites and bosses are rooted instead of stunned.")
+			.addCooldown(SHIELD_BASH_COOLDOWN);
+	}
+
+	private static Description<ShieldBash> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Additionally, apply damage, stun, and taunt to all mobs within ")
+			.add(a -> a.mRadius, SHIELD_BASH_2_RADIUS)
+			.add(" blocks of the mob targeted by this ability.");
+	}
+
+	private static Description<ShieldBash> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Blocking damage with a shield within ")
+			.addDuration(a -> a.mParryDuration, ENHANCEMENT_BLOCKING_DURATION)
+			.add(" second of beginning to block refreshes ")
+			.addPercent(a -> a.mCDR, ENHANCEMENT_CDR)
+			.add(" of this ability's cooldown.");
+	}
 }

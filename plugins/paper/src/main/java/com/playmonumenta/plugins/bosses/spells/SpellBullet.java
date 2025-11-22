@@ -101,7 +101,7 @@ public class SpellBullet extends Spell {
 	private static final double PLAYER_HITBOX_HEIGHT = 1.8;
 
 	public SpellBullet(Plugin plugin, LivingEntity caster, Vector offset, int duration, int delay, int emissionSpeed, double velocity, double detectRange, double hitboxRadius, int cooldown, int bulletDuration, String pattern,
-					   double accel, int accelStart, int accelEnd, boolean passThrough, double rotationSpeed, TickAction tickAction, CastAction castAction, Material bulletMaterial, IntersectAction intersectAction) {
+	                   double accel, int accelStart, int accelEnd, boolean passThrough, double rotationSpeed, TickAction tickAction, CastAction castAction, Material bulletMaterial, IntersectAction intersectAction) {
 		mPlugin = plugin;
 		mEmissionSpeed = emissionSpeed;
 		mCaster = caster;
@@ -152,7 +152,7 @@ public class SpellBullet extends Spell {
 				if (mTicks < mDelay) {
 					mTickAction.run(mCaster, mTicks);
 				} else if (mTicks < mDuration + mDelay && mTicks % mEmissionSpeed == 0) {
-					if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, false).size() > 0) {
+					if (!PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, false).isEmpty()) {
 						List<Player> hittablePlayers = PlayerUtils.playersInRange(mCaster.getLocation(), 75, false);
 						if (mPattern == Pattern.BORDER || mPattern == Pattern.BORDER_2 || mPattern == Pattern.BORDER_1) {
 							launchAcceleratingBullet(hittablePlayers, new Vector(1, 0, 0).rotateAroundY(mRotation), 0, 0, 0);
@@ -203,7 +203,7 @@ public class SpellBullet extends Spell {
 							double rotation = mTicks / mRotationSpeed * Math.PI;
 							if (mTicks % 10 == 0) {
 								for (int i = 0; i < 4; i++) {
-									summonMarker(new Vector(1, 0, 0).rotateAroundY(rotation + i * Math.PI / 2.0), mDetectRange);
+									summonMarker(new Vector(1, 0, 0).rotateAroundY(rotation + i * Math.PI / 2.5), mDetectRange);
 								}
 								List<Player> players = EntityUtils.getNearestPlayers(mCaster.getLocation(), mDetectRange);
 								for (Player player : players) {
@@ -343,7 +343,7 @@ public class SpellBullet extends Spell {
 					launchAcceleratingBullet(players, detLoc, mBulletDuration, new Vector(0, 0, -1).rotateAroundY(rotationAngle - Math.PI / (4.0 * (granularity - mI + 1))), 0, 0, 0, small);
 				}
 			}
-			.runTaskLater(mPlugin, 10 + i);
+				.runTaskLater(mPlugin, 10 + i);
 		}
 	}
 

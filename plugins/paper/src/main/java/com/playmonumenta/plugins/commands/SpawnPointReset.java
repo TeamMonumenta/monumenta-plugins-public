@@ -12,16 +12,16 @@ public class SpawnPointReset {
 	@SuppressWarnings("unchecked")
 	public static void register() {
 		new CommandAPICommand("spawnpointreset")
-				.withSubcommand(new CommandAPICommand("reset"))
-				.withPermission(CommandPermission.fromString("monumenta.spawnpointreset"))
-				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
-				.executes((sender, args) -> {
-					Collection<Player> targets = (Collection<Player>) Objects.requireNonNull(args.get("players"));
-					for (Player target : targets) {
-						target.setRespawnLocation(null, true);
-					}
-				})
-				.register();
+			.withSubcommand(new CommandAPICommand("reset"))
+			.withPermission(CommandPermission.fromString("monumenta.spawnpointreset"))
+			.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
+			.executes((sender, args) -> {
+				Collection<Player> targets = (Collection<Player>) Objects.requireNonNull(args.get("players"));
+				for (Player target : targets) {
+					target.setRespawnLocation(null, true);
+				}
+			})
+			.register();
 	}
 
 }

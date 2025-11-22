@@ -24,11 +24,11 @@ public class UnsignBook extends GenericCommand {
 		}
 
 		// get the info of the written book
-		BookMeta bookmeta = (BookMeta)item.getItemMeta();
+		BookMeta bookmeta = (BookMeta) item.getItemMeta();
 
 		// create new item
 		ItemStack newItem = new ItemStack(Material.WRITABLE_BOOK, item.getAmount());
-		BookMeta newBookMeta = (BookMeta)newItem.getItemMeta();
+		BookMeta newBookMeta = (BookMeta) newItem.getItemMeta();
 
 		// transfer the infos
 		newBookMeta.addPages(bookmeta.pages().toArray(new Component[0]));

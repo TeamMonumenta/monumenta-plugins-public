@@ -84,7 +84,7 @@ public class PurgingPyreCS extends CleansingRainCS {
 		Location loc1 = loc.clone().add(left90);
 		Location loc2 = loc.clone().add(right90);
 		for (int i = 0; i < 2; i++) {
-			double delta = 0.2*i;
+			double delta = 0.2 * i;
 			final Particle.DustOptions ORANGE = new Particle.DustOptions(Color.fromRGB(255 - 60 * i, 135 - 35 * i, 0), 1.2f - i * 0.2f);
 			new PPLine(Particle.REDSTONE, loc1.clone().subtract(front), loc1.clone().add(front)).data(ORANGE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			new PPLine(Particle.REDSTONE, loc.clone().subtract(front), loc2.clone().subtract(front)).data(ORANGE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
@@ -92,7 +92,7 @@ public class PurgingPyreCS extends CleansingRainCS {
 			new PPLine(Particle.REDSTONE, loc, loc.clone().add(front)).data(ORANGE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			new PPLine(Particle.REDSTONE, loc, loc.clone().add(front.clone().multiply(0.5)).add(right90.clone().multiply(0.5))).data(ORANGE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 			new PPLine(Particle.REDSTONE, loc.clone().add(front), loc.clone().add(front.clone().multiply(0.5)).add(right90.clone().multiply(0.5))).data(ORANGE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
-			new PPCircle(Particle.REDSTONE, loc2.clone().add(front.clone().multiply(0.5)), mRadius*0.3).data(ORANGE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
+			new PPCircle(Particle.REDSTONE, loc2.clone().add(front.clone().multiply(0.5)), mRadius * 0.3).data(ORANGE).countPerMeter(10).delta(delta, 0, delta).spawnAsPlayerActive(player);
 		}
 		new PPCircle(Particle.ENCHANTMENT_TABLE, loc, mRadius).countPerMeter(12).extraRange(0.1, 0.2).innerRadiusFactor(1)
 			.directionalMode(true).delta(1, 0.2, 4).rotateDelta(true).spawnAsPlayerActive(player);

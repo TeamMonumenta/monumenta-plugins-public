@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfAnchoring;
 import com.playmonumenta.plugins.depths.abilities.gifts.StatueOfRegret;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +43,13 @@ public class StatueOfRegretReplaceGUI extends AbstractDepthsSelectionGUI<DepthsA
 		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
 		if (dp != null) {
 			List<DepthsAbilityInfo<?>> curses = DepthsManager.getFilteredAbilities(List.of(DepthsTree.CURSE)).stream()
-				.filter(dai -> dai.getDisplayName() != null && !dai.getDisplayName().equals(removingCurse) && !dp.hasAbility(dai.getDisplayName()))
+				.filter(dai -> {
+					String displayName = dai.getDisplayName();
+					return displayName != null
+						&& !displayName.equals(removingCurse)
+						&& !dp.hasAbility(displayName)
+						&& !(displayName.equals(CurseOfAnchoring.ABILITY_NAME) && DepthsManager.getInstance().getPlayerAbilities(dp).stream().anyMatch(a -> a.getDepthsTrigger() == DepthsTrigger.SWAP));
+				})
 				.collect(Collectors.toList());
 			if (dp.mRegretSelections.isEmpty()) {
 				Collections.shuffle(curses);

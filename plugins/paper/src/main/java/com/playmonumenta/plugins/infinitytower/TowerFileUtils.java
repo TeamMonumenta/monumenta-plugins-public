@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.infinitytower;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiItem;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
@@ -251,11 +252,11 @@ public class TowerFileUtils {
 	}
 
 	public static @Nullable TowerFloor getTowerFloor(TowerGame game, int nextFloor) {
-		if (TOWER_FLOORS_LOCATION_MAP.get(game.ID) == null) {
+		if (TOWER_FLOORS_LOCATION_MAP.get(game.mId) == null) {
 			return null;
 		}
 
-		for (TowerFloor floor : TOWER_FLOORS_LOCATION_MAP.get(game.ID)) {
+		for (TowerFloor floor : TOWER_FLOORS_LOCATION_MAP.get(game.mId)) {
 			if (floor.mMin <= nextFloor && floor.mMax >= nextFloor) {
 				return floor;
 			}
@@ -267,7 +268,7 @@ public class TowerFileUtils {
 		Set<Integer> keys = new HashSet<>(TOWER_FLOORS_LOCATION_MAP.keySet());
 
 		for (TowerGame game : new ArrayList<>(TowerManager.GAMES.values())) {
-			keys.remove(game.ID);
+			keys.remove(game.mId);
 		}
 
 		if (keys.isEmpty()) {
@@ -318,7 +319,7 @@ public class TowerFileUtils {
 
 	public static @Nullable JsonObject readFile(String fileName) {
 		try {
-			return FileUtils.readJson(TowerManager.mPlugin.getDataFolder() + File.separator + "InfinityTower" + File.separator + fileName);
+			return FileUtils.readJson(Plugin.getInstance().getDataFolder() + File.separator + "InfinityTower" + File.separator + fileName);
 		} catch (Exception e) {
 			warning("exception while reading file: " + fileName + " Reason: " + e.getMessage());
 		}
@@ -340,7 +341,7 @@ public class TowerFileUtils {
 
 	public static void saveFile(JsonObject obj, String fileName) {
 		try {
-			FileUtils.writeJson(TowerManager.mPlugin.getDataFolder() + File.separator + "InfinityTower" + File.separator + fileName, obj);
+			FileUtils.writeJson(Plugin.getInstance().getDataFolder() + File.separator + "InfinityTower" + File.separator + fileName, obj);
 		} catch (Exception e) {
 			warning("exception while save file : " + e.getMessage());
 		}
@@ -424,7 +425,7 @@ public class TowerFileUtils {
 	}
 
 	public static void warning(String msg) {
-		TowerManager.mPlugin.getLogger().warning("[InfinityTower] " + msg);
+		Plugin.getInstance().getLogger().warning("[InfinityTower] " + msg);
 	}
 
 

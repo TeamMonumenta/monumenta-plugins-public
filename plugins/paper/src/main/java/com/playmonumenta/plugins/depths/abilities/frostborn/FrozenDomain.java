@@ -105,7 +105,7 @@ public class FrozenDomain extends DepthsAbility {
 	}
 
 	private static Description<FrozenDomain> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<FrozenDomain>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When standing on ice, gain ")
 			.addPercent(a -> a.mSpeedPercent, SPEED_PERCENT[rarity - 1], false, true)
 			.add(" speed and heal ")

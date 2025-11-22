@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.UUID;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,6 +36,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -83,6 +85,29 @@ public class Skyhook extends DepthsAbility {
 		}
 	}
 
+	@Override
+	public void playerTeleportEvent(PlayerTeleportEvent event) {
+		UUID playerId = mPlayer.getUniqueId();
+		if (!playerId.equals(event.getPlayer().getUniqueId())) {
+			return;
+		}
+
+		World world = mPlayer.getWorld();
+		for (Entity entity : world.getEntities()) {
+			if (!(entity instanceof Projectile proj)) {
+				continue;
+			}
+
+			if (!playerId.equals(proj.getOwnerUniqueId())) {
+				continue;
+			}
+
+			if (proj.hasMetadata(SKYHOOK_ARROW_METADATA)) {
+				proj.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
+			}
+		}
+	}
+
 	private void hook(Entity projectile) {
 		if (!DepthsManager.getInstance().isAlive(mPlayer)) {
 			return;
@@ -91,6 +116,10 @@ public class Skyhook extends DepthsAbility {
 		Location loc = projectile.getLocation();
 		Location playerStartLoc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
+		if (!world.getUID().equals(loc.getWorld().getUID())) {
+			// World doesn't match for whatever reason
+			return;
+		}
 
 		if (LocationUtils.blinkCollisionCheck(mPlayer, loc.toVector())) {
 			loc = mPlayer.getLocation();
@@ -131,8 +160,8 @@ public class Skyhook extends DepthsAbility {
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (isOnCooldown()
-			    || !mPlayer.isSneaking()
-			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+			|| !mPlayer.isSneaking()
+			|| !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			return true;
 		}
 		putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
@@ -174,7 +203,7 @@ public class Skyhook extends DepthsAbility {
 	}
 
 	private static Description<Skyhook> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Skyhook>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Shooting a projectile while sneaking shoots out a skyhook. When the skyhook lands, you dash to the location and reduce all other ability cooldowns by ")
 			.addPercent(a -> a.mCDRPerBlock, CDR_PERCENT_PER_BLOCK)
 			.add(" per block traveled, up to a maximum of 5 seconds.")

@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -20,14 +20,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-/*
- * Leaves a stationary cloud of doom that deals 20 damage every 0.5 seconds
- * and inflicts slowness 1, mining fatigue 3 and unluck (for warlock undead amphex), all 30 seconds duration
- * Cloud is active for 15 seconds, afterwards, explodes and deal 40 damage to all players nearby.
- */
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class SpellPotionCloud extends Spell {
 	private static final String SPELL_NAME = "Unstable Concoction";
 	private static final String SLOWNESS_SRC = "UnstableConcoctionSlowness";
+	private static final String VULNERABILITY_SRC = "UnstableConcoctionVulnerability";
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -72,8 +70,9 @@ public class SpellPotionCloud extends Spell {
 						DamageUtils.damage(mBoss, p, DamageType.AILMENT, 2, null, false, true, SPELL_NAME);
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SLOWNESS_SRC,
 							new PercentSpeed(20 * 30, -0.15, SLOWNESS_SRC));
-						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 30, 0));
-						AbilityUtils.increaseDamageReceivedPlayer(p, 20 * 30, 0.15, "Lich");
+						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, TICKS_PER_SECOND * 30, 0));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, VULNERABILITY_SRC,
+							new PercentDamageReceived(TICKS_PER_SECOND * 30, 0.15));
 					}
 				}
 
@@ -89,22 +88,21 @@ public class SpellPotionCloud extends Spell {
 					for (Player p : PlayerUtils.playersInRange(loc, 3, true)) {
 						DamageUtils.damage(mBoss, p, DamageType.BLAST, 35, null, false, true, SPELL_NAME);
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, SLOWNESS_SRC,
-							new PercentSpeed(20 * 10, -0.3, SLOWNESS_SRC));
-						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 10, 2));
-						AbilityUtils.increaseDamageReceivedPlayer(p, 20 * 10, 0.25, "Lich");
+							new PercentSpeed(TICKS_PER_SECOND * 10, -0.3, SLOWNESS_SRC));
+						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, TICKS_PER_SECOND * 10, 2));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, VULNERABILITY_SRC,
+							new PercentDamageReceived(TICKS_PER_SECOND * 10, 0.25));
 						MovementUtils.knockAway(loc, p, 0.7f, false);
 					}
 				}
 			}
-
 		};
-		run.runTaskTimer(mPlugin, 20, 1);
+		run.runTaskTimer(mPlugin, TICKS_PER_SECOND, 1);
 		mActiveRunnables.add(run);
 	}
 
 	@Override
 	public int cooldownTicks() {
-		return 20 * 8;
+		return TICKS_PER_SECOND * 8;
 	}
-
 }

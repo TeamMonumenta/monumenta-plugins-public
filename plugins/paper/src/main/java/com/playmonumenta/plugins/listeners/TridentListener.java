@@ -19,11 +19,10 @@ public class TridentListener implements Listener {
 		//If a player throws a trident
 		if (event.getEntity().getType() != EntityType.TRIDENT
 			|| event.getEntity().getShooter() == null
-			|| !(event.getEntity().getShooter() instanceof Player)) {
+			|| !(event.getEntity().getShooter() instanceof Player player)) {
 			return;
 		}
 
-		Player player = (Player) event.getEntity().getShooter();
 		ItemStack mainhand = player.getInventory().getItemInMainHand();
 		ItemStack offhand = player.getInventory().getItemInOffHand();
 		Trident trident = (Trident) event.getEntity();
@@ -33,7 +32,7 @@ public class TridentListener implements Listener {
 		//or mainhand is changed to a trident while the offhand is being thrown (in case the mainhand has trident enchantments),
 		//cancel trident throw
 		if ((!mainhand.equals(item) && !offhand.equals(item)) ||
-				(offhand.equals(item) && mainhand.getType() == Material.TRIDENT)) {
+			(offhand.equals(item) && mainhand.getType() == Material.TRIDENT)) {
 			event.setCancelled(true);
 			return;
 		}

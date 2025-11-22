@@ -3,6 +3,10 @@ package com.playmonumenta.plugins.depths;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
+import com.playmonumenta.plugins.depths.abilities.curses.CurseOfChaos;
+import com.playmonumenta.plugins.depths.abilities.gifts.BrokenClock;
+import com.playmonumenta.plugins.depths.abilities.gifts.TreasureMap;
+import com.playmonumenta.plugins.depths.abilities.gifts.WildCard;
 import com.playmonumenta.plugins.depths.guis.DepthsTreeGUI;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -69,13 +73,13 @@ public class DepthsPlayer {
 	public boolean mUsedAbilityMutation;
 	//Whether or not they have used generosity on this floor
 	public boolean mUsedGenerosity;
-	//Remaining active ability only wand aspect uses
-	public int mWandAspectCharges = 0;
+	//Remaining active ability only uses
+	public int mActiveSelectionsRemaining = 0;
 
 	//Individual treasure score. Copied from the party's treasure score when they die.
 	public int mFinalTreasureScore;
 	//Reward queue implementation to let the player catch up on reward chests they have missed later
-	public Queue<DepthsRewardType> mEarnedRewards;
+	public Queue<DepthsReward> mEarnedRewards;
 	//Opened but unclaimed ability reward options
 	public @Nullable List<DepthsAbilityItem> mAbilityOfferings;
 	//Opened but unclaimed upgrade reward options
@@ -84,6 +88,8 @@ public class DepthsPlayer {
 	public int mDeathRoom;
 	// Number of times this player has died as relevant for graves (gets reduced with bosses beaten, so is not an accurate total count)
 	public int mNumDeaths;
+	// Number of times this player disconnected near mobs
+	public int mDisconnects;
 	// Remaining number of unused rerolls
 	public int mRerolls;
 	// Rerolls previously gained from Opportunity
@@ -98,9 +104,6 @@ public class DepthsPlayer {
 
 	// Whether the player should be killed on login. Currently used when the party abandons the player.
 	public boolean mZenithAbandonedByParty = false;
-
-	// Whether the player is currently processing Abnormality
-	public int mAbnormalityLevel = 0;
 
 	// The current counter of the player's Curse of Chaos ability
 	public int mCurseofChaosCount = 0;
@@ -130,6 +133,13 @@ public class DepthsPlayer {
 	// The last time the player logged out. If 0, then they haven't logged out yet.
 	public long mLastLogoutTime = 0;
 
+	// There's some abilities that need to activate on players that are offline but won't work.
+	// These variables store which need to be activated when they log in.
+	public boolean mTriggerBrokenClock = false;
+	public boolean mTriggerTreasureMap = false;
+	public int mTriggerWildCard = 0;
+	public int mTriggerCurseOfChaos = 0;
+
 	// Abilities that the player can receive from Generosity
 	public final List<DepthsAbilityItem> mGenerosityGifts = new ArrayList<>();
 
@@ -153,7 +163,7 @@ public class DepthsPlayer {
 	 * IF YOU ADD ANYTHING HERE THAT REFERENCES A COMPLEX OBJECT THE SERVER WILL CRASH WHILE SAVING
 	 * (especially Player or World)
 	 */
-
+	@SuppressWarnings("NullAway.Init")
 	public DepthsPlayer(Player p) {
 		mPlayerId = p.getUniqueId();
 		mPlayerName = p.getName();
@@ -192,12 +202,13 @@ public class DepthsPlayer {
 
 	public void initTreeSelection() {
 		// we have to initialize the random tree choice once, so that way you can't repeatedly reroll your choices by retriggering the GUI
-		if (getPlayer() == null) {
-			return;
+		final var player = getPlayer();
+		if (player == null) {
+			throw new IllegalStateException();
 		}
 
 		List<DepthsTree> choices = new ArrayList<>();
-		int talismanScore = DepthsUtils.getDepthsContent() == DepthsContent.DARKEST_DEPTHS ? ScoreboardUtils.getScoreboardValue(getPlayer(), "DDTalisman").orElse(0) : ScoreboardUtils.getScoreboardValue(getPlayer(), "CZTalisman").orElse(0);
+		int talismanScore = DepthsUtils.getDepthsContent() == DepthsContent.DARKEST_DEPTHS ? ScoreboardUtils.getScoreboardValue(player, "DDTalisman").orElse(0) : ScoreboardUtils.getScoreboardValue(player, "CZTalisman").orElse(0);
 		if (talismanScore > 0) {
 			DepthsTree talismanTree = DepthsTree.OWNABLE_TREES[talismanScore - 1];
 			choices.add(talismanTree);
@@ -301,6 +312,28 @@ public class DepthsPlayer {
 		return true;
 	}
 
+	public void triggerQueuedAbilities(Player player) {
+		if (mTriggerBrokenClock) {
+			BrokenClock.trigger(player, this);
+			mTriggerBrokenClock = false;
+		}
+
+		if (mTriggerTreasureMap) {
+			TreasureMap.trigger(player, this);
+			mTriggerTreasureMap = false;
+		}
+
+		while (mTriggerWildCard > 0) {
+			WildCard.trigger(player, this);
+			mTriggerWildCard--;
+		}
+
+		while (mTriggerCurseOfChaos > 0) {
+			CurseOfChaos.trigger(player, this);
+			mTriggerCurseOfChaos--;
+		}
+	}
+
 	public int getLevelInAbility(@Nullable String abilityName) {
 		if (abilityName == null) {
 			return 0;
@@ -313,6 +346,22 @@ public class DepthsPlayer {
 			return false;
 		}
 		return mAbilities.containsKey(abilityName);
+	}
+
+	public void addReward(DepthsRewardType rewardType) {
+		addReward(rewardType, 0);
+	}
+
+	public void addReward(DepthsRewardType rewardType, int forceLevel) {
+		mEarnedRewards.add(new DepthsReward(rewardType, forceLevel));
+	}
+
+	public DepthsReward peekReward() {
+		return mEarnedRewards.peek();
+	}
+
+	public DepthsRewardType peekRewardType() {
+		return peekReward().mRewardType();
 	}
 
 	public List<String> getSolarRayUniqueMobNames() {

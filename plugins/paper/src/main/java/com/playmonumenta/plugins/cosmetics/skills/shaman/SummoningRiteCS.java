@@ -79,6 +79,7 @@ public class SummoningRiteCS extends TotemicProjectionCS implements GalleryCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (!proj.isValid() || mTicks >= 100) {
@@ -106,7 +107,8 @@ public class SummoningRiteCS extends TotemicProjectionCS implements GalleryCS {
 							new PartialParticle(Particle.DUST_COLOR_TRANSITION, projLoc).data(DECAYED_COLOR).spawnAsPlayerActive(player);
 							new PartialParticle(Particle.SPORE_BLOSSOM_AIR, projLoc).delta(0.25).extra(1).spawnAsPlayerActive(player);
 						}
-						default -> { }
+						default -> {
+						}
 					}
 				}
 				mTicks++;
@@ -122,6 +124,7 @@ public class SummoningRiteCS extends TotemicProjectionCS implements GalleryCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (!proj.isValid() || mTicks >= 100) {
@@ -141,9 +144,12 @@ public class SummoningRiteCS extends TotemicProjectionCS implements GalleryCS {
 	public void projectionCollision(Player player, Location dropCenter, double radius, List<LivingEntity> totems) {
 		dropCenter.subtract(0, LocationUtils.distanceToGround(dropCenter, -64, 1), 0);
 		switch (totems.size()) {
-			default -> player.getWorld().playSound(dropCenter, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.8f, 1.4f);
-			case 2, 3 -> player.getWorld().playSound(dropCenter, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 0.75f, 1.4f);
-			case 4 -> player.getWorld().playSound(dropCenter, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 0.7f, 1.4f);
+			case 2, 3 ->
+				player.getWorld().playSound(dropCenter, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 0.75f, 1.4f);
+			case 4 ->
+				player.getWorld().playSound(dropCenter, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 0.7f, 1.4f);
+			default ->
+				player.getWorld().playSound(dropCenter, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.8f, 1.4f);
 		}
 
 		player.getWorld().playSound(dropCenter, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.45f, 1.35f);
@@ -156,6 +162,7 @@ public class SummoningRiteCS extends TotemicProjectionCS implements GalleryCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				Vector dir = new Vector(radius * 0.4, 0, 0);
@@ -176,6 +183,7 @@ public class SummoningRiteCS extends TotemicProjectionCS implements GalleryCS {
 		dropCenter.subtract(0, LocationUtils.distanceToGround(dropCenter, -64, 1), 0);
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				new PPCircle(Particle.DUST_COLOR_TRANSITION, dropCenter, radius * (0.75 + 0.25 * mTicks)).countPerMeter(8).delta(0.06).data(CRIMSON).spawnAsPlayerActive(player);

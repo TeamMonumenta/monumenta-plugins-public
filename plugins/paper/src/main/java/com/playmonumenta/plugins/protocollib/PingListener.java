@@ -12,11 +12,11 @@ import com.comphenix.protocol.events.PacketPostListener;
 import com.playmonumenta.plugins.Plugin;
 import java.util.HashMap;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Triple;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class PingListener extends PacketAdapter {
 	private static final int BASE_ID = "the_portals rules!".hashCode();

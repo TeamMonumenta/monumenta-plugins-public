@@ -31,22 +31,22 @@ import org.bukkit.util.Vector;
 
 public class SpellFinalParticle extends Spell {
 
-	private Plugin mPlugin;
-	private Location mCenter;
-	private double mRange;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final Location mCenter;
+	private final double mRange;
+	private final LivingEntity mBoss;
 	private static final String WEAKNESS_SRC = "MiasmaWeakness";
 	private static final String SLOWNESS_SRC = "MiasmaSlowness";
 	private final int DEBUFF_DURATION = 20 * 15;
-	private int mCylRadius = 8;
+	private final int mCylRadius = 8;
 	private boolean mPTick = true;
-	private List<Player> mWarned = new ArrayList<Player>();
-	private FallingBlock mBlock;
+	private final List<Player> mWarned = new ArrayList<>();
+	private final FallingBlock mBlock;
 	private boolean mTrigger = false;
-	private List<Player> mPlayers = new ArrayList<Player>();
+	private List<Player> mPlayers = new ArrayList<>();
 	private static final Particle.DustOptions BLACK = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.5f);
-	private PartialParticle mBlack;
-	private PPCircle mIndicator;
+	private final PartialParticle mBlack;
+	private final PPCircle mIndicator;
 
 	public SpellFinalParticle(Plugin plugin, LivingEntity boss, Location loc, double range, FallingBlock block) {
 		mPlugin = plugin;

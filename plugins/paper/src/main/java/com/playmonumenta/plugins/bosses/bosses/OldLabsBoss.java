@@ -27,7 +27,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -42,7 +41,7 @@ public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
 	private static final String SUMMON_SLOWNESS_SRC = "SummonOldLabsBossSlowness";
 	private static final int SUMMON_SLOWNESS_DURATION = 20 * 2;
 	private static final double SUMMON_SLOWNESS_POTENCY = -0.75;
-	private static final String[] mDialog = new String[] {
+	private static final String[] mDialog = new String[]{
 		"Well, this is very peculiar...",
 		"The rats causing a ruckus down here are mere commoners? How feeble are those bandits?",
 		"The aristocratic code of ethics demands I take pity on you, but why shouldn't I prune you here where no one will know?",
@@ -151,8 +150,8 @@ public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
 					.append(Component.text("[Elcard the Ignoble] ", NamedTextColor.GOLD))
 					.append(Component.text("Useless sluggards! Kill these commoners where they stand or we all face the gallows!")));
 			Location spawnLoc = mSpawnLoc.clone().add(-1, -1, 13);
+			new PartialParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
 			try {
-				new PartialParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
 				Entity mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelSoldier");
 				if (mob instanceof LivingEntity) {
 					Plugin.getInstance().mEffectManager.addEffect(mob, SUMMON_SLOWNESS_SRC,
@@ -167,8 +166,8 @@ public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
 						new PercentSpeed(SUMMON_SLOWNESS_DURATION, SUMMON_SLOWNESS_POTENCY, SUMMON_SLOWNESS_SRC));
 				}
 			} catch (Exception ex) {
-				MMLog.warning("Failed to spawn labs boss summons");
-				ex.printStackTrace();
+				MMLog.warning(() -> "[OldLabsBoss] Failed to spawn summons RebelSoldier and/or RebelSlinger! Is the " +
+					"Library of Souls empty or not loaded?");
 			}
 		});
 
@@ -189,15 +188,10 @@ public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void init() {
-		int bossTargetHp = 0;
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
-		int hpDelta = 160;
-		while (playerCount > 0) {
-			bossTargetHp = bossTargetHp + hpDelta;
-			hpDelta = hpDelta / 2;
-			playerCount--;
-		}
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
-		mBoss.setHealth(bossTargetHp);
+		final int baseHealth = 160;
+		final double scaledHealth = baseHealth * BossUtils.healthScalingCoef(PlayerUtils.playersInRange(mSpawnLoc,
+			detectionRange, true).size(), 0.5, 0.5);
+
+		EntityUtils.setMaxHealthAndHealth(mBoss, scaledHealth);
 	}
 }

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.overrides;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
@@ -12,10 +13,10 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import de.tr7zw.nbtapi.NBTItem;
-import java.util.List;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -34,30 +35,43 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class FirmamentOverride {
-	private static final String CAN_PLACE_SHULKER_PERM = "monumenta.canplaceshulker";
+	public enum FirmamentType {
+		PRISMARINE("Prismarine", ITEM_NAME, Material.PRISMARINE),
+		BLACKSTONE("Blackstone", DELVE_SKIN_NAME, Material.BLACKSTONE);
 
-	private static final Component PRISMARINE_ENABLED = Component.text("Prismarine ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-		.append(Component.text("Enabled").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
-	private static final Component PRISMARINE_DISABLED = Component.text("Prismarine ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-		.append(Component.text("Disabled").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-	private static final Component BLACKSTONE_ENABLED = Component.text("Blackstone ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-		.append(Component.text("Enabled").color(NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
-	private static final Component BLACKSTONE_DISABLED = Component.text("Blackstone ").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-		.append(Component.text("Disabled").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-	private static final String PLAIN_PRISMARINE_ENABLED = MessagingUtils.plainText(PRISMARINE_ENABLED);
-	private static final String PLAIN_PRISMARINE_DISABLED = MessagingUtils.plainText(PRISMARINE_DISABLED);
-	private static final String PLAIN_BLACKSTONE_ENABLED = MessagingUtils.plainText(BLACKSTONE_ENABLED);
-	private static final String PLAIN_BLACKSTONE_DISABLED = MessagingUtils.plainText(BLACKSTONE_DISABLED);
+		public final String mMaterialName;
+		public final String mItemName;
+		public final Material mMaterial;
+
+		FirmamentType(String materialName, String itemName, Material material) {
+			mMaterialName = materialName;
+			mItemName = itemName;
+			mMaterial = material;
+		}
+
+		public Component getMessage(boolean disabled) {
+			Component line = Component.text(mMaterialName + " ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+			if (disabled) {
+				return line.append(Component.text("Disabled", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+			} else {
+				return line.append(Component.text("Enabled", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+			}
+		}
+	}
+
 	private static final String ITEM_NAME = "Firmament";
 	private static final String DELVE_SKIN_NAME = "Doorway from Eternity";
+	private static final String DISABLED_KEY = "FirmamentPrismarineDisabled";
 
 	public static boolean placeBlock(Player player, ItemStack item, BlockPlaceEvent event) {
-		if (!isFirmamentItem(item)) {
+		FirmamentType firmamentType = getFirmamentType(item);
+		if (firmamentType == null) {
 			// Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe - hopefully other shulkers with lore won't get placed
 			// Check permission to enable placing shulkers, just so this can be turned off via perms if needed
-			return player.hasPermission(CAN_PLACE_SHULKER_PERM);
+			return player.hasPermission(Constants.Permissions.CAN_PLACE_SHULKER);
 		}
 		if (!player.hasPermission("monumenta.firmament")) {
 			player.sendMessage(Component.text("You don't have permission to use this item. Please ask a moderator to fix this.", NamedTextColor.RED));
@@ -92,16 +106,10 @@ public class FirmamentOverride {
 
 				BlockData blockData;
 				boolean removeItem = true;
-				if (FastUtils.RANDOM.nextBoolean()
-					&& item.getItemMeta().hasLore()
-					&& (InventoryUtils.testForItemWithLore(item, PLAIN_PRISMARINE_ENABLED) || InventoryUtils.testForItemWithLore(item, PLAIN_BLACKSTONE_ENABLED))) {
+				if (FastUtils.RANDOM.nextBoolean() && !isDisabled(item)) {
 					removeItem = false;
 					// Place a prismarine/blackstone block instead of the block from the shulker
-					if (InventoryUtils.testForItemWithName(item, ITEM_NAME, true)) {
-						blockData = Material.PRISMARINE.createBlockData();
-					} else {
-						blockData = Material.BLACKSTONE.createBlockData();
-					}
+					blockData = firmamentType.mMaterial.createBlockData();
 				} else {
 					// Use block data from meta if the meta has some already
 					if (meta instanceof BlockDataMeta blockMeta && blockMeta.hasBlockData()) {
@@ -161,7 +169,8 @@ public class FirmamentOverride {
 	}
 
 	public static boolean changeMode(ItemStack item, Player player) {
-		if (!isFirmamentItem(item)) {
+		FirmamentType type = getFirmamentType(item);
+		if (type == null) {
 			//Somehow triggered when it wasn't the right item - shouldn't prevent the event to be safe
 			return false;
 		}
@@ -169,67 +178,40 @@ public class FirmamentOverride {
 			return false;
 		}
 
-		NBTItem nbt = new NBTItem(item);
-		List<String> lore = ItemStatUtils.getPlainLore(nbt);
-
-		boolean foundLine = false;
-		if (InventoryUtils.testForItemWithName(item, ITEM_NAME, true)) {
-			for (int i = 0; i < lore.size(); ++i) {
-				String line = lore.get(i);
-				if (line.equals(PLAIN_PRISMARINE_ENABLED)) {
-					ItemStatUtils.removeLore(item, i);
-					ItemStatUtils.addLore(item, i, PRISMARINE_DISABLED);
-					player.sendMessage(PRISMARINE_DISABLED);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
-					foundLine = true;
-					break;
-				} else if (line.equals(PLAIN_PRISMARINE_DISABLED)) {
-					ItemStatUtils.removeLore(item, i);
-					ItemStatUtils.addLore(item, i, PRISMARINE_ENABLED);
-					player.sendMessage(PRISMARINE_ENABLED);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
-					foundLine = true;
-					break;
-				}
-			}
-			if (!foundLine) {
-				ItemStatUtils.addLore(item, lore.size(), PRISMARINE_ENABLED);
-				player.sendMessage(PRISMARINE_ENABLED);
-				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
-			}
-		} else if (InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME, true)) {
-			for (int i = 0; i < lore.size(); ++i) {
-				String line = lore.get(i);
-				if (line.equals(PLAIN_BLACKSTONE_ENABLED)) {
-					ItemStatUtils.removeLore(item, i);
-					ItemStatUtils.addLore(item, i, BLACKSTONE_DISABLED);
-					player.sendMessage(BLACKSTONE_DISABLED);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
-					foundLine = true;
-					break;
-				} else if (line.equals(PLAIN_BLACKSTONE_DISABLED)) {
-					ItemStatUtils.removeLore(item, i);
-					ItemStatUtils.addLore(item, i, BLACKSTONE_ENABLED);
-					player.sendMessage(BLACKSTONE_ENABLED);
-					player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
-					foundLine = true;
-					break;
-				}
-			}
-			if (!foundLine) {
-				ItemStatUtils.addLore(item, lore.size(), BLACKSTONE_ENABLED);
-				player.sendMessage(BLACKSTONE_ENABLED);
-				player.playSound(player.getLocation(), Sound.BLOCK_SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 1, 1);
-			}
-		}
+		NBT.modify(item, nbt -> {
+			ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(nbt);
+			boolean previouslyDisabled = isDisabled(playerModified);
+			playerModified.setBoolean(DISABLED_KEY, !previouslyDisabled);
+			player.sendMessage(type.getMessage(!previouslyDisabled));
+			player.playSound(player.getLocation(), previouslyDisabled ? Sound.BLOCK_SHULKER_BOX_OPEN : Sound.BLOCK_SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 1, 1);
+		});
 		ItemUpdateHelper.generateItemStats(item);
 		return true;
 	}
 
-	public static boolean isFirmamentItem(ItemStack item) {
-		return item != null &&
-			(InventoryUtils.testForItemWithName(item, ITEM_NAME, true) || InventoryUtils.testForItemWithName(item, DELVE_SKIN_NAME, true)) &&
-			ItemStatUtils.getTier(item).equals(Tier.EPIC) &&
-			ItemUtils.isShulkerBox(item.getType());
+	public static @Nullable FirmamentType getFirmamentType(@Nullable ItemStack item) {
+		if (item == null || !ItemStatUtils.getTier(item).equals(Tier.EPIC) || !ItemUtils.isShulkerBox(item.getType())) {
+			return null;
+		}
+		for (FirmamentType type : FirmamentType.values()) {
+			if (InventoryUtils.testForItemWithName(item, type.mItemName, true)) {
+				return type;
+			}
+		}
+		return null;
+	}
+
+	public static boolean isFirmamentItem(@Nullable ItemStack item) {
+		return getFirmamentType(item) != null;
+	}
+
+	public static boolean isDisabled(ItemStack itemStack) {
+		return NBT.get(itemStack, nbt -> {
+			return isDisabled(ItemStatUtils.getPlayerModified(nbt));
+		});
+	}
+
+	public static boolean isDisabled(@Nullable ReadableNBT playerModified) {
+		return playerModified != null && playerModified.getOrDefault(DISABLED_KEY, false);
 	}
 }

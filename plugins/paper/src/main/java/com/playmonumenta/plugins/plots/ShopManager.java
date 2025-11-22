@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.plots;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
@@ -9,6 +10,7 @@ import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -99,15 +101,15 @@ public class ShopManager implements Listener {
 
 		Component customName = damagee.customName();
 		if (damager instanceof Player player && damagee instanceof Shulker
-				&& customName != null && MessagingUtils.plainText(customName).endsWith("Shop")
-				&& ZoneUtils.hasZoneProperty(damager, ZoneProperty.SHOPS_POSSIBLE)) {
+			&& customName != null && MessagingUtils.plainText(customName).endsWith("Shop")
+			&& ZoneUtils.hasZoneProperty(damager, ZoneProperty.SHOPS_POSSIBLE)) {
 
 			final Shop shop;
 			try {
 				shop = Shop.fromShopEntity(damagee);
 			} catch (WrapperCommandSyntaxException ex) {
 				// Not a shop after all?
-				Plugin.getInstance().getLogger().warning("Tried to damage a shulker that seemed like a shop but wasn't: " + ex.getMessage());
+				MMLog.warning("Tried to damage a shulker that seemed like a shop but wasn't: " + ex.getMessage());
 				return;
 			}
 
@@ -291,8 +293,18 @@ public class ShopManager implements Listener {
 				throw CommandAPI.failWithString("Shop entity is missing a required tag");
 			}
 
+			String updatedOwnerName = MonumentaRedisSyncIntegration.cachedUuidToName(ownerUUID);
+			if (updatedOwnerName != null && !ownerName.equals(updatedOwnerName)) {
+				shopEntity.removeScoreboardTag("shop_ownerName=" + ownerName);
+				ownerName = updatedOwnerName;
+				shopEntity.addScoreboardTag("shop_ownerName=" + ownerName);
+				if (ownerGuildName == null) {
+					shopEntity.customName(Component.text(ownerName + "'s Shop", NamedTextColor.AQUA));
+				}
+			}
+
 			return new Shop(new Location(shopEntity.getWorld(), x1, y1, z1), new Location(shopEntity.getWorld(), x2, y2, z2),
-			                (Shulker) shopEntity, ownerName, ownerGuildName, ownerUUID, originalEntityMat);
+				(Shulker) shopEntity, ownerName, ownerGuildName, ownerUUID, originalEntityMat);
 		}
 
 		/* Calls func(Location) for each shop platform block, plus a 1-block border */
@@ -373,7 +385,7 @@ public class ShopManager implements Listener {
 
 		private BoundingBox getExpandedBoundingBox() {
 			return new BoundingBox(mMin.getX() - 1, mMin.getY() - SHOP_DEPTH - 1, mMin.getZ() - 1,
-			                       mMax.getX() + 1, mMax.getY() + SHOP_HEIGHT + 1, mMax.getZ() + 1);
+				mMax.getX() + 1, mMax.getY() + SHOP_HEIGHT + 1, mMax.getZ() + 1);
 		}
 
 		private Collection<Entity> getEntities() {
@@ -381,7 +393,6 @@ public class ShopManager implements Listener {
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	public static void registerCommands() {
 		/* ******************** NEW ******************** */
 		new CommandAPICommand("monumentashop")
@@ -913,19 +924,17 @@ public class ShopManager implements Listener {
 		/* This command was initiated by a player interacting with the NPC - check permissions */
 		if (shop.isGuildShop()) {
 			Group guild = LuckPermsIntegration.getGuild(player);
+			String msg = "You must have permission to manage the shop for the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 			if (guild == null) {
-				String msg = "You must be a *manager* or *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 				player.sendMessage(Component.text(msg, NamedTextColor.RED));
 				throw CommandAPI.failWithString(msg);
 			}
 			String guildName = LuckPermsIntegration.getUnlockedGuildName(guild);
 			if (guildName == null || !guildName.equalsIgnoreCase(shop.mOwnerGuildName)) {
-				String msg = "You must be a *manager* or *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 				player.sendMessage(Component.text(msg, NamedTextColor.RED));
 				throw CommandAPI.failWithString(msg);
 			}
 			if (!GuildPermission.GUILD_SHOP.hasAccess(guild, player)) {
-				String msg = "You must have permission to manage the shop for the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 				player.sendMessage(Component.text(msg, NamedTextColor.RED));
 				throw CommandAPI.failWithString(msg);
 			}
@@ -940,7 +949,7 @@ public class ShopManager implements Listener {
 	private static void clearContainer(Block block) {
 		BlockState state = block.getState();
 		if (state instanceof Container) {
-			((Container)state).getInventory().clear();
+			((Container) state).getInventory().clear();
 			state.update();
 		}
 	}

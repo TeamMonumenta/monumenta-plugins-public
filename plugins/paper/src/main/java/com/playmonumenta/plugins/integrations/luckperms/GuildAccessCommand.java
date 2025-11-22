@@ -22,11 +22,8 @@ import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.luckperms.api.model.data.NodeMap;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
-import net.luckperms.api.node.Node;
-import net.luckperms.api.node.types.InheritanceNode;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -59,11 +56,11 @@ public class GuildAccessCommand {
 					callee = proxied.getCallee();
 				}
 				if (callee instanceof Player player) {
-					String stringUser = args.getUnchecked("player");
+					String targetName = args.getUnchecked("player");
 
-					UUID targetUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(stringUser);
+					UUID targetUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(targetName);
 					if (targetUUID == null) {
-						throw CommandAPI.failWithString("Given target does not exist in Redis.");
+						throw CommandAPI.failWithString("Could not identify that player.");
 					}
 
 					Group accessedGroup = LuckPermsIntegration.getGuild(player);
@@ -91,17 +88,17 @@ public class GuildAccessCommand {
 								if (throwable instanceof WrapperCommandSyntaxException wrapperCSE) {
 									sender.sendMessage(Component.text(wrapperCSE.getMessage(), NamedTextColor.RED));
 								} else if (throwable != null) {
-									MMLog.warning("Caught unexpected Exception when loading luckperms User", throwable);
+									MMLog.warning("Caught unexpected exception when loading luckperms user", throwable);
 								}
 							});
 							return null;
 						})
-						.thenAccept((user) -> {
-							if (user == null) {
+						.thenAccept((targetUser) -> {
+							if (targetUser == null) {
 								// Already handled
 								return;
 							}
-							Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> run(plugin, sender, guild, player, user, accessLevel, false));
+							Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> run(plugin, sender, guild, player, targetName, targetUser, accessLevel, false));
 						});
 				} else {
 					callee.sendMessage(Component.text("This command may only be run by a player", NamedTextColor.RED));
@@ -135,11 +132,11 @@ public class GuildAccessCommand {
 
 				String guildName = args.getUnchecked("guild name");
 
-				String stringUser = args.getUnchecked("player");
+				String targetName = args.getUnchecked("player");
 
-				UUID targetUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(stringUser);
+				UUID targetUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(targetName);
 				if (targetUUID == null) {
-					throw CommandAPI.failWithString("Given target does not exist in Redis.");
+					throw CommandAPI.failWithString("Could not identify that player.");
 				}
 
 				String guildRoot = GuildArguments.getIdFromName(guildName);
@@ -158,12 +155,12 @@ public class GuildAccessCommand {
 						Bukkit.getScheduler().runTask(plugin, () -> handleError(throwable, player));
 						return null;
 					})
-					.thenAcceptBoth(guildFuture, (user, group) -> {
-						if (user == null || group == null) {
+					.thenAcceptBoth(guildFuture, (targetUser, group) -> {
+						if (targetUser == null || group == null) {
 							// Already handled
 							return;
 						}
-						Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> run(plugin, sender, group, player, user, accessLevel, true));
+						Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> run(plugin, sender, group, player, targetName, targetUser, accessLevel, true));
 					});
 			});
 	}
@@ -205,72 +202,133 @@ public class GuildAccessCommand {
 		return result;
 	}
 
-	protected static void run(Plugin plugin, CommandSender sender, Group guildRoot, Player player, User target, GuildAccessLevel targetAccess, boolean isOperator) {
-		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			User agent = LuckPermsIntegration.getUser(player);
+	protected static void run(
+		Plugin plugin,
+		CommandSender sender,
+		Group guildRoot,
+		Player player,
+		String targetName,
+		User target,
+		GuildAccessLevel targetAccess,
+		boolean isOperator
+	) {
+		User agent = LuckPermsIntegration.getUser(player);
 
-			GuildAccessLevel agentAccess = LuckPermsIntegration.getAccessLevel(guildRoot, agent);
-			GuildAccessLevel targetCurrentAccess = LuckPermsIntegration.getAccessLevel(guildRoot, target);
+		GuildAccessLevel agentAccess = LuckPermsIntegration.getAccessLevel(guildRoot, agent);
+		GuildAccessLevel targetCurrentAccess = LuckPermsIntegration.getAccessLevel(guildRoot, target);
 
-			boolean canAgentSetPermission =
-				(agentAccess.compareTo(targetCurrentAccess) < 0 &&
-					agentAccess.compareTo(targetAccess) <= 0 &&
-					agentAccess.compareTo(GuildAccessLevel.MANAGER) <= 0) || // Apply on other
-
-					(player.getUniqueId().equals(target.getUniqueId()) &&
-						agentAccess.compareTo(targetAccess) < 0) || // Apply on self
-
-					isOperator; // Operator bypass
-
-			if (!canAgentSetPermission) {
-				Bukkit.getScheduler().runTask(plugin, ()
-					-> sender.sendMessage(Component.text(String.format("You cannot change %s's permission from %s to %s", target.getUsername(), targetCurrentAccess.mLabel, targetAccess.mLabel), NamedTextColor.RED)));
+		// Operators can set any access level
+		if (!isOperator) {
+			if (!GuildPermission.MANAGE_MEMBERSHIP.hasAccess(guildRoot, agent)) {
+				Bukkit.getScheduler().runTask(plugin, () ->
+					sender.sendMessage(Component.text("You do not have permission to manage guild access in your guild.", NamedTextColor.RED))
+				);
 				return;
 			}
 
-			if (targetAccess != GuildAccessLevel.NONE) {
-				Group targetAccessGroup = targetAccess.loadGroupFromRoot(guildRoot).join().orElse(null);
-				if (targetAccessGroup == null) {
-					Bukkit.getScheduler().runTask(plugin, ()
-						-> sender.sendMessage(Component.text(String.format("Could not find group %s", targetAccess.groupNameFromRoot(guildRoot)), NamedTextColor.RED)));
+			if (targetCurrentAccess.equals(targetAccess)) {
+				Bukkit.getScheduler().runTask(plugin, () ->
+					sender.sendMessage(Component.text("That would not change anything.", NamedTextColor.RED))
+				);
+				return;
+			}
+
+			if (targetCurrentAccess.equals(GuildAccessLevel.BLOCKED)) {
+				// Blocked players can be unblocked, but must start out as "not in the guild"/kicked
+				if (!targetAccess.equals(GuildAccessLevel.NONE)) {
+					Bukkit.getScheduler().runTask(plugin, () ->
+						sender.sendMessage(
+							Component.text("If you wish to unblock someone, ", NamedTextColor.RED)
+								.append(
+									Component.text("kick them", NamedTextColor.GOLD)
+										.hoverEvent(Component.text("Click to put command in chat bar", NamedTextColor.GOLD))
+										.clickEvent(ClickEvent.suggestCommand("/guild access " + targetName + " kick"))
+								)
+								.append(Component.text(" (and optionally "))
+								.append(
+									Component.text("send them an invite", NamedTextColor.GOLD)
+										.hoverEvent(Component.text("Click to put command in chat bar", NamedTextColor.GOLD))
+										.clickEvent(ClickEvent.suggestCommand("/guild invite " + targetName + " "))
+								)
+								.append(Component.text(")."))
+						)
+					);
+					return;
+				}
+			} else if (targetAccess.compareTo(GuildAccessLevel.MEMBER) <= 0 && targetCurrentAccess.compareTo(GuildAccessLevel.MEMBER) > 0) {
+				// Target is either a guest or not in the guild - so they cannot be promoted to member or above
+				Bukkit.getScheduler().runTask(plugin, () ->
+					sender.sendMessage(
+						Component.text("If you want to invite someone to your guild use ", NamedTextColor.RED)
+							.append(
+								Component.text("/guild invite", NamedTextColor.GOLD)
+									.hoverEvent(Component.text("Click to put command in chat bar", NamedTextColor.GOLD))
+									.clickEvent(ClickEvent.suggestCommand("/guild invite " + targetName + " member"))
+							)
+					)
+				);
+				return;
+			} else if (targetAccess.compareTo(GuildAccessLevel.GUEST) <= 0 && targetCurrentAccess.compareTo(GuildAccessLevel.GUEST) > 0) {
+				// Target is either not in the guild - so they cannot be promoted to guest or above
+				Bukkit.getScheduler().runTask(plugin, () ->
+					sender.sendMessage(
+						Component.text("If you want to invite someone to your guild use ", NamedTextColor.RED)
+							.append(
+								Component.text("/guild invite", NamedTextColor.GOLD)
+									.hoverEvent(Component.text("Click to put command in chat bar", NamedTextColor.GOLD))
+									.clickEvent(ClickEvent.suggestCommand("/guild invite " + targetName + " guest"))
+							)
+					)
+				);
+				return;
+			} else if (player.getUniqueId().equals(target.getUniqueId())) {
+				// Targeting self
+				if (agentAccess.compareTo(targetAccess) > 0) {
+					Bukkit.getScheduler().runTask(plugin, () ->
+						sender.sendMessage(Component.text("You cannot increase your own guild access.", NamedTextColor.RED))
+					);
+					return;
+				}
+			} else {
+				// Targeting other
+				if (agentAccess.compareTo(targetCurrentAccess) >= 0) {
+					Bukkit.getScheduler().runTask(plugin, () ->
+						sender.sendMessage(Component.text("You modify the access of someone with greater or equal access to yourself.", NamedTextColor.RED))
+					);
 					return;
 				}
 
-				if (targetCurrentAccess.compareTo(GuildAccessLevel.MEMBER) > 0 && !isOperator) {
-					Bukkit.getScheduler().runTask(plugin, ()
-						-> sender.sendMessage(Component.text("If you want to invite someone to your guild use ", NamedTextColor.RED).append(Component.text("/guild invite", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/guild invite ")))));
+				if (agentAccess.compareTo(targetAccess) > 0) {
+					Bukkit.getScheduler().runTask(plugin, () ->
+						sender.sendMessage(Component.text("You cannot grant someone more access than yourself.", NamedTextColor.RED))
+					);
 					return;
 				}
 			}
+		}
 
-			// Access removal
+		if (!targetAccess.equals(GuildAccessLevel.NONE)) {
+			Group targetAccessGroup = targetAccess.loadGroupFromRoot(guildRoot).join().orElse(null);
+			if (targetAccessGroup == null) {
+				Bukkit.getScheduler().runTask(plugin, () ->
+					sender.sendMessage(Component.text("Could not find group " + targetAccess.groupNameFromRoot(guildRoot), NamedTextColor.RED))
+				);
+				return;
+			}
+		}
+
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+			GuildInviteLevel.setInviteLevel(target, guildRoot, GuildInviteLevel.NONE);
+			GuildAccessLevel.setAccessLevel(target, guildRoot, targetAccess);
+
+			LuckPermsIntegration.pushUserUpdate(target);
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				String targetAccessGroupId = targetCurrentAccess.groupNameFromRoot(guildRoot);
-				NodeMap targetData = target.data();
-				for (Node node : targetData.toCollection()) {
-					if (!(node instanceof InheritanceNode inheritanceNode)) {
-						continue;
-					}
-
-					if (inheritanceNode.getGroupName().equals(targetAccessGroupId)) {
-						targetData.remove(node);
-						for (GuildPermission guildPermission : GuildPermission.values()) {
-							guildPermission.setExplicitPermission(guildRoot, target, null).join();
-						}
-					}
-				}
-
-				if (targetAccess != GuildAccessLevel.NONE) {
-					// Add access.
-					targetData.add(InheritanceNode.builder(targetAccess.groupNameFromRoot(guildRoot)).build());
-				}
-				// Broadcast message to guild chat saying that user's access got changed?
-
-				LuckPermsIntegration.pushUserUpdate(target);
+				String guildRootDisplayName = guildRoot.getDisplayName();
+				String targetUserName = target.getUsername();
 				AuditListener.log(
 					String.format("Changed guild %s access for %s from %s to %s\nTask executed by %s",
-						guildRoot.getDisplayName() != null ? guildRoot.getDisplayName() : guildRoot.getName(), // needed because getDisplayName returns null if it is the same as getName
-						target.getUsername() != null ? target.getUsername() : target.getUniqueId().toString(), // usb: this can return null if luckperms doesn't have a username associated with this uuid
+						guildRootDisplayName != null ? guildRootDisplayName : guildRoot.getName(), // needed because getDisplayName returns null if it is the same as getName
+						targetUserName != null ? targetUserName : target.getUniqueId().toString(), // usb: this can return null if luckperms doesn't have a username associated with this uuid
 						targetCurrentAccess.name(),
 						targetAccess.name(),
 						isOperator ? player.getName() + " (Operator)" : player.getName())
@@ -284,8 +342,6 @@ public class GuildAccessCommand {
 					boolean promoted = targetAccess.compareTo(targetCurrentAccess) < 0;
 					sender.sendMessage(Component.text(String.format("Successfully %s %s to %s (player's guild permissions have been reset)",
 						(promoted ? "promoted" : "demoted"), target.getUsername(), targetAccess.mLabel), NamedTextColor.GOLD));
-				} else {
-					sender.sendMessage(Component.text(String.format("Could not modify rank because %s is already a %s", target.getUsername(), targetAccess.mLabel), NamedTextColor.RED));
 				}
 			});
 		});

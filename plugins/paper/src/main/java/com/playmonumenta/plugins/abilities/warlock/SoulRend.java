@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.warlock;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -16,8 +18,8 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.NavigableSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,6 +45,7 @@ public class SoulRend extends Ability {
 
 	public static final String CHARM_COOLDOWN = "Soul Rend Cooldown";
 	public static final String CHARM_HEAL = "Soul Rend Healing";
+	public static final String CHARM_PACT_HEAL = "Soul Rend Pact Healing";
 	public static final String CHARM_MARK_DURATION = "Soul Rend Mark Duration";
 	public static final String CHARM_MARK_COUNT = "Soul Rend Mark Count";
 	public static final String CHARM_ALLY = "Soul Rend Ally Heal";
@@ -55,15 +58,7 @@ public class SoulRend extends Ability {
 			.linkedSpell(ClassAbility.SOUL_REND)
 			.scoreboardId("SoulRend")
 			.shorthandName("SR")
-			.descriptions(
-				"Attacking an enemy with a critical scythe attack heals you for %s health. Cooldown: %ss."
-					.formatted(HEAL, StringUtils.ticksToSeconds(COOLDOWN)),
-				("The attacked enemy is marked for %s seconds, allowing your next %s critical scythe attacks against them to heal you for %s%% of the damage dealt, capped at %s health per hit. " +
-					"Killing the enemy heals you for %s health for each remaining mark on the mob. " +
-					"Healing from this ability now applies to all players within %s blocks of you.")
-					.formatted(StringUtils.ticksToSeconds(MARK_DURATION), MARK_COUNT, StringUtils.multiplierToPercentage(MARK_HEAL_PERCENT), MARK_HEAL_CAP, REMAINING_MARK_HEAL, RADIUS),
-				"Healing from the initial attack that is above max health or negated by Dark Pact is converted into up to %s absorption health, for %ss."
-					.formatted(ABSORPTION_CAP, StringUtils.ticksToSeconds(ABSORPTION_DURATION)))
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Critical strikes heal you.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.POTION);
@@ -79,7 +74,7 @@ public class SoulRend extends Ability {
 	private final int mAbsorptionDuration;
 	private final double mAllyHealMultiplier;
 
-	private final double mDarkPactHeal;
+	public final double mDarkPactHeal;
 	private @Nullable DarkPact mDarkPact;
 
 	private final SoulRendCS mCosmetic;
@@ -93,11 +88,11 @@ public class SoulRend extends Ability {
 		mHealCap = MARK_HEAL_CAP;
 		mRemainingHeal = REMAINING_MARK_HEAL;
 		mRadius = CharmManager.getRadius(player, CHARM_RADIUS, RADIUS);
-		mAbsorptionCap = ABSORPTION_CAP;
-		mAbsorptionDuration = ABSORPTION_DURATION;
+		mAbsorptionCap = CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION_CAP, ABSORPTION_CAP);
+		mAbsorptionDuration = CharmManager.getDuration(player, CHARM_ABSORPTION_DURATION, ABSORPTION_DURATION);
 		mAllyHealMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, 1);
 
-		mDarkPactHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, isLevelOne() ? DARK_PACT_HEAL_1 : DARK_PACT_HEAL_2);
+		mDarkPactHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_PACT_HEAL, isLevelOne() ? DARK_PACT_HEAL_1 : DARK_PACT_HEAL_2);
 		Bukkit.getScheduler().runTask(plugin, () -> mDarkPact = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DarkPact.class));
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SoulRendCS());
@@ -106,22 +101,27 @@ public class SoulRend extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (!isOnCooldown()
-			    && event.getType() == DamageType.MELEE
-			    && PlayerUtils.isFallingAttack(mPlayer)
-			    && ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
+			&& event.getType() == DamageType.MELEE
+			&& PlayerUtils.isFallingAttack(mPlayer)
+			&& ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
 			mCosmetic.rendHitSound(world, loc);
 			mCosmetic.rendHitParticle(mPlayer, loc);
 
+			@Nullable
 			NavigableSet<Effect> darkPactEffects = mPlugin.mEffectManager.getEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
 			if (darkPactEffects != null) {
 				if (mDarkPact != null && mDarkPact.isLevelTwo()) {
-					int currPactDuration = darkPactEffects.last().getDuration();
+					NavigableSet<Effect> previousDarkPactEffects = new ConcurrentSkipListSet<>(darkPactEffects);
+
 					mPlugin.mEffectManager.clearEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
 					healPlayer(mPlayer, mHeal, enemy, mDarkPactHeal);
-					mPlugin.mEffectManager.addEffect(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME, new PercentHeal(currPactDuration, -1));
+
+					// give back the dark pact effects
+					previousDarkPactEffects.forEach(effect ->
+						mPlugin.mEffectManager.addEffect(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME, new PercentHeal(effect.getDuration(), -effect.getMagnitude()).deleteOnAbilityUpdate(true)));
 
 				} else if (isEnhanced()) {
 					// All healing converted to absorption
@@ -134,7 +134,8 @@ public class SoulRend extends Ability {
 
 			if (isLevelTwo()) {
 				mPlugin.mEffectManager.addEffect(enemy, "SoulRendLifeSteal." + mPlayer.getUniqueId(),
-					new SoulRendLifeSteal(mPlayer, mMarkDuration, mMarks, mHealPercent, mHealCap, mRemainingHeal, this, mCosmetic));
+					new SoulRendLifeSteal(mPlayer, mMarkDuration, mMarks, mHealPercent, mHealCap, mRemainingHeal, this, mCosmetic)
+						.deleteOnAbilityUpdate(true));
 
 				healOthers(mHeal, enemy);
 			}
@@ -184,4 +185,37 @@ public class SoulRend extends Ability {
 		mCosmetic.rendAbsorptionEffect(mPlayer, player, enemy);
 	}
 
+	private static Description<SoulRend> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("When you attack a mob with a critical scythe attack, heal ")
+			.add(a -> a.mHeal, HEAL)
+			.add(" health.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<SoulRend> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The attacked mob is marked for ")
+			.addDuration(a -> a.mMarkDuration, MARK_DURATION)
+			.add(" seconds, causing your next ")
+			.add(a -> a.mMarks, MARK_COUNT)
+			.add(" critical scythe attacks against them to heal you for ")
+			.addPercent(a -> a.mHealPercent, MARK_HEAL_PERCENT)
+			.add(" of the damage dealt, capped at ")
+			.add(a -> a.mHealCap, MARK_HEAL_CAP)
+			.add(" health per hit. Killing the mob heals you for ")
+			.add(a -> a.mRemainingHeal, REMAINING_MARK_HEAL)
+			.add(" health for each remaining mark on the mob. Healing from this ability now applies to all players within ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks of you.");
+	}
+
+	private static Description<SoulRend> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Healing from the initial attack that is above max health or negated by Dark Pact is converted into up to ")
+			.add(a -> a.mAbsorptionCap, ABSORPTION_CAP)
+			.add(" absorption health, which lasts ")
+			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
+			.add(" seconds.");
+	}
 }

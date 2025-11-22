@@ -19,14 +19,7 @@ public class Execution implements Infusion {
 	private static final int DURATION = 4 * 20;
 	public static final double PERCENT_DAMAGE_PER_LEVEL = 0.015;
 	private static final String PERCENT_DAMAGE_EFFECT_NAME = "ExecutionPercentDamageEffect";
-	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-			DamageType.MELEE,
-			DamageType.MELEE_ENCH,
-			DamageType.MELEE_SKILL,
-			DamageType.PROJECTILE,
-			DamageType.PROJECTILE_SKILL,
-			DamageType.MAGIC
-	);
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	@Override
 	public String getName() {
@@ -45,7 +38,8 @@ public class Execution implements Infusion {
 		BlockData fallingDustData = Material.ANVIL.createBlockData();
 		new PartialParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 3,
 			(enemy.getWidth() / 2) + 0.1, enemy.getHeight() / 3, (enemy.getWidth() / 2) + 0.1, fallingDustData).spawnAsPlayerActive(player);
-		plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new GearDamageIncrease(DURATION, percentDamage, AFFECTED_DAMAGE_TYPES));
+		plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new GearDamageIncrease(DURATION, percentDamage)
+			.damageTypes(AFFECTED_DAMAGE_TYPES));
 	}
 
 	public static double getDamageDealtMultiplier(double level) {

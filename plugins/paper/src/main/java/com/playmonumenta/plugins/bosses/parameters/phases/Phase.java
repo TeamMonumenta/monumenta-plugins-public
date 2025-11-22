@@ -1,16 +1,10 @@
 package com.playmonumenta.plugins.bosses.parameters.phases;
 
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.bosses.parameters.ParseResult;
-import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.bosses.parameters.phases.Trigger.TriggerOperation;
 import com.playmonumenta.plugins.events.DamageEvent;
-import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +19,9 @@ public class Phase {
 
 	private boolean mIsReusable = false;
 
-	private Phase(List<Trigger> triggers, List<Action> actions) {
+	public Phase(String name, boolean reusable, List<Trigger> triggers, List<Action> actions) {
+		mName = name;
+		mIsReusable = reusable;
 		mTriggers = triggers;
 		mActions = actions;
 	}
@@ -170,6 +166,17 @@ public class Phase {
 
 	}
 
+	public boolean onShoot(LivingEntity boss) {
+		List<Trigger> temp = mTriggers.stream()
+			.filter(trigger -> trigger.onShoot(boss))
+			.toList();
+
+		if (!temp.isEmpty()) {
+			runTest(temp, boss);
+			return true;
+		}
+		return false;
+	}
 
 	private void runTest(List<Trigger> triggers, LivingEntity boss) {
 		boolean runActions = true;
@@ -217,124 +224,4 @@ public class Phase {
 			action.runAction(boss);
 		}
 	}
-
-
-
-	protected static final Map<String, Trigger.TriggerBuilder> TRIGGER_BUILDER_MAP = new HashMap<>();
-	protected static final Map<String, Action.ActionBuilder> ACTION_BUILDER_MAP = new HashMap<>();
-
-	static {
-		TRIGGER_BUILDER_MAP.put("ON_SPAWN", OnSpawnTrigger::fromReader);
-		TRIGGER_BUILDER_MAP.put("ON_DEATH", OnDeathTrigger::fromReader);
-		TRIGGER_BUILDER_MAP.put("ON_DAMAGE", OnDamageTrigger::fromReader);
-		TRIGGER_BUILDER_MAP.put("ON_HURT", OnHurtTrigger::fromReader);
-		TRIGGER_BUILDER_MAP.put("ON_CAST", BossCastTrigger::fromReader);
-		TRIGGER_BUILDER_MAP.put("NEARBY_PLAYERS", NearbyPlayersTrigger::fromReader);
-		TRIGGER_BUILDER_MAP.put("HEALTH", HealthTrigger::fromReader);
-		TRIGGER_BUILDER_MAP.put("CUSTOM", CustomTrigger::fromReader);
-		TRIGGER_BUILDER_MAP.put("FLAG", FlagTrigger::fromReader);
-
-
-		ACTION_BUILDER_MAP.put("ADD_ABILITY", AddAbilityAction::fromReader);
-		ACTION_BUILDER_MAP.put("REMOVE_ABILITY", RemoveAbilityAction::fromReader);
-		ACTION_BUILDER_MAP.put("FORCE_CAST", ForceCastAction::fromReader);
-		ACTION_BUILDER_MAP.put("CUSTOM", CustomTriggerAction::fromReader);
-		ACTION_BUILDER_MAP.put("DELAY_ACTION", DelayAction::fromReader);
-		ACTION_BUILDER_MAP.put("COMMAND", CommandAction::fromReader);
-		ACTION_BUILDER_MAP.put("RANDOM", RandomAction::fromReader);
-		ACTION_BUILDER_MAP.put("FLAG", FlagSetAction::fromReader);
-	}
-
-
-	public static ParseResult<Phase> fromReader(StringReader reader) {
-		List<Trigger> triggerList = new ArrayList<>();
-		List<Action> actionsList = new ArrayList<>();
-		int lastThingRead = 0;
-		boolean hasReadNegation = false;
-		Trigger trigger = null;
-
-		while (true) {
-			if (lastThingRead % 2 == 0) {
-				//read NOT or a Trigger or skip
-
-				if (!triggerList.isEmpty()) {
-					if (reader.advance("->")) {
-						break;
-					}
-				}
-
-				if (reader.advance("NOT")) {
-					hasReadNegation = true;
-				}
-				String name = reader.readOneOf(TRIGGER_BUILDER_MAP.keySet());
-				if (name == null) {
-					List<Tooltip<String>> suggestionArgs = new ArrayList<>(TRIGGER_BUILDER_MAP.keySet().size() + 1);
-					String soFar = reader.readSoFar();
-					for (String valid : TRIGGER_BUILDER_MAP.keySet()) {
-						suggestionArgs.add(Tooltip.ofString(soFar + valid, "hoverDescription")); //todo add a way to get custom descriptions
-					}
-					if (!hasReadNegation) {
-						suggestionArgs.add(Tooltip.ofString(soFar + "NOT ", "negation"));
-					}
-					return ParseResult.of(suggestionArgs.toArray(Tooltip.arrayOf()));
-				}
-				ParseResult<Trigger> parseResult = Objects.requireNonNull(TRIGGER_BUILDER_MAP.get(name)).buildTrigger(reader);
-				if (parseResult.getResult() == null) {
-					return ParseResult.of(Objects.requireNonNull(parseResult.getTooltip()));
-				}
-				trigger = parseResult.getResult();
-				trigger.setNegated(hasReadNegation);
-				triggerList.add(trigger);
-				hasReadNegation = false;
-				lastThingRead++;
-
-			}
-
-			if (trigger != null) {
-				if (reader.advance("->")) {
-					break;
-				}
-
-				TriggerOperation opp = reader.readEnum(TriggerOperation.values());
-				if (opp == null) {
-					List<Tooltip<String>> suggestionArgs = new ArrayList<>(TriggerOperation.values().length);
-					String soFar = reader.readSoFar();
-					for (TriggerOperation valid : TriggerOperation.values()) {
-						suggestionArgs.add(Tooltip.ofString(soFar + valid.name(), "hoverDescription"));
-					}
-					suggestionArgs.add(Tooltip.ofString(soFar + " ->", "negation"));
-					return ParseResult.of(suggestionArgs.toArray(Tooltip.arrayOf()));
-				}
-
-				trigger.setOperation(opp);
-				lastThingRead++;
-				trigger = null;
-			}
-		}
-
-		do {
-			String name = reader.readOneOf(ACTION_BUILDER_MAP.keySet());
-			if (name == null) {
-				List<Tooltip<String>> suggestionArgs = new ArrayList<>(ACTION_BUILDER_MAP.keySet().size() + 1);
-				String soFar = reader.readSoFar();
-				for (String valid : ACTION_BUILDER_MAP.keySet()) {
-					suggestionArgs.add(Tooltip.ofString(soFar + valid + " ", "hoverDescription")); //todo add a way to get custom descriptions
-				}
-				return ParseResult.of(suggestionArgs.toArray(Tooltip.arrayOf()));
-			}
-
-			ParseResult<Action> parseResult = Objects.requireNonNull(ACTION_BUILDER_MAP.get(name)).buildAction(reader);
-			if (parseResult.getResult() == null) {
-				return ParseResult.of(Objects.requireNonNull(parseResult.getTooltip()));
-			}
-
-			actionsList.add(parseResult.getResult());
-
-		} while (reader.advance(","));
-
-		return ParseResult.of(new Phase(triggerList, actionsList));
-
-	}
-
-
 }

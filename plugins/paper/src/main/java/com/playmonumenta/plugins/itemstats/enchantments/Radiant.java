@@ -12,7 +12,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class Radiant implements Enchantment {
-	private static final String NIGHTVISION_DISABLED_TAG = "RadiantDarksightDisabled";
+	public static final String NIGHTVISION_DISABLED_TAG = "RadiantDarksightDisabled";
 
 	@Override
 	public String getName() {

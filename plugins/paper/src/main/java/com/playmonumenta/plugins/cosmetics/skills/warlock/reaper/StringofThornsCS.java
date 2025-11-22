@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,6 +23,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class StringofThornsCS extends VoodooBondsCS {
 	private static final Particle.DustOptions RED_SMALL = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 0.6f);
@@ -64,6 +64,7 @@ public class StringofThornsCS extends VoodooBondsCS {
 			int mTicks = 0;
 			final Location mLoc = startLoc.clone();
 			final Vector mDir = direction.clone();
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 8; i++) {
@@ -105,6 +106,7 @@ public class StringofThornsCS extends VoodooBondsCS {
 		startLoc.subtract(0, 2, 0);
 		new BukkitRunnable() {
 			double mD = 30;
+
 			@Override
 			public void run() {
 				Vector vec;

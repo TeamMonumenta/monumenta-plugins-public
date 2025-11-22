@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 
 public class MobRisingBoss extends BossAbilityGroup {
@@ -45,13 +46,15 @@ public class MobRisingBoss extends BossAbilityGroup {
 		public boolean SUMMON_GLOWING = true;
 
 		@BossParam(help = "not written")
-		public LoSPool MOB_POOL = LoSPool.EMPTY;
+		public LoSPool MOB_POOL = LoSPool.LibraryPool.EMPTY;
 		@BossParam(help = "not written")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_SELF_TARGET;
 		@BossParam(help = "not written")
 		public SoundsList SOUNDS = SoundsList.EMPTY;
 		@BossParam(help = "not written")
-		public ParticlesList PARTICLES = ParticlesList.fromString("[(SPELL_INSTANT,2,0.5,0.5,0.5,0)]");
+		public ParticlesList PARTICLES = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.SPELL_INSTANT, 2, 0.5, 0.5, 0.5, 0.0))
+			.build();
 	}
 
 	public MobRisingBoss(Plugin plugin, LivingEntity boss) {
@@ -59,7 +62,7 @@ public class MobRisingBoss extends BossAbilityGroup {
 
 		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		if (p.MOB_POOL != LoSPool.EMPTY) {
+		if (p.MOB_POOL != LoSPool.LibraryPool.EMPTY) {
 			Spell spell = new SpellBaseSummon(
 				plugin,
 				boss,

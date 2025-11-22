@@ -44,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 public final class WingedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_winged";
 	// In-game, Minecraft shows Pose values as degrees, but internally it's radians
-	public static final double headMovement = 0.8 * Math.PI / 180;
+	public static final double headMovement = Math.toRadians(0.8);
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Only move towards players and idly oscillate if there is a player within this radius")
@@ -62,8 +62,18 @@ public final class WingedBoss extends BossAbilityGroup {
 		@BossParam(help = "Manual Y offset for wing position relative to the entity")
 		public double WING_Y_OFFSET = 0;
 
+		@BossParam(help = "Manual Y offset for the entity position relative to the target (If vertical is enabled)")
+		public double ENTITY_Y_OFFSET = 0;
+
 		@BossParam(help = "Ignore blocks and be able to move through walls")
 		public boolean IGNORE_BLOCKS = false;
+
+		@BossParam(help = "Whether or not if the boss should spawn wings")
+		public boolean HAS_WINGS = true;
+
+		@BossParam(help = "Should the boss bob up and down")
+		public boolean OSCILLATE = true;
+
 	}
 
 	public WingedBoss(Plugin plugin, LivingEntity boss) {
@@ -81,19 +91,23 @@ public final class WingedBoss extends BossAbilityGroup {
 		boss.setGravity(false);
 
 		// Spawn wings
-		Collection<Entity> wings = createWings(spawnLoc);
-		List<ItemStack[]> armorList = banner(p.BANNER_PATTERN);
-		wings.forEach(e -> {
-			if (e instanceof ArmorStand stand) {
-				if (stand.getScoreboardTags().contains("left")) {
-					stand.getEquipment().setArmorContents(armorList.get(0));
-				} else {
-					stand.getEquipment().setArmorContents(armorList.get(1));
+		Collection<Entity> wings;
+		if (p.HAS_WINGS) {
+			wings = createWings(spawnLoc);
+			List<ItemStack[]> armorList = banner(p.BANNER_PATTERN);
+			wings.forEach(e -> {
+				if (e instanceof ArmorStand stand) {
+					if (stand.getScoreboardTags().contains("left")) {
+						stand.getEquipment().setArmorContents(armorList.get(0));
+					} else {
+						stand.getEquipment().setArmorContents(armorList.get(1));
+					}
+					stand.removeScoreboardTag("winged_wing");
 				}
-				stand.removeScoreboardTag("winged_wing");
-			}
-		});
-
+			});
+		} else {
+			wings = List.of();
+		}
 		new BukkitRunnable() {
 			final LinearInterpolator mInterp = new LinearInterpolator();
 			final PolynomialSplineFunction mFunction = mInterp.interpolate(distanceThresholds, speedValues);
@@ -105,7 +119,9 @@ public final class WingedBoss extends BossAbilityGroup {
 			@Override
 			public void run() {
 				if (!mBoss.isValid() || mBoss.isDead()) {
-					destroyWings(wings);
+					if (p.HAS_WINGS) {
+						destroyWings(wings);
+					}
 
 					this.cancel();
 					return;
@@ -118,32 +134,39 @@ public final class WingedBoss extends BossAbilityGroup {
 
 				// Temporarily stop flying if stunned
 				if (EntityUtils.isStunned(mBoss)) {
-					wings.forEach(e -> {
-						if (e instanceof ArmorStand stand) {
-							stand.teleport(mBoss.getLocation().add(0, p.WING_Y_OFFSET, 0));
-						}
-					});
+					if (p.HAS_WINGS) {
+						wings.forEach(e -> {
+							if (e instanceof ArmorStand stand) {
+								stand.teleport(mBoss.getLocation().add(0, p.WING_Y_OFFSET, 0));
+							}
+						});
+					}
 					return;
+
 				}
 
 				// Make the target detection more accurate by ignoring oscillation
 				Location loc = mBoss.getLocation();
 				Location middleLoc = loc.clone().add(0, FastUtils.cosDeg(mVerticalOscillation * 6), 0);
 
-				oscillateY(loc, FastUtils.sinDeg(mVerticalOscillation * 6) * 0.1, p.VERTICAL, p.IGNORE_BLOCKS);
+				// Is oscillate enabled?
+				double movementY = p.OSCILLATE ? FastUtils.sinDeg(mVerticalOscillation * 6) * 0.1 : 0;
+				oscillateY(loc, movementY, p.VERTICAL, p.IGNORE_BLOCKS);
 
 				LivingEntity target = ((Mob) mBoss).getTarget();
 				double mobSpeed = EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0.2);
 				if (target != null && mobSpeed != 0) {
-					moveEntity(loc, target, middleLoc, p.VERTICAL, mFunction, mobSpeed, p.IGNORE_BLOCKS);
+					moveEntity(loc, target, middleLoc, p.VERTICAL, mFunction, mobSpeed, p.IGNORE_BLOCKS, p.ENTITY_Y_OFFSET);
 				}
 
-				flapWings(wings, mReverseWingOscillation, p.WING_Y_OFFSET);
+				if (p.HAS_WINGS) {
+					flapWings(wings, mReverseWingOscillation, p.WING_Y_OFFSET);
 
-				mWingOscillation++;
-				if (mWingOscillation == 27) {
-					mReverseWingOscillation = !mReverseWingOscillation;
-					mWingOscillation = 0;
+					mWingOscillation++;
+					if (mWingOscillation == 27) {
+						mReverseWingOscillation = !mReverseWingOscillation;
+						mWingOscillation = 0;
+					}
 				}
 
 				mVerticalOscillation++;
@@ -184,25 +207,33 @@ public final class WingedBoss extends BossAbilityGroup {
 		mBoss.setVelocity(v);
 	}
 
-	private void moveEntity(Location loc, LivingEntity target, Location middleLoc, boolean verticalMovement, PolynomialSplineFunction function, double mobSpeed, boolean ignoreBlocks) {
+	private void moveEntity(Location loc, LivingEntity target, Location middleLoc, boolean verticalMovement, PolynomialSplineFunction function, double mobSpeed, boolean ignoreBlocks, double entityYOffset) {
 		// Make the boss face the target
 		Vector targetDir = target.getLocation().toVector().subtract(loc.toVector());
+
 		double[] targetYawPitch = VectorUtils.vectorToRotation(targetDir);
 		if (!Double.isFinite(targetYawPitch[0]) || !Double.isFinite(targetYawPitch[1])) {
-			targetYawPitch = new double[] {0, 0};
+			targetYawPitch = new double[]{0, 0};
 		}
 		mBoss.setRotation((float) targetYawPitch[0], (float) targetYawPitch[1]);
 
+		// Include entityYOffset for targetEyeLoc
+		Location targetEyeLoc = target.getEyeLocation().add(0, entityYOffset, 0);
+
 		// Move the boss towards the target, use middleLoc (location in the middle of the Y oscillation) for a more accurate distanceToTarget
-		double distanceToTarget = middleLoc.distance(target.getEyeLocation());
+		double distanceToTarget = middleLoc.distance(targetEyeLoc);
 		double speed = function.value(distanceToTarget);
+
 		Location eyeLocation = mBoss.getEyeLocation();
 		eyeLocation.setY(middleLoc.getY() + 0.5);
-		Vector forwards = eyeLocation.getDirection().multiply(speed);
 
-		double yDifference = middleLoc.getY() - target.getEyeLocation().getY();
+		Vector forwards = targetEyeLoc.toVector().subtract(eyeLocation.toVector()).normalize().multiply(speed);
+
+		double yDifference = middleLoc.getY() - targetEyeLoc.getY();
 		// If entity isn't level enough with the player, increase vertical movement by assuming the boss is further than it is in reality
-		if (verticalMovement && (yDifference <= -2.5 || yDifference >= 1.5)) {
+		double upperY = 1.5 + entityYOffset;
+
+		if (verticalMovement && (yDifference <= -2.5 || yDifference >= upperY)) {
 			forwards.setY(eyeLocation.getDirection().getY() * function.value(distanceToTarget + Math.abs(yDifference)));
 		}
 
@@ -239,12 +270,12 @@ public final class WingedBoss extends BossAbilityGroup {
 
 	private Collection<Entity> createWings(Location loc) {
 		return List.of(
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "left"),
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "left", "effect_player"),
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "left"),
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "right"),
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "right"),
-			createWing(loc, new EulerAngle(20f, 15f, -60f), "right")
+			createWing(loc, new EulerAngle(Math.toRadians(20f), Math.toRadians(15f), Math.toRadians(-60f)), "left"),
+			createWing(loc, new EulerAngle(Math.toRadians(15f), Math.toRadians(0f), Math.toRadians(-90f)), "left", "effect_player"),
+			createWing(loc, new EulerAngle(Math.toRadians(20f), Math.toRadians(-15f), Math.toRadians(-120f)), "left"),
+			createWing(loc, new EulerAngle(Math.toRadians(20f), Math.toRadians(-15f), Math.toRadians(60f)), "right"),
+			createWing(loc, new EulerAngle(Math.toRadians(15f), Math.toRadians(0f), Math.toRadians(90f)), "right"),
+			createWing(loc, new EulerAngle(Math.toRadians(20f), Math.toRadians(15f), Math.toRadians(120f)), "right")
 		);
 	}
 
@@ -322,8 +353,8 @@ public final class WingedBoss extends BossAbilityGroup {
 		}
 
 		List<ItemStack[]> armorList = Lists.newArrayList();
-		armorList.add(new ItemStack[] {new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), banner});
-		armorList.add(new ItemStack[] {new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), banner1});
+		armorList.add(new ItemStack[]{new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), banner});
+		armorList.add(new ItemStack[]{new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), banner1});
 		return armorList;
 
 	}

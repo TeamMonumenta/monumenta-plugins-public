@@ -84,7 +84,7 @@ public class SpellMortalChains extends Spell {
 						new PPCircle(Particle.BLOCK_CRACK, loc, mRadius).data(Material.OAK_WOOD.createBlockData()).count(25).spawnAsBoss();
 						new PPCircle(Particle.BLOCK_CRACK, loc, mRadius).data(Material.JUNGLE_LEAVES.createBlockData()).count(25).spawnAsBoss();
 
-						if (HexfallUtils.playersInBossInXZRange(loc, mRadius, true).size() > 0) {
+						if (!HexfallUtils.playersInBossInXZRange(loc, mRadius, true).isEmpty()) {
 							new PPPillar(Particle.REDSTONE, loc, 5).data(new Particle.DustOptions(Color.fromRGB(0, 255, 0), 1.65f)).count(15).spawnAsBoss();
 						} else {
 							new PPPillar(Particle.REDSTONE, loc, 5).data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.65f)).count(5).spawnAsBoss();
@@ -112,6 +112,7 @@ public class SpellMortalChains extends Spell {
 							int mT = 0;
 							final int mAnimationTime = 20 * 2;
 							double mCircleRadius = mRadius;
+
 							@Override
 							public void run() {
 								mCircleRadius = (mRadius * (1d - ((double) mT / (double) mAnimationTime)));
@@ -135,7 +136,7 @@ public class SpellMortalChains extends Spell {
 
 						List<Player> playersInSoak = HexfallUtils.playersInBossInXZRange(loc, mRadius, true);
 
-						if (playersInSoak.size() > 0) {
+						if (!playersInSoak.isEmpty()) {
 							attachTether(loc.clone().add(0, 1.5, 0), playersInSoak.get(0));
 							playersInSoak.get(0).sendMessage(Component.text("A chain latches onto your very soul...").decorate(TextDecoration.ITALIC).color(TextColor.color(160, 160, 160)));
 							playersWithTethers.add(playersInSoak.get(0));
@@ -216,6 +217,7 @@ public class SpellMortalChains extends Spell {
 			int mTetherTimer = mTetherBreakTime;
 			final TextDisplay mTextDisplay = loc.getWorld().spawn(loc.clone().add(0, 2.5, 0), TextDisplay.class);
 			final int mMaxTickMarks = 60;
+
 			@Override
 			public void run() {
 

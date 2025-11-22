@@ -21,6 +21,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -46,8 +48,8 @@ public class AbilityTriggersGui extends Gui {
 		mGuiTextures = GUIUtils.getGuiTextureObjective(player);
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes", "EnumOrdinal", "ReturnValueIgnored"})
 	@Override
-	@SuppressWarnings({ "EnumOrdinal", "rawtypes", "unchecked" })
 	protected void setup() {
 		ItemStack tempItem;
 		String guiTag;
@@ -58,13 +60,21 @@ public class AbilityTriggersGui extends Gui {
 					"Return to the class selection page.", NamedTextColor.GRAY, 40);
 				GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_main_back", mGuiTextures);
 				setItem(0, tempItem)
-					.onLeftClick(() -> new ClassSelectionGui(mPlayer, false).open());
+					.onLeftClick(() -> {
+						new ClassSelectionGui(mPlayer, false).open();
+
+						playButtonSoundNormal(mPlayer);
+					});
 			} else {
 				tempItem = GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false,
 					"Return to the ability summary page.", NamedTextColor.GRAY, 40);
 				GUIUtils.setGuiNbtTag(tempItem, "texture", "depth_trigger_main_back", mGuiTextures);
 				setItem(0, tempItem)
-					.onLeftClick(() -> new DepthsSummaryGUI(mPlayer).open());
+					.onLeftClick(() -> {
+						new DepthsSummaryGUI(mPlayer).open();
+
+						playButtonSoundNormal(mPlayer);
+					});
 			}
 
 			// help icon
@@ -72,7 +82,7 @@ public class AbilityTriggersGui extends Gui {
 				"""
 					Click on a trigger to change it.
 					Triggers are shown in the order they are handled. Whenever a key is pressed, the top-left trigger is checked first if it matches. If not, the next trigger is checked, and so forth until a trigger matches and casts its ability.
-					Eagle Eye is an exception: it allows other abilities to trigger after it.
+					If the ability cannot cast and "fall-through" is enabled on the trigger, the next trigger is checked.
 					Right-click a trigger to immediately perform the trigger's action (e.g. toggle some state).""", NamedTextColor.GRAY, 40);
 			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_main_help", mGuiTextures);
 			setItem(4, tempItem);
@@ -90,8 +100,8 @@ public class AbilityTriggersGui extends Gui {
 						lore.add(Component.text(trigger.getDescription(), NamedTextColor.GRAY));
 					}
 					lore.add(trigger.getTrigger().equals(info.getTrigger(trigger.getId()).getTrigger()) ?
-						         Component.text("Current Trigger (default):", NamedTextColor.GRAY) :
-						         Component.text("Custom Trigger:", NamedTextColor.AQUA));
+						Component.text("Current Trigger (default):", NamedTextColor.GRAY) :
+						Component.text("Custom Trigger:", NamedTextColor.AQUA));
 					lore.addAll(trigger.getTriggerDescription());
 					ItemStack item = GUIUtils.createBasicItem(info.getDisplayItem(), 1,
 						info.getDisplayName() + " - " + trigger.getDisplayName(), NamedTextColor.GOLD, false,
@@ -104,11 +114,13 @@ public class AbilityTriggersGui extends Gui {
 							mSelectedTrigger = trigger;
 							mNewTrigger = new AbilityTrigger(trigger.getTrigger());
 							update();
+
+							playButtonSoundSpecial(mPlayer);
 						})
 						.onRightClick(() -> {
 							if (trigger.getRestriction() == null || trigger.getRestriction().getPredicate().test(mPlayer)) {
 								// cast is fine here, as the trigger is for the ability we got it from
-								((AbilityTriggerInfo) trigger).getAction().test(ability);
+								((AbilityTriggerInfo) trigger).getAction().run(ability);
 							}
 						});
 					i++;
@@ -120,8 +132,8 @@ public class AbilityTriggersGui extends Gui {
 				setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_class_4_l", mGuiTextures));
 				setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_class_4_r", mGuiTextures));
 			} else {
-					setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_depth_4_l", mGuiTextures));
-					setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_depth_4_r", mGuiTextures));
+				setItem(GUI_IDENTIFIER_LOC_L, GUIUtils.createGuiIdentifierItem("gui_depth_4_l", mGuiTextures));
+				setItem(GUI_IDENTIFIER_LOC_R, GUIUtils.createGuiIdentifierItem("gui_depth_4_r", mGuiTextures));
 			}
 
 			// "revert all" button - top right to hopefully prevent accidental presses
@@ -141,6 +153,8 @@ public class AbilityTriggersGui extends Gui {
 							}
 						}
 						update();
+
+						playButtonSoundCancel(mPlayer);
 					});
 			}
 		} else {
@@ -149,11 +163,13 @@ public class AbilityTriggersGui extends Gui {
 				NamedTextColor.GRAY, false, "Return to the trigger selection page.", NamedTextColor.GRAY, 40);
 			GUIUtils.setGuiNbtTag(tempItem, "texture", "trigger_detail_back", mGuiTextures);
 			setItem(0, 0, tempItem)
-					.onLeftClick(() -> {
-						mSelectedAbility = null;
-						mKeyOptionsStartIndex = 0;
-						update();
-					});
+				.onLeftClick(() -> {
+					mSelectedAbility = null;
+					mKeyOptionsStartIndex = 0;
+					update();
+
+					playButtonSoundNormal(mPlayer);
+				});
 
 			Objects.requireNonNull(mNewTrigger);
 			Objects.requireNonNull(mSelectedTrigger);
@@ -179,6 +195,8 @@ public class AbilityTriggersGui extends Gui {
 			makeOptionIcons(1, 0, tempItem, mNewTrigger.isEnabled() ? Material.GREEN_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setEnabled(!mNewTrigger.isEnabled());
 				update();
+
+				playButtonSoundNormal(mPlayer);
 			});
 			tempItem = GUIUtils.createBasicItem(Material.JIGSAW, "Key: " + mNewTrigger.getKey(), NamedTextColor.WHITE, false,
 				"Click to cycle through main key.\nNote that this also changes the \"extras\" when changed.", NamedTextColor.GRAY, 40);
@@ -206,6 +224,8 @@ public class AbilityTriggersGui extends Gui {
 					}
 				}
 				update();
+
+				playButtonSoundNormal(mPlayer);
 			});
 			tempItem = GUIUtils.createBasicItem(Material.SHEARS, "Double click: " + (mNewTrigger.isDoubleClick() ? "yes" : "no"), mNewTrigger.isDoubleClick() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
 				"Click to toggle requiring a double click", NamedTextColor.GRAY, 40);
@@ -213,24 +233,26 @@ public class AbilityTriggersGui extends Gui {
 			makeOptionIcons(1, 3, tempItem, mNewTrigger.isDoubleClick() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setDoubleClick(!mNewTrigger.isDoubleClick());
 				update();
+
+				playButtonSoundNormal(mPlayer);
 			});
 			makeBinaryOptionIcon(1, 4, Material.FEATHER, "sneaking", mNewTrigger.getSneaking(), mNewTrigger::setSneaking);
 			makeBinaryOptionIcon(1, 5, Material.IRON_BOOTS, "sprinting", mNewTrigger.getSprinting(), mNewTrigger::setSprinting);
 			makeBinaryOptionIcon(1, 6, Material.ROOTED_DIRT, "on ground", mNewTrigger.getOnGround(), mNewTrigger::setOnGround);
 
 			String looking = "Looking " + (mNewTrigger.getLookDirections().size() == 3 ? "anywhere"
-					: mNewTrigger.getLookDirections().stream().map(d -> d.name().toLowerCase(Locale.ROOT)).collect(Collectors.joining(" or ")));
+				: mNewTrigger.getLookDirections().stream().map(d -> d.name().toLowerCase(Locale.ROOT)).collect(Collectors.joining(" or ")));
 			guiTag = "trigger_detail_look_" + (
 				switch (looking) {
-				case "Looking anywhere" -> "all";
-				case "Looking up" -> "up";
-				case "Looking level" -> "mid";
-				case "Looking down" -> "down";
-				case "Looking level or up" -> "up_mid";
-				case "Looking down or up" -> "up_down";
-				case "Looking down or level" -> "mid_down";
-				default -> "unsupported";
-			});
+					case "Looking anywhere" -> "all";
+					case "Looking up" -> "up";
+					case "Looking level" -> "mid";
+					case "Looking down" -> "down";
+					case "Looking level or up" -> "up_mid";
+					case "Looking down or up" -> "up_down";
+					case "Looking down or level" -> "mid_down";
+					default -> "unsupported";
+				});
 			tempItem = GUIUtils.createBasicItem(Material.HEART_OF_THE_SEA, looking, NamedTextColor.GRAY, false,
 				"Click to cycle through look directions", NamedTextColor.GRAY, 40);
 			GUIUtils.setGuiNbtTag(tempItem, "texture", guiTag, mGuiTextures);
@@ -258,6 +280,8 @@ public class AbilityTriggersGui extends Gui {
 					}
 				}
 				update();
+
+				playButtonSoundNormal(mPlayer);
 			});
 
 			tempItem = GUIUtils.createBasicItem(Material.POINTED_DRIPSTONE, "Allow fall-through: " + (mNewTrigger.isFallThrough() ? "yes" : "no"), mNewTrigger.isFallThrough() ? NamedTextColor.GREEN : NamedTextColor.GRAY, false,
@@ -266,6 +290,8 @@ public class AbilityTriggersGui extends Gui {
 			makeOptionIcons(1, 8, tempItem, mNewTrigger.isFallThrough() ? Material.GREEN_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 				mNewTrigger.setFallThrough(!mNewTrigger.isFallThrough());
 				update();
+
+				playButtonSoundNormal(mPlayer);
 			});
 
 			// extras aka key options
@@ -287,6 +313,8 @@ public class AbilityTriggersGui extends Gui {
 				setItem(3, 1, tempItem).onLeftClick(() -> {
 					mKeyOptionsStartIndex -= 6;
 					update();
+
+					playButtonSoundNormal(mPlayer);
 				});
 			}
 			if (mKeyOptionsStartIndex + 7 < AbilityTrigger.KeyOptions.values().length) {
@@ -296,6 +324,8 @@ public class AbilityTriggersGui extends Gui {
 				setItem(3, 8, tempItem).onLeftClick(() -> {
 					mKeyOptionsStartIndex += mKeyOptionsStartIndex == 0 ? 7 : 6;
 					update();
+
+					playButtonSoundNormal(mPlayer);
 				});
 			}
 
@@ -317,6 +347,8 @@ public class AbilityTriggersGui extends Gui {
 						}
 					}
 					update();
+
+					playButtonSoundNormal(mPlayer);
 				});
 			}
 
@@ -346,6 +378,8 @@ public class AbilityTriggersGui extends Gui {
 						mSelectedAbility = null;
 						mKeyOptionsStartIndex = 0;
 						update();
+
+						playButtonSoundSpecial(mPlayer);
 					});
 				}
 				{
@@ -361,6 +395,8 @@ public class AbilityTriggersGui extends Gui {
 						mSelectedAbility = null;
 						mKeyOptionsStartIndex = 0;
 						update();
+
+						playButtonSoundCancel(mPlayer);
 					});
 				}
 			}
@@ -377,6 +413,8 @@ public class AbilityTriggersGui extends Gui {
 					mSelectedAbility = null;
 					mKeyOptionsStartIndex = 0;
 					update();
+
+					playButtonSoundCancel(mPlayer);
 				});
 			}
 		}
@@ -385,8 +423,8 @@ public class AbilityTriggersGui extends Gui {
 
 	private void makeOptionIcons(int row, int column, ItemStack display, AbilityTrigger.BinaryOption value, Runnable onClick) {
 		Material indicatorMaterial = value == AbilityTrigger.BinaryOption.TRUE ? Material.GREEN_STAINED_GLASS_PANE
-				: value == AbilityTrigger.BinaryOption.FALSE ? Material.RED_STAINED_GLASS_PANE
-				: Material.GRAY_STAINED_GLASS_PANE;
+			: value == AbilityTrigger.BinaryOption.FALSE ? Material.RED_STAINED_GLASS_PANE
+			: Material.GRAY_STAINED_GLASS_PANE;
 		makeOptionIcons(row, column, display, indicatorMaterial, onClick);
 	}
 
@@ -401,11 +439,11 @@ public class AbilityTriggersGui extends Gui {
 	@SuppressWarnings("EnumOrdinal")
 	private void makeBinaryOptionIcon(int row, int column, Material material, String name, AbilityTrigger.BinaryOption value, Consumer<AbilityTrigger.BinaryOption> setter) {
 		String displayName = value == AbilityTrigger.BinaryOption.TRUE ? "Must be " + name
-				: value == AbilityTrigger.BinaryOption.FALSE ? "Not " + name
-				: capitalize(name) + " or not " + name;
+			: value == AbilityTrigger.BinaryOption.FALSE ? "Not " + name
+			: capitalize(name) + " or not " + name;
 		NamedTextColor color = value == AbilityTrigger.BinaryOption.TRUE ? NamedTextColor.GREEN
-				: value == AbilityTrigger.BinaryOption.FALSE ? NamedTextColor.RED
-				: NamedTextColor.GRAY;
+			: value == AbilityTrigger.BinaryOption.FALSE ? NamedTextColor.RED
+			: NamedTextColor.GRAY;
 
 		String guiTag = switch (name) {
 			case "sneaking" -> "sneak";
@@ -423,6 +461,8 @@ public class AbilityTriggersGui extends Gui {
 		makeOptionIcons(row, column, tempItem, value, () -> {
 			setter.accept(AbilityTrigger.BinaryOption.values()[(value.ordinal() + 1) % AbilityTrigger.BinaryOption.values().length]);
 			update();
+
+			playButtonSoundNormal(mPlayer);
 		});
 	}
 
@@ -430,4 +470,16 @@ public class AbilityTriggersGui extends Gui {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 
+	private void playButtonSoundNormal(Player player) {
+		player.playSound(player, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
+	}
+
+	private void playButtonSoundSpecial(Player player) {
+		player.playSound(player, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
+		player.playSound(player, Sound.BLOCK_TRIAL_SPAWNER_EJECT_ITEM, SoundCategory.PLAYERS, 1f, 1.4f);
+	}
+
+	private void playButtonSoundCancel(Player player) {
+		player.playSound(player, Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 1f, 0.63f);
+	}
 }

@@ -23,10 +23,10 @@ import com.playmonumenta.plugins.itemstats.enchantments.IntoxicatingWarmth;
 import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
 import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
-import com.playmonumenta.plugins.itemstats.enchantments.Snowy;
 import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
@@ -36,6 +36,7 @@ import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
@@ -152,7 +153,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			if (isHotbarOrOffhandSlot) {
 				// Virtual Firmament
 				if (ItemUtils.isShulkerBox(itemStack.getType())
-				    && VirtualFirmament.isEnabled(player)) {
+					&& VirtualFirmament.isEnabled(player)) {
 					String plainName = ItemUtils.getPlainNameIfExists(itemStack);
 					if ("Firmament".equals(plainName) || "Doorway from Eternity".equals(plainName)) {
 						int blockCountInsideFirm = NBT.get(itemStack, nbt -> {
@@ -211,9 +212,9 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			if (isArmorOrOffhandSlot) {
 				// Depth Strider disabled while holding or using a riptide trident
 				if (slot != 45
-					    && itemStack.containsEnchantment(Enchantment.DEPTH_STRIDER)
-					    && player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.RIPTIDE)
-					    && (!player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING) || player.isHandRaised() || player.isRiptiding())) {
+					&& itemStack.containsEnchantment(Enchantment.DEPTH_STRIDER)
+					&& player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.RIPTIDE)
+					&& (!player.getScoreboardTags().contains(Constants.Tags.DEPTH_STRIDER_DISABLED_ONLY_WHILE_RIPTIDING) || player.isHandRaised() || player.isRiptiding())) {
 					itemStack.removeEnchantment(Enchantment.DEPTH_STRIDER);
 					markVirtual(itemStack);
 				}
@@ -301,20 +302,6 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				});
 				return itemStack;
 			}
-
-			if (isHotbarOrOffhandSlot && ItemStatUtils.hasEnchantment(itemStack, EnchantmentType.SNOWY)) {
-				int count = Snowy.getSnowballAmmo(itemStack);
-				itemStack.setAmount(Math.max(1, count));
-
-				Component prevDisplayName = ItemUtils.getDisplayName(itemStack);
-				NBT.modify(itemStack, nbt -> {
-					nbt.modifyMeta((nbtr, meta) -> {
-						meta.displayName(prevDisplayName.append(Component.text(" (" + count + ")")));
-					});
-					markVirtual(nbt);
-				});
-				return itemStack;
-			}
 		}
 
 		// Custom shulker names
@@ -362,6 +349,15 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			}
 		}
 
+		// Update Hunt Track items
+		if (ItemStatUtils.getInfusionLevel(itemStack, InfusionType.HUNT_TRACK) > 0) {
+			ItemUpdateHelper.generateItemStats(itemStack);
+			NBT.modify(itemStack, nbt -> {
+				markVirtual(nbt);
+			});
+			return itemStack;
+		}
+
 		return itemStack;
 	}
 
@@ -379,12 +375,8 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			nbt.modifyMeta((nbtr, meta) -> {
 				if (meta instanceof PotionMeta potionMeta) {
 					double ratio = ((double) count) / potionsAbility.getMaxCharges();
-					int color = (int) (ratio * 255);
-					if (potionsAbility.isGruesomeMode()) {
-						potionMeta.setColor(Color.fromRGB(color, 0, 0));
-					} else {
-						potionMeta.setColor(Color.fromRGB(0, color, 0));
-					}
+					Color color = potionsAbility.mCosmetic.splashColor(potionsAbility.isGruesomeMode());
+					potionMeta.setColor(ParticleUtils.getTransition(Color.BLACK, color, ratio));
 				}
 				meta.displayName(ItemUtils.getDisplayName(itemStack).append(Component.text(" (" + count + ")")));
 			});

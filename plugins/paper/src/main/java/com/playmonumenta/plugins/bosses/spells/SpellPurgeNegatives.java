@@ -7,10 +7,10 @@ import org.bukkit.potion.PotionEffectType;
 
 public class SpellPurgeNegatives extends Spell {
 	private int mCooldown = 0;
-	private LivingEntity mBoss;
-	private int mTimer;
+	private final LivingEntity mBoss;
+	private final int mTimer;
 
-	private static final PotionEffectType[] NEGATIVE_EFFECTS = new PotionEffectType[] {
+	private static final PotionEffectType[] NEGATIVE_EFFECTS = new PotionEffectType[]{
 		PotionEffectType.BLINDNESS,
 		PotionEffectType.POISON,
 		PotionEffectType.CONFUSION,

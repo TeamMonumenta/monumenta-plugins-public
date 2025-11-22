@@ -23,18 +23,21 @@ public class PlayerGuildInfo {
 	private final GuildAccessLevel mAccessLevel;
 	private final GuildInviteLevel mInviteLevel;
 	private final EnumSet<GuildPermission> mGuildPermissions;
+	private final EnumSet<GuildFlag> mGuildFlags;
 
 	private PlayerGuildInfo(User user,
 	                        Group guild,
 	                        GuildAccessLevel accessLevel,
 	                        GuildInviteLevel inviteLevel,
-	                        EnumSet<GuildPermission> guildPermissions) {
+	                        EnumSet<GuildPermission> guildPermissions,
+	                        EnumSet<GuildFlag> guildFlags) {
 		mUser = user;
 		mPlayerName = MonumentaRedisSyncIntegration.cachedUuidToName(user.getUniqueId());
 		mGuild = guild;
 		mAccessLevel = accessLevel;
 		mInviteLevel = inviteLevel;
 		mGuildPermissions = guildPermissions;
+		mGuildFlags = guildFlags;
 	}
 
 	public CompletableFuture<PlayerGuildInfo> getUpdated() {
@@ -50,6 +53,7 @@ public class PlayerGuildInfo {
 				GuildAccessLevel accessLevel;
 				GuildInviteLevel inviteLevel;
 				EnumSet<GuildPermission> guildPermissions;
+				EnumSet<GuildFlag> guildFlags;
 				root = LuckPermsIntegration.getGuildRoot(guild);
 				if (root == null) {
 					throw new RuntimeException("Could not find guild root for " + guild.getName());
@@ -62,13 +66,20 @@ public class PlayerGuildInfo {
 							guildPermissions.add(guildPermission);
 						}
 					}
+					guildFlags = EnumSet.noneOf(GuildFlag.class);
+					for (GuildFlag guildFlag : GuildFlag.values()) {
+						if (guildFlag.hasFlag(root)) {
+							guildFlags.add(guildFlag);
+						}
+					}
 				}
 				PlayerGuildInfo guildInfo = new PlayerGuildInfo(
 					user,
 					root,
 					accessLevel,
 					inviteLevel,
-					guildPermissions
+					guildPermissions,
+					guildFlags
 				);
 				future.complete(guildInfo);
 			} catch (Exception ex) {
@@ -171,5 +182,9 @@ public class PlayerGuildInfo {
 
 	public EnumSet<GuildPermission> getGuildPermissions() {
 		return mGuildPermissions.clone();
+	}
+
+	public EnumSet<GuildFlag> getGuildFlags() {
+		return mGuildFlags.clone();
 	}
 }

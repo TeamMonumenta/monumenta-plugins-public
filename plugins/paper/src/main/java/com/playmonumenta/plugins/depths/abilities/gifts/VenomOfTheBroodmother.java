@@ -42,6 +42,6 @@ public class VenomOfTheBroodmother extends DepthsAbility {
 	}
 
 	private static Description<VenomOfTheBroodmother> getDescription() {
-		return new DescriptionBuilder<VenomOfTheBroodmother>().add("Restore your grave timer to the maximum.");
+		return new DescriptionBuilder<>(() -> INFO).add("Restore your grave timer to the maximum.");
 	}
 }

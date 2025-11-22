@@ -30,17 +30,17 @@ public class TinyBombTossBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		Spell spell = new SpellBombToss(plugin, boss, detectionRange, LOBS, FUSE,
-				(World world, TNTPrimed tnt, Location loc) -> {
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 1f);
-					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsEntityActive(boss);
+			(World world, TNTPrimed tnt, Location loc) -> {
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 1f);
+				new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsEntityActive(boss);
 
-					for (Player player : PlayerUtils.playersInRange(loc, RADIUS, true)) {
-						if (player.hasLineOfSight(tnt)) {
-							double multiplier = (RADIUS - player.getLocation().distance(loc)) / RADIUS;
-							BossUtils.blockableDamage(boss, player, DamageType.BLAST, POINT_BLANK_DAMAGE * multiplier, tnt.getLocation());
-						}
+				for (Player player : PlayerUtils.playersInRange(loc, RADIUS, true)) {
+					if (player.hasLineOfSight(tnt)) {
+						double multiplier = (RADIUS - player.getLocation().distance(loc)) / RADIUS;
+						BossUtils.blockableDamage(boss, player, DamageType.BLAST, POINT_BLANK_DAMAGE * multiplier, tnt.getLocation());
 					}
-				});
+				}
+			});
 
 		super.constructBoss(spell, detectionRange);
 	}

@@ -91,7 +91,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 
 		List<Spell> passiveSpells = Arrays.asList(new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) ->
 				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
-				0.4, 0.35, Material.BROWN_CONCRETE.createBlockData()).spawnAsEntityActive(boss)),
+					0.4, 0.35, Material.BROWN_CONCRETE.createBlockData()).spawnAsEntityActive(boss)),
 			new SpellBlockBreak(mBoss, 1, 3, 1, 8, false, true, false),
 			new SpellShieldStun(30 * 20),
 			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK
@@ -106,7 +106,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 	@Override
 	public void bossCastAbility(SpellCastEvent event) {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		if (players.size() > 0 && mBoss instanceof Mob mob) {
+		if (!players.isEmpty() && mBoss instanceof Mob mob) {
 			Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
 			mob.setTarget(newTarget);
 		}

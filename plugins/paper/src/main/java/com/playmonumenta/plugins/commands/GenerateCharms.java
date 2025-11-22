@@ -94,12 +94,12 @@ public class GenerateCharms extends GenericCommand {
 			} else {
 				player.chat("/editinfo ring charm " + location + " none");
 			}
-			player.chat("/editcharm power " + Integer.toString(power));
+			player.chat("/editcharm power " + power);
 			// Charm Stats
 			for (int i = 0; i < loreText.length; i++) {
 				String line = loreText[i];
 				if (line != null && !line.equals("") && !line.equals("-")) {
-					player.chat("/editcharm" + " add " + Integer.toString(i) + " " + line);
+					player.chat("/editcharm" + " add " + i + " " + line);
 				}
 			}
 

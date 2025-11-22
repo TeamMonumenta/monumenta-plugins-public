@@ -21,18 +21,19 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class JunglesNourishment implements Enchantment {
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.utils.PlayerUtils.MAX_FOOD_LEVEL;
 
+public final class JunglesNourishment implements Enchantment {
 	private static final double HEAL_PERCENT = 0.4;
-	private static final int DURATION = 20 * 5;
+	private static final int RESISTANCE_DURATION = TICKS_PER_SECOND * 5;
 	private static final double PERCENT_DAMAGE_RECEIVED = -0.2;
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "JunglesNourishmentResistance";
-	private static final int COOLDOWN = 20 * 25;
+	private static final int COOLDOWN = TICKS_PER_SECOND * 25;
 	public static final Material COOLDOWN_ITEM = Material.MELON_SEEDS;
 
 	public static final String CHARM_COOLDOWN = "Jungle's Nourishment Cooldown";
@@ -50,33 +51,37 @@ public class JunglesNourishment implements Enchantment {
 		return EnchantmentType.JUNGLES_NOURISHMENT;
 	}
 
-	@Override public EnumSet<Slot> getSlots() {
+	@Override
+	public EnumSet<Slot> getSlots() {
 		return EnumSet.of(Slot.MAINHAND, Slot.OFFHAND);
 	}
 
 	@Override
-	public void onConsume(Plugin plugin, Player player, double level, PlayerItemConsumeEvent event) {
+	public void onConsume(final Plugin plugin, final Player player, final double level, final PlayerItemConsumeEvent event) {
 		if (ItemStatUtils.getEnchantmentLevel(event.getItem(), EnchantmentType.JUNGLES_NOURISHMENT) > 0) {
-			ItemStack item = event.getItem();
-			String source = ItemCooldown.toSource(getEnchantmentType());
+			final ItemStack item = event.getItem();
+			final String source = ItemCooldown.toSource(getEnchantmentType());
 			if (plugin.mEffectManager.hasEffect(player, source)) {
 				player.sendMessage(Component.text("Your " + ItemUtils.getPlainName(item) + " is still on cooldown!", TextColor.fromHexString("#D02E28")));
 				event.setCancelled(true);
 				return;
 			}
 
-			double healPercent = HEAL_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_HEALTH);
+			final double healPercent = HEAL_PERCENT + CharmManager.getLevelPercentDecimal(player, CHARM_HEALTH);
+			final int resistanceDuration = (int) (CharmManager.getDuration(player, CHARM_DURATION, RESISTANCE_DURATION) * Quench.getDurationScaling(plugin, player));
+			final double resistancePotency = PERCENT_DAMAGE_RECEIVED - CharmManager.getLevelPercentDecimal(player, CHARM_RESISTANCE);
+			final int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, Refresh.reduceCooldown(plugin, player, COOLDOWN));
+
 			PlayerUtils.healPlayer(plugin, player, healPercent * EntityUtils.getMaxHealth(player), player);
+			player.setFoodLevel(MAX_FOOD_LEVEL);
+			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME,
+				new PercentDamageReceived(resistanceDuration, resistancePotency));
+			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()),
+				new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
 
-			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived((int) (CharmManager.getDuration(player, CHARM_DURATION, DURATION) * Quench.getDurationScaling(plugin, player)), PERCENT_DAMAGE_RECEIVED - CharmManager.getLevelPercentDecimal(player, CHARM_RESISTANCE)));
-
-			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, Refresh.reduceCooldown(plugin, player, COOLDOWN));
-			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()), new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
-			player.setFoodLevel(24);
-			World world = player.getWorld();
-			new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1).spawnAsPlayerActive(player);
-			new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1).spawnAsPlayerActive(player);
-			world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1, 1.25f);
+			new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0)).count(20).delta(0.25, 0.5, 0.25).extra(1).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0)).count(25).delta(0.25, 0.45, 0.25).extra(1).spawnAsPlayerActive(player);
+			player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1, 1.25f);
 		}
 	}
 }

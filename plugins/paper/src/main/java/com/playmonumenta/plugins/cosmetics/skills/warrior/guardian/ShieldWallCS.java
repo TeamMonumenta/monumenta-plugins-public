@@ -72,7 +72,7 @@ public class ShieldWallCS implements CosmeticSkill {
 	}
 
 	public void shieldOnHit(World world, Location eLoc, Player player, float multiplier) {
-		world.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.0f * multiplier, 1f);
+		world.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, multiplier, 1f);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, eLoc, (int) (50 * multiplier), 0, 0, 0, 0.35f).spawnAsPlayerActive(player);
 	}
 }

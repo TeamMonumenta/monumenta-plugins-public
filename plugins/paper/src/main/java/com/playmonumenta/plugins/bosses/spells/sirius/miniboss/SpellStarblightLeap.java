@@ -20,9 +20,9 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellStarblightLeap extends Spell {
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 	private boolean mOnCooldown;
-	private Plugin mPlugin;
+	private final Plugin mPlugin;
 	private static final int COOLDOWN = 5 * 20;
 	private static final float VELOCITYMULTIPLIER = 1.2f;
 

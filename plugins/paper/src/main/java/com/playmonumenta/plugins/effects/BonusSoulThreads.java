@@ -23,7 +23,7 @@ public class BonusSoulThreads extends SingleArgumentEffect {
 	public void onKill(EntityDeathEvent event, Player player) {
 		for (ItemStack drop : event.getDrops()) {
 			String name = ItemUtils.getPlainName(drop);
-			if (name != null && name.equals("Soul Thread")) {
+			if (name.equals("Soul Thread")) {
 				if (FastUtils.RANDOM.nextDouble() <= mAmount) {
 					drop.setAmount(drop.getAmount() * 2);
 				}

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
+import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
@@ -32,6 +33,14 @@ public class TreasureMap extends DepthsAbility {
 		super(plugin, player, INFO);
 	}
 
+	public static void trigger(Player player, DepthsPlayer dp) {
+		dp.sendMessage("After looking through all the rooms with your Treasure Map, you were able to find 2 prismatic ability rewards!");
+		dp.addReward(DepthsRoomType.DepthsRewardType.PRISMATIC);
+		dp.addReward(DepthsRoomType.DepthsRewardType.PRISMATIC);
+		DepthsManager.getInstance().setPlayerLevelInAbility(ABILITY_NAME, player, dp, 0, false, false);
+		playSounds(player);
+	}
+
 	public static void playSounds(Player player) {
 		Plugin plugin = Plugin.getInstance();
 		player.playSound(player, Sound.ITEM_SHOVEL_FLATTEN, 1.0f, 1.0f);
@@ -42,7 +51,7 @@ public class TreasureMap extends DepthsAbility {
 	}
 
 	private static Description<TreasureMap> getDescription() {
-		return new DescriptionBuilder<TreasureMap>().add("Once your team selects one of each room type, gain 2 ")
+		return new DescriptionBuilder<>(() -> INFO).add("Once your team selects one of each room type, gain 2 ")
 			.add(DepthsTree.PRISMATIC.getNameComponent())
 			.add(" ability selections.")
 			.add((a, p) -> {

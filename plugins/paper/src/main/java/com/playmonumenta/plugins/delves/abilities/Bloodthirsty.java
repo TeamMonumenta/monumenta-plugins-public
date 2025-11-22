@@ -11,15 +11,16 @@ public class Bloodthirsty {
 	private static final double BLOODTHIRSTY_CHANCE_PER_LEVEL = 0.07;
 
 	public static final String DESCRIPTION = "Enemies can coordinate attacks on players.";
+	public static final String AVOID_BLOODTHIRSTY = "boss_bloodthirstyimmune";
 
 	public static Component[] rankDescription(int level) {
-			return new Component[] {
-				Component.text("Enemies have a " + Math.round(100 * BLOODTHIRSTY_CHANCE_PER_LEVEL * level) + "% chance to be Bloodthirsty.")
-			};
+		return new Component[]{
+			Component.text("Enemies have a " + Math.round(100 * BLOODTHIRSTY_CHANCE_PER_LEVEL * level) + "% chance to be Bloodthirsty.")
+		};
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (FastUtils.RANDOM.nextDouble() < BLOODTHIRSTY_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob)) {
+		if (FastUtils.RANDOM.nextDouble() < BLOODTHIRSTY_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob) && !mob.getScoreboardTags().contains(AVOID_BLOODTHIRSTY)) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			mob.addScoreboardTag(CoordinatedAttackBoss.identityTag);
 		}

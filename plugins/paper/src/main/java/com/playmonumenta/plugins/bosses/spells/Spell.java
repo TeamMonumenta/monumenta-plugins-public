@@ -83,6 +83,15 @@ public abstract class Spell implements Cloneable {
 		return mActiveRunnables.stream().anyMatch(r -> !r.isCancelled()) || mActiveTasks.stream().anyMatch(r -> !r.isCancelled());
 	}
 
+	/**
+	 * Checks if the spell should persist after a phase change
+	 *
+	 * @return True if spell should not cancel on phase change
+	 */
+	public boolean persistOnPhaseChange() {
+		return false;
+	}
+
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 
 	}

@@ -2,9 +2,12 @@ package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -16,7 +19,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import java.util.function.Predicate;
@@ -38,12 +40,13 @@ public class JudgementChain extends MultipleChargeAbility {
 	private static final int CHAIN_DURATION = Constants.TICKS_PER_SECOND * 8;
 	private static final double SLOWNESS_AMOUNT = 0.4;
 	private static final double WEAKNESS_AMOUNT = 0.4;
-	private static final double DMG_BOOST_1 = 0.15;
-	private static final double DMG_BOOST_2 = 0.3;
+	private static final double DMG_BOOST_1 = 0.25;
+	private static final double DMG_BOOST_2 = 0.5;
 	private static final int DEBUFF_DURATION = Constants.TICKS_PER_SECOND * 3;
 	private static final int EXTRA_TARGETS = 2;
 	private static final double EXTRA_TARGET_RADIUS = 3;
 	public static final String EFFECT_NAME = "JudgementChainEffect";
+
 	public static final String CHARM_CHARGES = "Judgement Chain Charges";
 	public static final String CHARM_COOLDOWN = "Judgement Chain Cooldown";
 	public static final String CHARM_RANGE = "Judgement Chain Range";
@@ -61,18 +64,7 @@ public class JudgementChain extends MultipleChargeAbility {
 			.scoreboardId("JudgementChain")
 			.shorthandName("JC")
 			.actionBarColor(TextColor.color(115, 115, 115))
-			.descriptions(
-				("Swap hands while looking at an unchained mob within %s blocks to teleport them in front of you and chain them to you for %ss, " +
-					"taunting them and afflicting them with %s%% Slowness and %s%% Weakness for %ss. " +
-					"You deal %s%% more damage to chained mobs. " +
-					"Bosses and crowd control/knockback immune mobs cannot be teleported, but will be chained and debuffed. Charges: %s. Charge Cooldown: %ss.")
-				.formatted(RANGE, StringUtils.ticksToSeconds(CHAIN_DURATION), StringUtils.multiplierToPercentage(SLOWNESS_AMOUNT),
-					StringUtils.multiplierToPercentage(WEAKNESS_AMOUNT), StringUtils.ticksToSeconds(DEBUFF_DURATION),
-					StringUtils.multiplierToPercentage(DMG_BOOST_1),
-					MAX_CHARGES, StringUtils.ticksToSeconds(COOLDOWN)),
-				("Judgement Chain now additionally teleports and chains the %s closest mobs within %s blocks of the targeted mob, " +
-					"and you deal %s%% more damage to chained mobs.")
-				.formatted(EXTRA_TARGETS, StringUtils.to2DP(EXTRA_TARGET_RADIUS), StringUtils.multiplierToPercentage(DMG_BOOST_2)))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Teleport a mob to you and debuff it.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", JudgementChain::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
@@ -135,6 +127,7 @@ public class JudgementChain extends MultipleChargeAbility {
 		if (isLevelTwo()) {
 			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(entityLoc, mExtraTargetRadius, entity);
 			nearbyMobs.removeIf(e -> mPlugin.mEffectManager.hasEffect(e, EFFECT_NAME));
+			nearbyMobs.removeIf(filter.negate());
 			for (int i = 0; i < mExtraTargets; i++) {
 				LivingEntity nearestMob = EntityUtils.getNearestMob(entityLoc, nearbyMobs);
 				if (nearestMob != null) {
@@ -172,6 +165,7 @@ public class JudgementChain extends MultipleChargeAbility {
 			new BukkitRunnable() { // teleport multiple times so that it actually updates
 
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					EntityUtils.teleportStack(entity, finalDestination);
@@ -189,7 +183,7 @@ public class JudgementChain extends MultipleChargeAbility {
 		EntityUtils.applyTaunt(entity, mPlayer);
 		EntityUtils.applySlow(mPlugin, mDebuffDuration, mSlowAmount, entity);
 		EntityUtils.applyWeaken(mPlugin, mDebuffDuration, mWeakenAmount, entity);
-		mPlugin.mEffectManager.addEffect(entity, EFFECT_NAME, new JudgementChainMobEffect(mChainDuration, mPlayer, mCosmetic.glowColor()));
+		mPlugin.mEffectManager.addEffect(entity, EFFECT_NAME, new JudgementChainMobEffect(mChainDuration, mCosmetic.glowColor()));
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;
@@ -212,8 +206,46 @@ public class JudgementChain extends MultipleChargeAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlugin.mEffectManager.hasEffect(enemy, EFFECT_NAME)) {
-			event.setFlatDamage(event.getFlatDamage() * (1 + mChainDmgBonus));
+			DamageEvent.DamageType type = event.getType();
+			if (type == DamageEvent.DamageType.TRUE || type == DamageEvent.DamageType.OTHER || type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.FIRE || type == DamageEvent.DamageType.POISON ) {
+				return false;
+			}
+			event.updateDamageWithMultiplier(1 + mChainDmgBonus);
+			// This is badly written. JudgementChainMobEffect should instead extend SelfishVulnerability or PercentDamageDealt.
+			// I don't really care, because Warlock rework is coming up in a few months or less. This is a bandaid patch.
 		}
 		return false;
+	}
+
+	private static Description<JudgementChain> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger("while looking at an unchained mob")
+			.add(" within ")
+			.add(a -> a.mRange, RANGE)
+			.add(" blocks to teleport them in front of you and chain them to you for ")
+			.addDuration(a -> a.mChainDuration, CHAIN_DURATION)
+			.add(" seconds, taunting them and afflicting them with ")
+			.addPercent(a -> a.mSlowAmount, SLOWNESS_AMOUNT)
+			.add(" slowness and ")
+			.addPercent(a -> a.mWeakenAmount, WEAKNESS_AMOUNT)
+			.add(" weaken for ")
+			.addDuration(a -> a.mDebuffDuration, DEBUFF_DURATION)
+			.add(" seconds. You deal ")
+			.addPercent(a -> a.mChainDmgBonus, DMG_BOOST_1, false, Ability::isLevelOne)
+			.add(" more damage to chained mobs. Bosses and crowd control/knockback immune mobs cannot be teleported, but will be chained and debuffed. Charges: ")
+			.add(a -> a.mMaxCharges, MAX_CHARGES)
+			.add(".")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<JudgementChain> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Now additionally teleport and chain the ")
+			.add(a -> a.mExtraTargets, EXTRA_TARGETS)
+			.add(" closest mobs within ")
+			.add(a -> a.mExtraTargetRadius, EXTRA_TARGET_RADIUS)
+			.add(" blocks of the targeted mob, and you deal ")
+			.addPercent(a -> a.mChainDmgBonus, DMG_BOOST_2, false, Ability::isLevelTwo)
+			.add(" more damage to chained mobs.");
 	}
 }

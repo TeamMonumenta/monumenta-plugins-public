@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.utils.MMLog;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.List;
-import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -84,7 +83,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0, 0.0, null, null);
+			explosionAesthetics, hitAction, ringAesthetics, centerAesthetics, lingeringHitAction, LoSPool.LibraryPool.EMPTY, 0.7f, 0.0, 0.0, null, null);
 	}
 
 	public SpellBaseGrenadeLauncher(
@@ -155,7 +154,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, LoSPool.EMPTY, 0.7f, 0.0f, 0.0f, additionalParameters, telegraphAesthetics);
+			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, LoSPool.LibraryPool.EMPTY, 0.7f, 0.0f, 0.0f, additionalParameters, telegraphAesthetics);
 	}
 
 	/*
@@ -288,6 +287,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			if (delay > 0) {
 				new BukkitRunnable() {
 					final ChargeUpManager mChargeupManager = additionalParameters.getChargeupManager();
+
 					@Override
 					public void run() {
 						if (mChargeupManager.nextTick()) {
@@ -303,8 +303,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 				new BukkitRunnable() {
 					int mLobsLaunched = 0;
 					final Location mBossLocation = bossLocation;
-					final WeakReference<Entity> mTarget = new WeakReference<Entity>(target);
-					final WeakReference<LivingEntity> mBossRef = new WeakReference<LivingEntity>(mBoss);
+					final WeakReference<Entity> mTarget = new WeakReference<>(target);
+					final WeakReference<LivingEntity> mBossRef = new WeakReference<>(mBoss);
+
 					@Override
 					public void run() {
 						Entity target = mTarget.get();
@@ -375,9 +376,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			}
 
 			// approximate formula for the max height of a falling block's trajectory given its initial y-velocity
-			double maxHeight = -0.453758* mGrenadeYVelocity + 12.6052*Math.pow(mGrenadeYVelocity, 2) +
-				-3.75027*Math.pow(mGrenadeYVelocity, 3) + 0.906156*Math.pow(mGrenadeYVelocity, 4) +
-				-0.114669*Math.pow(mGrenadeYVelocity, 5);
+			double maxHeight = -0.453758 * mGrenadeYVelocity + 12.6052 * Math.pow(mGrenadeYVelocity, 2) +
+				-3.75027 * Math.pow(mGrenadeYVelocity, 3) + 0.906156 * Math.pow(mGrenadeYVelocity, 4) +
+				-0.114669 * Math.pow(mGrenadeYVelocity, 5);
 
 			// h = 0.5 * g * t^2
 			// t^2 = 0.5 * g / h
@@ -618,38 +619,23 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		void launch(Location loc);
 	}
 
-	public static class AdditionalGrenadeParameters {
-		// Offset from the boss' location from which to spawn the grenade
-		public final Location mSpawnOffset;
-		// Max randomness in the targeting, or how inaccurate the targeting should be at maximum
-		public final double mTargetMaxRandomness;
-		// Extra delay before actually starting to lob grenades
-		public final int mStartDelay;
-		// Lock the targeting Y level. Pass -1 to disable the option.
-		public final double mFixedY;
-		// Name to put on the charge bar if start delay is > 0
-		public final ChargeUpManager mChargeupManager;
-		// Whether to remove the lingering effect after a certain amount of times it procced
-		public final boolean mCapLingeringApplications;
-		// How many applications the lingering will las for, max
-		public final int mMaxLingeringApplications;
-		// Whether the spell has internal cooldown, useful to have it cast less often compared to other spells
-		public final int mInternalCooldownTicks;
-		// Whether to spawn the explosion at the registered player location, at the time of launch.
-		public final boolean mAlwaysAccurate;
-
-		public AdditionalGrenadeParameters(Location spawnOffset, double targetMaxRandomness, int startDelay, double fixedY, ChargeUpManager chargeupManager,
-			   boolean capLingeringApplications, int maxLingeringApplications, int internalCooldownTicks, boolean alwaysAccurate) {
-			mSpawnOffset = spawnOffset;
-			mTargetMaxRandomness = targetMaxRandomness;
-			mStartDelay = startDelay;
-			mFixedY = fixedY;
-			mChargeupManager = chargeupManager;
-			mCapLingeringApplications = capLingeringApplications;
-			mMaxLingeringApplications = maxLingeringApplications;
-			mInternalCooldownTicks = internalCooldownTicks;
-			mAlwaysAccurate = alwaysAccurate;
-		}
+	/**
+	 * A boss that launches area effect clouds
+	 *
+	 * @param mSpawnOffset              Offset from the boss' location from which to spawn the grenade
+	 * @param mTargetMaxRandomness      Max randomness in the targeting, or how inaccurate the targeting should be at maximum
+	 * @param mStartDelay               Extra delay before actually starting to lob grenades
+	 * @param mFixedY                   Lock the targeting Y level. Pass -1 to disable the option.
+	 * @param mChargeupManager          Name to put on the charge bar if start delay is > 0
+	 * @param mCapLingeringApplications Whether to remove the lingering effect after a certain amount of times it proceed
+	 * @param mMaxLingeringApplications How many applications the lingering will las for, max
+	 * @param mInternalCooldownTicks    Whether the spell has internal cooldown, useful to have it cast less often compared to other spells
+	 * @param mAlwaysAccurate           Whether to spawn the explosion at the registered player location, at the time of launch.
+	 */
+	public record AdditionalGrenadeParameters(Location mSpawnOffset, double mTargetMaxRandomness, int mStartDelay,
+	                                          double mFixedY, ChargeUpManager mChargeupManager,
+	                                          boolean mCapLingeringApplications, int mMaxLingeringApplications,
+	                                          int mInternalCooldownTicks, boolean mAlwaysAccurate) {
 
 		public Location getSpawnOffset() {
 			return mSpawnOffset;
@@ -657,7 +643,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 
 		public double getRandomOffset() {
 			// Returns a value between -maxRandomness and +maxRandomness
-			return RandomUtils.nextDouble(0, 2 * mTargetMaxRandomness) - mTargetMaxRandomness;
+			return FastUtils.randomDoubleInRange(0, 2 * mTargetMaxRandomness) - mTargetMaxRandomness;
 		}
 
 		public int getStartDelay() {

@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
+import com.playmonumenta.plugins.abilities.scout.Quickdraw;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
@@ -57,9 +57,19 @@ public class Oversized implements Enchantment {
 			// ThrowRate already calls this, but others don't
 			onAnyShoot(player, cooldown, fromThrowingKnife, !fromThrowingKnife);
 		}
-		for (Material mat : new Material[] {Material.TRIDENT, Material.SNOWBALL}) {
-			if (player.getCooldown(mat) < cooldown) {
-				player.setCooldown(mat, cooldown);
+
+		if (player.getCooldown(Material.SNOWBALL) < cooldown) {
+			player.setCooldown(Material.SNOWBALL, cooldown);
+		}
+		// only set tridents on cooldown if the player has a non-riptide trident in hotbar
+		// to prevent riptide tridents from being disabled
+		for (int i = 0; i < 9; i++) {
+			ItemStack item = player.getInventory().getItem(i);
+			if (item != null && item.getType() == Material.TRIDENT
+				&& !ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE)
+				&& player.getCooldown(Material.TRIDENT) < cooldown) {
+				player.setCooldown(Material.TRIDENT, cooldown);
+				break;
 			}
 		}
 	}
@@ -69,7 +79,7 @@ public class Oversized implements Enchantment {
 		for (int i = 0; i < 9; i++) {
 			ItemStack item = player.getInventory().getItem(i);
 			if (item != null && ((disableOversized && ItemStatUtils.hasEnchantment(item, EnchantmentType.OVERSIZED))
-					|| (disableThrowingKnife && ItemStatUtils.hasEnchantment(item, EnchantmentType.THROWING_KNIFE)))) {
+				|| (disableThrowingKnife && ItemStatUtils.hasEnchantment(item, EnchantmentType.THROWING_KNIFE)))) {
 				if (player.getCooldown(item.getType()) < cooldown) {
 					player.setCooldown(item.getType(), cooldown);
 				}

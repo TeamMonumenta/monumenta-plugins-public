@@ -35,10 +35,10 @@ public class ChallengeCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.2f, 0.1f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.4f, 0.1f);
 		new PartialParticle(Particle.FLAME, loc, 25, 0.4, 1, 0.4, 0.7f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 100, 1, 0, 1, 0.425).spawnAsPlayerActive(player);
 		loc.add(0, 1.25, 0);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 250, 0, 0, 0, 0.425).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CRIT, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CRIT_MAGIC, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT, loc, 250, 0, 0, 0, 1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT_MAGIC, loc, 250, 0, 0, 0, 1).spawnAsPlayerActive(player);
 	}
 
 	public void onCastEffect(Player player, World world, Location loc) {

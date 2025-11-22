@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -19,16 +20,16 @@ public class PercentDamageReceived extends Effect {
 	public static final String effectID = "PercentDamageReceived";
 	public static final String GENERIC_NAME = "PercentDamageReceived";
 
-	private final double mAmount;
-	private final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
+	protected final double mAmount;
+	protected final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
 
-	public PercentDamageReceived(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes) {
+	public PercentDamageReceived(final int duration, final double amount, final @Nullable EnumSet<DamageType> affectedDamageTypes) {
 		super(duration, effectID);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
 	}
 
-	public PercentDamageReceived(int duration, double amount) {
+	public PercentDamageReceived(final int duration, final double amount) {
 		this(duration, amount, null);
 	}
 
@@ -52,11 +53,11 @@ public class PercentDamageReceived extends Effect {
 	}
 
 	@Override
-	public void onHurt(LivingEntity entity, DamageEvent event) {
-		if (event.getType() != DamageType.TRUE && (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType()))) {
+	public void onHurt(final LivingEntity entity, final DamageEvent event) {
+		if (event.getType() != DamageType.TRUE && (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) && event.getAbility() != ClassAbility.REVERB) {
 			double amount = mAmount;
-			if (EntityUtils.isBoss(entity) && amount > 0) {
-				amount = amount / 2;
+			if (EntityUtils.isBoss(entity) && isDebuff()) {
+				amount /= 2;
 			}
 			event.updateDamageWithMultiplier(1 + amount);
 		}
@@ -64,13 +65,13 @@ public class PercentDamageReceived extends Effect {
 
 	@Override
 	public JsonObject serialize() {
-		JsonObject object = new JsonObject();
+		final JsonObject object = new JsonObject();
 		object.addProperty("effectID", mEffectID);
 		object.addProperty("duration", mDuration);
 		object.addProperty("amount", mAmount);
 
 		if (mAffectedDamageTypes != null) {
-			JsonArray jsonArray = new JsonArray();
+			final JsonArray jsonArray = new JsonArray();
 			for (DamageType damageType : mAffectedDamageTypes) {
 				jsonArray.add(damageType.name());
 			}
@@ -81,18 +82,17 @@ public class PercentDamageReceived extends Effect {
 	}
 
 	public static PercentDamageReceived deserialize(JsonObject object, Plugin plugin) {
-		int duration = object.get("duration").getAsInt();
-		double amount = object.get("amount").getAsDouble();
+		final int duration = object.get("duration").getAsInt();
+		final double amount = object.get("amount").getAsDouble();
 
 		if (object.has("type")) {
-			JsonArray damageTypes = object.getAsJsonArray("type");
-			List<DamageType> damageTypeList = new ArrayList<>();
-			for (JsonElement element : damageTypes) {
-				String string = element.getAsString();
-				damageTypeList.add(DamageEvent.DamageType.valueOf(string));
+			final JsonArray damageTypes = object.getAsJsonArray("type");
+			final List<DamageType> damageTypeList = new ArrayList<>();
+			for (final JsonElement element : damageTypes) {
+				damageTypeList.add(DamageEvent.DamageType.valueOf(element.getAsString()));
 			}
 
-			EnumSet<DamageEvent.DamageType> damageTypeSet = EnumSet.copyOf(damageTypeList);
+			final EnumSet<DamageEvent.DamageType> damageTypeSet = EnumSet.copyOf(damageTypeList);
 			return new PercentDamageReceived(duration, amount, damageTypeSet);
 		} else {
 			return new PercentDamageReceived(duration, amount);
@@ -101,24 +101,26 @@ public class PercentDamageReceived extends Effect {
 
 	@Override
 	public @Nullable Component getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(-mAmount).append(Component.text(StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + getDisplayedName()));
+		return StringUtils.doubleToColoredAndSignedPercentage(-mAmount).append(
+			getDisplayedName() != null ? Component.text(getDisplayedName()) : Component.empty()
+		);
 	}
 
 	@Override
 	public @Nullable String getDisplayedName() {
-		return "Resistance";
+		return StringUtils.getDamageTypeString(mAffectedDamageTypes, false, null) + " " + "Resistance";
 	}
 
 	@Override
 	public String toString() {
-		String types = "any";
+		StringBuilder types = new StringBuilder("any");
 		if (mAffectedDamageTypes != null) {
-			types = "";
-			for (DamageType type : mAffectedDamageTypes) {
+			types = new StringBuilder();
+			for (final DamageType type : mAffectedDamageTypes) {
 				if (!types.isEmpty()) {
-					types += ",";
+					types.append(",");
 				}
-				types += type.name();
+				types.append(type.name());
 			}
 		}
 		return String.format("PercentDamageReceived duration:%d types:%s amount:%f", this.getDuration(), types, mAmount);

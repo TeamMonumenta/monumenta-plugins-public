@@ -146,10 +146,10 @@ public class PassGui extends Gui {
 				.decoration(TextDecoration.ITALIC, false));
 		}
 		lore.add(Component.text(
-			String.format("Missions end in %dd %dh",
-				mPass.getDaysUntilMissionEnd(),
-				mPass.getHoursUntilMissionEnd()),
-			NamedTextColor.YELLOW)
+				String.format("Missions end in %dd %dh",
+					mPass.getDaysUntilMissionEnd(),
+					mPass.getHoursUntilMissionEnd()),
+				NamedTextColor.YELLOW)
 			.decoration(TextDecoration.ITALIC, false));
 		lore.add(Component.text(
 				String.format("Pass ends in %dd %dh",
@@ -183,7 +183,7 @@ public class PassGui extends Gui {
 						mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						mPlayer.sendMessage(
 							Component.text("That player's progress went missing, cancelling changes",
-							NamedTextColor.RED));
+								NamedTextColor.RED));
 						close();
 						return;
 					}
@@ -216,7 +216,7 @@ public class PassGui extends Gui {
 				}
 				mView = new WeekView(this);
 				updateWithPageSound();
-		});
+			});
 
 		ItemStack rewardsViewItem = new ItemStack(Material.EMERALD);
 		meta = rewardsViewItem.getItemMeta();
@@ -325,9 +325,9 @@ public class PassGui extends Gui {
 	}
 
 	public void addRewardIndicatorIcon(int y,
-	                          int x,
-	                          Player displayedPlayer,
-	                          int rewardIndex) {
+	                                   int x,
+	                                   Player displayedPlayer,
+	                                   int rewardIndex) {
 		if (rewardIndex < 0 || rewardIndex >= mPass.mRewards.size()) {
 			return;
 		}

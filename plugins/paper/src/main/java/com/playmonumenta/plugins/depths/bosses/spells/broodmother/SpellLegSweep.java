@@ -8,13 +8,13 @@ import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.bosses.Broodmother;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.structures.StructuresAPI;
 import java.util.ArrayList;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -77,7 +77,7 @@ public class SpellLegSweep extends Spell {
 
 		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_SPIDER_AMBIENT, SoundCategory.HOSTILE, 3f, 0.5f);
 
-		boolean startWithRight = RandomUtils.nextBoolean();
+		boolean startWithRight = FastUtils.randomBoolean();
 		if (startWithRight) {
 			sweep(mSweepRight1, true, false);
 			sweep(mSweepRight2, true, false);
@@ -100,6 +100,7 @@ public class SpellLegSweep extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			boolean mSwitchedDirection = false;
+
 			@Override
 			public void run() {
 				if (!mSwitchedDirection) {

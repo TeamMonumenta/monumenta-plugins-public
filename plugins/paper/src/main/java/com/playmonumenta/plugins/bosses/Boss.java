@@ -1,20 +1,26 @@
 package com.playmonumenta.plugins.bosses;
 
+import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.EntityGlowEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Vex;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
@@ -42,7 +48,8 @@ public class Boss {
 	}
 
 	public void onHurt(DamageEvent event) {
-		for (BossAbilityGroup ability : mAbilities) {
+		// Make a copy of the list before iterating as some bosses change their abilities based on a damage threshold
+		for (BossAbilityGroup ability : new ArrayList<>(mAbilities)) {
 			if (!event.isCancelled()) {
 				ability.onHurt(event);
 				ability.triggerOnSpells(spell -> spell.onHurt(event));
@@ -51,7 +58,8 @@ public class Boss {
 	}
 
 	public void onHurtByEntity(DamageEvent event, Entity damager) {
-		for (BossAbilityGroup ability : mAbilities) {
+		// Make a copy of the list before iterating as some bosses change their abilities based on a damage threshold
+		for (BossAbilityGroup ability : new ArrayList<>(mAbilities)) {
 			if (!event.isCancelled()) {
 				ability.onHurtByEntity(event, damager);
 				ability.triggerOnSpells(spell -> spell.onHurtByEntity(event, damager));
@@ -60,7 +68,8 @@ public class Boss {
 	}
 
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		for (BossAbilityGroup ability : mAbilities) {
+		// Make a copy of the list before iterating as some bosses change their abilities based on a damage threshold
+		for (BossAbilityGroup ability : new ArrayList<>(mAbilities)) {
 			if (!event.isCancelled()) {
 				ability.onHurtByEntityWithSource(event, damager, source);
 				ability.triggerOnSpells(spell -> spell.onHurtByEntityWithSource(event, damager, source));
@@ -69,7 +78,8 @@ public class Boss {
 	}
 
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		for (BossAbilityGroup ability : mAbilities) {
+		// Make a copy of the list before iterating as some bosses change their abilities based on a damage threshold
+		for (BossAbilityGroup ability : new ArrayList<>(mAbilities)) {
 			if (!event.isCancelled()) {
 				ability.onDamage(event, damagee);
 				ability.triggerOnSpells(spell -> spell.onDamage(event, damagee));
@@ -126,7 +136,8 @@ public class Boss {
 			return;
 		}
 		try {
-			for (BossAbilityGroup ability : mAbilities) {
+			// Make a copy of the list before iterating as some bosses change their abilities based on a damage threshold
+			for (BossAbilityGroup ability : new ArrayList<>(mAbilities)) {
 				ability.bossCastAbility(event);
 				ability.triggerOnSpells(spell -> spell.bossCastAbility(event));
 			}
@@ -154,16 +165,34 @@ public class Boss {
 		}
 	}
 
+	public void bossGlowed(EntityGlowEvent event) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossGlowed(event);
+		}
+	}
+
 	public void bossExploded(EntityExplodeEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossExploded(event);
 		}
 	}
 
-	// Only acts on fire applied by the plugin
-	public void bossIgnited(int ticks) {
+	public void bossKnockedBackEntity(EntityKnockbackByEntityEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
-			ability.bossIgnited(ticks);
+			ability.bossKnockedBackEntity(event);
+		}
+	}
+
+	public void bossSummonedVex(CreatureSpawnEvent event, Vex vex) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossSummonedVex(event, vex);
+		}
+	}
+
+	// Only acts on fire applied by the plugin
+	public void bossIgnited(int ticks, @Nullable Entity applier) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossIgnited(ticks, applier);
 		}
 	}
 
@@ -198,7 +227,7 @@ public class Boss {
 	}
 
 	public List<BossAbilityGroup> getAbilities() {
-		return new ArrayList<BossAbilityGroup>(mAbilities);
+		return new ArrayList<>(mAbilities);
 	}
 
 	public void unload(boolean shuttingDown) {
@@ -251,8 +280,11 @@ public class Boss {
 	}
 
 	public void nearbyEntityDeath(EntityDeathEvent event) {
+		Location location = event.getEntity().getLocation();
 		for (BossAbilityGroup ability : mAbilities) {
-			ability.nearbyEntityDeath(event);
+			if (ability.nearbyEntityDeathWithinRange(location)) {
+				ability.nearbyEntityDeath(event);
+			}
 		}
 	}
 
@@ -280,9 +312,27 @@ public class Boss {
 		return false;
 	}
 
-	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+	public void nearbyBlockPlace(BlockPlaceEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
-			ability.nearbyPlayerDeath(event);
+			ability.nearbyBlockPlace(event);
+		}
+	}
+
+	public boolean hasNearbyBlockPlaceTrigger() {
+		for (BossAbilityGroup ability : mAbilities) {
+			if (ability.hasNearbyBlockPlaceTrigger()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		Location location = event.getPlayer().getLocation();
+		for (BossAbilityGroup ability : mAbilities) {
+			if (ability.deadPlayerWithinRange(location)) {
+				ability.nearbyPlayerDeath(event);
+			}
 		}
 	}
 

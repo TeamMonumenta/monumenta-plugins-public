@@ -26,8 +26,8 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 	private static final double DISTANCE = 15;
 	private static final int DESPAWN_TIMER = 20 * 20;
 
-	private static final EntityTargets TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, 100, false, EntityTargets.Limit.CLOSER_ONE);
-	private static final EntityTargets TARGET_DESPAWN = new EntityTargets(EntityTargets.TARGETS.PLAYER, DISTANCE, true, EntityTargets.Limit.CLOSER_ONE);
+	private static final EntityTargets TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, 100, EntityTargets.Limit.CLOSER_ONE, List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED));
+	private static final EntityTargets TARGET_DESPAWN = new EntityTargets(EntityTargets.TARGETS.PLAYER, DISTANCE, EntityTargets.Limit.CLOSER_ONE);
 
 	public GenericGalleryMobBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -64,7 +64,7 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 
 				if (mLastTarget == null) {
 					List<? extends LivingEntity> targets = TARGETS.getTargetsList(mob).stream().filter((player) -> !GalleryUtils.isPlayerDeath(player)).toList();
-					if (targets.size() > 0) {
+					if (!targets.isEmpty()) {
 						mob.setTarget(targets.get(0));
 						mLastTarget = targets.get(0);
 					} else {
@@ -81,13 +81,15 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 				return 5;
 			}
 
-			@Override public void onHurtByEntity(DamageEvent event, Entity damager) {
+			@Override
+			public void onHurtByEntity(DamageEvent event, Entity damager) {
 				if ((mLastTarget == null || mob.getLocation().distanceSquared(mLastTarget.getLocation()) > mob.getLocation().distance(damager.getLocation())) && damager instanceof Player player && !AbilityUtils.isStealthed(player)) {
 					mLastTarget = player;
 				}
 			}
 
-			@Override public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+			@Override
+			public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 				if ((mLastTarget == null || mob.getLocation().distanceSquared(mLastTarget.getLocation()) > mob.getLocation().distance(source.getLocation())) && source instanceof Player player && !AbilityUtils.isStealthed(player)) {
 					mLastTarget = player;
 				}
@@ -97,35 +99,40 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 		//Spell that handle the despawn system
 		Spell despawnSpell = new Spell() {
 			int mTimer = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				mTimer += 10;
 
-				if (mTimer >= DESPAWN_TIMER && TARGET_DESPAWN.getTargetsList(mBoss).size() <= 0) {
+				if (mTimer >= DESPAWN_TIMER && TARGET_DESPAWN.getTargetsList(mBoss).isEmpty()) {
 					GalleryUtils.despawnMob(mBoss);
 				}
 			}
 
-			@Override public int cooldownTicks() {
+			@Override
+			public int cooldownTicks() {
 				return 10;
 			}
 
-			@Override public void onDamage(DamageEvent event, LivingEntity damagee) {
+			@Override
+			public void onDamage(DamageEvent event, LivingEntity damagee) {
 				mTimer = 0;
 			}
 
-			@Override public void onHurtByEntity(DamageEvent event, Entity damager) {
+			@Override
+			public void onHurtByEntity(DamageEvent event, Entity damager) {
 				if (damager instanceof Player) {
 					mTimer = 0;
 				}
 			}
 
-			@Override public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+			@Override
+			public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 				if (source instanceof Player) {
 					mTimer = 0;
 				}
 			}
 		};
-
 
 
 		super.constructBoss(SpellManager.EMPTY, List.of(targetSpell, despawnSpell), 150, null, 5);

@@ -43,8 +43,8 @@ public class LichConquestBoss extends BossAbilityGroup {
 			new SpellConditionalTeleport(mBoss.getVehicle(), mCenter, b -> loc.distance(b.getLocation()) > 80),
 			// Teleport the boss to spawnLoc if he is stuck in bedrock
 			new SpellConditionalTeleport(mBoss.getVehicle(), mCenter, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
-				                                                               b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
-				                                                               b.getLocation().getBlock().getType() == Material.LAVA)
+				b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
+				b.getLocation().getBlock().getType() == Material.LAVA)
 		);
 
 		super.constructBoss(activeSpells, passives, detectionRange, null);

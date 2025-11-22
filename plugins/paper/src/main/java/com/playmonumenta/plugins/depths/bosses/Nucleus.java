@@ -156,36 +156,36 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 
 		//Spell setup
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
-				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
-				new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
+			new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
+			new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
 		));
 		List<Spell> phase1Passives = Arrays.asList(
-				new SpellBlockBreak(mBoss, 2, 3, 2),
-				new SpellPassiveEyes(mBoss, this, spawnLoc),
-				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((floor - 1) / 3) + 1, this)
+			new SpellBlockBreak(mBoss, 2, 3, 2),
+			new SpellPassiveEyes(mBoss, this, spawnLoc),
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((floor - 1) / 3) + 1, this)
 		);
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-				new SpellTectonicDevastation(mPlugin, mBoss, mSpawnLoc, mCooldownTicks, this),
-				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
-				new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
+			new SpellTectonicDevastation(mPlugin, mBoss, mSpawnLoc, mCooldownTicks, this),
+			new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
+			new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
 		));
 		List<Spell> phase2Passives = Arrays.asList(
-				new SpellBlockBreak(mBoss, 2, 3, 2),
-				new SpellPassiveEyes(mBoss, this, spawnLoc),
-				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((floor - 1) / 3) + 1, this)
+			new SpellBlockBreak(mBoss, 2, 3, 2),
+			new SpellPassiveEyes(mBoss, this, spawnLoc),
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((floor - 1) / 3) + 1, this)
 		);
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
-				new SpellTectonicDevastation(mPlugin, mBoss, mSpawnLoc, mCooldownTicks, this),
-				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
-				new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
+			new SpellTectonicDevastation(mPlugin, mBoss, mSpawnLoc, mCooldownTicks, this),
+			new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
+			new SpellRisingTides(plugin, mBoss, mSpawnLoc, mCooldownTicks, this)
 		));
 		List<Spell> phase3Passives = Arrays.asList(
-				new SpellBlockBreak(mBoss, 2, 3, 2),
-				new SpellVolcanicDeepmise(mBoss, mSpawnLoc),
-				new SpellPassiveEyes(mBoss, this, spawnLoc),
-				new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((floor - 1) / 3) + 1, this)
+			new SpellBlockBreak(mBoss, 2, 3, 2),
+			new SpellVolcanicDeepmise(mBoss, mSpawnLoc),
+			new SpellPassiveEyes(mBoss, this, spawnLoc),
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((floor - 1) / 3) + 1, this)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -194,15 +194,15 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 			mCooldownTicks -= 30;
 			changePhase(phase2Spells, phase2Passives, null);
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
-					.sendMessage(Component.text("", NamedTextColor.RED)
-							.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
-							.append(Component.text(" Beyond... I "))
-							.append(Component.text("nb").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text(" push further into "))
-							.append(Component.text("nbff").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text("this reality... Quickness... Yes... "))
-							.append(Component.text("hggghg").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text(" Sink...")));
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
+					.append(Component.text(" Beyond... I "))
+					.append(Component.text("nb").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text(" push further into "))
+					.append(Component.text("nbff").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("this reality... Quickness... Yes... "))
+					.append(Component.text("hggghg").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text(" Sink...")));
 			forceCastSpell(SpellTectonicDevastation.class);
 			hide();
 		});
@@ -210,13 +210,13 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 			mCooldownTicks -= 30;
 			changePhase(phase3Spells, phase3Passives, null);
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
-					.sendMessage(Component.text("", NamedTextColor.RED)
-							.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
-							.append(Component.text(" This "))
-							.append(Component.text("ygg").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text("Void sustains me... Faster now... "))
-							.append(Component.text("hfhu").decoration(TextDecoration.OBFUSCATED, true))
-							.append(Component.text("Faster...")));
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
+					.append(Component.text(" This "))
+					.append(Component.text("ygg").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("Void sustains me... Faster now... "))
+					.append(Component.text("hfhu").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("Faster...")));
 			forceCastSpell(SpellTectonicDevastation.class);
 			hide();
 		});
@@ -231,13 +231,13 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 
 		if (mEyesKilled >= EYE_KILL_COUNT) {
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
-					.sendMessage(Component.text("The nucleus is exposed!", NamedTextColor.RED));
+				.sendMessage(Component.text("The nucleus is exposed!", NamedTextColor.RED));
 			expose();
 			mEyes.values().forEach(Entity::remove);
 			mEyes.clear();
 		} else {
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
-					.sendMessage(Component.text("You killed an eye! You need to take down " + (EYE_KILL_COUNT - mEyesKilled) + " more!", NamedTextColor.RED));
+				.sendMessage(Component.text("You killed an eye! You need to take down " + (EYE_KILL_COUNT - mEyesKilled) + " more!", NamedTextColor.RED));
 		}
 	}
 
@@ -291,7 +291,7 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 		Collections.shuffle(mEyeSpawns);
 		for (Location loc : mEyeSpawns) {
 			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(loc, 1.0);
-			if (mEyes.get(loc) == null && nearbyMobs.size() == 0) {
+			if (mEyes.get(loc) == null && nearbyMobs.isEmpty()) {
 				//Summon a new eye here
 				LivingEntity newEye = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, EYE_LOS));
 				mEyes.put(loc, newEye);
@@ -342,8 +342,8 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 					this.cancel();
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 						MessagingUtils.sendTitle(player,
-								Component.text("Gyrhaeddant", NamedTextColor.DARK_RED, TextDecoration.BOLD),
-								Component.text("The Nucleus", NamedTextColor.DARK_RED, TextDecoration.BOLD));
+							Component.text("Gyrhaeddant", NamedTextColor.DARK_RED, TextDecoration.BOLD),
+							Component.text("The Nucleus", NamedTextColor.DARK_RED, TextDecoration.BOLD));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 					}
@@ -364,16 +364,16 @@ public final class Nucleus extends SerializedLocationBossAbilityGroup {
 		BossUtils.endBossFightEffects(players);
 		for (Player player : players) {
 			player.sendMessage(Component.text("", NamedTextColor.RED)
-					.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
-					.append(Component.text(" B"))
-					.append(Component.text("ngrbgg").decoration(TextDecoration.OBFUSCATED, true))
-					.append(Component.text("A"))
-					.append(Component.text("gbg").decoration(TextDecoration.OBFUSCATED, true))
-					.append(Component.text("C"))
-					.append(Component.text("bggbg").decoration(TextDecoration.OBFUSCATED, true))
-					.append(Component.text("K!!! AWAY!!! This world... "))
-					.append(Component.text("hhgg").decoration(TextDecoration.OBFUSCATED, true))
-					.append(Component.text("is poison...")));
+				.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
+				.append(Component.text(" B"))
+				.append(Component.text("ngrbgg").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text("A"))
+				.append(Component.text("gbg").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text("C"))
+				.append(Component.text("bggbg").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text("K!!! AWAY!!! This world... "))
+				.append(Component.text("hhgg").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text("is poison...")));
 		}
 
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);

@@ -8,6 +8,8 @@ import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
@@ -39,6 +41,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.luckperms.api.model.group.Group;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -441,9 +444,9 @@ public class ItemStatUtils {
 		}
 		NBT.modify(item, nbt -> {
 			ReadWriteNBTList<String> lore = nbt.getOrCreateCompound(MONUMENTA_KEY).getStringList(CHARM_KEY);
-			if (lore.size() > 0 && index < lore.size()) {
+			if (!lore.isEmpty() && index < lore.size()) {
 				lore.remove(index);
-			} else if (lore.size() > 0) {
+			} else if (!lore.isEmpty()) {
 				lore.remove(lore.size() - 1);
 			}
 		});
@@ -503,8 +506,8 @@ public class ItemStatUtils {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-				ReadWriteNBT monumenta = nbt.getOrCreateCompound(MONUMENTA_KEY);
-				monumenta.setInteger(FISH_QUALITY_KEY, level);
+			ReadWriteNBT monumenta = nbt.getOrCreateCompound(MONUMENTA_KEY);
+			monumenta.setInteger(FISH_QUALITY_KEY, level);
 		});
 	}
 
@@ -586,18 +589,18 @@ public class ItemStatUtils {
 				abilities.addAll(playerClass.mAbilities);
 				abilities.addAll(playerClass.mSpecOne.mAbilities);
 				abilities.addAll(playerClass.mSpecTwo.mAbilities);
+				abilities.add(playerClass.mPassive);
+				if (playerClass.mSpecOne.mPassive != null) {
+					abilities.add(playerClass.mSpecOne.mPassive);
+				}
+				if (playerClass.mSpecTwo.mPassive != null) {
+					abilities.add(playerClass.mSpecTwo.mPassive);
+				}
 
-				List<String> abilityNames = new ArrayList<>();
-				abilityNames.add(playerClass.mClassPassiveName);
-				abilities.forEach(a -> abilityNames.add(a.getDisplayName()));
-
-				for (String name : abilityNames) {
-					if (line.contains(name)) {
+				for (AbilityInfo<?> ability : abilities) {
+					if (ability.getDisplayName() != null && line.contains(ability.getDisplayName())) {
 						return playerClass;
 					}
-				}
-				if (line.contains(playerClass.mClassPassiveName)) {
-					return playerClass;
 				}
 			}
 			// The real ability name is "Alchemist Potions", but charms don't use the "s"
@@ -693,10 +696,7 @@ public class ItemStatUtils {
 
 		return NBT.get(item, nbt -> {
 			ReadableNBTList<ReadWriteNBT> effects = getEffects(nbt);
-			if (effects == null || effects.isEmpty()) {
-				return false;
-			}
-			return true;
+			return effects != null && !effects.isEmpty();
 		});
 	}
 
@@ -1041,6 +1041,46 @@ public class ItemStatUtils {
 		return getInfusionLevel(item, type) > 0;
 	}
 
+	public static boolean checkOwnership(Player player, ItemStack item) {
+		if (!hasInfusion(item, InfusionType.OWNED)) {
+			return true;
+		}
+		String infuserGuild = getInfuserNpc(item, InfusionType.OWNED);
+		UUID infuserPlayer = getInfuser(item, InfusionType.OWNED);
+		if (infuserGuild != null && infuserGuild.contains("guild#")) { // guild case, check permissions
+			Long guildPlotId = Long.parseLong(infuserGuild.substring(6));
+			Group guild = LuckPermsIntegration.getLoadedGuildByPlotId(guildPlotId);
+			return guild == null || GuildPermission.GUILD_OWNED_INFUSION.hasAccess(guild, player);
+		} else {
+			return infuserPlayer != null && infuserPlayer.equals(player.getUniqueId()); // player case
+		}
+	}
+
+	public static boolean isOwnable(ItemStack item) {
+		if (item == null) {
+			return false;
+		}
+
+		if (item.getAmount() != 1) {
+			return false;
+		}
+
+		switch (getTier(item)) {
+			case ZENITH_CHARM:
+			case CURRENCY:
+			case EVENT_CURRENCY:
+				return false;
+			case SHULKER_BOX:
+			case QUEST_COMPASS:
+				return true;
+			default:
+				break;
+		}
+
+		Region region = getRegion(item);
+		return region == Region.VALLEY || region == Region.ISLES || region == Region.RING;
+	}
+
 	public static @Nullable ReadWriteNBTCompoundList getAttributes(final ReadWriteNBT nbt) {
 		ReadWriteNBT stock = getStock(nbt);
 		if (stock == null) {
@@ -1280,6 +1320,7 @@ public class ItemStatUtils {
 		});
 	}
 
+	@SuppressWarnings("PointlessNullCheck")
 	public static void cleanIfNecessary(final @Nullable ItemStack item) {
 		if (item != null && isDirty(item)) {
 			ItemUpdateHelper.generateItemStats(item);
@@ -1342,7 +1383,7 @@ public class ItemStatUtils {
 
 	public static QuiverListener.ArrowTransformMode getArrowTransformMode(ItemStack item) {
 		return NBT.get(item, nbt -> {
-			return (QuiverListener.ArrowTransformMode) nbt.resolveOrDefault(MONUMENTA_KEY + "." + PLAYER_MODIFIED_KEY + "." + QUIVER_ARROW_TRANSFORM_MODE_KEY, QuiverListener.ArrowTransformMode.NONE);
+			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + PLAYER_MODIFIED_KEY + "." + QUIVER_ARROW_TRANSFORM_MODE_KEY, QuiverListener.ArrowTransformMode.NONE);
 		});
 	}
 

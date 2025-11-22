@@ -31,7 +31,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -78,7 +77,7 @@ public class Avalanche extends DepthsAbility {
 		Location loc = mPlayer.getLocation();
 
 		Set<Location> checkIce = getNearbyIce(loc, mRadius);
-		if (checkIce.size() == 0) {
+		if (checkIce.isEmpty()) {
 			return false;
 		}
 
@@ -90,6 +89,7 @@ public class Avalanche extends DepthsAbility {
 			int mPulses = 0;
 			final List<LivingEntity> mHitMobs = new ArrayList<>();
 			Set<Location> mIceToBreak = new HashSet<>();
+
 			@Override
 			public void run() {
 				// re-obtain nearby ice every pulse in case ice disappears in the middle of casting
@@ -119,14 +119,8 @@ public class Avalanche extends DepthsAbility {
 				mPulses++;
 				if (mPulses >= NUM_PULSES) {
 					for (Location l : mIceToBreak) {
-						Block b = l.getBlock();
-						if (b.getType() == Permafrost.PERMAFROST_ICE_MATERIAL) {
-							//If special permafrost ice, set to normal ice instead of destroying
-							b.setType(DepthsUtils.ICE_MATERIAL);
-						} else {
-							b.setBlockData(DepthsUtils.iceActive.get(l));
-							DepthsUtils.iceActive.remove(l);
-						}
+						l.getBlock().setBlockData(DepthsUtils.iceActive.get(l));
+						DepthsUtils.iceActive.remove(l);
 
 						Location aboveLoc = l.clone().add(0.5, 1, 0.5);
 						new PartialParticle(Particle.REDSTONE, aboveLoc.clone().add(0, 0.6, 0), 7, 0.3, 0.5, 0.3, ICE_PARTICLE_COLOR).spawnAsPlayerActive(mPlayer);
@@ -162,8 +156,9 @@ public class Avalanche extends DepthsAbility {
 	}
 
 	private static Description<Avalanche> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Avalanche>(color)
-			.add("Swap hands to begin shattering all ice blocks within a radius of ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to begin shattering all ice blocks within a radius of ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks, dealing a total of ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)

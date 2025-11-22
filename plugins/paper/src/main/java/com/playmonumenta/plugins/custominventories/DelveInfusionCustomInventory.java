@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
@@ -48,10 +49,10 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 	private static final List<ItemStack> mInvalidItems;
 	private static final ItemStack mRefundItem;
-	@SuppressWarnings("unused") // We'll want to turn this back on at some point later.
-	private static final ItemStack mFullRefundItem;
-	private static final ItemStack mMaxLevelReachedItem;
-	private static final ItemStack mMaxLevelReachedRevelationItem;
+	// We'll want to turn this back on at some point later.
+	public static final ItemStack mMaxLevelReachedItem;
+	public static final ItemStack mMaxLevelReachedRevelationItem;
+	public static final ItemStack mWrongGUIItem;
 
 	private final Map<Integer, ItemClicked> mMapFunction;
 
@@ -69,7 +70,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		addItems(DelveInfusionSelection.AURA, (i, perLevel) -> "Mobs in a 3 block radius from you are slowed by " + StringUtils.multiplierToPercentage(Aura.SLOW_PER_LEVEL * i) + "%" + perLevel + " for 0.5 seconds. This is refreshed as long as they are in range.");
 		addItems(DelveInfusionSelection.EXPEDITE, (i, perLevel) -> "Damaging an enemy with an ability increases your movement speed by " + StringUtils.multiplierToPercentage(Expedite.PERCENT_SPEED_PER_LEVEL * i) + "%" + perLevel + " for 5 seconds, stacking up to 3 times.");
 		addItems(DelveInfusionSelection.CHOLER, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Choler.DAMAGE_MLT_PER_LVL * i) + "% more damage" + perLevel + " to any mob that is on fire, slowed, or stunned.");
-		addItems(DelveInfusionSelection.UNYIELDING, (i, perLevel) -> "Gain " + StringUtils.to2DP(Unyielding.KB_PER_LEVEL * i * 10) + " Knockback Resistance" + perLevel + ".");
+		addItems(DelveInfusionSelection.UNYIELDING, (i, perLevel) -> "Gain an additive " + StringUtils.multiplierToPercentage(Unyielding.KB_PER_LEVEL * i) + "% Knockback Resistance" + perLevel + ".");
 		addItems(DelveInfusionSelection.USURPER, (i, perLevel) -> "Heal " + StringUtils.multiplierToPercentage(Usurper.HEAL_PCT_PER_LVL * i) + "% of your max health" + perLevel + " whenever you slay an elite or boss enemy.");
 		addItems(DelveInfusionSelection.VENGEFUL, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Vengeful.DAMAGE_MLT_PER_LVL * i) + "% more damage" + perLevel + " against the last enemy that damaged you.");
 		//R2
@@ -99,6 +100,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		addItems(DelveInfusionSelection.DECAPITATION, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Decapitation.DAMAGE_MLT_PER_LVL * i) + "% additional damage" + perLevel + " on a critical melee strike.");
 		addItems(DelveInfusionSelection.CELESTIAL, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Celestial.DAMAGE_BONUS_PER_LEVEL * i) + "% additional damage" + perLevel + " to mobs that are at a higher elevation than you.");
 		addItems(DelveInfusionSelection.FERVOR, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Fervor.PERCENT_DAMAGE_PER_LEVEL * i) + "% additional damage" + perLevel + " for 3s after gaining a buff that lasts at least 5s.");
+		addItems(DelveInfusionSelection.STURDY, (i, perLevel) -> "Reduces the duration shields are stunned for by " + StringUtils.multiplierToPercentageWithSign(Sturdy.CDR_PER_LEVEL * i) + perLevel + ".");
+		addItems(DelveInfusionSelection.CELERITY, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentageWithSign(Celerity.SPEED_BONUS * i) + " Speed if there are no hostile mobs within an 18 block radius.");
+		addItems(DelveInfusionSelection.ORBITAL, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Orbital.DAMAGE_REDUCTION_PER_LEVEL * i) + "% Damage Reduction" + perLevel + " against aerial mobs and knocks them downward.");
 
 		mInvalidItems = Stream.of("helmet", "chestplate", "leggings", "boots", "main hand", "off hand")
 			.map(s -> GUIUtils.createBasicItem(Material.ARMOR_STAND, "Invalid Item", NamedTextColor.GRAY, true, "Your " + s + " can't be infused.", NamedTextColor.DARK_GRAY)).toList();
@@ -106,14 +110,14 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		//Refund item
 		mRefundItem = GUIUtils.createBasicItem(Material.GRINDSTONE, "Click to refund this item's infusions.", NamedTextColor.DARK_GRAY, true, "You will receive " + (DelveInfusionUtils.FULL_REFUND ? "100" : (int) (DelveInfusionUtils.REFUND_PERCENT * 100)) + "% of the experience, but all of the materials back.", NamedTextColor.GRAY);
 
-		//Refund item
-		mFullRefundItem = GUIUtils.createBasicItem(Material.GRINDSTONE, "Click to refund this item's infusions.", NamedTextColor.DARK_GRAY, true, "You will receive 100% of the experience, and all of the materials back.", NamedTextColor.GRAY);
-
 		//Cake for max level reached
 		mMaxLevelReachedItem = GUIUtils.createBasicItem(Material.CAKE, "Congratulations!", NamedTextColor.DARK_AQUA, true, "You've reached the max Delve Infusion level on this item.", NamedTextColor.DARK_AQUA);
 
 		// Echo shard for item with Revelation & max level
 		mMaxLevelReachedRevelationItem = GUIUtils.createBasicItem(Material.ECHO_SHARD, "Revelation!", NamedTextColor.DARK_AQUA, true, "You've reached the max Delve Infusion level on this item, and Invoked it to its true potential.", NamedTextColor.DARK_AQUA);
+
+		// Barrier for item that has a view-only infusion that is not infused at the Delve Infusion Station, like Sturdy
+		mWrongGUIItem = GUIUtils.createBasicItem(Material.BARRIER, "Cannot Upgrade", NamedTextColor.RED, true, "You cannot upgrade this Delve Infusion here. Return to the original infusion location to upgrade this item.", NamedTextColor.GRAY);
 	}
 
 	public DelveInfusionCustomInventory(Player owner) {
@@ -176,8 +180,9 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 
 		itemPlacements.put(DelveInfusionSelection.SOOTHING, 27);
 		itemPlacements.put(DelveInfusionSelection.FUELED, 28);
-		itemPlacements.put(DelveInfusionSelection.REFRESH, 29);
-		itemPlacements.put(DelveInfusionSelection.FERVOR, 30);
+		itemPlacements.put(DelveInfusionSelection.ORBITAL, 29);
+		itemPlacements.put(DelveInfusionSelection.REFRESH, 30);
+		itemPlacements.put(DelveInfusionSelection.FERVOR, 31);
 
 		itemPlacements.put(DelveInfusionSelection.QUENCH, 36);
 		itemPlacements.put(DelveInfusionSelection.GRACE, 37);
@@ -189,7 +194,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			if (infusion.isUnlocked(player)) {
 				mInventory.setItem(place, mDelvePanelList.get(infusion));
 				mMapFunction.put(place, (p, inventory, slot) -> {
-					attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion, mDelveInfusionMaterial);
+					attemptInfusion(p, infusedItem, infusion, mDelveInfusionMaterial);
 					mSlotSelected = null;
 				});
 			}
@@ -230,7 +235,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			}
 		} catch (Exception e) {
 			p.sendMessage(Component.text("If you see this message please contact a mod! (Error in infusing)", NamedTextColor.RED));
-			e.printStackTrace();
+			MMLog.severe("Error in infusing, see " + e.getMessage());
 		}
 	}
 
@@ -249,7 +254,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 					mInventory.setItem((row * 9), mRefundItem);
 
 					mMapFunction.put((row * 9), (p, inventory, slot) -> {
-						DelveInfusionUtils.refundInfusion(player.getEquipment().getItem(equipmentSlot), p);
+						DelveInfusionUtils.refundInfusion(item, p);
 					});
 
 					//load the infusion.
@@ -264,14 +269,17 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 					}
 
 					int slot = (row * 9) + 2 + level;
-					if (level < DelveInfusionUtils.MAX_LEVEL) {
+					if (level < DelveInfusionUtils.MAX_LEVEL && infusion.isViewOnly()) {
+						// This infusion is not fully upgraded, and is view-only
+						mInventory.setItem(slot, mWrongGUIItem);
+					} else if (level < DelveInfusionUtils.MAX_LEVEL) {
 						//if we didn't reach max level then load item to infuse
 						DelveInfusionUtils.DelveInfusionMaterial delveInfusionMaterial = DelveInfusionUtils.getDelveInfusionMaterial(item);
 						ItemStack infuseItem = GUIUtils.createBasicItem(Material.ENCHANTED_BOOK, "Click to infuse to level " + (level + 1), NamedTextColor.DARK_AQUA, true,
 							"You will need " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[level] + " " + delveInfusionMaterial.mItemNamePlural + ", " + DelveInfusionUtils.MAT_COST_PER_INFUSION[level] + " " + infusion.getDelveMatPlural() + ", and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY);
 						mInventory.setItem(slot, infuseItem);
 						mMapFunction.put(slot, (p, inventory, slotClicked) -> {
-							attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion, delveInfusionMaterial);
+							attemptInfusion(p, item, infusion, delveInfusionMaterial);
 						});
 					} else {
 						//Max level reached
@@ -303,7 +311,12 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 						"The first Delve Infusion level costs " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[0] + " " + materials + ", " + DelveInfusionUtils.MAT_COST_PER_INFUSION[0] + " corresponding Delve Materials, and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY);
 					mInventory.setItem((row * 9) + 2 + 4, infuseItem);
 					mMapFunction.put((row * 9) + 2 + 4, (p, inventory, slot) -> {
-						mSlotSelected = equipmentSlot;
+						//check if item in the slot is the same on GUI open and on GUI click, if not, reload the GUI
+						if (item.isSimilar(player.getEquipment().getItem(equipmentSlot))) {
+							mSlotSelected = equipmentSlot;
+						} else {
+							mSlotSelected = null;
+						}
 					});
 				}
 			} else {

@@ -5,32 +5,39 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
-public class PercentDamageDealtSingle extends PercentDamageDealt {
+public final class PercentDamageDealtSingle extends PercentDamageDealt {
 	public static final String effectID = "PercentDamageDealtSingle";
 
 	private boolean mHasDoneDamage;
 	private final boolean mMultiplicative;
+	private final @Nullable Consumer<DamageEvent> mOnUse;
 
-	public PercentDamageDealtSingle(int duration, double amount) {
+	public PercentDamageDealtSingle(final int duration, final double amount) {
 		this(duration, amount, null, false);
 	}
 
-	public PercentDamageDealtSingle(int duration, double amount, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes) {
-		this(duration, amount, affectedDamageTypes, false);
+	public PercentDamageDealtSingle(final int duration, final double amount,
+	                                final @Nullable EnumSet<DamageType> affectedDamageTypes, final boolean multiplicative) {
+		this(duration, amount, affectedDamageTypes, multiplicative, null);
 	}
 
-	public PercentDamageDealtSingle(int duration, double amount, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes, boolean multiplicative) {
+	public PercentDamageDealtSingle(final int duration, final double amount,
+	                                final @Nullable EnumSet<DamageType> affectedDamageTypes, final boolean multiplicative,
+	                                final @Nullable Consumer<DamageEvent> onUse) {
 		super(duration, amount, affectedDamageTypes, effectID);
 		mHasDoneDamage = false;
 		mMultiplicative = multiplicative;
+		mOnUse = onUse;
 	}
 
 	@Override
@@ -44,23 +51,22 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 		if (mHasDoneDamage) {
 			return;
 		}
-		if (event.getType() == DamageEvent.DamageType.TRUE) {
+		if (event.getType() == DamageType.TRUE) {
 			return;
 		}
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
-			|| (mAffectedDamageTypes.contains(DamageEvent.DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
+			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
 			mHasDoneDamage = true;
 			if (mMultiplicative) {
 				event.setFlatDamage(event.getFlatDamage() * (1 + mAmount));
 			} else {
 				event.updateDamageWithMultiplier(Math.max(0, 1 + mAmount));
 			}
-		}
-	}
 
-	@Override
-	public boolean isBuff() {
-		return mAmount > 0;
+			if (mOnUse != null) {
+				mOnUse.accept(event);
+			}
+		}
 	}
 
 	@Override
@@ -88,7 +94,7 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 
 		if (mAffectedDamageTypes != null) {
 			JsonArray jsonArray = new JsonArray();
-			for (DamageEvent.DamageType damageType : mAffectedDamageTypes) {
+			for (DamageType damageType : mAffectedDamageTypes) {
 				jsonArray.add(damageType.name());
 			}
 			object.add("type", jsonArray);
@@ -108,16 +114,16 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 		} else {
 			if (object.has("type")) {
 				JsonArray damageTypes = object.getAsJsonArray("type");
-				List<DamageEvent.DamageType> damageTypeList = new ArrayList<>();
+				List<DamageType> damageTypeList = new ArrayList<>();
 				for (JsonElement element : damageTypes) {
 					String string = element.getAsString();
-					damageTypeList.add(DamageEvent.DamageType.valueOf(string));
+					damageTypeList.add(DamageType.valueOf(string));
 				}
 
-				EnumSet<DamageEvent.DamageType> damageTypeSet = EnumSet.copyOf(damageTypeList);
-				return new PercentDamageDealtSingle(duration, amount, damageTypeSet);
+				EnumSet<DamageType> damageTypeSet = EnumSet.copyOf(damageTypeList);
+				return (PercentDamageDealtSingle) new PercentDamageDealtSingle(duration, amount).damageTypes(damageTypeSet);
 			} else {
-				return new PercentDamageDealtSingle(duration, amount, null);
+				return new PercentDamageDealtSingle(duration, amount);
 			}
 		}
 	}

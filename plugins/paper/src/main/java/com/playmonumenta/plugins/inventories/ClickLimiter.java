@@ -27,6 +27,6 @@ public class ClickLimiter {
 	}
 
 	public static void removeLock(Player player, String key) {
-			MetadataUtils.removeMetadata(player, key);
+		MetadataUtils.removeMetadata(player, key);
 	}
 }

@@ -76,7 +76,7 @@ public class Detonation extends DepthsAbility {
 	}
 
 	private static Description<Detonation> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Detonation>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When an enemy dies within ")
 			.add(a -> a.mDeathRadius, DEATH_RADIUS)
 			.add(" blocks of you, it explodes, dealing ")

@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import javax.annotation.Nullable;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -33,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Nullable;
 
 public class MessagingUtils {
 	public static final Gson GSON = new Gson();
@@ -151,7 +151,9 @@ public class MessagingUtils {
 	}
 
 	public static int plainLengthFromMini(String mini) {
-		String plain = plainText(fromMiniMessage(mini));
+		// Replace key components with a single character
+		String replacedKeys = mini.replaceAll("<key:key\\.[^\\s>]*>", "*");
+		String plain = plainText(fromMiniMessage(replacedKeys));
 		// Remove any format ends
 		plain = plain.replaceAll("<\\/[^\\s>]*>", "");
 		return plain.length();
@@ -203,8 +205,8 @@ public class MessagingUtils {
 
 	public static void sendBoldTitle(Player player, @Nullable Component title, @Nullable Component subtitle) {
 		sendTitle(player,
-				  title == null ? Component.empty() : title.decorate(TextDecoration.BOLD),
-				  subtitle == null ? Component.empty() : subtitle.decorate(TextDecoration.BOLD));
+			title == null ? Component.empty() : title.decorate(TextDecoration.BOLD),
+			subtitle == null ? Component.empty() : subtitle.decorate(TextDecoration.BOLD));
 	}
 
 	public static void sendTitle(Player player, @Nullable String title, @Nullable String subtitle) {
@@ -273,6 +275,18 @@ public class MessagingUtils {
 		return Duration.ofMillis(t * 50L);
 	}
 
+	public static String concatenateStringsWithAnd(List<String> strings) {
+		if (strings.isEmpty()) {
+			return "";
+		} else if (strings.size() == 1) {
+			return strings.get(0);
+		} else if (strings.size() == 2) {
+			return strings.get(0) + " and " + strings.get(1);
+		} else {
+			return String.join(", ", strings.subList(0, strings.size() - 1)) + ", and " + strings.get(strings.size() - 1);
+		}
+	}
+
 	public static Component concatenateComponents(List<Component> components) {
 		return concatenateComponents(components, Component.newline());
 	}
@@ -289,6 +303,15 @@ public class MessagingUtils {
 			joinConfiguration = JoinConfiguration.separators(Component.text(", "), Component.text(", and "));
 		}
 		return Component.join(joinConfiguration, components);
+	}
+
+	public static List<Component> recursiveComponents(Component component) {
+		List<Component> result = new ArrayList<>();
+		result.add(component);
+		for (Component child : component.children()) {
+			result.addAll(recursiveComponents(child));
+		}
+		return result;
 	}
 
 }

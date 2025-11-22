@@ -55,7 +55,7 @@ public class RitualRingCS extends TransmutationRingCS implements GalleryCS {
 	@Override
 	public boolean isUnlocked(Player mPlayer) {
 		return ScoreboardUtils.getScoreboardValue(mPlayer, GALLERY_COMPLETE_SCB).orElse(0) >= 1
-			       || mPlayer.getGameMode() == GameMode.CREATIVE;
+			|| mPlayer.getGameMode() == GameMode.CREATIVE;
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class RitualRingCS extends TransmutationRingCS implements GalleryCS {
 		new PPCircle(Particle.ENCHANTMENT_TABLE, center, 5 * 0.75).delta(0.1, 0.25, 0.1).count(100).ringMode(false).spawnAsPlayerActive(player);
 
 		PPCircle particles = new PPCircle(Particle.REDSTONE, center, radius)
-			                     .data(BLOODY_COLOR1);
+			.data(BLOODY_COLOR1);
 		particles.count((int) Math.floor(90 * radius / 5)).location(center).spawnAsPlayerActive(player);
 		particles.count((int) Math.floor(6 * radius / 5)).location(center.clone().add(0, 1, 0)).spawnAsPlayerActive(player);
 		particles.count((int) Math.floor(30 * radius / 5)).location(center.clone().add(0, 1.75, 0)).spawnAsPlayerActive(player);

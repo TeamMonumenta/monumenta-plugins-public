@@ -41,6 +41,7 @@ public class RespawnStasis extends Stasis {
 	public static final int MINIMUM_DURATION = 10;
 	public static final int SPECTATE_DURATION = 3 * 20;
 	public static final String SPECTATE_DISABLE_TAG = "RespawnStasisSpectateDisable";
+	public static final String TEMP_NO_SPECTATE_TAG = "TempRespawnStasisNoSpectate";
 
 	int mShatter;
 	int mShatterLevel;
@@ -75,6 +76,7 @@ public class RespawnStasis extends Stasis {
 				&& !player.getScoreboardTags().contains(SPECTATE_DISABLE_TAG)
 				&& !ZoneUtils.hasZoneProperty(mDeathLocation, ZoneUtils.ZoneProperty.NO_SPECTATOR_ON_DEATH)
 				&& !ZoneUtils.hasZoneProperty(mRespawnLocation, ZoneUtils.ZoneProperty.NO_SPECTATOR_ON_RESPAWN)
+				&& !player.getScoreboardTags().contains(TEMP_NO_SPECTATE_TAG)
 			) {
 				Location spectateLocation = findSpectateLocation(mDeathLocation, player);
 				ArmorStand stand = spectateLocation.getWorld().spawn(spectateLocation, ArmorStand.class, s -> {
@@ -109,6 +111,8 @@ public class RespawnStasis extends Stasis {
 				}
 				startEffects(player);
 			}
+
+			player.removeScoreboardTag(TEMP_NO_SPECTATE_TAG);
 
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> showMessages(player, false));
 
@@ -209,16 +213,16 @@ public class RespawnStasis extends Stasis {
 			// For the first 10 seconds, show hint on how to repair gear if shattered
 			if (mShatter == 1) {
 				player.sendActionBar(Component.text("You will take ", NamedTextColor.GOLD)
-						.append(Component.text(StringUtils.multiplierToPercentage(Shattered.getMultiplier(mShatterLevel)) + "% more damage", NamedTextColor.RED))
-						.append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
-						.append(Component.text("collecting your grave", NamedTextColor.AQUA))
-						.append(Component.text("!", NamedTextColor.GOLD)));
+					.append(Component.text(StringUtils.multiplierToPercentage(Shattered.getMultiplier(mShatterLevel)) + "% more damage", NamedTextColor.RED))
+					.append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
+					.append(Component.text("collecting your grave", NamedTextColor.AQUA))
+					.append(Component.text("!", NamedTextColor.GOLD)));
 			} else {
 				player.sendActionBar(Component.text("You will take ", NamedTextColor.GOLD)
-						.append(Component.text(StringUtils.multiplierToPercentage(Shattered.getMultiplier(mShatterLevel)) + "% more damage", NamedTextColor.RED))
-						.append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
-						.append(Component.text("using anvils on it", NamedTextColor.AQUA))
-						.append(Component.text("!", NamedTextColor.GOLD)));
+					.append(Component.text(StringUtils.multiplierToPercentage(Shattered.getMultiplier(mShatterLevel)) + "% more damage", NamedTextColor.RED))
+					.append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
+					.append(Component.text("using anvils on it", NamedTextColor.AQUA))
+					.append(Component.text("!", NamedTextColor.GOLD)));
 			}
 			mRemoveActionbar = false;
 		} else if (getDuration() >= DURATION / 2) {

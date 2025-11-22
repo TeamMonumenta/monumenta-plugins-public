@@ -11,7 +11,7 @@ public class SpawnZone {
 	protected int mShardID;
 	protected Point mLowerCorner;
 	protected Point mUpperCorner;
-	protected List<SpawnEffect> mSEList = new ArrayList<SpawnEffect>();
+	protected List<SpawnEffect> mSEList = new ArrayList<>();
 
 	public SpawnZone(String zoneName, int shardID, Point lowerCorner, Point upperCorner, List<SpawnEffect> effectList) {
 		mZoneName = zoneName;
@@ -27,8 +27,8 @@ public class SpawnZone {
 
 	public boolean withinZone(Point point) {
 		return point.mX >= mLowerCorner.mX && point.mX <= mUpperCorner.mX &&
-		       point.mY >= mLowerCorner.mY && point.mY <= mUpperCorner.mY &&
-		       point.mZ >= mLowerCorner.mZ && point.mZ <= mUpperCorner.mZ;
+			point.mY >= mLowerCorner.mY && point.mY <= mUpperCorner.mY &&
+			point.mZ >= mLowerCorner.mZ && point.mZ <= mUpperCorner.mZ;
 	}
 
 	public int getZoneShardID() {

@@ -36,8 +36,8 @@ public class TranscCombosCS extends ViciousCombosCS {
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-				"The transcendent one",
-				"will be bested by none.");
+			"The transcendent one",
+			"will be bested by none.");
 	}
 
 	@Override
@@ -94,6 +94,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 			int mT = 0;
 			float mTridentPitch = 0.0f;
 			float mPufferPitch = 0.0f;
+
 			@Override
 			public void run() {
 				mT++;
@@ -128,7 +129,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 						});
 
 					ParticleUtils.drawCleaveArc(newLoc, 3.5, 160, -80, 260, 8, 0, 0, 0.2, 60,
-						(Location l, int ring) -> {
+						(Location l, int ring, double angleProgress) -> {
 							new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 								new Particle.DustOptions(
 									ParticleUtils.getTransition(TRANSC_SLASH_COLOR_BASE, TRANSC_SLASH_COLOR_TIP, ring / 8D),
@@ -137,7 +138,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 						});
 
 					ParticleUtils.drawCleaveArc(newLoc, 3.5, 20, -80, 260, 8, 0, 0, 0.2, 60,
-						(Location l, int ring) -> {
+						(Location l, int ring, double angleProgress) -> {
 							new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
 								new Particle.DustOptions(
 									ParticleUtils.getTransition(TRANSC_SLASH_COLOR_BASE, TRANSC_SLASH_COLOR_TIP, ring / 8D),

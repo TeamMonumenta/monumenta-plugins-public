@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -12,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -83,8 +87,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 	private int mChargeRemain;
 
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, int range, boolean singleTarget, boolean launchTracking, int cooldown, int delay,
-									  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers,
-									  AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers,
+	                                  AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		this(plugin, boss, range, singleTarget, launchTracking, cooldown, delay,
 			speed, turnRadius, lifetimeTicks, hitboxLength, collidesWithBlocks, lingers, 0, false,
 			initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
@@ -95,8 +99,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 	 * @param singleTarget Target random player (true) or all players (false)
 	 */
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, int range, boolean singleTarget, boolean launchTracking, int cooldown, int delay,
-									  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
-									  AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
+	                                  AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();
@@ -140,12 +144,69 @@ public class SpellBaseSeekingProjectile extends Spell {
 	//Constructors above are redirected to this one.
 
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int cooldown, int delay,
-									  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
-									  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
+	                                  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		this(plugin, boss, launchTracking, 1, 40, cooldown, delay,
 			0, 0, 0, 0, 200.0, 100.0, 1, 30, speed, turnRadius,
 			lifetimeTicks, hitboxLength, lingers, collidesWithBlocks, 0.5, 0.125, collidesWithOthers, collisionCheckDelay,
 			targets, initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
+	}
+
+	public SpellBaseSeekingProjectile(Plugin mPlugin, LivingEntity mBoss, ProjectileBoss.Parameters p) {
+		this(mPlugin, mBoss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL,
+			p.COOLDOWN, p.SPELL_DELAY, p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH,
+			p.SPLIT, p.SPLIT_ANGLE, p.SPEED, p.TURN_RADIUS, (int) (p.DISTANCE / p.SPEED), p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS,
+			p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
+			//spell targets
+			() -> p.TARGETS.getTargetsList(mBoss),
+			// Initiate Aesthetic
+			(World world, Location loc, int ticks) -> {
+				if (p.SPELL_DELAY > 0) {
+					GlowingManager.startGlowing(mBoss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
+				}
+				p.SOUND_START.play(loc);
+			},
+			// Launch Aesthetic
+			(World world, Location loc, int ticks) -> {
+				p.PARTICLE_LAUNCH.spawn(mBoss, loc);
+				p.SOUND_LAUNCH.play(loc);
+			},
+			// Projectile Aesthetic
+			(World world, Location loc, int ticks) -> {
+				p.PARTICLE_PROJECTILE.spawn(mBoss, loc, 0.1, 0.1, 0.1, 0.1);
+				if (ticks % 40 == 0) {
+					p.SOUND_PROJECTILE.play(loc);
+				}
+			},
+			// Hit Action
+			(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
+
+				if (target != null) {
+					p.HIT_SUMMONS.spawn(loc);
+				} else if (p.SUMMON_ON_COLLISION && prevLoc != null) {
+					p.HIT_SUMMONS.spawn(prevLoc);
+				}
+
+				if (!p.DAMAGE_PLAYER_ONLY || target instanceof Player) {
+					p.SOUND_HIT.play(loc, 0.5f, 0.5f);
+					p.PARTICLE_HIT.spawn(mBoss, loc, 0d, 0d, 0d, 0.25d);
+
+					if (target != null && prevLoc != null) {
+						ProjectileBoss.onHitActions(p, mBoss, target, prevLoc);
+					}
+
+					if (p.AOE_RADIUS > 0) {
+						/* TODO: This could be generalized to work with all LivingEntities with some effort. I only
+						 *  made it work with players since I'm strictly importing functionality from KineticProjectileBoss */
+						final List<Player> hitPlayers = new Hitbox.AABBHitbox(world,
+							new BoundingBox().shift(loc).expand(p.AOE_RADIUS)).getHitPlayers(true);
+						hitPlayers.removeIf(player -> player == target);
+						if (prevLoc != null) {
+							hitPlayers.forEach(player -> ProjectileBoss.onHitActions(p, mBoss, player, prevLoc));
+						}
+					}
+				}
+			});
 	}
 
 	/**
@@ -176,9 +237,9 @@ public class SpellBaseSeekingProjectile extends Spell {
 	 * @param hitAction           Called when the projectile intersects a player (or possibly a block)
 	 */
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int charge, int chargeInterval, int cooldown, int delay,
-									  double offsetX, double offsetY, double offsetZ, int mirror, double fixYaw, double fixPitch, int split, double splitAngle, double speed, double turnRadius,
-									  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, double speedLiquid, double speedBlocks, boolean collidesWithOthers, int collisionCheckDelay,
-									  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double offsetX, double offsetY, double offsetZ, int mirror, double fixYaw, double fixPitch, int split, double splitAngle, double speed, double turnRadius,
+	                                  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, double speedLiquid, double speedBlocks, boolean collidesWithOthers, int collisionCheckDelay,
+	                                  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();
@@ -228,7 +289,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 		if (mGetSpellTargets != null) {
 			List<? extends LivingEntity> entities = mGetSpellTargets.getTargets();
-			Map<LivingEntity, Location> locations = new HashMap<LivingEntity, Location>();
+			Map<LivingEntity, Location> locations = new HashMap<>();
 			if (!mLaunchTracking) {
 				for (LivingEntity target : entities) {
 					locations.put(target, target.getEyeLocation());
@@ -268,7 +329,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 		final List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
 
-		Map<Player, Location> locations = new HashMap<Player, Location>();
+		Map<Player, Location> locations = new HashMap<>();
 		if (!mLaunchTracking) {
 			for (Player player : players) {
 				locations.put(player, player.getEyeLocation());
@@ -347,7 +408,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	}
 
 	public <V extends LivingEntity> void launchDX(V target, Location targetLoc, double offsetX, double offsetY, double offsetZ,
-												  int split, double splitAngle, int mirror, double fixYaw, double fixPitch) {
+	                                              int split, double splitAngle, int mirror, double fixYaw, double fixPitch) {
 		// yaw degrees of splits
 		double[] yaws = new double[split];
 		for (int i = 0; i < split; i++) {
@@ -374,7 +435,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	}
 
 	public <V extends LivingEntity> void launch(V target, Location targetLoc, boolean fixed, double fYaw, double fPitch,
-												double offsetX, double offsetY, double offsetZ, double offsetYaw, double offsetPitch) {
+	                                            double offsetX, double offsetY, double offsetZ, double offsetYaw, double offsetPitch) {
 		if (!targetLoc.getWorld().equals(mBoss.getWorld())) {
 			return;
 		}
@@ -456,7 +517,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 				Block block = mLocation.getBlock();
 				if (mCollidesWithBlocks && mCollisionDelayTicks <= 0) {
 					if (!block.isLiquid() && mHitbox.overlaps(block.getBoundingBox())) {
-						mHitAction.run(mWorld, null, mLocation.subtract(mDirection.multiply(0.5)), null);
+						mHitAction.run(mWorld, null, mLocation.subtract(mDirection.multiply(0.5)), mLocation.subtract(mDirection.multiply(0.5)));
 						this.cancel();
 						if (!mLingers) {
 							mActiveRunnables.remove(this);

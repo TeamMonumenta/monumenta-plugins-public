@@ -56,6 +56,7 @@ public class EarthsWrathTowerAbility extends TowerAbility {
 						int mTicks = 0;
 						final World mWorld = boss.getWorld();
 						final Location mBossLoc = boss.getLocation();
+
 						@Override
 						public void run() {
 							if (mTicks >= DURATION) {

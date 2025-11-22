@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GenericCommand;
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import com.playmonumenta.plugins.cosmetics.gui.CosmeticsGUI;
+import com.playmonumenta.plugins.cosmetics.poses.GravePoses;
+import com.playmonumenta.plugins.cosmetics.punches.PlayerPunches;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.plots.PlotBorderCustomInventory;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -35,20 +37,18 @@ public class CosmeticsCommand extends GenericCommand {
 		Argument<?> allCosmeticsArgument = new GreedyStringArgument("name")
 			.replaceSuggestions(ArgumentSuggestions.strings(info -> {
 				CosmeticType type = CosmeticType.valueOf(((String) info.previousArgs().getUnchecked("type")).toUpperCase(Locale.ROOT));
-				if (type == CosmeticType.ELITE_FINISHER) {
-					return EliteFinishers.getNames();
-				} else if (type == CosmeticType.PLOT_BORDER) {
-					return PlotBorderCustomInventory.getCosmeticNames();
-				} else if (type == CosmeticType.VANITY) {
-					return Arrays.stream(Material.values())
+				return switch (type) {
+					case ELITE_FINISHER -> EliteFinishers.getNames();
+					case GRAVE_POSE -> GravePoses.getNames();
+					case PLAYER_PUNCH -> PlayerPunches.getNames();
+					case PLOT_BORDER -> PlotBorderCustomInventory.getCosmeticNames();
+					case VANITY -> Arrays.stream(Material.values())
 						.filter(mat -> !mat.isLegacy())
 						.map(mat -> mat.name().toLowerCase(Locale.ROOT) + ":")
 						.toArray(String[]::new);
-				} else if (type == CosmeticType.COSMETIC_SKILL) {
-					return CosmeticSkills.getNames();
-				} else {
-					return new String[0];
-				}
+					case COSMETIC_SKILL -> CosmeticSkills.getNames();
+					default -> new String[0];
+				};
 			}));
 
 		// requires the first argument to be the player, and the second to be the cosmetic type

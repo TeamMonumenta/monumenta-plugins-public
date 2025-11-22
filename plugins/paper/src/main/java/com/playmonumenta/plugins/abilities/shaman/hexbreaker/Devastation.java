@@ -5,19 +5,18 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.DevastationCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,7 +30,7 @@ public class Devastation extends Ability {
 	public static final int RADIUS_2 = 8;
 	public static final int DAMAGE_1 = 23;
 	public static final int DAMAGE_2 = 28;
-	public static final int CDR_ON_KILL = 3;
+	public static final int CDR_ON_KILL = 3 * 20;
 
 	public static final String CHARM_DAMAGE = "Devastation Damage";
 	public static final String CHARM_RADIUS = "Devastation Radius";
@@ -43,17 +42,7 @@ public class Devastation extends Ability {
 			.linkedSpell(ClassAbility.DEVASTATION)
 			.scoreboardId("Devastation")
 			.shorthandName("DV")
-			.descriptions(
-				String.format("Punch while holding a projectile weapon to destroy the nearest totem, dealing %s magic damage within a %s block radius of the totem. The totem's cooldown is reduced by %ss. Cooldown: %ss",
-					DAMAGE_1,
-					RADIUS_1,
-					CDR_ON_KILL,
-					StringUtils.ticksToSeconds(COOLDOWN)
-				),
-				String.format("Magic damage is increased to %s and the radius is increased to %s blocks.",
-					DAMAGE_2,
-					RADIUS_2)
-			)
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Punch with a bow to destroy your nearest totem, dealing massive damage within a medium radius.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Devastation::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false)
@@ -67,12 +56,9 @@ public class Devastation extends Ability {
 
 	public Devastation(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelOne() ? RADIUS_1 : RADIUS_2);
-		mCooldownReduction = CharmManager.getDuration(mPlayer, CHARM_CDR, 20 * CDR_ON_KILL);
+		mCooldownReduction = CharmManager.getDuration(mPlayer, CHARM_CDR, CDR_ON_KILL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DevastationCS());
 	}
 
@@ -128,5 +114,27 @@ public class Devastation extends Ability {
 		}
 
 		return true;
+	}
+
+	private static Description<Devastation> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to destroy the nearest totem, dealing ")
+			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage to mobs within ")
+			.add(a -> a.mRadius, RADIUS_1, false, Ability::isLevelOne)
+			.add(" blocks of the totem. The totem's cooldown is reduced by ")
+			.addDuration(a -> a.mCooldownReduction, CDR_ON_KILL)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<Devastation> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" and the radius is increased to ")
+			.add(a -> a.mRadius, RADIUS_2, false, Ability::isLevelTwo)
+			.add(" blocks.");
 	}
 }

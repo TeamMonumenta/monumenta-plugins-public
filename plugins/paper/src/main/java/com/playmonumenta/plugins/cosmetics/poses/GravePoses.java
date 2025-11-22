@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Set;
 import org.bukkit.Material;
@@ -63,7 +62,7 @@ public class GravePoses {
 	}
 
 	public static String[] getNames() {
-		return POSES.keySet().stream().map(CommandUtils::quoteIfNeeded).toArray(String[]::new);
+		return POSES.keySet().toArray(String[]::new);
 	}
 
 	public static Set<String> getNameSet() {
@@ -154,7 +153,6 @@ public class GravePoses {
 		grave.setLeftLegPose(pose.leftLeg());
 		grave.setRightLegPose(pose.rightLeg());
 	}
-
 
 
 }

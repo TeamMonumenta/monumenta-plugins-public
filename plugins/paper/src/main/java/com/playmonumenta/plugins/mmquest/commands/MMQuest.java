@@ -104,7 +104,7 @@ public class MMQuest {
 				mmQuestOutput = mmQuestOutput.append(blockOne);
 				if (quest.checkQuestCompletion(target)) {
 					mmQuestOutput = mmQuestOutput.append(blockOnep2);
-				 //adds "Complete" if quest is complete.
+					//adds "Complete" if quest is complete.
 				} else {
 					mmQuestOutput = mmQuestOutput.append(blockOnep3);
 				} //otherwise adds "Incomplete".
@@ -214,7 +214,7 @@ public class MMQuest {
 	public static void setupQuests(Plugin plugin) {
 
 		// Sets up Hashmap which pairs String (questName) with its corresponding Quest instance:
-		stringQuestHashMap = new HashMap<String, Quest>();
+		stringQuestHashMap = new HashMap<>();
 
 		try {
 			// Grabs file path for JSON file, parses it, places the results in an instance of AllMyQuests:
@@ -229,7 +229,7 @@ public class MMQuest {
 				stringQuestHashMap.put(questString, quest);
 			}
 		} catch (Exception e) {
-			MMLog.fine("MMQuest Error: " + e.toString());
+			MMLog.fine("MMQuest Error: " + e);
 		}
 		int size = stringQuestHashMap.size();
 		if (size > 0) {
@@ -250,18 +250,18 @@ public class MMQuest {
 		Component blockTwo = Component.text("")
 			.append(Component.newline())
 			.append(Component.text("Requirements:"));
-		for (int i = 0; i < quest.mQuestReqs.length; i++) {
+		for (final var questReqs : quest.mQuestReqs) {
 
 			// For each Quest name listed inside our quest's questReqs[], we:
 			// 1: remove whitespace.
 			// 2: use getQuestObj() to return our Quest instance.
 			// 3: use checkQuestCompletion() on our Quest instance.
-			String questString = quest.mQuestReqs[i].replaceAll("\\s", "");
+			String questString = questReqs.replaceAll("\\s", "");
 			Quest questInstance = getQuestInstance(questString);
 			if (questInstance == null) {
 				// If the requirement is not actually a valid quest (such as "Completion of White Wool Dungeon"),
 				//  simply list the requirement, then continue the loop.
-				Component requiredQuest = Component.text("  " + quest.mQuestReqs[i])
+				Component requiredQuest = Component.text("  " + questReqs)
 					.hoverEvent(Component.text("Check manually!"))
 					.color(TextColor.color(0xFFFFFF));
 				blockTwo = blockTwo.append(requiredQuest);
@@ -270,13 +270,13 @@ public class MMQuest {
 			boolean isQuestComplete = questInstance.checkQuestCompletion(player);
 			// If the quest is complete, show its name with color green. Else, color red.
 			if (isQuestComplete) {
-				Component requiredQuest = Component.text("  " + quest.mQuestReqs[i] + "  ")
-					                          .hoverEvent(Component.text("Complete"))
-					                          .clickEvent(ClickEvent.runCommand("/mmquest " + player.getName() + " " + questString))
-					                          .color(TextColor.color(0x00ff00));
+				Component requiredQuest = Component.text("  " + questReqs + "  ")
+					.hoverEvent(Component.text("Complete"))
+					.clickEvent(ClickEvent.runCommand("/mmquest " + player.getName() + " " + questString))
+					.color(TextColor.color(0x00ff00));
 				blockTwo = blockTwo.append(requiredQuest);
 			} else {
-				Component requiredQuest = Component.text("  " + quest.mQuestReqs[i] + "  ")
+				Component requiredQuest = Component.text("  " + questReqs + "  ")
 					.hoverEvent(Component.text("Incomplete"))
 					.clickEvent(ClickEvent.runCommand("/mmquest " + player.getName() + " " + questString))
 					.color(TextColor.color(0xFF5555));

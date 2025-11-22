@@ -56,15 +56,15 @@ public class Icebreaker extends DepthsAbility {
 
 	private double getDebuffMultiplier(LivingEntity entity) {
 		if (!PotionUtils.getNegativeEffects(mPlugin, entity).isEmpty() || EntityUtils.isStunned(entity) || EntityUtils.isParalyzed(mPlugin, entity) || EntityUtils.isBleeding(mPlugin, entity)
-			     || EntityUtils.isSlowed(mPlugin, entity) || EntityUtils.isWeakened(mPlugin, entity) || EntityUtils.isSilenced(entity) || EntityUtils.isVulnerable(mPlugin, entity)
-			     || entity.getFireTicks() > 0 || Inferno.hasInferno(mPlugin, entity) || EntityUtils.hasDamageOverTime(mPlugin, entity)) {
+			|| EntityUtils.isSlowed(mPlugin, entity) || EntityUtils.isWeakened(mPlugin, entity) || EntityUtils.isSilenced(entity) || EntityUtils.isVulnerable(mPlugin, entity)
+			|| entity.getFireTicks() > 0 || Inferno.hasInferno(mPlugin, entity) || EntityUtils.hasDamageOverTime(mPlugin, entity)) {
 			return 1 + mDebuffMultiplier;
 		}
 		return 1;
 	}
 
 	private static Description<Icebreaker> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Icebreaker>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Damage you deal is increased by ")
 			.addPercent(a -> a.mIceMultiplier, ICE_DAMAGE[rarity - 1], false, true)
 			.add(" if the mob is on ice or ")

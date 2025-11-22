@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -48,7 +49,7 @@ public class SpellAbyssalLeap extends SpellBaseSlam {
 				new PartialParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(launcher);
 			}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
 				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
-					Arrays.asList(
+					List.of(
 						new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
 							new PartialParticle(Particle.SOUL, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(launcher);
 							new PartialParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(launcher);

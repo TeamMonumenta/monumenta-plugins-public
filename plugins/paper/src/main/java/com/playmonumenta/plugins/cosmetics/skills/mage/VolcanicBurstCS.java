@@ -74,8 +74,8 @@ public class VolcanicBurstCS extends MagmaShieldCS implements DepthsCS {
 				}
 				int flameI = mHeight % 2;
 				double degree = 90 - angle;
-				// particles about every 30 degrees
-				int degreeSteps = ((int) (2 * angle)) / 30;
+				// particles ranging from ~every 30 degrees to every (cone angle)/8 degrees
+				int degreeSteps = ((int) (2 * angle)) / Math.max(30, (int) (2 * angle / 8));
 				double degreeStep = 2 * angle / degreeSteps;
 				for (int step = 0; step <= degreeSteps; step++, degree += degreeStep) {
 					double radian1 = FastMath.toRadians(degree);

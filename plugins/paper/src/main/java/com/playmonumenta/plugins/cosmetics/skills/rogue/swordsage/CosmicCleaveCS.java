@@ -11,6 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -38,7 +39,7 @@ public class CosmicCleaveCS extends DeadlyRondeCS {
 	}
 
 	@Override
-	public void rondeHitEffect(World world, Player player, double radius, double rondeBaseRadius, boolean lv2) {
+	public void rondeHitEffect(World world, Player player, Entity enemy, double radius, double rondeBaseRadius, boolean lv2) {
 		Location loc = player.getLocation();
 		Vector viewDirection = loc.getDirection();
 		switch (mMode) {
@@ -94,6 +95,7 @@ public class CosmicCleaveCS extends DeadlyRondeCS {
 
 		new BukkitRunnable() {
 			double mAngle = -Math.PI / 5;
+
 			@Override
 			public void run() {
 				if (mAngle > Math.PI / 5) {

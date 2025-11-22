@@ -36,11 +36,11 @@ public class ImplosionFinisher implements EliteFinisher {
 			}
 		);
 		ParticleUtils.drawSphere(centered, 30, 0.1,
-				(l, t) -> {
-					Vector vel = centered.clone().subtract(l).toVector().normalize();
-					new PartialParticle(Particle.END_ROD, l, 1).directionalMode(true)
-							.delta(vel.getX(), vel.getY(), vel.getZ()).extra(0.15).spawnAsPlayerActive(p);
-				}
+			(l, t) -> {
+				Vector vel = centered.clone().subtract(l).toVector().normalize();
+				new PartialParticle(Particle.END_ROD, l, 1).directionalMode(true)
+					.delta(vel.getX(), vel.getY(), vel.getZ()).extra(0.15).spawnAsPlayerActive(p);
+			}
 		);
 	}
 

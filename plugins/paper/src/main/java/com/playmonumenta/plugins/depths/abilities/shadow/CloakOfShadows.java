@@ -80,7 +80,8 @@ public class CloakOfShadows extends DepthsAbility {
 		putOnCooldown();
 		AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration);
 
-		mPlugin.mEffectManager.addEffect(mPlayer, "CloakOfShadowsDamageEffect", new PercentDamageDealtSingle(DAMAGE_DURATION, mDamage, EnumSet.of(DamageEvent.DamageType.MELEE), true));
+		mPlugin.mEffectManager.addEffect(mPlayer, "CloakOfShadowsDamageEffect",
+			new PercentDamageDealtSingle(DAMAGE_DURATION, mDamage, EnumSet.of(DamageEvent.DamageType.MELEE), true));
 
 		new BukkitRunnable() {
 
@@ -114,8 +115,9 @@ public class CloakOfShadows extends DepthsAbility {
 	}
 
 	private static Description<CloakOfShadows> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<CloakOfShadows>(color)
-			.add("Left click while sneaking to throw a shadow bomb, which explodes on landing, applying ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to throw a shadow bomb, which explodes on landing, applying ")
 			.addPercent(a -> a.mWeakenAmplifier, WEAKEN_AMPLIFIER[rarity - 1], false, true)
 			.add(" weaken for ")
 			.addDuration(a -> a.mWeakenDuration, WEAKEN_DURATION)

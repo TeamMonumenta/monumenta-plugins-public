@@ -76,7 +76,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 	);
 	private static final Component bhairaviBackseating = Component.text("[Bhairavi]", NamedTextColor.GOLD)
 		.append(Component.text(" Quickly! Kill those creatures! They will charge the Spear with power and let you claim it!", NamedTextColor.WHITE));
-	private static final Component[] fightDialogue = new Component[] {
+	private static final Component[] fightDialogue = new Component[]{
 		Component.text("I am deeper than the power of Malkus... I shall take you into the nothingness from which you came.", NamedTextColor.DARK_RED),
 		Component.text("The Gates open! Come forth, nithlings!", NamedTextColor.DARK_RED),
 		Component.text("The Gates open once more! Come forth, nithlings!", NamedTextColor.DARK_RED),
@@ -267,7 +267,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 						new PartialParticle(Particle.FLAME, p.getLocation(), 10, 0.5, 0.25, 0.5, 0.2).spawnAsEntityActive(boss);
 					}
 				}
-				int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+				final int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 				mScalingCoefficient = BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
 			}
 		}.runTaskTimer(mPlugin, 0, 20);
@@ -393,14 +393,12 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void init() {
-		int hpDel = 3000;
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
+		final int baseHealth = 3000;
+		final int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		mScalingCoefficient = BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, hpDel);
+		EntityUtils.setMaxHealthAndHealth(mBoss, baseHealth);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(hpDel);
-
 		mBoss.setPersistent(true);
 	}
 

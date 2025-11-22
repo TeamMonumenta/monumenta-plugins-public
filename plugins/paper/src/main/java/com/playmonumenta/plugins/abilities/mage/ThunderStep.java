@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.ThunderStepCS;
@@ -52,10 +54,9 @@ public class ThunderStep extends Ability {
 	public static final int DISTANCE_1 = 8;
 	public static final int DISTANCE_2 = 10;
 	public static final double CHECK_INCREMENT = 0.1;
-	public static final int COOLDOWN_SECONDS = 20;
-	public static final int COOLDOWN_TICKS = COOLDOWN_SECONDS * 20;
+	public static final int COOLDOWN_TICKS = 20 * 20;
 
-	public static final double BACK_TELEPORT_MAX_DISTANCE = 64;
+	public static final double BACK_TELEPORT_MAX_DISTANCE = 128;
 	public static final int BACK_TELEPORT_MAX_DELAY = 3 * 20;
 	public static final int ENHANCEMENT_BONUS_DAMAGE_TIMER = 30 * 20;
 	public static final int ENHANCEMENT_PARALYZE_DURATION = 5 * 20;
@@ -65,49 +66,26 @@ public class ThunderStep extends Ability {
 	public static final String CHARM_COOLDOWN = "Thunder Step Cooldown";
 	public static final String CHARM_RADIUS = "Thunder Step Radius";
 	public static final String CHARM_DISTANCE = "Thunder Step Distance";
-
-	private final ThunderStepCS mCosmetic;
+	public static final String CHARM_ENHANCEMENT_DURATION = "Thunder Step Enhancement Duration";
 
 	public static final AbilityInfo<ThunderStep> INFO =
 		new AbilityInfo<>(ThunderStep.class, NAME, ThunderStep::new)
 			.linkedSpell(ABILITY)
 			.scoreboardId("ThunderStep")
 			.shorthandName("TS")
-			.descriptions(
-				String.format(
-					"Pressing the drop key while holding a wand materializes a flash of thunder," +
-						" dealing %s thunder magic damage to all enemies in a %s block radius around you and knocking them away." +
-						" The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block," +
-						" and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
-					DAMAGE_1,
-					SIZE,
-					DISTANCE_1,
-					COOLDOWN_SECONDS
-				),
-				String.format(
-					"Damage is increased from %s to %s." +
-						" Teleport range is increased from %s to %s blocks.",
-					DAMAGE_1,
-					DAMAGE_2,
-					DISTANCE_1,
-					DISTANCE_2
-				),
-				String.format("Within %ss of casting, use the same trigger to return to the original starting location, dealing %s%% of the skill's damage." +
-					              " If you do not do so, your next Thunder Step within %ss will paralyze enemies for %ss.",
-					BACK_TELEPORT_MAX_DELAY / 20,
-					(int) (ENHANCEMENT_DAMAGE_RATIO * 100),
-					ENHANCEMENT_BONUS_DAMAGE_TIMER / 20,
-					ENHANCEMENT_PARALYZE_DURATION / 20
-				)
-			)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Teleport forward, damaging mobs at the origin and destination.")
 			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ThunderStep::cast, new AbilityTrigger(AbilityTrigger.Key.DROP),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
 			.displayItem(Material.HORN_CORAL);
 
-	private final float mLevelDamage;
-	private final int mLevelDistance;
+	private final double mLevelDamage;
+	private final double mLevelDistance;
+	private final double mRadius;
+	private final int mBackTeleportMaxDelay;
+
+	private final ThunderStepCS mCosmetic;
 
 	private int mLastCastTick = -1;
 	private @Nullable Location mLastCastLocation = null;
@@ -115,8 +93,10 @@ public class ThunderStep extends Ability {
 
 	public ThunderStep(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mLevelDistance = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
+		mLevelDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mLevelDistance = CharmManager.calculateFlatAndPercentValue(player, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
+		mRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, SIZE);
+		mBackTeleportMaxDelay = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_ENHANCEMENT_DURATION, BACK_TELEPORT_MAX_DELAY);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ThunderStepCS());
 	}
 
@@ -125,21 +105,24 @@ public class ThunderStep extends Ability {
 			return false;
 		}
 
-		float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+		float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, (float) mLevelDamage);
 
 		// if enhanced, can teleport back within a short time frame (regardless of if on cooldown or not)
 		if (isEnhanced()
-			    && Bukkit.getServer().getCurrentTick() <= mLastCastTick + BACK_TELEPORT_MAX_DELAY
-			    && mLastCastLocation != null
-			    && mLastCastLocation.getWorld() == mPlayer.getWorld()
-			    && mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
+			&& Bukkit.getServer().getCurrentTick() <= mLastCastTick + mBackTeleportMaxDelay
+			&& mLastCastLocation != null
+			&& mLastCastLocation.getWorld() == mPlayer.getWorld()
+			&& mLastCastLocation.distance(mPlayer.getLocation()) < BACK_TELEPORT_MAX_DISTANCE) {
 
-			doDamage(mPlayer.getLocation(), spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
+			Location recastStartLocation = mPlayer.getLocation();
+			doDamage(recastStartLocation, spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
 			mLastCastLocation.setDirection(mPlayer.getLocation().getDirection());
 			PlayerUtils.playerTeleport(mPlayer, mLastCastLocation);
 			doDamage(mLastCastLocation, spellDamage * ENHANCEMENT_DAMAGE_RATIO, false);
+			mCosmetic.trailEffect(mPlayer, recastStartLocation, mLastCastLocation);
 
 			// prevent further back teleports as well as paralyze of any further casts
+			mCosmetic.playerTeleportedBack();
 			mLastCastLocation = null;
 			mLastCastTick = -1;
 			mCanParalyze = false;
@@ -169,33 +152,33 @@ public class ThunderStep extends Ability {
 			movingPlayerBox,
 			mLevelDistance,
 			vector,
-			CHECK_INCREMENT,
-			true,
-			null, -1, -1
+			CHECK_INCREMENT
 		);
 		Location playerEndLocation = movingPlayerBox
-			                             .getCenter()
-			                             .setY(movingPlayerBox.getMinY())
-			                             .toLocation(world)
-			                             .setDirection(vector);
+			.getCenter()
+			.setY(movingPlayerBox.getMinY())
+			.toLocation(world)
+			.setDirection(vector);
 
 		if (!playerEndLocation.getWorld().getWorldBorder().isInside(playerEndLocation)
-			    || ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			|| ZoneUtils.hasZoneProperty(playerEndLocation, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			return true;
 		}
-
 		PlayerUtils.playerTeleport(mPlayer, playerEndLocation);
 		doDamage(playerEndLocation, spellDamage, doParalyze);
+		mCosmetic.trailEffect(mPlayer, playerStartLocation, playerEndLocation);
+		if (isEnhanced() && mLastCastTick > -1) {
+			mCosmetic.lingeringEffect(mPlugin, mPlayer, playerStartLocation, mBackTeleportMaxDelay);
+		}
 
 		return true;
 	}
 
 	public void doDamage(Location location, float spellDamage, boolean enhancementParalyze) {
-		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, SIZE);
-		double ratio = radius / SIZE;
-		mCosmetic.castEffect(mPlayer, ratio);
+		double ratio = mRadius / SIZE;
+		mCosmetic.castEffect(mPlayer, ratio, mRadius);
 
-		Hitbox hitbox = new Hitbox.SphereHitbox(location.clone().add(0, 0.9, 0), radius);
+		Hitbox hitbox = new Hitbox.SphereHitbox(location.clone().add(0, 0.9, 0), mRadius);
 		List<LivingEntity> enemies = hitbox.getHitMobs();
 		int mobParticles = Math.max(
 			1, 20 / Math.max(1, enemies.size()) // Never divide by 0. Always maximum 20 particles for <= 1 enemy
@@ -219,4 +202,38 @@ public class ThunderStep extends Ability {
 		}
 	}
 
+	private static Description<ThunderStep> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to materialize a flash of thunder, dealing ")
+			.add(a -> a.mLevelDamage, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" thunder magic damage to all enemies within ")
+			.add(a -> a.mRadius, SIZE)
+			.add(" blocks around you. The next moment, you teleport in the direction you're looking, travelling up to ")
+			.add(a -> a.mLevelDistance, DISTANCE_1, false, Ability::isLevelOne)
+			.add(" blocks or until you hit a solid block, and repeat the thunder attack at your destination.")
+			.addCooldown(COOLDOWN_TICKS);
+	}
+
+	private static Description<ThunderStep> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mLevelDamage, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" and teleport range is increased to ")
+			.add(a -> a.mLevelDistance, DISTANCE_2, false, Ability::isLevelTwo)
+			.add(" blocks.");
+	}
+
+	private static Description<ThunderStep> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Within ")
+			.addDuration(BACK_TELEPORT_MAX_DELAY)
+			.add(" seconds of casting, trigger again to return to the original starting location, dealing ")
+			.addPercent(ENHANCEMENT_DAMAGE_RATIO)
+			.add(" of the skill's damage. If you do not do so, your next Thunder Step within ")
+			.addDuration(ENHANCEMENT_BONUS_DAMAGE_TIMER)
+			.add(" seconds will paralyze enemies for ")
+			.addDuration(ENHANCEMENT_PARALYZE_DURATION)
+			.add(" seconds.");
+	}
 }

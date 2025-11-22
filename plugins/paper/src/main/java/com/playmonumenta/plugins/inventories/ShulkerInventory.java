@@ -25,7 +25,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 /**
  * This class allows one Shulker Box to be accessed without being placed.
  */
-@SuppressWarnings("checkstyle:EmptyLineSeparator")
 public class ShulkerInventory {
 	private final Plugin mPlugin;
 	private final Player mPlayer;
@@ -66,14 +65,14 @@ public class ShulkerInventory {
 	 * the Shulker Box inventory cannot be opened by a player. This is useful for depositing items
 	 * into the shulker without opening it.
 	 *
-	 * @param plugin The Plugin to manage scheduling tasks.
-	 * @param player The Player who is opening this Shulker Box.
+	 * @param plugin          The Plugin to manage scheduling tasks.
+	 * @param player          The Player who is opening this Shulker Box.
 	 * @param parentInventory The inventory the Shulker Box item is in.
-	 * @param parentSlot The slot the Shulker Box is in.
-	 * @param depositLimit The number of ItemStacks that will be deposited into this Shulker Box.
-	 *                     Attempting to deposit more than this number will throw an error.
-	 *                     The shulker will automatically be closed when this number of deposits is reached.
-	 *                     If 0, the shulker is not being used for deposit, but to be opened by a player.
+	 * @param parentSlot      The slot the Shulker Box is in.
+	 * @param depositLimit    The number of ItemStacks that will be deposited into this Shulker Box.
+	 *                        Attempting to deposit more than this number will throw an error.
+	 *                        The shulker will automatically be closed when this number of deposits is reached.
+	 *                        If 0, the shulker is not being used for deposit, but to be opened by a player.
 	 */
 	ShulkerInventory(Plugin plugin, Player player, Inventory parentInventory, int parentSlot, int depositLimit) throws Exception {
 		mPlugin = plugin;
@@ -129,7 +128,7 @@ public class ShulkerInventory {
 	 * Note that the actual update does not occur until the following server tick. This is to account
 	 * for InventoryClickEvents that don't actually update inventories until the end of the event.
 	 *
-	 * @param unlock True if the Shulker Box should be unlocked after this update.
+	 * @param unlock  True if the Shulker Box should be unlocked after this update.
 	 * @param instant True if the Shulker Box should be saved instantly. For
 	 * @return True if the Shulker Box still exists in the parent inventory.
 	 */

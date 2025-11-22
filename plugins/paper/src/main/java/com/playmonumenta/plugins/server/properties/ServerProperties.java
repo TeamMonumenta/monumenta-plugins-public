@@ -7,7 +7,7 @@ import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.plots.PlotManager;
-import com.playmonumenta.plugins.utils.DungeonUtils;
+import com.playmonumenta.plugins.utils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -50,6 +51,7 @@ public class ServerProperties {
 	private boolean mKeepLowTierInventory = false;
 	private boolean mClassSpecializationsEnabled = false;
 	private boolean mAbilityEnhancementsEnabled = false;
+	private boolean mDisableBossProcessing = false;
 	private boolean mAuditMessagesEnabled = true;
 	private boolean mRepairExplosions = false;
 	private @Nullable Pattern mRepairExplosionsWorldPattern = null;
@@ -58,18 +60,22 @@ public class ServerProperties {
 	private boolean mInfusionsEnabled = true;
 	private boolean mMasterworkRefundEnabled = false;
 	private boolean mLootBoxEnabled = true;
+	private boolean mSharedVaultEnabled = true;
 	private boolean mShardOpen = true;
 	private int mHTTPStatusPort = 8000;
 
 	private String mShardName = "default_settings";
 
 	private boolean mDisableEntityScoresInDefaultWorld = true;
-	private List<String> mDisableEntityScoresInWorlds = new ArrayList<>();
+	private final List<String> mDisableEntityScoresInWorlds = new ArrayList<>();
 
 	private final EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
+	private final EnumSet<Material> mPreciousBlocks = EnumSet.noneOf(Material.class);
 	private final EnumSet<Material> mAlwaysPickupMats = EnumSet.noneOf(Material.class);
 	private final EnumSet<Material> mNamedPickupMats = EnumSet.noneOf(Material.class);
 
+	private final Set<String> mFormattingFreeBlockNames = new TreeSet<>();
+	private final List<NamespacedKey> mDroppedItemReplacements = new ArrayList<>();
 	private final List<NamespacedKey> mEggifySpawnEggs = new ArrayList<>();
 	private int mLootingLimiterMobKills = 0;
 	private int mLootingLimiterSpawners = 0;
@@ -77,6 +83,8 @@ public class ServerProperties {
 	private boolean mDepthsEnabled = false;
 	private boolean mTrickyCreepersEnabled = true;
 	private @Nullable String mGameplayDataExportPath = null;
+
+	private JsonObject mDebugParameters = new JsonObject();
 
 	private final Map<String, Integer> mShardCounts = new HashMap<>();
 
@@ -126,7 +134,7 @@ public class ServerProperties {
 			}
 		}
 
-		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(shard);
+		DungeonCommandMapping mapping = DungeonCommandMapping.getByShard(shard);
 		if (mapping == null) {
 			return null;
 		}
@@ -152,6 +160,10 @@ public class ServerProperties {
 			return INSTANCE.mAbilityEnhancementsEnabled;
 		}
 		return effectiveRegion == 0 || effectiveRegion >= 3;
+	}
+
+	public static boolean isBossProcessingDisabled() {
+		return INSTANCE.mDisableBossProcessing;
 	}
 
 	public static String getGameplayDataExportPath() {
@@ -189,6 +201,10 @@ public class ServerProperties {
 		return INSTANCE.mLootBoxEnabled;
 	}
 
+	public static boolean getSharedVaultEnabled() {
+		return INSTANCE.mSharedVaultEnabled;
+	}
+
 	public static boolean getShardOpen() {
 		return INSTANCE.mShardOpen;
 	}
@@ -199,6 +215,10 @@ public class ServerProperties {
 
 	public static String getShardName() {
 		return INSTANCE.mShardName;
+	}
+
+	public static boolean isBuildShard() {
+		return getShardName().equals("build");
 	}
 
 	public static boolean getEntityScoresDisabled(World world) {
@@ -221,12 +241,24 @@ public class ServerProperties {
 		return INSTANCE.mUnbreakableBlocks;
 	}
 
+	public static Set<Material> getPreciousBlocks() {
+		return INSTANCE.mPreciousBlocks;
+	}
+
 	public static Set<Material> getAlwaysPickupMats() {
 		return INSTANCE.mAlwaysPickupMats;
 	}
 
 	public static Set<Material> getNamedPickupMats() {
 		return INSTANCE.mNamedPickupMats;
+	}
+
+	public static Set<String> getFormatingFreeBlockNames() {
+		return INSTANCE.mFormattingFreeBlockNames;
+	}
+
+	public static List<NamespacedKey> getDroppedItemReplacements() {
+		return INSTANCE.mDroppedItemReplacements;
 	}
 
 	public static List<NamespacedKey> getEggifySpawnEggs() {
@@ -257,6 +289,86 @@ public class ServerProperties {
 		return INSTANCE.mMasterworkRefundEnabled;
 	}
 
+	public static boolean getDebugParameter(String parameterName, boolean defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isBoolean()
+		) {
+			return parameterPrimitive.getAsBoolean();
+		}
+		return defaultValue;
+	}
+
+	public static byte getDebugParameter(String parameterName, byte defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsByte();
+		}
+		return defaultValue;
+	}
+
+	public static short getDebugParameter(String parameterName, short defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsShort();
+		}
+		return defaultValue;
+	}
+
+	public static int getDebugParameter(String parameterName, int defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsInt();
+		}
+		return defaultValue;
+	}
+
+	public static long getDebugParameter(String parameterName, long defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsLong();
+		}
+		return defaultValue;
+	}
+
+	public static float getDebugParameter(String parameterName, float defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsFloat();
+		}
+		return defaultValue;
+	}
+
+	public static double getDebugParameter(String parameterName, double defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isNumber()
+		) {
+			return parameterPrimitive.getAsDouble();
+		}
+		return defaultValue;
+	}
+
+	public static String getDebugParameter(String parameterName, String defaultValue) {
+		if (
+			INSTANCE.mDebugParameters.get(parameterName) instanceof JsonPrimitive parameterPrimitive &&
+				parameterPrimitive.isString()
+		) {
+			return parameterPrimitive.getAsString();
+		}
+		return defaultValue;
+	}
+
 	public static int getShardCount(String shard) {
 		return INSTANCE.mShardCounts.getOrDefault(shard, 1);
 	}
@@ -277,6 +389,7 @@ public class ServerProperties {
 			mKeepLowTierInventory = getPropertyValueBool(object, "keepLowTierInventory", mKeepLowTierInventory);
 			mClassSpecializationsEnabled = getPropertyValueBool(object, "classSpecializationsEnabled", mClassSpecializationsEnabled);
 			mAbilityEnhancementsEnabled = getPropertyValueBool(object, "abilityEnhancementsEnabled", mAbilityEnhancementsEnabled);
+			mDisableBossProcessing = getPropertyValueBool(object, "disableBossProcessing", mDisableBossProcessing);
 			mAuditMessagesEnabled = getPropertyValueBool(object, "auditMessagesEnabled", mAuditMessagesEnabled);
 			mRepairExplosions = getPropertyValueBool(object, "repairExplosions", mRepairExplosions);
 			String repairExplosionsWorldPattern = getPropertyValueString(object, "repairExplosionsWorldPattern", null);
@@ -296,6 +409,7 @@ public class ServerProperties {
 			mInfusionsEnabled = getPropertyValueBool(object, "infusionsEnabled", mInfusionsEnabled);
 			mMasterworkRefundEnabled = getPropertyValueBool(object, "masterworkRefundEnabled", mMasterworkRefundEnabled);
 			mLootBoxEnabled = getPropertyValueBool(object, "lootBoxEnabled", mLootBoxEnabled);
+			mSharedVaultEnabled = getPropertyValueBool(object, "sharedVaultEnabled", mSharedVaultEnabled);
 			mShardOpen = getPropertyValueBool(object, "shardOpen", mShardOpen);
 			mHTTPStatusPort = getPropertyValueInt(object, "httpStatusPort", mHTTPStatusPort);
 
@@ -320,6 +434,20 @@ public class ServerProperties {
 			getPropertyValueMaterialList(plugin, object, "alwaysPickupMaterials", sender, mAlwaysPickupMats);
 			getPropertyValueMaterialList(plugin, object, "namedPickupMaterials", sender, mNamedPickupMats);
 
+			// Set default value
+			mPreciousBlocks.clear();
+			mPreciousBlocks.addAll(EnumSet.of(
+				Material.IRON_BLOCK,
+				Material.RAW_IRON_BLOCK,
+				Material.GOLD_BLOCK,
+				Material.RAW_GOLD_BLOCK,
+				Material.DIAMOND_BLOCK
+			));
+			// Replace default value if possible
+			getPropertyValueMaterialList(plugin, object, "preciousBlocks", sender, mPreciousBlocks);
+
+			getPropertyValueCollection(plugin, object, "formattingFreeBlockNames", sender, String::toString, mFormattingFreeBlockNames);
+			getPropertyValueCollection(plugin, object, "droppedItemReplacements", sender, NamespacedKeyUtils::fromString, mDroppedItemReplacements);
 			getPropertyValueCollection(plugin, object, "eggifySpawnEggs", sender, NamespacedKeyUtils::fromString, mEggifySpawnEggs);
 
 			mLootingLimiterMobKills = getPropertyValueInt(object, "lootingLimiterMobKills", mLootingLimiterMobKills);
@@ -328,6 +456,12 @@ public class ServerProperties {
 
 			mDepthsEnabled = getPropertyValueBool(object, "depthsEnabled", mDepthsEnabled);
 			mTrickyCreepersEnabled = getPropertyValueBool(object, "trickyCreepersEnabled", mTrickyCreepersEnabled);
+
+			if (!(object.get("debugParameters") instanceof JsonObject debugParameters)) {
+				mDebugParameters = new JsonObject();
+			} else {
+				mDebugParameters = debugParameters;
+			}
 
 			JsonElement shardCounts = object.get("shardCounts");
 			if (shardCounts != null) {
@@ -364,6 +498,7 @@ public class ServerProperties {
 		out.add("keepLowTierInventory = " + mKeepLowTierInventory);
 		out.add("classSpecializationsEnabled = " + mClassSpecializationsEnabled);
 		out.add("abilityEnhancementsEnabled = " + mAbilityEnhancementsEnabled);
+		out.add("disableBossProcessing = " + mDisableBossProcessing);
 		out.add("auditMessagesEnabled = " + mAuditMessagesEnabled);
 		out.add("repairExplosions = " + mRepairExplosions);
 		out.add("repairExplosionsWorldPattern = " + (mRepairExplosionsWorldPattern == null ? null : mRepairExplosionsWorldPattern.pattern()));
@@ -372,6 +507,7 @@ public class ServerProperties {
 		out.add("infusionsEnabled = " + mInfusionsEnabled);
 		out.add("masterworkRefundEnabled = " + mMasterworkRefundEnabled);
 		out.add("lootBoxEnabled = " + mLootBoxEnabled);
+		out.add("sharedVaultEnabled = " + mSharedVaultEnabled);
 		out.add("shardOpen = " + mShardOpen);
 		out.add("httpStatusPort = " + mHTTPStatusPort);
 
@@ -382,9 +518,12 @@ public class ServerProperties {
 		out.add("disableEntityScoresInWorlds = [" + String.join(" ", mDisableEntityScoresInWorlds) + "]");
 
 		out.add("unbreakableBlocks = [" + mUnbreakableBlocks.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
+		out.add("preciousBlocks = [" + mPreciousBlocks.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
 		out.add("alwaysPickupMaterials = [" + mAlwaysPickupMats.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
 		out.add("namedPickupMaterials = [" + mNamedPickupMats.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
 
+		out.add("formattingFreeBlockNames = <set of " + mFormattingFreeBlockNames.size() + " block names>");
+		out.add("droppedItemReplacements = <set of " + mDroppedItemReplacements.size() + " loot tables>");
 		out.add("eggifySpawnEggs = <set of " + mEggifySpawnEggs.size() + " loot tables>");
 
 		out.add("lootingLimiterMobKills = " + mLootingLimiterMobKills);
@@ -394,6 +533,8 @@ public class ServerProperties {
 		out.add("depthsEnabled = " + mDepthsEnabled + " (NB: changing this requires a restart)");
 
 		out.add("trickyCreepersEnabled = " + mTrickyCreepersEnabled);
+
+		out.add("debugParameters = " + mDebugParameters.toString());
 
 		out.add("shardCounts = " + mShardCounts);
 
@@ -439,7 +580,7 @@ public class ServerProperties {
 	}
 
 	private <T> void getPropertyValueCollection(Plugin plugin, JsonObject object, String propertyName, @Nullable CommandSender sender,
-												Function<String, T> parser, Collection<T> collection) {
+	                                            Function<String, T> parser, Collection<T> collection) {
 		JsonElement element = object.get(propertyName);
 		if (element != null) {
 			collection.clear();

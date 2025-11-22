@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.cosmetics.skills.cleric;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -49,15 +52,20 @@ public class ContortingBoltCS extends HandOfLightCS {
 
 	@Override
 	public void lightHealCastEffect(World world, Location userLoc, Plugin mPlugin, Player player, float radius, double angle, List<Player> players) {
+		Vector arcDir = player.getLocation().getDirection().setY(0).normalize();
+		double degree = VectorUtils.vectorToRotation(arcDir)[0] + 90;
+		new PPCircle(Particle.CRIT, userLoc.clone().add(0, 0.15, 0), radius).arcDegree(degree - Math.toDegrees(angle), degree + Math.toDegrees(angle)).countPerMeter(3).delta(0, 0.1, 0).spawnAsPlayerActive(player);
+
+		List<Player> finalPlayers = new ArrayList<>(players.stream().limit(20).toList());
 		int delay;
-		switch (players.size()) {
+		switch (finalPlayers.size()) {
 			case 1 -> delay = 5;
 			case 2 -> delay = 4;
 			case 3 -> delay = 3;
 			case 4 -> delay = 2;
 			default -> delay = 1;
 		}
-		players.add(player);
+		finalPlayers.add(player);
 		Vector dir = player.getEyeLocation().getDirection();
 		createOrb(dir, LocationUtils.getHalfHeightLocation(player), player, players.get(0), PINK, Particle.CRIT, radius);
 		world.playSound(userLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.2f, 0.9f);
@@ -65,10 +73,11 @@ public class ContortingBoltCS extends HandOfLightCS {
 		world.playSound(userLoc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1.2f, 2f);
 		new BukkitRunnable() {
 			int mInt = 0;
+
 			@Override
 			public void run() {
-				if (mInt < players.size() - 1) {
-					createOrb(dir, LocationUtils.getHalfHeightLocation(players.get(mInt)), player, players.get(mInt + 1), PINK, Particle.CRIT, radius);
+				if (mInt < finalPlayers.size() - 1) {
+					createOrb(dir, LocationUtils.getHalfHeightLocation(finalPlayers.get(mInt)), player, finalPlayers.get(mInt + 1), PINK, Particle.CRIT, radius);
 				} else {
 					this.cancel();
 				}
@@ -84,26 +93,32 @@ public class ContortingBoltCS extends HandOfLightCS {
 
 	@Override
 	public void lightDamageCastEffect(World world, Location userLoc, Plugin mPlugin, Player player, float radius, double angle, List<LivingEntity> mobs) {
+		Vector arcDir = player.getLocation().getDirection().setY(0).normalize();
+		double degree = VectorUtils.vectorToRotation(arcDir)[0] + 90;
+		new PPCircle(Particle.CRIT_MAGIC, userLoc.clone().add(0, 0.15, 0), radius).arcDegree(degree - Math.toDegrees(Math.acos(angle)), degree + Math.toDegrees(Math.acos(angle))).countPerMeter(3).delta(0, 0.1, 0).spawnAsPlayerActive(player);
+
+		List<LivingEntity> finalMobs = new ArrayList<>(mobs.stream().limit(20).toList());
 		int delay;
-		switch (mobs.size()) {
+		switch (finalMobs.size()) {
 			case 1 -> delay = 5;
 			case 2 -> delay = 4;
 			case 3 -> delay = 3;
 			case 4 -> delay = 2;
 			default -> delay = 1;
 		}
-		mobs.add(player);
+		finalMobs.add(player);
 		Vector dir = player.getEyeLocation().getDirection();
-		createOrb(dir, LocationUtils.getHalfHeightLocation(player), player, mobs.get(0), CYAN, Particle.CRIT_MAGIC, radius);
+		createOrb(dir, LocationUtils.getHalfHeightLocation(player), player, finalMobs.get(0), CYAN, Particle.CRIT_MAGIC, radius);
 		world.playSound(userLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.2f, 0.9f);
 		world.playSound(userLoc, Sound.ENTITY_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 2f);
 		world.playSound(userLoc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1.2f, 2f);
 		new BukkitRunnable() {
 			int mInt = 0;
+
 			@Override
 			public void run() {
-				if (mInt < mobs.size() - 1) {
-					createOrb(dir, LocationUtils.getHalfHeightLocation(mobs.get(mInt)), player, mobs.get(mInt + 1), CYAN, Particle.CRIT_MAGIC, radius);
+				if (mInt < finalMobs.size() - 1) {
+					createOrb(dir, LocationUtils.getHalfHeightLocation(finalMobs.get(mInt)), player, finalMobs.get(mInt + 1), CYAN, Particle.CRIT_MAGIC, radius);
 				} else {
 					this.cancel();
 				}
@@ -135,14 +150,14 @@ public class ContortingBoltCS extends HandOfLightCS {
 				if (target != player) {
 					if (target instanceof Player) {
 						new PartialParticle(Particle.HEART, target.getEyeLocation().add(0, -0.5, 0)).count(8).delta(0.4, 0.8, 0.4).spawnAsPlayerActive(player);
-						world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.5f, 1.3f);
-						world.playSound(target.getLocation(), Sound.BLOCK_SHROOMLIGHT_STEP, SoundCategory.PLAYERS, 1.6f, 1.2f);
-						world.playSound(target.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.6f, 0.9f);
+						world.playSound(target.getLocation(), Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 1.3f);
+						world.playSound(target.getLocation(), Sound.BLOCK_SHROOMLIGHT_STEP, SoundCategory.PLAYERS, 1.1f, 1.2f);
+						world.playSound(target.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.1f, 0.9f);
 					} else {
 						new PartialParticle(Particle.BUBBLE_POP, to).count(12).delta(0.3, 0.6, 0.3).spawnAsPlayerActive(player);
-						world.playSound(target.getLocation(), Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1.2f, 1.6f);
-						world.playSound(target.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.6f, 0.9f);
-						world.playSound(target.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.PLAYERS, 1.4f, 1.0f);
+						world.playSound(target.getLocation(), Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1.0f, 1.6f);
+						world.playSound(target.getLocation(), Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1.2f, 0.9f);
+						world.playSound(target.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.PLAYERS, 1.1f, 1.0f);
 					}
 				} else {
 					new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0)).count(8).delta(0.6, 1.0, 0.6).spawnAsPlayerActive(player);

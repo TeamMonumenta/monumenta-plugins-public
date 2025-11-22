@@ -17,7 +17,7 @@ public class PackedIceOverride extends BaseOverride {
 		}
 
 		if (InventoryUtils.testForItemWithName(item, "Crystallized Water", true)
-			    && player.getGameMode() == GameMode.SURVIVAL) {
+			&& player.getGameMode() == GameMode.SURVIVAL) {
 			if (ZoneUtils.isInPlot(player)) {
 				event.getBlockPlaced().setType(Material.WATER);
 			} else {

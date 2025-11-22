@@ -213,8 +213,8 @@ public enum DelvePreset {
 	)),
 	PINK(59, "pink", 100, Material.PINK_WOOL, Map.ofEntries(
 		entry(DelvesModifier.LEGIONARY, 7),
-		entry(DelvesModifier.VENGEANCE, 13),
-		entry(DelvesModifier.TWISTED, 5),
+		entry(DelvesModifier.VENGEANCE, 12),
+		entry(DelvesModifier.TWISTED_TORMENTED, 3),
 		entry(DelvesModifier.PERNICIOUS, 5),
 		entry(DelvesModifier.RIFTBORN, 1),
 		entry(DelvesModifier.TRANSCENDENT, 10),
@@ -249,10 +249,10 @@ public enum DelvePreset {
 		entry(DelvesModifier.RIFTBORN, 1)
 	)),
 	PURPLE(63, "purple", 100, Material.PURPLE_WOOL, Map.ofEntries(
-		entry(DelvesModifier.PERNICIOUS, 8),
+		entry(DelvesModifier.PERNICIOUS, 7),
 		entry(DelvesModifier.COLOSSAL, 5),
 		entry(DelvesModifier.BLOODTHIRSTY, 17),
-		entry(DelvesModifier.TWISTED, 5),
+		entry(DelvesModifier.TWISTED_TORMENTED, 3),
 		entry(DelvesModifier.CHRONOLOGY, 1),
 		entry(DelvesModifier.HAUNTED, 1),
 		entry(DelvesModifier.ASSASSINS, 1)
@@ -260,47 +260,52 @@ public enum DelvePreset {
 	TEAL(64, "teal", 100, Material.CYAN_WOOL, Map.ofEntries(
 		entry(DelvesModifier.TRANSCENDENT, 12),
 		entry(DelvesModifier.CHRONOLOGY, 1),
-		entry(DelvesModifier.PERNICIOUS, 8),
+		entry(DelvesModifier.PERNICIOUS, 7),
 		entry(DelvesModifier.ARCANIC, 10),
-		entry(DelvesModifier.TWISTED, 5),
+		entry(DelvesModifier.TWISTED_TORMENTED, 3),
 		entry(DelvesModifier.ASSASSINS, 1),
 		entry(DelvesModifier.RIFTBORN, 1)
 	)),
 	SHIFTING(65, "shiftingcity", 100, Material.PRISMARINE, Map.ofEntries(
 		entry(DelvesModifier.TWISTED, 5),
-		entry(DelvesModifier.COLOSSAL, 5),
 		entry(DelvesModifier.CHRONOLOGY, 1),
-		entry(DelvesModifier.PERNICIOUS, 5),
-		entry(DelvesModifier.ARCANIC, 5),
-		entry(DelvesModifier.TRANSCENDENT, 10),
-		entry(DelvesModifier.DREADFUL, 10),
-		entry(DelvesModifier.ASSASSINS, 1)
+		entry(DelvesModifier.ENTROPY, 25)
 	)),
 	FORUM(66, "forum", 100, Material.BOOKSHELF, Map.ofEntries(
 		entry(DelvesModifier.LEGIONARY, 7),
 		entry(DelvesModifier.TRANSCENDENT, 10),
 		entry(DelvesModifier.CHRONOLOGY, 1),
 		entry(DelvesModifier.PERNICIOUS, 10),
-		entry(DelvesModifier.TWISTED, 5),
-		entry(DelvesModifier.BLOODTHIRSTY, 5),
+		entry(DelvesModifier.TWISTED_TORMENTED, 3),
+		entry(DelvesModifier.BLOODTHIRSTY, 4),
 		entry(DelvesModifier.DREADFUL, 8)
 	)),
 	BLUE(67, "blue", 100, Material.BLUE_WOOL, Map.ofEntries(
 		entry(DelvesModifier.INFERNAL, 10),
 		entry(DelvesModifier.TRANSCENDENT, 10),
 		entry(DelvesModifier.ASTRAL, 1),
-		entry(DelvesModifier.PERNICIOUS, 5),
+		entry(DelvesModifier.PERNICIOUS, 4),
 		entry(DelvesModifier.ARCANIC, 10),
-		entry(DelvesModifier.TWISTED, 5),
+		entry(DelvesModifier.TWISTED_TORMENTED, 3),
 		entry(DelvesModifier.RIFTBORN, 1)
 	)),
 	BROWN(68, "brown", 100, Material.BROWN_WOOL, Map.ofEntries(
 		entry(DelvesModifier.COLOSSAL, 15),
 		entry(DelvesModifier.HAUNTED, 1),
 		entry(DelvesModifier.CARAPACE, 15),
-		entry(DelvesModifier.SPECTRAL, 5),
-		entry(DelvesModifier.TWISTED, 5),
+		entry(DelvesModifier.SPECTRAL, 4),
+		entry(DelvesModifier.TWISTED_TORMENTED, 3),
 		entry(DelvesModifier.DREADFUL, 5)
+	)),
+	INDIGO(69, "indigo", 100, Material.PURPLE_WOOL, Map.ofEntries(
+		entry(DelvesModifier.CHIVALROUS, 10),
+		entry(DelvesModifier.TRANSCENDENT, 8),
+		entry(DelvesModifier.INFERNAL, 7),
+		entry(DelvesModifier.LEGIONARY, 5),
+		entry(DelvesModifier.TWISTED, 5),
+		entry(DelvesModifier.CHRONOLOGY, 1),
+		entry(DelvesModifier.ASTRAL, 1),
+		entry(DelvesModifier.RIFTBORN, 1)
 	));
 
 	public static final String PRESET_SCOREBOARD = "Daily3DelvePreset";
@@ -390,8 +395,8 @@ public enum DelvePreset {
 	 */
 	public static @Nullable DelvePreset getChall(String dungeonName) {
 		return Arrays.stream(values())
-					 .filter(preset -> dungeonName.startsWith(preset.mName))
-					 .findFirst()
-					 .orElse(null);
+			.filter(preset -> dungeonName.startsWith(preset.mName))
+			.findFirst()
+			.orElse(null);
 	}
 }

@@ -31,8 +31,8 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-				"Infuses your alchemy with",
-				"ghastly and twisted echoes.");
+			"Infuses your alchemy with",
+			"ghastly and twisted echoes.");
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 		Vector colorValues = isGruesome ? new Vector(ECHO_COLOR.getRed(), ECHO_COLOR.getGreen(), ECHO_COLOR.getBlue()).normalize() :
 			new Vector(TWISTED_COLOR.getRed(), TWISTED_COLOR.getGreen(), TWISTED_COLOR.getBlue()).normalize();
 		ParticleUtils.explodingRingEffect(Plugin.getInstance(), loc, radius, 1, 3,
-			Arrays.asList(
+			List.of(
 				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(1.0, (Location location) -> {
 					new PartialParticle(Particle.SPELL_MOB_AMBIENT, location, 1, colorValues.getX(), colorValues.getY(), colorValues.getZ(), 1).directionalMode(true).spawnAsPlayerActive(mPlayer);
 				})
@@ -96,6 +96,7 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 		new BukkitRunnable() {
 
 			double mRadius = 2.75;
+
 			@Override
 			public void run() {
 

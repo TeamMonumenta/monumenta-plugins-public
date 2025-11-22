@@ -35,7 +35,7 @@ public class BottomlessBowl extends DepthsAbility {
 	}
 
 	private static Description<BottomlessBowl> getDescription() {
-		return new DescriptionBuilder<BottomlessBowl>().add("You now have the choice to skip room rewards; doing so will grant you +5% healing and damage dealt.")
+		return new DescriptionBuilder<>(() -> INFO).add("You now have the choice to skip room rewards; doing so will grant you +5% healing and damage dealt.")
 			.add((a, p) -> a != null && a.mDepthsPlayer != null
 				? Component.text("\nCurrent bonus: " + StringUtils.multiplierToPercentageWithSign(a.mDepthsPlayer.mRewardSkips * 0.05))
 				: Component.empty());

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.mail.recipient;
 
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.mail.NoMailAccessException;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -63,7 +64,7 @@ public class PlayerRecipient implements Recipient {
 				case ARG -> {
 					if (mPlayerNameArg == null) {
 						future.completeExceptionally(new Exception(
-								mLabel + " argument interpreter was not initialized correctly and cannot continue."));
+							mLabel + " argument interpreter was not initialized correctly and cannot continue."));
 					} else {
 						String targetName = args.getByArgument(mPlayerNameArg);
 						try {
@@ -178,7 +179,7 @@ public class PlayerRecipient implements Recipient {
 	}
 
 	@Override
-	public boolean nonMemberCheck(Player viewer) {
+	public boolean nonMemberCheck(Player viewer, GuildPermission guildPermission) {
 		return !viewer.getUniqueId().equals(mPlayerId);
 	}
 

@@ -125,7 +125,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		}
 
 		if (!InventoryUtils.testForItemWithLore(item, CLASS_STR)
-			    || !InventoryUtils.testForItemWithName(item, CONFIGURED.content(), false)) {
+			|| !InventoryUtils.testForItemWithName(item, CONFIGURED.content(), false)) {
 			/* Not active */
 			if (action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK)) {
 				// If a player doesn't have any abilities, tell them that's required
@@ -136,7 +136,7 @@ public class YellowTesseractOverride extends BaseOverride {
 				storeSkills(player, item);
 			}
 		} else if (player.isSneaking()
-			           && (action.equals(Action.LEFT_CLICK_AIR) || action.equals(Action.LEFT_CLICK_BLOCK))) {
+			&& (action.equals(Action.LEFT_CLICK_AIR) || action.equals(Action.LEFT_CLICK_BLOCK))) {
 			//Reset Tesseract with shift + left click
 			resetTesseract(player, item);
 		} else if (InventoryUtils.isSoulboundToPlayer(item, player)) {
@@ -161,9 +161,9 @@ public class YellowTesseractOverride extends BaseOverride {
 				// If the CD hasn't hit 0, tell the player and silence them.
 				if (cd != 0) {
 					player.sendMessage(Component.text("The Tesseract is still on cooldown! You have been silenced for 30s.", NamedTextColor.RED)
-						                   .append(Component.text(" You have ", NamedTextColor.GRAY))
-						                   .append(Component.text(cd, NamedTextColor.RED).decorate(TextDecoration.BOLD))
-						                   .append(Component.text(" minute" + (cd == 1 ? "" : "s") + " remaining until you can use it again without being silenced.", NamedTextColor.GRAY)));
+						.append(Component.text(" You have ", NamedTextColor.GRAY))
+						.append(Component.text(cd, NamedTextColor.RED).decorate(TextDecoration.BOLD))
+						.append(Component.text(" minute" + (cd == 1 ? "" : "s") + " remaining until you can use it again without being silenced.", NamedTextColor.GRAY)));
 					Plugin.getInstance().mEffectManager.addEffect(player, "YellowTessSilence", new AbilitySilence(30 * 20));
 				}
 			}
@@ -231,11 +231,11 @@ public class YellowTesseractOverride extends BaseOverride {
 		for (int i = lore.size() - 1; i >= 0; --i) {
 			String line = lore.get(i);
 			if (line.startsWith(CLASS_STR)
-				    || line.startsWith(SPEC_STR)
-				    || line.startsWith(CLASS_LEVEL_STR)
-				    || line.startsWith(SPEC_LEVEL_STR)
-				    || line.startsWith(ENHANCE_STR)
-				    || line.startsWith(PREFIX)) {
+				|| line.startsWith(SPEC_STR)
+				|| line.startsWith(CLASS_LEVEL_STR)
+				|| line.startsWith(SPEC_LEVEL_STR)
+				|| line.startsWith(ENHANCE_STR)
+				|| line.startsWith(PREFIX)) {
 				ItemStatUtils.removeLore(item, i);
 			}
 		}
@@ -270,8 +270,8 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		MonumentaClasses mClasses = new MonumentaClasses();
 		List<AbilityInfo<?>> allAbilities = mClasses.mClasses.stream()
-			                                    .flatMap(x -> Stream.concat(x.mAbilities.stream(), Stream.concat(x.mSpecOne.mAbilities.stream(), x.mSpecTwo.mAbilities.stream())))
-			                                    .toList();
+			.flatMap(x -> Stream.concat(x.mAbilities.stream(), Stream.concat(x.mSpecOne.mAbilities.stream(), x.mSpecTwo.mAbilities.stream())))
+			.toList();
 		for (AbilityInfo<?> reference : allAbilities) {
 			if (reference.getDisplayName() != null && reference.getScoreboard() != null) {
 				int value = ScoreboardUtils.getScoreboardValue(player, reference.getScoreboard()).orElse(0);
@@ -342,8 +342,8 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		MonumentaClasses classes = new MonumentaClasses();
 		List<AbilityInfo<?>> allAbilities = classes.mClasses.stream()
-			                                    .flatMap(c -> Stream.concat(c.mAbilities.stream(), Stream.concat(c.mSpecOne.mAbilities.stream(), c.mSpecTwo.mAbilities.stream())))
-			                                    .toList();
+			.flatMap(c -> Stream.concat(c.mAbilities.stream(), Stream.concat(c.mSpecOne.mAbilities.stream(), c.mSpecTwo.mAbilities.stream())))
+			.toList();
 		/* Remove all the player's current skills */
 		for (AbilityInfo<?> reference : allAbilities) {
 			if (reference.getScoreboard() != null) {
@@ -352,13 +352,13 @@ public class YellowTesseractOverride extends BaseOverride {
 		}
 
 		PlayerClass mc = classes.mClasses.stream()
-			                 .filter(c -> c.mClass == classId)
-			                 .findFirst()
-			                 .orElse(null);
+			.filter(c -> c.mClass == classId)
+			.findFirst()
+			.orElse(null);
 		PlayerSpec spec = mc == null ? null : Stream.of(mc.mSpecOne, mc.mSpecTwo)
-			                                      .filter(s -> s.mSpecialization == specId)
-			                                      .findFirst()
-			                                      .orElse(null);
+			.filter(s -> s.mSpecialization == specId)
+			.findFirst()
+			.orElse(null);
 
 		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME, mc != null ? mc.mClass : 0);
 		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME, spec != null ? spec.mSpecialization : 0);

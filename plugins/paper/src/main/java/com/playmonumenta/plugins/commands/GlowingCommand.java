@@ -81,7 +81,7 @@ public class GlowingCommand {
 		INVISIBLE("invisible entities", 4) {
 			@Override
 			boolean appliesTo(Player player, Entity entity) {
-				return entity instanceof LivingEntity && ((LivingEntity) entity).isInvisible();
+				return entity instanceof LivingEntity && entity.isInvisible();
 			}
 		},
 		ITEMS("items", 7) {
@@ -101,7 +101,7 @@ public class GlowingCommand {
 		};
 
 		private final String mDescription;
-		private final int mPackedIndex;
+		public final int mPackedIndex;
 
 		Option(String description, int packedIndex) {
 			if (packedIndex >= 32) {
@@ -122,14 +122,14 @@ public class GlowingCommand {
 	public static void register() {
 
 		new CommandAPICommand(COMMAND)
-				.withPermission(PERMISSION)
-				.withArguments(
-						new LiteralArgument("show-config")
-				)
-				.executesPlayer((player, args) -> {
-					showConfig(player, true);
-				})
-				.register();
+			.withPermission(PERMISSION)
+			.withArguments(
+				new LiteralArgument("show-config")
+			)
+			.executesPlayer((player, args) -> {
+				showConfig(player, true);
+			})
+			.register();
 
 		// enable/disable option can take a variable amount of options as arguments
 		String[] optionLiterals = Arrays.stream(Option.values()).map(o -> o.name().toLowerCase(Locale.ROOT)).toArray(String[]::new);
@@ -139,29 +139,29 @@ public class GlowingCommand {
 		for (int i = 0; i < optionLiterals.length - 2; i++) { // -1 for "all", and another -1 because listing every single option makes no sense
 			if (i != 0) {
 				arguments.add(new StringArgument("option" + (i + 1)).replaceSuggestions(ArgumentSuggestions.strings(info -> Arrays.stream(optionLiterals)
-						.filter(o -> !o.equals(Option.ALL.name().toLowerCase(Locale.ROOT)) && !info.currentInput().contains(o))
-						.toArray(String[]::new))));
+					.filter(o -> !o.equals(Option.ALL.name().toLowerCase(Locale.ROOT)) && !info.currentInput().contains(o))
+					.toArray(String[]::new))));
 			}
 
 			new CommandAPICommand(COMMAND)
-					.withPermission(PERMISSION)
-					.withArguments(arguments)
-					.executesPlayer((player, args) -> {
-						setOptions(player, Arrays.copyOfRange(args.args(), 1, args.count()), args.getUnchecked("action"));
-					})
-					.register();
+				.withPermission(PERMISSION)
+				.withArguments(arguments)
+				.executesPlayer((player, args) -> {
+					setOptions(player, Arrays.copyOfRange(args.args(), 1, args.count()), args.getUnchecked("action"));
+				})
+				.register();
 
 		}
 
 		new CommandAPICommand(COMMAND)
-				.withPermission(PERMISSION)
-				.withArguments(
-						new LiteralArgument("help")
-				)
-				.executesPlayer((player, args) -> {
-					showHelp(player);
-				})
-				.register();
+			.withPermission(PERMISSION)
+			.withArguments(
+				new LiteralArgument("help")
+			)
+			.executesPlayer((player, args) -> {
+				showHelp(player);
+			})
+			.register();
 
 	}
 
@@ -208,7 +208,7 @@ public class GlowingCommand {
 		int viewDistance = Bukkit.getServer().getViewDistance() * 16;
 		player.getWorld().getNearbyEntities(player.getLocation(), viewDistance, viewDistance, viewDistance,
 			e -> (e.isGlowing() || (e instanceof LivingEntity le && le.hasPotionEffect(PotionEffectType.GLOWING)))
-				     && e.getTrackedBy().contains(player)).forEach(e -> GlowingReplacer.resendEntityMetadataFlags(e, player));
+				&& e.getTrackedBy().contains(player)).forEach(e -> GlowingReplacer.resendEntityMetadataFlags(e, player));
 
 		player.sendMessage(Component.text("Glowing " + operation + "d"
 			+ " for " + StringUtils.join(options, ", ") + ". Your new options are:", NamedTextColor.GOLD));
@@ -250,8 +250,8 @@ public class GlowingCommand {
 	public static boolean isGlowingEnabled(Player player, int scoreboardValue, Entity entity) {
 		for (Option option : Option.values()) {
 			if (option != Option.ALL
-				    && option.appliesTo(player, entity)
-				    && isOptionEnabled(scoreboardValue, option)) {
+				&& option.appliesTo(player, entity)
+				&& isOptionEnabled(scoreboardValue, option)) {
 				return true;
 			}
 		}

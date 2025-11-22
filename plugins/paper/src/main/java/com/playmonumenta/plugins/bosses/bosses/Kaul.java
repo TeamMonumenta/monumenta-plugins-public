@@ -279,9 +279,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		});
 		SpellConditionalTeleport conditionalTeleport = new SpellConditionalTeleport(mBoss, spawnLoc,
 			b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-			  || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-			  || b.getLocation().getBlock().getType() == Material.LAVA
-			  || b.getLocation().getBlock().getType() == Material.WATER);
+				|| b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+				|| b.getLocation().getBlock().getType() == Material.LAVA
+				|| b.getLocation().getBlock().getType() == Material.WATER);
 
 		List<Spell> phase1PassiveSpells = Arrays.asList(
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_1, false, mShrineMarker.getLocation()),
@@ -393,8 +393,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 										for (Block block : LocationUtils.getEdge(loc.clone().subtract(mT, 0, mT),
 											loc.clone().add(mT, 0, mT))) {
 											if (FastUtils.RANDOM.nextInt(6) == 1 && block.getType() == Material.SMOOTH_SANDSTONE
-												    && block.getLocation().add(0, 1.5, 0).getBlock()
-													       .getType() == Material.AIR) {
+												&& block.getLocation().add(0, 1.5, 0).getBlock()
+												.getType() == Material.AIR) {
 												block.setType(Material.SMOOTH_RED_SANDSTONE);
 											}
 										}
@@ -543,9 +543,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					List<ArmorStand> points = new ArrayList<>();
 					for (ArmorStand e : mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, detectionRange, detectionRange, detectionRange)) {
 						if (e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)
-							     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)
-							     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)
-							     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) {
+							|| e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)
+							|| e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)
+							|| e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) {
 							points.add(e);
 						}
 					}
@@ -882,7 +882,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 								teleport(mSpawnLoc);
 								List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-								if (players.size() > 0) {
+								if (!players.isEmpty()) {
 									Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
 									((Mob) mBoss).setTarget(newTarget);
 								}
@@ -902,7 +902,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			return;
 		}
 		mDefeated = true;
-		String[] dio = new String[] {
+		String[] dio = new String[]{
 			"AS ALL RETURNS TO ROT, SO TOO HAS THIS ECHO FALLEN.",
 			"DO NOT THINK THIS ABSOLVES YOUR BLASPHEMY. RETURN HERE AGAIN, AND YOU WILL PERISH.",
 			"NOW... THE JUNGLE... MUST SLEEP..."
@@ -1038,8 +1038,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
 				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
-				String[] dio = new String[] {
-					"THE JUNGLE'S WILL IS UNASSAILABLE, YET YOU SCURRY ACROSS MY SHRINE LIKE ANTS.",
+				String[] dio = new String[]{
+					"THE JUNGLE'S WILL IS UNASSAILABLE, YET YOU SCURRY ACROSS MY SHRINE LIKE " + (mPlayerCount > 1 ? "ANTS." : "AN ANT."),
 					"IS THE DEFILEMENT OF THE DREAM NOT ENOUGH!?"
 				};
 
@@ -1162,9 +1162,9 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					return;
 				}
 				getArenaParticipants().forEach(p -> {
-					 if (mHs.contains(p.getUniqueId()) && !hasFedora(p)) {
+					if (mHs.contains(p.getUniqueId()) && !hasFedora(p)) {
 						mHs.remove(p.getUniqueId());
-					 }
+					}
 				});
 			}
 
@@ -1185,7 +1185,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			@Override
 			void onTick() {
 				mTick++;
-				if (mTick % 10 == 0 && getArenaParticipantsY(ARENA_MAX_Y, 256).size() >= 15) {
+				if (mTick % 10 == 0 && getArenaParticipantsY(ARENA_MAX_Y, 256).size() >= 10) {
 					getArenaParticipants().forEach(p -> AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/celebrity"));
 				}
 			}
@@ -1225,40 +1225,40 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 		// Vanilla
 		new KaulAdvancementHandler() {
-		final HashSet<UUID> mHs = new HashSet<>();
-		int mTick = 0;
+			final HashSet<UUID> mHs = new HashSet<>();
+			int mTick = 0;
 
-		@Override
-		void onBossSpawn() {
-			getArenaParticipants().forEach(p -> {
-				if (AbilityUtils.isClassless(p)) {
-					mHs.add(p.getUniqueId());
-				}
-			});
-		}
-
-		@Override
-		void onTick() {
-			mTick++;
-			if (mTick % 10 != 0) {
-				return;
+			@Override
+			void onBossSpawn() {
+				getArenaParticipants().forEach(p -> {
+					if (AbilityUtils.isClassless(p)) {
+						mHs.add(p.getUniqueId());
+					}
+				});
 			}
-			getArenaParticipants().forEach(p -> {
-				if (mHs.contains(p.getUniqueId()) && !AbilityUtils.isClassless(p)) {
-					mHs.remove(p.getUniqueId());
-				}
-			});
-		}
 
-		@Override
-		void onBossDeath() {
-			getArenaParticipants().forEach(p -> {
-				if (mHs.contains(p.getUniqueId()) && AbilityUtils.isClassless(p)) {
-					AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/vanilla");
+			@Override
+			void onTick() {
+				mTick++;
+				if (mTick % 10 != 0) {
+					return;
 				}
-			});
-		}
-	});
+				getArenaParticipants().forEach(p -> {
+					if (mHs.contains(p.getUniqueId()) && !AbilityUtils.isClassless(p)) {
+						mHs.remove(p.getUniqueId());
+					}
+				});
+			}
+
+			@Override
+			void onBossDeath() {
+				getArenaParticipants().forEach(p -> {
+					if (mHs.contains(p.getUniqueId()) && AbilityUtils.isClassless(p)) {
+						AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/vanilla");
+					}
+				});
+			}
+		});
 
 	private static class KaulAdvancementHandler {
 		void onBossSpawn() {

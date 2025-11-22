@@ -16,7 +16,9 @@ public enum GuildAccessLevel {
 	MANAGER("manager", "manager", "Manager"),
 	MEMBER("member", "member", "Member"),
 	GUEST("guest", "guest", "Guest"),
-	NONE("none", "kick", "Not in Guild");
+	NONE("none", "kick", "Not in Guild"),
+	BLOCKED("blocked", "block", "Blocked"),
+	;
 
 	public final String mId;
 	public final String mArgument;
@@ -78,8 +80,9 @@ public enum GuildAccessLevel {
 
 	/**
 	 * Updates the access level of a player for a guild
-	 * @param target The player whose access level is being updated
-	 * @param guild The guild for which that player's access level is being updated
+	 *
+	 * @param target      The player whose access level is being updated
+	 * @param guild       The guild for which that player's access level is being updated
 	 * @param targetLevel The desired access level for that player in that guild
 	 * @return A future for the User object for the target user
 	 */
@@ -115,6 +118,7 @@ public enum GuildAccessLevel {
 				if (NONE.equals(targetLevel)) {
 					LuckPermsIntegration.pushUserUpdate(target);
 					future.complete(target);
+					return;
 				}
 
 				Group targetGroup = targetLevel.loadGroupFromRoot(guild).join().orElse(null);

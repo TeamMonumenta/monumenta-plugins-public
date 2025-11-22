@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import com.playmonumenta.plugins.itemstats.enchantments.Steadfast;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import org.bukkit.entity.Entity;
@@ -36,8 +37,8 @@ public class Armor implements Attribute {
 		if (value > 0 && event.getType().isDefendable()) {
 			boolean adaptability = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADAPTABILITY) > 0;
 			double damageMultiplier = getDamageMultiplier(value, getSecondaryEnchantsMod(event, plugin, player),
-				plugin.mItemStatManager.getAttributeAmount(player, AttributeType.AGILITY), Agility.getSecondaryEnchantsMod(event, plugin, player),
-				getSecondaryEnchantCap(player), adaptability, 0, event.getType().isEnvironmental());
+				plugin.mItemStatManager.getAttributeAmount(player, AttributeType.AGILITY), Agility.getSecondaryEnchantsLevel(event, plugin, player),
+				getSecondaryEnchantCap(player), getSecondaryEHPMultiplier(player), adaptability, 0, event.getType().isEnvironmental());
 			event.setFlatDamage(event.getDamage() * damageMultiplier);
 		}
 	}
@@ -45,31 +46,35 @@ public class Armor implements Attribute {
 	/**
 	 * Calculates the amount to multiply incoming damage with for the given values of armor, agility, etc.
 	 *
-	 * @param armor         Total armor value
-	 * @param armorMods     Total secondary armor enchantment modifier, see {@link #getSecondaryEnchantsMod(DamageEvent, Plugin, Player)}
-	 * @param agility       Total agility value
-	 * @param agilityMods   Total secondary agility enchantment modifier, see {@link Agility#getSecondaryEnchantsMod(DamageEvent, Plugin, Player)}
-	 * @param adaptability  Whether the {@link Adaptability} enchantment is present
-	 * @param epf           EPF from protection enchantments
-	 * @param environmental Whether the damage is environmental
+	 * @param armor               Total armor value
+	 * @param armorEnchantLevel   Total secondary armor enchantment level, see {@link #getSecondaryEnchantsMod(DamageEvent, Plugin, Player)}
+	 * @param agility             Total agility value
+	 * @param agilityEnchantLevel Total secondary agility enchantment level, see {@link Agility#getSecondaryEnchantsLevel(DamageEvent, Plugin, Player)}
+	 * @param adaptability        Whether the {@link Adaptability} enchantment is present
+	 * @param epf                 EPF from protection enchantments
+	 * @param environmental       Whether the damage is environmental
 	 * @return Damage multiplier
 	 */
-	public static double getDamageMultiplier(double armor, double armorMods, double agility, double agilityMods, double secondaryEnchantsCap, boolean adaptability, double epf, boolean environmental) {
+	public static double getDamageMultiplier(double armor, double armorEnchantLevel, double agility, double agilityEnchantLevel, double secondaryEnchantsCap, double secondaryEHPMultiplierPerLevel, boolean adaptability, double epf, boolean environmental) {
 		double armorValueMod = 0;
 		double agilityValueMod = 0;
 		if (adaptability) {
 			if (armor > agility) {
-				armorValueMod = armorMods + agilityMods;
+				armorValueMod = armorEnchantLevel + agilityEnchantLevel;
 			} else {
-				agilityValueMod = armorMods + agilityMods;
+				agilityValueMod = armorEnchantLevel + agilityEnchantLevel;
 			}
 		} else {
-			armorValueMod = armorMods;
-			agilityValueMod = agilityMods;
+			armorValueMod = armorEnchantLevel;
+			agilityValueMod = agilityEnchantLevel;
 		}
 
-		double armorBonus = Math.min(armor, secondaryEnchantsCap) * armorValueMod;
-		double agilityBonus = Math.min(agility, secondaryEnchantsCap) * agilityValueMod;
+		// Apply caps of 20 / 30 / 36 BEFORE the log formula to get correct percentages
+		armorValueMod *= Math.min(armor, secondaryEnchantsCap) / secondaryEnchantsCap;
+		agilityValueMod *= Math.min(agility, secondaryEnchantsCap) / secondaryEnchantsCap;
+
+		double armorBonus = Math.log(1 + secondaryEHPMultiplierPerLevel * armorValueMod) / Math.log(25.0 / 24.0);
+		double agilityBonus = Math.log(1 + secondaryEHPMultiplierPerLevel * agilityValueMod) / Math.log(25.0 / 24.0);
 
 		return DamageUtils.getDamageMultiplier(armor + armorBonus, agility + agilityBonus, epf, environmental);
 	}
@@ -79,11 +84,19 @@ public class Armor implements Attribute {
 	 * Any additional points will still provide defense, but won't be affected by secondary enchants.
 	 */
 	public static double getSecondaryEnchantCap(Player player) {
-		return getSecondaryEnchantCap(ServerProperties.getClassSpecializationsEnabled(player));
+		return getSecondaryEnchantCap(ServerProperties.getRegion(player));
 	}
 
-	public static double getSecondaryEnchantCap(boolean region2) {
-		return region2 ? 30 : 20;
+	public static double getSecondaryEnchantCap(Region region) {
+		return region == Region.RING ? 36 : region == Region.ISLES ? 30 : 20;
+	}
+
+	public static double getSecondaryEHPMultiplier(Player player) {
+		return getSecondaryEHPMultiplier(ServerProperties.getRegion(player));
+	}
+
+	public static double getSecondaryEHPMultiplier(Region region) {
+		return region == Region.RING ? 0.3 : region == Region.ISLES ? 0.25 : 0.2;
 	}
 
 	/**
@@ -91,10 +104,10 @@ public class Armor implements Attribute {
 	 */
 	public static double getSecondaryEnchantsMod(DamageEvent event, Plugin plugin, Player player) {
 		return Shielding.applyShielding(event, plugin, player)
-			       + Inure.applyInure(event, plugin, player)
-			       + Steadfast.applySteadfast(event, plugin, player)
-			       + Poise.applyPoise(event, plugin, player)
-			       + Guard.applyGuard(event, plugin, player);
+			+ Inure.applyInure(event, plugin, player)
+			+ Steadfast.applySteadfast(event, plugin, player)
+			+ Poise.applyPoise(event, plugin, player)
+			+ Guard.applyGuard(event, plugin, player);
 	}
 
 }

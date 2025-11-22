@@ -48,7 +48,7 @@ public class KnickKnackSackGui extends Gui {
 
 	private static final Talisman[] DEPTHS_TALISMAN_LIST = {
 		// Dawnbringer talisman
-		 new Talisman(
+		new Talisman(
 			"Dawnbringer",
 			"epic:r2/depths/utility/dawnbringer_talisman",
 			"DDT1Purchased",
@@ -196,11 +196,11 @@ public class KnickKnackSackGui extends Gui {
 	protected void setup() {
 		setTitle(mPage.mTitle);
 		switch (mPage) {
-			default -> setupTrinketPage1();
 			case DEPTHS_TALISMANS -> setupTalismansPage(false, false);
 			case DEPTHS_REFUNDS -> setupTalismansPage(true, false);
 			case ZENITH_TALISMANS -> setupTalismansPage(false, true);
 			case CONTRACT_CONFIRM_DELETE -> setupContractConfirmDelete();
+			default -> setupTrinketPage1();
 		}
 	}
 
@@ -383,10 +383,6 @@ public class KnickKnackSackGui extends Gui {
 				}
 
 				switch (evt.getClick()) {
-					default -> {
-						// Swap experience
-						runConsoleCommand("execute as @S in minecraft:overworld run function monumenta:mechanisms/contract/swap");
-					}
 					case SHIFT_LEFT -> {
 						// Check experience
 						runFunction("monumenta:mechanisms/contract/check");
@@ -395,6 +391,10 @@ public class KnickKnackSackGui extends Gui {
 						// Clear stored experience
 						mPage = Page.CONTRACT_CONFIRM_DELETE;
 						update();
+					}
+					default -> {
+						// Swap experience
+						runConsoleCommand("execute as @S in minecraft:overworld run function monumenta:mechanisms/contract/swap");
 					}
 				}
 			});

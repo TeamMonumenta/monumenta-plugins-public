@@ -62,8 +62,8 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new GuildDisplayBoss.Parameters());
 		int period = (int) (p.WIDTH * 20) + 2;
 		for (Entity e : boss.getLocation().getWorld().getNearbyEntities(
-				new BoundingBox(p.X_OFFSET + p.WIDTH + EXTRA, p.Y_OFFSET - EXTRA, p.Z_OFFSET + p.WIDTH + EXTRA,
-						p.X_OFFSET - p.WIDTH - EXTRA, p.Y_OFFSET + p.HEIGHT + EXTRA, p.Z_OFFSET - p.WIDTH - EXTRA))) {
+			new BoundingBox(p.X_OFFSET + p.WIDTH + EXTRA, p.Y_OFFSET - EXTRA, p.Z_OFFSET + p.WIDTH + EXTRA,
+				p.X_OFFSET - p.WIDTH - EXTRA, p.Y_OFFSET + p.HEIGHT + EXTRA, p.Z_OFFSET - p.WIDTH - EXTRA))) {
 			if ((e instanceof ItemDisplay || e instanceof TextDisplay) && e.getScoreboardTags().contains(scoreboardTag)) {
 				e.remove();
 			}
@@ -223,8 +223,8 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 
 	@Override
 	public void unload() {
-		for (Pair pa : mPairs) {
-			pa.delete();
-		}
+		// Would really like to remove the entities here, but removal isn't allowed during chunk unloading
+		// Instead just clear the list, the entities have REMOVE_ON_UNLOAD tag so they'll be removed when the chunk loads next
+		mPairs.clear();
 	}
 }

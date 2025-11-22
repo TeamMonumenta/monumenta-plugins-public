@@ -159,8 +159,8 @@ public class HeadlessHorsemanBoss extends SerializedLocationBossAbilityGroup {
 			new SpellConditionalTeleport(mBoss, spawnLoc, b -> spawnLoc.distance(b.getLocation()) > 80),
 			// Teleport the boss to spawnLoc if he is stuck in bedrock
 			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
-				                                                   b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
-				                                                   b.getLocation().getBlock().getType() == Material.LAVA),
+				b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
+				b.getLocation().getBlock().getType() == Material.LAVA),
 			new SpellPhantomOfTheOpera(plugin, boss, mSpawnLoc, detectionRange, 20 * 60),
 			new SpellShieldStun(30 * 20),
 			new SpellRemoveLevitation(mBoss)

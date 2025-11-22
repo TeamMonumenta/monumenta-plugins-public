@@ -30,7 +30,7 @@ public class TrapdoorOverride extends UnbreakableOnBedrockOverride {
 		}
 		Location loc = block.getLocation();
 		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BIG_DOOR_DOWN_CW)
-				|| ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BIG_DOOR_DOWN_CCW)) {
+			|| ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BIG_DOOR_DOWN_CCW)) {
 			toggleBigDoor(player, block);
 			return false;
 		}
@@ -56,8 +56,8 @@ public class TrapdoorOverride extends UnbreakableOnBedrockOverride {
 		}
 
 		// Get the full door's structure
-		int centerX = (int)loc.getX();
-		int centerZ = (int)loc.getZ();
+		int centerX = (int) loc.getX();
+		int centerZ = (int) loc.getZ();
 		Set<Block> currentDoorBlocks = new HashSet<>();
 		Set<Block> visitedDoorBlocks = new HashSet<>();
 		Set<Block> possibleDoorBlocks = new HashSet<>();
@@ -69,10 +69,9 @@ public class TrapdoorOverride extends UnbreakableOnBedrockOverride {
 			visitedDoorBlocks.add(possibleDoorBlock);
 
 			BlockData blockData = possibleDoorBlock.getBlockData();
-			if (!(blockData instanceof TrapDoor)) {
+			if (!(blockData instanceof TrapDoor trapDoorData)) {
 				continue;
 			}
-			TrapDoor trapDoorData = (TrapDoor) blockData;
 			if (!clickedHalf.equals(trapDoorData.getHalf())) {
 				continue;
 			}
@@ -93,9 +92,9 @@ public class TrapdoorOverride extends UnbreakableOnBedrockOverride {
 
 			currentDoorBlocks.add(possibleDoorBlock);
 
-			int x = (int)doorBlockLoc.getX();
-			int y = (int)doorBlockLoc.getY();
-			int z = (int)doorBlockLoc.getZ();
+			int x = (int) doorBlockLoc.getX();
+			int y = (int) doorBlockLoc.getY();
+			int z = (int) doorBlockLoc.getZ();
 			Block newPossibleDoorBlock;
 			if (clickedAlongX) {
 				if (clickedCenterPositive) {
@@ -153,9 +152,9 @@ public class TrapdoorOverride extends UnbreakableOnBedrockOverride {
 		// Check the door is able to toggle state without destroying blocks
 		for (Block doorBlock : currentDoorBlocks) {
 			Location doorBlockLoc = doorBlock.getLocation();
-			int newY = ((int)doorBlockLoc.getY());
-			int newX = ((int)doorBlockLoc.getZ() - centerZ) * (rotateClockwise ? -1 : 1) + centerX;
-			int newZ = ((int)doorBlockLoc.getX() - centerX) * (rotateClockwise ? 1 : -1) + centerZ;
+			int newY = ((int) doorBlockLoc.getY());
+			int newX = ((int) doorBlockLoc.getZ() - centerZ) * (rotateClockwise ? -1 : 1) + centerX;
+			int newZ = ((int) doorBlockLoc.getX() - centerX) * (rotateClockwise ? 1 : -1) + centerZ;
 			Block destBlock = loc.getWorld().getBlockAt(newX, newY, newZ);
 			if (player.getGameMode() == GameMode.CREATIVE) {
 				markPos(destBlock.getLocation());
@@ -178,10 +177,10 @@ public class TrapdoorOverride extends UnbreakableOnBedrockOverride {
 		// Move the door
 		for (Block srcBlock : currentDoorBlocks) {
 			Location srcBlockLoc = srcBlock.getLocation();
-			int newY = ((int)srcBlockLoc.getY());
-			int newX = ((int)srcBlockLoc.getZ() - centerZ) * (rotateClockwise ? -1 : 1) + centerX;
-			int newZ = ((int)srcBlockLoc.getX() - centerX) * (rotateClockwise ? 1 : -1) + centerZ;
-			TrapDoor srcState = (TrapDoor)srcBlock.getBlockData();
+			int newY = ((int) srcBlockLoc.getY());
+			int newX = ((int) srcBlockLoc.getZ() - centerZ) * (rotateClockwise ? -1 : 1) + centerX;
+			int newZ = ((int) srcBlockLoc.getX() - centerX) * (rotateClockwise ? 1 : -1) + centerZ;
+			TrapDoor srcState = (TrapDoor) srcBlock.getBlockData();
 
 			if (Half.TOP.equals(clickedHalf)) {
 				srcState.setHalf(Half.BOTTOM);
@@ -190,31 +189,31 @@ public class TrapdoorOverride extends UnbreakableOnBedrockOverride {
 			}
 			if (rotateClockwise) {
 				switch (clickedFacing) {
-				case NORTH:
-					srcState.setFacing(BlockFace.WEST);
-					break;
-				case EAST:
-					srcState.setFacing(BlockFace.NORTH);
-					break;
-				case SOUTH:
-					srcState.setFacing(BlockFace.EAST);
-					break;
-				default:
-					srcState.setFacing(BlockFace.SOUTH);
+					case NORTH:
+						srcState.setFacing(BlockFace.WEST);
+						break;
+					case EAST:
+						srcState.setFacing(BlockFace.NORTH);
+						break;
+					case SOUTH:
+						srcState.setFacing(BlockFace.EAST);
+						break;
+					default:
+						srcState.setFacing(BlockFace.SOUTH);
 				}
 			} else {
 				switch (clickedFacing) {
-				case NORTH:
-					srcState.setFacing(BlockFace.EAST);
-					break;
-				case EAST:
-					srcState.setFacing(BlockFace.SOUTH);
-					break;
-				case SOUTH:
-					srcState.setFacing(BlockFace.WEST);
-					break;
-				default:
-					srcState.setFacing(BlockFace.NORTH);
+					case NORTH:
+						srcState.setFacing(BlockFace.EAST);
+						break;
+					case EAST:
+						srcState.setFacing(BlockFace.SOUTH);
+						break;
+					case SOUTH:
+						srcState.setFacing(BlockFace.WEST);
+						break;
+					default:
+						srcState.setFacing(BlockFace.NORTH);
 				}
 			}
 

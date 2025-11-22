@@ -46,7 +46,7 @@ public class SpellIvyGarden extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return mPlants.values().size() > 0;
+		return !mPlants.isEmpty();
 	}
 
 	@Override
@@ -55,41 +55,41 @@ public class SpellIvyGarden extends Spell {
 		for (LivingEntity le : mPlants.values()) {
 			if (le != null && !le.isDead()) {
 				runForce(mPlugin, le, mRadius, mTime, mCooldownTicks, false, false, Sound.ENTITY_IRON_GOLEM_ATTACK, 1f, 1,
-						(Location loc) -> new PartialParticle(Particle.SMOKE_LARGE, loc, 1, ((double) mRadius) / 2, ((double) mRadius) / 2, ((double) mRadius) / 2, 0.05).spawnAsEntityActive(le),
-						(Location loc) -> new PartialParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(le),
-						(Location loc) -> {
-							World world = loc.getWorld();
-							world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1.5f, 0.65f);
-							world.playSound(loc, Sound.ENTITY_GHAST_SHOOT, SoundCategory.HOSTILE, 1f, 0.5f);
-							world.playSound(loc, Sound.ENTITY_GUARDIAN_HURT, SoundCategory.HOSTILE, 1f, 0.8f);
-							new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 0.5, 0), 100, 0.5, 0, 0.5, 0.8f).spawnAsEntityActive(le);
-						},
-						(Location loc) -> {
-							new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(le);
-							new PartialParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(le);
-						},
-						(Location loc) -> {
-							for (Player player : PlayerUtils.playersInRange(le.getLocation(), mRadius, true)) {
+					(Location loc) -> new PartialParticle(Particle.SMOKE_LARGE, loc, 1, ((double) mRadius) / 2, ((double) mRadius) / 2, ((double) mRadius) / 2, 0.05).spawnAsEntityActive(le),
+					(Location loc) -> new PartialParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(le),
+					(Location loc) -> {
+						World world = loc.getWorld();
+						world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1.5f, 0.65f);
+						world.playSound(loc, Sound.ENTITY_GHAST_SHOOT, SoundCategory.HOSTILE, 1f, 0.5f);
+						world.playSound(loc, Sound.ENTITY_GUARDIAN_HURT, SoundCategory.HOSTILE, 1f, 0.8f);
+						new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 0.5, 0), 100, 0.5, 0, 0.5, 0.8f).spawnAsEntityActive(le);
+					},
+					(Location loc) -> {
+						new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(le);
+						new PartialParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(le);
+					},
+					(Location loc) -> {
+						for (Player player : PlayerUtils.playersInRange(le.getLocation(), mRadius, true)) {
 
-								double distance = player.getLocation().distance(loc);
-								if (distance < mRadius / 3.0) {
-									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
-										new PercentSpeed(SLOWNESS_DURATION, -0.5, SLOWNESS_SRC));
-									MovementUtils.knockAway(le, player, 3.0f, false);
-								} else if (distance < (mRadius * 2.0) / 3.0) {
-									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
-										new PercentSpeed(SLOWNESS_DURATION, -0.3, SLOWNESS_SRC));
-									MovementUtils.knockAway(le, player, 2.1f, false);
-								} else if (distance < mRadius) {
-									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
-										new PercentSpeed(SLOWNESS_DURATION, -0.1, SLOWNESS_SRC));
-									MovementUtils.knockAway(le, player, 1.2f, false);
-								}
-								BossUtils.blockableDamage(le, player, DamageType.MAGIC, DAMAGE, "Ivy Garden", le.getLocation());
-
-								new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0).spawnAsEntityActive(le);
+							double distance = player.getLocation().distance(loc);
+							if (distance < mRadius / 3.0) {
+								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+									new PercentSpeed(SLOWNESS_DURATION, -0.5, SLOWNESS_SRC));
+								MovementUtils.knockAway(le, player, 3.0f, false);
+							} else if (distance < (mRadius * 2.0) / 3.0) {
+								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+									new PercentSpeed(SLOWNESS_DURATION, -0.3, SLOWNESS_SRC));
+								MovementUtils.knockAway(le, player, 2.1f, false);
+							} else if (distance < mRadius) {
+								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+									new PercentSpeed(SLOWNESS_DURATION, -0.1, SLOWNESS_SRC));
+								MovementUtils.knockAway(le, player, 1.2f, false);
 							}
-						});
+							BossUtils.blockableDamage(le, player, DamageType.MAGIC, DAMAGE, "Ivy Garden", le.getLocation());
+
+							new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0).spawnAsEntityActive(le);
+						}
+					});
 				//Resistance
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(le, PercentDamageReceived.GENERIC_NAME,
 					new PercentDamageReceived(100, -0.6));

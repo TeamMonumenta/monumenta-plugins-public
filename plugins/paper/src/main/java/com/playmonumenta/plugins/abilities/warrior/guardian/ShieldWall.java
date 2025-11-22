@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.ShieldWallCS;
@@ -19,7 +21,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,39 +54,24 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	public static final String CHARM_HEIGHT = "Shield Wall Height";
 	public static final String CHARM_RADIUS = "Shield Wall Radius";
 
+	private static final AbilityTriggerInfo.TriggerRestriction RESTRICTION = new AbilityTriggerInfo.TriggerRestriction("holding a shield in either hand",
+		player -> player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD);
+
 	public static final AbilityInfo<ShieldWall> INFO =
-			new AbilityInfo<>(ShieldWall.class, "Shield Wall", ShieldWall::new)
-					.linkedSpell(ClassAbility.SHIELD_WALL)
-					.scoreboardId("ShieldWall")
-					.shorthandName("SW")
-					.descriptions(
-							String.format("Press the swap key while holding a shield in either hand to create a %s degree arc of particles from 1 block below to %s blocks above the user's location and with a %s block radius in front of the user. " +
-											"Enemies that pass through the wall are dealt %s melee damage and knocked back. The wall also blocks all enemy projectiles such as arrows or fireballs. The wall lasts %s seconds. The wall moves along with the user. Triggering again while active makes the wall stationary at the same location for the remainder of the duration, with radius increased to %s blocks. Cooldown: %ss.",
-									SHIELD_WALL_ANGLE,
-									SHIELD_WALL_HEIGHT,
-									SHIELD_WALL_RADIUS,
-									SHIELD_WALL_DAMAGE,
-									StringUtils.ticksToSeconds(SHIELD_WALL_1_DURATION),
-									SHIELD_WALL_RADIUS_STATIONARY,
-									StringUtils.ticksToSeconds(SHIELD_WALL_1_COOLDOWN)
-							),
-							String.format("The shield lasts %s seconds instead. Cooldown: %ss.",
-									StringUtils.ticksToSeconds(SHIELD_WALL_2_DURATION),
-									StringUtils.ticksToSeconds(SHIELD_WALL_2_COOLDOWN)
-							)
-					)
-					.simpleDescription("Deploy a wall that can block projectiles and mobs from entering.")
-					.cooldown(SHIELD_WALL_1_COOLDOWN, SHIELD_WALL_2_COOLDOWN, CHARM_COOLDOWN)
-					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", shieldWall -> shieldWall.cast(false), new AbilityTrigger(AbilityTrigger.Key.SWAP),
-							new AbilityTriggerInfo.TriggerRestriction("holding a shield in either hand",
-									player -> player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD)))
-					.addTrigger(new AbilityTriggerInfo<>("caststationary", "cast stationary", shieldWall -> shieldWall.cast(true), new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false),
-							new AbilityTriggerInfo.TriggerRestriction("holding a shield in either hand",
-								player -> player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD)))
-					.displayItem(Material.STONE_BRICK_WALL);
+		new AbilityInfo<>(ShieldWall.class, "Shield Wall", ShieldWall::new)
+			.linkedSpell(ClassAbility.SHIELD_WALL)
+			.scoreboardId("ShieldWall")
+			.shorthandName("SW")
+			.descriptions(getDescription1(), getDescription2())
+			.simpleDescription("Deploy a wall that can block projectiles and mobs from entering.")
+			.cooldown(SHIELD_WALL_1_COOLDOWN, SHIELD_WALL_2_COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", "Moves after being cast, recasting will make it stationary.", shieldWall -> shieldWall.cast(false, true), new AbilityTrigger(AbilityTrigger.Key.SWAP), RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("castmoving", "cast moving", "Moves after being cast, does nothing when recast.", shieldWall -> shieldWall.cast(false, false), new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false), RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("caststationary", "cast stationary", "Will never move when cast. If cast with a different trigger, using this trigger will make it stationary.", shieldWall -> shieldWall.cast(true, true), new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false), RESTRICTION))
+			.displayItem(Material.STONE_BRICK_WALL);
 
 	private final int mDuration;
-	private final int mHeight;
+	private final double mHeight;
 	private final float mKnockback;
 	private final double mDamage;
 	private final double mAngle;
@@ -100,7 +86,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	public ShieldWall(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, (isLevelOne() ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION));
-		mHeight = SHIELD_WALL_HEIGHT + (int) CharmManager.getLevel(mPlayer, CHARM_HEIGHT);
+		mHeight = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEIGHT, SHIELD_WALL_HEIGHT);
 		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, SHIELD_WALL_KNOCKBACK);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_WALL_DAMAGE);
 		mAngle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, SHIELD_WALL_ANGLE);
@@ -109,9 +95,9 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldWallCS());
 	}
 
-	public boolean cast(boolean deposit) {
+	public boolean cast(boolean deposit, boolean canRecast) {
 		if (isOnCooldown()) {
-			if (mDeposited) {
+			if (mDeposited || !canRecast) {
 				return false;
 			}
 			mDeposited = true;
@@ -145,7 +131,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 
 				double radius = mDeposited ? mRadiusStationary : mRadius;
 
-				Hitbox hitbox = Hitbox.approximateHollowCylinderSegment(mLoc.clone().add(0, -1, 0), mHeight + 1, radius - 0.4, radius + 0.4, Math.toRadians(mAngle) / 2);
+				Hitbox hitbox = Hitbox.approximateHollowCylinderSegment(mLoc.clone().add(0, -1, 0), mHeight + 1, 0.7 * radius - 0.5, 1.15 * radius, Math.toRadians(mAngle) / 2);
 
 				mCosmetic.wallParticles(mPlayer, mLoc, radius, mAngle, mHeight);
 
@@ -174,7 +160,7 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 						}
 						mCosmetic.shieldOnHit(world, le.getLocation(), mPlayer, enteredWall ? 1 : 0.5f);
 						MovementUtils.knockAway(mLoc, le, mKnockback, y, true);
-						mPlugin.mEffectManager.addEffect(le, ON_HIT_EFFECT + mPlayer.getName(), new OnHitTimerEffect(5, 0));
+						mPlugin.mEffectManager.addEffect(le, ON_HIT_EFFECT + mPlayer.getName(), new OnHitTimerEffect(5));
 					}
 
 					mMobsAlreadyHit.add(le);
@@ -206,5 +192,32 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
+
+	private static Description<ShieldWall> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to create a ")
+			.add(a -> a.mAngle, SHIELD_WALL_ANGLE)
+			.add(" degree arc of particles from 1 block below to ")
+			.add(a -> a.mHeight, SHIELD_WALL_HEIGHT)
+			.add(" blocks above the user's location and with a ")
+			.add(a -> a.mRadius, SHIELD_WALL_RADIUS)
+			.add(" block radius in front of the user. Enemies that pass through the wall are dealt ")
+			.add(a -> a.mDamage, SHIELD_WALL_DAMAGE)
+			.add(" melee damage and knocked back. The wall also blocks all nonmagical enemy projectiles. The wall lasts ")
+			.addDuration(a -> a.mDuration, SHIELD_WALL_1_DURATION, false, Ability::isLevelOne)
+			.add(" seconds and moves along with the user. Triggering again while active makes the wall stationary at the same location for the remainder of the duration, with radius increased to ")
+			.add(a -> a.mRadiusStationary, SHIELD_WALL_RADIUS_STATIONARY)
+			.add(" blocks.")
+			.addCooldown(SHIELD_WALL_1_COOLDOWN, Ability::isLevelOne);
+	}
+
+	private static Description<ShieldWall> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("The shield wall lasts ")
+			.addDuration(a -> a.mDuration, SHIELD_WALL_2_DURATION, false, Ability::isLevelTwo)
+			.add(" seconds instead.")
+			.addCooldown(SHIELD_WALL_2_COOLDOWN, Ability::isLevelTwo);
 	}
 }

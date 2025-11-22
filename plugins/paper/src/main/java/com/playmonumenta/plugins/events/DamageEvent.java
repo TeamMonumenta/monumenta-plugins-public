@@ -1,16 +1,19 @@
 package com.playmonumenta.plugins.events;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.parameters.ParseResult;
-import com.playmonumenta.plugins.bosses.parameters.StringReader;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.listeners.AuditListener;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
-import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EvokerFangs;
@@ -34,6 +37,7 @@ public class DamageEvent extends Event implements Cancellable {
 		MELEE_ENCH(false, true, "Melee Enchantment"),
 		PROJECTILE(false, true, "Projectile"),
 		PROJECTILE_SKILL(false, true, "Projectile Skill"),
+		PROJECTILE_ENCH(false, true, "Projectile Enchantment"),
 		MAGIC(false, true, "Magic"),
 		THORNS(false, true, "Thorns"),
 		BLAST(false, true, "Blast"),
@@ -48,7 +52,7 @@ public class DamageEvent extends Event implements Cancellable {
 			// List every cause for completeness
 			return switch (cause) {
 				case WORLD_BORDER, CONTACT, MELTING, DROWNING, STARVATION, LIGHTNING, FALLING_BLOCK, CUSTOM, DRYOUT,
-					 FREEZE, CRAMMING, SONIC_BOOM, SUFFOCATION -> OTHER;
+				     FREEZE, CRAMMING, SONIC_BOOM, SUFFOCATION -> OTHER;
 				case ENTITY_ATTACK -> MELEE;
 				case ENTITY_SWEEP_ATTACK -> MELEE_ENCH;
 				case PROJECTILE -> PROJECTILE;
@@ -114,21 +118,30 @@ public class DamageEvent extends Event implements Cancellable {
 		}
 
 		public static EnumSet<DamageType> getAllProjectileTypes() {
-			return EnumSet.of(PROJECTILE, PROJECTILE_SKILL);
+			return EnumSet.of(PROJECTILE, PROJECTILE_SKILL, PROJECTILE_ENCH);
 		}
 
-		public static ParseResult<DamageType> fromReader(StringReader reader, String hoverDescription) {
-			DamageType type = reader.readEnum(values());
-			if (type == null) {
-				List<Tooltip<String>> suggArgs = new ArrayList<>(values().length);
-				String soFar = reader.readSoFar();
-				for (DamageType valid : values()) {
-					suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
-				}
-				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
-			}
+		public static EnumSet<DamageType> getAllMagicTypes() {
+			// Might create MAGIC_ENCH to handle Trivium properly in the future, not this PR though
+			return EnumSet.of(MAGIC);
+		}
 
-			return ParseResult.of(type);
+		public static EnumSet<DamageType> getAllMeleeAndProjectileTypes() {
+			EnumSet<DamageType> enumSet = getAllMeleeTypes();
+			enumSet.addAll(getAllProjectileTypes());
+			return enumSet;
+		}
+
+		public static EnumSet<DamageType> getAllProjectileAndMagicTypes() {
+			EnumSet<DamageType> enumSet = getAllProjectileTypes();
+			enumSet.addAll(getAllMagicTypes());
+			return enumSet;
+		}
+
+		public static EnumSet<DamageType> getAllMeleeProjectileAndMagicTypes() {
+			EnumSet<DamageType> enumSet = getAllMeleeAndProjectileTypes();
+			enumSet.addAll(getAllMagicTypes());
+			return enumSet;
 		}
 	}
 
@@ -189,6 +202,7 @@ public class DamageEvent extends Event implements Cancellable {
 	private double mUnmodifiableDamage = 0;
 	private @Nullable Double mDamageCap = null;
 	private boolean mIsCrit = false;
+	private List<EffectsList.Effect> mEffects;
 
 	public DamageEvent(EntityDamageEvent event, LivingEntity damagee) {
 		this(event, damagee, DamageType.getType(event.getCause()));
@@ -210,6 +224,7 @@ public class DamageEvent extends Event implements Cancellable {
 		mFlatDamage = event.getDamage();
 		mEvent = event;
 		mLifelineCancel = false;
+		mEffects = new ArrayList<>();
 
 		if (mDamager instanceof Projectile proj) {
 			ProjectileSource source = proj.getShooter();
@@ -241,6 +256,8 @@ public class DamageEvent extends Event implements Cancellable {
 	 *                          useful to check if an attack would be lethal
 	 * @return The final damage that will be dealt
 	 */
+	// Bukkit deprecates EntityDamageEvent.DamageModifier
+	@SuppressWarnings("deprecation")
 	public double getFinalDamage(boolean includeAbsorption) {
 		if (includeAbsorption) {
 			return Math.max(0, mEvent.getFinalDamage());
@@ -255,7 +272,7 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public void setFlatDamage(double damage) {
 		if (damage < 0) {
-			Plugin.getInstance().getLogger().log(Level.WARNING, "Negative damage dealt: " + damage, new Exception());
+			Plugin.getInstance().getLogger().log(Level.FINE, "Negative damage dealt: " + damage, new Exception());
 		}
 		if (!Double.isFinite(damage)) {
 			Plugin.getInstance().getLogger().log(Level.WARNING, "Non-finite damage dealt: " + damage, new Exception());
@@ -265,16 +282,15 @@ public class DamageEvent extends Event implements Cancellable {
 		// Update flat damage, since we're setting a new base
 		// In case something goes horribly wrong, log the stack trace when set to finest
 		mFlatDamage = damage;
-		MMLog.finest(Arrays.toString(Thread.currentThread().getStackTrace()));
+		MMLog.finest(() -> Arrays.toString(Thread.currentThread().getStackTrace()));
 
 		recalculateDamage();
 	}
 
 	public void updateDamageWithMultiplier(double damageMultiplier) {
 		if (damageMultiplier < 0) {
-			Plugin.getInstance().getLogger().log(Level.WARNING, "Negative damage multiplier: " + damageMultiplier, new Exception());
+			Plugin.getInstance().getLogger().log(Level.FINE, "Negative damage multiplier: " + damageMultiplier, new Exception());
 		}
-
 		if (damageMultiplier > 1) {
 			// Accumulate damage multiplier (Additively)
 			mDamageMultiplier += (damageMultiplier - 1);
@@ -282,35 +298,99 @@ public class DamageEvent extends Event implements Cancellable {
 			// Accumulate weakness / reduction multiplier (Multiplicatively)
 			mDamageReductionMultiplier *= Math.max(0, damageMultiplier);
 		}
-
 		recalculateDamage();
 	}
 
 	public void updateGearDamageWithMultiplier(double damageGearMultiplier) {
 		if (damageGearMultiplier < 0) {
-			Plugin.getInstance().getLogger().log(Level.WARNING, "Negative damage multiplier: " + damageGearMultiplier, new Exception());
+			Plugin.getInstance().getLogger().log(Level.FINE, "Negative damage multiplier: " + damageGearMultiplier, new Exception());
 		}
-
 		// Accumulate damage multiplier
 		mGearDamageMultiplier += (damageGearMultiplier - 1);
-
 		recalculateDamage();
 	}
 
+	static final int DAMAGE_CAP = 1000000;
+	static final int DAMAGE_WARN = 10000;
+	private boolean mHasBeenWarned = false;
+	private final UUID mEventIdentifier = UUID.randomUUID();
+
 	private void recalculateDamage() {
 		// Never set damage above 1000000 (arbitrary high amount) so that it doesn't go over the limit of what can actually be dealt
-		double damage = Math.max(Math.min(mFlatDamage * mGearDamageMultiplier * mDamageMultiplier * mDamageReductionMultiplier * critModifier() + mUnmodifiableDamage, 1000000), 0);
-
+		double damage = Math.max(Math.min(mFlatDamage * mGearDamageMultiplier * mDamageMultiplier * mDamageReductionMultiplier * critModifier() + mUnmodifiableDamage, DAMAGE_CAP), 0);
 		if (mDamageCap != null) {
 			damage = Math.min(damage, mDamageCap);
 		}
-
+		// Log big warning because damage is too high
+		if (damage >= DAMAGE_WARN) {
+			damageCapWarn(damage);
+		}
 		if (mMetadata.mType == DamageType.POISON && mDamagee instanceof Player && mDamagee.getHealth() - damage <= 0) {
 			mEvent.setDamage(Math.max(mDamagee.getHealth() - 1, 0));
 			return;
 		}
-
 		mEvent.setDamage(damage);
+	}
+
+	private void damageCapWarn(double damage) {
+		if (!(mSource instanceof Player player)) {
+			return;
+		}
+		if (!mHasBeenWarned) {
+			final var inventory = player.getInventory();
+			// grab current charms
+			final var charms = CharmManager.getInstance().getCharms(player, CharmManager.getInstance().mEnabledCharmType);
+			final var charmNames = new ArrayList<>();
+			if (charms != null && !charms.isEmpty()) {
+				for (final var charm : charms) {
+					charmNames.add(ItemUtils.getPlainName(charm));
+				}
+			}
+			final var charmString = charmNames.isEmpty() ? "" : String.join(",", charmNames.toArray(new String[0]));
+			String equipment;
+			try {
+				equipment = String.join(",", "mainhand=" + ItemUtils.getPlainName(inventory.getItemInMainHand()), "offhand=" + ItemUtils.getPlainName(inventory.getItemInOffHand()), "helmet=" + ItemUtils.getPlainName(inventory.getHelmet()), "chestplate=" + ItemUtils.getPlainName(inventory.getChestplate()), "leggings=" + ItemUtils.getPlainName(inventory.getLeggings()), "boots=" + ItemUtils.getPlainName(inventory.getBoots()), "charms=[" + charmString + "]");
+			} catch (Exception ex) {
+				equipment = "error";
+			}
+			final String string = String.join(" ", "Player dealt damage higher than " + DAMAGE_WARN, "[" + String.join(",", "player=" + player.getName(), "damage=" + damage, "originalDamage=" + mOriginalDamage, "flatDamage=" + mFlatDamage, "damageEventId=" + mEventIdentifier, "equipment=[" + equipment + "]") + "]");
+			// now craft the stacktrace
+			MMLog.severe(() -> string + parseStackTracesFromMonumentaPlugin());
+			AuditListener.logPlayer(string);
+			return;
+		}
+		MMLog.severe(() -> "Player: " + player.getName() + " excceded damage cap! [damageEventId=" + mEventIdentifier + ",damage=" + damage + "]");
+	}
+
+	private static final Set<String> IGNORED_CLAZZ = Set.of(
+		"DamageEvent",
+		"DamageListener",
+		"DamageUtils"
+	);
+
+	private static String parseStackTracesFromMonumentaPlugin() {
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		var s = "\n";
+		for (StackTraceElement stackTraceElement : stackTrace) {
+			String className = stackTraceElement.getClassName();
+			if (!className.contains("com.playmonumenta")) {
+				continue;
+			}
+
+			var founcIgnored = false;
+			for (var ignoredClass : IGNORED_CLAZZ) {
+				if (className.contains(ignoredClass)) {
+					founcIgnored = true;
+					break;
+				}
+			}
+			if (founcIgnored) {
+				continue;
+			}
+
+			s = s + stackTraceElement.toString() + "\n";
+		}
+		return s;
 	}
 
 	public double getFlatDamage() {
@@ -426,8 +506,26 @@ public class DamageEvent extends Event implements Cancellable {
 	/**
 	 * Returns whether the damage is blocked by a shield
 	 */
+	// Bukkit deprecates EntityDamageEvent.DamageModifier
+	@SuppressWarnings("deprecation")
 	public boolean isBlockedByShield() {
 		return mEvent.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0;
+	}
+
+	// Stores the potion effects that were applied by a bosstag/spell
+	public void setEffects(List<EffectsList.Effect> effectList) {
+		mEffects = effectList;
+	}
+
+	public List<EffectsList.Effect> getEffects() {
+		return mEffects;
+	}
+
+	/**
+	 * Returns true if the damage cause is {@link DamageCause#VOID} or {@link DamageCause#KILL}, false if not
+	 */
+	public boolean isUnblockable() {
+		return getCause() == DamageCause.VOID || getCause() == DamageCause.KILL;
 	}
 
 	// Mandatory Event Methods
@@ -441,5 +539,4 @@ public class DamageEvent extends Event implements Cancellable {
 	public static HandlerList getHandlerList() {
 		return HANDLERS;
 	}
-
 }

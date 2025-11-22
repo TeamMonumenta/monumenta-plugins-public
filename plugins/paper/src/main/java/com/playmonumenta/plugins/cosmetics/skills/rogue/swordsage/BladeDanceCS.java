@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,11 +16,10 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 public class BladeDanceCS implements CosmeticSkill {
-	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
+	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(110, 0, 100), 1.0f);
+	private final Color ACCENT_COLOR = Color.fromRGB(0x29073c);
 
 	@Override
 	public ClassAbility getAbility() {
@@ -35,18 +36,23 @@ public class BladeDanceCS implements CosmeticSkill {
 		world.playSound(loc, Sound.BLOCK_GRINDSTONE_USE, SoundCategory.PLAYERS, 0.5f, 1.2f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.6f, 0.1f);
 		world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 2.0f, 1.0f);
-		Location modifiedLoc = loc.clone().add(0, 1, 0);
-		new PartialParticle(Particle.VILLAGER_ANGRY, modifiedLoc, 6, 0.45, 0.5, 0.45, 0).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CLOUD, modifiedLoc, 20, 0.25, 0.5, 0.25, 0.15).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, modifiedLoc, 6, 0.45, 0.5, 0.45, 0, SWORDSAGE_COLOR).spawnAsPlayerActive(player);
 	}
 
-	public void danceTick(Player player, World world, Location loc, int tick, double danceRadius) {
+	public void danceTick(Player player, World world, Location loc, int tick, int duration, double danceRadius) {
+		loc.setPitch(0);
 		float pitch = 0.5f + (tick % 2 == 0 ? tick : tick - 1) * 0.1f / 2.0f;
-		double r = danceRadius - (3 * pitch);
-		new PartialParticle(Particle.SWEEP_ATTACK, loc, 3, r, 2, r, 0).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, loc, 4, r, 2, r, 0, SWORDSAGE_COLOR).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CLOUD, loc, 4, r, 2, r, 0).spawnAsPlayerActive(player);
+
+		Location loc2 = LocationUtils.getHalfHeightLocation(player);
+		loc2.setPitch(0);
+
+		double angle = FastUtils.randomDoubleInRange(0, 360);
+		double multiplier = FastUtils.randomDoubleInRange(0.35, 0.9);
+		ParticleUtils.drawHalfArc(loc2, danceRadius * multiplier, FastUtils.randomIntInRange(-10, 10) * 5 * multiplier + (FastUtils.randomBoolean() ? 180 : 0),
+			angle, angle + 160, 1, 0.25, false, (int) (40 + 50.0 * tick / duration), (location, ring, angleProgress) -> {
+				new PartialParticle(Particle.REDSTONE, location)
+					.data(new Particle.DustOptions(ParticleUtils.getTransition(Color.fromRGB(0x999999), ACCENT_COLOR, multiplier), 0.9f))
+					.spawnAsPlayerActive(player);
+			});
 		if (tick % 2 == 0) {
 			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.7f, pitch);
 			world.playSound(loc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.4f, 2.0f);
@@ -63,31 +69,27 @@ public class BladeDanceCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 2.0f, 1.0f);
 		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.PLAYERS, 0.6f, 2.0f);
 		world.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.PLAYERS, 0.8f, 2.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 2.4f, 0.7f);
 
-		new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0).spawnAsPlayerActive(player);
+		new PPCircle(Particle.CRIT, loc.clone().add(0, 1, 0), danceRadius / 2)
+			.count(50)
+			.delta(0.5, 0, 1)
+			.rotateDelta(true).directionalMode(true)
+			.extra(danceRadius / 2)
+			.extraVariance(danceRadius / 2)
+			.spawnAsPlayerActive(player);
 
-		new BukkitRunnable() {
-			int mTicks = 0;
-			double mRadians = 0;
+		Location loc2 = LocationUtils.getHalfHeightLocation(player);
+		loc2.setPitch(0);
 
-			@Override
-			public void run() {
-				Vector vec = new Vector(FastUtils.cos(mRadians) * danceRadius / 1.5, 0, FastUtils.sin(mRadians) * danceRadius / 1.5);
 
-				Location loc2 = player.getEyeLocation().add(vec);
-				new PartialParticle(Particle.SWEEP_ATTACK, loc2, 5, 1, 0.25, 1, 0).spawnAsPlayerActive(player);
-				new PartialParticle(Particle.CRIT, loc2, 10, 1, 0.25, 1, 0.3).spawnAsPlayerActive(player);
-				new PartialParticle(Particle.REDSTONE, loc2, 10, 1, 0.25, 1, 0, SWORDSAGE_COLOR).spawnAsPlayerActive(player);
-				world.playSound(loc2, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1.2f, 1.5f);
-
-				if (mTicks >= 5) {
-					this.cancel();
-				}
-
-				mTicks++;
-				mRadians += Math.toRadians(72);
-			}
-		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+		for (int i = 0; i < 2; i++) {
+			ParticleUtils.drawHalfArc(loc2, danceRadius - 1.75, i == 0 ? -12 : 360 + 12, i * 180 + 90, 450 + i * 180, 7, 0.25, false, 90, (location, ring, angleProgress) -> {
+				new PartialParticle(Particle.REDSTONE, location)
+					.data(new Particle.DustOptions(ParticleUtils.getTransition(ACCENT_COLOR, Color.GRAY, angleProgress), 1.2f))
+					.spawnAsPlayerActive(player);
+			});
+		}
 	}
 
 	public void danceHit(Player player, World world, LivingEntity mob, Location mobLoc) {

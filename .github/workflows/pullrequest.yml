@@ -1,58 +1,17 @@
 name: reviewdog
-
 on: [pull_request]
-
 jobs:
-  deps:
-    name: Build Dependencies
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up JDK 1.17
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.17
-
-    - name: git config
-      run: |
-        git config --global user.name "Monumenta CI"
-        git config --global user.email "Monumenta.CI@NotARealEmail.com"
-
-    - name: Cache maven dependencies
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-maven-dependencies
-      with:
-        # maven files are stored in `~/.m2/repository`
-        path: |
-          ~/.m2/repository
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        # Create the key based on runner os, cache name, and a hash of all the pom.xml files
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
-
   build:
     name: Build plugin
-    needs: deps
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up JDK 1.17
+    - uses: actions/checkout@v4
+    - name: Set up JDK 1.21
       uses: actions/setup-java@v1
       with:
-        java-version: 1.17
-
-    - name: git config
-      run: |
-        git config --global user.name "Monumenta CI"
-        git config --global user.email "Monumenta.CI@NotARealEmail.com"
-
+        java-version: 1.21
     - name: Cache maven dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       env:
         cache-name: cache-maven-dependencies
       with:
@@ -67,23 +26,11 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-
-    # - name: Setup Golang with cache
-    #   uses: magnetikonline/action-golang-cache@v3
-    #   with:
-    #     go-version: ~1.18
-    # - run: go install github.com/reviewdog/reviewdog/cmd/reviewdog@master
-
-    # Currently installing this manually using the above golang build because the current latest
-    # v0.14.1 has a bug where too much data causes the data post to fail
-    # Check https://github.com/reviewdog/reviewdog/releases/ and if it's > 0.14.1,
-    # remove the above block and uncomment the below stuff
     - name: Setup reviewdog
       uses: reviewdog/action-setup@v1
       with:
         reviewdog_version: latest
-
-    - name: Build and report style/pmd/warnings
+    - name: Build and report warnings
       working-directory: ./plugins
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -91,9 +38,8 @@ jobs:
         set -o pipefail
         ./gradlew build --console=plain 2>&1 | tee compile.log
         set +o pipefail
-        cat compile.log | reviewdog -efm="%W%f:%l: warning: %m" -efm="%+C%[ %\t]%.%#" -name="compiler-warnings" -level=error -fail-on-error -reporter=github-pr-review
-        cat ./adapter_api/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (adapterapi)" -level=error -fail-on-error -reporter=github-pr-review
-        cat ./adapter_unsupported/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (adapterapi)" -level=error -fail-on-error -reporter=github-pr-review
-        cat ./adapter_v1_20_R3/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (v1_20_R3)" -level=error -fail-on-error -reporter=github-pr-review
-        cat ./paper/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="checkstyle (plugin)" -level=error -fail-on-error -reporter=github-pr-review
-        cat ./paper/build/reports/pmd/main.xml ./adapter_v1_20_R3/build/reports/pmd/main.xml ./adapter_api/build/reports/pmd/main.xml ./adapter_unsupported/build/reports/pmd/main.xml | reviewdog -efm='%+P<file name="%f">' -efm='%W<violation beginline="%l%.%#begincolumn="%c%.%#' -efm='%-C<%.%#' -efm='%+C%.%#' -efm='%-Q' -name="pmd" -level=error -fail-on-error -reporter=github-pr-review
+        # compiler warnings
+        cat compile.log | reviewdog -efm="%W%f:%l: warning: %m" -efm="%+C%[ %\t]%.%#" -name="Javac" -level=error -fail-level=error -reporter=github-pr-review
+        # other things
+        cat ./*/build/reports/checkstyle/main.xml | reviewdog -f=checkstyle -name="Checkstyle" -level=error -fail-level=error -reporter=github-pr-review
+        cat ./*/build/reports/pmd/main.xml | reviewdog -efm='%+P<file name="%f">' -efm='%W<violation beginline="%l%.%#begincolumn="%c%.%#' -efm='%-C<%.%#' -efm='%+C%.%#' -efm='%-Q' -name="PMD" -level=error -fail-level=error -reporter=github-pr-review

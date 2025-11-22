@@ -31,7 +31,6 @@ public class EarthquakeTowerAbility extends TowerAbility {
 	private static final int DAMAGE = 16;
 
 
-
 	public EarthquakeTowerAbility(Plugin plugin, String identityTag, LivingEntity boss, TowerGame game, TowerMob mob, boolean isPlayerMob) {
 		super(plugin, identityTag, boss, game, mob, isPlayerMob);
 
@@ -93,6 +92,7 @@ public class EarthquakeTowerAbility extends TowerAbility {
 								new BukkitRunnable() {
 
 									int mTimer2 = 0;
+
 									@Override
 									public void run() {
 										if (mTimer2 >= 2) {

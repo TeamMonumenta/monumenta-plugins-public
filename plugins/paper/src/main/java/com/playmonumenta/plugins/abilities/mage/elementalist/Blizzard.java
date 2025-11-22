@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.BlizzardCS;
@@ -37,7 +39,7 @@ public class Blizzard extends Ability {
 	public static final int SIZE_2 = 10;
 	public static final double SLOW_MULTIPLIER_1 = 0.25;
 	public static final double SLOW_MULTIPLIER_2 = 0.3;
-	public static final int DAMAGE_INTERVAL = 1 * Constants.TICKS_PER_SECOND;
+	public static final int DAMAGE_INTERVAL = Constants.TICKS_PER_SECOND;
 	public static final int SLOW_INTERVAL = (int) (0.5 * Constants.TICKS_PER_SECOND);
 	public static final int DURATION_TICKS = 10 * Constants.TICKS_PER_SECOND;
 	public static final int SLOW_TICKS = 5 * Constants.TICKS_PER_SECOND;
@@ -48,46 +50,35 @@ public class Blizzard extends Ability {
 	public static final String CHARM_RANGE = "Blizzard Range";
 	public static final String CHARM_DURATION = "Blizzard Duration";
 	public static final String CHARM_SLOW = "Blizzard Slowness Amplifier";
+	public static final String CHARM_DELAY = "Blizzard Tick Delay";
 
 	public static final AbilityInfo<Blizzard> INFO =
 		new AbilityInfo<>(Blizzard.class, NAME, Blizzard::new)
 			.linkedSpell(ClassAbility.BLIZZARD)
 			.scoreboardId(NAME)
 			.shorthandName("Bl")
-			.descriptions(
-				String.format("Right click while sneaking, looking upwards, and holding a wand to create a storm of ice and snow that follows the player, " +
-					              "dealing %s ice magic damage every second to all enemies in a %s block radius around you. The blizzard lasts for %ss, and chills enemies within it, slowing them by %s%%." +
-					              " Players in the blizzard are extinguished if they are on fire, and the ability's damage bypasses iframes. This ability does not interact with Spellshock. Cooldown: %ss.",
-					DAMAGE_1,
-					SIZE_1,
-					DURATION_TICKS / 20,
-					(int) (SLOW_MULTIPLIER_1 * 100),
-					COOLDOWN_TICKS / 20),
-				String.format("Damage is increased from %s to %s, aura size is increased from %s to %s blocks, slowness increased to %s%%.",
-					DAMAGE_1,
-					DAMAGE_2,
-					SIZE_1,
-					SIZE_2,
-					(int) (SLOW_MULTIPLIER_2 * 100)))
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("For a period of time, slightly damage and slow nearby mobs.")
 			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Blizzard::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
 			.displayItem(Material.SNOWBALL);
 
-	private final float mLevelDamage;
-	private final float mLevelSize;
+	private final double mLevelDamage;
+	private final double mLevelSize;
 	private final double mLevelSlowMultiplier;
 	private final int mDuration;
+	private final int mTickDelay;
 
 	private final BlizzardCS mCosmetic;
 
 	public Blizzard(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mLevelSize = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, isLevelOne() ? SIZE_1 : SIZE_2);
+		mLevelDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mLevelSize = CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, isLevelOne() ? SIZE_1 : SIZE_2);
 		mLevelSlowMultiplier = (isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS);
+		mTickDelay = CharmManager.getDuration(mPlayer, CHARM_DELAY, DAMAGE_INTERVAL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BlizzardCS());
 	}
 
@@ -101,7 +92,7 @@ public class Blizzard extends Ability {
 		mCosmetic.onCast(mPlayer, world, mPlayer.getLocation());
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-		float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+		float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, (float) mLevelDamage);
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
@@ -124,7 +115,7 @@ public class Blizzard extends Ability {
 					}
 				}
 
-				if (mTicks % DAMAGE_INTERVAL == 0) {
+				if (mTicks % mTickDelay == 0) {
 					for (LivingEntity mob : mobs) {
 						DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), spellDamage, true, false, false);
 					}
@@ -141,4 +132,29 @@ public class Blizzard extends Ability {
 		return true;
 	}
 
+	private static Description<Blizzard> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to create a storm of ice and snow that follows the player, dealing ")
+			.add(a -> a.mLevelDamage, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" ice magic damage every second to all enemies within ")
+			.add(a -> a.mLevelSize, SIZE_1, false, Ability::isLevelOne)
+			.add(" blocks of you. The blizzard lasts for ")
+			.addDuration(a -> a.mDuration, DURATION_TICKS)
+			.add(" seconds, and chills enemies within it, slowing them by ")
+			.addPercent(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_1, false, Ability::isLevelOne)
+			.add(". Players in the blizzard are extinguished if they are on fire. This ability does not interact with Spellshock.")
+			.addCooldown(COOLDOWN_TICKS);
+	}
+
+	private static Description<Blizzard> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mLevelDamage, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(", aura size is increased to ")
+			.add(a -> a.mLevelSize, SIZE_2, false, Ability::isLevelTwo)
+			.add(" blocks, and slowness is increased to ")
+			.addPercent(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_2, false, Ability::isLevelTwo)
+			.add(".");
+	}
 }

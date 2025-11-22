@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
@@ -70,23 +72,32 @@ public class LaserBoss extends BossAbilityGroup {
 		public EffectsList EFFECTS = EffectsList.EMPTY;
 
 		@BossParam(help = "LOS name of the mob at the location of the laser's end")
-		public LoSPool SPAWNED_MOB_POOL = LoSPool.EMPTY;
+		public LoSPool SPAWNED_MOB_POOL = LoSPool.LibraryPool.EMPTY;
 
 		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";
 
 		//particle & sound used!
 		@BossParam(help = "Sound used each tick on each player")
-		public SoundsList SOUND_TICKS = SoundsList.fromString("[(ENTITY_SHULKER_BULLET_HIT)]");
+		public SoundsList SOUND_TICKS = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_SHULKER_BULLET_HIT, 1.0f, 1.0f))
+			.build();
 
 		@BossParam(help = "Particle used for the laser")
-		public ParticlesList PARTICLE_LASER = ParticlesList.fromString("[(CRIT,1),(CRIT_MAGIC,1)]");
+		public ParticlesList PARTICLE_LASER = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.CRIT, 1, 0.0, 0.0, 0.0, 0.0))
+			.add(new ParticlesList.CParticle(Particle.CRIT_MAGIC, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Particle used when the cast is over")
-		public ParticlesList PARTICLE_END = ParticlesList.fromString("[(EXPLOSION_NORMAL,35)]");
+		public ParticlesList PARTICLE_END = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_NORMAL, 35, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
 		@BossParam(help = "Sound used when the cast is over")
-		public SoundsList SOUND_END = SoundsList.fromString("[(ENTITY_DRAGON_FIREBALL_EXPLODE,0.6,1.5)]");
+		public SoundsList SOUND_END = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.6f, 1.5f))
+			.build();
 
 		@BossParam(help = "not written")
 		public int PARTICLE_FREQUENCY = 1;
@@ -105,12 +116,12 @@ public class LaserBoss extends BossAbilityGroup {
 			//same object
 			//probably an older mob version?
 			//build a new target from others config
-			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL), List.of(PLAYERFILTER.HAS_LINEOFSIGHT));
+			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL), List.of(PLAYERFILTER.HAS_LINEOFSIGHT, EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 			//by default LaserBoss don't take player in stealth and need LINEOFSIGHT to cast.
 		}
 
 		/* I am NOT writing another constructor for these shenanigans - Spy */
-		SpellBlockBreak blockBreakAtLaserEnd = new SpellBlockBreak(boss, p.BLOCK_BREAK_RADIUS, p.BLOCK_BREAK_RADIUS, p.BLOCK_BREAK_RADIUS,
+		SpellBlockBreak blockBreakAtLaserEnd = new SpellBlockBreak(boss, p.BLOCK_BREAK_RADIUS, p.BLOCK_BREAK_RADIUS, p.BLOCK_BREAK_RADIUS, 0,
 			-65, false, true, false, true, true, true, Material.AIR);
 		Spell laser = new SpellBaseLaser(plugin, boss, p.DURATION, false, p.COOLDOWN,
 			() -> p.TARGETS.getTargetsList(mBoss),
@@ -148,11 +159,11 @@ public class LaserBoss extends BossAbilityGroup {
 
 				if (target != null) {
 					if (p.DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList());
 					}
 
 					if (p.DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME);
+						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME, p.EFFECTS.mEffectList());
 					}
 
 					p.EFFECTS.apply(target, mBoss);
@@ -170,4 +181,3 @@ public class LaserBoss extends BossAbilityGroup {
 
 	}
 }
-

@@ -6,8 +6,11 @@ import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -126,6 +129,10 @@ public class ClassPage extends Page {
 					if (event.isShiftClick()) {
 						return;
 					}
+
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_TRIAL_SPAWNER_EJECT_ITEM, SoundCategory.PLAYERS, 1f, 1f);
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
+
 					new AbilityTriggersGui(mGui.mPlayer, true).open();
 				});
 		}
@@ -140,22 +147,6 @@ public class ClassPage extends Page {
 		boolean otherChosen,
 		boolean chosen
 	) {
-		if (mGui.isClassPermLocked(classToItemize)) {
-			mGui.setItem(
-				row,
-				column,
-				GUIUtils.createBasicItem(
-					Material.BARRIER,
-					classToItemize.mClassName,
-					classToItemize.mClassColor,
-					true,
-					"This class is currently unavailable to you.",
-					NamedTextColor.RED
-				)
-			);
-			return;
-		}
-
 		if (mGui.isClassLocked(classToItemize)) {
 			mGui.setItem(
 				row,
@@ -202,12 +193,12 @@ public class ClassPage extends Page {
 			classItem.setItemMeta(newMeta);
 		}
 
-		if (classToItemize.mClassPassiveDescription != null && classToItemize.mClassPassiveName != null) {
+		if (classToItemize.mPassive != null) {
 			ItemMeta newMeta = classItem.getItemMeta();
 			GUIUtils.splitLoreLine(
 				newMeta,
-				classToItemize.mClassPassiveName + " (Passive): " + classToItemize.mClassPassiveDescription,
-				NamedTextColor.GREEN,
+				Component.text(classToItemize.mPassive.getDisplayName() + " (Passive): ", NamedTextColor.GREEN)
+					.append(classToItemize.mPassive.getDescription(1, mGui.mPlayer, true)),
 				30,
 				false
 			);
@@ -215,10 +206,10 @@ public class ClassPage extends Page {
 		}
 
 		mGui.setItem(
-			row,
-			column,
-			classItem
-		)
+				row,
+				column,
+				classItem
+			)
 			.onClick(event -> {
 				if (event.isShiftClick()) {
 					return;
@@ -235,6 +226,11 @@ public class ClassPage extends Page {
 					);
 					mGui.updatePlayerAbilities();
 					MonumentaNetworkRelayIntegration.refreshPlayer(mGui.mPlayer);
+
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.5f, 1.5f);
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.PLAYERS, 1f, 0.5f);
+				} else {
+					mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
 				}
 				mGui.mPage = new SkillPage(mGui, classToItemize);
 				mGui.update();

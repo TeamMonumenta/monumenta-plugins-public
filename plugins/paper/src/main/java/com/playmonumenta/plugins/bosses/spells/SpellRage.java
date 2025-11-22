@@ -1,17 +1,15 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.effects.CCImmuneEffect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PPCircle;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -30,44 +28,53 @@ public class SpellRage extends SpellBaseAoE {
 	public double mKBRAmount;
 	public boolean mCCImmuneBuff;
 
-	public SpellRage(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown, int buffDuration, double strengthAmount, double speedAmount, double kbrAmount, boolean ccImmune, boolean canMoveWhileCasting) {
+	public SoundsList mSoundCharge;
+	public ParticlesList mParticleCharge;
+	public ParticlesList mParticleChargeCircle;
+	public SoundsList mSoundFinish;
+	public ParticlesList mParticleFinishCircle;
+	public ParticlesList mParticleFinish;
+
+	public SpellRage(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown, int buffDuration, double strengthAmount, double speedAmount, double kbrAmount, boolean ccImmune, boolean canMoveWhileCasting,
+	                 SoundsList soundCharge, ParticlesList particleCharge, ParticlesList particleChargeCircle, SoundsList soundFinish, ParticlesList particleFinish, ParticlesList particleFinishCircle) {
 		super(plugin, launcher, radius, time, cooldown, canMoveWhileCasting, Sound.UI_TOAST_OUT);
 		mBuffDuration = buffDuration;
 		mSpeedAmount = speedAmount;
 		mStrengthAmount = strengthAmount;
 		mKBRAmount = kbrAmount;
 		mCCImmuneBuff = ccImmune;
+
+		mSoundCharge = soundCharge;
+		mParticleCharge = particleCharge;
+		mParticleChargeCircle = particleChargeCircle;
+		mSoundFinish = soundFinish;
+		mParticleFinish = particleFinish;
+		mParticleFinishCircle = particleFinishCircle;
 	}
 
 	@Override
 	protected void chargeAuraAction(Location loc) {
-		World world = loc.getWorld();
-
 		if (!mIsCasting) {
-			world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1f, 0.6f);
+			mSoundCharge.play(loc);
 			mIsCasting = true;
 		}
 
-		new PartialParticle(Particle.SPELL_WITCH, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05).spawnAsEntityActive(mLauncher);
+		mParticleCharge.spawn(mLauncher, loc, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05);
 	}
 
 	@Override
 	protected void chargeCircleAction(Location loc, double radius) {
-		new PPCircle(Particle.CRIT_MAGIC, loc, radius).count(12).delta(0.25).extra(0.1).spawnAsEntityActive(mLauncher);
+		mParticleChargeCircle.spawn(mLauncher, particle -> new PPCircle(particle, loc, radius));
 	}
 
 	@Override
 	protected void outburstAction(Location loc) {
-		World world = loc.getWorld();
-		world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1.5f, 1.5f);
-		world.playSound(loc, Sound.ENTITY_RAVAGER_HURT, SoundCategory.HOSTILE, 1.5f, 0.5f);
-		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1.5f, 0.75f);
+		mSoundFinish.play(loc);
 	}
 
 	@Override
 	protected void circleOutburstAction(Location loc, double radius) {
-		new PPCircle(Particle.SPELL_WITCH, loc, radius).count(24).delta(0.1).extra(0.3).spawnAsEntityActive(mLauncher);
-		new PPCircle(Particle.BUBBLE_POP, loc, radius).count(48).delta(0.25).extra(0.1).spawnAsEntityActive(mLauncher);
+		mParticleFinishCircle.spawn(mLauncher, particle -> new PPCircle(particle, loc, radius));
 	}
 
 	@Override
@@ -85,8 +92,7 @@ public class SpellRage extends SpellBaseAoE {
 			if (mCCImmuneBuff) {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mob, CCIMMUNE_BUFF_NAME, new CCImmuneEffect(mBuffDuration));
 			}
-			new PartialParticle(Particle.SPELL_WITCH, mob.getLocation().add(0, mob.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
-			new PartialParticle(Particle.VILLAGER_ANGRY, mob.getLocation().add(0, mob.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(mLauncher);
+			mParticleFinish.spawn(mLauncher, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2.0, 0));
 		}
 
 		mIsCasting = false;

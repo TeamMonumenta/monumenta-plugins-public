@@ -49,7 +49,7 @@ class VanityBuyScreen extends Gui {
 				default -> "Offhand";
 			};
 			meta.lore(List.of(Component.text("Base material: ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-				                  .append(Component.translatable(vanityItem.getType().translationKey())),
+					.append(Component.translatable(vanityItem.getType().translationKey())),
 				Component.text("Slot: " + slot, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			meta.addItemFlags(ItemFlag.values());
 			vanityItem.setItemMeta(meta);
@@ -63,7 +63,7 @@ class VanityBuyScreen extends Gui {
 			meta.displayName(Component.text("Confirm", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(getTwistedStrandStack(), mPlayer, true);
 			meta.lore(List.of(Component.text("Pay " + VanityGUI.STRAND_COST_PER_VANITY_UNLOCK + " Twisted Strands to unlock", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
-				Component.text("this item for vanity use (" + (debt.mNumInWallet + debt.mNumInInventory) + " owned).", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
+				Component.text("this item for vanity use (" + (debt.mNumInWallet() + debt.mNumInInventory()) + " owned).", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
 				Component.text("All items of the same type as this item", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("(base material + name) will permanently be", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
 				Component.text("unlocked for you for use as vanity.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));

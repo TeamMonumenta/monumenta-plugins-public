@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +57,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+
 
 public class DiscoBall extends DepthsAbility {
 
@@ -108,7 +110,7 @@ public class DiscoBall extends DepthsAbility {
 		if (ballHead != null) {
 			new DisplayEntityUtils.DisplayAnimation(ballHead)
 				.addDelay(1)
-				.addKeyframe(new Transformation(new Vector3f(), new Quaternionf(0, 0.995f, 0, 0.1f), new Vector3f(1), new Quaternionf()), DURATION)
+				.addKeyframe(new Transformation(new Vector3f(), new Quaternionf().rotationY((float) Math.toRadians(10)), new Vector3f(1), new Quaternionf()), DURATION)
 				.removeDisplaysAfterwards()
 				.play();
 		}
@@ -215,11 +217,13 @@ public class DiscoBall extends DepthsAbility {
 				return countTrees(depthsParty) >= 8;
 			}
 
+
 			public void doFinalBlast() {
 				cancelOnDeath(new BukkitRunnable() {
 					final double mThetaStep = Math.PI / 4;
 					double mTheta = 0;
 					int mRuns = 0;
+
 					@Override
 					public void run() {
 						// Try to target mobs under the cone of the disco ball first.
@@ -246,17 +250,7 @@ public class DiscoBall extends DepthsAbility {
 	}
 
 	private static int countTrees(DepthsParty party) {
-		Set<DepthsTree> globalDepthsTrees = new HashSet<>();
-		party.mPlayersInParty.forEach(dPlayer -> {
-			List<DepthsAbilityInfo<?>> abilities = DepthsManager.getInstance().getPlayerAbilities(dPlayer);
-			Set<DepthsTree> activeTrees = abilities.stream()
-				.filter(depthsAbilityInfo -> !depthsAbilityInfo.getDepthsTrigger().equals(DepthsTrigger.PASSIVE))
-				.map(DepthsAbilityInfo::getDepthsTree)
-				.filter(Objects::nonNull) // Weapon Aspects have null tree
-				.filter(tree -> tree != DepthsTree.CURSE)
-				.collect(Collectors.toSet());
-			globalDepthsTrees.addAll(activeTrees);
-		});
+		Set<DepthsTree> globalDepthsTrees = getActiveDepthTreesFromParty(party);
 		return globalDepthsTrees.size();
 	}
 
@@ -319,7 +313,7 @@ public class DiscoBall extends DepthsAbility {
 	}
 
 	private static Description<DiscoBall> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DiscoBall>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Fire a projectile weapon while sneaking to summon a spinning Disco Ball above where your projectile lands. The ball lasts ")
 			.addDuration(DURATION)
 			.add(" seconds, and rains ")
@@ -336,8 +330,55 @@ public class DiscoBall extends DepthsAbility {
 				if (party == null) {
 					return Component.empty();
 				}
-				return Component.text("\nCurrent: " + countTrees(party) + "/8 trees")
-					.append(Component.text("\n\nAscension Damage Bonus: " + StringUtils.multiplierToPercentageWithSign(party.getPrismaticDamageMultiplier() - 1)));
+				Component baseReturn = Component.text("\nCurrent: " + countTrees(party) + "/8 trees");
+
+				if (countTrees(party) > 3 && countTrees(party) != 8) {
+					baseReturn = baseReturn.append(Component.text("\n\nMissing: "));
+					baseReturn = findMissingTrees(party, baseReturn);
+				}
+				baseReturn = baseReturn.append(Component.text("\n\nAscension Damage Bonus: " + StringUtils.multiplierToPercentageWithSign(party.getPrismaticDamageMultiplier() - 1)));
+
+
+				return baseReturn;
 			});
+	}
+
+	private static Component findMissingTrees(DepthsParty party, Component currComponent) {
+		Set<String> activeTreeNames = getActiveDepthTreesFromParty(party).stream()
+			.filter(tree -> tree != DepthsTree.PRISMATIC)
+			.map(DepthsTree::getDisplayName)
+			.collect(Collectors.toSet());
+
+		List<DepthsTree> treeNames = Arrays.stream(DepthsTree.values())
+			.filter(tree -> tree != DepthsTree.CURSE && tree != DepthsTree.GIFT && tree != DepthsTree.PRISMATIC)
+			.filter(tree -> activeTreeNames.stream()
+				.noneMatch(name -> name.equalsIgnoreCase(tree.getDisplayName())))
+			.toList();
+
+		return getDecoratedString(treeNames, currComponent);
+	}
+
+	private static Component getDecoratedString(List<DepthsTree> trees, Component currComponent) {
+		for (DepthsTree tree : trees) {
+			String display = tree.getDisplayName() + " (" + tree.getSymbol() + ")  ";
+			Component decorated = tree.getColor().apply(display);
+			currComponent = currComponent.append(decorated);
+		}
+		return currComponent;
+	}
+
+	private static Set<DepthsTree> getActiveDepthTreesFromParty(DepthsParty party) {
+		Set<DepthsTree> activeTrees = new HashSet<>();
+		party.mPlayersInParty.forEach(dPlayer -> {
+			List<DepthsAbilityInfo<?>> abilities = DepthsManager.getInstance().getPlayerAbilities(dPlayer);
+			Set<DepthsTree> playerTrees = abilities.stream()
+				.filter(depthsAbilityInfo -> depthsAbilityInfo.getDepthsTrigger().isActive())
+				.map(DepthsAbilityInfo::getDepthsTree)
+				.filter(Objects::nonNull)
+				.filter(tree -> tree != DepthsTree.CURSE && tree != DepthsTree.GIFT)
+				.collect(Collectors.toSet());
+			activeTrees.addAll(playerTrees);
+		});
+		return activeTrees;
 	}
 }

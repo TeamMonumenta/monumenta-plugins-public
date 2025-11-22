@@ -73,8 +73,8 @@ public class ThunderAspect implements Enchantment {
 
 			if (event.getAbility() == ClassAbility.ERUPTION) {
 				//Special case for eruption - always stun
-				EntityUtils.applyStun(plugin, (int) (10 * level), enemy);
-			} else if (!(type == DamageType.PROJECTILE || event.getAbility() == ClassAbility.EXPLOSIVE || event.getAbility() == ClassAbility.PREDATOR_STRIKE)) {
+				EntityUtils.applyStun(plugin, (int) (6 * level), enemy);
+			} else if (!(type == DamageType.PROJECTILE || event.getAbility() == ClassAbility.EXPLOSIVE || event.getAbility() == ClassAbility.PREDATOR_STRIKE || event.getAbility() == ClassAbility.ETHEREAL_ASCENSION)) {
 				apply(plugin, player, level, enemy, type == DamageType.MELEE);
 			} else {
 				double chance = CHANCE * level;

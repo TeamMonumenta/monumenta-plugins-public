@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.depths.abilities.gifts;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
@@ -22,7 +24,11 @@ public class WildCard extends DepthsAbility {
 		super(plugin, player, INFO);
 	}
 
+	public static void trigger(Player player, DepthsPlayer dp) {
+		DepthsManager.getInstance().increaseRandomAbilityLevel(player, dp, 1);
+	}
+
 	private static Description<WildCard> getDescription() {
-		return new DescriptionBuilder<WildCard>().add("Every time you enter a Wildcard room, upgrade a random ability by one level.");
+		return new DescriptionBuilder<>(() -> INFO).add("Every time you enter a Wildcard room, upgrade a random ability by one level.");
 	}
 }

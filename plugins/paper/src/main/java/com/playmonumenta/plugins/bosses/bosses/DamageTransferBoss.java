@@ -16,9 +16,11 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class DamageTransferBoss extends BossAbilityGroup {
 
@@ -28,7 +30,7 @@ public class DamageTransferBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "targeted entity/entities. don't have 2 mobs target each other with this ability (it can crash the shard)")
-		public EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.setRange(15);
+		public EntityTargets TARGETS = EntityTargets.GENERIC_MOB_TARGET.clone().setRange(15);
 		@BossParam(help = "detection radius")
 		public int DETECTION = 30;
 
@@ -48,7 +50,7 @@ public class DamageTransferBoss extends BossAbilityGroup {
 				targets.remove(mBoss);
 				for (LivingEntity e : targets) {
 					DamageTransferBoss otherBoss = BossManager.getInstance().getBoss(e, DamageTransferBoss.class);
-					if (otherBoss != null && otherBoss.mTarget == mBoss) {
+					if (otherBoss != null && otherBoss.mTarget.equals(mBoss)) {
 						continue;
 					}
 					mTarget = e;
@@ -64,33 +66,27 @@ public class DamageTransferBoss extends BossAbilityGroup {
 	public void onHurt(DamageEvent event) {
 		if (mTarget != null && !mTarget.isDead() && event.getSource() != null) {
 			mBossDamageThisTick += event.getDamage();
+			event.setFlatDamage(0);
 			// Do this at the end of the tick so we can't miss the passenger being damaged
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				DamageUtils.damage(null, mTarget, event.getType(), mBossDamageThisTick, null, false);
 				mBossDamageThisTick = 0;
 			}, 0);
-		} else {
-			DamageUtils.damage(null, mBoss, event.getType(), event.getDamage(), null, false);
 		}
-		event.setFlatDamage(0);
 	}
 
 	@Override
 	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
 		if (mTarget != null && !mTarget.isDead() && COPIED_EFFECTS.contains(event.getEffect().getClass())) {
 			event.setEntity(mTarget);
-		} else {
-			event.setEntity(mBoss);
 		}
 	}
 
 	@Override
-	public void bossIgnited(int ticks) {
+	public void bossIgnited(int ticks, @Nullable Entity igniter) {
 		if (mTarget != null && !mTarget.isDead()) {
-			EntityUtils.setFireTicksIfLower(ticks, mTarget);
+			EntityUtils.setFireTicksIfLower(ticks, mTarget, igniter);
 			mBoss.setFireTicks(0);
-		} else {
-			mBoss.setFireTicks(ticks);
 		}
 	}
 }

@@ -119,7 +119,7 @@ public class SpellTotemicDestruction extends Spell {
 							);
 
 							new PPBezier(Particle.REDSTONE, locs)
-								.count(5)
+								.count(25)
 								.data(new Particle.DustOptions(lifeOrDeath ? Color.fromRGB(0, 204, 0) : Color.fromRGB(153, 76, 37), 1.65f))
 								.spawnAsBoss();
 						}

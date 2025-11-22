@@ -23,7 +23,7 @@ public class PercentSpeed extends Effect {
 
 	private boolean mWasInNoMobilityZone = false;
 
-	public PercentSpeed(int duration, double amount, String modifierName) {
+	public PercentSpeed(final int duration, final double amount, final String modifierName) {
 		super(duration, effectID);
 		mAmount = Math.max(-1, amount);
 		mModifierName = modifierName;
@@ -49,23 +49,26 @@ public class PercentSpeed extends Effect {
 	}
 
 	@Override
-	public void entityGainEffect(Entity entity) {
-		if (entity instanceof Attributable attributable && (!(entity instanceof Player) || !ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES))) {
-			EntityUtils.replaceAttribute(attributable, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+	public void entityGainEffect(final Entity entity) {
+		if (entity instanceof final Attributable attributable && (!(entity instanceof Player) ||
+			!ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES))) {
+			EntityUtils.replaceAttribute(attributable, Attribute.GENERIC_MOVEMENT_SPEED,
+				new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 
 	@Override
-	public void entityLoseEffect(Entity entity) {
-		if (entity instanceof Attributable attributable) {
+	public void entityLoseEffect(final Entity entity) {
+		if (entity instanceof final Attributable attributable) {
 			EntityUtils.removeAttribute(attributable, Attribute.GENERIC_MOVEMENT_SPEED, mModifierName);
 		}
 	}
 
 	@Override
-	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
+	public void entityTickEffect(final Entity entity, final boolean fourHertz, final boolean twoHertz,
+	                             final boolean oneHertz) {
 		if (entity instanceof Player) {
-			boolean isInNoMobilityZone = ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES);
+			final boolean isInNoMobilityZone = ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES);
 
 			if (mWasInNoMobilityZone && !isInNoMobilityZone) {
 				entityGainEffect(entity);
@@ -77,7 +80,7 @@ public class PercentSpeed extends Effect {
 		}
 	}
 
-	public void setAmount(double speed, Entity entity) {
+	public void setAmount(final double speed, final Entity entity) {
 		mAmount = speed;
 		if (mUsed) {
 			entityGainEffect(entity);
@@ -86,7 +89,7 @@ public class PercentSpeed extends Effect {
 
 	@Override
 	public JsonObject serialize() {
-		JsonObject object = new JsonObject();
+		final JsonObject object = new JsonObject();
 		object.addProperty("effectID", mEffectID);
 		object.addProperty("duration", mDuration);
 		object.addProperty("amount", mAmount);
@@ -95,17 +98,18 @@ public class PercentSpeed extends Effect {
 		return object;
 	}
 
-	public static PercentSpeed deserialize(JsonObject object, Plugin plugin) {
-		int duration = object.get("duration").getAsInt();
-		double amount = object.get("amount").getAsDouble();
-		String modifierName = object.get("modifierName").getAsString();
+	public static PercentSpeed deserialize(final JsonObject object, final Plugin plugin) {
+		final int duration = object.get("duration").getAsInt();
+		final double amount = object.get("amount").getAsDouble();
+		final String modifierName = object.get("modifierName").getAsString();
 
 		return new PercentSpeed(duration, amount, modifierName);
 	}
 
 	@Override
 	public @Nullable Component getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(mAmount).append(Component.text(" " + getDisplayedName()));
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount)
+			.append(Component.text(" " + getDisplayedName()));
 	}
 
 	@Override

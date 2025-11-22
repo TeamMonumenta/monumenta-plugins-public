@@ -32,11 +32,11 @@ public class ForsakenGrimoire extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.GRIMOIRE);
+		dp.addReward(DepthsRoomType.DepthsRewardType.GRIMOIRE);
 	}
 
 	private static Description<ForsakenGrimoire> getDescription() {
-		return new DescriptionBuilder<ForsakenGrimoire>().add("Select an active ability from your trees and obtain it at ")
+		return new DescriptionBuilder<>(() -> INFO).add("Select an active ability from your trees and obtain it at ")
 			.add(DepthsRarity.RARE.getDisplay())
 			.add(" rarity.");
 	}

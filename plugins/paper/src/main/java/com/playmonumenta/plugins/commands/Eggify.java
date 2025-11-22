@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -37,6 +37,11 @@ public class Eggify {
 	}
 
 	private static void eggify(Player player, Entity entity) {
+		if (GuildPlotUtils.guildPlotUseEggsBlocked(player)) {
+			player.sendMessage(Component.text("You do not have permission to turn entities into eggs on this plot.", NamedTextColor.RED));
+			return;
+		}
+
 		if (!entity.isValid()) {
 			return;
 		}
@@ -53,7 +58,7 @@ public class Eggify {
 			NBTItem nbtItem = new NBTItem(spawnEgg);
 			NBTCompound entityTag = nbtItem.getCompound("EntityTag");
 			String customNameJson = entityTag == null ? null : entityTag.getString("CustomName");
-			String name = customNameJson == null ? null : ChatColor.stripColor(MessagingUtils.plainText(MessagingUtils.parseComponent(customNameJson)));
+			String name = customNameJson == null ? null : MessagingUtils.plainText(MessagingUtils.parseComponent(customNameJson));
 			if (!Objects.equals(entityName, name)) {
 				continue;
 			}

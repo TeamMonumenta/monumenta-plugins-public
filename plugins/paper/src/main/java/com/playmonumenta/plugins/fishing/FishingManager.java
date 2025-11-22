@@ -55,12 +55,12 @@ public class FishingManager implements Listener {
 		() -> new RhythmFM(false, false),
 		() -> new RhythmFM(true, false),
 		() -> new RhythmFM(false, true),
-		() -> new PointAndClickFM(120, 7, 0.4, false, false),
-		() -> new PointAndClickFM(130, 6, 0.5, true, false),
+		() -> new PointAndClickFM(130, 7, 0.4, false, false),
+		() -> new PointAndClickFM(150, 6, 0.5, true, false),
 		() -> new PointAndClickFM(150, 8, 0.4, false, true),
-		() -> new MinesweeperFM(40 * 20, 4, 5),
-		() -> new MinesweeperFM(30 * 20, 3, 4),
-		() -> new MinesweeperFM(55 * 20, 6, 6)
+		() -> new MinesweeperFM(45 * 20, 4, 5),
+		() -> new MinesweeperFM(35 * 20, 3, 4),
+		() -> new MinesweeperFM(60 * 20, 6, 6)
 	);
 	private final HashMap<Player, FishingMinigame> mPlayerMinigameMap = new HashMap<>();
 	private final HashMap<Player, FishHook> mPlayerFishHookMap = new HashMap<>();
@@ -69,8 +69,9 @@ public class FishingManager implements Listener {
 	private final ArrayList<Player> mPlayerPrepCombatList = new ArrayList<>();
 	private final FishingCombatManager mCombatManager;
 	private static final String LESSER_LOOT_TABLE = "epic:r3/world/fishing/custom_fishing/cache_lesser";
-	private static final String GREATER_LOOT_TABLE = "epic:r3/world/fishing/custom_fishing/cache_greater";
-	private static final String ABYSSAL_LOOT_TABLE = "epic:r3/world/fishing/custom_fishing/cache_abyssal";
+	private static final String GREATER_LOOT_TABLE = "epic:r3/world/fishing/custom_fishing/cache_greater_v2";
+	private static final String ABYSSAL_LOOT_TABLE_TIER_ONE = "epic:r3/world/fishing/custom_fishing/cache_abyssal1_v2";
+	private static final String ABYSSAL_LOOT_TABLE_TIER_TWO = "epic:r3/world/fishing/custom_fishing/cache_abyssal2_v2";
 	private static final String WEIGHTED_FISH_TABLE = "epic:r3/items/fishing/fish/ring_fish_greater_weighted";
 	private static final String FISH_COMBAT_PERMISSION = "monumenta.fishingcombat";
 
@@ -119,11 +120,20 @@ public class FishingManager implements Listener {
 					if (overrideItem != null) {
 						caughtItemStack.setItemMeta(overrideItem.getItemMeta());
 						caughtItemStack = caughtItemStack.withType(overrideItem.getType());
+						caughtItem.setItemStack(caughtItemStack);
 					}
 				}
 
 				modifyAndAssessFishQuality(player, caughtItemStack, baitInfo);
 			}
+
+			// Fished up items should be owned by the fisher for 10 secs
+			caughtItem.setOwner(player.getUniqueId());
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				if (caughtItem.isValid()) {
+					caughtItem.setOwner(null);
+				}
+			}, 200);
 		}
 	}
 
@@ -229,9 +239,9 @@ public class FishingManager implements Listener {
 			FishingParticleListener.suppressFishingParticles(player, fishHook.getLocation());
 			mPlayerMinigameMap.put(player, rollMinigame());
 		} else if (eventProbability < minigameOdds + combatOdds &&
-			           !ZoneUtils.hasZoneProperty(fishHook.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
-			           !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
-			           player.hasPermission(FISH_COMBAT_PERMISSION)) {
+			!ZoneUtils.hasZoneProperty(fishHook.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
+			!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
+			player.hasPermission(FISH_COMBAT_PERMISSION)) {
 			mPlayerPrepCombatList.add(player);
 		}
 	}
@@ -290,11 +300,11 @@ public class FishingManager implements Listener {
 
 			modifyAndAssessFishQuality(player, reward, baitInfo);
 
-			InventoryUtils.giveItem(player, reward);
+			InventoryUtils.dropTempOwnedItem(reward, player.getLocation(), player);
 		} else {
 			ItemStack reward = new ItemStack(Material.CHEST);
 			reward.setItemMeta(getLesserChest().getItemMeta());
-			InventoryUtils.giveItem(player, reward);
+			InventoryUtils.dropTempOwnedItem(reward, player.getLocation(), player);
 		}
 		removeHook(player, true);
 	}
@@ -372,8 +382,14 @@ public class FishingManager implements Listener {
 	}
 
 	public static ItemStack getAbyssalChest(int tier) {
+		String lootTable;
+		switch (tier) {
+			case 1 -> lootTable = ABYSSAL_LOOT_TABLE_TIER_ONE;
+			case 2 -> lootTable = ABYSSAL_LOOT_TABLE_TIER_TWO;
+			default -> throw new IllegalArgumentException("Invalid tier: " + tier);
+		}
 		return ChestUtils.giveChestWithLootTable(
-			ABYSSAL_LOOT_TABLE + tier,
+			lootTable,
 			"Architect's Abyssal Fishing Cache " + StringUtils.toRoman(tier),
 			"#26ABBD",
 			List.of(
@@ -443,13 +459,6 @@ public class FishingManager implements Listener {
 		return Math.random() <= baitInfo.mBait.mReplacementChance;
 	}
 
-	private static class BaitInfo {
-		final Bait mBait;
-		final ItemStack mItemStack;
-
-		public BaitInfo(Bait bait, ItemStack itemStack) {
-			mBait = bait;
-			mItemStack = itemStack;
-		}
+	private record BaitInfo(Bait mBait, ItemStack mItemStack) {
 	}
 }

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -55,6 +56,7 @@ public class AbilityTrigger {
 			mDisplay = display;
 		}
 
+		// Doesn't matter here.
 		@SuppressWarnings("EnumOrdinal")
 		public Key next() {
 			return values()[Math.floorMod(ordinal() + 1, values().length)];
@@ -75,7 +77,7 @@ public class AbilityTrigger {
 		NO_FOOD("not holding food", "may be holding food", Material.COOKED_BEEF,
 			player -> !player.getInventory().getItemInMainHand().getType().isEdible(), "hold_food"),
 		NO_PROJECTILE_WEAPON("not holding a projectile weapon", "may be holding a projectile weapon", Material.CROSSBOW,
-			player -> !ItemUtils.isShootableItem(player.getInventory().getItemInMainHand()), "hold_proj"),
+			player -> !ItemUtils.isShootableItem(player.getInventory().getItemInMainHand()) && !Grappling.playerHoldingHook(player), "hold_proj"),
 		NO_SHIELD("not holding a shield", "may be holding a shield", Material.SHIELD,
 			player -> player.getInventory().getItemInMainHand().getType() != Material.SHIELD, "hold_shield"),
 		NO_BLOCKS("not holding blocks", "may be holding blocks", Material.COBBLESTONE,
@@ -100,7 +102,7 @@ public class AbilityTrigger {
 		NO_AXE("not holding an axe", "may be holding an axe", Material.IRON_AXE,
 			player -> !ItemUtils.isAxe(player.getInventory().getItemInMainHand()), "hold_axe"),
 		REQUIRE_PROJECTILE_WEAPON("holding a projectile weapon", "may be not holding a projectile weapon", Material.CROSSBOW,
-			player -> ItemUtils.isShootableItem(player.getInventory().getItemInMainHand()), "hold_proj_force"),
+			player -> ItemUtils.isShootableItem(player.getInventory().getItemInMainHand()) && !Grappling.playerHoldingHook(player), "hold_proj_force"),
 		SNEAK_WITH_SHIELD("sneaking if holding a shield", "no sneak requirement if holding a shield", Material.SHIELD,
 			player -> player.isSneaking() || !(player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD), "sneak_shield"),
 		;
@@ -129,14 +131,6 @@ public class AbilityTrigger {
 		// tag used for rp support
 		private final String mGuiTag;
 
-		KeyOptions(String enabledDisplay, String disabledDisplay, Material material, Predicate<Player> predicate) {
-			mEnabledDisplay = enabledDisplay;
-			mDisabledDisplay = disabledDisplay;
-			mMaterial = material;
-			mPredicate = predicate;
-			mGuiTag = "unassigned";
-		}
-
 		KeyOptions(String enabledDisplay, String disabledDisplay, Material material, Predicate<Player> predicate, String guiTag) {
 			mEnabledDisplay = enabledDisplay;
 			mDisabledDisplay = disabledDisplay;
@@ -164,7 +158,13 @@ public class AbilityTrigger {
 	}
 
 	public enum LookDirection {
-		DOWN, LEVEL, UP
+		DOWN("down"), LEVEL("level"), UP("up");
+
+		final String mName;
+
+		LookDirection(String name) {
+			mName = name;
+		}
 	}
 
 	private static final AtomicInteger mNextMetadataId = new AtomicInteger();
@@ -400,8 +400,8 @@ public class AbilityTrigger {
 			return false;
 		}
 		LookDirection lookDirection = player.getLocation().getPitch() < -LOOK_DIRECTION_CUTOFF_ANGLE ? LookDirection.UP
-			                              : player.getLocation().getPitch() > LOOK_DIRECTION_CUTOFF_ANGLE ? LookDirection.DOWN
-				                                : LookDirection.LEVEL;
+			: player.getLocation().getPitch() > LOOK_DIRECTION_CUTOFF_ANGLE ? LookDirection.DOWN
+			: LookDirection.LEVEL;
 		if (!mLookDirections.contains(lookDirection)) {
 			return false;
 		}
@@ -430,7 +430,7 @@ public class AbilityTrigger {
 			return false;
 		}
 		return mEnabled == that.mEnabled && mDoubleClick == that.mDoubleClick && mKey == that.mKey && mKeyOptions.equals(that.mKeyOptions) && mSneaking == that.mSneaking
-			       && mSprinting == that.mSprinting && mOnGround == that.mOnGround && mFallThrough == that.mFallThrough && mLookDirections.equals(that.mLookDirections);
+			&& mSprinting == that.mSprinting && mOnGround == that.mOnGround && mFallThrough == that.mFallThrough && mLookDirections.equals(that.mLookDirections);
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public class CurseOfArachnophobia extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (DamageEvent.DamageType.getScalableDamageType().contains(event.getType()) &&
-			(enemy instanceof Spider || ScoreboardUtils.checkTag(enemy, Broodmother.identityTag) || enemy.getName().equals(Broodmother.LIMB_NAME))) {
+			(enemy instanceof Spider || ScoreboardUtils.checkTag(enemy, Broodmother.identityTag) || enemy.getName().equals(Broodmother.LIMB_PLAIN_NAME))) {
 			event.updateDamageWithMultiplier(1 - DAMAGE_DEALT);
 		}
 		return false;
@@ -49,7 +49,7 @@ public class CurseOfArachnophobia extends DepthsAbility {
 	}
 
 	private static Description<CurseOfArachnophobia> getDescription() {
-		return new DescriptionBuilder<CurseOfArachnophobia>()
+		return new DescriptionBuilder<>(() -> INFO)
 			.add("Deal ")
 			.addPercent(DAMAGE_DEALT)
 			.add(" less to and take ")

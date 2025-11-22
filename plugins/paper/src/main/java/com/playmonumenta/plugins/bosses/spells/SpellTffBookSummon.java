@@ -15,7 +15,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellTffBookSummon extends Spell {
-	private Plugin mPlugin;
+	private final Plugin mPlugin;
 	private static final int PLAYER_RANGE = 16;
 	private static final int MAX_NEARBY_SUMMONS = 8;
 	private final LivingEntity mBoss;
@@ -61,7 +61,7 @@ public class SpellTffBookSummon extends Spell {
 				}
 			}
 
-		}.runTaskLater(mPlugin, 20 * 1);
+		}.runTaskLater(mPlugin, 20);
 	}
 
 	@Override

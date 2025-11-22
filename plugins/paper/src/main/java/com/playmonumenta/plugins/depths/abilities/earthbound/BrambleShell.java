@@ -49,8 +49,8 @@ public class BrambleShell extends DepthsAbility {
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (source != null
-			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)
-			    && !event.isBlocked()) {
+			&& (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)
+			&& !event.isBlocked()) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
 			new PartialParticle(Particle.BLOCK_CRACK, loc.add(0, source.getHeight() / 2, 0), 25, 0.5, 0.5, 0.5, 0.125, Bukkit.createBlockData(Material.SWEET_BERRY_BUSH)).spawnAsPlayerPassive(mPlayer);
@@ -61,7 +61,7 @@ public class BrambleShell extends DepthsAbility {
 	}
 
 	private static Description<BrambleShell> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<BrambleShell>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Whenever an enemy deals melee or projectile damage to you, they take ")
 			.addDepthsDamage(a -> a.mDamage, BRAMBLE_DAMAGE[rarity - 1], true)
 			.add(" melee damage.");

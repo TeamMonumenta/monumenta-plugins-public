@@ -123,7 +123,7 @@ public class PaintSplashFinisher implements EliteFinisher {
 	public static Item throwConcrete(int degrees, Location loc, ItemStack concrete) {
 		ItemMeta meta = concrete.getItemMeta();
 		meta.displayName(Component.text("Concrete " + degrees, NamedTextColor.WHITE)
-			                 .decoration(TextDecoration.ITALIC, false));
+			.decoration(TextDecoration.ITALIC, false));
 		concrete.setItemMeta(meta);
 		Item concreteItem = loc.getWorld().dropItem(loc, concrete);
 		concreteItem.setPickupDelay(Integer.MAX_VALUE);

@@ -31,6 +31,8 @@ public enum ClassAbility {
 	MANA_LANCE("Mana Lance"),
 	PRISMATIC_SHIELD("Prismatic Shield"),
 	SPELLSHOCK(Spellshock.NAME),
+	SPELLSHOCK_ARCANE("Spellshock Arcane Enhancement"),
+	SPELLSHOCK_THUNDER("Spellshock Thunder Enhancement"),
 	THUNDER_STEP(ThunderStep.NAME),
 
 	// Arcanist
@@ -49,6 +51,7 @@ public enum ClassAbility {
 	BY_MY_BLADE("By My Blade"),
 	DAGGER_THROW("Dagger Throw"),
 	DODGING("Dodging"),
+	MAGIC_DODGING("Magic Dodging"),
 	SKIRMISHER("Skirmisher"),
 	ESCAPE_DEATH("Escape Death"),
 	SMOKESCREEN("Smokescreen"),
@@ -71,13 +74,15 @@ public enum ClassAbility {
 	HAND_OF_LIGHT("Hand of Light"),
 	SANCTIFIED_ARMOR("Sanctified Armor"),
 	ILLUMINATE("Illuminate"),
-	CRUSADE("Crusade"),
+	ILLUMINATE_DOT("Illuminate DoT"),
+	TOUCH_OF_RADIANCE("Touch of Radiance"),
 	HEAVENLY_BOON("Heavenly Boon"),
 
 	// Hierophant
-	ENCHANTED_PRAYER("Enchanted Prayer"),
+	ETHEREAL_ASCENSION("Ethereal Ascension"),
 	HALLOWED_BEAM("Hallowed Beam"),
-	THURIBLE_PROCESSION("Thurible Procession"),
+	HALLOWED_BEAM_SEAL("Hallowed Beam"), // Used for differentiating L1 and L2
+	KEEPER_VIRTUE("Keeper Virtue"),
 
 	// Paladin
 	CHOIR_BELLS("Choir Bells"),
@@ -92,7 +97,7 @@ public enum ClassAbility {
 	SWIFT_CUTS("Swift Cuts"), //placeholder for cosmetic
 	SWIFTNESS("Swiftness"),
 	SHARPSHOOTER("Sharpshooter"),
-	AGILITY("Agility"),
+	QUICKDRAW("Quickdraw"),
 
 	// Hunter
 	PREDATOR_STRIKE("Predator Strike"),
@@ -101,7 +106,7 @@ public enum ClassAbility {
 
 	// Ranger
 	TACTICAL_MANEUVER("Tactical Maneuver"),
-	QUICKDRAW("Quickdraw"),
+	RENDING_RAZOR("Rending Razor"),
 	WHIRLING_BLADE("Whirling Blade"),
 
 	// [Warlock]
@@ -118,6 +123,7 @@ public enum ClassAbility {
 	DARK_PACT("Dark Pact"),
 	JUDGEMENT_CHAIN("Judgement Chain"),
 	VOODOO_BONDS("Voodoo Bonds"),
+	VOODOO_BONDS_PIN("Voodoo Bonds Pin"),
 
 	// Tenebrist
 	HAUNTING_SHADES("Haunting Shades"),
@@ -128,7 +134,6 @@ public enum ClassAbility {
 	BRUTE_FORCE("Brute Force"),
 	BRUTE_FORCE_AOE("Brute Force"), // special case for glorious battle
 	COUNTER_STRIKE("Counter Strike"),
-	COUNTER_STRIKE_AOE("Counter Strike"), // special case for glorious battle
 	DEFENSIVE_LINE("Defensive Line"),
 	RIPOSTE("Riposte"),
 	SHIELD_BASH("Shield Bash"),
@@ -150,6 +155,7 @@ public enum ClassAbility {
 	// [Alchemist]
 	ALCHEMIST_POTION("Alchemist Potion"),
 	ALCHEMICAL_ARTILLERY("Alchemical Artillery"),
+	ALCHEMICAL_ARTILLERY_AFTERSHOCK("Alchemical Artillery Aftershock"),
 	BEZOAR("Bezoar"),
 	BRUTAL_ALCHEMY("Brutal Alchemy"),
 	ENERGIZING_ELIXIR("Energizing Elixir"),
@@ -171,7 +177,6 @@ public enum ClassAbility {
 	// [Shaman]
 	CLEANSING_TOTEM("Cleansing Totem"),
 	EARTHEN_TREMOR("Earthen Tremor"),
-	FLAME_SPIRIT("Flame Spirit"),
 	FLAME_TOTEM("Flame Totem"),
 	INTERCONNECTED_HAVOC("Interconnected Havoc"),
 	CHAIN_LIGHTNING("Chain Lightning"),
@@ -194,6 +199,7 @@ public enum ClassAbility {
 	APOCALYPSE("Apocalypse"),
 	DETONATION("Detonation"),
 	FIREBALL("Fireball"),
+	FLAME_SPIRIT("Flame Spirit"),
 	FLAMESTRIKE("Flamestrike"),
 	IGNEOUS_RUNE("Igneous Rune"),
 	VOLCANIC_COMBOS("Volcanic Combos"),
@@ -209,6 +215,7 @@ public enum ClassAbility {
 	SIDEARM("Sidearm"),
 	STEEL_STALLION("Steel Stallion"),
 	VOLLEY_DEPTHS("Volley"),
+	SHARPSHOOTER_DEPTHS("Sharpshooter"),
 
 	// WINDWALKER
 	GUARDING_BOLT("Guarding Bolt"),
@@ -245,15 +252,17 @@ public enum ClassAbility {
 	AVALANCHE("Avalanche"),
 	PIERCING_COLD("Piercing Cold"),
 	CRYOBOX("Cryobox"),
+	PERMAFROST("Permafrost"),
 
 	// EARTHBORN
+	BEASTSCLAW("Beast's Claw"),
 	BRAMBLE_SHELL("Bramble Shell"),
 	BULWARK("Bulwark"),
-	CRUSHING_EARTH("Crushing Earth"),
 	EARTHEN_WRATH("Earthen Wrath"),
 	EARTHQUAKE("Earthquake"),
 	IRON_GRIP("Iron Grip"),
 	TAUNT("Taunt"),
+	ENTRENCH("Entrench"),
 
 	//PRISMATIC
 	CHROMA_BLADE("Chroma Blade"),
@@ -270,11 +279,14 @@ public enum ClassAbility {
 	// Used to trigger other events
 	ERUPTION("Eruption", true),
 	QUAKE("Quake", true),
+	SWEEPING_EDGE("Sweeping Edge", true),
+	ARCANE_THRUST("Arcane Thrust", true),
 	EXPLOSIVE("Explosive", true),
 	INFERNO("Inferno", true),
 	REVERB("Reverb", true),
-	TRIVIUM("Trivium", true)
-	;
+	TRIVIUM("Trivium", true),
+	REFLECTION("Reflection", true),
+	BLEEDING("Bleeding", true);
 
 	private final String mName;
 	private final boolean mFake;

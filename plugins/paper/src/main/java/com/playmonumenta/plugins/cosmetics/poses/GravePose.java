@@ -13,7 +13,8 @@ import org.bukkit.util.EulerAngle;
 
 public interface GravePose {
 
-	record Pose(EulerAngle head, EulerAngle body, EulerAngle leftArm, EulerAngle rightArm, EulerAngle leftLeg, EulerAngle rightLeg) {
+	record Pose(EulerAngle head, EulerAngle body, EulerAngle leftArm, EulerAngle rightArm, EulerAngle leftLeg,
+	            EulerAngle rightLeg) {
 	}
 
 	// In general, override the individual angle methods instead of this method, unless there is randomization and the angles are not independent
@@ -63,6 +64,7 @@ public interface GravePose {
 			int mTicks = 0;
 			double mY = 0;
 			double mTheta = 0;
+
 			@Override
 			public void run() {
 				new PartialParticle(Particle.TOTEM, loc.clone().add(FastUtils.cos(mTheta), mY, FastUtils.sin(mTheta)), 1, 0, 0, 0, 0).spawnAsPlayerPassive(player);

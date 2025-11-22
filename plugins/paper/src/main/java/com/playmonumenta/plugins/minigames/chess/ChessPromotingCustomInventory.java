@@ -74,8 +74,8 @@ public class ChessPromotingCustomInventory extends CustomInventory {
 
 	}
 
-	private ChessBoard mBoard;
-	private ChessPiece mPiece;
+	private final ChessBoard mBoard;
+	private final ChessPiece mPiece;
 	private Boolean mPromoted;
 
 	public ChessPromotingCustomInventory(Player owner, ChessBoard board, ChessPiece promotingPiece) {

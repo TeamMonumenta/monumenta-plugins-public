@@ -39,7 +39,7 @@ import org.bukkit.util.Vector;
 public class Scrapshot extends DepthsAbility {
 	public static final String ABILITY_NAME = "Scrapshot";
 	private static final int COOLDOWN = 10 * 20;
-	private static final int[] DAMAGE = {32, 39, 47, 54, 62, 77};
+	private static final int[] DAMAGE = {35, 43, 52, 59, 68, 85};
 	private static final double RECOIL_VELOCITY = 1;
 	private static final int RANGE = 8;
 	private static final double SHRAPNEL_DAMAGE_PERCENT = 0.33;
@@ -162,8 +162,9 @@ public class Scrapshot extends DepthsAbility {
 	}
 
 	private static Description<Scrapshot> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Scrapshot>(color)
-			.add("Left click while sneaking to fire a blunderbuss shot that goes up to ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to fire a blunderbuss shot that goes up to ")
 			.add(a -> a.mRange, RANGE)
 			.add(" blocks away, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)

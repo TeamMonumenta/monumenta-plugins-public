@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -33,7 +34,7 @@ public class SpellForsakenLeap extends SpellBaseSlam {
 	public static final int JUMP_HEIGHT = 1;
 
 	public Plugin mPlugin;
-	private RKitxet mRKitxet;
+	private final RKitxet mRKitxet;
 
 	public SpellForsakenLeap(Plugin plugin, LivingEntity launcher, int cooldown, RKitxet rKitxet) {
 		super(plugin, launcher, JUMP_HEIGHT, DETECTION, MIN_RANGE, RUN_DISTANCE, cooldown, VELOCITY_MULTIPLIER,
@@ -49,7 +50,7 @@ public class SpellForsakenLeap extends SpellBaseSlam {
 				rKitxet.useSpell("Forsaken Leap");
 
 				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
-					Arrays.asList(
+					List.of(
 						new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
 							new PartialParticle(Particle.CRIMSON_SPORE, location, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(launcher);
 							new PartialParticle(Particle.CLOUD, location, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(launcher);

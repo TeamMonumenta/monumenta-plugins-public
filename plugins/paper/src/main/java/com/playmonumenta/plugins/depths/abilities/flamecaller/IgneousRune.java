@@ -222,6 +222,7 @@ public class IgneousRune extends DepthsAbility {
 			final Location mLoc = loc;
 			final World mWorld = loc.getWorld();
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				// cosmetics
@@ -357,6 +358,7 @@ public class IgneousRune extends DepthsAbility {
 			int mTicks = 0;
 			int mIter = 0;
 			double mDegree = 0;
+
 			@Override
 			public void run() {
 				for (int i = 0; i < 8; i++) {
@@ -393,8 +395,9 @@ public class IgneousRune extends DepthsAbility {
 	}
 
 	private static Description<IgneousRune> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<IgneousRune>(color)
-			.add("Left click while sneaking to place a rune up to ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to place a rune up to ")
 			.add(a -> a.mCastRange, CAST_RANGE)
 			.add(" blocks away. The rune has a radius of ")
 			.add(a -> a.mRuneRadius, RUNE_RADIUS)

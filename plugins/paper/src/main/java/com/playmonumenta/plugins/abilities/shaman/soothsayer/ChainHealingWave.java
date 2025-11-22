@@ -5,20 +5,19 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.ChainHealingWaveCS;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,7 +38,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 	public static final int BOUNCE_RANGE_2 = 15;
 	public static final double HEAL_PERCENT_1 = 0.3;
 	public static final double HEAL_PERCENT_2 = 0.4;
-	public static final int CDR_ON_KILL = 1;
+	public static final int CDR_ON_KILL = 20;
 	public static final int CHARGES = 2;
 
 	public static final String CHARM_COOLDOWN = "Chain Healing Wave Cooldown";
@@ -54,21 +53,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 			.linkedSpell(ClassAbility.CHAIN_HEALING_WAVE)
 			.scoreboardId("ChainHealWave")
 			.shorthandName("CHW")
-			.descriptions(
-				String.format("Punch while holding a projectile weapon to cast a beam of healing, bouncing between up to %s players within %s blocks of the last target hit " +
-					"and healing for %s%% of their health. Will also bounce to nearby totems, decreasing their cooldowns by %ss without consuming a heal. %s charges, %ss cooldown.",
-					TARGETS_1,
-					BOUNCE_RANGE_1,
-					StringUtils.multiplierToPercentage(HEAL_PERCENT_1),
-					CDR_ON_KILL,
-					CHARGES,
-					StringUtils.ticksToSeconds(COOLDOWN)
-				),
-				String.format("Heal is increased to %s%%, range between bounces has increased to %s, and can now heal up to %s targets.",
-					StringUtils.multiplierToPercentage(HEAL_PERCENT_2),
-					BOUNCE_RANGE_2,
-					TARGETS_2)
-			)
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Cast a heal that will bounce between teammates and your totems.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ChainHealingWave::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
@@ -84,14 +69,11 @@ public class ChainHealingWave extends MultipleChargeAbility {
 
 	public ChainHealingWave(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
 		mMaxCharges = CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mBounceRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelTwo() ? BOUNCE_RANGE_2 : BOUNCE_RANGE_1);
 		mTargets = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TARGETS, isLevelOne() ? TARGETS_1 : TARGETS_2);
 		mHealPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
-		mCooldownReduction = CharmManager.getDuration(mPlayer, CHARM_CDR, 20 * CDR_ON_KILL);
+		mCooldownReduction = CharmManager.getDuration(mPlayer, CHARM_CDR, CDR_ON_KILL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChainHealingWaveCS());
 	}
 
@@ -147,7 +129,7 @@ public class ChainHealingWave extends MultipleChargeAbility {
 		if (!consumeCharge()) {
 			return;
 		}
-		PlayerUtils.healPlayer(mPlugin, mPlayer, mHealPercent * EntityUtils.getMaxHealth(mPlayer), mPlayer);
+		PlayerUtils.healPlayer(mPlugin, mPlayer, mHealPercent * EntityUtils.getMaxHealth(mPlayer) / 2, mPlayer);
 
 		for (int i = 0; i < mHitTargets.size() - 1; i++) {
 			LivingEntity target = mHitTargets.get(i + 1);
@@ -207,5 +189,33 @@ public class ChainHealingWave extends MultipleChargeAbility {
 			}
 		}
 		return totalBounces - totalTotems;
+	}
+
+	private static Description<ChainHealingWave> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to cast a beam of healing, bouncing between up to ")
+			.add(a -> a.mTargets, TARGETS_1, false, Ability::isLevelOne)
+			.add(" players within ")
+			.add(a -> a.mBounceRange, BOUNCE_RANGE_1, false, Ability::isLevelOne)
+			.add(" blocks of the last target hit, healing each player for ")
+			.addPercent(a -> a.mHealPercent, HEAL_PERCENT_1, false, Ability::isLevelOne)
+			.add(" of their health. The beam can also bounce to nearby totems, decreasing their cooldowns by ")
+			.addDuration(a -> a.mCooldownReduction, CDR_ON_KILL)
+			.add(" second without consuming a heal. Charges: ")
+			.add(a -> a.mMaxCharges, CHARGES)
+			.add(". Any healing to yourself is half as effective.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<ChainHealingWave> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Healing is increased to ")
+			.addPercent(a -> a.mHealPercent, HEAL_PERCENT_2, false, Ability::isLevelTwo)
+			.add(". Range between bounces is increased to ")
+			.add(a -> a.mBounceRange, BOUNCE_RANGE_2, false, Ability::isLevelTwo)
+			.add(". Up to ")
+			.add(a -> a.mTargets, TARGETS_2, false, Ability::isLevelTwo)
+			.add(" players can now be targeted.");
 	}
 }

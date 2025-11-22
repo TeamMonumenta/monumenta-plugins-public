@@ -1,15 +1,15 @@
 package com.playmonumenta.velocity;
 
 import com.google.inject.Inject;
-import com.playmonumenta.velocity.commands.Rejoin;
 import com.playmonumenta.velocity.commands.Vote;
 import com.playmonumenta.velocity.handlers.JoinLeaveHandler;
-import com.playmonumenta.velocity.handlers.MonumentaReconnectHandler;
 import com.playmonumenta.velocity.integrations.LuckPermsIntegration;
 import com.playmonumenta.velocity.integrations.NetworkRelayIntegration;
 import com.playmonumenta.velocity.integrations.PremiumVanishIntegration;
 import com.playmonumenta.velocity.network.VelocityClientModHandler;
 import com.playmonumenta.velocity.voting.VoteManager;
+import com.velocitypowered.api.command.CommandManager;
+import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ListenerCloseEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -54,7 +54,6 @@ public class MonumentaVelocity {
 	public MonumentaVelocityConfiguration mConfig = new MonumentaVelocityConfiguration(); // class with actual data
 
 	private @Nullable VoteManager mVoteManager = null;
-	private @Nullable MonumentaReconnectHandler mReconnectHandler = null;
 
 	@Inject
 	public MonumentaVelocity(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -71,9 +70,10 @@ public class MonumentaVelocity {
 	}
 
 	@Subscribe
-	public void proxyInitalizeEvent(ProxyInitializeEvent event) {
+	public void proxyInitializeEvent(ProxyInitializeEvent event) {
 		mLoaded = true;
-		PluginManager plugins = mServer.getPluginManager();
+		final PluginManager plugins = mServer.getPluginManager();
+		final CommandManager commandManager = mServer.getCommandManager();
 
 		if (plugins.isLoaded("premiumvanish")) {
 			PremiumVanishIntegration.enable();
@@ -83,12 +83,6 @@ public class MonumentaVelocity {
 			new LuckPermsIntegration();
 		}
 
-		if (plugins.isLoaded("monumenta-redisapi")) {
-			mReconnectHandler = new MonumentaReconnectHandler(this);
-			mServer.getEventManager().register(this, mReconnectHandler);
-			mServer.getCommandManager().register("rejoin", new Rejoin(mReconnectHandler));
-		}
-
 		if (plugins.isLoaded("monumenta-network-relay")) {
 			mServer.getEventManager().register(this, new NetworkRelayIntegration(this));
 		}
@@ -96,7 +90,10 @@ public class MonumentaVelocity {
 		if (plugins.isLoaded("nuvotifier")) {
 			try {
 				mVoteManager = new VoteManager(this, mConfig);
-				mServer.getCommandManager().register("vote", new Vote(mVoteManager));
+				CommandMeta voteCommandMeta = commandManager.metaBuilder("vote")
+					.plugin(this)
+					.build();
+				mServer.getCommandManager().register(voteCommandMeta, new Vote(mVoteManager));
 				mServer.getEventManager().register(this, mVoteManager);
 			} catch (IllegalArgumentException ex) {
 				mLogger.warn("Failed to initialize voting system:", ex);
@@ -105,7 +102,8 @@ public class MonumentaVelocity {
 
 		mServer.getEventManager().register(this, new JoinLeaveHandler(this));
 
-		mServer.getEventManager().register(this, new VelocityClientModHandler(this, mConfig.mAllowPacketPublicizeContent));
+		String envAllowsPacketsPublicizeContent = System.getenv("ALLOW_PACKETS_PUBLICIZE_CONTENT");
+		mServer.getEventManager().register(this, new VelocityClientModHandler(envAllowsPacketsPublicizeContent.equalsIgnoreCase("true")));
 		mServer.getChannelRegistrar().register(VelocityClientModHandler.CHANNEL_ID);
 	}
 
@@ -142,36 +140,27 @@ public class MonumentaVelocity {
 
 	@ConfigSerializable
 	public static class MonumentaVelocityConfiguration {
-		@Setting(value = "default_server")
-		public String mDefaultServer = "";
-
 		@Setting(value = "join_messages_enabled")
 		public boolean mJoinMessagesEnabled = true;
 
 		@Setting(value = "voting")
 		public MonumentaVoting mVoting = new MonumentaVoting();
 
-		@Setting(value = "excluded_servers")
-		public List<String> mExcludedServers = new ArrayList<>();
-
 		@Setting(value = "max_player_count")
 		public int mMaxPlayerCount = 400;
 
 		@Setting(value = "version_string")
 		public String mVersionString = "Monumenta 1.19.4-1.20.2";
-
-		@Setting(value = "allow_packets_publicize_content")
-		public Boolean mAllowPacketPublicizeContent = false;
 	}
 
 	@ConfigSerializable
 	public static class MonumentaVoting {
 		@Setting(value = "sites")
-		public List<String> mUrls = new ArrayList<String>();
+		public List<String> mUrls = new ArrayList<>();
 		@Setting(value = "alternate_names")
-		public List<String> mAlternateNames = new ArrayList<String>();
+		public List<String> mAlternateNames = new ArrayList<>();
 		@Setting(value = "cooldown_minutes")
-		public List<Integer> mCooldownMinutes = new ArrayList<Integer>();
+		public List<Integer> mCooldownMinutes = new ArrayList<>();
 	}
 
 }

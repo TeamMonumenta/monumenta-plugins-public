@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -19,12 +21,22 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
+import static com.playmonumenta.plugins.Constants.SPAWNER_COUNT_METAKEY;
+
 public final class KamikazeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kamikaze";
 	public static final int detectionRange = 30;
 
+	public static class Parameters extends BossParameters {
+		@BossParam(help = "Pool of mobs to summon")
+		public LoSPool POOL = LoSPool.LibraryPool.EMPTY;
+	}
+
+	private final Parameters mParam;
+
 	public KamikazeBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
+		mParam = BossParameters.getParameters(boss, identityTag, new KamikazeBoss.Parameters());
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> new PartialParticle(Particle.SMOKE_NORMAL, boss.getLocation().clone().add(new Location(boss.getWorld(), 0, 1, 0)), 2, 0.5, 1, 0.5, 0).spawnAsEntityActive(boss))
 		);
@@ -40,6 +52,13 @@ public final class KamikazeBoss extends BossAbilityGroup {
 				World world = damager.getWorld();
 				world.playSound(damager.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.7f);
 				new PartialParticle(Particle.EXPLOSION_LARGE, damager.getLocation(), 10, 0.5, 1, 0.5, 0.05).spawnAsEntityActive(mBoss);
+
+				Entity entity = mParam.POOL.spawn(mBoss.getLocation());
+
+				// Include the original mob's metadata for spawner counting to prevent mob farming
+				if (entity != null && mBoss.hasMetadata(SPAWNER_COUNT_METAKEY)) {
+					entity.setMetadata(SPAWNER_COUNT_METAKEY, mBoss.getMetadata(SPAWNER_COUNT_METAKEY).get(0));
+				}
 			}
 		}
 	}

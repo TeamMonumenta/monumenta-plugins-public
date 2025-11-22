@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.particle;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Objects;
 import java.util.function.DoublePredicate;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +30,7 @@ public class PPCircle extends AbstractPartialParticle<PPCircle> {
 	private double mOffset = 0;
 	private boolean mIncludeStart = true;
 	private boolean mIncludeEnd = false;
+	private int mTicks = 0;
 
 	protected Vector mAxis1 = new Vector(1, 0, 0);
 	protected Vector mAxis2 = new Vector(0, 0, 1);
@@ -64,6 +67,7 @@ public class PPCircle extends AbstractPartialParticle<PPCircle> {
 		copy.mOffset = mOffset;
 		copy.mIncludeStart = mIncludeStart;
 		copy.mIncludeEnd = mIncludeEnd;
+		copy.mTicks = mTicks;
 		copy.mAxis1 = mAxis1.clone();
 		copy.mAxis2 = mAxis2.clone();
 		copy.mRotateDelta = mRotateDelta;
@@ -107,6 +111,15 @@ public class PPCircle extends AbstractPartialParticle<PPCircle> {
 		return this;
 	}
 
+	public PPCircle ticks(int ticks) {
+		mTicks = ticks;
+		return this;
+	}
+
+	public int ticks() {
+		return mTicks;
+	}
+
 	/**
 	 * In ring mode, sets the number of particles so that there's the requested number of particles per meter.
 	 * Also sets the minimum number per meter to 1/4th of this value.
@@ -144,7 +157,7 @@ public class PPCircle extends AbstractPartialParticle<PPCircle> {
 
 	/**
 	 * Limits the circle to the given degrees, starting at the x-axis and turning towards z.
-	 * Turns off randomized angles when used, and enabled inclusion of both start and end if giving an arc < 360°.
+	 * Turns off randomized angles when used, and enabled inclusion of both start and end if giving an arc &lt; 360°.
 	 */
 	public PPCircle arcDegree(double startAngleDeg, double endAngleDeg) {
 		mStartAngleDeg = startAngleDeg;
@@ -220,7 +233,7 @@ public class PPCircle extends AbstractPartialParticle<PPCircle> {
 		packagedValues.count(1);
 
 		double currentDegrees = mStartAngleDeg;
-		if (mInnerRadiusFactor == 1 && mRandomizeAngle) {
+		if (mInnerRadiusFactor == 1 && mRandomizeAngle && (mTicks == 0)) {
 			// Randomly rotated starting offset if enabled and making a ring
 			currentDegrees = FastUtils.randomDoubleInRange(0, 360);
 		}
@@ -230,38 +243,98 @@ public class PPCircle extends AbstractPartialParticle<PPCircle> {
 
 		int rawCount = partialCount - (mIncludeStart && mIncludeEnd ? 1 : 0) + (!mIncludeStart && !mIncludeEnd ? 1 : 0);
 		double step = (mEndAngleDeg - mStartAngleDeg) / Math.max(1, rawCount);
-		currentDegrees += mOffset * step;
 
-		for (int i = 0; i < partialCount; i++) {
-			if (mInnerRadiusFactor != 1 && mRandomizeAngle) {
-				// If enabled, re-randomise rotation for each particle when making a filled circle
-				currentDegrees = FastUtils.randomDoubleInRange(mStartAngleDeg, mEndAngleDeg);
-			} else if (i > 0 || !mIncludeStart) {
-				// Add on after initial rotation
-				currentDegrees += step;
+		if (mTicks > 0) {
+			new BukkitRunnable() {
+				int mSpawned = 0;
+				int mCurrentTick = 0;
+
+				@Override
+				public void run() {
+					if (mSpawned >= partialCount || mCurrentTick >= mTicks) {
+						cancel();
+						return;
+					}
+					// Evenly distributes total particles across entire duration.
+					// Calculates floor of average per-tick value, then spawns one extra depending on fractional part
+					double perTickF = (double) partialCount / mTicks;
+					int toSpawn = (int) Math.floor(perTickF);
+					if (Math.random() < (perTickF - toSpawn)) {
+						toSpawn++;
+					}
+					for (int i = 0; i < toSpawn && mSpawned < partialCount; i++, mSpawned++) {
+						double currentDegrees = mStartAngleDeg + step * mSpawned + step * mOffset;
+						double rad = Math.toRadians(currentDegrees);
+
+						if (!mIncludeStart && mSpawned == 0) {
+							continue;
+						}
+						if (!mIncludeEnd && mSpawned == partialCount - 1) {
+							continue;
+						}
+						if (mAnglePredicate != null && !mAnglePredicate.test(currentDegrees)) {
+							continue;
+						}
+
+						double x = FastUtils.cos(rad) * mRadius;
+						double z = FastUtils.sin(rad) * mRadius;
+						double inwardFactor = 1;
+						if (mInnerRadiusFactor < 1) {
+							// Randomly move inwards
+							inwardFactor = Math.sqrt(FastUtils.randomDoubleInRange(mInnerRadiusFactor * mInnerRadiusFactor, 1));
+							x *= inwardFactor;
+							z *= inwardFactor;
+						}
+
+						Location loc = centerLocation.clone()
+							.add(mAxis1.clone().multiply(x))
+							.add(mAxis2.clone().multiply(z));
+						packagedValues.location(loc);
+
+						if (mRotateDelta) {
+							Vector rotatedDelta = originalDelta.clone().rotateAroundNonUnitAxis(normal, rad).multiply(inwardFactor);
+							packagedValues.offset(rotatedDelta.getX(), rotatedDelta.getY(), rotatedDelta.getZ());
+						}
+
+						spawnUsingSettings(packagedValues);
+					}
+					mCurrentTick++;
+				}
+			}.runTaskTimerAsynchronously(Plugin.getInstance(), 0L, 1L);
+		} else {
+			currentDegrees += mOffset * step;
+
+			for (int i = 0; i < partialCount; i++) {
+				if (mInnerRadiusFactor != 1 && mRandomizeAngle) {
+					// If enabled, re-randomise rotation for each particle when making a filled circle
+					currentDegrees = FastUtils.randomDoubleInRange(mStartAngleDeg, mEndAngleDeg);
+				} else if (i > 0 || !mIncludeStart) {
+					// Add on after initial rotation
+					currentDegrees += step;
+				}
+				if (mAnglePredicate != null && !mAnglePredicate.test(currentDegrees)) {
+					continue;
+				}
+
+				double offsetX = FastUtils.cosDeg(currentDegrees) * mRadius;
+				double offsetZ = FastUtils.sinDeg(currentDegrees) * mRadius;
+				double inwardFactor = 1;
+				if (mInnerRadiusFactor < 1) {
+					// Randomly move inwards
+					inwardFactor = Math.sqrt(FastUtils.randomDoubleInRange(mInnerRadiusFactor * mInnerRadiusFactor, 1));
+					offsetX *= inwardFactor;
+					offsetZ *= inwardFactor;
+				}
+
+				packagedValues.location(centerLocation.clone().add(mAxis1.clone().multiply(offsetX)).add(mAxis2.clone().multiply(offsetZ)));
+
+				if (mRotateDelta) {
+					Vector rotatedDelta = originalDelta.clone().rotateAroundNonUnitAxis(normal, Math.toRadians(currentDegrees)).multiply(inwardFactor);
+					packagedValues.offset(rotatedDelta.getX(), rotatedDelta.getY(), rotatedDelta.getZ());
+				}
+
+				spawnUsingSettings(packagedValues);
 			}
-			if (mAnglePredicate != null && !mAnglePredicate.test(currentDegrees)) {
-				continue;
-			}
-
-			double offsetX = FastUtils.cosDeg(currentDegrees) * mRadius;
-			double offsetZ = FastUtils.sinDeg(currentDegrees) * mRadius;
-			double inwardFactor = 1;
-			if (mInnerRadiusFactor < 1) {
-				// Randomly move inwards
-				inwardFactor = Math.sqrt(FastUtils.randomDoubleInRange(mInnerRadiusFactor * mInnerRadiusFactor, 1));
-				offsetX *= inwardFactor;
-				offsetZ *= inwardFactor;
-			}
-
-			packagedValues.location(centerLocation.clone().add(mAxis1.clone().multiply(offsetX)).add(mAxis2.clone().multiply(offsetZ)));
-
-			if (mRotateDelta) {
-				Vector rotatedDelta = originalDelta.clone().rotateAroundNonUnitAxis(normal, Math.toRadians(currentDegrees)).multiply(inwardFactor);
-				packagedValues.offset(rotatedDelta.getX(), rotatedDelta.getY(), rotatedDelta.getZ());
-			}
-
-			spawnUsingSettings(packagedValues);
 		}
 	}
 }

@@ -10,6 +10,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class DeadlyRondeCS implements CosmeticSkill {
@@ -26,14 +27,14 @@ public class DeadlyRondeCS implements CosmeticSkill {
 		return Material.BLAZE_ROD;
 	}
 
-	public void rondeHitEffect(World world, Player player, double radius, double rondeBaseRadius, boolean lv2) {
-		Location particleLoc = player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(3));
+	public void rondeHitEffect(World world, Player player, Entity enemy, double radius, double rondeBaseRadius, boolean lv2) {
+		double distance = enemy.getLocation().distance(player.getLocation());
+		Location particleLoc = player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(distance));
 		double multiplier = radius / rondeBaseRadius;
-		double delta = 1.5 * multiplier;
-		new PartialParticle(Particle.SWEEP_ATTACK, particleLoc, (int) (10 * multiplier), delta, 0.5, delta).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CRIT, particleLoc, (int) (50 * multiplier), delta, 0.5, delta, 0.2).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CLOUD, particleLoc, (int) (20 * multiplier), delta, 0.5, delta, 0.3).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, particleLoc, (int) (45 * multiplier), delta, 0.5, delta, SWORDSAGE_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SWEEP_ATTACK, particleLoc, (int) (2 * radius), 1, 0.5, 1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT, particleLoc, (int) (40 * multiplier), 1, 0.5, 1, 0.2).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CLOUD, particleLoc, (int) (20 * multiplier), 1, 0.5, 1, 0.3).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, particleLoc, (int) (35 * multiplier), 1, 0.5, 1, SWORDSAGE_COLOR).spawnAsPlayerActive(player);
 
 		world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1.0f, 0.1f);
 		world.playSound(particleLoc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.4f);

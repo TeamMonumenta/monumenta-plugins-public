@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -52,18 +53,18 @@ public class ZoneListener implements Listener {
 
 		if (namespace.equals("default")) {
 			switch (property) {
-			case "Adventure Mode":
-				if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
-					player.setGameMode(GameMode.ADVENTURE);
-				}
-				break;
-			case "!Adventure Mode":
-				if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
-					player.setGameMode(GameMode.SURVIVAL);
-				}
-				break;
-			default:
-				// Do nothing
+				case "Adventure Mode":
+					if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
+						player.setGameMode(GameMode.ADVENTURE);
+					}
+					break;
+				case "!Adventure Mode":
+					if (mode != GameMode.CREATIVE && mode != GameMode.SPECTATOR) {
+						player.setGameMode(GameMode.SURVIVAL);
+					}
+					break;
+				default:
+					// Do nothing
 			}
 		}
 	}
@@ -74,7 +75,7 @@ public class ZoneListener implements Listener {
 			if (event.getEntityType() == EntityType.SNOWBALL && event.getEntity() instanceof Snowball snowball) {
 				// Only allow winter arena snowballs in the winter arena
 				if (ZoneUtils.hasZoneProperty(player, ZoneProperty.WINTER_SNOWBALLS_ONLY)
-					    && !InventoryUtils.testForItemWithName(snowball.getItem(), "Arena Snowball", true)) {
+					&& !InventoryUtils.testForItemWithName(snowball.getItem(), "Arena Snowball", true)) {
 					event.setCancelled(true);
 				}
 			} else if (event.getEntityType() == EntityType.SPLASH_POTION) {
@@ -158,7 +159,7 @@ public class ZoneListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void preciousBlockSpawnedEvent(ItemSpawnEvent event) {
 		if (ZoneUtils.hasZoneProperty(event.getEntity(), ZoneProperty.PRECIOUS_BLOCK_DROPS_DISABLED)
-			&& ZoneUtils.PRECIOUS_BLOCKS.contains(event.getEntity().getItemStack().getType())) {
+			&& ServerProperties.getPreciousBlocks().contains(event.getEntity().getItemStack().getType())) {
 			event.setCancelled(true);
 		}
 	}
@@ -167,10 +168,10 @@ public class ZoneListener implements Listener {
 	public void playerThrowPreciousBlockEvent(PlayerDropItemEvent event) {
 		if (ZoneUtils.hasZoneProperty(event.getItemDrop(), ZoneProperty.PRECIOUS_BLOCK_DROPS_DISABLED)
 			&& event.getPlayer().getGameMode() != GameMode.CREATIVE
-			&& ZoneUtils.PRECIOUS_BLOCKS.contains(event.getItemDrop().getItemStack().getType())) {
+			&& ServerProperties.getPreciousBlocks().contains(event.getItemDrop().getItemStack().getType())) {
 			event.setCancelled(true);
 			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_SHULKER_HURT_CLOSED, 1, 1);
-			event.getPlayer().sendMessage(Component.text("You get the feeling that discarding this item here would be a bad idea...", NamedTextColor.RED));
+			event.getPlayer().sendMessage(Component.text("You get the feeling that discarding this valuable block here would be a bad idea...", NamedTextColor.RED));
 		}
 	}
 
@@ -178,10 +179,10 @@ public class ZoneListener implements Listener {
 	public void playerPlacePreciousBlockEvent(BlockPlaceEvent event) {
 		if (ZoneUtils.hasZoneProperty(event.getBlockPlaced().getLocation(), ZoneProperty.PRECIOUS_BLOCK_DROPS_DISABLED)
 			&& event.getPlayer().getGameMode() != GameMode.CREATIVE
-			&& ZoneUtils.PRECIOUS_BLOCKS.contains(event.getBlockPlaced().getType())) {
+			&& ServerProperties.getPreciousBlocks().contains(event.getBlockPlaced().getType())) {
 			event.setCancelled(true);
 			event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_SHULKER_HURT_CLOSED, 1, 1);
-			event.getPlayer().sendMessage(Component.text("You get the feeling that placing this item here would be a bad idea...", NamedTextColor.RED));
+			event.getPlayer().sendMessage(Component.text("You get the feeling that placing this valuable block here would be a bad idea...", NamedTextColor.RED));
 		}
 	}
 
@@ -191,7 +192,7 @@ public class ZoneListener implements Listener {
 			&& event.getPlayer().getGameMode() != GameMode.CREATIVE
 			&& ZoneUtils.hasZoneProperty(c.getLocation(), ZoneProperty.PRECIOUS_BLOCK_DROPS_DISABLED)) {
 			for (ItemStack item : c.getInventory().getContents()) {
-				if (item != null && ZoneUtils.PRECIOUS_BLOCKS.contains(item.getType())) {
+				if (item != null && ServerProperties.getPreciousBlocks().contains(item.getType())) {
 					event.setCancelled(true);
 					event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_SHULKER_HURT_CLOSED, 1, 1);
 					event.getPlayer().sendMessage(Component.text("You should make sure there aren't any valuable materials in there first!", NamedTextColor.RED));
@@ -204,7 +205,7 @@ public class ZoneListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockDispensePreciousBlockEvent(BlockDispenseEvent event) {
 		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneProperty.PRECIOUS_BLOCK_DROPS_DISABLED)
-			&& ZoneUtils.PRECIOUS_BLOCKS.contains(event.getItem().getType())) {
+			&& ServerProperties.getPreciousBlocks().contains(event.getItem().getType())) {
 			event.setCancelled(true);
 		}
 	}

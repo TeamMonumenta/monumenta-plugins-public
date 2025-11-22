@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.warlock.tenebrist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -65,19 +67,9 @@ public class RestlessSouls extends Ability {
 			.linkedSpell(ClassAbility.RESTLESS_SOULS)
 			.scoreboardId("RestlessSouls")
 			.shorthandName("RS")
-			.descriptions(
-				"Whenever an enemy dies within " + RANGE + " blocks of you, a glowing invisible invulnerable vex spawns. " +
-					"The vex targets your enemies and possesses them, dealing " + DAMAGE_1 + " magic damage to the target and silences all mobs within " + DEBUFF_RANGE + " blocks for " + SILENCE_DURATION_1 / 20 + " seconds. " +
-					"Vex count is capped at " + VEX_CAP_1 + " and each lasts for " + VEX_DURATION / 20 + " seconds. " +
-					"Each vex can only possess 1 enemy. Enemies killed by the vex will not spawn additional vexes.",
-				"Damage is increased to " + DAMAGE_2 + " and silence duration increased to " + SILENCE_DURATION_2 / 20 + " seconds. " +
-					"Maximum vex count increased to " + VEX_CAP_2 + ". " +
-					"Additionally, the possessed mob is inflicted with a level 1 debuff of the corresponding active skill that is on cooldown for " + DEBUFF_DURATION / 20 + " seconds. " +
-					"Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > -100% Healing. " +
-					"Melancholic Lament > 10% Weaken. Withering Gaze > Decay 1. Haunting Shades > 10% Vulnerability.")
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Mobs that die near you spawn a vex that targets enemies, dealing damage and silencing them.")
 			.displayItem(Material.ENDER_EYE);
-
 
 	private final boolean mLevel;
 	private final double mDamage;
@@ -86,6 +78,8 @@ public class RestlessSouls extends Ability {
 	private final double mDebuffRange;
 	private final int mDebuffDuration;
 	private final double mMoveSpeed;
+	private final double mRadius;
+	private final int mDuration;
 	private final List<Vex> mVexList = new ArrayList<>();
 	private final RestlessSoulsCS mCosmetic;
 
@@ -99,12 +93,14 @@ public class RestlessSouls extends Ability {
 		mDebuffRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_DEBUFF_RANGE, DEBUFF_RANGE);
 		mDebuffDuration = CharmManager.getDuration(player, CHARM_DEBUFF_DURATION, DEBUFF_DURATION);
 		mMoveSpeed = CharmManager.calculateFlatAndPercentValue(player, CHARM_SPEED, MOVESPEED);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RANGE);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, VEX_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new RestlessSoulsCS());
 	}
 
 	@Override
 	public double entityDeathRadius() {
-		return CharmManager.getRadius(mPlayer, CHARM_RADIUS, RANGE);
+		return mRadius;
 	}
 
 	@Override
@@ -139,8 +135,6 @@ public class RestlessSouls extends Ability {
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 			restlessSoulsBoss.spawn(mPlayer, mDamage, mDebuffRange, mSilenceTime, mDebuffDuration, mLevel, playerItemStats, mCosmetic);
 
-			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, VEX_DURATION);
-
 			new BukkitRunnable() {
 				int mTicksElapsed = 0;
 				@Nullable LivingEntity mTarget;
@@ -152,7 +146,7 @@ public class RestlessSouls extends Ability {
 				public void run() {
 					mCosmetic.vexTick(mPlayer, mBoss, mTicksElapsed);
 
-					boolean isOutOfTime = mTicksElapsed >= duration;
+					boolean isOutOfTime = mTicksElapsed >= mDuration;
 					if (isOutOfTime || !mBoss.isValid()) {
 						if (mBoss.isValid()) {
 							mCosmetic.vexDespawn(mPlayer, mBoss);
@@ -173,7 +167,7 @@ public class RestlessSouls extends Ability {
 							nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 							nearbyMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC));
 							// check mob count again after removal of vexes
-							if (nearbyMobs.size() > 0) {
+							if (!nearbyMobs.isEmpty()) {
 								Collections.shuffle(nearbyMobs);
 								LivingEntity randomMob = nearbyMobs.get(0);
 								if (randomMob != null) {
@@ -234,12 +228,42 @@ public class RestlessSouls extends Ability {
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		if (mVexList != null) {
 			mVexList.removeIf(e -> !e.isValid() || e.isDead());
-			if (mVexList.size() > 0) {
+			if (!mVexList.isEmpty()) {
 				for (Vex v : mVexList) {
 					v.remove();
 				}
 				mVexList.clear();
 			}
 		}
+	}
+
+	private static Description<RestlessSouls> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Whenever an enemy dies within ")
+			.add(a -> a.mRadius, RANGE)
+			.add(" blocks of you, an invulnerable vex spawns. The vex targets mobs and possesses them, dealing ")
+			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage to the target and silences all mobs within ")
+			.add(a -> a.mDebuffRange, DEBUFF_RANGE)
+			.add(" blocks for ")
+			.addDuration(a -> a.mSilenceTime, SILENCE_DURATION_1, false, Ability::isLevelOne)
+			.add(" seconds. Vex count is capped at ")
+			.add(a -> a.mVexCap, VEX_CAP_1, false, Ability::isLevelOne)
+			.add(" and each lasts for ")
+			.addDuration(a -> a.mDuration, VEX_DURATION)
+			.add(" seconds. Each vex can only possess 1 enemy. Enemies killed by the vex will not spawn additional vexes.");
+	}
+
+	private static Description<RestlessSouls> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is increased to ")
+			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" and silence duration increased to ")
+			.addDuration(a -> a.mSilenceTime, SILENCE_DURATION_2, false, Ability::isLevelTwo)
+			.add(" seconds. Maximum vex count increased to ")
+			.add(a -> a.mVexCap, VEX_CAP_2, false, Ability::isLevelTwo)
+			.add(". Additionally, the possessed mob is inflicted with a level 1 debuff of the corresponding active skill that is on cooldown for ")
+			.addDuration(a -> a.mDebuffDuration, DEBUFF_DURATION)
+			.add(" seconds. Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > -100% Healing. Melancholic Lament > 10% Weaken. Withering Gaze > Decay 1. Haunting Shades > 10% Vulnerability.");
 	}
 }

@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import java.util.Collections;
 import org.bukkit.entity.Creature;
@@ -13,21 +15,20 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
 public class HostileBoss extends BossAbilityGroup {
-
 	public static final String identityTag = "boss_hostile";
 
-	@BossParam(help = "Make this LivingEntity fight player")
+	@BossParam(help = "Force a Creature to target and attempt to damage Players")
 	public static class Parameters extends BossParameters {
-		@BossParam(help = "Attack of this mob")
+		@BossParam(help = "Damage amount per attack")
 		public double DAMAGE = 0;
 
-		@BossParam(help = "Attack % of this mob")
+		@BossParam(help = "Percent Health True damage to apply on hit")
 		public double DAMAGE_PERCENTAGE = 0;
 
-		@BossParam(help = "Damage type of this mob attack")
+		@BossParam(help = "Damage type to use with the DAMAGE param")
 		public DamageEvent.DamageType TYPE = DamageEvent.DamageType.MELEE;
 
-		@BossParam(help = "Particles summon at player eye")
+		@BossParam(help = "Particles summoned on the target when hit")
 		public ParticlesList PARTICLES = ParticlesList.EMPTY;
 
 		@BossParam(help = "Sounds played when damage is dealt")
@@ -50,12 +51,14 @@ public class HostileBoss extends BossAbilityGroup {
 		try {
 			if (boss instanceof Creature creature) {
 				NmsUtils.getVersionAdapter().setAggressive(creature, (LivingEntity target) -> {
-					if (p.DAMAGE != 0) {
+					if (p.DAMAGE > 0) {
 						BossUtils.blockableDamage(mBoss, target, p.TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.SHIELD_BREAK_TICKS);
 					}
 
-					if (p.DAMAGE_PERCENTAGE != 0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation());
+					if (p.DAMAGE_PERCENTAGE > 0) {
+						DamageUtils.damage(mBoss, target, new DamageEvent.Metadata(DamageEvent.DamageType.TRUE,
+								null, null, p.SPELL_NAME), p.DAMAGE_PERCENTAGE * EntityUtils.getMaxHealth(target),
+							false, true, true);
 					}
 
 					if (p.SOUNDS != SoundsList.EMPTY) {

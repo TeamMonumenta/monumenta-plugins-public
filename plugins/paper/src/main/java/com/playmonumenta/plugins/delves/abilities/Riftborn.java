@@ -50,12 +50,13 @@ public class Riftborn {
 		if (!block.getLocation().clone().add(0, 1, 0).getBlock().isSolid()) {
 			validSpawnLocs.add(block.getLocation().clone().add(0.5, 1, 0.5));
 		}
-		if (validSpawnLocs.size() > 0) {
+		if (!validSpawnLocs.isEmpty()) {
 			Location loc = validSpawnLocs.get(FastUtils.RANDOM.nextInt(validSpawnLocs.size()));
 			LivingEntity boss = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, "VoidGate"));
 			boss.addScoreboardTag(BlockLockBoss.identityTag + String.format("[x=%s,y=%s,z=%s]", block.getX(), block.getY(), block.getZ()));
 			new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					if (mTicks < 5) {

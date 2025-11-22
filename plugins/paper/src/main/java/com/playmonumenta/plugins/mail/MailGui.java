@@ -186,9 +186,10 @@ public abstract class MailGui extends Gui implements Comparable<MailGui> {
 
 	/**
 	 * Checks if the GUI's viewer has access to the GUI and an optional mailbox
+	 *
 	 * @param mailbox The mailbox to check access for, if any
 	 * @throws NoMailAccessException with the reason the player does not have access to the mailbox,
-	 * as well as if the GUI should be closed.
+	 *                               as well as if the GUI should be closed.
 	 */
 	public void noAccessGuiCheck(@Nullable Mailbox mailbox) throws NoMailAccessException {
 		String shard = ServerProperties.getShardName();
@@ -357,12 +358,16 @@ public abstract class MailGui extends Gui implements Comparable<MailGui> {
 				TextColor confirmationColor = TextColor.color(0x7f, 0xbf, 0xff);
 				Component confirmationMessage;
 				if (returnedItems.isEmpty()) {
-					confirmationMessage = Component.text("Sent ", confirmationColor)
-						.append(Component.text("[", NamedTextColor.RED)
-							.append(ItemUtils.getDisplayName(newMailItem))
-							.append(Component.text("]"))
-							.hoverEvent(newMailItem))
-						.append(Component.text("!"));
+					if (ItemUtils.isNullOrAir(newMailItem)) {
+						confirmationMessage = null;
+					} else {
+						confirmationMessage = Component.text("Sent ", confirmationColor)
+							.append(Component.text("[", NamedTextColor.RED)
+								.append(ItemUtils.getDisplayName(newMailItem))
+								.append(Component.text("]"))
+								.hoverEvent(newMailItem))
+							.append(Component.text("!"));
+					}
 				} else if (ItemUtils.isNullOrAir(newMailItem)) {
 					confirmationMessage = Component.text("Received ", confirmationColor)
 						.append(Component.join(joinConfiguration, returnedItemComponents))
@@ -378,7 +383,9 @@ public abstract class MailGui extends Gui implements Comparable<MailGui> {
 						.append(Component.join(joinConfiguration, returnedItemComponents))
 						.append(Component.text("!"));
 				}
-				mPlayer.sendMessage(confirmationMessage);
+				if (confirmationMessage != null) {
+					mPlayer.sendMessage(confirmationMessage);
+				}
 
 				mPlayer.playSound(mPlayer, Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f);
 

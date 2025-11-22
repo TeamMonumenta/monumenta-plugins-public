@@ -49,7 +49,7 @@ public class GlowingReplacer extends PacketAdapter implements Listener {
 
 	public GlowingReplacer(Plugin plugin) {
 		super(plugin, ListenerPriority.NORMAL,
-				PacketType.Play.Server.ENTITY_METADATA, PacketType.Play.Server.SCOREBOARD_TEAM);
+			PacketType.Play.Server.ENTITY_METADATA, PacketType.Play.Server.SCOREBOARD_TEAM);
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 
@@ -64,10 +64,10 @@ public class GlowingReplacer extends PacketAdapter implements Listener {
 			// Entity flags is a byte and is at index 0, see https://wiki.vg/Entity_metadata#Entity
 			PacketPlayOutEntityMetadataHandle handle = PacketPlayOutEntityMetadataHandle.createHandle(packet.getHandle());
 			if (handle.getMetadataItems().isEmpty()
-					|| handle.getMetadataItems().get(0) == null
-					|| !handle.getMetadataItems().get(0).isForKey(EntityHandle.DATA_FLAGS)
-					|| !(handle.getMetadataItems().get(0).value() instanceof Byte data)
-					|| (data & GLOWING_BIT) == 0) {
+				|| handle.getMetadataItems().get(0) == null
+				|| !handle.getMetadataItems().get(0).isForKey(EntityHandle.DATA_FLAGS)
+				|| !(handle.getMetadataItems().get(0).value() instanceof Byte data)
+				|| (data & GLOWING_BIT) == 0) {
 				// No glowing bit is set, so there's nothing to do
 				return;
 			}
@@ -166,8 +166,8 @@ public class GlowingReplacer extends PacketAdapter implements Listener {
 		final WrappedDataWatcher dataWatcher = WrappedDataWatcher.getEntityWatcher(entity);
 		final List<WrappedWatchableObject> dataWatcherObjects = dataWatcher.getWatchableObjects();
 		if (dataWatcherObjects.isEmpty()
-				|| dataWatcherObjects.get(0).getIndex() != 0
-				|| !(dataWatcherObjects.get(0).getValue() instanceof Byte)) {
+			|| dataWatcherObjects.get(0).getIndex() != 0
+			|| !(dataWatcherObjects.get(0).getValue() instanceof Byte)) {
 			return;
 		}
 		packet.getIntegers().write(0, entity.getEntityId());
@@ -194,6 +194,7 @@ public class GlowingReplacer extends PacketAdapter implements Listener {
 		return "_glowing_color_" + color + (forPlayers ? "_players" : "") + (unpushable ? "_unpushable" : "");
 	}
 
+	// BKCommonLib insists on using ChatColor
 	@SuppressWarnings("deprecation")
 	private static ChatColor namedTextColorToChatColor(NamedTextColor color) {
 		return ChatColor.valueOf(color.toString().toUpperCase(Locale.ROOT));

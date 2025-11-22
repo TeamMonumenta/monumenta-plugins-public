@@ -41,11 +41,14 @@ public class ElementalSpiritIce extends BaseElementalSpirit {
 			.hotbarName("EsI")
 			.cooldown(COOLDOWN_TICKS, ElementalSpiritFire.CHARM_COOLDOWN, CHARM_COOLDOWN2);
 
+	protected final double mSize;
 
 	private @Nullable BukkitTask mSpiritPulser;
 
 	public ElementalSpiritIce(Plugin plugin, Player player) {
 		super(plugin, player, INFO, ICE_ABILITIES, DAMAGE_1, DAMAGE_2, BOW_MULTIPLIER_1, BOW_MULTIPLIER_2);
+		mLevelDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE2, mLevelDamage);
+		mSize = CharmManager.getRadius(mPlayer, ElementalSpiritFire.CHARM_SIZE, SIZE);
 	}
 
 	@Override
@@ -69,20 +72,18 @@ public class ElementalSpiritIce extends BaseElementalSpirit {
 	@Override
 	protected void activate(LivingEntity target, World world, double spellDamage, ItemStatManager.PlayerItemStats playerItemStats, boolean isElementalArrows) {
 		Location centre = LocationUtils.getHalfHeightLocation(target);
-		double size = CharmManager.getRadius(mPlayer, ElementalSpiritFire.CHARM_SIZE, SIZE);
-		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE2, spellDamage);
 		mSpiritPulser = new BukkitRunnable() {
 			int mPulses = 1; // The current pulse for this run
 
 			@Override
 			public void run() {
 				// Damage actions
-				for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, size)) {
-					damage(mob, damage, playerItemStats, isElementalArrows);
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(centre, mSize)) {
+					damage(mob, spellDamage, playerItemStats, isElementalArrows);
 					mob.setVelocity(new Vector()); // Wipe velocity, extreme local climate
 				}
 
-				mCosmetic.iceSpiritPulse(mPlayer, world, centre, size);
+				mCosmetic.iceSpiritPulse(mPlayer, world, centre, mSize);
 
 				if (mPulses >= PULSES) {
 					this.cancel();

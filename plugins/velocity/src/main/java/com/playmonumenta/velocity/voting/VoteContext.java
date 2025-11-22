@@ -114,7 +114,7 @@ public class VoteContext {
 		}
 
 		if (minutesLeft > 0) {
-			if (str.length() > 0) {
+			if (!str.isEmpty()) {
 				str += " ";
 			}
 			str += minutesLeft + " minute";

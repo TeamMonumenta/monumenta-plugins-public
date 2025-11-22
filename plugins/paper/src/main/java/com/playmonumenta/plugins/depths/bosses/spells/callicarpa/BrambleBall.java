@@ -166,7 +166,7 @@ public class BrambleBall extends Spell {
 				// If the bramble hits a player, apply major slowness and jump negation.
 				Hitbox hitbox = new Hitbox.SphereHitbox(mCurrLoc, 0.5);
 				List<Player> hitPlayers = hitbox.getHitPlayers(false);
-				if (hitPlayers.size() != 0) {
+				if (!hitPlayers.isEmpty()) {
 					Player hitPlayer = hitPlayers.get(0);
 					// Apply major slowness and jump negation
 					hitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PLAYER_HIT_DEBUFFS_DURATION, -10, true, false, false));

@@ -29,8 +29,8 @@ public class TowerManager implements Listener {
 
 	protected static final Map<UUID, TowerGame> GAMES = new HashMap<>();
 
-	@SuppressWarnings("NullAway.Init") // set in constructor, which should be called before any other tower methods
-	public static Plugin mPlugin;
+	// set in constructor, which should be called before any other tower methods
+	private final Plugin mPlugin;
 
 
 	public TowerManager(Plugin plugin) {
@@ -74,8 +74,6 @@ public class TowerManager implements Listener {
 			TowerFileUtils.saveTowerMobs();
 		}
 	}
-
-
 
 
 	//------------------------EVENTS-----------------------------------
@@ -127,7 +125,7 @@ public class TowerManager implements Listener {
 		try {
 			NetworkRelayAPI.sendBroadcastMessage("com.playmonumenta.plugins.infinitytower.updatetower", newTeamFloor);
 		} catch (Exception e) {
-			mPlugin.getLogger().warning("[TowerManager] can't send broadcast update tower. Reason : " + e.getMessage());
+			Plugin.getInstance().getLogger().warning("[TowerManager] can't send broadcast update tower. Reason : " + e.getMessage());
 		}
 	}
 

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import org.bukkit.Location;
@@ -20,6 +21,8 @@ public final class FacingBoss extends BossAbilityGroup {
 
 		@BossParam(help = "continuously faces aggro target")
 		public boolean PREFER_TARGET = true;
+		@BossParam(help = "only set head rotation")
+		public boolean HEAD_ROTATION = false;
 		@BossParam(help = "targets of the spell")
 		public EntityTargets TARGET = EntityTargets.GENERIC_PLAYER_TARGET;
 	}
@@ -34,8 +37,8 @@ public final class FacingBoss extends BossAbilityGroup {
 		}
 		LivingEntity facingTarget = targets.get(0);
 
-		if (p.PREFER_TARGET && ((Mob) boss).getTarget() != null) {
-			facingTarget = ((Mob) boss).getTarget();
+		if (p.PREFER_TARGET && boss instanceof Mob mob && mob.getTarget() != null) {
+			facingTarget = mob.getTarget();
 		}
 
 		LivingEntity finalFacingTarget = facingTarget;
@@ -52,10 +55,13 @@ public final class FacingBoss extends BossAbilityGroup {
 			Location loc = boss.getLocation();
 			Vector targetDir = target.getLocation().toVector().subtract(loc.toVector());
 			double[] targetYawPitch = VectorUtils.vectorToRotation(targetDir);
-			boss.setRotation((float) targetYawPitch[0], (float) targetYawPitch[1]);
+			if (p.HEAD_ROTATION) {
+				NmsUtils.getVersionAdapter().setHeadRotation(boss, (float) targetYawPitch[0], (float) targetYawPitch[1]);
+			} else {
+				boss.setRotation((float) targetYawPitch[0], (float) targetYawPitch[1]);
+			}
 		}));
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, -1, null, 0, 1);
 	}
 }
-

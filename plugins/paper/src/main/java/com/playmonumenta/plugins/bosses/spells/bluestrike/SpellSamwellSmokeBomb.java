@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,9 +26,15 @@ public class SpellSamwellSmokeBomb extends SpellBaseGrenadeLauncher {
 	private static final int SILENCE_DURATION = 3 * 20;
 	private static final ParticlesList.CParticle mPGrenade = new ParticlesList.CParticle(Particle.CRIT, 5, 0.1, 0.1, 0.1);
 	private static final ParticlesList.CParticle mPExplode = new ParticlesList.CParticle(Particle.EXPLOSION_HUGE, 10, 2.5, 2.5, 2.5);
-	private static final ParticlesList PARTICLE_LINGERING_RING = ParticlesList.fromString("[(REDSTONE,5,0.15,0.3,0.15,0.2,WHITE,1.5)]");
-	private static final ParticlesList PARTICLE_LINGERING_CENTER = ParticlesList.fromString("[(LAVA,10,0,0,0,1.5)]");
-	private static final SoundsList SOUND_LINGERING = SoundsList.fromString("[(ENTITY_BLAZE_BURN,4,1.5)]");
+	private static final ParticlesList PARTICLE_LINGERING_RING = ParticlesList.builder()
+		.add(new ParticlesList.CParticle(Particle.REDSTONE, 5, 0.15, 0.3, 0.15, 0.2, new Particle.DustOptions(Color.WHITE, 1.5f)))
+		.build();
+	private static final ParticlesList PARTICLE_LINGERING_CENTER = ParticlesList.builder()
+		.add(new ParticlesList.CParticle(Particle.LAVA, 10, 0.0, 0.0, 0.0, 1.5))
+		.build();
+	private static final SoundsList SOUND_LINGERING = SoundsList.builder()
+		.add(new SoundsList.CSound(Sound.ENTITY_BLAZE_BURN, 4.0f, 1.5f))
+		.build();
 	private static final String SPELL_NAME = "Lava Bomb";
 	private boolean mCooldown = false;
 	private final Plugin mPlugin;

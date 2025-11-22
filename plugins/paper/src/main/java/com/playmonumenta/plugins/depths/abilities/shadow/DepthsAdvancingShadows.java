@@ -141,7 +141,8 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			}
 			playerLoc = mPlayer.getLocation();
 
-			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new PercentDamageDealt(mDamageDuration, mDamage, DamageEvent.DamageType.getAllMeleeTypes()));
+			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME,
+				new PercentDamageDealt(mDamageDuration, mDamage).damageTypes(DamageEvent.DamageType.getAllMeleeTypes()));
 
 			new PartialParticle(Particle.SPELL_WITCH, playerLoc.clone().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);
@@ -154,8 +155,9 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	}
 
 	private static Description<DepthsAdvancingShadows> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<DepthsAdvancingShadows>(color)
-			.add("Right click while looking directly at a hostile mob within ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger("looking at a hostile mob")
+			.add(" within ")
 			.add(a -> a.mRange, ADVANCING_SHADOWS_RANGE)
 			.add(" blocks to teleport to it and gain ")
 			.addPercent(a -> a.mDamage, DAMAGE[rarity - 1], false, true)

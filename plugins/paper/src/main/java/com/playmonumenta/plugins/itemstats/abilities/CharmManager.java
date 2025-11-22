@@ -28,14 +28,15 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
-import com.playmonumenta.plugins.abilities.cleric.Rejuvenation;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.EnchantedPrayer;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.HallowedBeam;
-import com.playmonumenta.plugins.abilities.cleric.hierophant.ThuribleProcession;
+import com.playmonumenta.plugins.abilities.cleric.TouchofRadiance;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
 import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
+import com.playmonumenta.plugins.abilities.cleric.seraph.EtherealAscension;
+import com.playmonumenta.plugins.abilities.cleric.seraph.HallowedBeam;
+import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtue;
+import com.playmonumenta.plugins.abilities.cleric.seraph.Rejuvenation;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
@@ -66,9 +67,9 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
-import com.playmonumenta.plugins.abilities.scout.Agility;
 import com.playmonumenta.plugins.abilities.scout.EagleEye;
 import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
+import com.playmonumenta.plugins.abilities.scout.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
@@ -77,7 +78,7 @@ import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
 import com.playmonumenta.plugins.abilities.scout.hunter.PredatorStrike;
 import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
-import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
+import com.playmonumenta.plugins.abilities.scout.ranger.RendingRazor;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
@@ -237,7 +238,7 @@ public class CharmManager {
 
 	public CharmType mEnabledCharmType;
 
-	@SuppressWarnings("NullAway.Init") // fields are initialised by called methods
+	// fields are initialised by called methods
 	private CharmManager() {
 		mPlayerCharmEffectMap = new HashMap<>();
 		if (ServerProperties.getDepthsEnabled()) {
@@ -285,10 +286,12 @@ public class CharmManager {
 			ManaLance.CHARM_CHARGES,
 			ManaLance.CHARM_COOLDOWN,
 			ManaLance.CHARM_RANGE,
+			ManaLance.CHARM_SIZE,
 			ThunderStep.CHARM_DAMAGE,
 			ThunderStep.CHARM_COOLDOWN,
 			ThunderStep.CHARM_DISTANCE,
 			ThunderStep.CHARM_RADIUS,
+			ThunderStep.CHARM_ENHANCEMENT_DURATION,
 			PrismaticShield.CHARM_DURATION,
 			PrismaticShield.CHARM_KNOCKBACK,
 			PrismaticShield.CHARM_STUN,
@@ -299,6 +302,7 @@ public class CharmManager {
 			PrismaticShield.CHARM_ENHANCE_DAMAGE,
 			PrismaticShield.CHARM_ENHANCE_DURATION,
 			PrismaticShield.CHARM_ENHANCE_HEALING,
+			PrismaticShield.CHARM_ENHANCE_CDR,
 			FrostNova.CHARM_DAMAGE,
 			FrostNova.CHARM_DURATION,
 			FrostNova.CHARM_RANGE,
@@ -311,7 +315,11 @@ public class CharmManager {
 			MagmaShield.CHARM_RANGE,
 			MagmaShield.CHARM_CONE,
 			MagmaShield.CHARM_COOLDOWN,
+			MagmaShield.CHARM_FIRE_BONUS,
 			MagmaShield.CHARM_ABILITY_BONUS,
+			MagmaShield.CHARM_DAMAGE_BONUS_DURATION,
+			MagmaShield.CHARM_ENHANCE_DAMAGE,
+			MagmaShield.CHARM_CHARGES,
 			ArcaneStrike.CHARM_DAMAGE,
 			ArcaneStrike.CHARM_RADIUS,
 			ArcaneStrike.CHARM_BONUS,
@@ -327,9 +335,14 @@ public class CharmManager {
 			Spellshock.CHARM_SLOW,
 			Spellshock.CHARM_SPELL,
 			Spellshock.CHARM_MELEE,
+			Spellshock.CHARM_RADIUS,
 			Spellshock.CHARM_ENHANCE_DAMAGE,
 			Spellshock.CHARM_ENHANCE_SLOW,
 			Spellshock.CHARM_ENHANCE_WEAK,
+			Spellshock.CHARM_ENHANCE_DOT_DAMAGE,
+			Spellshock.CHARM_ENHANCE_DOT_DURATION,
+			Spellshock.CHARM_ENHANCE_LIGHTNING_DAMAGE,
+			Spellshock.CHARM_ENHANCE_LIGHTNING_RANGE,
 			AstralOmen.CHARM_DAMAGE,
 			AstralOmen.CHARM_RANGE,
 			AstralOmen.CHARM_MODIFIER,
@@ -343,6 +356,7 @@ public class CharmManager {
 			CosmicMoonblade.CHARM_SPELL_COOLDOWN,
 			CosmicMoonblade.CHARM_DEATH_COOLDOWN,
 			CosmicMoonblade.CHARM_SLASH,
+			CosmicMoonblade.CHARM_SLASH_INTERVAL,
 			SagesInsight.CHARM_SPEED,
 			SagesInsight.CHARM_ABILITY,
 			SagesInsight.CHARM_DECAY,
@@ -352,6 +366,7 @@ public class CharmManager {
 			Blizzard.CHARM_DURATION,
 			Blizzard.CHARM_RANGE,
 			Blizzard.CHARM_DAMAGE,
+			Blizzard.CHARM_DELAY,
 			Starfall.CHARM_COOLDOWN,
 			Starfall.CHARM_DAMAGE,
 			Starfall.CHARM_RANGE,
@@ -378,7 +393,19 @@ public class CharmManager {
 			DivineJustice.CHARM_SELF,
 			DivineJustice.CHARM_HEAL_RADIUS,
 			DivineJustice.CHARM_ENHANCE_DAMAGE,
-			DivineJustice.CHARM_ENHANCE_DURATION,
+			DivineJustice.CHARM_ENHANCE_PRIME_DURATION,
+			DivineJustice.CHARM_ENHANCE_COMBO_TIMER,
+			TouchofRadiance.CHARM_RANGE,
+			TouchofRadiance.CHARM_WEAKNESS,
+			TouchofRadiance.CHARM_RADIUS,
+			TouchofRadiance.CHARM_CDR,
+			TouchofRadiance.CHARM_CDR_ALLY,
+			TouchofRadiance.CHARM_STUN_DURATION,
+			TouchofRadiance.CHARM_WEAKNESS_DURATION,
+			TouchofRadiance.CHARM_ENHANCE_DAMAGE,
+			TouchofRadiance.CHARM_ENHANCE_STUN_DURATION,
+			TouchofRadiance.CHARM_DURATION,
+			TouchofRadiance.CHARM_COOLDOWN,
 			HeavenlyBoon.CHARM_CHANCE,
 			HeavenlyBoon.CHARM_DURATION,
 			HeavenlyBoon.CHARM_RADIUS,
@@ -388,16 +415,21 @@ public class CharmManager {
 			HeavenlyBoon.CHARM_STRENGTH_AMPLIFIER,
 			HeavenlyBoon.CHARM_RESIST_AMPLIFIER,
 			HeavenlyBoon.CHARM_ABSORPTION_AMPLIFIER,
-			HeavenlyBoon.CHARM_ENHANCE_COOLDOWN,
+			HeavenlyBoon.CHARM_COOLDOWN,
 			HeavenlyBoon.CHARM_ENHANCE_CDR,
 			HeavenlyBoon.CHARM_ENHANCE_CDR_CAP,
-			Crusade.CHARM_DAMAGE,
+			Crusade.CHARM_DURATION,
 			CleansingRain.CHARM_COOLDOWN,
 			CleansingRain.CHARM_RANGE,
+			CleansingRain.CHARM_HEALING,
+			CleansingRain.CHARM_HEALING_MAX_DEBUFFS,
 			CleansingRain.CHARM_REDUCTION,
 			CleansingRain.CHARM_DURATION,
+			CleansingRain.CHARM_HEALING,
+			CleansingRain.CHARM_HEALING_MAX_DEBUFFS,
 			HandOfLight.CHARM_COOLDOWN,
 			HandOfLight.CHARM_DAMAGE,
+			HandOfLight.CHARM_MAX_MOBS,
 			HandOfLight.CHARM_HEALING,
 			HandOfLight.CHARM_RANGE,
 			Illuminate.CHARM_COOLDOWN,
@@ -416,6 +448,7 @@ public class CharmManager {
 			HolyJavelin.CHARM_DAMAGE,
 			HolyJavelin.CHARM_RANGE,
 			HolyJavelin.CHARM_SIZE,
+			HolyJavelin.CHARM_VELOCITY,
 			ChoirBells.CHARM_COOLDOWN,
 			ChoirBells.CHARM_RANGE,
 			ChoirBells.CHARM_SLOW,
@@ -423,49 +456,88 @@ public class CharmManager {
 			ChoirBells.CHARM_VULN,
 			ChoirBells.CHARM_WEAKEN,
 			ChoirBells.CHARM_DURATION,
-			LuminousInfusion.CHARM_COOLDOWN,
+			ChoirBells.CHARM_TOLLS,
+			ChoirBells.CHARM_TOLL_DELAY,
 			LuminousInfusion.CHARM_RADIUS,
 			LuminousInfusion.CHARM_DAMAGE,
-			LuminousInfusion.CHARM_MAX_STACKS,
-			LuminousInfusion.CHARM_DAMAGE_MULTIPLIER,
+			LuminousInfusion.CHARM_COOLDOWN,
+			LuminousInfusion.CHARM_CHARGES,
 			LuminousInfusion.CHARM_FIRE_DURATION,
-			LuminousInfusion.CHARM_HIT_REQUIREMENT,
-			LuminousInfusion.CHARM_STACKS_REFRESHED,
-			LuminousInfusion.CHARM_STACKS_ON_HIT,
-			EnchantedPrayer.CHARM_COOLDOWN,
-			EnchantedPrayer.CHARM_DAMAGE,
-			EnchantedPrayer.CHARM_RANGE,
-			EnchantedPrayer.CHARM_EFFECT_RANGE,
-			EnchantedPrayer.CHARM_HEAL,
-			ThuribleProcession.CHARM_COOLDOWN,
-			ThuribleProcession.CHARM_EFFECT_DURATION,
-			ThuribleProcession.CHARM_DAMAGE,
-			ThuribleProcession.CHARM_SPEED,
-			ThuribleProcession.CHARM_ATTACK,
-			ThuribleProcession.CHARM_HEAL,
+			LuminousInfusion.CHARM_KNOCKBACK,
+			EtherealAscension.CHARM_DAMAGE,
+			EtherealAscension.CHARM_RANGE,
+			EtherealAscension.CHARM_RADIUS,
+			EtherealAscension.CHARM_TRAVEL_SPEED,
+			EtherealAscension.CHARM_KNOCKBACK,
+			EtherealAscension.CHARM_DAMAGE_BONUS,
+			EtherealAscension.CHARM_HASTE,
+			EtherealAscension.CHARM_BUFF_DURATION,
+			EtherealAscension.CHARM_THROW_RATE,
+			EtherealAscension.CHARM_DURATION_EXTENSION,
+			EtherealAscension.CHARM_DURATION_MAX_EXTENSION,
+			EtherealAscension.CHARM_LAUNCH_KNOCKBACK,
+			EtherealAscension.CHARM_LAUNCH_KNOCKBACK_RADIUS,
+			EtherealAscension.CHARM_HOVER_HEIGHT,
+			EtherealAscension.CHARM_DASH_VELOCITY,
+			EtherealAscension.CHARM_DURATION,
+			EtherealAscension.CHARM_COOLDOWN,
 			HallowedBeam.CHARM_CHARGE,
 			HallowedBeam.CHARM_COOLDOWN,
 			HallowedBeam.CHARM_DAMAGE,
+			HallowedBeam.CHARM_SEAL_DAMAGE,
+			HallowedBeam.CHARM_SEAL_RADIUS,
+			HallowedBeam.CHARM_SEAL_DURATION,
+			HallowedBeam.CHARM_SEALS,
 			HallowedBeam.CHARM_DISTANCE,
 			HallowedBeam.CHARM_STUN,
 			HallowedBeam.CHARM_HEAL,
 			HallowedBeam.CHARM_RESISTANCE,
 			HallowedBeam.CHARM_RESISTANCE_DURATION,
 			HallowedBeam.CHARM_HEALING_PERCENT_THRESHOLD,
+			KeeperVirtue.CHARM_DAMAGE,
+			KeeperVirtue.CHARM_ATTACK_DELAY,
+			KeeperVirtue.CHARM_ATTACK_DRAIN,
+			KeeperVirtue.CHARM_ACTION_RANGE,
+			KeeperVirtue.CHARM_DETECTION_RANGE,
+			KeeperVirtue.CHARM_HEALING,
+			KeeperVirtue.CHARM_HEAL_DELAY,
+			KeeperVirtue.CHARM_HEAL_DRAIN,
+			KeeperVirtue.CHARM_HEAL_LOWER_THRESHOLD,
+			KeeperVirtue.CHARM_HEAL_UPPER_THRESHOLD,
+			KeeperVirtue.CHARM_COOLDOWN,
+			KeeperVirtue.CHARM_REGENERATION,
+			KeeperVirtue.CHARM_MOVEMENT_SPEED,
+			KeeperVirtue.CHARM_SPEED,
+			KeeperVirtue.CHARM_SPEED_RADIUS,
+			KeeperVirtue.CHARM_VULN,
+			KeeperVirtue.CHARM_VULN_DURATION,
+			KeeperVirtue.CHARM_HEALTH,
+			Rejuvenation.CHARM_RADIUS,
+			Rejuvenation.CHARM_HEALING,
 			Rejuvenation.CHARM_THRESHOLD,
-			SanctifiedArmor.CHARM_DAMAGE,
-			SanctifiedArmor.CHARM_SLOW,
+			SanctifiedArmor.CHARM_COOLDOWN,
+			SanctifiedArmor.CHARM_RESISTANCE,
+			SanctifiedArmor.CHARM_KBR,
 			SanctifiedArmor.CHARM_DURATION,
+			SanctifiedArmor.CHARM_SLOW,
+			SanctifiedArmor.CHARM_SLOW_DURATION,
+			SanctifiedArmor.CHARM_ELITE_DURATION,
+			SanctifiedArmor.CHARM_ENHANCE_HEAL,
 
 			//Rogue
 			AdvancingShadows.CHARM_COOLDOWN,
 			AdvancingShadows.CHARM_DAMAGE,
+			AdvancingShadows.CHARM_DURATION,
 			AdvancingShadows.CHARM_KNOCKBACK,
+			AdvancingShadows.CHARM_KNOCKBACK_RADIUS,
 			AdvancingShadows.CHARM_RANGE,
-			AdvancingShadows.CHARM_ENHANCE_TIMER,
+			AdvancingShadows.CHARM_ENHANCEMENT_TIMER,
+			AdvancingShadows.CHARM_KILL_TIMER,
+			AdvancingShadows.CHARM_ENHANCEMENT_MULTIPLIER,
 			ByMyBlade.CHARM_COOLDOWN,
 			ByMyBlade.CHARM_DAMAGE,
-			ByMyBlade.CHARM_HASTE_DURATION,
+			ByMyBlade.CHARM_ATTACK_SPEED_DURATION,
+			ByMyBlade.CHARM_ATTACK_SPEED_AMPLIFIER,
 			ByMyBlade.CHARM_HASTE_AMPLIFIER,
 			ByMyBlade.CHARM_HEALTH,
 			ByMyBlade.CHARM_ELITE_HEALTH,
@@ -473,14 +545,25 @@ public class CharmManager {
 			DaggerThrow.CHARM_DAMAGE,
 			DaggerThrow.CHARM_RANGE,
 			DaggerThrow.CHARM_VULN,
+			DaggerThrow.CHARM_VULN_DURATION,
+			DaggerThrow.CHARM_SILENCE_DURATION,
+			DaggerThrow.CHARM_RECAST_DURATION,
+			DaggerThrow.CHARM_RECAST_MULTIPLIER,
 			DaggerThrow.CHARM_DAGGERS,
 			Dodging.CHARM_COOLDOWN,
 			Dodging.CHARM_SPEED,
+			Dodging.CHARM_DURATION,
+			Dodging.CHARM_MAGIC_DODGING_COOLDOWN,
 			EscapeDeath.CHARM_ABSORPTION,
 			EscapeDeath.CHARM_COOLDOWN,
 			EscapeDeath.CHARM_SPEED,
 			EscapeDeath.CHARM_JUMP,
+			EscapeDeath.CHARM_DURATION,
+			EscapeDeath.CHARM_RADIUS,
 			EscapeDeath.CHARM_STUN_DURATION,
+			EscapeDeath.CHARM_HUNT_RADIUS,
+			EscapeDeath.CHARM_ELITE_HEALING,
+			EscapeDeath.CHARM_ELITE_HUNT_DURATION,
 			Skirmisher.CHARM_DAMAGE,
 			Skirmisher.CHARM_RADIUS,
 			Skirmisher.CHARM_TARGETS,
@@ -489,7 +572,9 @@ public class CharmManager {
 			Smokescreen.CHARM_RANGE,
 			Smokescreen.CHARM_WEAKEN,
 			Smokescreen.CHARM_SLOW,
-			Smokescreen.CHARM_DURATION,
+			Smokescreen.CHARM_ENHANCEMENT_DURATION,
+			Smokescreen.CHARM_EFFECT_DURATION,
+			Smokescreen.CHARM_DAMAGE,
 			ViciousCombos.CHARM_CDR,
 			ViciousCombos.CHARM_RADIUS,
 			ViciousCombos.CHARM_VULN,
@@ -506,10 +591,15 @@ public class CharmManager {
 			DeadlyRonde.CHARM_ANGLE,
 			DeadlyRonde.CHARM_KNOCKBACK,
 			DeadlyRonde.CHARM_STACKS,
+			DeadlyRonde.CHARM_STACK_GAIN,
 			DeadlyRonde.CHARM_SPEED,
+			DeadlyRonde.CHARM_DECAY_TIME,
+			DeadlyRonde.CHARM_STACKS_REQ,
+			DeadlyRonde.CHARM_ATTACK_SPEED_SCALING_PORTION,
 			WindWalk.CHARM_CHARGE,
 			WindWalk.CHARM_COOLDOWN,
 			WindWalk.CHARM_COOLDOWN_REDUCTION,
+			WindWalk.CHARM_DURATION,
 			BodkinBlitz.CHARM_CHARGE,
 			BodkinBlitz.CHARM_COOLDOWN,
 			BodkinBlitz.CHARM_DAMAGE,
@@ -534,14 +624,14 @@ public class CharmManager {
 			CounterStrike.CHARM_RADIUS,
 			CounterStrike.CHARM_DURATION,
 			CounterStrike.CHARM_DAMAGE_REDUCTION,
+			CounterStrike.CHARM_ABSORPTION_DAMAGE_REDUCTION,
 			CounterStrike.CHARM_KBR,
-			CounterStrike.CHARM_BLEED,
-			CounterStrike.CHARM_BLEED_DURATION,
 			DefensiveLine.CHARM_COOLDOWN,
 			DefensiveLine.CHARM_DURATION,
 			DefensiveLine.CHARM_KNOCKBACK,
 			DefensiveLine.CHARM_REDUCTION,
 			DefensiveLine.CHARM_RANGE,
+			DefensiveLine.CHARM_RADIUS,
 			DefensiveLine.CHARM_NEGATIONS,
 			Frenzy.CHARM_ATTACK_SPEED,
 			Frenzy.CHARM_SPEED,
@@ -562,9 +652,11 @@ public class CharmManager {
 			ShieldBash.CHARM_DURATION,
 			ShieldBash.CHARM_PARRY_DURATION,
 			ShieldBash.CHARM_CDR,
+			ShieldBash.CHARM_KNOCKBACK,
 			Toughness.CHARM_HEALTH,
 			Toughness.CHARM_REDUCTION,
 			Toughness.CHARM_HEALING,
+			Toughness.CHARM_HEALTH_THRESHOLD,
 			WeaponMastery.CHARM_REDUCTION,
 			WeaponMastery.CHARM_SPEED,
 			WeaponMastery.CHARM_WEAKEN,
@@ -591,6 +683,7 @@ public class CharmManager {
 			Rampage.CHARM_HEALING,
 			Rampage.CHARM_THRESHOLD,
 			Rampage.CHARM_REDUCTION_PER_STACK,
+			Rampage.CHARM_ACTIVE_MIN_STACKS,
 			Bodyguard.CHARM_COOLDOWN,
 			Bodyguard.CHARM_RADIUS,
 			Bodyguard.CHARM_RANGE,
@@ -599,7 +692,8 @@ public class CharmManager {
 			Bodyguard.CHARM_STUN_DURATION,
 			Bodyguard.CHARM_KNOCKBACK,
 			Challenge.CHARM_COOLDOWN,
-			Challenge.CHARM_DAMAGE,
+			Challenge.CHARM_DAMAGE_PER,
+			Challenge.CHARM_DAMAGE_MAX,
 			Challenge.CHARM_ABSORPTION_PER,
 			Challenge.CHARM_ABSORPTION_MAX,
 			Challenge.CHARM_SPEED_PER,
@@ -622,10 +716,12 @@ public class CharmManager {
 			AlchemicalArtillery.CHARM_COOLDOWN,
 			AlchemicalArtillery.CHARM_AFTERSHOCK_DAMAGE,
 			AlchemicalArtillery.CHARM_AFTERSHOCK_DELAY,
+			AlchemicalArtillery.CHARM_AFTERSHOCK_COUNT,
 			AlchemicalArtillery.CHARM_DAMAGE,
 			AlchemicalArtillery.CHARM_RADIUS,
 			AlchemicalArtillery.CHARM_VELOCITY,
 			AlchemicalArtillery.CHARM_SIZE,
+			AlchemicalArtillery.CHARM_COST,
 			Bezoar.CHARM_RADIUS,
 			Bezoar.CHARM_REQUIREMENT,
 			Bezoar.CHARM_DAMAGE,
@@ -639,11 +735,9 @@ public class CharmManager {
 			Bezoar.CHARM_PHILOSOPHER_STONE_POTIONS,
 			Bezoar.CHARM_ABSORPTION,
 			Bezoar.CHARM_ABSORPTION_DURATION,
-			BrutalAlchemy.CHARM_POTION_DAMAGE,
+			BrutalAlchemy.CHARM_DAMAGE_MULTIPLIER,
 			BrutalAlchemy.CHARM_DOT_DAMAGE,
 			BrutalAlchemy.CHARM_DURATION,
-			BrutalAlchemy.CHARM_MULTIPLIER,
-			BrutalAlchemy.CHARM_RADIUS,
 			EmpoweringOdor.CHARM_SPEED,
 			EmpoweringOdor.CHARM_DAMAGE,
 			EmpoweringOdor.CHARM_SINGLE_HIT_DAMAGE,
@@ -655,7 +749,7 @@ public class CharmManager {
 			EnergizingElixir.CHARM_STACKS,
 			EnergizingElixir.CHARM_BONUS,
 			EnergizingElixir.CHARM_PRICE,
-			GruesomeAlchemy.CHARM_DAMAGE,
+			GruesomeAlchemy.CHARM_DAMAGE_MULTIPLIER,
 			GruesomeAlchemy.CHARM_DURATION,
 			GruesomeAlchemy.CHARM_SLOWNESS,
 			GruesomeAlchemy.CHARM_VULNERABILITY,
@@ -667,6 +761,8 @@ public class CharmManager {
 			IronTincture.CHARM_REFILL,
 			IronTincture.CHARM_ALLY_REFILL,
 			IronTincture.CHARM_VELOCITY,
+			IronTincture.CHARM_STUN_RADIUS,
+			IronTincture.CHARM_STUN_DURATION,
 			UnstableAmalgam.CHARM_COOLDOWN,
 			UnstableAmalgam.CHARM_DAMAGE,
 			UnstableAmalgam.CHARM_DURATION,
@@ -677,6 +773,7 @@ public class CharmManager {
 			UnstableAmalgam.CHARM_POTION_DAMAGE,
 			Panacea.CHARM_DAMAGE,
 			Panacea.CHARM_DOT_DAMAGE,
+			Panacea.CHARM_DOT_DURATION,
 			Panacea.CHARM_COOLDOWN,
 			Panacea.CHARM_RADIUS,
 			Panacea.CHARM_ABSORPTION,
@@ -701,13 +798,14 @@ public class CharmManager {
 			WardingRemedy.CHARM_HEALING,
 			EsotericEnhancements.CHARM_COOLDOWN,
 			EsotericEnhancements.CHARM_DAMAGE,
-			EsotericEnhancements.CHARM_BLEED,
+			EsotericEnhancements.CHARM_SLOWNESS,
 			EsotericEnhancements.CHARM_DURATION,
 			EsotericEnhancements.CHARM_RADIUS,
 			EsotericEnhancements.CHARM_REACTION_TIME,
 			EsotericEnhancements.CHARM_FUSE,
 			EsotericEnhancements.CHARM_SPEED,
 			EsotericEnhancements.CHARM_CREEPER,
+			EsotericEnhancements.CHARM_KNOCKBACK,
 			ScorchedEarth.CHARM_DAMAGE,
 			ScorchedEarth.CHARM_COOLDOWN,
 			ScorchedEarth.CHARM_CHARGES,
@@ -716,6 +814,7 @@ public class CharmManager {
 			ScorchedEarth.CHARM_FIRE_DURATION,
 			Taboo.CHARM_COOLDOWN,
 			Taboo.CHARM_DAMAGE,
+			Taboo.CHARM_DAMAGE_BURST,
 			Taboo.CHARM_BURST_DURATION,
 			Taboo.CHARM_HEALING_PENALTY,
 			Taboo.CHARM_ABSORPTION_PENALTY,
@@ -732,6 +831,7 @@ public class CharmManager {
 			AmplifyingHex.CHARM_POTENCY_CAP,
 			AmplifyingHex.CHARM_ENHANCE_HEALTH,
 			AmplifyingHex.CHARM_ENHANCE_DAMAGE,
+			AmplifyingHex.CHARM_MAX_DEBUFFS,
 			CholericFlames.CHARM_COOLDOWN,
 			CholericFlames.CHARM_DAMAGE,
 			CholericFlames.CHARM_DURATION,
@@ -750,19 +850,23 @@ public class CharmManager {
 			GraspingClaws.CHARM_PULL_RADIUS,
 			GraspingClaws.CHARM_SLOW,
 			GraspingClaws.CHARM_SLOW_DURATION,
-			GraspingClaws.CHARM_CLEAVE_DAMAGE,
+			GraspingClaws.CHARM_CLEAVE_FLAT_DAMAGE,
+			GraspingClaws.CHARM_CLEAVE_PERCENT_DAMAGE,
 			GraspingClaws.CHARM_CLEAVE_RADIUS,
 			GraspingClaws.CHARM_CAGE_RADIUS,
 			GraspingClaws.CHARM_CAGE_HEALING,
 			GraspingClaws.CHARM_CAGE_DURATION,
 			MelancholicLament.CHARM_COOLDOWN,
-			MelancholicLament.CHARM_ENHANCE_DAMAGE,
-			MelancholicLament.CHARM_ENHANCE_DURATION,
 			MelancholicLament.CHARM_RADIUS,
 			MelancholicLament.CHARM_RECOVERY,
 			MelancholicLament.CHARM_WEAKNESS,
+			MelancholicLament.CHARM_WEAKNESS_DURATION,
 			MelancholicLament.CHARM_SILENCE_RADIUS,
 			MelancholicLament.CHARM_SILENCE_DURATION,
+			MelancholicLament.CHARM_ENHANCE_RADIUS,
+			MelancholicLament.CHARM_ENHANCE_DAMAGE,
+			MelancholicLament.CHARM_ENHANCE_MAX_MOBS,
+			MelancholicLament.CHARM_ENHANCE_DURATION,
 			PhlegmaticResolve.CHARM_ALLY,
 			PhlegmaticResolve.CHARM_RANGE,
 			PhlegmaticResolve.CHARM_RESIST,
@@ -775,10 +879,13 @@ public class CharmManager {
 			SanguineHarvest.CHARM_KNOCKBACK,
 			SanguineHarvest.CHARM_RADIUS,
 			SanguineHarvest.CHARM_RANGE,
-			SanguineHarvest.CHARM_BLEED,
 			SanguineHarvest.CHARM_DAMAGE_BOOST,
+			SanguineHarvest.CHARM_BLIGHT_DURATION,
+			SanguineHarvest.CHARM_BLIGHT_VULN_PER_DEBUFF,
+			SanguineHarvest.CHARM_MARKS,
 			SoulRend.CHARM_COOLDOWN,
 			SoulRend.CHARM_HEAL,
+			SoulRend.CHARM_PACT_HEAL,
 			SoulRend.CHARM_MARK_DURATION,
 			SoulRend.CHARM_MARK_COUNT,
 			SoulRend.CHARM_ALLY,
@@ -837,18 +944,19 @@ public class CharmManager {
 			Culling.CHARM_RESISTANCE,
 
 			//Scout
-			Agility.CHARM_HASTE,
 			EagleEye.CHARM_COOLDOWN,
 			EagleEye.CHARM_DURATION,
 			EagleEye.CHARM_RADIUS,
 			EagleEye.CHARM_REFRESH,
 			EagleEye.CHARM_VULN,
+			EagleEye.CHARM_DAMAGE,
+			EagleEye.CHARM_HITS,
 			HuntingCompanion.CHARM_DAMAGE,
 			HuntingCompanion.CHARM_DURATION,
 			HuntingCompanion.CHARM_COOLDOWN,
 			HuntingCompanion.CHARM_STUN_DURATION,
-			HuntingCompanion.CHARM_BLEED_DURATION,
-			HuntingCompanion.CHARM_BLEED_AMPLIFIER,
+			HuntingCompanion.CHARM_WEAKEN_DURATION,
+			HuntingCompanion.CHARM_WEAKEN_AMPLIFIER,
 			HuntingCompanion.CHARM_FOXES,
 			HuntingCompanion.CHARM_EAGLES,
 			HuntingCompanion.CHARM_SPEED,
@@ -863,24 +971,29 @@ public class CharmManager {
 			SwiftCuts.CHARM_DURATION,
 			SwiftCuts.CHARM_ENHANCE,
 			Swiftness.CHARM_SPEED,
+			Swiftness.CHARM_ATTACK_SPEED,
 			Swiftness.CHARM_JUMP_BOOST,
-			Swiftness.CHARM_DODGE,
+			Swiftness.CHARM_ENHANCE_CDR,
 			Volley.CHARM_COOLDOWN,
 			Volley.CHARM_ARROWS,
 			Volley.CHARM_DAMAGE,
 			Volley.CHARM_PIERCING,
-			Volley.CHARM_BLEED_AMPLIFIER,
-			Volley.CHARM_BLEED_DURATION,
+			Quickdraw.CHARM_COOLDOWN,
+			Quickdraw.CHARM_PIERCING,
+			Quickdraw.CHARM_DAMAGE,
 			WindBomb.CHARM_COOLDOWN,
 			WindBomb.CHARM_DAMAGE,
 			WindBomb.CHARM_DAMAGE_MODIFIER,
 			WindBomb.CHARM_RADIUS,
 			WindBomb.CHARM_DURATION,
 			WindBomb.CHARM_WEAKNESS,
+			WindBomb.CHARM_SLOWNESS,
 			WindBomb.CHARM_HEIGHT,
 			WindBomb.CHARM_PULL,
 			WindBomb.CHARM_VORTEX_DURATION,
 			WindBomb.CHARM_VORTEX_RADIUS,
+			WindBomb.CHARM_VORTEX_HEIGHT,
+			WindBomb.CHARM_STUN_DURATION,
 			PinningShot.CHARM_DAMAGE,
 			PinningShot.CHARM_WEAKEN,
 			PredatorStrike.CHARM_DAMAGE,
@@ -889,12 +1002,20 @@ public class CharmManager {
 			PredatorStrike.CHARM_RANGE,
 			PredatorStrike.CHARM_KNOCKBACK,
 			PredatorStrike.CHARM_PIERCING,
+			PredatorStrike.CHARM_DAMAGE_RANGE,
+			PredatorStrike.CHARM_DISTANCE_SCALE,
+			PredatorStrike.CHARM_BASE_DAMAGE,
 			SplitArrow.CHARM_DAMAGE,
 			SplitArrow.CHARM_RANGE,
 			SplitArrow.CHARM_BOUNCES,
-			Quickdraw.CHARM_COOLDOWN,
-			Quickdraw.CHARM_PIERCING,
-			Quickdraw.CHARM_DAMAGE,
+			RendingRazor.CHARM_EMBED_DAMAGE,
+			RendingRazor.CHARM_REND_DAMAGE,
+			RendingRazor.CHARM_COOLDOWN,
+			RendingRazor.CHARM_SPEED,
+			RendingRazor.CHARM_SLOWNESS,
+			RendingRazor.CHARM_SLOWNESS_DURATION,
+			RendingRazor.CHARM_RAZOR_RANGE,
+			RendingRazor.CHARM_RAZOR_SIZE,
 			TacticalManeuver.CHARM_CHARGES,
 			TacticalManeuver.CHARM_COOLDOWN,
 			TacticalManeuver.CHARM_DAMAGE,
@@ -908,9 +1029,9 @@ public class CharmManager {
 			WhirlingBlade.CHARM_KNOCKBACK,
 			WhirlingBlade.CHARM_WEAKEN,
 			WhirlingBlade.CHARM_SLOWNESS,
-			WhirlingBlade.CHARM_WEAKEN_DURATION,
-			WhirlingBlade.CHARM_SLOWNESS_DURATION,
+			WhirlingBlade.CHARM_DURATION,
 			WhirlingBlade.CHARM_STUN_DURATION,
+			WhirlingBlade.CHARM_CYCLES,
 
 			//Shaman
 			TotemicEmpowerment.CHARM_SPEED,
@@ -929,6 +1050,8 @@ public class CharmManager {
 			ChainLightning.CHARM_TARGETS,
 			ChainLightning.CHARM_CHARGES,
 			ChainLightning.CHARM_KNOCKBACK,
+			ChainLightning.CHARM_POSITIVE_TOTEM_EFFICIENCY,
+			ChainLightning.CHARM_NEGATIVE_TOTEM_EFFICIENCY,
 			CrystallineCombos.CHARM_CRYSTAL_DAMAGE,
 			CrystallineCombos.CHARM_CRYSTAL_RANGE,
 			CrystallineCombos.CHARM_CRYSTAL_STACK_THRESHOLD,
@@ -965,7 +1088,9 @@ public class CharmManager {
 			LightningTotem.CHARM_DAMAGE,
 			LightningTotem.CHARM_STORM_DAMAGE,
 			LightningTotem.CHARM_STORM_RADIUS,
+			LightningTotem.CHARM_STORM_DURATION,
 			LightningTotem.CHARM_PULSE_DELAY,
+			LightningTotem.CHARM_STORM_PULSE_DELAY,
 			TotemicProjection.CHARM_COOLDOWN,
 			TotemicProjection.CHARM_DISTANCE,
 			TotemicProjection.CHARM_SLOWNESS_PERCENT,
@@ -1029,27 +1154,36 @@ public class CharmManager {
 			CosmicMoonblade.CHARM_COOLDOWN,
 			SagesInsight.CHARM_STACKS,
 			Blizzard.CHARM_COOLDOWN,
+			Blizzard.CHARM_DELAY,
 			Starfall.CHARM_COOLDOWN,
 			ElementalSpiritFire.CHARM_COOLDOWN,
 			CelestialBlessing.CHARM_COOLDOWN,
 			CleansingRain.CHARM_COOLDOWN,
+			TouchofRadiance.CHARM_COOLDOWN,
 			HandOfLight.CHARM_COOLDOWN,
-			HeavenlyBoon.CHARM_ENHANCE_COOLDOWN,
+			HeavenlyBoon.CHARM_COOLDOWN,
+			SanctifiedArmor.CHARM_COOLDOWN,
 			HolyJavelin.CHARM_COOLDOWN,
 			ChoirBells.CHARM_COOLDOWN,
+			ChoirBells.CHARM_TOLL_DELAY,
 			LuminousInfusion.CHARM_COOLDOWN,
-			LuminousInfusion.CHARM_HIT_REQUIREMENT,
 			Illuminate.CHARM_COOLDOWN,
-			EnchantedPrayer.CHARM_COOLDOWN,
-			ThuribleProcession.CHARM_COOLDOWN,
+			EtherealAscension.CHARM_COOLDOWN,
 			HallowedBeam.CHARM_COOLDOWN,
+			KeeperVirtue.CHARM_COOLDOWN,
+			KeeperVirtue.CHARM_ATTACK_DELAY,
+			KeeperVirtue.CHARM_ATTACK_DRAIN,
+			KeeperVirtue.CHARM_HEAL_DELAY,
+			KeeperVirtue.CHARM_HEAL_DRAIN,
 			AdvancingShadows.CHARM_COOLDOWN,
 			ByMyBlade.CHARM_COOLDOWN,
 			DaggerThrow.CHARM_COOLDOWN,
 			Dodging.CHARM_COOLDOWN,
+			Dodging.CHARM_MAGIC_DODGING_COOLDOWN,
 			EscapeDeath.CHARM_COOLDOWN,
 			Smokescreen.CHARM_COOLDOWN,
 			BladeDance.CHARM_COOLDOWN,
+			DeadlyRonde.CHARM_STACKS_REQ,
 			WindWalk.CHARM_COOLDOWN,
 			BodkinBlitz.CHARM_COOLDOWN,
 			BruteForce.CHARM_WAVE_DELAY,
@@ -1059,6 +1193,7 @@ public class CharmManager {
 			MeteorSlam.CHARM_COOLDOWN,
 			MeteorSlam.CHARM_THRESHOLD,
 			Rampage.CHARM_THRESHOLD,
+			Rampage.CHARM_ACTIVE_MIN_STACKS,
 			Bodyguard.CHARM_COOLDOWN,
 			Challenge.CHARM_COOLDOWN,
 			ShieldWall.CHARM_COOLDOWN,
@@ -1081,6 +1216,7 @@ public class CharmManager {
 			AlchemicalArtillery.CHARM_AFTERSHOCK_DELAY,
 			AmplifyingHex.CHARM_COOLDOWN,
 			AmplifyingHex.CHARM_ENHANCE_HEALTH,
+			AmplifyingHex.CHARM_MAX_DEBUFFS,
 			CholericFlames.CHARM_COOLDOWN,
 			GraspingClaws.CHARM_COOLDOWN,
 			MelancholicLament.CHARM_COOLDOWN,
@@ -1100,6 +1236,7 @@ public class CharmManager {
 			Quickdraw.CHARM_COOLDOWN,
 			TacticalManeuver.CHARM_COOLDOWN,
 			WhirlingBlade.CHARM_COOLDOWN,
+			RendingRazor.CHARM_COOLDOWN,
 			CleansingTotem.CHARM_COOLDOWN,
 			CleansingTotem.CHARM_PULSE_DELAY,
 			ChainLightning.CHARM_COOLDOWN,
@@ -1110,6 +1247,7 @@ public class CharmManager {
 			EarthenTremor.CHARM_COOLDOWN,
 			LightningTotem.CHARM_COOLDOWN,
 			LightningTotem.CHARM_PULSE_DELAY,
+			LightningTotem.CHARM_STORM_PULSE_DELAY,
 			TotemicProjection.CHARM_COOLDOWN,
 			DecayedTotem.CHARM_COOLDOWN,
 			DecayedTotem.CHARM_PULSE_DELAY,
@@ -1123,9 +1261,10 @@ public class CharmManager {
 		)).toList();
 	}
 
-	/** Returns the charms a player has equipped that are of type <code>charmType</code>
+	/**
+	 * Returns the charms a player has equipped that are of type <code>charmType</code>
 	 *
-	 * @param player The player
+	 * @param player    The player
 	 * @param charmType The type of charm to query
 	 * @return The charms of the given type that the player currently has equipped.
 	 */
@@ -1133,11 +1272,12 @@ public class CharmManager {
 		return charmType.mPlayerCharms.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>());
 	}
 
-	/** Add (equip) a charm onto a player.
+	/**
+	 * Add (equip) a charm onto a player.
 	 * Returns false if passed a null player or if the charm is not valid.
 	 *
-	 * @param p The player
-	 * @param charm The charm
+	 * @param p         The player
+	 * @param charm     The charm
 	 * @param charmType The type of said charm.
 	 * @return True if successful
 	 */
@@ -1159,6 +1299,7 @@ public class CharmManager {
 		//Also make sure the charm list has space for the new charm if it exists
 		//Also make sure it's not a stack (only one item)
 		//Also parse the charm's power budget and make sure adding it would not overflow
+		//Also check there's no conflicts with locked stats
 
 		//Check item stack for valid name and amount
 		if (charm == null || p == null || charm.getAmount() != 1 || !charm.hasItemMeta() || !charm.getItemMeta().hasDisplayName()) {
@@ -1180,8 +1321,16 @@ public class CharmManager {
 					return false;
 				}
 				int powerBudget = 0;
-				//Check naming of each charm
 				for (ItemStack c : charms) {
+					//Check for conflicts with locked stats
+					for (CharmManager.CharmParsedInfo info : readCharm(c)) {
+						for (CharmManager.CharmParsedInfo info2 : readCharm(charm)) {
+							if (info.mEffect.equals(info2.mEffect) && (info.mIsLocked || info2.mIsLocked)) {
+								return false;
+							}
+						}
+					}
+					//Check naming of each charm
 					if (Objects.equals(c.getItemMeta().displayName(), charm.getItemMeta().displayName())) {
 						return false;
 					}
@@ -1267,7 +1416,7 @@ public class CharmManager {
 		AbilityManager.getManager().updatePlayerAbilities(p, true);
 	}
 
-	private static final Pattern CHARM_LINE_PATTERN = Pattern.compile("([-+]?\\d+(?:\\.\\d+)?)(%)? (.+)");
+	private static final Pattern CHARM_LINE_PATTERN = Pattern.compile("(# )?([-+]?\\d+(?:\\.\\d+)?)(%)? (.+)");
 
 	//Helper method to parse item for charm effects
 	private List<CharmParsedInfo> readCharm(ItemStack itemStack) {
@@ -1292,10 +1441,11 @@ public class CharmManager {
 		if (!matcher.matches()) {
 			return null;
 		}
-		double value = Double.parseDouble(matcher.group(1));
-		boolean percent = matcher.group(2) != null;
-		String effect = matcher.group(3);
-		return new CharmParsedInfo(value, percent, effect);
+		boolean locked = matcher.group(1) != null;
+		double value = Double.parseDouble(matcher.group(2));
+		boolean percent = matcher.group(3) != null;
+		String effect = matcher.group(4);
+		return new CharmParsedInfo(value, percent, locked, effect);
 	}
 
 	/**
@@ -1319,15 +1469,14 @@ public class CharmManager {
 		return 0;
 	}
 
-	/** Summarize a player's charm attributes into a map, given the type of charm to summarize.
+	/**
+	 * Summarize a player's charm attributes into a map, given the type of charm to summarize.
 	 *
-	 * @param p The player
+	 * @param p         The player
 	 * @param charmType The type of the charm.
 	 * @return A TreeMap sorted on effect name, representing a summary of all the <code>charmType</code> charm attributes of this player
 	 * @see CharmManager#getSummaryOfAllAttributesAsComponents(Player, CharmType)
-	 * @see com.playmonumenta.plugins.managers.DataCollectionManager.PlayerInformation#PlayerInformation(String, Player)
 	 */
-	@SuppressWarnings("JavadocReference")
 	@Contract(value = "_, _ -> !null", pure = true)
 	public @NonNull Map<String, Double> getSummaryOfAllAttributes(Player p, CharmType charmType) {
 		if (getCharms(p, charmType).isEmpty()) {
@@ -1340,7 +1489,7 @@ public class CharmManager {
 			.reduce(
 				new TreeMap<>(),
 				(map, charm) -> {
-					final var newName = charm.mEffect + (charm.mIsPercent ? "%" : ""); // we add a percent sign here (see method getSummaryOfAllAttributesAsComponents)
+					final var newName = charm.mEffect + (charm.mIsPercent ? " %" : "") + (charm.mIsLocked ? " (LOCKED)" : ""); // we add a percent sign here (see method getSummaryOfAllAttributesAsComponents)
 					map.put(newName, map.getOrDefault(newName, 0.0) + charm.mValue);
 					return map;
 				},
@@ -1355,13 +1504,14 @@ public class CharmManager {
 
 	private static final DecimalFormat valueFormatter = new DecimalFormat("#.###"); // i hate floats
 
-	/** Summarizes the charms of a given player that match the given CharmType.
+	/**
+	 * Summarizes the charms of a given player that match the given CharmType.
 	 * Used for rendering charm info into GUI components.
 	 *
-	 * @param p The player
+	 * @param p         The player
 	 * @param charmType The type of charms we want to summarize.
-	 * @see CharmsGUI#setup()
 	 * @return The summary of all the charm attributes of the given type as components.
+	 * @see CharmsGUI#setup()
 	 */
 	public List<Component> getSummaryOfAllAttributesAsComponents(Player p, CharmType charmType) {
 		List<Component> output = new ArrayList<>();
@@ -1375,7 +1525,7 @@ public class CharmManager {
 		Set<String> orderedEffects = summary.keySet();
 
 		for (String s : orderedEffects) {
-			final var normalized = s.replace("%", "");
+			final var normalized = s.replace("%", "").replace("# ", "");
 			double baseValue = summary.getOrDefault(s, 0.0);
 			double value = getValueOrCap(baseValue, normalized, charmType); // we need to replace % here otherwise things don't work correctly (see bug 19814)
 			if (value != 0) {
@@ -1420,9 +1570,10 @@ public class CharmManager {
 		return output;
 	}
 
-	/** Summarize the names of the charms a player has equipped of a given type, including the total charm power used.
+	/**
+	 * Summarize the names of the charms a player has equipped of a given type, including the total charm power used.
 	 *
-	 * @param p The player
+	 * @param p         The player
 	 * @param charmType The type of the charms.
 	 * @return A summary of charm names of a given type on a given player.
 	 */
@@ -1441,9 +1592,10 @@ public class CharmManager {
 		return Component.text("no charms", NamedTextColor.GRAY);
 	}
 
-	/** Returns the total amount of charm power the player is using by their charms of type <code>charmType</code>
+	/**
+	 * Returns the total amount of charm power the player is using by their charms of type <code>charmType</code>
 	 *
-	 * @param p The player
+	 * @param p         The player
 	 * @param charmType The type of the charms.
 	 * @return The total used charm power of all the charms the player is using of type <code>charmType</code>
 	 */
@@ -1500,7 +1652,7 @@ public class CharmManager {
 							ItemStack item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_ITEM).getAsString()));
 							if (item != null) {
 
-									ItemStatUtils.cleanIfNecessary(item);
+								ItemStatUtils.cleanIfNecessary(item);
 
 								playerCharms.add(item);
 							}
@@ -1521,14 +1673,14 @@ public class CharmManager {
 
 	/**
 	 * Get the scaled radius of a skill
-	 * @param player The player with the charm effect
-	 * @param charmEffectName Name of the charm effect. Warning: This only detects charms that use percentages!
-	 * @param baseRadius Initial radius of the skill
+	 *
+	 * @param player          The player with the charm effect
+	 * @param charmEffectName Name of the charm effect
+	 * @param baseRadius      Initial radius of the skill
 	 * @return The scaled radius or 0.1, whichever is greater
 	 */
 	public static double getRadius(Player player, String charmEffectName, double baseRadius) {
-		double level = getInstance().getValueOfAttribute(player, charmEffectName + "%");
-		return Math.max(0.1, baseRadius * ((level / 100.0) + 1));
+		return Math.max(0.1, calculateFlatAndPercentValue(player, charmEffectName, baseRadius));
 	}
 
 	// This is still used in two places which do not handle the conversion to getDuration well, so they have been left for now
@@ -1567,13 +1719,13 @@ public class CharmManager {
 	public static double calculateFlatAndPercentValue(Player player, String charmEffectName, double baseValue) {
 		double flatLevel = getInstance().getValueOfAttribute(player, charmEffectName);
 		double percentLevel = getInstance().getValueOfAttribute(player, charmEffectName + "%");
-
 		return (baseValue + flatLevel) * ((percentLevel / 100.0) + 1);
 	}
 
-	/** Returns the given value, or the cap of the charm's effect if the value is over it
+	/**
+	 * Returns the given value, or the cap of the charm's effect if the value is over it
 	 *
-	 * @param value The value
+	 * @param value           The value
 	 * @param charmEffectName The effect name
 	 * @return Returns the passed value, or returns the max value for the stat.
 	 */
@@ -1602,11 +1754,13 @@ public class CharmManager {
 	public static class CharmParsedInfo {
 		public double mValue;
 		public boolean mIsPercent;
+		public boolean mIsLocked;
 		public String mEffect;
 
-		public CharmParsedInfo(double value, boolean isPercent, String effect) {
+		public CharmParsedInfo(double value, boolean isPercent, boolean locked, String effect) {
 			mValue = value;
 			mIsPercent = isPercent;
+			mIsLocked = locked;
 			mEffect = effect;
 		}
 
@@ -1615,6 +1769,7 @@ public class CharmManager {
 			return "CharmParsedInfo{" +
 				"mValue=" + mValue +
 				", mIsPercent=" + mIsPercent +
+				", mIsLocked=" + mIsLocked +
 				", mEffect='" + mEffect + '\'' +
 				'}';
 		}

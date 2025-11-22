@@ -37,7 +37,7 @@ public class StarburstCS extends ViciousCombosCS {
 		);
 	}
 
-	private static final Color[] colors = new Color[] {
+	private static final Color[] colors = new Color[]{
 		Color.fromRGB(255, 90, 90),
 		Color.fromRGB(255, 180, 90),
 		Color.fromRGB(255, 225, 90),
@@ -59,15 +59,16 @@ public class StarburstCS extends ViciousCombosCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks < 16 && mTicks % 2 == 0) {
 					for (Vector v : starFull) {
 						drawParticle(scaleVector(v, starCentre, (double) mTicks / 16).toLocation(world), player, colors[mTicks / 2]);
 					}
-					world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1f, 1.4f - (float)mTicks / 20);
-					world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1f, 1.4f - (float)mTicks / 20);
-					world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 0.4f, 1.6f - (float)mTicks / 20);
+					world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1f, 1.4f - (float) mTicks / 20);
+					world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1f, 1.4f - (float) mTicks / 20);
+					world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 0.4f, 1.6f - (float) mTicks / 20);
 				} else if (mTicks == 16) {
 					for (Vector v : starFull) {
 						drawStar(v.toLocation(world), player);
@@ -116,43 +117,43 @@ public class StarburstCS extends ViciousCombosCS {
 	}
 
 	private List<Vector> generateStar(Vector starCentre, double starSize, double starHeaviness, double particlesPerEdge, double rotation) {
-		Vector[][] starPoints = new Vector[][] {
-			new Vector[] {
+		Vector[][] starPoints = new Vector[][]{
+			new Vector[]{
 				new Vector(starSize, 0, 0),
 				new Vector(starHeaviness, starHeaviness, starHeaviness),
 				new Vector(starHeaviness, -starHeaviness, starHeaviness),
 				new Vector(starHeaviness, starHeaviness, -starHeaviness),
 				new Vector(starHeaviness, -starHeaviness, -starHeaviness)
 			},
-			new Vector[] {
+			new Vector[]{
 				new Vector(-starSize, 0, 0),
 				new Vector(-starHeaviness, starHeaviness, starHeaviness),
 				new Vector(-starHeaviness, -starHeaviness, starHeaviness),
 				new Vector(-starHeaviness, starHeaviness, -starHeaviness),
 				new Vector(-starHeaviness, -starHeaviness, -starHeaviness)
 			},
-			new Vector[] {
+			new Vector[]{
 				new Vector(0, starSize, 0),
 				new Vector(starHeaviness, starHeaviness, starHeaviness),
 				new Vector(starHeaviness, starHeaviness, -starHeaviness),
 				new Vector(-starHeaviness, starHeaviness, starHeaviness),
 				new Vector(-starHeaviness, starHeaviness, -starHeaviness),
 			},
-			new Vector[] {
+			new Vector[]{
 				new Vector(0, -starSize, 0),
 				new Vector(starHeaviness, -starHeaviness, starHeaviness),
 				new Vector(starHeaviness, -starHeaviness, -starHeaviness),
 				new Vector(-starHeaviness, -starHeaviness, starHeaviness),
 				new Vector(-starHeaviness, -starHeaviness, -starHeaviness),
 			},
-			new Vector[] {
+			new Vector[]{
 				new Vector(0, 0, starSize),
 				new Vector(starHeaviness, starHeaviness, starHeaviness),
 				new Vector(starHeaviness, -starHeaviness, starHeaviness),
 				new Vector(-starHeaviness, starHeaviness, starHeaviness),
 				new Vector(-starHeaviness, -starHeaviness, starHeaviness)
 			},
-			new Vector[] {
+			new Vector[]{
 				new Vector(0, 0, -starSize),
 				new Vector(starHeaviness, starHeaviness, -starHeaviness),
 				new Vector(starHeaviness, -starHeaviness, -starHeaviness),

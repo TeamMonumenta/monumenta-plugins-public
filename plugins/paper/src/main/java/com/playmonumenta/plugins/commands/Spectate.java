@@ -8,7 +8,10 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.PlayerArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -58,10 +61,36 @@ public class Spectate implements Listener {
 			.withPermission(CommandPermission.fromString("monumenta.command.spectate"))
 			.executes((sender, args) -> {
 				if (sender instanceof Player) {
-					run(plugin, (Player)sender);
+					run(plugin, (Player) sender);
 				} else {
 					throw CommandAPI.failWithString("This command must be run by a player!");
 				}
+			})
+			.register();
+		registerSpectatorTeleportCommand();
+	}
+
+	private void registerSpectatorTeleportCommand() {
+		new CommandAPICommand("spectatetp")
+			.withPermission(CommandPermission.fromString("monumenta.command.spectate"))
+			.withRequirement(sender -> sender instanceof Player && ((Player) sender).hasMetadata(SPECTATE_METAKEY))
+			.withArguments(new PlayerArgument("target"))
+			.executesPlayer((sender, args) -> {
+				final Player target = (Player) args.get("target");
+
+				if (target == null) {
+					return;
+				}
+				if (target.equals(sender)) {
+					sender.sendMessage(Component.text("You cannot teleport to yourself.", NamedTextColor.RED));
+					return;
+				}
+				sender.teleport(target.getLocation());
+				sender.sendMessage(
+					Component.text("Teleported to ", NamedTextColor.GRAY)
+						.append(target.name().color(NamedTextColor.AQUA))
+						.append(Component.text(".", NamedTextColor.GRAY))
+				);
 			})
 			.register();
 	}
@@ -70,12 +99,12 @@ public class Spectate implements Listener {
 		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
 			if (player.hasMetadata(SPECTATE_METAKEY)) {
 				// Put player back where they were before when they log out
-				((SpectateContext)player.getMetadata(SPECTATE_METAKEY).get(0).value()).restore(player);
+				((SpectateContext) player.getMetadata(SPECTATE_METAKEY).get(0).value()).restore(player);
 			} else {
 				throw CommandAPI.failWithString("You can not use this command in spectator mode");
 			}
 			//Success condition- either in a safezone OR on a dungeon shard with no nearby mobs
-		} else if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SPECTATE_AVAILABLE) || (ServerProperties.getPreventDungeonItemTransfer() && EntityUtils.getNearbyMobs(player.getLocation(), MOB_CANCEL_RADIUS).size() == 0)) {
+		} else if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SPECTATE_AVAILABLE) || (ServerProperties.getPreventDungeonItemTransfer() && EntityUtils.getNearbyMobs(player.getLocation(), MOB_CANCEL_RADIUS).isEmpty())) {
 			// Move player to spectator, remember coordinates
 			new SpectateContext(plugin, player);
 			// Succeeded in making this player a spectator
@@ -102,7 +131,7 @@ public class Spectate implements Listener {
 
 		// Put player back where they were before when they log out
 		if (player.hasMetadata(SPECTATE_METAKEY)) {
-			((SpectateContext)player.getMetadata(SPECTATE_METAKEY).get(0).value()).restore(player);
+			((SpectateContext) player.getMetadata(SPECTATE_METAKEY).get(0).value()).restore(player);
 		}
 	}
 }

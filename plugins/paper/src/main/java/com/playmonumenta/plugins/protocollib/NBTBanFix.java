@@ -55,7 +55,7 @@ public class NBTBanFix extends PacketAdapter {
 			nbt.removeKey("BlockEntityTag");
 		});
 		StructureModifier<List<WrappedDataValue>> watchableAccessor = packet.getDataValueCollectionModifier();
-		watchableAccessor.write(0, Arrays.asList(new WrappedDataValue(8, WrappedDataWatcher.Registry.getItemStackSerializer(false), MinecraftReflection.getMinecraftItemStack(item))));
+		watchableAccessor.write(0, List.of(new WrappedDataValue(8, WrappedDataWatcher.Registry.getItemStackSerializer(false), MinecraftReflection.getMinecraftItemStack(item))));
 		event.setPacket(packet);
 	}
 }

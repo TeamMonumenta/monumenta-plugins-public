@@ -52,7 +52,7 @@ public class AbilitySilence extends ZeroArgumentEffect {
 	public void entityLoseEffect(Entity entity) {
 		if (entity instanceof Player player) {
 			Bukkit.getScheduler().runTask(Plugin.getInstance(),
-					() -> AbilityManager.getManager().updateSilence(player, false));
+				() -> AbilityManager.getManager().updateSilence(player, false));
 			ClientModHandler.silenced(player, 0);
 		}
 	}

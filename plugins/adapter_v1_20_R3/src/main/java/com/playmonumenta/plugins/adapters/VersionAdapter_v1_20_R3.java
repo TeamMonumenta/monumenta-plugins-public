@@ -1,18 +1,22 @@
 package com.playmonumenta.plugins.adapters;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.adapters.v1_20_R3.CustomDamageSource;
-import com.playmonumenta.plugins.adapters.v1_20_R3.CustomMobAgroMeleeAttack;
+import com.playmonumenta.mixinapi.v1.CustomMeleeAttackGoal;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.papermc.paper.adventure.PaperAdventure;
 import io.papermc.paper.util.CollisionUtil;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,18 +27,31 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
@@ -43,6 +60,7 @@ import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
+import net.minecraft.world.entity.ai.goal.SwellGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -78,9 +96,11 @@ import org.bukkit.craftbukkit.v1_20_R3.util.CraftVector;
 import org.bukkit.entity.AbstractSkeleton;
 import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Drowned;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
@@ -95,9 +115,164 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("checkstyle:TypeName")
 public class VersionAdapter_v1_20_R3 implements VersionAdapter {
+	public static class CustomDamageSource extends DamageSource {
+		private final boolean mBlockable;
+		@Nullable
+		private final String mKilledUsingMsg;
+		@Nullable
+		private final net.minecraft.world.entity.Entity mDamager;
+
+		public CustomDamageSource(Holder<DamageType> type, @Nullable net.minecraft.world.entity.Entity damager,
+								  boolean blockable, @Nullable String killedUsingMsg) {
+			super(type, damager, damager);
+			mDamager = damager;
+			mBlockable = blockable;
+			mKilledUsingMsg = killedUsingMsg;
+		}
+
+		@Override
+		public @Nullable Vec3 getSourcePosition() {
+			return mBlockable ? super.getSourcePosition() : null;
+		}
+
+		@Override
+		public Component getLocalizedDeathMessage(net.minecraft.world.entity.LivingEntity killed) {
+			if (this.mDamager == null) {
+				// death.attack.magic=%1$s was killed by magic
+				String s = "death.attack.magic";
+				return Component.translatable(s, killed.getDisplayName());
+			} else if (mKilledUsingMsg == null || mKilledUsingMsg.isEmpty()) {
+				// death.attack.mob=%1$s was killed by %2$s
+				String s = "death.attack.mob";
+				return Component.translatable(s, killed.getDisplayName(), this.mDamager.getDisplayName());
+			} else {
+				// death.attack.indirectMagic.item=%1$s was killed by %2$s using %3$s
+				String s = "death.attack.indirectMagic.item";
+				return Component.translatable(s, killed.getDisplayName(), this.mDamager.getDisplayName(), mKilledUsingMsg);
+			}
+		}
+	}
+
+	public static class CustomMobAgroMeleeAttack extends MeleeAttackGoal implements CustomMeleeAttackGoal {
+		@FunctionalInterface
+		public interface RangePredicate {
+			boolean test(PathfinderMob mob, net.minecraft.world.entity.LivingEntity target, double attackRangeSqr);
+		}
+
+		public static class Builder {
+			private final PathfinderMob mMob;
+			@Nullable
+			private DamageAction mAction = null;
+			private boolean mRequireSight = false;
+			private RangePredicate mRangeChecker = (mob, target, attackRangeSqr) -> {
+				double dx = mob.getX() - target.getX();
+				double dy = mob.getY() + mob.getBbHeight() / 2 - (target.getY() + target.getBbHeight() / 2);
+				double dz = mob.getZ() - target.getZ();
+
+				return dx * dx + dy * dy + dz * dz <= attackRangeSqr;
+			};
+			private double mAttackRange = 0;
+			private double mSpeed = 1;
+			private boolean mPauseWhenMobIdle = false;
+
+			public Builder(PathfinderMob entity) {
+				this.mMob = entity;
+			}
+
+			public Builder action(DamageAction action) {
+				this.mAction = action;
+				return this;
+			}
+
+			public Builder requireSight(boolean requireSight) {
+				this.mRequireSight = requireSight;
+				return this;
+			}
+
+			public Builder attackRange(double attackRange) {
+				this.mAttackRange = attackRange;
+				return this;
+			}
+
+			public Builder speed(double speed) {
+				this.mSpeed = speed;
+				return this;
+			}
+
+			public Builder pauseWhenMobIdle(boolean pauseWhenMobIdle) {
+				this.mPauseWhenMobIdle = pauseWhenMobIdle;
+				return this;
+			}
+
+			public Builder rangeChecker(RangePredicate rangeChecker) {
+				this.mRangeChecker = rangeChecker;
+				return this;
+			}
+
+			public CustomMobAgroMeleeAttack build() {
+				return new CustomMobAgroMeleeAttack(mMob, mAction, mRequireSight, mAttackRange, mSpeed,
+					mPauseWhenMobIdle,
+					mRangeChecker);
+			}
+		}
+
+		public static Builder builder(PathfinderMob mob) {
+			return new Builder(mob);
+		}
+
+		@Nullable
+		private final VersionAdapter.DamageAction mDamageAction;
+		private final boolean mRequireSight;
+		private final double mAttackRangeSquared;
+		private final RangePredicate mRangeChecker;
+
+		private CustomMobAgroMeleeAttack(
+			PathfinderMob entity,
+			@Nullable VersionAdapter.DamageAction action,
+			boolean requireSight,
+			double attackRange,
+			double speed,
+			boolean pauseWhenMobIdle,
+			RangePredicate rangeChecker
+		) {
+			super(entity, speed, pauseWhenMobIdle);
+			mDamageAction = action;
+			this.mRequireSight = requireSight;
+			mAttackRangeSquared = attackRange * attackRange;
+			this.mRangeChecker = rangeChecker;
+		}
+
+		@Override
+		protected void checkAndPerformAttack(@NotNull net.minecraft.world.entity.LivingEntity target) {
+			if (this.isTimeToAttack() && isWithinAttackRange(target.getBukkitLivingEntity()) && (!mRequireSight || this.mob.getSensing().hasLineOfSight(target))) {
+				this.resetAttackCooldown();
+				this.mob.swing(InteractionHand.MAIN_HAND);
+				if (mDamageAction == null) {
+					this.mob.doHurtTarget(target);
+				} else {
+					mDamageAction.damage(target.getBukkitLivingEntity());
+				}
+			}
+		}
+
+		// The naming scheme here is a bit terrible, sorry :(
+		@Override
+		public boolean isWithinAttackRange(LivingEntity e) {
+			final var target = ((CraftLivingEntity) e).getHandle();
+
+			if (mAttackRangeSquared == 0) {
+				return this.mob.isWithinMeleeAttackRange(target);
+			}
+
+			return mRangeChecker.test(mob, target, mAttackRangeSquared);
+		}
+	}
+
 	public VersionAdapter_v1_20_R3(@SuppressWarnings("PMD.UnusedFormalParameter") Logger logger) {
 	}
 
@@ -132,8 +307,9 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		((CraftLivingEntity) damagee).getHandle().hurt(reason, (float) amount);
 	}
 
-	@Override
+	// Can't get around this.
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T extends Entity> T duplicateEntity(T entity) {
 		final var newEntity = (T) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 
@@ -316,6 +492,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		server.getCommands().performCommand(parsed, command);
 	}
 
+	@Override
 	public boolean hasCollision(World world, BoundingBox aabb) {
 		final var bb = new AABB(
 			aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(),
@@ -449,6 +626,10 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 						|| goal.getGoal() instanceof Bee.BeeGrowCropGoal
 				);
 			}
+		} else if (mob instanceof Creeper) {
+			if (mob.getScoreboardTags().contains("boss_creeper_no_swell")) {
+				availableGoals.removeIf(goal -> goal.getGoal() instanceof SwellGoal);
+			}
 		}
 		// prevent all mobs from attacking iron golems and turtles
 		availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
@@ -462,12 +643,10 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		return Component.Serializer.fromJson(GsonComponentSerializer.gson().serialize(component));
 	}
 
+	@SuppressWarnings("ReferenceEquality")
 	@Override
-	public boolean isSameItem(@Nullable ItemStack item1,
-							  @Nullable ItemStack item2) {
-		return item1 == item2
-			|| item1 instanceof CraftItemStack craftItem1 && item2 instanceof CraftItemStack craftItem2
-			&& craftItem1.handle == craftItem2.handle;
+	public boolean isSameItem(@Nullable ItemStack item1, @Nullable ItemStack item2) {
+		return item1 == item2 || (item1 instanceof CraftItemStack lhs && item2 instanceof CraftItemStack rhs && lhs.handle == rhs.handle);
 	}
 
 	@Override
@@ -495,6 +674,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		((CraftEntity) entity).getHandle().moveTo(target.getX(), target.getY(), target.getZ(), yaw, pitch);
 	}
 
+	@Override
 	public JsonObject getScoreHolderScoresAsJson(String scoreHolder, org.bukkit.scoreboard.Scoreboard scoreboard) {
 		final var nmsScoreboard = ((CraftScoreboard) scoreboard).getHandle();
 
@@ -511,9 +691,10 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		return data;
 	}
 
+	@Override
 	public void resetScoreHolderScores(String scoreHolder, org.bukkit.scoreboard.Scoreboard scoreboard) {
 		Scoreboard nmsScoreboard = ((CraftScoreboard) scoreboard).getHandle();
-		nmsScoreboard.resetSinglePlayerScore(() -> scoreHolder, null); // ???
+		nmsScoreboard.resetAllPlayerScores(() -> scoreHolder);
 	}
 
 	@Override
@@ -654,5 +835,159 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 	@Override
 	public void sendOpenSignPacket(Player player, int blockX, int blockY, int blockZ, boolean b) {
 		((CraftPlayer) player).getHandle().connection.send(new ClientboundOpenSignEditorPacket(new BlockPos(blockX, blockY, blockZ), b));
+	}
+
+	@Override
+	public void setHeadRotation(Entity bukkitEntity, float yaw, float pitch) {
+		net.minecraft.world.entity.Entity handle = ((CraftEntity) bukkitEntity).getHandle();
+		handle.setXRot(pitch);
+		handle.setYHeadRot(yaw);
+	}
+
+	@Override
+	public Entity spawnWorldlessEntity(EntityType type, World world) {
+		Optional<net.minecraft.world.entity.EntityType<?>> entityTypes = net.minecraft.world.entity.EntityType.byString(type.name().toLowerCase(Locale.ROOT));
+		if (entityTypes.isEmpty()) {
+			throw new IllegalArgumentException("Unknown entity type: " + type.name());
+		}
+		net.minecraft.world.entity.Entity entity = entityTypes.get().create(((CraftWorld) world).getHandle());
+		if (entity == null) {
+			throw new IllegalArgumentException("Failed to create entity of type: " + type.name());
+		}
+		return entity.getBukkitEntity();
+	}
+
+	@Override
+	public void spawnPlayerNametag(Player clientPlayer, Player targetPlayer, Set<Map.Entry<Entity, Entity>> entities) {
+		net.minecraft.world.entity.Entity mcTargetPlayer = ((CraftEntity) targetPlayer).getHandle();
+		net.minecraft.server.level.ServerPlayer mcClientPlayer = ((CraftPlayer) clientPlayer).getHandle();
+
+		// Some of these fields probably have to be zeroed
+		List<Packet<ClientGamePacketListener>> list = new ArrayList<>();
+		org.bukkit.Location targetLocation = targetPlayer.getLocation();
+
+		// add text displays
+		for (Map.Entry<Entity, Entity> e : entities) {
+			Entity entity = e.getKey();
+			net.minecraft.world.entity.Entity mcEntity = ((CraftEntity) entity).getHandle();
+			list.add(new ClientboundAddEntityPacket(
+				mcEntity.getId(),
+				mcEntity.getUUID(),
+				targetLocation.getX(),
+				targetLocation.getY(),
+				targetLocation.getZ(),
+				mcEntity.getXRot(),
+				mcEntity.getYRot(),
+				mcEntity.getType(),
+				0,
+				mcEntity.getDeltaMovement(),
+				mcEntity.getYHeadRot()
+			));
+			Packet<ClientGamePacketListener> packet = getEntityDataPacket(mcEntity);
+			if (packet != null) {
+				list.add(packet);
+			}
+
+			Entity entity2 = e.getValue();
+			net.minecraft.world.entity.Entity mcEntity2 = ((CraftEntity) entity2).getHandle();
+			list.add(new ClientboundAddEntityPacket(
+				mcEntity2.getId(),
+				mcEntity2.getUUID(),
+				targetLocation.getX(),
+				targetLocation.getY(),
+				targetLocation.getZ(),
+				mcEntity2.getXRot(),
+				mcEntity2.getYRot(),
+				mcEntity2.getType(),
+				0,
+				mcEntity2.getDeltaMovement(),
+				mcEntity2.getYHeadRot()
+			));
+			packet = getEntityDataPacket(mcEntity2);
+			if (packet != null) {
+				list.add(packet);
+			}
+		}
+
+		List<Entity> meow = new ArrayList<>();
+		for (Map.Entry<Entity, Entity> e : entities) {
+			Entity entity = e.getKey();
+			meow.add(entity);
+		}
+		list.add(getEntityPassengersPacket(mcTargetPlayer, meow.toArray(new Entity[0])));
+		for (Map.Entry<Entity, Entity> e : entities) {
+			Entity entity = e.getKey();
+			Entity entity2 = e.getValue();
+			net.minecraft.world.entity.Entity mcEntity = ((CraftEntity) entity).getHandle();
+			list.add(getEntityPassengersPacket(mcEntity, entity2));
+		}
+		mcClientPlayer.connection.send(new ClientboundBundlePacket(list));
+	}
+
+	@Override
+	public void removePlayerNametag(Player clientPlayer, Player targetPlayer, Entity ...targetEntities) {
+		IntList targetIds = new IntArrayList(targetEntities.length);
+		for (Entity targetEntity : targetEntities) {
+			targetIds.add(targetEntity.getEntityId());
+		}
+
+		net.minecraft.server.level.ServerPlayer mcClientPlayer = ((CraftPlayer) clientPlayer).getHandle();
+		List<Packet<ClientGamePacketListener>> list = new ArrayList<>();
+		list.add(new ClientboundRemoveEntitiesPacket(targetIds));
+		mcClientPlayer.connection.send(new ClientboundBundlePacket(list));
+	}
+
+	@Override
+	public void updatePlayerNametag(Player clientPlayer, Entity ...entities) {
+		List<Packet<ClientGamePacketListener>> list = new ArrayList<>();
+		net.minecraft.server.level.ServerPlayer mcClientPlayer = ((CraftPlayer) clientPlayer).getHandle();
+		for (Entity targetEntity : entities) {
+			net.minecraft.world.entity.Entity mcTargetEntity = ((CraftEntity) targetEntity).getHandle();
+
+			Packet<ClientGamePacketListener> packet = getEntityDataPacket(mcTargetEntity);
+			if (packet != null) {
+				list.add(packet);
+			}
+		}
+		if (!list.isEmpty()) {
+			// no need to bundle if there's only one packet
+			if (list.size() == 1) {
+				mcClientPlayer.connection.send(list.get(0));
+				return;
+			}
+			mcClientPlayer.connection.send(new ClientboundBundlePacket(list));
+		}
+	}
+
+	private @Nullable ClientboundSetEntityDataPacket getEntityDataPacket(net.minecraft.world.entity.Entity entity) {
+		SynchedEntityData synchedEntityData = entity.getEntityData();
+		// usb: accesswidener ftw
+		List<SynchedEntityData.DataValue<?>> list = synchedEntityData.packAll();
+		if (list != null) {
+			return new ClientboundSetEntityDataPacket(entity.getId(), list);
+		}
+		return null;
+	}
+
+	private ClientboundSetPassengersPacket getEntityPassengersPacket(net.minecraft.world.entity.Entity vehicle, Entity ...passengers) {
+		FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+		List<net.minecraft.world.entity.Entity> originalPassengers = vehicle.getPassengers();
+		IntList passengerIds = new IntArrayList();
+		for (net.minecraft.world.entity.Entity p : originalPassengers) {
+			passengerIds.add(p.getId());
+		}
+		for (Entity p : passengers) {
+			passengerIds.add(p.getEntityId());
+		}
+		buf.writeVarInt(vehicle.getId());
+		buf.writeVarIntArray(passengerIds.toIntArray());
+
+		return new ClientboundSetPassengersPacket(buf);
+  }
+
+  @Override
+	public double getJumpVelocity(LivingEntity entity) {
+		net.minecraft.world.entity.LivingEntity e = ((CraftLivingEntity) entity).getHandle();
+		return e.getJumpPower();
 	}
 }

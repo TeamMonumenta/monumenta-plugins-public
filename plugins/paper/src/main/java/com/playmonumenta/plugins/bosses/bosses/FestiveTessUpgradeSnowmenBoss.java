@@ -84,7 +84,7 @@ public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 		}
 
 		if (event.getHitEntity() != null && !(event.getHitEntity() instanceof Player) &&
-			    event.getHitEntity() instanceof LivingEntity le && !(event.getHitEntity() instanceof Snowman)) {
+			event.getHitEntity() instanceof LivingEntity le && !(event.getHitEntity() instanceof Snowman)) {
 			DamageUtils.damage(mBoss, le, DamageType.PROJECTILE, mParams.DAMAGE);
 		}
 	}

@@ -45,9 +45,9 @@ public class Bulwark extends DepthsAbility {
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (source != null
-			    && event.getType() == DamageType.MELEE
-			    && !event.isBlocked()
-			    && !isOnCooldown()) {
+			&& event.getType() == DamageType.MELEE
+			&& !event.isBlocked()
+			&& !isOnCooldown()) {
 			Location loc = mPlayer.getLocation();
 			World world = mPlayer.getWorld();
 			Location particleLoc = loc.add(0, mPlayer.getHeight() / 2, 0);
@@ -62,7 +62,7 @@ public class Bulwark extends DepthsAbility {
 	}
 
 	private static Description<Bulwark> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Bulwark>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("You block the next melee attack that would have hit you, nullifying the damage.")
 			.addCooldown(COOLDOWN[rarity - 1], true);
 	}

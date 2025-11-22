@@ -28,7 +28,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class SpellShuraDagger extends Spell {
+public final class SpellShuraDagger extends Spell {
 
 	private final LivingEntity mBoss;
 	private final Plugin mPlugin;
@@ -37,7 +37,7 @@ public class SpellShuraDagger extends Spell {
 	private static final boolean SINGLE_TARGET = true;
 	private static final boolean LAUNCH_TRACKING = false;
 	private static final int COOLDOWN = 20 * 6;
-	private static final int DELAY = 20 * 1;
+	private static final int DELAY = 20;
 	private static final double SPEED = 0.8;
 	private static final double TURN_RADIUS = 0;
 	private static final int DISTANCE = 32;
@@ -52,36 +52,36 @@ public class SpellShuraDagger extends Spell {
 		mPlugin = plugin;
 
 		mMissile = new SpellBaseSeekingProjectile(plugin, boss, CShura.detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
-				// Initiate Aesthetic
-				(World world, Location loc, int ticks) -> {
-					GlowingManager.startGlowing(mBoss, NamedTextColor.RED, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
-					world.playSound(loc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.HOSTILE, 3.0f, 0.5f);
-					world.playSound(loc, Sound.ENTITY_EVOKER_CELEBRATE, SoundCategory.HOSTILE, 2.0f, 0.7f);
+			SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
+			// Initiate Aesthetic
+			(World world, Location loc, int ticks) -> {
+				GlowingManager.startGlowing(mBoss, NamedTextColor.RED, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
+				world.playSound(loc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.HOSTILE, 3.0f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_EVOKER_CELEBRATE, SoundCategory.HOSTILE, 2.0f, 0.7f);
 
-					if (ticks % 4 == 0) {
-						new PartialParticle(Particle.SMOKE_NORMAL, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mBoss);
-					}
-				},
-				// Launch Aesthetic
-				(World world, Location loc, int ticks) -> {
-					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.HOSTILE, 3, 1.2f);
-				},
-				// Projectile Aesthetic
-				(World world, Location loc, int ticks) -> {
-					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 4, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.05).spawnAsEntityActive(mBoss);
-				},
-				// Hit Action
-				(World world, @Nullable LivingEntity le, Location loc, @Nullable Location prevLoc) -> {
-					loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 1, 1);
-					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.5, 0.5, 0.5, 0.5).spawnAsEntityActive(mBoss);
-					if (le instanceof Player player) {
-						BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Arcane Dagger", prevLoc);
-						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.POISON, 6 * 20, 0));
-						AbilityUtils.increaseHealingPlayer(player, 6 * 20, -0.5, "Shura");
-					}
-				});
+				if (ticks % 4 == 0) {
+					new PartialParticle(Particle.SMOKE_NORMAL, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mBoss);
+				}
+			},
+			// Launch Aesthetic
+			(World world, Location loc, int ticks) -> {
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.HOSTILE, 3, 1.2f);
+			},
+			// Projectile Aesthetic
+			(World world, Location loc, int ticks) -> {
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 4, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.05).spawnAsEntityActive(mBoss);
+			},
+			// Hit Action
+			(World world, @Nullable LivingEntity le, Location loc, @Nullable Location prevLoc) -> {
+				loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 1, 1);
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.5, 0.5, 0.5, 0.5).spawnAsEntityActive(mBoss);
+				if (le instanceof Player player) {
+					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Arcane Dagger", prevLoc);
+					PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.POISON, 6 * 20, 0));
+					AbilityUtils.increaseHealingPlayer(player, 6 * 20, -0.5, "Shura");
+				}
+			});
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class SpellShuraDagger extends Spell {
 		mMissile.runInitiateAesthetic(mBoss.getWorld(), mBoss.getEyeLocation(), 0);
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), CShura.detectionRange, true);
 		Collections.shuffle(players);
-		if (players.size() == 0 || mBoss.getTargetBlock(null, CShura.detectionRange) == null) {
+		if (players.isEmpty() || mBoss.getTargetBlock(null, CShura.detectionRange) == null) {
 			return;
 		}
 

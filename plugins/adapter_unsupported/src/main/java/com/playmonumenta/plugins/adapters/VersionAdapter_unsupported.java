@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.adapters;
 
 import com.google.gson.JsonObject;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -14,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
@@ -25,40 +27,50 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("checkstyle:TypeName")
 public class VersionAdapter_unsupported implements VersionAdapter {
 	public VersionAdapter_unsupported() {
 
 	}
 
+	@Override
 	public void removeAllMetadata(Plugin plugin) {
 
 	}
 
+	@Override
 	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg) {
 		damagee.damage(amount, damager);
 	}
 
+	// Can't get around this
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T extends Entity> T duplicateEntity(T entity) {
 		return (T) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 	}
 
+	@Override
 	public Vector getActualDirection(Entity entity) {
 		return entity.getLocation().getDirection();
 	}
 
+	@Override
 	public int getAttackCooldown(LivingEntity entity) {
 		return 0;
 	}
 
+	@Override
 	public void setAttackCooldown(LivingEntity entity, int newCooldown) {
 
 	}
 
+	@Override
 	public void releaseActiveItem(LivingEntity entity, boolean clearActiveItem) {
 
 	}
 
+	@Override
 	public void stunShield(Player player, int ticks) {
 
 	}
@@ -124,10 +136,11 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 
 	@Override
 	public Object toVanillaChatComponent(Component component) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@SuppressWarnings("ReferenceEquality")
 	public boolean isSameItem(@Nullable ItemStack item1, @Nullable ItemStack item2) {
 		return item1 == item2;
 	}
@@ -157,6 +170,7 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 		entity.teleport(new Location(entity.getWorld(), target.getX(), target.getY(), target.getZ(), yaw, pitch));
 	}
 
+	@Override
 	public JsonObject getScoreHolderScoresAsJson(String scoreHolder, Scoreboard scoreboard) {
 		return new JsonObject();
 	}
@@ -169,18 +183,18 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	public void disableRangedAttackGoal(LivingEntity entity) {
 	}
 
+	@Override
 	public void forceSyncEntityPositionData(Entity entity) {
 	}
 
 	@Override
+	@SuppressWarnings("checkstyle:RegexpSinglelineJava")
 	public <T> int sendParticle(Particle particle, Player reciever, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, @Nullable T data, boolean force) {
-		// Turn off checkstyle for specifically fallback spawnParticle call here
-		// CHECKSTYLE:OFF
 		reciever.spawnParticle(particle, x, y, z, count, offsetX, offsetY, offsetZ, extra, data);
-		// CHECKSTYLE:ON
 		return 0;
 	}
 
+	@Override
 	public Object replaceWorldNames(Object packet, Consumer<WorldNameReplacementToken> handler) {
 		return packet;
 	}
@@ -188,5 +202,34 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	@Override
 	public void sendOpenSignPacket(Player player, int blockX, int blockY, int blockZ, boolean b) {
 
+	}
+
+	@Override
+	public void setHeadRotation(Entity bukkitEntity, float yaw, float pitch) {
+
+	}
+
+	@Override
+	public Entity spawnWorldlessEntity(EntityType type, World world) {
+		return null;
+	}
+
+	@Override
+	public void spawnPlayerNametag(Player clientPlayer, Player targetPlayer, Set<Map.Entry<Entity, Entity>> entities) {
+
+	}
+
+	@Override
+	public void removePlayerNametag(Player clientPlayer, Player targetPlayer, Entity ...entities) {
+
+	}
+
+	@Override
+	public void updatePlayerNametag(Player clientPlayer, Entity ...entities) {
+  }
+
+  @Override
+	public double getJumpVelocity(LivingEntity entity) {
+		return 0.0d;
 	}
 }

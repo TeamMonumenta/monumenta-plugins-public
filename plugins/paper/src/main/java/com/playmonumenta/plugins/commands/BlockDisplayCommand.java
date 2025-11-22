@@ -31,6 +31,6 @@ public class BlockDisplayCommand {
 						Location corner2 = args.getUnchecked("corner2");
 						DisplayEntityUtils.turnBlockDisplayCuboidIntoBlocks(corner1, corner2);
 					})
-		).register();
+			).register();
 	}
 }

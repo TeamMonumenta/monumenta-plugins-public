@@ -122,6 +122,7 @@ public class EternalSavior extends DepthsAbility {
 		mStasisActive = true;
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				Location loc = mPlayer.getLocation();
@@ -187,7 +188,8 @@ public class EternalSavior extends DepthsAbility {
 						world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.8f, 1.7f);
 						world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.8f, 2f);
 					}
-					default -> { }
+					default -> {
+					}
 				}
 
 				if (mTicks % 4 == 0) {
@@ -223,7 +225,8 @@ public class EternalSavior extends DepthsAbility {
 							(entity, fourHertz, twoHertz, oneHertz) -> {
 								new PartialParticle(Particle.SPELL_INSTANT, LocationUtils.getEntityCenter(entity), 2, 0.25, 0.25, 0.25, 0).spawnAsEnemyBuff();
 							},
-							(entity) -> { }
+							(entity) -> {
+							}
 						));
 					}
 				}
@@ -337,7 +340,7 @@ public class EternalSavior extends DepthsAbility {
 	}
 
 	private static Description<EternalSavior> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<EternalSavior>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When your health drops below ")
 			.addPercent(TRIGGER_HEALTH)
 			.add(", enter stasis for ")

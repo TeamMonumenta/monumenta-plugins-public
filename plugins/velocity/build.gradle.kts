@@ -1,5 +1,5 @@
 plugins {
-    id("com.playmonumenta.plugins.java-conventions")
+	id("com.playmonumenta.plugins.java-conventions")
 }
 
 dependencies {

@@ -50,11 +50,6 @@ public class HealingSickness extends Effect {
 	}
 
 	@Override
-	public boolean isBuff() {
-		return false;
-	}
-
-	@Override
 	public @Nullable Component getSpecificDisplay() {
 		return Component.text(StringUtils.to2DP(mAmount * 100) + "% " + getDisplayedName(), NamedTextColor.RED);
 	}

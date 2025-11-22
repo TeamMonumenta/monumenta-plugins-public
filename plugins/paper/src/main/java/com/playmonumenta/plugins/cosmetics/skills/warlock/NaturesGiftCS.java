@@ -58,15 +58,15 @@ public class NaturesGiftCS extends SoulRendCS {
 	@Override
 	public void rendHitParticle(Player player, Location loc) {
 		new PPParametric(Particle.REDSTONE, loc, (param, builder) -> {
-				double x = 2 * FastUtils.cos(14 * Math.PI * param) * FastUtils.cos(4 * Math.PI * param);
-				double z = 2 * FastUtils.cos(14 * Math.PI * param) * FastUtils.sin(4 * Math.PI * param);
-				Vector vec = new Vector(x, 0.15, z);
-				vec.setY(vec.lengthSquared() / 8);
-				builder.location(loc.clone().add(vec));
+			double x = 2 * FastUtils.cos(14 * Math.PI * param) * FastUtils.cos(4 * Math.PI * param);
+			double z = 2 * FastUtils.cos(14 * Math.PI * param) * FastUtils.sin(4 * Math.PI * param);
+			Vector vec = new Vector(x, 0.15, z);
+			vec.setY(vec.lengthSquared() / 8);
+			builder.location(loc.clone().add(vec));
 
-				Color color = ParticleUtils.getTransition(YELLOW.getColor(), MAGENTA.getColor(), vec.lengthSquared() / 4);
-				builder.data(new Particle.DustOptions(color, 0.8f));
-			}).count(600).spawnAsPlayerActive(player);
+			Color color = ParticleUtils.getTransition(YELLOW.getColor(), MAGENTA.getColor(), vec.lengthSquared() / 4);
+			builder.data(new Particle.DustOptions(color, 0.8f));
+		}).count(600).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.SPELL_INSTANT, loc.clone().add(0, 0.2, 0), 12, 0.15, 0.15, 0.15, 1).spawnAsPlayerActive(player);
 	}
 
@@ -158,7 +158,8 @@ public class NaturesGiftCS extends SoulRendCS {
 				new PPLine(Particle.REDSTONE, loc.clone().add(0, -0.3, 0), loc.clone().add(0, 0.2, 0))
 					.data(isPassive ? MAGENTA_SMALL : YELLOW).countPerMeter(12).groupingDistance(0).spawnAsPlayerActive(player);
 			}
-			default -> { }
+			default -> {
+			}
 		}
 	}
 }

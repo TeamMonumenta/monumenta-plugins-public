@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
+import java.util.ArrayList;
 import java.util.Collection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -67,8 +68,8 @@ public class SpellActions {
 
 		// Deals flat and percent damage to prevent players from surviving for long periods
 		Plugin.getInstance().mEffectManager.addEffect(player, ANTIHEAL_SRC, new PercentHeal(3 * 20, -1.0));
-		BossUtils.bossDamagePercent(boss, player, 0.1, null, false, null, false);
-		BossUtils.bossDamagePercent(boss, player, 2.0, null, true, null, false);
+		BossUtils.bossDamagePercent(boss, player, 0.1, null, false, null, false, new ArrayList<>());
+		BossUtils.bossDamagePercent(boss, player, 2.0, null, true, null, false, new ArrayList<>());
 		if (!MetadataUtils.happenedInRecentTicks(player, "PlayerIntoDepthsVarcosaMetakey", 600)) {
 			MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, "PlayerIntoDepthsVarcosaMetakey"); // Mark this tick
 			player.sendMessage(Component.text("Into the depths with ye! The deep gods take yer soul!", NamedTextColor.RED));

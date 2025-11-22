@@ -31,260 +31,260 @@ public class SpawnerCommand {
 
 	public static void register() {
 		new CommandAPICommand("spawner")
-				.withPermission("monumenta.command.spawner")
-				.withSubcommands(
-						new CommandAPICommand("shields")
-								.withArguments(new IntegerArgument("shields"))
-								.executesPlayer((player, args) -> {
-									ItemStack item = getHeldItemAndSendErrors(player);
-									if (item == null) {
-										return;
-									}
+			.withPermission("monumenta.command.spawner")
+			.withSubcommands(
+				new CommandAPICommand("shields")
+					.withArguments(new IntegerArgument("shields"))
+					.executesPlayer((player, args) -> {
+						ItemStack item = getHeldItemAndSendErrors(player);
+						if (item == null) {
+							return;
+						}
 
-									int shields = args.getUnchecked("shields");
-									SpawnerUtils.setShields(item, shields);
-								}),
-					new CommandAPICommand("type")
-						.withSubcommands(
-							new CommandAPICommand("guarded")
-								.withArguments(new IntegerArgument("guarded"))
-								.executesPlayer((player, args) -> {
-									ItemStack item = getHeldItemAndSendErrors(player);
-									if (item == null) {
-										return;
-									}
+						int shields = args.getUnchecked("shields");
+						SpawnerUtils.setShields(item, shields);
+					}),
+				new CommandAPICommand("type")
+					.withSubcommands(
+						new CommandAPICommand("guarded")
+							.withArguments(new IntegerArgument("guarded"))
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
 
-									int guardBlock = args.getUnchecked("guarded");
-									SpawnerUtils.setSpawnerType(item, SpawnerUtils.GUARDED_ATTRIBUTE, guardBlock);
-								}),
-							new CommandAPICommand("ensnared")
-								.withArguments(new IntegerArgument("ensnared"))
-								.executesPlayer((player, args) -> {
-									ItemStack item = getHeldItemAndSendErrors(player);
-									if (item == null) {
-										return;
-									}
-									int ensnaredBlock = args.getUnchecked("ensnared");
-									if (ensnaredBlock < 4) {
-										player.sendMessage("The command needs the radius to be greater than 3.");
-										return;
-									}
-									SpawnerUtils.setSpawnerType(item, SpawnerUtils.ENSNARED_ATTRIBUTE, ensnaredBlock);
-								}),
-							new CommandAPICommand("decaying")
-								.withArguments(new IntegerArgument("decaying"))
-								.executesPlayer((player, args) -> {
-									ItemStack item = getHeldItemAndSendErrors(player);
-									if (item == null) {
-										return;
-									}
+								int guardBlock = args.getUnchecked("guarded");
+								SpawnerUtils.setSpawnerType(item, SpawnerUtils.GUARDED_ATTRIBUTE, guardBlock);
+							}),
+						new CommandAPICommand("ensnared")
+							.withArguments(new IntegerArgument("ensnared"))
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
+								int ensnaredBlock = args.getUnchecked("ensnared");
+								if (ensnaredBlock < 4) {
+									player.sendMessage("The command needs the radius to be greater than 3.");
+									return;
+								}
+								SpawnerUtils.setSpawnerType(item, SpawnerUtils.ENSNARED_ATTRIBUTE, ensnaredBlock);
+							}),
+						new CommandAPICommand("decaying")
+							.withArguments(new IntegerArgument("decaying"))
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
 
-									int decayingBlock = args.getUnchecked("decaying");
-									SpawnerUtils.setSpawnerType(item, SpawnerUtils.DECAYING_ATTRIBUTE, decayingBlock);
-								}),
-							new CommandAPICommand("protector")
-								.withArguments(new BooleanArgument("protector"))
-								.executesPlayer((player, args) -> {
-									ItemStack item = getHeldItemAndSendErrors(player);
-									if (item == null) {
-										return;
-									}
+								int decayingBlock = args.getUnchecked("decaying");
+								SpawnerUtils.setSpawnerType(item, SpawnerUtils.DECAYING_ATTRIBUTE, decayingBlock);
+							}),
+						new CommandAPICommand("protector")
+							.withArguments(new BooleanArgument("protector"))
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
 
-									boolean protector = args.getUnchecked("protector");
-									ProtectorSpawner.setProtector(item, protector);
-								}),
-							new CommandAPICommand("rally")
-								.withArguments(new IntegerArgument("rally"))
-								.executesPlayer((player, args) -> {
-									ItemStack item = getHeldItemAndSendErrors(player);
-									if (item == null) {
-										return;
-									}
+								boolean protector = args.getUnchecked("protector");
+								ProtectorSpawner.setProtector(item, protector);
+							}),
+						new CommandAPICommand("rally")
+							.withArguments(new IntegerArgument("rally"))
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
 
-									int rallyBlock = args.getUnchecked("rally");
-									RallySpawner.setRally(item, rallyBlock);
-								}),
-							new CommandAPICommand("cat")
-								.withArguments(new IntegerArgument("cat"))
-								.withArguments(new IntegerArgument("catRadius"))
-								.executesPlayer((player, args) -> {
-									ItemStack item = getHeldItemAndSendErrors(player);
-									if (item == null) {
-										return;
-									}
+								int rallyBlock = args.getUnchecked("rally");
+								RallySpawner.setRally(item, rallyBlock);
+							}),
+						new CommandAPICommand("cat")
+							.withArguments(new IntegerArgument("cat"))
+							.withArguments(new IntegerArgument("catRadius"))
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
 
-									int catBlock = args.getUnchecked("cat");
-									int catRadius = args.getUnchecked("catRadius");
+								int catBlock = args.getUnchecked("cat");
+								int catRadius = args.getUnchecked("catRadius");
 
-									SpawnerUtils.setSpawnerType(item, SpawnerUtils.CAT_ATTRIBUTE, catBlock);
-									SpawnerUtils.setSpawnerType(item, SpawnerUtils.CAT_ATTRIBUTE_RADIUS, catRadius);
-								}),
-							new CommandAPICommand("sequential")
-								.withArguments(new IntegerArgument("sequence"))
-								.withArguments(new IntegerArgument("radius"))
-								.executesPlayer((player, args) -> {
-									ItemStack item = getHeldItemAndSendErrors(player);
-									if (item == null) {
-										return;
-									}
+								SpawnerUtils.setSpawnerType(item, SpawnerUtils.CAT_ATTRIBUTE, catBlock);
+								SpawnerUtils.setSpawnerType(item, SpawnerUtils.CAT_ATTRIBUTE_RADIUS, catRadius);
+							}),
+						new CommandAPICommand("sequential")
+							.withArguments(new IntegerArgument("sequence"))
+							.withArguments(new IntegerArgument("radius"))
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
 
-									int sequenceBlock = args.getUnchecked("sequence");
-									int sequenceRadius = args.getUnchecked("radius");
+								int sequenceBlock = args.getUnchecked("sequence");
+								int sequenceRadius = args.getUnchecked("radius");
 
-									if (sequenceRadius >= 100) {
-										player.sendMessage("The command needs the radius to be under 100.");
-										return;
-									}
+								if (sequenceRadius >= 100) {
+									player.sendMessage("The command needs the radius to be under 100.");
+									return;
+								}
 
-									SpawnerUtils.setSpawnerType(item, SpawnerUtils.SEQUENCE_ATTRIBUTE, sequenceBlock);
-									SpawnerUtils.setSpawnerType(item, SpawnerUtils.SEQUENCE_ATTRIBUTE_RADIUS, sequenceRadius);
-								})
-						),
-						new CommandAPICommand("function")
-								.withSubcommands(
-										new CommandAPICommand("set")
-												.withArguments(new FunctionArgument("function"))
-												.executesPlayer((player, args) -> {
-													ItemStack item = getHeldItemAndSendErrors(player);
-													if (item == null) {
-														return;
-													}
+								SpawnerUtils.setSpawnerType(item, SpawnerUtils.SEQUENCE_ATTRIBUTE, sequenceBlock);
+								SpawnerUtils.setSpawnerType(item, SpawnerUtils.SEQUENCE_ATTRIBUTE_RADIUS, sequenceRadius);
+							})
+					),
+				new CommandAPICommand("function")
+					.withSubcommands(
+						new CommandAPICommand("set")
+							.withArguments(new FunctionArgument("function"))
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
 
-													FunctionWrapper[] functions = args.getUnchecked("function");
-													if (functions.length == 0) {
-														throw CommandAPI.failWithString("Failed to get function");
-													}
-													SpawnerUtils.setCustomFunction(item, functions[0]);
-												}),
-										new CommandAPICommand("unset")
-												.executesPlayer((player, args) -> {
-													ItemStack item = getHeldItemAndSendErrors(player);
-													if (item == null) {
-														return;
-													}
+								FunctionWrapper[] functions = args.getUnchecked("function");
+								if (functions.length == 0) {
+									throw CommandAPI.failWithString("Failed to get function");
+								}
+								SpawnerUtils.setCustomFunction(item, functions[0]);
+							}),
+						new CommandAPICommand("unset")
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
 
-													SpawnerUtils.unsetCustomFunction(item);
-												})
-								),
-						new CommandAPICommand("lospool")
-								.withArguments(new GreedyStringArgument("los pool").includeSuggestions(
-										ArgumentSuggestions.stringCollection(info -> LibraryOfSoulsIntegration.getPoolNames())
-								))
-								.executesPlayer((player, args) -> {
-									ItemStack item = getHeldItemAndSendErrors(player);
-									if (item == null) {
-										return;
-									}
+								SpawnerUtils.unsetCustomFunction(item);
+							})
+					),
+				new CommandAPICommand("lospool")
+					.withArguments(new GreedyStringArgument("los pool").includeSuggestions(
+						ArgumentSuggestions.stringCollection(info -> LibraryOfSoulsIntegration.getPoolNames())
+					))
+					.executesPlayer((player, args) -> {
+						ItemStack item = getHeldItemAndSendErrors(player);
+						if (item == null) {
+							return;
+						}
 
-									String losPool = args.getUnchecked("los pool");
-									if (!isLosPoolValid(losPool)) {
-										player.sendMessage(Component.text("The selected pool has 0 elements.", NamedTextColor.RED));
-										return;
-									}
+						String losPool = args.getUnchecked("los pool");
+						if (!isLosPoolValid(losPool)) {
+							player.sendMessage(Component.text("The selected pool has 0 elements.", NamedTextColor.RED));
+							return;
+						}
 
-									SpawnerUtils.setLosPool(item, losPool);
-								}),
-						new CommandAPICommand("action")
-								.withSubcommands(
-										new CommandAPICommand("add")
-												.withArguments(
-														new StringArgument("name").includeSuggestions(
-																ArgumentSuggestions.strings(SpawnerCommand::getAvailableActionIdentifiersSuggestions)
-														)
-												)
-												.executesPlayer((player, args) -> {
-													ItemStack item = getHeldItemAndSendErrors(player);
-													if (item == null) {
-														return;
-													}
-
-													String action = args.getUnchecked("name");
-													if (!SpawnerActionManager.actionExists(action)) {
-														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
-														return;
-													}
-
-													SpawnerUtils.addBreakAction(item, action);
-												}),
-										new CommandAPICommand("remove")
-												.withArguments(
-														new StringArgument("name")
-																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions))
-												)
-												.executesPlayer((player, args) -> {
-													ItemStack item = getHeldItemAndSendErrors(player);
-													if (item == null) {
-														return;
-													}
-
-													String action = args.getUnchecked("name");
-													if (!SpawnerActionManager.actionExists(action)) {
-														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
-														return;
-													}
-
-													SpawnerUtils.removeBreakAction(item, action);
-												}),
-										new CommandAPICommand("parameter")
-												.withArguments(
-														new StringArgument("action identifier")
-																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions)),
-														new StringArgument("parameter name")
-																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getParameterNameSuggestions)),
-														new LiteralArgument("set"),
-														new TextArgument("value")
-																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getDefaultParameterValueSuggestion))
-												)
-												.executesPlayer((player, args) -> {
-													ItemStack item = getHeldItemAndSendErrors(player);
-													if (item == null) {
-														return;
-													}
-
-													String actionIdentifier = args.getUnchecked("action identifier");
-													String parameterName = args.getUnchecked("parameter name");
-													String valueString = args.getUnchecked("value");
-													if (!SpawnerActionManager.actionExists(actionIdentifier)) {
-														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
-														return;
-													}
-
-													SpawnerUtils.setParameterValue(item, actionIdentifier, parameterName, valueString);
-												}),
-										new CommandAPICommand("parameter")
-												.withArguments(
-														new StringArgument("action identifier")
-																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions)),
-														new StringArgument("parameter name")
-																.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getParameterNameSuggestions)),
-														new LiteralArgument("reset")
-												)
-												.executesPlayer((player, args) -> {
-													ItemStack item = getHeldItemAndSendErrors(player);
-													if (item == null) {
-														return;
-													}
-
-													String actionIdentifier = args.getUnchecked("action identifier");
-													String parameterName = args.getUnchecked("parameter name");
-													if (!SpawnerActionManager.actionExists(actionIdentifier)) {
-														player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
-														return;
-													}
-
-													Object value = SpawnerActionManager.getActionParameters(actionIdentifier).get(parameterName);
-
-													if (value != null) {
-														SpawnerUtils.setParameterValue(item, actionIdentifier, parameterName, value);
-													}
-												})
+						SpawnerUtils.setLosPool(item, losPool);
+					}),
+				new CommandAPICommand("action")
+					.withSubcommands(
+						new CommandAPICommand("add")
+							.withArguments(
+								new StringArgument("name").includeSuggestions(
+									ArgumentSuggestions.strings(SpawnerCommand::getAvailableActionIdentifiersSuggestions)
 								)
-				)
-				.register();
+							)
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
+
+								String action = args.getUnchecked("name");
+								if (!SpawnerActionManager.actionExists(action)) {
+									player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
+									return;
+								}
+
+								SpawnerUtils.addBreakAction(item, action);
+							}),
+						new CommandAPICommand("remove")
+							.withArguments(
+								new StringArgument("name")
+									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions))
+							)
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
+
+								String action = args.getUnchecked("name");
+								if (!SpawnerActionManager.actionExists(action)) {
+									player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
+									return;
+								}
+
+								SpawnerUtils.removeBreakAction(item, action);
+							}),
+						new CommandAPICommand("parameter")
+							.withArguments(
+								new StringArgument("action identifier")
+									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions)),
+								new StringArgument("parameter name")
+									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getParameterNameSuggestions)),
+								new LiteralArgument("set"),
+								new TextArgument("value")
+									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getDefaultParameterValueSuggestion))
+							)
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
+
+								String actionIdentifier = args.getUnchecked("action identifier");
+								String parameterName = args.getUnchecked("parameter name");
+								String valueString = args.getUnchecked("value");
+								if (!SpawnerActionManager.actionExists(actionIdentifier)) {
+									player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
+									return;
+								}
+
+								SpawnerUtils.setParameterValue(item, actionIdentifier, parameterName, valueString);
+							}),
+						new CommandAPICommand("parameter")
+							.withArguments(
+								new StringArgument("action identifier")
+									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getActionIdentifierSuggestions)),
+								new StringArgument("parameter name")
+									.includeSuggestions(ArgumentSuggestions.strings(SpawnerCommand::getParameterNameSuggestions)),
+								new LiteralArgument("reset")
+							)
+							.executesPlayer((player, args) -> {
+								ItemStack item = getHeldItemAndSendErrors(player);
+								if (item == null) {
+									return;
+								}
+
+								String actionIdentifier = args.getUnchecked("action identifier");
+								String parameterName = args.getUnchecked("parameter name");
+								if (!SpawnerActionManager.actionExists(actionIdentifier)) {
+									player.sendMessage(Component.text("The specified action does not exist.", NamedTextColor.RED));
+									return;
+								}
+
+								Object value = SpawnerActionManager.getActionParameters(actionIdentifier).get(parameterName);
+
+								if (value != null) {
+									SpawnerUtils.setParameterValue(item, actionIdentifier, parameterName, value);
+								}
+							})
+					)
+			)
+			.register();
 	}
 
 	private static boolean isLosPoolValid(String losPool) {
-		return LibraryOfSoulsIntegration.getPool(losPool).keySet().size() > 0;
+		return !LibraryOfSoulsIntegration.getPool(losPool).isEmpty();
 	}
 
 	private static @Nullable ItemStack getHeldItemAndSendErrors(Player player) {
@@ -308,7 +308,7 @@ public class SpawnerCommand {
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (SpawnerUtils.isSpawner(item)) {
 				List<String> breakActions = SpawnerUtils.getBreakActionIdentifiers(item);
-				return breakActions.size() > 0 ? breakActions.toArray(new String[0]) : new String[0];
+				return !breakActions.isEmpty() ? breakActions.toArray(new String[0]) : new String[0];
 			}
 		}
 		return new String[0];

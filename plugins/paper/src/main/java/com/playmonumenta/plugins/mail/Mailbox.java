@@ -71,6 +71,7 @@ public class Mailbox implements Comparable<Mailbox> {
 
 	/**
 	 * Returns all mailboxes sent or received by a given receiver, without caching their contents.
+	 *
 	 * @param recipient The recipient whose mail is being fetched
 	 * @return A sorted list of relevant mailboxes
 	 */
@@ -208,6 +209,7 @@ public class Mailbox implements Comparable<Mailbox> {
 
 	/**
 	 * Refreshes the mailbox content cache. Remember to only get or add items using swapItemInSlot.
+	 *
 	 * @return A future that will be completed when the contents are updated.
 	 */
 	public CompletableFuture<Void> refreshContents() {
@@ -261,7 +263,7 @@ public class Mailbox implements Comparable<Mailbox> {
 					continue;
 				}
 
-				result.put(slot, mailboxSlot.getItem());
+				result.put(slot, mailboxSlot.getGuiItem());
 			}
 
 			mMailItems = result;
@@ -288,7 +290,7 @@ public class Mailbox implements Comparable<Mailbox> {
 				if (mailboxSlot == null) {
 					mMailItems.remove(slot);
 				} else {
-					mMailItems.put(slot, mailboxSlot.getItem());
+					mMailItems.put(slot, mailboxSlot.getGuiItem());
 				}
 
 				loadLockFromRedis(slot).join();
@@ -307,6 +309,7 @@ public class Mailbox implements Comparable<Mailbox> {
 	/**
 	 * Gets the item fetched by refreshContents(). Remember this cache is for display purposes only.
 	 * Use swapItemInSlot to get/set items instead.
+	 *
 	 * @param slot The slot of the mailbox to be returned
 	 * @return The cached item for display purposes only
 	 */
@@ -598,6 +601,7 @@ public class Mailbox implements Comparable<Mailbox> {
 
 	/**
 	 * Updates the number of item slots filled for a given mailbox
+	 *
 	 * @param deltaItemSlots +1 if an item was added, -1 if an item was removed, 0 if the count is the same
 	 */
 	public CompletableFuture<Void> updateMailSlotCounts(long deltaItemSlots) {
@@ -683,6 +687,7 @@ public class Mailbox implements Comparable<Mailbox> {
 	 * This can still return false if it is being updated, but the local cache is not aware of this.
 	 * It is always safe to use swapItemInSlot to attempt to update a slot, though if this returns true,
 	 * then the attempt will most likely be denied.
+	 *
 	 * @param slot The slot to check
 	 * @return true if the slot is known to be locked, otherwise false
 	 */
@@ -705,6 +710,7 @@ public class Mailbox implements Comparable<Mailbox> {
 	 * Attempts to claim a lock on a given mailbox's slot.
 	 * This claim will expire automatically should the attempt to modify be interrupted.
 	 * Based on <a href="https://redis.io/docs/latest/develop/use/patterns/distributed-locks/#correct-implementation-with-a-single-instance">the official Redis implementation</a>
+	 *
 	 * @param slot The slot to be claimed.
 	 * @return A CompletableFuture with the lock ID string required to later release the lock
 	 * @throws LockException in the event the lock was not claimed successfully, including a reason for the issue.

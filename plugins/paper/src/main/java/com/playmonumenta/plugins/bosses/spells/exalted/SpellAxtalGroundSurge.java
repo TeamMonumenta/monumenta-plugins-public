@@ -31,10 +31,10 @@ import org.bukkit.util.Vector;
 
 public class SpellAxtalGroundSurge extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private int mCount;
-	private int mRange;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final int mCount;
+	private final int mRange;
 	private boolean mCooldown = false;
 	private final String SPELL_NAME = "Ground Surge";
 
@@ -45,11 +45,13 @@ public class SpellAxtalGroundSurge extends Spell {
 		mRange = range;
 	}
 
-	@Override public void run() {
+	@Override
+	public void run() {
 		if (!mCooldown) {
 			mCooldown = true;
 			new BukkitRunnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					mCooldown = false;
 				}
 			}.runTaskLater(mPlugin, 12 * 20);
@@ -70,7 +72,9 @@ public class SpellAxtalGroundSurge extends Spell {
 		BukkitRunnable statueMovement = new BukkitRunnable() {
 			int mTicksElapsed = 0;
 			double mRadian = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 
 				if (mTicksElapsed < 30) {
 					statueLoc.add(0, 0.1, 0);
@@ -86,7 +90,9 @@ public class SpellAxtalGroundSurge extends Spell {
 		// select targets after 2 seconds (40t), launch "count" times
 		BukkitRunnable attack = new BukkitRunnable() {
 			int mAttackCount = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				if (mAttackCount < mCount) {
 					mAttackCount++;
 					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
@@ -96,7 +102,9 @@ public class SpellAxtalGroundSurge extends Spell {
 					BukkitRunnable warning = new BukkitRunnable() {
 						int mTicks = 0;
 						float mPitch = 0;
-						@Override public void run() {
+
+						@Override
+						public void run() {
 							kaulstatue.setRotation(bossLoc.getYaw(), bossLoc.getPitch());
 							Location mLoc = kaulstatue.getLocation();
 							Location pLoc = mLoc.clone();
@@ -135,7 +143,7 @@ public class SpellAxtalGroundSurge extends Spell {
 
 			BukkitRunnable runnable = new BukkitRunnable() {
 				int mInnerTicks = 0;
-				BoundingBox mBox = BoundingBox.of(nloc, 0.65, 0.65, 0.65);
+				final BoundingBox mBox = BoundingBox.of(nloc, 0.65, 0.65, 0.65);
 
 				@Override
 				public void run() {
@@ -191,10 +199,10 @@ public class SpellAxtalGroundSurge extends Spell {
 							Player tPlayer = rPlayer;
 							BukkitRunnable runnable = new BukkitRunnable() {
 								Player mTPlayer = tPlayer;
-								BoundingBox mBox = BoundingBox.of(bLoc, 0.4, 0.4, 0.4);
+								final BoundingBox mBox = BoundingBox.of(bLoc, 0.4, 0.4, 0.4);
 								int mTicks = 0;
 								int mHits = 0;
-								List<UUID> mHit = new ArrayList<>();
+								final List<UUID> mHit = new ArrayList<>();
 
 								@Override
 								public void run() {
@@ -228,8 +236,8 @@ public class SpellAxtalGroundSurge extends Spell {
 									new PartialParticle(Particle.LAVA, innerBoxLoc, 1, 0.2, 0.2, 0.2, 0.25).spawnAsEntityActive(mBoss);
 									for (Player surgePlayer : players) {
 										if (surgePlayer.getBoundingBox().overlaps(mBox)
-											    && !surgePlayer.getUniqueId().equals(player.getUniqueId())
-											    && !mHit.contains(surgePlayer.getUniqueId())) {
+											&& !surgePlayer.getUniqueId().equals(player.getUniqueId())
+											&& !mHit.contains(surgePlayer.getUniqueId())) {
 											mHit.add(surgePlayer.getUniqueId());
 											DamageUtils.damage(mBoss, surgePlayer, DamageEvent.DamageType.BLAST, 50, null, false, true, SPELL_NAME);
 											surgePlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
@@ -278,7 +286,8 @@ public class SpellAxtalGroundSurge extends Spell {
 		}
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return 6 * 20;
 	}
 }

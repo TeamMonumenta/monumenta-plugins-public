@@ -34,10 +34,10 @@ public class PredatorStrikeCS implements CosmeticSkill {
 	}
 
 	public void strikeSoundReady(World world, Player player) {
-		world.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, SoundCategory.PLAYERS, 2.0f, 0.6f);
-		world.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, SoundCategory.PLAYERS, 2.0f, 0.8f);
-		world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.0f, 0.8f);
-		world.playSound(player.getLocation(), Sound.ENTITY_CREEPER_HURT, SoundCategory.PLAYERS, 0.8f, 0.1f);
+		world.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, SoundCategory.PLAYERS, 1.0f, 0.6f);
+		world.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, SoundCategory.PLAYERS, 1.0f, 0.8f);
+		world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 0.8f, 0.8f);
+		world.playSound(player.getLocation(), Sound.ENTITY_CREEPER_HURT, SoundCategory.PLAYERS, 0.6f, 0.1f);
 	}
 
 	public void strikeLaunch(World world, Player player) {

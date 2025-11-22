@@ -52,97 +52,98 @@ public class SpellEggThrow extends SpellBaseGrenadeLauncher {
 
 	public SpellEggThrow(LivingEntity boss, @Nullable DepthsParty party) {
 		super(Plugin.getInstance(), boss, GRENADE_MATERIAL, false, EXPLODE_DELAY, LOBS, LOBS_DELAY, DURATION, DepthsParty.getAscensionEightCooldown(COOLDOWN, party), LINGERING_DURATION, 0,
-				() -> {
-					// Grenade Targets
-					// Ground spider eggs
-					List<Entity> groundTargets = new ArrayList<>(boss.getLocation().getNearbyEntities(60, 60, 60).stream().filter(e -> e.getScoreboardTags().contains("ground_egg_target")).toList());
-					Collections.shuffle(groundTargets);
-					// Flying spider eggs
-					List<Entity> flyingTargets = new ArrayList<>(boss.getLocation().getNearbyEntities(60, 60, 60).stream().filter(e -> e.getScoreboardTags().contains("flying_egg_target")).toList());
-					Collections.shuffle(flyingTargets);
-					// Choose MAX_GROUND_TARGETS and MAX_FLYING_TARGETS
-					List<Entity> finalTargets = new ArrayList<>(groundTargets.stream().limit(getMaxGroundTargets(party)).toList());
-					finalTargets.addAll(flyingTargets.stream().limit(getMaxFlyingTargets(party)).toList());
-					return finalTargets;
-				},
-				(Location loc) -> {
-					// Explosion Targets
-					return Collections.emptyList();
-				},
-				(LivingEntity bosss, Location loc) -> {
-					// Boss Aesthetics
-					bosss.getWorld().playSound(loc, Sound.ENTITY_SPIDER_AMBIENT, SoundCategory.HOSTILE, 3f, 0.5f);
-				},
-				(LivingEntity bosss, Location loc) -> {
-					// Grenade Aesthetics
-					new PartialParticle(Particle.CRIT, loc, 5).extra(0.05).spawnAsEntityActive(bosss);
-				},
-				(LivingEntity bosss, Location loc) -> {
-					// Explosion Aesthetics
-					bosss.getWorld().playSound(loc, Sound.ENTITY_TURTLE_EGG_BREAK, SoundCategory.HOSTILE, 1.2f, 2f);
-					Entity entity = LibraryOfSoulsIntegration.summon(loc.clone().add(0.5, 0, 0.5), "SpiderEgg");
-					if (entity instanceof Slime slime) {
-						int hatchTime = getHatchTime(party);
-						buildEgg(loc, hatchTime);
-						new BukkitRunnable() {
-							final Slime mSlime = slime;
-							final Location mLoc = loc.clone();
-							final boolean mIsGround = isGroundEgg(mLoc);
-							final int mHatchTime = hatchTime;
-							int mTicks = 0;
-							@Override
-							public void run() {
-								if (mTicks >= mHatchTime) {
-									// Hatch with spawning spiders
-									bosss.getWorld().playSound(mLoc, Sound.ENTITY_TURTLE_EGG_HATCH, SoundCategory.HOSTILE, 1.2f, 1f);
-									if (mIsGround) {
-										for (int i = 0; i < getGroundSpawns(party); i++) {
-											spawnGroundSpider(mLoc);
-										}
-									} else {
-										for (int i = 0; i < getFlyingSpawns(party); i++) {
-											spawnFlyingSpider(mLoc);
-										}
+			() -> {
+				// Grenade Targets
+				// Ground spider eggs
+				List<Entity> groundTargets = new ArrayList<>(boss.getLocation().getNearbyEntities(60, 60, 60).stream().filter(e -> e.getScoreboardTags().contains("ground_egg_target")).toList());
+				Collections.shuffle(groundTargets);
+				// Flying spider eggs
+				List<Entity> flyingTargets = new ArrayList<>(boss.getLocation().getNearbyEntities(60, 60, 60).stream().filter(e -> e.getScoreboardTags().contains("flying_egg_target")).toList());
+				Collections.shuffle(flyingTargets);
+				// Choose MAX_GROUND_TARGETS and MAX_FLYING_TARGETS
+				List<Entity> finalTargets = new ArrayList<>(groundTargets.stream().limit(getMaxGroundTargets(party)).toList());
+				finalTargets.addAll(flyingTargets.stream().limit(getMaxFlyingTargets(party)).toList());
+				return finalTargets;
+			},
+			(Location loc) -> {
+				// Explosion Targets
+				return Collections.emptyList();
+			},
+			(LivingEntity bosss, Location loc) -> {
+				// Boss Aesthetics
+				bosss.getWorld().playSound(loc, Sound.ENTITY_SPIDER_AMBIENT, SoundCategory.HOSTILE, 3f, 0.5f);
+			},
+			(LivingEntity bosss, Location loc) -> {
+				// Grenade Aesthetics
+				new PartialParticle(Particle.CRIT, loc, 5).extra(0.05).spawnAsEntityActive(bosss);
+			},
+			(LivingEntity bosss, Location loc) -> {
+				// Explosion Aesthetics
+				bosss.getWorld().playSound(loc, Sound.ENTITY_TURTLE_EGG_BREAK, SoundCategory.HOSTILE, 1.2f, 2f);
+				Entity entity = LibraryOfSoulsIntegration.summon(loc.clone().add(0.5, 0, 0.5), "SpiderEgg");
+				if (entity instanceof Slime slime) {
+					int hatchTime = getHatchTime(party);
+					buildEgg(loc, hatchTime);
+					new BukkitRunnable() {
+						final Slime mSlime = slime;
+						final Location mLoc = loc.clone();
+						final boolean mIsGround = isGroundEgg(mLoc);
+						final int mHatchTime = hatchTime;
+						int mTicks = 0;
+
+						@Override
+						public void run() {
+							if (mTicks >= mHatchTime) {
+								// Hatch with spawning spiders
+								bosss.getWorld().playSound(mLoc, Sound.ENTITY_TURTLE_EGG_HATCH, SoundCategory.HOSTILE, 1.2f, 1f);
+								if (mIsGround) {
+									for (int i = 0; i < getGroundSpawns(party); i++) {
+										spawnGroundSpider(mLoc);
 									}
-									mSlime.remove();
-									new PartialParticle(Particle.FIREWORKS_SPARK, mLoc.clone().add(0, 1, 0), 75).extra(0.1).spawnAsEntityActive(boss);
-									new PartialParticle(Particle.END_ROD, mLoc.clone().add(0, 1, 0), 75).extra(0.1).spawnAsEntityActive(boss);
-									this.cancel();
+								} else {
+									for (int i = 0; i < getFlyingSpawns(party); i++) {
+										spawnFlyingSpider(mLoc);
+									}
 								}
-								if (!mSlime.isValid()) {
-									// Egg was broken before it hatched
-									bosss.getWorld().playSound(loc, Sound.ENTITY_TURTLE_EGG_BREAK, SoundCategory.HOSTILE, 1.2f, 0.5f);
-									removeEgg(mLoc);
-									mSlime.remove();
-									new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc.clone().add(0, 1, 0), 75).extra(0.1).spawnAsEntityActive(boss);
-									this.cancel();
-								}
-								mTicks++;
+								mSlime.remove();
+								new PartialParticle(Particle.FIREWORKS_SPARK, mLoc.clone().add(0, 1, 0), 75).extra(0.1).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.END_ROD, mLoc.clone().add(0, 1, 0), 75).extra(0.1).spawnAsEntityActive(boss);
+								this.cancel();
 							}
-						}.runTaskTimer(Plugin.getInstance(), 0, 1);
-					}
-				},
-				(LivingEntity bosss, LivingEntity target, Location loc) -> {
-					// Hit Action on Explosion Targets
-				},
-				(Location loc) -> {
-					// Ring Aesthetics
-				},
-				(Location loc, int ticks) -> {
-					// Center Aesthetics
-				},
-				(LivingEntity bosss, LivingEntity target, Location loc) -> {
-					// Lingering effect action
-				},
-				() -> {
-					// Additional parameters
-					return new AdditionalGrenadeParameters(new Location(boss.getWorld(), -4, 8, 0), 0, START_DELAY, -1,
-						new ChargeUpManager(boss, START_DELAY, Component.text("Charging ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.YELLOW, TextDecoration.BOLD)),
-							BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, 100), true, 1, INTERNAL_COOLDOWN, true);
-				},
-				(Location loc) -> {
-					// Landing Location telegraph
+							if (!mSlime.isValid()) {
+								// Egg was broken before it hatched
+								bosss.getWorld().playSound(loc, Sound.ENTITY_TURTLE_EGG_BREAK, SoundCategory.HOSTILE, 1.2f, 0.5f);
+								removeEgg(mLoc);
+								mSlime.remove();
+								new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc.clone().add(0, 1, 0), 75).extra(0.1).spawnAsEntityActive(boss);
+								this.cancel();
+							}
+							mTicks++;
+						}
+					}.runTaskTimer(Plugin.getInstance(), 0, 1);
 				}
+			},
+			(LivingEntity bosss, LivingEntity target, Location loc) -> {
+				// Hit Action on Explosion Targets
+			},
+			(Location loc) -> {
+				// Ring Aesthetics
+			},
+			(Location loc, int ticks) -> {
+				// Center Aesthetics
+			},
+			(LivingEntity bosss, LivingEntity target, Location loc) -> {
+				// Lingering effect action
+			},
+			() -> {
+				// Additional parameters
+				return new AdditionalGrenadeParameters(new Location(boss.getWorld(), -4, 8, 0), 0, START_DELAY, -1,
+					new ChargeUpManager(boss, START_DELAY, Component.text("Charging ", NamedTextColor.WHITE).append(Component.text(SPELL_NAME, NamedTextColor.YELLOW, TextDecoration.BOLD)),
+						BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, 100), true, 1, INTERNAL_COOLDOWN, true);
+			},
+			(Location loc) -> {
+				// Landing Location telegraph
+			}
 		);
 	}
 

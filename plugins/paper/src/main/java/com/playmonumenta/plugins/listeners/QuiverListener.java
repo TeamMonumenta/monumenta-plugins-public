@@ -8,10 +8,12 @@ import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Multiload;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -25,6 +27,8 @@ import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
@@ -34,6 +38,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.AbstractArrow;
@@ -88,6 +93,7 @@ public class QuiverListener implements Listener {
 			mItemStack = item;
 		}
 
+		// Using enum ordinal is the best way of handling this, and doesn't have any issues with persistence here.
 		@SuppressWarnings("EnumOrdinal")
 		ArrowTransformMode next(boolean reverse) {
 			return values()[Math.floorMod(ordinal() + (reverse ? -1 : 1), values().length)];
@@ -103,10 +109,10 @@ public class QuiverListener implements Listener {
 			@Override
 			public boolean canPutIntoContainer(ItemStack item) {
 				return ItemUtils.isArrow(item)
-					       && !ItemStatUtils.hasPlayerModified(item)
-					       && !ItemStatUtils.isQuiver(item)
-					       && !InventoryUtils.containsSpecialLore(item)
-						   && !ItemUtils.isQuestItem(item);
+					&& !ItemStatUtils.hasPlayerModified(item)
+					&& !ItemStatUtils.isQuiver(item)
+					&& !InventoryUtils.containsSpecialLore(item)
+					&& !ItemUtils.isQuestItem(item);
 			}
 
 			@Override
@@ -142,8 +148,8 @@ public class QuiverListener implements Listener {
 					amount += playerModified.getLong(CustomContainerItemManager.AMOUNT_KEY);
 				}
 				addLore.accept(Component.text("Contains ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-					               .append(Component.text(amount + (mTotalItemsLimit > 0 ? "/" + mTotalItemsLimit : ""), NamedTextColor.WHITE))
-					               .append(Component.text(" arrows", NamedTextColor.GRAY)));
+					.append(Component.text(amount + (mTotalItemsLimit > 0 ? "/" + mTotalItemsLimit : ""), NamedTextColor.WHITE))
+					.append(Component.text(" arrows", NamedTextColor.GRAY)));
 			}
 
 			@Override
@@ -155,11 +161,11 @@ public class QuiverListener implements Listener {
 						meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 						if (mode == ArrowTransformMode.NONE) {
 							meta.displayName(Component.text("Arrow transformation disabled", NamedTextColor.WHITE)
-								                 .decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+								.decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 						} else {
 							meta.displayName(Component.text("Transform arrows to ", NamedTextColor.WHITE)
-								                 .decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false)
-								                 .append(Component.text(mode.getArrowName(), NamedTextColor.GOLD)));
+								.decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false)
+								.append(Component.text(mode.getArrowName(), NamedTextColor.GOLD)));
 						}
 						meta.lore(List.of(
 							Component.text("Click to cycle through arrow transform modes.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
@@ -189,7 +195,7 @@ public class QuiverListener implements Listener {
 								NBT.modify(quiver, nbt -> {
 									ReadWriteNBTCompoundList itemsList = ItemStatUtils.getItemList(nbt);
 									ReadWriteNBT firstArrowPlayerModified = null;
-									for (Iterator<ReadWriteNBT> it = itemsList.iterator(); it.hasNext();) {
+									for (Iterator<ReadWriteNBT> it = itemsList.iterator(); it.hasNext(); ) {
 										ReadWriteNBT compound = it.next();
 										ItemStack containedItem = NBT.itemStackFromNBT(compound);
 										if (containedItem == null) {
@@ -221,7 +227,7 @@ public class QuiverListener implements Listener {
 											}
 										}
 									}
-                                    // why is this needed
+									// why is this needed
 								});
 								gui.mPlayer.playSound(gui.mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.BLOCKS, 1, 1);
 								gui.update();
@@ -238,7 +244,7 @@ public class QuiverListener implements Listener {
 	public void entityShootBowEvent(EntityShootBowEvent event) {
 		mCallProjectileLaunchEvent = false;
 		if (event.getEntity() instanceof Player player
-			    && ItemStatUtils.isQuiver(event.getConsumable())) {
+			&& ItemStatUtils.isQuiver(event.getConsumable())) {
 			ItemStack quiver = event.getConsumable();
 			boolean hasInfinity = ItemStatUtils.hasEnchantment(event.getBow(), EnchantmentType.INFINITY);
 			Pair<ItemStack, Boolean> projectile = takeFromQuiver(player, quiver, 1, item -> {
@@ -272,7 +278,7 @@ public class QuiverListener implements Listener {
 				newArrow.setPierceLevel(oldArrow.getPierceLevel());
 
 				if (newArrow instanceof Arrow newPotionArrow
-					    && projectileItem.getItemMeta() instanceof PotionMeta itemMeta) {
+					&& projectileItem.getItemMeta() instanceof PotionMeta itemMeta) {
 					newPotionArrow.setBasePotionType(itemMeta.getBasePotionType());
 					newPotionArrow.setColor(itemMeta.getColor());
 					for (PotionEffect customEffect : itemMeta.getCustomEffects()) {
@@ -292,7 +298,6 @@ public class QuiverListener implements Listener {
 		}
 	}
 
-	// TODO: fix this in 1.20.5 :3
 	@SuppressWarnings("deprecation")
 	public AbstractArrow arrowSetItemWrapper(AbstractArrow item, ItemStack projectileItem) {
 		item.setItem(projectileItem);
@@ -404,8 +409,6 @@ public class QuiverListener implements Listener {
 	}
 
 	// If an arrow is picked up, put it into a quiver if space is available
-	// Special handling is needed because `getItem` from PlayerPickupArrowEvent doesn't return the correct itemstack
-	// TODO: this entire thing breaks in 1.20.5 but it's the best we got for now - usb
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	public void playerPickupArrowEvent(PlayerPickupArrowEvent event) {
@@ -432,13 +435,13 @@ public class QuiverListener implements Listener {
 
 	public static boolean attemptPickup(Player player, ItemStack itemStack) {
 		if (player.getGameMode() == GameMode.CREATIVE
-			    || !ItemUtils.isArrow(itemStack)
-			    || ItemStatUtils.getEnchantmentLevel(itemStack, EnchantmentType.THROWING_KNIFE) > 0) {
+			|| !ItemUtils.isArrow(itemStack)
+			|| ItemStatUtils.getEnchantmentLevel(itemStack, EnchantmentType.THROWING_KNIFE) > 0) {
 			return false;
 		}
 		for (ItemStack quiver : player.getInventory()) {
-			if (quiver == null || !ItemStatUtils.isQuiver(quiver) || quiver.getAmount() != 1
-				    || (ItemStatUtils.isArrowTransformingQuiver(quiver) && !canUseArrowTransformingQuiver(player))) {
+			if (!ItemStatUtils.isQuiver(quiver) || quiver.getAmount() != 1
+				|| (ItemStatUtils.isArrowTransformingQuiver(quiver) && !canUseArrowTransformingQuiver(player))) {
 				continue;
 			}
 			CustomContainerItemManager.CustomContainerItemConfiguration config = getQuiverConfig(quiver);
@@ -478,5 +481,4 @@ public class QuiverListener implements Listener {
 		transformed.setAmount(arrows.getAmount());
 		return transformed;
 	}
-
 }

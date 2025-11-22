@@ -87,6 +87,7 @@ public class SpellStranglingRoot extends Spell {
 						int mCount = mCastCount;
 						int mTicksMultiCast = 0;
 						int mTChargeUp = 0;
+
 						@Override
 						public void run() {
 							mPlayers = mPlayers.stream().filter(HexfallUtils::playerInBoss).collect(Collectors.toList());

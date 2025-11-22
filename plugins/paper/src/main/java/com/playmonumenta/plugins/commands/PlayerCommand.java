@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.custominventories.PEBCustomInventory;
 import com.playmonumenta.plugins.custominventories.PlayerDisplayCustomInventory;
+import com.playmonumenta.plugins.guis.peb.PebGui;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
@@ -37,20 +37,14 @@ public class PlayerCommand {
 			)
 			.withSubcommand(new CommandAPICommand("settings")
 				.withPermission("monumenta.command.player.settings")
-				.executesPlayer((PlayerCommandExecutor) (player, args) ->
-					new PEBCustomInventory(player).openInventory(player, plugin)
-				)
+				.executesPlayer((PlayerCommandExecutor) (player, args) -> new PebGui(player).open())
 				.withSubcommand(new CommandAPICommand("sound")
 					.withPermission("monumenta.command.player.settings.sound")
-					.executesPlayer((PlayerCommandExecutor) (player, args) ->
-						new PEBCustomInventory(player, PEBCustomInventory.PebPage.SOUND_CONTROLS).openInventory(player, plugin)
-					)
+					.executesPlayer((PlayerCommandExecutor) (player, args) -> new PebGui(player, PebGui.SOUND_CONTROLS_PAGE).open())
 				)
 				.withSubcommand(new CommandAPICommand("particles")
 					.withPermission("monumenta.command.player.settings.particles")
-					.executesPlayer((PlayerCommandExecutor) (player, args) ->
-						new PEBCustomInventory(player, PEBCustomInventory.PebPage.PARTIAL_PARTICLES).openInventory(player, plugin)
-					)
+					.executesPlayer((PlayerCommandExecutor) (player, args) -> new PebGui(player, PebGui.PARTIAL_PARTICLES_PAGE).open())
 				)
 			)
 			.withSubcommand(new CommandAPICommand("status")

@@ -26,12 +26,12 @@ public class ChessBoard {
 		WHITE_TURN,
 		WAIT_TURN,
 		ENDED,
-		FORCE_END;
+		FORCE_END
 	}
 
 	public enum ChessTeam {
 		WHITE,
-		BLACK;
+		BLACK
 	}
 
 	public enum ChessPieceType {
@@ -40,7 +40,7 @@ public class ChessBoard {
 		ROOKS,
 		BISHOPS,
 		KNIGHTS,
-		PAWNS;
+		PAWNS
 	}
 
 	private static final String PAWNS_EN_PASSANT_TAG = "EnPassantPossible";
@@ -48,14 +48,14 @@ public class ChessBoard {
 	//private static final String BLOCK_KING_UNDER_ATTACK_TAG = "AttackingEnemyKing";
 
 	private static final int[][] ROOKS_MOVES = {{-8, -16, -24, -32, -40, -48, -56},
-	                                            {8, 16, 24, 32, 40, 48, 56}};
+		{8, 16, 24, 32, 40, 48, 56}};
 	private static final int[][] ROOKS_MOVES_RIGHT = {{1, 2, 3, 4, 5, 6, 7}};
 	private static final int[][] ROOKS_MOVES_LEFT = {{-1, -2, -3, -4, -5, -6, -7}};
 
 	private static final int[][] BISHOPS_MOVES_RIGHT = {{9, 18, 27, 36, 45, 54, 63},
-	                                                    {-7, -14, -21, -28, -35, -42, -49}};
+		{-7, -14, -21, -28, -35, -42, -49}};
 	private static final int[][] BISHOPS_MOVES_LEFT = {{-9, -18, -27, -36, -45, -54, -63},
-	                                                   {7, 14, 21, 28, 35, 42, 49}};
+		{7, 14, 21, 28, 35, 42, 49}};
 
 	private static final int[] KNIGHTS_MOVES_RIGHT = {-6, -15, 10, 17};
 	private static final int[] KNIGHTS_MOVES_LEFT = {6, 15, -10, -17};
@@ -66,18 +66,18 @@ public class ChessBoard {
 
 	private static final int[][] QUEEN_MOVES = ROOKS_MOVES;
 	private static final int[][] QUEEN_MOVES_RIGHT = {{9, 18, 27, 36, 45, 54, 63},
-	                                                  {-7, -14, -21, -28, -35, -42, -49},
-	                                                  {1, 2, 3, 4, 5, 6, 7}};
+		{-7, -14, -21, -28, -35, -42, -49},
+		{1, 2, 3, 4, 5, 6, 7}};
 	private static final int[][] QUEEN_MOVES_LEFT = {{-9, -18, -27, -36, -45, -54, -63},
-	                                                 {7, 14, 21, 28, 35, 42, 49},
-	                                                 {-1, -2, -3, -4, -5, -6, -7}};
+		{7, 14, 21, 28, 35, 42, 49},
+		{-1, -2, -3, -4, -5, -6, -7}};
 
 	public static class ChessPiece {
-		private ChessTeam mTeam;
+		private final ChessTeam mTeam;
 		private ChessPieceType mType;
 		private int mBoardLoc;
-		private Set<Integer> mPossibleMoves = new HashSet<>();
-		private Set<String> mPieceTags = new HashSet<>();
+		private final Set<Integer> mPossibleMoves = new HashSet<>();
+		private final Set<String> mPieceTags = new HashSet<>();
 
 		public ChessPiece(ChessPieceType type, ChessTeam team, int boardLocation) {
 			mType = type;
@@ -247,19 +247,19 @@ public class ChessBoard {
 		List<Integer> list = new ArrayList<>();
 		int canMove = 0;
 
-		for (int move: KING_MOVES) {
+		for (int move : KING_MOVES) {
 			canMove = canMoveTo(piece, piece.mBoardLoc + move);
 			if (canMove >= 0 && !squareUnderAttack(piece.mTeam, piece.mBoardLoc + move)) {
 				list.add(piece.mBoardLoc + move);
 			}
 		}
-		for (int move: KING_MOVES_LEFT) {
+		for (int move : KING_MOVES_LEFT) {
 			canMove = canMoveToWithLeftBorder(piece, piece.mBoardLoc + move);
 			if (canMove >= 0 && !squareUnderAttack(piece.mTeam, piece.mBoardLoc + move)) {
 				list.add(piece.mBoardLoc + move);
 			}
 		}
-		for (int move: KING_MOVES_RIGHT) {
+		for (int move : KING_MOVES_RIGHT) {
 			canMove = canMoveToWithRightBorder(piece, piece.mBoardLoc + move);
 			if (canMove >= 0 && !squareUnderAttack(piece.mTeam, piece.mBoardLoc + move)) {
 				list.add(piece.mBoardLoc + move);
@@ -285,7 +285,7 @@ public class ChessBoard {
 
 				if (mWhiteCastlingShort) {
 					boolean canCast = !(squareUnderAttack(piece.mTeam, 60) || squareUnderAttack(piece.mTeam, 61) || squareUnderAttack(piece.mTeam, 62)) &&
-										canMoveTo(piece, 60) == 0 && canMoveTo(piece, 61) == 0 && canMoveTo(piece, 62) == 0;
+						canMoveTo(piece, 60) == 0 && canMoveTo(piece, 61) == 0 && canMoveTo(piece, 62) == 0;
 
 					if (canCast) {
 						list.add(62);
@@ -312,7 +312,7 @@ public class ChessBoard {
 
 				if (mBlackCastlingLong) {
 					boolean canCast = !(squareUnderAttack(piece.mTeam, 5) || squareUnderAttack(piece.mTeam, 6) || squareUnderAttack(piece.mTeam, 4)) &&
-										canMoveTo(piece, 5) == 0 && canMoveTo(piece, 6) == 0 && canMoveTo(piece, 4) == 0;
+						canMoveTo(piece, 5) == 0 && canMoveTo(piece, 6) == 0 && canMoveTo(piece, 4) == 0;
 
 					if (canCast) {
 						list.add(6);
@@ -331,9 +331,9 @@ public class ChessBoard {
 			case KING:
 				return getPossibleMovesKings(piece);
 			case QUEEN:
-				for (int[] moves: QUEEN_MOVES) {
+				for (int[] moves : QUEEN_MOVES) {
 					canMove = 0;
-					for (int move: moves) {
+					for (int move : moves) {
 						canMove += canMoveTo(piece, piece.mBoardLoc + move);
 						if (canMove == 0) {
 							list.add(piece.mBoardLoc + move);
@@ -345,7 +345,7 @@ public class ChessBoard {
 						}
 					}
 				}
-				for (int[] moves: QUEEN_MOVES_LEFT) {
+				for (int[] moves : QUEEN_MOVES_LEFT) {
 					canMove = 0;
 					for (int move : moves) {
 						canMove += canMoveToWithLeftBorder(piece, piece.mBoardLoc + move);
@@ -359,7 +359,7 @@ public class ChessBoard {
 						}
 					}
 				}
-				for (int[] moves: QUEEN_MOVES_RIGHT) {
+				for (int[] moves : QUEEN_MOVES_RIGHT) {
 					canMove = 0;
 					for (int move : moves) {
 						canMove += canMoveToWithRightBorder(piece, piece.mBoardLoc + move);
@@ -375,7 +375,7 @@ public class ChessBoard {
 				}
 				break;
 			case BISHOPS:
-				for (int[] moves: BISHOPS_MOVES_LEFT) {
+				for (int[] moves : BISHOPS_MOVES_LEFT) {
 					canMove = 0;
 					for (int move : moves) {
 						canMove += canMoveToWithLeftBorder(piece, piece.mBoardLoc + move);
@@ -389,7 +389,7 @@ public class ChessBoard {
 						}
 					}
 				}
-				for (int[] moves: BISHOPS_MOVES_RIGHT) {
+				for (int[] moves : BISHOPS_MOVES_RIGHT) {
 					canMove = 0;
 					for (int move : moves) {
 						canMove += canMoveToWithRightBorder(piece, piece.mBoardLoc + move);
@@ -405,7 +405,7 @@ public class ChessBoard {
 				}
 				break;
 			case ROOKS:
-				for (int[] moves: ROOKS_MOVES) {
+				for (int[] moves : ROOKS_MOVES) {
 					canMove = 0;
 					for (int move : moves) {
 						canMove += canMoveTo(piece, piece.mBoardLoc + move);
@@ -420,7 +420,7 @@ public class ChessBoard {
 					}
 				}
 
-				for (int[] moves: ROOKS_MOVES_LEFT) {
+				for (int[] moves : ROOKS_MOVES_LEFT) {
 					canMove = 0;
 					for (int move : moves) {
 						canMove += canMoveToWithLeftBorder(piece, piece.mBoardLoc + move);
@@ -435,7 +435,7 @@ public class ChessBoard {
 					}
 				}
 
-				for (int[] moves: ROOKS_MOVES_RIGHT) {
+				for (int[] moves : ROOKS_MOVES_RIGHT) {
 					canMove = 0;
 					for (int move : moves) {
 						canMove += canMoveToWithRightBorder(piece, piece.mBoardLoc + move);
@@ -453,14 +453,14 @@ public class ChessBoard {
 				break;
 			case KNIGHTS:
 				canMove = 0;
-				for (int move: KNIGHTS_MOVES_LEFT) {
+				for (int move : KNIGHTS_MOVES_LEFT) {
 					canMove = canMoveToWithLeftBorder(piece, piece.mBoardLoc + move);
 					if (canMove >= 0) {
 						list.add(piece.mBoardLoc + move);
 					}
 				}
 				canMove = 0;
-				for (int move: KNIGHTS_MOVES_RIGHT) {
+				for (int move : KNIGHTS_MOVES_RIGHT) {
 					canMove = canMoveToWithRightBorder(piece, piece.mBoardLoc + move);
 					if (canMove >= 0) {
 						list.add(piece.mBoardLoc + move);
@@ -787,26 +787,10 @@ public class ChessBoard {
 
 		if (section.length > 2) {
 			String castlings = section[2];
-			if (castlings.contains("K")) {
-				mWhiteCastlingShort = true;
-			} else {
-				mWhiteCastlingShort = false;
-			}
-			if (castlings.contains("Q")) {
-				mWhiteCastlingLong = true;
-			} else {
-				mWhiteCastlingLong = false;
-			}
-			if (castlings.contains("k")) {
-				mBlackCastlingShort = true;
-			} else {
-				mBlackCastlingShort = false;
-			}
-			if (castlings.contains("q")) {
-				mBlackCastlingLong = true;
-			} else {
-				mBlackCastlingLong = false;
-			}
+			mWhiteCastlingShort = castlings.contains("K");
+			mWhiteCastlingLong = castlings.contains("Q");
+			mBlackCastlingShort = castlings.contains("k");
+			mBlackCastlingLong = castlings.contains("q");
 		}
 
 		//TODO-implement rules of 5 move and remaning stuff

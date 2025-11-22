@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.inventories;
 
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -9,7 +11,6 @@ import de.tr7zw.nbtapi.NBTItem;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -43,6 +44,14 @@ public class LootChestsInInventory implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
+		Player player = (Player) event.getWhoClicked();
+
+		Inventory topInventory = event.getView().getTopInventory();
+		if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player, topInventory)) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (!event.getClick().equals(ClickType.RIGHT)) {
 			return;
 		}
@@ -57,8 +66,6 @@ public class LootChestsInInventory implements Listener {
 			return;
 		}
 
-		Player player = (Player)event.getWhoClicked();
-
 		//This is needed for it to work
 		NBTItem nbti = new NBTItem(item);
 		NBTCompound tag = nbti.getCompound("BlockEntityTag");
@@ -69,9 +76,9 @@ public class LootChestsInInventory implements Listener {
 		ItemStack item2 = nbti.getItem();
 
 		//Classic turning an item into a blockstate
-		BlockStateMeta meta = (BlockStateMeta)item2.getItemMeta();
+		BlockStateMeta meta = (BlockStateMeta) item2.getItemMeta();
 		BlockState state = meta.getBlockState();
-		Chest chest = (Chest)state;
+		Chest chest = (Chest) state;
 		//Loot tables are fun. Make sure the loot table exists
 		LootTable table = chest.getLootTable();
 		if (table == null) {
@@ -87,10 +94,34 @@ public class LootChestsInInventory implements Listener {
 			return;
 		}
 		//Make an inventory and do some good ol roundabout population of the loot
-		Inventory inventory = Bukkit.createInventory(null, 27, Objects.requireNonNull(item.getItemMeta().displayName()));
+		Component displayName = item.getItemMeta().displayName();
+		if (displayName == null) {
+			player.sendMessage(Component.text("Only chests with names can be opened in inventory. Please report a bug explaining how you obtained this nameless chest that has a loot table.", NamedTextColor.DARK_RED));
+			event.setCancelled(true);
+			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			return;
+		}
+		Inventory inventory = Bukkit.createInventory(null, 27, displayName);
 		LootContext.Builder builder = new LootContext.Builder(player.getLocation());
 		Collection<ItemStack> loot = table.populateLoot(FastUtils.RANDOM, builder.build());
 		item.subtract();
+		// Logger for SKR Scrolls
+		if (player.hasPermission(ChestUtils.LOG_SCROLLS_PERMISSION)) {
+			int fragmentCount = 0;
+			for (ItemStack thisItem : loot) {
+				if (ChestUtils.testForScroll(thisItem)) {
+					AuditListener.logPlayer("[Scroll Logger] Player " + player.getName() + " found a SKR Scroll (" + ItemUtils.getPlainNameIfExists(thisItem) + ") in an inventory chest with loot table " + table + ".");
+					break;
+				} else if (ChestUtils.LOG_SCROLL_FRAGMENTS && InventoryUtils.testForItemWithName(thisItem, "Remnant", false) &&
+					thisItem.getType().name().contains("FLINT")) {
+					fragmentCount++;
+				}
+			}
+			if (fragmentCount >= 1) {
+				// Temp log for scroll fragments
+				AuditListener.logPlayer("[Scroll Fragment Logger] Player " + player.getName() + " found " + fragmentCount + " SKR scroll fragments in an inventory chest with loot table " + table + ".");
+			}
+		}
 		ChestUtils.generateLootInventory(loot, inventory, player, true);
 
 		addOrInitializePlayer(player);

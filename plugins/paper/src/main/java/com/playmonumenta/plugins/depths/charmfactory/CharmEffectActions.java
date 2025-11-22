@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.depths.charmfactory;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public enum CharmEffectActions {
 

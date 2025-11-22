@@ -15,4 +15,9 @@ public abstract class ZeroArgumentEffect extends Effect {
 
 		return object;
 	}
+
+	@Override
+	public String toString() {
+		return String.format(mEffectID + " duration:%d", this.getDuration());
+	}
 }

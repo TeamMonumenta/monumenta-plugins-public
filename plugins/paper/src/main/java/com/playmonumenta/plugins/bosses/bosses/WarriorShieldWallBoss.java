@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -17,14 +18,17 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class WarriorShieldWallBoss extends BossAbilityGroup {
+public final class WarriorShieldWallBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_warrior_shield_wall";
 
 	public static class Parameters extends BossParameters {
@@ -49,18 +53,34 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
 
-		public ParticlesList PARTICLE_CAST = ParticlesList.fromString("[(FIREWORKS_SPARK,70,0,0,0,0.3)]");
+		public ParticlesList PARTICLE_CAST = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 70, 0.0, 0.0, 0.0, 0.3))
+			.build();
 
-		public ParticlesList PARTICLE_WALL = ParticlesList.fromString("[(REDSTONE,1,0.1,0.2,0.1,0.0,GRAY,1),(SPELL_INSTANT)]");
+		public ParticlesList PARTICLE_WALL = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.REDSTONE, 1, 0.1, 0.2, 0.1, 0.0, new Particle.DustOptions(Color.GRAY, 1.0f)))
+			.add(new ParticlesList.CParticle(Particle.SPELL_INSTANT, 1, 0.0, 0.0, 0.0, 0.0))
+			.build();
 
-		public ParticlesList PARTICLE_DEFLECT_PROJECTILE = ParticlesList.fromString("[(FIREWORKS_SPARK,5,0,0,0,0.25)]");
+		public ParticlesList PARTICLE_DEFLECT_PROJECTILE = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.FIREWORKS_SPARK, 5, 0.0, 0.0, 0.0, 0.25))
+			.build();
 
-		public ParticlesList PARTICLE_DEFLECT_ENTITY = ParticlesList.fromString("[(EXPLOSION_NORMAL,30,0,0,0,0.35)]");
+		public ParticlesList PARTICLE_DEFLECT_ENTITY = ParticlesList.builder()
+			.add(new ParticlesList.CParticle(Particle.EXPLOSION_NORMAL, 30, 0.0, 0.0, 0.0, 0.35))
+			.build();
 
-		public SoundsList SOUND_CAST = SoundsList.fromString("[(BLOCK_ANVIL_PLACE,1,1.5),(ENTITY_IRON_GOLEM_HURT,1,0.8)]");
+		public SoundsList SOUND_CAST = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.BLOCK_ANVIL_PLACE, 1.0f, 1.5f))
+			.add(new SoundsList.CSound(Sound.ENTITY_IRON_GOLEM_HURT, 1.0f, 0.8f))
+			.build();
 
-		public SoundsList SOUND_DEFLECT_PROJECTILE = SoundsList.fromString("[(ENTITY_ZOMBIE_ATTACK_IRON_DOOR,0.75,1.5)]");
-		public SoundsList SOUND_DEFLECT_ENTITY = SoundsList.fromString("[(ENTITY_GENERIC_EXPLODE,1,1)]");
+		public SoundsList SOUND_DEFLECT_PROJECTILE = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.5f))
+			.build();
+		public SoundsList SOUND_DEFLECT_ENTITY = SoundsList.builder()
+			.add(new SoundsList.CSound(Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f))
+			.build();
 
 	}
 
@@ -131,11 +151,12 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 								}
 
 								if (p.DAMAGE > 0) {
-									BossUtils.blockableDamage(boss, le, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, shieldLocation);
+									BossUtils.blockableDamage(boss, le, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, shieldLocation, p.EFFECTS.mEffectList());
 								}
 
 								if (p.DAMAGE_PERCENTAGE > 0) {
-									BossUtils.bossDamagePercent(mBoss, le, p.DAMAGE_PERCENTAGE, shieldLocation, p.SPELL_NAME);
+									DamageUtils.damagePercentHealth(mBoss, le, p.DAMAGE_PERCENTAGE, true,
+										true, p.SPELL_NAME, true, p.EFFECTS.mEffectList());
 								}
 
 								p.EFFECTS.apply(le, boss);

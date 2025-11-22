@@ -6,14 +6,17 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
+import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.managers.travelanchor.TravelAnchorManager;
 import com.playmonumenta.plugins.player.EnderPearlTracker;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -38,6 +41,7 @@ import de.tr7zw.nbtapi.NBTEntity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -50,11 +54,13 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
+import org.bukkit.Color;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -74,6 +80,7 @@ import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -95,16 +102,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class EntityListener implements Listener {
-	private static final Set<Material> ENTITY_UNINTERACTABLE_MATS = EnumSet.of(
+	private static final EnumSet<Material> REDSTONE_TRIGGERED_BY_ARROWS = EnumSet.of(
+		Material.TRIPWIRE,
+		Material.LIGHT_WEIGHTED_PRESSURE_PLATE,
+		Material.HEAVY_WEIGHTED_PRESSURE_PLATE,
+		Material.TARGET
+	);
+
+	private static final EnumSet<Material> ENTITY_UNINTERACTABLE_MATS = EnumSet.of(
 		Material.TRIPWIRE,
 		Material.TRIPWIRE_HOOK,
-		Material.OAK_PRESSURE_PLATE,
-		Material.ACACIA_PRESSURE_PLATE,
-		Material.BIRCH_PRESSURE_PLATE,
-		Material.DARK_OAK_PRESSURE_PLATE,
-		Material.JUNGLE_PRESSURE_PLATE,
-		Material.SPRUCE_PRESSURE_PLATE,
-		Material.STONE_PRESSURE_PLATE,
 		Material.LIGHT_WEIGHTED_PRESSURE_PLATE,
 		Material.HEAVY_WEIGHTED_PRESSURE_PLATE
 	);
@@ -123,6 +130,13 @@ public class EntityListener implements Listener {
 		DamageCause.WITHER
 	);
 
+	static {
+		REDSTONE_TRIGGERED_BY_ARROWS.addAll(Tag.WOODEN_BUTTONS.getValues());
+		REDSTONE_TRIGGERED_BY_ARROWS.addAll(Tag.WOODEN_PRESSURE_PLATES.getValues());
+
+		ENTITY_UNINTERACTABLE_MATS.addAll(Tag.PRESSURE_PLATES.getValues());
+	}
+
 	public static final String INVULNERABLE_ITEM_TAG = "MonumentaInvulnerableItem";
 	public static final String INVISIBLE_ITEM_FRAME_NAME = "Invisible Item Frame";
 	public static final String BEES_BLOCK_HIVE_ENTER_EVENT = "BeeNoHive";
@@ -134,6 +148,8 @@ public class EntityListener implements Listener {
 	private static final String AREA_EFFECT_CLOUD_POTION_METAKEY = "MonumentaAreaEffectCloudPotion";
 
 	public static final String PROJECTILE_PASSTHROUGH_TAG = "projectile_passthrough";
+
+	public static final Set<String> mProtectHangingWorlds = new HashSet<>();
 
 	Plugin mPlugin;
 	AbilityManager mAbilities;
@@ -214,6 +230,12 @@ public class EntityListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
+			if (damager instanceof Player playerDamager && damagee instanceof ArmorStand) {
+				if (GuildPlotUtils.guildPlotInventoryModificationBlocked(playerDamager)) {
+					event.setCancelled(true);
+					return;
+				}
+			}
 			if (damagee instanceof ArmorStand || damagee.isInvulnerable()) {
 				return;
 			}
@@ -230,14 +252,11 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
-			if (playerDamager.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(damagee)) {
+			if (GuildPlotUtils.guildPlotInventoryModificationBlocked(playerDamager)) {
 				event.setCancelled(true);
 			}
 		} else if (damager instanceof Projectile proj && proj.getShooter() instanceof Player player) {
-			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
-			if (player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(damagee)) {
-				damager.remove();
+			if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
 				event.setCancelled(true);
 				return;
 			}
@@ -360,11 +379,19 @@ public class EntityListener implements Listener {
 	// Entity interacts with something
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityInteractEvent(EntityInteractEvent event) {
-		Material material = event.getBlock().getType();
+		Block block = event.getBlock();
+		Location loc = block.getLocation();
+		Material material = block.getType();
+		Entity entity = event.getEntity();
+
+		if (REDSTONE_TRIGGERED_BY_ARROWS.contains(material) && ZoneUtils.hasZoneProperty(loc, ZoneProperty.DISABLE_REDSTONE_INTERACTIONS)) {
+			if (entity instanceof Projectile) {
+				event.setCancelled(true);
+				return;
+			}
+		}
 
 		if (ENTITY_UNINTERACTABLE_MATS.contains(material)) {
-			Entity entity = event.getEntity();
-
 			// Only items and players can activate tripwires
 			// Also pigs, for the pig quest
 			if (entity instanceof Item || entity instanceof Player || entity instanceof Pig || entity.getScoreboardTags().contains("block_interact")) {
@@ -382,16 +409,36 @@ public class EntityListener implements Listener {
 		Hanging entity = event.getEntity();
 		Location loc = entity.getLocation();
 
+		// Guildplots checks
+		if (damager instanceof Player player) {
+			// If hurt by a player in adventure mode we want to prevent the break;
+
+			if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
+				event.setCancelled(true);
+				return;
+			}
+		} else if (damager instanceof Projectile projectile) {
+			// If hurt by a projectile from a player in adventure mode.
+
+			ProjectileSource source = projectile.getShooter();
+			if (source instanceof Player player) {
+				if (GuildPlotUtils.guildPlotInventoryModificationBlocked(player)) {
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
+
 		if (ZoneUtils.hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE)) {
 			if (damager instanceof Player && entity instanceof ItemFrame itemFrame && itemFrame.getItem().getType() != Material.AIR && ZoneUtils.hasZoneProperty(loc, ZoneProperty.ITEM_FRAMES_EDITABLE)) {
 				return;
 			}
 
 			if (!(damager instanceof Player player
-				      && (player.getGameMode() == GameMode.CREATIVE
-					          || (player.getGameMode() == GameMode.SURVIVAL
-						              && ZoneUtils.isInPlot(player)
-						              && ZoneUtils.isInPlot(loc))))) {
+				&& (player.getGameMode() == GameMode.CREATIVE
+				|| (player.getGameMode() == GameMode.SURVIVAL
+				&& ZoneUtils.isInPlot(player)
+				&& ZoneUtils.isInPlot(loc))))) {
 				event.setCancelled(true);
 				return;
 			}
@@ -443,9 +490,10 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public void entityAddToWorldEvent(EntityRemoveFromWorldEvent event) {
+	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
 		Entity entity = event.getEntity();
 		mPlugin.mTrackingManager.removeEntity(entity);
+		TravelAnchorManager.getInstance().unloadAnchor(entity);
 	}
 
 	// Player shoots an arrow.
@@ -541,10 +589,12 @@ public class EntityListener implements Listener {
 					&& (potionItem.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0 || ItemStatUtils.hasEnchantment(potionItem, EnchantmentType.INFINITY) || ItemStatUtils.hasEnchantment(potionItem, EnchantmentType.ALCHEMICAL_ALEMBIC))) {
 					ThrownPotion potionClone = (ThrownPotion) potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
 					ItemStack newPotion = potionItem.clone();
-					if (newPotion.hasItemMeta() && newPotion.getItemMeta().hasLore()) {
+					if (newPotion.hasItemMeta()) {
 						List<Component> lore = newPotion.lore();
-						lore.removeIf((component) -> !MessagingUtils.plainText(component).contains("* Alchemical Utensil *"));
-						newPotion.lore(lore);
+						if (lore != null) {
+							lore.removeIf((component) -> !MessagingUtils.plainText(component).contains("* Alchemical Utensil *"));
+							newPotion.lore(lore);
+						}
 					}
 					ItemUtils.setPlainTag(newPotion);
 
@@ -571,11 +621,7 @@ public class EntityListener implements Listener {
 				// Remove thrown potions after 10 seconds.
 				// This is so they don't get stuck in water bubble columns forever.
 				ThrownPotion finalPotion = potion;
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					if (finalPotion != null) {
-						finalPotion.remove();
-					}
-				}, 10 * 20);
+				Bukkit.getScheduler().runTaskLater(mPlugin, finalPotion::remove, 10 * 20);
 			}
 		}
 	}
@@ -681,10 +727,21 @@ public class EntityListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void lingeringPotionSplashEvent(LingeringPotionSplashEvent event) {
-		MetadataUtils.setMetadata(event.getAreaEffectCloud(), AREA_EFFECT_CLOUD_POTION_METAKEY, event.getEntity().getItem());
-		if (!event.getAreaEffectCloud().hasCustomEffects()) {
-			// Area effect clouds without potion effects do not call AreaEffectCloudApplyEvent, so add a dummy effect
-			event.getAreaEffectCloud().addCustomEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 0, 0, true, false, false), false);
+		AreaEffectCloud cloud = event.getAreaEffectCloud();
+		ThrownPotion thrownPotion = event.getEntity();
+		ItemStack potionItem = thrownPotion.getItem();
+		
+		MetadataUtils.setMetadata(cloud, AREA_EFFECT_CLOUD_POTION_METAKEY, potionItem);
+		
+		if (!cloud.hasCustomEffects()) {
+			cloud.addCustomEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 0, 0, true, false, false), false);
+		}
+		
+		if (potionItem.getItemMeta() instanceof PotionMeta potionMeta) {
+			Color color = potionMeta.getColor();
+			if (color != null) {
+				cloud.setColor(color);
+			}
 		}
 	}
 
@@ -744,14 +801,16 @@ public class EntityListener implements Listener {
 	// Cancel explosions in adventure zones
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
+		// Alchemical aberrations should never explode any blocks, but we don't want to cancel the event
+		if (event.getEntity().getScoreboardTags().contains(AlchemicalAberrationBoss.identityTag)) {
+			event.blockList().clear();
+			return;
+		}
+
 		// Cancel the event immediately if within a no-explosions zone
 		if (ZoneUtils.hasZoneProperty(event.getLocation(), ZoneProperty.NO_EXPLOSIONS)) {
 			event.setCancelled(true);
 			return;
-		}
-
-		if (event.getEntity().getScoreboardTags().contains(AlchemicalAberrationBoss.identityTag)) {
-			event.blockList().clear();
 		}
 
 		Iterator<Block> iter = event.blockList().iterator();
@@ -832,6 +891,20 @@ public class EntityListener implements Listener {
 		Projectile proj = event.getEntity();
 		ProjectileSource source = proj.getShooter();
 
+		if (event.getHitBlock() != null) {
+			Block block = event.getHitBlock();
+			Material type = block.getType();
+
+			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+				if (type == Material.DECORATED_POT && !ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.CAN_SHOOT_POTS)) {
+					// Prevent decorated pots from being broken in adventure mode zones UNLESS the DecoratedPotsShoot zone exists
+					event.setCancelled(true);
+				} else if (type == Material.POINTED_DRIPSTONE) {
+					event.setCancelled(true);
+				}
+			}
+		}
+
 		if (entity instanceof Player player) {
 			mAbilities.playerHitByProjectileEvent(player, event);
 
@@ -907,6 +980,28 @@ public class EntityListener implements Listener {
 					mAbilities.entityTargetLivingEntityEvent(player, event);
 				}
 			}
+
+			/* NOTE:
+			 * Ignore IntelliJ's warning about the method annotation here. The event can be cancelled
+			 */
+			if (event.isCancelled()) {
+				return;
+			}
+
+			// Match
+			// Chivalrous mob's targets with the mount
+			if (Chivalrous.isChivalrousName(event.getEntity().getName())) {
+				event.getEntity().getPassengers().forEach(mount -> {
+					if (mount instanceof Mob mob) {
+						mob.setTarget(target);
+					}
+				});
+			}
+			if (event.getEntity().getScoreboardTags().contains(Chivalrous.CHIVALROUS_PASSENGER_TAG)) {
+				if (event.getEntity().getVehicle() instanceof Mob mob) {
+					mob.setTarget(target);
+				}
+			}
 		}
 	}
 
@@ -973,9 +1068,9 @@ public class EntityListener implements Listener {
 		// Prevent falling blocks forming into real blocks inside adventure mode areas if they come from outside
 		// Note that this event is also called when the block starts to fall, thus a missing metadata on the block is assumed to be that start event and thus allowed
 		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneProperty.ADVENTURE_MODE)
-			    && event.getEntity() instanceof FallingBlock fallingBlock
-			    && (!MetadataUtils.getMetadata(fallingBlock, FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, true)
-				    || fallingBlock.getScoreboardTags().contains(FALLING_BLOCK_NO_PLACE_ADVENTURE_MODE_TAG))) {
+			&& event.getEntity() instanceof FallingBlock fallingBlock
+			&& (!MetadataUtils.getMetadata(fallingBlock, FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, true)
+			|| fallingBlock.getScoreboardTags().contains(FALLING_BLOCK_NO_PLACE_ADVENTURE_MODE_TAG))) {
 			if (fallingBlock.getDropItem()) {
 				Material material = fallingBlock.getBlockData().getMaterial();
 				if (!material.isAir() && material != Material.FROSTED_ICE) { // this can apparently happen, and frosted ice somehow gets turned into air too?
@@ -1018,7 +1113,7 @@ public class EntityListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void entityMountEvent(EntityMountEvent event) {
 		if (event.getEntity().getScoreboardTags().contains(EntityUtils.DONT_ENTER_BOATS_TAG)
-			    && event.getMount() instanceof Boat) {
+			&& event.getMount() instanceof Boat) {
 			event.setCancelled(true);
 		}
 	}
@@ -1049,18 +1144,38 @@ public class EntityListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void entityTeleportEvent(EntityTeleportEvent event) {
+		Entity entity = event.getEntity();
+		if (
+			mProtectHangingWorlds.contains(entity.getWorld().getName())
+				&& (entity instanceof Shulker)
+		) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void hangingBreakEvent(HangingBreakEvent event) {
-		if (event.getEntity() instanceof ItemFrame frame
-				&& INVISIBLE_ITEM_FRAME_NAME.equals(frame.getName())
-				&& !(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
+		Entity entity = event.getEntity();
+		if (mProtectHangingWorlds.contains(entity.getWorld().getName())) {
+			event.setCancelled(true);
+			return;
+		}
+
+		if (entity instanceof ItemFrame frame
+			&& INVISIBLE_ITEM_FRAME_NAME.equals(frame.getName())
+			&& !(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			Location centeredLocation = frame.getLocation().toCenterLocation();
-			frame.getWorld().dropItem(centeredLocation, InventoryUtils.getItemFromLootTable(frame, INVISIBLE_ITEM_FRAME_LOOT_TABLE));
-			if (!ItemUtils.isNullOrAir(frame.getItem())
+			ItemStack invisibleItemFrame = InventoryUtils.getItemFromLootTable(frame, INVISIBLE_ITEM_FRAME_LOOT_TABLE);
+			if (invisibleItemFrame != null) {
+				frame.getWorld().dropItem(centeredLocation, invisibleItemFrame);
+				if (!ItemUtils.isNullOrAir(frame.getItem())
 					&& frame.getItemDropChance() >= FastUtils.RANDOM.nextFloat()) {
-				frame.getWorld().dropItem(centeredLocation, frame.getItem());
+					frame.getWorld().dropItem(centeredLocation, frame.getItem());
+				}
+				frame.remove();
 			}
-			frame.remove();
 		}
 	}
 }

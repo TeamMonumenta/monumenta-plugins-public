@@ -167,8 +167,9 @@ public class BottledSunlight extends DepthsAbility {
 
 
 	private static Description<BottledSunlight> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<BottledSunlight>(color)
-			.add("Right click while sneaking to throw a luminescent bottle. If you or an ally walk over it, you both gain ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger()
+			.add(" to throw a luminescent bottle. If you or an ally walk over it, you both gain ")
 			.add(a -> a.mAbsorption, ABSORPTION[rarity - 1], false, null, true)
 			.add(" absorption health for ")
 			.addDuration(a -> a.mDuration, BOTTLE_ABSORPTION_DURATION)

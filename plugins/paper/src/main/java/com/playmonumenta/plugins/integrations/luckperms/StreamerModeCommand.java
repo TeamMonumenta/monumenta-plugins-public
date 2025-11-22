@@ -7,6 +7,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 public class StreamerModeCommand extends TogglePermCommand {
+	public static String PERM_STRING = "group.streamermode";
+
 	@Override
 	public String getCommandName() {
 		return "streamermode";
@@ -24,7 +26,7 @@ public class StreamerModeCommand extends TogglePermCommand {
 
 	@Override
 	public String getToggledPerm() {
-		return "group.streamermode";
+		return PERM_STRING;
 	}
 
 	@Override

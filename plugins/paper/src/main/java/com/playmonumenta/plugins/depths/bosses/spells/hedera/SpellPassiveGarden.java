@@ -35,7 +35,7 @@ public class SpellPassiveGarden extends Spell {
 	public Location mResetLocation;
 
 	public SpellPassiveGarden(LivingEntity mBoss, List<Location> plantSpawns, Map<Location, LivingEntity> plants,
-			Map<Location, String> plantTypes, Location spawnPoint) {
+	                          Map<Location, String> plantTypes, Location spawnPoint) {
 		mLauncher = mBoss;
 		mPlantSpawns = plantSpawns;
 		mPlants = plants;
@@ -106,7 +106,7 @@ public class SpellPassiveGarden extends Spell {
 		Collections.shuffle(mPlantSpawns);
 		for (Location loc : mPlantSpawns) {
 			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(loc, 1.0);
-			if (mPlants.get(loc) == null && mPlantTypes.get(loc) == null && nearbyMobs.size() == 0) {
+			if (mPlants.get(loc) == null && mPlantTypes.get(loc) == null && nearbyMobs.isEmpty()) {
 				//Summon a new plant here
 				String plant = getValidPlant();
 				if (plant == null) {

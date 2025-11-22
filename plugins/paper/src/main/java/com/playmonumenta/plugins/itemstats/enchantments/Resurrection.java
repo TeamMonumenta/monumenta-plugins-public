@@ -76,7 +76,7 @@ public class Resurrection implements Enchantment {
 
 		if (resurrectionEnchantment != null) {
 			PlayerInventory inventory = player.getInventory();
-			for (ItemStack item : new ItemStack[] {inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots()}) {
+			for (ItemStack item : new ItemStack[]{inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots()}) {
 				if (ItemStatUtils.getEnchantmentLevel(item, resurrectionEnchantment) >= 1) {
 					item.subtract();
 					break;

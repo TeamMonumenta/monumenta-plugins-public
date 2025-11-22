@@ -21,6 +21,6 @@ public class Intuition implements Enchantment {
 
 	@Override
 	public void onExpChange(Plugin plugin, Player player, double level, PlayerExpChangeEvent event) {
-		event.setAmount((int)(event.getAmount() * INTUITION_MULTIPLIER));
+		event.setAmount((int) (event.getAmount() * INTUITION_MULTIPLIER));
 	}
 }

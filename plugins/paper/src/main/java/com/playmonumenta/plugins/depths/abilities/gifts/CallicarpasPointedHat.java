@@ -38,11 +38,11 @@ public class CallicarpasPointedHat extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.POINTED);
+		dp.addReward(DepthsRoomType.DepthsRewardType.POINTED);
 	}
 
 	private static Description<CallicarpasPointedHat> getDescription() {
-		return new DescriptionBuilder<CallicarpasPointedHat>().add("Pick an active tree. For the next three ability selections, you will only find abilities from that tree.")
+		return new DescriptionBuilder<>(() -> INFO).add("Pick an active tree. For the next three ability selections, you will only find abilities from that tree.")
 			.add((a, p) -> a != null && a.mDepthsPlayer != null
 				? Component.text("\nSelected tree: ")
 				.append(a.mDepthsPlayer.mPointedHatTree == null

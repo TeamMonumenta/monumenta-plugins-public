@@ -3,34 +3,28 @@ package com.playmonumenta.plugins.minigames.chess;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
 import org.bukkit.entity.Player;
 
-public class ChessPlayer {
+/**
+ * Tracked state for a given chess player
+ *
+ * @param mBoard The chessboard where this player is playing
+ * @param mTeam  The Team of this player (Black or White)
+ */
+public record ChessPlayer(Player mPlayer, ChessBoard mBoard, ChessTeam mTeam) {
 
 	//Not used for this implementations
 	public enum ChessPiecesTier {
 		DEFAULT,
 		PATREON_25,
-		CHAMPION;
+		CHAMPION
 	}
 
 	private static final String CHESS_PLAYER_TAG = "ChessPlayer";
 
-	public final Player mPlayer;
-
-	/**
-	 * The chessboard where this player is playing
-	 */
-	public final ChessBoard mBoard;
-
-	/**
-	 * The Team of this player (Black or White)
-	 */
-	public final ChessTeam mTeam;
-
-	public ChessPlayer(Player player, ChessBoard board, ChessTeam team) {
-		mPlayer = player;
-		mBoard = board;
-		mTeam = team;
-		mPlayer.addScoreboardTag(CHESS_PLAYER_TAG);
+	public ChessPlayer(Player mPlayer, ChessBoard mBoard, ChessTeam mTeam) {
+		this.mPlayer = mPlayer;
+		this.mBoard = mBoard;
+		this.mTeam = mTeam;
+		this.mPlayer.addScoreboardTag(CHESS_PLAYER_TAG);
 	}
 
 	public ChessPiecesTier getPiecesTier() {
@@ -50,7 +44,7 @@ public class ChessPlayer {
 	}
 
 	public static final void removeChessPlayer(ChessPlayer player) {
-		if (player != null && player.mPlayer != null && player.mPlayer.getScoreboardTags() != null) {
+		if (player != null && player.mPlayer != null) {
 			player.mPlayer.removeScoreboardTag(CHESS_PLAYER_TAG);
 		}
 	}

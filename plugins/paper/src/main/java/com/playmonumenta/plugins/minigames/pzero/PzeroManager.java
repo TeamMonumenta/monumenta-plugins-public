@@ -524,7 +524,7 @@ public class PzeroManager implements Listener {
 
 	private @Nullable PzeroPlayer getPzeroPlayer(Player player) {
 		List<PzeroPlayer> playerList = mTrackedPlayers.values().stream().filter(pzPlayer -> pzPlayer.getUniqueId().equals(player.getUniqueId())).toList();
-		if (playerList.size() == 0) {
+		if (playerList.isEmpty()) {
 			return null;
 		}
 
@@ -536,8 +536,8 @@ public class PzeroManager implements Listener {
 	public void onEntityDismount(EntityDismountEvent event) {
 		if (
 			event.getEntity() instanceof Player player &&
-			mTrackedPlayers.containsKey(player.getUniqueId()) &&
-			event.getDismounted().getScoreboardTags().contains(PZERO_PIG_TAG)
+				mTrackedPlayers.containsKey(player.getUniqueId()) &&
+				event.getDismounted().getScoreboardTags().contains(PZERO_PIG_TAG)
 		) {
 			event.setCancelled(true);
 			// Car honk sound!

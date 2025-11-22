@@ -77,13 +77,13 @@ public class NecromantiaCS extends CursedWoundCS {
 				Vector dir = new Vector(i, 0, j);
 				Location location = eLoc.clone().add(0, 0.5, 0).setDirection(dir);
 				ParticleUtils.drawHalfArc(location, radius / 3, 190, 90, 270, 1, 0,
-					(Location l, int ring) ->
+					(Location l, int ring, double angleProgress) ->
 						new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, FastUtils.roundRandomly(0.8), 0.05, 0.05, 0.05, 0).data(BLACK).spawnAsPlayerActive(player));
 				ParticleUtils.drawHalfArc(location, radius * 2 / 3, 200, 100, 290, 1, 0,
-					(Location l, int ring) ->
+					(Location l, int ring, double angleProgress) ->
 						new PartialParticle(Particle.SPELL_WITCH, l, FastUtils.roundRandomly(0.5), 0, 0, 0, 0).spawnAsPlayerActive(player));
 				ParticleUtils.drawHalfArc(location, radius, 210, 110, 310, 1, 0,
-					(Location l, int ring) ->
+					(Location l, int ring, double angleProgress) ->
 						new PartialParticle(Particle.SPELL_MOB, l, FastUtils.roundRandomly(0.5), 0.4, 0, 0.5, 1).directionalMode(true).spawnAsPlayerActive(player));
 			}
 		}

@@ -138,13 +138,13 @@ public class ArcaneTransmutationCS extends TransmutationRingCS {
 		// rays
 		double centerSymbolSizeRingRadius = centerSymbolSize * 1.05;
 		PPCircle rayCircle = new PPCircle(Particle.END_ROD, raisedLoc, centerSymbolSizeRingRadius)
-			                     .count(8).minimumCount(3).maximumMultiplier(1) // 3 to 8 rays
-			                     .arcDegree(mRotation, mRotation + 360)
-			                     .directionalMode(true)
-			                     .delta(1, 0, 0)
-			                     .extra((radius - centerSymbolSizeRingRadius) / 11)
-			                     .rotateDelta(true)
-			                     .spawnAsPlayerActive(player);
+			.count(8).minimumCount(3).maximumMultiplier(1) // 3 to 8 rays
+			.arcDegree(mRotation, mRotation + 360)
+			.directionalMode(true)
+			.delta(1, 0, 0)
+			.extra((radius - centerSymbolSizeRingRadius) / 11)
+			.rotateDelta(true)
+			.spawnAsPlayerActive(player);
 		// sparks at the origin of the rays
 		rayCircle.particle(Particle.ELECTRIC_SPARK)
 			.delta(-0.2, 0, 0.98)

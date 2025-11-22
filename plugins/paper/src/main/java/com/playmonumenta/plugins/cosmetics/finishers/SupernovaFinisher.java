@@ -43,7 +43,7 @@ public class SupernovaFinisher implements EliteFinisher {
 		Location lineBotMid = centered.clone().add(vectorBot);
 
 		Location[][] curve = new Location[4][9];
-		curve[0] = new Location[] {
+		curve[0] = new Location[]{
 			centered.clone().add(-0.7, 0, 1.067),
 			centered.clone().add(-1, 0, 0.97),
 			centered.clone().add(-1.3, 0, 0.8),
@@ -55,7 +55,7 @@ public class SupernovaFinisher implements EliteFinisher {
 			centered.clone().add(0, 0, -3.69)
 		};
 
-		curve[1] = new Location[] {
+		curve[1] = new Location[]{
 			centered.clone().add(0.7, 0, -1.067),
 			centered.clone().add(1, 0, -0.97),
 			centered.clone().add(1.3, 0, -0.8),
@@ -67,7 +67,7 @@ public class SupernovaFinisher implements EliteFinisher {
 			centered.clone().add(0, 0, 3.69)
 		};
 
-		curve[2] = new Location[] {
+		curve[2] = new Location[]{
 			centered.clone().add(1.067, 0, 0.7),
 			centered.clone().add(0.97, 0, 1),
 			centered.clone().add(0.8, 0, 1.3),
@@ -79,7 +79,7 @@ public class SupernovaFinisher implements EliteFinisher {
 			centered.clone().add(-3.69, 0, 0)
 		};
 
-		curve[3] = new Location[] {
+		curve[3] = new Location[]{
 			centered.clone().add(-1.067, 0, -0.7),
 			centered.clone().add(-0.97, 0, -1),
 			centered.clone().add(-0.8, 0, -1.3),
@@ -128,7 +128,7 @@ public class SupernovaFinisher implements EliteFinisher {
 		realCurrent[0] = current[0].clone();
 		realCurrent[1] = current[1].clone();
 
-			new BukkitRunnable() {
+		new BukkitRunnable() {
 			int mTicks = 0;
 			final int mRStep = (255 - 230) / 10;
 			final int mGStep = (255 - 48) / 10;
@@ -139,7 +139,7 @@ public class SupernovaFinisher implements EliteFinisher {
 			public void run() {
 
 				if (mTicks == 0) {
-					loc.getWorld().playSound(loc, Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.PLAYERS, 0.75f, 0.05f);
+					loc.getWorld().playSound(loc, Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.PLAYERS, 0.5f, 0.05f);
 				}
 				if (mTicks < 10) {
 					mLineSize = 1.0f;
@@ -219,14 +219,14 @@ public class SupernovaFinisher implements EliteFinisher {
 
 				} else if (mTicks == 35) {
 					p.stopSound(Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.PLAYERS);
-					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5f, 2.0f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5f, 2.0f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5f, 2.0f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5f, 2.0f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5f, 2.0f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.PLAYERS, 1.0f, 0.25f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 2.0f, 0.15f);
-					loc.getWorld().playSound(loc, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 3f, 0.75f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.4f, 2.0f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.4f, 2.0f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.4f, 2.0f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.4f, 2.0f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.4f, 2.0f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.PLAYERS, 0.75f, 0.25f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1.75f, 0.15f);
+					loc.getWorld().playSound(loc, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 2.5f, 0.75f);
 
 					new PartialParticle(Particle.FLASH, centered, 1).minimumCount(1).spawnAsPlayerActive(p);
 					new PartialParticle(Particle.EXPLOSION_LARGE, centered, 1).minimumCount(1).spawnAsPlayerActive(p);

@@ -2,10 +2,10 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -32,9 +32,11 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+
 public class SpellFinalCrystal extends Spell {
 	private final Plugin mPlugin;
-	private double mT = 20 * 1;
+	private double mT = 20;
 	private final int mSoloCooldown = 20 * 20;
 	private double mCooldown;
 	private final double mMaxFactor = 2.0;
@@ -178,7 +180,7 @@ public class SpellFinalCrystal extends Spell {
 				BossUtils.hideBossBar(bar, world);
 			}
 		};
-		runA.runTaskTimer(mPlugin, 20 * 1, 1);
+		runA.runTaskTimer(mPlugin, 20, 1);
 		mActiveRunnables.add(runA);
 	}
 
@@ -235,7 +237,8 @@ public class SpellFinalCrystal extends Spell {
 											if (mCenter.distance(player.getLocation()) < mRange) {
 												/* Fire aura can not be blocked */
 												BossUtils.bossDamagePercent(mBoss, player, 0.15, "Souldrain Pool");
-												AbilityUtils.increaseDamageDealtPlayer(player, 20 * 8, -0.3, "Lich");
+												com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "LichSouldrainPoolWeakness",
+													new PercentDamageDealt(TICKS_PER_SECOND * 8, -0.3));
 											}
 										}
 									}

@@ -22,7 +22,7 @@ public class BowAspect extends WeaponAspectDepthsAbility {
 		new DepthsAbilityInfo<>(BowAspect.class, ABILITY_NAME, BowAspect::new, null, DepthsTrigger.WEAPON_ASPECT)
 			.displayItem(Material.BOW)
 			.description("Your sneak fire with bow ability has " + StringUtils.multiplierToPercentage(COOLDOWN_REDUCTION) + "% reduced cooldown, and you have a " +
-				             StringUtils.multiplierToPercentage(PASSIVE_ARROW_SAVE) + "% chance for arrows to not be consumed when using a bow or crossbow.");
+				StringUtils.multiplierToPercentage(PASSIVE_ARROW_SAVE) + "% chance for arrows to not be consumed when using a bow or crossbow.");
 
 	public BowAspect(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

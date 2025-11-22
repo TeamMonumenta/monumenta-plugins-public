@@ -48,9 +48,12 @@ public class LightspeedCS extends AdvancingShadowsCS {
 		double angle = Math.atan2(direction.getX(), direction.getZ());
 		for (Vector v : starFull) {
 			switch (FastUtils.randomIntInRange(0, 3)) {
-				case 0 -> drawCrit(v.clone().rotateAroundY(angle).add(starCentre.clone()).toLocation(player.getWorld()), player);
-				case 1 -> drawSpark(v.clone().rotateAroundY(angle).add(starCentre.clone()).toLocation(player.getWorld()), player);
-				default -> drawGold(v.clone().rotateAroundY(angle).add(starCentre.clone()).toLocation(player.getWorld()), player);
+				case 0 ->
+					drawCrit(v.clone().rotateAroundY(angle).add(starCentre.clone()).toLocation(player.getWorld()), player);
+				case 1 ->
+					drawSpark(v.clone().rotateAroundY(angle).add(starCentre.clone()).toLocation(player.getWorld()), player);
+				default ->
+					drawGold(v.clone().rotateAroundY(angle).add(starCentre.clone()).toLocation(player.getWorld()), player);
 			}
 		}
 

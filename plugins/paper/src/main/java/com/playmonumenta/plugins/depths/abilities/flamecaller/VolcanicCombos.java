@@ -144,7 +144,7 @@ public class VolcanicCombos extends DepthsAbility {
 	}
 
 	private static Description<VolcanicCombos> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<VolcanicCombos>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When you melee attack an enemy, deal ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
 			.add(" magic damage to enemies in a ")

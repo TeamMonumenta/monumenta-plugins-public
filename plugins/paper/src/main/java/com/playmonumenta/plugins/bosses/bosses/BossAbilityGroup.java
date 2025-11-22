@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.BossBarManager;
@@ -10,6 +11,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.chunk.ChunkManager;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.EntityGlowEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -24,8 +26,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Vex;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
@@ -45,6 +50,7 @@ public abstract class BossAbilityGroup {
 	protected final Plugin mPlugin;
 	private final String mIdentityTag;
 
+	private int mDetectionRange;
 	private @Nullable BossBarManager mBossBar;
 	public SpellManager mActiveSpells;
 	private List<Spell> mPassiveSpells;
@@ -54,6 +60,7 @@ public abstract class BossAbilityGroup {
 	private boolean mUnloaded = false;
 	private int mNextActiveTimer = 0;
 	public boolean mDead = false;
+	private long mPassiveIntervalTicks;
 
 	protected BossAbilityGroup(Plugin plugin, String identityTag, LivingEntity boss) {
 		mPlugin = plugin;
@@ -64,13 +71,30 @@ public abstract class BossAbilityGroup {
 		mPassiveSpells = Collections.emptyList();
 	}
 
-	public void changePhase(SpellManager activeSpells, List<Spell> passiveSpells,
-							@Nullable Consumer<LivingEntity> phaseAction) {
+	public void changePhase(SpellManager activeSpells,
+	                        List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction) {
+
+		changePhase(activeSpells, passiveSpells, phaseAction, 0);
+	}
+
+	public void changePhase(SpellManager activeSpells,
+	                        List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction, int spellDelay) {
 		if (phaseAction != null) {
 			phaseAction.accept(mBoss);
 		}
-
-		mActiveSpells.cancelAll();
+		if (spellDelay > 0) {
+			if (mTaskActive != null) {
+				mTaskActive.cancel();
+				mTaskActive = getSpellCastRunnable();
+				mTaskActive.runTaskTimer(mPlugin, spellDelay, 2L);
+			}
+			if (mTaskPassive != null) {
+				mTaskPassive.cancel();
+				mTaskPassive = getPassiveSpellCastRunnable();
+				mTaskPassive.runTaskTimer(mPlugin, spellDelay, mPassiveIntervalTicks);
+			}
+		}
+		mActiveSpells.cancelAll(true);
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
 		MMLog.fine("Changed phase for " + mIdentityTag + ". Boss's health is currently at " +
@@ -86,48 +110,58 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange,
-							  @Nullable BossBarManager bossBar) {
+	                          @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpell, detectionRange, bossBar, 100);
 	}
 
 	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange,
-							  @Nullable BossBarManager bossBar, long spellDelay) {
+	                          @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(List.of(activeSpell), Collections.emptyList(), detectionRange, bossBar, spellDelay);
 	}
 
 	public void constructBoss(BossAbilityGroup this, List<Spell> activeSpells, List<Spell> passiveSpells,
-							  int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
+	                          int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(new SpellManager(activeSpells), passiveSpells, detectionRange, bossBar, spellDelay);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
-							  @Nullable BossBarManager bossBar) {
+	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+	                          @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 100);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
-							  @Nullable BossBarManager bossBar, long spellDelay) {
+	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+	                          @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, PASSIVE_RUN_INTERVAL_DEFAULT);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
-							  @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
+	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+	                          @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, passiveIntervalTicks, false);
 	}
 
 	/* If detectionRange <= 0, will always run regardless of whether players are nearby */
 	public void constructBoss(BossAbilityGroup this, SpellManager activeSpells, List<Spell> passiveSpells,
-							  int detectionRange, @Nullable BossBarManager bossBar, long spellDelay,
-							  long passiveIntervalTicks, boolean preventSameSpellTwiceInARow) {
+	                          int detectionRange, @Nullable BossBarManager bossBar, long spellDelay,
+	                          long passiveIntervalTicks, boolean preventSameSpellTwiceInARow) {
+		mDetectionRange = detectionRange;
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
 		mPreventSameSpellTwiceInARow = preventSameSpellTwiceInARow;
 
-		mTaskPassive = new BukkitRunnable() {
+		mPassiveIntervalTicks = passiveIntervalTicks;
+		mTaskPassive = getPassiveSpellCastRunnable();
+		mTaskPassive.runTaskTimer(mPlugin, 1, mPassiveIntervalTicks);
+
+		mTaskActive = getSpellCastRunnable();
+		mTaskActive.runTaskTimer(mPlugin, spellDelay, 2L);
+	}
+
+	private BukkitRunnable getPassiveSpellCastRunnable() {
+		return new BukkitRunnable() {
 			private long mMissingTicks = 0;
 
 			@Override
@@ -136,7 +170,7 @@ public abstract class BossAbilityGroup {
 					mBossBar.update();
 				}
 
-				mMissingTicks += passiveIntervalTicks;
+				mMissingTicks += mPassiveIntervalTicks;
 				if (mMissingTicks > 100) {
 					mMissingTicks = 0;
 					/* Check if somehow the boss entity is missing even though this is still running */
@@ -148,7 +182,7 @@ public abstract class BossAbilityGroup {
 				}
 
 				/* Don't run abilities if players aren't present */
-				if (detectionRange > 0 && PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).isEmpty()) {
+				if (mDetectionRange > 0 && PlayerUtils.playersInRange(mBoss.getLocation(), mDetectionRange, true).isEmpty()) {
 					return;
 				}
 
@@ -162,9 +196,10 @@ public abstract class BossAbilityGroup {
 				}
 			}
 		};
-		mTaskPassive.runTaskTimer(mPlugin, 1, passiveIntervalTicks);
+	}
 
-		mTaskActive = new BukkitRunnable() {
+	private BukkitRunnable getSpellCastRunnable() {
+		return new BukkitRunnable() {
 			private boolean mDisabled = true;
 			private int mMissingTicks = 0;
 
@@ -189,7 +224,7 @@ public abstract class BossAbilityGroup {
 				}
 
 				/* Don't progress if players aren't present */
-				if (detectionRange > 0 && PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).isEmpty()) {
+				if (mDetectionRange > 0 && PlayerUtils.playersInRange(mBoss.getLocation(), mDetectionRange, true).isEmpty()) {
 					if (!mDisabled) {
 						/* Cancel all the spells just in case they were activated */
 						mDisabled = true;
@@ -215,7 +250,6 @@ public abstract class BossAbilityGroup {
 				}
 			}
 		};
-		mTaskActive.runTaskTimer(mPlugin, spellDelay, 2L);
 	}
 
 	private void handleMissingBoss() {
@@ -241,7 +275,7 @@ public abstract class BossAbilityGroup {
 			SpellCastEvent event = new SpellCastEvent(mBoss, this, sp);
 			Bukkit.getPluginManager().callEvent(event);
 		} else {
-			MMLog.severe("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() +
+			MMLog.fine("Warning: Boss '" + mIdentityTag + "' attempted to force cast '" + spell.toString() +
 				"' but boss does not have this spell!");
 		}
 	}
@@ -356,12 +390,24 @@ public abstract class BossAbilityGroup {
 
 	}
 
+	public void bossGlowed(EntityGlowEvent event) {
+
+	}
+
 	public void bossExploded(EntityExplodeEvent event) {
 
 	}
 
-	// Only acts on fire applied by the plugin
-	public void bossIgnited(int ticks) {
+	public void bossKnockedBackEntity(EntityKnockbackByEntityEvent event) {
+
+	}
+
+	public void bossSummonedVex(CreatureSpawnEvent event, Vex vex) {
+
+	}
+
+	// Only acts on fire applied by plugin
+	public void bossIgnited(int time, @Nullable Entity igniter) {
 
 	}
 
@@ -388,7 +434,8 @@ public abstract class BossAbilityGroup {
 	}
 
 	/*
-	 * Called only the first time the boss is summoned into the world
+	 * Called only the first time the boss is instantiated with /bossfight or BossManager.createBoss()
+	 * Not called when mobs spawned with /los summon or are reloaded
 	 *
 	 * Useful to set the bosses health / armor / etc. based on # of players
 	 */
@@ -419,8 +466,12 @@ public abstract class BossAbilityGroup {
 		return false;
 	}
 
-	public double maxEntityDeathRange() {
-		return 0;
+	public double nearbyEntityDeathMaxRange() {
+		return 12;
+	}
+
+	public boolean nearbyEntityDeathWithinRange(Location location) {
+		return location.distanceSquared(mBoss.getLocation()) <= nearbyEntityDeathMaxRange() * nearbyEntityDeathMaxRange();
 	}
 
 	/*
@@ -437,6 +488,22 @@ public abstract class BossAbilityGroup {
 
 	public boolean hasNearbyBlockBreakTrigger() {
 		return false;
+	}
+
+	public void nearbyBlockPlace(BlockPlaceEvent event) {
+
+	}
+
+	public boolean hasNearbyBlockPlaceTrigger() {
+		return false;
+	}
+
+	public double maxPlayerDeathRange() {
+		return 75.0;
+	}
+
+	public boolean deadPlayerWithinRange(Location location) {
+		return location.distanceSquared(mBoss.getLocation()) <= maxPlayerDeathRange() * maxPlayerDeathRange();
 	}
 
 	/*

@@ -4,10 +4,9 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
+import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
 import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildOrder;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.CommandUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -16,7 +15,7 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,19 +23,17 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.Nullable;
 
 // Note: Much of this is copied from GuildGui's AccessibleGuildsView
 public class TeleportGuildGui extends Gui {
@@ -49,7 +46,7 @@ public class TeleportGuildGui extends Gui {
 	private final Plugin mMainPlugin;
 	private User mPlayerUser;
 	private int mPage = 0;
-	private List<PlayerGuildInfo> mAccessibleGuilds = new ArrayList<>();
+	private List<@Nullable PlayerGuildInfo> mAccessibleGuilds = new ArrayList<>();
 	private GuildOrder mOrder = GuildOrder.DEFAULT;
 
 	public static void register(Plugin plugin) {
@@ -72,25 +69,23 @@ public class TeleportGuildGui extends Gui {
 				}
 
 				for (Player player : players) {
-					run(plugin, player);
+					new TeleportGuildGui(plugin, player).open();
 				}
 			})
 			.register();
-	}
-
-	private static void run(Plugin plugin, Player player) {
-		if (!ServerProperties.getShardName().equals("plots")) {
-			player.sendMessage(Component.text("The guild teleport GUI can only be run on plots for now."));
-			return;
-		}
-
-		new TeleportGuildGui(plugin, player).open();
 	}
 
 	private TeleportGuildGui(Plugin plugin, Player player) {
 		super(player, 54, Component.text("Teleport to Guild"));
 		mMainPlugin = plugin;
 		mPlayerUser = LuckPermsIntegration.getUser(mPlayer);
+
+		// Faster initial load
+		CompletableFuture<List<Group>> nonPublicGuildsFuture = new CompletableFuture<>();
+		nonPublicGuildsFuture.complete(new ArrayList<>(LuckPermsIntegration.getRelevantGuilds(mPlayerUser, true, false)));
+		refresh(nonPublicGuildsFuture);
+
+		// Include public guilds
 		refresh();
 	}
 
@@ -113,9 +108,23 @@ public class TeleportGuildGui extends Gui {
 					break;
 				}
 
-				setGuildIcon(PAGE_START_Y + y,
-					PAGE_START_X + x,
-					mAccessibleGuilds.get(index));
+				PlayerGuildInfo playerGuildInfo = mAccessibleGuilds.get(index);
+				if (playerGuildInfo != null) {
+					setGuildIcon(PAGE_START_Y + y,
+						PAGE_START_X + x,
+						playerGuildInfo);
+				} else {
+					ItemStack fallbackIcon = LuckPermsIntegration.defaultGuildBanner();
+					ItemMeta meta = fallbackIcon.getItemMeta();
+					meta.displayName(GuildPlotUtils.FALLBACK_WORLD_COMPONENT);
+					meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+					fallbackIcon.setItemMeta(meta);
+					setItem(PAGE_START_Y + y,
+						PAGE_START_X + x,
+						fallbackIcon)
+						.onClick((InventoryClickEvent event) ->
+							GuildPlotUtils.sendGuildPlotHub(mPlayer, true));
+				}
 			}
 		}
 	}
@@ -129,9 +138,9 @@ public class TeleportGuildGui extends Gui {
 		guildOrderLore.add(Component.empty());
 		guildOrderLore.add(Component.text("Sort order (hotbar keys to select):", NamedTextColor.GRAY)
 			.decoration(TextDecoration.ITALIC, false));
-		GuildOrder[] orders = GuildOrder.values();
+		List<GuildOrder> orders = GuildOrder.visibleGuildOrders(mPlayer);
 		for (int i = 0; i < 9; i++) {
-			if (i >= orders.length) {
+			if (i >= orders.size()) {
 				break;
 			}
 
@@ -139,7 +148,7 @@ public class TeleportGuildGui extends Gui {
 				Component.text("", NamedTextColor.GRAY)
 					.decoration(TextDecoration.ITALIC, false)
 					.append(Component.keybind(Constants.Keybind.hotbar(i)))
-					.append(Component.text(": " + orders[i].mName)));
+					.append(Component.text(": " + orders.get(i).mName)));
 		}
 
 		item = new ItemStack(Material.PLAYER_HEAD);
@@ -159,12 +168,11 @@ public class TeleportGuildGui extends Gui {
 			.onClick((InventoryClickEvent event) -> {
 				GuildOrder order;
 				if (event.getClick().equals(ClickType.NUMBER_KEY)) {
-					GuildOrder[] guildOrders = GuildOrder.values();
 					int index = event.getHotbarButton();
-					if (index < 0 || index >= guildOrders.length) {
+					if (index < 0 || index >= orders.size()) {
 						order = GuildOrder.DEFAULT;
 					} else {
-						order = guildOrders[index];
+						order = orders.get(index);
 					}
 					changeOrder(order);
 				} else {
@@ -207,7 +215,7 @@ public class TeleportGuildGui extends Gui {
 				}
 
 				if (LuckPermsIntegration.isLocked(guild)) {
-					if (mPlayer.isOp()) {
+					if (mPlayer.hasPermission(GuildGui.MOD_GUI_PERMISSION)) {
 						mPlayer.sendMessage(Component.text("That guild is on lockdown; your operator status bypassed this check.", NamedTextColor.RED));
 					} else {
 						mPlayer.sendMessage(Component.text("That guild is on lockdown; you may not teleport to it at this time.", NamedTextColor.RED));
@@ -220,26 +228,7 @@ public class TeleportGuildGui extends Gui {
 					}
 				}
 
-				World world = mPlayer.getWorld();
-				Bukkit.getScheduler().runTaskAsynchronously(mMainPlugin, () -> {
-					try {
-						Optional<Location> optLoc = LuckPermsIntegration.getGuildTp(world, guild).join();
-						Bukkit.getScheduler().runTask(mMainPlugin, () -> {
-							if (optLoc.isEmpty()) {
-								mPlayer.sendMessage(Component.text("The teleport for your guild is not set up", NamedTextColor.RED));
-								mPlayer.sendMessage(Component.text("Please ask a moderator to fix this", NamedTextColor.RED));
-								return;
-							}
-
-							mPlayer.teleport(optLoc.get(), PlayerTeleportEvent.TeleportCause.COMMAND);
-						});
-					} catch (Exception ex) {
-						Bukkit.getScheduler().runTask(mMainPlugin, () -> {
-							mPlayer.sendMessage(Component.text("Unable to teleport you to that guild:", NamedTextColor.RED));
-							MessagingUtils.sendStackTrace(mPlayer, ex);
-						});
-					}
-				});
+				GuildPlotUtils.sendGuildPlotWorld(mPlayer, guild);
 			});
 	}
 
@@ -286,27 +275,47 @@ public class TeleportGuildGui extends Gui {
 	}
 
 	public void refresh() {
+		refresh(LuckPermsIntegration.getGuilds());
+	}
+
+	public void refresh(CompletableFuture<List<Group>> guildsFuture) {
 		Bukkit.getScheduler().runTaskAsynchronously(mMainPlugin, () -> {
 			mPlayerUser = LuckPermsIntegration.loadUser(mPlayerUser.getUniqueId()).join();
 
-			List<PlayerGuildInfo> guilds = mOrder.sortGuilds(
-				PlayerGuildInfo.ofCollection(
-						mPlayerUser,
-						LuckPermsIntegration.getRelevantGuilds(mPlayerUser, true, false)
-					).join()
-					.stream()
-					.filter(playerGuildInfo -> playerGuildInfo.getGuildPermissions().contains(GuildPermission.VISIT))
-					.collect(Collectors.toList())
-			).join();
+			List<PlayerGuildInfo> unsortedGuilds = PlayerGuildInfo.ofCollection(
+					mPlayerUser,
+					guildsFuture.join()
+				).join()
+				.stream()
+				.filter(playerGuildInfo -> (
+					playerGuildInfo.getGuildPermissions().contains(GuildPermission.VISIT)
+						&& playerGuildInfo.getGuildFlags().contains(GuildFlag.OWNS_PLOT)
+				))
+				.collect(Collectors.toList());
+
+			List<@Nullable PlayerGuildInfo> guilds = new ArrayList<>();
+			guilds.add(null);
 
 			Group mainGuild = LuckPermsIntegration.getGuild(mPlayerUser);
 			if (mainGuild != null) {
 				PlayerGuildInfo mainGuildInfo = PlayerGuildInfo.of(mPlayerUser, mainGuild).join();
-				if (mainGuildInfo != null) {
-					guilds.remove(mainGuildInfo);
-					guilds.add(0, mainGuildInfo);
+				if (mainGuildInfo != null && unsortedGuilds.contains(mainGuildInfo)) {
+					unsortedGuilds.remove(mainGuildInfo);
+					guilds.add(mainGuildInfo);
 				}
 			}
+
+			// Guest guilds
+			guilds.addAll(mOrder.sortGuilds(unsortedGuilds.stream()
+				.filter(playerGuildInfo -> !playerGuildInfo.getAccessLevel().equals(GuildAccessLevel.NONE))
+				.toList()
+			).join());
+
+			// Public guilds
+			guilds.addAll(mOrder.sortGuilds(unsortedGuilds.stream()
+				.filter(playerGuildInfo -> playerGuildInfo.getAccessLevel().equals(GuildAccessLevel.NONE))
+				.toList()
+			).join());
 
 			Bukkit.getScheduler().runTask(mMainPlugin, () -> {
 				// Handle this list sync so that it can't be modified during reads

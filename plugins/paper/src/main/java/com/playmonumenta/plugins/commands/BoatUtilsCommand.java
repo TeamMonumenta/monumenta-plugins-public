@@ -106,7 +106,8 @@ public class BoatUtilsCommand {
 		// OakBoat, BirchBoat, JungleBoat, AcaciaBoat, DarkOakBoat (with spruce being default)
 		Boat.Type selectedType = Boat.Type.SPRUCE;
 
-		outside: for (String tag : player.getScoreboardTags()) {
+		outside:
+		for (String tag : player.getScoreboardTags()) {
 			switch (tag) {
 				case "OakBoat" -> {
 					selectedType = Boat.Type.OAK;

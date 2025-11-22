@@ -16,7 +16,7 @@ public class TridentOverride extends BaseOverride {
 			return true;
 		}
 		if (player.getInventory().getItemInMainHand().getType() != Material.TRIDENT &&
-				player.getInventory().getItemInOffHand().getType() != Material.TRIDENT) {
+			player.getInventory().getItemInOffHand().getType() != Material.TRIDENT) {
 			return false;
 		}
 

@@ -36,7 +36,7 @@ public class Prosperity extends DepthsAbility {
 	}
 
 	private static Description<Prosperity> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Prosperity>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Gain a ")
 			.addPercent(a -> CHANCE[rarity - 1], CHANCE[rarity - 1], false, true)
 			.add(" chance to get an extra option in ability and upgrade rewards.");

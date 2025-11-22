@@ -30,13 +30,13 @@ public class TemporaryBlockChangeManager implements Listener {
 
 	private final Map<World, Map<Block, ChangedBlock>> mChangedBlocks = new HashMap<>();
 
-	private static class ChangedBlock {
+	public static class ChangedBlock {
 		private final Material mTemporaryType;
 		/**
 		 * Old state of the block. Will always be the original state, even if there's more changes to this block ({@link #mPreviousChange}).
 		 */
-		private final BlockState mOldState;
-		private final int mExpiration;
+		public final BlockState mOldState;
+		private int mExpiration;
 		/**
 		 * An older change to the same block that outlasts the current change, i.e. {@code mExpiration < mPreviousChange.mExpiration}
 		 */
@@ -149,12 +149,52 @@ public class TemporaryBlockChangeManager implements Listener {
 	 * @param expectedType The expected temporary type of the block. If changed but not of this type, will return false.
 	 */
 	public boolean isChangedBlock(Block block, Material expectedType) {
-		Map<Block, ChangedBlock> worldMap = mChangedBlocks.get(block.getWorld());
-		if (worldMap == null) {
+		return getChangedBlock(block, expectedType) != null;
+	}
+
+	/**
+	 * Increases the duration of the temporary block. The new expiration will be calculated by adding the given duration with
+	 * the current server tick. The old expiration will not have any effect on the new expiration. Will only increase if the
+	 * new expiration is later than the old.
+	 *
+	 * @param block    The block's duration to change
+	 * @param duration The duration to add to the current server tick for the new expiration
+	 * @return True if the duration was increased, false if not
+	 */
+	public boolean increaseDuration(Block block, int duration) {
+		if (duration <= 0) {
 			return false;
 		}
+		Map<Block, ChangedBlock> worldMap = mChangedBlocks.computeIfAbsent(block.getWorld(), key -> new HashMap<>());
+		if (worldMap.containsKey(block)) {
+			ChangedBlock changedBlock = worldMap.get(block);
+			int oldExpiration = changedBlock.mExpiration;
+			int newExpiration = Bukkit.getCurrentTick() + duration;
+			if (oldExpiration >= newExpiration) {
+				return false;
+			}
+			changedBlock.mExpiration = newExpiration;
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Gets the ChangedBlock if active. Null if the block is not changed or not of the expected type.
+	 *
+	 * @param block        The block to check
+	 * @param expectedType The expected temporary type of the block. If changed but not of this type, will return null.
+	 */
+	public @Nullable ChangedBlock getChangedBlock(Block block, Material expectedType) {
+		Map<Block, ChangedBlock> worldMap = mChangedBlocks.get(block.getWorld());
+		if (worldMap == null) {
+			return null;
+		}
 		ChangedBlock changedBlock = worldMap.get(block);
-		return changedBlock != null && changedBlock.mTemporaryType == expectedType && block.getLocation().isChunkLoaded() && block.getType() == expectedType;
+		if (changedBlock == null || changedBlock.mTemporaryType != expectedType || !block.getLocation().isChunkLoaded() || block.getType() != expectedType) {
+			return null;
+		}
+		return changedBlock;
 	}
 
 	/**

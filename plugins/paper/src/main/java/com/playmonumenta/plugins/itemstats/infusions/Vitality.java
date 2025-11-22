@@ -42,7 +42,7 @@ public class Vitality implements Infusion {
 				AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
 				if (maxHealth != null) {
 					AttributeModifier mod = new AttributeModifier(MODIFIER, healthBoostPct,
-							AttributeModifier.Operation.MULTIPLY_SCALAR_1);
+						AttributeModifier.Operation.MULTIPLY_SCALAR_1);
 					maxHealth.addModifier(mod);
 				}
 			}

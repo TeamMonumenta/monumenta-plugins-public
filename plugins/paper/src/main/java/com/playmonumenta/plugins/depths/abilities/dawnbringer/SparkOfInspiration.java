@@ -24,7 +24,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -40,6 +39,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SparkOfInspiration extends DepthsAbility {
 
@@ -138,6 +138,7 @@ public class SparkOfInspiration extends DepthsAbility {
 			int mTicks = 0;
 			final Player mTarget = finalTargetPlayer;
 			final World mWorld = mTarget.getWorld();
+
 			@Override
 			public void run() {
 				Location targetLoc = mTarget.getLocation();
@@ -263,8 +264,9 @@ public class SparkOfInspiration extends DepthsAbility {
 	}
 
 	private static Description<SparkOfInspiration> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<SparkOfInspiration>(color)
-			.add("Swap hands while looking at a player within ")
+		return new DescriptionBuilder<>(() -> INFO, color)
+			.addTrigger("looking at a player")
+			.add(" within ")
 			.add(a -> a.mRange, CAST_RANGE)
 			.add(" blocks to instantly heal both of you for 100% of your max HP and empower both of you for the next ")
 			.addDuration(a -> a.mBuffDuration, BUFF_DURATION[rarity - 1], false, true)

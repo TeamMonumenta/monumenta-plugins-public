@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.depths.abilities.prismatic.Convergence;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
@@ -42,7 +43,7 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 		TRIGGER_MAP.put(20, DepthsTrigger.SHIFT_LEFT_CLICK);
 		TRIGGER_MAP.put(21, DepthsTrigger.SHIFT_RIGHT_CLICK);
 		//empty space to be even
-		TRIGGER_MAP.put(23, DepthsTrigger.SPAWNER);
+		TRIGGER_MAP.put(23, DepthsTrigger.WILDCARD);
 		TRIGGER_MAP.put(24, DepthsTrigger.SHIFT_BOW);
 		TRIGGER_MAP.put(25, DepthsTrigger.SWAP);
 		TRIGGER_MAP.put(26, DepthsTrigger.LIFELINE);
@@ -65,7 +66,17 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 		mInventory.setItem(4, getDescriptionItem());
 
 		List<DepthsAbilityItem> passiveItems = new ArrayList<>();
+		boolean hasConvergence = dp.hasAbility(Convergence.ABILITY_NAME);
 		for (DepthsAbilityItem item : items) {
+			// if ability is wildcard and not convergence, add to passive list for display if player has convergence
+			if (item.mTrigger == DepthsTrigger.WILDCARD
+				&& hasConvergence
+				&& !Convergence.ABILITY_NAME.equals(item.mAbility)) {
+				if (mShowPassives) {
+					passiveItems.add(item);
+				}
+				continue;
+			}
 			if (item.mTrigger == DepthsTrigger.PASSIVE) {
 				if (mShowPassives) {
 					passiveItems.add(item);
@@ -91,7 +102,7 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 			if (checkItem != null && checkItem.getType() == FILLER) {
 				DepthsTrigger trigger = TRIGGER_MAP.get(i);
 				if (trigger != null) {
-					mInventory.setItem(i, trigger.getNoAbilityItem());
+					mInventory.setItem(i, trigger.getNoAbilityItem(dp));
 				}
 			}
 		}
@@ -114,8 +125,8 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 		GUIUtils.refreshOffhand(event);
 		ItemStack clickedItem = event.getCurrentItem();
 		if (event.getClickedInventory() != mInventory
-			    || clickedItem == null
-			    || clickedItem.getType() == FILLER) {
+			|| clickedItem == null
+			|| clickedItem.getType() == FILLER) {
 			return;
 		}
 		Player player = (Player) event.getWhoClicked();
@@ -137,7 +148,7 @@ public abstract class AbstractDepthsAbilityUtilityGUI extends CustomInventory {
 		} else {
 			for (DepthsAbilityInfo<?> ability : abilities) {
 				if (ability.getDisplayName() != null
-					    && ItemUtils.getPlainName(clickedItem).contains(ability.getDisplayName())) {
+					&& ItemUtils.getPlainName(clickedItem).contains(ability.getDisplayName())) {
 					setConfirmation(clickedItem);
 					return;
 				}

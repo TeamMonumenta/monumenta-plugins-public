@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.infinitytower.guis;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerGameUtils;
-import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
@@ -72,7 +72,7 @@ public class TowerGuiMob extends CustomInventory {
 		mInventory.setItem(CLASS_ITEM_SLOT, mMob.buildClassItem(mGame));
 		mInventory.setItem(HP_ITEM_SLOT, mMob.buildHPItem(mGame));
 		int i = 0;
-		if (mMob.mAbilities.size() > 0) {
+		if (!mMob.mAbilities.isEmpty()) {
 			for (int pos : SPELL_ITEMS_SLOT[mMob.mAbilities.size() - 1]) {
 				mInventory.setItem(pos, mMob.buildSpellItem(mGame, i++));
 			}
@@ -93,7 +93,6 @@ public class TowerGuiMob extends CustomInventory {
 		}
 
 	}
-
 
 
 	@Override
@@ -117,7 +116,7 @@ public class TowerGuiMob extends CustomInventory {
 			player.playSound(player.getEyeLocation(), Sound.ENTITY_CHICKEN_HURT, SoundCategory.NEUTRAL, 1, 1.2f);
 			mInventory.clear();
 			player.closeInventory();
-			new TowerGuiTeam(player, mGame).openInventory(player, TowerManager.mPlugin);
+			new TowerGuiTeam(player, mGame).openInventory(player, Plugin.getInstance());
 			return;
 		}
 

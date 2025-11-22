@@ -144,7 +144,7 @@ public enum AttributeType {
 			}
 		} else {
 			if (operation == Operation.ADD && attribute == KNOCKBACK_RESISTANCE) {
-				return Component.text(String.format("%s %s", ItemStatUtils.NUMBER_CHANGE_FORMATTER.format(amount * 10), name.replace(" Add", "")), amount > 0 ? NamedTextColor.BLUE : NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
+				return Component.text(String.format("%s %s", ItemStatUtils.PERCENT_CHANGE_FORMATTER.format(amount), name.replace(" Add", "")), amount > 0 ? NamedTextColor.BLUE : NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
 			} else if (operation == Operation.ADD) {
 				return Component.text(String.format("%s %s", ItemStatUtils.NUMBER_CHANGE_FORMATTER.format(amount), name.replace(" Add", "")), amount > 0 ? NamedTextColor.BLUE : NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
 			} else if (attribute == PROJECTILE_SPEED) {

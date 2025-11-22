@@ -54,7 +54,7 @@ public class PassesView extends View {
 			meta.displayName(Component.text("Next Passes", NamedTextColor.WHITE, TextDecoration.BOLD)
 				.decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
-			mGui.setItem(0, 1, item).onClick((InventoryClickEvent event) -> nextPage());
+			mGui.setItem(0, 8, item).onClick((InventoryClickEvent event) -> nextPage());
 		}
 
 		Iterator<SeasonalPass> passIter = SeasonalEventManager.mAllPasses.values().iterator();

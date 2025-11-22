@@ -74,10 +74,6 @@ public class DepthsTreeGUI extends Gui {
 			dp.mEligibleTrees.add(allTrees.get(i));
 		}
 
-		// then give them their starting ability
-		int[] chances = {80, 15, 5, 0, 0};
-		DepthsManager.getInstance().getRandomAbility(mPlayer, dp, chances, null, false);
-
 		close();
 	}
 }

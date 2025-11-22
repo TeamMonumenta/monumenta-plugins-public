@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.classes;
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
+import com.playmonumenta.plugins.abilities.warlock.Culling;
 import com.playmonumenta.plugins.abilities.warlock.CursedWound;
 import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
 import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
@@ -42,8 +43,7 @@ public class Warlock extends PlayerClass {
 		mQuestReq = "Quest13";
 		mQuestReqMin = 1;
 		mClassDescription = "Warlocks use scythes in combination with dark magic to bring suffering and death to their enemies.";
-		mClassPassiveDescription = "Killing an enemy while holding a scythe grants 10% damage reduction for 6 seconds.";
-		mClassPassiveName = "Culling";
+		mPassive = Culling.INFO;
 
 		mSpecOne.mAbilities.add(DarkPact.INFO);
 		mSpecOne.mAbilities.add(JudgementChain.INFO);

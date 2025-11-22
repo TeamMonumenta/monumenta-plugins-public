@@ -29,7 +29,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 	private static final boolean SINGLE_TARGET = true;
 	private static final boolean LAUNCH_TRACKING = true;
 	private static final int COOLDOWN = 20 * 12;
-	private static final int DELAY = 20 * 1;
+	private static final int DELAY = 20;
 	private static final double SPEED = 0.2;
 	private static final double TURN_RADIUS = Math.PI / 45;
 	private static final int LIFETIME_TICKS = 20 * 6;
@@ -47,40 +47,40 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 
 	public SvalgotOrbOfBones(LivingEntity boss, Plugin plugin, Svalgot bossClass) {
 		super(plugin, boss, Svalgot.detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS, 20, true,
-				// Initiate Aesthetic
-				(World world, Location loc, int ticks) -> {
-					GlowingManager.startGlowing(boss, COLOR, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
+			SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS, 20, true,
+			// Initiate Aesthetic
+			(World world, Location loc, int ticks) -> {
+				GlowingManager.startGlowing(boss, COLOR, DELAY, GlowingManager.BOSS_SPELL_PRIORITY);
 
-					if (ticks % 2 == 0) {
-						new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(boss);
-						new PartialParticle(Particle.FLAME, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(boss);
-					}
-				},
-				// Launch Aesthetic
-				(World world, Location loc, int ticks) -> {
-					world.playSound(loc, Sound.ITEM_FIRECHARGE_USE, SoundCategory.HOSTILE, 3, 0.5f);
-					world.playSound(loc, Sound.ENTITY_GHAST_HURT, SoundCategory.HOSTILE, 5, 1.5f);
-				},
-				// Projectile Aesthetic
-				(World world, Location loc, int ticks) -> {
+				if (ticks % 2 == 0) {
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.FLAME, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(boss);
+				}
+			},
+			// Launch Aesthetic
+			(World world, Location loc, int ticks) -> {
+				world.playSound(loc, Sound.ITEM_FIRECHARGE_USE, SoundCategory.HOSTILE, 3, 0.5f);
+				world.playSound(loc, Sound.ENTITY_GHAST_HURT, SoundCategory.HOSTILE, 5, 1.5f);
+			},
+			// Projectile Aesthetic
+			(World world, Location loc, int ticks) -> {
 
-					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 6, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(boss);
-					new PartialParticle(Particle.FLAME, loc, 8, 1, 1, 1, 0.1).spawnAsEntityActive(boss);
-					new PartialParticle(Particle.CLOUD, loc, 6, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
-				},
-				// Hit Action
-				(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
-					new PartialParticle(Particle.FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(boss);
-					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(boss);
-					new PartialParticle(Particle.CLOUD, loc, 40, 1, 1, 1, 0.5).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 6, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.FLAME, loc, 8, 1, 1, 1, 0.1).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.CLOUD, loc, 6, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
+			},
+			// Hit Action
+			(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
+				new PartialParticle(Particle.FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.CLOUD, loc, 40, 1, 1, 1, 0.5).spawnAsEntityActive(boss);
 
-					for (Player p : PlayerUtils.playersInRange(loc, 5, true)) {
-						DamageUtils.damage(boss, p, DamageType.MAGIC, DAMAGE, null, false, true, "Orb of Bones");
-						EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, p, boss);
-					}
-				});
+				for (Player p : PlayerUtils.playersInRange(loc, 5, true)) {
+					DamageUtils.damage(boss, p, DamageType.MAGIC, DAMAGE, null, false, true, "Orb of Bones");
+					EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, p, boss);
+				}
+			});
 		mBossClass = bossClass;
 		mBoss = boss;
 		mPlugin = plugin;
@@ -98,7 +98,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 
 		//List is farthest players in the beginning, and nearest players at the end
 		List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), BeastOfTheBlackFlame.detectionRange);
-		if (players.size() > 0) {
+		if (!players.isEmpty()) {
 			Player playerOne = players.get(0);
 			super.launch(playerOne, playerOne.getEyeLocation());
 		}

@@ -38,6 +38,6 @@ public class AvariciousPendant extends DepthsAbility {
 	}
 
 	private static Description<AvariciousPendant> getDescription() {
-		return new DescriptionBuilder<AvariciousPendant>().add("Every time you conquer an elite room or boss, gain one treasure score.");
+		return new DescriptionBuilder<>(() -> INFO).add("Every time you conquer an elite room or boss, gain one treasure score.");
 	}
 }

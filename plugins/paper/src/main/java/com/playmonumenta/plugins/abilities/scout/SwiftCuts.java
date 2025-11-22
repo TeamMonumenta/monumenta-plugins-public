@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.SwiftCutsCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -54,22 +56,7 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 		new AbilityInfo<>(SwiftCuts.class, "Swift Cuts", SwiftCuts::new)
 			.scoreboardId("SwiftCuts")
 			.shorthandName("SC")
-			.descriptions(
-				String.format("Attacking an enemy with a fully charged valid melee weapon attack grants you a Swift Cuts stack with a maximum of %d stacks. Every stack grants you +%d%% melee damage. Stacks decay by 1 after %d seconds.",
-					STACKS_CAP_1,
-					(int) (DAMAGE_AMPLIFIER * 100),
-					EFFECT_DURATION / 20
-				),
-				String.format("Maximum stacks increased to %d.",
-					STACKS_CAP_2
-				),
-				String.format("Additional effect applies while having maximum Swift Cuts stacks. Tactical Maneuver: -%d%% Cooldown, Whirling Blade: +%d%% Damage and Radius, Predator Strike: -%d%% Cooldown, Split Arrow: +%d Bounce",
-					(int) (TACTICAL_MANEUVER_CDR * 100),
-					(int) (WHIRLING_BLADE_BUFF * 100),
-					(int) (PREDATOR_STRIKE_CDR * 100),
-					SPLIT_ARROW_BUFF
-				)
-			)
+			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
 			.simpleDescription("Melee deals increasing damage the more you melee enemies.")
 			.quest216Message("-------t-------e-------")
 			.displayItem(Material.STONE_SWORD);
@@ -80,6 +67,7 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	private final int mDuration;
 	private final double mTacticalManeuverCDR;
 	private final double mPredatorStrikeCDR;
+	private final double mWhirlingBladeBuff;
 	private int mStacks;
 
 	private final SwiftCutsCS mCosmetic;
@@ -89,8 +77,10 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 		mMaxStacks = (isLevelOne() ? STACKS_CAP_1 : STACKS_CAP_2) + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 		mDamageAmplifier = DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, EFFECT_DURATION);
-		mTacticalManeuverCDR = TACTICAL_MANEUVER_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE);
-		mPredatorStrikeCDR = PREDATOR_STRIKE_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE);
+		double enhanceCharm = CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE);
+		mTacticalManeuverCDR = TACTICAL_MANEUVER_CDR + enhanceCharm;
+		mPredatorStrikeCDR = PREDATOR_STRIKE_CDR + enhanceCharm;
+		mWhirlingBladeBuff = WHIRLING_BLADE_BUFF + enhanceCharm;
 		mStacks = 0;
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SwiftCutsCS());
 	}
@@ -110,8 +100,10 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 				//send stack update to client
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
-			double damageBoost = mStacks * mDamageAmplifier;
-			Bukkit.getScheduler().runTask(mPlugin, () -> mPlugin.mEffectManager.addEffect(mPlayer, EFFECT_NAME, new PercentDamageDealt(mDuration, damageBoost, AFFECTED_DAMAGE_TYPES)));
+
+			Bukkit.getScheduler().runTask(mPlugin, () -> mPlugin.mEffectManager.addEffect(mPlayer, EFFECT_NAME,
+				new PercentDamageDealt(mDuration, mStacks * mDamageAmplifier)
+					.damageTypes(DamageEvent.DamageType.getAllMeleeTypes()).deleteOnAbilityUpdate(true)));
 		}
 		return false; // only changes event damage
 	}
@@ -124,7 +116,9 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 				mStacks--;
 				if (mStacks > 0) {
 					double damageBoost = mStacks * mDamageAmplifier;
-					mPlugin.mEffectManager.addEffect(mPlayer, EFFECT_NAME, new PercentDamageDealt(mDuration, damageBoost, AFFECTED_DAMAGE_TYPES));
+					mPlugin.mEffectManager.addEffect(mPlayer, EFFECT_NAME,
+						new PercentDamageDealt(mDuration, damageBoost).damageTypes(AFFECTED_DAMAGE_TYPES)
+							.deleteOnAbilityUpdate(true));
 				}
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
@@ -145,6 +139,10 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 
 	public double getPredatorStrikeCDR() {
 		return mPredatorStrikeCDR;
+	}
+
+	public double getWhirlingBladeBuff() {
+		return 1 + mWhirlingBladeBuff;
 	}
 
 	@Override
@@ -174,5 +172,36 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 		output = output.append(Component.text(charges + "/" + maxCharges, (charges == 0 ? NamedTextColor.GRAY : (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
 
 		return output;
+	}
+
+	private static Description<SwiftCuts> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Attacking an enemy with a fully charged valid melee weapon attack grants you a Swift Cuts stack with a maximum of ")
+			.add(a -> a.mMaxStacks, STACKS_CAP_1, false, Ability::isLevelOne)
+			.add(" stacks. Every stack grants you ")
+			.addPercent(a -> a.mDamageAmplifier, DAMAGE_AMPLIFIER)
+			.add(" melee damage. Stacks decay by 1 after ")
+			.addDuration(a -> a.mDuration, EFFECT_DURATION)
+			.add(" seconds.");
+	}
+
+	private static Description<SwiftCuts> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Maximum stacks increased to ")
+			.add(a -> a.mMaxStacks, STACKS_CAP_2, false, Ability::isLevelTwo)
+			.add(".");
+	}
+
+	private static Description<SwiftCuts> getDescriptionEnhancement() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Additional effect applies while having maximum Swift Cuts stacks. Tactical Maneuver: -")
+			.addPercent(a -> a.mTacticalManeuverCDR, TACTICAL_MANEUVER_CDR)
+			.add(" Cooldown, Whirling Blade: +")
+			.addPercent(a -> a.mWhirlingBladeBuff, WHIRLING_BLADE_BUFF)
+			.add(" Damage and Radius, Predator Strike: -")
+			.addPercent(a -> a.mPredatorStrikeCDR, PREDATOR_STRIKE_CDR)
+			.add(" Cooldown, Split Arrow: +")
+			.add(a -> SPLIT_ARROW_BUFF, SPLIT_ARROW_BUFF)
+			.add(" Bounce");
 	}
 }

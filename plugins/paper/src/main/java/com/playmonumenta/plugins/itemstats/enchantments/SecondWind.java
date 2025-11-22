@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 
-
 public class SecondWind implements Enchantment {
 	private static final double DAMAGE_RESIST = 0.1;
 	private static final double HEALTH_LIMIT = 0.5;

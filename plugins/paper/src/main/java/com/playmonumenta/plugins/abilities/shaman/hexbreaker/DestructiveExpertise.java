@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.shaman.hexbreaker;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -14,14 +16,12 @@ public class DestructiveExpertise extends Ability {
 	public static final double DAMAGE_BOOST = 0.05;
 
 	public static final AbilityInfo<DestructiveExpertise> INFO =
-		new AbilityInfo<>(DestructiveExpertise.class, null, DestructiveExpertise::new)
+		new AbilityInfo<>(DestructiveExpertise.class, "Destructive Expertise", DestructiveExpertise::new)
+			.description(getDescription())
 			.canUse(player -> AbilityUtils.getSpecNum(player) == Shaman.HEXBREAKER_ID);
 
 	public DestructiveExpertise(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
 	}
 
 	@Override
@@ -31,5 +31,12 @@ public class DestructiveExpertise extends Ability {
 			event.setFlatDamage(event.getFlatDamage() * (1 + AbilityUtils.getEffectiveTotalSpecPoints(mPlayer) * DAMAGE_BOOST));
 		}
 		return false;
+	}
+
+	private static Description<DestructiveExpertise> getDescription() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Your abilities deal ")
+			.addPercent(DAMAGE_BOOST)
+			.add(" more damage per specialization point.");
 	}
 }

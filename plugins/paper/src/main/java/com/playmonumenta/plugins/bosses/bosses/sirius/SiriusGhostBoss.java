@@ -44,7 +44,7 @@ public class SiriusGhostBoss extends BossAbilityGroup {
 			));
 
 			List<Spell> passiveSpells = List.of(
-				new SpellBasePassiveAbility(1 * 20, new SpellRadiance(mConverter, mBoss)),
+				new SpellBasePassiveAbility(20, new SpellRadiance(mConverter, mBoss)),
 				new SpellBasePassiveAbility(4 * 20, new CrowdControlImmunity(mBoss))
 			);
 

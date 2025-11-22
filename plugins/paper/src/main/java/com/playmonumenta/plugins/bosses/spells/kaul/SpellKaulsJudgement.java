@@ -61,7 +61,7 @@ import org.jetbrains.annotations.Nullable;
 public class SpellKaulsJudgement extends Spell implements Listener {
 	private static final int KAULS_JUDGEMENT_RANGE = 50;
 	private static final String KAULS_JUDGEMENT_TP_TAG = "KaulsJudgementTPTag";
-	private static final String KAULS_JUDGEMENT_TAG = "KaulsJudgementTag";
+	public static final String KAULS_JUDGEMENT_TAG = "KaulsJudgementTag";
 	private static final String KAULS_JUDGEMENT_MOB_SPAWN_TAG = "KaulsJudgementMobSpawn";
 	private static final String KAULS_JUDGEMENT_MOB_TAG = "deleteelite";
 	private static final int KAULS_JUDGEMENT_TOTAL_TIME = 20 * 55;
@@ -130,7 +130,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		world.playSound(mBossLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 2);
 		new PartialParticle(Particle.SMOKE_LARGE, mBossLoc, 50, 0.5, 0.25, 0.5, 0).spawnAsBoss();
 
-		int amount = Math.max(2, (players.size() + 1)/2);
+		int amount = Math.max(2, (players.size() + 1) / 2);
 		Collections.shuffle(players);
 		while (players.size() > amount) {
 			players.remove(0);

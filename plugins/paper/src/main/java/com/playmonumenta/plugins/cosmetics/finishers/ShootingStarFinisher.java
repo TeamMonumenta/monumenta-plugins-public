@@ -42,7 +42,7 @@ public class ShootingStarFinisher implements EliteFinisher {
 		int[] greenStar = new int[5];
 		int[] blueStar = new int[5];
 
-        //boolean check1 = Math.round(p.getLocation().getX()) % 10 == 0;
+		//boolean check1 = Math.round(p.getLocation().getX()) % 10 == 0;
 
 		// framework for more shooting stars later perhaps
 		for (int i = 0; i < 9; i++) {
@@ -70,6 +70,7 @@ public class ShootingStarFinisher implements EliteFinisher {
 			final int mRStep = (223 - 79) / 15;
 			final int mGStep = (252 - 45) / 15;
 			final int mBStep = (252 - 200) / 15;
+
 			@Override
 			public void run() {
 

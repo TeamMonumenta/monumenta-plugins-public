@@ -43,7 +43,7 @@ public class SpellBombToss extends Spell {
 	private final @Nullable ExplodeAction mExplodeAction;
 	private final int mCooldown;
 
-	private final List<TNTPrimed> mTNTList = new ArrayList<TNTPrimed>();
+	private final List<TNTPrimed> mTNTList = new ArrayList<>();
 
 	public SpellBombToss(Plugin plugin, LivingEntity boss, int range) {
 		this(plugin, boss, range, 4, 1, 50, false, true);
@@ -151,7 +151,7 @@ public class SpellBombToss extends Spell {
 
 			int delay = mFuse % 4;
 			BukkitRunnable fuseSound = new BukkitRunnable() {
-				TNTPrimed mTnt = tnt;
+				final TNTPrimed mTnt = tnt;
 				int mCount = 0;
 
 				@Override
@@ -171,7 +171,7 @@ public class SpellBombToss extends Spell {
 
 			// Create explosion manually for proper damage calculations; source it at a mob entity and use the TNT location
 			BukkitRunnable explosion = new BukkitRunnable() {
-				TNTPrimed mTnt = tnt;
+				final TNTPrimed mTnt = tnt;
 
 				@Override
 				public void run() {

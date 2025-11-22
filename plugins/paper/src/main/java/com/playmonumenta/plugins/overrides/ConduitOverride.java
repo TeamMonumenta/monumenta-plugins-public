@@ -14,10 +14,8 @@ public class ConduitOverride extends BaseOverride {
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
 		if (player == null || player.getGameMode() == GameMode.CREATIVE) {
 			return true;
-		} else if (player.getGameMode() == GameMode.SURVIVAL && ZoneUtils.isInPlot(player)) {
-			return true;
+		} else {
+			return player.getGameMode() == GameMode.SURVIVAL && ZoneUtils.isInPlot(player);
 		}
-
-		return false;
 	}
 }

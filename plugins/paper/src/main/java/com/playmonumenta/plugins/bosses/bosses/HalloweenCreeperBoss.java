@@ -37,7 +37,7 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 	public HalloweenCreeperBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 		if (!(boss instanceof Creeper creeper)) {
-			throw new Exception(identityTag + " only works on mobs!");
+			throw new Exception(identityTag + " only works on mobs! Entity name='" + boss.getName() + "', tags=[" + String.join(",", boss.getScoreboardTags()) + "]");
 		}
 		mBoss.addScoreboardTag("NoTrickyTransformation");
 
@@ -64,9 +64,9 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 						case 12 -> {
 							Block block = world.getBlockAt(loc);
 							if ((block.getType() == Material.AIR || block.isLiquid())
-								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)
-								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.RESTRICTED)
-								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
+								&& !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)
+								&& !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.RESTRICTED)
+								&& !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
 								block.setType(Material.CHEST);
 								ChestUtils.setNonLootLimitedChest(block, true);
 								if (block.getState() instanceof Chest chest) {

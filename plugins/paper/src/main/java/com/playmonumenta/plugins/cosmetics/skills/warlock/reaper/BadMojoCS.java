@@ -68,6 +68,7 @@ public class BadMojoCS extends DarkPactCS {
 		new BukkitRunnable() {
 			int mTicks = 0;
 			final List<Location> mLocations = hexLocations;
+
 			@Override
 			public void run() {
 				for (Location loc : mLocations) {
@@ -101,6 +102,7 @@ public class BadMojoCS extends DarkPactCS {
 			new BukkitRunnable() {
 				int mTicks = 0;
 				final Location mLoc = finalLocation;
+
 				@Override
 				public void run() {
 					if (mTicks == 0) {
@@ -118,6 +120,7 @@ public class BadMojoCS extends DarkPactCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				// spawn soul faces around the player's head

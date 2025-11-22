@@ -124,7 +124,7 @@ public class POIManager implements Listener {
 					}
 				}
 				//Check if we actually loaded any POIs
-				if (playerPOIs.size() > 0) {
+				if (!playerPOIs.isEmpty()) {
 					mPlayerPOI.put(p.getUniqueId(), playerPOIs);
 				}
 			}

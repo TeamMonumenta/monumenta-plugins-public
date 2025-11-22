@@ -128,7 +128,7 @@ public class GUIUtils {
 		meta.lore(lines);
 	}
 
-	private static List<Component> splitLoreLine(Component lore, int maxLength) {
+	public static List<Component> splitLoreLine(Component lore, int maxLength) {
 		String mini = MessagingUtils.toMiniMessage(lore);
 		if (mini.isEmpty()) {
 			return new ArrayList<>();
@@ -312,8 +312,8 @@ public class GUIUtils {
 
 	public static Component formatName(String name, TextColor nameColor, boolean nameBold) {
 		return Component.text(name, nameColor)
-			       .decoration(TextDecoration.ITALIC, false)
-			       .decoration(TextDecoration.BOLD, nameBold);
+			.decoration(TextDecoration.ITALIC, false)
+			.decoration(TextDecoration.BOLD, nameBold);
 	}
 
 	public static void fillWithFiller(Inventory inventory) {
@@ -352,7 +352,7 @@ public class GUIUtils {
 	/**
 	 * Sets a tag in the "GUI" tag on the item. This allows resource packs to style icons differently even if the name is the same
 	 * without having to rely on lore that may change often.
-	 *
+	 * <p>
 	 * Also returns the argument passed in, which is useful for nested function calls.
 	 */
 	public static ItemStack setGuiNbtTag(ItemStack item, String tagName, @Nullable String value, boolean active) {

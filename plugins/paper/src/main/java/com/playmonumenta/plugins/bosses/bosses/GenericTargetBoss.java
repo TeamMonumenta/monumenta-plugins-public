@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
@@ -20,7 +21,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_generictarget";
 
 	public static class Parameters extends BossParameters {
-		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.clone().setOptional(false);
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.clone().setFilters(List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 		public boolean TARGET_EVERY_TICK = false;
 		public int DELAY = 10;
 	}
@@ -30,7 +31,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 	public GenericTargetBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 		if (!(boss instanceof Mob mob)) {
-			throw new Exception(identityTag + " only works on mobs!");
+			throw new Exception(identityTag + " only works on mobs! Entity name='" + boss.getName() + "', tags=[" + String.join(",", boss.getScoreboardTags()) + "]");
 		}
 
 		if (boss instanceof Wolf || boss instanceof Golem || boss instanceof Dolphin || boss instanceof Ocelot) {
@@ -52,7 +53,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 				}
 
 				if (mLastTarget != null) {
-					if (!mLastTarget.isValid() || mLastTarget.isDead() || (mLastTarget instanceof Player player && AbilityUtils.isStealthed(player))) {
+					if (!mLastTarget.isValid() || mLastTarget.isDead() || (mLastTarget instanceof Player player && (AbilityUtils.isStealthed(player) || player.getGameMode() == GameMode.SPECTATOR))) {
 						mLastTarget = null;
 						mob.setTarget(null);
 					}
@@ -61,7 +62,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 				if (mLastTarget == null || param.TARGET_EVERY_TICK) {
 					List<? extends LivingEntity> targets = param.TARGETS.getTargetsList(mob);
 					targets.removeIf(le -> le instanceof Player player && AbilityUtils.isStealthed(player));
-					if (targets.size() > 0) {
+					if (!targets.isEmpty()) {
 						mob.setTarget(targets.get(0));
 						mLastTarget = targets.get(0);
 					} else {
@@ -88,4 +89,3 @@ public class GenericTargetBoss extends BossAbilityGroup {
 	}
 
 }
-

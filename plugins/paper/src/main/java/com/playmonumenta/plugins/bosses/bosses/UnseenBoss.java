@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
 import org.bukkit.Sound;
@@ -28,6 +29,10 @@ public class UnseenBoss extends BossAbilityGroup {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
+		if (event.getType() == DamageType.TRUE) {
+			return;
+		}
+
 		if (damagee instanceof Player player && !EntityUtils.isInFieldOfView(player, mBoss)) {
 			player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, SoundCategory.HOSTILE, 1f, 0.8f);
 			event.setFlatDamage(event.getDamage() * mParam.DAMAGE_INCREASE);

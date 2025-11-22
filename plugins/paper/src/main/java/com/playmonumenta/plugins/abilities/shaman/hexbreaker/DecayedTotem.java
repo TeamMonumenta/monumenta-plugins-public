@@ -5,21 +5,20 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
 import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
 import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.DecayedTotemCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -59,23 +58,7 @@ public class DecayedTotem extends TotemAbility {
 			.linkedSpell(ClassAbility.DECAYED_TOTEM)
 			.scoreboardId("DecayedTotem")
 			.shorthandName("DT")
-			.descriptions(
-				String.format("Press the swap key while holding a melee weapon and not sneaking to fire a projectile that summons a Decayed Totem. The totem anchors up to %s targets within %s blocks of the totem, " +
-					"inflicting %s magic damage per second and %s%% Slowness. Additionally grants %s damage to your flame totems and %s damage to your lightning " +
-					" totems that exist during this totem's duration. Charge up time: %ss. Duration: %ss. Cooldown: %ss.",
-					TARGETS,
-					AOE_RANGE,
-					DAMAGE,
-					StringUtils.multiplierToPercentage(SLOWNESS_PERCENT),
-					FLAME_TOTEM_DAMAGE_BUFF,
-					LIGHTNING_TOTEM_DAMAGE_BUFF,
-					StringUtils.ticksToSeconds(PULSE_DELAY),
-					StringUtils.ticksToSeconds(DURATION_1),
-					StringUtils.ticksToSeconds(COOLDOWN)
-				),
-				String.format("Damage now ticks every half second, and duration is increased to %ss.",
-					StringUtils.ticksToSeconds(DURATION_2))
-			)
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Summons a totem, dealing damage and heavily slowing 3 mobs within range.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DecayedTotem::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)
@@ -95,9 +78,6 @@ public class DecayedTotem extends TotemAbility {
 
 	public DecayedTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Decayed Totem Projectile", "DecayedTotem", "Decayed Totem");
-		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AbilityUtils.resetClass(player);
-		}
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
@@ -149,7 +129,7 @@ public class DecayedTotem extends TotemAbility {
 		if (dealDamage) {
 			DamageUtils.damage(mPlayer, target,
 				new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats),
-				mDamage * (bonusAction ? ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY : 1), true, false, false);
+				mDamage * (bonusAction ? (ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_NEGATIVE_TOTEM_EFFICIENCY)) : 1), true, false, false);
 		}
 		EntityUtils.applySlow(mPlugin, duration, mSlowness, target);
 	}
@@ -182,5 +162,35 @@ public class DecayedTotem extends TotemAbility {
 				}
 			}
 		}
+	}
+
+	private static Description<DecayedTotem> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.addTrigger()
+			.add(" to fire a projectile that summons a Decayed Totem. The totem anchors up to ")
+			.add(a -> a.mTargetCount, TARGETS)
+			.add(" targets within ")
+			.add(a -> a.mRadius, AOE_RANGE)
+			.add(" blocks of the totem, dealing ")
+			.add(a -> a.mDamage, DAMAGE)
+			.add(" magic damage each second and inflicting ")
+			.addPercent(a -> a.mSlowness, SLOWNESS_PERCENT)
+			.add(" slowness. Additionally your flame and lightning totems that exist during this totem's duration gain ")
+			.add(a -> a.mFlameTotemBuff, FLAME_TOTEM_DAMAGE_BUFF)
+			.add(" damage and ")
+			.add(a -> a.mLightningTotemBuff, LIGHTNING_TOTEM_DAMAGE_BUFF)
+			.add(" damage respectively. Charge up time: ")
+			.addDuration(PULSE_DELAY)
+			.add("s. Duration: ")
+			.addDuration(a -> a.mDuration, DURATION_1, false, Ability::isLevelOne)
+			.add("s.")
+			.addCooldown(COOLDOWN);
+	}
+
+	private static Description<DecayedTotem> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Damage is now dealt twice as often, and the duration is increased to ")
+			.addDuration(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
+			.add(" seconds.");
 	}
 }

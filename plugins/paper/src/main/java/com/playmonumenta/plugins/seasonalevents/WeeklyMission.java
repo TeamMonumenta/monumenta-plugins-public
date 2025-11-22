@@ -11,7 +11,7 @@ public class WeeklyMission extends Mission {
 
 	public WeeklyMission(CommandSender sender,
 	                     String startDateStr,
-						 String passName,
+	                     String passName,
 	                     JsonObject missionObject,
 	                     boolean showWarnings) {
 		super(sender, startDateStr, passName, missionObject, showWarnings);

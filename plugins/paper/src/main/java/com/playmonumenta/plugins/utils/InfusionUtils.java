@@ -212,8 +212,11 @@ public class InfusionUtils {
 		ExperienceUtils.setTotalExperience(player, xp + refundXP);
 
 		AuditListener.logPlayer("[Infusion] Refund - player=" + player.getName() + ", item='" + ItemUtils.getPlainName(item) + "', from level=" + level + ", stack size=" + item.getAmount()
-			                        + ", refunded material count=" + refundMaterials + ", refunded XP=" + refundXP);
+			+ ", refunded material count=" + refundMaterials + ", refunded XP=" + refundXP);
 
+		if (!ItemStatUtils.checkOwnership(player, item)) {
+			AuditListener.logPlayer("[Ownership Tracker] Player " + player.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+		}
 	}
 
 	private static void giveMaterials(Player player, Region region, int refundMaterials) throws WrapperCommandSyntaxException {
@@ -296,55 +299,55 @@ public class InfusionUtils {
 			case 2:
 				switch (level) {
 					case 0:
-					// Infuse Level 0 Rare
+						// Infuse Level 0 Rare
 						return ExperienceUtils.LEVEL_30;
 					case 1:
-					// Infuse Level 1 Rare
+						// Infuse Level 1 Rare
 						return ExperienceUtils.LEVEL_40;
 					case 2:
-					// Infuse Level 2 Rare
+						// Infuse Level 2 Rare
 						return ExperienceUtils.LEVEL_50;
 					case 3:
-					// Infuse Level 3 Rare
+						// Infuse Level 3 Rare
 						return ExperienceUtils.LEVEL_60;
 					default:
-					// Infuse Level 4 Rare
+						// Infuse Level 4 Rare
 						throw CommandAPI.failWithString("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
 				}
 			case 3:
 				switch (level) {
 					case 0:
-					// Infuse Level 0 Artifact
+						// Infuse Level 0 Artifact
 						return ExperienceUtils.LEVEL_40;
 					case 1:
-					// Infuse Level 1 Artifact
+						// Infuse Level 1 Artifact
 						return ExperienceUtils.LEVEL_50;
 					case 2:
-					// Infuse Level 2 Artifact
+						// Infuse Level 2 Artifact
 						return ExperienceUtils.LEVEL_60;
 					case 3:
-					// Infuse Level 3 Artifact
+						// Infuse Level 3 Artifact
 						return ExperienceUtils.LEVEL_70;
 					default:
-					// Infuse Level 4 Artifact
+						// Infuse Level 4 Artifact
 						throw CommandAPI.failWithString("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
 				}
 			case 6:
 				switch (level) {
 					case 0:
-					// Infuse Level 0 Epic
+						// Infuse Level 0 Epic
 						return ExperienceUtils.LEVEL_50;
 					case 1:
-					// Infuse Level 1 Epic
+						// Infuse Level 1 Epic
 						return ExperienceUtils.LEVEL_60;
 					case 2:
-					// Infuse Level 2 Epic
+						// Infuse Level 2 Epic
 						return ExperienceUtils.LEVEL_70;
 					case 3:
-					// Infuse Level 3 Epic
+						// Infuse Level 3 Epic
 						return ExperienceUtils.LEVEL_80;
 					default:
-					// Infuse Level 4 Epic
+						// Infuse Level 4 Epic
 						throw CommandAPI.failWithString("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
 				}
 			default:
@@ -491,7 +494,10 @@ public class InfusionUtils {
 
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			AuditListener.log("[Infusion] Player " + player.getName() + " infused an item while in creative mode! item='" + ItemUtils.getPlainName(item) + "', to level=" + newLevel
-				                  + ", stack size=" + item.getAmount() + ", normal material cost count=" + amount + ", normal XP cost=" + expCost);
+				+ ", stack size=" + item.getAmount() + ", normal material cost count=" + amount + ", normal XP cost=" + expCost);
+			if (!ItemStatUtils.checkOwnership(player, item)) {
+				AuditListener.logPlayer("[Ownership Tracker] Player " + player.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+			}
 			return true;
 		}
 
@@ -508,8 +514,10 @@ public class InfusionUtils {
 		ExperienceUtils.setTotalExperience(player, currentExp - expCost);
 
 		AuditListener.logPlayer("[Infusion] Item infused - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "', to level=" + newLevel + ", stack size=" + item.getAmount()
-			                        + ", material cost count=" + amount + ", XP cost=" + expCost);
-
+			+ ", material cost count=" + amount + ", XP cost=" + expCost);
+		if (!ItemStatUtils.checkOwnership(player, item)) {
+			AuditListener.logPlayer("[Ownership Tracker] Player " + player.getName() + " changed an item ('" + ItemUtils.getPlainName(item) + "') that was not Owned by them.");
+		}
 
 		return true;
 	}

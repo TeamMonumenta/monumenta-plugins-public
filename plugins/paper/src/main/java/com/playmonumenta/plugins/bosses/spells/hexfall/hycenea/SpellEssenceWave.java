@@ -8,12 +8,11 @@ import com.playmonumenta.plugins.particle.PPBezier;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -69,8 +68,6 @@ public class SpellEssenceWave extends Spell {
 			}
 
 			BukkitRunnable runnable = new BukkitRunnable() {
-
-				final List<BoundingBox> mBoxes = new ArrayList<>();
 				int mT = 0;
 
 				@Override
@@ -116,7 +113,7 @@ public class SpellEssenceWave extends Spell {
 
 								new PPBezier(Particle.BLOCK_CRACK, endpoints)
 									.data(data)
-									.count(10)
+									.count(100)
 									.spawnAsBoss();
 
 								if (!moveOrLock) {
@@ -139,6 +136,7 @@ public class SpellEssenceWave extends Spell {
 					}
 
 					if (mT++ >= mCastTime) {
+						List<BoundingBox> boxes = new ArrayList<>();
 
 						for (int i = 0; i < players.size(); i++) {
 							vecs.get(i).rotateAroundY(Math.toRadians(-mAngle / 2));
@@ -146,7 +144,7 @@ public class SpellEssenceWave extends Spell {
 								vecs.get(i).rotateAroundY(Math.toRadians(1));
 
 								for (int r = 0; r < mConeRange; r++) {
-									mBoxes.add(BoundingBox.of(coneStartLocs.get(i).clone().add(vecs.get(i).clone().normalize().multiply(r).setY(0)), 0.85, 15, 0.85));
+									boxes.add(BoundingBox.of(coneStartLocs.get(i).clone().add(vecs.get(i).clone().normalize().multiply(r).setY(0)), 0.85, 15, 0.85));
 								}
 
 								new PPLine(Particle.SQUID_INK, coneStartLocs.get(i), vecs.get(i).clone().normalize(), mConeRange)
@@ -155,16 +153,8 @@ public class SpellEssenceWave extends Spell {
 							}
 						}
 
-						Set<Player> playersHit = new HashSet<>();
-						for (Player p : players) {
-							for (BoundingBox box : mBoxes) {
-								if (p.getBoundingBox().overlaps(box)) {
-									playersHit.add(p);
-								}
-							}
-						}
-
-						for (Player player : playersHit) {
+						Hitbox hitbox = Hitbox.unionOfAABB(boxes, mBlue.getWorld());
+						for (Player player : hitbox.getHitPlayers(true)) {
 							DamageUtils.damage(mBlue, player, DamageEvent.DamageType.MAGIC, mDamage, null, true, true, ABILITY_NAME);
 							player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 1f);
 							player.playSound(player.getLocation(), Sound.ENTITY_RAVAGER_ATTACK, SoundCategory.HOSTILE, 1f, 2f);

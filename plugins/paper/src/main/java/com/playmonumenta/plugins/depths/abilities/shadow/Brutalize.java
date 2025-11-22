@@ -72,7 +72,7 @@ public class Brutalize extends DepthsAbility {
 	}
 
 	private static Description<Brutalize> getDescription(int rarity, TextColor color) {
-		return new DescriptionBuilder<Brutalize>(color)
+		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("When you critically strike, you deal ")
 			.addPercent(a -> a.mDamage, DAMAGE[rarity - 1], false, true)
 			.add(" of the damage to all enemies (including the target) in a ")

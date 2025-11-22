@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.player;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -34,7 +36,7 @@ public class PlayerInventoryManager {
 	 * Needs to be ordered so that trigger orders are correct
 	 */
 
-	private final @Nullable ItemStack[] mInventoryLastCheck = new ItemStack[41];
+	private final List<@Nullable ItemStack> mInventoryLastCheck = Arrays.asList(new ItemStack[41]);
 
 	//Set true when player shift clicks items in inventory so it only runs after inventory is closed
 	private boolean mNeedsUpdate = false;
@@ -52,12 +54,11 @@ public class PlayerInventoryManager {
 		updateItemLastCheck(slot, inv[slot]);
 	}
 
-	@SuppressWarnings("NullAway") // nullaway bug - arrays are non-null, elements are nullable
 	public void updateItemLastCheck(int slot, @Nullable ItemStack item) {
 		if (item == null) {
-			mInventoryLastCheck[slot] = null;
+			mInventoryLastCheck.set(slot, null);
 		} else {
-			mInventoryLastCheck[slot] = item.clone();
+			mInventoryLastCheck.set(slot, item.clone());
 		}
 	}
 
@@ -65,7 +66,7 @@ public class PlayerInventoryManager {
 		// Updates different indexes for custom enchant depending on the event given, if null or not listed, rescan everything
 		if (event instanceof InventoryClickEvent invClickEvent) {
 			if (invClickEvent.getSlotType() == InventoryType.SlotType.CRAFTING
-				    || invClickEvent.isShiftClick() || invClickEvent.getSlot() == -1) {
+				|| invClickEvent.isShiftClick() || invClickEvent.getSlot() == -1) {
 				mNeedsUpdate = true;
 			} else if (invClickEvent.isRightClick() && ShulkerEquipmentListener.isEquipmentBox(invClickEvent.getCurrentItem())) {
 				for (int i = 0; i <= 8; i++) {
@@ -117,14 +118,8 @@ public class PlayerInventoryManager {
 				int droppedSlot = getDroppedSlotId(playerDropItemEvent);
 				updateItemSlotProperties(plugin, player, droppedSlot);
 			}
-		} else if (!mNeedsUpdate && event instanceof InventoryCloseEvent) {
-            //Only ever updates on InventoryCloseEvent if shift clicks have been made
-		} else {
-
-			// Sets mHasShiftClicked to false after updating entire inventory
-			if (mNeedsUpdate && event instanceof InventoryCloseEvent) {
-				mNeedsUpdate = false;
-			}
+		} else if (mNeedsUpdate && event instanceof InventoryCloseEvent) {
+			mNeedsUpdate = false;
 		}
 	}
 
@@ -132,8 +127,7 @@ public class PlayerInventoryManager {
 		if (slot < 0 || slot > 40) {
 			return false;
 		}
-		@SuppressWarnings("NullAway")
-		@Nullable ItemStack oldItem = mInventoryLastCheck[slot];
+		final var oldItem = mInventoryLastCheck.get(slot);
 		@Nullable ItemStack currentItem = player.getInventory().getContents()[slot];
 		return !Objects.equals(oldItem, currentItem);
 	}
@@ -145,8 +139,7 @@ public class PlayerInventoryManager {
 		ItemStack droppedItem = event.getItemDrop().getItemStack();
 
 		for (int slot = 0; slot <= 40; slot++) {
-			@SuppressWarnings("NullAway")
-			@Nullable ItemStack oldItem = mInventoryLastCheck[slot];
+			final var oldItem = mInventoryLastCheck.get(slot);
 			if (oldItem == null || !droppedItem.isSimilar(oldItem)) {
 				continue;
 			}

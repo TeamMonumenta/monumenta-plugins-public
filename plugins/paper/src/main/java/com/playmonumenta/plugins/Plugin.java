@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins;
 
+import com.google.common.base.Preconditions;
 import com.playmonumenta.plugins.abilities.AbilityHotbar;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
@@ -20,6 +21,7 @@ import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
 import com.playmonumenta.plugins.discoveries.DiscoveryManager;
 import com.playmonumenta.plugins.effects.EffectManager;
@@ -28,7 +30,10 @@ import com.playmonumenta.plugins.fishing.FishingCombatManager;
 import com.playmonumenta.plugins.fishing.FishingManager;
 import com.playmonumenta.plugins.gallery.GalleryCommands;
 import com.playmonumenta.plugins.gallery.GalleryManager;
+import com.playmonumenta.plugins.guis.lib.GuiListener;
 import com.playmonumenta.plugins.hexfall.HexfallListener;
+import com.playmonumenta.plugins.hunts.HuntsCommand;
+import com.playmonumenta.plugins.hunts.HuntsManager;
 import com.playmonumenta.plugins.infinitytower.TowerCommands;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.integrations.ChestSortIntegration;
@@ -40,14 +45,17 @@ import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.TABIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildPermissions;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.Lockdown;
 import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
 import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
+import com.playmonumenta.plugins.inventories.CharmBagManager;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.inventories.LootChestsInInventory;
 import com.playmonumenta.plugins.inventories.PlayerInventoryView;
+import com.playmonumenta.plugins.inventories.SharedVaultManager;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -62,8 +70,11 @@ import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.managers.PlayerSkinManager;
 import com.playmonumenta.plugins.managers.PlayerTitleManager;
 import com.playmonumenta.plugins.managers.PlaylistManager;
+import com.playmonumenta.plugins.managers.SmartFurnaceManager;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
 import com.playmonumenta.plugins.managers.UsernameManager;
+import com.playmonumenta.plugins.managers.travelanchor.TravelAnchorCommands;
+import com.playmonumenta.plugins.managers.travelanchor.TravelAnchorManager;
 import com.playmonumenta.plugins.market.MarketCommands;
 import com.playmonumenta.plugins.market.MarketListener;
 import com.playmonumenta.plugins.market.MarketManager;
@@ -79,6 +90,7 @@ import com.playmonumenta.plugins.particle.ParticleManager;
 import com.playmonumenta.plugins.player.PlayerSaturationTracker;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.plots.AnimalLimits;
+import com.playmonumenta.plugins.plots.PlotCommand;
 import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.plots.ShopManager;
 import com.playmonumenta.plugins.poi.POICommands;
@@ -86,11 +98,16 @@ import com.playmonumenta.plugins.poi.POIManager;
 import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.protocollib.ProtocolLibIntegration;
+import com.playmonumenta.plugins.rush.RushCommands;
+import com.playmonumenta.plugins.rush.RushManager;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventCommand;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
+import com.playmonumenta.plugins.social.BlockCommand;
+import com.playmonumenta.plugins.social.FriendCommand;
+import com.playmonumenta.plugins.social.SocialManager;
 import com.playmonumenta.plugins.spawners.SpawnerVisualisation;
 import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
 import com.playmonumenta.plugins.timers.CooldownTimers;
@@ -193,22 +210,21 @@ public class Plugin extends JavaPlugin {
 	public PzeroManager mPzeroManager;
 	public ShulkerEquipmentListener mShulkerEquipmentListener;
 	public PlayerListener mPlayerListener;
-	public UsernameManager mUsernameManager;
 	public GrapplingListener mGrapplingListener;
 	public @Nullable AuditListener mAuditListener = null;
-	private @Nullable CustomLogger mLogger = null;
+	public HuntsManager mHuntsManager;	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
 	// INSTANCE is set if the plugin is properly enabled
-	@SuppressWarnings({"initialization.static.field.uninitialized", "NullAway.Init"})
+	@Nullable
 	private static Plugin INSTANCE;
 
 	public static Plugin getInstance() {
+		Preconditions.checkState(INSTANCE != null, "instance not initialized yet");
 		return INSTANCE;
 	}
 
-	// fields are set as long as the plugin is properly enabled
-	@SuppressWarnings({"initialization.fields.uninitialized", "NullAway.Init"})
+	@SuppressWarnings("NullAway.Init")
 	public Plugin() {
 	}
 
@@ -228,7 +244,7 @@ public class Plugin extends JavaPlugin {
 		AbsorptionCommand.register();
 		AdminNotify.register();
 		AttributeModifierCommand.register();
-		AuditLogCommand.register();
+		BlockCommand.register();
 		BlueStrikeDaggerCraftingBoss.register();
 		BoatUtilsCommand.register();
 		BossDebug.register();
@@ -239,6 +255,7 @@ public class Plugin extends JavaPlugin {
 		CharmsCommand.register();
 		ClaimRaffle.register(this);
 		ClearPortals.register();
+		CompareScoresCommand.register();
 		ConfirmationGUICommand.register();
 		CooldownsCommand.register(this);
 		CoreProtectLogCommand.register();
@@ -257,6 +274,7 @@ public class Plugin extends JavaPlugin {
 		EventCommand.register();
 		ExperiencinatorCommand.register();
 		ForceCastSpell.register();
+		FriendCommand.register();
 		GenerateCharms.register();
 		GenerateItems.register();
 		GetScoreCommand.register();
@@ -264,18 +282,6 @@ public class Plugin extends JavaPlugin {
 		GlowingCommand.register();
 		GraveCommand.register();
 		HasBadWordCommand.register();
-		ItemStatCommands.registerAttrCommand();
-		ItemStatCommands.registerCharmCommand();
-		ItemStatCommands.registerColorCommand();
-		ItemStatCommands.registerConsumeCommand();
-		ItemStatCommands.registerDelveInfusionTypeCommand();
-		ItemStatCommands.registerEnchCommand();
-		ItemStatCommands.registerFishCommand();
-		ItemStatCommands.registerInfoCommand();
-		ItemStatCommands.registerLoreCommand();
-		ItemStatCommands.registerNameCommand();
-		ItemStatCommands.registerRemoveCommand();
-		ItemStatCommands.registerCopyCommand();
 		JingleBells.register();
 		Launch.register();
 		LoadoutManagerCommand.register();
@@ -305,10 +311,11 @@ public class Plugin extends JavaPlugin {
 		RedeemVoteRewards.register(this);
 		RefreshClass.register(this);
 		RegisterTorch.register();
-		RepairItemCommand.register();
-		ReportCommand.register();
+		RemotePunchCommand.register();
 		RemoveTags.register();
 		RenameItemCommand.register();
+		RepairItemCommand.register();
+		ReportCommand.register();
 		ResetClass.register();
 		RestartEmptyCommand.register(this);
 		RocketJump.register();
@@ -319,6 +326,7 @@ public class Plugin extends JavaPlugin {
 		SendBlockCrackCommand.register();
 		SetActivity.register(this);
 		SetMasterwork.register();
+		ItemOwnershipCommand.register();
 		SkillDescription.register(this);
 		SkillSummary.register(this);
 		ShardSorterCommand.register();
@@ -336,6 +344,7 @@ public class Plugin extends JavaPlugin {
 		DataCollectionCommand.register();
 		ToggleSwap.register();
 		ToggleTrail.register();
+		TravelAnchorCommands.register();
 		UnsignBook.register();
 		UpTimeCommand.register();
 		UpdateChestItems.register();
@@ -347,6 +356,7 @@ public class Plugin extends JavaPlugin {
 		ViewActivity.register();
 		VirtualFirmament.register();
 		WalletCommand.register();
+		CharmBagCommand.register();
 		WeaponDash.register();
 		WorldNameCommand.register();
 		BlockDisplayCommand.register();
@@ -359,6 +369,8 @@ public class Plugin extends JavaPlugin {
 		StatTrackAdd.register();
 		PlaySoundsCommand.register();
 		CloseInventoryCommand.register();
+		HuntsCommand.register(this);
+		FunctionCooldownCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -378,7 +390,22 @@ public class Plugin extends JavaPlugin {
 		}
 
 		/* Plot commands are valid on all shards */
-		PlotManager.registerCommands();
+		PlotCommand.register();
+
+		// Some of these commands need ServerProperties to be loaded
+		// in order to know whether this is build shard
+		ItemStatCommands.registerAttrCommand();
+		ItemStatCommands.registerCharmCommand();
+		ItemStatCommands.registerColorCommand();
+		ItemStatCommands.registerConsumeCommand();
+		ItemStatCommands.registerDelveInfusionTypeCommand();
+		ItemStatCommands.registerEnchCommand();
+		ItemStatCommands.registerFishCommand();
+		ItemStatCommands.registerInfoCommand();
+		ItemStatCommands.registerLoreCommand();
+		ItemStatCommands.registerNameCommand();
+		ItemStatCommands.registerRemoveCommand();
+		ItemStatCommands.registerCopyCommand();
 
 		mJunkItemsListener = new JunkItemListener();
 		mItemDropListener = new ItemDropListener();
@@ -441,8 +468,8 @@ public class Plugin extends JavaPlugin {
 		mPzeroManager = new PzeroManager();
 		mShulkerEquipmentListener = new ShulkerEquipmentListener(this);
 		mPlayerListener = new PlayerListener(this);
-		mUsernameManager = new UsernameManager(this);
 		mGrapplingListener = new GrapplingListener();
+		mHuntsManager = new HuntsManager(this);
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
@@ -453,6 +480,8 @@ public class Plugin extends JavaPlugin {
 		DailyReset.startTimer(this);
 
 		SpawnerCommand.register();
+
+		RushCommands.register();
 
 		//  Load info.
 		reloadMonumentaConfig(null);
@@ -494,16 +523,21 @@ public class Plugin extends JavaPlugin {
 		if (!IS_PLAY_SERVER) {
 			manager.registerEvents(NodePlanner.getInstance(), this);
 		}
+		Location spawn = Bukkit.getWorlds().get(0).getSpawnLocation();
 		manager.registerEvents(new AnimalLimits(), this);
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(mPlayerListener, this);
-		manager.registerEvents(mUsernameManager, this);
+		manager.registerEvents(new UsernameManager(), this);
+		manager.registerEvents(new SocialManager(), this);
+		manager.registerEvents(new PlotManager(), this);
 		manager.registerEvents(new MobListener(this), this);
 		manager.registerEvents(new EntityListener(this, mAbilityManager), this);
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new WorldListener(this), this);
 		manager.registerEvents(new ShulkerShortcutListener(this), this);
 		manager.registerEvents(mShulkerEquipmentListener, this);
+		manager.registerEvents(SmartFurnaceManager.getInstance(), this);
+		manager.registerEvents(TravelAnchorManager.getInstance(), this);
 		manager.registerEvents(new ExplosionManager(), this);
 		manager.registerEvents(new LootboxManager(this), this);
 		manager.registerEvents(new PortableEnderListener(), this);
@@ -528,6 +562,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new BrewingListener(), this);
 		manager.registerEvents(new ItemUpdateManager(this), this);
 		manager.registerEvents(new DamageListener(this), this);
+		manager.registerEvents(new DroppedItemReplacementListener(), this);
+		manager.registerEvents(new RenameOnPlaceListener(), this);
 		manager.registerEvents(mItemStatManager, this);
 		manager.registerEvents(new StasisListener(), this);
 		manager.registerEvents(new TradeListener(), this);
@@ -547,11 +583,15 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(PortalManager.getInstance(), this);
 		manager.registerEvents(new LootingLimiter(), this);
 		manager.registerEvents(new InventoryUpdateListener(), this);
-		WalletManager.initialize(new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
+		GuildPlotUtils.initialize(spawn);
+		WalletManager.initialize(spawn);
 		manager.registerEvents(new WalletManager(), this);
+		CharmBagManager.initialize(new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
+		manager.registerEvents(new CharmBagManager(), this);
 		manager.registerEvents(new CustomContainerItemManager(), this);
 		manager.registerEvents(StatTrackManager.getInstance(), this);
 		manager.registerEvents(new PotionBarrelListener(), this);
+		manager.registerEvents(new SharedVaultManager(), this);
 		manager.registerEvents(TemporaryBlockChangeManager.INSTANCE, this);
 		manager.registerEvents(new TorchListener(), this);
 		manager.registerEvents(new MarketListener(), this);
@@ -561,11 +601,14 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new IchorListener(), this);
 		manager.registerEvents(new DiscoveryManager(), this);
 		manager.registerEvents(mGrapplingListener, this);
+		manager.registerEvents(mHuntsManager, this);
 		manager.registerEvents(new CelestialGemListener(), this);
 		manager.registerEvents(new UnlockEnchantmentListener(), this);
 		manager.registerEvents(new WinterListener(), this);
 		new SpawnerVisualisation().register();
 		manager.registerEvents(MailMan.getInstance(), this);
+		manager.registerEvents(new GuiListener(), this);
+		manager.registerEvents(mHuntsManager, this);
 		PlayerTitleManager.start();
 
 		if (ServerProperties.getDepthsEnabled()) {
@@ -575,7 +618,7 @@ public class Plugin extends JavaPlugin {
 		if (ServerProperties.getShardName().contains("gallery")
 			|| ServerProperties.getShardName().startsWith("dev")) {
 			GalleryCommands.register();
-			manager.registerEvents(new GalleryManager(this), this);
+			manager.registerEvents(new GalleryManager(), this);
 		}
 
 		if (ServerProperties.getShardName().contains("ring")
@@ -588,6 +631,16 @@ public class Plugin extends JavaPlugin {
 		if (ServerProperties.getShardName().contains("hexfall")
 			|| ServerProperties.getShardName().startsWith("dev")) {
 			manager.registerEvents(new HexfallListener(), this);
+		}
+
+		if (ServerProperties.getShardName().contains("indigo")
+			|| ServerProperties.getShardName().startsWith("dev")) {
+			manager.registerEvents(new IndigoListener(), this);
+		}
+
+		if (ServerProperties.getShardName().contains("rush")
+			|| ServerProperties.getShardName().startsWith("dev")) {
+			manager.registerEvents(new RushManager(), this);
 		}
 
 		//TODO Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.
@@ -743,6 +796,14 @@ public class Plugin extends JavaPlugin {
 			getLogger().warning("Failed to export skills.");
 		}
 
+		try {
+			String skillExportPath = getDataFolder() + File.separator + "exported_zenith_charm_effects.json";
+			FileUtils.writeJson(skillExportPath, CharmEffects.dumpAsJson());
+		} catch (Exception e) {
+			// Failed to export skills to json, non-critical error.
+			getLogger().warning("Failed to export zenith charm effects.");
+		}
+
 		/* If this is the depths shard, enable depths manager */
 		if (ServerProperties.getDepthsEnabled()) {
 			new DepthsManager(this, getLogger(), getDataFolder() + File.separator + "depths");
@@ -751,11 +812,14 @@ public class Plugin extends JavaPlugin {
 		}
 
 		ParticleManager.init();
+
+		Bukkit.getPluginManager().registerEvents(MinigameManager.getInstance(), this);
+		MiniGameCommands.register();
 	}
 
 	//  Logic that is performed upon disabling the plugin.
 	@Override
-	@SuppressWarnings("NullAway") // we set INSTANCE to null to find bugs easier
+	// we set INSTANCE to null to find bugs easier
 	public void onDisable() {
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);

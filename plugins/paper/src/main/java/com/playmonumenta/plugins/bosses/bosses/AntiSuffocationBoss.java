@@ -7,17 +7,17 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.Plugin;
 
-public class AntiSuffocationBoss extends BossAbilityGroup {
+public final class AntiSuffocationBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_antisuffocation";
-	public static final int detectionRange = 40;
+	public static final int detectionRange = 60;
 
-	public AntiSuffocationBoss(Plugin plugin, LivingEntity boss) {
+	public AntiSuffocationBoss(final Plugin plugin, final LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	@Override
-	public void onHurt(DamageEvent event) {
+	public void onHurt(final DamageEvent event) {
 		if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
 			event.setCancelled(true);
 		}

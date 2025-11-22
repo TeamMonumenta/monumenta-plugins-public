@@ -31,6 +31,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -72,6 +73,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,9 +83,18 @@ public class WorldListener implements Listener {
 	public static final NamespacedKey ENTITY_SCORES_DATA_KEY = NamespacedKeyUtils.fromString("monumenta:entity_scores");
 	public int mEntityScoreLastDeleteTick = Integer.MIN_VALUE;
 	public Set<String> mEntityScoresDeletedThisTick = new HashSet<>();
+	private static final ConcurrentHashMap<String, BoundingBox> mEntityScoreLoadBounds = new ConcurrentHashMap<>();
 
 	public WorldListener(Plugin plugin) {
 		mPlugin = plugin;
+	}
+
+	public static void startLoadingScoresInBounds(String worldName, BoundingBox bb) {
+		mEntityScoreLoadBounds.put(worldName, bb);
+	}
+
+	public static void stopLoadingScoresInBounds(String worldName, BoundingBox bb) {
+		mEntityScoreLoadBounds.remove(worldName, bb);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -92,38 +103,44 @@ public class WorldListener implements Listener {
 
 		MessagingUtils.updatePlainName(entity);
 
+		Location loc = entity.getLocation();
+		BoundingBox bb = mEntityScoreLoadBounds.get(loc.getWorld().getName());
+		if (bb != null && bb.contains(loc.toVector())) {
+			loadEntityScores(List.of(entity));
+		}
+
 		Bukkit.getScheduler().runTask(mPlugin, () -> mPlugin.mTrackingManager.addEntity(entity));
 	}
 
 	// Convenience list of offsets to get adjacent blocks
 	private static final List<Vector> ADJACENT_OFFSETS = Arrays.asList(
-	                                                         new Vector(0, 0, 1),
-	                                                         new Vector(0, 0, -1),
-	                                                         new Vector(0, 1, 0),
-	                                                         new Vector(0, 1, 1),
-	                                                         new Vector(0, 1, -1),
-	                                                         new Vector(0, -1, 0),
-	                                                         new Vector(0, -1, 1),
-	                                                         new Vector(0, -1, -1),
-	                                                         new Vector(1, 0, 0),
-	                                                         new Vector(1, 0, 1),
-	                                                         new Vector(1, 0, -1),
-	                                                         new Vector(1, 1, 0),
-	                                                         new Vector(1, 1, 1),
-	                                                         new Vector(1, 1, -1),
-	                                                         new Vector(1, -1, 0),
-	                                                         new Vector(1, -1, 1),
-	                                                         new Vector(1, -1, -1),
-	                                                         new Vector(-1, 0, 0),
-	                                                         new Vector(-1, 0, 1),
-	                                                         new Vector(-1, 0, -1),
-	                                                         new Vector(-1, 1, 0),
-	                                                         new Vector(-1, 1, 1),
-	                                                         new Vector(-1, 1, -1),
-	                                                         new Vector(-1, -1, 0),
-	                                                         new Vector(-1, -1, 1),
-	                                                         new Vector(-1, -1, -1)
-	                                                     );
+		new Vector(0, 0, 1),
+		new Vector(0, 0, -1),
+		new Vector(0, 1, 0),
+		new Vector(0, 1, 1),
+		new Vector(0, 1, -1),
+		new Vector(0, -1, 0),
+		new Vector(0, -1, 1),
+		new Vector(0, -1, -1),
+		new Vector(1, 0, 0),
+		new Vector(1, 0, 1),
+		new Vector(1, 0, -1),
+		new Vector(1, 1, 0),
+		new Vector(1, 1, 1),
+		new Vector(1, 1, -1),
+		new Vector(1, -1, 0),
+		new Vector(1, -1, 1),
+		new Vector(1, -1, -1),
+		new Vector(-1, 0, 0),
+		new Vector(-1, 0, 1),
+		new Vector(-1, 0, -1),
+		new Vector(-1, 1, 0),
+		new Vector(-1, 1, 1),
+		new Vector(-1, 1, -1),
+		new Vector(-1, -1, 0),
+		new Vector(-1, -1, 1),
+		new Vector(-1, -1, -1)
+	);
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onEntitiesLoadEvent(EntitiesLoadEvent event) {
@@ -140,7 +157,7 @@ public class WorldListener implements Listener {
 		}
 	}
 
-	public void loadEntityScores(Collection<Entity> entities) {
+	public static void loadEntityScores(Collection<Entity> entities) {
 		Gson gson = new Gson();
 		for (Entity entity : entities) {
 			if (entity instanceof Player) {
@@ -258,7 +275,7 @@ public class WorldListener implements Listener {
 			return;
 		}
 
-		if (entityScores.size() > 0) {
+		if (!entityScores.isEmpty()) {
 			entity.getPersistentDataContainer().set(ENTITY_SCORES_DATA_KEY, PersistentDataType.STRING, entityScores.toString());
 		} else {
 			entity.getPersistentDataContainer().remove(ENTITY_SCORES_DATA_KEY);
@@ -492,10 +509,10 @@ public class WorldListener implements Listener {
 	public void cauldronLevelChangeEvent(CauldronLevelChangeEvent event) {
 		CauldronLevelChangeEvent.ChangeReason reason = event.getReason();
 		if (event.getNewState().getBlockData() instanceof Levelled cauldron
-			    && (reason == CauldronLevelChangeEvent.ChangeReason.BANNER_WASH
-				        || reason == CauldronLevelChangeEvent.ChangeReason.ARMOR_WASH
-				        || reason == CauldronLevelChangeEvent.ChangeReason.SHULKER_WASH)
-			    && ServerProperties.getShardName().endsWith("plots")) {
+			&& (reason == CauldronLevelChangeEvent.ChangeReason.BANNER_WASH
+			|| reason == CauldronLevelChangeEvent.ChangeReason.ARMOR_WASH
+			|| reason == CauldronLevelChangeEvent.ChangeReason.SHULKER_WASH)
+			&& ServerProperties.getShardName().endsWith("plots")) {
 			// Cannot cancel the event, as that prevents cleaning items, so increase the level by one instead.
 			cauldron.setLevel(Math.min(cauldron.getLevel() + 1, cauldron.getMaximumLevel()));
 			event.getNewState().setBlockData(cauldron);
@@ -510,7 +527,7 @@ public class WorldListener implements Listener {
 		List<Chunk> chunkList = LocationUtils.getSurroundingChunks(spawner, SPAWNER_BREAK_CHEST_CHECK_RADIUS);
 		int chests = 0;
 		for (Chunk chunk : chunkList) {
-			for (BlockState interestingBlock : chunk.getTileEntities()) {
+			for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST || b.getType() == Material.TRAPPED_CHEST, false)) {
 				if (ChestUtils.isUnscaledChest(interestingBlock.getBlock()) && LocationUtils.blocksAreWithinRadius(spawner, interestingBlock.getBlock(), SPAWNER_BREAK_CHEST_CHECK_RADIUS)) {
 					chests++;
 					List<Player> players = PlayerUtils.playersInLootScalingRange(spawner.getLocation());

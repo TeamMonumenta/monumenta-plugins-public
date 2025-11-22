@@ -39,10 +39,10 @@ public class PoetsQuill extends DepthsAbility {
 		if (dp == null) {
 			return;
 		}
-		dp.mEarnedRewards.add(DepthsRoomType.DepthsRewardType.POETS);
+		dp.addReward(DepthsRoomType.DepthsRewardType.POETS);
 	}
 
 	private static Description<PoetsQuill> getDescription() {
-		return new DescriptionBuilder<PoetsQuill>().add("Remove a tree (but not any abilities) and replace it with another tree of your choice.");
+		return new DescriptionBuilder<>(() -> INFO).add("Remove a tree (but not any abilities) and replace it with another tree of your choice.");
 	}
 }

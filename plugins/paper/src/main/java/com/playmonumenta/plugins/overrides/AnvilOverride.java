@@ -93,6 +93,7 @@ public class AnvilOverride extends BaseOverride {
 				Location loc = block.getLocation().add(0.5, 1.2, 0.5);
 				new BukkitRunnable() {
 					int mTicks = 0;
+
 					@Override
 					public void run() {
 						new PartialParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.2, 0, 0.2, 0).spawnAsPlayerActive(player);

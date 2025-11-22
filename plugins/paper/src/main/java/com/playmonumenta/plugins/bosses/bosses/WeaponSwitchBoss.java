@@ -12,7 +12,7 @@ public class WeaponSwitchBoss extends BossAbilityGroup {
 	public WeaponSwitchBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 		if (!(boss instanceof Mob mob)) {
-			throw new Exception("boss_weaponswitch only works on mobs!");
+			throw new Exception(identityTag + " only works on mobs! Entity name='" + boss.getName() + "', tags=[" + String.join(",", boss.getScoreboardTags()) + "]");
 		}
 
 		super.constructBoss(new SpellWeaponSwitch(mob), detectionRange);

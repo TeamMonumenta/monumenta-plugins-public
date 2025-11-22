@@ -21,11 +21,13 @@ public class GearDamageIncrease extends Effect {
 	public static final String effectID = "GearDamageIncrease";
 
 	protected final double mAmount;
-	protected final @Nullable EnumSet<DamageType> mAffectedDamageTypes;
-	protected final int mPriority;
-	private @Nullable BiPredicate<LivingEntity, LivingEntity> mPredicate = null;
+	protected @Nullable EnumSet<DamageType> mAffectedDamageTypes;
+	protected int mPriority;
+	private @Nullable BiPredicate<LivingEntity, LivingEntity> mPredicate;
 
-	private GearDamageIncrease(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate, String id) {
+	private GearDamageIncrease(final int duration, final double amount,
+	                           final @Nullable EnumSet<DamageType> affectedDamageTypes, final int priority,
+	                           final @Nullable BiPredicate<LivingEntity, LivingEntity> predicate, final String id) {
 		super(duration, id);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
@@ -33,21 +35,49 @@ public class GearDamageIncrease extends Effect {
 		mPredicate = predicate;
 	}
 
-	public GearDamageIncrease(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, int priority, @Nullable BiPredicate<LivingEntity, LivingEntity> predicate) {
-		this(duration, amount, affectedDamageTypes, priority, predicate, effectID);
+	/**
+	 * Create a new <code>GearDamageIncrease</code> Effect.
+	 *
+	 * @param duration Time in ticks the effect lasts
+	 * @param amount   Potency of the effect where amount < 0 is a debuff and amount > 0 is a buff
+	 */
+	public GearDamageIncrease(final int duration, final double amount) {
+		this(duration, amount, null, 0, null, effectID);
 	}
 
-	public GearDamageIncrease(int duration, double amount) {
-		this(duration, amount, null, 0, null);
+	/**
+	 * Restricts what DamageTypes an instance of GearDamageIncrease can apply to
+	 *
+	 * @param affectedDamageTypes Which DamageTypes the effect should modify
+	 * @return Modified GearDamageIncrease instance
+	 */
+	public GearDamageIncrease damageTypes(final @Nullable EnumSet<DamageType> affectedDamageTypes) {
+		mAffectedDamageTypes = affectedDamageTypes;
+		return this;
 	}
 
-	public GearDamageIncrease(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes) {
-		this(duration, amount, affectedDamageTypes, 0, null);
+	/**
+	 * Modifies the EffectPriority of an instance of GearDamageIncrease. Default is 0 (early)<br>
+	 * Note: This is set to <code>protected</code> since this builder method isn't used outside of this class. Unless
+	 * you have a good reason to override an effect's priority, don't change this method to public
+	 *
+	 * @param priority Priority ordering of this effect
+	 * @return Modified GearDamageIncrease instance
+	 */
+	protected GearDamageIncrease priority(final int priority) {
+		mPriority = priority;
+		return this;
 	}
 
-	// Only call this in PercentDamageDealtSingle
-	protected GearDamageIncrease(int duration, double amount, @Nullable EnumSet<DamageType> affectedDamageTypes, String effectIdentifier) {
-		this(duration, amount, affectedDamageTypes, 0, null, effectIdentifier);
+	/**
+	 * Restricts what DamageTypes an instance of GearDamageIncrease can apply to
+	 *
+	 * @param predicate Determines what DamageEvents should be modified using damagee and damager
+	 * @return Modified GearDamageIncrease instance
+	 */
+	public GearDamageIncrease predicate(final @Nullable BiPredicate<LivingEntity, LivingEntity> predicate) {
+		mPredicate = predicate;
+		return this;
 	}
 
 	// This needs to trigger before any flat damage
@@ -77,12 +107,8 @@ public class GearDamageIncrease extends Effect {
 		return mAmount > 0;
 	}
 
-	public @Nullable EnumSet<DamageType> getAffectedDamageTypes() {
-		return mAffectedDamageTypes;
-	}
-
 	@Override
-	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
+	public void onDamage(final LivingEntity entity, final DamageEvent event, final LivingEntity enemy) {
 		if (event.getType() == DamageType.TRUE) {
 			return;
 		}
@@ -90,14 +116,16 @@ public class GearDamageIncrease extends Effect {
 			return;
 		}
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
-			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
+			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL)
+			&& AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
 			event.updateGearDamageWithMultiplier(Math.max(0, 1 + mAmount));
 		}
 	}
 
 	@Override
 	public @Nullable Component getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(mAmount).append(Component.text(StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + getDisplayedName()));
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount)
+			.append(Component.text(StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + getDisplayedName()));
 	}
 
 	@Override
@@ -107,14 +135,14 @@ public class GearDamageIncrease extends Effect {
 
 	@Override
 	public JsonObject serialize() {
-		JsonObject object = new JsonObject();
+		final JsonObject object = new JsonObject();
 		object.addProperty("effectID", mEffectID);
 		object.addProperty("duration", mDuration);
 		object.addProperty("amount", mAmount);
 
 		if (mAffectedDamageTypes != null) {
-			JsonArray jsonArray = new JsonArray();
-			for (DamageType damageType : mAffectedDamageTypes) {
+			final JsonArray jsonArray = new JsonArray();
+			for (final DamageType damageType : mAffectedDamageTypes) {
 				jsonArray.add(damageType.name());
 			}
 			object.add("type", jsonArray);
@@ -126,41 +154,40 @@ public class GearDamageIncrease extends Effect {
 		return object;
 	}
 
-	public static @Nullable GearDamageIncrease deserialize(JsonObject object, Plugin plugin) {
+	public static @Nullable GearDamageIncrease deserialize(final JsonObject object, final Plugin plugin) {
 		if (object.has("hasPredicate") && object.get("hasPredicate").getAsBoolean()) {
 			// Noper nope nope not dealing with this
 			return null;
 		}
 
-		int duration = object.get("duration").getAsInt();
-		double amount = object.get("amount").getAsDouble();
-		int priority = object.get("priority").getAsInt();
+		final int duration = object.get("duration").getAsInt();
+		final double amount = object.get("amount").getAsDouble();
+		final int priority = object.get("priority").getAsInt();
 
 		if (object.has("type")) {
-			JsonArray damageTypes = object.getAsJsonArray("type");
-			List<DamageType> damageTypeList = new ArrayList<>();
-			for (JsonElement element : damageTypes) {
-				String string = element.getAsString();
-				damageTypeList.add(DamageType.valueOf(string));
+			final JsonArray damageTypes = object.getAsJsonArray("type");
+			final List<DamageType> damageTypeList = new ArrayList<>();
+			for (final JsonElement element : damageTypes) {
+				damageTypeList.add(DamageType.valueOf(element.getAsString()));
 			}
 
-			EnumSet<DamageType> damageTypeSet = EnumSet.copyOf(damageTypeList);
-			return new GearDamageIncrease(duration, amount, damageTypeSet, priority, null);
+			final EnumSet<DamageType> damageTypeSet = EnumSet.copyOf(damageTypeList);
+			return new GearDamageIncrease(duration, amount).damageTypes(damageTypeSet).priority(priority);
 		} else {
-			return new GearDamageIncrease(duration, amount, null, priority, null);
+			return new GearDamageIncrease(duration, amount).priority(priority);
 		}
 	}
 
 	@Override
 	public String toString() {
-		String types = "any";
+		StringBuilder types = new StringBuilder("any");
 		if (mAffectedDamageTypes != null) {
-			types = "";
-			for (DamageType type : mAffectedDamageTypes) {
+			types = new StringBuilder();
+			for (final DamageType type : mAffectedDamageTypes) {
 				if (!types.isEmpty()) {
-					types += ",";
+					types.append(",");
 				}
-				types += type.name();
+				types.append(type.name());
 			}
 		}
 		return String.format("PercentDamageDealt duration:%d types:%s amount:%f", this.getDuration(), types, mAmount);

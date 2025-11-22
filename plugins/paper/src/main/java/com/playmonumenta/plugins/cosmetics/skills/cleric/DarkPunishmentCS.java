@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -76,42 +75,14 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 	}
 
 	@Override
-	public Material justiceAsh() {
-		return Material.BLACK_DYE;
-	}
-
-	@Override
-	public NamedTextColor justiceAshColor() {
-		return NamedTextColor.DARK_PURPLE;
-	}
-
-	@Override
-	public String justiceAshName() {
-		return "Umbral Essence";
-	}
-
-	@Override
-	public void justiceAshPickUp(Player player, Location loc) {
-		player.playSound(player.getLocation(), Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 0.8f, 0.5f);
-		player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.5f, 2f);
-		player.playSound(player.getLocation(), Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
-		player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1f, 0.5f);
-
-		Location particleLocation = loc.add(0, 0.2, 0);
-		createOrb(new Vector(FastUtils.randomDoubleInRange(-0.75, 0.75),
-			FastUtils.randomDoubleInRange(1, 1.5),
-			FastUtils.randomDoubleInRange(-0.75, 0.75)), player.getLocation().clone().add(0, 1, 0), player, particleLocation, null);
-	}
-
-	@Override
-	public void justiceOnDamage(Player player, LivingEntity enemy, World world, Location enemyLoc, double widerWidthDelta, int combo) {
+	public void justiceOnDamage(Player player, LivingEntity enemy, World world, Location enemyLoc, double widerWidthDelta, int combo, boolean enhanced) {
 		world.playSound(enemyLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.6f, 1.65f);
 		world.playSound(enemyLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1, SWEEP_PITCH[combo]);
 		world.playSound(enemyLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, TRIDENT_PITCH[combo]);
 		world.playSound(enemyLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1, 0.75f);
-		if (combo >= 2) {
-			world.playSound(enemyLoc, Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
-			world.playSound(enemyLoc, Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, 1, 0.8f);
+		if (combo == 2) {
+			world.playSound(enemyLoc, Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, enhanced ? 1.15f : 1f, 0.5f);
+			world.playSound(enemyLoc, Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, enhanced ? 1.15f : 1, 0.8f);
 		} else {
 			world.playSound(enemyLoc, Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1, 0.5f);
 		}
@@ -129,7 +100,7 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 		enemyLoc.setDirection(dir);
 		Location loc = enemyLoc.add(0, 1, 0).subtract(dir.multiply(2.35));
 		ParticleUtils.drawHalfArc(loc, 2.1, ANGLE[combo], -20, 140, 7, 0.2,
-			(Location l, int ring) -> {
+			(Location l, int ring, double angleProgress) -> {
 				new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 1, 0, 0, 0, 0,
 					new Particle.DustTransition(
 						ParticleUtils.getTransition(BASE_COLOR, TIP_COLOR, ring / 7D),
@@ -192,64 +163,5 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 				pitch
 			);
 		}
-	}
-
-	private void createOrb(Vector dir, Location loc, Player player, Location targetLoc, @Nullable Location optLoc) {
-		World world = loc.getWorld();
-		new BukkitRunnable() {
-			final Location mL = targetLoc;
-			int mT = 0;
-			double mArcCurve = 0;
-			Vector mD = dir.clone();
-
-			@Override
-			public void run() {
-				mT++;
-
-				Location to = optLoc != null ? optLoc : LocationUtils.getHalfHeightLocation(player);
-
-				new PartialParticle(Particle.DRAGON_BREATH,
-					mL.clone().add(FastUtils.randomDoubleInRange(-0.05, 0.05),
-						FastUtils.randomDoubleInRange(-0.05, 0.05),
-						FastUtils.randomDoubleInRange(-0.05, 0.05)), 1,
-					0, 0, 0, 0.01
-				).spawnAsPlayerActive(player);
-
-				for (int i = 0; i < 4; i++) {
-					if (mT <= 2) {
-						mD = dir.clone();
-					} else {
-						mArcCurve += 0.065;
-						mD = dir.clone().add(LocationUtils.getDirectionTo(to, mL).multiply(mArcCurve));
-					}
-
-					if (mD.length() > 0.2) {
-						mD.normalize().multiply(0.2);
-					}
-
-					mL.add(mD);
-
-					Color c = FastUtils.RANDOM.nextBoolean() ? BASE_COLOR : TIP_COLOR;
-					new PartialParticle(Particle.REDSTONE, mL, 1, 0, 0, 0, 0,
-						new Particle.DustOptions(c, 1.4f))
-						.spawnAsPlayerActive(player);
-
-					if (mT > 5 && mL.distance(to) < 0.35) {
-						world.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.PLAYERS, 1f, 2f);
-						new PartialParticle(Particle.SPELL_WITCH, mL, 10, 0f, 0f, 0f, 0.2F)
-							.spawnAsPlayerActive(player);
-						ParticleUtils.drawParticleCircleExplosion(player, player.getLocation().clone().add(0, 1, 0), 0, 1, 0, 0, 10, 0.25f,
-							true, 0, 0, Particle.SQUID_INK);
-						this.cancel();
-						return;
-					}
-				}
-
-				if (mT >= 100) {
-					this.cancel();
-				}
-			}
-
-		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 }

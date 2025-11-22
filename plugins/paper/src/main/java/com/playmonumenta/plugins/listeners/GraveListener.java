@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.itemstats.enums.PickupFilterResult;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -152,8 +153,8 @@ public class GraveListener implements Listener {
 			return;
 		}
 		if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
-			    && GraveManager.isGrave(event.getEntity())
-			    && MetadataUtils.checkOnceThisTick(mPlugin, player, INTERACT_METAKEY)) {
+			&& GraveManager.isGrave(event.getEntity())
+			&& MetadataUtils.checkOnceThisTick(mPlugin, player, INTERACT_METAKEY)) {
 			event.setCancelled(true);
 			GraveManager.onInteract(player, event.getEntity());
 		}
@@ -204,14 +205,14 @@ public class GraveListener implements Listener {
 		if (event.getEntity() instanceof Item entity) {
 			EntityDamageEvent.DamageCause cause = event.getCause();
 			if ((entity.getScoreboardTags().contains("ExplosionImmune")
-				     && (cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION))) {
+				&& (cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION))) {
 				event.setCancelled(true);
 				return;
 			}
 			GraveManager.onDestroyItem(entity);
 			if (entity.isValid()
-				    && !DamageEvent.DamageType.is(event.getCause(), DamageEvent.DamageType.TRUE)
-				    && ItemStatUtils.getInfusionLevel(entity.getItemStack(), InfusionType.HOPE) > 0) {
+				&& !DamageEvent.DamageType.is(event.getCause(), DamageEvent.DamageType.TRUE)
+				&& ItemStatUtils.getInfusionLevel(entity.getItemStack(), InfusionType.HOPE) > 0) {
 				// If a hoped item isn't put into a grave (because graves are disabled), cancel all non-void damage.
 				event.setCancelled(true);
 				entity.setInvulnerable(true); // also make the item invulnerable to prevent this event from being spammed
@@ -233,7 +234,7 @@ public class GraveListener implements Listener {
 	public static void itemDropped(Player player, Item entity) {
 		ItemStack item = entity.getItemStack();
 		if (gravesEnabled(player)
-			    && doesGrave(item)) {
+			&& doesGrave(item)) {
 			@Nullable UUID thrower = entity.getThrower();
 			if (thrower != null && thrower.equals(player.getUniqueId())) {
 				GraveManager.onDropItem(player, entity);
@@ -258,7 +259,8 @@ public class GraveListener implements Listener {
 			case NONE, ZERO, I, II, III, KEYTIER, QUEST_COMPASS -> false;
 			// Do not grave Carriers of Explosions unless they carry contents that can grave
 			case SHULKER_BOX -> PickupFilterResult.TIERED.equals(PickupFilterResult.getFilterResult(item));
-			default -> true;
+			// Do not grave if item has Special Lore ("Taking this item outside of the dungeon..."), else, do grave
+			default -> !InventoryUtils.containsSpecialLore(item);
 		};
 	}
 
@@ -267,8 +269,8 @@ public class GraveListener implements Listener {
 		// If a tiered item breaks, shatter it instead of destroying it
 		ItemStack item = event.getItem();
 		if (item.getItemMeta() instanceof Damageable meta
-			    && event.getDamage() + meta.getDamage() >= item.getType().getMaxDurability()
-			    && ItemStatUtils.getTier(item) != Tier.NONE) {
+			&& event.getDamage() + meta.getDamage() >= item.getType().getMaxDurability()
+			&& ItemStatUtils.getTier(item) != Tier.NONE) {
 			event.setCancelled(true);
 			meta.setDamage(item.getType().getMaxDurability());
 			item.setItemMeta(meta);
@@ -276,7 +278,7 @@ public class GraveListener implements Listener {
 				Component itemName = ItemUtils.getDisplayName(item).decoration(TextDecoration.UNDERLINED, false);
 				String translatedMessage = TranslationsManager.translate(event.getPlayer(), "Your %s shattered because it ran out of durability!");
 				Component message = Component.text(translatedMessage).color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
-					                    .replaceText(TextReplacementConfig.builder().matchLiteral("%s").replacement(itemName).build());
+					.replaceText(TextReplacementConfig.builder().matchLiteral("%s").replacement(itemName).build());
 				event.getPlayer().sendMessage(message);
 			}
 		}
@@ -356,10 +358,10 @@ public class GraveListener implements Listener {
 			// Shatter equipment
 			EntityDamageEvent.DamageCause lastDamageCause = player.getLastDamageCause() != null ? player.getLastDamageCause().getCause() : null;
 			int shatterLevels = player.getLocation().getY() < player.getWorld().getMinHeight() || lastDamageCause == EntityDamageEvent.DamageCause.VOID
-				                    ? Shattered.DEATH_VOID_SHATTER
-				                    : EntityUtils.touchesLava(player) || lastDamageCause == EntityDamageEvent.DamageCause.LAVA
-					                      ? Shattered.DEATH_LAVA_SHATTER
-					                      : Shattered.DEATH_SHATTER;
+				? Shattered.DEATH_VOID_SHATTER
+				: EntityUtils.touchesLava(player) || lastDamageCause == EntityDamageEvent.DamageCause.LAVA
+				? Shattered.DEATH_LAVA_SHATTER
+				: Shattered.DEATH_SHATTER;
 
 			int extraEquipmentShatter = 0;
 			for (int i = 36; i <= 40; i++) {
@@ -416,8 +418,8 @@ public class GraveListener implements Listener {
 			event.getDrops().removeIf(item -> ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_VANISHING) >= 2);
 			for (ItemStack item : inv.getContents()) {
 				if (item != null
-					    && item.containsEnchantment(Enchantment.VANISHING_CURSE)
-					    && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_VANISHING) == 1) {
+					&& item.containsEnchantment(Enchantment.VANISHING_CURSE)
+					&& ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_VANISHING) == 1) {
 					Shattered.shatter(item, Shattered.CURSE_OF_VANISHING_SHATTER);
 					event.getDrops().add(item);
 				}
@@ -427,6 +429,6 @@ public class GraveListener implements Listener {
 
 	public static boolean gravesEnabled(Player player) {
 		return !player.getScoreboardTags().contains("DisableGraves")
-			       && !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.DISABLE_GRAVES);
+			&& !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.DISABLE_GRAVES);
 	}
 }

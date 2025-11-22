@@ -1,18 +1,14 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.bosses.bosses.TpBehindBoss;
+import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
@@ -27,69 +23,63 @@ import org.bukkit.util.Vector;
 public class SpellTpBehindPlayer extends Spell {
 
 	private static final int TP_STUN_CREEPER_INCREASED = 20; // Increased time for creepers
-	private static final int DISTANCE_TO_PLAYER = 2 * 4; // How many half-blocks behind the player maximum
-	private static final int VERTICAL_DISTANCE_TO_PLAYER = 3;
+	private static final int VERTICAL_DISTANCE_TO_ENTITY = 3;
 
 	private final Plugin mPlugin;
 	protected final LivingEntity mLauncher;
-	private final int mCooldown;
-	private final int mRange;
-	private final int mTPDelay;
-	private final int mTPStun;
-	private final boolean mRandom;
+	private final TpBehindBoss.Parameters mParameters;
 
-
-	public SpellTpBehindPlayer(Plugin plugin, LivingEntity launcher, int cooldown) {
-		this(plugin, launcher, cooldown, 20, 50, 10, false);
-	}
-
-	public SpellTpBehindPlayer(Plugin plugin, LivingEntity launcher, int cooldown, int range, int delay, int stun, boolean random) {
+	public SpellTpBehindPlayer(Plugin plugin, LivingEntity launcher, TpBehindBoss.Parameters parameters) {
 		mPlugin = plugin;
 		mLauncher = launcher;
-		mCooldown = cooldown;
-		mRange = range;
-		mTPDelay = delay;
-		mTPStun = stun;
-		mRandom = random;
+		mParameters = parameters;
+	}
+
+	// ExaltedCAxtal, MimicQueen, CAxtal, and SpellConditionalTpBehindPlayer
+	public SpellTpBehindPlayer(Plugin plugin, LivingEntity launcher, int cooldown, int range, int delay, int stun, boolean random) {
+		mParameters = new TpBehindBoss.Parameters();
+		mPlugin = plugin;
+		mLauncher = launcher;
+		mParameters.COOLDOWN = cooldown;
+		mParameters.DELAY = delay;
+		mParameters.STUN = stun;
+		mParameters.PREFER_TARGET = !random;
+		mParameters.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, range, new EntityTargets.Limit(EntityTargets.Limit.LIMITSENUM.ALL, EntityTargets.Limit.SORTING.RANDOM), List.of(EntityTargets.PLAYERFILTER.NOT_STEALTHED));
 	}
 
 	@Override
 	public void run() {
 		if (mLauncher instanceof Mob) {
-			Player targetPlayer = null;
-			if (mRandom) {
-				List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), mRange, false);
-				while (!players.isEmpty()) {
-					LivingEntity target = players.get(FastUtils.RANDOM.nextInt(players.size()));
-					/* Do not teleport to players in safezones */
-					if (ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5) || ZoneUtils.hasZoneProperty(target, ZoneProperty.LOOTROOM)) {
-						/* This player is in a safe area - don't tp to them */
-						players.remove(target);
-					} else {
-						targetPlayer = (Player) target;
-						break;
-					}
-				}
-			} else {
+			LivingEntity targetEntity = null;
+			if (mParameters.PREFER_TARGET) {
 				LivingEntity target = ((Mob) mLauncher).getTarget();
-				if (target instanceof Player && target.getLocation().distance(mLauncher.getLocation()) < mRange
-					    && !ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)) {
-					targetPlayer = (Player) target;
+				if (target != null
+					&& target.getLocation().distance(mLauncher.getLocation()) < mParameters.TARGETS.getRange()
+					&& !ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)) {
+					targetEntity = target;
 				}
+			} // If the targetEntity is still null after prefer_target, have EntityTarget fallback
+			if (targetEntity == null) {
+				List<? extends LivingEntity> targets = mParameters.TARGETS.getTargetsList(mLauncher);
+				targets.removeIf(target
+					-> ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)
+					|| ZoneUtils.hasZoneProperty(target, ZoneProperty.LOOTROOM));
+				targetEntity = targets.get(0);
 			}
-			if (targetPlayer != null) {
-				launch(targetPlayer, mRange);
-				animation(targetPlayer);
+			// If that didn't work, don't tp at all
+			if (targetEntity != null) {
+				launch(targetEntity, mParameters.TARGETS.getRange());
+				animation();
 			}
 		}
 	}
 
 	@Override
 	public int cooldownTicks() {
-		return mCooldown;
+		return mParameters.COOLDOWN;
 	}
 
-	protected void launch(Player target, double maxRange) {
+	protected void launch(LivingEntity target, double maxRange) {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -99,23 +89,24 @@ public class SpellTpBehindPlayer extends Spell {
 					return;
 				}
 
-				World world = target.getWorld();
 				loc.setY(loc.getY() + 0.1f);
 				Vector shift = loc.getDirection();
 				shift.setY(0).normalize().multiply(-0.5);
 
+				final int DISTANCE_TO_ENTITY = 2 * mParameters.DISTANCE; // How many half-blocks behind the player maximum
+
 				// Check from farthest horizontally to closest, lowest vertically to highest
-				for (int horizontalShift = DISTANCE_TO_PLAYER; horizontalShift > 0; horizontalShift--) {
-					for (int verticalShift = 0; verticalShift <= VERTICAL_DISTANCE_TO_PLAYER; verticalShift++) {
+				for (int horizontalShift = DISTANCE_TO_ENTITY; horizontalShift > 0; horizontalShift--) {
+					for (int verticalShift = 0; verticalShift <= VERTICAL_DISTANCE_TO_ENTITY; verticalShift++) {
 						Location locTest = loc.clone().add(shift.clone().multiply(horizontalShift));
 						locTest.setY(locTest.getY() + verticalShift);
 						if (canTeleport(locTest)) {
 							loc.add(0, mLauncher.getHeight() / 2, 0);
-							new PartialParticle(Particle.SPELL_WITCH, loc, 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
-							new PartialParticle(Particle.SMOKE_LARGE, loc, 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);
+							mParameters.PARTICLE_TP.spawn(mLauncher, mLauncher.getLocation());
 
 							EntityUtils.teleportStack(mLauncher, locTest);
-							if (mLauncher instanceof Mob mob && !AbilityUtils.isStealthed(target)) {
+							// Don't aggro to a mob, or a player in stealth
+							if (mLauncher instanceof Mob mob && !(target instanceof Player && AbilityUtils.isStealthed((Player) target))) {
 								mob.setTarget(target);
 								// For some reason just setting the target doesn't seem to be enough, so try again a tick later
 								Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -125,15 +116,14 @@ public class SpellTpBehindPlayer extends Spell {
 							onTeleport(target);
 
 							locTest.add(0, mLauncher.getHeight() / 2, 0);
-							new PartialParticle(Particle.SPELL_WITCH, locTest, 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
-							new PartialParticle(Particle.SMOKE_LARGE, locTest, 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);
-							world.playSound(locTest, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 3f, 0.7f);
+							mParameters.PARTICLE_TP.spawn(mLauncher, mLauncher.getLocation());
+							mParameters.SOUND_TP.play(mLauncher.getLocation());
 
 							// The mPlugin here is of the incorrect type for some reason
 							if (mLauncher instanceof Creeper) {
-								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mTPStun + TP_STUN_CREEPER_INCREASED, mLauncher);
+								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mParameters.STUN + TP_STUN_CREEPER_INCREASED, mLauncher);
 							} else {
-								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mTPStun, mLauncher);
+								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mParameters.STUN, mLauncher);
 							}
 
 							// Janky way to break out of nested loop
@@ -145,16 +135,16 @@ public class SpellTpBehindPlayer extends Spell {
 			}
 		};
 
-		runnable.runTaskLater(mPlugin, mTPDelay);
+		runnable.runTaskLater(mPlugin, mParameters.DELAY);
 		mActiveRunnables.add(runnable);
 	}
 
-	protected void onTeleport(Player player) {
+	protected void onTeleport(LivingEntity entity) {
 		// Does nothing, can be overridden by extending spells
 	}
 
-	protected void animation(Player target) {
-		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 1.4f, 0.5f);
+	protected void animation() {
+		mParameters.SOUND_TEL.play(mLauncher.getLocation());
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
@@ -162,10 +152,9 @@ public class SpellTpBehindPlayer extends Spell {
 			@Override
 			public void run() {
 				mTicks++;
-				Location particleLoc = mLauncher.getLocation().add(new Location(mLauncher.getWorld(), -0.5f, 0f, 0.5f));
-				new PartialParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
+				mParameters.PARTICLE_TEL.spawn(mLauncher, mLauncher.getLocation());
 
-				if (mTicks > mTPDelay) {
+				if (mTicks > mParameters.DELAY) {
 					this.cancel();
 				}
 			}
@@ -182,19 +171,15 @@ public class SpellTpBehindPlayer extends Spell {
 		box.shift(loc.clone().subtract(mLauncher.getLocation()));
 
 		// Check the 8 corners of the bounding box and the location itself for blocks
-		if (isObstructed(loc, box)
-			    || isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMinZ()), box)
-			    || isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMaxZ()), box)
-			    || isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMinZ()), box)
-			    || isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMaxZ()), box)
-			    || isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMinZ()), box)
-			    || isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMaxZ()), box)
-			    || isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMinZ()), box)
-			    || isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMaxZ()), box)) {
-			return false;
-		}
-
-		return true;
+		return !isObstructed(loc, box)
+			&& !isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMinZ()), box)
+			&& !isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMaxZ()), box)
+			&& !isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMinZ()), box)
+			&& !isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMaxZ()), box)
+			&& !isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMinZ()), box)
+			&& !isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMaxZ()), box)
+			&& !isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMinZ()), box)
+			&& !isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMaxZ()), box);
 	}
 
 	private boolean isObstructed(Location loc, BoundingBox box) {

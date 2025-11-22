@@ -33,9 +33,9 @@ public class SeasonalPass {
 	// cost of rewards, in Metamorphosis Tokens
 	private static final int[] DUMMY_COSTS = {2, 3};
 	protected static final ImmutableMap<CosmeticType, int[]> COSMETIC_COSTS = ImmutableMap.of(
-		CosmeticType.TITLE, new int[] {1, 1, 2, 2, 3, 3},
-		CosmeticType.ELITE_FINISHER, new int[] {2, 3, 4},
-		CosmeticType.PLOT_BORDER, new int[] {5}
+		CosmeticType.TITLE, new int[]{1, 1, 2, 2, 3, 3},
+		CosmeticType.ELITE_FINISHER, new int[]{2, 3, 4},
+		CosmeticType.PLOT_BORDER, new int[]{5}
 	);
 
 	public static final int MP_PER_LEVEL = 75;
@@ -327,9 +327,9 @@ public class SeasonalPass {
 		if (missionProgress < 0) {
 			//Play an animation and notify player
 			p.sendMessage(Component.text(
-					"You completed a weekly mission! Open the Seasonal Pass menu to claim your progress!",
-					NamedTextColor.GOLD,
-					TextDecoration.BOLD));
+				"You completed a weekly mission! Open the Seasonal Pass menu to claim your progress!",
+				NamedTextColor.GOLD,
+				TextDecoration.BOLD));
 			EntityUtils.fireworkAnimation(p);
 		}
 	}

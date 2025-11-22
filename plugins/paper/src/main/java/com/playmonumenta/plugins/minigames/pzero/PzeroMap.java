@@ -21,8 +21,7 @@ import org.bukkit.util.Vector;
 public enum PzeroMap {
 	MAP_NULL("NULL", new Vector(), new Vector(), new Vector(), "", "", "", "", 1, Collections.emptyList()),
 	MAP_0("Test", new Vector(-1985, 212, -1175), new Vector(-2009, 206, -1172), new Vector(-1976, 229, -1210), "monumenta:events/pzero/arena0start", "monumenta:events/pzero/arena0reset", "monumenta:events/pzero/arena0win", "pzerotest", 1, getMap0Checkpoints()),
-	MAP_1("Wintery Shroomland", new Vector(-1045, 101, -2982), new Vector(-989, 100, -2971), new Vector(-1094, 140, -3049), "monumenta:events/pzero/race1start", "monumenta:events/pzero/race1reset", "monumenta:events/pzero/race1win", "PZero-WinteryShroomland", 3, getMap1Checkpoints())
-	;
+	MAP_1("Wintery Shroomland", new Vector(-1045, 101, -2982), new Vector(-989, 100, -2971), new Vector(-1094, 140, -3049), "monumenta:events/pzero/race1start", "monumenta:events/pzero/race1reset", "monumenta:events/pzero/race1win", "PZero-WinteryShroomland", 3, getMap1Checkpoints());
 
 	public final String mName;
 	public final Vector mReturnPosition;
@@ -144,7 +143,7 @@ public enum PzeroMap {
 		PlayerUtils.playersInRange(mReturnPosition.toLocation(world), radius, true).forEach(player -> {
 			player.sendMessage(Component.text("▂▄▆ Race Results ▆▄▂", PzeroPlayer.SILVER_COLOR, TextDecoration.BOLD));
 			List<PzeroPlayerPlacement> placementsCopy = getPlacements();
-			if (placementsCopy.size() == 0) {
+			if (placementsCopy.isEmpty()) {
 				player.sendMessage(Component.text("Race Cancelled - All players left", NamedTextColor.RED, TextDecoration.BOLD));
 			}
 			placementsCopy.sort(Comparator.comparingInt(placement -> placement.mPlacement));

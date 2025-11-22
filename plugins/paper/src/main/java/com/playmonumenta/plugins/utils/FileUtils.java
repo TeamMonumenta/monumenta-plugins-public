@@ -3,22 +3,16 @@ package com.playmonumenta.plugins.utils;
 import com.google.common.base.Ascii;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonWriter;
 import io.papermc.paper.datapack.Datapack;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,80 +25,18 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 
 public class FileUtils {
-	public static String readFile(String fileName) throws Exception, FileNotFoundException {
+	public static void writeFile(Path fileName, String contents) throws IOException {
 		// Do not attempt to catch exceptions here - let them propagate to the caller
-		File file;
-
-		if (fileName == null || fileName.isEmpty()) {
-			throw new Exception("Filename is null or empty");
-		}
-
-		file = new File(fileName);
-		if (!file.exists()) {
-			throw new FileNotFoundException("File '" + fileName + "' does not exist");
-		}
-
-		InputStreamReader reader = null;
-		final int bufferSize = 1024;
-		final char[] buffer = new char[bufferSize];
-		final StringBuilder content = new StringBuilder();
-
-		try {
-			reader = new InputStreamReader(new FileInputStream(fileName), StandardCharsets.UTF_8);
-			while (true) {
-				int rsz = reader.read(buffer, 0, buffer.length);
-				if (rsz < 0) {
-					break;
-				}
-				content.append(buffer, 0, rsz);
-			}
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-
-		return content.toString();
-	}
-
-	public static void writeFile(String fileName, String contents) throws IOException {
-		// Do not attempt to catch exceptions here - let them propagate to the caller
-		File file = new File(fileName);
-
-		if (!file.exists()) {
-			file.getParentFile().mkdirs();
-			file.createNewFile();
-		}
-
-		try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileName), StandardCharsets.UTF_8)) {
-			writer.write(contents);
-		}
-	}
-
-	public static void moveFile(String fromFile, String toFile) throws Exception,
-		FileNotFoundException {
-		if (fromFile == null || fromFile.isEmpty()) {
-			throw new Exception("fromFile is null or empty");
-		}
-		if (toFile == null || toFile.isEmpty()) {
-			throw new Exception("toFile is null or empty");
-		}
-
-		// Open the new file if it exists
-		File sourceFile = new File(fromFile);
-		if (!sourceFile.exists()) {
-			throw new FileNotFoundException("sourceFile '" + fromFile + "' does not exist");
-		}
-
-		// Make sure the target directory exists
-		File destFile = new File(toFile);
-		destFile.getParentFile().mkdirs();
-
-		// Rename the file and overwrite anything there
-		sourceFile.renameTo(destFile);
+		Files.createDirectories(fileName.getParent());
+		Files.writeString(fileName, contents);
 	}
 
 	/**
@@ -127,39 +59,44 @@ public class FileUtils {
 		return matchedFiles;
 	}
 
-	public static void writeJson(String fileName, JsonObject json) throws IOException {
+	public static void writeJson(String fileName, JsonElement json) throws IOException {
 		writeJson(fileName, json, true);
 	}
 
-	public static void writeJson(String fileName, JsonObject json, boolean escapeHtmlCharacters) throws IOException {
+	public static void writeJson(String fileName, JsonElement json, boolean escapeHtmlCharacters) throws IOException {
 		// Do not attempt to catch exceptions here - let them propagate to the caller
-		File file = new File(fileName);
+		Path file = Path.of(fileName);
 
-		if (!file.exists()) {
-			file.getParentFile().mkdirs();
-			file.createNewFile();
+		if (!Files.exists(file)) {
+			Files.createDirectories(file.getParent());
 		}
 
-		OutputStreamWriter writer = null;
-		JsonWriter jsonWriter = null;
 		Gson gson;
-		try {
-			writer = new OutputStreamWriter(new FileOutputStream(fileName), StandardCharsets.UTF_8);
+		try (var writer = Files.newBufferedWriter(file)) {
 			GsonBuilder gsonBuilder = new GsonBuilder();
 			if (!escapeHtmlCharacters) {
 				gsonBuilder.disableHtmlEscaping();
 			}
 			gson = gsonBuilder.create();
-			jsonWriter = gson.newJsonWriter(writer);
-			jsonWriter.setIndent("    ");
-			gson.toJson(json, jsonWriter);
-		} finally {
-			if (jsonWriter != null) {
-				jsonWriter.close();
+			gson.toJson(json, writer);
+		}
+	}
+
+	public static void writeJsonSafely(String fileName, JsonObject json, boolean escapeHtmlCharacters) throws IOException {
+		String tempFileName = fileName + ".tmp";
+		writeJson(tempFileName, json, escapeHtmlCharacters);
+
+		File file = new File(fileName);
+		File tempFile = new File(tempFileName);
+
+		if (file.isFile()) {
+			if (!file.delete()) {
+				MMLog.warning("Failed to delete " + fileName + " before replacing it");
 			}
-			if (writer != null) {
-				writer.close();
-			}
+		}
+
+		if (!tempFile.renameTo(file)) {
+			MMLog.warning("Failed to rename " + tempFileName + " to " + fileName);
 		}
 	}
 
@@ -172,6 +109,105 @@ public class FileUtils {
 
 		return gson.fromJson(reader, JsonObject.class);
 
+	}
+
+	public static File getWorldMonumentaFolder(World world) {
+		File worldFolder = world.getWorldFolder();
+		return new File(worldFolder, "monumenta");
+	}
+
+	public static File getWorldMonumentaFile(World world, String fileName) {
+		File worldMonumentaFolder = getWorldMonumentaFolder(world);
+		File file = new File(worldMonumentaFolder, fileName);
+		File tempFile = new File(worldMonumentaFolder, fileName + ".tmp");
+		if (!file.isFile() && tempFile.isFile()) {
+			// file was being replaced with tempFile, but interrupted; safe to use tempFile instead
+			if (!tempFile.renameTo(file)) {
+				return file;
+			}
+		}
+		return file;
+	}
+
+	public static File getChunkMonumentaFolder(Location location) {
+		File worldMonumentaFolder = getWorldMonumentaFolder(location.getWorld());
+		Chunk chunk = location.getChunk();
+
+		int cx = chunk.getX();
+		int cz = chunk.getX();
+
+		int rx = cx >> 5;
+		int rz = cz >> 5;
+
+		File monumentaRegionFolder = new File(worldMonumentaFolder, String.format("r.%d.%d", rx, rz));
+		return new File(monumentaRegionFolder, String.format("c.%d.%d", cx, cz));
+	}
+
+	public static File getChunkMonumentaFile(Location location, String fileName) {
+		File chunkMonumentaFolder = getChunkMonumentaFolder(location);
+
+		File file = new File(chunkMonumentaFolder, fileName);
+		File tempFile = new File(chunkMonumentaFolder, fileName + ".tmp");
+		if (!file.isFile() && tempFile.isFile()) {
+			// file was being replaced with tempFile, but interrupted; safe to use tempFile instead
+			if (!tempFile.renameTo(file)) {
+				return file;
+			}
+		}
+		return file;
+	}
+
+	public static File getBlockMonumentaFile(Block block, String prefix, String suffix) {
+		return getBlockMonumentaFile(block.getState(), prefix, suffix);
+	}
+
+	public static File getBlockMonumentaFile(BlockState block, String prefix, String suffix) {
+		Location loc = block.getLocation();
+		int x = loc.getBlockX();
+		int y = loc.getBlockY();
+		int z = loc.getBlockZ();
+
+		String fileName = String.format("%s%d.%d.%d%s", prefix, x, y, z, suffix);
+		return getChunkMonumentaFile(loc, fileName);
+	}
+
+	/**
+	 * If the target path is a file or empty folder, delete it,
+	 * recursively delete parent folders if they are now empty,
+	 * and return true if anything was deleted at all, otherwise false.
+	 *
+	 * @param path The path to be deleted
+	 * @return Returns true if a file/folder was deleted, otherwise false
+	 * @throws Exception Any exceptions related to these action are to be handled by the caller.
+	 */
+	public static boolean deletePathAndEmptyParentFolders(File path) throws Exception {
+		boolean deletedSomething = false;
+
+		// Delete the target path
+		if (path.isDirectory()) {
+			// If the target path has child paths, or this cannot be determined, abort
+			File[] children = path.listFiles();
+			if (children == null || children.length > 0) {
+				return false;
+			}
+			if (path.delete()) {
+				deletedSomething = true;
+			}
+		} else if (path.isFile()) {
+			if (path.delete()) {
+				deletedSomething = true;
+			}
+		} else if (path.exists()) {
+			// Some other path type? Links or block devices maybe? Not handled at any rate, abort.
+			return false;
+		}
+
+		// Either we deleted something, or there was nothing to delete; recurse
+		if (deletePathAndEmptyParentFolders(path.getParentFile())) {
+			deletedSomething = true;
+		}
+
+		return deletedSomething;
 	}
 
 	/**

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.mage;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -19,14 +20,18 @@ public class Channeling extends Ability {
 	public static final double PERCENT_MELEE_INCREASE = 0.2;
 
 	public static final AbilityInfo<Channeling> INFO =
-		new AbilityInfo<>(Channeling.class, null, Channeling::new)
+		new AbilityInfo<>(Channeling.class, "Channeling", Channeling::new)
+			.description(getDescription())
 			.canUse(player -> AbilityUtils.getClassNum(player) == Mage.CLASS_ID)
 			.priorityAmount(999);
+
+	private final double mDamage;
 
 	private boolean mCast = false;
 
 	public Channeling(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mDamage = PERCENT_MELEE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 	}
 
 	@Override
@@ -38,11 +43,18 @@ public class Channeling extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE
-			    && mCast
-			    && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(EnchantmentType.MAGIC_WAND) > 0) {
-			event.updateDamageWithMultiplier(1 + (PERCENT_MELEE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
+			&& mCast
+			&& mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.MAGIC_WAND) > 0) {
+			event.updateDamageWithMultiplier(1 + mDamage);
 			mCast = false;
 		}
 		return false; // only changes event damage
+	}
+
+	private static DescriptionBuilder<Channeling> getDescription() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Your spell damage is increased by your wand's Spell Power stat. After casting a spell, your next melee attack with a wand deals ")
+			.addPercent(a -> a.mDamage, PERCENT_MELEE_INCREASE)
+			.add(" more damage.");
 	}
 }

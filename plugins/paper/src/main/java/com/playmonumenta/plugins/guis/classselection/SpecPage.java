@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.classes.PlayerSpec;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.inventory.ItemStack;
 
 public class SpecPage extends Page {
@@ -49,6 +51,8 @@ public class SpecPage extends Page {
 			}
 			mGui.mPage = new SkillPage(mGui, mClass);
 			mGui.update();
+
+			mGui.mPlayer.playSound(mGui.mPlayer, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
 		});
 
 		// Set gui identifier

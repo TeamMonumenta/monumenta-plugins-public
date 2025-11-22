@@ -19,21 +19,24 @@ public class NbtUtils {
 	 */
 	public class NestedCompoundIterator implements Iterator<NBTCompound> {
 		private boolean mStarted = false;
-		private NBTCompound mHere;
+		private final NBTCompound mHere;
 		// mIt is only null if uninitialized or mHere is the only node
-		@Nullable private Iterator<String> mIt = null;
-		private List<Iterable<String>> mSubPathIterables;
+		@Nullable
+		private Iterator<String> mIt = null;
+		private final List<Iterable<String>> mSubPathIterables;
 
 		// Used for remove()
 		private boolean mLastRemoved = false;
 		private String mLastLocalKey = "";
-		@Nullable private NestedCompoundIterator mLastLocalIt = null;
+		@Nullable
+		private NestedCompoundIterator mLastLocalIt = null;
 
 		// Remember the next node once found
 		private boolean mSearchedForNext = false;
 		private boolean mHasNext = false;
 		private String mNextLocalKey = "";
-		@Nullable private NestedCompoundIterator mNextLocalIt = null;
+		@Nullable
+		private NestedCompoundIterator mNextLocalIt = null;
 
 		NestedCompoundIterator(NBTCompound compound, List<Iterable<String>> pathIterables) {
 			mHere = compound;
@@ -130,7 +133,7 @@ public class NbtUtils {
 			}
 			while (mIt.hasNext()) {
 				mNextLocalKey = mIt.next();
-				if (mHere.hasKey(mNextLocalKey)) {
+				if (mHere.hasTag(mNextLocalKey)) {
 					NBTCompound child = mHere.addCompound(mNextLocalKey);
 					mNextLocalIt = new NestedCompoundIterator(child, mSubPathIterables);
 					if (mNextLocalIt.hasNext()) {
@@ -157,7 +160,7 @@ public class NbtUtils {
 			return;
 		}
 		String key = path.get(0);
-		if (compound.hasKey(key)) {
+		if (compound.hasTag(key)) {
 			if (path.size() == 1) {
 				compound.removeKey(key);
 				return;

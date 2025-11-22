@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -14,7 +16,6 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -54,33 +55,16 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 			.linkedSpell(ClassAbility.TRANSMUTATION_RING)
 			.scoreboardId("Transmutation")
 			.shorthandName("TR")
-			.descriptions(
-				("Sneak while throwing an Alchemist's Potion to create a Transmutation Ring at the potion's landing location that lasts for %ss. " +
-				"The ring has a radius of %s blocks. Other players within this ring deal %s%% extra damage on all attacks. " +
-				"The caster gets half the bonus of other players. " +
-				"Mobs that die within this ring increase the damage bonus by %s%% per mob, up to %s%% extra damage. Cooldown: %ss.")
-					.formatted(
-							StringUtils.ticksToSeconds(TRANSMUTATION_RING_DURATION),
-							StringUtils.to2DP(TRANSMUTATION_RING_RADIUS),
-							StringUtils.multiplierToPercentage(DAMAGE_AMPLIFIER),
-							StringUtils.multiplierToPercentage(DAMAGE_PER_DEATH_AMPLIFIER),
-							StringUtils.multiplierToPercentage(MAX_KILLS * DAMAGE_PER_DEATH_AMPLIFIER),
-							StringUtils.ticksToSeconds(TRANSMUTATION_RING_1_COOLDOWN)
-					),
-				("Mobs that die within this ring refunds %s Alchemist Potions and " +
-				"increase its duration by %ss per mob, up to %s extra seconds. Cooldown: %ss.")
-					.formatted(
-							REFUND_POTION_AMOUNT,
-							StringUtils.ticksToSeconds(DURATION_INCREASE),
-							StringUtils.ticksToSeconds(MAX_DURATION_INCREASE),
-							StringUtils.ticksToSeconds(TRANSMUTATION_RING_2_COOLDOWN)
-					)
-			)
+			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Deploy a circular zone that buffs the damage dealt by allies.")
 			.cooldown(TRANSMUTATION_RING_1_COOLDOWN, TRANSMUTATION_RING_2_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.GOLD_NUGGET);
 
 	private final double mRadius;
+	private final int mDuration;
+	private final double mAmplifier;
+	private final double mPerKillAmplifier;
+	private final int mMaxKills;
 
 	private @Nullable Location mCenter;
 	private int mKills = 0;
@@ -89,10 +73,15 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 
 	private @Nullable BukkitTask mActiveTask;
 	private @Nullable AlchemistPotions mAlchemistPotions;
+	private int mCurrDuration = -1;
 
 	public TransmutationRing(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TRANSMUTATION_RING_RADIUS);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TRANSMUTATION_RING_DURATION);
+		mAmplifier = DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
+		mPerKillAmplifier = DAMAGE_PER_DEATH_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_PER_KILL_AMPLIFIER);
+		mMaxKills = MAX_KILLS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_KILLS);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TransmutationRingCS());
 
@@ -109,8 +98,6 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 		}
 	}
 
-	private int mCurrDuration = -1;
-
 	@Override
 	public boolean createAura(Location loc, ThrownPotion potion, ItemStatManager.PlayerItemStats playerItemStats) {
 		if (!potion.hasMetadata(TRANSMUTATION_POTION_METAKEY)) {
@@ -122,22 +109,17 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 
 		mCosmetic.startEffect(mPlayer, mCenter, mRadius);
 
-		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TRANSMUTATION_RING_DURATION);
-		double amplifier = DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
-		double perKillAmplifier = DAMAGE_PER_DEATH_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_PER_KILL_AMPLIFIER);
-		int maxKills = MAX_KILLS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_KILLS);
-
 		mCurrDuration = 0;
 		ClientModHandler.updateAbility(mPlayer, this);
 
 		mActiveTask = new BukkitRunnable() {
 			int mTicks = 0;
-			int mMaxTicks = duration;
+			int mMaxTicks = mDuration;
 
 			@Override
 			public void run() {
 				if (isLevelTwo()) {
-					mMaxTicks = duration + Math.min(mKills * DURATION_INCREASE, MAX_DURATION_INCREASE);
+					mMaxTicks = mDuration + Math.min(mKills * DURATION_INCREASE, MAX_DURATION_INCREASE);
 				}
 
 				if (mTicks >= mMaxTicks || mCenter == null) {
@@ -147,17 +129,21 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 					return;
 				}
 
-				double damageBoost = amplifier + Math.min(mKills, maxKills) * perKillAmplifier;
+				double damageBoost = mAmplifier + Math.min(mKills, mMaxKills) * mPerKillAmplifier;
 				List<Player> players = PlayerUtils.playersInRange(mCenter, mRadius, true);
 				for (Player player : players) {
 					if (player == mPlayer) {
-						mPlugin.mEffectManager.addEffect(mPlayer, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost / 2.0).displaysTime(false));
+						mPlugin.mEffectManager.addEffect(mPlayer, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME,
+							new PercentDamageDealt(20, damageBoost / 2.0).deleteOnAbilityUpdate(true)
+								.displaysTime(false));
 					} else {
-						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost).displaysTime(false));
+						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME,
+							new PercentDamageDealt(20, damageBoost).deleteOnAbilityUpdate(true)
+								.displaysTime(false));
 					}
 				}
 
-				mCosmetic.periodicEffect(mPlayer, mCenter, mRadius, mTicks, mMaxTicks, duration + MAX_DURATION_INCREASE);
+				mCosmetic.periodicEffect(mPlayer, mCenter, mRadius, mTicks, mMaxTicks, mDuration + MAX_DURATION_INCREASE);
 
 				mTicks += 5;
 				if (mCurrDuration >= 0) {
@@ -197,11 +183,39 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 
 	@Override
 	public int getInitialAbilityDuration() {
-		return CharmManager.getDuration(mPlayer, CHARM_DURATION, TRANSMUTATION_RING_DURATION);
+		return mDuration;
 	}
 
 	@Override
 	public int getRemainingAbilityDuration() {
 		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
+
+	private static Description<TransmutationRing> getDescription1() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Throw an Alchemist's Potion while sneaking to create a Transmutation Ring at the potion's landing location that lasts for ")
+			.addDuration(a -> a.mDuration, TRANSMUTATION_RING_DURATION)
+			.add(" seconds. The ring has a radius of ")
+			.add(a -> a.mRadius, TRANSMUTATION_RING_RADIUS)
+			.add(" blocks. Other players within this ring deal ")
+			.addPercent(a -> a.mAmplifier, DAMAGE_AMPLIFIER)
+			.add(" extra damage on all attacks. The caster gets half the bonus of other players. Mobs that die within this ring increase the damage bonus by ")
+			.addPercent(a -> a.mPerKillAmplifier, DAMAGE_PER_DEATH_AMPLIFIER)
+			.add(" per mob, up to ")
+			.add(a -> a.mMaxKills, MAX_KILLS)
+			.add(" mobs.")
+			.addCooldown(TRANSMUTATION_RING_1_COOLDOWN, Ability::isLevelOne);
+	}
+
+	private static Description<TransmutationRing> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Mobs that die within this ring refund ")
+			.add(a -> REFUND_POTION_AMOUNT, REFUND_POTION_AMOUNT)
+			.add(" Alchemist Potions and increase its duration by ")
+			.addDuration(DURATION_INCREASE)
+			.add(" seconds per mob, up to ")
+			.addDuration(MAX_DURATION_INCREASE)
+			.add(" extra seconds.")
+			.addCooldown(TRANSMUTATION_RING_2_COOLDOWN, Ability::isLevelTwo);
 	}
 }

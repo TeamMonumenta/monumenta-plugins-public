@@ -86,7 +86,7 @@ public class BlockAllowListCommand {
 	) {
 		if (
 			listOwnerArgs.mTarget.equals(ArgTarget.ARG)
-			&& !viewer.hasPermission(MailGui.MAIL_MOD_PERM.toString())
+				&& !viewer.hasPermission(MailGui.MAIL_MOD_PERM.toString())
 		) {
 			viewer.sendMessage(Component.text("You do not have permission for this command.", NamedTextColor.RED));
 			return;

@@ -60,41 +60,34 @@ public class DamageListener implements Listener {
 		mPlugin = plugin;
 	}
 
+	// Bukkit deprecates EntityDamageEvent.DamageModifier.
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
 		if (event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent) {
 			// don't allow dealing damage across worlds, no matter how (can e.g. happen via damage over time effects or delayed damage)
 			if (event.getEntity().getWorld() != entityDamageByEntityEvent.getDamager().getWorld()
-				    || (entityDamageByEntityEvent.getDamager() instanceof Projectile projectile
-					        && projectile.getShooter() instanceof Entity shooter
-					        && event.getEntity().getWorld() != shooter.getWorld())) {
+				|| (entityDamageByEntityEvent.getDamager() instanceof Projectile projectile
+				&& projectile.getShooter() instanceof Entity shooter
+				&& event.getEntity().getWorld() != shooter.getWorld())) {
 				event.setCancelled(true);
 				return;
 			}
 
 			if (event.getCause().equals(DamageCause.ENTITY_EXPLOSION)
-				    && event.getEntity() instanceof LivingEntity le) {
+				&& event.getEntity() instanceof LivingEntity le) {
 				Entity damager = entityDamageByEntityEvent.getDamager();
 				if (damager instanceof Creeper creeper) {
 					event.setDamage(EntityUtils.calculateCreeperExplosionDamage(creeper, le, event.getDamage()));
 				}
 			}
 			if (entityDamageByEntityEvent.getDamager() instanceof WitherSkull witherSkull
-				    && witherSkull.getShooter() instanceof Wither wither) {
+				&& witherSkull.getShooter() instanceof Wither wither) {
 				event.setDamage(EntityUtils.getAttributeOrDefault(wither, Attribute.GENERIC_ATTACK_DAMAGE, event.getDamage()));
 			}
 
-			if (entityDamageByEntityEvent.getDamager() instanceof Player player
-				    && event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
-				PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStats(player);
-				double sweepingEdgeLevel = ItemStatUtils.getEnchantmentLevel(player.getInventory().getItemInMainHand(), EnchantmentType.SWEEPING_EDGE);
-				if (playerItemStats != null && sweepingEdgeLevel > 0) {
-					double damage = (1 + playerItemStats.getItemStats().get(AttributeType.ATTACK_DAMAGE_ADD.getItemStat()))
-						                * playerItemStats.getItemStats().get(AttributeType.ATTACK_DAMAGE_MULTIPLY.getItemStat());
-					event.setDamage(1 + damage * (sweepingEdgeLevel / (sweepingEdgeLevel + 1)));
-				} else {
-					event.setDamage(1);
-				}
+			if (event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
+				event.setDamage(1);
 			}
 		}
 
@@ -117,9 +110,8 @@ public class DamageListener implements Listener {
 		// This also prevents knockback going through shields sometimes for some reason.
 		// Needs to check for holding a shield since the mob's attack may have disabled it.
 		if (event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0
-			    && event.getEntity() instanceof Player player
-			    && player.getActiveItem() != null
-			    && player.getActiveItem().getType() == Material.SHIELD) {
+			&& event.getEntity() instanceof Player player
+			&& player.getActiveItem().getType() == Material.SHIELD) {
 			event.setDamage(originalDamage);
 		}
 
@@ -132,9 +124,9 @@ public class DamageListener implements Listener {
 		}
 		if (event.getDamage() < 0 || event.getFinalDamage() < 0) {
 			// (Still) negative: log and fix
-			mPlugin.getLogger().log(Level.WARNING,
-					"Negative damage dealt! finalDamage=" + event.getFinalDamage() + ", "
-							+ Arrays.stream(EntityDamageEvent.DamageModifier.values()).map(mod -> mod + "=" + event.getDamage(mod)).collect(Collectors.joining(", ")), new Exception());
+			mPlugin.getLogger().log(Level.FINE,
+				"Negative damage dealt! finalDamage=" + event.getFinalDamage() + ", "
+					+ Arrays.stream(EntityDamageEvent.DamageModifier.values()).map(mod -> mod + "=" + event.getDamage(mod)).collect(Collectors.joining(", ")), new Exception());
 			if (!(event.getEntity() instanceof Player)) { // the negative damage bug doesn't apply to players, and can cause issues with absorption making players invulnerable
 				event.setDamage(0);
 			}
@@ -143,8 +135,8 @@ public class DamageListener implements Listener {
 		if (!Double.isFinite(event.getDamage()) || !Double.isFinite(event.getFinalDamage())) {
 			// NaN or infinite damage dealt: log and set damage to 0
 			mPlugin.getLogger().log(Level.WARNING,
-					"Non-finite damage dealt! finalDamage=" + event.getFinalDamage() + ", "
-							+ Arrays.stream(EntityDamageEvent.DamageModifier.values()).map(mod -> mod + "=" + event.getDamage(mod)).collect(Collectors.joining(", ")), new Exception());
+				"Non-finite damage dealt! finalDamage=" + event.getFinalDamage() + ", "
+					+ Arrays.stream(EntityDamageEvent.DamageModifier.values()).map(mod -> mod + "=" + event.getDamage(mod)).collect(Collectors.joining(", ")), new Exception());
 			event.setDamage(0);
 		}
 
@@ -171,13 +163,17 @@ public class DamageListener implements Listener {
 
 		event.updateDamageWithMultiplier(EntityUtils.vulnerabilityMult(damagee));
 
+		// If this event was caused by /kill, the entity should immediately die with no further processing
+		if (event.getCause().equals(DamageCause.KILL)) {
+			damagee.setHealth(0);
+		}
+
 		// Player getting damaged
 		if (damagee instanceof Player player) {
 			mPlugin.mItemStatManager.onHurt(mPlugin, player, event, damager, source);
 			mPlugin.mAbilityManager.onHurt(player, event, damager, source);
 
-			if (event.getFinalDamage(true) >= player.getHealth()
-				    && !event.isCancelled()) {
+			if (event.getFinalDamage(true) >= player.getHealth() && !event.isCancelled()) {
 				mPlugin.mAbilityManager.onHurtFatal(player, event);
 				mPlugin.mItemStatManager.onHurtFatal(mPlugin, player, event);
 			}
@@ -213,8 +209,8 @@ public class DamageListener implements Listener {
 
 		// Projectile Iframes rework. Need to be placed at the end in order to get final damage.
 		if (!event.isCancelled() && source instanceof Player player
-			    && ((damager instanceof Projectile proj && !proj.hasMetadata(RapidFire.META_DATA_TAG)) || ElementalArrows.isElementalArrowDamage(event))
-			    && event.getType() != DamageEvent.DamageType.TRUE) {
+			&& ((damager instanceof Projectile proj && !proj.hasMetadata(RapidFire.META_DATA_TAG)) || ElementalArrows.isElementalArrowDamage(event))
+			&& event.getType() != DamageEvent.DamageType.TRUE) {
 			double damage = event.getDamage();
 			// Now, set damage to 0.001 (to allow for knockback effects), and customly damage enemy using damage function.
 			event.setFlatDamage(0.001);
@@ -261,7 +257,7 @@ public class DamageListener implements Listener {
 		UUID uuid = proj.getUniqueId();
 		if (proj instanceof AbstractArrow arrow && !(proj instanceof Trident)) {
 			ItemStack item = arrow.getItemStack();
-			if (item != null && item.getType() != Material.AIR) {
+			if (item.getType() != Material.AIR) {
 				NBT.get(item, nbt -> {
 					ReadableNBT enchantments = ItemStatUtils.getEnchantments(nbt);
 

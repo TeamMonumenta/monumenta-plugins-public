@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.tracking;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.player.PlayerInventoryManager;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -46,7 +47,7 @@ public class PlayerTracking implements EntityTracking {
 			GameMode expectedGameMode = ZoneUtils.expectedGameMode(player);
 			if (
 				GameMode.SURVIVAL.equals(currentGameMode)
-				&& GameMode.ADVENTURE.equals(expectedGameMode)
+					&& GameMode.ADVENTURE.equals(expectedGameMode)
 			) {
 				player.setGameMode(GameMode.ADVENTURE);
 			} else if (
@@ -112,7 +113,7 @@ public class PlayerTracking implements EntityTracking {
 				}
 			}
 
-			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.PLOTS_POSSIBLE)) {
+			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SHOPS_POSSIBLE)) {
 				GameMode expectedGameMode = ZoneUtils.expectedGameMode(player);
 
 				if (mode == GameMode.SURVIVAL && expectedGameMode == GameMode.ADVENTURE) {
@@ -137,6 +138,11 @@ public class PlayerTracking implements EntityTracking {
 			}
 			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.MASK_JUMP_BOOST)) {
 				mPlugin.mPotionManager.addPotion(player, PotionID.SAFE_ZONE, Constants.CITY_JUMP_MASK_EFFECT);
+			}
+
+			// Give Conduit Power to those with their head in water in a Conduit Power Water zone
+			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.CONDUIT_POWER_WATER) && player.getEyeLocation().getBlock().getType() == Material.WATER) {
+				EffectType.applyEffect(EffectType.VANILLA_CONDUIT, player, 5, 3, "Conduit Power Water Zone", false);
 			}
 		}
 
