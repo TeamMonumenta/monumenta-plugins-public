@@ -713,13 +713,13 @@ public class EntityListener implements Listener {
 		}
 
 		for (Player p : affectedPlayers) {
-			Collection<PotionEffect> appliedEffects = p.getActivePotionEffects();
+			Collection<PotionEffect> appliedEffects = potion.getEffects();
 			for (PotionEffect pe : appliedEffects) {
 				if (pe.getType().equals(PotionEffectType.SLOW_FALLING) &&
 					p.getGameMode().equals(GameMode.ADVENTURE)) {
 					//Remove Slow Falling effects in Adventure mode areas (#947)
 					p.sendMessage(Component.text("You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.", NamedTextColor.RED));
-					Bukkit.getScheduler().runTaskLater(mPlugin, () -> p.removePotionEffect(PotionEffectType.SLOW_FALLING), 1);
+					Bukkit.getScheduler().runTask(mPlugin, () -> p.removePotionEffect(PotionEffectType.SLOW_FALLING));
 				}
 			}
 		}
