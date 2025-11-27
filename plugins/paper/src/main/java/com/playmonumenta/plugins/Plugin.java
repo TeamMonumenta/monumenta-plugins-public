@@ -643,8 +643,7 @@ public class Plugin extends JavaPlugin {
 			manager.registerEvents(new IndigoListener(), this);
 		}
 
-		if (ServerProperties.getShardName().contains("rush")
-			|| ServerProperties.getShardName().startsWith("dev")) {
+		if (ServerProperties.getShardName().contains("rush")) {
 			manager.registerEvents(new RushManager(), this);
 		}
 
