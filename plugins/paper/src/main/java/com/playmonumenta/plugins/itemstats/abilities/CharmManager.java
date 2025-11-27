@@ -1392,6 +1392,10 @@ public class CharmManager {
 		//Calculate the map of effects to values
 		Map<String, Double> allEffects = new HashMap<>();
 
+		// Anticheat for locked+unlocked charms on the same stat at once, which can occur with item replacements
+		Map<String, Boolean> statIsLocked = new HashMap<>();
+		boolean badCombinationFound = false;
+
 		for (ItemStack charm : equippedCharms) {
 			if (charm == null || charm.getType() == Material.AIR) {
 				continue;
@@ -1401,8 +1405,20 @@ public class CharmManager {
 					MMLog.warning("Unknown effect '" + info.mEffect + "' in charm '" + ItemUtils.getPlainName(charm) + "'!");
 					continue;
 				}
+				if (statIsLocked.getOrDefault(info.mEffect, false) || (info.mIsLocked && statIsLocked.containsKey(info.mEffect))) {
+					// found an invalid combination; either a previous charm had this stat locked,
+					// or this charm has the stat locked and a previous charm had the stat at all
+					badCombinationFound = true;
+					break;
+				}
+				statIsLocked.put(info.mEffect, info.mIsLocked);
 				//Combine all effects
 				allEffects.merge(info.mEffect + (info.mIsPercent ? "%" : ""), info.mValue, (a, b) -> Math.ceil((a + b) * 1000) / 1000);
+			}
+			if (badCombinationFound) {
+				allEffects.clear();
+				p.sendMessage(Component.text("Your charms were temporarily disabled because of an invalid combination with locked charms. Remove one of the conflicting charms to fix this.", NamedTextColor.RED));
+				break;
 			}
 		}
 
@@ -1525,7 +1541,7 @@ public class CharmManager {
 		Set<String> orderedEffects = summary.keySet();
 
 		for (String s : orderedEffects) {
-			final var normalized = s.replace("%", "").replace("# ", "");
+			final var normalized = s.replace(" %", "").replace(" (LOCKED)", "");
 			double baseValue = summary.getOrDefault(s, 0.0);
 			double value = getValueOrCap(baseValue, normalized, charmType); // we need to replace % here otherwise things don't work correctly (see bug 19814)
 			if (value != 0) {
