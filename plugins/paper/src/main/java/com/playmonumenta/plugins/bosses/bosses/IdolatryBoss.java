@@ -4,12 +4,12 @@ import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
-import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentAbilityDamageReceived;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPLine;
@@ -25,17 +25,12 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class IdolatryBoss extends BossAbilityGroup implements Listener {
+public class IdolatryBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_idolatry";
 
@@ -48,7 +43,7 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 	private final Map<LivingEntity, Double> mEntityDamageMap = new HashMap<>();
 
 	public static class Parameters extends BossParameters {
-		@BossParam(help = "Spherical radius centered at the idol in which it can take redirected damage from.")
+		@BossParam(help = "Spherical radius centered at the idol in which it can take redirected damage from. HARD CAPPED at 32 to prevent server explosion.")
 		public double RADIUS = 8.0;
 		@BossParam(help = "The percentage of the original damage that is redirected to the idol.")
 		public double DAMAGE_REDIRECT_PERCENTAGE = 0.75;
@@ -58,22 +53,25 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 		public SoundsList SOUNDS_REDIRECT = SoundsList.fromString("[(ENTITY_VEX_HURT, 1.0, 0.6), (ITEM_SHIELD_BLOCK, 1.0, 0.5), (ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.0, 1.65)]");
 		@BossParam(help = "Number of damage redirects this Idol can take per tick.")
 		public int MAX_REDIRECTS = 3;
+		@BossParam(help = "Level of healing that this Idol has (default full antiheal).")
+		public double HEALING_EFFICIENCY = -10;
 	}
 
 	public IdolatryBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		this.mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
-		List<Spell> passiveSpells = List.of();
-		super.constructBoss(SpellManager.EMPTY, passiveSpells, (int) Math.ceil(mParams.RADIUS), null, 0, 1);
-		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, "IdolatryAntiHeal",
+			new PercentHeal(2147483647, mParams.HEALING_EFFICIENCY));
+		// 1242 days, or 3.4 years of antiheal
+
+		super.constructBoss(SpellManager.EMPTY, List.of(), (int) Math.ceil(mParams.RADIUS), null, 0, 1);
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onEntityDamaged(DamageEvent event) {
+	@Override
+	public void nearbyEntityHurt(DamageEvent event) {
 		LivingEntity damagedEntity = event.getDamagee();
 		if (mBoss == null || mBoss.isDead()
-			|| damagedEntity.getWorld() != mBoss.getWorld()
-			|| mBoss.getLocation().distanceSquared(damagedEntity.getLocation()) > mParams.RADIUS * mParams.RADIUS
 			|| damagedEntity.equals(mBoss)
 			|| event.getType() == DamageEvent.DamageType.PROJECTILE // Prevents doubled Projectile damage
 			|| ElementalArrows.isElementalArrowDamage(event) // Prevents doubled EArrows damage
@@ -129,12 +127,11 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 		}
 		// Next tick, sort the list, but only one time...
 		if (mHasNotInitiatedNextTickRunnable) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
+			Bukkit.getScheduler().runTaskLater(mPlugin,
+				() -> {
 					ArrayList<Double> sortedEntityDamageMap = new ArrayList<>(mEntityDamageMap.values());
 					Collections.sort(sortedEntityDamageMap);
-					// After the list is sorted, take the top 3 elements and whack the boss with it
+					// After the list is sorted, take the top MAX_REDIRECTS (default 3) elements and whack the boss with it
 					int i = 0;
 					while (i < mParams.MAX_REDIRECTS && !sortedEntityDamageMap.isEmpty()) {
 						// Update to getLast() method when upgrading to Java 21
@@ -149,8 +146,7 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 					}
 					mHasNotInitiatedNextTickRunnable = true;
 					mEntityDamageMap.clear();
-				}
-			}.runTaskLater(mPlugin, 1);
+				}, 0); // Run at the start of the next tick
 			mHasNotInitiatedNextTickRunnable = false;
 		}
 
@@ -159,19 +155,10 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 		if (!damagedEntity.hasMetadata(soundMetadataKey)) {
 			mParams.SOUNDS_REDIRECT.play(mBoss.getLocation());
 			damagedEntity.setMetadata(soundMetadataKey, new FixedMetadataValue(mPlugin, true));
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				damagedEntity.removeMetadata(soundMetadataKey, mPlugin);
-			}, 5L);
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> damagedEntity.removeMetadata(soundMetadataKey, mPlugin), 5L);
 		}
 		// VFX: particle line
 		new PPLine(Particle.SOUL_FIRE_FLAME, damagedEntity.getEyeLocation(), mBoss.getEyeLocation(), 0.08).deltaVariance(true).countPerMeter(2).spawnAsEnemy();
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onHeal(EntityRegainHealthEvent event) {
-		if (event.getEntity().equals(mBoss)) {
-			event.setCancelled(true);
-		}
 	}
 
 	@Override
@@ -180,5 +167,18 @@ public class IdolatryBoss extends BossAbilityGroup implements Listener {
 		if ((effect instanceof PercentDamageReceived || effect instanceof PercentAbilityDamageReceived) && effect.isDebuff()) {
 			event.setCancelled(true);
 		}
+	}
+
+	@Override
+	public boolean hasNearbyEntityHurtTrigger() {
+		return true;
+	}
+
+	@Override
+	public double nearbyEntityHurtMaxRange() {
+		// Don't let this exceed 32, just in case someone messes up with the bosstag creator.
+		// This is a super intensive event and it would be bad for it to go off at such high ranges.
+		// 32 is well outside what anyone should ever use.
+		return Math.min(32, mParams.RADIUS);
 	}
 }

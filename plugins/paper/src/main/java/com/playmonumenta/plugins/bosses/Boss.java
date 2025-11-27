@@ -297,6 +297,24 @@ public class Boss {
 		return false;
 	}
 
+	public void nearbyEntityHurt(DamageEvent event) {
+		Location location = event.getDamagee().getLocation();
+		for (BossAbilityGroup ability : mAbilities) {
+			if (ability.nearbyEntityHurtWithinRange(location)) {
+				ability.nearbyEntityHurt(event);
+			}
+		}
+	}
+
+	public boolean hasNearbyEntityHurtTrigger() {
+		for (BossAbilityGroup ability : mAbilities) {
+			if (ability.hasNearbyEntityHurtTrigger()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void nearbyBlockBreak(BlockBreakEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.nearbyBlockBreak(event);
@@ -360,7 +378,6 @@ public class Boss {
 	}
 
 	public List<String> getIdentityTags() {
-		List<String> tags = mAbilities.stream().map(BossAbilityGroup::getIdentityTag).sorted().toList();
-		return tags;
+		return mAbilities.stream().map(BossAbilityGroup::getIdentityTag).sorted().toList();
 	}
 }
