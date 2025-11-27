@@ -118,7 +118,9 @@ public class EnchantopediaGui extends Gui {
 					return false;
 				}
 				for (var filter : getEnchantNames(finalFilter)) {
-					if (MessagingUtils.plainText(adv.displayName()).contains(filter.getFirst().getName())) {
+					String plainText = MessagingUtils.plainText(adv.displayName());
+					plainText = plainText.substring(1, plainText.length() - 1).trim(); // display name contains brackets around name
+					if (plainText.equals(filter.getFirst().getName())) {
 						return true;
 					}
 				}
@@ -147,7 +149,7 @@ public class EnchantopediaGui extends Gui {
 			update();
 		}));
 
-		if (!mFilterTerm.equals("")) {
+		if (!mFilterTerm.isEmpty()) {
 			displayedEnchants = mEnchants.stream().filter(adv -> adv != null && MessagingUtils.plainText(adv.displayName()).toUpperCase(Locale.ROOT).contains(mFilterTerm.toUpperCase(Locale.ROOT))).toList();
 		}
 
@@ -233,7 +235,9 @@ public class EnchantopediaGui extends Gui {
 					if (enchant2 == null) {
 						continue;
 					}
-					if (MessagingUtils.plainText(enchant2.displayName()).contains(enchant.getFirst().getName())) {
+					String plainText = MessagingUtils.plainText(enchant2.displayName());
+					plainText = plainText.substring(1, plainText.length() - 1).trim(); // display name contains brackets around name
+					if (plainText.equals(enchant.getFirst().getName())) {
 						lore.add(enchant.getFirst().getDisplay(enchant.getSecond()));
 					}
 				}
