@@ -286,7 +286,8 @@ public enum ClassAbility {
 	REVERB("Reverb", true),
 	TRIVIUM("Trivium", true),
 	REFLECTION("Reflection", true),
-	BLEEDING("Bleeding", true);
+	BLEEDING("Bleeding", true),
+	IMPACT("Impact", true);
 
 	private final String mName;
 	private final boolean mFake;
