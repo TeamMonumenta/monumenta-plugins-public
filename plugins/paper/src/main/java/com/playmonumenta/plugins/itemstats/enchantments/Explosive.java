@@ -83,6 +83,7 @@ public class Explosive implements Enchantment {
 			int earth = (int) itemStatsMap.get(EnchantmentType.EARTH_ASPECT);
 			int wind = (int) itemStatsMap.get(EnchantmentType.WIND_ASPECT);
 			int punch = (int) itemStatsMap.get(EnchantmentType.PUNCH);
+			int harpoon = (int) itemStatsMap.get(EnchantmentType.HARPOON);
 
 			Location location = LocationUtils.getEntityCenter(enemy);
 
@@ -99,6 +100,7 @@ public class Explosive implements Enchantment {
 					// Deal damage.
 					DamageUtils.damage(player, mob, DamageEvent.DamageType.PROJECTILE_ENCH, damage, ClassAbility.EXPLOSIVE, false);
 					Punch.applyPunch(plugin, punch, mob, projectile.getVelocity());
+					Harpoon.applyHarpoon(plugin, harpoon, mob, projectile.getVelocity());
 				}
 			}
 

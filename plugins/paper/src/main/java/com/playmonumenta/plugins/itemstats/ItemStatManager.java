@@ -745,6 +745,15 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
+	/**
+	 * Called when a projectile fired by the player hits something.
+	 * Note that this takes the stats at the moment of <bold>hit</bold>,
+	 * not at the moment of <bold>firing</bold>, which can lead to "sword-swapping".
+	 * @param plugin monumenta plugin
+	 * @param player player who fired the projectile
+	 * @param event projectile hit event
+	 * @param projectile the projectile that hit something
+	 */
 	public void onProjectileHit(Plugin plugin, Player player, ProjectileHitEvent event, Projectile projectile) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {

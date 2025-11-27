@@ -136,7 +136,7 @@ public interface ItemStat {
 	}
 
 	/**
-	 * Player Projectile hit something.
+	 * Player Projectile hit something. Uses item stats from when the projectile was <bold>launched</bold>, not item stats at moment of <bold>impact</bold>.
 	 *
 	 * @param plugin     monumenta plugin
 	 * @param player     the Player launching Projectile

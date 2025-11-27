@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
@@ -13,13 +14,39 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Villager;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
 public class Punch implements Enchantment {
 	private static final float KB_VEL_BASE = 0.2f;
 	private static final float KB_VEL_PER_LEVEL = 0.6f;
 	private static final float VERTICAL_LAUNCH = 0.28f;
+
+	@Override
+	public String getName() {
+		return "Punch";
+	}
+
+	@Override
+	public EnchantmentType getEnchantmentType() {
+		return EnchantmentType.PUNCH;
+	}
+
+	@Override
+	public EnumSet<Slot> getSlots() {
+		return EnumSet.of(Slot.MAINHAND, Slot.PROJECTILE);
+	}
+
+	@Override
+	public double getPriorityAmount() {
+		return 31;
+	}
+
+	@Override
+	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		if (event.getDamager() instanceof Projectile projectile) {
+			applyPunch(plugin, value, event.getDamagee(), projectile.getVelocity());
+		}
+	}
 
 	public static void applyPunch(Plugin plugin, double level, Entity entity, Vector projVelocity) {
 		if (level <= 0) {
@@ -48,30 +75,5 @@ public class Punch implements Enchantment {
 		// Sorry. Java requires that I input a "final" into the lambda expression.
 		final Vector dir = vector.clone();
 		Bukkit.getScheduler().runTask(plugin, () -> MovementUtils.knockAwayDirection(dir, enemy, 0.5f, true, false));
-	}
-
-	@Override
-	public String getName() {
-		return "Punch";
-	}
-
-	@Override
-	public EnchantmentType getEnchantmentType() {
-		return EnchantmentType.PUNCH;
-	}
-
-	@Override
-	public EnumSet<Slot> getSlots() {
-		return EnumSet.of(Slot.MAINHAND, Slot.PROJECTILE);
-	}
-
-	@Override
-	public double getPriorityAmount() {
-		return 31;
-	}
-
-	@Override
-	public void onProjectileHit(Plugin plugin, Player player, double level, ProjectileHitEvent event, Projectile projectile) {
-		applyPunch(plugin, level, event.getHitEntity(), projectile.getVelocity());
 	}
 }
