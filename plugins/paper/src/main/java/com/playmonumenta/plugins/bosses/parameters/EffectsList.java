@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.PercentAbsorption;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -47,6 +48,11 @@ public record EffectsList(List<Effect> mEffectList) {
 			});
 			EFFECT_RUNNER.put("InstantDamagePercent", (target, boss, strength) -> {
 				EffectType.applyEffect(EffectType.INSTANT_DAMAGE, target, 1, strength, "EffectListInstantDamagePercent", false);
+			});
+			EFFECT_RUNNER.put("AbsorptionDisruption", (target, boss, duration) -> {
+				target.setAbsorptionAmount(0);
+				target.removePotionEffect(PotionEffectType.ABSORPTION);
+				Plugin.getInstance().mEffectManager.addEffect(target, "DisableAbsorption", new PercentAbsorption((int)duration, -1.00));
 			});
 
 
