@@ -135,13 +135,13 @@ public class PercentDamageDealt extends Effect {
 	@Override
 	public @Nullable Component getSpecificDisplay() {
 		return StringUtils.doubleToColoredAndSignedPercentage(mAmount).append(
-			getDisplayedName() != null ? Component.text(getDisplayedName()) : Component.empty()
+			getDisplayedName() != null ? Component.text(" " + getDisplayedName()) : Component.empty()
 		);
 	}
 
 	@Override
 	public @Nullable String getDisplayedName() {
-		return StringUtils.getDamageTypeString(mAffectedDamageTypes, false, null) + " " + "Damage Dealt";
+		return StringUtils.getDamageTypeString(mAffectedDamageTypes, true, null) + "Damage Dealt";
 	}
 
 	@Override
