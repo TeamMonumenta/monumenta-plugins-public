@@ -121,7 +121,7 @@ public class NegateDamage extends Effect {
 		if (mCount <= 0) {
 			return null;
 		}
-		return StringUtils.getDamageTypeString(mAffectedTypes, false, null) + " " + "Damage Blocked";
+		return StringUtils.getDamageTypeString(mAffectedTypes, true, null) + "Damage Blocked";
 	}
 
 	@Override

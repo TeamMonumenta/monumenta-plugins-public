@@ -89,7 +89,7 @@ public class FlatDamageDealt extends Effect {
 
 	@Override
 	public @Nullable Component getSpecificDisplay() {
-		return Component.text("+" + StringUtils.to2DP(mAmount) + StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + getDisplayedName());
+		return Component.text("+" + StringUtils.to2DP(mAmount) + StringUtils.getDamageTypeString(mAffectedDamageTypes) + getDisplayedName());
 	}
 
 	@Override
