@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.depths.guis;
 
 import com.playmonumenta.plugins.depths.DepthsAbilityItem;
+import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
@@ -16,6 +17,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -173,11 +176,12 @@ public class DepthsSummaryGUI extends Gui {
 			Player player = dp.getPlayer();
 			if (player != null && player.isOnline()) {
 				String itemName = player.getName() + "'s Abilities";
-				ItemStack playerHead = GUIUtils.createBasicItem(Material.PLAYER_HEAD, itemName, NamedTextColor.YELLOW);
+				ItemStack playerHead = GUIUtils.createBasicItem(Material.PLAYER_HEAD, itemName, NamedTextColor.YELLOW, "Grave Timer: " + DepthsListener.getGraveDuration(mDepthsParty, dp, player) / 20.0 + "s");
 				GUIUtils.setSkullOwner(playerHead, player);
 
 				if (dp == mTargetPlayer) {
-					ItemStack activePlayerIndicator = GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, itemName, NamedTextColor.YELLOW, false, "Currently Shown", NamedTextColor.GRAY);
+					List<String> lore = List.of("Currently Shown","Grave Timer: " + DepthsListener.getGraveDuration(mDepthsParty, dp, player) / 20.0 + "s");
+					ItemStack activePlayerIndicator = GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, Component.text(itemName).color(NamedTextColor.YELLOW), lore, NamedTextColor.GRAY);
 					setItem(HEAD_LOCATIONS.get(i), activePlayerIndicator);
 					setItem(4, playerHead);
 				} else {
