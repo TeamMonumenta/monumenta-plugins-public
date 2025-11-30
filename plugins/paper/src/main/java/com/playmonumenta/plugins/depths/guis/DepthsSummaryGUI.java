@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -178,7 +180,8 @@ public class DepthsSummaryGUI extends Gui {
 				GUIUtils.setSkullOwner(playerHead, player);
 
 				if (dp == mTargetPlayer) {
-					ItemStack activePlayerIndicator = GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, itemName, NamedTextColor.YELLOW, false, "Currently Shown\nGrave Timer: " + DepthsListener.getGraveDuration(mDepthsParty, dp, player) / 20.0 + "s", NamedTextColor.GRAY);
+					List<String> lore = List.of("Currently Shown","Grave Timer: " + DepthsListener.getGraveDuration(mDepthsParty, dp, player) / 20.0 + "s");
+					ItemStack activePlayerIndicator = GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, Component.text(itemName).color(NamedTextColor.YELLOW), lore, NamedTextColor.GRAY);
 					setItem(HEAD_LOCATIONS.get(i), activePlayerIndicator);
 					setItem(4, playerHead);
 				} else {
