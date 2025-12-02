@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +33,7 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 
 	private static final Particle.DustOptions BLOODY_COLOR1 = new Particle.DustOptions(Color.fromRGB(175, 33, 19), 1.0f);
 	private static final Particle.DustOptions BLOODY_COLOR2 = new Particle.DustOptions(Color.fromRGB(224, 40, 24), 1.1f);
+	private static final ItemStack REDSTONE_ITEM_STACK = new ItemStack(Material.REDSTONE_BLOCK);
 	private static final int LAND_ANIM_FRAMES = 5;
 
 	@Override
@@ -70,9 +73,9 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 
 	@Override
 	public void gloryStart(World world, Player player, Location location, int duration) {
-		world.playSound(location, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 5.5f, 0.85f);
-		world.playSound(location, Sound.ENTITY_HORSE_GALLOP, SoundCategory.PLAYERS, 3f, 0.75f);
-		world.playSound(location, Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.PLAYERS, 4f, 0.5f);
+		world.playSound(location, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 2f, 0.85f);
+		world.playSound(location, Sound.ENTITY_HORSE_GALLOP, SoundCategory.PLAYERS, 1.5f, 0.75f);
+		world.playSound(location, Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.PLAYERS, 2f, 0.5f);
 		world.playSound(location, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.PLAYERS, 0.2f, 2f);
 		world.playSound(location, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 0.55f, 0.65f);
 
@@ -123,12 +126,33 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 		Location loc1 = player.getEyeLocation();
 		Location loc2 = target.getLocation();
 		Location loc3 = target.getEyeLocation();
+
 		player.getWorld().playSound(loc2, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.75f);
 		player.getWorld().playSound(loc2, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.75f, 0.8f);
 		player.getWorld().playSound(loc2, Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.PLAYERS, 1f, 0.65f);
 
 		new PartialParticle(Particle.REDSTONE, loc3, 25, 0.75, 0.75, 0.75, 0.1, BLOODY_COLOR2).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc3, 10, 0.5, 0.5, 0.5, 0.25).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.DRIP_LAVA, loc3, 10, 0.5, 0.5, 0.5, 0.5).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.ITEM_CRACK, loc3, 40, 0.15, 0.15, 0.15, 0.15, REDSTONE_ITEM_STACK).spawnAsPlayerActive(player);
+		Vector dir = loc3.clone().subtract(loc1).toVector().normalize();
+
+		ParticleUtils.drawLine(LocationUtils.getHalfHeightLocation(player), LocationUtils.getHalfHeightLocation(target).add(dir), 15,
+			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1)
+				.data(new Particle.DustOptions(ParticleUtils.getTransition(BLOODY_COLOR2, BLOODY_COLOR1, t / (double) 15).getColor(), 2))
+				.spawnAsPlayerActive(player));
+
+	}
+
+	@Override
+	public void gloryOnLand(World world, Player player, LivingEntity target, double radius) {
+		Location loc1 = player.getEyeLocation();
+		Location loc2 = target.getLocation();
+		Location loc3 = target.getEyeLocation();
+
+		world.playSound(loc2, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.PLAYERS, 0.35f, 0.55f);
+		world.playSound(loc2, Sound.ENTITY_HORSE_GALLOP, SoundCategory.PLAYERS, 4.5F, 0.5F);
+		world.playSound(loc2, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 0.6f);
 
 		Vector mFront = loc3.clone().subtract(loc1).toVector();
 		if (EntityUtils.isHumanlike(target)) {
@@ -137,25 +161,13 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 			ParticleUtils.drawCurve(loc3, -8, 8, dir,
 				t -> 0,
 				t -> 0.16 * t, t -> 0.24 * t,
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, BLOODY_COLOR2).spawnAsPlayerActive(player)
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, new Particle.DustOptions(BLOODY_COLOR2.getColor(), 2f)).spawnAsPlayerActive(player)
 			);
 			ParticleUtils.drawCurve(loc3, -8, 8, dir,
 				t -> 0,
 				t -> -0.16 * t, t -> 0.24 * t,
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, BLOODY_COLOR2).spawnAsPlayerActive(player)
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, new Particle.DustOptions(BLOODY_COLOR2.getColor(), 2f)).spawnAsPlayerActive(player)
 			);
-			ParticleUtils.drawCurve(loc3, -8, 4, dir,
-				t -> 0.25 * t,
-				t -> 0, t -> 0,
-				(l, t) -> new BukkitRunnable() {
-					@Override
-					public void run() {
-						new PartialParticle(Particle.REDSTONE, l, (6 - t) * 2, (4 - t) * 0.025, (4 - t) * 0.025, (4 - t) * 0.025, 0,
-							ParticleUtils.getTransition(BLOODY_COLOR2, BLOODY_COLOR1, (4 - t) / 12.0)).spawnAsPlayerActive(player);
-					}
-				}.runTaskLater(Plugin.getInstance(), (t + 8) / 4)
-			);
-
 		} else if (EntityUtils.isUndead(target)) {
 			// Undead -> heavy smite
 			Vector dir = mFront.length() < 2 ? mFront.clone().normalize().multiply(2) : mFront;
@@ -212,30 +224,22 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 			}
 		} else {
 			// Default -> X flame
-			new PartialParticle(Particle.DRIP_LAVA, loc3, 80, 0.75, 0.75, 0.75, 0.5).spawnAsPlayerActive(player);
 			ParticleUtils.drawCurve(loc3, -12, 12, mFront.clone().normalize(),
 				t -> 0,
 				t -> t * 0.15, t -> t * 0.075,
-				(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.1).spawnAsPlayerActive(player)
+				(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.05).spawnAsPlayerActive(player)
 			);
 			ParticleUtils.drawCurve(loc3, -12, 12, mFront.clone().normalize(),
 				t -> 0,
 				t -> t * -0.15, t -> t * 0.075,
-				(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.1).spawnAsPlayerActive(player)
+				(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.05).spawnAsPlayerActive(player)
 			);
-
 		}
-	}
 
-	@Override
-	public void gloryOnLand(World world, Player player, Location loc, double radius) {
-		world.playSound(loc, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.PLAYERS, 0.35f, 0.55f);
-		world.playSound(loc, Sound.ENTITY_HORSE_GALLOP, SoundCategory.PLAYERS, 4.5F, 0.5F);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 0.6f);
+		Vector mStart = player.getLocation().getDirection().setY(0).normalize().multiply(radius);
 
-		Vector mFront = player.getLocation().getDirection().setY(0).normalize().multiply(radius);
 		final int units = (int) Math.ceil(LAND_ANIM_FRAMES * radius * 3);
-		ParticleUtils.drawCurve(loc.clone().add(0, 0.5, 0), 0, units, mFront,
+		ParticleUtils.drawCurve(loc2.clone().add(0, 0.5, 0), 0, units, mStart,
 			t -> FastUtils.cos(t * 3.1416 / 13) * t / units,
 			t -> 0, t -> FastUtils.sin(t * 3.1416 / 13) * t / units,
 			(l, t) -> new BukkitRunnable() {
@@ -245,7 +249,7 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 				}
 			}.runTaskLater(Plugin.getInstance(), (long) LAND_ANIM_FRAMES * t / units)
 		);
-		ParticleUtils.drawCurve(loc.clone().add(0, 0.5, 0), 0, units, mFront,
+		ParticleUtils.drawCurve(loc2.clone().add(0, 0.5, 0), 0, units, mStart,
 			t -> FastUtils.cos(t * 3.1416 / 13 - 3.1416 * 1.33) * t / units,
 			t -> 0, t -> FastUtils.sin(t * 3.1416 / 13 - 3.1416 * 1.33) * t / units,
 			(l, t) -> new BukkitRunnable() {
@@ -255,7 +259,7 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 				}
 			}.runTaskLater(Plugin.getInstance(), (long) LAND_ANIM_FRAMES * t / units)
 		);
-		ParticleUtils.drawCurve(loc.clone().add(0, 0.5, 0), 0, units, mFront,
+		ParticleUtils.drawCurve(loc2.clone().add(0, 0.5, 0), 0, units, mStart,
 			t -> FastUtils.cos(t * 3.1416 / 13 + 3.1416 * 1.33) * t / units,
 			t -> 0, t -> FastUtils.sin(t * 3.1416 / 13 + 3.1416 * 1.33) * t / units,
 			(l, t) -> new BukkitRunnable() {
@@ -269,9 +273,8 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				new PPCircle(Particle.CRIT_MAGIC, loc.clone().add(0, 0.5, 0), 0).count((int) Math.ceil(radius * 11)).spawnAsPlayerActive(player);
-				new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.5, 0), 0).count((int) Math.ceil(radius * 7)).data(BLOODY_COLOR1).spawnAsPlayerActive(player);
-				new PartialParticle(Particle.SWEEP_ATTACK, loc, (int) Math.ceil(radius * 3), radius / 3, 0, radius / 3, 0).spawnAsPlayerActive(player);
+				new PPCircle(Particle.REDSTONE, loc2.clone().add(0, 0.5, 0), radius).count((int) Math.ceil(radius * 7)).data(BLOODY_COLOR1).spawnAsPlayerActive(player);
+				new PartialParticle(Particle.SWEEP_ATTACK, loc2, (int) Math.ceil(radius * 3), radius / 3, 0, radius / 3, 0).spawnAsPlayerActive(player);
 			}
 		}.runTaskLater(Plugin.getInstance(), LAND_ANIM_FRAMES);
 	}

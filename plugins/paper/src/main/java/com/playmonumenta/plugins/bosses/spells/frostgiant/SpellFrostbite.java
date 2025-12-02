@@ -9,7 +9,9 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,6 +35,7 @@ public final class SpellFrostbite extends Spell {
 	private final FrostGiant mFrostGiant;
 	private final LivingEntity mBoss;
 	private final List<UUID> mWarned = new ArrayList<>();
+	private final Set<Player> mLenience = new HashSet<>();
 
 	private int mTicks;
 
@@ -64,19 +67,23 @@ public final class SpellFrostbite extends Spell {
 		final Collection<Player> players = mFrostGiant.getArenaParticipants();
 		players.forEach(player -> {
 			final Location playerLoc = player.getLocation();
-			// The too high check is really lenient because of Meteor Slam's Jump Boost 5. If this lets people cheese
-			// I will find a different way to do this
-			final boolean tooHigh = playerLoc.getY() - FrostGiant.ARENA_FLOOR_Y >= 5.1;
+			// The too high check is lenient because of Meteor Slam's velocity leap
+			final boolean tooHigh = playerLoc.getY() - FrostGiant.ARENA_FLOOR_Y >= 6.5;
 			final boolean tooLow = playerLoc.getY() - FrostGiant.ARENA_FLOOR_Y <= -2;
 
 			if (tooHigh || tooLow) {
-				applyDamage(player);
+				if(!mLenience.add(player)) {
+					applyDamage(player);
+				}
+
 
 				if (!mWarned.contains(player.getUniqueId())) {
 					final String msg = tooHigh ? "The upper air is freezing!" : "The lower air is freezing!";
 					player.sendMessage(Component.text(msg, NamedTextColor.RED));
 					mWarned.add(player.getUniqueId());
 				}
+			} else {
+				mLenience.remove(player);
 			}
 		});
 	}

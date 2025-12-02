@@ -224,7 +224,7 @@ public final class SpellGreatswordSlam extends Spell {
 									if (!mHitPlayers.contains(player.getUniqueId())) {
 										DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, 36, null, false, false, SPELL_NAME);
 										AbilityUtils.silencePlayer(player, Constants.TICKS_PER_SECOND * 5);
-										MovementUtils.knockAway(bossLoc, player, 0f, 1.5f, false);
+										MovementUtils.knockAway(bossLoc, player, 0f, 1.75f, false);
 										mHitPlayers.add(player.getUniqueId());
 									}
 								}

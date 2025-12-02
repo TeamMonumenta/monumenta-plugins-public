@@ -132,9 +132,10 @@ import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
+import com.playmonumenta.plugins.abilities.warrior.berserker.Bloodlust;
 import com.playmonumenta.plugins.abilities.warrior.berserker.GloriousBattle;
-import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
+import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
@@ -386,6 +387,7 @@ public class AbilityManager {
 			MeteorSlam.INFO,
 			Rampage.INFO,
 			GloriousBattle.INFO,
+			Bloodlust.INFO,
 
 			// GUARDIAN
 			ShieldWall.INFO,

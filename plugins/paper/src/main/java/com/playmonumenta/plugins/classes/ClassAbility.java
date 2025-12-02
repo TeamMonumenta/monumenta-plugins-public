@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.CosmicMoonblade;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
-import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import org.jetbrains.annotations.Nullable;
 
 /*
@@ -143,9 +142,10 @@ public enum ClassAbility {
 	TOUGHNESS("Toughness"),
 
 	// Berserker
-	METEOR_SLAM(MeteorSlam.NAME),
+	METEOR_SLAM("Meteor Slam"),
 	RAMPAGE("Rampage"),
 	GLORIOUS_BATTLE("Glorious Battle"),
+	BLOODLUST("Bloodlust"),
 
 	// Guardian
 	BODYGUARD("Bodyguard"),

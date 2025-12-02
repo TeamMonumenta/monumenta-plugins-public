@@ -10,9 +10,10 @@ import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
+import com.playmonumenta.plugins.abilities.warrior.berserker.Bloodlust;
 import com.playmonumenta.plugins.abilities.warrior.berserker.GloriousBattle;
-import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
+import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
@@ -51,6 +52,7 @@ public class Warrior extends PlayerClass {
 		mSpecOne.mSpecName = "Berserker";
 		mSpecOne.mDisplayItem = Material.WITHER_SKELETON_SKULL;
 		mSpecOne.mDescription = "Berserkers specialize in melee combat. They thrive in the heart of battle taking heavy risks for great rewards.";
+		mSpecOne.mPassive = Bloodlust.INFO;
 
 		mSpecTwo.mAbilities.add(Bodyguard.INFO);
 		mSpecTwo.mAbilities.add(Challenge.INFO);
@@ -63,8 +65,9 @@ public class Warrior extends PlayerClass {
 
 		mTriggerOrder = ImmutableList.of(
 			GloriousBattle.INFO,
-			MeteorSlam.INFO, // after glorious battle
+			MeteorSlam.INFO,
 			Rampage.INFO,
+			Bloodlust.INFO,
 
 			Bodyguard.INFO,
 			Challenge.INFO,
