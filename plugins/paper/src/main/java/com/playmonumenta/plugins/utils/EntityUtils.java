@@ -1660,6 +1660,10 @@ public class EntityUtils {
 		return !(lineOfSight.angle(mobToPlayer) > Math.toRadians(75.0));
 	}
 
+	public static boolean playerCantSeeBodyOrEyes(Player player, LivingEntity entity) {
+		return !player.hasLineOfSight(entity) && !player.hasLineOfSight(entity.getEyeLocation());
+	}
+
 	// returns change in mob's health
 	public static double healMob(LivingEntity mob, double healAmount) {
 		if (healAmount <= 0 || mob.isDead()) {

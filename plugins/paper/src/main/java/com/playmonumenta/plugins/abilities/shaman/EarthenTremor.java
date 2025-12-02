@@ -10,45 +10,49 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.EarthenTremorCS;
+import com.playmonumenta.plugins.effects.CursedEarth;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
-import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class EarthenTremor extends Ability {
-
-	private static final int COOLDOWN = 10 * 20;
-	private static final int SILENCE_DURATION = 30;
-	private static final int RANGE = 7;
-	private static final int DAMAGE_1 = 10;
-	private static final int DAMAGE_2 = 13;
-	private static final double KNOCKBACK = 0.8;
-	private static final int SHOCKWAVES = 6;
-	private static final int SHOCKWAVE_RADIUS = 3;
-	private static final int SHOCKWAVE_DISTANCE = 5;
-	private static final double DAMAGE_BONUS_ENHANCE = 2.5;
-
-	public static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.25f);
+	private static final int COOLDOWN_1 = 12 * 20;
+	private static final int COOLDOWN_2 = 10 * 20;
+	private static final double DAMAGE_1 = 8;
+	private static final double DAMAGE_2 = 11;
+	private static final double RADIUS = 7;
+	private static final double TOTEM_THROW_DAMAGE_1 = 5;
+	private static final double TOTEM_THROW_DAMAGE_2 = 8;
+	private static final int ENHANCE_EFFECT_DURATION = 5 * 20;
+	private static final double ENHANCE_MELEE_SCALING = 0.35;
+	private static final double ENHANCE_PROJ_SCALING = 0.2;
+	private static final double ENHANCE_RADIUS = 3;
+	private static final double KNOCKUP = 0.7;
+	private static final String ENHANCE_EFFECT_SOURCE = "EarthenTremorCursedEarth";
+	private static final int TOTEM_THROW_RANGE = 4;
+	private static final int ROOT_DURATION = 2 * 20;
 
 	public static final String CHARM_COOLDOWN = "Earthen Tremor Cooldown";
 	public static final String CHARM_DAMAGE = "Earthen Tremor Damage";
+	public static final String CHARM_KNOCKUP = "Earthen Tremor Knockup";
 	public static final String CHARM_RADIUS = "Earthen Tremor Radius";
-	public static final String CHARM_SILENCE_DURATION = "Earthen Tremor Silence Duration";
-	public static final String CHARM_KNOCKBACK = "Earthen Tremor Knockback";
-	public static final String CHARM_SHOCKWAVES = "Earthen Tremor Shockwaves";
-	public static final String CHARM_SHOCKWAVE_RADIUS = "Earthen Tremor Shockwave Radius";
-	public static final String CHARM_SHOCKWAVE_DISTANCE = "Earthen Tremor Shockwave Distance";
+	public static final String CHARM_TOTEM_THROW_DAMAGE = "Earthen Tremor Totem Landing Damage";
+	public static final String CHARM_TOTEM_THROW_RADIUS = "Earthen Tremor Totem Landing Range";
+	public static final String CHARM_ENHANCE_DURATION = "Earthen Tremor Cursed Earth Duration";
+	public static final String CHARM_ENHANCE_MELEE = "Earthen Tremor Cursed Earth Melee Scaling";
+	public static final String CHARM_ENHANCE_PROJ = "Earthen Tremor Cursed Earth Projectile Scaling";
+	public static final String CHARM_ENHANCE_RADIUS = "Earthen Tremor Cursed Earth Radius";
+	public static final String CHARM_ROOT_DURATION = "Earthen Tremor Root Duration";
 
 	public static final AbilityInfo<EarthenTremor> INFO =
 		new AbilityInfo<>(EarthenTremor.class, "Earthen Tremor", EarthenTremor::new)
@@ -56,36 +60,38 @@ public class EarthenTremor extends Ability {
 			.scoreboardId("EarthenTremor")
 			.shorthandName("ET")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Summons a earthen tremor on your location, dealing damage and knocking mobs away.")
-			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.simpleDescription("Summons a earthen tremor on your location, dealing damage and knocking mobs up.")
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenTremor::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+			.addAltPresetTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenTremor::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).lookDirections(AbilityTrigger.LookDirection.DOWN).onGround(true)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
 			.displayItem(Material.DIRT);
 
-	private final double mDamageBase;
-	private final double mDamageEnhance;
 	private final double mDamage;
 	private final double mRadius;
-	private final int mSilenceDuration;
-	private final float mKnockback;
-	private final int mShockwaves;
-	private final double mShockwaveDistance;
-	private final double mShockwaveRadius;
-	private final List<LivingEntity> mHitEntities = new ArrayList<>();
+	private final double mTotemLandingDamage;
+	private final double mTotemLandingRadius;
+	private final int mCursedEarthDuration;
+	private final double mCursedEarthScalingM;
+	private final double mCursedEarthScalingP;
+	private final double mCursedEarthRadius;
+	private final double mKnockup;
+	private final int mRootDuration;
 	private final EarthenTremorCS mCosmetic;
 
 	public EarthenTremor(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamageBase = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mDamageEnhance = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_BONUS_ENHANCE);
-		mDamage = mDamageBase + (isEnhanced() ? mDamageEnhance : 0);
-		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RANGE);
-		mSilenceDuration = CharmManager.getDuration(mPlayer, CHARM_SILENCE_DURATION, SILENCE_DURATION);
-		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK);
-		mShockwaves = SHOCKWAVES + (int) CharmManager.getLevel(mPlayer, CHARM_SHOCKWAVES);
-		mShockwaveDistance = CharmManager.getRadius(mPlayer, CHARM_SHOCKWAVE_DISTANCE, SHOCKWAVE_DISTANCE);
-		mShockwaveRadius = CharmManager.getRadius(mPlayer, CHARM_SHOCKWAVE_RADIUS, SHOCKWAVE_RADIUS);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+		mTotemLandingDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TOTEM_THROW_DAMAGE, isLevelOne() ? TOTEM_THROW_DAMAGE_1 : TOTEM_THROW_DAMAGE_2);
+		mTotemLandingRadius = CharmManager.getRadius(mPlayer, CHARM_TOTEM_THROW_RADIUS, TOTEM_THROW_RANGE);
+		mCursedEarthDuration = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_DURATION, ENHANCE_EFFECT_DURATION);
+		mCursedEarthScalingM = ENHANCE_MELEE_SCALING + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_MELEE);
+		mCursedEarthScalingP = ENHANCE_PROJ_SCALING + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_PROJ);
+		mCursedEarthRadius = CharmManager.getRadius(mPlayer, CHARM_ENHANCE_RADIUS, ENHANCE_RADIUS);
+		mKnockup = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKUP, KNOCKUP);
+		mRootDuration = CharmManager.getDuration(mPlayer, CHARM_ROOT_DURATION, ROOT_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EarthenTremorCS());
 	}
 
@@ -95,43 +101,55 @@ public class EarthenTremor extends Ability {
 		}
 		putOnCooldown();
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobsInSphere(mPlayer.getLocation(), mRadius, null)) {
-			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, false);
-			mHitEntities.add(mob);
-			if (!EntityUtils.isCCImmuneMob(mob)) {
-				MovementUtils.knockAway(mPlayer, mob, mKnockback);
-				if (isLevelTwo()) {
-					EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);
-				}
-			}
-		}
-		mCosmetic.earthenTremorEffect(mPlayer, mRadius);
+		Location loc = mPlayer.getLocation();
+		mCosmetic.earthenTremorEffect(mPlayer, loc, mRadius);
 
-		if (isEnhanced()) {
-			int angleBetween = 360 / mShockwaves;
-			Vector forward = mPlayer.getLocation().getDirection().setY(0).normalize();
-			for (int i = 0; i < 360; i += angleBetween) {
-				Vector normDir = VectorUtils.rotateYAxis(forward, i).normalize();
-				Location shockwaveLoc = mPlayer.getLocation().add(normDir.clone().multiply(mRadius));
-				for (int j = 0; j < mShockwaveDistance; j++) {
-					mCosmetic.earthenTremorEnhancement(mPlayer, shockwaveLoc, mShockwaveRadius, j, mShockwaveDistance);
-					shockwaveLoc.add(normDir);
-					List<LivingEntity> mShockwaveHits = EntityUtils.getNearbyMobsInSphere(shockwaveLoc, mShockwaveRadius, null);
-					mShockwaveHits.removeAll(mHitEntities);
-					for (LivingEntity mob : mShockwaveHits) {
-						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, false);
-						mHitEntities.add(mob);
-						if (!EntityUtils.isCCImmuneMob(mob)) {
-							MovementUtils.knockAway(mPlayer, mob, mKnockback);
-							if (isLevelTwo()) {
-								EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);
-							}
-						}
-					}
-				}
+		List<LivingEntity> nearbyMobs = new Hitbox.SphereHitbox(loc, mRadius).getHitMobs();
+		nearbyMobs.removeIf(mob -> EntityUtils.playerCantSeeBodyOrEyes(mPlayer, mob));
+		for (LivingEntity mob : nearbyMobs) {
+			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, false);
+			if (!EntityUtils.isFlyingMob(mob) && !EntityUtils.isCCImmuneMob(mob) && mob.getPassengers().isEmpty()) {
+				MovementUtils.knockUp(mob, (float) mKnockup, false);
+				EntityUtils.applySlow(mPlugin, mRootDuration, 1, mob);
+			}
+			if (isEnhanced()) {
+				mPlugin.mEffectManager.addEffect(mob, ENHANCE_EFFECT_SOURCE, new CursedEarth(
+					ENHANCE_EFFECT_SOURCE, mCursedEarthDuration, mPlayer, mCosmetic, mCursedEarthScalingM, mCursedEarthScalingP, mCursedEarthRadius
+				));
 			}
 		}
-		mHitEntities.clear();
+
+		List<LivingEntity> totems = ShamanPassiveManager.getTotemList(mPlayer);
+		List<ArmorStand> nearbyTotems = new Hitbox.SphereHitbox(loc, mRadius).getHitEntitiesByClass(ArmorStand.class);
+		nearbyTotems.removeIf(totem -> !totems.contains(totem));
+		nearbyTotems.removeIf(totem -> EntityUtils.playerCantSeeBodyOrEyes(mPlayer, totem));
+
+		for (LivingEntity totem : nearbyTotems) {
+			MovementUtils.knockUp(totem, (float) mKnockup * 1.2f, false);
+
+			new BukkitRunnable() {
+				int mT = 0;
+				@Override
+				public void run() {
+					mT++;
+					if (mT >= 4 * 20 || (totem.isOnGround() && totem.getVelocity().getY() < 0.5)) {
+						Location totemLoc = totem.getLocation();
+						mCosmetic.totemLandingEffect(mPlayer, totemLoc, mTotemLandingRadius);
+						List<LivingEntity> totemHits = new Hitbox.SphereHitbox(totemLoc, mTotemLandingRadius).getHitMobs();
+						for (LivingEntity mob : totemHits) {
+							DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mTotemLandingDamage, mInfo.getLinkedSpell(), true, false);
+						}
+						this.cancel();
+					}
+
+					if (totem.isDead() || !totem.isValid()) {
+						this.cancel();
+					}
+					mT++;
+				}
+			}.runTaskTimer(mPlugin, 0, 5);
+		}
+
 		return true;
 	}
 
@@ -139,32 +157,39 @@ public class EarthenTremor extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.addTrigger()
 			.add(" to summon an earthen tremor at your location that deals ")
-			.add(a -> a.mDamageBase, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage to mobs within ")
-			.add(a -> a.mRadius, RANGE)
-			.add(" blocks and pushes them away.")
-			.addCooldown(COOLDOWN);
+			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage to mobs within line of sight in a radius of ")
+			.add(a -> a.mRadius, RADIUS)
+			.add(" blocks. Totems and mobs within the tremor are launched, totems dealing ")
+			.add(a -> a.mTotemLandingDamage, TOTEM_THROW_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" magic damage in a ")
+			.add(a -> a.mTotemLandingRadius, TOTEM_THROW_RANGE)
+			.add(" block radius of where they land. Launched mobs are also rooted in place for ")
+			.addDuration(a -> a.mRootDuration, ROOT_DURATION)
+			.add(" seconds.")
+			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
 	}
 
 	private static Description<EarthenTremor> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Damage is increased to ")
-			.add(a -> a.mDamageBase, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(". Now additionally silences mobs for ")
-			.addDuration(a -> a.mSilenceDuration, SILENCE_DURATION)
-			.add(" seconds.");
+			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" and totem slam damage is increased to ")
+			.add(a -> a.mTotemLandingDamage, TOTEM_THROW_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(".")
+			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
 	}
 
 	private static Description<EarthenTremor> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Upon triggering, now sends out ")
-			.add(a -> a.mShockwaves, SHOCKWAVES)
-			.add(" additional shockwaves from the edge of the radius outwards for an additional ")
-			.add(a -> a.mShockwaveDistance, SHOCKWAVE_DISTANCE)
-			.add(" blocks with a radius of ")
-			.add(a -> a.mShockwaveRadius, SHOCKWAVE_RADIUS)
-			.add(" blocks. Damage is increased by ")
-			.add(a -> a.mDamageEnhance, DAMAGE_BONUS_ENHANCE)
-			.add(".");
+			.add("Mobs damaged by the intial hit of Earthen Tremor are inflicted with Cursed Earth for ")
+			.addDuration(a -> a.mCursedEarthDuration, ENHANCE_EFFECT_DURATION)
+			.add(" seconds. Damaging them with a [Melee / Projectile] attack deals [")
+			.addPercent(a -> a.mCursedEarthScalingM, ENHANCE_MELEE_SCALING)
+			.add(" / ")
+			.addPercent(a -> a.mCursedEarthScalingP, ENHANCE_PROJ_SCALING)
+			.add("] of the base weapon damage as magic damage to all mobs within a ")
+			.add(a -> a.mCursedEarthRadius, ENHANCE_RADIUS)
+			.add(" block radius. The effect is then cleared.");
 	}
 }

@@ -82,14 +82,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 
 		// Increment charges if last check was on cooldown, and now is off cooldown.
 		if (mCharges < mMaxCharges && mWasOnCooldown && !onCooldown) {
-			mCharges++;
-			if (mMaxCharges > 1) {
-				showChargesMessage();
-			} else {
-				showOffCooldownMessage();
-			}
-			needsClientModUpdate = true;
-			AbilityManager.getManager().trackCharges(mPlayer, mLinkedSpell, mCharges);
+			needsClientModUpdate = incrementCharge();
 		}
 
 		// Put on cooldown if charges can still be gained

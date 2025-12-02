@@ -33,14 +33,6 @@ public class InterconnectedHavoc extends Ability {
 	public static final String CHARM_ENHANCEMENT_KNOCKBACK = "Interconnected Havoc Knockback";
 	public static final String CHARM_ENHANCEMENT_STUN = "Interconnected Havoc Stun Duration";
 
-	private final double mRange;
-	private final double mDamage;
-	private final float mKnockback;
-	private final int mStunTime;
-	private int mClearTimer;
-	private final List<LivingEntity> mHitMobs = new ArrayList<>();
-	private final List<LivingEntity> mBlockedMobs = new ArrayList<>();
-
 	public static final AbilityInfo<InterconnectedHavoc> INFO =
 		new AbilityInfo<>(InterconnectedHavoc.class, "Interconnected Havoc", InterconnectedHavoc::new)
 			.linkedSpell(ClassAbility.INTERCONNECTED_HAVOC)
@@ -51,7 +43,15 @@ public class InterconnectedHavoc extends Ability {
 			.quest216Message("-------e-------r-------")
 			.displayItem(Material.CHAIN);
 
+	private final double mRange;
+	private final double mDamage;
+	private final float mKnockback;
+	private final int mStunTime;
 	private final InterconnectedHavocCS mCosmetic;
+
+	private final List<LivingEntity> mHitMobs = new ArrayList<>();
+	private final List<LivingEntity> mBlockedMobs = new ArrayList<>();
+	private int mClearTimer;
 
 	public InterconnectedHavoc(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -64,7 +64,7 @@ public class InterconnectedHavoc extends Ability {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		List<Location> activeList = TotemicEmpowerment.getTotemLocations(mPlayer);
+		List<Location> activeList = ShamanPassiveManager.getTotemLocations(mPlayer);
 		if (activeList.isEmpty() || mPlayer.isDead()) {
 			return;
 		}
@@ -111,7 +111,7 @@ public class InterconnectedHavoc extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Totems form a line between them with a maximum distance of ")
 			.add(a -> a.mRange, RANGE_1, false, Ability::isLevelOne)
-			.add(". Mobs take ")
+			.add(" blocks. Mobs take ")
 			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
 			.add(" magic damage each second while intersecting a line.");
 	}

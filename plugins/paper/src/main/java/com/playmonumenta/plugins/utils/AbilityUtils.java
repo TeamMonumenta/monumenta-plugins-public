@@ -675,16 +675,6 @@ public class AbilityUtils {
 		target.teleport(totem.getEyeLocation().add(0, 0.5, 0));
 	}
 
-	public static void produceChargeUpString(LivingEntity totem, ArmorStand target, int chargeDuration, int currentDuration) {
-		Component indicatorName = Component.empty();
-		indicatorName = indicatorName.append(Component.text("[", NamedTextColor.WHITE));
-		indicatorName = indicatorName.append(Component.text("   Charging Up...   ", NamedTextColor.RED));
-		indicatorName = indicatorName.append(Component.text("]", NamedTextColor.WHITE));
-
-		target.customName(indicatorName);
-		target.teleport(totem.getEyeLocation().add(0, 0.5, 0));
-	}
-
 	public static ThrowableProjectile spawnAbilitySnowball(Plugin plugin, Player player, World world, double velocity, String name, @Nullable Particle particle) {
 		return spawnAbilitySnowball(plugin, player, world, velocity, name, particle, false);
 	}
@@ -785,8 +775,9 @@ public class AbilityUtils {
 		ClassAbility.FLAME_TOTEM,
 		ClassAbility.LIGHTNING_TOTEM,
 		ClassAbility.INTERCONNECTED_HAVOC,
-		ClassAbility.CRYSTALLINE_COMBOS,
+		ClassAbility.SPIRITUAL_COMBOS,
 		ClassAbility.DECAYED_TOTEM,
+		ClassAbility.SPIRITCATCHER_ORBS,
 		ClassAbility.ILLUMINATE_DOT,
 		ClassAbility.KEEPER_VIRTUE,
 		ClassAbility.CURSED_WOUND,

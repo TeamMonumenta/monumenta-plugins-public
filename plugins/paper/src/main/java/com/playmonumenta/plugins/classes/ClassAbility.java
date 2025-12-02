@@ -181,17 +181,18 @@ public enum ClassAbility {
 	INTERCONNECTED_HAVOC("Interconnected Havoc"),
 	CHAIN_LIGHTNING("Chain Lightning"),
 	LIGHTNING_TOTEM("Lightning Totem"),
-	CRYSTALLINE_COMBOS("Crystalline Combos"),
+	IGNITION_DRIVE("Ignition Drive"),
+	SPIRITUALISM("Spiritualism"),
 	TOTEMIC_PROJECTION("Totemic Projection"),
 
 	// Soothsayer
-	CHAIN_HEALING_WAVE("Chain Healing Wave"),
-	SANCTUARY("Sanctuary"),
+	TOTEMIC_CONSECRATION("Totemic Consecration"),
+	SPIRITUAL_COMBOS("Spiritual Combos"),
 	WHIRLWIND_TOTEM("Whirlwind Totem"),
 
 	// Hexbreaker
 	DECAYED_TOTEM("Decayed Totem"),
-	DESECRATING_SHOT("Desecrating Shot"),
+	SPIRITCATCHER_ORBS("Spiritcatcher Orbs"),
 	DEVASTATION("Devastation"),
 
 	// [DEPTHS ABILITIES]

@@ -10,7 +10,9 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
+import com.playmonumenta.plugins.abilities.rogue.MagicDodging;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
+import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Bloodlust;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
@@ -267,11 +269,13 @@ public class ClientModHandler {
 		}
 		if (ability instanceof AlchemistPotions) {
 			return "Alchemist";
-		}
-		if (ability instanceof ElementalSpiritIce) {
+		} else if (ability instanceof ElementalSpiritIce) {
 			return "Mage";
-		}
-		if (ability instanceof Bloodlust) {
+		} else if (ability instanceof MagicDodging) {
+			return "Rogue";
+		} else if (ability instanceof TotemicProjection) {
+			return "Shaman";
+		} else if (ability instanceof Bloodlust) {
 			return "Warrior";
 		}
 		for (PlayerClass playerClass : INSTANCE.mClasses.mClasses) {

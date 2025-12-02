@@ -10,14 +10,16 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.FlameTotemCS;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.ArrayList;
-import java.util.Collections;
+import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.List;
+import java.util.WeakHashMap;
+import java.util.function.Predicate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -26,40 +28,37 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class FlameTotem extends TotemAbility {
-
+	private static final int INTERVAL = 30;
 	private static final int COOLDOWN = 22 * 20;
-	private static final int INTERVAL = 20;
-	private static final int DURATION_1 = 10 * 20;
-	private static final int DURATION_2 = 12 * 20;
+	private static final int DURATION = 15 * 20;
 	private static final int AOE_RANGE_1 = 6;
 	private static final int AOE_RANGE_2 = 7;
-	private static final int FIRE_DURATION = 2 * 20;
-	private static final int DAMAGE_1 = 5;
-	private static final int DAMAGE_2 = 6;
-	private static final double BOMB_RADIUS = 3;
-	private static final int BOMB_COUNT = 1;
-	private static final int ENHANCE_BOMB_BONUS = 1;
-	private static final double ENHANCE_INFERNO_SCALE = 0.5;
+	private static final double DAMAGE_1 = 3;
+	private static final double DAMAGE_2 = 4;
+	private static final double STACKING_DAMAGE = 0.05;
+	private static final double ABILITY_FLAT_DMG_ADDITION = 0.5;
+	private static final int ABILITY_LIMIT = 4;
+	private static final int ABILITY_LIMIT_ENHANCE = 6;
+	private static final int IGNITION_DURATION = 4 * 20;
+	private static final double ENHANCE_DAMAGE_BOOST = 0.2;
+	private static final List<ClassAbility> TOTEM_ABILITY_LIST = List.of(
+		ClassAbility.FLAME_TOTEM,
+		ClassAbility.LIGHTNING_TOTEM,
+		ClassAbility.CLEANSING_TOTEM,
+		ClassAbility.WHIRLWIND_TOTEM,
+		ClassAbility.DECAYED_TOTEM,
+		ClassAbility.TOTEMIC_PROJECTION
+	);
 
 	public static final String CHARM_DURATION = "Flame Totem Duration";
 	public static final String CHARM_RADIUS = "Flame Totem Radius";
 	public static final String CHARM_COOLDOWN = "Flame Totem Cooldown";
-	public static final String CHARM_DAMAGE = "Flame Totem Damage";
-	public static final String CHARM_FIRE_DURATION = "Flame Totem Fire Duration";
-	public static final String CHARM_BOMB_RADIUS = "Flame Totem Explosion Radius";
-	public static final String CHARM_BOMB_COUNT = "Flame Totem Explosion Count";
-	public static final String CHARM_ENHANCE_INFERNO_SCALE = "Flame Totem Enhancement Inferno Efficiency";
+	public static final String CHARM_ENHANCE_DAMAGE_BOOST = "Flame Totem Enhancement Damage Amplifier";
 	public static final String CHARM_PULSE_DELAY = "Flame Totem Pulse Delay";
-
-	private final double mDamage;
-	private final double mRadius;
-	private final double mBombRadius;
-	private final int mBombCount;
-	private final int mFireDuration;
-	private final double mEnhanceInfernoScale;
-	private final int mInterval;
-
-	public double mDecayedTotemBuff = 0;
+	public static final String CHARM_ABILITY_FLAT_BOOST = "Flame Totem Used Ability Bonus Damage";
+	public static final String CHARM_ABILITY_LIMIT = "Flame Totem Used Ability Limit";
+	public static final String CHARM_STACKING_DAMAGE = "Flame Totem Stacking Damage Amplifier";
+	public static final String CHARM_DAMAGE = "Flame Totem Damage";
 
 	public static final AbilityInfo<FlameTotem> INFO =
 		new AbilityInfo<>(FlameTotem.class, "Flame Totem", FlameTotem::new)
@@ -67,86 +66,96 @@ public class FlameTotem extends TotemAbility {
 			.scoreboardId("FlameTotem")
 			.shorthandName("FT")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Summon a totem that deals damage and sets mobs on fire within its range.")
+			.simpleDescription("Summon a totem that incinerates mobs in an area.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FlameTotem::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+			.addAltPresetTrigger(new AbilityTriggerInfo<>("cast", "cast", FlameTotem::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
 			.displayItem(Material.MAGMA_BLOCK);
 
+	private final int mInterval;
+	private final double mEnhanceDamageAmplifier;
+	private final double mDamage;
+	private final double mStackingDamageAmplifier;
+	private final double mBonusDamageFlat;
+	private final int mAbilityLimit;
 	private final FlameTotemCS mCosmetic;
+
+	public double mDecayedTotemBuff = 0;
+	private double mCurrentBonusFlatDamage = 0;
+	private WeakHashMap<LivingEntity, Double> mConsecutiveDamageMap = new WeakHashMap<>();
 
 	public FlameTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Flame Totem Projectile", "FlameTotem", "Flame Totem");
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);
-		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelTwo() ? AOE_RANGE_2 : AOE_RANGE_1);
-		mFireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, FIRE_DURATION);
-		mBombRadius = CharmManager.getRadius(mPlayer, CHARM_BOMB_RADIUS, BOMB_RADIUS);
-		mBombCount = BOMB_COUNT + (int) CharmManager.getLevel(mPlayer, CHARM_BOMB_COUNT) + (isEnhanced() ? ENHANCE_BOMB_BONUS : 0);
-		mEnhanceInfernoScale = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_INFERNO_SCALE, ENHANCE_INFERNO_SCALE);
-		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
+		mDuration = CharmManager.getDuration(player, CHARM_DURATION, DURATION);
+		setRadius(CharmManager.getRadius(player, CHARM_RADIUS, isLevelTwo() ? AOE_RANGE_2 : AOE_RANGE_1));
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mEnhanceDamageAmplifier = CharmManager.calculateFlatAndPercentValue(player, CHARM_ENHANCE_DAMAGE_BOOST, ENHANCE_DAMAGE_BOOST);
+		mBonusDamageFlat = CharmManager.calculateFlatAndPercentValue(player, CHARM_ABILITY_FLAT_BOOST, ABILITY_FLAT_DMG_ADDITION);
+		mAbilityLimit = (isEnhanced() ? ABILITY_LIMIT_ENHANCE : ABILITY_LIMIT) + (int) CharmManager.getLevel(player, CHARM_ABILITY_LIMIT);
+		mStackingDamageAmplifier = STACKING_DAMAGE + CharmManager.getLevelPercentDecimal(player, CHARM_STACKING_DAMAGE);
+		mInterval = CharmManager.getDuration(player, CHARM_PULSE_DELAY, INTERVAL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new FlameTotemCS());
 	}
 
 	@Override
 	public void placeTotem(Location standLocation, Player player, ArmorStand stand) {
-		mCosmetic.flameTotemSpawn(standLocation, player, stand, mRadius);
+		mConsecutiveDamageMap = new WeakHashMap<>();
+		mCurrentBonusFlatDamage = 0;
+		mCosmetic.flameTotemSpawn(standLocation, player, stand, getTotemRadius());
 	}
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		if (isEnhanced()) {
-			mCosmetic.flameTotemTickEnhanced(mPlayer, standLocation, mRadius);
-		} else {
-			mCosmetic.flameTotemTick(mPlayer, standLocation, mRadius);
+		if (EntityUtils.playerCantSeeBodyOrEyes(mPlayer, stand)) {
+			// player cannot see the flame totem, don't tick
+			mConsecutiveDamageMap.clear();
+			return;
 		}
+
 		if (ticks % mInterval == 0) {
 			pulse(standLocation, stats, false);
-			dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), 40);
+		}
+
+		if (isEnhanced()) {
+			mCosmetic.flameTotemTickEnhanced(mPlayer, standLocation, getTotemRadius());
+		} else {
+			mCosmetic.flameTotemTick(mPlayer, standLocation, getTotemRadius());
 		}
 	}
 
 	@Override
-	public void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean bonusAction) {
-		List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null);
-		double damageApplied = (mDamage + mDecayedTotemBuff)
-			* (bonusAction ? (ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_NEGATIVE_TOTEM_EFFICIENCY)) : 1);
-		Collections.shuffle(affectedMobs);
-		List<LivingEntity> impactedMobs = new ArrayList<>();
-		List<LivingEntity> targetMobs = new ArrayList<>();
-		if (!affectedMobs.isEmpty()) {
-			for (int i = 0; i < mBombCount; i++) {
-				LivingEntity finalTarget = null;
-				for (LivingEntity target : affectedMobs) {
-					if (!impactedMobs.contains(target)) {
-						finalTarget = target;
-						break;
-					}
-				}
-				if (finalTarget == null) {
-					// No target that hasn't been hit yet, so just pick a random one to bomb
-					finalTarget = affectedMobs.get(0);
-				}
-				targetMobs.add(finalTarget);
-				Location targetLocation = finalTarget.getLocation();
+	public void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean chainLightning) {
+		mCosmetic.flameTotemPulse(mPlayer, standLocation, getTotemRadius());
 
-				List<LivingEntity> newImpactedMobs = EntityUtils.getNearbyMobsInSphere(targetLocation, mBombRadius, null);
-				for (LivingEntity mob : newImpactedMobs) {
-					DamageUtils.damage(mPlayer, mob,
-						new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats),
-						damageApplied, true, false, false);
-					EntityUtils.applyFire(mPlugin, mFireDuration, mob, mPlayer,
-						stats, mEnhanceInfernoScale);
-					impactedMobs.add(mob);
-				}
+		double chainLightningMultiplier = chainLightning ? (ChainLightning.ENHANCE_OFFENSIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_OFFENSIVE_TOTEM_EFFICIENCY)) : 1;
+		double damage = (mDamage + mDecayedTotemBuff + mCurrentBonusFlatDamage) * mSpiritualismMultiplier * chainLightningMultiplier;
+
+		List<LivingEntity> affectedMobs = new Hitbox.SphereHitbox(standLocation, getTotemRadius()).getHitMobs();
+		affectedMobs.removeIf(e -> EntityUtils.playerCantSeeBodyOrEyes(mPlayer, e));
+
+		boolean isFinalPulse = !chainLightning && getRemainingAbilityDuration() < mInterval;
+
+		for (LivingEntity mob : affectedMobs) {
+			double mobDamage = damage;
+			if (mConsecutiveDamageMap.containsKey(mob) && !chainLightning) {
+				mobDamage *= 1 + mConsecutiveDamageMap.get(mob);
 			}
-			if (isEnhanced()) {
-				mCosmetic.flameTotemBombEnhanced(mPlayer, targetMobs, standLocation, mPlugin, mBombRadius);
-			} else {
-				mCosmetic.flameTotemBomb(mPlayer, targetMobs, standLocation, mPlugin, mBombRadius);
+			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC,
+				mInfo.getLinkedSpell(), stats), mobDamage, true, false, false);
+			if (isFinalPulse && isEnhanced()) {
+				EntityUtils.applyFire(mPlugin, IGNITION_DURATION, mob, mPlayer, true);
 			}
+			mCosmetic.flameTotemBomb(mPlayer, mob, standLocation, mPlugin, 0.3);
 		}
+
+		if (isLevelOne() || chainLightning) {
+			return;
+		}
+
+		mConsecutiveDamageMap.keySet().removeIf(mob -> !affectedMobs.contains(mob));
+		affectedMobs.forEach(mob -> mConsecutiveDamageMap.merge(mob, mStackingDamageAmplifier, Double::sum));
 	}
 
 	@Override
@@ -155,42 +164,66 @@ public class FlameTotem extends TotemAbility {
 		mCosmetic.flameTotemExpire(world, mPlayer, standLocation);
 	}
 
+	@Override
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		// Handle enhancement damage boost
+		if (isEnhanced() && mTotem != null && event.getType() == DamageEvent.DamageType.MAGIC && !TOTEM_ABILITY_LIST.contains(event.getAbility())) {
+			if (new Hitbox.SphereHitbox(mTotem.getLocation(), getTotemRadius()).getHitMobs().contains(enemy)) {
+				event.updateDamageWithMultiplier(1 + mEnhanceDamageAmplifier);
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean abilityCastEvent(AbilityCastEvent event) {
+		if (mTotem != null && mTotem.getLocation().distance(mPlayer.getLocation()) <= getTotemRadius()) {
+			if (mCurrentBonusFlatDamage < mBonusDamageFlat * ABILITY_LIMIT) {
+				mCurrentBonusFlatDamage += mBonusDamageFlat;
+			}
+		}
+		return true;
+	}
+
 	private static Description<FlameTotem> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.addTrigger()
-			.add(" to fire a projectile that summons a Flame Totem. The totem throws an explosive fireball at a mob within ")
-			.add(a -> a.mRadius, AOE_RANGE_1, false, Ability::isLevelOne)
-			.add(" blocks every second. The fireball deals ")
+			.add(" to fire a projectile that summons a Flame Totem with a ")
+			.add(TotemAbility::getTotemRadius, AOE_RANGE_1, false, Ability::isLevelOne)
+			.add(" block radius. Every ")
+			.addDuration(a -> a.mInterval, INTERVAL, true)
+			.add(" seconds, so long as it is within your line of sight, the totem pulses with flames that do ")
 			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" damage to mobs within ")
-			.add(a -> a.mBombRadius, BOMB_RADIUS)
-			.add(" blocks and sets them on fire, without inferno damage, for ")
-			.addDuration(a -> a.mFireDuration, FIRE_DURATION)
-			.add(" seconds. Charge up time: ")
-			.addDuration(PULSE_DELAY)
-			.add("s. Duration: ")
-			.addDuration(a -> a.mDuration, DURATION_1, false, Ability::isLevelOne)
+			.add(" magic damage to mobs also within your line of sight. Non-totem spells cast within the radius increase your Flame Totem damage by ")
+			.add(a -> a.mBonusDamageFlat, ABILITY_FLAT_DMG_ADDITION)
+			.add(" until it expires, limited up to ")
+			.add(a -> a.mAbilityLimit, ABILITY_LIMIT, false, Predicate.not(Ability::isEnhanced))
+			.add(" times. Duration: ")
+			.addDuration(a -> a.mDuration, DURATION, false, Ability::isLevelOne)
 			.add("s.")
 			.addCooldown(COOLDOWN);
 	}
 
 	private static Description<FlameTotem> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
+			.add("Radius increased to ")
+			.add(TotemAbility::getTotemRadius, AOE_RANGE_2, false, Ability::isLevelTwo)
+			.add(" blocks, and the damage is increased to ")
 			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(". Radius is increased to ")
-			.add(a -> a.mRadius, AOE_RANGE_2, false, Ability::isLevelTwo)
-			.add(". Duration is incrased to ")
-			.addDuration(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
-			.add(" seconds.");
+			.add(". Mobs take ")
+			.addPercent(a -> a.mStackingDamageAmplifier, STACKING_DAMAGE)
+			.add(" extra damage from your Flame Totem with each consecutive pulse of damage taken.");
 	}
 
 	private static Description<FlameTotem> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Now throws ")
-			.add(a -> ENHANCE_BOMB_BONUS, ENHANCE_BOMB_BONUS)
-			.add(" extra fireball each second and applies inferno at ")
-			.addPercent(a -> a.mEnhanceInfernoScale, ENHANCE_INFERNO_SCALE)
-			.add(" efficiency.");
+			.add("The bonus damage from non-totem abilities can now be gained up to ")
+			.add(a -> a.mAbilityLimit, ABILITY_LIMIT_ENHANCE, false, Ability::isEnhanced)
+			.add(" times. Mobs within the Flame Totem's radius take ")
+			.addPercent(a -> a.mEnhanceDamageAmplifier, ENHANCE_DAMAGE_BOOST)
+			.add(" more magic damage from your non-totem spells. The final pulse of your Flame Totem now also ignites mobs for ")
+			.addDuration(IGNITION_DURATION)
+			.add(" seconds.");
 	}
 }

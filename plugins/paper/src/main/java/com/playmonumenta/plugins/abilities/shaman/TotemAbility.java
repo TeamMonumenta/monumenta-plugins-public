@@ -4,16 +4,17 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.Sanctuary;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.TotemicProjectionCS;
+import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.TotemicConsecrationCS;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -21,7 +22,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -35,22 +35,26 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class TotemAbility extends Ability implements AbilityWithDuration {
-
-	protected static final int PULSE_DELAY = 20;
-	private static final double VELOCITY = 1.25;
-	private static final double TIME_TO_DROP = 75;
-	private static final double XZ_DISTANCE_TO_DROP = 14;
+	public static final double VELOCITY = 1.25;
+	public static final double TIME_TO_DROP = 75;
+	public static final double XZ_DISTANCE_TO_DROP = 14;
 
 	private final Map<ThrowableProjectile, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
+	protected @Nullable LivingEntity mTotem = null;
+	private double mRadius;
 	private final String mProjectileName;
 	private final String mTotemName;
 	public final String mDisplayName;
 	public double mWhirlwindBuffPercent = 0;
 	public boolean mDecayedBuffed = false;
 	public int mDuration;
-	public int mChargeUpTicks = PULSE_DELAY;
-	public boolean mIsCharging = true;
+	public boolean mIsInFlight = false;
 	private final TotemicProjectionCS mCosmetic;
+
+	public double mSpiritualismMultiplier = 1;
+	public boolean mIsBlessed = false;
+	public double mTotemRadiusMultiplier = 1;
+	private @Nullable TotemicConsecrationCS consecrationCosmetic;
 
 	private @Nullable BukkitRunnable mTotemTickingRunnable;
 
@@ -64,12 +68,11 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 	public boolean cast() {
 		if (isOnCooldown()) {
-			return false;
+			return attemptProjectionRecast();
 		}
 		if (mTotemTickingRunnable != null) {
 			mTotemTickingRunnable.cancel();
 		}
-		mIsCharging = mChargeUpTicks > 0;
 
 		World world = mPlayer.getWorld();
 		ThrowableProjectile proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, mProjectileName, null, LocationUtils.isLocationInWater(mPlayer.getLocation()));
@@ -79,11 +82,11 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 		mProjectiles.put(proj, playerItemStats);
 		putOnCooldown();
-		onTotemCast();
 
 		int cd = getModifiedCooldown();
 		// Clear out list just in case
 		mProjectiles.keySet().removeIf(p -> p.isDead() || !p.isValid() || p.getTicksLived() >= 100);
+		mIsInFlight = true;
 		new BukkitRunnable() {
 			int mT = 0;
 			final Location mPlayerLocation = mPlayer.getLocation();
@@ -91,6 +94,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 			@Override
 			public void run() {
 				if (mProjectiles.get(proj) != playerItemStats) {
+					mIsInFlight = false;
 					this.cancel();
 				}
 
@@ -103,6 +107,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 
 				if (mT > cd) {
+					mIsInFlight = false;
 					proj.remove();
 					this.cancel();
 				}
@@ -111,6 +116,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 					if (mProjectiles.remove(proj) != null) {
 						placeTotem(proj.getLocation(), playerItemStats);
 					}
+					mIsInFlight = false;
 					this.cancel();
 				}
 				mT++;
@@ -120,16 +126,23 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		return true;
 	}
 
+	private boolean attemptProjectionRecast() {
+		TotemicProjection projection = mPlugin.mAbilityManager.getPlayerAbility(mPlayer, TotemicProjection.class);
+		if (projection != null && projection.getCharges() > 0 && !mIsInFlight && this.isOnCooldown() && this.getRemainingAbilityDuration() > 20) {
+			return projection.cast();
+		}
+		return false;
+	}
+
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if ((proj instanceof Snowball || proj instanceof Trident) && proj.getTicksLived() <= 160) {
+		if ((proj instanceof Snowball || proj instanceof Trident)
+			&& proj.getTicksLived() <= 160 && mProjectiles.containsKey(proj)) {
 			ItemStatManager.PlayerItemStats stats = mProjectiles.remove(proj);
 			if (!mPlayer.getWorld().equals(proj.getWorld()) || mPlayer.getLocation().distance(proj.getLocation()) >= 50) {
 				return;
 			}
 			if (stats != null) {
-				Entity hitMob = event.getHitEntity();
-				onTotemHitEntity(hitMob);
 				placeTotem(proj.getLocation(), stats);
 			}
 			proj.remove();
@@ -154,7 +167,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 		placeTotem(bLoc, mPlayer, stand);
 
-		TotemicEmpowerment.addTotem(mPlayer, stand);
+		ShamanPassiveManager.addTotem(mPlayer, stand, this);
 
 		ArmorStand durationStand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, "TotemDurationStand");
 		if (durationStand != null) {
@@ -177,20 +190,16 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 					return;
 				}
 
-				if (mT - mChargeUpTicks >= 0 && mIsCharging) {
-					mIsCharging = false;
-					mT = 0;
-				}
-				if (!mIsCharging) {
-					onTotemTick(mT, stand, world, standLocation, stats);
+				onTotemTick(mT, stand, world, standLocation, stats);
+				if (mIsBlessed) {
+					if (consecrationCosmetic == null) {
+						consecrationCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new TotemicConsecrationCS());
+					}
+					consecrationCosmetic.blessedTotemTick(mPlayer, standLocation, getTotemRadius());
 				}
 
 				if (durationStand != null) {
-					if (mIsCharging) {
-						AbilityUtils.produceChargeUpString(stand, durationStand, mChargeUpTicks, mDuration);
-					} else {
-						AbilityUtils.produceDurationString(stand, durationStand, mDuration, mT, mWhirlwindBuffPercent, mDecayedBuffed);
-					}
+					AbilityUtils.produceDurationString(stand, durationStand, mDuration, mT, mWhirlwindBuffPercent, mDecayedBuffed);
 				}
 
 				if (((mWhirlwindBuffPercent != 0 && mT >= mDuration * mWhirlwindBuffPercent) || (mWhirlwindBuffPercent == 0 && mT >= mDuration))
@@ -215,49 +224,36 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 				}
 				mDecayedBuffed = false;
 				mWhirlwindBuffPercent = 0;
-				TotemicEmpowerment.removeTotem(mPlayer, stand);
+				ShamanPassiveManager.removeTotem(mPlayer, stand);
+				mTotem = null;
 				mCurrDuration = -1;
+				mIsBlessed = false;
+				setTotemRadiusMultiplier(1);
 				ClientModHandler.updateAbility(mPlayer, TotemAbility.this);
 				super.cancel();
 			}
 		};
 		mTotemTickingRunnable.runTaskTimer(mPlugin, 0, 1);
+		mTotem = stand;
 	}
 
 	public abstract void placeTotem(Location loc, Player player, ArmorStand stand);
 
 	@Override
 	public int getInitialAbilityDuration() {
-		return mDuration + mChargeUpTicks;
+		return mDuration;
 	}
 
 	@Override
 	public int getRemainingAbilityDuration() {
-		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() + (int) (mWhirlwindBuffPercent * mDuration)  - this.mCurrDuration : 0;
 	}
 
 	public abstract void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats);
 
 	public abstract void onTotemExpire(World world, Location standLocation);
 
-	public void onTotemHitEntity(Entity entity) {
-
-	}
-
-	public void onTotemCast() {
-
-	}
-
-	public void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean bonusAction) {
-
-	}
-
-	public void dealSanctuaryImpacts(List<LivingEntity> targets, int ticks) {
-		Sanctuary sanctuary = AbilityManager.getManager().getPlayerAbility(mPlayer, Sanctuary.class);
-		if (sanctuary != null) {
-			sanctuary.dealSanctuaryDebuffs(targets, ticks);
-		}
-	}
+	public abstract void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean chainLightning);
 
 	@Override
 	public void invalidate() {
@@ -265,5 +261,31 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 			mTotemTickingRunnable.cancel();
 		}
 		super.invalidate();
+	}
+
+	public void setRadius(double radius) {
+		mRadius = radius;
+	}
+
+	public double getTotemRadius() {
+		return mRadius * mTotemRadiusMultiplier;
+	}
+
+	public void setTotemRadiusMultiplier(double multiplier) {
+		mTotemRadiusMultiplier = multiplier;
+	}
+
+	public @Nullable Location getTotemLocation() {
+		if (mTotem == null) {
+			return null;
+		}
+		return mTotem.getLocation();
+	}
+
+	public List<Player> getPlayersInRange() {
+		if (mTotem == null) {
+			return new ArrayList<>();
+		}
+		return new Hitbox.SphereHitbox(mTotem.getLocation(), getTotemRadius()).getHitPlayers(true);
 	}
 }

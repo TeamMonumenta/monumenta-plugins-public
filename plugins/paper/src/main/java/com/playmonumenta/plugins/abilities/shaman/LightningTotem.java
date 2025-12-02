@@ -13,50 +13,71 @@ import com.playmonumenta.plugins.cosmetics.skills.shaman.LightningTotemCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.itemstats.enchantments.Chaotic;
+import com.playmonumenta.plugins.itemstats.enchantments.Duelist;
+import com.playmonumenta.plugins.itemstats.enchantments.HexEater;
+import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
+import com.playmonumenta.plugins.itemstats.enchantments.Slayer;
+import com.playmonumenta.plugins.itemstats.enchantments.Smite;
+import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LightningTotem extends TotemAbility {
+	private static final int INTERVAL = 50;
+	private static final int COOLDOWN = 26 * 20;
+	private static final int TOTEM_DURATION = 16 * 20;
+	private static final int AOE_RANGE_1 = 7;
+	private static final int AOE_RANGE_2 = 9;
+	private static final double DAMAGE_1_P = 0.35;
+	private static final double DAMAGE_2_P = 0.45;
+	private static final double DAMAGE_ELITE_2_P = 0.55;
+	private static final double DAMAGE_1_M = 0.5;
+	private static final double DAMAGE_2_M = 0.65;
+	private static final double DAMAGE_ELITE_2_M = 0.8;
+	private static final double DAMAGE_FLAT_1 = 2;
+	private static final double DAMAGE_FLAT_2 = 3;
+	private static final int SHOCK_DURATION = 15; // 15 ticks = 0.75s
+	private static final double STORM_DAMAGE = 4;
+	private static final double STORM_DAMAGE_RADIUS = 2.5;
+	private static final int STORM_DURATION = 4 * 20;
+	private static final int STORM_INTERVAL = 20;
 
-	private static final int COOLDOWN = 22 * 20;
-	private static final int TOTEM_DURATION = 10 * 20;
-	private static final int INTERVAL = 2 * 20;
-	private static final int AOE_RANGE = 7;
-	private static final int DAMAGE_1 = 14;
-	private static final int DAMAGE_2 = 21;
-	private static final double STORM_DAMAGE_PERCENT = 0.35;
-	private static final int STORM_DAMAGE_RADIUS = 2;
-	private static final int STORM_DURATION = 7 * 20;
-	private static final int STORM_INTERVAL = 2 * 20;
-	public static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.25f);
-	public static final Particle.DustOptions DUST_GRAY_LARGE = new Particle.DustOptions(Color.fromRGB(51, 51, 51), 2);
-
+	public static final String CHARM_PULSE_DELAY = "Lightning Totem Pulse Delay";
 	public static final String CHARM_DURATION = "Lightning Totem Duration";
 	public static final String CHARM_RADIUS = "Lightning Totem Radius";
 	public static final String CHARM_COOLDOWN = "Lightning Totem Cooldown";
-	public static final String CHARM_DAMAGE = "Lightning Totem Damage";
+	public static final String CHARM_DAMAGE = "Lightning Totem Damage Multiplier";
+	public static final String CHARM_DAMAGE_P = "Lightning Totem Projectile Damage Multiplier";
+	public static final String CHARM_ELITE_DAMAGE_P = "Lightning Totem Elite Projectile Damage Multiplier";
+	public static final String CHARM_DAMAGE_M = "Lightning Totem Melee Damage Multiplier";
+	public static final String CHARM_ELITE_DAMAGE_M = "Lightning Totem Elite Melee Damage Multiplier";
+	public static final String CHARM_ADDITIONAL_DAMAGE = "Lightning Totem Additional Damage";
+	public static final String CHARM_SHOCK_DURATION = "Lightning Totem Shocked Duration";
 	public static final String CHARM_STORM_DAMAGE = "Lightning Totem Lightning Storm Damage";
 	public static final String CHARM_STORM_RADIUS = "Lightning Totem Lightning Storm Radius";
 	public static final String CHARM_STORM_DURATION = "Lightning Totem Lightning Storm Duration";
-	public static final String CHARM_PULSE_DELAY = "Lightning Totem Pulse Delay";
 	public static final String CHARM_STORM_PULSE_DELAY = "Lightning Totem Lightning Storm Pulse Delay";
 
 	public static final AbilityInfo<LightningTotem> INFO =
@@ -65,89 +86,163 @@ public class LightningTotem extends TotemAbility {
 			.scoreboardId("LightningTotem")
 			.shorthandName("LT")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Summon a totem which will strike a mob within range for high damage throughout its duration.")
+			.simpleDescription("Summon a totem that deals damage with your hits and shocks mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", LightningTotem::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", LightningTotem::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+			.addAltPresetTrigger(new AbilityTriggerInfo<>("cast", "cast", LightningTotem::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
 			.displayItem(Material.YELLOW_WOOL);
 
-	private final double mDamage;
-	private final double mRadius;
-	private @Nullable LivingEntity mTarget = null;
-	public double mDecayedTotemBuff = 0;
-	private final double mStormDamagePercent;
+	private final int mInterval;
+	private final double mLightningTotemDamageMultiplier;
+	private final double mDamagePercentProj;
+	private final double mEliteDamagePercentProj;
+	private final double mDamagePercentMelee;
+	private final double mEliteDamagePercentMelee;
+	private final double mDamageFlat;
+	private final int mShockDuration;
+	private final double mStormDamage;
 	private final double mStormRadius;
 	private final int mStormDuration;
-	private final List<Location> mAllLocs = new ArrayList<>();
-	private final int mInterval;
 	private final int mStormInterval;
-	private final List<BukkitTask> mStormTasks = new ArrayList<>();
 	private final LightningTotemCS mCosmetic;
+
+	private final List<Location> mAllLocs = new ArrayList<>();
+	private final List<BukkitTask> mStormTasks = new ArrayList<>();
+	public double mDecayedTotemBuff = 0;
 
 	public LightningTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Lightning Totem Projectile", "LightningTotem", "Lightning Totem");
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+
+		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
+		mDamagePercentProj = (isLevelOne() ? DAMAGE_1_P : DAMAGE_2_P) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_P);
+		mEliteDamagePercentProj = DAMAGE_ELITE_2_P + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ELITE_DAMAGE_P);
+		mDamagePercentMelee = (isLevelOne() ? DAMAGE_1_M : DAMAGE_2_M) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_M);
+		mEliteDamagePercentMelee = DAMAGE_ELITE_2_M + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ELITE_DAMAGE_M);
+		mDamageFlat = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ADDITIONAL_DAMAGE, isLevelOne() ? DAMAGE_FLAT_1 : DAMAGE_FLAT_2);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TOTEM_DURATION);
-		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
-		mStormDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_STORM_DAMAGE, STORM_DAMAGE_PERCENT);
+		setRadius(CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelOne() ? AOE_RANGE_1 : AOE_RANGE_2));
+		mShockDuration = CharmManager.getDuration(mPlayer, CHARM_SHOCK_DURATION, SHOCK_DURATION);
+		mStormDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_STORM_DAMAGE, STORM_DAMAGE);
 		mStormRadius = CharmManager.getRadius(mPlayer, CHARM_STORM_RADIUS, STORM_DAMAGE_RADIUS);
 		mStormDuration = CharmManager.getDuration(mPlayer, CHARM_STORM_DURATION, STORM_DURATION);
-		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, INTERVAL);
 		mStormInterval = CharmManager.getDuration(mPlayer, CHARM_STORM_PULSE_DELAY, STORM_INTERVAL);
+		mLightningTotemDamageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, 1);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new LightningTotemCS());
 	}
 
 	@Override
 	public void placeTotem(Location standLocation, Player player, ArmorStand stand) {
-		mCosmetic.lightningTotemSpawn(standLocation, player, stand, mRadius);
+		mCosmetic.lightningTotemSpawn(standLocation, player, stand, getTotemRadius());
 	}
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		mCosmetic.lightningTotemTick(mPlayer, mRadius, standLocation, stand);
-		mStormTasks.removeIf(BukkitTask::isCancelled);
 		if (ticks % mInterval == 0) {
 			pulse(standLocation, stats, false);
+		}
+
+		mCosmetic.lightningTotemTick(mPlayer, getTotemRadius(), standLocation, stand);
+		mStormTasks.removeIf(BukkitTask::isCancelled);
+	}
+
+	@Override
+	public void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean chainLightning) {
+		mCosmetic.lightningTotemPulse(mPlayer, standLocation, getTotemRadius());
+
+		List<LivingEntity> affectedMobs = new Hitbox.SphereHitbox(standLocation, getTotemRadius()).getHitMobs();
+		affectedMobs.removeIf(mob -> EntityUtils.isBoss(mob) || EntityUtils.isElite(mob) || EntityUtils.isCCImmuneMob(mob));
+
+		double slowAmount = chainLightning ? ChainLightning.ENHANCE_OFFENSIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_OFFENSIVE_TOTEM_EFFICIENCY) : 1;
+		slowAmount = Math.max(Math.min(slowAmount, 1), 0); // Ensures the slow amount is between 0 and 1 inclusive
+
+		for (LivingEntity mob : affectedMobs) {
+			EntityUtils.applySlow(mPlugin, mShockDuration, slowAmount, mob); // brief 100% slow effect
+			mCosmetic.lightningTotemShock(mPlayer, mob);
 		}
 	}
 
 	@Override
-	public void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean bonusAction) {
-		if (mTarget == null || mTarget.isDead() || !mTarget.isValid() || mTarget.getLocation().distance(standLocation) > mRadius) {
-			mTarget = null;
-			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null);
-			affectedMobs.removeIf(mob -> ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG));
-			affectedMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC));
-			if (!affectedMobs.isEmpty()) {
-				Collections.shuffle(affectedMobs);
-				for (LivingEntity mob : affectedMobs) {
-					if (mTarget == null) {
-						mTarget = mob;
-					}
-					if (EntityUtils.isBoss(mob) || EntityUtils.isElite(mob)) {
-						mTarget = mob;
-						break;
-					}
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (mTotem != null && mTotem.isValid()) {
+			// Check if this is a critical strike
+			double damage = 0;
+			boolean meleeActivated = true;
+
+			// Check for arrow critical
+			if (event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
+				if (!MetadataUtils.checkOnceInRecentTicks(mPlugin, enemy, "LightningTotemHit", 5)) {
+					return false;
+				}
+
+				ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(projectile);
+				if (playerItemStats == null) {
+					return false;
+				}
+				ItemStatManager.PlayerItemStats.ItemStatsMap itemStatsMap = playerItemStats.getItemStats();
+
+				double projDamageAdd = itemStatsMap.get(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
+				projDamageAdd += Sniper.apply(mPlayer, enemy, itemStatsMap.get(EnchantmentType.SNIPER));
+				projDamageAdd += PointBlank.apply(mPlayer, enemy, itemStatsMap.get(EnchantmentType.POINT_BLANK));
+				projDamageAdd += HexEater.calculateHexDamage(mPlugin, true, mPlayer, (int) itemStatsMap.get(EnchantmentType.HEX_EATER), enemy);
+				projDamageAdd += Smite.calculateSmiteDamage(true, mPlayer, (int) itemStatsMap.get(EnchantmentType.SMITE), enemy);
+				projDamageAdd += Slayer.calculateSlayerDamage(true, mPlayer, (int) itemStatsMap.get(EnchantmentType.SLAYER), enemy);
+				projDamageAdd += Duelist.calculateDuelistDamage(true, mPlayer, (int) itemStatsMap.get(EnchantmentType.DUELIST), enemy);
+				projDamageAdd += Chaotic.calculateChaoticDamage(true, mPlayer, (int) itemStatsMap.get(EnchantmentType.CHAOTIC), enemy);
+
+				boolean useEliteDamage = isLevelTwo() && (EntityUtils.isElite(enemy) || EntityUtils.isBoss(enemy) || EntityUtils.getMaxHealth(enemy) == enemy.getHealth());
+				damage = (useEliteDamage ? mEliteDamagePercentProj : mDamagePercentProj) * projDamageAdd;
+				meleeActivated = false;
+			}
+			// Check for melee (fully charged)
+			else if (event.getType() == DamageEvent.DamageType.MELEE && mPlayer.getCooledAttackStrength(0) > 0.9) {
+				if (!MetadataUtils.checkOnceInRecentTicks(mPlugin, enemy, "LightningTotemHit", 5)) {
+					return false;
+				}
+
+				final ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
+
+				double attackDamageAdd = ItemStatUtils.getAttributeAmount(inMainHand, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) + 1;
+				attackDamageAdd += HexEater.calculateHexDamage(mPlugin, true, mPlayer, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.HEX_EATER), enemy);
+				attackDamageAdd += Smite.calculateSmiteDamage(false, mPlayer, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.SMITE), enemy);
+				attackDamageAdd += Slayer.calculateSlayerDamage(false, mPlayer, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.SLAYER), enemy);
+				attackDamageAdd += Duelist.calculateDuelistDamage(false, mPlayer, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.DUELIST), enemy);
+				attackDamageAdd += Chaotic.calculateChaoticDamage(false, mPlayer, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.CHAOTIC), enemy);
+
+				boolean useEliteDamage = isLevelTwo() && (EntityUtils.isElite(enemy) || EntityUtils.isBoss(enemy) || EntityUtils.getMaxHealth(enemy) == enemy.getHealth());
+				damage = (useEliteDamage ? mEliteDamagePercentMelee : mDamagePercentMelee) * attackDamageAdd;
+			}
+
+			if (damage > 0) {
+				damage += mDamageFlat;
+				damage *= mLightningTotemDamageMultiplier;
+				damage += mDecayedTotemBuff;
+				damage *= mSpiritualismMultiplier;
+
+				// Check if either player or mob is in totem radius
+				Location totemLocation = mTotem.getLocation();
+				if (enemy.getLocation().distance(totemLocation) <= getTotemRadius()) {
+					triggerLightningStrike(enemy, totemLocation, damage, meleeActivated);
 				}
 			}
 		}
-		double damageApplied = (mDamage + mDecayedTotemBuff)
-			* (bonusAction ? (ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_NEGATIVE_TOTEM_EFFICIENCY)) : 1);
-		if (mTarget != null) {
-			DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC,
-				mInfo.getLinkedSpell(), stats), damageApplied, true, false, false);
-			mCosmetic.lightningTotemStrike(mPlayer, standLocation, mTarget);
-		}
-		dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), INTERVAL + 20);
+
+		return false;
+	}
+
+	private void triggerLightningStrike(LivingEntity target, Location totemLocation, double damage, boolean meleeActivated) {
+		// Visual effects
+		mCosmetic.lightningTotemStrike(mPlayer, totemLocation, target, meleeActivated);
+
+		// Apply damage
+		DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);
 	}
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		Location targetLoc = mTarget != null ? mTarget.getLocation() : null;
-		if (isEnhanced()
-			&& targetLoc != null
-			&& event.getEntity().equals(mTarget)) {
+		if (isEnhanced() && mTotem != null && mTotem.isValid()) {
+			Location targetLoc = event.getEntity().getLocation();
 			List<Location> locsWithinKill = new ArrayList<>(mAllLocs);
 			locsWithinKill.removeIf(loc -> loc.distance(targetLoc) > mStormRadius);
 			if (locsWithinKill.isEmpty()) {
@@ -164,10 +259,10 @@ public class LightningTotem extends TotemAbility {
 
 						if (mTicks % mStormInterval == 0) {
 							mCosmetic.lightningTotemEnhancementStrike(mPlayer, mLoc, mStormRadius);
-							for (LivingEntity entity : EntityUtils.getNearbyMobsInSphere(mLoc, mStormRadius, mTarget)) {
+							for (LivingEntity entity : EntityUtils.getNearbyMobsInSphere(mLoc, mStormRadius, null)) {
 								DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(
 										DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), mStats),
-									(mDamage + mDecayedTotemBuff) * mStormDamagePercent, true, false, false);
+									mStormDamage, true, false, false);
 							}
 						}
 						if (mTicks++ > mStormDuration) {
@@ -181,33 +276,27 @@ public class LightningTotem extends TotemAbility {
 
 	@Override
 	public void onTotemExpire(World world, Location standLocation) {
-		mCosmetic.lightningTotemExpire(mPlayer, standLocation, world);
-		mTarget = null;
 		mDecayedTotemBuff = 0;
-		mWhirlwindBuffPercent = 0;
+		mCosmetic.lightningTotemExpire(mPlayer, standLocation, world);
 		mAllLocs.clear();
-	}
-
-	@Override
-	public void onTotemHitEntity(Entity entity) {
-		if (entity instanceof LivingEntity target
-			&& EntityUtils.isHostileMob(target)) {
-			mTarget = target;
-		}
 	}
 
 	private static Description<LightningTotem> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.addTrigger()
-			.add(" to fire a projectile that summons a Lightning Totem. The totem will target a mob within ")
-			.add(a -> a.mRadius, AOE_RANGE)
-			.add(" blocks with priority towards Boss and Elite mobs and deal ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage every ")
+			.add(" to fire a projectile that summons a Lightning Totem. Every ")
 			.addDuration(a -> a.mInterval, INTERVAL, true)
-			.add(" seconds. Charge up time: ")
-			.addDuration(PULSE_DELAY)
-			.add("s. Duration: ")
+			.add(" seconds, all non-Elite/Boss mobs within ")
+			.add(TotemAbility::getTotemRadius, AOE_RANGE_1, false, Ability::isLevelOne)
+			.add(" blocks are Shocked, rooting them for ")
+			.addDuration(a -> a.mShockDuration, SHOCK_DURATION)
+			.add(" seconds. Additionally, fully charged [Melee / Projectile] strikes bring down lightning, doing ")
+			.add(a -> a.mDamageFlat, DAMAGE_FLAT_1, false, Ability::isLevelOne)
+			.add(" + [")
+			.addPercent(a -> a.mDamagePercentMelee, DAMAGE_1_M, false, Ability::isLevelOne)
+			.add(" / ")
+			.addPercent(a -> a.mDamagePercentProj, DAMAGE_1_P, false, Ability::isLevelOne)
+			.add("] of your base weapon damage as magic damage. Duration: ")
 			.addDuration(a -> a.mDuration, TOTEM_DURATION)
 			.add("s.")
 			.addCooldown(COOLDOWN);
@@ -215,20 +304,32 @@ public class LightningTotem extends TotemAbility {
 
 	private static Description<LightningTotem> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(".");
+			.add("The totem's range is increased to ")
+			.add(TotemAbility::getTotemRadius, AOE_RANGE_2, false, Ability::isLevelTwo)
+			.add(" blocks, and the damage is increased to ")
+			.add(a -> a.mDamageFlat, DAMAGE_FLAT_2, false, Ability::isLevelTwo)
+			.add(" + [")
+			.addPercent(a -> a.mDamagePercentMelee, DAMAGE_2_M, false, Ability::isLevelTwo)
+			.add(" / ")
+			.addPercent(a -> a.mDamagePercentProj, DAMAGE_2_P, false, Ability::isLevelTwo)
+			.add("] of your base weapon damage, or ")
+			.add(a -> a.mDamageFlat, DAMAGE_FLAT_2, false, Ability::isLevelTwo)
+			.add(" + [")
+			.addPercent(a -> a.mEliteDamagePercentMelee, DAMAGE_ELITE_2_M, false, Ability::isLevelTwo)
+			.add(" / ")
+			.addPercent(a -> a.mEliteDamagePercentProj, DAMAGE_ELITE_2_P, false, Ability::isLevelTwo)
+			.add("] instead against elites, bosses, and full health mobs.");
 	}
 
 	private static Description<LightningTotem> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("When this ability kills a mob, it spawns a lightning storm at the mob's location (unless the mob is already in an existing storm). The lightning storm deals ")
-			.addPercent(a -> a.mStormDamagePercent, STORM_DAMAGE_PERCENT)
-			.add(" of the main magic damage to all mobs within ")
+			.add("When a mob dies within range of your Lightning Totem, it spawns a lightning storm at the mob's location (unless the mob is already in an existing storm). The lightning storm deals ")
+			.add(a -> a.mStormDamage, STORM_DAMAGE)
+			.add(" magic damage to all mobs within ")
 			.add(a -> a.mStormRadius, STORM_DAMAGE_RADIUS)
 			.add(" blocks of the center every ")
-			.addDuration(a -> a.mStormInterval, STORM_INTERVAL)
-			.add(" seconds for ")
+			.addDuration(a -> a.mStormInterval, STORM_INTERVAL, true)
+			.add(" second for ")
 			.addDuration(a -> a.mStormDuration, STORM_DURATION)
 			.add(" seconds.");
 	}

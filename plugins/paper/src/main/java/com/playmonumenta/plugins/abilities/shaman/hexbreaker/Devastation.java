@@ -7,35 +7,59 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
+import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
+import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
 import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
-import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.ShamanPassiveManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.DevastationCS;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import java.util.Comparator;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class Devastation extends Ability {
-	public static final int COOLDOWN = 15 * 20;
-	public static final int RADIUS_1 = 6;
-	public static final int RADIUS_2 = 8;
-	public static final int DAMAGE_1 = 23;
-	public static final int DAMAGE_2 = 28;
-	public static final int CDR_ON_KILL = 3 * 20;
+	private static final int COOLDOWN = 15 * 20;
+	private static final int RADIUS_1 = 6;
+	private static final int RADIUS_2 = 8;
+	private static final int DAMAGE_1 = 28;
+	private static final int DAMAGE_2 = 36;
+	private static final int CDR_ON_KILL = 3 * 20;
+	private static final int FIRE_STRENGTH_DURATION = 6 * 20;
+	private static final double FIRE_STRENGTH = 0.15;
+	private static final int LIGHTNING_DAMAGE = 8;
+	private static final int LIGHTNING_STUN_DURATION = 30;
+	private static final int CLEANSE_DURATION = 10 * 20;
+	private static final double CLEANSE_WEAKEN = 0.3;
+	private static final double DECAY_DAMAGE = 6;
+	private static final float KNOCKBACK = 0.5f;
+	private static final String STRENGTH_SOURCE = "Devastation Strength";
 
 	public static final String CHARM_DAMAGE = "Devastation Damage";
 	public static final String CHARM_RADIUS = "Devastation Radius";
 	public static final String CHARM_COOLDOWN = "Devastation Cooldown";
 	public static final String CHARM_CDR = "Devastation Cooldown Reduction";
+	public static final String CHARM_FIRE_STRENGTH_DURATION = "Devastation Flame Totem Strength Duration";
+	public static final String CHARM_FIRE_STRENGTH = "Devastation Flame Totem Strength Amplifier";
+	public static final String CHARM_LIGHTNING_DAMAGE = "Devastation Lightning Totem Damage";
+	public static final String CHARM_LIGHTNING_STUN = "Devastation Lightning Totem Stun Duration";
+	public static final String CHARM_CLEANSE_DURATION = "Devastation Cleansing Totem Weakness Duration";
+	public static final String CHARM_CLEANSE_WEAKEN = "Devastation Cleansing Totem Weakness Amplifier";
+	public static final String CHARM_DECAY_DAMAGE = "Devastation Decayed Totem Bonus Damage";
 
 	public static final AbilityInfo<Devastation> INFO =
 		new AbilityInfo<>(Devastation.class, "Devastation", Devastation::new)
@@ -43,15 +67,24 @@ public class Devastation extends Ability {
 			.scoreboardId("Devastation")
 			.shorthandName("DV")
 			.descriptions(getDescription1(), getDescription2())
-			.simpleDescription("Punch with a bow to destroy your nearest totem, dealing massive damage within a medium radius.")
+			.simpleDescription("Destroy your nearest totem, dealing massive damage within a medium radius.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Devastation::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false)
-				.keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Devastation::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false).doubleClick()
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+			.addAltPresetTrigger(new AbilityTriggerInfo<>("cast", "cast", Devastation::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).onGround(true).lookDirections(AbilityTrigger.LookDirection.LEVEL, AbilityTrigger.LookDirection.UP)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
 			.displayItem(Material.COAL_BLOCK);
 
 	public double mDamage;
 	private final double mRadius;
 	private final int mCooldownReduction;
+	private final int mFireStrengthDuration;
+	private final double mFireStrengthPotency;
+	private final double mLightningDamage;
+	private final int mLightningStunDuration;
+	private final int mCleanseDuration;
+	private final double mCleanseWeaken;
+	private final double mDecayDamage;
 	private final DevastationCS mCosmetic;
 
 	public Devastation(Plugin plugin, Player player) {
@@ -60,6 +93,13 @@ public class Devastation extends Ability {
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelOne() ? RADIUS_1 : RADIUS_2);
 		mCooldownReduction = CharmManager.getDuration(mPlayer, CHARM_CDR, CDR_ON_KILL);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DevastationCS());
+		mFireStrengthDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_STRENGTH_DURATION, FIRE_STRENGTH_DURATION);
+		mFireStrengthPotency = FIRE_STRENGTH + CharmManager.getLevelPercentDecimal(player, CHARM_FIRE_STRENGTH);
+		mLightningDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_LIGHTNING_DAMAGE, LIGHTNING_DAMAGE);
+		mLightningStunDuration = CharmManager.getDuration(mPlayer, CHARM_LIGHTNING_STUN, LIGHTNING_STUN_DURATION);
+		mCleanseDuration = CharmManager.getDuration(mPlayer, CHARM_CLEANSE_DURATION, CLEANSE_DURATION);
+		mCleanseWeaken = CLEANSE_WEAKEN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CLEANSE_WEAKEN);
+		mDecayDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DECAY_DAMAGE, DECAY_DAMAGE);
 	}
 
 	public boolean cast() {
@@ -67,7 +107,7 @@ public class Devastation extends Ability {
 			return false;
 		}
 
-		List<LivingEntity> totemList = TotemicEmpowerment.getTotemList(mPlayer);
+		List<LivingEntity> totemList = ShamanPassiveManager.getTotemList(mPlayer);
 		if (totemList.isEmpty()) {
 			return false;
 		}
@@ -78,39 +118,69 @@ public class Devastation extends Ability {
 		totemsInHitbox.removeIf(totem -> !totemList.contains(totem));
 		LivingEntity totemToNuke;
 		if (!totemsInHitbox.isEmpty()) {
-			totemToNuke = totemsInHitbox.get(0);
+			totemToNuke = totemsInHitbox.getFirst();
 			for (LivingEntity totem : totemsInHitbox) {
 				if (!totemToNuke.equals(totem) && mPlayer.getLocation().distance(totemToNuke.getLocation()) > mPlayer.getLocation().distance(totem.getLocation())) {
 					totemToNuke = totem;
 				}
 			}
 		} else {
-			totemToNuke = totemList.get(0);
+			totemToNuke = totemList.getFirst();
 			for (LivingEntity totem : totemList) {
 				if (!totemToNuke.equals(totem) && mPlayer.getLocation().distance(totemToNuke.getLocation()) > mPlayer.getLocation().distance(totem.getLocation())) {
 					totemToNuke = totem;
 				}
 			}
 		}
-		putOnCooldown();
-
 		Location targetLoc = totemToNuke.getLocation();
+		TotemAbility targetTotem = null;
 		for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
 			if (abil instanceof TotemAbility totemAbility
 				&& totemAbility.getRemainingAbilityDuration() > 0
 				&& totemAbility.mDisplayName.equalsIgnoreCase(totemToNuke.getName())) {
 				ClassAbility linkedSpell = abil.getInfo().getLinkedSpell();
 				if (linkedSpell != null) {
+					putOnCooldown();
+					targetTotem = totemAbility;
 					mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, mCooldownReduction);
 				}
 			}
 		}
-		TotemicEmpowerment.removeTotem(mPlayer, totemToNuke);
+		if (targetTotem == null) {
+			return false;
+		}
+		ShamanPassiveManager.removeTotem(mPlayer, totemToNuke);
 
 		mCosmetic.devastationCast(mPlugin, targetLoc, mPlayer, mRadius);
 
+		double devastationDamage = mDamage;
+
+		if (isLevelTwo()) {
+			if (targetTotem instanceof FlameTotem) {
+				mPlugin.mEffectManager.addEffect(mPlayer, STRENGTH_SOURCE, new PercentDamageDealt(mFireStrengthDuration, mFireStrengthPotency).deleteOnAbilityUpdate(true));
+			} else if (targetTotem instanceof LightningTotem) {
+				List<LivingEntity> targetsSortedByHP = new Hitbox.SphereHitbox(targetLoc, mRadius).getHitMobs()
+					.stream()
+					.sorted(Comparator.comparingDouble(Damageable::getHealth).reversed())
+					.toList();
+
+				targetsSortedByHP.forEach(mob -> EntityUtils.applyStun(mPlugin, mLightningStunDuration, mob));
+
+				DamageUtils.damage(mPlayer, targetsSortedByHP.getFirst(), DamageEvent.DamageType.MAGIC, mLightningDamage, mInfo.getLinkedSpell(), true);
+			} else if (targetTotem instanceof CleansingTotem) {
+				for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, mRadius)) {
+					EntityUtils.applyWeaken(mPlugin, mCleanseDuration, mCleanseWeaken, mob);
+				}
+			} else if (targetTotem instanceof DecayedTotem) {
+				devastationDamage += mDecayDamage;
+			}
+		}
+
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, mRadius)) {
-			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true);
+			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, devastationDamage, INFO.getLinkedSpell(), true);
+			if (!EntityUtils.isCCImmuneMob(mob)) {
+				MovementUtils.knockAway(targetLoc, mob, KNOCKBACK, true);
+			}
 		}
 
 		return true;
@@ -123,7 +193,7 @@ public class Devastation extends Ability {
 			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
 			.add(" magic damage to mobs within ")
 			.add(a -> a.mRadius, RADIUS_1, false, Ability::isLevelOne)
-			.add(" blocks of the totem. The totem's cooldown is reduced by ")
+			.add(" blocks of the totem, and knocking them away. The totem's cooldown is reduced by ")
 			.addDuration(a -> a.mCooldownReduction, CDR_ON_KILL)
 			.add(" seconds.")
 			.addCooldown(COOLDOWN);
@@ -131,10 +201,32 @@ public class Devastation extends Ability {
 
 	private static Description<Devastation> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
+			.add("The damage is increased to ")
 			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
 			.add(" and the radius is increased to ")
 			.add(a -> a.mRadius, RADIUS_2, false, Ability::isLevelTwo)
-			.add(" blocks.");
+			.add(" blocks. Each totem also has unique effects on explosion.")
+			.add(Component.newline())
+			.add("Flame Totem: Gain a ")
+			.addPercent(a -> a.mFireStrengthPotency, FIRE_STRENGTH, false, Ability::isLevelTwo)
+			.add(" damage bonus for ")
+			.addDuration(a -> a.mFireStrengthDuration, FIRE_STRENGTH_DURATION, false, Ability::isLevelTwo)
+			.add("s.")
+			.add(Component.newline())
+			.add("Lightning Totem: Strikes the mob with the most health for an additional ")
+			.add(a -> a.mLightningDamage, LIGHTNING_DAMAGE, false, Ability::isLevelTwo)
+			.add(" magic damage and stuns all mobs in range for ")
+			.addDuration(a -> a.mLightningStunDuration, LIGHTNING_STUN_DURATION)
+			.add("s.")
+			.add(Component.newline())
+			.add("Cleansing Totem: Weakens mobs in range by ")
+			.addPercent(a -> a.mCleanseWeaken, CLEANSE_WEAKEN, false, Ability::isLevelTwo)
+			.add(" for ")
+			.addDuration(a -> a.mCleanseDuration, CLEANSE_DURATION)
+			.add("s.")
+			.add(Component.newline())
+			.add("Decayed Totem: Increases your Devastation's damage by ")
+			.add(a -> a.mDecayDamage, DECAY_DAMAGE, false, Ability::isLevelTwo)
+			.add(".");
 	}
 }

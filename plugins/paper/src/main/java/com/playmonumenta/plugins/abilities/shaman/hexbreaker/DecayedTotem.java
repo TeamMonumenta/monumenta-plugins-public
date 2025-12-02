@@ -30,18 +30,19 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class DecayedTotem extends TotemAbility {
-
 	private static final int COOLDOWN = 26 * 20;
 	private static final int AOE_RANGE = 8;
 	private static final int INTERVAL_1 = 20;
-	private static final int INTERVAL_2 = 10;
-	private static final int DURATION_1 = 8 * 20;
+	private static final int INTERVAL_2 = 15;
+	private static final int DURATION_1 = 10 * 20;
 	private static final int DURATION_2 = 12 * 20;
-	private static final int DAMAGE = 4;
+	private static final int DAMAGE = 5;
 	private static final double SLOWNESS_PERCENT = 0.3;
 	private static final int TARGETS = 3;
-	private static final int FLAME_TOTEM_DAMAGE_BUFF = 1;
-	private static final int LIGHTNING_TOTEM_DAMAGE_BUFF = 5;
+	private static final double FLAME_TOTEM_DAMAGE_BUFF_1 = 1;
+	private static final double FLAME_TOTEM_DAMAGE_BUFF_2 = 1.5;
+	private static final double LIGHTNING_TOTEM_DAMAGE_BUFF_1 = 1.5;
+	private static final double LIGHTNING_TOTEM_DAMAGE_BUFF_2 = 2.5;
 
 	public static final String CHARM_DURATION = "Decayed Totem Duration";
 	public static final String CHARM_RADIUS = "Decayed Totem Radius";
@@ -59,15 +60,13 @@ public class DecayedTotem extends TotemAbility {
 			.scoreboardId("DecayedTotem")
 			.shorthandName("DT")
 			.descriptions(getDescription1(), getDescription2())
-			.simpleDescription("Summons a totem, dealing damage and heavily slowing 3 mobs within range.")
+			.simpleDescription("Summons a totem, dealing damage and heavily slowing some of the mobs within range.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DecayedTotem::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DecayedTotem::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
 			.displayItem(Material.WITHER_ROSE);
 
 	private final double mDamage;
-	private final double mRadius;
 	private final double mSlowness;
 	private final int mTargetCount;
 	private final List<LivingEntity> mTargets = new ArrayList<>();
@@ -80,12 +79,12 @@ public class DecayedTotem extends TotemAbility {
 		super(plugin, player, INFO, "Decayed Totem Projectile", "DecayedTotem", "Decayed Totem");
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);
-		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
+		setRadius(CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE));
 		mInterval = CharmManager.getDuration(mPlayer, CHARM_PULSE_DELAY, isLevelTwo() ? INTERVAL_2 : INTERVAL_1);
 		mSlowness = SLOWNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
 		mTargetCount = TARGETS + (int) CharmManager.getLevel(mPlayer, CHARM_TARGETS);
-		mFlameTotemBuff = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_FLAME_TOTEM_DAMAGE_BUFF, FLAME_TOTEM_DAMAGE_BUFF);
-		mLightningTotemBuff = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_LIGHTNING_TOTEM_DAMAGE_BUFF, LIGHTNING_TOTEM_DAMAGE_BUFF);
+		mFlameTotemBuff = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_FLAME_TOTEM_DAMAGE_BUFF, isLevelOne() ? FLAME_TOTEM_DAMAGE_BUFF_1 : FLAME_TOTEM_DAMAGE_BUFF_2);
+		mLightningTotemBuff = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_LIGHTNING_TOTEM_DAMAGE_BUFF, isLevelOne() ? LIGHTNING_TOTEM_DAMAGE_BUFF_1 : LIGHTNING_TOTEM_DAMAGE_BUFF_2);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DecayedTotemCS());
 	}
 
@@ -98,13 +97,13 @@ public class DecayedTotem extends TotemAbility {
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		mCosmetic.decayedTotemTick(mPlayer, stand);
-		mTargets.removeIf(mob -> !mob.getWorld().equals(standLocation.getWorld()) || standLocation.distance(mob.getLocation()) >= mRadius || mob.isDead());
+		mTargets.removeIf(mob -> !mob.getWorld().equals(standLocation.getWorld()) || standLocation.distance(mob.getLocation()) >= getTotemRadius() || mob.isDead());
 		if (mTargets.size() < mTargetCount) {
-			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null);
+			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, getTotemRadius(), null);
 			Collections.shuffle(affectedMobs);
 
 			for (LivingEntity mob : affectedMobs) {
-				if (mTargets.contains(mob) || standLocation.distance(mob.getLocation()) >= mRadius) {
+				if (mTargets.contains(mob) || standLocation.distance(mob.getLocation()) >= getTotemRadius()) {
 					continue;
 				}
 				impactMob(mob, mInterval + 5, false, false, stats);
@@ -125,11 +124,13 @@ public class DecayedTotem extends TotemAbility {
 		}
 	}
 
-	private void impactMob(LivingEntity target, int duration, boolean dealDamage, boolean bonusAction, ItemStatManager.PlayerItemStats stats) {
+	private void impactMob(LivingEntity target, int duration, boolean dealDamage, boolean chainLightning, ItemStatManager.PlayerItemStats stats) {
 		if (dealDamage) {
 			DamageUtils.damage(mPlayer, target,
 				new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats),
-				mDamage * (bonusAction ? (ChainLightning.ENHANCE_NEGATIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_NEGATIVE_TOTEM_EFFICIENCY)) : 1), true, false, false);
+				mDamage * mSpiritualismMultiplier *
+					(chainLightning ? (ChainLightning.ENHANCE_OFFENSIVE_EFFICIENCY + CharmManager.getLevelPercentDecimal(mPlayer, ChainLightning.CHARM_OFFENSIVE_TOTEM_EFFICIENCY)) : 1),
+				true, false, false);
 		}
 		EntityUtils.applySlow(mPlugin, duration, mSlowness, target);
 	}
@@ -142,12 +143,11 @@ public class DecayedTotem extends TotemAbility {
 	}
 
 	@Override
-	public void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean bonusAction) {
+	public void pulse(Location standLocation, ItemStatManager.PlayerItemStats stats, boolean chainLightning) {
 		applyDecayedDamageBoost();
 		for (LivingEntity target : mTargets) {
-			impactMob(target, mInterval + 20, true, bonusAction, stats);
+			impactMob(target, mInterval + 20, true, chainLightning, stats);
 		}
-		dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), mInterval + 20);
 	}
 
 	public void applyDecayedDamageBoost() {
@@ -170,18 +170,18 @@ public class DecayedTotem extends TotemAbility {
 			.add(" to fire a projectile that summons a Decayed Totem. The totem anchors up to ")
 			.add(a -> a.mTargetCount, TARGETS)
 			.add(" targets within ")
-			.add(a -> a.mRadius, AOE_RANGE)
+			.add(TotemAbility::getTotemRadius, AOE_RANGE)
 			.add(" blocks of the totem, dealing ")
 			.add(a -> a.mDamage, DAMAGE)
-			.add(" magic damage each second and inflicting ")
+			.add(" magic damage every ")
+			.addDuration(a -> a.mInterval, INTERVAL_1, true, Ability::isLevelOne)
+			.add(" second and inflicting ")
 			.addPercent(a -> a.mSlowness, SLOWNESS_PERCENT)
-			.add(" slowness. Additionally your flame and lightning totems that exist during this totem's duration gain ")
-			.add(a -> a.mFlameTotemBuff, FLAME_TOTEM_DAMAGE_BUFF)
-			.add(" damage and ")
-			.add(a -> a.mLightningTotemBuff, LIGHTNING_TOTEM_DAMAGE_BUFF)
-			.add(" damage respectively. Charge up time: ")
-			.addDuration(PULSE_DELAY)
-			.add("s. Duration: ")
+			.add(" slowness. Additionally your Flame and Lightning Totems that exist during this totem's duration gain ")
+			.add(a -> a.mFlameTotemBuff, FLAME_TOTEM_DAMAGE_BUFF_1, false, Ability::isLevelOne)
+			.add(" bonus damage and ")
+			.add(a -> a.mLightningTotemBuff, LIGHTNING_TOTEM_DAMAGE_BUFF_1, false, Ability::isLevelOne)
+			.add(" bonus damage respectively, applying if they do damage. Duration: ")
 			.addDuration(a -> a.mDuration, DURATION_1, false, Ability::isLevelOne)
 			.add("s.")
 			.addCooldown(COOLDOWN);
@@ -189,8 +189,14 @@ public class DecayedTotem extends TotemAbility {
 
 	private static Description<DecayedTotem> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is now dealt twice as often, and the duration is increased to ")
+			.add("Damage is now dealt every ")
+			.addDuration(a -> a.mInterval, INTERVAL_2, true, Ability::isLevelTwo)
+			.add(" seconds, and the duration is increased to ")
 			.addDuration(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
-			.add(" seconds.");
+			.add(" seconds. Additionally the Flame and Lightning Totem damage bonuses are increased to ")
+			.add(a -> a.mFlameTotemBuff, FLAME_TOTEM_DAMAGE_BUFF_2, false, Ability::isLevelTwo)
+			.add(" and ")
+			.add(a -> a.mLightningTotemBuff, LIGHTNING_TOTEM_DAMAGE_BUFF_2, false, Ability::isLevelTwo)
+			.add(" respectively.");
 	}
 }

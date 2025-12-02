@@ -28,6 +28,7 @@ public class ChainLightningCS implements CosmeticSkill {
 	}
 
 	public void chainLightningSound(Player player) {
-		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.PLAYERS, 2.0f, 2.0f);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.PLAYERS, 0.3f, 2f);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.5f, 2f, 3);
 	}
 }
