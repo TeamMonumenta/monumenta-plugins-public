@@ -5,103 +5,376 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import java.util.HashMap;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BrutalAlchemy extends Ability implements PotionAbility {
-	private static final int BRUTAL_ALCHEMY_DURATION = 8 * 20;
-	private static final int BRUTAL_ALCHEMY_PERIOD = 20;
-	private static final double BRUTAL_ALCHEMY_1_DOT_MULTIPLIER = 0.20;
-	private static final double BRUTAL_ALCHEMY_2_DOT_MULTIPLIER = 0.35;
-	private static final double BRUTAL_ALCHEMY_ENHANCED_DOT_MULTIPLIER = 0.20;
-	private static final String BRUTAL_ALCHEMY_DOT_EFFECT_NAME = "BrutalAlchemyDamageOverTimeEffect";
-	private static final String BRUTAL_ALCHEMY_DOT_ENHANCED_EFFECT_NAME = "BrutalAlchemyDamageOverTimeEnhancedEffect";
+	public static final int DOT_DURATION = 3 * 20;
+	private static final int DOT_PERIOD = 20;
+	private static final int REFRESHES_NEEDED_TO_EXPLODE = 3;
+	private static final int COOLDOWN_AFTER_EXPLOSION = 5;
+	private static final double DOT_FLAT_BASE = 1;
+	private static final double DOT_MULT_BASE = 0.1;
+
+	private static final double DOT_MULT_INCREASE_1 = 0.05;
+	private static final double DOT_FLAT_INCREASE_1 = 0.5;
+	private static final double DOT_EXPLOSION_MULT_1 = 0.5;
+
+	private static final double DOT_MULT_INCREASE_2 = 0.1;
+	private static final double DOT_FLAT_INCREASE_2 = 1;
+	private static final double DOT_EXPLOSION_MULT_2 = 0.65;
+
+	public static final double DOT_MULT_INCREASE_3 = 0.15;
+	public static final double DOT_FLAT_INCREASE_3 = 1.5;
+	public static final double DOT_EXPLOSION_MULT_3 = 0.8;
+
+	public static final double BRUTAL_POTION_DAMAGE_MULTIPLIER = 1;
+	public static final int ENHANCEMENT_ADDITIONAL_TICKS = 1;
 
 	public static final String CHARM_DAMAGE_MULTIPLIER = "Brutal Alchemy Damage Multiplier";
-	public static final String CHARM_DOT_DAMAGE = "Brutal Alchemy DoT Damage";
 	public static final String CHARM_DURATION = "Brutal Alchemy Duration";
+	public static final String CHARM_DOT_BASE_DAMAGE = "Brutal Alchemy DoT Base Damage";
+	public static final String CHARM_DOT_INCREASE_DAMAGE_FLAT = "Brutal Alchemy DoT Reapplication Damage Flat";
+	public static final String CHARM_DOT_INCREASE_DAMAGE_MULT = "Brutal Alchemy DoT Reapplication Damage Multiplier";
+	public static final String CHARM_REFRESHES_NEEDED_TO_EXPLODE = "Brutal Alchemy Reapplications Needed To Explode";
+	public static final String CHARM_DOT_EXPLOSION_DAMAGE_MULT = "Brutal Alchemy DoT Explosion Damage Multiplier";
+	public static final String CHARM_ENHANCEMENT_ADDITIONAL_TICKS = "Brutal Alchemy Enhancement Additional Ticks";
 
 	public static final AbilityInfo<BrutalAlchemy> INFO =
 		new AbilityInfo<>(BrutalAlchemy.class, "Brutal Alchemy", BrutalAlchemy::new)
 			.linkedSpell(ClassAbility.BRUTAL_ALCHEMY)
 			.scoreboardId("BrutalAlchemy")
 			.shorthandName("BA")
+			.canUse(player -> AbilityUtils.getClassNum(player) == Alchemist.CLASS_ID)
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Apply a magic damage over time effect to mobs hit by your brutal potions.")
+			.simpleDescription("Throw potions that apply a magic damage over time effect to enemies.")
 			.displayItem(Material.REDSTONE);
 
+	private class BrutalDotInfo {
+		private final LivingEntity mTarget;
+		private final ItemStatManager.PlayerItemStats mPlayerItemStats;
+		private final int mMaxDamageTicks;
+		private final int mMaxRefreshes;
+		private int mRefreshes;
+		private int mDamageTicksReceived;
+		private int mTimer;
+		private int mLevel;
+		private double mDamage;
+
+		private BrutalDotInfo(LivingEntity target, int level, ItemStatManager.PlayerItemStats playerItemStats) {
+			mTarget = target;
+			mPlayerItemStats = playerItemStats;
+			mMaxDamageTicks = mDuration / DOT_PERIOD;
+			mMaxRefreshes = mRefreshesNeededToExplode;
+			mRefreshes = 0;
+			mDamageTicksReceived = 0;
+			mTimer = 0;
+			mLevel = level;
+			mDamage = 0;
+			if (mAlchemistPotions != null) {
+				mDamage = mAlchemistPotions.getDamage(playerItemStats) * mDotBaseMultDamage + mDotBaseFlatDamage;
+			}
+		}
+
+		private double calculateTickDamage() {
+			if (mAlchemistPotions == null) {
+				return 0;
+			}
+			return mDamage + (getMultIncrease(mLevel) + getFlatIncrease(mLevel)) * mRefreshes;
+		}
+
+		private void dealAdditionalTicks(int ticks) {
+			dealDamage(true);
+			if (ticks > 1) {
+				// Cool staggered effect
+				new BukkitRunnable() {
+					private int mDamagesDealt = 1;
+
+					@Override
+					public void run() {
+						dealDamage(true);
+						mDamagesDealt++;
+
+						if (mDamagesDealt >= ticks) {
+							cancel();
+						}
+					}
+				}.runTaskTimer(mPlugin, 2, 2);
+			}
+		}
+
+		private void dealDamage(boolean isAdditionalTick) {
+			DamageUtils.damage(
+				mPlayer,
+				mTarget,
+				new DamageEvent.Metadata(
+					DamageEvent.DamageType.MAGIC,
+					ClassAbility.BRUTAL_ALCHEMY,
+					mPlayerItemStats
+				),
+				calculateTickDamage(),
+				true,
+				false,
+				false
+			);
+			if (mAlchemistPotions != null) {
+				mAlchemistPotions.mCosmetic.brutalDotTickEffects(mTarget);
+				if (isAdditionalTick) {
+					mAlchemistPotions.mCosmetic.brutalDotAdditionalTicksEffects(mTarget);
+				}
+			}
+		}
+
+		private void tick() {
+			mTimer += 5;
+			if (mTimer >= DOT_PERIOD) {
+				mTimer -= DOT_PERIOD;
+				mDamageTicksReceived++;
+				dealDamage(false);
+			}
+		}
+
+		private void periodicVisuals() {
+			if (mAlchemistPotions != null) {
+				mAlchemistPotions.mCosmetic.brutalPeriodicEffects(mTarget, mRefreshes + 1, mMaxRefreshes, mLevel);
+			}
+		}
+
+		private void setLevel(int level) {
+			mLevel = level;
+		}
+
+		private void refresh() {
+			if (mRefreshes + 1 >= mMaxRefreshes && mAlchemistPotions != null) {
+				// DoT pops: immediately deals the remaining ticks + the pop damage
+				mLastDotExplosions.put(mTarget.getUniqueId(), Bukkit.getCurrentTick());
+				double finalDamage = calculateTickDamage() * (mMaxDamageTicks - mDamageTicksReceived)
+					+ mAlchemistPotions.getDamage(mPlayerItemStats) * getExplosionDamageMult(mLevel);
+				DamageUtils.damage(
+					mPlayer,
+					mTarget,
+					new DamageEvent.Metadata(
+						DamageEvent.DamageType.MAGIC,
+						ClassAbility.BRUTAL_ALCHEMY,
+						mPlayerItemStats
+					),
+					finalDamage,
+					true,
+					false,
+					false
+				);
+				mAlchemistPotions.mCosmetic.brutalDotExplosionEffects(mTarget);
+			}
+			// Increment later to avoid calculating for 1 more refresh than wanted.
+			mRefreshes++;
+			mDamageTicksReceived = 0;
+		}
+
+		private boolean isDone() {
+			return mTarget.isDead() ||
+				!mTarget.isValid() ||
+				mAlchemistPotions == null ||
+				mRefreshes >= mMaxRefreshes ||
+				mDamageTicksReceived >= mMaxDamageTicks;
+		}
+	}
+
 	private final int mDuration;
-	private final double mDoTMultiplier;
-	private final double mEnhancementMultiplier;
+	private final double mDotBaseFlatDamage;
+	private final double mDotBaseMultDamage;
+	private final int mEnhancementAdditionalTicks;
+	private final int mRefreshesNeededToExplode;
 	private @Nullable AlchemistPotions mAlchemistPotions;
+	private final HashMap<UUID, BrutalDotInfo> mActiveDoTs = new HashMap<>();
+	private final HashMap<UUID, Integer> mLastDotExplosions = new HashMap<>();
+	private final ConcurrentHashMap<UUID, Integer> mAfflictedMobs = new ConcurrentHashMap<>();
 
 	public BrutalAlchemy(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, BRUTAL_ALCHEMY_DURATION);
-		mDoTMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT_DAMAGE, isLevelOne() ? BRUTAL_ALCHEMY_1_DOT_MULTIPLIER : BRUTAL_ALCHEMY_2_DOT_MULTIPLIER);
-		mEnhancementMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT_DAMAGE, BRUTAL_ALCHEMY_ENHANCED_DOT_MULTIPLIER);
-
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DOT_DURATION);
+		mDotBaseFlatDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT_BASE_DAMAGE, DOT_FLAT_BASE);
+		mDotBaseMultDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT_BASE_DAMAGE, DOT_MULT_BASE);
+		mEnhancementAdditionalTicks = ENHANCEMENT_ADDITIONAL_TICKS + (int) CharmManager.getLevel(mPlayer, CHARM_ENHANCEMENT_ADDITIONAL_TICKS);
+		mRefreshesNeededToExplode = REFRESHES_NEEDED_TO_EXPLODE + (int) CharmManager.getLevel(mPlayer, CHARM_REFRESHES_NEEDED_TO_EXPLODE);
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, AlchemistPotions.class);
 		});
 	}
 
-	@Override
-	public void apply(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
-		if (!isGruesome && mAlchemistPotions != null) {
+	public int getLevel() {
+		if (isLevelOne()) {
+			return 1;
+		}
+		if (isLevelTwo()) {
+			return 2;
+		}
+		return 0;
+	}
 
-			double baseDamage = mAlchemistPotions.getDamage(playerItemStats);
-			double damage = baseDamage * mDoTMultiplier;
-			CustomDamageOverTime dot = new CustomDamageOverTime(mDuration, Math.max(1, damage), BRUTAL_ALCHEMY_PERIOD, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
-			dot.setVisuals(mAlchemistPotions.mCosmetic::damageOverTimeEffects);
-			mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, dot);
+	public double getFlatIncrease(int level) {
+		double base = 0;
+		switch (level) {
+			case 1 -> base = DOT_FLAT_INCREASE_1;
+			case 2 -> base = DOT_FLAT_INCREASE_2;
+			case 3 -> base = DOT_FLAT_INCREASE_3;
+		}
+		return base + CharmManager.getLevel(mPlayer, CHARM_DOT_INCREASE_DAMAGE_FLAT);
+	}
 
-			if (isEnhanced()) {
-				double finalEnhancedDamage = baseDamage * mEnhancementMultiplier;
-				// Apply the enhanced dot a little later for a cool effect
-				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					CustomDamageOverTime enhancementDot = new CustomDamageOverTime(mDuration, Math.max(1, finalEnhancedDamage), BRUTAL_ALCHEMY_PERIOD * 2, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
-					if (mAlchemistPotions != null) {
-						enhancementDot.setVisuals(mAlchemistPotions.mCosmetic::damageOverTimeEffects);
-					}
-					mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_ENHANCED_EFFECT_NAME, enhancementDot);
-				}, 10);
+	public double getMultIncrease(int level) {
+		double base = 0;
+		switch (level) {
+			case 1 -> base = DOT_MULT_INCREASE_1;
+			case 2 -> base = DOT_MULT_INCREASE_2;
+			case 3 -> base = DOT_MULT_INCREASE_3;
+		}
+		return base + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DOT_INCREASE_DAMAGE_MULT);
+	}
+
+	public double getExplosionDamageMult(int level) {
+		double base = 0;
+		switch (level) {
+			case 1 -> base = DOT_EXPLOSION_MULT_1;
+			case 2 -> base = DOT_EXPLOSION_MULT_2;
+			case 3 -> base = DOT_EXPLOSION_MULT_3;
+		}
+		return base + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DOT_EXPLOSION_DAMAGE_MULT);
+	}
+
+	private void applyDoT(LivingEntity mob, ItemStatManager.PlayerItemStats playerItemStats, int level) {
+		if (mAlchemistPotions == null) {
+			return;
+		}
+
+		@Nullable Integer lastExplosionTicks = mLastDotExplosions.get(mob.getUniqueId());
+		if (lastExplosionTicks != null && Bukkit.getCurrentTick() - lastExplosionTicks <= COOLDOWN_AFTER_EXPLOSION) {
+			return;
+		}
+
+		mAfflictedMobs.put(mob.getUniqueId(), Bukkit.getCurrentTick());
+		cleanAfflictedMap();
+		@Nullable BrutalDotInfo brutalDotInfo = mActiveDoTs.get(mob.getUniqueId());
+		if (brutalDotInfo == null) {
+			if (level > 0) {
+				mActiveDoTs.put(
+					mob.getUniqueId(),
+					new BrutalDotInfo(mob, level, playerItemStats)
+				);
 			}
+		} else {
+			brutalDotInfo.refresh();
+			if (brutalDotInfo.mLevel < level) {
+				// Upgrade the DoT to a higher level (e.g. from Volatile Reaction)
+				brutalDotInfo.setLevel(level);
+			}
+			// Clear the ones that popped due to reaching max refreshes
+			mActiveDoTs.values().removeIf(BrutalDotInfo::isDone);
+		}
+	}
+
+	private void cleanAfflictedMap() {
+		int currentTick = Bukkit.getCurrentTick();
+		mAfflictedMobs.values().removeIf(applicationTicks -> currentTick - applicationTicks > mDuration);
+	}
+
+	public boolean isAfflicted(LivingEntity mob) {
+		int currentTick = Bukkit.getCurrentTick();
+		return mAfflictedMobs.containsKey(mob.getUniqueId()) &&
+			currentTick - mAfflictedMobs.get(mob.getUniqueId()) <= mDuration;
+	}
+
+	public static void tryDoEnhancementEffect(@Nullable BrutalAlchemy brutalAlchemy, LivingEntity mob) {
+		if (brutalAlchemy == null) {
+			return;
+		}
+
+		brutalAlchemy.internalTryDoEnhancementEffect(mob);
+	}
+
+	private void internalTryDoEnhancementEffect(LivingEntity mob) {
+		if (!isEnhanced()) {
+			return;
+		}
+
+		@Nullable BrutalDotInfo brutalDotInfo = mActiveDoTs.get(mob.getUniqueId());
+		if (brutalDotInfo == null) {
+			return;
+		}
+
+		brutalDotInfo.dealAdditionalTicks(mEnhancementAdditionalTicks);
+	}
+
+	@Override
+	public void apply(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats, int level, boolean refreshBrutalDot) {
+		if (!isGruesome && refreshBrutalDot && mAlchemistPotions != null) {
+			applyDoT(mob, playerItemStats, level);
+		}
+	}
+
+	@Override
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		// Triggers every 5 ticks
+		mActiveDoTs.values().forEach(BrutalDotInfo::tick);
+		mActiveDoTs.values().removeIf(BrutalDotInfo::isDone);
+		mActiveDoTs.values().forEach(BrutalDotInfo::periodicVisuals);
+	}
+
+	public void applyHigherLevel(LivingEntity mob, ItemStatManager.PlayerItemStats playerItemStats) {
+		if (mAlchemistPotions != null) {
+			mAlchemistPotions.applyEffects(mob, false, playerItemStats, getLevel() + 1);
 		}
 	}
 
 	private static Description<BrutalAlchemy> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your Brutal Alchemist's Potions now apply a Damage Over Time effect which does ")
-			.addPercent(a -> a.mDoTMultiplier, BRUTAL_ALCHEMY_1_DOT_MULTIPLIER, false, Ability::isLevelOne)
-			.add(" base damage as magic damage every second, over ")
-			.addDuration(a -> a.mDuration, BRUTAL_ALCHEMY_DURATION)
-			.add(" seconds. The damage dealt by this effect cannot be less than 1.");
+			.add("Your Brutal Alchemist's Potions now apply a DoT effect which does ")
+			.add(a -> a.mDotBaseFlatDamage, DOT_FLAT_BASE)
+			.add(" + ")
+			.addPercent(a -> a.mDotBaseMultDamage, DOT_MULT_BASE)
+			.add(" of your potion's damage as magic damage every second, over ")
+			.addDuration(a -> a.mDuration, DOT_DURATION)
+			.add("s. Hitting an enemy afflicted by this DoT refreshes its duration and increases its potency by ")
+			.add(a -> a.getFlatIncrease(1), DOT_FLAT_INCREASE_1, false, Ability::isLevelOne)
+			.add(" + ")
+			.addPercent(a -> a.getMultIncrease(1), DOT_MULT_INCREASE_1, false, Ability::isLevelOne)
+			.add(" of your potion's damage. Refreshing the DoT ")
+			.add(a -> a.mRefreshesNeededToExplode, REFRESHES_NEEDED_TO_EXPLODE)
+			.add(" times causes it to explode, instantly dealing its remaining damage, plus an additional ")
+			.addPercent(a -> a.getExplosionDamageMult(1), DOT_EXPLOSION_MULT_1, false, Ability::isLevelOne)
+			.add(" of your potion's damage, and clearing the effect.");
 	}
 
 	private static Description<BrutalAlchemy> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("The Damage Over Time effect now does ")
-			.addPercent(a -> a.mDoTMultiplier, BRUTAL_ALCHEMY_2_DOT_MULTIPLIER, false, Ability::isLevelTwo)
-			.add(" base damage as magic damage.");
+			.add("Refreshing the DoT now increases its potency by ")
+			.add(a -> a.getFlatIncrease(2), DOT_FLAT_INCREASE_2, false, Ability::isLevelTwo)
+			.add(" + ")
+			.addPercent(a -> a.getMultIncrease(2), DOT_MULT_INCREASE_2, false, Ability::isLevelTwo)
+			.add(" of your potion's damage. The additional damage from the explosion is now ")
+			.addPercent(a -> a.getExplosionDamageMult(2), DOT_EXPLOSION_MULT_2, false, Ability::isLevelTwo)
+			.add(" of your potion's damage.");
 	}
 
 	private static Description<BrutalAlchemy> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your Brutal Alchemist's Potions now apply a second Damage Over Time effect which does ")
-			.addPercent(a -> a.mEnhancementMultiplier, BRUTAL_ALCHEMY_ENHANCED_DOT_MULTIPLIER)
-			.add(" base damage as magic damage every ")
-			.addDuration(BRUTAL_ALCHEMY_PERIOD * 2)
-			.add(" seconds, over ")
-			.addDuration(a -> a.mDuration, BRUTAL_ALCHEMY_DURATION)
-			.add(" seconds.");
+			.add("Hitting enemies afflicted by the DoT with your more powerful abilities")
+			.add(" (Alchemical Artillery, Unstable Amalgam, Volatile Reaction, Panacea, Transmutation Ring, or Esoteric Enhancements)")
+			.add(" makes them instantly take ")
+			.add(a -> a.mEnhancementAdditionalTicks, ENHANCEMENT_ADDITIONAL_TICKS)
+			.add(" additional tick of the DoT's damage.");
 	}
 }

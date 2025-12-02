@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
@@ -20,19 +22,26 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.WeakHashMap;
@@ -42,6 +51,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -57,43 +67,62 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.alchemist.PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION;
+
 /*
  * Handles giving potions and the direct damage aspect
  */
 public class AlchemistPotions extends Ability implements AbilityWithChargesOrStacks {
 
 	private static final String GRUESOME_MODE_TAG = "AlchPotionGruesomeMode";
+	private static final String GRUESOME_POTION_METAKEY = "GruesomeAlchemistPotion";
 	public static final String METADATA_KEY = "PlayerThrowAlchPotionEvent";
 	public static final int MAX_CHARGES = 8;
-	public static final int POTIONS_TIMER_BASE = 2 * 20;
-	private static final int POTIONS_TIMER_TOWN = 20;
-	private static final int IFRAME_BETWEEN_POT = 10;
+	public static final int POTIONS_TIMER_BASE = (int) (1.5 * 20);
+	private static final int POTIONS_TIMER_TOWN = 1 * 20;
+	public static final int IFRAME_BETWEEN_POT = 10;
 	private static final String POTION_SCOREBOARD = "StoredPotions";
 
 	public static final String CHARM_CHARGES = "Alchemist Potion Charges";
 	public static final String CHARM_DAMAGE = "Alchemist Potion Damage";
 	public static final String CHARM_RADIUS = "Alchemist Potion Radius";
+	public static final String CHARM_RECHARGE_RATE = "Alchemist Potion Recharge Rate";
 
 	private final List<PotionAbility> mPotionAbilities = new ArrayList<>();
 	private double mTimer = 0;
 	private int mSlot;
+	private @Nullable ItemStack mItemInSlot;
 	private final int mMaxCharges;
 	private int mCharges;
 	private int mChargeTime;
 	private final IndependentIframeTracker mIframeTracker;
 	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private final HashMap<String, Double> mRechargeRateMultipliers;
 
 	public static final AbilityInfo<AlchemistPotions> INFO =
 		new AbilityInfo<>(AlchemistPotions.class, "Alchemist Potions", AlchemistPotions::new)
 			.hotbarName("A") // Have this as "A" to make it sorted in front of everything (alphabetically)
 			.linkedSpell(ClassAbility.ALCHEMIST_POTION)
 			.description(getDescription())
-			.canUse(player -> AbilityUtils.getClassNum(player) == Alchemist.CLASS_ID);
+			.canUse(player -> AbilityUtils.getClassNum(player) == Alchemist.CLASS_ID)
+			.addTrigger(new AbilityTriggerInfo<>("throwOpposite", "throw opposite potion", "Throws a potion of the opposite type, e.g. a gruesome potion if brutal potions are selected.",
+				AlchemistPotions::throwOpposite, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false), HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", "Toggles between throwing gruesome or brutal potions.",
+				AlchemistPotions::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).enabled(false), HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.displayItem(Material.SKELETON_SKULL);
 
 	public final GruesomeAlchemyCS mCosmetic;
-	private boolean mHasGruesomeAlchemy = false;
+	private final int mLevelZeroDuration;
+	private final double mLevelZeroSlownessAmount;
+	private final double mLevelZeroVulnerabilityAmount;
+	private final double mLevelZeroWeakenAmount;
+	private final double mGruesomeDamageMultiplier;
+	private final double mBrutalDamageMultiplier;
 
+	private double mRechargeRateCoefficient = 1;
 	private @Nullable ProjectileHitEvent mLastHitEvent;
+	private @Nullable GruesomeAlchemy mGruesomeAlchemy;
+	private @Nullable BrutalAlchemy mBrutalAlchemy;
 
 	public AlchemistPotions(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -103,40 +132,43 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		mChargeTime = POTIONS_TIMER_BASE;
 		mMaxCharges = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CHARGES, MAX_CHARGES);
 		mCharges = Math.min(ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0), mMaxCharges);
-
+		mLevelZeroDuration = CharmManager.getDuration(mPlayer, GruesomeAlchemy.CHARM_DURATION, GruesomeAlchemy.GRUESOME_ALCHEMY_DURATION);
+		mLevelZeroSlownessAmount = GruesomeAlchemy.GRUESOME_ALCHEMY_0_SLOWNESS_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_SLOWNESS);
+		mLevelZeroVulnerabilityAmount = GruesomeAlchemy.GRUESOME_ALCHEMY_0_VULNERABILITY_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_VULNERABILITY);
+		mLevelZeroWeakenAmount = GruesomeAlchemy.GRUESOME_ALCHEMY_0_WEAKEN_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_WEAKEN);
+		mGruesomeDamageMultiplier = GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_DAMAGE_MULTIPLIER);
+		mBrutalDamageMultiplier = BrutalAlchemy.BRUTAL_POTION_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, BrutalAlchemy.CHARM_DAMAGE_MULTIPLIER);
 		mPlayerItemStatsMap = new WeakHashMap<>();
+		mRechargeRateMultipliers = new HashMap<>();
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GruesomeAlchemyCS());
 
-		// Scan hotbar for alch potion
+		// Scan hotbar for alchemical utensil
 		PlayerInventory inv = player.getInventory();
 		mSlot = 0;
 		for (int i = 0; i < 9; i++) {
-			if (ItemUtils.isAlchemistItem(inv.getItem(i))) {
+			ItemStack item = inv.getItem(i);
+			if (ItemUtils.isAlchemistItem(item)) {
 				mSlot = i;
+				mItemInSlot = item;
+				mRechargeRateCoefficient = getRechargeRate(item);
 				break;
 			}
 		}
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
-			List<? extends PotionAbility> potionAbilities = Stream.of(GruesomeAlchemy.class, BrutalAlchemy.class, EmpoweringOdor.class, TransmutationRing.class, EsotericEnhancements.class, ScorchedEarth.class)
+			List<? extends PotionAbility> potionAbilities = Stream.of(GruesomeAlchemy.class, BrutalAlchemy.class, VolatileReaction.class, TransmutationRing.class, EsotericEnhancements.class, ScorchedEarth.class, EnergizingElixir.class)
 				.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).filter(Objects::nonNull).toList();
 
-			for (PotionAbility potionAbility : potionAbilities) {
-				mPotionAbilities.add(potionAbility);
-
-				if (potionAbility instanceof GruesomeAlchemy) {
-					mHasGruesomeAlchemy = true;
-				} else if (potionAbility instanceof EmpoweringOdor odor && odor.isLevelTwo()) {
-					mChargeTime -= EmpoweringOdor.POTION_RECHARGE_TIME_REDUCTION_2;
-				}
-			}
+			mPotionAbilities.addAll(potionAbilities);
+			mGruesomeAlchemy = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, GruesomeAlchemy.class);
+			mBrutalAlchemy = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, BrutalAlchemy.class);
 		});
 	}
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion, ProjectileLaunchEvent e) {
-		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && ItemUtils.isAlchemistItem(potion.getItem())) {
+		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && mPlayer.getInventory().getHeldItemSlot() == mSlot && ItemUtils.isAlchemistItem(potion.getItem())) {
 			mPlayer.setMetadata(METADATA_KEY, new FixedMetadataValue(mPlugin, mPlayer.getTicksLived()));
 			if (decrementCharge()) {
 				setPotionToAlchemistPotion(potion, isGruesomeMode());
@@ -152,20 +184,45 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public void throwPotion(boolean gruesome) {
+		throwPotion(gruesome, null);
+	}
+
+	public void throwPotion(boolean gruesome, @Nullable String customMetaKey) {
 		if (decrementCharge()) {
 			ThrownPotion thrownPotion = mPlayer.launchProjectile(ThrownPotion.class);
 			thrownPotion.setItem(mPlayer.getEquipment().getItemInMainHand());
-			setPotionToAlchemistPotion(thrownPotion, gruesome);
+			setPotionToAlchemistPotion(thrownPotion, gruesome, customMetaKey);
 		}
+	}
+
+	public boolean toggle() {
+		mCosmetic.effectsOnSwap(mPlayer, isGruesomeMode());
+		swapMode();
+		return true;
+	}
+
+	private boolean throwOpposite() {
+		if (MetadataUtils.checkOnceInRecentTicks(mPlugin, mPlayer, "GruesomeAlchemy_throwOpposite", 3)) {
+			throwPotion(!isGruesomeMode());
+			return true;
+		}
+		return false;
 	}
 
 	/**
 	 * This function will set the given ThrownPotion potion to an Alchemist Potion, with also the damage and if it's gruesome or brutal mode
 	 */
 	public void setPotionToAlchemistPotion(ThrownPotion potion, boolean gruesome) {
+		setPotionToAlchemistPotion(potion, gruesome, null);
+	}
+
+	public void setPotionToAlchemistPotion(ThrownPotion potion, boolean gruesome, @Nullable String customMetaKey) {
 		mPlayerItemStatsMap.put(potion, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 		if (gruesome) {
-			potion.setMetadata("GruesomeAlchemistPotion", new FixedMetadataValue(mPlugin, 0));
+			potion.setMetadata(GRUESOME_POTION_METAKEY, new FixedMetadataValue(mPlugin, 0));
+		}
+		if (customMetaKey != null) {
+			potion.setMetadata(customMetaKey, new FixedMetadataValue(mPlugin, 0));
 		}
 
 		setPotionAlchemistPotionAesthetic(potion, gruesome);
@@ -207,6 +264,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 			// Sometimes, the potion just randomly splashes several blocks away from where it actually lands. Force it to splash at the correct location.
 			potion.teleport(loc.clone().add(0, 0.25, 0));
+			Vector originalPotionVelocity = potion.getVelocity();
 			potion.setVelocity(new Vector(0, 0, 0));
 
 			boolean isGruesome = isGruesome(potion);
@@ -215,9 +273,12 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 			boolean isSpecialPot = false;
 			for (PotionAbility potionAbility : mPotionAbilities) {
-				isSpecialPot |= potionAbility.createAura(loc, potion, playerItemStats);
+				isSpecialPot |= potionAbility.createAura(loc, potion, originalPotionVelocity, playerItemStats);
 			}
 
+			if (potion.hasMetadata(VolatileReaction.POTION_METAKEY)) {
+				return true;
+			}
 			mCosmetic.effectsOnSplash(mPlayer, loc, isGruesome, radius, isSpecialPot);
 
 			Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
@@ -226,7 +287,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			}
 
 			List<Player> players = PlayerUtils.playersInRange(loc, radius, true);
-			players.remove(mPlayer);
 			players.forEach(player -> applyToPlayer(player, potion, isGruesome));
 		}
 
@@ -238,16 +298,35 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, getDamage(playerItemStats));
 
 			if (isGruesome) {
-				damage *= GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_DAMAGE_MULTIPLIER);
+				damage *= mGruesomeDamageMultiplier;
 			} else {
-				damage *= 1 + CharmManager.getLevelPercentDecimal(mPlayer, BrutalAlchemy.CHARM_DAMAGE_MULTIPLIER);
+				damage *= mBrutalDamageMultiplier;
 			}
 
 			double finalDamage = damage;
-			mIframeTracker.damage(mob, () -> DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), finalDamage, true, true, false));
-
-			// Intentionally apply effects after damage
-			applyEffects(mob, isGruesome, playerItemStats);
+			// Intentionally apply effects after damage.
+			mIframeTracker.damage(mob, () -> {
+				DamageUtils.damage(
+					mPlayer,
+					mob,
+					new DamageEvent.Metadata(
+						DamageType.MAGIC,
+						mInfo.getLinkedSpell(),
+						playerItemStats
+					),
+					finalDamage,
+					true,
+					true,
+					false
+				);
+				// Brutal DoT-stacking effects need to be Iframe-capped.
+				if (!isGruesome) {
+					applyEffects(mob, false, playerItemStats, true);
+				}
+			});
+			// Gruesome effects don't need to be Iframe-capped.
+			// Also, allow Brutal to trigger abilities like Volatile at any time.
+			applyEffects(mob, isGruesome, playerItemStats, false);
 		}
 	}
 
@@ -260,10 +339,83 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public void applyEffects(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
+		if (isGruesome && mGruesomeAlchemy != null) {
+			applyEffects(mob, true, playerItemStats, mGruesomeAlchemy.getLevel(), true);
+		} else if (!isGruesome && mBrutalAlchemy != null) {
+			applyEffects(mob, false, playerItemStats, mBrutalAlchemy.getLevel(), true);
+		}
+	}
+
+	public void applyEffects(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats, boolean refreshBrutalDot) {
+		if (isGruesome && mGruesomeAlchemy != null) {
+			applyEffects(mob, true, playerItemStats, mGruesomeAlchemy.getLevel(), refreshBrutalDot);
+		} else if (!isGruesome && mBrutalAlchemy != null) {
+			applyEffects(mob, false, playerItemStats, mBrutalAlchemy.getLevel(), refreshBrutalDot);
+		}
+	}
+
+	public void applyEffects(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats, int level) {
+		applyEffects(mob, isGruesome, playerItemStats, level, true);
+	}
+
+	public void applyEffects(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats, int level, boolean refreshBrutalDot) {
 		// Apply potions effects but no damage
 		for (PotionAbility potionAbility : mPotionAbilities) {
-			potionAbility.apply(mob, isGruesome, playerItemStats);
+			potionAbility.apply(mob, isGruesome, playerItemStats, level, refreshBrutalDot);
 		}
+	}
+
+	/**
+	 * Returns true if it has changed, and false if it has not.
+	 */
+	private boolean checkAlchemicalUtensilChanged() {
+		// Check if the player has an alchemical utensil on the hotbar
+		PlayerInventory inventory = mPlayer.getInventory();
+		if (ItemUtils.isAlchemistItem(inventory.getItemInMainHand())) {
+			if (inventory.getHeldItemSlot() != mSlot) {
+				mSlot = inventory.getHeldItemSlot();
+				mCharges = 0;
+				mRechargeRateCoefficient = getRechargeRate(inventory.getItemInMainHand());
+				return true;
+			} else {
+				ItemStack itemInMainhand = inventory.getItemInMainHand();
+
+				if (!ItemUtils.equalIgnoringDurability(itemInMainhand, mItemInSlot)) {
+					mItemInSlot = itemInMainhand;
+					mCharges = 0;
+					mRechargeRateCoefficient = getRechargeRate(itemInMainhand);
+					return true;
+				}
+				return false;
+			}
+		}
+
+		ItemStack itemInSlot = inventory.getItem(mSlot);
+		if (itemInSlot != null && ItemUtils.isAlchemistItem(itemInSlot)) {
+			if (mItemInSlot == null || !ItemUtils.equalIgnoringDurability(itemInSlot, mItemInSlot)) {
+				mItemInSlot = itemInSlot;
+				mCharges = 0;
+				mRechargeRateCoefficient = getRechargeRate(itemInSlot);
+				return true;
+			}
+			return false;
+		}
+
+		// Not found in mSlot either, so must look for it anew.
+		boolean found = false;
+		for (int i = 0; i < 9; i++) {
+			ItemStack itemInHotbar = inventory.getItem(i);
+			if (ItemUtils.isAlchemistItem(itemInHotbar)) {
+				mSlot = i;
+				mItemInSlot = itemInHotbar;
+				mCharges = 0;
+				mRechargeRateCoefficient = getRechargeRate(itemInHotbar);
+				found = true;
+				break;
+			}
+		}
+
+		return found;
 	}
 
 	public boolean decrementCharge() {
@@ -271,32 +423,14 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			return false;
 		}
 
-		// Check if the player has an alchemical utensil on the hotbar
-		PlayerInventory inventory = mPlayer.getInventory();
-		if (ItemUtils.isAlchemistItem(inventory.getItemInMainHand())) {
-			mSlot = inventory.getHeldItemSlot();
-		} else if (!ItemUtils.isAlchemistItem(inventory.getItem(mSlot))) {
-			boolean found = false;
-			for (int i = 0; i < 9; i++) {
-				if (ItemUtils.isAlchemistItem(inventory.getItem(i))) {
-					mSlot = i;
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				// Cannot find alch bag
-				return false;
-			}
+		if (checkAlchemicalUtensilChanged()) {
+			return false;
 		}
 
 		mCharges--;
 		ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
-
 		PlayerUtils.callAbilityCastEvent(mPlayer, this, ClassAbility.ALCHEMIST_POTION);
-
 		updateAlchemistItem();
-
 		ClientModHandler.updateAbility(mPlayer, this);
 
 		return true;
@@ -313,6 +447,44 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			return true;
 		}
 		return false;
+	}
+
+	public boolean decrementCharges(double charges) {
+		int intCharges = (int) charges;
+		double doubleCharges = charges - intCharges;
+		double doubleChargesTimer = doubleCharges * mChargeTime;
+
+		if (mCharges < intCharges) {
+			// Not enough potions to pay the integer price
+			return false;
+		}
+
+		// mCharges >= intCharges
+		if (mCharges == intCharges && mTimer < doubleChargesTimer) {
+			return false;
+		}
+
+		// mCharges >= intCharges
+		if (mTimer >= doubleChargesTimer) {
+			for (int i = 0; i < intCharges; i++) {
+				if (!decrementCharge()) {
+					// Enough charges but cannot remove for other reason such as no bag
+					return false;
+				}
+			}
+			mTimer -= doubleChargesTimer;
+			return true;
+		}
+
+		// mCharges > intCharges, mTimer < doubleChargesTimer
+		for (int i = 0; i < intCharges + 1; i++) {
+			if (!decrementCharge()) {
+				// Enough charges but cannot remove for other reason such as no bag
+				return false;
+			}
+		}
+		mTimer += (1 - doubleCharges) * mChargeTime;
+		return true;
 	}
 
 	public boolean incrementCharge() {
@@ -336,9 +508,17 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		// Check if the utensil has changed, in which case we immediately use
+		// the new utensil's recharge rate stat.
+		if (checkAlchemicalUtensilChanged()) {
+			mOnCooldown = true;
+			mTimer = 0;
+			updateAlchemistItem();
+		}
 
 		if (mOnCooldown) {
-			mTimer += 5;
+			double coefficient = calculateRechargeRateCoefficient();
+			mTimer += 5 * coefficient;
 			int chargeTime = ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.RESIST_5) ? Math.min(POTIONS_TIMER_TOWN, mChargeTime) : mChargeTime;
 			if (mTimer >= chargeTime) {
 				mTimer -= chargeTime;
@@ -355,7 +535,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			mCharges = mMaxCharges;
 			ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
 			// Update item
-
 			updateAlchemistItem();
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
@@ -368,6 +547,18 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 	}
 
+	public void addRechargeRateMultiplier(String source, double multiplier) {
+		mRechargeRateMultipliers.put(source, multiplier);
+	}
+
+	public void removeRechargeRateMultiplier(String source) {
+		mRechargeRateMultipliers.remove(source);
+	}
+
+	private double calculateRechargeRateCoefficient() {
+		return mRechargeRateMultipliers.values().stream().reduce(mRechargeRateCoefficient, (acc, curr) -> acc * curr);
+	}
+
 	public void swapMode() {
 		boolean gruesome = ScoreboardUtils.toggleTag(mPlayer, GRUESOME_MODE_TAG);
 		String mode = gruesome ? "Gruesome" : "Brutal";
@@ -378,11 +569,11 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public boolean isGruesomeMode() {
-		return mHasGruesomeAlchemy && mPlayer.getScoreboardTags().contains(GRUESOME_MODE_TAG);
+		return mPlayer.getScoreboardTags().contains(GRUESOME_MODE_TAG);
 	}
 
-	private boolean isGruesome(ThrownPotion potion) {
-		return potion.hasMetadata("GruesomeAlchemistPotion");
+	public boolean isGruesome(ThrownPotion potion) {
+		return potion.hasMetadata(GRUESOME_POTION_METAKEY);
 	}
 
 	public void increaseChargeTime(int ticks) {
@@ -428,6 +619,14 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	public double getSpeed(ItemStatManager.PlayerItemStats playerItemStats) {
 		return playerItemStats.getItemStats().get(AttributeType.PROJECTILE_SPEED.getItemStat());
+	}
+
+	public double getRechargeRate(ItemStack itemStack) {
+		double baseRate = NBT.get(itemStack, nbt -> {
+			ReadableNBTList<ReadWriteNBT> attributes = ItemStatUtils.getAttributes(nbt);
+			return ItemStatUtils.getAttributeAmount(attributes, AttributeType.POTION_RECHARGE_RATE, Operation.MULTIPLY, Slot.MAINHAND);
+		});
+		return CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RECHARGE_RATE, baseRate);
 	}
 
 	@Override
@@ -477,8 +676,24 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Allows using Alchemical Utensils. You gain 1 potion every ")
 			.addDuration(POTIONS_TIMER_BASE)
-			.add(" seconds, up to a maximum of ")
+			.add("s, up to a maximum of ")
 			.add(a -> a.mMaxCharges, MAX_CHARGES)
-			.add(".");
+			.add(".\n")
+			.add(Component.text("Right click while holding an Alchemist's Bag and not sneaking ").color(NamedTextColor.YELLOW))
+			.add("to throw a Brutal potion, which deals ")
+			.addPercent(a -> a.mBrutalDamageMultiplier, BrutalAlchemy.BRUTAL_POTION_DAMAGE_MULTIPLIER)
+			.add(" of your base potion's damage as magic damage, to enemies near the point of impact.\n")
+			.addTrigger()
+			.add(" to throw a Gruesome potion, which deals ")
+			.addPercent(a -> a.mGruesomeDamageMultiplier, GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER)
+			.add(" of your base potion's damage as magic damage, and applies ")
+			.addPercent(a -> a.mLevelZeroSlownessAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_0_SLOWNESS_AMPLIFIER)
+			.add(" slowness, ")
+			.addPercent(a -> a.mLevelZeroVulnerabilityAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_0_VULNERABILITY_AMPLIFIER)
+			.add(" vulnerability, and ")
+			.addPercent(a -> a.mLevelZeroWeakenAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_0_WEAKEN_AMPLIFIER)
+			.add(" weakness to affected mobs, for ")
+			.addDuration(a -> a.mLevelZeroDuration, GruesomeAlchemy.GRUESOME_ALCHEMY_DURATION)
+			.add("s.");
 	}
 }

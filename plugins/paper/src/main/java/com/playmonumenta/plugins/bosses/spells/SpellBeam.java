@@ -122,6 +122,14 @@ public class SpellBeam extends Spell {
 
 				@Override
 				public void run() {
+					if (EntityUtils.shouldCancelSpells(mBoss)) {
+						this.cancel();
+						return;
+					}
+
+					if (EntityUtils.shouldPauseSpells(mBoss)) {
+						return;
+					}
 					if (mTicks < mParameters.SPELL_DELAY) {
 						if (mTicks < mParameters.BEAM_TRACK && isValidTracking(target)) {
 							mDirection = getTargetVector(target).rotateAroundY(yawRotation[j]);
@@ -156,7 +164,7 @@ public class SpellBeam extends Spell {
 						return;
 					}
 					mTicks++;
-					if (mTicks > mParameters.SPELL_DELAY || mBoss.isDead() || EntityUtils.shouldCancelSpells(mBoss)) {
+					if (mTicks > mParameters.SPELL_DELAY || mBoss.isDead()) {
 						this.cancel();
 					}
 				}

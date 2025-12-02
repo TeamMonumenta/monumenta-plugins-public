@@ -82,6 +82,9 @@ public class RebornBoss extends BossAbilityGroup {
 			if (EntityUtils.isStunned(mBoss)) {
 				EntityUtils.removeStun(mBoss);
 			}
+			if (EntityUtils.isStaggered(mBoss)) {
+				EntityUtils.removeStagger(mBoss);
+			}
 			new BukkitRunnable() {
 				int mT = 0;
 

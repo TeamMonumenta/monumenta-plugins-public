@@ -95,6 +95,10 @@ public class SpellBaseShatter extends Spell {
 					return;
 				}
 
+				if (EntityUtils.shouldPauseSpells(mBoss)) {
+					return;
+				}
+
 				mT += 2;
 				mPitch += 0.025f;
 

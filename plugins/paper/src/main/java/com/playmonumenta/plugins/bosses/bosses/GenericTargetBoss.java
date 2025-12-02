@@ -44,7 +44,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				if (EntityUtils.isStunned(mob)) {
+				if (EntityUtils.isStunned(mob) || EntityUtils.isStaggered(mob)) {
 					return;
 				}
 

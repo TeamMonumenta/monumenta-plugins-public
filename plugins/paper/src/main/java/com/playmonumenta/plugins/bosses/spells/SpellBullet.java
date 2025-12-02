@@ -144,7 +144,7 @@ public class SpellBullet extends Spell {
 					this.cancel();
 					return;
 				}
-				if (EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster)) {
+				if (EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster) || EntityUtils.isStaggered(mCaster)) {
 					// Do not cancel as the spell is only ran once until players are out of range
 					return;
 				}

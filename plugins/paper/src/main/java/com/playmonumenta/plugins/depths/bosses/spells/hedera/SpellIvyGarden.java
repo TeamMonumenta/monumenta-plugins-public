@@ -130,8 +130,6 @@ public class SpellIvyGarden extends Spell {
 
 			@Override
 			public void run() {
-				Location loc = launcher.getLocation();
-
 				if (EntityUtils.shouldCancelSpells(launcher)) {
 					launcher.setAI(true);
 					if (!canMoveWhileCasting) {
@@ -140,7 +138,13 @@ public class SpellIvyGarden extends Spell {
 					this.cancel();
 					return;
 				}
+
+				if (EntityUtils.shouldPauseSpells(launcher)) {
+					return;
+				}
+
 				mTicks++;
+				Location loc = launcher.getLocation();
 				chargeAuraAction.accept(loc.clone().add(0, 1, 0));
 				if (mTicks <= (duration - 5) && mTicks % soundDensity == 0) {
 					mWorld.playSound(launcher.getLocation(), chargeSound, SoundCategory.HOSTILE, soundVolume, 0.25f + (mTicks / 100));

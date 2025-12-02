@@ -83,6 +83,11 @@ public class SpellEarthshake extends Spell {
 					this.cancel();
 					return;
 				}
+
+				if (EntityUtils.shouldPauseSpells(mLauncher)) {
+					return;
+				}
+
 				mTicks++;
 				chargeActions(mTargetLocation, mTicks);
 				if (mTicks >= mParameters.FUSE_TIME) {

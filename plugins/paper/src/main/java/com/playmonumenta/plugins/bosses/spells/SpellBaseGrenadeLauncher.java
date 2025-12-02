@@ -310,10 +310,16 @@ public class SpellBaseGrenadeLauncher extends Spell {
 					public void run() {
 						Entity target = mTarget.get();
 						LivingEntity boss = mBossRef.get();
+
 						if (target == null || !target.isValid() || EntityUtils.shouldCancelSpells(boss)) {
 							cancel();
 							return;
 						}
+
+						if (EntityUtils.shouldPauseSpells(boss)) {
+							return;
+						}
+
 						if (!boss.isDead() && boss.isValid() && target.isValid()) {
 							mAestheticsBoss.launch(boss, bossLocation);
 							launchGrenade(mBossLocation, target, additionalParameters);

@@ -81,6 +81,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	private final HitAction mHitAction;
 	private final int mCollisionCheckDelay;
 	private final boolean mCollidesWithOthers;
+	private final String mColor;
 	private final @Nullable GetSpellTargets<LivingEntity> mGetSpellTargets;
 
 	private final boolean mFixed;
@@ -134,6 +135,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 		mHitAction = hitAction;
 		mCollisionCheckDelay = collisionCheckDelay;
 		mCollidesWithOthers = collidesWithOthers;
+		mColor = "red";
 
 		//not used
 		mGetSpellTargets = null;
@@ -148,16 +150,16 @@ public class SpellBaseSeekingProjectile extends Spell {
 	                                  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		this(plugin, boss, launchTracking, 1, 40, cooldown, delay,
 			0, 0, 0, 0, 200.0, 100.0, 1, 30, speed, turnRadius,
-			lifetimeTicks, hitboxLength, lingers, collidesWithBlocks, 0.5, 0.125, collidesWithOthers, collisionCheckDelay,
+			lifetimeTicks, hitboxLength, lingers, collidesWithBlocks, 0.5, 0.125, collidesWithOthers, collisionCheckDelay, "red",
 			targets, initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
 	}
 
 	public SpellBaseSeekingProjectile(Plugin mPlugin, LivingEntity mBoss, ProjectileBoss.Parameters p) {
 		this(mPlugin, mBoss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL,
-			p.COOLDOWN, p.SPELL_DELAY, p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH,
-			p.SPLIT, p.SPLIT_ANGLE, p.SPEED, p.TURN_RADIUS, (int) (p.DISTANCE / p.SPEED), p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS,
-			p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
-			//spell targets
+		 p.COOLDOWN, p.SPELL_DELAY, p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH,
+		 p.SPLIT, p.SPLIT_ANGLE, p.SPEED, p.TURN_RADIUS, (int) (p.DISTANCE / p.SPEED), p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS,
+		 p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0, p.COLOR,
+		 //spell targets
 			() -> p.TARGETS.getTargetsList(mBoss),
 			// Initiate Aesthetic
 			(World world, Location loc, int ticks) -> {
@@ -209,6 +211,16 @@ public class SpellBaseSeekingProjectile extends Spell {
 			});
 	}
 
+	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int charge, int chargeInterval, int cooldown, int delay,
+									  double offsetX, double offsetY, double offsetZ, int mirror, double fixYaw, double fixPitch, int split, double splitAngle, double speed, double turnRadius,
+									  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, double speedLiquid, double speedBlocks, boolean collidesWithOthers, int collisionCheckDelay,
+									  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+			this(plugin, boss, launchTracking, charge, chargeInterval, cooldown, delay,
+				offsetX, offsetY, offsetZ, mirror, fixYaw, fixPitch, split, splitAngle, speed, turnRadius,
+				lifetimeTicks, hitboxLength, lingers, collidesWithBlocks, speedLiquid, speedBlocks, collidesWithOthers, collisionCheckDelay,
+				"red", targets, initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
+	}
+
 	/**
 	 * @param plugin              Plugin
 	 * @param boss                Boss
@@ -237,9 +249,9 @@ public class SpellBaseSeekingProjectile extends Spell {
 	 * @param hitAction           Called when the projectile intersects a player (or possibly a block)
 	 */
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int charge, int chargeInterval, int cooldown, int delay,
-	                                  double offsetX, double offsetY, double offsetZ, int mirror, double fixYaw, double fixPitch, int split, double splitAngle, double speed, double turnRadius,
-	                                  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, double speedLiquid, double speedBlocks, boolean collidesWithOthers, int collisionCheckDelay,
-	                                  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+									  double offsetX, double offsetY, double offsetZ, int mirror, double fixYaw, double fixPitch, int split, double splitAngle, double speed, double turnRadius,
+									  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, double speedLiquid, double speedBlocks, boolean collidesWithOthers, int collisionCheckDelay,
+									  String color, GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();
@@ -271,6 +283,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 		mHitAction = hitAction;
 		mCollisionCheckDelay = collisionCheckDelay;
 		mCollidesWithOthers = collidesWithOthers;
+		mColor = color;
 		mGetSpellTargets = targets;
 
 		//it should be not used since mGetSpellTargets will handle also the singletarget
@@ -295,36 +308,51 @@ public class SpellBaseSeekingProjectile extends Spell {
 					locations.put(target, target.getEyeLocation());
 				}
 			}
+
 			BukkitRunnable initiateSpell = new BukkitRunnable() {
 				final List<? extends LivingEntity> mTargets = entities;
 				final Map<LivingEntity, Location> mLocations = locations;
+				int mElapsedDelay = 0;
+				int mPausedTicks = 0;
 
 				@Override
 				public void run() {
-					if (!mLaunchTracking) {
-						for (Map.Entry<LivingEntity, Location> entry : mLocations.entrySet()) {
-							LivingEntity target = entry.getKey();
-							if (!(target instanceof Player) || !AbilityUtils.isStealthed((Player) target)) {
-								launchDX(target, entry.getValue(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
-							}
-						}
-					} else {
-						for (LivingEntity target : mTargets) {
-							if (!(target instanceof Player) || !AbilityUtils.isStealthed((Player) target)) {
-								launchDX(target, target.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
-							}
-						}
+					if (EntityUtils.shouldPauseSpells(mBoss)) {
+						mPausedTicks++;
+						return;
 					}
 
-				}
+					if (mPausedTicks > 0) {
+						int newGlowingDuration = mDelay - mElapsedDelay;
+						GlowingManager.startGlowing(mBoss, NamedTextColor.NAMES.valueOr(mColor, NamedTextColor.RED), newGlowingDuration, GlowingManager.BOSS_SPELL_PRIORITY);
+						mPausedTicks = 0;
+					}
 
+					mElapsedDelay++;
+					if (mElapsedDelay >= mDelay) {
+						if (!mLaunchTracking) {
+							for (Map.Entry<LivingEntity, Location> entry : mLocations.entrySet()) {
+								LivingEntity target = entry.getKey();
+								if (!(target instanceof Player) || !AbilityUtils.isStealthed((Player) target)) {
+									launchDX(target, entry.getValue(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+								}
+							}
+						} else {
+							for (LivingEntity target : mTargets) {
+								if (!(target instanceof Player) || !AbilityUtils.isStealthed((Player) target)) {
+									launchDX(target, target.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+								}
+							}
+						}
+						this.cancel();
+					}
+				}
 			};
 
-			initiateSpell.runTaskLater(mPlugin, mDelay);
+			initiateSpell.runTaskTimer(mPlugin, 0, 1);
 			mActiveRunnables.add(initiateSpell);
 			consumeCharge();
 			return;
-
 		}
 
 		final List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
@@ -339,45 +367,62 @@ public class SpellBaseSeekingProjectile extends Spell {
 		BukkitRunnable initiateSpell = new BukkitRunnable() {
 			final List<Player> mPlayers = players;
 			final Map<Player, Location> mLocations = locations;
+			int mElapsedDelay = 0;
+			int mPausedTicks = 0;
 
 			@Override
 			public void run() {
-				if (!mPlayers.isEmpty()) {
-					if (mSingleTarget) {
-						// Single target chooses a random player within range
-						Collections.shuffle(mPlayers);
-						for (Player player : mPlayers) {
-							if (LocationUtils.hasLineOfSight(mBoss, player) && !AbilityUtils.isStealthed(player)) {
-								if (!mLaunchTracking) {
-									launchDX(player, Objects.requireNonNull(mLocations.get(player)), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
-								} else {
-									launchDX(player, player.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
-								}
-								return;
-							}
-						}
-					} else {
-						// Otherwise target all players within range
-						if (!mLaunchTracking) {
-							for (Map.Entry<Player, Location> entry : mLocations.entrySet()) {
-								Player player = entry.getKey();
+				if (EntityUtils.shouldPauseSpells(mBoss)) {
+					mPausedTicks++;
+					return;
+				}
+
+				if (mPausedTicks > 0) {
+					int newGlowingDuration = mDelay - mElapsedDelay;
+					GlowingManager.startGlowing(mBoss, NamedTextColor.NAMES.valueOr(mColor, NamedTextColor.RED), newGlowingDuration, GlowingManager.BOSS_SPELL_PRIORITY);
+					mPausedTicks = 0;
+				}
+
+				mElapsedDelay++;
+				if (mElapsedDelay >= mDelay) {
+					if (!mPlayers.isEmpty()) {
+						if (mSingleTarget) {
+							// Single target chooses a random player within range
+							Collections.shuffle(mPlayers);
+							for (Player player : mPlayers) {
 								if (LocationUtils.hasLineOfSight(mBoss, player) && !AbilityUtils.isStealthed(player)) {
-									launchDX(player, entry.getValue(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+									if (!mLaunchTracking) {
+										launchDX(player, Objects.requireNonNull(mLocations.get(player)), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+									} else {
+										launchDX(player, player.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+									}
+									return;
 								}
 							}
 						} else {
-							for (Player player : mPlayers) {
-								if (LocationUtils.hasLineOfSight(mBoss, player)) {
-									launchDX(player, player.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+							// Otherwise target all players within range
+							if (!mLaunchTracking) {
+								for (Map.Entry<Player, Location> entry : mLocations.entrySet()) {
+									Player player = entry.getKey();
+									if (LocationUtils.hasLineOfSight(mBoss, player) && !AbilityUtils.isStealthed(player)) {
+										launchDX(player, entry.getValue(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+									}
+								}
+							} else {
+								for (Player player : mPlayers) {
+									if (LocationUtils.hasLineOfSight(mBoss, player)) {
+										launchDX(player, player.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+									}
 								}
 							}
 						}
 					}
+					this.cancel();
 				}
 			}
 		};
 
-		initiateSpell.runTaskLater(mPlugin, mDelay);
+		initiateSpell.runTaskTimer(mPlugin, 0, 1);
 		mActiveRunnables.add(initiateSpell);
 		consumeCharge();
 	}

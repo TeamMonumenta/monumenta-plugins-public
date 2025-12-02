@@ -49,7 +49,7 @@ public class SpellBaseAura extends Spell {
 	 */
 	@Override
 	public void run() {
-		if (!mCancelable || (!EntityUtils.isSilenced(mBoss) && !EntityUtils.isStunned(mBoss))) {
+		if (!mCancelable || (!EntityUtils.isSilenced(mBoss) && !EntityUtils.isStunned(mBoss) && !EntityUtils.isStaggered(mBoss))) {
 			if (mParticlesSummoner != null) {
 				mParticlesSummoner.run(mBoss);
 			}

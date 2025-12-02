@@ -155,7 +155,6 @@ public enum ClassAbility {
 	// [Alchemist]
 	ALCHEMIST_POTION("Alchemist Potion"),
 	ALCHEMICAL_ARTILLERY("Alchemical Artillery"),
-	ALCHEMICAL_ARTILLERY_AFTERSHOCK("Alchemical Artillery Aftershock"),
 	BEZOAR("Bezoar"),
 	BRUTAL_ALCHEMY("Brutal Alchemy"),
 	ENERGIZING_ELIXIR("Energizing Elixir"),
@@ -163,6 +162,8 @@ public enum ClassAbility {
 	IRON_TINCTURE("Iron Tincture"),
 	UNSTABLE_AMALGAM("Unstable Amalgam"),
 	EMPOWERING_ODOR("Empowering Odor"),
+	VOLATILE_REACTION("Volatile Reaction"),
+	VOLATILE_REACTION_DOT("Volatile Reaction DoT"),
 
 	// Apothecary
 	PANACEA("Panacea"),

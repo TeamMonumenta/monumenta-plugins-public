@@ -30,16 +30,8 @@ public class ArcaneElixirCS extends EnergizingElixirCS {
 	}
 
 	@Override
-	public void activate(Player player, int newStacks, boolean manualCast) {
-		if (manualCast) {
-			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, SoundCategory.PLAYERS, 1, 0);
-		}
-		ArcanePotionsCS.drawSingleCircle(player, player.getLocation().add(0, 0.25, 0), 0.5, null, Particle.SCRAPE);
-	}
-
-	@Override
-	public void stackDecayEffect(Player player, int newStacks) {
-		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 0.6f, 0);
+	public void activate(Player player) {
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, SoundCategory.PLAYERS, 1, 0);
 		ArcanePotionsCS.drawSingleCircle(player, player.getLocation().add(0, 0.25, 0), 0.5, null, Particle.SCRAPE);
 	}
 

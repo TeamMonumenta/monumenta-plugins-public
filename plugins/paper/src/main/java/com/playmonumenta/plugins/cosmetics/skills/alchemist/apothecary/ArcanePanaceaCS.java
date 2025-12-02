@@ -47,7 +47,7 @@ public class ArcanePanaceaCS extends PanaceaCS {
 
 	private static final double CAST_RING_DISTANCE = 1;
 	private static final double CAST_RING_RADIUS = 1.15;
-	private static final double RADIUS_FOR_DOUBLING = Panacea.PANACEA_RADIUS * 1.75;
+	private static final double RADIUS_FOR_DOUBLING = Panacea.RADIUS * 1.75;
 
 	@Override
 	public void castEffects(Player player, double radius) {

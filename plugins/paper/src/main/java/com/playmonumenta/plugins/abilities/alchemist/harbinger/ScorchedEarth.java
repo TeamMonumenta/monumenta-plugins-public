@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
@@ -12,43 +13,67 @@ import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ScorchedEarthCS;
-import com.playmonumenta.plugins.effects.ScorchedEarthDamage;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class ScorchedEarth extends MultipleChargeAbility implements PotionAbility, AbilityWithDuration {
 	private static final String SCORCHED_EARTH_POTION_METAKEY = "ScorchedEarthPotion";
 
-	private static final int SCORCHED_EARTH_1_COOLDOWN = 20 * 30;
-	private static final int SCORCHED_EARTH_2_COOLDOWN = 20 * 25;
-	private static final int SCORCHED_EARTH_1_CHARGES = 1;
-	private static final int SCORCHED_EARTH_2_CHARGES = 2;
-	private static final int SCORCHED_EARTH_DURATION = 20 * 15;
-	private static final int SCORCHED_EARTH_FIRE_DURATION = 20 * 4;
-	public static final double SCORCHED_EARTH_DAMAGE_FRACTION = 0.25;
-	private static final double SCORCHED_EARTH_RADIUS = 5;
-	private static final String SCORCHED_EARTH_EFFECT_NAME = "ScorchedEarthDamageEffect";
+	private static final int COOLDOWN_1 = 30 * 20;
+	private static final int COOLDOWN_2 = 25 * 20;
+	private static final int CHARGES = 2;
+	private static final int MAX_SCORCHED_DURATION = 5 * 20;
+	private static final int SCORCHED_DURATION_PER_APPLICATION = 20;
+	private static final double SCORCHED_DAMAGE_PER_SECOND_1 = 0.5;
+	private static final double SCORCHED_DAMAGE_PER_SECOND_2 = 0.6;
+	private static final int SCORCHED_DAMAGE_INTERVAL = 5;
+	private static final int ON_ENTER_SCORCH = 2 * SCORCHED_DURATION_PER_APPLICATION;
+	private static final double SLOWNESS_AMP_1 = 0.25;
+	private static final double SLOWNESS_AMP_2 = 0.35;
+	private static final double WEAKNESS_AMP_1 = 0.1;
+	private static final double WEAKNESS_AMP_2 = 0.15;
+	private static final int DURATION = 10 * 20;
+	private static final double RADIUS = 6;
+	private static final int SHRAPNEL_COUNT = 3;
+	public static final double SHRAPNEL_RADIUS = 2.5;
 
 	public static final String CHARM_COOLDOWN = "Scorched Earth Cooldown";
 	public static final String CHARM_CHARGES = "Scorched Earth Charge";
 	public static final String CHARM_DURATION = "Scorched Earth Duration";
 	public static final String CHARM_RADIUS = "Scorched Earth Radius";
-	public static final String CHARM_DAMAGE = "Scorched Earth Damage";
-	public static final String CHARM_FIRE_DURATION = "Scorched Earth Fire Duration";
+	public static final String CHARM_SCORCH_ON_ENTER = "Scorched Earth Scorched Duration On Enter";
+	public static final String CHARM_SLOWNESS = "Scorched Earth Slowness Amplifier";
+	public static final String CHARM_WEAKNESS = "Scorched Earth Weakness Amplifier";
+	public static final String CHARM_SHRAPNEL_COUNT = "Scorched Earth Shrapnel Count";
+	public static final String CHARM_SHRAPNEL_RADIUS = "Scorched Earth Shrapnel Radius";
+	public static final String CHARM_SCORCHED_DURATION = "Scorched Earth Scorched Duration";
+	public static final String CHARM_SCORCHED_MAX_DURATION = "Scorched Earth Scorched Max Duration";
+	public static final String CHARM_SCORCHED_DAMAGE = "Scorched Earth Scorched Damage";
 
 	public static final AbilityInfo<ScorchedEarth> INFO =
 		new AbilityInfo<>(ScorchedEarth.class, "Scorched Earth", ScorchedEarth::new)
@@ -57,19 +82,120 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 			.shorthandName("SE")
 			.actionBarColor(TextColor.color(230, 134, 0))
 			.descriptions(getDescription1(), getDescription2())
-			.simpleDescription("Deploy a circular zone in which enemies take extra damage based on your potion damage.")
-			.cooldown(SCORCHED_EARTH_1_COOLDOWN, SCORCHED_EARTH_2_COOLDOWN, CHARM_COOLDOWN)
+			.simpleDescription("Deploy a circular zone in which your potions break into fragments that Scorch enemies.")
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.displayItem(Material.BROWN_DYE);
 
-	private final List<Instance> mActiveInstances = new ArrayList<>();
+	private static class Instance {
+		final Location mLocation;
+		final int mEndTick;
+		final PlayerItemStats mStats;
+		final ScorchedEarthCS mCosmetic;
+		final ArrayList<UUID> mMobsHit = new ArrayList<>();
+		int mLastPotionSplashTick;
 
-	private record Instance(Location mLocation, int mEndTick, PlayerItemStats mStats, ScorchedEarthCS mCosmetic) {
+		private Instance(Location location, int endTick, PlayerItemStats playerItemStats, ScorchedEarthCS cosmetic,
+						 int lastPotionSplashTick) {
+			mLocation = location;
+			mEndTick = endTick;
+			mStats = playerItemStats;
+			mCosmetic = cosmetic;
+			mLastPotionSplashTick = lastPotionSplashTick;
+		}
+
+		public boolean hitMob(LivingEntity mob) {
+			if (mMobsHit.contains(mob.getUniqueId())) {
+				return false;
+			}
+			mMobsHit.add(mob.getUniqueId());
+			return true;
+		}
+
+		public Location mLocation() {
+			return mLocation;
+		}
+
+		public int mEndTick() {
+			return mEndTick;
+		}
+
+		public ScorchedEarthCS mCosmetic() {
+			return mCosmetic;
+		}
+
+		private void setLastPotionSplashTick(int newTick) {
+			mLastPotionSplashTick = newTick;
+		}
 	}
+
+	private class ScorchedInfo {
+		final LivingEntity mTarget;
+		final PlayerItemStats mPlayerItemStats;
+		int mTimer;
+		int mRemainingDuration;
+		boolean mIsDone = false;
+
+		private ScorchedInfo(LivingEntity target, PlayerItemStats playerItemStats, int initialDuration) {
+			mTarget = target;
+			mPlayerItemStats = playerItemStats;
+			mTimer = 0;
+			mRemainingDuration = initialDuration;
+		}
+
+		private void reapply(int extraDuration) {
+			mRemainingDuration = Math.min(mScorchedMaxDuration, mRemainingDuration + extraDuration);
+		}
+
+		private void tick() {
+			if (mAlchemistPotions == null) {
+				return;
+			}
+			mRemainingDuration = Math.max(0, mRemainingDuration - 5);
+			mTimer += 5;
+
+			if (mTimer >= SCORCHED_DAMAGE_INTERVAL) {
+				double damage = mScorchedDamage / ((double) mScorchedDuration / SCORCHED_DAMAGE_INTERVAL)
+					* mAlchemistPotions.getDamage(mPlayerItemStats);
+				DamageUtils.damage(
+					mPlayer,
+					mTarget,
+					new DamageEvent.Metadata(
+						DamageEvent.DamageType.MAGIC,
+						mInfo.getLinkedSpell(),
+						mPlayerItemStats
+					),
+					damage,
+					true,
+					false,
+					false
+				);
+				EntityUtils.applyFire(mPlugin, SCORCHED_DAMAGE_INTERVAL + 1, mTarget, mPlayer);
+				mCosmetic.damageEffect(mTarget, mPlayer);
+				mTimer -= SCORCHED_DAMAGE_INTERVAL;
+				if (mRemainingDuration == 0) {
+					mIsDone = true;
+				}
+			}
+		}
+
+		private boolean isDone() {
+			return mAlchemistPotions == null || mTarget.isDead() || !mTarget.isValid() || mIsDone;
+		}
+	}
+
+	private final List<Instance> mActiveInstances = new ArrayList<>();
+	private final ConcurrentHashMap<UUID, ScorchedInfo> mScorchedInfos = new ConcurrentHashMap<>();
 
 	private final int mDuration;
 	private final double mRadius;
-	private final int mFireDuration;
-	private final double mDamageMult;
+	private final int mShrapnelCount;
+	private final double mShrapnelRadius;
+	private final double mSlownessAmp;
+	private final double mWeaknessAmp;
+	private final int mScorchOnEnterDuration;
+	private final int mScorchedDuration;
+	private final int mScorchedMaxDuration;
+	private final double mScorchedDamage;
 	private int mLastCastTicks = 0;
 	private final ScorchedEarthCS mCosmetic;
 	private @Nullable AlchemistPotions mAlchemistPotions;
@@ -77,17 +203,92 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 
 	public ScorchedEarth(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mMaxCharges = (isLevelOne() ? SCORCHED_EARTH_1_CHARGES : SCORCHED_EARTH_2_CHARGES) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
+		mMaxCharges = CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
-		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SCORCHED_EARTH_DURATION);
-		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, SCORCHED_EARTH_RADIUS);
-		mFireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, SCORCHED_EARTH_FIRE_DURATION);
-		mDamageMult = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SCORCHED_EARTH_DAMAGE_FRACTION);
-
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+		mShrapnelCount = SHRAPNEL_COUNT + (int) CharmManager.getLevel(mPlayer, CHARM_SHRAPNEL_COUNT);
+		mShrapnelRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SHRAPNEL_RADIUS, SHRAPNEL_RADIUS);
+		mSlownessAmp = isLevelOne() ? SLOWNESS_AMP_1 : SLOWNESS_AMP_2
+			+ CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
+		mWeaknessAmp = isLevelOne() ? WEAKNESS_AMP_1 : WEAKNESS_AMP_2
+			+ CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
+		mScorchOnEnterDuration = CharmManager.getDuration(mPlayer, CHARM_SCORCH_ON_ENTER, ON_ENTER_SCORCH);
+		mScorchedDuration = CharmManager.getDuration(mPlayer, CHARM_SCORCHED_DURATION, SCORCHED_DURATION_PER_APPLICATION);
+		mScorchedMaxDuration = CharmManager.getDuration(mPlayer, CHARM_SCORCHED_MAX_DURATION, MAX_SCORCHED_DURATION);
+		mScorchedDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SCORCHED_DAMAGE, isLevelOne() ? SCORCHED_DAMAGE_PER_SECOND_1 : SCORCHED_DAMAGE_PER_SECOND_2);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ScorchedEarthCS());
 
 		Bukkit.getScheduler().runTask(mPlugin, () ->
 			mAlchemistPotions = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class));
+	}
+
+	private void applyOrRefreshScorched(LivingEntity mob, PlayerItemStats playerItemStats, int duration) {
+		@Nullable ScorchedInfo scorchedInfo = mScorchedInfos.get(mob.getUniqueId());
+		if (scorchedInfo == null) {
+			mScorchedInfos.put(mob.getUniqueId(), new ScorchedInfo(mob, playerItemStats, duration));
+			return;
+		}
+
+		scorchedInfo.reapply(duration);
+	}
+
+	private void shootShrapnel(Location from, Vector velocity, boolean isGruesome, PlayerItemStats playerItemStats) {
+		@Nullable Item physicsItem = EntityUtils.createUnpickableItem(mCosmetic.getFragmentMaterial(), from);
+		if (physicsItem == null) {
+			return;
+		}
+
+		physicsItem.setVelocity(velocity);
+		new BukkitRunnable() {
+			int mTimer = 0;
+
+			@Override
+			public void run() {
+				mTimer++;
+				if (!physicsItem.isValid() || mAlchemistPotions == null || mPlayer.isDead() || !mPlayer.isValid() || !mPlayer.isOnline()) {
+					physicsItem.remove();
+					cancel();
+					return;
+				}
+
+				if (physicsItem.isOnGround() || mTimer >= 100) {
+					physicsItem.remove();
+					shrapnelHitGround(physicsItem.getLocation(), isGruesome, playerItemStats);
+					cancel();
+					return;
+				}
+
+				mCosmetic.shrapnelFlyEffect(physicsItem.getLocation().clone().add(0, 0.25, 0), isGruesome, mPlayer);
+			}
+		}.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	private void shrapnelHitGround(Location where, boolean isGruesome, PlayerItemStats playerItemStats) {
+		if (mAlchemistPotions == null) {
+			return;
+		}
+
+		double radius = mShrapnelRadius * (mAlchemistPotions.getRadius(playerItemStats) / 3);
+		mCosmetic.shrapnelLandEffect(where, radius, isGruesome, mPlayer);
+		new Hitbox.SphereHitbox(where, radius)
+			.getHitMobs()
+			.forEach(mob -> applyOrRefreshScorched(mob, playerItemStats, mScorchedDuration));
+	}
+
+	private void handleCooldown() {
+		if (mWasOnCooldown && !isOnCooldown()) {
+			mCharges = mMaxCharges;
+			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.SCORCHED_EARTH, mCharges);
+			showOffCooldownMessage();
+			ClientModHandler.updateAbility(mPlayer, this);
+		}
+
+		mWasOnCooldown = isOnCooldown();
+
+		if (!isOnCooldown() && mCharges != mMaxCharges) {
+			putOnCooldown();
+		}
 	}
 
 	@Override
@@ -96,23 +297,38 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 			mActiveInstances.clear();
 			return;
 		}
-		manageChargeCooldowns();
+		handleCooldown();
+		if (!mActiveInstances.isEmpty()) {
+			for (Iterator<Instance> iterator = mActiveInstances.iterator(); iterator.hasNext(); ) {
+				Instance instance = iterator.next();
+				int timeRemaining = instance.mEndTick() - Bukkit.getCurrentTick();
 
-		for (Iterator<Instance> iterator = mActiveInstances.iterator(); iterator.hasNext(); ) {
-			final Instance instance = iterator.next();
-			final int timeRemaining = instance.mEndTick() - Bukkit.getCurrentTick();
-
-			if (timeRemaining <= 0) {
-				iterator.remove();
-			} else {
-				instance.mCosmetic().activeEffects(mPlayer, instance.mLocation(), mRadius, timeRemaining, mDuration);
-				final double damage = mDamageMult * mAlchemistPotions.getDamage(instance.mStats());
-				final Hitbox hitbox = new Hitbox.SphereHitbox(instance.mLocation(), mRadius);
-				for (LivingEntity mob : hitbox.getHitMobs()) {
-					mPlugin.mEffectManager.addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage, mPlayer, instance.mStats(), mFireDuration, mCosmetic));
+				if (timeRemaining <= 0) {
+					iterator.remove();
+					continue;
 				}
+
+				instance.mCosmetic().activeEffects(mPlayer, instance.mLocation(), mRadius, timeRemaining, mDuration);
+
+				new Hitbox.SphereHitbox(instance.mLocation, mRadius)
+					.getHitMobs()
+					.forEach(mob -> {
+						// Periodically apply "difficult terrain" effects
+						EntityUtils.applySlow(mPlugin, 10, mSlownessAmp, mob);
+						EntityUtils.applyWeaken(mPlugin, 10, mWeaknessAmp, mob);
+
+						if (!instance.hitMob(mob)) {
+							return;
+						}
+
+						applyOrRefreshScorched(mob, instance.mStats, mScorchOnEnterDuration);
+						mCosmetic.damageEffect(mob, mPlayer);
+					});
 			}
 		}
+
+		mScorchedInfos.values().removeIf(ScorchedInfo::isDone);
+		mScorchedInfos.values().forEach(ScorchedInfo::tick);
 
 		if (mCurrDuration >= mDuration) {
 			mCurrDuration = -1;
@@ -142,16 +358,68 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 	}
 
 	@Override
-	public boolean createAura(Location loc, ThrownPotion potion, PlayerItemStats playerItemStats) {
-		if (mAlchemistPotions != null && potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
+	public boolean createAura(Location loc, ThrownPotion potion, Vector originalPotionVelocity, PlayerItemStats playerItemStats) {
+		if (mAlchemistPotions == null) {
+			return false;
+		}
+
+		AlchemistPotions nonNullAlchemistPotions = mAlchemistPotions;
+		int currentTick = Bukkit.getCurrentTick();
+		if (potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
 			loc.setDirection(loc.toVector().subtract(mPlayer.getLocation().toVector()));
 			mCosmetic.landEffects(mPlayer, loc, mRadius, mDuration);
 			final ScorchedEarthCS activeCosmetic = mCosmetic.copyForActiveInstance();
 			// immediately do periodic effects too (the next ordinary execution may be delayed by up to 5 ticks)
 			activeCosmetic.activeEffects(mPlayer, loc, mRadius, mDuration, mDuration);
-			mActiveInstances.add(new Instance(loc, Bukkit.getCurrentTick() + mDuration, playerItemStats, activeCosmetic));
+			mActiveInstances.add(new Instance(loc, currentTick + mDuration, playerItemStats, activeCosmetic, currentTick));
 			return true;
 		}
+
+		if (mActiveInstances.isEmpty()) {
+			return false;
+		}
+
+		List<Instance> hitInstances = mActiveInstances.stream()
+			.filter(instance ->
+				instance.mLocation.distanceSquared(loc) <= Math.pow(mRadius, 2) &&
+				currentTick - instance.mLastPotionSplashTick >= AlchemistPotions.IFRAME_BETWEEN_POT
+			)
+			.toList();
+
+		if (hitInstances.isEmpty()) {
+			return false;
+		}
+
+		Location slightlyElevatedLoc = loc.clone().add(0, 0.2, 0);
+		// Extract a unit vector with only X and Z components for direction
+		// which will be made to point upwards later.
+		Vector velocity = originalPotionVelocity.clone().setY(0).normalize();
+		double rotation = Math.PI * 2 / mShrapnelCount;
+		new BukkitRunnable() {
+			final Iterator<Instance> mInstanceIterator = hitInstances.iterator();
+
+			@Override
+			public void run() {
+				if (!mInstanceIterator.hasNext()) {
+					cancel();
+					return;
+				}
+				Instance instance = mInstanceIterator.next();
+				instance.setLastPotionSplashTick(currentTick);
+				instance.mCosmetic.potionLandInZoneEffect(slightlyElevatedLoc, mPlayer);
+				for (int i = 0; i < mShrapnelCount; i++) {
+					double horizontalMultiplier = FastUtils.randomDoubleInRange(0.05, 0.25);
+					double height = FastUtils.randomDoubleInRange(0.2, 0.35);
+					double angleOffset = FastUtils.randomDoubleInRange(0, Math.PI / 4) - Math.PI / 8;
+					Vector fragmentVelocity = velocity.clone().rotateAroundY(angleOffset).multiply(horizontalMultiplier).setY(height);
+					shootShrapnel(slightlyElevatedLoc, fragmentVelocity, nonNullAlchemistPotions.isGruesome(potion), playerItemStats);
+					velocity.rotateAroundY(rotation);
+				}
+				// Offset the next cluster by a bit
+				velocity.rotateAroundY(rotation / 2);
+			}
+		}.runTaskTimer(mPlugin, 0, 5);
+
 		return false;
 	}
 
@@ -162,28 +430,55 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 
 	@Override
 	public int getRemainingAbilityDuration() {
-		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+		return mCurrDuration >= 0 ? getInitialAbilityDuration() - mCurrDuration : 0;
 	}
 
 	private static Description<ScorchedEarth> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Throw an Alchemist's Potion while sneaking to deploy a ")
-			.add(a -> a.mRadius, SCORCHED_EARTH_RADIUS)
-			.add(" block radius zone that lasts ")
-			.addDuration(a -> a.mDuration, SCORCHED_EARTH_DURATION)
-			.add(" seconds where the potion lands. Mobs in this zone are dealt ")
-			.addPercent(a -> a.mDamageMult, SCORCHED_EARTH_DAMAGE_FRACTION)
-			.add(" of your potion's damage and set on fire for ")
-			.addDuration(a -> a.mFireDuration, SCORCHED_EARTH_FIRE_DURATION)
-			.add(" seconds whenever taking damage of types other than ailment or fire.")
-			.addCooldown(SCORCHED_EARTH_1_COOLDOWN, Ability::isLevelOne);
+			.add(a -> a.mRadius, RADIUS)
+			.add(" block radius zone that lasts for ")
+			.addDuration(a -> a.mDuration, DURATION)
+			.add("s where the potion lands. While active, all mobs inside the zone are afflicted with ")
+			.addPercent(a -> a.mSlownessAmp, SLOWNESS_AMP_1, false, Ability::isLevelOne)
+			.add(" slowness and ")
+			.addPercent(a -> a.mWeaknessAmp, WEAKNESS_AMP_1, false, Ability::isLevelOne)
+			.add(" weakness. Additionally, all mobs that enter it for the first time are Scorched for ")
+			.addDuration(a -> a.mScorchOnEnterDuration, ON_ENTER_SCORCH)
+			.add("s. ")
+			.add("Splashing your Alchemist's Potions within an active zone makes them break into ")
+			.add(a -> a.mShrapnelCount, SHRAPNEL_COUNT)
+			.add(" fragments, which quickly fall back to the ground, each Scorching enemies within ")
+			.add(a -> a.mShrapnelRadius, SHRAPNEL_RADIUS)
+			.add(" blocks of the impact location (scales with your potion's radius) for ")
+			.addDuration(a -> a.mScorchedDuration, SCORCHED_DURATION_PER_APPLICATION)
+			.add("s. ")
+			.add("Charges: ")
+			.add(a -> a.mMaxCharges, CHARGES)
+			.add(" (all are refunded when the cooldown ends).")
+			.addCooldown(COOLDOWN_1, Ability::isLevelOne)
+			.add(Component.text("\nScorched:\n").color(NamedTextColor.YELLOW))
+			.add("Scorched enemies take ")
+			.addPercent(a -> a.mScorchedDamage, SCORCHED_DAMAGE_PER_SECOND_1, false, Ability::isLevelOne)
+			.add(" of your potion's damage over ")
+			.addDuration(a -> a.mScorchedDuration, SCORCHED_DURATION_PER_APPLICATION)
+			.add("s, and are set on fire. ")
+			.add("The duration of this debuff can stack up to a maximum of ")
+			.addDuration(a -> a.mScorchedMaxDuration, MAX_SCORCHED_DURATION)
+			.add("s, and it is gradually consumed over time.");
 	}
 
 	private static Description<ScorchedEarth> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Charges: ")
-			.add(a -> a.mMaxCharges, SCORCHED_EARTH_2_CHARGES, false, Ability::isLevelTwo)
-			.add(".")
-			.addCooldown(SCORCHED_EARTH_2_COOLDOWN, Ability::isLevelTwo);
+			.add("Mobs inside the zone are now afflicted with ")
+			.addPercent(a -> a.mSlownessAmp, SLOWNESS_AMP_2, false, Ability::isLevelTwo)
+			.add(" slowness and ")
+			.addPercent(a -> a.mWeaknessAmp, WEAKNESS_AMP_2, false, Ability::isLevelTwo)
+			.add(" weakness. The damage of the Scorched debuff is increased to ")
+			.addPercent(a -> a.mScorchedDamage, SCORCHED_DAMAGE_PER_SECOND_2, false, Ability::isLevelTwo)
+			.add(" of your potion's damage over ")
+			.addDuration(a -> a.mScorchedDuration, SCORCHED_DURATION_PER_APPLICATION)
+			.add("s.")
+			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
 	}
 }

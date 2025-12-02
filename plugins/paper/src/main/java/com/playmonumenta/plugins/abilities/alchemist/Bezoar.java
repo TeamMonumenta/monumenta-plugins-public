@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.BezoarCS;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentPotionRecharge;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
@@ -24,8 +25,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,10 +39,12 @@ public class Bezoar extends Ability {
 	private static final double DAMAGE_PERCENT = 0.15;
 	private static final int POTIONS = 1;
 
-	private static final double PHILOSOPHER_STONE_BEZOAR_COUNT = 10;
-	private static final int PHILOSOPHER_STONE_POTIONS = 3;
+	private static final int PHILOSOPHER_STONE_BEZOAR_COUNT = 5;
 	public static final int PHILOSOPHER_STONE_ABSORPTION_AMOUNT = 4;
-	public static final int PHILOSOPHER_STONE_ABSORPTION_DURATION = 16 * 20;
+	public static final int PHILOSOPHER_STONE_ABSORPTION_DURATION = 12 * 20;
+	public static final String PHILOSOPHER_STONE_RECHARGE_RATE_MULTIPLIER_NAME = "PhilosophersStoneRechargeRateMultiplier";
+	public static final double PHILOSOPHER_STONE_RECHARGE_RATE_BONUS = 1;
+	public static final int PHILOSOPHER_STONE_RECHARGE_RATE_REDUCTION_DURATION = 8 * 20;
 
 	public static final String CHARM_REQUIREMENT = "Bezoar Generation Requirement";
 	public static final String CHARM_LINGER_TIME = "Bezoar Linger Duration";
@@ -52,12 +53,13 @@ public class Bezoar extends Ability {
 	public static final String CHARM_HEALING = "Bezoar Healing";
 	public static final String CHARM_DAMAGE_DURATION = "Bezoar Damage Duration";
 	public static final String CHARM_DAMAGE = "Bezoar Damage Modifier";
-	public static final String CHARM_PHILOSOPHER_STONE_RATE = "Bezoar Philosopher Stone Spawn Rate";
-	public static final String CHARM_ABSORPTION = "Bezoar Absorption Health";
-	public static final String CHARM_ABSORPTION_DURATION = "Bezoar Absorption Duration";
 	public static final String CHARM_POTIONS = "Bezoar Potions";
-	public static final String CHARM_PHILOSOPHER_STONE_POTIONS = "Bezoar Philosopher Stone Potions";
 	public static final String CHARM_RADIUS = "Bezoar Radius";
+	public static final String CHARM_PHILOSOPHER_STONE_SPAWN_RATE = "Bezoar Philosopher Stone Spawn Rate";
+	public static final String CHARM_PHILOSOPHER_STONE_RECHARGE_RATE_BONUS = "Bezoar Philosopher Stone Recharge Rate Bonus";
+	public static final String CHARM_PHILOSOPHER_STONE_RECHARGE_RATE_DURATION = "Bezoar Philosopher Stone Recharge Rate Duration";
+	public static final String CHARM_PHILOSOPHER_STONE_ABSORPTION = "Bezoar Philosopher Stone Absorption Health";
+	public static final String CHARM_PHILOSOPHER_STONE_ABSORPTION_DURATION = "Bezoar Philosopher Stone Absorption Duration";
 
 	public static final AbilityInfo<Bezoar> INFO =
 		new AbilityInfo<>(Bezoar.class, "Bezoar", Bezoar::new)
@@ -70,7 +72,11 @@ public class Bezoar extends Ability {
 
 	private final int mLingerTime;
 	private final int mPotions;
-	private final int mPhilosophersStonePotions;
+	private final int mPhilosophersStoneBezoarCount;
+	private final double mPhilosophersStoneRechargeRateBonus;
+	private final int mPhilosophersStoneRechargeRateDuration;
+	private final double mPhilosophersStoneAbsorptionAmount;
+	private final int mPhilosophersStoneAbsorptionDuration;
 	private final int mDebuffReduction;
 	private final int mHealDuration;
 	private final double mHealPercent;
@@ -88,7 +94,11 @@ public class Bezoar extends Ability {
 		super(plugin, player, INFO);
 		mLingerTime = CharmManager.getDuration(mPlayer, CHARM_LINGER_TIME, LINGER_TIME);
 		mPotions = POTIONS + (int) CharmManager.getLevel(mPlayer, CHARM_POTIONS);
-		mPhilosophersStonePotions = PHILOSOPHER_STONE_POTIONS + (int) CharmManager.getLevel(mPlayer, CHARM_PHILOSOPHER_STONE_POTIONS);
+		mPhilosophersStoneAbsorptionAmount = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PHILOSOPHER_STONE_ABSORPTION, PHILOSOPHER_STONE_ABSORPTION_AMOUNT);
+		mPhilosophersStoneAbsorptionDuration = CharmManager.getDuration(mPlayer, CHARM_PHILOSOPHER_STONE_ABSORPTION_DURATION, PHILOSOPHER_STONE_ABSORPTION_DURATION);
+		mPhilosophersStoneBezoarCount = PHILOSOPHER_STONE_BEZOAR_COUNT + (int) CharmManager.getLevel(mPlayer, CHARM_PHILOSOPHER_STONE_SPAWN_RATE);
+		mPhilosophersStoneRechargeRateBonus = PHILOSOPHER_STONE_RECHARGE_RATE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_PHILOSOPHER_STONE_RECHARGE_RATE_BONUS);
+		mPhilosophersStoneRechargeRateDuration = CharmManager.getDuration(mPlayer, CHARM_PHILOSOPHER_STONE_RECHARGE_RATE_DURATION, PHILOSOPHER_STONE_RECHARGE_RATE_REDUCTION_DURATION);
 		mDebuffReduction = CharmManager.getDuration(mPlayer, CHARM_DEBUFF_REDUCTION, DEBUFF_REDUCTION);
 		mHealDuration = CharmManager.getDuration(mPlayer, CHARM_HEAL_DURATION, HEAL_DURATION);
 		mHealPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT);
@@ -109,7 +119,7 @@ public class Bezoar extends Ability {
 		// Every n bezoars spawned, it should spawn a philosopher stone instead.
 		if (isEnhanced()) {
 			mBezoarsSpawned++;
-			if (mBezoarsSpawned >= PHILOSOPHER_STONE_BEZOAR_COUNT) {
+			if (mBezoarsSpawned >= mPhilosophersStoneBezoarCount) {
 				mBezoarsSpawned = 0;
 				spawnPhilosopherStone(loc);
 			} else {
@@ -163,16 +173,24 @@ public class Bezoar extends Ability {
 
 
 	private void applyEffects(Player player, boolean isPhilosopherStone) {
-		for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {
-			PotionEffect effect = player.getPotionEffect(effectType);
-			if (effect != null) {
-				player.removePotionEffect(effectType);
-				// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
-				player.addPotionEffect(new PotionEffect(effectType, Math.max(effect.getDuration() - mDebuffReduction, 0), effect.getAmplifier()));
+		if (isPhilosopherStone) {
+			AbsorptionUtils.addAbsorption(player, mPlayer, mPhilosophersStoneAbsorptionAmount, mPhilosophersStoneAbsorptionAmount, mPhilosophersStoneAbsorptionDuration);
+			if (mAlchemistPotions != null) {
+				mPlugin.mEffectManager.addEffect(
+					mPlayer,
+					PHILOSOPHER_STONE_RECHARGE_RATE_MULTIPLIER_NAME,
+					new PercentPotionRecharge(
+						mPhilosophersStoneRechargeRateDuration,
+						mPhilosophersStoneRechargeRateBonus,
+						PHILOSOPHER_STONE_RECHARGE_RATE_MULTIPLIER_NAME,
+						mAlchemistPotions
+					)
+				);
 			}
+			return;
 		}
 
-		// If the effects are from a philosopher stone, it should give them with triple the duration.
+		PotionUtils.reduceAllDebuffsDuration(mPlugin, player, mDebuffReduction);
 		double maxHealth = EntityUtils.getMaxHealth(player);
 		mPlugin.mEffectManager.addEffect(player, "BezoarHealing",
 			new CustomRegeneration(mHealDuration,
@@ -180,10 +198,6 @@ public class Bezoar extends Ability {
 
 		if (isLevelTwo()) {
 			mPlugin.mEffectManager.addEffect(player, "BezoarPercentDamageDealtEffect", new PercentDamageDealt(mDamageDuration, mDamagePercent).deleteOnAbilityUpdate(true));
-		}
-
-		if (isPhilosopherStone) {
-			AbsorptionUtils.addAbsorption(player, PHILOSOPHER_STONE_ABSORPTION_AMOUNT, PHILOSOPHER_STONE_ABSORPTION_AMOUNT, PHILOSOPHER_STONE_ABSORPTION_DURATION);
 		}
 	}
 
@@ -206,10 +220,6 @@ public class Bezoar extends Ability {
 					}
 					applyPhilosopherEffects(mPlayer);
 					mCosmetic.targetEffects(mPlayer, itemLoc, true);
-
-					if (mAlchemistPotions != null) {
-						mAlchemistPotions.incrementCharges(mPhilosophersStonePotions);
-					}
 
 					item.remove();
 					mCosmetic.pickupEffects(mPlayer, itemLoc, true);
@@ -261,13 +271,13 @@ public class Bezoar extends Ability {
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks of the Alchemist spawns a Bezoar that lingers for ")
 			.addDuration(a -> a.mLingerTime, LINGER_TIME)
-			.add(" seconds. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates ")
+			.add("s. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates ")
 			.addPercent(a -> a.mHealPercent, HEAL_PERCENT)
 			.add(" of max health every second for ")
 			.addDuration(a -> a.mHealDuration, HEAL_DURATION)
-			.add(" seconds and reduces the duration of all current potion debuffs by ")
+			.add("s and reduces the duration of all your vanilla potion debuffs by ")
 			.addDuration(a -> a.mDebuffReduction, DEBUFF_REDUCTION)
-			.add(" seconds.");
+			.add("s.");
 	}
 
 	private static Description<Bezoar> getDescription2() {
@@ -276,19 +286,21 @@ public class Bezoar extends Ability {
 			.addPercent(a -> a.mDamagePercent, DAMAGE_PERCENT)
 			.add(" damage from all sources for ")
 			.addDuration(a -> a.mDamageDuration, DAMAGE_DURATION)
-			.add(" seconds.");
+			.add("s.");
 	}
 
 	private static Description<Bezoar> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Every ")
-			.add(a -> PHILOSOPHER_STONE_BEZOAR_COUNT, PHILOSOPHER_STONE_BEZOAR_COUNT, true)
-			.add(" bezoars spawned, summon a Philosopher's Stone instead. A Philosopher's Stone grants the Alchemist ")
-			.add(a -> a.mPhilosophersStonePotions, PHILOSOPHER_STONE_POTIONS)
-			.add(" potions, and gives the same effects as bezoars, while also granting ")
-			.add(a -> PHILOSOPHER_STONE_ABSORPTION_AMOUNT, PHILOSOPHER_STONE_ABSORPTION_AMOUNT)
-			.add(" absorption for ")
-			.addDuration(PHILOSOPHER_STONE_ABSORPTION_DURATION)
-			.add(" seconds.");
+			.add(a -> a.mPhilosophersStoneBezoarCount, PHILOSOPHER_STONE_BEZOAR_COUNT, true)
+			.add(" bezoars spawned, summon a Philosopher's Stone instead. Picking it up grants you +")
+			.addPercent(a -> a.mPhilosophersStoneRechargeRateBonus, PHILOSOPHER_STONE_RECHARGE_RATE_BONUS)
+			.add(" potion recharge rate for ")
+			.addDuration(a -> a.mPhilosophersStoneRechargeRateDuration, PHILOSOPHER_STONE_RECHARGE_RATE_REDUCTION_DURATION)
+			.add("s and ")
+			.add(a -> a.mPhilosophersStoneAbsorptionAmount, PHILOSOPHER_STONE_ABSORPTION_AMOUNT)
+			.add(" absorption health for ")
+			.addDuration(a -> a.mPhilosophersStoneAbsorptionDuration, PHILOSOPHER_STONE_ABSORPTION_DURATION)
+			.add("s.");
 	}
 }

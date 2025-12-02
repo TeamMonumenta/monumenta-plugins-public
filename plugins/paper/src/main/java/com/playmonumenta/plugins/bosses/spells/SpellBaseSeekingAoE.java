@@ -129,8 +129,6 @@ public abstract class SpellBaseSeekingAoE extends Spell {
 
 			@Override
 			public void run() {
-				mTicks++;
-
 				if (EntityUtils.shouldCancelSpells(mCaster) || targets.isEmpty()) {
 					this.cancel();
 					if (!mCanMoveWhileCharging) {
@@ -139,6 +137,11 @@ public abstract class SpellBaseSeekingAoE extends Spell {
 					return;
 				}
 
+				if (EntityUtils.shouldPauseSpells(mCaster)) {
+					return;
+				}
+
+				mTicks++;
 				for (Player target : new ArrayList<>(targets)) {
 
 					if (target.getLocation().distanceSquared(mCaster.getLocation()) > mRange * mRange && mCancelOutsideRange) {

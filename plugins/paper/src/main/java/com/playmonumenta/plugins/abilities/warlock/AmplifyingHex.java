@@ -189,6 +189,10 @@ public class AmplifyingHex extends Ability {
 				debuffCount++;
 			}
 
+			if (EntityUtils.isStaggered(mob)) {
+				debuffCount++;
+			}
+
 			if (effectPairList.containsKey(EntityUtils.PARALYZE_EFFECT_NAME)) {
 				debuffCount++;
 			}

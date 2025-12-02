@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -23,7 +24,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -51,15 +51,15 @@ import org.jetbrains.annotations.Nullable;
 
 public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 
-	private static final int UNSTABLE_AMALGAM_1_COOLDOWN = 20 * 20;
-	private static final int UNSTABLE_AMALGAM_2_COOLDOWN = 16 * 20;
+	private static final int UNSTABLE_AMALGAM_1_COOLDOWN = 18 * 20;
+	private static final int UNSTABLE_AMALGAM_2_COOLDOWN = 14 * 20;
 	private static final int UNSTABLE_AMALGAM_1_DAMAGE = 10;
 	private static final int UNSTABLE_AMALGAM_2_DAMAGE = 15;
 	private static final int UNSTABLE_AMALGAM_CAST_RANGE = 7;
-	private static final int UNSTABLE_AMALGAM_DURATION = 3 * 20;
+	private static final int UNSTABLE_AMALGAM_DURATION = 1 * 20;
 	private static final int UNSTABLE_AMALGAM_RADIUS = 4;
-	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED_HORIZONTAL = 2.5f;
-	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED_VERTICAL = 1.0f;
+	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED_HORIZONTAL = 2f;
+	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED_VERTICAL = 0.8f;
 	private static final int UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION = 20 * 8;
 	private static final double UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE = 0.4;
 	private static final String DISABLE_SOURCE = "UnstableAmalgamDisable";
@@ -71,7 +71,8 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 	public static final String CHARM_RANGE = "Unstable Amalgam Cast Range";
 	public static final String CHARM_RADIUS = "Unstable Amalgam Radius";
 	public static final String CHARM_DURATION = "Unstable Amalgam Duration";
-	public static final String CHARM_KNOCKBACK = "Unstable Amalgam Knockback Speed";
+	public static final String CHARM_KNOCKBACK_MOBS = "Unstable Amalgam Mob Knockback Speed";
+	public static final String CHARM_KNOCKBACK_PLAYERS = "Unstable Amalgam Player Knockback Speed";
 	public static final String CHARM_INSTABILITY_DURATION = "Unstable Amalgam Instability Duration";
 	public static final String CHARM_POTION_DAMAGE = "Unstable Amalgam Dropped Potion Damage Modifier";
 
@@ -90,12 +91,18 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 			.displayItem(Material.GUNPOWDER);
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
-	private boolean mHasGruesome;
+	private @Nullable GruesomeAlchemy mGruesomeAlchemy;
+	private @Nullable BrutalAlchemy mBrutalAlchemy;
+	private @Nullable EsotericEnhancements mEsotericEnhancements;
 	private @Nullable Slime mAmalgam = null;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats = null;
 	private final double mDamage;
 	private final double mRadius;
 	private final double mRange;
+	private final float mMobHorizontalKnockback;
+	private final float mMobVerticalKnockback;
+	private final float mPlayerHorizontalKnockback;
+	private final float mPlayerVerticalKnockback;
 	private final int mInstabilityDuration;
 	private final double mPotionDamageMult;
 	private final Map<ThrownPotion, ItemStatManager.PlayerItemStats> mEnhancementPotionPlayerStat = new HashMap<>();
@@ -106,18 +113,34 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 
 	public UnstableAmalgam(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? UNSTABLE_AMALGAM_1_DAMAGE : UNSTABLE_AMALGAM_2_DAMAGE);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
+			isLevelOne() ? UNSTABLE_AMALGAM_1_DAMAGE : UNSTABLE_AMALGAM_2_DAMAGE);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, UNSTABLE_AMALGAM_RADIUS);
 		mMaxDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, UNSTABLE_AMALGAM_DURATION);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, UNSTABLE_AMALGAM_CAST_RANGE);
-		mInstabilityDuration = CharmManager.getDuration(mPlayer, CHARM_INSTABILITY_DURATION, UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION);
-		mPotionDamageMult = UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_POTION_DAMAGE);
+		mInstabilityDuration = CharmManager.getDuration(mPlayer, CHARM_INSTABILITY_DURATION,
+			UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION);
+		mPotionDamageMult = UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE +
+			CharmManager.getLevelPercentDecimal(mPlayer, CHARM_POTION_DAMAGE);
+		mMobHorizontalKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer,
+			CHARM_KNOCKBACK_MOBS, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_HORIZONTAL);
+		mMobVerticalKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer,
+			CHARM_KNOCKBACK_MOBS, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_VERTICAL);
+		mPlayerHorizontalKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer,
+			CHARM_KNOCKBACK_PLAYERS, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_HORIZONTAL * 1.25);
+		mPlayerVerticalKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer,
+			CHARM_KNOCKBACK_PLAYERS, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_VERTICAL * 2.5);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new UnstableAmalgamCS());
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-			mHasGruesome = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, GruesomeAlchemy.class) != null;
-		});
+		Bukkit.getScheduler().runTask(
+			plugin,
+			() -> {
+				mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+				mGruesomeAlchemy = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, GruesomeAlchemy.class);
+				mBrutalAlchemy = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, BrutalAlchemy.class);
+				mEsotericEnhancements = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, EsotericEnhancements.class);
+			}
+		);
 	}
 
 	public boolean cast() {
@@ -127,13 +150,6 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 			return false;
 		}
 
-		// explode existing amalgam
-		if (MetadataUtils.checkOnceInRecentTicks(mPlugin, mPlayer, "UnstableAmalgamCast", 2) && mAmalgam != null) {
-			explode(mAmalgam.getLocation());
-			mAmalgam.remove();
-			mAmalgam = null;
-			return true;
-		}
 		if (isOnCooldown()) {
 			return false;
 		}
@@ -224,26 +240,29 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 			return;
 		}
 
-		float horizontalKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_HORIZONTAL);
-		float verticalKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_VERTICAL);
-		float playerVertical = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_VERTICAL * 2);
-
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
 		List<LivingEntity> mobs = hitbox.getHitMobs(mAmalgam);
 		mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+
+		if (mEsotericEnhancements != null) {
+			mEsotericEnhancements.createPuddle(loc, true, mPlayerItemStats, mRadius);
+			mEsotericEnhancements.createPuddle(loc, false, mPlayerItemStats, mRadius);
+		}
 
 		double damage = mDamage + CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage());
 		for (LivingEntity mob : mobs) {
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), mPlayerItemStats), damage, true, true, false);
 
+			GruesomeAlchemy.tryDoEnhancementEffect(mGruesomeAlchemy, mob);
+			BrutalAlchemy.tryDoEnhancementEffect(mBrutalAlchemy, mob);
 			applyEffects(mob, mPlayerItemStats);
 
-			if (!EntityUtils.isBoss(mob)) {
+			if (!EntityUtils.isBoss(mob) && !EntityUtils.isCCImmuneMob(mob)) {
 				if (isEnhanced()) {
-					mob.setVelocity(new Vector(0, verticalKnockback, 0));
-					BossManager.getInstance().entityKnockedAway(mob, verticalKnockback);
+					mob.setVelocity(new Vector(0, mMobVerticalKnockback, 0));
+					BossManager.getInstance().entityKnockedAway(mob, mMobVerticalKnockback);
 				} else {
-					MovementUtils.knockAwayRealistic(loc, mob, horizontalKnockback, verticalKnockback, true);
+					MovementUtils.knockAwayRealistic(loc, mob, mMobHorizontalKnockback, mMobVerticalKnockback, true);
 				}
 			}
 			mAlchemistPotions.incrementCharge();
@@ -259,11 +278,11 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 			for (Player player : hitbox.getHitPlayers(true)) {
 				if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 					if (!player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, ROCKET_JUMP_OBJECTIVE).orElse(0) == 100) {
-						MovementUtils.knockAwayRealistic(loc, player, horizontalKnockback, playerVertical, false);
+						MovementUtils.knockAwayRealistic(loc, player, mPlayerHorizontalKnockback, mPlayerVerticalKnockback, false);
 						disable(player);
 					} else if (player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, ROCKET_JUMP_OBJECTIVE).orElse(1) > 0) {
 						// by default any Alch can use Rocket Jump with their UA
-						MovementUtils.knockAwayRealistic(loc, player, horizontalKnockback, playerVertical, false);
+						MovementUtils.knockAwayRealistic(loc, player, mPlayerHorizontalKnockback, mPlayerVerticalKnockback, false);
 						disable(player);
 					}
 				}
@@ -348,9 +367,7 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 
 	private void applyEffects(LivingEntity entity, ItemStatManager.PlayerItemStats stats) {
 		if (mAlchemistPotions != null) {
-			if (mHasGruesome) {
-				mAlchemistPotions.applyEffects(entity, true, stats);
-			}
+			mAlchemistPotions.applyEffects(entity, true, stats);
 			mAlchemistPotions.applyEffects(entity, false, stats);
 		}
 	}
@@ -381,13 +398,15 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 			.addTrigger()
 			.add(" to consume a potion to place an Amalgam with 1 health at the location you are looking, up to ")
 			.add(a -> a.mRange, UNSTABLE_AMALGAM_CAST_RANGE)
-			.add(" blocks away. Trigger again to detonate it, dealing your Alchemist Potion's damage + ")
+			.add(" blocks away. When killed, or after ")
+			.addDuration(a -> a.mMaxDuration, UNSTABLE_AMALGAM_DURATION)
+			.add("s, it detonates, dealing your Alchemist Potion's damage + ")
 			.add(a -> a.mDamage, UNSTABLE_AMALGAM_1_DAMAGE, false, Ability::isLevelOne)
 			.add(" magic damage to mobs within ")
 			.add(a -> a.mRadius, UNSTABLE_AMALGAM_RADIUS)
-			.add(" blocks and applying potion effects from all abilities. The Amalgam also explodes when killed, or ")
-			.addDuration(a -> a.mMaxDuration, UNSTABLE_AMALGAM_DURATION)
-			.add(" seconds after being placed. Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion.")
+			.add(" blocks and applying both Gruesome and Brutal potion effects.")
+			.add(" Mobs and players in the radius are knocked away from the Amalgam.")
+			.add(" For each mob damaged, gain an Alchemist's Potion.")
 			.addCooldown(UNSTABLE_AMALGAM_1_COOLDOWN, Ability::isLevelOne);
 	}
 
@@ -405,6 +424,6 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 			.addDuration(a -> a.mInstabilityDuration, UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION)
 			.add(" seconds, and they are knocked straight up. When an unstable mob is killed, a potion that deals ")
 			.addPercent(a -> a.mPotionDamageMult, UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE)
-			.add(" of your potion damage is dropped at its location. These potions apply both Brutal and Gruesome effects (if equipped), and bypass both normal and Alchemist Potion iframes.");
+			.add(" of your potion damage is dropped at its location. These potions apply both Brutal and Gruesome, and bypass both normal and Alchemist Potion iframes.");
 	}
 }

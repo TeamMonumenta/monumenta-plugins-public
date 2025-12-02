@@ -7,11 +7,11 @@ import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.Bezoar;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
-import com.playmonumenta.plugins.abilities.alchemist.EmpoweringOdor;
 import com.playmonumenta.plugins.abilities.alchemist.EnergizingElixir;
 import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.IronTincture;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableAmalgam;
+import com.playmonumenta.plugins.abilities.alchemist.VolatileReaction;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
@@ -326,7 +326,7 @@ public class AbilityManager {
 			//********** ALCHEMIST **********//
 			Bezoar.INFO,
 			AlchemicalArtillery.INFO,
-			EmpoweringOdor.INFO,
+			VolatileReaction.INFO,
 			UnstableAmalgam.INFO,
 			IronTincture.INFO,
 			GruesomeAlchemy.INFO,

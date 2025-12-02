@@ -5,11 +5,11 @@ import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.Bezoar;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
-import com.playmonumenta.plugins.abilities.alchemist.EmpoweringOdor;
 import com.playmonumenta.plugins.abilities.alchemist.EnergizingElixir;
 import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.IronTincture;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableAmalgam;
+import com.playmonumenta.plugins.abilities.alchemist.VolatileReaction;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
@@ -31,7 +31,7 @@ public class Alchemist extends PlayerClass {
 		mAbilities.add(BrutalAlchemy.INFO);
 		mAbilities.add(IronTincture.INFO);
 		mAbilities.add(AlchemicalArtillery.INFO);
-		mAbilities.add(EmpoweringOdor.INFO);
+		mAbilities.add(VolatileReaction.INFO);
 		mAbilities.add(UnstableAmalgam.INFO);
 		mAbilities.add(EnergizingElixir.INFO);
 		mAbilities.add(Bezoar.INFO);
@@ -64,6 +64,7 @@ public class Alchemist extends PlayerClass {
 		mTriggerOrder = ImmutableList.of(
 			Taboo.INFO,
 			ScorchedEarth.INFO,
+			VolatileReaction.INFO,
 
 			Panacea.INFO,
 			TransmutationRing.INFO,

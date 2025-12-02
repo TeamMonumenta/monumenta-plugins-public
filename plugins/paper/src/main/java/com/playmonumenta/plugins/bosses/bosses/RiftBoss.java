@@ -163,6 +163,16 @@ public class RiftBoss extends BossAbilityGroup {
 
 					@Override
 					public void run() {
+						if (EntityUtils.shouldCancelSpells(mBoss)) {
+							EntityUtils.cancelSelfRoot(mBoss);
+							this.cancel();
+							return;
+						}
+
+						if (EntityUtils.shouldPauseSpells(mBoss)) {
+							return;
+						}
+
 						mT += 2;
 						mPitch += 0.025f;
 
@@ -184,11 +194,6 @@ public class RiftBoss extends BossAbilityGroup {
 
 						p.SOUND_CHARGE.play(mLoc, 1.25f, mPitch);
 						p.PARTICLE_BOSS_CHARGE.spawn(mBoss, mLoc);
-
-						if (EntityUtils.shouldCancelSpells(mBoss)) {
-							this.cancel();
-							EntityUtils.cancelSelfRoot(mBoss);
-						}
 
 						if (mT >= p.DURATION) {
 							this.cancel();

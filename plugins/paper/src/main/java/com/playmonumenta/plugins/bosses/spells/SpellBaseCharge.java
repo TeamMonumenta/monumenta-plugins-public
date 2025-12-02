@@ -405,6 +405,10 @@ public class SpellBaseCharge extends Spell {
 					this.cancel();
 					return;
 				}
+
+				if (EntityUtils.shouldPauseSpells(mBoss)) {
+					return;
+				}
 				if (mTicks == 0) {
 					if (mWarningAction != null) {
 						mWarningAction.run(target);
@@ -445,6 +449,10 @@ public class SpellBaseCharge extends Spell {
 			public void run() {
 				if (EntityUtils.shouldCancelSpells(mBoss)) {
 					this.cancel();
+					return;
+				}
+
+				if (EntityUtils.shouldPauseSpells(mBoss)) {
 					return;
 				}
 				if (mTicks == 0 || mTargetLoc == null) {

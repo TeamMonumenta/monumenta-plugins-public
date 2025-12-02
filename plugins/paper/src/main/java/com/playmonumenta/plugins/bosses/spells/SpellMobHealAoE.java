@@ -99,7 +99,6 @@ public class SpellMobHealAoE extends Spell {
 
 			@Override
 			public void run() {
-				Location loc = mBoss.getLocation();
 				if (EntityUtils.shouldCancelSpells(mBoss)) {
 					this.cancel();
 					if (mCanMoveWhileCasting) {
@@ -108,6 +107,11 @@ public class SpellMobHealAoE extends Spell {
 					return;
 				}
 
+				if (EntityUtils.shouldPauseSpells(mBoss)) {
+					return;
+				}
+
+				Location loc = mBoss.getLocation();
 				mChargeAuraAesthetic.run(loc.clone().add(0, 1, 0), mTimer);
 
 				for (double i = 0; i < 360; i += 30) {

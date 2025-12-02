@@ -35,8 +35,8 @@ public class Choler implements Infusion {
 		if (!AFFECTED_DAMAGE_TYPES.contains(event.getType())) {
 			return;
 		}
-		if (EntityUtils.isStunned(enemy) || EntityUtils.isSlowed(plugin, enemy) || enemy.hasPotionEffect(PotionEffectType.SLOW)
-			|| enemy.getFireTicks() > 0 || plugin.mEffectManager.hasEffect(enemy, InfernoDamage.class)) {
+		if (EntityUtils.isStunned(enemy) || EntityUtils.isStaggered(enemy) || EntityUtils.isSlowed(plugin, enemy) || enemy.hasPotionEffect(PotionEffectType.SLOW)
+			    || enemy.getFireTicks() > 0 || plugin.mEffectManager.hasEffect(enemy, InfernoDamage.class)) {
 			event.updateGearDamageWithMultiplier(getDamageDealtMultiplier(value));
 		}
 	}

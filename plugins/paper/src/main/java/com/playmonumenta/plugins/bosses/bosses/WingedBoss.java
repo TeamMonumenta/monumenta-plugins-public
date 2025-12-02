@@ -133,8 +133,8 @@ public final class WingedBoss extends BossAbilityGroup {
 				}
 
 				// Temporarily stop flying if stunned
-				if (EntityUtils.isStunned(mBoss)) {
-					if (p.HAS_WINGS) {
+				if (EntityUtils.isStunned(mBoss) || EntityUtils.isStaggered(mBoss)) {
+					if(p.HAS_WINGS) {
 						wings.forEach(e -> {
 							if (e instanceof ArmorStand stand) {
 								stand.teleport(mBoss.getLocation().add(0, p.WING_Y_OFFSET, 0));

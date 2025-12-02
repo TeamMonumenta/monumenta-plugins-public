@@ -211,5 +211,7 @@ public interface VersionAdapter {
 
 	void updatePlayerNametag(Player clientPlayer, Entity...entities);
 
-  double getJumpVelocity(LivingEntity entity);
+	double getJumpVelocity(LivingEntity entity);
+
+	void setNotOnGround(Entity entity);
 }

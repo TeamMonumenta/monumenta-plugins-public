@@ -372,6 +372,10 @@ public class AbilityUtils {
 			debuffCount++;
 		}
 
+		if (EntityUtils.isStaggered(entity)) {
+			debuffCount++;
+		}
+
 		if (EntityUtils.isParalyzed(plugin, entity)) {
 			debuffCount++;
 		}
@@ -769,7 +773,7 @@ public class AbilityUtils {
 		ClassAbility.METEOR_SLAM,
 		ClassAbility.SCORCHED_EARTH,
 		ClassAbility.BRUTAL_ALCHEMY,
-		ClassAbility.PANACEA,
+		ClassAbility.VOLATILE_REACTION_DOT,
 		ClassAbility.ESOTERIC_ENHANCEMENTS,
 		ClassAbility.ELEMENTAL_SPIRIT_ICE,
 		ClassAbility.FLAME_TOTEM,

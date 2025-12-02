@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.itemstats.attributes.MagicDamageAdd;
 import com.playmonumenta.plugins.itemstats.attributes.MagicDamageMultiply;
 import com.playmonumenta.plugins.itemstats.attributes.PotionDamage;
 import com.playmonumenta.plugins.itemstats.attributes.PotionRadius;
+import com.playmonumenta.plugins.itemstats.attributes.PotionRechargeRate;
 import com.playmonumenta.plugins.itemstats.attributes.ProjectileDamageAdd;
 import com.playmonumenta.plugins.itemstats.attributes.ProjectileDamageMultiply;
 import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
@@ -31,6 +32,9 @@ public enum AttributeType {
 	ARMOR(new Armor(), false, true),
 	AGILITY(new Agility(), false, true),
 	MAX_HEALTH(Attribute.GENERIC_MAX_HEALTH, "Max Health", false, false),
+	POTION_DAMAGE(new PotionDamage(), true, false),
+	POTION_RADIUS(new PotionRadius(), true, false),
+	POTION_RECHARGE_RATE(new PotionRechargeRate(), true, false),
 	ATTACK_DAMAGE_ADD(new AttackDamageAdd(), true, false),
 	ATTACK_DAMAGE_MULTIPLY(new AttackDamageMultiply(), true, false),
 	ATTACK_SPEED(Attribute.GENERIC_ATTACK_SPEED, "Attack Speed", false, false),
@@ -43,8 +47,6 @@ public enum AttributeType {
 	MAGIC_DAMAGE_MULTIPLY(new MagicDamageMultiply(), true, false),
 	SPEED(Attribute.GENERIC_MOVEMENT_SPEED, "Speed", false, false),
 	KNOCKBACK_RESISTANCE(Attribute.GENERIC_KNOCKBACK_RESISTANCE, "Knockback Resistance", false, false),
-	POTION_DAMAGE(new PotionDamage(), true, false),
-	POTION_RADIUS(new PotionRadius(), true, false),
 	THORNS(new ThornsDamage(), true, true);
 
 	static final Map<String, AttributeType> REVERSE_MAPPINGS = Arrays.stream(values())
@@ -57,7 +59,8 @@ public enum AttributeType {
 		PROJECTILE_SPEED,
 		THROW_RATE,
 		POTION_DAMAGE,
-		POTION_RADIUS
+		POTION_RADIUS,
+		POTION_RECHARGE_RATE
 	);
 
 	public static final ImmutableList<AttributeType> PROJECTILE_ATTRIBUTE_TYPES = ImmutableList.of(
@@ -119,21 +122,26 @@ public enum AttributeType {
 
 	public static Component getDisplay(AttributeType attribute, double amount, Slot slot, Operation operation) {
 		String name = attribute.getName();
-		if (slot == Slot.MAINHAND && operation == Operation.ADD) {
-			if (attribute == ATTACK_DAMAGE_ADD) {
-				return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount + 1), name.replace(" Add", "")), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
-			} else if (attribute == ATTACK_SPEED) {
-				return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount + 4), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
-			} else if (attribute == PROJECTILE_SPEED || attribute == THROW_RATE) {
-				return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
-			} else if (PROJECTILE_DAMAGE_ADD.getName().equals(name)) {
-				return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount), name.replace(" Add", "")), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
-			} else if (attribute == POTION_DAMAGE || attribute == POTION_RADIUS) {
-				return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
+		if (slot == Slot.MAINHAND) {
+			if (operation == Operation.ADD) {
+				if (attribute == ATTACK_DAMAGE_ADD) {
+					return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount + 1), name.replace(" Add", "")), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
+				} else if (attribute == ATTACK_SPEED) {
+					return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount + 4), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
+				} else if (attribute == PROJECTILE_SPEED || attribute == THROW_RATE) {
+					return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
+				} else if (PROJECTILE_DAMAGE_ADD.getName().equals(name)) {
+					return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount), name.replace(" Add", "")), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
+				} else if (attribute == POTION_DAMAGE || attribute == POTION_RADIUS) {
+					return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
+				}
+			} else {
+				if (attribute == POTION_RECHARGE_RATE) {
+					return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
+				} else if (attribute == PROJECTILE_SPEED) {
+					return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
+				}
 			}
-		} else if (slot == Slot.MAINHAND && attribute == PROJECTILE_SPEED) {
-			// Hack for mainhand items using projectile speed multiply instead of add
-			return Component.text(String.format(" %s %s", ItemStatUtils.NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
 		}
 
 		if (attribute == ARMOR || attribute == AGILITY) {

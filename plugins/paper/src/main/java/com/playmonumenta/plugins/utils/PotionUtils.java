@@ -365,6 +365,17 @@ public class PotionUtils {
 		}
 	}
 
+	public static void reduceAllDebuffsDuration(Plugin plugin, LivingEntity le, int debuffReductionTicks) {
+		for (PotionEffectType effectType : getNegativeEffects(plugin, le)) {
+			PotionEffect effect = le.getPotionEffect(effectType);
+			if (effect != null) {
+				le.removePotionEffect(effectType);
+				// No chance of overwriting and we don't want to trigger PotionApplyEvent for "upgrading" effects, so don't use PotionUtils here
+				le.addPotionEffect(new PotionEffect(effectType, Math.max(effect.getDuration() - debuffReductionTicks, 0), effect.getAmplifier()));
+			}
+		}
+	}
+
 	public static List<PotionEffectType> getNegativeEffects(Plugin plugin, LivingEntity le) {
 		List<PotionEffectType> types = new ArrayList<>();
 		for (PotionEffect effect : le.getActivePotionEffects()) {

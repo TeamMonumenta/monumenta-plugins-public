@@ -54,6 +54,10 @@ public class SpellMageCosmicMoonblade extends Spell {
 						return;
 					}
 
+					if (EntityUtils.shouldPauseSpells(mBoss)) {
+						return;
+					}
+
 					for (double r = 1; r < mParams.RANGE; r += 0.5) {
 						for (double degree = mDegree; degree < mDegree + mParams.DEGREE_INCREMENT; degree += 5) {
 							double radian1 = Math.toRadians(degree);
@@ -94,6 +98,11 @@ public class SpellMageCosmicMoonblade extends Spell {
 						cancel();
 						return;
 					}
+
+					if (EntityUtils.shouldPauseSpells(mBoss)) {
+						return;
+					}
+
 					mTimes++;
 					mSwings++;
 					Location origin = mBoss.getLocation().clone();

@@ -55,6 +55,10 @@ public class SpellRam extends Spell {
 					return;
 				}
 
+				if (EntityUtils.shouldPauseSpells(mBoss)) {
+					return;
+				}
+
 				if (mBoss instanceof Mob c) {
 					Pathfinder pathfinder = c.getPathfinder();
 

@@ -1053,6 +1053,58 @@ public class ParticleUtils {
 		}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
 	}
 
+	/**
+	 * Adaptation of Infernal Flames' code for tendrils.
+	 */
+	public static void spawnTendril(Location loc, LivingEntity particleOwner, int minDuration, int maxDuration, int iterations, double height, float sizeMultiplier, Color baseColor, Color tipColor) {
+		Location to = loc.clone().add(0, height, 0);
+
+		new BukkitRunnable() {
+			final Location mL = loc.clone();
+			int mT = 0;
+
+			final int mDuration = FastUtils.RANDOM.nextInt(minDuration, maxDuration);
+			final int mIterations = iterations;
+
+			final double mXMult = FastUtils.randomDoubleInRange(-1, 1);
+			final double mZMult = FastUtils.randomDoubleInRange(-1, 1);
+			double mJ = 0;
+			@Override
+			public void run() {
+				mT++;
+
+				for (int i = 0; i < mIterations; i++) {
+					mJ++;
+					float size = (0.5f + (1.7f * (1f - (float) (mJ / (mIterations * mDuration))))) * sizeMultiplier;
+					double offset = 0.1 * (1f - (mJ / (mIterations * mDuration)));
+					double transition = mJ / (mIterations * mDuration);
+					double pi = (Math.PI * 2) * (1f - (mJ / (mIterations * mDuration)));
+
+					Vector vec = new Vector(mXMult * FastUtils.cos(pi), 0,
+						mZMult * FastUtils.sin(pi));
+					Location tendrilLoc = mL.clone().add(vec);
+
+					spawnParticleAsLivingEntity(
+						new PartialParticle(Particle.REDSTONE, tendrilLoc, 3, offset, offset, offset, 0, new Particle.DustOptions(
+							getTransition(tipColor, baseColor, transition), size)),
+						particleOwner
+					);
+
+					mL.add(0, 0.25, 0);
+					if (mL.distance(to) < 0.4) {
+						this.cancel();
+						return;
+					}
+				}
+
+				if (mT >= mDuration) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
+	}
+
 	public static void drawFlag(Player player, Location loc, List<Color> colors, float size) {
 		Location eLoc = loc.clone();
 		eLoc.setPitch(0);
@@ -1083,6 +1135,28 @@ public class ParticleUtils {
 
 	public static Particle.DustOptions getRandomColorOptions(int min, float size) {
 		return new Particle.DustOptions(Color.fromRGB(FastUtils.randomIntInRange(min, 255), FastUtils.randomIntInRange(min, 255), FastUtils.randomIntInRange(min, 255)), size);
+	}
+
+	public static Color getOffsetColor(Color baseColor, int delta) {
+		float[] hsbValues = java.awt.Color.RGBtoHSB(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), null);
+		float hue = hsbValues[0];
+		float saturation = hsbValues[1];
+		float brightness = hsbValues[2];
+
+		int hueInt = (int) (hue * 255);
+		hueInt = hueInt + delta;
+		if (hueInt < 0) {
+			hueInt += 255;
+		} else {
+			hueInt -= 255;
+		}
+
+		return Color.fromARGB(java.awt.Color.HSBtoRGB(((float) hueInt) / 255.0f, saturation, brightness));
+	}
+
+	public static Color getRandomCloseColor(Color baseColor, int variance) {
+		int randShift = FastUtils.randomIntInRange(0, variance * 2) - variance;
+		return getOffsetColor(baseColor, randShift);
 	}
 
 }

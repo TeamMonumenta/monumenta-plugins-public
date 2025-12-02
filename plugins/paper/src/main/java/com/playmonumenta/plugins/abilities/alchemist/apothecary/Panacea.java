@@ -9,11 +9,12 @@ import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
+import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
+import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.PanaceaCS;
-import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -23,6 +24,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -39,28 +41,26 @@ import org.jetbrains.annotations.Nullable;
 
 public class Panacea extends Ability implements AbilityWithDuration {
 
-	private static final double PANACEA_DAMAGE_FRACTION = 1;
-	private static final int PANACEA_1_SHIELD = 2;
-	private static final int PANACEA_2_SHIELD = 4;
-	private static final int PANACEA_MAX_SHIELD = 16;
-	private static final int PANACEA_ABSORPTION_DURATION = 20 * 24;
+	private static final double DAMAGE_FRACTION = 1.35;
+	private static final double SHIELD_ALLIES_1 = 2;
+	private static final double SHIELD_ALLIES_2 = 4;
+	private static final double SHIELD_MOBS = 1;
+	private static final double MOB_SHIELD_RADIUS = 6;
+	private static final int MAX_MOB_HITS = 6;
+	private static final int DEBUFF_REDUCTION = 5 * 20;
+	private static final int MAX_SHIELD = 16;
+	private static final int ABSORPTION_DURATION = 16 * 20;
 	// Calculate the range with MAX_DURATION * MOVE_SPEED
-	private static final int PANACEA_MAX_DURATION = 20 * 2;
-	private static final double PANACEA_MOVE_SPEED = 0.35;
-	public static final double PANACEA_RADIUS = 1.5;
-	private static final int PANACEA_1_SLOW_TICKS = (int) (1.5 * 20);
-	private static final int PANACEA_2_SLOW_TICKS = 2 * 20;
-	private static final int COOLDOWN = 20 * 20;
-	private static final double PANACEA_LEVEL_1_DOT_MULTIPLIER = 0.15;
-	private static final double PANACEA_LEVEL_2_DOT_MULTIPLIER = 0.25;
-	private static final String PANACEA_DOT_EFFECT_NAME = "PanaceaDamageOverTimeEffect";
-	private static final int PANACEA_DOT_PERIOD = 10;
-	private static final int PANACEA_DOT_DURATION = 20 * 9;
+	private static final int MAX_DURATION = 20 * 2;
+	private static final double MOVE_SPEED = 0.4;
+	public static final double RADIUS = 1.5;
+	private static final int SLOW_TICKS_1 = (int) (1.5 * 20);
+	private static final int SLOW_TICKS_2 = 2 * 20;
+	private static final int COOLDOWN = 12 * 20;
 
 	public static final String CHARM_DAMAGE = "Panacea Damage";
-	public static final String CHARM_DOT_DAMAGE = "Panacea DoT Damage";
-	public static final String CHARM_DOT_DURATION = "Panacea DoT Duration";
-	public static final String CHARM_ABSORPTION = "Panacea Absorption Health";
+	public static final String CHARM_ABSORPTION_PLAYERS = "Panacea Player Absorption Health";
+	public static final String CHARM_ABSORPTION_MOBS = "Panacea Mob Absorption Health";
 	public static final String CHARM_ABSORPTION_MAX = "Panacea Max Absorption Health";
 	public static final String CHARM_ABSORPTION_DURATION = "Panacea Absorption Duration";
 	public static final String CHARM_MOVEMENT_DURATION = "Panacea Movement Duration";
@@ -68,6 +68,9 @@ public class Panacea extends Ability implements AbilityWithDuration {
 	public static final String CHARM_RADIUS = "Panacea Radius";
 	public static final String CHARM_SLOW_DURATION = "Panacea Slow Duration";
 	public static final String CHARM_COOLDOWN = "Panacea Cooldown";
+	public static final String CHARM_MAX_MOB_SHIELD_HITS = "Panacea Max Shieldings From Hit Mobs";
+	public static final String CHARM_MOB_SHIELD_RADIUS = "Panacea Mob Shield Radius";
+	public static final String CHARM_DEBUFF_REDUCTION = "Panacea Debuff Reduction";
 
 	public static final AbilityInfo<Panacea> INFO =
 		new AbilityInfo<>(Panacea.class, "Panacea", Panacea::new)
@@ -76,43 +79,55 @@ public class Panacea extends Ability implements AbilityWithDuration {
 			.shorthandName("Pn")
 			.actionBarColor(TextColor.color(255, 255, 100))
 			.descriptions(getDescription1(), getDescription2())
-			.simpleDescription("Launch a slow moving projectile that inflicts a heavy damage over time effect to mobs hit, shielding allies in the process.")
+			.simpleDescription("Launch a slow moving projectile that inflicts Gruesome and Brutal effects to mobs hit, and shields allies.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Panacea::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.displayItem(Material.PURPLE_CONCRETE_POWDER);
 
-	private final double mShield;
+	private final double mShieldAllies;
+	private final double mShieldMobs;
+	private final int mMaxMobShieldHits;
+	private final double mMobShieldRadius;
 	private final double mMaxAbsorption;
 	private final int mAbsorptionDuration;
+	private final int mDebuffReduction;
 	private final int mSlowTicks;
 	private final double mRadius;
 	private final double mMoveSpeed;
 	private final int mMaxDuration;
 	private final double mDamageMult;
-	private final double mDoTMultiplier;
-	private final int mDoTDuration;
 	private final PanaceaCS mCosmetic;
+	private int mCurrMobShieldHits = 0;
 	private @Nullable AlchemistPotions mAlchemistPotions;
+	private @Nullable GruesomeAlchemy mGruesomeAlchemy;
+	private @Nullable BrutalAlchemy mBrutalAlchemy;
 
 	public Panacea(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mSlowTicks = CharmManager.getDuration(mPlayer, CHARM_SLOW_DURATION, (isLevelOne() ? PANACEA_1_SLOW_TICKS : PANACEA_2_SLOW_TICKS));
-		mShield = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? PANACEA_1_SHIELD : PANACEA_2_SHIELD);
-		mMaxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_MAX, PANACEA_MAX_SHIELD);
-		mAbsorptionDuration = CharmManager.getDuration(mPlayer, CHARM_ABSORPTION_DURATION, PANACEA_ABSORPTION_DURATION);
-		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, PANACEA_RADIUS);
-		mMoveSpeed = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MOVEMENT_SPEED, PANACEA_MOVE_SPEED);
-		mMaxDuration = CharmManager.getDuration(mPlayer, CHARM_MOVEMENT_DURATION, PANACEA_MAX_DURATION);
-		mDamageMult = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, PANACEA_DAMAGE_FRACTION);
-		mDoTMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT_DAMAGE, isLevelOne() ? PANACEA_LEVEL_1_DOT_MULTIPLIER : PANACEA_LEVEL_2_DOT_MULTIPLIER);
-		mDoTDuration = CharmManager.getDuration(mPlayer, CHARM_DOT_DURATION, PANACEA_DOT_DURATION);
+		mSlowTicks = CharmManager.getDuration(mPlayer, CHARM_SLOW_DURATION, (isLevelOne() ? SLOW_TICKS_1 : SLOW_TICKS_2));
+		mShieldAllies = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_PLAYERS, isLevelOne() ? SHIELD_ALLIES_1 : SHIELD_ALLIES_2);
+		mShieldMobs = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_MOBS, SHIELD_MOBS);
+		mMaxMobShieldHits = MAX_MOB_HITS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_MOB_SHIELD_HITS);
+		mMobShieldRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MOB_SHIELD_RADIUS, MOB_SHIELD_RADIUS);
+		mMaxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_MAX, MAX_SHIELD);
+		mAbsorptionDuration = CharmManager.getDuration(mPlayer, CHARM_ABSORPTION_DURATION, ABSORPTION_DURATION);
+		mDebuffReduction = CharmManager.getDuration(mPlayer, CHARM_DEBUFF_REDUCTION, DEBUFF_REDUCTION);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+		mMoveSpeed = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MOVEMENT_SPEED, MOVE_SPEED);
+		mMaxDuration = CharmManager.getDuration(mPlayer, CHARM_MOVEMENT_DURATION, MAX_DURATION);
+		mDamageMult = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_FRACTION);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PanaceaCS());
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-		});
+		Bukkit.getScheduler().runTask(
+			plugin,
+			() -> {
+				mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+				mGruesomeAlchemy = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, GruesomeAlchemy.class);
+				mBrutalAlchemy = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, BrutalAlchemy.class);
+			}
+		);
 	}
 
 	private int mCurrDuration = -1;
@@ -123,14 +138,13 @@ public class Panacea extends Ability implements AbilityWithDuration {
 		}
 
 		putOnCooldown();
-
+		mCurrMobShieldHits = 0;
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-
 		mCosmetic.castEffects(mPlayer, mRadius);
 
 		double potionDamage = mAlchemistPotions.getDamage();
 		double damage = potionDamage * mDamageMult;
-		double dotDamage = mAlchemistPotions.getDamage() * mDoTMultiplier;
+		PotionUtils.reduceAllDebuffsDuration(mPlugin, mPlayer, mDebuffReduction);
 
 		mCurrDuration = 0;
 		ClientModHandler.updateAbility(mPlayer, this);
@@ -159,10 +173,31 @@ public class Panacea extends Ability implements AbilityWithDuration {
 					if (!mHitEntities.add(mob.getUniqueId())) {
 						continue;
 					}
-					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, true, false);
-					CustomDamageOverTime damageOverTime = new CustomDamageOverTime(mDoTDuration, dotDamage, PANACEA_DOT_PERIOD, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
-					damageOverTime.setVisuals(mCosmetic::damageOverTimeEffects);
-					mPlugin.mEffectManager.addEffect(mob, PANACEA_DOT_EFFECT_NAME, damageOverTime);
+					if (mCurrMobShieldHits < mMaxMobShieldHits) {
+						mCurrMobShieldHits++;
+						new Hitbox.SphereHitbox(mLoc, mMobShieldRadius)
+							.getHitPlayers(true)
+							.forEach(p -> AbsorptionUtils.addAbsorption(p, mShieldMobs, mMaxAbsorption, mAbsorptionDuration));
+					}
+					DamageUtils.damage(
+						mPlayer,
+						mob,
+						new DamageEvent.Metadata(
+							DamageEvent.DamageType.MAGIC,
+							mInfo.getLinkedSpell(),
+							playerItemStats),
+						damage,
+						true,
+						true,
+						false);
+
+					GruesomeAlchemy.tryDoEnhancementEffect(mGruesomeAlchemy, mob);
+					BrutalAlchemy.tryDoEnhancementEffect(mBrutalAlchemy, mob);
+
+					if (mAlchemistPotions != null) {
+						boolean isGruesome = mGruesomeAlchemy == null || !mGruesomeAlchemy.isAfflicted(mob);
+						mAlchemistPotions.applyEffects(mob, isGruesome, playerItemStats, isLevelOne() ? 1 : 2);
+					}
 
 					if (!EntityUtils.isBoss(mob)) {
 						EntityUtils.applySlow(mPlugin, mSlowTicks, 1, mob);
@@ -173,7 +208,8 @@ public class Panacea extends Ability implements AbilityWithDuration {
 					if (!mHitEntities.add(player.getUniqueId())) {
 						continue;
 					}
-					AbsorptionUtils.addAbsorption(player, mShield, mMaxAbsorption, mAbsorptionDuration);
+					AbsorptionUtils.addAbsorption(player, mPlayer, mShieldAllies, mMaxAbsorption, mAbsorptionDuration);
+					PotionUtils.reduceAllDebuffsDuration(mPlugin, player, mDebuffReduction);
 					mCosmetic.projectileHitEffects(mPlayer, player, mRadius);
 				}
 
@@ -242,7 +278,7 @@ public class Panacea extends Ability implements AbilityWithDuration {
 
 	@Override
 	public int getInitialAbilityDuration() {
-		return PANACEA_MAX_DURATION;
+		return MAX_DURATION;
 	}
 
 	@Override
@@ -254,35 +290,41 @@ public class Panacea extends Ability implements AbilityWithDuration {
 		return new DescriptionBuilder<>(() -> INFO)
 			.addTrigger()
 			.add(" to shoot a mixture that deals ")
-			.addPercent(a -> a.mDamageMult, PANACEA_DAMAGE_FRACTION)
-			.add(" of your potion damage, applies 100% slow for ")
-			.addDuration(a -> a.mSlowTicks, PANACEA_1_SLOW_TICKS, false, Ability::isLevelOne)
-			.add(" seconds, applies a ")
-			.addPercent(a -> a.mDoTMultiplier, PANACEA_LEVEL_1_DOT_MULTIPLIER, false, Ability::isLevelOne)
-			.add(" base magic Damage Over Time effect every ")
-			.addDuration(PANACEA_DOT_PERIOD)
-			.add(" seconds for ")
-			.addDuration(a -> a.mDoTDuration, PANACEA_DOT_DURATION)
-			.add(" seconds, and adds ")
-			.add(a -> a.mShield, PANACEA_1_SHIELD, false, Ability::isLevelOne)
-			.add(" absorption health to other players per enemy touched (maximum ")
-			.add(a -> a.mMaxAbsorption, PANACEA_MAX_SHIELD)
-			.add(" absorption), lasting ")
-			.addDuration(a -> a.mAbsorptionDuration, PANACEA_ABSORPTION_DURATION)
-			.add(" seconds. After hitting a block or traveling ")
-			.add(a -> a.mMaxDuration * a.mMoveSpeed, PANACEA_MAX_DURATION * PANACEA_MOVE_SPEED)
-			.add(" blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time.")
+			.addPercent(a -> a.mDamageMult, DAMAGE_FRACTION)
+			.add(" of your potion's damage, applies 100% slow for ")
+			.addDuration(a -> a.mSlowTicks, SLOW_TICKS_1, false, Ability::isLevelOne)
+			.add("s, and applies Level 1 Gruesome to mobs that are not already affected by it, or Level 1 Brutal otherwise. ")
+			.add("The mixture lowers the duration of all your vanilla potion debuffs by ")
+			.addDuration(a -> a.mDebuffReduction, DEBUFF_REDUCTION)
+			.add("s. All hit allies also receive this effect, and are granted ")
+			.add(a -> a.mShieldMobs, SHIELD_ALLIES_1, false, Ability::isLevelOne)
+			.add(" absorption health (max of ")
+			.add(a -> a.mMaxAbsorption, MAX_SHIELD)
+			.add(") for ")
+			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
+			.add("s. If the mixture hits a mob, all players within ")
+			.add(a -> a.mMobShieldRadius, MOB_SHIELD_RADIUS)
+			.add(" blocks of it are granted ")
+			.add(a -> a.mShieldMobs, SHIELD_MOBS, false, Ability::isLevelOne)
+			.add(" absorption health (max of ")
+			.add(a -> a.mMaxAbsorption, MAX_SHIELD)
+			.add(") for ")
+			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
+			.add("s, up to a maximum of ")
+			.add(a -> a.mMaxMobShieldHits, MAX_MOB_HITS)
+			.add(" mobs. After hitting a block or traveling ")
+			.add(a -> a.mMaxDuration * a.mMoveSpeed, MAX_DURATION * MOVE_SPEED)
+			.add(" blocks, the mixture returns to you, and is able to damage mobs and shield allies a second time.")
 			.addCooldown(COOLDOWN);
 	}
 
 	private static Description<Panacea> getDescription2() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Absorption health added is increased to ")
-			.add(a -> a.mShield, PANACEA_2_SHIELD, false, Ability::isLevelTwo)
-			.add(", slow duration is increased to ")
-			.addDuration(a -> a.mSlowTicks, PANACEA_2_SLOW_TICKS, false, Ability::isLevelTwo)
-			.add(" seconds,  and Damage Over Time is increased to ")
-			.addPercent(a -> a.mDoTMultiplier, PANACEA_LEVEL_2_DOT_MULTIPLIER, false, Ability::isLevelTwo)
-			.add(" base magic damage.");
+			.add("The level of Gruesome and Brutal inflicted is increased to 2. ")
+			.add("The absorption health granted to hit allies is increased to ")
+			.add(a -> a.mShieldAllies, SHIELD_ALLIES_2, false, Ability::isLevelTwo)
+			.add(", and the slow duration is increased to ")
+			.addDuration(a -> a.mSlowTicks, SLOW_TICKS_2, false, Ability::isLevelTwo)
+			.add("s.");
 	}
 }

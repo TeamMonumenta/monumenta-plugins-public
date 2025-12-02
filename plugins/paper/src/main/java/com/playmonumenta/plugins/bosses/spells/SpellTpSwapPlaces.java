@@ -107,15 +107,18 @@ public class SpellTpSwapPlaces extends Spell {
 
 			@Override
 			public void run() {
-				mTicks++;
-				Location particleLoc = mLauncher.getLocation().add(-0.5, 0, 0.5);
-				mParticles.spawn(mLauncher, particleLoc);
-				mParticles.spawn(mLauncher, target.getLocation());
-
 				if (EntityUtils.shouldCancelSpells(mLauncher) || target.isDead()) {
 					this.cancel();
 				}
 
+				if (EntityUtils.shouldPauseSpells(mLauncher)) {
+					return;
+				}
+
+				mTicks++;
+				Location particleLoc = mLauncher.getLocation().add(-0.5, 0, 0.5);
+				mParticles.spawn(mLauncher, particleLoc);
+				mParticles.spawn(mLauncher, target.getLocation());
 				if (mTicks > mDuration) {
 					launch(target);
 					this.cancel();

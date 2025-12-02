@@ -209,6 +209,11 @@ public abstract class BossAbilityGroup {
 
 			@Override
 			public void run() {
+				// Don't advance the timer if the entity is staggered
+				if (EntityUtils.isStaggered(mBoss)) {
+					return;
+				}
+
 				mNextActiveTimer -= 2;
 				mMissingTicks += 2;
 

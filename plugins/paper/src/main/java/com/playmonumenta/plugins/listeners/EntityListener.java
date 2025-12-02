@@ -966,7 +966,7 @@ public class EntityListener implements Listener {
 		Entity entity = event.getEntity();
 		LivingEntity target = event.getTarget();
 
-		if (entity instanceof Creature && EntityUtils.isStunned(entity)) {
+		if (entity instanceof Creature && (EntityUtils.isStunned(entity) || EntityUtils.isStaggered(entity))) {
 			event.setCancelled(true);
 			return;
 		}

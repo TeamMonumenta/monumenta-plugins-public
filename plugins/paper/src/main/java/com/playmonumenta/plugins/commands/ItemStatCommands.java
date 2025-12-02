@@ -742,15 +742,20 @@ public class ItemStatCommands {
 					return;
 				}
 
-				if (operationString.equals("add") && attribute.contains("ProjectileSpeed")) {
-					player.sendMessage("You are using the wrong type of Projectile Speed, do multiply");
-					return;
-				}
+			if (operationString.equals("add") && attribute.contains("ProjectileSpeed") && amount != 0) {
+				player.sendMessage("You are using the wrong type of Projectile Speed, do multiply");
+				return;
+			}
 
-				if (operationString.equals("multiply") && attribute.contains("KnockbackResistance")) {
-					player.sendMessage("You are using the wrong type of KBR, do add");
-					return;
-				}
+			if (operationString.equals("add") && attribute.contains("PotionRechargeRate") && amount != 0) {
+				player.sendPlainMessage("You are using the wrong type of Potion Recharge Rate, do multiply");
+				return;
+			}
+
+			if (operationString.equals("multiply") && attribute.contains("KnockbackResistance") && amount != 0) {
+				player.sendMessage("You are using the wrong type of KBR, do add");
+				return;
+			}
 
 				AttributeType type = AttributeType.getAttributeType(attribute);
 				if (type != null) {

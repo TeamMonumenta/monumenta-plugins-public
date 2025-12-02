@@ -68,6 +68,10 @@ public class HexEater implements Enchantment {
 				effects++;
 			}
 
+			if (EntityUtils.isStaggered(target)) {
+				effects++;
+			}
+
 			if (EntityUtils.isParalyzed(plugin, target)) {
 				effects++;
 			}

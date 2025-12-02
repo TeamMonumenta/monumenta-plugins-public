@@ -93,7 +93,7 @@ public final class WarriorShieldWallBoss extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				if (EntityUtils.shouldCancelSpells(mBoss)) {
+				if (EntityUtils.shouldCancelSpells(mBoss) || EntityUtils.isStaggered(mBoss)) {
 					return;
 				}
 
@@ -107,6 +107,10 @@ public final class WarriorShieldWallBoss extends BossAbilityGroup {
 
 					@Override
 					public void run() {
+						if (EntityUtils.isStaggered(mBoss)) {
+							return;
+						}
+
 						mT++;
 						Vector vec;
 

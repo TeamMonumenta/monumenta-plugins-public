@@ -983,11 +983,16 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		buf.writeVarIntArray(passengerIds.toIntArray());
 
 		return new ClientboundSetPassengersPacket(buf);
-  }
+  	}
 
-  @Override
+  	@Override
 	public double getJumpVelocity(LivingEntity entity) {
 		net.minecraft.world.entity.LivingEntity e = ((CraftLivingEntity) entity).getHandle();
 		return e.getJumpPower();
+	}
+
+	@Override
+	public void setNotOnGround(Entity entity) {
+		((CraftEntity) entity).getHandle().setOnGround(false);
 	}
 }
