@@ -56,8 +56,9 @@ public class GatekeeperFinisher implements EliteFinisher {
 						Location endLoc = startLoc.clone().add(FastUtils.randomDoubleInRange(-0.3, 0.3), FastUtils.randomDoubleInRange(1, 3), FastUtils.randomDoubleInRange(-0.3, 0.3));
 						Vector direction = endLoc.toVector().subtract(startLoc.toVector());
 						startLoc.setDirection(direction);
-						TransfiguredSpikeCS.spawnTendril(startLoc, endLoc, p, TWIST_COLOR_DARK, TWIST_COLOR_LIGHT);
-						TransfiguredSpikeCS.spawnTendril(startLoc, endLoc, p, FLESH_COLOR_DARK, FLESH_COLOR_LIGHT);
+						// 0.7f is the "base size" of uncharmed Mana Lance
+						TransfiguredSpikeCS.spawnTendril(startLoc, endLoc, p, TWIST_COLOR_DARK, TWIST_COLOR_LIGHT, 0.7);
+						TransfiguredSpikeCS.spawnTendril(startLoc, endLoc, p, FLESH_COLOR_DARK, FLESH_COLOR_LIGHT, 0.7);
 					}
 
 					if (mTicks >= 35 && mClonedKilledMob != null) {
