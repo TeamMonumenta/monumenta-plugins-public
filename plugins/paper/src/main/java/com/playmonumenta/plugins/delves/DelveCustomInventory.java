@@ -446,6 +446,7 @@ public class DelveCustomInventory extends CustomInventory {
 			mods.removeAll(DelvesModifier.rotatingDelveModifiers());
 			mods.remove(DelvesModifier.BOUNTIFUL);
 			mods.remove(DelvesModifier.ENTROPY);
+			mods.remove(DelvesModifier.MORBID);
 			return mods;
 		}
 
