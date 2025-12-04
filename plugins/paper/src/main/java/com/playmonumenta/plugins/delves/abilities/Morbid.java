@@ -75,6 +75,9 @@ public class Morbid {
 				player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 15, 1, false, false));
 				player.sendMessage(Component.text("Void gashes your surroundings as you feel reality fracture around you. This morbid world is no longer stable enough for you to continue.", NamedTextColor.RED));
 
+				if (player.getScoreboardTags().contains("DungeonRace")) {
+					player.removeScoreboardTag("DungeonRace");
+				}
 				if (mapping.canAbandon(player)) {
 					ScoreboardUtils.setScoreboardValue(player, mapping.getAccessName(), 0);
 				} else {
