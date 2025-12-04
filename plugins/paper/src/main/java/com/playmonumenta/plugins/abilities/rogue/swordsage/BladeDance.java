@@ -136,7 +136,7 @@ public class BladeDance extends Ability {
 			.addTrigger()
 			.add(" to enter a defensive stance, parrying all attacks and becoming invulnerable for ")
 			.addDuration(a -> a.mInvulnDuration, INVULN_DURATION)
-			.add(" seconds. Afterwards, unleash a powerful attack that deals ")
+			.add(" seconds. Afterwards, deal ")
 			.add(a -> a.mDamage, DANCE_1_DAMAGE, false, Ability::isLevelOne)
 			.add(" melee damage to mobs within ")
 			.add(a -> a.mRadius, DANCE_RADIUS)
