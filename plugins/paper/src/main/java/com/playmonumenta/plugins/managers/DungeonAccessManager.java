@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.managers;
 
+import com.playmonumenta.plugins.delves.abilities.Morbid;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.DungeonCommandMapping;
@@ -60,4 +61,14 @@ public class DungeonAccessManager {
 		}
 	}
 
+	public static void resetMorbidLockouts(Player player) {
+		Morbid.resetWeeklyDeaths(player);
+
+		for (DungeonCommandMapping mapping : DungeonCommandMapping.values()) {
+			String accessName = mapping.getAccessName();
+			if (ScoreboardUtils.getScoreboardValue(player, accessName).orElse(0) == -1) {
+				ScoreboardUtils.setScoreboardValue(player, accessName, 0);
+			}
+		}
+	}
 }

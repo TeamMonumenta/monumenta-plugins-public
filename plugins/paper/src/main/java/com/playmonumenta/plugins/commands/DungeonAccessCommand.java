@@ -205,6 +205,9 @@ public class DungeonAccessCommand extends GenericCommand {
 				// Same instance: send directly without changing any scores on the player
 				iterator.remove();
 				send(List.of(otherPlayer), mapping, returnLocation, returnYaw, returnPitch);
+			} else if (otherAccessScore == -1) {
+				iterator.remove();
+				otherPlayer.sendMessage(Component.text("The unstable plane rejects you. You are locked out of this dungeon for this week!", NamedTextColor.RED));
 			} else if (otherAccessScore != 0) {
 				// Other instance: send error message and don't send the player anywhere
 				iterator.remove();

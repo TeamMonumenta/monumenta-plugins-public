@@ -231,6 +231,11 @@ public class DailyReset {
 		}
 		boolean isNewWeek = DateUtils.getWeeklyVersion(dailyVersion) != DateUtils.getWeeklyVersion();
 
+		// on new week, reset morbid lockouts
+		if (isNewWeek) {
+			DungeonAccessManager.resetMorbidLockouts(player);
+		}
+
 		// Dungeon access checks
 		DungeonAccessManager.checkPlayerAccess(player);
 

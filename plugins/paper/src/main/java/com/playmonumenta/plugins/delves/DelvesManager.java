@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.delves.abilities.Haunted;
 import com.playmonumenta.plugins.delves.abilities.HealCut;
 import com.playmonumenta.plugins.delves.abilities.Idolatry;
 import com.playmonumenta.plugins.delves.abilities.Infernal;
+import com.playmonumenta.plugins.delves.abilities.Morbid;
 import com.playmonumenta.plugins.delves.abilities.Riftborn;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
 import com.playmonumenta.plugins.delves.abilities.Twisted;
@@ -705,6 +706,9 @@ public class DelvesManager implements Listener {
 			if (boss != null) {
 				boss.playerDeath(player);
 			}
+		}
+		if (getRank(player, DelvesModifier.MORBID) > 0) {
+			Morbid.applyModifiers(player, DelvesUtils.getModifierLevel(player, DelvesModifier.MORBID));
 		}
 	}
 

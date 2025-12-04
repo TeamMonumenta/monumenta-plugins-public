@@ -666,9 +666,15 @@ public enum DungeonCommandMapping {
 			Player player = ownEntry.getKey();
 			PlayerDungeonStatus ownStatus = ownEntry.getValue();
 
+			if (ownStatus.mAccessScore == -1) {
+				player.sendMessage(Component.text("You are locked out of this dungeon for the week.", NamedTextColor.RED));
+				continue;
+			}
+
 			boolean shouldPlayErrorSound = false;
 			boolean shouldPlayWarningSound = false;
 
+			List<String> lockedInstance = new ArrayList<>();
 			List<String> ownInstance = new ArrayList<>();
 			List<String> noInstance = new ArrayList<>();
 			List<String> otherNoAbandonNoInvite = new ArrayList<>();
@@ -687,7 +693,9 @@ public enum DungeonCommandMapping {
 					continue;
 				}
 
-				if (!otherStatus.mHasInstance) {
+				if (otherStatus.mAccessScore == -1) {
+					lockedInstance.add(otherStatus.mPlayerName);
+				} else if (!otherStatus.mHasInstance) {
 					noInstance.add(otherStatus.mPlayerName);
 
 					if (ownStatus.mHasInstance && !ownStatus.mCanInvite) {
@@ -775,6 +783,14 @@ public enum DungeonCommandMapping {
 			}
 
 			player.sendMessage(header.append(Component.text("As for everyone else here:")));
+
+			if (!lockedInstance.isEmpty()) {
+				player.sendMessage(header
+					.append(Component.text("People with a Locked Instance: "
+						+ MessagingUtils.concatenateStringsWithAnd(lockedInstance), NamedTextColor.RED))
+				);
+			}
+
 			if (!ownInstance.isEmpty()) {
 				player.sendMessage(header
 					.append(Component.text("People in your instance: "
