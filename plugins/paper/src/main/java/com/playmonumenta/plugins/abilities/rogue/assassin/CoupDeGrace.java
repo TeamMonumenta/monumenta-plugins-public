@@ -65,7 +65,7 @@ public class CoupDeGrace extends Ability {
 			&& !EntityUtils.isBoss(enemy)
 			&& !DamageUtils.isImmuneToDamage(enemy, DamageType.MELEE)
 			&& (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH
-			|| event.getAbility() == ClassAbility.QUAKE || event.getAbility() == ClassAbility.SKIRMISHER)) {
+			|| event.getAbility() == ClassAbility.QUAKE_MELEE || event.getAbility() == ClassAbility.SKIRMISHER)) {
 			// Cannot currently get the real final damage, as some effects like vulnerability will modify it later.
 			// Thus, just check the mob's health a tick later.
 			Bukkit.getScheduler().runTask(mPlugin, () -> {

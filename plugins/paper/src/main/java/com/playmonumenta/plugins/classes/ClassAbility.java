@@ -280,7 +280,8 @@ public enum ClassAbility {
 	// Fake class abilities for some enchantments
 	// Used to trigger other events
 	ERUPTION("Eruption", true),
-	QUAKE("Quake", true),
+	QUAKE_MELEE("Quake", true),
+	QUAKE_PROJ("Quake", true),
 	SWEEPING_EDGE("Sweeping Edge", true),
 	ARCANE_THRUST("Arcane Thrust", true),
 	EXPLOSIVE("Explosive", true),

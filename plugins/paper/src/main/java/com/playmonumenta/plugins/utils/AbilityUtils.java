@@ -568,7 +568,8 @@ public class AbilityUtils {
 
 	private static final EnumSet<ClassAbility> TRIGGERS_ASPECTS = EnumSet.of(
 		ClassAbility.ERUPTION,
-		ClassAbility.QUAKE,
+		ClassAbility.QUAKE_MELEE,
+		ClassAbility.QUAKE_PROJ,
 		ClassAbility.SWEEPING_EDGE,
 		ClassAbility.ARCANE_THRUST,
 		ClassAbility.EXPLOSIVE,
