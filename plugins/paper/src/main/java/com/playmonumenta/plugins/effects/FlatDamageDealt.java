@@ -89,7 +89,8 @@ public class FlatDamageDealt extends Effect {
 
 	@Override
 	public @Nullable Component getSpecificDisplay() {
-		return Component.text("+" + StringUtils.to2DP(mAmount) + StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + getDisplayedName());
+		return Component.text("+" + StringUtils.to2DP(mAmount) +
+			" " + StringUtils.getDamageTypeString(mAffectedDamageTypes) + getDisplayedName());
 	}
 
 	@Override
@@ -99,14 +100,14 @@ public class FlatDamageDealt extends Effect {
 
 	@Override
 	public String toString() {
-		String types = "any";
+		StringBuilder types = new StringBuilder("any");
 		if (mAffectedDamageTypes != null) {
-			types = "";
+			types = new StringBuilder();
 			for (DamageType type : mAffectedDamageTypes) {
 				if (!types.isEmpty()) {
-					types += ",";
+					types.append(",");
 				}
-				types += type.name();
+				types.append(type.name());
 			}
 		}
 		return String.format("FlatDamageDealt duration:%d types:%s amount:%f", this.getDuration(), types, mAmount);

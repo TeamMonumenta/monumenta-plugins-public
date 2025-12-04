@@ -353,10 +353,10 @@ public class StringUtils {
 			}
 		}
 
-		// Add a space before
+		// Add a space after
 		if (!string.isEmpty()) {
 			if (includeSpaceAfter) {
-				string = " " + string;
+				string = string + " ";
 			}
 		} else if (defaultString != null) {
 			return defaultString;

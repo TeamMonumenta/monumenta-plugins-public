@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.depths.guis;
 
 import com.playmonumenta.plugins.depths.DepthsAbilityItem;
+import com.playmonumenta.plugins.depths.DepthsContent;
+import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
@@ -173,11 +175,13 @@ public class DepthsSummaryGUI extends Gui {
 			Player player = dp.getPlayer();
 			if (player != null && player.isOnline()) {
 				String itemName = player.getName() + "'s Abilities";
-				ItemStack playerHead = GUIUtils.createBasicItem(Material.PLAYER_HEAD, itemName, NamedTextColor.YELLOW);
+				ItemStack playerHead = GUIUtils.createBasicItem(Material.PLAYER_HEAD, itemName, NamedTextColor.YELLOW,
+					mDepthsParty.mContent == DepthsContent.DARKEST_DEPTHS ? "" : "Grave Timer: " + DepthsListener.getGraveDuration(mDepthsParty, dp, player) / 20.0 + "s");
 				GUIUtils.setSkullOwner(playerHead, player);
 
 				if (dp == mTargetPlayer) {
-					ItemStack activePlayerIndicator = GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, itemName, NamedTextColor.YELLOW, false, "Currently Shown", NamedTextColor.GRAY);
+					ItemStack activePlayerIndicator = GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, itemName, NamedTextColor.YELLOW, false,
+						mDepthsParty.mContent == DepthsContent.DARKEST_DEPTHS ? "Currently Shown" : "Currently Shown\nGrave Timer: " + DepthsListener.getGraveDuration(mDepthsParty, dp, player) / 20.0 + "s", NamedTextColor.GRAY);
 					setItem(HEAD_LOCATIONS.get(i), activePlayerIndicator);
 					setItem(4, playerHead);
 				} else {
