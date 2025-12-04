@@ -94,7 +94,7 @@ public class Taboo extends Ability implements AbilityWithDuration, AbilityWithCh
 		super(plugin, player, INFO);
 
 		resetVariables();
-		mMagicDamageIncrease = isLevelOne() ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mMagicDamageIncrease = (isLevelOne() ? MAGIC_DAMAGE_INCREASE_1 : MAGIC_DAMAGE_INCREASE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mHealthDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF_DAMAGE, PERCENT_HEALTH_DAMAGE);
 		mKBR = PERCENT_KNOCKBACK_RESIST + CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK_RESISTANCE) / 10;
 		mCastDuration = CharmManager.getDuration(mPlayer, CHARM_EFFECT_DURATION, EFFECT_DURATION);
