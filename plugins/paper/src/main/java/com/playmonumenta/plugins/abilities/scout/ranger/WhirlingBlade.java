@@ -25,6 +25,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -44,6 +45,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	private static final double BLADE_RADIUS = 1;
 	private static final int BLADE_MAX_CHARGES = 2;
 	private static final int BLADE_COOLDOWN = 20 * 6;
+	private static final int ANGLE_INCREMENT = 30;
 
 	public static final String CHARM_DAMAGE = "Whirling Blade Damage";
 	public static final String CHARM_KNOCKBACK = "Whirling Blade Knockback";
@@ -144,6 +146,10 @@ public class WhirlingBlade extends MultipleChargeAbility {
 
 			double mStartAngle = Math.atan(eyeDir.getZ() / eyeDir.getX());
 			int mIncrementDegrees = 0;
+			// Get the starting tick of the *first* cycle cast
+			final int mStartingTick = Bukkit.getCurrentTick() -
+				((mCycles == cyclesLeft) ? 0 : (mCycles - cyclesLeft) * (360 / ANGLE_INCREMENT) + 1);
+
 
 			@Override
 			public void run() {
@@ -178,18 +184,26 @@ public class WhirlingBlade extends MultipleChargeAbility {
 				}
 
 				Location loc = mPlayer.getLocation();
-				mCosmetic.tick(mPlayer, bladeLoc1, world, loc, throwRadius, bladeRadius, mIncrementDegrees);
+				mCosmetic.tick(mPlayer, bladeLoc1, world, loc, throwRadius, bladeRadius, mIncrementDegrees, mStartingTick, mCycles == cyclesLeft);
 
-				mIncrementDegrees += 30;
 				if (mIncrementDegrees >= 360) {
-					mCosmetic.end(world, loc, mPlayer);
 					this.cancel();
-					if (cyclesLeft > 1) {
+					if (cyclesLeft <= 1) {
+						mCosmetic.end(world, loc, mPlayer, mStartingTick);
+					} else {
 						castBlade(location, throwRadius, eyeDir, bladeRadius, damage, world, cyclesLeft - 1);
 					}
 				}
+				mIncrementDegrees += ANGLE_INCREMENT;
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
+	}
+
+	@Override
+	public void playerDeathEvent(PlayerDeathEvent event) {
+		if (!event.isCancelled()) {
+			mCosmetic.onDeath();
+		}
 	}
 
 	private static Description<WhirlingBlade> getDescription1() {
