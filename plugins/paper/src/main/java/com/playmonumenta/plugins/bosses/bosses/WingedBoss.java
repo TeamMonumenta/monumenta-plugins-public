@@ -369,6 +369,11 @@ public final class WingedBoss extends BossAbilityGroup {
 
 	public void destroyWings(Collection<Entity> wings) {
 		wings.forEach(e -> {
+			if (!e.isValid()) {
+				// Any attempt to load an unloaded entity loads the chunk again, cause a sync load and usually a memory leak.
+				// However, these entities are set to delete themselves when loaded (incorrectly labeled delete on unload)
+				return;
+			}
 			if (e instanceof ArmorStand stand) {
 				// Only play runnable on one of the armor stands for optimization and so that particles/sounds don't duplicate
 				stand.setGravity(true);
