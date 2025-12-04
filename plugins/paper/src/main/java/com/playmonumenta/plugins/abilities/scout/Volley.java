@@ -9,9 +9,10 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.VolleyCS;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.HashMap;
@@ -98,17 +99,23 @@ public class Volley extends Ability {
 				if (!isEnhanced()) {
 					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows, arrowSpeed, 5, projectile.getType());
 				} else {
-					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows * 5, arrowSpeed, 360.0 / (mArrows * 5), projectile.getType());
+					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows * 2, arrowSpeed, 5, projectile.getType());
 				}
 
-				int piercing = (projectile instanceof AbstractArrow) ? (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING) : 0;
+				int piercing = (projectile instanceof AbstractArrow) ? ((AbstractArrow) projectile).getPierceLevel () + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING) : 0;
 
 				for (Projectile proj : projectiles) {
-
 					mVolley.add(proj);
+					ProjectileLaunchEvent event = new ProjectileLaunchEvent(proj);
+					Bukkit.getPluginManager().callEvent(event);
 
-					if (projectile.getScoreboardTags().contains("SourceQuickDraw")) {
-						proj.addScoreboardTag("SourceQuickDrawVolley");
+					if (projectile.getScoreboardTags().contains(Quickdraw.SOURCE_QUICKDRAW_TAG)) {
+						proj.addScoreboardTag(Quickdraw.SOURCE_QUICKDRAW_VOLLEY_TAG);
+						final ItemStatManager.PlayerItemStats itemStats = DamageListener.getProjectileItemStats(projectile);
+						if (itemStats != null) {
+							DamageListener.removeProjectileItemStats(proj);
+							DamageListener.addProjectileItemStats(proj, itemStats);
+						}
 					}
 
 					if (proj instanceof AbstractArrow arrow) {
@@ -121,9 +128,6 @@ public class Volley extends Ability {
 					}
 
 					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
-
-					ProjectileLaunchEvent event = new ProjectileLaunchEvent(proj);
-					Bukkit.getPluginManager().callEvent(event);
 				}
 
 				// We can't just use arrow.remove() because that cancels the event and refunds the arrow
@@ -139,7 +143,7 @@ public class Volley extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity proj = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && mVolley.contains(proj)) {
+		if (proj instanceof Projectile && mVolley.contains(proj)) {
 			if (notBeenHit(enemy)) {
 				event.updateDamageWithMultiplier(mMultiplier);
 				mCosmetic.volleyHit(mPlayer, enemy);
@@ -181,6 +185,6 @@ public class Volley extends Ability {
 
 	private static Description<Volley> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Volley now fires in a 360 degree arc.");
+			.add("Volley now fires twice as many arrows in twice as wide an arc.");
 	}
 }

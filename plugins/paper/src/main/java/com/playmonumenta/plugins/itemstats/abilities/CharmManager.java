@@ -1034,6 +1034,7 @@ public class CharmManager {
 			Quickdraw.CHARM_COOLDOWN,
 			Quickdraw.CHARM_PIERCING,
 			Quickdraw.CHARM_DAMAGE,
+			Quickdraw.CHARM_ARROWS,
 			WindBomb.CHARM_COOLDOWN,
 			WindBomb.CHARM_DAMAGE,
 			WindBomb.CHARM_DAMAGE_MODIFIER,

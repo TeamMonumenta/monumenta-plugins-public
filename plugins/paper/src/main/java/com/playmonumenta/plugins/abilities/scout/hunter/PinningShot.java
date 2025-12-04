@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.scout.Quickdraw;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PinningShotCS;
@@ -59,9 +60,9 @@ public class PinningShot extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() != DamageType.PROJECTILE || !(event.getDamager() instanceof Projectile proj) ||
+		if (!(event.getDamager() instanceof Projectile proj) ||
 			!EntityUtils.isAbilityTriggeringProjectile(proj, false) ||
-			proj.getScoreboardTags().contains("SourceQuickDrawVolley")) {
+			proj.getScoreboardTags().contains(Quickdraw.SOURCE_QUICKDRAW_VOLLEY_TAG)) {
 			return false;
 		}
 

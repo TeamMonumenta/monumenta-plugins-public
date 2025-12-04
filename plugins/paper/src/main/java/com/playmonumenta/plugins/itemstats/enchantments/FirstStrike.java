@@ -18,6 +18,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 
 public class FirstStrike implements Enchantment {
 
@@ -74,9 +75,9 @@ public class FirstStrike implements Enchantment {
 		}
 
 		//onDamageDelayed does not include potion damage
-		// For some godforsaken reason, onDamageDelayed does not play nice with PROJECTILE type damage. It does not accurately update the damage despite passing through the triggerFirstStrike method.
-		// As a workaround, PROJECTILE damage will mark the mob to take increased damage that tick but will instead have its damage boost handled here.
-		if ((event.getAbility() == ClassAbility.ALCHEMIST_POTION || event.getType() == DamageType.PROJECTILE) &&
+		// For some godforsaken reason, onDamageDelayed does not play nice with projectiles. It does not accurately update the damage despite passing through the triggerFirstStrike method.
+		// As a workaround, projectiles will mark the mob to take increased damage that tick but will instead have its damage boost handled here.
+		if ((event.getAbility() == ClassAbility.ALCHEMIST_POTION || event.getDamager() instanceof Projectile) &&
 			plugin.mEffectManager.getEffects(enemy, SOURCE + player.getName()) == null) {
 			double bonus = DAMAGE_PER_LEVEL * level;
 			triggerFirstStrike(plugin, player, bonus, event, enemy);

@@ -9,20 +9,22 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.scout.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PredatorStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStat;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
-import com.playmonumenta.plugins.itemstats.enums.Operation;
-import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -35,6 +37,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
@@ -181,7 +184,7 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mDeactivationRunnable == null || !EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
+		if (mDeactivationRunnable == null || (!EntityUtils.isAbilityTriggeringProjectile(projectile, true) && !projectile.getScoreboardTags().contains(Quickdraw.SOURCE_QUICKDRAW_TAG))) {
 			return true;
 		}
 		if (Grappling.playerHoldingHook(mPlayer)) {
@@ -232,28 +235,34 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 			endLoc = result.getHitPosition().toLocation(world);
 		}
 
-		mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, endLoc, mExplodeRadius), endLoc, mPlayer);
-		explode(endLoc, piercedMobs);
-		mCosmetic.strikeParticleLine(mPlayer, loc, endLoc);
-
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, endLoc, mExplodeRadius), endLoc, mPlayer);
+			explode(endLoc, piercedMobs, projectile);
+			mCosmetic.strikeParticleLine(mPlayer, loc, endLoc);
+		});
 		return true;
 	}
 
-	private void explode(Location loc, List<LivingEntity> piercedMobs) {
+	private void explode(Location loc, List<LivingEntity> piercedMobs, Projectile projectile) {
 		ItemStack item = mPlayer.getInventory().getItemInMainHand();
+		final ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(projectile);
 
 		// go through pierced mobs and use their locations
 		for (LivingEntity piercedMob : piercedMobs) {
-			double damage = ItemStatUtils.getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
-			damage += PointBlank.apply(mPlayer, piercedMob.getLocation(), ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.POINT_BLANK));
-			damage += Sniper.apply(mPlayer, piercedMob.getLocation(), ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SNIPER));
-			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-			damage *= mBaseDamage + mDistanceScale * Math.min(mPlayer.getLocation().distance(piercedMob.getLocation()), mDamageRange);
+			if (playerItemStats != null) {
+				final ItemStatManager.PlayerItemStats.ItemStatsMap map = playerItemStats.getItemStats();
+				final ItemStat projDamageAdd = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
+				double damage = map.get(projDamageAdd);
+				damage += PointBlank.apply(mPlayer, piercedMob.getLocation(), map.get(Objects.requireNonNull(EnchantmentType.POINT_BLANK.getItemStat())));
+				damage += Sniper.apply(mPlayer, piercedMob.getLocation(), map.get(Objects.requireNonNull(EnchantmentType.SNIPER.getItemStat())));
+				damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
+				damage *= mBaseDamage + mDistanceScale * Math.min(mPlayer.getLocation().distance(piercedMob.getLocation()), mDamageRange);
 
-			float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, EXPLODE_KNOCKBACK);
+				float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, EXPLODE_KNOCKBACK);
 
-			MovementUtils.knockAway(mPlayer.getLocation(), piercedMob, knockback, knockback, true);
-			DamageUtils.damage(mPlayer, piercedMob, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true);
+				MovementUtils.knockAway(mPlayer.getLocation(), piercedMob, knockback, knockback, true);
+				DamageUtils.damage(mPlayer, piercedMob, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true);
+			}
 		}
 
 		// go through exploded mobs and use the explosion's location
@@ -262,10 +271,12 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		// prevents stacked damage instances
 		mobs.removeIf(piercedMobs::contains);
 
-		if (!mobs.isEmpty()) {
-			double damage = ItemStatUtils.getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
-			damage += PointBlank.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.POINT_BLANK));
-			damage += Sniper.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SNIPER));
+		if (!mobs.isEmpty() && playerItemStats != null) {
+			final ItemStatManager.PlayerItemStats.ItemStatsMap map = playerItemStats.getItemStats();
+			final ItemStat projDamageAdd = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
+			double damage = map.get(projDamageAdd);
+			damage += PointBlank.apply(mPlayer, loc, map.get(Objects.requireNonNull(EnchantmentType.POINT_BLANK.getItemStat())));
+			damage += Sniper.apply(mPlayer, loc, map.get(Objects.requireNonNull(EnchantmentType.SNIPER.getItemStat())));
 			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 			damage *= mBaseDamage + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), mDamageRange);
 

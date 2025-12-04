@@ -71,11 +71,7 @@ public class SplitArrow extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && EntityUtils.isHostileMob(enemy)) {
-			if (proj.getScoreboardTags().contains("SourceQuickDrawVolley")) {
-				return false;
-			}
-
+		if (event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && !proj.getScoreboardTags().contains("SourceQuickDrawVolley") && EntityUtils.isHostileMob(enemy)) {
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getDamage() * mDamagePercent);
 			int count = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_BOUNCES);
 			if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
@@ -123,7 +119,7 @@ public class SplitArrow extends Ability {
 
 	private static Description<SplitArrow> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("When you hit an enemy with an arrow, the next nearest enemy within ")
+			.add("When you hit an enemy with a projectile, the next nearest enemy within ")
 			.add(a -> a.mRange, SPLIT_ARROW_CHAIN_RANGE)
 			.add(" blocks takes ")
 			.addPercent(a -> a.mDamagePercent, SPLIT_ARROW_1_DAMAGE_PERCENT, false, Ability::isLevelOne)

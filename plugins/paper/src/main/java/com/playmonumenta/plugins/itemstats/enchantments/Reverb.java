@@ -60,7 +60,7 @@ public class Reverb implements Enchantment {
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (EntityUtils.isHostileMob(enemy) &&
 			(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK ||
-				event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE
+				event.getType() == DamageEvent.DamageType.PROJECTILE
 				|| event.getAbility() == ClassAbility.REVERB)) {
 			INSTANCE_MAP
 				.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>())

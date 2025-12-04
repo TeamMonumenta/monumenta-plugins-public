@@ -45,10 +45,15 @@ public class Quickdraw extends Ability {
 	private static final int COOLDOWN_1 = Constants.TICKS_PER_SECOND * 6;
 	private static final int COOLDOWN_2 = Constants.TICKS_PER_SECOND * 3;
 	private static final int PIERCE_LVL = 1;
+	private static final int ARROWS = 1;
 
 	public static final String CHARM_DAMAGE = "Quickdraw Damage";
 	public static final String CHARM_COOLDOWN = "Quickdraw Cooldown";
 	public static final String CHARM_PIERCING = "Quickdraw Piercing";
+	public static final String CHARM_ARROWS = "Quickdraw Arrows";
+
+	public static final String SOURCE_QUICKDRAW_TAG = "SourceQuickDraw";
+	public static final String SOURCE_QUICKDRAW_VOLLEY_TAG = "SourceQuickDrawVolley";
 
 	public static final AbilityInfo<Quickdraw> INFO =
 		new AbilityInfo<>(Quickdraw.class, "Quickdraw", Quickdraw::new)
@@ -66,12 +71,14 @@ public class Quickdraw extends Ability {
 
 	private final double mDamage;
 	private final int mPiercing;
+	private final int mArrows;
 	private final QuickdrawCS mCosmetic;
 
 	public Quickdraw(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_DAMAGE : ServerProperties.getClassSpecializationsEnabled(player) ? R2_DAMAGE : R1_DAMAGE);
 		mPiercing = PIERCE_LVL + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING);
+		mArrows = ARROWS + (int) CharmManager.getLevel(mPlayer, CHARM_ARROWS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new QuickdrawCS());
 	}
 
@@ -88,21 +95,16 @@ public class Quickdraw extends Ability {
 		}
 		mCosmetic.quickdrawCast(mPlayer);
 
-		final boolean launched = shootProjectile(inMainHand, 0);
-		if (launched) {
-			putOnCooldown();
-
-			if (ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.MULTISHOT) > 0) {
-				for (int i = 0; i < 2; i++) {
-					shootProjectile(inMainHand, 2 * i - 1);
-				}
+		for (int i = 0; i < mArrows; i++) {
+			if (!shootProjectile(inMainHand,  -0.5 * mArrows + 0.5 + i)) {
+				return false;
 			}
-			return true;
 		}
-		return false;
+		putOnCooldown();
+		return true;
 	}
 
-	private boolean shootProjectile(final ItemStack inMainHand, final int deviation) {
+	private boolean shootProjectile(final ItemStack inMainHand, final double deviation) {
 		final Vector direction = mPlayer.getLocation().getDirection();
 		if (deviation != 0) {
 			final Location l = mPlayer.getLocation();
@@ -150,13 +152,8 @@ public class Quickdraw extends Ability {
 			Bukkit.getScheduler().runTaskLater(mPlugin, mPlayer::updateInventory, 1);
 		}
 
-		proj.addScoreboardTag("SourceQuickDraw");
+		proj.addScoreboardTag(SOURCE_QUICKDRAW_TAG);
 		proj.setShooter(mPlayer);
-		if (proj instanceof final AbstractArrow arrow) {
-			arrow.setPierceLevel(Math.max(0, Math.min((isEnhanced() ? mPiercing : 0), 127)));
-			arrow.setCritical(true);
-			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
-		}
 
 		final ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(proj);
 		Bukkit.getPluginManager().callEvent(eventLaunch);
@@ -165,9 +162,16 @@ public class Quickdraw extends Ability {
 			mCosmetic.quickdrawProjectileEffect(mPlugin, proj);
 		}
 
+		if (proj instanceof final AbstractArrow arrow) {
+			arrow.setPierceLevel(isEnhanced() ? mPiercing : 0);
+			arrow.setCritical(true);
+			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+		}
+
 		final ItemStatManager.PlayerItemStats stats = DamageListener.getProjectileItemStats(proj);
 		if (stats != null) {
 			final ItemStatManager.PlayerItemStats.ItemStatsMap map = stats.getItemStats();
+
 			if (map != null) {
 				final ItemStat projDamageAdd = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
 				final ItemStat sniper = Objects.requireNonNull(EnchantmentType.SNIPER.getItemStat());
@@ -177,6 +181,7 @@ public class Quickdraw extends Ability {
 				final ItemStat slayer = Objects.requireNonNull(EnchantmentType.SLAYER.getItemStat());
 				final ItemStat duelist = Objects.requireNonNull(EnchantmentType.DUELIST.getItemStat());
 				final ItemStat hexEater = Objects.requireNonNull(EnchantmentType.HEX_EATER.getItemStat());
+				final ItemStat chaotic = Objects.requireNonNull(EnchantmentType.CHAOTIC.getItemStat());
 				map.set(projDamageAdd, mDamage);
 				map.set(sniper, 0);
 				map.set(pointBlank, 0);
@@ -184,6 +189,8 @@ public class Quickdraw extends Ability {
 				map.set(slayer, 0);
 				map.set(duelist, 0);
 				map.set(hexEater, 0);
+				map.set(chaotic, 0);
+				// See DamageListener for damage implementation
 			}
 		}
 
@@ -197,7 +204,7 @@ public class Quickdraw extends Ability {
 	private static Description<Quickdraw> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.addTrigger()
-			.add(" to fire a damage projectile that inherits the enchantments of that weapon except those that modify base weapon damage.")
+			.add(" to instantly fire a damaging projectile that inherits your weapon's aspect enchants.")
 			.add(" This skill can only apply Recoil once before touching the ground.")
 			.add(" Damage is based on region: R1 = " + R1_DAMAGE + " / R2 = " + R2_DAMAGE + " / R3 = " + R3_DAMAGE + ".")
 			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
@@ -212,8 +219,8 @@ public class Quickdraw extends Ability {
 
 	private static Description<Quickdraw> getDescriptionEnhancement() {
 		return new DescriptionBuilder<>(() -> INFO)
-			.add("Projectiles shot with this skill are given +")
+			.add("Projectiles shot with this skill are given Piercing ")
 			.add(a -> a.mPiercing, PIERCE_LVL)
-			.add(" Piercing.");
+			.add(".");
 	}
 }

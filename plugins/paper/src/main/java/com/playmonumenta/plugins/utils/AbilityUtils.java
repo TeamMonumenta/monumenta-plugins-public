@@ -573,6 +573,7 @@ public class AbilityUtils {
 		ClassAbility.ARCANE_THRUST,
 		ClassAbility.EXPLOSIVE,
 		ClassAbility.ARCANE_STRIKE_ENHANCED,
+		ClassAbility.QUICKDRAW,
 		ClassAbility.PREDATOR_STRIKE,
 		ClassAbility.ALCHEMIST_POTION,
 		ClassAbility.ALCHEMICAL_ARTILLERY, // NOT its enhancement
