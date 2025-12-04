@@ -64,7 +64,7 @@ public class Reverb implements Enchantment {
 				|| event.getAbility() == ClassAbility.REVERB)) {
 			INSTANCE_MAP
 				.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>())
-				.computeIfAbsent(enemy.getUniqueId(), key -> new ReverbInstance())
+				.computeIfAbsent(enemy.getUniqueId(), key -> new ReverbInstance(event.getAbility() == ClassAbility.REVERB))
 				.setEnemyHealth(enemy.getHealth());
 		}
 	}
@@ -162,7 +162,10 @@ public class Reverb implements Enchantment {
 							world.playSound(targetLocation, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 1.3f, 1.6f);
 							world.playSound(targetLocation, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 0.6f);
 
-							double finalDamage = value * (overkill * OVERKILL_DAMAGE_MULTIPLIER_PER_LEVEL + highestDamage * HIGHEST_DAMAGE_MULTIPLIER_PER_LEVEL);
+							double finalDamage = value * overkill * OVERKILL_DAMAGE_MULTIPLIER_PER_LEVEL;
+							if (!reverbInstance.mIsChain) {
+								finalDamage += value * highestDamage * HIGHEST_DAMAGE_MULTIPLIER_PER_LEVEL;
+							}
 							DamageUtils.damage(player, hitMob, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, ClassAbility.REVERB, playerItemStats), finalDamage, true, false, false);
 
 							this.cancel();
@@ -222,6 +225,11 @@ public class Reverb implements Enchantment {
 		private double mHighestDamageThisTick = 0;
 		private double mEnemyHealth = 0;
 		private boolean mIsValid = true;
+		private final boolean mIsChain;
+
+		private ReverbInstance(boolean isChain) {
+			mIsChain = isChain;
+		}
 
 		private void setEnemyHealth(double enemyHealth) {
 			mEnemyHealth = enemyHealth;
