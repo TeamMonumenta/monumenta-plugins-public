@@ -60,7 +60,6 @@ public enum Location {
 	SANCTUM("sanctum", "Forsworn Sanctum", TextColor.fromHexString("#52AA00")),
 	VERDANT("verdant", "Verdant Remnants", TextColor.fromHexString("#158315")),
 	VERDANTSKIN("verdantskin", "Threadwarped Skin", TextColor.fromHexString("#704C8A")),
-	KOAL("koal", "Coalrupted Sierhaven", TextColor.fromHexString("#A1C4E0"), true),
 	// bosses
 	AZACOR("azacor", "Azacor's Malice", TextColor.fromHexString("#FF6F55")),
 	KAUL("kaul", "Kaul's Judgment", TextColor.fromHexString("#00AA00")),
@@ -149,6 +148,7 @@ public enum Location {
 	HALLOWEEN("halloween", "Halloween Event", TextColor.fromHexString("#FFAA00")),
 	TRICKSTER("trickster", "Trickster Challenge", TextColor.fromHexString("#FFAA00")),
 	WINTER("winter", "Winter Event", TextColor.fromHexString("#AFC2E3")),
+	KOAL("koal", "Coalrupted Sierhaven", TextColor.fromHexString("#A1C4E0")),
 	HOLIDAYSKIN("holidayskin", "Holiday Skin", TextColor.fromHexString("#B00C2F")),
 	UGANDA("uganda", "Uganda 2018", TextColor.fromHexString("#D02E28")),
 
