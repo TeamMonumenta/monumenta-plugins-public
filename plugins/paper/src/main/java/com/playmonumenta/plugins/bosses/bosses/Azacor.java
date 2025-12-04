@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -68,9 +69,22 @@ public final class Azacor extends SerializedLocationBossAbilityGroup {
 				(Location loc) -> {
 					loc.getWorld().playSound(loc, Sound.ENTITY_GHAST_SHOOT, SoundCategory.HOSTILE, 1.0f, 1.0f);
 					new PartialParticle(Particle.VILLAGER_ANGRY, loc).count(10).delta(0.4).extra(0).spawnAsEntityActive(mBoss);
-				}),
-			new SpellBaseLaser(mPlugin, mBoss, detectionRange, Constants.TICKS_PER_SECOND * 5,
-				false, false, Constants.TICKS_PER_SECOND * 8,
+				},
+				// Filter dead players
+				(List<Player> players) ->
+					players.stream()
+						.filter(player -> !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5))
+						.toList()
+				),
+			new SpellBaseLaser(mPlugin, mBoss, Constants.TICKS_PER_SECOND * 5,
+				false, Constants.TICKS_PER_SECOND * 8,
+				// Filter dead players
+				() -> {
+					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+					return players.stream()
+						.filter(player -> !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5))
+						.toList();
+				},
 				// Tick action per player
 				(LivingEntity target, int ticks, boolean blocked) -> {
 					if (ticks % 8 == 0) {
@@ -92,6 +106,8 @@ public final class Azacor extends SerializedLocationBossAbilityGroup {
 					new PartialParticle(Particle.SMOKE_LARGE, loc).count(1).delta(0.02).extra(0).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.FLAME, loc).count(1).delta(0.02).extra(0).spawnAsEntityActive(mBoss);
 				},
+				1,
+				6,
 				// Damage generated at the end of the attack
 				(LivingEntity target, Location loc, boolean blocked) -> {
 					loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1f, 1.5f);
@@ -109,7 +125,9 @@ public final class Azacor extends SerializedLocationBossAbilityGroup {
 					} else {
 						loc.getWorld().spawn(loc, TNTPrimed.class, e -> e.setFuseTicks(0));
 					}
-				}),
+				},
+				0
+				),
 			new SpellKnockAway(mPlugin, mBoss, 5, Constants.TICKS_PER_SECOND, 1.5f)
 		));
 
