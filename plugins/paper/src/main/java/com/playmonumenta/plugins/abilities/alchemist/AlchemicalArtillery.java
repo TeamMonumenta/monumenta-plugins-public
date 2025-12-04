@@ -104,7 +104,7 @@ public class AlchemicalArtillery extends Ability {
 		mRadiusMult = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelOne() ? RADIUS_MULTIPLIER_1 : RADIUS_MULTIPLIER_2);
 		mDamageMult = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_MULTIPLIER_1 : DAMAGE_MULTIPLIER_2);
 		mDamageRaw = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_RAW_1 : DAMAGE_RAW_2);
-		mMaxBounceCount = ENHANCEMENT_MAX_BOUNCES + (int) CharmManager.getLevel(mPlayer, CHARM_BOUNCE_COUNT);
+		mMaxBounceCount = Math.max(0, ENHANCEMENT_MAX_BOUNCES + (int) CharmManager.getLevel(mPlayer, CHARM_BOUNCE_COUNT));
 		mBounceDamageMultiplierIncrease = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_BOUNCE_DAMAGE_MULTIPLIER_INCREASE, ENHANCEMENT_ADDED_DAMAGE_MULTIPLIER_PER_BOUNCE);
 		mBounceDamageRawIncrease = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_BOUNCE_DAMAGE_RAW_INCREASE, ENHANCEMENT_ADDED_DAMAGE_RAW_PER_BOUNCE);
 		mBounceDamageFraction = ENHANCEMENT_BOUNCE_DAMAGE_FRACTION + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BOUNCE_DAMAGE_FRACTION);

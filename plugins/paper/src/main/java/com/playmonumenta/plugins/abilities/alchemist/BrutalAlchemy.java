@@ -94,7 +94,7 @@ public class BrutalAlchemy extends Ability implements PotionAbility {
 			if (mAlchemistPotions == null) {
 				return 0;
 			}
-			return mDamage + (getMultIncrease(mLevel) + getFlatIncrease(mLevel)) * mRefreshes;
+			return mDamage + (getMultIncrease(mLevel) * mAlchemistPotions.getDamage(mPlayerItemStats) + getFlatIncrease(mLevel)) * mRefreshes;
 		}
 
 		private void dealAdditionalTicks(int ticks) {
