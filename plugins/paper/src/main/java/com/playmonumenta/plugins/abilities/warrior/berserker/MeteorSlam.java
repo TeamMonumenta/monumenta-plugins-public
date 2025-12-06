@@ -278,7 +278,10 @@ public class MeteorSlam extends Ability {
 	}
 
 	public boolean doGroundPound(boolean customCast) {
-		if (isLevelTwo() && mBloodlust != null && canGroundPound()) {
+		if (isLevelTwo()
+			&& mBloodlust != null
+			&& canGroundPound()
+			&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			boolean customTriggerEnabled = hasCustomTrigger(mPlayer);
 			if (!customTriggerEnabled
 				&& Bukkit.getServer().getCurrentTick() - CAST_DELAY > mVaultCastTime

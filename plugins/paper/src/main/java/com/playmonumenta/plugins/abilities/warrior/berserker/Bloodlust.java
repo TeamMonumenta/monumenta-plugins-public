@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
@@ -75,6 +76,20 @@ public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 
 			@Override
 			public void run() {
+				if (player == null) {
+					this.cancel();
+					return;
+				}
+
+				if (AbilityManager.getManager().getPlayerAbility(player, Bloodlust.class) == null
+					|| player.isDead()
+					|| !player.isOnline()) {
+					if (!AbilityManager.getManager().getPlayerAbilities(player).isSilenced()) {
+						this.cancel();
+					}
+					return;
+				}
+
 				mMaxBloodlust = MAX_BLOODLUST_PER_TICK;
 				if (mTicks % 20 == 0 && !EntityUtils.getNearbyMobs(mPlayer.getLocation(), 16).isEmpty() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.RESIST_5)) {
 					mCombatTime = Bukkit.getServer().getCurrentTick();
