@@ -401,7 +401,10 @@ public class ChanceCubes {
 					Material.RED_SHULKER_BOX,
 					Material.BLACK_SHULKER_BOX,
 					Material.GOLD_BLOCK,
-					Material.IRON_BLOCK
+					Material.IRON_BLOCK,
+					Material.AIR,
+					Material.CAVE_AIR,
+					Material.VOID_AIR
 				);
 
 				List<Player> players = PlayerUtils.playersInRange(loc, range, true);
@@ -428,7 +431,7 @@ public class ChanceCubes {
 							if (mTicks == 0) {
 								target.playSound(target.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 4f);
 								loc.getWorld().playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 5f);
-								target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 4));
+								target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 2));
 								if (FastUtils.RANDOM.nextBoolean()) {
 									mMaterial = Material.LAVA;
 								}
@@ -442,7 +445,7 @@ public class ChanceCubes {
 											BlockState state = blockLocation.getBlock().getState();
 											if (!ignoredMats.contains(state.getType()) &&
 												!BlockUtils.INTERACTABLE.contains(state.getType()) &&
-												FastUtils.RANDOM.nextInt(100) < 37) {
+												FastUtils.RANDOM.nextInt(100) < 27) {
 												mBlocksToRestore.add(state);
 											}
 										}
