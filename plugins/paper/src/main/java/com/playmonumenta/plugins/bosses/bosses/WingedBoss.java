@@ -48,6 +48,7 @@ public final class WingedBoss extends BossAbilityGroup {
 
 	private final Parameters mParams;
 	final List<Entity> mWings = new ArrayList<>();
+	private final BukkitRunnable mFlyingRunnable;
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Only move towards players and idly oscillate if there is a player within this radius")
@@ -97,7 +98,7 @@ public final class WingedBoss extends BossAbilityGroup {
 		if (mParams.HAS_WINGS) {
 			createWings(spawnLoc);
 		}
-		new BukkitRunnable() {
+		mFlyingRunnable = new BukkitRunnable() {
 			final LinearInterpolator mLerp = new LinearInterpolator();
 			final PolynomialSplineFunction mFunction = mLerp.interpolate(distanceThresholds, speedValues);
 
@@ -176,7 +177,8 @@ public final class WingedBoss extends BossAbilityGroup {
 					mVerticalOscillation = 0;
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+		mFlyingRunnable.runTaskTimer(mPlugin, 0, 1);
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), mParams.DETECTION, null);
 	}
@@ -452,5 +454,14 @@ public final class WingedBoss extends BossAbilityGroup {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void unload() {
+		super.unload();
+		if (mParams.HAS_WINGS) {
+			destroyWings();
+		}
+		mFlyingRunnable.cancel();
 	}
 }
