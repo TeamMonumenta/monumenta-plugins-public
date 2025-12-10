@@ -102,7 +102,7 @@ public class CustomRegeneration extends Effect {
 	@Override
 	public @Nullable String getDisplayedName() {
 		String time = mNormalizedDisplay || mInterval == 20 ? "s" : StringUtils.ticksToSeconds(mInterval) + "s";
-		return "/ " + time + " Regeneration";
+		return "/" + time + " Regeneration";
 	}
 
 	@Override
