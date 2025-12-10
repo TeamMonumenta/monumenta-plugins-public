@@ -27,7 +27,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 
 public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
-	public static final String deathMetakey = "PLAYER_SNOWMAN_DEATH_METAKEY";
 	public static final String identityTag = "boss_festivetess_snowman";
 	public static final int detectionRange = 50;
 	private static final int LIFETIME = 60 * 20;
@@ -39,7 +38,7 @@ public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 		public int DAMAGE = 1;
 	}
 
-	public FestiveTessUpgradeSnowmenBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public FestiveTessUpgradeSnowmenBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
@@ -70,7 +69,7 @@ public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 		Location loc = mBoss.getLocation();
 		loc.getWorld().playSound(loc, Sound.BLOCK_CORAL_BLOCK_BREAK, SoundCategory.HOSTILE, 2, 0);
 		new PartialParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1).spawnAsEntityActive(mBoss);
-		event.setFlatDamage(1);
+		event.setDamageCap(1.0);
 	}
 
 	@Override
