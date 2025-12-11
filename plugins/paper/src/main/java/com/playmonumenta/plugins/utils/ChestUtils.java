@@ -381,7 +381,7 @@ public class ChestUtils {
 	// Test if an item has a specified name and item type.
 	// Used for: SKR Scrolls, certain Winter Event items
 	public static boolean testForItem(ItemStack item, String name, String type) {
-		return (item.getType().name().contains(type)) && InventoryUtils.testForItemWithName(item, name, false);
+		return item.getType().name().contains(type) && InventoryUtils.testForItemWithName(item, name, false);
 	}
 
 	public static boolean isUnscaledChest(Block block) {

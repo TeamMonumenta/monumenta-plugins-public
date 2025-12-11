@@ -21,6 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
@@ -30,7 +31,7 @@ public class Frozen extends ZeroArgumentEffect {
 	public static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(127, 209, 255), 1f);
 	private boolean mStartedWithAI = false;
 	private boolean mStartedWithGravity = false;
-	private BlockDisplay mDisplay;
+	private @Nullable BlockDisplay mDisplay;
 
 	public Frozen(int duration) {
 		super(duration, effectID);
@@ -105,11 +106,13 @@ public class Frozen extends ZeroArgumentEffect {
 
 	@Override
 	public void onDeath(EntityDeathEvent event) {
-		mDisplay.remove();
+		removeDisplay();
 	}
 
 	private void removeDisplay() {
-		mDisplay.remove();
+		if (mDisplay != null) {
+			mDisplay.remove();
+		}
 	}
 
 	@Override
