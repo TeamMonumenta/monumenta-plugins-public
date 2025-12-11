@@ -85,9 +85,9 @@ import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
 import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
 import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
+import com.playmonumenta.plugins.abilities.shaman.IgnitionDrive;
 import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
 import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
-import com.playmonumenta.plugins.abilities.shaman.IgnitionDrive;
 import com.playmonumenta.plugins.abilities.shaman.Spiritualism;
 import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
@@ -121,8 +121,8 @@ import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Bloodlust;
 import com.playmonumenta.plugins.abilities.warrior.berserker.GloriousBattle;
-import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
 import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
+import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
@@ -769,7 +769,6 @@ public class CharmManager {
 			EnergizingElixir.CHARM_DURATION,
 			EnergizingElixir.CHARM_COOLDOWN,
 			EnergizingElixir.CHARM_DAMAGE_AMPLIFIER,
-			EnergizingElixir.CHARM_DAMAGE_AMPLIFIER_DURATION,
 			EnergizingElixir.CHARM_ENHANCEMENT_ABSORPTION_AMOUNT,
 			EnergizingElixir.CHARM_ENHANCEMENT_ABSORPTION_MAX,
 			EnergizingElixir.CHARM_ENHANCEMENT_ABSORPTION_DURATION,
@@ -866,16 +865,15 @@ public class CharmManager {
 			ScorchedEarth.CHARM_SCORCHED_MAX_DURATION,
 			ScorchedEarth.CHARM_SCORCHED_DAMAGE,
 			Taboo.CHARM_COOLDOWN,
+			Taboo.CHARM_SELF_DAMAGE_RAMPING,
+			Taboo.CHARM_MISSING_HEALTH_FRACTION_PER_ABSORPTION,
+			Taboo.CHARM_ABSORPTION_ON_DEACTIVATION_AMOUNT,
+			Taboo.CHARM_ABSORPTION_ON_DEACTIVATION_MAX,
+			Taboo.CHARM_ABSORPTION_ON_DEACTIVATION_DURATION,
 			Taboo.CHARM_DAMAGE,
 			Taboo.CHARM_KNOCKBACK_RESISTANCE,
 			Taboo.CHARM_RECHARGE_RATE,
 			Taboo.CHARM_SELF_DAMAGE,
-			Taboo.CHARM_POTION_REFUND_PER_KILL,
-			Taboo.CHARM_POTION_REFUND_MAX,
-			Taboo.CHARM_EFFECT_DURATION,
-			Taboo.CHARM_EXTRA_COOLDOWN_PER_RECAST,
-			Taboo.CHARM_MAX_RECASTS,
-			Taboo.CHARM_RECAST_COST,
 			//Warlock
 			AmplifyingHex.CHARM_CONE,
 			AmplifyingHex.CHARM_COOLDOWN,
@@ -1302,9 +1300,8 @@ public class CharmManager {
 			EsotericEnhancements.CHARM_FUSE,
 			ScorchedEarth.CHARM_COOLDOWN,
 			Taboo.CHARM_COOLDOWN,
+			Taboo.CHARM_SELF_DAMAGE_RAMPING,
 			Taboo.CHARM_SELF_DAMAGE,
-			Taboo.CHARM_EXTRA_COOLDOWN_PER_RECAST,
-			Taboo.CHARM_RECAST_COST,
 			AlchemicalArtillery.CHARM_COOLDOWN,
 			Bezoar.CHARM_PHILOSOPHER_STONE_SPAWN_RATE,
 			AmplifyingHex.CHARM_COOLDOWN,

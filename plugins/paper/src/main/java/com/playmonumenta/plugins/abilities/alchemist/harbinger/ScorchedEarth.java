@@ -44,13 +44,12 @@ import org.jetbrains.annotations.Nullable;
 public class ScorchedEarth extends MultipleChargeAbility implements PotionAbility, AbilityWithDuration {
 	private static final String SCORCHED_EARTH_POTION_METAKEY = "ScorchedEarthPotion";
 
-	private static final int COOLDOWN_1 = 30 * 20;
-	private static final int COOLDOWN_2 = 25 * 20;
+	private static final int COOLDOWN = 30 * 20;
 	private static final int CHARGES = 2;
 	private static final int MAX_SCORCHED_DURATION = 5 * 20;
 	private static final int SCORCHED_DURATION_PER_APPLICATION = 20;
-	private static final double SCORCHED_DAMAGE_PER_SECOND_1 = 0.5;
-	private static final double SCORCHED_DAMAGE_PER_SECOND_2 = 0.6;
+	private static final double SCORCHED_DAMAGE_PER_SECOND_1 = 0.4;
+	private static final double SCORCHED_DAMAGE_PER_SECOND_2 = 0.5;
 	private static final int SCORCHED_DAMAGE_INTERVAL = 5;
 	private static final int ON_ENTER_SCORCH = 2 * SCORCHED_DURATION_PER_APPLICATION;
 	private static final double SLOWNESS_AMP_1 = 0.25;
@@ -83,7 +82,7 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 			.actionBarColor(TextColor.color(230, 134, 0))
 			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Deploy a circular zone in which your potions break into fragments that Scorch enemies.")
-			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.BROWN_DYE);
 
 	private static class Instance {
@@ -456,7 +455,7 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 			.add("Charges: ")
 			.add(a -> a.mMaxCharges, CHARGES)
 			.add(" (all are refunded when the cooldown ends).")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne)
+			.addCooldown(COOLDOWN, Ability::isLevelOne)
 			.add(Component.text("\nScorched:\n").color(NamedTextColor.YELLOW))
 			.add("Scorched enemies take ")
 			.addPercent(a -> a.mScorchedDamage, SCORCHED_DAMAGE_PER_SECOND_1, false, Ability::isLevelOne)
@@ -478,7 +477,6 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 			.addPercent(a -> a.mScorchedDamage, SCORCHED_DAMAGE_PER_SECOND_2, false, Ability::isLevelTwo)
 			.add(" of your potion's damage over ")
 			.addDuration(a -> a.mScorchedDuration, SCORCHED_DURATION_PER_APPLICATION)
-			.add("s.")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+			.add("s.");
 	}
 }

@@ -53,7 +53,7 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	private static final int SUMMON_DURATION = 30;
 	private static final double SLOW_AMOUNT = 0.35;
 	private static final int SLOW_DURATION = 4 * 20;
-	private static final int COOLDOWN = 4 * 20;
+	private static final int COOLDOWN = 5 * 20;
 	private static final double TARGET_RADIUS = 8;
 	private static final double MAX_TARGET_Y = 6;
 	private static final int LIFETIME = 15 * 20;

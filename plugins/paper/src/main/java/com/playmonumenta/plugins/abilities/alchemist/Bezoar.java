@@ -243,7 +243,16 @@ public class Bezoar extends Ability {
 	}
 
 	private Item spawnItem(World world, Location loc, boolean philosophersStone) {
-		return AbilityUtils.spawnAbilityItem(world, loc, mCosmetic.bezoarMat(philosophersStone), mCosmetic.bezoarName(philosophersStone), true, 0, true, true);
+		return AbilityUtils.spawnAbilityItem(
+			world,
+			loc,
+			mCosmetic.bezoarMat(philosophersStone),
+			mCosmetic.bezoarName(philosophersStone),
+			true,
+			0,
+			true,
+			true,
+			mCosmetic.bezoarGlowColor(philosophersStone));
 	}
 
 	public boolean shouldDrop() {

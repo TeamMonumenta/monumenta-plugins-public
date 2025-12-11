@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.VolatileReactionCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.Comparator;
@@ -215,8 +216,7 @@ public class VolatileReaction extends Ability implements PotionAbility {
 	private final double mBrutalLevelThreeMultDamageIncrease;
 	private final double mBrutalLevelThreeExplosionDamageMult;
 	private final double mRadiusMultiplier;
-	private final double mMainDamageMultiplier1;
-	private final double mMainDamageMultiplier2;
+	private final double mMainDamageMultiplier;
 	private final double mDetonateRadius;
 	private final double mDetonateDamageMultiplier;
 	private final int mEnhancementSpreadCap;
@@ -236,8 +236,7 @@ public class VolatileReaction extends Ability implements PotionAbility {
 		mBrutalLevelThreeMultDamageIncrease = BrutalAlchemy.DOT_MULT_INCREASE_3 + CharmManager.getLevelPercentDecimal(mPlayer, BrutalAlchemy.CHARM_DOT_INCREASE_DAMAGE_MULT);
 		mBrutalLevelThreeExplosionDamageMult = BrutalAlchemy.DOT_EXPLOSION_MULT_3 + CharmManager.getLevelPercentDecimal(mPlayer, BrutalAlchemy.CHARM_DOT_EXPLOSION_DAMAGE_MULT);
 		mRadiusMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS_MULTIPLIER, POTION_RADIUS_MULTIPLIER);
-		mMainDamageMultiplier1 = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MAIN_DAMAGE_MULTIPLIER, MAIN_DAMAGE_MULTIPLIER_1);
-		mMainDamageMultiplier2 = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MAIN_DAMAGE_MULTIPLIER, MAIN_DAMAGE_MULTIPLIER_2);
+		mMainDamageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MAIN_DAMAGE_MULTIPLIER, isLevelOne() ? MAIN_DAMAGE_MULTIPLIER_1 : MAIN_DAMAGE_MULTIPLIER_2);
 		mDetonateRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DETONATE_RADIUS, DETONATE_RADIUS);
 		mDetonateDamageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DETONATE_DAMAGE_MULTIPLIER, DETONATION_DAMAGE_MULTIPLIER);
 		mEnhancementSpreadCap = ENHANCEMENT_SPREAD_CAP + (int) CharmManager.getLevel(mPlayer, CHARM_ENHANCEMENT_SPREAD_CAP);
@@ -272,7 +271,7 @@ public class VolatileReaction extends Ability implements PotionAbility {
 		return true;
 	}
 
-	private void explode(LivingEntity mob, boolean isGruesome, boolean isLevelTwoExplosion, ItemStatManager.PlayerItemStats playerItemStats) {
+	private void explode(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
 		if (mAlchemistPotions == null) {
 			return;
 		}
@@ -287,15 +286,15 @@ public class VolatileReaction extends Ability implements PotionAbility {
 				mInfo.getLinkedSpell(),
 				playerItemStats
 			),
-			nonNullAlchemistPotions.getDamage() * (isLevelTwoExplosion ? mMainDamageMultiplier2 : mMainDamageMultiplier1),
+			nonNullAlchemistPotions.getDamage() * mMainDamageMultiplier,
 			true,
 			false,
 			false
 		);
 
-		// Detonation
+		// Detonation (to other mobs only)
 		Hitbox detonationHitbox = new Hitbox.SphereHitbox(mob.getLocation(), mDetonateRadius);
-		detonationHitbox.getHitMobs().forEach(hitMob -> {
+		detonationHitbox.getHitMobs(mob).forEach(hitMob -> {
 			// Damage
 			DamageUtils.damage(
 				mPlayer,
@@ -311,22 +310,15 @@ public class VolatileReaction extends Ability implements PotionAbility {
 				false
 			);
 
-			// Effect spread to other mobs
-			if (!hitMob.equals(mob)) {
-				nonNullAlchemistPotions.applyEffects(hitMob, isGruesome, playerItemStats);
-			}
+			// Effect spread
+			nonNullAlchemistPotions.applyEffects(hitMob, isGruesome, playerItemStats);
 		});
 
-		if (isLevelTwoExplosion) {
-			// Increase the potency of the effects on the mob.
-			// Since this is the level two explosion, we know it is affected by both.
-			if (mGruesomeAlchemy != null) {
-				mGruesomeAlchemy.applyHigherLevel(mob, playerItemStats);
-			}
-
-			if (mBrutalAlchemy != null) {
-				mBrutalAlchemy.applyHigherLevel(mob, playerItemStats);
-			}
+		// Increase the potency of the effect on the mob.
+		if (isGruesome && mGruesomeAlchemy != null) {
+			mGruesomeAlchemy.applyHigherLevel(mob, playerItemStats);
+		} else if (!isGruesome && mBrutalAlchemy != null) {
+			mBrutalAlchemy.applyHigherLevel(mob, playerItemStats);
 		}
 
 		GruesomeAlchemy.tryDoEnhancementEffect(mGruesomeAlchemy, mob);
@@ -347,24 +339,24 @@ public class VolatileReaction extends Ability implements PotionAbility {
 		if (isLevelOne() && !isEnhanced()) {
 			if (!mobInfo.mAffectedByBrutal && !mobInfo.mAffectedByGruesome) {
 				mobInfo.setAffected(isGruesome);
-				explode(mob, isGruesome, false, playerItemStats);
+				explode(mob, isGruesome, playerItemStats);
 			}
 		} else {
 			if (!mobInfo.isAffected(isGruesome)) {
 				mobInfo.setAffected(isGruesome);
 				if (mobInfo.isAffectedByBoth()) {
-					explode(mob, isGruesome, true, playerItemStats);
+					if (isLevelTwo()) {
+						explode(mob, isGruesome, playerItemStats);
+					}
 					if (isEnhanced()) {
 						// Spread Enhancement's DoT
 						Hitbox spreadHitbox = new Hitbox.SphereHitbox(mob.getLocation(), mEnhancementDotSpreadRadius);
 						// Look for highest hp target that doesn't already have max stacks
 						Optional<LivingEntity> mobToSpreadTo = spreadHitbox.getHitMobs()
 							.stream()
+							.filter(le -> !DamageUtils.isImmuneToDamage(le, DamageEvent.DamageType.MAGIC))
+							.filter(le -> !le.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG))
 							.filter(possibleSpreadTarget -> {
-								if (possibleSpreadTarget.getUniqueId().equals(mob.getUniqueId())) {
-									return false;
-								}
-
 								if (!mEnhancementDoTInfos.containsKey(possibleSpreadTarget.getUniqueId())) {
 									return true;
 								}
@@ -385,7 +377,7 @@ public class VolatileReaction extends Ability implements PotionAbility {
 						}
 					}
 				} else {
-					explode(mob, isGruesome, false, playerItemStats);
+					explode(mob, isGruesome, playerItemStats);
 				}
 			}
 		}
@@ -445,24 +437,25 @@ public class VolatileReaction extends Ability implements PotionAbility {
 			.addPercent(a -> a.mRadiusMultiplier, POTION_RADIUS_MULTIPLIER)
 			.add(" radius which deals no damage, but marks all hit mobs as Volatile.")
 			.add(" When Volatile mobs gain either Gruesome or Brutal effects, they explode, taking ")
-			.addPercent(a -> a.mMainDamageMultiplier1, MAIN_DAMAGE_MULTIPLIER_1, false, Ability::isLevelOne)
+			.addPercent(a -> a.mMainDamageMultiplier, MAIN_DAMAGE_MULTIPLIER_1, false, Ability::isLevelOne)
 			.add(" of your potion's damage, and dealing ")
 			.addPercent(a -> a.mDetonateDamageMultiplier, DETONATION_DAMAGE_MULTIPLIER)
 			.add(" of your potion's damage within a ")
 			.add(a -> a.mDetonateRadius, DETONATE_RADIUS)
-			.add(" block radius, spreading the Gruesome or Brutal effect they were hit with.")
-			.addCooldown(COOLDOWN);
-	}
-
-	private static Description<VolatileReaction> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Volatile mobs hit with both Gruesome and Brutal effects now explode for a second time, taking ")
-			.addPercent(a -> a.mMainDamageMultiplier2, MAIN_DAMAGE_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(" of your potion's damage. The potency of their Gruesome and Brutal effects is increased by one level.")
+			.add(" block radius, spreading the Gruesome or Brutal effect they were hit with. ")
+			.add("Additionally, the potency of the effect applied to the Volatile mobs is increased by one level. ")
+			.addCooldown(COOLDOWN)
 			.add(Component.text("\nBrutal Alchemy level 3 effect:\n").color(NamedTextColor.YELLOW))
 			.add(getDescriptionBrutalAlchemy3())
 			.add(Component.text("\nGruesome Alchemy level 3 effect:\n").color(NamedTextColor.YELLOW))
 			.add(getDescriptionGruesomeAlchemy3());
+	}
+
+	private static Description<VolatileReaction> getDescription2() {
+		return new DescriptionBuilder<>(() -> INFO)
+			.add("Volatile mobs hit with both Gruesome and Brutal effects now explode for a second time. The main damage of both explosions is increased to ")
+			.addPercent(a -> a.mMainDamageMultiplier, MAIN_DAMAGE_MULTIPLIER_2, false, Ability::isLevelTwo)
+			.add(" of your potion's damage.");
 	}
 
 	private static Description<VolatileReaction> getDescriptionBrutalAlchemy3() {

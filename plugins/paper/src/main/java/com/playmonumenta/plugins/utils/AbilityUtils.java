@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -728,6 +729,10 @@ public class AbilityUtils {
 	}
 
 	public static Item spawnAbilityItem(World world, Location loc, Material mat, String name, boolean dropNaturally, double velocity, boolean glow, boolean invulnerable) {
+		return spawnAbilityItem(world, loc, mat, name, dropNaturally, velocity, glow, invulnerable, NamedTextColor.WHITE);
+	}
+
+	public static Item spawnAbilityItem(World world, Location loc, Material mat, String name, boolean dropNaturally, double velocity, boolean glow, boolean invulnerable, NamedTextColor glowColor) {
 		ItemStack stack = new ItemStack(mat);
 		ItemMeta meta = stack.getItemMeta();
 		meta.displayName(Component.text(name, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
@@ -746,7 +751,10 @@ public class AbilityUtils {
 			droppedItem.setVelocity(vel);
 		}
 		droppedItem.setPickupDelay(Integer.MAX_VALUE);
-		droppedItem.setGlowing(glow);
+		if (glow) {
+			GlowingManager.startGlowing(droppedItem, glowColor, -1, GlowingManager.PLAYER_ABILITY_PRIORITY);
+		}
+
 		if (invulnerable) {
 			EntityUtils.makeItemInvulnerable(droppedItem);
 		}

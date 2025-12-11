@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
-import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import org.bukkit.Location;
@@ -10,8 +10,8 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class TabooCS implements CosmeticSkill {
 
@@ -25,45 +25,26 @@ public class TabooCS implements CosmeticSkill {
 		return Material.DRAGON_BREATH;
 	}
 
-	public void periodicEffects(Player player, boolean twoHertz, boolean oneSecond, int ticks, boolean inBurst) {
+	public void periodicEffects(Player player, boolean twoHertz, boolean oneSecond, int ticks, double currentSelfDamage, double absorptionLossThreshold) {
+		Location loc = player.getLocation();
 		if (oneSecond) {
-			World world = player.getWorld();
-			Location loc = player.getLocation();
 			new PartialParticle(Particle.FALLING_DUST, loc.clone().add(0, player.getHeight() / 2, 0), 5, 0.25, 0.2, 0.25, 0).data(Material.WARPED_HYPHAE.createBlockData()).spawnAsPlayerBuff(player);
 			new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, loc.clone().add(0, player.getHeight() / 2, 0), 10, 0.25, 0.2, 0.25, 0).spawnAsPlayerBuff(player);
 			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CONDUIT_AMBIENT, 0.8f, 1);
-
-			if (inBurst) {
-				new PPCircle(Particle.FLAME, loc.clone().add(0, 0.1, 0), 2).count(50).ringMode(false).spawnAsPlayerBuff(player);
-				world.playSound(loc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
-			}
 		}
-	}
 
-	public void burstEffects(Player player) {
-		World world = player.getWorld();
-		Location loc = player.getLocation();
-		world.playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 2.0f, 0.6f);
-		world.playSound(loc, Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 0.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 2.0f, 0.1f);
-		world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 0.8f, 0.1f);
-		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 2.0f, 0.1f);
-		world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_DEATH, SoundCategory.PLAYERS, 0.3f, 0.1f);
-		world.playSound(loc, Sound.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.PLAYERS, 1.4f, 0.1f);
-		world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 2.0f, 1.0f);
-		new PartialParticle(Particle.DAMAGE_INDICATOR, loc.clone().add(0, player.getHeight() / 2, 0), 20, 0.2, 0.2, 0.2, 0).spawnAsPlayerBuff(player);
-		new PPCircle(Particle.FLAME, loc.clone().add(0, 0.1, 0), 2).count(50).ringMode(false).spawnAsPlayerBuff(player);
-	}
-
-	public void unburstEffects(Player player) {
-		World world = player.getWorld();
-		Location loc = player.getLocation();
-		world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 2.0f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_BREATH, SoundCategory.PLAYERS, 1.5f, 0.1f);
-		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 2.0f, 1.0f);
-		world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 2.0f, 0.1f);
-		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 1.2f, 1.2f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 2.0f, 0.7f);
+		if (currentSelfDamage >= absorptionLossThreshold) {
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_GRAVEL_BREAK, 0.2f, 0.5f);
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CHORUS_FLOWER_GROW, 2f, 1f);
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CHORUS_FLOWER_DEATH, 2f, 1f);
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CHORUS_FLOWER_DEATH, 2f, 1f);
+		} else if (currentSelfDamage >= absorptionLossThreshold / 2 && twoHertz) {
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_GRAVEL_BREAK, 0.25f, 0.5f);
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CHORUS_FLOWER_GROW, 1.5f, 1f);
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CHORUS_FLOWER_GROW, 1.5f, 1f);
+		} else if (oneSecond) {
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_GRAVEL_BREAK, 0.2f, 0.5f);
+		}
 	}
 
 	public void toggle(Player player, boolean active) {
@@ -74,4 +55,28 @@ public class TabooCS implements CosmeticSkill {
 		}
 	}
 
+	public void notifyAbsorptionLossStart(Player player, Plugin plugin) {
+		new BukkitRunnable() {
+			int mT = 0;
+
+			@Override
+			public void run() {
+				if (player.isDead() || !player.isValid() || !player.isOnline()) {
+					cancel();
+					return;
+				}
+
+				player.playSound(player, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2f, 1.5f);
+				player.playSound(player, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2f, 1.5f);
+				player.playSound(player, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2f, 1.125f);
+				player.playSound(player, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2f, 1.125f);
+				player.playSound(player, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2f, 0.75f);
+				player.playSound(player, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2f, 0.75f);
+				mT++;
+				if (mT >= 3) {
+					cancel();
+				}
+			}
+		}.runTaskTimer(plugin, 0, 20);
+	}
 }
