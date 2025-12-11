@@ -55,7 +55,7 @@ public class POICommands {
 						}
 					}
 					if (conqueredCount >= UNIQUE_POIS_NEEDED_SKR) {
-						player.sendMessage(Component.text("You find a scroll from ancient times after clearing " + UNIQUE_POIS_NEEDED_SKR + " POI's this week.", NamedTextColor.GREEN));
+						player.sendMessage(Component.text("You find a scroll from ancient times after clearing " + UNIQUE_POIS_NEEDED_SKR + " unique POIs this week.", NamedTextColor.GREEN));
 						player.addScoreboardTag("AllPoisConquered");
 						ItemStack item = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString("epic:r3/dungeons/skr/standard_scroll"));
 						InventoryUtils.giveItem(player, item);
