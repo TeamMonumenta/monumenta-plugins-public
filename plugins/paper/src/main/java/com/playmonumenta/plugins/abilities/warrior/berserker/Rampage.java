@@ -30,6 +30,7 @@ import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,14 +46,15 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 	private static final double DAMAGE_L2 = 10;
 	private static final double RADIUS = 4;
 	private static final int BLOODLUST_COST = 4;
-	private static final int MAX_BLOODLUST_GAIN = 5;
-	private static final double HEAL_PERCENT = 0.05;
-	private static final double DAMAGE_PERCENT = 0.2;
+	private static final int MAX_BLOODLUST_GAIN_L1 = 3;
+	private static final int MAX_BLOODLUST_GAIN_L2 = 5;
+	private static final double HEAL_PERCENT = 0.01;
+	private static final double DAMAGE_PERCENT_L1 = 0.10;
+	private static final double DAMAGE_PERCENT_L2 = 0.15;
 	private static final double MELEE_RESISTANCE_PERCENT = 0.1;
 	private static final double KNOCKBACK = 0.45;
-	private static final int DURATION_PER_STACK_L1 = Constants.TICKS_PER_SECOND;
-	private static final int DURATION_PER_STACK_L2 = 30; // 20 * 1.5
-	private static final int INITIAL_DURATION = Constants.TICKS_PER_SECOND * 5;
+	private static final int DURATION_PER_STACK = Constants.TICKS_PER_SECOND;
+	private static final int INITIAL_DURATION = Constants.TICKS_PER_SECOND * 3;
 	private static final String DAMAGE_EFFECT_NAME = "RampagePercentDamageEffect";
 	private static final String REGENERATION_EFFECT_NAME = "RampageCustomRegenerationEffect";
 	private static final String RESISTANCE_EFFECT_NAME = "RampageMeleeResistanceEffect";
@@ -70,6 +72,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 	public static final String CHARM_KNOCKBACK = "Rampage Knockback";
 	public static final String CHARM_INITIAL_DURATION = "Rampage Initial Duration";
 	public static final String CHARM_DURATION_PER_STACK = "Rampage Duration Per Stack";
+	public static final String CHARM_MAX_DURATION = "Rampage Max Duration";
 
 	public static final AbilityInfo<Rampage> INFO =
 		new AbilityInfo<>(Rampage.class, "Rampage", Rampage::new)
@@ -106,17 +109,17 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_L1 : DAMAGE_L2);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
-		mDurationPerStack = CharmManager.getDuration(mPlayer, CHARM_DURATION_PER_STACK, isLevelOne() ? DURATION_PER_STACK_L1 : DURATION_PER_STACK_L2);
-		mMaxBloodlustGain = MAX_BLOODLUST_GAIN + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_BLOODLUST_GAIN);
+		mDurationPerStack = CharmManager.getDuration(mPlayer, CHARM_DURATION_PER_STACK, DURATION_PER_STACK);
+		mMaxBloodlustGain = (isLevelOne() ? MAX_BLOODLUST_GAIN_L1 : MAX_BLOODLUST_GAIN_L2) + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_BLOODLUST_GAIN);
 		mInitialDuration = CharmManager.getDuration(mPlayer, CHARM_INITIAL_DURATION, INITIAL_DURATION);
 
 		mHealing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT);
-		mDamageBuff = DAMAGE_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_BUFF);
+		mDamageBuff = (isLevelOne() ? DAMAGE_PERCENT_L1 : DAMAGE_PERCENT_L2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_BUFF);
 		mKnockback = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK);
 		mMeleeResistance = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MELEE_RESISTANCE, MELEE_RESISTANCE_PERCENT);
 
 		mBloodlustCost = BLOODLUST_COST + (int) CharmManager.getLevel(mPlayer, CHARM_BLOODLUST_COST);
-		mMaxDuration = mMaxBloodlustGain * mDurationPerStack;
+		mMaxDuration = CharmManager.getDuration(mPlayer, CHARM_MAX_DURATION, mDurationPerStack * mMaxBloodlustGain + mInitialDuration);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new RampageCS());
 
 		Bukkit.getScheduler().runTask(mPlugin, () ->
@@ -152,7 +155,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 				new PercentDamageDealt(mInitialDuration, mDamageBuff).damageTypes(EnumSet.of(DamageType.MELEE, DamageType.MELEE_SKILL)).deleteOnAbilityUpdate(true));
 
 			effectManager.addEffect(mPlayer, REGENERATION_EFFECT_NAME,
-				new CustomRegeneration(mInitialDuration, mHealing * EntityUtils.getMaxHealth(mPlayer), mPlugin).deleteOnAbilityUpdate(true));
+				new CustomRegeneration(mInitialDuration, mHealing * EntityUtils.getMaxHealth(mPlayer), 5, null, false, mPlugin));
 
 			if (isLevelTwo()) {
 				effectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME,
@@ -242,15 +245,22 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 			.append(Component.text("]", NamedTextColor.YELLOW))
 			.append(Component.text(": ", NamedTextColor.WHITE));
 
-		output = output.append(Component.text(charges + "s ",
-			(charges == 0 ? NamedTextColor.GRAY : (charges >= getMaxCharges() ? NamedTextColor.GREEN : NamedTextColor.YELLOW))));
+		if (charges == 0 && mBloodlust != null) {
+			output = output.append(mBloodlust.getStacks() >= mBloodlustCost ?
+				Component.text("✓", NamedTextColor.GREEN, TextDecoration.BOLD) :
+				Component.text("x", NamedTextColor.RED, TextDecoration.BOLD)
+			);
+		} else {
+			output = output.append(Component.text(charges + "s ",
+				charges >= getMaxCharges() ? NamedTextColor.GREEN : NamedTextColor.YELLOW));
+		}
 
 		return output;
 	}
 
 	@Override
 	public int getMaxCharges() {
-		return mMaxBloodlustGain + mInitialDuration / 20;
+		return mMaxDuration / 20;
 	}
 
 	@Override
@@ -274,14 +284,16 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 			.add(" block radius. For the next ")
 			.addDuration(a -> a.mInitialDuration, INITIAL_DURATION)
 			.add("s, you gain ")
-			.addPercent(a -> a.mDamageBuff, DAMAGE_PERCENT)
+			.addPercent(a -> a.mDamageBuff, DAMAGE_PERCENT_L1, false, Ability::isLevelOne)
 			.add(" melee damage, and ")
 			.addPercent(a -> a.mHealing, HEAL_PERCENT)
-			.add(" max health regen per second. Gaining a Bloodlust stack while this effect is active extends its duration by ")
-			.addDuration(a -> a.mDurationPerStack, DURATION_PER_STACK_L1, false, Ability::isLevelOne)
-			.add("s, capping at ")
-			.add(a -> a.mMaxBloodlustGain, MAX_BLOODLUST_GAIN)
-			.add(" Bloodlust Stacks. Rampage damage does not contribute towards Bloodlust. ")
+			.add(" max health regen per second. The next ")
+			.add(a -> a.mMaxBloodlustGain, MAX_BLOODLUST_GAIN_L1, false, Ability::isLevelOne)
+			.add(" Bloodlust stack extends the duration by ")
+			.addDuration(a -> a.mDurationPerStack, DURATION_PER_STACK)
+			.add("s. The max duration is ")
+			.addDuration(a -> a.mMaxDuration, INITIAL_DURATION + MAX_BLOODLUST_GAIN_L1 * DURATION_PER_STACK, false, Ability::isLevelOne)
+			.add("s. Rampage damage does not contribute towards Bloodlust. ")
 			.add("\n \n Cost: ")
 			.add(a -> a.mBloodlustCost, BLOODLUST_COST, true)
 			.add("x Bloodlust Stack.");
@@ -291,10 +303,14 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Rampage now deals ")
 			.add(a -> a.mDamage, DAMAGE_L2, false, Ability::isLevelTwo)
-			.add(" damage. Grants ")
+			.add(" damage, gain ")
+			.addPercent(a -> a.mDamageBuff, DAMAGE_PERCENT_L2, false, Ability::isLevelTwo)
+			.add(" melee damage, and gain ")
 			.addPercent(a -> a.mMeleeResistance, MELEE_RESISTANCE_PERCENT)
-			.add(" melee resistance, and Bloodlust stacks now extend the effect's duration by ")
-			.addDuration(a -> a.mDurationPerStack, DURATION_PER_STACK_L2, false, Ability::isLevelTwo)
-			.add("s each.");
+			.add(" melee resistance. Additional, the next ")
+			.addDuration(a -> a.mMaxBloodlustGain, MAX_BLOODLUST_GAIN_L2, false, Ability::isLevelTwo)
+			.add(" Bloodlust stack will extend the duration and the max duration is now ")
+			.addDuration(a -> a.mMaxDuration, INITIAL_DURATION + MAX_BLOODLUST_GAIN_L2 * DURATION_PER_STACK, false, Ability::isLevelTwo)
+			.add("s.");
 	}
 }

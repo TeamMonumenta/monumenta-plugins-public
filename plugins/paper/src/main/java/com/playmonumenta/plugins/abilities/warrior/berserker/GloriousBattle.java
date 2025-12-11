@@ -50,14 +50,15 @@ public class GloriousBattle extends Ability {
 	private static final int BLOODLUST_COST = 2;
 	private static final int PIERCE_DAMAGE_1 = 5;
 	private static final int PIERCE_DAMAGE_2 = 8;
-	private static final double AOE_DAMAGE_1 = 0.45;
-	private static final double AOE_DAMAGE_2 = 0.5;
+	private static final double AOE_DAMAGE_1 = 0.5;
+	private static final double AOE_DAMAGE_2 = 0.6;
+	private static final double CRITICAL_DAMAGE_1 = 0.75;
+	private static final double CRITICAL_DAMAGE_2 = 0.9;
 	private static final double VELOCITY = 1.5;
 	private static final double VERTICAL_SPEED_CAP = 0.3;
 	private static final double RADIUS = 2.5;
 	private static final int DURATION = 30;
 	private static final float KNOCK_AWAY_SPEED = 0.4f;
-	private static final int BLEED = 2;
 	private static final String KBR_EFFECT = "GloriousBattleKnockbackResistanceEffect";
 
 	public static final String CHARM_DAMAGE = "Glorious Battle Damage";
@@ -67,7 +68,7 @@ public class GloriousBattle extends Ability {
 	public static final String CHARM_KNOCKBACK = "Glorious Battle Knockback";
 	public static final String CHARM_BLOODLUST_COST = "Glorious Battle Bloodlust Cost";
 	public static final String CHARM_DURATION = "Glorious Battle Duration";
-	public static final String CHARM_BLEED = "Glorious Battle Bleed Stacks";
+	public static final String CHARM_CRITICAL_DAMAGE = "Glorious Battle Critical Damage Multiplier";
 
 	public static final AbilityInfo<GloriousBattle> INFO =
 		new AbilityInfo<>(GloriousBattle.class, "Glorious Battle", GloriousBattle::new)
@@ -87,7 +88,8 @@ public class GloriousBattle extends Ability {
 	private final double mVelocity;
 	private final double mRadius;
 	private final double mKnockback;
-	private final int mBleed;
+	private final double mCriticalDamage;
+	private final double mCriticalMultiplier;
 
 	private boolean mCanCritAttack = false;
 	private @Nullable Bloodlust mBloodlust;
@@ -98,13 +100,14 @@ public class GloriousBattle extends Ability {
 		super(plugin, player, INFO);
 
 		mAoeDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? AOE_DAMAGE_1 : AOE_DAMAGE_2);
+		mCriticalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? CRITICAL_DAMAGE_1 : CRITICAL_DAMAGE_2);
+		mCriticalMultiplier = CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CRITICAL_DAMAGE);
 		mPierceDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PIERCE_DAMAGE, isLevelOne() ? PIERCE_DAMAGE_1 : PIERCE_DAMAGE_2);
 		mVelocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, VELOCITY);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 		mBloodlustCost = BLOODLUST_COST + (int) CharmManager.getLevel(mPlayer, CHARM_BLOODLUST_COST);
 		mKnockback = CharmManager.getExtraPercent(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
-		mBleed = BLEED + (int) CharmManager.getLevel(mPlayer, CHARM_BLEED);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GloriousBattleCS());
 
@@ -216,32 +219,27 @@ public class GloriousBattle extends Ability {
 		if (!mCanCritAttack) {
 			return true;
 		}
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			mCanCritAttack = false;
-			// Having bleeding enchant prevented this from properly stacking, so delay by a tick
-			if (isLevelTwo() && !enemy.isDead() && enemy.isValid()) {
-				EntityUtils.applyBleed(mPlugin, mPlayer, enemy, mBleed);
-			}
-		});
+		mCanCritAttack = false;
 
 		final boolean weaponHasCumbersome = ItemStatUtils.hasEnchantment(mPlayer.getInventory().getItemInMainHand(), EnchantmentType.CUMBERSOME);
-		double damage = (event.getFlatDamage() / (weaponHasCumbersome ? 1.5 : 1)) * mAoeDamage;
+		double baseDamage = event.getFlatDamage() / (weaponHasCumbersome ? 1.5 : 1);
 
 		mCosmetic.gloryOnLand(mPlayer.getWorld(), mPlayer, enemy, mRadius);
 
 		List<LivingEntity> targets = EntityUtils.getNearbyMobs(enemy.getLocation(), mRadius);
 
-		for (LivingEntity target : targets) {
-			MovementUtils.knockAway(mPlayer, target, (float) mKnockback, true);
-			DamageUtils.damage(mPlayer, target, DamageType.MELEE_SKILL, damage, ClassAbility.GLORIOUS_BATTLE, true);
-			mCosmetic.gloryOnDamage(mPlayer.getWorld(), mPlayer, target);
-		}
+		hitMob(enemy, baseDamage * (mCriticalDamage + mCriticalMultiplier));
+		targets.remove(enemy);
+
+		targets.forEach(e -> hitMob(e, baseDamage * mAoeDamage));
 
 		return true;
 	}
 
-	public boolean isGloriousCritical() {
-		return mCanCritAttack;
+	private void hitMob(LivingEntity entity, double damage) {
+		DamageUtils.damage(mPlayer, entity, DamageType.MELEE_SKILL, damage, ClassAbility.GLORIOUS_BATTLE, true);
+		MovementUtils.knockAway(mPlayer, entity, (float) mKnockback, true);
+		mCosmetic.gloryOnDamage(mPlayer.getWorld(), mPlayer, entity);
 	}
 
 	private boolean isInapplicableMainhand() {
@@ -264,10 +262,12 @@ public class GloriousBattle extends Ability {
 			.add(" melee damage. Critically attacking during Glorious Battle or ")
 			.addDuration(a -> a.mDuration, DURATION)
 			.add("s after landing causes a large overhead swing, dealing ")
+			.addPercent(a -> a.mCriticalDamage, CRITICAL_DAMAGE_1, false, Ability::isLevelOne)
+			.add(" weapon damage to the struck mob and ")
 			.addPercent(a -> a.mAoeDamage, AOE_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" of your weapon's damage to all mobs within ")
+			.add(" weapon damage to all other mobs within ")
 			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks of the target and knocks them back. Critical strikes with Glorious Battle are considered AoE.")
+			.add(" blocks and knocks them back. ")
 			.add(" \n \n Cost: ")
 			.add(a -> a.mBloodlustCost, BLOODLUST_COST, true)
 			.add("x Bloodlust Stack.");
@@ -277,11 +277,11 @@ public class GloriousBattle extends Ability {
 		return new DescriptionBuilder<>(() -> INFO)
 			.add("Glorious Battle now deals ")
 			.add(a -> a.mPierceDamage, PIERCE_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" melee damage on collision and ")
+			.add(" melee damage on collision, ")
+			.addPercent(a -> a.mCriticalDamage, CRITICAL_DAMAGE_2, false, Ability::isLevelTwo)
+			.add(" weapon damage to the struck mob, and ")
 			.addPercent(a -> a.mAoeDamage, AOE_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" weapon damage on its overhead swing. The vertical cap is removed. Additionally, the struck mob gains ")
-			.add(a -> a.mBleed, BLEED)
-			.add(" stacks of Bleed.");
+			.add(" weapon damage to all other mobs. The vertical cap is removed.");
 	}
 
 }

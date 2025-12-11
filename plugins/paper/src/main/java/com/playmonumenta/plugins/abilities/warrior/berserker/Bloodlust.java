@@ -130,12 +130,9 @@ public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 		final boolean isShieldBash = event.getAbility() == ClassAbility.SHIELD_BASH;
 		final boolean isBruteForce = event.getAbility() == ClassAbility.BRUTE_FORCE;
 
-		// Critical Strike with Glorious receives penalty
-		final boolean isGloriousBattleCrit = mGloriousBattle != null && mGloriousBattle.isGloriousCritical() && isMelee && PlayerUtils.isFallingAttack(mPlayer);
-
 		if ((isMelee || isMeleeAbil) && !isRampage) {
 			double damage = event.getFinalDamage(false);
-			if (!(isMelee || isShieldBash || isBruteForce) || isGloriousBattleCrit) {
+			if (!(isMelee || isShieldBash || isBruteForce)) {
 				damage *= AOE_PENALTY;
 			}
 			damageDealt(damage);

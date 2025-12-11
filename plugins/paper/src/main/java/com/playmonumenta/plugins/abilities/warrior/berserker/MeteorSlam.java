@@ -23,6 +23,10 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -64,7 +68,7 @@ public class MeteorSlam extends Ability {
 	// Slam
 	public static final double AUTOMATIC_THRESHOLD = 3;
 	public static final double MAX_HEIGHT = 7;
-	public static final double SLAM_DAMAGE_PER_BLOCK = 3;
+	public static final double SLAM_DAMAGE_PER_BLOCK = 3.5;
 	public static final double SLAM_RADIUS = 3;
 
 	public static final String CHARM_THRESHOLD = "Meteor Slam Fall Requirement";
@@ -78,7 +82,7 @@ public class MeteorSlam extends Ability {
 
 	// Ground Pound
 	public static final double GROUND_POUND_DAMAGE_PER_BLOCK = 1.5;
-	public static final double GROUND_POUND_VELOCITY = 2;
+	public static final double GROUND_POUND_VELOCITY = 1.8;
 	public static final double GROUND_POUND_RADIUS = 1.5;
 	public static final int GROUND_POUND_FIRE_DURATION = 5 * Constants.TICKS_PER_SECOND;
 	public static final int GROUND_POUND_BLOODLUST_COST = 1;
@@ -134,7 +138,7 @@ public class MeteorSlam extends Ability {
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", MeteorSlam::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
 			.addTrigger(new AbilityTriggerInfo<>("castgroundpound", "cast ground pound", mSlam -> mSlam.doGroundPound(true), new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false)))
-			.displayItem(Material.FIRE_CORAL_FAN);
+			.displayItem(Material.FIRE_CHARGE);
 
 	public MeteorSlam(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -271,7 +275,7 @@ public class MeteorSlam extends Ability {
 		if (isLevelTwo()
 			&& mGroundPound
 			&& Bukkit.getServer().getCurrentTick() - CAST_DELAY > mPoundCastTime // 5 tick window so ground pound is guarantee
-			&& mPlayer.getVelocity().getY() > -mGroundPoundVelocity) {
+			&& mPlayer.getVelocity().getY() > -mGroundPoundVelocity + 0.01) {
 			mSneakTime = 0;
 			mGroundPound = false;
 		}
@@ -341,14 +345,17 @@ public class MeteorSlam extends Ability {
 	// Jumping at the same time cancels slam attack
 	private void doSlamAttack(Location location) {
 		World world = mPlayer.getWorld();
-		double fallDistance = Math.min(mMaxHeight, calculateFallDistance());
+		double fallDistance = calculateFallDistance();
+		double linearFall = Math.min(mMaxHeight, fallDistance);
+		double extraFall = 10 * (1 - Math.pow(0.975, Math.max(0, fallDistance - linearFall)));
+		double actualFall = linearFall + extraFall;
 
-		double slamDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SLAM_DAMAGE, fallDistance * SLAM_DAMAGE_PER_BLOCK);
+		double slamDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SLAM_DAMAGE, actualFall * SLAM_DAMAGE_PER_BLOCK);
 		double slamRadius = mSlamRadius;
 
 		if (mGroundPound) {
 			slamRadius += mGroundPoundRadius;
-			slamDamage += mGroundPoundDamage * fallDistance;
+			slamDamage += mGroundPoundDamage * actualFall;
 			mCosmetic.onGroundPoundSlam(mPlugin, world, location, mPlayer, slamRadius);
 		}
 
@@ -397,6 +404,22 @@ public class MeteorSlam extends Ability {
 		mSneakTime = 0;
 	}
 
+	@Override
+	public @Nullable Component getHotbarMessage() {
+		final TextColor color = INFO.getActionBarColor();
+		final String name = INFO.getHotbarName();
+
+		if (mBloodlust != null && mBloodlust.getStacks() < 1 && !isOnCooldown()) {
+			return Component.text("[", NamedTextColor.YELLOW)
+				.append(Component.text(name != null ? name : "Error", color))
+				.append(Component.text("]", NamedTextColor.YELLOW))
+				.append(Component.text(": ", NamedTextColor.WHITE))
+				.append(Component.text("x", NamedTextColor.RED, TextDecoration.BOLD));
+		}
+
+		return null;
+	}
+
 	private static Description<MeteorSlam> getDescription1() {
 		return new DescriptionBuilder<>(() -> INFO)
 			.addTrigger()
@@ -412,9 +435,11 @@ public class MeteorSlam extends Ability {
 			.add(a -> a.mThreshold, AUTOMATIC_THRESHOLD)
 			.add(" blocks generates a slam where you land, dealing ")
 			.add(a -> CharmManager.calculateFlatAndPercentValue(a.getPlayer(), CHARM_SLAM_DAMAGE, SLAM_DAMAGE_PER_BLOCK), SLAM_DAMAGE_PER_BLOCK, false, Ability::isLevelOne)
-			.add(" melee damage per block fallen, capping at ")
+			.add(" melee damage per block fallen with a radius of ")
+			.add(a -> a.mSlamRadius, SLAM_RADIUS)
+			.add(" blocks, capping at ")
 			.add(a -> a.mMaxHeight, MAX_HEIGHT)
-			.add(" blocks. Dealing any damage with Meteor Slam cancels all fall damage. \n \n")
+			.add(" blocks. Additional height will count 25% of the original value, slowly decreasing. Dealing any damage with Meteor Slam cancels all fall damage. \n \n")
 			.addCooldown(COOLDOWN)
 			.add("\n Cost: ")
 			.add(a -> a.mBloodlustCost, BLOODLUST_COST)
