@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
+import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsAbilityItem;
 import com.playmonumenta.plugins.depths.DepthsManager;
@@ -42,9 +43,10 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	private Consumer<Player> mGain;
 	private Predicate<Player> mOfferable;
 	private Predicate<Integer> mFloors;
+	private IntFunction<Description<T>> mDescriptionFunction;
 
 	public DepthsAbilityInfo(Class<T> abilityClass, String displayName, BiFunction<Plugin, Player, T> constructor,
-	                         @Nullable DepthsTree depthsTree, DepthsTrigger depthsTrigger) {
+							 @Nullable DepthsTree depthsTree, DepthsTrigger depthsTrigger) {
 		super(abilityClass, displayName, constructor);
 		mDepthsTree = depthsTree;
 		mDepthsTrigger = depthsTrigger;
@@ -54,6 +56,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		};
 		mOfferable = player -> true;
 		mFloors = floor -> true;
+		mDescriptionFunction = unused -> new DescriptionBuilder<>(() -> this); // empty string default
 		canUse(player -> DepthsManager.getInstance().getPlayerLevelInAbility(displayName, player) > 0);
 	}
 
@@ -137,6 +140,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	@Override
 	public DepthsAbilityInfo<T> descriptions(IntFunction<Description<T>> supplier, int levels) {
 		super.descriptions(supplier, levels);
+		mDescriptionFunction = supplier;
 		return this;
 	}
 
@@ -337,5 +341,14 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	public Component getNameWithHover(int rarity, int prevRarity, Player player, boolean useAbility) {
 		ItemStack item = createAbilityItem(rarity, prevRarity, 0, player, useAbility);
 		return getColoredName().hoverEvent(item.asHoverEvent());
+	}
+
+	// used for depths skill api
+	public DepthsAbilityInfo<T> rebuildDescriptions() {
+		if (mDescriptionFunction == null) {
+			return this;
+		}
+		super.descriptions(mDescriptionFunction, mHasLevels ? DepthsAbility.MAX_RARITY : 1);
+		return this;
 	}
 }

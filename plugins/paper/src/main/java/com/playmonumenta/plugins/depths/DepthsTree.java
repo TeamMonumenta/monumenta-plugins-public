@@ -61,6 +61,10 @@ public enum DepthsTree {
 		return color(mDisplayName).decoration(TextDecoration.ITALIC, false);
 	}
 
+	public String getDescription() {
+		return mDescription;
+	}
+
 	public ItemStack createItem() {
 		return GUIUtils.createBasicItem(mMaterial, 1, getNameComponent(), mDescription, NamedTextColor.GRAY, 30, true);
 	}

@@ -108,6 +108,10 @@ public class DepthsUtils {
 	//List of locations where ice is spawned by a barrier
 	public static Map<Location, Boolean> iceBarrier = new HashMap<>();
 
+	// depths content type for the shard
+	// depths skills api changes this temporarily to get descriptions for both depths and zenith
+	private static @Nullable DepthsContent depthsContentOverride = null;
+
 	public static Component getLoreForItem(DepthsTree tree, int rarity, int oldRarity, int preIncreaseRarity) {
 		Component extraComponent = Component.empty();
 		if (oldRarity != 0 && oldRarity != rarity) {
@@ -211,10 +215,8 @@ public class DepthsUtils {
 		return item != null && (ItemUtils.isAxe(item) || ItemUtils.isSword(item) || ItemUtils.isWand(item) || ItemUtils.isHoe(item));
 	}
 
-	private static final List<String> WEAPON_ASPECT_NAMES = DepthsManager.getWeaponAspects().stream().map(AbilityInfo::getDisplayName).filter(Objects::nonNull).toList();
-
 	public static boolean isWeaponAspectAbility(String s) {
-		return WEAPON_ASPECT_NAMES.contains(s);
+		return DepthsManager.getWeaponAspects().stream().map(AbilityInfo::getDisplayName).filter(Objects::nonNull).toList().contains(s);
 	}
 
 	public static boolean isPrismaticAbility(String s) {
@@ -364,13 +366,19 @@ public class DepthsUtils {
 
 	public static DepthsContent getDepthsContent() {
 		//TODO revisit after zenith release and split up dev shards for testing
-
-		if (ServerProperties.getShardName().contains("zenith") || ServerProperties.getShardName().startsWith("dev")) {
+		if (depthsContentOverride != null) {
+			return depthsContentOverride;
+		} else if (ServerProperties.getShardName().contains("zenith") || ServerProperties.getShardName().startsWith("dev")) {
 			return DepthsContent.CELESTIAL_ZENITH;
 		} else if (ServerProperties.getShardName().contains("depths")) {
 			return DepthsContent.DARKEST_DEPTHS;
+		} else {
+			return DepthsContent.CELESTIAL_ZENITH;
 		}
-		return DepthsContent.CELESTIAL_ZENITH;
+	}
+
+	public static void setDepthsContentOverride(@Nullable DepthsContent content) {
+		depthsContentOverride = content;
 	}
 
 	public static double getDamageMultiplier() {

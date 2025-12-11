@@ -21,6 +21,8 @@ import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsSkillsAPI;
+import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
 import com.playmonumenta.plugins.discoveries.DiscoveryManager;
@@ -807,6 +809,21 @@ public class Plugin extends JavaPlugin {
 		} catch (Exception e) {
 			// Failed to export skills to json, non-critical error.
 			getLogger().warning("Failed to export zenith charm effects.");
+		}
+
+		if (ServerProperties.getShardName().contains("valley") || ServerProperties.getShardName().contains("dev")) {
+			try {
+				String skillExportPath = getDataFolder() + File.separator + "exported_depths_skills.json";
+				FileUtils.writeJson(skillExportPath, DepthsSkillsAPI.dumpFullJson());
+				getLogger().info("Depths skills API written successfully.");
+			} catch (Exception e) {
+				// Failed to export skills to json, non-critical error.
+				getLogger().warning("Failed to export depths skills.");
+			} finally {
+				// the API generator sets this override to generate descriptions for skills that differ between dd and cz
+				// regardless of whether it throws an exception, reset the override so it determines the type from shard name again
+				DepthsUtils.setDepthsContentOverride(null);
+			}
 		}
 
 		/* If this is the depths shard, enable depths manager */
