@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.entity.Cat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -47,6 +48,10 @@ public class Eggify {
 		}
 		EntityType entityType = entity.getType();
 		String entityName = MessagingUtils.plainText(entity.customName());
+
+		// if mob is a cat get cats type, otherwise null
+		Cat.Type catType = (entity instanceof Cat ? ((Cat) entity).getCatType(): null);
+
 		List<ItemStack> spawnEggs = ServerProperties.getEggifySpawnEggs().stream()
 			.flatMap(key -> InventoryUtils.getItemsFromLootTable(player.getLocation(), key).stream())
 			.filter(Objects::nonNull)
@@ -62,6 +67,16 @@ public class Eggify {
 			if (!Objects.equals(entityName, name)) {
 				continue;
 			}
+
+			// cat specific handling
+			if (catType != null) {
+				String existingCatTypeNamespacedKey = catType.key().asString();
+				String eggCatTypeNamespacedKey = entityTag.getString("variant");
+				if (!existingCatTypeNamespacedKey.equals(eggCatTypeNamespacedKey)) {
+					continue;
+				}
+			}
+
 			entity.remove();
 			InventoryUtils.giveItem(player, spawnEgg);
 			return;
