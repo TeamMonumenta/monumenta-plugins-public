@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.classes.Scout;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -21,7 +22,8 @@ public class Versatile extends Ability {
 	public static final AbilityInfo<Versatile> INFO =
 		new AbilityInfo<>(Versatile.class, "Versatile", Versatile::new)
 			.description(getDescription())
-			.canUse(player -> AbilityUtils.getClassNum(player) == Scout.CLASS_ID);
+			.canUse(player -> AbilityUtils.getClassNum(player) == Scout.CLASS_ID)
+			.displayItem(Material.LEATHER);
 
 	public Versatile(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

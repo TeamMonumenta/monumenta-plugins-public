@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
@@ -21,7 +22,8 @@ public class Formidable extends Ability {
 		new AbilityInfo<>(Formidable.class, "Formidable", Formidable::new)
 			.description(getDescription())
 			.canUse(player -> AbilityUtils.getClassNum(player) == Warrior.CLASS_ID)
-			.remove(player -> EntityUtils.removeAttribute(player, Attribute.GENERIC_KNOCKBACK_RESISTANCE, MODIFIER_NAME));
+			.remove(player -> EntityUtils.removeAttribute(player, Attribute.GENERIC_KNOCKBACK_RESISTANCE, MODIFIER_NAME))
+			.displayItem(Material.IRON_INGOT);
 
 	public Formidable(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

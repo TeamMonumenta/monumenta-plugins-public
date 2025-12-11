@@ -11,9 +11,9 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
 
 public class Channeling extends Ability {
 	public static final String CHARM_DAMAGE = "Channeling Damage Modifier";
@@ -23,7 +23,8 @@ public class Channeling extends Ability {
 		new AbilityInfo<>(Channeling.class, "Channeling", Channeling::new)
 			.description(getDescription())
 			.canUse(player -> AbilityUtils.getClassNum(player) == Mage.CLASS_ID)
-			.priorityAmount(999);
+			.priorityAmount(999)
+			.displayItem(Material.DEAD_TUBE_CORAL);
 
 	private final double mDamage;
 

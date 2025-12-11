@@ -11,10 +11,10 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-
 
 public class Crusade extends Ability {
 	public static final int TAG_DURATION = 10 * 20;
@@ -23,7 +23,8 @@ public class Crusade extends Ability {
 	public static final AbilityInfo<Crusade> INFO =
 		new AbilityInfo<>(Crusade.class, "Crusade", Crusade::new)
 			.description(getDescription())
-			.canUse(player -> AbilityUtils.getClassNum(player) == Cleric.CLASS_ID);
+			.canUse(player -> AbilityUtils.getClassNum(player) == Cleric.CLASS_ID)
+			.displayItem(Material.WOODEN_SWORD);
 
 	private final int mDuration;
 

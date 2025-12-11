@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -21,7 +22,8 @@ public class Dethroner extends Ability {
 	public static final AbilityInfo<Dethroner> INFO =
 		new AbilityInfo<>(Dethroner.class, "Dethroner", Dethroner::new)
 			.description(getDescription())
-			.canUse(player -> AbilityUtils.getClassNum(player) == Rogue.CLASS_ID);
+			.canUse(player -> AbilityUtils.getClassNum(player) == Rogue.CLASS_ID)
+			.displayItem(Material.NETHERITE_SWORD);
 
 	public Dethroner(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

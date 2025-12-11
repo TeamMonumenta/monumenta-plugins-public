@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
@@ -27,7 +28,8 @@ public class Culling extends Ability {
 	public static final AbilityInfo<Culling> INFO =
 		new AbilityInfo<>(Culling.class, "Culling", Culling::new)
 			.description(getDescription())
-			.canUse(player -> AbilityUtils.getClassNum(player) == Warlock.CLASS_ID);
+			.canUse(player -> AbilityUtils.getClassNum(player) == Warlock.CLASS_ID)
+			.displayItem(Material.ANCIENT_DEBRIS);
 
 	private final double mResistancePotency;
 	private final int mResistanceDuration;

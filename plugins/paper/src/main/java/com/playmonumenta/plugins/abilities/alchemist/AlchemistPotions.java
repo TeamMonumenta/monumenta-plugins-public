@@ -109,7 +109,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				AlchemistPotions::throwOpposite, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false), HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", "Toggles between throwing gruesome or brutal potions.",
 				AlchemistPotions::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).enabled(false), HOLDING_ALCHEMIST_BAG_RESTRICTION))
-			.displayItem(Material.SKELETON_SKULL);
+			.displayItem(Material.DRAGON_BREATH);
 
 	public final GruesomeAlchemyCS mCosmetic;
 	private final int mLevelZeroDuration;
