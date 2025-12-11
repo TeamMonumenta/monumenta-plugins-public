@@ -44,7 +44,8 @@ public class Expedite implements Infusion {
 				Effect oldEffect = oldEffects.last();
 				int oldStacks = (int) Math.round(oldEffect.getMagnitude() / percentSpeed);
 				if (oldStacks >= MAX_STACKS) {
-					oldEffect.setDuration(DURATION);
+                    oldEffect.clearEffect();
+                    plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed * oldStacks, PERCENT_SPEED_EFFECT_NAME));
 				} else {
 					oldEffect.clearEffect();
 					plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed * (oldStacks + 1), PERCENT_SPEED_EFFECT_NAME));
