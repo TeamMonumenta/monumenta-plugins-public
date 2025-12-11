@@ -21,13 +21,16 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class TotemicConsecration extends MultipleChargeAbility {
 	private static final int CHARGES = 2;
@@ -66,9 +69,11 @@ public class TotemicConsecration extends MultipleChargeAbility {
 			.simpleDescription("Mark totems as Sacred, instantly dealing damage around them and protecting players within their range.")
 			.cooldown(COOLDOWN, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", TotemicConsecration::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false).doubleClick()
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.addAltPresetTrigger(new AbilityTriggerInfo<>("cast", "cast", TotemicConsecration::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).onGround(true).lookDirections(AbilityTrigger.LookDirection.LEVEL, AbilityTrigger.LookDirection.UP)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(Material.YELLOW_CANDLE);
 
 	private final double mBaseDamage;
@@ -108,52 +113,30 @@ public class TotemicConsecration extends MultipleChargeAbility {
 		}
 		mLastCastTicks = ticks;
 
-		List<LivingEntity> totemList = ShamanPassiveManager.getTotemList(mPlayer);
-		if (totemList.isEmpty()) {
+		// Get all the player's totem entities and order them by distance
+		List<LivingEntity> totemEntitiesByDistance = ShamanPassiveManager.getTotemList(mPlayer).stream()
+			.sorted(Comparator.comparingDouble(totem -> mPlayer.getLocation().distance(totem.getLocation())))
+			.toList();
+		if (totemEntitiesByDistance.isEmpty()) {
 			return false;
 		}
 
-		// Determine using cone hitbox what totem should be blessed
+		// Search for totem entities in a cone in front of the player, filter to just the player's totems, then order those by distance too
 		Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), 20, Math.toRadians(18))
 			.union(Hitbox.approximateCone(mPlayer.getEyeLocation(), 3, Math.toRadians(30)));
-		List<ArmorStand> totemsInHitbox = hitbox.getHitEntitiesByClass(ArmorStand.class);
-		totemsInHitbox.removeIf(totem -> !totemList.contains(totem));
-		LivingEntity totemToBless;
-		if (!totemsInHitbox.isEmpty()) {
-			totemToBless = totemsInHitbox.getFirst();
-			for (LivingEntity totem : totemsInHitbox) {
-				if (!totemToBless.equals(totem) && mPlayer.getLocation().distance(totemToBless.getLocation()) > mPlayer.getLocation().distance(totem.getLocation())) {
-					totemToBless = totem;
-				}
-			}
-		} else {
-			totemToBless = totemList.getFirst();
-			for (LivingEntity totem : totemList) {
-				if (!totemToBless.equals(totem) && mPlayer.getLocation().distance(totemToBless.getLocation()) > mPlayer.getLocation().distance(totem.getLocation())) {
-					totemToBless = totem;
-				}
-			}
-		}
+		List<LivingEntity> totemsInHitbox = hitbox.getHitEntitiesByClass(ArmorStand.class).stream()
+			.map(armorStand -> (LivingEntity) armorStand)
+			.filter(totemEntitiesByDistance::contains)
+			.sorted(Comparator.comparingDouble(totem -> mPlayer.getLocation().distance(totem.getLocation())))
+			.toList();
 
-		// Determine the type of totem that is being blessed / get the TotemAbility of the totem
-		Location targetLoc = totemToBless.getLocation();
-		TotemAbility targetTotem = null;
-		for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
-			if (abil instanceof TotemAbility totemAbility
-				&& totemAbility.getRemainingAbilityDuration() > 0
-				&& totemAbility.mDisplayName.equalsIgnoreCase(totemToBless.getName())
-				&& !totemAbility.mIsBlessed) {
-				ClassAbility linkedSpell = abil.getInfo().getLinkedSpell();
-				if (linkedSpell != null) {
-					consumeCharge();
-					targetTotem = totemAbility;
-				}
-			}
-		}
+		// Get the first non-blessed totem in the hitbox, or the nearest non-blessed totem if that fails
+		TotemAbility targetTotem = Optional.ofNullable(getFirstNonBlessedTotem(totemsInHitbox))
+			.orElseGet(() -> getFirstNonBlessedTotem(totemEntitiesByDistance));
 		if (targetTotem == null) {
 			return false;
 		}
-		double remainingDuration = targetTotem.getRemainingAbilityDuration();
+		consumeCharge();
 
 		targetTotem.mIsBlessed = true;
 		mBlessedTotems.add(targetTotem);
@@ -162,8 +145,10 @@ public class TotemicConsecration extends MultipleChargeAbility {
 		}
 
 		double totemRadius = targetTotem.getTotemRadius();
-
+		double remainingDuration = targetTotem.getRemainingAbilityDuration();
 		double finalDamage = mBaseDamage + mBonusDamage * (int) (remainingDuration / mDurationPerBonus);
+		Location targetLoc = targetTotem.getTotemLocation();
+
 		mCosmetic.consecrationAction(mPlayer, targetLoc, totemRadius);
 		List<LivingEntity> affectedMobs = new Hitbox.SphereHitbox(targetLoc, totemRadius).getHitMobs();
 
@@ -178,6 +163,16 @@ public class TotemicConsecration extends MultipleChargeAbility {
 		}
 
 		return true;
+	}
+
+	private @Nullable TotemAbility getFirstNonBlessedTotem(List<LivingEntity> totemEntities) {
+		for (LivingEntity totemEntity : totemEntities) {
+			TotemAbility totemAbility = ShamanPassiveManager.getTotemAbility(totemEntity);
+			if (totemAbility != null && !totemAbility.mIsBlessed) {
+				return totemAbility;
+			}
+		}
+		return null;
 	}
 
 	@Override

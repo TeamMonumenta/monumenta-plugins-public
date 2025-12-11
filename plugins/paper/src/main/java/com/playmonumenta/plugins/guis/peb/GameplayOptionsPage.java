@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityHotbar;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableAmalgam;
+import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import com.playmonumenta.plugins.cosmetics.punches.PlayerPunches;
@@ -141,19 +142,25 @@ final class GameplayOptionsPage extends PebPage {
 			Material.PAPER,
 			"Ability Hotbar",
 			"Click to toggle ability HUD."
-		).toggle("Ability hotbar: ", AbilityHotbar.ABILITY_HOTBAR_TAG).set(3, 2);
+		).toggle("Ability hotbar: ", AbilityHotbar.ABILITY_HOTBAR_TAG).set(3, 1);
 
 		entry(
 			Material.LANTERN,
 			"Toggle Darksight",
 			"Click to toggle whether Darksight provides Night Vision."
-		).invertedToggle("Night vision: ", Darksight.DARKSIGHT_DISABLED_TAG).set(3, 3);
+		).invertedToggle("Night vision: ", Darksight.DARKSIGHT_DISABLED_TAG).set(3, 2);
 
 		entry(
 			Material.SOUL_LANTERN,
 			"Toggle Radiant",
 			"Click to toggle whether Radiant provides Night Vision."
-		).invertedToggle("Night vision: ", Radiant.NIGHTVISION_DISABLED_TAG).set(3, 4);
+		).invertedToggle("Night vision: ", Radiant.NIGHTVISION_DISABLED_TAG).set(3, 3);
+
+		entry(
+			Material.TOTEM_OF_UNDYING,
+			"Toggle Projection on Totem Recast",
+			"Click to toggle whether Totemic Projection is triggered by recasting totems on cooldown."
+		).invertedToggle("Projection on recast: ", TotemAbility.PROJECTION_ON_RECAST_DISABLED_OBJECTIVE).set(3, 5);
 
 		entry(
 			Material.FIREWORK_ROCKET,
@@ -164,7 +171,7 @@ final class GameplayOptionsPage extends PebPage {
 			"Disabled",
 			"Self only",
 			"All"
-		).set(3, 5);
+		).set(3, 6);
 
 		entry(
 			Material.ZOMBIE_HEAD,
@@ -176,7 +183,7 @@ final class GameplayOptionsPage extends PebPage {
 			"Hide and Glow",
 			"Show and Don't Glow",
 			"Hide completely"
-		).set(3, 6);
+		).set(3, 7);
 
 		entry(
 			Material.SKELETON_SKULL,

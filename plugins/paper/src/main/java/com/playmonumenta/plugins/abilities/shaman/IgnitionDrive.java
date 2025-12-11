@@ -35,8 +35,8 @@ import org.bukkit.util.Vector;
 public class IgnitionDrive extends Ability {
 	private static final int COOLDOWN_1 = 18 * 20;
 	private static final int COOLDOWN_2 = 15 * 20;
-	private static final int DAMAGE_1 = 9;
-	private static final int DAMAGE_2 = 12;
+	private static final int DAMAGE_1 = 11;
+	private static final int DAMAGE_2 = 15;
 	private static final int RADIUS_1 = 3;
 	private static final int RADIUS_2 = 4;
 	private static final int FIRE_DURATION = 4 * 20;

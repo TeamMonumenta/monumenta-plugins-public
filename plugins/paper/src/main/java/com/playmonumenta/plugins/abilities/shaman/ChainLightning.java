@@ -66,9 +66,11 @@ public class ChainLightning extends MultipleChargeAbility {
 			.simpleDescription("Flings lightning at mobs in a medium radius in front of you, bouncing between mobs and totems.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast1", "cast", ChainLightning::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_PROJECTILE_WEAPON)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.addTrigger(new AbilityTriggerInfo<>("cast2", "alternative cast", ChainLightning::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(Material.BLAZE_ROD);
 
 	private final double mBounceRange;
@@ -94,7 +96,7 @@ public class ChainLightning extends MultipleChargeAbility {
 
 		mMaxCharges = CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
-		
+
 		mBounceRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BOUNCE_RANGE);
 		mTargets = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TARGETS, isLevelOne() ? TARGETS_1 : TARGETS_2);
 		mInitialRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_INITIAL_RANGE, INITIAL_RANGE);

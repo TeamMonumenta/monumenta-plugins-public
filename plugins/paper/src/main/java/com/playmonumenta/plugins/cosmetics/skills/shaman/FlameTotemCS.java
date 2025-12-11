@@ -50,10 +50,8 @@ public class FlameTotemCS implements CosmeticSkill {
 	}
 
 	public void flameTotemBomb(Player player, LivingEntity target, Location standLocation, Plugin plugin, double mBombRadius) {
-		Location standEyeLocation = standLocation.clone().add(0, 1.5, 0);
 		Location targetLocation = target.getLocation();
-		Location targetEyeLocation = target.getEyeLocation();
-		new PPLine(Particle.FLAME, standEyeLocation, targetEyeLocation)
+		new PPLine(Particle.FLAME, standLocation, targetLocation)
 			.countPerMeter(8).delta(0).spawnAsPlayerActive(player);
 		ParticleUtils.explodingRingEffect(plugin, targetLocation.clone().add(0, 0.1, 0),
 			mBombRadius, 1.2, 5, 0.2,

@@ -114,4 +114,8 @@ public class ShamanPassiveManager extends Ability {
 
 		return abilityList;
 	}
+
+	public static @Nullable TotemAbility getTotemAbility(LivingEntity totem) {
+		return TOTEM_ABILITY_MAP.getOrDefault(totem, null);
+	}
 }

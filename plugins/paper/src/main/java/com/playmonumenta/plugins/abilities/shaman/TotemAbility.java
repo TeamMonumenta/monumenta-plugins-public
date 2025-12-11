@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	public static final double VELOCITY = 1.25;
 	public static final double TIME_TO_DROP = 75;
 	public static final double XZ_DISTANCE_TO_DROP = 14;
+	public static final String PROJECTION_ON_RECAST_DISABLED_OBJECTIVE = "ProjectionOnRecastDisabled";
 
 	private final Map<ThrowableProjectile, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 	protected @Nullable LivingEntity mTotem = null;
@@ -127,8 +129,11 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	}
 
 	private boolean attemptProjectionRecast() {
+		if (ScoreboardUtils.checkTag(mPlayer, PROJECTION_ON_RECAST_DISABLED_OBJECTIVE)) {
+			return false;
+		}
 		TotemicProjection projection = mPlugin.mAbilityManager.getPlayerAbility(mPlayer, TotemicProjection.class);
-		if (projection != null && projection.getCharges() > 0 && !mIsInFlight && this.isOnCooldown() && this.getRemainingAbilityDuration() > 20) {
+		if (projection != null && projection.getCharges() > 0 && !mIsInFlight && this.isOnCooldown() && !ShamanPassiveManager.getTotemList(mPlayer).isEmpty()) {
 			return projection.cast();
 		}
 		return false;

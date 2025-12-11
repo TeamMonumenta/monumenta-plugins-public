@@ -69,9 +69,11 @@ public class FlameTotem extends TotemAbility {
 			.simpleDescription("Summon a totem that incinerates mobs in an area.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FlameTotem::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.addAltPresetTrigger(new AbilityTriggerInfo<>("cast", "cast", FlameTotem::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(Material.MAGMA_BLOCK);
 
 	private final int mInterval;
@@ -108,7 +110,7 @@ public class FlameTotem extends TotemAbility {
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		if (EntityUtils.playerCantSeeBodyOrEyes(mPlayer, stand)) {
+		if (EntityUtils.playerCantSeeEntity(mPlayer, stand)) {
 			// player cannot see the flame totem, don't tick
 			mConsecutiveDamageMap.clear();
 			return;
@@ -133,7 +135,7 @@ public class FlameTotem extends TotemAbility {
 		double damage = (mDamage + mDecayedTotemBuff + mCurrentBonusFlatDamage) * mSpiritualismMultiplier * chainLightningMultiplier;
 
 		List<LivingEntity> affectedMobs = new Hitbox.SphereHitbox(standLocation, getTotemRadius()).getHitMobs();
-		affectedMobs.removeIf(e -> EntityUtils.playerCantSeeBodyOrEyes(mPlayer, e));
+		affectedMobs.removeIf(e -> EntityUtils.playerCantSeeEntity(mPlayer, e));
 
 		boolean isFinalPulse = !chainLightning && getRemainingAbilityDuration() < mInterval;
 
@@ -179,7 +181,7 @@ public class FlameTotem extends TotemAbility {
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
 		if (mTotem != null && mTotem.getLocation().distance(mPlayer.getLocation()) <= getTotemRadius()) {
-			if (mCurrentBonusFlatDamage < mBonusDamageFlat * ABILITY_LIMIT) {
+			if (mCurrentBonusFlatDamage < mBonusDamageFlat * mAbilityLimit) {
 				mCurrentBonusFlatDamage += mBonusDamageFlat;
 			}
 		}

@@ -1726,8 +1726,21 @@ public class EntityUtils {
 		return !(lineOfSight.angle(mobToPlayer) > Math.toRadians(75.0));
 	}
 
-	public static boolean playerCantSeeBodyOrEyes(Player player, LivingEntity entity) {
-		return !player.hasLineOfSight(entity) && !player.hasLineOfSight(entity.getEyeLocation());
+	// Checks feet, eyes, and 4 corners of the entity (corners calculated at the middle y value between feet and eyes).
+	public static boolean playerCantSeeEntity(Player player, LivingEntity entity) {
+		World world = player.getWorld();
+		Location eyeLocation = entity.getEyeLocation();
+		Location feetLocation = entity.getLocation();
+		double midHeight = (eyeLocation.getY() + feetLocation.getY()) / 2;
+		double xCoord = feetLocation.getX();
+		double zCoord = feetLocation.getZ();
+		double entityHalfWidth = entity.getWidth() / 2;
+
+		return !player.hasLineOfSight(eyeLocation) && !player.hasLineOfSight(feetLocation)
+			&& !player.hasLineOfSight(new Location(world, xCoord + entityHalfWidth, midHeight, zCoord + entityHalfWidth))
+			&& !player.hasLineOfSight(new Location(world, xCoord + entityHalfWidth, midHeight, zCoord - entityHalfWidth))
+			&& !player.hasLineOfSight(new Location(world, xCoord - entityHalfWidth, midHeight, zCoord + entityHalfWidth))
+			&& !player.hasLineOfSight(new Location(world, xCoord - entityHalfWidth, midHeight, zCoord - entityHalfWidth));
 	}
 
 	// returns change in mob's health

@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 public class TotemicProjection extends MultipleChargeAbility {
-	private static final int COOLDOWN = 8 * 20;
+	private static final int COOLDOWN = 5 * 20;
 	private static final int MAX_CHARGES = 2;
 	private static final double DISTRIBUTION_RADIUS = 3;
 

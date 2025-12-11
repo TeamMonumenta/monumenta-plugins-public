@@ -34,10 +34,10 @@ public class EarthenTremor extends Ability {
 	private static final double TOTEM_THROW_DAMAGE_1 = 5;
 	private static final double TOTEM_THROW_DAMAGE_2 = 8;
 	private static final int ENHANCE_EFFECT_DURATION = 5 * 20;
-	private static final double ENHANCE_MELEE_SCALING = 0.35;
-	private static final double ENHANCE_PROJ_SCALING = 0.2;
-	private static final double ENHANCE_RADIUS = 3;
-	private static final double KNOCKUP = 0.7;
+	private static final double ENHANCE_MELEE_SCALING = 0.5;
+	private static final double ENHANCE_PROJ_SCALING = 0.35;
+	private static final double ENHANCE_RADIUS = 4;
+	private static final double KNOCKUP = 0.8;
 	private static final String ENHANCE_EFFECT_SOURCE = "EarthenTremorCursedEarth";
 	private static final int TOTEM_THROW_RANGE = 4;
 	private static final int ROOT_DURATION = 2 * 20;
@@ -63,9 +63,11 @@ public class EarthenTremor extends Ability {
 			.simpleDescription("Summons a earthen tremor on your location, dealing damage and knocking mobs up.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenTremor::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.addAltPresetTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenTremor::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).lookDirections(AbilityTrigger.LookDirection.DOWN).onGround(true)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE, AbilityTrigger.KeyOptions.NO_BLOCKS, AbilityTrigger.KeyOptions.NO_POTION, AbilityTrigger.KeyOptions.NO_FOOD)))
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(Material.DIRT);
 
 	private final double mDamage;
@@ -105,7 +107,6 @@ public class EarthenTremor extends Ability {
 		mCosmetic.earthenTremorEffect(mPlayer, loc, mRadius);
 
 		List<LivingEntity> nearbyMobs = new Hitbox.SphereHitbox(loc, mRadius).getHitMobs();
-		nearbyMobs.removeIf(mob -> EntityUtils.playerCantSeeBodyOrEyes(mPlayer, mob));
 		for (LivingEntity mob : nearbyMobs) {
 			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, false);
 			if (!EntityUtils.isFlyingMob(mob) && !EntityUtils.isCCImmuneMob(mob) && mob.getPassengers().isEmpty()) {
@@ -122,7 +123,6 @@ public class EarthenTremor extends Ability {
 		List<LivingEntity> totems = ShamanPassiveManager.getTotemList(mPlayer);
 		List<ArmorStand> nearbyTotems = new Hitbox.SphereHitbox(loc, mRadius).getHitEntitiesByClass(ArmorStand.class);
 		nearbyTotems.removeIf(totem -> !totems.contains(totem));
-		nearbyTotems.removeIf(totem -> EntityUtils.playerCantSeeBodyOrEyes(mPlayer, totem));
 
 		for (LivingEntity totem : nearbyTotems) {
 			MovementUtils.knockUp(totem, (float) mKnockup * 1.2f, false);
@@ -158,7 +158,7 @@ public class EarthenTremor extends Ability {
 			.addTrigger()
 			.add(" to summon an earthen tremor at your location that deals ")
 			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage to mobs within line of sight in a radius of ")
+			.add(" magic damage to mobs in a radius of ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks. Totems and mobs within the tremor are launched, totems dealing ")
 			.add(a -> a.mTotemLandingDamage, TOTEM_THROW_DAMAGE_1, false, Ability::isLevelOne)

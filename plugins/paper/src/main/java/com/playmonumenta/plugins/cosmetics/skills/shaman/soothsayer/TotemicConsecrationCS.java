@@ -29,12 +29,12 @@ public class TotemicConsecrationCS implements CosmeticSkill {
 	}
 
 	public void blessedTotemTick(Player player, Location standLocation, double radius) {
-		PPCircle outerRing = new PPCircle(Particle.FIREWORKS_SPARK, standLocation.add(0, 0.15, 0), radius).ringMode(true).countPerMeter(0.6).delta(0);
+		PPCircle outerRing = new PPCircle(Particle.FIREWORKS_SPARK, standLocation.add(0, 0.15, 0), radius).ringMode(true).countPerMeter(0.2).delta(0);
 		PPCircle outerRing2 = new PPCircle(Particle.REDSTONE, standLocation.add(0, 0.1, 0), radius).ringMode(true).countPerMeter(0.6).delta(0).data(COLOR_GOLD);
 		outerRing.spawnAsPlayerActive(player);
 		outerRing2.spawnAsPlayerActive(player);
 
-		PPCircle innerRing = new PPCircle(Particle.FIREWORKS_SPARK, standLocation.add(0, 0.45, 0), 0.5).ringMode(true).countPerMeter(0.3).delta(0);
+		PPCircle innerRing = new PPCircle(Particle.FIREWORKS_SPARK, standLocation.add(0, 0.45, 0), 0.5).ringMode(true).countPerMeter(0.2).delta(0);
 		PPCircle innerRing2 = new PPCircle(Particle.REDSTONE, standLocation.add(0, 0.15, 0), 0.5).ringMode(true).countPerMeter(0.6).delta(0).data(COLOR_GOLD);
 		PPCircle innerRing4 = new PPCircle(Particle.REDSTONE, standLocation.add(0, 0.3, 0), 0.5).ringMode(true).countPerMeter(0.6).delta(0).data(COLOR_GOLD);
 		innerRing.spawnAsPlayerActive(player);
