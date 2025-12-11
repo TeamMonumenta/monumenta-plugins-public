@@ -396,7 +396,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 									} else {
 										launchDX(player, player.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
 									}
-									return;
+									break;
 								}
 							}
 						} else {
