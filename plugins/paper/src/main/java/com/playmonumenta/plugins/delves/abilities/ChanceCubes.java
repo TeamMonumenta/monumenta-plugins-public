@@ -281,7 +281,7 @@ public class ChanceCubes {
 				}
 			}
 			case 4 -> {
-				List<Player> nearbyPlayers = (List<Player>) loc.getNearbyPlayers(20);
+				List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, 20, false);
 				for (Player player : nearbyPlayers) {
 					loc.getWorld().playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_AMBIENT, SoundCategory.HOSTILE, 2f, 0.8f);
 					loc.getWorld().playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_AMBIENT, SoundCategory.HOSTILE, 2f, 0.8f);
@@ -306,12 +306,9 @@ public class ChanceCubes {
 				}
 			}
 			case 5 -> {
-				List<Player> nearbyPlayers = (List<Player>) loc.getNearbyPlayers(15);
+				List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, 15, false);
 				Map<Player, Entity> lockedEnemies = new HashMap<>();
 				for (Player player : nearbyPlayers) {
-					if (player.getGameMode() == GameMode.SPECTATOR) {
-						continue;
-					}
 					if (lockedEnemies.containsKey(player)) {
 						continue;
 					}
@@ -468,7 +465,7 @@ public class ChanceCubes {
 				}
 			}
 			case 7 -> {
-				List<Player> nearbyPlayers = (List<Player>) loc.getNearbyPlayers(15);
+				List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, 15, false);
 				for (Player player : nearbyPlayers) {
 					loc.getWorld().playSound(loc, Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.HOSTILE, 1f, 1f);
 					int potionDice = FastUtils.randomIntInRange(1, 12);
@@ -547,7 +544,7 @@ public class ChanceCubes {
 				task.runTaskTimer(Plugin.getInstance(), 0, 5);
 			}
 			case 10 -> {
-				List<Player> nearbyPlayers = (List<Player>) loc.getNearbyPlayers(7);
+				List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, 7, false);
 				for (Player player : nearbyPlayers) {
 					PlayerUtils.healPlayer(Plugin.getInstance(), player, EntityUtils.getMaxHealth(player), player);
 					AbsorptionUtils.addAbsorption(player, 6, 6, 300);
