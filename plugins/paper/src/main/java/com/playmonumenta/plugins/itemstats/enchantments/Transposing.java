@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -18,6 +19,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class Transposing implements Enchantment {
+public class Transposing implements Enchantment, Listener {
 
 	private static final double MAX_TRANSPOSE_DISTANCE = 80.0;
 	private static final int SWAP_COOLDOWN_TICKS = 100;
@@ -118,13 +120,16 @@ public class Transposing implements Enchantment {
 		if (StasisListener.isInStasis(p1) || StasisListener.isInStasis(p2)) {
 			return "Can't transpose while in Stasis!";
 		}
-		if (p1.getScoreboardTags().contains("NoTransposing") || p2.getScoreboardTags().contains("NoTransposing")) {
+		if (p1.getScoreboardTags().contains(Constants.Tags.NO_TRANSPOSING) || p2.getScoreboardTags().contains(Constants.Tags.NO_TRANSPOSING)) {
 			return "A powerful spell is interfering with your Totem of Transposing's signal.";
 		}
 		if (ZoneUtils.hasZoneProperty(p1, ZoneUtils.ZoneProperty.ADVENTURE_MODE) || ZoneUtils.hasZoneProperty(p1, ZoneUtils.ZoneProperty.LOOTROOM)) {
 			return "A powerful spell is interfering with your Totem of Transposing's signal.";
 		}
 		if (ZoneUtils.hasZoneProperty(p2, ZoneUtils.ZoneProperty.ADVENTURE_MODE) || ZoneUtils.hasZoneProperty(p2, ZoneUtils.ZoneProperty.LOOTROOM)) {
+			return "A powerful spell is interfering with your Totem of Transposing's signal.";
+		}
+		if (ZoneUtils.hasZoneProperty(p1, ZoneUtils.ZoneProperty.NO_TRANSPOSING) || ZoneUtils.hasZoneProperty(p2, ZoneUtils.ZoneProperty.NO_TRANSPOSING)) {
 			return "A powerful spell is interfering with your Totem of Transposing's signal.";
 		}
 		return null;
