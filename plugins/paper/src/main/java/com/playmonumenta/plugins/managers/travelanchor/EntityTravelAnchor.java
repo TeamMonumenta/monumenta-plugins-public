@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.playmonumenta.plugins.chunk.ChunkManager;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -54,7 +55,7 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 		String anchorJson = pdc.get(TRAVEL_ANCHOR_PDC_KEY, PersistentDataType.STRING);
 		Gson gson = new Gson();
 		JsonObject data = gson.fromJson(anchorJson, JsonObject.class);
-		return new EntityTravelAnchor(data);
+		return new EntityTravelAnchor(entity, data);
 	}
 
 	public static void removeAnchor(Entity entity) {
@@ -93,8 +94,10 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 		}
 	}
 
-	public EntityTravelAnchor(JsonObject data) {
-		if (data.get("mEntityId") instanceof JsonPrimitive entityIdPrimitive && entityIdPrimitive.isString()) {
+	public EntityTravelAnchor(@Nullable Entity entity, JsonObject data) {
+		if (entity != null) {
+			mEntityId = entity.getUniqueId();
+		} else if (data.get("mEntityId") instanceof JsonPrimitive entityIdPrimitive && entityIdPrimitive.isString()) {
 			mEntityId = UUID.fromString(entityIdPrimitive.getAsString());
 		} else {
 			throw new RuntimeException("Invalid EntityTravelAnchor mEntityId");
@@ -129,28 +132,34 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 			}
 		}
 
-		if (data.get("mLastWorld") instanceof JsonPrimitive worldIdPrimitive && worldIdPrimitive.isString()) {
+		if (entity != null) {
+			mLastWorld = entity.getWorld().getUID();
+		} else if (data.get("mLastWorld") instanceof JsonPrimitive worldIdPrimitive && worldIdPrimitive.isString()) {
 			mLastWorld = UUID.fromString(worldIdPrimitive.getAsString());
 		} else {
 			throw new RuntimeException("Invalid EntityTravelAnchor mLastWorld");
 		}
 
-		List<Double> lastLocList = new ArrayList<>();
-		if (data.get("mLastLoc") instanceof JsonArray lastLocArr) {
-			for (JsonElement lastLocElem : lastLocArr) {
-				if (lastLocElem instanceof JsonPrimitive lastLocPrim && lastLocPrim.isNumber()) {
-					lastLocList.add(lastLocPrim.getAsDouble());
-				} else {
-					throw new RuntimeException("Invalid EntityTravelAnchor mLastLoc[]");
-				}
-			}
+		if (entity != null) {
+			mLastLoc = entity.getLocation().toVector();
 		} else {
-			throw new RuntimeException("Invalid EntityTravelAnchor mLastLoc");
+			List<Double> lastLocList = new ArrayList<>();
+			if (data.get("mLastLoc") instanceof JsonArray lastLocArr) {
+				for (JsonElement lastLocElem : lastLocArr) {
+					if (lastLocElem instanceof JsonPrimitive lastLocPrim && lastLocPrim.isNumber()) {
+						lastLocList.add(lastLocPrim.getAsDouble());
+					} else {
+						throw new RuntimeException("Invalid EntityTravelAnchor mLastLoc[]");
+					}
+				}
+			} else {
+				throw new RuntimeException("Invalid EntityTravelAnchor mLastLoc");
+			}
+			if (lastLocList.size() != 3) {
+				throw new RuntimeException("Invalid EntityTravelAnchor mLastLoc size");
+			}
+			mLastLoc = new Vector(lastLocList.get(0), lastLocList.get(1), lastLocList.get(2));
 		}
-		if (lastLocList.size() != 3) {
-			throw new RuntimeException("Invalid EntityTravelAnchor mLastLoc size");
-		}
-		mLastLoc = new Vector(lastLocList.get(0), lastLocList.get(1), lastLocList.get(2));
 	}
 
 	public JsonObject toJson() {
@@ -182,7 +191,11 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 	}
 
 	public @Nullable Entity getEntity() {
-		return Bukkit.getEntity(mEntityId);
+		Entity entity = Bukkit.getEntity(mEntityId);
+		if (entity != null && ChunkManager.isChunkLoaded(entity) && entity.isValid()) {
+			return entity;
+		}
+		return null;
 	}
 
 	public String label() {
@@ -290,14 +303,17 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 	}
 
 	public @Nullable World lastWorld() {
+		update();
 		return Bukkit.getWorld(mLastWorld);
 	}
 
 	public Vector lastPos() {
+		update();
 		return mLastLoc;
 	}
 
 	public @Nullable Location lastLocation() {
+		update();
 		World world = Bukkit.getWorld(mLastWorld);
 		if (world == null) {
 			return null;
