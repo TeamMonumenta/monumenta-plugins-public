@@ -303,7 +303,6 @@ public class EntityTravelAnchor implements Comparable<EntityTravelAnchor> {
 	}
 
 	public @Nullable World lastWorld() {
-		update();
 		return Bukkit.getWorld(mLastWorld);
 	}
 
