@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
 import com.playmonumenta.plugins.seasonalevents.SeasonalPass;
 import com.playmonumenta.plugins.seasonalevents.WeeklyMission;
 import com.playmonumenta.plugins.utils.DateUtils;
+import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -72,6 +73,18 @@ public class WeekView extends View {
 			meta = item.getItemMeta();
 			meta.displayName(Component.text("Week " + displayWeek, NamedTextColor.GOLD, TextDecoration.BOLD)
 				.decoration(TextDecoration.ITALIC, false));
+
+			if (pass.isActive() && mGui.mDisplayedEpochWeek == mGui.mOpenedEpochWeek) {
+				List<Component> lore = new ArrayList<>();
+				lore.add(Component.text(
+						String.format("Missions end in %dd %dh",
+							pass.getDaysUntilMissionEnd(),
+							pass.getHoursUntilMissionEnd()),
+						NamedTextColor.YELLOW)
+					.decoration(TextDecoration.ITALIC, false));
+				meta.lore(lore);
+			}
+
 			item.setItemMeta(meta);
 			mGui.setItem(0, 2, item);
 
