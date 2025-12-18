@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.AuditListener;
@@ -183,6 +184,10 @@ public class MarketManager {
 
 		if (CurseOfEphemerality.isEphemeral(currentItem)) {
 			errors.add("You cannot sell items with Curse of Ephemerality.");
+		}
+
+		if (ItemStatUtils.hasInfusion(currentItem, InfusionType.OWNED)) {
+			errors.add("You cannot sell items that are infused with Owned.");
 		}
 
 		if (Shattered.isShattered(currentItem)) {
