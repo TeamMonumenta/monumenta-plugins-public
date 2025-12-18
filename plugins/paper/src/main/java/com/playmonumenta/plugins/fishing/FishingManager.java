@@ -425,7 +425,6 @@ public class FishingManager implements Listener {
 			while (increaseChance > 1 && quality < 5) {
 				if (FastUtils.randomDoubleInRange(0, 1) <= increaseChance - 1) {
 					quality++;
-					increaseChance--;
 					new PartialParticle(Particle.ELECTRIC_SPARK, player.getEyeLocation(), 20).delta(1, 0.5, 1).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
 					player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 2.0f);
 					ItemStack nextFish = getNextFish(player, ItemUtils.getPlainName(fishItem), quality);
@@ -434,6 +433,7 @@ public class FishingManager implements Listener {
 					}
 					fishItem.setItemMeta(nextFish.getItemMeta());
 				}
+				increaseChance--;
 			}
 		}
 
