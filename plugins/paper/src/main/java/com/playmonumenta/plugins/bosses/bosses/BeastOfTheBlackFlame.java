@@ -126,7 +126,7 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 				for (Player p : getPlayers()) {
 					if ((mSpawnLoc.distance(p.getLocation()) > 22
 						|| mSpawnLoc.getY() - p.getLocation().getY() >= 3
-						|| (mSpawnLoc.getY() - p.getLocation().getY() <= -2 && PlayerUtils.isOnGround(p)))
+						|| BossUtils.isTooHigh(boss, p, mSpawnLoc, 2))
 						&& p.getGameMode() != GameMode.CREATIVE) {
 						Vector vel = p.getVelocity();
 						BossUtils.bossDamagePercent(mBoss, p, 0.1);

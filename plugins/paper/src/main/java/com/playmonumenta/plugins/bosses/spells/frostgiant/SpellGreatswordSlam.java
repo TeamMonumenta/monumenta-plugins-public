@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -225,6 +226,7 @@ public final class SpellGreatswordSlam extends Spell {
 										DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, 36, null, false, false, SPELL_NAME);
 										AbilityUtils.silencePlayer(player, Constants.TICKS_PER_SECOND * 5);
 										MovementUtils.knockAway(bossLoc, player, 0f, 1.75f, false);
+										BossUtils.markHighVulnerability(mBoss, player);
 										mHitPlayers.add(player.getUniqueId());
 									}
 								}

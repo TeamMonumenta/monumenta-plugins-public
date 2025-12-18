@@ -23,6 +23,7 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
@@ -56,8 +57,6 @@ public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 	private final BukkitRunnable mBloodlustRunnable;
 	private int mMaxBloodlust = 3;
 	private @Nullable Rampage mRampage;
-	private @Nullable GloriousBattle mGloriousBattle;
-
 
 	public static final AbilityInfo<Bloodlust> INFO =
 		new AbilityInfo<>(Bloodlust.class, "Bloodlust", Bloodlust::new)
@@ -74,7 +73,6 @@ public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
 			mRampage = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, Rampage.class);
-			mGloriousBattle = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, GloriousBattle.class);
 		});
 
 		mBloodlustRunnable = new BukkitRunnable() {
@@ -96,8 +94,10 @@ public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 					return;
 				}
 
+				boolean hasAggro = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 8).stream().anyMatch(e -> e instanceof Mob mob && mPlayer.equals(mob.getTarget()));
+
 				mMaxBloodlust = MAX_BLOODLUST_PER_TICK;
-				if (mTicks % 20 == 0 && !EntityUtils.getNearbyMobs(mPlayer.getLocation(), 16).isEmpty() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.RESIST_5)) {
+				if (mTicks % 20 == 0 && hasAggro && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.RESIST_5)) {
 					mCombatTime = Bukkit.getServer().getCurrentTick();
 				}
 				if (mTicks % TIME_PER_RAMPAGE == 0) {

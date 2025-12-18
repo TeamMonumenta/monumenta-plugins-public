@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
@@ -35,7 +36,6 @@ public final class SpellFrostbite extends Spell {
 	private final FrostGiant mFrostGiant;
 	private final LivingEntity mBoss;
 	private final List<UUID> mWarned = new ArrayList<>();
-	private final Set<Player> mLenience = new HashSet<>();
 
 	private int mTicks;
 
@@ -67,23 +67,17 @@ public final class SpellFrostbite extends Spell {
 		final Collection<Player> players = mFrostGiant.getArenaParticipants();
 		players.forEach(player -> {
 			final Location playerLoc = player.getLocation();
-			// The too high check is lenient because of Meteor Slam's velocity leap
-			final boolean tooHigh = playerLoc.getY() - FrostGiant.ARENA_FLOOR_Y >= 6.5;
+			final boolean tooHigh = BossUtils.isTooHigh(mFrostGiant.mBoss, player, FrostGiant.ARENA_FLOOR_Y, 4.1);
 			final boolean tooLow = playerLoc.getY() - FrostGiant.ARENA_FLOOR_Y <= -2;
 
 			if (tooHigh || tooLow) {
-				if(!mLenience.add(player)) {
-					applyDamage(player);
-				}
-
+				applyDamage(player);
 
 				if (!mWarned.contains(player.getUniqueId())) {
 					final String msg = tooHigh ? "The upper air is freezing!" : "The lower air is freezing!";
 					player.sendMessage(Component.text(msg, NamedTextColor.RED));
 					mWarned.add(player.getUniqueId());
 				}
-			} else {
-				mLenience.remove(player);
 			}
 		});
 	}

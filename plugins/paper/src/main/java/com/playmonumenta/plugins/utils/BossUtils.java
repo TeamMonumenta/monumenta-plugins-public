@@ -17,9 +17,11 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.WeakHashMap;
 import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -189,7 +191,7 @@ public class BossUtils {
 	 * Returns whether the player survived (true) or was killed (false)
 	 */
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth,
-	                                        @Nullable Location location, boolean raw, @Nullable String cause, boolean knockback, List<EffectsList.Effect> effects) {
+											@Nullable Location location, boolean raw, @Nullable String cause, boolean knockback, List<EffectsList.Effect> effects) {
 		if (percentHealth <= 0) {
 			return true;
 		}
@@ -418,7 +420,7 @@ public class BossUtils {
 	}
 
 	public static void endBossFightEffects(final @Nullable LivingEntity boss, final Collection<Player> players,
-	                                       final int winEffectDuration) {
+										   final int winEffectDuration) {
 		endBossFightEffects(boss, players, winEffectDuration, false, false);
 	}
 
@@ -433,8 +435,8 @@ public class BossUtils {
 	 * @param removeGlowing     If true, remove glowing effect from boss. Defaults to false
 	 */
 	public static void endBossFightEffects(final @Nullable LivingEntity boss, final Collection<Player> players,
-	                                       final int winEffectDuration, final boolean keepBossAlive,
-	                                       final boolean removeGlowing) {
+										   final int winEffectDuration, final boolean keepBossAlive,
+										   final boolean removeGlowing) {
 		final String BOSS_WIN_RESISTANCE = "BossWinResistance";
 		final String BOSS_WIN_REGENERATION = "BossWinRegeneration";
 		final int REGENERATION_INTERVAL = 12;
@@ -465,5 +467,55 @@ public class BossUtils {
 				new CustomRegeneration(winEffectDuration, 1, REGENERATION_INTERVAL, null, false, Plugin.getInstance()));
 			SongManager.stopSong(player, true);
 		}
+	}
+
+	private static final WeakHashMap<LivingEntity, HashMap<Player, Integer>> mYAntiCheat = new WeakHashMap<>();
+	private static final int Y_TIMER_LENIENCY = 3;
+
+	/**
+	 * Mark the player as vulnerable to the y anti cheat. This is for abilities that rely on y velocity to do a combo.
+	 *
+	 * @param player the player
+	 * @param boss   the boss that has the y anticheat
+	 */
+	public static void markHighVulnerability(LivingEntity boss, Player player) {
+		HashMap<Player, Integer> playerMapping = mYAntiCheat.computeIfAbsent(boss, (k) -> new HashMap<>());
+		playerMapping.put(player, 8);
+	}
+
+	/**
+	 * See {@link #isTooHigh(LivingEntity, Player, double, double)}
+	 */
+	public static boolean isTooHigh(LivingEntity boss, Player player, Location loc, double y) {
+		return isTooHigh(boss, player, loc.getY(), y);
+	}
+
+	/**
+	 * Internal countdown that ticks if called. Increase counter by 1 if player is above the y threshold, otherwise
+	 * decrease it. Returns true if the counter exceed leniency or player is not free-falling.
+	 * To have player instantly be damaged, see {@link #markHighVulnerability(LivingEntity, Player)}
+	 *
+	 * @param player the player
+	 * @param boss   the boss that has the y anticheat
+	 * @param locY   the y value of the center
+	 * @param y      minimum y difference to check
+	 */
+
+	public static boolean isTooHigh(LivingEntity boss, Player player, double locY, double y) {
+		if (boss.isDead() || !boss.isValid()) {
+			mYAntiCheat.remove(boss);
+			return false;
+		}
+
+		HashMap<Player, Integer> playerMapping = mYAntiCheat.computeIfAbsent(boss, (k) -> new HashMap<>());
+
+		int count = playerMapping.getOrDefault(player, 0);
+		if(player.getY() - locY <= y) {
+			playerMapping.put(player, Math.max(0, count-2));
+			return false;
+		}
+		playerMapping.put(player, ++count);
+
+		return count >= Y_TIMER_LENIENCY || !PlayerUtils.isFreeFalling(player);
 	}
 }

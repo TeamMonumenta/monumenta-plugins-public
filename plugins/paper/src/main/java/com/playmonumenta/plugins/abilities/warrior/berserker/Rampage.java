@@ -104,6 +104,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 
 	private @Nullable Bloodlust mBloodlust;
 	private int mLastCastTicks = 0;
+	private boolean mActive = false;
 
 	private final RampageCS mCosmetic;
 
@@ -139,11 +140,11 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 		if (stacks < mBloodlustCost) {
 			return false;
 		}
+		mBloodlust.useStacks(mBloodlustCost);
 		mBloodlustExtension = 0;
 
 		World world = mPlayer.getWorld();
 
-		mBloodlust.useStacks(mBloodlustCost);
 		EffectManager effectManager = mPlugin.mEffectManager;
 
 		Effect rampage = effectManager.getActiveEffect(mPlayer, AESTHETICS_EFFECT_NAME);
@@ -165,6 +166,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 					new PercentDamageReceived(mInitialDuration, -mMeleeResistance, EnumSet.of(DamageType.MELEE)).deleteOnAbilityUpdate(true));
 			}
 		}
+		mActive = true;
 
 		Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), mRadius);
 		for (LivingEntity mob : hitbox.getHitMobs()) {
@@ -224,6 +226,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 
 	private void rampageEnd() {
 		mCosmetic.loseEffect(mPlayer);
+		mActive = false;
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
@@ -275,6 +278,11 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 	@Override
 	public ChargeType getChargeType() {
 		return ChargeType.STACKS;
+	}
+
+	@Override
+	public @Nullable String getMode() {
+		return mActive ? "max" : null;
 	}
 
 	private static Description<Rampage> getDescription1() {

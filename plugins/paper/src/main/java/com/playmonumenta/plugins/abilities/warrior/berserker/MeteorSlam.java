@@ -204,10 +204,9 @@ public class MeteorSlam extends Ability {
 
 					// If first tick landing, should still have old mFallFromY to calculate using
 					// Therefore can damage if eligible
-					if (calculateFallDistance() > mThreshold) {
+					if (calculateFallDistance() > mThreshold && MetadataUtils.checkOnceThisTick(plugin, player, SLAM_ONCE_THIS_TICK_METAKEY)) {
 						// Only for checking in LivingEntityDamagedByPlayerEvent below,
 						// so doesn't slam twice, since this doesn't yet set fall distance to 0
-						MetadataUtils.checkOnceThisTick(plugin, player, SLAM_ONCE_THIS_TICK_METAKEY);
 						doSlamAttack(player.getLocation().add(0, 0.15, 0));
 					}
 					onLanding();
@@ -280,7 +279,7 @@ public class MeteorSlam extends Ability {
 		if (isLevelTwo()
 			&& mGroundPound
 			&& Bukkit.getServer().getCurrentTick() - CAST_DELAY > mPoundCastTime // 5 tick window so ground pound is guarantee
-			&& mPlayer.getVelocity().getY() > -mGroundPoundVelocity + 0.01) {
+			&& mPlayer.getVelocity().getY() > -mGroundPoundVelocity + 0.05) {
 			mSneakTime = 0;
 			mGroundPound = false;
 		}
@@ -336,12 +335,12 @@ public class MeteorSlam extends Ability {
 
 			Location loc = enemy.getLocation().add(0, 0.15, 0);
 
-			MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY);
-			doSlamAttack(loc);
-			mCosmetic.onSlamCritical(mPlugin, mPlayer.getWorld(), loc, mPlayer);
-			onLanding();
-
-			return true;
+			if(MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
+				doSlamAttack(loc);
+				mCosmetic.onSlamCritical(mPlugin, mPlayer.getWorld(), loc, mPlayer);
+				onLanding();
+				return true;
+			}
 		}
 		return false;
 	}

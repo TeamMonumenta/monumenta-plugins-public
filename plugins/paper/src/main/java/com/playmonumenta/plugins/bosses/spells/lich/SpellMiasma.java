@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class SpellMiasma extends Spell {
 		if (mT <= 0) {
 			mT = 2;
 			for (Player player : Lich.playersInRange(mCenter, mRange, true)) {
-				if (player.getLocation().getY() > mDepth + 10 && player.getGameMode() == GameMode.SURVIVAL) {
+				if (BossUtils.isTooHigh(mBoss, player, mDepth, 10) && player.getGameMode() == GameMode.SURVIVAL) {
 					Location l = player.getEyeLocation();
 					new PartialParticle(Particle.SQUID_INK, l, 10, 0.1, 0.1, 0.1, 0.25).spawnAsEntityActive(mBoss);
 
