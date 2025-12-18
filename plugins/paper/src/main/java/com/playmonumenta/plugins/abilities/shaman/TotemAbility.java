@@ -40,7 +40,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	public static final double VELOCITY = 1.25;
 	public static final double TIME_TO_DROP = 75;
 	public static final double XZ_DISTANCE_TO_DROP = 14;
-	public static final String PROJECTION_ON_RECAST_DISABLED_OBJECTIVE = "ProjectionOnRecastDisabled";
+	public static final String PROJECTION_ON_RECAST_DISABLED_TAG = "ProjectionOnRecastDisabled";
 
 	private final Map<ThrowableProjectile, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 	protected @Nullable LivingEntity mTotem = null;
@@ -137,11 +137,11 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	}
 
 	private boolean attemptProjectionRecast() {
-		if (ScoreboardUtils.checkTag(mPlayer, PROJECTION_ON_RECAST_DISABLED_OBJECTIVE)) {
+		if (ScoreboardUtils.checkTag(mPlayer, PROJECTION_ON_RECAST_DISABLED_TAG)) {
 			return false;
 		}
 		TotemicProjection projection = mPlugin.mAbilityManager.getPlayerAbility(mPlayer, TotemicProjection.class);
-		if (projection != null && projection.getCharges() > 0 && !mIsInFlight && this.isOnCooldown() && !ShamanPassiveManager.getTotemList(mPlayer).isEmpty()) {
+		if (projection != null && projection.getCharges() > 0 && !mIsInFlight && this.isOnCooldown()) {
 			return projection.cast();
 		}
 		return false;

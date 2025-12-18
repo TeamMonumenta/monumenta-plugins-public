@@ -71,7 +71,7 @@ public class TotemicProjection extends MultipleChargeAbility {
 	}
 
 	public boolean cast() {
-		if (!useCharge()) {
+		if (ShamanPassiveManager.getTotemList(mPlayer).isEmpty() || !useCharge()) {
 			return false;
 		}
 

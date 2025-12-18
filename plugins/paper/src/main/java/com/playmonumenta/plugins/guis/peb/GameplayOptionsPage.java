@@ -160,7 +160,7 @@ final class GameplayOptionsPage extends PebPage {
 			Material.TOTEM_OF_UNDYING,
 			"Toggle Projection on Totem Recast",
 			"Click to toggle whether Totemic Projection is triggered by recasting totems on cooldown."
-		).invertedToggle("Projection on recast: ", TotemAbility.PROJECTION_ON_RECAST_DISABLED_OBJECTIVE).set(3, 5);
+		).invertedToggle("Projection on recast: ", TotemAbility.PROJECTION_ON_RECAST_DISABLED_TAG).set(3, 5);
 
 		entry(
 			Material.FIREWORK_ROCKET,
