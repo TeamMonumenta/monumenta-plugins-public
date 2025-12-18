@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
@@ -59,6 +60,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	private @Nullable TotemicConsecrationCS consecrationCosmetic;
 
 	private @Nullable BukkitRunnable mTotemTickingRunnable;
+	private int mLastCastTicks = 0;
 
 	public TotemAbility(Plugin plugin, Player player, AbilityInfo<?> info, String projectileName, String totemName, String displayName) {
 		super(plugin, player, info);
@@ -69,6 +71,12 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	}
 
 	public boolean cast() {
+		int ticks = Bukkit.getServer().getCurrentTick();
+		if (ticks - mLastCastTicks <= 5) {
+			return false;
+		}
+		mLastCastTicks = ticks;
+
 		if (isOnCooldown()) {
 			return attemptProjectionRecast();
 		}
