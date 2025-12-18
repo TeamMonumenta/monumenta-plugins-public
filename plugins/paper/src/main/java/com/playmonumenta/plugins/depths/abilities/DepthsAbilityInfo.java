@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsAbilityItem;
 import com.playmonumenta.plugins.depths.DepthsManager;
@@ -43,7 +42,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	private Consumer<Player> mGain;
 	private Predicate<Player> mOfferable;
 	private Predicate<Integer> mFloors;
-	private IntFunction<Description<T>> mDescriptionFunction;
+	private @Nullable IntFunction<Description<T>> mDescriptionFunction;
 
 	public DepthsAbilityInfo(Class<T> abilityClass, String displayName, BiFunction<Plugin, Player, T> constructor,
 							 @Nullable DepthsTree depthsTree, DepthsTrigger depthsTrigger) {
@@ -56,7 +55,6 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		};
 		mOfferable = player -> true;
 		mFloors = floor -> true;
-		mDescriptionFunction = unused -> new DescriptionBuilder<>(() -> this); // empty string default
 		canUse(player -> DepthsManager.getInstance().getPlayerLevelInAbility(displayName, player) > 0);
 	}
 
