@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.MonumentaEvent;
+import com.playmonumenta.plugins.seasonalevents.community.CommunityMissionManager;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,8 @@ public class SeasonalEventListener implements Listener {
 	 * Run through any potential depths missions and give credit
 	 */
 	public static void playerCompletedDepths(Player p, int roomNumber) {
-		// Check for mission type of depths rooms
+		CommunityMissionManager.getInstance().addProgress(p, MonumentaContent.DEPTHS, roomNumber);
+
 		for (Mission mission : SeasonalEventManager.getActiveMissions()) {
 			if (mission.mType == MissionType.DEPTHS_ROOMS) {
 				SeasonalEventManager.addMissionProgress(p, mission, roomNumber);
@@ -63,6 +65,10 @@ public class SeasonalEventListener implements Listener {
 	 * Run through any potential depths missions and give credit
 	 */
 	public static void playerCompletedZenith(Player p, int roomNumber, int ascension) {
+		if (roomNumber >= 30) {
+			CommunityMissionManager.getInstance().addProgress(p, MonumentaContent.ZENITH, ascension);
+		}
+
 		for (Mission mission : SeasonalEventManager.getActiveMissions()) {
 			if (mission.mType == MissionType.ZENITH_ROOMS) {
 				SeasonalEventManager.addMissionProgress(p, mission, roomNumber);
@@ -83,6 +89,8 @@ public class SeasonalEventListener implements Listener {
 	 * Run through any potential gallery missions and give credit
 	 */
 	public static void playerGalleryWave(Player p) {
+		CommunityMissionManager.getInstance().addProgress(p, MonumentaContent.GALLERY, 1);
+
 		// Check for mission type of gallery rounds
 		for (Mission mission : SeasonalEventManager.getActiveMissions()) {
 			if (mission.mType == MissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.GALLERY_ROUND)) {
@@ -98,6 +106,8 @@ public class SeasonalEventListener implements Listener {
 	 */
 
 	public static void playerRushRound(Player p) {
+		CommunityMissionManager.getInstance().addProgress(p, MonumentaContent.RUSH, 1);
+
 		for (Mission mission : SeasonalEventManager.getActiveMissions()) {
 			if (mission.mType == MissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.RUSH_WAVE)) {
 				SeasonalEventManager.addMissionProgress(p, mission, 1);
@@ -115,6 +125,8 @@ public class SeasonalEventListener implements Listener {
 		MonumentaContent content = MonumentaContent.getContentSelection(event.getEvent());
 		Player p = event.getPlayer();
 		if (p != null && content != null) {
+			CommunityMissionManager.getInstance().addProgress(p, content, 1);
+
 			// Loop through missions and update them if they apply
 			for (Mission mission : SeasonalEventManager.getActiveMissions()) {
 				if (mission.mType == MissionType.CONTENT && mission.mContent != null && mission.mContent.contains(content)) {

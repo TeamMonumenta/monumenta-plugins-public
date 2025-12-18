@@ -1,14 +1,19 @@
 package com.playmonumenta.plugins.seasonalevents;
 
 import com.playmonumenta.plugins.commands.GenericCommand;
+import com.playmonumenta.plugins.seasonalevents.community.CommunityMissionManager;
+import com.playmonumenta.plugins.seasonalevents.community.CommunityMissionsGui;
 import com.playmonumenta.plugins.seasonalevents.gui.PassGui;
 import com.playmonumenta.plugins.utils.DateUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.LongArgument;
+import dev.jorel.commandapi.arguments.StringArgument;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -156,5 +161,76 @@ public class SeasonalEventCommand extends GenericCommand {
 				}
 				new PassGui(seasonalPass, player, otherPlayer, now, true).open();
 			}).register();
+
+
+		// new community mission commands
+
+		// default command for opening gui for player
+		new CommandAPICommand("communitymissions")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
+				if (sender instanceof Player senderPlayer && !senderPlayer.equals(player)) {
+					// cant open it on other people as a player
+					return;
+				}
+				new CommunityMissionsGui(player).open();
+			})
+			.register();
+
+		// debug command to set total contribs for mission
+		new CommandAPICommand("communitymissions")
+			.withPermission(perms)
+			.withArguments(new LiteralArgument("setTotal"))
+			.withArguments(new IntegerArgument("index", 1, 3))
+			.withArguments(new LongArgument("amount", 0))
+			.executes((sender, args) -> {
+				int index = (int) args.getUnchecked("index") - 1;
+				long amount = args.getUnchecked("amount");
+
+				boolean success = CommunityMissionManager.getInstance().setTotalContribution(index, amount);
+				if (success) {
+					sender.sendMessage(Component.text("Set Mission " + (index + 1) + " total to " + amount, NamedTextColor.GREEN));
+				} else {
+					sender.sendMessage(Component.text("Failed: No active community event found.", NamedTextColor.RED));
+				}
+			})
+			.register();
+
+		// debug command to set personal contribs for mission
+		new CommandAPICommand("communitymissions")
+			.withPermission(perms)
+			.withArguments(new LiteralArgument("setPersonal"))
+			.withArguments(new EntitySelectorArgument.OnePlayer("target"))
+			.withArguments(new IntegerArgument("index", 1, 3))
+			.withArguments(new LongArgument("amount", 0))
+			.executes((sender, args) -> {
+				Player target = args.getUnchecked("target");
+				int index = (int) args.getUnchecked("index") - 1;
+				long amount = args.getUnchecked("amount");
+
+				boolean success = CommunityMissionManager.getInstance().setPlayerContribution(index, target.getUniqueId(), amount);
+				if (success) {
+					sender.sendMessage(Component.text("Set " + target.getName() + "'s contribution for Mission " + (index + 1) + " to " + amount + " (and updated total)", NamedTextColor.GREEN));
+				} else {
+					sender.sendMessage(Component.text("Failed: No active community event found.", NamedTextColor.RED));
+				}
+			})
+			.register();
+
+		// internal command (similar to how the hunts warnings work i think)
+		new CommandAPICommand("communitymissions")
+			.withPermission(perms)
+			.withArguments(new LiteralArgument("internalbroadcast"))
+			.withArguments(new StringArgument("type"))
+			.withArguments(new GreedyStringArgument("data"))
+			.executes((sender, args) -> {
+				String type = args.getUnchecked("type");
+				String data = args.getUnchecked("data");
+				String[] parts = data.split(" ");
+
+				CommunityMissionManager.getInstance().handleIncomingAlert(type, parts);
+			})
+			.register();
 	}
 }
