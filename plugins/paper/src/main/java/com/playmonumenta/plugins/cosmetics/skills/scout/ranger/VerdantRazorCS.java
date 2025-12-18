@@ -63,7 +63,9 @@ public class VerdantRazorCS extends WhirlingBladeCS {
 		EntityUtils.setRemoveEntityOnUnload(razorDisplayMap.get(currentTick));
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(),
 			() -> {
-				razorDisplayMap.get(currentTick).remove();
+				if (razorDisplayMap.get(currentTick) != null) {
+					razorDisplayMap.get(currentTick).remove();
+				}
 				razorDisplayMap.remove(currentTick);
 			}, Constants.TICKS_PER_MINUTE);
 		razorDisplayMap.get(currentTick).setItemStack(DisplayEntityUtils.generateRPItem(Material.CROSSBOW, "Steelsage Talisman"));
@@ -152,6 +154,11 @@ public class VerdantRazorCS extends WhirlingBladeCS {
 	@Override
 	public void onDeath() {
 		// Just in case the player dies / unloads, hopefully proof against memory leaks
+		for (ItemDisplay display : razorDisplayMap.values()) {
+			if (display != null) {
+				display.remove();
+			}
+		}
 		razorDisplayMap.clear();
 	}
 }
