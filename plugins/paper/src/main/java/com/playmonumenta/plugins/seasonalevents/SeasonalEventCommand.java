@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.commands.GenericCommand;
 import com.playmonumenta.plugins.seasonalevents.community.CommunityMissionManager;
 import com.playmonumenta.plugins.seasonalevents.community.CommunityMissionsGui;
 import com.playmonumenta.plugins.seasonalevents.gui.PassGui;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DateUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -167,22 +168,19 @@ public class SeasonalEventCommand extends GenericCommand {
 		// new community mission commands
 
 		// default command for opening gui for player
-		new CommandAPICommand("communitymissions")
-			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+		CommandAPICommand communityGui = new CommandAPICommand("gui")
 			.executes((sender, args) -> {
-				Player player = args.getUnchecked("player");
+				Player player = CommandUtils.getPlayerFromSender(sender);
 				if (sender instanceof Player senderPlayer && !senderPlayer.equals(player)) {
 					// cant open it on other people as a player
 					return;
 				}
 				new CommunityMissionsGui(player).open();
-			})
-			.register();
+			});
 
-		// debug command to set total contribs for mission
-		new CommandAPICommand("communitymissions")
+		// debug command to set total contributions for mission
+		CommandAPICommand communityDebugSetTotal = new CommandAPICommand("setTotal")
 			.withPermission(permsCommunityMissions)
-			.withArguments(new LiteralArgument("setTotal"))
 			.withArguments(new IntegerArgument("index", 1, 3))
 			.withArguments(new LongArgument("amount", 0))
 			.executes((sender, args) -> {
@@ -195,13 +193,11 @@ public class SeasonalEventCommand extends GenericCommand {
 				} else {
 					sender.sendMessage(Component.text("Failed: No active community event found.", NamedTextColor.RED));
 				}
-			})
-			.register();
+			});
 
-		// debug command to set personal contribs for mission
-		new CommandAPICommand("communitymissions")
+		// debug command to set personal contributions for mission
+		CommandAPICommand communityDebugSetPersonal = new CommandAPICommand("setPersonal")
 			.withPermission(permsCommunityMissions)
-			.withArguments(new LiteralArgument("setPersonal"))
 			.withArguments(new EntitySelectorArgument.OnePlayer("target"))
 			.withArguments(new IntegerArgument("index", 1, 3))
 			.withArguments(new LongArgument("amount", 0))
@@ -216,13 +212,11 @@ public class SeasonalEventCommand extends GenericCommand {
 				} else {
 					sender.sendMessage(Component.text("Failed: No active community event found.", NamedTextColor.RED));
 				}
-			})
-			.register();
+			});
 
 		// internal command (similar to how the hunts warnings work i think)
-		new CommandAPICommand("communitymissions")
+		CommandAPICommand communityDebugInternalBroadcast = new CommandAPICommand("internalbroadcast")
 			.withPermission(permsCommunityMissions)
-			.withArguments(new LiteralArgument("internalbroadcast"))
 			.withArguments(new StringArgument("type"))
 			.withArguments(new GreedyStringArgument("data"))
 			.executes((sender, args) -> {
@@ -231,7 +225,13 @@ public class SeasonalEventCommand extends GenericCommand {
 				String[] parts = data.split(" ");
 
 				CommunityMissionManager.getInstance().handleIncomingAlert(type, parts);
-			})
+			});
+
+		new CommandAPICommand("communitymissions")
+			.withSubcommand(communityGui)
+			.withSubcommand(communityDebugSetPersonal)
+			.withSubcommand(communityDebugSetTotal)
+			.withSubcommand(communityDebugInternalBroadcast)
 			.register();
 	}
 }
