@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ItemStackUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -330,7 +331,7 @@ public class KnickKnackSackGui extends Gui {
 			setItem(recordSlot, tRecord);
 		} else {
 			// Locked item if neither record player nor soulsinger is unlocked
-			record = record.withType(Material.BARRIER);
+			record = ItemStackUtils.withTypePreserveName(record, Material.BARRIER);
 			GUIUtils.splitLoreLine(record, "Complete the quest \"Halid's Song\" to unlock!", NamedTextColor.YELLOW, true);
 			setItem(recordSlot, record);
 		}
@@ -581,7 +582,7 @@ public class KnickKnackSackGui extends Gui {
 					update();
 				});
 		} else {
-			talisman = talisman.withType(Material.BARRIER);
+			talisman = ItemStackUtils.withTypePreserveName(talisman, Material.BARRIER);
 			GUIUtils.splitLoreLine(talisman, "Purchase the " + t.mTreeName + " " + (celestialZenith ? "Zenith" : "Depths") + " Talisman to unlock!", NamedTextColor.YELLOW, true);
 			return new GuiItem(talisman);
 		}
