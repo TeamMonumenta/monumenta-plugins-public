@@ -201,7 +201,7 @@ public class PassivePolarAura extends Spell {
 			return;
 		}
 
-		mFrostbiteValues.put(player, 0f);
+		mFrostbiteValues.put(player, -0.5f);
 
 		BossBar bar = BossBar.bossBar(NORMAL_BOSSBAR, 0, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
 		player.showBossBar(bar);
