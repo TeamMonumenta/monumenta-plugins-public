@@ -27,6 +27,7 @@ public class SeasonalEventCommand extends GenericCommand {
 	public static void register() {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.battlepass");
+		CommandPermission permsCommunityMissions = CommandPermission.fromString("monumenta.command.communitymissions");
 
 		// Add battlepass reload command
 		List<Argument<?>> arguments = new ArrayList<>();
@@ -180,7 +181,7 @@ public class SeasonalEventCommand extends GenericCommand {
 
 		// debug command to set total contribs for mission
 		new CommandAPICommand("communitymissions")
-			.withPermission(perms)
+			.withPermission(permsCommunityMissions)
 			.withArguments(new LiteralArgument("setTotal"))
 			.withArguments(new IntegerArgument("index", 1, 3))
 			.withArguments(new LongArgument("amount", 0))
@@ -199,7 +200,7 @@ public class SeasonalEventCommand extends GenericCommand {
 
 		// debug command to set personal contribs for mission
 		new CommandAPICommand("communitymissions")
-			.withPermission(perms)
+			.withPermission(permsCommunityMissions)
 			.withArguments(new LiteralArgument("setPersonal"))
 			.withArguments(new EntitySelectorArgument.OnePlayer("target"))
 			.withArguments(new IntegerArgument("index", 1, 3))
@@ -220,7 +221,7 @@ public class SeasonalEventCommand extends GenericCommand {
 
 		// internal command (similar to how the hunts warnings work i think)
 		new CommandAPICommand("communitymissions")
-			.withPermission(perms)
+			.withPermission(permsCommunityMissions)
 			.withArguments(new LiteralArgument("internalbroadcast"))
 			.withArguments(new StringArgument("type"))
 			.withArguments(new GreedyStringArgument("data"))
