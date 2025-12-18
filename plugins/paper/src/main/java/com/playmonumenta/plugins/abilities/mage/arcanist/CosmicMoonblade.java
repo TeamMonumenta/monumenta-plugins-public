@@ -7,8 +7,9 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.CosmicMoonbladeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -26,6 +27,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class CosmicMoonblade extends Ability {
 
@@ -155,35 +161,43 @@ public class CosmicMoonblade extends Ability {
 	}
 
 	private static Description<CosmicMoonblade> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to cause a wave of arcane blades to hit every enemy within a ")
-			.add(a -> a.mRange, RADIUS)
-			.add(" block cone ")
-			.add(a -> a.mTotalSwings, SWINGS)
-			.add(" times in rapid succession. Each slash deals ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" arcane magic damage and reduces all your other skill cooldowns by ")
-			.addPercent(a -> a.mLevelReduction, REDUCTION_MULTIPLIER_1, false, Ability::isLevelOne)
-			.add(" (Max ")
-			.addDuration(a -> a.mLevelCap, CAP_TICKS_1, false, Ability::isLevelOne)
-			.add(" seconds) if it hits at least one mob.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Slash %d times in front of you, dealing")
+				.statValues(stat(a -> a.mTotalSwings, SWINGS))
+			.addLine("*Arcane* damage with each slash.").styles(Mage.ARCANE_COLOR)
+			.addLine()
+			.addLine("Each slash reduces all your other ability")
+			.addLine("cooldowns if at least *1* mob was hit.").styles(WHITE)
+			.addLine()
+			.addStat("Damage: %d1 (s) per slash")
+				.statValues(stat(a -> a.mDamage, DAMAGE_1))
+			.addStat("Radius: %r (Cone-Shaped)")
+				.statValues(stat(a -> a.mRange, RADIUS))
+			.addStat("Cooldown Reduction: %p1 (max %t1) per slash ")
+				.statValues(stat(a -> a.mLevelReduction, REDUCTION_MULTIPLIER_1), stat(a -> a.mLevelCap, CAP_TICKS_1))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 
 	private static Description<CosmicMoonblade> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Cooldown reduction is increased to ")
-			.addPercent(a -> a.mLevelReduction, REDUCTION_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(" (Max ")
-			.addDuration(a -> a.mLevelCap, CAP_TICKS_2, false, Ability::isLevelTwo)
-			.add(" second) per blade and damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(". Additionally reduce all cooldowns including Cosmic Moonblade by ")
-			.addPercent(a -> a.mKillCDR, REDUCTION_MULTIPLIER_KILL)
-			.add(" (Max ")
-			.addDuration(a -> a.mKillCDRCap, CAP_TICKS_KILL)
-			.add(" seconds) if this ability killed a mob once per activation.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Cosmic Moonblade*'s damage").styles(UNDERLINED)
+			.addLine("and cooldown reduction.")
+			.addLine()
+			.addLine("If *Cosmic Moonblade* killed a mob, reduce").styles(UNDERLINED)
+			.addLine("your ability cooldowns even further.")
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mDamage, DAMAGE_2))
+			.addStatComparison("Cooldown Reduction: %p1 -> %p2 (max %t2)")
+				.statValues(stat(REDUCTION_MULTIPLIER_1), stat(a -> a.mLevelReduction, REDUCTION_MULTIPLIER_2), stat(a -> a.mLevelCap, CAP_TICKS_2))
+			.addStat("Kill Cooldown Reduction: %p (max %t)")
+				.statValues(stat(a -> a.mKillCDR, REDUCTION_MULTIPLIER_KILL), stat(a -> a.mKillCDRCap, CAP_TICKS_KILL))
+			.addDashedLine();
 	}
 }

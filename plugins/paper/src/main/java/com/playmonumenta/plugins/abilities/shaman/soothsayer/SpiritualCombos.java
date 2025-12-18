@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.SpiritualCombosCS;
@@ -31,6 +31,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class SpiritualCombos extends Ability implements AbilityWithChargesOrStacks {
 	private static final int CRYSTAL_STACK_THRESHOLD = 12;
@@ -246,32 +250,46 @@ public class SpiritualCombos extends Ability implements AbilityWithChargesOrStac
 	}
 
 	private static Description<SpiritualCombos> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Gain a stack of spiritual crystals each time you kill a mob not with this ability. When you get ")
-			.add(a -> a.mCrystalStackThreshold, CRYSTAL_STACK_THRESHOLD, true)
-			.add(" stacks, they reset, and the crystals lash out at mobs within ")
-			.add(a -> a.mCrystalRange, CRYSTAL_RANGE)
-			.add(" blocks. Every ")
-			.addDuration(a -> a.mShotDelay, SHOT_DELAY, true)
-			.add(" seconds, a random mob is shot, dealing ")
-			.add(a -> a.mCrystalDamage, CRYSTAL_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage, up to a total of ")
-			.add(a -> a.mTotalShots, SHOT_COUNT_1, false, Ability::isLevelOne)
-			.add(" shots. The first shot will wait to be fired if there are no mobs in range, but subsequent shots will do nothing if there are no mobs to shoot. Stacks decay at a rate of 1 stack per ")
-			.addDuration(a -> a.mStackDecayTime, STACK_DECAY_TIME_1, false, Ability::isLevelOne)
-			.add(" seconds. Additionally, gain ")
-			.addPercent(a -> a.mSpeed, SPEED_PERCENT)
-			.add(" speed while spiritual crystals are firing.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Killing a mob grants you *1* stack of").styles(WHITE)
+			.addLine("*Spiritual Combos*, which begins to decay").styles(UNDERLINED)
+			.addLine("after %t1 of not gaining any.")
+				.statValues(stat(a -> a.mStackDecayTime, STACK_DECAY_TIME_1))
+			.addLine()
+			.addLine("Upon reaching %d stacks, begin to fire")
+				.statValues(stat(a -> a.mCrystalStackThreshold, CRYSTAL_STACK_THRESHOLD))
+			.addLine("crystals at random nearby mobs over")
+			.addLine("time, and reset your stacks to *0*.").styles(WHITE)
+			.addLine()
+			.addStat("Damage: %d1 (s) every %t")
+				.statValues(stat(a -> a.mCrystalDamage, CRYSTAL_DAMAGE_1), stat(a -> a.mShotDelay, SHOT_DELAY))
+			.addStat("Crystals Fired: %d1")
+				.statValues(stat(a -> a.mTotalShots, SHOT_COUNT_1))
+			.addStat("Range: %r")
+				.statValues(stat(a -> a.mCrystalRange, CRYSTAL_RANGE))
+			.addLine()
+			.addLine("Gain increased speed while crystals")
+			.addLine("are firing.")
+			.addLine()
+			.addStat("Effect: +%p Speed")
+				.statValues(stat(a -> a.mSpeed, SPEED_PERCENT))
+			.addDashedLine();
 	}
 
 	private static Description<SpiritualCombos> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mCrystalDamage, CRYSTAL_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(". The number of shots is increased to ")
-			.add(a -> a.mTotalShots, SHOT_COUNT_2, false, Ability::isLevelTwo)
-			.add(". Stack decay rate is reduced to 1 stack per ")
-			.addDuration(a -> a.mStackDecayTime, STACK_DECAY_TIME_2, false, Ability::isLevelTwo)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Spiritual Combos*'s damage and").styles(UNDERLINED)
+			.addLine("number of crystals fired, and reduce")
+			.addLine("the stack decay rate.")
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)")
+				.statValues(stat(CRYSTAL_DAMAGE_1), stat(a -> a.mCrystalDamage, CRYSTAL_DAMAGE_2))
+			.addStatComparison("Crystals Fired: %d1 -> %d2")
+				.statValues(stat(SHOT_COUNT_1), stat(a -> a.mTotalShots, SHOT_COUNT_2))
+			.addStatComparison("Stack Decay Time: %t1 -> %t2")
+				.statValues(stat(STACK_DECAY_TIME_1), stat(a -> a.mStackDecayTime, STACK_DECAY_TIME_2))
+			.addDashedLine();
 	}
 }

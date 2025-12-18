@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.mage.MagmaShield;
 import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -23,11 +23,16 @@ import java.util.Objects;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
 	public static final String NAME = "Sage's Insight";
@@ -42,6 +47,8 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	public static final String CHARM_DECAY = "Sage's Insight Decay Duration";
 	public static final String CHARM_SPEED = "Sage's Insight Speed Amplifier";
 	public static final String CHARM_ABILITY = "Sage's Insight Ability Count";
+
+	public static final Style INSIGHT_COLOR = Style.style(TextColor.color(0x79EAB9));
 
 	public static final AbilityInfo<SagesInsight> INFO =
 		new AbilityInfo<>(SagesInsight.class, NAME, SagesInsight::new)
@@ -181,22 +188,27 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	}
 
 	private static Description<SagesInsight> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to ")
-			.add(a -> a.mMaxStacks, MAX_STACKS)
-			.add(", but decay every ")
-			.addDuration(a -> a.mDecayTimer, DECAY_TIMER)
-			.add(" seconds of not gaining one. Once ")
-			.add(a -> a.mMaxStacks, MAX_STACKS)
-			.add(" Insights are revealed, the cooldowns of the previous ")
-			.add(a -> a.mResetSize, ABILITIES_COUNT_1, false, Ability::isLevelOne)
-			.add(" spells cast are refreshed. This sets your Insights back to 0.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Hitting mobs with an active ability")
+			.addLine("grants you *1* *Insight*, which begins").styles(WHITE, INSIGHT_COLOR)
+			.addLine("to decay after %t after not gaining any.")
+				.statValues(stat(a -> a.mDecayTimer, DECAY_TIMER))
+			.addLine()
+			.addLine("Reaching %d *Insights* resets the cooldowns").styles(INSIGHT_COLOR)
+				.statValues(stat(a -> a.mMaxStacks, MAX_STACKS))
+			.addLine("of the last %d1 abilities you've casted")
+				.statValues(stat(a -> a.mResetSize, ABILITIES_COUNT_1))
+			.addLine("and resets your *Insights* to 0.").styles(INSIGHT_COLOR)
+			.addDashedLine();
 	}
 
 	private static Description<SagesInsight> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Sage's Insight now refreshes the cooldowns of your previous ")
-			.add(a -> a.mResetSize, ABILITIES_COUNT_2, false, Ability::isLevelTwo)
-			.add(" spells upon activating.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("*Sage's Insight* now resets the cooldowns").styles(UNDERLINED)
+			.addLine("of the last %d2 abilities you've casted.")
+				.statValues(stat(a -> a.mResetSize, ABILITIES_COUNT_2))
+			.addDashedLine();
 	}
 }

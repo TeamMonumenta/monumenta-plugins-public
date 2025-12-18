@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.MelancholicLamentCS;
@@ -31,6 +31,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class MelancholicLament extends Ability {
 
@@ -226,43 +230,57 @@ public class MelancholicLament extends Ability {
 	}
 
 	private static Description<MelancholicLament> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to recite a haunting song, causing all mobs within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks to target you and afflicting them with ")
-			.addPercent(a -> a.mWeakenEffect, WEAKEN_EFFECT_1, false, Ability::isLevelOne)
-			.add(" Weaken for ")
-			.addDuration(a -> a.mWeakenDuration, DURATION)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Weaken and taunt all nearby mobs.")
+			.addLine()
+			.addStat("Effect: %p1 Weakness for %t")
+				.statValues(stat(a -> a.mWeakenEffect, WEAKEN_EFFECT_1), stat(a -> a.mWeakenDuration, DURATION))
+			.addStat("Radius: %r")
+			.statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<MelancholicLament> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The Weaken is increased to ")
-			.addPercent(a -> a.mWeakenEffect, WEAKEN_EFFECT_2, false, Ability::isLevelTwo)
-			.add(". Players in the radius have their negative potion effect durations decreased by ")
-			.addDuration(a -> a.mReductionTime, CLEANSE_REDUCTION)
-			.add(" seconds. Your next melee scythe attack within the next ")
-			.addDuration(SILENCE_WINDOW)
-			.add(" seconds will silence all mobs within ")
-			.add(a -> a.mSilenceRadius, SILENCE_RADIUS)
-			.add(" blocks for ")
-			.addDuration(a -> a.mSilenceDuration, SILENCE_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Melancholic Lament*'s weakness,").styles(UNDERLINED)
+			.addLine("and lower the duration of your potion")
+			.addLine("debuffs on cast.")
+			.addLine()
+			.addStatComparison("Effect: %p1 -> %p2 Weakness")
+				.statValues(stat(WEAKEN_EFFECT_1), stat(a -> a.mWeakenEffect, WEAKEN_EFFECT_2))
+			.addStat("Effect: -%t Debuff Duration")
+				.statValues(stat(a -> a.mReductionTime, CLEANSE_REDUCTION))
+			.addLine()
+			.addLine("After casting *Melancholic Lament*, your").styles(UNDERLINED)
+			.addLine("next attack within %t will silence the")
+				.statValues(stat(SILENCE_WINDOW))
+			.addLine("target and all nearby mobs.")
+			.addLine()
+			.addStat("Effect: Silence for %t")
+				.statValues(stat(a -> a.mSilenceDuration, SILENCE_DURATION))
+			.addStat("Silence Radius: %r")
+				.statValues(stat(a -> a.mSilenceRadius, SILENCE_RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<MelancholicLament> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("For ")
-			.addDuration(a -> a.mEnhanceDuration, ENHANCE_DURATION)
-			.add(" seconds after casting this ability, you and other players within ")
-			.add(a -> a.mEnhanceRadius, ENHANCE_RADIUS)
-			.add(" blocks gain ")
-			.addPercent(a -> a.mEnhanceDamage, ENHANCE_DAMAGE)
-			.add(" melee damage for each mob targeting you in that radius (capped at ")
-			.add(a -> a.mEnhanceCap, ENHANCE_MAX_MOBS)
-			.add(" mobs).");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("After casting *Melancholic Lament*, you and").styles(UNDERLINED)
+			.addLine("nearby players will deal increased melee")
+			.addLine("damage for each mob targeting you.")
+			.addLine()
+			.addStat("Effect: +%p Melee Damage per mob (max %d)")
+				.statValues(stat(a -> a.mEnhanceDamage, ENHANCE_DAMAGE), stat(a -> a.mEnhanceCap, ENHANCE_MAX_MOBS))
+			.addStat("Duration: %t")
+				.statValues(stat(a -> a.mEnhanceDuration, ENHANCE_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mEnhanceRadius, ENHANCE_RADIUS))
+			.addDashedLine();
 	}
 }

@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.BezoarCS;
@@ -18,6 +18,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,6 +29,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class Bezoar extends Ability {
 	private static final int FREQUENCY = 5;
@@ -60,6 +65,9 @@ public class Bezoar extends Ability {
 	public static final String CHARM_PHILOSOPHER_STONE_RECHARGE_RATE_DURATION = "Bezoar Philosopher Stone Recharge Rate Duration";
 	public static final String CHARM_PHILOSOPHER_STONE_ABSORPTION = "Bezoar Philosopher Stone Absorption Health";
 	public static final String CHARM_PHILOSOPHER_STONE_ABSORPTION_DURATION = "Bezoar Philosopher Stone Absorption Duration";
+
+	public static final Style BEZOAR_COLOR = Style.style(TextColor.color(0x549923));
+	public static final Style PHILOSOPHER_COLOR = Style.style(TextColor.color(0x991F27));
 
 	public static final AbilityInfo<Bezoar> INFO =
 		new AbilityInfo<>(Bezoar.class, "Bezoar", Bezoar::new)
@@ -273,43 +281,57 @@ public class Bezoar extends Ability {
 	}
 
 	private static Description<Bezoar> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Every ")
-			.add(a -> a.mFrequency, FREQUENCY, true)
-			.add(" mobs killed within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks of the Alchemist spawns a Bezoar that lingers for ")
-			.addDuration(a -> a.mLingerTime, LINGER_TIME)
-			.add("s. Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates ")
-			.addPercent(a -> a.mHealPercent, HEAL_PERCENT)
-			.add(" of max health every second for ")
-			.addDuration(a -> a.mHealDuration, HEAL_DURATION)
-			.add("s and reduces the duration of all your vanilla potion debuffs by ")
-			.addDuration(a -> a.mDebuffReduction, DEBUFF_REDUCTION)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Spawn a *Bezoar* for every %d mobs killed").styles(BEZOAR_COLOR)
+				.statValues(stat(a -> a.mFrequency, FREQUENCY))
+			.addLine("within %d blocks of you, lasting for %t.")
+				.statValues(
+					stat(a -> a.mRadius, RADIUS),
+					stat(a -> a.mLingerTime, LINGER_TIME))
+			.addLine()
+			.addLine("Players can pick up *Bezoars*, granting that player").styles(BEZOAR_COLOR)
+			.addLine("and yourself healing over time and reducing")
+			.addLine("the duration of potion debuffs on both players.")
+			.addLine()
+			.addLine("Gain *1* potion when a *Bezoar* is picked up.").styles(WHITE, BEZOAR_COLOR)
+			.addLine()
+			.addStat("Healing: %p HP every 1s for %t")
+				.statValues(
+					stat(a -> a.mHealPercent, HEAL_PERCENT),
+					stat(a -> a.mHealDuration, HEAL_DURATION))
+			.addStat("Effect: -%t Debuff Duration")
+				.statValues(stat(a -> a.mDebuffReduction, DEBUFF_REDUCTION))
+			.addDashedLine();
 	}
 
 	private static Description<Bezoar> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The Bezoar now additionally grants ")
-			.addPercent(a -> a.mDamagePercent, DAMAGE_PERCENT)
-			.add(" damage from all sources for ")
-			.addDuration(a -> a.mDamageDuration, DAMAGE_DURATION)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("*Bezoars* now also grant both").styles(BEZOAR_COLOR)
+			.addLine("players a damage boost.")
+			.addLine()
+			.addStat("Effect: +%p Damage for %t")
+				.statValues(
+					stat(a -> a.mDamagePercent, DAMAGE_PERCENT),
+					stat(a -> a.mDamageDuration, DAMAGE_DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<Bezoar> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Every ")
-			.add(a -> a.mPhilosophersStoneBezoarCount, PHILOSOPHER_STONE_BEZOAR_COUNT, true)
-			.add(" bezoars spawned, summon a Philosopher's Stone instead. Picking it up grants you +")
-			.addPercent(a -> a.mPhilosophersStoneRechargeRateBonus, PHILOSOPHER_STONE_RECHARGE_RATE_BONUS)
-			.add(" potion recharge rate for ")
-			.addDuration(a -> a.mPhilosophersStoneRechargeRateDuration, PHILOSOPHER_STONE_RECHARGE_RATE_REDUCTION_DURATION)
-			.add("s and ")
-			.add(a -> a.mPhilosophersStoneAbsorptionAmount, PHILOSOPHER_STONE_ABSORPTION_AMOUNT)
-			.add(" absorption health for ")
-			.addDuration(a -> a.mPhilosophersStoneAbsorptionDuration, PHILOSOPHER_STONE_ABSORPTION_DURATION)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Every %d *Bezoars* becomes a *Philosopher's Stone*").styles(BEZOAR_COLOR, PHILOSOPHER_COLOR)
+				.statValues(stat(PHILOSOPHER_STONE_BEZOAR_COUNT))
+			.addLine("instead, and picking it up grants you increased")
+			.addLine("potion recharge rate and absorption.")
+			.addLine()
+			.addStat("Effect: +%p Potion Recharge Rate for %t")
+				.statValues(stat(a -> a.mPhilosophersStoneRechargeRateBonus, PHILOSOPHER_STONE_RECHARGE_RATE_BONUS),
+					stat(a -> a.mPhilosophersStoneRechargeRateDuration, PHILOSOPHER_STONE_RECHARGE_RATE_REDUCTION_DURATION))
+			.addStat("Effect: +%d Absorption for %t")
+				.statValues(stat(a -> a.mPhilosophersStoneAbsorptionAmount, PHILOSOPHER_STONE_ABSORPTION_AMOUNT),
+					stat(a -> a.mPhilosophersStoneAbsorptionDuration, PHILOSOPHER_STONE_ABSORPTION_DURATION))
+			.addDashedLine();
 	}
 }

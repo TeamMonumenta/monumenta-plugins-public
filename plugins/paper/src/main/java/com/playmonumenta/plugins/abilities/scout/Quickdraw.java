@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.QuickdrawCS;
@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -37,6 +38,12 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class Quickdraw extends Ability {
 	private static final int R1_DAMAGE = 11;
@@ -96,7 +103,7 @@ public class Quickdraw extends Ability {
 		mCosmetic.quickdrawCast(mPlayer);
 
 		for (int i = 0; i < mArrows; i++) {
-			if (!shootProjectile(inMainHand,  -0.5 * mArrows + 0.5 + i)) {
+			if (!shootProjectile(inMainHand, -0.5 * mArrows + 0.5 + i)) {
 				return false;
 			}
 		}
@@ -202,25 +209,35 @@ public class Quickdraw extends Ability {
 	}
 
 	private static Description<Quickdraw> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to instantly fire a damaging projectile that inherits your weapon's aspect enchants.")
-			.add(" This skill can only apply Recoil once before touching the ground.")
-			.add(" Damage is based on region: R1 = " + R1_DAMAGE + " / R2 = " + R2_DAMAGE + " / R3 = " + R3_DAMAGE + ".")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Instantly fire an arrow with your weapon.")
+			.addIf((a, p) -> p != null && AdvancementUtils.checkAdvancement(p, "monumenta:handbook/enchantments/recoil"), desc -> desc
+				.addLine("(Can only use Recoil once while midair)"))
+			.addLine()
+			.addStat("Damage: %d (p)")
+				.statValues(perRegion(a -> a.mDamage, R1_DAMAGE, R2_DAMAGE, R3_DAMAGE))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<Quickdraw> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Cooldown: ")
-			.addDuration(a -> a.getCharmCooldown(COOLDOWN_2), COOLDOWN_2, true, Ability::isLevelTwo)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Reduce *Quickdraw*'s cooldown.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(COOLDOWN_1), cooldown(COOLDOWN_2))
+			.addDashedLine();
 	}
 
 	private static Description<Quickdraw> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Projectiles shot with this skill are given Piercing ")
-			.add(a -> a.mPiercing, PIERCE_LVL)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Quickdraw*'s arrows gain *Piercing* %d.").styles(UNDERLINED, WHITE)
+				.statValues(stat(a -> a.mPiercing, PIERCE_LVL))
+			.addDashedLine();
 	}
 }

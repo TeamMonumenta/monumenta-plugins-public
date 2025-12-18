@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.abilities.rogue.assassin;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -36,6 +35,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.classes.Rogue.STEALTH_COLOR;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class BodkinBlitz extends MultipleChargeAbility {
 
@@ -225,29 +229,43 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	}
 
 	private static Description<BodkinBlitz> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to teleport ")
-			.add(a -> a.mDistance, DISTANCE_1, false, Ability::isLevelOne)
-			.add(" blocks forwards. Upon teleporting, you gain ")
-			.addDuration(a -> a.mStealthDuration, STEALTH_DURATION_1, false, Ability::isLevelOne)
-			.add(" second of Stealth and your next melee attack deals ")
-			.add(a -> a.mBonusDmg, BONUS_DMG_1, false, Ability::isLevelOne)
-			.add(" bonus damage if your target is not focused on you. Charges: ")
-			.add(a -> a.mMaxCharges, MAX_CHARGES)
-			.add(".")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Teleport forwards and gain *Stealth*").styles(STEALTH_COLOR)
+			.addLine("for a short period of time.")
+			.addLine()
+			.addLine("Your next *Stealthed* attack deals").styles(STEALTH_COLOR)
+			.addLine("bonus damage.")
+			.addLine()
+			.addStat("Bonus Damage: +%d1 (m)")
+				.statValues(stat(a -> a.mBonusDmg, BONUS_DMG_1))
+			.addStat("Effect: Stealth for %t1")
+				.statValues(stat(a -> a.mStealthDuration, STEALTH_DURATION_1))
+			.addStat("Teleport Distance: %r1")
+				.statValues(stat(a -> a.mDistance, DISTANCE_1))
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, MAX_CHARGES))
+			.addStat("Cooldown: %t1 (per charge)")
+				.statValues(cooldown(COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<BodkinBlitz> getDescritpion2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Range is increased to ")
-			.add(a -> a.mDistance, DISTANCE_2, false, Ability::isLevelTwo)
-			.add(" blocks, Stealth duration is increased to ")
-			.addDuration(a -> a.mStealthDuration, STEALTH_DURATION_2, false, Ability::isLevelTwo)
-			.add(" seconds, and bonus damage is increased to ")
-			.add(a -> a.mBonusDmg, BONUS_DMG_2, false, Ability::isLevelTwo)
-			.add(".")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Bodkin Blitz*'s bonus damage,").styles(UNDERLINED)
+			.addLine("*Stealth* duration, and teleport distance,").styles(STEALTH_COLOR)
+			.addLine("and reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Damage: +%d1 -> +%d2 (m)")
+				.statValues(stat(BONUS_DMG_1), stat(a -> a.mBonusDmg, BONUS_DMG_2))
+			.addStatComparison("Effect: %t1 -> %t2 Stealth")
+				.statValues(stat(STEALTH_DURATION_1), stat(a -> a.mStealthDuration, STEALTH_DURATION_2))
+			.addStatComparison("Teleport Distance: %r1 -> %r2")
+				.statValues(stat(DISTANCE_1), stat(a -> a.mDistance, DISTANCE_2))
+			.addStatComparison("Cooldown: %t1 -> %t2 (per charge)")
+				.statValues(cooldown(COOLDOWN_1), cooldown(COOLDOWN_2))
+			.addDashedLine();
 	}
 }

@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
@@ -26,8 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -40,6 +38,10 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class ScorchedEarth extends MultipleChargeAbility implements PotionAbility, AbilityWithDuration {
 	private static final String SCORCHED_EARTH_POTION_METAKEY = "ScorchedEarthPotion";
@@ -73,6 +75,8 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 	public static final String CHARM_SCORCHED_DURATION = "Scorched Earth Scorched Duration";
 	public static final String CHARM_SCORCHED_MAX_DURATION = "Scorched Earth Scorched Max Duration";
 	public static final String CHARM_SCORCHED_DAMAGE = "Scorched Earth Scorched Damage";
+
+	public static final Style SCORCH_COLOR = Style.style(TextColor.color(0xDD452C));
 
 	public static final AbilityInfo<ScorchedEarth> INFO =
 		new AbilityInfo<>(ScorchedEarth.class, "Scorched Earth", ScorchedEarth::new)
@@ -433,50 +437,54 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 	}
 
 	private static Description<ScorchedEarth> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Throw an Alchemist's Potion while sneaking to deploy a ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" block radius zone that lasts for ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add("s where the potion lands. While active, all mobs inside the zone are afflicted with ")
-			.addPercent(a -> a.mSlownessAmp, SLOWNESS_AMP_1, false, Ability::isLevelOne)
-			.add(" slowness and ")
-			.addPercent(a -> a.mWeaknessAmp, WEAKNESS_AMP_1, false, Ability::isLevelOne)
-			.add(" weakness. Additionally, all mobs that enter it for the first time are Scorched for ")
-			.addDuration(a -> a.mScorchOnEnterDuration, ON_ENTER_SCORCH)
-			.add("s. ")
-			.add("Splashing your Alchemist's Potions within an active zone makes them break into ")
-			.add(a -> a.mShrapnelCount, SHRAPNEL_COUNT)
-			.add(" fragments, which quickly fall back to the ground, each Scorching enemies within ")
-			.add(a -> a.mShrapnelRadius, SHRAPNEL_RADIUS)
-			.add(" blocks of the impact location (scales with your potion's radius) for ")
-			.addDuration(a -> a.mScorchedDuration, SCORCHED_DURATION_PER_APPLICATION)
-			.add("s. ")
-			.add("Charges: ")
-			.add(a -> a.mMaxCharges, CHARGES)
-			.add(" (all are refunded when the cooldown ends).")
-			.addCooldown(COOLDOWN, Ability::isLevelOne)
-			.add(Component.text("\nScorched:\n").color(NamedTextColor.YELLOW))
-			.add("Scorched enemies take ")
-			.addPercent(a -> a.mScorchedDamage, SCORCHED_DAMAGE_PER_SECOND_1, false, Ability::isLevelOne)
-			.add(" of your potion's damage over ")
-			.addDuration(a -> a.mScorchedDuration, SCORCHED_DURATION_PER_APPLICATION)
-			.add("s, and are set on fire. ")
-			.add("The duration of this debuff can stack up to a maximum of ")
-			.addDuration(a -> a.mScorchedMaxDuration, MAX_SCORCHED_DURATION)
-			.add("s, and it is gradually consumed over time.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Throwing a potion while sneaking creates")
+			.addLine("a scorched area that lasts for %t.")
+				.statValues(stat(a -> a.mDuration, DURATION))
+			.addLine()
+			.addLine("The area slows and weakens mobs inside, and")
+			.addLine("mobs entering it are *Scorched* for +%t.").styles(SCORCH_COLOR)
+				.statValues(stat(a -> a.mScorchOnEnterDuration, ON_ENTER_SCORCH))
+			.addLine()
+			.addStat("Effect: %p1 Slowness")
+				.statValues(stat(a -> a.mSlownessAmp, SLOWNESS_AMP_1))
+			.addStat("Effect: %p1 Weakness")
+				.statValues(stat(a -> a.mWeaknessAmp, WEAKNESS_AMP_1))
+			.addLine()
+			.addLine("Potions that splash inside the area break into %d")
+				.statValues(stat(a -> a.mShrapnelCount, SHRAPNEL_COUNT))
+			.addLine("smaller fragments that *Scorch* mobs for +%t.").styles(SCORCH_COLOR)
+				.statValues(stat(a -> a.mScorchedDuration, SCORCHED_DURATION_PER_APPLICATION))
+			.addLine()
+			.addLine("*Scorched* mobs take rapid damage over time.").styles(SCORCH_COLOR)
+			.addLine("Its duration can be stacked up to a maximum of %t,")
+				.statValues(stat(a -> a.mScorchedMaxDuration, MAX_SCORCHED_DURATION))
+			.addLine("which is consumed over time.")
+			.addLine()
+			.addStat("Scorch Damage: %p1 (s) over 1s (of potion damage)")
+				.statValues(stat(a -> a.mScorchedDamage, SCORCHED_DAMAGE_PER_SECOND_1))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, CHARGES))
+			.addStat("Cooldown: %t (all charges refreshed at once)")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<ScorchedEarth> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Mobs inside the zone are now afflicted with ")
-			.addPercent(a -> a.mSlownessAmp, SLOWNESS_AMP_2, false, Ability::isLevelTwo)
-			.add(" slowness and ")
-			.addPercent(a -> a.mWeaknessAmp, WEAKNESS_AMP_2, false, Ability::isLevelTwo)
-			.add(" weakness. The damage of the Scorched debuff is increased to ")
-			.addPercent(a -> a.mScorchedDamage, SCORCHED_DAMAGE_PER_SECOND_2, false, Ability::isLevelTwo)
-			.add(" of your potion's damage over ")
-			.addDuration(a -> a.mScorchedDuration, SCORCHED_DURATION_PER_APPLICATION)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Scorched Earth*'s slowness,").styles(UNDERLINED)
+			.addLine("weakness, and the damage of *Scorch*.").styles(SCORCH_COLOR)
+			.addLine()
+			.addStatComparison("Effect: %p1 -> %p2 Slowness")
+				.statValues(stat(SLOWNESS_AMP_1), stat(a -> a.mSlownessAmp, SLOWNESS_AMP_2))
+			.addStatComparison("Effect: %p1 -> %p2 Weakness")
+				.statValues(stat(WEAKNESS_AMP_1), stat(a -> a.mWeaknessAmp, WEAKNESS_AMP_2))
+			.addStatComparison("Scorch Damage: %p1 -> %p2 (s)")
+				.statValues(stat(SCORCHED_DAMAGE_PER_SECOND_1), stat(a -> a.mScorchedDamage, SCORCHED_DAMAGE_PER_SECOND_2))
+			.addDashedLine();
 	}
 }

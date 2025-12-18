@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.VolatileReactionCS;
@@ -21,8 +21,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,6 +34,11 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.classes.Alchemist.BRUTAL_COLOR;
+import static com.playmonumenta.plugins.classes.Alchemist.GRUESOME_COLOR;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class VolatileReaction extends Ability implements PotionAbility {
 	private static final ClassAbility VOLATILE_DOT_ABILITY = ClassAbility.VOLATILE_REACTION_DOT;
@@ -63,6 +68,8 @@ public class VolatileReaction extends Ability implements PotionAbility {
 	public static final String CHARM_ENHANCEMENT_DOT_BASE_TICK_DELAY = "Volatile Reaction Enhancement DoT Base Delay";
 	public static final String CHARM_ENHANCEMENT_DOT_TICK_DELAY_PER_STACK = "Volatile Reaction Enhancement DoT Tick Delay per Stack";
 	public static final String CHARM_ENHANCEMENT_DOT_SPREAD_RADIUS = "Volatile Reaction Enhancement DoT Spread Radius";
+
+	public static final Style VOLATILE_COLOR = Style.style(TextColor.color(0xCC6729));
 
 	public static final AbilityInfo<VolatileReaction> INFO =
 		new AbilityInfo<>(VolatileReaction.class, "Volatile Reaction", VolatileReaction::new)
@@ -209,12 +216,6 @@ public class VolatileReaction extends Ability implements PotionAbility {
 	private final ConcurrentHashMap<UUID, EnhancementDotInfo> mEnhancementDoTInfos = new ConcurrentHashMap<>();
 
 	private final VolatileReactionCS mCosmetic;
-	private final double mGruesomeLevelThreeSlownessAmount;
-	private final double mGruesomeLevelThreeVulnerabilityAmount;
-	private final double mGruesomeLevelThreeWeakenAmount;
-	private final double mBrutalLevelThreeFlatDamageIncrease;
-	private final double mBrutalLevelThreeMultDamageIncrease;
-	private final double mBrutalLevelThreeExplosionDamageMult;
 	private final double mRadiusMultiplier;
 	private final double mMainDamageMultiplier;
 	private final double mDetonateRadius;
@@ -229,12 +230,6 @@ public class VolatileReaction extends Ability implements PotionAbility {
 	public VolatileReaction(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
-		mGruesomeLevelThreeSlownessAmount = GruesomeAlchemy.GRUESOME_ALCHEMY_3_SLOWNESS_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_SLOWNESS);
-		mGruesomeLevelThreeVulnerabilityAmount = GruesomeAlchemy.GRUESOME_ALCHEMY_3_VULNERABILITY_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_VULNERABILITY);
-		mGruesomeLevelThreeWeakenAmount = GruesomeAlchemy.GRUESOME_ALCHEMY_3_WEAKEN_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_WEAKEN);
-		mBrutalLevelThreeFlatDamageIncrease = BrutalAlchemy.DOT_FLAT_INCREASE_3 + CharmManager.getLevel(mPlayer, BrutalAlchemy.CHARM_DOT_INCREASE_DAMAGE_FLAT);
-		mBrutalLevelThreeMultDamageIncrease = BrutalAlchemy.DOT_MULT_INCREASE_3 + CharmManager.getLevelPercentDecimal(mPlayer, BrutalAlchemy.CHARM_DOT_INCREASE_DAMAGE_MULT);
-		mBrutalLevelThreeExplosionDamageMult = BrutalAlchemy.DOT_EXPLOSION_MULT_3 + CharmManager.getLevelPercentDecimal(mPlayer, BrutalAlchemy.CHARM_DOT_EXPLOSION_DAMAGE_MULT);
 		mRadiusMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS_MULTIPLIER, POTION_RADIUS_MULTIPLIER);
 		mMainDamageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MAIN_DAMAGE_MULTIPLIER, isLevelOne() ? MAIN_DAMAGE_MULTIPLIER_1 : MAIN_DAMAGE_MULTIPLIER_2);
 		mDetonateRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DETONATE_RADIUS, DETONATE_RADIUS);
@@ -431,69 +426,64 @@ public class VolatileReaction extends Ability implements PotionAbility {
 	}
 
 	private static Description<VolatileReaction> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to consume a potion and throw a Volatile Concoction with ")
-			.addPercent(a -> a.mRadiusMultiplier, POTION_RADIUS_MULTIPLIER)
-			.add(" radius which deals no damage, but marks all hit mobs as Volatile.")
-			.add(" When Volatile mobs gain either Gruesome or Brutal effects, they explode, taking ")
-			.addPercent(a -> a.mMainDamageMultiplier, MAIN_DAMAGE_MULTIPLIER_1, false, Ability::isLevelOne)
-			.add(" of your potion's damage, and dealing ")
-			.addPercent(a -> a.mDetonateDamageMultiplier, DETONATION_DAMAGE_MULTIPLIER)
-			.add(" of your potion's damage within a ")
-			.add(a -> a.mDetonateRadius, DETONATE_RADIUS)
-			.add(" block radius, spreading the Gruesome or Brutal effect they were hit with. ")
-			.add("Additionally, the potency of the effect applied to the Volatile mobs is increased by one level. ")
-			.addCooldown(COOLDOWN)
-			.add(Component.text("\nBrutal Alchemy level 3 effect:\n").color(NamedTextColor.YELLOW))
-			.add(getDescriptionBrutalAlchemy3())
-			.add(Component.text("\nGruesome Alchemy level 3 effect:\n").color(NamedTextColor.YELLOW))
-			.add(getDescriptionGruesomeAlchemy3());
+			.addDashedLine()
+			.addLine("Spend *1* potion to throw a concoction that").styles(WHITE)
+			.addLine("deals no damage, but makes mobs *Volatile*.").styles(VOLATILE_COLOR)
+			.addLine()
+			.addStat("Concoction Radius: %p (of potion radius)")
+			.statValues(stat(a -> a.mRadiusMultiplier, POTION_RADIUS_MULTIPLIER))
+			.addLine()
+			.addLine("Afflicting a *Volatile* mob with *Gruesome* or").styles(VOLATILE_COLOR, GRUESOME_COLOR)
+			.addLine("*Brutal* causes an explosion that damages that").styles(BRUTAL_COLOR)
+			.addLine("mob and other nearby mobs, spreading the")
+			.addLine("*Gruesome*/*Brutal* effect to other mobs.").styles(GRUESOME_COLOR, BRUTAL_COLOR)
+			.addLine()
+			.addLine("Additionally, the level of the *Gruesome*/*Brutal*").styles(GRUESOME_COLOR, BRUTAL_COLOR)
+			.addLine("effect applied to the main mob is increased by *1*.").styles(WHITE)
+			.addLine()
+			.addStat("Direct Damage: %p (s) (of potion damage)")
+				.statValues(stat(a -> a.mMainDamageMultiplier, MAIN_DAMAGE_MULTIPLIER_1))
+			.addStat("Explosion Damage: %p (s) (of potion damage)")
+				.statValues(stat(a -> a.mDetonateDamageMultiplier, DETONATION_DAMAGE_MULTIPLIER))
+			.addStat("Explosion Radius: %r")
+				.statValues(stat(a -> a.mDetonateRadius, DETONATE_RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<VolatileReaction> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Volatile mobs hit with both Gruesome and Brutal effects now explode for a second time. The main damage of both explosions is increased to ")
-			.addPercent(a -> a.mMainDamageMultiplier, MAIN_DAMAGE_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(" of your potion's damage.");
-	}
-
-	private static Description<VolatileReaction> getDescriptionBrutalAlchemy3() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Refreshing the DoT now increases its potency by ")
-			.add(a -> a.mBrutalLevelThreeFlatDamageIncrease, BrutalAlchemy.DOT_FLAT_INCREASE_3)
-			.add(" + ")
-			.addPercent(a -> a.mBrutalLevelThreeMultDamageIncrease, BrutalAlchemy.DOT_MULT_INCREASE_3)
-			.add(" of your potion's damage. The additional damage from the explosion is now ")
-			.addPercent(a -> a.mBrutalLevelThreeExplosionDamageMult, BrutalAlchemy.DOT_EXPLOSION_MULT_3)
-			.add(" of your potion's damage.");
-	}
-
-	private static Description<VolatileReaction> getDescriptionGruesomeAlchemy3() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The slow is increased to ")
-			.addPercent(a -> a.mGruesomeLevelThreeSlownessAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_3_SLOWNESS_AMPLIFIER)
-			.add(", the vulnerability is increased to ")
-			.addPercent(a -> a.mGruesomeLevelThreeVulnerabilityAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_3_VULNERABILITY_AMPLIFIER)
-			.add(", and the weakness is increased to ")
-			.addPercent(a -> a.mGruesomeLevelThreeWeakenAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_3_WEAKEN_AMPLIFIER)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("*Volatile* mobs afflicted with both *Gruesome*").styles(VOLATILE_COLOR, GRUESOME_COLOR)
+			.addLine("and *Brutal* now cause a second explosion.").styles(BRUTAL_COLOR)
+			.addLine()
+			.addLine("The direct damage of both explosions is increased.")
+			.addLine()
+			.addStatComparison("Direct Damage: %p1 -> %p2 (s)")
+			.statValues(stat(MAIN_DAMAGE_MULTIPLIER_1), stat(a -> a.mMainDamageMultiplier, MAIN_DAMAGE_MULTIPLIER_2))
+			.addDashedLine();
 	}
 
 	private static Description<VolatileReaction> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Volatile mobs hit with both Gruesome and Brutal effects now spread a DoT with stacking potency to the enemy with the highest remaining health within ")
-			.add(a -> a.mEnhancementDotSpreadRadius, ENHANCEMENT_DOT_SPREAD_RADIUS)
-			.add(" blocks (capped at ")
-			.add(a -> a.mEnhancementSpreadCap, ENHANCEMENT_SPREAD_CAP)
-			.add(" stacks). The DoT has a base delay of ")
-			.addDuration(a -> a.mEnhancementDotBaseTickDelay, ENHANCEMENT_DOT_BASE_TICK_DELAY)
-			.add("s between each tick. For each stack, it ticks an additional ")
-			.add(a -> a.mEnhancementDotTicksPerStack, ENHANCEMENT_DOT_TICKS_PER_STACK)
-			.add(" times, deals ")
-			.addPercent(a -> a.mEnhancementDotPotencyPerStack, ENHANCEMENT_DOT_POTENCY_PER_STACK)
-			.add(" more of your potion's damage, and has the tick delay reduced by ")
-			.addDuration(a -> a.mEnhancementTickDelayReductionPerStack, ENHANCEMENT_DOT_TICK_DELAY_REDUCTION_PER_STACK)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Volatile* mobs hit with both *Gruesome* and").styles(VOLATILE_COLOR, GRUESOME_COLOR)
+			.addLine("*Brutal* now spread a damaging effect to the").styles(BRUTAL_COLOR)
+			.addLine("highest HP mob within %d blocks.")
+			.statValues(stat(a -> a.mEnhancementDotSpreadRadius, ENHANCEMENT_DOT_SPREAD_RADIUS))
+			.addLine()
+			.addLine("The effect can stack up to %d times, and")
+			.statValues(stat(a -> a.mEnhancementSpreadCap, ENHANCEMENT_SPREAD_CAP))
+			.addLine("for each stack, it deals more damage, damages")
+			.addLine("more frequently, and hits more times.")
+			.addLine()
+			.addStat("Damage: %p (s) per stack (of potion damage)")
+			.statValues(stat(a -> a.mEnhancementDotPotencyPerStack, ENHANCEMENT_DOT_POTENCY_PER_STACK))
+			.addStat("Interval: every %t, -%t per stack")
+			.statValues(stat(a -> a.mEnhancementDotBaseTickDelay, ENHANCEMENT_DOT_BASE_TICK_DELAY), stat(a -> a.mEnhancementTickDelayReductionPerStack, ENHANCEMENT_DOT_TICK_DELAY_REDUCTION_PER_STACK))
+			.addStat("Duration: %d hits per stack")
+			.statValues(stat(a -> a.mEnhancementDotTicksPerStack, ENHANCEMENT_DOT_TICKS_PER_STACK))
+			.addDashedLine();
 	}
 }

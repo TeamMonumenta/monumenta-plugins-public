@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.abilities.rogue.swordsage;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -31,6 +30,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class WindWalk extends MultipleChargeAbility {
 
@@ -154,21 +157,36 @@ public class WindWalk extends MultipleChargeAbility {
 	}
 
 	private static Description<WindWalk> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to dash in the direction you are facing, stunning and levitating enemies for ")
-			.addDuration(a -> a.mDuration, WIND_WALK_DURATION)
-			.add(" seconds. Elites are not levitated. Charges: ")
-			.add(a -> a.mMaxCharges, WIND_WALK_MAX_CHARGES)
-			.add(".")
-			.addCooldown(WIND_WALK_1_COOLDOWN, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Dash forwards, stunning and ")
+			.addLine("levitating mobs in your path.")
+			.addLine("(Elites/Bosses are not levitated)")
+			.addLine()
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mDuration, WIND_WALK_DURATION))
+			.addStat("Effect: Levitation 1 for %t")
+				.statValues(stat(a -> a.mDuration, WIND_WALK_DURATION))
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, WIND_WALK_MAX_CHARGES))
+			.addStat("Cooldown: %t1 (per charge)")
+				.statValues(cooldown(WIND_WALK_1_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<WindWalk> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Casting this ability reduces the cooldown of all other abilities by ")
-			.addDuration(a -> a.mCDR, WIND_WALK_CDR)
-			.add(" seconds.")
-			.addCooldown(WIND_WALK_2_COOLDOWN, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Reduce *Wind Walk*'s cooldown.").styles(UNDERLINED)
+			.addLine()
+			.addLine("Casting *Wind Walk* reduces all").styles(UNDERLINED)
+			.addLine("your other ability cooldowns.")
+			.addLine()
+			.addStatComparison("Cooldown: %t1 -> %t2 (per charge)")
+				.statValues(cooldown(WIND_WALK_1_COOLDOWN), cooldown(WIND_WALK_2_COOLDOWN))
+			.addStat("Cooldown Reduction: %t")
+				.statValues(stat(a -> a.mCDR, WIND_WALK_CDR))
+			.addDashedLine();
 	}
 }

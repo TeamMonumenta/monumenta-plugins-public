@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.IndependentIframeTracker;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
@@ -67,7 +67,10 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 import static com.playmonumenta.plugins.abilities.alchemist.PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.TRIGGER_TEXT;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 /*
  * Handles giving potions and the direct damage aspect
@@ -672,28 +675,25 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		return output;
 	}
 
-	private static Description<AlchemistPotions> getDescription() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Allows using Alchemical Utensils. You gain 1 potion every ")
-			.addDuration(POTIONS_TIMER_BASE)
-			.add("s, up to a maximum of ")
-			.add(a -> a.mMaxCharges, MAX_CHARGES)
-			.add(".\n")
-			.add(Component.text("Right click while holding an Alchemist's Bag and not sneaking ").color(NamedTextColor.YELLOW))
-			.add("to throw a Brutal potion, which deals ")
-			.addPercent(a -> a.mBrutalDamageMultiplier, BrutalAlchemy.BRUTAL_POTION_DAMAGE_MULTIPLIER)
-			.add(" of your base potion's damage as magic damage, to enemies near the point of impact.\n")
-			.addTrigger()
-			.add(" to throw a Gruesome potion, which deals ")
-			.addPercent(a -> a.mGruesomeDamageMultiplier, GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER)
-			.add(" of your base potion's damage as magic damage, and applies ")
-			.addPercent(a -> a.mLevelZeroSlownessAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_0_SLOWNESS_AMPLIFIER)
-			.add(" slowness, ")
-			.addPercent(a -> a.mLevelZeroVulnerabilityAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_0_VULNERABILITY_AMPLIFIER)
-			.add(" vulnerability, and ")
-			.addPercent(a -> a.mLevelZeroWeakenAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_0_WEAKEN_AMPLIFIER)
-			.add(" weakness to affected mobs, for ")
-			.addDuration(a -> a.mLevelZeroDuration, GruesomeAlchemy.GRUESOME_ALCHEMY_DURATION)
-			.add("s.");
+	public static Description<AlchemistPotions> getDescription() {
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addLine("Allows using Alchemical Utensils.")
+			.addLine("You gain *1* potion every %t, up to").styles(WHITE)
+				.statValues(stat(POTIONS_TIMER_BASE))
+			.addLine("a maximum of %d potions.")
+				.statValues(stat(a -> a.mMaxCharges, MAX_CHARGES))
+			.addLine()
+			.addLine("*Right Button* to throw *Brutal* potions").styles(TRIGGER_TEXT, Alchemist.BRUTAL_COLOR)
+			.addLine("that deal magic damage (s) in an area.")
+			.addLine()
+			.addLine("*Left Button* to throw *Gruesome* potions").styles(TRIGGER_TEXT, Alchemist.GRUESOME_COLOR)
+			.addLine("that deal %p of regular damage, but ")
+				.statValues(stat(a -> a.mGruesomeDamageMultiplier, GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER))
+			.addLine("inflict %p *Slowness*, %p *Vulnerability*,").styles(WHITE, WHITE)
+				.statValues(stat(a -> a.mLevelZeroSlownessAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_0_SLOWNESS_AMPLIFIER),
+					stat(a -> a.mLevelZeroVulnerabilityAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_0_VULNERABILITY_AMPLIFIER))
+			.addLine("and %p *Weakness* to mobs for %t.").styles(WHITE)
+				.statValues(stat(a -> a.mLevelZeroWeakenAmount, GruesomeAlchemy.GRUESOME_ALCHEMY_0_WEAKEN_AMPLIFIER),
+					stat(a -> a.mLevelZeroDuration, GruesomeAlchemy.GRUESOME_ALCHEMY_DURATION));
 	}
 }

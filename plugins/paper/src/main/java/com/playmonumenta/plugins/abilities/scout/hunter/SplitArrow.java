@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -33,6 +33,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+
 public class SplitArrow extends Ability {
 
 	private static final double SPLIT_ARROW_1_DAMAGE_PERCENT = 0.35;
@@ -56,6 +59,7 @@ public class SplitArrow extends Ability {
 
 	private final double mRange;
 	private final double mDamagePercent;
+	private final int mBounces;
 	private @Nullable SwiftCuts mSwiftCuts;
 	private final SplitArrowCS mCosmetic;
 
@@ -63,6 +67,7 @@ public class SplitArrow extends Ability {
 		super(plugin, player, INFO);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, SPLIT_ARROW_CHAIN_RANGE);
 		mDamagePercent = isLevelOne() ? SPLIT_ARROW_1_DAMAGE_PERCENT : SPLIT_ARROW_2_DAMAGE_PERCENT;
+		mBounces = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_BOUNCES);
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SwiftCuts.class);
 		});
@@ -73,7 +78,7 @@ public class SplitArrow extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && !proj.getScoreboardTags().contains("SourceQuickDrawVolley") && EntityUtils.isHostileMob(enemy)) {
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getDamage() * mDamagePercent);
-			int count = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_BOUNCES);
+			int count = mBounces;
 			if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
 				count += SwiftCuts.SPLIT_ARROW_BUFF;
 			}
@@ -118,18 +123,29 @@ public class SplitArrow extends Ability {
 	}
 
 	private static Description<SplitArrow> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When you hit an enemy with a projectile, the next nearest enemy within ")
-			.add(a -> a.mRange, SPLIT_ARROW_CHAIN_RANGE)
-			.add(" blocks takes ")
-			.addPercent(a -> a.mDamagePercent, SPLIT_ARROW_1_DAMAGE_PERCENT, false, Ability::isLevelOne)
-			.add(" of the original arrow damage. This ability cannot be triggered by Volleys initiated by Quickdraw.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("When you hit a mob with a projectile,")
+			.addLine("the nearest mob near the target takes")
+			.addLine("a portion of the projectile's damage.")
+			.addLine()
+			.addIf((a, p) -> a != null && a.mBounces != 1, desc -> desc
+				.addStat("Bounces: %d")
+				.statValues(stat(a -> a.mBounces, 1)))
+			.addStat("Damage: %p1 (p)")
+				.statValues(stat(a -> a.mDamagePercent, SPLIT_ARROW_1_DAMAGE_PERCENT))
+			.addStat("Range: %r")
+				.statValues(stat(a -> a.mRange, SPLIT_ARROW_CHAIN_RANGE))
+			.addDashedLine();
 	}
 
 	private static Description<SplitArrow> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage to the second target is increased to ")
-			.addPercent(a -> a.mDamagePercent, SPLIT_ARROW_2_DAMAGE_PERCENT, false, Ability::isLevelTwo)
-			.add(" of the original arrow damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Split Arrow*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage: %p1 -> %p2 (p)")
+				.statValues(stat(SPLIT_ARROW_1_DAMAGE_PERCENT), stat(a -> a.mDamagePercent, SPLIT_ARROW_2_DAMAGE_PERCENT))
+			.addDashedLine();
 	}
 }

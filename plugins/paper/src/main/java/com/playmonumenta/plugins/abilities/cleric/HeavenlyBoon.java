@@ -8,10 +8,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.HeavenlyBoonCS;
 import com.playmonumenta.plugins.effects.HeavenlyBoonTracker;
@@ -35,6 +36,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public final class HeavenlyBoon extends Ability implements KillTriggeredAbility {
 	private static final String BOON_EFFECT_NAME = "ClericHeavenlyBoonTracker";
@@ -247,47 +253,69 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		}
 	}
 
-	// This one is kind of terrible so I just didn't include a bunch of stuff
 	private static Description<HeavenlyBoon> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Whenever you are hit with a positive splash potion, the effects are also given to other players within ")
-			.add(a -> a.mRadius, HEAVENLY_BOON_RADIUS)
-			.add(" blocks. In addition, whenever a Heretic you have hit within ")
-			.addDuration(MOB_EFFECT_DURATION)
-			.add(" seconds dies or you deal enough non-true damage to a boss (R1 " + BOSS_DAMAGE_THRESHOLD_R1 + "/R2 " + BOSS_DAMAGE_THRESHOLD_R2 + "/R3 " + BOSS_DAMAGE_THRESHOLD_R3 + "), you have a ")
-			.addPercent(a -> a.mChance, HEAVENLY_BOON_1_CHANCE, false, Ability::isLevelOne)
-			.add(" chance to be splashed with a ")
-			.addPercent(HEAVENLY_BOON_HEAL)
-			.add(" Instant Health potion, with an additional effect of either Regeneration ")
-			.addPotionAmplifier(a -> HEAVENLY_BOON_REGEN, HEAVENLY_BOON_REGEN)
-			.add(", ")
-			.addPercent(HEAVENLY_BOON_STRENGTH)
-			.add(" strength, ")
-			.addPercent(HEAVENLY_BOON_RESISTANCE)
-			.add(" resistance, ")
-			.addPercent(HEAVENLY_BOON_SPEED)
-			.add(" speed, or ")
-			.addPercent(HEAVENLY_BOON_ABSORPTION)
-			.add(" absorption with a ")
-			.addDuration(HEAVENLY_BOON_DURATION_1)
-			.add(" second duration.")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("When you are splashed with a beneficial potion,")
+			.addLine("all nearby players also gain its effects.")
+			.addLine()
+			.addStat("Potion Sharing Radius: %r")
+				.statValues(stat(a -> a.mRadius, HEAVENLY_BOON_RADIUS))
+			.addLine()
+			.addLine("When a *Heretic* you've damaged in the last %t dies,").styles(Cleric.HERETIC_COLOR)
+				.statValues(stat(MOB_EFFECT_DURATION))
+			.addLine("or when you deal %d damage to Bosses, you")
+				.statValues(perRegion(BOSS_DAMAGE_THRESHOLD_R1, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3))
+			.addLine("have a chance to be splashed by a healing")
+			.addLine("potion with a random bonus effect.")
+			.addLine()
+			.addStat("Potion Chance: %p")
+				.statValues(stat(a -> a.mChance, HEAVENLY_BOON_1_CHANCE))
+			.addStat("Healing: %p HP")
+				.statValues(stat(HEAVENLY_BOON_HEAL))
+			.addStat("Bonus Effect: (randomly chosen)")
+				.addListItem("Regeneration %d").statValues(stat(HEAVENLY_BOON_REGEN + 1))
+				.addListItem("+%p Damage").statValues(stat(HEAVENLY_BOON_STRENGTH))
+				.addListItem("+%p Resistance").statValues(stat(HEAVENLY_BOON_RESISTANCE))
+				.addListItem("+%p Speed").statValues(stat(HEAVENLY_BOON_SPEED))
+				.addListItem("+%p Absorption").statValues(stat(HEAVENLY_BOON_ABSORPTION))
+			.addStat("Bonus Effect Duration: %t1")
+				.statValues(stat(a -> HEAVENLY_BOON_DURATION_1 + a.mDurationChange, HEAVENLY_BOON_DURATION_1))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<HeavenlyBoon> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Boon generated potions now give ")
-			.addDuration(HEAVENLY_BOON_DURATION_2)
-			.add(" second effect duration.")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Heavenly Boon*'s bonus effect").styles(UNDERLINED)
+			.addLine("duration and reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Bonus Effect Duration: %t1 -> %t2")
+				.statValues(
+					stat(HEAVENLY_BOON_DURATION_1),
+					stat(a -> HEAVENLY_BOON_DURATION_2 + a.mDurationChange, HEAVENLY_BOON_DURATION_2))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(
+					cooldown(COOLDOWN_1),
+					cooldown(COOLDOWN_2))
+			.addDashedLine();
 	}
 
 	private static Description<HeavenlyBoon> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When a potion is created by this skill, decrease all other ability cooldowns of all players in the radius by ")
-			.addPercent(a -> a.mEnhanceCDR, ENHANCEMENT_CDR)
-			.add(" (max ")
-			.addDuration(a -> a.mEnhanceCDRCap, ENHANCEMENT_CDR_CAP)
-			.add(" seconds).");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("When *Heavenly Boon* spawns a potion, reduce").styles(UNDERLINED)
+			.addLine("the ability cooldowns of all nearby players.")
+			.addLine("(Doesn't reduce this ability's cooldown)")
+			.addLine()
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, HEAVENLY_BOON_RADIUS))
+			.addStat("Cooldown Reduction: %p (max %t)")
+				.statValues(
+					stat(a -> a.mEnhanceCDR, ENHANCEMENT_CDR),
+					stat(a -> a.mEnhanceCDRCap, ENHANCEMENT_CDR_CAP))
+			.addDashedLine();
 	}
 }

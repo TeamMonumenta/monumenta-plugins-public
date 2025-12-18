@@ -1,16 +1,16 @@
 package com.playmonumenta.plugins.abilities.shaman.soothsayer;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.shaman.ShamanPassiveManager;
 import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.TotemicConsecrationCS;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +33,10 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class TotemicConsecration extends MultipleChargeAbility {
 	private static final int CHARGES = 2;
@@ -59,6 +65,8 @@ public class TotemicConsecration extends MultipleChargeAbility {
 	public static final String CHARM_RADIUS_AMPLIFIER = "Totemic Consecration Totem Radius Amplifier";
 	public static final String CHARM_RESISTANCE = "Totemic Consecration Resistance Amplifier";
 	public static final String CHARM_SILENCE_DURATION = "Totemic Consecration Silence Duration";
+
+	public static final Style SACRED_COLOR = Style.style(TextColor.color(0xDED3B1));
 
 	public static final AbilityInfo<TotemicConsecration> INFO =
 		new AbilityInfo<>(TotemicConsecration.class, "Totemic Consecration", TotemicConsecration::new)
@@ -214,35 +222,51 @@ public class TotemicConsecration extends MultipleChargeAbility {
 	}
 
 	private static Description<TotemicConsecration> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" while looking at a totem to mark it as Sacred for the remainder of its duration. Marked totems will instantly deal ")
-			.add(a -> a.mBaseDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage to all mobs within range, plus ")
-			.add(a -> a.mBonusDamage, BONUS_DAMAGE)
-			.add(" extra damage per ")
-			.addDuration(a -> a.mDurationPerBonus, DURATION_PER_BONUS)
-			.add(" seconds remaining on the totem. Sacred Totems grant every player in the radius ")
-			.addPercent(a -> a.mResistance, RESISTANCE)
-			.add(" resistance, and will also grant a player in its radius ")
-			.addPercent(a -> a.mAbsorption, ABSORPTION_PERCENT)
-			.add(" of their max health as absorption exactly once if they drop below ")
-			.addPercent(a -> a.mHealthThreshold, HEALTH_THRESHOLD)
-			.add(" health, then lose its Sacred empowerment. Charges: ")
-			.add(a -> a.mMaxCharges, CHARGES)
-			.add(".")
-			.addCooldown(COOLDOWN, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Consecrate a targeted *Totem* as a *Sacred Totem*.").styles(Shaman.TOTEM_COLOR, SACRED_COLOR)
+			.addLine()
+			.addLine("The *Sacred Totem* immediately deals damage to all").styles(SACRED_COLOR)
+			.addLine("mobs in its area, plus bonus damage based on its")
+			.addLine("remaining duration.")
+			.addLine()
+			.addStat("Damage: %d1 (s), +%d1 per %t of duration left").styles(Shaman.TOTEM_COLOR)
+				.statValues(stat(a -> a.mBaseDamage, DAMAGE_1), stat(a -> a.mBonusDamage, BONUS_DAMAGE), stat(a -> a.mDurationPerBonus, DURATION_PER_BONUS))
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, CHARGES))
+			.addStat("Cooldown: %t1 (per charge)")
+				.statValues(cooldown(COOLDOWN))
+			.addLine()
+			.addLine("*Sacred Totems* grant resistance to players inside.").styles(SACRED_COLOR)
+			.addLine("If a player's health drops below %p HP, the *Totem*").styles(Shaman.TOTEM_COLOR)
+				.statValues(stat(a -> a.mHealthThreshold, HEALTH_THRESHOLD))
+			.addLine("loses its *Sacred* power to grant them absorption.").styles(SACRED_COLOR)
+			.addLine()
+			.addStat("Effect: +%p Resistance")
+				.statValues(stat(a -> a.mResistance, RESISTANCE))
+			.addStat("Effect: +%p Absorption for %t")
+				.statValues(stat(a -> a.mAbsorption, ABSORPTION_PERCENT), stat(ABSORPTION_DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<TotemicConsecration> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased to ")
-			.add(a -> a.mBaseDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" and non-Elite/Boss mobs are silenced for ")
-			.addDuration(a -> a.mSilenceDuration, SILENCE_DURATION)
-			.add(" seconds when that damage is dealt. Additionally Sacred Totems gain a ")
-			.addPercent(a -> a.mRadiusAmplifier, TOTEM_RADIUS_AMPLIFIER, false, Ability::isLevelTwo)
-			.add(" boost to their radius.")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Totemic Consecration*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mBaseDamage, DAMAGE_2))
+			.addLine()
+			.addLine("Consecrating a *Totem* as a *Sacred Totem*").styles(Shaman.TOTEM_COLOR, SACRED_COLOR)
+			.addLine("now increases its radius and silences all")
+			.addLine("mobs inside.")
+			.addLine("(Elites/Bosses are immune)")
+			.addLine()
+			.addStat("Radius Increase: +%p")
+				.statValues(stat(a -> a.mRadiusAmplifier, TOTEM_RADIUS_AMPLIFIER))
+			.addStat("Effect: Silence for %t")
+				.statValues(stat(a -> a.mSilenceDuration, SILENCE_DURATION))
+			.addDashedLine();
 	}
 }

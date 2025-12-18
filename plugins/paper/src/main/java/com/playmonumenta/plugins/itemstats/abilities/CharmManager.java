@@ -1634,7 +1634,7 @@ public class CharmManager {
 		Set<String> orderedEffects = summary.keySet();
 
 		for (String s : orderedEffects) {
-			final String normalized = s.replace("%", "").replace("# ", "").replace("(LOCKED)", "").trim();
+			final String normalized = getPlainEffectName(s);
 			double baseValue = summary.getOrDefault(s, 0.0);
 			double value = getValueOrCap(baseValue, normalized, charmType); // we need to replace % here otherwise things don't work correctly (see bug 19814)
 			if (value != 0) {
@@ -1858,6 +1858,10 @@ public class CharmManager {
 
 	public static TextColor getCharmEffectColor(boolean isPositive, boolean invertColor) {
 		return TextColor.fromHexString(isPositive != invertColor ? "#4AC2E5" : "#D02E28");
+	}
+
+	public static String getPlainEffectName(String effect) {
+		return effect.replace("%", "").replace("# ", "").replace("(LOCKED)", "").trim();
 	}
 
 	public static class CharmParsedInfo {

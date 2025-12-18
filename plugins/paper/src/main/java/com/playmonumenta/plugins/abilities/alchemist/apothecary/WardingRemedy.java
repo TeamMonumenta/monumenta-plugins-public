@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.WardingRemedyCS;
@@ -21,6 +21,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class WardingRemedy extends Ability implements AbilityWithDuration {
 
@@ -159,31 +163,37 @@ public class WardingRemedy extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<WardingRemedy> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to give players (including yourself) within ")
-			.add(a -> a.mRange, RANGE)
-			.add(" blocks ")
-			.add(a -> a.mAbsorption, ABSORPTION)
-			.add(" absorption health every ")
-			.addDuration(a -> a.mDelay, PULSE_DELAY)
-			.add(" seconds for ")
-			.addDuration(WardingRemedy::getInitialAbilityDuration, PULSES * PULSE_DELAY)
-			.add(" seconds, lasting ")
-			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
-			.add(" seconds, up to ")
-			.add(a -> a.mMaxAbsorption, MAX_ABSORPTION)
-			.add(" absorption health.")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Grant yourself and other nearby players")
+			.addLine("absorption every %t for the next %t.")
+				.statValues(stat(a -> a.mDelay, PULSE_DELAY), stat(a -> a.mDelay * a.mTotalPulses, PULSES * PULSE_DELAY))
+			.addLine()
+			.addStat("Effect: +%d Absorption for %t (max +%d)")
+				.statValues(stat(a -> a.mAbsorption, ABSORPTION), stat(a -> a.mAbsorptionDuration, ABSORPTION_DURATION), stat(a -> a.mMaxAbsorption, MAX_ABSORPTION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRange, RANGE))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<WardingRemedy> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("You and allies within ")
-			.add(a -> a.mRange, RANGE)
-			.add(" blocks passively gain ")
-			.addPercent(a -> a.mResistanceAmp, RESISTANCE_AMP)
-			.add(" resistance while having absorption health.")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Reduce *Warding Remedy*'s cooldown.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(COOLDOWN_1), cooldown(COOLDOWN_2))
+			.addLine()
+			.addLine("Passively, you and other nearby players")
+			.addLine("gain resistance while having absorption.")
+			.addLine()
+			.addStat("Effect: +%p Resistance")
+				.statValues(stat(a -> a.mResistanceAmp, RESISTANCE_AMP))
+			.addStat("Passive Radius: %r")
+				.statValues(stat(a -> a.mRange, RANGE))
+			.addDashedLine();
 	}
 }

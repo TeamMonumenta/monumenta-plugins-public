@@ -6,8 +6,10 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
+import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.AlchemicalArtilleryCS;
@@ -38,6 +40,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class AlchemicalArtillery extends Ability {
 	private static final int COOLDOWN = 20 * 6;
@@ -398,43 +404,53 @@ public class AlchemicalArtillery extends Ability {
 	}
 
 	private static Description<AlchemicalArtillery> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to launch a heavy bomb at the cost of ")
-			.add(a -> a.mCost, POTION_COST, true, Ability::isLevelOne)
-			.add(" potions, which inherits ")
-			.addPercent(a -> a.mBaseVelocityMult, VELOCITY_MULTIPLIER)
-			.add(" of your potion's velocity, and explodes on contact with the ground, lava, any mob, or after 6 seconds, dealing ")
-			.add(a -> a.mDamageRaw, DAMAGE_RAW_1, false, Ability::isLevelOne)
-			.add(" + ")
-			.addPercent(a -> a.mDamageMult, DAMAGE_MULTIPLIER_1, false, Ability::isLevelOne)
-			.add(" of your potion's damage and applying Brutal, in an area that is ")
-			.addPercent(a -> a.mRadiusMult, RADIUS_MULTIPLIER_1, false, Ability::isLevelOne)
-			.add(" of your potion's radius. The initial speed of the bomb scales with your projectile speed.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Spend %d potions to launch a bomb that")
+				.statValues(stat(a -> a.mCost, POTION_COST))
+			.addLine("explodes on contact, dealing damage and")
+			.addLine("applying *1* stack of *Brutal* to mobs hit.").styles(WHITE, Alchemist.BRUTAL_COLOR)
+			.addLine()
+			.addIf((a, p) -> a != null && a.mBaseVelocityMult != VELOCITY_MULTIPLIER, desc -> desc
+				.addStat("Velocity: %p")
+					.statValues(stat(a -> a.mBaseVelocityMult, VELOCITY_MULTIPLIER)))
+			.addStat("Damage: %d1 + %p1 (s) (of potion damage)")
+				.statValues(stat(a -> a.mDamageRaw, DAMAGE_RAW_1), stat(a -> a.mDamageMult, DAMAGE_MULTIPLIER_1))
+			.addStat("Radius: %p (of potion radius)")
+				.statValues(stat(a -> a.mRadiusMult, RADIUS_MULTIPLIER_1))
+			.addStat("Cooldown: %t")
+				.statValues(StatValue.cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<AlchemicalArtillery> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The bomb's damage is increased to ")
-			.add(a -> a.mDamageRaw, DAMAGE_RAW_2, false, Ability::isLevelTwo)
-			.add(" + ")
-			.addPercent(a -> a.mDamageMult, DAMAGE_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(" of your potion's damage, its radius is increased to ")
-			.addPercent(a -> a.mRadiusMult, RADIUS_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(" of your potion's radius, and it now applies Brutal twice.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Alchemical Artillery*'s damage").styles(UNDERLINED)
+			.addLine("and radius, and it now applies *2* stacks").styles(WHITE)
+			.addLine("of *Brutal*.").styles(Alchemist.BRUTAL_COLOR)
+			.addLine()
+			.addStatComparison("Damage: %d1 + %p1 -> %d2 + %p2 (s)")
+				.statValues(stat(DAMAGE_RAW_1), stat(DAMAGE_MULTIPLIER_1), stat(a -> a.mDamageRaw, DAMAGE_RAW_2), stat(a -> a.mDamageMult, DAMAGE_MULTIPLIER_2))
+			.addStatComparison("Radius: %p1 -> %p2")
+				.statValues(stat(RADIUS_MULTIPLIER_1), stat(a -> a.mRadiusMult,	 RADIUS_MULTIPLIER_2))
+			.addDashedLine();
 	}
 
 	private static Description<AlchemicalArtillery> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The bomb now bounces on collision with terrain, up to a maximum of ")
-			.add(a -> a.mMaxBounceCount, ENHANCEMENT_MAX_BOUNCES)
-			.add(" times. With the first bounce, it gains ")
-			.add(a -> a.mBounceDamageRawIncrease, ENHANCEMENT_ADDED_DAMAGE_RAW_PER_BOUNCE)
-			.add(" + ")
-			.addPercent(a -> a.mBounceDamageMultiplierIncrease, ENHANCEMENT_ADDED_DAMAGE_MULTIPLIER_PER_BOUNCE)
-			.add(" of your potion's damage, and for each subsequent one it gains ")
-			.addPercent(a -> a.mBounceDamageFraction, ENHANCEMENT_BOUNCE_DAMAGE_FRACTION)
-			.add(" as much as the previous one.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("The bomb bounces off of terrain up to %d times.")
+				.statValues(stat(a -> a.mMaxBounceCount, ENHANCEMENT_MAX_BOUNCES))
+			.addLine()
+			.addLine("Each time it bounces, its damage increases.")
+			.addLine("Subsequent bounces give %p as much bonus")
+				.statValues(stat(a -> a.mBounceDamageFraction, ENHANCEMENT_BOUNCE_DAMAGE_FRACTION))
+			.addLine("damage as the previous bounce.")
+			.addLine()
+			.addStat("Bonus Damage: +%d + %p (s) on first bounce")
+				.statValues(stat(a -> a.mBounceDamageRawIncrease, ENHANCEMENT_ADDED_DAMAGE_RAW_PER_BOUNCE), stat(a -> a.mBounceDamageMultiplierIncrease, ENHANCEMENT_ADDED_DAMAGE_MULTIPLIER_PER_BOUNCE))
+			.addDashedLine();
 	}
 }

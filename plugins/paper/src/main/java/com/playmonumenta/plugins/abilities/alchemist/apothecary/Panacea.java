@@ -7,11 +7,12 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
+import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.PanaceaCS;
@@ -38,6 +39,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class Panacea extends Ability implements AbilityWithDuration {
 
@@ -287,44 +292,60 @@ public class Panacea extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<Panacea> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to shoot a mixture that deals ")
-			.addPercent(a -> a.mDamageMult, DAMAGE_FRACTION)
-			.add(" of your potion's damage, applies 100% slow for ")
-			.addDuration(a -> a.mSlowTicks, SLOW_TICKS_1, false, Ability::isLevelOne)
-			.add("s, and applies Level 1 Gruesome to mobs that are not already affected by it, or Level 1 Brutal otherwise. ")
-			.add("The mixture lowers the duration of all your vanilla potion debuffs by ")
-			.addDuration(a -> a.mDebuffReduction, DEBUFF_REDUCTION)
-			.add("s. All hit allies also receive this effect, and are granted ")
-			.add(a -> a.mShieldMobs, SHIELD_ALLIES_1, false, Ability::isLevelOne)
-			.add(" absorption health (max of ")
-			.add(a -> a.mMaxAbsorption, MAX_SHIELD)
-			.add(") for ")
-			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
-			.add("s. If the mixture hits a mob, all players within ")
-			.add(a -> a.mMobShieldRadius, MOB_SHIELD_RADIUS)
-			.add(" blocks of it are granted ")
-			.add(a -> a.mShieldMobs, SHIELD_MOBS, false, Ability::isLevelOne)
-			.add(" absorption health (max of ")
-			.add(a -> a.mMaxAbsorption, MAX_SHIELD)
-			.add(") for ")
-			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
-			.add("s, up to a maximum of ")
-			.add(a -> a.mMaxMobShieldHits, MAX_MOB_HITS)
-			.add(" mobs. After hitting a block or traveling ")
-			.add(a -> a.mMaxDuration * a.mMoveSpeed, MAX_DURATION * MOVE_SPEED)
-			.add(" blocks, the mixture returns to you, and is able to damage mobs and shield allies a second time.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Fire a slow-moving mixture in front of you.")
+			.addLine("Reduce the duration of your potion debuffs.")
+			.addLine()
+			.addLine("Other players hit by the mixture gain absorption,")
+			.addLine("and have their potion debuffs' durations reduced.")
+			.addLine()
+			.addStat("Effect: +%d1 Absorption for %t (max +%d)")
+				.statValues(stat(a -> a.mShieldAllies, SHIELD_ALLIES_1), stat(a -> a.mAbsorptionDuration, ABSORPTION_DURATION), stat(a -> a.mMaxAbsorption, MAX_SHIELD))
+			.addStat("Effect: -%t Debuff Duration")
+				.statValues(stat(a -> a.mDebuffReduction, DEBUFF_REDUCTION))
+			.addLine()
+			.addLine("Mobs hit by the mixture take damage, are rooted,")
+			.addLine("and are afflicted with *Level 1* *Gruesome*, or").styles(WHITE, Alchemist.GRUESOME_COLOR)
+			.addLine("*Brutal* if already afflicted by *Gruesome*.").styles(Alchemist.BRUTAL_COLOR, Alchemist.GRUESOME_COLOR)
+			.addLine("When the mixture hits a mob, all players near")
+			.addLine("that mob gain absorption. (max %d mobs per cast)")
+				.statValues(stat(a -> a.mMaxMobShieldHits, MAX_MOB_HITS))
+			.addLine()
+			.addStat("Damage: %p (s) (of potion damage)")
+				.statValues(stat(a -> a.mDamageMult, DAMAGE_FRACTION))
+			.addStat("Effect: Root for %t1")
+				.statValues(stat(a -> a.mSlowTicks, SLOW_TICKS_1))
+			.addStat("Effect: +%d Absorption per mob for %t")
+				.statValues(stat(a -> a.mShieldMobs, SHIELD_MOBS), stat(a -> a.mAbsorptionDuration, ABSORPTION_DURATION), stat(a -> a.mMaxAbsorption, MAX_SHIELD))
+			.addStat("Absorption Radius: %r")
+				.statValues(stat(a -> a.mMobShieldRadius, MOB_SHIELD_RADIUS))
+			.addLine()
+			.addLine("After hitting a block or traveling %d blocks,")
+				.statValues(stat(a -> a.mMaxDuration * a.mMoveSpeed, MAX_DURATION * MOVE_SPEED))
+			.addLine("the mixture returns back to you and can hit")
+			.addLine("mobs and players a second time.")
+			.addLine()
+			.addStat("Mixture Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<Panacea> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The level of Gruesome and Brutal inflicted is increased to 2. ")
-			.add("The absorption health granted to hit allies is increased to ")
-			.add(a -> a.mShieldAllies, SHIELD_ALLIES_2, false, Ability::isLevelTwo)
-			.add(", and the slow duration is increased to ")
-			.addDuration(a -> a.mSlowTicks, SLOW_TICKS_2, false, Ability::isLevelTwo)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Panacea*'s absorption for players and").styles(UNDERLINED)
+			.addLine("root duration for mobs.")
+			.addLine()
+			.addLine("*Panacea* now inflicts *Level 2* *Gruesome* and *Brutal*.").styles(UNDERLINED, WHITE, Alchemist.GRUESOME_COLOR, Alchemist.BRUTAL_COLOR)
+			.addLine()
+			.addStatComparison("Effect: +%d1 -> +%d2 Absorption")
+				.statValues(stat(SHIELD_ALLIES_1), stat(a -> a.mShieldAllies, SHIELD_ALLIES_2))
+			.addStatComparison("Effect: %t1 -> %t2 Root")
+				.statValues(stat(SLOW_TICKS_1), stat(a -> a.mSlowTicks, SLOW_TICKS_2))
+			.addDashedLine();
 	}
 }

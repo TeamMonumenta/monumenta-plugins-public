@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.GloriousBattleCS;
@@ -44,6 +45,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 
 public class GloriousBattle extends Ability {
@@ -251,37 +254,44 @@ public class GloriousBattle extends Ability {
 	}
 
 	private static Description<GloriousBattle> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" lunges you forward at a velocity of ")
-			.add(a -> a.mVelocity, VELOCITY)
-			.add(", granting knockback immunity (vertical velocity is capped at ")
-			.add(VERTICAL_SPEED_CAP)
-			.add("). While airborne, colliding with nearby mobs deal ")
-			.add(a -> a.mPierceDamage, PIERCE_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" melee damage. Critically attacking during Glorious Battle or ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add("s after landing causes a large overhead swing, dealing ")
-			.addPercent(a -> a.mCriticalDamage, CRITICAL_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" weapon damage to the struck mob and ")
-			.addPercent(a -> a.mAoeDamage, AOE_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" weapon damage to all other mobs within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks and knocks them back. ")
-			.add(" \n \n Cost: ")
-			.add(a -> a.mBloodlustCost, BLOODLUST_COST, true)
-			.add("x Bloodlust Stack.");
+			.addDashedLine()
+			.addLine("Spend %d stacks of *Bloodlust* to lunge horizontally,").styles(Bloodlust.BLOODLUST_COLOR)
+				.statValues(stat(a -> a.mBloodlustCost, BLOODLUST_COST))
+			.addLine("gain knockback immunity, and deal damage to mobs")
+			.addLine("while airborne.")
+			.addLine()
+			.addStat("Collision Damage: %d1 (m)")
+				.statValues(stat(a -> a.mPierceDamage, PIERCE_DAMAGE_1))
+			.addLine()
+			.addLine("Your next critical attack while airborne or for %t")
+				.statValues(stat(a -> a.mDuration, DURATION))
+			.addLine("after landing causes a large swing that deals")
+			.addLine("bonus damage to the target and nearby mobs.")
+			.addLine()
+			.addStat("Direct Damage: %p1 (m) (of the attack's damage)")
+				.statValues(stat(a -> a.mCriticalDamage, CRITICAL_DAMAGE_1))
+			.addStat("Area Damage: %p1 (m) (of the attack's damage)")
+				.statValues(stat(a -> a.mAoeDamage, AOE_DAMAGE_1))
+			.addStat("Area Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addDashedLine();
 	}
 
 	private static DescriptionBuilder<GloriousBattle> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Glorious Battle now deals ")
-			.add(a -> a.mPierceDamage, PIERCE_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" melee damage on collision, ")
-			.addPercent(a -> a.mCriticalDamage, CRITICAL_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" weapon damage to the struck mob, and ")
-			.addPercent(a -> a.mAoeDamage, AOE_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" weapon damage to all other mobs. The vertical cap is removed.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Glorious Battle*'s damage, and").styles(UNDERLINED)
+			.addLine("you can now lunge in any direction.")
+			.addLine()
+			.addStatComparison("Collision Damage: %d1 -> %d2 (m)")
+				.statValues(stat(PIERCE_DAMAGE_1), stat(a -> a.mPierceDamage, PIERCE_DAMAGE_2))
+			.addStatComparison("Direct Damage: %p1 -> %p2 (m)")
+				.statValues(stat(CRITICAL_DAMAGE_1), stat(a -> a.mCriticalDamage, CRITICAL_DAMAGE_2))
+			.addStatComparison("Area Damage: %p1 -> %p2 (m) ")
+			.statValues(stat(AOE_DAMAGE_1), stat(a -> a.mAoeDamage, AOE_DAMAGE_2))
+			.addDashedLine();
 	}
 
 }

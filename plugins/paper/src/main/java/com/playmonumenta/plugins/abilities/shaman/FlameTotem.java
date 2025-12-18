@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.abilities.shaman;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.FlameTotemCS;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
@@ -19,13 +19,16 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.List;
 import java.util.WeakHashMap;
-import java.util.function.Predicate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class FlameTotem extends TotemAbility {
 	private static final int INTERVAL = 30;
@@ -189,43 +192,64 @@ public class FlameTotem extends TotemAbility {
 	}
 
 	private static Description<FlameTotem> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to fire a projectile that summons a Flame Totem with a ")
-			.add(TotemAbility::getTotemRadius, AOE_RANGE_1, false, Ability::isLevelOne)
-			.add(" block radius. Every ")
-			.addDuration(a -> a.mInterval, INTERVAL, true)
-			.add(" seconds, so long as it is within your line of sight, the totem pulses with flames that do ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage to mobs also within your line of sight. Non-totem spells cast within the radius increase your Flame Totem damage by ")
-			.add(a -> a.mBonusDamageFlat, ABILITY_FLAT_DMG_ADDITION)
-			.add(" until it expires, limited up to ")
-			.add(a -> a.mAbilityLimit, ABILITY_LIMIT, false, Predicate.not(Ability::isEnhanced))
-			.add(" times. Duration: ")
-			.addDuration(a -> a.mDuration, DURATION, false, Ability::isLevelOne)
-			.add("s.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Summon a *Totem* that periodically deals").styles(Shaman.TOTEM_COLOR)
+			.addLine("damage to nearby mobs.")
+			.addLine("(Will only damage mobs in line of sight)")
+			.addLine()
+			.addStat("Damage: %d1 (s) every %t")
+				.statValues(stat(a -> a.mDamage, DAMAGE_1), stat(a -> a.mInterval, INTERVAL))
+			.addStat("Radius: %r1")
+				.statValues(stat(a -> a.mRadius, AOE_RANGE_1))
+			.addStat("Duration: %t")
+				.statValues(stat(a -> a.mDuration, DURATION))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addLine()
+			.addLine("Casting non-*Totem* abilities inside *Flame*").styles(Shaman.TOTEM_COLOR, UNDERLINED)
+			.addLine("*Totem*'s area increases its damage").styles(UNDERLINED)
+			.addLine("by +%d (s), up to %d1e_only times.")
+				.statValues(stat(a -> a.mBonusDamageFlat, ABILITY_FLAT_DMG_ADDITION), stat(a -> a.mAbilityLimit, ABILITY_LIMIT))
+			.addDashedLine();
 	}
 
 	private static Description<FlameTotem> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Radius increased to ")
-			.add(TotemAbility::getTotemRadius, AOE_RANGE_2, false, Ability::isLevelTwo)
-			.add(" blocks, and the damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(". Mobs take ")
-			.addPercent(a -> a.mStackingDamageAmplifier, STACKING_DAMAGE)
-			.add(" extra damage from your Flame Totem with each consecutive pulse of damage taken.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Flame Totem*'s damage and radius.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s) every %t")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mDamage, DAMAGE_2), stat(a -> a.mInterval, INTERVAL))
+			.addStatComparison("Radius: %r1 -> %r2")
+				.statValues(stat(AOE_RANGE_1), stat(a -> a.mRadius, AOE_RANGE_2))
+			.addLine()
+			.addLine("Mobs take +%p damage from *Flame Totem* with").styles(UNDERLINED)
+				.statValues(stat(a -> a.mStackingDamageAmplifier, STACKING_DAMAGE))
+			.addLine("each consecutive pulse of damage taken.")
+			.addDashedLine();
 	}
 
 	private static Description<FlameTotem> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The bonus damage from non-totem abilities can now be gained up to ")
-			.add(a -> a.mAbilityLimit, ABILITY_LIMIT_ENHANCE, false, Ability::isEnhanced)
-			.add(" times. Mobs within the Flame Totem's radius take ")
-			.addPercent(a -> a.mEnhanceDamageAmplifier, ENHANCE_DAMAGE_BOOST)
-			.add(" more magic damage from your non-totem spells. The final pulse of your Flame Totem now also ignites mobs for ")
-			.addDuration(IGNITION_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Increase the number of times *Flame Totem*'s").styles(UNDERLINED)
+			.addLine("damage can be increased by casting non-")
+			.addLine("*Totem* abilities.").styles(Shaman.TOTEM_COLOR)
+			.addLine()
+			.addStatComparison("Max Increases: %d1e -> %d3")
+				.statValues(stat(ABILITY_LIMIT), stat(a -> a.mAbilityLimit, ABILITY_LIMIT_ENHANCE))
+			.addLine()
+			.addLine("Mobs within *Flame Totem*'s area take increased").styles(UNDERLINED)
+			.addLine("damage from non-*Totem* abilities.").styles(Shaman.TOTEM_COLOR)
+			.addLine()
+			.addLine("*Flame Totem*'s final pulse now ignites mobs.").styles(UNDERLINED)
+			.addLine()
+			.addStat("Damage Boost: +%p (s)")
+				.statValues(stat(a -> a.mEnhanceDamageAmplifier, ENHANCE_DAMAGE_BOOST))
+			.addStat("Effect: Fire for %t")
+				.statValues(stat(IGNITION_DURATION))
+			.addDashedLine();
 	}
 }

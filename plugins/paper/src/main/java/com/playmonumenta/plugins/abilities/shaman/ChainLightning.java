@@ -6,9 +6,10 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.ChainLightningCS;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -29,6 +30,10 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class ChainLightning extends MultipleChargeAbility {
 	private static final int COOLDOWN = 6 * 20;
@@ -248,43 +253,64 @@ public class ChainLightning extends MultipleChargeAbility {
 	}
 
 	private static Description<ChainLightning> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.addTrigger(0)
-			.add(" or ")
-			.addTrigger(1)
-			.add(" to cast a beam of lightning, bouncing between up to ")
-			.add(a -> a.mTargets, TARGETS_1, false, Ability::isLevelOne)
-			.add(" mobs within line of sight of each other and within ")
-			.add(a -> a.mBounceRange, BOUNCE_RANGE)
-			.add(" blocks of the last target hit, dealing ")
-			.add(a -> a.mBaseDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" + (")
-			.add(BONUS_DAMAGE_1)
-			.add(" * Skill Points) magic damage to each. The beam can also bounce to nearby totems without consuming a hit target. Charges: ")
-			.add(a -> a.mMaxCharges, CHARGES)
-			.add(".")
-			.addCooldown(COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addTrigger()
+			.addDashedLine()
+			.addLine("Fire a bolt of lightning that damages")
+			.addLine("and bounces to other nearby mobs.")
+			.addLine()
+			.addLine("The lightning can bounce to nearby")
+			.addLine("*Totems* to extend its range.").styles(Shaman.TOTEM_COLOR)
+			.addLine()
+			.addStat("Damage: %d1e (s)")
+				.statValues(stat((a, p) -> a.mFinalDamage, (a, p) -> DAMAGE_1 + BONUS_DAMAGE_1 * AbilityUtils.getEffectiveTotalSkillPoints(p)))
+			.addStat("Max Mobs: %d1")
+				.statValues(stat(a -> a.mTargets, TARGETS_1))
+			.addStat("Bounce Range: %r")
+				.statValues(stat(a -> a.mBounceRange, BOUNCE_RANGE))
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, CHARGES))
+			.addStat("Cooldown: %t (per charge)")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<ChainLightning> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mBaseDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" + (")
-			.add(BONUS_DAMAGE_2)
-			.add(" * Skill Points). Up to ")
-			.add(a -> a.mTargets, TARGETS_2, false, Ability::isLevelTwo)
-			.add(" mobs can now be targeted.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Chain Lightning*'s damage").styles(UNDERLINED)
+			.addLine("and maximum mobs hit.")
+			.addLine()
+			.addStatComparison("Damage: %d1e -> %d2e (s)")
+				.statValues(stat((a, p) -> DAMAGE_1 + BONUS_DAMAGE_1 * AbilityUtils.getEffectiveTotalSkillPoints(p)),
+					stat((a, p) -> a.mFinalDamage, (a, p) -> DAMAGE_2 + BONUS_DAMAGE_2 * AbilityUtils.getEffectiveTotalSkillPoints(p)))
+			.addStatComparison("Max Mobs: %d1 -> %d2")
+				.statValues(stat(TARGETS_1), stat(a -> a.mTargets, TARGETS_2))
+			.addDashedLine();
 	}
 
 	private static Description<ChainLightning> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Each totem the beam bounces off of now instantly pulses its effects at ")
-			.addPercent(a -> a.mNegativeEfficiency, ENHANCE_OFFENSIVE_EFFICIENCY)
-			.add(" efficiency for damaging totems and ")
-			.addPercent(a -> a.mPositiveEfficiency, ENHANCE_SUPPORT_EFFICIENCY)
-			.add(" efficiency for non-damaging totems. These extra activations do not interact with the stacking buffs from consecutive pulses on Flame Totem. The base magic damage of Chain Lightning is also increased by ")
-			.add(a -> a.mEnhanceBonusDmg, DAMAGE_3)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Increase *Chain Lightning*'s damage by an").styles(UNDERLINED)
+			.addLine("additional +%d (s).")
+				.statValues(stat(a -> a.mEnhanceBonusDmg, DAMAGE_3))
+			.addLine()
+			.addIfElse((a, p) -> a == null || a.isLevelOne(),
+				desc -> desc.addStatComparison("Damage: %d1 -> %d3 (s)")
+					.statValues(stat((a, p) -> DAMAGE_1 + BONUS_DAMAGE_1 * AbilityUtils.getEffectiveTotalSkillPoints(p)),
+						stat((a, p) -> a.mFinalDamage, (a, p) -> DAMAGE_1 + BONUS_DAMAGE_1 * AbilityUtils.getEffectiveTotalSkillPoints(p) + DAMAGE_3)),
+				desc -> desc.addStatComparison("Damage: %d2 -> %d3 (s)")
+					.statValues(stat((a, p) -> DAMAGE_2 + BONUS_DAMAGE_2 * AbilityUtils.getEffectiveTotalSkillPoints(p)),
+						stat((a, p) -> a.mFinalDamage, (a, p) -> DAMAGE_2 + BONUS_DAMAGE_2 * AbilityUtils.getEffectiveTotalSkillPoints(p) + DAMAGE_3)))
+			.addLine()
+			.addLine("When *Chain Lightning* bounces to a *Totem*,").styles(UNDERLINED, Shaman.TOTEM_COLOR)
+			.addLine("instantly trigger that *Totem's* effect at").styles(Shaman.TOTEM_COLOR)
+			.addLine("%p effectiveness for damaging *Totems*,").styles(Shaman.TOTEM_COLOR)
+				.statValues(stat(a -> a.mNegativeEfficiency, ENHANCE_OFFENSIVE_EFFICIENCY))
+			.addLine("and %p effectiveness for non-damaging")
+				.statValues(stat(a -> a.mPositiveEfficiency, ENHANCE_SUPPORT_EFFICIENCY))
+			.addLine("*Totems*.").styles(Shaman.TOTEM_COLOR)
+			.addDashedLine();
 	}
 }

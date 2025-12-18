@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.BladeDanceCS;
@@ -21,12 +21,18 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 
 public class BladeDance extends Ability {
@@ -89,7 +95,6 @@ public class BladeDance extends Ability {
 		mIsActive = true;
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
-			final int mDuration = CharmManager.getDuration(mPlayer, CHARM_RESIST, INVULN_DURATION);
 
 			@Override
 			public void run() {
@@ -128,31 +133,42 @@ public class BladeDance extends Ability {
 		if (mIsActive && event.getType().isDefendable()) {
 			event.setFlatDamage(0);
 			event.setCancelled(true);
+
+			mPlayer.playSound(mPlayer, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.PLAYERS, 1f, 1.3f);
 		}
 	}
 
 	private static Description<BladeDance> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to enter a defensive stance, parrying all attacks and becoming invulnerable for ")
-			.addDuration(a -> a.mInvulnDuration, INVULN_DURATION)
-			.add(" seconds. Afterwards, deal ")
-			.add(a -> a.mDamage, DANCE_1_DAMAGE, false, Ability::isLevelOne)
-			.add(" melee damage to mobs within ")
-			.add(a -> a.mRadius, DANCE_RADIUS)
-			.add(" blocks and roots them for ")
-			.addDuration(a -> a.mSlowDuration, SLOW_DURATION_1, false, Ability::isLevelOne)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Become invulnerable for %t, then")
+				.statValues(stat(a -> a.mInvulnDuration, INVULN_DURATION))
+			.addLine("deal damage and root nearby mobs.")
+			.addLine()
+			.addStat("Damage: %d1 (m)")
+				.statValues(stat(a -> a.mDamage, DANCE_1_DAMAGE))
+			.addStat("Effect: Root for %t1")
+				.statValues(stat(a -> a.mSlowDuration, SLOW_DURATION_1))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, DANCE_RADIUS))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<BladeDance> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mDamage, DANCE_2_DAMAGE, false, Ability::isLevelTwo)
-			.add(" and root duration is increased to ")
-			.addDuration(a -> a.mSlowDuration, SLOW_DURATION_2, false, Ability::isLevelTwo)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Blade Dance*'s damage and").styles(UNDERLINED)
+			.addLine("root duration, and reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (m)")
+				.statValues(stat(DANCE_1_DAMAGE), stat(a -> a.mDamage, DANCE_2_DAMAGE))
+			.addStatComparison("Effect: %t1 -> %t2 Root")
+				.statValues(stat(SLOW_DURATION_1), stat(a -> a.mSlowDuration, SLOW_DURATION_2))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(COOLDOWN_1), cooldown(COOLDOWN_2))
+			.addDashedLine();
 	}
 }

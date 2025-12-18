@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.classes;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
 import com.playmonumenta.plugins.abilities.warlock.Culling;
@@ -16,8 +18,13 @@ import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.RestlessSouls;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WARLOCK_LORE;
 
 
 public class Warlock extends PlayerClass {
@@ -79,4 +86,40 @@ public class Warlock extends PlayerClass {
 		);
 	}
 
+	@Override
+	public Component getDescription(Player player) {
+		return new FormattedDescriptionBuilder<>(() -> Culling.INFO)
+			.addDashedLine()
+			.addLine("*Warlocks wield scythes and dark magic*").styles(WARLOCK_LORE)
+			.addLine("*to bring suffering to their enemies.*").styles(WARLOCK_LORE)
+			.addLine()
+			.addLine("*Culling (Class Passive):*").styles(Style.style(mClassColor))
+			.add(Culling.getDescription())
+			.addDashedLine()
+			.get(AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Culling.class), player);
+	}
+
+	@Override
+	public Component getSpecOneDescription(Player player) {
+		return new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addLine("*Reapers are no strangers to dark magic,*").styles(WARLOCK_LORE)
+			.addLine("*cursing both themselves and their enemies*").styles(WARLOCK_LORE)
+			.addLine("*to control and destroy any foe.*").styles(WARLOCK_LORE)
+			.addLine("(DPS, Bruiser, Self Debuff)")
+			.addDashedLine()
+			.get();
+	}
+
+	@Override
+	public Component getSpecTwoDescription(Player player) {
+		return new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addLine("*Tenebrists wield umbral magic, calling*").styles(WARLOCK_LORE)
+			.addLine("*forth shades and souls to curse and*").styles(WARLOCK_LORE)
+			.addLine("*ail hordes of enemies.*").styles(WARLOCK_LORE)
+			.addLine("(Area Damage, Crowd Control, Debuffs)")
+			.addDashedLine()
+			.get();
+	}
 }

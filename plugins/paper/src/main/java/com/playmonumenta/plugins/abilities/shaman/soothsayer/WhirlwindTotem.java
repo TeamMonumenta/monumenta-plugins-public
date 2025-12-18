@@ -6,10 +6,11 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.soothsayer.WhirlwindTotemCS;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -21,6 +22,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class WhirlwindTotem extends TotemAbility {
 	private static final int COOLDOWN = 26 * 20;
@@ -129,30 +134,37 @@ public class WhirlwindTotem extends TotemAbility {
 	}
 
 	private static Description<WhirlwindTotem> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to fire a projectile that summons a Whirlwind Totem. Every ")
-			.addDuration(a -> a.mInterval, INTERVAL, true)
-			.add(" seconds, players within ")
-			.add(TotemAbility::getTotemRadius, AOE_RANGE)
-			.add(" blocks of the totem have their cooldowns reduced by ")
-			.addPercent(a -> a.mCDRPercent, CDR_PERCENT)
-			.add(" (maximum ")
-			.addDuration(a -> a.mCDRMax, CDR_MAX_PER_SECOND)
-			.add(" seconds). Cannot decrease the cooldown of this ability. Additionally, other totems existing during this totem's duration gain ")
-			.addPercent(a -> a.mDurationBoost, DURATION_BOOST)
-			.add(" duration. Duration: ")
-			.addDuration(a -> a.mDuration, DURATION_1, false, Ability::isLevelOne)
-			.add("s.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Summon a *Totem* that periodically reduces nearby").styles(Shaman.TOTEM_COLOR)
+			.addLine("players' ability cooldowns while inside the totem's")
+			.addLine("area, and for %t after leaving.")
+				.statValues(stat(50))
+			.addLine("(Doesn't reduce this ability's cooldown)")
+			.addLine()
+			.addStat("Cooldown Reduction: %p (max %t) every %t")
+				.statValues(stat(a -> a.mCDRPercent, CDR_PERCENT), stat(a -> a.mCDRMax, CDR_MAX_PER_SECOND), stat(20))
+			.addStat("Radius: %r").statValues(stat(a -> a.mRadius, AOE_RANGE))
+			.addStat("Duration: %t1").statValues(stat(a -> a.mDuration, DURATION_1))
+			.addStat("Cooldown: %t").statValues(cooldown(COOLDOWN))
+			.addLine()
+			.addLine("*Totems* summoned while *Whirlwind Totem* is active").styles(Shaman.TOTEM_COLOR, UNDERLINED)
+			.addLine("gain +%p increased duration.")
+				.statValues(stat(a -> a.mDurationBoost, DURATION_BOOST))
+			.addDashedLine();
 	}
 
 	private static Description<WhirlwindTotem> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Duration is increased to ")
-			.addDuration(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
-			.add(" seconds. Now additionally gives ")
-			.addPercent(a -> a.mSpeed, SPEED_PERCENT)
-			.add(" speed to players within range.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Whirlwind Totem*'s duration.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Duration: %t1 -> %t2").statValues(stat(DURATION_1), stat(a -> a.mDuration, DURATION_2))
+			.addLine()
+			.addLine("*Whirlwind Totem* now grants players speed.").styles(UNDERLINED)
+			.addLine()
+			.addStat("Effect: +%p Speed").statValues(stat(a -> a.mSpeed, SPEED_PERCENT))
+			.addDashedLine();
 	}
 }

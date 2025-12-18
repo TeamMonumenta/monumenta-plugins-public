@@ -6,10 +6,11 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.HolyJavelinCS;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -34,15 +35,17 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+
 
 public class HolyJavelin extends Ability {
 	private static final int RANGE_1 = 12;
 	private static final int RANGE_2 = 16;
 	private static final double SIZE = 0.95;
-	private static final int HERETIC_DAMAGE_1 = 24;
-	private static final int HERETIC_DAMAGE_2 = 24;
-	private static final int DAMAGE_1 = 12;
-	private static final int DAMAGE_2 = 12;
+	private static final int DAMAGE = 12;
+	private static final int HERETIC_DAMAGE = 24;
 	private static final int FIRE_DURATION = 5 * 20;
 	private static final float VELOCIY_MULTIPLIER = 1.15f;
 	private static final int COOLDOWN_1 = 9 * 20;
@@ -81,8 +84,8 @@ public class HolyJavelin extends Ability {
 
 	public HolyJavelin(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mHereticDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? HERETIC_DAMAGE_1 : HERETIC_DAMAGE_2);
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE);
+		mHereticDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, HERETIC_DAMAGE);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, isLevelOne() ? RANGE_1 : RANGE_2);
 		mSize = CharmManager.getRadius(mPlayer, CHARM_SIZE, SIZE);
 		mVelocity = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_VELOCITY, VELOCIY_MULTIPLIER);
@@ -156,27 +159,48 @@ public class HolyJavelin extends Ability {
 	}
 
 	private static Description<HolyJavelin> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to throw a piercing spear of light ")
-			.add(a -> a.mSize, SIZE)
-			.add(" blocks wide, instantly travelling up to ")
-			.add(a -> a.mRange, RANGE_1, false, Ability::isLevelOne)
-			.add(" blocks or until it hits a solid block. It deals ")
-			.add(a -> a.mHereticDamage, HERETIC_DAMAGE_1)
-			.add(" magic damage to all Heretics along its path, and ")
-			.add(a -> a.mDamage, DAMAGE_1)
-			.add(" magic damage to non-Heretics, and sets them all on fire for ")
-			.addDuration(FIRE_DURATION)
-			.add(" seconds. Attacking a Heretic while triggering, whether critical or not, transmits Divine Justice damage to all enemies pierced by the spear.")
-			.addCooldown(COOLDOWN_1, false, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Throw a spear of light that deals damage")
+			.addLine("and ignites mobs in a line in front of you.")
+			.addLine("*Heretics* take increased damage.").styles(Cleric.HERETIC_COLOR)
+			.addLine()
+			.addLine("Attacking a mob while throwing the spear")
+			.addLine("will also deal *Divine Justice*'s damage").styles(UNDERLINED)
+			.addLine("to other mobs hit by the spear.")
+			.addLine()
+			.addStat("Damage: %d (s) (to non-Heretics)")
+				.statValues(stat(a -> a.mDamage, DAMAGE))
+			.addStat("Damage: %d (s) (to Heretics)")
+				.statValues(stat(a -> a.mHereticDamage, HERETIC_DAMAGE))
+			.addStat("Effect: Fire for %t")
+				.statValues(stat(FIRE_DURATION))
+			.addStat("Range: %r1")
+				.statValues(stat(a -> a.mRange, RANGE_1))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<HolyJavelin> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The range is increased to ")
-			.add(a -> a.mRange, RANGE_2, false, Ability::isLevelTwo)
-			.add(" blocks. Additionally, if there are no mobs in the spear's path, launch yourself forward with it. You can only launch yourself once before touching the ground again.")
-			.addCooldown(COOLDOWN_2, false, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Holy Javelin*'s range and").styles(UNDERLINED)
+			.addLine("reduce its cooldown.")
+			.addLine()
+			.addLine("If no mobs are hit by the spear, launch")
+			.addLine("yourself forwards with the spear instead.")
+			.addLine("(Can only launch once while midair)")
+			.addLine()
+			.addStatComparison("Range: %r1 -> %r2")
+				.statValues(
+					stat(RANGE_1),
+					stat(a -> a.mRange, RANGE_2))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+			.statValues(
+				cooldown(COOLDOWN_1),
+				cooldown(COOLDOWN_2))
+			.addDashedLine();
 	}
 }

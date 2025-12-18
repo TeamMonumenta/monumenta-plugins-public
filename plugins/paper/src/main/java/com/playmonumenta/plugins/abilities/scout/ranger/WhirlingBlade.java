@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -30,6 +29,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 
 public class WhirlingBlade extends MultipleChargeAbility {
@@ -207,30 +210,42 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	}
 
 	private static Description<WhirlingBlade> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to throw a whirling blade that circles around you, knocking back and dealing ")
-			.add(a -> a.mDamage, BLADE_1_DAMAGE, false, Ability::isLevelOne)
-			.add(" melee damage to enemies it hits within a radius of ")
-			.add(a -> a.mThrowRadius + a.mBladeRadius, THROW_RADIUS + BLADE_RADIUS)
-			.add(" and inflicts ")
-			.addPercent(a -> a.mWeaken, BLADE_WEAKEN)
-			.add(" weakness and ")
-			.addPercent(a -> a.mSlow, BLADE_SLOWNESS)
-			.add(" slowness for ")
-			.addDuration(a -> a.mDuration, DEBUFF_DURATION)
-			.add(" seconds. Charges: ")
-			.add(a -> a.mMaxCharges, BLADE_MAX_CHARGES)
-			.add(".")
-			.addCooldown(BLADE_COOLDOWN);
+			.addDashedLine()
+			.addLine("Throw a blade that circles around you,")
+			.addLine("damaging and afflicting nearby mobs")
+			.addLine("with slowness and weakness.")
+			.addLine()
+			.addIf((a, p) -> a != null && a.mCycles != 1, desc -> desc
+				.addStat("Cycles: %d")
+				.statValues(stat(a -> a.mCycles, 1)))
+			.addStat("Damage: %d1 (m)")
+				.statValues(stat(a -> a.mDamage, BLADE_1_DAMAGE))
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(stat(a -> a.mSlow, BLADE_SLOWNESS), stat(a -> a.mDuration, DEBUFF_DURATION))
+			.addStat("Effect: %p Weakness for %t")
+				.statValues(stat(a -> a.mWeaken, BLADE_WEAKEN), stat(a -> a.mDuration, DEBUFF_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mThrowRadius + a.mBladeRadius, THROW_RADIUS + BLADE_RADIUS))
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, BLADE_MAX_CHARGES))
+			.addStat("Cooldown: %t (per charge)")
+				.statValues(cooldown(BLADE_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<WhirlingBlade> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased to ")
-			.add(a -> a.mDamage, BLADE_2_DAMAGE, false, Ability::isLevelTwo)
-			.add(" and also stun for ")
-			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Whirling Blade*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addLine("*Whirling Blade* now stuns mobs it hits.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (m)")
+				.statValues(stat(BLADE_1_DAMAGE), stat(a -> a.mDamage, BLADE_2_DAMAGE))
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunDuration, STUN_DURATION))
+			.addDashedLine();
 	}
 }

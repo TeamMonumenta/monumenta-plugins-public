@@ -5,10 +5,11 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.seraph.HallowedBeamCS;
 import com.playmonumenta.plugins.effects.HallowedBeamL2;
@@ -44,6 +45,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
@@ -59,6 +62,12 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class HallowedBeam extends MultipleChargeAbility {
 	// Feature flags
@@ -107,6 +116,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 	public static final String CHARM_RESISTANCE_DURATION = "Hallowed Beam Resistance Duration";
 	public static final String CHARM_CHARGE = "Hallowed Beam Charge";
 	public static final String CHARM_HEALING_PERCENT_THRESHOLD = "Hallowed Beam Healing Threshold";
+
+	public static final Style HOLY_SEAL_COLOR = Style.style(TextColor.color(0xEBCFB0));
 
 	public static final AbilityInfo<HallowedBeam> INFO =
 		new AbilityInfo<>(HallowedBeam.class, "Hallowed Beam", HallowedBeam::new)
@@ -601,38 +612,63 @@ public class HallowedBeam extends MultipleChargeAbility {
 	}
 
 	private static Description<HallowedBeam> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.addTrigger(0, "looking directly at a player or mob")
-			.add(" within ")
-			.add(a -> a.mRange, CAST_RANGE)
-			.add(" blocks to shoot a beam of light. If aimed at a player, the beam instantly heals them for ")
-			.addPercent(a -> a.mHeal, HALLOWED_HEAL_PERCENT)
-			.add(" of their max health, knocking back enemies within ")
-			.add(a -> HALLOWED_RADIUS, HALLOWED_RADIUS)
-			.add(" blocks. If aimed at a Heretic, it instantly deals R2: " + HALLOWED_DAMAGE_R2 + " / R3: ")
-			.add(a -> ServerProperties.getAbilityEnhancementsEnabled(a.mPlayer) ? a.mDamage : HALLOWED_DAMAGE_R3, HALLOWED_DAMAGE_R3)
-			.add(" magic damage to them, applies aspect enchants, and stuns them for ")
-			.addDuration(a -> a.mHereticStunDuration, HALLOWED_HERETIC_STUN)
-			.add("s. If aimed at a non-Heretic mob, it instantly stuns them for ")
-			.addDuration(a -> a.mLivingStunDuration, HALLOWED_LIVING_STUN)
-			.add("s and applies aspect enchants. This skill can only apply Recoil once before touching the ground. Charges: ")
-			.add(a -> a.mMaxCharges, HALLOWED_MAX_CHARGES, false)
-			.add(".")
-			.addCooldown(HALLOWED_COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addTrigger()
+			.addDashedLine()
+			.addLine("Shoot a beam of light at a target player or mob.")
+			.addLine()
+			.addStat("Range: %r")
+				.statValues(stat(a -> a.mRange, CAST_RANGE))
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, HALLOWED_MAX_CHARGES))
+			.addStat("Cooldown: %t (per charge)")
+				.statValues(cooldown(HALLOWED_COOLDOWN))
+			.addLine()
+			.addLine("If aimed at a player or your *Virtue*, they are").styles(KeeperVirtue.VIRTUE_COLOR)
+			.addLine("healed and mobs are knocked away from them.")
+			.addLine()
+			.addStat("Healing: %p HP")
+				.statValues(stat(a -> a.mHeal, HALLOWED_HEAL_PERCENT))
+			.addStat("Knockback Radius: %r")
+				.statValues(stat(HALLOWED_RADIUS))
+			.addLine()
+			.addLine("If aimed at a mob, stun them. *Heretics* take").styles(Cleric.HERETIC_COLOR)
+			.addLine("damage, but are stunned for a shorter time.")
+			.addLine()
+			.addStat("Effect: Stun for %t (to non-Heretics)")
+				.statValues(stat(a -> a.mLivingStunDuration, HALLOWED_LIVING_STUN))
+			.addStat("Damage: %d (s) (to Heretics)")
+				.statValues(perRegion(a -> a.mDamage, HALLOWED_DAMAGE_R2, HALLOWED_DAMAGE_R3))
+			.addStat("Effect: Stun for %t (to Heretics)")
+				.statValues(stat(a -> a.mHereticStunDuration, HALLOWED_HERETIC_STUN))
+			.addDashedLine();
 	}
 
 	private static Description<HallowedBeam> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Players healed are now also granted ")
-			.addPercent(a -> a.mResistance, HALLOWED_DAMAGE_REDUCTION_PERCENT)
-			.add(" resistance for ")
-			.addDuration(a -> a.mResistanceDuration, HALLOWED_DAMAGE_REDUCTION_DURATION)
-			.add(" seconds. Mobs affected are marked by a Holy Seal for ")
-			.addDuration(a -> a.mSealDuration, HALLOWED_SEAL_DURATION)
-			.add(" seconds - the next melee attack, projectile or Ethereal Ascension orb to damage them by any player will explode the Seal, dealing R2: " + HALLOWED_SEAL_DAMAGE_R2 + " / R3: ")
-			.add(a -> ServerProperties.getAbilityEnhancementsEnabled(a.mPlayer) ? a.mSealDamage : HALLOWED_SEAL_DAMAGE_R3, HALLOWED_SEAL_DAMAGE_R3)
-			.add(" magic damage in a ")
-			.add(a -> a.mSealRadius, HALLOWED_SEAL_RADIUS)
-			.add(" block radius. If the beam kills the mob, the Seal is instead transferred to the nearest mob within 4 blocks.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Players healed by *Hallowed Beam* additionally").styles(UNDERLINED)
+			.addLine("gain resistance for a short period of time.")
+			.addLine()
+			.addStat("Effect: +%p Resistance for %t")
+				.statValues(
+					stat(a -> a.mResistance, HALLOWED_DAMAGE_REDUCTION_PERCENT),
+					stat(a -> a.mResistanceDuration, HALLOWED_DAMAGE_REDUCTION_DURATION))
+			.addLine()
+			.addLine("*Hallowed Beam* now marks mobs with a *Holy Seal*.").styles(UNDERLINED, HOLY_SEAL_COLOR)
+			.addLine("*(If Hallowed Beam instantly kills the mob, the*").styles(DARK_GREY)
+			.addLine("*Holy Seal is applied to the nearest mob instead)*").styles(DARK_GREY)
+			.addLine()
+			.addLine("Attacks, projectiles, and *Ethereal Ascension*'s").styles(UNDERLINED)
+			.addLine("orbs will detonate the *Holy Seal* and deal bonus").styles(HOLY_SEAL_COLOR)
+			.addLine("damage to that mob and nearby mobs.")
+			.addLine()
+			.addStat("Seal Damage: %d (s)")
+				.statValues(perRegion(a -> a.mSealDamage, HALLOWED_SEAL_DAMAGE_R2, HALLOWED_SEAL_DAMAGE_R3))
+			.addStat("Seal Radius: %r")
+				.statValues(stat(a -> a.mSealRadius, HALLOWED_SEAL_RADIUS))
+			.addStat("Seal Duration: %t")
+				.statValues(stat(a -> a.mSealDuration, HALLOWED_SEAL_DURATION))
+			.addDashedLine();
 	}
 }

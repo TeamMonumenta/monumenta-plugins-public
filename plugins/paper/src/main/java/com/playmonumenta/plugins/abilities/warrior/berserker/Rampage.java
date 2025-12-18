@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.RampageCS;
@@ -39,6 +39,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public final class Rampage extends Ability implements AbilityWithChargesOrStacks {
 
@@ -275,42 +278,52 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 	}
 
 	private static Description<Rampage> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to deal ")
-			.add(a -> a.mDamage, DAMAGE_L1, false, Ability::isLevelOne)
-			.add(" melee damage and knocking all enemies back within a ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" block radius. For the next ")
-			.addDuration(a -> a.mInitialDuration, INITIAL_DURATION)
-			.add("s, you gain ")
-			.addPercent(a -> a.mDamageBuff, DAMAGE_PERCENT_L1, false, Ability::isLevelOne)
-			.add(" melee damage, and ")
-			.addPercent(a -> a.mHealing, HEAL_PERCENT)
-			.add(" max health regen per second. The next ")
-			.add(a -> a.mMaxBloodlustGain, MAX_BLOODLUST_GAIN_L1, false, Ability::isLevelOne)
-			.add(" Bloodlust stack extends the duration by ")
-			.addDuration(a -> a.mDurationPerStack, DURATION_PER_STACK)
-			.add("s. The max duration is ")
-			.addDuration(a -> a.mMaxDuration, INITIAL_DURATION + MAX_BLOODLUST_GAIN_L1 * DURATION_PER_STACK, false, Ability::isLevelOne)
-			.add("s. Rampage damage does not contribute towards Bloodlust. ")
-			.add("\n \n Cost: ")
-			.add(a -> a.mBloodlustCost, BLOODLUST_COST, true)
-			.add("x Bloodlust Stack.");
+			.addDashedLine()
+			.addLine("Spend %d stacks of *Bloodlust* to deal damage to all").styles(Bloodlust.BLOODLUST_COLOR)
+				.statValues(stat(a -> a.mBloodlustCost, BLOODLUST_COST))
+			.addLine("nearby mobs and knock them back and enter a")
+			.addLine("rampage for the next %t.")
+				.statValues(stat(a -> a.mInitialDuration, INITIAL_DURATION))
+			.addLine("(Rampage's damage doesn't contribute to Bloodlust)")
+			.addLine()
+			.addStat("Damage: %d1 (m)")
+				.statValues(stat(a -> a.mDamage, DAMAGE_L1))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addLine()
+			.addLine("While *Rampage* is active, you deal more melee").styles(UNDERLINED)
+			.addLine("damage and are continuously healed, and gaining")
+			.addLine("*Bloodlust* stacks extends its duration.").styles(Bloodlust.BLOODLUST_COLOR, UNDERLINED)
+			.addLine()
+			.addStat("Effect: +%p1 Melee Damage")
+				.statValues(stat(a -> a.mDamageBuff, DAMAGE_PERCENT_L1))
+			.addStat("Healing: %p HP every %t")
+			.statValues(stat(a -> a.mHealing, HEAL_PERCENT), stat(5))
+			.addStat("Duration Increase: +%t per stack (max +%t1)")
+				.statValues(stat(a -> a.mDurationPerStack, DURATION_PER_STACK), stat(a -> a.mMaxBloodlustGain * a.mDurationPerStack, MAX_BLOODLUST_GAIN_L1 * DURATION_PER_STACK))
+			.addDashedLine();
 	}
 
 	private static Description<Rampage> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Rampage now deals ")
-			.add(a -> a.mDamage, DAMAGE_L2, false, Ability::isLevelTwo)
-			.add(" damage, gain ")
-			.addPercent(a -> a.mDamageBuff, DAMAGE_PERCENT_L2, false, Ability::isLevelTwo)
-			.add(" melee damage, and gain ")
-			.addPercent(a -> a.mMeleeResistance, MELEE_RESISTANCE_PERCENT)
-			.add(" melee resistance. Additional, the next ")
-			.addDuration(a -> a.mMaxBloodlustGain, MAX_BLOODLUST_GAIN_L2, false, Ability::isLevelTwo)
-			.add(" Bloodlust stack will extend the duration and the max duration is now ")
-			.addDuration(a -> a.mMaxDuration, INITIAL_DURATION + MAX_BLOODLUST_GAIN_L2 * DURATION_PER_STACK, false, Ability::isLevelTwo)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Rampage*'s damage, damage boost,").styles(UNDERLINED)
+			.addLine("and the number of times its duration can")
+			.addLine("be increased.")
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (m)")
+				.statValues(stat(DAMAGE_L1), stat(a -> a.mDamage, DAMAGE_L2))
+			.addStatComparison("Effect: +%p1 -> +%p2 Melee Damage")
+				.statValues(stat(DAMAGE_PERCENT_L1), stat(a -> a.mDamageBuff, DAMAGE_PERCENT_L2))
+			.addStatComparison("Max Duration Increase: +%t1 -> +%t2")
+				.statValues(stat(MAX_BLOODLUST_GAIN_L1 * DURATION_PER_STACK), stat(a -> a.mMaxBloodlustGain * a.mDurationPerStack, MAX_BLOODLUST_GAIN_L2 * DURATION_PER_STACK))
+			.addLine()
+			.addLine("Gain melee resistance while *Rampage* is active.").styles(UNDERLINED)
+			.addLine()
+			.addStat("Effect: +%p Melee Resistance")
+				.statValues(stat(a -> a.mMeleeResistance, MELEE_RESISTANCE_PERCENT))
+			.addDashedLine();
 	}
 }

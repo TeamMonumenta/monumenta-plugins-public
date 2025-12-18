@@ -4,20 +4,20 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.CounterStrikeCS;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,6 +25,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class CounterStrike extends Ability {
 	private static final int DURATION = 4 * 20;
@@ -41,6 +44,8 @@ public class CounterStrike extends Ability {
 	public static final String CHARM_ABSORPTION_DAMAGE_REDUCTION = "Counter Strike Absorption Damage Reduction";
 	public static final String CHARM_KBR = "Counter Strike Knockback Resistance";
 	public static final String CHARM_RADIUS = "Counter Strike Radius";
+
+	private static final Style COUNTER_COLOR = Style.style(TextColor.color(0xF0A000));
 
 	public static final AbilityInfo<CounterStrike> INFO =
 		new AbilityInfo<>(CounterStrike.class, "Counter Strike", CounterStrike::new)
@@ -151,29 +156,51 @@ public class CounterStrike extends Ability {
 	}
 
 	private static Description<CounterStrike> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When a mob attacks you (even if the attack is blocked or negated), a Counter Strike is primed against that mob, which lasts up to ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds. Hitting a mob with a Counter Strike deals ")
-			.addPercent(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" more damage and removes the Counter Strike.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("When a mob attacks you, prepare a")
+			.addLine("*Counter Strike* against them for %t.").styles(COUNTER_COLOR)
+				.statValues(stat(a -> a.mDuration, DURATION))
+			.addLine()
+			.addLine("Attacking a mob with a *Counter Strike* will").styles(COUNTER_COLOR)
+			.addLine("deal increased damage and remove it.")
+			.addLine()
+			.addStat("Damage Boost: +%p1 (m)")
+				.statValues(stat(a -> a.mDamage, DAMAGE_1))
+			.addDashedLine();
 	}
 
 	private static Description<CounterStrike> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage bonus is increased to ")
-			.addPercent(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" Additionally, the first time you taunt a given mob using an ability, a Counter Strike is primed against that mob.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Counter Strike*'s damage boost.").styles(UNDERLINED)
+			.addLine()
+			.addLine("Taunting a mob now primes a *Counter Strike*").styles(COUNTER_COLOR)
+			.addLine("against them. (Max once per mob)")
+			.addLine()
+			.addStatComparison("Damage Boost: +%p1 -> +%p2 (m)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mDamage, DAMAGE_2))
+			.addDashedLine();
 	}
 
 	private static Description<CounterStrike> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Take ")
-			.addPercent(a -> a.mResistance, RESISTANCE)
-			.add(" less damage from a mob that has a Counter Strike primed against them. If the Counter Strike was primed while you had absorption active, take ")
-			.addPercent(a -> a.mAbsorptionResistance, ABSORPTION_RESISTANCE)
-			.add(" less damage instead, and gain ")
-			.addPercent(a -> a.mKBR, KBR)
-			.add(" Knockback Resistance while the Counter Strike is active.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Take less damage from mobs that have a")
+			.addLine("*Counter Strike* primed against them.").styles(COUNTER_COLOR)
+			.addLine()
+			.addStat("Effect: +%p Resistance")
+				.statValues(stat(a -> a.mResistance, RESISTANCE))
+			.addLine()
+			.addLine("If that *Counter Strike* was primed").styles(COUNTER_COLOR)
+			.addLine("while you had absorption, take even less")
+			.addLine("damage and gain knockback resistance")
+			.addLine("while it remains on the mob.")
+			.addLine()
+			.addStat("Effect: +%p Resistance")
+				.statValues(stat(a -> a.mAbsorptionResistance, ABSORPTION_RESISTANCE))
+			.addStat("Effect: +%p Knockback Resistance")
+				.statValues(stat(a -> a.mKBR, KBR))
+			.addDashedLine();
 	}
 }

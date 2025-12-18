@@ -7,9 +7,10 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.ChoirBellsCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -26,6 +27,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 
 public class ChoirBells extends Ability implements AbilityWithDuration {
@@ -177,43 +182,58 @@ public class ChoirBells extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<ChoirBells> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to afflict all enemies within ")
-			.add(a -> a.mRange, CHOIR_BELLS_RANGE)
-			.add(" blocks with ")
-			.addPercent(a -> a.mSlownessAmount, SLOWNESS_AMPLIFIER)
-			.add(" slowness for ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds. Heretics are taunted, dealt ")
-			.add(a -> a.mDamage, DAMAGE)
-			.add(" magic damage, and are afflicted with ")
-			.addPercent(a -> a.mVulnerabilityEffect, VULNERABILITY_EFFECT)
-			.add(" vulnerability and ")
-			.addPercent(a -> a.mWeakenEffect, WEAKEN_EFFECT)
-			.add(" weakness for ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Slow all nearby mobs.")
+			.addLine()
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(
+					stat(a -> a.mSlownessAmount, SLOWNESS_AMPLIFIER),
+					stat(a -> a.mDuration, DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRange, CHOIR_BELLS_RANGE))
+			.addLine()
+			.addLine("*Heretics* are also taunted, take damage, and").styles(Cleric.HERETIC_COLOR)
+			.addLine("are inflicted with weakness and vulnerability.")
+			.addLine()
+			.addStat("Damage: %d (s)")
+				.statValues(stat(a -> a.mDamage, DAMAGE))
+			.addStat("Effect: %p Weakness for %t")
+				.statValues(
+					stat(a -> a.mWeakenEffect, WEAKEN_EFFECT),
+					stat(a -> a.mDuration, DURATION))
+			.addStat("Effect: %p Vulnerability for %t")
+				.statValues(
+					stat(a -> a.mVulnerabilityEffect, VULNERABILITY_EFFECT),
+					stat(a -> a.mDuration, DURATION))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<ChoirBells> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("After casting, the bells will toll ")
-			.add(a -> a.mExtraTolls, EXTRA_TOLLS)
-			.add(" more times at the casting location, at a rate of every ")
-			.addDuration(a -> a.mTollDelay, TOLL_DELAY, true)
-			.add(" seconds. The extra tolls apply ")
-			.addPercent(a -> a.mSlownessAmount2, SLOWNESS_AMPLIFIER_2, false, Ability::isLevelTwo)
-			.add(" slowness to all mobs and ")
-			.addPercent(a -> a.mVulnerabilityEffect2, VULNERABILITY_EFFECT_2, false, Ability::isLevelTwo)
-			.add(" vulnerability and ")
-			.add(a -> a.mTollDamage, DAMAGE_2)
-			.add(" magic damage to Heretics in its ")
-			.add(a -> a.mRange, CHOIR_BELLS_RANGE)
-			.add(" block radius for ")
-			.addDuration(a -> a.mTollDelay, TOLL_DELAY)
-			.add(" seconds, taunting them as well.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("*Choir Bells* now tolls %d more times, every %t.").styles(UNDERLINED)
+				.statValues(
+					stat(a -> a.mExtraTolls, EXTRA_TOLLS),
+					stat(a -> a.mTollDelay, TOLL_DELAY))
+			.addLine()
+			.addLine("The extra tolls deal less damage, taunt mobs,")
+			.addLine("and inflict weaker debuffs for a shorter time.")
+			.addLine()
+			.addStat("Damage: %d (s) (to Heretics)")
+			.statValues(stat(a -> a.mTollDamage, DAMAGE_2))
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(
+					stat(a -> a.mSlownessAmount2, SLOWNESS_AMPLIFIER_2),
+					stat(a -> a.mTollDelay, TOLL_DELAY))
+			.addStat("Effect: %p Vulnerability for %t (to Heretics)")
+				.statValues(
+					stat(a -> a.mVulnerabilityEffect2, VULNERABILITY_EFFECT_2),
+					stat(a -> a.mTollDelay, TOLL_DELAY))
+			.addDashedLine();
 	}
 
 	@Override

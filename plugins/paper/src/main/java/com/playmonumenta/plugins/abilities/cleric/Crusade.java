@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.effects.CrusadeTag;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -15,6 +15,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 
 public class Crusade extends Ability {
 	public static final int TAG_DURATION = 10 * 20;
@@ -60,10 +62,11 @@ public class Crusade extends Ability {
 		crusade.addCrusadeTag(enemy);
 	}
 
-	private static Description<Crusade> getDescription() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("After being damaged or debuffed by an ability, any mob will be treated as a Heretic by your abilities for ")
-			.addDuration(a -> a.mDuration, TAG_DURATION)
-			.add(" seconds.");
+	public static Description<Crusade> getDescription() {
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addLine("After being damaged or debuffed by one")
+			.addLine("of your abilities, any mob will be treated")
+			.addLine("as a *Heretic* for %t.").styles(Cleric.HERETIC_COLOR)
+				.statValues(stat(a -> a.mDuration, TAG_DURATION));
 	}
 }

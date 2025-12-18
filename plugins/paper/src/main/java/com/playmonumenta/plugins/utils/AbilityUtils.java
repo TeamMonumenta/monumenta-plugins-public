@@ -412,7 +412,11 @@ public class AbilityUtils {
 		return debuffCount;
 	}
 
-	public static int getEffectiveTotalSkillPoints(Player player) {
+	public static int getEffectiveTotalSkillPoints(@Nullable Player player) {
+		if (player == null) {
+			return 0;
+		}
+
 		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
 		if (ServerProperties.getAbilityEnhancementsEnabled(player)
 			&& PlayerUtils.hasUnlockedRing(player)) {
@@ -815,5 +819,16 @@ public class AbilityUtils {
 		}
 		ClassAbility ca = event.getAbility();
 		return INDIRECT_ABILITIES.contains(ca);
+	}
+
+	public static int getPlayerLevel(@Nullable Player player) {
+		if (player == null) {
+			return 0;
+		}
+
+		int charmLevel = ScoreboardUtils.getScoreboardValue(player, CHARM_POWER).orElse(0);
+		charmLevel = (charmLevel > 0) ? (charmLevel / 3) - 2 : 0;
+
+		return getEffectiveTotalSkillPoints(player) + getEffectiveTotalSpecPoints(player) + ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0) + charmLevel;
 	}
 }

@@ -3,25 +3,34 @@ package com.playmonumenta.plugins.guis.classselection;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DescriptionUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.scoreboard;
 
 public class ClassSelectionGui extends Gui {
 	protected static final int COMMON_HEADER_ROW = 0;
@@ -36,6 +45,10 @@ public class ClassSelectionGui extends Gui {
 	protected final boolean mWasYellowTessOnCooldown;
 	protected final boolean mGuiTextures;
 	protected Page mPage;
+
+	public static final Style SKILL_POINT_COLOR = Style.style(TextColor.color(0xD99F00));
+	public static final Style SPEC_POINT_COLOR = Style.style(TextColor.color(0x4CC8D4));
+	public static final Style ENHANCEMENT_POINT_COLOR = Style.style(TextColor.color(0xD934A2));
 
 	public ClassSelectionGui(Player player, boolean fromYellowTess) {
 		super(player, 54, "Class Selection GUI");
@@ -84,16 +97,28 @@ public class ClassSelectionGui extends Gui {
 	private void setRemainingCountIcons() {
 		if (PlayerUtils.hasUnlockedRing(mPlayer)) {
 			int currentEnhanceCount = remainingEnhanceCount();
-			ItemStack summaryItem = GUIUtils.createBasicItem(
-				currentEnhanceCount == 0 ? Material.BARRIER : Material.ENCHANTING_TABLE,
-				"Enhancement Points",
-				NamedTextColor.WHITE,
-				false,
-				"You have " + currentEnhanceCount
-					+ " enhancement point" + (currentEnhanceCount == 1 ? "" : "s")
-					+ " remaining.",
-				NamedTextColor.LIGHT_PURPLE
-			);
+
+			Material material = currentEnhanceCount == 0 ? Material.BARRIER : Material.ENCHANTING_TABLE;
+
+			Component description = new FormattedDescriptionBuilder<>()
+				.addDashedLine()
+				.addLine("You have %d out of %d *Enhancement*").styles(ENHANCEMENT_POINT_COLOR)
+					.statValues(scoreboard(AbilityUtils.REMAINING_ENHANCE), scoreboard(AbilityUtils.TOTAL_ENHANCE))
+				.addLine("*Points* remaining.").styles(ENHANCEMENT_POINT_COLOR)
+				.addLine()
+				.addLine("*Enhancement Points* boost your").styles(ENHANCEMENT_POINT_COLOR)
+				.addLine("existing abilities even further.")
+				.addLine()
+				.addIfElse((a, p) -> ServerProperties.getAbilityEnhancementsEnabled(p),
+					desc -> desc.addLine("Enhancements are currently *enabled*").styles(DescriptionUtils.GREEN),
+					desc -> desc.addLine("Enhancements are currently *disabled*").styles(DescriptionUtils.RED))
+				.addLine("in this region.")
+				.addDashedLine()
+				.get(mPlayer);
+
+			Component name = DescriptionUtils.centeredComponent(description, "Enhancement Points", ENHANCEMENT_POINT_COLOR, true);
+
+			ItemStack summaryItem = GUIUtils.createBasicItem(material, 1, name, description, 99, true);
 			GUIUtils.setGuiNbtTag(
 				summaryItem,
 				"texture",
@@ -106,16 +131,27 @@ public class ClassSelectionGui extends Gui {
 
 		if (hasEffectiveSpecsUnlocked()) {
 			int currentSpecCount = remainingSpecPoints();
-			ItemStack summaryItem = GUIUtils.createBasicItem(
-				currentSpecCount == 0 ? Material.BARRIER : Material.SAND,
-				"Specialization Points",
-				NamedTextColor.WHITE,
-				false,
-				"You have " + currentSpecCount
-					+ " specialization point" + (currentSpecCount == 1 ? "" : "s")
-					+ " remaining.",
-				NamedTextColor.LIGHT_PURPLE
-			);
+			Material material = currentSpecCount == 0 ? Material.BARRIER : Material.SAND;
+
+			Component description = new FormattedDescriptionBuilder<>()
+				.addDashedLine()
+				.addLine("You have %d out of %d *Specialization*").styles(SPEC_POINT_COLOR)
+				.statValues(scoreboard(AbilityUtils.REMAINING_SPEC), scoreboard(AbilityUtils.TOTAL_SPEC))
+				.addLine("*Points* remaining.").styles(SPEC_POINT_COLOR)
+				.addLine()
+				.addLine("*Specialization Points* are used for").styles(SPEC_POINT_COLOR)
+				.addLine("your class specialization's abilities.")
+				.addLine()
+				.addIfElse((a, p) -> ServerProperties.getClassSpecializationsEnabled(p),
+					desc -> desc.addLine("Specializations are currently *enabled*").styles(DescriptionUtils.GREEN),
+					desc -> desc.addLine("Specializations are currently *disabled*").styles(DescriptionUtils.RED))
+				.addLine("in this region.")
+				.addDashedLine()
+				.get(mPlayer);
+
+			Component name = DescriptionUtils.centeredComponent(description, "Specialization Points", SPEC_POINT_COLOR, true);
+
+			ItemStack summaryItem = GUIUtils.createBasicItem(material, 1, name, description, 99, true);
 			GUIUtils.setGuiNbtTag(
 				summaryItem,
 				"texture",
@@ -127,14 +163,23 @@ public class ClassSelectionGui extends Gui {
 		}
 
 		int currentSkillCount = remainingSkillPoints();
-		ItemStack summaryItem = GUIUtils.createBasicItem(
-			currentSkillCount == 0 ? Material.BARRIER : Material.GREEN_CONCRETE,
-			"Skill Points",
-			NamedTextColor.WHITE,
-			false,
-			"You have " + currentSkillCount + " skill point" + (currentSkillCount == 1 ? "" : "s") + " remaining.",
-			NamedTextColor.LIGHT_PURPLE
-		);
+
+		Material material = currentSkillCount == 0 ? Material.BARRIER : Material.GREEN_CONCRETE;
+
+		Component description = new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addLine("You have %d out of %d *Skill Points*").styles(SKILL_POINT_COLOR)
+			.statValues(scoreboard(AbilityUtils.REMAINING_SKILL), scoreboard(AbilityUtils.TOTAL_LEVEL))
+			.addLine("remaining.").styles(SKILL_POINT_COLOR)
+			.addLine()
+			.addLine("*Skill Points* are used to unlock new").styles(SKILL_POINT_COLOR)
+			.addLine("abilities or upgrade existing ones.")
+			.addDashedLine()
+			.get(mPlayer);
+
+		Component name = DescriptionUtils.centeredComponent(description, "Skill Points", SKILL_POINT_COLOR, true);
+
+		ItemStack summaryItem = GUIUtils.createBasicItem(material, 1, name, description, 99, true);
 		GUIUtils.setGuiNbtTag(
 			summaryItem,
 			"texture",
@@ -152,33 +197,47 @@ public class ClassSelectionGui extends Gui {
 		@Nullable PlayerSpec displayedSpec, // Only set for spec abilities
 		AbilityInfo<?> ability
 	) {
-		String desc = ability.getSimpleDescription();
-		Component clickHere = Component.text(
-			"Click here to remove your levels in this skill, and click the panes to the right to pick a level in this skill.",
-			NamedTextColor.GRAY
-		);
-		Component lore = Component.text(desc == null ? "" : desc, NamedTextColor.WHITE);
-		if (isClass(displayedClass, displayedSpec)) {
-			if (desc != null) {
-				lore = lore.append(Component.newline());
-			}
-			lore = lore.append(clickHere);
+		int currentLevel;
+		if (ability.getScoreboard() != null) {
+			currentLevel = ScoreboardUtils.getScoreboardValue(mPlayer, ability.getScoreboard()).orElse(0);
+		} else {
+			currentLevel = 0;
 		}
+
+		Component description = new FormattedDescriptionBuilder<>(() -> ability)
+			.addDashedLine()
+			.add((a, p) -> {
+				var result = new FormattedDescriptionBuilder<>(() -> ability);
+
+				if (displayedSpec != null && !ServerProperties.getClassSpecializationsEnabled(p)) {
+					result.addStat("Current Level: *Disabled*").styles(DescriptionUtils.RED);
+				} else {
+					switch (currentLevel) {
+						case 0 -> result.addStat("Current Level: *Not Selected*").styles(DescriptionUtils.DARK_GREY);
+						case 1 -> result.addStat("Current Level: Level 1");
+						case 2 -> result.addStat("Current Level: Level 2");
+						case 3 -> result.addStat("Current Level: Level 1 *[Enhanced]*")
+							.styles(ServerProperties.getAbilityEnhancementsEnabled(p) ? ENHANCEMENT_POINT_COLOR : DescriptionUtils.DISABLED);
+						case 4 -> result.addStat("Current Level: Level 2 *[Enhanced]*")
+							.styles(ServerProperties.getAbilityEnhancementsEnabled(p) ? ENHANCEMENT_POINT_COLOR : DescriptionUtils.DISABLED);
+					}
+				}
+				return result.get(p);
+			})
+			.addCharmEffects()
+			.addDashedLine()
+			.addIf((a, p) -> currentLevel != 0, desc -> desc.addAction("Click to remove this ability.", DescriptionUtils.ACTION_SELECT))
+			.get(mPlayer);
+
 		String quest216Message = ability.getQuest216Message();
 		Component quest216Component;
-		if (
-			quest216Message != null
-				&& mPlayer.getScoreboardTags().contains("Q216Distortion4Active")
-		) {
-			quest216Component = Component.text(
-				quest216Message,
+		if (quest216Message != null && mPlayer.getScoreboardTags().contains("Q216Distortion4Active")) {
+			quest216Component = Component.text(quest216Message,
 				NamedTextColor.DARK_GRAY,
 				TextDecoration.ITALIC,
 				TextDecoration.OBFUSCATED
 			);
-			lore = lore
-				.append(Component.newline())
-				.append(quest216Component);
+			description = description.appendNewline().appendSpace().append(quest216Component);
 		} else {
 			quest216Component = null;
 		}
@@ -186,12 +245,11 @@ public class ClassSelectionGui extends Gui {
 		if (item == null) {
 			item = displayedClass.mDisplayItem;
 		}
-		String name = ability.getDisplayName();
-		if (name == null) {
-			name = "";
+		Component name = Component.empty();
+		if (ability.getDisplayName() != null) {
+			name = DescriptionUtils.centeredComponent(description, ability.getDisplayName(), displayedClass.mClassColor, true);
 		}
-		ItemStack abilityIcon = GUIUtils.createBasicItem(item, 1, name,
-			displayedClass.mClassColor, true, lore, 30, true);
+		ItemStack abilityIcon = GUIUtils.createBasicItem(item, 1, name, description, 99, true);
 		GUIUtils.setGuiNbtTag(abilityIcon, "texture", ability.getDisplayName(), mGuiTextures);
 		setItem(row, column, abilityIcon).onClick(event -> {
 			if (event.isShiftClick()) {
@@ -226,17 +284,37 @@ public class ClassSelectionGui extends Gui {
 			}
 		}
 
+		boolean canSelect;
+		if (displayedSpec == null) {
+			int remainingSkill = ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_SKILL).orElse(0);
+			canSelect = level - currentLevel <= remainingSkill;
+		} else {
+			int remainingSpec = ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_SPEC).orElse(0);
+			canSelect = level - currentLevel <= remainingSpec;
+		}
+
+		Component instruction;
+		if (!isClass(displayedClass, displayedSpec)) {
+			instruction = Component.empty();
+		} else if (!canSelect) {
+			instruction = DescriptionUtils.actionLine("Cannot select ability!", DescriptionUtils.ACTION_DENIED).appendNewline().appendSpace()
+				.append(DescriptionUtils.actionLine("Not enough points!", DescriptionUtils.ACTION_DENIED));
+		} else if (currentLevel < level) {
+			instruction = DescriptionUtils.actionLine("Click to select!", DescriptionUtils.ACTION_SELECT);
+		} else {
+			instruction = DescriptionUtils.actionLine("Ability already selected.", DescriptionUtils.ACTION_COMPLETED);
+		}
+
+		Component lore = ability.getDescription(level, mPlayer, true);
+		lore = lore.appendNewline().append(instruction);
+
+		Component name = Component.text(Objects.requireNonNull(ability.getDisplayName()), displayedClass.mClassColor)
+			.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)
+			.append(Component.text(" [Lv. %s]".formatted(level), DescriptionUtils.GOLD).decoration(TextDecoration.BOLD, false));
+
 		Material newMat = currentLevel >= level ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
-		levelItem = GUIUtils.createBasicItem(
-			newMat,
-			1,
-			"Level " + level,
-			displayedClass.mClassColor,
-			true,
-			ability.getDescription(level, mPlayer, true).color(NamedTextColor.WHITE),
-			30,
-			true
-		);
+		levelItem = GUIUtils.createBasicItem(newMat, 1, name, lore, 99, true);
+
 		GUIUtils.setGuiNbtTag(
 			levelItem,
 			"texture",
@@ -252,7 +330,7 @@ public class ClassSelectionGui extends Gui {
 				return;
 			}
 			applyAbilityChosen(displayedClass, displayedSpec, ability, level);
-			update();
+			Bukkit.getScheduler().runTask(mPlugin, this::update);
 		});
 	}
 
@@ -263,30 +341,31 @@ public class ClassSelectionGui extends Gui {
 		AbilityInfo<?> ability
 	) {
 		ItemStack newItem;
-		if (ability.getDescriptions().size() != 3) {
-			newItem = GUIUtils.createBasicItem(Material.BARRIER, "No Option",
-				displayedClass.mClassColor, true, "No Enhancement Created", NamedTextColor.WHITE);
-			setItem(row, column, newItem);
-			return;
-		}
 
+		boolean isDisabled;
 		boolean hasEnhancement;
 		Material newMat;
+		String guiTexture;
 		String scoreboard = ability.getScoreboard();
 		switch (scoreboard == null ? 0 : ScoreboardUtils.getScoreboardValue(mPlayer, scoreboard).orElse(0)) {
 			case 0 -> {
+				isDisabled = true;
+				hasEnhancement = false;
 				newMat = Material.BARRIER;
-				ItemStack disabledEn = GUIUtils.createBasicItem(newMat, 1,
-					"Enhancement", displayedClass.mClassColor, true,
-					Component.text("Cannot Select; Choose levels in the ability first. Description: ")
-						.append(ability.getDescription(3, mPlayer, true)),
-					30, true);
-				GUIUtils.setGuiNbtTag(disabledEn, "texture", "skill_select_en_disabled", mGuiTextures);
-				setItem(row, column, disabledEn);
-				return;
+				guiTexture = "skill_select_en_disabled";
 			}
-			case 1, 2 -> hasEnhancement = false;
-			case 3, 4 -> hasEnhancement = true;
+			case 1, 2 -> {
+				isDisabled = false;
+				hasEnhancement = false;
+				newMat = Material.ORANGE_STAINED_GLASS_PANE;
+				guiTexture = "skill_select_en_unlit";
+			}
+			case 3, 4 -> {
+				isDisabled = false;
+				hasEnhancement = true;
+				newMat = Material.YELLOW_STAINED_GLASS_PANE;
+				guiTexture = "skill_select_en_lit";
+			}
 			default -> {
 				newMat = Material.BARRIER;
 				newItem = GUIUtils.createBasicItem(newMat, "Unknown Level",
@@ -295,24 +374,51 @@ public class ClassSelectionGui extends Gui {
 				return;
 			}
 		}
-		newMat = hasEnhancement ? Material.YELLOW_STAINED_GLASS_PANE : Material.ORANGE_STAINED_GLASS_PANE;
-		newItem = GUIUtils.createBasicItem(newMat, 1,
-			"Enhancement", displayedClass.mClassColor, true,
-			ability.getDescription(3, mPlayer, true), 30, true);
+
+		Component instruction;
+		if (!isClass(displayedClass, null)) {
+			instruction = Component.empty();
+		} else if (hasEnhancement) {
+			instruction = DescriptionUtils.actionLine("Enhancement already selected.", DescriptionUtils.ACTION_COMPLETED).appendNewline().appendSpace()
+				.append(DescriptionUtils.actionLine("Click to deselect!", DescriptionUtils.ACTION_SELECT));
+		} else if (ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE).orElse(0) == 0) {
+			instruction = DescriptionUtils.actionLine("Cannot select enhancement!", DescriptionUtils.ACTION_DENIED).appendNewline().appendSpace()
+				.append(DescriptionUtils.actionLine("Not enough points!", DescriptionUtils.ACTION_DENIED));
+		} else if (isDisabled) {
+			instruction = DescriptionUtils.actionLine("Cannot select enhancement!", DescriptionUtils.ACTION_DENIED).appendNewline().appendSpace()
+				.append(DescriptionUtils.actionLine("Ability must be selected first!", DescriptionUtils.ACTION_DENIED));
+		} else {
+			instruction = DescriptionUtils.actionLine("Click to select!", DescriptionUtils.ACTION_SELECT);
+		}
+
+		Component description = ability.getDescription(3, mPlayer, true).appendNewline().appendSpace();
+		description = description.append(instruction);
+
+		Component name = Component.text(Objects.requireNonNull(ability.getDisplayName()), displayedClass.mClassColor)
+			.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)
+			.append(Component.text(" [Enhancement]", DescriptionUtils.GOLD).decoration(TextDecoration.BOLD, false));
+
+		newItem = GUIUtils.createBasicItem(newMat, 1, name, description, 99, true);
 		GUIUtils.setGuiNbtTag(
 			newItem,
 			"texture",
-			hasEnhancement ? "skill_select_en_lit" : "skill_select_en_unlit",
+			guiTexture,
 			mGuiTextures
 		);
+
 
 		setItem(row, column, newItem)
 			.onClick(event -> {
 				if (event.isShiftClick()) {
 					return;
 				}
+				if (isDisabled) {
+					mPlayer.playSound(mPlayer, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
+					mPlayer.playSound(mPlayer, Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 0.8f, 0.75f);
+					return;
+				}
 				applyEnhancementChosen(displayedClass, ability, !hasEnhancement);
-				update();
+				Bukkit.getScheduler().runTask(mPlugin, this::update);
 			});
 	}
 
@@ -373,12 +479,9 @@ public class ClassSelectionGui extends Gui {
 				ScoreboardUtils.setScoreboardValue(mPlayer, objective, enhancementOffset + level);
 
 				playSelectionSound(mPlayer, displayedSpec == null ? level : null, displayedSpec == null ? null : level, null);
-			} else if (displayedSpec == null) {
-				mPlayer.sendMessage("You don't have enough skill points to select this skill!");
-				return;
 			} else {
-				mPlayer.sendMessage("You don't have enough specialization points to select this skill!");
-				return;
+				mPlayer.playSound(mPlayer, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
+				mPlayer.playSound(mPlayer, Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 0.8f, 0.75f);
 			}
 		}
 		updatePlayerAbilities();
@@ -413,7 +516,8 @@ public class ClassSelectionGui extends Gui {
 
 				playSelectionSound(mPlayer, null, null, 1);
 			} else {
-				mPlayer.sendMessage("You don't have enough enhancement points to select this enhancement!");
+				mPlayer.playSound(mPlayer, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
+				mPlayer.playSound(mPlayer, Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 0.8f, 0.75f);
 				return;
 			}
 		} else {

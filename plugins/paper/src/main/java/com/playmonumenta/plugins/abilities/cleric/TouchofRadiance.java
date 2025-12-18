@@ -6,8 +6,9 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.TouchofRadianceCS;
 import com.playmonumenta.plugins.effects.AbilityCooldownRechargeRate;
@@ -19,7 +20,6 @@ import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
-import java.util.function.Predicate;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -28,6 +28,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class TouchofRadiance extends Ability {
 	public static final String NAME = "Touch of Radiance";
@@ -185,40 +189,83 @@ public class TouchofRadiance extends Ability {
 	}
 
 	private static Description<TouchofRadiance> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.addTrigger(" while looking at another player or a Heretic")
-			.add(" within ")
-			.add(a -> a.mRange, RANGE)
-			.add(" blocks to gain ")
-			.addPercent(a -> a.mCDR, CDR_1, false, Predicate.not(Ability::isLevelTwo))
-			.add(" faster cooldown recharge rate for all other abilities for the next ")
-			.addDuration(a -> a.mBuffDuration, DURATION)
-			.add(" seconds. If looking at a player, they gain the same buff. If looking at a Heretic, it is stunned for ")
-			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" seconds. Players are prioritized when searching for a target.")
-			.addCooldown(COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addTrigger()
+			.addDashedLine()
+			.addLine("Target a player or *Heretic* to gain faster").styles(Cleric.HERETIC_COLOR)
+			.addLine("cooldown recharge rate for a short time.")
+			.addLine("(Doesn't reduce this ability's cooldown)")
+			.addLine()
+			.addStat("Self Effect: +%p1 Cooldown Recharge Rate for %t")
+				.statValues(
+					stat(a -> a.mCDR, CDR_1),
+					stat(a -> a.mBuffDuration, DURATION))
+			.addLine()
+			.addLine("If you targeted a player, they also gain")
+			.addLine("faster cooldown recharge rate.")
+			.addLine()
+			.addStat("Ally Effect: +%p1 Cooldown Recharge Rate for %t")
+				.statValues(
+					stat(a -> a.mCDRAlly, CDR_1_ALLY),
+					stat(a -> a.mBuffDuration, DURATION))
+			.addLine()
+			.addLine("If you targeted a *Heretic*, they get stunned.").styles(Cleric.HERETIC_COLOR)
+			.addStat("Heretic Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunDuration, STUN_DURATION))
+			.addLine()
+			.addStat("Range: %r")
+				.statValues(stat(a -> a.mRange, RANGE))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<TouchofRadiance> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Cooldown recharge rate is increased to ")
-			.addPercent(a -> a.mCDR, CDR_2, false, Predicate.not(Ability::isLevelOne))
-			.add(". Additionally, all mobs within a ")
-			.add(a -> a.mWeaknessRadius, RADIUS)
-			.add(" block radius of the target are inflicted with ")
-			.addPercent(a -> a.mWeakness, WEAKNESS)
-			.add(" weakness for ")
-			.addDuration(a -> a.mWeaknessDuration, WEAKNESS_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Touch of Radiance*'s cooldown").styles(UNDERLINED)
+			.addLine("recharge rate.")
+			.addLine()
+			.addStatComparison("Self Effect: +%p1 -> +%p2 Cooldown Recharge Rate")
+				.statValues(
+					stat(CDR_1),
+					stat(a -> a.mCDR, CDR_2))
+			.addStatComparison("Ally Effect: +%p1 -> +%p2 Cooldown Recharge Rate")
+				.statValues(
+					stat(CDR_1_ALLY),
+					stat(a -> a.mCDRAlly, CDR_2_ALLY))
+			.addLine()
+			.addLine("*Touch of Radiance* now weakens all mobs").styles(UNDERLINED)
+			.addLine("near the target player or *Heretic*.").styles(Cleric.HERETIC_COLOR)
+			.addLine()
+			.addStat("Effect: %p Weakness for %t")
+				.statValues(
+					stat(a -> a.mWeakness, WEAKNESS),
+					stat(a -> a.mWeaknessDuration, WEAKNESS_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mWeaknessRadius, RADIUS))
+			.addDashedLine();
 	}
 
 
 	private static Description<TouchofRadiance> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("After killing a targeted mob, your next attack on a Heretic deals ")
-			.add(a -> a.mEnhanceDamage, ENHANCE_DAMAGE)
-			.add(" magic damage to it and stuns it for ")
-			.addDuration(a -> a.mEnhanceStunDuration, ENHANCE_STUN_DURATION)
-			.add(" seconds. That mob becomes the new target, and killing it grants the same effect, repeating until Touch of Radiance runs out. If the first target was a player, the effect is primed for both of you immediately.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("After killing the targeted mob, your next")
+			.addLine("attack against a *Heretic* deals bonus").styles(Cleric.HERETIC_COLOR)
+			.addLine("damage to it and stuns it.")
+			.addLine()
+			.addStat("Damage: %d (s)")
+				.statValues(stat(a -> a.mEnhanceDamage, ENHANCE_DAMAGE))
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mEnhanceStunDuration, ENHANCE_STUN_DURATION))
+			.addLine()
+			.addLine("That mob becomes the new target of")
+			.addLine("this effect, and can repeat until")
+			.addLine("*Touch of Radiance*'s buff ends.").styles(UNDERLINED)
+			.addLine()
+			.addLine("If your initial target was a player, this")
+			.addLine("effect is primed for both of you immediately.")
+			.addDashedLine();
 	}
 }

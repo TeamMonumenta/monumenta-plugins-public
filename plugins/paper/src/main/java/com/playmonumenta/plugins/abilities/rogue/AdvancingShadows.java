@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.AdvancingShadowsCS;
@@ -33,6 +33,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class AdvancingShadows extends Ability {
 
@@ -275,37 +279,51 @@ public class AdvancingShadows extends Ability {
 	}
 
 	private static Description<AdvancingShadows> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to teleport to the target hostile enemy within ")
-			.add(a -> a.mActivationRange, ADVANCING_SHADOWS_RANGE_1, false, Ability::isLevelOne)
-			.add(" blocks and gain ")
-			.addPercent(a -> a.mPercentDamageDealt, DAMAGE_BONUS_1, false, Ability::isLevelOne)
-			.add(" melee damage for ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds.")
-			.addCooldown(ADVANCING_SHADOWS_COOLDOWN);
+			.addDashedLine()
+			.addLine("Teleport to a target mob in front of you")
+			.addLine("and gain increased melee damage.")
+			.addLine()
+			.addStat("Effect: +%p1 Melee Damage for %t")
+				.statValues(stat(a -> a.mPercentDamageDealt, DAMAGE_BONUS_1), stat(a -> a.mDuration, DURATION))
+			.addStat("Range: %r1")
+				.statValues(stat(a -> a.mActivationRange, ADVANCING_SHADOWS_RANGE_1))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(ADVANCING_SHADOWS_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<AdvancingShadows> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage increased to ")
-			.addPercent(a -> a.mPercentDamageDealt, DAMAGE_BONUS_2, false, Ability::isLevelTwo)
-			.add(" melee damage, teleport range is increased to ")
-			.add(a -> a.mActivationRange, ADVANCING_SHADOWS_RANGE_2, false, Ability::isLevelTwo)
-			.add(" blocks, and all hostile non-target mobs within ")
-			.add(a -> a.mKnockbackRadius, ADVANCING_SHADOWS_AOE_KNOCKBACK_RANGE)
-			.add(" blocks are knocked away from the target.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Advancing Shadows*'s damage").styles(UNDERLINED)
+			.addLine("boost and its teleport range.")
+			.addLine()
+			.addLine("Knock away all other mobs near")
+			.addLine("the target mob when you teleport.")
+			.addLine()
+			.addStatComparison("Effect: +%p1 -> +%p2 Melee Damage")
+				.statValues(stat(DAMAGE_BONUS_1), stat(a -> a.mPercentDamageDealt, DAMAGE_BONUS_2))
+			.addStatComparison("Range: %r1 -> %r2")
+				.statValues(stat(ADVANCING_SHADOWS_RANGE_1), stat(a -> a.mActivationRange, ADVANCING_SHADOWS_RANGE_2))
+			.addStat("Knockback Radius: %r")
+				.statValues(stat(a -> a.mKnockbackRadius, ADVANCING_SHADOWS_AOE_KNOCKBACK_RANGE))
+			.addDashedLine();
 	}
 
 	private static Description<AdvancingShadows> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("If the mob you teleported to dies within ")
-			.addDuration(a -> a.mEnhancementKillTimer, ENHANCEMENT_KILL_REQUIREMENT_TIME)
-			.add(" second, you can recast Advancing Shadows again in the next ")
-			.addDuration(a -> a.mRecastTimer, ENHANCEMENT_CHAIN_DURATION)
-			.add(" seconds. Recasts provide ")
-			.addPercent(a -> a.mEnhancementMultiplier, 0.5)
-			.add(" of the damage bonus and do not provide Deadly Ronde stacks.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("If the mob you teleported to dies within %t,")
+				.statValues(stat(a -> a.mEnhancementKillTimer, ENHANCEMENT_KILL_REQUIREMENT_TIME))
+			.addLine("you can recast *Advancing Shadows* in the").styles(UNDERLINED)
+			.addLine("next %t to teleport to another mob.")
+				.statValues(stat(a -> a.mRecastTimer, ENHANCEMENT_CHAIN_DURATION))
+			.addLine()
+			.addLine("Recasts provide %p of the damage boost")
+				.statValues(stat(a -> a.mEnhancementMultiplier, ENHANCEMENT_MULTIPLIER))
+			.addLine("and do not trigger *Deadly Ronde*.").styles(UNDERLINED)
+			.addDashedLine();
 	}
 }

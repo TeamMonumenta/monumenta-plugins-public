@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.DefensiveLineCS;
@@ -25,6 +25,10 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class DefensiveLine extends Ability {
 	private static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "DefensiveLinePercentDamageReceivedEffect";
@@ -59,6 +63,7 @@ public class DefensiveLine extends Ability {
 	private final double mRange;
 	private final double mPercentDamageReceived;
 	private final double mKnockAwayRadius;
+	private final int mEnhanceNegates;
 
 	private final DefensiveLineCS mCosmetic;
 
@@ -68,6 +73,7 @@ public class DefensiveLine extends Ability {
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 		mPercentDamageReceived = (isLevelOne() ? PERCENT_DAMAGE_RECEIVED_EFFECT_1 : PERCENT_DAMAGE_RECEIVED_EFFECT_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
 		mKnockAwayRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, KNOCK_AWAY_RADIUS);
+		mEnhanceNegates = (int) (1 + CharmManager.getLevel(mPlayer, CHARM_NEGATIONS));
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DefensiveLineCS());
 	}
 
@@ -92,7 +98,7 @@ public class DefensiveLine extends Ability {
 				new PercentDamageReceived(mDuration, -mPercentDamageReceived).deleteOnAbilityUpdate(true));
 			if (isEnhanced()) {
 				mPlugin.mEffectManager.addEffect(player, NEGATE_DAMAGE_EFFECT_NAME,
-					new NegateDamage(mDuration, (int) (1 + CharmManager.getLevel(mPlayer, CHARM_NEGATIONS)),
+					new NegateDamage(mDuration, mEnhanceNegates,
 						EnumSet.of(DamageEvent.DamageType.MELEE),
 						new PartialParticle(Particle.FIREWORKS_SPARK, loc).count(5).delta(0).extra(0.25))
 						.deleteOnAbilityUpdate(true));
@@ -105,29 +111,43 @@ public class DefensiveLine extends Ability {
 	}
 
 	private static Description<DefensiveLine> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Block while sneaking to grant yourself and other players within ")
-			.add(a -> a.mRange, RANGE)
-			.add(" blocks ")
-			.addPercent(a -> a.mPercentDamageReceived, PERCENT_DAMAGE_RECEIVED_EFFECT_1, false, Ability::isLevelOne)
-			.add(" resistance for ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds. Additionally, mobs within ")
-			.add(a -> a.mKnockAwayRadius, KNOCK_AWAY_RADIUS)
-			.add(" blocks of an affected player are knocked back.")
-			.addCooldown(COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addCustomTrigger("Shield Block while Sneaking")
+			.addDashedLine()
+			.addLine("Grant yourself and other nearby players")
+			.addLine("a temporary resistance boost and knock")
+			.addLine("mobs away from them.")
+			.addLine()
+			.addStat("Effect: +%p1 Resistance for %t")
+				.statValues(stat(a -> a.mPercentDamageReceived, PERCENT_DAMAGE_RECEIVED_EFFECT_1), stat(a -> a.mDuration, DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRange, RANGE))
+			.addStat("Knockback Radius: %r")
+				.statValues(stat(a -> a.mKnockAwayRadius, KNOCK_AWAY_RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<DefensiveLine> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The effect is increased to ")
-			.addPercent(a -> a.mPercentDamageReceived, PERCENT_DAMAGE_RECEIVED_EFFECT_2, false, Ability::isLevelTwo)
-			.add(" resistance.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Defensive Line*'s resistance.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Effect: +%p1 -> +%p2 Resistance")
+				.statValues(stat(PERCENT_DAMAGE_RECEIVED_EFFECT_1), stat(a -> a.mPercentDamageReceived, PERCENT_DAMAGE_RECEIVED_EFFECT_2))
+			.addDashedLine();
 	}
 
 	private static Description<DefensiveLine> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Additionally, all affected players negate the next melee attack dealt to them within the duration.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Additionally, all affected players block")
+			.addLine("the next melee attack dealt to them.")
+			.addLine()
+			.addStat("Effect: %d Melee Hit Blocked for %t")
+				.statValues(stat(a -> a.mEnhanceNegates, 1), stat(a -> a.mDuration, DURATION))
+			.addDashedLine();
 	}
 
 }

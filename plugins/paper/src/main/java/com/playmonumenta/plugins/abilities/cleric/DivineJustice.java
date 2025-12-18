@@ -6,10 +6,11 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.cleric.paladin.Unwavering;
 import com.playmonumenta.plugins.abilities.cleric.seraph.Rejuvenation;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.DivineJusticeCS;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
@@ -36,6 +37,10 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class DivineJustice extends Ability implements AbilityWithChargesOrStacks, AbilityWithDuration {
 	public static final String NAME = "Divine Justice";
@@ -219,36 +224,59 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	}
 
 	private static Description<DivineJustice> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Critical melee or projectile attacks deal ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" plus ")
-			.addPercent(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_1, false, Ability::isLevelOne)
-			.add(" of your base critical damage as magic damage to Heretics.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Critical attacks and projectiles deal")
+			.addLine("bonus magic damage (s) to *Heretics*.").styles(Cleric.HERETIC_COLOR)
+			.addLine()
+			.addStat("Bonus Damage: +%d1 + %p1 (s)")
+				.statValues(
+					stat(a -> a.mDamage, DAMAGE_1),
+					stat(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_1))
+			.tab().addLine("(of the attack's damage)")
+			.addDashedLine();
 	}
 
 	private static Description<DivineJustice> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" + ")
-			.addPercent(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(" of your base critical damage. Additionally, whenever you kill a Heretic, you and players within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks of you regenerate ")
-			.addPercent(a -> a.mSelfHeal, HEALING_MULTIPLIER_OWN)
-			.add(" of their max health over 1 second. Duration stacks on kill up to 3 seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Divine Justice*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Bonus Damage: +%d1 + %p1 -> +%d2 + %p2 (s)")
+				.statValues(stat(DAMAGE_1), stat(DAMAGE_MULTIPLIER_1), stat(a -> a.mDamage, DAMAGE_2), stat(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_2))
+			.addLine()
+			.addLine("Killing a *Heretic* with *Divine Justice* heals").styles(Cleric.HERETIC_COLOR, UNDERLINED)
+			.addLine("yourself and other nearby players over time.")
+			.addLine("(Duration stacks per kill, up to 3s)")
+			.addLine()
+			// Don't want to display redundant lines for the majority of cases!
+			.addIfElse((a, p) -> a == null || a.mSelfHeal == a.mAllyHeal,
+				desc -> desc.addStat("Healing: %p HP over 1s")
+					.statValues(stat(a -> a.mSelfHeal, HEALING_MULTIPLIER_OWN)),
+				desc -> desc.addStat("Self Healing: %p HP over 1s")
+					.statValues(stat(a -> a.mSelfHeal, HEALING_MULTIPLIER_OWN))
+					.addStat("Ally Healing: %p HP over 1s")
+					.statValues(stat(a -> a.mAllyHeal, HEALING_MULTIPLIER_OTHER)))
+
+			.addStat("Healing Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<DivineJustice> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("After triggering Divine Justice 3 times within ")
-			.addDuration(a -> a.mComboTimer, ENHANCEMENT_COMBO_TIMER)
-			.add(" seconds of each other, all your other damaging abilities deal ")
-			.addPercent(a -> a.mEnhanceDamage, ENHANCEMENT_BONUS_DAMAGE)
-			.add(" more damage for the next ")
-			.addDuration(a -> a.mEnhanceDuration, ENHANCEMENT_BONUS_DAMAGE_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("After triggering *Divine Justice* *3* times within").styles(UNDERLINED, WHITE)
+			.addLine("%t of each other, deal increased damage with")
+				.statValues(stat(a -> a.mComboTimer, ENHANCEMENT_COMBO_TIMER))
+			.addLine("your other abilities for a short time.")
+			.addLine("(Doesn't boost Divine Justice's damage)")
+			.addLine()
+			.addStat("Effect: +%p Ability Damage for %t")
+				.statValues(
+					stat(a -> a.mEnhanceDamage, ENHANCEMENT_BONUS_DAMAGE),
+					stat(a -> a.mEnhanceDuration, ENHANCEMENT_BONUS_DAMAGE_DURATION))
+			.addDashedLine();
 	}
 
 	@Override

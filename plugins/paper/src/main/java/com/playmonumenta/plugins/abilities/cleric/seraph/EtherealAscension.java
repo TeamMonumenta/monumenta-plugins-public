@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.seraph.EtherealAscensionCS;
@@ -39,6 +39,8 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -56,6 +58,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class EtherealAscension extends Ability implements AbilityWithDuration {
 
@@ -94,6 +100,8 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 	public static final String CHARM_DASH_VELOCITY = "Ethereal Ascension Dash Velocity";
 	public static final String CHARM_DURATION = "Ethereal Ascension Duration";
 	public static final String CHARM_COOLDOWN = "Ethereal Ascension Cooldown";
+
+	private static final Style ASCENDED_COLOR = Style.style(TextColor.color(0xFFEE99));
 
 	public static final String NOT_FULLY_CHARGED_MARKER = "Non-critical Ethereal Ascension Orb";
 
@@ -380,37 +388,52 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<EtherealAscension> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to Ascend and hover above the ground for ")
-			.addDuration(a -> a.mAscensionDuration, ASCENSION_DURATION)
-			.add("s. While Ascended, projectiles you shoot turn into orbs that move in a straight line, applying aspect enchants and dealing up to ")
-			.add(a -> a.mAscensionOrbDamageFlat, ASCENSION_ORB_DAMAGE_FLAT)
-			.add(" + ")
-			.addPercent(a -> a.mAscensionOrbDamagePercent, ASCENSION_ORB_DAMAGE_PERCENT)
-			.add(" of your base projectile damage when fully charged, including flat damage buffs, as magic damage to mobs in a ")
-			.add(a -> a.mAscensionOrbRadius, ASCENSION_ORB_RADIUS)
-			.add(" block radius on impact. A mob can only be hit by one orb every 0.4s. Hitting allies with an orb grants them a ")
-			.addPercent(a -> a.mAscensionOrbDamageBonus, ASCENSION_ORB_DAMAGE_BONUS)
-			.add(" damage bonus and Haste ")
-			.addPotionAmplifier(a -> a.mAscensionOrbHaste, ASCENSION_ORB_HASTE)
-			.add(" for ")
-			.addDuration(a -> a.mAscensionOrbBuffDuration, ASCENSION_ORB_BUFF_DURATION)
-			.add("s. Double-jumping will cause you to dash forward, at most once every 2s. Ascension ends and goes on cooldown when the duration expires or you recast the ability.")
-			.addCooldown(ASCENSION_COOLDOWN);
+			.addDashedLine()
+			.addLine("*Ascend* and hover above the ground for %t.").styles(ASCENDED_COLOR)
+				.statValues(stat(a -> a.mAscensionDuration, ASCENSION_DURATION))
+			.addLine("(Recast to end the effect early)")
+			.addLine()
+			.addLine("While *Ascended*, your projectiles become orbs that").styles(ASCENDED_COLOR)
+			.addLine("burst on impact, dealing magic damage (s) instead and")
+			.addLine("granting increased damage and haste to players hit.")
+			.addLine("You can double jump to dash forwards. (2s cooldown)")
+			.addLine()
+			.addStat("Damage: %d + %p (s) (of the projectile's damage)")
+				.statValues(
+					stat(a -> a.mAscensionOrbDamageFlat, ASCENSION_ORB_DAMAGE_FLAT),
+					stat(a -> a.mAscensionOrbDamagePercent, ASCENSION_ORB_DAMAGE_PERCENT))
+			.addStat("Effect: +%p Damage for %t")
+				.statValues(
+					stat(a -> a.mAscensionOrbDamageBonus, ASCENSION_ORB_DAMAGE_BONUS),
+					stat(a -> a.mAscensionOrbBuffDuration, ASCENSION_ORB_BUFF_DURATION))
+			.addStat("Effect: Haste %d for %t")
+				.statValues(
+					stat(a -> a.mAscensionOrbHaste + 1, ASCENSION_ORB_HASTE + 1),
+					stat(a -> a.mAscensionOrbBuffDuration, ASCENSION_ORB_BUFF_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mAscensionOrbRadius, ASCENSION_ORB_RADIUS))
+			.addStat("Cooldown: %t (starts when ability ends)")
+				.statValues(cooldown(ASCENSION_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<EtherealAscension> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("You gain ")
-			.addPercent(ASCENSION_ORB_RADIUS_PERCENT_BONUS)
-			.add(" increased orb radius from fully charged bow and crossbow shots, and ")
-			.addPercent(a -> a.mAscensionThrowRate, ASCENSION_THROW_RATE)
-			.add(" faster throw rate while Ascended. For each mob you kill while Ascended, extend the duration by ")
-			.addDuration(a -> a.mAscensionDurationExtension, ASCENSION_DURATION_EXTENSION)
-			.add("s, up to a total of ")
-			.addDuration(a -> a.mAscensionMaxDurationExtension, ASCENSION_DURATION_MAX_EXTENSION)
-			.add(" extra seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Gain +%p *Throw Rate* while *Ascended*.").styles(WHITE, ASCENDED_COLOR)
+				.statValues(stat(a -> a.mAscensionThrowRate, ASCENSION_THROW_RATE))
+			.addLine("Orbs shot with fully charged bows or")
+			.addLine("crossbows gain +%p radius.")
+				.statValues(stat(ASCENSION_ORB_RADIUS_PERCENT_BONUS))
+			.addLine()
+			.addLine("Killing a mob while *Ascended* extends its").styles(ASCENDED_COLOR)
+			.addLine("duration by +%t, up to a maximum of +%t.")
+				.statValues(
+					stat(a -> a.mAscensionDurationExtension, ASCENSION_DURATION_EXTENSION),
+					stat(a -> a.mAscensionMaxDurationExtension, ASCENSION_DURATION_MAX_EXTENSION))
+			.addDashedLine();
 	}
 
 	@Override

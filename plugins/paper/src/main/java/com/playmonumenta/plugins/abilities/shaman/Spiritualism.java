@@ -4,8 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.SpiritualismCS;
 import com.playmonumenta.plugins.effects.PercentHeal;
@@ -17,6 +18,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Spiritualism extends Ability {
 
@@ -138,31 +142,48 @@ public class Spiritualism extends Ability {
 	}
 
 	private static Description<Spiritualism> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Gain ")
-			.addPercent(a -> a.mHealing, BASE_HEALING_L1, false, Ability::isLevelOne)
-			.add(" increased healing from all sources innately. Other players in range of your totems gain ")
-			.addPercent(a -> a.mBonusHealing, TOTEM_HEALING)
-			.add(" increased healing. Additionally, your totem damage is boosted by ")
-			.addPercent(a -> a.mTotemDamageBoost, TOTEM_DMG_BOOST_L1, false, Ability::isLevelOne)
-			.add(" if there is any player within its radius.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Gain increased healing. Other players")
+			.addLine("inside a *Totem's* area gain increased").styles(Shaman.TOTEM_COLOR)
+			.addLine("healing as well.")
+			.addLine()
+			.addStat("Self Effect: +%p1 Healing")
+				.statValues(stat(a -> a.mHealing, BASE_HEALING_L1))
+			.addStat("Ally Effect: +%p Healing")
+				.statValues(stat(a -> a.mBonusHealing, TOTEM_HEALING))
+			.addLine()
+			.addLine("*Totems* deal increased damage while").styles(Shaman.TOTEM_COLOR)
+			.addLine("a player is within their area.")
+			.addLine()
+			.addStat("Damage Boost: +%p1 (s)")
+				.statValues(stat(a -> a.mTotemDamageBoost, TOTEM_DMG_BOOST_L1))
+			.addDashedLine();
 	}
 
 	private static Description<Spiritualism> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The base healing rate is increased to ")
-			.addPercent(a -> a.mHealing, BASE_HEALING_L2, false, Ability::isLevelTwo)
-			.add(". The totem damage boost is increased to ")
-			.addPercent(a -> a.mTotemDamageBoost, TOTEM_DMG_BOOST_L2, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Spiritualism*'s healing boost").styles(UNDERLINED)
+			.addLine("and *Totem* damage boost.").styles(Shaman.TOTEM_COLOR)
+			.addLine()
+			.addStatComparison("Self Effect: +%p1 -> +%p2 Healing")
+				.statValues(stat(BASE_HEALING_L1), stat(a -> a.mHealing, BASE_HEALING_L2))
+			.addStatComparison("Damage Boost: +%p1 -> +%p2 (s)")
+				.statValues(stat(TOTEM_DMG_BOOST_L1), stat(a -> a.mTotemDamageBoost, TOTEM_DMG_BOOST_L2))
+			.addDashedLine();
 	}
 
 	private static Description<Spiritualism> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Casting a non-totem ability in range of a totem immediately refunds ")
-			.addPercent(a -> a.mNonTotemCooldownRefundPercent, TOTEM_COOLDOWN_REFUND_PERCENT)
-			.add(" of its total cooldown, capping at ")
-			.addDuration(a -> a.mNonTotemCooldownRefundCap, TOTEM_COOLDOWN_REFUND_CAP)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Casting a non-*Totem* ability while inside").styles(Shaman.TOTEM_COLOR)
+			.addLine("a *Totem's* area reduces the cooldown").styles(Shaman.TOTEM_COLOR)
+			.addLine("of that ability.")
+			.addLine()
+			.addStat("Cooldown Reduction: %p (max %t)")
+				.statValues(stat(a -> a.mNonTotemCooldownRefundPercent, TOTEM_COOLDOWN_REFUND_PERCENT),
+					stat(a -> a.mNonTotemCooldownRefundCap, TOTEM_COOLDOWN_REFUND_CAP))
+			.addDashedLine();
 	}
 }

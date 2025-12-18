@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.CleansingRainCS;
@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -34,6 +33,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class CleansingRain extends Ability implements AbilityWithDuration {
 	private static final int CLEANSING_1_DURATION = TICKS_PER_SECOND * 6;
@@ -240,35 +242,57 @@ public class CleansingRain extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<CleansingRain> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to summon a Cleansing Rain that follows you, removing all negative effects shorter than ")
-			.addDuration(CLEANSING_MAX_DEBUFF_DURATION)
-			.add(" seconds from players within ")
-			.add(a -> a.mRadius, CLEANSING_RADIUS, false, Predicate.not(Ability::isEnhanced))
-			.add(" blocks, including yourself, and lasts for ")
-			.addDuration(a -> a.mRainDuration, CLEANSING_1_DURATION, false, Predicate.not(Ability::isLevelTwo))
-			.add(" seconds. Players heal ")
-			.addPercent(a -> a.mRainHealing, CLEANSING_HEALING_INCREMENT)
-			.add(" of their max health the first time a given debuff is cleansed, up to ")
-			.add(a -> a.mRainHealingMaxDebuffs, CLEANSING_HEALING_MAX_DEBUFFS)
-			.add(" unique debuffs.")
-			.addCooldown(CLEANSING_COOLDOWN);
+			.addDashedLine()
+			.addLine("Summon a rain cloud that follows you")
+			.addLine("and removes negative effects from")
+			.addLine("yourself and nearby players.")
+			.addLine()
+			.addLine("Players are healed when a debuff")
+			.addLine("is cleansed.")
+			.addLine()
+			.addStat("Healing: %p HP per debuff (max %d)")
+				.statValues(
+					stat(a -> a.mRainHealing, CLEANSING_HEALING_INCREMENT),
+					stat(a -> a.mRainHealingMaxDebuffs, CLEANSING_HEALING_MAX_DEBUFFS))
+			.addStat("Radius: %r1e_only")
+				.statValues(stat(a -> a.mRadius, CLEANSING_RADIUS))
+			.addStat("Duration: %t1")
+				.statValues(stat(a -> a.mRainDuration, CLEANSING_1_DURATION))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(CLEANSING_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<CleansingRain> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Additionally grants ")
-			.addPercent(a -> a.mResistancePotency, PERCENT_DAMAGE_RESIST)
-			.add(" resistance to players while under the rain. Duration is increased to ")
-			.addDuration(a -> a.mRainDuration, CLEANSING_2_DURATION, false, Predicate.not(Ability::isLevelOne))
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("*Cleansing Rain* now grants resistance").styles(UNDERLINED)
+			.addLine("to players under the cloud and its")
+			.addLine("duration is increased.")
+			.addLine()
+			.addStat("Effect: +%p Resistance")
+				.statValues(stat(a -> a.mResistancePotency, PERCENT_DAMAGE_RESIST))
+			.addStatComparison("Duration: %t1 -> %t2")
+				.statValues(
+					stat(CLEANSING_1_DURATION),
+					stat(a -> a.mRainDuration, CLEANSING_2_DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<CleansingRain> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The radius is increased to ")
-			.add(a -> a.mRadius, CLEANSING_RADIUS_ENHANCED, false, Ability::isEnhanced)
-			.add(" blocks, and each player touched by the rain keeps its effect for the cast duration.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Increase *Cleansing Rain*'s radius.").styles(UNDERLINED)
+			.addLine()
+			.addLine("Any player who enters the rain keeps its effect")
+			.addLine("for the full duration, even after leaving.")
+			.addLine()
+			.addStatComparison("Radius: %r1e -> %r3")
+				.statValues(
+					stat(CLEANSING_RADIUS),
+					stat(a -> a.mRadius, CLEANSING_RADIUS_ENHANCED))
+			.addDashedLine();
 	}
 }

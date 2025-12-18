@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.assassin.CoupDeGraceCS;
@@ -18,6 +18,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 /*
  * Coup De Grâce: If you melee attack a normal enemy and that attack
@@ -86,20 +89,28 @@ public class CoupDeGrace extends Ability {
 	}
 
 	private static Description<CoupDeGrace> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("If melee damage you deal brings a normal mob below ")
-			.addPercent(a -> a.mNormalThreshold, COUP_1_NORMAL_THRESHOLD, false, Ability::isLevelOne)
-			.add(" health or an Elite mob below ")
-			.addPercent(a -> a.mEliteThreshold, COUP_1_ELITE_THRESHOLD, false, Ability::isLevelOne)
-			.add(" health, they die instantly.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("After you deal melee damage to a mob,")
+			.addLine("instantly kill them if they're at low health.")
+			.addLine("(Bosses are excluded)")
+			.addLine()
+			.addStat("Normal Kill Threshold: %p1")
+				.statValues(stat(a -> a.mNormalThreshold, COUP_1_NORMAL_THRESHOLD))
+			.addStat("Elite Kill Threshold: %p1")
+				.statValues(stat(a -> a.mEliteThreshold, COUP_1_ELITE_THRESHOLD))
+			.addDashedLine();
 	}
 
 	private static Description<CoupDeGrace> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The health threshold is increased to ")
-			.addPercent(a -> a.mNormalThreshold, COUP_2_NORMAL_THRESHOLD, false, Ability::isLevelTwo)
-			.add(" for normal enemies and ")
-			.addPercent(a -> a.mEliteThreshold, COUP_2_ELITE_THRESHOLD, false, Ability::isLevelTwo)
-			.add(" for Elites.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Coup de Grace*'s kill thresholds.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Normal Kill Threshold: %p1 -> %p2")
+				.statValues(stat(COUP_1_NORMAL_THRESHOLD), stat(a -> a.mNormalThreshold, COUP_2_NORMAL_THRESHOLD))
+			.addStatComparison("Elite Kill Threshold: %p1 -> %p2")
+				.statValues(stat(COUP_1_ELITE_THRESHOLD), stat(a -> a.mEliteThreshold, COUP_2_ELITE_THRESHOLD))
+			.addDashedLine();
 	}
 }

@@ -1,14 +1,19 @@
 package com.playmonumenta.plugins.guis.classselection;
 
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
+import com.playmonumenta.plugins.utils.DescriptionUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.inventory.ItemStack;
+
+import static com.playmonumenta.plugins.utils.DescriptionUtils.ACTION_SELECT;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.LIGHT_GREY;
 
 public class SpecPage extends Page {
 	protected final PlayerClass mClass;
@@ -36,14 +41,18 @@ public class SpecPage extends Page {
 		}
 
 		// Summary
-		setHeaderIcon(GUIUtils.createBasicItem(
-			mSpec.mDisplayItem, mSpec.mSpecName + " Specialization Skills", NamedTextColor.WHITE, false,
-			"Pick your specialization skills.", NamedTextColor.LIGHT_PURPLE
-		));
+		Component description = (mSpec == mClass.mSpecOne ? mClass.getSpecOneDescription(mGui.mPlayer) : mClass.getSpecTwoDescription(mGui.mPlayer));
+		Component name = DescriptionUtils.centeredComponent(description, mSpec.mSpecName, mClass.mClassColor, true);
+
+		setHeaderIcon(GUIUtils.createBasicItem(mSpec.mDisplayItem, 1, name, description, 99, true));
 
 		// Back button
-		ItemStack backButton = GUIUtils.createBasicItem(Material.ARROW, "Back",
-			NamedTextColor.GRAY, false, "Return to the skill selection page.", NamedTextColor.GRAY);
+		Component backDescription = new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addAction("Click to go back.", ACTION_SELECT)
+			.get();
+		Component backName = DescriptionUtils.centeredComponent(backDescription, "Return", LIGHT_GREY, true);
+		ItemStack backButton = GUIUtils.createBasicItem(Material.ARROW, 1, backName, backDescription, 99, true);
 		GUIUtils.setGuiNbtTag(backButton, "texture", "spec_select_back", mGui.mGuiTextures);
 		setBackIcon(backButton).onClick(event -> {
 			if (event.isShiftClick()) {

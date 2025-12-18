@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -22,6 +22,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+
 public class BrutalAlchemy extends Ability implements PotionAbility {
 	public static final int DOT_DURATION = 3 * 20;
 	private static final int DOT_PERIOD = 20;
@@ -34,9 +37,9 @@ public class BrutalAlchemy extends Ability implements PotionAbility {
 	private static final double DOT_FLAT_INCREASE_1 = 0.5;
 	private static final double DOT_EXPLOSION_MULT_1 = 0.5;
 
-	private static final double DOT_MULT_INCREASE_2 = 0.1;
-	private static final double DOT_FLAT_INCREASE_2 = 1;
-	private static final double DOT_EXPLOSION_MULT_2 = 0.65;
+	public static final double DOT_MULT_INCREASE_2 = 0.1;
+	public static final double DOT_FLAT_INCREASE_2 = 1;
+	public static final double DOT_EXPLOSION_MULT_2 = 0.65;
 
 	public static final double DOT_MULT_INCREASE_3 = 0.15;
 	public static final double DOT_FLAT_INCREASE_3 = 1.5;
@@ -340,41 +343,67 @@ public class BrutalAlchemy extends Ability implements PotionAbility {
 	}
 
 	private static Description<BrutalAlchemy> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your Brutal Alchemist's Potions now apply a DoT effect which does ")
-			.add(a -> a.mDotBaseFlatDamage, DOT_FLAT_BASE)
-			.add(" + ")
-			.addPercent(a -> a.mDotBaseMultDamage, DOT_MULT_BASE)
-			.add(" of your potion's damage as magic damage every second, over ")
-			.addDuration(a -> a.mDuration, DOT_DURATION)
-			.add("s. Hitting an enemy afflicted by this DoT refreshes its duration and increases its potency by ")
-			.add(a -> a.getFlatIncrease(1), DOT_FLAT_INCREASE_1, false, Ability::isLevelOne)
-			.add(" + ")
-			.addPercent(a -> a.getMultIncrease(1), DOT_MULT_INCREASE_1, false, Ability::isLevelOne)
-			.add(" of your potion's damage. Refreshing the DoT ")
-			.add(a -> a.mRefreshesNeededToExplode, REFRESHES_NEEDED_TO_EXPLODE)
-			.add(" times causes it to explode, instantly dealing its remaining damage, plus an additional ")
-			.addPercent(a -> a.getExplosionDamageMult(1), DOT_EXPLOSION_MULT_1, false, Ability::isLevelOne)
-			.add(" of your potion's damage, and clearing the effect.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("*Brutal* potions now inflict mobs with an additional").styles(Alchemist.BRUTAL_COLOR)
+			.addLine("damage over time effect.")
+			.addLine()
+			.addStat("Base Damage: %d + %p (s) every %t for %t")
+				.statValues(stat(a -> a.mDotBaseFlatDamage, DOT_FLAT_BASE), stat(a -> a.mDotBaseMultDamage, DOT_MULT_BASE), stat(DOT_PERIOD), stat(a -> a.mDuration, DOT_DURATION))
+			.tab().addLine("(of potion damage)")
+			.addLine()
+			.addLine("Reapplying *Brutal* onto a mob refreshes its").styles(Alchemist.BRUTAL_COLOR)
+			.addLine("duration and increases the effect's damage.")
+			.addLine()
+			.addStat("Stack Damage: +%d1 + %p1 (s) per extra stack")
+				.statValues(stat(a -> a.getFlatIncrease(1), DOT_FLAT_INCREASE_1), stat(a -> a.getMultIncrease(1), DOT_MULT_INCREASE_1))
+			.addLine()
+			.addLine("Reaching %d stacks of *Brutal* on a mob causes").styles(Alchemist.BRUTAL_COLOR)
+			.statValues(stat(a -> a.mRefreshesNeededToExplode + 1, REFRESHES_NEEDED_TO_EXPLODE + 1))
+			.addLine("the effect to explode, instantly dealing its")
+			.addLine("remaining damage, plus bonus damage, and")
+			.addLine("clearing the effect.")
+			.addLine()
+			.addStat("Bonus Damage: %p1 (s) (of potion damage)")
+				.statValues(stat(a -> a.getExplosionDamageMult(1), DOT_EXPLOSION_MULT_1))
+			.addDashedLine();
 	}
 
 	private static Description<BrutalAlchemy> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Refreshing the DoT now increases its potency by ")
-			.add(a -> a.getFlatIncrease(2), DOT_FLAT_INCREASE_2, false, Ability::isLevelTwo)
-			.add(" + ")
-			.addPercent(a -> a.getMultIncrease(2), DOT_MULT_INCREASE_2, false, Ability::isLevelTwo)
-			.add(" of your potion's damage. The additional damage from the explosion is now ")
-			.addPercent(a -> a.getExplosionDamageMult(2), DOT_EXPLOSION_MULT_2, false, Ability::isLevelTwo)
-			.add(" of your potion's damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase your *Brutal* potions' damage per").styles(Alchemist.BRUTAL_COLOR)
+			.addLine("stack and the bonus damage on explosion.")
+			.addLine()
+			.addStatComparison("Stack Damage: +%d1 + %p1 -> +%d2 + %p2 (s)")
+				.statValues(stat(DOT_FLAT_INCREASE_1), stat(DOT_MULT_INCREASE_1), stat(a -> a.getFlatIncrease(2), DOT_FLAT_INCREASE_2), stat(a -> a.getMultIncrease(2), DOT_MULT_INCREASE_2))
+			.addStatComparison("Bonus Damage: %p1 -> %p2 (s)")
+				.statValues(stat(DOT_EXPLOSION_MULT_1), stat(a -> a.getExplosionDamageMult(2), DOT_EXPLOSION_MULT_2))
+			.addLine()
+			.addLine("When boosted by *Volatile Reaction* to Level 3:").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Stack Damage: +%d2 + %p2 -> +%d3 + %p3 (s)")
+				.statValues(stat(DOT_FLAT_INCREASE_2), stat(DOT_MULT_INCREASE_2), stat(a -> a.getFlatIncrease(3), DOT_FLAT_INCREASE_3), stat(a -> a.getMultIncrease(3), DOT_MULT_INCREASE_3))
+			.addStatComparison("Bonus Damage: %p2 -> %p3 (s)")
+				.statValues(stat(DOT_EXPLOSION_MULT_2), stat(a -> a.getExplosionDamageMult(3), DOT_EXPLOSION_MULT_3))
+			.addDashedLine();
 	}
 
 	private static Description<BrutalAlchemy> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Hitting enemies afflicted by the DoT with your more powerful abilities")
-			.add(" (Alchemical Artillery, Unstable Amalgam, Volatile Reaction, Panacea, Transmutation Ring, or Esoteric Enhancements)")
-			.add(" makes them instantly take ")
-			.add(a -> a.mEnhancementAdditionalTicks, ENHANCEMENT_ADDITIONAL_TICKS)
-			.add(" additional tick of the DoT's damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Hitting *Brutal*-afflicted mobs with powerful").styles(Alchemist.BRUTAL_COLOR)
+			.addLine("abilities makes them instantly take %d")
+				.statValues(stat(a -> a.mEnhancementAdditionalTicks, ENHANCEMENT_ADDITIONAL_TICKS))
+			.addLine("additional tick of the effect's damage.")
+			.addLine()
+			.addStat("Powerful Abilities:")
+				.addListItem("Alchemical Artillery")
+				.addListItem("Unstable Amalgam")
+				.addListItem("Volatile Reaction")
+				.addListItem("Esoteric Enhancements")
+				.addListItem("Panacea")
+				.addListItem("Transmutation Ring")
+			.addDashedLine();
 	}
 }

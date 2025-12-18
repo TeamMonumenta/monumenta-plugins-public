@@ -2,12 +2,11 @@ package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -22,6 +21,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import java.util.function.Predicate;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -32,6 +32,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class JudgementChain extends MultipleChargeAbility {
 	private static final int COOLDOWN = Constants.TICKS_PER_SECOND * 12;
@@ -57,6 +62,8 @@ public class JudgementChain extends MultipleChargeAbility {
 	public static final String CHARM_DEBUFF_DURATION = "Judgement Chain Debuff Duration";
 	public static final String CHARM_EXTRA_TARGETS = "Judgement Chain Extra Targets";
 	public static final String CHARM_EXTRA_TARGET_RADIUS = "Judgement Chain Extra Target Radius";
+
+	public static final Style CHAIN_COLOR = Style.style(TextColor.color(0xC2B8CC));
 
 	public static final AbilityInfo<JudgementChain> INFO =
 		new AbilityInfo<>(JudgementChain.class, "Judgement Chain", JudgementChain::new)
@@ -218,34 +225,44 @@ public class JudgementChain extends MultipleChargeAbility {
 	}
 
 	private static Description<JudgementChain> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.addTrigger("while looking at an unchained mob")
-			.add(" within ")
-			.add(a -> a.mRange, RANGE)
-			.add(" blocks to teleport them in front of you and chain them to you for ")
-			.addDuration(a -> a.mChainDuration, CHAIN_DURATION)
-			.add(" seconds, taunting them and afflicting them with ")
-			.addPercent(a -> a.mSlowAmount, SLOWNESS_AMOUNT)
-			.add(" slowness and ")
-			.addPercent(a -> a.mWeakenAmount, WEAKNESS_AMOUNT)
-			.add(" weaken for ")
-			.addDuration(a -> a.mDebuffDuration, DEBUFF_DURATION)
-			.add(" seconds. You deal ")
-			.addPercent(a -> a.mChainDmgBonus, DMG_BOOST_1, false, Ability::isLevelOne)
-			.add(" more damage to chained mobs. Bosses and crowd control/knockback immune mobs cannot be teleported, but will be chained and debuffed. Charges: ")
-			.add(a -> a.mMaxCharges, MAX_CHARGES)
-			.add(".")
-			.addCooldown(COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addTrigger()
+			.addDashedLine()
+			.addLine("*Chain* a target mob to you and teleport").styles(CHAIN_COLOR)
+			.addLine("them in front of you, taunting them and")
+			.addLine("afflicting them with slowness and weakness.")
+			.addLine("*(Knockback/crowd control immune mobs won't*").styles(DARK_GREY)
+			.addLine("*be teleported)*").styles(DARK_GREY)
+			.addLine()
+			.addLine("Deal increased damage to *Chained* mobs.").styles(CHAIN_COLOR)
+			.addLine()
+			.addStat("Damage Boost: +%p1 to *Chained* mobs").styles(CHAIN_COLOR)
+				.statValues(stat(a -> a.mChainDmgBonus, DMG_BOOST_1))
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(stat(a -> a.mSlowAmount, SLOWNESS_AMOUNT), stat(a -> a.mDebuffDuration, DEBUFF_DURATION))
+			.addStat("Effect: %p Weakness for %t")
+				.statValues(stat(a -> a.mWeakenAmount, WEAKNESS_AMOUNT), stat(a -> a.mDebuffDuration, DEBUFF_DURATION))
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, MAX_CHARGES))
+			.addStat("Cooldown: %t (per charge)")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<JudgementChain> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Now additionally teleport and chain the ")
-			.add(a -> a.mExtraTargets, EXTRA_TARGETS)
-			.add(" closest mobs within ")
-			.add(a -> a.mExtraTargetRadius, EXTRA_TARGET_RADIUS)
-			.add(" blocks of the targeted mob, and you deal ")
-			.addPercent(a -> a.mChainDmgBonus, DMG_BOOST_2, false, Ability::isLevelTwo)
-			.add(" more damage to chained mobs.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Judgement Chain*'s damage boost.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage Boost: +%p1 -> +%p2 to *Chained* mobs").styles(CHAIN_COLOR)
+				.statValues(stat(DMG_BOOST_1), stat(a -> a.mChainDmgBonus, DMG_BOOST_2))
+			.addLine()
+			.addLine("*Judgement Chain* now *Chains* and teleports %d").styles(UNDERLINED, CHAIN_COLOR)
+				.statValues(stat(a -> a.mExtraTargets, EXTRA_TARGETS))
+			.addLine("additional mobs that are closest to the target.")
+			.addLine()
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mExtraTargetRadius, EXTRA_TARGET_RADIUS))
+			.addDashedLine();
 	}
 }

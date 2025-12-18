@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -31,6 +30,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 
 public class TacticalManeuver extends MultipleChargeAbility {
@@ -169,31 +173,47 @@ public class TacticalManeuver extends MultipleChargeAbility {
 	}
 
 	private static Description<TacticalManeuver> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger(0)
-			.add(" to dash forward, dealing ")
-			.add(a -> a.mDashDamage, TACTICAL_DASH_DAMAGE)
-			.add(" damage to the first enemy hit, and stunning it and all enemies within ")
-			.add(a -> a.mRadius, TACTICAL_MANEUVER_RADIUS)
-			.add(" blocks for ")
-			.addDuration(a -> a.mDuration, TACTICAL_DASH_STUN_DURATION)
-			.add(" second. ")
+			.tab().addLine("to dash forwards").styles(WHITE)
 			.addTrigger(1)
-			.add(" to leap backwards, dealing ")
-			.add(a -> a.mLeapDamage, TACTICAL_LEAP_DAMAGE)
-			.add(" damage to enemies within ")
-			.add(a -> a.mRadius, TACTICAL_MANEUVER_RADIUS)
-			.add(" blocks and knocking them away. Charges: ")
-			.add(a -> a.mMaxCharges, TACTICAL_MANEUVER_1_MAX_CHARGES, false, Ability::isLevelOne)
-			.add(".")
-			.addCooldown(TACTICAL_MANEUVER_1_COOLDOWN, Ability::isLevelOne);
+			.tab().addLine("to dash backwards").styles(WHITE)
+			.addDashedLine()
+			.addLine("Dash forwards and damage the first mob")
+			.addLine("you hit, stunning it and nearby mobs.")
+			.addLine()
+			.addStat("Damage: %d (m)")
+				.statValues(stat(a -> a.mDashDamage, TACTICAL_DASH_DAMAGE))
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mDuration, TACTICAL_DASH_STUN_DURATION))
+			.addStat("Stun Radius: %r")
+				.statValues(stat(a -> a.mRadius, TACTICAL_MANEUVER_RADIUS))
+			.addLine()
+			.addLine("Dash backwards to deal damage to all")
+			.addLine("nearby mobs and knock them away.")
+			.addLine()
+			.addStat("Damage: %d (m)")
+				.statValues(stat(a -> a.mLeapDamage, TACTICAL_LEAP_DAMAGE))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, TACTICAL_MANEUVER_RADIUS))
+			.addLine()
+			.addStat("Charges: %d1")
+				.statValues(stat(a -> a.mMaxCharges, TACTICAL_MANEUVER_1_MAX_CHARGES))
+			.addStat("Cooldown: %t1 (per charge)")
+				.statValues(cooldown(TACTICAL_MANEUVER_1_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<TacticalManeuver> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Charges: ")
-			.add(a -> a.mMaxCharges, TACTICAL_MANEUVER_2_MAX_CHARGES, false, Ability::isLevelTwo)
-			.add(".")
-			.addCooldown(TACTICAL_MANEUVER_2_COOLDOWN, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Tactical Maneuver*'s maximum").styles(UNDERLINED)
+			.addLine("charges and reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Charges: %d1 -> %d2")
+				.statValues(stat(TACTICAL_MANEUVER_1_MAX_CHARGES), stat(a -> a.mMaxCharges, TACTICAL_MANEUVER_2_MAX_CHARGES))
+			.addStatComparison("Cooldown: %t1 -> %t2 (per charge)")
+				.statValues(cooldown(TACTICAL_MANEUVER_1_COOLDOWN), cooldown(TACTICAL_MANEUVER_2_COOLDOWN))
+			.addDashedLine();
 	}
 }

@@ -6,8 +6,9 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.EarthenTremorCS;
 import com.playmonumenta.plugins.effects.CursedEarth;
@@ -18,12 +19,18 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.List;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class EarthenTremor extends Ability {
 	private static final int COOLDOWN_1 = 12 * 20;
@@ -53,6 +60,8 @@ public class EarthenTremor extends Ability {
 	public static final String CHARM_ENHANCE_PROJ = "Earthen Tremor Cursed Earth Projectile Scaling";
 	public static final String CHARM_ENHANCE_RADIUS = "Earthen Tremor Cursed Earth Radius";
 	public static final String CHARM_ROOT_DURATION = "Earthen Tremor Root Duration";
+
+	public static final Style CURSED_EARTH_COLOR = Style.style(TextColor.color(0x643326));
 
 	public static final AbilityInfo<EarthenTremor> INFO =
 		new AbilityInfo<>(EarthenTremor.class, "Earthen Tremor", EarthenTremor::new)
@@ -154,42 +163,61 @@ public class EarthenTremor extends Ability {
 	}
 
 	private static Description<EarthenTremor> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to summon an earthen tremor at your location that deals ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage to mobs in a radius of ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks. Totems and mobs within the tremor are launched, totems dealing ")
-			.add(a -> a.mTotemLandingDamage, TOTEM_THROW_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage in a ")
-			.add(a -> a.mTotemLandingRadius, TOTEM_THROW_RANGE)
-			.add(" block radius of where they land. Launched mobs are also rooted in place for ")
-			.addDuration(a -> a.mRootDuration, ROOT_DURATION)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Create an earthen tremor that damages")
+			.addLine("nearby mobs, roots them, and launches")
+			.addLine("them upwards.")
+			.addLine()
+			.addStat("Tremor Damage: %d1 (s)").statValues(stat(a -> a.mDamage, DAMAGE_1))
+			.addStat("Tremor Effect: Root for %t").statValues(stat(a -> a.mRootDuration, ROOT_DURATION))
+			.addStat("Tremor Radius: %r").statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Cooldown: %t1").statValues(cooldown(COOLDOWN_1))
+			.addLine()
+			.addLine("*Totems* are also launched upwards by").styles(Shaman.TOTEM_COLOR)
+			.addLine("the tremor and deal area damage when")
+			.addLine("they land.")
+			.addLine()
+			.addStat("Landing Damage: %d1 (s)").statValues(stat(a -> a.mTotemLandingDamage, TOTEM_THROW_DAMAGE_1))
+			.addStat("Landing Radius: %r").statValues(stat(a -> a.mTotemLandingRadius, TOTEM_THROW_RANGE))
+			.addDashedLine();
 	}
 
 	private static Description<EarthenTremor> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" and totem slam damage is increased to ")
-			.add(a -> a.mTotemLandingDamage, TOTEM_THROW_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(".")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Earthen Tremor*'s damage").styles(UNDERLINED)
+			.addLine("and reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Tremor Damage: %d1 -> %d2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mDamage, DAMAGE_2))
+			.addStatComparison("Landing Damage: %d1 -> %d2 (s)")
+				.statValues(stat(TOTEM_THROW_DAMAGE_1), stat(a -> a.mTotemLandingDamage, TOTEM_THROW_DAMAGE_2))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(COOLDOWN_1), cooldown(COOLDOWN_2))
+			.addDashedLine();
 	}
 
 	private static Description<EarthenTremor> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Mobs damaged by the intial hit of Earthen Tremor are inflicted with Cursed Earth for ")
-			.addDuration(a -> a.mCursedEarthDuration, ENHANCE_EFFECT_DURATION)
-			.add(" seconds. Damaging them with a [Melee / Projectile] attack deals [")
-			.addPercent(a -> a.mCursedEarthScalingM, ENHANCE_MELEE_SCALING)
-			.add(" / ")
-			.addPercent(a -> a.mCursedEarthScalingP, ENHANCE_PROJ_SCALING)
-			.add("] of the base weapon damage as magic damage to all mobs within a ")
-			.add(a -> a.mCursedEarthRadius, ENHANCE_RADIUS)
-			.add(" block radius. The effect is then cleared.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Mobs damaged by the tremor are")
+			.addLine("afflicted with *Cursed Earth* for %t.").styles(CURSED_EARTH_COLOR)
+			.statValues(stat(a -> a.mCursedEarthDuration, ENHANCE_EFFECT_DURATION))
+			.addLine()
+			.addLine("Attacks and projectiles against *Cursed* mobs").styles(CURSED_EARTH_COLOR)
+			.addLine("will deal bonus magic damage (s) to that mob")
+			.addLine("mob and nearby mobs, clearing the effect.")
+			.addLine()
+			.addStat("Bonus Damage (m): %p")
+				.statValues(stat(a -> a.mCursedEarthScalingM, ENHANCE_MELEE_SCALING))
+			.tab().addLine("(of weapon's base damage)")
+			.addStat("Bonus Damage (p): %p")
+				.statValues(stat(a -> a.mCursedEarthScalingP, ENHANCE_PROJ_SCALING))
+			.tab().addLine("(of weapon's base damage)")
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mCursedEarthRadius, ENHANCE_RADIUS))
+			.addDashedLine();
 	}
 }

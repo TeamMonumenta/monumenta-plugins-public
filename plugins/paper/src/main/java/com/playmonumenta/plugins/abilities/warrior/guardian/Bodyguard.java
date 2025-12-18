@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.BodyguardCS;
@@ -26,6 +26,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Bodyguard extends Ability {
 	private static final int COOLDOWN = Constants.TICKS_PER_SECOND * 30;
@@ -130,28 +134,38 @@ public class Bodyguard extends Ability {
 	}
 
 	private static Description<Bodyguard> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.addTrigger(1, "looking directly at another player")
-			.add(" within ")
-			.add(a -> a.mRange, RANGE)
-			.add(" blocks to charge to them. Upon arriving, knock away all mobs within ")
-			.add(a -> a.mKnockbackRadius, RADIUS)
-			.add(" blocks. Both you and the other player gain ")
-			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_1, false, Ability::isLevelOne)
-			.add(" absorption health for ")
-			.addDuration(a -> a.mAbsorptionDuration, BUFF_DURATION)
-			.add(" seconds. ")
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addTrigger(1)
+			.tab().addLine("to teleport to another player")
 			.addTrigger(0)
-			.add(" to cast on yourself.")
-			.addCooldown(COOLDOWN);
+			.tab().addLine("to cast on yourself")
+			.addDashedLine()
+			.addLine("Teleport to a target player to grant")
+			.addLine("absorption to both of you and knock")
+			.addLine("nearby mobs away.")
+			.addLine()
+			.addStat("Effect: +%d1 Absorption for %t")
+				.statValues(stat(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_1), stat(a -> a.mAbsorptionDuration, BUFF_DURATION))
+			.addStat("Knockback Radius: %r")
+				.statValues(stat(a -> a.mKnockbackRadius, RADIUS))
+			.addStat("Max Range: %r")
+				.statValues(stat(a -> a.mRange, RANGE))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<Bodyguard> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The absorption health is increased to ")
-			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_2, false, Ability::isLevelTwo)
-			.add(". Additionally, affected mobs are stunned for ")
-			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Bodyguard*'s absorption.").styles(UNDERLINED)
+			.addLine()
+			.addLine("*Bodyguard* now stuns all affected mobs.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Effect: +%d1 -> +%d2 Absorption")
+				.statValues(stat(ABSORPTION_HEALTH_1), stat(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_2))
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunDuration, STUN_DURATION))
+			.addDashedLine();
 	}
 }

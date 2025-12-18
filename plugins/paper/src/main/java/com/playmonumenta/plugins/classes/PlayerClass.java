@@ -6,8 +6,10 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 // fields are initialised in subclasses
@@ -57,4 +59,15 @@ public abstract class PlayerClass {
 			: null;
 	}
 
+	public Component getDescription(Player player) {
+		return Component.empty();
+	}
+
+	public Component getSpecOneDescription(Player player) {
+		return Component.empty();
+	}
+
+	public Component getSpecTwoDescription(Player player) {
+		return Component.empty();
+	}
 }

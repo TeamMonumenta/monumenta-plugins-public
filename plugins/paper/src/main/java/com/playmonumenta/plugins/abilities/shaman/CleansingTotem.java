@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.abilities.shaman;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.CleansingTotemCS;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -23,6 +23,10 @@ import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+
 public class CleansingTotem extends TotemAbility {
 	private static final int COOLDOWN = 30 * 20;
 	private static final int AOE_RANGE = 6;
@@ -33,6 +37,7 @@ public class CleansingTotem extends TotemAbility {
 	private static final int CLEANSES = 2;
 	private static final double ENHANCE_HEALING_PERCENT = 0.01;
 	private static final int ENHANCE_ABSORB_CAP = 4;
+	private static final int ABSORPTION_DURATION = 15 * 20;
 
 	public static String CHARM_DURATION = "Cleansing Totem Duration";
 	public static String CHARM_RADIUS = "Cleansing Totem Radius";
@@ -118,7 +123,7 @@ public class CleansingTotem extends TotemAbility {
 				double healed = PlayerUtils.healPlayer(mPlugin, p, totalHealing);
 				double remainingHealing = totalHealing - healed;
 				if (remainingHealing > 0 && isEnhanced()) {
-					AbsorptionUtils.addAbsorption(p, remainingHealing, mAbsorbCap, 15 * 20);
+					AbsorptionUtils.addAbsorption(p, remainingHealing, mAbsorbCap, ABSORPTION_DURATION);
 				}
 			}
 			mCosmetic.cleansingTotemPulse(mPlayer, standLocation, getTotemRadius());
@@ -143,33 +148,52 @@ public class CleansingTotem extends TotemAbility {
 	}
 
 	private static Description<CleansingTotem> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to fire a projectile that summons a Cleansing Totem. Players within ")
-			.add(TotemAbility::getTotemRadius, AOE_RANGE)
-			.add(" blocks of this totem heal ")
-			.addPercent(a -> a.mHealPercentBase, HEAL_PERCENT)
-			.add(" max health per second. Duration: ")
-			.addDuration(a -> a.mDuration, DURATION_1, false, Ability::isLevelOne)
-			.add("s.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Summon a *Totem* that periodically heals").styles(Shaman.TOTEM_COLOR)
+			.addLine("all nearby players.")
+			.addLine()
+			.addStat("Healing: %p1e_only HP every 1s")
+				.statValues(stat(a -> a.mHealPercentBase, HEAL_PERCENT))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, AOE_RANGE))
+			.addStat("Duration: %t1")
+				.statValues(stat(a -> a.mDuration, DURATION_1))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<CleansingTotem> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Duration is increased to ")
-			.addDuration(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
-			.add(" seconds. Now additionally cleanses debuffs from players ")
-			.add(a -> a.mCleanses, CLEANSES)
-			.add(" times evenly throughout the duration.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Cleansing Totem*'s duration.").styles(UNDERLINED)
+			.addLine()
+			.addLine("*Cleansing Totem* now cleanses debuffs").styles(UNDERLINED)
+			.addLine("from players %d times evenly spread over")
+				.statValues(stat(a -> a.mCleanses, CLEANSES))
+			.addLine("its duration.")
+			.addLine()
+			.addStatComparison("Duration: %t1 -> %t2")
+				.statValues(stat(DURATION_1), stat(a -> a.mDuration, DURATION_2))
+			.addDashedLine();
 	}
 
 	private static Description<CleansingTotem> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Healing is increased by ")
-			.addPercent(a -> a.mHealPercentEnhance, ENHANCE_HEALING_PERCENT)
-			.add(" max health. Healing done while at full health is now converted to absorption, up to ")
-			.add(a -> a.mAbsorbCap, ENHANCE_ABSORB_CAP)
-			.add(" absorption health. Now cleanses debuffs on every pulse.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Increase *Cleansing Totem*'s healing, and").styles(UNDERLINED)
+			.addLine("it now cleanses debuffs on every pulse.")
+			.addLine()
+			.addStatComparison("Healing: +%p1e -> +%p3 HP every 1s")
+				.statValues(stat(HEAL_PERCENT), stat(a -> a.mHealPercent, HEAL_PERCENT + ENHANCE_HEALING_PERCENT))
+			.addLine()
+			.addLine("Excess healing from *Cleansing Totem* is").styles(UNDERLINED)
+			.addLine("now converted into up to %d absorption, ")
+				.statValues(stat(a -> a.mAbsorbCap, ENHANCE_ABSORB_CAP))
+			.addLine("which lasts for %t.")
+				.statValues(stat(ABSORPTION_DURATION))
+			.addDashedLine();
 	}
 }

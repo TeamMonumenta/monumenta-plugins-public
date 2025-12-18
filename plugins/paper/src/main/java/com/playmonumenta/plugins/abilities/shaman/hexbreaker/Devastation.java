@@ -6,13 +6,14 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
 import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
 import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
-import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.abilities.shaman.ShamanPassiveManager;
+import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.DevastationCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -24,13 +25,16 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.Comparator;
 import java.util.List;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Devastation extends Ability {
 	private static final int COOLDOWN = 15 * 20;
@@ -189,46 +193,50 @@ public class Devastation extends Ability {
 	}
 
 	private static Description<Devastation> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to destroy the nearest totem, dealing ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage to mobs within ")
-			.add(a -> a.mRadius, RADIUS_1, false, Ability::isLevelOne)
-			.add(" blocks of the totem, and knocking them away. The totem's cooldown is reduced by ")
-			.addDuration(a -> a.mCooldownReduction, CDR_ON_KILL)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Destroy a targeted *Totem*, dealing damage").styles(Shaman.TOTEM_COLOR)
+			.addLine("to mobs near it and knocking them away.")
+			.addLine()
+			.addLine("Reduce the cooldown of the destroyed *Totem*.").styles(Shaman.TOTEM_COLOR)
+			.addLine()
+			.addStat("Damage: %d1 (s)").statValues(stat(a -> a.mDamage, DAMAGE_1))
+			.addStat("Radius: %r").statValues(stat(a -> a.mRadius, RADIUS_1))
+			.addStat("Cooldown Reduction: %t").statValues(stat(a -> a.mCooldownReduction, CDR_ON_KILL))
+			.addStat("Cooldown: %t").statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<Devastation> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" and the radius is increased to ")
-			.add(a -> a.mRadius, RADIUS_2, false, Ability::isLevelTwo)
-			.add(" blocks. Each totem also has unique effects on explosion.")
-			.add(Component.newline())
-			.add("Flame Totem: Gain a ")
-			.addPercent(a -> a.mFireStrengthPotency, FIRE_STRENGTH, false, Ability::isLevelTwo)
-			.add(" damage bonus for ")
-			.addDuration(a -> a.mFireStrengthDuration, FIRE_STRENGTH_DURATION, false, Ability::isLevelTwo)
-			.add("s.")
-			.add(Component.newline())
-			.add("Lightning Totem: Strikes the mob with the most health for an additional ")
-			.add(a -> a.mLightningDamage, LIGHTNING_DAMAGE, false, Ability::isLevelTwo)
-			.add(" magic damage and stuns all mobs in range for ")
-			.addDuration(a -> a.mLightningStunDuration, LIGHTNING_STUN_DURATION)
-			.add("s.")
-			.add(Component.newline())
-			.add("Cleansing Totem: Weakens mobs in range by ")
-			.addPercent(a -> a.mCleanseWeaken, CLEANSE_WEAKEN, false, Ability::isLevelTwo)
-			.add(" for ")
-			.addDuration(a -> a.mCleanseDuration, CLEANSE_DURATION)
-			.add("s.")
-			.add(Component.newline())
-			.add("Decayed Totem: Increases your Devastation's damage by ")
-			.add(a -> a.mDecayDamage, DECAY_DAMAGE, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Devastation*'s damage and radius.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)").statValues(stat(DAMAGE_1), stat(a -> a.mDamage, DAMAGE_2))
+			.addStatComparison("Radius: %r1 -> %r2").statValues(stat(RADIUS_1), stat(a -> a.mRadius, RADIUS_2))
+			.addLine()
+			.addLine("*Devastation* performs additional effects").styles(UNDERLINED)
+			.addLine("depending on which *Totem* was destroyed.").styles(Shaman.TOTEM_COLOR)
+			.addLine()
+			.addLine("*Cleansing Totem*: Devastation now weakens mobs.").styles(UNDERLINED)
+			.addStat("Effect: %p Weakness for %t")
+				.statValues(stat(a -> a.mCleanseWeaken, CLEANSE_WEAKEN), stat(a -> a.mCleanseDuration, CLEANSE_DURATION))
+			.addLine()
+			.addLine("*Flame Totem*: You gain a damage boost.").styles(UNDERLINED)
+			.addStat("Effect: +%p Damage for %t")
+				.statValues(stat(a -> a.mFireStrengthPotency, FIRE_STRENGTH), stat(a -> a.mFireStrengthDuration, FIRE_STRENGTH_DURATION))
+			.addLine()
+			.addLine("*Lightning Totem*: Damage the mob with the highest").styles(UNDERLINED)
+			.addLine("HP and Devastation now stuns mobs.")
+			.addStat("Damage: %d (s)")
+				.statValues(stat(a -> a.mLightningDamage, LIGHTNING_DAMAGE))
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mLightningStunDuration, LIGHTNING_STUN_DURATION))
+			.addLine()
+			.addLine("*Decayed Totem*: Devastation deals more damage.").styles(UNDERLINED)
+			.addStat("Damage Boost: +%d (s)")
+				.statValues(stat(a -> a.mDecayDamage, DECAY_DAMAGE))
+			.addDashedLine();
 	}
 }

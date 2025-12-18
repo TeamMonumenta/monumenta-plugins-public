@@ -4,8 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.InterconnectedHavocCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -19,6 +20,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class InterconnectedHavoc extends Ability {
 	private static final int DAMAGE_1 = 5;
@@ -108,27 +112,40 @@ public class InterconnectedHavoc extends Ability {
 	}
 
 	private static Description<InterconnectedHavoc> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Totems form a line between them with a maximum distance of ")
-			.add(a -> a.mRange, RANGE_1, false, Ability::isLevelOne)
-			.add(" blocks. Mobs take ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage each second while intersecting a line.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Summoning multiple *Totems* connects them").styles(Shaman.TOTEM_COLOR)
+			.addLine("with lines that periodically damage mobs")
+			.addLine("touching them.")
+			.addLine()
+			.addStat("Damage: %d1 (s) every 1s")
+				.statValues(stat(a -> a.mDamage, DAMAGE_1))
+			.addStat("Max Distance: %r1")
+				.statValues(stat(a -> a.mRange, RANGE_1))
+			.addDashedLine();
 	}
 
 	private static Description<InterconnectedHavoc> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(". Maximum distance is increased to ")
-			.add(a -> a.mRange, RANGE_2, false, Ability::isLevelTwo)
-			.add(" blocks.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Interconnected Havoc*'s damage").styles(UNDERLINED)
+			.addLine("and max totem distance.")
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s) every 1s")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mDamage, DAMAGE_2))
+			.addStatComparison("Max Distance: %r1 -> %r2")
+				.statValues(stat(RANGE_1), stat(a -> a.mRange, RANGE_2))
+			.addDashedLine();
 	}
 
 	private static Description<InterconnectedHavoc> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Mobs are now knocked back from the player and stunned for ")
-			.addDuration(a -> a.mStunTime, STUN_TIME)
-			.add(" seconds when coming in contact with a line for the first time.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Mobs are now knocked back and stunned")
+			.addLine("upon touching a line for the first time.")
+			.addLine()
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunTime, STUN_TIME))
+			.addDashedLine();
 	}
 }

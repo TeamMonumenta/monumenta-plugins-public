@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -27,8 +29,8 @@ import org.joml.Vector3f;
 
 public class Frozen extends ZeroArgumentEffect {
 	public static final String effectID = "Frozen";
-
 	public static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(127, 209, 255), 1f);
+	public static final Style FROZEN_COLOR = Style.style(TextColor.color(0xC7FDFF));
 	private boolean mStartedWithAI = false;
 	private boolean mStartedWithGravity = false;
 	private @Nullable BlockDisplay mDisplay;

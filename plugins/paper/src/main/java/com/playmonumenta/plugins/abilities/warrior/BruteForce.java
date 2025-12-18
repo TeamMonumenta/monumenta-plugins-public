@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.BruteForceCS;
@@ -30,6 +30,8 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.HALF_TICKS_PER_SECOND;
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public final class BruteForce extends Ability {
 	private static final float BRUTE_FORCE_RADIUS = 2.0f;
@@ -142,29 +144,43 @@ public final class BruteForce extends Ability {
 	}
 
 	private static Description<BruteForce> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Performing a critical melee attack deals ")
-			.add(a -> a.mFlatDamage, BRUTE_FORCE_DAMAGE)
-			.add(" damage and applies knockback to the hit enemy and all enemies within ")
-			.add(a -> a.mWaveRadius, BRUTE_FORCE_RADIUS)
-			.add(" blocks. Bosses do not take knockback.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Critical attacks deal extra damage to")
+			.addLine("the target and other nearby mobs,")
+			.addLine("knocking them away.")
+			.addLine()
+			.addStat("Bonus Damage: +%d1 (m)")
+				.statValues(stat(a -> a.mFlatDamage, BRUTE_FORCE_DAMAGE))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mWaveRadius, BRUTE_FORCE_RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<BruteForce> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased to ")
-			.add(a -> a.mFlatDamage, BRUTE_FORCE_DAMAGE)
-			.add(" plus ")
-			.addPercent(a -> a.mMultiplier, BRUTE_FORCE_2_MODIFIER, false, Ability::isLevelTwo)
-			.add(" of the critical attack's damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Brute Force*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Bonus Damage: %d1 -> +%d2 + %p2 (m)")
+				.statValues(stat(BRUTE_FORCE_DAMAGE),
+					stat(a -> a.mFlatDamage, BRUTE_FORCE_DAMAGE), stat(a -> a.mMultiplier, BRUTE_FORCE_2_MODIFIER))
+			.addDashedLine();
 	}
 
 	private static Description<BruteForce> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Triggering this ability causes a subsequent wave after ")
-			.addDuration(a -> a.mEnhanceWaveDelay, ENHANCEMENT_DELAY)
-			.add(" seconds centered on the hit enemy that deals ")
-			.addPercent(a -> a.mEnhanceDamageMult, ENHANCEMENT_DAMAGE_RATIO)
-			.add(" of the damage and applies knockback.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Brute Force* creates a second wave").styles(UNDERLINED)
+			.addLine("that hits the target mob after %t")
+				.statValues(stat(a -> a.mEnhanceWaveDelay, ENHANCEMENT_DELAY))
+			.addLine("and deals reduced damage.")
+			.addLine()
+			.addIf((a, p) -> a != null && a.mEnhanceWaves != 1,
+				desc -> desc.addStat("Extra Waves: %d")
+					.statValues(stat(a -> a.mEnhanceWaves, 1)))
+			.addStat("Extra Wave Damage: %p of previous wave")
+				.statValues(stat(a -> a.mEnhanceDamageMult, ENHANCEMENT_DAMAGE_RATIO))
+			.addDashedLine();
 	}
 }

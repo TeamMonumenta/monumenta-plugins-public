@@ -43,7 +43,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 	private final Map<ThrowableProjectile, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 	protected @Nullable LivingEntity mTotem = null;
-	private double mRadius;
+	protected double mRadius;
 	private final String mProjectileName;
 	private final String mTotemName;
 	public final String mDisplayName;

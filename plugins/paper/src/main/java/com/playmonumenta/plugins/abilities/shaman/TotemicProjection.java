@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
@@ -16,6 +16,9 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -28,9 +31,8 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 
 public class TotemicProjection extends MultipleChargeAbility {
 	private static final int COOLDOWN = 5 * 20;
@@ -185,13 +187,15 @@ public class TotemicProjection extends MultipleChargeAbility {
 		return 1;
 	}
 
-	private static Description<TotemicProjection> getDescription() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Recast a totem while on cooldown, or use a custom trigger, to fire a snowball that moves all active totems to where it lands within a ")
-			.add(a -> a.mDistributionRadius, DISTRIBUTION_RADIUS)
-			.add(" block radius. Charges: ")
-			.add(a -> a.mMaxCharges, MAX_CHARGES)
-			.add(".")
-			.addCooldown(COOLDOWN);
+	public static Description<TotemicProjection> getDescription() {
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addLine("Recast a *Totem* ability to fire a projectile").styles(Shaman.TOTEM_COLOR)
+			.addLine("that teleports *Totems* to its landing point,").styles(Shaman.TOTEM_COLOR)
+			.addLine("with a spread of %d blocks.")
+				.statValues(stat(a -> a.mDistributionRadius, DISTRIBUTION_RADIUS))
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, MAX_CHARGES))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN));
 	}
 }

@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.FrenzyCS;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
@@ -16,6 +16,10 @@ import java.util.EnumSet;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+
 
 
 public class Frenzy extends Ability {
@@ -86,31 +90,38 @@ public class Frenzy extends Ability {
 	}
 
 	private static Description<Frenzy> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Gain ")
-			.addPercent(a -> a.mPercentAttackSpeedEffect, PERCENT_ATTACK_SPEED_EFFECT_1, false, Ability::isLevelOne)
-			.add(" attack speed for ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds after killing a mob.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Killing a mob grants you attack speed.")
+			.addLine()
+			.addStat("Effect: +%p1 Attack Speed for %t")
+				.statValues(stat(a -> a.mPercentAttackSpeedEffect, PERCENT_ATTACK_SPEED_EFFECT_1), stat(a -> a.mDuration, DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<Frenzy> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Attack speed is increased to ")
-			.addPercent(a -> a.mPercentAttackSpeedEffect, PERCENT_ATTACK_SPEED_EFFECT_2, false, Ability::isLevelTwo)
-			.add(" and also gain ")
-			.addPercent(a -> a.mSpeedPotency, PERCENT_SPEED)
-			.add(" speed for ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Frenzy*'s attack speed and").styles(UNDERLINED)
+			.addLine("also gain speed when it activates.")
+			.addLine()
+			.addStatComparison("Effect: +%p1 -> +%p2 Attack Speed")
+				.statValues(stat(PERCENT_ATTACK_SPEED_EFFECT_1), stat(a -> a.mPercentAttackSpeedEffect, PERCENT_ATTACK_SPEED_EFFECT_2))
+			.addStat("Effect: +%p Speed for %t")
+				.statValues(stat(a -> a.mSpeedPotency, PERCENT_SPEED), stat(a -> a.mDuration, DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<Frenzy> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Additionally, your next melee swing within ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds after getting a kill deals ")
-			.addPercent(a -> a.mEnhanceDamageMult, DAMAGE_BONUS)
-			.add(" extra damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Killing a mob makes your next attack")
+			.addLine("within %t deal increased damage.")
+				.statValues(stat(a -> a.mDuration, DURATION))
+			.addLine()
+			.addStat("Damage Boost: +%p (m)")
+				.statValues(stat(a -> a.mEnhanceDamageMult, DAMAGE_BONUS))
+			.addDashedLine();
+
 	}
 }

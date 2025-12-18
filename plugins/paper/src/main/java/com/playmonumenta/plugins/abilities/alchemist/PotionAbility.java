@@ -12,7 +12,7 @@ import org.bukkit.util.Vector;
 public interface PotionAbility {
 
 	AbilityTriggerInfo.TriggerRestriction HOLDING_ALCHEMIST_BAG_RESTRICTION =
-		new AbilityTriggerInfo.TriggerRestriction("holding an Alchemist's Bag", player -> ItemUtils.isAlchemistItem(player.getInventory().getItemInMainHand()));
+		new AbilityTriggerInfo.TriggerRestriction("Holding an Alchemical Utensil", player -> ItemUtils.isAlchemistItem(player.getInventory().getItemInMainHand()));
 
 	/**
 	 * Called for every mob in the area when an Alchemist Potion splashes

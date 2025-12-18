@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.ViciousCombosCS;
@@ -24,6 +24,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class ViciousCombos extends Ability {
 
@@ -149,35 +152,52 @@ public class ViciousCombos extends Ability {
 	}
 
 	private static Description<ViciousCombos> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Passively, killing a mob refreshes the cooldown of your abilities by ")
-			.addDuration(a -> a.mCDR, VICIOUS_COMBOS_COOL_1, false, Ability::isLevelOne)
-			.add(" second. Killing an Elite or Boss mob instead resets the cooldown of your abilities.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Killing a mob reduces your ability cooldowns.")
+			.addLine()
+			.addLine("Killing an Elite or Boss fully resets your")
+			.addLine("ability cooldowns instead.")
+			.addLine()
+			.addStat("Normal Cooldown Reduction: %t1")
+				.statValues(stat(a -> a.mCDR, VICIOUS_COMBOS_COOL_1))
+			.addStat("Elite/Boss Cooldown Reduction: 100%")
+			.addDashedLine();
 	}
 
 	private static Description<ViciousCombos> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Killing a mob now refreshes your ability cooldowns by ")
-			.addDuration(a -> a.mCDR, VICIOUS_COMBOS_COOL_2, false, Ability::isLevelTwo)
-			.add(" seconds. Killing an Elite or Boss mob inflicts nearby mobs within ")
-			.add(a -> a.mRadius, VICIOUS_COMBOS_RANGE)
-			.add(" blocks with ")
-			.addPercent(a -> a.mWeaken, VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL)
-			.add(" weaken and ")
-			.addPercent(a -> a.mVuln, VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL)
-			.add(" vulnerability for ")
-			.addDuration(a -> a.mDuration, VICIOUS_COMBOS_CRIPPLE_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Vicious Combos*'s cooldown").styles(UNDERLINED)
+			.addLine("reduction for killing normal mobs.")
+			.addLine()
+			.addStatComparison("Normal Cooldown Reduction: %t1 -> %t2")
+				.statValues(stat(VICIOUS_COMBOS_COOL_1), stat(a -> a.mCDR, VICIOUS_COMBOS_COOL_2))
+			.addLine()
+			.addLine("Killing an Elite or Boss afflicts nearby")
+			.addLine("mobs with weakness and vulnerability.")
+			.addLine()
+			.addStat("Effect: %p Weakness for %t")
+				.statValues(stat(a -> a.mWeaken, VICIOUS_COMBOS_CRIPPLE_WEAKNESS_LEVEL), stat(a -> a.mDuration, VICIOUS_COMBOS_CRIPPLE_DURATION))
+			.addStat("Effect: %p Vulnerability for %t")
+				.statValues(stat(a -> a.mVuln, VICIOUS_COMBOS_CRIPPLE_VULN_LEVEL), stat(a -> a.mDuration, VICIOUS_COMBOS_CRIPPLE_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, VICIOUS_COMBOS_RANGE))
+			.addDashedLine();
 	}
 
 	private static Description<ViciousCombos> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When an ability goes on cooldown, your next melee attack within ")
-			.addDuration(ENHANCEMENT_CHARGE_LIFETIME)
-			.add(" seconds deals ")
-			.addPercent(a -> a.mEnhancementDamage, ENHANCEMENT_DAMAGE_INCREASE)
-			.add(" more melee damage and that ability's cooldown is refreshed by ")
-			.addDuration(ENHANCEMENT_COOLDOWN_REDUCTION)
-			.add(" second, prioritizing the last ability.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("When an ability goes on cooldown, your next")
+			.addLine("attack within %t will deal increased damage")
+				.statValues(stat(ENHANCEMENT_CHARGE_LIFETIME))
+			.addLine("and reduce the cooldown of that ability.")
+			.addLine()
+			.addStat("Damage Boost: +%p (m)")
+				.statValues(stat(a -> a.mEnhancementDamage, ENHANCEMENT_DAMAGE_INCREASE))
+			.addStat("Cooldown Reduction: %t")
+				.statValues(stat(ENHANCEMENT_COOLDOWN_REDUCTION))
+			.addDashedLine();
 	}
 }

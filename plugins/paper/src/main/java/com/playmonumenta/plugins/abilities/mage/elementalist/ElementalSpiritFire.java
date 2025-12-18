@@ -2,11 +2,11 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.AbstractPartialParticle;
@@ -23,6 +23,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class ElementalSpiritFire extends BaseElementalSpirit {
 	public static final String NAME = "Elemental Spirits";
@@ -129,48 +133,63 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 	}
 
 	private static Description<ElementalSpiritFire> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Two spirits accompany you - one of fire and one of ice. The next moment after you deal fire damage, the fire spirit instantly dashes from you towards the farthest enemy that spell hit, dealing ")
-			.add(a -> a.mLevelDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" fire magic damage to all enemies within ")
-			.add(a -> a.mSize, HITBOX)
-			.add(" blocks around it along its path. ")
-			.add(convert(ice().add("The next moment after you deal ice damage, the ice spirit warps to the closest enemy that spell hit and induces an extreme local climate, dealing ")
-				.add(a -> a.mLevelDamage, ElementalSpiritIce.DAMAGE_1, false, Ability::isLevelOne)
-				.add(" ice magic damage to all enemies within ")
-				.add(a -> a.mSize, ElementalSpiritIce.SIZE)
-				.add(" blocks around it every second for ")
-				.addDuration(ElementalSpiritIce.PULSES * 20)
-				.add(" seconds. ")))
-			.add("If the spell was Elemental Arrows, the fire spirit does an additional ")
-			.addPercent(a -> a.mLevelBowMultiplier, BOW_MULTIPLIER_1, false, Ability::isLevelOne)
-			.add(" of the projectile weapon's original damage, ")
-			.add(convert(ice().add("and for the ice spirit, an additional ")
-				.addPercent(a -> a.mLevelBowMultiplier, ElementalSpiritIce.BOW_MULTIPLIER_1, false, Ability::isLevelOne)
-				.add(". Independent")))
-			.addCooldown(COOLDOWN_TICKS);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Gain a *Fire Spirit* and an *Ice Spirit*").styles(Mage.FIRE_COLOR, Mage.ICE_COLOR)
+			.addLine("that follow you around.")
+			.addLine()
+			.addLine("After dealing *Fire* damage to a mob, the").styles(Mage.FIRE_COLOR)
+			.addLine("*Fire Spirit* dashes there and deals").styles(Mage.FIRE_COLOR)
+			.addLine("*Fire* damage to mobs in its path.").styles(Mage.FIRE_COLOR)
+			.addLine()
+			.addStat("Damage: %d1 (s)")
+				.statValues(stat(a -> a.mLevelDamage, DAMAGE_1))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mSize, HITBOX))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN_TICKS))
+			.addLine()
+			.addLine("After dealing *Ice* damage to a mob, the").styles(Mage.ICE_COLOR)
+			.addLine("*Ice Spirit* teleports there and deals").styles(Mage.ICE_COLOR)
+			.addLine("*Ice* damage in the area over time.").styles(Mage.ICE_COLOR)
+			.addLine()
+			.addOtherAbility(() -> ElementalSpiritIce.INFO, ElementalSpiritIce.class, desc -> desc
+				.addStat("Damage: %d1 (s) every %t for %t")
+					.statValues(stat(a -> a.mLevelDamage, ElementalSpiritIce.DAMAGE_1), stat(ElementalSpiritIce.PULSE_INTERVAL), stat(ElementalSpiritIce.PULSE_INTERVAL * ElementalSpiritIce.PULSES))
+				.addStat("Radius: %r")
+					.statValues(stat(a -> a.mSize, ElementalSpiritIce.SIZE))
+				.addStat("Cooldown: %t")
+					.statValues(cooldown(ElementalSpiritIce.COOLDOWN_TICKS)))
+			.addLine()
+			.addLine("When *Elemental Arrows* activates a spirit,").styles(UNDERLINED)
+			.addLine("it deals bonus damage based on the")
+			.addLine("projectile weapon's base damage.")
+			.addLine()
+			.addStat("Fire Spirit Bonus Damage: +%p1 (s)")
+				.statValues(stat(a -> a.mLevelBowMultiplier, BOW_MULTIPLIER_1))
+			.addOtherAbility(() -> ElementalSpiritIce.INFO, ElementalSpiritIce.class, desc -> desc
+				.addStat("Ice Spirit Bonus Damage: +%p1 (s)")
+					.statValues(stat(a -> a.mLevelBowMultiplier, ElementalSpiritIce.BOW_MULTIPLIER_1)))
+			.addDashedLine();
 	}
 
 	private static Description<ElementalSpiritFire> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Fire spirit damage is increased to ")
-			.add(a -> a.mLevelDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(convert(ice().add(". Ice spirit damage is increased to ")
-				.add(a -> a.mLevelDamage, ElementalSpiritIce.DAMAGE_2, false, Ability::isLevelTwo)))
-			.add(". The Elemental Arrows projectile damage multiplier is increased to ")
-			.addPercent(a -> a.mLevelBowMultiplier, BOW_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(convert(ice().add(" for the fire spirit and ")
-				.addPercent(a -> a.mLevelBowMultiplier, ElementalSpiritIce.BOW_MULTIPLIER_2, false, Ability::isLevelTwo)
-				.add(" for the ice spirit.")));
-	}
-
-	private static Description<ElementalSpiritFire> convert(Description<ElementalSpiritIce> ice) {
-		// This is mildly cursed but I can't think of a better way to do it without completely restructuring the ability
-		return new DescriptionBuilder<>(() -> INFO)
-			.add((a, p) -> ice.get(Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(p, ElementalSpiritIce.class), p));
-	}
-
-	private static DescriptionBuilder<ElementalSpiritIce> ice() {
-		return new DescriptionBuilder<>(() -> ElementalSpiritIce.INFO);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Elemental Spirits*' damage and").styles(UNDERLINED)
+			.addLine("the bonus damage from *Elemental Arrows*.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Fire Spirit Damage: %d1 -> %d2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mLevelDamage, DAMAGE_2))
+			.addOtherAbility(() -> ElementalSpiritIce.INFO, ElementalSpiritIce.class, desc1 -> desc1
+				.addStatComparison("Ice Spirit Damage: %d1 -> %d2 (s)")
+				.statValues(stat(ElementalSpiritIce.DAMAGE_1), stat(a -> a.mLevelDamage, ElementalSpiritIce.DAMAGE_2)))
+			.addLine()
+			.addStatComparison("Fire Spirit Bonus Damage: +%p1 -> +%p2 (s)")
+				.statValues(stat(BOW_MULTIPLIER_1), stat(a -> a.mLevelBowMultiplier, BOW_MULTIPLIER_2))
+			.addOtherAbility(() -> ElementalSpiritIce.INFO, ElementalSpiritIce.class, desc2 -> desc2
+				.addStatComparison("Ice Spirit Bonus Damage: +%p1 -> +%p2 (s)")
+					.statValues(stat(ElementalSpiritIce.BOW_MULTIPLIER_1), stat(a -> a.mLevelBowMultiplier, ElementalSpiritIce.BOW_MULTIPLIER_2)))
+			.addDashedLine();
 	}
 }

@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -29,6 +30,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class Taboo extends Ability {
 	private static final double PERCENT_HEALTH_DAMAGE_PER_SECOND = 0.025;
@@ -62,6 +67,8 @@ public class Taboo extends Ability {
 	public static final String CHARM_ABSORPTION_ON_DEACTIVATION_AMOUNT = "Taboo Absorption On Deactivation Amount";
 	public static final String CHARM_ABSORPTION_ON_DEACTIVATION_MAX = "Taboo Absorption On Deactivation Max";
 	public static final String CHARM_ABSORPTION_ON_DEACTIVATION_DURATION = "Taboo Absorption On Deactivation Duration";
+
+	public static final Style TRANSFORM_COLOR = Style.style(TextColor.color(0x632E80));
 
 	public static final AbilityInfo<Taboo> INFO =
 		new AbilityInfo<>(Taboo.class, "Taboo", Taboo::new)
@@ -270,39 +277,53 @@ public class Taboo extends Ability {
 	}
 
 	private static Description<Taboo> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to undergo a Taboo transformation, which lasts until deactivated. ")
-			.add("While transformed, you deal ")
-			.addPercent(a -> a.mMagicDamageIncrease, MAGIC_DAMAGE_INCREASE_1, false, Ability::isLevelOne)
-			.add(" more magic damage, gain ")
-			.addPercent(a -> a.mKBR, PERCENT_KNOCKBACK_RESIST)
-			.add(" knockback resistance, and gain +")
-			.addPercent(a -> a.mRechargeRateBonus, BASE_RECHARGE_RATE_BONUS)
-			.add(" potion recharge rate. However, you lose ")
-			.addPercent(a -> a.mSelfDamagePercentPerSecond, PERCENT_HEALTH_DAMAGE_PER_SECOND, true)
-			.add(" of your health every second, which bypasses resistances and absorption, but cannot kill you. When this happens, the health loss increases by ")
-			.addPercent(a -> a.mPercentDamagePercentRampingPerSecond, PERCENT_HEALTH_DAMAGE_RAMPING_PER_SECOND, true)
-			.add(". If the health loss reaches ")
-			.addPercent(ABSORPTION_LOSS_THRESHOLD)
-			.add(", you also start losing ")
-			.addPercent(PERCENT_ABSORPTION_LOSS_PER_SECOND)
-			.add(" of your max health in absorption.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("*Transform* yourself, which lasts until you").styles(TRANSFORM_COLOR)
+			.addLine("recast *Taboo* to deactivate it.").styles(UNDERLINED)
+			.addLine()
+			.addLine("While *Transformed*, you deal more magic damage,").styles(TRANSFORM_COLOR)
+			.addLine("gain knockback resistance, and recharge potions")
+			.addLine("faster.")
+			.addLine()
+			.addStat("Effect: +%p1 Magic Damage")
+				.statValues(stat(a -> a.mMagicDamageIncrease, MAGIC_DAMAGE_INCREASE_1))
+			.addStat("Effect: +%p Knockback Resistance")
+				.statValues(stat(a -> a.mKBR, PERCENT_KNOCKBACK_RESIST))
+			.addStat("Effect: +%p Potion Recharge Rate")
+				.statValues(stat(a -> a.mRechargeRateBonus, BASE_RECHARGE_RATE_BONUS))
+			.addLine()
+			.addLine("However, you lose %p HP every *1s*, and the").styles(WHITE)
+				.statValues(stat(a -> a.mSelfDamagePercentPerSecond, PERCENT_HEALTH_DAMAGE_PER_SECOND))
+			.addLine("health loss increases by +%p HP every *1s*.").styles(WHITE)
+				.statValues(stat(a -> a.mPercentDamagePercentRampingPerSecond, PERCENT_HEALTH_DAMAGE_RAMPING_PER_SECOND))
+			.addLine("If the health loss reaches %p HP, you also start")
+				.statValues(stat(ABSORPTION_LOSS_THRESHOLD))
+			.addLine("losing %p of your max HP in absorption every *1s*.").styles(WHITE)
+				.statValues(stat(PERCENT_ABSORPTION_LOSS_PER_SECOND))
+			.addLine("(Health loss cannot kill you)")
+			.addLine()
+			.addStat("Cooldown: %t (begins when effect ends)")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<Taboo> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The magic damage bonus is increased to ")
-			.addPercent(a -> a.mMagicDamageIncrease, MAGIC_DAMAGE_INCREASE_2, false, Ability::isLevelTwo)
-			.add(". Deactivating Taboo now gives you ")
-			.add(a -> a.mAbsorptionOnDeactivationAmount, ABSORPTION_ON_DEACTIVATION_AMOUNT)
-			.add(" absorption health (max of ")
-			.add(a -> a.mAbsorptionOnDeactivationMax, ABSORPTION_ON_DEACTIVATION_MAX, false)
-			.add(") for every ")
-			.addPercent(a -> a.mMissingHealthFractionPerAbsorption, MISSING_HEALTH_FRACTION_PER_ABSORPTION)
-			.add(" of health missing, lasting for ")
-			.addDuration(a -> a.mAbsorptionOnDeactivationDuration, ABSORPTION_ON_DEACTIVATION_DURATION)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Taboo*'s damage boost.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Effect: +%p1 -> +%p2 Magic Damage")
+				.statValues(stat(MAGIC_DAMAGE_INCREASE_1), stat(a -> a.mMagicDamageIncrease, MAGIC_DAMAGE_INCREASE_2))
+			.addLine()
+			.addLine("Deactivating *Taboo* now grants you +%d").styles(UNDERLINED)
+				.statValues(stat(a -> a.mAbsorptionOnDeactivationAmount, ABSORPTION_ON_DEACTIVATION_AMOUNT))
+			.addLine("absorption for every %p HP you're missing,")
+				.statValues(stat(a -> a.mMissingHealthFractionPerAbsorption, MISSING_HEALTH_FRACTION_PER_ABSORPTION))
+			.addLine("for %t. (max +%d)")
+				.statValues(stat(a -> a.mAbsorptionOnDeactivationDuration, ABSORPTION_ON_DEACTIVATION_DURATION),
+					stat(a -> a.mAbsorptionOnDeactivationMax, ABSORPTION_ON_DEACTIVATION_MAX))
+			.addDashedLine();
 	}
 }

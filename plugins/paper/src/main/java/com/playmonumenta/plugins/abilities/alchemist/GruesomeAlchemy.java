@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -20,18 +20,21 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+
 public class GruesomeAlchemy extends Ability implements PotionAbility {
 	public static final int GRUESOME_ALCHEMY_DURATION = 8 * 20;
 	public static final double GRUESOME_ALCHEMY_0_SLOWNESS_AMPLIFIER = 0.05;
-	private static final double GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER = 0.15;
-	private static final double GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER = 0.25;
+	public static final double GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER = 0.15;
+	public static final double GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER = 0.25;
 	public static final double GRUESOME_ALCHEMY_3_SLOWNESS_AMPLIFIER = 0.35;
 	public static final double GRUESOME_ALCHEMY_0_VULNERABILITY_AMPLIFIER = 0.05;
-	private static final double GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER = 0.15;
-	private static final double GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER = 0.25;
+	public static final double GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER = 0.15;
+	public static final double GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER = 0.25;
 	public static final double GRUESOME_ALCHEMY_3_VULNERABILITY_AMPLIFIER = 0.35;
 	public static final double GRUESOME_ALCHEMY_0_WEAKEN_AMPLIFIER = 0.05;
-	private static final double GRUESOME_ALCHEMY_1_WEAKEN_AMPLIFIER = 0.1;
+	public static final double GRUESOME_ALCHEMY_1_WEAKEN_AMPLIFIER = 0.1;
 	public static final double GRUESOME_ALCHEMY_3_WEAKEN_AMPLIFIER = 0.2;
 	public static final double GRUESOME_POTION_DAMAGE_MULTIPLIER = 0.8;
 	public static final int GRUESOME_ALCHEMY_ENHANCEMENT_STUN_DURATION = 10;
@@ -198,33 +201,59 @@ public class GruesomeAlchemy extends Ability implements PotionAbility {
 	}
 
 	private static Description<GruesomeAlchemy> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your Gruesome Alchemist's Potions now apply ")
-			.addPercent(a -> a.getSlownessAmplifier(1), GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER, false, Ability::isLevelOne)
-			.add(" slow, ")
-			.addPercent(a -> a.getVulnerabilityAmplifier(1), GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER, false, Ability::isLevelOne)
-			.add(" vulnerability, and ")
-			.addPercent(a -> a.getWeaknessAmplifier(1), GRUESOME_ALCHEMY_1_WEAKEN_AMPLIFIER)
-			.add(" weaken for ")
-			.addDuration(a -> a.mDuration, GRUESOME_ALCHEMY_DURATION)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Increase the slowness, vulnerability, and").styles(UNDERLINED)
+			.addLine("weakness applied by *Gruesome* potions.").styles(Alchemist.GRUESOME_COLOR)
+			.addLine()
+			.addStatComparison("Effect: %p0 -> %p1 Slowness")
+				.statValues(stat(GRUESOME_ALCHEMY_0_SLOWNESS_AMPLIFIER), stat(a -> a.getSlownessAmplifier(1), GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER))
+			.addStatComparison("Effect: %p0 -> %p1 Vulnerability")
+				.statValues(stat(GRUESOME_ALCHEMY_0_VULNERABILITY_AMPLIFIER), stat(a -> a.getVulnerabilityAmplifier(1), GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER))
+			.addStatComparison("Effect: %p0 -> %p1 Weakness")
+				.statValues(stat(GRUESOME_ALCHEMY_0_WEAKEN_AMPLIFIER), stat(a -> a.getWeaknessAmplifier(1), GRUESOME_ALCHEMY_1_WEAKEN_AMPLIFIER))
+			.addDashedLine();
 	}
 
 	private static Description<GruesomeAlchemy> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The slow is increased to ")
-			.addPercent(a -> a.getSlownessAmplifier(2), GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER, false, Ability::isLevelTwo)
-			.add(" and the vulnerability is increased to ")
-			.addPercent(a -> a.getVulnerabilityAmplifier(2), GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase the slowness and vulnerability").styles(UNDERLINED)
+			.addLine("applied by *Gruesome* potions even further.").styles(Alchemist.GRUESOME_COLOR)
+			.addLine()
+			.addStatComparison("Effect: %p1 -> %p2 Slowness")
+				.statValues(stat(GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER), stat(a -> a.getSlownessAmplifier(2), GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER))
+			.addStatComparison("Effect: %p1 -> %p2 Vulnerability")
+				.statValues(stat(GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER), stat(a -> a.getVulnerabilityAmplifier(2), GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER))
+			.addLine()
+			.addLine("When boosted by *Volatile Reaction* to Level 3:").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Effect: %p2 -> %p3 Slowness")
+				.statValues(stat(GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER), stat(a -> a.getSlownessAmplifier(3), GRUESOME_ALCHEMY_3_SLOWNESS_AMPLIFIER))
+			.addStatComparison("Effect: %p2 -> %p3 Vulnerability")
+				.statValues(stat(GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER), stat(a -> a.getVulnerabilityAmplifier(3), GRUESOME_ALCHEMY_3_VULNERABILITY_AMPLIFIER))
+			.addStatComparison("Effect: %p2 -> %p3 Weakness")
+				.statValues(stat(GRUESOME_ALCHEMY_1_WEAKEN_AMPLIFIER), stat(a -> a.getWeaknessAmplifier(3), GRUESOME_ALCHEMY_3_WEAKEN_AMPLIFIER))
+			.addDashedLine();
 	}
 
 	private static Description<GruesomeAlchemy> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Each time you hit non-boss mobs afflicted by your Gruesome Alchemist's Potions with your more powerful abilities ")
-			.add("(Alchemical Artillery, Unstable Amalgam, Volatile Reaction, Panacea, Transmutation Ring, or Esoteric Enhancements), ")
-			.add("they are stunned for ")
-			.addDuration(a -> a.mStunDuration, GRUESOME_ALCHEMY_ENHANCEMENT_STUN_DURATION)
-			.add("s. Elites are Staggered instead (Stagger: same as Stun, but spells are only paused instead of cancelled).");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Hitting *Gruesome*-afflicted mobs with").styles(Alchemist.GRUESOME_COLOR)
+			.addLine("powerful abilities stuns them.")
+			.addLine("Elites are staggered instead.")
+			.addLine()
+			.addStat("Powerful Abilities:")
+				.addListItem("Alchemical Artillery")
+				.addListItem("Unstable Amalgam")
+				.addListItem("Volatile Reaction")
+				.addListItem("Esoteric Enhancements")
+				.addListItem("Panacea")
+				.addListItem("Transmutation Ring")
+			.addLine()
+			.addStat("Effect: Stun/Stagger for %t")
+			.statValues(stat(a -> a.mStunDuration, GRUESOME_ALCHEMY_ENHANCEMENT_STUN_DURATION))
+			.addDashedLine();
 	}
 }

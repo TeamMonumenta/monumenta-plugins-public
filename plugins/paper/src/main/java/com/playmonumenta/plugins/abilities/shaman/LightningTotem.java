@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.abilities.shaman;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.LightningTotemCS;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -43,6 +43,10 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class LightningTotem extends TotemAbility {
 	private static final int INTERVAL = 50;
@@ -284,55 +288,73 @@ public class LightningTotem extends TotemAbility {
 	}
 
 	private static Description<LightningTotem> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to fire a projectile that summons a Lightning Totem. Every ")
-			.addDuration(a -> a.mInterval, INTERVAL, true)
-			.add(" seconds, all non-Elite/Boss mobs within ")
-			.add(TotemAbility::getTotemRadius, AOE_RANGE_1, false, Ability::isLevelOne)
-			.add(" blocks are Shocked, rooting them for ")
-			.addDuration(a -> a.mShockDuration, SHOCK_DURATION)
-			.add(" seconds. Additionally, fully charged [Melee / Projectile] strikes bring down lightning, doing ")
-			.add(a -> a.mDamageFlat, DAMAGE_FLAT_1, false, Ability::isLevelOne)
-			.add(" + [")
-			.addPercent(a -> a.mDamagePercentMelee, DAMAGE_1_M, false, Ability::isLevelOne)
-			.add(" / ")
-			.addPercent(a -> a.mDamagePercentProj, DAMAGE_1_P, false, Ability::isLevelOne)
-			.add("] of your base weapon damage as magic damage. Duration: ")
-			.addDuration(a -> a.mDuration, TOTEM_DURATION)
-			.add("s.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Summon a *Totem* that periodically roots").styles(Shaman.TOTEM_COLOR)
+			.addLine("nearby mobs.")
+			.addLine("(Elites/Bosses are immune)")
+			.addLine()
+			.addStat("Effect: Root for %t, every %t")
+				.statValues(stat(a -> a.mShockDuration, SHOCK_DURATION), stat(a -> a.mInterval, INTERVAL))
+			.addStat("Radius: %r1")
+				.statValues(stat(a -> a.mRadius, AOE_RANGE_1))
+			.addStat("Duration: %t")
+				.statValues(stat(a -> a.mDuration, TOTEM_DURATION))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addLine()
+			.addLine("Mobs inside *Lightning Totem*'s area take").styles(UNDERLINED)
+			.addLine("bonus magic damage (s) from your")
+			.addLine("attacks and projectiles.")
+			.addLine()
+			.addStat("Bonus Damage (m): %d1 + %p1 (s)")
+				.statValues(stat(a -> a.mDamageFlat, DAMAGE_FLAT_1), stat(a -> a.mDamagePercentMelee, DAMAGE_1_M))
+			.tab().addLine("(of weapon's base damage)")
+			.addStat("Bonus Damage (p): %d1 + %p1 (s)")
+				.statValues(stat(a -> a.mDamageFlat, DAMAGE_FLAT_1), stat(a -> a.mDamagePercentProj, DAMAGE_1_P))
+			.tab().addLine("(of weapon's base damage)")
+			.addDashedLine();
 	}
 
 	private static Description<LightningTotem> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The totem's range is increased to ")
-			.add(TotemAbility::getTotemRadius, AOE_RANGE_2, false, Ability::isLevelTwo)
-			.add(" blocks, and the damage is increased to ")
-			.add(a -> a.mDamageFlat, DAMAGE_FLAT_2, false, Ability::isLevelTwo)
-			.add(" + [")
-			.addPercent(a -> a.mDamagePercentMelee, DAMAGE_2_M, false, Ability::isLevelTwo)
-			.add(" / ")
-			.addPercent(a -> a.mDamagePercentProj, DAMAGE_2_P, false, Ability::isLevelTwo)
-			.add("] of your base weapon damage, or ")
-			.add(a -> a.mDamageFlat, DAMAGE_FLAT_2, false, Ability::isLevelTwo)
-			.add(" + [")
-			.addPercent(a -> a.mEliteDamagePercentMelee, DAMAGE_ELITE_2_M, false, Ability::isLevelTwo)
-			.add(" / ")
-			.addPercent(a -> a.mEliteDamagePercentProj, DAMAGE_ELITE_2_P, false, Ability::isLevelTwo)
-			.add("] instead against elites, bosses, and full health mobs.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Lightning Totem*'s damage and radius.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Bonus Damage (m): %d1 + %p1 -> %d2 + %p2 (s)")
+				.statValues(stat(DAMAGE_FLAT_1), stat(DAMAGE_1_M), stat(a -> a.mDamageFlat, DAMAGE_FLAT_2), stat(a -> a.mDamagePercentMelee, DAMAGE_2_M))
+			.addStatComparison("Bonus Damage (p): %d1 + %p1 -> %d2 + %p2 (s)")
+				.statValues(stat(DAMAGE_FLAT_1), stat(DAMAGE_1_P), stat(a -> a.mDamageFlat, DAMAGE_FLAT_2), stat(a -> a.mDamagePercentProj, DAMAGE_2_P))
+			.addStatComparison("Radius: %r1 -> %r2")
+				.statValues(stat(AOE_RANGE_1), stat(a -> a.mRadius, AOE_RANGE_2))
+			.addLine()
+			.addLine("*Lightning Totem* deals increased damage to").styles(UNDERLINED)
+			.addLine("Elites, Bosses, and mobs with full health.")
+			.addLine()
+			.addStat("High-HP Damage (m): %d + %p (s)")
+			.statValues(stat(a -> a.mDamageFlat, DAMAGE_FLAT_2), stat(a -> a.mEliteDamagePercentMelee, DAMAGE_ELITE_2_M))
+			.tab().addLine("(of weapon's base damage)")
+			.addStat("High-HP Damage (p): %d + %p (s)")
+			.statValues(stat(a -> a.mDamageFlat, DAMAGE_FLAT_2), stat(a -> a.mEliteDamagePercentProj, DAMAGE_ELITE_2_P))
+			.tab().addLine("(of weapon's base damage)")
+			.addDashedLine();
 	}
 
 	private static Description<LightningTotem> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When a mob dies within range of your Lightning Totem, it spawns a lightning storm at the mob's location (unless the mob is already in an existing storm). The lightning storm deals ")
-			.add(a -> a.mStormDamage, STORM_DAMAGE)
-			.add(" magic damage to all mobs within ")
-			.add(a -> a.mStormRadius, STORM_DAMAGE_RADIUS)
-			.add(" blocks of the center every ")
-			.addDuration(a -> a.mStormInterval, STORM_INTERVAL, true)
-			.add(" second for ")
-			.addDuration(a -> a.mStormDuration, STORM_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("When a mob dies inside *Lightning Totem*'s area,").styles(UNDERLINED)
+			.addLine("create a lightning storm that periodically")
+			.addLine("deals damage where it died.")
+			.addLine("(Cannot create storms inside existing storms)")
+			.addLine()
+			.addStat("Storm Damage: %d (s) every %t")
+				.statValues(stat(a -> a.mStormDamage, STORM_DAMAGE), stat(a -> a.mStormInterval, STORM_INTERVAL))
+			.addStat("Storm Radius: %r")
+				.statValues(stat(a -> a.mStormRadius, STORM_DAMAGE_RADIUS))
+			.addStat("Storm Duration: %t")
+				.statValues(stat(a -> a.mStormDuration, STORM_DURATION))
+			.addDashedLine();
 	}
 }

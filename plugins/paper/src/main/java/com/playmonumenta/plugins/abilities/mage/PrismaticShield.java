@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.PrismaticShieldCS;
@@ -27,6 +27,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class PrismaticShield extends Ability {
 
@@ -198,41 +203,56 @@ public class PrismaticShield extends Ability {
 	}
 
 	private static Description<PrismaticShield> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When you drop below ")
-			.add(a -> a.mTriggerHealth, TRIGGER_HEALTH)
-			.add(" health, you receive ")
-			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_1, false, Ability::isLevelOne)
-			.add(" absorption health which lasts up to ")
-			.addDuration(a -> a.mAbsorptionDuration, DURATION)
-			.add(" seconds. If damage taken would kill you but could have been prevented by up to ")
-			.add(a -> OVERKILL_PROTECTION_MULTIPLIER, OVERKILL_PROTECTION_MULTIPLIER)
-			.add(" times this skill's absorption, it will save you from death. In addition, enemies within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks are knocked back.")
-			.addCooldown(COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("When your health drops below %d HP, you")
+				.statValues(stat(TRIGGER_HEALTH))
+			.addLine("gain absorption and knock back nearby mobs.")
+			.addLine()
+			.addLine("If having %d times this absorption could have").styles(WHITE)
+				.statValues(stat(OVERKILL_PROTECTION_MULTIPLIER))
+			.addLine("saved you from death, it will do so.")
+			.addLine()
+			.addStat("Effect: +%d1 Absorption for %t")
+				.statValues(stat(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_1), stat(a -> a.mAbsorptionDuration, DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<PrismaticShield> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The shield is improved to ")
-			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_2, false, Ability::isLevelTwo)
-			.add(" absorption health. Knocked back enemies are stunned for ")
-			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" second.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Prismatic Shield*'s absorption.").styles(UNDERLINED)
+			.addLine()
+			.addLine("*Prismatic Shield* now additionally").styles(UNDERLINED)
+			.addLine("stuns nearby mobs when triggered.")
+			.addLine()
+			.addStatComparison("Effect: +%d1 -> +%d2 Absorption")
+				.statValues(stat(ABSORPTION_HEALTH_1), stat(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH_2))
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunDuration, STUN_DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<PrismaticShield> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("After Prismatic Shield is activated, in the next ")
-			.addDuration(a -> a.mEnhancementDuration, ENHANCEMENT_DURATION)
-			.add(" seconds, you deal ")
-			.addPercent(a -> a.mDamageBuff, DAMAGE_BUFF_PERCENT)
-			.add(" more damage and every spell that deals damage to at least one enemy will heal you for ")
-			.addPercent(a -> a.mPercentHeal, HEAL_PERCENT)
-			.add(" of your max health. Additionally, your abilities' cooldowns are reduced by ")
-			.addDuration(a -> a.mCDR, ENHANCEMENT_COOLDOWN_REDUCTION_TICKS)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("When *Prismatic Shield* is triggered,").styles(UNDERLINED)
+			.addLine("reduce all your ability cooldowns,")
+			.addLine("gain a damage boost, and heal yourself")
+			.addLine("for each ability that hits a mob for")
+			.addLine("a short period of time.")
+			.addLine()
+			.addStat("Cooldown Reduction: %t")
+				.statValues(stat(a -> a.mCDR, ENHANCEMENT_COOLDOWN_REDUCTION_TICKS))
+			.addStat("Effect: +%p Damage for %t")
+				.statValues(stat(a -> a.mDamageBuff, DAMAGE_BUFF_PERCENT), stat(a -> a.mEnhancementDuration, ENHANCEMENT_DURATION))
+			.addStat("Healing: %p HP (per ability)")
+				.statValues(stat(a -> a.mPercentHeal, HEAL_PERCENT))
+			.addDashedLine();
 	}
 
 }

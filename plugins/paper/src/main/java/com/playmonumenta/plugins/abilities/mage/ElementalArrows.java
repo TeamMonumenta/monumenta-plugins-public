@@ -5,8 +5,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.ElementalArrowsCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.SpellshockCS;
@@ -39,6 +40,10 @@ import org.bukkit.entity.Stray;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 
 public class ElementalArrows extends Ability {
@@ -218,34 +223,58 @@ public class ElementalArrows extends Ability {
 	}
 
 	private static Description<ElementalArrows> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your fully drawn projectiles are set on fire. If sneaking, shoot an ice arrow instead, afflicting the target with ")
-			.addPercent(a -> a.mSlowAmplifier, SLOW_AMPLIFIER)
-			.add(" slowness for ")
-			.addDuration(a -> a.mDuration, ELEMENTAL_ARROWS_DURATION)
-			.add(" seconds. Projectiles shot this way are magically infused, scaling off of magic damage instead of projectile damage. Ice arrows deal ")
-			.add(a -> ELEMENTAL_ARROWS_BONUS_DAMAGE, ELEMENTAL_ARROWS_BONUS_DAMAGE)
-			.add(" extra damage to Blazes. Fire arrows deal ")
-			.add(a -> ELEMENTAL_ARROWS_BONUS_DAMAGE, ELEMENTAL_ARROWS_BONUS_DAMAGE)
-			.add(" extra damage to strays. This skill can not apply Spellshock.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Your critical projectiles deal magic damage (s)")
+			.addLine("instead of projectile damage (p).")
+			.addLine()
+			.addLine("While not sneaking, they are imbued with *Fire*").styles(Mage.FIRE_COLOR)
+			.addLine("and ignite mobs, dealing bonus damage to Strays.")
+			.addLine()
+			.addStat("Effect: Fire for %t")
+				.statValues(stat(a -> a.mDuration, ELEMENTAL_ARROWS_DURATION))
+			.addStat("Bonus Damage: +%d (s) (to Strays)")
+				.statValues(stat(ELEMENTAL_ARROWS_BONUS_DAMAGE))
+			.addLine()
+			.addLine("While sneaking, they are imbued with *Ice* instead").styles(Mage.ICE_COLOR)
+			.addLine("and slow mobs, dealing bonus damage to Blazes.")
+			.addLine()
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(stat(a -> a.mSlowAmplifier, SLOW_AMPLIFIER), stat(a -> a.mDuration, ELEMENTAL_ARROWS_DURATION))
+			.addStat("Bonus Damage: +%d (s) (to Blazes)")
+				.statValues(stat(ELEMENTAL_ARROWS_BONUS_DAMAGE))
+			.addLine()
+			.addLine("*Elemental Arrows* cannot apply *Spellshock*'s *Static*.").styles(UNDERLINED, UNDERLINED, Spellshock.STATIC_COLOR)
+			.addDashedLine();
 	}
 
 	private static Description<ElementalArrows> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your Elemental Arrows deal ")
-			.addPercent(a -> a.mAOEMultiplier, AOE_DAMAGE_MULTIPLIER)
-			.add(" of the damage to mobs within ")
-			.add(a -> a.mRadius, ELEMENTAL_ARROWS_RADIUS)
-			.add(" blocks and apply effects.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("*Elemental Arrows* now apply their effects").styles(UNDERLINED)
+			.addLine("and deal a portion of their damage to other")
+			.addLine("nearby mobs on impact.")
+			.addLine()
+			.addStat("Area Damage: %p (s) of original")
+				.statValues(stat(a -> a.mAOEMultiplier, AOE_DAMAGE_MULTIPLIER))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, ELEMENTAL_ARROWS_RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<ElementalArrows> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your next elemental arrow also stuns enemies hit for ")
-			.addDuration(a -> a.mStunDuration, ENHANCED_ARROW_STUN_DURATION)
-			.add(" seconds and deals ")
-			.addPercent(ENHANCED_DAMAGE_MULTIPLIER)
-			.add(" more damage.")
-			.addCooldown(ENHANCED_ARROW_COOLDOWN, Ability::isEnhanced);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Periodically, your next *Elemental Arrow*").styles(UNDERLINED)
+			.addLine("is infused with *Thunder*, dealing increased").styles(Mage.THUNDER_COLOR)
+			.addLine("damage and stunning mobs it hits.")
+			.addLine()
+			.addStat("Damage Boost: +%p (s)")
+				.statValues(stat(ENHANCED_DAMAGE_MULTIPLIER))
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunDuration, ENHANCED_ARROW_STUN_DURATION))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(ENHANCED_ARROW_COOLDOWN))
+			.addDashedLine();
 	}
 }

@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.CholericFlamesCS;
@@ -27,6 +27,11 @@ import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 
 public class CholericFlames extends Ability {
@@ -115,35 +120,49 @@ public class CholericFlames extends Ability {
 	}
 
 	private static Description<CholericFlames> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to deal ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage to mobs within ")
-			.add(a -> a.mRange, RANGE)
-			.add(" blocks, knocking them back and igniting them for ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Damage and ignite all nearby mobs.")
+			.addLine()
+			.addStat("Damage: %d1 (s)")
+				.statValues(stat(a -> a.mDamage, DAMAGE_1))
+			.addStat("Effect: Fire for %t")
+				.statValues(stat(a -> a.mDuration, DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRange, RANGE))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<CholericFlames> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(", and mobs are also afflicted with -100% healing for ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" (Counts as a level 1 debuff).");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Choleric Flames*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addLine("*Choleric Flames* now inflicts anti-heal.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mDamage, DAMAGE_2))
+			.addStat("Effect: -100% Healing for %t")
+				.statValues(stat(a -> a.mDuration, DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<CholericFlames> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Mobs ignited by this ability are inflicted with an additional level of Inferno for every two debuffs they have (rounded down) prior to this ability, up to ")
-			.add(a -> a.mMaxDebuffs, MAX_DEBUFFS)
-			.add(". Additionally, when these mobs die, they explode, applying all Inferno they have at the time of death to all mobs within ")
-			.add(a -> a.mSpreadRadius, SPREAD_EFFECT_RADIUS)
-			.add(" blocks for ")
-			.addDuration(SPREAD_EFFECT_DURATION_APPLIED)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Choleric Flames* inflicts mobs with extra levels").styles(UNDERLINED)
+			.addLine("of *Inferno* for every *2* debuffs they have.").styles(Inferno.INFERNO_COLOR, WHITE)
+			.addLine()
+			.addLine("When these mobs die, they spread their")
+			.addLine("*Inferno* to other nearby mobs.").styles(Inferno.INFERNO_COLOR)
+			.addLine()
+			.addStat("Effect: +1 Inferno per 2 debuffs (max +%d)")
+				.statValues(stat(a -> a.mMaxDebuffs, MAX_DEBUFFS))
+			.addStat("Spread Radius: %r")
+				.statValues(stat(a -> a.mSpreadRadius, SPREAD_EFFECT_RADIUS))
+			.addDashedLine();
 	}
 }

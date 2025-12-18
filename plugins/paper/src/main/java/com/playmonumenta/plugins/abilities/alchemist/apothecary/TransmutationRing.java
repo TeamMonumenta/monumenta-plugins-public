@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
@@ -27,6 +27,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -39,6 +41,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class TransmutationRing extends Ability implements PotionAbility, AbilityWithDuration, AbilityWithChargesOrStacks {
 	private static final int COOLDOWN = 15 * 20;
@@ -66,6 +72,8 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 	public static final String CHARM_ABSORPTION_DURATION = "Transmutation Ring Absorption Duration";
 	public static final String CHARM_POTION_REFUND_PER_KILL = "Transmutation Ring Potion Refund Per Kill";
 	public static final String CHARM_EXTRA_BUFF_DURATION_ON_MAX_STACKS = "Transmutation Ring Extra Buff Duration On Max Stacks";
+
+	public static final Style INSTABILITY_COLOR = Style.style(TextColor.color(0xCCA047));
 
 	public static final AbilityInfo<TransmutationRing> INFO =
 		new AbilityInfo<>(TransmutationRing.class, "Transmutation Ring", TransmutationRing::new)
@@ -304,34 +312,50 @@ public class TransmutationRing extends Ability implements PotionAbility, Ability
 	}
 
 	private static Description<TransmutationRing> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Throw an Alchemist's Potion while sneaking to create an unstable Transmutation Ring at the potion's landing location. The ring lasts for ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds and has a radius of ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks. While active, all players within the ring deal ")
-			.addPercent(a -> a.mAmplifier, DAMAGE_AMPLIFIER)
-			.add(" extra damage on all attacks. For each mob that dies within the ring, it gains a stack of instability, or two if it was an Elite, up to a maximum of ")
-			.add(a -> a.mMaxKills, MAX_KILLS)
-			.add(". Upon expiring or reaching maximum instability, the ring explodes, dealing ")
-			.add(a -> a.mDamageRawPerKill, DAMAGE_INCREASE_PER_KILL_RAW)
-			.add(" + ")
-			.addPercent(a -> a.mDamageMultPerKill, DAMAGE_INCREASE_PER_KILL_MULT)
-			.add(" of your potion's damage per stack to each mob still inside it. It also grants the remaining duration of its damage buff, plus ")
-			.addDuration(a -> a.mExtraBuffDurationOnMaxStacks, EXTRA_BUFF_DURATION_ON_MAX_STACKS)
-			.add("s extra if it had reached max stacks, to all players inside.")
-			.addCooldown(COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Throwing a potion while sneaking creates a")
+			.addLine("transmutation ring that lasts for %t.")
+				.statValues(stat(a -> a.mDuration, DURATION))
+			.addLine()
+			.addLine("Players inside the ring deal increased damage.")
+			.addLine()
+			.addStat("Effect: +%p Damage")
+				.statValues(stat(a -> a.mAmplifier, DAMAGE_AMPLIFIER))
+			.addLine()
+			.addLine("Mobs that die inside the ring increase its")
+			.addLine("*Instability* by *1*. Elites increase it by *2*.").styles(INSTABILITY_COLOR, WHITE, WHITE)
+			.addLine()
+			.addLine("Upon expiring or reaching %d *Instability*, the ring").styles(INSTABILITY_COLOR)
+				.statValues(stat(a -> a.mMaxKills, MAX_KILLS))
+			.addLine("explodes, dealing damage to mobs and granting")
+			.addLine("players the remaining duration of its damage")
+				.statValues(stat(a -> a.mExtraBuffDurationOnMaxStacks, EXTRA_BUFF_DURATION_ON_MAX_STACKS))
+			.addLine("boost, +%t if maximum *Instability* was reached.").styles(INSTABILITY_COLOR)
+				.statValues(stat(a -> a.mExtraBuffDurationOnMaxStacks, EXTRA_BUFF_DURATION_ON_MAX_STACKS))
+			.addLine()
+			.addStat("Damage: %d + %p (s) (of potion damage) per *Instability*").styles(INSTABILITY_COLOR)
+				.statValues(stat(a -> a.mDamageRawPerKill, DAMAGE_INCREASE_PER_KILL_RAW), stat(a -> a.mDamageMultPerKill, DAMAGE_INCREASE_PER_KILL_MULT))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<TransmutationRing> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Each stack of instability gained now refunds you ")
-			.add(a -> a.mPotionsPerKill, REFUND_POTION_AMOUNT)
-			.add(" Alchemist's Potion. Additionally, all players caught inside the explosion now gain ")
-			.add(a -> a.mAbsorptionPerKill, ABSORPTION_HEALTH_PER_KILL)
-			.add(" absorption health for ")
-			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_HEALTH_DURATION)
-			.add("s for each stack of instability.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Gain %d potion for each stack of *Instability*").styles(INSTABILITY_COLOR)
+				.statValues(stat(a -> a.mPotionsPerKill, REFUND_POTION_AMOUNT))
+			.addLine("gained by the ring.").styles(INSTABILITY_COLOR)
+			.addLine()
+			.addLine("Players inside the ring now gain absorption")
+			.addLine("when it explodes.")
+			.addLine()
+			.addStat("Effect: +%d Absorption per *Instability* for %t").styles(INSTABILITY_COLOR)
+				.statValues(stat(a -> a.mAbsorptionPerKill, ABSORPTION_HEALTH_PER_KILL), stat(a -> a.mAbsorptionDuration, ABSORPTION_HEALTH_DURATION))
+			.addDashedLine();
 	}
 
 	@Override

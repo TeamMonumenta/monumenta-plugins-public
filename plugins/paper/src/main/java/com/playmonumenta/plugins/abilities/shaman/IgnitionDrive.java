@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.IgnitionDriveCS;
@@ -31,6 +31,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class IgnitionDrive extends Ability {
 	private static final int COOLDOWN_1 = 18 * 20;
@@ -219,50 +223,67 @@ public class IgnitionDrive extends Ability {
 	}
 
 	private static Description<IgnitionDrive> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to launch forward, lighting mobs on fire and dealing ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" damage within ")
-			.add(a -> a.mRadius, RADIUS_1, false, Ability::isLevelOne)
-			.add(" blocks of your launching and landing location. Harness thunder to stun up to ")
-			.add(a -> a.mStunLimit, STUN_LIMIT_1, false, Ability::isLevelOne)
-			.add(" mobs you pass through for ")
-			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" second. Fall damage is negated until you hit the ground or until ")
-			.addDuration(FALL_IMMUNITY_DURATION)
-			.add(" seconds pass.")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Launch forwards, dealing damage to and")
+			.addLine("igniting nearby mobs upon launching.")
+			.addLine()
+			.addLine("While midair, you stun up to %d1 mobs in your")
+				.statValues(stat(a -> a.mStunLimit, STUN_LIMIT_1))
+			.addLine("path, and you damage and ignite mobs again")
+			.addLine("upon landing.")
+			.addLine()
+			.addStat("Damage: %d1 (s)")
+				.statValues(stat(a -> a.mDamage, DAMAGE_1))
+			.addStat("Radius: %r1")
+				.statValues(stat(a -> a.mRadius, RADIUS_1))
+			.addStat("Effect: Fire for %t")
+				.statValues(stat(a -> a.mFireDuration, FIRE_DURATION))
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunDuration, STUN_DURATION))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<IgnitionDrive> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(", the damage range is increased to ")
-			.add(a -> a.mRadius, RADIUS_2, false, Ability::isLevelTwo)
-			.add(" blocks, the stun limit is increased to ")
-			.add(a -> a.mStunLimit, STUN_LIMIT_2, false, Ability::isLevelTwo)
-			.add(", and the launching power is increased by ")
-			.addPercent((LAUNCH_DISTANCE_2 - LAUNCH_DISTANCE_1) / LAUNCH_DISTANCE_1)
-			.add(".")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Ignition Drive*'s damage,").styles(UNDERLINED)
+			.addLine("radius, maximum mobs stunned, and")
+			.addLine("launch velocity.")
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mDamage, DAMAGE_2))
+			.addStatComparison("Radius: %r1 -> %r2")
+				.statValues(stat(RADIUS_1), stat(a -> a.mRadius, RADIUS_2))
+			.addStatComparison("Max Mobs Stunned: %d1 -> %d2")
+				.statValues(stat(STUN_LIMIT_1), stat(a -> a.mStunLimit, STUN_LIMIT_2))
+			.addStat("Velocity: +%p")
+				.statValues(stat((LAUNCH_DISTANCE_2 - LAUNCH_DISTANCE_1) / LAUNCH_DISTANCE_1))
+			.addDashedLine();
 	}
 
 	private static Description<IgnitionDrive> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Using Ignition Drive above ")
-			.addPercent(a -> a.mEnhanceUpperHealthThreshold, ENHANCE_UPPER_THRESHOLD, true)
-			.add(" health will instantly refresh its cooldown by ")
-			.addPercent(a -> a.mEnhanceCDR, ENHANCE_COOLDOWN_REFRESH)
-			.add(". Using Ignition Drive while below ")
-			.addPercent(a -> a.mEnhanceLowerHealthThreshold, ENHANCE_LOWER_THRESHOLD)
-			.add(" health will grant ")
-			.addPercent(a -> a.mEnhanceMagicDmg, ENHANCE_MAGIC_DMG_BOOST)
-			.add(" magic damage for ")
-			.addDuration(a -> a.mEnhanceMagicDmgDuration, ENHANCE_MAGIC_DMG_DURATION)
-			.add(" seconds and stun mobs from the launch location for ")
-			.addDuration(a -> a.mEnhanceStunDuration, ENHANCE_STUN_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Casting *Ignition Drive* while above %p HP").styles(UNDERLINED)
+				.statValues(stat(a -> a.mEnhanceUpperHealthThreshold, ENHANCE_UPPER_THRESHOLD))
+			.addLine("reduces its cooldown.")
+			.addLine()
+			.addStat("Cooldown Reduction: %p")
+				.statValues(stat(a -> a.mEnhanceCDR, ENHANCE_COOLDOWN_REFRESH))
+			.addLine()
+			.addLine("Casting *Ignition Drive* while below %p HP").styles(UNDERLINED)
+				.statValues(stat(a -> a.mEnhanceLowerHealthThreshold, ENHANCE_LOWER_THRESHOLD))
+			.addLine("grants you increased magic damage and")
+			.addLine("stuns mobs in the launch area.")
+			.addLine()
+			.addStat("Effect: +%p Magic Damage for %t")
+			.statValues(stat(a -> a.mEnhanceMagicDmg, ENHANCE_MAGIC_DMG_BOOST), stat(a -> a.mEnhanceMagicDmgDuration, ENHANCE_MAGIC_DMG_DURATION))
+			.addStat("Effect: Stun for %t")
+			.statValues(stat(a -> a.mEnhanceStunDuration, ENHANCE_STUN_DURATION))
+			.addDashedLine();
 	}
 }

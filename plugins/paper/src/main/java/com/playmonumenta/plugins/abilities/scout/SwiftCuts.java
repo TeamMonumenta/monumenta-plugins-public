@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.SwiftCutsCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -29,6 +29,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.GREY;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	private static final int EFFECT_DURATION = 5 * 20;
@@ -175,33 +180,48 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	}
 
 	private static Description<SwiftCuts> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Attacking an enemy with a fully charged valid melee weapon attack grants you a Swift Cuts stack with a maximum of ")
-			.add(a -> a.mMaxStacks, STACKS_CAP_1, false, Ability::isLevelOne)
-			.add(" stacks. Every stack grants you ")
-			.addPercent(a -> a.mDamageAmplifier, DAMAGE_AMPLIFIER)
-			.add(" melee damage. Stacks decay by 1 after ")
-			.addDuration(a -> a.mDuration, EFFECT_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Attacking a mob grants you *1* stack").styles(WHITE)
+			.addLine("of *Swift Cuts*, which decays after %t").styles(UNDERLINED)
+				.statValues(stat(a -> a.mDuration, EFFECT_DURATION))
+			.addLine("of not gaining any.")
+			.addLine()
+			.addLine("Each stack increases the melee damage")
+			.addLine("you deal.")
+			.addLine()
+			.addStat("Damage Boost: +%p (m) per stack")
+				.statValues(stat(a -> a.mDamageAmplifier, DAMAGE_AMPLIFIER))
+			.addStat("Max Stacks: %d1")
+				.statValues(stat(a -> a.mMaxStacks, STACKS_CAP_1))
+			.addDashedLine();
 	}
 
 	private static Description<SwiftCuts> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Maximum stacks increased to ")
-			.add(a -> a.mMaxStacks, STACKS_CAP_2, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Swift Cuts*'s maximum stacks.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Max Stacks: %d1 -> %d2")
+				.statValues(stat(STACKS_CAP_1), stat(a -> a.mMaxStacks, STACKS_CAP_2))
+			.addDashedLine();
 	}
 
 	private static Description<SwiftCuts> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Additional effect applies while having maximum Swift Cuts stacks. Tactical Maneuver: -")
-			.addPercent(a -> a.mTacticalManeuverCDR, TACTICAL_MANEUVER_CDR)
-			.add(" Cooldown, Whirling Blade: +")
-			.addPercent(a -> a.mWhirlingBladeBuff, WHIRLING_BLADE_BUFF)
-			.add(" Damage and Radius, Predator Strike: -")
-			.addPercent(a -> a.mPredatorStrikeCDR, PREDATOR_STRIKE_CDR)
-			.add(" Cooldown, Split Arrow: +")
-			.add(a -> SPLIT_ARROW_BUFF, SPLIT_ARROW_BUFF)
-			.add(" Bounce");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("While you're at maximum *Swift Cuts* stacks,").styles(UNDERLINED)
+			.addLine("various abilities gain special bonuses.")
+			.addLine()
+			.addStat("Tactical Maneuver: -%p Cooldown")
+				.statValues(stat(a -> a.mTacticalManeuverCDR, TACTICAL_MANEUVER_CDR))
+			.addStat("Whirling Blade: +%p Damage *and* Radius").styles(GREY)
+				.statValues(stat(a -> a.mWhirlingBladeBuff, WHIRLING_BLADE_BUFF))
+			.addLine()
+			.addStat("Split Arrow: +%d Bounces")
+				.statValues(stat(SPLIT_ARROW_BUFF))
+			.addStat("Predator Strike: -%p Cooldown")
+				.statValues(stat(a -> a.mPredatorStrikeCDR, PREDATOR_STRIKE_CDR))
+			.addDashedLine();
 	}
 }

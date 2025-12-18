@@ -5,8 +5,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.ArcaneStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -37,6 +38,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
+
+import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class ArcaneStrike extends Ability {
 	private static final float RADIUS = 4.0f;
@@ -180,39 +186,57 @@ public class ArcaneStrike extends Ability {
 	}
 
 	private static Description<ArcaneStrike> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When you attack an enemy with a wand, you unleash an arcane explosion dealing ")
-			.add(a -> a.mDamageBonus, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" + ")
-			.addPercent(a -> a.mWandScaling, WAND_SCALING_1)
-			.add(" of your wand's base damage as arcane magic damage to all mobs within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks around the target. Enemies that are on fire or slowed take ")
-			.add(a -> a.mDamageBonusAffected, BONUS_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" extra damage. Arcane Strike can not trigger Spellshock's static.")
-			.addCooldown(COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("When you attack a mob with a wand,")
+			.addLine("create an explosion that deals *Arcane*").styles(Mage.ARCANE_COLOR)
+			.addLine("damage to that mob and nearby mobs.")
+			.addLine()
+			.addLine("Mobs that are on fire or slowed take")
+			.addLine("bonus damage.")
+			.addLine()
+			.addStat("Damage: %d1 + %p1 (s) (of the attack's damage)")
+				.statValues(stat(a -> a.mDamageBonus, DAMAGE_1), stat(a -> a.mWandScaling, WAND_SCALING_1))
+			.addStat("Bonus Damage: +%d1 (s) if on fire/slowed")
+				.statValues(stat(a -> a.mDamageBonusAffected, BONUS_DAMAGE_1))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<ArcaneStrike> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased to ")
-			.add(a -> a.mDamageBonus, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" + ")
-			.addPercent(a -> a.mWandScaling, WAND_SCALING_2)
-			.add(" of your wand's base damage. Mobs that are on fire or slowed take ")
-			.add(a -> a.mDamageBonusAffected, BONUS_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" additional damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Arcane Strike*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage: %d1 + %p1 -> %d2 + %p2 (s)")
+				.statValues(stat(DAMAGE_1), stat(WAND_SCALING_1), stat(a -> a.mDamageBonus, DAMAGE_2), stat(a -> a.mWandScaling, WAND_SCALING_2))
+			.addStatComparison("Bonus Damage: +%d1 -> +%d2 (s)")
+				.statValues(stat(BONUS_DAMAGE_1), stat(a -> a.mDamageBonusAffected, BONUS_DAMAGE_2))
+			.addDashedLine();
 	}
 
 	private static Description<ArcaneStrike> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased by ")
-			.addPercent(ENHANCEMENT_DAMAGE_MULTIPLIER - 1)
-			.add(". Your enchantment on-hit effects are now also applied to all other enemies hit in the radius. Additionally, apply a ")
-			.addPercent(a -> a.mWeakenPotency, ENHANCEMENT_WEAKNESS_POTENCY)
-			.add(" weaken effect to the hit mob that lasts for ")
-			.addDuration(a -> a.mWeakenDuration, ENHANCEMENT_WEAKNESS_DURATION)
-			.add(" seconds and applies to melee, projectile, magic, blast, and fire damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Increase *Arcane Strike*'s damage by an").styles(UNDERLINED)
+			.addLine("additional +%p.")
+				.statValues(stat(ENHANCEMENT_DAMAGE_MULTIPLIER - 1))
+			.addLine()
+			.addLine("Your wand's Aspect enchantments are")
+			.addLine("applied to all mobs in the explosion.")
+			.addLine("*(Fire, Ice, Thunder, Wind Aspect,*").styles(DARK_GREY)
+			.addLine("*Decay, and Bleeding)*").styles(DARK_GREY)
+			.addLine()
+			.addLine("*Arcane Strike* now weakens mobs it hits.").styles(UNDERLINED)
+			.addLine("*(Weakens all damage types, instead of*").styles(DARK_GREY)
+			.addLine("*only melee or projectile damage)*").styles(DARK_GREY)
+			.addLine()
+			.addStat("Effect: %p Weakness for %t")
+				.statValues(stat(a -> a.mWeakenPotency, ENHANCEMENT_WEAKNESS_POTENCY), stat(a -> a.mWeakenDuration, ENHANCEMENT_WEAKNESS_DURATION))
+			.addDashedLine();
 	}
 
 }

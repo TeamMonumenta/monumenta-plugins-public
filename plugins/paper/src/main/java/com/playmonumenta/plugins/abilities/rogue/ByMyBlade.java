@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.ByMyBladeCS;
@@ -25,6 +25,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perLevel;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public final class ByMyBlade extends Ability {
 	private static final int HASTE_POTENCY = 1;
@@ -121,36 +125,51 @@ public final class ByMyBlade extends Ability {
 	}
 
 	private static Description<ByMyBlade> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("While holding two swords, performing a critical melee attack deals ")
-			.add(a -> a.mDamageBonusBase, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" melee damage to the hit enemy and grants Haste ")
-			.addPotionAmplifier(a -> HASTE_POTENCY, HASTE_POTENCY)
-			.add(" for ")
-			.addDuration(a -> a.mAttackSpeedDuration, ATTACK_SPEED_DURATION)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Critically attacking a mob deals bonus")
+			.addLine("damage and grants you haste.")
+			.addLine()
+			.addStat("Bonus Damage: +%d1e (m)")
+				.statValues(stat(a -> a.mDamageBonusBase, DAMAGE_1))
+			.addStat("Effect: Haste %d for %t")
+				.statValues(stat(a -> a.mHasteAmplifier + 1, HASTE_POTENCY + 1), stat(a -> a.mAttackSpeedDuration, ATTACK_SPEED_DURATION))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<ByMyBlade> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased to ")
-			.add(a -> a.mDamageBonusBase, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" and additionally gain ")
-			.addPercent(a -> a.mAttackSpeedAmplifier, ATTACK_SPEED_2)
-			.add(" attack speed for ")
-			.addDuration(a -> a.mAttackSpeedDuration, ATTACK_SPEED_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *By My Blade*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addLine("*By My Blade* grants additional attack speed.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Bonus Damage: +%d1e -> +%d2e (m)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mDamageBonusBase, DAMAGE_2))
+			.addStat("Effect: +%p Attack Speed for %t")
+				.statValues(stat(a -> a.mAttackSpeedAmplifier, ATTACK_SPEED_2), stat(a -> a.mAttackSpeedDuration, ATTACK_SPEED_DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<ByMyBlade> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("By My Blade does ")
-			.addPercent(ENHANCEMENT_DAMAGE_MULT)
-			.add(" extra damage. Killing an enemy with this ability heals you for ")
-			.addPercent(a -> a.mEnhancementHeal, ENHANCEMENT_HEAL_PERCENT)
-			.add(" of your max health which is increased to ")
-			.addPercent(a -> a.mEnhancementHealElite, ENHANCEMENT_HEAL_PERCENT_ELITE)
-			.add(" if the target was an Elite or Boss mob.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Increase *By My Blade*'s damage by an").styles(UNDERLINED)
+			.addLine("additional +%p.")
+				.statValues(stat(ENHANCEMENT_DAMAGE_MULT))
+			.addLine()
+			.addLine("Killing a mob with *By My Blade* heals you.").styles(UNDERLINED)
+			.addLine("Killing an Elite or Boss heals you for")
+			.addLine("a greater amount.")
+			.addLine()
+			.addStatComparison("Bonus Damage: +%d1e -> +%d3 (m)")
+				.statValues(perLevel(DAMAGE_1, DAMAGE_2), perLevel(a -> a.mDamageBonus, DAMAGE_1 * (1 + ENHANCEMENT_DAMAGE_MULT), DAMAGE_2 * (1 + ENHANCEMENT_DAMAGE_MULT)))
+			.addStat("Normal Healing: %p HP")
+				.statValues(stat(a -> a.mEnhancementHeal, ENHANCEMENT_HEAL_PERCENT))
+			.addStat("Elite/Boss Healing: %p HP")
+				.statValues(stat(a -> a.mEnhancementHealElite, ENHANCEMENT_HEAL_PERCENT_ELITE))
+			.addDashedLine();
 	}
 }

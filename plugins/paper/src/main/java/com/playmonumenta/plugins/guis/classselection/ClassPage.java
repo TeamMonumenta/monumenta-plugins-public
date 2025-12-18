@@ -1,9 +1,11 @@
 package com.playmonumenta.plugins.guis.classselection;
 
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.guis.AbilityTriggersGui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DescriptionUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.Component;
@@ -12,7 +14,10 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+
+import static com.playmonumenta.plugins.utils.DescriptionUtils.ACTION_COMPLETED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.ACTION_SELECT;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class ClassPage extends Page {
 	public ClassPage(ClassSelectionGui gui) {
@@ -45,26 +50,33 @@ public class ClassPage extends Page {
 			classIndex++;
 		}
 
-		ItemStack summaryItem = GUIUtils.createBasicItem(
-			Material.SCUTE,
-			"Main Menu",
-			NamedTextColor.WHITE,
-			false,
-			"Pick a class to view abilities within that class. You can reset your class at any time, with no consequences.",
-			NamedTextColor.LIGHT_PURPLE
-		);
-		GUIUtils.setGuiNbtTag(summaryItem, "texture", "class_select_main_menu", mGui.mGuiTextures);
-		setHeaderIcon(summaryItem);
+		Component mainMenuDescription = new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addLine("Choose a class and assign your")
+			.addLine("*Skill Points* here.").styles(ClassSelectionGui.SKILL_POINT_COLOR)
+			.addLine()
+			.addLine("You can reset your class and")
+			.addLine("reassign your points at any time,")
+			.addLine("at no cost.")
+			.addDashedLine()
+			.get();
+		Component mainMenuName = DescriptionUtils.centeredComponent(mainMenuDescription, "Main Menu", WHITE, true);
+		ItemStack mainMenuItem = GUIUtils.createBasicItem(Material.SCUTE, 1, mainMenuName, mainMenuDescription, 99, true);
+
+		GUIUtils.setGuiNbtTag(mainMenuItem, "texture", "class_select_main_menu", mGui.mGuiTextures);
+		setHeaderIcon(mainMenuItem);
 
 		if (mGui.hasClass()) {
-			ItemStack resetItem = GUIUtils.createBasicItem(
-				Material.CYAN_BED,
-				"Reset Your Class",
-				NamedTextColor.WHITE,
-				false,
-				"Click here to reset your class, allowing access to other choices.",
-				NamedTextColor.LIGHT_PURPLE
-			);
+			Component resetDescription = new FormattedDescriptionBuilder<>()
+				.addDashedLine()
+				.addLine("Reset your class and all assigned")
+				.addLine("points, allowing you to pick a")
+				.addLine("different class.")
+				.addDashedLine()
+				.addAction("Click to reset your class.", ACTION_SELECT)
+				.get();
+			Component resetName = DescriptionUtils.centeredComponent(resetDescription, "Reset Class", WHITE, true);
+			ItemStack resetItem = GUIUtils.createBasicItem(Material.CYAN_BED, 1, resetName, resetDescription, 99, true);
 			GUIUtils.setGuiNbtTag(
 				resetItem,
 				"texture",
@@ -87,24 +99,25 @@ public class ClassPage extends Page {
 			// Possibly create reset spec item
 			int spec = AbilityUtils.getSpecNum(mGui.mPlayer);
 			if (mGui.hasSpec()) {
-				ItemStack specItem = GUIUtils.createBasicItem(
-					Material.RED_BANNER,
-					"Reset Your Specialization",
-					NamedTextColor.WHITE,
-					false,
-					"Click here to reset your specialization, allowing access to choose either specialization.",
-					NamedTextColor.LIGHT_PURPLE
-				);
-				GUIUtils.setGuiNbtTag(specItem, "texture", "cross_gui_reset_spec", mGui.mGuiTextures);
+				Component specResetDescription = new FormattedDescriptionBuilder<>()
+					.addDashedLine()
+					.addLine("Reset your class specialization, allowing")
+					.addLine("you to pick a different one.")
+					.addDashedLine()
+					.addAction("Click to reset your specialization.", ACTION_SELECT)
+					.get();
+				Component specResetName = DescriptionUtils.centeredComponent(specResetDescription, "Reset Specialization", WHITE, true);
+				ItemStack specResetItem = GUIUtils.createBasicItem(Material.RED_BANNER, 1, specResetName, specResetDescription, 99, true);
+				GUIUtils.setGuiNbtTag(specResetItem, "texture", "cross_gui_reset_spec", mGui.mGuiTextures);
 				if (playerClass != null) {
 					GUIUtils.setGuiNbtTag(
-						specItem,
+						specResetItem,
 						"Spec",
 						(spec == playerClass.mSpecOne.mSpecialization ? playerClass.mSpecOne : playerClass.mSpecTwo).mSpecName,
 						mGui.mGuiTextures
 					);
 				}
-				mGui.setItem(5, 4, specItem)
+				mGui.setItem(5, 4, specResetItem)
 					.onClick(event -> {
 						if (event.isShiftClick()) {
 							return;
@@ -115,14 +128,15 @@ public class ClassPage extends Page {
 					});
 			}
 
-			ItemStack triggersItem = GUIUtils.createBasicItem(
-				Material.JIGSAW,
-				"Change Ability Triggers",
-				NamedTextColor.WHITE,
-				false,
-				"Click here to change which key combinations are used to cast abilities.",
-				NamedTextColor.LIGHT_PURPLE
-			);
+			Component triggersDescription = new FormattedDescriptionBuilder<>()
+				.addDashedLine()
+				.addLine("View and change which keybinds")
+				.addLine("are used to cast abilities.")
+				.addDashedLine()
+				.addAction("Click to view ability triggers.", ACTION_SELECT)
+				.get();
+			Component triggersName = DescriptionUtils.centeredComponent(triggersDescription, "Change Ability Triggers", WHITE, true);
+			ItemStack triggersItem = GUIUtils.createBasicItem(Material.JIGSAW, 1, triggersName, triggersDescription, 99, true);
 			GUIUtils.setGuiNbtTag(triggersItem, "texture", "class_select_trigger", mGui.mGuiTextures);
 			mGui.setItem(5, 6, triggersItem)
 				.onClick(event -> {
@@ -163,47 +177,23 @@ public class ClassPage extends Page {
 			return;
 		}
 
-		String lore;
+		Component description = classToItemize.getDescription(mGui.mPlayer).appendNewline().appendSpace();
+
+		Component instruction;
 		if (chosen) {
-			lore = "Click to view your skills.";
+			instruction = DescriptionUtils.centeredComponent(description, "Click to view your skills!", ACTION_COMPLETED);
 		} else if (otherChosen) {
-			lore = "Click to view skills";
+			instruction = DescriptionUtils.centeredComponent(description, "Click to view %s's skills!".formatted(classToItemize.mClassName), ACTION_SELECT);
 		} else {
-			lore = "Click to choose this class!";
+			instruction = DescriptionUtils.centeredComponent(description, "Click to choose %s!".formatted(classToItemize.mClassName), ACTION_SELECT);
 		}
+		description = description.append(instruction);
+
+		Component name = DescriptionUtils.centeredComponent(description, classToItemize.mClassName, classToItemize.mClassColor, true);
 
 		ItemStack classItem = GUIUtils.createBasicItem(
-			otherChosen ? Material.BARRIER : classToItemize.mDisplayItem,
-			classToItemize.mClassName,
-			classToItemize.mClassColor,
-			true,
-			lore,
-			NamedTextColor.GRAY
-		);
-
-		if (classToItemize.mClassDescription != null) {
-			ItemMeta newMeta = classItem.getItemMeta();
-			GUIUtils.splitLoreLine(
-				newMeta,
-				"Description: " + classToItemize.mClassDescription,
-				NamedTextColor.YELLOW,
-				30,
-				false
-			);
-			classItem.setItemMeta(newMeta);
-		}
-
-		if (classToItemize.mPassive != null) {
-			ItemMeta newMeta = classItem.getItemMeta();
-			GUIUtils.splitLoreLine(
-				newMeta,
-				Component.text(classToItemize.mPassive.getDisplayName() + " (Passive): ", NamedTextColor.GREEN)
-					.append(classToItemize.mPassive.getDescription(1, mGui.mPlayer, true)),
-				30,
-				false
-			);
-			classItem.setItemMeta(newMeta);
-		}
+			otherChosen ? Material.BARRIER : classToItemize.mDisplayItem, 1,
+			name, description, 99, true);
 
 		mGui.setItem(
 				row,

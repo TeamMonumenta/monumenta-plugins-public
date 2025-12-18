@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.HuntingCompanionCS;
@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -67,6 +69,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+
+
 public class HuntingCompanion extends Ability implements AbilityWithDuration {
 	private static final int COOLDOWN = 24 * 20;
 	private static final int DURATION = 12 * 20;
@@ -94,6 +102,9 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 	public static final String CHARM_SPEED = "Hunting Companion Speed";
 	public static final String CHARM_FOXES = "Hunting Companion Foxes";
 	public static final String CHARM_EAGLES = "Hunting Companion Eagles";
+
+	public static final Style FOX_COLOR = Style.style(TextColor.color(0xE68129));
+	public static final Style EAGLE_COLOR = Style.style(TextColor.color(0xC6D6E2));
 
 	public static final AbilityInfo<HuntingCompanion> INFO =
 		new AbilityInfo<>(HuntingCompanion.class, "Hunting Companion", HuntingCompanion::new)
@@ -472,37 +483,55 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<HuntingCompanion> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to summon a fox companion. The fox attacks the nearest mob within ")
-			.add(a -> DETECTION_RANGE, DETECTION_RANGE)
-			.add(" blocks. The fox prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The fox deals damage equal to ")
-			.addPercent(a -> a.mDamageFraction, DAMAGE_FRACTION_1, false, Ability::isLevelOne)
-			.add(" of your mainhand's projectile damage, amplified by both melee and projectile damage from gear. Once per mob, the fox stuns upon attack for ")
-			.addDuration(a -> a.mStunDuration, STUN_TIME_1, false, Ability::isLevelOne)
-			.add(" seconds, except for elites and bosses. When a mob that was damaged by the fox dies, you heal ")
-			.addPercent(a -> a.mHealingPercent, HEALING_PERCENT)
-			.add(" of your max health. The fox disappears after ")
-			.addDuration(a -> a.mMaxDuration, DURATION)
-			.add(" seconds. Triggering while on cooldown will clear the specified target. If used while in water, an axolotl is spawned instead, and if used while in lava, a strider is spawned instead.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Summon a *Fox* that follows you and attacks").styles(FOX_COLOR)
+			.addLine("mobs, stunning them once per mob.")
+			.addLine()
+			.addLine("The *Fox* prioritizes mobs you've hit").styles(FOX_COLOR)
+			.addLine("with a projectile, and scales off of both")
+			.addLine("melee (m) and projectile damage (p).")
+			.addLine()
+			.addLine("When a mob damaged by a *Hunting Companion*").styles(UNDERLINED)
+			.addLine("dies, you are healed.")
+			.addLine()
+			.addStat("Damage: %p1 (m) (of weapon damage)")
+				.statValues(stat(a -> a.mDamageFraction, DAMAGE_FRACTION_1))
+			.addStat("Effect: Stun for %t1")
+				.statValues(stat(a -> a.mStunDuration, STUN_TIME_1))
+			.addStat("Healing: %p HP per kill")
+				.statValues(stat(a -> a.mHealingPercent, HEALING_PERCENT))
+			.addStat("Duration: %t")
+				.statValues(stat(a -> a.mMaxDuration, DURATION))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<HuntingCompanion> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.addPercent(a -> a.mDamageFraction, DAMAGE_FRACTION_2, false, Ability::isLevelTwo)
-			.add(" of your projectile damage and the stun time is increased to ")
-			.addDuration(a -> a.mStunDuration, STUN_TIME_2, false, Ability::isLevelTwo)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Hunting Companion*'s").styles(UNDERLINED)
+			.addLine("damage and stun duration.")
+			.addLine()
+			.addStatComparison("Damage: %p1 -> %p2 (m)")
+				.statValues(stat(DAMAGE_FRACTION_1), stat(a -> a.mDamageFraction, DAMAGE_FRACTION_2))
+			.addStatComparison("Effect: %t1 -> %t2 Stun")
+				.statValues(stat(STUN_TIME_1), stat(a -> a.mStunDuration, STUN_TIME_2))
+			.addDashedLine();
 	}
 
 	private static Description<HuntingCompanion> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Also summon an invulnerable eagle companion (parrot). The eagle deals the same damage as the fox and targets similarly, although the two will always avoid targeting the same mob at once. The eagle can swoop towards its target. The eagle applies ")
-			.addPercent(a -> a.mWeakenAmount, WEAKEN_AMOUNT)
-			.add(" weaken for ")
-			.addDuration(a -> a.mWeakenDuration, WEAKEN_DURATION)
-			.add(" seconds instead of stunning, which can be reapplied on a mob. If used in water, a dolphin is spawned instead.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Hunting Companion* now also summons an").styles(UNDERLINED)
+			.addLine("*Eagle* that deals the same damage, but").styles(EAGLE_COLOR)
+			.addLine("weakens mobs instead of stunning them.")
+			.addLine("(Cannot attack the fox's target)").styles(DARK_GREY)
+			.addLine()
+			.addStat("Effect: %p Weaken for %t")
+				.statValues(stat(a -> a.mWeakenAmount, WEAKEN_AMOUNT), stat(a -> a.mWeakenDuration, WEAKEN_DURATION))
+			.addDashedLine();
 	}
 }

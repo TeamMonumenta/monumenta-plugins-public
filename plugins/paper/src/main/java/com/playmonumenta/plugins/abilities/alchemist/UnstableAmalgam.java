@@ -7,9 +7,10 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.UnstableAmalgamCS;
@@ -35,6 +36,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,6 +51,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 
@@ -76,6 +84,9 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 	public static final String CHARM_INSTABILITY_DURATION = "Unstable Amalgam Instability Duration";
 	public static final String CHARM_POTION_DAMAGE = "Unstable Amalgam Dropped Potion Damage Modifier";
 
+	public static final Style AMALGAM_COLOR = Style.style(TextColor.color(0xE68EE6));
+	public static final Style UNSTABLE_COLOR = Style.style(TextColor.color(0x9043BF));
+
 	public static final AbilityInfo<UnstableAmalgam> INFO =
 		new AbilityInfo<>(UnstableAmalgam.class, "Unstable Amalgam", UnstableAmalgam::new)
 			.linkedSpell(ClassAbility.UNSTABLE_AMALGAM)
@@ -96,7 +107,8 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 	private @Nullable EsotericEnhancements mEsotericEnhancements;
 	private @Nullable Slime mAmalgam = null;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats = null;
-	private final double mDamage;
+	private final double mFlatDamage;
+	private final double mPercentDamage;
 	private final double mRadius;
 	private final double mRange;
 	private final float mMobHorizontalKnockback;
@@ -113,8 +125,9 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 
 	public UnstableAmalgam(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
+		mFlatDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE,
 			isLevelOne() ? UNSTABLE_AMALGAM_1_DAMAGE : UNSTABLE_AMALGAM_2_DAMAGE);
+		mPercentDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, 1);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, UNSTABLE_AMALGAM_RADIUS);
 		mMaxDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, UNSTABLE_AMALGAM_DURATION);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, UNSTABLE_AMALGAM_CAST_RANGE);
@@ -249,7 +262,7 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 			mEsotericEnhancements.createPuddle(loc, false, mPlayerItemStats, mRadius);
 		}
 
-		double damage = mDamage + CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage());
+		double damage = mFlatDamage + mPercentDamage * mAlchemistPotions.getDamage();
 		for (LivingEntity mob : mobs) {
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), mPlayerItemStats), damage, true, true, false);
 
@@ -394,36 +407,55 @@ public class UnstableAmalgam extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<UnstableAmalgam> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to consume a potion to place an Amalgam with 1 health at the location you are looking, up to ")
-			.add(a -> a.mRange, UNSTABLE_AMALGAM_CAST_RANGE)
-			.add(" blocks away. When killed, or after ")
-			.addDuration(a -> a.mMaxDuration, UNSTABLE_AMALGAM_DURATION)
-			.add("s, it detonates, dealing your Alchemist Potion's damage + ")
-			.add(a -> a.mDamage, UNSTABLE_AMALGAM_1_DAMAGE, false, Ability::isLevelOne)
-			.add(" magic damage to mobs within ")
-			.add(a -> a.mRadius, UNSTABLE_AMALGAM_RADIUS)
-			.add(" blocks and applying both Gruesome and Brutal potion effects.")
-			.add(" Mobs and players in the radius are knocked away from the Amalgam.")
-			.add(" For each mob damaged, gain an Alchemist's Potion.")
-			.addCooldown(UNSTABLE_AMALGAM_1_COOLDOWN, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Spend *1* potion to place an *Amalgam* at a").styles(WHITE, AMALGAM_COLOR)
+			.addLine("location up to %d blocks away.")
+				.statValues(stat(a -> a.mRange, UNSTABLE_AMALGAM_CAST_RANGE))
+			.addLine()
+			.addLine("The *Amalgam* explodes when hit, or after %t,").styles(AMALGAM_COLOR)
+				.statValues(stat(a -> a.mMaxDuration, UNSTABLE_AMALGAM_DURATION))
+			.addLine("dealing damage, knockback, and applying both")
+			.addLine("*Gruesome* and *Brutal* onto mobs hit.").styles(Alchemist.GRUESOME_COLOR, Alchemist.BRUTAL_COLOR)
+			.addLine()
+			.addLine("Gain *1* potion for each mob hit.").styles(WHITE)
+			.addLine()
+			.addStat("Damage: %d1 + %p1 (s) (of potion damage)")
+				.statValues(stat(a -> a.mFlatDamage, UNSTABLE_AMALGAM_1_DAMAGE), stat(a -> a.mPercentDamage, 1))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, UNSTABLE_AMALGAM_RADIUS))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(UNSTABLE_AMALGAM_1_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<UnstableAmalgam> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased to ")
-			.add(a -> a.mDamage, UNSTABLE_AMALGAM_2_DAMAGE, false, Ability::isLevelTwo)
-			.add(".")
-			.addCooldown(UNSTABLE_AMALGAM_2_COOLDOWN, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Unstable Amalgam*'s damage").styles(UNDERLINED)
+			.addLine("and reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Damage: %d1 + %p1 -> %d2 + %p2 (s)")
+				.statValues(stat(UNSTABLE_AMALGAM_1_DAMAGE), stat(1), stat(a -> a.mFlatDamage, UNSTABLE_AMALGAM_2_DAMAGE), stat(a -> a.mPercentDamage, 1))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(UNSTABLE_AMALGAM_1_COOLDOWN), cooldown(UNSTABLE_AMALGAM_2_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<UnstableAmalgam> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Enemies hit by the Amalgam's explosion become unstable for ")
-			.addDuration(a -> a.mInstabilityDuration, UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION)
-			.add(" seconds, and they are knocked straight up. When an unstable mob is killed, a potion that deals ")
-			.addPercent(a -> a.mPotionDamageMult, UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE)
-			.add(" of your potion damage is dropped at its location. These potions apply both Brutal and Gruesome, and bypass both normal and Alchemist Potion iframes.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Mobs hit by the *Amalgam* become *Unstable* for").styles(AMALGAM_COLOR, UNSTABLE_COLOR)
+			.addLine("%t and are launched vertically.")
+				.statValues(stat(a -> a.mInstabilityDuration, UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION))
+			.addLine()
+			.addLine("When an *Unstable* mob dies, it drops a potion").styles(UNSTABLE_COLOR)
+			.addLine("that deals damage and applies both *Gruesome*").styles(Alchemist.GRUESOME_COLOR)
+			.addLine("and *Brutal*.").styles(Alchemist.BRUTAL_COLOR)
+			.addLine()
+			.addStat("Unstable Damage: %p (s) (of potion damage)")
+				.statValues(stat(a -> a.mPotionDamageMult, UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE))
+			.addDashedLine();
 	}
 }

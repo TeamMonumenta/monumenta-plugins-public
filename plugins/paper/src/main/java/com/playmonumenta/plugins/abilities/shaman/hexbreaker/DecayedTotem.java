@@ -6,12 +6,13 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
 import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
 import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.DecayedTotemCS;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -28,6 +29,10 @@ import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class DecayedTotem extends TotemAbility {
 	private static final int COOLDOWN = 26 * 20;
@@ -166,38 +171,51 @@ public class DecayedTotem extends TotemAbility {
 	}
 
 	private static Description<DecayedTotem> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to fire a projectile that summons a Decayed Totem. The totem anchors up to ")
-			.add(a -> a.mTargetCount, TARGETS)
-			.add(" targets within ")
-			.add(TotemAbility::getTotemRadius, AOE_RANGE)
-			.add(" blocks of the totem, dealing ")
-			.add(a -> a.mDamage, DAMAGE)
-			.add(" magic damage every ")
-			.addDuration(a -> a.mInterval, INTERVAL_1, true, Ability::isLevelOne)
-			.add(" second and inflicting ")
-			.addPercent(a -> a.mSlowness, SLOWNESS_PERCENT)
-			.add(" slowness. Additionally your Flame and Lightning Totems that exist during this totem's duration gain ")
-			.add(a -> a.mFlameTotemBuff, FLAME_TOTEM_DAMAGE_BUFF_1, false, Ability::isLevelOne)
-			.add(" bonus damage and ")
-			.add(a -> a.mLightningTotemBuff, LIGHTNING_TOTEM_DAMAGE_BUFF_1, false, Ability::isLevelOne)
-			.add(" bonus damage respectively, applying if they do damage. Duration: ")
-			.addDuration(a -> a.mDuration, DURATION_1, false, Ability::isLevelOne)
-			.add("s.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Summon a *Totem* that anchors to up to %d mobs,").styles(Shaman.TOTEM_COLOR)
+				.statValues(stat(a -> a.mTargetCount, TARGETS))
+			.addLine("dealing damage to them and slowing them.")
+			.addLine()
+			.addStat("Damage: %d (s) every %t1")
+				.statValues(stat(a -> a.mDamage, DAMAGE), stat(a -> a.mInterval, INTERVAL_1))
+			.addStat("Effect: %p Slowness")
+				.statValues(stat(a -> a.mSlowness, SLOWNESS_PERCENT))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, AOE_RANGE))
+			.addStat("Duration: %t1")
+				.statValues(stat(a -> a.mDuration, DURATION_1))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addLine()
+			.addLine("*Flame* and *Lightning Totems* summoned while").styles(UNDERLINED, UNDERLINED)
+			.addLine("*Decayed Totem* is active deal increased damage.").styles(UNDERLINED)
+			.addLine()
+			.addStat("Flame Totem Boost: +%d1 (s)")
+				.statValues(stat(a -> a.mFlameTotemBuff, FLAME_TOTEM_DAMAGE_BUFF_1))
+			.addStat("Lightning Totem Boost: +%d1 (s)")
+				.statValues(stat(a -> a.mLightningTotemBuff, LIGHTNING_TOTEM_DAMAGE_BUFF_1))
+			.addDashedLine();
 	}
 
 	private static Description<DecayedTotem> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is now dealt every ")
-			.addDuration(a -> a.mInterval, INTERVAL_2, true, Ability::isLevelTwo)
-			.add(" seconds, and the duration is increased to ")
-			.addDuration(a -> a.mDuration, DURATION_2, false, Ability::isLevelTwo)
-			.add(" seconds. Additionally the Flame and Lightning Totem damage bonuses are increased to ")
-			.add(a -> a.mFlameTotemBuff, FLAME_TOTEM_DAMAGE_BUFF_2, false, Ability::isLevelTwo)
-			.add(" and ")
-			.add(a -> a.mLightningTotemBuff, LIGHTNING_TOTEM_DAMAGE_BUFF_2, false, Ability::isLevelTwo)
-			.add(" respectively.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Decayed Totem*'s rate of damage").styles(UNDERLINED)
+			.addLine("and its duration.")
+			.addLine()
+			.addLine("Increase the damage boost given to *Flame*").styles(UNDERLINED)
+			.addLine("and *Lightning Totems*.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Interval: %t1 -> %t2")
+				.statValues(stat(INTERVAL_1), stat(a -> a.mInterval, INTERVAL_2))
+			.addStatComparison("Duration: %t1 -> %t2")
+				.statValues(stat(DURATION_1), stat(a -> a.mDuration, DURATION_2))
+			.addStatComparison("Flame Totem Boost: +%d1 -> +%d2 (s)")
+				.statValues(stat(FLAME_TOTEM_DAMAGE_BUFF_1), stat(a -> a.mFlameTotemBuff, FLAME_TOTEM_DAMAGE_BUFF_2))
+			.addStatComparison("Lightning Totem Boost: +%d1 -> +%d2 (s)")
+				.statValues(stat(LIGHTNING_TOTEM_DAMAGE_BUFF_1), stat(a -> a.mLightningTotemBuff, LIGHTNING_TOTEM_DAMAGE_BUFF_2))
+			.addDashedLine();
 	}
 }

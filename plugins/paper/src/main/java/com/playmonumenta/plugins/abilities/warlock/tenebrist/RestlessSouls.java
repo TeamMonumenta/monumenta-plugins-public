@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,6 +38,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class RestlessSouls extends Ability {
 	private static final int DAMAGE_1 = 10;
@@ -61,6 +66,8 @@ public class RestlessSouls extends Ability {
 	public static final String CHARM_DEBUFF_RANGE = "Restless Souls Debuff Radius";
 	public static final String CHARM_DEBUFF_DURATION = "Restless Souls Debuff Duration";
 	public static final String CHARM_SPEED = "Restless Souls Movement Speed";
+
+	public static final Style VEX_COLOR = Style.style(TextColor.color(0x75A2C7));
 
 	public static final AbilityInfo<RestlessSouls> INFO =
 		new AbilityInfo<>(RestlessSouls.class, "Restless Souls", RestlessSouls::new)
@@ -238,32 +245,53 @@ public class RestlessSouls extends Ability {
 	}
 
 	private static Description<RestlessSouls> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Whenever an enemy dies within ")
-			.add(a -> a.mRadius, RANGE)
-			.add(" blocks of you, an invulnerable vex spawns. The vex targets mobs and possesses them, dealing ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage to the target and silences all mobs within ")
-			.add(a -> a.mDebuffRange, DEBUFF_RANGE)
-			.add(" blocks for ")
-			.addDuration(a -> a.mSilenceTime, SILENCE_DURATION_1, false, Ability::isLevelOne)
-			.add(" seconds. Vex count is capped at ")
-			.add(a -> a.mVexCap, VEX_CAP_1, false, Ability::isLevelOne)
-			.add(" and each lasts for ")
-			.addDuration(a -> a.mDuration, VEX_DURATION)
-			.add(" seconds. Each vex can only possess 1 enemy. Enemies killed by the vex will not spawn additional vexes.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("When a mob dies within %d blocks of you,")
+				.statValues(stat(a -> a.mRadius, RANGE))
+			.addLine("summon a *Vex* that lasts for %t, follows").styles(VEX_COLOR)
+				.statValues(stat(a -> a.mDuration, VEX_DURATION))
+			.addLine("you, and seeks out nearby enemies.")
+			.addLine("(Excludes kills from Vexes)")
+			.addLine()
+			.addLine("*Vexes* attack on contact, dealing damage,").styles(VEX_COLOR)
+			.addLine("silencing the mob, and then disappearing.")
+			.addLine()
+			.addStat("Damage: %d1 (s)")
+				.statValues(stat(a -> a.mDamage, DAMAGE_1))
+			.addStat("Effect: Silence for %t1")
+				.statValues(stat(a -> a.mSilenceTime, SILENCE_DURATION_1))
+			.addStat("Max Vexes: %d1")
+				.statValues(stat(a -> a.mVexCap, VEX_CAP_1))
+			.addDashedLine();
 	}
 
 	private static Description<RestlessSouls> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" and silence duration increased to ")
-			.addDuration(a -> a.mSilenceTime, SILENCE_DURATION_2, false, Ability::isLevelTwo)
-			.add(" seconds. Maximum vex count increased to ")
-			.add(a -> a.mVexCap, VEX_CAP_2, false, Ability::isLevelTwo)
-			.add(". Additionally, the possessed mob is inflicted with a level 1 debuff of the corresponding active skill that is on cooldown for ")
-			.addDuration(a -> a.mDebuffDuration, DEBUFF_DURATION)
-			.add(" seconds. Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > -100% Healing. Melancholic Lament > 10% Weaken. Withering Gaze > Decay 1. Haunting Shades > 10% Vulnerability.");
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addDashedLine()
+			.addLine("Increase *Restless Souls*'s damage,").styles(UNDERLINED)
+			.addLine("silence duration, and maximum *Vexes*.").styles(VEX_COLOR)
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)")
+			.statValues(stat(DAMAGE_1), stat(a -> a.mDamage, DAMAGE_2))
+			.addStatComparison("Effect: %t1 -> %t2 Silence")
+			.statValues(stat(SILENCE_DURATION_1), stat(a -> a.mSilenceTime, SILENCE_DURATION_2))
+			.addStatComparison("Max Vexes: %d1 -> %d2")
+			.statValues(stat(VEX_CAP_1), stat(a -> a.mVexCap, VEX_CAP_2))
+			.addLine()
+			.addLine("*Vexes* inflict bonus debuffs depending").styles(VEX_COLOR)
+			.addLine("on what abilities you have on cooldown.")
+			.addLine()
+			.addStat("Bonus Debuffs: (if ability is on cooldown)")
+				.addListItem("Fire (Lv. 1 Choleric Flames)")
+				.addListItem("-100% Healing (Lv. 2 Choleric Flames)")
+				.addListItem("10% Slowness (Grasping Claws)")
+				.addListItem("10% Weakness (Melancholic Lament)")
+				.addListItem("10% Vulnerability (Haunting Shades)")
+				.addListItem("2 (s) every 2s (Withering Gaze)")
+			.addStat("Bonus Debuff Duration: %t")
+				.statValues(stat(a -> a.mDebuffDuration, DEBUFF_DURATION))
+			.addDashedLine();
+//
 	}
 }

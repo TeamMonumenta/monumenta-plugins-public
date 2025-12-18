@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -16,16 +16,20 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 
@@ -40,6 +44,8 @@ public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 
 	public static final String CHARM_STACKS = "Bloodlust Max Stacks";
 	public static final String CHARM_THRESHOLD = "Bloodlust Stack Threshold";
+
+	public static final Style BLOODLUST_COLOR = Style.style(TextColor.color(0xA82511));
 
 	private final int mStackLimit;
 	private final double mDamageReq;
@@ -194,19 +200,17 @@ public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 		return false;
 	}
 
-	private static Description<Bloodlust> getDescription() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Gain Bloodlust stacks upon dealing ")
-			.add(R2_DAMAGE_REQ)
-			.add("/")
-			.add(a -> a.mDamageReq, R3_DAMAGE_REQ)
-			.add(" melee damage, stacking up to ")
-			.add(a -> a.mStackLimit, MAX_STACKS)
-			.add(". ")
-			.addPercent(AOE_PENALTY)
-			.add(" of melee damage from AoE contribute towards Bloodlust. Passively gain ")
-			.add(a -> MAX_PASSIVE_GAIN, MAX_PASSIVE_GAIN)
-			.add(" Bloodlust when out of combat.");
+	public static Description<Bloodlust> getDescription() {
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addLine("Gain *1* stack of *Bloodlust* for every %d").styles(WHITE, BLOODLUST_COLOR)
+				.statValues(perRegion(a -> a.mDamageReq, R2_DAMAGE_REQ, R3_DAMAGE_REQ))
+			.addLine("melee damage you deal, up to %d stacks.")
+				.statValues(stat(a -> a.mStackLimit, MAX_STACKS))
+			.addLine("(AoE damage only contributes %p as much)")
+				.statValues(stat(AOE_PENALTY))
+			.addLine()
+			.addLine("Gain up to %d stacks while outside combat.").styles(BLOODLUST_COLOR)
+				.statValues(stat(MAX_PASSIVE_GAIN));
 	}
 
 	@Override

@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.MeteorSlamCS;
@@ -39,6 +39,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 
 public class MeteorSlam extends Ability {
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickSlammed";
@@ -78,6 +81,7 @@ public class MeteorSlam extends Ability {
 
 	private final double mThreshold;
 	private final double mMaxHeight;
+	private final double mSlamDamage;
 	private final double mSlamRadius;
 
 	// Ground Pound
@@ -151,6 +155,7 @@ public class MeteorSlam extends Ability {
 
 		mThreshold = AUTOMATIC_THRESHOLD + CharmManager.getLevel(mPlayer, CHARM_THRESHOLD);
 		mMaxHeight = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEIGHT, MAX_HEIGHT);
+		mSlamDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SLAM_DAMAGE, SLAM_DAMAGE_PER_BLOCK);
 		mSlamRadius = CharmManager.getRadius(mPlayer, CHARM_METEOR_SLAM_RADIUS, SLAM_RADIUS);
 
 		mGroundPoundDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_GROUND_POUND_DAMAGE, GROUND_POUND_DAMAGE_PER_BLOCK);
@@ -421,56 +426,54 @@ public class MeteorSlam extends Ability {
 	}
 
 	private static Description<MeteorSlam> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" vaults you upwards at a velocity of ")
-			.add(a -> a.mVaultVelocity, VAULT_VELOCITY)
-			.add(" (reduced by ")
-			.addPercent(a -> VAULT_VELOCITY_PENALTY, VAULT_VELOCITY_PENALTY)
-			.add(" until landing), dealing ")
-			.add(a -> a.mVaultDamage, UP_DAMAGE, false, Ability::isLevelOne)
-			.add(" melee damage within a ")
-			.add(a -> a.mVaultRadius, CONE_RADIUS)
-			.add(" block cone and knocking mobs downwards. Falling more than ")
-			.add(a -> a.mThreshold, AUTOMATIC_THRESHOLD)
-			.add(" blocks generates a slam where you land, dealing ")
-			.add(a -> CharmManager.calculateFlatAndPercentValue(a.getPlayer(), CHARM_SLAM_DAMAGE, SLAM_DAMAGE_PER_BLOCK), SLAM_DAMAGE_PER_BLOCK, false, Ability::isLevelOne)
-			.add(" melee damage per block fallen with a radius of ")
-			.add(a -> a.mSlamRadius, SLAM_RADIUS)
-			.add(" blocks, capping at ")
-			.add(a -> a.mMaxHeight, MAX_HEIGHT)
-			.add(" blocks. Additional height will count 25% of the original value, slowly decreasing. Dealing any damage with Meteor Slam cancels all fall damage. \n \n")
-			.addCooldown(COOLDOWN)
-			.add("\n Cost: ")
-			.add(a -> a.mBloodlustCost, BLOODLUST_COST)
-			.add("x Bloodlust Stack. ");
+			.addDashedLine()
+			.addLine("Spend %d stack of *Bloodlust* to vault upwards").styles(Bloodlust.BLOODLUST_COLOR)
+				.statValues(stat(a -> a.mBloodlustCost, BLOODLUST_COST))
+			.addLine("and damage mobs in front of you, knocking them")
+			.addLine("downwards.")
+			.addLine()
+			.addStat("Vault Damage: %d (m)")
+				.statValues(stat(a -> a.mVaultDamage, UP_DAMAGE))
+			.addStat("Vault Radius: %r (Cone-Shaped)")
+				.statValues(stat(a -> a.mVaultRadius, CONE_RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addLine()
+			.addLine("Passively, falling more than %d blocks creates")
+				.statValues(stat(a -> a.mThreshold, AUTOMATIC_THRESHOLD))
+			.addLine("a slam upon landing, dealing more damage for")
+			.addLine("each block fallen. (%d block softcap)")
+				.statValues(stat(a -> a.mMaxHeight, MAX_HEIGHT))
+			.addLine("Fall damage is cancelled if any mob was hit")
+			.addLine("by the slam.")
+			.addLine()
+			.addStat("Slam Damage: %d (m) per block")
+				.statValues(stat(a -> a.mSlamDamage, SLAM_DAMAGE_PER_BLOCK))
+			.addStat("Slam Radius: %r")
+				.statValues(stat(a -> a.mSlamRadius, SLAM_RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<MeteorSlam> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Sneaking (or ")
-			.addTrigger(1)
-			.add(" if enabled) while midair now performs a ground pound attack, lunging you downward at a velocity of ")
-			.add(a -> a.mGroundPoundVelocity, GROUND_POUND_VELOCITY)
-			.add(". Your next Meteor Slam is amplified: ")
-			.add("\n - +")
-			.add(a -> a.mGroundPoundDamage, GROUND_POUND_DAMAGE_PER_BLOCK)
-			.add(" damage per block fallen.")
-			.add("\n - +")
-			.add(a -> a.mGroundPoundRadius, GROUND_POUND_RADIUS)
-			.add(" block radius.")
-			.add("\n - ")
-			.addDuration(a -> a.mGroundPoundFireDuration, GROUND_POUND_FIRE_DURATION)
-			.add("s of fire.")
-			.add("\n - ")
-			.addPercent(a -> a.mGroundPoundSlownessMultiplier, GROUND_POUND_SLOWNESS_MULTIPLIER)
-			.add(" slowness for ")
-			.addDuration(a -> a.mGroundPoundSlownessDuration, GROUND_POUND_SLOWNESS_DURATION)
-			.add("s.")
-			.add("\n - Knocks back mobs. ")
-			.add("\n \n Cost: ")
-			.add(a -> a.mGroundPoundBloodlustCost, GROUND_POUND_BLOODLUST_COST)
-			.add("x Bloodlust Stack.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Sneaking while midair spends %d stack of *Bloodlust*").styles(Bloodlust.BLOODLUST_COLOR)
+				.statValues(stat(a -> a.mGroundPoundBloodlustCost, GROUND_POUND_BLOODLUST_COST))
+			.addLine("to lunge downwards and enhance your next slam,")
+			.addLine("increasing its damage and radius, and causing it")
+			.addLine("to ignite mobs, slow them, and knock them back.")
+			.addLine()
+			.addStatComparison("Ground Pound Damage: %d -> %d (m) per block")
+				.statValues(stat(SLAM_DAMAGE_PER_BLOCK), stat(a -> a.mSlamDamage + a.mGroundPoundDamage, SLAM_DAMAGE_PER_BLOCK + GROUND_POUND_DAMAGE_PER_BLOCK))
+			.addStatComparison("Ground Pound Radius: %r -> %r")
+				.statValues(stat(SLAM_RADIUS), stat(a -> a.mSlamRadius + a.mGroundPoundRadius, SLAM_RADIUS + GROUND_POUND_RADIUS))
+			.addStat("Effect: Fire for %t")
+				.statValues(stat(a -> a.mGroundPoundFireDuration, GROUND_POUND_FIRE_DURATION))
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(stat(a -> a.mGroundPoundSlownessMultiplier, GROUND_POUND_SLOWNESS_MULTIPLIER), stat(a -> a.mGroundPoundSlownessDuration, GROUND_POUND_SLOWNESS_DURATION))
+			.addDashedLine();
 	}
 
 	private static boolean hasCustomTrigger(Player player) {

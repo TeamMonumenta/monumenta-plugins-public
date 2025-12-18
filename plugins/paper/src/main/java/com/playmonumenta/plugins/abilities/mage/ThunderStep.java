@@ -6,8 +6,9 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.ThunderStepCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -31,6 +32,10 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 
 public class ThunderStep extends Ability {
@@ -203,37 +208,54 @@ public class ThunderStep extends Ability {
 	}
 
 	private static Description<ThunderStep> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to materialize a flash of thunder, dealing ")
-			.add(a -> a.mLevelDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" thunder magic damage to all enemies within ")
-			.add(a -> a.mRadius, SIZE)
-			.add(" blocks around you. The next moment, you teleport in the direction you're looking, travelling up to ")
-			.add(a -> a.mLevelDistance, DISTANCE_1, false, Ability::isLevelOne)
-			.add(" blocks or until you hit a solid block, and repeat the thunder attack at your destination.")
-			.addCooldown(COOLDOWN_TICKS);
+			.addDashedLine()
+			.addLine("Deal *Thunder* damage to nearby mobs").styles(Mage.THUNDER_COLOR)
+			.addLine("and teleport forwards, dealing damage")
+			.addLine("again at your destination.")
+			.addLine()
+			.addStat("Damage: %d1 (s)")
+				.statValues(stat(a -> a.mLevelDamage, DAMAGE_1))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, SIZE))
+			.addStat("Teleport Distance: %r1")
+				.statValues(stat(a -> a.mLevelDistance, DISTANCE_1))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN_TICKS))
+			.addDashedLine();
 	}
 
 	private static Description<ThunderStep> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mLevelDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" and teleport range is increased to ")
-			.add(a -> a.mLevelDistance, DISTANCE_2, false, Ability::isLevelTwo)
-			.add(" blocks.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Thunder Step*'s damage").styles(UNDERLINED)
+			.addLine("and teleport distance.")
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mLevelDamage, DAMAGE_2))
+			.addStatComparison("Teleport Distance: %r1 -> %r2")
+				.statValues(stat(DISTANCE_1), stat(a -> a.mLevelDistance, DISTANCE_2))
+			.addDashedLine();
 	}
 
 	private static Description<ThunderStep> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Within ")
-			.addDuration(BACK_TELEPORT_MAX_DELAY)
-			.add(" seconds of casting, trigger again to return to the original starting location, dealing ")
-			.addPercent(ENHANCEMENT_DAMAGE_RATIO)
-			.add(" of the skill's damage. If you do not do so, your next Thunder Step within ")
-			.addDuration(ENHANCEMENT_BONUS_DAMAGE_TIMER)
-			.add(" seconds will paralyze enemies for ")
-			.addDuration(ENHANCEMENT_PARALYZE_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Recast *Thunder Step* within %t of casting").styles(UNDERLINED)
+				.statValues(stat(BACK_TELEPORT_MAX_DELAY))
+			.addLine("it to teleport back to your original")
+			.addLine("location and deal reduced damage.")
+			.addLine()
+			.addStat("Recast Damage: %p (s) of original")
+				.statValues(stat(ENHANCEMENT_DAMAGE_RATIO))
+			.addLine()
+			.addLine("If you don't recast it, your next")
+			.addLine("*Thunder Step* will paralyze mobs it hits.").styles(UNDERLINED)
+			.addLine("(25% chance to Root for 1s, every 1s)")
+			.addLine()
+			.addStat("Effect: Paralysis for %t")
+				.statValues(stat(ENHANCEMENT_PARALYZE_DURATION))
+			.addDashedLine();
 	}
 }

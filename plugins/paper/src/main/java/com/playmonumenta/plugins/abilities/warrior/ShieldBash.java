@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.ShieldBashCS;
@@ -26,6 +26,10 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 
 public class ShieldBash extends Ability {
@@ -166,30 +170,45 @@ public class ShieldBash extends Ability {
 	}
 
 	private static Description<ShieldBash> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Block while looking at a mob within ")
-			.add(a -> a.mRange, SHIELD_BASH_RANGE)
-			.add(" blocks and not sneaking to deal ")
-			.add(a -> a.mDamage, SHIELD_BASH_DAMAGE)
-			.add(" melee damage, stun for ")
-			.addDuration(a -> a.mStunDuration, SHIELD_BASH_STUN)
-			.add(" second, and taunt the targeted enemy. Elites and bosses are rooted instead of stunned.")
-			.addCooldown(SHIELD_BASH_COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addCustomTrigger("Shield Block")
+			.addDashedLine()
+			.addLine("Damage, taunt, and stun a target")
+			.addLine("mob in front of you.")
+			.addLine("(Elites/Bosses are rooted instead)")
+			.addLine()
+			.addStat("Damage: %d (m)")
+				.statValues(stat(a -> a.mDamage, SHIELD_BASH_DAMAGE))
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunDuration, SHIELD_BASH_STUN))
+			.addStat("Range: %r")
+				.statValues(stat(a -> a.mRange, SHIELD_BASH_RANGE))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(SHIELD_BASH_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<ShieldBash> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Additionally, apply damage, stun, and taunt to all mobs within ")
-			.add(a -> a.mRadius, SHIELD_BASH_2_RADIUS)
-			.add(" blocks of the mob targeted by this ability.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("*Shield Bash* now hits all").styles(UNDERLINED)
+			.addLine("mobs near the target mob.")
+			.addLine()
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, SHIELD_BASH_2_RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<ShieldBash> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Blocking damage with a shield within ")
-			.addDuration(a -> a.mParryDuration, ENHANCEMENT_BLOCKING_DURATION)
-			.add(" second of beginning to block refreshes ")
-			.addPercent(a -> a.mCDR, ENHANCEMENT_CDR)
-			.add(" of this ability's cooldown.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Blocking an attack within %t of")
+				.statValues(stat(a -> a.mParryDuration, ENHANCEMENT_BLOCKING_DURATION))
+			.addLine("raising your shield reduces")
+			.addLine("*Shield Bash*'s cooldown.").styles(UNDERLINED)
+			.addLine()
+			.addStat("Cooldown Reduction: %p")
+				.statValues(stat(a -> a.mCDR, ENHANCEMENT_CDR))
+			.addDashedLine();
 	}
 }

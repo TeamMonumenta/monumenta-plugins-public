@@ -5,8 +5,9 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.shaman.hexbreaker.SpiritcatcherOrbsCS;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -24,6 +25,7 @@ import java.util.EnumSet;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -38,6 +40,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 import static com.playmonumenta.plugins.utils.EntityUtils.VULNERABILITY_EFFECT_NAME;
 
 public class SpiritcatcherOrbs extends Ability implements AbilityWithChargesOrStacks {
@@ -74,6 +79,8 @@ public class SpiritcatcherOrbs extends Ability implements AbilityWithChargesOrSt
 	public static final String CHARM_MAX_STACKS = "Spiritcatcher Orbs Max Stacks";
 	public static final String CHARM_STACK_DECAY_TIME = "Spiritcatcher Orbs Stack Decay Time";
 	public static final String CHARM_IMBUED_DAMAGE_BONUS = "Spiritcatcher Orbs Imbuement Damage Bonus Amplifier";
+
+	public static final Style SPIRITFLAME_COLOR = Style.style(TextColor.color(0x2BA1AF));
 
 	public static final AbilityInfo<SpiritcatcherOrbs> INFO =
 		new AbilityInfo<>(SpiritcatcherOrbs.class, "Spiritcatcher Orbs", SpiritcatcherOrbs::new)
@@ -279,37 +286,58 @@ public class SpiritcatcherOrbs extends Ability implements AbilityWithChargesOrSt
 	}
 
 	private static Description<SpiritcatcherOrbs> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("On totem expiration or destruction, your totems will leave behind ")
-			.add(a -> a.mOrbCount, ORB_COUNT)
-			.add(" Spiritcatcher Orbs that last for ")
-			.addDuration(a -> a.mLifetime, ORB_LIFETIME)
-			.add(" seconds. Pick up Spiritcatcher Orbs to imbue your next attack with Spiritflame that lasts ")
-			.addDuration(a -> a.mFlameDuration, SPIRITFLAME_DURATION_1, false, Ability::isLevelOne)
-			.add(" seconds. While inflicted with Spiritflame, all mobs with the same name within ")
-			.add(a -> a.mFlameRange, SPIRITFLAME_RANGE)
-			.add(" blocks take ")
-			.add(a -> a.mFlameDamage, SPIRITFLAME_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage per second. Spiritflame imbued attacks have their damage increased by ")
-			.addPercent(a -> a.mImbuedDamageBonus, IMBUED_DAMAGE_BONUS)
-			.add(". You can hold up to ")
-			.add(a -> a.mMaxOrbStacks, ORB_MAX_STACKS)
-			.add(" Spiritcatcher Orbs, and these decay after ")
-			.addDuration(a -> a.mDecayDuration, ORB_STACK_DECAY_TIME)
-			.add(" seconds. Any player can pick up your Spiritcatcher Orbs on the ground and you will gain the effects.")
-			.add(" Breaking a spawner immediately collects all of your Spiritcatcher Orbs.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("When a *Totem* expires or is destroyed, it leaves").styles(Shaman.TOTEM_COLOR)
+			.addLine("behind %d orbs that can be picked up by players.")
+				.statValues(stat(a -> a.mOrbCount, ORB_COUNT))
+			.addLine("Breaking a spawner picks up all orbs.")
+			.addLine()
+			.addLine("You can hold up to %d orbs at once, and they")
+				.statValues(stat(a -> a.mMaxOrbStacks, ORB_MAX_STACKS))
+			.addLine("begin to decay after %t of not gaining any.")
+				.statValues(stat(a -> a.mDecayDuration, ORB_STACK_DECAY_TIME))
+			.addLine()
+			.addLine("Your attacks and projectiles consume *1* orb").styles(WHITE)
+			.addLine("to deal more damage and afflict the target")
+			.addLine("with *Spiritflame*.").styles(SPIRITFLAME_COLOR)
+				.statValues(stat(a -> a.mFlameDuration, SPIRITFLAME_DURATION_1))
+			.addLine()
+			.addStat("Damage Boost: +%p (m/p)")
+			.statValues(stat(a -> a.mImbuedDamageBonus, IMBUED_DAMAGE_BONUS))
+			.addLine()
+			.addLine("*Spiritflame* deals damage over time to the mob and").styles(SPIRITFLAME_COLOR)
+			.addLine("nearby mobs with the same name. If the mob dies, the")
+			.addLine("*Spiritflame* continues to burn where it died.").styles(SPIRITFLAME_COLOR)
+			.addLine()
+			.addStat("Damage: %d1 (s) every 1s")
+				.statValues(stat(a -> a.mFlameDamage, SPIRITFLAME_DAMAGE_1))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mFlameRange, SPIRITFLAME_RANGE))
+			.addStat("Duration: %t1")
+				.statValues(stat(a -> a.mFlameDuration, SPIRITFLAME_DURATION_1))
+			.addDashedLine();
 	}
 
 	private static Description<SpiritcatcherOrbs> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Spiritflame duration is increased to ")
-			.addDuration(a -> a.mFlameDuration, SPIRITFLAME_DURATION_2, false, Ability::isLevelTwo)
-			.add(" seconds and damage is increased to ")
-			.add(a -> a.mFlameDamage, SPIRITFLAME_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(". Mobs inflicted by Spiritflame take ")
-			.addPercent(a -> a.mFlameVuln, SPIRITFLAME_MAGIC_VULN, false, Ability::isLevelTwo)
-			.add(" more magic damage and are afflicted with a ")
-			.addPercent(a -> a.mFlameWeaken, SPIRITFLAME_WEAKEN, false, Ability::isLevelTwo)
-			.add(" weaken effect that applies to melee, projectile, magic, blast, and fire damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase the damage and duration of *Spiritflame*.").styles(SPIRITFLAME_COLOR)
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s) every 1s")
+				.statValues(stat(SPIRITFLAME_DAMAGE_1), stat(a -> a.mFlameDamage, SPIRITFLAME_DAMAGE_2))
+			.addStatComparison("Duration: %t1 -> %t2")
+				.statValues(stat(SPIRITFLAME_DURATION_1), stat(a -> a.mFlameDuration, SPIRITFLAME_DURATION_2))
+			.addLine()
+			.addLine("*Spiritflame* now weakens the afflicted mob and").styles(SPIRITFLAME_COLOR)
+			.addLine("makes them take increased magic damage.")
+			.addLine("*(Weakens all damage types, instead of*").styles(DARK_GREY)
+			.addLine("*only melee or projectile damage)*").styles(DARK_GREY)
+			.addLine()
+			.addStat("Effect: %p Weakness")
+				.statValues(stat(a -> a.mFlameWeaken, SPIRITFLAME_WEAKEN))
+			.addStat("Effect: %p Magic Vulnerability")
+				.statValues(stat(a -> a.mFlameVuln, SPIRITFLAME_MAGIC_VULN))
+			.addDashedLine();
 	}
 }

@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.WeaponMasteryCS;
@@ -22,6 +22,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perLevel;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class WeaponMastery extends Ability {
 	private static final double AXE_1_DAMAGE_FLAT = 2;
@@ -57,7 +61,7 @@ public class WeaponMastery extends Ability {
 	private final double mDamageReduction;
 	private final int mWeakenDuration;
 	private final double mWeaken;
-	private final double mAttackSpeed;
+	private final double mSpeed;
 	private final WeaponMasteryCS mCosmetic;
 
 	public WeaponMastery(Plugin plugin, Player player) {
@@ -70,7 +74,7 @@ public class WeaponMastery extends Ability {
 		mDamageReduction = WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
 		mWeakenDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SWORD_WEAKEN_DURATION);
 		mWeaken = SWORD_WEAKEN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
-		mAttackSpeed = AXE_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
+		mSpeed = AXE_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WeaponMasteryCS());
 	}
 
@@ -108,7 +112,7 @@ public class WeaponMastery extends Ability {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (isEnhanced() && ItemUtils.isAxe(mPlayer.getInventory().getItemInMainHand())) {
-			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT, new PercentSpeed(6, mAttackSpeed, SPEED_EFFECT).displaysTime(false).deleteOnAbilityUpdate(true));
+			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT, new PercentSpeed(6, mSpeed, SPEED_EFFECT).displaysTime(false).deleteOnAbilityUpdate(true));
 		}
 	}
 
@@ -123,39 +127,62 @@ public class WeaponMastery extends Ability {
 	}
 
 	private static Description<WeaponMastery> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("You gain ")
-			.addPercent(a -> a.mDamageReduction, WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE)
-			.add(" resistance while holding a sword. Additionally, your axe damage is increased by an unscalable ")
-			.add(a -> a.mDamageBonusAxeFlat, AXE_1_DAMAGE_FLAT, false, Ability::isLevelOne)
-			.add(" plus ")
-			.addPercent(a -> a.mDamageBonusAxe - (a.isEnhanced() ? ENHANCED_DAMAGE : 0), AXE_1_DAMAGE, false, Ability::isLevelOne)
-			.add(" of final damage dealt.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("While holding a sword, gain resistance.")
+			.addLine()
+			.addStat("Sword Effect: +%p Resistance")
+				.statValues(stat(a -> a.mDamageReduction, WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE))
+			.addLine()
+			.addLine("While holding an axe, your attacks deal")
+			.addLine("increased damage.")
+			.addLine()
+			.addStat("Axe Damage Boost: +%d1e + %p1e (m)")
+				.statValues(stat(a -> a.mDamageBonusAxeFlat, AXE_1_DAMAGE_FLAT), stat(a -> a.mDamageBonusAxe, AXE_1_DAMAGE))
+			.addDashedLine();
 	}
 
 	private static Description<WeaponMastery> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your sword swing's damage is increased by an unscalable ")
-			.add(a -> a.mDamageBonusSwordFlat, SWORD_2_DAMAGE_FLAT, false, Ability::isLevelTwo)
-			.add(" plus ")
-			.addPercent(a -> a.mDamageBonusSword - (a.isEnhanced() ? ENHANCED_DAMAGE : 0), SWORD_2_DAMAGE, false, Ability::isLevelTwo)
-			.add(" of final damage dealt. The axe damage buffs are increased to an unscalable ")
-			.add(a -> a.mDamageBonusAxeFlat, AXE_2_DAMAGE_FLAT, false, Ability::isLevelTwo)
-			.add(" plus ")
-			.addPercent(a -> a.mDamageBonusAxe - (a.isEnhanced() ? ENHANCED_DAMAGE : 0), AXE_2_DAMAGE, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("While holding a sword, your attacks now")
+			.addLine("deal increased damage as well.")
+			.addLine()
+			.addStat("Sword Damage Boost: +%d2e + %p2e (m)")
+				.statValues(stat(a -> a.mDamageBonusSwordFlat, SWORD_2_DAMAGE_FLAT), stat(a -> a.mDamageBonusSword, SWORD_2_DAMAGE))
+			.addLine()
+			.addLine("While holding an axe, your attacks deal")
+			.addLine("even more damage.")
+			.addLine()
+			.addStatComparison("Axe Damage Boost: +%d1e + %p1e -> +%d2e + %p2e (m)")
+				.statValues(stat(AXE_1_DAMAGE_FLAT), stat(AXE_1_DAMAGE),
+					stat(a -> a.mDamageBonusAxeFlat, AXE_2_DAMAGE_FLAT), stat(a -> a.mDamageBonusAxe, AXE_2_DAMAGE))
+			.addDashedLine();
 	}
 
 	private static Description<WeaponMastery> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Gain ")
-			.addPercent(ENHANCED_DAMAGE)
-			.add(" final damage when using either a sword or an axe. Apply ")
-			.addPercent(a -> a.mWeaken, SWORD_WEAKEN)
-			.add(" weaken for ")
-			.addDuration(a -> a.mWeakenDuration, SWORD_WEAKEN_DURATION)
-			.add(" seconds when using a sword. Gain ")
-			.addPercent(a -> a.mAttackSpeed, AXE_SPEED)
-			.add(" speed when holding an axe.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Increase *Weapon Mastery*'s damage boost").styles(UNDERLINED)
+			.addLine("for both weapons by an additional %p.")
+				.statValues(stat(ENHANCED_DAMAGE))
+			.addLine()
+			.addStatComparison("Sword Damage Boost: %d + %p -> +%d3 + %p3 (m)")
+			.statValues(perLevel(0, SWORD_2_DAMAGE_FLAT), perLevel(0, SWORD_2_DAMAGE),
+				perLevel(a -> a.mDamageBonusSwordFlat, 0, SWORD_2_DAMAGE_FLAT), perLevel(a -> a.mDamageBonusSword, ENHANCED_DAMAGE, SWORD_2_DAMAGE + ENHANCED_DAMAGE))
+			.addStatComparison("Axe Damage Boost: %d + %p -> +%d3 + %p3 (m)")
+			.statValues(perLevel(AXE_1_DAMAGE_FLAT, AXE_2_DAMAGE_FLAT), perLevel(AXE_1_DAMAGE, AXE_2_DAMAGE),
+				perLevel(a -> a.mDamageBonusAxeFlat, AXE_1_DAMAGE_FLAT, AXE_2_DAMAGE_FLAT), perLevel(a -> a.mDamageBonusAxe, AXE_1_DAMAGE + ENHANCED_DAMAGE, AXE_2_DAMAGE + ENHANCED_DAMAGE))
+			.addLine()
+			.addLine("While holding a sword, your attacks weaken mobs.")
+			.addLine()
+			.addStat("Effect: %p Weakness for %t")
+				.statValues(stat(a -> a.mWeaken, SWORD_WEAKEN), stat(a -> a.mWeakenDuration, SWORD_WEAKEN_DURATION))
+			.addLine()
+			.addLine("While holding an axe, gain speed.")
+			.addLine()
+			.addStat("Effect: +%p Speed")
+				.statValues(stat(a -> a.mSpeed, AXE_SPEED))
+			.addDashedLine();
 	}
 }

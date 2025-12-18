@@ -1,13 +1,12 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -28,6 +27,11 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perLevel;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class IronTincture extends MultipleChargeAbility {
 
@@ -92,8 +96,7 @@ public class IronTincture extends MultipleChargeAbility {
 	private final double mEnhancementEffectRadius;
 	private final int mStunDuration;
 	private final double mEnhancementAbsorptionOnKillAmount;
-	private final double mEnhancementAbsorptionMaxLevelOne;
-	private final double mEnhancementAbsorptionMaxLevelTwo;
+	private final double mEnhancementAbsorptionMax;
 	private final IronTinctureCS mCosmetic;
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private int lastCastTime = 0;
@@ -112,8 +115,7 @@ public class IronTincture extends MultipleChargeAbility {
 		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, ENHANCEMENT_STUN_DURATION);
 		mEnhancementEffectRadius = CharmManager.getRadius(mPlayer, CHARM_ENHANCEMENT_EFFECT_RADIUS, ENHANCEMENT_EFFECT_RADIUS);
 		mEnhancementAbsorptionOnKillAmount = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCEMENT_ABSORPTION_ON_KILL_AMOUNT, ENHANCEMENT_ABSORPTION_ON_KILL_AMOUNT);
-		mEnhancementAbsorptionMaxLevelOne = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCEMENT_ABSORPTION_ON_KILL_MAX, ENHANCEMENT_ABSORPTION_ON_KILL_MAX_1);
-		mEnhancementAbsorptionMaxLevelTwo = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCEMENT_ABSORPTION_ON_KILL_MAX, ENHANCEMENT_ABSORPTION_ON_KILL_MAX_2);
+		mEnhancementAbsorptionMax = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCEMENT_ABSORPTION_ON_KILL_MAX, isLevelOne() ? ENHANCEMENT_ABSORPTION_ON_KILL_MAX_1 : ENHANCEMENT_ABSORPTION_ON_KILL_MAX_2);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new IronTinctureCS());
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -159,7 +161,7 @@ public class IronTincture extends MultipleChargeAbility {
 						new IronTinctureEnhancementAbsorptionInfused(
 							mEnhancementEffectDuration,
 							mEnhancementAbsorptionOnKillAmount,
-							isLevelOne() ? mEnhancementAbsorptionMaxLevelOne : mEnhancementAbsorptionMaxLevelTwo,
+							mEnhancementAbsorptionMax,
 							mEnhancementAbsorptionDuration,
 							mPlayer.getUniqueId()
 						)
@@ -255,45 +257,68 @@ public class IronTincture extends MultipleChargeAbility {
 	}
 
 	private static Description<IronTincture> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to throw a tincture. If you walk over the tincture, gain ")
-			.add(a -> a.mAbsorption, ABSORPTION_1, false, Ability::isLevelOne)
-			.add(" stacking absorption health for ")
-			.addDuration(a -> a.mDuration, ABSORPTION_DURATION)
-			.add(" seconds. If an ally walks over it, you both gain the effect. If it isn't grabbed before it disappears, it will refund you a charge. When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, you gain 1 Alchemist's Potion. ")
-			.add("Charges: ")
-			.add(a -> a.mMaxCharges, CHARGES)
-			.add(" (all charges are refunded when the skill comes off cooldown).")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Throw a tincture that players can pick up, which")
+			.addLine("grants absorption to that player and yourself.")
+			.addLine()
+			.addLine("Gain %d potions when another player picks")
+				.statValues(stat(a -> a.mAllyRefill, ALLY_POTION_REFILL))
+			.addLine("up the tincture, or %d if you pick it up.")
+				.statValues(stat(a -> a.mRefill, POTION_REFILL))
+			.addLine()
+			.addLine("Refunds a charge if no one picks it up.")
+			.addLine()
+			.addStat("Effect: +%d1 Absorption for %t (max +%d1)")
+				.statValues(stat(a -> a.mAbsorption, ABSORPTION_1), stat(a -> a.mDuration, ABSORPTION_DURATION), stat(a -> a.mAbsorption * 2, ABSORPTION_1 * 2))
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, CHARGES))
+			.addStat("Cooldown: %t1 (refreshes all charges at once)")
+				.statValues(cooldown(COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<IronTincture> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The absorption is increased to ")
-			.add(a -> a.mAbsorption, ABSORPTION_2, false, Ability::isLevelTwo)
-			.add(". The tincture now also grants ")
-			.addPercent(a -> a.mResistance, FIRST_HIT_RESISTANCE_2)
-			.add(" resistance to the first hit taken.")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Iron Tincture*'s absorption and").styles(UNDERLINED)
+			.addLine("reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Effect: +%d1 -> +%d2 Absorption (max +%d2)")
+				.statValues(stat(ABSORPTION_1), stat(a -> a.mAbsorption, ABSORPTION_2), stat(a -> a.mAbsorption * 2, ABSORPTION_2 * 2))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(COOLDOWN_1), cooldown(COOLDOWN_2))
+			.addLine()
+			.addLine("The tincture's effect now grants resistance")
+			.addLine("on the next hit taken.")
+			.addLine()
+			.addStat("Effect: +%p Resistance for 1 hit")
+				.statValues(stat(a -> a.mResistance, FIRST_HIT_RESISTANCE_2))
+			.addDashedLine();
 	}
 
 	private static Description<IronTincture> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The tincture now stuns non-elite, non-boss mobs within ")
-			.add(a -> a.mEnhancementEffectRadius, ENHANCEMENT_EFFECT_RADIUS)
-			.add(" blocks of its landing location, or the location of the player that picks it up before it lands, for ")
-			.addDuration(a -> a.mStunDuration, ENHANCEMENT_STUN_DURATION)
-			.add("s. If a player kills the affected mobs within ")
-			.addDuration(a -> a.mEnhancementEffectDuration, ENHANCEMENT_ABSORPTION_ON_KILL_TIMEOUT)
-			.add("s, they gain ")
-			.add(a -> a.mEnhancementAbsorptionOnKillAmount, ENHANCEMENT_ABSORPTION_ON_KILL_AMOUNT)
-			.add(" absorption health for each kill, up to a maximum of ")
-			.add(a -> a.mEnhancementAbsorptionMaxLevelOne, ENHANCEMENT_ABSORPTION_ON_KILL_MAX_1)
-			.add(" for level 1, and ")
-			.add(a -> a.mEnhancementAbsorptionMaxLevelTwo, ENHANCEMENT_ABSORPTION_ON_KILL_MAX_2)
-			.add(" for level 2, which lasts for ")
-			.addDuration(a -> a.mEnhancementAbsorptionDuration, ENHANCEMENT_ABSORPTION_ON_KILL_DURATION)
-			.add("s. However, if the tincture disappears, it will no longer refund you a charge.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Iron Tincture* no longer refunds charges for").styles(UNDERLINED)
+			.addLine("tinctures that weren't picked up.")
+			.addLine()
+			.addLine("Upon landing, the tincture stuns nearby mobs.")
+			.addLine()
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunDuration, ENHANCEMENT_STUN_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mEnhancementEffectRadius, ENHANCEMENT_EFFECT_RADIUS))
+			.addLine()
+			.addLine("Players that kill these mobs within %t gain")
+				.statValues(stat(a -> a.mEnhancementEffectDuration, ENHANCEMENT_ABSORPTION_ON_KILL_TIMEOUT))
+			.addLine("absorption for each mob killed.")
+			.addLine()
+			.addStat("Effect: +%d Absorption for %t per mob (max +%d)")
+			.statValues(stat(a -> a.mEnhancementAbsorptionOnKillAmount, ENHANCEMENT_ABSORPTION_ON_KILL_AMOUNT),
+				stat(a -> a.mEnhancementAbsorptionDuration, ENHANCEMENT_ABSORPTION_ON_KILL_DURATION),
+				perLevel(a -> a.mEnhancementAbsorptionMax, ENHANCEMENT_ABSORPTION_ON_KILL_MAX_1, ENHANCEMENT_ABSORPTION_ON_KILL_MAX_2))
+			.addDashedLine();
 	}
 }

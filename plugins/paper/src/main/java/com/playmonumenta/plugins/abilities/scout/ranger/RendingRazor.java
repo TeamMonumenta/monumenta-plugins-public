@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.RendingRazorCS;
@@ -31,6 +31,9 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class RendingRazor extends Ability {
 	private static final int EMBED_DAMAGE_1 = 14;
@@ -261,31 +264,45 @@ public class RendingRazor extends Ability {
 	}
 
 	private static Description<RendingRazor> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to toss a spinning razor that travels ")
-			.add(a -> a.mRazorRange, MAXIMUM_BLOCK_DISTANCE)
-			.add(" blocks and deals ")
-			.add(a -> a.mEmbedDamage, EMBED_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" projectile damage when it embeds itself into an enemy. The razor lasts for ")
-			.addDuration(RAZOR_TRAVEL_TIME)
-			.add(" seconds. If the enemy is still alive, recasting the skill rends the razor out of the enemy, pulling it slightly and dealing ")
-			.add(a -> a.mRendDamage, REND_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" projectile damage to it and all enemies that the razor passes through.")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Throw a spinning razor that damages")
+			.addLine("the first mob it hits, embedding itself")
+			.addLine("into that mob for %t.")
+				.statValues(stat(RAZOR_TRAVEL_TIME))
+			.addLine()
+			.addLine("Recast to rend the razor out of the mob,").styles(UNDERLINED)
+			.addLine("dealing damage to it and all mobs on its")
+			.addLine("way back to you.")
+			.addLine()
+			.addStat("Embed Damage: %d1 (p)")
+				.statValues(stat(a -> a.mEmbedDamage, EMBED_DAMAGE_1))
+			.addStat("Rend Damage: %d1 (p)")
+				.statValues(stat(a -> a.mRendDamage, REND_DAMAGE_1))
+			.addStat("Max Range: %r")
+				.statValues(stat(a -> a.mRazorRange, MAXIMUM_BLOCK_DISTANCE))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<RendingRazor> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The razor's damage is increased to ")
-			.add(a -> a.mEmbedDamage, EMBED_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" for the impact and ")
-			.add(a -> a.mRendDamage, REND_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" for the rend. Additionally, all enemies damaged by the razor receive ")
-			.addPercent(a -> a.mSlownessPotency, SLOW_EFFECT_2)
-			.add(" slowness for ")
-			.addDuration(a -> a.mSlownessDuration, SLOW_DURATION_2)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Rending Razor*'s damage").styles(UNDERLINED)
+			.addLine("and reduce its cooldown.")
+			.addLine()
+			.addLine("*Rending Razor* now slows all mobs hit.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Embed Damage: %d1 -> %d2 (p)")
+				.statValues(stat(EMBED_DAMAGE_1), stat(a -> a.mEmbedDamage, EMBED_DAMAGE_2))
+			.addStatComparison("Rend Damage: %d1 -> %d2 (p)")
+				.statValues(stat(REND_DAMAGE_1), stat(a -> a.mRendDamage, REND_DAMAGE_2))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(COOLDOWN_1), cooldown(COOLDOWN_2))
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(stat(a -> a.mSlownessPotency, SLOW_EFFECT_2), stat(a -> a.mSlownessDuration, SLOW_DURATION_2))
+			.addDashedLine();
 	}
 }

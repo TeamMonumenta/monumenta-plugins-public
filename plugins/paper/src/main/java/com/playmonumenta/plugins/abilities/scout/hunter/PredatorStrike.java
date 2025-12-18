@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.scout.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -58,6 +58,10 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 
 public class PredatorStrike extends Ability implements AbilityWithDuration {
@@ -358,33 +362,44 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 
 	// Annoying to do the damage correctly here because of sniper/pb
 	private static Description<PredatorStrike> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger(1)
-			.add(" to prime a Predator Strike that unprimes after ")
-			.addDuration(DURATION)
-			.add(" seconds. When you fire a critical projectile with a strike primed, it instantly travels up to ")
-			.add(a -> a.mRange, MAX_RANGE)
-			.add(" blocks in a straight line until it collides with an enemy or block. Enemies within ")
-			.add(a -> a.mExplodeRadius, EXPLODE_RADIUS)
-			.add(" blocks of the impact receive ")
-			.addPercent(a -> a.mBaseDamage, DAMAGE_MULTIPLIER, false)
-			.add(" of your Projectile damage increased by ")
-			.addPercent(a -> a.mDistanceScale, DISTANCE_SCALE_1, false, Ability::isLevelOne)
-			.add(" for every block of distance between you and the hit enemy (up to ")
-			.add(a -> a.mDamageRange, MAX_DAMAGE_RANGE)
-			.add(" blocks). The final damage an enemy receives is capped at ")
-			.add(a -> R2_CAP, R2_CAP)
-			.add(" in Region 2 and ")
-			.add(a -> R3_CAP, R3_CAP)
-			.add(" in Region 3.")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Prime a Predator Strike for %t.")
+				.statValues(stat(DURATION))
+			.addLine()
+			.addLine("While primed, the next projectile you fire")
+			.addLine("will travel instantly and explode on impact,")
+			.addLine("dealing increased damage, plus bonus damage")
+			.addLine("per block traveled.")
+			.addLine()
+			.addStat("Damage: %p (p) (of weapon damage),")
+				.statValues(stat(a -> a.mBaseDamage, DAMAGE_MULTIPLIER))
+			.tab().addLine("+%p1 per block (max %d blocks)")
+				.statValues(stat(a -> a.mDistanceScale, DISTANCE_SCALE_1), stat(a -> a.mDamageRange, MAX_DAMAGE_RANGE))
+			.tab().addLine("(capped at %d damage)")
+				.statValues(perRegion(R2_CAP, R3_CAP))
+			.addStat("Explosion Radius: %r")
+				.statValues(stat(a -> a.mExplodeRadius, EXPLODE_RADIUS))
+			.addStat("Max Range: %r")
+				.statValues(stat(MAX_RANGE))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<PredatorStrike> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage now increases by ")
-			.addPercent(a -> a.mDistanceScale, DISTANCE_SCALE_2, false, Ability::isLevelTwo)
-			.add(" for each block of distance (up to the same cap), and the final damage cap is doubled.")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Predator Strike*'s bonus damage").styles(UNDERLINED)
+			.addLine("scaling and reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Bonus Damage: +%p1 -> +%p2 per block")
+				.statValues(stat(DISTANCE_SCALE_1), stat(a -> a.mDistanceScale, DISTANCE_SCALE_2), stat(a -> a.mDamageRange, MAX_DAMAGE_RANGE))
+			.tab().addLine("(capped at %d damage)")
+			.statValues(perRegion(R2_CAP * CAP_LEVEL_TWO_MULTIPLIER, R3_CAP * CAP_LEVEL_TWO_MULTIPLIER))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(COOLDOWN_1), cooldown(COOLDOWN_2))
+			.addDashedLine();
 	}
 }

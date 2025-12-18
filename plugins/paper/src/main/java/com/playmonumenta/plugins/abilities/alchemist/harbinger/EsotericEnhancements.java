@@ -5,12 +5,13 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
+import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.EsotericEnhancementsCS;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,6 +46,10 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class EsotericEnhancements extends Ability implements PotionAbility {
 	private static final double POTION_DAMAGE_MULTIPLIER_1 = 0.9;
@@ -70,6 +77,8 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	public static final String CHARM_SPEED = "Esoteric Enhancements Speed";
 	public static final String CHARM_KNOCKBACK = "Esoteric Enhancements Knockback";
 	public static final String CHARM_SLOW = "Esoteric Enhancements Slow Amplifier";
+
+	public static final Style ABERRATION_COLOR = Style.style(TextColor.color(0x6847B3));
 
 	public static final AbilityInfo<EsotericEnhancements> INFO =
 		new AbilityInfo<>(EsotericEnhancements.class, "Esoteric Enhancements", EsotericEnhancements::new)
@@ -403,33 +412,42 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	}
 
 	private static Description<EsotericEnhancements> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When splashing the ground with both Gruesome and Brutal effects within ")
-			.addDuration(a -> a.mReactionTime, SUMMON_DURATION)
-			.add(" seconds of each other, summon an Alchemical Aberration. The Aberration targets the mob with the highest health within ")
-			.add(a -> TARGET_RADIUS, TARGET_RADIUS)
-			.add(" blocks and explodes on that mob, dealing ")
-			.add(a -> a.mDamageRaw, POTION_DAMAGE_RAW_1, false, Ability::isLevelOne)
-			.add(" + ")
-			.addPercent(a -> a.mDamageMultiplier, POTION_DAMAGE_MULTIPLIER_1, false, Ability::isLevelOne)
-			.add(" of your potion damage and applying ")
-			.addPercent(a -> a.mSlow, SLOW_AMOUNT)
-			.add(" Slow for ")
-			.addDuration(a -> a.mSlowDuration, SLOW_DURATION)
-			.add(" seconds, and Level 1 Brutal to all mobs within ")
-			.add(a -> a.mRadius, DAMAGE_RADIUS)
-			.add(" blocks. The aberration expires after ")
-			.addDuration(LIFETIME)
-			.add("s.")
-			.addCooldown(COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Mixing *Gruesome* and *Brutal* in any location").styles(Alchemist.GRUESOME_COLOR, Alchemist.BRUTAL_COLOR)
+			.addLine("within %t of each other summons an")
+				.statValues(stat(a -> a.mReactionTime, SUMMON_DURATION))
+			.addLine("*Aberration* that lasts for %t.").styles(ABERRATION_COLOR)
+				.statValues(stat(LIFETIME))
+			.addLine()
+			.addLine("The *Aberration* targets the highest HP mob").styles(ABERRATION_COLOR)
+			.addLine("within %d blocks and explodes on them, dealing")
+				.statValues(stat(a -> TARGET_RADIUS, TARGET_RADIUS))
+			.addLine("damage, knockback, slowness, and inflicting")
+			.addLine("*Level 1* *Brutal* onto mobs hit.").styles(WHITE, Alchemist.BRUTAL_COLOR)
+			.addLine()
+			.addIf((a, p) -> a != null && a.mCreeperCount != 1, desc -> desc
+				.addStat("Aberrations Spawned: %d")
+					.statValues(stat(a -> a.mCreeperCount, 1)))
+			.addStat("Damage: %d1 + %p1 (s) (of potion damage)")
+				.statValues(stat(a -> a.mDamageRaw, POTION_DAMAGE_RAW_1), stat(a -> a.mDamageMultiplier, POTION_DAMAGE_MULTIPLIER_1))
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(stat(a -> a.mSlow, SLOW_AMOUNT), stat(a -> a.mSlowDuration, SLOW_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, DAMAGE_RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<EsotericEnhancements> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mDamageRaw, POTION_DAMAGE_RAW_2, false, Ability::isLevelTwo)
-			.add(" + ")
-			.addPercent(a -> a.mDamageMultiplier, POTION_DAMAGE_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(" of your potion damage, and the level of Brutal applied is increased to 2.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase the *Aberration*'s damage, and").styles(ABERRATION_COLOR)
+			.addLine("it now inflicts *Level 2* *Brutal*.").styles(WHITE, Alchemist.BRUTAL_COLOR)
+			.addLine()
+			.addStatComparison("Damage: %d1 + %p1 -> %d2 + %p2 (s)")
+				.statValues(stat(POTION_DAMAGE_RAW_1), stat(POTION_DAMAGE_MULTIPLIER_1), stat(a -> a.mDamageRaw, POTION_DAMAGE_RAW_2), stat(a -> a.mDamageMultiplier, POTION_DAMAGE_MULTIPLIER_2))
+			.addDashedLine();
 	}
 }

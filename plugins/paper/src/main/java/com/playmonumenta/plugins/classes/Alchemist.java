@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.classes;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.Bezoar;
@@ -16,8 +18,13 @@ import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.utils.DescriptionUtils.ALCHEMIST_LORE;
 
 
 public class Alchemist extends PlayerClass {
@@ -25,6 +32,9 @@ public class Alchemist extends PlayerClass {
 	public static final int CLASS_ID = 5;
 	public static final int HARBINGER_SPEC_ID = 9;
 	public static final int APOTHECARY_SPEC_ID = 10;
+
+	public static final Style BRUTAL_COLOR = Style.style(TextColor.color(0xC697E6));
+	public static final Style GRUESOME_COLOR = Style.style(TextColor.color(0x94E622));
 
 	public Alchemist() {
 		mAbilities.add(GruesomeAlchemy.INFO);
@@ -50,7 +60,6 @@ public class Alchemist extends PlayerClass {
 		mSpecOne.mSpecialization = HARBINGER_SPEC_ID;
 		mSpecOne.mSpecName = "Harbinger";
 		mSpecOne.mDisplayItem = Material.DEAD_BUSH;
-		mSpecOne.mDescription = "Harbingers use special potions to weaken and destroy their enemies. Harbingers prefer slinging deadly potions and using strategy.";
 
 		mSpecTwo.mAbilities.add(Panacea.INFO);
 		mSpecTwo.mAbilities.add(TransmutationRing.INFO);
@@ -59,7 +68,6 @@ public class Alchemist extends PlayerClass {
 		mSpecTwo.mSpecialization = APOTHECARY_SPEC_ID;
 		mSpecTwo.mSpecName = "Apothecary";
 		mSpecTwo.mDisplayItem = Material.BLUE_ORCHID;
-		mSpecTwo.mDescription = "Apothecaries employ magic potions to weaken enemies and support friends.";
 
 		mTriggerOrder = ImmutableList.of(
 			Taboo.INFO,
@@ -76,5 +84,44 @@ public class Alchemist extends PlayerClass {
 			UnstableAmalgam.INFO,
 			EnergizingElixir.INFO
 		);
+	}
+
+
+	@Override
+	public Component getDescription(Player player) {
+		return new FormattedDescriptionBuilder<>(() -> AlchemistPotions.INFO)
+			.addDashedLine()
+			.addLine("*Alchemists employ magic potions to*").styles(ALCHEMIST_LORE)
+			.addLine("*weaken and destroy their enemies.*").styles(ALCHEMIST_LORE)
+			.addLine()
+			.addLine("*Alchemist Potions (Class Passive):*").styles(Style.style(mClassColor))
+			.add(AlchemistPotions.getDescription())
+			.addDashedLine()
+			.get(AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class), player);
+	}
+
+	@Override
+	public Component getSpecOneDescription(Player player) {
+		return new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addLine("*Harbingers administer vile concoctions*").styles(ALCHEMIST_LORE)
+			.addLine("*on both enemies and themselves,*").styles(ALCHEMIST_LORE)
+			.addLine("*debilitating and destroying their*").styles(ALCHEMIST_LORE)
+			.addLine("*foes by any means necessary.*").styles(ALCHEMIST_LORE)
+			.addLine("(AoE, High Damage, Health Drain)")
+			.addDashedLine()
+			.get();
+	}
+
+	@Override
+	public Component getSpecTwoDescription(Player player) {
+		return new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addLine("*Apothecaries are forefront casters,*").styles(ALCHEMIST_LORE)
+			.addLine("*supporting allies and crippling foes*").styles(ALCHEMIST_LORE)
+			.addLine("*with their many ailments and cures.*").styles(ALCHEMIST_LORE)
+			.addLine("(Support, Absorption)")
+			.addDashedLine()
+			.get();
 	}
 }

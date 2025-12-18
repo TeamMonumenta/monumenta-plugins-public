@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityTrigger.BinaryOption;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -11,11 +12,18 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.utils.DescriptionUtils.REQUIREMENT_LABEL;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.REQUIREMENT_TEXT;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.TRIGGER_LABEL;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.TRIGGER_TEXT;
 
 /**
  * Represents one triggerable action of an {@link Ability} - holds the action, the trigger to cast it,
@@ -33,16 +41,16 @@ public class AbilityTriggerInfo<T extends Ability> {
 	}
 
 	public static final TriggerRestriction HOLDING_PROJECTILE_WEAPON_RESTRICTION =
-		new TriggerRestriction("holding a projectile weapon", player -> ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()) && !Grappling.playerHoldingHook(player));
+		new TriggerRestriction("Holding a Projectile Weapon", player -> ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()) && !Grappling.playerHoldingHook(player));
 	public static final TriggerRestriction NOT_HOLDING_PROJECTILE_WEAPON_RESTRICTION =
-		new TriggerRestriction("not holding a projectile weapon", player -> !ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()));
+		new TriggerRestriction("Not Holding a Projectile Weapon", player -> !ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()));
 
 	public static final TriggerRestriction HOLDING_MAGIC_WAND_RESTRICTION =
-		new TriggerRestriction("holding a wand", player -> Plugin.getInstance().mItemStatManager.getEnchantmentLevel(player, EnchantmentType.MAGIC_WAND) > 0);
+		new TriggerRestriction("Holding a Wand", player -> Plugin.getInstance().mItemStatManager.getEnchantmentLevel(player, EnchantmentType.MAGIC_WAND) > 0);
 	public static final TriggerRestriction HOLDING_SCYTHE_RESTRICTION =
-		new TriggerRestriction("holding a scythe", player -> ItemUtils.isHoe(player.getInventory().getItemInMainHand()));
+		new TriggerRestriction("Holding a Scythe", player -> ItemUtils.isHoe(player.getInventory().getItemInMainHand()));
 	public static final TriggerRestriction HOLDING_TWO_SWORDS_RESTRICTION =
-		new TriggerRestriction("holding two swords", player -> InventoryUtils.rogueTriggerCheck(Plugin.getInstance(), player));
+		new TriggerRestriction("Holding Two Swords", player -> InventoryUtils.rogueTriggerCheck(Plugin.getInstance(), player));
 
 	private final String mId;
 
@@ -259,6 +267,93 @@ public class AbilityTriggerInfo<T extends Ability> {
 		} else if (option == AbilityTrigger.BinaryOption.FALSE) {
 			conditions.add("not " + trueString);
 		}
+	}
+
+	public Component getAsFormattedLines(@Nullable String extraCondition) {
+		// Handle trigger component: all the 4 base keys, plus sneaking to cover most of the "default triggers" we have.
+		Component keyComp = switch (mTrigger.getKey()) {
+			case LEFT_CLICK -> Component.text("").append(Component.keybind(Constants.Keybind.ATTACK));
+			case RIGHT_CLICK -> Component.text("").append(Component.keybind(Constants.Keybind.USE));
+			case SWAP -> Component.text("Press ").append(Component.keybind(Constants.Keybind.SWAP_OFFHAND));
+			case DROP -> Component.text("Press ").append(Component.keybind(Constants.Keybind.DROP));
+		};
+		if (mTrigger.isDoubleClick()) {
+			keyComp = keyComp.append(Component.text(" Twice"));
+		}
+		if (mTrigger.getSneaking() == BinaryOption.TRUE) {
+			keyComp = keyComp.append(Component.text(" while Sneaking"));
+		}
+
+		StringBuilder builder = new StringBuilder();
+		List<String> conditions = new ArrayList<>();
+		if (mRestriction != null && mRestriction.includeInDescription()) {
+			conditions.add(mRestriction.getDisplay());
+		}
+		// This is the only key option we actually want to list. Others would mostly clutter the descriptions
+		if (mTrigger.getKeyOptions().contains(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)) {
+			conditions.add(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON.getDisplay(true));
+		}
+
+		AbilityTrigger.BinaryOption sneaking = mTrigger.getSneaking();
+		AbilityTrigger.BinaryOption sprinting = mTrigger.getSprinting();
+		if (sprinting != AbilityTrigger.BinaryOption.FALSE || sneaking != AbilityTrigger.BinaryOption.TRUE) {
+			addCondition(conditions, sprinting, "sprinting");
+		}
+		addCondition(conditions, mTrigger.getOnGround(), "on the ground");
+
+		List<AbilityTrigger.LookDirection> dirs = new ArrayList<>(mTrigger.getLookDirections());
+		if (dirs.size() < 3 && !dirs.isEmpty()) {
+			String desc = "";
+			if (dirs.size() == 2) {
+				desc += "not ";
+				dirs = new ArrayList<>(EnumSet.complementOf(mTrigger.getLookDirections()));
+			}
+			// We now always have exactly one element left
+			desc += "looking " + dirs.get(0).mName;
+			conditions.add(desc);
+		}
+
+		if (extraCondition != null) {
+			conditions.add(extraCondition);
+		}
+
+		if (!conditions.isEmpty()) {
+			builder.append(" ");
+			if (conditions.size() <= 2) {
+				builder.append(conditions.get(0));
+				if (conditions.size() == 2) {
+					builder.append(" and ").append(conditions.get(1));
+				}
+			} else {
+				for (int i = 0; i < conditions.size(); i++) {
+					if (i != 0) {
+						builder.append(", ");
+					}
+					if (i == conditions.size() - 1) {
+						builder.append("and ");
+					}
+					builder.append(conditions.get(i));
+				}
+			}
+		}
+
+		if (mTrigger.getKeyOptions().contains(AbilityTrigger.KeyOptions.SNEAK_WITH_SHIELD) && mTrigger.getSneaking() == AbilityTrigger.BinaryOption.EITHER) {
+			builder.append(" (sneaking if holding shield)");
+		}
+
+		Component trigger = Component.text(" Trigger: ", TRIGGER_LABEL)
+			.append(keyComp.style(TRIGGER_TEXT));
+
+		String requirement = StringUtils.trim(builder.toString());
+		if (!requirement.isBlank()) {
+			requirement = requirement.substring(0, 1).toUpperCase(Locale.ROOT) + requirement.substring(1); // capitalize first letter
+			trigger = trigger.appendNewline().appendSpace()
+				.append(Component.text(" Requirement: ", REQUIREMENT_LABEL))
+				.append(Component.text(requirement, REQUIREMENT_TEXT));
+		}
+
+		return trigger;
+
 	}
 
 }

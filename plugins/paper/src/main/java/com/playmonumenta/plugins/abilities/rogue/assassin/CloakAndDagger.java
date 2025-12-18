@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -30,6 +29,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.classes.Rogue.STEALTH_COLOR;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class CloakAndDagger extends Ability implements KillTriggeredAbility, AbilityWithChargesOrStacks {
 
@@ -173,49 +177,40 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	}
 
 	private static Description<CloakAndDagger> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Killing a mob grants ")
-			.add(a -> a.mStacksOnKill, 1)
-			.add(" stack of cloak, up to ")
-			.add(a -> a.mMaxStacks, CLOAK_1_MAX_STACKS, false, Ability::isLevelOne)
-			.add(" stacks. Elite kills and Boss \"kills\" grant ")
-			.add(a -> a.mStacksOnEliteKill, CLOAK_STACKS_ON_ELITE_KILL)
-			.add(" stacks (")
-			.add((a, p) -> {
-				Description<CloakAndDagger> subDescription;
-				if (p == null) {
-					subDescription = new DescriptionBuilder<>(() -> INFO)
-						.add("every ")
-						.add(aa -> BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R2)
-						.add(" damage to them in R2; every ")
-						.add(aa -> BOSS_DAMAGE_THRESHOLD_R3, BOSS_DAMAGE_THRESHOLD_R3)
-						.add(" damage to them in R3");
-				} else {
-					int threshold = ServerProperties.getAbilityEnhancementsEnabled(p) ? BOSS_DAMAGE_THRESHOLD_R3 : BOSS_DAMAGE_THRESHOLD_R2;
-					subDescription = new DescriptionBuilder<>(() -> INFO)
-						.add("every ")
-						.add(aa -> threshold, threshold)
-						.add(" damage to them");
-				}
-				return subDescription.get(a, p);
-			})
-			.add(" excluding damage from this skill). ")
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to spend all cloak stacks to gain ")
-			.addDuration(a -> a.mStealthDuration, STEALTH_DURATION)
-			.add(" seconds of Stealth and (")
-			.addPercent(a -> a.mDamageMultiplier, CLOAK_1_DAMAGE_MULTIPLIER, false, Ability::isLevelOne)
-			.add(" * X) melee damage on your next melee attack while in Stealth, where X is the number of stacks you had at activation. Performing a successful melee attack or switching from your held swords ends Stealth. You must have at least ")
-			.add(a -> CLOAK_MIN_STACKS, CLOAK_MIN_STACKS)
-			.add(" stacks for activation.");
+			.addDashedLine()
+			.addLine("Killing a mob grants you %d stack of *Cloak and Dagger*.").styles(UNDERLINED)
+				.statValues(stat(a -> a.mStacksOnKill, 1))
+			.addLine("Killing an Elite or dealing %d damage to Bosses grants")
+				.statValues(perRegion(BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3))
+			.addLine("you %d stacks instead.").styles(UNDERLINED)
+				.statValues(stat(a -> a.mStacksOnEliteKill, CLOAK_STACKS_ON_ELITE_KILL))
+			.addLine()
+			.addLine("Activate with at least %d stacks to spend all of them,")
+				.statValues(stat(CLOAK_MIN_STACKS))
+			.addLine("granting yourself *Stealth* until your next attack, which").styles(STEALTH_COLOR)
+			.addLine("deals bonus damage.")
+			.addLine()
+			.addStat("Bonus Damage: +%d1 (m) per stack")
+				.statValues(stat(a -> a.mDamageMultiplier, CLOAK_1_DAMAGE_MULTIPLIER))
+			.addStat("Effect: Stealth for %t")
+				.statValues(stat(a -> a.mStealthDuration, STEALTH_DURATION))
+			.addStat("Max Daggers: %d1")
+				.statValues(stat(a -> a.mMaxStacks, CLOAK_1_MAX_STACKS))
+			.addDashedLine();
 	}
 
 	private static Description<CloakAndDagger> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The stack cap is increased to ")
-			.add(a -> a.mMaxStacks, CLOAK_2_MAX_STACKS, false, Ability::isLevelTwo)
-			.add(" and the melee damage is increased to (")
-			.addPercent(a -> a.mDamageMultiplier, CLOAK_2_DAMAGE_MULTIPLIER, false, Ability::isLevelTwo)
-			.add(" * X).");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Cloak and Dagger*'s").styles(UNDERLINED)
+			.addLine("bonus damage and maximum stacks.")
+			.addLine()
+			.addStatComparison("Bonus Damage: +%d1 -> +%d2 (m) per stack")
+				.statValues(stat(CLOAK_1_DAMAGE_MULTIPLIER), stat(a -> a.mDamageMultiplier, CLOAK_2_DAMAGE_MULTIPLIER))
+			.addStatComparison("Max Stacks: %d1 -> %d2")
+				.statValues(stat(CLOAK_1_MAX_STACKS), stat(a -> a.mMaxStacks, CLOAK_2_MAX_STACKS))
+			.addDashedLine();
 	}
 }

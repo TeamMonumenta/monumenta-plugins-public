@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.DaggerThrowCS;
@@ -27,6 +27,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class DaggerThrow extends Ability {
 
@@ -189,39 +193,56 @@ public class DaggerThrow extends Ability {
 	}
 
 	private static Description<DaggerThrow> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to throw ")
-			.add(a -> a.mDaggers, DAGGER_THROW_DAGGERS)
-			.add(" daggers which deal ")
-			.add(a -> a.mDamage, DAGGER_THROW_1_DAMAGE, false, Ability::isLevelOne)
-			.add(" melee damage and apply ")
-			.addPercent(a -> a.mVulnBase, DAGGER_THROW_1_VULN, false, Ability::isLevelOne)
-			.add(" vulnerability for ")
-			.addDuration(a -> a.mVulnDuration, DAGGER_THROW_DURATION)
-			.add(" seconds. The daggers travel up to ")
-			.add(a -> a.mRange, DAGGER_THROW_RANGE)
-			.add(" blocks.")
-			.addCooldown(DAGGER_THROW_COOLDOWN);
+			.addDashedLine()
+			.addLine("Throw a fan of %d daggers in front of you,")
+				.statValues(stat(a -> a.mDaggers, DAGGER_THROW_DAGGERS))
+			.addLine("dealing damage and inflicting vulnerability.")
+			.addLine()
+			.addStat("Damage: %d1 (m)")
+				.statValues(stat(a -> a.mDamage, DAGGER_THROW_1_DAMAGE))
+			.addStat("Effect: %p1 Vulnerability for %t")
+				.statValues(stat(a -> a.mVulnBase, DAGGER_THROW_1_VULN), stat(a -> a.mVulnDuration, DAGGER_THROW_DURATION))
+			.addStat("Range: %r (Cone-Shaped)")
+				.statValues(stat(a -> a.mRange, DAGGER_THROW_RANGE))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(DAGGER_THROW_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<DaggerThrow> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased to ")
-			.add(a -> a.mDamage, DAGGER_THROW_2_DAMAGE, false, Ability::isLevelTwo)
-			.add(" and the vulnerability is increased to ")
-			.addPercent(a -> a.mVulnBase, DAGGER_THROW_2_VULN, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Dagger Throw*'s damage").styles(UNDERLINED)
+			.addLine("and vulnerability.")
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (m)")
+				.statValues(stat(DAGGER_THROW_1_DAMAGE), stat(a -> a.mDamage, DAGGER_THROW_2_DAMAGE))
+			.addStatComparison("Effect: %p1 -> %p2 Vulnerability")
+				.statValues(stat(DAGGER_THROW_1_VULN), stat(a -> a.mVulnBase, DAGGER_THROW_2_VULN))
+			.addDashedLine();
 	}
 
 	private static Description<DaggerThrow> getDescritpionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your daggers will remain stationary at the end of their path. After ")
-			.addDuration(a -> a.mRecastDuration, DAGGER_THROW_RECAST_DURATION)
-			.add(" seconds, your daggers will be recalled, or you can recast to trigger the recall early. Recalled daggers do ")
-			.addPercent(a -> a.mRecastMultiplier, DAGGER_THROW_RECAST_MULTIPLIER)
-			.add(" of the damage. Your Dagger Throw additionally silences mobs for ")
-			.addDuration(a -> a.mSilenceDuration, DAGGER_THROW_SILENCE_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Dagger Throw*'s daggers stay stationary").styles(UNDERLINED)
+			.addLine("at the end of their path for %t.")
+				.statValues(stat(a -> a.mRecastDuration, DAGGER_THROW_RECAST_DURATION))
+			.addLine()
+			.addLine("Recast *Dagger Throw* to return the daggers").styles(UNDERLINED)
+			.addLine("to you and deal reduced damage.")
+			.addLine("(Automatically returns after %t)")
+				.statValues(stat(a -> a.mRecastDuration, DAGGER_THROW_RECAST_DURATION))
+			.addLine()
+			.addStat("Return Damage: %p (m) of original")
+			.statValues(stat(a -> a.mRecastMultiplier, DAGGER_THROW_RECAST_MULTIPLIER))
+			.addLine()
+			.addLine("*Dagger Throw* now silences mobs it hits.").styles(UNDERLINED)
+			.addLine()
+			.addStat("Effect: Silence for %t")
+				.statValues(stat(a -> a.mSilenceDuration, DAGGER_THROW_SILENCE_DURATION))
+			.addDashedLine();
 	}
 }

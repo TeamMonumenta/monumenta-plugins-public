@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.Rogue;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -13,6 +13,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 
 public class Dethroner extends Ability {
 
@@ -43,12 +45,12 @@ public class Dethroner extends Ability {
 		return false; // increases event damage and does not cause another damage instance, so no recursion
 	}
 
-	private static Description<Dethroner> getDescription() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("While holding two swords, you deal ")
-			.addPercent(PASSIVE_DAMAGE_ELITE_MODIFIER - 1)
-			.add(" more melee damage to Elites and ")
-			.addPercent(PASSIVE_DAMAGE_BOSS_MODIFIER - 1)
-			.add(" more melee damage to Bosses.");
+	public static Description<Dethroner> getDescription() {
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addLine("While holding two swords, you deal %p")
+				.statValues(stat(PASSIVE_DAMAGE_ELITE_MODIFIER - 1))
+			.addLine("more melee damage to Elites and %p")
+				.statValues(stat(PASSIVE_DAMAGE_BOSS_MODIFIER - 1))
+			.addLine("more melee damage to Bosses.");
 	}
 }

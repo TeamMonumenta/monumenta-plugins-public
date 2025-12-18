@@ -8,10 +8,11 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.AbilityWithHealthBar;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.bosses.bosses.abilities.KeeperVirtueBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.seraph.KeeperVirtueCS;
 import com.playmonumenta.plugins.effects.PercentHeal;
@@ -36,6 +37,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,6 +50,12 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class KeeperVirtue extends Ability implements AbilityWithHealthBar, AbilityWithDuration {
 	private static final int VIRTUE_COOLDOWN = 20 * 20;
@@ -90,6 +99,8 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 	public static final String CHARM_VULN_DURATION = "Keeper Virtue Vulnerability Duration";
 	public static final String CHARM_HEALTH = "Keeper Virtue Health";
 
+	public static final Style VIRTUE_COLOR = Style.style(TextColor.color(0xD9A336));
+
 	private @Nullable Allay mBoss = null;
 	private @Nullable LivingEntity mTarget;
 	private VirtueMode mMode = VirtueMode.INACTIVE;
@@ -128,7 +139,6 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 	private final int mVulnDuration;
 	private final double mHealth;
 	private final int mMinimumHeals;
-	private final int mCooldown;
 	private final KeeperVirtueCS mCosmetic;
 
 	public KeeperVirtue(Plugin plugin, Player player) {
@@ -151,7 +161,6 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 		mVulnDuration = CharmManager.getDuration(player, CHARM_VULN_DURATION, VIRTUE_VULN_DURATION);
 		mHealth = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEALTH, isLevelOne() ? VIRTUE_HEALTH_1 : VIRTUE_HEALTH_2);
 		mMinimumHeals = VIRTUE_MINIMUM_HEALS;
-		mCooldown = CharmManager.getDuration(player, CHARM_COOLDOWN, VIRTUE_COOLDOWN);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new KeeperVirtueCS());
 	}
@@ -414,51 +423,72 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 	}
 
 	private static Description<KeeperVirtue> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Passively have a Virtue with ")
-			.add(a -> a.mHealth, VIRTUE_HEALTH_1, false, Ability::isLevelOne)
-			.add(" health follow you, and while inactive it regenerates ")
-			.add(a -> a.mRegeneration, VIRTUE_REGENERATION)
-			.add(" health every 0.5s and grants you ")
-			.addPercent(a -> a.mSpeedAmplifier, VIRTUE_SPEED)
-			.add(" speed. You can heal it with Hallowed Beam at any time. ")
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger(2)
-			.add(" to toggle it active, making it seek out players within ")
-			.add(a -> a.mDetectionRange, VIRTUE_DETECTION_RANGE)
-			.add(" blocks under ")
-			.addPercent(a -> a.mHealLowerThreshold, VIRTUE_HEAL_LOWER_THRESHOLD)
-			.add(" health, healing them for ")
-			.addPercent(a -> a.mHealing, VIRTUE_HEALING)
-			.add(" of their max health every ")
-			.addDuration(a -> a.mHealDelay, VIRTUE_HEAL_DELAY)
-			.add("s at least ")
-			.add(a -> a.mMinimumHeals, VIRTUE_MINIMUM_HEALS)
-			.add(" times and until they're up to ")
-			.addPercent(a -> a.mHealUpperThreshold, VIRTUE_HEAL_UPPER_THRESHOLD)
-			.add(" or higher, draining ")
-			.add(a -> a.mHealDrain, VIRTUE_HEAL_DRAIN)
-			.add(" of its health per heal. If no players are found, it instead seeks out Heretics, dealing R2: " + VIRTUE_DAMAGE_R2 + " / R3: ")
-			.add(a -> ServerProperties.getAbilityEnhancementsEnabled(a.mPlayer) ? a.mDamage : VIRTUE_DAMAGE_R3, VIRTUE_DAMAGE_R3)
-			.add(" magic damage to them and draining ")
-			.add(a -> a.mAttackDrain, VIRTUE_ATTACK_DRAIN)
-			.add(" health every ")
-			.addDuration(a -> a.mAttackDelay, VIRTUE_ATTACK_DELAY)
-			.add("s. The Virtue regenerates half as much while active with no target. If the Virtue dies, it respawns after ")
-			.addDuration(a -> a.mCooldown, VIRTUE_COOLDOWN)
-			.add("s.");
+			.addDashedLine()
+			.addLine("Gain a *Virtue* with %d1 HP that follows you around").styles(VIRTUE_COLOR)
+				.statValues(stat(a -> a.mHealth, VIRTUE_HEALTH_1))
+			.addLine("and can be healed with your *Hallowed Beam*.").styles(UNDERLINED)
+			.addLine("Activate to swap it between being active or inactive.")
+			.addLine()
+			.addLine("While inactive, the *Virtue* stays near you,").styles(VIRTUE_COLOR)
+			.addLine("granting you speed and regenerating its HP.")
+			.addStat("Effect: +%p Speed")
+				.statValues(stat(a -> a.mSpeedAmplifier, VIRTUE_SPEED))
+			.addStat("Virtue Regen: +%d HP every %t")
+				.statValues(
+					stat(a -> a.mRegeneration, VIRTUE_REGENERATION),
+					stat(10))
+			.addLine()
+			.addLine("While active, the *Virtue* finds players below %p HP").styles(VIRTUE_COLOR)
+				.statValues(stat(a -> a.mHealLowerThreshold, VIRTUE_HEAL_LOWER_THRESHOLD))
+			.addLine("to heal and loses %d HP per heal.")
+				.statValues(stat(a -> a.mHealDrain, VIRTUE_HEAL_DRAIN))
+			.addLine("*(Will heal %p HP, then continues to heal until*").styles(DARK_GREY)
+				.statValues(stat(a -> a.mMinimumHeals * a.mHealing, VIRTUE_MINIMUM_HEALS * VIRTUE_HEALING))
+			.addLine("*the player reaches at least %p HP)*").styles(DARK_GREY)
+				.statValues(stat(a -> a.mHealUpperThreshold, VIRTUE_HEAL_UPPER_THRESHOLD))
+			.addStat("Healing: %p HP every %t")
+				.statValues(
+					stat(a -> a.mHealing, VIRTUE_HEALING),
+					stat(a -> a.mHealDelay, VIRTUE_HEAL_DELAY))
+			.addLine()
+			.addLine("If there are no players to heal, the *Virtue* finds").styles(VIRTUE_COLOR)
+			.addLine("*Heretics* and attacks them, losing %d HP per attack.").styles(Cleric.HERETIC_COLOR)
+				.statValues(stat(a -> a.mAttackDrain, VIRTUE_ATTACK_DRAIN))
+			.addStat("Damage: %d (s) every %t")
+				.statValues(
+					perRegion(a -> a.mDamage, VIRTUE_DAMAGE_R2, VIRTUE_DAMAGE_R3),
+					stat(a -> a.mAttackDelay, VIRTUE_ATTACK_DELAY))
+			.addLine()
+			.addStat("Vision Range: %r")
+				.statValues(stat(a -> a.mDetectionRange, VIRTUE_DETECTION_RANGE))
+			.addStat("Cooldown: %t (when the Virtue dies)")
+				.statValues(cooldown(VIRTUE_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<KeeperVirtue> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The Virtue now has ")
-			.add(a -> a.mHealth, VIRTUE_HEALTH_2, false, Ability::isLevelTwo)
-			.add(" health. The speed bonus when inactive is now granted to all players in a ")
-			.add(a -> a.mSpeedRadius, VIRTUE_SPEED_RADIUS)
-			.add(" block radius around you. Mobs attacked by the Virtue are inflicted with ")
-			.addPercent(a -> a.mVulnAmplifier, VIRTUE_VULN, false, Ability::isLevelTwo)
-			.add(" vulnerability for ")
-			.addDuration(a -> a.mVulnDuration, VIRTUE_VULN_DURATION)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase the *Virtue*'s health.").styles(VIRTUE_COLOR)
+			.addLine()
+			.addStatComparison("Virtue HP: %d1 -> %d2")
+				.statValues(stat(VIRTUE_HEALTH_1), stat(a -> a.mHealth, VIRTUE_HEALTH_2))
+			.addLine()
+			.addLine("The *Virtue*'s speed buff while inactive").styles(VIRTUE_COLOR)
+			.addLine("is now granted to all players near you.")
+			.addLine()
+			.addLine("Mobs attacked by the *Virtue* are").styles(VIRTUE_COLOR)
+			.addLine("inflicted with vulnerability.")
+			.addLine()
+			.addStat("Speed Radius: %r")
+				.statValues(stat(a -> a.mSpeedRadius, VIRTUE_SPEED_RADIUS))
+			.addStat("Effect: %p Vulnerability for %t")
+				.statValues(
+					stat(a -> a.mVulnAmplifier, VIRTUE_VULN),
+					stat(a -> a.mVulnDuration, VIRTUE_VULN_DURATION))
+			.addDashedLine();
 	}
 
 	@Override

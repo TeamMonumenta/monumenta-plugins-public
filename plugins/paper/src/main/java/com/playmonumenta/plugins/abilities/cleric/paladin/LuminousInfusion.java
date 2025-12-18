@@ -9,9 +9,10 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.LuminousInfusionCS;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -30,6 +31,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class LuminousInfusion extends Ability implements AbilityWithChargesOrStacks {
 	public static final int R2_DAMAGE = 8;
@@ -215,26 +221,40 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 	}
 
 	private static Description<LuminousInfusion> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to charge your hands with holy light. The next attack or ability you perform against a Heretic causes a ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" block radius explosion that deals R2: " + R2_HERETIC_DAMAGE + " / R3: ")
-			.add(a -> ServerProperties.getAbilityEnhancementsEnabled(a.mPlayer) ? a.mHereticDamage : R3_HERETIC_DAMAGE, R3_HERETIC_DAMAGE)
-			.add(" magic damage to it and other Heretics or R2: " + R2_DAMAGE + " / R3: ")
-			.add(a -> ServerProperties.getAbilityEnhancementsEnabled(a.mPlayer) ? a.mDamage : R3_DAMAGE, R3_DAMAGE)
-			.add(" damage to non-Heretics. Enemies are knocked away from the hit Heretic. ")
-			.add(a -> a.mMaxCharges, CHARGES_1, false, Ability::isLevelOne)
-			.add(" charges. Having multiple charges primed at once will cause one explosion at a time, and all charges are replenished when cooldown expires.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Activate to prime your next attack or ability")
+			.addLine("on a *Heretic* to explode and deal damage").styles(Cleric.HERETIC_COLOR)
+			.addLine("to nearby mobs, knocking them away.")
+			.addLine("*Heretics* take increased damage.").styles(Cleric.HERETIC_COLOR)
+			.addLine()
+			.addStat("Damage: %d (s) (to non-Heretics)")
+				.statValues(perRegion(a -> a.mDamage, R2_DAMAGE, R3_DAMAGE))
+			.addStat("Damage: %d (s) (to Heretics)")
+				.statValues(perRegion(a -> a.mHereticDamage, R2_HERETIC_DAMAGE, R3_HERETIC_DAMAGE))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Charges: %d1")
+				.statValues(stat(a -> a.mMaxCharges, CHARGES_1))
+			.addStat("Cooldown: %t (refreshes all charges at once)")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<LuminousInfusion> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Max charges increased to ")
-			.add(a -> a.mMaxCharges, CHARGES_2, false, Ability::isLevelTwo)
-			.add(". Mobs hit by an explosion are set on fire for ")
-			.addDuration(a -> a.mFireDuration, FIRE_DURATION, false, Ability::isLevelTwo)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Luminous Infusion*'s max charges.").styles(UNDERLINED)
+			.addLine()
+			.addLine("*Luminous Infusion* now ignites mobs hit.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Charges: %d1 -> %d2")
+			.statValues(
+				stat(CHARGES_1),
+				stat(a -> a.mMaxCharges, CHARGES_2))
+			.addStat("Effect: Fire for %t")
+				.statValues(stat(a -> a.mFireDuration, FIRE_DURATION))
+			.addDashedLine();
 	}
 }

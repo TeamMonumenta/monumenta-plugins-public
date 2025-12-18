@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.effects.RejuvenationHealing;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -13,6 +13,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.entity.Player;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Rejuvenation extends Ability {
 	private static final int RADIUS = 12;
@@ -63,19 +65,19 @@ public class Rejuvenation extends Ability {
 		return mPercentDamage;
 	}
 
-	private static Description<Rejuvenation> getDescription() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Divine Justice's % multiplier is increased by ")
-			.addPercent(a -> a.mPercentDamage, DJ_MULTIPLIER)
-			.add(", and you and other players within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks heal ")
-			.addPercent(a -> a.mHealing, PERCENT_HEAL)
-			.add(" of max health every ")
-			.addDuration(HEAL_INTERVAL)
-			.add(" seconds while under ")
-			.addPercent(a -> a.mThreshold, HEALTH_LIMIT)
-			.add(" health.");
+	public static Description<Rejuvenation> getDescription() {
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addLine("You and other players within %d")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addLine("blocks heal %p HP every %t while")
+				.statValues(
+					stat(a -> a.mHealing, PERCENT_HEAL),
+					stat(HEAL_INTERVAL))
+			.addLine("under %p HP.")
+				.statValues(stat(a -> a.mThreshold, HEALTH_LIMIT))
+			.addLine()
+			.addLine("Increase *Divine Justice*'s bonus").styles(UNDERLINED)
+			.addLine("damage multiplier by +%p.")
+				.statValues(stat(a -> a.mPercentDamage, DJ_MULTIPLIER));
 	}
-
 }

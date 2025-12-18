@@ -7,7 +7,8 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
+import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.EnergizingElixirCS;
@@ -35,6 +36,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 
 public class EnergizingElixir extends Ability implements PotionAbility, AbilityWithDuration {
 	private static final double SPEED_AMPLIFIER = 0.15;
@@ -250,43 +253,43 @@ public class EnergizingElixir extends Ability implements PotionAbility, AbilityW
 	}
 
 	private static Description<EnergizingElixir> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your potions now leave a faint ")
-			.add(CLOUD_HEIGHT)
-			.add(" block high cloud, with ")
-			.addPercent(CLOUD_RADIUS_MULTIPLIER)
-			.add(" of your potion's radius, that lingers for ")
-			.addDuration(CLOUD_LINGER_TIME)
-			.add("s. Immediately, and every ")
-			.addDuration(CLOUD_TICK_INTERVAL)
-			.add("s, standing in the cloud gives you +")
-			.addPercent(a -> a.mSpeedAmp, SPEED_AMPLIFIER)
-			.add(" speed and Jump Boost ")
-			.addPotionAmplifier(a -> a.mJumpBoostAmp, JUMP_LEVEL)
-			.add(" for ")
-			.addDuration(a -> a.mDuration, EFFECTS_DURATION)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Your potions leave lingering clouds that")
+			.addLine("grant yourself speed and jump boost.")
+			.addLine()
+			.addStat("Effect: +%p Speed for %t")
+				.statValues(stat(a -> a.mSpeedAmp, SPEED_AMPLIFIER), stat(a -> a.mDuration, EFFECTS_DURATION))
+			.addStat("Effect: Jump Boost %d for %t")
+				.statValues(stat(a -> a.mJumpBoostAmp + 1, JUMP_LEVEL + 1), stat(a -> a.mDuration, EFFECTS_DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<EnergizingElixir> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The cloud now buffs allies within it with +")
-			.addPercent(a -> a.mDamageAmp, DAMAGE_AMPLIFIER)
-			.add(" damage dealt for ")
-			.addDuration(a -> a.mDuration, EFFECTS_DURATION)
-			.add("s, refreshing on each application.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("The clouds now grant other players")
+			.addLine("increased damage.")
+			.addLine()
+			.addStat("Effect: +%p Damage for %t")
+				.statValues(stat(a -> a.mDamageAmp, DAMAGE_AMPLIFIER), stat(a -> a.mDuration, EFFECTS_DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<EnergizingElixir> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Clouds formed with your Brutal potions now grant allies within them ")
-			.add(a -> a.mAbsorptionAmount, ENHANCEMENT_ABSORPTION_AMOUNT)
-			.add(" absorption health for ")
-			.addDuration(a -> a.mAbsorptionDuration, ENHANCEMENT_ABSORPTION_DURATION)
-			.add("s, up to a maximum of ")
-			.add(a -> a.mAbsorptionMax, ENHANCEMENT_ABSORPTION_MAX)
-			.add(" absorption health, while clouds formed with your Gruesome potions now reduce the duration of all debuffs afflicting allies within them by ")
-			.addDuration(a -> a.mDebuffReduction, ENHANCEMENT_DEBUFF_REDUCTION)
-			.add("s.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Clouds formed by *Brutal* potions grant").styles(Alchemist.BRUTAL_COLOR)
+			.addLine("other players absorption.")
+			.addLine()
+			.addStat("Effect: +%d Absorption for %t (max +%d)")
+				.statValues(stat(a -> a.mAbsorptionAmount, ENHANCEMENT_ABSORPTION_AMOUNT), stat(a -> a.mAbsorptionDuration, ENHANCEMENT_ABSORPTION_DURATION), stat(a -> a.mAbsorptionMax, ENHANCEMENT_ABSORPTION_MAX))
+			.addLine()
+			.addLine("Clouds formed by *Gruesome* potions reduce").styles(Alchemist.GRUESOME_COLOR)
+			.addLine("the duration of other players' debuffs.")
+			.addLine()
+			.addStat("Effect: -%t Debuff Duration")
+				.statValues(stat(a -> a.mDebuffReduction, ENHANCEMENT_DEBUFF_REDUCTION))
+			.addDashedLine();
 	}
 }
