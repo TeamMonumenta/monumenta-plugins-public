@@ -93,6 +93,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	private final List<Location> mMarkedLocations = new ArrayList<>(); // To mark locations (Even if block is not replaced)
 
 	private final SanguineHarvestCS mCosmetic;
+	private BukkitRunnable mActiveMarkerRunnable;
 
 	public SanguineHarvest(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -208,7 +209,11 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	private void runMarkerRunnable() {
 		if (!mMarkedLocations.isEmpty() &&
 			isEnhanced()) {
-			new BukkitRunnable() {
+			if (mActiveMarkerRunnable != null && !mActiveMarkerRunnable.isCancelled()) {
+				mActiveMarkerRunnable.cancel();
+			}
+
+			mActiveMarkerRunnable = new BukkitRunnable() {
 				int mTicks = 0;
 
 				@Override
@@ -243,7 +248,8 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 					mCurrDuration = -1;
 					ClientModHandler.updateAbility(mPlayer, SanguineHarvest.this);
 				}
-			}.runTaskTimer(mPlugin, 0, 10);
+			};
+			mActiveMarkerRunnable.runTaskTimer(mPlugin, 0, 10);
 			mCurrDuration = 0;
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
