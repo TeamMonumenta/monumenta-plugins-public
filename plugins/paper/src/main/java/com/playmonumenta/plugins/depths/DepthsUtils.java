@@ -10,10 +10,12 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -208,7 +210,7 @@ public class DepthsUtils {
 	 * @return if the item is an axe, sword, scythe, wand, or trident
 	 */
 	public static boolean isWeaponItem(@Nullable ItemStack item) {
-		return item != null && (ItemUtils.isAxe(item) || ItemUtils.isSword(item) || ItemUtils.isWand(item) || ItemUtils.isHoe(item));
+		return item != null && (ItemUtils.isAxe(item) || ItemUtils.isSword(item) || ItemUtils.isWand(item) || ItemUtils.isHoe(item) || (item.getType() == Material.TRIDENT && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.RIPTIDE) == 0));
 	}
 
 	private static final List<String> WEAPON_ASPECT_NAMES = DepthsManager.getWeaponAspects().stream().map(AbilityInfo::getDisplayName).filter(Objects::nonNull).toList();
