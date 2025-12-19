@@ -106,8 +106,8 @@ public class PrismaticShield extends Ability {
 			// It is intentional that Prismatic Shield saves you from death if you take a buttload of damage somehow.
 			double healthRemaining = mPlayer.getHealth() - event.getFinalDamage(true);
 
-			// Health is less than 0 but does not penetrate the absorption shield
-			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -OVERKILL_PROTECTION_MULTIPLIER * mAbsorptionHealth;
+			// Health is less than or equal to 0 but does not penetrate the absorption shield
+			boolean dealDamageLater = healthRemaining <= 0 && healthRemaining > -OVERKILL_PROTECTION_MULTIPLIER * mAbsorptionHealth;
 
 			if (healthRemaining <= mTriggerHealth) {
 				mPlugin.mEffectManager.damageEvent(event);
