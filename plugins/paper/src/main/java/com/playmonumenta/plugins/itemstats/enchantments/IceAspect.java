@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -10,6 +11,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.EnumSet;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -111,6 +113,9 @@ public class IceAspect implements Enchantment {
 	}
 
 	public static void apply(Plugin plugin, Player player, double level, int duration, LivingEntity enemy, boolean particles) {
+		if (!EntityUtils.isSlowed(plugin, enemy) && !enemy.hasPotionEffect(org.bukkit.potion.PotionEffectType.SLOW)) {
+			MetadataUtils.checkOnceThisTick(plugin, enemy, Constants.ENTITY_SLOWED_NONCE_METAKEY);
+		}
 		EntityUtils.applySlow(plugin, duration, level * SLOW_PER_LEVEL, enemy);
 		if (particles) {
 			new PartialParticle(Particle.SNOWBALL, enemy.getLocation().add(0, 1, 0), 8, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerBuff(player);
