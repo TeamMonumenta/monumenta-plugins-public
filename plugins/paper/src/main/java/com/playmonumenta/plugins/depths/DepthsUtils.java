@@ -10,10 +10,13 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -212,7 +215,12 @@ public class DepthsUtils {
 	 * @return if the item is an axe, sword, scythe, wand, or trident
 	 */
 	public static boolean isWeaponItem(@Nullable ItemStack item) {
-		return item != null && (ItemUtils.isAxe(item) || ItemUtils.isSword(item) || ItemUtils.isWand(item) || ItemUtils.isHoe(item));
+		return item != null
+			&& (ItemUtils.isAxe(item)
+			|| ItemUtils.isSword(item)
+			|| ItemUtils.isWand(item)
+			|| ItemUtils.isHoe(item)
+			|| (item.getType() == Material.TRIDENT && ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) != 0));
 	}
 
 	public static boolean isWeaponAspectAbility(String s) {

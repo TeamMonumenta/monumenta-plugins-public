@@ -44,7 +44,7 @@ public class CurseOfLust extends DepthsAbility {
 				.mapToDouble(p -> p.getLocation().distanceSquared(mPlayer.getLocation()))
 				.min().orElse(0);
 			if (closestSquared >= MIN_BLOCKS * MIN_BLOCKS) {
-				double mult = 1 - DAMAGE_REDUCTION_PER_BLOCK * (Math.min(Math.sqrt(closestSquared), MAX_BLOCKS) - MIN_BLOCKS);
+				double mult = 1 - DAMAGE_REDUCTION_PER_BLOCK * (Math.min(Math.sqrt(closestSquared), MIN_BLOCKS + MAX_BLOCKS) - MIN_BLOCKS);
 				event.updateDamageWithMultiplier(mult);
 			}
 		}

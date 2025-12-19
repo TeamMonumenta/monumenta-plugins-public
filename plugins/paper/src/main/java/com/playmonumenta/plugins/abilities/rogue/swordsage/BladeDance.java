@@ -100,11 +100,12 @@ public class BladeDance extends Ability {
 			public void run() {
 				mTicks += 1;
 				Location loc = mPlayer.getLocation();
-				mCosmetic.danceTick(mPlayer, world, loc, mTicks, mInvulnDuration, mRadius);
 
-				if (mTicks >= mInvulnDuration) {
-					mIsActive = false;
+				if (mTicks <= mInvulnDuration) {
+					mCosmetic.danceTick(mPlayer, world, loc, mTicks, mInvulnDuration, mRadius);
+				}
 
+				if (mTicks == mInvulnDuration) {
 					mCosmetic.danceEnd(mPlayer, world, loc, mRadius);
 
 					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), mRadius);
@@ -118,7 +119,8 @@ public class BladeDance extends Ability {
 
 						mCosmetic.danceHit(mPlayer, world, mob, mob.getLocation().add(0, 1, 0));
 					}
-
+				} else if (mTicks > mInvulnDuration) {
+					mIsActive = false;
 					this.cancel();
 				}
 			}
