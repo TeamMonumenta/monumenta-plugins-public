@@ -99,6 +99,11 @@ public class ChestOverride extends BaseOverride {
 				|| !chest.getLock().equals(MessagingUtils.plainText(itemMeta.displayName()))) {
 				// Cancel clicks on locked chests. This prevents any custom code from running on it, e.g. purple tesseract.
 				// Since the event is cancelled, we need to manually send the locked message and sound though.
+
+				// Player can't open chests when sneaking anyways, allows for interacting with the chest normally
+				if (player.isSneaking()) {
+					return false;
+				}
 				Component name = chest.customName();
 				player.sendActionBar(Component.translatable("container.isLocked", name != null ? name : Component.translatable("container.chest")));
 				player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1, 1);
