@@ -102,10 +102,12 @@ public class ArcaneStrike extends Ability {
 				double preSpellPowerDamage = mDamageBonus;
 
 				// Arcane Strike extra damage if on fire or slowed (but effect not applied this tick)
-				if (EntityUtils.isSlowed(mPlugin, mob) || (mob.hasPotionEffect(PotionEffectType.SLOW)
+				if ((mob.getFireTicks() > 0
+					&& !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))
+					|| (EntityUtils.isSlowed(mPlugin, mob)
 					&& !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))
-					|| (mob.getFireTicks() > 0
-					&& !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_COMBUST_NONCE_METAKEY, 0))) {
+					|| (mob.hasPotionEffect(PotionEffectType.SLOW)
+					&& !MetadataUtils.happenedThisTick(mob, Constants.ENTITY_SLOWED_NONCE_METAKEY, 0))) {
 					preSpellPowerDamage += mDamageBonusAffected;
 				}
 
