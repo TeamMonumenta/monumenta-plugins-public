@@ -555,13 +555,13 @@ public class ItemUpdateHelper {
 
 		// Now modify the LORE on the item
 		lore.removeAll(loreToRemove);
+		addDummyAttributeIfNeeded(item);
+
 		NBT.modify(item, nbt -> {
 			// remove unused keys
 			for (String path : unusedKeys) {
 				cleanEmptyTags(nbt, path);
 			}
-
-			addDummyAttributeIfNeeded(item);
 
 			// return if no NBT
 			if (nbt.getKeys().isEmpty()) {
