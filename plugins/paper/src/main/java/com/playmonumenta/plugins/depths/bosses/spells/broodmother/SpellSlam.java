@@ -55,6 +55,7 @@ public class SpellSlam extends Spell {
 	private final ChargeUpManager mChargeUp;
 	private final int mFinalCooldown;
 	private final int mFinalCastTime;
+	private @Nullable BukkitRunnable mQuakeRunnable = null;
 
 	private boolean mOnCooldown = false;
 
@@ -137,7 +138,7 @@ public class SpellSlam extends Spell {
 		DisplayEntityUtils.groundBlockQuake(mSlam.getCenter(), mSlam.getRadius(), GROUND_QUAKE_BLOCKS, new Display.Brightness(8, 8), 0.015);
 		// Follow the quake and deal damage at its level.
 		// Seems to be travelling at ~0.67 blocks per tick, and takes 3 seconds (60 ticks) to reach the 40 block radius.
-		new BukkitRunnable() {
+		mQuakeRunnable = new BukkitRunnable() {
 			final Location mSlamLoc = mBoss.getLocation().subtract(0, 1, 0);
 			final ArrayList<UUID> mHitPlayers = new ArrayList<>();
 			final double mRadiusIncrease = 0.75;
@@ -168,7 +169,15 @@ public class SpellSlam extends Spell {
 				player.setVelocity(player.getVelocity().add(new Vector(0, 0.75, 0)));
 				mHitPlayers.add(player.getUniqueId());
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+		mQuakeRunnable.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	public void stopQuake() {
+		if (mQuakeRunnable != null && !mQuakeRunnable.isCancelled()) {
+			mQuakeRunnable.cancel();
+			mQuakeRunnable = null;
+		}
 	}
 
 	@Override
