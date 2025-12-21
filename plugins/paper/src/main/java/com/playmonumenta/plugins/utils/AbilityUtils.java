@@ -178,6 +178,7 @@ public class AbilityUtils {
 			if (entity instanceof Mob mob) {
 				if (mob.getTarget() != null && mob.getTarget().getUniqueId().equals(player.getUniqueId())) {
 					mob.setTarget(null);
+					mob.getPathfinder().stopPathfinding();
 				}
 			}
 		}
