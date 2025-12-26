@@ -44,6 +44,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
@@ -55,7 +56,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
+import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
 
@@ -68,7 +69,6 @@ public class DiscoBall extends DepthsAbility {
 	public static final int DURATION = 5 * 20;
 	public static final int SHOOT_INTERVAL = 10;
 	public static final int SPOTLIGHT_PROJECTILES = 3;
-	public static final int PARTICLE_REFRESH_INTERVAL = 10;
 	public static final double BLAST_RADIUS = 2.5;
 	public static final String BALL_HEAD_BASE64 = "ewogICJ0aW1lc3RhbXAiIDogMTY5Njc1Nzc0ODc0MSwKICAicHJvZmlsZUlkIiA6ICI0Y2FlYmM0N2YxNzI0ZTMyYWY2YTAxYmQwMGI2MWI1ZiIsCiAgInByb2ZpbGVOYW1lIiA6ICJiaWtlc3VwZXIiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQ4MDQyMTJiMjczYTVjYjRlOGMwM2M5ZTI5NTYxYmViY2M5NWQyNDQ5ZDhlNzYwZTY2YzgyMTRjMzc2YTRjYiIKICAgIH0KICB9Cn0=";
 	public static final int[] TREE_COLORS = {DepthsUtils.DAWNBRINGER, DepthsUtils.EARTHBOUND, DepthsUtils.FLAMECALLER, DepthsUtils.FROSTBORN, DepthsUtils.PRISMATIC, DepthsUtils.SHADOWDANCER, DepthsUtils.STEELSAGE, DepthsUtils.WINDWALKER};
@@ -105,14 +105,18 @@ public class DiscoBall extends DepthsAbility {
 
 	private void initDiscoBall(Location loc, double distanceFromGround, ItemStatManager.PlayerItemStats playerItemStats) {
 		loc.subtract(0, 1, 0);
-		loc.setDirection(new Vector(0, -1, 0));
 		@Nullable ItemDisplay ballHead = DisplayEntityUtils.spawnItemDisplayWithBase64Head(loc, BALL_HEAD_BASE64);
 		if (ballHead != null) {
+<<<<<<< Updated upstream
 			new DisplayEntityUtils.DisplayAnimation(ballHead)
 				.addDelay(1)
 				.addKeyframe(new Transformation(new Vector3f(), new Quaternionf().rotationY((float) Math.toRadians(168.5)), new Vector3f(1), new Quaternionf()), DURATION)
 				.removeDisplaysAfterwards()
 				.play();
+=======
+			ballHead.setBillboard(Display.Billboard.FIXED);
+			ballHead.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.FIXED);
+>>>>>>> Stashed changes
 		}
 
 		loc.getWorld().playSound(loc, "block.amethyst_block.resonate", SoundCategory.PLAYERS, 5, 1);
@@ -127,15 +131,24 @@ public class DiscoBall extends DepthsAbility {
 			int mTicks = 1;
 			int mTimesShot = 0;
 			double mAngle = 5;
+			float mRotationAngle = 0;
 			final ArrayList<LivingEntity> mAlreadyHitMobs = new ArrayList<>();
 
 			@Override
 			public void run() {
-				if (mTicks % PARTICLE_REFRESH_INTERVAL == 0) {
-					drawDiscoBall();
-				}
-
 				if (mTicks % SHOOT_INTERVAL == 0) {
+					if (ballHead != null && ballHead.isValid()) {
+						mRotationAngle += (float) (2 * Math.PI * SHOOT_INTERVAL / DURATION);
+						ballHead.setInterpolationDuration(SHOOT_INTERVAL);
+						ballHead.setInterpolationDelay(0);
+						ballHead.setTransformation(new Transformation(
+							new Vector3f(),
+							new AxisAngle4f(mRotationAngle, 0, 0, 1),
+							new Vector3f(1, 1, 1),
+							new AxisAngle4f()
+						));
+					}
+					drawDiscoBall();
 					mAlreadyHitMobs.clear();
 					mTimesShot++;
 					if (mTimesShot == mMaxShots && mFinalBlast) {
@@ -149,6 +162,9 @@ public class DiscoBall extends DepthsAbility {
 				mTicks++;
 				if (mTicks > DURATION) {
 					mBallLoc.getWorld().playSound(mBallLoc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 5, 0.5f);
+					if (ballHead != null) {
+						ballHead.remove();
+					}
 					cancel();
 				}
 			}
