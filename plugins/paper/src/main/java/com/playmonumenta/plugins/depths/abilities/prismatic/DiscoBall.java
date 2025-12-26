@@ -107,16 +107,8 @@ public class DiscoBall extends DepthsAbility {
 		loc.subtract(0, 1, 0);
 		@Nullable ItemDisplay ballHead = DisplayEntityUtils.spawnItemDisplayWithBase64Head(loc, BALL_HEAD_BASE64);
 		if (ballHead != null) {
-<<<<<<< Updated upstream
-			new DisplayEntityUtils.DisplayAnimation(ballHead)
-				.addDelay(1)
-				.addKeyframe(new Transformation(new Vector3f(), new Quaternionf().rotationY((float) Math.toRadians(168.5)), new Vector3f(1), new Quaternionf()), DURATION)
-				.removeDisplaysAfterwards()
-				.play();
-=======
 			ballHead.setBillboard(Display.Billboard.FIXED);
 			ballHead.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.FIXED);
->>>>>>> Stashed changes
 		}
 
 		loc.getWorld().playSound(loc, "block.amethyst_block.resonate", SoundCategory.PLAYERS, 5, 1);
