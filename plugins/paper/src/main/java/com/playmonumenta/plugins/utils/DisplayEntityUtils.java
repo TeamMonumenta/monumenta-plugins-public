@@ -219,7 +219,12 @@ public class DisplayEntityUtils {
 		Entity e = display.getWorld().spawnEntity(loc, EntityType.BLOCK_DISPLAY);
 		if (e instanceof BlockDisplay blockDisplayCopy) {
 			blockDisplayCopy.setBlock(display.getBlock());
-			blockDisplayCopy.setTransformation(new Transformation(new Vector3f(), display.getTransformation().getLeftRotation(), display.getTransformation().getScale(), display.getTransformation().getRightRotation()));
+			Transformation original = display.getTransformation();
+			blockDisplayCopy.setTransformation(new Transformation(
+				new Vector3f(original.getTranslation()),
+				new Quaternionf(original.getLeftRotation()),
+				new Vector3f(original.getScale()),
+				new Quaternionf(original.getRightRotation())));
 			blockDisplayCopy.setBrightness(display.getBrightness());
 			blockDisplayCopy.setBillboard(display.getBillboard());
 			blockDisplayCopy.setDisplayHeight(display.getDisplayHeight());
@@ -233,7 +238,12 @@ public class DisplayEntityUtils {
 		Entity e = display.getWorld().spawnEntity(loc, EntityType.TEXT_DISPLAY);
 		if (e instanceof TextDisplay textDisplayCopy) {
 			textDisplayCopy.text(display.text());
-			textDisplayCopy.setTransformation(new Transformation(new Vector3f(), display.getTransformation().getLeftRotation(), display.getTransformation().getScale(), display.getTransformation().getRightRotation()));
+			Transformation original = display.getTransformation();
+			textDisplayCopy.setTransformation(new Transformation(
+				new Vector3f(original.getTranslation()),
+				new Quaternionf(original.getLeftRotation()),
+				new Vector3f(original.getScale()),
+				new Quaternionf(original.getRightRotation())));
 			textDisplayCopy.setAlignment(display.getAlignment());
 			textDisplayCopy.setTextOpacity(display.getTextOpacity());
 			textDisplayCopy.setDisplayHeight(display.getDisplayHeight());
@@ -253,7 +263,12 @@ public class DisplayEntityUtils {
 		Entity e = display.getWorld().spawnEntity(loc, EntityType.ITEM_DISPLAY);
 		if (e instanceof ItemDisplay itemDisplayCopy) {
 			itemDisplayCopy.setItemStack(display.getItemStack());
-			itemDisplayCopy.setTransformation(new Transformation(new Vector3f(), display.getTransformation().getLeftRotation(), display.getTransformation().getScale(), display.getTransformation().getRightRotation()));
+			Transformation original = display.getTransformation();
+			itemDisplayCopy.setTransformation(new Transformation(
+				new Vector3f(original.getTranslation()),
+				new Quaternionf(original.getLeftRotation()),
+				new Vector3f(original.getScale()),
+				new Quaternionf(original.getRightRotation())));
 			itemDisplayCopy.setDisplayHeight(display.getDisplayHeight());
 			itemDisplayCopy.setDisplayWidth(display.getDisplayWidth());
 			itemDisplayCopy.setBrightness(display.getBrightness());
@@ -392,13 +407,16 @@ public class DisplayEntityUtils {
 			if (currentFrame != 0) {
 				Matrix4f previousFrame = mFrames.get(currentFrame - 1);
 				if (previousFrame != null) {
-					ArrayList<Display> teleportedDisplays = new ArrayList<>();
-					mDisplays.forEach(display -> {
-						teleportedDisplays.add(spawnCopyOfDisplay(display, display.getLocation().add(getTranslationVector(previousFrame))));
-						display.remove();
+					Vector translation = getTranslationVector(previousFrame);
+					if (translation.lengthSquared() > 0.0001) {
+						ArrayList<Display> teleportedDisplays = new ArrayList<>();
+						mDisplays.forEach(display -> {
+							teleportedDisplays.add(spawnCopyOfDisplay(display, display.getLocation().add(translation)));
+							display.remove();
 
-					});
-					mDisplays = teleportedDisplays;
+						});
+						mDisplays = teleportedDisplays;
+					}
 				}
 			}
 
