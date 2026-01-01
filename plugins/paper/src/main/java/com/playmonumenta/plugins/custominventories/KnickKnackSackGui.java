@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
 import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.seasonalevents.community.CommunityMissionsGui;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -208,20 +209,21 @@ public class KnickKnackSackGui extends Gui {
 	private void setupTrinketPage1() {
 		int pebSlot = 10;       // PEB
 		int passSlot = 11;      // Season pass
-		int cosmeticsSlot = 12; // Personal Cosmetics Interface
-		int emoteSlot = 13;     // Emotes Trinket
-		int bestiarySlot = 14;  // Bestiary
-		int recordSlot = 15;    // Tlaxan Record Player or Soulsinger
-		int contractSlot = 16;  // Crimson Contract
-		int parrotSlot = 19;    // Parrot Bell
-		int depthsSlot = 20;    // Depths Trinket
-		int charmSlot = 21;     // Charms Trinket
-		int delveSlot = 22;     // Delves Trinket
-		int depthsTalismanSlot = 23;    // Depths Talisman
-		int zenithTalismanSlot = 24;    // Zenith Trinket
-		int guildSlot = 25;     // Guild GUI
-		int questSlot = 28;     // Quest guide
-		int enchantSlot = 29;   // Enchantopedia
+		int communitySlot = 12; // Community missions
+		int cosmeticsSlot = 13; // Personal Cosmetics Interface
+		int emoteSlot = 14;     // Emotes Trinket
+		int bestiarySlot = 15;  // Bestiary
+		int recordSlot = 16;    // Tlaxan Record Player or Soulsinger
+		int contractSlot = 19;  // Crimson Contract
+		int parrotSlot = 20;    // Parrot Bell
+		int depthsSlot = 21;    // Depths Trinket
+		int charmSlot = 22;     // Charms Trinket
+		int delveSlot = 23;     // Delves Trinket
+		int depthsTalismanSlot = 24;    // Depths Talisman
+		int zenithTalismanSlot = 25;    // Zenith Trinket
+		int guildSlot = 28;     // Guild GUI
+		int questSlot = 29;     // Quest guide
+		int enchantSlot = 30;   // Enchantopedia
 
 		// Information sign
 		ItemStack info = GUIUtils.createBasicItem(Material.OAK_SIGN, "Trinkets", NamedTextColor.WHITE, true);
@@ -300,6 +302,16 @@ public class KnickKnackSackGui extends Gui {
 			"Click to show active pass and weekly mission progress."
 		).onClick((evt) -> runConsoleCommand("battlepass gui @S"));
 		setItem(passSlot, tPass);
+
+		// Community missions trinket, always unlocked
+		GuiItem tCommunity = makeTrinketGuiItem(
+			"epic:pass/community_trinket",
+			"Click to show active community mission progress."
+		).onClick((evt) -> {
+			mPlayer.closeInventory();
+			new CommunityMissionsGui(mPlayer).open();
+		});
+		setItem(communitySlot, tCommunity);
 
 		// Cosmetics Trinket, always unlocked
 		GuiItem tCosmetics = makeTrinketGuiItem(

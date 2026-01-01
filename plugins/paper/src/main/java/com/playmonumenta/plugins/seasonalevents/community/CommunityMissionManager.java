@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.RedisAPI;
 import io.lettuce.core.RedisFuture;
 import java.time.LocalDateTime;
@@ -304,6 +305,11 @@ public class CommunityMissionManager {
 
 						Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 							if (!player.isOnline()) {
+								return;
+							}
+
+							if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_VIRTUAL_INVENTORIES)) {
+								player.sendMessage(Component.text("You have unclaimed rewards, but may not claim them here.", NamedTextColor.GRAY));
 								return;
 							}
 

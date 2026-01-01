@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.seasonalevents.community.CommunityMissionsGui;
 import com.playmonumenta.plugins.seasonalevents.gui.PassGui;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DateUtils;
+import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -170,10 +172,9 @@ public class SeasonalEventCommand extends GenericCommand {
 		// default command for opening gui for player
 		CommandAPICommand communityGui = new CommandAPICommand("gui")
 			.executes((sender, args) -> {
-				Player player = CommandUtils.getPlayerFromSender(sender);
-				if (sender instanceof Player senderPlayer && !senderPlayer.equals(player)) {
-					// cant open it on other people as a player
-					return;
+				CommandSender callee = CommandUtils.getCallee(sender);
+				if (!(callee instanceof Player player)) {
+					throw CommandAPI.failWithString("The community missions GUI can only be shown to players");
 				}
 				new CommunityMissionsGui(player).open();
 			});
