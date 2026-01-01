@@ -245,8 +245,8 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.addStatComparison("Bonus Damage: +%d1 + %p1 -> +%d2 + %p2 (s)")
 				.statValues(stat(DAMAGE_1), stat(DAMAGE_MULTIPLIER_1), stat(a -> a.mDamage, DAMAGE_2), stat(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_2))
 			.addLine()
-			.addLine("Killing a *Heretic* with *Divine Justice* heals").styles(Cleric.HERETIC_COLOR, UNDERLINED)
-			.addLine("yourself and other nearby players over time.")
+			.addLine("Killing a *Heretic* heals yourself").styles(Cleric.HERETIC_COLOR, UNDERLINED)
+			.addLine("and other nearby players over time.")
 			.addLine("(Duration stacks per kill, up to 3s)")
 			.addLine()
 			// Don't want to display redundant lines for the majority of cases!

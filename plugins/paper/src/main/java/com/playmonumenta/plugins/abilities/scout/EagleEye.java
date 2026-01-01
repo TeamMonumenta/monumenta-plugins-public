@@ -189,10 +189,10 @@ public class EagleEye extends Ability {
 	private static Description<EagleEye> getDescriptionEnhancement() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
 			.addDashedLine()
-			.addLine("Your first projectile against each")
+			.addLine("Your first attack against each")
 			.addLine("revealed mob deals increased damage.")
 			.addLine()
-			.addStat("Damage Boost: +%p (p)")
+			.addStat("Damage Boost: +%p")
 				.statValues(stat(a -> a.mDamage, ENHANCEMENT_DAMAGE_PERCENT))
 			.addIf((a, p) -> a != null && a.mHits != 1, desc -> desc
 				.addStat("Boosted Hits: %d")

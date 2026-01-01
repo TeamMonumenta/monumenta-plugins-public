@@ -798,7 +798,7 @@ public class AbilityUtils {
 		ClassAbility.SPIRITCATCHER_ORBS,
 		ClassAbility.ILLUMINATE_DOT,
 		ClassAbility.KEEPER_VIRTUE,
-		ClassAbility.CURSED_WOUND,
+		ClassAbility.CURSED_WOUND_DOT,
 		ClassAbility.WITHERING_GAZE,
 		ClassAbility.REFLECTION,
 		ClassAbility.BLEEDING

@@ -112,6 +112,7 @@ public enum ClassAbility {
 	AMPLIFYING("Amplifying Hex"),
 	CHOLERIC_FLAMES("Choleric Flames"),
 	CURSED_WOUND("Cursed Wound"),
+	CURSED_WOUND_DOT("Cursed Wound Damage Over Time"), // Separates the base DoT and enhancement burst
 	PHLEGMATIC_RESOLVE("Phlegmatic Resolve"),
 	GRASPING_CLAWS("Grasping Claws"),
 	MELANCHOLIC_LAMENT("Melancholic Lament"),

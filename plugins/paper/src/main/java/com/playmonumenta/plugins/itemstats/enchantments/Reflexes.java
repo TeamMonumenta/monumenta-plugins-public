@@ -36,7 +36,7 @@ public class Reflexes implements Enchantment {
 		ClassAbility.BRUTE_FORCE_AOE,
 		ClassAbility.HUNTING_COMPANION,
 		ClassAbility.PHLEGMATIC_RESOLVE,
-		ClassAbility.CURSED_WOUND,
+		ClassAbility.CURSED_WOUND_DOT,
 		ClassAbility.VOODOO_BONDS, // VOODOO_BONDS_PIN is allowed
 		ClassAbility.RESTLESS_SOULS,
 		ClassAbility.WITHERING_GAZE,

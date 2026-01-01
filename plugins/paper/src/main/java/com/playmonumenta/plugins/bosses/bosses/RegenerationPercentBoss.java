@@ -36,12 +36,7 @@ public class RegenerationPercentBoss extends BossAbilityGroup {
 	int interruptionCycles = 0;
 
 	public void setInterruptionCycles(int cycles) {
-		if (cycles <= 0) {
-			// don't want it to be negative
-			interruptionCycles = 0;
-		} else {
-			interruptionCycles = cycles;
-		}
+		interruptionCycles = Math.max(0, cycles);
 	}
 
 	public RegenerationPercentBoss(final Plugin plugin, final LivingEntity boss) {
@@ -66,8 +61,9 @@ public class RegenerationPercentBoss extends BossAbilityGroup {
 		// need to take Chiinox's Reflexes code to make Panacea tick 1 count as interruption
 		ClassAbility.PANACEA,
 		ClassAbility.BRUTAL_ALCHEMY,
-		ClassAbility.CURSED_WOUND,
+		ClassAbility.CURSED_WOUND_DOT,
 		ClassAbility.SANCTIFIED_ARMOR,
+		ClassAbility.WITHERING_GAZE,
 		ClassAbility.INFERNO
 	);
 
