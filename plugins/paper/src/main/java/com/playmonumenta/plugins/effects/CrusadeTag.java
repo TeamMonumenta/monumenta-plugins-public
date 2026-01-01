@@ -1,32 +1,21 @@
 package com.playmonumenta.plugins.effects;
 
-import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.particle.PartialParticle;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.CrusadeCS;
 import org.bukkit.entity.Entity;
 
 public class CrusadeTag extends ZeroArgumentEffect {
 	public static final String effectID = "CrusadeSlayerTag";
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(252, 211, 3), 1.0f);
+	private final CrusadeCS mCosmetic;
 
-	public CrusadeTag(int duration) {
+	public CrusadeTag(int duration, CrusadeCS cosmetic) {
 		super(duration, effectID);
+		mCosmetic = cosmetic;
 	}
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
-		Location loc = entity.getLocation().add(0, entity.getHeight() + 0.6, 0);
-		new PartialParticle(Particle.REDSTONE, loc, 20, 0.01, 0.35, 0.01, COLOR).spawnAsEnemyBuff();
-		new PartialParticle(Particle.REDSTONE, loc.add(0, 0.2, 0), 20, 0.175, 0.01, 0.01, COLOR).spawnAsEnemyBuff();
+		mCosmetic.crusadeTag(entity);
 	}
-
-	public CrusadeTag deserialize(JsonObject object) {
-		int duration = object.get("duration").getAsInt();
-		return new CrusadeTag(duration);
-	}
-
 
 	@Override
 	public boolean isDebuff() {

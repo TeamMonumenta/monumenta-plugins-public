@@ -76,6 +76,7 @@ public enum ClassAbility {
 	ILLUMINATE_DOT("Illuminate DoT"),
 	TOUCH_OF_RADIANCE("Touch of Radiance"),
 	HEAVENLY_BOON("Heavenly Boon"),
+	CRUSADE("Crusade"),
 
 	// Hierophant
 	ETHEREAL_ASCENSION("Ethereal Ascension"),

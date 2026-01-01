@@ -5,7 +5,10 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Cleric;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.CrusadeCS;
 import com.playmonumenta.plugins.effects.CrusadeTag;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -24,15 +27,19 @@ public class Crusade extends Ability {
 
 	public static final AbilityInfo<Crusade> INFO =
 		new AbilityInfo<>(Crusade.class, "Crusade", Crusade::new)
+			.linkedSpell(ClassAbility.CRUSADE)
 			.description(getDescription())
 			.canUse(player -> AbilityUtils.getClassNum(player) == Cleric.CLASS_ID)
 			.displayItem(Material.WOODEN_SWORD);
 
 	private final int mDuration;
+	public final CrusadeCS mCosmetic;
 
 	public Crusade(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TAG_DURATION);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CrusadeCS());
 	}
 
 	@Override
@@ -51,7 +58,7 @@ public class Crusade extends Ability {
 
 	private void addCrusadeTag(LivingEntity enemy) {
 		if (!EntityUtils.isUndead(enemy) && !EntityUtils.isHumanlike(enemy)) {
-			mPlugin.mEffectManager.addEffect(enemy, "CrusadeTag", new CrusadeTag(mDuration));
+			mPlugin.mEffectManager.addEffect(enemy, "CrusadeTag", new CrusadeTag(mDuration, mCosmetic));
 		}
 	}
 
