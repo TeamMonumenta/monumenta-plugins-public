@@ -287,6 +287,18 @@ public class ItemUpdateHelper {
 					if (infusion == null) {
 						continue;
 					}
+					if (type == InfusionType.AMMUNITION) {
+						String preferredName = ItemStatUtils.getQuiverArrowPreferenceName(item);
+						Component preferredLabel = preferredName == null || preferredName.isBlank()
+							? Component.text("No Preference Set", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
+							: Component.text(preferredName, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
+						Component display = type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY))
+							.append(Component.text(" (Loading ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false))
+							.append(preferredLabel)
+							.append(Component.text(")", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+						infusionMap.put(type, display);
+						continue;
+					}
 					if (type.isStatTrackOption()) {
 						if (type == InfusionType.STAT_TRACK_DEATH && ItemUtils.isShulkerBox(item.getType())) {
 							// Easter egg: Times Dyed for shulker boxes
