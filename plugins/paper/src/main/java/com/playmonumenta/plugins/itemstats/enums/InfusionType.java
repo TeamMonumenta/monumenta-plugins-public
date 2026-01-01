@@ -62,6 +62,7 @@ public enum InfusionType {
 	// Other Added Tags
 	LOCKED(new Locked(), "", false, false, false, false, false, false, false, false),
 	ENLIGHTENING(new Enlightening(), "", false, false, false, false, true, false, false, false),
+	HEARTWARMING(new Heartwarming(), "", false, false, false, false, true, false, false, false),
 	BARKING(new Barking(), "", true, false, true, false, false, false, false, false),
 	DEBARKING(new Debarking(), "", false, false, false, false, false, false, false, false),
 	RUSTWORTHY(new Rustworthy(), "", true, true, false, false, false, false, false, false),

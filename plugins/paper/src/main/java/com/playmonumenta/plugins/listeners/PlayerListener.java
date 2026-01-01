@@ -115,6 +115,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -1714,6 +1715,13 @@ public class PlayerListener implements Listener {
 		}
 
 		mPlugin.mItemStatManager.onBlockBreak(mPlugin, player, event);
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void blockDropItemEvent(BlockDropItemEvent event) {
+		Player player = event.getPlayer();
+
+		mPlugin.mItemStatManager.onBlockDropItem(mPlugin, player, event);
 	}
 
 	@EventHandler(ignoreCancelled = true)

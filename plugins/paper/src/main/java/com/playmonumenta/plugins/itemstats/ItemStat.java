@@ -13,6 +13,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -182,6 +183,18 @@ public interface ItemStat {
 	 * @param event  the associated BlockBreakEvent
 	 */
 	default void onBlockBreak(Plugin plugin, Player player, double value, BlockBreakEvent event) {
+
+	}
+
+	/**
+	 * Items dropped from a block a player broke
+	 *
+	 * @param plugin monumenta plugin
+	 * @param player the Player who broke the block
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated BlockDropItemEvent
+	 */
+	default void onBlockDropItem(Plugin plugin, Player player, double value, BlockDropItemEvent event) {
 
 	}
 

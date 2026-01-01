@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -63,9 +64,12 @@ import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BookMeta;
@@ -1824,8 +1828,32 @@ public class ItemUtils {
 			return null;
 		}
 
-		ReadableNBTList<ReadWriteNBT> itemStacks = blockEntityTag.getCompoundList("Items");
-		return itemStacks;
+		return blockEntityTag.getCompoundList("Items");
+	}
+
+	public static @Nullable ItemStack getFurnaceResult(@Nullable ItemStack toSmelt) {
+		if (toSmelt == null || isNullOrAir(toSmelt)) {
+			return null;
+		}
+
+		if (!ItemStatUtils.isMaterial(toSmelt) && hasLore(toSmelt)) {
+			return null;
+		}
+
+		Iterator<Recipe> it = Bukkit.recipeIterator();
+		while (it.hasNext()) {
+			Recipe recipe = it.next();
+			if (!(recipe instanceof FurnaceRecipe furnaceRecipe)) {
+				continue;
+			}
+
+			RecipeChoice recipeChoice = furnaceRecipe.getInputChoice();
+			if (recipeChoice.test(toSmelt)) {
+				return furnaceRecipe.getResult();
+			}
+		}
+
+		return null;
 	}
 
 	public static void addPlainLoreLine(ItemStack item, String line) {
