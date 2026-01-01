@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.cosmetics.skills.warrior.guardian;
 
+import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
+import com.playmonumenta.plugins.particle.PPParametric;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.DisplayEntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -11,7 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 public class ShieldWallCS implements CosmeticSkill {
 
@@ -36,8 +39,31 @@ public class ShieldWallCS implements CosmeticSkill {
 		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 70, 0, 0, 0, 0.3f).spawnAsPlayerActive(player);
 	}
 
-	public ItemStack shieldItem() {
-		return DisplayEntityUtils.generateRPItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE, "Shield Wall");
+	public void wallParticles(Player player, Location center, double radius, double angle, double height) {
+		for (int y = -1; y <= height; y++) {
+			int y2 = y;
+			new PPParametric(baseParticle(), center, (parameter, packagedValues) -> {
+				double theta = Math.toRadians(angle * (parameter - 0.5));
+				Vector vec = new Vector(-FastUtils.sin(theta) * radius, -1, FastUtils.cos(theta) * radius);
+				vec = VectorUtils.rotateYAxis(vec, center.getYaw());
+				Location l = center.clone().add(vec).add(0, y2 + 0.5, 0);
+				packagedValues.location(l);
+				packagedValues.particle(replaceParticle(parameter, y2 / height));
+			})
+				.count((int) (15 * angle * radius / (ShieldWall.SHIELD_WALL_ANGLE * ShieldWall.SHIELD_WALL_RADIUS)))
+				.delta(0.03, 0.05, 0.03)
+				.extra(1000000)
+				.includeEnd(angle < 360)
+				.spawnAsPlayerActive(player);
+		}
+	}
+
+	public Particle baseParticle() {
+		return Particle.ELECTRIC_SPARK;
+	}
+
+	public Particle replaceParticle(double angleRatio, double heightRatio) {
+		return baseParticle();
 	}
 
 	public void shieldOnBlock(World world, Location eLoc, Player player) {

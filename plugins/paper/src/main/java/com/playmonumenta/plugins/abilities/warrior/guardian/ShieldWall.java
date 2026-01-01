@@ -18,27 +18,19 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Transformation;
-import org.joml.AxisAngle4f;
-import org.joml.Vector3f;
 
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
@@ -57,11 +49,6 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	public static final double SHIELD_WALL_RADIUS_STATIONARY = 4;
 	private static final int SHIELD_WALL_HEIGHT = 5;
 	private static final String ON_HIT_EFFECT = "ShieldWallHitCooldownEffect";
-
-	private static final double SECTOR_ANGLE = 45;
-	private static final double COS_BASE_ANGLE = FastUtils.cosDeg(67.5);
-	private static final double SIN_BASE_ANGLE = FastUtils.sinDeg(67.5);
-	private static final float VISUAL_MARGIN = 2;
 
 	public static final String CHARM_DURATION = "Shield Wall Duration";
 	public static final String CHARM_DAMAGE = "Shield Wall Damage";
@@ -96,7 +83,6 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	private final double mRadiusStationary;
 	private final ShieldWallCS mCosmetic;
 
-	private final List<Display> mDisplays = new ArrayList<>();
 	private int mCurrDuration = -1;
 
 	private boolean mDeposited = false;
@@ -119,7 +105,6 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 				return false;
 			}
 			mDeposited = true;
-			mDisplays.forEach(this::depositWallExpansion);
 			return true;
 		}
 		mDeposited = deposit;
@@ -127,7 +112,6 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
 		mCosmetic.shieldStartEffect(world, mPlayer, loc, SHIELD_WALL_RADIUS);
-		createDisplays();
 		putOnCooldown();
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
@@ -152,8 +136,8 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 				double radius = mDeposited ? mRadiusStationary : mRadius;
 
 				Hitbox hitbox = Hitbox.approximateHollowCylinderSegment(mLoc.clone().add(0, -1, 0), mHeight + 1, 0.7 * radius - 0.5, 1.15 * radius, Math.toRadians(mAngle) / 2);
-				mLoc.setPitch(0);
-				mDisplays.forEach(display -> display.teleport(mLoc));
+
+				mCosmetic.wallParticles(mPlayer, mLoc, radius, mAngle, mHeight);
 
 				List<Projectile> projectiles = hitbox.getHitEntitiesByClass(Projectile.class);
 				for (Projectile proj : projectiles) {
@@ -197,74 +181,11 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 			public synchronized void cancel() {
 				super.cancel();
 				mCurrDuration = -1;
-
-				mDisplays.forEach(Entity::remove);
-				mDisplays.clear();
-
 				ClientModHandler.updateAbility(mPlayer, ShieldWall.this);
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
 
 		return true;
-	}
-
-	private void createDisplays() {
-		int n = Math.min((int) Math.round((mAngle / 2 - (SECTOR_ANGLE / 2)) / SECTOR_ANGLE), 3);
-		boolean createBack = mAngle >= 360;
-
-		summonDisplay(0);
-		if (createBack) {
-			summonDisplay(180);
-		}
-		for (int i = 1; i <= n; i++) {
-			int angle = 45 * i;
-			summonDisplay(angle);
-			summonDisplay(-angle);
-		}
-	}
-
-	private void summonDisplay(int angle) {
-		World world = mPlayer.getWorld();
-		Location playerLoc = mPlayer.getLocation();
-		playerLoc.setPitch(0);
-		float angleRadians = (float) Math.toRadians(angle);
-		float visualHeight = (float) mHeight - VISUAL_MARGIN;
-
-		ItemDisplay itemDisplay = world.spawn(playerLoc, ItemDisplay.class, display -> {
-			display.setItemStack(mCosmetic.shieldItem());
-			display.setTransformation(new Transformation(
-				new Vector3f(0, visualHeight / 2, (float) (mRadius * SIN_BASE_ANGLE)).rotateY(angleRadians),
-				new AxisAngle4f(angleRadians, 0, 1, 0),
-				new Vector3f((float) (2 * mRadius * COS_BASE_ANGLE), visualHeight, 1.0f),
-				new AxisAngle4f()
-			));
-			display.setTeleportDuration(1);
-
-			EntityUtils.setRemoveEntityOnUnload(display);
-		});
-		mDisplays.add(itemDisplay);
-	}
-
-	private void depositWallExpansion(Display itemDisplay) {
-		Transformation oldTransformation = itemDisplay.getTransformation();
-		Vector3f oldTranslation = oldTransformation.getTranslation();
-		Vector3f oldScale = oldTransformation.getScale();
-		float ratio = (float) (mRadiusStationary / mRadius);
-
-		itemDisplay.setTransformation(new Transformation(
-			new Vector3f(
-				oldTranslation.x * ratio,
-				oldTranslation.y,
-				oldTranslation.z * ratio
-			),
-			oldTransformation.getLeftRotation(),
-			new Vector3f(
-				oldScale.x * ratio,
-				oldScale.y,
-				oldScale.z
-			),
-			oldTransformation.getRightRotation()
-		));
 	}
 
 	@Override
