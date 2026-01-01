@@ -60,6 +60,7 @@ public enum InfusionType {
 	VENGEFUL(new Vengeful(), "", true, false, false, false, true, true, true, false),
 
 	// Other Added Tags
+	AMMUNITION(new Ammunition(), "", false, false, false, false, false, false, false, false),
 	LOCKED(new Locked(), "", false, false, false, false, false, false, false, false),
 	ENLIGHTENING(new Enlightening(), "", false, false, false, false, true, false, false, false),
 	HEARTWARMING(new Heartwarming(), "", false, false, false, false, true, false, false, false),
