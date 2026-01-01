@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics.skills.warrior.guardian;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
 import org.bukkit.Color;
@@ -13,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,13 +96,8 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	}
 
 	@Override
-	public Particle baseParticle() {
-		return Particle.WAX_ON;
-	}
-
-	@Override
-	public Particle replaceParticle(double angleRatio, double heightRatio) {
-		return Math.abs(1 - (Math.abs(angleRatio - 0.5) * 2) - heightRatio) <= 0.2 ? Particle.FIREWORKS_SPARK : baseParticle();
+	public ItemStack shieldItem() {
+		return DisplayEntityUtils.generateRPItem(Material.WHITE_STAINED_GLASS_PANE, "Prestigious Shield");
 	}
 
 	@Override
