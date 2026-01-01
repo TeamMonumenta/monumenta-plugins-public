@@ -533,7 +533,8 @@ public class EntityListener implements Listener {
 				// Check if the player has an infinity snowball and not throw rate
 				if (itemInMainHand.getType().equals(Material.SNOWBALL)
 					&& (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0 || ItemStatUtils.hasEnchantment(itemInMainHand, EnchantmentType.INFINITY))
-					&& ItemStatUtils.getAttributeAmount(itemInMainHand, AttributeType.THROW_RATE, Operation.ADD, Slot.MAINHAND) == 0) {
+					&& ItemStatUtils.getAttributeAmount(itemInMainHand, AttributeType.THROW_RATE, Operation.ADD, Slot.MAINHAND) == 0
+					&& !ItemStatUtils.hasEnchantment(itemInMainHand, EnchantmentType.CONSUMPTION)) {
 					Snowball newBall = (Snowball) origBall.getWorld().spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 
 					// Copy the item's name/etc. so it can be textured

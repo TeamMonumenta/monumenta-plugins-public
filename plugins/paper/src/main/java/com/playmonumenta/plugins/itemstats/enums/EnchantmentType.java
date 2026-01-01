@@ -148,6 +148,7 @@ public enum EnchantmentType {
 	CURSE_OF_EPHEMERALITY(new CurseOfEphemerality(), true, true, true, false),
 	CURSE_OF_SHRAPNEL(new CurseOfShrapnel(), true, true, false, false),
 	CURSE_OF_THE_VEIL(new CurseOfTheVeil(), true, true, false, false),
+	CONSUMPTION(new Consumption(), false, true, false, false),
 	TWO_HANDED(new TwoHanded(), false, true, false, false),
 	UNDROPPABLE(new Undroppable(), false, true, false, false),
 	INEPTITUDE(new Ineptitude(), true, true, false, false),
