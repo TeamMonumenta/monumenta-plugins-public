@@ -43,13 +43,9 @@ public class Expedite implements Infusion {
 			if (oldEffects != null && !oldEffects.isEmpty()) {
 				Effect oldEffect = oldEffects.last();
 				int oldStacks = (int) Math.round(oldEffect.getMagnitude() / percentSpeed);
-				if (oldStacks >= MAX_STACKS) {
-					oldEffect.setDuration(DURATION);
-				} else {
-					oldEffect.clearEffect();
-					plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed * (oldStacks + 1), PERCENT_SPEED_EFFECT_NAME));
-					AbilityUtils.playPassiveAbilitySound(player, player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
-				}
+				oldEffect.clearEffect();
+				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed * Math.min(oldStacks + 1, MAX_STACKS), PERCENT_SPEED_EFFECT_NAME));
+				AbilityUtils.playPassiveAbilitySound(player, player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
 			} else {
 				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, percentSpeed, PERCENT_SPEED_EFFECT_NAME));
 				AbilityUtils.playPassiveAbilitySound(player, player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.1f, 1.0f);
