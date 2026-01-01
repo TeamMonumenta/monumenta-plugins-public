@@ -15,7 +15,12 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Chaotic;
+import com.playmonumenta.plugins.itemstats.enchantments.Duelist;
+import com.playmonumenta.plugins.itemstats.enchantments.HexEater;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
+import com.playmonumenta.plugins.itemstats.enchantments.Slayer;
+import com.playmonumenta.plugins.itemstats.enchantments.Smite;
 import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -37,6 +42,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Stray;
+import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.Nullable;
@@ -141,8 +147,21 @@ public class ElementalArrows extends Ability {
 		if (bonusEntity.isInstance(enemy)) {
 			targetDamage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
 		}
+		// PB / Sniper
 		targetDamage += PointBlank.apply(mPlayer, enemy, playerItemStats.getItemStats().get(EnchantmentType.POINT_BLANK));
 		targetDamage += Sniper.apply(mPlayer, enemy, playerItemStats.getItemStats().get(EnchantmentType.SNIPER));
+
+		// Spec Enchants (only tridents)
+		if (event.getDamager() instanceof Trident) {
+			targetDamage += Smite.calculateSmiteDamage(true, mPlayer, playerItemStats.getItemStats().get(EnchantmentType.SMITE), enemy);
+			targetDamage += Slayer.calculateSlayerDamage(true, mPlayer, playerItemStats.getItemStats().get(EnchantmentType.SLAYER), enemy);
+			targetDamage += Duelist.calculateDuelistDamage(true, mPlayer, playerItemStats.getItemStats().get(EnchantmentType.DUELIST), enemy);
+		}
+
+		// Hex / Chaos
+		targetDamage += HexEater.calculateHexDamage(mPlugin, true, mPlayer, playerItemStats.getItemStats().get(EnchantmentType.HEX_EATER), enemy);
+		targetDamage += Chaotic.calculateChaoticDamage(true, mPlayer, playerItemStats.getItemStats().get(EnchantmentType.CHAOTIC), enemy);
+
 		if (thunder) {
 			targetDamage *= 1 + ENHANCED_DAMAGE_MULTIPLIER;
 		}

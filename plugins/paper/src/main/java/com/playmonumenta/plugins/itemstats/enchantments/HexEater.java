@@ -59,7 +59,7 @@ public class HexEater implements Enchantment {
 		}
 	}
 
-	public static double calculateHexDamage(Plugin plugin, boolean isProjectile, Player player, int level, LivingEntity target) {
+	public static double calculateHexDamage(Plugin plugin, boolean isProjectile, Player player, double level, LivingEntity target) {
 		if (level > 0) {
 			List<PotionEffectType> e = PotionUtils.getNegativeEffects(plugin, target);
 			int effects = e.size();
