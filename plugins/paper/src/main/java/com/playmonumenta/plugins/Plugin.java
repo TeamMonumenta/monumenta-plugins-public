@@ -378,6 +378,7 @@ public class Plugin extends JavaPlugin {
 		CloseInventoryCommand.register();
 		HuntsCommand.register(this);
 		FunctionCooldownCommand.register();
+		RotateCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
