@@ -1055,6 +1055,7 @@ public class ParticleUtils {
 
 	/**
 	 * Adaptation of Infernal Flames' code for tendrils.
+	 * <code>minDuration</code> CANNOT be equal to <code>maxDuration</code>, for a fixed duration tendril set max to be 1 more than min.
 	 */
 	public static void spawnTendril(Location loc, LivingEntity particleOwner, int minDuration, int maxDuration, int iterations, double height, float sizeMultiplier, Color baseColor, Color tipColor) {
 		Location to = loc.clone().add(0, height, 0);

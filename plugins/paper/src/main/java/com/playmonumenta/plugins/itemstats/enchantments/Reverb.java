@@ -157,7 +157,7 @@ public class Reverb implements Enchantment {
 
 						// When the animation is done:
 						if (mTicks >= mBoltDurations) {
-							new PartialParticle(Particle.SOUL, targetLocation, 25, 0.3, 0.3, 0.3, 0.05).spawnAsEnemy();
+							new PartialParticle(Particle.SOUL, targetLocation, 25, 0.3, 0.3, 0.3, 0.05).spawnAsPlayerActive(player);
 							world.playSound(targetLocation, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 0.8f, 0.4f);
 							world.playSound(targetLocation, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 1.3f, 1.6f);
 							world.playSound(targetLocation, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 0.6f);
