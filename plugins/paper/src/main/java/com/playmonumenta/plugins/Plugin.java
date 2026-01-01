@@ -617,7 +617,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(MailMan.getInstance(), this);
 		manager.registerEvents(new GuiListener(), this);
 		manager.registerEvents(mHuntsManager, this);
-		PlayerTitleManager.start();
+		PlayerTitleManager.getInstance().onEnable(this, manager);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);
@@ -873,6 +873,7 @@ public class Plugin extends JavaPlugin {
 		mBossManager.unloadAll(true);
 		MonumentaNetworkRelayIntegration.disable();
 		MetadataUtils.removeAllMetadata(this);
+		PlayerTitleManager.getInstance().onDisable();
 
 		// Log any async threads that haven't finished yet; these need to be handled before this point!
 		for (BukkitWorker worker : Bukkit.getScheduler().getActiveWorkers()) {

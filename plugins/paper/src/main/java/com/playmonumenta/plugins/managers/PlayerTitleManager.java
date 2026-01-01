@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.managers;
 
-import com.destroystokyo.paper.event.server.ServerTickStartEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
@@ -11,6 +10,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import io.papermc.paper.event.player.PlayerTrackEntityEvent;
 import io.papermc.paper.event.player.PlayerUntrackEntityEvent;
@@ -34,13 +34,49 @@ import org.bukkit.entity.Pose;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerTitleManager implements Listener {
-	public static void start() {
-		Plugin.getInstance().getServer().getPluginManager().registerEvents(new PlayerTitleManager(), Plugin.getInstance());
+	private static @Nullable PlayerTitleManager INSTANCE = null;
+	private @Nullable BukkitRunnable mHealthChangeRunnable = null;
+
+	private PlayerTitleManager() {
 	}
 
-	public PlayerTitleManager() {
+	public static PlayerTitleManager getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new PlayerTitleManager();
+		}
+		return INSTANCE;
+	}
+
+	public void onEnable(Plugin plugin, PluginManager manager) {
+		if (mHealthChangeRunnable != null) {
+			MMLog.severe("The Player Title Manager appears to have been enabled twice somehow");
+			mHealthChangeRunnable.cancel();
+		}
+
+		manager.registerEvents(new PlayerTitleManager(), plugin);
+		mHealthChangeRunnable = new BukkitRunnable() {
+			@Override
+			public void run() {
+				try {
+					handlePlayerHealthChanges();
+				} catch (Exception ex) {
+					MMLog.severe("Caught exception handling player health changes, somehow: ", ex);
+				}
+			}
+		};
+		mHealthChangeRunnable.runTaskTimer(plugin, 0, 4);
+	}
+
+	public void onDisable() {
+		if (mHealthChangeRunnable != null) {
+			mHealthChangeRunnable.cancel();
+			mHealthChangeRunnable = null;
+		}
 	}
 
 	private static final float MAGIC_HEIGHT_START = 0.0f;
@@ -258,15 +294,11 @@ public class PlayerTitleManager implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = false)
-	public void playerHealthChangeEvent(ServerTickStartEvent event) {
-		final int tick = event.getTickNumber();
-		if (tick % 4 == 0) {
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				NameTag nameTag = trackedEntities.get(player.getUniqueId());
-				if (nameTag != null) {
-					nameTag.update(player);
-				}
+	public void handlePlayerHealthChanges() {
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			NameTag nameTag = trackedEntities.get(player.getUniqueId());
+			if (nameTag != null) {
+				nameTag.update(player);
 			}
 		}
 	}
