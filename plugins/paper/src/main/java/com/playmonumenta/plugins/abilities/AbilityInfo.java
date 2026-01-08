@@ -514,6 +514,11 @@ public class AbilityInfo<T extends Ability> {
 				descriptions.add(MessagingUtils.plainText(description));
 			}
 			info.add("descriptions", descriptions);
+			JsonArray formattedDescriptions = new JsonArray();
+			for (Component description : descriptionList) {
+				formattedDescriptions.add(MessagingUtils.toGson(description));
+			}
+			info.add("formattedDescriptions", formattedDescriptions);
 		}
 		if (!mTriggers.isEmpty()) {
 			JsonArray descriptions = new JsonArray();
