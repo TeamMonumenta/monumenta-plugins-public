@@ -433,7 +433,7 @@ public class QuiverListener implements Listener {
 		if (!(event.getWhoClicked() instanceof Player player)) {
 			return;
 		}
-		if (!(event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SWAP_OFFHAND)) {
+		if (event.getClick() != ClickType.RIGHT) {
 			return;
 		}
 		if (!(event.getClickedInventory() instanceof PlayerInventory)) {
@@ -446,7 +446,8 @@ public class QuiverListener implements Listener {
 		if (!isProjectileWeapon(item) || !ItemStatUtils.hasInfusion(item, InfusionType.AMMUNITION)) {
 			return;
 		}
-		if (event.getClick() == ClickType.SWAP_OFFHAND) {
+		ItemStack cursor = event.getCursor();
+		if (ItemUtils.isNullOrAir(cursor)) {
 			ItemStatUtils.setQuiverArrowPreference(item, null);
 			ItemUpdateHelper.generateItemStats(item);
 			player.sendMessage(Component.text("Preferred arrow cleared.", NamedTextColor.GOLD));
@@ -454,7 +455,6 @@ public class QuiverListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
-		ItemStack cursor = event.getCursor();
 		if (!ItemUtils.isArrow(cursor) || ItemStatUtils.isQuiver(cursor)) {
 			return;
 		}
