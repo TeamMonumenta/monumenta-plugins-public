@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.bluestrike.SpellCraftDaggerAnimation;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
@@ -139,7 +140,7 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 		int reqShards = mSamwellAbility.mShardsReq - mSamwellAbility.getShards();
 
 		for (ItemStack itemStack : player.getInventory()) {
-			if (itemStack != null && itemStack.isSimilar(mSamwellAbility.mShards)) {
+			if (itemStack != null && ItemUtils.getPlainName(itemStack).equals(ItemUtils.getPlainName(mSamwellAbility.mShards))) {
 				int amount = itemStack.getAmount();
 				if (reqShards > amount) {
 					mSamwellAbility.addShards(amount);

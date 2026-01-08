@@ -778,7 +778,7 @@ public class Samwell extends BossAbilityGroup {
 	}
 
 	public boolean isBossItem(ItemStack itemStack) {
-		return (itemStack != null) && (ItemUtils.getPlainName(itemStack).equals(ItemUtils.getPlainName(mDagger)) || itemStack.isSimilar(mShards));
+		return (itemStack != null) && (ItemUtils.getPlainName(itemStack).equals(ItemUtils.getPlainName(mDagger)) || ItemUtils.getPlainName(itemStack).equals(ItemUtils.getPlainName(mShards)));
 	}
 
 	public boolean isDaggerItem(ItemStack itemStack) {
