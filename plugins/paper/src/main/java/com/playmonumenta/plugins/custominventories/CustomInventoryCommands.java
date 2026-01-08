@@ -21,6 +21,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import java.util.ArrayList;
@@ -417,6 +418,16 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openenchantexplanations.self")
 			.executesPlayer((player, args) -> {
 				new EnchantopediaGui(player).open();
+			})
+			.register();
+		new CommandAPICommand("openenchantexplanations")
+			.withAliases("enchantments", "enchants")
+			.withPermission("monumenta.command.openenchantexplanations.self")
+			.withArguments(
+				new GreedyStringArgument("query")
+			)
+			.executesPlayer((player, args) -> {
+				EnchantopediaGui.enchantmentSearchCommand(player, args.getUnchecked("query"));
 			})
 			.register();
 		new CommandAPICommand("openenchantexplanationsfor")
