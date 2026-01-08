@@ -39,7 +39,7 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
-	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg) {
+	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg, boolean causeKnockback, boolean bypassIFrames) {
 		damagee.damage(amount, damager);
 	}
 

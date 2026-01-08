@@ -19,7 +19,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class DamageUtils {
@@ -195,13 +194,6 @@ public class DamageUtils {
 			originalAttackCooldown = NmsUtils.getVersionAdapter().getAttackCooldown(damager);
 		}
 
-		int originalIFrames = damagee.getNoDamageTicks();
-		double originalLastDamage = damagee.getLastDamage();
-		Vector originalVelocity = damagee.getVelocity();
-		if (bypassIFrames) {
-			damagee.setNoDamageTicks(0);
-		}
-
 		Plugin plugin = Plugin.getInstance();
 		double amountFinal = amount;
 		if (damager instanceof Player) {
@@ -210,19 +202,9 @@ public class DamageUtils {
 
 		nextEventMetadata = metadata;
 		try {
-			NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, amountFinal, blockable, metadata.getBossSpellName());
+			NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, amountFinal, blockable, metadata.getBossSpellName(), causeKnockback, bypassIFrames);
 		} finally {
 			nextEventMetadata = null;
-
-			if (bypassIFrames) {
-				damagee.setNoDamageTicks(originalIFrames);
-				damagee.setLastDamage(originalLastDamage);
-			}
-
-			if (!causeKnockback) {
-				damagee.setVelocity(originalVelocity);
-			}
-
 			if (damager != null) {
 				NmsUtils.getVersionAdapter().setAttackCooldown(damager, originalAttackCooldown);
 			}
