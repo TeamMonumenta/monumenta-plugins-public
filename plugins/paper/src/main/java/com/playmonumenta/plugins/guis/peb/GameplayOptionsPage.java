@@ -64,8 +64,8 @@ final class GameplayOptionsPage extends PebPage {
 		}
 
 		private static EliteFinisherSelfSetting get(Player player) {
-			boolean glow = ScoreboardUtils.checkTag(player, EliteFinishers.FINISHER_GLOW_TAG);
-			boolean show = ScoreboardUtils.checkTag(player, EliteFinishers.FINISHER_SHOW_TAG);
+			boolean glow = !ScoreboardUtils.checkTag(player, EliteFinishers.FINISHER_NO_GLOW_TAG);
+			boolean show = !ScoreboardUtils.checkTag(player, EliteFinishers.FINISHER_NO_SHOW_TAG);
 
 			return Arrays.stream(values())
 				.filter(x -> x.mShow == show && x.mGlow == glow)
@@ -75,15 +75,15 @@ final class GameplayOptionsPage extends PebPage {
 
 		private void set(Player player) {
 			final var tags = player.getScoreboardTags();
-			tags.remove(EliteFinishers.FINISHER_GLOW_TAG);
-			tags.remove(EliteFinishers.FINISHER_SHOW_TAG);
+			tags.remove(EliteFinishers.FINISHER_NO_GLOW_TAG);
+			tags.remove(EliteFinishers.FINISHER_NO_SHOW_TAG);
 
-			if (mGlow) {
-				tags.add(EliteFinishers.FINISHER_GLOW_TAG);
+			if (!mGlow) {
+				tags.add(EliteFinishers.FINISHER_NO_GLOW_TAG);
 			}
 
-			if (mShow) {
-				tags.add(EliteFinishers.FINISHER_SHOW_TAG);
+			if (!mShow) {
+				tags.add(EliteFinishers.FINISHER_NO_SHOW_TAG);
 			}
 		}
 	}
