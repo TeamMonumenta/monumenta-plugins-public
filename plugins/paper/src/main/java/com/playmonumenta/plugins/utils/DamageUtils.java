@@ -194,6 +194,12 @@ public class DamageUtils {
 			originalAttackCooldown = NmsUtils.getVersionAdapter().getAttackCooldown(damager);
 		}
 
+		int originalIFrames = damagee.getNoDamageTicks();
+		double originalLastDamage = damagee.getLastDamage();
+		if (bypassIFrames) {
+			damagee.setNoDamageTicks(0);
+		}
+
 		Plugin plugin = Plugin.getInstance();
 		double amountFinal = amount;
 		if (damager instanceof Player) {
@@ -205,6 +211,13 @@ public class DamageUtils {
 			NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, amountFinal, blockable, metadata.getBossSpellName(), causeKnockback, bypassIFrames);
 		} finally {
 			nextEventMetadata = null;
+
+			// usb: this is needed because we check NoDamageTicks elsewhere other than inside mixins
+			if (bypassIFrames) {
+				damagee.setNoDamageTicks(originalIFrames);
+				damagee.setLastDamage(originalLastDamage);
+			}
+
 			if (damager != null) {
 				NmsUtils.getVersionAdapter().setAttackCooldown(damager, originalAttackCooldown);
 			}
