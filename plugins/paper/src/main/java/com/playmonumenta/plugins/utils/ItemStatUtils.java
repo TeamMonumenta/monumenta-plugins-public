@@ -81,6 +81,7 @@ public class ItemStatUtils {
 	public static final String CUSTOM_INVENTORY_ITEMS_PER_TYPE_LIMIT_KEY = "CustomInventoryItemsPerTypeLimit";
 	public static final String IS_QUIVER_KEY = "IsQuiver";
 	public static final String QUIVER_ARROW_TRANSFORM_MODE_KEY = "ArrowTransformMode";
+	public static final String AMMUNITION_PREFERRED_ARROW_NAME_KEY = "PreferredArrowName";
 	public static final String CHARGES_KEY = "Charges";
 	public static final String ITEMS_KEY = "Items";
 	public static final String VANITY_ITEMS_KEY = "VanityItems";
@@ -1384,6 +1385,45 @@ public class ItemStatUtils {
 	public static QuiverListener.ArrowTransformMode getArrowTransformMode(ItemStack item) {
 		return NBT.get(item, nbt -> {
 			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + PLAYER_MODIFIED_KEY + "." + QUIVER_ARROW_TRANSFORM_MODE_KEY, QuiverListener.ArrowTransformMode.NONE);
+		});
+	}
+
+	public static void setQuiverArrowPreference(@Nullable ItemStack item, @Nullable ItemStack preferredArrow) {
+		if (ItemUtils.isNullOrAir(item) || !hasInfusion(item, InfusionType.AMMUNITION)) {
+			return;
+		}
+		NBT.modify(item, nbt -> {
+			ReadWriteNBT infusion = addPlayerModified(nbt)
+				.getOrCreateCompound(InfusionType.KEY)
+				.getOrCreateCompound(InfusionType.AMMUNITION.getName());
+			if (ItemUtils.isNullOrAir(preferredArrow)) {
+				infusion.removeKey(AMMUNITION_PREFERRED_ARROW_NAME_KEY);
+				return;
+			}
+			String preferenceName = ItemUtils.getPlainNameOrDefault(preferredArrow);
+			if (preferenceName == null || preferenceName.isBlank()) {
+				infusion.removeKey(AMMUNITION_PREFERRED_ARROW_NAME_KEY);
+				return;
+			}
+			infusion.setString(AMMUNITION_PREFERRED_ARROW_NAME_KEY, preferenceName);
+		});
+	}
+
+	public static @Nullable String getQuiverArrowPreferenceName(@Nullable ItemStack item) {
+		if (ItemUtils.isNullOrAir(item)) {
+			return null;
+		}
+		return NBT.get(item, nbt -> {
+			ReadableNBT infusions = getInfusions(nbt);
+			if (infusions == null) {
+				return null;
+			}
+			ReadableNBT infusion = infusions.getCompound(InfusionType.AMMUNITION.getName());
+			if (infusion == null) {
+				return null;
+			}
+			String stored = infusion.getString(AMMUNITION_PREFERRED_ARROW_NAME_KEY);
+			return stored == null || stored.isBlank() ? null : stored;
 		});
 	}
 

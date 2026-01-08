@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.inventories.CustomContainerItemGui;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Multiload;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -53,10 +54,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
@@ -255,7 +258,7 @@ public class QuiverListener implements Listener {
 				ArrowConsumeEvent arrowConsumeEvent = new ArrowConsumeEvent(player, item);
 				Bukkit.getPluginManager().callEvent(arrowConsumeEvent);
 				return !arrowConsumeEvent.isCancelled();
-			});
+			}, event.getBow());
 			if (projectile == null) {
 				event.setCancelled(true);
 				return;
@@ -326,7 +329,7 @@ public class QuiverListener implements Listener {
 				int numProjectiles = 1 + ItemStatUtils.getEnchantmentLevel(crossbow, EnchantmentType.MULTILOAD);
 
 				// Crossbows refund arrows when being shot instead of not consuming arrows when being loaded
-				Pair<ItemStack, Boolean> projectile = takeFromQuiver(player, quiver, numProjectiles, is -> true);
+				Pair<ItemStack, Boolean> projectile = takeFromQuiver(player, quiver, numProjectiles, is -> true, crossbow);
 				if (projectile == null) {
 					return;
 				}
@@ -353,7 +356,7 @@ public class QuiverListener implements Listener {
 		}
 	}
 
-	private @Nullable Pair<ItemStack, Boolean> takeFromQuiver(Player player, ItemStack quiver, int numProjectiles, Predicate<ItemStack> consumePredicate) {
+	private @Nullable Pair<ItemStack, Boolean> takeFromQuiver(Player player, ItemStack quiver, int numProjectiles, Predicate<ItemStack> consumePredicate, @Nullable ItemStack weapon) {
 		if (quiver.getAmount() != 1) {
 			player.sendMessage(Component.text("Cannot use stacked quivers!", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 1, 1);
@@ -361,6 +364,17 @@ public class QuiverListener implements Listener {
 		}
 		if (!getQuiverConfig(quiver).checkCanUse(player)) {
 			return null;
+		}
+		String preferredArrowName = getPreferredArrowNameFromWeapon(weapon);
+		if (preferredArrowName != null) {
+			boolean requireFullAmount = numProjectiles > 1;
+			if (!requireFullAmount || countInQuiver(quiver, preferredArrowName) >= numProjectiles) {
+				Pair<ItemStack, Boolean> preferredResult = CustomContainerItemManager.removeFirstFromContainer(quiver, numProjectiles,
+					item -> ItemUtils.isArrow(item) && ItemUtils.getPlainNameOrDefault(item).equals(preferredArrowName), consumePredicate);
+				if (preferredResult != null) {
+					return preferredResult;
+				}
+			}
 		}
 		Pair<ItemStack, Boolean> result = CustomContainerItemManager.removeFirstFromContainer(quiver, numProjectiles, ItemUtils::isArrow, consumePredicate);
 		if (result == null) {
@@ -371,11 +385,89 @@ public class QuiverListener implements Listener {
 		return result;
 	}
 
+	private @Nullable String getPreferredArrowNameFromWeapon(@Nullable ItemStack weapon) {
+		if (ItemUtils.isNullOrAir(weapon) || !ItemStatUtils.hasInfusion(weapon, InfusionType.AMMUNITION)) {
+			return null;
+		}
+		String preferredArrowName = ItemStatUtils.getQuiverArrowPreferenceName(weapon);
+		if (preferredArrowName == null || preferredArrowName.isBlank()) {
+			return null;
+		}
+		return preferredArrowName;
+	}
+
+	private long countInQuiver(ItemStack quiver, String preferredArrowName) {
+		return NBT.get(quiver, nbt -> {
+			ReadableNBTList<ReadWriteNBT> itemsList = ItemStatUtils.getItemList(nbt);
+			if (itemsList == null) {
+				return 0L;
+			}
+			for (ReadWriteNBT compound : itemsList) {
+				ItemStack containedItem = NBT.itemStackFromNBT(compound);
+				if (containedItem == null) {
+					continue;
+				}
+				NBT.modify(containedItem, ItemStatUtils::removePlayerModified);
+				if (!ItemUtils.isArrow(containedItem) || !ItemUtils.getPlainNameOrDefault(containedItem).equals(preferredArrowName)) {
+					continue;
+				}
+				ReadableNBT playerModified = ItemStatUtils.getPlayerModified(compound.getCompound("tag"));
+				if (playerModified == null) {
+					return 0L;
+				}
+				return playerModified.getLong(CustomContainerItemManager.AMOUNT_KEY);
+			}
+			return 0L;
+		});
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockPreDispenseEvent(BlockPreDispenseEvent event) {
 		if (event.getBlock().getType() == Material.DISPENSER && ItemStatUtils.isQuiver(event.getItemStack())) {
 			event.setCancelled(true);
 		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void inventoryClickEvent(InventoryClickEvent event) {
+		if (!(event.getWhoClicked() instanceof Player player)) {
+			return;
+		}
+		if (event.getClick() != ClickType.RIGHT) {
+			return;
+		}
+		if (!(event.getClickedInventory() instanceof PlayerInventory)) {
+			return;
+		}
+		ItemStack item = event.getCurrentItem();
+		if (ItemUtils.isNullOrAir(item) || item.getAmount() != 1) {
+			return;
+		}
+		if (!isProjectileWeapon(item) || !ItemStatUtils.hasInfusion(item, InfusionType.AMMUNITION)) {
+			return;
+		}
+		ItemStack cursor = event.getCursor();
+		if (ItemUtils.isNullOrAir(cursor)) {
+			ItemStatUtils.setQuiverArrowPreference(item, null);
+			ItemUpdateHelper.generateItemStats(item);
+			player.sendMessage(Component.text("Preferred arrow cleared.", NamedTextColor.GOLD));
+			player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.PLAYERS, 0.8f, 0.9f);
+			event.setCancelled(true);
+			return;
+		}
+		if (!ItemUtils.isArrow(cursor) || ItemStatUtils.isQuiver(cursor)) {
+			return;
+		}
+
+		ItemStatUtils.setQuiverArrowPreference(item, cursor);
+		ItemUpdateHelper.generateItemStats(item);
+		player.sendMessage(Component.text("Preferred arrow set to " + ItemUtils.getPlainNameOrDefault(cursor) + ".", NamedTextColor.GOLD));
+		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.PLAYERS, 0.8f, 1.2f);
+		event.setCancelled(true);
+	}
+
+	private boolean isProjectileWeapon(ItemStack item) {
+		return item.getType() == Material.BOW || item.getType() == Material.CROSSBOW;
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
