@@ -789,6 +789,27 @@ public class PlayerListener implements Listener {
 
 			/* Mark the item so it won't get shattered later */
 			event.getItem().addScoreboardTag("ShatterProcessed");
+
+			/* If item has a "special lore tag", assign the player's current world to it, if one isn't present yet
+			 * If one is present, check if the item's assigned world and the player's current world are the same.
+			 * If not the same, delete the item. */
+			if (Plugin.IS_PLAY_SERVER && InventoryUtils.containsSpecialLore(event.getItem().getItemStack())) {
+				if (player.getGameMode().equals(GameMode.CREATIVE)) {
+					/* Remove the world tag if the player is in creative; allows mods to give keys to people without possible issues */
+					if (ItemStatUtils.hasAssignedWorld(event.getItem().getItemStack())) {
+						ItemStatUtils.removeAssignedWorld(event.getItem().getItemStack());
+					}
+				} else {
+					String playerWorldName = player.getWorld().getName();
+					if (!ItemStatUtils.hasAssignedWorld(event.getItem().getItemStack())) {
+						ItemStatUtils.addAssignedWorld(event.getItem().getItemStack(), playerWorldName);
+					} else if (!ItemStatUtils.checkAssignedWorld(event.getItem().getItemStack(), playerWorldName)) {
+						player.sendMessage(Component.text("The dungeon key you picked up was in the wrong instance, and was removed!", NamedTextColor.RED));
+						event.setCancelled(true);
+						event.getItem().remove();
+					}
+				}
+			}
 		} else {
 			/* Non-player entities don't get to pick up items */
 			event.setCancelled(true);
@@ -816,6 +837,24 @@ public class PlayerListener implements Listener {
 		}
 
 		ItemStack item = event.getCurrentItem();
+		// If item has a "special lore tag", assign the player's current world to it, if one isn't present yet
+		if (Plugin.IS_PLAY_SERVER && item != null && InventoryUtils.containsSpecialLore(item)) {
+			if (player.getGameMode().equals(GameMode.CREATIVE)) {
+				// Remove the world tag if the player is in creative; allows mods to give keys to people without possible issues
+				if (ItemStatUtils.hasAssignedWorld(item)) {
+					ItemStatUtils.removeAssignedWorld(item);
+				}
+			} else {
+				String playerWorldName = player.getWorld().getName();
+				if (!ItemStatUtils.hasAssignedWorld(item)) {
+					ItemStatUtils.addAssignedWorld(item, playerWorldName);
+				} else if (ItemStatUtils.hasAssignedWorld(item) && !ItemStatUtils.checkAssignedWorld(item, playerWorldName)) {
+					player.sendMessage(Component.text("The dungeon key you tried to interact with was in the wrong instance, and was removed!", NamedTextColor.RED));
+					event.setCancelled(true);
+					item.setAmount(0);
+				}
+			}
+		}
 
 		// If item contains curse of ephemerality, prevent from putting in other inventories
 		// Checks for player inventory unless it's a shift click

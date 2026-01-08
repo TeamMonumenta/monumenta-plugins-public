@@ -61,6 +61,7 @@ public class ItemStatUtils {
 	public static final String LEGACY_LORE_KEY = "Lore";
 	public static final String STOCK_KEY = "Stock";
 	public static final String PLAYER_MODIFIED_KEY = "PlayerModified";
+	public static final String ASSIGNED_WORLD_KEY = "AssignedWorld";
 	public static final String LEVEL_KEY = "Level";
 	public static final String INFUSER_KEY = "Infuser";
 	public static final String INFUSER_NPC_KEY = "InfuserNpc";
@@ -808,6 +809,91 @@ public class ItemStatUtils {
 
 	public static boolean hasEnchantment(@Nullable ItemStack item, EnchantmentType type) {
 		return getEnchantmentLevel(item, type) > 0;
+	}
+
+	public static boolean hasAssignedWorld(final @Nullable ItemStack item) {
+		if (ItemUtils.isNullOrAir(item)) {
+			return false;
+		}
+		return NBT.get(item, nbt -> {
+			ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+			if (monumenta == null) {
+				return false;
+			}
+			ReadableNBT modified = monumenta.getCompound(PLAYER_MODIFIED_KEY);
+			if (modified == null) {
+				return false;
+			}
+			return modified.hasTag(ASSIGNED_WORLD_KEY);
+		});
+	}
+
+	public static @Nullable String getAssignedWorld(final @Nullable ItemStack item) {
+		if (ItemUtils.isNullOrAir(item)) {
+			return null;
+		}
+		return NBT.get(item, nbt -> {
+			ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+			if (monumenta == null) {
+				return null;
+			}
+			ReadableNBT modified = monumenta.getCompound(PLAYER_MODIFIED_KEY);
+			if (modified == null) {
+				return null;
+			}
+			String worldName = modified.getString(ASSIGNED_WORLD_KEY);
+			if (worldName == null || worldName.isEmpty()) {
+				return null;
+			}
+			return worldName;
+		});
+	}
+
+	public static void removeAssignedWorld(final @Nullable ItemStack item) {
+		if (ItemUtils.isNullOrAir(item)) {
+			return;
+		}
+
+		NBT.modify(item, nbt -> {
+			ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+			if (monumenta == null) {
+				return;
+			}
+			ReadWriteNBT modified = monumenta.getCompound(PLAYER_MODIFIED_KEY);
+			if (modified == null) {
+				return;
+			}
+			modified.removeKey(ASSIGNED_WORLD_KEY);
+			if (modified.getKeys().isEmpty()) {
+				monumenta.removeKey(PLAYER_MODIFIED_KEY);
+				if (monumenta.getKeys().isEmpty()) {
+					nbt.removeKey(MONUMENTA_KEY);
+				}
+			}
+		});
+	}
+
+	public static void addAssignedWorld(final @Nullable ItemStack item, String worldName) {
+		if (ItemUtils.isNullOrAir(item) || !InventoryUtils.containsSpecialLore(item)) {
+			return;
+		}
+		NBT.modify(item, nbt -> {
+			ReadWriteNBT modified = addPlayerModified(nbt);
+			modified.setString(ASSIGNED_WORLD_KEY, worldName);
+		});
+	}
+
+	public static boolean checkAssignedWorld(final @Nullable ItemStack item, String worldName) {
+		if (ItemUtils.isNullOrAir(item)) {
+			return true;
+		}
+
+		String itemWorldName = getAssignedWorld(item);
+		if (itemWorldName == null) {
+			return true;
+		}
+
+		return itemWorldName.equals(worldName);
 	}
 
 	public static boolean hasPlayerModified(final @Nullable ItemStack item) {
