@@ -397,11 +397,11 @@ public class InventoryUtils {
 		giveItem(player, item, player.getInventory(), silent);
 	}
 
-	public static void giveItem(final Player player, final @Nullable ItemStack item, final Inventory inventory) {
+	public static void giveItem(final Player player, final @Nullable ItemStack item, Inventory inventory) {
 		giveItem(player, item, inventory, false);
 	}
 
-	public static void giveItem(final Player player, final @Nullable ItemStack item, final Inventory inventory, boolean silent) {
+	public static void giveItem(final Player player, final @Nullable ItemStack item, Inventory inventory, boolean silent) {
 		if (item == null) {
 			return;
 		}
@@ -409,21 +409,32 @@ public class InventoryUtils {
 		if (item.getAmount() == 0) {
 			return;
 		}
-		if (canFitInInventory(item, inventory)) {
-			inventory.addItem(item);
-		} else {
-			if (inventory.getType().equals(InventoryType.PLAYER)) {
-				// drop if inventory is the player's inventory
-				Item itemEntity = dropTempOwnedItem(item, player.getLocation(), player);
-				if (!silent) {
-					if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, "DroppedItemMessage")) {
-						player.sendMessage(Component.text("Your inventory is full! Some items were dropped on the ground!", NamedTextColor.RED));
-					}
-					GlowingManager.startGlowing(itemEntity, NamedTextColor.RED, 60 * 20, 0, p -> p == player, null);
-				}
+		int maxStackSize = item.getMaxStackSize();
+		int remainingAmount = item.getAmount();
+		while (remainingAmount > 0) {
+			int subStackSize = Integer.min(remainingAmount, maxStackSize);
+			int canFitInInventory = numCanFitInInventory(item, inventory);
+			if (canFitInInventory > 0) {
+				subStackSize = Integer.min(subStackSize, canFitInInventory);
+				ItemStack itemSubStack = item.asQuantity(subStackSize);
+				remainingAmount -= subStackSize;
+				inventory.addItem(itemSubStack);
 			} else {
-				// otherwise attempt to give it to the player's inventory
-				giveItem(player, item, player.getInventory(), silent);
+				ItemStack itemSubStack = item.asQuantity(subStackSize);
+				remainingAmount -= subStackSize;
+				if (inventory.getType().equals(InventoryType.PLAYER)) {
+					// drop if inventory is the player's inventory
+					Item itemEntity = dropTempOwnedItem(itemSubStack, player.getLocation(), player);
+					if (!silent) {
+						if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, "DroppedItemMessage")) {
+							player.sendMessage(Component.text("Your inventory is full! Some items were dropped on the ground!", NamedTextColor.RED));
+						}
+						GlowingManager.startGlowing(itemEntity, NamedTextColor.RED, 60 * 20, 0, p -> p == player, null);
+					}
+				} else {
+					// otherwise attempt to give it to the player's inventory
+					inventory = player.getInventory();
+				}
 			}
 		}
 	}
