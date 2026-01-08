@@ -58,7 +58,7 @@ public class PlayerTitleManager implements Listener {
 			mHealthChangeRunnable.cancel();
 		}
 
-		manager.registerEvents(new PlayerTitleManager(), plugin);
+		manager.registerEvents(getInstance(), plugin);
 		mHealthChangeRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
