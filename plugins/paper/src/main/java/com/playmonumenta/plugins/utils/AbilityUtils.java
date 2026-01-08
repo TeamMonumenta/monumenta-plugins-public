@@ -631,9 +631,6 @@ public class AbilityUtils {
 								return false;
 							}
 						}
-						case ALCHEMICAL_ARTILLERY -> {
-							return false;
-						}
 						default -> {
 							// Avoids a warning
 							return true;
