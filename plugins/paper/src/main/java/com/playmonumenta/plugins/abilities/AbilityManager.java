@@ -616,6 +616,17 @@ public class AbilityManager {
 		}
 	}
 
+	public void onDamageDelayed(Player player, DamageEvent event, LivingEntity enemy) {
+		if (EntityUtils.isHostileMob(enemy)) {
+			for (Ability abil : getPlayerAbilities(player).getAbilities()) {
+				if (event.isCancelled()) {
+					break;
+				}
+				abil.onDamageDelayed(event, enemy);
+			}
+		}
+	}
+
 	@FunctionalInterface
 	private interface CastArgumentNoReturn {
 		void run(Ability ability);

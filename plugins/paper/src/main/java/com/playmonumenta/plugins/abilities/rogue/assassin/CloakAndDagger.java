@@ -98,7 +98,6 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		mTracker.updateDamageDealtToBosses(event);
 		if (AbilityUtils.isStealthed(mPlayer) && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH) && mActive) {
 			AbilityUtils.removeStealth(mPlugin, mPlayer, false, mCosmetic);
 			if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
@@ -110,6 +109,11 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			mActive = false;
 		}
 		return false; // only tallies damage done
+	}
+
+	@Override
+	public void onDamageDelayed(DamageEvent event, LivingEntity enemy) {
+		mTracker.updateDamageDealtToBosses(event);
 	}
 
 	@Override

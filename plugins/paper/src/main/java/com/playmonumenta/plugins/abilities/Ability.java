@@ -194,6 +194,16 @@ public abstract class Ability {
 		return false;
 	}
 
+	/**
+	 * Called after all damage modifiers have been applied.
+	 *
+	 * @param event The damage event
+	 * @param enemy The entity that was damaged
+	 */
+	public void onDamageDelayed(DamageEvent event, LivingEntity enemy) {
+
+	}
+
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 
 	}

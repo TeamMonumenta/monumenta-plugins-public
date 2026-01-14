@@ -243,6 +243,7 @@ public class DamageListener implements Listener {
 			} else {
 				mPlugin.mItemStatManager.onDamageDelayed(mPlugin, player, event, damagee);
 			}
+			mPlugin.mAbilityManager.onDamageDelayed(player, event, damagee);
 		}
 	}
 
