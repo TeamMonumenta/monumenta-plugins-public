@@ -354,11 +354,6 @@ public class PzeroManager implements Listener {
 		int currentFinishes = ScoreboardUtils.getScoreboardValue(pzPlayer.getPlayer(), FINISH_LEADERBOARD).orElse(0);
 		ScoreboardUtils.setScoreboardValue(pzPlayer.getPlayer(), FINISH_LEADERBOARD, currentFinishes + 1);
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "leaderboard update " + pzPlayer.getPlayer().getName() + " " + FINISH_LEADERBOARD);
-		// Win advancement 1st place and race had at least 4 players
-		if (placement.mPlacement == 1 && countPlayersInMap(map.getName()) >= WIN_ADVANCEMENT_MIN_PLAYERS) {
-			AdvancementUtils.grantAdvancement(pzPlayer.getPlayer(), "monumenta:trophies/events/2023/winter");
-		}
-
 		return placement;
 	}
 
