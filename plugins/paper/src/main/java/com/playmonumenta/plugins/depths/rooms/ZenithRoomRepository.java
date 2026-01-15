@@ -61,6 +61,7 @@ public class ZenithRoomRepository extends RoomRepository {
 			mEliteRooms.add(new DepthsRoom("depths2/f1r47", DepthsRoomType.ABILITY, new Vector(53, 55, 52), new Vector(1.0, -32.0, -14.0), 15, DepthsRoom.RoomDirection.DOWN));
 			mEliteRooms.add(new DepthsRoom("depths2/f1r48", DepthsRoomType.ABILITY, new Vector(61, 33, 68), new Vector(1.0, -15.0, -8.0), 21, DepthsRoom.RoomDirection.EVEN));
 			mEliteRooms.add(new DepthsRoom("depths2/f1r50", DepthsRoomType.ABILITY, new Vector(51, 41, 56), new Vector(1.0, -11.0, -33.0), 16, DepthsRoom.RoomDirection.EVEN));
+			mEliteRooms.add(new DepthsRoom("depths2/f1r52", DepthsRoomType.ABILITY, new Vector(70, 41, 91), new Vector(1.0, -16.0, -54.0), 23, DepthsRoom.RoomDirection.EVEN));
 
 			//Boss f1 room
 			mBossRoom = new DepthsRoom("depths2/f1r21", DepthsRoomType.BOSS, new Vector(51, 46, 56), new Vector(1.0, -16.0, -15.0), 0, DepthsRoom.RoomDirection.EVEN);
