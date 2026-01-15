@@ -840,7 +840,7 @@ public class Plugin extends JavaPlugin {
 
 		Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
 			try {
-				GroupChildrenAndMembers dev = LuckPermsIntegration.getGroupChildrenAndMembers("mod", false).join();
+				GroupChildrenAndMembers dev = LuckPermsIntegration.getGroupChildrenAndMembers("dev", false).join();
 				GroupChildrenAndMembers devOps = LuckPermsIntegration.getGroupChildrenAndMembers("devops", false).join();
 				GroupChildrenAndMembers devLead = LuckPermsIntegration.getGroupChildrenAndMembers("devlead", false).join();
 				Set<UUID> devUuids = new HashSet<>(dev.getMembers(false));
