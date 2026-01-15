@@ -150,6 +150,26 @@ public class LuckPermsIntegration implements Listener {
 		public GroupChildrenAndMembers(String name) {
 			mName = name;
 		}
+
+		public Map<String, GroupChildrenAndMembers> getChildGroups(boolean recursive) {
+			Map<String, GroupChildrenAndMembers> result = new TreeMap<>(mChildGroups);
+			if (recursive) {
+				for (GroupChildrenAndMembers child : mChildGroups.values()) {
+					result.putAll(child.getChildGroups(true));
+				}
+			}
+			return result;
+		}
+
+		public Set<UUID> getMembers(boolean recursive) {
+			Set<UUID> result = new HashSet<>(mMembers);
+			if (recursive) {
+				for (GroupChildrenAndMembers child : getChildGroups(true).values()) {
+					result.addAll(child.getMembers(false));
+				}
+			}
+			return result;
+		}
 	}
 
 	public LuckPermsIntegration(Plugin plugin) {

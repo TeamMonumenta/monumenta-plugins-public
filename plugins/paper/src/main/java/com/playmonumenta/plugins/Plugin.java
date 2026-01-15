@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.AbilityHotbar;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
@@ -49,6 +51,7 @@ import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.TABIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.GroupChildrenAndMembers;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildPermissions;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.Lockdown;
 import com.playmonumenta.plugins.integrations.monumentanetworkrelay.BroadcastedEvents;
@@ -123,6 +126,8 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -795,8 +800,10 @@ public class Plugin extends JavaPlugin {
 		}
 
 		// Export class/skill info
+		String exportedFolder = getDataFolder() + File.separator + "exported" + File.separator;
+
 		try {
-			String skillExportPath = getDataFolder() + File.separator + "exported_skills.json";
+			String skillExportPath = exportedFolder + "skills.json";
 			MonumentaClasses classes = new MonumentaClasses();
 			FileUtils.writeJson(skillExportPath, classes.toJson());
 		} catch (Exception e) {
@@ -805,16 +812,20 @@ public class Plugin extends JavaPlugin {
 		}
 
 		try {
-			String skillExportPath = getDataFolder() + File.separator + "exported_zenith_charm_effects.json";
+			String skillExportPath = exportedFolder + "zenith_charm_effects.json";
 			FileUtils.writeJson(skillExportPath, CharmEffects.dumpAsJson());
 		} catch (Exception e) {
 			// Failed to export skills to json, non-critical error.
 			getLogger().warning("Failed to export zenith charm effects.");
 		}
 
-		if (ServerProperties.getShardName().contains("valley") || ServerProperties.getShardName().contains("dev")) {
+		if (
+			ServerProperties.getShardName().contains("valley") ||
+			ServerProperties.getShardName().contains("plots") ||
+			ServerProperties.getShardName().contains("dev")
+		) {
 			try {
-				String skillExportPath = getDataFolder() + File.separator + "exported_depths_skills.json";
+				String skillExportPath = exportedFolder + "depths_skills.json";
 				FileUtils.writeJson(skillExportPath, DepthsSkillsAPI.dumpFullJson());
 				getLogger().info("Depths skills API written successfully.");
 			} catch (Exception e) {
@@ -826,6 +837,26 @@ public class Plugin extends JavaPlugin {
 				DepthsUtils.setDepthsContentOverride(null);
 			}
 		}
+
+		Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+			try {
+				GroupChildrenAndMembers dev = LuckPermsIntegration.getGroupChildrenAndMembers("mod", false).join();
+				GroupChildrenAndMembers devOps = LuckPermsIntegration.getGroupChildrenAndMembers("devops", false).join();
+				GroupChildrenAndMembers devLead = LuckPermsIntegration.getGroupChildrenAndMembers("devlead", false).join();
+				Set<UUID> devUuids = new HashSet<>(dev.getMembers(false));
+				devUuids.addAll(devOps.getMembers(false));
+				devUuids.addAll(devLead.getMembers(false));
+				exportPlayers(exportedFolder + "teamMembers.json", devUuids);
+
+				GroupChildrenAndMembers moderators = LuckPermsIntegration.getGroupChildrenAndMembers("mod", false).join();
+				GroupChildrenAndMembers moderatorLeads = LuckPermsIntegration.getGroupChildrenAndMembers("modlead", false).join();
+				Set<UUID> modUuids = new HashSet<>(moderators.getMembers(false));
+				modUuids.addAll(moderatorLeads.getMembers(false));
+				exportPlayers(exportedFolder + "moderators.json", modUuids);
+			} catch (Exception ex) {
+				MMLog.warning("Failed to export luckperms members: ", ex);
+			}
+		});
 
 		/* If this is the depths shard, enable depths manager */
 		if (ServerProperties.getDepthsEnabled()) {
@@ -906,5 +937,22 @@ public class Plugin extends JavaPlugin {
 			mLogger = new CustomLogger(super.getLogger(), Level.INFO);
 		}
 		return mLogger;
+	}
+
+	private void exportPlayers(String path, Set<UUID> playerUuids) throws IOException {
+		JsonArray playerArray = new JsonArray();
+		for (UUID playerUuid : playerUuids) {
+			String playerName = MonumentaRedisSyncIntegration.cachedUuidToName(playerUuid);
+			if (playerName == null) {
+				continue;
+			}
+
+			JsonObject playerObj = new JsonObject();
+			playerObj.addProperty("uuid", playerUuid.toString());
+			playerObj.addProperty("name", playerName);
+			playerArray.add(playerObj);
+		}
+
+		FileUtils.writeJson(path, playerArray);
 	}
 }
