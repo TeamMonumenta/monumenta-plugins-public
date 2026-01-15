@@ -113,8 +113,10 @@ public class SpellVesperidysAnticheese extends Spell {
 				if (DepthsUtils.isDepthsGrave(armorStand)
 					&& (Math.abs(armorStand.getLocation().getX() - mSpawnLoc.getX()) > 18
 					|| Math.abs(armorStand.getLocation().getY() - mSpawnLoc.getY()) > 5
-					|| Math.abs(armorStand.getLocation().getZ() - mSpawnLoc.getZ()) > 18)) {
+					|| Math.abs(armorStand.getLocation().getZ() - mSpawnLoc.getZ()) > 18)
+					|| (armorStand.getLocation().getY() < mSpawnLoc.getY() && armorStand.getLocation().getBlock().getType() != Material.AIR)) {
 					List<Vesperidys.Platform> platforms = mVesperidys.mPlatformList.getShuffledPlatforms(null);
+
 					Vesperidys.Platform selectedPlatform = null;
 
 					// Prioritizes platforms which doesn't have adds on it (including boss itself).

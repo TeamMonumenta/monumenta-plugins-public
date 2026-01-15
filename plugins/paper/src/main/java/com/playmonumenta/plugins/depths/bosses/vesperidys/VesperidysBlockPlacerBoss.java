@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import io.papermc.paper.entity.TeleportFlag;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.NavigableSet;
@@ -96,7 +97,7 @@ public class VesperidysBlockPlacerBoss extends BossAbilityGroup {
 							mBoss.getWorld().playSound(bossLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 							mBoss.getWorld().playSound(newLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 
-							mMob.teleport(newLoc);
+							mMob.teleport(newLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS, TeleportFlag.EntityState.RETAIN_VEHICLE);
 							mMob.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 5 * 20, 0));
 						}
 					}

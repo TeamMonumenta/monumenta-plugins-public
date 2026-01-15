@@ -172,7 +172,7 @@ public class VoidCorruption extends Effect {
 
 	@Override
 	public void onHurtByEntity(LivingEntity entity, DamageEvent event, Entity damager) {
-		if (entity instanceof Player player && mExplosionTick < 0) {
+		if (entity instanceof Player player && mExplosionTick < 0 && player.getNoDamageTicks() == 0) {
 			double damage = event.getDamage();
 			double maxHealth = EntityUtils.getMaxHealth(player);
 
