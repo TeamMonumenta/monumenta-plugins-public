@@ -60,7 +60,8 @@ public class BroadcastedEvents implements Listener {
 	private static final Argument<String> SHARD_OR_STAR_ARGUMENT = new TextArgument("shard")
 		.replaceSuggestions(ArgumentSuggestions.stringCollection((info) -> {
 			List<String> result = new ArrayList<>(NetworkRelayAPI.getOnlineShardNames());
-			result.add("*");
+			result.add("\".\"");
+			result.add("\"*\"");
 			return result;
 		}));
 	private static final Argument<String> EVENT_NAME_ARGUMENT = new StringArgument("Event Name")
@@ -77,6 +78,8 @@ public class BroadcastedEvents implements Listener {
 	public static OptionalInt getEventTime(@Nullable String shard, String eventName) {
 		if ("*".equals(shard)) {
 			shard = null;
+		} else if (".".equals(shard)) {
+			shard = getThisShardName();
 		}
 
 		if (shard != null) {
