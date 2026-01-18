@@ -17,6 +17,7 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.arguments.TextArgument;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -54,7 +55,14 @@ public class BroadcastedEvents implements Listener {
 	private static final String SEPARATOR = "@";
 	private static final int CHILD_CLEANING_DELAY = 3600; // 3 minutes
 
-	private static final Argument<String> SHARD_ARGUMENT = new StringArgument("shard");
+	private static final Argument<String> SHARD_ARGUMENT = new StringArgument("shard")
+		.replaceSuggestions(ArgumentSuggestions.strings(NetworkRelayAPI.getOnlineShardNames()));
+	private static final Argument<String> SHARD_OR_STAR_ARGUMENT = new TextArgument("shard")
+		.replaceSuggestions(ArgumentSuggestions.stringCollection((info) -> {
+			List<String> result = new ArrayList<>(NetworkRelayAPI.getOnlineShardNames());
+			result.add("*");
+			return result;
+		}));
 	private static final Argument<String> EVENT_NAME_ARGUMENT = new StringArgument("Event Name")
 		.replaceSuggestions(ArgumentSuggestions.strings(KnownEvent.names()));
 
@@ -64,6 +72,55 @@ public class BroadcastedEvents implements Listener {
 
 	public static ConcurrentMap<String, Event> getCurrentEvents() {
 		return mEventMap;
+	}
+
+	public static OptionalInt getEventTime(@Nullable String shard, String eventName) {
+		if ("*".equals(shard)) {
+			shard = null;
+		}
+
+		if (shard != null) {
+			String key = shard + SEPARATOR + eventName;
+
+			Event event = mEventMap.get(key);
+			if (event == null) {
+				return OptionalInt.empty();
+			}
+			return OptionalInt.of(event.mTimeLeft);
+		}
+
+		OptionalInt result = OptionalInt.empty();
+		for (Event event : mEventMap.values()) {
+			if (eventName.equals(event.mEventName)) {
+				if (result.isEmpty()) {
+					result = OptionalInt.of(event.mTimeLeft);
+				} else {
+					int oldTime = result.getAsInt();
+					int newTime = event.mTimeLeft;
+					result = OptionalInt.of(Integer.min(oldTime, newTime));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	public static OptionalInt getScheduledStopTime() {
+		OptionalInt result = OptionalInt.empty();
+
+		for (Event event : mEventMap.values()) {
+			if (event.getAsKnownEvent().mIsScheduledStop) {
+				if (result.isEmpty()) {
+					result = OptionalInt.of(event.mTimeLeft);
+				} else {
+					int oldTime = result.getAsInt();
+					int newTime = event.mTimeLeft;
+					result = OptionalInt.of(Integer.min(oldTime, newTime));
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/*
@@ -139,7 +196,29 @@ public class BroadcastedEvents implements Listener {
 
 					runCommandLogic(sender, shard, eventName, timeLeft);
 				})
-		).register();
+		);
+
+		root.withSubcommand(
+			new CommandAPICommand("gettime")
+				.withPermission(perms)
+				.withArguments(SHARD_OR_STAR_ARGUMENT, EVENT_NAME_ARGUMENT)
+				.executes((sender, args) -> {
+					String shard = args.getByArgument(SHARD_OR_STAR_ARGUMENT);
+					String eventName = args.getByArgument(EVENT_NAME_ARGUMENT);
+
+					return getEventTime(shard, eventName).orElse(-1);
+				})
+		);
+
+		root.withSubcommand(
+			new CommandAPICommand("getstoptime")
+				.withPermission(perms)
+				.executes((sender, args) -> {
+					return getScheduledStopTime().orElse(-1);
+				})
+		);
+
+		root.register();
 	}
 
 	public static void updateEvent(String event, int timeLeft) {
@@ -202,7 +281,7 @@ public class BroadcastedEvents implements Listener {
 				//clear locally.
 				mEventMap.remove(key);
 
-				String msg = "Sucessfully cleared event " + key + ".";
+				String msg = "Successfully cleared event " + key + ".";
 				if (sender instanceof Player player) {
 					player.sendMessage(Component.text(msg, NamedTextColor.GOLD));
 				}
@@ -218,7 +297,7 @@ public class BroadcastedEvents implements Listener {
 				parentEvent.broadcastPeriodicUpdate();
 			}
 
-			String msg = "Sucessfully updated event " + key + " with duration " + timeLeft + ".";
+			String msg = "Successfully updated event " + key + " with duration " + timeLeft + ".";
 			if (sender instanceof Player player) {
 				player.sendMessage(Component.text(msg, NamedTextColor.GOLD));
 			}
@@ -510,6 +589,8 @@ public class BroadcastedEvents implements Listener {
 	}
 
 	public enum KnownEvent {
+		DAILY_RESTART("Daily Restart", true, false),
+		SCHEDULED_MAINTENANCE("Scheduled Maintenance", true, false),
 		KAUL("Kaul", NamedTextColor.DARK_GREEN, true, new EventRequirement("Quest21", 20), new EventRequirement("Corrupted", 1)),
 		ELDRASK("Eldrask", NamedTextColor.AQUA, true, new EventRequirement("Quest101", 12), new EventRequirement("Teal", 1)),
 		HEKAWT("Hekawt", NamedTextColor.GOLD, true, new EventRequirement("Quest101", 12), new EventRequirement("Fred", 1)),
@@ -525,6 +606,7 @@ public class BroadcastedEvents implements Listener {
 		public final String mDisplayName;
 		public final @Nullable TextColor mColor;
 		public final boolean mDisplayShard;
+		public final boolean mIsScheduledStop;
 
 		//If none, will not require anything.
 		public final EventRequirement[] mPossibilities;
@@ -534,10 +616,19 @@ public class BroadcastedEvents implements Listener {
 			mColor = color;
 			mPossibilities = possibleRequirements;
 			mDisplayShard = displayShard;
+			mIsScheduledStop = false;
 		}
 
 		KnownEvent(HuntsManager.QuarryType quarryType) {
 			this(quarryType.getName(), quarryType.getColor(), false, new EventRequirement("HuntsLodge", 2));
+		}
+
+		KnownEvent(String displayName, boolean isScheduledStop, boolean displayShard) {
+			mDisplayName = displayName;
+			mColor = NamedTextColor.RED;
+			mPossibilities = new EventRequirement[0];
+			mIsScheduledStop = isScheduledStop;
+			mDisplayShard = displayShard;
 		}
 
 		public static String[] names() {
