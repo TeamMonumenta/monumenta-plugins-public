@@ -84,7 +84,7 @@ public class CommunityMissionManager {
 			"scoreboard players set $KaulIceSpleefUnlocked const 1", "unlock a new Ice Spleef map!"
 		));
 		mSchedule.add(new CommunityEvent(
-			LocalDateTime.of(2026, 1, 31, 0, 0),
+			LocalDateTime.of(2026, 1, 21, 0, 0),
 			LocalDateTime.of(2026, 2, 5, 0, 0),
 			new CommunityMissionDefinition(CommunityMissionType.SANCTUM, 200, 400, 750, 2, 5,
 				new TieredRewardSchema(
