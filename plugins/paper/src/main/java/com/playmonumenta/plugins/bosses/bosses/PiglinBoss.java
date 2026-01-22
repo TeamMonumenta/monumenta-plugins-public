@@ -12,10 +12,10 @@ public class PiglinBoss extends BossAbilityGroup {
 	public static class Parameters extends BossParameters {
 
 		@BossParam(help = "If holding a crossbow, the minimum distance to strafe away from the target.")
-		public int MIN_RANGE_DISTANCE = 5;
+		public int MIN_RANGED_DISTANCE = 5;
 
 		@BossParam(help = "If holding a crossbow, the maximum distance before moving closer to the target.")
-		public int MAX_RANGE_DISTANCE = 5;
+		public int MAX_RANGED_DISTANCE = 5;
 
 		@BossParam(help = "The minimum time in ticks to load the crossbow.")
 		public int MIN_SHOT_DELAY = 20;
