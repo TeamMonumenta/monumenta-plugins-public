@@ -116,7 +116,7 @@ public class EliteFinishers {
 		if (hasNoGlowTag && hasNoShowTag) {
 			// Both tags present: hide everything
 			killedMob.setVisibleByDefault(false);
-		} else if (hasNoGlowTag) {
+		} else if (hasNoShowTag) {
 			// Only Glow Tag present: show glowing and hide mob
 			GlowingManager.startGlowing(killedMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);
 			killedMob.setInvisible(true);
@@ -124,7 +124,7 @@ public class EliteFinishers {
 			if (equipment != null) {
 				equipment.clear();
 			}
-		} else if (hasNoShowTag) {
+		} else if (hasNoGlowTag) {
 			// Only Show Tag present: remove glowing, show mob
 			GlowingManager.clearAll(killedMob);
 		} else {
