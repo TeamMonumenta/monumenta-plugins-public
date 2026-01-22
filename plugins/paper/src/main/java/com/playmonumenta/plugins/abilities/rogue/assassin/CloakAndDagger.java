@@ -44,8 +44,8 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	private static final int CLOAK_MIN_STACKS = 4;
 	private static final int CLOAK_STACKS_ON_ELITE_KILL = 5;
 	private static final int STEALTH_DURATION = (int) (2.5 * 20);
-	private static final int BOSS_DAMAGE_THRESHOLD_R2 = 300;
-	private static final int BOSS_DAMAGE_THRESHOLD_R3 = 450;
+	private static final int BOSS_DAMAGE_THRESHOLD_R2 = 320;
+	private static final int BOSS_DAMAGE_THRESHOLD_R3 = 480;
 
 	public static final String CHARM_DAMAGE = "Cloak and Dagger Damage";
 	public static final String CHARM_STACKS = "Cloak and Dagger Max Stacks";
@@ -102,7 +102,6 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		mTracker.updateDamageDealtToBosses(event);
 		if (AbilityUtils.isStealthed(mPlayer) && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_ENCH) && mActive) {
 			AbilityUtils.removeStealth(mPlugin, mPlayer, false, mCosmetic);
 			if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
@@ -114,6 +113,16 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			mActive = false;
 		}
 		return false; // only tallies damage done
+	}
+
+	@Override
+	public void onDamageDelayed(DamageEvent event, LivingEntity enemy) {
+		// Prevent Cloak and Dagger's damage from counting towards boss damage thresholds
+		if (event.getAbility() == ClassAbility.CLOAK_AND_DAGGER) {
+			return;
+		}
+
+		mTracker.updateDamageDealtToBosses(event);
 	}
 
 	@Override
@@ -182,7 +191,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			.addDashedLine()
 			.addLine("Killing a mob grants you %d stack of *Cloak and Dagger*.").styles(UNDERLINED)
 				.statValues(stat(a -> a.mStacksOnKill, 1))
-			.addLine("Killing an Elite or dealing %d damage to Bosses grants")
+			.addLine("Killing an Elite or dealing %d damage to Bosses (Excluding Cloak and Dagger) grants")
 				.statValues(perRegion(BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3))
 			.addLine("you %d stacks instead.").styles(UNDERLINED)
 				.statValues(stat(a -> a.mStacksOnEliteKill, CLOAK_STACKS_ON_ELITE_KILL))

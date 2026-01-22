@@ -196,9 +196,9 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	}
 
 	@Override
-	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
+	public void onDamageDelayed(final DamageEvent event, final LivingEntity enemy) {
 		if (event.getType().equals(DamageType.TRUE)) {
-			return false; // don't count true damage
+			return; // don't count true damage
 		}
 
 		mTracker.updateDamageDealtToBosses(event);
@@ -208,7 +208,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			final String source = BOON_EFFECT_NAME + mPlayer.getName();
 			mPlugin.mEffectManager.addEffect(enemy, source, new HeavenlyBoonTracker(MOB_EFFECT_DURATION, mPlayer.getUniqueId()));
 		}
-		return false;
 	}
 
 	@Override

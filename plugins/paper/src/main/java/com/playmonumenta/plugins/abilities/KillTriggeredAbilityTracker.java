@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities;
 
-import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -32,11 +31,6 @@ public class KillTriggeredAbilityTracker {
 	}
 
 	public void updateDamageDealtToBosses(DamageEvent event) {
-		// Prevent Cloak and Dagger's damage from counting towards boss damage thresholds
-		if (event.getAbility() == ClassAbility.CLOAK_AND_DAGGER) {
-			return;
-		}
-
 		updateDamageDealtToBosses(event.getFinalDamage(false), event.getDamagee());
 	}
 

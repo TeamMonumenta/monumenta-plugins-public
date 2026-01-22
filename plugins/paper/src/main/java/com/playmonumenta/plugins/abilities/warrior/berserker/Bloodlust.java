@@ -35,8 +35,8 @@ import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 
 	private static final int MAX_BLOODLUST_PER_TICK = 3;
-	private static final int R2_DAMAGE_REQ = 70;
-	private static final int R3_DAMAGE_REQ = 120;
+	private static final int R2_DAMAGE_REQ = 80;
+	private static final int R3_DAMAGE_REQ = 130;
 	private static final double AOE_PENALTY = 0.33;
 	private static final int MAX_STACKS = 10;
 	private static final int MAX_PASSIVE_GAIN = 2;
@@ -122,7 +122,7 @@ public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 	}
 
 	@Override
-	public boolean onDamage(final DamageEvent event, final LivingEntity enemy) {
+	public void onDamageDelayed(final DamageEvent event, final LivingEntity enemy) {
 		if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.RESIST_5)) {
 			mCombatTime = Bukkit.getServer().getCurrentTick();
 		}
@@ -143,7 +143,6 @@ public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 			}
 			damageDealt(damage);
 		}
-		return false;
 	}
 
 	/*
