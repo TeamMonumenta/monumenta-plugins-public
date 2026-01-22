@@ -135,6 +135,10 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
+	public void clearPiglinTarget(LivingEntity piglin) {
+	}
+
+	@Override
 	public Object toVanillaChatComponent(Component component) {
 		throw new UnsupportedOperationException();
 	}

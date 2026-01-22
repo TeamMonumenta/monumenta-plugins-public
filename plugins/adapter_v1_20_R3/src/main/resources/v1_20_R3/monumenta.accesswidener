@@ -15,3 +15,8 @@ accessible method net/minecraft/world/scores/PlayerScores listRawScores ()Ljava/
 accessible method net/minecraft/world/entity/LivingEntity getJumpPower ()F
 accessible field net/minecraft/server/level/ServerEntity broadcast Ljava/util/function/Consumer;
 accessible method net/minecraft/network/syncher/SynchedEntityData packAll ()Ljava/util/List;
+accessible field net/minecraft/world/entity/LivingEntity brain Lnet/minecraft/world/entity/ai/Brain;
+accessible field net/minecraft/world/entity/ai/behavior/CrossbowAttack attackDelay I
+accessible method net/minecraft/world/entity/monster/piglin/PiglinAi findNearestValidAttackTarget (Lnet/minecraft/world/entity/monster/piglin/Piglin;)Ljava/util/Optional;
+accessible method net/minecraft/world/entity/monster/piglin/PiglinAi createIdleLookBehaviors ()Lnet/minecraft/world/entity/ai/behavior/RunOne;
+accessible method net/minecraft/world/entity/monster/piglin/PiglinAi createIdleMovementBehaviors ()Lnet/minecraft/world/entity/ai/behavior/RunOne;

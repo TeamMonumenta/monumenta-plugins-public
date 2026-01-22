@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.BlockPos;
@@ -87,9 +89,12 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftCreature;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftHoglin;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftParrot;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPiglin;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPiglinBrute;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R3.scoreboard.CraftScoreboard;
@@ -104,15 +109,19 @@ import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fox;
+import org.bukkit.entity.Hoglin;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
+import org.bukkit.entity.Piglin;
+import org.bukkit.entity.PiglinBrute;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Spider;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.entity.Wolf;
+import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
@@ -654,12 +663,53 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 			if (mob.getScoreboardTags().contains("boss_creeper_no_swell")) {
 				availableGoals.removeIf(goal -> goal.getGoal() instanceof SwellGoal);
 			}
+		} else if (mob instanceof Piglin bukkitPiglin) {
+			bukkitPiglin.setIsAbleToHunt(false);
+			bukkitPiglin.setMemory(MemoryKey.ADMIRING_DISABLED, true);
+			// For piglins, disable various activities we don't want (e.g. interactions with items), and also allow baby piglins to attack
+			net.minecraft.world.entity.monster.piglin.Piglin piglin = ((CraftPiglin) mob).getHandle();
+			int minRangedDistance = (int) parseBossTagNumber(mob, "boss_piglin", "minRangedDistance", 5);
+			int maxRangedDistance = (int) parseBossTagNumber(mob, "boss_piglin", "maxRangedDistance", 8);
+			int minShotDelay = Math.max(1, (int) parseBossTagNumber(mob, "boss_piglin", "minShotDelay", 20));
+			int maxShotDelay = Math.max(minShotDelay, (int) parseBossTagNumber(mob, "boss_piglin", "maxShotDelay", 40));
+			int attackSpeed = Math.max(1, (int) parseBossTagNumber(mob, "boss_piglin", "meleeAttackSpeed", 20));
+			piglin.brain = CustomBrains.makePiglinBrain(piglin, minRangedDistance, maxRangedDistance, minShotDelay, maxShotDelay, attackSpeed);
+		} else if (mob instanceof PiglinBrute) {
+			int attackSpeed = Math.max(1, (int) parseBossTagNumber(mob, "boss_piglin", "meleeAttackSpeed", 20));
+			net.minecraft.world.entity.monster.piglin.PiglinBrute piglinBrute = ((CraftPiglinBrute) mob).getHandle();
+			piglinBrute.brain = CustomBrains.makePiglinBruteBrain(piglinBrute, attackSpeed);
+		} else if (mob instanceof Hoglin) {
+			net.minecraft.world.entity.monster.hoglin.Hoglin hoglin = ((CraftHoglin) mob).getHandle();
+			hoglin.brain = CustomBrains.makeHoglinBrain(hoglin);
 		}
 		// prevent all mobs from attacking iron golems and turtles
 		availableTargetGoals.removeIf(goal -> goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg
 			&& (natg.targetType == net.minecraft.world.entity.animal.IronGolem.class
 			|| natg.targetType == Turtle.class
 			|| natg.targetType == AbstractVillager.class));
+	}
+
+	@Override
+	public void clearPiglinTarget(LivingEntity pigType) {
+		net.minecraft.world.entity.Entity entity = ((CraftEntity) pigType).getHandle();
+		if(entity instanceof AbstractPiglin piglin) {
+			CustomBrains.dropAbstractPiglinAggro(piglin);
+		}
+	}
+
+	private static double parseBossTagNumber(Entity entity, String bossTagId, String bossTagValue, double defaultValue) {
+		if (entity.getScoreboardTags().contains(bossTagId)) {
+			Pattern valuePattern = Pattern.compile("[,\\[]\\s*" + bossTagValue.toLowerCase(Locale.ROOT) + "=(\\d+(\\.\\d+)?)");
+			for (String tag : entity.getScoreboardTags()) {
+				if (tag.startsWith(bossTagId + "[")) {
+					Matcher matcher = valuePattern.matcher(tag.toLowerCase(Locale.ROOT));
+					if (matcher.find()) {
+						return Double.parseDouble(matcher.group(1));
+					}
+				}
+			}
+		}
+		return defaultValue;
 	}
 
 	@Override

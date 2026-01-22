@@ -49,9 +49,12 @@ import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Hoglin;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Piglin;
+import org.bukkit.entity.PiglinBrute;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
@@ -176,6 +179,11 @@ public class AbilityUtils {
 		}
 
 		for (LivingEntity entity : EntityUtils.getNearbyMobs(player.getLocation(), 64)) {
+			if (entity instanceof Piglin || entity instanceof PiglinBrute) {
+				NmsUtils.getVersionAdapter().clearPiglinTarget(entity);
+				continue;
+			}
+
 			if (entity instanceof Mob mob) {
 				if (mob.getTarget() != null && mob.getTarget().getUniqueId().equals(player.getUniqueId())) {
 					mob.setTarget(null);

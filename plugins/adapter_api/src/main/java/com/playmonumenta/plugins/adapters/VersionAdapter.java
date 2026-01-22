@@ -130,6 +130,8 @@ public interface VersionAdapter {
 	 */
 	void mobAIChanges(Mob entity);
 
+	void clearPiglinTarget(LivingEntity pigType);
+
 	Object toVanillaChatComponent(Component component);
 
 	/**
