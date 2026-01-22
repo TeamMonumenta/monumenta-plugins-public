@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 public enum BlockAllowListType {
 	BLOCK("blocklist"),
 	ALLOW("allowlist"),
+	SPEED_DIAL("speeddial"),
 	;
 
 	private final String mArgString;

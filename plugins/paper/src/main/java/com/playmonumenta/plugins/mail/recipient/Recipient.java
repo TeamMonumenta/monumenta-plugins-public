@@ -92,6 +92,10 @@ public interface Recipient extends Comparable<Recipient> {
 		return Mailbox.redisKeyPrefix(redisSubKey) + redisKey(MailDirection.DEFAULT);
 	}
 
+	default String speedDialListRedisKey() {
+		return Mailbox.redisKeyPrefix("speeddiallist") + redisKey(MailDirection.DEFAULT);
+	}
+
 	default String allowListRedisKey() {
 		return Mailbox.redisKeyPrefix("allowlist") + redisKey(MailDirection.DEFAULT);
 	}

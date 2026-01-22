@@ -29,6 +29,7 @@ import org.bukkit.entity.Player;
 public class MailCache {
 	private final Recipient mRecipient;
 	private final CompletableFuture<Void> mInitializationFuture = new CompletableFuture<>();
+	private ConcurrentSkipListSet<Recipient> mSpeedDialList;
 	private ConcurrentSkipListSet<Recipient> mRecipientAllowList;
 	private ConcurrentSkipListSet<Recipient> mRecipientBlockList;
 	private ConcurrentSkipListSet<Mailbox> mRelevantMailboxes;
@@ -37,17 +38,28 @@ public class MailCache {
 
 	public MailCache(Recipient recipient) {
 		mRecipient = recipient;
+		mSpeedDialList = new ConcurrentSkipListSet<>(Recipient::mailboxCompareTo);
 		mRecipientAllowList = new ConcurrentSkipListSet<>(Recipient::mailboxCompareTo);
 		mRecipientBlockList = new ConcurrentSkipListSet<>(Recipient::mailboxCompareTo);
-		mRelevantMailboxes = new ConcurrentSkipListSet<>(Mailbox::mailboxCompareTo);
-		mSentMailboxes = new ConcurrentSkipListMap<>(Recipient::mailboxCompareTo);
-		mReceivedMailboxes = new ConcurrentSkipListMap<>(Recipient::mailboxCompareTo);
+		mRelevantMailboxes = new ConcurrentSkipListSet<>(this::sortMailboxesWithSpeedDial);
+		mSentMailboxes = new ConcurrentSkipListMap<>(this::sortRecipientsWithSpeedDial);
+		mReceivedMailboxes = new ConcurrentSkipListMap<>(this::sortRecipientsWithSpeedDial);
 		MMLog.fine(() -> "[Mailbox] Created mail cache for " + recipient.friendlyStr(MailDirection.DEFAULT));
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			ConcurrentSkipListSet<Recipient> speedDialList = new ConcurrentSkipListSet<>(Recipient::mailboxCompareTo);
 			ConcurrentSkipListSet<Recipient> allowList = new ConcurrentSkipListSet<>(Recipient::mailboxCompareTo);
 			ConcurrentSkipListSet<Recipient> blockList = new ConcurrentSkipListSet<>(Recipient::mailboxCompareTo);
+			ConcurrentSkipListSet<Recipient> speedDialAndBlocked = new ConcurrentSkipListSet<>();
 			ConcurrentSkipListSet<Recipient> allowedAndBlocked = new ConcurrentSkipListSet<>();
+
+			for (String senderKey : RedisAPI.getInstance().async().smembers(mRecipient.speedDialListRedisKey()).toCompletableFuture().join()) {
+				Recipient testSender = Recipient.of(senderKey).join();
+				if (testSender == null) {
+					continue;
+				}
+				speedDialList.add(testSender);
+			}
 
 			for (String senderKey : RedisAPI.getInstance().async().smembers(mRecipient.allowListRedisKey()).toCompletableFuture().join()) {
 				Recipient testSender = Recipient.of(senderKey).join();
@@ -63,17 +75,20 @@ public class MailCache {
 					continue;
 				}
 				blockList.add(testSender);
+				if (speedDialList.remove(testSender)) {
+					speedDialAndBlocked.add(testSender);
+				}
 				if (allowList.remove(testSender)) {
 					allowedAndBlocked.add(testSender);
 				}
 			}
 
 			ConcurrentSkipListSet<Mailbox> relevantMailboxes
-				= new ConcurrentSkipListSet<>(Mailbox::mailboxCompareTo);
+				= new ConcurrentSkipListSet<>(this::sortMailboxesWithSpeedDial);
 			ConcurrentSkipListMap<Recipient, Mailbox> sentMailboxes
-				= new ConcurrentSkipListMap<>(Recipient::mailboxCompareTo);
+				= new ConcurrentSkipListMap<>(this::sortRecipientsWithSpeedDial);
 			ConcurrentSkipListMap<Recipient, Mailbox> receivedMailboxes
-				= new ConcurrentSkipListMap<>(Recipient::mailboxCompareTo);
+				= new ConcurrentSkipListMap<>(this::sortRecipientsWithSpeedDial);
 
 			List<Mailbox> testMailboxes = Mailbox.getRecipientMailboxes(mRecipient).join();
 
@@ -106,12 +121,23 @@ public class MailCache {
 				}
 			}
 
+			// Add extra entries for speed dial results
+			for (Recipient speedDialRecipient : speedDialList) {
+				if (!sentMailboxes.containsKey(speedDialRecipient)) {
+					sentMailboxes.put(speedDialRecipient, new Mailbox(recipient, speedDialRecipient));
+				}
+			}
+
+			mSpeedDialList = speedDialList;
 			mRecipientAllowList = allowList;
 			mRecipientBlockList = blockList;
 			mRelevantMailboxes = relevantMailboxes;
 			mSentMailboxes = sentMailboxes;
 			mReceivedMailboxes = receivedMailboxes;
 
+			for (Recipient erroneousRecipient : speedDialAndBlocked) {
+				speedDialListRemove(erroneousRecipient, false).join();
+			}
 			for (Recipient erroneousRecipient : allowedAndBlocked) {
 				allowListRemove(erroneousRecipient, false).join();
 			}
@@ -150,6 +176,9 @@ public class MailCache {
 
 	public ConcurrentSkipListSet<Recipient> recipientBlockAllowList(BlockAllowListType listType) {
 		switch (listType) {
+			case SPEED_DIAL -> {
+				return speedDialList();
+			}
 			case ALLOW -> {
 				return recipientAllowList();
 			}
@@ -162,6 +191,10 @@ public class MailCache {
 		}
 	}
 
+	public ConcurrentSkipListSet<Recipient> speedDialList() {
+		return new ConcurrentSkipListSet<>(mSpeedDialList);
+	}
+
 	public ConcurrentSkipListSet<Recipient> recipientAllowList() {
 		return new ConcurrentSkipListSet<>(mRecipientAllowList);
 	}
@@ -172,6 +205,9 @@ public class MailCache {
 
 	public CompletableFuture<Void> blockAllowListAdd(BlockAllowListType listType, Recipient recipient, boolean isLocal) {
 		switch (listType) {
+			case SPEED_DIAL -> {
+				return speedDialListAdd(recipient, isLocal);
+			}
 			case ALLOW -> {
 				return allowListAdd(recipient, isLocal);
 			}
@@ -184,6 +220,32 @@ public class MailCache {
 				return future;
 			}
 		}
+	}
+
+	public CompletableFuture<Void> speedDialListAdd(Recipient recipient, boolean isLocal) {
+		CompletableFuture<Void> future = new CompletableFuture<>();
+
+		if (mSpeedDialList.contains(recipient)) {
+			future.complete(null);
+			return future;
+		}
+
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			RedisAPI.getInstance().async().srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
+			mRecipientBlockList.remove(recipient);
+			RedisAPI.getInstance().async().sadd(mRecipient.speedDialListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
+			mSpeedDialList.add(recipient);
+
+			if (isLocal) {
+				MailMan.broadcastBlockAllowListChange(mRecipient, BlockAllowListType.SPEED_DIAL, recipient, true);
+			}
+
+			MailMan.getOrRegister(new Mailbox(mRecipient, recipient));
+
+			future.complete(null);
+		});
+
+		return future;
 	}
 
 	public CompletableFuture<Void> allowListAdd(Recipient recipient, boolean isLocal) {
@@ -236,6 +298,9 @@ public class MailCache {
 
 	public CompletableFuture<Void> blockAllowListRemove(BlockAllowListType listType, Recipient recipient, boolean isLocal) {
 		switch (listType) {
+			case SPEED_DIAL -> {
+				return speedDialListRemove(recipient, isLocal);
+			}
 			case ALLOW -> {
 				return allowListRemove(recipient, isLocal);
 			}
@@ -248,6 +313,28 @@ public class MailCache {
 				return future;
 			}
 		}
+	}
+
+	public CompletableFuture<Void> speedDialListRemove(Recipient recipient, boolean isLocal) {
+		CompletableFuture<Void> future = new CompletableFuture<>();
+
+		if (!mSpeedDialList.contains(recipient)) {
+			future.complete(null);
+			return future;
+		}
+
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			RedisAPI.getInstance().async().srem(mRecipient.speedDialListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
+			mSpeedDialList.remove(recipient);
+
+			if (isLocal) {
+				MailMan.broadcastBlockAllowListChange(mRecipient, BlockAllowListType.SPEED_DIAL, recipient, false);
+			}
+
+			future.complete(null);
+		});
+
+		return future;
 	}
 
 	public CompletableFuture<Void> allowListRemove(Recipient recipient, boolean isLocal) {
@@ -469,5 +556,30 @@ public class MailCache {
 				});
 			}
 		});
+	}
+
+	public int sortRecipientsWithSpeedDial(Recipient a, Recipient b) {
+		boolean aInSpeedDial = mSpeedDialList.contains(a);
+		boolean bInSpeedDial = mSpeedDialList.contains(b);
+
+		if (aInSpeedDial != bInSpeedDial) {
+			return aInSpeedDial ? -1 : 1;
+		}
+
+		return a.mailboxCompareTo(b);
+	}
+
+	public int sortMailboxesWithSpeedDial(Mailbox a, Mailbox b) {
+		Recipient aOtherRecipient = a.otherParticipant(mRecipient);
+		Recipient bOtherRecipient = b.otherParticipant(mRecipient);
+
+		boolean aInSpeedDial = mSpeedDialList.contains(aOtherRecipient);
+		boolean bInSpeedDial = mSpeedDialList.contains(bOtherRecipient);
+
+		if (aInSpeedDial != bInSpeedDial) {
+			return aInSpeedDial ? -1 : 1;
+		}
+
+		return a.mailboxCompareTo(b);
 	}
 }

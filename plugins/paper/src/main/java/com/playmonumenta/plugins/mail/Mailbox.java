@@ -195,6 +195,19 @@ public class Mailbox implements Comparable<Mailbox> {
 		return result;
 	}
 
+	/**
+	 * Gets the other participant in a mailbox;
+	 * assumes the participant you specified is one of the participants
+	 * @param recipient The first participant you're checking, ie the other of a mail cache
+	 * @return The participant other than the one you specified
+	 */
+	public Recipient otherParticipant(Recipient recipient) {
+		if (mSender.equals(recipient)) {
+			return mReceiver;
+		}
+		return mSender;
+	}
+
 	public Component friendlyName() {
 		return Component.text("Mailbox ", NamedTextColor.DARK_GRAY)
 			.decoration(TextDecoration.ITALIC, false)
