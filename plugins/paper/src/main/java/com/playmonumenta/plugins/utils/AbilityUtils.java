@@ -693,7 +693,7 @@ public class AbilityUtils {
 	}
 
 	public static ThrowableProjectile spawnAbilitySnowball(Plugin plugin, Player player, World world, double velocity, String name, @Nullable Particle particle) {
-		return spawnAbilitySnowball(plugin, player, world, velocity, name, particle, false);
+		return spawnAbilitySnowball(plugin, player, world, velocity, name, particle, LocationUtils.isLocationInWater(player.getLocation()));
 	}
 
 	public static ThrowableProjectile spawnAbilitySnowball(Plugin plugin, Player player, World world, double velocity, String name, @Nullable Particle particle, boolean inWater) {
@@ -702,6 +702,8 @@ public class AbilityUtils {
 		if (inWater) {
 			Trident trident = world.spawn(loc, Trident.class);
 			trident.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+			trident.setDamage(0);
+			trident.setKnockbackStrength(0);
 			proj = trident;
 		} else {
 			proj = world.spawn(loc, Snowball.class);
