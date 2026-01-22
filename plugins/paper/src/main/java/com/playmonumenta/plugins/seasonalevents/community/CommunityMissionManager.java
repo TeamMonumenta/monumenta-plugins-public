@@ -83,6 +83,32 @@ public class CommunityMissionManager {
 			),
 			"scoreboard players set $KaulIceSpleefUnlocked const 1", "unlock a new Ice Spleef map!"
 		));
+		mSchedule.add(new CommunityEvent(
+			LocalDateTime.of(2026, 1, 31, 0, 0),
+			LocalDateTime.of(2026, 2, 5, 0, 0),
+			new CommunityMissionDefinition(CommunityMissionType.SANCTUM, 200, 400, 750, 2, 5,
+				new TieredRewardSchema(
+					"epic:r1/dungeons/sanctumstrike/consuming_blight", 4,
+					"epic:r1/dungeons/sanctumstrike/consuming_blight", 8,
+					"epic:r1/dungeons/sanctumstrike/taferna_fragment", 2
+				)
+			),
+			new CommunityMissionDefinition(CommunityMissionType.DEPTHS, 4000, 10000, 18000, 25, 60,
+				new TieredRewardSchema(
+					"epic:r2/depths/loot/voidstained_geode", 4,
+					"epic:r2/items/currency/hyper_crystalline_shard", 2,
+					"epic:r2/depths/loot/voidstained_geode", 8
+				)
+			),
+			new CommunityMissionDefinition(CommunityMissionType.FISHING_COMBAT, 150, 300, 500, 2, 5,
+				new TieredRewardSchema(
+					"epic:r3/items/currency/hyperchromatic_archos_ring", 2,
+					"epic:r3/items/fishing/sand_dollar", 6,
+					"epic:r3/items/fishing/sand_dollar", 8
+				)
+			),
+			"scoreboard players set $KaulIceSpleefUnlocked const 1", "unlock a new Ice Spleef map!"
+		));
 	}
 
 	public @Nullable CommunityEvent getCurrentEvent() {
