@@ -31,9 +31,11 @@ import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
@@ -334,7 +336,7 @@ public class DelvesManager implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entitySpawnEvent(EntitySpawnEvent event) {
 		Entity entity = event.getEntity();
-		if (!DelvesUtils.isInDelvableWorld(entity.getWorld())) {
+		if (!DelvesUtils.isInDelvableWorld(entity.getWorld()) || ZoneUtils.hasZoneProperty(entity, ZoneUtils.ZoneProperty.NO_DELVES)) {
 			setForcedReferenceToSpawner(null);
 			return;
 		}
@@ -432,7 +434,7 @@ public class DelvesManager implements Listener {
 		Player player = event.getPlayer();
 		//load the delves
 		loadPlayerData(player);
-		if (getRank(player, DelvesModifier.HAUNTED) > 0 && !player.isDead()) {
+		if (getRank(player, DelvesModifier.HAUNTED) > 0 && !player.isDead() && !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_DELVES)) {
 			Haunted.applyModifiers(player);
 		}
 	}
@@ -440,7 +442,9 @@ public class DelvesManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityDeathEvent(EntityDeathEvent event) {
 		if ((getRank(event.getEntity().getKiller(), DelvesModifier.HAUNTED) > 0)) {
-			if (event.getEntity().getKiller() == null || event.getEntity().getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)) {
+			if (event.getEntity().getKiller() == null
+				|| event.getEntity().getScoreboardTags().contains(EntityUtils.IGNORE_DEATH_TRIGGERS_TAG)
+				|| ZoneUtils.hasZoneProperty(event.getEntity(), ZoneUtils.ZoneProperty.NO_DELVES)) {
 				return;
 			}
 			int multiplier = 1;
@@ -460,9 +464,11 @@ public class DelvesManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void playerWalk(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		if (getRank(player, DelvesModifier.ASTRAL) == 0
+		if (!MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, "Ran astral check recently", 5)
 			|| player.getGameMode() == GameMode.SPECTATOR
-			|| player.getGameMode() == GameMode.CREATIVE) {
+			|| player.getGameMode() == GameMode.CREATIVE
+			|| getRank(player, DelvesModifier.ASTRAL) == 0
+			|| ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_DELVES)) {
 			return;
 		}
 		PotionEffect resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
@@ -504,6 +510,9 @@ public class DelvesManager implements Listener {
 			return;
 		}
 		Player player = event.getPlayer();
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_DELVES)) {
+			return;
+		}
 		double expBuffPct = 0;
 		for (DelvesModifier mod : DelvesModifier.rotatingDelveModifiers()) {
 			if (getRank(player, mod) > 0) {
@@ -516,7 +525,7 @@ public class DelvesManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onPlayerHurt(DamageEvent event) {
 		if (event.getDamagee() instanceof Player player) {
-			if (!DUNGEONS.contains(DelvesUtils.getDungeonName(player))) {
+			if (!DUNGEONS.contains(DelvesUtils.getDungeonName(player)) || ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_DELVES)) {
 				return;
 			}
 
@@ -544,7 +553,8 @@ public class DelvesManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockBreakEventLate(BlockBreakEvent event) {
 		if (!DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
-			|| !Plugin.IS_PLAY_SERVER) {
+			|| !Plugin.IS_PLAY_SERVER
+			|| ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.NO_DELVES)) {
 			return;
 		}
 		Gravity.gravityBlockBreakHandler(event.getBlock(), DelvesUtils.getModifierLevel(event.getBlock().getLocation(), DelvesModifier.GRAVITY));
@@ -554,7 +564,8 @@ public class DelvesManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerVelocityChange(PlayerVelocityEvent event) {
 		if (!DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
-			|| !Plugin.IS_PLAY_SERVER) {
+			|| !Plugin.IS_PLAY_SERVER
+			|| ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneUtils.ZoneProperty.NO_DELVES)) {
 			return;
 		}
 		if (DelvesUtils.getModifierLevel(event.getPlayer(), DelvesModifier.GRAVITY) == 0) {
@@ -567,7 +578,8 @@ public class DelvesManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onFallBlock(final EntityChangeBlockEvent event) {
 		if (!DelvesUtils.isInDelvableWorld(event.getBlock().getWorld())
-			|| !Plugin.IS_PLAY_SERVER) {
+			|| !Plugin.IS_PLAY_SERVER
+			|| ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.NO_DELVES)) {
 			return;
 		}
 		if (event.getEntity() instanceof FallingBlock fallingBlock) {
@@ -584,7 +596,8 @@ public class DelvesManager implements Listener {
 	public void onLoom(final StructureGrowEvent event) {
 		if (event.getPlayer() == null
 			|| !DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
-			|| !Plugin.IS_PLAY_SERVER) {
+			|| !Plugin.IS_PLAY_SERVER
+			|| ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneUtils.ZoneProperty.NO_DELVES)) {
 			return;
 		}
 		Location loc = event.getLocation();
@@ -603,7 +616,8 @@ public class DelvesManager implements Listener {
 	public void onBlockPlaceEvent(BlockPlaceEvent event) {
 		Location loc = event.getBlock().getLocation();
 		if (!DUNGEONS.contains(DelvesUtils.getDungeonName(event.getPlayer()))
-			|| !Plugin.IS_PLAY_SERVER) {
+			|| !Plugin.IS_PLAY_SERVER
+			|| ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneUtils.ZoneProperty.NO_DELVES)) {
 			return;
 		}
 		new BukkitRunnable() { // Need to delay gravity check to allow for firmament to switch the block out first
@@ -621,7 +635,8 @@ public class DelvesManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockExplodeEventLate(BlockExplodeEvent event) {
 		if (!DelvesUtils.isInDelvableWorld(event.getBlock().getWorld())
-			|| !Plugin.IS_PLAY_SERVER) {
+			|| !Plugin.IS_PLAY_SERVER
+			|| ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.NO_DELVES)) {
 			return;
 		}
 		Gravity.handleExplosion(event.blockList(), DelvesUtils.getModifierLevel(event.getBlock().getLocation(), DelvesModifier.GRAVITY));
@@ -633,7 +648,8 @@ public class DelvesManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityExplodeEventLate(EntityExplodeEvent event) {
 		if (!DelvesUtils.isInDelvableWorld(event.getEntity().getWorld())
-			|| !Plugin.IS_PLAY_SERVER) {
+			|| !Plugin.IS_PLAY_SERVER
+			|| ZoneUtils.hasZoneProperty(event.getEntity(), ZoneUtils.ZoneProperty.NO_DELVES)) {
 			return;
 		}
 		Gravity.handleExplosion(event.blockList(), DelvesUtils.getModifierLevel(event.getLocation(), DelvesModifier.GRAVITY));
@@ -681,7 +697,7 @@ public class DelvesManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		Player player = event.getPlayer();
-		if (getRank(player, DelvesModifier.HAUNTED) > 0) {
+		if (getRank(player, DelvesModifier.HAUNTED) > 0 && !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_DELVES)) {
 			Haunted.applyModifiers(player);
 		}
 	}
@@ -689,16 +705,20 @@ public class DelvesManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
-		if (getRank(player, DelvesModifier.HAUNTED) > 0) {
-			for (Entity entity : player.getNearbyEntities(100, 100, 100)) {
-				if (entity instanceof ArmorStand && entity.getScoreboardTags().contains(PHANTOM_NAME + player.getUniqueId())) {
-					entity.remove();
+		if (!ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_DELVES)) {
+			if (getRank(player, DelvesModifier.HAUNTED) > 0) {
+				for (Entity entity : player.getNearbyEntities(100, 100, 100)) {
+					if (entity instanceof ArmorStand && entity.getScoreboardTags().contains(PHANTOM_NAME + player.getUniqueId())) {
+						entity.remove();
+					}
 				}
 			}
-		}
-
-		if (!event.getKeepInventory()) {
-			Fragile.applyModifiers(player, DelvesUtils.getModifierLevel(player, DelvesModifier.FRAGILE));
+			if (!event.getKeepInventory()) {
+				Fragile.applyModifiers(player, DelvesUtils.getModifierLevel(player, DelvesModifier.FRAGILE));
+			}
+			if (getRank(player, DelvesModifier.MORBID) > 0) {
+				Morbid.applyModifiers(player, DelvesUtils.getModifierLevel(player, DelvesModifier.MORBID));
+			}
 		}
 
 		for (LivingEntity mob : player.getLocation().getNearbyLivingEntities(25)) {
@@ -706,9 +726,6 @@ public class DelvesManager implements Listener {
 			if (boss != null) {
 				boss.playerDeath(player);
 			}
-		}
-		if (getRank(player, DelvesModifier.MORBID) > 0) {
-			Morbid.applyModifiers(player, DelvesUtils.getModifierLevel(player, DelvesModifier.MORBID));
 		}
 	}
 

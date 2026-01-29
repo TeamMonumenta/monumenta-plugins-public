@@ -46,6 +46,7 @@ public class ZoneUtils {
 		MONUMENT("Monument"),
 		NO_BERRY_BUSH_CLICKS("No Berry Bush Clicks"),
 		NO_BUFF_DURATION_LOSS_ON_DEATH("No Buff Duration Loss On Death"),
+		NO_DELVES("No Delves"),
 		NO_DOOR_CLICKS("No Door Clicks"),
 		NO_EQUIPMENT_DAMAGE("No Equipment Damage"),
 		NO_EXPLOSIONS("No Explosions"),
