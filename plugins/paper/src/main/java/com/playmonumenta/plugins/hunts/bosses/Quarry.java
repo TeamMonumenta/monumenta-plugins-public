@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.hunts.bosses;
 
 import com.playmonumenta.libraryofsouls.bestiary.BestiaryManager;
 import com.playmonumenta.libraryofsouls.commands.LibraryOfSoulsCommand;
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.bosses.SerializedLocationBossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -39,7 +40,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -203,12 +206,27 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 		UUID uuid = player.getUniqueId();
 		mPlayers.remove(uuid);
 		mSpoiledPlayers.remove(uuid);
+		mWarnedLatePlayers.remove(uuid);
 		teleportToLodge(player);
 		MessagingUtils.sendTitle(player, Component.text("You have been banished!", NamedTextColor.RED), Component.text("You find yourself safe back at the Lodge", NamedTextColor.GRAY));
 		PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.BLINDNESS, 3 * 20, 0, true, false));
 		PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DARKNESS, 2 * 20, 0, true, false));
 		EffectManager.getInstance().addEffect(player, "QuarryBanishStasis", new Stasis(2 * 20, false));
 		MMLog.fine("[Hunts] Player " + player.getName() + " banished by quarry " + mBoss.getName());
+
+		// banish message obeys player's PEB setting for whether death messages are broadcasted
+		Component banishMessage = formatBanishMessage(player);
+		player.sendMessage(banishMessage);
+		if (ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0) == 0) { // visible to all players in fight
+			for (Player onlinePlayer : getPlayers()) {
+				onlinePlayer.sendMessage(banishMessage);
+			}
+			for (Player onlinePlayer : getWarnedLatePlayers()) {
+				onlinePlayer.sendMessage(banishMessage);
+			}
+		} else { // only shown to player who was banished
+			player.sendMessage(Component.text("Only you saw this message. Change this with /deathmsg", NamedTextColor.AQUA));
+		}
 	}
 
 	@Override
@@ -449,5 +467,20 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 
 	public boolean hasPlayer(Player player) {
 		return mPlayers.contains(player.getUniqueId());
+	}
+
+	public String getBanishMessage() {
+		return "";
+	}
+
+	public Component formatBanishMessage(Player player) {
+		TextReplacementConfig config1 = TextReplacementConfig.builder()
+			.match("PLAYER").replacement(player.getName())
+			.build();
+		TextReplacementConfig config2 = TextReplacementConfig.builder()
+			.match("QUARRY").replacement(mBoss.customName())
+			.build();
+		return Component.text("⌘ ", TextColor.fromHexString("#4C8F4D"))
+			.append(Component.text(getBanishMessage(), NamedTextColor.WHITE).replaceText(config1).replaceText(config2));
 	}
 }

@@ -202,4 +202,9 @@ public class CoreElemental extends Quarry {
 	public void addChangedBlock(Block block) {
 		mChangedBlocks.put(block, block.getType());
 	}
+
+	@Override
+	public String getBanishMessage() {
+		return "PLAYER was melted by QUARRY's heat";
+	}
 }

@@ -635,4 +635,9 @@ public class ExperimentSeventyOne extends Quarry {
 	public String getQuestTag() {
 		return "HuntHoglin";
 	}
+
+	@Override
+	public String getBanishMessage() {
+		return "PLAYER was trapped in the mud by QUARRY";
+	}
 }

@@ -340,4 +340,9 @@ public class Uamiel extends Quarry {
 	public String getQuestTag() {
 		return "HuntRavager";
 	}
+
+	@Override
+	public String getBanishMessage() {
+		return "PLAYER fell victim to QUARRY's paralyzing spores";
+	}
 }

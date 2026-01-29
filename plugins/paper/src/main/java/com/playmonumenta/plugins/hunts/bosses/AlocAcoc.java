@@ -270,4 +270,9 @@ public class AlocAcoc extends Quarry {
 	public String getQuestTag() {
 		return "HuntBear";
 	}
+
+	@Override
+	public String getBanishMessage() {
+		return "PLAYER was frozen by QUARRY";
+	}
 }

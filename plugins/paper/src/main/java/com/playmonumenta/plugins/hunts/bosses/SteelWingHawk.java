@@ -165,4 +165,9 @@ public class SteelWingHawk extends Quarry {
 	public String getQuestTag() {
 		return "HuntPhantom";
 	}
+
+	@Override
+	public String getBanishMessage() {
+		return "PLAYER was lulled into a nightmare by QUARRY";
+	}
 }

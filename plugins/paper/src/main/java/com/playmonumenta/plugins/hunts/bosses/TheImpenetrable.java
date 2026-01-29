@@ -490,4 +490,9 @@ public class TheImpenetrable extends Quarry {
 	public String getQuestTag() {
 		return "HuntShulker";
 	}
+
+	@Override
+	public String getBanishMessage() {
+		return "PLAYER was paralyzed by QUARRY's gaze";
+	}
 }
