@@ -4,9 +4,13 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.networkchat.RemotePlayerListener;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEvent;
+import com.playmonumenta.networkrelay.RemotePlayerAPI;
+import com.playmonumenta.networkrelay.RemotePlayerAbstraction;
+import com.playmonumenta.networkrelay.RemotePlayerLoadedEvent;
+import com.playmonumenta.networkrelay.RemotePlayerUnloadedEvent;
+import com.playmonumenta.networkrelay.RemotePlayerUpdatedEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -32,7 +36,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
@@ -52,8 +55,8 @@ public class SocialManager implements Listener {
 	private static final Map<String, BukkitTask> PENDING_FRIEND_REQUESTS_MAP = new ConcurrentHashMap<>();
 	private static final Map<String, CompletableFuture<Void>> PENDING_FRIEND_REMOVALS_MAP = new ConcurrentHashMap<>();
 
-	// shard swap check
-	private static final Set<UUID> PENDING_LOGOUT_CHECKS = ConcurrentHashMap.newKeySet();
+	// player visibility cache
+	private static final Set<UUID> VISIBLE_REMOTE_PLAYERS = ConcurrentHashMap.newKeySet();
 
 	// Blocking
 	static final String REDIS_SOCIAL_TYPE_BLOCKED = "blocked";
@@ -69,9 +72,19 @@ public class SocialManager implements Listener {
 	private static final String MODERATOR_FORCE_REMOVED_FRIENDS_CHANNEL = "moderatorForceRemovedFriendsChannel";
 	private static final String BLOCKED_PLAYER_CHANNEL = "blockedPlayerChannel";
 	private static final String UNBLOCKED_PLAYER_CHANNEL = "unblockedPlayerChannel";
-	private static final String FRIEND_LOGIN_CHANNEL = "friendLoginChannel";
-	private static final String FRIEND_LOGOUT_CHANNEL = "friendLogoutChannel";
 	//endregion
+
+	public SocialManager() {
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+			try {
+				if (RemotePlayerAPI.isManagerLoaded()) {
+					VISIBLE_REMOTE_PLAYERS.addAll(RemotePlayerAPI.getVisiblePlayerUuids());
+				}
+			} catch (Exception ex) {
+				MMLog.warning(LOG_PREFIX + "Failed to initialize visible players cache: " + ex.getMessage());
+			}
+		});
+	}
 
 	//region <FRIENDS>
 	static void sendFriendRequest(UUID senderUuid, UUID receiverUuid) {
@@ -590,31 +603,9 @@ public class SocialManager implements Listener {
 			.thenAccept(socialCache -> SOCIAL_CACHE_MAP.put(playerUuid, socialCache));
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		Player p = event.getPlayer();
-
-		if (!PremiumVanishIntegration.isInvisibleOrSpectator(p)) {
-			Map<String, String> jsonProperties = Map.of(
-				"uuid", p.getUniqueId().toString(),
-				"name", p.getName()
-			);
-			broadcastNotification(FRIEND_LOGIN_CHANNEL, jsonProperties, "Failed to notify other shards of player login via RabbitMQ.");
-		}
-	}
-
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void onPlayerLogout(PlayerQuitEvent event) {
 		UUID playerUuid = event.getPlayer().getUniqueId();
-		Player p = event.getPlayer();
-
-		if (!PremiumVanishIntegration.isInvisibleOrSpectator(p)) {
-			Map<String, String> jsonProperties = Map.of(
-				"uuid", playerUuid.toString(),
-				"name", p.getName()
-			);
-			broadcastNotification(FRIEND_LOGOUT_CHANNEL, jsonProperties, "Failed to notify other shards of player logout via RabbitMQ.");
-		}
 
 		PlayerSocialCache cachedAtLogout = SOCIAL_CACHE_MAP.get(playerUuid);
 
@@ -631,6 +622,54 @@ public class SocialManager implements Listener {
 			}
 		}, 15 * 20L);
 	}
+
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void onRemotePlayerLoaded(RemotePlayerLoadedEvent event) {
+		UUID uuid = event.mRemotePlayer.getUuid();
+		String name = event.mRemotePlayer.getName();
+
+		if (!"minecraft".equals(event.mRemotePlayer.getServerType())) {
+			return;
+		}
+		if (isSociallyVisible(event.mRemotePlayer)) {
+			if (VISIBLE_REMOTE_PLAYERS.add(uuid)) {
+				notifyFriends(uuid, name, true);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void onRemotePlayerUnloaded(RemotePlayerUnloadedEvent event) {
+		UUID uuid = event.mRemotePlayer.getUuid();
+		String name = event.mRemotePlayer.getName();
+
+		if (!"proxy".equals(event.mRemotePlayer.getServerType())) {
+			return;
+		}
+		if (VISIBLE_REMOTE_PLAYERS.remove(uuid)) {
+			notifyFriends(uuid, name, false);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void onRemotePlayerUpdated(RemotePlayerUpdatedEvent event) {
+		UUID uuid = event.mRemotePlayer.getUuid();
+		String name = event.mRemotePlayer.getName();
+
+		if (!"minecraft".equals(event.mRemotePlayer.getServerType())) {
+			return;
+		}
+		
+		boolean isNowVisible = isSociallyVisible(event.mRemotePlayer);
+		boolean wasVisible = VISIBLE_REMOTE_PLAYERS.contains(uuid);
+		if (isNowVisible && !wasVisible) {
+			VISIBLE_REMOTE_PLAYERS.add(uuid);
+			notifyFriends(uuid, name, true);
+		} else if (!isNowVisible && wasVisible) {
+			VISIBLE_REMOTE_PLAYERS.remove(uuid);
+			notifyFriends(uuid, name, false);
+		}
+	}
 	//endregion
 
 	//region <RABBITMQ>
@@ -646,58 +685,9 @@ public class SocialManager implements Listener {
 			case MODERATOR_FORCE_REMOVED_FRIENDS_CHANNEL -> handleModeratorForceRemovedFriendship(data);
 			case BLOCKED_PLAYER_CHANNEL -> handleBlockedPlayer(data);
 			case UNBLOCKED_PLAYER_CHANNEL -> handleUnblockedPlayer(data);
-			case FRIEND_LOGIN_CHANNEL -> handleFriendLogin(data);
-			case FRIEND_LOGOUT_CHANNEL -> handleFriendLogout(data);
 			default -> {
 				// Do nothing
 			}
-		}
-	}
-
-	private void handleFriendLogin(JsonObject data) {
-		if (data.has("uuid") && data.has("name")) {
-			UUID joiningUuid = UUID.fromString(data.get("uuid").getAsString());
-			String joiningName = data.get("name").getAsString();
-
-			// if player has logged out recently, probably switching servers, remove so it doesn't do quit or join message
-			if (PENDING_LOGOUT_CHECKS.remove(joiningUuid)) {
-				return;
-			}
-
-			SOCIAL_CACHE_MAP.values().forEach(cache -> {
-				if (cache.isFriendsWith(joiningUuid)) {
-					Player localFriend = Bukkit.getPlayer(cache.getPlayerUuid());
-					if (localFriend != null && localFriend.isOnline() && !localFriend.getUniqueId().equals(joiningUuid)) {
-						localFriend.sendMessage(appendPrefix(
-							Component.text(joiningName + " joined.", NamedTextColor.GREEN)
-						));
-					}
-				}
-			});
-		}
-	}
-
-	private void handleFriendLogout(JsonObject data) {
-		if (data.has("uuid") && data.has("name")) {
-			UUID quittingUuid = UUID.fromString(data.get("uuid").getAsString());
-			String quittingName = data.get("name").getAsString();
-
-			// if player is still in set and hasn't logged in after 2 secs, not a shard switch so send quit message
-			PENDING_LOGOUT_CHECKS.add(quittingUuid);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				if (PENDING_LOGOUT_CHECKS.remove(quittingUuid)) {
-					SOCIAL_CACHE_MAP.values().forEach(cache -> {
-						if (cache.isFriendsWith(quittingUuid)) {
-							Player localFriend = Bukkit.getPlayer(cache.getPlayerUuid());
-							if (localFriend != null && localFriend.isOnline() && !localFriend.getUniqueId().equals(quittingUuid)) {
-								localFriend.sendMessage(appendPrefix(
-									Component.text(quittingName + " quit.", NamedTextColor.RED)
-								));
-							}
-						}
-					});
-				}
-			}, 40L);
 		}
 	}
 
@@ -1104,6 +1094,25 @@ public class SocialManager implements Listener {
 	private static String getSocialPairKey(UUID uuid1, UUID uuid2) {
 		// Generate a consistent key for a pair of UUIDs regardless of their order
 		return uuid1.compareTo(uuid2) < 0 ? uuid1 + "-" + uuid2 : uuid2 + "-" + uuid1;
+	}
+
+	private void notifyFriends(UUID playerUuid, String playerName, boolean isJoin) {
+		SOCIAL_CACHE_MAP.values().forEach(cache -> {
+			if (cache.isFriendsWith(playerUuid)) {
+				Player localFriend = Bukkit.getPlayer(cache.getPlayerUuid());
+				if (localFriend != null && localFriend.isOnline() && !localFriend.getUniqueId().equals(playerUuid)) {
+					String action = isJoin ? " joined." : " quit.";
+					NamedTextColor color = isJoin ? NamedTextColor.GREEN : NamedTextColor.RED;
+					localFriend.sendMessage(appendPrefix(
+						Component.text(playerName + action, color)
+					));
+				}
+			}
+		});
+	}
+
+	private boolean isSociallyVisible(@Nullable RemotePlayerAbstraction abstraction) {
+		return abstraction != null && abstraction.isOnline() && !Boolean.TRUE.equals(abstraction.isHidden());
 	}
 	//endregion
 
