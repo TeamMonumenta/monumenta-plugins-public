@@ -356,7 +356,7 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 			mPhase++;
 			mPreventTargetting = false;
 			sendDialogue("YOU... SHOULD HAVE NOT COME HERE... PERISH...", NamedTextColor.DARK_AQUA, true);
-			sendDialogue("An inpenetrable armor forms around Eldrask.", NamedTextColor.AQUA, false);
+			sendDialogue("An impenetrable armor forms around Eldrask.", NamedTextColor.AQUA, false);
 			changeMainhandItem(new ItemStack(Material.BONE), "Frost Giant's Staff");
 		});
 

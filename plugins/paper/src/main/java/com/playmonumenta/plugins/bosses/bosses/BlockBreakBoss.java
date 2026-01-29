@@ -32,7 +32,7 @@ public final class BlockBreakBoss extends BossAbilityGroup {
 		public int Z_RADIUS = 1;
 
 		@BossParam(help = "Vertical offset for block break volume")
-		public int Y_OFFSET = 0;
+		public double Y_OFFSET = 0.5;
 
 		@BossParam(help = "How often the block break is casted")
 		public int COOLDOWN = PASSIVE_RUN_INTERVAL_DEFAULT;

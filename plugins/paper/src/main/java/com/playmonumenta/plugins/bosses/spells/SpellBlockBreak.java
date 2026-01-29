@@ -36,7 +36,7 @@ public class SpellBlockBreak extends Spell {
 	private final int mXRad;
 	private final int mYRad;
 	private final int mZRad;
-	private final int mYOffset;
+	private final double mYOffset;
 	private final int mArenaFloorY;
 	private final boolean mBreakBossArena;
 	private final boolean mFlattenArena;
@@ -64,7 +64,7 @@ public class SpellBlockBreak extends Spell {
 		this(launcher, xRad, yRad, zRad, 0, arenaFloorY, adaptToBoundingBox, breakBossArena, breakFootLevel);
 	}
 
-	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int yOffset, final int arenaFloorY,
+	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final double yOffset, final int arenaFloorY,
 	                       final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean breakFootLevel) {
 		this(launcher, xRad, yRad, zRad, yOffset, arenaFloorY, adaptToBoundingBox, breakBossArena, false,
 			breakFootLevel, true, false, Material.AIR);
@@ -95,10 +95,10 @@ public class SpellBlockBreak extends Spell {
 	 * @param onlyForcecast       Whether to run this spell manually. Used during the launcher's pathfinding calculations. Defaults to false
 	 * @param noBreak             List of block materials the launcher should not break
 	 */
-	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final int yOffset, final int arenaFloorY,
-	                       final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean flattenArena,
-	                       final boolean breakFootLevel, final boolean breakOverheadBlocks, final boolean onlyForcecast,
-	                       final Material... noBreak) {
+	public SpellBlockBreak(final Entity launcher, final int xRad, final int yRad, final int zRad, final double yOffset, final int arenaFloorY,
+						   final boolean adaptToBoundingBox, final boolean breakBossArena, final boolean flattenArena,
+						   final boolean breakFootLevel, final boolean breakOverheadBlocks, final boolean onlyForcecast,
+						   final Material... noBreak) {
 		mLauncher = launcher;
 		mAdaptToBoundingBox = adaptToBoundingBox;
 		mXRad = xRad;
