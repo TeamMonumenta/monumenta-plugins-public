@@ -4,11 +4,12 @@ import com.playmonumenta.velocity.MonumentaVelocity;
 import com.playmonumenta.velocity.integrations.PremiumVanishIntegration;
 import com.playmonumenta.velocity.network.VelocityClientModHandler;
 import com.velocitypowered.api.event.PostOrder;
+import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.DisconnectEvent.LoginStatus;
+import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
-import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import java.util.Collection;
 import java.util.Set;
@@ -79,7 +80,7 @@ public class JoinLeaveHandler {
 	}
 
 	@Subscribe(order = PostOrder.EARLY)
-	public void serverPreConnectEvent(ServerPreConnectEvent event) {
+	public void loginEvent(LoginEvent event) {
 		String whitelistPermission = System.getenv("MONUMENTA_WHITELIST");
 		if (whitelistPermission == null || whitelistPermission.isBlank()) {
 			return;
@@ -87,7 +88,7 @@ public class JoinLeaveHandler {
 
 		Player player = event.getPlayer();
 		if (!player.hasPermission(whitelistPermission)) {
-			event.setResult(ServerPreConnectEvent.ServerResult.denied());
+			event.setResult(ResultedEvent.ComponentResult.denied(Component.text("You do not have access to this test server.\nTry server.playmonumenta.com instead.")));
 		}
 	}
 
