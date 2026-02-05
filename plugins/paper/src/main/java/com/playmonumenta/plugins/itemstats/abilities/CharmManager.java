@@ -448,6 +448,7 @@ public class CharmManager {
 			Illuminate.CHARM_KNOCKBACK,
 			Illuminate.CHARM_ENHANCE_DAMAGE,
 			Illuminate.CHARM_ENHANCE_RADIUS,
+			Illuminate.CHARM_ENHANCE_TICK_DELAY,
 			HolyJavelin.CHARM_COOLDOWN,
 			HolyJavelin.CHARM_DAMAGE,
 			HolyJavelin.CHARM_RANGE,
@@ -1258,6 +1259,7 @@ public class CharmManager {
 			ChoirBells.CHARM_TOLL_DELAY,
 			LuminousInfusion.CHARM_COOLDOWN,
 			Illuminate.CHARM_COOLDOWN,
+			Illuminate.CHARM_ENHANCE_TICK_DELAY,
 			EtherealAscension.CHARM_COOLDOWN,
 			HallowedBeam.CHARM_COOLDOWN,
 			KeeperVirtue.CHARM_COOLDOWN,
@@ -1808,7 +1810,7 @@ public class CharmManager {
 		double flatLevel = getInstance().getValueOfAttribute(player, charmEffectName);
 		double percentLevel = getInstance().getValueOfAttribute(player, charmEffectName + "%");
 
-		return (int) ((baseDuration + flatLevel * 20) * ((percentLevel / 100.0) + 1));
+		return (int) Math.round((baseDuration + flatLevel * 20) * ((percentLevel / 100.0) + 1));
 	}
 
 	public static int getCooldown(Player player, String charmEffectName, int baseCooldown) {

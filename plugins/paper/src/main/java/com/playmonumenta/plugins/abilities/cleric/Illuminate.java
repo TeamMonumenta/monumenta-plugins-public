@@ -69,6 +69,7 @@ public class Illuminate extends Ability {
 	public static final String CHARM_KNOCKBACK = "Illuminate Knockback";
 	public static final String CHARM_ENHANCE_RADIUS = "Illuminate Enhancement Radius";
 	public static final String CHARM_ENHANCE_DAMAGE = "Illuminate Enhancement Damage";
+	public static final String CHARM_ENHANCE_TICK_DELAY = "Illuminate Enhancement Tick Delay";
 
 	public static final AbilityInfo<Illuminate> INFO =
 		new AbilityInfo<>(Illuminate.class, "Illuminate", Illuminate::new)
@@ -97,6 +98,7 @@ public class Illuminate extends Ability {
 	private final double mStrengthBuff;
 	private final double mEnhanceRadius;
 	private final double mEnhanceDamage;
+	private final int mEnhanceTickCooldown;
 
 	private @Nullable BukkitRunnable mCastRunnable;
 	private @Nullable BukkitRunnable mEffectsRunnable;
@@ -127,6 +129,7 @@ public class Illuminate extends Ability {
 		// enhancement
 		mEnhanceRadius = CharmManager.getRadius(mPlayer, CHARM_ENHANCE_RADIUS, ILLUMINATE_ENHANCE_RADIUS);
 		mEnhanceDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ENHANCE_DAMAGE, ILLUMINATE_ENHANCE_DAMAGE);
+		mEnhanceTickCooldown = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_TICK_DELAY, ILLUMINATE_ENHANCE_COOLDOWN);
 
 		mCastRunnable = null;
 		mEffectsRunnable = null;
@@ -205,7 +208,7 @@ public class Illuminate extends Ability {
 					}
 				}
 
-				if (isEnhanced() && mTicks % ILLUMINATE_ENHANCE_COOLDOWN == 0) {
+				if (isEnhanced() && mTicks % mEnhanceTickCooldown == 0) {
 					for (final LivingEntity mob : mMobsInZone) {
 						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mEnhanceDamage, ILLUMINATE_DOT_ABILITY, true);
 						mCosmetic.enhanceTickDamageEffect(mPlayer, mob);
@@ -355,7 +358,7 @@ public class Illuminate extends Ability {
 			.addStat("Trail Damage: %d (s) every %t")
 				.statValues(
 					stat(a -> a.mEnhanceDamage, ILLUMINATE_ENHANCE_DAMAGE),
-					stat(ILLUMINATE_ENHANCE_COOLDOWN))
+					stat(a -> a.mEnhanceTickCooldown, ILLUMINATE_ENHANCE_COOLDOWN))
 			.addStat("Area Radius: %r")
 				.statValues(stat(a -> a.mEnhanceRadius, ILLUMINATE_ENHANCE_RADIUS))
 			.addDashedLine();
