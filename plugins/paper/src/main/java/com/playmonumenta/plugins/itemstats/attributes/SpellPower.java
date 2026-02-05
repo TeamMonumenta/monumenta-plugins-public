@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.attributes;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Attribute;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +37,13 @@ public class SpellPower implements Attribute {
 		if (player == null) {
 			return damage;
 		}
+		return getSpellDamage(plugin.mItemStatManager.getPlayerItemStats(player), damage);
+	}
 
-		return (float) (damage * plugin.mItemStatManager.getAttributeAmount(player, AttributeType.SPELL_DAMAGE));
+	public static float getSpellDamage(@Nullable ItemStatManager.PlayerItemStats playerItemStats, float damage) {
+		if (playerItemStats == null) {
+			return damage;
+		}
+		return (float) (damage * playerItemStats.getItemStats().get(AttributeType.SPELL_DAMAGE));
 	}
 }
