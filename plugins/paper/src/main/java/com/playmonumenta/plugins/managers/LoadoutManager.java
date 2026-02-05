@@ -145,12 +145,13 @@ public class LoadoutManager implements Listener {
 
 		ARMOR("armor", "armou?rs?", 1, item -> ItemUtils.isArmorOrWearable(item) || ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
 
-		SWORD("sword", "swords?", 2, item -> ItemUtils.isSword(item)),
-		AXE("axe", "axes?", 2, item -> ItemUtils.isAxe(item)),
-		PICKAXE("pickaxe", "pickaxes?", 2, item -> ItemUtils.isPickaxe(item)),
-		SCYTHE("scythe", "hoes?|scythes?", 2, item -> ItemUtils.isHoe(item)),
-		WAND("wand", "wands?", 2, item -> ItemUtils.isWand(item)),
-		RANGED("ranged", "ranged|projectiles?|(?:cross|x)?bows?|tridents?|(?:snow)?balls?", 2, item -> ItemUtils.isProjectileWeapon(item)),
+		SWORD("sword", "swords?", 2, ItemUtils::isSword),
+		AXE("axe", "axes?", 2, ItemUtils::isAxe),
+		PICKAXE("pickaxe", "pickaxes?", 2, ItemUtils::isPickaxe),
+		SCYTHE("scythe", "hoes?|scythes?", 2, ItemUtils::isHoe),
+		WAND("wand", "wands?", 2, ItemUtils::isWand),
+		ALCHEMIST("alchemist", "alch", 2, ItemUtils::isAlchemistItem),
+		RANGED("ranged", "ranged|projectiles?|(?:cross|x)?bows?|tridents?|(?:snow)?balls?", 2, ItemUtils::isProjectileWeapon),
 		WEAPON("weapon", "weapons?|mainhands?", 2, item -> ItemStatUtils.hasAttributeInSlot(item, Slot.MAINHAND) && !ItemStatUtils.hasAttributeInSlot(item, Slot.OFFHAND)),
 		SHIELD("shield", "shields?", 2, item -> item.getType() == Material.SHIELD),
 
@@ -181,8 +182,8 @@ public class LoadoutManager implements Listener {
 
 		// Consumables are (mostly) region-independent, and charms always R3, so their priority includes the priority a region tag would add
 		// this for example makes 'consumables' higher priority than 'r2 weapons', thus sorting Fruit of Life into 'consumables' rather than 'weapons'
-		CHARM("charm", "charms?", 104, item -> ItemStatUtils.isCharm(item)),
-		ZENITH("zenith", "zenith", 105, item -> ItemStatUtils.isZenithCharm(item)),
+		CHARM("charm", "charms?", 104, ItemStatUtils::isCharm),
+		ZENITH("zenith", "zenith", 105, ItemStatUtils::isZenithCharm),
 		CONSUMABLE("consumable", "consumables?|foods?|potions?", 104,
 			item -> ItemStatUtils.isConsumable(item)
 				|| (item.getType().isEdible() && !ItemStatUtils.isCharm(item))
@@ -476,7 +477,7 @@ public class LoadoutManager implements Listener {
 									newItem.subtract();
 									activeCharms.add(newItemClone);
 									if (!oldCharms.isEmpty()) {
-										ItemStack oldCharm = oldCharms.remove(0);
+										ItemStack oldCharm = oldCharms.removeFirst();
 										giveItem(player, inventories, oldCharm, List.of(inventory), invI);
 									}
 									if (!charmInventories.contains(inventory)) {
@@ -591,7 +592,7 @@ public class LoadoutManager implements Listener {
 			player.sendMessage(Component.text("Nothing swapped, you already match this loadout.", NamedTextColor.GRAY));
 			return;
 		}
-		String message = "Swapped " + String.join(", ", swappedThings.subList(0, swappedThings.size() - 1)) + (swappedThings.size() == 1 ? "" : " and ") + swappedThings.get(swappedThings.size() - 1) + ".";
+		String message = "Swapped " + String.join(", ", swappedThings.subList(0, swappedThings.size() - 1)) + (swappedThings.size() == 1 ? "" : " and ") + swappedThings.getLast() + ".";
 		player.sendMessage(Component.text(message, NamedTextColor.GOLD, TextDecoration.BOLD));
 		player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.1f);
 
