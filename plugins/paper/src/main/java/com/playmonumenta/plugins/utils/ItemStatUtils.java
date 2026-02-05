@@ -1,12 +1,15 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
+import com.playmonumenta.plugins.effects.AbsorptionSickness;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.HealingSickness;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
@@ -87,8 +90,12 @@ public class ItemStatUtils {
 	public static final String VANITY_ITEMS_KEY = "VanityItems";
 	public static final String PLAYER_CUSTOM_NAME_KEY = "PlayerCustomName";
 	public static final String CUSTOM_SKIN_KEY = "CustomSkin";
+	public static final String ABSORPTION_SICKNESS_COOLDOWN_KEY = "AbsorptionSicknessWarningSent";
+	public static final String HEALING_SICKNESS_COOLDOWN_KEY = "HealingSicknessWarningSent";
 
 	public static final Component DUMMY_LORE_TO_REMOVE = Component.text("DUMMY LORE TO REMOVE", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
+
+	public static final int SICKNESS_WARNING_COOLDOWN = 4 * Constants.TICKS_PER_SECOND;
 
 	public static @Nullable ReadWriteNBT getMonumenta(@Nullable ReadWriteNBT nbt) {
 		if (nbt == null) {
@@ -183,18 +190,20 @@ public class ItemStatUtils {
 				return;
 			}
 
-			double quenchScale = entity instanceof Player player ? Quench.getDurationScaling(plugin, player) : 1;
-
 			for (ReadWriteNBT effect : effects) {
 				String type = effect.getString(EFFECT_TYPE_KEY);
 				int duration = (int) (effect.getInteger(EFFECT_DURATION_KEY) * durationScale) + durationAdd;
 				double strength = effect.getDouble(EFFECT_STRENGTH_KEY) + strengthChanges.getOrDefault(type, 0.0);
 
-				int modifiedDuration = (int) (duration * quenchScale);
+				int modifiedDuration = duration;
 
 				EffectType effectType = EffectType.fromType(type);
 				if (effectType != null) {
 					if (entity instanceof Player player) {
+						double quenchScale = Quench.EXCLUDED_EFFECTS.contains(effectType)
+							? 1
+							: Quench.getDurationScaling(plugin, player);
+						modifiedDuration = (int) (modifiedDuration * quenchScale);
 						// In the future this event could be used to process Quench and sicknesses to make this code a bit cleaner
 						EffectTypeApplyFromPotionEvent event = new EffectTypeApplyFromPotionEvent(player, effectType, strength, modifiedDuration, item);
 						Bukkit.getPluginManager().callEvent(event);
@@ -206,25 +215,45 @@ public class ItemStatUtils {
 					}
 
 					if (effectType == EffectType.ABSORPTION) {
-						double sicknessPenalty = 0;
 						if (entity instanceof Player player) {
-							NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "AbsorptionSickness");
-							if (sicks != null) {
-								Effect sick = sicks.last();
-								sicknessPenalty = sick.getMagnitude();
+							NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, AbsorptionSickness.effectID);
+							// Absorption Sickness fully disables the application of either effect
+							if (sicks == null) {
+								EffectType.applyEffect(effectType, entity, modifiedDuration, strength, null, applySickness);
+								continue;
+							}
+							if (MetadataUtils.checkOnceInRecentTicks(plugin, player, ABSORPTION_SICKNESS_COOLDOWN_KEY, SICKNESS_WARNING_COOLDOWN)) {
+								player.sendMessage(
+									Component.text("Your absorption shield warps and shimmers, you", NamedTextColor.GRAY)
+										.append(Component.text("aren't gaining absorption at all.", NamedTextColor.RED))
+										.appendNewline()
+										.append(Component.text("Wait ", NamedTextColor.GRAY))
+										.append(Component.text(sicks.last().getDuration() / 20, NamedTextColor.WHITE))
+										.append(Component.text(" more seconds before drinking another Absorption potion!", NamedTextColor.GRAY))
+								);
 							}
 						}
-						EffectType.applyEffect(effectType, entity, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
-					} else if (effectType == EffectType.INSTANT_HEALTH) {
-						double sicknessPenalty = 0;
+					} else if (effectType == EffectType.INSTANT_HEALTH || effectType == EffectType.CUSTOM_HEALTH_OVER_TIME) {
 						if (entity instanceof Player player) {
-							NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "HealingSickness");
-							if (sicks != null) {
-								Effect sick = sicks.last();
-								sicknessPenalty = sick.getMagnitude();
+							NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, HealingSickness.effectID);
+							// Healing Sickness fully disables the application of either effect
+							if (sicks == null) {
+								EffectType.applyEffect(effectType, entity, modifiedDuration, strength, null, applySickness);
+								continue;
+							}
+							if (MetadataUtils.checkOnceInRecentTicks(plugin, player, HEALING_SICKNESS_COOLDOWN_KEY, SICKNESS_WARNING_COOLDOWN)) {
+								player.sendMessage(
+									Component.text("You feel ", NamedTextColor.GRAY)
+										.append(Component.text("horrible and queasy, ", NamedTextColor.RED))
+										.append(Component.text("and you ", NamedTextColor.GRAY))
+										.append(Component.text("aren't healing at all...", NamedTextColor.RED))
+										.appendNewline()
+										.append(Component.text("Wait ", NamedTextColor.GRAY))
+										.append(Component.text(sicks.last().getDuration() / 20, NamedTextColor.WHITE))
+										.append(Component.text(" more seconds before drinking another Healing potion!", NamedTextColor.GRAY))
+								);
 							}
 						}
-						EffectType.applyEffect(effectType, entity, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
 					} else {
 						EffectType.applyEffect(effectType, entity, modifiedDuration, strength, null, applySickness);
 					}

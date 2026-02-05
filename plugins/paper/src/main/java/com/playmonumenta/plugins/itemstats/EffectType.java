@@ -101,7 +101,9 @@ public enum EffectType {
 		(effectType, entity, duration, strength, source, applySickness) -> {
 			double amount = strength * EntityUtils.getMaxHealth(entity);
 			AbsorptionUtils.addAbsorption(entity, amount, amount, duration);
-			applyAbsorptionSickness(entity, applySickness, Plugin.getInstance());
+			if (applySickness) {
+				applyAbsorptionSickness(entity, Plugin.getInstance());
+			}
 		}),
 	SATURATION("Saturation", "Saturation", true, true, PotionEffectType.SATURATION),
 	STARVATION("Starvation", "Starvation", false, true, false,
@@ -214,7 +216,9 @@ public enum EffectType {
 			double maxHealth = EntityUtils.getMaxHealth(entity);
 			if (entity instanceof Player player) {
 				PlayerUtils.healPlayer(plugin, player, maxHealth * strength);
-				applyHealingSickness(entity, applySickness, plugin);
+				if (applySickness) {
+					applyHealingSickness(entity, plugin);
+				}
 			} else {
 				EntityUtils.healMob(entity, maxHealth * strength);
 			}
@@ -230,10 +234,10 @@ public enum EffectType {
 			}
 		}),
 
-	HEAL("Heal", "Healing Rate", true, false, false, pluginApplicator(
+	HEAL("Heal", "Healing Received", true, false, false, pluginApplicator(
 		(duration, strength, source) -> new PercentHeal(duration, strength)
 	)),
-	ANTI_HEAL("AntiHeal", "Healing Rate", false, false, false, pluginApplicator(
+	ANTI_HEAL("AntiHeal", "Healing Received", false, false, false, pluginApplicator(
 		(duration, strength, source) -> new PercentHeal(duration, -strength)
 	)),
 
@@ -246,8 +250,8 @@ public enum EffectType {
 			addEffect(entity, source,
 				new CustomRegeneration(duration, amount, Constants.QUARTER_TICKS_PER_SECOND, null, false, plugin)
 			);
-			if (entity instanceof Player player) {
-				applyHealingSickness(player, applySickness, plugin);
+			if (entity instanceof Player player && applySickness) {
+				applyHealingSickness(player, plugin);
 			}
 		}
 	),
@@ -290,7 +294,7 @@ public enum EffectType {
 	FISH_QUALITY_INCREASE("FishQualityIncrease", "Fish Quality", true, false, false, pluginApplicator(
 		(duration, strength, source) -> new FishQualityIncrease(duration, strength)
 	)),
-	FISH_QUALITY_DECREASE("FishQualityDecrease", "FishQuality", false, false, false, pluginApplicator(
+	FISH_QUALITY_DECREASE("FishQualityDecrease", "Fish Quality", false, false, false, pluginApplicator(
 		(duration, strength, source) -> new FishQualityIncrease(duration, -strength)
 	)),
 
@@ -313,7 +317,7 @@ public enum EffectType {
 	REINCARNATION("Reincarnation", "Reincarnation", false, false, true, pluginApplicator(
 		(duration, strength, source) -> new Reincarnation(duration, strength)
 	)),
-	VOODOO_BINDINGS("VooodooBindings", "Voodoo Bindings", false, false, true, pluginApplicator(
+	VOODOO_BINDINGS("VoodooBindings", "Voodoo Bindings", false, false, true, pluginApplicator(
 		(duration, strength, source) -> new VoodooBindings(duration)
 	)),
 	LIFE_VULNERABILITY("LifeVulnerability", "Life Vulnerability", false, false, true, pluginApplicator(
@@ -543,7 +547,9 @@ public enum EffectType {
 		return null;
 	}
 
-	/** Method to create components for visual display on consumables, like +20% Strength (1:30).
+	/**
+	 * Method to create components for visual display on consumables, like +20% Strength (1:30).
+	 *
 	 * @param effectType Effect type.
 	 * @param strength   Effect strength.
 	 * @param duration   Duration (in ticks) of the effect
@@ -624,27 +630,21 @@ public enum EffectType {
 		effectType.getEffectApplicator().apply(effectType, entity, duration, strength, notNullString(effectType, source), applySickness);
 	}
 
-	private static void applyHealingSickness(Entity entity, boolean applySickness, Plugin plugin) {
-		if (applySickness) {
-			double sicknessPenalty = 0;
-			NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(entity, "HealingSickness");
-			if (sicks != null) {
-				Effect sick = sicks.last();
-				sicknessPenalty = sick.getMagnitude();
-			}
-			plugin.mEffectManager.addEffect(entity, "HealingSickness", new HealingSickness(20 * 15, Math.min(sicknessPenalty + 0.2, 0.8), "HealingSickness"));
+	private static void applyHealingSickness(Entity entity, Plugin plugin) {
+		NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(entity, HealingSickness.effectID);
+		if (sicks != null) {
+			// Don't stack the duration of Healing Sickness
+			return;
 		}
+		plugin.mEffectManager.addEffect(entity, HealingSickness.effectID, new HealingSickness(12 * Constants.TICKS_PER_SECOND));
 	}
 
-	private static void applyAbsorptionSickness(Entity entity, boolean applySickness, Plugin plugin) {
-		if (applySickness) {
-			double sicknessPenalty = 0;
-			NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(entity, "AbsorptionSickness");
-			if (sicks != null) {
-				Effect sick = sicks.last();
-				sicknessPenalty = sick.getMagnitude();
-			}
-			plugin.mEffectManager.addEffect(entity, "AbsorptionSickness", new AbsorptionSickness(20 * 15, Math.min(sicknessPenalty + 0.2, 0.8), "AbsorptionSickness"));
+	private static void applyAbsorptionSickness(Entity entity, Plugin plugin) {
+		NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(entity, AbsorptionSickness.effectID);
+		if (sicks != null) {
+			// Don't stack the duration of Absorption Sickness
+			return;
 		}
+		plugin.mEffectManager.addEffect(entity, AbsorptionSickness.effectID, new AbsorptionSickness(12 * Constants.TICKS_PER_SECOND));
 	}
 }

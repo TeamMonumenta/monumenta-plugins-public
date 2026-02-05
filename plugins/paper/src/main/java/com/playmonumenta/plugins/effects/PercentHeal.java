@@ -49,7 +49,7 @@ public class PercentHeal extends SingleArgumentEffect {
 
 	@Override
 	public @Nullable String getDisplayedName() {
-		return "Healing";
+		return "Healing Received";
 	}
 
 	@Override
