@@ -64,7 +64,7 @@ public class SpellTpBehindPlayer extends Spell {
 				targets.removeIf(target
 					-> ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)
 					|| ZoneUtils.hasZoneProperty(target, ZoneProperty.LOOTROOM));
-				targetEntity = targets.get(0);
+				targetEntity = targets.isEmpty() ? null : targets.getFirst();
 			}
 			// If that didn't work, don't tp at all
 			if (targetEntity != null) {
