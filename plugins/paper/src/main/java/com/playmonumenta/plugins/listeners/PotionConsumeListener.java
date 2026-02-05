@@ -68,14 +68,14 @@ public class PotionConsumeListener implements Listener {
 		.build();
 
 	private final Plugin mPlugin;
-	/* Note that this map only contains non-cancelled tasks. Everywhere these runnables are cancelled they should be removed from this map */
+	/* Note that this map only contains non-canceled tasks. Everywhere these runnables are canceled they should be removed from this map */
 	private final Map<UUID, BukkitRunnable> mRunnables = new HashMap<>();
 	/* This will only contain an item if currently consuming a potion, cleared after complete */
 	private final Map<UUID, ItemStack> mPotionsConsumed = new HashMap<>();
-	/* This will only contain an slot number if currently consuming a potion, cleared after complete */
+	/* This will only contain a slot number if currently consuming a potion, cleared after complete */
 	private final Map<UUID, Integer> mPotionsSlot = new HashMap<>();
 
-	/* Note that this map only contains non-cancelled tasks. Everywhere these runnables are cancelled they should be removed from this map */
+	/* Note that this map only contains non-canceled tasks. Everywhere these runnables are canceled they should be removed from this map */
 	private final Map<UUID, BukkitTask> mCooldowns = new HashMap<>();
 
 	public PotionConsumeListener(Plugin plugin) {
@@ -136,7 +136,7 @@ public class PotionConsumeListener implements Listener {
 
 			event.setCancelled(true);
 
-			if (ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY) && !isOnlyGlowing(customEffects)) {
+			if (ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY) && !isOnlyGlowingOrNightVision(customEffects)) {
 				player.sendMessage(Component.text("Infinite potions cannot be quick drunk!", NamedTextColor.RED));
 				float pitch = ((float) FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
 				player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f + pitch);
@@ -210,7 +210,7 @@ public class PotionConsumeListener implements Listener {
 
 						Starvation.apply(player, starvation);
 
-						//Remove glass bottle from inventory once drinked
+						//Remove glass bottle from inventory once drunk
 						postPotionDrink(player, clickedInventory, false);
 
 						this.cancel();
@@ -354,8 +354,8 @@ public class PotionConsumeListener implements Listener {
 		for (ReadWriteNBT effect : customEffects) {
 			if (effect.hasTag(ItemStatUtils.EFFECT_TYPE_KEY)) {
 				EffectType type = EffectType.fromType(effect.getString(ItemStatUtils.EFFECT_TYPE_KEY));
-				if (COOLDOWN_EFFECTS.containsKey(type)) {
-					double amount = COOLDOWN_EFFECTS.get(type);
+				Double amount = COOLDOWN_EFFECTS.get(type);
+				if (amount != null) {
 					if (amount == 0 || (effect.hasTag(ItemStatUtils.EFFECT_STRENGTH_KEY) && effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY) >= amount)) {
 						return true;
 					}
@@ -366,11 +366,11 @@ public class PotionConsumeListener implements Listener {
 		return false;
 	}
 
-	private boolean isOnlyGlowing(ReadableNBTList<ReadWriteNBT> customEffects) {
+	private boolean isOnlyGlowingOrNightVision(ReadableNBTList<ReadWriteNBT> customEffects) {
 		for (ReadWriteNBT effect : customEffects) {
 			if (effect.hasTag(ItemStatUtils.EFFECT_TYPE_KEY)) {
 				EffectType type = EffectType.fromType(effect.getString(ItemStatUtils.EFFECT_TYPE_KEY));
-				if (type != EffectType.VANILLA_GLOW) {
+				if (type != EffectType.VANILLA_GLOW && type != EffectType.VANILLA_NIGHT_VISION) {
 					return false;
 				}
 			}
@@ -394,9 +394,6 @@ public class PotionConsumeListener implements Listener {
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		Inventory inventory = event.getInventory();
 		if (inventory instanceof PlayerInventory) {
-			return;
-		}
-		if (inventory == null) {
 			return;
 		}
 		postPotionDrink((Player) event.getPlayer(), inventory, true);

@@ -446,7 +446,7 @@ public enum EffectType {
 	EffectType(String type, String name, boolean isPositive, boolean isConstant, PotionEffectType vanillaPotionEffectType) {
 		this(type, name, isPositive, true, isConstant, vanillaPotionEffectType,
 			(effectType, entity, duration, strength, source, applySickness) -> {
-				PotionEffect potionEffect = new PotionEffect(vanillaPotionEffectType, duration, (int) strength - 1, true);
+				PotionEffect potionEffect = new PotionEffect(vanillaPotionEffectType, duration, (int) strength - 1, true, duration != -1);
 				if (entity instanceof Player player) {
 					PotionUtils.applyPotion(Plugin.getInstance(), player, potionEffect);
 				} else {
