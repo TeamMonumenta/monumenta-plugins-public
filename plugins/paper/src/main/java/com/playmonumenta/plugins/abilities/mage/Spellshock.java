@@ -64,7 +64,7 @@ public class Spellshock extends Ability {
 	private static final int STATIC_DURATION = Constants.TICKS_PER_SECOND * 6;
 	private static final double SPEED_POTENCY = 0.2;
 	private static final int SPEED_DURATION = Constants.TICKS_PER_SECOND * 6;
-	private static final int SLOW_DURATION = Constants.HALF_TICKS_PER_SECOND;
+	private static final int SLOW_DURATION = 30;
 	private static final double SLOW_POTENCY = 0.3;
 	private static final double ENHANCE_DAMAGE_MULT = 0.2;
 	private static final double ENHANCE_SLOW_POTENCY = 0.15;
@@ -271,10 +271,10 @@ public class Spellshock extends Ability {
 		LivingEntity target = null;
 		if (!elites.isEmpty()) {
 			Collections.shuffle(elites);
-			target = elites.get(0);
+			target = elites.getFirst();
 		} else if (!mobs.isEmpty()) {
 			Collections.shuffle(mobs);
-			target = mobs.get(0);
+			target = mobs.getFirst();
 		}
 		if (target != null) {
 			// attack target

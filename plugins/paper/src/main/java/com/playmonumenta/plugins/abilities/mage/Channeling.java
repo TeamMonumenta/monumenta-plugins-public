@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -20,7 +21,9 @@ import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.St
 
 public class Channeling extends Ability {
 	public static final String CHARM_DAMAGE = "Channeling Damage Modifier";
+	public static final String CHARM_HITS = "Channeling Hits";
 	public static final double PERCENT_MELEE_INCREASE = 0.2;
+	public static final int HITS = 1;
 
 	public static final AbilityInfo<Channeling> INFO =
 		new AbilityInfo<>(Channeling.class, "Channeling", Channeling::new)
@@ -30,27 +33,29 @@ public class Channeling extends Ability {
 			.displayItem(Material.DEAD_TUBE_CORAL);
 
 	private final double mDamage;
+	private final int mHits;
 
-	private boolean mCast = false;
+	private int mCast = 0;
 
 	public Channeling(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamage = PERCENT_MELEE_INCREASE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mHits = HITS + (int) CharmManager.getLevel(player, CHARM_HITS);
 	}
 
 	@Override
 	public boolean abilityCastEvent(AbilityCastEvent event) {
-		mCast = true;
+		mCast = mHits;
 		return true;
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE
-			&& mCast
+			&& mCast > 0
 			&& mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.MAGIC_WAND) > 0) {
 			event.updateDamageWithMultiplier(1 + mDamage);
-			mCast = false;
+			mCast--;
 		}
 		return false; // only changes event damage
 	}
@@ -61,7 +66,11 @@ public class Channeling extends Ability {
 			.addLine("your wand's Spell Power stat.")
 			.addLine()
 			.addLine("After using an ability, your next")
-			.addLine("attack (m) deals %p more damage.")
-				.statValues(stat(a -> a.mDamage, PERCENT_MELEE_INCREASE));
+			.addIfElse((a, p) -> a.mHits != HITS && ServerProperties.getClassSpecializationsEnabled(p),
+				desc -> desc.addLine("%d attacks (m) deal %p more")
+					.statValues(stat(a -> a.mHits, HITS), stat(a -> a.mDamage, PERCENT_MELEE_INCREASE))
+					.addLine("damage."),
+				desc -> desc.addLine("attack (m) deals %p more damage.")
+					.statValues(stat(a -> a.mDamage, PERCENT_MELEE_INCREASE)));
 	}
 }

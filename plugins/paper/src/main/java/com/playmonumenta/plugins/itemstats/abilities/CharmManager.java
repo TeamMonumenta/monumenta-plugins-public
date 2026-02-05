@@ -325,6 +325,8 @@ public class CharmManager {
 			ArcaneStrike.CHARM_RADIUS,
 			ArcaneStrike.CHARM_BONUS,
 			ArcaneStrike.CHARM_COOLDOWN,
+			ArcaneStrike.CHARM_WEAKEN_POTENCY,
+			ArcaneStrike.CHARM_WEAKEN_DURATION,
 			ElementalArrows.CHARM_DAMAGE,
 			ElementalArrows.CHARM_AREA_DAMAGE,
 			ElementalArrows.CHARM_DURATION,
@@ -382,6 +384,7 @@ public class CharmManager {
 			ElementalSpiritIce.CHARM_DAMAGE2,
 			ElementalSpiritIce.CHARM_COOLDOWN2,
 			Channeling.CHARM_DAMAGE,
+			Channeling.CHARM_HITS,
 
 			//Cleric
 			CelestialBlessing.CHARM_COOLDOWN,

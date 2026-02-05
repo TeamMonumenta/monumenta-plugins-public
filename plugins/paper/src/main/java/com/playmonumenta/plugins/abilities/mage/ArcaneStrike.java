@@ -14,10 +14,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
-import com.playmonumenta.plugins.itemstats.enums.Operation;
-import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -47,11 +44,11 @@ import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 public class ArcaneStrike extends Ability {
 	private static final float RADIUS = 4.0f;
 	private static final int DAMAGE_1 = 4;
-	private static final int DAMAGE_2 = 7;
-	private static final double WAND_SCALING_1 = 0.1;
-	private static final double WAND_SCALING_2 = 0.2;
-	private static final int BONUS_DAMAGE_1 = 2;
-	private static final int BONUS_DAMAGE_2 = 3;
+	private static final int DAMAGE_2 = 6;
+	private static final double WAND_SCALING_1 = 0.25;
+	private static final double WAND_SCALING_2 = 0.35;
+	private static final int BONUS_DAMAGE_1 = 1;
+	private static final int BONUS_DAMAGE_2 = 2;
 	private static final double ENHANCEMENT_DAMAGE_MULTIPLIER = 1.15;
 	private static final double ENHANCEMENT_WEAKNESS_POTENCY = 0.2;
 	private static final int ENHANCEMENT_WEAKNESS_DURATION = Constants.TICKS_PER_SECOND * 8;
@@ -99,7 +96,7 @@ public class ArcaneStrike extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE
 			&& !isOnCooldown()
-			&& mPlayer.getCooledAttackStrength(0) == 1
+			&& mPlayer.getCooledAttackStrength(0.5f) > 0.9
 			&& mPlugin.mItemStatManager.getEnchantmentLevel(mPlayer, EnchantmentType.MAGIC_WAND) > 0) {
 			putOnCooldown();
 
@@ -117,11 +114,7 @@ public class ArcaneStrike extends Ability {
 					preSpellPowerDamage += mDamageBonusAffected;
 				}
 
-				// Base damage scaling from wands + fist damage
-				final ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-				double attackDamageAdd = ItemStatUtils.getAttributeAmount(inMainHand, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
-				preSpellPowerDamage += (attackDamageAdd + 1) * mWandScaling;
-
+				preSpellPowerDamage += event.getFlatDamage() * mWandScaling;
 				float dmg = SpellPower.getSpellDamage(mPlugin, mPlayer, (float) preSpellPowerDamage);
 
 				ClassAbility ability = ClassAbility.ARCANE_STRIKE;
