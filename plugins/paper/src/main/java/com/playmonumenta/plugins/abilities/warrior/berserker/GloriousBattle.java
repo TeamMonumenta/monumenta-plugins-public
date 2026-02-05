@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
@@ -53,10 +54,10 @@ public class GloriousBattle extends Ability {
 	private static final int BLOODLUST_COST = 2;
 	private static final int PIERCE_DAMAGE_1 = 5;
 	private static final int PIERCE_DAMAGE_2 = 8;
-	private static final double AOE_DAMAGE_1 = 0.5;
-	private static final double AOE_DAMAGE_2 = 0.6;
-	private static final double CRITICAL_DAMAGE_1 = 0.75;
-	private static final double CRITICAL_DAMAGE_2 = 0.9;
+	private static final double AOE_DAMAGE_1 = 0.3;
+	private static final double AOE_DAMAGE_2 = 0.4;
+	private static final double CRITICAL_DAMAGE_1 = 0.5;
+	private static final double CRITICAL_DAMAGE_2 = 0.6;
 	private static final double VELOCITY = 1.5;
 	private static final double VERTICAL_SPEED_CAP = 0.3;
 	private static final double RADIUS = 2.5;
@@ -225,7 +226,7 @@ public class GloriousBattle extends Ability {
 		mCanCritAttack = false;
 
 		final boolean weaponHasCumbersome = ItemStatUtils.hasEnchantment(mPlayer.getInventory().getItemInMainHand(), EnchantmentType.CUMBERSOME);
-		double baseDamage = event.getFlatDamage() / (weaponHasCumbersome ? 1.5 : 1);
+		double baseDamage = event.getFlatDamage() * (weaponHasCumbersome ? 1 : CritScaling.CRIT_BONUS);
 
 		mCosmetic.gloryOnLand(mPlayer.getWorld(), mPlayer, enemy, mRadius);
 

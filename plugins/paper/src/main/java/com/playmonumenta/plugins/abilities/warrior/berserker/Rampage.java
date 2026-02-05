@@ -40,11 +40,13 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public final class Rampage extends Ability implements AbilityWithChargesOrStacks {
 
+	private static final int COOLDOWN = 6 * Constants.TICKS_PER_SECOND;
 	private static final double DAMAGE_L1 = 6;
 	private static final double DAMAGE_L2 = 10;
 	private static final double RADIUS = 4;
@@ -57,7 +59,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 	private static final double MELEE_RESISTANCE_PERCENT = 0.1;
 	private static final double KNOCKBACK = 0.45;
 	private static final int DURATION_PER_STACK = Constants.TICKS_PER_SECOND;
-	private static final int INITIAL_DURATION = Constants.TICKS_PER_SECOND * 3;
+	private static final int INITIAL_DURATION = Constants.TICKS_PER_SECOND * 5;
 	private static final String DAMAGE_EFFECT_NAME = "RampagePercentDamageEffect";
 	private static final String REGENERATION_EFFECT_NAME = "RampageCustomRegenerationEffect";
 	private static final String RESISTANCE_EFFECT_NAME = "RampageMeleeResistanceEffect";
@@ -65,6 +67,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 
 	public static final String CHARM_DAMAGE = "Rampage Damage";
 	public static final String CHARM_MAX_BLOODLUST_GAIN = "Rampage Max Bloodlust Gain";
+	public static final String CHARM_COOLDOWN = "Rampage Cooldown";
 
 	public static final String CHARM_DAMAGE_BUFF = "Rampage Damage Buff";
 	public static final String CHARM_MELEE_RESISTANCE = "Rampage Melee Resistance";
@@ -84,6 +87,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 			.shorthandName("Rmp")
 			.descriptions(getDescription1(), getDescription2())
 			.simpleDescription("Consume Bloodlust stacks to knock enemies back, and gain health regeneration and melee damage on Bloodlust gain.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Rampage::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).lookDirections(AbilityTrigger.LookDirection.DOWN)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(Material.BLAZE_POWDER);
@@ -131,15 +135,15 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 	}
 
 	public boolean cast() {
-		if (mBloodlust == null || isRecast()) {
+		if (mBloodlust == null || isOnCooldown() || isRecast()) {
 			return false;
 		}
 
 		int stacks = mBloodlust.getStacks();
-
-		if (stacks < mBloodlustCost) {
+		if (stacks < mBloodlustCost || mActive) {
 			return false;
 		}
+
 		mBloodlust.useStacks(mBloodlustCost);
 		mBloodlustExtension = 0;
 
@@ -147,24 +151,19 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 
 		EffectManager effectManager = mPlugin.mEffectManager;
 
-		Effect rampage = effectManager.getActiveEffect(mPlayer, AESTHETICS_EFFECT_NAME);
-		boolean keepBuff = rampage != null && rampage.getDuration() > mInitialDuration;
+		effectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(mInitialDuration,
+			(entity, fourHertz, twoHertz, oneHertz) -> rampageTick(fourHertz, twoHertz, oneHertz),
+			(entity) -> rampageEnd()).deleteOnAbilityUpdate(true));
 
-		if (!keepBuff) {
-			effectManager.addEffect(mPlayer, AESTHETICS_EFFECT_NAME, new Aesthetics(mInitialDuration,
-				(entity, fourHertz, twoHertz, oneHertz) -> rampageTick(fourHertz, twoHertz, oneHertz),
-				(entity) -> rampageEnd()).deleteOnAbilityUpdate(true));
+		effectManager.addEffect(mPlayer, DAMAGE_EFFECT_NAME,
+			new PercentDamageDealt(mInitialDuration, mDamageBuff).damageTypes(EnumSet.of(DamageType.MELEE, DamageType.MELEE_SKILL)).deleteOnAbilityUpdate(true));
 
-			effectManager.addEffect(mPlayer, DAMAGE_EFFECT_NAME,
-				new PercentDamageDealt(mInitialDuration, mDamageBuff).damageTypes(EnumSet.of(DamageType.MELEE, DamageType.MELEE_SKILL)).deleteOnAbilityUpdate(true));
+		effectManager.addEffect(mPlayer, REGENERATION_EFFECT_NAME,
+			new CustomRegeneration(mInitialDuration, mHealing * EntityUtils.getMaxHealth(mPlayer), 5, null, false, mPlugin));
 
-			effectManager.addEffect(mPlayer, REGENERATION_EFFECT_NAME,
-				new CustomRegeneration(mInitialDuration, mHealing * EntityUtils.getMaxHealth(mPlayer), 5, null, false, mPlugin));
-
-			if (isLevelTwo()) {
-				effectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME,
-					new PercentDamageReceived(mInitialDuration, -mMeleeResistance, EnumSet.of(DamageType.MELEE)).deleteOnAbilityUpdate(true));
-			}
+		if (isLevelTwo()) {
+			effectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME,
+				new PercentDamageReceived(mInitialDuration, -mMeleeResistance, EnumSet.of(DamageType.MELEE)).deleteOnAbilityUpdate(true));
 		}
 		mActive = true;
 
@@ -227,6 +226,7 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 	private void rampageEnd() {
 		mCosmetic.loseEffect(mPlayer);
 		mActive = false;
+		putOnCooldown();
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
@@ -300,6 +300,8 @@ public final class Rampage extends Ability implements AbilityWithChargesOrStacks
 				.statValues(stat(a -> a.mDamage, DAMAGE_L1))
 			.addStat("Radius: %r")
 				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
 			.addLine()
 			.addLine("While *Rampage* is active, you deal more melee").styles(UNDERLINED)
 			.addLine("damage and are continuously healed, and gaining")
