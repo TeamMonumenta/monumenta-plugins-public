@@ -6,13 +6,17 @@ import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class FacingBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_facing";
@@ -27,33 +31,27 @@ public final class FacingBoss extends BossAbilityGroup {
 		public EntityTargets TARGET = EntityTargets.GENERIC_PLAYER_TARGET;
 	}
 
+	@Nullable
+	private LivingEntity mTarget = null;
+
 	public FacingBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
-		List<? extends LivingEntity> targets = p.TARGET.getTargetsList(mBoss);
-		if (targets == null || targets.isEmpty()) {
-			return;
-		}
-		LivingEntity facingTarget = targets.get(0);
 
-		if (p.PREFER_TARGET && boss instanceof Mob mob && mob.getTarget() != null) {
-			facingTarget = mob.getTarget();
-		}
-
-		LivingEntity finalFacingTarget = facingTarget;
 		List<Spell> passiveSpells = List.of(new SpellRunAction(() -> {
-			LivingEntity target = null;
-			if (!p.PREFER_TARGET) {
-				target = finalFacingTarget;
-			} else if (boss instanceof Mob mob && mob.getTarget() != null) {
-				target = mob.getTarget();
+			if (p.PREFER_TARGET && boss instanceof Mob mob && mob.getTarget() != null) {
+				mTarget = mob.getTarget();
 			}
-			if (target == null) {
-				return;
+			if (mTarget == null || !mTarget.isValid() || (mTarget instanceof Player player && AbilityUtils.isStealthed(player))) {
+				List<? extends @NotNull LivingEntity> targetsList = p.TARGET.getTargetsList(boss);
+				if (targetsList.isEmpty()) {
+					return;
+				}
+				mTarget = targetsList.getFirst();
 			}
 			Location loc = boss.getLocation();
-			Vector targetDir = target.getLocation().toVector().subtract(loc.toVector());
+			Vector targetDir = mTarget.getLocation().toVector().subtract(loc.toVector());
 			double[] targetYawPitch = VectorUtils.vectorToRotation(targetDir);
 			if (p.HEAD_ROTATION) {
 				NmsUtils.getVersionAdapter().setHeadRotation(boss, (float) targetYawPitch[0], (float) targetYawPitch[1]);
