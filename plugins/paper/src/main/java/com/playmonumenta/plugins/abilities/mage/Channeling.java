@@ -66,7 +66,7 @@ public class Channeling extends Ability {
 			.addLine("your wand's Spell Power stat.")
 			.addLine()
 			.addLine("After using an ability, your next")
-			.addIfElse((a, p) -> a.mHits != HITS && ServerProperties.getClassSpecializationsEnabled(p),
+			.addIfElse((a, p) -> a != null && a.mHits != HITS && ServerProperties.getClassSpecializationsEnabled(p),
 				desc -> desc.addLine("%d attacks (m) deal %p more")
 					.statValues(stat(a -> a.mHits, HITS), stat(a -> a.mDamage, PERCENT_MELEE_INCREASE))
 					.addLine("damage."),
