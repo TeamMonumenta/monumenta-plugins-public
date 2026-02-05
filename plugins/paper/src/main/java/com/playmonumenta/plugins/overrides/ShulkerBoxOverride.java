@@ -35,12 +35,22 @@ public class ShulkerBoxOverride extends BaseOverride {
 	}
 
 	@Override
+	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
+		if (PotionInjectorsOverride.isAnyInjector(item)) {
+			return PotionInjectorsOverride.leftClickAction(plugin, player, item);
+		}
+		return true;
+	}
+
+	@Override
 	public boolean swapHandsInteraction(Plugin plugin, Player player, ItemStack item) {
 		// (It all returns true)
 		if (FirmamentOverride.isFirmamentItem(item)) {
 			return FirmamentOverride.changeMode(item, player);
 		} else if (WorldshaperOverride.isWorldshaperItem(item)) {
 			return WorldshaperOverride.changeMode(item, player);
+		} else if (PotionInjectorsOverride.isPotionInjector(item) && player.isSneaking()) {
+			return PotionInjectorsOverride.swapShiftInteraction(item, player);
 		}
 		return false;
 	}
