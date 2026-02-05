@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SpawnerUtils;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 public class Eruption implements Enchantment {
 
@@ -55,6 +57,7 @@ public class Eruption implements Enchantment {
 			int thunder = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.THUNDER_ASPECT);
 			int decay = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.DECAY);
 			int bleed = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.BLEEDING);
+			int knockback = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.KNOCKBACK);
 			int sapper = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SAPPER) > 0 ? plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SAPPER) : 0;
 			int adrenaline = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.ADRENALINE) > 0 ? plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE) : 0;
 			int wind = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.WIND_ASPECT) > 0 ? plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT) : 0;
@@ -90,6 +93,23 @@ public class Eruption implements Enchantment {
 					double speed = Adrenaline.PERCENT_SPEED_PER_LEVEL * adrenaline * 0.5;
 					int duration = Adrenaline.SPAWNER_DURATION;
 					plugin.mEffectManager.addEffect(p, Adrenaline.PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(duration, speed, Adrenaline.PERCENT_SPEED_EFFECT_NAME));
+				}
+			}
+
+			//Knockback Interaction
+			if (knockback > 0) {
+				for (LivingEntity mob : mobs) {
+					float speed = 0.5f * (float) knockback;
+					Vector kbDir = mob.getLocation().clone().toVector().subtract(event.getBlock().getLocation().add(0.5, 0.5, 0.5).toVector());
+					kbDir.setY(0);
+					if (kbDir.length() < 0.001) {
+						kbDir = new Vector(0, 0.2, 0);
+					} else {
+						kbDir.normalize()
+							.multiply(speed)
+							.setY(0.2);
+					}
+					MovementUtils.knockAwayDirection(kbDir, mob, 0.5f, true, false);
 				}
 			}
 

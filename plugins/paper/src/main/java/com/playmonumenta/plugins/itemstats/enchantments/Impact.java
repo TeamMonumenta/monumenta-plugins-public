@@ -43,6 +43,9 @@ public class Impact implements Enchantment {
 		DamageEvent.DamageType.MELEE,
 		DamageEvent.DamageType.PROJECTILE
 	);
+	private static final EnumSet<ClassAbility> TRIGGERING_ABILITIES = EnumSet.of(
+		ClassAbility.ERUPTION
+	);
 	private static final String PROJECTILE_METAKEY = "ImpactProjectileHitThisTick"; // Is there a naming convention for this?
 
 	private final Map<Player, ImpactInstance> mDamageInTick = new HashMap<>();
@@ -103,9 +106,9 @@ public class Impact implements Enchantment {
 	private void task() {
 
 		mDamageInTick.forEach((p, instance) -> {
-			if (instance.mMap.values().stream().anyMatch(events -> events.stream().anyMatch(event -> TRIGGERING_DAMAGE_TYPES.contains(event.getType())))) {
+			if (instance.mMap.values().stream().anyMatch(events -> events.stream().anyMatch(event -> TRIGGERING_DAMAGE_TYPES.contains(event.getType()) || TRIGGERING_ABILITIES.contains(event.getAbility())))) {
 				instance.mMap.forEach((entity, events) -> applyImpact(instance.mPlugin, p, instance.mValue, events, entity));
-				// Impact will only activate if the player dealt MELEE or PROJECTILE damage in the same tick
+				// Impact will only activate if the player dealt MELEE, PROJECTILE or OTHER (Eruption) damage in the same tick
 			}
 		});
 		mDamageInTick.clear();
@@ -115,9 +118,6 @@ public class Impact implements Enchantment {
 
 	private void applyImpact(Plugin plugin, Player player, double value, List<DamageEvent> events, LivingEntity enemy) {
 
-		if (enemy instanceof Player) {
-			return;
-		}
 		double damage = 0;
 		for (DamageEvent event : events) {
 			damage += event.getFinalDamage(true);
