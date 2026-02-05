@@ -6,12 +6,14 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -51,6 +53,8 @@ public class ShockwaveBoss extends BossAbilityGroup {
 		public int POINT_COUNT = 48;
 		@BossParam(help = "whether the shockwave ignores i-frames")
 		public boolean IGNORE_IFRAMES = false;
+		@BossParam(help = "whether the shockwave is blockable with a shield")
+		public boolean BLOCKABLE = false;
 		@BossParam(help = "damage type")
 		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MAGIC;
 		@BossParam(help = "horizontal knockback velocity")
@@ -132,7 +136,11 @@ public class ShockwaveBoss extends BossAbilityGroup {
 										p.PARTICLE_RELEASE.spawn(mBoss, bLoc);
 										for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), p.DETECTION, true)) {
 											if (player.getBoundingBox().overlaps(mBox)) {
-												DamageUtils.damage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, null, p.IGNORE_IFRAMES, true, p.SPELL_NAME);
+												if (p.BLOCKABLE) {
+													BossUtils.blockableDamage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, p.IGNORE_IFRAMES, true, p.SPELL_NAME, centerLoc, List.of());
+												} else {
+													DamageUtils.damage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, null, p.IGNORE_IFRAMES, true, p.SPELL_NAME);
+												}
 												MovementUtils.knockAway(centerLoc, player, p.KB_X, p.KB_Y);
 												p.EFFECTS.apply(player, boss);
 
