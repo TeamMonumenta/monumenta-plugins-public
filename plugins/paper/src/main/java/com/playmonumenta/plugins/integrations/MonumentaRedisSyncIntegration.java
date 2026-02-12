@@ -21,10 +21,12 @@ import com.playmonumenta.redissync.event.PlayerTransferFailEvent;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -39,49 +41,35 @@ import org.jetbrains.annotations.Nullable;
 
 public class MonumentaRedisSyncIntegration implements Listener {
 	private static final String IDENTIFIER = "Monumenta";
-
 	private static boolean mEnabled = false;
 
-	public static final ArgumentSuggestions<CommandSender> ALL_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings((info)
-		-> {
-		if (!mEnabled) {
-			return Bukkit
-				.getOnlinePlayers()
-				.stream()
-				.filter((player)
-					-> !PremiumVanishIntegration.isInvisibleOrSpectator(player))
-				.map(Player::getName)
-				.toArray(String[]::new);
-		}
-		if (info.sender().hasPermission("monumenta.listoffline")) {
-			return MonumentaRedisSyncAPI.getAllCachedPlayerNames().toArray(String[]::new);
-		}
-		return RemotePlayerAPI.getVisiblePlayerNames().toArray(String[]::new);
-	});
+	public static final String LIST_OFFLINE_PLAYERS_PERMISSION = "monumenta.listoffline";
 
-	public static final ArgumentSuggestions<CommandSender> ALL_OTHER_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings((info)
-		-> {
-		if (!mEnabled) {
-			return Bukkit.getOnlinePlayers()
-				.stream()
-				.filter((player)
-					-> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
-				.map(Player::getName)
-				.toArray(String[]::new);
+	public static final ArgumentSuggestions<CommandSender> ALL_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings(
+		(info) -> {
+			if (info.sender().hasPermission(LIST_OFFLINE_PLAYERS_PERMISSION)) {
+				return getOfflinePlayerNames().toArray(String[]::new);
+			}
+			return getVisiblePlayerNames().toArray(String[]::new);
 		}
-		if (info.sender().hasPermission("monumenta.listoffline")) {
-			return MonumentaRedisSyncAPI.getAllCachedPlayerNames()
-				.stream()
-				.filter((player)
-					-> !Objects.equals(player, info.sender().getName()))
-				.toArray(String[]::new);
+	);
+
+	public static final ArgumentSuggestions<CommandSender> ALL_OTHER_CACHED_PLAYER_NAMES_SUGGESTIONS = ArgumentSuggestions.strings(
+		(info) -> {
+			Set<String> names;
+			if (info.sender().hasPermission("monumenta.listoffline")) {
+				names = new TreeSet<>(getOfflinePlayerNames());
+			} else {
+				names = new TreeSet<>(getVisiblePlayerNames());
+			}
+
+			if (info.sender() instanceof Player playerSender) {
+				names.remove(playerSender.getName());
+			}
+
+			return names.toArray(String[]::new);
 		}
-		return RemotePlayerAPI.getVisiblePlayerNames()
-			.stream()
-			.filter((player)
-				-> !Objects.equals(player, info.sender().getName()))
-			.toArray(String[]::new);
-	});
+	);
 
 	private final Plugin mPlugin;
 	private final Logger mLogger;
@@ -232,6 +220,34 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		} else {
 			return null;
 		}
+	}
+
+	public static Set<String> getOfflinePlayerNames() {
+		if (!mEnabled) {
+			return Bukkit
+				.getOnlinePlayers()
+				.stream()
+				.filter((player)
+					-> !PremiumVanishIntegration.isInvisibleOrSpectator(player))
+				.map(Player::getName)
+				.collect(Collectors.toSet());
+		}
+
+		return MonumentaRedisSyncAPI.getAllCachedPlayerNames();
+	}
+
+	public static Set<String> getVisiblePlayerNames() {
+		if (!mEnabled) {
+			return Bukkit
+				.getOnlinePlayers()
+				.stream()
+				.filter((player)
+					-> !PremiumVanishIntegration.isInvisibleOrSpectator(player))
+				.map(Player::getName)
+				.collect(Collectors.toSet());
+		}
+
+		return RemotePlayerAPI.getVisiblePlayerNames();
 	}
 
 	public static CompletableFuture<Map<String, Integer>> getLeaderboard(String objective, long start, long stop, boolean ascending) {

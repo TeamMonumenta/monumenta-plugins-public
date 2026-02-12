@@ -4,16 +4,23 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.listeners.GuildArguments;
+import com.playmonumenta.plugins.mail.MailCache;
+import com.playmonumenta.plugins.mail.MailMan;
 import com.playmonumenta.plugins.mail.NoMailAccessException;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.executors.CommandArguments;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -30,6 +37,29 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class GuildRecipient implements Recipient {
+	public static final ArgumentSuggestions<CommandSender> GUILD_RECIPIENT_SUGGESTIONS = ArgumentSuggestions.strings(
+		(info) -> {
+			TreeSet<String> speedDialSet = new TreeSet<>();
+			TreeSet<String> remainingSet;
+			CommandSender sender = info.sender();
+
+			if (sender instanceof Player senderPlayer) {
+				MailCache mailCache = MailMan.recipientMailCache(new PlayerRecipient(senderPlayer.getUniqueId()));
+				speedDialSet.addAll(mailCache.speedDialList().stream()
+					.filter(recipient -> recipient instanceof GuildRecipient)
+					.map(recipient -> recipient.friendlyStr(MailDirection.DEFAULT))
+					.collect(Collectors.toSet()));
+			}
+
+			remainingSet = new TreeSet<>(GuildArguments.getGuildNames());
+			remainingSet.removeAll(speedDialSet);
+
+			List<String> suggestions = new ArrayList<>(speedDialSet);
+			suggestions.addAll(remainingSet);
+			return CommandUtils.alwaysQuote(suggestions).toArray(String[]::new);
+		}
+	);
+
 	public static class GuildRecipientCmdArgs extends RecipientCmdArgs {
 		private final String mLabel;
 		private final @Nullable Argument<String> mGuildNameArg;
@@ -40,7 +70,7 @@ public class GuildRecipient implements Recipient {
 			mRecipientArgs.add(new LiteralArgument("guild"));
 			if (Objects.requireNonNull(target) == ArgTarget.ARG) {
 				mGuildNameArg = new TextArgument(mLabel)
-					.replaceSuggestions(GuildArguments.NAME_SUGGESTIONS);
+					.replaceSuggestions(GUILD_RECIPIENT_SUGGESTIONS);
 				mRecipientArgs.add(mGuildNameArg);
 			} else {
 				mGuildNameArg = null;

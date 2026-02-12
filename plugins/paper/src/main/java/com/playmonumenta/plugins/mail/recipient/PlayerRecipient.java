@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.mail.recipient;
 
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
+import com.playmonumenta.plugins.mail.MailCache;
+import com.playmonumenta.plugins.mail.MailMan;
 import com.playmonumenta.plugins.mail.NoMailAccessException;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -10,14 +12,19 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.executors.CommandArguments;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,9 +38,35 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration.ALL_CACHED_PLAYER_NAMES_SUGGESTIONS;
-
 public class PlayerRecipient implements Recipient {
+	public static final ArgumentSuggestions<CommandSender> PLAYER_RECIPIENT_SUGGESTIONS = ArgumentSuggestions.strings(
+		(info) -> {
+			TreeSet<String> speedDialSet = new TreeSet<>();
+			TreeSet<String> remainingSet;
+			CommandSender sender = info.sender();
+
+			if (sender instanceof Player senderPlayer) {
+				MailCache mailCache = MailMan.recipientMailCache(new PlayerRecipient(senderPlayer.getUniqueId()));
+				speedDialSet.addAll(mailCache.speedDialList().stream()
+					.filter(recipient -> recipient instanceof PlayerRecipient)
+					.map(recipient -> recipient.friendlyStr(MailDirection.DEFAULT))
+					.collect(Collectors.toSet()));
+			}
+
+			if (sender.hasPermission(MonumentaRedisSyncIntegration.LIST_OFFLINE_PLAYERS_PERMISSION)) {
+				remainingSet = new TreeSet<>(MonumentaRedisSyncIntegration.getOfflinePlayerNames());
+			} else {
+				remainingSet = new TreeSet<>(MonumentaRedisSyncIntegration.getVisiblePlayerNames());
+			}
+
+			remainingSet.removeAll(speedDialSet);
+
+			List<String> suggestions = new ArrayList<>(speedDialSet);
+			suggestions.addAll(remainingSet);
+			return suggestions.toArray(String[]::new);
+		}
+	);
+
 	public static class PlayerRecipientCmdArgs extends RecipientCmdArgs {
 		private final String mLabel;
 		private final @Nullable Argument<String> mPlayerNameArg;
@@ -44,7 +77,7 @@ public class PlayerRecipient implements Recipient {
 			mRecipientArgs.add(new LiteralArgument("player"));
 			if (Objects.requireNonNull(target) == ArgTarget.ARG) {
 				mPlayerNameArg = new TextArgument(mLabel)
-					.replaceSuggestions(ALL_CACHED_PLAYER_NAMES_SUGGESTIONS);
+					.replaceSuggestions(PLAYER_RECIPIENT_SUGGESTIONS);
 				mRecipientArgs.add(mPlayerNameArg);
 			} else {
 				mPlayerNameArg = null;
