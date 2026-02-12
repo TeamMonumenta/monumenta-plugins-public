@@ -55,6 +55,7 @@ public class MusicGui extends Gui {
 		GRAY("gray", 27, "Monumenta Soundtrack: Valley of the Forgotten Pharaohs"),
 		BLUE("blue", 27, "Monumenta Soundtrack: Coven's Gambit"),
 		BROWN("brown", 27, "Monumenta Soundtrack: Cradle of the Broken God"),
+		INDIGO("indigo", 27, "Monumenta Soundtrack: Phyrrys, City of Fallen Stars"),
 		PLOTS("plots", 27, "Monumenta Soundtrack: Miscellaneous");
 
 		public final String mLabel;
@@ -217,6 +218,7 @@ public class MusicGui extends Gui {
 				//R3
 				addDungeonItem(4, 2, Material.BLUE_WOOL, Location.BLUE, MusicPage.BLUE, "Blue");
 				addDungeonItem(4, 3, Material.BROWN_WOOL, Location.BROWN, MusicPage.BROWN, "Brown");
+				addDungeonItem(4, 4, Material.PURPLE_STAINED_GLASS_PANE,Location.INDIGO,MusicPage.INDIGO,"Indigo");
 			}
 
 			case PLAYLIST -> {
@@ -324,6 +326,13 @@ public class MusicGui extends Gui {
 				addMusicItem(1, 3, Material.MUSIC_DISC_BLOCKS, "Pelias' Echo", Location.BROWN, "Okaye", "epic:music.brownfactory", 210);
 				addMusicItem(1, 4, Material.MUSIC_DISC_MALL, "The Empty Cradle", Location.BROWN, "Okaye x Whitebeard_OP", "epic:music.brownmall", 157);
 				addMusicItem(1, 5, Material.MUSIC_DISC_PIGSTEP, "Advanced Annihilation Mechanism", Location.BROWN, "Xernial x CmdrGod", "epic:music.mechapelias", 151);
+			}
+
+			case INDIGO -> {
+				addMusicItem(1, 2, Material.MUSIC_DISC_MELLOHI, "Soaring Through The City Above", Location.INDIGO, "Salamanderlonk", "epic:music.indigo1", 138);
+				addMusicItem(1, 3, Material.MUSIC_DISC_MALL, "Echoes of the Stars", Location.INDIGO, "Salamanderlonk", "epic:music.indigo2", 144);
+				addMusicItem(1, 5, Material.MUSIC_DISC_5, "In Sight of The Void", Location.INDIGO, "Salamanderlonk", "epic:music.indigo3", 140);
+				addMusicItem(1, 6, Material.MUSIC_DISC_STAL, "The Void's Vengeance", Location.INDIGO, "Salamanderlonk", "epic:music.voidknight", 165);
 			}
 
 			case PLOTS -> {
