@@ -630,7 +630,7 @@ public enum EffectType {
 		effectType.getEffectApplicator().apply(effectType, entity, duration, strength, notNullString(effectType, source), applySickness);
 	}
 
-	private static void applyHealingSickness(Entity entity, Plugin plugin) {
+	public static void applyHealingSickness(Entity entity, Plugin plugin) {
 		NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(entity, HealingSickness.effectID);
 		if (sicks != null) {
 			// Don't stack the duration of Healing Sickness
@@ -639,7 +639,7 @@ public enum EffectType {
 		plugin.mEffectManager.addEffect(entity, HealingSickness.effectID, new HealingSickness(12 * Constants.TICKS_PER_SECOND));
 	}
 
-	private static void applyAbsorptionSickness(Entity entity, Plugin plugin) {
+	public static void applyAbsorptionSickness(Entity entity, Plugin plugin) {
 		NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(entity, AbsorptionSickness.effectID);
 		if (sicks != null) {
 			// Don't stack the duration of Absorption Sickness

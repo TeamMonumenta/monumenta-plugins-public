@@ -701,7 +701,10 @@ public class EntityListener implements Listener {
 			if (entity instanceof Player || (allowEffectsOnFriendlyMobs && !EntityUtils.isHostileMob(entity))) {
 				double distance = Math.min(entity.getLocation().distance(event.getEntity().getLocation()), entity.getEyeLocation().distance(event.getEntity().getLocation()));
 				distance = Math.min(Math.max(-0.1 * distance + 1, 0), 1);
-				ItemStatUtils.applyCustomEffects(Plugin.getInstance(), entity, item, true, distance);
+				ItemStatUtils.applyCustomEffects(Plugin.getInstance(), entity, item,
+					// Applies sickness only to the thrower
+					source instanceof Player thrower && entity instanceof Player afflicted && thrower.equals(afflicted),
+					distance);
 			}
 		}
 
@@ -731,13 +734,13 @@ public class EntityListener implements Listener {
 		AreaEffectCloud cloud = event.getAreaEffectCloud();
 		ThrownPotion thrownPotion = event.getEntity();
 		ItemStack potionItem = thrownPotion.getItem();
-		
+
 		MetadataUtils.setMetadata(cloud, AREA_EFFECT_CLOUD_POTION_METAKEY, potionItem);
-		
+
 		if (!cloud.hasCustomEffects()) {
 			cloud.addCustomEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 0, 0, true, false, false), false);
 		}
-		
+
 		if (potionItem.getItemMeta() instanceof PotionMeta potionMeta) {
 			Color color = potionMeta.getColor();
 			if (color != null) {
@@ -789,7 +792,9 @@ public class EntityListener implements Listener {
 				}
 
 				if (potion != null) {
-					ItemStatUtils.applyCustomEffects(mPlugin, player, potion);
+					// Lingering potions don't apply sickness if they were thrown by someone else
+					ItemStatUtils.applyCustomEffects(mPlugin, player, potion,
+						cloud.getSource() instanceof Player thrower && thrower.equals(player));
 				}
 			} else if (potion != null && allowEffectsOnFriendlyMobs && !EntityUtils.isHostileMob(entity) && !PotionUtils.hasNegativeEffects(potion) && !ItemStatUtils.hasNegativeEffect(potion, true)) {
 				// only affect friendly mobs on plots, and only with beneficial potions

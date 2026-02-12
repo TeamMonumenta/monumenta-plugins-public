@@ -1309,7 +1309,8 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mAbilityManager.playerItemConsumeEvent(player, event);
 
-		ItemStatUtils.applyCustomEffects(mPlugin, player, item);
+		// Non-potions don't apply sicknesses
+		ItemStatUtils.applyCustomEffects(mPlugin, player, item, ItemUtils.isSomePotion(item));
 
 		mPlugin.mItemStatManager.onConsume(mPlugin, player, event);
 
@@ -1328,7 +1329,6 @@ public class PlayerListener implements Listener {
 			// Kill the player if they drink a potion with instant damage 10+
 			PotionEffectType effectType = effect.getType();
 			if (effectType.equals(PotionEffectType.HARM) && effect.getAmplifier() >= 9) {
-
 				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, () -> player.setHealth(0), 0);
 			} else if (effectType.equals(PotionEffectType.SLOW_FALLING)) {
 				// Remove Slow Falling effects

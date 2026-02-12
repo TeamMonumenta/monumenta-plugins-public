@@ -185,7 +185,10 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 					ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem(), false, 1, mDurationChange, mPotStrengthChange);
 				} else {
 					// Clerics that splash themselves with IH or Absorption should get sicknesses
-					ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem(), p.equals(mPlayer));
+					ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem(),
+						p.equals(mPlayer)
+							&& potion.getShooter() instanceof Player shooter
+							&& shooter.equals(mPlayer));
 				}
 
 				/* Remove this player from the "usual" application of potion effects */

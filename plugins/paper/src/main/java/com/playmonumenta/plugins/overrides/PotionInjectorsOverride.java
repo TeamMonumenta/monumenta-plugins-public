@@ -43,6 +43,7 @@ public class PotionInjectorsOverride extends BaseOverride {
 	private static final String COOLDOWN_SOURCE = "PotionInjectorCooldown";
 	private static final int COOLDOWN = 5 * 20;
 
+	@SuppressWarnings("SameReturnValue")
 	public static boolean leftClickAction(Plugin plugin, Player player, ItemStack injector) {
 		if (!player.hasPermission("monumenta.potion_injector") || ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.NO_POTIONS)) {
 			player.sendMessage(Component.text("Potions cannot be used here!", NamedTextColor.RED));
@@ -64,8 +65,11 @@ public class PotionInjectorsOverride extends BaseOverride {
 		ShulkerBox shulkerBox = (ShulkerBox) shulkerMeta.getBlockState();
 		Inventory shulkerInventory = shulkerBox.getInventory();
 
-		if (plugin.mEffectManager.hasEffect(player, COOLDOWN_SOURCE)) {
-			player.sendMessage(Component.text(String.format("Your %s is on cooldown.", ItemUtils.getPlainName(injector)), NamedTextColor.RED));
+		var cooldownEffect = plugin.mEffectManager.getEffects(player, COOLDOWN_SOURCE);
+		if (cooldownEffect != null && !cooldownEffect.isEmpty()) {
+			player.sendMessage(
+				Component.text(String.format("Your %s is on cooldown for " + cooldownEffect.last().getDuration() / 20 + "s.", ItemUtils.getPlainName(injector)), NamedTextColor.RED)
+			);
 			return false;
 		}
 
@@ -157,6 +161,11 @@ public class PotionInjectorsOverride extends BaseOverride {
 			var effects = ItemStatUtils.getEffects(nbt);
 			var healingSickness = plugin.mEffectManager.getEffects(player, HealingSickness.effectID);
 			var absorptionSickness = plugin.mEffectManager.getEffects(player, AbsorptionSickness.effectID);
+
+			boolean healing = false;
+			boolean absorption = false;
+			boolean other = false;
+
 			if (effects == null || effects.isEmpty()) {
 				return false;
 			}
@@ -164,26 +173,43 @@ public class PotionInjectorsOverride extends BaseOverride {
 				String type = effect.getString(ItemStatUtils.EFFECT_TYPE_KEY);
 				EffectType effectType = EffectType.fromType(type);
 				if (healingSickness != null && !healingSickness.isEmpty() && (effectType == EffectType.INSTANT_HEALTH || effectType == EffectType.CUSTOM_HEALTH_OVER_TIME)) {
-					player.sendMessage(Component.text("Your next potion would not heal you!", NamedTextColor.RED)
-						.appendNewline()
-						.append(Component.text("Wait ", NamedTextColor.GRAY))
-						.append(Component.text(healingSickness.last().getDuration() / 20, NamedTextColor.WHITE))
-						.append(Component.text(" more seconds before drinking another Healing potion!", NamedTextColor.GRAY))
-					);
-					return true;
+					healing = true;
 				}
 				if (absorptionSickness != null && !absorptionSickness.isEmpty() && effectType == EffectType.ABSORPTION) {
-					player.sendMessage(Component.text("Your next potion would not give you absorption!", NamedTextColor.RED)
-						.appendNewline()
-						.append(Component.text("Wait ", NamedTextColor.GRAY))
-						.append(Component.text(absorptionSickness.last().getDuration() / 20, NamedTextColor.WHITE))
-						.append(Component.text(" more seconds before drinking another Absorption potion!", NamedTextColor.GRAY))
-					);
-					return true;
+					absorption = true;
+				}
+				if (effectType != EffectType.INSTANT_HEALTH && effectType != EffectType.CUSTOM_HEALTH_OVER_TIME && effectType != EffectType.ABSORPTION) {
+					other = true;
+					break;
 				}
 			}
-			return false;
-		});
+			if (other) {
+				// Permit the injector to work as long as there are effects that are non-healing or non-absorption
+				return false;
+			}
+			if (healing && healingSickness != null && healingSickness.last() != null) {
+				player.sendMessage(Component.text("Your next potion would not heal you!", NamedTextColor.RED)
+					.appendNewline()
+					.append(Component.text("Wait ", NamedTextColor.GRAY))
+					.append(Component.text(healingSickness.last().getDuration() / 20, NamedTextColor.WHITE))
+					.append(Component.text(" more seconds before drinking another Healing potion!", NamedTextColor.GRAY))
+				);
+			}
+			if (absorption && absorptionSickness != null && absorptionSickness.last() != null) {
+				player.sendMessage(Component.text("Your next potion would not give you absorption!", NamedTextColor.RED)
+					.appendNewline()
+					.append(Component.text("Wait ", NamedTextColor.GRAY))
+					.append(Component.text(absorptionSickness.last().getDuration() / 20, NamedTextColor.WHITE))
+					.append(Component.text(" more seconds before drinking another Absorption potion!", NamedTextColor.GRAY))
+				);
+			}
+			if (healing || absorption) {
+				return true;
+			} else {
+				// Let the injector run if there aren't other effects but also no sicknesses
+				return false;
+			}
+			});
 		if (cancel) {
 			return potion;
 		}

@@ -90,8 +90,11 @@ public class ItemStatUtils {
 	public static final String VANITY_ITEMS_KEY = "VanityItems";
 	public static final String PLAYER_CUSTOM_NAME_KEY = "PlayerCustomName";
 	public static final String CUSTOM_SKIN_KEY = "CustomSkin";
+	// These two govern cooldowns for the warning messages:
 	public static final String ABSORPTION_SICKNESS_COOLDOWN_KEY = "AbsorptionSicknessWarningSent";
 	public static final String HEALING_SICKNESS_COOLDOWN_KEY = "HealingSicknessWarningSent";
+	// This prevents healsickness from being applied more than once on one tick, prevents the warning from being sent
+	public static final String HEALING_SICKNESS_THIS_TICK_KEY = "HealingSicknessAppliedThisTick";
 
 	public static final Component DUMMY_LORE_TO_REMOVE = Component.text("DUMMY LORE TO REMOVE", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
 
@@ -214,18 +217,20 @@ public class ItemStatUtils {
 						strength = event.getStrength();
 					}
 
-					if (effectType == EffectType.ABSORPTION) {
+					if (effectType == EffectType.ABSORPTION
+						&& applySickness) {
 						if (entity instanceof Player player) {
 							NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, AbsorptionSickness.effectID);
-							// Absorption Sickness fully disables the application of either effect
+							// Absorption Sickness fully disables the application of absorption effects
 							if (sicks == null) {
 								EffectType.applyEffect(effectType, entity, modifiedDuration, strength, null, applySickness);
 								continue;
 							}
 							if (MetadataUtils.checkOnceInRecentTicks(plugin, player, ABSORPTION_SICKNESS_COOLDOWN_KEY, SICKNESS_WARNING_COOLDOWN)) {
 								player.sendMessage(
-									Component.text("Your absorption shield warps and shimmers, you", NamedTextColor.GRAY)
-										.append(Component.text("aren't gaining absorption at all.", NamedTextColor.RED))
+									Component.text("Your absorption shield warps and shimmers! You ", NamedTextColor.GRAY)
+										.append(Component.text("aren't gaining absorption ", NamedTextColor.RED))
+										.append(Component.text("at all.", NamedTextColor.GRAY))
 										.appendNewline()
 										.append(Component.text("Wait ", NamedTextColor.GRAY))
 										.append(Component.text(sicks.last().getDuration() / 20, NamedTextColor.WHITE))
@@ -233,8 +238,9 @@ public class ItemStatUtils {
 								);
 							}
 						}
-					} else if (effectType == EffectType.INSTANT_HEALTH || effectType == EffectType.CUSTOM_HEALTH_OVER_TIME) {
-						if (entity instanceof Player player) {
+					} else if ((effectType == EffectType.INSTANT_HEALTH || effectType == EffectType.CUSTOM_HEALTH_OVER_TIME)
+						&& applySickness) {
+						if (entity instanceof Player player && MetadataUtils.checkOnceThisTick(plugin, player, HEALING_SICKNESS_THIS_TICK_KEY)) {
 							NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, HealingSickness.effectID);
 							// Healing Sickness fully disables the application of either effect
 							if (sicks == null) {
