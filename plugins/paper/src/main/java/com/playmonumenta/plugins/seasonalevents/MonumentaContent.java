@@ -67,7 +67,13 @@ public enum MonumentaContent {
 	STARPOINT_POI("starpoint", ContentType.POI, 0),
 	KEEP_POI("keep", ContentType.POI, 0),
 	WOLFSWOOD_POI("wolfswood", ContentType.POI, 0),
-	FISHING_COMBAT("fishingcombat", ContentType.OTHER, 0);
+	FISHING_COMBAT("fishingcombat", ContentType.OTHER, 0),
+
+	// Special pass objectives, which can be used for "custom" missions for a given week
+	WEEKLY1("weekly1", ContentType.OTHER, 0),
+	WEEKLY2("weekly2", ContentType.OTHER, 0),
+	WEEKLY3("weekly3", ContentType.OTHER, 0),
+	MULTIWEEK("multiweek", ContentType.OTHER, 0);
 
 	public static final Set<Integer> ALL_CONTENT_REGION_INDEXES
 		= Arrays.stream(values())
