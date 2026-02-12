@@ -32,17 +32,12 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(EnchantmentType.MAGIC_WAND) > 0) {
+		ItemStatManager.PlayerItemStats playerItemStats = event.getPlayerItemStats() != null ? event.getPlayerItemStats() : mPlugin.mItemStatManager.getPlayerItemStats(mPlayer);
+		if (playerItemStats.getItemStats().get(EnchantmentType.MAGIC_WAND) > 0) {
 			if (event.getType() == DamageType.MELEE) {
 				event.setFlatDamage(event.getFlatDamage() + DAMAGE);
 			} else if (event.getAbility() != null && !event.getAbility().isFake() && event.getType() == DamageType.MAGIC) {
-				ItemStatManager.PlayerItemStats playerItemStats = event.getPlayerItemStats();
-				float spellMultiplier;
-				if (playerItemStats == null) {
-					spellMultiplier = SpellPower.getSpellDamage(mPlugin, mPlayer, 1);
-				} else {
-					spellMultiplier = SpellPower.getSpellDamage(event.getPlayerItemStats(), 1);
-				}
+				float spellMultiplier = SpellPower.getSpellDamage(playerItemStats, 1);
 				event.updateDamageWithMultiplier(1 + (spellMultiplier - 1) * SPELL_MOD);
 			}
 		}
