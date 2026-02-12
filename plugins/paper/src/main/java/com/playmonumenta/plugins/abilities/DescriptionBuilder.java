@@ -171,8 +171,9 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 	}
 
 	public DescriptionBuilder<T> addConditionalTree(DepthsTree tree, Description<T> description) {
+		// if player is null, show all trees (depths skills api compatibility)
 		return add((a, p) -> {
-			if (p != null && DepthsManager.getInstance().hasTreeUnlocked(p, tree)) {
+			if (p == null || DepthsManager.getInstance().hasTreeUnlocked(p, tree)) {
 				return description.get(a, p);
 			} else {
 				return Component.empty();
@@ -181,8 +182,9 @@ public class DescriptionBuilder<T extends Ability> implements Description<T> {
 	}
 
 	public DescriptionBuilder<T> addConditionalTreeOrAbility(DepthsTree tree, Description<T> description) {
+		// if player is null, show all trees (depths skills api compatibility)
 		return add((a, p) -> {
-			if (p != null && (DepthsManager.getInstance().hasTreeUnlocked(p, tree)
+			if (p == null || (DepthsManager.getInstance().hasTreeUnlocked(p, tree)
 				|| DepthsManager.getInstance().getPlayerAbilities(p).stream().filter(da -> da.getDepthsTree() == tree).anyMatch(AbilityInfo::hasCooldown))) {
 				return description.get(a, p);
 			} else {
