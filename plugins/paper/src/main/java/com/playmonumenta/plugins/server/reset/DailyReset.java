@@ -30,6 +30,7 @@ public class DailyReset {
 		60 * 30,
 		60 * 15,
 		0));
+	private static final String DAILY_SERVER_CHANGES_COMMAND = "function monumenta:mechanisms/daily_server_changes";
 	private static final String DAILY_PLAYER_CHANGES_COMMAND = "execute as @S at @s run function monumenta:mechanisms/daily_player_changes";
 	public static final String DAILY_VERSION_OBJECTIVE = "DailyVersion";
 	static ScheduledThreadPoolExecutor mRealTimePool = new ScheduledThreadPoolExecutor(1);
@@ -208,6 +209,7 @@ public class DailyReset {
 		String message = getNewDayMessage(mLastDailyVersion);
 		mLastDailyVersion = dailyVersion;
 		plugin.getLogger().info("[DailyReset] " + message);
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently(DAILY_SERVER_CHANGES_COMMAND);
 		SeasonalEventManager.reloadPasses(Bukkit.getConsoleSender());
 		for (Player player : plugin.getServer().getOnlinePlayers()) {
 			handle(player);
