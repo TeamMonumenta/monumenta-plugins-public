@@ -16,8 +16,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class PassiveCryogenesis extends Spell {
-	private static final int ABOVE_Y = 3;
-
 	private final LivingEntity mBoss;
 	private final PassivePolarAura mAura;
 	private int mT;

@@ -218,7 +218,7 @@ public class MusicGui extends Gui {
 				//R3
 				addDungeonItem(4, 2, Material.BLUE_WOOL, Location.BLUE, MusicPage.BLUE, "Blue");
 				addDungeonItem(4, 3, Material.BROWN_WOOL, Location.BROWN, MusicPage.BROWN, "Brown");
-				addDungeonItem(4, 4, Material.PURPLE_STAINED_GLASS_PANE,Location.INDIGO,MusicPage.INDIGO,"Indigo");
+				addDungeonItem(4, 4, Material.PURPLE_STAINED_GLASS_PANE, Location.INDIGO, MusicPage.INDIGO, "Indigo");
 			}
 
 			case PLAYLIST -> {

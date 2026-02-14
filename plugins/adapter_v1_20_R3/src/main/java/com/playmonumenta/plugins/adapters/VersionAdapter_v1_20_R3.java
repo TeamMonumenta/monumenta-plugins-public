@@ -692,7 +692,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 	@Override
 	public void clearPiglinTarget(LivingEntity pigType) {
 		net.minecraft.world.entity.Entity entity = ((CraftEntity) pigType).getHandle();
-		if(entity instanceof AbstractPiglin piglin) {
+		if (entity instanceof AbstractPiglin piglin) {
 			CustomBrains.dropAbstractPiglinAggro(piglin);
 		}
 	}
@@ -999,7 +999,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 	}
 
 	@Override
-	public void removePlayerNametag(Player clientPlayer, Player targetPlayer, Entity ...targetEntities) {
+	public void removePlayerNametag(Player clientPlayer, Player targetPlayer, Entity... targetEntities) {
 		IntList targetIds = new IntArrayList(targetEntities.length);
 		for (Entity targetEntity : targetEntities) {
 			targetIds.add(targetEntity.getEntityId());
@@ -1012,7 +1012,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 	}
 
 	@Override
-	public void updatePlayerNametag(Player clientPlayer, Entity ...entities) {
+	public void updatePlayerNametag(Player clientPlayer, Entity... entities) {
 		List<Packet<ClientGamePacketListener>> list = new ArrayList<>();
 		net.minecraft.server.level.ServerPlayer mcClientPlayer = ((CraftPlayer) clientPlayer).getHandle();
 		for (Entity targetEntity : entities) {
@@ -1043,7 +1043,7 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		return null;
 	}
 
-	private ClientboundSetPassengersPacket getEntityPassengersPacket(net.minecraft.world.entity.Entity vehicle, Entity ...passengers) {
+	private ClientboundSetPassengersPacket getEntityPassengersPacket(net.minecraft.world.entity.Entity vehicle, Entity... passengers) {
 		FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
 		List<net.minecraft.world.entity.Entity> originalPassengers = vehicle.getPassengers();
 		IntList passengerIds = new IntArrayList();
@@ -1057,9 +1057,9 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		buf.writeVarIntArray(passengerIds.toIntArray());
 
 		return new ClientboundSetPassengersPacket(buf);
-  	}
+	}
 
-  	@Override
+	@Override
 	public double getJumpVelocity(LivingEntity entity) {
 		net.minecraft.world.entity.LivingEntity e = ((CraftLivingEntity) entity).getHandle();
 		return e.getJumpPower();

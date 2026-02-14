@@ -103,13 +103,15 @@ public class LesbianClawsCS extends GraspingClawsCS {
 	@Override
 	public void cageTick(Player player, Location loc, double radius, int ticks) {
 		if (ticks % 10 == 0) {
+			Particle.DustTransition dustData;
+			if (ticks % 20 == 0) {
+				dustData = new Particle.DustTransition(LESBIAN_RED, LESBIAN_WHITE, 1.3f);
+			} else {
+				dustData = new Particle.DustTransition(LESBIAN_WHITE, LESBIAN_HOT_PINK, 1.3f);
+			}
 			new PPSpiral(Particle.DUST_COLOR_TRANSITION, loc, radius)
 				.delta(0.1)
-				.data(switch (ticks % 20) {
-					case 0 -> new Particle.DustTransition(LESBIAN_RED, LESBIAN_WHITE, 1.3f);
-					case 10 -> new Particle.DustTransition(LESBIAN_WHITE, LESBIAN_HOT_PINK, 1.3f);
-					default -> throw new IllegalStateException("Unexpected value: " + ticks % 20);
-				})
+				.data(dustData)
 				.countPerBlockPerCurve(2)
 				.curveAngle(70)
 				.curves(10)
@@ -118,11 +120,7 @@ public class LesbianClawsCS extends GraspingClawsCS {
 
 			new PPSpiral(Particle.DUST_COLOR_TRANSITION, loc, radius)
 				.delta(0.1)
-				.data(switch (ticks % 20) {
-					case 0 -> new Particle.DustTransition(LESBIAN_RED, LESBIAN_WHITE, 1.3f);
-					case 10 -> new Particle.DustTransition(LESBIAN_WHITE, LESBIAN_HOT_PINK, 1.3f);
-					default -> throw new IllegalStateException("Unexpected value: " + ticks % 20);
-				})
+				.data(dustData)
 				.countPerBlockPerCurve(2)
 				.curveAngle(-70)
 				.curves(10)

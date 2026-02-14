@@ -31,19 +31,19 @@ public record ChessPlayer(Player mPlayer, ChessBoard mBoard, ChessTeam mTeam) {
 		return ChessPiecesTier.DEFAULT;
 	}
 
-	public static final ChessPiecesTier getPieceTier(Player player) {
+	public static ChessPiecesTier getPieceTier(Player player) {
 		return ChessPiecesTier.DEFAULT;
 	}
 
-	public static final boolean isChessPlayer(Player player) {
+	public static boolean isChessPlayer(Player player) {
 		return player.getScoreboardTags().contains(CHESS_PLAYER_TAG);
 	}
 
-	public static final void removeChessPlayer(Player player) {
+	public static void removeChessPlayer(Player player) {
 		player.removeScoreboardTag(CHESS_PLAYER_TAG);
 	}
 
-	public static final void removeChessPlayer(ChessPlayer player) {
+	public static void removeChessPlayer(ChessPlayer player) {
 		if (player != null && player.mPlayer != null) {
 			player.mPlayer.removeScoreboardTag(CHESS_PLAYER_TAG);
 		}

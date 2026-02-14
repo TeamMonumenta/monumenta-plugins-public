@@ -510,8 +510,8 @@ public class BossUtils {
 		HashMap<Player, Integer> playerMapping = mYAntiCheat.computeIfAbsent(boss, (k) -> new HashMap<>());
 
 		int count = playerMapping.getOrDefault(player, 0);
-		if(player.getY() - locY <= y) {
-			playerMapping.put(player, Math.max(0, count-2));
+		if (player.getY() - locY <= y) {
+			playerMapping.put(player, Math.max(0, count - 2));
 			return false;
 		}
 		playerMapping.put(player, ++count);

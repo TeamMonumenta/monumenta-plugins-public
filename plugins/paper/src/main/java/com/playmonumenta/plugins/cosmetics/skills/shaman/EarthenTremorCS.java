@@ -30,7 +30,7 @@ public class EarthenTremorCS implements CosmeticSkill {
 
 	public void earthenTremorEffect(Player player, Location location, double radius) {
 		DisplayEntityUtils.groundBlockQuake(location.add(0, 0.1, 0), radius, List.of(Material.PODZOL, Material.DIRT, Material.MUD), new Display.Brightness(12, 12));
-		World world	= player.getWorld();
+		World world = player.getWorld();
 		world.playSound(location, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 0.7f, 0.4f);
 		world.playSound(location, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.2f, 2f);
 		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.2f, 0.8f);
@@ -45,7 +45,7 @@ public class EarthenTremorCS implements CosmeticSkill {
 		new PartialParticle(Particle.BLOCK_CRACK, loc, 70, radius * 0.75, 0.25, radius * 0.75, 0.1,
 			Bukkit.createBlockData(Material.IRON_ORE)).spawnAsPlayerActive(player);
 
-		World world	= player.getWorld();
+		World world = player.getWorld();
 		world.playSound(location, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 0.5f, 0.6f);
 		world.playSound(location, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 0.3f, 0.6f);
 		world.playSound(location, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.2f, 1.9f);
@@ -61,7 +61,7 @@ public class EarthenTremorCS implements CosmeticSkill {
 		new PartialParticle(Particle.BLOCK_CRACK, loc, 50, radius * 0.75, 0.25, radius * 0.75, 0.1,
 			Bukkit.createBlockData(Material.SCULK)).spawnAsPlayerActive(player);
 
-		World world	= location.getWorld();
+		World world = location.getWorld();
 
 		world.playSound(location, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 0.7f, 0.5f);
 		world.playSound(location, Sound.ENTITY_FROG_TONGUE, SoundCategory.PLAYERS, 2f, 0.5f);
@@ -70,8 +70,7 @@ public class EarthenTremorCS implements CosmeticSkill {
 		if (meleeHit) {
 			world.playSound(location, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1f, 0.8f);
 			world.playSound(location, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1f, 1f);
-		}
-		else {
+		} else {
 			world.playSound(location, Sound.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 0.7f, 0.7f);
 			world.playSound(location, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.7f, 1.6f);
 		}

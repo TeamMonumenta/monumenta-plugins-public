@@ -224,15 +224,15 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
-	public void removePlayerNametag(Player clientPlayer, Player targetPlayer, Entity ...entities) {
+	public void removePlayerNametag(Player clientPlayer, Player targetPlayer, Entity... entities) {
 
 	}
 
 	@Override
-	public void updatePlayerNametag(Player clientPlayer, Entity ...entities) {
-  	}
+	public void updatePlayerNametag(Player clientPlayer, Entity... entities) {
+	}
 
-  	@Override
+	@Override
 	public double getJumpVelocity(LivingEntity entity) {
 		return 0.0d;
 	}

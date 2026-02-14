@@ -36,9 +36,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class ArcaneStrike extends Ability {

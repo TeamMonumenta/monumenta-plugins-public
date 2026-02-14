@@ -40,8 +40,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 import static com.playmonumenta.plugins.utils.EntityUtils.VULNERABILITY_EFFECT_NAME;
 
@@ -224,8 +224,7 @@ public class SpiritcatcherOrbs extends Ability implements AbilityWithChargesOrSt
 		event.updateDamageWithMultiplier(1 + mImbuedDamageBonus);
 		if (mPlugin.mEffectManager.getActiveEffect(enemy, SPIRITFLAME_EFFECT_NAME) instanceof SpiritcatcherOrbsSpiritflames flames) {
 			flames.extendDuration(mFlameDuration);
-		}
-		else {
+		} else {
 			mPlugin.mEffectManager.addEffect(enemy, SPIRITFLAME_EFFECT_NAME, new SpiritcatcherOrbsSpiritflames(mFlameDuration, mFlameDamage, mFlameRange, mPlayer, ClassAbility.SPIRITCATCHER_ORBS, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer), mCosmetic));
 		}
 		if (isLevelTwo()) {

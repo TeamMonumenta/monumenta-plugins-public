@@ -259,7 +259,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 	@Override
 	public int getRemainingAbilityDuration() {
-		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() + (int) (mWhirlwindBuffPercent * mDuration)  - this.mCurrDuration : 0;
+		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() + (int) (mWhirlwindBuffPercent * mDuration) - this.mCurrDuration : 0;
 	}
 
 	public abstract void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats);

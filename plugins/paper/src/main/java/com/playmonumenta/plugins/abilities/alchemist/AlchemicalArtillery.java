@@ -434,7 +434,7 @@ public class AlchemicalArtillery extends Ability {
 			.addStatComparison("Damage: %d1 + %p1 -> %d2 + %p2 (s)")
 				.statValues(stat(DAMAGE_RAW_1), stat(DAMAGE_MULTIPLIER_1), stat(a -> a.mDamageRaw, DAMAGE_RAW_2), stat(a -> a.mDamageMult, DAMAGE_MULTIPLIER_2))
 			.addStatComparison("Radius: %p1 -> %p2")
-				.statValues(stat(RADIUS_MULTIPLIER_1), stat(a -> a.mRadiusMult,	 RADIUS_MULTIPLIER_2))
+				.statValues(stat(RADIUS_MULTIPLIER_1), stat(a -> a.mRadiusMult, RADIUS_MULTIPLIER_2))
 			.addDashedLine();
 	}
 

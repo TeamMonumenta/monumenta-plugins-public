@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import de.tr7zw.nbtapi.NBT;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;

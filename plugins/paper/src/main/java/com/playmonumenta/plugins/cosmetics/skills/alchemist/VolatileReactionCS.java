@@ -204,7 +204,7 @@ public class VolatileReactionCS implements CosmeticSkill {
 			100,
 			null,
 			new Particle.DustOptions(ParticleUtils.getRandomCloseColor(ENHANCEMENT_DOT_TICK_ORANGE, 30), 0.8f),
-			(mob) -> {}
+			(mob) -> { }
 		);
 	}
 

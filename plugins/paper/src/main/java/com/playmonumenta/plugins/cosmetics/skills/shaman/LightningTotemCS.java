@@ -76,8 +76,7 @@ public class LightningTotemCS implements CosmeticSkill {
 		if (meleeActivated) {
 			world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 0.5f);
 			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1f, 0.7f);
-		}
-		else {
+		} else {
 			world.playSound(loc, Sound.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1f, 0.7f);
 			world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1f, 2f);
 		}

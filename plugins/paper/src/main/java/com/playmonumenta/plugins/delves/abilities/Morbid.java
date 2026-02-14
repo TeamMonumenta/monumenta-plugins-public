@@ -91,7 +91,7 @@ public class Morbid {
 				}
 			}
 
-		}  else if (level == 1 && currentDeaths == 2) {
+		} else if (level == 1 && currentDeaths == 2) {
 			player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 2f, 2f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 15, 1, false, false));
 			player.sendMessage(Component.text("The crack widens; you feel that one more death will shatter it completely.", NamedTextColor.RED));

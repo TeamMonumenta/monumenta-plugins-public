@@ -44,29 +44,29 @@ public class SpiritArcheryGUI extends Gui {
 				.appendNewline()
 				.append(Component.text("It will cost you " + CXP_COSTS[0] + " CXP to attempt this fight.", NamedTextColor.GRAY))
 				.appendNewline()
-				.append(Component.text("The Spiritsinger will award you one ticket per " + SpiritArcheryMinigame.scorePerTicketByDifficulty[0] + " score attained.", NamedTextColor.DARK_GRAY))
-			, 30, true),
+				.append(Component.text("The Spiritsinger will award you one ticket per " + SpiritArcheryMinigame.scorePerTicketByDifficulty[0] + " score attained.", NamedTextColor.DARK_GRAY)),
+			30, true),
 		GUIUtils.createBasicItem(Material.YELLOW_STAINED_GLASS_PANE, 1, "Medium", NamedTextColor.GOLD, false,
 			Component.text("Avoid penalty targets that reduce score.")
 				.appendNewline()
 				.append(Component.text("It will cost you " + CXP_COSTS[1] + " CXP to attempt this fight.", NamedTextColor.GRAY))
 				.appendNewline()
-				.append(Component.text("The Spiritsinger will award you one ticket per " + SpiritArcheryMinigame.scorePerTicketByDifficulty[1] + " score attained.", NamedTextColor.DARK_GRAY))
-			, 30, true),
+				.append(Component.text("The Spiritsinger will award you one ticket per " + SpiritArcheryMinigame.scorePerTicketByDifficulty[1] + " score attained.", NamedTextColor.DARK_GRAY)),
+			30, true),
 		GUIUtils.createBasicItem(Material.RED_STAINED_GLASS_PANE, 1, "Hard", NamedTextColor.RED, false,
 			Component.text("Prioritise darker targets that increase score by more.")
 				.appendNewline()
 				.append(Component.text("It will cost you " + CXP_COSTS[2] + " CXP to attempt this fight.", NamedTextColor.GRAY))
 				.appendNewline()
-				.append(Component.text("The Spiritsinger will award you one ticket per " + SpiritArcheryMinigame.scorePerTicketByDifficulty[2] + " score attained.", NamedTextColor.DARK_GRAY))
-			, 30, true),
+				.append(Component.text("The Spiritsinger will award you one ticket per " + SpiritArcheryMinigame.scorePerTicketByDifficulty[2] + " score attained.", NamedTextColor.DARK_GRAY)),
+			30, true),
 		GUIUtils.createBasicItem(Material.BLACK_STAINED_GLASS_PANE, 1, "Expert", NamedTextColor.DARK_RED, false,
 			Component.text("Avoid darker red targets, or you'll lose more score.")
 				.appendNewline()
 				.append(Component.text("It will cost you " + CXP_COSTS[3] + " CXP to attempt this fight.", NamedTextColor.GRAY))
 				.appendNewline()
-				.append(Component.text("The Spiritsinger will award you one ticket per " + SpiritArcheryMinigame.scorePerTicketByDifficulty[3] + " score attained.", NamedTextColor.DARK_GRAY))
-			, 30, true),
+				.append(Component.text("The Spiritsinger will award you one ticket per " + SpiritArcheryMinigame.scorePerTicketByDifficulty[3] + " score attained.", NamedTextColor.DARK_GRAY)),
+			30, true),
 	};
 	public final Location cornerLoc1 = new Location(mPlayer.getWorld(), 264, 135, -136);
 	private final String[] conditions = {

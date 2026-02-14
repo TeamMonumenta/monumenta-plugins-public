@@ -50,7 +50,7 @@ public class Eggify {
 		String entityName = MessagingUtils.plainText(entity.customName());
 
 		// if mob is a cat get cats type, otherwise null
-		Cat.Type catType = (entity instanceof Cat ? ((Cat) entity).getCatType(): null);
+		Cat.Type catType = (entity instanceof Cat ? ((Cat) entity).getCatType() : null);
 
 		List<ItemStack> spawnEggs = ServerProperties.getEggifySpawnEggs().stream()
 			.flatMap(key -> InventoryUtils.getItemsFromLootTable(player.getLocation(), key).stream())

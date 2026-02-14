@@ -1178,7 +1178,7 @@ public class EntityUtils {
 			startTracker(plugin);
 		}
 
-		if(mob instanceof Piglin || mob instanceof PiglinBrute) {
+		if (mob instanceof Piglin || mob instanceof PiglinBrute) {
 			NmsUtils.getVersionAdapter().clearPiglinTarget(mob);
 		} else if (mob instanceof Mob m) {
 			m.setTarget(null);

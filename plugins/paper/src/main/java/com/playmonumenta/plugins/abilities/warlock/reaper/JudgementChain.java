@@ -214,7 +214,7 @@ public class JudgementChain extends MultipleChargeAbility {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (mPlugin.mEffectManager.hasEffect(enemy, EFFECT_NAME)) {
 			DamageEvent.DamageType type = event.getType();
-			if (type == DamageEvent.DamageType.TRUE || type == DamageEvent.DamageType.OTHER || type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.FIRE || type == DamageEvent.DamageType.POISON ) {
+			if (type == DamageEvent.DamageType.TRUE || type == DamageEvent.DamageType.OTHER || type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.FIRE || type == DamageEvent.DamageType.POISON) {
 				return false;
 			}
 			event.updateDamageWithMultiplier(1 + mChainDmgBonus);

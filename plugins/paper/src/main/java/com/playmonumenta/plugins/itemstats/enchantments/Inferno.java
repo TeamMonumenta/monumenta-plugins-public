@@ -19,6 +19,7 @@ public class Inferno implements Enchantment {
 
 	public static final String INFERNO_EFFECT_NAME = "Inferno";
 	public static final Style INFERNO_COLOR = Style.style(TextColor.color(0xE63C22));
+
 	@Override
 	public String getName() {
 		return "Inferno";

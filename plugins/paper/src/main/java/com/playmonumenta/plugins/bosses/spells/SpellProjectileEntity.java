@@ -265,7 +265,7 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 				for (LivingEntity entity : entities) {
 					// If it can collide with a player, check if it's the initial target or if it can hit others
 					// Otherwise, check if collision is the target
-					boolean shouldHit = entity instanceof Player player?
+					boolean shouldHit = entity instanceof Player player ?
 						mParameters.COLLIDES_WITH_PLAYERS && player.getGameMode() != GameMode.SPECTATOR && (player.equals(target) || mParameters.COLLIDE_OTHER_PLAYERS) :
 						entity.equals(target);
 

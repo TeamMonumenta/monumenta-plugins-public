@@ -81,7 +81,7 @@ public class TransmutationRingCS implements CosmeticSkill {
 			100,
 			centerLoc.clone().add(0, -0.5, 0),
 			new Particle.DustOptions(ParticleUtils.getOffsetColor(GOLD_COLOR.getColor(), -offset), isElite ? 3f : 1f),
-			(mob) -> {}
+			(mob) -> { }
 		);
 	}
 

@@ -63,7 +63,7 @@ public class RushArenaUtils {
 			data.set(RushManager.RUSH_PLAYER_COUNT_KEY, PersistentDataType.INTEGER, count);
 			playerCount = count;
 		}
-		if(isMultiplayer == null) {
+		if (isMultiplayer == null) {
 			isMultiplayer = playerCount > 1;
 			data.set(RushManager.RUSH_IS_MULTIPLAYER, PersistentDataType.BOOLEAN, isMultiplayer);
 		}

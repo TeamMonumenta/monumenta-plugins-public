@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;

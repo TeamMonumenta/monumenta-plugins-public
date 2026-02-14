@@ -127,7 +127,6 @@ public class VerdantRazorCS extends WhirlingBladeCS {
 		Location playerLoc = player.getLocation().add(0, 1, 0);
 		if (mEndLoc != null && razorDisplayMap.get(startingTick) != null) {
 			Vector toBlade = LocationUtils.getVectorTo(mEndLoc, playerLoc);
-//			final Particle.DustTransition GREEN = new Particle.DustTransition(Color.fromRGB(140, 210, 45), Color.fromRGB(70, 105, 27), 1.2f);
 			new BukkitRunnable() {
 				int mTicks = 0;
 

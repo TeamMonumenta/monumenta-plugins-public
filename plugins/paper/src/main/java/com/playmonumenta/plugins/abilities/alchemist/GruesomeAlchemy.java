@@ -87,7 +87,7 @@ public class GruesomeAlchemy extends Ability implements PotionAbility {
 		double base = 0;
 		switch (level) {
 			case 0 -> base = GRUESOME_ALCHEMY_0_WEAKEN_AMPLIFIER;
-			case 1,2 -> base = GRUESOME_ALCHEMY_1_WEAKEN_AMPLIFIER;
+			case 1, 2 -> base = GRUESOME_ALCHEMY_1_WEAKEN_AMPLIFIER;
 			case 3 -> base = GRUESOME_ALCHEMY_3_WEAKEN_AMPLIFIER;
 		}
 		return base + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);

@@ -55,7 +55,7 @@ import org.jetbrains.annotations.Nullable;
 public class CustomBrains {
 
 	// there's a bunch of protected method/fields we cant to use, which we can conveniently access without reflection by making subclasses
-	private static abstract class PiglinAccessor extends Piglin {
+	private abstract static class PiglinAccessor extends Piglin {
 		static ImmutableList<MemoryModuleType<?>> MEMORY_TYPES = Piglin.MEMORY_TYPES;
 		static ImmutableList<SensorType<? extends Sensor<? super Piglin>>> SENSOR_TYPES = Piglin.SENSOR_TYPES;
 
@@ -64,13 +64,13 @@ public class CustomBrains {
 		}
 	}
 
-	private static abstract class PiglinAiAccessor extends PiglinAi {
+	private abstract static class PiglinAiAccessor extends PiglinAi {
 		protected static @NotNull Brain<?> makeBrain(Piglin piglin, Brain<Piglin> brain) {
 			return PiglinAi.makeBrain(piglin, brain);
 		}
 	}
 
-	private static abstract class PiglinBruteAccessor extends PiglinBrute {
+	private abstract static class PiglinBruteAccessor extends PiglinBrute {
 		static ImmutableList<MemoryModuleType<?>> MEMORY_TYPES = PiglinBrute.MEMORY_TYPES;
 		static ImmutableList<SensorType<? extends Sensor<? super PiglinBrute>>> SENSOR_TYPES = PiglinBrute.SENSOR_TYPES;
 
@@ -79,13 +79,13 @@ public class CustomBrains {
 		}
 	}
 
-	private static abstract class PiglinBruteAiAccessor extends PiglinBruteAi {
+	private abstract static class PiglinBruteAiAccessor extends PiglinBruteAi {
 		protected static @NotNull Brain<?> makeBrain(PiglinBrute piglinBrute, Brain<PiglinBrute> brain) {
 			return PiglinBruteAi.makeBrain(piglinBrute, brain);
 		}
 	}
 
-	private static abstract class HoglinAccessor extends Hoglin {
+	private abstract static class HoglinAccessor extends Hoglin {
 		static ImmutableList<? extends MemoryModuleType<?>> MEMORY_TYPES = Hoglin.MEMORY_TYPES;
 		static ImmutableList<? extends SensorType<? extends Sensor<? super Hoglin>>> SENSOR_TYPES = Hoglin.SENSOR_TYPES;
 
@@ -94,7 +94,7 @@ public class CustomBrains {
 		}
 	}
 
-	private static abstract class HoglinAiAccessor extends HoglinAi {
+	private abstract static class HoglinAiAccessor extends HoglinAi {
 		protected static @NotNull Brain<?> makeBrain(Brain<Hoglin> brain) {
 			return HoglinAi.makeBrain(brain);
 		}
@@ -271,7 +271,7 @@ public class CustomBrains {
 			if (activity.equals(Activity.FIGHT) && piglinBrute.getTags().contains("boss_no_pathfinding")) {
 				// remove SetWalkTargetFromAttackTargetIfTargetOutOfReach if pathfinding is disabled
 				super.addActivityAndRemoveMemoryWhenStopped(activity, begin, ImmutableList.of(tasks.get(0), tasks.get(2)), memoryType);
-			} else if(activity.equals(Activity.FIGHT)) {
+			} else if (activity.equals(Activity.FIGHT)) {
 				// changed: configurable attack speed
 				super.addActivityAndRemoveMemoryWhenStopped(activity, begin, ImmutableList.of(tasks.get(0), tasks.get(1), MeleeAttack.create(attackSpeed)), memoryType);
 			} else {
@@ -299,6 +299,7 @@ public class CustomBrains {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	public static class CustomHoglinBrain extends Brain<Hoglin> {
 		private final Hoglin hoglin;
 

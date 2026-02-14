@@ -200,9 +200,7 @@ public class LightningTotem extends TotemAbility {
 				boolean useEliteDamage = isLevelTwo() && (EntityUtils.isElite(enemy) || EntityUtils.isBoss(enemy) || EntityUtils.getMaxHealth(enemy) == enemy.getHealth());
 				damage = (useEliteDamage ? mEliteDamagePercentProj : mDamagePercentProj) * projDamageAdd;
 				meleeActivated = false;
-			}
-			// Check for melee (fully charged)
-			else if (event.getType() == DamageEvent.DamageType.MELEE && mPlayer.getCooledAttackStrength(0) > 0.9) {
+			} else if (event.getType() == DamageEvent.DamageType.MELEE && mPlayer.getCooledAttackStrength(0) > 0.9) {
 				if (!MetadataUtils.checkOnceInRecentTicks(mPlugin, enemy, "LightningTotemHit", 5)) {
 					return false;
 				}

@@ -418,14 +418,14 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 			World world = mBoss.getWorld();
 			world.playSound(mBoss.getLocation(), mParameters.loom_sound, SoundCategory.HOSTILE, 3.0f, Constants.Note.F4.mPitch);
 			Bukkit.getScheduler().runTaskLater(mPlugin,
-				() -> world.playSound(mBoss.getLocation(), mParameters.loom_sound, SoundCategory.HOSTILE, 2.8f, Constants.Note.A4.mPitch)
-				, 3);
+				() -> world.playSound(mBoss.getLocation(), mParameters.loom_sound, SoundCategory.HOSTILE, 2.8f, Constants.Note.A4.mPitch),
+				3);
 			Bukkit.getScheduler().runTaskLater(mPlugin,
-				() -> world.playSound(mBoss.getLocation(), mParameters.loom_sound, SoundCategory.HOSTILE, 2.6f, Constants.Note.C5.mPitch)
-				, 6);
+				() -> world.playSound(mBoss.getLocation(), mParameters.loom_sound, SoundCategory.HOSTILE, 2.6f, Constants.Note.C5.mPitch),
+				6);
 			Bukkit.getScheduler().runTaskLater(mPlugin,
-				() -> world.playSound(mBoss.getLocation(), mParameters.loom_sound, SoundCategory.HOSTILE, 2.8f, Constants.Note.F5.mPitch)
-				, 9);
+				() -> world.playSound(mBoss.getLocation(), mParameters.loom_sound, SoundCategory.HOSTILE, 2.8f, Constants.Note.F5.mPitch),
+				9);
 		}
 	}
 

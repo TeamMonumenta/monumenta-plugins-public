@@ -77,7 +77,7 @@ public class DeathSummonBoss extends BossAbilityGroup {
 
 		boolean poolSet = !mParam.POOL.toString().isEmpty();
 		boolean partySet = !mParam.PARTY.toString().isEmpty();
-		
+
 		if (!poolSet && !partySet) {
 			MMLog.severe("[DeathSummonBoss] Boss '" + boss.getName() + "' has neither POOL nor PARTY set! At least one must be configured.");
 		} else if (poolSet && partySet) {
@@ -93,9 +93,9 @@ public class DeathSummonBoss extends BossAbilityGroup {
 		mParam.PARTICLES.spawn(mBoss, loc.clone().add(0, 0.5, 0));
 		mParam.SOUNDS.play(loc);
 		Random r = new Random();
-		
+
 		boolean isParty = !mParam.PARTY.toString().isEmpty();
-		
+
 		for (int i = 0; i < mParam.MOB_COUNT; i++) {
 			if (isParty) {
 				// For parties, spawn all mobs from the party
@@ -119,7 +119,7 @@ public class DeathSummonBoss extends BossAbilityGroup {
 			}
 		}
 	}
-	
+
 	private void applyEntitySettings(Entity entity, Random r) {
 		// Include the original mob's metadata for spawner counting to prevent mob farming
 		if (entity != null && mBoss.hasMetadata(SPAWNER_COUNT_METAKEY)) {

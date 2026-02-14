@@ -102,13 +102,15 @@ public class GayTotemCS extends CleansingTotemCS {
 
 	@Override
 	public void cleansingTotemPulse(Player player, Location standLocation, double radius) {
+		Particle.DustTransition dustData;
+		if (mTicks % 2 == 0) {
+			dustData = new Particle.DustTransition(GAY_GREEN, GAY_WHITE, 1.3f);
+		} else {
+			dustData = new Particle.DustTransition(GAY_WHITE, GAY_INDIGO, 1.3f);
+		}
 		new PPSpiral(Particle.DUST_COLOR_TRANSITION, standLocation, radius)
 			.delta(0.1)
-			.data(switch (mTicks % 2) {
-				case 0 -> new Particle.DustTransition(GAY_GREEN, GAY_WHITE, 1.3f);
-				case 1 -> new Particle.DustTransition(GAY_WHITE, GAY_INDIGO, 1.3f);
-				default -> throw new IllegalStateException("Unexpected value: " + mTicks % 2);
-			})
+			.data(dustData)
 			.countPerBlockPerCurve(3)
 			.curveAngle(70)
 			.curves(10)
@@ -117,11 +119,7 @@ public class GayTotemCS extends CleansingTotemCS {
 
 		new PPSpiral(Particle.DUST_COLOR_TRANSITION, standLocation, radius)
 			.delta(0.1)
-			.data(switch (mTicks % 2) {
-				case 0 -> new Particle.DustTransition(GAY_GREEN, GAY_WHITE, 1.3f);
-				case 1 -> new Particle.DustTransition(GAY_WHITE, GAY_INDIGO, 1.3f);
-				default -> throw new IllegalStateException("Unexpected value: " + mTicks % 2);
-			})
+			.data(dustData)
 			.countPerBlockPerCurve(3)
 			.curveAngle(-70)
 			.curves(10)

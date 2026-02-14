@@ -246,8 +246,8 @@ public class Parser {
 	 *    {@code optional}: whether this parameter is optional
 	 * {@code build}: A factory, defined as:
 	 *    {@code factory}: given a Map of Strings (Name) to Objects (Value),
-	 * 	with a helping method of {@code getNonNull()} to {@code Objects.requireNonNull()},
-	 * 	return an object of {@code Class}
+	 *    with a helping method of {@code getNonNull()} to {@code Objects.requireNonNull()},
+	 *    return an object of {@code Class}
 	 * </pre>
 	 */
 	// Will not throw because there are NO duplicate keys, yet the pmd will complain about it :p
@@ -903,7 +903,7 @@ public class Parser {
 				String value = peek.getValue();
 				Set<String> poolNames = LibraryOfSoulsIntegration.getPoolNames();
 				Set<String> partyNames = LibraryOfSoulsIntegration.getPartyNames();
-				
+
 				if (poolNames.contains(value)) {
 					return parseAnyOf(tokens, poolNames, "Los Pool").map(LoSPool.LibraryPool::new);
 				} else if (partyNames.contains(value)) {

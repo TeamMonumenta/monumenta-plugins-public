@@ -206,8 +206,8 @@ public class WormBoss extends BossAbilityGroup implements Listener {
 			// Has to be hardcoded for proj iframes...
 			for (LivingEntity part : mParts) {
 				if (!part.isDead()) {
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.
-						addEffect(part, ProjectileIframe.SOURCE, projectileIframe.cleanCopy());
+					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager
+						.addEffect(part, ProjectileIframe.SOURCE, projectileIframe.cleanCopy());
 				}
 			}
 		}

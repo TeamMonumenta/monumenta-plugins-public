@@ -335,7 +335,7 @@ public class MeteorSlam extends Ability {
 
 			Location loc = enemy.getLocation().add(0, 0.15, 0);
 
-			if(MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
+			if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
 				doSlamAttack(loc);
 				mCosmetic.onSlamCritical(mPlugin, mPlayer.getWorld(), loc, mPlayer);
 				onLanding();

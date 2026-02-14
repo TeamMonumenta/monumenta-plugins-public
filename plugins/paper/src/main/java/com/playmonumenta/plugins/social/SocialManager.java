@@ -659,7 +659,7 @@ public class SocialManager implements Listener {
 		if (!"minecraft".equals(event.mRemotePlayer.getServerType())) {
 			return;
 		}
-		
+
 		boolean isNowVisible = isSociallyVisible(event.mRemotePlayer);
 		boolean wasVisible = VISIBLE_REMOTE_PLAYERS.contains(uuid);
 		if (isNowVisible && !wasVisible) {

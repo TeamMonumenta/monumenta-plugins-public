@@ -70,7 +70,7 @@ public record EffectsList(List<Effect> mEffectList) {
 							(target, boss, duration) ->
 								EffectType.applyEffect(effectType, target, (int) duration, 1, null, false)
 						);
-					} else {// for some reason DamageIncrease is called 'damage' here?
+					} else { // for some reason DamageIncrease is called 'damage' here?
 						CUSTOM_EFFECT_RUNNER.put("Custom" + (type.equals("damage") ? "DamageIncrease" : type),
 							(target, boss, duration, strength, effectName) ->
 								EffectType.applyEffect(effectType, target, duration, strength, effectName, false)
