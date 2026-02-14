@@ -40,9 +40,9 @@ public class AdvancedAudioMechanism implements EliteFinisher {
 		ItemDisplay speakerLeft = createDisplay(Material.JUKEBOX, middleLoc.clone().add(VectorUtils.rotateTargetDirection(dir, -90, 0)), dir);
 		ItemDisplay speakerRight = createDisplay(Material.JUKEBOX, middleLoc.clone().add(VectorUtils.rotateTargetDirection(dir, 90, 0)), dir);
 
-		Skeleton DJ = (Skeleton) LibraryOfSoulsIntegration.summon(middleLoc.clone().add(dir).setDirection(dir.multiply(-1)), "SoundEngineer");
-		if (DJ != null) {
-			EliteFinishers.modifyFinisherMob(DJ, p, NamedTextColor.GRAY);
+		Skeleton dj = (Skeleton) LibraryOfSoulsIntegration.summon(middleLoc.clone().add(dir).setDirection(dir.multiply(-1)), "SoundEngineer");
+		if (dj != null) {
+			EliteFinishers.modifyFinisherMob(dj, p, NamedTextColor.GRAY);
 		}
 
 		BukkitRunnable runnable = new BukkitRunnable() {
@@ -118,8 +118,8 @@ public class AdvancedAudioMechanism implements EliteFinisher {
 				speakerRightNew.getScale().set(4 * DISPLAY_SIZE + expansion, 4 * DISPLAY_SIZE + expansion, 4 * DISPLAY_SIZE + expansion);
 				speakerRight.setTransformation(speakerRightNew);
 
-				if (DJ != null) {
-					DJ.teleport(DJ.getLocation().setDirection(LocationUtils.getVectorTo(middleLoc.clone().add(0, 1.3 + 0.3 * Math.sin(22.5 * (mTicks % 8)), 0), DJ.getEyeLocation())));
+				if (dj != null) {
+					dj.teleport(dj.getLocation().setDirection(LocationUtils.getVectorTo(middleLoc.clone().add(0, 1.3 + 0.3 * Math.sin(22.5 * (mTicks % 8)), 0), dj.getEyeLocation())));
 				}
 
 				if (mTicks % 8 == 0) {
@@ -127,8 +127,8 @@ public class AdvancedAudioMechanism implements EliteFinisher {
 					new PartialParticle(Particle.NOTE, speakerRight.getLocation().add(0, 0.8, 0)).extra(1).spawnAsPlayerActive(p);
 				}
 				if (mTicks >= DURATION) {
-					if (DJ != null) {
-						DJ.remove();
+					if (dj != null) {
+						dj.remove();
 					}
 					new PartialParticle(Particle.EXPLOSION_LARGE, middleLoc).spawnAsPlayerActive(p);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, middleLoc, 10, 0, 0, 0, 0.4).spawnAsPlayerActive(p);

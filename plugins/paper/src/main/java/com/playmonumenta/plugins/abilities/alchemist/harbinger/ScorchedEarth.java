@@ -114,15 +114,15 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 			return true;
 		}
 
-		public Location mLocation() {
+		public Location location() {
 			return mLocation;
 		}
 
-		public int mEndTick() {
+		public int endTick() {
 			return mEndTick;
 		}
 
-		public ScorchedEarthCS mCosmetic() {
+		public ScorchedEarthCS cosmetic() {
 			return mCosmetic;
 		}
 
@@ -304,14 +304,14 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 		if (!mActiveInstances.isEmpty()) {
 			for (Iterator<Instance> iterator = mActiveInstances.iterator(); iterator.hasNext(); ) {
 				Instance instance = iterator.next();
-				int timeRemaining = instance.mEndTick() - Bukkit.getCurrentTick();
+				int timeRemaining = instance.endTick() - Bukkit.getCurrentTick();
 
 				if (timeRemaining <= 0) {
 					iterator.remove();
 					continue;
 				}
 
-				instance.mCosmetic().activeEffects(mPlayer, instance.mLocation(), mRadius, timeRemaining, mDuration);
+				instance.cosmetic().activeEffects(mPlayer, instance.location(), mRadius, timeRemaining, mDuration);
 
 				new Hitbox.SphereHitbox(instance.mLocation, mRadius)
 					.getHitMobs()

@@ -290,7 +290,7 @@ public class MonumentaNetworkRelayIntegration implements Listener {
 		TABIntegration.loadRemotePlayer(event.mRemotePlayer);
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(ignoreCancelled = false, priority = EventPriority.HIGH)
 	public void lowMemory(LowMemoryEvent event) {
 		Bukkit.getServer().dispatchCommand(
 			Bukkit.getServer().getConsoleSender(),

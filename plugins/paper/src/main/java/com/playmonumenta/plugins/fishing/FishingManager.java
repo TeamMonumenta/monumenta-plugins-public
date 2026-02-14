@@ -81,7 +81,7 @@ public class FishingManager implements Listener {
 		mCombatManager = combatManager;
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onFish(PlayerFishEvent event) {
 		Player player = event.getPlayer();
 		if (event.getState() == PlayerFishEvent.State.FISHING && mPlayerMinigameMap.containsKey(player)) {
@@ -139,7 +139,7 @@ public class FishingManager implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	public void onInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		if (!mPlayerMinigameMap.containsKey(player) && !mPlayerPrepCombatList.contains(player)) {

@@ -1420,18 +1420,18 @@ public class Parser {
 			return this;
 		}
 
+		public ParseError suggests(Collection<Suggestion> suggestions) {
+			mSuggestions.clear();
+			mSuggestions.addAll(suggestions);
+			return this;
+		}
+
 		public ParseError suggestsMore(Collection<String> suggestions, String tooltip) {
 			mSuggestions.add(Suggestion.of(mTokenIndex - 1, suggestions, tooltip));
 			return this;
 		}
 
 		public ParseError suggestsMore(Collection<Suggestion> suggestions) {
-			mSuggestions.addAll(suggestions);
-			return this;
-		}
-
-		public ParseError suggests(Collection<Suggestion> suggestions) {
-			mSuggestions.clear();
 			mSuggestions.addAll(suggestions);
 			return this;
 		}

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.listeners.StasisListener;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
@@ -166,8 +167,8 @@ public class Transposing implements Enchantment, Listener {
 
 	private void playTransposeEffect(Location location) {
 		location.getWorld().playSound(location, Sound.ENTITY_ENDERMAN_TELEPORT, 0.5f, 1.2f);
-		location.getWorld().spawnParticle(Particle.PORTAL, location.clone().add(0, 1, 0), 50, 0.5, 0.5, 0.5, 0.1);
-		location.getWorld().spawnParticle(Particle.REVERSE_PORTAL, location.clone().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.05);
+		new PartialParticle(Particle.PORTAL, location.clone().add(0, 1, 0), 50, 0.5, 0.5, 0.5, 0.1).spawnFull();
+		new PartialParticle(Particle.REVERSE_PORTAL, location.clone().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.05).spawnFull();
 	}
 
 	private int getTransposingId(ItemStack item) {

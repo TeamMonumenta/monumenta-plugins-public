@@ -340,6 +340,7 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 				}
 			}
 			case REMOVE -> boss.remove();
+			default -> throw new IllegalStateException("Unexpected projectile end type: " + mParameters.TYPE);
 		}
 	}
 

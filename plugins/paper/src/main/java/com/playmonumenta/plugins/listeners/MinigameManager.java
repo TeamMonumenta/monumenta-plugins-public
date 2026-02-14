@@ -129,14 +129,14 @@ public class MinigameManager implements Listener {
 	}
 
 	// add events accordingly
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityDeath(EntityDeathEvent event) {
 		getMinigamesInRange(event.getEntity().getLocation()).forEach(minigame ->
 			minigame.onEntityDeath(event)
 		);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		getActiveMinigames().values().forEach(minigame ->
 			minigame.onPlayerDeath(event)

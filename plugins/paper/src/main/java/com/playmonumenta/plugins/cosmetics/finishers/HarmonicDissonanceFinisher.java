@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 import com.playmonumenta.plugins.Constants.Note;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -171,7 +172,7 @@ public class HarmonicDissonanceFinisher implements EliteFinisher {
 					world.playSound(sound, mPlayer);
 				}
 				for (Location particleLoc : particleLocations) {
-					world.spawnParticle(particle, particleLoc, 1);
+					new PartialParticle(particle, particleLoc, 1).spawnAsPlayerActive(mPlayer);
 				}
 				noteNum++;
 				if (noteNum >= maxNotes) {

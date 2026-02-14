@@ -989,7 +989,7 @@ public class BossManager implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void bossExploded(EntityExplodeEvent event) {
 		Boss boss = mBosses.get(event.getEntity().getUniqueId());
 

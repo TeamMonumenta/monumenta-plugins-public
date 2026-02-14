@@ -52,16 +52,15 @@ public class CookiefyFinisher implements EliteFinisher {
 	}
 
 	public static void throwCookies(int offset, boolean funny, Location loc) {
-		ItemStack cookie = null;
 		for (int i = 0; i < 4; i++) {
+			final ItemStack cookie;
 			if (!funny) {
 				cookie = DisplayEntityUtils.generateRPItem(Material.COOKIE, "Christmas Cookie!");
-			}
-			if (funny) {
-				int dice = FastUtils.randomIntInRange(1, 2);
-				switch (dice) {
-					case 1 -> cookie = DisplayEntityUtils.generateRPItem(Material.COOKIE, "Chewed Cookie");
-					case 2 -> cookie = DisplayEntityUtils.generateRPItem(Material.COOKIE, "Congrats");
+			} else {
+				if (FastUtils.randomIntInRange(1, 2) == 1) {
+					cookie = DisplayEntityUtils.generateRPItem(Material.COOKIE, "Chewed Cookie");
+				} else {
+					cookie = DisplayEntityUtils.generateRPItem(Material.COOKIE, "Congrats");
 				}
 			}
 			Item cookieItem = loc.getWorld().dropItem(loc, cookie);

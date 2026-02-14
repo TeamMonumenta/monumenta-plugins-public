@@ -806,13 +806,13 @@ public class BossTagCommand {
 		);
 	}
 
-	private static void listBossTagParameters(Player player, String boss_tag) throws WrapperCommandSyntaxException {
+	private static void listBossTagParameters(Player player, String bossTag) throws WrapperCommandSyntaxException {
 		BookOfSouls bos = getBos(player);
 		NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
 
 		player.sendMessage(Component.empty()
 			.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			.append(MessagingUtils.fromMiniMessage(String.format("<color:gray>Parameters of <color:gold>%s</color>:</color>", boss_tag)))
+			.append(MessagingUtils.fromMiniMessage(String.format("<color:gray>Parameters of <color:gold>%s</color>:</color>", bossTag)))
 		);
 
 		// Preserve ordering of elements
@@ -822,7 +822,7 @@ public class BossTagCommand {
 			String tagString = (String) nbtTagsList.get(i);
 
 			String parameterComponent = getParameterComponent(tagString);
-			if (getTagComponent(tagString).equals(boss_tag) && !parameterComponent.isEmpty()) {
+			if (getTagComponent(tagString).equals(bossTag) && !parameterComponent.isEmpty()) {
 				relevantTags.put(i, parameterComponent);
 			}
 		}
@@ -837,7 +837,7 @@ public class BossTagCommand {
 						.clickEvent(ClickEvent.suggestCommand("/bosstag delete " + index)))
 					.append(Component.text(" "))
 					.append(formatTag(parameters)
-						.clickEvent(ClickEvent.suggestCommand(String.format("/bosstag edit %d %s%s", index, boss_tag, parameters)))));
+						.clickEvent(ClickEvent.suggestCommand(String.format("/bosstag edit %d %s%s", index, bossTag, parameters)))));
 		}
 	}
 

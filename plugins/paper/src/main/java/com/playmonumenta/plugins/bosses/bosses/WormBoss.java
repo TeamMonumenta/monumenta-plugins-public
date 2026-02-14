@@ -187,7 +187,7 @@ public class WormBoss extends BossAbilityGroup implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onHemorrhage(HemorrhageEvent event) {
 		if (event.getMob() == mBoss) {
 			for (LivingEntity livingEntity : mParts) {

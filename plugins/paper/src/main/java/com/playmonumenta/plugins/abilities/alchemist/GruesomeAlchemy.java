@@ -89,6 +89,7 @@ public class GruesomeAlchemy extends Ability implements PotionAbility {
 			case 0 -> base = GRUESOME_ALCHEMY_0_WEAKEN_AMPLIFIER;
 			case 1, 2 -> base = GRUESOME_ALCHEMY_1_WEAKEN_AMPLIFIER;
 			case 3 -> base = GRUESOME_ALCHEMY_3_WEAKEN_AMPLIFIER;
+			default -> new IllegalStateException("Unexpected ability level: " + level + " for player " + mPlayer).printStackTrace();
 		}
 		return base + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
 	}
@@ -100,6 +101,7 @@ public class GruesomeAlchemy extends Ability implements PotionAbility {
 			case 1 -> base = GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER;
 			case 2 -> base = GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER;
 			case 3 -> base = GRUESOME_ALCHEMY_3_SLOWNESS_AMPLIFIER;
+			default -> new IllegalStateException("Unexpected ability level: " + level + " for player " + mPlayer).printStackTrace();
 		}
 		return base + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
 	}
@@ -111,6 +113,7 @@ public class GruesomeAlchemy extends Ability implements PotionAbility {
 			case 1 -> base = GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER;
 			case 2 -> base = GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER;
 			case 3 -> base = GRUESOME_ALCHEMY_3_VULNERABILITY_AMPLIFIER;
+			default -> new IllegalStateException("Unexpected ability level: " + level + " for player " + mPlayer).printStackTrace();
 		}
 		return base + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULNERABILITY);
 	}
