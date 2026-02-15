@@ -6,7 +6,6 @@ import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEventGeneric;
 import com.playmonumenta.velocity.MonumentaVelocity;
 import com.playmonumenta.velocity.voting.VoteManager;
-import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.proxy.Player;
@@ -35,7 +34,7 @@ public class NetworkRelayIntegration {
 		INSTANCE = this;
 	}
 
-	@Subscribe(order = PostOrder.LATE)
+	@Subscribe(priority = Short.MIN_VALUE / 2)
 	public void proxyPingEvent(ProxyPingEvent event) {
 		int count = getCachedPlayerCount();
 		ServerPing oldPing = event.getPing();
@@ -65,7 +64,7 @@ public class NetworkRelayIntegration {
 		event.setPluginData("monumenta-velocity", data);
 	}
 
-	@Subscribe(order = PostOrder.EARLY)
+	@Subscribe(priority = Short.MAX_VALUE / 2)
 	public void networkRelayMessageEventVelocity(NetworkRelayMessageEventGeneric event) {
 		if (event.getChannel().equals(VOTE_NOTIFY_CHANNEL)) {
 			JsonObject data = event.getData();

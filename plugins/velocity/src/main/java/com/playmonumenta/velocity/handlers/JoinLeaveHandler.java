@@ -3,7 +3,6 @@ package com.playmonumenta.velocity.handlers;
 import com.playmonumenta.velocity.MonumentaVelocity;
 import com.playmonumenta.velocity.integrations.PremiumVanishIntegration;
 import com.playmonumenta.velocity.network.VelocityClientModHandler;
-import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -79,7 +78,7 @@ public class JoinLeaveHandler {
 		}
 	}
 
-	@Subscribe(order = PostOrder.EARLY)
+	@Subscribe(priority = Short.MAX_VALUE / 2)
 	public void loginEvent(LoginEvent event) {
 		String whitelistPermission = System.getenv("MONUMENTA_WHITELIST");
 		if (whitelistPermission == null || whitelistPermission.isBlank()) {
@@ -92,7 +91,7 @@ public class JoinLeaveHandler {
 		}
 	}
 
-	@Subscribe(order = PostOrder.LATE)
+	@Subscribe(priority = Short.MIN_VALUE / 2)
 	public void serverPostConnectEvent(ServerPostConnectEvent event) {
 		Player player = event.getPlayer();
 
@@ -106,7 +105,7 @@ public class JoinLeaveHandler {
 		}
 	}
 
-	@Subscribe(order = PostOrder.EARLY)
+	@Subscribe(priority = Short.MAX_VALUE / 2)
 	public void disconnectEvent(DisconnectEvent event) {
 		if (!event.getLoginStatus().equals(LoginStatus.SUCCESSFUL_LOGIN)) {
 			return;

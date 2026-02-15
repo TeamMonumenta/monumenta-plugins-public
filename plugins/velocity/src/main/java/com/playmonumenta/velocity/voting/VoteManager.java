@@ -5,7 +5,6 @@ import com.playmonumenta.redissync.RedisAPI;
 import com.playmonumenta.velocity.MonumentaVelocity;
 import com.playmonumenta.velocity.MonumentaVelocity.MonumentaVelocityConfiguration;
 import com.playmonumenta.velocity.integrations.NetworkRelayIntegration;
-import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
@@ -72,7 +71,7 @@ public class VoteManager {
 		mTickTask.cancel();
 	}
 
-	@Subscribe(order = PostOrder.LAST)
+	@Subscribe(priority = Short.MIN_VALUE + 1)
 	public void postLoginEvent(ServerPostConnectEvent event) {
 		Player player = event.getPlayer();
 		UUID uuid = player.getUniqueId();
@@ -93,12 +92,12 @@ public class VoteManager {
 		});
 	}
 
-	@Subscribe(order = PostOrder.EARLY)
+	@Subscribe(priority = Short.MAX_VALUE / 2)
 	public void playerDisconnectEvent(DisconnectEvent event) {
 		mContexts.remove(event.getPlayer().getUniqueId());
 	}
 
-	@Subscribe(order = PostOrder.FIRST)
+	@Subscribe(priority = Short.MAX_VALUE - 1)
 	public void votifierEvent(VotifierEvent event) {
 		Vote vote = event.getVote();
 		String playerName = vote.getUsername();

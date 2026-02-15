@@ -2,7 +2,6 @@ package com.playmonumenta.velocity.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.PlayerChannelRegisterEvent;
 import com.velocitypowered.api.proxy.Player;
@@ -32,7 +31,7 @@ public class VelocityClientModHandler {
 		INSTANCE = this;
 	}
 
-	@Subscribe(order = PostOrder.EARLY)
+	@Subscribe(priority = Short.MAX_VALUE / 2)
 	public void onPlayerChannelRegisterEvent(PlayerChannelRegisterEvent event) {
 		if (!event.getChannels().contains(CHANNEL_ID)) {
 			return;
