@@ -55,7 +55,7 @@ public class RushDownMobBoss extends BossAbilityGroup {
 		new BukkitRunnable() {
 			int mTimer = 0;
 			// Get mob location again, a tick later
-			Location location = mob.getLocation();
+			Location mLocation = mob.getLocation();
 
 			@Override
 			public void run() {
@@ -64,12 +64,12 @@ public class RushDownMobBoss extends BossAbilityGroup {
 					return;
 				}
 				if (mTimer == 0) {
-					location = mob.getLocation();
+					mLocation = mob.getLocation();
 					mob.setInvulnerable(false);
 				}
 
 				if (boss.getVehicle() == null) {
-					EntityUtils.teleportStack(boss, location.add(0, HEIGHT / SUMMONING_DURATION, 0));
+					EntityUtils.teleportStack(boss, mLocation.add(0, HEIGHT / SUMMONING_DURATION, 0));
 				}
 
 				if (mTimer >= SUMMONING_DURATION) {

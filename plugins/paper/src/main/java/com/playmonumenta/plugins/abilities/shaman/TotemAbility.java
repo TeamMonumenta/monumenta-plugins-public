@@ -57,7 +57,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	public double mSpiritualismMultiplier = 1;
 	public boolean mIsBlessed = false;
 	public double mTotemRadiusMultiplier = 1;
-	private @Nullable TotemicConsecrationCS consecrationCosmetic;
+	private @Nullable TotemicConsecrationCS mConsecrationCosmetic;
 
 	private @Nullable BukkitRunnable mTotemTickingRunnable;
 	private int mLastCastTicks = 0;
@@ -205,10 +205,10 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 				onTotemTick(mT, stand, world, standLocation, stats);
 				if (mIsBlessed) {
-					if (consecrationCosmetic == null) {
-						consecrationCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new TotemicConsecrationCS());
+					if (mConsecrationCosmetic == null) {
+						mConsecrationCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new TotemicConsecrationCS());
 					}
-					consecrationCosmetic.blessedTotemTick(mPlayer, standLocation, getTotemRadius());
+					mConsecrationCosmetic.blessedTotemTick(mPlayer, standLocation, getTotemRadius());
 				}
 
 				if (durationStand != null) {

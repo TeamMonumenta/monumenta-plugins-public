@@ -118,7 +118,7 @@ public class EnergizingElixir extends Ability implements PotionAbility, AbilityW
 	private final EnergizingElixirCS mCosmetic;
 	private final ArrayList<CloudInstance> mCloudInstances = new ArrayList<>();
 	private final HashMap<UUID, Integer> mAffectedPlayersMap = new HashMap<>();
-	private int lastApplicationTime = 0;
+	private int mLastApplicationTime = 0;
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private int mRemainingDuration = 0;
 
@@ -224,9 +224,9 @@ public class EnergizingElixir extends Ability implements PotionAbility, AbilityW
 					new PotionEffect(PotionEffectType.JUMP, mDuration, mJumpBoostAmp, true, false, true)
 				);
 			}
-			if (mPlayer.getTicksLived() > lastApplicationTime + COSMETIC_APPLICATION_COOLDOWN) {
+			if (mPlayer.getTicksLived() > mLastApplicationTime + COSMETIC_APPLICATION_COOLDOWN) {
 				mCosmetic.activate(mPlayer);
-				lastApplicationTime = mPlayer.getTicksLived();
+				mLastApplicationTime = mPlayer.getTicksLived();
 			}
 			return;
 		}

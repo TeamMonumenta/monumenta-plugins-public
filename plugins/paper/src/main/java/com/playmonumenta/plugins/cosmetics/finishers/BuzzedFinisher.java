@@ -62,38 +62,38 @@ public class BuzzedFinisher implements EliteFinisher {
 		groundLoc.getWorld().playSound(groundLoc, Sound.ENTITY_BEE_POLLINATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
 		new BukkitRunnable() {
-			private int ticks = 0;
-			private double currentHeight = 0;
-			private float currentYaw = 0;
-			private int beesSpawned = 0;
-			private boolean cleanupStarted = false;
+			private int mTicks = 0;
+			private double mCurrentHeight = 0;
+			private float mCurrentYaw = 0;
+			private int mBeesSpawned = 0;
+			private boolean mCleanupStarted = false;
 
-			private float currentSpinSpeed = INITIAL_SPIN_SPEED;
-			private int pulseTicks = 0;
-			private int ticksUntilNextFlap = INITIAL_FLAP_INTERVAL;
+			private float mCurrentSpinSpeed = INITIAL_SPIN_SPEED;
+			private int mPulseTicks = 0;
+			private int mTicksUntilNextFlap = INITIAL_FLAP_INTERVAL;
 
 			@Override
 			public void run() {
-				if (ticks > MAX_DURATION_TICKS || beeNestDisplay.isDead()) {
+				if (mTicks > MAX_DURATION_TICKS || beeNestDisplay.isDead()) {
 					cleanup();
 					this.cancel();
 					return;
 				}
 
-				pulseTicks++;
-				currentSpinSpeed += SPIN_ACCELERATION;
-				currentYaw = (currentYaw + currentSpinSpeed) % 360;
-				float currentScale = HIVE_SCALE + (float) (Math.sin(Math.toRadians(pulseTicks * PULSE_FREQUENCY)) * PULSE_AMPLITUDE);
+				mPulseTicks++;
+				mCurrentSpinSpeed += SPIN_ACCELERATION;
+				mCurrentYaw = (mCurrentYaw + mCurrentSpinSpeed) % 360;
+				float currentScale = HIVE_SCALE + (float) (Math.sin(Math.toRadians(mPulseTicks * PULSE_FREQUENCY)) * PULSE_AMPLITUDE);
 
-				if (currentHeight < MAX_HEIGHT) {
-					currentHeight = Math.min(MAX_HEIGHT, currentHeight + ASCEND_SPEED);
-					Location currentHiveLoc = groundLoc.clone().add(0, currentHeight, 0);
+				if (mCurrentHeight < MAX_HEIGHT) {
+					mCurrentHeight = Math.min(MAX_HEIGHT, mCurrentHeight + ASCEND_SPEED);
+					Location currentHiveLoc = groundLoc.clone().add(0, mCurrentHeight, 0);
 					beeNestDisplay.teleport(currentHiveLoc);
 
 					new PartialParticle(Particle.REDSTONE, currentHiveLoc, 5)
 						.data(new Particle.DustOptions(Color.YELLOW, 1.2f))
 						.delta(0.75, 0.75, 0.75).spawnAsPlayerActive(p);
-					if (ticks % 4 == 0) {
+					if (mTicks % 4 == 0) {
 						double hiveRadius = 0.5 * HIVE_SCALE;
 						double randomAngle = FastUtils.randomDoubleInRange(0, Math.PI * 2);
 						double randomDistFromCenter = FastUtils.randomDoubleInRange(0, hiveRadius);
@@ -104,36 +104,36 @@ public class BuzzedFinisher implements EliteFinisher {
 					}
 				}
 
-				ticksUntilNextFlap--;
-				if (ticksUntilNextFlap <= 0) {
+				mTicksUntilNextFlap--;
+				if (mTicksUntilNextFlap <= 0) {
 					beeNestDisplay.getWorld().playSound(beeNestDisplay.getLocation(), Sound.ENTITY_PHANTOM_FLAP, SoundCategory.PLAYERS, 1.0f, 1.25f);
 					beeNestDisplay.getWorld().playSound(beeNestDisplay.getLocation(), Sound.ENTITY_PHANTOM_FLAP, SoundCategory.PLAYERS, 1.0f, 1.25f);
-					double progress = Math.min(1.0, (double) ticks / FLAP_ACCELERATION_DURATION);
+					double progress = Math.min(1.0, (double) mTicks / FLAP_ACCELERATION_DURATION);
 					double nextInterval = INITIAL_FLAP_INTERVAL + (MINIMUM_FLAP_INTERVAL - INITIAL_FLAP_INTERVAL) * progress;
-					ticksUntilNextFlap = (int) Math.round(nextInterval);
+					mTicksUntilNextFlap = (int) Math.round(nextInterval);
 				}
 
 				Transformation transform = new Transformation(
 					new Vector3f(0, 0, 0), new AxisAngle4f(0, 0, 1, 0),
 					new Vector3f(currentScale, currentScale, currentScale),
-					new AxisAngle4f((float) Math.toRadians(currentYaw), 0, 1, 0)
+					new AxisAngle4f((float) Math.toRadians(mCurrentYaw), 0, 1, 0)
 				);
 				beeNestDisplay.setTransformation(transform);
 				beeNestDisplay.setInterpolationDuration(1);
 
-				if (beesSpawned < totalBees) {
-					double spawnThreshold = 2.0 + (beesSpawned * (2.0 / (totalBees - 1)));
-					if (currentHeight >= spawnThreshold) {
+				if (mBeesSpawned < totalBees) {
+					double spawnThreshold = 2.0 + (mBeesSpawned * (2.0 / (totalBees - 1)));
+					if (mCurrentHeight >= spawnThreshold) {
 						spawnBee(p, beeNestDisplay.getLocation());
-						beesSpawned++;
+						mBeesSpawned++;
 					}
 				}
 
-				if (beesSpawned >= totalBees && !cleanupStarted) {
-					cleanupStarted = true;
+				if (mBeesSpawned >= totalBees && !mCleanupStarted) {
+					mCleanupStarted = true;
 					Plugin.getInstance().getServer().getScheduler().runTaskLater(Plugin.getInstance(), this::cleanup, 10L);
 				}
-				ticks++;
+				mTicks++;
 			}
 
 			private void spawnBee(Player p, final Location startLoc) {
@@ -151,11 +151,11 @@ public class BuzzedFinisher implements EliteFinisher {
 				final int travelTicks = 45;
 
 				new BukkitRunnable() {
-					int ticksTraveled = 0;
+					int mTicksTraveled = 0;
 
 					@Override
 					public void run() {
-						if (ticksTraveled >= travelTicks || bee.isDead()) {
+						if (mTicksTraveled >= travelTicks || bee.isDead()) {
 							if (!bee.isDead()) {
 								Location beeLoc = bee.getLocation();
 								bee.getWorld().playSound(beeLoc, Sound.ENTITY_BEE_DEATH, SoundCategory.PLAYERS, 1.0f, 1.15f);
@@ -174,22 +174,22 @@ public class BuzzedFinisher implements EliteFinisher {
 							return;
 						}
 
-						double progress = (double) ticksTraveled / travelTicks;
+						double progress = (double) mTicksTraveled / travelTicks;
 						double easedProgress = 1 - Math.pow(1 - progress, 5);
 						Location currentPos = startLoc.clone().add(direction.clone().multiply(distance * easedProgress));
 
 						currentPos.setDirection(direction);
 						bee.teleport(currentPos);
 
-						if (ticksTraveled % 10 == 0) {
+						if (mTicksTraveled % 10 == 0) {
 							new PartialParticle(Particle.FALLING_HONEY, bee.getLocation(), 1).extra(0).spawnAsPlayerActive(p);
 						}
-						if (ticksTraveled % 5 == 0) {
+						if (mTicksTraveled % 5 == 0) {
 							new PartialParticle(Particle.END_ROD, bee.getLocation(), 1).extra(0).spawnAsPlayerActive(p);
 						} else {
 							new PartialParticle(Particle.REDSTONE, bee.getLocation(), 1).data(new Particle.DustOptions(Color.YELLOW, 1.55f)).extra(0).spawnAsPlayerActive(p);
 						}
-						ticksTraveled++;
+						mTicksTraveled++;
 					}
 				}.runTaskTimer(Plugin.getInstance(), 0, 1);
 			}
@@ -200,7 +200,7 @@ public class BuzzedFinisher implements EliteFinisher {
 					Transformation finalTransform = new Transformation(
 						new Vector3f(0, 0, 0), new AxisAngle4f(0, 0, 1, 0),
 						new Vector3f(finalScale, finalScale, finalScale),
-						new AxisAngle4f((float) Math.toRadians(currentYaw), 0, 1, 0)
+						new AxisAngle4f((float) Math.toRadians(mCurrentYaw), 0, 1, 0)
 					);
 					beeNestDisplay.setTransformation(finalTransform);
 

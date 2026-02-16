@@ -230,7 +230,7 @@ public class ArcanicBoss extends BossAbilityGroup {
 	private static final com.playmonumenta.plugins.Plugin rejuvPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 	@Nullable
 	private ItemDisplay mArcaneRune;
-	private static final float mRuneOffset = 0.85f;
+	private static final float RUNE_OFFSET = 0.85f;
 
 	public ArcanicBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -261,8 +261,8 @@ public class ArcanicBoss extends BossAbilityGroup {
 		boss.addPassenger(mArcaneRune);
 
 		new BukkitRunnable() {
-			private float yaw = 0f;
-			private float verticalOscillation = 15f;
+			private float mYaw = 0f;
+			private float mVerticalOscillation = 15f;
 
 			@Override
 			public void run() {
@@ -275,11 +275,11 @@ public class ArcanicBoss extends BossAbilityGroup {
 					this.cancel();
 					return;
 				}
-				mArcaneRune.setRotation(yaw, 0f);
-				yaw = (yaw + 12f) % 360; // 12f is rotation speed
+				mArcaneRune.setRotation(mYaw, 0f);
+				mYaw = (mYaw + 12f) % 360; // 12f is rotation speed
 
-				float yOffset = (float) (mRuneOffset + FastUtils.sinDeg(verticalOscillation * 6) * 0.1);
-				verticalOscillation = (verticalOscillation + 1) % 60;
+				float yOffset = (float) (RUNE_OFFSET + FastUtils.sinDeg(mVerticalOscillation * 6) * 0.1);
+				mVerticalOscillation = (mVerticalOscillation + 1) % 60;
 				transformation.getTranslation().set(0, yOffset, 0);
 				mArcaneRune.setTransformation(transformation);
 			}

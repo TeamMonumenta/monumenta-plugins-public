@@ -33,10 +33,10 @@ public class RegenerationPercentBoss extends BossAbilityGroup {
 		public boolean DOT_INTERRUPTS = true;
 	}
 
-	int interruptionCycles = 0;
+	int mInterruptionCycles = 0;
 
 	public void setInterruptionCycles(int cycles) {
-		interruptionCycles = Math.max(0, cycles);
+		mInterruptionCycles = Math.max(0, cycles);
 	}
 
 	public RegenerationPercentBoss(final Plugin plugin, final LivingEntity boss) {
@@ -45,10 +45,10 @@ public class RegenerationPercentBoss extends BossAbilityGroup {
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				if (!mBoss.isDead()) {
-					if (interruptionCycles <= 0) {
+					if (mInterruptionCycles <= 0) {
 						EntityUtils.healMobPercent(mBoss, p.HEAL_PERCENTAGE);
 					} else {
-						interruptionCycles--;
+						mInterruptionCycles--;
 					}
 				}
 			})

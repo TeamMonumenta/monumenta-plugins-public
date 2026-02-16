@@ -78,7 +78,7 @@ public class HolyJavelin extends Ability {
 	private final float mVelocity;
 
 	private @Nullable DivineJustice mDivineJustice;
-	private boolean disableMobility = false;
+	private boolean mDisableMobility = false;
 
 	private final HolyJavelinCS mCosmetic;
 
@@ -128,18 +128,18 @@ public class HolyJavelin extends Ability {
 
 		List<LivingEntity> mobs = Hitbox.approximateCylinder(startLoc, endLoc, mSize, true).accuracy(0.5).getHitMobs();
 
-		if (mobs.isEmpty() && isLevelTwo() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && triggeringEnemy == null && !disableMobility) {
+		if (mobs.isEmpty() && isLevelTwo() && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && triggeringEnemy == null && !mDisableMobility) {
 			Vector dir = mPlayer.getLocation().getDirection();
 			dir.setY(dir.getY() + 0.4 * (1 - dir.getY()));
 			dir.multiply(mVelocity);
 			mPlayer.setVelocity(mPlayer.getVelocity().multiply(0.25).add(dir));
 
-			disableMobility = true;
+			mDisableMobility = true;
 			new BukkitRunnable() {
 				@Override
 				public void run() {
 					if (((Entity) mPlayer).isOnGround() || mPlayer.isInWater() || mPlayer.isDead() || !mPlayer.isValid() || !mPlayer.isOnline()) {
-						disableMobility = false;
+						mDisableMobility = false;
 						this.cancel();
 					}
 				}

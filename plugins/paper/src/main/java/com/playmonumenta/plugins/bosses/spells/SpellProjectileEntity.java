@@ -43,8 +43,8 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 	private final LivingEntity mBoss;
 	private final UUID mBossUUID;
 	private final ProjectileEntityBoss.Parameters mParameters;
-	BossManager bossManager = BossManager.getInstance();
-	EntityTargets projEntityTargets;
+	BossManager mBossManager = BossManager.getInstance();
+	EntityTargets mProjEntityTargets;
 
 	private final HashSet<UUID> mProjectileEntities = new HashSet<>();
 
@@ -88,7 +88,7 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 		this.mPlugin = mPlugin;
 		mBossUUID = mBoss.getUniqueId();
 		mParameters = p;
-		projEntityTargets = mParameters.LINGERS ? mParameters.TARGETS.clone()
+		mProjEntityTargets = mParameters.LINGERS ? mParameters.TARGETS.clone()
 			.setLimit(new EntityTargets.Limit(EntityTargets.Limit.LIMITSENUM.ALL)) :
 			mParameters.TARGETS;
 	}
@@ -154,34 +154,34 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 
 			int mTicks = 0;
 			@Nullable
-			LivingEntity target = initialTarget;
+			LivingEntity mTarget = initialTarget;
 
 			@Override
 			public void run() {
 				mTicks++;
 
 				// If lingering is enabled, try searching for a new target
-				if (target == null ||
-					!target.isValid() ||
-					target.isDead() ||
-					!target.getWorld().equals(mLocation.getWorld()) ||
+				if (mTarget == null ||
+					!mTarget.isValid() ||
+					mTarget.isDead() ||
+					!mTarget.getWorld().equals(mLocation.getWorld()) ||
 					!Double.isFinite(mDirection.getX()) ||
-					(target instanceof Player p && p.getGameMode() == GameMode.SPECTATOR)) {
+					(mTarget instanceof Player p && p.getGameMode() == GameMode.SPECTATOR)) {
 					if (mParameters.LINGERS && projEntity instanceof LivingEntity lEntity) {
 						// Get the projectile entity possible target candidates based on boss targets, omit itself
-						List<? extends LivingEntity> filter = projEntityTargets.getTargetsList(lEntity);
+						List<? extends LivingEntity> filter = mProjEntityTargets.getTargetsList(lEntity);
 						filter.removeIf(t -> t.equals(projEntity)
 							|| (t instanceof Player p && (p.getGameMode() == GameMode.SPECTATOR)));
-						target = EntityUtils.getNearestMob(mLocation, filter); // If target is null, projectile exist will continue without a target
+						mTarget = EntityUtils.getNearestMob(mLocation, filter); // If target is null, projectile exist will continue without a target
 					} else {
 						this.cancel();
 						return;
 					}
 				}
 
-				if (target != null) {
+				if (mTarget != null) {
 					@SuppressWarnings("ConstantConditions")
-					Vector newDirection = target == null ? mDirection : target.getEyeLocation().add(0, mParameters.AIM_OFFSET, 0).subtract(mLocation).toVector();
+					Vector newDirection = mTarget == null ? mDirection : mTarget.getEyeLocation().add(0, mParameters.AIM_OFFSET, 0).subtract(mLocation).toVector();
 					if (newDirection.length() > 2 * maxRange) {
 						this.cancel();
 						return;
@@ -227,7 +227,7 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 						}
 					}
 				}
-				if (target == null) {
+				if (mTarget == null) {
 					shift.multiply(mParameters.SPEED_LINGER);
 				}
 				Location prevLoc = mLocation.clone();
@@ -266,8 +266,8 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 					// If it can collide with a player, check if it's the initial target or if it can hit others
 					// Otherwise, check if collision is the target
 					boolean shouldHit = entity instanceof Player player ?
-						mParameters.COLLIDES_WITH_PLAYERS && player.getGameMode() != GameMode.SPECTATOR && (player.equals(target) || mParameters.COLLIDE_OTHER_PLAYERS) :
-						entity.equals(target);
+						mParameters.COLLIDES_WITH_PLAYERS && player.getGameMode() != GameMode.SPECTATOR && (player.equals(mTarget) || mParameters.COLLIDE_OTHER_PLAYERS) :
+						entity.equals(mTarget);
 
 					if (shouldHit) {
 						projectileHit(entity, mLocation, prevLoc);
@@ -319,7 +319,7 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 			return;
 		}
 		if (!mParameters.CUSTOM.isEmpty()) {
-			PhasesManagerBoss phasesManagerBoss = bossManager.getBoss(boss, PhasesManagerBoss.class);
+			PhasesManagerBoss phasesManagerBoss = mBossManager.getBoss(boss, PhasesManagerBoss.class);
 			if (phasesManagerBoss != null) {
 				phasesManagerBoss.onCustomTrigger(mParameters.CUSTOM);
 			}

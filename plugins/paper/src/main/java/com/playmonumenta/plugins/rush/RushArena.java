@@ -80,33 +80,33 @@ public class RushArena {
 			loc -> new PartialParticle(Particle.REDSTONE, loc, RushArenaUtils.SEASON_PARTICLE_COUNT, 10, 6, 10,
 				new Particle.DustOptions(Color.fromRGB(166, 40, 40), 1f)));
 
-		final LoSPool commonPool;
-		final LoSPool elitePool;
-		final LoSPool boss;
+		final LoSPool mCommonPool;
+		final LoSPool mElitePool;
+		final LoSPool mBoss;
 
-		final Float pitch;
-		final Sound sound;
-		final TextComponent component;
-		final Function<Location, PartialParticle> particleSupplier;
+		final Float mPitch;
+		final Sound mSound;
+		final TextComponent mComponent;
+		final Function<Location, PartialParticle> mParticleSupplier;
 
 		Season(String season, TextComponent component, Sound sound, Float pitch, Function<Location, PartialParticle> particleSupplier) {
-			commonPool = new LoSPool.LibraryPool(POOL_COMMON_PREFIX + season);
-			elitePool = new LoSPool.LibraryPool(POOL_ELITE_PREFIX + season);
-			boss = new LoSPool.LibraryPool(POOL_BOSS_PREFIX + season);
+			mCommonPool = new LoSPool.LibraryPool(POOL_COMMON_PREFIX + season);
+			mElitePool = new LoSPool.LibraryPool(POOL_ELITE_PREFIX + season);
+			mBoss = new LoSPool.LibraryPool(POOL_BOSS_PREFIX + season);
 
-			this.pitch = pitch;
-			this.sound = sound;
-			this.component = component;
-			this.particleSupplier = particleSupplier;
+			this.mPitch = pitch;
+			this.mSound = sound;
+			this.mComponent = component;
+			this.mParticleSupplier = particleSupplier;
 		}
 
 		public PartialParticle doSeasonEffects(World world, Location loc, Set<Player> players) {
 			Location center = loc.clone().add(0, 6, 0);
 
 			world.playSound(center, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.AMBIENT, 5.0f, 0.5f);
-			world.playSound(center, sound, SoundCategory.AMBIENT, 5.0f, pitch);
-			players.forEach(p -> p.sendMessage(component.decorate(TextDecoration.ITALIC)));
-			return particleSupplier.apply(center);
+			world.playSound(center, mSound, SoundCategory.AMBIENT, 5.0f, mPitch);
+			players.forEach(p -> p.sendMessage(mComponent.decorate(TextDecoration.ITALIC)));
+			return mParticleSupplier.apply(center);
 		}
 	}
 
@@ -170,9 +170,9 @@ public class RushArena {
 		mWave = 0;
 
 		mMobPool.clear();
-		mMobPool.add(mSeason.commonPool);
-		mMobPool.add(mSeason.elitePool);
-		mMobPool.add(mSeason.boss);
+		mMobPool.add(mSeason.mCommonPool);
+		mMobPool.add(mSeason.mElitePool);
+		mMobPool.add(mSeason.mBoss);
 
 		mCheese = new RushAntiCheese(mPlayers, mCenter.getY());
 

@@ -99,7 +99,7 @@ public class IronTincture extends MultipleChargeAbility {
 	private final double mEnhancementAbsorptionMax;
 	private final IronTinctureCS mCosmetic;
 	private @Nullable AlchemistPotions mAlchemistPotions;
-	private int lastCastTime = 0;
+	private int mLastCastTime = 0;
 
 	public IronTincture(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -124,7 +124,7 @@ public class IronTincture extends MultipleChargeAbility {
 	}
 
 	public boolean cast() {
-		if (mPlayer.getTicksLived() <= lastCastTime + CAST_DELAY) {
+		if (mPlayer.getTicksLived() <= mLastCastTime + CAST_DELAY) {
 			return false;
 		}
 
@@ -132,7 +132,7 @@ public class IronTincture extends MultipleChargeAbility {
 			return false;
 		}
 
-		lastCastTime = mPlayer.getTicksLived();
+		mLastCastTime = mPlayer.getTicksLived();
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getEyeLocation();
 		double velocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, VELOCITY);

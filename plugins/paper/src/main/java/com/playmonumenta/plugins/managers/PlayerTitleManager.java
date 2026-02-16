@@ -83,25 +83,25 @@ public class PlayerTitleManager implements Listener {
 	private static final float MAGIC_HEIGHT_STEP = 0.25f;
 
 	public static class NameTagData {
-		public final Interaction interaction;
-		public final TextDisplay nametag;
-		public Component text = Component.empty();
-		public boolean dirty = false;
+		public final Interaction mInteraction;
+		public final TextDisplay mNametag;
+		public Component mText = Component.empty();
+		public boolean mDirty = false;
 
 		public NameTagData(Interaction interaction, TextDisplay nametag) {
-			this.interaction = interaction;
-			this.nametag = nametag;
+			this.mInteraction = interaction;
+			this.mNametag = nametag;
 		}
 	}
 
 	public static class NameTag {
-		public final UUID uuid; // player UUID this nametag is for
-		public final Map<String, NameTagData> entities = new WeakHashMap<>(); // all entities used for this nameta
-		public final Set<UUID> viewers = Collections.newSetFromMap(new WeakHashMap<>());
-		public float height = MAGIC_HEIGHT_START;
+		public final UUID mUuid; // player UUID this nametag is for
+		public final Map<String, NameTagData> mEntities = new WeakHashMap<>(); // all entities used for this nameta
+		public final Set<UUID> mViewers = Collections.newSetFromMap(new WeakHashMap<>());
+		public float mHeight = MAGIC_HEIGHT_START;
 
 		public NameTag(Player player) {
-			this.uuid = player.getUniqueId();
+			this.mUuid = player.getUniqueId();
 
 
 			update(player, true);
@@ -112,11 +112,11 @@ public class PlayerTitleManager implements Listener {
 		}
 
 		private void update(Player player, final boolean first) {
-			if (!player.getUniqueId().equals(uuid)) {
+			if (!player.getUniqueId().equals(mUuid)) {
 				// updating for wrong player?
 				return;
 			}
-			height = MAGIC_HEIGHT_START;
+			mHeight = MAGIC_HEIGHT_START;
 
 			setup(player, "title", getTitleDisplay(player));
 			setup(player, "health", getHealthDisplay(player));
@@ -128,7 +128,7 @@ public class PlayerTitleManager implements Listener {
 		}
 
 		private void setup(Player player, String name, Component text) {
-			entities.compute(name, (key, existing) -> {
+			mEntities.compute(name, (key, existing) -> {
 				if (text == null || text.equals(Component.empty())) {
 					// TODO: implement a recreation system
 					return existing;
@@ -139,30 +139,30 @@ public class PlayerTitleManager implements Listener {
 					existing = new NameTagData(interaction, nametag);
 
 					// nametag prep
-					existing.nametag.setPersistent(false);
-					existing.nametag.setCustomNameVisible(true);
-					existing.nametag.setViewRange(256f);
-					existing.nametag.setInvisible(true);
-					existing.nametag.setDefaultBackground(false);
-					existing.nametag.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
+					existing.mNametag.setPersistent(false);
+					existing.mNametag.setCustomNameVisible(true);
+					existing.mNametag.setViewRange(256f);
+					existing.mNametag.setInvisible(true);
+					existing.mNametag.setDefaultBackground(false);
+					existing.mNametag.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
 
 					// interaction prep
-					existing.interaction.setPersistent(false);
-					existing.interaction.setInteractionHeight(height);
-					existing.interaction.setInteractionWidth(0f);
-					existing.interaction.setInvisible(true);
-					existing.interaction.setPose(Pose.SNIFFING);
+					existing.mInteraction.setPersistent(false);
+					existing.mInteraction.setInteractionHeight(mHeight);
+					existing.mInteraction.setInteractionWidth(0f);
+					existing.mInteraction.setInvisible(true);
+					existing.mInteraction.setPose(Pose.SNIFFING);
 				}
 
-				if (text.equals(existing.text)) {
+				if (text.equals(existing.mText)) {
 					return existing;
 				}
-				existing.text = text;
-				existing.dirty = true;
+				existing.mText = text;
+				existing.mDirty = true;
 
-				existing.nametag.customName(text);
+				existing.mNametag.customName(text);
 
-				height += MAGIC_HEIGHT_STEP;
+				mHeight += MAGIC_HEIGHT_STEP;
 				return existing;
 			});
 		}
@@ -204,25 +204,25 @@ public class PlayerTitleManager implements Listener {
 		}
 
 		public void addPlayer(Player clientPlayer, Player targetPlayer) {
-			if (!targetPlayer.getUniqueId().equals(uuid)) {
+			if (!targetPlayer.getUniqueId().equals(mUuid)) {
 				// adding for wrong player?
 				return;
 			}
-			viewers.add(clientPlayer.getUniqueId());
+			mViewers.add(clientPlayer.getUniqueId());
 			Set<Map.Entry<Entity, Entity>> entities2 = Collections.newSetFromMap(new WeakHashMap<>());
-			for (Map.Entry<String, NameTagData> entry : entities.entrySet()) {
+			for (Map.Entry<String, NameTagData> entry : mEntities.entrySet()) {
 				NameTagData data = entry.getValue();
-				entities2.add(Map.entry(data.interaction, data.nametag));
+				entities2.add(Map.entry(data.mInteraction, data.mNametag));
 			}
 			NmsUtils.getVersionAdapter().spawnPlayerNametag(clientPlayer, targetPlayer, entities2);
 		}
 
 		private void updatePlayers(Player targetPlayer) {
-			for (UUID viewer : viewers) {
+			for (UUID viewer : mViewers) {
 				updatePlayer(Bukkit.getPlayer(viewer), targetPlayer);
 			}
-			for (NameTagData data : entities.values()) {
-				data.dirty = false;
+			for (NameTagData data : mEntities.values()) {
+				data.mDirty = false;
 			}
 		}
 
@@ -230,36 +230,36 @@ public class PlayerTitleManager implements Listener {
 		 * This only updates the nametag text, not anything else
 		 */
 		private void updatePlayer(Player clientPlayer, Player targetPlayer) {
-			if (!targetPlayer.getUniqueId().equals(uuid)) {
+			if (!targetPlayer.getUniqueId().equals(mUuid)) {
 				// updating for wrong player?
 				return;
 			}
 			List<Entity> entities2 = new ArrayList<>();
-			for (NameTagData data : entities.values()) {
-				if (!data.dirty) {
+			for (NameTagData data : mEntities.values()) {
+				if (!data.mDirty) {
 					continue;
 				}
-				entities2.add(data.nametag);
+				entities2.add(data.mNametag);
 			}
 			NmsUtils.getVersionAdapter().updatePlayerNametag(clientPlayer, entities2.toArray(new Entity[0]));
 		}
 
 		public void removePlayer(Player clientPlayer, Player targetPlayer) {
-			if (!targetPlayer.getUniqueId().equals(uuid)) {
+			if (!targetPlayer.getUniqueId().equals(mUuid)) {
 				// removing for wrong player?
 				return;
 			}
-			viewers.remove(clientPlayer.getUniqueId());
+			mViewers.remove(clientPlayer.getUniqueId());
 			List<Entity> entities2 = new ArrayList<>();
-			for (NameTagData data : entities.values()) {
-				entities2.add(data.interaction);
-				entities2.add(data.nametag);
+			for (NameTagData data : mEntities.values()) {
+				entities2.add(data.mInteraction);
+				entities2.add(data.mNametag);
 			}
 			NmsUtils.getVersionAdapter().removePlayerNametag(clientPlayer, targetPlayer, entities2.toArray(new Entity[0]));
 		}
 	}
 
-	private final Map<UUID, NameTag> trackedEntities = new WeakHashMap<>();
+	private final Map<UUID, NameTag> mTrackedEntities = new WeakHashMap<>();
 
 	@EventHandler(ignoreCancelled = false)
 	public void playerTrackEvent(PlayerTrackEntityEvent event) {
@@ -268,7 +268,7 @@ public class PlayerTitleManager implements Listener {
 		if (entity instanceof Player targetPlayer) {
 			// need to delay by a tick to ensure packet order
 			targetPlayer.getScheduler().run(Plugin.getInstance(), (task) -> {
-				trackedEntities.compute(targetPlayer.getUniqueId(), (uuid, existing) -> {
+				mTrackedEntities.compute(targetPlayer.getUniqueId(), (uuid, existing) -> {
 					if (existing == null) {
 						existing = new NameTag(targetPlayer);
 					}
@@ -284,9 +284,9 @@ public class PlayerTitleManager implements Listener {
 		Player player = event.getPlayer();
 		Entity entity = event.getEntity();
 		if (entity instanceof Player targetPlayer) {
-			trackedEntities.computeIfPresent(targetPlayer.getUniqueId(), (uuid, existing) -> {
+			mTrackedEntities.computeIfPresent(targetPlayer.getUniqueId(), (uuid, existing) -> {
 				existing.removePlayer(player, targetPlayer);
-				if (existing.viewers.isEmpty()) {
+				if (existing.mViewers.isEmpty()) {
 					return null;
 				}
 				return existing;
@@ -296,7 +296,7 @@ public class PlayerTitleManager implements Listener {
 
 	public void handlePlayerHealthChanges() {
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			NameTag nameTag = trackedEntities.get(player.getUniqueId());
+			NameTag nameTag = mTrackedEntities.get(player.getUniqueId());
 			if (nameTag != null) {
 				nameTag.update(player);
 			}

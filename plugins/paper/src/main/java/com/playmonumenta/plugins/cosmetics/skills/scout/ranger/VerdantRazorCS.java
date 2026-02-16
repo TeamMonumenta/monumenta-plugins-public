@@ -49,34 +49,34 @@ public class VerdantRazorCS extends WhirlingBladeCS {
 	}
 
 	private @Nullable Location mEndLoc = null;
-	private final HashMap<Integer, ItemDisplay> razorDisplayMap = new HashMap<>();
+	private final HashMap<Integer, ItemDisplay> mRazorDisplayMap = new HashMap<>();
 
 	@Override
 	public void onCast(Player player, Location loc, World world) {
 		int currentTick = Bukkit.getCurrentTick();
-		if (razorDisplayMap.get(currentTick) != null) {
-			razorDisplayMap.get(currentTick).remove();
+		if (mRazorDisplayMap.get(currentTick) != null) {
+			mRazorDisplayMap.get(currentTick).remove();
 		}
 
-		razorDisplayMap.put(currentTick,
+		mRazorDisplayMap.put(currentTick,
 			loc.getWorld().spawn(loc, ItemDisplay.class));
-		EntityUtils.setRemoveEntityOnUnload(razorDisplayMap.get(currentTick));
+		EntityUtils.setRemoveEntityOnUnload(mRazorDisplayMap.get(currentTick));
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(),
 			() -> {
-				if (razorDisplayMap.get(currentTick) != null) {
-					razorDisplayMap.get(currentTick).remove();
+				if (mRazorDisplayMap.get(currentTick) != null) {
+					mRazorDisplayMap.get(currentTick).remove();
 				}
-				razorDisplayMap.remove(currentTick);
+				mRazorDisplayMap.remove(currentTick);
 			}, Constants.TICKS_PER_MINUTE);
-		razorDisplayMap.get(currentTick).setItemStack(DisplayEntityUtils.generateRPItem(Material.CROSSBOW, "Steelsage Talisman"));
-		razorDisplayMap.get(currentTick).setTransformation(
+		mRazorDisplayMap.get(currentTick).setItemStack(DisplayEntityUtils.generateRPItem(Material.CROSSBOW, "Steelsage Talisman"));
+		mRazorDisplayMap.get(currentTick).setTransformation(
 			new Transformation(
 				new Vector3f(0),
 				new AxisAngle4f(),
 				new Vector3f(1.2f),
 				new AxisAngle4f()
 			));
-		razorDisplayMap.get(currentTick).setTeleportDuration(1);
+		mRazorDisplayMap.get(currentTick).setTeleportDuration(1);
 
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.3f, 0.7f);
 		world.playSound(loc, Sound.ENTITY_BREEZE_IDLE_GROUND, SoundCategory.PLAYERS, 1.5f, 1.5f);
@@ -114,9 +114,9 @@ public class VerdantRazorCS extends WhirlingBladeCS {
 
 		world.playSound(bladeLoc, Sound.BLOCK_AZALEA_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
-		if (razorDisplayMap.get(startingTick) != null) {
+		if (mRazorDisplayMap.get(startingTick) != null) {
 			// Razor has to "teleport" "twice as far" to account for travel time
-			razorDisplayMap.get(startingTick).teleport(bladeLoc.clone().add(bladeLoc.clone().subtract(oldLoc)));
+			mRazorDisplayMap.get(startingTick).teleport(bladeLoc.clone().add(bladeLoc.clone().subtract(oldLoc)));
 		}
 		mEndLoc = bladeLoc;
 	}
@@ -125,7 +125,7 @@ public class VerdantRazorCS extends WhirlingBladeCS {
 	public void end(World world, Location loc, Player player, int startingTick) {
 		world.playSound(loc, "block.vault.insert_item", SoundCategory.PLAYERS, 1.8f, 1.1f);
 		Location playerLoc = player.getLocation().add(0, 1, 0);
-		if (mEndLoc != null && razorDisplayMap.get(startingTick) != null) {
+		if (mEndLoc != null && mRazorDisplayMap.get(startingTick) != null) {
 			Vector toBlade = LocationUtils.getVectorTo(mEndLoc, playerLoc);
 			new BukkitRunnable() {
 				int mTicks = 0;
@@ -133,16 +133,16 @@ public class VerdantRazorCS extends WhirlingBladeCS {
 				@Override
 				public void run() {
 					if (mTicks >= 4) {
-						if (razorDisplayMap.get(startingTick) != null) {
-							razorDisplayMap.get(startingTick).remove();
+						if (mRazorDisplayMap.get(startingTick) != null) {
+							mRazorDisplayMap.get(startingTick).remove();
 						}
-						razorDisplayMap.remove(startingTick);
+						mRazorDisplayMap.remove(startingTick);
 						this.cancel();
 					}
-					if (razorDisplayMap.get(startingTick) != null && mEndLoc != null) {
+					if (mRazorDisplayMap.get(startingTick) != null && mEndLoc != null) {
 						Location playerLoc = player.getEyeLocation().add(0, -0.5, 0);
 						Location bladeLoc = playerLoc.clone().add(toBlade.clone().multiply(1 - mTicks * 0.34)).setDirection(mEndLoc.getDirection());
-						razorDisplayMap.get(startingTick).teleport(bladeLoc);
+						mRazorDisplayMap.get(startingTick).teleport(bladeLoc);
 					}
 					mTicks++;
 				}
@@ -153,11 +153,11 @@ public class VerdantRazorCS extends WhirlingBladeCS {
 	@Override
 	public void onDeath() {
 		// Just in case the player dies / unloads, hopefully proof against memory leaks
-		for (ItemDisplay display : razorDisplayMap.values()) {
+		for (ItemDisplay display : mRazorDisplayMap.values()) {
 			if (display != null) {
 				display.remove();
 			}
 		}
-		razorDisplayMap.clear();
+		mRazorDisplayMap.clear();
 	}
 }

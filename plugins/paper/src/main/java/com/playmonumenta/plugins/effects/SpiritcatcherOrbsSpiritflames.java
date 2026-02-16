@@ -28,7 +28,7 @@ public class SpiritcatcherOrbsSpiritflames extends Effect {
 	private final double mRange;
 
 	private int mNumDamages;
-	private @Nullable Location deadLocation = null;
+	private @Nullable Location mDeadLocation = null;
 
 	public SpiritcatcherOrbsSpiritflames(int duration, double damage, double range, Player player, ClassAbility linkedSpell, PlayerItemStats stats, SpiritcatcherOrbsCS cosmetic) {
 		super(duration, effectID);
@@ -56,7 +56,7 @@ public class SpiritcatcherOrbsSpiritflames extends Effect {
 					return;
 				}
 
-				List<LivingEntity> affectedMobs = new Hitbox.SphereHitbox(deadLocation != null ? deadLocation : entity.getLocation(), mRange).getHitMobs().stream()
+				List<LivingEntity> affectedMobs = new Hitbox.SphereHitbox(mDeadLocation != null ? mDeadLocation : entity.getLocation(), mRange).getHitMobs().stream()
 					.filter(enemy -> enemy.getName().equals(name))
 					.toList();
 
@@ -76,7 +76,7 @@ public class SpiritcatcherOrbsSpiritflames extends Effect {
 
 	@Override
 	public void onDeath(EntityDeathEvent event) {
-		deadLocation = event.getEntity().getLocation();
+		mDeadLocation = event.getEntity().getLocation();
 	}
 
 	public void extendDuration(int duration) {

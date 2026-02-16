@@ -84,7 +84,7 @@ public class SpiritArcheryMinigame extends Minigame {
 	private final int mMobsToKillPerRound;
 	private final BossBar mBossBar;
 
-	public int score;
+	public int mScore;
 	private long mTicks = 0;
 	private int mMobsToKill;
 	@Nullable
@@ -244,8 +244,8 @@ public class SpiritArcheryMinigame extends Minigame {
 					if (scoreGain > 0) {
 						mMobsToKill--;
 					}
-					score += scoreGain;
-					MessagingUtils.sendActionBarMessage(mPlayer, String.format("Score: %d (%s%d)", score, scoreGain > 0 ? "+" : "", scoreGain));
+					mScore += scoreGain;
+					MessagingUtils.sendActionBarMessage(mPlayer, String.format("Score: %d (%s%d)", mScore, scoreGain > 0 ? "+" : "", scoreGain));
 				}
 			} else {
 				MMLog.finer("Mob other than target was killed in the firing range.");
@@ -268,13 +268,13 @@ public class SpiritArcheryMinigame extends Minigame {
 		if (mPlayer == null) {
 			return;
 		}
-		awardLoot(mPlayer, score, mDifficulty);
-		mPlayer.sendMessage("Cleared Spirit Archery with " + score + " score!");
-		attemptAdvanceScore(mPlayer, score, mDifficulty);
+		awardLoot(mPlayer, mScore, mDifficulty);
+		mPlayer.sendMessage("Cleared Spirit Archery with " + mScore + " score!");
+		attemptAdvanceScore(mPlayer, mScore, mDifficulty);
 		// Clear lingering stuff
 		mPlayer.hideBossBar(mBossBar);
 		InventoryUtils.removeSpecialItems(mPlayer, true, true, false);
-		score = 0;
+		mScore = 0;
 		// This sucks. I don't want to be force-teleporting the player in this file, I think it should be done some other way, but I cannot figure out a better way. It's very very janky that the teleport-in is performed in the GUI but the teleport-out has to be done here.
 		PlayerUtils.playerTeleport(mPlayer, new Location(mPlayer.getWorld(), 268.5, 133.0, -145.5));
 	}
