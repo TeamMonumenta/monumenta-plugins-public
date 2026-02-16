@@ -6,8 +6,7 @@ import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,16 +66,17 @@ public class LootChestsInInventory implements Listener {
 		}
 
 		//This is needed for it to work
-		NBTItem nbti = new NBTItem(item);
-		NBTCompound tag = nbti.getCompound("BlockEntityTag");
-		if (tag == null) {
+		if (!NBT.get(item, nbt -> {
+			return nbt.hasTag("BlockEntityTag");
+		})) {
 			return;
 		}
-		tag.setString("id", "minecraft:chest");
-		ItemStack item2 = nbti.getItem();
+		NBT.modify(item, nbt -> {
+			nbt.getOrCreateCompound("BlockEntityTag").setString("id", "minecraft:chest");
+		});
 
 		//Classic turning an item into a blockstate
-		BlockStateMeta meta = (BlockStateMeta) item2.getItemMeta();
+		BlockStateMeta meta = (BlockStateMeta) item.getItemMeta();
 		BlockState state = meta.getBlockState();
 		Chest chest = (Chest) state;
 		//Loot tables are fun. Make sure the loot table exists
@@ -129,8 +129,8 @@ public class LootChestsInInventory implements Listener {
 		player.openInventory(inventory);
 		ItemStack emptyChest = new ItemStack(Material.CHEST);
 		ItemMeta emptyChestMeta = emptyChest.getItemMeta();
-		if (item2.hasItemMeta() && item2.getItemMeta().hasDisplayName()) {
-			emptyChestMeta.displayName(item2.getItemMeta().displayName());
+		if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
+			emptyChestMeta.displayName(item.getItemMeta().displayName());
 		}
 		emptyChest.setItemMeta(emptyChestMeta);
 		ItemUtils.setPlainTag(emptyChest);
