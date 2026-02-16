@@ -12,9 +12,9 @@ import com.playmonumenta.scriptedquests.Plugin;
 import com.playmonumenta.scriptedquests.quests.QuestContext;
 import com.playmonumenta.scriptedquests.quests.components.QuestPrerequisites;
 import com.playmonumenta.scriptedquests.utils.JsonUtils;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTType;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -514,21 +514,22 @@ public final class ExperiencinatorConfig {
 
 		@Override
 		public ConversionRateResult getValue(ItemStack item) {
-			NBTCompound nbt = new NBTItem(item);
-			for (int i = 0; i < mTagPath.length - 1; i++) {
-				String tag = mTagPath[i];
-				nbt = nbt.getCompound(tag);
-				if (nbt == null) {
+			return NBT.get(item, nbt -> {
+				ReadableNBT current = nbt;
+				for (int i = 0; i < mTagPath.length - 1; i++) {
+					current = current.getCompound(mTagPath[i]);
+					if (current == null) {
+						return ConversionRateResult.EMPTY;
+					}
+				}
+				String leaf = mTagPath[mTagPath.length - 1];
+				NBTType type = current.getType(leaf);
+				if (type == null) {
 					return ConversionRateResult.EMPTY;
 				}
-			}
-			String leaf = mTagPath[mTagPath.length - 1];
-			NBTType type = nbt.getType(leaf);
-			if (type == null) {
-				return ConversionRateResult.EMPTY;
-			}
-			String tagValue = type == NBTType.NBTTagString ? nbt.getString(leaf) : "" + nbt.getInteger(leaf);
-			return mRates.getOrDefault(tagValue, ConversionRateResult.EMPTY);
+				String tagValue = type == NBTType.NBTTagString ? current.getString(leaf) : "" + current.getInteger(leaf);
+				return mRates.getOrDefault(tagValue, ConversionRateResult.EMPTY);
+			});
 		}
 	}
 
