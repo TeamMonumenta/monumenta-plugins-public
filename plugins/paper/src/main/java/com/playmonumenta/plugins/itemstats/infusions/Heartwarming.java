@@ -22,6 +22,10 @@ public class Heartwarming implements Infusion {
 
 	@Override
 	public void onBlockDropItem(Plugin plugin, Player player, double value, BlockDropItemEvent event) {
+		if (player.isSneaking()) {
+			return;
+		}
+
 		for (Item itemEntity : event.getItems()) {
 			ItemStack drop = itemEntity.getItemStack();
 
