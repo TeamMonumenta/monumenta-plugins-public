@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.chunk.ChunkManager;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.EntityGlowEvent;
+import com.playmonumenta.plugins.events.HemorrhageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -396,6 +397,10 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
+
+	}
+
+	public void bossHemorrhaged(HemorrhageEvent event) {
 
 	}
 

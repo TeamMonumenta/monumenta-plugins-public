@@ -23,15 +23,13 @@ import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class WormBoss extends BossAbilityGroup implements Listener {
+public class WormBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_worm";
 	public static final String IGNORE_WORM_TAG = WormSegmentBoss.identityTag;
 
@@ -187,15 +185,13 @@ public class WormBoss extends BossAbilityGroup implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
-	public void onHemorrhage(HemorrhageEvent event) {
-		if (event.getMob() == mBoss) {
-			for (LivingEntity livingEntity : mParts) {
-				if (!livingEntity.isDead()) {
-					EntityUtils.applyHemorrhageCooldown(
-						com.playmonumenta.plugins.Plugin.getInstance(),
-						livingEntity, true);
-				}
+	@Override
+	public void bossHemorrhaged(HemorrhageEvent event) {
+		for (LivingEntity livingEntity : mParts) {
+			if (!livingEntity.isDead()) {
+				EntityUtils.applyHemorrhageCooldown(
+					com.playmonumenta.plugins.Plugin.getInstance(),
+					livingEntity, true);
 			}
 		}
 	}
