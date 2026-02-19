@@ -12,7 +12,7 @@ import com.playmonumenta.plugins.classes.Scout;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.classes.Warrior;
-import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPBezier;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -106,9 +106,8 @@ public class SpellTwistedReplicants extends Spell {
 					REPLICANT_NAMES.getOrDefault(spec, FastUtils.getRandomElement(REPLICANT_NAMES.values().stream().toList()))));
 				bossRise(replicant);
 
-				replicant.addScoreboardTag(StatMultiplierBoss.identityTag);
-				replicant.addScoreboardTag(StatMultiplierBoss.identityTag + "[damagemult=1.4]");
-				EntityUtils.scaleMaxHealth(replicant, 0.2, "TwistedReplicant");
+				mPlugin.mEffectManager.addEffect(replicant, "TwistedReplicantDamage", new PercentDamageDealt(99999999, 0.5));
+				EntityUtils.scaleMaxHealth(replicant, 0.4, "TwistedReplicantHealth");
 
 				replicant.addScoreboardTag(SPAWNED_TAG);
 				replicant.setLootTable(LootTables.EMPTY.getLootTable());
