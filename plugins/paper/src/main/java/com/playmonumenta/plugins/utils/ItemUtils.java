@@ -22,9 +22,9 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBTList;
+import de.tr7zw.nbtapi.iface.ReadableItemNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.ArrayList;
@@ -1711,13 +1711,12 @@ public class ItemUtils {
 		if (item != null) {
 			ItemIdentifier id = new ItemIdentifier(item.getType(), getPlainNameIfExists(item));
 			if (item.getType() != Material.AIR && item.getAmount() != 0) {
-				NBTItem nbt = new NBTItem(item);
-				ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
-				if (playerModified != null) {
-					long uuid = playerModified.getLong(CharmFactory.CHARM_UUID_KEY);
-					if (uuid != 0 && item.getItemMeta().hasDisplayName()) {
-						id = new ZenithCharmIdentifier(item.getType(), MessagingUtils.plainText(item.getItemMeta().displayName()), uuid);
-					}
+				long uuid = NBT.get(item, (ReadableItemNBT nbt) -> {
+					ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+					return playerModified != null ? playerModified.getLong(CharmFactory.CHARM_UUID_KEY) : 0L;
+				});
+				if (uuid != 0 && item.getItemMeta().hasDisplayName()) {
+					id = new ZenithCharmIdentifier(item.getType(), MessagingUtils.plainText(item.getItemMeta().displayName()), uuid);
 				}
 			}
 			if (normalized) {

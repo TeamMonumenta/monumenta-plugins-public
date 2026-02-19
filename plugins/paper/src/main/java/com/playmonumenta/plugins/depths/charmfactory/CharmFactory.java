@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.StringUtils;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableItemNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
@@ -129,86 +128,85 @@ public class CharmFactory {
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {
-		if (!item.getType().isAir()) {
-			NBTItem nbt = new NBTItem(item);
-			ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
-			if (playerModified == null) {
-				return null;
-			}
-
-			int power = ItemStatUtils.getCharmPower(item);
-			int rarity = playerModified.getInteger(CHARM_RARITY_KEY);
-			long seed = playerModified.getLong(CHARM_UUID_KEY);
-
-			if (power == 0 || rarity == 0 || seed == 0) {
-				// Invalid charm
-				return null;
-			}
-			//Iterate through ability effect data to create a list
-			List<String> charmEffectOrder = new ArrayList<>();
-			List<String> charmActionOrder = new ArrayList<>();
-			List<Double> charmRollsOrder = new ArrayList<>();
-
-			int count = 1;
-			while (playerModified.getString(CHARM_EFFECTS_KEY + count) != null
-				&& !playerModified.getString(CHARM_EFFECTS_KEY + count).isEmpty()) {
-
-				// replace charm effects according to map
-				String effect = playerModified.getString(CHARM_EFFECTS_KEY + count);
-				MMLog.fine("retrieved nbt " + effect + " " + count);
-
-				String newEffect = effect;
-				if (charmConversionMap.get(effect) != null) {
-					newEffect = charmConversionMap.get(effect);
-					MMLog.fine("changed charm effect from " + effect + " to " + newEffect + " " + count);
-				}
-
-				charmEffectOrder.add(newEffect);
-				count++;
-			}
-
-			// we can't use the previous method because getDouble returns 0.0 for rolls past the end-of-list
-			// which is indistinguishable from a roll that was actually rolled as 0.0.
-			// effects and rolls should always come in the same amount, so this should work instead
-			for (int i = 1; i < count; i++) {
-				charmRollsOrder.add(playerModified.getDouble(CHARM_ROLLS_KEY + i));
-				MMLog.fine("retrieved nbt " + charmRollsOrder.get(i - 1) + " " + i);
-			}
-
-			count = 1;
-			while (playerModified.getString(CHARM_ACTIONS_KEY + count) != null
-				&& !playerModified.getString(CHARM_ACTIONS_KEY + count).isEmpty()) {
-
-				String actionName = playerModified.getString(CHARM_ACTIONS_KEY + count);
-
-				charmActionOrder.add(actionName);
-				MMLog.fine("retrieved nbt " + charmActionOrder.get(count - 1) + " " + count);
-				count++;
-			}
-
-			MMLog.finer("updateCharm final review:");
-			MMLog.finer("charmEffectOrder:");
-			for (String effect : charmEffectOrder) {
-				MMLog.finer(effect);
-			}
-			MMLog.finer("charmRollsOrder:");
-			for (Double roll : charmRollsOrder) {
-				MMLog.finer(roll.toString());
-			}
-			MMLog.finer("charmActionOrder:");
-			for (String action : charmActionOrder) {
-				MMLog.finer(action);
-			}
-
-			try {
-				return generateCharm(rarity, power, seed, charmEffectOrder, charmActionOrder, charmRollsOrder, item.getItemMeta().displayName(), item, 0, false);
-			} catch (Exception e) {
-				MMLog.warning("CharmFactory failed to update a charm! Returning the same charm...");
-				ItemUpdateHelper.generateItemStats(item);
-				return item;
-			}
+		if (item.getType().isAir()) {
+			return null;
 		}
-		return null;
+		ReadableNBT playerModified = ItemStatUtils.getPlayerModified(NBT.readNbt(item));
+		if (playerModified == null) {
+			return null;
+		}
+
+		int power = ItemStatUtils.getCharmPower(item);
+		int rarity = playerModified.getInteger(CHARM_RARITY_KEY);
+		long seed = playerModified.getLong(CHARM_UUID_KEY);
+
+		if (power == 0 || rarity == 0 || seed == 0) {
+			// Invalid charm
+			return null;
+		}
+		//Iterate through ability effect data to create a list
+		List<String> charmEffectOrder = new ArrayList<>();
+		List<String> charmActionOrder = new ArrayList<>();
+		List<Double> charmRollsOrder = new ArrayList<>();
+
+		int count = 1;
+		while (playerModified.getString(CHARM_EFFECTS_KEY + count) != null
+			&& !playerModified.getString(CHARM_EFFECTS_KEY + count).isEmpty()) {
+
+			// replace charm effects according to map
+			String effect = playerModified.getString(CHARM_EFFECTS_KEY + count);
+			MMLog.fine("retrieved nbt " + effect + " " + count);
+
+			String newEffect = effect;
+			if (charmConversionMap.get(effect) != null) {
+				newEffect = charmConversionMap.get(effect);
+				MMLog.fine("changed charm effect from " + effect + " to " + newEffect + " " + count);
+			}
+
+			charmEffectOrder.add(newEffect);
+			count++;
+		}
+
+		// we can't use the previous method because getDouble returns 0.0 for rolls past the end-of-list
+		// which is indistinguishable from a roll that was actually rolled as 0.0.
+		// effects and rolls should always come in the same amount, so this should work instead
+		for (int i = 1; i < count; i++) {
+			charmRollsOrder.add(playerModified.getDouble(CHARM_ROLLS_KEY + i));
+			MMLog.fine("retrieved nbt " + charmRollsOrder.get(i - 1) + " " + i);
+		}
+
+		count = 1;
+		while (playerModified.getString(CHARM_ACTIONS_KEY + count) != null
+			&& !playerModified.getString(CHARM_ACTIONS_KEY + count).isEmpty()) {
+
+			String actionName = playerModified.getString(CHARM_ACTIONS_KEY + count);
+
+			charmActionOrder.add(actionName);
+			MMLog.fine("retrieved nbt " + charmActionOrder.get(count - 1) + " " + count);
+			count++;
+		}
+
+		MMLog.finer("updateCharm final review:");
+		MMLog.finer("charmEffectOrder:");
+		for (String effect : charmEffectOrder) {
+			MMLog.finer(effect);
+		}
+		MMLog.finer("charmRollsOrder:");
+		for (Double roll : charmRollsOrder) {
+			MMLog.finer(roll.toString());
+		}
+		MMLog.finer("charmActionOrder:");
+		for (String action : charmActionOrder) {
+			MMLog.finer(action);
+		}
+
+		try {
+			return generateCharm(rarity, power, seed, charmEffectOrder, charmActionOrder, charmRollsOrder, item.getItemMeta().displayName(), item, 0, false);
+		} catch (Exception e) {
+			MMLog.warning("CharmFactory failed to update a charm! Returning the same charm...");
+			ItemUpdateHelper.generateItemStats(item);
+			return item;
+		}
 	}
 
 	public static ItemStack generateCharm(int level, int power, long seed, @Nullable List<String> effectOrder, @Nullable List<String> actionOrder, @Nullable List<Double> rollsOrder, @Nullable Component fixedName, @Nullable ItemStack oldItem, int tree, boolean isUpgrade) {
@@ -248,20 +246,21 @@ public class CharmFactory {
 		if (oldItem != null) {
 			item = item.withType(oldItem.getType());
 
+			ReadableNBT oldNbt = NBT.readNbt(oldItem);
+			ReadableNBT oldPlayerModified = ItemStatUtils.getPlayerModified(oldNbt);
+
+			boolean hasUsed = oldPlayerModified != null && oldPlayerModified.getBoolean(CelestialGemListener.HAS_USED_KEY);
+			ReadableNBT oldInfusions = ItemStatUtils.getInfusions(oldNbt);
+
 			NBT.modify(item, nbt -> {
-				// transfer HAS_USED_KEY from old item to new item
-				NBTItem oldNBT = new NBTItem(oldItem);
-				ReadWriteNBT oldPlayerModified = ItemStatUtils.getPlayerModified(oldNBT);
-				if (oldPlayerModified != null && oldPlayerModified.getBoolean(CelestialGemListener.HAS_USED_KEY)) {
+				if (hasUsed) {
 					ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(nbt);
 					playerModified.setBoolean(CelestialGemListener.HAS_USED_KEY, true);
 				}
 
-				// transfer infusions from old item to new item
-				ReadableNBT infusions = ItemStatUtils.getInfusions(oldNBT);
-				if (infusions != null) {
+				if (oldInfusions != null) {
 					ReadWriteNBT newInfusions = ItemStatUtils.addPlayerModified(nbt).getOrCreateCompound(InfusionType.KEY);
-					newInfusions.mergeCompound(infusions);
+					newInfusions.mergeCompound(oldInfusions);
 				}
 			});
 		}
@@ -836,8 +835,7 @@ public class CharmFactory {
 	}
 
 	public static ItemStack upgradeCharm(ItemStack item) {
-		NBTItem nbt = new NBTItem(item);
-		ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+		ReadableNBT playerModified = ItemStatUtils.getPlayerModified(NBT.readNbt(item));
 		if (playerModified == null) {
 			return item;
 		}

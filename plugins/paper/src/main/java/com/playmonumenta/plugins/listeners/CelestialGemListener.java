@@ -3,8 +3,8 @@ package com.playmonumenta.plugins.listeners;
 import com.playmonumenta.plugins.depths.charmfactory.CharmFactory;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -146,11 +146,12 @@ public class CelestialGemListener implements Listener {
 			return false;
 		}
 
-		NBTItem nbt = new NBTItem(item);
-		ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
-		if (playerModified == null) {
-			return false;
-		}
-		return playerModified.getBoolean(HAS_USED_KEY);
+		return NBT.get(item, nbt -> {
+			ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+			if (playerModified == null) {
+				return false;
+			}
+			return playerModified.getBoolean(HAS_USED_KEY);
+		});
 	}
 }

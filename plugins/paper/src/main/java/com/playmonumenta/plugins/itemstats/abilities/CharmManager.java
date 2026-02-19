@@ -144,8 +144,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadableItemNBT;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -1537,7 +1536,7 @@ public class CharmManager {
 	//Helper method to parse item for charm effects
 	private List<CharmParsedInfo> readCharm(ItemStack itemStack) {
 		List<CharmParsedInfo> effects = new ArrayList<>();
-		List<String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(itemStack));
+		List<String> plainLoreLines = NBT.get(itemStack, (ReadableItemNBT nbt) -> ItemStatUtils.getPlainCharmLore(nbt));
 		for (String plainLore : plainLoreLines) {
 			if (plainLore.isEmpty()) {
 				continue;
@@ -1746,7 +1745,7 @@ public class CharmManager {
 				data.add(KEY_CHARMS, charmArray);
 				for (ItemStack charm : charms) {
 					JsonObject charmData = new JsonObject();
-					charmData.addProperty(KEY_ITEM, NBTItem.convertItemtoNBT(charm).toString());
+					charmData.addProperty(KEY_ITEM, NBT.itemStackToNBT(charm).toString());
 					charmArray.add(charmData);
 				}
 				event.setPluginData(charmType.getPluginDataKey(), data);
@@ -1765,7 +1764,7 @@ public class CharmManager {
 					for (JsonElement charmElement : charmArray) {
 						JsonObject data = charmElement.getAsJsonObject();
 						if (data.has(KEY_ITEM) && data.get(KEY_ITEM).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_ITEM).isString()) {
-							ItemStack item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_ITEM).getAsString()));
+							ItemStack item = NBT.itemStackFromNBT(NBT.parseNBT(data.getAsJsonPrimitive(KEY_ITEM).getAsString()));
 							if (item != null) {
 
 								ItemStatUtils.cleanIfNecessary(item);

@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.depths.guis.DepthsDebugGUI;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -230,7 +230,9 @@ public class DepthsCommand extends GenericCommand {
 				Location loc = player.getLocation();
 				int power = new Random().nextInt(5) + 1;
 				ItemStack charm = CharmFactory.generateCharm(args.getByArgument(charmRarityArg), power, 0, null, null, null, null, null, args.getByArgument(treeArg), false);
-				player.sendMessage("DEBUG SEED " + Objects.requireNonNull(ItemStatUtils.getPlayerModified(new NBTItem(charm))).getLong(CharmFactory.CHARM_UUID_KEY));
+				player.sendMessage("DEBUG SEED " + NBT.get(charm, nbt -> {
+					return Objects.requireNonNull(ItemStatUtils.getPlayerModified(nbt)).getLong(CharmFactory.CHARM_UUID_KEY);
+				}));
 				loc.getWorld().dropItem(loc, charm);
 			}).register();
 
@@ -249,7 +251,9 @@ public class DepthsCommand extends GenericCommand {
 					player.getInventory().setItemInMainHand(newCharm);
 					item.setAmount(0);
 					player.updateInventory();
-					player.sendMessage("DEBUG SEED " + Objects.requireNonNull(ItemStatUtils.getPlayerModified(new NBTItem(newCharm))).getLong(CharmFactory.CHARM_UUID_KEY));
+					player.sendMessage("DEBUG SEED " + NBT.get(newCharm, nbt -> {
+						return Objects.requireNonNull(ItemStatUtils.getPlayerModified(nbt)).getLong(CharmFactory.CHARM_UUID_KEY);
+					}));
 				}
 			}).register();
 
