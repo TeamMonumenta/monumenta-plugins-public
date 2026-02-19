@@ -5,8 +5,8 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import java.util.Collection;
@@ -43,7 +43,7 @@ public class Eggify {
 			return;
 		}
 
-		if (!entity.isValid()) {
+		if (!entity.isValid() || entity.customName() == null) {
 			return;
 		}
 		EntityType entityType = entity.getType();
@@ -60,9 +60,14 @@ public class Eggify {
 			if (entityType != ItemUtils.getSpawnEggType(spawnEgg)) {
 				continue;
 			}
-			NBTItem nbtItem = new NBTItem(spawnEgg);
-			NBTCompound entityTag = nbtItem.getCompound("EntityTag");
-			String customNameJson = entityTag == null ? null : entityTag.getString("CustomName");
+			String[] eggData = NBT.get(spawnEgg, nbt -> {
+				ReadableNBT entityTag = nbt.getCompound("EntityTag");
+				if (entityTag == null) {
+					return null;
+				}
+				return new String[] {entityTag.getString("CustomName"), entityTag.getString("variant")};
+			});
+			String customNameJson = eggData == null ? null : eggData[0];
 			String name = customNameJson == null ? null : MessagingUtils.plainText(MessagingUtils.parseComponent(customNameJson));
 			if (!Objects.equals(entityName, name)) {
 				continue;
@@ -71,7 +76,7 @@ public class Eggify {
 			// cat specific handling
 			if (catType != null) {
 				String existingCatTypeNamespacedKey = catType.key().asString();
-				String eggCatTypeNamespacedKey = entityTag.getString("variant");
+				String eggCatTypeNamespacedKey = eggData[1];
 				if (!existingCatTypeNamespacedKey.equals(eggCatTypeNamespacedKey)) {
 					continue;
 				}
