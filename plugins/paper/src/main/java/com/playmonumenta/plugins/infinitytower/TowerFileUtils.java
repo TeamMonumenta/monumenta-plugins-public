@@ -11,9 +11,10 @@ import com.playmonumenta.plugins.infinitytower.mobs.TowerMobRarity;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTListCompound;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -285,7 +286,21 @@ public class TowerFileUtils {
 		}
 
 		try {
-			return new NBTItem(item).getCompound("SkullOwner").getCompound("Properties").getCompoundList("textures").get(0).getString("Value");
+			return NBT.get(item, nbt -> {
+				ReadableNBT skull = nbt.getCompound("SkullOwner");
+				if (skull == null) {
+					return null;
+				}
+				ReadableNBT props = skull.getCompound("Properties");
+				if (props == null) {
+					return null;
+				}
+				ReadableNBTList<ReadWriteNBT> textures = props.getCompoundList("textures");
+				if (textures.isEmpty()) {
+					return null;
+				}
+				return textures.get(0).getString("Value");
+			});
 		} catch (Exception e) {
 			return null;
 		}
@@ -299,17 +314,15 @@ public class TowerFileUtils {
 
 		ItemStack head = new ItemStack(Material.PLAYER_HEAD);
 
-		NBTItem item = new NBTItem(head);
-		NBTCompound skull = item.addCompound("SkullOwner");
+		NBT.modify(head, nbt -> {
+			ReadWriteNBT skull = nbt.getOrCreateCompound("SkullOwner");
+			skull.setString("Name", null);
+			skull.setString("Id", UUID.randomUUID().toString());
+			ReadWriteNBT tex = skull.getOrCreateCompound("Properties").getCompoundList("textures").addCompound();
+			tex.setString("Value", texture);
+		});
 
-		skull.setString("Name", null);
-		skull.setString("Id", UUID.randomUUID().toString());
-
-		NBTListCompound tex = skull.addCompound("Properties").getCompoundList("textures").addCompound();
-		tex.setString("Value", texture);
-
-
-		return item.getItem();
+		return head;
 	}
 
 	private static String getRedisPath(String fileName) {
