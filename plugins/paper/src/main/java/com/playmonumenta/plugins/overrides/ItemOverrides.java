@@ -74,6 +74,7 @@ public final class ItemOverrides {
 			mItems.put(bed, bedOverride);
 		}
 
+
 		RespawnAnchorOverride respawnAnchorOverride = new RespawnAnchorOverride();
 		mItems.put(Material.RESPAWN_ANCHOR, respawnAnchorOverride);
 
@@ -96,6 +97,7 @@ public final class ItemOverrides {
 		mItems.put(Material.CHEST, chestOverride);
 		mItems.put(Material.TRAPPED_CHEST, chestOverride);
 
+		mItems.put(Material.CHISELED_BOOKSHELF, new ChiseledBookshelfOverride());
 		mItems.put(Material.DECORATED_POT, new DecoratedPotOverride());
 
 		mItems.put(Material.YELLOW_STAINED_GLASS, new YellowTesseractOverride());
