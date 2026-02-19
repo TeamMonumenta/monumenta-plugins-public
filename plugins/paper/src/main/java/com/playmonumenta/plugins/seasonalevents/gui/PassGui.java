@@ -577,6 +577,19 @@ public class PassGui extends Gui {
 								.decoration(TextDecoration.ITALIC, false)
 						)).toList());
 					});
+				} else if (mPass.mPurchasingDisabled) {
+					ItemUtils.modifyMeta(item, meta -> {
+						List<Component> lore = meta.lore();
+						if (lore == null) {
+							lore = new ArrayList<>();
+						}
+						meta.lore(Stream.concat(lore.stream(), Stream.of(
+							Component.text("Buying items from this pass", NamedTextColor.RED)
+								.decoration(TextDecoration.ITALIC, false),
+							Component.text("is currently disabled!", NamedTextColor.RED)
+								.decoration(TextDecoration.ITALIC, false)
+						)).toList());
+					});
 				} else if (reward.mCost >= 0) {
 					canBuy = true;
 					ItemUtils.modifyMeta(item, meta -> {

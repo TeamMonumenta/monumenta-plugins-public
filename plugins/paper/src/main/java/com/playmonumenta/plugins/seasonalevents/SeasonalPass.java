@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.seasonalevents.PlayerProgress.PassProgress;
@@ -50,6 +51,7 @@ public class SeasonalPass {
 	public TextColor mNameColor;
 	public int mNumberOfWeeks = 0;
 	public int mTotalMp = 0;
+	public boolean mPurchasingDisabled = false;
 	public final Map<Integer, List<WeeklyMission>> mWeeklyMissions = new HashMap<>();
 	public final List<LongMission> mLongMissions = new ArrayList<>();
 	public final List<SeasonalReward> mRewards = new ArrayList<>();
@@ -80,6 +82,13 @@ public class SeasonalPass {
 				+ mPassStart.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
 				+ " instead)", NamedTextColor.RED));
 		}
+
+		if (data.get("disable_purchasing") instanceof JsonPrimitive purchasablePrimitive
+			&& purchasablePrimitive.isBoolean()
+			&& purchasablePrimitive.getAsBoolean()) {
+			mPurchasingDisabled = true;
+		}
+
 		JsonArray rewardParse = data.get("rewards").getAsJsonArray();
 		for (JsonElement rewardElement : rewardParse) {
 			try {
