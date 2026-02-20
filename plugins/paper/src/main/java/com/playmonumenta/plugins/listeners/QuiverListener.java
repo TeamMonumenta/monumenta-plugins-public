@@ -365,7 +365,7 @@ public class QuiverListener implements Listener {
 		if (!getQuiverConfig(quiver).checkCanUse(player)) {
 			return null;
 		}
-		String preferredArrowName = getPreferredArrowNameFromWeapon(weapon);
+		String preferredArrowName = ItemStatUtils.getQuiverArrowPreferenceName(weapon);
 		if (preferredArrowName != null) {
 			boolean requireFullAmount = numProjectiles > 1;
 			if (!requireFullAmount || countInQuiver(quiver, preferredArrowName) >= numProjectiles) {
@@ -385,17 +385,6 @@ public class QuiverListener implements Listener {
 		return result;
 	}
 
-	private @Nullable String getPreferredArrowNameFromWeapon(@Nullable ItemStack weapon) {
-		if (ItemUtils.isNullOrAir(weapon) || !ItemStatUtils.hasInfusion(weapon, InfusionType.AMMUNITION)) {
-			return null;
-		}
-		String preferredArrowName = ItemStatUtils.getQuiverArrowPreferenceName(weapon);
-		if (preferredArrowName == null || preferredArrowName.isBlank()) {
-			return null;
-		}
-		return preferredArrowName;
-	}
-
 	private long countInQuiver(ItemStack quiver, String preferredArrowName) {
 		return NBT.get(quiver, nbt -> {
 			ReadableNBTList<ReadWriteNBT> itemsList = ItemStatUtils.getItemList(nbt);
@@ -407,7 +396,6 @@ public class QuiverListener implements Listener {
 				if (containedItem == null) {
 					continue;
 				}
-				NBT.modify(containedItem, ItemStatUtils::removePlayerModified);
 				if (!ItemUtils.isArrow(containedItem) || !ItemUtils.getPlainNameOrDefault(containedItem).equals(preferredArrowName)) {
 					continue;
 				}
@@ -443,7 +431,7 @@ public class QuiverListener implements Listener {
 		if (ItemUtils.isNullOrAir(item) || item.getAmount() != 1) {
 			return;
 		}
-		if (!isProjectileWeapon(item) || !ItemStatUtils.hasInfusion(item, InfusionType.AMMUNITION)) {
+		if (!ItemUtils.isSomeBow(item) || !ItemStatUtils.hasInfusion(item, InfusionType.AMMUNITION)) {
 			return;
 		}
 		ItemStack cursor = event.getCursor();
@@ -464,10 +452,6 @@ public class QuiverListener implements Listener {
 		player.sendMessage(Component.text("Preferred arrow set to " + ItemUtils.getPlainNameOrDefault(cursor) + ".", NamedTextColor.GOLD));
 		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.PLAYERS, 0.8f, 1.2f);
 		event.setCancelled(true);
-	}
-
-	private boolean isProjectileWeapon(ItemStack item) {
-		return item.getType() == Material.BOW || item.getType() == Material.CROSSBOW;
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
