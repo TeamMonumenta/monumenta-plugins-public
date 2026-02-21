@@ -287,6 +287,7 @@ public enum ClassAbility {
 	SWEEPING_EDGE("Sweeping Edge", true),
 	ARCANE_THRUST("Arcane Thrust", true),
 	EXPLOSIVE("Explosive", true),
+	PINCUSHION("Pincushion", true),
 	INFERNO("Inferno", true),
 	REVERB("Reverb", true),
 	TRIVIUM("Trivium", true),

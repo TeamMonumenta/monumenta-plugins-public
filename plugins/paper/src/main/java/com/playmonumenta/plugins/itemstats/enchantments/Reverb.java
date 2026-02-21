@@ -73,7 +73,7 @@ public class Reverb implements Enchantment {
 	@Override
 	public void onDamageDelayed(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		// Don't want to include damage done to other entities, so we make sure the only one that's counted is the one that receives the ENTITY_ATTACK.
-		// Also, don't include 'Coup de Grace', it deals 9000 damage and doesn't make sense here anyway.
+		// Also, don't include 'Coup de Grâce', it deals 9000 damage and doesn't make sense here anyway.
 		if (event.getAbility() == ClassAbility.COUP_DE_GRACE) {
 			return;
 		}

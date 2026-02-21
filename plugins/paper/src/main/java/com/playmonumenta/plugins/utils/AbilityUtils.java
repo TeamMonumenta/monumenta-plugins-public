@@ -593,7 +593,8 @@ public class AbilityUtils {
 		ClassAbility.ALCHEMICAL_ARTILLERY, // NOT its enhancement
 		ClassAbility.UNSTABLE_AMALGAM,
 		ClassAbility.ETHEREAL_ASCENSION,
-		ClassAbility.HALLOWED_BEAM
+		ClassAbility.HALLOWED_BEAM,
+		ClassAbility.PINCUSHION
 	);
 
 	public static boolean isAspectTriggeringEvent(DamageEvent event, Player player) {

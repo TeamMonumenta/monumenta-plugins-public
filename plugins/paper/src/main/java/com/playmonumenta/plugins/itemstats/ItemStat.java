@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.HemorrhageEvent;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -27,6 +28,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.jetbrains.annotations.Nullable;
 
 public interface ItemStat {
@@ -362,12 +364,24 @@ public interface ItemStat {
 	/**
 	 * Player gains a custom effect
 	 *
-	 * @param plugin monumenta plguin
+	 * @param plugin monumenta plugin
 	 * @param player the Player gaining the custom effect
 	 * @param value  the value of ItemStat possessed by the Player
 	 * @param event  the associated CustomEffectApplyEvent
 	 */
 	default void onCustomEffectApply(Plugin plugin, Player player, double value, CustomEffectApplyEvent event) {
+
+	}
+
+	/**
+	 * Player gains a non-custom effect
+	 *
+	 * @param plugin monumenta plugin
+	 * @param player the Player gaining the custom effect
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated PotionEffectApplyEvent
+	 */
+	default void onPotionEffectApply(Plugin plugin, Player player, double value, PotionEffectApplyEvent event) {
 
 	}
 
@@ -380,10 +394,22 @@ public interface ItemStat {
 	 *
 	 * @param plugin monumenta plugin
 	 * @param player the Player affected (may be different from the one causing the Hemorrhage)
-	 * @param value value of ItemStat possessed by the Player
-	 * @param event Hemorrhage Event
+	 * @param value  value of ItemStat possessed by the Player
+	 * @param event  Hemorrhage Event
 	 */
 	default void onHemorrhage(Plugin plugin, Player player, double value, HemorrhageEvent event) {
+
+	}
+
+	/**
+	 * Player begins or ends sprinting
+	 *
+	 * @param plugin monumenta plugin
+	 * @param player player sprinting
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  associated event
+	 */
+	default void onSprintToggle(Plugin plugin, Player player, double value, PlayerToggleSprintEvent event) {
 
 	}
 }

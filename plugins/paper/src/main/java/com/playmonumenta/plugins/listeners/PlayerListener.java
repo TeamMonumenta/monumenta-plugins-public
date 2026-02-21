@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.events.HemorrhageEvent;
+import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
@@ -336,7 +337,7 @@ public class PlayerListener implements Listener {
 		mPlugin.mAbilityManager.playerSaveEvent(player, event);
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void playerChangeWorldEvent(PlayerChangedWorldEvent event) {
 		Player player = event.getPlayer();
 
@@ -346,7 +347,7 @@ public class PlayerListener implements Listener {
 		PortalManager.clearAllPortals(player);
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) {
 			return;
@@ -617,7 +618,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void playerInteractEntityEventWithCancelled(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof Allay) {
 			event.setCancelled(true);
@@ -1466,9 +1467,7 @@ public class PlayerListener implements Listener {
 		mPlugin.mAbilityManager.playerTeleportEvent(player, event);
 
 		// If the teleport wasn't cancelled by anything, update their gamemode and other location-based info
-		if (!event.isCancelled()) {
-			mPlugin.mTrackingManager.mPlayers.updateLocation(player, event.getTo(), 0);
-		}
+		mPlugin.mTrackingManager.mPlayers.updateLocation(player, event.getTo(), 0);
 
 		Gui gui = Gui.getOpenGui(player);
 		if (gui != null && gui.getCloseOnTeleport()) {
@@ -1730,11 +1729,18 @@ public class PlayerListener implements Listener {
 		mPlugin.mItemStatManager.onAbilityCast(mPlugin, player, event);
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void hemorrhageEvent(HemorrhageEvent event) {
 		Player player = event.getCaster();
 		// Insert Ability Manager code here, if you want it
 		mPlugin.mItemStatManager.onHemorrhage(mPlugin, player, event);
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void playerToggleSprintEvent(PlayerToggleSprintEvent event) {
+		Player player = event.getPlayer();
+		// Line for any hypothetical ability that triggers on sprint start / stop goes here
+		mPlugin.mItemStatManager.onSprintToggle(mPlugin, player, event);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -2088,17 +2094,17 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void playerServerTransferEvent(PlayerServerTransferEvent event) {
 		mTransferringPlayers.add(event.getPlayer().getUniqueId());
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void playerTransferFailEvent(PlayerTransferFailEvent event) {
 		mTransferringPlayers.remove(event.getPlayer().getUniqueId());
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void playerFinishedTransferring(PlayerQuitEvent event) {
 		mTransferringPlayers.remove(event.getPlayer().getUniqueId());
 	}
@@ -2112,6 +2118,13 @@ public class PlayerListener implements Listener {
 		if (event.getEntity() instanceof Player player) {
 			mPlugin.mAbilityManager.customEffectApplyEvent(player, event);
 			mPlugin.mItemStatManager.onCustomEffectApply(mPlugin, player, event);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void potionEffectApplyEvent(PotionEffectApplyEvent event) {
+		if (event.getApplied() instanceof Player player) {
+			mPlugin.mItemStatManager.onPotionEffectApply(mPlugin, player, event);
 		}
 	}
 
