@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPlotUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
@@ -341,7 +341,9 @@ public final class ItemOverrides {
 			&& player.getGameMode() != GameMode.CREATIVE
 			&& !EXCEPTION_LORED_MATERIALS.contains(item.getType())
 			&& !ItemUtils.isNullOrAir(item)
-			&& !Objects.equals(new NBTItem(item).getByte("Placeable"), (byte) 1)) {
+			&& !Objects.equals(NBT.get(item, nbt -> {
+				return nbt.getByte("Placeable");
+			}), (byte) 1)) {
 			eventCancelled = true;
 		}
 

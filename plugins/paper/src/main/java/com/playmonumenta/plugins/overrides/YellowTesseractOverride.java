@@ -22,7 +22,8 @@ import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadableItemNBT;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -224,8 +225,9 @@ public class YellowTesseractOverride extends BaseOverride {
 	}
 
 	private static void clearTesseractLore(ItemStack item) {
-		NBTItem nbt = new NBTItem(item);
-		List<String> lore = ItemStatUtils.getPlainLore(nbt);
+		List<String> lore = NBT.get(item, (ReadableItemNBT nbt) -> {
+			return ItemStatUtils.getPlainLore(nbt);
+		});
 
 		ItemStatUtils.removeInfusion(item, InfusionType.SOULBOUND, false);
 		for (int i = lore.size() - 1; i >= 0; --i) {
@@ -253,9 +255,10 @@ public class YellowTesseractOverride extends BaseOverride {
 		int enhanceLevel = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE).orElse(0);
 		int totalEnhance = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
 
-		NBTItem nbt = new NBTItem(item);
 		ItemStack copyItem = item.clone();
-		List<String> lore = ItemStatUtils.getPlainLore(nbt);
+		List<String> lore = NBT.get(item, (ReadableItemNBT nbt) -> {
+			return ItemStatUtils.getPlainLore(nbt);
+		});
 		int newLoreIdx = lore.size();
 
 		if (InventoryUtils.testForItemWithLore(copyItem, CLASS_STR)) {

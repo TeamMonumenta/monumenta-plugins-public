@@ -68,7 +68,7 @@ import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
 import com.playmonumenta.redissync.event.PlayerTransferFailEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
-import de.tr7zw.nbtapi.NBTEntity;
+import de.tr7zw.nbtapi.NBT;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -698,7 +698,9 @@ public class PlayerListener implements Listener {
 				&& EntityListener.INVISIBLE_ITEM_FRAME_NAME.equals(frame.getName())) {
 				Bukkit.getScheduler().runTask(mPlugin, () -> {
 					if (frame.isValid()) {
-						new NBTEntity(frame).setBoolean("Invisible", !ItemUtils.isNullOrAir(frame.getItem()));
+						NBT.modify(frame, nbt -> {
+							nbt.setBoolean("Invisible", !ItemUtils.isNullOrAir(frame.getItem()));
+						});
 					}
 				});
 			}

@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
@@ -793,9 +792,9 @@ public class ItemStatCommands {
 				}
 			}
 
-			NBTItem nbt = new NBTItem(item);
-			nbt.removeKey(ItemStatUtils.MONUMENTA_KEY);
-			item.setItemMeta(nbt.getItem().getItemMeta());
+			NBT.modify(item, nbt -> {
+				nbt.removeKey(ItemStatUtils.MONUMENTA_KEY);
+			});
 			item.lore(null);
 
 			ItemMeta meta = item.getItemMeta();

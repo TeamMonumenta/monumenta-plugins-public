@@ -15,8 +15,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
@@ -212,14 +210,14 @@ public class TradeListener implements Listener {
 				ItemStack newResult = ItemUtils.clone(result);
 
 				// Modify the result item to carry over player modifications (infusions etc.)
-				NBTItem playerItemNbt = new NBTItem(playerItem);
-				NBTItem newResultNbt = new NBTItem(newResult);
-				NBTCompound playerModified = playerItemNbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+				ReadWriteNBT playerItemNbt = NBT.itemStackToNBT(playerItem);
+				ReadableNBT playerModified = ItemStatUtils.getPlayerModified(playerItemNbt);
 				if (playerModified == null) { // no modifications, skip this item
 					continue;
 				}
-				ItemStatUtils.addPlayerModified(newResultNbt).mergeCompound(playerModified);
-				newResult = newResultNbt.getItem();
+				NBT.modify(newResult, nbt -> {
+					ItemStatUtils.addPlayerModified(nbt).mergeCompound(playerModified);
+				});
 
 				ItemUpdateHelper.generateItemStats(newResult);
 
@@ -292,9 +290,9 @@ public class TradeListener implements Listener {
 				};
 				copyDye = (from, to) -> {
 					ItemStack result = to.withType(from.getType());
+					ReadableNBT fromShulker = NBT.itemStackToNBT(from).getCompound("BlockEntityTag");
 					NBT.modify(result, nbt -> {
 						nbt.removeKey("BlockEntityTag");
-						NBTCompound fromShulker = new NBTItem(from).getCompound("BlockEntityTag");
 						if (fromShulker != null) {
 							nbt.getOrCreateCompound("BlockEntityTag").mergeCompound(fromShulker);
 						}
@@ -327,9 +325,9 @@ public class TradeListener implements Listener {
 					return result;
 				};
 				copyDye = (from, to) -> {
+					ReadableNBT fromBanner = NBT.itemStackToNBT(from).getCompound("BlockEntityTag");
 					NBT.modify(to, nbt -> {
 						nbt.removeKey("BlockEntityTag");
-						NBTCompound fromBanner = new NBTItem(from).getCompound("BlockEntityTag");
 						if (fromBanner != null) {
 							nbt.getOrCreateCompound("BlockEntityTag").mergeCompound(fromBanner);
 						}

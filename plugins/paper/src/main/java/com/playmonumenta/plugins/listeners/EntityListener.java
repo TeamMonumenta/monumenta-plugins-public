@@ -37,7 +37,7 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import de.tr7zw.nbtapi.NBTEntity;
+import de.tr7zw.nbtapi.NBT;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -303,7 +303,9 @@ public class EntityListener implements Listener {
 				&& INVISIBLE_ITEM_FRAME_NAME.equals(damagee.getName())) {
 				Bukkit.getScheduler().runTask(mPlugin, () -> {
 					if (frame.isValid()) {
-						new NBTEntity(frame).setBoolean("Invisible", !ItemUtils.isNullOrAir(frame.getItem()));
+						NBT.modify(frame, nbt -> {
+							nbt.setBoolean("Invisible", !ItemUtils.isNullOrAir(frame.getItem()));
+						});
 					}
 				});
 			}
