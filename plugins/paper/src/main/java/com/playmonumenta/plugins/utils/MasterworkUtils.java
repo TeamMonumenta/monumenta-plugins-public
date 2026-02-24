@@ -6,8 +6,9 @@ import com.playmonumenta.plugins.itemstats.enums.Masterwork;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -574,13 +575,13 @@ public class MasterworkUtils {
 	public static ItemStack preserveModified(ItemStack base, ItemStack upgrade) {
 		ItemStack newUpgrade = ItemUtils.clone(upgrade);
 
-		NBTItem playerItemNbt = new NBTItem(base);
-		NBTItem newUpgradeNbt = new NBTItem(newUpgrade);
-		NBTCompound playerModified = playerItemNbt.getCompound(ItemStatUtils.MONUMENTA_KEY).getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+		ReadWriteNBT baseNbt = NBT.itemStackToNBT(base);
+		ReadableNBT playerModified = ItemStatUtils.getPlayerModified(baseNbt);
 
 		if (playerModified != null) {
-			ItemStatUtils.addPlayerModified(newUpgradeNbt).mergeCompound(playerModified);
-			newUpgrade = newUpgradeNbt.getItem();
+			NBT.modify(newUpgrade, nbt -> {
+				ItemStatUtils.addPlayerModified(nbt).mergeCompound(playerModified);
+			});
 			ItemUpdateHelper.generateItemStats(newUpgrade);
 		}
 

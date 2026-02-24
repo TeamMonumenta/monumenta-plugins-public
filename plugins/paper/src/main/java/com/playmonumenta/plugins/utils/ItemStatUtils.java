@@ -947,6 +947,10 @@ public class ItemStatUtils {
 	public static @Nullable ReadWriteNBT getPlayerModified(final ReadWriteNBT nbt) {
 		ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
+			ReadWriteNBT tag = nbt.getCompound("tag");
+			if (tag != null) {
+				return getPlayerModified(tag);
+			}
 			return null;
 		}
 		return monumenta.getCompound(PLAYER_MODIFIED_KEY);
@@ -955,6 +959,10 @@ public class ItemStatUtils {
 	public static @Nullable ReadableNBT getPlayerModified(final ReadableNBT nbt) {
 		ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
+			ReadableNBT tag = nbt.getCompound("tag");
+			if (tag != null) {
+				return getPlayerModified(tag);
+			}
 			return null;
 		}
 		return monumenta.getCompound(PLAYER_MODIFIED_KEY);

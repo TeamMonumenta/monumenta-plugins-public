@@ -7,8 +7,9 @@ import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableItemNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -401,17 +402,19 @@ public class DelveInfusionUtils {
 	}
 
 	public static DelveInfusionMaterial getDelveInfusionMaterial(ItemStack item) {
-		ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(new NBTItem(item));
-		if (playerModified != null) {
-			String label = playerModified.getString(DelveInfusionMaterial.KEY);
-			if (label != null) {
-				DelveInfusionMaterial material = DelveInfusionMaterial.getDelveInfusionMaterial(label);
-				if (material != null) {
-					return material;
+		return NBT.get(item, (ReadableItemNBT nbt) -> {
+			ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+			if (playerModified != null) {
+				String label = playerModified.getString(DelveInfusionMaterial.KEY);
+				if (label != null) {
+					DelveInfusionMaterial material = DelveInfusionMaterial.getDelveInfusionMaterial(label);
+					if (material != null) {
+						return material;
+					}
 				}
 			}
-		}
-		return DelveInfusionMaterial.VOIDSTAINED_GEODE;
+			return DelveInfusionMaterial.VOIDSTAINED_GEODE;
+		});
 	}
 
 	public static void removeDelveInfusionMaterial(ItemStack item) {
