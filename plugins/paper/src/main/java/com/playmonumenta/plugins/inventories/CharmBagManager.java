@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
-import de.tr7zw.nbtapi.NBTItem;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -262,7 +261,7 @@ public class CharmBagManager implements Listener {
 		return item != null
 			&& item.getAmount() > 0
 			&& isCharm(item)
-			&& ItemStatUtils.getPlayerModified(new NBTItem(item)) == null;
+			&& !ItemStatUtils.hasPlayerModified(item);
 		//&& ItemStatUtils.getTier(item).compareTo(settings.mMaxTier) <= 0
 		//&& (settings.allCharms || ItemStatUtils.getTier(item).compareTo(settings.mMaxTier) < 0);
 	}

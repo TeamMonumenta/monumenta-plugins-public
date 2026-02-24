@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
-import de.tr7zw.nbtapi.NBTItem;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -401,7 +400,7 @@ public class WalletManager implements Listener {
 		return item != null
 			&& item.getAmount() > 0
 			&& isCurrency(item)
-			&& ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
+			&& !ItemStatUtils.hasPlayerModified(item)
 			&& ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) <= 0
 			&& (settings.allCurrencies || ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) < 0 || MAIN_CURRENCIES.stream().anyMatch(c -> c.isSimilar(item)));
 	}

@@ -10,8 +10,8 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +75,10 @@ public class CustomContainerItemGui extends Gui {
 			}
 			ItemStack displayItem = ItemUtils.clone(item);
 			ItemMeta itemMeta = displayItem.getItemMeta();
-			long amount = ItemStatUtils.addPlayerModified(new NBTItem(item)).getLong(CustomContainerItemManager.AMOUNT_KEY);
+			long amount = NBT.get(item, nbt -> {
+				ReadableNBT pm = ItemStatUtils.getPlayerModified(nbt);
+				return pm == null ? 0L : pm.getLong(CustomContainerItemManager.AMOUNT_KEY);
+			});
 			String amountString;
 			if (showAmountsAsStacks && item.getMaxStackSize() > 1 && amount >= item.getMaxStackSize()) {
 				long stacks = amount / item.getMaxStackSize();

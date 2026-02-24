@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -136,7 +135,7 @@ public class LoadoutManagerGui extends Gui {
 						item -> item != null
 							&& item.getType() == Material.RAW_IRON
 							&& "Armory Page Upgrader".equals(ItemUtils.getPlainNameIfExists(item))
-							&& ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
+							&& !ItemStatUtils.hasPlayerModified(item)
 					).findFirst().orElse(null);
 					if (cost1 == null) {
 						mPlayer.sendMessage(Component.text("You need an Armory Page Upgrader to purchase a page!", NamedTextColor.RED));
@@ -199,7 +198,7 @@ public class LoadoutManagerGui extends Gui {
 						item -> item != null
 							&& item.getType() == Material.YELLOW_STAINED_GLASS
 							&& "Tesseract of the Elements".equals(ItemUtils.getPlainNameIfExists(item))
-							&& ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
+							&& !ItemStatUtils.hasPlayerModified(item)
 					).findFirst().orElse(null);
 					if (cost3 == null) {
 						mPlayer.sendMessage(Component.text("You need an empty, unmodified Tesseract of the Elements to buy a loadout slot!", NamedTextColor.RED));

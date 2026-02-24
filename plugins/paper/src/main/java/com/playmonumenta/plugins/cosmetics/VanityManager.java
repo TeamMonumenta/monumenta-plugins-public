@@ -15,10 +15,9 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTType;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -128,7 +127,7 @@ public class VanityManager implements Listener {
 		VanityData vanityData = new VanityData();
 		JsonObject items = data.getAsJsonObject("equipped");
 		for (Map.Entry<String, JsonElement> entry : items.entrySet()) {
-			ItemStack item = NBTItem.convertNBTtoItem(new NBTContainer(entry.getValue().getAsString()));
+			ItemStack item = NBT.itemStackFromNBT(NBT.parseNBT(entry.getValue().getAsString()));
 			EquipmentSlot slot = EquipmentSlot.valueOf(entry.getKey());
 			if (isValidVanityItem(player, item, slot)) {
 				if (ItemStatUtils.isDirty(item)) {
@@ -155,7 +154,7 @@ public class VanityManager implements Listener {
 		JsonObject data = new JsonObject();
 		JsonObject equipped = new JsonObject();
 		for (Map.Entry<EquipmentSlot, ItemStack> entry : vanityData.mEquipped.entrySet()) {
-			equipped.addProperty(entry.getKey().name(), NBTItem.convertItemtoNBT(entry.getValue()).toString());
+			equipped.addProperty(entry.getKey().name(), NBT.itemStackToNBT(entry.getValue()).toString());
 		}
 		data.add("equipped", equipped);
 		data.addProperty("selfVanityEnabled", vanityData.mSelfVanityEnabled);
@@ -221,28 +220,27 @@ public class VanityManager implements Listener {
 		if (!item.hasItemMeta()) {
 			return ItemUtils.clone(item);
 		}
-		NBTItem nbtItem = new NBTItem(item);
-		if (item.getType() != Material.SHIELD && !ItemUtils.isBanner(item)) {
-			nbtItem.removeKey("BlockEntityTag"); // shulker contents, and also other invisible block entity data
-		}
-		if (nbtItem.getType("display") == NBTType.NBTTagCompound) {
-			// display lore (plain.display.Lore is kept for RP purposes)
-			NBTCompound display = nbtItem.getCompound("display");
-			display.removeKey("Lore");
-		}
-		nbtItem.removeKey("pages"); // book contents
-		NBTCompound monumenta = nbtItem.getCompound(ItemStatUtils.MONUMENTA_KEY);
-		if (monumenta != null) {
-			NBTCompound playerModified = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-			if (playerModified != null) {
-				playerModified.removeKey(ItemStatUtils.ITEMS_KEY); // custom items storage
+		ItemStack newItem = ItemUtils.clone(item);
+		NBT.modify(newItem, nbt -> {
+			if (item.getType() != Material.SHIELD && !ItemUtils.isBanner(item)) {
+				nbt.removeKey("BlockEntityTag"); // shulker contents, and also other invisible block entity data
 			}
-			monumenta.removeKey(ItemStatUtils.STOCK_KEY);
-			monumenta.removeKey(ItemStatUtils.LORE_KEY);
-		}
-		nbtItem.removeKey("AttributeModifiers");
-
-		ItemStack newItem = nbtItem.getItem();
+			if (nbt.getType("display") == NBTType.NBTTagCompound) {
+				// display lore (plain.display.Lore is kept for RP purposes)
+				nbt.getCompound("display").removeKey("Lore");
+			}
+			nbt.removeKey("pages"); // book contents
+			ReadWriteNBT monumenta = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY);
+			if (monumenta != null) {
+				ReadWriteNBT playerModified = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+				if (playerModified != null) {
+					playerModified.removeKey(ItemStatUtils.ITEMS_KEY); // custom items storage
+				}
+				monumenta.removeKey(ItemStatUtils.STOCK_KEY);
+				monumenta.removeKey(ItemStatUtils.LORE_KEY);
+			}
+			nbt.removeKey("AttributeModifiers");
+		});
 		ItemMeta meta = newItem.getItemMeta();
 		if (meta instanceof Damageable) {
 			((Damageable) meta).setDamage(0);
@@ -255,8 +253,10 @@ public class VanityManager implements Listener {
 		if (itemStack == null || itemStack.getType() == Material.AIR) {
 			return false;
 		}
-		NBTCompound monumenta = new NBTItem(itemStack).getCompound(ItemStatUtils.MONUMENTA_KEY);
-		return monumenta != null && Boolean.TRUE.equals(monumenta.getBoolean(INVISIBLE_NBT_KEY));
+		return NBT.get(itemStack, nbt -> {
+			ReadableNBT monumenta = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY);
+			return monumenta != null && Boolean.TRUE.equals(monumenta.getBoolean(INVISIBLE_NBT_KEY));
+		});
 	}
 
 	public static ItemStack getInvisibleVanityItem(EquipmentSlot slot) {
