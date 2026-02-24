@@ -96,69 +96,61 @@ public class DiscoveryCommand {
 								new IntegerArgument("new id")
 							)
 							.executesPlayer((player, args) -> {
-								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
-									if (discovery != null) {
-										DiscoveryManager.setNewId(discovery, args.getUnchecked("new id"));
-										player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
-									} else {
-										player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
-									}
-								});
+								ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
+								if (discovery != null) {
+									DiscoveryManager.setNewId(discovery, args.getUnchecked("new id"));
+									player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
+								} else {
+									player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
+								}
 							}),
 						new CommandAPICommand("loot")
 							.withArguments(
 								new LootTableArgument("new loot path")
 							)
 							.executesPlayer((player, args) -> {
-								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
-									if (discovery != null) {
-										DiscoveryManager.setNewLoot(discovery, ((LootTable) args.get("new loot path")).getKey());
-										player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
-									} else {
-										player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
-									}
-								});
+								ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
+								if (discovery != null) {
+									DiscoveryManager.setNewLoot(discovery, ((LootTable) args.get("new loot path")).getKey());
+									player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
+								} else {
+									player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
+								}
 							}),
 						new CommandAPICommand("tier")
 							.withArguments(
 								new MultiLiteralArgument("tier", Arrays.stream(ItemDiscovery.ItemDiscoveryTier.values()).map(ItemDiscovery.ItemDiscoveryTier::name).toArray(String[]::new))
 							)
 							.executesPlayer((player, args) -> {
-								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
-									if (discovery != null) {
-										DiscoveryManager.setNewTier(discovery, ItemDiscovery.ItemDiscoveryTier.valueOf(args.getUnchecked("tier")));
-										player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
-									} else {
-										player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
-									}
-								});
+								ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
+								if (discovery != null) {
+									DiscoveryManager.setNewTier(discovery, ItemDiscovery.ItemDiscoveryTier.valueOf(args.getUnchecked("tier")));
+									player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
+								} else {
+									player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
+								}
 							}),
 						new CommandAPICommand("function")
 							.withOptionalArguments(
 								new FunctionArgument("new function path")
 							)
 							.executesPlayer((player, args) -> {
-								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
-									if (discovery != null) {
-										FunctionWrapper[] functionArr = args.getUnchecked("new function path");
-										NamespacedKey key = null;
-										if (functionArr != null) {
-											if (functionArr.length == 0) {
-												player.sendMessage(Component.text("Failed to get provided function"));
-											} else {
-												key = functionArr[0].getKey();
-											}
+								ItemDiscovery discovery = DiscoveryManager.getNearestToLocation(player.getLocation());
+								if (discovery != null) {
+									FunctionWrapper[] functionArr = args.getUnchecked("new function path");
+									NamespacedKey key = null;
+									if (functionArr != null) {
+										if (functionArr.length == 0) {
+											player.sendMessage(Component.text("Failed to get provided function"));
+										} else {
+											key = functionArr[0].getKey();
 										}
-										DiscoveryManager.setNewFunction(discovery, key);
-										player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
-									} else {
-										player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
 									}
-								});
+									DiscoveryManager.setNewFunction(discovery, key);
+									player.sendMessage(Component.text("Updated 1 discovery", MESSAGE_COLOR));
+								} else {
+									player.sendMessage(Component.text("There are no nearby discoveries", MESSAGE_COLOR));
+								}
 							}),
 						new CommandAPICommand("location")
 							.withArguments(
@@ -197,11 +189,9 @@ public class DiscoveryCommand {
 								new IntegerArgument("new id")
 							)
 							.executesPlayer((player, args) -> {
-								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									int successes = DiscoveryManager.setNewId((int) args.getUnchecked("id"), args.getUnchecked("new id"));
+								int successes = DiscoveryManager.setNewId((int) args.getUnchecked("id"), args.getUnchecked("new id"));
 
-									player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
-								});
+								player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 							}),
 						new CommandAPICommand("loot")
 							.withArguments(
@@ -209,11 +199,9 @@ public class DiscoveryCommand {
 								new LootTableArgument("new loot path")
 							)
 							.executesPlayer((player, args) -> {
-								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									int successes = DiscoveryManager.setNewLoot((int) args.getUnchecked("id"), ((LootTable) args.get("new loot path")).getKey());
+								int successes = DiscoveryManager.setNewLoot((int) args.getUnchecked("id"), ((LootTable) args.get("new loot path")).getKey());
 
-									player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
-								});
+								player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 							}),
 						new CommandAPICommand("tier")
 							.withArguments(
@@ -221,11 +209,9 @@ public class DiscoveryCommand {
 								new MultiLiteralArgument("tier", Arrays.stream(ItemDiscovery.ItemDiscoveryTier.values()).map(ItemDiscovery.ItemDiscoveryTier::name).toArray(String[]::new))
 							)
 							.executesPlayer((player, args) -> {
-								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									int successes = DiscoveryManager.setNewTier((int) args.getUnchecked("id"), ItemDiscovery.ItemDiscoveryTier.valueOf(args.getUnchecked("tier")));
+								int successes = DiscoveryManager.setNewTier((int) args.getUnchecked("id"), ItemDiscovery.ItemDiscoveryTier.valueOf(args.getUnchecked("tier")));
 
-									player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
-								});
+								player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 							}),
 						new CommandAPICommand("function")
 							.withArguments(
@@ -233,21 +219,19 @@ public class DiscoveryCommand {
 							)
 							.withOptionalArguments(new FunctionArgument("new function path"))
 							.executesPlayer((player, args) -> {
-								Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-									FunctionWrapper[] functionArr = args.getUnchecked("new function path");
-									NamespacedKey key = null;
-									if (functionArr != null) {
-										if (functionArr.length == 0) {
-											player.sendMessage(Component.text("Failed to get provided function"));
-										} else {
-											key = functionArr[0].getKey();
-										}
+								FunctionWrapper[] functionArr = args.getUnchecked("new function path");
+								NamespacedKey key = null;
+								if (functionArr != null) {
+									if (functionArr.length == 0) {
+										player.sendMessage(Component.text("Failed to get provided function"));
+									} else {
+										key = functionArr[0].getKey();
 									}
+								}
 
-									int successes = DiscoveryManager.setNewFunction((int) args.getUnchecked("id"), key);
+								int successes = DiscoveryManager.setNewFunction((int) args.getUnchecked("id"), key);
 
-									player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
-								});
+								player.sendMessage(Component.text(String.format("Updated %s %s", successes, successes == 1 ? "discovery" : "discoveries"), MESSAGE_COLOR));
 							}),
 						new CommandAPICommand("location")
 							.withArguments(

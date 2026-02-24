@@ -18,8 +18,8 @@ import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTEntity;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
 import io.lettuce.core.KeyValue;
 import java.time.Instant;
@@ -169,17 +169,49 @@ public class DiscoveryManager implements Listener {
 		}
 	}
 
+	// Helper class for NBT parsing
+	private static class DiscoveryNBTData {
+		final @Nullable Integer mId;
+		final @Nullable String mTier;
+		final @Nullable String mLoot;
+		final @Nullable String mFunction;
+
+		DiscoveryNBTData(@Nullable Integer id, @Nullable String tier, @Nullable String loot, @Nullable String function) {
+			mId = id;
+			mTier = tier;
+			mLoot = loot;
+			mFunction = function;
+		}
+	}
+
 	// Attempt to read discovery data off the marker entity and load it if valid
 	private static void tryReadDiscovery(Marker marker) {
 		try {
-			NBTEntity entity = new NBTEntity(marker);
-			NBTCompound container = entity.getPersistentDataContainer().getOrCreateCompound("discovery");
+			DiscoveryNBTData nbtData = NBT.getPersistentData(marker, nbt -> {
+				ReadableNBT container = nbt.getCompound("discovery");
+				if (container == null) {
+					return null;
+				}
+				return new DiscoveryNBTData(container.getInteger("id"), container.getString("tier"), container.getString("loot"), container.getString("function"));
+			});
+			if (nbtData == null) {
+				MMLog.warning(String.format("[Discovery] Missing compound key 'discovery' when parsing Discovery at Location: [%s, %s, %s] in World: %s", marker.getLocation().getX(), marker.getLocation().getY(), marker.getLocation().getZ(), marker.getWorld().getName()));
+				return;
+			}
 
-			int id = container.getInteger("id");
+			if (nbtData.mId == null) {
+				MMLog.warning(String.format("[Discovery] Missing 'id' when parsing Discovery at Location: [%s, %s, %s] in World: %s", marker.getLocation().getX(), marker.getLocation().getY(), marker.getLocation().getZ(), marker.getWorld().getName()));
+				return;
+			}
+			int id = nbtData.mId;
 
-			ItemDiscovery.ItemDiscoveryTier tier = ItemDiscovery.ItemDiscoveryTier.valueOf(container.getString("tier"));
+			if (nbtData.mTier == null) {
+				MMLog.warning(String.format("[Discovery] Missing 'tier' when parsing Discovery at Location: [%s, %s, %s] in World: %s", marker.getLocation().getX(), marker.getLocation().getY(), marker.getLocation().getZ(), marker.getWorld().getName()));
+				return;
+			}
+			ItemDiscovery.ItemDiscoveryTier tier = ItemDiscovery.ItemDiscoveryTier.valueOf(nbtData.mTier);
 
-			String lootString = container.getString("loot");
+			String lootString = nbtData.mLoot;
 			NamespacedKey lootKey = null;
 			if (lootString != null && lootString.contains(":")) {
 				String[] split = lootString.split(":", 2);
@@ -190,7 +222,7 @@ public class DiscoveryManager implements Listener {
 				return;
 			}
 
-			String functionString = container.getString("function");
+			String functionString = nbtData.mFunction;
 			NamespacedKey functionKey = null;
 			if (functionString != null && functionString.contains(":")) {
 				String[] split = functionString.split(":", 2);
@@ -427,10 +459,17 @@ public class DiscoveryManager implements Listener {
 	}
 
 	// attempt to update the matching entry in the json list
-	// should be executed async
+	// will not wait for data to be stored
 	private static void updateJsonList(ItemDiscovery discovery) {
 		String uuid = discovery.mMarkerUUID.toString();
-		RedisAPI.getInstance().async().hset(getRedisStorageKey(), uuid, discovery.toJson().toString()).toCompletableFuture().join();
+		RedisAPI.getInstance().async().hset(getRedisStorageKey(), uuid, discovery.toJson().toString())
+			.whenComplete((unusedResult, ex) -> {
+				if (ex != null) {
+					Plugin.getInstance().getLogger().severe("Failed to store discovery updateJsonList: " + ex.getMessage());
+					ex.printStackTrace();
+				}
+			}
+		);
 	}
 
 	// returns whether the provided discovery was updated

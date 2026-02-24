@@ -9,8 +9,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.StringUtils;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTEntity;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -171,12 +171,13 @@ public class ItemDiscovery {
 			throw new IllegalArgumentException("No marker entity was found");
 		}
 
-		NBTEntity entity = new NBTEntity(markerEntity);
-		NBTCompound container = entity.getPersistentDataContainer().getOrCreateCompound("discovery");
-		container.setInteger("id", mId);
-		container.setString("tier", mTier.name());
-		container.setString("loot", mLootTablePath.getNamespace() + ":" + mLootTablePath.getKey());
-		container.setString("function", mOptionalFunctionPath == null ? "" : (mOptionalFunctionPath.getNamespace() + ":" + mOptionalFunctionPath.getKey()));
+		NBT.modifyPersistentData(markerEntity, nbt -> {
+			ReadWriteNBT container = nbt.getOrCreateCompound("discovery");
+			container.setInteger("id", mId);
+			container.setString("tier", mTier.name());
+			container.setString("loot", mLootTablePath.getNamespace() + ":" + mLootTablePath.getKey());
+			container.setString("function", mOptionalFunctionPath == null ? "" : (mOptionalFunctionPath.getNamespace() + ":" + mOptionalFunctionPath.getKey()));
+		});
 	}
 
 	public JsonObject toJson() {
