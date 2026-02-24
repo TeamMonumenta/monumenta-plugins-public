@@ -20,6 +20,7 @@ public class Stuck {
 
 	public static final Set<String> ALLOWED_SHARDS = Set.of(
 		"dev1",
+		"playerplots",
 		"plots",
 		"guildplots"
 	);
