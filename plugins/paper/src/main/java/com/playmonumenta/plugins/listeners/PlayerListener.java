@@ -337,7 +337,7 @@ public class PlayerListener implements Listener {
 		mPlugin.mAbilityManager.playerSaveEvent(player, event);
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void playerChangeWorldEvent(PlayerChangedWorldEvent event) {
 		Player player = event.getPlayer();
 
@@ -347,7 +347,7 @@ public class PlayerListener implements Listener {
 		PortalManager.clearAllPortals(player);
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		if (event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) {
 			return;
@@ -618,7 +618,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void playerInteractEntityEventWithCancelled(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof Allay) {
 			event.setCancelled(true);
@@ -2094,17 +2094,17 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void playerServerTransferEvent(PlayerServerTransferEvent event) {
 		mTransferringPlayers.add(event.getPlayer().getUniqueId());
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void playerTransferFailEvent(PlayerTransferFailEvent event) {
 		mTransferringPlayers.remove(event.getPlayer().getUniqueId());
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void playerFinishedTransferring(PlayerQuitEvent event) {
 		mTransferringPlayers.remove(event.getPlayer().getUniqueId());
 	}
