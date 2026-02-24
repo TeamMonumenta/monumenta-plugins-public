@@ -26,11 +26,13 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
-import de.tr7zw.nbtapi.NBTEntity;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Function;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -243,8 +245,7 @@ public class GraveListener implements Listener {
 			} else {
 				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 					if (entity.isValid()) {
-						NBTEntity nbte = new NBTEntity(entity);
-						if (nbte.getShort("Age") < 11999) {
+						if (NBT.get(entity, (Function<ReadableNBT, Short>) nbt -> nbt.getShort("Age")) < 11999) {
 							GraveManager.onDropItem(player, entity);
 						}
 					}

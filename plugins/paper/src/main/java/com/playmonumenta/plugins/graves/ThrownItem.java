@@ -5,9 +5,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTEntity;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -66,7 +68,7 @@ public class ThrownItem {
 		mShardName = ServerProperties.getShardName();
 		mLocation = entity.getLocation().clone();
 		mVelocity = entity.getVelocity().clone();
-		mAge = new NBTEntity(entity).getShort("Age");
+		mAge = NBT.get(entity, (Function<ReadableNBT, Short>) nbt -> nbt.getShort("Age"));
 		mValid = true;
 		// Item dropping for first time, make immune to explosions for 5 seconds.
 		// This prevents shattering due to double-creepers and TNT traps.
@@ -103,8 +105,7 @@ public class ThrownItem {
 			mEntity.setCanMobPickup(false);
 			mEntity.setPickupDelay(0);
 			mEntity.setThrower(mPlayer.getUniqueId());
-			NBTEntity nbt = new NBTEntity(mEntity);
-			nbt.setShort("Age", mAge);
+			NBT.modify(mEntity, (Consumer<ReadWriteNBT>) nbt -> nbt.setShort("Age", mAge));
 			mManager.addItem(mEntity, this);
 			mManager.removeUnloadedItem(Chunk.getChunkKey(mLocation), this);
 			startTracking();
@@ -213,7 +214,7 @@ public class ThrownItem {
 			if (mEntity.isValid()) {
 				mLocation = mEntity.getLocation();
 				mVelocity = mEntity.getVelocity();
-				mAge = new NBTEntity(mEntity).getShort(KEY_AGE);
+				mAge = NBT.get(mEntity, (Function<ReadableNBT, Short>) nbt -> nbt.getShort(KEY_AGE));
 			} else {
 				delete();
 			}
@@ -227,7 +228,7 @@ public class ThrownItem {
 		Location location = null;
 		Vector velocity = null;
 		if (data.has(KEY_NBT) && data.get(KEY_NBT).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_NBT).isString()) {
-			item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_NBT).getAsString()));
+			item = NBT.itemStackFromNBT(NBT.parseNBT(data.getAsJsonPrimitive(KEY_NBT).getAsString()));
 		}
 		if (item == null || ItemUtils.isNullOrAir(item)) { // item replacements deleted this item, or bad data
 			return null;
@@ -265,7 +266,7 @@ public class ThrownItem {
 			return null;
 		}
 		JsonObject data = new JsonObject();
-		data.addProperty(KEY_NBT, NBTItem.convertItemtoNBT(mItem).toString());
+		data.addProperty(KEY_NBT, NBT.itemStackToNBT(mItem).toString());
 		data.addProperty(KEY_SHARD, mShardName);
 		data.addProperty(KEY_AGE, mAge);
 

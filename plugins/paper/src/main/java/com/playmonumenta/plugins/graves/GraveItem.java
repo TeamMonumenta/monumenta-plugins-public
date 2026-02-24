@@ -2,8 +2,7 @@ package com.playmonumenta.plugins.graves;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +32,7 @@ public class GraveItem {
 	static @Nullable GraveItem deserialize(JsonObject data) {
 		ItemStack item = null;
 		if (data.has(KEY_NBT) && data.get(KEY_NBT).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_NBT).isString()) {
-			item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_NBT).getAsString()));
+			item = NBT.itemStackFromNBT(NBT.parseNBT(data.getAsJsonPrimitive(KEY_NBT).getAsString()));
 			if (ItemUtils.isNullOrAir(item)) { // item replacements deleted this item
 				return null;
 			}
@@ -53,7 +52,7 @@ public class GraveItem {
 
 	JsonObject serialize() {
 		JsonObject data = new JsonObject();
-		data.addProperty(KEY_NBT, NBTItem.convertItemtoNBT(mItem).toString());
+		data.addProperty(KEY_NBT, NBT.itemStackToNBT(mItem).toString());
 		return data;
 	}
 }

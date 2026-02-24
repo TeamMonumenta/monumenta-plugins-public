@@ -25,8 +25,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
@@ -624,7 +623,7 @@ public final class Grave {
 			JsonObject equipmentData = data.getAsJsonObject(KEY_EQUIPMENT);
 			for (String key : KEYS_EQUIPMENT_PARTS) {
 				if (equipmentData.has(key) && equipmentData.get(key).isJsonPrimitive() && equipmentData.getAsJsonPrimitive(key).isString()) {
-					equipment.put(key, NBTItem.convertNBTtoItem(new NBTContainer(equipmentData.getAsJsonPrimitive(key).getAsString())));
+					equipment.put(key, NBT.itemStackFromNBT(NBT.parseNBT(equipmentData.getAsJsonPrimitive(key).getAsString())));
 				}
 			}
 		}
@@ -677,7 +676,7 @@ public final class Grave {
 			JsonObject equipment = new JsonObject();
 			for (String key : KEYS_EQUIPMENT_PARTS) {
 				ItemStack item = mEquipment.get(key);
-				equipment.addProperty(key, item == null || item.getType() == Material.AIR ? null : NBTItem.convertItemtoNBT(item).toString());
+				equipment.addProperty(key, item == null || item.getType() == Material.AIR ? null : NBT.itemStackToNBT(item).toString());
 			}
 			data.add(KEY_EQUIPMENT, equipment);
 		}

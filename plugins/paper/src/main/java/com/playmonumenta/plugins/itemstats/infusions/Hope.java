@@ -6,7 +6,9 @@ import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import de.tr7zw.nbtapi.NBTEntity;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import java.util.function.Consumer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
@@ -33,8 +35,7 @@ public class Hope implements Infusion {
 	public void onSpawn(Plugin plugin, Item item, double value) {
 		// Do not set the age if DeathSort has set the age to despawn next tick
 		if (!item.getScoreboardTags().contains(NO_AGE_CHANGE_TAG)) {
-			NBTEntity nbt = new NBTEntity(item);
-			nbt.setShort("Age", (short) (-1 * EXTRA_MINUTES_PER_LEVEL * Constants.TICKS_PER_MINUTE * value));
+			NBT.modify(item, (Consumer<ReadWriteNBT>) nbt -> nbt.setShort("Age", (short) (-1 * EXTRA_MINUTES_PER_LEVEL * Constants.TICKS_PER_MINUTE * value)));
 		}
 
 		new BukkitRunnable() {
