@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.hunts.bosses.AlocAcoc;
 import com.playmonumenta.plugins.hunts.bosses.CoreElemental;
 import com.playmonumenta.plugins.hunts.bosses.ExperimentSeventyOne;
+import com.playmonumenta.plugins.hunts.bosses.SporousAmalgam;
 import com.playmonumenta.plugins.hunts.bosses.SteelWingHawk;
 import com.playmonumenta.plugins.hunts.bosses.TheImpenetrable;
 import com.playmonumenta.plugins.hunts.bosses.Uamiel;
@@ -121,6 +122,11 @@ public class HuntsManager implements Listener {
 			"Experiment Seventy-One", "ExperimentSeventyOne", ExperimentSeventyOne.identityTag,
 			new Vector(-351, 174, 271), new Vector(-382, 172, 241), ExperimentSeventyOne.INNER_RADIUS,
 			ExperimentSeventyOne.TEXT_COLOR, Sound.ENTITY_HOGLIN_ANGRY, "Sloshing can be heard from the mud patch. Experiment Seventy-One is looking to make a mess."
+		),
+		SPOROUS_AMALGAM(
+			"Sporous Amalgam", "SporousAmalgam", SporousAmalgam.identityTag,
+			new Vector(-494.5, 41, -453.5), new Vector(-528, 40, -487), SporousAmalgam.INNER_RADIUS,
+			SporousAmalgam.TEXT_COLOR, Sound.ENTITY_WITCH_DRINK, "Spores are gathering near the heart of the Wolfswood. The Sporous Amalgam is forming."
 		);
 
 		private final String mName;
@@ -190,7 +196,7 @@ public class HuntsManager implements Listener {
 				// Special case - TheImpenetrable los summons an armor stand that the boss rides on
 				if (this == THE_IMPENETRABLE) {
 					List<Entity> passengers = quarry.getPassengers();
-					if (!passengers.isEmpty() && passengers.get(0) instanceof Shulker shulker) {
+					if (!passengers.isEmpty() && passengers.getFirst() instanceof Shulker shulker) {
 						quarry = shulker;
 					}
 				}
@@ -448,7 +454,7 @@ public class HuntsManager implements Listener {
 
 	private CompletableFuture<Long> setRandomQuarry() {
 		List<QuarryType> quarries = Arrays.stream(QuarryType.values()).filter(q -> q != mNextQuarry).toList();
-		return setQuarry(FastUtils.getRandomElement(quarries));
+		return (mNextQuarry == QuarryType.SPOROUS_AMALGAM) ? setQuarry(FastUtils.getRandomElement(quarries)) : setQuarry(QuarryType.SPOROUS_AMALGAM);
 	}
 
 	@SuppressWarnings("EnumOrdinal")
@@ -571,6 +577,7 @@ public class HuntsManager implements Listener {
 			case ALOC_ACOC -> Particle.SNOWFLAKE;
 			case CORE_ELEMENTAL -> Particle.FLAME;
 			case STEEL_WING_HAWK -> Particle.FIREWORKS_SPARK;
+			case SPOROUS_AMALGAM -> Particle.WARPED_SPORE;
 		};
 
 		Location center = quarryType.getLocation(mWorld);
@@ -775,7 +782,7 @@ public class HuntsManager implements Listener {
 								if (guildPlayers.isEmpty()) {
 									break;
 								}
-								guildPlayers.remove(0);
+								guildPlayers.removeFirst();
 								lockedPlayers++;
 							}
 						}

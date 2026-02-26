@@ -140,6 +140,7 @@ public enum EnchantmentType {
 	RELIC(new Relic(), false, false, false, false),
 	OUTRAGE(new Outrage(), true, false, false, false),
 	RETALIATION(new Retaliation(), false, false, false, false),
+	DEFIANCE(new Defiance(), true, false, false, false),
 
 	// Curses
 	CURSE_OF_ANEMIA(new CurseOfAnemia(), true, true, false, false),
@@ -165,6 +166,7 @@ public enum EnchantmentType {
 	AILMENT_FRAGILITY(new AilmentFragility(), true, true, false, false),
 	CUMBERSOME(new Cumbersome(), false, true, false, false),
 	OVERSIZED(new Oversized(), false, true, false, false),
+	CURSE_OF_PESTILENCE(new CurseOfPestilence(), true, true, false, false),
 
 	// Cosmetic Item Enchants
 	BAAING(new Baaing(), false, true, true, false),

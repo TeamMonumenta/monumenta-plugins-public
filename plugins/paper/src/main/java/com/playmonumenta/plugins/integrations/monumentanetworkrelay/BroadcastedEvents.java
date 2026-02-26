@@ -604,6 +604,7 @@ public class BroadcastedEvents implements Listener {
 		THE_IMPENETRABLE(HuntsManager.QuarryType.THE_IMPENETRABLE),
 		UAMIEL(HuntsManager.QuarryType.UAMIEL),
 		EXPERIMENT_SEVENTY_ONE(HuntsManager.QuarryType.EXPERIMENT_SEVENTY_ONE),
+		SPOROUS_AMALGAM(HuntsManager.QuarryType.SPOROUS_AMALGAM),
 		UNKNOWN("Unknown", null, true);
 
 		public final String mDisplayName;

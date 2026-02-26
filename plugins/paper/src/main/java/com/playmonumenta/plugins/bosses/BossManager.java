@@ -87,6 +87,7 @@ import com.playmonumenta.plugins.gallery.bosses.GallerySummonMobBoss;
 import com.playmonumenta.plugins.hunts.bosses.AlocAcoc;
 import com.playmonumenta.plugins.hunts.bosses.CoreElemental;
 import com.playmonumenta.plugins.hunts.bosses.ExperimentSeventyOne;
+import com.playmonumenta.plugins.hunts.bosses.SporousAmalgam;
 import com.playmonumenta.plugins.hunts.bosses.SteelWingHawk;
 import com.playmonumenta.plugins.hunts.bosses.TheImpenetrable;
 import com.playmonumenta.plugins.hunts.bosses.Uamiel;
@@ -433,6 +434,9 @@ public class BossManager implements Listener {
 		registerStatelessBoss(EruptionBoss.identityTag, EruptionBoss::new, new EruptionBoss.Parameters());
 		registerStatelessBoss(PhalanxBoss.identityTag, PhalanxBoss::new, new PhalanxBoss.Parameters());
 		registerStatelessBoss(BurrowBoss.identityTag, BurrowBoss::new, new BurrowBoss.Parameters());
+		registerStatelessBoss(PlayerHallucinationBoss.identityTag, PlayerHallucinationBoss::new);
+		registerStatelessBoss(CustomGlowingBoss.identityTag, CustomGlowingBoss::new, new CustomGlowingBoss.Parameters());
+		registerStatelessBoss(SoulLinkBoss.identityTag, SoulLinkBoss::new, new SoulLinkBoss.Parameters());
 		registerStatelessBoss(DisplayBoss.identityTag, DisplayBoss::new, new DisplayBoss.Parameters());
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -485,6 +489,7 @@ public class BossManager implements Listener {
 		registerStatefulBoss(SteelWingHawk.identityTag, SteelWingHawk::new);
 		registerStatefulBoss(TheImpenetrable.identityTag, TheImpenetrable::new);
 		registerStatefulBoss(Uamiel.identityTag, Uamiel::new);
+		registerStatefulBoss(SporousAmalgam.identityTag, SporousAmalgam::new);
 		registerStatefulBoss(ExperimentSeventyOne.identityTag, ExperimentSeventyOne::new);
 		registerStatefulBoss(IntruderBoss.identityTag, IntruderBoss::new);
 	}

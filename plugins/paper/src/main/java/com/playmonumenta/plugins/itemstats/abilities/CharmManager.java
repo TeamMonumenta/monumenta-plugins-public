@@ -568,6 +568,8 @@ public class CharmManager {
 			EscapeDeath.CHARM_HUNT_RADIUS,
 			EscapeDeath.CHARM_ELITE_HEALING,
 			EscapeDeath.CHARM_ELITE_HUNT_DURATION,
+			EscapeDeath.CHARM_HEALING,
+			EscapeDeath.CHARM_REGENERATION_DURATION,
 			Skirmisher.CHARM_DAMAGE,
 			Skirmisher.CHARM_RADIUS,
 			Skirmisher.CHARM_TARGETS,
