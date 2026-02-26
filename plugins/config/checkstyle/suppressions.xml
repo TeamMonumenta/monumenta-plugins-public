@@ -8,6 +8,9 @@
 	<suppress files=".*[\\/]VersionAdapter_.*java"
 			  checks="TypeName"
 			  message=".*Type name.*must match pattern.*"/>
+	<suppress files=".*[\\/][A-Za-z]*CustomBrains.java"
+			  checks="MemberName"
+			  message=".*Member name.*must match pattern.*"/>
 	<suppress files=".*[\\/][A-Za-z]*ClientModHandler.java"
 			  checks="MemberName"
 			  message=".*Member name.*must match pattern.*"/>
