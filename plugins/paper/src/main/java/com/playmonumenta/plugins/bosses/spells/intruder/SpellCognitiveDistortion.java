@@ -4,11 +4,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.intruder.IntruderBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.DamageImmunity;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SingleArgumentEffect;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
@@ -38,6 +39,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -117,7 +119,7 @@ public class SpellCognitiveDistortion extends Spell {
 							for (int r = 1; r <= 3; r++) {
 								LivingEntity summon = (LivingEntity) Objects.requireNonNull(LibraryOfSoulsIntegration.summon(mShiftedLoc.clone().add(VectorUtils.rotateYAxis(new Vector(r * 8, 0, 0), d)), "LiminalShadow"));
 								if (!solo) {
-									EffectManager.getInstance().addEffect(summon, "CognitiveDistortionAlone", new PercentSpeed(15 * 20, 0.2, "CognitiveDistortionAlone"));
+									mPlugin.mEffectManager.addEffect(summon, "CognitiveDistortionAlone", new PercentSpeed(15 * 20, 0.2, "CognitiveDistortionAlone"));
 								}
 							}
 						}
@@ -168,19 +170,19 @@ public class SpellCognitiveDistortion extends Spell {
 		IntruderBoss.playersInRange(mBoss.getLocation()).forEach(player -> {
 			double previousPower = 0;
 			// Use weakness source as a basis for additional debuff
-			if (EffectManager.getInstance().hasEffect(player, WEAKNESS_SOURCE)) {
-				previousPower = Objects.requireNonNull(EffectManager.getInstance().getEffects(player, WEAKNESS_SOURCE)).stream()
+			if (mPlugin.mEffectManager.hasEffect(player, WEAKNESS_SOURCE)) {
+				previousPower = Objects.requireNonNull(mPlugin.mEffectManager.getEffects(player, WEAKNESS_SOURCE)).stream()
 					.filter(effect -> effect instanceof SingleArgumentEffect)
 					.reduce(0.0, (d, effect) -> d + effect.getMagnitude(), Double::sum);
 			}
 
-			EffectManager.getInstance().clearEffects(player, WEAKNESS_SOURCE);
-			EffectManager.getInstance().clearEffects(player, ANTI_HEAL_SOURCE);
-			EffectManager.getInstance().clearEffects(player, SLOWNESS_SOURCE);
+			mPlugin.mEffectManager.clearEffects(player, WEAKNESS_SOURCE);
+			mPlugin.mEffectManager.clearEffects(player, ANTI_HEAL_SOURCE);
+			mPlugin.mEffectManager.clearEffects(player, SLOWNESS_SOURCE);
 
-			EffectManager.getInstance().addEffect(player, WEAKNESS_SOURCE, new PercentDamageDealt(DEBUFF_DURATION, -0.1 - previousPower).deleteOnLogout(true));
-			EffectManager.getInstance().addEffect(player, ANTI_HEAL_SOURCE, new PercentHeal(DEBUFF_DURATION, -0.1 - previousPower).deleteOnLogout(true));
-			EffectManager.getInstance().addEffect(player, SLOWNESS_SOURCE, new PercentSpeed(DEBUFF_DURATION, -0.1 - previousPower, SLOWNESS_SOURCE).deleteOnLogout(true));
+			mPlugin.mEffectManager.addEffect(player, WEAKNESS_SOURCE, new PercentDamageDealt(DEBUFF_DURATION, -0.1 - previousPower).deleteOnLogout(true));
+			mPlugin.mEffectManager.addEffect(player, ANTI_HEAL_SOURCE, new PercentHeal(DEBUFF_DURATION, -0.1 - previousPower).deleteOnLogout(true));
+			mPlugin.mEffectManager.addEffect(player, SLOWNESS_SOURCE, new PercentSpeed(DEBUFF_DURATION, -0.1 - previousPower, SLOWNESS_SOURCE).deleteOnLogout(true));
 		});
 		finishSpell();
 	}
@@ -188,7 +190,7 @@ public class SpellCognitiveDistortion extends Spell {
 	private void spreadPlayers() {
 		Vector offset = VectorUtils.randomHorizontalUnitVector().multiply(FastUtils.randomDoubleInRange(SPREAD_RANGE / 2, SPREAD_RANGE));
 		for (Player player : mPlayers) {
-			player.teleport(mShiftedLoc.clone().add(offset));
+			player.teleport(mShiftedLoc.clone().add(offset), PlayerTeleportEvent.TeleportCause.UNKNOWN);
 			offset.rotateAroundY(FastUtils.randomDoubleInRange(Math.PI / 2, 3 * Math.PI / 2));
 			player.playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 0.6f, 1.1f);
 		}
@@ -318,8 +320,11 @@ public class SpellCognitiveDistortion extends Spell {
 			player.stopSound(Sound.AMBIENT_CRIMSON_FOREST_LOOP);
 			player.stopSound(Sound.AMBIENT_WARPED_FOREST_LOOP);
 			player.stopSound(Sound.AMBIENT_SOUL_SAND_VALLEY_LOOP);
-			player.teleport(mPlayerPreviousLocation.get(player));
+			
+			player.teleport(mPlayerPreviousLocation.get(player), PlayerTeleportEvent.TeleportCause.UNKNOWN);
+			
 			player.removePotionEffect(PotionEffectType.DARKNESS);
+			mPlugin.mEffectManager.addEffect(player, "CognitiveDistortionImmunity", new DamageImmunity(20, DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes()));
 		});
 		mChargeUpManager.remove();
 		mPreviousGlowingEffect.forEach(LivingEntity::addPotionEffect);
@@ -336,8 +341,9 @@ public class SpellCognitiveDistortion extends Spell {
 		if (isRunning() && mPlayers.contains(player)) {
 			event.setCancelled(true);
 			mPlayers.remove(player);
+
 			player.setHealth(EntityUtils.getMaxHealth(player));
-			player.teleport(mPlayerPreviousLocation.get(player));
+			player.teleport(mPlayerPreviousLocation.get(player), PlayerTeleportEvent.TeleportCause.UNKNOWN);
 			if (mPlayers.isEmpty()) {
 				failMechanic();
 				cancel();

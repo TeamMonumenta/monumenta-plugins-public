@@ -112,7 +112,7 @@ public class SpellParasomnicMist extends Spell {
 					}
 				} else {
 					if (mChargeUpManager.nextTick(1)) {
-						mChargeUpManager.setTitle(Component.text("Unleashing  ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
+						mChargeUpManager.setTitle(Component.text("Unleashing ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
 						mChargeUpManager.setColor(BossBar.Color.RED);
 						mChargeUpManager.setTime(DURATION);
 						mChargeUpManager.setChargeTime(DURATION);

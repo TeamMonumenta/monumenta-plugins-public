@@ -82,7 +82,7 @@ public class SpellSinkingNightmares extends Spell {
 					if (mChargeUpManager.nextTick()) {
 						mChargeUpManager.setTime(DURATION);
 						mChargeUpManager.setChargeTime(DURATION);
-						mChargeUpManager.setTitle(Component.text("Unleashing  ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
+						mChargeUpManager.setTitle(Component.text("Unleashing ", NamedTextColor.DARK_RED).append(Component.text(SPELL_NAME, NamedTextColor.RED)));
 						mStarted = true;
 					}
 				} else {
