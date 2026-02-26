@@ -40,7 +40,7 @@ final class SoundOptionsPage extends PebPage {
 			Material.ENDER_PEARL,
 			"Teleporter Cutoffs",
 			"Click to toggle if teleporters will stop the currently playing song."
-		).toggle(
+		).invertedToggle(
 			"Stop current song: ",
 			ReactiveValue.binaryScoreboard(mGui, "MusicStopResetTpToggle", true)
 		).set(2, 4);

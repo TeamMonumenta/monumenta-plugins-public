@@ -69,7 +69,8 @@ final class TradeGuiPage extends PebPage {
 		).toggle(
 			"Trade organization: ",
 			ReactiveValue.binaryScoreboard(mGui, CustomTradeGui.TRADEORG, false),
-			"<white>split by type", "<white>display together"
+			"<white>display together",
+			"<white>split by type"
 		).set(2, 7);
 
 		entry(

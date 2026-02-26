@@ -8,7 +8,7 @@ final class ServerInfoPage extends PebPage {
 	private static final String VERSION = Plugin.getInstance().getPluginMeta().getVersion();
 
 	ServerInfoPage(PebGui gui) {
-		super(gui, Material.DISPENSER, "Sound Categories", "Use the options below to choose settings for certain categories of music.");
+		super(gui, Material.DISPENSER, "Server Information", "Server information");
 	}
 
 	@Override
