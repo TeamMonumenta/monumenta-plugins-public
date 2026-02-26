@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.entity.Item;
@@ -23,6 +24,15 @@ public class Heartwarming implements Infusion {
 	@Override
 	public void onBlockDropItem(Plugin plugin, Player player, double value, BlockDropItemEvent event) {
 		if (player.isSneaking()) {
+			return;
+		}
+
+		// This method gets called with the combined infusion value of all slots,
+		// however Heartwarming should only affect items in your main hand
+		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager
+			.getPlayerItemStatsMappings()
+			.get(player.getUniqueId());
+		if (playerItemStats == null || playerItemStats.getMainhandAddStats().get(this) <= 0) {
 			return;
 		}
 
