@@ -68,48 +68,48 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Changes the type of block the mob uses. Invalid options default to polished blackstone bricks.")
-		public Material block = Material.POLISHED_BLACKSTONE_BRICKS;
+		public Material BLOCK = Material.POLISHED_BLACKSTONE_BRICKS;
 
 		@BossParam(help = "Change the sound of the block being placed.")
-		public SoundsList sound_place = SoundsList.builder()
+		public SoundsList SOUND_PLACE = SoundsList.builder()
 			.add(new SoundsList.CSound(Sound.BLOCK_NETHER_BRICKS_PLACE, 1f, 0.6f))
 			.build();
 
 		@BossParam(help = "Whether the mob places blocks beneath it when freefalling below the player.")
-		public boolean loom_floor = true;
+		public boolean LOOM_FLOOR = true;
 
 		@BossParam(help = "Downwards velocity that the mob has to fall at before placing a block underneath it. Positive values are downwards.")
-		public double fall_velocity = 1;
+		public double FALL_VELOCITY = 1;
 
-		@BossParam(help = "Distance below the target player before the mob's loom floor behaviour becomes more aggressive. Set arbitrarily high (>5000) to disable. Will not work if loom_floor is false.")
-		public int aggressive_loom_height = 15;
+		@BossParam(help = "Distance below the target player before the mob's loom floor behaviour becomes more aggressive. Set arbitrarily high (>5000) to disable. Will not work if LOOM_FLOOR is false.")
+		public int AGGRESSIVE_LOOM_HEIGHT = 15;
 
 		@BossParam(help = "Downwards velocity that the mob has to fall at before placing a block underneath it, under aggressive looming. Positive values are downwards.")
-		public double aggressive_fall_velocity = 0.2;
+		public double AGGRESSIVE_FALL_VELOCITY = 0.2;
 
 		@BossParam(help = "Whether the boss attempts to escape liquids.")
-		public boolean hydrophobic = true;
+		public boolean HYDROPHOBIC = true;
 
 		@BossParam(help = "How long the boss waits (in ticks) before it force-swims out to escape liquids.")
-		public int hydrophobic_swimming_ticks = TICKS_PER_SECOND;
+		public int HYDROPHOBIC_SWIMMING_TICKS = TICKS_PER_SECOND;
 
 		@BossParam(help = "How long the boss waits (in ticks) before it teleports out to escape liquids.")
-		public int hydrophobic_teleportation_ticks = 5 * TICKS_PER_SECOND;
+		public int HYDROPHOBIC_TELEPORTATION_TICKS = 5 * TICKS_PER_SECOND;
 
 		@BossParam(help = "Speed at which the boss flings itself out of water.")
-		public double hydrophobic_swimming_speed = 1.0;
+		public double HYDROPHOBIC_SWIMMING_SPEED = 1.0;
 
 		@BossParam(help = "Time (in ticks) that the boss remains stationary, before the boss attempts to break blocks around itself to escape.")
-		public int low_movement_ticks = TICKS_PER_SECOND;
+		public int LOW_MOVEMENT_TICKS = TICKS_PER_SECOND;
 
 		@BossParam(help = "Time (in ticks) that the boss remains stationary, before the boss aggressively attempts to break blocks around itself to escape.")
-		public int aggressive_low_movement_ticks = 4 * TICKS_PER_SECOND;
+		public int AGGRESSIVE_LOW_MOVEMENT_TICKS = 4 * TICKS_PER_SECOND;
 
 		@BossParam(help = "Whether the boss plays a nice musical chord when using its Loom floor or not.")
-		public boolean musical_loom = true;
+		public boolean MUSICAL_LOOM = true;
 
-		@BossParam(help = "The sound effect that bosses use when they use their Loom, if musical_loom is true.")
-		public Sound loom_sound = Sound.BLOCK_AMETHYST_CLUSTER_HIT;
+		@BossParam(help = "The sound effect that bosses use when they use their Loom, if MUSICAL_LOOM is true.")
+		public Sound LOOM_SOUND = Sound.BLOCK_AMETHYST_CLUSTER_HIT;
 	}
 
 	public BlockPlacerBoss(final Plugin plugin, final LivingEntity boss) {
@@ -119,9 +119,9 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 		final SpellBlockBreak blockBreakToTarget = new SpellBlockBreak(mBoss, true, false, true);
 
 		// Prevent blocks that shouldn't be used for placing
-		if (!mParameters.block.isBlock() || !mParameters.block.isSolid() ||
-			BlockUtils.isValuableBlock(mParameters.block) || BlockUtils.isMechanicalBlock(mParameters.block) || mParameters.block.equals(Material.BEACON)) {
-			mParameters.block = Material.POLISHED_BLACKSTONE_BRICKS;
+		if (!mParameters.BLOCK.isBlock() || !mParameters.BLOCK.isSolid() ||
+			BlockUtils.isValuableBlock(mParameters.BLOCK) || BlockUtils.isMechanicalBlock(mParameters.BLOCK) || mParameters.BLOCK.equals(Material.BEACON)) {
+			mParameters.BLOCK = Material.POLISHED_BLACKSTONE_BRICKS;
 		}
 
 		final List<Spell> spells = List.of(
@@ -137,12 +137,12 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 					final LivingEntity target = mMob.getTarget();
 					final List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), NEW_TARGET_RANGE, false);
 
-					if (mParameters.hydrophobic
+					if (mParameters.HYDROPHOBIC
 						&& ((mBoss.isInWater() && !(target != null && target.isInWater()))
 						|| (mBoss.isInLava() && !(target != null && target.isInLava())))) {
 						mSubmergedTicks += 5;
 
-						if (mSubmergedTicks >= mParameters.hydrophobic_teleportation_ticks) {
+						if (mSubmergedTicks >= mParameters.HYDROPHOBIC_TELEPORTATION_TICKS) {
 							// This part of the code has to be here, so that it attempts to escape even if not targeting anything
 							Location nearestDryLoc = LocationUtils.getNearestDryBlock(mBoss.getLocation(), 25);
 							if (nearestDryLoc != null && LocationUtils.hasLineOfSight(mBoss.getLocation(), nearestDryLoc)) {
@@ -165,12 +165,12 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 								mLowMovementTicks = 0;
 								attemptLoom(1);
 							}
-						} else if (mSubmergedTicks >= mParameters.hydrophobic_swimming_ticks) {
+						} else if (mSubmergedTicks >= mParameters.HYDROPHOBIC_SWIMMING_TICKS) {
 							// Figure out where to launch towards.
 							Location nearestDryLoc = LocationUtils.getNearestDryBlock(mBoss.getLocation(), 15, true);
 							if (nearestDryLoc != null && LocationUtils.hasLineOfSight(mBoss.getLocation(), nearestDryLoc)) {
 								Vector vector = nearestDryLoc.clone().subtract(mBoss.getLocation()).toVector();
-								mBoss.setVelocity(vector.normalize().multiply(mParameters.hydrophobic_swimming_speed));
+								mBoss.setVelocity(vector.normalize().multiply(mParameters.HYDROPHOBIC_SWIMMING_SPEED));
 								mBoss.setFrictionState(TriState.FALSE);
 								if (mHydrophobicLaunchRunnable == null) {
 									mHydrophobicLaunchRunnable = new BukkitRunnable() {
@@ -199,7 +199,7 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 																mHydrophobicLoomRunnable = null;
 															} else if (!mBoss.isInWater()
 																&& !mBoss.isInLava()
-																&& mBoss.getVelocity().getY() < -mParameters.aggressive_fall_velocity) {
+																&& mBoss.getVelocity().getY() < -mParameters.AGGRESSIVE_FALL_VELOCITY) {
 																// Then, when the boss next is freefalling, Loom underneath it to catch itself so that it can bridge out towards the target
 																mBoss.setVelocity(mBoss.getVelocity().normalize().multiply(0.1));
 																attemptLoom(1, true);
@@ -260,12 +260,12 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 					}
 
 					mLastLocation = bossLoc;
-					if (mLowMovementTicks >= mParameters.low_movement_ticks) {
+					if (mLowMovementTicks >= mParameters.LOW_MOVEMENT_TICKS) {
 						/* Launcher likely can't navigate to the target's loc */
 						blockBreakToTarget.tryToBreakBlocks(SpellBlockBreak.DEFAULT_REQUIRED_SCORE / 2);
 					}
 					final Vector bossToPlayerVec = targetLoc.clone().subtract(bossLoc).toVector();
-					if (mLowMovementTicks >= mParameters.aggressive_low_movement_ticks
+					if (mLowMovementTicks >= mParameters.AGGRESSIVE_LOW_MOVEMENT_TICKS
 						|| (bossToPlayerVec.getY() < 0
 						&& bossToPlayerVec.getY() > -PREVENT_PLACING_HEIGHT
 						&& Math.abs(bossToPlayerVec.getX()) < 1
@@ -273,16 +273,16 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 						/* Launcher likely boxed itself inside a cage and needs to be rescued */
 						/* Or the launcher is directly above the player, and we want it to jump down and engage */
 						final List<Block> nearbyBridgeBlocks = BlockUtils.getBlocksInCube(bossLoc, 3);
-						nearbyBridgeBlocks.removeIf(block -> block.getType() != mParameters.block);
+						nearbyBridgeBlocks.removeIf(block -> block.getType() != mParameters.BLOCK);
 						blockBreakToTarget.breakBlocks(bossLoc, nearbyBridgeBlocks);
 						mLowMovementTicks = 0;
 						return;
 					}
 
 					/* Launcher is falling pretty fast and below the target */
-					if (mParameters.loom_floor
-						&& mBoss.getVelocity().getY() < -mParameters.aggressive_fall_velocity
-						&& mBoss.getY() < target.getY() - mParameters.aggressive_loom_height) {
+					if (mParameters.LOOM_FLOOR
+						&& mBoss.getVelocity().getY() < -mParameters.AGGRESSIVE_FALL_VELOCITY
+						&& mBoss.getY() < target.getY() - mParameters.AGGRESSIVE_LOOM_HEIGHT) {
 						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20, 7));
 						// it keeps FALLING OFF its loom
 						mBoss.teleport(mBoss.getLocation().toBlockLocation());
@@ -290,8 +290,8 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 						attemptLoom(1);
 					}
 
-					if (mParameters.loom_floor
-						&& (mBoss.getVelocity().getY() < -mParameters.fall_velocity
+					if (mParameters.LOOM_FLOOR
+						&& (mBoss.getVelocity().getY() < -mParameters.FALL_VELOCITY
 						&& mBoss.getY() < target.getY())) {
 						/* Downwards velocity of 1 corresponds to about 7 blocks of freefall */
 						mBoss.setVelocity(mBoss.getVelocity().clone().setY(0.1));
@@ -414,17 +414,17 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 			attemptPlace(loc, replaceLiquid);
 		}
 
-		if (mParameters.musical_loom) {
+		if (mParameters.MUSICAL_LOOM) {
 			World world = mBoss.getWorld();
-			world.playSound(mBoss.getLocation(), mParameters.loom_sound, SoundCategory.HOSTILE, 3.0f, Constants.Note.F4.mPitch);
+			world.playSound(mBoss.getLocation(), mParameters.LOOM_SOUND, SoundCategory.HOSTILE, 3.0f, Constants.Note.F4.mPitch);
 			Bukkit.getScheduler().runTaskLater(mPlugin,
-				() -> world.playSound(mBoss.getLocation(), mParameters.loom_sound, SoundCategory.HOSTILE, 2.8f, Constants.Note.A4.mPitch),
+				() -> world.playSound(mBoss.getLocation(), mParameters.LOOM_SOUND, SoundCategory.HOSTILE, 2.8f, Constants.Note.A4.mPitch),
 				3);
 			Bukkit.getScheduler().runTaskLater(mPlugin,
-				() -> world.playSound(mBoss.getLocation(), mParameters.loom_sound, SoundCategory.HOSTILE, 2.6f, Constants.Note.C5.mPitch),
+				() -> world.playSound(mBoss.getLocation(), mParameters.LOOM_SOUND, SoundCategory.HOSTILE, 2.6f, Constants.Note.C5.mPitch),
 				6);
 			Bukkit.getScheduler().runTaskLater(mPlugin,
-				() -> world.playSound(mBoss.getLocation(), mParameters.loom_sound, SoundCategory.HOSTILE, 2.8f, Constants.Note.F5.mPitch),
+				() -> world.playSound(mBoss.getLocation(), mParameters.LOOM_SOUND, SoundCategory.HOSTILE, 2.8f, Constants.Note.F5.mPitch),
 				9);
 		}
 	}
@@ -460,7 +460,7 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 			return;
 		}
 
-		block.setType(mParameters.block);
-		mParameters.sound_place.play(mBoss.getLocation());
+		block.setType(mParameters.BLOCK);
+		mParameters.SOUND_PLACE.play(mBoss.getLocation());
 	}
 }
