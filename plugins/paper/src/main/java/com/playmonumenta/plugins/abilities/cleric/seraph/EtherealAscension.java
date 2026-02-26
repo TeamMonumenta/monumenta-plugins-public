@@ -253,11 +253,11 @@ public class EtherealAscension extends Ability implements AbilityWithDuration {
 				ClientModHandler.updateAbility(mPlayer, EtherealAscension.this);
 				if (mPlayer.getGameMode() == GameMode.SPECTATOR || mPlayer.getGameMode() == GameMode.CREATIVE) {
 					mPlayer.setAllowFlight(true);
-					mPlayer.setFlySpeed(0.1f);
 				} else {
 					mPlayer.setAllowFlight(false);
 					mPlayer.setFlying(false);
 				}
+				mPlayer.setFlySpeed(0.1f);
 			}
 		};
 		cancelOnDeath(mAscendRunnable.runTaskTimer(mPlugin, 0, 1));
