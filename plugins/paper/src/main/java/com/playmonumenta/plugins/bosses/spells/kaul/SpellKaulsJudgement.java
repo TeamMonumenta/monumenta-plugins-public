@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.ArrayList;
@@ -183,8 +184,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 							new PartialParticle(Particle.SPELL_WITCH, pLoc.add(0, 1, 0), 60, 0, 0.4, 0, 1).spawnAsBoss();
 							new PartialParticle(Particle.SMOKE_LARGE, pLoc.add(0, 1, 0), 20, 0, 0.4, 0, 0.15).spawnAsBoss();
 
-							Location tpLoc = mTpLoc;
-							tpLoc.add(FastUtils.randomDoubleInRange(-6, 6), 0, FastUtils.randomDoubleInRange(-6, 6));
+							Location tpLoc = LocationUtils.randomLocationInCircle(mTpLoc, 6);
 							tpLoc.setYaw(tpLoc.getYaw() + FastUtils.randomFloatInRange(-30, 30));
 							tpLoc.setPitch(tpLoc.getPitch() + FastUtils.randomFloatInRange(-10, 10));
 							player.teleport(tpLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
@@ -288,8 +288,10 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		if (mJudgedPlayersAndOrigins.containsKey(player)) {
 			event.setCancelled(true);
 
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> fail(player), 1);
-			mJudgedPlayersAndOrigins.remove(player);
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				fail(player);
+				mJudgedPlayersAndOrigins.remove(player);
+			}, 1);
 		}
 	}
 
