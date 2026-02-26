@@ -88,15 +88,11 @@ public abstract class BossAbilityGroup {
 			phaseAction.accept(mBoss);
 		}
 		if (spellDelay > 0) {
-			if (mTaskActive != null) {
-				mTaskActive.cancel();
-				mTaskActive = getSpellCastRunnable();
-				mTaskActive.runTaskTimer(mPlugin, spellDelay, 2L);
-			}
+			mNextActiveTimer = Math.max(spellDelay, mNextActiveTimer);
 			if (mTaskPassive != null) {
 				mTaskPassive.cancel();
 				mTaskPassive = getPassiveSpellCastRunnable();
-				mTaskPassive.runTaskTimer(mPlugin, spellDelay, mPassiveIntervalTicks);
+				mTaskPassive.runTaskTimer(mPlugin, 0, mPassiveIntervalTicks);
 			}
 		}
 		mActiveSpells.cancelAll(true);

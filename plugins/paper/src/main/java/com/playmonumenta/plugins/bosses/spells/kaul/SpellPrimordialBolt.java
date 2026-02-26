@@ -52,7 +52,7 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 			(Player player) -> player != null && player.getLocation().getY() < 60
 		);
 		mChargeUpManager = new ChargeUpManager(mCaster, 2 * 20,
-			Component.text("Charging ", NamedTextColor.GOLD).append(Component.text("Primordial Bolt", NamedTextColor.RED)),
+			Component.text("Charging ", NamedTextColor.GREEN).append(Component.text("Primordial Bolt", NamedTextColor.RED)),
 			BossBar.Color.RED, BossBar.Overlay.PROGRESS, Kaul.detectionRange);
 	}
 
@@ -97,15 +97,20 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 			return;
 		}
 		new PartialParticle(Particle.BLOCK_CRACK, loc, 6, 0.45, 0.45, 0.45, 0.25,
-			Material.STONE.createBlockData()).spawnAsEntityActive(mCaster);
-		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25).minimumCount(1).spawnAsEntityActive(mCaster);
+			Material.MAGMA_BLOCK.createBlockData()).spawnAsEntityActive(mCaster);
+		new PartialParticle(Particle.FLAME, loc, 2, 0, 0, 0, 0.02).spawnAsEntityActive(mCaster);
+		boolean brokeBlock = false;
 		for (Block block : LocationUtils.getNearbyBlocks(loc.getBlock(), 1)) {
 			if (block.getType().isSolid()) {
 				Material material = block.getType();
 				if (ARENA_MATS.contains(material)) {
 					block.setType(Material.AIR);
+					brokeBlock = true;
 				}
 			}
+		}
+		if (brokeBlock) {
+			new PartialParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25).minimumCount(1).spawnAsEntityActive(mCaster);
 		}
 	}
 

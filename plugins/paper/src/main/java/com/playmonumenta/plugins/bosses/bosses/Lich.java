@@ -37,6 +37,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -629,7 +630,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 							@Override
 							public void run() {
 								mT++;
-								for (Block block : LocationUtils.getEdge(mLoc.clone().subtract(mT, 0, mT), mLoc.clone().add(mT, 0, mT))) {
+								for (Block block : BlockUtils.getEdge(mLoc, mT)) {
 									if (block.getType() == Material.TERRACOTTA) {
 										block.setType(Material.RED_NETHER_BRICKS);
 									}

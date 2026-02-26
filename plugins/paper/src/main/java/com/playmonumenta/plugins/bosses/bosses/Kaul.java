@@ -20,21 +20,23 @@ import com.playmonumenta.plugins.bosses.spells.kaul.SpellLightningStrike;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellPutridPlague;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
-import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.managers.GlowingManager;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.particle.PPSpiral;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -46,7 +48,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -62,13 +63,11 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -138,45 +137,45 @@ The elemental will lose his "Raise Jungle" ability, but will still possess the o
 public class Kaul extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_kaul";
 	public static final int detectionRange = 50;
-	public static final int ARENA_WIDTH = 111;
+	public static final int ARENA_RADIUS = 55;
 	// Barrier layer is from Y 62.0 to 64.0
 	public static final int ARENA_MAX_Y = 62;
+
+	public static final int PILLAR_OFFSET = 18;
+	public static final Vector RED_OFFSET = new Vector(PILLAR_OFFSET, 0, -PILLAR_OFFSET);
+	public static final Vector BLUE_OFFSET = new Vector(PILLAR_OFFSET, 0, PILLAR_OFFSET);
+	public static final Vector YELLOW_OFFSET = new Vector(-PILLAR_OFFSET, 0, PILLAR_OFFSET);
+	public static final Vector GREEN_OFFSET = new Vector(-PILLAR_OFFSET, 0, -PILLAR_OFFSET);
 
 	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_1 = 18;
 	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_2 = 12;
 	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_3 = 10;
 	private static final int LIGHTNING_STRIKE_COOLDOWN_SECONDS_4 = 6;
 	private static final int MAX_HEALTH = 2048;
+	private static final int DIALOGUE_DELAY = 20 * 4;
 	private static final double SCALING_X = 0.7;
 	private static final double SCALING_Y = 0.65;
 	private static final String primordial = "PrimordialElemental";
 	private static final String immortal = "ImmortalElemental";
-	private static final String LIGHTNING_STORM_TAG = "KaulLightningStormTag";
-	private static final String PUTRID_PLAGUE_TAG_RED = "KaulPutridPlagueRed";
-	private static final String PUTRID_PLAGUE_TAG_BLUE = "KaulPutridPlagueBlue";
-	private static final String PUTRID_PLAGUE_TAG_YELLOW = "KaulPutridPlagueYellow";
-	private static final String PUTRID_PLAGUE_TAG_GREEN = "KaulPutridPlagueGreen";
+	private static final int FLOOR_Y = 8;
+	private static final double PILLAR_DISTANCE = Math.sqrt(18 * 18 * 2);
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
-	// At the centre of the Kaul shrine, upon the height of most of the arena's surface
-	private LivingEntity mShrineMarker;
+	private final Location mShrineLoc;
 	private boolean mDefeated = false;
 	private boolean mCooldown = false;
 	private boolean mPrimordialPhase = false;
-	private int mHits = 0;
 	private int mPlayerCount;
 	private double mDefenseScaling;
+	@Nullable
+	private LivingEntity mImmortal;
 
 	public Kaul(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
-		mShrineMarker = boss;
-		for (LivingEntity le : boss.getWorld().getLivingEntities()) {
-			if (le.getScoreboardTags().contains(LIGHTNING_STORM_TAG)) {
-				mShrineMarker = le;
-				break;
-			}
-		}
+		mShrineLoc = boss.getLocation();
+		mShrineLoc.setY(FLOOR_Y);
+
 		mPlayerCount = getArenaParticipants().size();
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 		mBoss.setRemoveWhenFarAway(false);
@@ -186,7 +185,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+				for (Player player : getArenaParticipants()) {
 					if (player.isSleeping()) {
 						DamageUtils.damage(mBoss, player, DamageType.OTHER, 22);
 						EffectType.applyEffect(EffectType.SLOW, player, 15 * 20, 0.3, "KaulAntiSleepSlowness", false);
@@ -194,7 +193,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 1, 0.85f);
 					}
 				}
-				if (mDefeated || mBoss.isDead() || !mBoss.isValid()) {
+				if (mDefeated || !mBoss.isValid()) {
 					this.cancel();
 				}
 			}
@@ -204,69 +203,73 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		 * I would do this for all of the spells here but I'll just thank Java for having no support for true pass by
 		 * copy for objects instead
 		 */
-		SpellKaulsJudgement kaulsJudgement = new SpellKaulsJudgement(mBoss, this);
-		SpellVolcanicDemise volcanicDemise = new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation());
+		SpellKaulsJudgement kaulsJudgement = new SpellKaulsJudgement(mBoss, this::judgementSuccess, mShrineLoc);
+		SpellVolcanicDemise volcanicDemise = new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineLoc);
 
 		SpellManager phase1Spells = new SpellManager(
-			Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mShrineMarker.getLocation().getY()),
-				new SpellPutridPlague(mPlugin, mBoss, this, false),
-				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-				new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc)));
+			Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, 20 * 9, 20 * 10, mShrineLoc),
+				new SpellPutridPlague(mPlugin, mBoss, false, mShrineLoc),
+				new SpellEarthsWrath(mPlugin, mBoss, mShrineLoc.getY()),
+				new SpellArachnopocolypse(mPlugin, mBoss, mShrineLoc)));
 
 		SpellManager phase2Spells = new SpellManager(
-			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, false),
-				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-				new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mShrineMarker.getLocation().getY()),
-				new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc),
+			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, false, mShrineLoc),
+				new SpellEarthsWrath(mPlugin, mBoss, mShrineLoc.getY()),
+				new SpellRaiseJungle(mPlugin, mBoss, 10, 20 * FLOOR_Y, 20 * 10, mShrineLoc),
+				new SpellArachnopocolypse(mPlugin, mBoss, mShrineLoc),
 				kaulsJudgement));
 
 		SpellManager phase3Spells = new SpellManager(
-			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, true),
-				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-				new SpellGroundSurge(mPlugin, mBoss, detectionRange),
+			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, true, mShrineLoc),
+				new SpellEarthsWrath(mPlugin, mBoss, mShrineLoc.getY()),
+				new SpellGroundSurge(mPlugin, mBoss, mShrineLoc),
 				volcanicDemise, kaulsJudgement));
 
 		SpellManager phase4Spells = new SpellManager(
-			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, true),
-				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-				new SpellGroundSurge(mPlugin, mBoss, detectionRange),
+			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, true, mShrineLoc),
+				new SpellEarthsWrath(mPlugin, mBoss, mShrineLoc.getY()),
+				new SpellGroundSurge(mPlugin, mBoss, mShrineLoc),
 				volcanicDemise));
 
-		List<UUID> hit = new ArrayList<>();
+		List<UUID> sentWaterMessage = new ArrayList<>();
 		List<UUID> cd = new ArrayList<>();
 		SpellPlayerAction action = new SpellPlayerAction(this::getArenaParticipants, (Player player) -> {
 			Vector loc = player.getLocation().toVector();
-			if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mShrineMarker.getLocation().toVector(), 42)) {
-				if (player.getLocation().getY() >= 61 || cd.contains(player.getUniqueId())) {
+			boolean inWater = player.getLocation().getBlock().isLiquid();
+			boolean tooFarAway = !loc.isInSphere(mShrineLoc.toVector(), 42);
+			if (inWater || tooFarAway) {
+				if (cd.contains(player.getUniqueId())) {
 					return;
 				}
 				/* Damage has no direction so can't be blocked */
 				if (BossUtils.bossDamagePercent(mBoss, player, 0.4)) {
 					/* Player survived the damage */
-					MovementUtils.knockAway(mSpawnLoc, player, -2.5f, 0.85f);
+					MovementUtils.knockAway(spawnLoc, player, -2.5f, 0.85f);
+
 					world.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 1, 1.3f);
 					new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 80, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
+
 					cd.add(player.getUniqueId());
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> cd.remove(player.getUniqueId()), 10);
 				}
-				if (player.getLocation().getBlock().isLiquid()) {
-					if (!hit.contains(player.getUniqueId())) {
-						hit.add(player.getUniqueId());
+				if (inWater) {
+					if (!sentWaterMessage.contains(player.getUniqueId())) {
+						sentWaterMessage.add(player.getUniqueId());
 						player.sendMessage(Component.text("That hurt! It seems like the water is extremely corrosive. Best to stay out of it.", NamedTextColor.AQUA));
 					}
-				} else if (!loc.isInSphere(mShrineMarker.getLocation().toVector(), 42)) {
+				} else {
 					player.sendMessage(Component.text("You feel a powerful force pull you back in fiercely. It seems there's no escape from this fight.", NamedTextColor.AQUA));
 				}
 			}
 		});
 
 		// These spells need to be shared between phases in this manner to prevent double casting on phase change
-		SpellLightningStorm lightningStorm = new SpellLightningStorm(boss, this);
-		SpellBlockBreak bossBlockBreak = new SpellBlockBreak(mBoss, 1, 3, 1, 8, false, true, false);
+		SpellLightningStorm lightningStorm = new SpellLightningStorm(mPlugin, boss, mShrineLoc);
+		SpellBlockBreak bossBlockBreak = new SpellBlockBreak(mBoss, 1, 3, 1, FLOOR_Y, false, true, false);
 		SpellShieldStun shieldStun = new SpellShieldStun(30 * 20);
 		SpellBaseParticleAura greenParticleAura = new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) ->
 			new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0),
-				8, 0.35, 0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss());
+				FLOOR_Y, 0.35, 0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss());
 		SpellBaseParticleAura angryParticleAura = new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
 			new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
 				0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss();
@@ -284,35 +287,32 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				|| b.getLocation().getBlock().getType() == Material.WATER);
 
 		List<Spell> phase1PassiveSpells = Arrays.asList(
-			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_1, false, mShrineMarker.getLocation()),
+			new SpellLightningStrike(boss, LIGHTNING_STRIKE_COOLDOWN_SECONDS_1, false, mShrineLoc),
 			lightningStorm, bossBlockBreak, shieldStun, greenParticleAura, conditionalTeleport, action
 		);
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
-			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_2, true, mShrineMarker.getLocation()),
+			new SpellLightningStrike(boss, LIGHTNING_STRIKE_COOLDOWN_SECONDS_2, true, mShrineLoc),
 			lightningStorm, bossBlockBreak, shieldStun, greenParticleAura, conditionalTeleport, action
 		);
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
-			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_3, true, mShrineMarker.getLocation()),
+			new SpellLightningStrike(boss, LIGHTNING_STRIKE_COOLDOWN_SECONDS_3, true, mShrineLoc),
 			lightningStorm, bossBlockBreak, shieldStun, angryParticleAura, conditionalTeleport, action
 		);
 
 		List<Spell> phase4PassiveSpells = Arrays.asList(
-			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_4, true, mShrineMarker.getLocation()),
+			new SpellLightningStrike(boss, LIGHTNING_STRIKE_COOLDOWN_SECONDS_4, true, mShrineLoc),
 			lightningStorm, bossBlockBreak, shieldStun, angryParticleAura, conditionalTeleport, action
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, mBoss -> {
 			Collection<Player> players = getArenaParticipants();
-			Component message;
-			if (players.size() <= 1) {
-				message = Component.text("THE JUNGLE WILL NOT ALLOW A LONE MORTAL LIKE YOU TO LIVE. PERISH, FOOLISH USURPER!", NamedTextColor.DARK_GREEN);
-			} else {
-				message = Component.text("THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USURPERS.", NamedTextColor.DARK_GREEN);
-			}
-			players.forEach(p -> p.sendMessage(message));
+			String message = players.size() > 1 ?
+				"THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USURPERS." :
+				"THE JUNGLE WILL NOT ALLOW A LONE MORTAL LIKE YOU TO LIVE. PERISH, FOOLISH USURPER!";
+			sendDialogue(message);
 		});
 
 		events.put(75, mBoss -> {
@@ -327,107 +327,50 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		events.put(66, mBoss -> {
 			MMLog.info(() -> "[Kaul] A Kaul fight got to 66% health");
 			sendDialogue("THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.");
-			knockback(plugin, 10);
+			knockbackPlayers();
+			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
+
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
 			mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
-				new PercentDamageReceived(20 * 9999, -1.0));
-			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					teleport(mSpawnLoc.clone().add(0, 5, 0));
-					new BukkitRunnable() {
-						final Location mLoc = mBoss.getLocation();
-						float mJ = 0;
-						double mRotation = 0;
-						double mRadius = 10;
+			Bukkit.getScheduler().runTaskLater(plugin, () -> {
+				int delay = 20 * 2;
+				new PPSpiral(Particle.SPELL_WITCH, spawnLoc, 10)
+					.countPerBlockPerCurve(24)
+					.delta(0.25)
+					.ticks(delay)
+					.curves(5)
+					.curveAngle(360)
+					.reversed(true)
+					.spawnAsBoss();
+				new PPSpiral(Particle.BLOCK_CRACK, spawnLoc, 10)
+					.countPerBlockPerCurve(24)
+					.delta(0.25)
+					.data(Material.COARSE_DIRT.createBlockData())
+					.ticks(delay)
+					.curves(5)
+					.curveAngle(360)
+					.reversed(true)
+					.spawnAsBoss();
 
-						@Override
-						public void run() {
-							mJ++;
-							world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 3, 0.5f + (mJ / 25));
-							for (int i = 0; i < 5; i++) {
-								double radian1 = Math.toRadians(mRotation + (72 * i));
-								mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-								new PartialParticle(Particle.SPELL_WITCH, mLoc, 6, 0.25, 0.25, 0.25, 0).spawnAsBoss();
-								new PartialParticle(Particle.BLOCK_CRACK, mLoc, 4, 0.25, 0.25, 0.25, 0.25,
-									Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
-								mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-							}
-							new PartialParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 20, 8, 5, 8,
-								0).spawnAsBoss();
-							mRotation += 8;
-							mRadius -= 0.25;
+				teleport(spawnLoc.clone().add(0, 5, 0));
+				new BukkitRunnable() {
+					float mT = 0;
 
-							if (mBoss.isDead() || !mBoss.isValid()) {
-								this.cancel();
-							}
+					@Override
+					public void run() {
+						mT++;
+						world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 3, 0.5f + (mT / 25));
+						new PartialParticle(Particle.SPELL_WITCH, mShrineLoc.clone().add(0, 3, 0), 20, 8, 5, 8, 0).spawnAsBoss();
 
-							if (mRadius <= 0) {
-								this.cancel();
-								Location loc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
-								changePhase(SpellManager.EMPTY, phase2PassiveSpells, null);
-								new BukkitRunnable() {
-									int mT = 0;
-									final double mRotation = 0;
-									double mRadius = 0;
-
-									@Override
-									public void run() {
-										mT++;
-										mRadius = mT;
-										new PartialParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 20, 8, 5, 8, 0).spawnAsBoss();
-										new PartialParticle(Particle.SMOKE_NORMAL, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 8, 0).spawnAsBoss();
-										for (int i = 0; i < 36; i++) {
-											double radian1 = Math.toRadians(mRotation + (10 * i));
-											loc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
-											new PartialParticle(Particle.SPELL_WITCH, loc, 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
-											new PartialParticle(Particle.BLOCK_CRACK, loc, 2, 0.4, 0.4, 0.4, 0.25,
-												Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
-											loc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
-										}
-										for (Block block : LocationUtils.getEdge(loc.clone().subtract(mT, 0, mT),
-											loc.clone().add(mT, 0, mT))) {
-											if (FastUtils.RANDOM.nextInt(6) == 1 && block.getType() == Material.SMOOTH_SANDSTONE
-												&& block.getLocation().add(0, 1.5, 0).getBlock()
-												.getType() == Material.AIR) {
-												block.setType(Material.SMOOTH_RED_SANDSTONE);
-											}
-										}
-										if (mT >= 40) {
-											this.cancel();
-										}
-									}
-
-								}.runTaskTimer(mPlugin, 0, 1);
-								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-									player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1,
-										0.75f);
-								}
-								new BukkitRunnable() {
-									@Override
-									public void run() {
-										mBoss.setInvulnerable(false);
-										mBoss.setAI(true);
-										teleport(mSpawnLoc);
-										com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
-										new BukkitRunnable() {
-											@Override
-											public void run() {
-												changePhase(phase2Spells, phase2PassiveSpells, null);
-											}
-										}.runTaskLater(mPlugin, 20 * 10);
-									}
-								}.runTaskLater(mPlugin, 20 * 2);
-							}
+						if (mT >= delay) {
+							this.cancel();
+							phase2(mShrineLoc, phase2Spells, phase2PassiveSpells);
 						}
-					}.runTaskTimer(mPlugin, 30, 1);
-				}
-			}.runTaskLater(mPlugin, 20 * 2);
+					}
+				}.runTaskTimer(mPlugin, 30, 1);
+			}, 20 * 2);
 		});
 
 		// Forcecast Raise Jungle
@@ -443,77 +386,67 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		events.put(50, mBoss -> {
 			MMLog.info(() -> "[Kaul] A Kaul fight got to 50% health");
 			sendDialogue("THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.");
-			knockback(plugin, 10);
+			knockbackPlayers();
+			teleport(spawnLoc.clone().add(0, 5, 0));
+			changePhase(SpellManager.EMPTY, phase1PassiveSpells, null);
+
 			mBoss.setInvulnerable(true);
 			mBoss.setAI(false);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
-				new PercentDamageReceived(20 * 9999, -1.0));
-			teleport(mSpawnLoc.clone().add(0, 5, 0));
-			changePhase(SpellManager.EMPTY, phase1PassiveSpells, null);
 			mPrimordialPhase = true;
 
-			new BukkitRunnable() {
-				final Location mLoc = mSpawnLoc;
-				double mRotation = 0;
-				double mRadius = 10;
+			int delay = 66;
 
-				@Override
-				public void run() {
-					for (int i = 0; i < 5; i++) {
-						double radian1 = Math.toRadians(mRotation + (72 * i));
-						mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-						new PartialParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0).spawnAsBoss();
-						new PartialParticle(Particle.BLOCK_CRACK, mLoc, 3, 0.1, 0.1, 0.1, 0.25,
-							Material.DIRT.createBlockData()).spawnAsBoss();
-						mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-					}
-					mRotation += 8;
-					mRadius -= 0.15;
-					if (mRadius <= 0) {
-						this.cancel();
-						world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0);
-						world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1, 0.75f);
-						new PartialParticle(Particle.CRIT_MAGIC, mLoc, 50, 0.1, 0.1, 0.1, 1).spawnAsBoss();
-						new PartialParticle(Particle.BLOCK_CRACK, mLoc, 150, 0.1, 0.1, 0.1, 0.5,
-							Material.DIRT.createBlockData()).spawnAsBoss();
-						LivingEntity miniboss = (LivingEntity) LibraryOfSoulsIntegration.summon(mLoc, primordial);
-						MMLog.info(() -> "[Kaul] Kaul has summoned the Primordial Elemental");
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								if (miniboss == null) {
-									MMLog.warning(() -> "[Kaul] Kaul tried to summon the Primordial Elemental, but the miniboss is null!");
-									this.cancel();
-								} else if (miniboss.isDead() || !miniboss.isValid()) {
-									MMLog.info(() -> "[Kaul] Kaul's Primordial Elemental is dead or no longer valid. Entering next phase");
-									this.cancel();
-									mBoss.setInvulnerable(false);
-									mBoss.setAI(true);
-									teleport(mSpawnLoc);
-									com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
-									mPrimordialPhase = false;
-									new BukkitRunnable() {
-										@Override
-										public void run() {
-											changePhase(phase2Spells, phase2PassiveSpells, null);
-										}
-									}.runTaskLater(mPlugin, 20 * 10);
-								}
+			new PPSpiral(Particle.SPELL_WITCH, spawnLoc, 10)
+				.countPerBlockPerCurve(20)
+				.delta(0.25)
+				.ticks(delay)
+				.curves(5)
+				.curveAngle(360)
+				.reversed(true)
+				.spawnAsBoss();
 
-								if (mBoss.isDead() || !mBoss.isValid()) {
-									MMLog.warning(() -> "[Kaul] Kaul is somehow dead or no longer valid after summoning the Primordial Elemental! This is very bad!");
-									this.cancel();
-								}
-							}
-						}.runTaskTimer(mPlugin, 0, 20);
-					}
-					if (mBoss.isDead()) {
-						MMLog.warning(() -> "[Kaul] Kaul is somehow dead after summoning the Primordial Elemental! This is very bad!");
-						this.cancel();
-					}
+			new PPSpiral(Particle.BLOCK_CRACK, spawnLoc, 10)
+				.countPerBlockPerCurve(20)
+				.delta(0.25)
+				.extra(0.25)
+				.data(Material.DIRT.createBlockData())
+				.ticks(delay)
+				.curves(5)
+				.curveAngle(360)
+				.reversed(true)
+				.spawnAsBoss();
+
+			Bukkit.getScheduler().runTaskLater(plugin, () -> {
+				world.playSound(spawnLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0);
+				world.playSound(spawnLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1, 0.75f);
+				new PartialParticle(Particle.CRIT_MAGIC, spawnLoc, 50, 0.1, 0.1, 0.1, 1).spawnAsBoss();
+				new PartialParticle(Particle.BLOCK_CRACK, spawnLoc, 150, 0.1, 0.1, 0.1, 0.5,
+					Material.DIRT.createBlockData()).spawnAsBoss();
+
+				LivingEntity miniboss = (LivingEntity) LibraryOfSoulsIntegration.summon(spawnLoc, primordial);
+				if (miniboss == null) {
+					MMLog.warning(() -> "[Kaul] Kaul tried to summon the Primordial Elemental, but the miniboss is null!");
+					return;
 				}
-			}.runTaskTimer(plugin, 0, 1);
+
+				MMLog.info(() -> "[Kaul] Kaul has summoned the Primordial Elemental");
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						if (!miniboss.isValid()) {
+							MMLog.info(() -> "[Kaul] Kaul's Primordial Elemental is dead or no longer valid. Entering next phase");
+							this.cancel();
+
+							mBoss.setInvulnerable(false);
+							mBoss.setAI(true);
+							teleport(spawnLoc);
+							mPrimordialPhase = false;
+
+							changePhase(phase2Spells, phase2PassiveSpells, null, 20 * 10);
+						}
+					}
+				}.runTaskTimer(mPlugin, 0, 20);
+			}, delay);
 		});
 
 		// Force-cast Kaul's Judgement if it hasn't been cast yet.
@@ -522,160 +455,128 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				MMLog.warning(() -> "[Kaul] Kaul somehow had no active spells when attempting to force cast Kaul's Judgement " + kaulsJudgement + " at 40% health! Overriding with phase 2 spells");
 				changePhase(phase2Spells, phase2PassiveSpells, null);
 			}
-			forceCastSpell(kaulsJudgement.getClass());
+			forceCastSpell(SpellKaulsJudgement.class);
 		});
 
 		// Phase 3
 		events.put(33, mBoss -> {
 			MMLog.info(() -> "[Kaul] A Kaul fight got to 33% health");
 			sendDialogue("YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.");
-			knockback(plugin, 10);
-			mBoss.setInvulnerable(true);
-			mBoss.setAI(false);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
-				new PercentDamageReceived(20 * 9999, -1.0));
+			knockbackPlayers();
 			changePhase(SpellManager.EMPTY, phase1PassiveSpells, null);
 
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					List<ArmorStand> points = new ArrayList<>();
-					for (ArmorStand e : mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, detectionRange, detectionRange, detectionRange)) {
-						if (e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)
-							|| e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)
-							|| e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)
-							|| e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) {
-							points.add(e);
+			mBoss.setInvulnerable(true);
+			mBoss.setAI(false);
+
+			Bukkit.getScheduler().runTaskLater(plugin, () -> {
+				teleport(spawnLoc.clone().add(0, 5, 0));
+
+				world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 5, 0.75f);
+
+				int delay = 50;
+
+				Bukkit.getScheduler().runTaskLater(plugin, () -> {
+					for (SpellPutridPlague.Pillar pillar : SpellPutridPlague.Pillar.values()) {
+						Vector offset = pillar.mOffset;
+						Location loc = mShrineLoc.clone().add(offset).add(0, 15, 0);
+
+						world.createExplosion(loc, 6, true);
+						world.createExplosion(loc.clone().subtract(0, 4, 0), 6, true);
+
+						Vector dir = offset.clone().multiply(-1 / PILLAR_DISTANCE);
+
+						if (pillar == SpellPutridPlague.Pillar.BLUE) {
+							new PPLine(Particle.FALLING_DUST, loc, dir, PILLAR_DISTANCE)
+								.countPerMeter(20)
+								.delta(0.4)
+								.delay(delay)
+								.data(Material.BLUE_WOOL.createBlockData())
+								.spawnAsBoss();
+							new PPLine(Particle.BLOCK_CRACK, loc, dir, PILLAR_DISTANCE)
+								.countPerMeter(20)
+								.delta(0.4)
+								.delay(delay)
+								.data(Material.BLUE_WOOL.createBlockData())
+								.spawnAsBoss();
+							new PPLine(Particle.EXPLOSION_NORMAL, loc, dir, PILLAR_DISTANCE)
+								.countPerMeter(5)
+								.delta(0.4)
+								.delay(delay)
+								.spawnAsBoss();
+						} else if (pillar == SpellPutridPlague.Pillar.RED) {
+							new PPLine(Particle.REDSTONE, loc, dir, PILLAR_DISTANCE)
+								.countPerMeter(20)
+								.delta(0.4)
+								.delay(delay)
+								.data(RED_COLOR)
+								.spawnAsBoss();
+							new PPLine(Particle.FALLING_DUST, loc, dir, PILLAR_DISTANCE)
+								.countPerMeter(15)
+								.delta(0.4)
+								.delay(delay)
+								.data(Material.RED_WOOL.createBlockData())
+								.spawnAsBoss();
+						} else if (pillar == SpellPutridPlague.Pillar.YELLOW) {
+							new PPLine(Particle.FLAME, loc, dir, PILLAR_DISTANCE)
+								.countPerMeter(20)
+								.delay(delay)
+								.delta(0.3)
+								.extra(0.1)
+								.spawnAsBoss();
+							new PPLine(Particle.SMOKE_LARGE, loc, dir, PILLAR_DISTANCE)
+								.countPerMeter(20)
+								.delta(0.4)
+								.delay(delay)
+								.spawnAsBoss();
+						} else if (pillar == SpellPutridPlague.Pillar.GREEN) {
+							new PPLine(Particle.FALLING_DUST, loc, dir, PILLAR_DISTANCE)
+								.countPerMeter(20)
+								.delta(0.4)
+								.delay(delay)
+								.data(Material.GREEN_TERRACOTTA.createBlockData())
+								.spawnAsBoss();
+							new PPLine(Particle.BLOCK_CRACK, loc, dir, PILLAR_DISTANCE)
+								.countPerMeter(10)
+								.delta(0.4)
+								.delay(delay)
+								.data(Material.GREEN_TERRACOTTA.createBlockData())
+								.spawnAsBoss();
+							new PPLine(Particle.EXPLOSION_NORMAL, loc, dir, PILLAR_DISTANCE)
+								.countPerMeter(5)
+								.delta(0.4)
+								.delay(delay)
+								.spawnAsBoss();
 						}
 					}
+				}, 2 * 20);
 
-					if (!points.isEmpty()) {
-						teleport(mSpawnLoc.clone().add(0, 5, 0));
-						for (ArmorStand point : points) {
-							world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 5, 0.75f);
-							new BukkitRunnable() {
-								final Location mLoc = point.getLocation().add(0, 15, 0);
-								final Vector mDir = LocationUtils.getDirectionTo(mBoss.getLocation().add(0, 1, 0), mLoc);
-								float mT = 0;
+				new BukkitRunnable() {
+					float mT = 0;
 
-								@Override
-								public void run() {
-									mT++;
-									if (mT % 2 == 0) {
-										new PartialParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0).spawnAsBoss();
-									}
-									new PartialParticle(Particle.FLAME, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0).spawnAsBoss();
-									new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1.25, 0), 16, 0.35, 0.45, 0.35, 0).spawnAsBoss();
-									new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.25, 0), 1, 0.35, 0.45, 0.35, 0).spawnAsBoss();
-									if (mT == 1) {
-										mLoc.getWorld().createExplosion(mLoc, 6, true);
-										mLoc.getWorld().createExplosion(mLoc.clone().subtract(0, 4, 0), 6, true);
-									}
-									mLoc.add(mDir.clone().multiply(0.35));
-									if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)) {
-										new PartialParticle(Particle.FALLING_DUST, mLoc, 9, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
-										new PartialParticle(Particle.BLOCK_CRACK, mLoc, 5, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
-										new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc, 2, 0.4, 0.4, 0.4, 0.1).spawnAsBoss();
-									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)) {
-										new PartialParticle(Particle.REDSTONE, mLoc, 15, 0.4, 0.4, 0.4, RED_COLOR).spawnAsBoss();
-										new PartialParticle(Particle.FALLING_DUST, mLoc, 10, 0.4, 0.4, 0.4, Material.RED_WOOL.createBlockData()).spawnAsBoss();
-									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)) {
-										new PartialParticle(Particle.FLAME, mLoc, 10, 0.3, 0.3, 0.3, 0.1).spawnAsBoss();
-										new PartialParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
-									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) {
-										new PartialParticle(Particle.FALLING_DUST, mLoc, 9, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData()).spawnAsBoss();
-										new PartialParticle(Particle.BLOCK_CRACK, mLoc, 5, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData()).spawnAsBoss();
-										new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc, 2, 0.4, 0.4, 0.4, 0.1).spawnAsBoss();
-									}
-									if (mLoc.distance(mSpawnLoc.clone().add(0, 5, 0)) < 1.25 || mLoc.distance(mBoss.getLocation().add(0, 1, 0)) < 1.25) {
-										this.cancel();
-										mHits++;
-									}
+					@Override
+					public void run() {
+						mT++;
+						if (mT % 2 == 0) {
+							new PartialParticle(Particle.SPELL_WITCH, mShrineLoc.clone().add(0, 3, 0), 30, 8, 5, 9, 0).spawnAsBoss();
+						}
+						new PartialParticle(Particle.FLAME, mShrineLoc.clone().add(0, 3, 0), 30, 8, 5, 9, 0).spawnAsBoss();
+						new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1.25, 0), 48, 0.35, 0.45, 0.35, 0).spawnAsBoss();
+						new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.25, 0), 3, 0.35, 0.45, 0.35, 0).spawnAsBoss();
 
-									if (mBoss.isDead() || !mBoss.isValid()) {
-										MMLog.warning(() -> "[Kaul] Kaul is somehow dead or not valid after running the aesthetics for his final phase! This is very bad!");
-										this.cancel();
-									}
-
-									if (mHits >= 4) {
-										this.cancel();
-										new PartialParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 25, 6, 5, 6, 1).spawnAsBoss();
-										new PartialParticle(Particle.FLAME, mShrineMarker.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1).spawnAsBoss();
-										EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0.02 + EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0));
-										EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, 3.0 + EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, 3));
-										changePhase(SpellManager.EMPTY, phase3PassiveSpells, null);
-										new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 200, 0, 0, 0, 0.175).spawnAsBoss();
-										new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25).spawnAsBoss();
-										new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25).spawnAsBoss();
-										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 5, 0.9f);
-										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5, 0f);
-
-										new BukkitRunnable() {
-											final Location mLoc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
-											final double mRotation = 0;
-											double mRadius = 0;
-											int mT = 0;
-
-											@Override
-											public void run() {
-												mT++;
-												mRadius = mT;
-												for (int i = 0; i < 36; i++) {
-													double radian1 = Math.toRadians(mRotation + (10 * i));
-													mLoc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
-													new PartialParticle(Particle.FLAME, mLoc, 2, 0.25, 0.25, 0.25, 0.1).spawnAsBoss();
-													new PartialParticle(Particle.BLOCK_CRACK, mLoc, 2, 0.25, 0.25, 0.25, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
-													mLoc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
-												}
-												for (Block block : LocationUtils.getEdge(mLoc.clone().subtract(mT, 0, mT), mLoc.clone().add(mT, 0, mT))) {
-													if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
-														block.setType(Material.NETHERRACK);
-														if (FastUtils.RANDOM.nextInt(3) == 1) {
-															block.setType(Material.MAGMA_BLOCK);
-														}
-													} else if (block.getType() == Material.SMOOTH_SANDSTONE) {
-														block.setType(Material.SMOOTH_RED_SANDSTONE);
-													}
-												}
-												if (mT >= 40) {
-													this.cancel();
-												}
-											}
-
-										}.runTaskTimer(mPlugin, 0, 1);
-										new BukkitRunnable() {
-											@Override
-											public void run() {
-												mBoss.setInvulnerable(false);
-												mBoss.setAI(true);
-												teleport(mSpawnLoc);
-												com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
-												new BukkitRunnable() {
-													@Override
-													public void run() {
-														// If the next phase change has already happened, don't do anything!
-														if (getActiveSpells().isEmpty()) {
-															changePhase(phase3Spells, phase3PassiveSpells, null);
-														}
-													}
-												}.runTaskLater(mPlugin, 20 * 10);
-											}
-										}.runTaskLater(mPlugin, 20 * 3);
-									}
-								}
-							}.runTaskTimer(mPlugin, 40, 1);
+						if (mT > delay) {
+							this.cancel();
+							phase3(mShrineLoc, phase3Spells, phase3PassiveSpells);
 						}
 					}
-				}
-			}.runTaskLater(mPlugin, 20 * 2);
+				}.runTaskTimer(mPlugin, 2 * 20, 1);
+			}, 20 * 2);
 		});
 
 		// Phase 3.25
 		//Summons a Immortal Elemental at 30% HP
 		events.put(30, mBoss -> {
 			sendDialogue("PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.");
-			summonImmortal(plugin, world);
+			summonImmortal(world);
 		});
 
 
@@ -686,7 +587,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				MMLog.warning(() -> "[Kaul] Kaul somehow had no active spells when attempting to force cast Kaul's Judgement " + kaulsJudgement + " at 25% health! Overriding with phase 3 spells");
 				changePhase(phase3Spells, phase3PassiveSpells, null);
 			}
-			forceCastSpell(kaulsJudgement.getClass());
+			forceCastSpell(SpellKaulsJudgement.class);
 		});
 
 		events.put(10, mBoss -> {
@@ -695,7 +596,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			changePhase(phase4Spells, phase4PassiveSpells, null);
 			// Force casting Volcanic Demise teleports Kaul back to his camp spot on top of the shrine and whatnot
 			// See bossCastAbility() for more info
-			forceCastSpell(volcanicDemise.getClass());
+			forceCastSpell(SpellVolcanicDemise.class);
 		});
 		BossBarManager bossBar = new BossBarManager(boss, detectionRange + 30, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, events);
 
@@ -712,131 +613,232 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					@Override
 					public void run() {
 						mAdvancements.forEach(KaulAdvancementHandler::onTick);
-						if (mDefeated || mBoss.isDead() || !mBoss.isValid()) {
+						if (mDefeated || !mBoss.isValid()) {
 							this.cancel();
 						}
 					}
 				}.runTaskTimer(mPlugin, 0, 1);
 			}
-		}.runTaskLater(mPlugin, (20 * 10) + 1);
+		}.runTaskLater(mPlugin, DIALOGUE_DELAY * 3);
 	}
 
-	private void summonImmortal(Plugin plugin, World world) {
+	private void phase2(Location shrineLoc, SpellManager activeSpells, List<Spell> passiveSpells) {
+		Location loc = shrineLoc.clone().subtract(0, 0.5, 0);
+		changePhase(SpellManager.EMPTY, passiveSpells, null);
+
 		new BukkitRunnable() {
-			final Location mLoc = mSpawnLoc;
-			double mRotation = 0;
-			double mRadius = 5;
+			int mRadius = 0;
 
 			@Override
 			public void run() {
-				for (int i = 0; i < 5; i++) {
-					double radian1 = Math.toRadians(mRotation + (72 * i));
-					mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-					new PartialParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0).spawnAsBoss();
-					new PartialParticle(Particle.BLOCK_CRACK, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
-						Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
-					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-				}
-				mRotation += 8;
-				mRadius -= 0.25;
-				if (mRadius <= 0) {
-					this.cancel();
-					world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0);
-					world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1, 0.75f);
-					new PartialParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1).spawnAsBoss();
-					LivingEntity miniboss = (LivingEntity) LibraryOfSoulsIntegration.summon(mLoc, immortal);
-					MMLog.info(() -> "[Kaul] Kaul has summoned the Immortal Elemental");
-					if (miniboss != null) {
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								if (mBoss.isDead() || !mBoss.isValid() || mDefeated) {
-									this.cancel();
-									if (!miniboss.isDead()) {
-										miniboss.setHealth(0);
-									}
-								}
-							}
-						}.runTaskTimer(mPlugin, 0, 20);
+				mRadius++;
+				new PartialParticle(Particle.SPELL_WITCH, shrineLoc.clone().add(0, 3, 0), 20, 8, 5, 8, 0).spawnAsBoss();
+				new PartialParticle(Particle.SMOKE_NORMAL, shrineLoc.clone().add(0, 3, 0), 10, 8, 5, 8, 0).spawnAsBoss();
+				new PPCircle(Particle.SPELL_WITCH, loc, mRadius)
+					.countPerMeter(4)
+					.delta(0.4)
+					.spawnAsBoss();
+				new PPCircle(Particle.BLOCK_CRACK, loc, mRadius)
+					.countPerMeter(3)
+					.data(Material.COARSE_DIRT.createBlockData())
+					.delta(0.4)
+					.extra(0.25)
+					.spawnAsBoss();
+				for (Block block : BlockUtils.getEdge(loc, mRadius)) {
+					if (FastUtils.RANDOM.nextInt(6) == 1 && block.getType() == Material.SMOOTH_SANDSTONE
+						&& block.getLocation().add(0, 1.5, 0).getBlock()
+						.getType() == Material.AIR
+					) {
+						block.setType(Material.SMOOTH_RED_SANDSTONE);
 					}
 				}
-				if (mBoss.isDead()) {
+				if (mRadius >= 40) {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(plugin, 0, 1);
+
+		}.runTaskTimer(mPlugin, 0, 1);
+		for (Player player : getArenaParticipants()) {
+			player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0.75f);
+		}
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			mBoss.setInvulnerable(false);
+			mBoss.setAI(true);
+			teleport(mSpawnLoc);
+
+			changePhase(activeSpells, passiveSpells, null, 20 * 10);
+		}, 20 * 2);
 	}
 
-	private void knockback(Plugin plugin, double r) {
+	private void phase3(Location shrineLoc, SpellManager activeSpells, List<Spell> passiveSpells) {
+		new PartialParticle(Particle.SPELL_WITCH, shrineLoc.clone().add(0, 3, 0), 25, 6, 5, 6, 1).spawnAsBoss();
+		new PartialParticle(Particle.FLAME, shrineLoc.clone().add(0, 3, 0), 40, 6, 5, 6, 0.1).spawnAsBoss();
+
+		new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 200, 0, 0, 0, 0.175).spawnAsBoss();
+		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25).spawnAsBoss();
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25).spawnAsBoss();
+
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 1);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.5f);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0f);
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
-			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
+		world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 5, 0.9f);
+		world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5, 0f);
+
+		changePhase(SpellManager.EMPTY, passiveSpells, null);
+		EntityUtils.replaceAttribute(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier("Phase3Speed", 0.02, AttributeModifier.Operation.ADD_NUMBER));
+		EntityUtils.replaceAttribute(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier("Phase3Damage", 3.0, AttributeModifier.Operation.ADD_NUMBER));
+
+		new BukkitRunnable() {
+			final Location mLoc = shrineLoc.clone().subtract(0, 0.5, 0);
+			int mRadius = 0;
+
+			@Override
+			public void run() {
+				mRadius++;
+				new PPCircle(Particle.FLAME, mLoc, mRadius)
+					.countPerMeter(4)
+					.delta(0.4)
+					.spawnAsBoss();
+				new PPCircle(Particle.BLOCK_CRACK, mLoc, mRadius)
+					.countPerMeter(3)
+					.data(Material.COARSE_DIRT.createBlockData())
+					.delta(0.4)
+					.extra(0.25)
+					.spawnAsBoss();
+				for (Block block : BlockUtils.getEdge(mLoc, mRadius)) {
+					if (block.getType() == Material.SMOOTH_RED_SANDSTONE) {
+						block.setType(Material.NETHERRACK);
+						if (FastUtils.RANDOM.nextInt(3) == 1) {
+							block.setType(Material.MAGMA_BLOCK);
+						}
+					} else if (block.getType() == Material.SMOOTH_SANDSTONE) {
+						block.setType(Material.SMOOTH_RED_SANDSTONE);
+					}
+				}
+				if (mRadius >= 40) {
+					this.cancel();
+				}
+			}
+
+		}.runTaskTimer(mPlugin, 0, 1);
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			mBoss.setInvulnerable(false);
+			mBoss.setAI(true);
+			teleport(mSpawnLoc);
+			changePhase(activeSpells, passiveSpells, null, 20 * 10);
+		}, 20 * 3);
+	}
+
+	private void summonImmortal(World world) {
+		int delay = 20;
+
+		new PPSpiral(Particle.SPELL_WITCH, mSpawnLoc, 10)
+			.countPerBlockPerCurve(20)
+			.delta(0.25)
+			.ticks(delay)
+			.curves(5)
+			.curveAngle(360)
+			.reversed(true)
+			.spawnAsBoss();
+
+		new PPSpiral(Particle.BLOCK_CRACK, mSpawnLoc, 10)
+			.countPerBlockPerCurve(20)
+			.delta(0.25)
+			.extra(0.25)
+			.data(Material.DIRT.createBlockData())
+			.ticks(delay)
+			.curves(5)
+			.curveAngle(360)
+			.reversed(true)
+			.spawnAsBoss();
+
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			world.playSound(mSpawnLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0);
+			world.playSound(mSpawnLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1, 0.75f);
+			new PartialParticle(Particle.CRIT_MAGIC, mSpawnLoc, 150, 0.1, 0.1, 0.1, 1).spawnAsBoss();
+
+			mImmortal = (LivingEntity) LibraryOfSoulsIntegration.summon(mSpawnLoc, immortal);
+			MMLog.info(() -> "[Kaul] Kaul has summoned the Immortal Elemental");
+		}, delay);
+	}
+
+	private void knockbackPlayers() {
+		World world = mBoss.getWorld();
+		Location bossLocation = mBoss.getLocation();
+		world.playSound(bossLocation, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 1);
+		world.playSound(bossLocation, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.5f);
+		world.playSound(bossLocation, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0f);
+
+		for (Player player : PlayerUtils.playersInRange(bossLocation, 10, true)) {
+			MovementUtils.knockAway(bossLocation, player, 0.55f, false);
 			EffectType.applyEffect(EffectType.SLOW, player, 5 * 20, 0.3, "KaulKnockbackSlowness", false);
 		}
 		new BukkitRunnable() {
-			double mRotation = 0;
-			final Location mLoc = mBoss.getLocation();
+			final Location mLoc = mBoss.getLocation().add(0, 2.5, 0);
+			final double mLowestY = mBoss.getY();
 			double mRadius = 0;
-			double mY = 2.5;
 			double mYminus = 0.35;
 
 			@Override
 			public void run() {
 				mRadius += 1;
-				for (int i = 0; i < 15; i += 1) {
-					mRotation += 24;
-					double radian1 = Math.toRadians(mRotation);
-					mLoc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
-					new PartialParticle(Particle.BLOCK_CRACK, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
-						Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
-					new PartialParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
-					mLoc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
-				}
-				mY -= mY * mYminus;
+				new PPCircle(Particle.SMOKE_LARGE, mLoc, mRadius)
+					.countPerMeter(4)
+					.delta(0.1)
+					.spawnAsBoss();
+				new PPCircle(Particle.BLOCK_CRACK, mLoc, mRadius)
+					.countPerMeter(6)
+					.data(Material.COARSE_DIRT.createBlockData())
+					.delta(0.2)
+					.extra(0.25)
+					.spawnAsBoss();
+				mLoc.setY(Math.max(mLowestY, mLoc.getY() - mYminus));
 				mYminus += 0.02;
 				if (mYminus >= 1) {
 					mYminus = 1;
 				}
-				if (mRadius >= r) {
+				if (mRadius >= 10) {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(plugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
-		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
-		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
+		Location bossLoc = mBoss.getLocation();
+		world.playSound(bossLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
+
+		new PartialParticle(Particle.SPELL_WITCH, bossLoc.clone().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
+		new PartialParticle(Particle.SMOKE_LARGE, bossLoc.clone().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
+		new PartialParticle(Particle.EXPLOSION_NORMAL, bossLoc, 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
+
 		mBoss.teleport(loc);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
-		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
-		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
+
+		new PartialParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
+
 	}
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		/* Boss deals AoE damage when melee'ing a player */
-		if (event.getType() == DamageType.MELEE && damagee.getLocation().distance(mBoss.getLocation()) <= 2) {
+		Location bossLocation = mBoss.getLocation();
+		if (event.getType() == DamageType.MELEE && damagee.getLocation().distance(bossLocation) <= 2) {
 			if (!mCooldown) {
 				mCooldown = true;
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, 20);
 				UUID uuid = damagee.getUniqueId();
-				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4, true)) {
+				for (Player player : PlayerUtils.playersInRange(bossLocation, 4, true)) {
 					if (!player.getUniqueId().equals(uuid)) {
 						BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, event.getDamage());
 					}
 				}
 				World world = mBoss.getWorld();
-				new PartialParticle(Particle.DAMAGE_INDICATOR, mBoss.getLocation(), 30, 2, 2, 2, 0.1).spawnAsBoss();
-				new PartialParticle(Particle.SWEEP_ATTACK, mBoss.getLocation(), 10, 2, 2, 2, 0.1).spawnAsBoss();
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, 0);
+				world.playSound(bossLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, 0);
+				new PartialParticle(Particle.DAMAGE_INDICATOR, bossLocation, 30, 2, 2, 2, 0.1).spawnAsBoss();
+				new PartialParticle(Particle.SWEEP_ATTACK, bossLocation, 10, 2, 2, 2, 0.1).spawnAsBoss();
 			}
 		}
 	}
@@ -864,31 +866,24 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		Spell spell = event.getSpell();
 		if (spell != null && spell.castTicks() > 0) {
 			mBoss.setInvulnerable(true);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
-				new PercentDamageReceived(20 * 9999, -1.0));
 			mBoss.setAI(false);
 			new BukkitRunnable() {
 				@Override
 				public void run() {
 					teleport(mSpawnLoc.clone().add(0, 5, 0));
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							// If the Primordial Elemental is active, don't allow other abilities to turn Kaul's AI back on
-							if (!mPrimordialPhase) {
-								mBoss.setInvulnerable(false);
-								mBoss.setAI(true);
-								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
-								teleport(mSpawnLoc);
-								List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-								if (!players.isEmpty()) {
-									Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
-									((Mob) mBoss).setTarget(newTarget);
-								}
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+						// If the Primordial Elemental is active, don't allow other abilities to turn Kaul's AI back on
+						if (!mPrimordialPhase) {
+							mBoss.setInvulnerable(false);
+							mBoss.setAI(true);
+							teleport(mSpawnLoc);
+							List<Player> players = getArenaParticipants();
+							if (!players.isEmpty()) {
+								Player newTarget = players.get(FastUtils.RANDOM.nextInt(players.size()));
+								((Mob) mBoss).setTarget(newTarget);
 							}
 						}
-					}.runTaskLater(mPlugin, spell.castTicks());
+					}, spell.castTicks());
 				}
 			}.runTaskLater(mPlugin, 1);
 		}
@@ -897,7 +892,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		MMLog.info(() -> "[Kaul] Kaul's death method has been called. If the logs don't contain messages for health events and Primordial/Immortal Elemental, this is a problem!");
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+		List<Player> players = getArenaParticipants();
 		if (players.isEmpty()) {
 			return;
 		}
@@ -907,35 +902,37 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			"DO NOT THINK THIS ABSOLVES YOUR BLASPHEMY. RETURN HERE AGAIN, AND YOU WILL PERISH.",
 			"NOW... THE JUNGLE... MUST SLEEP..."
 		};
-		knockback(mPlugin, 10);
-		mAdvancements.forEach(KaulAdvancementHandler::onBossDeath);
+		knockbackPlayers();
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
-		BossUtils.endBossFightEffects(mBoss, players, 20 * 20, true, true);
-
-		World world = mBoss.getWorld();
-		for (Entity ent : mSpawnLoc.getNearbyLivingEntities(detectionRange)) {
-			if (!ent.getUniqueId().equals(mBoss.getUniqueId()) && ent instanceof WitherSkeleton && !ent.isDead()) {
-				ent.remove();
-			}
+		if (event != null) {
+			event.setCancelled(true);
+			event.setReviveHealth(100);
 		}
+		BossUtils.endBossFightEffects(mBoss, players, 20 * 20, true, true);
+		mAdvancements.forEach(KaulAdvancementHandler::onBossDeath);
+
+		if (mImmortal != null) {
+			mImmortal.remove();
+		}
+
 		new BukkitRunnable() {
-			final Location mLoc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
-			final double mRotation = 0;
-			double mRadius = 0;
-			int mT = 0;
+			final Location mLoc = mShrineLoc.clone().subtract(0, 0.5, 0);
+			int mRadius = 0;
 
 			@Override
 			public void run() {
-				mT++;
-				mRadius = mT;
-				for (int i = 0; i < 36; i++) {
-					double radian1 = Math.toRadians(mRotation + (10 * i));
-					mLoc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
-					new PartialParticle(Particle.CLOUD, mLoc, 3, 0.25, 0.25, 0.25, 0.025, null).spawnAsBoss();
-					new PartialParticle(Particle.VILLAGER_HAPPY, mLoc, 5, 0.4, 0.25, 0.4, 0.25, null).spawnAsBoss();
-					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
-				}
-				for (Block block : LocationUtils.getEdge(mLoc.clone().subtract(mT, 0, mT), mLoc.clone().add(mT, 0, mT))) {
+				mRadius++;
+				new PPCircle(Particle.CLOUD, mLoc, mRadius)
+					.countPerMeter(4)
+					.delta(0.25)
+					.extra(0.025)
+					.spawnAsBoss();
+				new PPCircle(Particle.VILLAGER_HAPPY, mLoc, mRadius)
+					.countPerMeter(FLOOR_Y)
+					.delta(0.4)
+					.extra(0.25)
+					.spawnAsBoss();
+				for (Block block : BlockUtils.getEdge(mLoc, mRadius)) {
 					if (block.getType() == Material.MAGMA_BLOCK) {
 						block.setType(Material.OAK_LEAVES);
 						if (FastUtils.RANDOM.nextInt(5) == 1) {
@@ -951,58 +948,51 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 						}
 					}
 				}
-				if (mT >= 40) {
+				if (mRadius >= 40) {
 					this.cancel();
 				}
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
-		new BukkitRunnable() {
-			int mT = 0;
+		sendDialogue(20 * 6, dio, () -> {
+			teleport(mSpawnLoc);
+			new BukkitRunnable() {
+				int mT = 0;
 
-			@Override
-			public void run() {
-				sendDialogue(dio[mT].toUpperCase(Locale.getDefault()));
-				mT++;
-				if (mT == dio.length) {
-					this.cancel();
-					teleport(mSpawnLoc);
-					new BukkitRunnable() {
-						int mT = 0;
-
-						@Override
-						public void run() {
-							if (mT <= 0) {
-								world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 10, 1);
-							}
-							mT++;
-							if (mT <= 60) {
-								mBoss.teleport(mBoss.getLocation().subtract(0, 0.05, 0));
-								new PartialParticle(Particle.BLOCK_CRACK, mSpawnLoc, 7, 0.3, 0.1, 0.3, 0.25,
-									Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
-							} else {
-								EntityEquipment equipment = mBoss.getEquipment();
-								if (equipment != null) {
-									equipment.clear();
-								}
-								mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 27, 0));
-								mBoss.setAI(false);
-								mBoss.setSilent(true);
-								mBoss.setInvulnerable(true);
-								if (mT >= 100) {
-									this.cancel();
-									for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-										MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.GREEN), Component.text("Kaul, Soul of the Jungle", NamedTextColor.DARK_GREEN));
-										player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
-									}
-									mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-									mBoss.remove();
-								}
-							}
+				@Override
+				public void run() {
+					if (mT <= 0) {
+						World world = mBoss.getWorld();
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 10, 1);
+					}
+					if (mT <= 3 * 20) {
+						mBoss.teleport(mBoss.getLocation().subtract(0, 0.05, 0));
+						new PartialParticle(Particle.BLOCK_CRACK, mSpawnLoc, 7, 0.3, 0.1, 0.3, 0.25,
+							Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
+					}
+					if (mT == 3 * 20) {
+						EntityEquipment equipment = mBoss.getEquipment();
+						if (equipment != null) {
+							equipment.clear();
 						}
-					}.runTaskTimer(mPlugin, 30, 1);
+						mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 27, 0));
+						mBoss.setAI(false);
+						mBoss.setSilent(true);
+						mBoss.setInvulnerable(true);
+					} else if (mT >= 5 * 20) {
+						this.cancel();
+
+						for (Player player : getArenaParticipants()) {
+							MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.GREEN), Component.text("Kaul, Soul of the Jungle", NamedTextColor.DARK_GREEN));
+							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
+						}
+						mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+						mBoss.remove();
+					}
+
+					mT++;
 				}
-			}
-		}.runTaskTimer(mPlugin, 0, 20 * 6);
+			}.runTaskTimer(mPlugin, 30, 1);
+		}, 0);
 	}
 
 	@Override
@@ -1016,6 +1006,10 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		GlowingManager.startGlowing(mBoss, NamedTextColor.DARK_GREEN, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1);
 
 		EntityEquipment equips = mBoss.getEquipment();
+		if (equips == null) {
+			MMLog.severe("[Kaul] Kaul has no equipment!");
+			return;
+		}
 		ItemStack[] armorc = equips.getArmorContents();
 		ItemStack m = equips.getItemInMainHand();
 		ItemStack o = equips.getItemInOffHand();
@@ -1031,90 +1025,87 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				mBoss.setAI(false);
 				mBoss.setSilent(true);
 				mBoss.setInvulnerable(true);
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
-					new PercentDamageReceived(20 * 9999, -1.0));
+
 				World world = mBoss.getWorld();
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3, 0f);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 3, 0f);
 				new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
 				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
+
 				String[] dio = new String[]{
 					"THE JUNGLE'S WILL IS UNASSAILABLE, YET YOU SCURRY ACROSS MY SHRINE LIKE " + (mPlayerCount > 1 ? "ANTS." : "AN ANT."),
 					"IS THE DEFILEMENT OF THE DREAM NOT ENOUGH!?"
 				};
 
-				new BukkitRunnable() {
-					int mT = 0;
-					int mIndex = 0;
+				sendDialogue(DIALOGUE_DELAY, dio, () -> {
+					this.cancel();
+					mBoss.setAI(true);
+					mBoss.setSilent(false);
+					mBoss.setInvulnerable(false);
+					mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
 
-					@Override
-					public void run() {
-						if (mT == 0) {
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 3, 0f);
-						}
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3, 0f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5, 0f);
+					new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
+					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
+					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
 
-						if (mT % (20 * 4) == 0) {
-							if (mIndex < dio.length) {
-								sendDialogue(dio[mIndex].toUpperCase(Locale.getDefault()));
-								mIndex++;
-							}
-						}
-						mT++;
+					mBoss.getEquipment().setArmorContents(armorc);
+					mBoss.getEquipment().setItemInMainHand(m);
+					mBoss.getEquipment().setItemInOffHand(o);
 
-						if (mT >= (20 * 8)) {
-							this.cancel();
-							mBoss.setAI(true);
-							mBoss.setSilent(false);
-							mBoss.setInvulnerable(false);
-							mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
-							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
-							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
-								new PercentDamageReceived(20 * 9999, -0.2));
-							EffectType.applyEffect(EffectType.VANILLA_GLOW, mBoss, 20 * 9999, 0, EffectType.VANILLA_GLOW.getName(), false);
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3, 0f);
-							new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
-							new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
-							new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
-							mBoss.getEquipment().setArmorContents(armorc);
-							mBoss.getEquipment().setItemInMainHand(m);
-							mBoss.getEquipment().setItemInOffHand(o);
-
-							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-								MessagingUtils.sendBoldTitle(player, Component.text("Kaul", NamedTextColor.DARK_GREEN), Component.text("Soul of the Jungle", NamedTextColor.GREEN));
-								player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
-							}
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5, 0f);
-						}
+					for (Player player : getArenaParticipants()) {
+						MessagingUtils.sendBoldTitle(player, Component.text("Kaul", NamedTextColor.DARK_GREEN), Component.text("Soul of the Jungle", NamedTextColor.GREEN));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 					}
-				}.runTaskTimer(mPlugin, 40, 1);
+				}, DIALOGUE_DELAY);
 			}
 		}.runTaskLater(mPlugin, 1);
 	}
 
-	public Collection<Player> getArenaParticipants() {
-		return getArenaParticipantsY(0, ARENA_MAX_Y);
+	public static List<Player> getArenaParticipants(Location center) {
+		List<Player> result = PlayerUtils.playersInRange(center, detectionRange, true);
+		result.removeIf(player -> player.getLocation().getY() >= ARENA_MAX_Y);
+		return result;
 	}
 
-	public Collection<Player> getArenaParticipantsY(int yStart, int yEnd) {
-		if (mShrineMarker == null) {
-			return Collections.emptyList();
-		}
-
-		Location arenaCenter = mShrineMarker.getLocation();
-		arenaCenter.setY(yStart);
-
-		// Cylinder from y 0 to 62
-		Hitbox hb = new Hitbox.UprightCylinderHitbox(arenaCenter, yEnd, ARENA_WIDTH / 2d);
-
-		return hb.getHitPlayers(true);
+	public List<Player> getArenaParticipants() {
+		return getArenaParticipants(mShrineLoc);
 	}
 
-	public LivingEntity getBoss() {
-		return mBoss;
+	public Collection<Player> getArenaSpectators() {
+		List<Player> result = PlayerUtils.playersInXZRange(mShrineLoc, ARENA_RADIUS, true);
+		result.removeIf(player -> player.getLocation().getY() < ARENA_MAX_Y);
+		return result;
 	}
 
 	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String spellName) {
 		return new ChargeUpManager(boss, chargeTime, Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(spellName + "...", NamedTextColor.DARK_GREEN)), BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, detectionRange);
+	}
+
+	public void sendDialogue(int delay, String[] messages, Runnable runAfterDialogue, int runnableDelay) {
+		new BukkitRunnable() {
+			int mIndex = 0;
+
+			@Override
+			public void run() {
+				// safety check
+				if (mIndex >= messages.length) {
+					this.cancel();
+					return;
+				}
+
+				// send message
+				sendDialogue(messages[mIndex]);
+
+				mIndex++;
+				if (mIndex >= messages.length) {
+					this.cancel();
+					Bukkit.getScheduler().runTaskLater(mPlugin, runAfterDialogue, runnableDelay);
+				}
+			}
+		}.runTaskTimer(mPlugin, 0, delay);
 	}
 
 	public void sendDialogue(String message) {
@@ -1139,11 +1130,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				if (helmet == null) {
 					return false;
 				}
-				Component name = helmet.getItemMeta().displayName();
-				if (name == null) {
-					return false;
-				}
-				return MessagingUtils.plainText(name).equals("Fedora");
+				return ItemUtils.getPlainName(helmet).equals("Fedora");
 			}
 
 			@Override
@@ -1185,7 +1172,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			@Override
 			void onTick() {
 				mTick++;
-				if (mTick % 10 == 0 && getArenaParticipantsY(ARENA_MAX_Y, 256).size() >= 10) {
+				if (mTick % 10 == 0 && getArenaSpectators().size() >= 10) {
 					getArenaParticipants().forEach(p -> AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r1/kaul/celebrity"));
 				}
 			}

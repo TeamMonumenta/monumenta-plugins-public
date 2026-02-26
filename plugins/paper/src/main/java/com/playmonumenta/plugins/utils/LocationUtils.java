@@ -372,46 +372,6 @@ public class LocationUtils {
 		return collidesWithBlocks(BoundingBox.of(loc, 0.001, 0.001, 0.001), loc.getWorld());
 	}
 
-	public static List<Block> getEdge(Location loc1, Location loc2) {
-		List<Block> blocks = new ArrayList<>();
-		int x1 = Math.min(loc1.getBlockX(), loc2.getBlockX());
-		int y1 = Math.min(loc1.getBlockY(), loc2.getBlockY());
-		int z1 = Math.min(loc1.getBlockZ(), loc2.getBlockZ());
-
-		int x2 = Math.max(loc1.getBlockX(), loc2.getBlockX());
-		int y2 = Math.max(loc1.getBlockY(), loc2.getBlockY());
-		int z2 = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
-
-		World world = loc1.getWorld();
-		for (int xPoint = x1; xPoint <= x2; xPoint++) {
-			Block currentBlock = world.getBlockAt(xPoint, y1, z1);
-			blocks.add(currentBlock);
-		}
-		for (int xPoint = x1; xPoint <= x2; xPoint++) {
-			Block currentBlock = world.getBlockAt(xPoint, y2, z2);
-			blocks.add(currentBlock);
-		}
-
-		for (int yPoint = y1; yPoint <= y2; yPoint++) {
-			Block currentBlock = world.getBlockAt(x1, yPoint, z1);
-			blocks.add(currentBlock);
-		}
-		for (int yPoint = y1; yPoint <= y2; yPoint++) {
-			Block currentBlock = world.getBlockAt(x2, yPoint, z2);
-			blocks.add(currentBlock);
-		}
-
-		for (int zPoint = z1; zPoint <= z2; zPoint++) {
-			Block currentBlock = world.getBlockAt(x1, y1, zPoint);
-			blocks.add(currentBlock);
-		}
-		for (int zPoint = z1; zPoint <= z2; zPoint++) {
-			Block currentBlock = world.getBlockAt(x2, y2, zPoint);
-			blocks.add(currentBlock);
-		}
-		return blocks;
-	}
-
 	public static List<Block> getNearbyBlocks(Block start, int radius) {
 		List<Block> blocks = new ArrayList<>();
 		for (double x = start.getLocation().getX() - radius; x <= start.getLocation().getX() + radius; x++) {

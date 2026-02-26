@@ -8,14 +8,17 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -47,10 +50,8 @@ public class SpellEarthenRupture extends Spell {
 		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
 			new BaseMovementSpeedModifyEffect(50, -0.3));
 		BukkitRunnable runnable = new BukkitRunnable() {
-
 			@Override
 			public void run() {
-
 				Location loc = mBoss.getLocation();
 				if (mChargeUp.getTime() % 2 == 0) {
 					world.playSound(loc, Sound.BLOCK_GRAVEL_HIT, SoundCategory.HOSTILE, 2.0f, 0.9f);
@@ -58,16 +59,21 @@ public class SpellEarthenRupture extends Spell {
 
 				new PartialParticle(Particle.BLOCK_CRACK, loc, 6, 0.4f, 0.1f, 0.4f, 0.2f, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.25f, 0.1f, 0.25f, 0.2f).spawnAsEntityActive(mBoss);
+
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 				}
 				if (mChargeUp.nextTick()) {
 					this.cancel();
 					mChargeUp.reset();
+
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 2.0f, 0.9f);
 					new PartialParticle(Particle.BLOCK_CRACK, loc, 150, 3, 0.1f, 3, 0.25f, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.LAVA, loc, 100, 3, 0.1f, 3, 0.25f).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1f, 3, 0.25f).spawnAsEntityActive(mBoss);
+
+					DisplayEntityUtils.groundBlockQuake(loc.clone().add(0, 0.2, 0), 6, List.of(Material.MAGMA_BLOCK, Material.DIRT, Material.MUD), new Display.Brightness(12, 12), 0.01);
+
 					for (Player player : PlayerUtils.playersInRange(loc, 6, true)) {
 						DamageUtils.damage(mBoss, player, DamageType.BLAST, 20, null, false, true, SPELL_NAME);
 						MovementUtils.knockAway(loc, player, 0.50f, 1.6f);
@@ -75,12 +81,6 @@ public class SpellEarthenRupture extends Spell {
 							new PercentSpeed(20 * 10, -0.5, SLOWNESS_SRC));
 					}
 				}
-			}
-
-			@Override
-			public synchronized void cancel() {
-				mActiveRunnables.remove(this);
-				super.cancel();
 			}
 		};
 		runnable.runTaskTimer(mPlugin, 0, 1);

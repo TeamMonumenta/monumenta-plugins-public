@@ -627,6 +627,46 @@ public class BlockUtils {
 			|| !block.getRelative(BlockFace.WEST).isSolid();
 	}
 
+	public static List<Block> getEdge(Location center, int mRadius) {
+		List<Block> blocks = new ArrayList<>();
+		int x1 = center.getBlockX() - mRadius;
+		int y1 = center.getBlockY();
+		int z1 = center.getBlockZ() - mRadius;
+
+		int x2 = center.getBlockX() + mRadius;
+		int y2 = center.getBlockY();
+		int z2 = center.getBlockZ() + mRadius;
+
+		World world = center.getWorld();
+		for (int xPoint = x1; xPoint <= x2; xPoint++) {
+			Block currentBlock = world.getBlockAt(xPoint, y1, z1);
+			blocks.add(currentBlock);
+		}
+		for (int xPoint = x1; xPoint <= x2; xPoint++) {
+			Block currentBlock = world.getBlockAt(xPoint, y2, z2);
+			blocks.add(currentBlock);
+		}
+
+		for (int yPoint = y1; yPoint <= y2; yPoint++) {
+			Block currentBlock = world.getBlockAt(x1, yPoint, z1);
+			blocks.add(currentBlock);
+		}
+		for (int yPoint = y1; yPoint <= y2; yPoint++) {
+			Block currentBlock = world.getBlockAt(x2, yPoint, z2);
+			blocks.add(currentBlock);
+		}
+
+		for (int zPoint = z1; zPoint <= z2; zPoint++) {
+			Block currentBlock = world.getBlockAt(x1, y1, zPoint);
+			blocks.add(currentBlock);
+		}
+		for (int zPoint = z1; zPoint <= z2; zPoint++) {
+			Block currentBlock = world.getBlockAt(x2, y2, zPoint);
+			blocks.add(currentBlock);
+		}
+		return blocks;
+	}
+
 	private static class Node {
 		private final Block mBlock;
 		private int mDistanceTo;

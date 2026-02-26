@@ -22,6 +22,7 @@ public class PPSpiral extends AbstractPartialParticle<PPSpiral> {
 	 */
 	protected double mCurveAngle = 270;
 	protected int mTicks = Constants.TICKS_PER_SECOND;
+	protected boolean mReversed = false;
 	protected int mCurves = 3;
 
 	protected int mCountPerBlockPerCurve = -1;
@@ -50,6 +51,7 @@ public class PPSpiral extends AbstractPartialParticle<PPSpiral> {
 		copy.mRadius = mRadius;
 		copy.mCurveAngle = mCurveAngle;
 		copy.mTicks = mTicks;
+		copy.mReversed = mReversed;
 		copy.mCurves = mCurves;
 		copy.mCountPerBlockPerCurve = mCountPerBlockPerCurve;
 		return copy;
@@ -110,6 +112,15 @@ public class PPSpiral extends AbstractPartialParticle<PPSpiral> {
 		return mTicks;
 	}
 
+	public PPSpiral reversed(boolean reversed) {
+		mReversed = reversed;
+		return this;
+	}
+
+	public boolean reversed() {
+		return mReversed;
+	}
+
 	/*-------------------------------------------------------------------------------
 	 * Methods
 	 */
@@ -137,11 +148,11 @@ public class PPSpiral extends AbstractPartialParticle<PPSpiral> {
 		}
 
 		new BukkitRunnable() {
-			final double mRadiusIncrementPerTick = mRadius / mTicks;
+			final double mRadiusIncrementPerTick = (mReversed ? -1 : 1) * mRadius / mTicks;
 			final double mParticlesPerCurvePerTick = (double) partialCount / mCurves / mTicks;
 			final double mDegPerCurve = 360.0 / mCurves;
 			final double mDegreeOffset = mCurveAngle * mCurves / partialCount;
-			double mCurrentRadius = 0;
+			double mCurrentRadius = mReversed ? mRadius : 0;
 			double mCurrentDegree = 0;
 			int mSafety = 0;
 
@@ -184,7 +195,7 @@ public class PPSpiral extends AbstractPartialParticle<PPSpiral> {
 					}
 					mCurrentDegree += (mParticlesPerCurvePerTick * mDegreeOffset);
 					mCurrentRadius += mRadiusIncrementPerTick;
-					if (mCurrentRadius > mRadius) {
+					if ((!mReversed && mCurrentRadius > mRadius) || (mReversed && mCurrentRadius < 0)) {
 						this.cancel();
 					}
 				} catch (Exception e) {

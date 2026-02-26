@@ -53,7 +53,7 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		GlowingManager.startGlowing(mBoss, NamedTextColor.GOLD, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellRaiseJungle(plugin, mBoss, 10, detectionRange, 20 * 8, 20 * 20),
+			new SpellRaiseJungle(plugin, mBoss, 10, 20 * 8, 20 * 20, spawnLoc),
 			new SpellEarthenRupture(plugin, mBoss),
 			new SpellPrimordialBolt(plugin, mBoss)
 		));

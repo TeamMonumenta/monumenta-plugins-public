@@ -124,7 +124,8 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 
 	private final List<Spell> mSpellsDesperation;
 	private final List<Spell> mBaseActiveSpells;
-	private final List<Spell> mPassives;
+	private final List<Spell> mBasePassives;
+	private final List<Spell> mStartingPassives;
 
 	private final BossBarManager mBossBarManager;
 	private final Set<Player> mWarned = new HashSet<>();
@@ -176,17 +177,19 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		// spells
 		List<Player> mPlayers = playersInRange(mSpawnLoc, true);
 		mPlayers.forEach(player -> player.removeScoreboardTag(DEAD_TAG));
-		mPassives = List.of(
+		mBasePassives = List.of(
 			mSpellAntiCheese = new SpellAntiCheese(plugin, boss, spawnLoc),
 			mIntruderAdvancements = new SpellIntruderAdvancements(boss),
 			new SpellRunAction(() -> {
 				if (playersInRange(mBoss.getLocation()).isEmpty()) {
 					lossCutscene();
 				}
-			}),
+			})
+		);
+		mStartingPassives = addSpells(mBasePassives, List.of(
 			new SpellTwistedSwipe(boss, false),
 			new SpellCerebralOutburst(plugin, boss, this::dialogue, false)
-		);
+		));
 		mPsychicMiasma = new SpellPsychicMiasma(plugin, boss, spawnLoc);
 		mScreamroom = new SpellScreamroom(plugin, boss, spawnLoc.getBlockY(), mIntruderAdvancements::addDistortedPlayer, this::dialogue, this::narration);
 		mLiminalCorruption = new SpellLiminalCorruption(plugin, boss, this::dialogue, false);
@@ -297,7 +300,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 		});
 		events.put(30, lBoss -> {
 			mActiveSpells.cancelAll();
-			mPassives.forEach(Spell::cancel);
+			mStartingPassives.forEach(Spell::cancel);
 			forceCastSpell(SpellParasomnicMist.class);
 		});
 		events.put(27, lBoss -> {
@@ -307,7 +310,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			mLucidRend.killLucidRends();
 
 			mSpellAntiCheese.setAmalgamatingDreamscape(true);
-			changePhase(new SpellManager(List.of(mAmalgamatingDreamscape)), mPassives, null, 40);
+			changePhase(new SpellManager(List.of(mAmalgamatingDreamscape)), mStartingPassives, null);
 			forceCastSpell(SpellAmalgamatingDreamscape.class);
 		});
 		events.put(18, lBoss -> {
@@ -472,7 +475,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 
 	private void startBoss() {
 		playersInRange(mSpawnLoc).forEach(IntruderBoss::clearBossSpecificEffects);
-		constructBoss(new SpellManager(mBaseActiveSpells), mPassives, DETECTION_RANGE, mBossBarManager, 40, 1, true);
+		constructBoss(new SpellManager(mBaseActiveSpells), mStartingPassives, DETECTION_RANGE, mBossBarManager, 40, 1, true);
 
 		mIntruderAdvancements.bossStarted();
 
@@ -676,10 +679,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 				}
 			)
 		);
-		changePhase(new SpellManager(spells), addSpells(removeSpells(mPassives, List.of(
-			SpellTwistedSwipe.class,
-			SpellCerebralOutburst.class
-		)), mSpellsDesperation), null, 8 * 20);
+		changePhase(SpellManager.EMPTY, List.of(), null);
 
 		dialogue(2 * 20, List.of(
 				"THE CONNECTION. IS. WANING.",
@@ -690,6 +690,8 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			() -> {
 				mBoss.setInvulnerable(false);
 				mBoss.setAI(true);
+
+				changePhase(new SpellManager(spells), addSpells(mBasePassives, mSpellsDesperation), null);
 			});
 		mPlayers.forEach(player -> {
 			player.playSound(player.getLocation(), Sound.AMBIENT_CAVE, SoundCategory.HOSTILE, 3.0f, Constants.Note.C4.mPitch, 36);
