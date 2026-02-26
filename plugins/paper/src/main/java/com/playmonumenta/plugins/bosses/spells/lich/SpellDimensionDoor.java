@@ -68,6 +68,7 @@ public class SpellDimensionDoor extends Spell {
 		Material.BARRIER,
 		Material.END_PORTAL
 	);
+	public static final String RESISTANCE_SOURCE = "DimensionalDoorResistance";
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -421,7 +422,7 @@ public class SpellDimensionDoor extends Spell {
 					if (byPortal) {
 						p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 5, 0));
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, PercentDamageReceived.GENERIC_NAME,
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, RESISTANCE_SOURCE,
 							new PercentDamageReceived(20 * 5, -1.0));
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, CustomRegeneration.effectID,
 							new CustomRegeneration(20 * 5, 1.0, 25, null, false, com.playmonumenta.plugins.Plugin.getInstance()));

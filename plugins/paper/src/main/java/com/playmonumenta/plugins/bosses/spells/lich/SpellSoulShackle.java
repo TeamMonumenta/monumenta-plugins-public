@@ -106,36 +106,48 @@ public final class SpellSoulShackle extends Spell {
 		}
 		event.setCancelled(true);
 		event.getEntity().remove();
-		if (!(event.getHitEntity() instanceof final Player p) || mGotHit.contains(p.getUniqueId())) {
+		if (!(event.getHitEntity() instanceof final Player player) || mGotHit.contains(player.getUniqueId())) {
 			return;
 		}
-		p.removePotionEffect(PotionEffectType.LEVITATION);
-		mGotHit.add(p.getUniqueId());
+		player.removePotionEffect(PotionEffectType.LEVITATION);
+		mGotHit.add(player.getUniqueId());
 
-		final Location centerLoc = p.getLocation().add(0, 1.5, 0);
+		final Location centerLoc = player.getLocation().add(0, 1.5, 0);
 		final PPCircle indicator = new PPCircle(Particle.END_ROD, centerLoc, SHACKLE_RADIUS).count(36);
 
-		p.sendMessage(Component.text("You got chained by Hekawt! Don't move outside of the ring!", NamedTextColor.DARK_AQUA));
-		DamageUtils.damage(mBoss, p, DamageType.MAGIC, 27, null, false, true, SPELL_NAME);
-		AbilityUtils.silencePlayer(p, SHACKLE_DURATION);
+		player.sendMessage(Component.text("You got chained by Hekawt! Don't move outside of the ring!", NamedTextColor.DARK_AQUA));
+		DamageUtils.damage(mBoss, player, DamageType.MAGIC, 27, null, false, true, SPELL_NAME);
+		AbilityUtils.silencePlayer(player, SHACKLE_DURATION);
 		mRod.location(centerLoc).spawnAsEntityActive(mBoss);
 		mWorld.playSound(centerLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 0.7f, 0.5f);
 
-		final ChargeUpManager shackleTimer = new ChargeUpManager(mBoss, SHACKLE_DURATION,
-			Component.text(SPELL_NAME + " Duration", NamedTextColor.RED), BossBar.Color.RED,
-			BossBar.Overlay.PROGRESS, Lich.detectionRange);
-		shackleTimer.setTime(SHACKLE_DURATION);
+		final BossBar shackleBar = BossBar.bossBar(Component.text(SPELL_NAME + " Duration", NamedTextColor.RED), 1, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
+		shackleBar.addViewer(player);
 
 		final BukkitRunnable hitDetection = new BukkitRunnable() {
+			int mTicks = 0;
+
 			@Override
 			public void run() {
-				if (SpellDimensionDoor.getShadowed().contains(p)) {
+				if (SpellDimensionDoor.getShadowed().contains(player) ||
+					mTicks >= SHACKLE_DURATION ||
+					player.isDead() ||
+					Lich.phase3over() ||
+					!mBoss.isValid()
+				) {
 					this.cancel();
 					return;
 				}
 
-				if (shackleTimer.getTime() % HALF_TICKS_PER_SECOND == 0) {
-					new PPLine(Particle.END_ROD, centerLoc, p.getLocation()).countPerMeter(10).delta(0.1).spawnAsEntityActive(mBoss);
+				int ticksLeft = SHACKLE_DURATION - mTicks;
+
+				shackleBar.progress((float) ticksLeft / SHACKLE_DURATION);
+				if (mTicks % TICKS_PER_SECOND == 0) {
+					shackleBar.name(Component.text("%s Duration: %.0fs".formatted(SPELL_NAME, Math.ceil((double) ticksLeft / TICKS_PER_SECOND)), NamedTextColor.RED));
+				}
+
+				if (mTicks % HALF_TICKS_PER_SECOND == 0) {
+					new PPLine(Particle.END_ROD, centerLoc, player.getLocation()).countPerMeter(10).delta(0.1).spawnAsEntityActive(mBoss);
 					indicator.location(centerLoc).spawnAsEntityActive(mBoss);
 					for (double n = -1; n < 2; n += 1) {
 						mSpark.location(centerLoc.clone().add(0, n, 0)).spawnAsEntityActive(mBoss);
@@ -143,28 +155,26 @@ public final class SpellSoulShackle extends Spell {
 
 					final List<Player> hitCheck = new Hitbox.UprightCylinderHitbox(centerLoc.clone()
 						.add(0, -2.5, 0), SHACKLE_HEIGHT, SHACKLE_RADIUS).getHitPlayers(true);
-					if (!hitCheck.contains(p)) {
+					if (!hitCheck.contains(player)) {
 						final Location shackleCenterGround = centerLoc.clone();
 						shackleCenterGround.setY(mCenter.getY());
 
-						DamageUtils.damage(mBoss, p, new DamageEvent.Metadata(DamageType.TRUE, null,
-								null, SPELL_NAME), 0.15 * EntityUtils.getMaxHealth(p),
+						DamageUtils.damage(mBoss, player, new DamageEvent.Metadata(DamageType.TRUE, null,
+								null, SPELL_NAME), 0.15 * EntityUtils.getMaxHealth(player),
 							false, false, true);
-						MovementUtils.knockAway(shackleCenterGround, p, -0.75f, false);
-						p.sendMessage(Component.text("I shouldn't leave this ring.", NamedTextColor.DARK_AQUA));
-						mWorld.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 2, 1);
+						MovementUtils.pullTowardsNormalized(shackleCenterGround, player, 0.75f, false);
+						player.sendMessage(Component.text("I shouldn't leave this ring.", NamedTextColor.DARK_AQUA));
+						mWorld.playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 2, 1);
 					}
 				}
 
-				if (shackleTimer.previousTick() || p.isDead() || Lich.phase3over() || mBoss.isDead() || !mBoss.isValid()) {
-					this.cancel();
-				}
+				mTicks++;
 			}
 
 			@Override
 			public synchronized void cancel() {
 				super.cancel();
-				shackleTimer.reset();
+				shackleBar.removeViewer(player);
 			}
 		};
 		hitDetection.runTaskTimer(mPlugin, 0, 1);
