@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths;
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.bosses.abilities.PhantomForceBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -847,6 +848,14 @@ public class DepthsListener implements Listener {
 		// Make sure to remove anticheese tags
 		player.getScoreboardTags().remove(DISCONNECT_ANTICHEESE_MOB_TAG);
 		player.getScoreboardTags().remove(DISCONNECT_ANTICHEESE_BOSS_TAG);
+
+		// Run remove of all overworld abilities, prevents smuggling of base stat multipliers (Formidable KBR, etc.)
+		for (AbilityInfo<?> ability : AbilityManager.getBaseOverworldAbilities()) {
+			ability.onRemove(player);
+		}
+		for (AbilityInfo<?> ability : AbilityManager.getSpecOverworldAbilities()) {
+			ability.onRemove(player);
+		}
 
 		if (dp == null
 			&& player.getGameMode() == GameMode.SURVIVAL

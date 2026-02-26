@@ -254,205 +254,18 @@ public class AbilityManager {
 			PatronRed.INFO
 		));
 
-		List<AbilityInfo<?>> classAbilities = Arrays.asList(
-
-			//********** MAGE **********//
-			ArcaneStrike.INFO,
-			ThunderStep.INFO,
-			ElementalArrows.INFO,
-			FrostNova.INFO,
-			Channeling.INFO,
-			MagmaShield.INFO,
-			ManaLance.INFO,
-			Spellshock.INFO,
-			PrismaticShield.INFO,
-
-			//********** ROGUE **********//
-			AdvancingShadows.INFO,
-			ByMyBlade.INFO,
-			DaggerThrow.INFO,
-			Dodging.INFO,
-			Dethroner.INFO,
-			MagicDodging.INFO,
-			Smokescreen.INFO,
-			ViciousCombos.INFO,
-			Skirmisher.INFO,
-			EscapeDeath.INFO,
-
-			//********** SCOUT **********//
-			HuntingCompanion.INFO,
-			Volley.INFO,
-			Swiftness.INFO,
-			EagleEye.INFO,
-			Versatile.INFO,
-			SwiftCuts.INFO,
-			Sharpshooter.INFO,
-			WindBomb.INFO,
-			Quickdraw.INFO,
-
-			//********** WARRIOR **********//
-			CounterStrike.INFO,
-			DefensiveLine.INFO,
-			Frenzy.INFO,
-			Riposte.INFO,
-			ShieldBash.INFO,
-			Toughness.INFO,
-			Formidable.INFO,
-			WeaponMastery.INFO,
-			BruteForce.INFO,
-
-			//********** CLERIC **********//
-			CelestialBlessing.INFO,
-			CleansingRain.INFO,
-			HandOfLight.INFO,
-			TouchofRadiance.INFO,
-			DivineJustice.INFO,
-			HeavenlyBoon.INFO,
-			Crusade.INFO,
-			Illuminate.INFO,
-			SanctifiedArmor.INFO,
-
-			//********** WARLOCK **********//
-			AmplifyingHex.INFO,
-			PhlegmaticResolve.INFO,
-			CholericFlames.INFO,
-			CursedWound.INFO,
-			GraspingClaws.INFO,
-			Culling.INFO,
-			SanguineHarvest.INFO,
-			SoulRend.INFO,
-			MelancholicLament.INFO,
-
-			//********** ALCHEMIST **********//
-			Bezoar.INFO,
-			AlchemicalArtillery.INFO,
-			VolatileReaction.INFO,
-			UnstableAmalgam.INFO,
-			IronTincture.INFO,
-			GruesomeAlchemy.INFO,
-			BrutalAlchemy.INFO,
-			EnergizingElixir.INFO,
-			AlchemistPotions.INFO,
-
-			//********** SHAMAN **************//
-			CleansingTotem.INFO,
-			ChainLightning.INFO,
-			FlameTotem.INFO,
-			InterconnectedHavoc.INFO,
-			EarthenTremor.INFO,
-			LightningTotem.INFO,
-			IgnitionDrive.INFO,
-			ShamanPassiveManager.INFO,
-			Spiritualism.INFO,
-			TotemicProjection.INFO
-		);
-
-		List<AbilityInfo<?>> specAbilities = Arrays.asList(
-			//********** MAGE **********//
-			// ELEMENTALIST
-			ElementalSpiritFire.INFO,
-			ElementalSpiritIce.INFO,
-			Blizzard.INFO,
-			Starfall.INFO,
-
-			// ARCANIST
-			CosmicMoonblade.INFO,
-			AstralOmen.INFO,
-			SagesInsight.INFO,
-
-			//********** ROGUE **********//
-			// SWORDSAGE
-			WindWalk.INFO,
-			BladeDance.INFO,
-			DeadlyRonde.INFO,
-
-			// ASSASSIN
-			BodkinBlitz.INFO,
-			CloakAndDagger.INFO,
-			CoupDeGrace.INFO,
-
-			//********** SCOUT **********//
-			// RANGER
-			RendingRazor.INFO,
-			TacticalManeuver.INFO,
-			WhirlingBlade.INFO,
-
-			// HUNTER
-			PinningShot.INFO,
-			SplitArrow.INFO,
-			PredatorStrike.INFO,
-
-			//********** WARRIOR **********//
-			// BERSERKER
-			MeteorSlam.INFO,
-			Rampage.INFO,
-			GloriousBattle.INFO,
-			Bloodlust.INFO,
-
-			// GUARDIAN
-			ShieldWall.INFO,
-			Challenge.INFO,
-			Bodyguard.INFO,
-
-			//********** CLERIC **********//
-			// PALADIN
-			Unwavering.INFO,
-			LuminousInfusion.INFO,
-			HolyJavelin.INFO,
-			ChoirBells.INFO,
-
-			// SERAPH
-			Rejuvenation.INFO,
-			EtherealAscension.INFO,
-			HallowedBeam.INFO,
-			KeeperVirtue.INFO,
-
-			//********** WARLOCK **********//
-			// REAPER
-			JudgementChain.INFO,
-			VoodooBonds.INFO,
-			DarkPact.INFO,
-
-			// TENEBRIST
-			WitheringGaze.INFO,
-			HauntingShades.INFO,
-			RestlessSouls.INFO,
-
-			//********** ALCHEMIST **********//
-			// HARBINGER
-			ScorchedEarth.INFO,
-			EsotericEnhancements.INFO,
-			Taboo.INFO,
-
-			// APOTHECARY
-			Panacea.INFO,
-			TransmutationRing.INFO,
-			WardingRemedy.INFO,
-
-			//*********** SHAMAN ***********//
-			//Soothsayer
-			TotemicConsecration.INFO,
-			SpiritualCombos.INFO,
-			WhirlwindTotem.INFO,
-
-			//Hexbreaker
-			DecayedTotem.INFO,
-			SpiritcatcherOrbs.INFO,
-			Devastation.INFO
-		);
-
 		if (ServerProperties.getDepthsEnabled()) {
 			//Depths abilities
 			mReferenceAbilities.addAll(DepthsManager.getAbilities());
 		}
 		if (!ServerProperties.getShardName().contains("depths") && !ServerProperties.getShardName().contains("zenith")) {
 			//Normal class and spec abilities
-			mReferenceAbilities.addAll(classAbilities);
+			mReferenceAbilities.addAll(getBaseOverworldAbilities());
 
 			if (ServerProperties.getClassSpecializationsEnabled(null)) {
-				mReferenceAbilities.addAll(specAbilities);
+				mReferenceAbilities.addAll(getSpecOverworldAbilities());
 			} else {
-				mDisabledSpecAbilities.addAll(specAbilities);
+				mDisabledSpecAbilities.addAll(getSpecOverworldAbilities());
 			}
 		}
 
@@ -569,6 +382,197 @@ public class AbilityManager {
 	/* Do not modify the returned data! */
 	public List<AbilityInfo<?>> getDisabledSpecAbilities() {
 		return mDisabledSpecAbilities;
+	}
+
+	public static List<AbilityInfo<?>> getBaseOverworldAbilities() {
+		return List.of(
+
+			//********** MAGE **********//
+			ArcaneStrike.INFO,
+			ThunderStep.INFO,
+			ElementalArrows.INFO,
+			FrostNova.INFO,
+			Channeling.INFO,
+			MagmaShield.INFO,
+			ManaLance.INFO,
+			Spellshock.INFO,
+			PrismaticShield.INFO,
+
+			//********** ROGUE **********//
+			AdvancingShadows.INFO,
+			ByMyBlade.INFO,
+			DaggerThrow.INFO,
+			Dodging.INFO,
+			Dethroner.INFO,
+			MagicDodging.INFO,
+			Smokescreen.INFO,
+			ViciousCombos.INFO,
+			Skirmisher.INFO,
+			EscapeDeath.INFO,
+
+			//********** SCOUT **********//
+			HuntingCompanion.INFO,
+			Volley.INFO,
+			Swiftness.INFO,
+			EagleEye.INFO,
+			Versatile.INFO,
+			SwiftCuts.INFO,
+			Sharpshooter.INFO,
+			WindBomb.INFO,
+			Quickdraw.INFO,
+
+			//********** WARRIOR **********//
+			CounterStrike.INFO,
+			DefensiveLine.INFO,
+			Frenzy.INFO,
+			Riposte.INFO,
+			ShieldBash.INFO,
+			Toughness.INFO,
+			Formidable.INFO,
+			WeaponMastery.INFO,
+			BruteForce.INFO,
+
+			//********** CLERIC **********//
+			CelestialBlessing.INFO,
+			CleansingRain.INFO,
+			HandOfLight.INFO,
+			TouchofRadiance.INFO,
+			DivineJustice.INFO,
+			HeavenlyBoon.INFO,
+			Crusade.INFO,
+			Illuminate.INFO,
+			SanctifiedArmor.INFO,
+
+			//********** WARLOCK **********//
+			AmplifyingHex.INFO,
+			PhlegmaticResolve.INFO,
+			CholericFlames.INFO,
+			CursedWound.INFO,
+			GraspingClaws.INFO,
+			Culling.INFO,
+			SanguineHarvest.INFO,
+			SoulRend.INFO,
+			MelancholicLament.INFO,
+
+			//********** ALCHEMIST **********//
+			Bezoar.INFO,
+			AlchemicalArtillery.INFO,
+			VolatileReaction.INFO,
+			UnstableAmalgam.INFO,
+			IronTincture.INFO,
+			GruesomeAlchemy.INFO,
+			BrutalAlchemy.INFO,
+			EnergizingElixir.INFO,
+			AlchemistPotions.INFO,
+
+			//********** SHAMAN **************//
+			CleansingTotem.INFO,
+			ChainLightning.INFO,
+			FlameTotem.INFO,
+			InterconnectedHavoc.INFO,
+			EarthenTremor.INFO,
+			LightningTotem.INFO,
+			IgnitionDrive.INFO,
+			ShamanPassiveManager.INFO,
+			Spiritualism.INFO,
+			TotemicProjection.INFO
+		);
+	}
+
+	public static List<AbilityInfo<?>> getSpecOverworldAbilities() {
+		return List.of(
+			//********** MAGE **********//
+			// ELEMENTALIST
+			ElementalSpiritFire.INFO,
+			ElementalSpiritIce.INFO,
+			Blizzard.INFO,
+			Starfall.INFO,
+
+			// ARCANIST
+			CosmicMoonblade.INFO,
+			AstralOmen.INFO,
+			SagesInsight.INFO,
+
+			//********** ROGUE **********//
+			// SWORDSAGE
+			WindWalk.INFO,
+			BladeDance.INFO,
+			DeadlyRonde.INFO,
+
+			// ASSASSIN
+			BodkinBlitz.INFO,
+			CloakAndDagger.INFO,
+			CoupDeGrace.INFO,
+
+			//********** SCOUT **********//
+			// RANGER
+			RendingRazor.INFO,
+			TacticalManeuver.INFO,
+			WhirlingBlade.INFO,
+
+			// HUNTER
+			PinningShot.INFO,
+			SplitArrow.INFO,
+			PredatorStrike.INFO,
+
+			//********** WARRIOR **********//
+			// BERSERKER
+			MeteorSlam.INFO,
+			Rampage.INFO,
+			GloriousBattle.INFO,
+			Bloodlust.INFO,
+
+			// GUARDIAN
+			ShieldWall.INFO,
+			Challenge.INFO,
+			Bodyguard.INFO,
+
+			//********** CLERIC **********//
+			// PALADIN
+			Unwavering.INFO,
+			LuminousInfusion.INFO,
+			HolyJavelin.INFO,
+			ChoirBells.INFO,
+
+			// SERAPH
+			Rejuvenation.INFO,
+			EtherealAscension.INFO,
+			HallowedBeam.INFO,
+			KeeperVirtue.INFO,
+
+			//********** WARLOCK **********//
+			// REAPER
+			JudgementChain.INFO,
+			VoodooBonds.INFO,
+			DarkPact.INFO,
+
+			// TENEBRIST
+			WitheringGaze.INFO,
+			HauntingShades.INFO,
+			RestlessSouls.INFO,
+
+			//********** ALCHEMIST **********//
+			// HARBINGER
+			ScorchedEarth.INFO,
+			EsotericEnhancements.INFO,
+			Taboo.INFO,
+
+			// APOTHECARY
+			Panacea.INFO,
+			TransmutationRing.INFO,
+			WardingRemedy.INFO,
+
+			//*********** SHAMAN ***********//
+			//Soothsayer
+			TotemicConsecration.INFO,
+			SpiritualCombos.INFO,
+			WhirlwindTotem.INFO,
+
+			//Hexbreaker
+			DecayedTotem.INFO,
+			SpiritcatcherOrbs.INFO,
+			Devastation.INFO
+		);
 	}
 
 	public JsonElement getAsJson(Player player) {
