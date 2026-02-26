@@ -3,70 +3,27 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Transformation;
+import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
 public class DisplayBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_display";
-	private final Display mDisplay;
-
-	public DisplayBoss(Plugin plugin, LivingEntity boss) {
-		super(plugin, identityTag, boss);
-
-		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
-		mDisplay = boss.getWorld().spawn(boss.getLocation(), p.TYPE.entityClass(), d -> {
-			d.setTransformation(new Transformation(
-				new Vector3f(p.TRANSLATION_X, p.TRANSLATION_Y, p.TRANSLATION_Z),
-				new AxisAngle4f((float) Math.toRadians(p.ROTATION_DEGREES), p.ROTATION_X, p.ROTATION_Y, p.ROTATION_Z),
-				new Vector3f(p.SCALE_X, p.SCALE_Y, p.SCALE_Z),
-				new AxisAngle4f()
-			));
-			if (d instanceof BlockDisplay blockDisplay) {
-				blockDisplay.setBlock(p.MATERIAL.createBlockData());
-			}
-			if (d instanceof ItemDisplay itemDisplay) {
-				itemDisplay.setItemDisplayTransform(p.ITEM_DISPLAY_TYPE);
-				itemDisplay.setItemStack(DisplayEntityUtils.generateRPItem(p.MATERIAL, p.ITEM_NAME));
-			}
-			d.setBillboard(p.BILLBOARD);
-			d.setTeleportDuration(Math.clamp(0, p.ANIMATION_TICKS, 59));
-			EntityUtils.setRemoveEntityOnUnload(d);
-		});
-		boss.addPassenger(mDisplay);
-
-		super.constructBoss(SpellManager.EMPTY, List.of(new Spell() {
-			@Override
-			public void run() {
-				if (p.FOLLOW_ENTITY_ROTATION) {
-					mDisplay.setInterpolationDelay(0);
-					mDisplay.setRotation(boss.getYaw(), boss.getPitch());
-				}
-				if (!boss.isValid()) {
-					mDisplay.remove();
-				}
-			}
-
-			@Override
-			public int cooldownTicks() {
-				return 0;
-			}
-		}), p.DETECTION, null, 0, 1);
-	}
-
-	@Override
-	public void unload() {
-		mDisplay.remove();
-	}
 
 	public static class Parameters extends BossParameters {
 		public enum DisplayType {
@@ -99,6 +56,14 @@ public class DisplayBoss extends BossAbilityGroup {
 		public ItemDisplay.ItemDisplayTransform ITEM_DISPLAY_TYPE = ItemDisplay.ItemDisplayTransform.NONE;
 		@BossParam(help = "For item displays, the name of the item")
 		public String ITEM_NAME = "";
+		@BossParam(help = "Overrides material and itemname, takes the item from the mob")
+		public boolean ITEM_FROM_SLOT = false;
+		@BossParam(help = "equipment slot to get the item for the display")
+		public EquipmentSlot SLOT = EquipmentSlot.HAND;
+		@BossParam(help = "Whether itemfromslot removes the item as well")
+		public boolean REMOVE_FROM_SLOT = false;
+		@BossParam(help = "Display glow color")
+		public String GLOW_COLOR = "";
 
 		@BossParam(help = "Translation is affected by rotation")
 		public float TRANSLATION_X = 0;
@@ -118,6 +83,8 @@ public class DisplayBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Should display rotate with the entity its on")
 		public boolean FOLLOW_ENTITY_ROTATION = false;
+		@BossParam(help = "Should display rotate without y")
+		public boolean IGNORE_Y_ROTATION = false;
 
 		@BossParam(help = "Scale of the display")
 		public float SCALE_X = 1;
@@ -125,5 +92,77 @@ public class DisplayBoss extends BossAbilityGroup {
 		public float SCALE_Y = 1;
 		@BossParam(help = "Scale of the display")
 		public float SCALE_Z = 1;
+	}
+
+	private final Display mDisplay;
+
+	public DisplayBoss(Plugin plugin, LivingEntity boss) {
+		super(plugin, identityTag, boss);
+
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
+		mDisplay = boss.getWorld().spawn(boss.getLocation(), p.TYPE.entityClass(), d -> {
+			d.setTransformation(new Transformation(
+				new Vector3f(p.TRANSLATION_X, p.TRANSLATION_Y, p.TRANSLATION_Z),
+				new AxisAngle4f((float) Math.toRadians(p.ROTATION_DEGREES), p.ROTATION_X, p.ROTATION_Y, p.ROTATION_Z),
+				new Vector3f(p.SCALE_X, p.SCALE_Y, p.SCALE_Z),
+				new AxisAngle4f()
+			));
+			@Nullable
+			EntityEquipment equipment = boss.getEquipment();
+			if (equipment != null) {
+				setDisplayContent(d, p, equipment);
+			}
+			d.setBillboard(p.BILLBOARD);
+			d.setTeleportDuration(Math.clamp(0, p.ANIMATION_TICKS, 59));
+			if (!p.GLOW_COLOR.isEmpty()) {
+				GlowingManager.startGlowing(mBoss, NamedTextColor.NAMES.valueOr(p.GLOW_COLOR, NamedTextColor.WHITE), -1, GlowingManager.BOSS_SPELL_PRIORITY);
+			}
+
+			EntityUtils.setRemoveEntityOnUnload(d);
+		});
+		boss.addPassenger(mDisplay);
+
+		super.constructBoss(SpellManager.EMPTY, p.FOLLOW_ENTITY_ROTATION ? List.of(new Spell() {
+			@Override
+			public void run() {
+				mDisplay.setInterpolationDelay(0);
+				mDisplay.setRotation(boss.getYaw(), p.IGNORE_Y_ROTATION ? 0 : boss.getPitch());
+			}
+
+			@Override
+			public int cooldownTicks() {
+				return 0;
+			}
+		}) : List.of(), p.DETECTION, null, 0, 1);
+	}
+
+	private static void setDisplayContent(Display d, Parameters p, EntityEquipment equipment) {
+		if (d instanceof BlockDisplay blockDisplay) {
+			if (p.ITEM_FROM_SLOT) {
+				blockDisplay.setBlock(equipment.getItem(p.SLOT).getType().createBlockData());
+				if (p.REMOVE_FROM_SLOT) {
+					equipment.setItem(p.SLOT, ItemStack.empty());
+				}
+			} else {
+				blockDisplay.setBlock(p.MATERIAL.createBlockData());
+			}
+		}
+		if (d instanceof ItemDisplay itemDisplay) {
+			if (p.ITEM_FROM_SLOT) {
+				itemDisplay.setItemStack(equipment.getItem(p.SLOT));
+				if (p.REMOVE_FROM_SLOT) {
+					equipment.setItem(p.SLOT, ItemStack.empty());
+				}
+			} else {
+				itemDisplay.setItemDisplayTransform(p.ITEM_DISPLAY_TYPE);
+				itemDisplay.setItemStack(DisplayEntityUtils.generateRPItem(p.MATERIAL, p.ITEM_NAME));
+			}
+		}
+	}
+
+	@Override
+	public void unload() {
+		super.unload();
+		mDisplay.remove();
 	}
 }
