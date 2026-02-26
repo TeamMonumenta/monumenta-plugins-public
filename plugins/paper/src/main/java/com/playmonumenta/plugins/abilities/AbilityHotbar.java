@@ -258,7 +258,7 @@ public class AbilityHotbar {
 
 	private static boolean shouldHandleAbility(Player player, Ability ability) {
 		return ability != null
-			&& (ability.getInfo().getBaseCooldown(player, ability.getAbilityScore()) > 0 || ability instanceof AbilityWithChargesOrStacks
+			&& (ability.getInfo().getBaseCooldown(player, ability.getAbilityScore()) > 0 || (ability instanceof AbilityWithChargesOrStacks && ((AbilityWithChargesOrStacks) ability).getMaxCharges() > 0)
 			|| ability instanceof AlchemicalArtillery); // these are passives with modes
 	}
 }
