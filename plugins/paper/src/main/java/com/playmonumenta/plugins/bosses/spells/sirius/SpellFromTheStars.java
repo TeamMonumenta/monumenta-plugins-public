@@ -39,7 +39,7 @@ public class SpellFromTheStars extends Spell {
 	private final Plugin mPlugin;
 	private boolean mPrimed;
 	private final PassiveTentacleManager mTentancleManager;
-	private final PassiveDeclaration mDeclerations;
+	private final PassiveDeclaration mDeclarations;
 	private int mDamage = 50;
 	private int mShockwaves = 1;
 
@@ -54,7 +54,7 @@ public class SpellFromTheStars extends Spell {
 		mPlugin = plugin;
 		mTentancleManager = tentacles;
 		mPrimed = false;
-		mDeclerations = declaration;
+		mDeclarations = declaration;
 	}
 
 
@@ -284,6 +284,6 @@ public class SpellFromTheStars extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return !mOnCooldown && !mPrimed && !mDeclerations.mSwapping;
+		return !mOnCooldown && !mPrimed && !mDeclarations.mSwapping;
 	}
 }

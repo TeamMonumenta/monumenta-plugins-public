@@ -3,10 +3,10 @@ package com.playmonumenta.plugins.bosses.spells.sirius.declaration;
 import com.playmonumenta.plugins.bosses.bosses.sirius.Sirius;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 
-public class DeclerationTemp extends Spell {
+public class DeclarationTemp extends Spell {
 	private final Sirius mSirius;
 
-	public DeclerationTemp(Sirius sirius) {
+	public DeclarationTemp(Sirius sirius) {
 		mSirius = sirius;
 	}
 

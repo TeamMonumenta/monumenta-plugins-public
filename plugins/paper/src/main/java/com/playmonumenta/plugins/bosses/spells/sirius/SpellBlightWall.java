@@ -41,7 +41,7 @@ public class SpellBlightWall extends Spell {
 	private static final float KNOCKBACKSTRENGTH = 1;
 
 	private boolean mOnCooldown;
-	private final PassiveDeclaration mDeclerations;
+	private final PassiveDeclaration mDeclarations;
 	private final Plugin mPlugin;
 	private final Sirius mSirius;
 	private final double mLength;
@@ -50,14 +50,14 @@ public class SpellBlightWall extends Spell {
 	private static final int WAVEDELAY = 7 * 20;
 	private boolean mPrimed;
 
-	public SpellBlightWall(Plugin plugin, Sirius sirius, PassiveDeclaration decleration) {
+	public SpellBlightWall(Plugin plugin, Sirius sirius, PassiveDeclaration declaration) {
 		mPlugin = plugin;
 		mSirius = sirius;
 		mOnCooldown = false;
 		mPrimed = false;
 		mLength = mSirius.mSpawnCornerOne.getX() - mSirius.mCornerTwo.getX();
 		mWidth = mSirius.mCornerOne.getZ() - mSirius.mCornerTwo.getZ();
-		mDeclerations = decleration;
+		mDeclarations = declaration;
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class SpellBlightWall extends Spell {
 
 			@Override
 			public void run() {
-				if (!mDeclerations.mSwapping && !mSirius.mCheeseLock && !mDeclerations.mTp) {
+				if (!mDeclarations.mSwapping && !mSirius.mCheeseLock && !mDeclarations.mTp) {
 					cast();
 					mPrimed = false;
 					this.cancel();
@@ -85,7 +85,7 @@ public class SpellBlightWall extends Spell {
 	}
 
 	private void cast() {
-		mDeclerations.mTpBlocked = true;
+		mDeclarations.mTpBlocked = true;
 		int duration = (int) (mLength / SPEED) + 1;
 		if (mSirius.mBlocks <= 10) {
 			duration = (int) (mLength / SPEED) + WAVEDELAY + 1;
@@ -134,11 +134,11 @@ public class SpellBlightWall extends Spell {
 					}
 				}
 				if (mTicks >= DELAY + finalDuration) {
-					Bukkit.getScheduler().runTaskLater(mPlugin, () -> mDeclerations.mTpBlocked = false, 5 * 20);
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> mDeclarations.mTpBlocked = false, 5 * 20);
 					this.cancel();
 				}
 				if (mSirius.mDone) {
-					Bukkit.getScheduler().runTaskLater(mPlugin, () -> mDeclerations.mTpBlocked = false, 5 * 20);
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> mDeclarations.mTpBlocked = false, 5 * 20);
 					this.cancel();
 					mBar.remove();
 				}

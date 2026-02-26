@@ -41,7 +41,7 @@ import org.bukkit.util.Vector;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-public class DeclerationTuulen extends Spell {
+public class DeclarationTuulen extends Spell {
 	private final SpellSummonTheStars mSpawner;
 	private final Sirius mSirius;
 	private final Plugin mPlugin;
@@ -67,7 +67,7 @@ public class DeclerationTuulen extends Spell {
 
 	private final List<Location> SILVERKNIGHTLOCATIONS;
 
-	public DeclerationTuulen(SpellSummonTheStars spawner, Sirius sirius, Plugin plugin) {
+	public DeclarationTuulen(SpellSummonTheStars spawner, Sirius sirius, Plugin plugin) {
 		mSpawner = spawner;
 		mSirius = sirius;
 		mPlugin = plugin;

@@ -82,8 +82,8 @@ import org.joml.Vector3f;
 public class Sirius extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_sirius";
 	public static final String MOB_TAG = "siriusmob";
-	public static final String FAIL_PARTICIPATION_TAG = "siriusfaildeclerationparticipation";
-	public static final String PARTICIPATION_TAG = "siriusdeclerationparticipation";
+	public static final String FAIL_PARTICIPATION_TAG = "siriusfaildeclarationparticipation";
+	public static final String PARTICIPATION_TAG = "siriusdeclarationparticipation";
 	public Location mCornerOne;
 	public Location mStartLocation;
 	public Location mCornerTwo;
@@ -237,7 +237,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 	public void changeHp(boolean declarationFail, int distance) {
 		if (declarationFail) {
-			applyDeclerationFail(distance > 0);
+			applyDeclarationFail(distance > 0);
 		}
 		if (!mDamagePhase) {
 			GlowingManager.makeGlowImmune(mBoss, -1, GlowingManager.BOSS_SPELL_PRIORITY - 1, null, "sirius");
@@ -439,7 +439,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		return valid;
 	}
 
-	public void applyDeclerationFail(boolean pass) {
+	public void applyDeclarationFail(boolean pass) {
 		for (Player p : getPlayers()) {
 			Effect declarationParticipation = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, PARTICIPATION_TAG);
 			Effect fail = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, FAIL_PARTICIPATION_TAG);

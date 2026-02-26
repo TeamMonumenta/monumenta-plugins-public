@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclarationDam
 import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclarationMobs;
 import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclarationPoints;
 import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclarationTp;
-import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclerationTuulen;
+import com.playmonumenta.plugins.bosses.spells.sirius.declaration.DeclarationTuulen;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class PassiveDeclaration extends Spell {
 		mPlugin = plugin;
 		//Less common as they are more powerful
 		mDeclarations.add(new DeclarationAurora(plugin, mSirius.mSpawnLoc.clone().subtract(25, -2, 0), sirius));
-		mDeclarations.add(new DeclerationTuulen(spawner, mSirius, plugin));
+		mDeclarations.add(new DeclarationTuulen(spawner, mSirius, plugin));
 		//Common Declarations
 		mDeclarations.add(new DeclarationTp(plugin, mSirius));
 		mDeclarations.add(new DeclarationTp(plugin, mSirius));
@@ -53,7 +53,7 @@ public class PassiveDeclaration extends Spell {
 		mDeclarations.add(new DeclarationMobs(spawner, mSirius));
 		mDeclarations.add(new DeclarationPoints(mSirius, plugin, converter));
 		mDeclarations.add(new DeclarationPoints(mSirius, plugin, converter));
-		//mDeclerations.add(new DeclerationTemp(mSirius));
+		//mDeclarations.add(new DeclarationTemp(mSirius));
 		mOnCooldown = false;
 		mLastSpell = null;
 		mTpBlocked = false;
