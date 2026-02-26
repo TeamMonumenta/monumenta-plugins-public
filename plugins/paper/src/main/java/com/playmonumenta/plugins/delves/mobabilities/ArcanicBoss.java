@@ -209,14 +209,14 @@ public class ArcanicBoss extends BossAbilityGroup {
 	public enum ArcanicSpell {
 		REJUVENATION(REJUVENATION_RUNE), ARROW(ARROW_RUNE), CHARGE(CHARGE_RUNE), MISSILE(MISSILE_RUNE);
 
-		private final String rune;
+		private final String mRune;
 
 		ArcanicSpell(String rune) {
-			this.rune = rune;
+			this.mRune = rune;
 		}
 
 		private String getRune() {
-			return rune;
+			return mRune;
 		}
 
 	}

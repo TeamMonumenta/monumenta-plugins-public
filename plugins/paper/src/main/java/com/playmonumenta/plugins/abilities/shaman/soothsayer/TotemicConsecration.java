@@ -156,6 +156,11 @@ public class TotemicConsecration extends MultipleChargeAbility {
 		double remainingDuration = targetTotem.getRemainingAbilityDuration();
 		double finalDamage = mBaseDamage + mBonusDamage * (int) (remainingDuration / mDurationPerBonus);
 		Location targetLoc = targetTotem.getTotemLocation();
+		if (targetLoc == null) {
+			// This already consumed a charge at this point... unknown why the totem entity didn't spawn
+			// This still counts as a "valid" cast at this point, even though it didn't work correctly
+			return true;
+		}
 
 		mCosmetic.consecrationAction(mPlayer, targetLoc, totemRadius);
 		List<LivingEntity> affectedMobs = new Hitbox.SphereHitbox(targetLoc, totemRadius).getHitMobs();

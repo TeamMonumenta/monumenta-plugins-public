@@ -192,7 +192,6 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
-	@SuppressWarnings("checkstyle:RegexpSinglelineJava")
 	public <T> int sendParticle(Particle particle, Player reciever, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, @Nullable T data, boolean force) {
 		reciever.spawnParticle(particle, x, y, z, count, offsetX, offsetY, offsetZ, extra, data);
 		return 0;
@@ -214,6 +213,8 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
+	@SuppressWarnings("NullAway")
+	// Can't do this without an adapter - NPE in caller is preferable to spawning an entity somewhere they didn't expect
 	public Entity spawnWorldlessEntity(EntityType type, World world) {
 		return null;
 	}

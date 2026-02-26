@@ -38,6 +38,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
@@ -102,7 +103,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	private final List<Location> mMarkedLocations = new ArrayList<>(); // To mark locations (Even if block is not replaced)
 
 	private final SanguineHarvestCS mCosmetic;
-	private BukkitRunnable mActiveMarkerRunnable;
+	private @Nullable BukkitRunnable mActiveMarkerRunnable;
 
 	public SanguineHarvest(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

@@ -19,4 +19,8 @@
 	<suppress files=".*com[\\/]playmonumenta[\\/]plugins[\\/]particle[\\/].*\.java"
 			  checks="RegexpSinglelineJava"
 			  message=".*spawnParticle.*"/>
+	<!-- suppress the spawnParticle check for the unsupported adapter stub -->
+	<suppress files=".*[\\/]VersionAdapter_unsupported\.java"
+			  checks="RegexpSinglelineJava"
+			  message=".*spawnParticle.*"/>
 </suppressions>
