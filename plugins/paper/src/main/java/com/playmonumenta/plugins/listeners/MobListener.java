@@ -194,8 +194,6 @@ public class MobListener implements Listener {
 				equipment.setItemInMainHandDropChance(ItemUtils.getItemDropChance(equipment.getItemInMainHand()));
 				equipment.setItemInOffHandDropChance(ItemUtils.getItemDropChance(equipment.getItemInOffHand()));
 			}
-
-			mPlugin.mZoneManager.applySpawnEffect(mPlugin, entity);
 		}
 	}
 

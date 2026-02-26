@@ -114,7 +114,6 @@ import com.playmonumenta.plugins.social.BlockCommand;
 import com.playmonumenta.plugins.social.FriendCommand;
 import com.playmonumenta.plugins.social.SocialManager;
 import com.playmonumenta.plugins.spawners.SpawnerVisualisation;
-import com.playmonumenta.plugins.spawnzone.SpawnZoneManager;
 import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.timers.ProjectileEffectTimers;
 import com.playmonumenta.plugins.timers.ShowMarkerTimer;
@@ -197,7 +196,6 @@ public class Plugin extends JavaPlugin {
 	public TrackingManager mTrackingManager;
 	public PotionManager mPotionManager;
 	public ActivityManager mActivityManager;
-	public SpawnZoneManager mZoneManager;
 	public AbilityManager mAbilityManager;
 	public ShulkerInventoryManager mShulkerInventoryManager;
 	public BossManager mBossManager;
@@ -460,7 +458,6 @@ public class Plugin extends JavaPlugin {
 
 		mPotionManager = new PotionManager();
 		mTrackingManager = new TrackingManager(this);
-		mZoneManager = new SpawnZoneManager(this);
 		mAbilityManager = new AbilityManager(this);
 		mShulkerInventoryManager = new ShulkerInventoryManager(this);
 		mBossManager = new BossManager(this);
