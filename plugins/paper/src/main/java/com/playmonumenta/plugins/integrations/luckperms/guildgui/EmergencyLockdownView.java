@@ -7,8 +7,10 @@ import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.GuildPermission;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.List;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -83,6 +85,7 @@ public class EmergencyLockdownView extends View {
 	}
 
 	private void setLockdownButton(int y, int x) {
+		Audience playerAndConsole = Audience.audience(mGui.mPlayer, Bukkit.getConsoleSender());
 		boolean isLocked = mGui.mGuildGroup != null && LuckPermsIntegration.isLocked(mGui.mGuildGroup);
 		boolean hasLockdownAccess = hasLockdownAccess();
 
@@ -143,10 +146,10 @@ public class EmergencyLockdownView extends View {
 			guiItem
 				.onClick((InventoryClickEvent event) -> {
 					if (!hasLockdownAccess()) {
-						mGui.mPlayer.sendMessage(
+						playerAndConsole.sendMessage(
 							Component.text("Sorry! You lost access before hitting confirm.",
 								NamedTextColor.RED, TextDecoration.BOLD));
-						mGui.mPlayer.sendMessage(
+						playerAndConsole.sendMessage(
 							Component.text("If needed, a moderator can still fix this.",
 								NamedTextColor.RED, TextDecoration.BOLD));
 						return;
@@ -155,7 +158,7 @@ public class EmergencyLockdownView extends View {
 						Group guild = mGui.mGuildGroup;
 						if (guild == null) {
 							Bukkit.getScheduler().runTask(Plugin.getInstance(), ()
-								-> mGui.mPlayer.sendMessage(Component.text(
+								-> playerAndConsole.sendMessage(Component.text(
 								"The selected guild is no longer available.",
 								NamedTextColor.DARK_GRAY)));
 							return;
@@ -175,7 +178,7 @@ public class EmergencyLockdownView extends View {
 											0.7f,
 											Constants.Note.FS3.mPitch);
 									}
-									mGui.mPlayer.sendMessage(Component.text(
+									playerAndConsole.sendMessage(Component.text(
 										guildName + " has been locked.", NamedTextColor.DARK_GRAY));
 									String guildTag = LuckPermsIntegration.getGuildPlainTag(guild);
 									if (guildTag == null) {
@@ -183,20 +186,24 @@ public class EmergencyLockdownView extends View {
 									} else {
 										guildTag = "[" + guildTag + "] ";
 									}
-									MonumentaNetworkRelayIntegration.sendAuditLogSevereMessage(
-										"Guild Emergency Lockdown triggered by " + mGui.mPlayer.getName()
-											+ " for the guild " + guildTag + guildName);
+									String message = "Guild Emergency Lockdown triggered by " +
+									                 mGui.mPlayer.getName() +
+									                 " for the guild " +
+									                 guildTag +
+									                 guildName;
+									MMLog.warning(message);
+									MonumentaNetworkRelayIntegration.sendAuditLogSevereMessage(message);
 								} else {
-									mGui.mPlayer.sendMessage(Component.text(
+									playerAndConsole.sendMessage(Component.text(
 										guildName + " has been unlocked.", NamedTextColor.GREEN));
 								}
 								mGui.update();
 							});
 						} catch (Exception ex) {
 							Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-								mGui.mPlayer.sendMessage(Component.text("Guild could not be locked.",
+								playerAndConsole.sendMessage(Component.text("Guild could not be locked.",
 									NamedTextColor.RED));
-								MessagingUtils.sendStackTrace(mGui.mPlayer, ex);
+								MessagingUtils.sendStackTrace(playerAndConsole, ex);
 								mGui.update();
 							});
 						}
@@ -208,7 +215,7 @@ public class EmergencyLockdownView extends View {
 			guiItem
 				.onClick((InventoryClickEvent event) -> {
 					if (!mGui.mPlayer.hasPermission(GuildGui.MOD_GUI_PERMISSION)) {
-						mGui.mPlayer.sendMessage(
+						playerAndConsole.sendMessage(
 							Component.text("Sorry! You lost access before hitting confirm.",
 								NamedTextColor.RED, TextDecoration.BOLD));
 						return;
@@ -217,7 +224,7 @@ public class EmergencyLockdownView extends View {
 						Group guild = mGui.mGuildGroup;
 						if (guild == null) {
 							Bukkit.getScheduler().runTask(Plugin.getInstance(), ()
-								-> mGui.mPlayer.sendMessage(Component.text(
+								-> playerAndConsole.sendMessage(Component.text(
 								"The selected guild is no longer available.",
 								NamedTextColor.DARK_GRAY)));
 							return;
@@ -228,7 +235,7 @@ public class EmergencyLockdownView extends View {
 							String guildName = LuckPermsIntegration.getNonNullGuildName(guild);
 							Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 								if (isNowLocked) {
-									mGui.mPlayer.sendMessage(Component.text(
+									playerAndConsole.sendMessage(Component.text(
 										guildName + " has been locked.", NamedTextColor.DARK_GRAY));
 								} else {
 									if (!mGui.mPlayer.hasPermission("group." + guild.getName())) {
@@ -240,14 +247,19 @@ public class EmergencyLockdownView extends View {
 											0.7f,
 											Constants.Note.FS4.mPitch);
 									}
-									mGui.mPlayer.sendMessage(Component.text(
+									playerAndConsole.sendMessage(Component.text(
 										guildName + " has been unlocked.", NamedTextColor.GREEN));
+									String message = guildName +
+									                 " has been unlocked by " +
+									                 mGui.mPlayer.getName();
+									MMLog.info(message);
+									MonumentaNetworkRelayIntegration.sendAuditLogSevereMessage(message);
 								}
 								mGui.update();
 							});
 						} catch (Exception ex) {
 							Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-								mGui.mPlayer.sendMessage(Component.text("Guild could not be unlocked.",
+								playerAndConsole.sendMessage(Component.text("Guild could not be unlocked.",
 									NamedTextColor.RED));
 								MessagingUtils.sendStackTrace(mGui.mPlayer, ex);
 								mGui.update();
