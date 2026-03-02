@@ -1,42 +1,9 @@
-name: reviewdog
+name: Reviewdog checks
+
 on: [pull_request]
+
 jobs:
-  build:
-    name: Build plugin
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
-    - name: Setup reviewdog
-      uses: reviewdog/action-setup@d8edfce3dd5e1ec6978745e801f9c50b5ef80252 # 1.4.0
-      with:
-        reviewdog_version: latest
-    - name: Build and report warnings
+  call-pr-common:
+    uses: TeamMonumenta/monumenta-automation/.github/workflows/plugin_pr_common.yml@master
+    with:
       working-directory: ./plugins
-      env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -o pipefail
-        ./gradlew build --console=plain 2>&1 | tee compile.log
-        set +o pipefail
-
-        # compiler warnings
-        cat compile.log | reviewdog -efm="%W%f:%l: warning: %m" -efm="%+C%[ %\t]%.%#" -name="Javac" -level=error -fail-level=error -reporter=github-pr-review
-
-        # checkstyle
-        for xml in */build/reports/checkstyle/main.xml; do
-        xmldirname="${xml%%/*}"
-        cat "$xml" | reviewdog -f=checkstyle -name="Checkstyle $xmldirname" -level=error -fail-level=error -reporter=github-pr-review
-        done
-
-        # pmd
-        for xml in */build/reports/pmd/main.xml; do
-        xmldirname="${xml%%/*}"
-        cat "$xml" | reviewdog -efm='%+P<file name="%f">' -efm='%W<violation beginline="%l%.%#begincolumn="%c%.%#' -efm='%-C<%.%#' -efm='%+C%.%#' -efm='%-Q' -name="PMD $xmldirname" -level=error -fail-level=error -reporter=github-pr-review
-        done
