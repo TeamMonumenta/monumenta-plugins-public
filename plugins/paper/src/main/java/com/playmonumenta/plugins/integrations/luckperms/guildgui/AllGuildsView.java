@@ -25,7 +25,7 @@ public class AllGuildsView extends View {
 
 	@Override
 	public void setup() {
-		int totalRows = Math.floorDiv((mAllGuilds.size() + PAGE_WIDTH - 1), PAGE_WIDTH);
+		int totalRows = Math.floorDiv(mAllGuilds.size() + PAGE_WIDTH - 1, PAGE_WIDTH);
 		setPageArrows(totalRows);
 
 		mGui.setTitle(Component.text("All Guilds"));

@@ -22,8 +22,10 @@ public class RewardsView extends View {
 
 	@Override
 	public void setup(Player displayedPlayer) {
-		int maxRow = getMaxRow();
-		mStartRow = Math.max(0, Math.min(mStartRow, maxRow));
+		int totalRows = Math.floorDiv(mGui.mPass.mRewards.size() + ROW_SIZE - 1, ROW_SIZE);
+		int maxPage = Math.floorDiv(Math.max(0, totalRows - 1), ROWS_SHOWN);
+		int maxPageStartRow = maxPage * ROWS_SHOWN;
+		mStartRow = Math.max(0, Math.min(mStartRow, maxPageStartRow));
 
 		// Arrows
 		ItemStack item;
@@ -38,7 +40,7 @@ public class RewardsView extends View {
 			mGui.setItem(5, 0, item).onClick((InventoryClickEvent event) -> prevPage());
 		}
 
-		if (mStartRow < maxRow) {
+		if (mStartRow < maxPageStartRow) {
 			item = new ItemStack(Material.ARROW);
 			meta = item.getItemMeta();
 			meta.displayName(Component.text("Next Rewards", NamedTextColor.WHITE, TextDecoration.BOLD)
@@ -59,10 +61,6 @@ public class RewardsView extends View {
 				mGui.addRewardItem(y + 1, x, displayedPlayer, rewardIndex);
 			}
 		}
-	}
-
-	private int getMaxRow() {
-		return (mGui.mPass.mRewards.size() / ROW_SIZE) - (ROWS_SHOWN - 1);
 	}
 
 	public void prevPage() {
