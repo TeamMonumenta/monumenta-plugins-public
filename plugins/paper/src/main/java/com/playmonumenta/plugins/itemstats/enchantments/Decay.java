@@ -63,14 +63,14 @@ public class Decay implements Enchantment {
 
 	public static void apply(Plugin plugin, LivingEntity enemy, int duration, double decayLevel, Player player, DamageType type) {
 		double desiredPeriod = 40 / decayLevel;
-		if (desiredPeriod > DURATION) { // Can happen with enchantment reductions from region scaling
+		if (desiredPeriod > duration) { // Can happen with enchantment reductions from region scaling
 			return;
 		}
 		// The DoT effect only runs every 5 ticks, so select the period as a multiple of 5 ticks and adjust damage instead to match expected DPS
 		int adjustedPeriod = (int) Math.ceil(desiredPeriod / 5) * 5;
 		double damage = DAMAGE * adjustedPeriod / desiredPeriod;
 		plugin.mEffectManager.addEffect(enemy, DOT_EFFECT_NAME,
-			new CustomDamageOverTime(DURATION, damage, adjustedPeriod, player, plugin.mItemStatManager.getPlayerItemStatsCopy(player), null, DamageType.AILMENT)
+			new CustomDamageOverTime(duration, damage, adjustedPeriod, player, plugin.mItemStatManager.getPlayerItemStatsCopy(player), null, DamageType.AILMENT)
 				.setVisuals(entity -> {
 					double xRad = entity.getBoundingBox().getWidthX() / 2;
 					double yRad = entity.getBoundingBox().getHeight() / 2;
