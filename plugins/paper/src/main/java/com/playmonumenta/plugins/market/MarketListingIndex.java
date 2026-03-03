@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.market;
 
 import com.google.gson.Gson;
 import com.playmonumenta.plugins.market.filters.ComponentConfig;
-import com.playmonumenta.redissync.ConfigAPI;
+import com.playmonumenta.redissync.BukkitConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import io.lettuce.core.MapScanCursor;
 import io.lettuce.core.ScanArgs;
@@ -106,7 +106,7 @@ public enum MarketListingIndex {
 	final @Nullable Map<String, ComponentConfig.ComponentConfigObject> mComponentConfig;
 
 	MarketListingIndex(String redisID, boolean sortedFetch, Function<MarketListing, String> getKeyMethod, Function<MarketListing, Boolean> matchMethod, boolean playerSelectable, Material displayIconBaseMaterial, @Nullable Map<String, ComponentConfig.ComponentConfigObject> componentConfig) {
-		this.mRedisPath = ConfigAPI.getServerDomain() + ":market:index:" + redisID;
+		this.mRedisPath = BukkitConfigAPI.getServerDomain() + ":market:index:" + redisID;
 		this.mSortedFetch = sortedFetch;
 		this.mGetKeyMethod = getKeyMethod;
 		this.mMatchMethod = matchMethod;

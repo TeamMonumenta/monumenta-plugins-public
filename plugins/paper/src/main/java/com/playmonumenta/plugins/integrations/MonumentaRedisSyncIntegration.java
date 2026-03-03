@@ -12,7 +12,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import com.playmonumenta.redissync.ConfigAPI;
+import com.playmonumenta.redissync.BukkitConfigAPI;
 import com.playmonumenta.redissync.LeaderboardAPI;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
@@ -84,7 +84,7 @@ public class MonumentaRedisSyncIntegration implements Listener {
 
 	public static String getServerDomain() {
 		if (mEnabled) {
-			return ConfigAPI.getServerDomain();
+			return BukkitConfigAPI.getServerDomain();
 		}
 		return "unknown";
 	}

@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.market.filters.Comparator;
 import com.playmonumenta.plugins.market.filters.FilterComponent;
 import com.playmonumenta.plugins.market.filters.MarketFilter;
-import com.playmonumenta.redissync.ConfigAPI;
+import com.playmonumenta.redissync.BukkitConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import io.lettuce.core.KeyValue;
 import io.lettuce.core.ScriptOutputType;
@@ -26,8 +26,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class MarketRedisManager {
 
-	private static final String pathListingCurrentID = ConfigAPI.getServerDomain() + ":market:listingCurrentID";
-	private static final String pathListingHashMap = ConfigAPI.getServerDomain() + ":market:listings";
+	private static final String pathListingCurrentID = BukkitConfigAPI.getServerDomain() + ":market:listingCurrentID";
+	private static final String pathListingHashMap = BukkitConfigAPI.getServerDomain() + ":market:listings";
 
 	public static String getListingCurrentIDRedisPath() {
 		return pathListingCurrentID;

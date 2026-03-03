@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.redissync.ConfigAPI;
+import com.playmonumenta.redissync.BukkitConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import io.lettuce.core.SetArgs;
 import java.time.LocalDateTime;
@@ -632,7 +632,7 @@ public class Mailbox implements Comparable<Mailbox> {
 	}
 
 	public static String redisKeyPrefix(String subKey) {
-		return ConfigAPI.getServerDomain() + ":mailbox:" + subKey + ":";
+		return BukkitConfigAPI.getServerDomain() + ":mailbox:" + subKey + ":";
 	}
 
 	public String itemSlotMapRedisKey() {

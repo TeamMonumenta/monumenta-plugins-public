@@ -9,7 +9,7 @@ import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobRarity;
 import com.playmonumenta.plugins.utils.FileUtils;
-import com.playmonumenta.redissync.ConfigAPI;
+import com.playmonumenta.redissync.BukkitConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
@@ -326,7 +326,7 @@ public class TowerFileUtils {
 	}
 
 	private static String getRedisPath(String fileName) {
-		return ConfigAPI.getServerDomain() + ":infinitytower:" + fileName;
+		return BukkitConfigAPI.getServerDomain() + ":infinitytower:" + fileName;
 
 	}
 

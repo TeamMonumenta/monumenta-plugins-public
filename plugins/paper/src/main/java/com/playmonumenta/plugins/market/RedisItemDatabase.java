@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.redissync.ConfigAPI;
+import com.playmonumenta.redissync.BukkitConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -35,9 +35,9 @@ public class RedisItemDatabase {
 	static ConcurrentHashMap<Long, ItemStack> mLocalCacheIDToItem = new ConcurrentHashMap<>();
 	static ConcurrentHashMap<ItemStack, Long> mLocalCacheItemToID = new ConcurrentHashMap<>();
 
-	private static final String mPathIDBCurrentID = ConfigAPI.getServerDomain() + ":market:ItemDBCurrentID";
-	private static final String mPathIDBItemToID = ConfigAPI.getServerDomain() + ":market:ItemDBItemToID";
-	private static final String mPathIDBIDToItem = ConfigAPI.getServerDomain() + ":market:ItemDBIDToItem";
+	private static final String mPathIDBCurrentID = BukkitConfigAPI.getServerDomain() + ":market:ItemDBCurrentID";
+	private static final String mPathIDBItemToID = BukkitConfigAPI.getServerDomain() + ":market:ItemDBItemToID";
+	private static final String mPathIDBIDToItem = BukkitConfigAPI.getServerDomain() + ":market:ItemDBIDToItem";
 
 	private static long createItemEntryInRedis(ItemStack item) {
 		long id = getNextItemID();

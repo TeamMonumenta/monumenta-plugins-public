@@ -29,3 +29,6 @@ release.properties
 
 # PMD
 .pmdCache
+
+# Gradle includebuild artifacts
+**/.kotlin

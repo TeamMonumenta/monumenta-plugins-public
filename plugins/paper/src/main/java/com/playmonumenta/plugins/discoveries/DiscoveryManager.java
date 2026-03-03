@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.redissync.ConfigAPI;
+import com.playmonumenta.redissync.BukkitConfigAPI;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
@@ -52,10 +52,10 @@ import org.jetbrains.annotations.Nullable;
 public class DiscoveryManager implements Listener {
 	private static final String DISCOVERY_IDENTIFIER_TAG = "ItemDiscovery";
 	private static final String REDIS_PLAYER_KEY = "Discoveries";
-	private static final String REDIS_STORAGE_ALL_KEY = ConfigAPI.getServerDomain() + ":discoveries:listall";
-	private static final String REDIS_STORAGE_DEVSHARD_KEY = ConfigAPI.getServerDomain() + ":discoveries:listdevshard"; // separated storage for dev shards
-	private static final String REDIS_ID_ALL_KEY = ConfigAPI.getServerDomain() + ":discoveries:idall";
-	private static final String REDIS_ID_DEVSHARD_KEY = ConfigAPI.getServerDomain() + ":discoveries:iddevshard"; // separated storage for dev shards
+	private static final String REDIS_STORAGE_ALL_KEY = BukkitConfigAPI.getServerDomain() + ":discoveries:listall";
+	private static final String REDIS_STORAGE_DEVSHARD_KEY = BukkitConfigAPI.getServerDomain() + ":discoveries:listdevshard"; // separated storage for dev shards
+	private static final String REDIS_ID_ALL_KEY = BukkitConfigAPI.getServerDomain() + ":discoveries:idall";
+	private static final String REDIS_ID_DEVSHARD_KEY = BukkitConfigAPI.getServerDomain() + ":discoveries:iddevshard"; // separated storage for dev shards
 	private static final int DISPLAY_RANGE = 30;
 
 	private static final String VIEW_PERMISSION = "monumenta.discovery.view";

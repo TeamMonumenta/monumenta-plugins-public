@@ -8,7 +8,7 @@ dependencies {
 	annotationProcessor("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
 
 	// Monumenta plugins
-	compileOnly("com.playmonumenta:redissync:5.2:all")
+	compileOnly("com.playmonumenta:redissync:6.0.0:all")
 	compileOnly("com.playmonumenta:monumenta-network-relay:2.9")
 
 	// Other dependencies
