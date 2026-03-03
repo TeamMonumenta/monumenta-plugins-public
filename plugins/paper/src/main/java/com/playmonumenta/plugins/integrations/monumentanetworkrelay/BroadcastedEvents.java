@@ -571,7 +571,7 @@ public class BroadcastedEvents implements Listener {
 
 			Component statusPart;
 			if (mTimeLeft > 0) {
-				statusPart = Component.text(mTimeLeft + "s", NamedTextColor.GREEN);
+				statusPart = Component.text(com.playmonumenta.plugins.utils.StringUtils.secondsToHumanWithLetters(mTimeLeft), NamedTextColor.GREEN);
 			} else {
 				TextColor statusColor = (mStatus.mColor == null) ? NamedTextColor.RED : mStatus.mColor;
 				statusPart = Component.text(mStatus.mDisplayedAs, statusColor, TextDecoration.BOLD);

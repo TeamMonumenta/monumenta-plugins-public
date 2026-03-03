@@ -223,6 +223,34 @@ public class StringUtils {
 		}
 	}
 
+	public static String secondsToHumanWithLetters(int seconds) {
+		if (seconds < 0) {
+			seconds = -seconds;
+		}
+
+		int minutes = Math.floorDiv(seconds, 60);
+		seconds = Math.floorMod(seconds, 60);
+		int hours = Math.floorDiv(minutes, 60);
+		minutes = Math.floorMod(minutes, 60);
+		int days = Math.floorDiv(hours, 24);
+		hours = Math.floorMod(hours, 24);
+
+		if (days > 9) {
+			return days + "d";
+		} else if (days > 0) {
+			return days + "d " + hours + "h";
+		} else if (hours > 9) {
+			return hours + "h";
+		} else if (hours > 0) {
+			return hours + "h " + minutes + "m";
+		} else if (minutes > 9) {
+			return minutes + "m";
+		} else if (minutes > 0) {
+			return minutes + "m " + seconds + "s";
+		}
+		return seconds + "s";
+	}
+
 	public static String ticksToTime(int ticks) {
 		int minutes = (ticks / 20) / 60;
 		int seconds = (ticks - ((minutes * 60) * 20)) / 20;
