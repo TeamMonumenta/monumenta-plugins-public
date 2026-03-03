@@ -599,15 +599,17 @@ public class AbilityUtils {
 
 	public static boolean isAspectTriggeringEvent(DamageEvent event, Player player) {
 		DamageEvent.DamageType type = event.getType();
+		ClassAbility ability = event.getAbility();
 
 		// Is:
 		// Melee from a weapon that is not only a projectile weapon
 		// Melee Enchantment damage (Sweeping Edge and Arcane Thrust)
 		// Projectile
 		// One of a few "class abilities" that trigger aspects (i.e. Eruption, Quake)
+		// Not the true damage that happens on quickdraw - this event doesn't have the proper item stats whereas the 0.001 damage does
 		return (type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand()))
 			|| type == DamageEvent.DamageType.PROJECTILE
-			|| TRIGGERS_ASPECTS.contains(event.getAbility());
+			|| (TRIGGERS_ASPECTS.contains(ability) && !(ability == ClassAbility.QUICKDRAW && type == DamageEvent.DamageType.TRUE));
 	}
 
 	public static boolean isChargedAspectTriggeringEvent(DamageEvent event, Player player) {
