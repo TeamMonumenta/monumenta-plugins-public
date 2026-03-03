@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -30,7 +31,7 @@ public class SpellLightningStorm extends Spell {
 	private final List<Player> mWarnedPlayers = new ArrayList<>();
 	private final Set<Player> mCooldownPlayers = new HashSet<>();
 
-	private static final long LIGHTNING_COOLDOWN = 10;
+	private static final long LIGHTNING_COOLDOWN = Constants.TICKS_PER_SECOND;
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 
