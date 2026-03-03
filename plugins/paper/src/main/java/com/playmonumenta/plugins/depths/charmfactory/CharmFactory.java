@@ -120,11 +120,13 @@ public class CharmFactory {
 
 		Map.entry("Crushing Earth Damage", "Beast's Claw Damage"),
 		Map.entry("Crushing Earth Cooldown", "Beast's Claw Cooldown"),
-		Map.entry("Crushing Earth Range", "Beast's Claw Velocity"),
+		Map.entry("Crushing Earth Range", "Beast's Claw Range"),
 		Map.entry("Crushing Earth Stun Duration", "Beast's Claw Stun Duration"),
 
 		Map.entry("Focused Combos Bleed Amplifier", "Focused Combos Damage Multiplier"),
-		Map.entry("Focused Combos Bleed Duration", "Focused Combos Damage Multiplier")
+		Map.entry("Focused Combos Bleed Duration", "Focused Combos Damage Multiplier"),
+
+		Map.entry("Beast's Claw Velocity", "Beast's Claw Range")
 	);
 
 	public static @Nullable ItemStack updateCharm(ItemStack item) {

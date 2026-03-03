@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
-import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -18,7 +17,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,18 +40,15 @@ public class BeastsClaw extends DepthsAbility {
 	private static final int COOLDOWN = 20 * 8;
 	private static final int[] DAMAGE = {8, 10, 12, 14, 16, 24};
 	private static final int[] STUN_DURATION = {15, 20, 25, 30, 35, 45};
-	private static final double ROAR_STUN_RADIUS = 3;
-	private static final double CLAW_RADIUS = 3;
+	private static final double CLAW_RADIUS = 4;
 	private static final double HITBOX_RADIUS = 1.1;
 	private static final double LENIENCY_HITBOX_RADIUS = 3;
-	private static final int CLAW_DELAY = 10;
 	private static final double DISTANCE_PER_CLAW = 0.5;
 	private static final double Y_OFFSET = 1.5;
 	private static final int ARC_INC = 25;
 	private static final int DEGREE_STEP = 5;
 	private static final int START_ANGLE = 160;
 	private static final int END_ANGLE = 360;
-	private static final String KBR_EFFECT = "BeastsClawKnockbackResistanceEffect";
 	private static final List<Material> MATERIALS = List.of(
 		Material.PODZOL,
 		Material.GRANITE,
@@ -71,15 +66,15 @@ public class BeastsClaw extends DepthsAbility {
 			.descriptions(BeastsClaw::getDescription);
 
 	private final double mDamage;
-	private final double mVelocity;
 	private final int mStunDuration;
+	private final double mClawRadius;
 	private final List<UUID> mHitMobs = new ArrayList<>();
 
 	public BeastsClaw(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.BEASTS_CLAW_DAMAGE.mEffectName, DAMAGE[mRarity - 1]);
-		mVelocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.BEASTS_CLAW_VELOCITY.mEffectName, 1.3);
 		mStunDuration = CharmManager.getDuration(mPlayer, CharmEffects.BEASTS_CLAW_STUN_DURATION.mEffectName, STUN_DURATION[mRarity - 1]);
+		mClawRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.BEASTS_CLAW_RANGE.mEffectName, CLAW_RADIUS);
 	}
 
 	public boolean cast() {
@@ -89,84 +84,39 @@ public class BeastsClaw extends DepthsAbility {
 		putOnCooldown();
 		mHitMobs.clear();
 
-		World world = mPlayer.getWorld();
-
-		// Dash
-		world.playSound(mPlayer, Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.PLAYERS, 1.0f, 0.8f);
-		world.playSound(mPlayer, Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.PLAYERS, 1.0f, 2.0f);
-		world.playSound(mPlayer, Sound.ENTITY_STRIDER_DEATH, SoundCategory.PLAYERS, 0.8f, 0.6f);
-		world.playSound(mPlayer, Sound.ENTITY_PHANTOM_AMBIENT, SoundCategory.PLAYERS, 1.0f, 1.2f);
-		world.playSound(mPlayer, Sound.ENTITY_RAVAGER_HURT, SoundCategory.PLAYERS, 0.6f, 0.5f);
-		world.playSound(mPlayer, Sound.ENTITY_SQUID_DEATH, SoundCategory.PLAYERS, 1.0f, 0.8f);
-		world.playSound(mPlayer, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 2f, 0.9f);
-		Vector dir = mPlayer.getLocation().getDirection();
-		mPlayer.setVelocity(dir.setY(dir.getY() * 0.175 + 0.3).multiply(mVelocity));
-		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT,
-			new PercentKnockbackResist(CLAW_DELAY + 5, 1, KBR_EFFECT)
-				.displaysTime(false).deleteOnAbilityUpdate(true));
-
-		// Roar effects
-		Location eyeLoc = mPlayer.getEyeLocation();
-		List<LivingEntity> hitMobs = new Hitbox.SphereHitbox(eyeLoc, ROAR_STUN_RADIUS).getHitMobs();
-		hitMobs.forEach(mob -> {
-			EntityUtils.applyStun(mPlugin, mStunDuration, mob);
-			MovementUtils.knockAway(eyeLoc, mob, 0.2f, 0.2f);
-		});
-
-		eyeLoc.subtract(eyeLoc.getDirection().multiply(0.15));
-		ParticleUtils.drawParticleCircleExplosion(mPlayer, eyeLoc, 0, 0.85, 0, -90,
-			10, 0.35f, false, 0, 0.1, Particle.EXPLOSION_NORMAL);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			ParticleUtils.drawParticleCircleExplosion(mPlayer, mPlayer.getEyeLocation(), 0, 0.85, 0, -90,
-				10, 0.35f, false, 0, 0.1, Particle.EXPLOSION_NORMAL);
-		}, 2);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			ParticleUtils.drawParticleCircleExplosion(mPlayer, mPlayer.getEyeLocation(), 0, 0.85, 0, -90,
-				10, 0.35f, false, 0, 0.1, Particle.EXPLOSION_NORMAL);
-		}, 4);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			ParticleUtils.drawParticleCircleExplosion(mPlayer, mPlayer.getEyeLocation(), 0, 0.85, 0, -90,
-				10, 0.35f, false, 0, 0.1, Particle.EXPLOSION_NORMAL);
-		}, 6);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			ParticleUtils.drawParticleCircleExplosion(mPlayer, mPlayer.getEyeLocation(), 0, 0.85, 0, -90,
-				10, 0.35f, false, 0, 0.1, Particle.EXPLOSION_NORMAL);
-		}, 8);
 		claw();
 
 		return true;
 	}
 
 	private void claw() {
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			World world = mPlayer.getWorld();
-			world.playSound(mPlayer, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 2f, 0.7f);
-			world.playSound(mPlayer, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 2f, 0.9f);
-			world.playSound(mPlayer, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.5f, 0.5f);
-			world.playSound(mPlayer, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.3f, 1.0f);
-			world.playSound(mPlayer, Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, SoundCategory.PLAYERS, 1f, 0.6f);
-			world.playSound(mPlayer, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.4f, 2.0f);
-			world.playSound(mPlayer, Sound.BLOCK_GRASS_BREAK, SoundCategory.PLAYERS, 1.0f, 0.9f);
+		World world = mPlayer.getWorld();
+		world.playSound(mPlayer, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 2f, 0.7f);
+		world.playSound(mPlayer, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 2f, 0.9f);
+		world.playSound(mPlayer, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.5f, 0.5f);
+		world.playSound(mPlayer, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.3f, 1.0f);
+		world.playSound(mPlayer, Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, SoundCategory.PLAYERS, 1f, 0.6f);
+		world.playSound(mPlayer, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.4f, 2.0f);
+		world.playSound(mPlayer, Sound.BLOCK_GRASS_BREAK, SoundCategory.PLAYERS, 1.0f, 0.9f);
 
-			Location startLoc = mPlayer.getLocation().clone().add(0, Y_OFFSET, 0);
-			startLoc.setPitch(Math.min(30, Math.max(0, -startLoc.getPitch())));
-			startLoc.add(startLoc.clone().getDirection().setY(0).normalize().multiply(0.5));
-			for (int i = 0; i < 3; i++) {
-				int finalI = i;
-				ParticleUtils.drawCleaveArc(startLoc, CLAW_RADIUS, 160, START_ANGLE, END_ANGLE, 1, 180, 0, 0, ARC_INC,
-					(Location l, int ring, double angleProgress) -> {
-						spawnParticle(l.clone().add(0, -DISTANCE_PER_CLAW * finalI, 0), startLoc, true, finalI == 1, angleProgress);
-					}, DEGREE_STEP);
-				ParticleUtils.drawCleaveArc(startLoc, CLAW_RADIUS, 20, START_ANGLE, END_ANGLE, 1, 180, 0, 0, ARC_INC,
-					(Location l, int ring, double angleProgress) -> {
-						spawnParticle(l.clone().add(0, -DISTANCE_PER_CLAW * finalI, 0), startLoc, false, finalI == 1, angleProgress);
-					}, DEGREE_STEP);
-			}
-		}, CLAW_DELAY);
+		Location startLoc = mPlayer.getLocation().clone().add(0, Y_OFFSET, 0);
+		startLoc.setPitch(Math.min(30, Math.max(0, -startLoc.getPitch())));
+		startLoc.add(startLoc.clone().getDirection().setY(0).normalize().multiply(0.5));
+		for (int i = 0; i < 3; i++) {
+			int finalI = i;
+			ParticleUtils.drawCleaveArc(startLoc, mClawRadius, 160, START_ANGLE, END_ANGLE, 1, 180, 0, 0, ARC_INC,
+				(Location l, int ring, double angleProgress) -> {
+					spawnParticle(l.clone().add(0, -DISTANCE_PER_CLAW * finalI, 0), startLoc, true, finalI == 1, angleProgress);
+				}, DEGREE_STEP);
+			ParticleUtils.drawCleaveArc(startLoc, mClawRadius, 20, START_ANGLE, END_ANGLE, 1, 180, 0, 0, ARC_INC,
+				(Location l, int ring, double angleProgress) -> {
+					spawnParticle(l.clone().add(0, -DISTANCE_PER_CLAW * finalI, 0), startLoc, false, finalI == 1, angleProgress);
+				}, DEGREE_STEP);
+		}
 		// Additional spherical hitbox halfway through the claw animation
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			damage(mPlayer.getLocation().clone().add(0, Y_OFFSET, 0), LENIENCY_HITBOX_RADIUS);
-		}, (int) (CLAW_DELAY + 0.5 * ((END_ANGLE - START_ANGLE) / ARC_INC)));
+		}, (int) (0.5 * ((END_ANGLE - START_ANGLE) / (float) ARC_INC)));
 	}
 
 	private void spawnParticle(Location loc, Location startLoc, boolean rightHand, boolean centerClaw, double angleProgress) {
@@ -201,13 +151,12 @@ public class BeastsClaw extends DepthsAbility {
 	private static Description<BeastsClaw> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<>(() -> INFO, color)
 			.addTrigger()
-			.add(" to roar, stunning enemies in a ")
-			.add(ROAR_STUN_RADIUS)
-			.add(" block radius for ")
-			.addDuration(a -> a.mStunDuration, STUN_DURATION[rarity - 1], false, true)
-			.add(" seconds and lunge forward, gaining full knockback resistance and unleashing a devastating claw swipe dealing ")
+			.add(" to unleash a devastating claw swipe of radius ")
+			.add(a -> a.mClawRadius, CLAW_RADIUS)
+			.add(" dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
-			.add(" melee damage and stunning mobs in front of you.")
+			.add(" melee damage and stunning mobs in front of you for ")
+			.addDuration(a -> a.mStunDuration, STUN_DURATION[rarity - 1], true)
 			.addCooldown(COOLDOWN);
 	}
 

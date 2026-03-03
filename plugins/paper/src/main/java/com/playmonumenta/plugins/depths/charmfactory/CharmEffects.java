@@ -147,7 +147,7 @@ public enum CharmEffects {
 	// Earthbound
 	BEASTS_CLAW_COOLDOWN(BeastsClaw.CHARM_COOLDOWN, BeastsClaw.INFO, false, true, 3.0, -30.0, new double[]{-5.0, -7.5, -10.0, -12.5, -15.0}),
 	BEASTS_CLAW_DAMAGE("Beast's Claw Damage", BeastsClaw.INFO, false, true, 5.0, 80.0, new double[]{10.0, 15.0, 20.0, 25.0, 30.0}),
-	BEASTS_CLAW_VELOCITY("Beast's Claw Velocity", BeastsClaw.INFO, false, true, 3.0, 30.0, new double[]{10.0, 12.0, 14.0, 16.0, 18.0}),
+	BEASTS_CLAW_RANGE("Beast's Claw Range", BeastsClaw.INFO, false, true, 5.0, 50.0, new double[]{10.0, 15.0, 20.0, 25.0, 30.0}),
 	BEASTS_CLAW_STUN_DURATION("Beast's Claw Stun Duration", BeastsClaw.INFO, true, false, 0.25, 2.0, new double[]{0.25, 0.5, 0.75, 1.0, 1.25}),
 	BRAMBLE_SHELL_DAMAGE("Bramble Shell Damage", BrambleShell.INFO, false, true, 5.0, 80.0, new double[]{10.0, 15.0, 20.0, 25.0, 30.0}),
 	BULWARK_COOLDOWN(Bulwark.CHARM_COOLDOWN, Bulwark.INFO, false, true, 3.0, -30.0, new double[]{-5.0, -7.5, -10.0, -12.5, -15.0}),
