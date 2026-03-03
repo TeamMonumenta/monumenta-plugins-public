@@ -15,11 +15,14 @@ import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.ParticleArgument;
 import dev.jorel.commandapi.wrappers.ParticleData;
 import java.util.Collection;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class PointToLocCommand {
@@ -43,7 +46,6 @@ public class PointToLocCommand {
 			)
 			.withOptionalArguments(new EntitySelectorArgument.ManyPlayers("allowed viewers"))
 			.executes((sender, args) -> {
-				Player player = (Player) CommandUtils.getCallee(sender);
 				Location startpoint = ((Location) args.getUnchecked("start")).clone();
 				Location endpoint = args.getUnchecked("end");
 				int count = args.getUnchecked("count");
@@ -66,22 +68,28 @@ public class PointToLocCommand {
 					right = direction.clone().crossProduct(new Vector(0, 1, 0)).normalize();
 					up = direction.clone().crossProduct(right).normalize();
 				}
-				final int[] mAngleOne = {0};
-				final int[] mAngleTwo = {180};
 
-				for (int i = 0; i < count; i++) {
-					Bukkit.getScheduler().runTaskLater(plugin, () -> {
+				new BukkitRunnable() {
+					int mCount = 0;
+					int mAngleOne = 0;
+					int mAngleTwo = 180;
+					@Override
+					public void run() {
+						if (mCount >= count) {
+							this.cancel();
+							return;
+						}
 						if (startpoint.distanceSquared(endpoint) <= endNormalized.lengthSquared()) {
 							return;
 						}
 						startpoint.add(endNormalized);
 						endNormalized.multiply(acceleration);
-						PartialParticle midParticle = new PartialParticle(midParticleData.particle(), startpoint, 2, 0, 0, 0);
+						PartialParticle midParticle = new PartialParticle(midParticleData.particle(), startpoint, 2, 0, 0, 0, midParticleData.data());
 						PPCircle helix1;
 						PPCircle helix2;
 						if (!skr) {
-							helix1 = new PPCircle(helixParticleData.particle(), startpoint, radius).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleOne[0], mAngleOne[0]);
-							helix2 = new PPCircle(helixParticleData.particle(), startpoint, radius).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleTwo[0], mAngleTwo[0]);
+							helix1 = new PPCircle(helixParticleData.particle(), startpoint, radius).data(helixParticleData.data()).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleOne, mAngleOne);
+							helix2 = new PPCircle(helixParticleData.particle(), startpoint, radius).data(helixParticleData.data()).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleTwo, mAngleTwo);
 						} else {
 							double length = startpoint.distanceSquared(endpoint);
 							Color helixColor;
@@ -95,22 +103,30 @@ public class PointToLocCommand {
 								helixColor = Color.RED;
 							}
 							Particle.DustTransition skrColours = new Particle.DustTransition(helixColor, helixColor, 1f);
-							helix1 = new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleOne[0], mAngleOne[0]);
-							helix2 = new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleTwo[0], mAngleTwo[0]);
+							helix1 = new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleOne, mAngleOne);
+							helix2 = new PPCircle(Particle.DUST_COLOR_TRANSITION, startpoint, radius).data(skrColours).countPerMeter(1).directionalMode(false).rotateDelta(true).axes(up, right).ringMode(true).arcDegree(mAngleTwo, mAngleTwo);
 						}
 						if (allowedViewers != null) {
 							midParticle.spawnForPlayers(ParticleCategory.FULL, allowedViewers);
 							helix1.spawnForPlayers(ParticleCategory.FULL, allowedViewers);
 							helix2.spawnForPlayers(ParticleCategory.FULL, allowedViewers);
 						} else {
+							CommandSender csender = CommandUtils.getCallee(sender);
+							if (!(csender instanceof Player player)) {
+								sender.sendMessage(Component.text("/pointtolocation cannot be used in a command block without allowed_viewers", NamedTextColor.RED));
+								this.cancel(); // this isn't going to change, so only send the error once
+								return;
+							}
 							midParticle.spawnAsPlayerActive(player);
-							helix1.spawnAsEnemy();
-							helix2.spawnAsEnemy();
+							helix1.spawnAsPlayerActive(player);
+							helix2.spawnAsPlayerActive(player);
 						}
-						mAngleOne[0] = (mAngleOne[0] + 10) % 360;
-						mAngleTwo[0] = (mAngleTwo[0] + 10) % 360;
-					}, i * (long) timer);
-				}
+						mAngleOne = (mAngleOne + 10) % 360;
+						mAngleTwo = (mAngleTwo + 10) % 360;
+
+						mCount++;
+					}
+				}.runTaskTimer(plugin, 0, timer);
 			})
 			.register();
 	}
