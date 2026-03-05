@@ -4,11 +4,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
-import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
@@ -19,7 +18,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.Nullable;
-import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class DisplayBoss extends BossAbilityGroup {
@@ -62,8 +61,10 @@ public class DisplayBoss extends BossAbilityGroup {
 		public EquipmentSlot SLOT = EquipmentSlot.HAND;
 		@BossParam(help = "Whether itemfromslot removes the item as well")
 		public boolean REMOVE_FROM_SLOT = false;
-		@BossParam(help = "Display glow color")
-		public String GLOW_COLOR = "";
+		@BossParam(help = "Whether the display glows")
+		public boolean GLOWING = false;
+		@BossParam(help = "Display glow color (glow_color_override nbt tag)")
+		public String GLOW_COLOR = "ffffff";
 
 		@BossParam(help = "Translation is affected by rotation")
 		public float TRANSLATION_X = 0;
@@ -72,14 +73,12 @@ public class DisplayBoss extends BossAbilityGroup {
 		@BossParam(help = "Translation is affected by rotation")
 		public float TRANSLATION_Z = 0;
 
-		@BossParam(help = "Rotation is in axis-angle (x,y,z,rotation)")
+		@BossParam(help = "Rotation about the X axis (degrees)")
 		public float ROTATION_X = 0;
-		@BossParam(help = "Rotation is in axis-angle (x,y,z,rotation)")
+		@BossParam(help = "Rotation about the Y axis (degrees)")
 		public float ROTATION_Y = 0;
-		@BossParam(help = "Rotation is in axis-angle (x,y,z,rotation)")
+		@BossParam(help = "Rotation about the Z axis (degrees)")
 		public float ROTATION_Z = 0;
-		@BossParam(help = "Rotation is in axis-angle (x,y,z,rotation)")
-		public double ROTATION_DEGREES = 0;
 
 		@BossParam(help = "Should display rotate with the entity its on")
 		public boolean FOLLOW_ENTITY_ROTATION = false;
@@ -103,9 +102,9 @@ public class DisplayBoss extends BossAbilityGroup {
 		mDisplay = boss.getWorld().spawn(boss.getLocation(), p.TYPE.entityClass(), d -> {
 			d.setTransformation(new Transformation(
 				new Vector3f(p.TRANSLATION_X, p.TRANSLATION_Y, p.TRANSLATION_Z),
-				new AxisAngle4f((float) Math.toRadians(p.ROTATION_DEGREES), p.ROTATION_X, p.ROTATION_Y, p.ROTATION_Z),
+				new Quaternionf().rotateYXZ((float) Math.toRadians(p.ROTATION_Y), (float) Math.toRadians(p.ROTATION_X), (float) Math.toRadians(p.ROTATION_Z)),
 				new Vector3f(p.SCALE_X, p.SCALE_Y, p.SCALE_Z),
-				new AxisAngle4f()
+				new Quaternionf()
 			));
 			@Nullable
 			EntityEquipment equipment = boss.getEquipment();
@@ -114,9 +113,10 @@ public class DisplayBoss extends BossAbilityGroup {
 			}
 			d.setBillboard(p.BILLBOARD);
 			d.setTeleportDuration(Math.clamp(0, p.ANIMATION_TICKS, 59));
-			if (!p.GLOW_COLOR.isEmpty()) {
-				GlowingManager.startGlowing(mBoss, NamedTextColor.NAMES.valueOr(p.GLOW_COLOR, NamedTextColor.WHITE), -1, GlowingManager.BOSS_SPELL_PRIORITY);
+			if (p.GLOWING) {
+				d.setGlowing(true);
 			}
+			d.setGlowColorOverride(Color.fromRGB(Integer.parseInt(p.GLOW_COLOR)));
 
 			EntityUtils.setRemoveEntityOnUnload(d);
 		});
@@ -154,9 +154,9 @@ public class DisplayBoss extends BossAbilityGroup {
 					equipment.setItem(p.SLOT, ItemStack.empty());
 				}
 			} else {
-				itemDisplay.setItemDisplayTransform(p.ITEM_DISPLAY_TYPE);
 				itemDisplay.setItemStack(DisplayEntityUtils.generateRPItem(p.MATERIAL, p.ITEM_NAME));
 			}
+			itemDisplay.setItemDisplayTransform(p.ITEM_DISPLAY_TYPE);
 		}
 	}
 
