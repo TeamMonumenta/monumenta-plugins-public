@@ -33,6 +33,7 @@ public class SporeLasers extends Spell {
 	private static final int BEAM_DURATION = 20 * 8;
 	private static final int BEAM_FREQUENCY = 20 * 12 + BEAM_DURATION;
 	private static final float BEAM_SPORE_AMOUNT = 1.25f;
+	private static final double LASER_DAMAGE = 45;
 
 	private static final int HOMING_PROJECTILE_STASIS_DURATION = (int) (20 * 1.5);
 	private static final int PLAYERS_PER_HOMING_P = 3;
@@ -190,7 +191,7 @@ public class SporeLasers extends Spell {
 						if (MetadataUtils.checkOnceInRecentTicks(mPlugin, p, "HitBySpore", 10)) {
 							mSporeBeast.addSpores(p, BEAM_SPORE_AMOUNT);
 							EffectManager.getInstance().addEffect(p, "Spore Laser", new PercentSpeed(20 * 5, -0.3, "Spore Slowness"));
-							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, 35);
+							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, LASER_DAMAGE);
 						}
 					}
 				}

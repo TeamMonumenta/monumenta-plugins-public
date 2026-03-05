@@ -24,13 +24,13 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SporeRelease extends Spell {
-	public static double SHOCKWAVE_DAMAGE = 60;
+	public static double SHOCKWAVE_DAMAGE = 80;
 	public static float SHOCKWAVE_SPORES = 2.5f;
 	public static int TELEGRAPH_DURATION = (int) (20 * 1.75);
 	public static int TRAVEL_DURATION = (int) (20 * 2.5);
 	public static int REBOUND_DELAY = (int) (20 * 1.5);
 	public static int SHOCKWAVE_POINTS = 54;
-	public static final Particle.DustTransition PARTICLE_DATA = new Particle.DustTransition(Color.WHITE, Color.GREEN, 1.25f);
+	public static final Particle.DustTransition PARTICLE_DATA = new Particle.DustTransition(Color.WHITE, Color.GREEN, 1.5f);
 	public static final double SHOCKWAVE_START_DISTANCE = 4;
 	public static final int EXTRA_DELAY_TICKS = 12;
 	public static int COOLDOWN = TELEGRAPH_DURATION + REBOUND_DELAY + TRAVEL_DURATION * 2 + EXTRA_DELAY_TICKS + 20 * 5;
@@ -41,6 +41,7 @@ public class SporeRelease extends Spell {
 	private final World mWorld;
 
 	private final HashSet<Player> mSporedPlayers;
+	private final HashSet<Player> mHitPlayers;
 
 	public SporeRelease(Plugin plugin, SporousAmalgam sporousAmalgam) {
 		mPlugin = plugin;
@@ -49,6 +50,7 @@ public class SporeRelease extends Spell {
 		mWorld = sporousAmalgam.mBoss.getWorld();
 
 		mSporedPlayers = new HashSet<>();
+		mHitPlayers = new HashSet<>();
 	}
 
 
@@ -76,7 +78,7 @@ public class SporeRelease extends Spell {
 				if (mTicks >= TELEGRAPH_DURATION) {
 					//Shockwave start
 					for (Player p : new Hitbox.SphereHitbox(mBoss.getLocation(), SHOCKWAVE_START_DISTANCE).getHitPlayers(true)) {
-						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.BLAST, SHOCKWAVE_DAMAGE, null, false, false, "Spore Spread");
+						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.BLAST, SHOCKWAVE_DAMAGE, null, false, false, "Spore Release");
 						if (mSporedPlayers.add(p)) {
 							mSporousAmalgam.addSpores(p, SHOCKWAVE_SPORES);
 						}
@@ -107,7 +109,8 @@ public class SporeRelease extends Spell {
 									mLocation.add(mPointSpeed);
 									for (Player p : mSporousAmalgam.getPlayersInOutRange()) {
 										if (p.getBoundingBox().overlaps(mBoundingBox)) {
-											DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MELEE, SHOCKWAVE_DAMAGE, null, false, false, "Spore Release");
+											double damage = (mHitPlayers.add(p)) ? SHOCKWAVE_DAMAGE : SHOCKWAVE_DAMAGE / 2;
+											DamageUtils.damage(mBoss, p, DamageEvent.DamageType.BLAST, damage, null, false, false, "Spore Release");
 											if (mSporedPlayers.add(p)) {
 												mSporousAmalgam.addSpores(p, SHOCKWAVE_SPORES);
 											}
@@ -147,7 +150,9 @@ public class SporeRelease extends Spell {
 							}
 
 							if (mTicks >= TRAVEL_DURATION * 2 + REBOUND_DELAY + EXTRA_DELAY_TICKS || !mBoss.isValid()) {
+								mHitPlayers.clear();
 								mSporedPlayers.clear();
+								//end sound
 								mWorld.playSound(mBoss, Sound.ENTITY_WARDEN_AGITATED, 1f, 1.6f);
 								mWorld.playSound(mBoss, Sound.ENTITY_RAVAGER_STUNNED, 1f, 0.8f);
 								mWorld.playSound(mBoss, Sound.ENTITY_GHAST_DEATH, 1f, 0.8f);

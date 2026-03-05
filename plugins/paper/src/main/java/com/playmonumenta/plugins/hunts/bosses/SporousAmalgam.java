@@ -501,6 +501,10 @@ public class SporousAmalgam extends Quarry {
 		}
 	}
 
+	public boolean isLastPhase() {
+		return mUprootedBeast != null;
+	}
+
 	public void addPlayerInBanish(Player player) {
 		mPlayersInBanish.add(player);
 	}

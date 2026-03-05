@@ -29,7 +29,7 @@ public class Uproot extends Spell {
 	private static final int ROOT_AMOUNT = 17;
 	private static final int MAX_BRANCHES_PER_ROOT = 7;
 
-	private static final double DAMAGE_AMOUNT = 30;
+	private static final double DAMAGE_AMOUNT = 50;
 	private static final float SPORE_AMOUNT = 1.5f;
 
 	private final Plugin mPlugin;
@@ -146,7 +146,7 @@ public class Uproot extends Spell {
 
 	private void dealDamage(List<Block> changedBlocks) {
 		ArrayList<BoundingBox> hitboxes = new ArrayList<>();
-		int allowedHits = (mSporeBeast.getPlayersInInRange().size() > 3) ? mSporeBeast.getPlayersInInRange().size() - 2 : 0;
+		int allowedHits = mSporeBeast.getPlayersInInRange().size() / 4;
 		int hits = 0;
 
 		for (Block b : changedBlocks) {

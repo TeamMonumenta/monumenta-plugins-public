@@ -36,9 +36,12 @@ public class SporeShower extends Spell {
 	private static final int RADIAL_EXPLOSIONS = 6;
 	private static final int RANDOM_EXPLOSIONS_AMOUNT = 4;
 
-	private static final double DAMAGE_AMOUNT = 60;
+	private static final double DAMAGE_AMOUNT = 90;
 	private static final float EXPLOSION_SPORE_AMOUNT = 2.5f;
 	private static final float LINGERING_SPORE_AMOUNT = 1f;
+
+	private static final Particle.DustTransition TELEGRAPH_DATA = new Particle.DustTransition(Color.fromRGB(196, 21, 212), Color.fromRGB(101, 56, 115), 1.25f);
+	private static final Particle.DustTransition LINGERING_DATA = new Particle.DustTransition(Color.fromRGB(0, 0, 255), Color.fromRGB(0, 71, 171), 1.25f);
 
 	private final PPCircle mOuterCircle;
 	private final PPCircle mInnerCircle;
@@ -53,7 +56,7 @@ public class SporeShower extends Spell {
 		mSporeBeast = sporeBeast;
 		mBoss = sporeBeast.mBoss;
 		mSporedByExplosion = new HashSet<>();
-		mOuterCircle = new PPCircle(Particle.DUST_COLOR_TRANSITION, mBoss.getLocation(), EXPLOSION_RADIUS).data(new Particle.DustTransition(Color.fromRGB(196, 21, 212), Color.fromRGB(101, 56, 115), 1f)).count(10);
+		mOuterCircle = new PPCircle(Particle.DUST_COLOR_TRANSITION, mBoss.getLocation(), EXPLOSION_RADIUS).data(TELEGRAPH_DATA).count(12);
 
 		mInnerCircle = new PPCircle(Particle.REDSTONE, mBoss.getLocation(), EXPLOSION_RADIUS)
 			.data(new Particle.DustOptions(Color.fromRGB(184, 22, 114), 1f)).countPerMeter(0.40).delta(0.2).ringMode(false);
@@ -62,6 +65,7 @@ public class SporeShower extends Spell {
 
 	@Override
 	public void run() {
+		mOuterCircle.data(TELEGRAPH_DATA);
 		 new BukkitRunnable() {
 			int mTicks = 0;
 			final Set<Player> mPlayersHitBySpore = new HashSet<>();
@@ -117,7 +121,8 @@ public class SporeShower extends Spell {
 		for (Location l : mExplosionHitboxLocations) {
 			Hitbox.UprightCylinderHitbox hitbox = new Hitbox.UprightCylinderHitbox(l, 0.5, EXPLOSION_RADIUS);
 			for (Player p : new Hitbox.UprightCylinderHitbox(l, 10, EXPLOSION_RADIUS).getHitPlayers(true)) {
-				DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE_AMOUNT, null, false, true, "Spore Shower");
+				double damage = mSporeBeast.isLastPhase() ? DAMAGE_AMOUNT * 0.66 : DAMAGE_AMOUNT;
+				DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, damage, null, false, true, "Spore Shower");
 				if (mSporedByExplosion.add(p)) {
 					mSporeBeast.addSpores(p, EXPLOSION_SPORE_AMOUNT);
 				}
@@ -125,6 +130,7 @@ public class SporeShower extends Spell {
 			hitboxes.add(hitbox);
 		}
 		mSporedByExplosion.clear();
+		mOuterCircle.data(LINGERING_DATA);
 		return hitboxes;
 	}
 

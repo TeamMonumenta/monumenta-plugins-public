@@ -454,7 +454,7 @@ public class HuntsManager implements Listener {
 
 	private CompletableFuture<Long> setRandomQuarry() {
 		List<QuarryType> quarries = Arrays.stream(QuarryType.values()).filter(q -> q != mNextQuarry).toList();
-		return (mNextQuarry == QuarryType.SPOROUS_AMALGAM) ? setQuarry(FastUtils.getRandomElement(quarries)) : setQuarry(QuarryType.SPOROUS_AMALGAM);
+		return setQuarry(FastUtils.getRandomElement(quarries));
 	}
 
 	@SuppressWarnings("EnumOrdinal")
