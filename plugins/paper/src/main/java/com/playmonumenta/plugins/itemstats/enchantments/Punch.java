@@ -72,7 +72,6 @@ public class Punch implements Enchantment {
 				.setY(VERTICAL_LAUNCH);
 		}
 		// TODO: Override the Minecraft Punch behaviour so that it doesn't perform a normal amount of KB via... mixin? Then rewrite this section so that it doesn't delay the KB by one tick
-		// Sorry. Java requires that I input a "final" into the lambda expression.
 		final Vector dir = vector.clone();
 		Bukkit.getScheduler().runTask(plugin, () -> MovementUtils.knockAwayDirection(dir, enemy, 0.5f, true, false));
 	}
