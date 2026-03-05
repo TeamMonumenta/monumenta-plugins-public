@@ -77,7 +77,7 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 	private final LuminousInfusionCS mCosmetic;
 	private boolean mActive = false;
 	private int mPrimedCharges;
-	private int mRemainingCharges = 0;
+	private int mRemainingCharges;
 	private boolean mWasOnCooldown;
 
 	public LuminousInfusion(Plugin plugin, Player player) {
@@ -87,6 +87,7 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new LuminousInfusionCS());
 		mMaxCharges = (isLevelOne() ? CHARGES_1 : CHARGES_2) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
+		mRemainingCharges = Math.min(AbilityManager.getManager().getTrackedCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION), mMaxCharges);
 		mFireDuration = CharmManager.getDuration(player, CHARM_FIRE_DURATION, FIRE_DURATION);
 		mKnocback = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_KNOCKBACK, KNOCKBACK_SPEED);
 	}
@@ -100,8 +101,8 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 		int oldHits = mPrimedCharges;
 		mRemainingCharges--;
 		mPrimedCharges++;
+		AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION, mRemainingCharges);
 
-		AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.SIDEARM, mRemainingCharges);
 		ClientModHandler.updateAbility(mPlayer, this);
 
 		mCosmetic.infusionStartMsg(mPlayer, mPrimedCharges);
@@ -111,7 +112,9 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 			mCosmetic.infusionAddStack(mPlayer.getWorld(), mPlayer, mPlayer.getLocation(), mPrimedCharges);
 			return true;
 		}
-		putOnCooldown();
+		if (!isOnCooldown()) {
+			putOnCooldown();
+		}
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;

@@ -100,7 +100,7 @@ public class TotemicConsecration extends MultipleChargeAbility {
 	public TotemicConsecration(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mMaxCharges = CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGES);
-		mCharges = getTrackedCharges();
+		mCharges = getChargesOffCooldown();
 		mBaseDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mBonusDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_BONUS_DAMAGE, BONUS_DAMAGE);
 		mDurationPerBonus = CharmManager.getDuration(player, CHARM_DURATION_PER_BONUS, DURATION_PER_BONUS);

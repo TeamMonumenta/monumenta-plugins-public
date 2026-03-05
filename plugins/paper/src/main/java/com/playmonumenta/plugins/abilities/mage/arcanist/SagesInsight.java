@@ -6,8 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
-import com.playmonumenta.plugins.abilities.mage.MagmaShield;
-import com.playmonumenta.plugins.abilities.mage.ManaLance;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.SagesInsightCS;
@@ -19,7 +17,6 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -121,15 +118,8 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 
 				mStacks = 0;
 				for (ClassAbility s : mResets) {
-					if (s == ClassAbility.MANA_LANCE) {
-						// Special Treatment for Mana Lance because of charged abilities.
-						Objects.requireNonNull(mPlugin.mAbilityManager.getPlayerAbility(mPlayer, ManaLance.class)).incrementCharge();
-					} else if (s == ClassAbility.MAGMA_SHIELD) {
-						// Special Treatment for Magma Shield because of charged abilities.
-						Objects.requireNonNull(mPlugin.mAbilityManager.getPlayerAbility(mPlayer, MagmaShield.class)).incrementCharge();
-					} else {
-						mPlugin.mTimers.removeCooldown(mPlayer, s);
-					}
+					// MultipleChargeAbilities should now automatically fix their charge count based on this
+					mPlugin.mTimers.removeLastCooldown(mPlayer, s);
 				}
 				mResets.clear();
 			} else {

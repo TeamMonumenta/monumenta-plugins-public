@@ -64,7 +64,7 @@ public class TotemicProjection extends MultipleChargeAbility {
 		super(plugin, player, INFO);
 
 		mMaxCharges = MAX_CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
-		mCharges = getTrackedCharges();
+		mCharges = getChargesOffCooldown();
 		mDistributionRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DISTRIBUTION_RADIUS, DISTRIBUTION_RADIUS);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TotemicProjectionCS());

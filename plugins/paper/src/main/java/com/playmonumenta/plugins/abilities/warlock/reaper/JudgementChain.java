@@ -92,7 +92,7 @@ public class JudgementChain extends MultipleChargeAbility {
 	public JudgementChain(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mMaxCharges = MAX_CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGES);
-		mCharges = getTrackedCharges();
+		mCharges = getChargesOffCooldown();
 
 		mRange = CharmManager.getRadius(player, CHARM_RANGE, RANGE);
 		mChainDuration = CharmManager.getDuration(player, CHARM_CHAIN_DURATION, CHAIN_DURATION);

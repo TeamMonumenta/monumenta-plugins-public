@@ -100,7 +100,7 @@ public class ChainLightning extends MultipleChargeAbility {
 		mFinalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mBaseDamage + mSkillPointDamage + (isEnhanced() ? mEnhanceBonusDmg : 0));
 
 		mMaxCharges = CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
-		mCharges = getTrackedCharges();
+		mCharges = getChargesOffCooldown();
 
 		mBounceRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BOUNCE_RANGE);
 		mTargets = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TARGETS, isLevelOne() ? TARGETS_1 : TARGETS_2);

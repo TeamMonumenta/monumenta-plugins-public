@@ -1,13 +1,14 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.IronTinctureCS;
@@ -33,7 +34,7 @@ import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.St
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
-public class IronTincture extends MultipleChargeAbility {
+public class IronTincture extends Ability implements AbilityWithChargesOrStacks {
 
 	private static final int DECAY_TIME = 20 * 10;
 	private static final int ABSORPTION_1 = 4;
@@ -101,10 +102,14 @@ public class IronTincture extends MultipleChargeAbility {
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private int mLastCastTime = 0;
 
+	private final int mMaxCharges;
+	private int mCharges;
+	private boolean mWasOnCooldown = false;
+
 	public IronTincture(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mMaxCharges = CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
-		mCharges = getTrackedCharges();
+		mCharges = Math.min(AbilityManager.getManager().getTrackedCharges(mPlayer, ClassAbility.IRON_TINCTURE), mMaxCharges);
 		mAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_1 : ABSORPTION_2);
 		mRefill = POTION_REFILL + (int) CharmManager.getLevel(mPlayer, CHARM_REFILL);
 		mAllyRefill = ALLY_POTION_REFILL + (int) CharmManager.getLevel(mPlayer, CHARM_ALLY_REFILL);
@@ -128,8 +133,17 @@ public class IronTincture extends MultipleChargeAbility {
 			return false;
 		}
 
-		if (!consumeCharge()) {
+		if (mCharges <= 0) {
 			return false;
+		}
+		mCharges--;
+		if (mMaxCharges > 1) {
+			showChargesMessage();
+		}
+		AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.IRON_TINCTURE, mCharges);
+
+		if (!isOnCooldown()) {
+			putOnCooldown();
 		}
 
 		mLastCastTime = mPlayer.getTicksLived();
@@ -138,9 +152,6 @@ public class IronTincture extends MultipleChargeAbility {
 		double velocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, VELOCITY);
 		Item tincture = AbilityUtils.spawnAbilityItem(world, loc, Material.SPLASH_POTION, mCosmetic.tinctureName(), false, velocity, true, true);
 		mCosmetic.onThrow(world, loc);
-
-		// Full duration cooldown - is shortened if not picked up
-		putOnCooldown();
 
 		new BukkitRunnable() {
 			int mTinctureDecay = 0;
@@ -215,10 +226,18 @@ public class IronTincture extends MultipleChargeAbility {
 					this.cancel();
 
 					// Refund one tincture if charges are below max, and skill is not enhanced (to prevent abusing the stun)
-					if (!isEnhanced()) {
-						incrementCharge();
+					if (!isEnhanced() && mCharges < mMaxCharges) {
+						mCharges++;
+						if (mMaxCharges > 1) {
+							showChargesMessage();
+						} else {
+							showOffCooldownMessage();
+						}
+						ClientModHandler.updateAbility(mPlayer, IronTincture.this);
+						AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.IRON_TINCTURE, mCharges);
+
 						if (mCharges == mMaxCharges) {
-							mPlugin.mTimers.setCooldown(mPlayer, ClassAbility.IRON_TINCTURE, 0);
+							mPlugin.mTimers.removeCooldown(mPlayer, ClassAbility.IRON_TINCTURE);
 						}
 					}
 				}
@@ -233,9 +252,9 @@ public class IronTincture extends MultipleChargeAbility {
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mWasOnCooldown && !isOnCooldown()) {
 			mCharges = mMaxCharges;
-			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.IRON_TINCTURE, mCharges);
 			showOffCooldownMessage();
 			ClientModHandler.updateAbility(mPlayer, this);
+			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.IRON_TINCTURE, mCharges);
 		}
 
 		mWasOnCooldown = isOnCooldown();
@@ -254,6 +273,21 @@ public class IronTincture extends MultipleChargeAbility {
 		}
 
 		mCosmetic.pickupEffectsForPlayer(player, tinctureLocation);
+	}
+
+	@Override
+	public int getCharges() {
+		return mCharges;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return mMaxCharges;
+	}
+
+	@Override
+	public ChargeType getChargeType() {
+		return ChargeType.CHARGES;
 	}
 
 	private static Description<IronTincture> getDescription1() {

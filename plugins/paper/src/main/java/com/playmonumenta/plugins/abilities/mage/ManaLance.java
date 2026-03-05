@@ -68,7 +68,7 @@ public class ManaLance extends MultipleChargeAbility {
 		super(plugin, player, INFO);
 
 		mMaxCharges = (isEnhanced() ? 2 : 1) + (int) CharmManager.getLevel(player, CHARM_CHARGES);
-		mCharges = getTrackedCharges();
+		mCharges = getChargesOffCooldown();
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RANGE);
 		mSize = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, SIZE);

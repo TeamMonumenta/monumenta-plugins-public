@@ -94,7 +94,7 @@ public class MagmaShield extends MultipleChargeAbility {
 
 		// Should function so that having extra charges without the enhancement is possible but kinda useless.
 		mMaxCharges = (isEnhanced() ? 2 : 1) + (int) CharmManager.getLevel(player, CHARM_CHARGES);
-		mCharges = getTrackedCharges();
+		mCharges = getChargesOffCooldown();
 
 		mLevelDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mEnhancementDamageBonus = isEnhanced() ? CharmManager.calculateFlatAndPercentValue(player, CHARM_ENHANCE_DAMAGE, DAMAGE_ENHANCE) : 0;

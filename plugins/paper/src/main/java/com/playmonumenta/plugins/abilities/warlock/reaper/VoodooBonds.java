@@ -97,7 +97,7 @@ public class VoodooBonds extends MultipleChargeAbility {
 	public VoodooBonds(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mMaxCharges = MAX_CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGES);
-		mCharges = getTrackedCharges();
+		mCharges = getChargesOffCooldown();
 
 		mRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_PIN_RANGE, RANGE);
 		mPinDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_PIN_DAMAGE, CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, PIN_DAMAGE));

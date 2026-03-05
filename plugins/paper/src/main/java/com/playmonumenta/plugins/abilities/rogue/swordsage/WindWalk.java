@@ -75,7 +75,7 @@ public class WindWalk extends MultipleChargeAbility {
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, WIND_WALK_DURATION);
 		mCDR = CharmManager.getDuration(mPlayer, CHARM_COOLDOWN_REDUCTION, WIND_WALK_CDR);
 		mMaxCharges = WIND_WALK_MAX_CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGE);
-		mCharges = getTrackedCharges();
+		mCharges = getChargesOffCooldown();
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WindWalkCS());
 	}
 

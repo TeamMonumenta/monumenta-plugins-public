@@ -162,11 +162,9 @@ public abstract class Ability {
 		AbilityInfo<?> info = getInfo();
 		ClassAbility linkedSpell = info.getLinkedSpell();
 		if (linkedSpell != null) {
-			if (!mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), linkedSpell)) {
-				mPlugin.mTimers.setCooldown(mPlayer, linkedSpell, cooldown);
-				if (callEvent) {
-					PlayerUtils.callAbilityCastEvent(mPlayer, this, linkedSpell);
-				}
+			mPlugin.mTimers.setCooldown(mPlayer, linkedSpell, cooldown);
+			if (callEvent) {
+				PlayerUtils.callAbilityCastEvent(mPlayer, this, linkedSpell);
 			}
 		}
 	}

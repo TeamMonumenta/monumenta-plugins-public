@@ -222,8 +222,8 @@ public class AbilityManager {
 	private final List<AbilityInfo<?>> mDisabledSpecAbilities;
 	private final Map<UUID, AbilityCollection> mAbilities = new HashMap<>();
 
-	//Only used for MultipleChargeAbilities
-	private final Map<UUID, HashMap<ClassAbility, Integer>> mChargeTracker = new HashMap<>();
+	// Now only used for abilities which aren't actually MultipleChargeAbilities - the exception has become the rule!
+	private final Map<UUID, Map<ClassAbility, Integer>> mChargeTracker = new HashMap<>();
 	private static final String KEY_CHARGES_PLUGIN_DATA = "AbilityCharges";
 
 	private final Map<UUID, Map<String, AbilityTrigger>> mCustomTriggers = new HashMap<>();
@@ -809,7 +809,7 @@ public class AbilityManager {
 	}
 
 	public void playerSaveEvent(Player player, PlayerSaveEvent event) {
-		HashMap<ClassAbility, Integer> charges = mChargeTracker.get(player.getUniqueId());
+		Map<ClassAbility, Integer> charges = mChargeTracker.get(player.getUniqueId());
 		if (charges != null) {
 			JsonObject data = new JsonObject();
 			for (Map.Entry<ClassAbility, Integer> entry : charges.entrySet()) {
@@ -1017,7 +1017,7 @@ public class AbilityManager {
 	}
 
 	public int getTrackedCharges(Player player, ClassAbility ability) {
-		HashMap<ClassAbility, Integer> playerCharges = mChargeTracker.get(player.getUniqueId());
+		Map<ClassAbility, Integer> playerCharges = mChargeTracker.get(player.getUniqueId());
 		if (playerCharges != null) {
 			return playerCharges.getOrDefault(ability, 0);
 		}

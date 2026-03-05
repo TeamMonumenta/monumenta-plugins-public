@@ -1,12 +1,13 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
-import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -43,7 +44,7 @@ import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.St
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
-public class ScorchedEarth extends MultipleChargeAbility implements PotionAbility, AbilityWithDuration {
+public class ScorchedEarth extends Ability implements PotionAbility, AbilityWithDuration, AbilityWithChargesOrStacks {
 	private static final String SCORCHED_EARTH_POTION_METAKEY = "ScorchedEarthPotion";
 
 	private static final int COOLDOWN = 30 * 20;
@@ -204,10 +205,14 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private int mCurrDuration = -1;
 
+	private final int mMaxCharges;
+	private int mCharges;
+	private boolean mWasOnCooldown = false;
+
 	public ScorchedEarth(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mMaxCharges = CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
-		mCharges = getTrackedCharges();
+		mCharges = Math.min(AbilityManager.getManager().getTrackedCharges(mPlayer, ClassAbility.SCORCHED_EARTH), mMaxCharges);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 		mShrapnelCount = SHRAPNEL_COUNT + (int) CharmManager.getLevel(mPlayer, CHARM_SHRAPNEL_COUNT);
@@ -282,9 +287,9 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 	private void handleCooldown() {
 		if (mWasOnCooldown && !isOnCooldown()) {
 			mCharges = mMaxCharges;
-			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.SCORCHED_EARTH, mCharges);
 			showOffCooldownMessage();
 			ClientModHandler.updateAbility(mPlayer, this);
+			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.SCORCHED_EARTH, mCharges);
 		}
 
 		mWasOnCooldown = isOnCooldown();
@@ -350,8 +355,16 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 		}
 		final int ticks = mPlayer.getTicksLived();
 		// Prevent double casting on accident
-		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
+		if (ticks - mLastCastTicks <= 5 || mCharges <= 0) {
 			return;
+		}
+		mCharges--;
+		if (mMaxCharges > 1) {
+			showChargesMessage();
+		}
+		AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.SCORCHED_EARTH, mCharges);
+		if (!isOnCooldown()) {
+			putOnCooldown();
 		}
 		mLastCastTicks = ticks;
 		potion.setMetadata(SCORCHED_EARTH_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));
@@ -434,6 +447,21 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 	@Override
 	public int getRemainingAbilityDuration() {
 		return mCurrDuration >= 0 ? getInitialAbilityDuration() - mCurrDuration : 0;
+	}
+
+	@Override
+	public int getCharges() {
+		return mCharges;
+	}
+
+	@Override
+	public int getMaxCharges() {
+		return mMaxCharges;
+	}
+
+	@Override
+	public ChargeType getChargeType() {
+		return ChargeType.CHARGES;
 	}
 
 	private static Description<ScorchedEarth> getDescription1() {

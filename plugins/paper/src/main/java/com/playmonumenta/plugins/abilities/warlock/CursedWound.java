@@ -147,12 +147,7 @@ public class CursedWound extends Ability {
 
 			mCosmetic.onAttack(mPlayer, enemy);
 
-			int cooldowns = 0;
-			for (Integer ability : mPlugin.mTimers.getCooldowns(mPlayer.getUniqueId()).values()) {
-				if (ability > 0) {
-					cooldowns++;
-				}
-			}
+			int cooldowns = mPlugin.mTimers.countAbilitiesOnCooldown(mPlayer);
 
 			event.updateDamageWithMultiplier(1 + (Math.min(cooldowns, mAbilityCap) * mCursedWoundDamage));
 

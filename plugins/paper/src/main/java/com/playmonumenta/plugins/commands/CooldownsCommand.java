@@ -24,7 +24,16 @@ public class CooldownsCommand {
 					.executes((sender, args) -> {
 						final Player who = (Player) Optional.ofNullable(args.getUnchecked(0)).orElseThrow();
 						sender.sendMessage(Component.text("(!) Cooldowns of player: " + who.getName()));
-						Plugin.getInstance().mTimers.getCooldowns(who.getUniqueId()).forEach((k, v) -> sender.sendMessage(Component.text(k.getName(), NamedTextColor.GOLD).append(Component.text(": " + v, NamedTextColor.BLUE))));
+						Plugin.getInstance().mTimers.getCooldowns(who.getUniqueId()).forEach((k, v) -> {
+							if (v.isEmpty()) {
+								return;
+							}
+							StringBuilder cooldowns = new StringBuilder(Integer.toString(v.get(0).getRemaining()));
+							for (int i = 1; i < v.size(); i++) {
+								cooldowns.append(", ").append(v.get(i).getRemaining());
+							}
+							sender.sendMessage(Component.text(k.getName(), NamedTextColor.GOLD).append(Component.text(": " + cooldowns, NamedTextColor.BLUE)));
+						});
 					})
 			)
 			.withSubcommand(new CommandAPICommand("clear"))

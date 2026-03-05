@@ -101,7 +101,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, STUN_DURATION);
 		mMaxCharges = BLADE_MAX_CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCycles = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CYCLES);
-		mCharges = getTrackedCharges();
+		mCharges = getChargesOffCooldown();
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WhirlingBladeCS());
 		Bukkit.getScheduler().runTask(plugin, () -> {

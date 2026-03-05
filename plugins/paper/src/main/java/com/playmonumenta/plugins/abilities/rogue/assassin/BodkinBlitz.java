@@ -87,7 +87,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 	public BodkinBlitz(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mMaxCharges = MAX_CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGE);
-		mCharges = getTrackedCharges();
+		mCharges = getChargesOffCooldown();
 
 		mStealthDuration = CharmManager.getDuration(player, CHARM_STEALTH, (isLevelOne() ? STEALTH_DURATION_1 : STEALTH_DURATION_2));
 		mBonusDmg = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2);

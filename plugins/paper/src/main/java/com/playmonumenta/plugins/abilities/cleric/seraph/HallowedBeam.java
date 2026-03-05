@@ -180,7 +180,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		mSealDuration = CharmManager.getDuration(player, CHARM_SEAL_DURATION, HALLOWED_SEAL_DURATION);
 		mSeals = HALLOWED_SEALS + (int) CharmManager.getLevel(player, CHARM_SEALS);
 		mMaxCharges = (int) CharmManager.getLevel(player, CHARM_CHARGE) + HALLOWED_MAX_CHARGES;
-		mCharges = getTrackedCharges();
+		mCharges = getChargesOffCooldown();
 		mRange = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, CAST_RANGE);
 		mHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEAL, HALLOWED_HEAL_PERCENT);
 		mResistance = HALLOWED_DAMAGE_REDUCTION_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
