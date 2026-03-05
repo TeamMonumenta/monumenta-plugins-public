@@ -69,6 +69,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -690,6 +691,11 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			() -> {
 				mBoss.setInvulnerable(false);
 				mBoss.setAI(true);
+				mBoss.teleport(mSpawnLoc);
+
+				World world = mBoss.getWorld();
+				world.playSound(mSpawnLoc, Sound.BLOCK_TRIAL_SPAWNER_SPAWN_MOB, SoundCategory.HOSTILE, 2.0f, 0.1f);
+				world.playSound(mSpawnLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 0.6f);
 
 				changePhase(new SpellManager(spells), addSpells(mBasePassives, mSpellsDesperation), null);
 			});
