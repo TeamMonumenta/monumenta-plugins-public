@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -47,7 +48,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -97,7 +97,6 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 	private final BossBarManager mBossBar;
 
-	private final com.playmonumenta.plugins.Plugin mMonumentaPlugin;
 	private final World mWorld;
 
 	@Nullable
@@ -115,7 +114,6 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		mWorld = boss.getWorld();
-		mMonumentaPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 
 		// load gallery game based on players nearby
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE, true);
@@ -380,7 +378,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 		if (damagee instanceof Player player) {
 			event.setFlatDamage(scaleDamage(event.getDamage()));
 
-			Bukkit.getScheduler().runTask(mPlugin, () -> mMonumentaPlugin.mPotionManager.clearPotionEffectType(player, PotionEffectType.WITHER));
+			Bukkit.getScheduler().runTask(mPlugin, () -> mPlugin.mPotionManager.clearPotionEffectType(player, PotionEffectType.WITHER));
 
 			changePlayerDeathValue(player, mMeleeDeathDamageOverride ? mMeleeDeathDamageOverrideDamage : MELEE_DEATH_DAMAGE, false);
 		}
@@ -404,8 +402,8 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 				// kill the player
 				sendDialogueMessageToPlayer(player, "LET YER SOUL BE CONSUMED BY THE ETERNAL MARCH OF DEATH");
-				mMonumentaPlugin.mEffectManager.clearEffects(player, Stasis.GENERIC_NAME);
-				mMonumentaPlugin.mEffectManager.clearEffects(player, VoodooBonds.PROTECTION_EFFECT);
+				mPlugin.mEffectManager.clearEffects(player, Stasis.GENERIC_NAME);
+				mPlugin.mEffectManager.clearEffects(player, VoodooBonds.PROTECTION_EFFECT);
 				PotionEffect resist = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 				if (resist != null && resist.getAmplifier() >= 4) {
 					player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.hunts.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
@@ -58,7 +59,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -114,13 +114,11 @@ public class ExperimentSeventyOne extends Quarry {
 
 	private @Nullable Entity mCurrentTarget;
 
-	private final com.playmonumenta.plugins.Plugin mMonumentaPlugin;
 	private final World mWorld;
 
 	public ExperimentSeventyOne(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc, INNER_RADIUS, OUTER_RADIUS, HuntsManager.QuarryType.EXPERIMENT_SEVENTY_ONE);
 
-		mMonumentaPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 		mWorld = boss.getWorld();
 
 		// Initialize base information
@@ -190,7 +188,7 @@ public class ExperimentSeventyOne extends Quarry {
 				}
 
 				mLeapCooldown--;
-				if (mLeapCooldown <= 0 && !mMonumentaPlugin.mEffectManager.hasEffect(mBoss, "SelfRoot") && getCurrentTarget() != null && mBoss.getLocation().distance(getCurrentTarget().getLocation()) > LEAP_DISTANCE) {
+				if (mLeapCooldown <= 0 && !mPlugin.mEffectManager.hasEffect(mBoss, "SelfRoot") && getCurrentTarget() != null && mBoss.getLocation().distance(getCurrentTarget().getLocation()) > LEAP_DISTANCE) {
 					leap.run();
 					mLeapCooldown = LEAP_COOLDOWN;
 				}
@@ -279,11 +277,11 @@ public class ExperimentSeventyOne extends Quarry {
 	}
 
 	private void manageMudEffects() {
-		EffectManager effectManager = mMonumentaPlugin.mEffectManager;
+		EffectManager effectManager = mPlugin.mEffectManager;
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), OUTER_RADIUS, true)) {
 			if (MUD_TRAIL_BLOCKS.contains(player.getLocation().clone().add(0, -0.7, 0).getBlock().getType())) {
-				mMonumentaPlugin.mEffectManager.addEffect(player, MUD_SLOWNESS_TAG, new PercentSpeed(MUD_EFFECT_DURATION, -MUD_SLOWNESS_AMOUNT, MUD_SLOWNESS_TAG));
-				mMonumentaPlugin.mEffectManager.addEffect(player, MUD_HEALING_TAG, new PercentHeal(MUD_EFFECT_DURATION, -MUD_HEALING_REDUCTION));
+				mPlugin.mEffectManager.addEffect(player, MUD_SLOWNESS_TAG, new PercentSpeed(MUD_EFFECT_DURATION, -MUD_SLOWNESS_AMOUNT, MUD_SLOWNESS_TAG));
+				mPlugin.mEffectManager.addEffect(player, MUD_HEALING_TAG, new PercentHeal(MUD_EFFECT_DURATION, -MUD_HEALING_REDUCTION));
 
 				Parasites parasites = effectManager.getActiveEffect(player, Parasites.class);
 				double amount = parasites == null ? 0 : parasites.getAmount();
@@ -482,7 +480,7 @@ public class ExperimentSeventyOne extends Quarry {
 		}
 
 		if (event.getDamager() instanceof Player player && !AbilityUtils.isIndirectDamage(event)) {
-			Effect effect = mMonumentaPlugin.mEffectManager.getActiveEffect(player, PARASITES_TAG);
+			Effect effect = mPlugin.mEffectManager.getActiveEffect(player, PARASITES_TAG);
 			if (effect instanceof Parasites parasites && parasites.getAmount() == 1 && !mSpoiledPlayers.contains(player.getUniqueId())) {
 				if (spoil(player)) {
 					player.sendMessage(Component.text("Your attack infects Experiment Seventy-One with parasites, spoiling your loot.", TEXT_COLOR));

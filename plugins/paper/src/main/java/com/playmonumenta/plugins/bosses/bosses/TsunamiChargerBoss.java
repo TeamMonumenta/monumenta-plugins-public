@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellTsunamiCharge;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 /* TODO: Merge this into ChargerBoss */
 public class TsunamiChargerBoss extends BossAbilityGroup {

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
@@ -8,7 +9,6 @@ import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.utils.BossUtils;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 public class BlueEarthBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blueearth";

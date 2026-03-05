@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellHandSwap;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
-import org.bukkit.plugin.Plugin;
 
 public class HandSwapBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_handswap";

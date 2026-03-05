@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
@@ -9,7 +10,6 @@ import com.playmonumenta.plugins.effects.ProjectileIframe;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 public class WormSegmentBoss extends BossAbilityGroup {

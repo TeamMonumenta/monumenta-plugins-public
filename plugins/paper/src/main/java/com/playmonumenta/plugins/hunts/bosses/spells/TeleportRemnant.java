@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.hunts.bosses.spells;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -30,7 +31,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -47,7 +47,6 @@ public class TeleportRemnant extends Spell {
 	private boolean mIsExisting = false;
 
 	private final Plugin mPlugin;
-	private final com.playmonumenta.plugins.Plugin mMonumentaPlugin;
 	private final World mWorld;
 	private final LivingEntity mBoss;
 
@@ -55,7 +54,6 @@ public class TeleportRemnant extends Spell {
 
 	public TeleportRemnant(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
-		mMonumentaPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 		mBoss = boss;
 		mWorld = boss.getWorld();
 
@@ -84,7 +82,7 @@ public class TeleportRemnant extends Spell {
 		Collection<Player> nearbyPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), TheImpenetrable.OUTER_RADIUS, true);
 		int players = nearbyPlayers.size();
 		double resistanceStrength = 1 / BossUtils.healthScalingCoef(players, 0.5, 0.45);
-		mMonumentaPlugin.mEffectManager.addEffect(remnant, REMNANT_RESISTANCE_TAG, new PercentDamageReceived(Integer.MAX_VALUE, 1 - resistanceStrength));
+		mPlugin.mEffectManager.addEffect(remnant, REMNANT_RESISTANCE_TAG, new PercentDamageReceived(Integer.MAX_VALUE, 1 - resistanceStrength));
 
 		mIsExisting = true;
 

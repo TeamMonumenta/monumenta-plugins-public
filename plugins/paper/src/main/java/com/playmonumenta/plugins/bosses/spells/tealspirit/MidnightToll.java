@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.tealspirit;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -16,7 +17,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class MidnightToll extends Spell {
@@ -68,9 +68,8 @@ public class MidnightToll extends Spell {
 						if (mEnrage) {
 							PlayerUtils.killPlayer(p, mBoss, ABILITY_NAME + " (☠)");
 						} else {
-							com.playmonumenta.plugins.Plugin monumentaPlugin = com.playmonumenta.plugins.Plugin.getInstance();
-							monumentaPlugin.mEffectManager.clearEffects(p, Stasis.GENERIC_NAME);
-							monumentaPlugin.mEffectManager.clearEffects(p, VoodooBonds.PROTECTION_EFFECT);
+							mPlugin.mEffectManager.clearEffects(p, Stasis.GENERIC_NAME);
+							mPlugin.mEffectManager.clearEffects(p, VoodooBonds.PROTECTION_EFFECT);
 							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, mDamage, null, false, true, ABILITY_NAME);
 						}
 						p.playSound(p.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.HOSTILE, 2f, 0.0f);

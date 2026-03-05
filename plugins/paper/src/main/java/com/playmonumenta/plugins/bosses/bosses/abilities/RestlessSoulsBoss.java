@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses.abilities;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
@@ -27,14 +28,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 public class RestlessSoulsBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_restlesssouls";
 	public static final int detectionRange = 64;
 
-	private final com.playmonumenta.plugins.Plugin mMonPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 	private @Nullable Player mPlayer = null;
 	private double mDamage = 0;
 	private double mRange = 0;
@@ -64,7 +63,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		mCosmetic = cosmetic;
 
 		if (player != null) {
-			Bukkit.getScheduler().runTask(mMonPlugin, () -> {
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
 				mAbilities = Stream.of(CholericFlames.class, GraspingClaws.class,
 						MelancholicLament.class, HauntingShades.class, WitheringGaze.class)
 					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
@@ -98,24 +97,24 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		// debuff
 		for (LivingEntity e : EntityUtils.getNearbyMobs(damagee.getLocation(), mRange)) {
 			if (!EntityUtils.isBoss(e)) {
-				EntityUtils.applySilence(mMonPlugin, mSilenceTime, e);
+				EntityUtils.applySilence(mPlugin, mSilenceTime, e);
 			}
 			if (!mLevelOne) {
 				for (Ability ability : mAbilities) {
-					if (ability != null && mMonPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ability.getInfo().getLinkedSpell())) {
+					if (ability != null && mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ability.getInfo().getLinkedSpell())) {
 						if (ability.getInfo().getLinkedSpell() == ClassAbility.CHOLERIC_FLAMES) {
-							EntityUtils.applyFire(mMonPlugin, mDuration, e, mPlayer, mPlayerItemStats);
+							EntityUtils.applyFire(mPlugin, mDuration, e, mPlayer, mPlayerItemStats);
 							if (ability.isLevelTwo()) {
-								mMonPlugin.mEffectManager.addEffect(e, CholericFlames.ANTIHEAL_EFFECT, new CholericFlamesAntiHeal(mDuration));
+								mPlugin.mEffectManager.addEffect(e, CholericFlames.ANTIHEAL_EFFECT, new CholericFlamesAntiHeal(mDuration));
 							}
 						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.GRASPING_CLAWS) {
-							EntityUtils.applySlow(mMonPlugin, mDuration, 0.1, e);
+							EntityUtils.applySlow(mPlugin, mDuration, 0.1, e);
 						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.MELANCHOLIC_LAMENT) {
-							EntityUtils.applyWeaken(mMonPlugin, mDuration, 0.1, e);
+							EntityUtils.applyWeaken(mPlugin, mDuration, 0.1, e);
 						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.HAUNTING_SHADES) {
-							EntityUtils.applyVulnerability(mMonPlugin, mDuration, 0.1, e);
+							EntityUtils.applyVulnerability(mPlugin, mDuration, 0.1, e);
 						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.WITHERING_GAZE) {
-							mMonPlugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(mDuration, 2, 40, mPlayer, mPlayerItemStats, ClassAbility.RESTLESS_SOULS, DamageType.AILMENT));
+							mPlugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(mDuration, 2, 40, mPlayer, mPlayerItemStats, ClassAbility.RESTLESS_SOULS, DamageType.AILMENT));
 						}
 					}
 				}

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.hunts.bosses.spells;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -24,7 +25,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -48,7 +48,6 @@ public class ToxicRepulsion extends Spell {
 	private static final double VULNERABILITY_AMOUNT = 0.15;
 
 	private final Plugin mPlugin;
-	private final com.playmonumenta.plugins.Plugin mMonumentaPlugin;
 	private final LivingEntity mBoss;
 	private final World mWorld;
 	private final ExperimentSeventyOne mExperimentSeventyOne;
@@ -57,7 +56,6 @@ public class ToxicRepulsion extends Spell {
 
 	public ToxicRepulsion(Plugin plugin, LivingEntity boss, ExperimentSeventyOne experimentSeventyOne, int cooldownModifier) {
 		mPlugin = plugin;
-		mMonumentaPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 		mBoss = boss;
 		mWorld = boss.getWorld();
 		mExperimentSeventyOne = experimentSeventyOne;
@@ -116,23 +114,23 @@ public class ToxicRepulsion extends Spell {
 						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.PROJECTILE, ATTACK_DAMAGE, null, true, false, "Toxic Repulsion");
 						MovementUtils.knockAway(mBoss.getLocation(), player, 0.3f, 0.3f, false);
 
-						NavigableSet<Effect> vulnEffects = mMonumentaPlugin.mEffectManager.getEffects(player, VULNERABILITY_TAG);
+						NavigableSet<Effect> vulnEffects = mPlugin.mEffectManager.getEffects(player, VULNERABILITY_TAG);
 						double currentVuln = 0;
 						if (vulnEffects != null) {
 							for (Effect effect : vulnEffects) {
 								currentVuln = effect.getMagnitude();
 							}
 						}
-						mMonumentaPlugin.mEffectManager.addEffect(player, VULNERABILITY_TAG, new PercentDamageReceived(EFFECT_DURATION, currentVuln + VULNERABILITY_AMOUNT));
+						mPlugin.mEffectManager.addEffect(player, VULNERABILITY_TAG, new PercentDamageReceived(EFFECT_DURATION, currentVuln + VULNERABILITY_AMOUNT));
 
-						NavigableSet<Effect> weakEffects = mMonumentaPlugin.mEffectManager.getEffects(player, WEAKNESS_TAG);
+						NavigableSet<Effect> weakEffects = mPlugin.mEffectManager.getEffects(player, WEAKNESS_TAG);
 						double currentWeak = 0;
 						if (weakEffects != null) {
 							for (Effect effect : weakEffects) {
 								currentWeak = effect.getMagnitude();
 							}
 						}
-						mMonumentaPlugin.mEffectManager.addEffect(player, WEAKNESS_TAG, new PercentDamageDealt(EFFECT_DURATION, -(currentWeak + WEAKNESS_AMOUNT)));
+						mPlugin.mEffectManager.addEffect(player, WEAKNESS_TAG, new PercentDamageDealt(EFFECT_DURATION, -(currentWeak + WEAKNESS_AMOUNT)));
 					}
 
 					mScreamRadius = Math.min(mScreamRadius + 0.75, SCREAM_RADIUS);

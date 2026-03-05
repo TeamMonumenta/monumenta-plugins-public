@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
@@ -7,7 +8,6 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellPhalanx;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 public class PhalanxBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_phalanx";

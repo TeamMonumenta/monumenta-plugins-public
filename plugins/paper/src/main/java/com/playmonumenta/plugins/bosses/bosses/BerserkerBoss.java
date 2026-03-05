@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.SpellBerserk;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 public final class BerserkerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_berserker";

@@ -9,7 +9,7 @@ import com.playmonumenta.plugins.gallery.GalleryGame;
 import com.playmonumenta.plugins.gallery.GalleryUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
+import com.playmonumenta.plugins.Plugin;
 
 public class GallerySummonMobBoss extends BossAbilityGroup {
 

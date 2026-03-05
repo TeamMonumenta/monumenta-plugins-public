@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses.exalted;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.exalted.SpellFlamingHavoc;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 public class FlamingHavocBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_flaminghavoc";

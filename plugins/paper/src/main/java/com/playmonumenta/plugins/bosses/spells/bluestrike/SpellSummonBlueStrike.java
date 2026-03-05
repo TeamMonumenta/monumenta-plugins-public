@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.bluestrike;
 
 import com.playmonumenta.libraryofsouls.Soul;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.DropShardBoss;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
@@ -23,7 +24,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 public class SpellSummonBlueStrike extends Spell {

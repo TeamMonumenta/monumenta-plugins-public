@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
@@ -26,7 +27,6 @@ import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -162,7 +162,7 @@ public class SilverBolts extends SpellBaseSeekingProjectile {
 	}
 
 	private static void cage(Player player) {
-		com.playmonumenta.plugins.Plugin plugin = com.playmonumenta.plugins.Plugin.getInstance();
+		Plugin plugin = Plugin.getInstance();
 		PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW_DIGGING, CAGE_DURATION, 99, false, false, true));
 		plugin.mEffectManager.addEffect(player, "SilverBoltsAntiHealEffect", new PercentHeal(CAGE_DURATION, -0.5));
 		player.sendActionBar(Component.text("You have 50% reduced healing for 10s", NamedTextColor.RED));

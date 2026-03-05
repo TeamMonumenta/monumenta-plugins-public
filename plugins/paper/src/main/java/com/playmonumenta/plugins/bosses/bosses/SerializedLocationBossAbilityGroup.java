@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 public abstract class SerializedLocationBossAbilityGroup extends BossAbilityGroup {
 	public final Location mSpawnLoc;

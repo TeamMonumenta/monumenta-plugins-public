@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses.gray;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
@@ -18,7 +19,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 	private static final int SUMMON_TIME = 200;

@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellDistanceCloser;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
-import org.bukkit.plugin.Plugin;
 
 public class DistanceCloserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_distancecloser";

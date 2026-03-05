@@ -17,7 +17,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
-import org.bukkit.plugin.Plugin;
+import com.playmonumenta.plugins.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 public class GenericGalleryMobBoss extends BossAbilityGroup {

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.hunts.bosses.spells;
 
 import com.playmonumenta.libraryofsouls.SoulGroup;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.PlayerHallucinationBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -20,7 +21,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -17,7 +18,6 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
@@ -49,13 +49,11 @@ public class CreipergeuseBoss extends BossAbilityGroup {
 
 	private static final String SPEED_SRC = "CreipergeuseSpeedBuff";
 	private static final String TARGET_TAG = "CreipergeuseBossTargeted";
-	private final com.playmonumenta.plugins.Plugin mMonumentaPlugin;
 	private final Parameters mParams;
 	private @Nullable Player mTargeted;
 
 	public CreipergeuseBoss(final Plugin plugin, final LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mMonumentaPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 		mParams = BossParameters.getParameters(mBoss, identityTag, new Parameters());
 
 		mBoss.setInvulnerable(true);
@@ -114,12 +112,12 @@ public class CreipergeuseBoss extends BossAbilityGroup {
 
 				if (distanceSquaredToTarget <= mParams.CLOSE_RADIUS * mParams.CLOSE_RADIUS) {
 					mParams.HEARTBEAT_SOUNDS.play(mTargeted);
-					mMonumentaPlugin.mEffectManager.clearEffects(mBoss, SPEED_SRC);
+					mPlugin.mEffectManager.clearEffects(mBoss, SPEED_SRC);
 				} else if (distanceSquaredToTarget <= mParams.MIDRANGE_RADIUS * mParams.MIDRANGE_RADIUS) {
-					mMonumentaPlugin.mEffectManager.addEffect(mBoss, SPEED_SRC,
+					mPlugin.mEffectManager.addEffect(mBoss, SPEED_SRC,
 						new BaseMovementSpeedModifyEffect(Constants.TICKS_PER_SECOND, 0.4));
 				} else {
-					mMonumentaPlugin.mEffectManager.addEffect(mBoss, SPEED_SRC,
+					mPlugin.mEffectManager.addEffect(mBoss, SPEED_SRC,
 						new BaseMovementSpeedModifyEffect(Constants.TICKS_PER_SECOND, 0.8));
 				}
 			}

@@ -14,7 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
+import com.playmonumenta.plugins.Plugin;
 
 public class GalleryMobRisingBoss extends BossAbilityGroup {
 	public static final String identityTag = "GalleryMobRisingBoss";

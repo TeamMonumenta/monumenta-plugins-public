@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.hunts.bosses.spells;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -21,7 +22,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -47,7 +47,6 @@ public class ShellRupture extends Spell {
 	private static final double WEAKNESS_AMOUNT = 0.35;
 
 	private final Plugin mPlugin;
-	private final com.playmonumenta.plugins.Plugin mMonumentaPlugin;
 	private final LivingEntity mBoss;
 	private final World mWorld;
 
@@ -56,7 +55,6 @@ public class ShellRupture extends Spell {
 
 	public ShellRupture(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
-		mMonumentaPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 		mBoss = boss;
 		mWorld = boss.getWorld();
 
@@ -156,7 +154,7 @@ public class ShellRupture extends Spell {
 					Hitbox hitbox = Hitbox.approximateCone(baseLocation.clone().setDirection(attackDirection), ATTACK_RANGE, Math.toRadians(ATTACK_ANGLE));
 					for (Player player : hitbox.getHitPlayers(true)) {
 						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MELEE, ATTACK_DAMAGE, null, false, true, "Rupturing Shell");
-						mMonumentaPlugin.mEffectManager.addEffect(player, WEAKNESS_TAG, new PercentDamageDealt(WEAKNESS_DURATION, -WEAKNESS_AMOUNT));
+						mPlugin.mEffectManager.addEffect(player, WEAKNESS_TAG, new PercentDamageDealt(WEAKNESS_DURATION, -WEAKNESS_AMOUNT));
 					}
 
 					this.cancel();

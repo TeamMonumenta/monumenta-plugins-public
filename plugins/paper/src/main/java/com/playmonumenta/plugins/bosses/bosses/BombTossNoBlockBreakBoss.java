@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 /* TODO: Merge this with BossGrenadeLauncher */
 public class BombTossNoBlockBreakBoss extends BossAbilityGroup {

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
@@ -16,7 +17,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 public class VindictiveBoss extends BossAbilityGroup {
@@ -73,8 +73,6 @@ public class VindictiveBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		com.playmonumenta.plugins.Plugin plugin = com.playmonumenta.plugins.Plugin.getInstance();
-
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), mParams.RANGE)) {
 			Location loc = mob.getEyeLocation();
 			mParams.SOUND.play(loc);
@@ -84,9 +82,9 @@ public class VindictiveBoss extends BossAbilityGroup {
 				mParams.ADDITIONAL_EFFECTS.apply(mob, mBoss);
 			}
 
-			plugin.mEffectManager.addEffect(mob, PERCENT_SPEED_EFFECT_NAME,
+			mPlugin.mEffectManager.addEffect(mob, PERCENT_SPEED_EFFECT_NAME,
 				new PercentSpeed(mParams.DURATION, mParams.PERCENT_SPEED_EFFECT, PERCENT_SPEED_EFFECT_NAME));
-			plugin.mEffectManager.addEffect(mob, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
+			mPlugin.mEffectManager.addEffect(mob, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
 				new PercentDamageDealt(mParams.DURATION, mParams.PERCENT_DAMAGE_DEALT_EFFECT));
 
 			mob.setHealth(Math.min(EntityUtils.getMaxHealth(mob), mob.getHealth() + mParams.HEAL));

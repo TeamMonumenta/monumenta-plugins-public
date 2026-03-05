@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.hunts.bosses.spells;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -25,7 +26,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -50,7 +50,6 @@ public class MuddyShriek extends Spell {
 
 
 	private final Plugin mPlugin;
-	private final com.playmonumenta.plugins.Plugin mMonumentaPlugin;
 	private final LivingEntity mBoss;
 	private final World mWorld;
 	private final ExperimentSeventyOne mExperimentSeventyOne;
@@ -61,7 +60,6 @@ public class MuddyShriek extends Spell {
 
 	public MuddyShriek(Plugin plugin, LivingEntity boss, ExperimentSeventyOne experimentSeventyOne, boolean permanentMud, int cooldownModifier) {
 		mPlugin = plugin;
-		mMonumentaPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 		mBoss = boss;
 		mWorld = boss.getWorld();
 		mExperimentSeventyOne = experimentSeventyOne;
@@ -185,7 +183,7 @@ public class MuddyShriek extends Spell {
 				for (Player player : hitbox.getHitPlayers(true)) {
 					if (!mHitPlayers.contains(player)) {
 						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.PROJECTILE, ATTACK_DAMAGE, null, false, true, "Muddy Shriek");
-						mMonumentaPlugin.mEffectManager.addEffect(player, SLOWNESS_TAG, new PercentSpeed(SLOWNESS_DURATION, -SLOWNESS_AMOUNT, SLOWNESS_TAG));
+						mPlugin.mEffectManager.addEffect(player, SLOWNESS_TAG, new PercentSpeed(SLOWNESS_DURATION, -SLOWNESS_AMOUNT, SLOWNESS_TAG));
 
 						player.playSound(player.getLocation(), Sound.ENTITY_TURTLE_EGG_CRACK, SoundCategory.HOSTILE, 2f, 0.8f);
 						mHitPlayers.add(player);

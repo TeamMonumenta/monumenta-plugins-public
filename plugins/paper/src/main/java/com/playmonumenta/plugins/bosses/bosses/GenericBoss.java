@@ -1,11 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import java.util.Collections;
 import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 public class GenericBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_generic";

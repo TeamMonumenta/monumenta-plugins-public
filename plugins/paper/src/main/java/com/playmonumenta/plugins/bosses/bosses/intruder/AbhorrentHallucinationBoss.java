@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses.intruder;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
@@ -21,7 +22,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 public class AbhorrentHallucinationBoss extends BossAbilityGroup {
 	public static final String TAG = "AbhorrentHallucination";

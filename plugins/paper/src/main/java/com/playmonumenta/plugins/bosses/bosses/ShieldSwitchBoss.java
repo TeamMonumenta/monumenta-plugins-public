@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldSwitch;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
-import org.bukkit.plugin.Plugin;
 
 public final class ShieldSwitchBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_shieldswitch";

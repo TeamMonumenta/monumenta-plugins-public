@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses.abilities;
 
 import com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent;
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
@@ -23,7 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 public class AlchemicalAberrationBoss extends BossAbilityGroup {

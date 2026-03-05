@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.plugin.Plugin;
 
 public class NoProjectileLaunchBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_no_projectile_launch";

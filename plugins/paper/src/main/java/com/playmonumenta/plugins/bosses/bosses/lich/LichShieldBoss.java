@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses.lich;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
@@ -15,7 +16,6 @@ import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 public class LichShieldBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lichshield";

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.hunts.bosses.spells;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -25,7 +26,6 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -41,7 +41,6 @@ public class BanishParalyzingMusk extends Spell {
 	private static final String SLOW_ATTR_TAG = "UamielBanishSlow";
 
 	private final Plugin mPlugin;
-	private final com.playmonumenta.plugins.Plugin mMonumentaPlugin;
 	private final LivingEntity mBoss;
 	private final Uamiel mUamiel;
 	private final World mWorld;
@@ -51,8 +50,6 @@ public class BanishParalyzingMusk extends Spell {
 		mBoss = boss;
 		mUamiel = uamiel;
 		mWorld = boss.getWorld();
-
-		mMonumentaPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 	}
 
 	@Override
@@ -64,7 +61,7 @@ public class BanishParalyzingMusk extends Spell {
 		List<Player> players = new ArrayList<>(mUamiel.getPlayers());
 		for (Player player : players) {
 			player.sendMessage(Component.text("Hazardous spores begin to settle on your skin, slowing you.", Uamiel.TEXT_COLOR));
-			mMonumentaPlugin.mEffectManager.addEffect(player, SOURCE, new UamielPetrification(CAST_DURATION + DISPEL_DURATION + 1));
+			mPlugin.mEffectManager.addEffect(player, SOURCE, new UamielPetrification(CAST_DURATION + DISPEL_DURATION + 1));
 		}
 
 		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_HORSE_BREATHE, SoundCategory.HOSTILE, 5f, 0.7f);
@@ -85,19 +82,19 @@ public class BanishParalyzingMusk extends Spell {
 			public void run() {
 				if (mTicks % 5 == 0) {
 					for (Player player : players) {
-						mMonumentaPlugin.mEffectManager.addEffect(player, SLOW_ATTR_TAG, new PercentSpeed(CAST_DURATION - mTicks + DISPEL_DURATION, -((double) mTicks / CAST_DURATION), SLOW_ATTR_TAG));
+						mPlugin.mEffectManager.addEffect(player, SLOW_ATTR_TAG, new PercentSpeed(CAST_DURATION - mTicks + DISPEL_DURATION, -((double) mTicks / CAST_DURATION), SLOW_ATTR_TAG));
 					}
 				}
 
 				// check if players have CurePetrify
 				List<Player> toRemovePlayers = new ArrayList<>();
 				for (Player player : players) {
-					if (!mMonumentaPlugin.mEffectManager.hasEffect(player, SOURCE)) {
+					if (!mPlugin.mEffectManager.hasEffect(player, SOURCE)) {
 						player.sendMessage(Component.text("Feeling freshly invigorated, the spores melt away, curing you.", Uamiel.TEXT_COLOR));
 						mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.HOSTILE, 0.65f, 0.8f);
 						toRemovePlayers.add(player);
 
-						mMonumentaPlugin.mEffectManager.clearEffects(player, SLOW_ATTR_TAG);
+						mPlugin.mEffectManager.clearEffects(player, SLOW_ATTR_TAG);
 						player.removePotionEffect(PotionEffectType.BLINDNESS);
 						AbilityUtils.unsilencePlayer(player);
 						chargeUp.excludePlayer(player);
@@ -155,7 +152,7 @@ public class BanishParalyzingMusk extends Spell {
 				super.cancel();
 
 				for (Player player : players) {
-					mMonumentaPlugin.mEffectManager.clearEffects(player, SLOW_ATTR_TAG);
+					mPlugin.mEffectManager.clearEffects(player, SLOW_ATTR_TAG);
 					player.removePotionEffect(PotionEffectType.BLINDNESS);
 					AbilityUtils.unsilencePlayer(player);
 				}

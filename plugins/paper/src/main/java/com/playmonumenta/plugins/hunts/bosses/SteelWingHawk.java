@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.hunts.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -40,7 +41,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SteelWingHawk extends Quarry {
@@ -124,9 +124,8 @@ public class SteelWingHawk extends Quarry {
 					new PPCircle(Particle.SNOWFLAKE, l, 1.35).countPerMeter(1.1).ringMode(false).spawnAsBoss();
 
 					for (Player p : new Hitbox.UprightCylinderHitbox(l, 1, 1.5).getHitPlayers(true)) {
-						com.playmonumenta.plugins.Plugin plugin = com.playmonumenta.plugins.Plugin.getInstance();
-						plugin.mEffectManager.addEffect(p, PROJ_DAMAGE_EFFECT, new PercentDamageDealt(EFFECT_DURATION, PERCENT_PROJ_DAMAGE).damageTypes(DamageEvent.DamageType.getAllProjectileTypes()));
-						plugin.mEffectManager.addEffect(p, SLOW_EFFECT, new PercentSpeed(EFFECT_DURATION, PERCENT_SLOW, SLOW_EFFECT));
+						mPlugin.mEffectManager.addEffect(p, PROJ_DAMAGE_EFFECT, new PercentDamageDealt(EFFECT_DURATION, PERCENT_PROJ_DAMAGE).damageTypes(DamageEvent.DamageType.getAllProjectileTypes()));
+						mPlugin.mEffectManager.addEffect(p, SLOW_EFFECT, new PercentSpeed(EFFECT_DURATION, PERCENT_SLOW, SLOW_EFFECT));
 
 						Location pLoc = p.getLocation();
 						world.playSound(pLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 0.85f, 1.5f);

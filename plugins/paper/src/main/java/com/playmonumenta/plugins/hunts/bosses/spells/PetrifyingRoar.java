@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.hunts.bosses.spells;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -17,7 +18,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class PetrifyingRoar extends Spell {
@@ -38,7 +38,6 @@ public class PetrifyingRoar extends Spell {
 	private static final String PETRIFY_VULN_ATTR_TAG = "UamielPetrifyVuln";
 
 	private final Plugin mPlugin;
-	private final com.playmonumenta.plugins.Plugin mMonumentaPlugin;
 	private final LivingEntity mBoss;
 	private final Uamiel mUamiel;
 
@@ -49,8 +48,6 @@ public class PetrifyingRoar extends Spell {
 		mBoss = boss;
 		mUamiel = uamiel;
 		mCooldownModifier = cooldownModifier;
-
-		mMonumentaPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 	}
 
 	@Override
@@ -109,8 +106,8 @@ public class PetrifyingRoar extends Spell {
 					for (Player player : hitbox.getHitPlayers(true)) {
 						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MELEE, ATTACK_DAMAGE, null, false, true, "Petrifying Roar");
 
-						mMonumentaPlugin.mEffectManager.addEffect(player, PETRIFY_SLOW_ATTR_TAG, new PercentSpeed(PETRIFY_DURATION, -1, PETRIFY_SLOW_ATTR_TAG));
-						mMonumentaPlugin.mEffectManager.addEffect(player, PETRIFY_VULN_ATTR_TAG, new PercentDamageReceived(PETRIFY_DURATION, 0.5));
+						mPlugin.mEffectManager.addEffect(player, PETRIFY_SLOW_ATTR_TAG, new PercentSpeed(PETRIFY_DURATION, -1, PETRIFY_SLOW_ATTR_TAG));
+						mPlugin.mEffectManager.addEffect(player, PETRIFY_VULN_ATTR_TAG, new PercentDamageReceived(PETRIFY_DURATION, 0.5));
 					}
 				}
 

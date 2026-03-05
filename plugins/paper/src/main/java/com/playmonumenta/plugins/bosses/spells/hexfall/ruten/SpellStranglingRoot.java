@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.hexfall.ruten;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.hexfall.Ruten;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -23,7 +24,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -133,9 +133,8 @@ public class SpellStranglingRoot extends Spell {
 															.count(1)
 															.data(Material.MOSS_BLOCK.createBlockData())
 															.spawnAsBoss();
-														com.playmonumenta.plugins.Plugin plugin = com.playmonumenta.plugins.Plugin.getInstance();
-														plugin.mEffectManager.addEffect(player, "StranglingRootAntiHeal", new PercentHeal(mDebuffDuration, ANTI_HEAL_MODIFIER));
-														plugin.mEffectManager.addEffect(player, "StranglingRootSlowness", new PercentSpeed(mDebuffDuration, SLOW_AMPLIFIER, "StranglingRootSlowness"));
+														mPlugin.mEffectManager.addEffect(player, "StranglingRootAntiHeal", new PercentHeal(mDebuffDuration, ANTI_HEAL_MODIFIER));
+														mPlugin.mEffectManager.addEffect(player, "StranglingRootSlowness", new PercentSpeed(mDebuffDuration, SLOW_AMPLIFIER, "StranglingRootSlowness"));
 														this.cancel();
 													}
 												}

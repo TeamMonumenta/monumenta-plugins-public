@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses.abilities;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtue;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
@@ -22,7 +23,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 public class KeeperVirtueBoss extends BossAbilityGroup {

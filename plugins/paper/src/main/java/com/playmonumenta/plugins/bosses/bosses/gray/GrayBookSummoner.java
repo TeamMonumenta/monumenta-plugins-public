@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses.gray;
 
+import com.playmonumenta.plugins.Plugin;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 /* TODO: Merge this with SpawnMobsBoss */
 public class GrayBookSummoner extends GraySwarmSummonerBase {

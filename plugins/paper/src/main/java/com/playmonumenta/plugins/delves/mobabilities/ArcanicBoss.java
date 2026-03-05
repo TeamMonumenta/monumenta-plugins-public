@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.delves.mobabilities;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.BossParameters;
 import com.playmonumenta.plugins.bosses.bosses.ChargerBoss;
@@ -24,7 +25,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.Nullable;
@@ -227,7 +227,6 @@ public class ArcanicBoss extends BossAbilityGroup {
 	}
 
 	final ArcanicBoss.Parameters mParameters;
-	private static final com.playmonumenta.plugins.Plugin rejuvPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 	@Nullable
 	private ItemDisplay mArcaneRune;
 	private static final float RUNE_OFFSET = 0.85f;
@@ -247,7 +246,7 @@ public class ArcanicBoss extends BossAbilityGroup {
 				spell = new SpellBaseSeekingProjectile(plugin, mBoss, MISSILE_PARAMETERS.get(mParameters.REGION));
 			case CHARGE -> spell = new SpellBaseCharge(plugin, mBoss, CHARGE_PARAMETERS.get(mParameters.REGION));
 			case REJUVENATION ->
-				spell = new SpellMobHealAoE(rejuvPlugin, mBoss, REJUVENATION_PARAMETERS.get(mParameters.REGION));
+				spell = new SpellMobHealAoE(mPlugin, mBoss, REJUVENATION_PARAMETERS.get(mParameters.REGION));
 			default -> spell = new SpellBaseCharge(plugin, mBoss, CHARGE_PARAMETERS.get(mParameters.REGION));
 		}
 		mArcaneRune = DisplayEntityUtils.spawnItemDisplayWithBase64Head(boss.getLocation(), mParameters.SPELL.getRune());

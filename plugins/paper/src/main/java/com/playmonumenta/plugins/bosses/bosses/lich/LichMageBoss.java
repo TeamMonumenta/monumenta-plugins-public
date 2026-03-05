@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses.lich;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.CrowdControlImmunity;
@@ -8,7 +9,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellBasePassiveAbility;
 import com.playmonumenta.plugins.bosses.spells.lich.undeadplayers.SpellMagmaShield;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
 
 public class LichMageBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lichmage";
