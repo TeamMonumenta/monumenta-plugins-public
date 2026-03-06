@@ -71,7 +71,7 @@ public class SpellPutridPlague extends Spell {
 
 		public static Pillar getRandom() {
 			Pillar[] values = values();
-			return values[FastUtils.randomIntInRange(0, values.length)];
+			return values[FastUtils.randomIntInRange(0, values.length - 1)];
 		}
 	}
 
