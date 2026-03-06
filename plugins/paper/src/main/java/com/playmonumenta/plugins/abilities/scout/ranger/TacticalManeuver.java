@@ -73,7 +73,6 @@ public class TacticalManeuver extends MultipleChargeAbility {
 	private final double mRadius;
 	private final int mDuration;
 	private int mLastCastTicks = 0;
-	private @Nullable SwiftCuts mSwiftCuts;
 	private final TacticalManeuverCS mCosmetic;
 
 	public TacticalManeuver(Plugin plugin, Player player) {
@@ -85,10 +84,6 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TACTICAL_MANEUVER_RADIUS);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TACTICAL_DASH_STUN_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TacticalManeuverCS());
-
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SwiftCuts.class);
-		});
 	}
 
 	public boolean cast(boolean forwards) {
@@ -104,12 +99,6 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		}
 
 		mLastCastTicks = ticks;
-
-		int cooldown = getModifiedCooldown();
-		if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
-			cooldown = (int) (cooldown * (1 - mSwiftCuts.getTacticalManeuverCDR()));
-		}
-		putOnCooldown(cooldown);
 
 		World world = mPlayer.getWorld();
 		if (forwards) {

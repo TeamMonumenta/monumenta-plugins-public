@@ -94,7 +94,7 @@ public class EarthenWrath extends DepthsAbility {
 			return false;
 		}
 
-		PlayerUtils.callAbilityCastEvent(mPlayer, this, ClassAbility.EARTHEN_WRATH);
+		PlayerUtils.callAbilityCastEvent(mPlayer, this, ClassAbility.EARTHEN_WRATH, 0);
 
 		cancelOnDeath(new BukkitRunnable() {
 			private int mTicks = 0;

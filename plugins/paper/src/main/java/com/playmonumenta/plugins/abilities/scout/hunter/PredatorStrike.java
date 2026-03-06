@@ -196,11 +196,7 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		}
 		mDeactivationRunnable.cancel();
 
-		int cooldown = getModifiedCooldown();
-		if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
-			cooldown = (int) (cooldown * (1 - mSwiftCuts.getPredatorStrikeCDR()));
-		}
-		putOnCooldown(cooldown);
+		putOnCooldown();
 
 		projectile.remove();
 		mPlugin.mProjectileEffectTimers.removeEntity(projectile);

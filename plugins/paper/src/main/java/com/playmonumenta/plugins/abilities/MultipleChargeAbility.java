@@ -43,7 +43,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 			for (int i = 0; i < charges; i++) {
 				putOnCooldown(false);
 			}
-			PlayerUtils.callAbilityCastEvent(mPlayer, this, mLinkedSpell);
+			PlayerUtils.callAbilityCastEvent(mPlayer, this, mLinkedSpell, 0);
 			ClientModHandler.updateAbility(mPlayer, this);
 			return charges;
 		}

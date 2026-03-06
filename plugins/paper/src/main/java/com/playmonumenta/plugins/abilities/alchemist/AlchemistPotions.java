@@ -432,7 +432,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 		mCharges--;
 		ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
-		PlayerUtils.callAbilityCastEvent(mPlayer, this, ClassAbility.ALCHEMIST_POTION);
+		PlayerUtils.callAbilityCastEvent(mPlayer, this, ClassAbility.ALCHEMIST_POTION, 0);
 		updateAlchemistItem();
 		ClientModHandler.updateAbility(mPlayer, this);
 

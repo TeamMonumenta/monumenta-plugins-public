@@ -91,7 +91,6 @@ public class WindWalk extends MultipleChargeAbility {
 		}
 		mLastCastTicks = ticks;
 
-		putOnCooldown();
 		walk();
 
 		if (isLevelTwo()) {

@@ -16,11 +16,13 @@ public class AbilityCastEvent extends Event implements Cancellable {
 	private final Player mCaster;
 	private final Ability mAbility;
 	private final ClassAbility mSpell;
+	private int mCooldown;
 
-	public AbilityCastEvent(Player caster, Ability ability, ClassAbility spell) {
+	public AbilityCastEvent(Player caster, Ability ability, ClassAbility spell, int cooldown) {
 		mCaster = caster;
 		mAbility = ability;
 		mSpell = spell;
+		mCooldown = cooldown;
 	}
 
 	public Player getCaster() {
@@ -33,6 +35,14 @@ public class AbilityCastEvent extends Event implements Cancellable {
 
 	public ClassAbility getSpell() {
 		return mSpell;
+	}
+
+	public int getCooldown() {
+		return mCooldown;
+	}
+
+	public void setCooldown(int cooldown) {
+		mCooldown = cooldown;
 	}
 
 	@Override

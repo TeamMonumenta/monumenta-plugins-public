@@ -82,9 +82,10 @@ public class PlayerUtils {
 	public static final int MAX_FOOD_LEVEL = 20;
 	public static final int MAX_FOOD_SATURATION_LEVEL = 20;
 
-	public static void callAbilityCastEvent(Player player, Ability ability, ClassAbility spell) {
-		AbilityCastEvent event = new AbilityCastEvent(player, ability, spell);
+	public static AbilityCastEvent callAbilityCastEvent(Player player, Ability ability, ClassAbility spell, int cooldown) {
+		AbilityCastEvent event = new AbilityCastEvent(player, ability, spell, cooldown);
 		Bukkit.getPluginManager().callEvent(event);
+		return event;
 	}
 
 	public static HemorrhageEvent callHemorrhageEvent(Player player, LivingEntity mob) {

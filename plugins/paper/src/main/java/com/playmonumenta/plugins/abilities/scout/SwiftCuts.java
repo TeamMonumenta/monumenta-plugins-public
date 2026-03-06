@@ -6,9 +6,11 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.SwiftCutsCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -128,6 +130,20 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
+	}
+
+	@Override
+	public boolean abilityCastEvent(AbilityCastEvent event) {
+		if (isEnhancementActive()) {
+			ClassAbility spell = event.getSpell();
+			if (spell == ClassAbility.TACTICAL_MANEUVER) {
+				event.setCooldown((int) (event.getCooldown() * (1 - TACTICAL_MANEUVER_CDR)));
+			} else if (spell == ClassAbility.PREDATOR_STRIKE) {
+				event.setCooldown((int) (event.getCooldown() * (1 - PREDATOR_STRIKE_CDR)));
+			}
+		}
+
+		return true;
 	}
 
 	private boolean hasEffect() {
