@@ -114,6 +114,7 @@ public class DepthsGUICommands {
 		DepthsPlayer dp = DepthsManager.getInstance().getDepthsPlayer(player);
 		if (dp == null) {
 			MessagingUtils.sendActionBarMessage(player, "No abilities to summarize.");
+			return;
 		}
 		new DepthsSummaryGUI(player).open();
 	}
