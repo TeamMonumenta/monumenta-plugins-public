@@ -27,7 +27,6 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 			if (mMaxCharges > 1) {
 				showChargesMessage();
 			}
-			ClientModHandler.updateAbility(mPlayer, this);
 
 			return true;
 		}
@@ -54,15 +53,20 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	// This must be manually called if PeriodicTrigger is overridden by the superclass
 	protected void manageChargeCooldowns() {
 		int currentCharges = mCharges;
-		mCharges = getChargesOffCooldown();
+		updateCharges();
 		if (mCharges != currentCharges && mMaxCharges > 1) {
 			showChargesMessage();
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
 
 		// If the skill is somehow on cooldown when charges are full, take it off cooldown
 		if (mCharges == mMaxCharges && isOnCooldown()) {
 			mPlugin.mTimers.removeCooldown(mPlayer, mLinkedSpell);
 		}
+	}
+
+	public void updateCharges() {
+		mCharges = getChargesOffCooldown();
 	}
 
 	@Override

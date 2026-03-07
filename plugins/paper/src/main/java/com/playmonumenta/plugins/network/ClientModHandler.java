@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
@@ -81,8 +82,8 @@ public class ClientModHandler {
 			return;
 		}
 		ClassAbility classAbility = ability.getInfo().getLinkedSpell();
-		int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
-		int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
+		int charges = ability instanceof AbilityWithChargesOrStacks abilityWithChargesOrStacks ? abilityWithChargesOrStacks.getCharges() : 0;
+		int remainingCooldown = classAbility == null || (ability instanceof MultipleChargeAbility && charges > 0) ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
 
 		AbilityUpdatePacket packet = new AbilityUpdatePacket();
 		packet.name = getAbilityName(ability);

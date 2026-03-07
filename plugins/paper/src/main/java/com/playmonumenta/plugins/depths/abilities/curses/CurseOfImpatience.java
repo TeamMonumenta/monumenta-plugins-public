@@ -14,13 +14,13 @@ import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.depths.abilities.windwalker.DepthsDodging;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import java.util.Objects;
-import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class CurseOfImpatience extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Curse of Impatience";
+	public static final int CD_INCREASE = 20;
 
 	public static final DepthsAbilityInfo<CurseOfImpatience> INFO =
 		new DepthsAbilityInfo<>(CurseOfImpatience.class, ABILITY_NAME, CurseOfImpatience::new, DepthsTree.CURSE, DepthsTrigger.PASSIVE)
@@ -36,7 +36,6 @@ public class CurseOfImpatience extends DepthsAbility {
 		if (e.getAbility().getInfo() instanceof DepthsAbilityInfo<?> info && (info == Bulwark.INFO || info == DepthsDodging.INFO || info.getDepthsTrigger() == DepthsTrigger.LIFELINE)) {
 			return true;
 		}
-		UUID uuid = mPlayer.getUniqueId();
 		mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities().stream()
 			.filter(ability -> !(ability instanceof EarthenWrath wrath && wrath.isWrathing())) // If we change the cooldown while it's active bad things happen
 			.map(Ability::getInfo)
@@ -45,9 +44,7 @@ public class CurseOfImpatience extends DepthsAbility {
 			.filter(Objects::nonNull) // Shouldn't be null here ever but whatever
 			.filter(ca -> ca != e.getSpell())
 			.forEach(ca -> {
-				// Modify cooldown directly - we don't want any effects, enchants, etc. messing with this
-				int cooldown = mPlugin.mTimers.getCooldown(uuid, ca);
-				mPlugin.mTimers.setCooldown(mPlayer, ca, cooldown + 20);
+				mPlugin.mTimers.increaseCurrentCooldownOrCreateNew(mPlayer, ca, CD_INCREASE);
 			});
 		return true;
 	}

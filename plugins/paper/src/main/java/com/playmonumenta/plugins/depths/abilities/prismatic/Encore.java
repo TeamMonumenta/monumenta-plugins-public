@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenWrath;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.timers.CooldownTimers;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import net.kyori.adventure.text.format.TextColor;
@@ -196,12 +197,12 @@ public class Encore extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1));
 
 		cancelOnDeath(Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			int prevCooldown = mPlugin.mTimers.getCooldown(mPlayer.getUniqueId(), spell);
+			List<CooldownTimers.Cooldown> prevCooldown = mPlugin.mTimers.getCooldownList(mPlayer.getUniqueId(), spell);
 			mPlugin.mTimers.removeCooldown(mPlayer, spell, false);
 			action.run();
 			// Earthen Wrath cooldown starts later - let the ability handle all of the cooldown stuff
 			if (!(ability instanceof EarthenWrath)) {
-				mPlugin.mTimers.setCooldown(mPlayer, spell, prevCooldown);
+				mPlugin.mTimers.replaceCooldownList(mPlayer, spell, prevCooldown);
 			}
 		}, DELAY));
 		mActive = false;

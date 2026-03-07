@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.timers;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityCollection;
+import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import java.util.ArrayList;
@@ -72,6 +73,30 @@ public class CooldownTimers {
 		UUID playerID = player.getUniqueId();
 		Map<ClassAbility, List<Cooldown>> playerCooldowns = mTimers.computeIfAbsent(playerID, p -> new HashMap<>());
 		playerCooldowns.computeIfAbsent(spell, s -> new ArrayList<>()).add(new Cooldown(cooldownTime));
+		ClientModHandler.updateAbility(player, spell);
+	}
+
+	public void replaceCooldownList(Player player, ClassAbility spell, List<Cooldown> cooldowns) {
+		UUID playerID = player.getUniqueId();
+		Map<ClassAbility, List<Cooldown>> playerCooldowns = mTimers.computeIfAbsent(playerID, p -> new HashMap<>());
+		playerCooldowns.put(spell, cooldowns);
+		ClientModHandler.updateAbility(player, spell);
+	}
+
+	public void increaseCurrentCooldownOrCreateNew(Player player, ClassAbility spell, int cooldownTime) {
+		if (!player.isOnline()) {
+			return;
+		}
+		UUID playerID = player.getUniqueId();
+		Map<ClassAbility, List<Cooldown>> playerCooldowns = mTimers.computeIfAbsent(playerID, p -> new HashMap<>());
+		List<Cooldown> cooldownList = playerCooldowns.computeIfAbsent(spell, s -> new ArrayList<>());
+		if (cooldownList.isEmpty()) {
+			cooldownList.add(new Cooldown(cooldownTime));
+		} else {
+			Cooldown cd = cooldownList.get(0);
+			cd.setRemaining(cd.getRemaining() + cooldownTime);
+		}
+
 		ClientModHandler.updateAbility(player, spell);
 	}
 
@@ -145,9 +170,17 @@ public class CooldownTimers {
 			if (time <= 0) {
 
 				cooldownList.remove(0);
+				Ability ability = mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilityIgnoringSilence(spell);
+
 				if (cooldownList.isEmpty()) {
 					abilityIter.remove();
-					showOffCooldownMessage(player, spell);
+					if (ability != null) {
+						showOffCooldownMessage(player, spell);
+					}
+				}
+
+				if (ability instanceof MultipleChargeAbility multipleChargeAbility) {
+					multipleChargeAbility.updateCharges();
 				}
 
 				ClientModHandler.updateAbility(player, spell);
