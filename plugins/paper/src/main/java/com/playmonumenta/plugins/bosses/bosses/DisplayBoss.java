@@ -116,7 +116,7 @@ public class DisplayBoss extends BossAbilityGroup {
 			if (p.GLOWING) {
 				d.setGlowing(true);
 			}
-			d.setGlowColorOverride(Color.fromRGB(Integer.parseInt(p.GLOW_COLOR)));
+			d.setGlowColorOverride(Color.fromRGB(Integer.parseInt(p.GLOW_COLOR, 16)));
 
 			EntityUtils.setRemoveEntityOnUnload(d);
 		});
