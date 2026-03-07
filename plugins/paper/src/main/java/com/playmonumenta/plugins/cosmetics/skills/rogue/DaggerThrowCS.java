@@ -35,6 +35,9 @@ public class DaggerThrowCS implements CosmeticSkill {
 	}
 
 	public void daggerParticle(Location startLoc, Location endLoc, Player player) {
+		if (startLoc.getWorld() != endLoc.getWorld()) {
+			return;
+		}
 		new PPLine(Particle.REDSTONE, startLoc, endLoc).countPerMeter(10).delta(0.1).data(DAGGER_THROW_COLOR).spawnAsPlayerActive(player);
 	}
 

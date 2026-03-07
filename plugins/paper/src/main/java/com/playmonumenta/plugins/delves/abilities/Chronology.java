@@ -21,7 +21,9 @@ public class Chronology {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					spawner.setDelay(Math.max(1, FastUtils.RANDOM.nextInt(spawner.getMinSpawnDelay(), spawner.getMaxSpawnDelay() + 1) / 2 - 5));
+					// Apparently sometimes the max can be lower than the min, which causes an exception
+					int max = Math.max(spawner.getMinSpawnDelay(), spawner.getMaxSpawnDelay());
+					spawner.setDelay(Math.max(1, FastUtils.RANDOM.nextInt(spawner.getMinSpawnDelay(), max + 1) / 2 - 5));
 					spawner.update(false, false);
 				}
 			}.runTaskLater(Plugin.getInstance(), 5);

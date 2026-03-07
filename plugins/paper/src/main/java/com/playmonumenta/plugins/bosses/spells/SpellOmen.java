@@ -97,6 +97,9 @@ public class SpellOmen extends Spell {
 	}
 
 	public void launchBlade(List<Vector> basevec, boolean warning, double yaw) {
+		if (basevec == null) {
+			return;
+		}
 		Set<Player> hitPlayers = new HashSet<>();
 		//loop for each direction, starting +Z, clockwise
 		for (int i = 0; i < mP.SPLITS; i++) {

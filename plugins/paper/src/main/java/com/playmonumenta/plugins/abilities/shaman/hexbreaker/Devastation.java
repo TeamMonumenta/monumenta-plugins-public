@@ -170,9 +170,11 @@ public class Devastation extends Ability {
 					.sorted(Comparator.comparingDouble(Damageable::getHealth).reversed())
 					.toList();
 
-				targetsSortedByHP.forEach(mob -> EntityUtils.applyStun(mPlugin, mLightningStunDuration, mob));
+				if (!targetsSortedByHP.isEmpty()) {
+					targetsSortedByHP.forEach(mob -> EntityUtils.applyStun(mPlugin, mLightningStunDuration, mob));
 
-				DamageUtils.damage(mPlayer, targetsSortedByHP.getFirst(), DamageEvent.DamageType.MAGIC, mLightningDamage, mInfo.getLinkedSpell(), true);
+					DamageUtils.damage(mPlayer, targetsSortedByHP.getFirst(), DamageEvent.DamageType.MAGIC, mLightningDamage, mInfo.getLinkedSpell(), true);
+				}
 			} else if (targetTotem instanceof CleansingTotem) {
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, mRadius)) {
 					EntityUtils.applyWeaken(mPlugin, mCleanseDuration, mCleanseWeaken, mob);

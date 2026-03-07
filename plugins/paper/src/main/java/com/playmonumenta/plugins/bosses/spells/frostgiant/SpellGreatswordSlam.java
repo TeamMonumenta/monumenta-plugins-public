@@ -220,14 +220,16 @@ public final class SpellGreatswordSlam extends Spell {
 									}
 								}
 
-								Hitbox hitbox = Hitbox.unionOfAABB(boxes, mWorld);
-								for (final Player player : hitbox.getHitPlayers(true)) {
-									if (!mHitPlayers.contains(player.getUniqueId())) {
-										DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, 36, null, false, false, SPELL_NAME);
-										AbilityUtils.silencePlayer(player, Constants.TICKS_PER_SECOND * 5);
-										MovementUtils.knockAway(bossLoc, player, 0f, 1.75f, false);
-										BossUtils.markHighVulnerability(mBoss, player);
-										mHitPlayers.add(player.getUniqueId());
+								if (!boxes.isEmpty()) {
+									Hitbox hitbox = Hitbox.unionOfAABB(boxes, mWorld);
+									for (final Player player : hitbox.getHitPlayers(true)) {
+										if (!mHitPlayers.contains(player.getUniqueId())) {
+											DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, 36, null, false, false, SPELL_NAME);
+											AbilityUtils.silencePlayer(player, Constants.TICKS_PER_SECOND * 5);
+											MovementUtils.knockAway(bossLoc, player, 0f, 1.75f, false);
+											BossUtils.markHighVulnerability(mBoss, player);
+											mHitPlayers.add(player.getUniqueId());
+										}
 									}
 								}
 								mRadius++;

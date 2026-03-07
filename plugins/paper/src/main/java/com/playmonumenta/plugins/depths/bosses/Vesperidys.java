@@ -1441,8 +1441,12 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 			return platforms;
 		}
 
-		public Platform getRandomPlatform(@Nullable List<Platform> exclusionList) {
-			return getRandomPlatforms(exclusionList, 1).get(0);
+		public @Nullable Platform getRandomPlatform(@Nullable List<Platform> exclusionList) {
+			List<Platform> platforms = getRandomPlatforms(exclusionList, 1);
+			if (platforms.isEmpty()) {
+				return null;
+			}
+			return platforms.getFirst();
 		}
 
 		public List<Platform> getShuffledPlatforms(@Nullable List<Platform> exclusionList) {

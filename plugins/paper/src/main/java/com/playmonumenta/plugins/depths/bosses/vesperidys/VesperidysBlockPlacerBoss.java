@@ -80,8 +80,9 @@ public class VesperidysBlockPlacerBoss extends BossAbilityGroup {
 				public void run() {
 					if (mMob.getLocation().getY() < mVesperidys.mSpawnLoc.getY() - 5) {
 						// Teleport back up
-						Location newLoc = mVesperidys.mPlatformList.getRandomPlatform(null).getCenter().add(0, 1, 0);
-						if (newLoc != null) {
+						Vesperidys.Platform platform = mVesperidys.mPlatformList.getRandomPlatform(null);
+						if (platform != null) {
+							Location newLoc = platform.getCenter().add(0, 1, 0);
 							Location bossLoc = mBoss.getLocation();
 
 							for (int i = 0; i < 50; i++) {

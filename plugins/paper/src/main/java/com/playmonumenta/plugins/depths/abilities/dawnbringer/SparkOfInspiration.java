@@ -222,6 +222,10 @@ public class SparkOfInspiration extends DepthsAbility {
 				mT++;
 
 				Location to = target.getEyeLocation();
+				if (mL.getWorld() != to.getWorld()) {
+					this.cancel();
+					return;
+				}
 
 				for (int i = 0; i < 6; i++) {
 					if (mT <= 2) {

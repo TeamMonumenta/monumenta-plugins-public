@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
 
 public class Quake implements Enchantment {
@@ -81,7 +82,9 @@ public class Quake implements Enchantment {
 
 			double finalDamage = damage * DAMAGE_MODIFIER_PER_LEVEL * level;
 			for (LivingEntity mob : mobs) {
-				DamageUtils.damage(player, mob, DamageType.TRUE, finalDamage, target.getMetadata(DAMAGE_IS_PROJ_METADATA).getFirst().asBoolean() ? ClassAbility.QUAKE_PROJ : ClassAbility.QUAKE_MELEE, false, true);
+				List<MetadataValue> metadata = target.getMetadata(DAMAGE_IS_PROJ_METADATA);
+				ClassAbility ca = !metadata.isEmpty() && metadata.getFirst().asBoolean() ? ClassAbility.QUAKE_PROJ : ClassAbility.QUAKE_MELEE;
+				DamageUtils.damage(player, mob, DamageType.TRUE, finalDamage, ca, false, true);
 			}
 
 			if (fire + ice + thunder + decay + bleed + wind == 0) {

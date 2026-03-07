@@ -186,14 +186,16 @@ public class SludgeScatterShot extends Spell {
 					}
 
 					List<Block> mudBlocks = new ArrayList<>(BlockUtils.getBlocksInSphere(targetLocation, RADIUS).stream().filter(Block::isSolid).toList());
-					Collections.shuffle(mudBlocks);
-					if (placeWormSpawner) {
-						mExperimentSeventyOne.placeWormSpawner(mudBlocks.remove(0));
-					}
-					if (mPermanentMud) {
-						mudBlocks.forEach(mExperimentSeventyOne::placeMudBlock);
-					} else {
-						mudBlocks.forEach((block) -> mExperimentSeventyOne.placeMudBlock(block, MUD_TIME));
+					if (!mudBlocks.isEmpty()) {
+						Collections.shuffle(mudBlocks);
+						if (placeWormSpawner) {
+							mExperimentSeventyOne.placeWormSpawner(mudBlocks.remove(0));
+						}
+						if (mPermanentMud) {
+							mudBlocks.forEach(mExperimentSeventyOne::placeMudBlock);
+						} else {
+							mudBlocks.forEach((block) -> mExperimentSeventyOne.placeMudBlock(block, MUD_TIME));
+						}
 					}
 				}
 

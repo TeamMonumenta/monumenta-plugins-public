@@ -307,10 +307,15 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 
 			@Override
 			public void run() {
-				if (Bukkit.getCurrentTick() - mDecayingBlocks.get(block) == TEMPORARY_BLOCK_DURATION / 2) {
+				Integer startTick = mDecayingBlocks.get(block);
+				if (startTick == null) {
+					this.cancel();
+					return;
+				}
+				if (Bukkit.getCurrentTick() - startTick == TEMPORARY_BLOCK_DURATION / 2) {
 					block.setType(Material.BLACK_STAINED_GLASS);
 				}
-				if (Bukkit.getCurrentTick() - mDecayingBlocks.get(block) == TEMPORARY_BLOCK_DURATION) {
+				if (Bukkit.getCurrentTick() - startTick == TEMPORARY_BLOCK_DURATION) {
 					this.cancel();
 				}
 

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.Bukkit;
@@ -60,13 +61,16 @@ public class Trivium implements Enchantment {
 	}
 
 	private void task() {
-		mDamageInTick.forEach((p, instance) -> dealDamage(p, instance.mMap, instance.mValue));
+		for (Map.Entry<Player, TriviumInstance> entry : new HashSet<>(mDamageInTick.entrySet())) {
+			TriviumInstance instance = entry.getValue();
+			dealDamage(entry.getKey(), instance.mMap, instance.mValue);
+		}
 		mDamageInTick.clear();
 		mRunDamageTask = null;
 	}
 
 	private void dealDamage(Player p, Map<ClassAbility, List<DamageEvent>> map, double value) {
-		map.forEach((ability, eventList) -> {
+		for (List<DamageEvent> eventList : new HashSet<>(map.values())) {
 			eventList = eventList.stream().filter(e -> e.getDamagee().getWorld() == p.getWorld()).toList();
 			if (eventList.size() >= 3) {
 				// If this tick had more than 3 of the same damage event of the same ability...
@@ -96,7 +100,7 @@ public class Trivium implements Enchantment {
 					2f
 				);
 			}
-		});
+		}
 	}
 
 	private static class TriviumInstance {

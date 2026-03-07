@@ -211,12 +211,14 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 												world.playSound(l, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0);
 											}
 										}
-										Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
-										for (LivingEntity target : hitbox.getHitEntitiesByClass(LivingEntity.class)) {
-											if ((mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs()).contains(target) && !mHitPlayers.contains(target)) {
-												DamageUtils.damage(mBoss, target, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false);
-												MovementUtils.knockAway(loc, target, 0f, 1.5f, false);
-												mHitPlayers.add(target);
+										if (!boxes.isEmpty()) {
+											Hitbox hitbox = Hitbox.unionOfAABB(boxes, world);
+											for (LivingEntity target : hitbox.getHitEntitiesByClass(LivingEntity.class)) {
+												if ((mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs()).contains(target) && !mHitPlayers.contains(target)) {
+													DamageUtils.damage(mBoss, target, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false);
+													MovementUtils.knockAway(loc, target, 0f, 1.5f, false);
+													mHitPlayers.add(target);
+												}
 											}
 										}
 										mRadius++;

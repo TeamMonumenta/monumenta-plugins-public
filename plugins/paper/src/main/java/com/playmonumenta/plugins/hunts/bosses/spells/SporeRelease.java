@@ -109,7 +109,7 @@ public class SporeRelease extends Spell {
 									mLocation.add(mPointSpeed);
 									for (Player p : mSporousAmalgam.getPlayersInOutRange()) {
 										if (p.getBoundingBox().overlaps(mBoundingBox)) {
-											double damage = (mHitPlayers.add(p)) ? SHOCKWAVE_DAMAGE : SHOCKWAVE_DAMAGE / 2;
+											double damage = mHitPlayers.add(p) ? SHOCKWAVE_DAMAGE : SHOCKWAVE_DAMAGE / 2;
 											DamageUtils.damage(mBoss, p, DamageEvent.DamageType.BLAST, damage, null, false, false, "Spore Release");
 											if (mSporedPlayers.add(p)) {
 												mSporousAmalgam.addSpores(p, SHOCKWAVE_SPORES);

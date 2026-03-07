@@ -218,9 +218,11 @@ public class RestlessSouls extends Ability {
 						// will place vexes in a circle behind the player
 						Vector circle = up.clone().multiply(FastUtils.sinDeg(90 + mNumber * 360.0 / mVexCap)).add(right.clone().multiply(FastUtils.cosDeg(90 + mNumber * 360.0 / mVexCap)));
 						Location finalPlayerLoc = mPlayer.getEyeLocation().add(behind).add(circle);
-						Vector direction = LocationUtils.getDirectionTo(finalPlayerLoc, vexLoc);
-						vexLoc.add(direction.multiply(mMoveSpeed * TICK_INTERVAL / 20 * Math.max(Math.min(vexLoc.distance(finalPlayerLoc) / 3, 1), 0)));
-						vexLoc.setDirection(direction.setY(0));
+						if (vexLoc.getWorld() == finalPlayerLoc.getWorld()) {
+							Vector direction = LocationUtils.getDirectionTo(finalPlayerLoc, vexLoc);
+							vexLoc.add(direction.multiply(mMoveSpeed * TICK_INTERVAL / 20 * Math.max(Math.min(vexLoc.distance(finalPlayerLoc) / 3, 1), 0)));
+							vexLoc.setDirection(direction.setY(0));
+						}
 					}
 					// bobbing
 					mBoss.teleport(vexLoc.clone().add(0, FastMath.sin(mRadian) * 0.05, 0));

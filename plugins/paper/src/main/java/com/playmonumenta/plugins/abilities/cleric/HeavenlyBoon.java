@@ -28,7 +28,7 @@ import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
-import java.util.Objects;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
@@ -154,8 +154,10 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		}
 
 		boolean isBoonPotion = false;
+		Component comp = potion.getItem().getItemMeta().displayName();
 		for (final String boon : BOON_DROPS) {
-			if (Objects.requireNonNull(potion.getItem().getItemMeta().displayName()).toString().contains(boon)) {
+			// This is a bad way of checking the name but I think this is getting changed soon so I'm not touching it
+			if (comp != null && comp.toString().contains(boon)) {
 				isBoonPotion = true;
 				break;
 			}
