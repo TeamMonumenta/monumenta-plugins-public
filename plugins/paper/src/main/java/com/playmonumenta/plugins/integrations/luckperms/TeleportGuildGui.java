@@ -161,7 +161,7 @@ public class TeleportGuildGui extends Gui {
 		lore.addAll(guildOrderLore);
 		meta.lore(lore);
 		if (meta instanceof SkullMeta headMeta) {
-			headMeta.setOwningPlayer(Bukkit.getOfflinePlayer(mPlayer.getUniqueId()));
+			headMeta.setOwningPlayer(mPlayer);
 		}
 		item.setItemMeta(meta);
 		setItem(HEADER_Y, 4, item)

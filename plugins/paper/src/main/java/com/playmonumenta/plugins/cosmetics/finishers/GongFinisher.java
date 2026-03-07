@@ -7,11 +7,9 @@ import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -93,8 +91,7 @@ public class GongFinisher implements EliteFinisher {
 					ItemStack head = new ItemStack(Material.PLAYER_HEAD);
 					SkullMeta meta = (SkullMeta) head.getItemMeta();
 					if (meta != null) {
-						OfflinePlayer owner = Bukkit.getOfflinePlayer(p.getName());
-						meta.setOwningPlayer(owner);
+						meta.setOwningPlayer(p);
 						head.setItemMeta(meta);
 					}
 					ItemStack bell = new ItemStack(Material.BELL);
