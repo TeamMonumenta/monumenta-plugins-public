@@ -6,13 +6,22 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.util.Vector;
 
 public class TOVUtils {
+
+	public static final String PERMISSION = "monumenta.feature.tov";
+	public static final Vector BLOCK_CHECK_LOCATION = new Vector(-1459, 3, -1441);
+	public static final Material BLOCK_CHECK_TYPE = Material.REDSTONE_LAMP;
+	public static final String CACHE_ARMOR_STAND_TAG = "THCache";
 
 	public static final String UNOPENED_CACHE_NAME = "TOVCache";
 	public static final String OPENED_CACHE_NAME = "Cache";
@@ -51,7 +60,7 @@ public class TOVUtils {
 
 	public static boolean setTOVLootTable(Plugin plugin, Player player, Block block) {
 		if (block.getState() instanceof Chest chest && isUnopenedCache(chest)) {
-			if (!canOpen(plugin, player)) {
+			if (!canOpen(plugin, player, block)) {
 				return false;
 			}
 
@@ -63,7 +72,29 @@ public class TOVUtils {
 		return false;
 	}
 
-	private static boolean canOpen(Plugin plugin, Player player) {
+	private static boolean canOpen(Plugin plugin, Player player, Block block) {
+		Location blockLocation = block.getLocation();
+		if (!blockLocation.getNearbyEntitiesByType(ArmorStand.class, 1.0)
+			.stream()
+			.anyMatch(armorStand -> armorStand.getScoreboardTags().contains(CACHE_ARMOR_STAND_TAG))
+		) {
+			MessagingUtils.sendActionBarMessage(player, "This Treasures of Viridia failed to despawn, and cannot be opened.", NamedTextColor.RED);
+			Bukkit.getScheduler().runTaskLater(plugin, () -> player.closeInventory(), 1);
+			return false;
+		}
+
+		Location blockCheckLocation = new Location(
+			block.getWorld(),
+			BLOCK_CHECK_LOCATION.getBlockX(),
+			BLOCK_CHECK_LOCATION.getBlockY(),
+			BLOCK_CHECK_LOCATION.getBlockZ()
+		);
+		if (!player.hasPermission(PERMISSION) || !blockCheckLocation.getBlock().getType().equals(BLOCK_CHECK_TYPE)) {
+			MessagingUtils.sendActionBarMessage(player, "Treasures of Viridia is currently disabled.");
+			Bukkit.getScheduler().runTaskLater(plugin, () -> player.closeInventory(), 1);
+			return false;
+		}
+
 		// can always open caches if less than 100 caches claimed in total
 		if (ScoreboardUtils.getScoreboardValue(player, CACHES_OPENED_SCORE).orElse(0) < 100) {
 			return true;
