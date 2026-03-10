@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -11,8 +9,8 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
-import com.playmonumenta.plugins.effects.DepthsWinded;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -71,7 +69,7 @@ public class Whirlwind extends DepthsAbility {
 	}
 
 	private void checkAirborne() {
-		if (isOnCooldown() || mPlugin.mEffectManager.hasEffect(mPlayer, DepthsWinded.class)) {
+		if (isOnCooldown() || mAirborneTime >= AIRBORNE_THRESHOLD) {
 			return;
 		}
 		if (PlayerUtils.isOnGround(mPlayer)) {
@@ -79,30 +77,27 @@ public class Whirlwind extends DepthsAbility {
 		} else {
 			mAirborneTime++;
 			if (mAirborneTime == AIRBORNE_THRESHOLD) {
-				mPlugin.mEffectManager.addEffect(mPlayer, DepthsWinded.effectID, new DepthsWinded().deleteOnLogout(true).displaysTime(false));
-				mAirborneTime = 0;
-
 				mPlayer.playSound(mPlayer, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.5f);
 				new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 30, 1, 1, 1, 0.8).spawnAsPlayerActive(mPlayer);
 			}
 		}
 	}
 
-	public void trigger(Ability ability) {
-		putOnCooldown();
-		mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(mDuration, mSpeed, SPEED_EFFECT_NAME));
-		mPlayer.playSound(mPlayer, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 0.5f, 1f);
-		mPlayer.playSound(mPlayer, Sound.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 1f, 1.7f);
-		mPlayer.playSound(mPlayer, Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 1f, 0.6f);
+	@Override
+	public boolean abilityCastEvent(AbilityCastEvent event) {
+		if (mAirborneTime >= AIRBORNE_THRESHOLD && !isOnCooldown()) {
+			// Setting mAirborneTime to 0 immediately prevents infinite recursion
+			mAirborneTime = 0;
+			putOnCooldown();
 
-		// ability cdr
-		AbilityInfo<?> ai = ability.getInfo();
-		ClassAbility spell = ai.getLinkedSpell();
-		if (!ai.hasCooldown() || spell == null) {
-			return;
+			mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(mDuration, mSpeed, SPEED_EFFECT_NAME));
+			mPlayer.playSound(mPlayer, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 0.5f, 1f);
+			mPlayer.playSound(mPlayer, Sound.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 1f, 1.7f);
+			mPlayer.playSound(mPlayer, Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 1f, 0.6f);
+
+			event.setCooldown((int) (event.getCooldown() * (1 - mCooldownReduction)));
 		}
-		int cooldown = ability.getModifiedCooldown();
-		mPlugin.mTimers.updateCooldown(mPlayer, spell, (int) (cooldown * mCooldownReduction));
+		return true;
 	}
 
 	private static Description<Whirlwind> getDescription(int rarity, TextColor color) {

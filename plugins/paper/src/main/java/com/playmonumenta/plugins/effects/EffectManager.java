@@ -408,7 +408,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(ImpactVulnerability.effectID, ImpactVulnerability::deserialize);
 		mEffectDeserializer.put(Parasites.effectID, Parasites::deserialize);
 		mEffectDeserializer.put(RetaliationEffect.effectID, RetaliationEffect::deserialize);
-		mEffectDeserializer.put(DepthsWinded.effectID, DepthsWinded::deserialize);
 		mEffectDeserializer.put(DepthsBrittle.effectID, DepthsBrittle::deserialize);
 		mEffectDeserializer.put(SelfishVulnerability.effectID, SelfishVulnerability::deserialize);
 	}

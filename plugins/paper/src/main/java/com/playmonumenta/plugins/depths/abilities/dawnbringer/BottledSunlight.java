@@ -112,7 +112,7 @@ public class BottledSunlight extends DepthsAbility {
 					this.cancel();
 
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.setCooldown(mPlayer, ClassAbility.BOTTLED_SUNLIGHT, 0);
+					mPlugin.mTimers.removeCooldown(mPlayer, ClassAbility.BOTTLED_SUNLIGHT);
 				}
 			}
 

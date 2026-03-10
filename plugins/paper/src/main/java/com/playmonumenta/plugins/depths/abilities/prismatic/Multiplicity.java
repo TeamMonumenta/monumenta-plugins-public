@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.depths.abilities.prismatic;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -38,7 +37,7 @@ public class Multiplicity extends DepthsAbility {
 			.displayItem(Material.AMETHYST_CLUSTER)
 			.descriptions(Multiplicity::getDescription);
 
-	private final Map<DepthsTree, DepthsAbility> mLastAbilities = new HashMap<>();
+	private final Map<DepthsTree, ClassAbility> mLastAbilities = new HashMap<>();
 
 	public Multiplicity(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -60,6 +59,11 @@ public class Multiplicity extends DepthsAbility {
 			return true;
 		}
 
+		ClassAbility spell = info.getLinkedSpell();
+		if (spell == null) {
+			return true;
+		}
+
 		if (mLastAbilities.containsKey(tree)) {
 			if (mLastAbilities.size() > 1) {
 				// "You fucked up" effects
@@ -68,11 +72,11 @@ public class Multiplicity extends DepthsAbility {
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 2, 0.5f), 8);
 			}
 			mLastAbilities.clear();
-			mLastAbilities.put(tree, ability);
+			mLastAbilities.put(tree, spell);
 			return true;
 		}
 
-		mLastAbilities.put(tree, ability);
+		mLastAbilities.put(tree, spell);
 		if (mLastAbilities.size() == 2) {
 			// "It's about to activate" effects
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 2, 0.65f);
@@ -81,12 +85,9 @@ public class Multiplicity extends DepthsAbility {
 		}
 
 		if (mLastAbilities.size() >= 3) {
-			mLastAbilities.values().forEach(a -> {
-				AbilityInfo<?> otherInfo = a.getInfo();
-				ClassAbility spell = otherInfo.getLinkedSpell();
-				if (spell != null) {
-					mPlugin.mTimers.updateCooldown(mPlayer, spell, (int) (CDR[mRarity - 1] * a.getInfo().getModifiedCooldown(mPlayer, a.getAbilityScore())));
-				}
+			mLastAbilities.values().forEach(ca -> {
+				// Refund next tick so the last one is actually on cooldown
+				Bukkit.getScheduler().runTask(mPlugin, () -> mPlugin.mTimers.updateCooldownPercent(mPlayer, ca, CDR[mRarity - 1]));
 			});
 			mPlugin.mEffectManager.addEffect(mPlayer, DAMAGE_EFFECT,
 				new PercentDamageDealt(DURATION, DAMAGE[mRarity - 1]).damageTypes(DamageEvent.DamageType.getAllMeleeTypes()));
