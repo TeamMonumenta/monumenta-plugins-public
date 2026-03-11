@@ -78,7 +78,7 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 	private static final String GENERAL_WINS_SCOREBOARD = "HuntsWins";
 	private static final String GENERAL_UNSPOILED_WINS_SCOREBOARD = "HuntsUnspoiledWins";
 
-	private static final List<Vector> LODGE_LOCS = Arrays.asList(
+	private static final List<Vector> LODGE_LOCATIONS = Arrays.asList(
 		new Vector(-501.5, 80, -636.5),
 		new Vector(-505.5, 80, -630.5),
 		new Vector(-511.5, 80, -630.5),
@@ -86,6 +86,8 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 		new Vector(-514.5, 80, -641.5)
 	);
 
+	protected final double mEhpCoefficientX;
+	protected final double mEhpCoefficientY;
 	protected final double mRadiusInner;
 	protected final double mRadiusOuter;
 	protected final HuntsManager.QuarryType mQuarryType;
@@ -103,7 +105,13 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 	private final Set<UUID> mBlockBreakMessagedPlayers = new HashSet<>();
 
 	public Quarry(Plugin plugin, String identityTag, LivingEntity boss, Location spawnLoc, Location endLoc, double radiusInner, double radiusOuter, HuntsManager.QuarryType quarryType) {
+		this(plugin, identityTag, boss, spawnLoc, endLoc, radiusInner, radiusOuter, quarryType, 0.6, 0.3);
+	}
+
+	public Quarry(Plugin plugin, String identityTag, LivingEntity boss, Location spawnLoc, Location endLoc, double radiusInner, double radiusOuter, HuntsManager.QuarryType quarryType, double ehpCoefficientX, double ehpCoefficientY) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
+		mEhpCoefficientX = ehpCoefficientX;
+		mEhpCoefficientY = ehpCoefficientY;
 		mRadiusInner = radiusInner;
 		mRadiusOuter = radiusOuter;
 		mQuarryType = quarryType;
@@ -245,7 +253,7 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 	}
 
 	private void teleportToLodge(Player player) {
-		player.teleport(FastUtils.getRandomElement(LODGE_LOCS).toLocation(player.getWorld()));
+		player.teleport(FastUtils.getRandomElement(LODGE_LOCATIONS).toLocation(player.getWorld()));
 	}
 
 	@Override

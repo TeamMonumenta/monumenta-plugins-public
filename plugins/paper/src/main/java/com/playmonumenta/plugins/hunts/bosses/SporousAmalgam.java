@@ -53,7 +53,7 @@ public class SporousAmalgam extends Quarry {
 	public static final int SPELL_INNER_RADIUS = 20;
 	public static final int INNER_RADIUS = 30;
 	public static final int OUTER_RADIUS = 40;
-	public static final double HEALTH = 11000;
+	public static final double HEALTH = 8000;
 
 	public static final double LAST_PHASE = 20;
 	private static final String LAST_PHASE_SOUL_SUMMON = "UprootedSporousAmalgam";
@@ -96,7 +96,7 @@ public class SporousAmalgam extends Quarry {
 	private @Nullable Spell mLastCastSpell = null;
 
 	public SporousAmalgam(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss, spawnLoc, endLoc, INNER_RADIUS, OUTER_RADIUS, HuntsManager.QuarryType.SPOROUS_AMALGAM);
+		super(plugin, identityTag, boss, spawnLoc, endLoc, INNER_RADIUS, OUTER_RADIUS, HuntsManager.QuarryType.SPOROUS_AMALGAM, 0.5, 0.4);
 
 		mBoss.setAI(false);
 		mBoss.teleport(spawnLoc);
@@ -124,6 +124,7 @@ public class SporousAmalgam extends Quarry {
 		}.runTaskTimer(plugin, 0, 1);
 
 		calculateSummonsToKill();
+		mKilledSummons = mSummonsToKill / 3;
 
 		mPassiveSpores = new PassiveSpores(plugin, this);
 		mPassiveSporeDefense = new PassiveSporeDefense(this);
@@ -315,6 +316,7 @@ public class SporousAmalgam extends Quarry {
 
 	@Override
 	public void onHurt(DamageEvent event) {
+		super.onHurt(event);
 		LivingEntity source = event.getSource();
 		if (source instanceof Player player) {
 			mSporeBeastArenaRange.addValidPlayer(player);

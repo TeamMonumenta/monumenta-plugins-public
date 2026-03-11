@@ -9,8 +9,7 @@ import org.bukkit.entity.Player;
 
 public class PassiveSporeDefense extends Spell {
 	public static final int VULNERABILITY_DURATION = 20 * 10;
-	public static final double RESISTANCE_MULTI = 0.03;
-	public static final double VULNERABILITY_MULTI = 0.45;
+	public static final double RESISTANCE_MULTI = 0.1;
 
 	private final SporousAmalgam mSporeBeast;
 	private final LivingEntity mBoss;
@@ -44,9 +43,7 @@ public class PassiveSporeDefense extends Spell {
 
 	@Override
 	public void onHurt(DamageEvent event) {
-		if (isVulnerable()) {
-			event.setFlatDamage(event.getFlatDamage() * (VULNERABILITY_MULTI - 0.015 * mSporeBeast.getPlayersInOutRange().size()));
-		} else {
+		if (!isVulnerable()) {
 			event.setFlatDamage(event.getFlatDamage() * RESISTANCE_MULTI);
 		}
 		double health = mBoss.getHealth();

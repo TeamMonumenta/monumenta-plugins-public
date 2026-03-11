@@ -22,19 +22,17 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SporeInfection extends Spell {
-	//private static final double INFECTION_RADIUS = 3;
 	private static final double CURE_ZONE_RADIUS = 4.2;
-	private static final int TICKS_TO_CURE = (int) (20 * 1.25);
-	//private static final int PULSE_DURATION = (int) (20 * 0.5);
+	private static final int TICKS_TO_CURE = 20;
 	private static final String CURE_MOB_SOUL_NAME = "CleansingBulbholder";
 	private static final TextColor CURE_COLOR = NamedTextColor.AQUA;
 	private static final String INFECTED_SYMBOL = "✽";
 
-	private static final int FAST_CURE_TIME = 20 * 4 + TICKS_TO_CURE;
-	private static final float FAST_CURE_REDUCTION = -1.5f;
-	private static final float SPORE_AMOUNT_PER_TIME = 0.075f;
+	private static final int FAST_CURE_TIME = (int) (20 * 3.5) + TICKS_TO_CURE;
+	private static final float FAST_CURE_REDUCTION = -2.0f;
+	private static final float SPORE_AMOUNT_PER_TIME = 0.05f;
 
-	private static final int COOLDOWN = FAST_CURE_TIME + 20 * 3;
+	private static final int COOLDOWN = FAST_CURE_TIME + 20 * 4;
 
 	private boolean mHasInfected;
 	private final Plugin mPlugin;
@@ -82,7 +80,7 @@ public class SporeInfection extends Spell {
 				if (mTicks % 10 == 0) {
 					if (playerDistance > CURE_ZONE_RADIUS) {
 						mSporeBeast.addSpores(targetPlayer, mSpores);
-						mSpores = Math.min(SPORE_AMOUNT_PER_TIME * 6, mSpores + SPORE_AMOUNT_PER_TIME);
+						mSpores = Math.min(SPORE_AMOUNT_PER_TIME * 5, mSpores + SPORE_AMOUNT_PER_TIME);
 					}
 				}
 				if (playerDistance < CURE_ZONE_RADIUS) {
@@ -123,7 +121,7 @@ public class SporeInfection extends Spell {
 
 		double multiplier = targetPlayer.getLocation().distance(cureLocation) * particlePosition;
 		Vector pLineLoc = LocationUtils.getDirectionTo(cureLocation, targetPlayer.getLocation()).multiply(multiplier);
-		new PartialParticle(Particle.GLOW, targetPlayer.getLocation().add(pLineLoc).add(0, 0.2, 0)).count(2).spawnForPlayer(ParticleCategory.BOSS, targetPlayer);
+		new PartialParticle(Particle.GLOW, targetPlayer.getLocation().add(pLineLoc).add(0, 0.2, 0)).count(4).spawnForPlayer(ParticleCategory.BOSS, targetPlayer);
 	}
 
 	private Location getCureLocation(Player targetPlayer) {

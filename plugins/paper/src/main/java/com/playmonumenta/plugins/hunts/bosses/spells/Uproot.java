@@ -28,6 +28,7 @@ public class Uproot extends Spell {
 	private static final int COOLDOWN = 20 * 8 + ROOTS_DURATION;
 	private static final int ROOT_AMOUNT = 17;
 	private static final int MAX_BRANCHES_PER_ROOT = 7;
+	private static final double NO_HIT_LENIENCY = 0.33;
 
 	private static final double DAMAGE_AMOUNT = 50;
 	private static final float SPORE_AMOUNT = 1.5f;
@@ -146,7 +147,7 @@ public class Uproot extends Spell {
 
 	private void dealDamage(List<Block> changedBlocks) {
 		ArrayList<BoundingBox> hitboxes = new ArrayList<>();
-		int allowedHits = mSporeBeast.getPlayersInInRange().size() / 4;
+		int allowedHits = (int) (mSporeBeast.getPlayersInInRange().size() * NO_HIT_LENIENCY);
 		int hits = 0;
 
 		for (Block b : changedBlocks) {
