@@ -1,11 +1,19 @@
 package com.playmonumenta.plugins.particle;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -508,6 +516,27 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 	protected void prepareSpawn() {
 	}
 
+	private void logWrongData(Class<?> dataType) {
+		String errorMessage = "[PartialParticle] \"%s\" has the wrong data type! (Requires: %s, Got: %s)"
+			.formatted(getClass().getSimpleName(), dataType, mData == null ? "null" : mData.getClass());
+		IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
+		StackTraceElement[] stackTraces = exception.getStackTrace();
+
+		if (!Plugin.IS_PLAY_SERVER) {
+			Bukkit.getServer().getOnlinePlayers().forEach(player -> {
+				player.sendMessage(Component.text(errorMessage, NamedTextColor.RED, TextDecoration.BOLD)
+					.hoverEvent(HoverEvent.showText(Component.text("Click for stacktrace", NamedTextColor.YELLOW)))
+					.clickEvent(ClickEvent.callback(audience -> {
+						for (StackTraceElement stackTrace : stackTraces) {
+							audience.sendMessage(Component.text(stackTrace.toString(), NamedTextColor.GRAY));
+						}
+					})));
+			});
+		}
+
+		MMLog.severe(errorMessage, exception);
+	}
+
 	protected Collection<Player> forEachNearbyPlayer() {
 		double capDistance = mDistanceFalloffSquared != 0 ? mDistanceFalloffSquared : PARTICLE_SPAWN_DISTANCE_SQUARED;
 		List<Player> players = new ArrayList<>();
@@ -522,6 +551,11 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 
 	private void spawnForPlayersInternal(ParticleCategory source, ParticleCategory otherSource, Collection<Player> players, @Nullable Player sourcePlayer) {
 		this.prepareSpawn();
+		Class<?> dataType = mParticle.getDataType();
+		if (mData == null ? dataType != Void.class : !dataType.isAssignableFrom(mData.getClass())) {
+			logWrongData(dataType);
+			return;
+		}
 		ParticleManager.runOffMainThread((final AbstractPartialParticle<?> self) -> {
 			players.forEach(player -> {
 				spawnForPlayerInternal(self, player, player == sourcePlayer ? source : otherSource, sourcePlayer);
@@ -586,5 +620,4 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 	public static long getSpawnedParticles() {
 		return mSpawnedParticles;
 	}
-
 }

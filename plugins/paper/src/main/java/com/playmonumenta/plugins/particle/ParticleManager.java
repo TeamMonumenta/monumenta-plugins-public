@@ -233,26 +233,21 @@ public final class ParticleManager {
 			return;
 		}
 		mIsFlushing.set(true);
-		ParticlePacket particle = null;
-		try {
-			while ((particle = mPendingParticles.poll()) != null) {
-				Player player = particle.mPlayer.get();
-				if (player == null) {
-					continue;
-				}
+		ParticlePacket particle;
+		while ((particle = mPendingParticles.poll()) != null) {
+			Player player = particle.mPlayer.get();
+			if (player == null) {
+				continue;
+			}
+			try {
 				sendParticle(particle.mParticle, player, particle.mX, particle.mY, particle.mZ, particle.mCount, particle.mOffsetX, particle.mOffsetY, particle.mOffsetZ, particle.mExtra, particle.mData, particle.mForce);
+			} catch (Exception ex) {
+				MMLog.severe("Error flushing particles (potentially malformed particle?):\n" + particle, ex);
 			}
-		} catch (Exception ex) {
-			if (particle != null) {
-				MMLog.severe("Error flushing particles (potentially malformed particle?): \n" + particle, ex);
-			} else {
-				MMLog.severe("Error flushing particles: ", ex);
-			}
-		} finally {
-			mPendingParticles.clear();
-			mIsFlushing.set(false);
-			mIsFlushQueued.set(false);
 		}
+		mPendingParticles.clear();
+		mIsFlushing.set(false);
+		mIsFlushQueued.set(false);
 	}
 
 	public static void addParticleToQueue(PartialParticleBuilder builder) {
