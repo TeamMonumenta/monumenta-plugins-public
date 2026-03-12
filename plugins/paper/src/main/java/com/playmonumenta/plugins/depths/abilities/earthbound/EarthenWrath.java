@@ -238,7 +238,10 @@ public class EarthenWrath extends DepthsAbility {
 	}
 
 	private void endWrath() {
-		putOnCooldown(false);
+		// Prevents stacking cooldowns from Encore
+		if (!isOnCooldown()) {
+			putOnCooldown(false);
+		}
 		mAbsorbDamage = false;
 	}
 
