@@ -356,7 +356,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 			@Override
 			public void run() {
 				Location summonLoc = LocationUtils.randomSafeLocationInDonut(mSpawnLoc, 4, 22, location ->
-					!location.getBlock().getType().isSolid() && mPlayers.stream().noneMatch(player -> player.getLocation().distance(location) <= SpellFacelessOne.RANGE + 1)
+					!location.getBlock().getType().isSolid() && mPlayers.stream().noneMatch(player -> player.getWorld().equals(location.getWorld()) && player.getLocation().distance(location) <= SpellFacelessOne.RANGE + 1)
 				);
 				Entity gaze = Objects.requireNonNull(LibraryOfSoulsIntegration.summon(summonLoc, "SourcelessGaze"));
 				summonLoc.getWorld().playSound(summonLoc, Sound.AMBIENT_NETHER_WASTES_MOOD, SoundCategory.PLAYERS, 1.4f, 1.7f, 4);

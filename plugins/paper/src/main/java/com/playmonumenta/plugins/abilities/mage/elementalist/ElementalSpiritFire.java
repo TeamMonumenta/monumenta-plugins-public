@@ -86,6 +86,9 @@ public class ElementalSpiritFire extends BaseElementalSpirit {
 	protected void activate(LivingEntity target, World world, double spellDamage, ItemStatManager.PlayerItemStats playerItemStats, boolean isElementalArrows) {
 		Location startLocation = LocationUtils.getHalfHeightLocation(mPlayer);
 		Location endLocation = LocationUtils.getHalfHeightLocation(target);
+		if (!startLocation.getWorld().equals(endLocation.getWorld())) {
+			return;
+		}
 		Location playerLocation = mPlayer.getLocation();
 
 		BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), mSize, mSize, mSize);

@@ -143,7 +143,7 @@ public class DaggerThrow extends Ability {
 
 			@Override
 			public void run() {
-				if (!mCanRecast) { // Already recalled daggers, cancel runnable
+				if (!mCanRecast || Bukkit.getWorld(world.getUID()) == null) { // Already recalled daggers or world is unloaded, cancel runnable
 					this.cancel();
 					return;
 				}
@@ -166,6 +166,11 @@ public class DaggerThrow extends Ability {
 
 	private void recallDaggers(World world) {
 		mCanRecast = false;
+
+		if (!mPlayer.getWorld().equals(world)) {
+			mDaggerEndPoints.clear();
+			return;
+		}
 
 		Location playerLoc = mPlayer.getEyeLocation(); // eye location for consistency with casting
 		mCosmetic.daggerThrowEffect(world, playerLoc, mPlayer);

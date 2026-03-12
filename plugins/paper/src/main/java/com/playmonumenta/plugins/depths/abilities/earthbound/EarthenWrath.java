@@ -108,7 +108,8 @@ public class EarthenWrath extends DepthsAbility {
 				if (mTicks % 10 == 0) {
 					for (DepthsPlayer dp : party.mPlayersInParty) {
 						Player p = Bukkit.getPlayer(dp.mPlayerId);
-						if (p != null && p.isOnline() && !dp.mPlayerId.equals(mPlayer.getUniqueId()) && mPlayer.getLocation().distance(p.getLocation()) <= mTransferRadius) {
+						if (p != null && p.isOnline() && !dp.mPlayerId.equals(mPlayer.getUniqueId())
+							&& mPlayer.getWorld().equals(p.getWorld()) && mPlayer.getLocation().distance(p.getLocation()) <= mTransferRadius) {
 							Location loc = p.getLocation();
 
 							Location tempLoc = loc.clone();

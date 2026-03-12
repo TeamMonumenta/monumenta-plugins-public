@@ -168,7 +168,7 @@ public class Fireball extends DepthsAbility {
 		new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 20, 0, 0, 0, 0.02 * mRadius).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.LAVA, loc, 40, mRadius / 4, 0, mRadius / 4, 0.04 * mRadius).spawnAsPlayerActive(mPlayer);
 
-		if (loc.distance(mPlayer.getLocation()) >= 12) {
+		if (loc.getWorld().equals(mPlayer.getWorld()) && loc.distance(mPlayer.getLocation()) >= 12) {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5f, 1.5f);
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 0.75f);
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.4f, 0.75f);

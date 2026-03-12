@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -35,22 +36,26 @@ public class LifeDrain implements Enchantment {
 		if (!EntityUtils.isHostileMob(target)) {
 			return;
 		}
+		double healAmount;
+		int particles;
 		if (PlayerUtils.isFallingAttack(player)) {
-			PlayerUtils.healPlayer(plugin, player, LIFE_DRAIN_CRIT_HEAL * Math.sqrt(level));
-			new PartialParticle(Particle.HEART, target.getEyeLocation(), 3, 0.1, 0.1, 0.1, 0.001).spawnAsPlayerActive(player);
+			healAmount = LIFE_DRAIN_CRIT_HEAL * Math.sqrt(level);
+			particles = 3;
 		} else {
-			PlayerUtils.healPlayer(
-				plugin,
-				player, LIFE_DRAIN_NONCRIT_HEAL_MULTIPLIER
+			healAmount = LIFE_DRAIN_NONCRIT_HEAL_MULTIPLIER
 					* Math.sqrt(level)
 					// This is * √(attack rate seconds)
 					// The same as / √(1 / attack rate seconds)
 					// Advancement simply says / √(attack speed)
 					* Math.sqrt(player.getCooldownPeriod() / Constants.TICKS_PER_SECOND)
-					* player.getCooledAttackStrength(0)
-
-			);
-			new PartialParticle(Particle.HEART, target.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0.001).spawnAsPlayerActive(player);
+					* player.getCooledAttackStrength(0);
+			particles = 1;
 		}
+		if (healAmount <= 0 || Double.isNaN(healAmount)) {
+			MMLog.warning("Life Drain tried to heal an invalid amount? Amount: %f, level: %f, player: %s".formatted(healAmount, level, player.getName()));
+			return;
+		}
+		PlayerUtils.healPlayer(plugin, player, healAmount);
+		new PartialParticle(Particle.HEART, target.getEyeLocation(), particles, 0.1, 0.1, 0.1, 0.001).spawnAsPlayerActive(player);
 	}
 }
