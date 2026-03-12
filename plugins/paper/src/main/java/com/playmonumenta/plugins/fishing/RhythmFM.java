@@ -145,7 +145,7 @@ public class RhythmFM extends FishingMinigame {
 						new PartialParticle(Particle.REDSTONE, centre.clone().add(offsetX).add(offsetY))
 							.data(new Particle.DustOptions(COLORS[AUTOMATIC_TIMING], 0.6f))
 							.count(1).minimumCount(0)
-							.spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+							.spawnForPlayer(ParticleCategory.FULL, player);
 					}
 				}
 				double angle = Math.PI / 2 + Math.PI * 2 * mTicks / durationPerLoop;
@@ -154,7 +154,7 @@ public class RhythmFM extends FishingMinigame {
 				new PartialParticle(Particle.REDSTONE, centre.clone().add(offsetX).add(offsetY))
 					.data(new Particle.DustOptions(COLORS[CLICKED_TIMING], 0.7f))
 					.count(3).delta(0.02).minimumCount(0)
-					.spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+					.spawnForPlayer(ParticleCategory.FULL, player);
 
 				// Gameplay.
 				for (RhythmCircle circle : circles) {
@@ -205,7 +205,7 @@ public class RhythmFM extends FishingMinigame {
 							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, 1.2f);
 						}
 
-						new PartialParticle(Particle.NOTE, centre.clone().add(planeVectorY.clone().multiply(2.5)), 1).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+						new PartialParticle(Particle.NOTE, centre.clone().add(planeVectorY.clone().multiply(2.5)), 1).spawnForPlayer(ParticleCategory.FULL, player);
 
 						circle.mState = CLICKED_TIMING;
 						mPrepareInput = false;
@@ -257,7 +257,7 @@ public class RhythmFM extends FishingMinigame {
 			new PartialParticle(Particle.REDSTONE, centre.clone().add(offsetX).add(offsetY))
 				.data(new Particle.DustOptions(COLORS[AUTOMATIC_TIMING], 0.6f))
 				.count(1).minimumCount(0)
-				.spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+				.spawnForPlayer(ParticleCategory.FULL, player);
 		}
 	}
 
@@ -308,14 +308,14 @@ public class RhythmFM extends FishingMinigame {
 				new PartialParticle(Particle.REDSTONE, mLoc.clone().add(offsetX).add(offsetY))
 					.count(1).minimumCount(0)
 					.data(new Particle.DustOptions(COLORS[mState % 5], 0.6f))
-					.spawnForPlayer(ParticleCategory.OWN_ACTIVE, mPlayer);
+					.spawnForPlayer(ParticleCategory.FULL, mPlayer);
 				if ((mState % 5 == LEFT_CLICKABLE_TIMING && (angle <= Math.PI / 2.0 || angle >= 3 * Math.PI / 2.0)) ||
 					(mState % 5 == RIGHT_CLICKABLE_TIMING && (angle >= Math.PI / 2.0 && angle <= 3 * Math.PI / 2.0))) {
 					for (int i = 1; i < 5; i++) {
 						new PartialParticle(Particle.REDSTONE, mLoc.clone().add(offsetX.clone().multiply(i / 5.0)).add(offsetY.clone().multiply(i / 5.0)))
 							.count(1).minimumCount(0)
 							.data(new Particle.DustOptions(COLORS[mState % 5], 0.3f))
-							.spawnForPlayer(ParticleCategory.OWN_ACTIVE, mPlayer);
+							.spawnForPlayer(ParticleCategory.FULL, mPlayer);
 					}
 				}
 			}

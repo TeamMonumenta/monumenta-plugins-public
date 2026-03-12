@@ -128,7 +128,7 @@ public class MinesweeperFM extends FishingMinigame {
 									// Clicked mine procedure
 									mLives--;
 									player.playSound(player, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.0f, 1.0f);
-									new PartialParticle(Particle.EXPLOSION_HUGE, loc.toLocation(player.getWorld()), 3).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+									new PartialParticle(Particle.EXPLOSION_HUGE, loc.toLocation(player.getWorld()), 3).spawnForPlayer(ParticleCategory.FULL, player);
 
 									if (mLives == 0) {
 										fishingManager.minigameFailure(player);
@@ -194,7 +194,7 @@ public class MinesweeperFM extends FishingMinigame {
 					// Draw info panel
 					drawRedX(mineCountLocation, planeVectorX, planeVectorY, player);
 					ParticleUtils.drawSevenSegmentDigit(Math.max(mFlags, 0), mineCountLocation.clone().subtract(planeVectorX.clone().multiply(1.4)), player, 0.55, Particle.REDSTONE, new Particle.DustOptions(Color.LIME, 0.5f));
-					new PartialParticle(Particle.HEART, lifeCountLocation, 2).delta(0.1).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+					new PartialParticle(Particle.HEART, lifeCountLocation, 2).delta(0.1).spawnForPlayer(ParticleCategory.FULL, player);
 					ParticleUtils.drawSevenSegmentDigit(mLives, lifeCountLocation.clone().subtract(planeVectorX.clone().multiply(1.4)), player, 0.55, Particle.REDSTONE, new Particle.DustOptions(Color.LIME, 0.5f));
 				}
 			}
@@ -231,7 +231,7 @@ public class MinesweeperFM extends FishingMinigame {
 	}
 
 	private void drawParticle(Location loc, Player player, Color color) {
-		new PartialParticle(Particle.REDSTONE, loc).data(new Particle.DustOptions(color, 0.6f)).count(2).minimumCount(0).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+		new PartialParticle(Particle.REDSTONE, loc).data(new Particle.DustOptions(color, 0.6f)).count(2).minimumCount(0).spawnForPlayer(ParticleCategory.FULL, player);
 	}
 
 	private void drawRectangle(Location bottomCorner, Vector planeVectorX, Vector planeVectorY, double width, double height, int separations, Player player) {
@@ -266,8 +266,8 @@ public class MinesweeperFM extends FishingMinigame {
 		Location topRight = centre.clone().subtract(xDiff).add(yDiff);
 		Location botRight = centre.clone().subtract(xDiff).subtract(yDiff);
 
-		new PPLine(Particle.REDSTONE, topLeft, botRight).countPerMeter(8).data(new Particle.DustOptions(Color.RED, 0.6f)).count(2).minimumCount(0).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
-		new PPLine(Particle.REDSTONE, topRight, botLeft).countPerMeter(8).data(new Particle.DustOptions(Color.RED, 0.6f)).count(2).minimumCount(0).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+		new PPLine(Particle.REDSTONE, topLeft, botRight).countPerMeter(8).data(new Particle.DustOptions(Color.RED, 0.6f)).count(2).minimumCount(0).spawnForPlayer(ParticleCategory.FULL, player);
+		new PPLine(Particle.REDSTONE, topRight, botLeft).countPerMeter(8).data(new Particle.DustOptions(Color.RED, 0.6f)).count(2).minimumCount(0).spawnForPlayer(ParticleCategory.FULL, player);
 	}
 
 	private void generateBoard() {

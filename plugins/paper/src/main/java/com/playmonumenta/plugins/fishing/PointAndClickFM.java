@@ -188,7 +188,7 @@ public class PointAndClickFM extends FishingMinigame {
 	}
 
 	private void drawParticle(Location loc, Player player, Color color) {
-		new PartialParticle(Particle.REDSTONE, loc).data(new Particle.DustOptions(color, 0.6f)).count(2).minimumCount(0).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+		new PartialParticle(Particle.REDSTONE, loc).data(new Particle.DustOptions(color, 0.6f)).count(2).minimumCount(0).spawnForPlayer(ParticleCategory.FULL, player);
 	}
 
 	private void drawRectangle(Location bottomCorner, Vector planeVectorX, Vector planeVectorY, double width, double height, int separations, Player player) {

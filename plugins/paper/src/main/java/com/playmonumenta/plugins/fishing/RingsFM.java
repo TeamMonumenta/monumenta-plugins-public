@@ -139,6 +139,6 @@ public class RingsFM extends FishingMinigame {
 	}
 
 	private void drawRing(int progress, Location centre, Player player, Color color, int duration) {
-		new PPCircle(Particle.REDSTONE, centre, 5 * (progress + 3) / (double) duration).ringMode(true).count(20).minimumCount(10).data(new Particle.DustOptions(color, 0.75f)).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+		new PPCircle(Particle.REDSTONE, centre, 5 * (progress + 3) / (double) duration).ringMode(true).count(20).minimumCount(10).data(new Particle.DustOptions(color, 0.75f)).spawnForPlayer(ParticleCategory.FULL, player);
 	}
 }
