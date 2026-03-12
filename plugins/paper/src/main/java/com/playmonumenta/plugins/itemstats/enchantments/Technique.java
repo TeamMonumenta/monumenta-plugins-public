@@ -43,8 +43,8 @@ public class Technique implements Enchantment {
 
 			double widthDelta = PartialParticle.getWidthDelta(enemy);
 			double heightDelta = PartialParticle.getHeightDelta(enemy);
-			new PartialParticle(Particle.SWEEP_ATTACK, enemy.getEyeLocation(), 3, widthDelta * 1.5, heightDelta, widthDelta * 1.5).spawnAsEnemy();
-			new PartialParticle(Particle.REDSTONE, enemy.getEyeLocation(), 6, widthDelta * 1.5, heightDelta, widthDelta * 1.5, new Particle.DustOptions(Color.fromRGB(252, 80, 80), 1.1f)).spawnAsEnemy();
+			new PartialParticle(Particle.SWEEP_ATTACK, enemy.getEyeLocation(), 3, widthDelta * 1.5, heightDelta, widthDelta * 1.5).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.REDSTONE, enemy.getEyeLocation(), 6, widthDelta * 1.5, heightDelta, widthDelta * 1.5, new Particle.DustOptions(Color.fromRGB(252, 80, 80), 1.1f)).spawnAsPlayerActive(player);
 		}
 	}
 

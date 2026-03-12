@@ -57,7 +57,7 @@ public class Fractal implements Enchantment {
 
 			double widthDelta = PartialParticle.getWidthDelta(enemy);
 			double heightDelta = PartialParticle.getHeightDelta(enemy);
-			new PartialParticle(Particle.REDSTONE, enemy.getEyeLocation(), 9, widthDelta * 1.5, heightDelta, widthDelta * 1.5, new Particle.DustOptions(Color.fromRGB(200, 100, 200), 1.1f)).spawnAsEnemy();
+			new PartialParticle(Particle.REDSTONE, enemy.getEyeLocation(), 9, widthDelta * 1.5, heightDelta, widthDelta * 1.5, new Particle.DustOptions(Color.fromRGB(200, 100, 200), 1.1f)).spawnAsPlayerActive(player);
 		}
 	}
 }

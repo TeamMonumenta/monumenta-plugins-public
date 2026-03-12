@@ -98,7 +98,7 @@ public class WindAspect implements Enchantment {
 			doubleWidthDelta,
 			heightDelta / 2,
 			doubleWidthDelta
-		).spawnAsEnemy();
+		).spawnAsPlayerActive(player);
 
 		double mult = Math.sqrt(level * (1 - kbr));
 

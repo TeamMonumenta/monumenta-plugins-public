@@ -178,7 +178,8 @@ public class Reverb implements Enchantment {
 
 							drawParticle(enemyLocation.clone()
 								.add(targetLocation.clone().subtract(enemyLocation).multiply(mScaledTicks))
-								.add(variance.clone().multiply(arcFunction(mScaledTicks))), mColor[i]);
+								.add(variance.clone().multiply(arcFunction(mScaledTicks))),
+								mColor[i], player);
 						}
 						mTicks++;
 					}
@@ -187,10 +188,10 @@ public class Reverb implements Enchantment {
 		}, 1);
 	}
 
-	private void drawParticle(Location location, Color color) {
+	private void drawParticle(Location location, Color color, Player player) {
 		new PartialParticle(Particle.REDSTONE, location, 20, 0.1, 0.1, 0.1,
 			new Particle.DustOptions(color, 0.75f))
-			.spawnAsEnemy();
+			.spawnAsPlayerActive(player);
 	}
 
 	// 2D function of the arc shape, defined on t in [0, 1]
