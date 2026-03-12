@@ -192,7 +192,7 @@ public class GruesomeAlchemy extends Ability implements PotionAbility {
 			}
 
 			if (e instanceof LivingEntity mob && mAlchemistPotions != null) {
-				mAlchemistPotions.mCosmetic.dizzyEffects(mob);
+				mAlchemistPotions.mCosmetic.dizzyEffects(mPlayer, mob);
 			}
 		});
 	}

@@ -135,23 +135,23 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 	}
 
 	@Override
-	public void brutalDotTickEffects(LivingEntity target) {
+	public void brutalDotTickEffects(Player player, LivingEntity target) {
 		Location halfHeightLoc = LocationUtils.getHalfHeightLocation(target);
 		new PartialParticle(Particle.BLOCK_CRACK, halfHeightLoc, 24)
 			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
 			.data(Material.REDSTONE_BLOCK.createBlockData())
-			.spawnAsEnemy();
+			.spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, halfHeightLoc, 36)
 			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
 			.data(new Particle.DustOptions(TWISTED_COLOR, 1f))
-			.spawnAsEnemy();
+			.spawnAsPlayerActive(player);
 		new PartialParticle(Particle.SOUL, halfHeightLoc, 12)
 			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
-			.spawnAsEnemy();
+			.spawnAsPlayerActive(player);
 	}
 
 	@Override
-	public void brutalPeriodicEffects(LivingEntity target, int stacks, int maxStacks, int level) {
+	public void brutalPeriodicEffects(Player player, LivingEntity target, int stacks, int maxStacks, int level) {
 		if (stacks > maxStacks) {
 			// Explosion will happen
 			return;
@@ -169,7 +169,7 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 			new PartialParticle(Particle.REDSTONE, currentLoc)
 				.count(5)
 				.data(new Particle.DustOptions(TWISTED_COLOR, size))
-				.spawnAsEnemy();
+				.spawnAsPlayerActive(player);
 			stacksLeft -= cost;
 			if (cost == 5 && stacksLeft >= 5) {
 				// Prevent the next "big blob" from being too close
@@ -180,7 +180,7 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 	}
 
 	@Override
-	public void brutalDotExplosionEffects(LivingEntity target) {
+	public void brutalDotExplosionEffects(Player player, LivingEntity target) {
 		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_SQUID_SQUIRT, SoundCategory.HOSTILE, 1f, 0.7f);
 		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_STRAY_STEP, SoundCategory.HOSTILE, 1.25f, 0.5f);
 		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_HUSK_STEP, SoundCategory.HOSTILE, 1.25f, 0.5f);
@@ -188,13 +188,13 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 		new PartialParticle(Particle.BLOCK_CRACK, halfHeightLoc, 80)
 			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
 			.data(Material.REDSTONE_BLOCK.createBlockData())
-			.spawnAsEnemy();
+			.spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, halfHeightLoc, 120)
 			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
 			.data(new Particle.DustOptions(TWISTED_COLOR, 1f))
-			.spawnAsEnemy();
+			.spawnAsPlayerActive(player);
 		new PartialParticle(Particle.SOUL, halfHeightLoc, 40)
 			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
-			.spawnAsEnemy();
+			.spawnAsPlayerActive(player);
 	}
 }

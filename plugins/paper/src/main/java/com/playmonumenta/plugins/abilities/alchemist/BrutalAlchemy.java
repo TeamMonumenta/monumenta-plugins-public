@@ -135,7 +135,7 @@ public class BrutalAlchemy extends Ability implements PotionAbility {
 				false
 			);
 			if (mAlchemistPotions != null) {
-				mAlchemistPotions.mCosmetic.brutalDotTickEffects(mTarget);
+				mAlchemistPotions.mCosmetic.brutalDotTickEffects(mPlayer, mTarget);
 				if (isAdditionalTick) {
 					mAlchemistPotions.mCosmetic.brutalDotAdditionalTicksEffects(mTarget);
 				}
@@ -153,7 +153,7 @@ public class BrutalAlchemy extends Ability implements PotionAbility {
 
 		private void periodicVisuals() {
 			if (mAlchemistPotions != null) {
-				mAlchemistPotions.mCosmetic.brutalPeriodicEffects(mTarget, mRefreshes + 1, mMaxRefreshes, mLevel);
+				mAlchemistPotions.mCosmetic.brutalPeriodicEffects(mPlayer, mTarget, mRefreshes + 1, mMaxRefreshes, mLevel);
 			}
 		}
 
@@ -180,7 +180,7 @@ public class BrutalAlchemy extends Ability implements PotionAbility {
 					false,
 					false
 				);
-				mAlchemistPotions.mCosmetic.brutalDotExplosionEffects(mTarget);
+				mAlchemistPotions.mCosmetic.brutalDotExplosionEffects(mPlayer, mTarget);
 			}
 			// Increment later to avoid calculating for 1 more refresh than wanted.
 			mRefreshes++;

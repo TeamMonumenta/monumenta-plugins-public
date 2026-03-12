@@ -98,14 +98,14 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 	}
 
 	@Override
-	public void brutalDotTickEffects(LivingEntity target) {
+	public void brutalDotTickEffects(Player player, LivingEntity target) {
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, LocationUtils.getHalfHeightLocation(target), 16)
 			.delta(target.getBoundingBox().getWidthX() / 3, target.getBoundingBox().getHeight() / 3, target.getBoundingBox().getWidthZ() / 3)
-			.spawnAsEnemy();
+			.spawnAsPlayerActive(player);
 	}
 
 	@Override
-	public void brutalPeriodicEffects(LivingEntity target, int stacks, int maxStacks, int level) {
+	public void brutalPeriodicEffects(Player player, LivingEntity target, int stacks, int maxStacks, int level) {
 		if (stacks > maxStacks) {
 			// Explosion will happen
 			return;
@@ -124,12 +124,12 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 				.add(up.clone().multiply(size * Math.sin(angleStep * (i + 1))));
 			new PPLine(Particle.ELECTRIC_SPARK, origin, endPoint)
 				.count((int) (size * 12))
-				.spawnAsEnemy();
+				.spawnAsPlayerActive(player);
 		}
 	}
 
 	@Override
-	public void brutalDotExplosionEffects(LivingEntity target) {
+	public void brutalDotExplosionEffects(Player player, LivingEntity target) {
 		target.getWorld().playSound(target.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1.25f, 1.5f);
 		target.getWorld().playSound(target.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1.25f, 1.5f);
 		Location origin = target.getEyeLocation();
@@ -142,11 +142,11 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 		new PPLine(Particle.ELECTRIC_SPARK, centerLeft, centerRight)
 			.count(40)
 			.extra(1)
-			.spawnAsEnemy();
+			.spawnAsPlayerActive(player);
 		new PPLine(Particle.WAX_ON, centerLeft, centerRight)
 			.count(20)
 			.extra(2)
-			.spawnAsEnemy();
+			.spawnAsPlayerActive(player);
 	}
 
 	/**
