@@ -516,6 +516,7 @@ public class IntruderBoss extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void init() {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, MAX_HEALTH);
+		EntityUtils.setRemoveEntityOnUnload(mBoss);
 		mBoss.setHealth(MAX_HEALTH);
 
 		triggerMechanic(mEnableDetectionCircle, false);
