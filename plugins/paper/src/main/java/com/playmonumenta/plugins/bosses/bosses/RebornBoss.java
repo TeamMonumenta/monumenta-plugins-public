@@ -61,7 +61,7 @@ public class RebornBoss extends BossAbilityGroup {
 			mTimesReborn++;
 			event.setFlatDamage(0.001);
 			if (mParams.IS_INVULNERABLE) {
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, "REBORN_INVULN", new PercentDamageReceived(mParams.INVULN_DURATION, -4));
+				Plugin.getInstance().mEffectManager.addEffect(mBoss, "REBORN_INVULN", new PercentDamageReceived(mParams.INVULN_DURATION, -4));
 			}
 			mParams.SOUND_REBORN.play(mBoss.getLocation());
 			mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * mParams.REBORN_PERCENT_HEALTH);
@@ -73,11 +73,11 @@ public class RebornBoss extends BossAbilityGroup {
 					mBoss.removePotionEffect(effect.getType());
 				}
 			}
-			if (EntityUtils.isSlowed(com.playmonumenta.plugins.Plugin.getInstance(), mBoss)) {
-				EntityUtils.setSlowTicks(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 0);
+			if (EntityUtils.isSlowed(Plugin.getInstance(), mBoss)) {
+				EntityUtils.setSlowTicks(Plugin.getInstance(), mBoss, 0);
 			}
-			if (EntityUtils.isParalyzed(com.playmonumenta.plugins.Plugin.getInstance(), mBoss)) {
-				EntityUtils.removeParalysis(com.playmonumenta.plugins.Plugin.getInstance(), mBoss);
+			if (EntityUtils.isParalyzed(Plugin.getInstance(), mBoss)) {
+				EntityUtils.removeParalysis(Plugin.getInstance(), mBoss);
 			}
 			if (EntityUtils.isStunned(mBoss)) {
 				EntityUtils.removeStun(mBoss);

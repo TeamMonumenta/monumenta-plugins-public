@@ -217,8 +217,8 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 		mWarnedLatePlayers.remove(uuid);
 		teleportToLodge(player);
 		MessagingUtils.sendTitle(player, Component.text("You have been banished!", NamedTextColor.RED), Component.text("You find yourself safe back at the Lodge", NamedTextColor.GRAY));
-		PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.BLINDNESS, 3 * 20, 0, true, false));
-		PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DARKNESS, 2 * 20, 0, true, false));
+		PotionUtils.applyPotion(Plugin.getInstance(), player, new PotionEffect(PotionEffectType.BLINDNESS, 3 * 20, 0, true, false));
+		PotionUtils.applyPotion(Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DARKNESS, 2 * 20, 0, true, false));
 		EffectManager.getInstance().addEffect(player, "QuarryBanishStasis", new Stasis(2 * 20, false));
 		MMLog.fine("[Hunts] Player " + player.getName() + " banished by quarry " + mBoss.getName());
 

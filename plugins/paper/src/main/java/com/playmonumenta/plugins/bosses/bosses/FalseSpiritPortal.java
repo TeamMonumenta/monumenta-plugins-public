@@ -78,7 +78,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		World world = mBoss.getWorld();
-		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+		Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
 			new PercentDamageReceived(20 * 60 * 27, -0.8));
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), FalseSpirit.detectionRange, true);

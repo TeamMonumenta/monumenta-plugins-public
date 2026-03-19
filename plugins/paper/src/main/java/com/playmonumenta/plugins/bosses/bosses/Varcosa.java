@@ -63,7 +63,7 @@ public final class Varcosa extends SerializedLocationBossAbilityGroup {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (ticks / 80f) * 1.5f);
 
 					if (ticks == 0) {
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+						Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
 							new BaseMovementSpeedModifyEffect((int) (TICKS_PER_SECOND * 5.5), -0.75));
 					}
 				},
@@ -80,7 +80,7 @@ public final class Varcosa extends SerializedLocationBossAbilityGroup {
 					if (!blocked) {
 						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, 30);
 						// Shields don't stop fire!
-						EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, target, mBoss);
+						EntityUtils.applyFire(Plugin.getInstance(), 4 * 20, target, mBoss);
 					}
 				})));
 

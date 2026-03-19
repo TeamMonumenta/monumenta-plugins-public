@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.gallery.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.BossParameters;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
@@ -9,7 +10,6 @@ import com.playmonumenta.plugins.gallery.GalleryGame;
 import com.playmonumenta.plugins.gallery.GalleryUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import com.playmonumenta.plugins.Plugin;
 
 public class GallerySummonMobBoss extends BossAbilityGroup {
 

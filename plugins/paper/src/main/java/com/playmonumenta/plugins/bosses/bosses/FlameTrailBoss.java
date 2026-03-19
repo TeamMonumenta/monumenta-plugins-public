@@ -70,7 +70,7 @@ public final class FlameTrailBoss extends BossAbilityGroup {
 				// Hit Action
 				(World world, Player player, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_BURN, SoundCategory.HOSTILE, 0.5f, 1f);
-					EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), p.FIRE_DURATION, player, boss);
+					EntityUtils.applyFire(Plugin.getInstance(), p.FIRE_DURATION, player, boss);
 					DamageUtils.damage(boss, player, DamageType.MAGIC, p.DAMAGE, null, false, false, p.SPELL_NAME);
 				},
 				// Expire Action

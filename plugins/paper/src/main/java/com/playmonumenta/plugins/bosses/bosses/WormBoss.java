@@ -190,7 +190,7 @@ public class WormBoss extends BossAbilityGroup {
 		for (LivingEntity livingEntity : mParts) {
 			if (!livingEntity.isDead()) {
 				EntityUtils.applyHemorrhageCooldown(
-					com.playmonumenta.plugins.Plugin.getInstance(),
+					Plugin.getInstance(),
 					livingEntity, true);
 			}
 		}
@@ -202,7 +202,7 @@ public class WormBoss extends BossAbilityGroup {
 			// Has to be hardcoded for proj iframes...
 			for (LivingEntity part : mParts) {
 				if (!part.isDead()) {
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager
+					Plugin.getInstance().mEffectManager
 						.addEffect(part, ProjectileIframe.SOURCE, projectileIframe.cleanCopy());
 				}
 			}

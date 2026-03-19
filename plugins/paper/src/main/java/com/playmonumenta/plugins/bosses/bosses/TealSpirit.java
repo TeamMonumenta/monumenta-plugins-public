@@ -338,7 +338,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 		}
 		PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> {
 			player.sendMessage(Component.text("no, this cannot be! time... betrays me? why do the hands of time not turn? i... will... be... forever!", NamedTextColor.DARK_AQUA));
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, RewriteHistory.PERCENT_HEALTH_EFFECT);
+			Plugin.getInstance().mEffectManager.clearEffects(player, RewriteHistory.PERCENT_HEALTH_EFFECT);
 		});
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 		if (mDoomsdayClock != null) {
@@ -373,6 +373,6 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getPlayer();
 		player.sendMessage(Component.text("the endless march of time will decay even your bones. you will be forgotten.", NamedTextColor.DARK_AQUA));
-		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, RewriteHistory.PERCENT_HEALTH_EFFECT);
+		Plugin.getInstance().mEffectManager.clearEffects(player, RewriteHistory.PERCENT_HEALTH_EFFECT);
 	}
 }

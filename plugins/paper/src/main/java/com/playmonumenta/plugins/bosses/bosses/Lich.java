@@ -864,7 +864,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2.0f, 0f);
 		for (Player player : playersInRange(mBoss.getLocation(), radius, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, PercentSpeed.GENERIC_NAME,
+			Plugin.getInstance().mEffectManager.addEffect(player, PercentSpeed.GENERIC_NAME,
 				new PercentSpeed(20 * 5, -0.3, PercentSpeed.GENERIC_NAME));
 		}
 	}
@@ -877,7 +877,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			|| player.getLocation().getY() - mSpawnLoc.getY() > mCeiling) {
 			return;
 		}
-		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, curseSource);
+		Plugin.getInstance().mEffectManager.clearEffects(player, curseSource);
 		mPlayerCount = playersInRange(mSpawnLoc, detectionRange, true).size();
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 		World world = player.getWorld();
@@ -1117,7 +1117,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		undead.addScoreboardTag("Undead" + player.getName());
 		undead.setCustomNameVisible(true);
 
-		VanityManager.VanityData vanityData = com.playmonumenta.plugins.Plugin.getInstance().mVanityManager.getData(player);
+		VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);
 		ItemStack helm = null;
 		ItemStack chest = null;
 		ItemStack legs = null;
@@ -1218,7 +1218,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		ScoreboardUtils.setScoreboardValue(p, "LichAccursedOne", score + 1);
 
 		p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.0f, 0.5f);
-		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, curseSource, new LichCurseEffect(time * 20));
+		Plugin.getInstance().mEffectManager.addEffect(p, curseSource, new LichCurseEffect(time * 20));
 		p.sendMessage(Component.text("I CAST DOWN DOOM UPON THEE, AND CURSE YOUR VERY BONES. YOU SHALL JOIN MY REVENANTS.", NamedTextColor.LIGHT_PURPLE));
 		p.sendActionBar(Component.text("You are cursed! You take double damage for " + time + " Seconds.", NamedTextColor.DARK_RED));
 	}
@@ -1634,7 +1634,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 							player.hideBossBar(timer);
 						}
 						mBoss.setHealth(100);
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+						Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
 							new PercentDamageReceived(100, -1.0));
 						finalAnimation(block);
 						this.cancel();
@@ -1935,7 +1935,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 										mBoss.remove();
 										// clear curse from all players
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, curseSource);
+											Plugin.getInstance().mEffectManager.clearEffects(p, curseSource);
 										}
 										// kill mobs again
 										List<LivingEntity> en = EntityUtils.getNearbyMobs(mStart.getLocation(), detectionRange);

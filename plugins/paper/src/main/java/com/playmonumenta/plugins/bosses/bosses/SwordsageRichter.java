@@ -74,8 +74,8 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 					new PartialParticle(Particle.EXPLOSION_NORMAL, boss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SWEEP_ATTACK, boss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
 					world.playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 2, t);
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME);
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+					Plugin.getInstance().mEffectManager.clearEffects(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME);
+					Plugin.getInstance().mEffectManager.addEffect(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
 						new BaseMovementSpeedModifyEffect(20 * 2, -0.3));
 				}
 
@@ -97,9 +97,9 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 				protected void intersectAction(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) {
 					if (!blocked && player != null) {
 						BossUtils.blockableDamage(boss, player, DamageType.PROJECTILE, 15, prevLoc);
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+						Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
 							new PercentSpeed(DEBUFF_DURATION, -0.3, SLOWNESS_SRC));
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
+						Plugin.getInstance().mEffectManager.addEffect(player, WEAKNESS_SRC,
 							new PercentDamageDealt(DEBUFF_DURATION, -0.1));
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175).spawnAsEntityActive(boss);

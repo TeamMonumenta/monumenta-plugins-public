@@ -38,7 +38,7 @@ public class ToughBoss extends BossAbilityGroup {
 		try {
 			BossManager.createBoss(null, mBannerHolder, ImmortalPassengerBoss.identityTag);
 		} catch (Exception e) {
-			com.playmonumenta.plugins.Plugin.getInstance().getLogger().warning("Failed to create boss ImmortalPassengerBoss: " + e.getMessage());
+			Plugin.getInstance().getLogger().warning("Failed to create boss ImmortalPassengerBoss: " + e.getMessage());
 			e.printStackTrace();
 		}
 		mBoss.addPassenger(mBannerHolder);

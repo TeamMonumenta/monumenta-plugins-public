@@ -51,13 +51,13 @@ public class UnyieldingBoss extends BossAbilityGroup {
 			event.setFlatDamage(0.001);
 			mBoss.setHealth(halfMaxHealth);
 			PotionUtils.clearNegatives(mBoss);
-			EntityUtils.setWeakenTicks(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 0);
-			EntityUtils.setSlowTicks(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 0);
+			EntityUtils.setWeakenTicks(Plugin.getInstance(), mBoss, 0);
+			EntityUtils.setSlowTicks(Plugin.getInstance(), mBoss, 0);
 
 			if (mBoss.getFireTicks() > 1) {
 				mBoss.setFireTicks(1);
 			}
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, "UnyieldingResistanceEffect", new PercentDamageReceived(2, -1));
+			Plugin.getInstance().mEffectManager.addEffect(mBoss, "UnyieldingResistanceEffect", new PercentDamageReceived(2, -1));
 
 			mHealingRunnable = new BukkitRunnable() {
 				int mTicks = 0;

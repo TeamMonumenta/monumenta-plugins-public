@@ -198,7 +198,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 				.data(mMenaceLinkOptions).spawnAsBoss();
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 2f);
 
-			Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> {
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				if (mMenace == null) {
 					return;
 				}
@@ -218,7 +218,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 				mBoss.setVelocity(calliToMenace);
 				mMenace.setVelocity(menaceToCalli);
 
-				Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> {
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 					// Callicarpa mounts the Hoglin Menace, after a delay.
 					// Remove the RangedAttackGoal from Callicarpa, since that will make the Hoglin behave like a ranged mob
 					// (it would stop running at its target if within 5 blocks of it)
@@ -288,7 +288,7 @@ public class Callicarpa extends SerializedLocationBossAbilityGroup {
 				}
 				mTicks++;
 			}
-		}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
 	private void spawnAnimation() {

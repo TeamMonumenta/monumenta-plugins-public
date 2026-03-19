@@ -376,7 +376,7 @@ public final class BlockPlacerBoss extends BossAbilityGroup {
 					for (final Location loc : bridgeLocs) {
 						attemptPlace(loc);
 						pathfinder.moveTo(loc.clone().add(0, 1, 0));
-						Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () ->
+						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () ->
 							pathfinder.moveTo(loc.clone().add(0, 1, 0)), 5);
 					}
 				}

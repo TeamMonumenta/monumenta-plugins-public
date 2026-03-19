@@ -97,7 +97,7 @@ public final class Azacor extends SerializedLocationBossAbilityGroup {
 						boss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 1.0f, 0.5f + (ticks / 100f) * 1.5f);
 					}
 					if (ticks == 0) {
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, LASER_SLOWNESS_SRC,
+						Plugin.getInstance().mEffectManager.addEffect(mBoss, LASER_SLOWNESS_SRC,
 							new BaseMovementSpeedModifyEffect((int) (Constants.TICKS_PER_SECOND * 5.5), -0.75));
 					}
 				},

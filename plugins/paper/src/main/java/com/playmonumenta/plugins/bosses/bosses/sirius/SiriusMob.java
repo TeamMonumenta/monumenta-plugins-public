@@ -24,7 +24,7 @@ public class SiriusMob extends BossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		if (event != null && event.getEntity() instanceof Player player) {
-			EffectManager manager = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager;
+			EffectManager manager = Plugin.getInstance().mEffectManager;
 			Effect effect = manager.getActiveEffect(player, MOB_KILLED_PARTICIPATION_TAG);
 			if (effect == null) {
 				manager.addEffect(player, MOB_KILLED_PARTICIPATION_TAG, new CustomTimerEffect(2 * 60 * 20, 1, "").displays(false).deleteOnLogout(true));

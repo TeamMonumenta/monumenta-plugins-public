@@ -283,8 +283,8 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 			mBoss.setHealth(40);
 			loseAnimation();
 			for (Player p : getPlayersInArena(false)) {
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.PROTECTION_EFFECT);
+				Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
+				Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.PROTECTION_EFFECT);
 				if (p.isInvulnerable()) {
 					p.setInvulnerable(false);
 				}
@@ -400,7 +400,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	public void onHurt(DamageEvent event) {
 		if (mDamagePhase) {
 			if (event.getDamager() != null) {
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(event.getDamager(), PARTICIPATION_TAG, new CustomTimerEffect(20 * 20, "Participated").displays(false));
+				Plugin.getInstance().mEffectManager.addEffect(event.getDamager(), PARTICIPATION_TAG, new CustomTimerEffect(20 * 20, "Participated").displays(false));
 			}
 			double mDamage = event.getDamage();
 			mHp -= mDamage;
@@ -431,7 +431,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 	public List<Player> getValidDeclarationPlayersInArena() {
 		List<Player> valid = new ArrayList<>();
 		for (Player p : getPlayers()) {
-			Effect declarationParticipation = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, FAIL_PARTICIPATION_TAG);
+			Effect declarationParticipation = Plugin.getInstance().mEffectManager.getActiveEffect(p, FAIL_PARTICIPATION_TAG);
 			if (declarationParticipation == null || declarationParticipation.getMagnitude() < 3) {
 				valid.add(p);
 			}
@@ -441,21 +441,21 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 
 	public void applyDeclarationFail(boolean pass) {
 		for (Player p : getPlayers()) {
-			Effect declarationParticipation = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, PARTICIPATION_TAG);
-			Effect fail = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.getActiveEffect(p, FAIL_PARTICIPATION_TAG);
+			Effect declarationParticipation = Plugin.getInstance().mEffectManager.getActiveEffect(p, PARTICIPATION_TAG);
+			Effect fail = Plugin.getInstance().mEffectManager.getActiveEffect(p, FAIL_PARTICIPATION_TAG);
 			if (declarationParticipation == null) {
 				if (fail != null) {
 					if (fail.getMagnitude() + 1 == 3) {
 						p.sendMessage(Component.text("Aurora and Tuulen’s protection for you against the blight is fading.", NamedTextColor.GRAY));
 					}
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, FAIL_PARTICIPATION_TAG, new CustomTimerEffect(2 * 60 * 20, (int) (1 + fail.getMagnitude()), "").displays(false).deleteOnLogout(true));
+					Plugin.getInstance().mEffectManager.addEffect(p, FAIL_PARTICIPATION_TAG, new CustomTimerEffect(2 * 60 * 20, (int) (1 + fail.getMagnitude()), "").displays(false).deleteOnLogout(true));
 				} else {
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, FAIL_PARTICIPATION_TAG, new CustomTimerEffect(2 * 60 * 20, 1, "").displays(false).deleteOnLogout(true));
+					Plugin.getInstance().mEffectManager.addEffect(p, FAIL_PARTICIPATION_TAG, new CustomTimerEffect(2 * 60 * 20, 1, "").displays(false).deleteOnLogout(true));
 				}
 			} else {
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, PARTICIPATION_TAG);
+				Plugin.getInstance().mEffectManager.clearEffects(p, PARTICIPATION_TAG);
 				if (fail != null) {
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, FAIL_PARTICIPATION_TAG);
+					Plugin.getInstance().mEffectManager.clearEffects(p, FAIL_PARTICIPATION_TAG);
 					p.sendMessage(Component.text("Aurora and Tuulen’s protection for you against the blight is regaining power.", NamedTextColor.GRAY));
 				}
 				if (pass) {
@@ -493,7 +493,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		mSpawner.wipeMobs();
 		removeCollisionBox();
 		for (Player p : ps) {
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
+			Plugin.getInstance().mEffectManager.clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
 		}
 		for (BlockDisplay dis : mDisplays) {
 			dis.remove();
@@ -510,7 +510,7 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 		mStarBlightConverter.restoreAll();
 		mSpawner.wipeMobs();
 		for (Player p : getPlayersInArena(false)) { // fine, better safe than sorry
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
+			Plugin.getInstance().mEffectManager.clearEffects(p, PassiveStarBlight.STARBLIGHTAG);
 		}
 		for (BlockDisplay dis : mDisplays) {
 			dis.remove();
@@ -893,8 +893,8 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 						vec.setY(0); //remove y
 						double ratio = Math.max(0, (12 - vec.length()) / (5 * vec.length()));
 						if (ratio >= 0.5) {
-							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
-							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.PROTECTION_EFFECT);
+							Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
+							Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.PROTECTION_EFFECT);
 							if (p.isInvulnerable()) {
 								p.setInvulnerable(false);
 							}
@@ -2545,8 +2545,8 @@ public class Sirius extends SerializedLocationBossAbilityGroup {
 					mStarBlightConverter.blightArena(List.of(mBoss.getLocation()), 0, 20, 20, mPlugin);
 					for (Player p : getPlayersInArena(false)) {
 						AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r3/sirius/fault");
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.PROTECTION_EFFECT);
+						Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
+						Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.PROTECTION_EFFECT);
 						if (p.isInvulnerable()) {
 							p.setInvulnerable(false);
 						}

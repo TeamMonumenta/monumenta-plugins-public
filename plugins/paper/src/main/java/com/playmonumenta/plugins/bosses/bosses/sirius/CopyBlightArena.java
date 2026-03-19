@@ -38,7 +38,7 @@ public class CopyBlightArena extends BossAbilityGroup {
 		mCornerTwo = null;
 		//stops build sharders swapping the arena and makes sure it only works on build.
 		//could remove shard check but want to be safe
-		if (!com.playmonumenta.plugins.Plugin.IS_PLAY_SERVER && !ServerProperties.getShardName().equals("build")) {
+		if (!Plugin.IS_PLAY_SERVER && !ServerProperties.getShardName().equals("build")) {
 			mCornerOne = mBoss.getLocation().add(43, 49, 58);
 			mCornerTwo = mBoss.getLocation().subtract(75, 7, 60);
 			Map<String, List<BlockData>> mStates = new HashMap<>();

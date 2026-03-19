@@ -25,7 +25,7 @@ public class TemporalShieldBoss extends BossAbilityGroup {
 
 	public TemporalShieldBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		EffectManager manager = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager;
+		EffectManager manager = Plugin.getInstance().mEffectManager;
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(boss.getLocation(), detectionRange, detectionRange, detectionRange);
@@ -49,7 +49,7 @@ public class TemporalShieldBoss extends BossAbilityGroup {
 		if (!(damager instanceof Player)) {
 			return;
 		}
-		EffectManager manager = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager;
+		EffectManager manager = Plugin.getInstance().mEffectManager;
 		if (!manager.hasEffect(damager, TemporalFlux.class)) {
 			event.setCancelled(true);
 		}

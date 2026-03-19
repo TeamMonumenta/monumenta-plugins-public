@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.hunts.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.effects.PercentAbilityCooldowns;
 import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.PercentAbilityCooldowns;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;

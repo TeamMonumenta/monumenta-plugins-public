@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.gallery.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.BossParameters;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
@@ -14,7 +15,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import com.playmonumenta.plugins.Plugin;
 
 public class GalleryMobRisingBoss extends BossAbilityGroup {
 	public static final String identityTag = "GalleryMobRisingBoss";
@@ -95,7 +95,7 @@ public class GalleryMobRisingBoss extends BossAbilityGroup {
 
 			super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 		} else {
-			com.playmonumenta.plugins.Plugin.getInstance().getLogger().warning("[GalleryMobRisingBoss] tried to summon a boss with default LoSPool MOB_POOL = EMPTY");
+			Plugin.getInstance().getLogger().warning("[GalleryMobRisingBoss] tried to summon a boss with default LoSPool MOB_POOL = EMPTY");
 		}
 
 	}

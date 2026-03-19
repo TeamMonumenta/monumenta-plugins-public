@@ -61,7 +61,7 @@ public class IdolatryBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		this.mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, "IdolatryAntiHeal",
+		Plugin.getInstance().mEffectManager.addEffect(mBoss, "IdolatryAntiHeal",
 			new PercentHeal(2147483647, mParams.HEALING_EFFICIENCY));
 		// 1242 days, or 3.4 years of antiheal
 

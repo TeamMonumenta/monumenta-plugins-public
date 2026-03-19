@@ -257,7 +257,7 @@ public class Davey extends SerializedLocationBossAbilityGroup {
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		//Slow on hit
 		if (damagee instanceof Player player) {
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+			Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
 				new PercentSpeed(SLOWNESS_DURATION, SLOWNESS_POTENCY, SLOWNESS_SRC));
 		}
 	}

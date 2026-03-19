@@ -91,7 +91,7 @@ public final class CAxtal extends SerializedLocationBossAbilityGroup {
 							final double dist = p.getLocation().distance(loc);
 							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, maxDmg * (1 - dist / r),
 								null, false, true, "Corruption Blast");
-							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, PercentDamageReceived.effectID,
+							Plugin.getInstance().mEffectManager.addEffect(p, PercentDamageReceived.effectID,
 								new PercentDamageReceived(2, -1.0));
 						}
 					}

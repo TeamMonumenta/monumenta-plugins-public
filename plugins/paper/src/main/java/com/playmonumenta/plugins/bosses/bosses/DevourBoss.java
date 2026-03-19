@@ -81,7 +81,7 @@ public class DevourBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new DevourBoss.Parameters());
 
-		mSpell = new SpellDevour((com.playmonumenta.plugins.Plugin) plugin, boss, p);
+		mSpell = new SpellDevour((Plugin) plugin, boss, p);
 
 		super.constructBoss(mSpell, p.DETECTION, null, p.DELAY);
 	}

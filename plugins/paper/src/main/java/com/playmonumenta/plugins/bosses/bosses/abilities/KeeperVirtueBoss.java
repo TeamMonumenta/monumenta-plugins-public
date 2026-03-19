@@ -80,7 +80,7 @@ public class KeeperVirtueBoss extends BossAbilityGroup {
 			return 0;
 		}
 		Location loc = mBoss.getEyeLocation();
-		PlayerUtils.healPlayer(com.playmonumenta.plugins.Plugin.getInstance(), player, mHealing * EntityUtils.getMaxHealth(player), mPlayer);
+		PlayerUtils.healPlayer(Plugin.getInstance(), player, mHealing * EntityUtils.getMaxHealth(player), mPlayer);
 		if (mCosmetic != null) {
 			mCosmetic.healPlayer(mPlayer, player, mBoss);
 		}
@@ -110,7 +110,7 @@ public class KeeperVirtueBoss extends BossAbilityGroup {
 		DamageUtils.damage(mPlayer, damagee, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.KEEPER_VIRTUE), mDamage, true, false, false);
 		MovementUtils.knockAway(loc, damagee, 0.3f, 0.1f);
 		if (mVulnAmplifier > 0) {
-			EntityUtils.applyVulnerability(com.playmonumenta.plugins.Plugin.getInstance(), mVulnDuration, mVulnAmplifier, damagee);
+			EntityUtils.applyVulnerability(Plugin.getInstance(), mVulnDuration, mVulnAmplifier, damagee);
 		}
 		if (mCosmetic != null) {
 			mCosmetic.attackHeretic(mPlayer, damagee, mBoss);

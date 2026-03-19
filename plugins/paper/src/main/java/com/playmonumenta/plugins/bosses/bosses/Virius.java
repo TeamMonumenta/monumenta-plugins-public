@@ -89,7 +89,7 @@ public final class Virius extends SerializedLocationBossAbilityGroup {
 					player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (ticks / 80f) * 1.5f);
 					mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (ticks / 80f) * 1.5f);
 					if (ticks == 0) {
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+						Plugin.getInstance().mEffectManager.addEffect(mBoss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
 							new BaseMovementSpeedModifyEffect(110, -0.75));
 					}
 				},
@@ -145,7 +145,7 @@ public final class Virius extends SerializedLocationBossAbilityGroup {
 	public void onDamage(final DamageEvent event, final LivingEntity damagee) {
 		if (event.getType() == DamageType.MELEE) {
 			MovementUtils.knockAway(mBoss.getLocation(), damagee, 1.0f, 0.5f, true);
-			EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), Constants.TICKS_PER_SECOND * 4,
+			EntityUtils.applyFire(Plugin.getInstance(), Constants.TICKS_PER_SECOND * 4,
 				damagee, mBoss);
 		}
 	}

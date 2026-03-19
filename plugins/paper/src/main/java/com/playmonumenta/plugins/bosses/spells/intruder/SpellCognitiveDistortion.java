@@ -320,9 +320,9 @@ public class SpellCognitiveDistortion extends Spell {
 			player.stopSound(Sound.AMBIENT_CRIMSON_FOREST_LOOP);
 			player.stopSound(Sound.AMBIENT_WARPED_FOREST_LOOP);
 			player.stopSound(Sound.AMBIENT_SOUL_SAND_VALLEY_LOOP);
-			
+
 			player.teleport(mPlayerPreviousLocation.get(player), PlayerTeleportEvent.TeleportCause.UNKNOWN);
-			
+
 			player.removePotionEffect(PotionEffectType.DARKNESS);
 			mPlugin.mEffectManager.addEffect(player, "CognitiveDistortionImmunity", new DamageImmunity(20, DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes()));
 		});

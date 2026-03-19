@@ -100,7 +100,7 @@ public final class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 						final double dist = p.getLocation().distance(loc);
 						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, maxDmg * Math.max(0, 1 - dist / r),
 							null, false, true, "Corruption Blast");
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "CorruptionBlast",
+						Plugin.getInstance().mEffectManager.addEffect(p, "CorruptionBlast",
 							new PercentDamageReceived(2, -1.0));
 					}
 				}
@@ -235,7 +235,7 @@ public final class ExaltedCAxtal extends SerializedLocationBossAbilityGroup {
 			final double distance = player.getLocation().distance(bossLoc);
 			final double speed = initKBSpeed * (1 - distance / radius);
 			MovementUtils.knockAway(mBoss.getLocation(), player, (float) speed, false);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
+			Plugin.getInstance().mEffectManager.addEffect(player, SLOWNESS_SRC,
 				new PercentSpeed(TICKS_PER_SECOND * 50, -0.3, SLOWNESS_SRC));
 		}
 

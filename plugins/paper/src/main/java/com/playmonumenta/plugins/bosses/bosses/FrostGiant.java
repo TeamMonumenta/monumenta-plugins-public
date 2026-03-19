@@ -232,7 +232,7 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 				mPlayers.forEach(player -> {
 					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, EntityUtils.getMaxHealth(player) * 0.9,
 						null, true, false, "Song of the Sleepers");
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, PLAYER_ANTICHEESE_SLOWNESS_SRC,
+					Plugin.getInstance().mEffectManager.addEffect(player, PLAYER_ANTICHEESE_SLOWNESS_SRC,
 						new PercentSpeed(Constants.TICKS_PER_SECOND * 15, -0.3, PLAYER_ANTICHEESE_SLOWNESS_SRC));
 					player.sendMessage(Component.text("YOU DARE MOCK OUR BATTLE?", NamedTextColor.DARK_AQUA));
 					mWorld.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 1, 0.85f);
@@ -241,7 +241,7 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 		}.runTaskTimer(mPlugin, 0, 5);
 
 		/* TODO: Implement charge bar for Shatter (requires a minor rework to ChargeUpManager) */
-		final SpellBaseShatter shatter = new SpellBaseShatter(com.playmonumenta.plugins.Plugin.getInstance(), mBoss, 1.5 * HAILSTORM_RADIUS,
+		final SpellBaseShatter shatter = new SpellBaseShatter(Plugin.getInstance(), mBoss, 1.5 * HAILSTORM_RADIUS,
 			Constants.TICKS_PER_SECOND * 7, (int) (Constants.TICKS_PER_SECOND * 2.5), 4, 20, ARENA_FLOOR_Y, Material.CRIMSON_HYPHAE,
 			/* Get living entity targets */
 			() -> (List<? extends LivingEntity>) getArenaParticipants(),
@@ -473,7 +473,7 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 					mBoss.getEquipment().setItemInMainHand(mMainhand);
 					mBoss.getEquipment().setItemInOffHand(mOffhand);
 					mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
+					Plugin.getInstance().mEffectManager.clearEffects(mBoss, PercentDamageReceived.GENERIC_NAME);
 					getArenaParticipants().forEach(player -> MessagingUtils.sendBoldTitle(player,
 						Component.text("Eldrask", NamedTextColor.AQUA), Component.text("The Waking Giant", NamedTextColor.BLUE)));
 
@@ -864,7 +864,7 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 		mBoss.setInvisible(true);
 		mBoss.setSilent(true);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Constants.TICKS_PER_SECOND * 60, 0));
-		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
+		Plugin.getInstance().mEffectManager.addEffect(mBoss, PercentDamageReceived.GENERIC_NAME,
 			new PercentDamageReceived(Constants.TICKS_PER_SECOND * 60, -1.0));
 
 		final EntityEquipment equipment = Objects.requireNonNull(mBoss.getEquipment());
@@ -934,7 +934,7 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 		mCastStomp = false;
 		for (final LivingEntity mob : EntityUtils.getNearbyMobs(mStartLoc, ARENA_RADIUS)) {
 			if (mob.getType() == EntityType.IRON_GOLEM) {
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mob, GOLEM_FREEZE_EFFECT_NAME,
+				Plugin.getInstance().mEffectManager.addEffect(mob, GOLEM_FREEZE_EFFECT_NAME,
 					new PercentSpeed(Constants.TICKS_PER_SECOND * 20, -1, GOLEM_FREEZE_EFFECT_NAME));
 				GlowingManager.startGlowing(mob, NamedTextColor.WHITE, Constants.TICKS_PER_SECOND * 20,
 					GlowingManager.BOSS_SPELL_PRIORITY, null, "FrostGiantGolemFreeze");
@@ -945,7 +945,7 @@ public final class FrostGiant extends SerializedLocationBossAbilityGroup {
 	public void unfreezeGolems() {
 		mCastStomp = true;
 		for (final LivingEntity mob : EntityUtils.getNearbyMobs(mStartLoc, ARENA_RADIUS)) {
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(mob, GOLEM_FREEZE_EFFECT_NAME);
+			Plugin.getInstance().mEffectManager.clearEffects(mob, GOLEM_FREEZE_EFFECT_NAME);
 			GlowingManager.clear(mob, "FrostGiantGolemFreeze");
 		}
 	}

@@ -26,7 +26,7 @@ public class GraySummoned extends BossAbilityGroup {
 	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {
 		if (event.getEntity().hasMetadata("MonumentaBossesGrayExorcism")) {
 			DamageUtils.damage(null, mBoss, DamageEvent.DamageType.TRUE, 15.0);
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, SLOWNESS_SRC,
+			Plugin.getInstance().mEffectManager.addEffect(mBoss, SLOWNESS_SRC,
 				new PercentSpeed(40, -0.5, SLOWNESS_SRC));
 		}
 	}

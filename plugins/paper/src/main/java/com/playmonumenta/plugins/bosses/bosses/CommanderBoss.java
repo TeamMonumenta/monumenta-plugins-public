@@ -95,7 +95,7 @@ public final class CommanderBoss extends BossAbilityGroup {
 					}
 				}
 
-			}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
+			}.runTaskTimer(Plugin.getInstance(), 0, 1);
 
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), mParams.RANGE, mBoss);
 			Collections.shuffle(mobs);

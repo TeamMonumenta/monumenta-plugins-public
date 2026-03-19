@@ -91,7 +91,7 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 			if (mAlchemistPotions != null && mPlayerItemStats != null) {
 				mAlchemistPotions.applyEffects(entity, false, mPlayerItemStats, mSkillLevel);
 			}
-			EntityUtils.applySlow(com.playmonumenta.plugins.Plugin.getInstance(), mSlowDuration, mSlowAmount, entity);
+			EntityUtils.applySlow(Plugin.getInstance(), mSlowDuration, mSlowAmount, entity);
 			if (mPlayer != null) {
 				mCosmetic.explosionEffects(mPlayer, mBoss, mRadius);
 			}

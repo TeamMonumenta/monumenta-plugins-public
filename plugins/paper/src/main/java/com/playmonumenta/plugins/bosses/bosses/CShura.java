@@ -165,7 +165,7 @@ public final class CShura extends SerializedLocationBossAbilityGroup {
 		events.put(25, mBoss -> {
 			// cshurawool.gif
 			sendMessage(null, Component.text("CUN! DIE ALREADY!", NamedTextColor.RED));
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, FlatDamageDealt.effectID,
+			Plugin.getInstance().mEffectManager.addEffect(mBoss, FlatDamageDealt.effectID,
 				new FlatDamageDealt(12000, 3));
 		});
 

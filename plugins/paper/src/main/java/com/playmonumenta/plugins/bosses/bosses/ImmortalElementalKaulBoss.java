@@ -57,7 +57,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 			new SpellBaseCharge(plugin, mBoss, 40, 65, 60, false,
 				(LivingEntity target) -> {
 					new PartialParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 30, 1, 1.25f, 1, 0).spawnAsEntityActive(boss);
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
+					Plugin.getInstance().mEffectManager.addEffect(boss, BaseMovementSpeedModifyEffect.GENERIC_NAME,
 						new BaseMovementSpeedModifyEffect(65, -0.9));
 					world.playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 3.0f, 1.5f);
 				},
