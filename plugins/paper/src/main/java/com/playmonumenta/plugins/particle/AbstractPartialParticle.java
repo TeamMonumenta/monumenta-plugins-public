@@ -69,6 +69,7 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 	private @Nullable Predicate<Player> mPlayerCondition;
 
 	private double mSkipBelowMultiplier = 0;
+	private boolean mLoggedError = false;
 
 	public AbstractPartialParticle(Particle particle, Location location) {
 		mParticle = particle;
@@ -414,6 +415,13 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 		if (packagedValues.receivers() == null || packagedValues.receivers().isEmpty() || packagedValues.location() == null) {
 			return;
 		}
+		Class<?> dataType = mParticle.getDataType();
+		Object packagedData = packagedValues.data();
+		if (!mLoggedError && (packagedData == null ? dataType != Void.class : !dataType.isAssignableFrom(packagedData.getClass()))) {
+			mLoggedError = true;
+			logWrongData(dataType, packagedData);
+			return;
+		}
 		if (mDistanceFalloffSquared != 0) {
 			double distance = Objects.requireNonNull(packagedValues.location()).distanceSquared(Objects.requireNonNull(packagedValues.receivers()).get(0).getLocation());
 			if (distance > mDistanceFalloffSquared) {
@@ -516,9 +524,15 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 	protected void prepareSpawn() {
 	}
 
-	private void logWrongData(Class<?> dataType) {
-		String errorMessage = "[PartialParticle] \"%s\" has the wrong data type! (Requires: %s, Got: %s)"
-			.formatted(getClass().getSimpleName(), dataType, mData == null ? "null" : mData.getClass());
+	private void logWrongData(Class<?> dataType, Object data) {
+		String errorMessage = "%s (Type: %s, Count: %s) has the wrong data type! (Requires: %s, Got: %s)"
+			.formatted(
+				getClass().getSimpleName(),
+				mParticle,
+				mCount,
+				dataType,
+				String.valueOf(data)
+			);
 		IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
 		StackTraceElement[] stackTraces = exception.getStackTrace();
 
@@ -551,11 +565,6 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 
 	private void spawnForPlayersInternal(ParticleCategory source, ParticleCategory otherSource, Collection<Player> players, @Nullable Player sourcePlayer) {
 		this.prepareSpawn();
-		Class<?> dataType = mParticle.getDataType();
-		if (mData == null ? dataType != Void.class : !dataType.isAssignableFrom(mData.getClass())) {
-			logWrongData(dataType);
-			return;
-		}
 		ParticleManager.runOffMainThread((final AbstractPartialParticle<?> self) -> {
 			players.forEach(player -> {
 				spawnForPlayerInternal(self, player, player == sourcePlayer ? source : otherSource, sourcePlayer);
