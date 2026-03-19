@@ -1,13 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.SpellManager;
-import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellMobEffect;
-import java.util.List;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class InvisibleBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_invisible";
@@ -16,12 +10,13 @@ public class InvisibleBoss extends BossAbilityGroup {
 	public InvisibleBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		// Immediately apply the effect, don't wait
-		Spell invis = new SpellMobEffect(boss, new PotionEffect(PotionEffectType.INVISIBILITY, 20, 0, false, false));
-		invis.run();
+		boss.setInvisible(true);
+	}
 
-		List<Spell> passiveSpells = List.of(invis);
-
-		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
+	@Override
+	public void unload() {
+		if (!mBoss.isDead()) {
+			mBoss.setInvisible(false);
+		}
 	}
 }
