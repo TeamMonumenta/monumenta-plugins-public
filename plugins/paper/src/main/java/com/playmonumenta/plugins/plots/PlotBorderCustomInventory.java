@@ -114,6 +114,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		BORDER_ITEMS.add(new TeleportEntry(2, 32, "Port Manteau", "Located right in the middle of the Architect's Ring's very own fishing town.", Material.ACACIA_BOAT, "portmanteau", "pass/portmanteau"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 33, "Al Malakut", "A view from the fiery end of the Valley of Forgotten Pharoahs", Material.CHISELED_SANDSTONE, "valleyofforgottenpharaohs", "pass/valleyofforgottenpharaohs"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 34, "The Vesperidys Arena", "A plot right in the heart of the glistening Stars Above", Material.BLACK_CONCRETE, "vesperidys_arena", "pass/vesperidys_arena"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 35, "Dissonant Vision", "Located in a realm of pale bones rising from a sea of crimson mist.", Material.RED_STAINED_GLASS, "Dissonant Vision", "red_salad_discovery"));
 
 		BORDER_ITEMS.add(new TeleportEntry(3, 18, "Halls of Wind and Blood", "A plot right in the middle of the main room.", Material.WHITE_WOOL, "White", 1, "dungeons/white"));
 		BORDER_ITEMS.add(new TeleportEntry(3, 19, "Arcane Rivalry", "Located in the lake looking in towards the first castle.", Material.LIGHT_BLUE_WOOL, "LightBlue", 1, "dungeons/lightblue"));
