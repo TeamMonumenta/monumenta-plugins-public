@@ -37,6 +37,7 @@ public class PlotCommand {
 	private static final String SUBCOMMAND_HELP = "help";
 	private static final String SUBCOMMAND_ADD = "add";
 	private static final String SUBCOMMAND_REMOVE = "remove";
+	private static final String SUBCOMMAND_LEAVE = "leave";
 	private static final String SUBCOMMAND_INFO = "info";
 	private static final String SUBCOMMAND_INFO_RAW = "info_raw";
 	private static final String SUBCOMMAND_REGION = "region";
@@ -67,6 +68,7 @@ public class PlotCommand {
 			- /plot help
 			- /plot add <player> [duration]
 			- /plot remove <player>
+			- /plot leave <player>
 			- /plot info
 			- /plot info_raw
 			- /plot region <region>
@@ -109,6 +111,32 @@ public class PlotCommand {
 				)
 				.executesPlayer((sender, args) -> {
 					PlotManager.plotAccessRemove(sender, (String) args.get("player"));
+				})
+			)
+
+			/* /plot leave <player> */
+			.withSubcommand(new CommandAPICommand(SUBCOMMAND_LEAVE)
+				// Suggest all players that sender has access to plots of
+				.withArguments(new StringArgument("player")
+					.replaceSuggestions(ArgumentSuggestions.stringsAsync((info) -> {
+						if (!(info.sender() instanceof Player sender)) {
+							// Return no suggestions if the command sender isn't a player
+							return CompletableFuture.completedFuture(new String[0]);
+						}
+
+						return PlotManager.getPlotInfo(sender.getUniqueId()).thenApply(plotInfo ->
+							plotInfo.mOwnerAccessToOtherPlots
+								.keySet()
+								.stream()
+								.map(MonumentaRedisSyncIntegration::cachedUuidToName)
+								.filter(Objects::nonNull)
+								.toArray(String[]::new)
+						);
+					}))
+				)
+				.executesPlayer((sender, args) -> {
+					UUID plotOwnerUUID = StringUtils.getUuidFromInput((String) args.get("player"));
+					PlotManager.plotAccessRemove(sender, plotOwnerUUID, sender.getUniqueId());
 				})
 			)
 
@@ -436,6 +464,10 @@ public class PlotCommand {
 		sender.sendMessage(Component.text("/plot ", NamedTextColor.GREEN).append(Component.text("remove playerName", NamedTextColor.AQUA)));
 		sender.sendMessage(Component.text("This revokes ", NamedTextColor.WHITE).append(Component.text("playerName", NamedTextColor.AQUA)).append(Component.text("'s access to your plot.", NamedTextColor.WHITE)));
 		sender.sendMessage(Component.text("Note that this will ", NamedTextColor.WHITE).append(Component.text("not", NamedTextColor.WHITE, TextDecoration.ITALIC)).append(Component.text(" teleport them out if they are on your plot or if they logged out while on your plot.", NamedTextColor.WHITE)));
+		sender.sendMessage(Component.empty());
+		sender.sendMessage(Component.text("/plot ", NamedTextColor.GREEN).append(Component.text("leave playerName", NamedTextColor.AQUA)));
+		sender.sendMessage(Component.text("This revokes your own access to ", NamedTextColor.WHITE).append(Component.text("playerName", NamedTextColor.AQUA)).append(Component.text("'s plot.", NamedTextColor.WHITE)));
+		sender.sendMessage(Component.text("Note that this will ", NamedTextColor.WHITE).append(Component.text("not", NamedTextColor.WHITE, TextDecoration.ITALIC)).append(Component.text(" teleport you out if you are on their plot!", NamedTextColor.WHITE)));
 	}
 
 	private static void plotInfoRaw(CommandSender sender, PlotManager.PlotInfo info) {
