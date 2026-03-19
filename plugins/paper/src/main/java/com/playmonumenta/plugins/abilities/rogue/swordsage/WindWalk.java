@@ -113,7 +113,7 @@ public class WindWalk extends MultipleChargeAbility {
 
 			@Override
 			public void run() {
-				if (mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
+				if (mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded() || mPlayer.getWorld() != world) {
 					this.cancel();
 					return;
 				}

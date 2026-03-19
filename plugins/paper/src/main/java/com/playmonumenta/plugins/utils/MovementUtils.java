@@ -184,7 +184,12 @@ public class MovementUtils {
 			return;
 		}
 		BossManager.getInstance().entityKnockedAway(target, speed);
-		Vector dir = target.getLocation().subtract(location.toVector()).toVector().normalize().multiply(-speed);
+		Vector vec = target.getLocation().subtract(location.toVector()).toVector();
+		if (vec.length() < 0.001) {
+			// The target is already at the location we want to pull towards
+			return;
+		}
+		Vector dir = vec.normalize().multiply(-speed);
 
 		double mult = useKnockbackRes ? 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0) : 1;
 		if (mult > 0) {

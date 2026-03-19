@@ -197,7 +197,10 @@ public class SporeLasers extends Spell {
 				}
 				if (mTicks == BEAM_DURATION + TELEGRAPH_DURATION) {
 					mBoss.getWorld().playSound(mBoss, Sound.BLOCK_BEACON_DEACTIVATE, 2f, 1f);
-					runHomingProjectile(mSporeBeast.getPlayersInOutRange().size() / PLAYERS_PER_HOMING_P + 1);
+					int playerCount = mSporeBeast.getPlayersInOutRange().size();
+					if (playerCount > 0) {
+						runHomingProjectile(playerCount / PLAYERS_PER_HOMING_P + 1);
+					}
 					this.cancel();
 				}
 				if (mBoss.isDead()) {

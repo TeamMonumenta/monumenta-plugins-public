@@ -53,12 +53,7 @@ public class SporeBeastArenaRange extends Spell {
 				return;
 			}
 
-			for (int i = 0; i < mValidPlayers.size(); i++) {
-				if (mValidPlayers.get(i).getLocation().distanceSquared(mBoss.getLocation()) > SporousAmalgam.OUTER_RADIUS * SporousAmalgam.OUTER_RADIUS) {
-					mValidPlayers.remove(i);
-					i--;
-				}
-			}
+			mValidPlayers.removeIf(player -> player.getWorld() != mBoss.getWorld() || player.getLocation().distanceSquared(mBoss.getLocation()) > SporousAmalgam.OUTER_RADIUS * SporousAmalgam.OUTER_RADIUS);
 
 			List<Player> players = mSporebeast.getPlayersInOutRange();
 			for (Player p : players) {

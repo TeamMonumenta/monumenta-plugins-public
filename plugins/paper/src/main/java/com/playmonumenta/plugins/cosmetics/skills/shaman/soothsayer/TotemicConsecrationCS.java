@@ -81,7 +81,7 @@ public class TotemicConsecrationCS implements CosmeticSkill {
 				}
 
 				PPCircle ring = new PPCircle(Particle.REDSTONE, standLocation.add(0, -0.1, 0), radius * (1 - mTicks / CIRCLE_COUNT)).ringMode(true).countPerMeter(0.6).delta(0).data(COLOR_GOLD);
-				PPCircle ring2 = new PPCircle(Particle.CRIT, standLocation.add(0, -0.1, 0), radius * (1 - mTicks / CIRCLE_COUNT)).ringMode(true).countPerMeter(0.6).delta(0).data(COLOR_GOLD);
+				PPCircle ring2 = new PPCircle(Particle.CRIT, standLocation.add(0, -0.1, 0), radius * (1 - mTicks / CIRCLE_COUNT)).ringMode(true).countPerMeter(0.6).delta(0);
 				ring.spawnAsPlayerActive(activatedPlayer);
 				ring2.spawnAsPlayerActive(activatedPlayer);
 
