@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import org.bukkit.entity.Player;
@@ -18,13 +19,12 @@ public class Epoch implements Infusion {
 		return InfusionType.EPOCH;
 	}
 
-	public static double getCooldownPercentage(Plugin plugin, Player player) {
-		double level = plugin.mItemStatManager.getInfusionLevel(player, InfusionType.EPOCH);
-		return getCooldownPercentage(level);
+	@Override
+	public void onAbilityCast(Plugin plugin, Player player, double value, AbilityCastEvent event) {
+		event.setCooldown((int) (event.getCooldown() * getCooldownPercentage(value)));
 	}
 
 	public static double getCooldownPercentage(double level) {
-		return -COOLDOWN_REDUCTION_PER_LEVEL * level;
+		return 1 - COOLDOWN_REDUCTION_PER_LEVEL * level;
 	}
-
 }

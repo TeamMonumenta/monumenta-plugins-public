@@ -4,25 +4,18 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
-import com.playmonumenta.plugins.effects.AbilityCooldownIncrease;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
-import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
-import com.playmonumenta.plugins.itemstats.enchantments.Ineptitude;
-import com.playmonumenta.plugins.itemstats.infusions.Epoch;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.NavigableSet;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -110,36 +103,11 @@ public abstract class Ability {
 		return mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), spell);
 	}
 
-	public int getModifiedCooldown(int baseCooldown) {
-		//Epoch and Ability Enchantment implementation
-		//Percents are negative so (1 + percent) is between 0 and 1 in most cases
-		double epochPercent = Epoch.getCooldownPercentage(mPlugin, mPlayer);
-		double aptitudePercent = Aptitude.getCooldownPercentage(mPlugin, mPlayer);
-		double ineptitudePercent = Ineptitude.getCooldownPercentage(mPlugin, mPlayer);
-
-		//Potion effects
-		double effectPercent = 0;
-
-		NavigableSet<AbilityCooldownIncrease> effInc = Plugin.getInstance().mEffectManager.getEffects(mPlayer, AbilityCooldownIncrease.class);
-		if (effInc != null && !effInc.isEmpty()) {
-			Effect inc = effInc.last();
-			effectPercent += inc.getMagnitude(); // this is always positive
-		}
-
-		NavigableSet<AbilityCooldownDecrease> effDec = Plugin.getInstance().mEffectManager.getEffects(mPlayer, AbilityCooldownDecrease.class);
-		if (effDec != null && !effDec.isEmpty()) {
-			Effect dec = effDec.last();
-			effectPercent -= dec.getMagnitude(); // this is always positive
-		}
-
-		return (int) (baseCooldown * (1 + epochPercent) * (1 + aptitudePercent) * (1 + ineptitudePercent) * (1 + effectPercent));
-	}
-
 	/**
 	 * This ability's cooldown modified by enchantments of items worn by the player
 	 */
 	public int getModifiedCooldown() {
-		return getModifiedCooldown(getInfo().getModifiedCooldown(mPlayer, getAbilityScore()));
+		return getInfo().getModifiedCooldown(mPlayer, getAbilityScore());
 	}
 
 	public int getCharmCooldown(int baseCooldown) {

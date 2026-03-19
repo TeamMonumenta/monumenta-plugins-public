@@ -285,10 +285,10 @@ public enum EffectType {
 	)),
 
 	COOLDOWN_DECREASE("AbilityCooldownDecrease", "Ability Cooldowns", true, false, false, pluginApplicator(
-		(duration, strength, source) -> new AbilityCooldownDecrease(duration, strength)
+		(duration, strength, source) -> new PercentAbilityCooldowns(duration, -strength)
 	)),
 	COOLDOWN_INCREASE("AbilityCooldownIncrease", "Ability Cooldowns", false, false, false, pluginApplicator(
-		(duration, strength, source) -> new AbilityCooldownIncrease(duration, strength)
+		(duration, strength, source) -> new PercentAbilityCooldowns(duration, strength)
 	)),
 
 	FISH_QUALITY_INCREASE("FishQualityIncrease", "Fish Quality", true, false, false, pluginApplicator(
@@ -343,7 +343,7 @@ public enum EffectType {
 		(duration, strength, source) -> new BoonOfThePit(duration)
 	)),
 	BOON_OF_SILVER_SCALES("BoonOfSilverScales", "Boon of Silver Scales", true, false, true, pluginApplicator(
-		(duration, strength, source) -> new AbilityCooldownDecrease(duration, 0.05)
+		(duration, strength, source) -> new PercentAbilityCooldowns(duration, -0.05)
 	)),
 	BOON_OF_KNIGHTLY_PRAYER("BoonOfKnightlyPrayer", "Boon of Knightly Prayer", true, false, true, pluginApplicator(
 		(duration, strength, source) -> new BoonOfKnightlyPrayer(duration)

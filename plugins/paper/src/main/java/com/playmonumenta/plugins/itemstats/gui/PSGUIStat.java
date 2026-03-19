@@ -141,9 +141,9 @@ enum PSGUIStat {
 			+ stats.getAdditiveDamageDealtMultiplier() - 1
 			+ Perspicacity.getDamageForRegion(stats.mPlayer) * stats.getInfusion(InfusionType.PERSPICACITY)) * stats.getMultiplicativeDamageDealtMultiplier()),
 	TOTAL_SPELL_DAMAGE("Total Spell Damage %", Formatting.PERCENT, stats -> SPELL_POWER.get(stats) * MAGIC_DAMAGE_MULTIPLY.get(stats)),
-	COOLDOWN_MULTIPLIER("Cooldown Multiplier", Formatting.PERCENT, stats -> (1 + Aptitude.getCooldownPercentage(stats.get(EnchantmentType.APTITUDE)))
-		* (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE)))
-		* (1 + Epoch.getCooldownPercentage(stats.getInfusion(InfusionType.EPOCH))), false),
+	COOLDOWN_MULTIPLIER("Cooldown Multiplier", Formatting.PERCENT, stats -> Aptitude.getCooldownPercentage(stats.get(EnchantmentType.APTITUDE))
+		* Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE))
+		* Epoch.getCooldownPercentage(stats.getInfusion(InfusionType.EPOCH)), false),
 	// misc
 	ARMOR("Total Armor", Formatting.NUMBER, stats -> stats.get(AttributeType.ARMOR)),
 	AGILITY("Total Agility", Formatting.NUMBER, stats -> stats.get(AttributeType.AGILITY)),

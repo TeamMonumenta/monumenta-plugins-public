@@ -311,8 +311,7 @@ public final class EffectManager implements Listener {
 
 	static {
 		mEffectDeserializer = new HashMap<>();
-		mEffectDeserializer.put(AbilityCooldownDecrease.effectID, AbilityCooldownDecrease::deserialize);
-		mEffectDeserializer.put(AbilityCooldownIncrease.effectID, AbilityCooldownIncrease::deserialize);
+		mEffectDeserializer.put(PercentAbilityCooldowns.effectID, PercentAbilityCooldowns::deserialize);
 		mEffectDeserializer.put(AbilitySilence.effectID, AbilitySilence::deserialize);
 		mEffectDeserializer.put(AbsorptionSickness.effectID, AbsorptionSickness::deserialize);
 		mEffectDeserializer.put(Aesthetics.effectID, Aesthetics::deserialize);

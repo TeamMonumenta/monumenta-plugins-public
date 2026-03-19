@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.gallery.effects;
 
-import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
 import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.PercentAbilityCooldowns;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
 import org.bukkit.entity.Player;
 
@@ -19,7 +19,7 @@ public class GalleryEnlightenmentEffect extends GalleryConsumableEffect {
 			if (player == null) {
 				return;
 			}
-			EffectManager.getInstance().addEffect(player, "GalleryEnlightenmentEffect", new AbilityCooldownDecrease(20, 0.2).displays(false));
+			EffectManager.getInstance().addEffect(player, "GalleryEnlightenmentEffect", new PercentAbilityCooldowns(20, -0.2).displays(false));
 		}
 	}
 }

@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.hunts.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.effects.AbilityCooldownIncrease;
+import com.playmonumenta.plugins.effects.PercentAbilityCooldowns;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -130,7 +130,7 @@ public class PassivePiercingGems extends Spell {
 			EffectManager.getInstance().addEffect(player, VULN_SOURCE, new PercentDamageReceived(DURATION, VULN));
 		}
 		if (FastUtils.RANDOM.nextBoolean()) {
-			EffectManager.getInstance().addEffect(player, CDR_SOURCE, new AbilityCooldownIncrease(DURATION, COOLDOWN_INCREASE));
+			EffectManager.getInstance().addEffect(player, CDR_SOURCE, new PercentAbilityCooldowns(DURATION, COOLDOWN_INCREASE));
 		} else {
 			EffectManager.getInstance().addEffect(player, WEAKNESS_SOURCE, new PercentDamageDealt(DURATION, WEAKNESS));
 		}

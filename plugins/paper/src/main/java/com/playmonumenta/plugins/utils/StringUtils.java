@@ -334,11 +334,15 @@ public class StringUtils {
 	}
 
 	public static Component doubleToColoredAndSignedPercentage(double d) {
+		return doubleToColoredAndSignedPercentage(d, false);
+	}
+
+	public static Component doubleToColoredAndSignedPercentage(double d, boolean invert) {
 		String percent = multiplierToPercentage(d);
 		if (d < 0) {
-			return Component.text(percent + "%", NamedTextColor.RED);
+			return Component.text(percent + "%", invert ? NamedTextColor.RED : NamedTextColor.GREEN);
 		} else {
-			return Component.text("+" + percent + "%", NamedTextColor.GREEN);
+			return Component.text("+" + percent + "%", invert ? NamedTextColor.GREEN : NamedTextColor.RED);
 		}
 	}
 

@@ -4,9 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.intruder.IntruderBoss;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
-import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.PercentAbilityCooldowns;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
@@ -244,7 +244,7 @@ public class SpellNightmarishCarvings extends SpellBaseAoE {
 				),
 			TextColor.color(0xfd245e)),
 		ABILITY_COOLDOWN(false, true,
-			extra -> new AbilityCooldownDecrease(BUFF_DURATION, 0.25),
+			extra -> new PercentAbilityCooldowns(BUFF_DURATION, -0.25),
 			extra ->
 				Component.text("The carving hastens you.\n", NamedTextColor.GRAY).append(
 					Component.text(String.format("-%d%% Ability Cooldown.", 25), TextColor.color(0x8bfe3e))

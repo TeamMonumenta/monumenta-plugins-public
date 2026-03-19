@@ -94,7 +94,7 @@ public class EarthenWrath extends DepthsAbility {
 			return false;
 		}
 
-		PlayerUtils.callAbilityCastEvent(mPlayer, this, ClassAbility.EARTHEN_WRATH, 0);
+		int cooldown = PlayerUtils.callAbilityCastEvent(mPlayer, this, ClassAbility.EARTHEN_WRATH, getModifiedCooldown()).getCooldown();
 
 		cancelOnDeath(new BukkitRunnable() {
 			private int mTicks = 0;
@@ -138,7 +138,7 @@ public class EarthenWrath extends DepthsAbility {
 
 				if (mTicks >= mDuration) {
 					this.cancel();
-					endWrath();
+					endWrath(cooldown);
 
 					Location loc = mPlayer.getLocation();
 
@@ -238,10 +238,10 @@ public class EarthenWrath extends DepthsAbility {
 		mAbsorbDamage = true;
 	}
 
-	private void endWrath() {
+	private void endWrath(int cooldown) {
 		// Prevents stacking cooldowns from Encore
 		if (!isOnCooldown()) {
-			putOnCooldown(false);
+			putOnCooldown(cooldown, false);
 		}
 		mAbsorbDamage = false;
 	}

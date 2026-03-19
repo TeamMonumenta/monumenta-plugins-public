@@ -99,9 +99,6 @@ public class BottledSunlight extends DepthsAbility {
 						execute(p);
 					}
 
-					mPlugin.mTimers.removeCooldown(mPlayer, ClassAbility.BOTTLED_SUNLIGHT);
-					putOnCooldown(false);
-
 					this.cancel();
 					return;
 				}
