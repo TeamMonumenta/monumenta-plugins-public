@@ -41,8 +41,7 @@ public class Knockback implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageEvent.DamageType.MELEE) {
-			Vector vector = enemy.getLocation().subtract(player.getLocation()).toVector();
-			applyKnockback(plugin, level, enemy, vector);
+			applyKnockback(plugin, level, enemy, player.getLocation().getDirection());
 		}
 	}
 
