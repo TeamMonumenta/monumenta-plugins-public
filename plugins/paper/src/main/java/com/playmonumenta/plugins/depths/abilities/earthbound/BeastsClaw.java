@@ -113,9 +113,10 @@ public class BeastsClaw extends DepthsAbility {
 					spawnParticle(l.clone().add(0, -DISTANCE_PER_CLAW * finalI, 0), startLoc, false, finalI == 1, angleProgress);
 				}, DEGREE_STEP);
 		}
-		// Additional spherical hitbox halfway through the claw animation
+		// Additional spherical hitbox for the inner part of the swipe
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			damage(mPlayer.getLocation().clone().add(0, Y_OFFSET, 0), LENIENCY_HITBOX_RADIUS);
+			double innerRadius = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.BEASTS_CLAW_RANGE.mEffectName, LENIENCY_HITBOX_RADIUS);
+			damage(Hitbox.approximateCylinderSegment(mPlayer.getLocation(), 3, innerRadius, Math.toRadians(100)).getHitMobs());
 		}, (int) (0.5 * ((END_ANGLE - START_ANGLE) / (float) ARC_INC)));
 	}
 
@@ -133,12 +134,11 @@ public class BeastsClaw extends DepthsAbility {
 			.spawnAsPlayerActive(mPlayer);
 
 		if (centerClaw && (angleProgress * END_ANGLE) % (DEGREE_STEP * 3) == 0) {
-			damage(finalLoc, HITBOX_RADIUS);
+			damage(new Hitbox.SphereHitbox(finalLoc, HITBOX_RADIUS).getHitMobs());
 		}
 	}
 
-	private void damage(Location loc, double radius) {
-		List<LivingEntity> hitMobs = new Hitbox.SphereHitbox(loc, radius).getHitMobs();
+	private void damage(List<LivingEntity> hitMobs) {
 		hitMobs.forEach(mob -> {
 			if (!mHitMobs.contains(mob.getUniqueId())) {
 				EntityUtils.applyStun(mPlugin, mStunDuration, mob);
@@ -151,12 +151,13 @@ public class BeastsClaw extends DepthsAbility {
 	private static Description<BeastsClaw> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<>(() -> INFO, color)
 			.addTrigger()
-			.add(" to unleash a devastating claw swipe of radius ")
-			.add(a -> a.mClawRadius, CLAW_RADIUS)
-			.add(" dealing ")
+			.add(" to unleash a devastating claw swipe in front of you, dealing ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
-			.add(" melee damage and stunning mobs in front of you for ")
+			.add(" melee damage to mobs in front of you within ")
+			.add(a -> a.mClawRadius, CLAW_RADIUS)
+			.add(" blocks and stunning them for ")
 			.addDuration(a -> a.mStunDuration, STUN_DURATION[rarity - 1], true)
+			.add(" seconds.")
 			.addCooldown(COOLDOWN);
 	}
 
