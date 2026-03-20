@@ -5,12 +5,14 @@ import com.playmonumenta.plugins.bosses.spells.SpellCooldownManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class SpellAbhorrentHallucinationTeleport extends Spell {
 	private final LivingEntity mBoss;
@@ -50,7 +52,7 @@ public class SpellAbhorrentHallucinationTeleport extends Spell {
 			.countPerMeter(10)
 			.data(new Particle.DustTransition(Color.BLACK, Color.fromRGB(0x6b0000), 5.0f))
 			.spawnAsBoss();
-		mBoss.teleport(newLocation);
+		mBoss.teleport(newLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
 		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 0.1f);
 		new PPCircle(Particle.SQUID_INK, mBoss.getLocation(), 0.5)
 			.directionalMode(true)

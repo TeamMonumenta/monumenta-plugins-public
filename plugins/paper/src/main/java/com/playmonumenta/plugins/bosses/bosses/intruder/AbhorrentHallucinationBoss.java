@@ -26,7 +26,6 @@ import org.bukkit.entity.LivingEntity;
 public class AbhorrentHallucinationBoss extends BossAbilityGroup {
 	public static final String TAG = "AbhorrentHallucination";
 
-	public static final int DAMAGE_PER_MOB = 30;
 	public static final String SUMMON_TAG = "AbhorrentHallucinationSpawn";
 
 	public AbhorrentHallucinationBoss(Plugin plugin, LivingEntity boss, Location spawnlocation, List<String> elitesList) {

@@ -27,7 +27,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -80,13 +79,7 @@ public class SpellAbhorrentHallucination extends Spell {
 		EffectManager.getInstance().addEffect(mBoss, "AbhorrentHallucinationResistance", new PercentDamageReceived(60 * 60 * 20, -1.0));
 		EffectManager.getInstance().addEffect(mBoss, "AbhorrentHallucinationSpeed", new PercentSpeed(60 * 60 * 20, -0.6, "AbhorrentHallucinationSpeed"));
 
-		Location spawnLocation = LocationUtils.randomSafeLocationInCircle(mBoss.getLocation(), 5, location ->
-			!location.getBlock().isSolid());
-		mAbhorrenthallucination = (LivingEntity) Objects.requireNonNull(LibraryOfSoulsIntegration.summon(spawnLocation, "AbhorrentHallucination"));
-
-		List<Player> viewers = IntruderBoss.playersInRange(spawnLocation);
-		viewers.forEach(player -> player.hideEntity(mPlugin, mAbhorrenthallucination));
-		mAbhorrenthallucination.setInvulnerable(true);
+		Location spawnLocation = LocationUtils.randomSafeLocationInCircle(mBoss.getLocation(), 5, location -> !location.getBlock().isSolid());
 
 		new BukkitRunnable() {
 
@@ -94,15 +87,11 @@ public class SpellAbhorrentHallucination extends Spell {
 			public void run() {
 				if (mChargeUpManager.nextTick(2)) {
 					mChargeUpManager.remove();
-
 					new PartialParticle(Particle.FLASH, spawnLocation).minimumCount(1).spawnAsBoss();
 
-					if (mAbhorrenthallucination != null) {
-						EntityUtils.setRemoveEntityOnUnload(mAbhorrenthallucination);
-						viewers.forEach(player -> player.showEntity(mPlugin, mAbhorrenthallucination));
-						mAbhorrenthallucination.setInvulnerable(false);
-						BossManager.getInstance().manuallyRegisterBoss(mAbhorrenthallucination, new AbhorrentHallucinationBoss(mPlugin, mAbhorrenthallucination, mCenter, mBosses.subList(mCastCount * 3, mCastCount * 3 + 3)));
-					}
+					mAbhorrenthallucination = (LivingEntity) Objects.requireNonNull(LibraryOfSoulsIntegration.summon(spawnLocation, "AbhorrentHallucination"));
+					EntityUtils.setRemoveEntityOnUnload(mAbhorrenthallucination);
+					BossManager.getInstance().manuallyRegisterBoss(mAbhorrenthallucination, new AbhorrentHallucinationBoss(mPlugin, mAbhorrenthallucination, mCenter, mBosses.subList(mCastCount * 3, mCastCount * 3 + 3)));
 					mCastCount++;
 					this.cancel();
 				} else {
