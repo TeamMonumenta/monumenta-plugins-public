@@ -30,7 +30,7 @@ public class PercentAbilityCooldowns extends SingleArgumentEffect {
 
 	@Override
 	public @Nullable Component getSpecificDisplay() {
-		return StringUtils.doubleToColoredAndSignedPercentage(mAmount).append(Component.text(" " + getDisplayedName()));
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount, true).append(Component.text(" " + getDisplayedName()));
 	}
 
 	@Override

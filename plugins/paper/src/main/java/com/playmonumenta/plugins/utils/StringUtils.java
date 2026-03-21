@@ -340,9 +340,9 @@ public class StringUtils {
 	public static Component doubleToColoredAndSignedPercentage(double d, boolean invert) {
 		String percent = multiplierToPercentage(d);
 		if (d < 0) {
-			return Component.text(percent + "%", invert ? NamedTextColor.RED : NamedTextColor.GREEN);
+			return Component.text(percent + "%", invert ? NamedTextColor.GREEN : NamedTextColor.RED);
 		} else {
-			return Component.text("+" + percent + "%", invert ? NamedTextColor.GREEN : NamedTextColor.RED);
+			return Component.text("+" + percent + "%", invert ? NamedTextColor.RED : NamedTextColor.GREEN);
 		}
 	}
 
