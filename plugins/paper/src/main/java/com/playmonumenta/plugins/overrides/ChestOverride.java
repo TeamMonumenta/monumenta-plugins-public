@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -79,8 +80,35 @@ public class ChestOverride extends BaseOverride {
 			BlockState state = block.getState();
 			if (state instanceof Chest chest) {
 				LootTable table = chest.getLootTable();
+				long seed = chest.getSeed();
 				if (table != null) {
-					player.sendMessage(Component.text("This chest has loot table: " + table.getKey(), NamedTextColor.GOLD));
+					player.sendMessage(Component.text(
+						"This chest has loot table: " + table.getKey() +
+							"\nAnd seed: " + seed,
+						NamedTextColor.WHITE));
+					Component msg = Component.text("")
+						.append(
+							Component.text("[Copy /setblock] ", NamedTextColor.AQUA)
+								.clickEvent(ClickEvent.copyToClipboard(
+									"/setblock ~ ~ ~ minecraft:chest{LootTableSeed:" + seed
+										+ ",LootTable:\"" + table.getKey() + "\"}"
+								))
+						)
+						.append(
+							Component.text("[Copy /give] ", NamedTextColor.GREEN)
+								.clickEvent(ClickEvent.copyToClipboard(
+									"/give @s minecraft:chest{BlockEntityTag:{LootTableSeed:" + seed
+									+ ",LootTable:\"" + table.getKey() + "\"}}"
+								))
+						)
+						.append(
+							Component.text("[Give]", NamedTextColor.GOLD)
+								.clickEvent(ClickEvent.runCommand(
+									"/give @s minecraft:chest{BlockEntityTag:{LootTableSeed:" + seed
+										+ ",LootTable:\"" + table.getKey() + "\"}}"
+								))
+						);
+					player.sendMessage(msg);
 					return false;
 				}
 			}
