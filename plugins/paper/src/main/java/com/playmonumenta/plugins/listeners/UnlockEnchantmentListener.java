@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,6 +18,18 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 public class UnlockEnchantmentListener implements Listener {
 
 	private static final Advancement ENCHANTMENT_ROOT = Bukkit.getAdvancement(NamespacedKeyUtils.fromString("monumenta:handbook/enchantments/root"));
+	private static final Set<String> ENCHANTMENT_CATEGORIES = Set.of(
+		"monumenta:handbook/enchantments/consumables",
+		"monumenta:handbook/enchantments/cosmetic",
+		"monumenta:handbook/enchantments/curses",
+		"monumenta:handbook/enchantments/defenses",
+		"monumenta:handbook/enchantments/delve_infusions",
+		"monumenta:handbook/enchantments/infusions",
+		"monumenta:handbook/enchantments/passiveeffects",
+		"monumenta:handbook/enchantments/ranged",
+		"monumenta:handbook/enchantments/tools",
+		"monumenta:handbook/enchantments/weapons"
+	);
 
 	@EventHandler(ignoreCancelled = false)
 	public void onAdvancementUnlock(PlayerAdvancementDoneEvent evt) {
@@ -33,6 +46,9 @@ public class UnlockEnchantmentListener implements Listener {
 	}
 
 	private boolean isEnchantmentAdvancement(Advancement a) {
+		if (ENCHANTMENT_CATEGORIES.contains(a.getKey().toString())) {
+			return false;
+		}
 		Advancement parent = a.getParent();
 		if (ENCHANTMENT_ROOT == null) {
 			MMLog.warning("UnlockEnchantmentListener could not find the root enchantment advancement!");
