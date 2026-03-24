@@ -89,6 +89,11 @@ public class TouchofRadianceCS implements CosmeticSkill {
 
 				Location to = target.getEyeLocation();
 
+				if (to.getWorld() != mL.getWorld()) {
+					this.cancel();
+					return;
+				}
+
 				for (int i = 0; i < 6; i++) {
 					if (mT <= 2) {
 						mD = dir.clone();
