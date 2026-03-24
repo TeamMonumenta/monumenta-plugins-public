@@ -234,7 +234,9 @@ public class VesperidysVoidCrystalSteel extends BossAbilityGroup {
 					@Override
 					public synchronized void cancel() throws IllegalStateException {
 						super.cancel();
-						trap.remove();
+						if (trap.isValid()) {
+							trap.remove();
+						}
 					}
 
 					@Override
