@@ -444,7 +444,9 @@ public class SpellStarStorm extends Spell {
 			@Override
 			public synchronized void cancel() {
 				super.cancel();
-				bullet.remove();
+				if (bullet.isValid()) {
+					bullet.remove();
+				}
 			}
 		};
 		runnableBullet.runTaskTimer(mPlugin, 0, 1);
@@ -499,7 +501,9 @@ public class SpellStarStorm extends Spell {
 			@Override
 			public synchronized void cancel() {
 				super.cancel();
-				bullet.remove();
+				if (bullet.isValid()) {
+					bullet.remove();
+				}
 			}
 		};
 		runnableBullet.runTaskTimer(mPlugin, 0, 1);
