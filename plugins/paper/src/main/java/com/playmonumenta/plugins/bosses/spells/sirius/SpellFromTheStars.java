@@ -118,6 +118,9 @@ public class SpellFromTheStars extends Spell {
 					}
 					mSirius.mBoss.setVisibleByDefault(false); //hide it so it doesnt have to move with interpolation
 					for (int i = 0; i < mSirius.mDisplays.size(); i++) {
+						if (i >= mTranslations.size()) {
+							break;
+						}
 						mSirius.mDisplays.get(i).setInterpolationDuration(39);
 						Transformation trans = mSirius.mDisplays.get(i).getTransformation();
 						mSirius.mDisplays.get(i).setTransformation(new Transformation(new Vector3f(0, JUMPHEIGHT, 0).add(mTranslations.get(i)), trans.getLeftRotation(), trans.getScale(), trans.getRightRotation()));
@@ -130,6 +133,9 @@ public class SpellFromTheStars extends Spell {
 				}
 				if (mTicks == 45) {
 					for (int i = 0; i < mSirius.mDisplays.size(); i++) {
+						if (i >= mTranslations.size()) {
+							break;
+						}
 						mSirius.mDisplays.get(i).setInterpolationDuration(6);
 						Transformation trans = mSirius.mDisplays.get(i).getTransformation();
 						mSirius.mDisplays.get(i).setTransformation(new Transformation(mTranslations.get(i), trans.getLeftRotation(), trans.getScale(), trans.getRightRotation()));
