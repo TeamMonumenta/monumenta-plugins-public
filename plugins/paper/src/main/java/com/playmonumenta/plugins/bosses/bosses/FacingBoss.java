@@ -52,6 +52,9 @@ public final class FacingBoss extends BossAbilityGroup {
 			}
 			Location loc = boss.getLocation();
 			Vector targetDir = mTarget.getLocation().toVector().subtract(loc.toVector());
+			if (targetDir.lengthSquared() == 0) {
+				return;
+			}
 			double[] targetYawPitch = VectorUtils.vectorToRotation(targetDir);
 			if (p.HEAD_ROTATION) {
 				NmsUtils.getVersionAdapter().setHeadRotation(boss, (float) targetYawPitch[0], (float) targetYawPitch[1]);
