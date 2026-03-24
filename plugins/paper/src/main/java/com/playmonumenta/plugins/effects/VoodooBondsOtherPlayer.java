@@ -84,8 +84,10 @@ public class VoodooBondsOtherPlayer extends Effect {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1, 2);
 		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 2f, 0.75f);
-		new PPLine(Particle.SPELL_WITCH, loc, mReaper.getLocation()).countPerMeter(6).spawnAsPlayerActive(mReaper);
-		new PPLine(Particle.REDSTONE, loc, mReaper.getLocation()).data(COLOR).countPerMeter(6).spawnAsPlayerActive(mReaper);
+		if (world.equals(mReaper.getWorld())) {
+			new PPLine(Particle.SPELL_WITCH, loc, mReaper.getLocation()).countPerMeter(6).spawnAsPlayerActive(mReaper);
+			new PPLine(Particle.REDSTONE, loc, mReaper.getLocation()).data(COLOR).countPerMeter(6).spawnAsPlayerActive(mReaper);
+		}
 
 		Location reaperLoc = mReaper.getLocation();
 		new PartialParticle(Particle.SPELL_WITCH, reaperLoc, 40, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(mReaper);
