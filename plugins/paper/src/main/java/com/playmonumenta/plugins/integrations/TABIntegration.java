@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
@@ -47,7 +48,7 @@ public class TABIntegration implements Listener {
 
 	public static @MonotonicNonNull TABIntegration INSTANCE;
 	final TabAPI mTab;
-	boolean mIsRefreshing = false;
+	AtomicBoolean mIsRefreshing = new AtomicBoolean(false);
 	long mLastRefresh = System.currentTimeMillis();
 
 	String mGlobalFooter = "%monumenta_boss_details_1% | &7Total players:&f -1 | %monumenta_boss_details_2%";
@@ -352,10 +353,9 @@ public class TABIntegration implements Listener {
 			refreshPingForLocalPlayersAndBroadcast();
 			return;
 		}
-		if (mIsRefreshing) {
+		if (!mIsRefreshing.compareAndSet(false, true)) {
 			return;
 		}
-		mIsRefreshing = true;
 		try {
 			mGlobalFooter = "%monumenta_boss_details_1% | &7Total players:&f " + NetworkRelayAPI.getVisiblePlayerNames().size() + " | %monumenta_boss_details_2%";
 			TabPlayer[] tabPlayers = mTab.getOnlinePlayers();
@@ -364,7 +364,7 @@ public class TABIntegration implements Listener {
 			}
 		} finally {
 			mLastRefresh = System.currentTimeMillis();
-			mIsRefreshing = false;
+			mIsRefreshing.set(false);
 		}
 	}
 
