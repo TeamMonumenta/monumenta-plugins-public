@@ -246,7 +246,13 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 							mCosmetic.onAggroSounds(world, nearestMob.getLocation(), summon);
 						} else {
 							// Follow player if there's no valid targets around
-							double distanceSquared = summon.getLocation().distanceSquared(mPlayer.getLocation());
+							Location summonLoc = summon.getLocation();
+							Location playerLoc = mPlayer.getLocation();
+							if (!summonLoc.getWorld().equals(playerLoc.getWorld())) {
+								summon.teleport(playerLoc);
+								continue;
+							}
+							double distanceSquared = summonLoc.distanceSquared(playerLoc);
 							if (distanceSquared > 4 * 4) {
 								// Slow down a bit near the player to get less jerky movement
 								summon.getPathfinder().moveTo(summon instanceof Parrot ? mPlayer.getLocation().add(0, 3, 0) : mPlayer.getLocation(), distanceSquared > 6 * 6 ? 1 : 0.66);
