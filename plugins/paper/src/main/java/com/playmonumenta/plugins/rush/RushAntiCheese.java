@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -54,7 +55,7 @@ public class RushAntiCheese {
 					return;
 				}
 
-				for (Player p : players) {
+				for (Player p : new ArrayList<>(players)) {
 					if (mPlayerTracker.get(p) == null || mPlayerInactivity.get(p) == null) {
 						continue;
 					}
@@ -78,7 +79,7 @@ public class RushAntiCheese {
 				}
 
 				if (mTicks % DAMAGE_TICK == 0) {
-					for (Player p : players) {
+					for (Player p : new ArrayList<>(players)) {
 						if (!mGracePeriod.remove(p)) {
 							runDamageFloor(p);
 						}
