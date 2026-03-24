@@ -198,13 +198,13 @@ public class JudgementChain extends MultipleChargeAbility {
 
 			@Override
 			public void run() {
-				mCosmetic.chain(mPlayer, mTarget, mT);
-
-				if (mPlayer.isDead() || mTarget.isDead() || !mTarget.isValid() || mPlayer.getLocation().distance(mTarget.getLocation()) > 30 || mT > mChainDuration) {
+				if (mPlayer.isDead() || mTarget.isDead() || !mTarget.isValid() || !mPlayer.getWorld().equals(mTarget.getWorld()) || mPlayer.getLocation().distance(mTarget.getLocation()) > 30 || mT > mChainDuration) {
 					mCosmetic.onBreakChain(mPlayer, mTarget);
 					mPlugin.mEffectManager.clearEffects(entity, EFFECT_NAME);
 					this.cancel();
+					return;
 				}
+				mCosmetic.chain(mPlayer, mTarget, mT);
 				mT++;
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
