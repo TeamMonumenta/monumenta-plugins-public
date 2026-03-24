@@ -271,8 +271,12 @@ public class SpellCascadingHex extends Spell {
 			@Override
 			public synchronized void cancel() throws IllegalStateException {
 				super.cancel();
-				mCascadeDisplay.remove();
-				mTextDisplay.remove();
+				if (mCascadeDisplay.isValid()) {
+					mCascadeDisplay.remove();
+				}
+				if (mTextDisplay.isValid()) {
+					mTextDisplay.remove();
+				}
 			}
 		};
 		runnable.runTaskTimer(mPlugin, 0, 1);
