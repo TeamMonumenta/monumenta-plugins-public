@@ -28,7 +28,7 @@ public class LichConquestBoss extends BossAbilityGroup {
 		mCenter = Lich.getLichSpawn();
 
 		Location loc = mBoss.getLocation().clone().add(0, 0, -23);
-		int playercount = Lich.playersInRange(loc, detectionRange, true).size();
+		int playercount = Math.max(1, Lich.playersInRange(loc, detectionRange, true).size());
 		double hpdel = 425;
 		double hp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.log(playercount)));
 		EntityUtils.setMaxHealthAndHealth(mBoss, hp);
