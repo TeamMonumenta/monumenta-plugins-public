@@ -143,6 +143,8 @@ public class SpellLucidRendSlash extends SpellSlashAttack {
 	}
 
 	public void removeSword() {
-		mSword.remove();
+		if (mSword.isValid()) {
+			mSword.remove();
+		}
 	}
 }
