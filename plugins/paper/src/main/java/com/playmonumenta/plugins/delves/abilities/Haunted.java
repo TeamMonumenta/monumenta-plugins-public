@@ -112,6 +112,15 @@ public class Haunted {
 					return;
 				}
 
+				if (!armorStand.getWorld().equals(p.getWorld())) {
+					armorStand.getEquipment().clear();
+					armorStand.setGlowing(false);
+					armorStand.remove();
+					applyModifiers(p);
+					this.cancel();
+					return;
+				}
+
 				Location sLoc = armorStand.getLocation();
 				double distanceSquared = armorStand.getLocation().distanceSquared(p.getLocation());
 
