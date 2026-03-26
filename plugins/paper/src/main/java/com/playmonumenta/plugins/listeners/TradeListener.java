@@ -3,15 +3,20 @@ package com.playmonumenta.plugins.listeners;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.playmonumenta.plugins.guis.CustomTradeGui;
+import com.playmonumenta.plugins.inventories.Wallet;
+import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.WalletUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
 import de.tr7zw.nbtapi.NBT;
@@ -29,16 +34,26 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.TradeSelectEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.MerchantRecipe;
@@ -46,6 +61,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Listens to ScriptedQuest's TradeWindowOpenEvent to dynamically change shown trades.
@@ -60,6 +76,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 public class TradeListener implements Listener {
 
 	private static final UUID NULL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+	public static final String VANILLA_WALLET_PERMISSION = "monumenta.vanilawallet";
 	private static final String DISREGARD_INFUSIONS = "DisregardInfusions";
 
 	// Ignore stat checks for trades between items in these sets
@@ -134,6 +151,92 @@ public class TradeListener implements Listener {
 			// Custom Trade GUI Enabled:
 			event.setCancelled(true);
 			new CustomTradeGui(player, event.getVillager(), event.getTitle(), trades).open();
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	public void tradeSelectEvent(TradeSelectEvent tradeSelectEvent) {
+		HumanEntity human = tradeSelectEvent.getWhoClicked();
+		if (!(human instanceof Player player)) {
+			return;
+		}
+		if (!player.hasPermission(VANILLA_WALLET_PERMISSION)) {
+			return;
+		}
+
+		// WALLET: 0: enabled, prioritize inventory. 1: disabled. 2: enabled, prioritize wallet.
+		final int walletOption = ScoreboardUtils.getScoreboardValue(player, CustomTradeGui.WALLET).orElse(0);
+		if (walletOption == 1) {
+			return;
+		}
+
+		InventoryView view = tradeSelectEvent.getView();
+		int index = tradeSelectEvent.getIndex();
+		MerchantRecipe recipe = tradeSelectEvent.getMerchant().getRecipe(index);
+		List<ItemStack> ingredients = recipe.getIngredients();
+
+		// Cancel event as early as possible
+		NmsUtils.getVersionAdapter().setSelectionHint(view, index);
+		tradeSelectEvent.setResult(Event.Result.DENY);
+
+		Inventory playerInventory = player.getInventory();
+		ItemStack[] playerInventoryContents = playerInventory.getStorageContents();
+		Wallet wallet = WalletManager.getWallet(player);
+		boolean isCreative = player.getGameMode() == GameMode.CREATIVE && player.hasPermission(CustomTradeGui.TRADE_FREE_PERMISSION);
+		if (isCreative) {
+			player.sendMessage(Component.text("Since you are in creative mode, this item is free.", NamedTextColor.LIGHT_PURPLE));
+			AuditListener.log(player.getName() + " used creative mode to purchase "
+				+ ItemUtils.getPlainNameIfExists(recipe.getResult()) + " for free from a trader.");
+		}
+
+		for (int slot = 0; slot < ingredients.size(); slot++) {
+			@Nullable
+			ItemStack requirement = ingredients.get(slot);
+			if (requirement == null || requirement.isEmpty()) {
+				continue;
+			}
+			@Nullable
+			ItemStack currentItem = view.getItem(slot);
+			// Prevents deletion of items in the slot
+			if (!ItemUtils.isNullOrAir(currentItem) && !requirement.isSimilar(currentItem)) {
+				com.playmonumenta.scriptedquests.utils.InventoryUtils.giveItems(player, List.of(currentItem), false);
+				ItemStack newItem = ItemStack.empty();
+				view.setItem(slot, newItem);
+				currentItem = newItem;
+			}
+			int currentAmount = currentItem == null ? 0 : currentItem.getAmount();
+			int numInInventory = InventoryUtils.numInInventory(playerInventoryContents, requirement);
+			long numInWallet = WalletManager.isCurrency(requirement) ? wallet.count(requirement) : 0;
+			if (isCreative) {
+				numInInventory = requirement.getAmount();
+				numInWallet = 0;
+			}
+			int addCount = Math.toIntExact(Math.min(numInInventory + numInWallet, requirement.getMaxStackSize())) - currentAmount;
+			if (addCount <= 0) {
+				continue;
+			}
+			requirement.setAmount(addCount);
+
+			WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(requirement, playerInventoryContents, wallet, walletOption != 0);
+			int inventoryDebt = debt.mInventoryDebt();
+			int walletDebt = debt.mWalletDebt();
+			if (!isCreative && !debt.mMeetsRequirement()) {
+				player.sendMessage("You don't have the required materials for this trade!");
+				continue;
+			}
+
+			// Remove from inventory and wallet:
+			if (!isCreative) {
+				if (inventoryDebt > 0) {
+					playerInventory.removeItem(requirement.asQuantity(inventoryDebt));
+				}
+				if (walletDebt > 0) {
+					player.playSound(player, Sound.ENTITY_SHULKER_OPEN, SoundCategory.NEUTRAL, 1.0f, 0.8f);
+					wallet.remove(player, requirement.asQuantity(walletDebt));
+				}
+				WalletUtils.notifyRemovalFromWallet(debt, player);
+			}
+			view.setItem(slot, requirement.asQuantity(currentAmount + addCount));
 		}
 	}
 

@@ -70,7 +70,7 @@ public class CustomTradeGui extends Gui {
 	public static final String SOUNDS = "peb_tradeGUI_sounds";
 	public static final String WALLET = "peb_tradeGUI_wallet";
 	public static final String PERMISSION = "monumenta.customtradegui";
-	private static final String TRADE_FREE_PERMISSION = "monumenta.freetrading";
+	public static final String TRADE_FREE_PERMISSION = "monumenta.freetrading";
 
 	// Options:
 	// Note: mPeb_tradeGUI_main & mPeb_tradeGUI_locked are also scoreboards, but not tested in here.

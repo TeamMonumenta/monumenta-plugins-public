@@ -19,6 +19,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Scoreboard;
@@ -216,4 +217,6 @@ public interface VersionAdapter {
 	double getJumpVelocity(LivingEntity entity);
 
 	void setNotOnGround(Entity entity);
+
+	void setSelectionHint(InventoryView view, int index);
 }

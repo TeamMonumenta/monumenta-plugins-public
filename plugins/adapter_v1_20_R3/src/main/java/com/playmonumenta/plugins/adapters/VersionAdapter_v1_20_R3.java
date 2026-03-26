@@ -76,6 +76,8 @@ import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Evoker;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
@@ -96,6 +98,7 @@ import org.bukkit.craftbukkit.v1_20_R3.entity.CraftParrot;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPiglin;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPiglinBrute;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R3.scoreboard.CraftScoreboard;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftNamespacedKey;
@@ -122,6 +125,7 @@ import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.memory.MemoryKey;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
@@ -1068,5 +1072,13 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 	@Override
 	public void setNotOnGround(Entity entity) {
 		((CraftEntity) entity).getHandle().setOnGround(false);
+	}
+
+	@Override
+	public void setSelectionHint(InventoryView view, int index) {
+		AbstractContainerMenu containerMenu = ((CraftInventoryView) view).getHandle();
+		if (containerMenu instanceof MerchantMenu merchantMenu) {
+			merchantMenu.setSelectionHint(index);
+		}
 	}
 }
