@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.spawners.types;
 
 import com.playmonumenta.plugins.particle.PPLine;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTTileEntity;
+import de.tr7zw.nbtapi.NBT;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,13 +22,7 @@ public class RallySpawner {
 			return 0;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(RALLY_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return item.getInteger(RALLY_ATTRIBUTE);
+		return NBT.get(spawnerItem, nbt -> nbt.hasTag(RALLY_ATTRIBUTE) ? nbt.getInteger(RALLY_ATTRIBUTE) : 0);
 	}
 
 	public static int getRally(Block spawnerBlock) {
@@ -38,13 +30,7 @@ public class RallySpawner {
 			return 0;
 		}
 
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(RALLY_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return dataContainer.getInteger(RALLY_ATTRIBUTE);
+		return NBT.getPersistentData(spawnerBlock.getState(), nbt -> nbt.hasTag(RALLY_ATTRIBUTE) ? nbt.getInteger(RALLY_ATTRIBUTE) : 0);
 	}
 
 	public static void setRally(ItemStack spawnerItem, int rally) {
@@ -52,9 +38,9 @@ public class RallySpawner {
 			return;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setInteger(RALLY_ATTRIBUTE, rally);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
+		NBT.modify(spawnerItem, nbt -> {
+			nbt.setInteger(RALLY_ATTRIBUTE, rally);
+		});
 	}
 
 	public static void setRally(Block spawnerBlock, int rally) {
@@ -62,8 +48,9 @@ public class RallySpawner {
 			return;
 		}
 
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setInteger(RALLY_ATTRIBUTE, rally);
+		NBT.modifyPersistentData(spawnerBlock.getState(), nbt -> {
+			nbt.setInteger(RALLY_ATTRIBUTE, rally);
+		});
 	}
 
 	public static void triggerRallyEffect(Block spawnerBlock, int rally) {

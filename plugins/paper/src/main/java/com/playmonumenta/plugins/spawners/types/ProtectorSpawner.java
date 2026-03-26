@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.spawners.types;
 
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTTileEntity;
+import de.tr7zw.nbtapi.NBT;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
@@ -15,13 +13,7 @@ public class ProtectorSpawner {
 			return false;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(PROTECTOR_ATTRIBUTE)) {
-			return false;
-		}
-
-		return item.getBoolean(PROTECTOR_ATTRIBUTE);
+		return NBT.get(spawnerItem, nbt -> nbt.hasTag(PROTECTOR_ATTRIBUTE) && nbt.getBoolean(PROTECTOR_ATTRIBUTE));
 	}
 
 	public static boolean getProtector(Block spawnerBlock) {
@@ -29,13 +21,7 @@ public class ProtectorSpawner {
 			return false;
 		}
 
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(PROTECTOR_ATTRIBUTE)) {
-			return false;
-		}
-
-		return dataContainer.getBoolean(PROTECTOR_ATTRIBUTE);
+		return NBT.getPersistentData(spawnerBlock.getState(), nbt -> nbt.hasTag(PROTECTOR_ATTRIBUTE) && nbt.getBoolean(PROTECTOR_ATTRIBUTE));
 	}
 
 	public static void setProtector(ItemStack spawnerItem, boolean protector) {
@@ -43,9 +29,9 @@ public class ProtectorSpawner {
 			return;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setBoolean(PROTECTOR_ATTRIBUTE, protector);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
+		NBT.modify(spawnerItem, nbt -> {
+			nbt.setBoolean(PROTECTOR_ATTRIBUTE, protector);
+		});
 	}
 
 	public static void setProtector(Block spawnerBlock, boolean protector) {
@@ -53,7 +39,8 @@ public class ProtectorSpawner {
 			return;
 		}
 
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setBoolean(PROTECTOR_ATTRIBUTE, protector);
+		NBT.modifyPersistentData(spawnerBlock.getState(), nbt -> {
+			nbt.setBoolean(PROTECTOR_ATTRIBUTE, protector);
+		});
 	}
 }

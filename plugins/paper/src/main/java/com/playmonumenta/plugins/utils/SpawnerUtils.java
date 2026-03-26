@@ -16,12 +16,9 @@ import com.playmonumenta.plugins.spawners.SpawnerActionManager;
 import com.playmonumenta.plugins.spawners.SpawnerBreakAction;
 import com.playmonumenta.plugins.spawners.actions.CustomFunctionAction;
 import com.playmonumenta.plugins.spawners.types.ProtectorSpawner;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTCompoundList;
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTTileEntity;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableItemNBT;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
 import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
@@ -36,6 +33,8 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.stream.StreamSupport;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
@@ -356,8 +355,10 @@ public class SpawnerUtils {
 			return Collections.emptyList();
 		}
 
-		return new NBTItem(spawnerItem).getCompoundList(BREAK_ACTIONS_ATTRIBUTE)
-			.stream().map(compound -> compound.getString("identifier")).toList();
+		return NBT.get(spawnerItem, nbt -> {
+			return StreamSupport.stream(nbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE).spliterator(), false)
+				.map(compound -> compound.getString("identifier")).toList();
+		});
 	}
 
 	public static List<String> getBreakActionIdentifiers(Block spawnerBlock) {
@@ -365,8 +366,10 @@ public class SpawnerUtils {
 			return Collections.emptyList();
 		}
 
-		return new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE)
-			.stream().map(compound -> compound.getString("identifier")).toList();
+		return NBT.getPersistentData(spawnerBlock.getState(), nbt -> {
+			return StreamSupport.stream(nbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE).spliterator(), false)
+				.map(compound -> compound.getString("identifier")).toList();
+		});
 	}
 
 	public static void transferBreakActionList(ItemStack spawnerItem, Block spawnerBlock) {
@@ -374,11 +377,13 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		NBTCompoundList itemBreakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		NBTCompoundList tileBreakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		itemBreakActions.forEach(tileBreakActions::addCompound);
+		NBT.get(spawnerItem, (Consumer<ReadableItemNBT>) itemNbt -> {
+			var itemBreakActions = itemNbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
+			NBT.modifyPersistentData(spawnerBlock.getState(), tileNbt -> {
+				var tileBreakActions = tileNbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
+				itemBreakActions.forEach(action -> tileBreakActions.addCompound().mergeCompound(action));
+			});
+		});
 	}
 
 	public static void addBreakAction(ItemStack spawnerItem, String actionIdentifier) {
@@ -386,19 +391,17 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.isEmpty()) {
-			// Create a new container for the action, add the identifier,
-			// and add the compound containing the parameters and their default values.
-			NBTContainer container = new NBTContainer();
-			container.setString("identifier", actionIdentifier);
-			NBTCompound parameters = container.addCompound("parameters");
-			addParametersToCompound(SpawnerActionManager.getActionParameters(actionIdentifier), parameters);
-			breakActions.addCompound(container);
-			spawnerItem.setItemMeta(item.getItem().getItemMeta());
-		}
+		NBT.modify(spawnerItem, nbt -> {
+			var breakActions = nbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
+			List<ReadWriteNBT> wantedAction = StreamSupport.stream(breakActions.spliterator(), false).filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+			if (wantedAction.isEmpty()) {
+				ReadWriteNBT container = NBT.createNBTObject();
+				container.setString("identifier", actionIdentifier);
+				ReadWriteNBT parameters = container.getOrCreateCompound("parameters");
+				addParametersToCompound(SpawnerActionManager.getActionParameters(actionIdentifier), parameters);
+				breakActions.addCompound().mergeCompound(container);
+			}
+		});
 	}
 
 	public static void addBreakAction(Block spawnerBlock, String actionIdentifier) {
@@ -406,18 +409,17 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (wantedAction.isEmpty()) {
-			// Create a new container for the action, add the identifier,
-			// and add the compound containing the parameters and their default values.
-			NBTContainer container = new NBTContainer();
-			container.setString("identifier", actionIdentifier);
-			NBTCompound parameters = container.addCompound("parameters");
-			addParametersToCompound(SpawnerActionManager.getActionParameters(actionIdentifier), parameters);
-			breakActions.addCompound(container);
-		}
+		NBT.modifyPersistentData(spawnerBlock.getState(), nbt -> {
+			var breakActions = nbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
+			List<ReadWriteNBT> wantedAction = StreamSupport.stream(breakActions.spliterator(), false).filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+			if (wantedAction.isEmpty()) {
+				ReadWriteNBT container = NBT.createNBTObject();
+				container.setString("identifier", actionIdentifier);
+				ReadWriteNBT parameters = container.getOrCreateCompound("parameters");
+				addParametersToCompound(SpawnerActionManager.getActionParameters(actionIdentifier), parameters);
+				breakActions.addCompound().mergeCompound(container);
+			}
+		});
 	}
 
 	public static void addBreakActions(ItemStack spawnerItem, List<String> actionIdentifiers) {
@@ -428,7 +430,7 @@ public class SpawnerUtils {
 		actionIdentifiers.forEach(actionIdentifier -> addBreakAction(spawnerBlock, actionIdentifier));
 	}
 
-	public static void addParametersToCompound(Map<String, Object> parameters, NBTCompound compound) {
+	public static void addParametersToCompound(Map<String, Object> parameters, ReadWriteNBT compound) {
 		parameters.forEach((k, v) -> compound.setString(k, GSON.toJson(v)));
 	}
 
@@ -437,14 +439,10 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (!wantedAction.isEmpty()) {
-			// Remove the action
-			breakActions.remove(wantedAction.get(0));
-			spawnerItem.setItemMeta(item.getItem().getItemMeta());
-		}
+		NBT.modify(spawnerItem, nbt -> {
+			nbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE)
+				.removeIf(action -> action.getString("identifier").equals(actionIdentifier));
+		});
 	}
 
 	public static void setParameterValue(ItemStack spawnerItem, String actionIdentifier, String parameterName, Object value) {
@@ -452,17 +450,15 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		// Try to find the requested action
-		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (!wantedAction.isEmpty()) {
-			// Set the requested parameter
-			ReadWriteNBT actionCompound = wantedAction.get(0);
-			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
-			parameters.setString(parameterName, MessagingUtils.GSON.toJson(value, value.getClass()));
-			spawnerItem.setItemMeta(item.getItem().getItemMeta());
-		}
+		NBT.modify(spawnerItem, nbt -> {
+			var breakActions = nbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
+			List<ReadWriteNBT> wantedAction = StreamSupport.stream(breakActions.spliterator(), false).filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+			if (!wantedAction.isEmpty()) {
+				ReadWriteNBT actionCompound = wantedAction.get(0);
+				ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
+				parameters.setString(parameterName, MessagingUtils.GSON.toJson(value, value.getClass()));
+			}
+		});
 	}
 
 	public static void setParameterValue(Block spawnerBlock, String actionIdentifier, String parameterName, Object value) {
@@ -470,16 +466,15 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		// Try to find the requested action
-		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (!wantedAction.isEmpty()) {
-			// Set the requested parameter
-			ReadWriteNBT actionCompound = wantedAction.get(0);
-			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
-			parameters.setString(parameterName, MessagingUtils.GSON.toJson(value, value.getClass()));
-		}
+		NBT.modifyPersistentData(spawnerBlock.getState(), nbt -> {
+			var breakActions = nbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
+			List<ReadWriteNBT> wantedAction = StreamSupport.stream(breakActions.spliterator(), false).filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+			if (!wantedAction.isEmpty()) {
+				ReadWriteNBT actionCompound = wantedAction.get(0);
+				ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
+				parameters.setString(parameterName, MessagingUtils.GSON.toJson(value, value.getClass()));
+			}
+		});
 	}
 
 	public static @Nullable Object getParameterValue(ItemStack spawnerItem, String actionIdentifier, String parameterName) {
@@ -487,28 +482,26 @@ public class SpawnerUtils {
 			return null;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		// Try to find the requested action
-		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (!wantedAction.isEmpty()) {
-			// Try to find the requested parameter
-			ReadWriteNBT actionCompound = wantedAction.get(0);
-			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
-			if (parameters.hasTag(parameterName)) {
-				String json = parameters.getOrNull(parameterName, String.class);
-				if (json == null) {
-					return null;
+		return NBT.get(spawnerItem, nbt -> {
+			var breakActions = nbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
+			List<ReadWriteNBT> wantedAction = StreamSupport.stream(breakActions.spliterator(), false).filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+			if (!wantedAction.isEmpty()) {
+				ReadWriteNBT actionCompound = wantedAction.get(0);
+				ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
+				if (parameters.hasTag(parameterName)) {
+					String json = parameters.getOrNull(parameterName, String.class);
+					if (json == null) {
+						return null;
+					}
+					Object parameter = SpawnerActionManager.getActionParameters(actionIdentifier).get(parameterName);
+					if (parameter == null) {
+						return null;
+					}
+					return MessagingUtils.GSON.fromJson(json, parameter.getClass());
 				}
-				Object parameter = SpawnerActionManager.getActionParameters(actionIdentifier).get(parameterName);
-				if (parameter == null) {
-					return null;
-				}
-				return MessagingUtils.GSON.fromJson(json, parameter.getClass());
 			}
-		}
-
-		return null;
+			return null;
+		});
 	}
 
 	public static @Nullable Object getParameterValue(Block spawnerBlock, String actionIdentifier, String parameterName) {
@@ -516,28 +509,26 @@ public class SpawnerUtils {
 			return null;
 		}
 
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		// Try to find the requested action
-		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (!wantedAction.isEmpty()) {
-			// Try to find the requested parameter
-			ReadWriteNBT actionCompound = wantedAction.get(0);
-			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
-			if (parameters.hasTag(parameterName)) {
-				String json = parameters.getOrNull(parameterName, String.class);
-				if (json == null) {
-					return null;
+		return NBT.getPersistentData(spawnerBlock.getState(), nbt -> {
+			var breakActions = nbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
+			List<ReadWriteNBT> wantedAction = StreamSupport.stream(breakActions.spliterator(), false).filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+			if (!wantedAction.isEmpty()) {
+				ReadWriteNBT actionCompound = wantedAction.get(0);
+				ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
+				if (parameters.hasTag(parameterName)) {
+					String json = parameters.getOrNull(parameterName, String.class);
+					if (json == null) {
+						return null;
+					}
+					Object parameter = SpawnerActionManager.getActionParameters(actionIdentifier).get(parameterName);
+					if (parameter == null) {
+						return null;
+					}
+					return MessagingUtils.GSON.fromJson(json, parameter.getClass());
 				}
-				Object parameter = SpawnerActionManager.getActionParameters(actionIdentifier).get(parameterName);
-				if (parameter == null) {
-					return null;
-				}
-				return MessagingUtils.GSON.fromJson(json, parameter.getClass());
 			}
-		}
-
-		return null;
+			return null;
+		});
 	}
 
 	public static Map<String, Object> getStoredParameters(Block spawnerBlock, String actionIdentifier) {
@@ -545,27 +536,24 @@ public class SpawnerUtils {
 			return new HashMap<>();
 		}
 
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
-		if (!wantedAction.isEmpty()) {
-			HashMap<String, Object> parameterMap = new HashMap<>(SpawnerActionManager.getActionParameters(actionIdentifier));
-			ReadWriteNBT actionCompound = wantedAction.get(0);
-			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
-			// Start from base parameters map and replace the values with the ones stored on the block.
-			parameterMap.forEach((key, value) -> {
-				String json = parameters.getOrNull(key, String.class);
-				if (json == null) {
-					return;
-				}
-
-				parameterMap.replace(key, MessagingUtils.GSON.fromJson(json, value.getClass()));
-			});
-
-			return parameterMap;
-		}
-
-		return new HashMap<>();
+		return NBT.getPersistentData(spawnerBlock.getState(), nbt -> {
+			var breakActions = nbt.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
+			List<ReadWriteNBT> wantedAction = StreamSupport.stream(breakActions.spliterator(), false).filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+			if (!wantedAction.isEmpty()) {
+				HashMap<String, Object> parameterMap = new HashMap<>(SpawnerActionManager.getActionParameters(actionIdentifier));
+				ReadWriteNBT actionCompound = wantedAction.get(0);
+				ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
+				parameterMap.forEach((key, value) -> {
+					String json = parameters.getOrNull(key, String.class);
+					if (json == null) {
+						return;
+					}
+					parameterMap.replace(key, MessagingUtils.GSON.fromJson(json, value.getClass()));
+				});
+				return parameterMap;
+			}
+			return new HashMap<>();
+		});
 	}
 
 	public static @Nullable String getLosPool(ItemStack spawnerItem) {
@@ -573,8 +561,9 @@ public class SpawnerUtils {
 			return null;
 		}
 
-		String losPool = new NBTItem(spawnerItem).getString(LOS_POOL_ATTRIBUTE);
-
+		String losPool = NBT.get(spawnerItem, nbt -> {
+			return nbt.getString(LOS_POOL_ATTRIBUTE);
+		});
 		return losPool.equals("") ? null : losPool;
 	}
 
@@ -583,8 +572,7 @@ public class SpawnerUtils {
 			return null;
 		}
 
-		String losPool = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer().getString(LOS_POOL_ATTRIBUTE);
-
+		String losPool = NBT.getPersistentData(spawnerBlock.getState(), nbt -> nbt.getString(LOS_POOL_ATTRIBUTE));
 		return losPool.equals("") ? null : losPool;
 	}
 
@@ -593,9 +581,9 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setString(LOS_POOL_ATTRIBUTE, losPool);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
+		NBT.modify(spawnerItem, nbt -> {
+			nbt.setString(LOS_POOL_ATTRIBUTE, losPool);
+		});
 	}
 
 	public static void setLosPool(Block spawnerBlock, String losPool) {
@@ -603,8 +591,9 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setString(LOS_POOL_ATTRIBUTE, losPool);
+		NBT.modifyPersistentData(spawnerBlock.getState(), nbt -> {
+			nbt.setString(LOS_POOL_ATTRIBUTE, losPool);
+		});
 	}
 
 	public static boolean hasShieldsAttribute(Block spawnerBlock) {
@@ -612,7 +601,7 @@ public class SpawnerUtils {
 			return false;
 		}
 
-		return new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer().getKeys().contains(SHIELDS_ATTRIBUTE);
+		return NBT.getPersistentData(spawnerBlock.getState(), nbt -> nbt.getKeys().contains(SHIELDS_ATTRIBUTE));
 	}
 
 	public static int getShields(ItemStack spawnerItem) {
@@ -620,13 +609,7 @@ public class SpawnerUtils {
 			return 0;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(SHIELDS_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return item.getInteger(SHIELDS_ATTRIBUTE);
+		return NBT.get(spawnerItem, nbt -> nbt.hasTag(SHIELDS_ATTRIBUTE) ? nbt.getInteger(SHIELDS_ATTRIBUTE) : 0);
 	}
 
 	public static int getShields(Block spawnerBlock) {
@@ -634,13 +617,7 @@ public class SpawnerUtils {
 			return 0;
 		}
 
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(SHIELDS_ATTRIBUTE)) {
-			return 0;
-		}
-
-		return dataContainer.getInteger(SHIELDS_ATTRIBUTE);
+		return NBT.getPersistentData(spawnerBlock.getState(), nbt -> nbt.hasTag(SHIELDS_ATTRIBUTE) ? nbt.getInteger(SHIELDS_ATTRIBUTE) : 0);
 	}
 
 	public static void setShields(ItemStack spawnerItem, int shields) {
@@ -648,9 +625,9 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setInteger(SHIELDS_ATTRIBUTE, shields);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
+		NBT.modify(spawnerItem, nbt -> {
+			nbt.setInteger(SHIELDS_ATTRIBUTE, shields);
+		});
 	}
 
 	public static void setShields(Block spawnerBlock, int shields) {
@@ -658,8 +635,9 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setInteger(SHIELDS_ATTRIBUTE, shields);
+		NBT.modifyPersistentData(spawnerBlock.getState(), nbt -> {
+			nbt.setInteger(SHIELDS_ATTRIBUTE, shields);
+		});
 	}
 
 	public static void unsetCustomFunction(ItemStack spawnerItem) {
@@ -671,9 +649,9 @@ public class SpawnerUtils {
 		removeBreakAction(spawnerItem, CustomFunctionAction.IDENTIFIER);
 		if (shouldClearBreakActionsNBT) {
 			//clear it so it doesn't spawn particles when breaking the spawner.
-			NBTItem item = new NBTItem(spawnerItem);
-			item.removeKey(BREAK_ACTIONS_ATTRIBUTE);
-			spawnerItem.setItemMeta(item.getItem().getItemMeta());
+			NBT.modify(spawnerItem, nbt -> {
+				nbt.removeKey(BREAK_ACTIONS_ATTRIBUTE);
+			});
 		}
 	}
 
@@ -893,13 +871,7 @@ public class SpawnerUtils {
 			return 0;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-
-		if (!item.hasTag(attribute)) {
-			return 0;
-		}
-
-		return item.getInteger(attribute);
+		return NBT.get(spawnerItem, nbt -> nbt.hasTag(attribute) ? nbt.getInteger(attribute) : 0);
 	}
 
 	public static int getSpawnerType(Block spawnerBlock, String attribute) {
@@ -907,13 +879,7 @@ public class SpawnerUtils {
 			return 0;
 		}
 
-		NBTCompound dataContainer = new NBTTileEntity(spawnerBlock.getState()).getPersistentDataContainer();
-
-		if (!dataContainer.hasTag(attribute)) {
-			return 0;
-		}
-
-		return dataContainer.getInteger(attribute);
+		return NBT.getPersistentData(spawnerBlock.getState(), nbt -> nbt.hasTag(attribute) ? nbt.getInteger(attribute) : 0);
 	}
 
 	public static void setSpawnerType(ItemStack spawnerItem, String attribute, int attribute1) {
@@ -921,9 +887,9 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTItem item = new NBTItem(spawnerItem);
-		item.setInteger(attribute, attribute1);
-		spawnerItem.setItemMeta(item.getItem().getItemMeta());
+		NBT.modify(spawnerItem, nbt -> {
+			nbt.setInteger(attribute, attribute1);
+		});
 	}
 
 	public static void setSpawnerType(Block spawnerBlock, String attribute, int attribute1) {
@@ -931,8 +897,9 @@ public class SpawnerUtils {
 			return;
 		}
 
-		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
-		tileEntity.getPersistentDataContainer().setInteger(attribute, attribute1);
+		NBT.modifyPersistentData(spawnerBlock.getState(), nbt -> {
+			nbt.setInteger(attribute, attribute1);
+		});
 	}
 
 	public static void startEnsnarementCheck(Block block) {

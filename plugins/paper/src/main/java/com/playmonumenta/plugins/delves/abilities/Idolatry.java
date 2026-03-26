@@ -3,8 +3,7 @@ package com.playmonumenta.plugins.delves.abilities;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTTileEntity;
+import de.tr7zw.nbtapi.NBT;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -37,11 +36,12 @@ public class Idolatry {
 	private static final String IDOLATRY_CHECK = "IdolatryCheck";
 
 	public static void applyModifiers(CreatureSpawner spawner, Entity spawnEntity, int level) {
-		NBTCompound persistentDataContainer = new NBTTileEntity(spawner).getPersistentDataContainer();
-		if (persistentDataContainer.hasTag(IDOLATRY_CHECK)) {
+		if (NBT.getPersistentData(spawner, nbt -> nbt.hasTag(IDOLATRY_CHECK))) {
 			return;
 		}
-		persistentDataContainer.setBoolean(IDOLATRY_CHECK, true);
+		NBT.modifyPersistentData(spawner, nbt -> {
+			nbt.setBoolean(IDOLATRY_CHECK, true);
+		});
 		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level) {
 			Location spawningLoc = spawnEntity.getLocation().clone();
 			// don't spawn directly in the mob, and try 20 times to find an open spot
