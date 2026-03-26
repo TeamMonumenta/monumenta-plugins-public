@@ -303,8 +303,16 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 						if (new Hitbox.SphereHitbox(allayLoc, range - 2).getBoundingBox().overlaps(mTarget.getBoundingBox())) {
 							if (mMode == VirtueMode.ACTIVE_COMBAT) {
 								mBoss.attack(mTarget);
+								if (mBoss == null) {
+									this.cancel();
+									return;
+								}
 							} else if (mMode == VirtueMode.ACTIVE_SUPPORT && mTarget instanceof Player player && playerVirtueMap.get(mBoss) == player) {
 								mHeals += keeperVirtueBoss.healPlayer(player);
+								if (mBoss == null) {
+									this.cancel();
+									return;
+								}
 								if (player.getHealth() >= EntityUtils.getMaxHealth(player) * mHealUpperThreshold && (mHeals >= mMinimumHeals || player.getHealth() >= EntityUtils.getMaxHealth(player))) {
 									mBoss.setTarget(null);
 									mTarget = null;
