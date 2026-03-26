@@ -136,6 +136,11 @@ public class TradeListener implements Listener {
 			// Only handle the consideration of dyes/infusions if the trader does NOT have this tag
 			// Use case examples: Halid for Soulsinger, Record-Keeper for SKR Scrolls
 			if (event.getVillager() != null && !event.getVillager().getScoreboardTags().contains(DISREGARD_INFUSIONS)) {
+				if (handleSpecialLoreTrades(player, trades, trade, recipe, i)) {
+					// Update values if the trades contain special lore items, as these trades are replaced
+					trade = trades.get(i);
+					recipe = trade.getRecipe();
+				}
 				handleReskinTrades(player, trades, trade, recipe);
 				handleDyedTrades(player, trades, trade, recipe);
 				handleSoulboundTradess(player, trade, recipe);
@@ -152,6 +157,43 @@ public class TradeListener implements Listener {
 			event.setCancelled(true);
 			new CustomTradeGui(player, event.getVillager(), event.getTitle(), trades).open();
 		}
+	}
+
+	private static boolean handleSpecialLoreTrades(Player player, List<TradeWindowOpenEvent.Trade> trades, TradeWindowOpenEvent.Trade trade, MerchantRecipe recipe, int originalIndex) {
+		// List for keeping track of trades to check for duplicate stacks of an item, to avoid creating more than needed
+		List<ItemStack> createdTrades = new ArrayList<>();
+		for (int slot = 0; slot < recipe.getIngredients().size(); slot++) {
+			// Check if the trade contains an item with "special lore"
+			ItemStack source = recipe.getIngredients().get(slot);
+			ItemStack result = recipe.getResult();
+			if (!InventoryUtils.containsSpecialLore(source)) {
+				continue;
+			}
+			// If it is, check to see if the player has these items WITH a world assigned to them
+			for (ItemStack playerItem : player.getInventory().getContents()) {
+				if (playerItem == null
+					|| playerItem.getType() == Material.AIR
+					|| playerItem.isSimilar(source)
+					|| createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))
+					|| !ItemStatUtils.hasAssignedWorld(playerItem)) {
+					continue;
+				}
+				// If they have the item with an assigned world, edit the existing trade with that version of the item.
+				ItemStack newSource = ItemUtils.clone(playerItem);
+				newSource.setAmount(source.getAmount()); // same amount as what the source requires
+				MerchantRecipe newRecipe = new MerchantRecipe(result, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(),
+					recipe.getVillagerExperience(), recipe.getPriceMultiplier(), recipe.shouldIgnoreDiscounts());
+				List<ItemStack> newIngredients = new ArrayList<>(recipe.getIngredients());
+				newIngredients.set(slot, newSource);
+				newRecipe.setIngredients(newIngredients);
+				TradeWindowOpenEvent.Trade newTrade = new TradeWindowOpenEvent.Trade(trade);
+				newTrade.setRecipe(newRecipe);
+				trades.set(originalIndex, newTrade);
+				createdTrades.add(playerItem);
+			}
+		}
+		// true/false check to see if trades need to be updated for additional trade replacement checks
+		return !createdTrades.isEmpty();
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
