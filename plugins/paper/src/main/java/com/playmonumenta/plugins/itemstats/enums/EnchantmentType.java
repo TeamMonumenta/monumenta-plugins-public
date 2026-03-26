@@ -166,6 +166,7 @@ public enum EnchantmentType {
 	AILMENT_FRAGILITY(new AilmentFragility(), true, true, false, false),
 	CUMBERSOME(new Cumbersome(), false, true, false, false),
 	OVERSIZED(new Oversized(), false, true, false, false),
+	CURSE_OF_KNOWLEDGE(new CurseOfKnowledge(), false, true, false, false),
 	CURSE_OF_PESTILENCE(new CurseOfPestilence(), true, true, false, false),
 
 	// Cosmetic Item Enchants
