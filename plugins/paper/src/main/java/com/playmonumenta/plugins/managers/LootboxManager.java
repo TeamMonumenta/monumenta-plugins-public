@@ -15,11 +15,8 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import de.jeff_media.chestsort.api.ChestSortAPI;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTCompoundList;
-import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTListCompound;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -258,17 +255,16 @@ public class LootboxManager implements Listener {
 	 * @param items   - the list of items that are in the share
 	 */
 	public static void createLootshare(Player player, ItemStack lootbox, List<ItemStack> items) {
-		NBTItem nbt = new NBTItem(lootbox);
-		NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
-		NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-		NBTCompound lootboxKey = playerModified.addCompound(LOOTBOX_KEY);
-		NBTCompound index = lootboxKey.addCompound(LOOTBOX_INDEX_KEY);
-		NBTCompoundList shares = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
+		NBT.modify(lootbox, nbt -> {
+			ReadWriteNBT monumenta = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY);
+			ReadWriteNBT playerModified = monumenta.getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+			ReadWriteNBT lootboxKey = playerModified.getOrCreateCompound(LOOTBOX_KEY);
+			ReadWriteNBT index = lootboxKey.getOrCreateCompound(LOOTBOX_INDEX_KEY);
+			ReadWriteNBTCompoundList shares = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
 
-		// create a new share
-		createLootshareData(index, shares, items);
-		// Refresh the lootbox item
-		lootbox.setItemMeta(nbt.getItem().getItemMeta());
+			// create a new share
+			createLootshareData(index, shares, items);
+		});
 	}
 
 	/**
@@ -280,24 +276,23 @@ public class LootboxManager implements Listener {
 	 * @return - List of items in the lootshare
 	 */
 	public static @Nullable List<ItemStack> getLootshare(Player player, ItemStack lootbox, boolean remove) {
-		NBTItem nbt = new NBTItem(lootbox);
-		NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
-		NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-		NBTCompound lootboxKey = playerModified.addCompound(LOOTBOX_KEY);
-		NBTCompound index = lootboxKey.addCompound(LOOTBOX_INDEX_KEY);
-		NBTCompoundList shares = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
-		if (shares == null || shares.isEmpty()) {
-			return null;
-		}
+		return NBT.modify(lootbox, nbt -> {
+			ReadWriteNBT monumenta = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY);
+			ReadWriteNBT playerModified = monumenta.getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+			ReadWriteNBT lootboxKey = playerModified.getOrCreateCompound(LOOTBOX_KEY);
+			ReadWriteNBT index = lootboxKey.getOrCreateCompound(LOOTBOX_INDEX_KEY);
+			ReadWriteNBTCompoundList shares = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
+			if (shares == null || shares.isEmpty()) {
+				return null;
+			}
 
-		List<ItemStack> items = getLootshareData(index, shares, 1);
-		if (remove) {
-			removeLootshareData(index, shares, 1);
-		}
+			List<ItemStack> items = getLootshareData(index, shares, 1);
+			if (remove) {
+				removeLootshareData(index, shares, 1);
+			}
 
-		lootbox.setItemMeta(nbt.getItem().getItemMeta());
-
-		return items;
+			return items;
+		});
 	}
 
 	/**
@@ -307,19 +302,18 @@ public class LootboxManager implements Listener {
 	 * @param lootbox - the lootbox
 	 */
 	public void removeLootshare(Player player, ItemStack lootbox) {
-		NBTItem nbt = new NBTItem(lootbox);
-		NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
-		NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-		NBTCompound lootboxKey = playerModified.addCompound(LOOTBOX_KEY);
-		NBTCompound index = lootboxKey.addCompound(LOOTBOX_INDEX_KEY);
-		NBTCompoundList shares = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
-		if (shares == null || shares.isEmpty()) {
-			return;
-		}
+		NBT.modify(lootbox, nbt -> {
+			ReadWriteNBT monumenta = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY);
+			ReadWriteNBT playerModified = monumenta.getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+			ReadWriteNBT lootboxKey = playerModified.getOrCreateCompound(LOOTBOX_KEY);
+			ReadWriteNBT index = lootboxKey.getOrCreateCompound(LOOTBOX_INDEX_KEY);
+			ReadWriteNBTCompoundList shares = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
+			if (shares == null || shares.isEmpty()) {
+				return;
+			}
 
-		removeLootshareData(index, shares, 1);
-
-		lootbox.setItemMeta(nbt.getItem().getItemMeta());
+			removeLootshareData(index, shares, 1);
+		});
 	}
 
 	/**
@@ -329,14 +323,14 @@ public class LootboxManager implements Listener {
 	 * @param shares - all shares
 	 * @param items  - items to create a share with
 	 */
-	public static void createLootshareData(NBTCompound index, @Nullable NBTCompoundList shares, List<ItemStack> items) {
+	public static void createLootshareData(ReadWriteNBT index, @Nullable ReadWriteNBTCompoundList shares, List<ItemStack> items) {
 		if (shares == null) {
 			return;
 		}
 		Map<String, Integer> shareItems = new HashMap<>();
 		Map<String, Integer> indexAmountTotal = new HashMap<>();
 		// create a new share
-		NBTListCompound lootShare = shares.addCompound();
+		ReadWriteNBT lootShare = shares.addCompound();
 		// add all items to share
 		// this accounts for duplicate items
 		for (ItemStack item : items) {
@@ -345,8 +339,8 @@ public class LootboxManager implements Listener {
 				continue;
 			}
 			// create new item (or use existing item if there are duplicates)
-			NBTCompound itemData = getItemKey(index, item);
-			String key = itemData.getName();
+			String key = getUUIDFromItem(item.asOne());
+			ReadWriteNBT itemData = getItemKey(index, item, key);
 			int amount = item.getAmount();
 			// add share amount to map
 			int newShareAmount = Objects.requireNonNullElse(shareItems.get(key), 0) + amount;
@@ -379,7 +373,7 @@ public class LootboxManager implements Listener {
 	 * @param shares - all shares
 	 * @param count  - Number of shares to get
 	 */
-	public static @Nullable List<ItemStack> getLootshareData(NBTCompound index, @Nullable NBTCompoundList shares,
+	public static @Nullable List<ItemStack> getLootshareData(ReadWriteNBT index, @Nullable ReadWriteNBTCompoundList shares,
 	                                                         int count) {
 		if (shares == null || shares.isEmpty()) {
 			return null;
@@ -391,7 +385,7 @@ public class LootboxManager implements Listener {
 		// get the desired amount of lootshares out of this
 		for (int i = 0; i < count; i++) {
 			// grab the lootshare
-			NBTCompound lootShare = shares.get(i);
+			ReadWriteNBT lootShare = shares.get(i);
 
 			// no more lootshares
 			if (lootShare == null) {
@@ -401,7 +395,7 @@ public class LootboxManager implements Listener {
 			// loop through all items in share
 			Set<String> keys = lootShare.getKeys();
 			for (String key : keys) {
-				NBTCompound itemData = index.getCompound(key);
+				ReadWriteNBT itemData = index.getCompound(key);
 
 				// if the item doesn't exist in the lootbox anymore
 				if (itemData == null) {
@@ -436,7 +430,7 @@ public class LootboxManager implements Listener {
 	 * @param shares - all shares
 	 * @param count  - Number of shares to delete
 	 */
-	public static void removeLootshareData(NBTCompound index, @Nullable NBTCompoundList shares, int count) {
+	public static void removeLootshareData(ReadWriteNBT index, @Nullable ReadWriteNBTCompoundList shares, int count) {
 		if (shares == null || shares.isEmpty()) {
 			return;
 		}
@@ -467,7 +461,7 @@ public class LootboxManager implements Listener {
 			String key = entry.getKey();
 			Integer amount = entry.getValue();
 
-			NBTCompound itemData = index.getCompound(key);
+			ReadWriteNBT itemData = index.getCompound(key);
 			// if item doesn't exist, then our job is done!
 			if (itemData == null) {
 				continue;
@@ -491,30 +485,17 @@ public class LootboxManager implements Listener {
 	 * @param index - index of uuid to items & count
 	 * @param item  - the item to index/check for
 	 */
-	private static NBTCompound getItemKey(NBTCompound index, ItemStack item) {
+	private static ReadWriteNBT getItemKey(ReadWriteNBT index, ItemStack item, String itemKey) {
 		// check if the item exists already
-		String itemKey = getUUIDFromItem(item.asOne());
-		NBTCompound container = getItemKeyFromItem(index, itemKey);
-		if (container != null) {
-			return container;
+		ReadWriteNBT entry = index.getCompound(itemKey);
+		if (entry != null) {
+			return entry;
 		}
 		// otherwise create the item
-		return createItemKey(index, item.asOne(), itemKey);
-	}
-
-	private static @Nullable NBTCompound getItemKeyFromItem(NBTCompound index, String itemKey) {
-		if (index.hasTag(itemKey)) {
-			return index.getCompound(itemKey);
-		}
-		return null;
-	}
-
-	private static NBTCompound createItemKey(NBTCompound index, ItemStack copy, String uuid) {
-		// generate random uuid
-		NBTCompound newEntry = index.addCompound(uuid);
-		newEntry.setItemStack(LOOTSHARE_ITEM_KEY, copy);
-		newEntry.setInteger(LOOTSHARE_AMOUNT_KEY, 0);
-		return newEntry;
+		entry = index.getOrCreateCompound(itemKey);
+		entry.setItemStack(LOOTSHARE_ITEM_KEY, item.asOne());
+		entry.setInteger(LOOTSHARE_AMOUNT_KEY, 0);
+		return entry;
 	}
 
 	private static String getUUIDFromItem(ItemStack item) {
@@ -599,21 +580,22 @@ public class LootboxManager implements Listener {
 		if (!isLootbox(lootbox)) {
 			return;
 		}
-		NBTItem nbt = new NBTItem(lootbox);
-		NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
-		NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-		NBTCompound lootboxKey = playerModified.addCompound(LOOTBOX_KEY);
-		NBTCompoundList shares = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
-		int previousShares = lootboxKey.getInteger(LOOTBOX_TOTAL_SHARES_KEY);
+		int newShareCount = NBT.modify(lootbox, nbt -> {
+			ReadWriteNBT monumenta = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY);
+			ReadWriteNBT playerModified = monumenta.getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+			ReadWriteNBT lootboxKey = playerModified.getOrCreateCompound(LOOTBOX_KEY);
+			// getCompoundList() creates the list if it doesn't exist, does not return null
+			ReadWriteNBTCompoundList shares = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
+			int previousShares = lootboxKey.getInteger(LOOTBOX_TOTAL_SHARES_KEY);
 
-		if (shares != null && previousShares != shares.size()) {
-			lootboxKey.setInteger(LOOTBOX_TOTAL_SHARES_KEY, shares.size());
-			lootbox.setItemMeta(nbt.getItem().getItemMeta());
-			updateLootboxLore(lootbox, shares.size());
-		} else if ((shares == null || shares.isEmpty()) && previousShares != 0) {
-			lootboxKey.setInteger(LOOTBOX_TOTAL_SHARES_KEY, 0);
-			lootbox.setItemMeta(nbt.getItem().getItemMeta());
-			updateLootboxLore(lootbox, 0);
+			if (previousShares != shares.size()) {
+				lootboxKey.setInteger(LOOTBOX_TOTAL_SHARES_KEY, shares.size());
+				return shares.size();
+			}
+			return -1;
+		});
+		if (newShareCount >= 0) {
+			updateLootboxLore(lootbox, newShareCount);
 		}
 	}
 
@@ -652,19 +634,20 @@ public class LootboxManager implements Listener {
 			if (isLootbox(item)) {
 				updateOldLootbox(item);
 				foundLootBox = true;
-				NBTItem nbt = new NBTItem(item);
-				NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
-				NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-				NBTCompound lootboxKey = playerModified.addCompound(LOOTBOX_KEY);
-				NBTCompoundList items = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
-				if (items != null) {
-					int size = getLootboxMaxSize(item);
-					numAvailSpaces = size - items.size();
-					if (numAvailSpaces > 0) {
-						lootbox = item;
-					}
-					break;
+				int sharesSize = NBT.modify(item, nbt -> {
+					ReadWriteNBT monumenta = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY);
+					ReadWriteNBT playerModified = monumenta.getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+					ReadWriteNBT lootboxKey = playerModified.getOrCreateCompound(LOOTBOX_KEY);
+					// getCompoundList() creates the list if it doesn't exist, does not return null
+					ReadWriteNBTCompoundList shares = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
+					return shares.size();
+				});
+				int size = getLootboxMaxSize(item);
+				numAvailSpaces = size - sharesSize;
+				if (numAvailSpaces > 0) {
+					lootbox = item;
 				}
+				break;
 			}
 		}
 
@@ -696,25 +679,44 @@ public class LootboxManager implements Listener {
 	 * @return True if it was an old lootbox, false if not
 	 */
 	private static boolean updateOldLootbox(ItemStack lootbox) {
-		NBTItem nbt = new NBTItem(lootbox);
-		NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
-		NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-		NBTCompound lootboxKey = playerModified.addCompound(LOOTBOX_KEY);
-		if (lootboxKey.hasTag(LOOTBOX_INDEX_KEY) || lootboxKey.hasTag(LOOTBOX_SHARES_KEY)) {
-			return false;
-		}
-		NBTCompound index = lootboxKey.addCompound(LOOTBOX_INDEX_KEY);
-		NBTCompoundList shares = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
-		if (isEpicLootbox(lootbox)) {
-			NBTCompoundList items = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
-			if (items != null) {
-				for (ReadWriteNBT share : items) {
-					ItemStack lootShare = NBT.itemStackFromNBT(share);
-					if (lootShare == null) {
+		boolean updated = NBT.modify(lootbox, nbt -> {
+			ReadWriteNBT monumenta = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY);
+			ReadWriteNBT playerModified = monumenta.getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+			ReadWriteNBT lootboxKey = playerModified.getOrCreateCompound(LOOTBOX_KEY);
+			if (lootboxKey.hasTag(LOOTBOX_INDEX_KEY) || lootboxKey.hasTag(LOOTBOX_SHARES_KEY)) {
+				return false;
+			}
+			ReadWriteNBT index = lootboxKey.getOrCreateCompound(LOOTBOX_INDEX_KEY);
+			ReadWriteNBTCompoundList shares = lootboxKey.getCompoundList(LOOTBOX_SHARES_KEY);
+			if (isEpicLootbox(lootbox)) {
+				ReadWriteNBTCompoundList items = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
+				if (items != null) {
+					for (ReadWriteNBT share : items) {
+						ItemStack lootShare = NBT.itemStackFromNBT(share);
+						if (lootShare == null) {
+							continue;
+						}
+
+						if (lootShare.getItemMeta() instanceof BlockStateMeta shareBlockMeta
+							&& shareBlockMeta.getBlockState() instanceof Chest chestMeta) {
+							List<ItemStack> lootShareItems = Arrays.stream(chestMeta.getInventory().getContents())
+								.filter((item) -> item != null && !item.getType().isAir())
+								.collect(Collectors.toList());
+							// since we are working directly with nbt, use underlying function instead
+							createLootshareData(index, shares, lootShareItems);
+						}
+					}
+					playerModified.removeKey(ItemStatUtils.ITEMS_KEY);
+				}
+			} else if (lootbox.getItemMeta() instanceof BlockStateMeta blockMeta
+				&& blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta && !shulkerMeta.getInventory().isEmpty()) {
+				// Clear the lootbox's inventory
+				ItemStack[] items = shulkerMeta.getInventory().getContents();
+				for (@Nullable ItemStack share : items) {
+					if (share == null || !share.getType().equals(Material.CHEST)) {
 						continue;
 					}
-
-					if (lootShare.getItemMeta() instanceof BlockStateMeta shareBlockMeta
+					if (share.getItemMeta() instanceof BlockStateMeta shareBlockMeta
 						&& shareBlockMeta.getBlockState() instanceof Chest chestMeta) {
 						List<ItemStack> lootShareItems = Arrays.stream(chestMeta.getInventory().getContents())
 							.filter((item) -> item != null && !item.getType().isAir())
@@ -723,29 +725,12 @@ public class LootboxManager implements Listener {
 						createLootshareData(index, shares, lootShareItems);
 					}
 				}
-				playerModified.removeKey(ItemStatUtils.ITEMS_KEY);
 			}
-		} else if (lootbox.getItemMeta() instanceof BlockStateMeta blockMeta
-			&& blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta && !shulkerMeta.getInventory().isEmpty()) {
-			// Clear the lootbox's inventory
-			ItemStack[] items = shulkerMeta.getInventory().getContents();
-			for (@Nullable ItemStack share : items) {
-				if (share == null || !share.getType().equals(Material.CHEST)) {
-					continue;
-				}
-				if (share.getItemMeta() instanceof BlockStateMeta shareBlockMeta
-					&& shareBlockMeta.getBlockState() instanceof Chest chestMeta) {
-					List<ItemStack> lootShareItems = Arrays.stream(chestMeta.getInventory().getContents())
-						.filter((item) -> item != null && !item.getType().isAir())
-						.collect(Collectors.toList());
-					// since we are working directly with nbt, use underlying function instead
-					createLootshareData(index, shares, lootShareItems);
-				}
-			}
+			return true;
+		});
+		if (!updated) {
+			return false;
 		}
-
-		// update the lootbox data with nbt
-		lootbox.setItemMeta(nbt.getItem().getItemMeta());
 		// clear the shulker afterwards
 		if (lootbox.getItemMeta() instanceof BlockStateMeta blockMeta
 			&& blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
