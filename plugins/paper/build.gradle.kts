@@ -25,7 +25,7 @@ dependencies {
 	compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core:2.9.1")
 	compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit:2.9.1")
 	compileOnly("com.playmonumenta:scripted-quests:7.0:all")
-	compileOnly("com.playmonumenta:redissync:6.0.0:all")
+	compileOnly("com.playmonumenta:redissync:6.1.0:all")
 	compileOnly("com.playmonumenta:monumenta-network-chat:2.13")
 	compileOnly("com.playmonumenta:monumenta-network-relay:2.13")
 	compileOnly("com.playmonumenta:structures:10.2")
