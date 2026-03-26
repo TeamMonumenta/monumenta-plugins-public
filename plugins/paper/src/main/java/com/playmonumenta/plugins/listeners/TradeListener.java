@@ -76,7 +76,7 @@ import org.jetbrains.annotations.Nullable;
 public class TradeListener implements Listener {
 
 	private static final UUID NULL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
-	public static final String VANILLA_WALLET_PERMISSION = "monumenta.vanilawallet";
+	public static final String VANILLA_WALLET_PERMISSION = "monumenta.vanillawallet";
 	private static final String DISREGARD_INFUSIONS = "DisregardInfusions";
 
 	// Ignore stat checks for trades between items in these sets
