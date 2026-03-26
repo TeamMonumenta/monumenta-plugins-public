@@ -7,18 +7,14 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 
 public class PermafrostMark extends Effect {
 	public static final String effectID = "PermafrostMark";
 	private final int mIceTicks;
-	private final Player mPlayer;
 
-
-	public PermafrostMark(int iceTicks, int duration, Player player) {
+	public PermafrostMark(int iceTicks, int duration) {
 		super(duration, effectID);
 		mIceTicks = iceTicks;
-		mPlayer = player;
 	}
 
 	@Override
