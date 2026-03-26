@@ -2,11 +2,13 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellPhalanx;
+import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.entity.LivingEntity;
 
 public class PhalanxBoss extends BossAbilityGroup {
@@ -28,7 +30,7 @@ public class PhalanxBoss extends BossAbilityGroup {
 		@BossParam(help = "how many projectiles there will be")
 		public int PROJ_COUNT = 4;
 
-		@BossParam(help = "radius the phalanx is set off at")
+		@BossParam(help = "the minimum delay after spawning that the phalanxes can set off at")
 		public int PHALANX_DURATION_MIN = 40;
 
 		@BossParam(help = "phalanx expires after this time is passed")
@@ -57,6 +59,15 @@ public class PhalanxBoss extends BossAbilityGroup {
 
 		@BossParam(help = "not written")
 		public int DETECTION = 20;
+
+		@BossParam(help = "duration the targets shield will be disabled for if a phalanx is blocked")
+		public int SHIELD_STUN = 2 * 20;
+
+		@BossParam(help = "effects applied on hit")
+		public EffectsList EFFECTS = EffectsList.EMPTY;
+
+		@BossParam(help = "not written")
+		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.PROJECTILE;
 
 		@BossParam(help = "target of this spell")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT;
