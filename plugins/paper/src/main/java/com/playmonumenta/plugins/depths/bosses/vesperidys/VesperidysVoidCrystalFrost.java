@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
+import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.depths.bosses.spells.vesperidys.SpellVoidCrystalTeleportPassive;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -307,6 +308,9 @@ public class VesperidysVoidCrystalFrost extends BossAbilityGroup {
 									for (int y = -radius; y < radius; y++) {
 										Block blockRelative = block.getRelative(0, y, 0);
 										if (blockRelative.getType() != Material.BLUE_ICE && blockRelative.isSolid()) {
+											if (blockRelative.getRelative(BlockFace.UP).getType() == DepthsUtils.SNOW_MATERIAL) {
+												DepthsUtils.unfreezeGround(blockRelative.getRelative(BlockFace.UP).getLocation());
+											}
 											spawnIceTerrain(blockRelative);
 											newBlock = true;
 										}

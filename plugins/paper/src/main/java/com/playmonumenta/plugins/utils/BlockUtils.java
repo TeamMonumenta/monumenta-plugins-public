@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -23,6 +24,7 @@ import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Fence;
 import org.bukkit.block.data.type.Gate;
+import org.bukkit.block.data.type.Light;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.BlockInventoryHolder;
@@ -468,6 +470,15 @@ public class BlockUtils {
 		Material.YELLOW_SHULKER_BOX
 	);
 
+	public static final Set<Material> LIQUIDS = of(
+		Material.WATER,
+		Material.LAVA,
+		Material.SEAGRASS,
+		Material.TALL_SEAGRASS,
+		Material.KELP,
+		Material.KELP_PLANT
+	);
+
 	public static final Set<BlockFace> CARTESIAN_BLOCK_FACES = Arrays.stream(BlockFace.values()).filter(BlockFace::isCartesian).collect(Collectors.toSet());
 
 	public static final EnumSet<BlockFace> CARDINAL_BLOCK_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST);
@@ -494,6 +505,10 @@ public class BlockUtils {
 			return waterlogged.isWaterlogged();
 		}
 		return false;
+	}
+
+	public static boolean isLiquid(Block block) {
+		return LIQUIDS.contains(block.getType()) || (!block.isSolid() && isWaterlogged(block.getState()));
 	}
 
 	public static boolean isMechanicalBlock(Material material) {
@@ -796,5 +811,34 @@ public class BlockUtils {
 		}
 
 		return blocks;
+	}
+
+	public static void tryMoveLight(BlockState blockState) {
+
+		if (blockState.getType() != Material.LIGHT || !(blockState.getBlockData() instanceof Light light)) {
+			return;
+		}
+		if (light.getLevel() <= light.getMinimumLevel()) {
+			return;
+		}
+
+		Light lowerLight = (Light) Bukkit.createBlockData(Material.LIGHT);
+		lowerLight.setLevel(light.getLevel() - 1);
+		for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN}) {
+			Block relative = blockState.getBlock().getRelative(face);
+			if (!ZoneUtils.isMineable(relative.getLocation())) {
+				continue;
+			}
+			if (relative.getType() == Material.AIR) {
+				lowerLight.setWaterlogged(false);
+				relative.setBlockData(lowerLight, false);
+			} else if (relative.getType() == Material.WATER
+				&& relative.getBlockData() instanceof Levelled fluid
+				&& fluid.getLevel() == 0) { // 0 == full block of water
+				lowerLight.setWaterlogged(true);
+				relative.setBlockData(lowerLight, false);
+			}
+		}
+
 	}
 }

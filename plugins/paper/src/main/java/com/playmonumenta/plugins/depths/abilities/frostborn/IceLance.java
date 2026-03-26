@@ -93,7 +93,7 @@ public class IceLance extends DepthsAbility {
 				endLoc = checkLoc.clone();
 				break;
 			}
-			if ((checkLoc.getBlock().isSolid() && !DepthsUtils.isIce(checkLoc.getBlock().getType()))) {
+			if ((checkLoc.getBlock().isSolid() && !DepthsUtils.isFrozen(checkLoc.getBlock().getType()))) {
 				endLoc = checkLoc.clone();
 
 				// if we hit a solid (non ice block, also play particles too
@@ -132,7 +132,7 @@ public class IceLance extends DepthsAbility {
 				deathSpot.getRelative(0, 0, 2)
 			);
 			for (Block b : iceLocations) {
-				DepthsUtils.iceExposedBlock(b, mIceDuration, mPlayer);
+				DepthsUtils.freezeExposedBlock(b, mIceDuration);
 			}
 		}
 
@@ -181,7 +181,7 @@ public class IceLance extends DepthsAbility {
 			.addPercent(a -> a.mAmplifier, AMPLIFIER)
 			.add(" Slowness and Weaken for ")
 			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds. Mobs hit by the lance have ice created under them that lasts for ")
+			.add(" seconds. Mobs hit by the lance have snow created under them that lasts for ")
 			.addDuration(a -> a.mIceDuration, ICE_TICKS)
 			.add(" seconds. The lance can pass through ice blocks.")
 			.addCooldown(COOLDOWN);

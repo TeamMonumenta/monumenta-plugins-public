@@ -52,7 +52,7 @@ public class FrozenDomain extends DepthsAbility {
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		boolean isOnIce = DepthsUtils.isOnIce(mPlayer);
+		boolean isOnIce = DepthsUtils.isOnFrozenGround(mPlayer);
 		if (isOnIce) {
 			new PartialParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 4, 0, 0, 0, 0.65).spawnAsPlayerPassive(mPlayer);
 		}
@@ -106,7 +106,7 @@ public class FrozenDomain extends DepthsAbility {
 
 	private static Description<FrozenDomain> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<>(() -> INFO, color)
-			.add("When standing on ice, gain ")
+			.add("When standing on ice or snow, gain ")
 			.addPercent(a -> a.mSpeedPercent, SPEED_PERCENT[rarity - 1], false, true)
 			.add(" speed and heal ")
 			.addPercent(a -> a.mPercentHeal, PERCENT_HEAL)
@@ -114,7 +114,7 @@ public class FrozenDomain extends DepthsAbility {
 			.addDuration(a -> REGEN_INTERVAL[rarity - 1], REGEN_INTERVAL[rarity - 1], true, true)
 			.add("s. Effects last for ")
 			.addDuration(a -> a.mDuration, DURATION_TICKS)
-			.add(" seconds after leaving ice. Standing on ice also extinguishes you if you are on fire.");
+			.add(" seconds after leaving the frozen ground. Standing on ice or snow also extinguishes you if you are on fire.");
 	}
 }
 

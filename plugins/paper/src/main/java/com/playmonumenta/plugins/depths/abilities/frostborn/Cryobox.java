@@ -169,7 +169,7 @@ public class Cryobox extends DepthsAbility {
 			};
 
 			for (Location loc : locs) {
-				DepthsUtils.spawnIceTerrain(loc.getBlock(), mIceDuration, mPlayer);
+				DepthsUtils.freezeTerrain(loc.getBlock(), mIceDuration, false, false);
 			}
 		}
 
@@ -179,7 +179,7 @@ public class Cryobox extends DepthsAbility {
 
 			@Override
 			public void run() {
-				if (DepthsUtils.isOnIce(mPlayer)) {
+				if (DepthsUtils.isOnFrozenGround(mPlayer)) {
 					AbsorptionUtils.addAbsorption(mPlayer, REPLENISH_AMOUNT, mAbsorptionHealth, 10);
 				}
 
@@ -212,7 +212,7 @@ public class Cryobox extends DepthsAbility {
 			.addDuration(a -> a.mFrozenDuration, FROZEN_DURATION)
 			.add(" seconds. For the next ")
 			.addDuration(REPLENISH_DURATION)
-			.add(" seconds, standing on ice rapidly replenishes this absorption, restoring 8 absorption per second.")
+			.add(" seconds, standing on frozen ground rapidly replenishes this absorption, restoring 8 absorption per second.")
 			.addCooldown(COOLDOWN);
 	}
 

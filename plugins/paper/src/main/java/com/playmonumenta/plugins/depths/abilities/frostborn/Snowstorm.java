@@ -171,9 +171,9 @@ public class Snowstorm extends DepthsAbility {
 					int successes = 0;
 					int blocksToIce = (int) (12 * Math.pow(mRadius / 6, 2));
 					while (successes < blocksToIce) {
-						Location iceLoc = LocationUtils.fallToGround(LocationUtils.randomLocationInCircle(mLoc, mRadius), mLoc.getY() - 6);
+						Location iceLoc = LocationUtils.fallToGround(LocationUtils.randomLocationInCircle(mLoc, mRadius), mLoc.getY() - 6, false);
 						Block iceBlock = iceLoc.getBlock();
-						if (DepthsUtils.iceExposedBlock(iceBlock, mIceDuration, mPlayer)) {
+						if (DepthsUtils.freezeExposedBlock(iceBlock, mIceDuration)) {
 							new PartialParticle(Particle.REDSTONE, BlockUtils.getCenteredBlockBaseLocation(iceBlock), 8).delta(0.25, 0, 0.25).data(LIGHT_BLUE).spawnAsPlayerActive(mPlayer);
 							successes++;
 						}

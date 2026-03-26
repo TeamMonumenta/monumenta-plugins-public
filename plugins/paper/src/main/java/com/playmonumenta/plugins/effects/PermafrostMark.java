@@ -30,7 +30,7 @@ public class PermafrostMark extends Effect {
 
 			Block b = entity.getLocation().add(0, -1, 0).getBlock();
 			if (!(b.getType() == Material.ICE || b.getType() == Material.PACKED_ICE)) {
-				DepthsUtils.iceExposedBlock(b, mIceTicks, mPlayer);
+				DepthsUtils.freezeExposedBlock(b, mIceTicks);
 			}
 		}
 	}

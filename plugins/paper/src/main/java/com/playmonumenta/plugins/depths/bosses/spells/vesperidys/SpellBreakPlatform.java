@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths.bosses.spells.vesperidys;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -16,6 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -138,6 +140,9 @@ public class SpellBreakPlatform extends Spell {
 									if (FastUtils.RANDOM.nextInt(3) == 0 || mT >= (4 * mCastTicks / 5)) {
 										block.setType(Material.NETHER_WART_BLOCK);
 									}
+								}
+								if (block.getRelative(BlockFace.UP).getType() == DepthsUtils.SNOW_MATERIAL) {
+									DepthsUtils.unfreezeGround(block.getRelative(BlockFace.UP).getLocation());
 								}
 							}
 						}

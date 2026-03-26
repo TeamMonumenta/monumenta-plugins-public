@@ -62,6 +62,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Light;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -1056,6 +1057,9 @@ public class Vesperidys extends SerializedLocationBossAbilityGroup {
 
 						if (platformBlocks.contains(block)) {
 							block.setType(Material.STRIPPED_CRIMSON_HYPHAE);
+							if (block.getRelative(BlockFace.UP).getType() == DepthsUtils.SNOW_MATERIAL) {
+								DepthsUtils.unfreezeGround(block.getRelative(BlockFace.UP).getLocation());
+							}
 
 							new PartialParticle(Particle.CLOUD, block.getLocation().add(0, 1, 0), 1, 0, 0, 0, 0.25).spawnAsBoss();
 						}

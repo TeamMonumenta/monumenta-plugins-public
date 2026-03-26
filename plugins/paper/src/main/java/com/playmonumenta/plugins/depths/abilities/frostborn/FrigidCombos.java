@@ -99,17 +99,17 @@ public class FrigidCombos extends DepthsAbility {
 		Location targetLoc = enemy.getLocation();
 		World world = targetLoc.getWorld();
 
-		boolean isOnIce = DepthsUtils.isOnIce(enemy);
+		boolean isOnIce = DepthsUtils.isOnFrozenGround(enemy);
 		double damage = isOnIce ? shatterDamage : normalDamage;
 		double radius = isOnIce ? shatterRadius : normalRadius;
 
 		Location playerLoc = player.getLocation().add(0, 1, 0);
 		if (isOnIce) {
-			HashSet<Location> iceToBreak = new HashSet<>(DepthsUtils.iceActive.keySet());
-			iceToBreak.removeIf(l -> !l.isWorldLoaded() || l.getWorld() != targetLoc.getWorld() || l.clone().add(0.5, 0.5, 0.5).distance(targetLoc) > 1.5 || !DepthsUtils.isIce(l.getBlock().getType()));
+			HashSet<Location> iceToBreak = new HashSet<>(DepthsUtils.frostActive.keySet());
+			iceToBreak.removeIf(l -> !l.isWorldLoaded() || l.getWorld() != targetLoc.getWorld() || l.clone().add(0.5, 0.5, 0.5).distance(targetLoc) > 1.5);
 			for (Location l : iceToBreak) {
-				l.getBlock().setBlockData(DepthsUtils.iceActive.get(l));
-				DepthsUtils.iceActive.remove(l);
+				DepthsUtils.unfreezeGround(l);
+
 				Location aboveLoc = l.clone().add(0.5, 1, 0.5);
 				new PartialParticle(Particle.CLOUD, aboveLoc.clone().add(0, 0.25, 0), 8, 0.3, 0.3, 0.3, 0).spawnAsPlayerActive(player);
 				new PartialParticle(Particle.BLOCK_CRACK, aboveLoc.clone().add(0, 0.25, 0), 8, 0.3, 0.3, 0.3, 0, Material.ICE.createBlockData()).spawnAsPlayerActive(player);
@@ -232,7 +232,7 @@ public class FrigidCombos extends DepthsAbility {
 			.addPercent(a -> a.mSlow, SLOW_AMPLIFIER[rarity - 1], false, true)
 			.add(" slowness to them for ")
 			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds. If the mob was standing on ice, shatter it and increase the damage to ")
+			.add(" seconds. If the mob was standing on frozen ground, shatter it and increase the damage to ")
 			.addDepthsDamage(a -> a.mShatterDamage, SHATTER_DAMAGE[rarity - 1], true)
 			.add(" and the radius to ")
 			.add(a -> a.mShatterRadius, SHATTER_RADIUS)

@@ -249,14 +249,14 @@ public class SpellVesperidysAnticheese extends Spell {
 				block.setType(Material.AIR);
 			} else if (FastUtils.randomIntInRange(0, 2) == 0) {
 				new PartialParticle(Particle.SQUID_INK, block.getLocation(), 5, 0.5, 0.5, 0.5, 0).spawnAsBoss();
-				if (DepthsUtils.isIce(block.getType())) {
+				if (block.getType() == DepthsUtils.ICE_MATERIAL) {
 					block.setType(Material.FROSTED_ICE);
 					BlockData blockData = block.getState().getBlockData();
 					if (blockData instanceof Ageable frostedIce) {
 						frostedIce.setAge(3);
 						block.setBlockData(frostedIce);
 					}
-				} else {
+				} else if (block.getType() != DepthsUtils.SNOW_MATERIAL) { //Don't want to turn snow into solid blocks.
 					block.setType(Material.STRIPPED_CRIMSON_HYPHAE);
 				}
 				mMarked.add(block);

@@ -796,6 +796,10 @@ public class LocationUtils {
 
 
 	public static Location fallToGround(Location loc, double minHeight) {
+		return fallToGround(loc, minHeight, true);
+	}
+
+	public static Location fallToGround(Location loc, double minHeight, boolean ignoreLiquids) {
 		Location clone = loc.clone();
 
 		// If below minHeight, go up to it
@@ -809,11 +813,14 @@ public class LocationUtils {
 			// If inside a block, go to the top of the block
 			clone.setY(Math.max(block.getBoundingBox().getMaxY(), minHeight));
 			return clone;
+		} else if (!ignoreLiquids && BlockUtils.isLiquid(block)) {
+			clone.setY(Math.max(block.getY() + 1, minHeight));
+			return clone;
 		} else {
 			// If not inside a block, go one block down and try again
 			Block below = block.getRelative(BlockFace.DOWN);
 			clone.setY(below.getY() + 0.5);
-			return fallToGround(clone, minHeight);
+			return fallToGround(clone, minHeight, ignoreLiquids);
 		}
 	}
 

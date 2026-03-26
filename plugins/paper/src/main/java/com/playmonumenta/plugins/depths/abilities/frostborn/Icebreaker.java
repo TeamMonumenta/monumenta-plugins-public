@@ -51,7 +51,7 @@ public class Icebreaker extends DepthsAbility {
 	}
 
 	private double getIceMultiplier(LivingEntity entity) {
-		return DepthsUtils.isOnIce(entity) ? 1 + mIceMultiplier : 1;
+		return DepthsUtils.isOnFrozenGround(entity) ? 1 + mIceMultiplier : 1;
 	}
 
 	private double getDebuffMultiplier(LivingEntity entity) {
@@ -67,7 +67,7 @@ public class Icebreaker extends DepthsAbility {
 		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Damage you deal is increased by ")
 			.addPercent(a -> a.mIceMultiplier, ICE_DAMAGE[rarity - 1], false, true)
-			.add(" if the mob is on ice or ")
+			.add(" if the mob is on frozen ground or ")
 			.addPercent(a -> a.mDebuffMultiplier, EFFECT_DAMAGE[rarity - 1], false, true)
 			.add(" if the mob is debuffed.");
 	}

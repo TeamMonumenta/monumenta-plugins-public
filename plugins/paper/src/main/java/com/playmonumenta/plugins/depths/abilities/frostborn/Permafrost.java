@@ -106,9 +106,9 @@ public class Permafrost extends DepthsAbility implements AbilityWithChargesOrSta
 					Location loc = mOriginalLocation.clone().add(mDirection);
 					loc = LocationUtils.fallToGround(loc, mPlayer.getLocation().getY() - 0.5);
 					Block block = loc.getBlock();
-					DepthsUtils.iceExposedBlock(block, mIceDuration, mPlayer);
-					DepthsUtils.iceExposedBlock(block.getRelative(mOriginalDirection.getX() > 0 ? BlockFace.EAST : BlockFace.WEST), mIceDuration, mPlayer);
-					DepthsUtils.iceExposedBlock(block.getRelative(mOriginalDirection.getZ() > 0 ? BlockFace.SOUTH : BlockFace.NORTH), mIceDuration, mPlayer);
+					DepthsUtils.freezeExposedBlock(block, mIceDuration);
+					DepthsUtils.freezeExposedBlock(block.getRelative(mOriginalDirection.getX() > 0 ? BlockFace.EAST : BlockFace.WEST), mIceDuration);
+					DepthsUtils.freezeExposedBlock(block.getRelative(mOriginalDirection.getZ() > 0 ? BlockFace.SOUTH : BlockFace.NORTH), mIceDuration);
 					mDirection.rotateAroundY(mIncrement);
 				}
 				mT++;
@@ -152,7 +152,7 @@ public class Permafrost extends DepthsAbility implements AbilityWithChargesOrSta
 		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("For every " + KILLS_PER_CHARGE + " mobs you kill, gain 1 charge, up to a maximum of " + MAX_CHARGES + ". ")
 			.addTrigger()
-			.add(" to consume the charge, spawning ice in a ")
+			.add(" to consume the charge, spawning snow in a ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" block cone for ")
 			.addDuration(a -> a.mIceDuration, ICE_TICKS[rarity - 1], false, true)

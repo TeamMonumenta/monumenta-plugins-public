@@ -233,7 +233,7 @@ public class ChromaBlade extends DepthsAbility {
 						}
 						Block block = world.getBlockAt(checkingLoc);
 						if (!mIceAlreadyCreated.contains(block)) {
-							DepthsUtils.iceExposedBlock(block, 8 * 20, mPlayer);
+							DepthsUtils.freezeExposedBlock(block, 8 * 20);
 							mIceAlreadyCreated.add(block);
 						}
 

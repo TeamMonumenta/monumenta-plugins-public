@@ -273,18 +273,20 @@ public class ColorSplash extends DepthsAbility {
 						underPlayer.getRelative(-1, 0, -1)
 					};
 					for (Block block : blocksToConvert) {
-						if (DepthsUtils.isIce(block.getType())) {
+						if (DepthsUtils.frostActive.containsKey(block.getLocation())) {
 							continue;
 						}
 
-						DepthsUtils.iceExposedBlock(block, FROSTBORN_ICE_DURATION, mPlayer, false);
+						DepthsUtils.freezeExposedBlock(block, FROSTBORN_ICE_DURATION);
 					}
 				}
 
 				if (mTicks % FROSTBORN_DAMAGE_INTERVAL == 0) {
 					// Damage nearby mobs standing on ice
 					List<LivingEntity> nearbyMobsOnIce = new Hitbox.SphereHitbox(mPlayer.getLocation(), FROSTBORN_RADIUS)
-						.getHitMobs().stream().filter(mob -> DepthsUtils.isIce(mob.getLocation().subtract(0, 1, 0).getBlock().getType())).toList();
+						.getHitMobs().stream()
+						.filter(DepthsUtils::isOnFrozenGround)
+						.toList();
 					nearbyMobsOnIce.forEach(mob -> {
 						DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), FROSTBORN_DAMAGE[mRarity - 1], true, false, false);
 						new PartialParticle(Particle.BLOCK_CRACK, mob.getLocation(), 10).delta(0.2, 0.5, 0.2)
@@ -706,13 +708,13 @@ public class ColorSplash extends DepthsAbility {
 			.add(Component.text("\nFrostborn").color(TextColor.color(DepthsUtils.FROSTBORN)))
 			.add(" - For ")
 			.addDuration(FROSTBORN_DURATION)
-			.add("s, leave a trail of ice behind you. Mobs within ")
+			.add("s, leave a trail of snow behind you. Mobs within ")
 			.add(FROSTBORN_RADIUS)
 			.add(" blocks of you will take ")
 			.addDepthsDamage(a -> FROSTBORN_DAMAGE[rarity - 1], FROSTBORN_DAMAGE[rarity - 1], true)
 			.add(" magic damage every ")
 			.addDuration(FROSTBORN_DAMAGE_INTERVAL)
-			.add("s while standing on ice.");
+			.add("s while standing on frozen ground.");
 	}
 
 	private static Description<ColorSplash> getFlamecallerDescription(int rarity, TextColor color) {

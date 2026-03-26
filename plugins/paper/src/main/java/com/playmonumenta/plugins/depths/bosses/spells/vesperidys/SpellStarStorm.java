@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses.spells.vesperidys;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -425,7 +426,7 @@ public class SpellStarStorm extends Spell {
 
 					double dX = mLocation.getX() - mVesperidys.mSpawnLoc.getX();
 					double dZ = mLocation.getZ() - mVesperidys.mSpawnLoc.getZ();
-					if (mLocation.getBlock().getType() != Material.AIR && !BlockUtils.isMechanicalBlock(mLocation.getBlock().getType())
+					if (mLocation.getBlock().getType() != Material.AIR && mLocation.getBlock().getType() != DepthsUtils.SNOW_MATERIAL && !BlockUtils.isMechanicalBlock(mLocation.getBlock().getType())
 						&& (Math.abs(dX) < SpellVesperidysAnticheese.ANTI_BLOCK_ZONE_DISTANCE && Math.abs(dZ) < SpellVesperidysAnticheese.ANTI_BLOCK_ZONE_DISTANCE)) {
 						mLocation.getBlock().setType(Material.AIR);
 						bullet.getWorld().playSound(mLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);

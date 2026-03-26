@@ -92,7 +92,7 @@ public class PiercingCold extends DepthsAbility {
 				endLoc = checkLoc.clone();
 				break;
 			}
-			if ((checkLoc.getBlock().isSolid() && !DepthsUtils.isIce(checkLoc.getBlock().getType()))) {
+			if ((checkLoc.getBlock().isSolid() && !DepthsUtils.isFrozen(checkLoc.getBlock().getType()))) {
 				endLoc = checkLoc.clone();
 
 				// if we hit a solid (non ice block, also play particles too
@@ -158,7 +158,7 @@ public class PiercingCold extends DepthsAbility {
 			}
 
 			// allow it to pass through ice
-			if ((block.getType().isSolid() || block.getType() == Material.WATER) && !DepthsUtils.isIce(block.getType())) {
+			if ((block.getType().isSolid() || block.getType() == Material.WATER) && !DepthsUtils.isFrozen(block.getType())) {
 				break;
 			}
 
@@ -167,7 +167,7 @@ public class PiercingCold extends DepthsAbility {
 
 		// ice all blocks
 		for (Block b : blocksToIce) {
-			DepthsUtils.iceExposedBlock(b, mIceDuration, mPlayer);
+			DepthsUtils.freezeExposedBlock(b, mIceDuration);
 		}
 
 		return true;
@@ -177,7 +177,7 @@ public class PiercingCold extends DepthsAbility {
 		return new DescriptionBuilder<>(() -> INFO, color)
 			.add("Shooting a projectile while sneaking instead shoots an enchanted beam of frost that deals ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
-			.add(" magic damage and leaves a trail of ice below it that lasts for ")
+			.add(" magic damage and leaves a trail of snow below it that lasts for ")
 			.addDuration(a -> a.mIceDuration, ICE_TICKS)
 			.add(" seconds. The beam can pass through ice blocks.")
 			.addCooldown(COOLDOWN);

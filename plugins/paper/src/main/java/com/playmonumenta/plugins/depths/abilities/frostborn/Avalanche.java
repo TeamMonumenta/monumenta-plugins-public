@@ -119,8 +119,7 @@ public class Avalanche extends DepthsAbility {
 				mPulses++;
 				if (mPulses >= NUM_PULSES) {
 					for (Location l : mIceToBreak) {
-						l.getBlock().setBlockData(DepthsUtils.iceActive.get(l));
-						DepthsUtils.iceActive.remove(l);
+						DepthsUtils.unfreezeGround(l);
 
 						Location aboveLoc = l.clone().add(0.5, 1, 0.5);
 						new PartialParticle(Particle.REDSTONE, aboveLoc.clone().add(0, 0.6, 0), 7, 0.3, 0.5, 0.3, ICE_PARTICLE_COLOR).spawnAsPlayerActive(mPlayer);
@@ -150,19 +149,19 @@ public class Avalanche extends DepthsAbility {
 	}
 
 	private Set<Location> getNearbyIce(Location loc, double radius) {
-		Set<Location> nearbyIce = new HashSet<>(DepthsUtils.iceActive.keySet());
-		nearbyIce.removeIf(l -> !l.isWorldLoaded() || l.getWorld() != loc.getWorld() || l.distance(loc) > radius || !DepthsUtils.isIce(l.getBlock().getType()));
+		Set<Location> nearbyIce = new HashSet<>(DepthsUtils.frostActive.keySet());
+		nearbyIce.removeIf(l -> !l.isWorldLoaded() || l.getWorld() != loc.getWorld() || l.distance(loc) > radius);
 		return nearbyIce;
 	}
 
 	private static Description<Avalanche> getDescription(int rarity, TextColor color) {
 		return new DescriptionBuilder<>(() -> INFO, color)
 			.addTrigger()
-			.add(" to begin shattering all ice blocks within a radius of ")
+			.add(" to begin shattering all ice blocks and snow within a radius of ")
 			.add(a -> a.mRadius, RADIUS)
 			.add(" blocks, dealing a total of ")
 			.addDepthsDamage(a -> a.mDamage, DAMAGE[rarity - 1], true)
-			.add(" magic damage in 4 pulses over 0.5s to enemies above the ice. The radius starts at 25% of the max value and grows with each pulse until it reaches 100%. Affected enemies are rooted for ")
+			.add(" magic damage in 4 pulses over 0.5s to enemies on frozen ground. The radius starts at 25% of the max value and grows with each pulse until it reaches 100%. Affected enemies are rooted for ")
 			.addDuration(a -> a.mDuration, SLOW_DURATION)
 			.add(" seconds.")
 			.addCooldown(COOLDOWN_TICKS);

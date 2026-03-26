@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.bosses.Vesperidys;
 import com.playmonumenta.plugins.depths.bosses.spells.vesperidys.SpellVoidCrystalTeleportPassive;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -33,6 +34,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -360,6 +362,9 @@ public class VesperidysVoidCrystalFlame extends BossAbilityGroup {
 										Block blockRelative = block.getRelative(0, y, 0);
 										if (blockRelative.getType() != Material.MAGMA_BLOCK && blockRelative.isSolid()) {
 											TemporaryBlockChangeManager.INSTANCE.changeBlock(blockRelative, Material.MAGMA_BLOCK, 120 * 20);
+											if (blockRelative.getRelative(BlockFace.UP).getType() == DepthsUtils.SNOW_MATERIAL) {
+												DepthsUtils.unfreezeGround(blockRelative.getRelative(BlockFace.UP).getLocation());
+											}
 										}
 									}
 								}

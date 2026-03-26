@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -26,6 +27,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,6 +49,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 
 public class DepthsUtils {
@@ -63,10 +66,12 @@ public class DepthsUtils {
 
 	//Material defined as ice
 	public static final Material ICE_MATERIAL = Material.ICE;
+	public static final Material SNOW_MATERIAL = Material.SNOW;
+
+	private static @Nullable BukkitRunnable FROZEN_TERRAIN_REMOVAL = null;
 
 	//Forbidden blocks for replacing with ice
 	private static final EnumSet<Material> IGNORED_MATS = EnumSet.of(
-		Material.LIGHT,
 		Material.COMMAND_BLOCK,
 		Material.CHAIN_COMMAND_BLOCK,
 		Material.REPEATING_COMMAND_BLOCK,
@@ -76,6 +81,8 @@ public class DepthsUtils {
 		Material.BARRIER,
 		Material.SPAWNER,
 		Material.CHEST,
+		Material.LECTERN,
+		Material.PLAYER_HEAD,
 		Material.BARREL,
 		Material.END_PORTAL,
 		Material.END_PORTAL_FRAME,
@@ -103,13 +110,34 @@ public class DepthsUtils {
 		Material.BROWN_SHULKER_BOX,
 		Material.GREEN_SHULKER_BOX,
 		Material.RED_SHULKER_BOX,
-		Material.BLACK_SHULKER_BOX
+		Material.BLACK_SHULKER_BOX,
+		Material.COBWEB
 	);
 
-	//List of locations where ice is currently active
-	public static Map<Location, BlockData> iceActive = new HashMap<>();
-	//List of locations where ice is spawned by a barrier
-	public static Map<Location, Boolean> iceBarrier = new HashMap<>();
+	//List of locations where ice or snow is currently active
+	public static Map<Location, FrozenTerrainData> frostActive = new HashMap<>();
+
+	public static class FrozenTerrainData {
+
+		public final @Nullable BlockData mBlockData;
+		public final boolean mIceBarrier;
+		public final boolean mIsVirtual;
+		public int mRemainingTicks;
+
+		/**
+		 * @param blockData the blockData of the replaced block
+		 * @param duration the duration of the frost
+		 * @param iceBarrier whether the frost was placed by ice barrier
+		 * @param isVirtual whether there is real ice/snow placed or if it only acts the part for abilities
+		 */
+		public FrozenTerrainData(@Nullable BlockData blockData, int duration, boolean iceBarrier, boolean isVirtual) {
+			mBlockData = blockData;
+			mIceBarrier = iceBarrier;
+			mIsVirtual = isVirtual;
+			mRemainingTicks = duration;
+		}
+
+	}
 
 	// depths content type for the shard
 	// depths skills api changes this temporarily to get descriptions for both depths and zenith
@@ -168,44 +196,94 @@ public class DepthsUtils {
 		return colors[rarity - 1];
 	}
 
-	public static boolean spawnIceTerrain(Block block, int ticks, Player p) {
-		return spawnIceTerrain(block, ticks, p, false);
-	}
-
-	public static boolean spawnIceTerrain(Block block, int ticks, Player p, boolean isBarrier) {
+	public static boolean freezeTerrain(Block block, int ticks, boolean isBarrier, boolean useSnow) {
 		Location l = block.getLocation();
 
-		//Check if the block is valid, or if the location is already active in the system
-		if (IGNORED_MATS.contains(l.getWorld().getBlockAt(l).getType()) || iceActive.get(l) != null) {
+		//Check if the location is already active in the system
+		if (frostActive.get(l) != null) {
+
+			if (!useSnow && l.getBlock().getType() == SNOW_MATERIAL) {
+				frostActive.get(l).mRemainingTicks = ticks;
+				l.getBlock().setType(ICE_MATERIAL);
+			}
+			if (!useSnow && frostActive.get(l).mIsVirtual && canFreeze(l.getBlock(), false)) {
+				BlockData bd = l.getWorld().getBlockAt(l).getBlockData();
+				frostActive.put(l, new FrozenTerrainData(bd, ticks, isBarrier, false));
+				l.getBlock().setType(ICE_MATERIAL);
+			}
 			return false; // return whether we placed ice or not
 		}
 
-		BlockData bd = l.getWorld().getBlockAt(l).getBlockData();
-		l.getBlock().setType(ICE_MATERIAL);
-		iceActive.put(l, bd);
-		iceBarrier.put(l, isBarrier);
+		//Whether to place down actual snow/ice or just consider it frozen
+		if (canFreeze(l.getBlock(), useSnow)) {
+			BlockData bd = l.getWorld().getBlockAt(l).getBlockData();
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (iceActive.containsKey(l)) {
-					if (l.isChunkLoaded()) {
-						Block b = l.getBlock();
-						if (isIce(b.getType())) {
-							b.setBlockData(bd);
-						}
-					}
-					iceActive.remove(l);
-					iceBarrier.remove(l);
-				}
+			//Move light blocks before replacing it to not affect the general brightness of the affected area too much
+			if (l.getBlock().getType() == Material.LIGHT) {
+				BlockUtils.tryMoveLight(l.getWorld().getBlockState(l));
 			}
-		}.runTaskLater(Plugin.getInstance(), ticks);
 
+			//Edge case to turn path and farmland into grass to make it work nicely with snow
+			Block relativeDown = l.getBlock().getRelative(BlockFace.DOWN);
+			if (useSnow && (relativeDown.getType() == Material.DIRT_PATH || relativeDown.getType() == Material.FARMLAND)) {
+				frostActive.put(relativeDown.getLocation(), new FrozenTerrainData(relativeDown.getBlockData().clone(), ticks, false, false));
+				relativeDown.setType(Material.GRASS_BLOCK);
+			}
+
+			l.getBlock().setType(useSnow ? SNOW_MATERIAL : ICE_MATERIAL);
+			frostActive.put(l, new FrozenTerrainData(bd, ticks, isBarrier, false));
+		} else {
+			frostActive.put(l, new FrozenTerrainData(null, ticks, isBarrier, true));
+		}
+
+		scheduleFrozenTerrainRemoval();
 		return true;
 	}
 
-	public static boolean isIce(Material material) {
-		return material == ICE_MATERIAL;
+	private static void scheduleFrozenTerrainRemoval() {
+		if (FROZEN_TERRAIN_REMOVAL != null && !FROZEN_TERRAIN_REMOVAL.isCancelled()) {
+			return;
+		}
+
+		FROZEN_TERRAIN_REMOVAL = new BukkitRunnable() {
+			@Override
+			public void run() {
+
+				Iterator<Map.Entry<Location, FrozenTerrainData>> iterator = frostActive.entrySet().iterator();
+				while (iterator.hasNext()) {
+					Map.Entry<Location, FrozenTerrainData> kvp = iterator.next();
+
+					kvp.getValue().mRemainingTicks -= 1;
+					if (kvp.getValue().mRemainingTicks <= 0) {
+						if (!kvp.getValue().mIsVirtual && kvp.getKey().isChunkLoaded()) {
+							Block b = kvp.getKey().getBlock();
+							b.setBlockData(kvp.getValue().mBlockData);
+						}
+						iterator.remove();
+					}
+				}
+
+				if (frostActive.isEmpty() || frostActive.keySet().stream().noneMatch(Location::isChunkLoaded)) {
+					this.cancel();
+				}
+			}
+		};
+
+		FROZEN_TERRAIN_REMOVAL.runTaskTimer(Plugin.getInstance(), 0, 1);
+	}
+
+	public static void unfreezeGround(Location l) {
+		if (!frostActive.containsKey(l)) {
+			return;
+		}
+		if (!frostActive.get(l).mIsVirtual) {
+			l.getBlock().setBlockData(frostActive.get(l).mBlockData);
+		}
+		frostActive.remove(l);
+	}
+
+	public static boolean isFrozen(Material material) {
+		return material == ICE_MATERIAL || material == SNOW_MATERIAL;
 	}
 
 	/**
@@ -282,65 +360,83 @@ public class DepthsUtils {
 		return Component.text("");
 	}
 
-	private static boolean canConvertToIce(Block b) {
-		return canConvertToIce(b.getType());
+	private static boolean canFreeze(Block b, boolean snow) {
+		return snow ? canConvertToSnow(b) : !IGNORED_MATS.contains(b.getType());
 	}
 
-	/**
-	 * Checks if a block of the given type can be converted to ice.
-	 * All blocks with collision (plus water) can be converted, except if they are special blocks like spawners or chests, or if they only have very small collision like carpets.
-	 */
-	private static boolean canConvertToIce(Material mat) {
-		if (mat == Material.WATER) {
-			return true;
+	//Blocks considered solid for frostborn snow
+	private static boolean isSolidGround(Material material) {
+		return material.isSolid() && material != Material.ICE && material != Material.SPAWNER && material != Material.SCULK_VEIN;
+	}
+
+	private static boolean canConvertToSnow(Block b) {
+		if (!isSolidGround(b.getRelative(BlockFace.DOWN).getType())) {
+			return false;
 		}
-		if (!mat.isBlock() || !mat.isCollidable() || IGNORED_MATS.contains(mat)) {
+
+		//Check if the top face of a block is a full 1x1 square
+		List<BoundingBox> bbs = b.getRelative(BlockFace.DOWN).getCollisionShape()
+			.getBoundingBoxes()
+			.stream()
+			.filter(a -> a.getMaxY() > 0.85).toList();
+		boolean minX = bbs.stream().map(BoundingBox::getMinX).toList().contains(0.0);
+		boolean maxX = bbs.stream().map(BoundingBox::getMaxX).toList().contains(1.0);
+		boolean minZ = bbs.stream().map(BoundingBox::getMinZ).toList().contains(0.0);
+		boolean maxZ = bbs.stream().map(BoundingBox::getMaxZ).toList().contains(1.0);
+
+		if (!minX || !maxX || !minZ || !maxZ) {
+			return false;
+		}
+		if (BlockUtils.isLiquid(b)) {
+			return false;
+		}
+		return canConvertToSnow(b.getType());
+	}
+
+	private static boolean canConvertToSnow(Material mat) {
+
+		if (IGNORED_MATS.contains(mat)) {
+			return false;
+		}
+		if (mat == Material.WATER || mat == Material.LAVA) {
 			return false;
 		}
 		return switch (mat) {
-			case // carpets
+			case
+				// carpets
 				RED_CARPET, BLACK_CARPET, BLUE_CARPET, BROWN_CARPET, CYAN_CARPET, GRAY_CARPET, GREEN_CARPET,
-				LIGHT_BLUE_CARPET,
-				LIGHT_GRAY_CARPET, LIME_CARPET, MAGENTA_CARPET, ORANGE_CARPET, PINK_CARPET, PURPLE_CARPET, WHITE_CARPET,
-				YELLOW_CARPET,
-				MOSS_CARPET,
-				// trapdoors
-				BIRCH_TRAPDOOR, ACACIA_TRAPDOOR, CRIMSON_TRAPDOOR, DARK_OAK_TRAPDOOR, IRON_TRAPDOOR, JUNGLE_TRAPDOOR,
-				MANGROVE_TRAPDOOR,
-				OAK_TRAPDOOR, SPRUCE_TRAPDOOR, WARPED_TRAPDOOR, BAMBOO_TRAPDOOR, CHERRY_TRAPDOOR,
-				// candles
-				CANDLE, CYAN_CANDLE, BLACK_CANDLE, BLUE_CANDLE, BROWN_CANDLE, GRAY_CANDLE, GREEN_CANDLE, LIME_CANDLE,
-				MAGENTA_CANDLE,
-				ORANGE_CANDLE, PINK_CANDLE, PURPLE_CANDLE, RED_CANDLE, WHITE_CANDLE, YELLOW_CANDLE, LIGHT_BLUE_CANDLE,
-				LIGHT_GRAY_CANDLE,
-				// rails
-				RAIL, ACTIVATOR_RAIL, DETECTOR_RAIL, POWERED_RAIL -> false;
-			default -> true;
+					LIGHT_BLUE_CARPET,
+					LIGHT_GRAY_CARPET, LIME_CARPET, MAGENTA_CARPET, ORANGE_CARPET, PINK_CARPET, PURPLE_CARPET, WHITE_CARPET,
+					YELLOW_CARPET, MOSS_CARPET,
+					//Misc that's also considered collidable
+					LIGHT, SCULK_VEIN
+				-> true;
+			default -> !mat.isCollidable();
 		};
 	}
 
-	public static boolean iceExposedBlock(Block b, int iceTicks, Player p) {
-		return iceExposedBlock(b, iceTicks, p, true);
-	}
-
-	public static boolean iceExposedBlock(Block b, int iceTicks, Player p, boolean withParticles) {
+	public static boolean freezeExposedBlock(Block b, int iceTicks) {
 		// Try the block above and below the desired block for a block that is near the surface
-		Block converted;
-		if (canConvertToIce(b.getRelative(BlockFace.UP)) && !canConvertToIce(b.getRelative(BlockFace.UP).getRelative(BlockFace.UP))) {
-			converted = b.getRelative(BlockFace.UP);
-		} else if (canConvertToIce(b)) {
-			converted = b;
-		} else if (canConvertToIce(b.getRelative(BlockFace.DOWN))) {
-			converted = b.getRelative(BlockFace.DOWN);
-		} else {
-			return false;
+		for (Block block : new Block[] {b.getRelative(BlockFace.UP), b, b.getRelative(BlockFace.DOWN)}) {
+
+			//Turn surface level water in to ice even when using snow placing abilities
+			Block relativeUp = block.getRelative(BlockFace.UP);
+			if (BlockUtils.isLiquid(block) && block.getType() != Material.LAVA
+				&& !BlockUtils.isLiquid(relativeUp) && !relativeUp.isSolid()) {
+				return freezeTerrain(block, iceTicks, false, false);
+			}
+
+			//The check that decides whether a block can be frozen. Does NOT decide whether actual snow/ice is placed
+			if (isSolidGround(block.getRelative(BlockFace.DOWN).getType()) && canConvertToSnow(block.getType())) {
+				return freezeTerrain(block, iceTicks, false, true);
+			}
 		}
-		return spawnIceTerrain(converted, iceTicks, p, false);
+		return false;
 	}
 
-	public static boolean isOnIce(Entity entity) {
-		Location loc = entity.getLocation();
-		return isIce(loc.getBlock().getRelative(BlockFace.DOWN).getType()) && iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
+	public static boolean isOnFrozenGround(Entity entity) {
+		Block b = entity.getLocation().getBlock();
+		return frostActive.containsKey(b.getRelative(BlockFace.DOWN).getLocation()) || frostActive.containsKey(b.getLocation());
 	}
 
 	public static void explodeEvent(EntityExplodeEvent event) {
@@ -350,8 +446,8 @@ public class DepthsUtils {
 		}
 		List<Block> blocks = event.blockList();
 		for (Block b : blocks) {
-			Boolean barrier = iceBarrier.get(b.getLocation());
-			if (barrier != null && barrier) {
+			FrozenTerrainData barrier = frostActive.get(b.getLocation());
+			if (barrier != null && barrier.mIceBarrier) {
 				// Apply ice barrier stun passive effect to the mob
 				EntityUtils.applyStun(Plugin.getInstance(), 2 * 20, le);
 				return;
