@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -91,29 +92,19 @@ public class SocialManager implements Listener {
 		Player sender = Bukkit.getPlayer(senderUuid);
 
 		// Load the sender's and the receiver's social cache from memory or from Redis
-		loadSocialCaches(senderUuid, receiverUuid).thenAccept(socialCaches -> {
-			if (socialCaches == null) {
+		loadSocialCachePair(senderUuid, receiverUuid).whenComplete((pair, ex) -> {
+			if (ex != null) {
 				if (sender != null) {
 					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED)));
 				}
 
-				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
+				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid, ex);
 				return;
 			}
 
 			// Fetch the sender's and the receiver's social cache
-			PlayerSocialCache senderCache = socialCaches.get(senderUuid);
-			PlayerSocialCache receiverCache = socialCaches.get(receiverUuid);
-
-			// This shouldn't occur if loadSocialCaches didn't return null
-			if (senderCache == null || receiverCache == null) {
-				if (sender != null) {
-					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED)));
-				}
-
-				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
-				return;
-			}
+			PlayerSocialCache senderCache = pair.getSender();
+			PlayerSocialCache receiverCache = pair.getReceiver();
 
 			// Perform checks to see if the sender can be friends with the receiver
 			PlayerSocialCache.FriendshipCheckResult result = senderCache.canBecomeFriendsWith(receiverCache);
@@ -153,57 +144,74 @@ public class SocialManager implements Listener {
 			long expirationTime = System.currentTimeMillis() / 1000 + FRIEND_REQUEST_EXPIRATION_TIME;
 
 			// Send the pending friend request to the receiver in Redis
-			RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString(), String.valueOf(expirationTime)).thenAccept(success -> {
-				if (!success) {
-					if (sender != null) {
-						sender.sendMessage(appendPrefix(Component.text("An error occurred while sending your friend request. Please report this as a bug if this keeps happening.", NamedTextColor.RED)));
+			try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+				conn.hset(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString(), String.valueOf(expirationTime)).whenComplete((success, hsetEx) -> {
+					if (hsetEx != null || !success) {
+						if (hsetEx != null) {
+							MMLog.severe(LOG_PREFIX + "Failed to send friend request from " + senderUuid + " to " + receiverUuid, hsetEx);
+						}
+						if (sender != null) {
+							sender.sendMessage(appendPrefix(Component.text("An error occurred while sending your friend request. Please report this as a bug if this keeps happening.", NamedTextColor.RED)));
+						}
+						return;
 					}
-					return;
-				}
 
-				// Notify the sender about the pending friend request
-				if (sender != null) {
-					sender.sendMessage(appendPrefix(Component.text("You have sent a friend request to " + resolveName(receiverUuid) + "! They have " + FRIEND_REQUEST_EXPIRATION_TIME / 60L + " minutes to accept before it expires.", NamedTextColor.YELLOW)));
-				}
+					// Notify the sender about the pending friend request
+					if (sender != null) {
+						sender.sendMessage(appendPrefix(Component.text("You have sent a friend request to " + resolveName(receiverUuid) + "! They have " + FRIEND_REQUEST_EXPIRATION_TIME / 60L + " minutes to accept before it expires.", NamedTextColor.YELLOW)));
+					}
 
-				// Broadcast to all shards via RabbitMQ to
-				// add the pending friend request in memory,
-				// to notify the receiver about the request,
-				// and to schedule the friend request expiration task
-				Map<String, String> jsonProperties = Map.of(
-					"senderUuid", senderUuid.toString(),
-					"receiverUuid", receiverUuid.toString(),
-					"expirationTime", String.valueOf(expirationTime)
-				);
-				broadcastNotification(INCOMING_FRIEND_REQUEST_CHANNEL, jsonProperties, "Failed to notify other shards of an incoming friend request via RabbitMQ.");
-			});
+					// Broadcast to all shards via RabbitMQ to
+					// add the pending friend request in memory,
+					// to notify the receiver about the request,
+					// and to schedule the friend request expiration task
+					Map<String, String> jsonProperties = Map.of(
+						"senderUuid", senderUuid.toString(),
+						"receiverUuid", receiverUuid.toString(),
+						"expirationTime", String.valueOf(expirationTime)
+					);
+					broadcastNotification(INCOMING_FRIEND_REQUEST_CHANNEL, jsonProperties, "Failed to notify other shards of an incoming friend request via RabbitMQ.");
+				});
+			}
 		});
 	}
 
 	private static void expireFriendRequest(UUID senderUuid, UUID receiverUuid) {
-		RedisAPI.getInstance().async().hget(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString()).thenAccept(storedTime -> {
-			if (storedTime != null && Long.parseLong(storedTime) <= System.currentTimeMillis() / 1000) {
-				// Remove the pending friend request from the receiver in Redis
-				RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString());
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.hget(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString()).whenComplete((storedTime, ex) -> {
+				if (ex != null) {
+					MMLog.severe(LOG_PREFIX + "Failed to check friend request expiration for " + senderUuid + " -> " + receiverUuid, ex);
+					return;
+				}
+				if (storedTime != null && Long.parseLong(storedTime) <= System.currentTimeMillis() / 1000) {
+					// Remove the pending friend request from the receiver in Redis
+					try (RedisAPI.BorrowedCommands<String, String> conn2 = RedisAPI.borrow()) {
+						conn2.hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString())
+							.exceptionally(ex2 -> {
+								MMLog.severe(LOG_PREFIX + "Failed to delete expired friend request for " + senderUuid + " -> " + receiverUuid, ex2);
+								return null;
+							});
+					}
 
-				// Broadcast to all shards via RabbitMQ to
-				// discard the friend request expiration task
-				// and notify the sender and the receiver about the friend request expiration
-				Map<String, String> jsonProperties = Map.of(
-					"senderUuid", senderUuid.toString(),
-					"receiverUuid", receiverUuid.toString()
-				);
-				broadcastNotification(FRIEND_REQUEST_EXPIRATION_CHANNEL, jsonProperties, "Failed to notify other shards of an expired friend request via RabbitMQ.");
-			}
-		});
+					// Broadcast to all shards via RabbitMQ to
+					// discard the friend request expiration task
+					// and notify the sender and the receiver about the friend request expiration
+					Map<String, String> jsonProperties = Map.of(
+						"senderUuid", senderUuid.toString(),
+						"receiverUuid", receiverUuid.toString()
+					);
+					broadcastNotification(FRIEND_REQUEST_EXPIRATION_CHANNEL, jsonProperties, "Failed to notify other shards of an expired friend request via RabbitMQ.");
+				}
+			});
+		}
 	}
 
 	static void addFriend(@Nullable Player moderator, UUID senderUuid, UUID receiverUuid) {
 		Player sender = Bukkit.getPlayer(senderUuid);
 
 		// Load the sender's and the receiver's social cache from memory or from Redis
-		loadSocialCaches(senderUuid, receiverUuid).thenAccept(socialCaches -> {
-			if (socialCaches == null) {
+		loadSocialCachePair(senderUuid, receiverUuid).whenComplete((pair, ex) -> {
+			if (ex != null) {
 				Component errorMessage = Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED);
 
 				if (moderator != null) {
@@ -212,27 +220,13 @@ public class SocialManager implements Listener {
 					sender.sendMessage(appendPrefix(errorMessage));
 				}
 
-				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
+				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid, ex);
 				return;
 			}
 
 			// Fetch the sender's and the receiver's social cache
-			PlayerSocialCache senderCache = socialCaches.get(senderUuid);
-			PlayerSocialCache receiverCache = socialCaches.get(receiverUuid);
-
-			// This shouldn't occur if loadSocialCaches didn't return null
-			if (senderCache == null || receiverCache == null) {
-				Component errorMessage = Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED);
-
-				if (moderator != null) {
-					moderator.sendMessage(appendPrefix(errorMessage));
-				} else if (sender != null) {
-					sender.sendMessage(appendPrefix(errorMessage));
-				}
-
-				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
-				return;
-			}
+			PlayerSocialCache senderCache = pair.getSender();
+			PlayerSocialCache receiverCache = pair.getReceiver();
 
 			// Perform checks to see if the sender can be friends with the receiver
 			PlayerSocialCache.FriendshipCheckResult result = senderCache.canBecomeFriendsWith(receiverCache);
@@ -268,44 +262,52 @@ public class SocialManager implements Listener {
 			// Fetch the current timestamp
 			String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
 
-			// Set the sender and the receiver as friends in Redis
-			CompletableFuture<Boolean> senderRedisFuture = RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, senderUuid), receiverUuid.toString(), timestamp).toCompletableFuture();
-			CompletableFuture<Boolean> receiverRedisFuture = RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, receiverUuid), senderUuid.toString(), timestamp).toCompletableFuture();
+			// Atomically set both players as friends in Redis
+			RedisAPI.multi(conn -> {
+				conn.hset(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, senderUuid), receiverUuid.toString(), timestamp);
+				conn.hset(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, receiverUuid), senderUuid.toString(), timestamp);
+			}).whenComplete((txResult, txEx) -> {
+				if (txEx != null) {
+					MMLog.severe(LOG_PREFIX + "Failed to add friendship between " + senderUuid + " and " + receiverUuid, txEx);
+					return;
+				}
 
-			CompletableFuture.allOf(senderRedisFuture, receiverRedisFuture).thenRun(() -> {
-				if (senderRedisFuture.join() && receiverRedisFuture.join()) {
-					// Clean up the pending friend requests in Redis
-					RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, senderUuid), receiverUuid.toString());
-					RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString());
+				// Atomically clean up the pending friend requests in Redis
+				RedisAPI.multi(conn -> {
+					conn.hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, senderUuid), receiverUuid.toString());
+					conn.hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString());
+				}).exceptionally(ex2 -> {
+					MMLog.severe(LOG_PREFIX + "Failed to clean up friend requests after adding friendship between " + senderUuid + " and " + receiverUuid, ex2);
+					return null;
+				});
 
-					// Broadcast to all shards via RabbitMQ to
-					// set the sender and the receiver as friends in memory,
-					// clean up the pending friend requests in memory,
-					// cancel the friend request expiration task,
-					// and to notify them
-					Map<String, String> jsonProperties = Map.of(
+				// Broadcast to all shards via RabbitMQ to
+				// set the sender and the receiver as friends in memory,
+				// clean up the pending friend requests in memory,
+				// cancel the friend request expiration task,
+				// and to notify them
+				Map<String, String> jsonProperties = Map.of(
+					"senderUuid", senderUuid.toString(),
+					"receiverUuid", receiverUuid.toString(),
+					"timestamp", timestamp
+				);
+				broadcastNotification(ADDED_FRIEND_CHANNEL, jsonProperties, "Failed to notify other shards of a new friendship via RabbitMQ.");
+
+				if (moderator != null) {
+					UUID moderatorUuid = moderator.getUniqueId();
+
+					// Notify the sender and the receiver via RabbitMQ if a moderator forcefully designated them as friends or
+					// notify the sender/receiver via RabbitMQ if a moderator forcefully added them as their friend
+					Map<String, String> moderatorJsonProperties = Map.of(
+						"moderatorUuid", moderatorUuid.toString(),
 						"senderUuid", senderUuid.toString(),
 						"receiverUuid", receiverUuid.toString(),
 						"timestamp", timestamp
 					);
-					broadcastNotification(ADDED_FRIEND_CHANNEL, jsonProperties, "Failed to notify other shards of a new friendship via RabbitMQ.");
+					broadcastNotification(MODERATOR_FORCE_ADDED_FRIENDS_CHANNEL, moderatorJsonProperties, "Failed to notify other shards of a new friendship formed by a moderator via RabbitMQ.");
 
-					if (moderator != null) {
-						UUID moderatorUuid = moderator.getUniqueId();
-
-						// Notify the sender and the receiver via RabbitMQ if a moderator forcefully designated them as friends or
-						// notify the sender/receiver via RabbitMQ if a moderator forcefully added them as their friend
-						Map<String, String> moderatorJsonProperties = Map.of(
-							"moderatorUuid", moderatorUuid.toString(),
-							"senderUuid", senderUuid.toString(),
-							"receiverUuid", receiverUuid.toString(),
-							"timestamp", timestamp
-						);
-						broadcastNotification(MODERATOR_FORCE_ADDED_FRIENDS_CHANNEL, moderatorJsonProperties, "Failed to notify other shards of a new friendship formed by a moderator via RabbitMQ.");
-
-						moderator.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " are now friends.", NamedTextColor.GREEN)));
-						AuditListener.log(LOG_PREFIX + moderator.getName() + " forcefully made " + resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " be friends.");
-					}
+					moderator.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " are now friends.", NamedTextColor.GREEN)));
+					AuditListener.log(LOG_PREFIX + moderator.getName() + " forcefully made " + resolveName(senderUuid) + " and " + resolveName(receiverUuid) + " be friends.");
 				}
 			});
 		});
@@ -315,59 +317,48 @@ public class SocialManager implements Listener {
 		Player sender = Bukkit.getPlayer(senderUuid);
 
 		// Load the sender's social cache from memory or from Redis
-		return loadSocialCaches(senderUuid).thenCompose(socialCaches -> {
-			if (socialCaches == null) {
+		return loadSocialCache(senderUuid)
+			.exceptionally(ex -> {
 				Component errorMessage = Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED);
-
 				if (moderator != null) {
 					moderator.sendMessage(appendPrefix(errorMessage));
 				} else if (sender != null) {
 					sender.sendMessage(appendPrefix(errorMessage));
 				}
+				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + senderUuid, ex);
+				// Re-throw the exception as the correct type to propagate it to the rest of the futures in this chain
+				if (ex instanceof CompletionException ce) {
+					throw ce;
+				}
+				throw new CompletionException(ex);
+			})
+			.thenCompose(senderCache -> {
+				// Check if the sender and the receiver are friends
+				if (!senderCache.isFriendsWith(receiverUuid)) {
+					if (moderator != null) {
+						moderator.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " is not friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
+					} else if (sender != null) {
+						sender.sendMessage(appendPrefix(Component.text("You are not friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
+					}
 
-				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?");
-				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?"));
-			}
-
-			// Fetch the sender's social cache
-			PlayerSocialCache senderCache = socialCaches.get(senderUuid);
-
-			// This shouldn't occur if loadSocialCaches didn't return null
-			if (senderCache == null) {
-				Component errorMessage = Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED);
-
-				if (moderator != null) {
-					moderator.sendMessage(appendPrefix(errorMessage));
-				} else if (sender != null) {
-					sender.sendMessage(appendPrefix(errorMessage));
+					return CompletableFuture.completedFuture(null);
 				}
 
-				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?");
-				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?"));
-			}
+				// Atomically remove both players as friends in Redis
+				String friendKey = getSocialPairKey(senderUuid, receiverUuid);
+				CompletableFuture<Void> syncFuture = new CompletableFuture<>();
+				PENDING_FRIEND_REMOVALS_MAP.put(friendKey, syncFuture);
 
-			// Check if the sender and the receiver are friends
-			if (!senderCache.isFriendsWith(receiverUuid)) {
-				if (moderator != null) {
-					moderator.sendMessage(appendPrefix(Component.text(resolveName(senderUuid) + " is not friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
-				} else if (sender != null) {
-					sender.sendMessage(appendPrefix(Component.text("You are not friends with " + resolveName(receiverUuid) + "!", NamedTextColor.RED)));
-				}
-
-				return CompletableFuture.completedFuture(null);
-			}
-
-			// Remove the sender and the receiver as friends in Redis
-			CompletableFuture<Boolean> senderRedisFuture = RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, senderUuid), receiverUuid.toString()).thenApply(val -> val == 1L).toCompletableFuture();
-			CompletableFuture<Boolean> receiverRedisFuture = RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, receiverUuid), senderUuid.toString()).thenApply(val -> val == 1L).toCompletableFuture();
-
-			// Create a pending future for the friend removal operation to be completed by RabbitMQ confirmation
-			String friendKey = getSocialPairKey(senderUuid, receiverUuid);
-			CompletableFuture<Void> syncFuture = new CompletableFuture<>();
-			PENDING_FRIEND_REMOVALS_MAP.put(friendKey, syncFuture);
-
-			return CompletableFuture.allOf(senderRedisFuture, receiverRedisFuture).thenRun(() -> {
-				if (senderRedisFuture.join() && receiverRedisFuture.join()) {
+				return RedisAPI.multi(conn -> {
+					conn.hdel(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, senderUuid), receiverUuid.toString());
+					conn.hdel(getRedisPath(REDIS_SOCIAL_TYPE_FRIEND, receiverUuid), senderUuid.toString());
+				}).whenComplete((result, redisEx) -> {
+					if (redisEx != null) {
+						MMLog.severe(LOG_PREFIX + "Failed to remove friendship between " + senderUuid + " and " + receiverUuid, redisEx);
+						PENDING_FRIEND_REMOVALS_MAP.remove(friendKey);
+						syncFuture.completeExceptionally(redisEx);
+						return;
+					}
 					if (moderator != null) {
 						UUID moderatorUuid = moderator.getUniqueId();
 
@@ -395,9 +386,8 @@ public class SocialManager implements Listener {
 						);
 						broadcastNotification(REMOVED_FRIEND_CHANNEL, jsonProperties, "Failed to notify other shards of a friend being removed via RabbitMQ.");
 					}
-				}
-			}).thenCompose(v -> syncFuture);
-		});
+				}).thenCompose(unused -> syncFuture);
+			});
 	}
 	//endregion
 
@@ -406,28 +396,18 @@ public class SocialManager implements Listener {
 		Player sender = Bukkit.getPlayer(senderUuid);
 
 		// Load the sender's and the receiver's social cache from memory or from Redis
-		loadSocialCaches(senderUuid, receiverUuid).thenAccept(socialCaches -> {
-			if (socialCaches == null) {
+		loadSocialCachePair(senderUuid, receiverUuid).whenComplete((pair, ex) -> {
+			if (ex != null) {
 				if (sender != null) {
 					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
 				}
 
-				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
+				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid, ex);
 				return;
 			}
 
-			PlayerSocialCache senderCache = socialCaches.get(senderUuid);
-			PlayerSocialCache receiverCache = socialCaches.get(receiverUuid);
-
-			// This shouldn't occur if loadSocialCaches didn't return null
-			if (senderCache == null || receiverCache == null) {
-				if (sender != null) {
-					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
-				}
-
-				MMLog.severe(LOG_PREFIX + "Failed to load social caches for " + senderUuid + " and/or " + receiverUuid + ". Is Redis down?");
-				return;
-			}
+			PlayerSocialCache senderCache = pair.getSender();
+			PlayerSocialCache receiverCache = pair.getReceiver();
 
 			// Perform synchronous checks to see if the sender can block the receiver
 			PlayerSocialCache.BlockCheckResult result = senderCache.canBlockPlayer(receiverCache);
@@ -460,15 +440,20 @@ public class SocialManager implements Listener {
 				// Fetch the current timestamp
 				String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
 
-				// Set the receiver as blocked in Redis
-				RedisAPI.getInstance().async().hset(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, senderUuid), receiverUuid.toString(), timestamp).thenRun(() -> {
+				// Atomically set the receiver as blocked and remove any pending friend requests in Redis
+				RedisAPI.multi(conn -> {
+					conn.hset(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, senderUuid), receiverUuid.toString(), timestamp);
+					conn.hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, senderUuid), receiverUuid.toString());
+					conn.hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString());
+				}).whenComplete((txResult, txEx) -> {
+					if (txEx != null) {
+						MMLog.severe(LOG_PREFIX + "Failed to block " + receiverUuid + " for " + senderUuid, txEx);
+						return;
+					}
+
 					if (sender != null) {
 						sender.sendMessage(appendPrefix(Component.text("You have blocked " + resolveName(receiverUuid) + ".", NamedTextColor.GREEN)));
 					}
-
-					// Remove all pending friend requests from Redis
-					RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, senderUuid), receiverUuid.toString());
-					RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, receiverUuid), senderUuid.toString());
 
 					// Check if the sender and the receiver are friends
 					if (senderCache.isFriendsWith(receiverUuid)) {
@@ -495,60 +480,59 @@ public class SocialManager implements Listener {
 		Player sender = Bukkit.getPlayer(senderUuid);
 
 		// Load the sender's social cache from memory or from Redis
-		return loadSocialCaches(senderUuid).thenCompose(socialCaches -> {
-			if (socialCaches == null) {
+		return loadSocialCache(senderUuid)
+			.exceptionally(ex -> {
 				if (sender != null) {
 					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
 				}
+				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + senderUuid, ex);
+				// Re-throw the exception as the correct type to propagate it to the rest of the futures in this chain
+				if (ex instanceof CompletionException ce) {
+					throw ce;
+				}
+				throw new CompletionException(ex);
+			})
+			.thenCompose(senderCache -> {
+				// Check if the receiver is blocked
+				if (!senderCache.hasBlocked(receiverUuid)) {
+					if (sender != null) {
+						sender.sendMessage(appendPrefix(Component.text("You do not have " + resolveName(receiverUuid) + " blocked!", NamedTextColor.RED)));
+					}
 
-				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?");
-				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?"));
-			}
-
-			// Fetch the sender's social cache
-			PlayerSocialCache senderCache = socialCaches.get(senderUuid);
-
-			// This shouldn't occur if loadSocialCaches didn't return null
-			if (senderCache == null) {
-				if (sender != null) {
-					sender.sendMessage(appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
+					return CompletableFuture.completedFuture(null);
 				}
 
-				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?");
-				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + senderUuid + ". Is Redis down?"));
-			}
+				// Remove the block on the receiver in Redis
+				String unblockKey = getSocialPairKey(senderUuid, receiverUuid);
+				CompletableFuture<Void> syncFuture = new CompletableFuture<>();
+				PENDING_UNBLOCKS_MAP.put(unblockKey, syncFuture);
 
-			// Check if the receiver is blocked
-			if (!senderCache.hasBlocked(receiverUuid)) {
-				if (sender != null) {
-					sender.sendMessage(appendPrefix(Component.text("You do not have " + resolveName(receiverUuid) + " blocked!", NamedTextColor.RED)));
+				CompletableFuture<Long> hdelFuture;
+				try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+					hdelFuture = conn.hdel(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, senderUuid), receiverUuid.toString()).toCompletableFuture();
 				}
 
-				return CompletableFuture.completedFuture(null);
-			}
+				return hdelFuture.whenComplete((deletedCount, redisEx) -> {
+					if (redisEx != null) {
+						MMLog.severe(LOG_PREFIX + "Failed to unblock " + receiverUuid + " for " + senderUuid, redisEx);
+						PENDING_UNBLOCKS_MAP.remove(unblockKey);
+						syncFuture.completeExceptionally(redisEx);
+						return;
+					}
 
-			// Remove the block on the receiver in Redis
-			CompletableFuture<Boolean> senderRedisFuture = RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, senderUuid), receiverUuid.toString()).thenApply(val -> val == 1L).toCompletableFuture();
+					if (sender != null) {
+						sender.sendMessage(appendPrefix(Component.text("You have unblocked " + resolveName(receiverUuid) + ".", NamedTextColor.GREEN)));
+					}
 
-			// Create a pending future for the unblock operation to be completed by RabbitMQ confirmation
-			String unblockKey = getSocialPairKey(senderUuid, receiverUuid);
-			CompletableFuture<Void> syncFuture = new CompletableFuture<>();
-			PENDING_UNBLOCKS_MAP.put(unblockKey, syncFuture);
-
-			return senderRedisFuture.thenRun(() -> {
-				if (sender != null) {
-					sender.sendMessage(appendPrefix(Component.text("You have unblocked " + resolveName(receiverUuid) + ".", NamedTextColor.GREEN)));
-				}
-
-				// Broadcast to all shards via RabbitMQ to
-				// remove the block on the receiver in memory
-				Map<String, String> jsonProperties = Map.of(
-					"senderUuid", senderUuid.toString(),
-					"receiverUuid", receiverUuid.toString()
-				);
-				broadcastNotification(UNBLOCKED_PLAYER_CHANNEL, jsonProperties, "Failed to notify other shards of a player being unblocked via RabbitMQ.");
-			}).thenCompose(v -> syncFuture);
-		});
+					// Broadcast to all shards via RabbitMQ to
+					// remove the block on the receiver in memory
+					Map<String, String> jsonProperties = Map.of(
+						"senderUuid", senderUuid.toString(),
+						"receiverUuid", receiverUuid.toString()
+					);
+					broadcastNotification(UNBLOCKED_PLAYER_CHANNEL, jsonProperties, "Failed to notify other shards of a player being unblocked via RabbitMQ.");
+				}).thenCompose(unused -> syncFuture);
+			});
 	}
 	//endregion
 
@@ -559,22 +543,41 @@ public class SocialManager implements Listener {
 		long currentTime = System.currentTimeMillis() / 1000;
 
 		// Check for expired friend requests when the player joins in case a shard went down before the corresponding friend request expiration tasks could run
-		CompletableFuture<Void> expiredFriendRequestsFuture = RedisAPI.getInstance().async()
-			.hgetall(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, playerUuid))
-			.thenAccept(data ->
+		CompletableFuture<Map<String, String>> pendingRequestsReadFuture;
+		CompletableFuture<Map<String, String>> blockedPlayersReadFuture;
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			pendingRequestsReadFuture = conn.hgetall(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, playerUuid)).toCompletableFuture();
+			blockedPlayersReadFuture = conn.hgetall(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, playerUuid)).toCompletableFuture();
+		}
+
+		CompletableFuture<Void> expiredFriendRequestsFuture = pendingRequestsReadFuture
+			.thenAccept(data -> {
+				List<String> expiredKeys = new ArrayList<>();
 				data.forEach((key, value) -> {
-					long storedTime = Long.parseLong(value);
-					if (currentTime >= storedTime) {
-						// Remove expired friend requests
-						RedisAPI.getInstance().async().hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, playerUuid), key);
+					if (currentTime >= Long.parseLong(value)) {
+						expiredKeys.add(key);
 					}
-				})
-			)
-			.toCompletableFuture();
+				});
+				if (!expiredKeys.isEmpty()) {
+					// Remove all expired friend requests in one call
+					try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+						conn.hdel(getRedisPath(REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, playerUuid), expiredKeys.toArray(String[]::new))
+							.exceptionally(ex -> {
+								MMLog.severe(LOG_PREFIX + "Failed to remove expired friend requests on login for " + playerUuid, ex);
+								return null;
+							});
+					}
+				}
+			})
+			.handle((unused, ex) -> {
+				if (ex != null) {
+					MMLog.severe(LOG_PREFIX + "Failed to load pending friend requests on login for " + playerUuid, ex);
+				}
+				return null;
+			});
 
 		// Check the player's block list to see if any blocked players now have the block exemption permission
-		CompletableFuture<Void> blockExemptedFuture = RedisAPI.getInstance().async()
-			.hgetall(getRedisPath(REDIS_SOCIAL_TYPE_BLOCKED, playerUuid))
+		CompletableFuture<Void> blockExemptedFuture = blockedPlayersReadFuture
 			.thenCompose(data -> {
 				// Track all asynchronous LuckPerms tasks to run
 				List<CompletableFuture<Void>> unblockFutures = new ArrayList<>();
@@ -595,12 +598,21 @@ public class SocialManager implements Listener {
 				// Wait for all asynchronous LuckPerms tasks to finish
 				return CompletableFuture.allOf(unblockFutures.toArray(new CompletableFuture[0]));
 			})
-			.toCompletableFuture();
+			.handle((unused, ex) -> {
+				if (ex != null) {
+					MMLog.severe(LOG_PREFIX + "Failed to check block exemptions on login for " + playerUuid, ex);
+				}
+				return null;
+			});
 
 		// Load the player's social cache into memory after the previous checks complete
 		CompletableFuture.allOf(expiredFriendRequestsFuture, blockExemptedFuture)
 			.thenCompose(v -> PlayerSocialCache.load(playerUuid))
-			.thenAccept(socialCache -> SOCIAL_CACHE_MAP.put(playerUuid, socialCache));
+			.thenAccept(socialCache -> SOCIAL_CACHE_MAP.put(playerUuid, socialCache))
+			.exceptionally(ex -> {
+				MMLog.severe(LOG_PREFIX + "Failed to load social cache on login for " + playerUuid, ex);
+				return null;
+			});
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
@@ -1001,64 +1013,25 @@ public class SocialManager implements Listener {
 		}
 	}
 
-	static CompletableFuture<@Nullable Map<UUID, PlayerSocialCache>> loadSocialCaches(UUID... uuids) {
-		// Hold the final <UUID, PlayerSocialCache> pairs
-		Map<UUID, PlayerSocialCache> result = new ConcurrentHashMap<>();
-
-		// Track all asynchronous load tasks to run
-		List<CompletableFuture<Boolean>> futures = new ArrayList<>();
-
-		for (UUID uuid : uuids) {
-			PlayerSocialCache cache = getSocialCache(uuid);
-
-			if (cache != null) {
-				// Use the existing cache if it's already loaded
-				result.put(uuid, cache);
-			} else {
-				// Load the missing cache from Redis
-				CompletableFuture<Boolean> future = PlayerSocialCache.load(uuid).thenApply(loaded -> {
-					if (loaded != null) {
-						// Use the newly loaded cache
-						result.put(uuid, loaded);
-						return true;
-					}
-
-					// Return false if the cache failed to load
-					return false;
-				});
-
-				// Track the current loading task
-				futures.add(future);
-			}
+	static CompletableFuture<PlayerSocialCache> loadSocialCache(UUID uuid) {
+		PlayerSocialCache cached = getSocialCache(uuid);
+		if (cached != null) {
+			return CompletableFuture.completedFuture(cached);
 		}
+		return PlayerSocialCache.load(uuid);
+	}
 
-		// Wait for all asynchronous loading tasks to finish before checking if any failed to load
-		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(v -> {
-			boolean allSucceeded = futures.stream().allMatch(f -> f.getNow(false));
+	static CompletableFuture<SocialCachePair> loadSocialCachePair(UUID senderUuid, UUID receiverUuid) {
+		CompletableFuture<PlayerSocialCache> senderFuture = loadSocialCache(senderUuid);
+		CompletableFuture<PlayerSocialCache> receiverFuture = loadSocialCache(receiverUuid);
 
-			// Return null if any tasks failed to load a cache
-			return allSucceeded ? result : null;
-		});
+		return CompletableFuture.allOf(senderFuture, receiverFuture)
+			.thenApply(v -> new SocialCachePair(senderFuture.join(), receiverFuture.join()));
 	}
 
 	static CompletableFuture<PlayerSocialDisplayInfo> getSocialDisplayInfo(UUID playerUuid) {
-		return loadSocialCaches(playerUuid).thenCompose(socialCaches -> {
-			if (socialCaches == null) {
-				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?");
-				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?"));
-			}
-
-			// Fetch the player's social cache
-			PlayerSocialCache playerCache = socialCaches.get(playerUuid);
-
-			// This shouldn't occur if loadSocialCaches didn't return null
-			if (playerCache == null) {
-				MMLog.severe(LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?");
-				return CompletableFuture.failedFuture(new IllegalStateException(LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?"));
-			}
-
-			return PlayerSocialDisplayInfo.getSocialInfoFromSocialCache(playerCache);
-		});
+		return loadSocialCache(playerUuid)
+			.thenCompose(PlayerSocialDisplayInfo::getSocialInfoFromSocialCache);
 	}
 
 	private static void clearExpirationTasks(UUID firstUuid, UUID secondUuid) {

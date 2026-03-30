@@ -83,15 +83,8 @@ public class FriendCommand {
 						UUID senderUuid = sender.getUniqueId();
 
 						// Load the sender's social cache from memory or from Redis
-						return SocialManager.loadSocialCaches(senderUuid).thenApply(socialCaches -> {
-							if (socialCaches == null) {
-								return new String[0];
-							}
-
-							PlayerSocialCache senderCache = socialCaches.get(senderUuid);
-
-							// This shouldn't occur if loadSocialCaches didn't return null
-							if (senderCache == null) {
+						return SocialManager.loadSocialCache(senderUuid).handle((senderCache, ex) -> {
+							if (ex != null) {
 								return new String[0];
 							}
 
@@ -178,15 +171,8 @@ public class FriendCommand {
 							}
 
 							// Load player one's social cache from memory or from Redis
-							return SocialManager.loadSocialCaches(playerOneUuid).thenApply(socialCaches -> {
-								if (socialCaches == null) {
-									return new String[0];
-								}
-
-								PlayerSocialCache playerOneCache = socialCaches.get(playerOneUuid);
-
-								// This shouldn't occur if loadSocialCaches didn't return null
-								if (playerOneCache == null) {
+							return SocialManager.loadSocialCache(playerOneUuid).handle((playerOneCache, ex) -> {
+								if (ex != null) {
 									return new String[0];
 								}
 
@@ -268,19 +254,10 @@ public class FriendCommand {
 					}
 
 					// Load player one's social cache from memory or from Redis
-					SocialManager.loadSocialCaches(playerOneUuid).thenAccept(socialCaches -> {
-						if (socialCaches == null) {
+					SocialManager.loadSocialCache(playerOneUuid).whenComplete((playerOneCache, ex) -> {
+						if (ex != null) {
 							moderator.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
-							MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerOneUuid + ". Is Redis down?");
-							return;
-						}
-
-						PlayerSocialCache playerOneCache = socialCaches.get(playerOneUuid);
-
-						// This shouldn't occur if loadSocialCaches didn't return null
-						if (playerOneCache == null) {
-							moderator.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keeps happening.", NamedTextColor.RED)));
-							MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerOneUuid + ". Is Redis down?");
+							MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerOneUuid, ex);
 							return;
 						}
 
@@ -302,20 +279,10 @@ public class FriendCommand {
 		final boolean commandSenderCanSeeVanished = commandSender.hasPermission("group.devops");
 
 		// Load the sender's social cache from memory or from Redis
-		SocialManager.loadSocialCaches(playerUuid).thenAccept(socialCaches -> {
-			if (socialCaches == null) {
+		SocialManager.loadSocialCache(playerUuid).whenComplete((playerCache, ex) -> {
+			if (ex != null) {
 				commandSender.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED)));
-				MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?");
-				return;
-			}
-
-			// Fetch the sender's social cache
-			PlayerSocialCache playerCache = socialCaches.get(playerUuid);
-
-			// This shouldn't occur if loadSocialCaches didn't return null
-			if (playerCache == null) {
-				commandSender.sendMessage(SocialManager.appendPrefix(Component.text("An error occurred while trying to load player data. Please report this to server operators if this keep happening.", NamedTextColor.RED)));
-				MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerUuid + ". Is Redis down?");
+				MMLog.severe(SocialManager.LOG_PREFIX + "Failed to load social cache for " + playerUuid, ex);
 				return;
 			}
 

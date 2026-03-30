@@ -27,27 +27,29 @@ public class PlayerSocialCache {
 	static CompletableFuture<PlayerSocialCache> load(UUID uuid) {
 		PlayerSocialCache socialCache = new PlayerSocialCache(uuid);
 
-		// Fetch pending friend requests, friends, and blocked players
-		CompletableFuture<Void> loadPendingFriendRequests = RedisAPI.getInstance().async()
-			.hgetall(SocialManager.getRedisPath(SocialManager.REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, uuid))
+		CompletableFuture<Map<String, String>> pendingFuture;
+		CompletableFuture<Map<String, String>> friendsFuture;
+		CompletableFuture<Map<String, String>> blockedFuture;
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			pendingFuture = conn.hgetall(SocialManager.getRedisPath(SocialManager.REDIS_SOCIAL_TYPE_PENDING_FRIEND_REQUEST, uuid)).toCompletableFuture();
+			friendsFuture = conn.hgetall(SocialManager.getRedisPath(SocialManager.REDIS_SOCIAL_TYPE_FRIEND, uuid)).toCompletableFuture();
+			blockedFuture = conn.hgetall(SocialManager.getRedisPath(SocialManager.REDIS_SOCIAL_TYPE_BLOCKED, uuid)).toCompletableFuture();
+		}
+
+		CompletableFuture<Void> loadPendingFriendRequests = pendingFuture
 			.thenAccept(requestData ->
 				requestData.forEach((key, value) ->
-					socialCache.mPendingFriendRequests.put(UUID.fromString(key), Long.parseLong(value))))
-			.toCompletableFuture();
+					socialCache.mPendingFriendRequests.put(UUID.fromString(key), Long.parseLong(value))));
 
-		CompletableFuture<Void> loadFriends = RedisAPI.getInstance().async()
-			.hgetall(SocialManager.getRedisPath(SocialManager.REDIS_SOCIAL_TYPE_FRIEND, uuid))
+		CompletableFuture<Void> loadFriends = friendsFuture
 			.thenAccept(friendData ->
 				friendData.forEach((key, value) ->
-					socialCache.mFriends.put(UUID.fromString(key), value)))
-			.toCompletableFuture();
+					socialCache.mFriends.put(UUID.fromString(key), value)));
 
-		CompletableFuture<Void> loadBlockedPlayers = RedisAPI.getInstance().async()
-			.hgetall(SocialManager.getRedisPath(SocialManager.REDIS_SOCIAL_TYPE_BLOCKED, uuid))
+		CompletableFuture<Void> loadBlockedPlayers = blockedFuture
 			.thenAccept(blockedData ->
 				blockedData.forEach((key, value) ->
-					socialCache.mBlockedPlayers.put(UUID.fromString(key), value)))
-			.toCompletableFuture();
+					socialCache.mBlockedPlayers.put(UUID.fromString(key), value)));
 
 		return CompletableFuture.allOf(loadPendingFriendRequests, loadFriends, loadBlockedPlayers).thenApply(v -> socialCache);
 	}
