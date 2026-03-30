@@ -53,7 +53,7 @@ public class DarkSummonerTowerAbility extends TowerAbility {
 					}
 					TowerGameUtils.startMob(livingEntity, null, game, mIsPlayerMob);
 				} catch (Exception e) {
-					TowerFileUtils.warning("Exception while spawning mob for DarkSummoner. Reason: " + e.getMessage());
+					TowerFileUtils.severe("Exception while spawning mob for DarkSummoner", e);
 				}
 			}
 

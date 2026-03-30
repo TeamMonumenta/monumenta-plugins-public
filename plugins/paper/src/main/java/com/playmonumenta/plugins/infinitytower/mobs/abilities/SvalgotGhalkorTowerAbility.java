@@ -70,8 +70,7 @@ public class SvalgotGhalkorTowerAbility extends TowerAbility {
 			}
 
 		} catch (Exception e) {
-			TowerFileUtils.warning("Catch an exception while spawning Svalgot & Ghalkor. Reason: " + e.getMessage());
-			e.printStackTrace();
+			TowerFileUtils.severe("Exception while spawning Svalgot & Ghalkor", e);
 		}
 	}
 }

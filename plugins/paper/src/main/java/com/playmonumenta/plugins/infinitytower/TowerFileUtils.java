@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobRarity;
 import com.playmonumenta.plugins.utils.FileUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.redissync.BukkitConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import de.tr7zw.nbtapi.NBT;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -31,6 +33,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 public class TowerFileUtils {
+
+	private static final String LOG_PREFIX = "[InfinityTower] ";
 
 
 	public static final List<TowerMobInfo> TOWER_MOBS_INFO = new ArrayList<>();
@@ -67,8 +71,7 @@ public class TowerFileUtils {
 				}
 			}
 		} catch (Exception e) {
-			warning(e.toString());
-			e.printStackTrace();
+			severe("Failed to load tower mobs info", e);
 			TowerConstants.SHOULD_GAME_START = false;
 		}
 
@@ -89,7 +92,7 @@ public class TowerFileUtils {
 			TowerConstants.DESIGNED_FLOORS = teams.size();
 
 		} catch (Exception e) {
-			warning(e.toString());
+			severe("Failed to load default teams", e);
 			TowerConstants.SHOULD_GAME_START = false;
 		}
 
@@ -113,7 +116,7 @@ public class TowerFileUtils {
 			}
 
 		} catch (Exception e) {
-			warning(e.toString());
+			warning("Failed to load player teams", e);
 			//TowerConstants.SHOULD_GAME_START = false; no problem ?
 		}
 
@@ -130,7 +133,7 @@ public class TowerFileUtils {
 					.add(TowerFloor.fromJson(((JsonObject) arr.get(i)).getAsJsonObject("floor")));
 			}
 		} catch (Exception e) {
-			warning(e.toString());
+			severe("Failed to load floors", e);
 			TowerConstants.SHOULD_GAME_START = false;
 		}
 	}
@@ -334,20 +337,24 @@ public class TowerFileUtils {
 		try {
 			return FileUtils.readJson(Plugin.getInstance().getDataFolder() + File.separator + "InfinityTower" + File.separator + fileName);
 		} catch (Exception e) {
-			warning("exception while reading file: " + fileName + " Reason: " + e.getMessage());
+			severe("Exception while reading file: " + fileName, e);
 		}
 		return null;
 	}
 
 	public static @Nullable JsonObject readFileRedis(String fileName) {
 		try {
-			String data = RedisAPI.getInstance().async().get(getRedisPath(fileName)).get(15, TimeUnit.SECONDS);
+			CompletableFuture<String> future;
+			try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+				future = conn.get(getRedisPath(fileName)).toCompletableFuture();
+			}
+			String data = future.get(15, TimeUnit.SECONDS);
 			if (data == null) {
-				warning("Tried to read file '" + fileName + "' from redis but it was empty");
+				severe("Tried to read file '" + fileName + "' from redis but it was empty");
 			}
 			return new Gson().fromJson(data, JsonObject.class);
 		} catch (Exception e) {
-			warning("exception while reading redis file: " + fileName + " Reason: " + e.getMessage());
+			severe("Exception while reading redis file: " + fileName, e);
 		}
 		return null;
 	}
@@ -356,16 +363,18 @@ public class TowerFileUtils {
 		try {
 			FileUtils.writeJson(Plugin.getInstance().getDataFolder() + File.separator + "InfinityTower" + File.separator + fileName, obj);
 		} catch (Exception e) {
-			warning("exception while save file : " + e.getMessage());
+			severe("Exception while saving file: " + fileName, e);
 		}
 	}
 
 	public static void saveFileRedis(JsonObject obj, String fileName) {
-		RedisAPI.getInstance().async().set(getRedisPath(fileName), new Gson().toJson(obj)).whenComplete((unused, ex) -> {
-			if (ex != null) {
-				warning("exception while save redis file : " + ex.getMessage());
-			}
-		});
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.set(getRedisPath(fileName), new Gson().toJson(obj)).whenComplete((unused, ex) -> {
+				if (ex != null) {
+					severe("Exception while saving redis file: " + fileName, ex);
+				}
+			});
+		}
 	}
 
 	public static @Nullable TowerMobInfo getMobInfo(String losName) {
@@ -438,8 +447,19 @@ public class TowerFileUtils {
 	}
 
 	public static void warning(String msg) {
-		Plugin.getInstance().getLogger().warning("[InfinityTower] " + msg);
+		MMLog.warning(LOG_PREFIX + msg);
 	}
 
+	public static void warning(String msg, Throwable ex) {
+		MMLog.warning(LOG_PREFIX + msg, ex);
+	}
+
+	public static void severe(String msg) {
+		MMLog.severe(LOG_PREFIX + msg);
+	}
+
+	public static void severe(String msg, Throwable ex) {
+		MMLog.severe(LOG_PREFIX + msg, ex);
+	}
 
 }

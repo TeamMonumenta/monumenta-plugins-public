@@ -504,7 +504,7 @@ public class TowerMobAbility {
 			}
 		}
 
-		TowerFileUtils.warning("No ability match for: " + name);
+		TowerFileUtils.severe("No ability match for: " + name);
 		mDescription = "FAIL! Please contact a moderator";
 		mBuilder = null;
 	}
@@ -514,7 +514,7 @@ public class TowerMobAbility {
 			try {
 				mBuilder.build(towerMob, mob, game, playerMob);
 			} catch (Exception e) {
-				TowerFileUtils.warning("Exception during applying ability: " + mName + " Reason:" + e.getMessage());
+				TowerFileUtils.severe("Exception during applying ability: " + mName, e);
 			}
 		}
 	}

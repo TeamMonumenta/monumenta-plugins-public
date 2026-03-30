@@ -64,8 +64,7 @@ public class TowerTeam {
 				mobs.add(mobSpawned);
 			}
 		} catch (Exception e) {
-			TowerFileUtils.warning("Catch an exception while spawning a mob. ");
-			e.printStackTrace();
+			TowerFileUtils.severe("Exception while spawning a mob", e);
 			game.forceStopGame();
 		}
 

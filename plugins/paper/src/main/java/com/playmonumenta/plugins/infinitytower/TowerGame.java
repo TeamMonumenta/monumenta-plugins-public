@@ -73,7 +73,7 @@ public class TowerGame {
 		if (floor == null) {
 			//no file?
 			//make a log and stop the game.
-			TowerFileUtils.warning("mFloor == null, no file loaded? stopping the game.");
+			TowerFileUtils.severe("mFloor == null, no file loaded? stopping the game.");
 
 			forceStopGame();
 			return;
@@ -84,7 +84,7 @@ public class TowerGame {
 		if (floorTeam == null) {
 			//no file?
 			//make a log and stop the game.
-			TowerFileUtils.warning("mFloorTeam == null, no file loaded? stopping the game.");
+			TowerFileUtils.severe("mFloorTeam == null, no file loaded? stopping the game.");
 
 			forceStopGame();
 			return;
@@ -93,7 +93,7 @@ public class TowerGame {
 
 		ItemStack stack = InventoryUtils.getItemFromLootTable(mPlayer.mPlayer, TowerConstants.BOOK_LOOT_TABLE_KEY);
 		if (stack == null) {
-			TowerFileUtils.warning("Failed to load loottable");
+			TowerFileUtils.severe("Failed to load loottable");
 			forceStopGame();
 			return;
 		}
@@ -225,7 +225,7 @@ public class TowerGame {
 							}
 						} catch (Exception e) {
 							//sometimes we have a ConcurrentModificationException
-							TowerFileUtils.warning("Exception while unloading a Boss. reason: " + e.getMessage());
+							TowerFileUtils.warning("Exception while unloading a Boss", e);
 						}
 					}
 

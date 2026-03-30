@@ -86,14 +86,14 @@ public class TowerCommands {
 				}
 
 				if (TowerManager.GAMES.containsKey(playerUUID)) {
-					TowerFileUtils.warning("Trying to start a new game with a player that has another one? wtf");
+					TowerFileUtils.severe("Trying to start a new game with a player that has another one?");
 					player.sendMessage(Component.text("Sorry there are some problems. Please contact a mod!", NamedTextColor.RED));
 					return -1;
 				}
 
 				Integer nextID = TowerFileUtils.getNextID();
 				if (nextID == null) {
-					TowerFileUtils.warning("======Tried to start a game with full instance=====");
+					TowerFileUtils.warning("Tried to start a game with full instance");
 					player.sendMessage(Component.text("Sorry all the instance of this game are full, try again later.", NamedTextColor.RED));
 					return -1;
 				}

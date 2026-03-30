@@ -94,15 +94,25 @@ public class UsernameManager implements Listener {
 	//region <USERNAME MANAGEMENT>
 	public UsernameManager() {
 		// Load blacklisted usernames from Redis into the shard's local TreeSet
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			TreeSet<String> tempSet = new TreeSet<>(RedisAPI.getInstance().async().smembers(BADNAMES_REDIS_KEY).toCompletableFuture().join());
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> mBlacklistedUsernames.addAll(tempSet));
-		});
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.smembers(BADNAMES_REDIS_KEY).whenComplete((members, ex) -> {
+				if (ex != null) {
+					MMLog.warning(AUDIT_LOG_PREFIX + "Failed to load blacklisted usernames from Redis: " + ex.getMessage());
+					return;
+				}
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> mBlacklistedUsernames.addAll(members));
+			});
+		}
 	}
 
 	private static void addUsernameToBlacklist(String username) {
 		// Add the blacklisted username to Redis
-		RedisAPI.getInstance().async().sadd(BADNAMES_REDIS_KEY, username.toLowerCase(Locale.ROOT));
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.sadd(BADNAMES_REDIS_KEY, username.toLowerCase(Locale.ROOT)).exceptionally(ex -> {
+				MMLog.warning(AUDIT_LOG_PREFIX + "Failed to add bad name to Redis: " + ex.getMessage());
+				return null;
+			});
+		}
 
 		// Notify other shards about the added blacklisted username via RabbitMQ
 		JsonObject jsonObject = new JsonObject();
@@ -116,7 +126,12 @@ public class UsernameManager implements Listener {
 
 	private static void removeUsernameFromBlacklist(String username) {
 		// Remove the blacklisted username from Redis
-		RedisAPI.getInstance().async().srem(BADNAMES_REDIS_KEY, username.toLowerCase(Locale.ROOT));
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.srem(BADNAMES_REDIS_KEY, username.toLowerCase(Locale.ROOT)).exceptionally(ex -> {
+				MMLog.warning(AUDIT_LOG_PREFIX + "Failed to remove bad name from Redis: " + ex.getMessage());
+				return null;
+			});
+		}
 
 		// Notify other shards about the removed blacklisted username via RabbitMQ
 		JsonObject jsonObject = new JsonObject();

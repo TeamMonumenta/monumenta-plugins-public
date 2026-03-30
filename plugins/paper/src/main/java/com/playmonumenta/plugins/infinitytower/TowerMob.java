@@ -188,7 +188,7 @@ public class TowerMob {
 		LivingEntity mobspawned = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, mInfo.mLosName);
 
 		if (mobspawned == null) {
-			TowerFileUtils.warning("WARNING! ------------ TowerMob = null | name = " + mInfo.mLosName);
+			TowerFileUtils.severe("TowerMob is null for name: " + mInfo.mLosName);
 			game.forceStopGame();
 			return null;
 		}
@@ -229,7 +229,7 @@ public class TowerMob {
 
 		LivingEntity mobspawned = (LivingEntity) LibraryOfSoulsIntegration.summon(loc1, mInfo.mLosName);
 		if (mobspawned == null) {
-			TowerFileUtils.warning("WARNING! ------------ TowerMob = null | name = " + mInfo.mLosName);
+			TowerFileUtils.severe("TowerMob is null for name: " + mInfo.mLosName);
 			game.forceStopGame();
 			return;
 		}

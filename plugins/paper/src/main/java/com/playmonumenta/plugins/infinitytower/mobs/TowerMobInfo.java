@@ -167,9 +167,8 @@ public class TowerMobInfo {
 
 			return item;
 		} catch (Exception e) {
-			TowerFileUtils.warning("Catch an exception during parsing a mob");
+			TowerFileUtils.severe("Exception during parsing a mob", e);
 			TowerConstants.SHOULD_GAME_START = false;
-			e.printStackTrace();
 			return null;
 		}
 
