@@ -180,6 +180,7 @@ public enum EnchantmentType {
 
 	//Random Stuff
 	PESTILENCE_TESSERACT(new PestilenceTesseract(), false, false, true, false),
+	UTILITY_ITEM_FOR_ARMORY(new UtilityItemForArmory(), false, false, false, false),
 
 	// Hidden enchantments that affect display
 	HIDE_ATTRIBUTES(new HideAttributes(), false, false, false, false),
@@ -273,6 +274,7 @@ public enum EnchantmentType {
 	public boolean isHidden() {
 		return this == MAINHAND_OFFHAND_DISABLE
 			|| this == OFFHAND_MAINHAND_DISABLE
+			|| this == UTILITY_ITEM_FOR_ARMORY
 			|| this == HIDE_ATTRIBUTES
 			|| this == HIDE_ENCHANTS
 			|| this == HIDE_INFO

@@ -97,12 +97,6 @@ public class ItemUtils {
 	// resolveOrDefault doesn't support NBTCompoundList or StringList
 	private static final String plainDisplayPath = PLAIN_KEY + "." + DISPLAY_KEY;
 
-	// Hardcoded list of utilities for isUtilityItem lockbox check
-	public static final Set<String> utilityItemNames = Set.of(
-		"Necronomicon",
-		"Annilys"
-	);
-
 	// List of materials that trees can't replace when they grow
 	public static final Set<Material> notAllowedTreeReplace = EnumSet.of(
 		// Basically #minecraft:wither_immune + chests, barrels, shulker boxes, spawners
@@ -1360,7 +1354,7 @@ public class ItemUtils {
 			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.RECOIL)
 			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE)
 			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.WORLDLY_PROTECTION)
-			|| utilityItemNames.contains(getPlainName(item));
+			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.UTILITY_ITEM_FOR_ARMORY);
 	}
 
 	/**
