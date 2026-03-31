@@ -432,7 +432,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 						Collection<LivingEntity> collide = bossLocation.getWorld().getNearbyEntitiesByType(LivingEntity.class, blockLocation, 5);
 						for (LivingEntity entity : collide) {
 							if (!entity.equals(mBoss) && entity.getBoundingBox().overlaps(box) && mDelay <= 0) {
-								mFallingBlock.remove();
+								if (mFallingBlock.isValid()) {
+									mFallingBlock.remove();
+								}
 								Location explosionLoc = mAlwaysAccurate ? mPLoc : blockLocation;
 								mExplosionAesthetics.launch(mBoss, explosionLoc);
 								List<? extends LivingEntity> targets = mExplosionTargets.getTargets(explosionLoc);
@@ -456,7 +458,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 					if (mFallingBlock.isOnGround() || !mFallingBlock.isValid()) {
 						mDelay -= 1;
 						if (mDelay <= 0) {
-							mFallingBlock.remove();
+							if (mFallingBlock.isValid()) {
+								mFallingBlock.remove();
+							}
 							Location explosionLoc = mAlwaysAccurate ? mPLoc : blockLocation;
 							mExplosionAesthetics.launch(mBoss, explosionLoc);
 							List<? extends LivingEntity> targets = mExplosionTargets.getTargets(explosionLoc);
@@ -475,7 +479,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 					}
 
 					if (mTicks >= mDuration) {
-						mFallingBlock.remove();
+						if (mFallingBlock.isValid()) {
+							mFallingBlock.remove();
+						}
 						Location explosionLoc = mAlwaysAccurate ? mPLoc : blockLocation;
 						mExplosionAesthetics.launch(mBoss, explosionLoc);
 						List<? extends LivingEntity> targets = mExplosionTargets.getTargets(explosionLoc);
@@ -498,7 +504,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 				@Override
 				public synchronized void cancel() throws IllegalStateException {
 					super.cancel();
-					mFallingBlock.remove();
+					if (mFallingBlock.isValid()) {
+						mFallingBlock.remove();
+					}
 					mActiveRunnables.remove(this);
 				}
 
