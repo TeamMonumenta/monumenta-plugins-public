@@ -242,12 +242,12 @@ public class Plugin extends JavaPlugin {
 		}
 
 		NmsUtils.loadVersionAdapter(this.getServer().getClass(), getLogger());
-
 		/*
 		 * CommandAPI commands which register directly and are usable in functions
 		 *
 		 * These need to register immediately on load to prevent function loading errors
 		 */
+		TitleUtilsCommand.register();
 		AbsorptionCommand.register();
 		AdminNotify.register();
 		AttributeModifierCommand.register();

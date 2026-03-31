@@ -314,4 +314,98 @@ public class MessagingUtils {
 		return result;
 	}
 
+	/**
+	 * Get the length of a component
+	 * @param component The text to get the length of
+	 * @return The length of the component (non-text components are treated as single characters)
+	 */
+	public static int componentLength(Component component) {
+		int result = 0;
+		for (Component child : recursiveComponents(component)) {
+			if (child instanceof TextComponent textComponent) {
+				result += textComponent.content().length();
+			} else {
+				result += 1;
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Get a substring-style component of another component, including formatting
+	 * @param original   The component to get a subcomponent of
+	 * @param beginIndex The inclusive starting index of the original component (negative is relative to the end of the component)
+	 * @param endIndex   The exclusive ending index of the original component (negative is relative to the end of the component)
+	 * @return A component contained within the other component
+	 */
+	public static Component subComponent(Component original, int beginIndex, int endIndex) {
+		int originalLength = componentLength(original);
+		// Python-style negative indices are treated as relative to the end of the original component
+		int interpretedBegin = beginIndex;
+		if (interpretedBegin < 0) {
+			interpretedBegin += originalLength;
+		}
+		int interpretedEnd = endIndex;
+		if (interpretedEnd < 0) {
+			interpretedEnd += originalLength;
+		}
+
+		// Bounds checks
+		if (interpretedBegin < 0 || interpretedBegin > interpretedEnd || interpretedEnd > originalLength) {
+			throw new IndexOutOfBoundsException("Invalid bounds (" + beginIndex + ", " + endIndex + ") for component of length " + originalLength);
+		}
+
+		return subComponentInternal(original, interpretedBegin, interpretedEnd).result;
+	}
+
+	private record SubComponentState(Component result, int length) {
+	}
+
+	// Internal method for getting a subcomponent;
+	// skips the bounds checks and returns empty components with the correct formatting where needed
+	private static SubComponentState subComponentInternal(Component original, int beginIndex, int endIndex) {
+		SubComponentState base;
+		int relativeBegin;
+		int relativeEnd;
+		if (original instanceof TextComponent textComponent) {
+			// Normal text; use substring and copy formatting
+			String content = textComponent.content();
+			int contentLen = content.length();
+			int innerBegin = Integer.max(0, beginIndex);
+			int innerEnd = Integer.min(endIndex, contentLen);
+
+			String subContent = content.substring(innerBegin, innerEnd);
+			base = new SubComponentState(Component.text(subContent, original.style()), contentLen);
+			relativeBegin = beginIndex - contentLen;
+			relativeEnd = endIndex - contentLen;
+		} else if (beginIndex > 0) {
+			// Not plain text, but too early in the subcomponent to include; skip, counting as 1 character
+			base = new SubComponentState(Component.text("", original.style()), 0);
+			relativeBegin = beginIndex - 1;
+			relativeEnd = endIndex - 1;
+		} else {
+			// Not plain text, and included in the subcomponent; include, counting as 1 character
+			base = new SubComponentState(original.children(List.of()), 1);
+			relativeBegin = beginIndex - 1;
+			relativeEnd = endIndex - 1;
+		}
+
+		int resultLength = base.length;
+
+		List<Component> children = new ArrayList<>();
+		for (Component originalChild : original.children()) {
+			// No need to go beyond the end of the subcomponent
+			if (relativeEnd <= 0) {
+				break;
+			}
+
+			SubComponentState subChildState = subComponentInternal(originalChild, relativeBegin, relativeEnd);
+			children.add(subChildState.result);
+			relativeBegin -= subChildState.length;
+			relativeEnd -= subChildState.length;
+			resultLength += subChildState.length;
+		}
+
+		return new SubComponentState(base.result.children(children), resultLength);
+	}
 }
