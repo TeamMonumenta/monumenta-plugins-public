@@ -202,7 +202,8 @@ public class TradeListener implements Listener {
 		if (!(human instanceof Player player)) {
 			return;
 		}
-		if (!player.hasPermission(VANILLA_WALLET_PERMISSION)) {
+		if (!player.hasPermission(VANILLA_WALLET_PERMISSION)
+			|| ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.DISABLE_CUSTOM_TRADE_GUI)) {
 			return;
 		}
 
