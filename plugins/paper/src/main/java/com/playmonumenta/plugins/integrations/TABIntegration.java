@@ -313,8 +313,10 @@ public class TABIntegration implements Listener {
 			value.mLastLayout = finalLayout;
 			return value;
 		});
-		setHeaderAndFooter(viewer, monuPlayer);
-		Objects.requireNonNull(mTab.getLayoutManager()).sendLayout(viewer, finalLayout.toLayout(viewer.getUniqueId()));
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+			setHeaderAndFooter(viewer, monuPlayer);
+			Objects.requireNonNull(mTab.getLayoutManager()).sendLayout(viewer, finalLayout.toLayout(viewer.getUniqueId()));
+		});
 	}
 
 	private long mNextRefreshLatencyTime = 0L;
