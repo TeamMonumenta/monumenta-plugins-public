@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.delves.abilities;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.delves.DelvesModifier;
@@ -408,7 +407,7 @@ public class Haunted {
 		armorStand.setGravity(false);
 		armorStand.setMarker(true);
 		armorStand.setCollidable(false);
-		armorStand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+		armorStand.setPersistent(false);
 		armorStand.setBasePlate(false);
 		armorStand.setArms(true);
 		armorStand.setHeadPose(new EulerAngle(Math.toRadians(357), Math.toRadians(0), Math.toRadians(0)));

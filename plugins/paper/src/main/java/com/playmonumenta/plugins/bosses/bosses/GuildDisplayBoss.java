@@ -26,7 +26,6 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-import static com.playmonumenta.plugins.Constants.Tags.REMOVE_ON_UNLOAD;
 
 public class GuildDisplayBoss extends BossAbilityGroup {
 
@@ -104,7 +103,7 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 									banner.setInterpolationDelay(0);
 									banner.setInterpolationDuration(1);
 									banner.addScoreboardTag(scoreboardTag);
-									banner.addScoreboardTag(REMOVE_ON_UNLOAD);
+									banner.setPersistent(false);
 									banner.setBrightness(new Display.Brightness(15, 15));
 									banner.setItemStack(LuckPermsIntegration.getGuildBanner(mAllGuilds.get(pos)));
 									TextDisplay text = mBoss.getWorld().spawn(loc.clone().add((p.WIDTH / 2) * FastUtils.sinDeg(p.ROTATION), 1.5 + height, (p.WIDTH / 2) * FastUtils.cosDeg(p.ROTATION)), TextDisplay.class);
@@ -115,7 +114,7 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 									text.setInterpolationDuration(1);
 									text.setBrightness(new Display.Brightness(15, 15));
 									text.addScoreboardTag(scoreboardTag);
-									text.addScoreboardTag(REMOVE_ON_UNLOAD);
+									text.setPersistent(false);
 									mPairs.add(new Pair(banner, text));
 								}
 							}
@@ -224,7 +223,7 @@ public class GuildDisplayBoss extends BossAbilityGroup {
 	@Override
 	public void unload() {
 		// Would really like to remove the entities here, but removal isn't allowed during chunk unloading
-		// Instead just clear the list, the entities have REMOVE_ON_UNLOAD tag so they'll be removed when the chunk loads next
+		// Instead just clear the list; entities have setPersistent(false) so they won't be saved on unload
 		mPairs.clear();
 	}
 }

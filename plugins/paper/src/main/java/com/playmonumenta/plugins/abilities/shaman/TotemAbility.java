@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.shaman;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -176,7 +175,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		stand.setGravity(true);
 		stand.setRotation(f, 0);
 		stand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
-		stand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+		stand.setPersistent(false);
 
 		placeTotem(bLoc, mPlayer, stand);
 
@@ -187,7 +186,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 			durationStand.setMarker(true);
 			durationStand.customName(Component.text(""));
 			durationStand.setCustomNameVisible(true);
-			durationStand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+			durationStand.setPersistent(false);
 		}
 
 		mCurrDuration = 0;

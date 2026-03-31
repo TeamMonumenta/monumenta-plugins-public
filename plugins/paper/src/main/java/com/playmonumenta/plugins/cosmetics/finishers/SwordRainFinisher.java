@@ -445,7 +445,7 @@ public class SwordRainFinisher implements EliteFinisher {
 		ItemUtils.setPlainTag(sword);
 		swordStand.getEquipment().setItemInMainHand(sword);
 		swordStand.setRightArmPose(new EulerAngle(Math.PI / 2.0, FastUtils.RANDOM.nextDouble() * Math.PI, 0));
-		swordStand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+		swordStand.setPersistent(false);
 		return swordStand;
 	}
 }

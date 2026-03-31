@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.punches;
 
 import com.playmonumenta.networkchat.RemotePlayerListener;
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
@@ -92,7 +91,7 @@ public class RobberyPunch implements PlayerPunch {
 				}
 			}
 			Item moneyItem = loc.getWorld().dropItem(loc, money);
-			moneyItem.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+			moneyItem.setPersistent(false);
 			moneyItem.setPickupDelay(Integer.MAX_VALUE);
 			moneyItem.addScoreboardTag(NAME);
 			int degrees = FastUtils.randomIntInRange(0, 360);

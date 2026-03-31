@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.spells.lich.undeadplayers;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -41,7 +40,7 @@ public class SpellFlameTotem extends Spell {
 			mTotem.setMarker(false);
 			mTotem.setGravity(true);
 			mTotem.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
-			mTotem.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+			mTotem.setPersistent(false);
 		}
 
 		BukkitRunnable manageTotem = new BukkitRunnable() {

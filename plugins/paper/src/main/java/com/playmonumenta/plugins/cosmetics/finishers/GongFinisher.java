@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
@@ -84,7 +83,7 @@ public class GongFinisher implements EliteFinisher {
 					player.setMarker(true);
 					player.setCollidable(false);
 					player.setRotation(eyeLocation.getYaw(), 0);
-					player.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+					player.setPersistent(false);
 					player.setBasePlate(false);
 					player.addDisabledSlots(EquipmentSlot.values());
 					player.setArms(true);

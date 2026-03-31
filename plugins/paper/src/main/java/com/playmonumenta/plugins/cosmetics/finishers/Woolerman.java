@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Note;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -60,7 +59,7 @@ public class Woolerman implements EliteFinisher {
 					armorStand.setGravity(false);
 					armorStand.setMarker(true);
 					armorStand.setSmall(true);
-					armorStand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+					armorStand.setPersistent(false);
 				});
 
 			@Override

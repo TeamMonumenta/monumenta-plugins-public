@@ -200,7 +200,7 @@ public class CornucopiaFinisher implements EliteFinisher {
 			Item foodItem = loc.getWorld().dropItem(loc, food);
 			foodItem.setPickupDelay(Integer.MAX_VALUE);
 			foodItem.addScoreboardTag(NAME);
-			foodItem.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+			foodItem.setPersistent(false);
 			int degrees = offset + (i * 90);
 			foodItem.setVelocity(new Vector(0.2 * FastUtils.sinDeg(degrees), 0.6, 0.2 * FastUtils.cosDeg(degrees)));
 		}

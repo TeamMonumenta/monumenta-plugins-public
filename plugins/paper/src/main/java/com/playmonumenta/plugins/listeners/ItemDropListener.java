@@ -161,6 +161,8 @@ public final class ItemDropListener implements Listener {
 		Player player = event.getPlayer();
 		Item itemEntity = event.getItemDrop();
 		if (player.getGameMode() == GameMode.CREATIVE) {
+			// Any items dropped by players in creative mode are not saved on chunk unload
+			itemEntity.setPersistent(false);
 			return;
 		}
 

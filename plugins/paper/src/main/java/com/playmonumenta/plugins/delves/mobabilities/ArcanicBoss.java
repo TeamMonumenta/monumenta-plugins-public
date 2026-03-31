@@ -255,7 +255,7 @@ public class ArcanicBoss extends BossAbilityGroup {
 			return;
 		}
 
-		mArcaneRune.addScoreboardTag("REMOVE_ON_UNLOAD");
+		mArcaneRune.setPersistent(false);
 		Transformation transformation = mArcaneRune.getTransformation();
 		boss.addPassenger(mArcaneRune);
 

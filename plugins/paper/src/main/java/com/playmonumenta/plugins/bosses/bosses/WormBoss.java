@@ -214,7 +214,7 @@ public class WormBoss extends BossAbilityGroup {
 		super.unload();
 		if (!mBoss.isDead()) {
 			// Would really like to remove the entities here, but removal isn't allowed during chunk unloading
-			// Instead just clear the list, the entities have REMOVE_ON_UNLOAD tag so they'll be removed when the chunk loads next
+			// Instead just clear the list; parts have setPersistent(false) so they won't be saved on unload
 			mParts.clear();
 		}
 	}

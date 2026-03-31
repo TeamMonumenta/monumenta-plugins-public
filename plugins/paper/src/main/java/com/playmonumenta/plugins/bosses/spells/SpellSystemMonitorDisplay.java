@@ -21,7 +21,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.TextDisplay;
 
-import static com.playmonumenta.plugins.Constants.Tags.REMOVE_ON_UNLOAD;
 
 public class SpellSystemMonitorDisplay extends Spell {
 	private static final int KIB_FACTOR = 1024;
@@ -154,7 +153,7 @@ public class SpellSystemMonitorDisplay extends Spell {
 		if (textDisplay == null) {
 			textDisplay = loc.getWorld().spawn(loc, TextDisplay.class);
 			textDisplay.addScoreboardTag(SystemMonitorDisplayBoss.identityTag);
-			textDisplay.addScoreboardTag(REMOVE_ON_UNLOAD);
+			textDisplay.setPersistent(false);
 			textDisplay.setBackgroundColor(BACKGROUND_COLOR);
 		}
 

@@ -154,7 +154,7 @@ public class MegalovaniaFinisher implements EliteFinisher {
 		sans.setCollidable(false);
 		sans.getEquipment().setHelmet(new ItemStack(Material.SKELETON_SKULL));
 		sans.setRotation(0, 0);
-		sans.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+		sans.setPersistent(false);
 		return sans;
 	}
 }

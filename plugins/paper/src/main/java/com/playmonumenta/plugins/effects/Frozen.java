@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -72,7 +71,7 @@ public class Frozen extends ZeroArgumentEffect {
 		);
 		display.setTransformation(transformation);
 		display.setBlock(Bukkit.createBlockData(Material.ICE));
-		display.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+		display.setPersistent(false);
 		mDisplay = display;
 
 		// Sometimes the ice can remain after a mob dies after being instantly killed, this is a failsafe.
