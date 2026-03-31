@@ -16,6 +16,7 @@ import io.papermc.paper.event.player.PlayerTrackEntityEvent;
 import io.papermc.paper.event.player.PlayerUntrackEntityEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -218,8 +219,15 @@ public class PlayerTitleManager implements Listener {
 		}
 
 		private void updatePlayers(Player targetPlayer) {
-			for (UUID viewer : mViewers) {
-				updatePlayer(Bukkit.getPlayer(viewer), targetPlayer);
+			Iterator<UUID> iterator = mViewers.iterator();
+			while (iterator.hasNext()) {
+				UUID viewer = iterator.next();
+				Player clientPlayer = Bukkit.getPlayer(viewer);
+				if (clientPlayer == null) {
+					iterator.remove();
+					continue;
+				}
+				updatePlayer(clientPlayer, targetPlayer);
 			}
 			for (NameTagData data : mEntities.values()) {
 				data.mDirty = false;
