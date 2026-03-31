@@ -417,7 +417,7 @@ public class AlchemicalArtillery extends Ability {
 					.statValues(stat(a -> a.mBaseVelocityMult, VELOCITY_MULTIPLIER)))
 			.addStat("Damage: %d1 + %p1 (s) (of potion damage)")
 				.statValues(stat(a -> a.mDamageRaw, DAMAGE_RAW_1), stat(a -> a.mDamageMult, DAMAGE_MULTIPLIER_1))
-			.addStat("Radius: %p (of potion radius)")
+			.addStat("Radius: %p1 (of potion radius)")
 				.statValues(stat(a -> a.mRadiusMult, RADIUS_MULTIPLIER_1))
 			.addStat("Cooldown: %t")
 				.statValues(StatValue.cooldown(COOLDOWN))
