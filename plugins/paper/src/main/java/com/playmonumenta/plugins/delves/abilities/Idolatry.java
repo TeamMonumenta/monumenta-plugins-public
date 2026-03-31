@@ -36,6 +36,9 @@ public class Idolatry {
 	private static final String IDOLATRY_CHECK = "IdolatryCheck";
 
 	public static void applyModifiers(CreatureSpawner spawner, Entity spawnEntity, int level) {
+		if (!spawner.getChunk().isLoaded() || !spawner.getChunk().isEntitiesLoaded()) {
+			return;
+		}
 		if (NBT.getPersistentData(spawner, nbt -> nbt.hasTag(IDOLATRY_CHECK))) {
 			return;
 		}
