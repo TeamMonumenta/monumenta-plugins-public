@@ -280,7 +280,8 @@ public enum DelvePreset {
 		entry(DelvesModifier.PERNICIOUS, 10),
 		entry(DelvesModifier.TWISTED_TORMENTED, 3),
 		entry(DelvesModifier.BLOODTHIRSTY, 4),
-		entry(DelvesModifier.DREADFUL, 8)
+		entry(DelvesModifier.DREADFUL, 8),
+		entry(DelvesModifier.BOUNTIFUL, 1)
 	)),
 	BLUE(67, "blue", 100, Material.BLUE_WOOL, Map.ofEntries(
 		entry(DelvesModifier.INFERNAL, 10),

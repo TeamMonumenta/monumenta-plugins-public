@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.commands.SpawnerCountCommand;
 import com.playmonumenta.plugins.delves.abilities.Astral;
 import com.playmonumenta.plugins.delves.abilities.Berserk;
+import com.playmonumenta.plugins.delves.abilities.Bountiful;
 import com.playmonumenta.plugins.delves.abilities.ChanceCubes;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Chronology;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -464,25 +466,42 @@ public class DelvesManager implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void playerWalk(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		if (!MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, "Ran astral check recently", 5)
+		if (!MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, "Ran PlayerMoveEvent recently", 5)
 			|| player.getGameMode() == GameMode.SPECTATOR
 			|| player.getGameMode() == GameMode.CREATIVE
-			|| getRank(player, DelvesModifier.ASTRAL) == 0
+			|| (getRank(player, DelvesModifier.ASTRAL) == 0 && getRank(player, DelvesModifier.BOUNTIFUL) == 0)
 			|| ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_DELVES)) {
 			return;
 		}
 		PotionEffect resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 		double resistanceLevel = (resistance == null ? 0 : resistance.getAmplifier() + 1);
-		if (resistanceLevel < 5) {
-			List<Chunk> chunkList = LocationUtils.getSurroundingChunks(event.getTo().getBlock(), 32);
-			for (Chunk chunk : chunkList) {
-				for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST || b.getType() == Material.TRAPPED_CHEST, false)) {
-					if (interestingBlock instanceof Chest chest
-						&& LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32)
-						&& ChestUtils.isAstrableChest(chest)
-						&& PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
-						Astral.applyModifiers(chest, getRank(player, DelvesModifier.ASTRAL));
-					}
+
+		if (resistanceLevel >= 5) {
+			return;
+		}
+
+		Block block = event.getTo().getBlock();
+		Predicate<Block> blockPredicate = b -> b.getType() == Material.CHEST
+				|| b.getType() == Material.TRAPPED_CHEST
+				|| b.getType() == Material.SPAWNER;
+
+		int astralRank = getRank(player, DelvesModifier.ASTRAL);
+		int bountifulRank = getRank(player, DelvesModifier.BOUNTIFUL);
+
+		List<Chunk> chunkList = LocationUtils.getSurroundingChunks(block, 32);
+		for (Chunk chunk : chunkList) {
+			for (BlockState interestingBlock : chunk.getTileEntities(blockPredicate, false)) {
+				if (astralRank != 0
+					&& interestingBlock instanceof Chest chest
+					&& LocationUtils.blocksAreWithinRadius(block, interestingBlock.getBlock(), 32)
+					&& ChestUtils.isAstrableChest(chest)
+					&& PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
+					Astral.applyModifiers(chest, astralRank);
+				} else if (bountifulRank != 0
+					&& interestingBlock instanceof CreatureSpawner spawner
+					&& LocationUtils.blocksAreWithinRadius(block, interestingBlock.getBlock(),
+					spawner.getRequiredPlayerRange() * 2)) {
+					Bountiful.applyModifiers(spawner, bountifulRank);
 				}
 			}
 		}
