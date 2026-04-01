@@ -356,7 +356,7 @@ public class ShulkerShortcutListener implements Listener {
 
 				// define material + facing of chest/barrel
 				BlockData containerBlockData;
-				if (item.getType() == Material.YELLOW_SHULKER_BOX) {
+				if (isBarrelCarrier(item)) {
 					containerBlockData = Material.BARREL.createBlockData();
 					float pitch = player.getLocation().getPitch();
 					((Directional) containerBlockData).setFacing(pitch > 45 ? BlockFace.UP : pitch < -45 ? BlockFace.DOWN : player.getFacing().getOppositeFace());
@@ -425,6 +425,12 @@ public class ShulkerShortcutListener implements Listener {
 				|| InventoryUtils.testForItemWithName(item, "Carrier of Festivity", true)
 				|| isCarrierOfExplosions(item)
 		);
+	}
+
+	public static boolean isBarrelCarrier(ItemStack item) {
+		return item != null &&
+		       Material.YELLOW_SHULKER_BOX.equals(item.getType()) &&
+		       InventoryUtils.testForItemWithName(item, "Carrier of Emotion", true);
 	}
 
 	public static boolean isPurpleTesseract(ItemStack item) {
