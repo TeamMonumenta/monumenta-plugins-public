@@ -481,6 +481,7 @@ public class Plugin extends JavaPlugin {
 		mHuntsManager = new HuntsManager(this);
 		mBalanceModeManager = new BalanceModeManager();
 
+
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
 		new AbilityHotbar(this);
@@ -520,6 +521,12 @@ public class Plugin extends JavaPlugin {
 			TowerCommands.register(this);
 			manager.registerEvents(mChessManager, this);
 			manager.registerEvents(mTowerManager, this);
+		}
+
+		if(ServerProperties.getShardName().contains("valley")
+			|| ServerProperties.getShardName().contains("isles")
+			|| ServerProperties.getShardName().contains("dev")) {
+			manager.registerEvents(new StructureConqueredListener(this), this);
 		}
 
 		if (ServerProperties.getShardName().contains("mobs")) {

@@ -70,6 +70,7 @@ public enum Location {
 	LOWTIDE("lowtide", "Lowtide Smuggler", TextColor.fromHexString("#196383")),
 	LIGHT("light", "Arena of Terth", TextColor.fromHexString("#FFFFAA")),
 	BLITZ("blitz", "Plunderer's Blitz", TextColor.fromHexString("#DAAD3E")),
+	VALLEY_EXPLORER("valleyexplorer", "King's Valley Explorer", TextColor.fromHexString("#DCAE32")),
 
 	// R2 dungeons, strikes, bosses
 	LIME("lime", "Salazar's Folly", TextColor.fromHexString("#55FF55")),
@@ -104,6 +105,7 @@ public enum Location {
 	INTELLECT("intellect", "Intellect Crystallizer", TextColor.fromHexString("#82DB17")),
 	CARNIVAL("carnival", "Floating Carnival", TextColor.fromHexString("#D02E28")),
 	DOCKS("docks", "Expedition Docks", TextColor.fromHexString("#196383")),
+	ISLES_EXPLORER("isleexplorer", "Celsian Isles Explorer", TextColor.fromHexString("#32D7DC")),
 
 	// R3 dungeons, strikes, bosses
 	SILVER("silver", "Silver Knight's Tomb", TextColor.fromHexString("#C0C0C0")),
