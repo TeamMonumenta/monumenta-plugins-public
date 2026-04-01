@@ -249,12 +249,9 @@ public class TradeListener implements Listener {
 			}
 			int currentAmount = currentItem == null ? 0 : currentItem.getAmount();
 			int numInInventory = InventoryUtils.numInInventory(playerInventoryContents, requirement);
-			long numInWallet = WalletManager.isCurrency(requirement) ? wallet.count(requirement) : 0;
-			if (isCreative) {
-				numInInventory = requirement.getAmount();
-				numInWallet = 0;
-			}
-			int addCount = Math.toIntExact(Math.min(numInInventory + numInWallet, requirement.getMaxStackSize())) - currentAmount;
+			// If not prioritizing wallet, Add as much as possible from inventory
+			int tryToAdd = walletOption == 2 ? requirement.getAmount() : Math.max(numInInventory, requirement.getAmount());
+			int addCount = Math.toIntExact(Math.min(currentAmount + tryToAdd, requirement.getMaxStackSize())) - currentAmount;
 			if (addCount <= 0) {
 				continue;
 			}
@@ -263,13 +260,11 @@ public class TradeListener implements Listener {
 			WalletUtils.Debt debt = WalletUtils.calculateInventoryAndWalletDebt(requirement, playerInventoryContents, wallet, walletOption != 0);
 			int inventoryDebt = debt.mInventoryDebt();
 			int walletDebt = debt.mWalletDebt();
-			if (!isCreative && !debt.mMeetsRequirement()) {
-				player.sendMessage("You don't have the required materials for this trade!");
-				continue;
-			}
-
-			// Remove from inventory and wallet:
 			if (!isCreative) {
+				if (!debt.mMeetsRequirement()) {
+					continue;
+				}
+
 				if (inventoryDebt > 0) {
 					playerInventory.removeItem(requirement.asQuantity(inventoryDebt));
 				}
