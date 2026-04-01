@@ -154,11 +154,11 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 											double damage = p.BASE_DAMAGE + p.DAMAGE_PER_DEBUFF * debuffCount;
 
 											if (damage > 0) {
-												BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, damage, p.SPELL_NAME, mBoss.getLocation(), p.EFFECTS.mEffectList());
+												BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, damage, p.SPELL_NAME, mBoss.getLocation());
 											}
 
 											if (p.DAMAGE_PERCENTAGE > 0.0) {
-												BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME, p.EFFECTS.mEffectList());
+												BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME);
 											}
 											p.EFFECTS.apply(target, mBoss);
 

@@ -303,11 +303,11 @@ public class SpellProjectileEntity extends SpellBaseSeekingProjectile {
 		if (target != null) {
 			if (mParameters.DAMAGE > 0) {
 				BossUtils.blockableDamage(mBoss, target, mParameters.DAMAGE_TYPE, mParameters.DAMAGE,
-					mParameters.SPELL_NAME, prevLoc, mParameters.EFFECTS.mEffectList());
+					mParameters.SPELL_NAME, prevLoc);
 				mParameters.EFFECTS.apply(target, mBoss);
 			}
 			if (mParameters.TRUE_DAMAGE_PERCENTAGE > 0) {
-				DamageUtils.damagePercentHealth(mBoss, target, mParameters.TRUE_DAMAGE_PERCENTAGE, false, mParameters.TRUE_DAMAGE_BLOCK, mParameters.SPELL_NAME, true, List.of());
+				DamageUtils.damagePercentHealth(mBoss, target, mParameters.TRUE_DAMAGE_PERCENTAGE, false, mParameters.TRUE_DAMAGE_BLOCK, mParameters.SPELL_NAME);
 			}
 		}
 	}

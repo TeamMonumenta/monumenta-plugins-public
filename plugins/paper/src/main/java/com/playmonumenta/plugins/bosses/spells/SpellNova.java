@@ -76,14 +76,14 @@ public class SpellNova extends SpellBaseAoE {
 		for (LivingEntity target : mTargets.getTargetsList(mLauncher)) {
 			if (DAMAGE > 0) {
 				if (CAN_BLOCK) {
-					BossUtils.blockableDamage(mLauncher, target, DamageEvent.DamageType.MAGIC, DAMAGE, mSpellName, mLauncher.getLocation(), mEffects.mEffectList());
+					BossUtils.blockableDamage(mLauncher, target, DamageEvent.DamageType.MAGIC, DAMAGE, mSpellName, mLauncher.getLocation());
 				} else {
 					DamageUtils.damage(mLauncher, target, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, true, mSpellName);
 				}
 			}
 
 			if (DAMAGE_PERCENTAGE > 0.0) {
-				BossUtils.bossDamagePercent(mLauncher, target, DAMAGE_PERCENTAGE, CAN_BLOCK ? mLauncher.getLocation() : null, mSpellName, mEffects.mEffectList());
+				BossUtils.bossDamagePercent(mLauncher, target, DAMAGE_PERCENTAGE, CAN_BLOCK ? mLauncher.getLocation() : null, mSpellName);
 			}
 			mEffects.apply(target, mLauncher);
 		}

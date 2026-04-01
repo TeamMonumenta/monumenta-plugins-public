@@ -83,21 +83,11 @@ public class DamageUtils {
 	 * @param causeKnockback Whether the damage should cause knockback
 	 * @param blockable      Whether the damage can be blocked with a shield
 	 * @param cause          Used for player death messages
-	 * @param isBossAbility  Whether this damage originated from a Boss. Only used by the Retaliation enchantment
-	 * @param effects        Statuses applied to the player with this attack. Only used by the Retaliation enchantment
 	 */
 	public static void damagePercentHealth(@Nullable final LivingEntity damager, final LivingEntity damagee,
 	                                       final double percentHealth, final boolean causeKnockback,
-	                                       final boolean blockable, final String cause, final boolean isBossAbility,
-	                                       final List<EffectsList.Effect> effects) {
+	                                       final boolean blockable, final String cause) {
 		final double damageToTake = percentHealth * EntityUtils.getMaxHealth(damagee);
-
-		// TODO: Retaliation should not be in this part of the damage pipeline. DamageUtils shouldn't need to know about
-		//  effects as this reduces the modularity/separation of concerns for the two systems. Move to DamageListener
-		if (damagee instanceof final Player player &&
-			ItemStatUtils.hasEnchantment(player.getInventory().getItemInOffHand(), EnchantmentType.RETALIATION)) {
-			new Retaliation().startEffect(player, effects, damager, isBossAbility);
-		}
 
 		damage(damager, damagee, new DamageEvent.Metadata(DamageType.TRUE, null, null, cause),
 			damageToTake, true, causeKnockback, blockable);

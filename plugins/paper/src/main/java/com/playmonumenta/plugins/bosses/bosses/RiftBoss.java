@@ -306,11 +306,11 @@ public class RiftBoss extends BossAbilityGroup {
 			private void directHit(LivingEntity target, Location loc) {
 				if (target != null) {
 					if (p.DIRECT_DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.DIRECT_DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList());
+						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.DIRECT_DAMAGE, p.SPELL_NAME, loc);
 					}
 
 					if (p.DIRECT_DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DIRECT_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList());
+						BossUtils.bossDamagePercent(mBoss, target, p.DIRECT_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME);
 					}
 					p.EFFECTS.apply(target, boss);
 				}
@@ -319,11 +319,11 @@ public class RiftBoss extends BossAbilityGroup {
 			private void lingeringHit(LivingEntity target, Location loc) {
 				if (target != null) {
 					if (p.LINGERING_DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.LINGERING_DAMAGE, p.SPELL_NAME, loc, p.EFFECTS.mEffectList());
+						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.LINGERING_DAMAGE, p.SPELL_NAME, loc);
 					}
 
 					if (p.LINGERING_DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.LINGERING_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME, p.EFFECTS.mEffectList());
+						BossUtils.bossDamagePercent(mBoss, target, p.LINGERING_DAMAGE_PERCENTAGE, loc, p.SPELL_NAME);
 					}
 					p.EFFECTS.apply(target, boss);
 				}

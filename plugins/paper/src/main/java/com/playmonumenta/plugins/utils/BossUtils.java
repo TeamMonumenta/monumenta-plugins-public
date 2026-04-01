@@ -3,19 +3,14 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
-import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.enchantments.Retaliation;
+import com.playmonumenta.plugins.events.DamageShieldedEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
-import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
-import com.playmonumenta.plugins.itemstats.enums.InfusionType;
-import com.playmonumenta.plugins.itemstats.infusions.Sturdy;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.scriptedquests.managers.SongManager;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.kyori.adventure.bossbar.BossBar;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -31,6 +27,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.entity.PufferFish;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -92,50 +89,32 @@ public class BossUtils {
 	}
 
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage) {
-		return blockableDamage(damager, damagee, type, damage, new ArrayList<>());
-	}
-
-	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, List<EffectsList.Effect> effects) {
 		Location location = null;
 		if (damager != null) {
 			location = damager.getLocation();
 		}
-		return blockableDamage(damager, damagee, type, damage, null, location, effects);
+		return blockableDamage(damager, damagee, type, damage, null, location);
 	}
 
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable Location location) {
-		return blockableDamage(damager, damagee, type, damage, null, location, new ArrayList<>());
+		return blockableDamage(damager, damagee, type, damage, null, location);
 	}
 
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location) {
-		return blockableDamage(damager, damagee, type, damage, cause, location, new ArrayList<>());
-	}
-
-	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location, List<EffectsList.Effect> effects) {
-		return blockableDamage(damager, damagee, type, damage, cause, location, calculateShieldStun(damage, damagee), effects);
-	}
-
-	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, List<EffectsList.Effect> effects) {
-		return blockableDamage(damager, damagee, type, damage, bypassIFrames, causeKnockback, cause, location, calculateShieldStun(damage, damagee), (int) (damage / 5), effects);
-	}
-
-	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location, int stunTicks, List<EffectsList.Effect> effects) {
-		// One shield durability damage for every 5 points of damage
-		return blockableDamage(damager, damagee, type, damage, false, true, cause, location, stunTicks, (int) (damage / 5), effects);
+		return blockableDamage(damager, damagee, type, damage, cause, location, calculateShieldStun(damage, damagee));
 	}
 
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location, int stunTicks) {
 		// One shield durability damage for every 5 points of damage
-		return blockableDamage(damager, damagee, type, damage, false, true, cause, location, stunTicks, (int) (damage / 5), new ArrayList<>());
+		return blockableDamage(damager, damagee, type, damage, false, true, cause, location, stunTicks, (int) (damage / 5));
 	}
 
-	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, int stunTicks, int durability) {
-		// One shield durability damage for every 5 points of damage
-		return blockableDamage(damager, damagee, type, damage, bypassIFrames, causeKnockback, cause, location, stunTicks, durability, new ArrayList<>());
+	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location) {
+		return blockableDamage(damager, damagee, type, damage, bypassIFrames, causeKnockback, cause, location, calculateShieldStun(damage, damagee), (int) (damage / 5));
 	}
 
 	//Returns whether the attack was blocked or otherwise completely negated (true = not blocked)
-	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, int stunTicks, int durability, List<EffectsList.Effect> effects) {
+	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, int stunTicks, int durability) {
 		if (damagee instanceof Player player && player.getSpectatorTarget() != null && player.getSpectatorTarget() instanceof PufferFish fish) {
 			damagee = fish;
 			// Redirect damage to the pufferfish as spectator is immune - if fish dies, player dies
@@ -146,14 +125,11 @@ public class BossUtils {
 
 		if (damagee instanceof Player player && bossDamageBlocked(player, location)) {
 			if (stunTicks > 0) {
-				int finalStunTicks = Sturdy.updateStunCooldown(stunTicks, Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.STURDY));
-				NmsUtils.getVersionAdapter().stunShield(player, finalStunTicks);
+				NmsUtils.getVersionAdapter().stunShield(player, stunTicks);
 				damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			}
 			ItemUtils.damageShield(player, durability);
-			if (ItemStatUtils.hasEnchantment(player.getInventory().getItemInOffHand(), EnchantmentType.RETALIATION)) {
-				new Retaliation().startEffect(player, effects, damager, true);
-			}
+			Bukkit.getPluginManager().callEvent(new DamageShieldedEvent(player, damager, EntityDamageEvent.DamageCause.CUSTOM));
 			return false;
 		} else {
 			DamageUtils.damage(damager, damagee, new DamageEvent.Metadata(type, null, null, cause), damage, bypassIFrames, causeKnockback, false);
@@ -165,38 +141,26 @@ public class BossUtils {
 	}
 
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth) {
-		return bossDamagePercent(boss, target, percentHealth, null, false, null, true, new ArrayList<>());
+		return bossDamagePercent(boss, target, percentHealth, null, false, null, true);
 	}
 
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location) {
-		return bossDamagePercent(boss, target, percentHealth, location, false, null, true, new ArrayList<>());
-	}
-
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, List<EffectsList.Effect> effects) {
-		return bossDamagePercent(boss, target, percentHealth, location, false, null, true, effects);
+		return bossDamagePercent(boss, target, percentHealth, location, false, null, true);
 	}
 
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable String cause) {
-		return bossDamagePercent(boss, target, percentHealth, null, false, cause, true, new ArrayList<>());
-	}
-
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable String cause, List<EffectsList.Effect> effects) {
-		return bossDamagePercent(boss, target, percentHealth, null, false, cause, true, effects);
+		return bossDamagePercent(boss, target, percentHealth, null, false, cause, true);
 	}
 
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, @Nullable String cause) {
-		return bossDamagePercent(boss, target, percentHealth, location, cause, new ArrayList<>());
-	}
-
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, @Nullable String cause, List<EffectsList.Effect> effects) {
-		return bossDamagePercent(boss, target, percentHealth, location, false, cause, true, effects);
+		return bossDamagePercent(boss, target, percentHealth, location, false, cause, true);
 	}
 
 	/*
 	 * Returns whether the player survived (true) or was killed (false)
 	 */
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth,
-											@Nullable Location location, boolean raw, @Nullable String cause, boolean knockback, List<EffectsList.Effect> effects) {
+											@Nullable Location location, boolean raw, @Nullable String cause, boolean knockback) {
 		if (percentHealth <= 0) {
 			return true;
 		}
@@ -217,20 +181,15 @@ public class BossUtils {
 			 */
 			if (raw) {
 				if (toTake > 1) {
-					int finalStunTicks = Sturdy.updateStunCooldown((int) Math.ceil(toTake * 0.5), Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.STURDY));
-					NmsUtils.getVersionAdapter().stunShield(player, finalStunTicks);
+					NmsUtils.getVersionAdapter().stunShield(player, (int) Math.ceil(toTake * 0.5));
 				}
-				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				ItemUtils.damageShield(player, (int) Math.ceil(toTake / 2.5));
 			} else {
-				int finalStunTicks = Sturdy.updateStunCooldown((int) (20 * percentHealth * 20), Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.STURDY));
-				NmsUtils.getVersionAdapter().stunShield(player, finalStunTicks);
-				target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				NmsUtils.getVersionAdapter().stunShield(player, (int) (20 * percentHealth * 20));
 				ItemUtils.damageShield(player, (int) (percentHealth * 20 / 2.5));
 			}
-			if (ItemStatUtils.hasEnchantment(player.getInventory().getItemInOffHand(), EnchantmentType.RETALIATION)) {
-				new Retaliation().startEffect(player, effects, boss, true);
-			}
+			target.getWorld().playSound(target.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			Bukkit.getPluginManager().callEvent(new DamageShieldedEvent(player, boss, EntityDamageEvent.DamageCause.CUSTOM));
 		} else {
 			double absorp = AbsorptionUtils.getAbsorption(target);
 			double adjustedHealth = (target.getHealth() + absorp) - toTake;
@@ -289,7 +248,7 @@ public class BossUtils {
 	/**
 	 * Adds modifiers to the existing map from the string
 	 *
-	 * @param s   a string like "[damage=10, cooldown=60, detectionrange=80, singletarget=true....]
+	 * @param s   a string like "[damage=10, cooldown=60, detectionrange=80, singletarget=true....]"
 	 * @param map the map where the values will be added
 	 */
 	public static void addModifiersFromString(final Map<String, String> map, String s) {

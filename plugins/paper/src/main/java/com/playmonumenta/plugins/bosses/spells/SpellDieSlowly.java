@@ -16,7 +16,7 @@ public class SpellDieSlowly extends Spell {
 
 	@Override
 	public void run() {
-		DamageUtils.damagePercentHealth(mBoss, mBoss, mParameters.DAMAGE_PERCENTAGE, false, false, " ", false, List.of());
+		DamageUtils.damagePercentHealth(mBoss, mBoss, mParameters.DAMAGE_PERCENTAGE, false, false, " ");
 	}
 
 	@Override

@@ -202,7 +202,6 @@ public class DamageEvent extends Event implements Cancellable {
 	private double mUnmodifiableDamage = 0;
 	private @Nullable Double mDamageCap = null;
 	private boolean mIsCrit = false;
-	private List<EffectsList.Effect> mEffects;
 
 	public DamageEvent(EntityDamageEvent event, LivingEntity damagee) {
 		this(event, damagee, DamageType.getType(event.getCause()));
@@ -224,7 +223,6 @@ public class DamageEvent extends Event implements Cancellable {
 		mFlatDamage = event.getDamage();
 		mEvent = event;
 		mLifelineCancel = false;
-		mEffects = new ArrayList<>();
 
 		if (mDamager instanceof Projectile proj) {
 			ProjectileSource source = proj.getShooter();
@@ -518,15 +516,6 @@ public class DamageEvent extends Event implements Cancellable {
 	@SuppressWarnings("deprecation")
 	public boolean isBlockedByShield() {
 		return mEvent.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0;
-	}
-
-	// Stores the potion effects that were applied by a bosstag/spell
-	public void setEffects(List<EffectsList.Effect> effectList) {
-		mEffects = effectList;
-	}
-
-	public List<EffectsList.Effect> getEffects() {
-		return mEffects;
 	}
 
 	/**

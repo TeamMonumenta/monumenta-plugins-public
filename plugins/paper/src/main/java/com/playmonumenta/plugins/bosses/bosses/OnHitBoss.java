@@ -48,7 +48,7 @@ public class OnHitBoss extends BossAbilityGroup {
 		public @Nullable DamageType DAMAGE_TYPE = null;
 	}
 
-	private final Parameters mParams;
+	public final Parameters mParams;
 
 	public OnHitBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -61,7 +61,6 @@ public class OnHitBoss extends BossAbilityGroup {
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (mParams.CAN_BLOCK && event.isBlockedByShield()) {
 			// Attack was blocked
-			event.setEffects(mParams.EFFECTS.mEffectList());
 			return;
 		}
 

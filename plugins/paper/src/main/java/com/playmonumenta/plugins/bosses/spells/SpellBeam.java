@@ -189,10 +189,10 @@ public class SpellBeam extends Spell {
 		for (Player player : struckPlayers) {
 			mParameters.SOUND_HIT.play(player.getLocation());
 			if (mParameters.DAMAGE > 0) {
-				BossUtils.blockableDamage(mBoss, player, mParameters.DAMAGE_TYPE, mParameters.DAMAGE, !mParameters.RESPECT_IFRAMES, false, mParameters.NAME, mBoss.getLocation(), mParameters.EFFECTS.mEffectList());
+				BossUtils.blockableDamage(mBoss, player, mParameters.DAMAGE_TYPE, mParameters.DAMAGE, !mParameters.RESPECT_IFRAMES, false, mParameters.NAME, mBoss.getLocation());
 			}
 			if (mParameters.TRUE_DAMAGE_PERCENTAGE > 0) {
-				DamageUtils.damagePercentHealth(mBoss, player, mParameters.TRUE_DAMAGE_PERCENTAGE, false, false, mParameters.NAME, true, mParameters.EFFECTS.mEffectList());
+				DamageUtils.damagePercentHealth(mBoss, player, mParameters.TRUE_DAMAGE_PERCENTAGE, false, false, mParameters.NAME);
 			}
 			if (mParameters.KB_Y != 0 && mParameters.KB_XZ != 0) {
 				MovementUtils.knockAway(mBoss.getLocation(), player, mParameters.KB_XZ, mParameters.KB_Y, true);

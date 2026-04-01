@@ -137,7 +137,7 @@ public class ShockwaveBoss extends BossAbilityGroup {
 										for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), p.DETECTION, true)) {
 											if (player.getBoundingBox().overlaps(mBox)) {
 												if (p.BLOCKABLE) {
-													BossUtils.blockableDamage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, p.IGNORE_IFRAMES, true, p.SPELL_NAME, centerLoc, List.of());
+													BossUtils.blockableDamage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, p.IGNORE_IFRAMES, true, p.SPELL_NAME, centerLoc);
 												} else {
 													DamageUtils.damage(mBoss, player, p.DAMAGE_TYPE, p.DAMAGE, null, p.IGNORE_IFRAMES, true, p.SPELL_NAME);
 												}

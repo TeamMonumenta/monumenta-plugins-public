@@ -49,6 +49,12 @@ public class PercentAttackSpeed extends Effect {
 	}
 
 	@Override
+	public boolean isDebuff() {
+		return mAmount < 0;
+	}
+
+
+	@Override
 	public @Nullable Component getSpecificDisplay() {
 		return StringUtils.doubleToColoredAndSignedPercentage(mAmount).append(Component.text(" " + getDisplayedName()));
 	}

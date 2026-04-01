@@ -179,11 +179,11 @@ public class StarfallBoss extends BossAbilityGroup {
 
 									if (p.DAMAGE > 0) {
 										// Must be looking up to block
-										BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, meteorCenter, p.EFFECTS.mEffectList());
+										BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, meteorCenter);
 									}
 
 									if (p.DAMAGE_PERCENTAGE > 0.0) {
-										BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, meteorCenter, p.SPELL_NAME, p.EFFECTS.mEffectList());
+										BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, meteorCenter, p.SPELL_NAME);
 									}
 									p.EFFECTS.apply(target, mBoss);
 									MovementUtils.knockAway(meteorCenter, target, p.KNOCKBACK, true);

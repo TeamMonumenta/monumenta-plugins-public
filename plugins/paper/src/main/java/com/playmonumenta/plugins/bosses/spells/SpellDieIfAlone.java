@@ -20,7 +20,7 @@ public class SpellDieIfAlone extends Spell {
 		if (DieIfAloneBoss.shouldActivate(mBoss, mParameters)) {
 			mLonelyPulses++;
 			if (mLonelyPulses > mParameters.LONELY_PULSES) {
-				DamageUtils.damagePercentHealth(mBoss, mBoss, mParameters.DAMAGE_PERCENTAGE, false, false, "", false, List.of());
+				DamageUtils.damagePercentHealth(mBoss, mBoss, mParameters.DAMAGE_PERCENTAGE, false, false, "");
 			}
 		} else {
 			mLonelyPulses = 0;

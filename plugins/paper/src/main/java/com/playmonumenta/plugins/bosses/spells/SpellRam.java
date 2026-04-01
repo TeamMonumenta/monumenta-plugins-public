@@ -97,7 +97,7 @@ public class SpellRam extends Spell {
 							DamageUtils.damage(mBoss, p, mParameters.DAMAGE_TYPE, mParameters.DAMAGE, null, false, false, mParameters.SPELL_NAME);
 						}
 						if (mParameters.DAMAGE_PERCENTAGE > 0) {
-							DamageUtils.damagePercentHealth(mBoss, p, mParameters.DAMAGE_PERCENTAGE, false, false, mParameters.SPELL_NAME, true, mParameters.EFFECTS_HIT.mEffectList());
+							DamageUtils.damagePercentHealth(mBoss, p, mParameters.DAMAGE_PERCENTAGE, false, false, mParameters.SPELL_NAME);
 						}
 						MovementUtils.knockAway(loc, p, mParameters.KB_XZ, mParameters.KB_Y, false);
 						mParameters.EFFECTS_HIT.apply(p, mBoss);

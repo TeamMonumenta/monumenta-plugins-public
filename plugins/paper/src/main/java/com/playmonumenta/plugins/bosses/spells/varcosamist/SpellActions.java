@@ -66,8 +66,8 @@ public class SpellActions {
 
 		// Deals flat and percent damage to prevent players from surviving for long periods
 		Plugin.getInstance().mEffectManager.addEffect(player, ANTIHEAL_SRC, new PercentHeal(3 * 20, -1.0));
-		BossUtils.bossDamagePercent(boss, player, 0.1, null, false, null, false, new ArrayList<>());
-		BossUtils.bossDamagePercent(boss, player, 2.0, null, true, null, false, new ArrayList<>());
+		BossUtils.bossDamagePercent(boss, player, 0.1, null, false, null, false);
+		BossUtils.bossDamagePercent(boss, player, 2.0, null, true, null, false);
 		if (!MetadataUtils.happenedInRecentTicks(player, "PlayerIntoDepthsVarcosaMetakey", 600)) {
 			MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, "PlayerIntoDepthsVarcosaMetakey"); // Mark this tick
 			player.sendMessage(Component.text("Into the depths with ye! The deep gods take yer soul!", NamedTextColor.RED));

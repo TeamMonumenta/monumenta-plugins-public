@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.effects.ProjectileIframe;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageShieldedEvent;
 import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
@@ -176,7 +177,9 @@ public class DamageListener implements Listener {
 		if (damagee instanceof Player player) {
 			mPlugin.mItemStatManager.onHurt(mPlugin, player, event, damager, source);
 			mPlugin.mAbilityManager.onHurt(player, event, damager, source);
-
+			if (event.isBlockedByShield()) {
+				Bukkit.getPluginManager().callEvent(new DamageShieldedEvent(player, source, event.getCause()));
+			}
 			if (event.getFinalDamage(true) >= player.getHealth() && !event.isCancelled()) {
 				mPlugin.mAbilityManager.onHurtFatal(player, event);
 				mPlugin.mItemStatManager.onHurtFatal(mPlugin, player, event);
@@ -254,6 +257,11 @@ public class DamageListener implements Listener {
 			}
 			mPlugin.mAbilityManager.onDamageDelayed(player, event, damagee);
 		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void damageShieldedEvent(DamageShieldedEvent event) {
+		mPlugin.mItemStatManager.onDamageShielded(mPlugin, event.getPlayer(), event);
 	}
 
 	public static @Nullable PlayerItemStats getProjectileItemStats(Projectile proj) {

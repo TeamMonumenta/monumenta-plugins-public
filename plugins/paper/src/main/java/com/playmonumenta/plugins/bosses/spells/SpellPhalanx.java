@@ -105,8 +105,7 @@ public class SpellPhalanx extends Spell {
 									BossUtils.blockableDamage(
 										mBoss, entry.getKey(), mParameters.DAMAGE_TYPE,
 										damage, true, true, mParameters.SPELL_NAME,
-										mBoss.getLocation(), mParameters.SHIELD_STUN, damage / 5,
-										mParameters.EFFECTS.mEffectList()
+										mBoss.getLocation(), mParameters.SHIELD_STUN, damage / 5
 									);
 									mDamageMap.put(entry.getKey(), 0);
 								}

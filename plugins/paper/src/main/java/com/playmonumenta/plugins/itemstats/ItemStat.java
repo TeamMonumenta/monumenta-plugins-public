@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageShieldedEvent;
 import com.playmonumenta.plugins.events.HemorrhageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
@@ -88,6 +89,18 @@ public interface ItemStat {
 	 * @param enemy  the LivingEntity being damaged
 	 */
 	default void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+
+	}
+
+	/**
+	 * Player blocking damage with a shield
+	 *
+	 * @param plugin monumenta plugin
+	 * @param player the player blocking the damage
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated DamageShieldedEvent
+	 */
+	default void onDamageShielded(Plugin plugin, Player player, double value, DamageShieldedEvent event) {
 
 	}
 

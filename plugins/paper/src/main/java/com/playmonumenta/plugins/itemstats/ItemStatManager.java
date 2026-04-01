@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.DamageShieldedEvent;
 import com.playmonumenta.plugins.events.HemorrhageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
@@ -696,6 +697,17 @@ public class ItemStatManager implements Listener {
 				return;
 			}
 			entry.getKey().onDamageDelayed(plugin, player, entry.getValue(), event, enemy);
+		}
+	}
+
+	public void onDamageShielded(Plugin plugin, Player player, DamageShieldedEvent event) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				if (event.isCancelled()) {
+					return;
+				}
+				entry.getKey().onDamageShielded(plugin, player, entry.getValue(), event);
+			}
 		}
 	}
 
