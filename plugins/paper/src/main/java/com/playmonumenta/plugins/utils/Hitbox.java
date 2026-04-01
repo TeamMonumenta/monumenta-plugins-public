@@ -467,6 +467,16 @@ public abstract class Hitbox {
 	}
 
 	/**
+	 * Gets a modifiable list of hostile mobs that are hit by this hitbox. The provided predicate includes an entity
+	 * if it is true.
+	 */
+	public List<LivingEntity> getHitMobsInclude(Predicate<LivingEntity> include) {
+		BoundingBox boundingBox = getBoundingBox();
+		return EntityUtils.getNearbyMobs(boundingBox.getCenter().toLocation(getWorld()), boundingBox.getWidthX() / 2, boundingBox.getHeight() / 2, boundingBox.getWidthZ() / 2,
+			entity -> ((include.test(entity) || EntityUtils.isHostileMob(entity)) && intersects(entity.getBoundingBox())));
+	}
+
+	/**
 	 * Gets a modifiable list of players that are hit by this hitbox.
 	 */
 	public List<Player> getHitPlayers(boolean includeNonTargetable) {

@@ -24,8 +24,19 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.ItemStat;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Chaotic;
+import com.playmonumenta.plugins.itemstats.enchantments.Duelist;
+import com.playmonumenta.plugins.itemstats.enchantments.HexEater;
+import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
+import com.playmonumenta.plugins.itemstats.enchantments.Slayer;
+import com.playmonumenta.plugins.itemstats.enchantments.Smite;
+import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -63,6 +74,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -610,13 +622,14 @@ public class AbilityUtils {
 		ClassAbility.ARCANE_THRUST,
 		ClassAbility.EXPLOSIVE,
 		ClassAbility.ARCANE_STRIKE_ENHANCED,
-		ClassAbility.QUICKDRAW,
 		ClassAbility.PREDATOR_STRIKE,
 		ClassAbility.ALCHEMIST_POTION,
 		ClassAbility.ALCHEMICAL_ARTILLERY, // NOT its enhancement
 		ClassAbility.UNSTABLE_AMALGAM,
 		ClassAbility.ETHEREAL_ASCENSION,
 		ClassAbility.HALLOWED_BEAM,
+		ClassAbility.TACTICAL_MANEUVER,
+		ClassAbility.QUIVER_STORM,
 		ClassAbility.PINCUSHION
 	);
 
@@ -632,7 +645,7 @@ public class AbilityUtils {
 		// Not the true damage that happens on quickdraw - this event doesn't have the proper item stats whereas the 0.001 damage does
 		return (type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand()))
 			|| type == DamageEvent.DamageType.PROJECTILE
-			|| (TRIGGERS_ASPECTS.contains(ability) && !(ability == ClassAbility.QUICKDRAW && type == DamageEvent.DamageType.TRUE));
+			|| TRIGGERS_ASPECTS.contains(ability);
 	}
 
 	public static boolean isChargedAspectTriggeringEvent(DamageEvent event, Player player) {
@@ -799,17 +812,13 @@ public class AbilityUtils {
 		return droppedItem;
 	}
 
-	public static boolean hasSpecialProjSkillScaling(@Nullable ClassAbility classAbility) {
-		return classAbility == ClassAbility.HUNTING_COMPANION;
-	}
-
 	public static boolean isVolley(Player player, Projectile proj) {
 		if (ServerProperties.getDepthsEnabled()) {
 			DepthsVolley volley = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, DepthsVolley.class);
 			return volley != null && volley.mDepthsVolley.contains(proj);
 		} else {
 			Volley volley = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Volley.class);
-			return volley != null && volley.mVolley.contains(proj);
+			return volley != null && (volley.mVolley.contains(proj) || proj.hasMetadata(Volley.ENHANCEMENT_METADATA));
 		}
 	}
 
@@ -863,6 +872,104 @@ public class AbilityUtils {
 		charmLevel = (charmLevel > 0) ? (charmLevel / 3) - 2 : 0;
 
 		return getEffectiveTotalSkillPoints(player) + getEffectiveTotalSpecPoints(player) + ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0) + charmLevel;
+	}
+
+	public static void inheritProjectileStats(Player player, Projectile newProj, Projectile oldProj) {
+		ItemStatManager.PlayerItemStats stats = Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(player);
+		inheritProjectileStats(stats, newProj, oldProj);
+	}
+
+	/**
+	 * To transfer the stats of the old projectile onto the new projectile. Needs to call projectile launch event after.
+	 *
+	 * @param stats         The stats to be modified.
+	 * @param newProjectile The projectile to inherit the stats.
+	 * @param oldProjectile The projectile to be read.
+	 */
+	public static void inheritProjectileStats(ItemStatManager.PlayerItemStats stats, Projectile newProjectile, Projectile oldProjectile) {
+		DamageListener.addProjectileItemStats(newProjectile.getUniqueId(), oldProjectile, stats);
+		newProjectile.setMetadata(DamageListener.DO_NOT_REPLACE_METADATA,
+			new FixedMetadataValue(Plugin.getInstance(), 0));
+	}
+
+	public static double projectileFinalDamage(Player player, LivingEntity entity, double flatDmg, double percentDmg) {
+		final ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(player);
+
+		return projectileFinalDamage(playerItemStats, player, entity, flatDmg, percentDmg);
+	}
+
+	public static double projectileFinalDamage(Projectile proj, LivingEntity mob, double flatDmg, double percentDmg) {
+		final ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(proj);
+
+		return playerItemStats != null && proj.getShooter() instanceof Player player ?
+			projectileFinalDamage(playerItemStats, player, mob, flatDmg, percentDmg) : 0;
+	}
+
+	/**
+	 * Retrieve the final projectile damage before gear scaling.
+	 *
+	 * @param stats      The stats to be read.
+	 * @param player     The player casting.
+	 * @param entity     The target to apply the damage to.
+	 * @param flatDmg    Additional flat damage. Note that this applies after percentage.
+	 * @param percentDmg Percent to apply to the base of the projectile weapon.
+	 * @return The final base damage
+	 */
+	public static double projectileFinalDamage(ItemStatManager.PlayerItemStats stats, Player player, LivingEntity entity, double flatDmg, double percentDmg) {
+		ItemStatManager.PlayerItemStats.ItemStatsMap map = stats.getItemStats();
+		if (map == null) {
+			return 0;
+		}
+
+		final ItemStat projDamageAdd = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
+		final ItemStat pointBlank = Objects.requireNonNull(EnchantmentType.POINT_BLANK.getItemStat());
+		final ItemStat sniper = Objects.requireNonNull(EnchantmentType.SNIPER.getItemStat());
+		final ItemStat smite = Objects.requireNonNull(EnchantmentType.SMITE.getItemStat());
+		final ItemStat slayer = Objects.requireNonNull(EnchantmentType.SLAYER.getItemStat());
+		final ItemStat duelist = Objects.requireNonNull(EnchantmentType.DUELIST.getItemStat());
+		final ItemStat hexEater = Objects.requireNonNull(EnchantmentType.HEX_EATER.getItemStat());
+		final ItemStat chaotic = Objects.requireNonNull(EnchantmentType.CHAOTIC.getItemStat());
+
+		double damage = map.get(projDamageAdd);
+
+		damage += PointBlank.apply(player, entity, map.get(pointBlank));
+		damage += Sniper.apply(player, entity, map.get(sniper));
+		damage += Smite.calculateSmiteDamage(true, player, map.get(smite), entity);
+		damage += Slayer.calculateSlayerDamage(true, player, map.get(slayer), entity);
+		damage += Duelist.calculateDuelistDamage(true, player, map.get(duelist), entity);
+		damage += HexEater.calculateHexDamage(Plugin.getInstance(), true, player, map.get(hexEater), entity);
+		damage += Chaotic.calculateChaoticDamage(true, player, map.get(chaotic), entity);
+
+		damage *= percentDmg;
+		damage += flatDmg;
+
+		return damage;
+	}
+
+	/**
+	 * Return the double that would be appropriate for the region scaling.
+	 *
+	 * @param player The player.
+	 * @param r1     Valley's double.
+	 * @param r2     Isle's double
+	 * @param r3     Ring's double.
+	 * @return The appropriate double.
+	 */
+	public static double regionalScale(Player player, double r1, double r2, double r3) {
+		return ServerProperties.getClassSpecializationsEnabled(player) ?
+			(ServerProperties.getAbilityEnhancementsEnabled(player) ? r3 : r2)
+			: r1;
+	}
+
+	/**
+	 * Removes the projectile by sending it to the void.
+	 *
+	 * @param projectile The projectile to remove.
+	 */
+	public static void removeProjectile(Projectile projectile) {
+		Location loc = projectile.getLocation();
+		loc.setY(-15);
+		projectile.teleport(loc);
 	}
 
 	public static double getRegionScaled(Player player, double[] baseValues) {

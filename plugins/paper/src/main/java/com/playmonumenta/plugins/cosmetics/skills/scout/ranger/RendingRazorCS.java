@@ -22,7 +22,7 @@ public class RendingRazorCS implements CosmeticSkill {
 		return Material.SHEARS;
 	}
 
-	public void razorCast(final Player player) {
+	public void razorCast(Player player) {
 		final World world = player.getWorld();
 		final Location playerLoc = player.getLocation();
 		world.playSound(playerLoc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.5f, 1.2f);
@@ -32,7 +32,7 @@ public class RendingRazorCS implements CosmeticSkill {
 		world.playSound(playerLoc, "minecraft:entity.breeze.charge", SoundCategory.PLAYERS, 1, 1.4f);
 	}
 
-	public void razorProjectileEffects(final Player player, final Location location) {
+	public void razorProjectileEffects(final Player player, final Location location, int startingTick) {
 		new PartialParticle(Particle.SWEEP_ATTACK, location).minimumCount(1).count(2).delta(0.1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, location).count(10).delta(0.2).extra(0.1).spawnAsPlayerActive(player);
 	}
@@ -50,28 +50,19 @@ public class RendingRazorCS implements CosmeticSkill {
 		world.playSound(location, Sound.ENTITY_BREEZE_DEATH, SoundCategory.PLAYERS, 1, 2);
 	}
 
-	public void razorRetrieveSound(final Player player, final Location location) {
-		final World world = location.getWorld();
-		world.playSound(location, Sound.ENTITY_BREEZE_DEATH, SoundCategory.PLAYERS, 1, 1.4f);
-		world.playSound(location, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.PLAYERS, 0.3f, 1.4f);
-		world.playSound(location, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 0.7f);
-	}
-
-	public void razorRetrieve(final Player player, final Location location) {
-		new PartialParticle(Particle.SWEEP_ATTACK, location).minimumCount(1).count(2).delta(0.1).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.END_ROD, location).count(5).delta(0.3).extra(0.1).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.DAMAGE_INDICATOR, location).count(5).delta(0.3).extra(0.1).spawnAsPlayerActive(player);
-	}
-
-	public void razorPierce(final Location location) {
+	public void razorPierce(Player player, Location location) {
 		location.getWorld().playSound(location, Sound.ENTITY_BREEZE_DEATH, 0.6f, 1.6f);
 		location.getWorld().playSound(location, Sound.ITEM_TRIDENT_RETURN, 0.6f, 0.7f);
 	}
 
-	public void razorReturned(final Location playerLoc) {
+	public void razorReturned(final Location playerLoc, int startingTick) {
 		final World world = playerLoc.getWorld();
 		world.playSound(playerLoc, Sound.ENTITY_EVOKER_CAST_SPELL, 0.4f, 1.6f);
 		world.playSound(playerLoc, "minecraft:entity.breeze.charge", 1, 1.5f);
 		world.playSound(playerLoc, Sound.ENTITY_WITCH_THROW, 1, 0.7f);
+	}
+
+	public void onDeath() {
+
 	}
 }

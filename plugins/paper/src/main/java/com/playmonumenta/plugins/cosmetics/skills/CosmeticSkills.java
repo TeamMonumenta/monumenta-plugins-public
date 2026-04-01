@@ -91,7 +91,7 @@ import com.playmonumenta.plugins.cosmetics.skills.scout.EverseeingEyeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.TwistedCompanionCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PanBombCS;
-import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PrestigiousPinningShotCS;
+import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PrestigiousLockdownCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.ButterflyEffectCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.PrestigiousManeuverCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.VerdantRazorCS;
@@ -244,7 +244,7 @@ public class CosmeticSkills {
 		EverseeingEyeCS::new,
 		PrestigiousManeuverCS::new,
 		ButterflyEffectCS::new,
-		PrestigiousPinningShotCS::new,
+		PrestigiousLockdownCS::new,
 		PanBombCS::new,
 		VerdantRazorCS::new,
 
@@ -336,7 +336,7 @@ public class CosmeticSkills {
 			.add(new PrestigiousBeamCS())
 			.add(new PrestigiousStarfallCS())
 			.add(new PrestigiousBlitzCS())
-			.add(new PrestigiousPinningShotCS())
+			.add(new PrestigiousLockdownCS())
 			.add(new PrestigiousDevastationCS())
 			.add(new PrestigiousShadesCS())
 			.add(new PrestigiousShieldCS())

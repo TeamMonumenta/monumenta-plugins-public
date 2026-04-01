@@ -125,9 +125,7 @@ public class PercentDamageDealt extends Effect {
 		if (mPredicate != null && !mPredicate.test(entity, enemy)) {
 			return;
 		}
-		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
-			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL)
-			&& AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
+		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			event.updateDamageWithMultiplier(Math.max(0, 1 + mAmount));
 		}
 	}

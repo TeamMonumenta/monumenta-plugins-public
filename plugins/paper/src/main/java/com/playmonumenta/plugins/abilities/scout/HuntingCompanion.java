@@ -1,110 +1,89 @@
 package com.playmonumenta.plugins.abilities.scout;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
+import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.HuntingCompanionCS;
-import com.playmonumenta.plugins.effects.HealPlayerOnDeath;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.itemstats.enums.AttributeType;
-import com.playmonumenta.plugins.itemstats.enums.Operation;
-import com.playmonumenta.plugins.itemstats.enums.Slot;
-import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.parrots.ParrotManager;
-import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.NmsUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import net.kyori.adventure.text.Component;
+import java.util.Set;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.Creature;
-import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
-import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Strider;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
-import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
-
-public class HuntingCompanion extends Ability implements AbilityWithDuration {
-	private static final int COOLDOWN = 24 * 20;
-	private static final int DURATION = 12 * 20;
+public class HuntingCompanion extends Ability {
 	private static final int TICK_INTERVAL = 5;
-	private static final int DETECTION_RANGE = 32;
-	private static final double DAMAGE_FRACTION_1 = 0.2;
-	private static final double DAMAGE_FRACTION_2 = 0.3;
-	private static final int STUN_TIME_1 = 2 * 20;
-	private static final int STUN_TIME_2 = 3 * 20;
-	private static final int WEAKEN_DURATION = 5 * 20;
-	private static final double WEAKEN_AMOUNT = 0.2;
-	private static final double VELOCITY = 0.9;
-	private static final double JUMP_HEIGHT = 0.8;
-	private static final double MAX_TARGET_Y = 4;
-	private static final double HEALING_PERCENT = 0.05;
-	private static final String HEAL_EFFECT = "HuntingCompanionHealPlayerOnDeathEffect";
+	private static final String NOT_AFK_METADATA = "HuntingCompanionNotAFKEffect";
+	public static final Style FOX_COLOR = Style.style(TextColor.color(0xE68129));
 
-	public static final String CHARM_COOLDOWN = "Hunting Companion Cooldown";
-	public static final String CHARM_DURATION = "Hunting Companion Duration";
-	public static final String CHARM_STUN_DURATION = "Hunting Companion Stun Duration";
-	public static final String CHARM_WEAKEN_DURATION = "Hunting Companion Weaken Duration";
-	public static final String CHARM_WEAKEN_AMPLIFIER = "Hunting Companion Weaken Amplifier";
+	private static final double MELEE_RANGE = 12;
+	private static final double DAMAGE_R1 = 3;
+	private static final double DAMAGE_R2 = 5;
+	private static final double DAMAGE_R3 = 7;
+	private static final double POUNCE_DAMAGE_L1_R1 = 7;
+	private static final double POUNCE_DAMAGE_L1_R2 = 10;
+	private static final double POUNCE_DAMAGE_L1_R3 = 16;
+	private static final double POUNCE_DAMAGE_L2_R1 = 10;
+	private static final double POUNCE_DAMAGE_L2_R2 = 14;
+	private static final double POUNCE_DAMAGE_L2_R3 = 20;
+	private static final int POUNCE_COOLDOWN = Constants.TICKS_PER_SECOND * 5;
+	private static final int RECALL_COOLDOWN = Constants.TICKS_PER_SECOND * 3;
+	private static final double POUNCE_RADIUS = 3;
+	private static final double HEALING_PERCENT = 0.1;
+	private static final double MAX_TARGET_Y = 4; // Not charmable
+
 	public static final String CHARM_DAMAGE = "Hunting Companion Damage";
+	public static final String CHARM_RANGE = "Hunting Companion Range";
+	public static final String CHARM_POUNCE_DAMAGE = "Hunting Companion Pounce Damage";
 	public static final String CHARM_HEALING = "Hunting Companion Healing";
 	public static final String CHARM_SPEED = "Hunting Companion Speed";
 	public static final String CHARM_FOXES = "Hunting Companion Foxes";
-	public static final String CHARM_EAGLES = "Hunting Companion Eagles";
-
-	public static final Style FOX_COLOR = Style.style(TextColor.color(0xE68129));
-	public static final Style EAGLE_COLOR = Style.style(TextColor.color(0xC6D6E2));
+	public static final String CHARM_POUNCE_COOLDOWN = "Hunting Companion Pounce Cooldown";
+	public static final String CHARM_POUNCE_RADIUS = "Hunting Companion Pounce Radius";
 
 	public static final AbilityInfo<HuntingCompanion> INFO =
 		new AbilityInfo<>(HuntingCompanion.class, "Hunting Companion", HuntingCompanion::new)
@@ -112,182 +91,156 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 			.scoreboardId("HuntingCompanion")
 			.shorthandName("HC")
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Summon a fox to help you fight and stun mobs.")
-			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HuntingCompanion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
-				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.simpleDescription("Staggering enemies will have your fox to follow up.")
+			.addTrigger(new AbilityTriggerInfo<>("recall", "recall companion", null,
+				HuntingCompanion::recallCompanion, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true)
+				.lookDirections(AbilityTrigger.LookDirection.DOWN), null))
 			.displayItem(Material.SWEET_BERRIES);
 
-	private final HashMap<Mob, LivingEntity> mSummons;
-	private final double mDamageFraction;
-	private final int mStunDuration;
-	private final int mWeakenDuration;
-	private final double mWeakenAmount;
+	private final double mBiteDamage;
+	private final double mRange;
+	private final double mPounceDamage;
 	private final double mHealingPercent;
-	private @Nullable BukkitRunnable mRunnable;
+	private final int mPounceCooldown;
+	private final double mPounceRadius;
+	private final int mFoxCount;
 
-	private final int mMaxDuration;
-	private int mCurrDuration = -1;
-
+	private final BukkitRunnable mCosmeticRunnable;
 	private final HuntingCompanionCS mCosmetic;
+
+	private final HashSet<HuntingCompanionBoss> mSummons;
+	private int mWasInLava = Bukkit.getCurrentTick();
+	private int mRecalled = Bukkit.getCurrentTick();
 
 	public HuntingCompanion(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamageFraction = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2);
-		mStunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, (isLevelOne() ? STUN_TIME_1 : STUN_TIME_2));
-		mWeakenDuration = CharmManager.getDuration(mPlayer, CHARM_WEAKEN_DURATION, WEAKEN_DURATION);
-		mWeakenAmount = WEAKEN_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN_AMPLIFIER);
+
+		double pounceDamage =
+			isLevelOne() ? AbilityUtils.regionalScale(player, POUNCE_DAMAGE_L1_R1, POUNCE_DAMAGE_L1_R2, POUNCE_DAMAGE_L1_R3)
+				: AbilityUtils.regionalScale(player, POUNCE_DAMAGE_L2_R1, POUNCE_DAMAGE_L2_R2, POUNCE_DAMAGE_L2_R3);
+
+		mBiteDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, AbilityUtils.regionalScale(player, DAMAGE_R1, DAMAGE_R2, DAMAGE_R3));
+		mRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, MELEE_RANGE);
+		mPounceDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_POUNCE_DAMAGE, pounceDamage);
+		mPounceCooldown = CharmManager.getDuration(mPlayer, CHARM_POUNCE_COOLDOWN, POUNCE_COOLDOWN);
+		mPounceRadius = CharmManager.getRadius(mPlayer, CHARM_POUNCE_RADIUS, POUNCE_RADIUS);
+		mFoxCount = (isEnhanced() ? 2 : 1) + (int) CharmManager.getLevel(mPlayer, CHARM_FOXES);
 		mHealingPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEALING_PERCENT);
-		mSummons = new HashMap<>();
-		mRunnable = null;
-		mMaxDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
-
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HuntingCompanionCS());
-	}
 
-	public boolean cast() {
-		if (isOnCooldown()) {
-			clearTargetGlowing();
-			mSummons.entrySet().forEach(entry -> entry.setValue(null));
-			return true;
-		}
+		mSummons = new HashSet<>();
 
-		putOnCooldown();
-
-		clearSummons();
-
-		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
-		double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(inMainHand, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
-
-		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-
-		Location loc = mPlayer.getLocation();
-		boolean isInWater = LocationUtils.isLocationInWater(loc);
-		boolean isInLava = loc.getBlock().getType() == Material.LAVA;
-		int foxCount = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_FOXES);
-
-		// anti lag check
-		if (foxCount > 5) {
-			Class<? extends Entity> type = !isInLava ? (!isInWater ? Fox.class : Axolotl.class) : Strider.class;
-			if (loc.getWorld().getNearbyEntitiesByType(type, loc, 50).size() > 10) {
-				return false;
-			}
-		}
-
-		String foxName = !isInLava ? (!isInWater ? mCosmetic.getFoxName() : mCosmetic.getAxolotlName()) : mCosmetic.getStriderName();
-		for (int i = 0; i < foxCount; i++) {
-			summon(foxName, damage, playerItemStats, false);
-		}
-		if (isEnhanced()) {
-			int eagleCount = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_EAGLES);
-			String eagleName = !isInWater ? mCosmetic.getEagleName() : mCosmetic.getDolphinName();
-			for (int i = 0; i < eagleCount; i++) {
-				summon(eagleName, damage, playerItemStats, true);
-			}
-		}
-
-		BukkitRunnable cosmeticRunnable = new BukkitRunnable() {
-			int mT = 0;
-
-			@Override
-			public void run() {
-				mT++;
-				mCurrDuration++;
-				for (Iterator<Map.Entry<Mob, LivingEntity>> iterator = mSummons.entrySet().iterator(); iterator.hasNext(); ) {
-					Map.Entry<Mob, LivingEntity> e = iterator.next();
-					Mob summon = e.getKey();
-					if (summon.isDead() || !summon.isValid()) {
-						iterator.remove();
-					} else {
-						mCosmetic.tick(summon, mPlayer, e.getValue(), mT);
-					}
-				}
-				if (mSummons.isEmpty()) {
-					this.cancel();
-				}
-			}
-
-			@Override
-			public synchronized void cancel() {
-				super.cancel();
-				mCurrDuration = -1;
-				ClientModHandler.updateAbility(mPlayer, HuntingCompanion.this);
-			}
-		};
-		cosmeticRunnable.runTaskTimer(mPlugin, 0, 1);
-
-		World world = mPlayer.getWorld();
-		mRunnable = new BukkitRunnable() {
+		mCosmeticRunnable = new BukkitRunnable() {
 			int mTicksElapsed = 0;
+			final int mCount = mFoxCount;
 
 			@Override
 			public void run() {
-				if (mTicksElapsed >= mMaxDuration) {
-					mSummons.keySet().forEach(summon -> mCosmetic.onDespawn(world, summon.getLocation(), summon, mPlayer));
-					clearSummons();
+				if (player == null || mCount == 0) {
+					this.cancel();
 					return;
 				}
 
-				for (Mob summon : new ArrayList<>(mSummons.keySet())) {
-					LivingEntity specifiedTarget = mSummons.get(summon);
-					if (specifiedTarget != null) {
-						if (specifiedTarget.isDead()) {
-							mSummons.replace(summon, null);
-						} else {
-							summon.setTarget(specifiedTarget);
-						}
-					} else if (!EntityUtils.isHostileMob(summon.getTarget())) {
-						summon.setTarget(null);
+				if (AbilityManager.getManager().getPlayerAbility(player, HuntingCompanion.class) == null
+					|| !player.isOnline()) {
+					if (!AbilityManager.getManager().getPlayerAbilities(player).isSilenced()) {
+						this.cancel();
 					}
-					if (summon.getTarget() == null || summon.getTarget().isDead()) {
-						LivingEntity nearestMob = findNearestNonTargetedMob(summon);
-						if (nearestMob != null) {
-							summon.setTarget(nearestMob);
-							mCosmetic.onAggroSounds(world, nearestMob.getLocation(), summon);
-						} else {
-							// Follow player if there's no valid targets around
-							Location summonLoc = summon.getLocation();
-							Location playerLoc = mPlayer.getLocation();
-							if (!summonLoc.getWorld().equals(playerLoc.getWorld())) {
-								summon.teleport(playerLoc);
-								continue;
-							}
-							double distanceSquared = summonLoc.distanceSquared(playerLoc);
-							if (distanceSquared > 4 * 4) {
-								// Slow down a bit near the player to get less jerky movement
-								summon.getPathfinder().moveTo(summon instanceof Parrot ? mPlayer.getLocation().add(0, 3, 0) : mPlayer.getLocation(), distanceSquared > 6 * 6 ? 1 : 0.66);
-							} else {
-								summon.getPathfinder().stopPathfinding();
-							}
-						}
-					}
+					return;
 				}
 
-				mTicksElapsed += TICK_INTERVAL;
-			}
-
-			@Override
-			public synchronized void cancel() {
-				super.cancel();
-				cosmeticRunnable.cancel();
+				mSummons.forEach(HuntingCompanionBoss::cosmeticTick);
+				mTicksElapsed++;
 			}
 		};
-		mRunnable.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
+
+		cancelOnDeath(mCosmeticRunnable.runTaskTimer(mPlugin, TICK_INTERVAL, 1));
+	}
+
+	@Override
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (mPlayer == null || mFoxCount == 0) {
+			return;
+		}
+
+		if (mSummons.size() != mFoxCount) {
+			clearSummons();
+			spawnSummons();
+			return;
+		}
+
+		Iterator<HuntingCompanionBoss> it = mSummons.iterator();
+		HashSet<HuntingCompanionBoss> transformed = new HashSet<>();
+
+		while (it.hasNext()) {
+			HuntingCompanionBoss summon = it.next();
+
+			// Check if the summon needs to be removed
+			// 1. If the tick returns false (ie its dead, invalid, or diff. worlds)
+			// 2. If it can transform (ie into a strider)
+			HuntingCompanionBoss attempt = attemptChange(summon);
+			if (!summon.tick() || attempt != null) {
+				Mob mob = summon.getBoss();
+				if (mob != null) {
+					mob.remove();
+				}
+
+				if (attempt != null) {
+					transformed.add(attempt);
+				}
+
+				it.remove();
+			}
+		}
+
+		mSummons.addAll(transformed);
+	}
+
+	private void spawnSummons() {
+		for (int i = 0; i < mFoxCount; i++) {
+			HuntingCompanionBoss summon = summon(mCosmetic.getFoxName(), null, false);
+			if (summon == null) {
+				break;
+			} else {
+				mSummons.add(summon);
+			}
+		}
+	}
+
+	public boolean recallCompanion() {
+		int currTick = Bukkit.getCurrentTick();
+		if (currTick - mRecalled < RECALL_COOLDOWN) {
+			return false;
+		}
+		mRecalled = currTick;
+
+		for (HuntingCompanionBoss fox : mSummons) {
+			fox.teleportCompanion();
+		}
 
 		return true;
 	}
 
 	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (!mSummons.containsValue(enemy) && event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false)) {
-			Mob nearestSummon = findNearestNonTargetingSummon(enemy);
-			if (nearestSummon != null) {
-				mSummons.replace(nearestSummon, enemy);
+	public void invalidate() {
+		if (mCosmeticRunnable != null) {
+			mCosmeticRunnable.cancel();
+		}
+		clearSummons();
+	}
 
-				World world = nearestSummon.getWorld();
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 1.0f, 0.5f);
-				mCosmetic.onAggro(world, nearestSummon.getLocation(), mPlayer, nearestSummon);
-				PotionUtils.applyPotion(mPlayer, enemy, new PotionEffect(PotionEffectType.GLOWING, DURATION, 0, true, false));
+	@Override
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (!ClassAbility.HUNTING_COMPANION.equals(event.getAbility())) {
+			MetadataUtils.markThisTick(mPlugin, mPlayer, NOT_AFK_METADATA);
+		}
+
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false)) {
+			HuntingCompanionBoss nearestSummon = findNearestSummon(mPlayer, enemy, mSummons, mRange);
+			if (nearestSummon != null) {
+				LivingEntity summon = nearestSummon.getBoss();
+				mCosmetic.onAggro(summon.getWorld(), summon.getLocation(), mPlayer, summon);
+				nearestSummon.getBoss().setTarget(enemy);
 			}
 		}
 
@@ -295,42 +248,30 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 	}
 
 	@Override
-	public void playerQuitEvent(PlayerQuitEvent event) {
-		clearSummons();
-	}
-
-	@Override
-	public void playerTeleportEvent(PlayerTeleportEvent event) {
-		//Clear summons when teleporting to a different world or more than 100 blocks away
-		if (event.getFrom().getWorld() != event.getTo().getWorld() || event.getFrom().distance(event.getTo()) > 100) {
-			clearSummons();
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (Bukkit.getCurrentTick() - mWasInLava >= Constants.TICKS_PER_SECOND * 5
+			&& event.getCause().equals(EntityDamageEvent.DamageCause.LAVA)
+		) {
+			mWasInLava = Bukkit.getCurrentTick();
+			attemptPounce(mPlayer, mPlayer, false);
 		}
 	}
 
 	private void clearSummons() {
-		mSummons.keySet().forEach(Entity::remove);
-		clearTargetGlowing();
+		mSummons.forEach(HuntingCompanionBoss::remove);
 		mSummons.clear();
-		if (mRunnable != null) {
-			mRunnable.cancel();
-			mRunnable = null;
-		}
 	}
 
-	private void clearTargetGlowing() {
-		mSummons.values().stream().filter(Objects::nonNull).forEach(target -> target.removePotionEffect(PotionEffectType.GLOWING));
-	}
-
-	// Relies on mobs from the LoS. These mobs must have the tags UNPUSHABLE, boss_ccimmune, boss_canceldamage, and summon_ignore and must be invulnerable
-	private void summon(String name, double damage, ItemStatManager.PlayerItemStats playerItemStats, boolean eagle) {
-		Location loc = mPlayer.getLocation();
+	// Relies on mobs from the LoS. These mobs must have certain tags and must be invulnerable
+	// boss_huntingcompanion, UNPUSHABLE, boss_ccimmune, boss_canceldamage, and summon_ignore
+	private @Nullable HuntingCompanionBoss summon(String name, @Nullable Location location, boolean playSound) {
+		Location loc = location == null ?
+			LocationUtils.randomLocationInDonut(mPlayer.getLocation(), 0.5, 1)
+			: location;
 		Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
-		Vector perp = new Vector(-facingDirection.getZ(), 0, facingDirection.getX()).normalize(); //projection of the perpendicular vector to facingDirection onto the xz plane
-		// Eagles and dolphins spawn on opposite side by default
-		if (eagle) {
-			perp.multiply(-1);
-		}
-		boolean switchedSides = false;
+		Vector perp = new Vector(-facingDirection.getZ(), 0, facingDirection.getX()).normalize(); // projection of the perpendicular vector to facingDirection onto the xz plane
+		perp.multiply(1);
+
 		Vector sideOffset = new Vector();
 		Location pos = loc.clone().add(perp);
 		Location neg = loc.clone().subtract(perp);
@@ -338,82 +279,32 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 			sideOffset = perp;
 		} else if (canSpawnAt(neg)) {
 			sideOffset = perp.clone().multiply(-1);
-			switchedSides = true;
-		} else if (!loc.isChunkLoaded()) {
-			// Player is standing somewhere that's not loaded, abort
-			return;
+		} else if (!loc.isChunkLoaded()) { // Abort if somewhere not loaded
+			return null;
 		}
 
 		loc.add(sideOffset).add(facingDirection.clone().setY(0).normalize().multiply(-0.25));
-		if (eagle) {
-			loc.add(0, 2, 0);
-		}
 
 		Creature summon = (Creature) LibraryOfSoulsIntegration.summon(loc, name);
 		if (summon == null) {
 			MMLog.warning("Failed to spawn " + name + " from Library of Souls");
-			return;
+			return null;
 		}
 
-		summon.setVelocity(facingDirection.clone().setY(eagle ? -JUMP_HEIGHT : JUMP_HEIGHT).normalize().multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SPEED, VELOCITY)));
-		summon.teleport(summon.getLocation().setDirection(facingDirection));
+		HuntingCompanionBoss companion = mPlugin.mBossManager.getBoss(summon, HuntingCompanionBoss.class);
+		if (companion == null) {
+			MMLog.warning("Failed to create HuntingCompanionBoss for " + name + " from Library of Souls");
+			summon.remove();
+			return null;
+		}
+		companion.spawn(mPlayer, isLevelTwo(), mBiteDamage, mPounceDamage, mPounceRadius,
+			mPounceCooldown, mHealingPercent, mRange, mCosmetic);
 
-		List<UUID> stunnedMobs = new ArrayList<>();
-		if (damage > 0) {
-			try {
-				NmsUtils.getVersionAdapter().setHuntingCompanion(summon, target -> {
-					DamageUtils.damage(mPlayer, target, new DamageEvent.Metadata(DamageType.MELEE_SKILL, ClassAbility.HUNTING_COMPANION, playerItemStats), damage, true, true, false);
-
-					if (!eagle && !EntityUtils.isElite(target) && !EntityUtils.isBoss(target)) {
-						UUID uuid = target.getUniqueId();
-						if (!stunnedMobs.contains(uuid)) {
-							EntityUtils.applyStun(mPlugin, mStunDuration, target);
-							stunnedMobs.add(uuid);
-						}
-					}
-
-					if (eagle) {
-						EntityUtils.applyWeaken(mPlugin, mWeakenDuration, mWeakenAmount, target);
-					}
-
-					mPlugin.mEffectManager.addEffect(target, HEAL_EFFECT, new HealPlayerOnDeath(60 * 20, EntityUtils.getMaxHealth(mPlayer) * mHealingPercent, mPlayer));
-
-					mCosmetic.onAttack(summon.getWorld(), summon.getLocation(), summon);
-				}, 4);
-			} catch (Exception e) {
-				MMLog.warning("Catch an exception while creating " + name + ". Reason: " + e.getMessage());
-				e.printStackTrace();
-			}
+		if (playSound) {
+			mCosmetic.onSummon(mPlayer.getWorld(), loc, mPlayer, summon);
 		}
 
-		if (summon instanceof Fox fox && LocationUtils.isInSnowyBiome(loc)) {
-			fox.setFoxType(Fox.Type.SNOW);
-		} else if (summon instanceof Parrot parrot) {
-			ParrotManager.ParrotVariant parrotVariant = switchedSides ? ParrotManager.getRightShoulderParrotVariant(mPlayer) : ParrotManager.getLeftShoulderParrotVariant(mPlayer);
-			if (parrotVariant == null) {
-				parrotVariant = switchedSides ? ParrotManager.getLeftShoulderParrotVariant(mPlayer) : ParrotManager.getRightShoulderParrotVariant(mPlayer);
-			}
-			if (parrotVariant != null) {
-				parrot.setVariant(parrotVariant.getVariant());
-				parrot.customName(Component.text(parrotVariant.getName()));
-				parrot.setCustomNameVisible(false);
-				if (parrotVariant == ParrotManager.ParrotVariant.RAINBOW) {
-					mPlugin.mBossManager.manuallyRegisterBoss(parrot, new RainbowParrot(mPlugin, parrot));
-				}
-			}
-		}
-
-		Attribute attribute;
-		if (summon instanceof Parrot) {
-			attribute = Attribute.GENERIC_FLYING_SPEED;
-		} else {
-			attribute = Attribute.GENERIC_MOVEMENT_SPEED;
-		}
-		EntityUtils.setAttributeBase(summon, attribute, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SPEED, EntityUtils.getAttributeBaseOrDefault(summon, attribute, 0)));
-
-		mSummons.put(summon, null);
-
-		mCosmetic.onSummon(loc.getWorld(), loc, mPlayer, summon);
+		return companion;
 	}
 
 	private boolean canSpawnAt(Location test) {
@@ -430,47 +321,51 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 		return false;
 	}
 
-	private @Nullable Mob findNearestNonTargetingSummon(LivingEntity target) {
-		// If a summon is already targeting this mob, choose that summon
-		for (Mob summon : mSummons.keySet()) {
-			if (summon.getTarget() == target) {
-				return summon;
-			}
+	private @Nullable HuntingCompanionBoss attemptChange(HuntingCompanionBoss companion) {
+		Mob summon = companion.getBoss();
+		Location loc = summon.getLocation();
+		HuntingCompanionBoss swap = null;
+
+		if (!(summon instanceof Fox) && summon.isOnGround() && !summon.isInWater() && !summon.isInLava()) {
+			swap = summon(mCosmetic.getFoxName(), loc, true);
+			// fox summon
+		} else if (!(summon instanceof Axolotl) && LocationUtils.isLocationInWater(loc)) {
+			swap = summon(mCosmetic.getAxolotlName(), loc, true);
+		} else if (!(summon instanceof Strider) && summon.isInLava()) {
+			swap = summon(mCosmetic.getStriderName(), loc, true);
 		}
-
-		Location targetLoc = target.getLocation();
-		List<LivingEntity> summons = new ArrayList<>(mSummons.keySet());
-
-		summons.removeIf(summon -> summon instanceof Mob mob && mSummons.get(mob) != null);
-		summons.removeIf(summon -> summon.getLocation().distance(targetLoc) > DETECTION_RANGE);
-
-		LivingEntity nearestSummon = EntityUtils.getNearestMob(targetLoc, summons);
-		if (nearestSummon instanceof Mob mob) {
-			// Should always be a mob (unless null) since it is one of the summons
-			return mob;
-		} else {
-			return null;
-		}
+		return swap;
 	}
 
-	private @Nullable LivingEntity findNearestNonTargetedMob(LivingEntity summon) {
-		Location summonLoc = summon.getLocation();
-		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(summon.getLocation(), DETECTION_RANGE);
+	// Static Util methods
 
-		nearbyMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageType.MELEE_SKILL));
-		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
-		mSummons.keySet().stream().map(Mob::getTarget).filter(Objects::nonNull).forEach(nearbyMobs::remove);
+	public static void staggerApplied(Player player, LivingEntity entity) {
+		attemptPounce(player, entity, true);
+	}
+
+	public static boolean isAFK(Player player) {
+		return !MetadataUtils.happenedInRecentTicks(player, NOT_AFK_METADATA, Constants.TICKS_PER_SECOND * 10);
+	}
+
+	public static @Nullable LivingEntity findNearestNonTargetedMob(LivingEntity summon, Player player, double range) {
+		Location loc = player.getLocation();
+		List<LivingEntity> nearbyMobs = getNearbyValidMob(loc, range);
 
 		List<LivingEntity> unfilteredNearbyMobs = new ArrayList<>(nearbyMobs);
 
+		HuntingCompanion hcAbility = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, HuntingCompanion.class);
+		if (hcAbility != null) {
+			hcAbility.mSummons.forEach(e -> nearbyMobs.remove(e.getTarget()));
+		}
+
 		if (summon instanceof Fox || summon instanceof Strider) {
-			nearbyMobs.removeIf(mob -> Math.abs(mob.getLocation().getY() - summonLoc.getY()) > MAX_TARGET_Y);
+			nearbyMobs.removeIf(mob -> Math.abs(mob.getLocation().getY() - loc.getY()) > MAX_TARGET_Y);
 			nearbyMobs.removeIf(mob -> EntityUtils.isFlyingMob(EntityUtils.getEntityStackBase(mob)));
-		} else if (summon instanceof Axolotl || summon instanceof Dolphin) {
+		} else if (summon instanceof Axolotl) {
 			nearbyMobs.removeIf(mob -> !EntityUtils.isInWater(mob));
 		}
 
-		// if there are no other mobs to target, we can double up
+		// If there are no other mobs, double up
 		if (nearbyMobs.isEmpty()) {
 			return EntityUtils.getNearestMob(summon.getLocation(), unfilteredNearbyMobs);
 		}
@@ -478,66 +373,93 @@ public class HuntingCompanion extends Ability implements AbilityWithDuration {
 		return EntityUtils.getNearestMob(summon.getLocation(), nearbyMobs);
 	}
 
-	@Override
-	public int getInitialAbilityDuration() {
-		return mMaxDuration;
+	private static void attemptPounce(Player player, LivingEntity entity, boolean isAttack) {
+		HuntingCompanion companion = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(player, HuntingCompanion.class);
+		if (companion != null) {
+			for (HuntingCompanionBoss fox : companion.mSummons) {
+				if (fox.pounce(entity, isAttack)) {
+					break;
+				}
+			}
+		}
 	}
 
-	@Override
-	public int getRemainingAbilityDuration() {
-		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	private static List<LivingEntity> getNearbyValidMob(Location loc, double range) {
+		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(loc, range);
+
+		// Remove immune & ignored
+
+		nearbyMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageType.PROJECTILE_SKILL));
+		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+
+		return nearbyMobs;
 	}
+
+	private static @Nullable HuntingCompanionBoss findNearestSummon(Player player, LivingEntity target,
+																	Set<HuntingCompanionBoss> summons, double range) {
+		Location targetLoc = target.getLocation();
+		List<HuntingCompanionBoss> companionBoss = new ArrayList<>(summons);
+
+		// Alternatively stack up foxes on a single target for maximum mayhem
+		companionBoss.removeIf(summon ->
+			player.getLocation().distanceSquared(targetLoc) > range * range
+				|| target.equals(summon.getTarget()));
+
+		Location pLoc = player.getLocation();
+
+		// Should always be a mob, unless its null
+		return companionBoss.stream()
+			.min(Comparator.comparingDouble(e -> e.getBoss().getLocation().distanceSquared(pLoc)))
+			.orElse(null);
+	}
+
 
 	private static Description<HuntingCompanion> getDescription1() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
-			.addTrigger()
 			.addDashedLine()
-			.addLine("Summon a *Fox* that follows you and attacks").styles(FOX_COLOR)
-			.addLine("mobs, stunning them once per mob.")
+			.addLine("A *Fox* will follow you around, attacking").styles(FOX_COLOR)
+			.addLine("nearby mobs within a %d block radius of you.")
+			.statValues(stat(a -> a.mRange, MELEE_RANGE))
 			.addLine()
-			.addLine("The *Fox* prioritizes mobs you've hit").styles(FOX_COLOR)
-			.addLine("with a projectile, and scales off of both")
-			.addLine("melee (m) and projectile damage (p).")
+			.addStat("Damage: %d (p) every 1s")
+			.statValues(perRegion(a -> a.mBiteDamage, DAMAGE_R1, DAMAGE_R2, DAMAGE_R3))
 			.addLine()
-			.addLine("When a mob damaged by a *Hunting Companion*").styles(UNDERLINED)
-			.addLine("dies, you are healed.")
+			.addLine("The *Fox* will pounce when a mob is").styles(FOX_COLOR)
+			.addLine("staggered, dealing area damage on impact.")
+			.addIf((a, p) -> a != null && a.mFoxCount > 1, desc -> desc
+				.addLine("(Multiple companions have their own separate cooldown)"))
 			.addLine()
-			.addStat("Damage: %p1 (m) (of weapon damage)")
-				.statValues(stat(a -> a.mDamageFraction, DAMAGE_FRACTION_1))
-			.addStat("Effect: Stun for %t1")
-				.statValues(stat(a -> a.mStunDuration, STUN_TIME_1))
-			.addStat("Healing: %p HP per kill")
-				.statValues(stat(a -> a.mHealingPercent, HEALING_PERCENT))
-			.addStat("Duration: %t")
-				.statValues(stat(a -> a.mMaxDuration, DURATION))
+			.addStat("Damage: %d1 (p)")
+			.statValues(perRegion(a -> a.mPounceDamage, POUNCE_DAMAGE_L1_R1, POUNCE_DAMAGE_L1_R2, POUNCE_DAMAGE_L1_R3))
+			.addStat("Radius: %r")
+			.statValues(stat(a -> a.mPounceRadius, POUNCE_RADIUS))
 			.addStat("Cooldown: %t")
-				.statValues(cooldown(COOLDOWN))
+			.statValues(cooldown(POUNCE_COOLDOWN))
 			.addDashedLine();
 	}
 
 	private static Description<HuntingCompanion> getDescription2() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
 			.addDashedLine()
-			.addLine("Increase *Hunting Companion*'s").styles(UNDERLINED)
-			.addLine("damage and stun duration.")
+			.addLine("Increase *Hunting Companion*'s pounce damage.").styles(UNDERLINED)
 			.addLine()
-			.addStatComparison("Damage: %p1 -> %p2 (m)")
-				.statValues(stat(DAMAGE_FRACTION_1), stat(a -> a.mDamageFraction, DAMAGE_FRACTION_2))
-			.addStatComparison("Effect: %t1 -> %t2 Stun")
-				.statValues(stat(STUN_TIME_1), stat(a -> a.mStunDuration, STUN_TIME_2))
+			.addStatComparison("Damage: %d1 -> %d2 (p)")
+			.statValues(perRegion(POUNCE_DAMAGE_L1_R1, POUNCE_DAMAGE_L1_R2, POUNCE_DAMAGE_L1_R3),
+				perRegion(a -> a.mPounceDamage, POUNCE_DAMAGE_L2_R1, POUNCE_DAMAGE_L2_R2, POUNCE_DAMAGE_L2_R3))
+			.addLine()
+			.addLine("Heal yourself over time when a *Fox* pounces.").styles(FOX_COLOR)
+			.addLine("(Duration stacks per pounce, up to 3s)")
+			.addLine()
+			.addStat("Healing: %p HP over 1s")
+			.statValues(stat(a -> a.mHealingPercent, HEALING_PERCENT))
 			.addDashedLine();
 	}
 
 	private static Description<HuntingCompanion> getDescriptionEnhancement() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
 			.addDashedLine()
-			.addLine("*Hunting Companion* now also summons an").styles(UNDERLINED)
-			.addLine("*Eagle* that deals the same damage, but").styles(EAGLE_COLOR)
-			.addLine("weakens mobs instead of stunning them.")
-			.addLine("(Cannot attack the fox's target)").styles(DARK_GREY)
-			.addLine()
-			.addStat("Effect: %p Weaken for %t")
-				.statValues(stat(a -> a.mWeakenAmount, WEAKEN_AMOUNT), stat(a -> a.mWeakenDuration, WEAKEN_DURATION))
+			.addLine("Gain an additional *Hunting Companion*.").styles(UNDERLINED)
+			.addLine("(Multiple companions have their own separate cooldown)")
 			.addDashedLine();
 	}
 }

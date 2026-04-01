@@ -33,14 +33,6 @@ public class TacticalManeuverCS implements CosmeticSkill {
 		new PartialParticle(Particle.CLOUD, loc, 20, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
 	}
 
-	public void maneuverBackEffect(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 2);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.PLAYERS, 1, 1.2f);
-		new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.1f, 0, 0.1f, 0.125f).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation(), 10, 0.1f, 0, 0.1f, 0.15f).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 25, 0.1f, 0, 0.1f, 0.15f).spawnAsPlayerActive(mPlayer);
-	}
-
 	public void maneuverTickEffect(Player mPlayer) {
 		new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 5, 0.25, 0.1, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
 	}
@@ -49,5 +41,21 @@ public class TacticalManeuverCS implements CosmeticSkill {
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 2.0f, 0.5f);
 		new PartialParticle(Particle.SMOKE_NORMAL, mPlayer.getLocation(), 63, 0.25, 0.1, 0.25, 0.2).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 20, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
+	}
+
+	public void maneuverMarkTick(World world, Player player, LivingEntity le) {
+		new PartialParticle(Particle.SMOKE_LARGE, le.getEyeLocation(), 1, 0, 0.12, 0, 0.22)
+			.directionalMode(true)
+			.spawnAsPlayerActive(player);
+	}
+
+	public void maneuverRefresh(World world, Player player, Location loc) {
+		player.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2f, 2f);
+		player.playSound(loc, Sound.ENTITY_BAT_TAKEOFF, SoundCategory.PLAYERS, 1f, 1f);
+
+		new PartialParticle(Particle.CLOUD, loc, 20)
+			.delta(0.2)
+			.extra(0.25f)
+			.spawnAsPlayerActive(player);
 	}
 }

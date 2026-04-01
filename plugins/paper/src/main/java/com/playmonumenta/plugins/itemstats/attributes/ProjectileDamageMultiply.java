@@ -41,7 +41,7 @@ public class ProjectileDamageMultiply implements Attribute {
 			return;
 		}
 
-		if (DamageType.getAllProjectileTypes().contains(type) || AbilityUtils.hasSpecialProjSkillScaling(event.getAbility())) {
+		if (DamageType.getAllProjectileTypes().contains(type)) {
 			event.updateGearDamageWithMultiplier(value);
 		}
 	}

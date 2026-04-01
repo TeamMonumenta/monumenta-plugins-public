@@ -4,11 +4,15 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.skills.scout.WindBombCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,14 +20,14 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class PanBombCS extends WindBombCS {
-	//These will be puns
-
 	public static final String NAME = "Pan Bomb";
 
 	private static final Color PAN_RED = Color.fromRGB(0xE54289);
@@ -52,7 +56,44 @@ public class PanBombCS extends WindBombCS {
 	private final int[] mAngles = {0, 0, 0};
 
 	@Override
-	public void onLand(Player player, World world, Location loc, double radius) {
+	public void onThrow(Plugin plugin, World world, Location loc) {
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 2.0f, 0.25f);
+		world.playSound(loc, Sound.ENTITY_DROWNED_SHOOT, SoundCategory.PLAYERS, 0.3f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 2.0f, 0.8f);
+	}
+
+	@Override
+	public void aerial(Player player, LivingEntity bomb, int ticks, int maxDuration) {
+		Location center = LocationUtils.getEntityCenter(bomb);
+		World world = bomb.getWorld();
+
+		new PPPeriodic(Particle.FALLING_DUST, center).count(2).data(Material.PINK_CONCRETE.createBlockData()).spawnAsPlayerActive(player);
+		new PPPeriodic(Particle.REDSTONE, center)
+			.count(2)
+			.extra(0.1)
+			.data(new Particle.DustOptions(ParticleUtils.getTransition(PAN_RED, PAN_BLUE, 0.5), 2))
+			.spawnAsPlayerActive(player);
+
+		world.playSound(bomb.getLocation(), Sound.ENTITY_BREEZE_SLIDE, SoundCategory.PLAYERS, 0.4f, 1.5f);
+		if (ticks % 20 == 0) {
+			world.playSound(center, Sound.ENTITY_ALLAY_AMBIENT_WITH_ITEM, SoundCategory.PLAYERS, 0.8f, 1.625f);
+			world.playSound(center, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.8f, 1.625f);
+			world.playSound(center, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.9f, 1.625f);
+		}
+	}
+
+	@Override
+	public String getBase64Head() {
+		return "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjVmY2Q1Mjc4ZjI2NmU5ZjY4NGFkODZiOWRjY2JiN2U1ZmNkNzMzZjQyNzIyNjQ3NjhiZGUyNzFhNjliZmI3YSJ9fX0=";
+	}
+
+	@Override
+	public Team getTeam() {
+		return ScoreboardUtils.getExistingTeamOrCreate("unpushable_yellow", NamedTextColor.YELLOW);
+	}
+
+	@Override
+	public void onExplode(Player player, World world, Location loc, double radius) {
 		Location ringLoc = loc.clone();
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -82,18 +123,8 @@ public class PanBombCS extends WindBombCS {
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1.2f, 0.9f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.8f, 0.8f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.9f, 0.2f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.9f, 1.5f);
 		ParticleUtils.drawFlag(player, loc.clone().add(0, 3, 0), PAN_COLORS, 1.88f);
-	}
-
-	@Override
-	public void onThrow(World world, Location loc) {
-		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 2.0f, 0.25f);
-		world.playSound(loc, Sound.ENTITY_DROWNED_SHOOT, SoundCategory.PLAYERS, 0.3f, 0.1f);
-		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 2.0f, 0.8f);
-
-		for (int i = 0; i < mAngles.length; i++) {
-			mAngles[i] = FastUtils.randomIntInRange(-60, 60);
-		}
 	}
 
 	@Override
@@ -130,4 +161,5 @@ public class PanBombCS extends WindBombCS {
 				.spawnAsPlayerActive(player);
 		}
 	}
+
 }

@@ -112,6 +112,77 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 	}
 
 	@Override
+	public void strikeSplinter(Player player, Location loc, double angle, double radius) {
+		World world = player.getWorld();
+
+		strikeExplode(world, player, loc, radius);
+		new PartialParticle(Particle.FLASH, loc, 1, 0, 0, 0)
+			.spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 60, 0, 0, 0, 0.25)
+			.spawnAsPlayerActive(player);
+
+		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, 2f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1.0f, 0.7f);
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 1.0f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 2.0f, 0.6f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 2f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 2.0f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 2.0f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 2.0f, 1.6f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 2.0f, 2f);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.2f, 0.4f);
+
+		new BukkitRunnable() {
+			double mRadius = 0;
+
+			@Override
+			public void run() {
+				if (mRadius > radius) {
+					this.cancel();
+					return;
+				}
+
+				Vector vec;
+				mRadius += 1.25;
+				double degree = 90 - angle;
+				// particles about every 10 degrees
+				int degreeSteps = (int) (angle / 5 * (1 + mRadius / radius));
+				double degreeStep = 2 * angle / degreeSteps;
+
+				for (int step = 0; step < degreeSteps; step++, degree += degreeStep) {
+
+					if (FastUtils.RANDOM.nextDouble() < 0.25) {
+						double radian1 = Math.toRadians(degree);
+						vec = new Vector(FastUtils.cos(radian1) * mRadius, 0.125, FastUtils.sin(radian1) * mRadius);
+						vec = VectorUtils.rotateXAxis(vec, loc.getPitch());
+						vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+
+						Location l = loc.clone().add(0, 0.1, 0).add(vec);
+
+						new PartialParticle(Particle.GUST, l)
+							.count(1)
+							.spawnAsPlayerActive(player);
+
+						new PartialParticle(Particle.FIREWORKS_SPARK, l)
+							.count(3)
+							.delta(0.2)
+							.extra(0.1)
+							.spawnAsPlayerActive(player);
+
+						new PartialParticle(Particle.END_ROD, l)
+							.count(3)
+							.delta(0.2)
+							.extra(0.1)
+							.spawnAsPlayerActive(player);
+
+						world.playSound(l, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, 0.25f, 0.8f);
+					}
+				}
+			}
+		}.runTaskTimer(Plugin.getInstance(), 0, 2);
+	}
+
+	@Override
 	public void strikeExplode(World world, Player player, Location loc, double radius) {
 		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, EXPLODE_VOLUME, 0.85f);
 		world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, EXPLODE_VOLUME, 0.85f);

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.skills.scout.ranger;
 
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -69,21 +70,6 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 		new PartialParticle(Particle.CLOUD, loc, 10, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
 
 		drawSymbol(mPlayer, dir);
-	}
-
-	@Override
-	public void maneuverBackEffect(World world, Player mPlayer) {
-		Location loc = mPlayer.getLocation();
-		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.45f, 2f);
-		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.35f, 1.8f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.6f, 2f);
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.PLAYERS, 1.25f, 1.5f);
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.PLAYERS, 1.5f, 1.75f);
-		new PartialParticle(Particle.SPIT, loc, 25, 0.1, 0, 0.1, 0.125).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CLOUD, loc, 20, 0.5, 0.25, 0.5, 0.15f).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, loc, 30, 1, 0.5, 1, 0.15, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
-
-		drawSymbol(mPlayer, mPlayer.getLocation().getDirection());
 	}
 
 	private void drawSymbol(Player mPlayer, Vector dir) {
@@ -159,5 +145,25 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 		new PartialParticle(Particle.REDSTONE, loc, 100, 2.5, 1.5, 2.5, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.6f, 0.8f);
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2f, 1.75f);
+	}
+
+	@Override
+	public void maneuverRefresh(World world, Player player, Location loc) {
+		player.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2f, 2f);
+		player.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1f, 2f);
+
+		new PPCircle(Particle.REDSTONE, loc, 2)
+			.ringMode(false)
+			.data(GOLD_COLOR)
+			.count(125)
+			.spawnAsPlayerActive(player);
+
+		new PPCircle(Particle.END_ROD, loc, 2)
+			.ringMode(true)
+			.directionalMode(true)
+			.delta(0, 0.2, 0)
+			.extra(0.2)
+			.count(15)
+			.spawnAsPlayerActive(player);
 	}
 }

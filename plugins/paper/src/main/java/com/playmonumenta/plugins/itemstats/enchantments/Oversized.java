@@ -1,8 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.scout.Quickdraw;
+import com.playmonumenta.plugins.abilities.scout.hunter.QuiverStorm;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
@@ -27,10 +26,9 @@ public class Oversized implements Enchantment {
 	}
 
 	public static void onAnyShoot(Player player, Projectile projectile) {
-		Quickdraw quickdraw = AbilityManager.getManager().getPlayerAbility(player, Quickdraw.class);
-		boolean isQuickdraw = quickdraw != null && quickdraw.isQuickDraw(projectile);
+		boolean isQuiverStorm = projectile.hasMetadata(QuiverStorm.ARROW_METADATA);
 
-		if (isQuickdraw) {
+		if (isQuiverStorm) {
 			return;
 		}
 

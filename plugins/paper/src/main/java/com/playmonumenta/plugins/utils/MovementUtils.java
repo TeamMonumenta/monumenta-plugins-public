@@ -79,7 +79,7 @@ public class MovementUtils {
 	 * @param transfer Coefficient of how much initial velocity carries over
 	 */
 	public static void knockAwayDirection(Vector dir, LivingEntity target, float transfer) {
-		knockAwayDirection(dir, target, transfer, true, true);
+		knockAwayDirection(dir.clone(), target, transfer, true, true);
 	}
 
 	/**

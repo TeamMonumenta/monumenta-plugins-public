@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -37,8 +38,10 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
@@ -136,6 +139,10 @@ public abstract class Ability {
 			}
 			mPlugin.mTimers.setCooldown(mPlayer, linkedSpell, cooldown);
 		}
+	}
+
+	public void updateAbility() {
+		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	//Events
@@ -299,6 +306,14 @@ public abstract class Ability {
 	}
 
 	public void blockWithShieldEvent() {
+
+	}
+
+	public void playerToggleFlightEvent(PlayerToggleFlightEvent event) {
+
+	}
+
+	public void playerItemHeldEvent(PlayerItemHeldEvent event) {
 
 	}
 

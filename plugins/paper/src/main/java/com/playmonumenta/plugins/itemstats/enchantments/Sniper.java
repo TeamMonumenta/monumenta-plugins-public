@@ -44,12 +44,12 @@ public class Sniper implements Enchantment {
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity target) {
 		if (event.getType() == DamageType.PROJECTILE && !event.isCancelled()) {
-			double effectiveness = 1.0;
+			double bowDraw = 1.0;
 			if (event.getDamager() instanceof AbstractArrow arrow) {
-				effectiveness = PlayerUtils.calculateBowDraw(arrow);
+				bowDraw = PlayerUtils.calculateBowDraw(arrow);
 			}
 
-			event.setFlatDamage(event.getFlatDamage() + effectiveness * apply(player, target, level));
+			event.setFlatDamage(event.getFlatDamage() + bowDraw * apply(player, target, level));
 		}
 	}
 
@@ -58,17 +58,19 @@ public class Sniper implements Enchantment {
 	}
 
 	public static double apply(Player player, Location target, double level) {
-		if (level > 0 && player.getEyeLocation().distance(target) > DISTANCE) {
-			particles(target, player);
-			return (level * DAMAGE_PER_LEVEL);
+		if (level > 0) {
+			float distanceScaling = Math.min((float) player.getEyeLocation().distance(target) / DISTANCE, 1);
+			particles(target, player, distanceScaling);
+			return (level * DAMAGE_PER_LEVEL * distanceScaling);
 		}
 		return 0;
 	}
 
-	public static void particles(Location loc, Player player) {
-		new PartialParticle(Particle.CRIT, loc, 30, 0, 0, 0, 0.65).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CRIT_MAGIC, loc, 30, 0, 0, 0, 0.65).spawnAsPlayerActive(player);
-		player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.6f, 0.5f);
+	public static void particles(Location loc, Player player, float distanceScaling) {
+		new PartialParticle(Particle.CRIT, loc, (int) (30 * distanceScaling), 0, 0, 0, 0.65).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT_MAGIC, loc, (int) (30 * distanceScaling), 0, 0, 0, 0.65).spawnAsPlayerActive(player);
+		if (distanceScaling > 0.4) {
+			player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, distanceScaling * 0.6f, 0.5f);
+		}
 	}
-
 }

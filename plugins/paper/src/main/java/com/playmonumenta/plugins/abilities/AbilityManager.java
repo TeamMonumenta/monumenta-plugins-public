@@ -83,21 +83,23 @@ import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
 import com.playmonumenta.plugins.abilities.scout.AllOutScout;
-import com.playmonumenta.plugins.abilities.scout.EagleEye;
+import com.playmonumenta.plugins.abilities.scout.Fleetfooted;
 import com.playmonumenta.plugins.abilities.scout.HuntingCompanion;
-import com.playmonumenta.plugins.abilities.scout.Quickdraw;
+import com.playmonumenta.plugins.abilities.scout.PartingShot;
 import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
-import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
+import com.playmonumenta.plugins.abilities.scout.ShrapnelBomb;
+import com.playmonumenta.plugins.abilities.scout.SteelTrap;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
-import com.playmonumenta.plugins.abilities.scout.Versatile;
 import com.playmonumenta.plugins.abilities.scout.Volley;
 import com.playmonumenta.plugins.abilities.scout.WindBomb;
-import com.playmonumenta.plugins.abilities.scout.hunter.PinningShot;
+import com.playmonumenta.plugins.abilities.scout.hunter.Deadeye;
+import com.playmonumenta.plugins.abilities.scout.hunter.Lockdown;
 import com.playmonumenta.plugins.abilities.scout.hunter.PredatorStrike;
-import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
+import com.playmonumenta.plugins.abilities.scout.hunter.QuiverStorm;
+import com.playmonumenta.plugins.abilities.scout.ranger.Elusive;
+import com.playmonumenta.plugins.abilities.scout.ranger.GaleShot;
 import com.playmonumenta.plugins.abilities.scout.ranger.RendingRazor;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
-import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
 import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
@@ -210,10 +212,12 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -430,12 +434,12 @@ public class AbilityManager {
 			HuntingCompanion.INFO,
 			Volley.INFO,
 			Swiftness.INFO,
-			EagleEye.INFO,
-			Versatile.INFO,
-			SwiftCuts.INFO,
+			PartingShot.INFO,
+			Fleetfooted.INFO,
+			ShrapnelBomb.INFO,
 			Sharpshooter.INFO,
 			WindBomb.INFO,
-			Quickdraw.INFO,
+			SteelTrap.INFO,
 
 			//********** WARRIOR **********//
 			CounterStrike.INFO,
@@ -522,13 +526,15 @@ public class AbilityManager {
 
 			//********** SCOUT **********//
 			// RANGER
-			RendingRazor.INFO,
+			Elusive.INFO,
+			GaleShot.INFO,
 			TacticalManeuver.INFO,
-			WhirlingBlade.INFO,
+			RendingRazor.INFO,
 
 			// HUNTER
-			PinningShot.INFO,
-			SplitArrow.INFO,
+			Deadeye.INFO,
+			Lockdown.INFO,
+			QuiverStorm.INFO,
 			PredatorStrike.INFO,
 
 			//********** WARRIOR **********//
@@ -732,12 +738,12 @@ public class AbilityManager {
 	}
 
 	public boolean playerSplashPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
-	                                       ThrownPotion potion, PotionSplashEvent event) {
+										   ThrownPotion potion, PotionSplashEvent event) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerSplashPotionEvent(affectedEntities, potion, event));
 	}
 
 	public boolean playerSplashedByPotionEvent(Player player, Collection<LivingEntity> affectedEntities,
-	                                           ThrownPotion potion, PotionSplashEvent event) {
+											   ThrownPotion potion, PotionSplashEvent event) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerSplashedByPotionEvent(affectedEntities, potion, event));
 	}
 
@@ -825,6 +831,14 @@ public class AbilityManager {
 
 	public void playerDismountEvent(Player player, EntityDismountEvent event) {
 		conditionalCast(player, ability -> ability.playerDismountEvent(event));
+	}
+
+	public void playerToggleFlightEvent(Player player, PlayerToggleFlightEvent event) {
+		conditionalCast(player, ability -> ability.playerToggleFlightEvent(event));
+	}
+
+	public void playerItemHeldEvent(Player player, PlayerItemHeldEvent event) {
+		conditionalCast(player, ability -> ability.playerItemHeldEvent(event));
 	}
 
 	public void playerQuitEvent(Player player, PlayerQuitEvent event) {

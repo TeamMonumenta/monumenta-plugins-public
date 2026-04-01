@@ -72,8 +72,7 @@ public final class PercentDamageDealtMultiple extends PercentDamageDealt {
 		if (event.getType() == DamageType.TRUE) {
 			return;
 		}
-		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
-			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
+		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			registerDamageDealt();
 			if (mMultiplicative) {
 				event.setFlatDamage(event.getFlatDamage() * (1 + mAmount));

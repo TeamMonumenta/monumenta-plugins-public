@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import com.google.common.base.Preconditions;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.scout.PartingShot;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.bosses.bosses.GenericTargetBoss;
@@ -1530,7 +1531,10 @@ public class EntityUtils {
 
 	public static boolean isAbilityTriggeringProjectile(Projectile proj, boolean requireCritical) {
 		if (proj instanceof AbstractArrow arrow) {
-			return !requireCritical || arrow.isCritical() || arrow instanceof Trident;
+			return !requireCritical
+				|| (arrow.getShooter() instanceof Player player && PartingShot.hasImbuement(player))
+				|| arrow.isCritical()
+				|| arrow instanceof Trident;
 		} else if (proj instanceof Snowball) {
 			ItemStatManager.PlayerItemStats projectileItemStats = DamageListener.getProjectileItemStats(proj);
 			return projectileItemStats != null

@@ -2,12 +2,9 @@ package com.playmonumenta.plugins.cosmetics.skills.scout.ranger;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.HashMap;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -20,21 +17,20 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-public class VerdantRazorCS extends WhirlingBladeCS {
-
+public class VerdantRazorCS extends RendingRazorCS {
 	public static final String NAME = "Verdant Razor";
+
+	private final HashMap<Integer, ItemDisplay> mRazorDisplayMap = new HashMap<>();
 
 	@Override
 	public @Nullable List<String> getDescription() {
 		return List.of(
-			"Vine swinging's got a different meaning once",
+			"Vine slinging's got a different meaning once",
 			"you attach a sharp object to the end of it.");
 	}
 
@@ -48,12 +44,14 @@ public class VerdantRazorCS extends WhirlingBladeCS {
 		return NAME;
 	}
 
-	private @Nullable Location mEndLoc = null;
-	private final HashMap<Integer, ItemDisplay> mRazorDisplayMap = new HashMap<>();
+	private static final Particle.DustTransition GREEN = new Particle.DustTransition(Color.fromRGB(140, 210, 45), Color.fromRGB(70, 105, 27), 1.2f);
 
 	@Override
-	public void onCast(Player player, Location loc, World world) {
+	public void razorCast(Player player) {
 		int currentTick = Bukkit.getCurrentTick();
+		Location loc = player.getLocation();
+		World world = loc.getWorld();
+
 		if (mRazorDisplayMap.get(currentTick) != null) {
 			mRazorDisplayMap.get(currentTick).remove();
 		}
@@ -68,85 +66,108 @@ public class VerdantRazorCS extends WhirlingBladeCS {
 				}
 				mRazorDisplayMap.remove(currentTick);
 			}, Constants.TICKS_PER_MINUTE);
-		mRazorDisplayMap.get(currentTick).setItemStack(DisplayEntityUtils.generateRPItem(Material.CROSSBOW, "Steelsage Talisman"));
+		mRazorDisplayMap.get(currentTick).setItemStack(DisplayEntityUtils.generateRPItem(Material.STONE_HOE, "Forest's Reaper"));
 		mRazorDisplayMap.get(currentTick).setTransformation(
 			new Transformation(
-				new Vector3f(0),
+				new Vector3f(),
 				new AxisAngle4f(),
-				new Vector3f(1.2f),
+				new Vector3f(1.4f),
 				new AxisAngle4f()
 			));
-		mRazorDisplayMap.get(currentTick).setTeleportDuration(1);
+		mRazorDisplayMap.get(currentTick).setTeleportDuration(2);
+		mRazorDisplayMap.get(currentTick).setInterpolationDelay(0);
 
-		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.3f, 0.7f);
-		world.playSound(loc, Sound.ENTITY_BREEZE_IDLE_GROUND, SoundCategory.PLAYERS, 1.5f, 1.5f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1f, 0.7f);
+		world.playSound(loc, Sound.BLOCK_GRASS_BREAK, SoundCategory.PLAYERS, 1f, 0.6f);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1f, 0.8f);
 	}
 
 	@Override
-	public void hitMob(Player player, Location loc, World world) {
-		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, SoundCategory.PLAYERS, 0.4f, 1.1f);
-	}
-
-	@Override
-	public void tick(Player player, Location bladeLoc, World world, Location playerLoc, double throwRadius, double bladeRadius, int degrees, int startingTick, boolean isFirstCycle) {
-		Location oldLoc = bladeLoc;
-
-		Vector front = LocationUtils.getDirectionTo(bladeLoc, playerLoc.clone().add(0, 1, 0));
-		Vector left = VectorUtils.rotateTargetDirection(front, 90, 0);
-		Vector down = VectorUtils.rotateTargetDirection(front, 0, 90);
-
-		double distance;
-		if (isFirstCycle && degrees == 0) {
-			distance = throwRadius;
-		} else {
-			distance = throwRadius + bladeRadius;
+	public void razorProjectileEffects(final Player player, final Location location, int startingTick) {
+		ItemDisplay display = mRazorDisplayMap.get(startingTick);
+		if (display != null) {
+			// TODO: Would be nice if pitch adjusted itself
+			Location loc = location.clone();
+			loc.setYaw(40 * (Bukkit.getCurrentTick() - startingTick));
+			loc.setPitch(90);
+			display.teleport(loc);
 		}
 
-		bladeLoc = playerLoc.clone().add(front.clone().multiply(distance)).add(0, 0.5, 0).setDirection(down);
-		playerLoc.add(0, 0.75, 0).add(isFirstCycle && degrees == 0 ? new Vector(0, 0, 0) : front);
+		new PartialParticle(Particle.DUST_COLOR_TRANSITION, location)
+			.count(10)
+			.delta(0.2)
+			.extra(0.1)
+			.data(GREEN)
+			.spawnAsPlayerActive(player);
 
-		final Particle.DustTransition GREEN = new Particle.DustTransition(Color.fromRGB(140, 210, 45 + (int) (45 * Math.sin(degrees))), Color.fromRGB(70, 105, 27), 1.2f);
-		new PPLine(Particle.DUST_COLOR_TRANSITION, playerLoc, bladeLoc, 0.08).countPerMeter(10).data(GREEN).spawnAsPlayerActive(player);
-		new PPLine(Particle.SPORE_BLOSSOM_AIR, playerLoc, bladeLoc).delta(0.15).countPerMeter(0.5).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.WHITE_SMOKE, bladeLoc).count(4).delta(left.getX(), 0, left.getZ()).extra(0.2).directionalMode(true).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.WHITE_SMOKE, bladeLoc).count(3).delta(left.getX(), 0, left.getZ()).extra(0.16).directionalMode(true).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CLOUD, bladeLoc).count(2).delta(left.getX(), 0, left.getZ()).extra(0.12).directionalMode(true).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.ELECTRIC_SPARK, location)
+			.count(3)
+			.delta(0.2)
+			.extra(0.1)
+			.spawnAsPlayerActive(player);
 
-		world.playSound(bladeLoc, Sound.BLOCK_AZALEA_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-
-		if (mRazorDisplayMap.get(startingTick) != null) {
-			// Razor has to "teleport" "twice as far" to account for travel time
-			mRazorDisplayMap.get(startingTick).teleport(bladeLoc.clone().add(bladeLoc.clone().subtract(oldLoc)));
-		}
-		mEndLoc = bladeLoc;
+		new PartialParticle(Particle.FALLING_DUST, location, 1)
+			.delta(0.2)
+			.extra(0)
+			.data(Bukkit.createBlockData(Material.GREEN_TERRACOTTA))
+			.spawnAsPlayerActive(player);
 	}
 
 	@Override
-	public void end(World world, Location loc, Player player, int startingTick) {
+	public void razorTravelSound(final Player player, final Location location) {
+		location.getWorld().playSound(location, "minecraft:entity.breeze.charge", SoundCategory.PLAYERS, 1f, 1f);
+	}
+
+	@Override
+	public void razorHit(final Player player, final Location location) {
+		final World world = player.getWorld();
+
+		new PartialParticle(Particle.BLOCK_CRACK, location, 150)
+			.delta(0.4)
+			.extra(0)
+			.data(Bukkit.createBlockData(Material.AZALEA_LEAVES))
+			.spawnAsPlayerActive(player);
+
+		world.playSound(location, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1f, 0.4f);
+		world.playSound(location, "minecraft:entity.breeze.deflect", SoundCategory.PLAYERS, 1f, 0.8f);
+		world.playSound(location, Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1f, 0.4f);
+		world.playSound(location, "minecraft:entity.armadillo.hurt_reduced", SoundCategory.PLAYERS, 2f, 0.4f);
+	}
+
+	@Override
+	public void razorPierce(Player player, Location location) {
+		final World world = location.getWorld();
+
+		new PartialParticle(Particle.DAMAGE_INDICATOR, location.clone().add(0, 0.5, 0))
+			.count(5)
+			.delta(0.2)
+			.extra(0.1)
+			.spawnAsPlayerActive(player);
+
+		new PartialParticle(Particle.BLOCK_CRACK, location, 30)
+			.delta(0.3)
+			.extra(0)
+			.data(Bukkit.createBlockData(Material.AZALEA_LEAVES))
+			.spawnAsPlayerActive(player);
+
+		world.playSound(location, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 0.8f, 1.5f);
+		world.playSound(location, Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, SoundCategory.PLAYERS, 1f, 0.8f);
+		world.playSound(location, Sound.ENTITY_BEE_STING, SoundCategory.PLAYERS, 1f, 1f);
+		world.playSound(location, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1f, 2f);
+	}
+
+	@Override
+	public void razorReturned(final Location loc, int startingTick) {
+		World world = loc.getWorld();
+
+		world.playSound(loc, Sound.BLOCK_GRASS_BREAK, SoundCategory.PLAYERS, 1f, 1f);
+		world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 1f, 0.8f);
+		world.playSound(loc, Sound.ITEM_FLINTANDSTEEL_USE, SoundCategory.PLAYERS, 1f, 0.4f);
 		world.playSound(loc, "block.vault.insert_item", SoundCategory.PLAYERS, 1.8f, 1.1f);
-		Location playerLoc = player.getLocation().add(0, 1, 0);
-		if (mEndLoc != null && mRazorDisplayMap.get(startingTick) != null) {
-			Vector toBlade = LocationUtils.getVectorTo(mEndLoc, playerLoc);
-			new BukkitRunnable() {
-				int mTicks = 0;
 
-				@Override
-				public void run() {
-					if (mTicks >= 4) {
-						if (mRazorDisplayMap.get(startingTick) != null) {
-							mRazorDisplayMap.get(startingTick).remove();
-						}
-						mRazorDisplayMap.remove(startingTick);
-						this.cancel();
-					}
-					if (mRazorDisplayMap.get(startingTick) != null && mEndLoc != null) {
-						Location playerLoc = player.getEyeLocation().add(0, -0.5, 0);
-						Location bladeLoc = playerLoc.clone().add(toBlade.clone().multiply(1 - mTicks * 0.34)).setDirection(mEndLoc.getDirection());
-						mRazorDisplayMap.get(startingTick).teleport(bladeLoc);
-					}
-					mTicks++;
-				}
-			}.runTaskTimer(Plugin.getInstance(), 0, 1);
+		ItemDisplay display = mRazorDisplayMap.remove(startingTick);
+		if (display != null) {
+			display.remove();
 		}
 	}
 

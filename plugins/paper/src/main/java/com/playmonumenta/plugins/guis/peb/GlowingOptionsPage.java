@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.guis.peb;
 
 import com.google.common.base.Preconditions;
-import com.playmonumenta.plugins.abilities.scout.EagleEye;
+import com.playmonumenta.plugins.abilities.scout.PartingShot;
 import com.playmonumenta.plugins.commands.GlowingCommand;
 import com.playmonumenta.plugins.guis.lib.ReactiveValue;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ final class GlowingOptionsPage extends PebPage {
 		}
 	}
 
-	private static final String[] EAGLE_EYE_OPTIONS = Arrays.stream(EagleEye.GlowingOption.values())
+	private static final String[] PARTING_SHOT_OPTIONS = Arrays.stream(PartingShot.GlowingOption.values())
 		.map(opt -> opt.mDescription)
 		.toArray(String[]::new);
 	private final ReactiveValue<Integer> mPackedOptions;
@@ -78,12 +78,12 @@ final class GlowingOptionsPage extends PebPage {
 			"Disable all glowing effects"
 		).onMouseClick(() -> mPackedOptions.set(0xffffffff)).set(3, 5);
 
-		// Eagle Eye cycle
+		// Parting Shot cycle (previously Eagle Eye)
 		entry(
 			Material.BOW,
-			"Eagle Eye Options",
-			"Additional glowing settings for Eagle Eye"
-		).cycle(EagleEye.GLOWING_OPTION_SCOREBOARD_NAME, EAGLE_EYE_OPTIONS).set(4, 4);
+			"Parting Shot Options",
+			"Additional glowing settings for Parting Shot"
+		).cycle(PartingShot.GLOWING_OPTION_SCOREBOARD_NAME, PARTING_SHOT_OPTIONS).set(4, 4);
 	}
 
 	private PebEntryHelper makeOption(Material icon, String name, GlowingCommand.Option option) {

@@ -9,35 +9,33 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
-import com.playmonumenta.plugins.abilities.scout.Quickdraw;
-import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
+import com.playmonumenta.plugins.abilities.scout.Sharpshooter;
+import com.playmonumenta.plugins.abilities.scout.WindBomb;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PredatorStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
-import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
-import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
-import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
@@ -59,26 +57,25 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
-import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 
 public class PredatorStrike extends Ability implements AbilityWithDuration {
-	private static final int COOLDOWN_1 = TICKS_PER_SECOND * 18;
-	private static final int COOLDOWN_2 = TICKS_PER_SECOND * 14;
-	private static final double DAMAGE_MULTIPLIER = 2.0;
-	private static final double DISTANCE_SCALE_1 = 0.1;
-	private static final double DISTANCE_SCALE_2 = 0.15;
+	private static final double COOLDOWN_REDUCTION = 0.25;
+	private static final int COOLDOWN = TICKS_PER_SECOND * 16;
+	private static final double DAMAGE = 24;
+	private static final double DAMAGE_MULTIPLIER = 1.0;
+	private static final double DAMAGE_SPLINTER = 26;
+	private static final double DAMAGE_SPLINTER_MULTIPLIER = 1.2;
 	private static final int MAX_RANGE = 30;
-	private static final int MAX_DAMAGE_RANGE = 12;
-	private static final double EXPLODE_RADIUS = 1.25;
+	private static final double EXPLODE_RADIUS = 3;
 	private static final double EXPLODE_KNOCKBACK = 0.25;
 	private static final int PIERCING = 0;
-	private static final int R2_CAP = 400;
-	private static final int R3_CAP = 750;
-	private static final int CAP_LEVEL_TWO_MULTIPLIER = 2;
 	private static final int DURATION = TICKS_PER_SECOND * 5;
+	private static final double SPLINTER_CONE = 60;
+	private static final double SPLINTER_RADIUS = 6;
+	private static final double SPLINTER_REQUIREMENT = 4;
 
 	public static final String CHARM_COOLDOWN = "Predator Strike Cooldown";
 	public static final String CHARM_DAMAGE = "Predator Strike Damage";
@@ -86,9 +83,10 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	public static final String CHARM_RANGE = "Predator Strike Range";
 	public static final String CHARM_KNOCKBACK = "Predator Strike Knockback";
 	public static final String CHARM_PIERCING = "Predator Strike Enemies Pierced";
-	public static final String CHARM_DAMAGE_RANGE = "Predator Strike Damage Scaling Range";
-	public static final String CHARM_DISTANCE_SCALE = "Predator Strike Damage Per Block";
-	public static final String CHARM_BASE_DAMAGE = "Predator Strike Base Damage Multiplier";
+	public static final String CHARM_SPLINTER_RADIUS = "Predator Strike Splinter Radius";
+	public static final String CHARM_SPLINTER_CONE = "Predator Strike Splinter Cone";
+	public static final String CHARM_SPLINTER_REQUIREMENT = "Predator Strike Splinter Distance Requirement";
+	public static final String CHARM_COOLDOWN_REDUCTION = "Predator Strike Splinter Cooldown Reduction Multiplier";
 
 	public static final AbilityInfo<PredatorStrike> INFO =
 		new AbilityInfo<>(PredatorStrike.class, "Predator Strike", PredatorStrike::new)
@@ -96,8 +94,8 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 			.scoreboardId("PredatorStrike")
 			.shorthandName("PrS")
 			.descriptions(getDescription1(), getDescription2())
-			.simpleDescription("Upon activation, your next shot will travel instantly and deal more damage the further it travels.")
-			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
+			.simpleDescription("Upon activation, your next shot will travel instantly and cause a powerful explosion.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			// Put this trigger first so that they can be made the same for convenience
 			.addTrigger(new AbilityTriggerInfo<>("unprime", "unprime", PredatorStrike::unprime,
 				new AbilityTrigger(AbilityTrigger.Key.DROP).enabled(false).sneaking(true),
@@ -106,17 +104,24 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 					return predatorStrike != null && predatorStrike.mDeactivationRunnable != null;
 				})))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "prime", PredatorStrike::prime,
-				new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
+				new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(Material.SPECTRAL_ARROW);
 
-	private @Nullable BukkitRunnable mDeactivationRunnable = null;
+	protected @Nullable BukkitRunnable mDeactivationRunnable = null;
 	private final double mRange;
-	private final double mDistanceScale;
-	private final double mDamageRange;
-	private final double mBaseDamage;
+	private final double mDamageMultiplier;
+	private final double mDamage;
 	private final double mExplodeRadius;
-	private @Nullable SwiftCuts mSwiftCuts;
+	private final float mKnockback;
+	private final double mSplinterRadius;
+	private final double mSplinterCone;
+	private final double mSplinterRequirement;
+	private final double mSplinterDamageMultiplier;
+	private final double mSplinterDamage;
+	private final double mCooldownReduction;
+	private @Nullable Sharpshooter mSharpshooter;
+
 	private int mCurrDuration = -1;
 	private int mLastPrimeTick = 0;
 
@@ -125,14 +130,21 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	public PredatorStrike(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, MAX_RANGE);
-		mDistanceScale = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DISTANCE_SCALE, isLevelOne() ? DISTANCE_SCALE_1 : DISTANCE_SCALE_2);
 		mExplodeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, EXPLODE_RADIUS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new PredatorStrikeCS());
-		mDamageRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE_RANGE, MAX_DAMAGE_RANGE);
-		mBaseDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_BASE_DAMAGE, DAMAGE_MULTIPLIER);
+		mDamageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_MULTIPLIER);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
+		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, EXPLODE_KNOCKBACK);
+		mSplinterDamageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_SPLINTER_MULTIPLIER);
+		mSplinterDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_SPLINTER);
+		mSplinterCone = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SPLINTER_CONE, SPLINTER_CONE);
+		mSplinterRadius = CharmManager.getRadius(mPlayer, CHARM_SPLINTER_RADIUS, SPLINTER_RADIUS);
+		mSplinterRequirement = CharmManager.getRadius(mPlayer, CHARM_SPLINTER_REQUIREMENT, SPLINTER_REQUIREMENT);
+		mCooldownReduction = COOLDOWN_REDUCTION + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_COOLDOWN_REDUCTION);
 
-		Bukkit.getScheduler().runTask(plugin, () ->
-			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, SwiftCuts.class));
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mSharpshooter = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, Sharpshooter.class);
+		});
 	}
 
 	public boolean prime() {
@@ -188,29 +200,96 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (mDeactivationRunnable == null || (!EntityUtils.isAbilityTriggeringProjectile(projectile, true) && !projectile.getScoreboardTags().contains(Quickdraw.SOURCE_QUICKDRAW_TAG))) {
+		if (mDeactivationRunnable == null || !EntityUtils.isAbilityTriggeringProjectile(projectile, true) || projectile.hasMetadata(QuiverStorm.ARROW_METADATA)) {
 			return true;
 		}
 		if (Grappling.playerHoldingHook(mPlayer)) {
 			return true;
 		}
-		mDeactivationRunnable.cancel();
 
-		putOnCooldown();
+		if (mSharpshooter != null) {
+			mSharpshooter.doNotTrack(projectile);
+		}
 
-		projectile.remove();
+		ItemStatManager.PlayerItemStats stats = Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(mPlayer);
+		DamageListener.appendProjectileStats(stats, projectile);
+
+		AbilityUtils.removeProjectile(projectile);
 		mPlugin.mProjectileEffectTimers.removeEntity(projectile);
 
+		mDeactivationRunnable.cancel();
+
+		int cooldown = getModifiedCooldown();
+
+		// Check if anything is within splinter range first
+		if (isLevelTwo() && !mPlayer.isSneaking()) {
+			Location pLoc = mPlayer.getEyeLocation();
+			Vector actualDir = NmsUtils.getVersionAdapter().getActualDirection(mPlayer).normalize();
+			pLoc.setDirection(actualDir);
+			Hitbox hitbox = Hitbox
+				.approximateCylinder(pLoc, pLoc.clone().add(actualDir.multiply(mSplinterRequirement)), 2.5, true)
+				.accuracy(0.5);
+
+			if (!hitbox.getHitMobs().isEmpty()) {
+				if (mSharpshooter != null) {
+					mSharpshooter.addStacks(Sharpshooter.checkSharpshooterType(projectile, mPlayer.getInventory().getItemInMainHand()));
+				}
+				putOnCooldown((int) (cooldown * (1 - mCooldownReduction)));
+				projectile.addScoreboardTag("NoRecoil");
+				predatorSplinter(stats);
+				return true;
+			}
+		}
+
+		putOnCooldown(cooldown);
+		mCosmetic.strikeLaunch(mPlayer.getWorld(), mPlayer);
+		predatorStrike(projectile, stats);
+
+		return true;
+	}
+
+	private void predatorSplinter(ItemStatManager.PlayerItemStats stats) {
+		Location pLoc = mPlayer.getEyeLocation();
+
+		mCosmetic.strikeSplinter(mPlayer, pLoc.clone().add(pLoc.getDirection()), mSplinterCone, mSplinterRadius);
+
+		Hitbox hitbox = Hitbox.approximateCone(pLoc, mSplinterRadius, Math.toRadians(mSplinterCone));
+
+		for (LivingEntity e : hitbox.getHitMobs()) {
+			double damage = AbilityUtils.projectileFinalDamage(stats, mPlayer, e, mSplinterDamage, mSplinterDamageMultiplier);
+
+			MovementUtils.knockAway(pLoc, e, mKnockback * 2, mKnockback * 2, true);
+			DamageUtils.damage(mPlayer, e,
+				new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.PREDATOR_STRIKE, stats), damage,
+				true, true, false);
+		}
+
+		if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			ItemStack item = mPlayer.getInventory().getItemInMainHand();
+			double recoil = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.RECOIL);
+
+			Vector velocity = Recoil.getRecoilVector(mPlayer, recoil + 5);
+			mPlayer.setFallDistance(0);
+			mPlayer.setVelocity(velocity);
+		}
+
+		playAspectSound(pLoc);
+	}
+
+	private void predatorStrike(Projectile proj, ItemStatManager.PlayerItemStats stats) {
 		Location loc = mPlayer.getEyeLocation();
 		Vector direction = loc.getDirection();
 		World world = loc.getWorld();
-		mCosmetic.strikeLaunch(world, mPlayer);
 
 		int piercing = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PIERCING, PIERCING);
 		List<LivingEntity> piercedMobs = new ArrayList<>();
 
 		RayTraceResult result = world.rayTrace(loc, direction, mRange, FluidCollisionMode.NEVER, true, 0.425,
-			e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
+			e -> (WindBomb.isWindBomb(e)
+				|| (EntityUtils.isHostileMob(e)
+				&& !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG)))
+				&& !e.isDead()
+				&& e.isValid());
 
 		while (piercing > 0) {
 			// if we hit a block then just stop
@@ -225,7 +304,12 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 			}
 
 			result = world.rayTrace(loc, direction, mRange, FluidCollisionMode.NEVER, true, 0.425,
-				e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid() && !piercedMobs.contains((LivingEntity) e));
+				e -> (WindBomb.isWindBomb(e)
+					|| (EntityUtils.isHostileMob(e)
+					&& !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG)))
+					&& !e.isDead()
+					&& e.isValid()
+					&& !piercedMobs.contains((LivingEntity) e));
 		}
 
 		Location endLoc;
@@ -237,58 +321,64 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
 			mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, endLoc, mExplodeRadius), endLoc, mPlayer);
-			explode(endLoc, piercedMobs, projectile);
+			explode(endLoc, piercedMobs, proj, stats);
 			mCosmetic.strikeParticleLine(mPlayer, loc, endLoc);
 		});
-		return true;
 	}
 
-	private void explode(Location loc, List<LivingEntity> piercedMobs, Projectile projectile) {
-		ItemStack item = mPlayer.getInventory().getItemInMainHand();
-		final ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(projectile);
-
+	private void explode(Location loc, List<LivingEntity> piercedMobs, Projectile proj, ItemStatManager.PlayerItemStats stats) {
 		// go through pierced mobs and use their locations
 		for (LivingEntity piercedMob : piercedMobs) {
-			if (playerItemStats != null) {
-				final ItemStatManager.PlayerItemStats.ItemStatsMap map = playerItemStats.getItemStats();
-				final ItemStat projDamageAdd = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
-				double damage = map.get(projDamageAdd);
-				damage += PointBlank.apply(mPlayer, piercedMob.getLocation(), map.get(Objects.requireNonNull(EnchantmentType.POINT_BLANK.getItemStat())));
-				damage += Sniper.apply(mPlayer, piercedMob.getLocation(), map.get(Objects.requireNonNull(EnchantmentType.SNIPER.getItemStat())));
-				damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-				damage *= mBaseDamage + mDistanceScale * Math.min(mPlayer.getLocation().distance(piercedMob.getLocation()), mDamageRange);
-
-				float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, EXPLODE_KNOCKBACK);
-
-				MovementUtils.knockAway(mPlayer.getLocation(), piercedMob, knockback, knockback, true);
-				DamageUtils.damage(mPlayer, piercedMob, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true);
+			if (WindBomb.attemptHit(piercedMob)) {
+				continue;
 			}
+
+			double damage = AbilityUtils.projectileFinalDamage(stats, mPlayer, piercedMob, mSplinterDamage, mSplinterDamageMultiplier);
+
+			MovementUtils.knockAway(mPlayer.getLocation(), piercedMob, mKnockback, mKnockback, true);
+			DamageUtils.damage(mPlayer, piercedMob,
+				new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.PREDATOR_STRIKE, stats), damage,
+				true, true, false);
+
 		}
 
 		// go through exploded mobs and use the explosion's location
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mExplodeRadius);
-		List<LivingEntity> mobs = hitbox.getHitMobs();
+
+		Predicate<LivingEntity> isWindBomb = WindBomb::isWindBomb;
+		List<LivingEntity> mobs = hitbox.getHitMobsInclude(isWindBomb);
 		// prevents stacked damage instances
 		mobs.removeIf(piercedMobs::contains);
 
-		if (!mobs.isEmpty() && playerItemStats != null) {
-			final ItemStatManager.PlayerItemStats.ItemStatsMap map = playerItemStats.getItemStats();
-			final ItemStat projDamageAdd = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
-			double damage = map.get(projDamageAdd);
-			damage += PointBlank.apply(mPlayer, loc, map.get(Objects.requireNonNull(EnchantmentType.POINT_BLANK.getItemStat())));
-			damage += Sniper.apply(mPlayer, loc, map.get(Objects.requireNonNull(EnchantmentType.SNIPER.getItemStat())));
-			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-			damage *= mBaseDamage + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), mDamageRange);
-
-			float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, EXPLODE_KNOCKBACK);
-
+		if (!mobs.isEmpty()) {
 			for (LivingEntity mob : mobs) {
-				MovementUtils.knockAway(loc, mob, knockback, knockback, true);
-				DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true);
+				if (WindBomb.attemptHit(mob)) {
+					continue;
+				}
+				double damage = AbilityUtils.projectileFinalDamage(stats, mPlayer, mob, mDamage, mDamageMultiplier);
+
+				MovementUtils.knockAway(loc, mob, mKnockback, mKnockback, true);
+				DamageUtils.damage(mPlayer, mob,
+					new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, ClassAbility.PREDATOR_STRIKE, stats), damage,
+					true, true, false);
 			}
 		}
 
+		if (mSharpshooter != null) {
+			if (!piercedMobs.isEmpty() || !mobs.isEmpty()) {
+				mSharpshooter.addStacks(Sharpshooter.checkSharpshooterType(proj, mPlayer.getInventory().getItemInMainHand()));
+			} else {
+				mSharpshooter.miss();
+			}
+		}
 		//Get enchant levels on weapon
+
+		playAspectSound(loc);
+	}
+
+	private void playAspectSound(Location loc) {
+		ItemStack item = mPlayer.getInventory().getItemInMainHand();
+
 		ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.FIRE_ASPECT);
 		int fire = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.FIRE_ASPECT);
 		int ice = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.ICE_ASPECT);
@@ -330,13 +420,10 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		}
 	}
 
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		int regionCap = ServerProperties.getAbilityEnhancementsEnabled(mPlayer) ? R3_CAP : R2_CAP;
-		int damageCap = isLevelOne() ? regionCap : regionCap * CAP_LEVEL_TWO_MULTIPLIER;
-
-		if (event.getAbility() == ClassAbility.PREDATOR_STRIKE) {
-			event.setDamageCap((double) damageCap);
+	public static boolean hasPredatorStrikeReady(Player player) {
+		PredatorStrike pstrike = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(player, PredatorStrike.class);
+		if (pstrike != null) {
+			return pstrike.mDeactivationRunnable != null;
 		}
 		return false;
 	}
@@ -356,46 +443,43 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
 	}
 
-	// Annoying to do the damage correctly here because of sniper/pb
 	private static Description<PredatorStrike> getDescription1() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger(1)
 			.addDashedLine()
 			.addLine("Prime a Predator Strike for %t.")
-				.statValues(stat(DURATION))
+			.statValues(stat(DURATION))
 			.addLine()
 			.addLine("While primed, the next projectile you fire")
 			.addLine("will travel instantly and explode on impact,")
-			.addLine("dealing increased damage, plus bonus damage")
-			.addLine("per block traveled.")
+			.addLine("dealing increased damage.")
 			.addLine()
-			.addStat("Damage: %p (p) (of weapon damage),")
-				.statValues(stat(a -> a.mBaseDamage, DAMAGE_MULTIPLIER))
-			.tab().addLine("+%p1 per block (max %d blocks)")
-				.statValues(stat(a -> a.mDistanceScale, DISTANCE_SCALE_1), stat(a -> a.mDamageRange, MAX_DAMAGE_RANGE))
-			.tab().addLine("(capped at %d1R damage)")
-				.statValues(perRegion(R2_CAP, R3_CAP))
+			.addStat("Damage: %d + %p (p) (of weapon damage),")
+			.statValues(stat(a -> a.mDamage, DAMAGE), stat(a -> a.mDamageMultiplier, DAMAGE_MULTIPLIER))
 			.addStat("Explosion Radius: %r")
-				.statValues(stat(a -> a.mExplodeRadius, EXPLODE_RADIUS))
+			.statValues(stat(a -> a.mExplodeRadius, EXPLODE_RADIUS))
 			.addStat("Max Range: %r")
-				.statValues(stat(MAX_RANGE))
-			.addStat("Cooldown: %t1")
-				.statValues(cooldown(COOLDOWN_1))
+			.statValues(stat(MAX_RANGE))
+			.addStat("Cooldown: %t")
+			.statValues(cooldown(COOLDOWN))
 			.addDashedLine();
 	}
 
 	private static Description<PredatorStrike> getDescription2() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
 			.addDashedLine()
-			.addLine("Increase *Predator Strike*'s bonus damage").styles(UNDERLINED)
-			.addLine("scaling and reduce its cooldown.")
+			.addLine("If a mob is within %d blocks then *Predator Strike*").styles(UNDERLINED)
+			.statValues(stat(a -> a.mSplinterRequirement, SPLINTER_REQUIREMENT))
+			.addLine("splinters into a short-ranged blast, dealing")
+			.addLine("damage, knockback, and self-recoil.")
+			.addLine("Refund %p of the cooldown when it splinters.")
+			.statValues(stat(a -> a.mCooldownReduction, COOLDOWN_REDUCTION))
+			.addLine("(Sneak to cancel the splinter)")
 			.addLine()
-			.addStatComparison("Bonus Damage: +%p1 -> +%p2 per block")
-				.statValues(stat(DISTANCE_SCALE_1), stat(a -> a.mDistanceScale, DISTANCE_SCALE_2), stat(a -> a.mDamageRange, MAX_DAMAGE_RANGE))
-			.tab().addLine("(capped at %d2R damage)")
-			.statValues(perRegion(R2_CAP * CAP_LEVEL_TWO_MULTIPLIER, R3_CAP * CAP_LEVEL_TWO_MULTIPLIER))
-			.addStatComparison("Cooldown: %t1 -> %t2")
-				.statValues(cooldown(COOLDOWN_1), cooldown(COOLDOWN_2))
+			.addStat("Damage: %d + %p (p) (of weapon damage),")
+			.statValues(stat(a -> a.mSplinterDamage, DAMAGE_SPLINTER), stat(a -> a.mSplinterDamageMultiplier, DAMAGE_SPLINTER_MULTIPLIER))
+			.addStat("Radius: %r (Cone-Shaped)")
+			.statValues(stat(a -> a.mSplinterRadius, SPLINTER_RADIUS))
 			.addDashedLine();
 	}
 }

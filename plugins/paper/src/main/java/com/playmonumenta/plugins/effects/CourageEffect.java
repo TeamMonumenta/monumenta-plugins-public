@@ -43,8 +43,7 @@ public class CourageEffect extends Effect {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
-			|| (mAffectedDamageTypes.contains(DamageEvent.DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
+		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			double amount = mAmount;
 
 			int currentTick = entity.getTicksLived();

@@ -2,9 +2,8 @@ package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
-import com.playmonumenta.plugins.abilities.scout.Quickdraw;
+import com.playmonumenta.plugins.abilities.scout.hunter.QuiverStorm;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
-import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.effects.ProjectileIframe;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -55,6 +54,7 @@ import org.jetbrains.annotations.Nullable;
 public class DamageListener implements Listener {
 
 	private final Plugin mPlugin;
+	public static final String DO_NOT_REPLACE_METADATA = "PlayerItemStatsMapUnreplacable";
 
 	private static final WeakHashMap<UUID, PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
 
@@ -152,7 +152,9 @@ public class DamageListener implements Listener {
 	public void projectileLaunchEvent(ProjectileLaunchEvent event) {
 		Projectile projectile = event.getEntity();
 		ProjectileSource source = projectile.getShooter();
-		if (source instanceof Player player) {
+
+		// For projectiles whose itemStats are modified prior to launch event.
+		if (source instanceof Player player && !projectile.hasMetadata(DO_NOT_REPLACE_METADATA)) {
 			addProjectileItemStats(projectile, player);
 		}
 	}
@@ -184,14 +186,7 @@ public class DamageListener implements Listener {
 				// Check if projectile
 				if (damager instanceof Projectile proj) {
 					PlayerItemStats playerItemStats = mPlayerItemStatsMap.get(proj.getUniqueId());
-					if ((proj.getScoreboardTags().contains(Quickdraw.SOURCE_QUICKDRAW_TAG) || proj.getScoreboardTags().contains(Quickdraw.SOURCE_QUICKDRAW_VOLLEY_TAG)) && playerItemStats != null) {
-						event.setType(DamageEvent.DamageType.PROJECTILE_SKILL);
-						event.setAbility(ClassAbility.QUICKDRAW);
-						// Need to move the damage to event flat damage
-						PlayerItemStats.ItemStatsMap map = playerItemStats.getItemStats();
-						final ItemStat projDamageAdd = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
-						event.setFlatDamage(map.get(projDamageAdd));
-					}
+
 					if (playerItemStats != null) {
 						mPlugin.mItemStatManager.onDamage(mPlugin, player, playerItemStats, event, damagee);
 						mPlugin.mAbilityManager.onDamage(player, event, damagee);
@@ -217,9 +212,13 @@ public class DamageListener implements Listener {
 			GalleryManager.onEntityDamageEvent(event);
 		}
 
+		boolean isNotRapidfire = damager instanceof Projectile proj
+			&& !(proj.hasMetadata(RapidFire.META_DATA_TAG)
+			|| proj.hasMetadata(QuiverStorm.ARROW_METADATA));
+
 		// Projectile Iframes rework. Need to be placed at the end in order to get final damage.
 		if (!event.isCancelled() && source instanceof Player player
-			&& ((damager instanceof Projectile proj && !proj.hasMetadata(RapidFire.META_DATA_TAG)) || ElementalArrows.isElementalArrowDamage(event))
+			&& (isNotRapidfire || ElementalArrows.isElementalArrowDamage(event))
 			&& event.getType() != DamageEvent.DamageType.TRUE) {
 			double damage = event.getDamage();
 			// Now, set damage to 0.001 (to allow for knockback effects), and customly damage enemy using damage function.
@@ -264,12 +263,27 @@ public class DamageListener implements Listener {
 	public static void addProjectileItemStats(Projectile proj, Player player) {
 		Plugin plugin = Plugin.getInstance();
 		PlayerItemStats stats = plugin.mItemStatManager.getPlayerItemStatsCopy(player);
-		addProjectileItemStats(proj, stats);
+		addProjectileItemStats(proj.getUniqueId(), proj, stats);
 	}
 
-	public static void addProjectileItemStats(Projectile proj, PlayerItemStats stats) {
+	public static void addProjectileItemStats(UUID uuid, Projectile proj, PlayerItemStats stats) {
+		appendProjectileStats(stats, proj);
+		addProjectileItemStats(uuid, stats);
+	}
+
+	public static void addProjectileItemStats(UUID uuid, PlayerItemStats stats) {
+		mPlayerItemStatsMap.put(uuid, stats);
+	}
+
+	/**
+	 * To add the stats of a projectile onto a PlayerItemStats.
+	 *
+	 * @param stats The PlayerItemStats to add onto
+	 * @param proj  The projectile with attributes
+	 */
+	public static void appendProjectileStats(PlayerItemStats stats, Projectile proj) {
 		PlayerItemStats.ItemStatsMap map = stats.getItemStats();
-		UUID uuid = proj.getUniqueId();
+
 		if (proj instanceof AbstractArrow arrow && !(proj instanceof Trident)) {
 			ItemStack item = arrow.getItemStack();
 			if (item.getType() != Material.AIR) {
@@ -298,8 +312,6 @@ public class DamageListener implements Listener {
 				});
 			}
 		}
-
-		mPlayerItemStatsMap.put(uuid, stats);
 	}
 
 	public static PlayerItemStats removeProjectileItemStats(Projectile proj) {

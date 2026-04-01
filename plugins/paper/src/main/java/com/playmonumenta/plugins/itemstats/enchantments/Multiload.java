@@ -117,4 +117,13 @@ public class Multiload implements Enchantment {
 			playerModified.setInteger(AMMO_KEY, amount);
 		});
 	}
+
+	public static boolean isAmmoFull(ItemStack crossbow) {
+		int multiloadLvl = ItemStatUtils.getEnchantmentLevel(crossbow, EnchantmentType.MULTILOAD);
+		if (crossbow == null || crossbow.getType() != Material.CROSSBOW || multiloadLvl < 1) {
+			return true;
+		}
+
+		return (getAmmoCount(crossbow) - 1) == multiloadLvl;
+	}
 }

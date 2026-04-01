@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Color;
@@ -26,6 +25,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.BoundingBox;
 
 public class Explosive implements Enchantment {
@@ -34,7 +34,7 @@ public class Explosive implements Enchantment {
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
-	private static final String EXPLODED_THIS_TICK_METADATA = "ExplosiveThisTick";
+	private static final String EXPLODED_METAKEY = "ExplosiveThisTick";
 
 	@Override
 	public String getName() {
@@ -63,7 +63,7 @@ public class Explosive implements Enchantment {
 			&& event.getDamager() instanceof Projectile projectile
 			&& EntityUtils.isAbilityTriggeringProjectile(projectile, true)
 			&& EntityUtils.isHostileMob(enemy)
-			&& MetadataUtils.checkOnceThisTick(plugin, enemy, EXPLODED_THIS_TICK_METADATA)
+			&& !projectile.hasMetadata(EXPLODED_METAKEY)
 			&& !(projectile.hasMetadata(ElementalArrows.FIRE_ARROW_METAKEY)
 			|| projectile.hasMetadata(ElementalArrows.ICE_ARROW_METAKEY)
 			|| projectile.hasMetadata(ElementalArrows.THUNDER_ARROW_METAKEY))) {
@@ -71,6 +71,8 @@ public class Explosive implements Enchantment {
 			if (playerItemStats == null) {
 				return;
 			}
+
+			projectile.setMetadata(EXPLODED_METAKEY, new FixedMetadataValue(Plugin.getInstance(), false));
 
 			ItemStatManager.PlayerItemStats.ItemStatsMap itemStatsMap = playerItemStats.getItemStats();
 

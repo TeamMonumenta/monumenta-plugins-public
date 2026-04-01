@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -26,8 +25,8 @@ public class GearDamageIncrease extends Effect {
 	private @Nullable BiPredicate<LivingEntity, LivingEntity> mPredicate;
 
 	private GearDamageIncrease(final int duration, final double amount,
-	                           final @Nullable EnumSet<DamageType> affectedDamageTypes, final int priority,
-	                           final @Nullable BiPredicate<LivingEntity, LivingEntity> predicate, final String id) {
+							   final @Nullable EnumSet<DamageType> affectedDamageTypes, final int priority,
+							   final @Nullable BiPredicate<LivingEntity, LivingEntity> predicate, final String id) {
 		super(duration, id);
 		mAmount = amount;
 		mAffectedDamageTypes = affectedDamageTypes;
@@ -115,9 +114,8 @@ public class GearDamageIncrease extends Effect {
 		if (mPredicate != null && !mPredicate.test(entity, enemy)) {
 			return;
 		}
-		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
-			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL)
-			&& AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
+		if (mAffectedDamageTypes == null
+			|| mAffectedDamageTypes.contains(event.getType())) {
 			event.updateGearDamageWithMultiplier(Math.max(0, 1 + mAmount));
 		}
 	}

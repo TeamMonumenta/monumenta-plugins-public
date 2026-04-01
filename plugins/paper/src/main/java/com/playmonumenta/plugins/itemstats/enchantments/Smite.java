@@ -37,8 +37,8 @@ public class Smite implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		boolean isProjectile = event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident;
-		if (isProjectile || event.getType() == DamageType.MELEE) {
+		boolean isProjectile = event.getType() == DamageType.PROJECTILE;
+		if (event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.MELEE) {
 			event.setFlatDamage(event.getFlatDamage() + calculateSmiteDamage(isProjectile, player, level, enemy));
 		}
 	}

@@ -56,8 +56,7 @@ public final class PercentDamageDealtSingleTick extends PercentDamageDealt {
 		if (event.getType() == DamageType.TRUE) {
 			return;
 		}
-		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())
-			|| (mAffectedDamageTypes.contains(DamageType.PROJECTILE_SKILL) && AbilityUtils.hasSpecialProjSkillScaling(event.getAbility()))) {
+		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			if (getDuration() < mDurationRemainingWhenTriggered) {
 				// If you're hitting after the time at which the bonus damage applied, mark it as consumed and cancel the event
 				mHasDoneDamage = true;

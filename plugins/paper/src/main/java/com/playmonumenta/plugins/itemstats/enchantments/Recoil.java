@@ -43,7 +43,7 @@ public class Recoil implements Enchantment {
 
 	@Override
 	public void onProjectileLaunch(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile proj) {
-		if (EntityUtils.isAbilityTriggeringProjectile(proj, true) || proj.getScoreboardTags().contains("SourceQuickDraw")) {
+		if (EntityUtils.isAbilityTriggeringProjectile(proj, true)) {
 			if (player.isSneaking()) {
 				Material type = player.getInventory().getItemInMainHand().getType();
 				if (player.getCooldown(type) < 10) {
@@ -75,11 +75,18 @@ public class Recoil implements Enchantment {
 		if (player == null || !player.isOnline()) {
 			return;
 		}
-		Vector velocity = NmsUtils.getVersionAdapter().getActualDirection(player).multiply(-0.5 * Math.sqrt(CharmManager.calculateFlatAndPercentValue(player, CHARM_VELOCITY, level)));
+		Vector velocity = getRecoilVector(player, level);
 		if (velocity.getY() >= -0.1) {
 			velocity.setY(Math.max(0.1, velocity.getY()));
 		}
 		player.setFallDistance(0);
 		player.setVelocity(velocity);
+	}
+
+	public static Vector getRecoilVector(Player player, final double level) {
+		return NmsUtils.getVersionAdapter()
+			.getActualDirection(player)
+			.multiply(-0.5 *
+				Math.sqrt(CharmManager.calculateFlatAndPercentValue(player, CHARM_VELOCITY, level)));
 	}
 }

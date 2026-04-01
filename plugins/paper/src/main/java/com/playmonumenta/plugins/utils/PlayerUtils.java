@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.HemorrhageEvent;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Multiload;
 import com.playmonumenta.plugins.itemstats.enchantments.ThrowingKnife;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
@@ -40,6 +41,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.structures.StructuresPlugin;
 import com.playmonumenta.structures.managers.RespawningStructure;
 import io.papermc.paper.entity.TeleportFlag;
+import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,6 +73,8 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BlockIterator;
@@ -359,7 +363,8 @@ public class PlayerUtils {
 		}
 		if (arrowlike.isShotFromCrossbow()
 			|| ThrowingKnife.isThrowingKnife(arrowlike)
-			|| arrowlike instanceof Trident) {
+			|| arrowlike instanceof Trident
+			|| arrowlike.isCritical()) {
 			// These are always critical.
 			return 1;
 		}
@@ -865,5 +870,60 @@ public class PlayerUtils {
 
 	public static boolean isDead(Player player) {
 		return player.isDead() || Plugin.getInstance().mEffectManager.hasEffect(player, RespawnStasis.class);
+	}
+
+	/**
+	 * Automatically loads the mainhand if it is a crossbow.
+	 */
+	public static void loadCrossbow(Player player, ItemStack mainhand) {
+		if (!(mainhand.getItemMeta() instanceof CrossbowMeta crossbowMeta) || crossbowMeta.hasChargedProjectiles()) {
+			return;
+		}
+
+		EntityLoadCrossbowEvent entityLoadCrossbowEvent = new EntityLoadCrossbowEvent(player, mainhand, EquipmentSlot.HAND);
+		Bukkit.getPluginManager().callEvent(entityLoadCrossbowEvent);
+
+		if (!entityLoadCrossbowEvent.isCancelled()) {
+			entityLoadCrossbowEvent.setCancelled(true);
+			@Nullable ItemStack projectileItem = tryToPayArrow(player);
+			if (projectileItem != null) {
+				int numProjectiles = 1 + ItemStatUtils.getEnchantmentLevel(mainhand, EnchantmentType.MULTILOAD);
+
+				if (numProjectiles > 1) {
+					// multi-loading handles adding charged projectile
+					Multiload.loadCrossbow(player, mainhand, projectileItem, numProjectiles, 1);
+					// Multi-load *probably doesn't work* with Kinetic Loading. This is unlikely to be a problem.
+				} else {
+					crossbowMeta.addChargedProjectile(projectileItem);
+					if (ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.MULTISHOT)) {
+						crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
+						crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
+					}
+					mainhand.setItemMeta(crossbowMeta);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Helper method to pay arrows. Returns the first arrow found, or null if the first arrow is a Quiver or player has no arrows.
+	 *
+	 * @param player Player to check for arrows
+	 * @return Arrow found
+	 */
+	public static @Nullable ItemStack tryToPayArrow(Player player) {
+		PlayerInventory playerInventory = player.getInventory();
+		ItemStack item;
+		for (int i = 0; i < playerInventory.getSize(); i++) {
+			item = playerInventory.getItem(i);
+			if (ItemUtils.isArrow(item)) {
+				if (ItemStatUtils.isQuiver(item)) {
+					return null;
+				}
+				playerInventory.removeItem(item.asOne());
+				return item.asOne();
+			}
+		}
+		return null;
 	}
 }

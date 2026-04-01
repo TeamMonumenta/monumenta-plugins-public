@@ -31,6 +31,7 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 	private static final double HELIX_RADIUS = 0.4;
 	private static final Color TWIST_COLOR_BASE = Color.fromRGB(130, 66, 66);
 	private static final Color TWIST_COLOR_TIP = Color.fromRGB(127, 0, 0);
+	private static final Color POUNCE_COLOR_TIP = Color.fromRGB(250, 0, 0);
 
 	@Override
 	public @Nullable List<String> getDescription() {
@@ -72,7 +73,7 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 	}
 
 	@Override
-	public void foxTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+	public void foxTick(LivingEntity summon, Player player, @Nullable LivingEntity target, int t) {
 		Location loc = LocationUtils.getHalfHeightLocation(summon);
 		for (int i = 0; i < 2; i++) {
 			double rotation = FastMath.toRadians((t * 10) + (i * 180));
@@ -104,17 +105,72 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 	}
 
 	@Override
-	public void foxOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
-		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.NEUTRAL, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 1.5f);
-		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.NEUTRAL, 1.5f, 0.7f);
+	public void foxOnTeleport(World world, Location loc, Player player, LivingEntity summon) {
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 35, 0.15, 0.15, 0.15, 0.125F).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, loc, 30, 0, 0, 0, 0.6F).spawnAsPlayerActive(player);
+	}
+
+
+	@Override
+	public void foxOnJump(World world, Location loc, LivingEntity summon, Player player, LivingEntity target) {
+		world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, 0.75f, 0.85f);
+		world.playSound(loc, Sound.ENTITY_FOX_SCREECH, 1.25f, 0.75f);
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.NEUTRAL, 1.5f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.NEUTRAL, 1.5f, 1.5f);
 
 		spawnRing(loc, player, 2);
+	}
+
+	@Override
+	public void foxPounceTick(LivingEntity summon, Player player, @Nullable LivingEntity target, int t) {
+		new PartialParticle(Particle.REDSTONE, LocationUtils.getHalfHeightLocation(summon))
+			.count(3)
+			.delta(0.2, 0.2, 0.5)
+			.data(new Particle.DustOptions(TWIST_COLOR_TIP, 1.5f))
+			.spawnAsPlayerActive(player);
+
+		new PartialParticle(Particle.SMOKE_NORMAL, LocationUtils.getHalfHeightLocation(summon))
+			.count(2)
+			.delta(0.2, 0.2, 0.5)
+			.extra(0.005f)
+			.spawnAsPlayerActive(player);
+	}
+
+	@Override
+	public void onPounce(World world, Location loc, Player player, LivingEntity summon, double radius) {
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.NEUTRAL, 1.25f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_SKELETON_HORSE_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 0.75f);
+		world.playSound(loc, Sound.ENTITY_ZOMBIE_HORSE_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 0.75f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.NEUTRAL, 1.25f, 0.7f);
+		world.playSound(loc, Sound.ENTITY_PHANTOM_BITE, SoundCategory.NEUTRAL, 1.25f, 0.75f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.NEUTRAL, 1.0f, 0.75f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.NEUTRAL, 1.0f, 0.75f);
+
+		spawnRing(loc, player, radius);
 		if (player.isOnline() && player.getWorld() == summon.getWorld()) {
 			createOrb(new Vector(FastUtils.randomDoubleInRange(-1, 1), 1,
-				FastUtils.randomDoubleInRange(-1, 1)), LocationUtils.getHalfHeightLocation(summon), player, player);
+				FastUtils.randomDoubleInRange(-1, 1)), loc, player, player);
+		}
+
+		loc.setPitch(0);
+
+		ParticleUtils.drawParticleCircleExplosion(player, loc, 0, 2, 1, 0, 75, 1.2f,
+			false, 0, Particle.CRIMSON_SPORE);
+
+		for (int i = 0; i < 2; i++) {
+			ParticleUtils.drawHalfArc(loc, radius - 1.25, i == 0 ? -12 : 360 + 12,
+				i * 180 + 90, 450 + i * 180, 5, 0.25, false, 90,
+				(location, ring, angleProgress) -> {
+					new PartialParticle(Particle.REDSTONE, location)
+						.data(new Particle.DustOptions(ParticleUtils.getTransition(TWIST_COLOR_BASE, POUNCE_COLOR_TIP, angleProgress), 1.2f))
+						.spawnAsPlayerActive(player);
+
+					if (FastUtils.randomBoolean()) {
+						new PartialParticle(Particle.BLOCK_CRACK, location)
+							.data(Material.REDSTONE_BLOCK.createBlockData())
+							.spawnAsPlayerActive(player);
+					}
+				});
 		}
 	}
 

@@ -224,7 +224,6 @@ public class PrestigiousSlamCS extends MeteorSlamCS implements PrestigeCS {
 			});
 	}
 
-	// TODO: Ground Pound may
 	private void slam(Location location, Player player, double radius, boolean isGroundPound) {
 		Location mCenter = location.clone().add(0, 0.125, 0);
 		Vector mFront = player.getLocation().getDirection().clone().setY(0).normalize().multiply(radius);

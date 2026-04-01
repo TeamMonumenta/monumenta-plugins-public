@@ -11,20 +11,15 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.EnumSet;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.Nullable;
 
 public class KineticLoading implements Enchantment {
 	@Override
@@ -44,33 +39,11 @@ public class KineticLoading implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageEvent.DamageType.MELEE && PlayerUtils.isFallingAttack(player)) {
+		if (event.getType() == DamageEvent.DamageType.MELEE && player.getCooledAttackStrength(0.5f) > 0.9) {
 			ItemStack mainhand = player.getInventory().getItemInMainHand();
 			if (mainhand.getItemMeta() instanceof CrossbowMeta crossbowMeta && !crossbowMeta.hasChargedProjectiles()) {
-				// Toss this event at the QuiverListener
-				EntityLoadCrossbowEvent entityLoadCrossbowEvent = new EntityLoadCrossbowEvent(player, mainhand, EquipmentSlot.HAND);
-				Bukkit.getPluginManager().callEvent(entityLoadCrossbowEvent);
+				PlayerUtils.loadCrossbow(player, mainhand);
 
-				if (!entityLoadCrossbowEvent.isCancelled()) {
-					entityLoadCrossbowEvent.setCancelled(true);
-					@Nullable ItemStack projectileItem = tryToPayArrow(player);
-					if (projectileItem != null) {
-						int numProjectiles = 1 + ItemStatUtils.getEnchantmentLevel(mainhand, EnchantmentType.MULTILOAD);
-
-						if (numProjectiles > 1) {
-							// multi-loading handles adding charged projectile
-							Multiload.loadCrossbow(player, mainhand, projectileItem, numProjectiles, 1);
-							// Multi-load *probably doesn't work* with Kinetic Loading. This is unlikely to be a problem.
-						} else {
-							crossbowMeta.addChargedProjectile(projectileItem);
-							if (ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.MULTISHOT)) {
-								crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
-								crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
-							}
-							mainhand.setItemMeta(crossbowMeta);
-						}
-					}
-				}
 				player.playSound(player.getLocation(), Sound.BLOCK_AZALEA_LEAVES_HIT, SoundCategory.PLAYERS, 1.5f, 0.7f);
 				player.playSound(player.getLocation(), Sound.ITEM_SPYGLASS_USE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.playSound(player.getLocation(), Sound.BLOCK_TRIAL_SPAWNER_DETECT_PLAYER, SoundCategory.PLAYERS, 0.5f, 1.3f);
@@ -99,27 +72,5 @@ public class KineticLoading implements Enchantment {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Helper method to pay arrows. Returns the first arrow found, or null if the first arrow is a Quiver or player has no arrows.
-	 *
-	 * @param player Player to check for arrows
-	 * @return Arrow found
-	 */
-	public static @Nullable ItemStack tryToPayArrow(Player player) {
-		PlayerInventory playerInventory = player.getInventory();
-		ItemStack item;
-		for (int i = 0; i < playerInventory.getSize(); i++) {
-			item = playerInventory.getItem(i);
-			if (ItemUtils.isArrow(item)) {
-				if (ItemStatUtils.isQuiver(item)) {
-					return null;
-				}
-				playerInventory.removeItem(item.asOne());
-				return item.asOne();
-			}
-		}
-		return null;
 	}
 }

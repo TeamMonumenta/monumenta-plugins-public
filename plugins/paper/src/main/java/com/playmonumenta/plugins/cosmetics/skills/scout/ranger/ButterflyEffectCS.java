@@ -57,11 +57,6 @@ public class ButterflyEffectCS extends TacticalManeuverCS {
 		doEffect(world, mPlayer);
 	}
 
-	@Override
-	public void maneuverBackEffect(World world, Player mPlayer) {
-		doEffect(world, mPlayer);
-	}
-
 	public void doEffect(World world, Player mPlayer) {
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.2f, 1f);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_WOOL_PLACE, SoundCategory.PLAYERS, 2f, 0.8f);
@@ -237,6 +232,58 @@ public class ButterflyEffectCS extends TacticalManeuverCS {
 				mTicks++;
 			}
 		}.runTaskTimer(Plugin.getInstance(), 1, 5);
+	}
+
+	@Override
+	public void maneuverRefresh(World world, Player player, Location loc) {
+		player.playSound(loc, Sound.ENTITY_BREEZE_IDLE_GROUND, SoundCategory.PLAYERS, 1f, 2f);
+		player.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1f, 0.7f);
+		player.playSound(loc, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, SoundCategory.PLAYERS, 1f, 1f);
+
+		new BukkitRunnable() {
+			private int mTicks = 0;
+
+			@Override
+			public void run() { // Do not trigger when cs is active
+				if (mTicks > 11 || activeManeuvers.getOrDefault(player.getUniqueId(), false)) {
+					this.cancel();
+					return;
+				}
+
+				Vector mFront = player.getEyeLocation().getDirection().setY(0).normalize();
+				Location flap = player.getLocation().clone().add(new Vector(mFront.getX() * -2, 0, mFront.getZ() * -2)).add(0, 1, 0);
+				Vector right = mFront.clone().crossProduct(new Vector(0, 1, 0)).normalize();
+
+				switch (mTicks) {
+					case 0 -> {
+						drawWing(player, mFront, 180);
+					}
+					case 2, 10 -> {
+						drawWing(player, mFront, 195);
+					}
+					case 4, 8 -> {
+						drawWing(player, mFront, 225);
+					}
+					case 6 -> {
+						drawWing(player, mFront, 260);
+						world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.PLAYERS, 1f, 0.75f);
+						world.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 0.5f, 1.5f);
+						world.playSound(player.getLocation(), Sound.BLOCK_WOOL_FALL, SoundCategory.PLAYERS, 1f, 1f);
+						for (int x = 0; x <= 19; x++) {
+							Location random = flap.clone().add(right.clone().multiply(FastUtils.randomFloatInRange(-1.5f, 1.5f))).add(mFront.clone().multiply(-1).multiply(FastUtils.randomFloatInRange(0.5f, 1.5f)));
+							new PartialParticle(Particle.END_ROD, flap, 1, random.getX() - flap.getX(), FastUtils.randomFloatInRange(-1.5f, 1.5f), random.getZ() - flap.getZ(), FastUtils.randomFloatInRange(0.15f, 0.25f))
+								.directionalMode(true).spawnAsPlayerActive(player);
+							Location random2 = flap.clone().add(right.clone().multiply(FastUtils.randomFloatInRange(-1.5f, 1.5f))).add(mFront.clone().multiply(-1).multiply(FastUtils.randomFloatInRange(0.5f, 1.5f)));
+							new PartialParticle(Particle.WAX_OFF, flap, 1, random2.getX() - flap.getX(), FastUtils.randomFloatInRange(-1.5f, 1.5f), random2.getZ() - flap.getZ(), FastUtils.randomFloatInRange(15f, 25f))
+								.directionalMode(true).spawnAsPlayerActive(player);
+						}
+					}
+					default -> {
+					}
+				}
+				mTicks++;
+			}
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
 	@EventHandler(ignoreCancelled = true)

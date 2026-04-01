@@ -2,7 +2,10 @@ package com.playmonumenta.plugins.cosmetics.skills.scout;
 
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -11,14 +14,16 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class HuntingCompanionCS implements CosmeticSkill {
+
+	private static final Particle.DustOptions GRAY =
+		new Particle.DustOptions(Color.fromRGB(211, 211, 211), 0.8f);
 
 	private final String FOX_NAME = "FoxCompanion";
 	private final String AXOLOTL_NAME = "AxolotlCompanion";
 	private final String STRIDER_NAME = "StriderCompanion";
-	private final String EAGLE_NAME = "EagleCompanion";
-	private final String DOLPHIN_NAME = "DolphinCompanion";
 
 	@Override
 	public ClassAbility getAbility() {
@@ -42,21 +47,14 @@ public class HuntingCompanionCS implements CosmeticSkill {
 		return STRIDER_NAME;
 	}
 
-	public String getEagleName() {
-		return EAGLE_NAME;
-	}
-
-	public String getDolphinName() {
-		return DOLPHIN_NAME;
-	}
+	// On Summon
+	// ie. Being teleported or by transformation
 
 	public void onSummon(World world, Location loc, Player player, LivingEntity summon) {
 		switch (summon.getType()) {
 			case FOX -> foxOnSummon(world, loc, player, summon);
 			case AXOLOTL -> axolotlOnSummon(world, loc, player, summon);
-			case STRIDER -> striderOnSummon(world, loc, player, summon);
-			case PARROT -> eagleOnSummon(world, loc, player, summon);
-			default -> dolphinOnSummon(world, loc, player, summon);
+			default -> striderOnSummon(world, loc, player, summon);
 		}
 	}
 
@@ -81,61 +79,36 @@ public class HuntingCompanionCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 1.0f, 1.0f);
 	}
 
-	public void eagleOnSummon(World world, Location loc, Player player, LivingEntity summon) {
-		eagleAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_PARROT_FLY, SoundCategory.NEUTRAL, 2.0f, 0.5f);
-		world.playSound(loc, Sound.BLOCK_SMALL_DRIPLEAF_FALL, SoundCategory.NEUTRAL, 1.0f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 0.5f, 1.5f);
-	}
+	// On Teleport
 
-	public void dolphinOnSummon(World world, Location loc, Player player, LivingEntity summon) {
-		dolphinAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_SPLASH, SoundCategory.NEUTRAL, 2.0f, 1.0f);
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, SoundCategory.NEUTRAL, 1.0f, 1.5f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 0.5f, 1.0f);
-	}
-
-	public void onDespawn(World world, Location loc, LivingEntity summon, Player player) {
+	public void onTeleport(World world, Location loc, Player player, LivingEntity summon) {
 		switch (summon.getType()) {
-			case FOX -> foxOnDespawn(world, loc, player, summon);
-			case AXOLOTL -> axolotlOnDespawn(world, loc, player, summon);
-			case STRIDER -> striderOnDespawn(world, loc, player, summon);
-			case PARROT -> eagleOnDespawn(world, loc, player, summon);
-			default -> dolphinOnDespawn(world, loc, player, summon);
+			case FOX -> foxOnTeleport(world, loc, player, summon);
+			case AXOLOTL -> axolotlOnTeleport(world, loc, player, summon);
+			default -> striderOnTeleport(world, loc, player, summon);
 		}
 	}
 
-	public void foxOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
+	public void foxOnTeleport(World world, Location loc, Player player, LivingEntity summon) {
 		foxAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_FOX_SNIFF, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 20).spawnAsPlayerActive(player);
 	}
 
-	public void axolotlOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
-		foxAmbient(world, loc);
+	public void axolotlOnTeleport(World world, Location loc, Player player, LivingEntity summon) {
+		axolotlAmbient(world, loc);
 		world.playSound(loc, Sound.ITEM_BUCKET_FILL_AXOLOTL, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, SoundCategory.NEUTRAL, 1.0f, 1.5f);
 		new PartialParticle(Particle.GLOW_SQUID_INK, loc, 5).spawnAsPlayerActive(player);
 	}
 
-	public void striderOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
+	public void striderOnTeleport(World world, Location loc, Player player, LivingEntity summon) {
 		striderAmbient(world, loc);
 		world.playSound(loc, Sound.ENTITY_STRIDER_RETREAT, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 		new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, loc, 5).spawnAsPlayerActive(player);
 	}
 
-	public void eagleOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
-		eagleAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_PARROT_IMITATE_PHANTOM, SoundCategory.NEUTRAL, 1.5f, 1.0f);
-		new PartialParticle(Particle.CLOUD, loc, 15).spawnAsPlayerActive(player);
-	}
-
-	public void dolphinOnDespawn(World world, Location loc, Player player, LivingEntity summon) {
-		dolphinAmbient(world, loc);
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_JUMP, SoundCategory.NEUTRAL, 1.5f, 1.0f);
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, SoundCategory.NEUTRAL, 1.0f, 1.5f);
-		new PartialParticle(Particle.WATER_BUBBLE, loc, 10).spawnAsPlayerActive(player);
-	}
+	// On Aggro
 
 	public void onAggro(World world, Location loc, Player player, LivingEntity summon) {
 		onAggroParticles(player, summon);
@@ -150,9 +123,7 @@ public class HuntingCompanionCS implements CosmeticSkill {
 		switch (summon.getType()) {
 			case FOX -> foxOnAggro(world, loc);
 			case AXOLOTL -> axolotlOnAggro(world, loc);
-			case STRIDER -> striderOnAggro(world, loc);
-			case PARROT -> eagleOnAggro(world, loc);
-			default -> dolphinOnAggro(world, loc);
+			default -> striderOnAggro(world, loc);
 		}
 	}
 
@@ -169,43 +140,29 @@ public class HuntingCompanionCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_STRIDER_HURT, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 	}
 
-	public void eagleOnAggro(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, SoundCategory.NEUTRAL, 1.0f, 2.0f);
-	}
+	// On Attack
 
-	public void dolphinOnAggro(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_HURT, SoundCategory.NEUTRAL, 1.5f, 0.5f);
-	}
-
-	public void onAttack(World world, Location loc, LivingEntity summon) {
+	public void onAttack(World world, Location loc, Player player, LivingEntity summon) {
 		switch (summon.getType()) {
 			case FOX -> foxOnAttack(world, loc);
 			case AXOLOTL -> axolotlOnAttack(world, loc);
-			case STRIDER -> striderOnAttack(world, loc);
-			case PARROT -> eagleOnAttack(world, loc);
-			default -> dolphinOnAttack(world, loc);
+			default -> striderOnAttack(world, loc);
 		}
 	}
 
 	public void foxOnAttack(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_FOX_BITE, SoundCategory.NEUTRAL, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_FOX_BITE, SoundCategory.NEUTRAL, 1.0f, 1.0f);
 	}
 
 	public void axolotlOnAttack(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_AXOLOTL_ATTACK, SoundCategory.NEUTRAL, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_AXOLOTL_ATTACK, SoundCategory.NEUTRAL, 1.0f, 1.0f);
 	}
 
 	public void striderOnAttack(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_STRIDER_EAT, SoundCategory.NEUTRAL, 1.5f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_STRIDER_EAT, SoundCategory.NEUTRAL, 1.0f, 1.0f);
 	}
 
-	public void eagleOnAttack(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, SoundCategory.NEUTRAL, 1.0f, 2.0f);
-	}
-
-	public void dolphinOnAttack(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_ATTACK, SoundCategory.NEUTRAL, 1.5f, 1.0f);
-	}
+	// Ambient
 
 	public void foxAmbient(World world, Location loc) {
 		world.playSound(loc, Sound.ENTITY_FOX_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 0.8f);
@@ -226,46 +183,103 @@ public class HuntingCompanionCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_STRIDER_HAPPY, SoundCategory.NEUTRAL, 1.5f, 1.2f);
 	}
 
-	public void eagleAmbient(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 0.6f);
-		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_PARROT_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 1.0f);
-	}
+	// On Tick
 
-	public void dolphinAmbient(World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, SoundCategory.NEUTRAL, 1.5f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, SoundCategory.NEUTRAL, 1.5f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_DOLPHIN_AMBIENT_WATER, SoundCategory.NEUTRAL, 1.5f, 1.2f);
-	}
-
-	public void tick(LivingEntity summon, Player player, LivingEntity target, int t) {
+	public void tick(LivingEntity summon, Player player, @Nullable LivingEntity target, int t) {
 		switch (summon.getType()) {
 			case FOX -> foxTick(summon, player, target, t);
 			case AXOLOTL -> axolotlTick(summon, player, target, t);
-			case STRIDER -> striderTick(summon, player, target, t);
-			case PARROT -> eagleTick(summon, player, target, t);
-			default -> dolphinTick(summon, player, target, t);
+			default -> striderTick(summon, player, target, t);
 		}
 	}
 
-	public void foxTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+	public void foxTick(LivingEntity summon, Player player, @Nullable LivingEntity target, int t) {
 
 	}
 
-	public void axolotlTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+	public void axolotlTick(LivingEntity summon, Player player, @Nullable LivingEntity target, int t) {
 
 	}
 
-	public void striderTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+	public void striderTick(LivingEntity summon, Player player, @Nullable LivingEntity target, int t) {
 
 	}
 
-	public void eagleTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+	// On Tick
+
+	public void pounceTick(LivingEntity summon, Player player, @Nullable LivingEntity target, int t) {
+		switch (summon.getType()) {
+			case FOX -> foxPounceTick(summon, player, target, t);
+			case AXOLOTL -> axolotlPounceTick(summon, player, target, t);
+			default -> striderPounceTick(summon, player, target, t);
+		}
+	}
+
+	public void foxPounceTick(LivingEntity summon, Player player, @Nullable LivingEntity target, int t) {
+		new PartialParticle(Particle.REDSTONE, LocationUtils.getHalfHeightLocation(summon))
+			.count(15)
+			.delta(0.2, 0.2, 0.5)
+			.data(GRAY)
+			.spawnAsPlayerActive(player);
+	}
+
+	public void axolotlPounceTick(LivingEntity summon, Player player, @Nullable LivingEntity target, int t) {
 
 	}
 
-	public void dolphinTick(LivingEntity summon, Player player, LivingEntity target, int t) {
+	public void striderPounceTick(LivingEntity summon, Player player, @Nullable LivingEntity target, int t) {
 
 	}
 
+	// On Jump
+
+	public void onJump(World world, Location loc, Player player, LivingEntity summon, LivingEntity target) {
+		switch (summon.getType()) {
+			case FOX -> foxOnJump(world, loc, summon, player, target);
+			case AXOLOTL -> axolotlOnJump(world, loc, summon, player, target);
+			default -> striderOnJump(world, loc, summon, player, target);
+		}
+	}
+
+	public void foxOnJump(World world, Location loc, LivingEntity summon, Player player, LivingEntity target) {
+		world.playSound(loc, Sound.ENTITY_PARROT_FLY, SoundCategory.NEUTRAL, 1.5f, 1f);
+		world.playSound(loc, Sound.ENTITY_FOX_SCREECH, SoundCategory.NEUTRAL, 1.5f, 1f);
+	}
+
+	public void axolotlOnJump(World world, Location loc, LivingEntity summon, Player player, LivingEntity target) {
+
+	}
+
+	public void striderOnJump(World world, Location loc, LivingEntity summon, Player player, LivingEntity target) {
+		world.playSound(loc, Sound.ENTITY_PARROT_FLY, SoundCategory.NEUTRAL, 1.5f, 1f);
+	}
+
+	// On Pounce
+
+	public void onPounce(World world, Location loc, Player player, LivingEntity summon, double radius) {
+		Location startLoc = LocationUtils.getHalfHeightLocation(summon);
+
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.NEUTRAL, 2, 0.5f);
+		world.playSound(loc, Sound.ENTITY_BREEZE_LAND, 1f, 1f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_BIG_FALL, 1.2f, 0.5f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, 0.6f, 1.5f);
+
+		new PPCircle(Particle.CLOUD, startLoc, radius - 0.25)
+			.ringMode(true)
+			.count(8)
+			.countPerMeter(1)
+			.extra(0.4)
+			.spawnAsPlayerActive(player);
+		new PPCircle(Particle.REDSTONE, startLoc, radius - 0.25)
+			.ringMode(true)
+			.count(16)
+			.countPerMeter(8)
+			.data(new Particle.DustOptions(Color.WHITE, 1.5f))
+			.spawnAsPlayerActive(player);
+		new PPCircle(Particle.SWEEP_ATTACK, startLoc, radius - 0.25)
+			.ringMode(true)
+			.count(8)
+			.countPerMeter(2)
+			.spawnAsPlayerActive(player);
+	}
 }

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.scout;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -10,110 +11,219 @@ import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.SwiftnessCS;
+import com.playmonumenta.plugins.effects.ZeroArgumentEffect;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static net.kyori.adventure.util.TriState.FALSE;
+import static net.kyori.adventure.util.TriState.TRUE;
 
 public class Swiftness extends Ability {
-	private static final String SPEED_SRC = "SwiftnessSpeedModifier";
-	private static final double SPEED_POTENCY = 0.2;
-	private static final int JUMP_BOOST_POTENCY = 2; // Jump Boost 3, effect potency is 0 indexed
-	private static final String ATTACK_SPEED_SRC = "SwiftnessAttackSpeedModifier";
-	private static final double ATTACK_SPEED_POTENCY_1 = 0.1;
-	private static final double ATTACK_SPEED_POTENCY_2 = 0.15;
-	private static final double ENHANCEMENT_CDR = 0.05;
-	private static final String NO_JUMP_BOOST_TAG = "SwiftnessJumpBoostDisable";
+	private static final String SWIFTNESS_INVULN = "SwiftnessEnhancementInvulnerability";
 
-	public static final String CHARM_SPEED = "Swiftness Speed Amplifier";
+	private static final double SPEED_BONUS = 0.1;
+	private static final int JUMP_BOOST_POTENCY = 2; // Jump Boost 3, effect potency is 0 indexed
+	private static final String NO_JUMP_BOOST_TAG = "SwiftnessJumpBoostDisable";
+	private static final int COOLDOWN = 60;
+	private static final int MAX_JUMP = 3;
+	private static final double DOUBLE_JUMP_STRENGTH_L1 = 0.4;
+	private static final double DOUBLE_JUMP_STRENGTH_L2 = 0.54;
+	private static final double DASH_VULNERABILITY_MULTIPLIER = 0.15;
+	private static final int DASH_VULNERABILITY_DURATION = 5 * Constants.TICKS_PER_SECOND;
+	private static final int DASH_IMMUNITY_DURATION = 8; // 0.4s
+
 	public static final String CHARM_JUMP_BOOST = "Swiftness Jump Boost Amplifier";
-	public static final String CHARM_ATTACK_SPEED = "Swiftness Attack Speed Amplifier";
-	public static final String CHARM_ENHANCE_CDR = "Swiftness Enhancement Cooldown Reduction";
+	public static final String CHARM_COOLDOWN = "Swiftness Double Jump Cooldown";
+	public static final String CHARM_DOUBLE_JUMP_STRENGTH = "Swiftness Double Jump Strength";
+
+	public static final String CHARM_DASH_VULNERABILITY_AMPLIFIER = "Swiftness Enhancement Vulnerability Amplifier";
+	public static final String CHARM_DASH_VULNERABILITY_DURATION = "Swiftness Dash Vulnerability Duration";
+	public static final String CHARM_DASH_RESISTANCE_DURATION = "Swiftness Dash Resistance Duration";
+
 
 	public static final AbilityInfo<Swiftness> INFO =
 		new AbilityInfo<>(Swiftness.class, "Swiftness", Swiftness::new)
 			.linkedSpell(ClassAbility.SWIFTNESS)
 			.scoreboardId("Swiftness")
 			.shorthandName("Swf")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.descriptions(getDescription1(), getDescription2(), getDescriptionEnhancement())
-			.simpleDescription("Gain movement speed, attack speed, and increased jump height.")
+			.simpleDescription("Gain jump height, double jump, and increased movement.")
 			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle jump boost", null,
 				Swiftness::toggleJumpBoost, new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false).sneaking(false)
 				.lookDirections(AbilityTrigger.LookDirection.UP)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PROJECTILE_WEAPON), null,
-				player -> {
-					Swiftness swiftness = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(player, Swiftness.class);
-					return swiftness != null && swiftness.isLevelTwo();
-				}))
-			.remove(player -> {
-				removeMovementSpeed(player);
-				removeAttackSpeed(player);
-			})
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PROJECTILE_WEAPON), null))
+			.remove(Swiftness::removeFlying)
 			.displayItem(Material.RABBIT_FOOT);
 
 	private final int mJumpBoostLevel;
 	private final double mSpeed;
-	private final double mAttackSpeed;
-	private final double mEnhancementCDR;
 	private boolean mWasInNoMobilityZone = false;
 	private boolean mJumpBoost;
+	private final double mDashStrength;
+	private final double mVulnerabilityMultiplier;
+	private final int mVulnerabilityDuration;
+	private final int mResistanceDuration;
 	private final SwiftnessCS mCosmetic;
+	private int mTotalJumps = 0;
+	private @Nullable BukkitTask mDashRunnable;
 
 	public Swiftness(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		mJumpBoost = !mPlayer.getScoreboardTags().contains(NO_JUMP_BOOST_TAG);
 		mJumpBoostLevel = JUMP_BOOST_POTENCY + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
-		mSpeed = SPEED_POTENCY + CharmManager.getLevelPercentDecimal(player, CHARM_SPEED);
-		mAttackSpeed = (isLevelTwo() ? ATTACK_SPEED_POTENCY_2 : ATTACK_SPEED_POTENCY_1) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ATTACK_SPEED);
-		/* This looks goofy but it makes CDR stacking with the charm effect multiplicative similar to other CDR sources */
-		mEnhancementCDR = 1 - (1 - ENHANCEMENT_CDR) * (1 - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_ENHANCE_CDR));
+		mSpeed = isLevelTwo() ? SPEED_BONUS : 0;
+		mDashStrength = CharmManager.calculateFlatAndPercentValue(player, CHARM_DOUBLE_JUMP_STRENGTH, isLevelOne() ? DOUBLE_JUMP_STRENGTH_L1 : DOUBLE_JUMP_STRENGTH_L2);
+		mVulnerabilityMultiplier = DASH_VULNERABILITY_MULTIPLIER + CharmManager.getLevelPercentDecimal(player, CHARM_DASH_VULNERABILITY_AMPLIFIER);
+		mVulnerabilityDuration = CharmManager.getDuration(mPlayer, CHARM_DASH_VULNERABILITY_DURATION, DASH_VULNERABILITY_DURATION);
+		mResistanceDuration = CharmManager.getDuration(mPlayer, CHARM_DASH_RESISTANCE_DURATION, DASH_IMMUNITY_DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new SwiftnessCS());
 
-		addMovementSpeed(mPlayer);
-		EntityUtils.addAttribute(mPlayer, Attribute.GENERIC_ATTACK_SPEED,
-			new AttributeModifier(ATTACK_SPEED_SRC, mAttackSpeed, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		mPlayer.setAllowFlight(true);
+		if (!canToggleFlight(mPlayer)) {
+			mPlayer.setFlyingFallDamage(TRUE);
+			mPlayer.setFlySpeed(0f);
+		}
 	}
 
 	@Override
-	public boolean blockBreakEvent(final BlockBreakEvent event) {
-		if (isEnhanced() && event.getBlock().getType() == Material.SPAWNER) {
-			/* Attempt to apply cooldown reduction. If at least one cooldown changed, do cosmetic */
-			if (mPlugin.mTimers.updateCooldownsPercent(mPlayer, mEnhancementCDR) > 0) {
-				mCosmetic.swiftnessEnhancement(mPlayer, event.getBlock().getLocation());
-			}
+	public void invalidate() {
+		if (mDashRunnable != null) {
+			mDashRunnable.cancel();
 		}
+
+		mPlayer.setFlySpeed(0.1f);
+		mPlayer.setFlyingFallDamage(FALSE);
+	}
+
+	@Override
+	public void playerToggleFlightEvent(PlayerToggleFlightEvent event) {
+		if (canToggleFlight(mPlayer)) {
+			mPlayer.setFlySpeed(0.1f);
+			return;
+		}
+
+		event.setCancelled(true);
+		mPlayer.setFlying(false);
+		cast();
+	}
+
+	public boolean cast() {
+		if (!canCast() || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			return false;
+		}
+		putOnCooldown();
+		mTotalJumps++;
+
+		Vector dir = mPlayer.getLocation().getDirection().normalize();
+		dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOUBLE_JUMP_STRENGTH, 1));
+
+		if (!isEnhanced()) {
+			mCosmetic.swiftnessDoubleJump(mPlayer, mPlayer.getLocation());
+
+			mPlayer.setVelocity(dir.setY(dir.getY() * 0.2 + mDashStrength));
+		} else {
+			// Swiftness Enhancement
+			mCosmetic.swiftnessDash(mPlayer, mPlayer.getLocation());
+
+			dir.normalize().multiply(1 + mDashStrength);
+			dir.setY(dir.getY() * 0.5);
+
+			if (mDashRunnable != null) {
+				mDashRunnable.cancel();
+			}
+
+			grantImmunity(mPlayer, mResistanceDuration);
+
+			mDashRunnable = new BukkitRunnable() {
+				int mT = 0;
+				boolean mDash = true;
+
+				@Override
+				public void run() {
+					if (mT > 8 || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.isValid()) {
+						mDashRunnable = null;
+						this.cancel();
+						return;
+					}
+
+					mCosmetic.swiftnessDashTick(mPlayer, dir);
+
+					Hitbox hitbox = new Hitbox.AABBHitbox(mPlayer.getWorld(), mPlayer.getBoundingBox());
+					hitbox.getHitMobs().forEach(e -> EntityUtils.applyVulnerability(mPlugin, mVulnerabilityDuration, mVulnerabilityMultiplier, e));
+
+					if (mDash) {
+						if (mT > 4) {
+							mPlayer.setVelocity(mPlayer.getVelocity().multiply(0.5));
+							mDash = false;
+						} else {
+							mPlayer.setVelocity(dir);
+						}
+					}
+
+					mT++;
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
+		}
+
 		return true;
 	}
 
 	@Override
 	public void periodicTrigger(final boolean twoHertz, final boolean oneSecond, final int ticks) {
+		if (mTotalJumps != 0 && PlayerUtils.isOnGround(mPlayer)) {
+			mTotalJumps = 0;
+		}
+
 		final boolean isInNoMobilityZone = ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES);
 
-		if (mWasInNoMobilityZone && !isInNoMobilityZone) {
-			addMovementSpeed(mPlayer);
-		} else if (!mWasInNoMobilityZone && isInNoMobilityZone) {
-			removeMovementSpeed(mPlayer);
+		if (canCast() && !isInNoMobilityZone && !mWasInNoMobilityZone) {
+			setFlying(mPlayer);
+		} else {
+			removeFlying(mPlayer);
 		}
 
 		mWasInNoMobilityZone = isInNoMobilityZone;
 
-		if (oneSecond && isLevelTwo() && !mWasInNoMobilityZone && mJumpBoost) {
+		if (oneSecond && !mWasInNoMobilityZone && mJumpBoost) {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 21,
 				mJumpBoostLevel, true, false));
+		}
+	}
+
+	// setFlyingFallDamage does not play audio when taking damage via fall
+	@Override
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (event.getType() == DamageEvent.DamageType.FALL) {
+			if (mPlayer.getFallDistance() > 7) {
+				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_BIG_FALL, 1f, 1f);
+			} else {
+				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_SMALL_FALL, 1f, 1f);
+			}
 		}
 	}
 
@@ -136,17 +246,39 @@ public class Swiftness extends Ability {
 		return true;
 	}
 
-	private void addMovementSpeed(final Player player) {
-		EntityUtils.addAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED,
-			new AttributeModifier(SPEED_SRC, mSpeed, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+	private static void setFlying(final Player player) {
+		player.setAllowFlight(true);
 	}
 
-	private static void removeMovementSpeed(final Player player) {
-		EntityUtils.removeAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, SPEED_SRC);
+	private static void removeFlying(final Player player) {
+		if (!canToggleFlight(player)) {
+			player.setAllowFlight(false);
+		}
 	}
 
-	private static void removeAttackSpeed(final Player player) {
-		EntityUtils.removeAttribute(player, Attribute.GENERIC_ATTACK_SPEED, ATTACK_SPEED_SRC);
+	private static boolean canToggleFlight(Player player) {
+		return player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR;
+	}
+
+	private static void grantImmunity(Player player, int duration) {
+		Plugin.getInstance().mEffectManager.addEffect(player, SWIFTNESS_INVULN,
+			new ZeroArgumentEffect(duration, SWIFTNESS_INVULN) {
+				@Override
+				public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
+					if (event.getType().isDefendable()) {
+						event.setFlatDamage(0);
+						event.setCancelled(true);
+					}
+				}
+			});
+	}
+
+	public double getFleetfootedBonus() {
+		return mSpeed;
+	}
+
+	private boolean canCast() {
+		return !isOnCooldown() && mTotalJumps < MAX_JUMP;
 	}
 
 	@Override
@@ -157,36 +289,40 @@ public class Swiftness extends Ability {
 	private static Description<Swiftness> getDescription1() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addDashedLine()
-			.addLine("Gain increased speed and attack speed.")
+			.addLine("Passively gain jump boost.")
+			.addLine("Gain the ability to double jump.")
+			.addLine("(Max three jumps while midair)")
 			.addLine()
-			.addStat("Effect: +%p Speed")
-				.statValues(stat(a -> a.mSpeed, SPEED_POTENCY))
-			.addStat("Effect: +%p1 Attack Speed")
-				.statValues(stat(a -> a.mAttackSpeed, ATTACK_SPEED_POTENCY_1))
+			.addStat("Effect: Jump Boost %d")
+			.statValues(stat(a -> a.mJumpBoostLevel + 1, JUMP_BOOST_POTENCY + 1))
+			.addStat("Cooldown: %t")
+			.statValues(cooldown(COOLDOWN))
 			.addDashedLine();
 	}
 
 	private static Description<Swiftness> getDescription2() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
 			.addDashedLine()
-			.addLine("Increase *Swiftness*'s attack speed and").styles(UNDERLINED)
-			.addLine("additionally gain jump boost.")
+			.addLine("Increase *Swiftness*'s double jump strength").styles(UNDERLINED)
+			.addLine("by %p and increase *Fleetfooted*'s speed.").styles(UNDERLINED)
+			.statValues(stat((DOUBLE_JUMP_STRENGTH_L2 / DOUBLE_JUMP_STRENGTH_L1) - 1))
 			.addLine()
-			.addStatComparison("Effect: +%p1 -> +%p2 Attack Speed")
-				.statValues(stat(ATTACK_SPEED_POTENCY_1), stat(a -> a.mAttackSpeed, ATTACK_SPEED_POTENCY_2))
-			.addStat("Effect: Jump Boost %d")
-				.statValues(stat(a -> a.mJumpBoostLevel + 1, JUMP_BOOST_POTENCY + 1))
+			.addStatComparison("Effect: +%p1 -> +%p2 Speed")
+			.statValues(stat(0.1), stat(a -> a.mSpeed + 0.1, SPEED_BONUS + 0.1))
 			.addDashedLine();
+
 	}
 
 	private static Description<Swiftness> getDescriptionEnhancement() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
 			.addDashedLine()
-			.addLine("Breaking a spawner reduces all of")
-			.addLine("your ability cooldowns.")
+			.addLine("*Swiftness*' double jump is transformed into").styles(UNDERLINED)
+			.addLine("a dash. Become invulnerable for %t and inflict")
+			.statValues(stat(a -> a.mResistanceDuration, DASH_IMMUNITY_DURATION))
+			.addLine("vulnerability when passing through mobs.")
 			.addLine()
-			.addStat("Cooldown Reduction: %p")
-				.statValues(stat(a -> a.mEnhancementCDR, ENHANCEMENT_CDR))
+			.addStat("Effect: %p Vulnerability for %t")
+			.statValues(stat(a -> a.mVulnerabilityMultiplier, DASH_VULNERABILITY_MULTIPLIER), stat(a -> a.mVulnerabilityDuration, DASH_VULNERABILITY_DURATION))
 			.addDashedLine();
 	}
 }

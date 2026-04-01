@@ -729,6 +729,8 @@ public class PlayerListener implements Listener {
 			&& playerHasDepthStrider(player)) {
 			Bukkit.getScheduler().runTask(mPlugin, player::updateInventory);
 		}
+
+		mPlugin.mAbilityManager.playerItemHeldEvent(player, event);
 	}
 
 	private boolean playerHasDepthStrider(Player player) {
@@ -1535,6 +1537,11 @@ public class PlayerListener implements Listener {
 		if (event.getEntity() instanceof Player player) {
 			mPlugin.mAbilityManager.playerDismountEvent(player, event);
 		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void playerToggleFlightEvent(PlayerToggleFlightEvent event) {
+		mPlugin.mAbilityManager.playerToggleFlightEvent(event.getPlayer(), event);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

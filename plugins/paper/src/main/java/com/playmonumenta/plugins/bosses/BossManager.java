@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.bosses.bosses.*;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AbilityMarkerEntityBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.HuntingCompanionBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.PartingShotDummyBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.PhantomForceBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
@@ -436,6 +438,8 @@ public class BossManager implements Listener {
 		registerStatelessBoss(CustomGlowingBoss.identityTag, CustomGlowingBoss::new, new CustomGlowingBoss.Parameters());
 		registerStatelessBoss(SoulLinkBoss.identityTag, SoulLinkBoss::new, new SoulLinkBoss.Parameters());
 		registerStatelessBoss(DisplayBoss.identityTag, DisplayBoss::new, new DisplayBoss.Parameters());
+		registerStatelessBoss(PartingShotDummyBoss.identityTag, PartingShotDummyBoss::new);
+		registerStatelessBoss(HuntingCompanionBoss.identityTag, HuntingCompanionBoss::new);
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);

@@ -40,7 +40,7 @@ public class Chaotic implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		boolean isProjectile = (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) || event.getAbility() == ClassAbility.ALCHEMIST_POTION;
+		boolean isProjectile = event.getType() == DamageType.PROJECTILE || event.getAbility() == ClassAbility.ALCHEMIST_POTION;
 		if (isProjectile || event.getType() == DamageType.MELEE) {
 			event.setFlatDamage(Math.max(0, event.getFlatDamage() + calculateChaoticDamage(isProjectile, player, value, enemy)));
 		}

@@ -2,14 +2,17 @@ package com.playmonumenta.plugins.cosmetics.skills.scout;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.skills.GalleryCS;
-import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -18,13 +21,17 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
+public class EverseeingEyeCS extends PartingShotCS implements GalleryCS {
+
+	// TODO: Could be improved
 
 	public static final String NAME = "Everseeing Eye";
 
@@ -73,18 +80,29 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 	}
 
 	@Override
-	public void eyeStart(World world, Player player, Location loc) {
-		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.6f, 0.6f);
-		world.playSound(loc, Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 1.5f, 0.5f);
-		world.playSound(loc, Sound.AMBIENT_CRIMSON_FOREST_MOOD, SoundCategory.PLAYERS, 1.25f, 2f);
-		world.playSound(loc, Sound.AMBIENT_WARPED_FOREST_MOOD, SoundCategory.PLAYERS, 0.75f, 2f);
+	public void dodge(World world, Player player, Location loc) {
+		world.playSound(loc, Sound.ENTITY_ALLAY_DEATH, SoundCategory.PLAYERS, 0.6f, 0.8f);
+		world.playSound(loc, Sound.AMBIENT_CRIMSON_FOREST_MOOD, SoundCategory.PLAYERS, 4f, 2f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.4f, 0.8f);
 
+		new PartialParticle(Particle.DAMAGE_INDICATOR, player.getEyeLocation())
+			.count(10)
+			.delta(0.2, 0.2, 0.2)
+			.spawnAsPlayerActive(player);
+
+		new PartialParticle(Particle.BLOCK_CRACK, LocationUtils.getHalfHeightLocation(player))
+			.count(40)
+			.data(Material.REDSTONE_BLOCK.createBlockData())
+			.delta(0.2, 0.5, 0.2)
+			.spawnAsPlayerActive(player);
+
+		// Eye Animation
 		new BukkitRunnable() {
 			int mFrame = 0;
 			final Vector mFront = VectorUtils.rotateTargetDirection(
-				VectorUtils.rotationToVector(loc.getYaw(), loc.getPitch()), 0, 24);
-			final Vector mOffset = VectorUtils.rotateTargetDirection(mFront.clone(), 0, -90).multiply(3);
-			final Location mCenter = player.getEyeLocation().clone().add(mFront.clone().add(mOffset));
+				VectorUtils.rotationToVector(loc.getYaw(), 0), 0, 0);
+
+			final Location mCenter = player.getEyeLocation().clone().add(0, 3, 0);
 
 			@Override
 			public void run() {
@@ -142,34 +160,165 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 					new PartialParticle(Particle.REDSTONE, mCenter, 15, 0.2, 0.2, 0.2, 0.1, INNER).spawnAsPlayerActive(player);
 				}
 			}
-
 		}.runTaskTimer(Plugin.getInstance(), 0, 2);
+	}
+
+	@Override
+	public void tickEffect(Player player, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
+		new PartialParticle(Particle.REDSTONE, LocationUtils.getHalfHeightLocation(player))
+			.count(5)
+			.delta(0.2, 0.5, 0.2)
+			.data(BLOOD)
+			.extra(0.01f)
+			.spawnAsPlayerBuff(player);
+	}
+
+	@Override
+	public void shoot(World world, Player player, Location loc, Projectile proj) {
+		world.playSound(loc, Sound.ENTITY_BREEZE_SHOOT, SoundCategory.PLAYERS, 0.6f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 1f, 1.6f);
+
+		new BukkitRunnable() {
+			int mT = 0;
+
+			@Override
+			public void run() {
+				if (!player.isValid() || player.isDead() || !proj.isValid() || ++mT > 100) {
+					this.cancel();
+					return;
+				}
+
+				new PartialParticle(Particle.BLOCK_CRACK, proj.getLocation())
+					.minimumCount(1)
+					.data(Material.REDSTONE_BLOCK.createBlockData())
+					.count(2)
+					.spawnAsPlayerActive(player);
+
+				new PartialParticle(Particle.REDSTONE, proj.getLocation())
+					.minimumCount(1)
+					.data(BLOOD)
+					.count(2)
+					.spawnAsPlayerActive(player);
+			}
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+	}
+
+	@Override
+	public void land(World world, Player player, Location loc, double radius) {
+		loc.add(0, 0.15, 0);
+
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 1f, 1.6f);
+		world.playSound(loc, Sound.BLOCK_CHAIN_FALL, SoundCategory.PLAYERS, 1f, 0.4f);
+
+		new PPCircle(Particle.BLOCK_CRACK, loc, radius)
+			.ringMode(false)
+			.data(Material.REDSTONE_BLOCK.createBlockData())
+			.count(125)
+			.spawnAsPlayerActive(player);
+
+		new PPCircle(Particle.REDSTONE, loc, radius)
+			.ringMode(false)
+			.data(BLOOD)
+			.count(125)
+			.spawnAsPlayerActive(player);
 
 	}
 
 	@Override
-	public void eyeOnTarget(World world, Player player, LivingEntity mob) {
+	public void expire(World world, Player player, Location loc) {
+		world.playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 1f, 1.6f);
+	}
+
+	@Override
+	public String getDummyName() {
+		return "OcularClone";
+	}
+
+	@Override
+	public void revealStart(World world, Player player, Location loc, double radius) {
+		world.playSound(loc, Sound.AMBIENT_WARPED_FOREST_ADDITIONS, SoundCategory.HOSTILE, 1.5f, 2f);
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.6f, 0.6f);
+		world.playSound(loc, Sound.ENTITY_ZOMBIE_HORSE_DEATH, SoundCategory.PLAYERS, 1.0f, 1.2f);
+		world.playSound(loc, Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 1.5f, 0.5f);
+		world.playSound(loc, Sound.AMBIENT_CRIMSON_FOREST_MOOD, SoundCategory.PLAYERS, 1.25f, 2f);
+		world.playSound(loc, Sound.AMBIENT_WARPED_FOREST_MOOD, SoundCategory.PLAYERS, 3f, 2f, 3);
+
+		ParticleUtils.explodingRingEffect(Plugin.getInstance(), loc, radius, 1, 5, 0.85,
+			l -> {
+				new PartialParticle(Particle.SMOKE_NORMAL, loc, 2, 0.15, 0.15, 0.15)
+					.extra(0.01)
+					.spawnAsPlayerActive(player);
+
+				new PartialParticle(Particle.REDSTONE, loc, 2, 0.15, 0.15, 0.15)
+					.extra(0.01)
+					.data(BLOOD)
+					.spawnAsPlayerActive(player);
+			});
+
+		HashSet<Item> itemSet = new HashSet<>();
+
+		for (int i = 0; i < 5; i++) {
+			Location newLoc = loc.clone();
+			Vector random = VectorUtils.randomHorizontalUnitVector();
+			random.setY(FastUtils.randomDoubleInRange(0.4, 1));
+			newLoc.setDirection(random);
+
+			itemSet.add(AbilityUtils.spawnAbilityItem(world, newLoc, Material.NETHER_WART_BLOCK, "meat",
+				false, 0.6f, false, true));
+		}
+
+		new BukkitRunnable() {
+			int mT = 0;
+
+			@Override
+			public void run() {
+				if (itemSet.isEmpty()) {
+					this.cancel();
+					return;
+				}
+
+				if (mT > 100) {
+					itemSet.forEach(Item::remove);
+					itemSet.clear();
+				}
+
+				Iterator<Item> it = itemSet.iterator();
+
+				while (it.hasNext()) {
+					Item item = it.next();
+
+					Location loc = item.getLocation();
+					loc.add(0, 0.2, 0);
+					loc.add(item.getVelocity());
+
+					new PartialParticle(Particle.REDSTONE, loc)
+						.delta(0.1)
+						.count(5)
+						.data(BLOOD)
+						.spawnAsPlayerActive(player);
+
+					if (item.isOnGround()) {
+						world.playSound(loc, Sound.BLOCK_SNIFFER_EGG_CRACK, 0.8f, 1f);
+						world.playSound(loc, Sound.ENTITY_SLIME_DEATH, SoundCategory.PLAYERS, 1.0f, 0.8f);
+						world.playSound(loc, Sound.ENTITY_SPIDER_STEP, SoundCategory.PLAYERS, 0.85f, 0.8f);
+
+						item.remove();
+						it.remove();
+					}
+				}
+
+				mT++;
+			}
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+
+
+	}
+
+	@Override
+	public void revealOnTarget(World world, Player player, LivingEntity mob) {
 		world.playSound(mob.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 0.15f, 0.6f);
 		world.playSound(mob.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.PLAYERS, 0.2f, 1.5f);
 		new PartialParticle(Particle.REDSTONE, mob.getLocation().add(0, 1, 0), 25, 0.7, 0.7, 0.7, 0.05, BLOOD).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIMSON_SPORE, mob.getLocation().add(0, 1, 0), 15, 0.3, 0.3, 0.3, 0.005).spawnAsPlayerActive(player);
-	}
-
-	@Override
-	public void eyeFirstStrike(World world, Player player, LivingEntity mob) {
-		Vector offset = new Vector(0, 0.25, 2.5);
-		Location loc = mob.getLocation();
-		Location loc1 = loc.clone().add(VectorUtils.rotateYAxis(offset, player.getLocation().getYaw() + 45));
-		Location loc2 = loc.clone().add(VectorUtils.rotateYAxis(offset, player.getLocation().getYaw() + 135));
-		Location loc3 = loc.clone().add(VectorUtils.rotateYAxis(offset, player.getLocation().getYaw() + 225));
-		Location loc4 = loc.clone().add(VectorUtils.rotateYAxis(offset, player.getLocation().getYaw() + 315));
-		new PPLine(Particle.REDSTONE, loc1, loc3).shiftStart(0.25).countPerMeter(10).delta(0.125).extra(0.05).data(BLOOD).spawnAsPlayerActive(player);
-		new PPLine(Particle.REDSTONE, loc2, loc4).shiftStart(0.25).countPerMeter(10).delta(0.125).extra(0.05).data(BLOOD).spawnAsPlayerActive(player);
-		world.playSound(mob.getLocation(), Sound.ENTITY_GENERIC_EAT, SoundCategory.PLAYERS, 1.25f, 0.5f);
-	}
-
-	@Override
-	public NamedTextColor enhancementGlowColor() {
-		return NamedTextColor.RED;
 	}
 }

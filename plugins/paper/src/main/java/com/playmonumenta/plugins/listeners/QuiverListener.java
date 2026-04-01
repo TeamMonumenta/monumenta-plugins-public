@@ -564,23 +564,43 @@ public class QuiverListener implements Listener {
 	// Delve Arrow Refund stuff below here
 	static Set<String> DELVE_ARROWS = Set.of(
 		// R1
+		"epic:items/arrows/soulflame_arrow",
 		"epic:items/arrows/beastblood_quarrel",
+		"epic:items/arrows/plagueroot_arrow",
+		"epic:items/arrows/argone_arrow",
+		"epic:items/arrows/elemental_arrow",
+		"epic:items/arrows/arrow_of_causality",
 		"epic:items/arrows/blackbearers_bolt",
+		"epic:items/arrows/nightmare_bolt",
 		// R2
+		"epic:items/arrows/gillman_dart",
+		"epic:items/arrows/arboretum_arrow",
+		"epic:items/arrows/deathknell_arrow",
 		"epic:items/arrows/star-tipped_arrow",
+		"epic:items/arrows/cursestone_quarrel",
 		"epic:items/arrows/void-dipped_arrow",
 		"epic:items/arrows/timetorn_arrow",
 		"epic:items/arrows/keterborn_bolt",
 		"epic:items/arrows/stormsurge_quarrel",
 		// R3
-		"epic:items/arrows/sentrys_arrow",
-		"epic:items/arrows/silver_bolt",
+		"epic:items/arrows/dichen_bolt",
 		"epic:items/arrows/ashkii_quarrel",
-		"epic:items/arrows/star_seekers_needle"
+		"epic:items/arrows/star_seekers_needle",
+		"epic:items/arrows/covenstead_dart",
+		"epic:items/arrows/sentrys_arrow",
+		"epic:items/arrows/singularity_shaft",
+		"epic:items/arrows/silver_bolt",
+		"epic:items/arrows/lightning_bolt",
+		"epic:items/arrows/godslayer_arrow",
+		"epic:items/arrows/bramblethorn_bolt"
 	);
 
 	static Set<String> R1_WOOLS_ARROWS = Set.of(
-		"epic:items/arrows/beastblood_quarrel"
+		"epic:items/arrows/soulflame_arrow",
+		"epic:items/arrows/beastblood_quarrel",
+		"epic:items/arrows/plagueroot_arrow",
+		"epic:items/arrows/argone_arrow",
+		"epic:items/arrows/elemental_arrow"
 	);
 
 	static boolean refundDebugMode = false;
@@ -677,6 +697,7 @@ public class QuiverListener implements Listener {
 										}
 									}
 									player.sendMessage(Component.text("Failed final check. Report this to a moderator via ModMail on our discord!", NamedTextColor.DARK_RED));
+									MMLog.warning("Delve Arrow Refund mechanism failed final check. Potential dupe vector, panic and ping Ash...");
 								} catch (NullPointerException nullPointerException) {
 									MMLog.finer(nullPointerException + " thrown while trying to refund delve arrows.");
 								}
