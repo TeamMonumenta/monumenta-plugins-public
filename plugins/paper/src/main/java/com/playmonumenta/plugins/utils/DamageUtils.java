@@ -17,6 +17,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.PufferFish;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
@@ -179,13 +180,18 @@ public class DamageUtils {
 	 */
 	public static void damage(@Nullable LivingEntity damager, LivingEntity damagee, DamageEvent.Metadata metadata,
 	                          double amount, boolean bypassIFrames, boolean causeKnockback, boolean blockable) {
+		if (damagee instanceof Player player && player.getSpectatorTarget() != null && player.getSpectatorTarget() instanceof PufferFish fish) {
+			damagee = fish;
+			// Redirect damage to the pufferfish as spectator is immune - if fish dies, player dies
+		}
 		if (!damagee.isValid() || isImmuneToDamage(damagee, metadata.getType())) {
 			return;
 		}
 
 		if (amount <= 0.0) {
+			LivingEntity finalDamagee = damagee;
 			MMLog.severe(() -> "[DamageUtils] Something tried to apply negative damage! No damage will be applied." +
-				"damagee: " + damagee.getName() + " metadata: " + metadata);
+				"damagee: " + finalDamagee.getName() + " metadata: " + metadata);
 			return;
 		}
 

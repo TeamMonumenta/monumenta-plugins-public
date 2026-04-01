@@ -66,6 +66,9 @@ public class ShamanPassiveManager extends Ability {
 			totemList.remove(stand);
 		}
 		TOTEM_ABILITY_MAP.remove(stand);
+		if (stand.getVehicle() != null) {
+			stand.getVehicle().remove();
+		}
 		stand.remove();
 	}
 

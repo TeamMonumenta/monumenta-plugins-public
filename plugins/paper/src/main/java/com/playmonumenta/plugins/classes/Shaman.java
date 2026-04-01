@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
 import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
 import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
+import com.playmonumenta.plugins.abilities.shaman.GiftOfSentience;
 import com.playmonumenta.plugins.abilities.shaman.IgnitionDrive;
 import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
 import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
@@ -49,6 +50,7 @@ public class Shaman extends PlayerClass {
 		mDisplayItem = Material.TOTEM_OF_UNDYING;
 		mClassDescription = "Shamans excel in strategic positioning and location defense, using their stationary totems to control the battle.";
 		mPassive = TotemicProjection.INFO;
+		mUltimate = GiftOfSentience.INFO;
 
 		mSpecOne.mAbilities.add(SpiritualCombos.INFO);
 		mSpecOne.mAbilities.add(WhirlwindTotem.INFO);
@@ -71,6 +73,7 @@ public class Shaman extends PlayerClass {
 		mSpecTwo.mDescription = "Deals in dark magics, focusing on harming enemies at the cost of totems.";
 
 		mTriggerOrder = ImmutableList.of(
+			GiftOfSentience.INFO,
 			InterconnectedHavoc.INFO,
 			CleansingTotem.INFO,
 			TotemicProjection.INFO,

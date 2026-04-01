@@ -504,6 +504,10 @@ public class AbilityUtils {
 						ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
 					}
 				}
+				String ultScoreboard = aClass.mUltimate.getScoreboard();
+				if (ultScoreboard != null) {
+					ScoreboardUtils.setScoreboardValue(player, ultScoreboard, 0);
+				}
 			}
 			if (playerSpec != aClass.mSpecOne.mSpecialization) {
 				for (AbilityInfo<?> ability : aClass.mSpecOne.mAbilities) {
@@ -567,6 +571,14 @@ public class AbilityUtils {
 					remainingSkillPoints -= score;
 				}
 			}
+			String ultScoreboard = chosenClass.mUltimate.getScoreboard();
+			if (ultScoreboard != null) {
+				int score = ScoreboardUtils.getScoreboardValue(player, ultScoreboard).orElse(0);
+				if (score > 2) {
+					remainingEnhancementPoints--;
+				}
+			}
+
 			// Loop over specs
 			for (AbilityInfo<?> specAbility : specAbilities) {
 				String scoreboard = specAbility.getScoreboard();

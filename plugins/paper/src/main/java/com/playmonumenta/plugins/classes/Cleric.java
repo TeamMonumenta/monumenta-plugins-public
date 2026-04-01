@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.abilities.cleric.HandOfLight;
 import com.playmonumenta.plugins.abilities.cleric.HeavenlyBoon;
 import com.playmonumenta.plugins.abilities.cleric.Illuminate;
+import com.playmonumenta.plugins.abilities.cleric.SacredConstructs;
 import com.playmonumenta.plugins.abilities.cleric.SanctifiedArmor;
 import com.playmonumenta.plugins.abilities.cleric.TouchofRadiance;
 import com.playmonumenta.plugins.abilities.cleric.paladin.ChoirBells;
@@ -53,6 +54,7 @@ public class Cleric extends PlayerClass {
 		mDisplayItem = Material.POPPY;
 		mClassDescription = "Clerics are mighty healers and specialize in fighting 'Heretics'. A Heretic is defined as a Humanoid or Undead mob.";
 		mPassive = Crusade.INFO;
+		mUltimate = SacredConstructs.INFO;
 
 		mSpecOne.mAbilities.add(HolyJavelin.INFO);
 		mSpecOne.mAbilities.add(ChoirBells.INFO);
@@ -75,6 +77,8 @@ public class Cleric extends PlayerClass {
 		mSpecTwo.mPassive = Rejuvenation.INFO;
 
 		mTriggerOrder = ImmutableList.of(
+			SacredConstructs.INFO,
+
 			ChoirBells.INFO,
 			HolyJavelin.INFO,
 			LuminousInfusion.INFO,

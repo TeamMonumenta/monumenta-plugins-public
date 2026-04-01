@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.cosmetics.skills.shaman.TotemicProjectionCS;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import java.util.Map;
@@ -130,9 +131,9 @@ public class TotemicProjection extends MultipleChargeAbility {
 			LivingEntity totem = totems.getFirst();
 			Location loc = targetLoc.clone().add(0, 0.05, 0);
 			if (loc.getBlock().isPassable()) {
-				totem.teleport(loc);
+				EntityUtils.teleportStack(totem, loc);
 			} else {
-				totem.teleport(targetLoc);
+				EntityUtils.teleportStack(totem, targetLoc);
 			}
 		} else {
 			Vector forward = targetLoc.getDirection().setY(0).normalize().multiply(mDistributionRadius);
@@ -148,11 +149,11 @@ public class TotemicProjection extends MultipleChargeAbility {
 				Location locLower = targetLoc.clone().add(dir);
 				Location loc = locLower.clone().add(0, 0.05, 0);
 				if (loc.getBlock().isPassable()) {
-					totem.teleport(loc);
+					EntityUtils.teleportStack(totem, loc);
 				} else if (locLower.getBlock().isPassable()) {
-					totem.teleport(locLower);
+					EntityUtils.teleportStack(totem, locLower);
 				} else {
-					totem.teleport(targetLoc);
+					EntityUtils.teleportStack(totem, targetLoc);
 				}
 				currentDeg += degIncrement;
 			}

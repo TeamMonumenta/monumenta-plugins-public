@@ -31,6 +31,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.PufferFish;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -135,6 +136,10 @@ public class BossUtils {
 
 	//Returns whether the attack was blocked or otherwise completely negated (true = not blocked)
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, int stunTicks, int durability, List<EffectsList.Effect> effects) {
+		if (damagee instanceof Player player && player.getSpectatorTarget() != null && player.getSpectatorTarget() instanceof PufferFish fish) {
+			damagee = fish;
+			// Redirect damage to the pufferfish as spectator is immune - if fish dies, player dies
+		}
 		if (DamageUtils.isImmuneToDamage(damagee, type)) {
 			return false;
 		}
@@ -195,7 +200,10 @@ public class BossUtils {
 		if (percentHealth <= 0) {
 			return true;
 		}
-
+		if (target instanceof Player player && player.getSpectatorTarget() != null && player.getSpectatorTarget() instanceof PufferFish fish) {
+			target = fish;
+			// Redirect damage to the pufferfish as spectator is immune - if fish dies, player dies
+		}
 		if (DamageUtils.isImmuneToDamage(target, null)) {
 			return true;
 		}

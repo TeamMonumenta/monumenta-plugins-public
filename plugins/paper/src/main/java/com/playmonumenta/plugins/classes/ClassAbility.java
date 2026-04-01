@@ -34,6 +34,8 @@ public enum ClassAbility {
 	SPELLSHOCK_THUNDER("Spellshock Thunder Enhancement"),
 	THUNDER_STEP(ThunderStep.NAME),
 
+	CATACLYSM("Cataclysm"),
+
 	// Arcanist
 	ASTRAL_OMEN(AstralOmen.NAME),
 	COSMIC_MOONBLADE(CosmicMoonblade.NAME),
@@ -55,6 +57,8 @@ public enum ClassAbility {
 	ESCAPE_DEATH("Escape Death"),
 	SMOKESCREEN("Smokescreen"),
 	VICIOUS_COMBOS("Vicious Combos"), //placeholder for cosmetic
+
+	SUPER_BLADE_DANCE_ULTRA("Super Blade Dance Ultra"),
 
 	// Assassin
 	BODKIN_BLITZ("Bodkin Blitz"),
@@ -78,6 +82,8 @@ public enum ClassAbility {
 	HEAVENLY_BOON("Heavenly Boon"),
 	CRUSADE("Crusade"),
 
+	SACRED_CONSTRUCTS("Sacred Constructs"),
+
 	// Hierophant
 	ETHEREAL_ASCENSION("Ethereal Ascension"),
 	HALLOWED_BEAM("Hallowed Beam"),
@@ -99,6 +105,8 @@ public enum ClassAbility {
 	SHARPSHOOTER("Sharpshooter"),
 	QUICKDRAW("Quickdraw"),
 
+	ALL_OUT_SCOUT("All Out Scout"),
+
 	// Hunter
 	PREDATOR_STRIKE("Predator Strike"),
 	SPLIT_ARROW("Split Arrow"),
@@ -119,6 +127,8 @@ public enum ClassAbility {
 	MELANCHOLIC_LAMENT("Melancholic Lament"),
 	SANGUINE_HARVEST("Sanguine Harvest"),
 	SOUL_REND("Soul Rend"),
+
+	DARKESTEREST_PACT("Darkesterest Pact"),
 
 	// Reaper
 	DARK_PACT("Dark Pact"),
@@ -142,6 +152,8 @@ public enum ClassAbility {
 	FRENZY("Frenzy"),
 	WEAPON_MASTERY("Weapon Mastery"),
 	TOUGHNESS("Toughness"),
+
+	RECKLESS_SWING("Reckless Swing"),
 
 	// Berserker
 	METEOR_SLAM("Meteor Slam"),
@@ -167,6 +179,8 @@ public enum ClassAbility {
 	VOLATILE_REACTION("Volatile Reaction"),
 	VOLATILE_REACTION_DOT("Volatile Reaction DoT"),
 
+	I_JUST_MADE_SOME_BS("I just made some BULLLLLLSHITTTTT!!!!!!"),
+
 	// Apothecary
 	PANACEA("Panacea"),
 	TRANSMUTATION_RING("Transmutation Ring"),
@@ -187,6 +201,8 @@ public enum ClassAbility {
 	IGNITION_DRIVE("Ignition Drive"),
 	SPIRITUALISM("Spiritualism"),
 	TOTEMIC_PROJECTION("Totemic Projection"),
+
+	GIFT_OF_SENTIENCE("The Gift of Sentience"),
 
 	// Soothsayer
 	TOTEMIC_CONSECRATION("Totemic Consecration"),

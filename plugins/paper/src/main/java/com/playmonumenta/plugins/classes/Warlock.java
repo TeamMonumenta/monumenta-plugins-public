@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
 import com.playmonumenta.plugins.abilities.warlock.Culling;
 import com.playmonumenta.plugins.abilities.warlock.CursedWound;
+import com.playmonumenta.plugins.abilities.warlock.DarkesterestPact;
 import com.playmonumenta.plugins.abilities.warlock.GraspingClaws;
 import com.playmonumenta.plugins.abilities.warlock.MelancholicLament;
 import com.playmonumenta.plugins.abilities.warlock.PhlegmaticResolve;
@@ -51,6 +52,7 @@ public class Warlock extends PlayerClass {
 		mQuestReqMin = 1;
 		mClassDescription = "Warlocks use scythes in combination with dark magic to bring suffering and death to their enemies.";
 		mPassive = Culling.INFO;
+		mUltimate = DarkesterestPact.INFO;
 
 		mSpecOne.mAbilities.add(DarkPact.INFO);
 		mSpecOne.mAbilities.add(JudgementChain.INFO);
@@ -71,6 +73,8 @@ public class Warlock extends PlayerClass {
 		mSpecTwo.mDescription = "Tenebrists use scythes in combination with dark magic to bring suffering to their enemies. They specialize in curses and status effects.";
 
 		mTriggerOrder = ImmutableList.of(
+			DarkesterestPact.INFO,
+
 			DarkPact.INFO,
 			JudgementChain.INFO, // after dark pact
 			VoodooBonds.INFO,

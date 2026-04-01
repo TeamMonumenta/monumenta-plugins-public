@@ -423,6 +423,83 @@ public class ClassSelectionGui extends Gui {
 			});
 	}
 
+	protected void setUltimateIcon(
+		int row,
+		int column,
+		PlayerClass displayedClass,
+		AbilityInfo<?> ability
+	) {
+		ItemStack newItem;
+
+		boolean hasEnhancement;
+		Material newMat;
+		String guiTexture;
+		String scoreboard = ability.getScoreboard();
+		switch (scoreboard == null ? 0 : ScoreboardUtils.getScoreboardValue(mPlayer, scoreboard).orElse(0)) {
+			case 0, 1, 2 -> {
+				hasEnhancement = false;
+				newMat = Material.RED_STAINED_GLASS_PANE;
+				guiTexture = "spec_select_spec_unlit";
+			}
+			case 3, 4 -> {
+				hasEnhancement = true;
+				newMat = Material.LIME_STAINED_GLASS_PANE;
+				guiTexture = "spec_select_spec_lit";
+			}
+			default -> {
+				newMat = Material.BARRIER;
+				newItem = GUIUtils.createBasicItem(newMat, "Unknown Level",
+					displayedClass.mClassColor, true, "Unknown level for ability.", NamedTextColor.WHITE);
+				setItem(row, column, newItem);
+				return;
+			}
+		}
+
+		Component instruction;
+		if (!isClass(displayedClass, null)) {
+			instruction = Component.empty();
+		} else if (hasEnhancement) {
+			instruction = DescriptionUtils.actionLine("Ultimate already selected.", DescriptionUtils.ACTION_COMPLETED);
+		} else if (ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE).orElse(0) == 0) {
+			instruction = DescriptionUtils.actionLine("Cannot select ultimate!", DescriptionUtils.ACTION_DENIED).appendNewline().appendSpace()
+				.append(DescriptionUtils.actionLine("Not enough points!", DescriptionUtils.ACTION_DENIED));
+		} else {
+			instruction = DescriptionUtils.actionLine("Click to select!", DescriptionUtils.ACTION_SELECT);
+		}
+
+		Component description = ability.getDescription(3, mPlayer, true).appendNewline().appendSpace();
+		description = description.append(instruction);
+
+		Component name = Component.text(Objects.requireNonNull(ability.getDisplayName()), displayedClass.mClassColor)
+			.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)
+			.append(Component.text(" [Ultimate]", NamedTextColor.AQUA).decoration(TextDecoration.BOLD, false));
+
+		newItem = GUIUtils.createBasicItem(newMat, 1, name, description, 99, true);
+		GUIUtils.setGuiNbtTag(
+			newItem,
+			"texture",
+			guiTexture,
+			mGuiTextures
+		);
+
+
+		setItem(row, column, newItem)
+			.onClick(event -> {
+				if (event.isShiftClick()) {
+					return;
+				}
+				if (ScoreboardUtils.getScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE).orElse(0) == 0) {
+					mPlayer.playSound(mPlayer, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1f);
+					mPlayer.playSound(mPlayer, Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, SoundCategory.PLAYERS, 0.8f, 0.75f);
+					return;
+				}
+				if (!hasEnhancement) {
+					applyEnhancementChosen(displayedClass, ability, true);
+					Bukkit.getScheduler().runTask(mPlugin, this::update);
+				}
+			});
+	}
+
 	protected void applyAbilityChosen(
 		PlayerClass displayedClass,
 		@Nullable PlayerSpec displayedSpec,
@@ -513,7 +590,7 @@ public class ClassSelectionGui extends Gui {
 			// We don't want to assign the ability if we don't have points
 			if (currentCount > 0) {
 				ScoreboardUtils.setScoreboardValue(mPlayer, AbilityUtils.REMAINING_ENHANCE, currentCount - 1);
-				ScoreboardUtils.setScoreboardValue(mPlayer, objective, currentLevel + 2);
+				ScoreboardUtils.setScoreboardValue(mPlayer, objective, Math.max(3, currentLevel + 2));
 
 				playSelectionSound(mPlayer, null, null, 1);
 			} else {
