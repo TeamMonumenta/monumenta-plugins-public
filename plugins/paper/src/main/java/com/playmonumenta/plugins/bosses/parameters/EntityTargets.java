@@ -246,6 +246,17 @@ public class EntityTargets implements Cloneable {
 				return true;
 			}
 		},
+		IS_SHAMAN {
+			@Override
+			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {
+				return entity instanceof Player player && PlayerUtils.isShaman(player);
+			}
+
+			@Override
+			public boolean anyMatchType() {
+				return true;
+			}
+		},
 		HAS_LINEOFSIGHT {
 			@Override
 			public <V extends Entity> boolean filter(LivingEntity launcher, V entity) {

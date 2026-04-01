@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.classes.Rogue;
 import com.playmonumenta.plugins.classes.Scout;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.depths.abilities.curses.CurseOfDependency;
@@ -614,6 +615,10 @@ public class PlayerUtils {
 
 	public static boolean isWarlock(Player player) {
 		return AbilityUtils.getClassNum(player) == Warlock.CLASS_ID;
+	}
+
+	public static boolean isShaman(Player player) {
+		return AbilityUtils.getClassNum(player) == Shaman.CLASS_ID;
 	}
 
 	public static void resetAttackCooldown(Player player) {
