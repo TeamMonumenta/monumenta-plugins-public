@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.ChoirBellsCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -29,6 +30,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
@@ -37,14 +39,14 @@ public class ChoirBells extends Ability implements AbilityWithDuration {
 
 	private static final int DURATION = 8 * 20;
 	private static final double WEAKEN_EFFECT = 0.2;
-	private static final double VULNERABILITY_EFFECT = 0.3;
-	private static final double VULNERABILITY_EFFECT_2 = 0.2;
+	private static final double VULNERABILITY_EFFECT = 0.25;
+	private static final double VULNERABILITY_EFFECT_2 = 0.15;
 	private static final double SLOWNESS_AMPLIFIER = 0.1;
 	private static final double SLOWNESS_AMPLIFIER_2 = 0.1;
 	private static final int COOLDOWN = 16 * 20;
 	private static final int CHOIR_BELLS_RANGE = 10;
-	private static final int DAMAGE = 8;
-	private static final int DAMAGE_2 = 3;
+	private static final double[] DAMAGE = {8, 11};
+	private static final double[] DAMAGE_2 = {3, 4};
 	private static final int EXTRA_TOLLS = 2;
 	private static final int TOLL_DELAY = 3 * 20;
 
@@ -99,11 +101,11 @@ public class ChoirBells extends Ability implements AbilityWithDuration {
 		mVulnerabilityEffect2 = CharmManager.getLevelPercentDecimal(player, CHARM_VULN) + VULNERABILITY_EFFECT_2;
 		mDuration = CharmManager.getDuration(player, CHARM_DURATION, DURATION);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, CHOIR_BELLS_RANGE);
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, AbilityUtils.getRegionScaled(player, DAMAGE));
 		mExtraTolls = EXTRA_TOLLS + (int) CharmManager.getLevel(player, CHARM_TOLLS);
 		mTollDelay = CharmManager.getDuration(player, CHARM_TOLL_DELAY, TOLL_DELAY);
 		mTollsDuration = mExtraTolls * mTollDelay;
-		mTollDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_2);
+		mTollDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, AbilityUtils.getRegionScaled(player, DAMAGE_2));
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChoirBellsCS());
 
 		Bukkit.getScheduler().runTask(plugin, () ->
@@ -197,8 +199,8 @@ public class ChoirBells extends Ability implements AbilityWithDuration {
 			.addLine("*Heretics* are also taunted, take damage, and").styles(Cleric.HERETIC_COLOR)
 			.addLine("are inflicted with weakness and vulnerability.")
 			.addLine()
-			.addStat("Damage: %d (s)")
-				.statValues(stat(a -> a.mDamage, DAMAGE))
+			.addStat("Damage: %d0R (s)")
+				.statValues(perRegion(a -> a.mDamage, DAMAGE[0], DAMAGE[1]))
 			.addStat("Effect: %p Weakness for %t")
 				.statValues(
 					stat(a -> a.mWeakenEffect, WEAKEN_EFFECT),
@@ -223,8 +225,8 @@ public class ChoirBells extends Ability implements AbilityWithDuration {
 			.addLine("The extra tolls deal less damage, taunt mobs,")
 			.addLine("and inflict weaker debuffs for a shorter time.")
 			.addLine()
-			.addStat("Damage: %d (s) (to Heretics)")
-			.statValues(stat(a -> a.mTollDamage, DAMAGE_2))
+			.addStat("Damage: %d0R (s) (to Heretics)")
+				.statValues(perRegion(a -> a.mTollDamage, DAMAGE_2[0], DAMAGE_2[1]))
 			.addStat("Effect: %p Slowness for %t")
 				.statValues(
 					stat(a -> a.mSlownessAmount2, SLOWNESS_AMPLIFIER_2),

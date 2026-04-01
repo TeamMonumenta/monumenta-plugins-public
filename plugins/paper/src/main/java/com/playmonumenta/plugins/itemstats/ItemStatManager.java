@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
 import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
+import com.playmonumenta.plugins.itemstats.enchantments.Oversized;
 import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
@@ -735,6 +736,7 @@ public class ItemStatManager implements Listener {
 				entry.getKey().onProjectileLaunch(plugin, player, entry.getValue(), event, projectile);
 			}
 		}
+		Oversized.onAnyShoot(player, projectile);
 	}
 
 	public void onConsumeArrow(Plugin plugin, Player player, ArrowConsumeEvent event) {

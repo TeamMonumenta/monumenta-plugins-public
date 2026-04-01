@@ -201,7 +201,7 @@ public class Bloodlust extends Ability implements AbilityWithChargesOrStacks {
 
 	public static Description<Bloodlust> getDescription() {
 		return new FormattedDescriptionBuilder<>(() -> INFO)
-			.addLine("Gain *1* stack of *Bloodlust* for every %d").styles(WHITE, BLOODLUST_COLOR)
+			.addLine("Gain *1* stack of *Bloodlust* for every %d0R").styles(WHITE, BLOODLUST_COLOR)
 				.statValues(perRegion(a -> a.mDamageReq, R2_DAMAGE_REQ, R3_DAMAGE_REQ))
 			.addLine("melee damage you deal, up to %d stacks.")
 				.statValues(stat(a -> a.mStackLimit, MAX_STACKS))

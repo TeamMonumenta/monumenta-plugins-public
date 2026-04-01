@@ -14,14 +14,12 @@ import org.bukkit.entity.Player;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
-import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Rejuvenation extends Ability {
 	private static final int RADIUS = 12;
 	private static final int HEAL_INTERVAL = TICKS_PER_SECOND * 3;
 	public static final double PERCENT_HEAL = 0.05;
 	private static final double HEALTH_LIMIT = 0.5;
-	public static final double DJ_MULTIPLIER = 0.1;
 
 	private static final String REGENERATION_EFFECT = "RejuvenationRegenerationEffect";
 
@@ -37,14 +35,12 @@ public class Rejuvenation extends Ability {
 	private final double mRadius;
 	private final double mHealing;
 	private final double mThreshold;
-	private final double mPercentDamage;
 
 	public Rejuvenation(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 		mHealing = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, PERCENT_HEAL);
 		mThreshold = HEALTH_LIMIT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_THRESHOLD);
-		mPercentDamage = DJ_MULTIPLIER;
 	}
 
 	@Override
@@ -61,10 +57,6 @@ public class Rejuvenation extends Ability {
 		}
 	}
 
-	public double getDJBonus() {
-		return mPercentDamage;
-	}
-
 	public static Description<Rejuvenation> getDescription() {
 		return new FormattedDescriptionBuilder<>(() -> INFO)
 			.addLine("You and other players within %d")
@@ -74,10 +66,6 @@ public class Rejuvenation extends Ability {
 					stat(a -> a.mHealing, PERCENT_HEAL),
 					stat(HEAL_INTERVAL))
 			.addLine("under %p HP.")
-				.statValues(stat(a -> a.mThreshold, HEALTH_LIMIT))
-			.addLine()
-			.addLine("Increase *Divine Justice*'s bonus").styles(UNDERLINED)
-			.addLine("damage multiplier by +%p.")
-				.statValues(stat(a -> a.mPercentDamage, DJ_MULTIPLIER));
+				.statValues(stat(a -> a.mThreshold, HEALTH_LIMIT));
 	}
 }

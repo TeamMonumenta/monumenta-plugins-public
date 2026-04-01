@@ -87,8 +87,9 @@ public enum ClassAbility {
 	// Hierophant
 	ETHEREAL_ASCENSION("Ethereal Ascension"),
 	HALLOWED_BEAM("Hallowed Beam"),
-	HALLOWED_BEAM_SEAL("Hallowed Beam"), // Used for differentiating L1 and L2
 	KEEPER_VIRTUE("Keeper Virtue"),
+	KEEPER_VIRTUE_HARMING("Keeper Virtue Harming Flare"),
+	KEEPER_VIRTUE_SHIELDING("Keeper Virtue Shielding Flare"),
 
 	// Paladin
 	CHOIR_BELLS("Choir Bells"),

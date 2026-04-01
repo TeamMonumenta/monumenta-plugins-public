@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
+import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtueShieldingFlare;
 import com.playmonumenta.plugins.bosses.bosses.HostileBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Cleric;
@@ -100,8 +101,9 @@ public class SanctifiedArmor extends Ability implements AbilityWithDuration {
 	private double mLastDamage;
 	@Nullable
 	public DamageType mLastDamageType;
-
 	private final SanctifiedArmorCS mCosmetic;
+
+	private @Nullable KeeperVirtueShieldingFlare mKeeperVirtueShieldingFlare;
 
 	public SanctifiedArmor(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -113,6 +115,8 @@ public class SanctifiedArmor extends Ability implements AbilityWithDuration {
 		mEliteDurationExtension = CharmManager.getDuration(player, CHARM_ELITE_DURATION, ELITE_DURATION);
 		mEnhanceHealing = CharmManager.calculateFlatAndPercentValue(player, CHARM_ENHANCE_HEAL, ENHANCE_HEALING);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SanctifiedArmorCS());
+
+		Bukkit.getScheduler().runTask(plugin, () -> mKeeperVirtueShieldingFlare = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, KeeperVirtueShieldingFlare.class));
 	}
 
 	@Override
@@ -129,6 +133,7 @@ public class SanctifiedArmor extends Ability implements AbilityWithDuration {
 				Bukkit.getScheduler().runTaskLater(mPlugin, () ->
 					mHealthLostCounter -= percent, 20);
 
+				// Activate
 				if ((mHealthLostCounter >= HEALTH_LOSS_THRESHOLD || (mPlayer.getHealth() - event.getFinalDamage(false)) / maxHealth <= MAX_HP_THRESHOLD) && !isOnCooldown()) {
 					mDurationExtensionCounter = 0;
 					mPlugin.mEffectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME, new PercentDamageReceived(mDuration, -mResistance) {
@@ -139,6 +144,9 @@ public class SanctifiedArmor extends Ability implements AbilityWithDuration {
 					}.deleteOnAbilityUpdate(true));
 					mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT_NAME, new PercentKnockbackResist(mDuration, mKBR, KBR_EFFECT_NAME).deleteOnAbilityUpdate(true));
 					mCosmetic.sanctOnTrigger(mPlayer.getWorld(), mPlayer, mPlayer.getLocation());
+					if (mKeeperVirtueShieldingFlare != null && mKeeperVirtueShieldingFlare.isLevelTwo()) {
+						mKeeperVirtueShieldingFlare.shieldPlayer(mPlayer);
+					}
 					putOnCooldown();
 				}
 			}

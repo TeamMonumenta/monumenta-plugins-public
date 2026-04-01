@@ -116,14 +116,9 @@ public class TelekinesisCS extends EtherealAscensionCS {
 	}
 
 	@Override
-	public void forceEndAscension(Player player, World world, Location loc) {
+	public void ascensionEnd(Player player, World world, Location loc) {
 		world.playSound(loc, Sound.UI_STONECUTTER_TAKE_RESULT, SoundCategory.PLAYERS, 1.0f, 0.9f);
 		world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.0f, 2.0f);
-	}
-
-	@Override
-	public void ascensionEnd(Player player, World world, Location loc) {
-		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 0.6f, 1.0f);
 		if (mBoulder != null) {
 			mBoulder.remove();
 		}

@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -33,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
@@ -49,8 +51,8 @@ public class Illuminate extends Ability {
 	private static final int ILLUMINATE_BUFF_DURATION = TICKS_PER_SECOND * 4;
 	private static final double ILLUMINATE_SPEED_BUFF = 0.20;
 	private static final double ILLUMINATE_STRENGTH_BUFF = 0.10;
-	private static final double ILLUMINATE_DAMAGE_1 = 11;
-	private static final double ILLUMINATE_DAMAGE_2 = 15;
+	private static final double[] ILLUMINATE_DAMAGE_1 = {10, 12, 15};
+	private static final double[] ILLUMINATE_DAMAGE_2 = {14, 16, 20};
 	private static final double ILLUMINATE_RADIUS = 4.5;
 	private static final float ILLUMINATE_KNOCKBACK = 0.5f;
 	private static final double ILLUMINATE_ENHANCE_RADIUS = 6.0;
@@ -119,7 +121,7 @@ public class Illuminate extends Ability {
 		mTrailDuration = CharmManager.getDuration(mPlayer, CHARM_TRAIL_DURATION, isLevelOne() ? ILLUMINATE_TRAIL_DURATION_1 : ILLUMINATE_TRAIL_DURATION_2);
 		mTrailWidth = CharmManager.getRadius(mPlayer, CHARM_TRAIL_WIDTH, ILLUMINATE_TRAIL_WIDTH);
 
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? ILLUMINATE_DAMAGE_1 : ILLUMINATE_DAMAGE_2);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, AbilityUtils.getRegionScaled(player, isLevelOne() ? ILLUMINATE_DAMAGE_1 : ILLUMINATE_DAMAGE_2));
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ILLUMINATE_RADIUS);
 		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, ILLUMINATE_KNOCKBACK);
 
@@ -311,8 +313,8 @@ public class Illuminate extends Ability {
 			.addLine("a block, it explodes and deals damage")
 			.addLine("to nearby mobs, knocking them back.")
 			.addLine()
-			.addStat("Damage: %d1 (s)")
-				.statValues(stat(a -> a.mDamage, ILLUMINATE_DAMAGE_1))
+			.addStat("Damage: %d1R (s)")
+				.statValues(perRegion(a -> a.mDamage, ILLUMINATE_DAMAGE_1[0], ILLUMINATE_DAMAGE_1[1], ILLUMINATE_DAMAGE_1[2]))
 			.addStat("Radius: %r")
 				.statValues(stat(a -> a.mRadius, ILLUMINATE_RADIUS))
 			.addStat("Effect: +%p Speed for %t")
@@ -332,8 +334,8 @@ public class Illuminate extends Ability {
 			.addLine("Increase *Illuminate*'s damage, trail").styles(UNDERLINED)
 			.addLine("duration, and reduce its cooldown.")
 			.addLine()
-			.addStatComparison("Damage: %d1 -> %d2 (s)")
-				.statValues(stat(ILLUMINATE_DAMAGE_1), stat(a -> a.mDamage, ILLUMINATE_DAMAGE_2))
+			.addStatComparison("Damage: %d1 -> %d2R (s)")
+				.statValues(perRegion(ILLUMINATE_DAMAGE_1[0], ILLUMINATE_DAMAGE_1[1], ILLUMINATE_DAMAGE_1[2]), perRegion(a -> a.mDamage, ILLUMINATE_DAMAGE_2[0], ILLUMINATE_DAMAGE_2[1], ILLUMINATE_DAMAGE_2[2]))
 			.addStatComparison("Duration: %t1 -> %t2")
 				.statValues(stat(ILLUMINATE_TRAIL_DURATION_1), stat(a -> a.mTrailDuration, ILLUMINATE_TRAIL_DURATION_2))
 			.addStatComparison("Cooldown: %t1 -> %t2")

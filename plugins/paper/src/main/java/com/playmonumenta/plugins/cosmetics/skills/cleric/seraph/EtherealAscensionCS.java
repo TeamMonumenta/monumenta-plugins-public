@@ -59,11 +59,8 @@ public class EtherealAscensionCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_BREEZE_SLIDE, 1f, 1.8f);
 	}
 
-	public void forceEndAscension(Player player, World world, Location loc) {
-		world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.0f, 2.0f);
-	}
-
 	public void ascensionEnd(Player player, World world, Location loc) {
 		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 0.6f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.0f, 2.0f);
 	}
 }

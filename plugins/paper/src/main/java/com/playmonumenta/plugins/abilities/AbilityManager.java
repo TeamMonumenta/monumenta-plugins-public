@@ -36,6 +36,8 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.Unwavering;
 import com.playmonumenta.plugins.abilities.cleric.seraph.EtherealAscension;
 import com.playmonumenta.plugins.abilities.cleric.seraph.HallowedBeam;
 import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtue;
+import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtueHarmingFlare;
+import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtueShieldingFlare;
 import com.playmonumenta.plugins.abilities.cleric.seraph.Rejuvenation;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.Cataclysm;
@@ -548,6 +550,8 @@ public class AbilityManager {
 			EtherealAscension.INFO,
 			HallowedBeam.INFO,
 			KeeperVirtue.INFO,
+			KeeperVirtueShieldingFlare.INFO,
+			KeeperVirtueHarmingFlare.INFO,
 
 			//********** WARLOCK **********//
 			// REAPER

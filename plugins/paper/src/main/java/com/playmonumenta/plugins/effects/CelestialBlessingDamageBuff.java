@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.CelestialBlessingCS;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -45,7 +46,8 @@ public class CelestialBlessingDamageBuff extends PercentDamageDealt {
 			if (event.getType() == DamageEvent.DamageType.MELEE && event.getDamager() instanceof final Player player && player.getCooledAttackStrength(0.5f) > 0.9) {
 				mMelee = true;
 			}
-			if (event.getType() == DamageEvent.DamageType.PROJECTILE && event.getDamager() instanceof final Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
+			if ((event.getType() == DamageEvent.DamageType.PROJECTILE && event.getDamager() instanceof final Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true))
+				|| (event.getAbility() != null && event.getAbility() == ClassAbility.ETHEREAL_ASCENSION)) {
 				mRanged = true;
 			}
 		}

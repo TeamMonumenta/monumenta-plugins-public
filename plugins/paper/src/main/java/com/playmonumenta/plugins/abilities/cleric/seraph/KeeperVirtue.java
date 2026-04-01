@@ -3,40 +3,21 @@ package com.playmonumenta.plugins.abilities.cleric.seraph;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityTrigger;
-import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.AbilityWithDuration;
-import com.playmonumenta.plugins.abilities.AbilityWithHealthBar;
+import com.playmonumenta.plugins.abilities.AbilityWithCustomDisplay;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
-import com.playmonumenta.plugins.abilities.cleric.Crusade;
-import com.playmonumenta.plugins.bosses.bosses.abilities.KeeperVirtueBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.seraph.KeeperVirtueCS;
-import com.playmonumenta.plugins.effects.PercentHeal;
-import com.playmonumenta.plugins.effects.PercentSpeed;
-import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.managers.GlowingManager;
-import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.math3.util.FastMath;
@@ -46,67 +27,62 @@ import org.bukkit.Material;
 import org.bukkit.entity.Allay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
-import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.GREY;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
-public class KeeperVirtue extends Ability implements AbilityWithHealthBar, AbilityWithDuration {
-	private static final int VIRTUE_COOLDOWN = 20 * 20;
-	private static final int VIRTUE_DAMAGE_R2 = 7;
-	private static final int VIRTUE_DAMAGE_R3 = 10;
-	private static final int VIRTUE_ATTACK_DELAY = 25;
-	private static final int VIRTUE_ATTACK_DRAIN = 2;
-	private static final int VIRTUE_ACTION_RANGE = 8;
-	private static final int VIRTUE_DETECTION_RANGE = 16;
-	private static final double VIRTUE_HEALING = 0.05;
-	private static final int VIRTUE_HEAL_DELAY = 10;
-	private static final int VIRTUE_HEAL_DRAIN = 2;
-	private static final double VIRTUE_HEAL_LOWER_THRESHOLD = 0.6;
-	private static final double VIRTUE_HEAL_UPPER_THRESHOLD = 0.7;
-	private static final int VIRTUE_REGENERATION = 1; // special implementation as the allay has antiheal - this is a multiplier, not hp/s
-	private static final int VIRTUE_MOVESPEED = 5; // blocks per second
-	private static final double VIRTUE_SPEED = 0.15;
-	private static final int VIRTUE_SPEED_RADIUS = 9;
-	private static final double VIRTUE_VULN = 0.15;
-	private static final int VIRTUE_VULN_DURATION = 4 * 20;
-	private static final int VIRTUE_HEALTH_1 = 30;
-	private static final int VIRTUE_HEALTH_2 = 35;
-	private static final int VIRTUE_MINIMUM_HEALS = 5;
+public class KeeperVirtue extends Ability implements AbilityWithCustomDisplay {
+	public static final int HARMING_COOLDOWN_1 = 5 * 20;
+	public static final int HARMING_COOLDOWN_2 = 4 * 20;
+	public static final int SHIELDING_COOLDOWN_1 = 10 * 20;
+	public static final int SHIELDING_COOLDOWN_2 = 8 * 20;
+	private static final int DAMAGE_R2 = 12;
+	private static final int DAMAGE_TOR_R2 = 16;
+	private static final int DAMAGE_R3 = 16;
+	private static final int DAMAGE_TOR_R3 = 20;
+	private static final double HARMING_RADIUS = 1.5;
+	private static final int FIRE_DURATION = 5 * 20;
+	private static final double ABSORPTION = 0.2;
+	private static final int ABSORPTION_DURATION = 6 * 20;
+	private static final int HIT_NEGATIONS = 1;
+	private static final int HIT_NEGATION_DURATION = 4 * 20;
+	private static final int ENHANCE_STUN_DURATION = 10;
+	private static final int ACTION_TIME = 8;
+	private static final int ACTION_RANGE = 30;
+	private static final double REDIRECT_RANGE = 3;
+	public static final int HARMING_FLARE_CAPACITY = 2;
+	public static final int SHIELDING_FLARE_CAPACITY = 2;
+	private static final double VIRTUE_MOVESPEED = 4;
 
 	public static final String CHARM_DAMAGE = "Keeper Virtue Damage";
-	public static final String CHARM_ATTACK_DELAY = "Keeper Virtue Attack Delay";
-	public static final String CHARM_ATTACK_DRAIN = "Keeper Virtue Attack Health Drain";
+	public static final String CHARM_HARMING_RADIUS = "Keeper Virtue Radius";
+	public static final String CHARM_FIRE_DURATION = "Keeper Virtue Fire Duration";
+	public static final String CHARM_ABSORPTION = "Keeper Virtue Absorption";
+	public static final String CHARM_ABSORPTION_DURATION = "Keeper Virtue Absorption Duration";
+	public static final String CHARM_HIT_NEGATIONS = "Keeper Virtue Hit Negations";
+	public static final String CHARM_HIT_NEGATION_DURATION = "Keeper Virtue Hit Negation Duration";
+	public static final String CHARM_TOR_DAMAGE = "Keeper Virtue Touch of Radiance Damage";
+	public static final String CHARM_TOR_STUN_DURATION = "Keeper Virtue Touch of Radiance Stun Duration";
+	public static final String CHARM_HARMING_COOLDOWN = "Keeper Virtue Harming Flare Cooldown";
+	public static final String CHARM_SHIELDING_COOLDOWN = "Keeper Virtue Shielding Flare Cooldown";
+	public static final String CHARM_ACTION_TIME = "Keeper Virtue Action Time";
 	public static final String CHARM_ACTION_RANGE = "Keeper Virtue Action Range";
-	public static final String CHARM_DETECTION_RANGE = "Keeper Virtue Detection Range";
-	public static final String CHARM_HEALING = "Keeper Virtue Healing";
-	public static final String CHARM_HEAL_DELAY = "Keeper Virtue Heal Delay";
-	public static final String CHARM_HEAL_DRAIN = "Keeper Virtue Heal Health Drain";
-	public static final String CHARM_HEAL_LOWER_THRESHOLD = "Keeper Virtue Heal Lower Threshold";
-	public static final String CHARM_HEAL_UPPER_THRESHOLD = "Keeper Virtue Heal Upper Threshold";
-	public static final String CHARM_COOLDOWN = "Keeper Virtue Cooldown";
-	public static final String CHARM_REGENERATION = "Keeper Virtue Regeneration";
-	public static final String CHARM_MOVEMENT_SPEED = "Keeper Virtue Movement Speed";
-	public static final String CHARM_SPEED = "Keeper Virtue Speed Amplifier";
-	public static final String CHARM_SPEED_RADIUS = "Keeper Virtue Speed Radius";
-	public static final String CHARM_VULN = "Keeper Virtue Vulnerability Amplifier";
-	public static final String CHARM_VULN_DURATION = "Keeper Virtue Vulnerability Duration";
-	public static final String CHARM_HEALTH = "Keeper Virtue Health";
+	public static final String CHARM_REDIRECT_RANGE = "Keeper Virtue Redirect Range";
+	public static final String CHARM_HARMING = "Keeper Virtue Harming Flares";
+	public static final String CHARM_SHIELDING = "Keeper Virtue Shielding Flares";
 
 	public static final Style VIRTUE_COLOR = Style.style(TextColor.color(0xD9A336));
+	public static final Style SHIELDING_COLOR = Style.style(TextColor.color(0x33DDCC));
+	public static final Style HARMING_COLOR = Style.style(TextColor.color(0xDD3333));
 
-	private @Nullable Allay mBoss = null;
-	private @Nullable LivingEntity mTarget;
-	private VirtueMode mMode = VirtueMode.INACTIVE;
-	private boolean mModeIsLocked = false;
-	private int mLastToggleTick = 0;
-	private static final Map<Allay, Player> playerVirtueMap = new HashMap<>(); // A map to make sure only one Virtue can heal a player at a time
+	public static final Map<Allay, Player> mVirtuePlayerMap = new HashMap<>();
+	public @Nullable Allay mBoss = null;
+	public @Nullable LivingEntity mTarget = null; // Only used for turning the Virtue
 
 	public static final AbilityInfo<KeeperVirtue> INFO =
 		new AbilityInfo<>(KeeperVirtue.class, "Keeper Virtue", KeeperVirtue::new)
@@ -114,79 +90,67 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 			.scoreboardId("KeeperVirtue")
 			.shorthandName("KV")
 			.descriptions(getDescription1(), getDescription2())
-			.simpleDescription("An angelic spirit follows you, supporting nearby players and attacking Heretics but losing health in the process.")
-			.cooldown(VIRTUE_COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("toggleHeal", "toggle (only heal)", a -> a.changeModeCast(VirtueMode.ACTIVE_SUPPORT), new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).lookDirections(AbilityTrigger.LookDirection.UP).enabled(false)))
-			.addTrigger(new AbilityTriggerInfo<>("toggleDamage", "toggle (only damage)", a -> a.changeModeCast(VirtueMode.ACTIVE_COMBAT), new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).lookDirections(AbilityTrigger.LookDirection.DOWN).enabled(false)))
-			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", a -> a.changeModeCast(VirtueMode.ACTIVE_GENERIC), new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)))
+			.simpleDescription("An angelic spirit follows you, supporting nearby players and attacking mobs.")
 			.displayItem(Material.MUSIC_DISC_RELIC);
 
-	private final double mDamage;
-	private final int mAttackDelay;
-	private final double mAttackDrain;
-	private final double mActionRange;
-	private final double mDetectionRange;
-	private final double mHealing;
-	private final int mHealDelay;
-	private final double mHealDrain;
-	private final double mHealLowerThreshold;
-	private final double mHealUpperThreshold;
-	private final double mRegeneration;
-	private final double mMoveSpeed;
-	private final double mSpeedAmplifier;
-	private final double mSpeedRadius;
-	private final double mVulnAmplifier;
-	private final int mVulnDuration;
-	private final double mHealth;
-	private final int mMinimumHeals;
-	private final KeeperVirtueCS mCosmetic;
+	public final double mDamage;
+	public final double mDamageToR;
+	public final double mHarmingRadius;
+	public final int mFireDuration;
+	public final double mAbsorption;
+	public final int mAbsorptionDuration;
+	public final int mHitNegations;
+	public final int mHitNegationDuration;
+	public final int mEnhanceStunDuration;
+	public final int mActionTime;
+	public final double mActionRange;
+	public final double mRedirectRange;
+	public final int mHarmingCooldown;
+	public final int mShieldingCooldown;
+
+	private final int mHarmingFlareCapacity;
+	private final int mShieldingFlareCapacity;
+	public int mTicksSinceTargetChance = 0;
+
+	private @Nullable KeeperVirtueShieldingFlare mKeeperVirtueShieldingFlare;
+	private @Nullable KeeperVirtueHarmingFlare mKeeperVirtueHarmingFlare;
+	public final KeeperVirtueCS mCosmetic;
 
 	public KeeperVirtue(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? VIRTUE_DAMAGE_R3 : VIRTUE_DAMAGE_R2);
-		mAttackDelay = CharmManager.getDuration(player, CHARM_ATTACK_DELAY, VIRTUE_ATTACK_DELAY);
-		mAttackDrain = CharmManager.calculateFlatAndPercentValue(player, CHARM_ATTACK_DRAIN, VIRTUE_ATTACK_DRAIN);
-		mActionRange = CharmManager.getRadius(player, CHARM_ACTION_RANGE, VIRTUE_ACTION_RANGE);
-		mDetectionRange = CharmManager.getRadius(player, CHARM_DETECTION_RANGE, VIRTUE_DETECTION_RANGE);
-		mHealing = CharmManager.getExtraPercent(player, CHARM_HEALING, VIRTUE_HEALING);
-		mHealDelay = CharmManager.getDuration(player, CHARM_HEAL_DELAY, VIRTUE_HEAL_DELAY);
-		mHealDrain = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL_DRAIN, VIRTUE_HEAL_DRAIN);
-		mHealLowerThreshold = VIRTUE_HEAL_LOWER_THRESHOLD + CharmManager.getLevelPercentDecimal(player, CHARM_HEAL_LOWER_THRESHOLD);
-		mHealUpperThreshold = VIRTUE_HEAL_UPPER_THRESHOLD + CharmManager.getLevelPercentDecimal(player, CHARM_HEAL_UPPER_THRESHOLD);
-		mRegeneration = CharmManager.getExtraPercent(player, CHARM_REGENERATION, VIRTUE_REGENERATION);
-		mMoveSpeed = CharmManager.calculateFlatAndPercentValue(player, CHARM_MOVEMENT_SPEED, VIRTUE_MOVESPEED);
-		mSpeedAmplifier = VIRTUE_SPEED + CharmManager.getLevelPercentDecimal(player, CHARM_SPEED);
-		mSpeedRadius = CharmManager.getRadius(player, CHARM_SPEED_RADIUS, VIRTUE_SPEED_RADIUS);
-		mVulnAmplifier = isLevelTwo() ? VIRTUE_VULN + CharmManager.getLevelPercentDecimal(player, CHARM_VULN) : 0;
-		mVulnDuration = CharmManager.getDuration(player, CHARM_VULN_DURATION, VIRTUE_VULN_DURATION);
-		mHealth = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEALTH, isLevelOne() ? VIRTUE_HEALTH_1 : VIRTUE_HEALTH_2);
-		mMinimumHeals = VIRTUE_MINIMUM_HEALS;
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? DAMAGE_R3 : DAMAGE_R2);
+		mDamageToR = CharmManager.calculateFlatAndPercentValue(player, CHARM_TOR_DAMAGE, CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? DAMAGE_TOR_R3 : DAMAGE_TOR_R2));
+		mHarmingRadius = CharmManager.getRadius(player, CHARM_HARMING_RADIUS, HARMING_RADIUS);
+		mFireDuration = CharmManager.getDuration(player, CHARM_FIRE_DURATION, FIRE_DURATION);
+		mAbsorption = ABSORPTION + CharmManager.getLevelPercentDecimal(player, CHARM_ABSORPTION);
+		mAbsorptionDuration = CharmManager.getDuration(player, CHARM_ABSORPTION_DURATION, ABSORPTION_DURATION);
+		mHitNegations = HIT_NEGATIONS + (int) CharmManager.getLevel(player, CHARM_HIT_NEGATIONS);
+		mHitNegationDuration = CharmManager.getDuration(player, CHARM_HIT_NEGATION_DURATION, HIT_NEGATION_DURATION);
+		mEnhanceStunDuration = CharmManager.getDuration(player, CHARM_TOR_STUN_DURATION, ENHANCE_STUN_DURATION);
+		mActionTime = CharmManager.getDuration(player, CHARM_ACTION_TIME, ACTION_TIME);
+		mActionRange = CharmManager.getRadius(player, CHARM_ACTION_RANGE, ACTION_RANGE);
+		mRedirectRange = CharmManager.getRadius(player, CHARM_REDIRECT_RANGE, REDIRECT_RANGE);
+		mHarmingCooldown = CharmManager.getCooldown(player, CHARM_HARMING_COOLDOWN, isLevelTwo() ? HARMING_COOLDOWN_2 : HARMING_COOLDOWN_1);
+		mShieldingCooldown = CharmManager.getCooldown(player, CHARM_SHIELDING_COOLDOWN, isLevelTwo() ? SHIELDING_COOLDOWN_2 : SHIELDING_COOLDOWN_1);
+		mHarmingFlareCapacity = HARMING_FLARE_CAPACITY + (int) CharmManager.getLevel(player, CHARM_HARMING);
+		mShieldingFlareCapacity = SHIELDING_FLARE_CAPACITY + (int) CharmManager.getLevel(player, CHARM_SHIELDING);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new KeeperVirtueCS());
-	}
-
-	public enum VirtueMode {
-		INACTIVE,
-		ACTIVE_GENERIC,
-		ACTIVE_COMBAT,
-		ACTIVE_SUPPORT
+		Bukkit.getScheduler().runTask(plugin, () -> mKeeperVirtueShieldingFlare = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, KeeperVirtueShieldingFlare.class));
+		Bukkit.getScheduler().runTask(plugin, () -> mKeeperVirtueHarmingFlare = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, KeeperVirtueHarmingFlare.class));
 	}
 
 	@Override
 	public void invalidate() {
 		if (mBoss != null) {
-			playerVirtueMap.remove(mBoss);
 			mBoss.remove();
+			mVirtuePlayerMap.remove(mBoss);
 			mBoss = null;
-			mTarget = null;
 		}
 	}
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (isOnCooldown()) {
-			return;
-		}
 		if (mBoss != null && !mBoss.isValid()) {
 			mBoss = null;
 		}
@@ -196,24 +160,11 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 				MMLog.warning("Failed to summon KeeperVirtue");
 				return;
 			}
-
-			KeeperVirtueBoss keeperVirtueBoss = BossUtils.getBossOfClass(mBoss, KeeperVirtueBoss.class);
-			if (keeperVirtueBoss == null) {
-				MMLog.warning("Failed to get KeeperVirtueBoss");
-				return;
-			}
-			keeperVirtueBoss.spawn(mPlayer, mDamage, mAttackDelay, mAttackDrain, mHealing, mHealDelay, mHealDrain, mVulnAmplifier, mVulnDuration, this, mCosmetic);
-			ClientModHandler.updateAbility(mPlayer, ClassAbility.KEEPER_VIRTUE);
-			EntityUtils.setMaxHealthAndHealth(mBoss, mHealth);
-			GlowingManager.startGlowing(mBoss, mCosmetic.getGlowColor(1), 40, GlowingManager.PLAYER_ABILITY_PRIORITY, mPlayer::equals, "KeeperVirtueGlowing");
-			if (mMode == VirtueMode.INACTIVE) {
-				changeMode(VirtueMode.INACTIVE);
-			}
+			mBoss.customName(mCosmetic.getComponentName());
+			mVirtuePlayerMap.put(mBoss, mPlayer);
 
 			cancelOnDeath(new BukkitRunnable() {
-				int mTicksElapsed = 0;
 				double mRadian = FastUtils.randomDoubleInRange(0, Math.PI);
-				int mHeals = 0;
 
 				@Override
 				public void run() {
@@ -224,299 +175,135 @@ public class KeeperVirtue extends Ability implements AbilityWithHealthBar, Abili
 						this.cancel();
 						return;
 					}
-					boolean isLockedDamage = mModeIsLocked && mMode == VirtueMode.ACTIVE_COMBAT;
-					boolean isLockedHealing = mModeIsLocked && mMode == VirtueMode.ACTIVE_SUPPORT;
-
-					mTarget = mBoss.getTarget();
-					Location pLoc = mPlayer.getLocation();
-					List<Player> nearbyPlayers = EntityUtils.getNearestPlayers(pLoc, mDetectionRange);
-					nearbyPlayers.remove(mPlayer);
-					if (!nearbyPlayers.isEmpty() && !(mTarget instanceof Player) && mBoss != null && !isLockedDamage) {
-						// Reset target if a player is found while targeting a mob
-						nearbyPlayers.removeIf(player -> mPlugin.mEffectManager.getEffects(player, PercentHeal.class).stream().anyMatch(percentHeal -> percentHeal.getValue() < -0.995));
-						nearbyPlayers.removeIf(player -> player.getHealth() > EntityUtils.getMaxHealth(player) * mHealLowerThreshold);
-						nearbyPlayers.removeIf(playerVirtueMap::containsValue);
-						if (!nearbyPlayers.isEmpty()) {
-							mTarget = null;
-						}
-					}
-					if (mMode != VirtueMode.INACTIVE && (mTarget == null || mTarget.isDead() || mTarget.getHealth() <= 0 || mTarget.getLocation().distance(pLoc) > mDetectionRange)) {
-						// Reset target
-						mTarget = null;
-						if (mBoss != null) {
-							mBoss.setTarget(null);
-						}
-						playerVirtueMap.remove(mBoss);
-						if (!nearbyPlayers.isEmpty() && !isLockedDamage) {
-							Collections.shuffle(nearbyPlayers);
-							Player randomPlayer = nearbyPlayers.get(0);
-							if (randomPlayer != null) {
-								changeMode(VirtueMode.ACTIVE_SUPPORT);
-								mBoss.setTarget(randomPlayer);
-								mTarget = randomPlayer;
-								playerVirtueMap.put(mBoss, randomPlayer);
-								mHeals = 0;
-							}
-						}
-						List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(pLoc, mDetectionRange, mBoss);
-						if (!nearbyMobs.isEmpty() && mTarget == null && mBoss != null && !isLockedHealing) {
-							nearbyMobs.removeIf(mob -> !LocationUtils.hasLineOfSight(Objects.requireNonNull(mBoss), mob));
-							nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
-							nearbyMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC));
-							nearbyMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob));
-							if (!nearbyMobs.isEmpty()) {
-								Collections.shuffle(nearbyMobs);
-								LivingEntity randomMob = nearbyMobs.get(0);
-								if (nearbyMobs.contains(EntityUtils.getEntityAtCursor(mPlayer, mDetectionRange))) {
-									randomMob = EntityUtils.getEntityAtCursor(mPlayer, mDetectionRange);
-								}
-								if (randomMob != null) {
-									changeMode(VirtueMode.ACTIVE_COMBAT);
-									mBoss.setTarget(randomMob);
-									mTarget = randomMob;
-								}
-							}
-						}
-					}
 
 					// movement
 					if (mBoss == null) {
-						mTarget = null;
 						return;
 					}
 					Location allayLoc = mBoss.getLocation();
-					if (mTarget != null && !mTarget.isDead() && (mMode == VirtueMode.ACTIVE_COMBAT || mMode == VirtueMode.ACTIVE_SUPPORT)) {
-						Vector direction = LocationUtils.getDirectionTo(LocationUtils.getEntityCenter(mTarget), allayLoc);
-						double yDiff = (mTarget.getLocation().getY() - mBoss.getLocation().getY()) * 0.25;
-						if (yDiff > direction.getY()) {
-							direction.setY(yDiff);
-						}
-						allayLoc.setDirection(direction);
-						double range = mActionRange + 0.5 * mTarget.getWidth();
-						// Slow it down when close
-						if (allayLoc.distance(LocationUtils.getEntityCenter(mTarget)) < range) {
-							direction.multiply(Math.max(0, (allayLoc.distance(LocationUtils.getEntityCenter(mTarget)) - range + 2) / 2));
-						}
-						// set speed
-						allayLoc.add(direction.multiply(mMoveSpeed / 20));
-						// attack
-						if (new Hitbox.SphereHitbox(allayLoc, range - 2).getBoundingBox().overlaps(mTarget.getBoundingBox())) {
-							if (mMode == VirtueMode.ACTIVE_COMBAT) {
-								mBoss.attack(mTarget);
-								if (mBoss == null) {
-									this.cancel();
-									return;
-								}
-							} else if (mMode == VirtueMode.ACTIVE_SUPPORT && mTarget instanceof Player player && playerVirtueMap.get(mBoss) == player) {
-								mHeals += keeperVirtueBoss.healPlayer(player);
-								if (mBoss == null) {
-									this.cancel();
-									return;
-								}
-								if (player.getHealth() >= EntityUtils.getMaxHealth(player) * mHealUpperThreshold && (mHeals >= mMinimumHeals || player.getHealth() >= EntityUtils.getMaxHealth(player))) {
-									mBoss.setTarget(null);
-									mTarget = null;
-									playerVirtueMap.remove(mBoss);
-									mHeals = 0;
-								}
-							}
-						}
+
+					Location playerLoc = LocationUtils.getEntityCenter(mPlayer);
+					Vector direction = LocationUtils.getDirectionTo(playerLoc, allayLoc);
+					Vector direction2 = direction.clone();
+					double distance = allayLoc.distance(playerLoc);
+					// Teleport to the player when very far away
+					if (distance > 32) {
+						allayLoc = playerLoc.clone().subtract(direction2.multiply(-2.5));
 					} else {
-						// Follow player if there's no valid targets around
-						Location playerLoc = LocationUtils.getEntityCenter(mPlayer);
-						Vector direction = LocationUtils.getDirectionTo(playerLoc, allayLoc);
-						Vector direction2 = direction.clone();
-						Location allayLoc2 = allayLoc.clone();
-						allayLoc2.setY(playerLoc.getY());
-						double distance = allayLoc2.distance(playerLoc);
-						// Teleport to the player when very far away
-						if (distance > 2 * mDetectionRange) {
-							allayLoc = playerLoc.clone().subtract(direction2.multiply(2));
+						if (distance < 4.5) {
+							direction2.multiply(0.5 * (distance - 2.5)).setY(direction.getY());
 						} else {
-							if (distance < 4) {
-								direction2.multiply(Math.max(0, 0.5 * (distance - 2))).setY(direction.getY());
-							} else {
-								direction2.multiply(Math.pow(1.2, Math.min(4, distance - 4))).setY(direction.getY());
-							}
-							allayLoc.add(direction2.clone().multiply(mMoveSpeed / 20));
+							direction2.multiply(Math.pow(1.25, Math.min(4.5, distance - 4.5))).setY(direction.getY());
 						}
+						allayLoc.add(direction2.clone().multiply(VIRTUE_MOVESPEED / 20));
+					}
+					if (mTarget != null) {
+						// Face the target when shooting flares
+						allayLoc.setDirection(LocationUtils.getDirectionTo(mTarget.getLocation(), allayLoc));
+					} else {
 						allayLoc.setDirection(direction.clone().setY(0));
 					}
+
 					// bobbing
 					mBoss.teleport(allayLoc.clone().add(0, FastMath.sin(mRadian) * 0.05, 0));
 					mRadian += Math.PI / 20D; // Finishes a sin bob in (20 * 2) ticks
-					mTicksElapsed++;
 				}
 			}.runTaskTimer(mPlugin, 0, 1));
 		}
 
-		if (mBoss != null) {
-			ClientModHandler.updateAbility(mPlayer, ClassAbility.KEEPER_VIRTUE);
-			mPlugin.mEffectManager.addEffect(mBoss, "KeeperVirtueHealing", new PercentHeal(10, 0) {
-				@Override
-				public boolean entityRegainHealthEvent(EntityRegainHealthEvent event) {
-					// If inactive, regenerate 2 hp/s (default allay regen). If active but without a target, regenerate 1 hp/s. If active with a target, don't regenerate.
-					if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.REGEN) {
-						event.setAmount(mRegeneration * event.getAmount() * (mMode == VirtueMode.INACTIVE ? 1 : mTarget == null ? 0.5 : 0));
-						ClientModHandler.updateAbility(mPlayer, ClassAbility.KEEPER_VIRTUE);
-					}
-					return true;
-				}
-			});
-			if (mMode == VirtueMode.INACTIVE) {
-				List<Player> players = isLevelTwo() ? EntityUtils.getNearestPlayers(mPlayer.getLocation(), mSpeedRadius) : List.of(mPlayer);
-				for (Player p : players) {
-					mPlugin.mEffectManager.addEffect(p, "KeeperVirtueSpeed", new PercentSpeed(10, mSpeedAmplifier, "KeeperVirtueSpeed").displaysTime(false));
-				}
-			}
-			double percent = getRemainingAbilityHealth() / getInitialAbilityHealth();
-			GlowingManager.startGlowing(mBoss, mCosmetic.getGlowColor(percent), 10, GlowingManager.PLAYER_ABILITY_PRIORITY, mPlayer::equals, "KeeperVirtueGlowing");
+		if (mTicksSinceTargetChance > 15 && mTarget != null) {
+			mTarget = null;
 		}
+		mTicksSinceTargetChance += 5;
 	}
 
-	public static boolean allayBelongsTo(Allay allay, Player player) {
-		KeeperVirtueBoss keeperVirtueBoss = BossUtils.getBossOfClass(allay, KeeperVirtueBoss.class);
-		return keeperVirtueBoss != null && keeperVirtueBoss.mPlayer == player;
-	}
-
-	public boolean changeModeCast(VirtueMode mode) {
-		if (mBoss == null || Bukkit.getCurrentTick() - mLastToggleTick < 5) {
-			return false;
-		}
-		KeeperVirtueBoss keeperVirtueBoss = BossUtils.getBossOfClass(mBoss, KeeperVirtueBoss.class);
-		if (keeperVirtueBoss == null) {
-			MMLog.warning("Failed to get KeeperVirtueBoss");
-			return false;
-		}
-		keeperVirtueBoss.resetActionTicks();
-		if (mMode == VirtueMode.INACTIVE) {
-			changeMode(mode);
-			mCosmetic.changeModeCast(mBoss, true);
-			if (mode != VirtueMode.ACTIVE_GENERIC) {
-				mModeIsLocked = true;
-			}
-		} else {
-			changeMode(VirtueMode.INACTIVE);
-			mCosmetic.changeModeCast(mBoss, false);
-			mModeIsLocked = false;
-		}
-		mLastToggleTick = Bukkit.getCurrentTick();
-		return true;
-	}
-
-	public void changeMode(VirtueMode newMode) {
-		if (mBoss == null) {
-			return;
-		}
-		mBoss.getEquipment().setItemInMainHand(mCosmetic.getHeldItem(newMode));
-		if (newMode == VirtueMode.INACTIVE) {
-			mPlugin.mEffectManager.clearEffects(mBoss, "KeeperVirtueHealing");
-		}
-		playerVirtueMap.remove(mBoss);
-		mMode = newMode;
-		mTarget = null;
-		mBoss.setTarget(null);
+	public static boolean virtueBelongsTo(Allay allay, Player player) {
+		return mVirtuePlayerMap.get(allay) != null && mVirtuePlayerMap.get(allay) == player;
 	}
 
 	@Override
-	public @Nullable String getMode() {
-		VirtueMode mode;
-		if (!mModeIsLocked) {
-			// If not locked, use generic always
-			mode = (mMode == VirtueMode.INACTIVE ? VirtueMode.INACTIVE : VirtueMode.ACTIVE_GENERIC);
-		} else {
-			mode = mMode;
+	public Component customDisplayComponent() {
+		Component display = Component.text("");
+		if (mKeeperVirtueShieldingFlare == null || mKeeperVirtueHarmingFlare == null) {
+			return display;
 		}
-		return mode.name().toLowerCase(Locale.ROOT);
+		for (int i = 0; i < mShieldingFlareCapacity; i++) {
+			display = display.append(Component.text("⏺", i < mKeeperVirtueShieldingFlare.getCharges() ? SHIELDING_COLOR : GREY));
+		}
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.KEEPER_VIRTUE_SHIELDING)) {
+			display = display.append(Component.text(" " + (int) Math.ceil(mPlugin.mTimers.getCooldown(mPlayer.getUniqueId(), ClassAbility.KEEPER_VIRTUE_SHIELDING) / 20.0) + "s", SHIELDING_COLOR));
+		}
+
+		if (mShieldingFlareCapacity > 0 && mHarmingFlareCapacity > 0) {
+			display = display.append(Component.text(" "));
+		}
+
+		for (int i = 0; i < mHarmingFlareCapacity; i++) {
+			display = display.append(Component.text("⏺", i < mKeeperVirtueHarmingFlare.getCharges() ? HARMING_COLOR : GREY));
+		}
+		if (mPlugin.mTimers.isAbilityOnCooldown(mPlayer.getUniqueId(), ClassAbility.KEEPER_VIRTUE_HARMING)) {
+			display = display.append(Component.text(" " + (int) Math.ceil(mPlugin.mTimers.getCooldown(mPlayer.getUniqueId(), ClassAbility.KEEPER_VIRTUE_HARMING) / 20.0) + "s", HARMING_COLOR));
+		}
+		return display;
 	}
 
 	private static Description<KeeperVirtue> getDescription1() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
-			.addTrigger(2)
 			.addDashedLine()
-			.addLine("Gain a *Virtue* with %d1 HP that follows you around").styles(VIRTUE_COLOR)
-				.statValues(stat(a -> a.mHealth, VIRTUE_HEALTH_1))
-			.addLine("and can be healed with your *Hallowed Beam*.").styles(UNDERLINED)
-			.addLine("Activate to swap it between being active or inactive.")
+			.addLine("Summon a *Virtue* that holds %d *Shielding Flares*").styles(VIRTUE_COLOR, SHIELDING_COLOR)
+				.statValues(stat(a -> a.mShieldingFlareCapacity, SHIELDING_FLARE_CAPACITY))
+			.addLine("and %d *Harming Flares*.").styles(HARMING_COLOR)
+				.statValues(stat(a -> a.mHarmingFlareCapacity, HARMING_FLARE_CAPACITY))
 			.addLine()
-			.addLine("While inactive, the *Virtue* stays near you,").styles(VIRTUE_COLOR)
-			.addLine("granting you speed and regenerating its HP.")
-			.addStat("Effect: +%p Speed")
-				.statValues(stat(a -> a.mSpeedAmplifier, VIRTUE_SPEED))
-			.addStat("Virtue Regen: +%d HP every %t")
-				.statValues(
-					stat(a -> a.mRegeneration, VIRTUE_REGENERATION),
-					stat(10))
+			.addLine("Casting *Hand of Light*, *Touch of Radiance* or").styles(UNDERLINED, UNDERLINED)
+			.addLine("*Hallowed Beam* on a player will send a *Shielding*").styles(UNDERLINED, SHIELDING_COLOR)
+			.addLine("*Flare* to that player, buffing them.").styles(SHIELDING_COLOR)
 			.addLine()
-			.addLine("While active, the *Virtue* finds players below %p HP").styles(VIRTUE_COLOR)
-				.statValues(stat(a -> a.mHealLowerThreshold, VIRTUE_HEAL_LOWER_THRESHOLD))
-			.addLine("to heal and loses %d HP per heal.")
-				.statValues(stat(a -> a.mHealDrain, VIRTUE_HEAL_DRAIN))
-			.addLine("*(Will heal %p HP, then continues to heal until*").styles(DARK_GREY)
-				.statValues(stat(a -> a.mMinimumHeals * a.mHealing, VIRTUE_MINIMUM_HEALS * VIRTUE_HEALING))
-			.addLine("*the player reaches at least %p HP)*").styles(DARK_GREY)
-				.statValues(stat(a -> a.mHealUpperThreshold, VIRTUE_HEAL_UPPER_THRESHOLD))
-			.addStat("Healing: %p HP every %t")
-				.statValues(
-					stat(a -> a.mHealing, VIRTUE_HEALING),
-					stat(a -> a.mHealDelay, VIRTUE_HEAL_DELAY))
+			.addStat("Effect: +%p Absorption for %t")
+				.statValues(stat(a -> a.mAbsorption, ABSORPTION), stat(a -> a.mAbsorptionDuration, ABSORPTION_DURATION))
+			.addStat("Effect: %d Hit Blocked (m/p) for %t")
+				.statValues(stat(a -> a.mHitNegations, HIT_NEGATIONS), stat(a -> a.mHitNegationDuration, HIT_NEGATION_DURATION))
+			.addStat("Cooldown: %t1 (per Shielding Flare)")
+				.statValues(stat(a -> a.mShieldingCooldown, SHIELDING_COOLDOWN_1))
 			.addLine()
-			.addLine("If there are no players to heal, the *Virtue* finds").styles(VIRTUE_COLOR)
-			.addLine("*Heretics* and attacks them, losing %d HP per attack.").styles(Cleric.HERETIC_COLOR)
-				.statValues(stat(a -> a.mAttackDrain, VIRTUE_ATTACK_DRAIN))
-			.addStat("Damage: %d (s) every %t")
-				.statValues(
-					perRegion(a -> a.mDamage, VIRTUE_DAMAGE_R2, VIRTUE_DAMAGE_R3),
-					stat(a -> a.mAttackDelay, VIRTUE_ATTACK_DELAY))
+			.addLine("Attacks, projectiles, *Hallowed Beam* and *Ethereal*").styles(UNDERLINED, UNDERLINED)
+			.addLine("*Ascension* will send a *Harming Flare* to the attacked").styles(UNDERLINED, HARMING_COLOR)
+			.addLine("mob, or the closest mob within %d blocks if it died.")
+				.statValues(stat(a -> a.mRedirectRange, REDIRECT_RANGE))
 			.addLine()
-			.addStat("Vision Range: %r")
-				.statValues(stat(a -> a.mDetectionRange, VIRTUE_DETECTION_RANGE))
-			.addStat("Cooldown: %t (when the Virtue dies)")
-				.statValues(cooldown(VIRTUE_COOLDOWN))
+			.addStat("Damage: %d0R (s)")
+				.statValues(perRegion(a -> a.mDamage, DAMAGE_R2, DAMAGE_R3))
+			.addStat("Effect: Fire for %t")
+				.statValues(stat(a -> a.mFireDuration, FIRE_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mHarmingRadius, HARMING_RADIUS))
+			.addStat("Cooldown: %t1 (per Harming Flare)")
+				.statValues(stat(a -> a.mHarmingCooldown, HARMING_COOLDOWN_1))
 			.addDashedLine();
 	}
 
 	private static Description<KeeperVirtue> getDescription2() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
 			.addDashedLine()
-			.addLine("Increase the *Virtue*'s health.").styles(VIRTUE_COLOR)
+			.addLine("Reduce the cooldowns of both flares.")
 			.addLine()
-			.addStatComparison("Virtue HP: %d1 -> %d2")
-				.statValues(stat(VIRTUE_HEALTH_1), stat(a -> a.mHealth, VIRTUE_HEALTH_2))
+			.addStatComparison("Cooldown: %t1 -> %t2 (per Shielding Flare)")
+				.statValues(stat(SHIELDING_COOLDOWN_1), stat(a -> a.mShieldingCooldown, SHIELDING_COOLDOWN_2))
+			.addStatComparison("Cooldown: %t1 -> %t2 (per Harming Flare)")
+				.statValues(stat(HARMING_COOLDOWN_1), stat(a -> a.mHarmingCooldown, HARMING_COOLDOWN_2))
 			.addLine()
-			.addLine("The *Virtue*'s speed buff while inactive").styles(VIRTUE_COLOR)
-			.addLine("is now granted to all players near you.")
+			.addLine("*Sanctified Armor* activating will now send a").styles(UNDERLINED)
+			.addLine("*Shielding Flare* to yourself.").styles(SHIELDING_COLOR)
 			.addLine()
-			.addLine("Mobs attacked by the *Virtue* are").styles(VIRTUE_COLOR)
-			.addLine("inflicted with vulnerability.")
+			.addLine("*Touch of Radiance* can now be cast on the *Virtue*,").styles(UNDERLINED, VIRTUE_COLOR)
+			.addLine("making *Harming Flares* deal more damage and").styles(HARMING_COLOR)
+			.addLine("briefly stun targets during the effect.")
+			.addLine("(Does not stun in their radius.)")
 			.addLine()
-			.addStat("Speed Radius: %r")
-				.statValues(stat(a -> a.mSpeedRadius, VIRTUE_SPEED_RADIUS))
-			.addStat("Effect: %p Vulnerability for %t")
-				.statValues(
-					stat(a -> a.mVulnAmplifier, VIRTUE_VULN),
-					stat(a -> a.mVulnDuration, VIRTUE_VULN_DURATION))
+			.addStatComparison("Damage: %d1 -> %d2R (s)")
+				.statValues(perRegion(DAMAGE_R2, DAMAGE_R3), perRegion(a -> a.mDamageToR, DAMAGE_TOR_R2, DAMAGE_TOR_R3))
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mEnhanceStunDuration, ENHANCE_STUN_DURATION))
 			.addDashedLine();
-	}
-
-	@Override
-	public double getInitialAbilityHealth() {
-		return mBoss == null ? -1 : mHealth;
-	}
-
-	@Override
-	public double getRemainingAbilityHealth() {
-		return mBoss == null ? -1 : mBoss.getHealth();
-	}
-
-	// Trickery to use the UMM duration indicator as a health bar - multiply health by 1000 for both more accuracy and no bar sliding
-	@Override
-	public int getInitialAbilityDuration() {
-		return mBoss == null ? -1 : (int) (1000 * mHealth);
-	}
-
-	@Override
-	public int getRemainingAbilityDuration() {
-		return mBoss == null ? -1 : (int) (1000 * mBoss.getHealth());
 	}
 }

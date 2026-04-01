@@ -15,11 +15,12 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.LuminousInfusionCS;
+import com.playmonumenta.plugins.effects.Blindness;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -38,15 +39,15 @@ import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.St
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class LuminousInfusion extends Ability implements AbilityWithChargesOrStacks {
-	public static final int R2_DAMAGE = 8;
-	public static final int R3_DAMAGE = 11;
-	public static final int R2_HERETIC_DAMAGE = 16;
-	public static final int R3_HERETIC_DAMAGE = 22;
-	public static final int CHARGES_1 = 2;
-	public static final int CHARGES_2 = 3;
-
+	public static final double[] DAMAGE_1 = {8, 11};
+	public static final double[] HERETIC_DAMAGE_1 = {16, 22};
+	public static final double[] DAMAGE_2 = {11, 15};
+	public static final double[] HERETIC_DAMAGE_2 = {22, 30};
 	private static final double RADIUS = 4;
+	private static final double BLIND_RADIUS = 1;
 	private static final int FIRE_DURATION = Constants.TICKS_PER_SECOND * 3;
+	private static final int BLIND_DURATION = Constants.TICKS_PER_SECOND;
+	public static final int CHARGES = 2;
 	private static final int COOLDOWN = Constants.TICKS_PER_SECOND * 18;
 	private static final float KNOCKBACK_SPEED = 0.55f;
 
@@ -55,6 +56,8 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 	public static final String CHARM_RADIUS = "Luminous Infusion Radius";
 	public static final String CHARM_CHARGES = "Luminous Infusion Charges";
 	public static final String CHARM_FIRE_DURATION = "Luminous Infusion Fire Duration";
+	public static final String CHARM_BLIND_RADIUS = "Luminous Infusion Blindness Radius";
+	public static final String CHARM_BLIND_DURATION = "Luminous Infusion Blindness Duration";
 	public static final String CHARM_KNOCKBACK = "Luminous Infusion Knockback";
 
 	public static final AbilityInfo<LuminousInfusion> INFO =
@@ -73,22 +76,28 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 	private final double mRadius;
 	private final int mMaxCharges;
 	private final int mFireDuration;
+	private final double mBlindRadius;
+	private final int mBlindDuration;
 	private final float mKnocback;
 	private final LuminousInfusionCS mCosmetic;
 	private boolean mActive = false;
 	private int mPrimedCharges;
-	private int mRemainingCharges;
+	private int mRemainingCharges = 0;
 	private boolean mWasOnCooldown;
+
+	private static final int EXPIRE_TICKS = 80;
+	private @Nullable BukkitRunnable mPrimeRunnable = null;
 
 	public LuminousInfusion(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_DAMAGE : R2_DAMAGE);
-		mHereticDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_HERETIC_DAMAGE : R2_HERETIC_DAMAGE);
+		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, AbilityUtils.getRegionScaled(player, isLevelOne() ? DAMAGE_1 : DAMAGE_2));
+		mHereticDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, AbilityUtils.getRegionScaled(player, isLevelOne() ? HERETIC_DAMAGE_1 : HERETIC_DAMAGE_2));
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new LuminousInfusionCS());
-		mMaxCharges = (isLevelOne() ? CHARGES_1 : CHARGES_2) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
-		mRemainingCharges = Math.min(AbilityManager.getManager().getTrackedCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION), mMaxCharges);
+		mMaxCharges = CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mFireDuration = CharmManager.getDuration(player, CHARM_FIRE_DURATION, FIRE_DURATION);
+		mBlindRadius = CharmManager.getRadius(mPlayer, CHARM_BLIND_RADIUS, BLIND_RADIUS);
+		mBlindDuration = CharmManager.getDuration(player, CHARM_BLIND_DURATION, BLIND_DURATION);
 		mKnocback = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_KNOCKBACK, KNOCKBACK_SPEED);
 	}
 
@@ -101,8 +110,8 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 		int oldHits = mPrimedCharges;
 		mRemainingCharges--;
 		mPrimedCharges++;
-		AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION, mRemainingCharges);
 
+		AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION, mRemainingCharges);
 		ClientModHandler.updateAbility(mPlayer, this);
 
 		mCosmetic.infusionStartMsg(mPlayer, mPrimedCharges);
@@ -110,15 +119,15 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 			mCosmetic.infusionStartEffect(mPlayer.getWorld(), mPlayer, mPlayer.getLocation(), mPrimedCharges);
 		} else {
 			mCosmetic.infusionAddStack(mPlayer.getWorld(), mPlayer, mPlayer.getLocation(), mPrimedCharges);
-			return true;
 		}
 		if (!isOnCooldown()) {
 			putOnCooldown();
 		}
-
-		cancelOnDeath(new BukkitRunnable() {
+		if (mPrimeRunnable != null) {
+			mPrimeRunnable.cancel();
+		}
+		mPrimeRunnable = new BukkitRunnable() {
 			int mT = 0;
-			final int EXPIRE_TICKS = getModifiedCooldown();
 
 			@Override
 			public void run() {
@@ -126,16 +135,26 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 				if (mPrimedCharges > 0) {
 					mCosmetic.infusionTickEffect(mPlayer, mT);
 				}
-				if (mT >= EXPIRE_TICKS || (!mActive && mRemainingCharges <= 0)) {
+				if (mT >= EXPIRE_TICKS || (!mActive && mPrimedCharges <= 0) || mRemainingCharges == mMaxCharges) {
 					mActive = false;
 					if (mT >= EXPIRE_TICKS) {
+						for (int i = 0; i < mPrimedCharges; i++) {
+							mRemainingCharges++;
+						}
+						mPrimedCharges = 0;
+						if (mRemainingCharges == mMaxCharges) {
+							mPlugin.mTimers.removeCooldown(mPlayer, ClassAbility.LUMINOUS_INFUSION);
+							mWasOnCooldown = false; // Prevent periodicTrigger from refunding
+						}
 						mCosmetic.infusionExpireMsg(mPlayer);
+						AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION, mRemainingCharges);
 						ClientModHandler.updateAbility(mPlayer, LuminousInfusion.this);
 					}
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(Plugin.getInstance(), 1, 1));
+		};
+		cancelOnDeath(mPrimeRunnable.runTaskTimer(Plugin.getInstance(), 1, 1));
 		return true;
 	}
 
@@ -166,6 +185,10 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 
 		DamageUtils.damage(mPlayer, damagee, DamageType.MAGIC, mHereticDamage, mInfo.getLinkedSpell(), true);
 		mCosmetic.infusionHitEffect(mPlayer.getWorld(), mPlayer, damagee, mRadius, 1f, 1f);
+		if (isLevelTwo()) {
+			EntityUtils.getNearbyMobs(damagee.getLocation(), mBlindRadius).forEach(m ->
+				mPlugin.mEffectManager.addEffect(m, "LuminousInfusionBlindness", new Blindness(mBlindDuration)));
+		}
 		ClientModHandler.updateAbility(mPlayer, this);
 
 		// Exclude the damagee so that the knockaway is valid
@@ -188,9 +211,19 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 	}
 
 	@Override
+	public void invalidate() {
+		if (mPrimeRunnable != null) {
+			mPrimeRunnable.cancel();
+		}
+		mPrimedCharges = 0;
+		mRemainingCharges = 0;
+	}
+
+	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mWasOnCooldown && !isOnCooldown()) {
 			mPrimedCharges = 0;
+			mActive = false;
 			mRemainingCharges = mMaxCharges;
 			AbilityManager.getManager().trackCharges(mPlayer, ClassAbility.LUMINOUS_INFUSION, mRemainingCharges);
 
@@ -228,18 +261,18 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 			.addTrigger()
 			.addDashedLine()
 			.addLine("Activate to prime your next attack or ability")
-			.addLine("on a *Heretic* to explode and deal damage").styles(Cleric.HERETIC_COLOR)
-			.addLine("to nearby mobs, knocking them away.")
+			.addLine("on a *Heretic* within %t to explode and deal").statValues(stat(EXPIRE_TICKS)).styles(Cleric.HERETIC_COLOR)
+			.addLine("damage to nearby mobs, knocking them away.")
 			.addLine("*Heretics* take increased damage.").styles(Cleric.HERETIC_COLOR)
 			.addLine()
-			.addStat("Damage: %d (s) (to non-Heretics)")
-				.statValues(perRegion(a -> a.mDamage, R2_DAMAGE, R3_DAMAGE))
-			.addStat("Damage: %d (s) (to Heretics)")
-				.statValues(perRegion(a -> a.mHereticDamage, R2_HERETIC_DAMAGE, R3_HERETIC_DAMAGE))
+			.addStat("Damage: %d1R (s) (to non-Heretics)")
+				.statValues(perRegion(a -> a.mDamage, DAMAGE_1[0], DAMAGE_1[1]))
+			.addStat("Damage: %d1R (s) (to Heretics)")
+				.statValues(perRegion(a -> a.mHereticDamage, HERETIC_DAMAGE_1[0], HERETIC_DAMAGE_1[1]))
 			.addStat("Radius: %r")
 				.statValues(stat(a -> a.mRadius, RADIUS))
-			.addStat("Charges: %d1")
-				.statValues(stat(a -> a.mMaxCharges, CHARGES_1))
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, CHARGES))
 			.addStat("Cooldown: %t (refreshes all charges at once)")
 				.statValues(cooldown(COOLDOWN))
 			.addDashedLine();
@@ -248,16 +281,27 @@ public class LuminousInfusion extends Ability implements AbilityWithChargesOrSta
 	private static Description<LuminousInfusion> getDescription2() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
 			.addDashedLine()
-			.addLine("Increase *Luminous Infusion*'s max charges.").styles(UNDERLINED)
+			.addLine("Increase *Luminous Infusion*'s damage and").styles(UNDERLINED)
+			.addLine("ignite all mobs the explosion hits.").styles(UNDERLINED)
 			.addLine()
-			.addLine("*Luminous Infusion* now ignites mobs hit.").styles(UNDERLINED)
-			.addLine()
-			.addStatComparison("Charges: %d1 -> %d2")
+			.addStatComparison("Damage: %d1 -> %d2R (s) (to non-Heretics)")
 			.statValues(
-				stat(CHARGES_1),
-				stat(a -> a.mMaxCharges, CHARGES_2))
+				perRegion(DAMAGE_1[0], DAMAGE_1[1]),
+				perRegion(a -> a.mDamage, DAMAGE_2[0], DAMAGE_2[1]))
+			.addStatComparison("Damage: %d1 -> %d2R (s) (to Heretics)")
+			.statValues(
+				perRegion(HERETIC_DAMAGE_1[0], HERETIC_DAMAGE_1[1]),
+				perRegion(a -> a.mHereticDamage, HERETIC_DAMAGE_2[0], HERETIC_DAMAGE_2[1]))
 			.addStat("Effect: Fire for %t")
 				.statValues(stat(a -> a.mFireDuration, FIRE_DURATION))
+			.addLine()
+			.addLine("Mobs close to the explosion center are").styles(Cleric.HERETIC_COLOR)
+			.addLine("blinded.")
+			.addLine()
+			.addStat("Effect: Blindness for %t")
+				.statValues(stat(a -> a.mBlindDuration, BLIND_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mBlindRadius, BLIND_RADIUS))
 			.addDashedLine();
 	}
 }

@@ -15,11 +15,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
-import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class Unwavering extends Ability {
-	public static final double DJ_MULTIPLIER = 0.1;
 	public static final double KBR_INCREMENT = 0.08;
 	public static final double MAX_KBR = 0.4;
 	public static final double RADIUS = 8;
@@ -30,14 +28,12 @@ public class Unwavering extends Ability {
 			.description(getDescription())
 			.canUse(player -> AbilityUtils.getSpecNum(player) == Cleric.PALADIN_SPEC_ID);
 
-	private final double mPercentDamage;
 	private final double mKBRIncrement;
 	private final double mMaxKBR;
 	private final double mRadius;
 
 	public Unwavering(final Plugin plugin, final Player player) {
 		super(plugin, player, INFO);
-		mPercentDamage = DJ_MULTIPLIER;
 		mKBRIncrement = KBR_INCREMENT;
 		mMaxKBR = MAX_KBR;
 		mRadius = RADIUS;
@@ -53,10 +49,6 @@ public class Unwavering extends Ability {
 		}
 	}
 
-	public double getDJBonus() {
-		return mPercentDamage;
-	}
-
 	public static Description<Unwavering> getDescription() {
 		return new FormattedDescriptionBuilder<>(() -> INFO)
 			.addLine("You gain +%p *Knockback Resistance* per").styles(WHITE)
@@ -64,10 +56,6 @@ public class Unwavering extends Ability {
 			.addLine("*Heretic* within %d blocks, up to +%p.").styles(Cleric.HERETIC_COLOR)
 				.statValues(
 					stat(a -> a.mRadius, RADIUS),
-					stat(a -> a.mMaxKBR, MAX_KBR))
-			.addLine()
-			.addLine("Increase *Divine Justice*'s bonus").styles(UNDERLINED)
-			.addLine("damage multiplier by +%p.")
-				.statValues(stat(a -> a.mPercentDamage, DJ_MULTIPLIER));
+					stat(a -> a.mMaxKBR, MAX_KBR));
 	}
 }

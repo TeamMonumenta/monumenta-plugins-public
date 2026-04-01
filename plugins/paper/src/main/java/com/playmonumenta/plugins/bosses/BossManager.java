@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.bosses.bosses.*;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AbilityMarkerEntityBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.KeeperVirtueBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.PhantomForceBoss;
 import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
@@ -356,7 +355,6 @@ public class BossManager implements Listener {
 		registerStatelessBoss(LichKeyGlowBoss.identityTag, LichKeyGlowBoss::new);
 		registerStatelessBoss(FestiveTessUpgradeSnowmenBoss.identityTag, FestiveTessUpgradeSnowmenBoss::new, new FestiveTessUpgradeSnowmenBoss.Parameters());
 		registerStatelessBoss(RestlessSoulsBoss.identityTag, RestlessSoulsBoss::new);
-		registerStatelessBoss(KeeperVirtueBoss.identityTag, KeeperVirtueBoss::new);
 		registerStatelessBoss(AlchemicalAberrationBoss.identityTag, AlchemicalAberrationBoss::new);
 		registerStatelessBoss(AbilityMarkerEntityBoss.identityTag, AbilityMarkerEntityBoss::new);
 		registerStatelessBoss(ThrowSummonBoss.identityTag, ThrowSummonBoss::new, new ThrowSummonBoss.Parameters());

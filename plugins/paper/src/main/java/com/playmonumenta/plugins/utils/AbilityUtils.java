@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -862,5 +863,35 @@ public class AbilityUtils {
 		charmLevel = (charmLevel > 0) ? (charmLevel / 3) - 2 : 0;
 
 		return getEffectiveTotalSkillPoints(player) + getEffectiveTotalSpecPoints(player) + ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0) + charmLevel;
+	}
+
+	public static double getRegionScaled(Player player, double[] baseValues) {
+		if (baseValues.length == 2) {
+			// Spec abilities use 2 values, for isles/ring
+			return ServerProperties.getRegion(player) == Region.RING ? baseValues[1] : baseValues[0];
+		} else if (baseValues.length == 3) {
+			// Normal abilities use 3 values, for valley/isles/ring
+			return switch (ServerProperties.getRegion(player)) {
+				case RING -> baseValues[2];
+				case ISLES -> baseValues[1];
+				default -> baseValues[0];
+			};
+		} else {
+			throw new IllegalArgumentException("StatValue.perRegion() only accepts 2 or 3 region values!");
+		}
+	}
+
+	public static Number getRegionScaled(Player player, Number... baseValues) {
+		if (baseValues.length == 2) {
+			return ServerProperties.getRegion(player) == Region.RING ? baseValues[1] : baseValues[0];
+		} else if (baseValues.length == 3) {
+			return switch (ServerProperties.getRegion(player)) {
+				case RING -> baseValues[2];
+				case ISLES -> baseValues[1];
+				default -> baseValues[0];
+			};
+		} else {
+			throw new IllegalArgumentException("getRegionScaled() only accepts 2 or 3 region values!");
+		}
 	}
 }

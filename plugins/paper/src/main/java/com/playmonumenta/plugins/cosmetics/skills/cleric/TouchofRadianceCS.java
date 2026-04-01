@@ -35,16 +35,23 @@ public class TouchofRadianceCS implements CosmeticSkill {
 	private static final Color ORANGE_1 = Color.fromRGB(255, 195, 60);
 	private static final Color ORANGE_2 = Color.fromRGB(255, 160, 30);
 
-	public void tickEffect(Player player) {
-		new PartialParticle(Particle.CRIT, LocationUtils.getEntityCenter(player), 5).delta(0.7).spawnAsPlayerBuff(player);
-		new PartialParticle(Particle.TRIAL_SPAWNER_DETECTION, LocationUtils.getEntityCenter(player), 3).delta(1).spawnAsPlayerBuff(player);
+	public void tickEffect(LivingEntity e) {
+		PartialParticle crit = new PartialParticle(Particle.CRIT, LocationUtils.getEntityCenter(e), 5).delta(0.7);
+		PartialParticle trial = new PartialParticle(Particle.TRIAL_SPAWNER_DETECTION, LocationUtils.getEntityCenter(e), 3).delta(1);
+		if (e instanceof Player player) {
+			crit.spawnAsPlayerBuff(player);
+			trial.spawnAsPlayerBuff(player);
+		} else {
+			crit.spawnAsEnemyBuff();
+			crit.spawnAsEnemyBuff();
+		}
 	}
 
-	public void loseEffect(Player player) {
-		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CONDUIT_DEACTIVATE, SoundCategory.PLAYERS, 0.9f, 0.9f);
+	public void loseEffect(LivingEntity e) {
+		e.getWorld().playSound(e.getLocation(), Sound.BLOCK_CONDUIT_DEACTIVATE, SoundCategory.PLAYERS, 0.9f, 0.9f);
 	}
 
-	public void castOnPlayer(Player player, Player target) {
+	public void castOnAlly(Player player, LivingEntity target) {
 		player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.9f, 1.2f);
 		target.getWorld().playSound(target.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.3f, 1.2f);
 

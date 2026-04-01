@@ -5,8 +5,8 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DescriptionUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -36,6 +36,7 @@ import static com.playmonumenta.plugins.utils.DescriptionUtils.DISABLED;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.GREY;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.MAGE_ARROW;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.RED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.REGION_SCALED;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.ROGUE_ARROW;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.SCOUT_ARROW;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.SHAMAN_ARROW;
@@ -145,16 +146,8 @@ public class FormattedDescriptionBuilder<T extends Ability> extends DescriptionB
 
 		public static <S extends Ability> StatValue<S> perRegion(Number... baseValues) {
 			BiFunction<S, Player, ? extends Number> baseValueGetter = (a, p) -> {
-				if (baseValues.length == 2) {
-					// Spec abilities use 2 values, for isles/ring
-					return ServerProperties.getRegion(p) == Region.RING ? baseValues[1] : baseValues[0];
-				} else if (baseValues.length == 3) {
-					// Normal abilities use 3 values, for valley/isles/ring
-					return switch (ServerProperties.getRegion(p)) {
-						case RING -> baseValues[2];
-						case ISLES -> baseValues[1];
-						default -> baseValues[0];
-					};
+				if (baseValues.length <= 3) {
+					return AbilityUtils.getRegionScaled(p, baseValues);
 				} else {
 					throw new IllegalArgumentException("StatValue.perRegion() only accepts 2 or 3 region values!");
 				}
@@ -164,14 +157,8 @@ public class FormattedDescriptionBuilder<T extends Ability> extends DescriptionB
 
 		public static <S extends Ability> StatValue<S> perRegion(Function<S, ? extends Number> realValue, Number... baseValues) {
 			BiFunction<S, Player, ? extends Number> baseValueGetter = (a, p) -> {
-				if (baseValues.length == 2) {
-					return ServerProperties.getRegion(p) == Region.RING ? baseValues[1] : baseValues[0];
-				} else if (baseValues.length == 3) {
-					return switch (ServerProperties.getRegion(p)) {
-						case RING -> baseValues[2];
-						case ISLES -> baseValues[1];
-						default -> baseValues[0];
-					};
+				if (baseValues.length <= 3) {
+					return AbilityUtils.getRegionScaled(p, baseValues);
 				} else {
 					throw new IllegalArgumentException("StatValue.perRegion() only accepts 2 or 3 region values!");
 				}
@@ -213,7 +200,7 @@ public class FormattedDescriptionBuilder<T extends Ability> extends DescriptionB
 		 * <p>Creates a Component containing the numerical value of the stat, alongside any bonus from charms.
 		 * Only displays charm bonus when the ability is at the corresponding level.
 		 * The number format depends on the content of the placeholder string in the description.
-		 * The placeholder string has format "%[formatOption][disableChar?]".</p>
+		 * The placeholder string has format "%[formatOption][disableChar?][regionScaled?]".</p>
 		 *
 		 * <p>formatOption: required. Determines how the stat value is represented.
 		 * <ul>
@@ -242,7 +229,8 @@ public class FormattedDescriptionBuilder<T extends Ability> extends DescriptionB
 			}
 
 			String formatOption = (placeholder.length() >= 2) ? placeholder.substring(1, 2) : "d";
-			String levelOption = (placeholder.length() >= 3) ? placeholder.substring(2) : "0";
+			String levelOption = (placeholder.length() >= 3) ? placeholder.substring(2, 3) : "0";
+			boolean regionScaled = placeholder.length() >= 4 && placeholder.charAt(3) == 'R';
 
 			Function<Double, String> valueFormat = switch (formatOption) {
 				case "r" -> value -> StringUtils.to2DP(value) + " Blocks";
@@ -271,6 +259,9 @@ public class FormattedDescriptionBuilder<T extends Ability> extends DescriptionB
 			};
 
 			Component output = Component.text((hasSign ? "+" : "") + valueFormat.apply(mBaseValue.apply(ability, player).doubleValue()));
+			if (regionScaled) {
+				output = output.style(REGION_SCALED);
+			}
 			if (ability == null) {
 				if (level == StatLevel.DISABLED) {
 					return output.style(DISABLED);

@@ -47,6 +47,7 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 	private static final Particle.DustOptions colorStrength = new Particle.DustOptions(Color.fromRGB(180, 0, 60), 1.2f);
 	private static final Particle.DustOptions colorResistance = new Particle.DustOptions(Color.fromRGB(51, 153, 102), 1.2f);
 	private static final Particle.DustOptions colorAbsorption = new Particle.DustOptions(Color.fromRGB(255, 153, 0), 1.2f);
+	private static final Particle.DustOptions colorCooldownRechargeRate = new Particle.DustOptions(Color.fromRGB(204, 214, 255), 1.2f);
 
 	@Override
 	public void splashEffectRegeneration(Player player, LivingEntity mob) {
@@ -139,9 +140,21 @@ public class VitalityExtractionCS extends HeavenlyBoonCS {
 	}
 
 	@Override
-	public void enhanceCDR(Player player) {
-		Location loc = player.getLocation();
-		player.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.PLAYERS, 1.0f, 1.75f);
+	public void splashEffectCooldownRechargeRate(Player player, LivingEntity mob) {
+		Color c = colorCooldownRechargeRate.getColor();
+		double red = c.getRed() / 255D;
+		double green = c.getGreen() / 255D;
+		double blue = c.getBlue() / 255D;
+		Location loc = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), 0, PlayerUtils.getJumpHeight(player)), 0);
+		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_AMBIENT, SoundCategory.PLAYERS, 1.8f, 1.2f);
+		player.playSound(player.getLocation(), Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.1f, 1.0f);
+		player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.1f, 1.4f);
+		new PPCircle(Particle.REDSTONE, loc, 0.8).delta(0.08, 0.08, 0.08).data(colorCooldownRechargeRate).ringMode(true).countPerMeter(6).spawnAsPlayerActive(player);
+		new PPCircle(Particle.SPELL_MOB, loc, 1.6).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(5).spawnAsPlayerActive(player);
+		new PPCircle(Particle.SPELL_MOB_AMBIENT, loc.clone().add(0, 0.5, 0), 2.4).delta(red, green, blue).extra(1).ringMode(true).directionalMode(true).countPerMeter(4).spawnAsPlayerActive(player);
+		createOrb(new Vector(FastUtils.randomDoubleInRange(-0.75, 0.75),
+			FastUtils.randomDoubleInRange(1, 1.5),
+			FastUtils.randomDoubleInRange(-0.75, 0.75)), loc.clone().add(0, 1, 0), player, mob, colorCooldownRechargeRate);
 	}
 
 	private void createOrb(Vector dir, Location loc, Player player, LivingEntity target, Particle.DustOptions color) {

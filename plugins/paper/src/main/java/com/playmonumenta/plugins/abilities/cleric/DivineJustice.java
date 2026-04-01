@@ -7,8 +7,6 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
-import com.playmonumenta.plugins.abilities.cleric.paladin.Unwavering;
-import com.playmonumenta.plugins.abilities.cleric.seraph.Rejuvenation;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -23,6 +21,7 @@ import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -38,7 +37,9 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
@@ -48,8 +49,8 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 
 	public static final int DAMAGE_1 = 2;
 	public static final int DAMAGE_2 = 3;
-	public static final double DAMAGE_MULTIPLIER_1 = 0.15;
-	public static final double DAMAGE_MULTIPLIER_2 = 0.3;
+	public static final double[] DAMAGE_MULTIPLIER_1 = {0.15, 0.2, 0.25};
+	public static final double[] DAMAGE_MULTIPLIER_2 = {0.3, 0.4, 0.45};
 	public static final double HEALING_MULTIPLIER_OWN = 0.05;
 	public static final double HEALING_MULTIPLIER_OTHER = 0.05;
 	public static final int RADIUS = 12;
@@ -76,7 +77,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	public final DivineJusticeCS mCosmetic;
 
 	private final double mDamage;
-	private double mPercentDamage = isLevelOne() ? DAMAGE_MULTIPLIER_1 : DAMAGE_MULTIPLIER_2;
+	private final double mPercentDamage;
 	private final double mSelfHeal;
 	private final double mAllyHeal;
 	private final double mRadius;
@@ -89,12 +90,11 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	private boolean mEnhanceIsReady = false;
 	private @Nullable BukkitRunnable mReadyRunnable = null;
 
-	private @Nullable Unwavering mUnwavering;
-	private @Nullable Rejuvenation mRejuvenation;
 
 	public DivineJustice(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mPercentDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, AbilityUtils.getRegionScaled(player, isLevelOne() ? DAMAGE_MULTIPLIER_1 : DAMAGE_MULTIPLIER_2));
 		mSelfHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF, HEALING_MULTIPLIER_OWN);
 		mAllyHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, HEALING_MULTIPLIER_OTHER);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_HEAL_RADIUS, RADIUS);
@@ -102,28 +102,13 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 		mEnhanceDuration = CharmManager.getDuration(mPlayer, CHARM_ENHANCE_PRIME_DURATION, ENHANCEMENT_BONUS_DAMAGE_DURATION);
 		mComboTimer = CharmManager.getDuration(player, CHARM_ENHANCE_COMBO_TIMER, ENHANCEMENT_COMBO_TIMER);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(mPlayer, new DivineJusticeCS());
-
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mUnwavering = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Unwavering.class);
-			mRejuvenation = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Rejuvenation.class);
-			if (mUnwavering != null) {
-				mPercentDamage += mUnwavering.getDJBonus();
-			} else if (mRejuvenation != null) {
-				mPercentDamage += mRejuvenation.getDJBonus();
-			}
-			mPercentDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, mPercentDamage);
-		});
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		return onDamageIncJavelin(event, enemy, false);
-	}
-
-	public boolean onDamageIncJavelin(DamageEvent event, LivingEntity enemy, boolean isJavelin) {
 		if (mEnhanceIsReady) {
 			ClassAbility ability = event.getAbility();
-			if (ability != null && ability != ABILITY && !ability.isFake()) {
+			if (ability != null && ability != ABILITY && ability != ClassAbility.ETHEREAL_ASCENSION && !ability.isFake()) {
 				event.updateDamageWithMultiplier(1 + mEnhanceDamage);
 			}
 		}
@@ -134,12 +119,15 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 		}
 
 		/* DamageEvents do not reliably store whether an event is a crit or not since Cumbersome modifies the crit boolean */
-		final boolean isMeleeCrit = (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) || isJavelin;
-		if (isMeleeCrit || (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile
+		final boolean isMeleeCrit = (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer));
+		final boolean isAscensionOrb = event.getAbility() != null && event.getAbility() == ClassAbility.ETHEREAL_ASCENSION;
+		if (isMeleeCrit || isAscensionOrb || (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile
 			&& EntityUtils.isAbilityTriggeringProjectile(projectile, true)
 			&& MetadataUtils.checkOnceThisTick(mPlugin, enemy, "DivineJustice" + mPlayer.getName()))) { // for Multishot projectiles, we only want to trigger DJ on mobs once, not 3 times
 
-			mCosmetic.justiceOnDamage(mPlayer, enemy, mPlayer.getWorld(), enemy.getLocation(), PartialParticle.getWidthDelta(enemy) * 1.5, mComboNumber, isEnhanced());
+			if (!isAscensionOrb) {
+				mCosmetic.justiceOnDamage(mPlayer, enemy, mPlayer.getWorld(), enemy.getLocation(), PartialParticle.getWidthDelta(enemy) * 1.5, mComboNumber, isEnhanced());
+			}
 
 			if (mComboNumber == 0 || mComboRunnable != null) {
 				if (mComboRunnable != null) {
@@ -150,6 +138,7 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 					public void run() {
 						mComboNumber = 0;
 						mComboRunnable = null;
+						ClientModHandler.updateAbility(mPlayer, ABILITY);
 					}
 				};
 				mComboRunnable.runTaskLater(mPlugin, mComboTimer);
@@ -185,6 +174,10 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 				}
 			}
 			ClientModHandler.updateAbility(mPlayer, this);
+			if (isAscensionOrb) {
+				// Only trigger once in a tick per orb
+				return true;
+			}
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, calculateDamage(event, isMeleeCrit), mInfo.getLinkedSpell(), true, false);
 		}
 		return false; // keep the ability open for more Multishot crits this tick
@@ -229,10 +222,10 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.addLine("Critical attacks and projectiles deal")
 			.addLine("bonus magic damage (s) to *Heretics*.").styles(Cleric.HERETIC_COLOR)
 			.addLine()
-			.addStat("Bonus Damage: +%d1 + %p1 (s)")
+			.addStat("Bonus Damage: +%d1 + %p1R (s)")
 				.statValues(
 					stat(a -> a.mDamage, DAMAGE_1),
-					stat(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_1))
+					perRegion(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_1[0], DAMAGE_MULTIPLIER_1[1], DAMAGE_MULTIPLIER_1[2]))
 			.tab().addLine("(of the attack's damage)")
 			.addDashedLine();
 	}
@@ -242,8 +235,12 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 			.addDashedLine()
 			.addLine("Increase *Divine Justice*'s damage.").styles(UNDERLINED)
 			.addLine()
-			.addStatComparison("Bonus Damage: +%d1 + %p1 -> +%d2 + %p2 (s)")
-				.statValues(stat(DAMAGE_1), stat(DAMAGE_MULTIPLIER_1), stat(a -> a.mDamage, DAMAGE_2), stat(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_2))
+			.addStatComparison("Bonus Damage: +%d1 + %p1 -> +%d2 + %p2R (s)")
+				.statValues(
+					stat(DAMAGE_1),
+					perRegion(DAMAGE_MULTIPLIER_1[0], DAMAGE_MULTIPLIER_1[1], DAMAGE_MULTIPLIER_1[2]),
+					stat(a -> a.mDamage, DAMAGE_2),
+					perRegion(a -> a.mPercentDamage, DAMAGE_MULTIPLIER_2[0], DAMAGE_MULTIPLIER_2[1], DAMAGE_MULTIPLIER_2[2]))
 			.addLine()
 			.addLine("Killing a *Heretic* heals yourself").styles(Cleric.HERETIC_COLOR, UNDERLINED)
 			.addLine("and other nearby players over time.")
@@ -266,11 +263,12 @@ public class DivineJustice extends Ability implements AbilityWithChargesOrStacks
 	private static Description<DivineJustice> getDescriptionEnhancement() {
 		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
 			.addDashedLine()
-			.addLine("After triggering *Divine Justice* *3* times within").styles(UNDERLINED, WHITE)
-			.addLine("%t of each other, deal increased damage with")
+			.addLine("After triggering *Divine Justice* or damaging a mob with an").styles(UNDERLINED)
+			.addLine("*Ethereal Ascension* orb *3* times within %t of each other, deal").styles(UNDERLINED, WHITE)
 				.statValues(stat(a -> a.mComboTimer, ENHANCEMENT_COMBO_TIMER))
-			.addLine("your other abilities for a short time.")
-			.addLine("(Doesn't boost Divine Justice's damage)")
+			.addLine("increased damage with your other abilities for a short time.")
+			.addLine("*(Doesn't boost Divine Justice's or Ethereal Ascension's*").styles(DARK_GREY)
+			.addLine("*damage.)*").styles(DARK_GREY)
 			.addLine()
 			.addStat("Effect: +%p Ability Damage for %t")
 				.statValues(

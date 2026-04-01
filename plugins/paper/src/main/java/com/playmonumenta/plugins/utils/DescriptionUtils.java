@@ -22,6 +22,7 @@ public class DescriptionUtils {
 
 	public static final Style UNDERLINED = Style.style(TextDecoration.UNDERLINED);
 	public static final Style DISABLED = DARK_GREY.decorate(TextDecoration.STRIKETHROUGH);
+	public static final Style REGION_SCALED = Style.style(TextColor.color(0x99DDFF));
 
 	public static final Style TRIGGER_LABEL = Style.style(TextColor.color(0xEDA73D));
 	public static final Style TRIGGER_TEXT = Style.style(TextColor.color(0xFFDC73));

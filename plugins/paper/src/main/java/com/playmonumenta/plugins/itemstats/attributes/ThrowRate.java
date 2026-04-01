@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.scout.Quickdraw;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentThrowRate;
 import com.playmonumenta.plugins.itemstats.Attribute;
-import com.playmonumenta.plugins.itemstats.enchantments.Oversized;
 import com.playmonumenta.plugins.itemstats.enchantments.Snowy;
 import com.playmonumenta.plugins.itemstats.enchantments.TwoHanded;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
@@ -103,8 +102,6 @@ public class ThrowRate implements Attribute {
 				ItemUtils.damageItemWithUnbreaking(plugin, player, player.getInventory().getItemInMainHand(), 1, true);
 
 				AbilityManager.getManager().playerShotProjectileEvent(player, newProj);
-			} else {
-				return;
 			}
 		} else if (proj instanceof Snowball oldSnowball) {
 			if (value > 0) {
@@ -135,14 +132,7 @@ public class ThrowRate implements Attribute {
 				}
 				// For clearing weapon snowballs after 10s (to prevent being stuck in bubble columns):
 				EntityListener.clearSnowballProjectile(snowball);
-			} else {
-				return;
 			}
-		}
-
-		if (proj instanceof Trident || proj instanceof Snowball
-			|| ItemStatUtils.hasEnchantment(player.getEquipment().getItemInMainHand(), EnchantmentType.THROWING_KNIFE)) {
-			Oversized.onAnyShoot(player, cooldown, true, true);
 		}
 	}
 }

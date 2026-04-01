@@ -216,7 +216,7 @@ public class Quickdraw extends Ability {
 			.addIf((a, p) -> p != null && AdvancementUtils.checkAdvancement(p, "monumenta:handbook/enchantments/recoil"), desc -> desc
 				.addLine("(Can only use Recoil once while midair)"))
 			.addLine()
-			.addStat("Damage: %d (p)")
+			.addStat("Damage: %d0R (p)")
 				.statValues(perRegion(a -> a.mDamage, R1_DAMAGE, R2_DAMAGE, R3_DAMAGE))
 			.addStat("Cooldown: %t1")
 				.statValues(cooldown(COOLDOWN_1))

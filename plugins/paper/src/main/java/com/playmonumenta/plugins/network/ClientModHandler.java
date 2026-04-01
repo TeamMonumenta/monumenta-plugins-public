@@ -7,8 +7,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
-import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
+import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtueHarmingFlare;
+import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtueShieldingFlare;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
 import com.playmonumenta.plugins.abilities.rogue.MagicDodging;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
@@ -249,7 +250,8 @@ public class ClientModHandler {
 	private static boolean shouldHandleAbility(Player player, Ability ability) {
 		return ability != null
 			&& (ability.getInfo().getBaseCooldown(player, ability.getAbilityScore()) > 0 || (ability instanceof AbilityWithChargesOrStacks && ((AbilityWithChargesOrStacks) ability).getMaxCharges() > 0)
-			|| ability instanceof AlchemicalArtillery || ability instanceof Swiftness || ability instanceof OneWithTheWind); // these are passives with modes
+			|| ability instanceof Swiftness || ability instanceof OneWithTheWind) // these are passives with modes
+			&& !(ability instanceof KeeperVirtueShieldingFlare && ((KeeperVirtueShieldingFlare) ability).getMaxCharges() <= 0); // KV has cooldown but shouldn't display without charges
 	}
 
 	private static @Nullable String getAbilityName(Ability ability) {
@@ -277,6 +279,8 @@ public class ClientModHandler {
 			return "Shaman";
 		} else if (ability instanceof Bloodlust) {
 			return "Warrior";
+		} else if (ability instanceof KeeperVirtueShieldingFlare || ability instanceof KeeperVirtueHarmingFlare) {
+			return "Cleric";
 		}
 		for (PlayerClass playerClass : INSTANCE.mClasses.mClasses) {
 			Predicate<AbilityInfo<?>> sameClass = abi -> abi.getAbilityClass() == ability.getClass();

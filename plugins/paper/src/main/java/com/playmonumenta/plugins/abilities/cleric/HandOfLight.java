@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
+import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtueShieldingFlare;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -20,7 +21,10 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -28,8 +32,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perRegion;
 import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
@@ -45,10 +51,10 @@ public class HandOfLight extends Ability {
 	private static final int FLAT_2 = 6;
 	private static final double PERCENT_1 = 0.1;
 	private static final double PERCENT_2 = 0.15;
-	private static final int DAMAGE_1 = 3;
-	private static final int DAMAGE_2 = 4;
-	private static final int DAMAGE_PER_1 = 2;
-	private static final int DAMAGE_PER_2 = 3;
+	private static final double[] DAMAGE_1 = {2, 2.5, 3};
+	private static final double[] DAMAGE_2 = {3, 4, 5};
+	private static final double[] DAMAGE_PER_1 = {2, 2.5, 3}; // Max damages: 12, 15, 18
+	private static final double[] DAMAGE_PER_2 = {3, 3.5, 4.5}; // Max damages: 15, 18, 23
 	private static final int MAX_MOBS_1 = 5;
 	private static final int MAX_MOBS_2 = 4;
 	private static final int REGEN_LEVEL = 1; // Actually 2 because of how effects work
@@ -83,20 +89,23 @@ public class HandOfLight extends Ability {
 	private final double mDamagePer;
 	private final int mMaxMobs;
 	private final int mRegenerationLevel;
-
 	private final HandOfLightCS mCosmetic;
+
+	private @Nullable KeeperVirtueShieldingFlare mKeeperVirtueShieldingFlare;
 
 	public HandOfLight(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 		mFlat = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, isLevelOne() ? FLAT_1 : FLAT_2);
 		mPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, isLevelOne() ? PERCENT_1 : PERCENT_2);
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mDamagePer = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, AbilityUtils.getRegionScaled(player, isLevelOne() ? DAMAGE_1 : DAMAGE_2));
+		mDamagePer = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, AbilityUtils.getRegionScaled(player, isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2));
 		mMaxMobs = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_MAX_MOBS, isLevelOne() ? MAX_MOBS_1 : MAX_MOBS_2);
 		mRegenerationLevel = REGEN_LEVEL + (int) CharmManager.getLevel(player, CHARM_REGEN);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS());
+
+		Bukkit.getScheduler().runTask(plugin, () -> mKeeperVirtueShieldingFlare = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, KeeperVirtueShieldingFlare.class));
 	}
 
 	public boolean cast() {
@@ -160,6 +169,11 @@ public class HandOfLight extends Ability {
 			if (isEnhanced()) {
 				cooldown *= 1 - Math.min((healthHealed / 4) * ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED, ENHANCEMENT_COOLDOWN_REDUCTION_MAX);
 			}
+
+			if (mKeeperVirtueShieldingFlare != null) {
+				nearbyPlayers.stream().min(Comparator.comparingDouble(p -> p.getHealth() / EntityUtils.getMaxHealth(p)))
+					.ifPresent(virtueShield -> Objects.requireNonNull(mKeeperVirtueShieldingFlare).shieldPlayer(virtueShield));
+			}
 		}
 
 		if (!doCooldown) {
@@ -190,10 +204,10 @@ public class HandOfLight extends Ability {
 			.addLine("area, deal damage to all mobs there, plus")
 			.addLine("bonus damage for each *Heretic* in the area.").styles(Cleric.HERETIC_COLOR)
 			.addLine()
-			.addStat("Damage: %d1 (s), +%d1 per *Heretic* (max %d1)").styles(Cleric.HERETIC_COLOR)
+			.addStat("Damage: %d1R (s), +%d1R per *Heretic* (max %d1)").styles(Cleric.HERETIC_COLOR)
 				.statValues(
-					stat(a -> a.mDamage, DAMAGE_1),
-					stat(a -> a.mDamagePer, DAMAGE_PER_1),
+					perRegion(a -> a.mDamage, DAMAGE_1[0], DAMAGE_1[1], DAMAGE_1[2]),
+					perRegion(a -> a.mDamagePer, DAMAGE_PER_1[0], DAMAGE_PER_1[1], DAMAGE_PER_1[2]),
 					stat(a -> a.mMaxMobs, MAX_MOBS_1))
 			.addStat("Radius: %r (Cone-Shaped)")
 				.statValues(stat(a -> a.mRange, RANGE))
@@ -214,12 +228,12 @@ public class HandOfLight extends Ability {
 					stat(PERCENT_1),
 					stat(a -> a.mFlat, FLAT_2),
 					stat(a -> a.mPercent, PERCENT_2))
-			.addStatComparison("Damage: %d1, +%d1 -> %d2 (s), +%d2 per *Heretic* (max %d2)").styles(Cleric.HERETIC_COLOR)
+			.addStatComparison("Damage: %d1, +%d1 -> %d2R (s), +%d2R per *Heretic* (max %d2)").styles(Cleric.HERETIC_COLOR)
 				.statValues(
-					stat(DAMAGE_1),
-					stat(DAMAGE_PER_1),
-					stat(a -> a.mDamage, DAMAGE_2),
-					stat(a -> a.mDamagePer, DAMAGE_PER_2),
+					perRegion(DAMAGE_1[0], DAMAGE_1[1], DAMAGE_1[2]),
+					perRegion(DAMAGE_PER_1[0], DAMAGE_PER_1[1], DAMAGE_PER_1[2]),
+					perRegion(a -> a.mDamage, DAMAGE_2[0], DAMAGE_2[1], DAMAGE_2[2]),
+					perRegion(a -> a.mDamagePer, DAMAGE_PER_2[0], DAMAGE_PER_2[1], DAMAGE_PER_2[2]),
 					stat(a -> a.mMaxMobs, MAX_MOBS_2))
 			.addStatComparison("Cooldown: %t1 -> %t2")
 				.statValues(

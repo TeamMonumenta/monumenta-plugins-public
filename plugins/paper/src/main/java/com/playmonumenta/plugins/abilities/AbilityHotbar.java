@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.abilities;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -87,8 +86,6 @@ public class AbilityHotbar {
 		int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
 		int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
 		int remainingDuration = ability instanceof AbilityWithDuration ? ((AbilityWithDuration) ability).getRemainingAbilityDuration() : 0;
-		double remainingHealth = ability instanceof AbilityWithHealthBar ? ((AbilityWithHealthBar) ability).getRemainingAbilityHealth() : 0;
-		double initialHealth = ability instanceof AbilityWithHealthBar ? ((AbilityWithHealthBar) ability).getInitialAbilityHealth() : 0;
 
 		TextColor color = ability.getInfo().getActionBarColor();
 		String name = getAbilityName(ability);
@@ -98,22 +95,15 @@ public class AbilityHotbar {
 			.append(Component.text(name, color))
 			.append(Component.text("]", NamedTextColor.YELLOW))
 			.append(Component.text(": ", NamedTextColor.WHITE));
-
-		if (charges > 0 && maxCharges > 1) {
+		if (ability instanceof AbilityWithCustomDisplay custom) {
+			if (custom.customDisplayComponent().equals(Component.text(""))) {
+				return Component.text("");
+			}
+			output = output.append(custom.customDisplayComponent());
+		} else if (charges > 0 && maxCharges > 1) {
 			output = output.append(Component.text(charges + "/" + maxCharges, (charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW)));
 		} else if (AbilityUtils.isSilenced(player)) {
 			output = output.append(Component.text(((int) Math.ceil(AbilityUtils.getSilenceDuration(player) / 20.0)) + "s", NamedTextColor.RED));
-		} else if (remainingHealth > 0 && initialHealth > 0) {
-			NamedTextColor healthColor;
-			double percent = remainingHealth / initialHealth;
-			if (percent >= (double) 2 / 3) {
-				healthColor = NamedTextColor.GREEN;
-			} else if (percent >= (double) 1 / 3) {
-				healthColor = NamedTextColor.GOLD;
-			} else {
-				healthColor = NamedTextColor.RED;
-			}
-			output = output.append(Component.text((int) remainingHealth, healthColor).append(Component.text("/" + (int) initialHealth + " HP", NamedTextColor.GRAY)));
 		} else if (remainingDuration > 0) {
 			output = output.append(Component.text(remainingDuration / 20 + "s", NamedTextColor.GREEN));
 		} else if (remainingCooldown > 0) {
@@ -259,6 +249,6 @@ public class AbilityHotbar {
 	private static boolean shouldHandleAbility(Player player, Ability ability) {
 		return ability != null
 			&& (ability.getInfo().getBaseCooldown(player, ability.getAbilityScore()) > 0 || (ability instanceof AbilityWithChargesOrStacks && ((AbilityWithChargesOrStacks) ability).getMaxCharges() > 0)
-			|| ability instanceof AlchemicalArtillery); // these are passives with modes
+			|| ability instanceof AbilityWithCustomDisplay); // these are passives with special displays
 	}
 }
