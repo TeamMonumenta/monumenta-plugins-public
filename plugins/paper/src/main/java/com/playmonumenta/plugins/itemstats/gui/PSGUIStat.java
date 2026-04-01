@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.itemstats.gui;
 
+import com.playmonumenta.plugins.itemstats.enchantments.AilmentFragility;
+import com.playmonumenta.plugins.itemstats.enchantments.AilmentProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Aptitude;
 import com.playmonumenta.plugins.itemstats.enchantments.BlastFragility;
 import com.playmonumenta.plugins.itemstats.enchantments.BlastProtection;
@@ -67,7 +69,7 @@ enum PSGUIStat {
 	FIRE_DAMAGE_TAKEN("Fire", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(new FireProtection(), new FireFragility()), false, Formatting.DR_CHANGE_FORMAT),
 	FALL_DAMAGE_TAKEN("Fall", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(new FeatherFalling(), new FallFragility())
 		* Pennate.getFallDamageResistance(stats.getInfusion(InfusionType.PENNATE)), false, Formatting.DR_CHANGE_FORMAT),
-	AILMENT_DAMAGE_TAKEN("Ailment", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(null, null), false, Formatting.DR_CHANGE_FORMAT),
+	AILMENT_DAMAGE_TAKEN("Ailment", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(new AilmentProtection(), new AilmentFragility()), false, Formatting.DR_CHANGE_FORMAT),
 
 	// These stats are effective damage taken, but get displayed as effective damage reduction
 	EFFECTIVE_MELEE_DAMAGE_TAKEN("Melee", Formatting.ONE_MINUS_PERCENT, stats -> MELEE_DAMAGE_TAKEN.get(stats) * 20.0 / HEALTH.get(stats), false, Formatting.DR_CHANGE_FORMAT),
