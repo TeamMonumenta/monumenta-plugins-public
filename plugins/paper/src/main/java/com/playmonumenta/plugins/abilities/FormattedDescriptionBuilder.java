@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.DescriptionUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +57,7 @@ public class FormattedDescriptionBuilder<T extends Ability> extends DescriptionB
 	private final List<Style> ARROW_COLORS = List.of(ALCHEMIST_ARROW, CLERIC_ARROW, MAGE_ARROW, ROGUE_ARROW, SCOUT_ARROW, SHAMAN_ARROW, WARLOCK_ARROW, WARRIOR_ARROW);
 
 	private final int mDescriptionLevel;
+	private @Nullable Style mArrowColor = null;
 
 	public FormattedDescriptionBuilder() {
 		this(() -> null);
@@ -68,6 +70,11 @@ public class FormattedDescriptionBuilder<T extends Ability> extends DescriptionB
 	public FormattedDescriptionBuilder(Supplier<AbilityInfo<T>> info, int level) {
 		super(info);
 		mDescriptionLevel = level;
+	}
+
+	public FormattedDescriptionBuilder<T> arrowColor(Style color) {
+		mArrowColor = color;
+		return this;
 	}
 
 	@Override
@@ -481,6 +488,10 @@ public class FormattedDescriptionBuilder<T extends Ability> extends DescriptionB
 		});
 	}
 
+	public FormattedDescriptionBuilder<T> styles(Style... styles) {
+		return styles(Arrays.stream(styles).toList());
+	}
+
 	/**
 	 * Applies styles to sections of the component bounded by asterisks.
 	 * The number of styles should correspond to the number of asterisk-bounded sections in the component.
@@ -488,7 +499,7 @@ public class FormattedDescriptionBuilder<T extends Ability> extends DescriptionB
 	 * @param styles the list of styles to apply to sections bounded by asterisks.
 	 * @return a Component with styles applied
 	 */
-	public FormattedDescriptionBuilder<T> styles(Style... styles) {
+	public FormattedDescriptionBuilder<T> styles(List<Style> styles) {
 		if (mDescriptions.isEmpty()) {
 			throw new IllegalStateException("No descriptions to apply styles to!");
 		}
@@ -534,6 +545,10 @@ public class FormattedDescriptionBuilder<T extends Ability> extends DescriptionB
 	}
 
 	private Style getArrowColor() {
+		if (mArrowColor != null) {
+			return mArrowColor;
+		}
+
 		AbilityInfo<T> ability = mInfo.get();
 
 		if (ability == null) {

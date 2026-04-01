@@ -414,6 +414,10 @@ public class DamageEvent extends Event implements Cancellable {
 		recalculateDamage();
 	}
 
+	public boolean getIsCrit() {
+		return mIsCrit;
+	}
+
 	private double critModifier() {
 		return mIsCrit ? 1.5 : 1;
 	}

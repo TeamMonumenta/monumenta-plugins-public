@@ -26,6 +26,7 @@ public class ZoneUtils {
 		BROOMSTICK_ENABLED("Broomstick Enabled"),
 		CAN_DEPOSIT_INTO_POTS("Can Deposit Into Pots"),
 		CAN_SHOOT_POTS("Can Shoot Pots"),
+		COALRUPTED_SNOW_PERKS("Coalrupted Snow Point Perks"),
 		CONDUIT_POWER_WATER("Conduit Power Water"),
 		DISABLE_CUSTOM_TRADE_GUI("Disable Custom Trade GUI"),
 		DISABLE_GRAVES("Disable Graves"),

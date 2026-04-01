@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.guis.HuntsInfusionGUI;
 import com.playmonumenta.plugins.guis.IchorSelectionGUI;
 import com.playmonumenta.plugins.guis.MusicGui;
 import com.playmonumenta.plugins.guis.SKRInfusionGUI;
+import com.playmonumenta.plugins.guis.SnowPerkGui;
 import com.playmonumenta.plugins.guis.SpiritArcheryGUI;
 import com.playmonumenta.plugins.guis.classselection.ClassSelectionGui;
 import com.playmonumenta.plugins.guis.peb.PebGui;
@@ -488,6 +489,24 @@ public class CustomInventoryCommands {
 				QuiverListener.refundDelveMaterials(
 					args.getUnchecked("player"),
 					args.getOrDefaultUnchecked("refundStack", false));
+			})
+			.register();
+		new CommandAPICommand("snowperkgui")
+			.withPermission("monumenta.command.snowperkgui")
+			.executesPlayer((player, args) -> {
+				new SnowPerkGui(player).open();
+			})
+			.register();
+		new CommandAPICommand("snowperkgui")
+			.withPermission("monumenta.command.snowperkgui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = args.getUnchecked("player");
+				Player viewer = player;
+				if (sender instanceof Player playerSender) {
+					viewer = playerSender;
+				}
+				new SnowPerkGui(viewer).open();
 			})
 			.register();
 	}

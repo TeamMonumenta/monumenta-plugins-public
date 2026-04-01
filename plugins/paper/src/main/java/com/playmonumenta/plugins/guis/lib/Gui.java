@@ -116,7 +116,7 @@ public abstract class Gui implements InventoryHolder {
 	 * and opens the updated inventory for the player if necessary.
 	 * </p>
 	 */
-	void update() {
+	protected void update() {
 		if (mInventory == null || !mIsDirty) {
 			return;
 		}

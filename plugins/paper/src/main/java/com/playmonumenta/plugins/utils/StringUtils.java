@@ -528,4 +528,25 @@ public class StringUtils {
 		}
 	}
 
+	public static String smallCaps(String text) {
+		String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		String smallCapsAlphabet = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀѕᴛᴜᴠᴡxʏᴢ";
+
+		text = text.toUpperCase(Locale.getDefault());
+
+		StringBuilder result = new StringBuilder();
+		for (int i = 0; i < text.length(); i++) {
+			char character = text.charAt(i);
+			int index = alphabet.indexOf(character);
+
+			if (index != -1) {
+				result.append(smallCapsAlphabet.charAt(index));
+			} else {
+				result.append(character);
+			}
+		}
+
+		return result.toString();
+	}
+
 }

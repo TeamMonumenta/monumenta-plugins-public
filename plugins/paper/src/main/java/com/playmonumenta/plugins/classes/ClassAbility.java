@@ -296,6 +296,11 @@ public enum ClassAbility {
 	SOLAR_RAY("Solar Ray"),
 	REBIRTH("Rebirth"),
 
+	// Coalrupted Sierhaven Snow Perks
+	SNOW_LEOPARD_CLAW("Snow Leopard Claw"),
+	SNOWY_OWL_FEATHER("Snowy Owl Feather"),
+	ICICLE_BURST("Icicle Burst"),
+
 	// Fake class abilities for some enchantments
 	// Used to trigger other events
 	ERUPTION("Eruption", true),

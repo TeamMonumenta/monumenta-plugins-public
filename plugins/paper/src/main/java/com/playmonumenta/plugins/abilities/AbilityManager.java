@@ -161,6 +161,7 @@ import com.playmonumenta.plugins.events.EffectTypeApplyFromPotionEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.gallery.GalleryManager;
+import com.playmonumenta.plugins.guis.SnowPerkGui;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -278,6 +279,10 @@ public class AbilityManager {
 				mDisabledSpecAbilities.addAll(getSpecOverworldAbilities());
 			}
 			mReferenceAbilities.addAll(getUltimateOverworldAbilities());
+		}
+
+		if (ServerProperties.getShardName().contains("valley") || ServerProperties.getShardName().contains("dev")) {
+			mReferenceAbilities.addAll(SnowPerkGui.PERKS);
 		}
 
 		mReferenceAbilities.sort(Comparator.comparingDouble(AbilityInfo::getPriorityAmount));

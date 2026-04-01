@@ -14,7 +14,7 @@ public class DescriptionUtils {
 	public static final Style WHITE = Style.style(TextColor.color(0xF2F0EF));
 	public static final Style LIGHT_GREY = Style.style(TextColor.color(0xC9C9C9));
 	public static final Style GREY = Style.style(TextColor.color(0x999999));
-	public static final Style DARK_GREY = Style.style(TextColor.color(0x404040));
+	public static final Style DARK_GREY = Style.style(TextColor.color(0x424242));
 	public static final Style BLACK = Style.style(TextColor.color(0x303030));
 	public static final Style RED = Style.style(TextColor.color(0xFF4040));
 	public static final Style GOLD = Style.style(TextColor.color(0xFFAA00));
@@ -22,6 +22,7 @@ public class DescriptionUtils {
 
 	public static final Style UNDERLINED = Style.style(TextDecoration.UNDERLINED);
 	public static final Style DISABLED = DARK_GREY.decorate(TextDecoration.STRIKETHROUGH);
+	public static final Style OBFUSCATED = DARK_GREY.decorate(TextDecoration.OBFUSCATED);
 	public static final Style REGION_SCALED = Style.style(TextColor.color(0x99DDFF));
 
 	public static final Style TRIGGER_LABEL = Style.style(TextColor.color(0xEDA73D));
@@ -96,8 +97,8 @@ public class DescriptionUtils {
 			pixelWidth += switch (character) {
 				case '\n' -> 0;
 				case '.', ',', ':', '\'', 'i', '!' -> 2;
-				case 'l' -> 3;
-				case ' ', '(', ')', '[', ']', 't', 'I' -> 4;
+				case '·', 'l' -> 3;
+				case ' ', '•', '(', ')', '[', ']', 't', 'I' -> 4;
 				case 'f', 'k' -> 5;
 				case '▶' -> 7;
 				case '→', '–' -> 8;

@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT>> {
@@ -219,6 +220,13 @@ public abstract class AbstractPartialParticle<SelfT extends AbstractPartialParti
 		mDeltaX = deltaX;
 		mDeltaY = deltaY;
 		mDeltaZ = deltaZ;
+		return getSelf();
+	}
+
+	public SelfT delta(Vector delta) {
+		mDeltaX = delta.getX();
+		mDeltaY = delta.getY();
+		mDeltaZ = delta.getZ();
 		return getSelf();
 	}
 
