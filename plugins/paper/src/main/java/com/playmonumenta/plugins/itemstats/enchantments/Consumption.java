@@ -8,7 +8,7 @@ public class Consumption implements Enchantment {
 
 	@Override
 	public @NotNull String getName() {
-		return "Consumption";
+		return "Consumable";
 	}
 
 	@Override

@@ -101,7 +101,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		addItems(DelveInfusionSelection.CELESTIAL, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Celestial.DAMAGE_BONUS_PER_LEVEL * i) + "% additional damage" + perLevel + " to mobs that are at a higher elevation than you.");
 		addItems(DelveInfusionSelection.FERVOR, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Fervor.PERCENT_DAMAGE_PER_LEVEL * i) + "% additional damage" + perLevel + " for 3s after gaining a buff that lasts at least 5s.");
 		addItems(DelveInfusionSelection.STURDY, (i, perLevel) -> "Reduces the duration shields are stunned for by " + StringUtils.multiplierToPercentageWithSign(Sturdy.CDR_PER_LEVEL * i) + perLevel + ".");
-		addItems(DelveInfusionSelection.CELERITY, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentageWithSign(Celerity.SPEED_BONUS * i) + " Speed if there are no hostile mobs within an 18 block radius.");
+		addItems(DelveInfusionSelection.CELERITY, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentageWithSign(Celerity.SPEED_BONUS * i) + " Speed unless you've taken or dealt damage within the last 5s.");
 		addItems(DelveInfusionSelection.ORBITAL, (i, perLevel) -> "Gain " + StringUtils.multiplierToPercentage(Orbital.DAMAGE_REDUCTION_PER_LEVEL * i) + "% Damage Reduction" + perLevel + " against aerial mobs and knocks them downward.");
 
 		mInvalidItems = Stream.of("helmet", "chestplate", "leggings", "boots", "main hand", "off hand")

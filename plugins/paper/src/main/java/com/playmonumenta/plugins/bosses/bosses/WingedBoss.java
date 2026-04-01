@@ -303,6 +303,27 @@ public final class WingedBoss extends BossAbilityGroup {
 		boolean differentHalves = false;
 		if (im instanceof BannerMeta bannerMeta) {
 			switch (pattern) {
+				case 6:
+					differentHalves = true;
+					// Left half
+					banner = new ItemStack(Material.WHITE_BANNER);
+					bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.TRIANGLE_TOP));
+					bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.FLOWER));
+					bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_CENTER));
+					bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.CURLY_BORDER));
+					bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.TRIANGLES_BOTTOM));
+					bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.FLOWER));
+					// Right half
+					banner1 = new ItemStack(Material.WHITE_BANNER);
+					if (im1 instanceof BannerMeta bannerMeta1) {
+						bannerMeta1.addPattern(new Pattern(DyeColor.BLACK, PatternType.TRIANGLE_TOP));
+						bannerMeta1.addPattern(new Pattern(DyeColor.BLACK, PatternType.FLOWER));
+						bannerMeta1.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_CENTER));
+						bannerMeta1.addPattern(new Pattern(DyeColor.WHITE, PatternType.CURLY_BORDER));
+						bannerMeta1.addPattern(new Pattern(DyeColor.WHITE, PatternType.TRIANGLES_BOTTOM));
+						bannerMeta1.addPattern(new Pattern(DyeColor.BLACK, PatternType.FLOWER));
+					}
+					break;
 				case 5:
 					differentHalves = true;
 					// Left half
