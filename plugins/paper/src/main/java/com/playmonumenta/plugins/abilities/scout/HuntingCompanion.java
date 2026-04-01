@@ -46,6 +46,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Strider;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -254,6 +256,18 @@ public class HuntingCompanion extends Ability {
 		) {
 			mWasInLava = Bukkit.getCurrentTick();
 			attemptPounce(mPlayer, mPlayer, false);
+		}
+	}
+
+	@Override
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		clearSummons();
+	}
+
+	@Override
+	public void playerTeleportEvent(PlayerTeleportEvent event) {
+		if (event.getFrom().getWorld() != event.getTo().getWorld()) {
+			clearSummons();
 		}
 	}
 
