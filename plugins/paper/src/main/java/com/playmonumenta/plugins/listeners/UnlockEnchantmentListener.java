@@ -24,6 +24,7 @@ public class UnlockEnchantmentListener implements Listener {
 		"monumenta:handbook/enchantments/curses",
 		"monumenta:handbook/enchantments/defenses",
 		"monumenta:handbook/enchantments/delve_infusions",
+		"monumenta:handbook/enchantments/event",
 		"monumenta:handbook/enchantments/infusions",
 		"monumenta:handbook/enchantments/passiveeffects",
 		"monumenta:handbook/enchantments/ranged",

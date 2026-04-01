@@ -56,6 +56,9 @@ public class SeasonalEventListener implements Listener {
 			} else if (mission.mType == MissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.DEPTHS) && roomNumber >= 30) {
 				// Content matches up - award points
 				SeasonalEventManager.addMissionProgress(p, mission, 1);
+			} else if (mission.mType == MissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.WEEKLY2) && roomNumber >= 120) {
+				// temporary for Week 13 of Blackroot Pass Redux
+				SeasonalEventManager.addMissionProgress(p, mission, 1);
 			}
 		}
 	}

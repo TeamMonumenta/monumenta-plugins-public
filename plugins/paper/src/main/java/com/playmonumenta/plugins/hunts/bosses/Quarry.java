@@ -392,6 +392,10 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 			addLeaderboardScore(player, GENERAL_UNSPOILED_WINS_SCOREBOARD);
 			addLeaderboardScore(player, getUnspoiledWinsScoreboard());
 			Bukkit.getPluginManager().callEvent(new MonumentaEvent(player, "huntsunspoiled"));
+			if (mQuarryType == HuntsManager.QuarryType.SPOROUS_AMALGAM) {
+				// Temporary completion for a week 7 mission in Blackroot Redux pass
+				Bukkit.getPluginManager().callEvent(new MonumentaEvent(player, "weekly1"));
+			}
 			AdvancementUtils.grantAdvancement(player, getAdvancementUnspoiled());
 			if (ScoreboardUtils.getScoreboardValue(player, getUnspoiledWinsScoreboard()).orElse(0) == 1) {
 				player.addScoreboardTag(getQuestTag());
@@ -403,6 +407,10 @@ public abstract class Quarry extends SerializedLocationBossAbilityGroup {
 			InventoryUtils.giveItemWithWarningAfterDelay(player, spoiledChest.clone());
 			player.sendMessage(Component.text(mQuarryType.getName() + " has been slain, but you were only able to gather a portion of the loot.", mQuarryType.getColor()));
 			Bukkit.getPluginManager().callEvent(new MonumentaEvent(player, "huntsspoiled"));
+			if (mQuarryType == HuntsManager.QuarryType.SPOROUS_AMALGAM) {
+				// Temporary completion for a week 7 mission in Blackroot Redux pass
+				Bukkit.getPluginManager().callEvent(new MonumentaEvent(player, "weekly1"));
+			}
 		}
 
 		List<Player> noRewardsPlayers = PlayerUtils.playersInRange(mSpawnLoc, mRadiusOuter, true);
