@@ -240,6 +240,10 @@ public class CooldownTimers {
 		updateCooldowns(player.getUniqueId(), player, s -> s != spell, (c, s) -> c.getRemaining() - ticks, true);
 	}
 
+	public void refreshCurrentCooldowns(Player player) {
+		updateCooldowns(player.getUniqueId(), player, s -> true, (c, s) -> 0, true);
+	}
+
 	public void removeAllCooldowns(Player player) {
 		Map<ClassAbility, List<Cooldown>> cds = mTimers.remove(player.getUniqueId());
 		if (cds != null) {
