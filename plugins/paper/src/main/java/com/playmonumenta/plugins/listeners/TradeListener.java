@@ -173,7 +173,7 @@ public class TradeListener implements Listener {
 			for (ItemStack playerItem : player.getInventory().getContents()) {
 				if (playerItem == null
 					|| playerItem.getType() == Material.AIR
-					|| playerItem.isSimilar(source)
+					|| !ItemUtils.getPlainName(playerItem).equals(ItemUtils.getPlainName(source))
 					|| createdTrades.stream().anyMatch(t -> t.isSimilar(playerItem))
 					|| !ItemStatUtils.hasAssignedWorld(playerItem)) {
 					continue;
