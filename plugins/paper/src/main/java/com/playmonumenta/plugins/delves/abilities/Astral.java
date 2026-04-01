@@ -106,7 +106,7 @@ public class Astral {
 	}
 
 	public static void applyModifiers(Chest chest, int level) {
-		if (level == 0 || ZoneUtils.hasZoneProperty(chest.getLocation(), ZoneUtils.ZoneProperty.LOOTROOM)) {
+		if (level == 0 || ZoneUtils.hasZoneProperty(chest.getLocation(), ZoneUtils.ZoneProperty.SAFE_FROM_MOB_TARGETING)) {
 			return;
 		}
 		if (!chest.getPersistentDataContainer().has(CHEST_CHECKED_PERSISTENT_DATA_KEY)) {

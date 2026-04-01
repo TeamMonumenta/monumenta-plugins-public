@@ -77,6 +77,7 @@ public class ZoneUtils {
 		RAISE_GRAVE_ABOVE_ZONE("Raise Grave Above Zone"),
 		RESIST_5("Resistance V"),
 		RESTRICTED("Restricted"),
+		SAFE_FROM_MOB_TARGETING("Safe From Mob Targeting"),
 		SATURATION_2("Saturation II"),
 		SHOPS_POSSIBLE("Shops Possible"),
 		SPECTATE_AVAILABLE("Spectate Available"),
