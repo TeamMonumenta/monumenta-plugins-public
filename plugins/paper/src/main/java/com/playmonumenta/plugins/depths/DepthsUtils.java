@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.depths.abilities.frostborn.Avalanche;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType;
 import com.playmonumenta.plugins.depths.rooms.DepthsRoomType.DepthsRewardType;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -12,6 +13,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BlockUtils;
@@ -25,9 +27,9 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,6 +40,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -202,8 +205,8 @@ public class DepthsUtils {
 		//Check if the location is already active in the system
 		if (frostActive.get(l) != null) {
 
+			frostActive.get(l).mRemainingTicks = ticks;
 			if (!useSnow && l.getBlock().getType() == SNOW_MATERIAL) {
-				frostActive.get(l).mRemainingTicks = ticks;
 				l.getBlock().setType(ICE_MATERIAL);
 			}
 			if (!useSnow && frostActive.get(l).mIsVirtual && canFreeze(l.getBlock(), false)) {
@@ -249,17 +252,26 @@ public class DepthsUtils {
 			@Override
 			public void run() {
 
-				Iterator<Map.Entry<Location, FrozenTerrainData>> iterator = frostActive.entrySet().iterator();
-				while (iterator.hasNext()) {
-					Map.Entry<Location, FrozenTerrainData> kvp = iterator.next();
+				List<Location> sortedKeys = frostActive
+					.keySet()
+					.stream()
+					.sorted(Comparator.comparingDouble(Location::getY).reversed())
+					.toList();
 
-					kvp.getValue().mRemainingTicks -= 1;
-					if (kvp.getValue().mRemainingTicks <= 0) {
-						if (!kvp.getValue().mIsVirtual && kvp.getKey().isChunkLoaded()) {
-							Block b = kvp.getKey().getBlock();
-							b.setBlockData(kvp.getValue().mBlockData);
+				for (Location key : sortedKeys) {
+					if (!frostActive.containsKey(key)) {
+						continue;
+					}
+
+					frostActive.get(key).mRemainingTicks -= 1;
+					if (frostActive.get(key).mRemainingTicks <= 0) {
+
+						if (!frostActive.get(key).mIsVirtual && key.isChunkLoaded()) {
+							Block b = key.getBlock();
+							b.setBlockData(frostActive.get(key).mBlockData);
+							new PartialParticle(Particle.REDSTONE, key.clone().add(0, 0.1, 0), 1, 0.2, 0.3, 0.2, Avalanche.ICE_PARTICLE_COLOR).spawnFull();
 						}
-						iterator.remove();
+						frostActive.remove(key);
 					}
 				}
 
@@ -409,7 +421,7 @@ public class DepthsUtils {
 					LIGHT_GRAY_CARPET, LIME_CARPET, MAGENTA_CARPET, ORANGE_CARPET, PINK_CARPET, PURPLE_CARPET, WHITE_CARPET,
 					YELLOW_CARPET, MOSS_CARPET,
 					//Misc that's also considered collidable
-					LIGHT, SCULK_VEIN
+					LIGHT, SCULK_VEIN, SNOW
 				-> true;
 			default -> !mat.isCollidable();
 		};

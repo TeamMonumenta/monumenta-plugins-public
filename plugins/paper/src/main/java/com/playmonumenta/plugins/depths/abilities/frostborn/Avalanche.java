@@ -44,7 +44,7 @@ public class Avalanche extends DepthsAbility {
 	public static final double SLOW_MODIFIER = 1;
 	public static final int RADIUS = 8;
 	public static final int NUM_PULSES = 4;
-	private static final Particle.DustOptions ICE_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(200, 225, 255), 1.0f);
+	public static final Particle.DustOptions ICE_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(200, 225, 255), 1.0f);
 
 	public static final String CHARM_COOLDOWN = "Avalanche Cooldown";
 
@@ -96,7 +96,7 @@ public class Avalanche extends DepthsAbility {
 				mIceToBreak = getNearbyIce(loc, mRadius * (mPulses + 1) / NUM_PULSES);
 				mHitMobs.clear();
 				for (Location l : mIceToBreak) {
-					Location aboveLoc = l.clone().add(0.5, 1, 0.5);
+					Location aboveLoc = l.clone().add(0.5, 0.25, 0.5);
 
 					//Damage and root mobs
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(aboveLoc, 1.5, 5.0, 1.5)) {
@@ -108,8 +108,8 @@ public class Avalanche extends DepthsAbility {
 						}
 					}
 
-					new PartialParticle(Particle.REDSTONE, aboveLoc.clone().add(0, 0.25, 0), 3, 0.3, 0.3, 0.3, ICE_PARTICLE_COLOR).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.BLOCK_CRACK, aboveLoc.clone().add(0, 0.25, 0), 3, 0.3, 0.3, 0.3, 0, Material.ICE.createBlockData()).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, aboveLoc, 3, 0.3, 0.3, 0.3, ICE_PARTICLE_COLOR).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.BLOCK_CRACK, aboveLoc, 3, 0.3, 0.3, 0.3, 0, Material.ICE.createBlockData()).spawnAsPlayerActive(mPlayer);
 				}
 
 				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0f, 1.5f);
@@ -121,9 +121,9 @@ public class Avalanche extends DepthsAbility {
 					for (Location l : mIceToBreak) {
 						DepthsUtils.unfreezeGround(l);
 
-						Location aboveLoc = l.clone().add(0.5, 1, 0.5);
-						new PartialParticle(Particle.REDSTONE, aboveLoc.clone().add(0, 0.6, 0), 7, 0.3, 0.5, 0.3, ICE_PARTICLE_COLOR).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.BLOCK_CRACK, aboveLoc.clone().add(0, 0.6, 0), 7, 0.3, 0.5, 0.3, 0, Material.ICE.createBlockData()).spawnAsPlayerActive(mPlayer);
+						Location aboveLoc = l.clone().add(0.5, 0.25, 0.5);
+						new PartialParticle(Particle.REDSTONE, aboveLoc, 7, 0.3, 0.5, 0.3, ICE_PARTICLE_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.BLOCK_CRACK, aboveLoc, 7, 0.3, 0.5, 0.3, 0, Material.ICE.createBlockData()).spawnAsPlayerActive(mPlayer);
 					}
 
 					ParticleUtils.drawParticleCircleExplosion(mPlayer, mPlayer.getLocation(), 0, 1, -mPlayer.getLocation().getYaw(), -mPlayer.getLocation().getPitch(), 125,

@@ -110,9 +110,9 @@ public class FrigidCombos extends DepthsAbility {
 			for (Location l : iceToBreak) {
 				DepthsUtils.unfreezeGround(l);
 
-				Location aboveLoc = l.clone().add(0.5, 1, 0.5);
-				new PartialParticle(Particle.CLOUD, aboveLoc.clone().add(0, 0.25, 0), 8, 0.3, 0.3, 0.3, 0).spawnAsPlayerActive(player);
-				new PartialParticle(Particle.BLOCK_CRACK, aboveLoc.clone().add(0, 0.25, 0), 8, 0.3, 0.3, 0.3, 0, Material.ICE.createBlockData()).spawnAsPlayerActive(player);
+				Location aboveLoc = l.clone().add(0.5, 0.25, 0.5);
+				new PartialParticle(Particle.CLOUD, aboveLoc, 8, 0.3, 0.3, 0.3, 0).spawnAsPlayerActive(player);
+				new PartialParticle(Particle.BLOCK_CRACK, aboveLoc, 8, 0.3, 0.3, 0.3, 0, Material.ICE.createBlockData()).spawnAsPlayerActive(player);
 			}
 
 			new PartialParticle(Particle.EXPLOSION_LARGE, LocationUtils.getHalfHeightLocation(enemy), 1, 0, 0, 0, 0.2).spawnAsPlayerActive(player);
