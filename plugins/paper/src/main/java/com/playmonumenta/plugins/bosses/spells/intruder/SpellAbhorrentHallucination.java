@@ -89,7 +89,7 @@ public class SpellAbhorrentHallucination extends Spell {
 					mChargeUpManager.remove();
 					new PartialParticle(Particle.FLASH, spawnLocation).minimumCount(1).spawnAsBoss();
 
-					mAbhorrenthallucination = (LivingEntity) Objects.requireNonNull(LibraryOfSoulsIntegration.summon(spawnLocation, "AbhorrentHallucination"));
+					mAbhorrenthallucination = (LivingEntity) Objects.requireNonNull(LibraryOfSoulsIntegration.summon(spawnLocation, "BrilliantHallucination"));
 					EntityUtils.setRemoveEntityOnUnload(mAbhorrenthallucination);
 					BossManager.getInstance().manuallyRegisterBoss(mAbhorrenthallucination, new AbhorrentHallucinationBoss(mPlugin, mAbhorrenthallucination, mCenter, mBosses.subList(mCastCount * 3, mCastCount * 3 + 3)));
 					mCastCount++;
