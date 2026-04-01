@@ -869,6 +869,9 @@ public class Plugin extends JavaPlugin {
 
 		Bukkit.getPluginManager().registerEvents(MinigameManager.getInstance(), this);
 		MiniGameCommands.register();
+
+		// April Fools
+		manager.registerEvents(new AprilFoolsLockedContainers(), this);
 	}
 
 	//  Logic that is performed upon disabling the plugin.

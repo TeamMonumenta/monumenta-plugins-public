@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelveLootTableGroup;
+import com.playmonumenta.plugins.listeners.AprilFoolsLockedContainers;
 import com.playmonumenta.plugins.listeners.LootingLimiter;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ChestUtils;
@@ -132,6 +133,11 @@ public class ChestOverride extends BaseOverride {
 				if (player.isSneaking()) {
 					return false;
 				}
+
+				if (AprilFoolsLockedContainers.handleEvent(event)) {
+					return false;
+				}
+
 				Component name = chest.customName();
 				player.sendActionBar(Component.translatable("container.isLocked", name != null ? name : Component.translatable("container.chest")));
 				player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1, 1);

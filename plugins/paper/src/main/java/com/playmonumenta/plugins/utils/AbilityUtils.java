@@ -298,6 +298,16 @@ public class AbilityUtils {
 		};
 	}
 
+	public static @Nullable PlayerClass getPlayerClass(Player player) {
+		int classNum = getClassNum(player);
+		for (PlayerClass oneClass : new MonumentaClasses().mClasses) {
+			if (classNum == oneClass.mClass) {
+				return oneClass;
+			}
+		}
+		return null;
+	}
+
 	public static boolean isClassless(Player player) {
 		return getClassNum(player) == 0;
 	}
