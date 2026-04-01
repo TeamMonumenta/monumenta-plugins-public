@@ -305,14 +305,18 @@ public class TABIntegration implements Listener {
 		Boolean swapFriendsAndGuild = bukkitPlayer.hasPermission("monumenta.tablist.swapfriendsandguild");
 		CachedLayout layout = createBaseLayout();
 		layout = calculateLayout(layout, monuPlayer, swapFriendsAndGuild);
-		if (layout.isSameLayout(monuPlayer.mLastLayout)) {
-			return;
-		}
 		final CachedLayout finalLayout = layout;
+		AtomicBoolean shouldSend = new AtomicBoolean(false);
 		mPlayers.computeIfPresent(uuid, (key, value) -> {
-			value.mLastLayout = finalLayout;
+			if (!finalLayout.isSameLayout(value.mLastLayout)) {
+				value.mLastLayout = finalLayout;
+				shouldSend.set(true);
+			}
 			return value;
 		});
+		if (!shouldSend.get()) {
+			return;
+		}
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 			setHeaderAndFooter(viewer, monuPlayer);
 			Objects.requireNonNull(mTab.getLayoutManager()).sendLayout(viewer, finalLayout.toLayout(viewer.getUniqueId()));
