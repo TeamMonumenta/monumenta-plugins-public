@@ -239,14 +239,16 @@ public enum DelvePreset {
 		entry(DelvesModifier.RIFTBORN, 1)
 	)),
 	CYAN(62, "cyan", 100, Material.CYAN_WOOL, Map.ofEntries(
-		entry(DelvesModifier.VENGEANCE, 5),
-		entry(DelvesModifier.INFERNAL, 12),
-		entry(DelvesModifier.PERNICIOUS, 5),
-		entry(DelvesModifier.TWISTED, 5),
+		entry(DelvesModifier.VENGEANCE, 8),
+		entry(DelvesModifier.INFERNAL, 24),
+		entry(DelvesModifier.PERNICIOUS, 10),
+		entry(DelvesModifier.TWISTED, 10),
 		entry(DelvesModifier.LEGIONARY, 7),
 		entry(DelvesModifier.SPECTRAL, 5),
 		entry(DelvesModifier.BLOODTHIRSTY, 6),
-		entry(DelvesModifier.RIFTBORN, 1)
+		entry(DelvesModifier.TRANSCENDENT, 5),
+		entry(DelvesModifier.RIFTBORN, 1),
+		entry(DelvesModifier.CHRONOLOGY, 1)
 	)),
 	PURPLE(63, "purple", 100, Material.PURPLE_WOOL, Map.ofEntries(
 		entry(DelvesModifier.PERNICIOUS, 7),
