@@ -153,7 +153,7 @@ public class WindBombCS implements CosmeticSkill {
 					this.cancel();
 					return;
 				}
-				if (!bomb.isValid()) {
+				if (!bomb.isValid() || bomb.isDead()) {
 					bombHead.remove();
 					this.cancel();
 					return;

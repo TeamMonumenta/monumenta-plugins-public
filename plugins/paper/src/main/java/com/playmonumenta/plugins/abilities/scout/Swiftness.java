@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -78,7 +79,8 @@ public class Swiftness extends Ability {
 				.lookDirections(AbilityTrigger.LookDirection.UP)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_PROJECTILE_WEAPON), null))
 			.remove(Swiftness::removeFlying)
-			.displayItem(Material.RABBIT_FOOT);
+			.displayItem(Material.RABBIT_FOOT)
+			.ignoresSilence(true);
 
 	private final int mJumpBoostLevel;
 	private final double mSpeed;
@@ -228,6 +230,10 @@ public class Swiftness extends Ability {
 	}
 
 	public boolean toggleJumpBoost() {
+		if (EntityUtils.isSilenced(mPlayer)) {
+			return false;
+		}
+
 		if (mJumpBoost) {
 			mJumpBoost = false;
 			mPlayer.addScoreboardTag(NO_JUMP_BOOST_TAG);
@@ -278,7 +284,7 @@ public class Swiftness extends Ability {
 	}
 
 	private boolean canCast() {
-		return !isOnCooldown() && mTotalJumps < MAX_JUMP;
+		return !isOnCooldown() && mTotalJumps < MAX_JUMP && !AbilityUtils.isSilenced(mPlayer);
 	}
 
 	@Override
